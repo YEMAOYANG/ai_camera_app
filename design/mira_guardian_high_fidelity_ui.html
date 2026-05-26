@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mira Guardian 家长端 App 全流程高保真原型</title>
+  <title>Mira Guardian 家长端 App 任务驱动高保真原型</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23101828'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%23ffffff' fill-opacity='.9'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%232563EB'/%3E%3C/svg%3E" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -606,7 +606,7 @@
         </span>
         <div>
           <p class="text-sm font-semibold text-mira-muted">Mira Guardian</p>
-          <h1 class="text-2xl font-semibold leading-tight text-mira-ink">全流程高保真 App 原型</h1>
+          <h1 class="text-2xl font-semibold leading-tight text-mira-ink">任务驱动高保真 App 原型</h1>
         </div>
       </div>
 
@@ -620,7 +620,7 @@
             <span class="pill bg-white text-mira-ink">设备绑定</span>
             <span class="pill bg-white text-mira-ink">孩子档案</span>
             <span class="pill bg-white text-mira-ink">首页</span>
-            <span class="pill bg-white text-mira-ink">流程任务</span>
+            <span class="pill bg-white text-mira-ink">任务模板</span>
             <span class="pill bg-white text-mira-ink">实时看护</span>
             <span class="pill bg-white text-mira-ink">报告积分</span>
             <span class="pill bg-white text-mira-ink">安全隐私</span>
@@ -631,7 +631,7 @@
           <p class="text-sm font-semibold">交互效果</p>
           <ul class="mt-3 space-y-2 text-sm leading-6 text-mira-muted">
             <li>点击态：按钮轻缩放与玻璃高光。</li>
-            <li>流程态：首次使用可以逐步推进。</li>
+            <li>引导态：首次使用可以逐步推进。</li>
             <li>抽屉态：证据确认、隐私提示、通话、奖励审批等。</li>
             <li>反馈态：截图、保存、处理完成会显示 toast。</li>
           </ul>
@@ -691,8 +691,8 @@
       { title: '今日工作台', items: [
         ['home', '首页'], ['care', '协作待办'], ['sleep', '睡眠晨起']
       ]},
-      { title: '流程与任务', items: [
-        ['flow', '一日流程'], ['packing', '带书清单'], ['tasks', '今日任务'], ['taskDetail', '任务详情'], ['focus', '专注计时']
+      { title: '任务与模板', items: [
+        ['flow', '任务模板'], ['packing', '带书清单'], ['tasks', '任务日历'], ['taskDetail', '任务详情'], ['focus', '专注计时']
       ]},
       { title: '看护与事件', items: [
         ['watch', '实时看护'], ['playback', '事件回放'], ['zones', '安全区域'], ['safety', '安全事件'], ['safetyDetail', '事件详情']
@@ -707,7 +707,7 @@
 
     const nav = [
       ['home', 'home', '首页'],
-      ['flow', 'list-checks', '流程'],
+      ['tasks', 'list-checks', '任务'],
       ['watch', 'video', '看护'],
       ['report', 'chart-no-axes-column', '报告'],
       ['settings', 'settings', '设置']
@@ -786,14 +786,14 @@
                 <span class="pill bg-white/70 text-mira-ink">${icon('sparkles', 'h-3.5 w-3.5')}家长端</span>
                 <span class="pill bg-white/70 text-mira-blue">iOS / Android</span>
               </div>
-              <h2 class="mt-16 text-[38px] font-semibold leading-[1.05] text-mira-ink">让家长少催促，孩子更有节奏。</h2>
-              <p class="mt-4 text-[15px] leading-7 text-mira-muted">米拉把摄像头的观察、语音提醒、任务证据和每日报告收进一个安静可靠的 App。</p>
+              <h2 class="mt-16 text-[38px] font-semibold leading-[1.05] text-mira-ink">少盯一点，孩子也能自己动起来。</h2>
+              <p class="mt-4 text-[15px] leading-7 text-mira-muted">米拉把观察、提醒、陪伴、任务证据和每日报告收进一个安静可靠的 App，家长只处理真正需要判断的事。</p>
             </div>
             <div class="solid-card overflow-hidden">
               <img src="${img.room}" alt="儿童学习空间" class="h-48 w-full object-cover" />
               <div class="p-4">
                 <div class="grid grid-cols-3 gap-2">
-                  ${metric('流程', '72%', 'blue')}
+                  ${metric('状态', '正常', 'green')}
                   ${metric('待处理', '2', 'coral')}
                   ${metric('安全', '正常', 'green')}
                 </div>
@@ -871,19 +871,20 @@
           </section>
         `,
         child: `
-          ${header('孩子档案', '让提醒更合适')}
+          ${header('孩子档案', '让任务更合适')}
           <section class="solid-card p-4">
             <label class="block text-sm font-semibold" for="childName">孩子称呼</label>
             <input id="childName" value="小宇" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
-            <div class="mt-4 grid grid-cols-2 gap-3">
-              <button class="tap min-h-[48px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white">小学低年级</button>
-              <button class="tap min-h-[48px] rounded-[18px] bg-white/80 text-sm font-semibold">小学高年级</button>
+            <div class="mt-4 grid grid-cols-3 gap-2">
+              <button class="tap min-h-[48px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white">7 岁</button>
+              <button class="tap min-h-[48px] rounded-[18px] bg-white/80 text-sm font-semibold">小学</button>
+              <button class="tap min-h-[48px] rounded-[18px] bg-white/80 text-sm font-semibold">一年级</button>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-3">
-              ${metric('作息', '21:30 睡', 'blue')}
-              ${metric('任务时长', '25/5', 'green')}
+              ${metric('作息建议', '21:30 睡', 'blue')}
+              ${metric('专注建议', '20/5', 'green')}
             </div>
-            <p class="mt-4 text-xs leading-5 text-mira-muted">性别不是必填项。档案只用于提醒语气、任务时长和安全策略。</p>
+            <div class="mt-4 rounded-[18px] bg-blue-50 p-3 text-xs leading-5 text-blue-800">将按年龄、就读阶段和班级推荐任务模板、提醒话术、积分和奖励建议；性别不是必填项。</div>
           </section>
           <div class="mt-5">${primary('继续命名摄像头', 'name')}</div>
         `,
@@ -913,50 +914,71 @@
           <div class="mt-5">${primary('进入首页', 'home')}</div>
         `,
         home: `
-          ${header('周一 19:42', '小宇今天', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="care" aria-label="待处理">${icon('bell')}</button>`)}
-          <section class="solid-card overflow-hidden">
-            <div class="relative h-60">
-              <img src="${img.study}" alt="孩子在书桌前写作业" class="h-full w-full object-cover" />
-              <div class="absolute left-3 top-3 flex gap-2">
-                <span class="pill bg-black/58 text-white">设备在线</span>
-                <span class="pill bg-white/76 text-mira-green">隐私灯亮起</span>
+          ${header('周一 19:42', '小宇现在', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="care" aria-label="待处理">${icon('bell')}</button>`)}
+          <section class="liquid rounded-[30px] p-5">
+            <div class="flex flex-wrap gap-2">
+              <span class="pill bg-green-50 text-mira-green">${icon('wifi', 'h-3.5 w-3.5')}设备在线</span>
+              <span class="pill bg-white/76 text-mira-blue">${icon('shield-check', 'h-3.5 w-3.5')}隐私灯亮起</span>
+              <span class="pill bg-blue-50 text-mira-blue">小学一年级</span>
+            </div>
+            <h3 class="mt-5 text-[25px] font-semibold leading-tight text-mira-ink">书桌前写作业，状态正常。</h3>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">当前任务是数学作业，第 2 个专注轮次；12 分钟后需要家长确认证据。</p>
+            <div class="mt-5 grid grid-cols-3 gap-2">
+              <div class="rounded-[18px] bg-white/62 p-3">
+                <p class="text-2xl font-semibold text-mira-green">正常</p>
+                <p class="mt-1 text-xs font-semibold text-mira-muted">安全</p>
               </div>
-              <div class="liquid absolute bottom-3 left-3 right-3 rounded-[24px] p-3">
-                <div class="flex items-center justify-between gap-3">
-                  <div>
-                    <p class="text-xs font-semibold text-mira-muted">当前状态</p>
-                    <p class="mt-1 text-xl font-semibold">专注学习 18 分钟</p>
-                  </div>
-                  <span class="pill bg-green-50 text-mira-green">正常</span>
-                </div>
+              <div class="rounded-[18px] bg-white/62 p-3">
+                <p class="text-2xl font-semibold text-mira-blue">12m</p>
+                <p class="mt-1 text-xs font-semibold text-mira-muted">下一步</p>
+              </div>
+              <div class="rounded-[18px] bg-white/62 p-3">
+                <p class="text-2xl font-semibold text-mira-coral">2</p>
+                <p class="mt-1 text-xs font-semibold text-mira-muted">待处理</p>
               </div>
             </div>
-            <div class="grid grid-cols-3 gap-2 p-3">
-              <button class="tap min-h-[48px] rounded-[16px] bg-mira-blue text-sm font-semibold text-white" data-go="watch">看护</button>
-              <button class="tap min-h-[48px] rounded-[16px] bg-slate-100 text-sm font-semibold" data-sheet="call">通话</button>
-              <button class="tap min-h-[48px] rounded-[16px] bg-slate-100 text-sm font-semibold" data-toast="已让摄像头温和提醒">提醒</button>
-            </div>
-          </section>
-          <section class="mt-4 grid grid-cols-3 gap-2">
-            ${metric('流程', '72%', 'blue')}
-            ${metric('任务', '4/6', 'green')}
-            ${metric('待处理', '2', 'coral')}
           </section>
           <section class="glass-card mt-4 p-4">
             <div class="flex items-center justify-between">
-              <p class="text-sm font-semibold">下一项</p>
-              <button class="tap text-sm font-semibold text-mira-blue" data-go="flow">查看流程</button>
+              <div>
+                <p class="text-sm font-semibold">需要你处理</p>
+                <p class="mt-1 text-xs text-mira-muted">避免重复催促，只放真正要家长决策的事</p>
+              </div>
+              <button class="tap text-sm font-semibold text-mira-blue" data-go="care">全部</button>
             </div>
             <div class="mt-3 space-y-2">
-              ${row('book-open-check', '数学作业进行中', '第 2 个专注轮次，剩余 12 分钟', '<span class="text-xs font-semibold text-mira-blue">进行中</span>', 'blue')}
-              ${row('file-check-2', '作业证据待确认', '确认后自动加 5 分', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-go="taskDetail">处理</button>', 'coral')}
+              ${row('file-check-2', '作业证据待确认', '确认后进入日报和积分流水', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-go="taskDetail">处理</button>', 'coral')}
+              ${row('gift', '奖励兑换审批', '小宇申请周末户外活动', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="reward">审批</button>', 'amber')}
+            </div>
+          </section>
+          <section class="solid-card mt-4 p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold">当前任务与下一步</p>
+                <p class="mt-1 text-xs text-mira-muted">只展示现在最影响家长决策的任务</p>
+              </div>
+              <button class="tap text-sm font-semibold text-mira-blue" data-go="tasks">查看</button>
+            </div>
+            <div class="mt-4 space-y-2">
+              ${row('book-open-check', '数学作业进行中', '剩余 12 分钟，结束后自动进入证据确认', '<span class="text-xs font-semibold text-mira-blue">进行中</span>', 'blue')}
+              ${row('moon', '睡前任务 21:10', '洗漱、收书包、上床目标 21:30', '<span class="text-xs font-semibold text-mira-muted">待开始</span>', 'slate')}
             </div>
           </section>
           <section class="mt-4 grid grid-cols-2 gap-3">
+            <button class="tap list-item p-4 text-left" data-go="packing">
+              <span class="pill bg-blue-50 text-mira-blue">${icon('backpack', 'h-3.5 w-3.5')}明日准备</span>
+              <p class="mt-3 text-lg font-semibold">带书清单</p>
+              <p class="mt-1 text-xs text-mira-muted">2 项待确认</p>
+            </button>
             <button class="tap list-item p-4 text-left" data-go="sleep">
-              <span class="pill bg-blue-50 text-mira-blue">${icon('moon', 'h-3.5 w-3.5')}睡眠</span>
-              <p class="mt-3 text-lg font-semibold">21:30 睡前流程</p>
-              <p class="mt-1 text-xs text-mira-muted">剩洗漱和收书包</p>
+              <span class="pill bg-indigo-50 text-mira-blue">${icon('moon', 'h-3.5 w-3.5')}睡眠</span>
+              <p class="mt-3 text-lg font-semibold">21:30 目标</p>
+              <p class="mt-1 text-xs text-mira-muted">睡前任务待开始</p>
+            </button>
+            <button class="tap list-item p-4 text-left" data-go="report">
+              <span class="pill bg-slate-100 text-slate-700">${icon('file-text', 'h-3.5 w-3.5')}日报</span>
+              <p class="mt-3 text-lg font-semibold">今晚 21:45</p>
+              <p class="mt-1 text-xs text-mira-muted">生成今日摘要</p>
             </button>
             <button class="tap list-item p-4 text-left" data-go="points">
               <span class="pill bg-orange-50 text-mira-coral">${icon('star', 'h-3.5 w-3.5')}积分</span>
@@ -986,7 +1008,7 @@
             <div class="flex items-center gap-4">
               <div class="progress-ring relative"><strong class="text-lg">2/4</strong></div>
               <div>
-                <p class="text-lg font-semibold">睡前流程进行中</p>
+                <p class="text-lg font-semibold">睡前任务进行中</p>
                 <p class="mt-2 text-sm leading-6 text-mira-muted">已完成晚饭和整理玩具，待洗漱、收书包。</p>
               </div>
             </div>
@@ -1001,26 +1023,25 @@
           </section>
         `,
         flow: `
-          ${header('上学日模板', '今日一日流程', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-sheet="flowItem" aria-label="添加流程项">${icon('plus')}</button>`)}
-          <section class="solid-card p-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-semibold">放学后流程</p>
-                <p class="mt-1 text-xs text-mira-muted">16:30 - 21:30</p>
-              </div>
-              <span class="pill bg-green-50 text-mira-green">5/8</span>
+          ${header('按档案推荐', '任务模板', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-sheet="task" aria-label="添加任务">${icon('plus')}</button>`)}
+          <section class="liquid rounded-[30px] p-5">
+            <div class="flex flex-wrap gap-2">
+              <span class="pill bg-white/76 text-mira-ink">7 岁</span>
+              <span class="pill bg-blue-50 text-mira-blue">小学一年级</span>
+              <span class="pill bg-green-50 text-mira-green">鼓励式提醒</span>
             </div>
-            <div class="timeline-list mt-4">
-              ${timeline('回家喝水', 'AI 自动确认，置信度 91%', '16:42', 'green')}
-              ${timeline('整理书包', '桌面截图已保存', '17:16', 'green')}
-              ${timeline('数学作业', '第 2 个专注轮次，剩余 12 分钟', '进行中', 'blue', 'taskDetail')}
-              ${timeline('语文背诵', '到点由摄像头语音提醒', '20:10', 'slate')}
-              ${timeline('睡前洗漱', '完成后进入故事时间', '21:10', 'slate')}
-            </div>
+            <h3 class="mt-4 text-2xl font-semibold leading-tight">系统已生成 6 个适龄任务模板。</h3>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">家长可以一键启用、改日期、改积分或改提醒强度。新建任务默认今天，也可以安排到未来日期。</p>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${templateCard('作业自启动', '每天 19:00 · 专注 20 分钟 + 休息 5 分钟', '启用', 'blue')}
+            ${templateCard('阅读 15 分钟', '睡前低刺激任务，完成后只给具体表扬', '已启用', 'green')}
+            ${templateCard('整理书包', '前一晚提醒带书，早晨只复查关键物品', '启用', 'amber')}
+            ${templateCard('睡前任务', '洗漱、收书包、上床目标 21:30', '启用', 'blue')}
           </section>
           <section class="mt-4 grid grid-cols-2 gap-3">
-            <button class="tap list-item p-4 text-left" data-go="packing">${icon('backpack', 'mb-3 h-5 w-5 text-mira-blue')}<p class="font-semibold">带书清单</p><p class="mt-1 text-xs text-mira-muted">明天 2 项待确认</p></button>
-            <button class="tap list-item p-4 text-left" data-sheet="flowItem">${icon('calendar-clock', 'mb-3 h-5 w-5 text-mira-coral')}<p class="font-semibold">临时调整</p><p class="mt-1 text-xs text-mira-muted">延后、跳过、完成</p></button>
+            <button class="tap list-item p-4 text-left" data-go="packing">${icon('backpack', 'mb-3 h-5 w-5 text-mira-blue')}<p class="font-semibold">带书清单</p><p class="mt-1 text-xs text-mira-muted">由任务和课程表生成</p></button>
+            <button class="tap list-item p-4 text-left" data-go="reward">${icon('gift', 'mb-3 h-5 w-5 text-mira-coral')}<p class="font-semibold">奖励建议</p><p class="mt-1 text-xs text-mira-muted">优先表扬和小特权</p></button>
           </section>
         `,
         packing: `
@@ -1033,14 +1054,26 @@
           <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold" data-sheet="packing">${icon('plus', 'h-4 w-4')}添加临时物品</button>
         `,
         tasks: `
-          ${header('任务计划', '今日任务')}
-          <section class="space-y-3">
-            ${taskCard('数学作业', '学习', '19:00 - 19:40', '进行中', 'blue', 'taskDetail')}
-            ${taskCard('语文背诵', '学习', '20:10 - 20:25', '待开始', 'amber', 'flow')}
-            ${taskCard('整理玩具', '家务', '18:20 已完成', '+3 分', 'green', 'points')}
-            ${taskCard('睡前洗漱', '睡眠', '21:10', '待开始', 'blue', 'sleep')}
+          ${header('任务', '今天', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-sheet="task" aria-label="新建任务">${icon('plus')}</button>`)}
+          <section class="glass-card mb-4 p-2">
+            <div class="grid grid-cols-4 gap-1">
+              <button class="tap min-h-[40px] rounded-[14px] bg-mira-ink text-xs font-semibold text-white">今天</button>
+              <button class="tap min-h-[40px] rounded-[14px] bg-white/70 text-xs font-semibold" data-toast="已切换到明天">明天</button>
+              <button class="tap min-h-[40px] rounded-[14px] bg-white/70 text-xs font-semibold" data-toast="已查看本周">本周</button>
+              <button class="tap min-h-[40px] rounded-[14px] bg-white/70 text-xs font-semibold" data-toast="已打开日历">日历</button>
+            </div>
           </section>
-          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="task">${icon('plus', 'h-4 w-4')}新建任务</button>
+          <section class="space-y-3">
+            ${taskCard('数学作业', '学习', '今天 19:00 - 19:40', '进行中', 'blue', 'taskDetail')}
+            ${taskCard('语文背诵', '学习', '今天 20:10 - 20:25', '待开始', 'amber', 'taskDetail')}
+            ${taskCard('整理玩具', '家务', '今天 18:20 已完成', '+3 分', 'green', 'points')}
+            ${taskCard('睡前洗漱', '睡眠', '今天 21:10', '待开始', 'blue', 'sleep')}
+            ${taskCard('美术材料准备', '带书清单', '周五 07:30', '未来任务', 'amber', 'packing')}
+          </section>
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <button class="tap flex min-h-[50px] items-center justify-center gap-2 rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="task">${icon('plus', 'h-4 w-4')}新建任务</button>
+            <button class="tap flex min-h-[50px] items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold" data-go="flow">${icon('sparkles', 'h-4 w-4')}模板</button>
+          </div>
         `,
         taskDetail: `
           ${header('任务证据', '数学作业')}
@@ -1170,10 +1203,10 @@
           ${header('2026 年 5 月 25 日', '今日报告')}
           <section class="solid-card bg-mira-ink p-5 text-white">
             <p class="text-sm font-semibold text-white/62">今日结论</p>
-            <h3 class="mt-2 text-2xl font-semibold leading-tight">流程完成稳定，作业中有一次短暂离座。</h3>
-            <p class="mt-3 text-sm leading-6 text-white/72">建议明天把语文背诵提前 15 分钟，睡前流程会更从容。</p>
+            <h3 class="mt-2 text-2xl font-semibold leading-tight">任务完成稳定，作业中有一次短暂离座。</h3>
+            <p class="mt-3 text-sm leading-6 text-white/72">建议明天把语文背诵提前 15 分钟，睡前任务会更从容。</p>
             <div class="mt-4 grid grid-cols-3 gap-2">
-              <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">72%</p><p class="mt-1 text-xs text-white/64">流程</p></div>
+              <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">5/6</p><p class="mt-1 text-xs text-white/64">任务</p></div>
               <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">43m</p><p class="mt-1 text-xs text-white/64">专注</p></div>
               <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">+12</p><p class="mt-1 text-xs text-white/64">积分</p></div>
             </div>
@@ -1225,7 +1258,7 @@
                 <p class="mt-2 text-sm leading-6 text-mira-muted">家长可收藏、删除、隐藏或分享到家庭成员，不把孩子失误做公开展示。</p>
               </div>
             </button>
-            ${videoCard('第一次独立完成睡前流程', '周日', img.room, 'blue')}
+            ${videoCard('第一次独立完成睡前任务', '周日', img.room, 'blue')}
             ${videoCard('主动收玩具', '周六', img.table, 'green')}
           </section>
         `,
@@ -1237,6 +1270,7 @@
               <p class="text-[56px] font-semibold leading-none">86</p>
               <button class="tap min-h-[44px] rounded-[16px] bg-mira-ink px-4 text-sm font-semibold text-white" data-go="reward">去兑换</button>
             </div>
+            <p class="mt-3 text-sm leading-6 text-mira-muted">作业自启动连续 5 天稳定，建议下周把积分从 +5 调为 +3，改用具体表扬和周末选择权。</p>
           </section>
           <section class="mt-4 space-y-3">
             ${row('plus', '数学作业确认完成', '+5 分，妈妈确认', '', 'green')}
@@ -1245,7 +1279,21 @@
           </section>
         `,
         reward: `
-          ${header('奖励商店', '兑换审批')}
+          ${header('奖励商店', '模板与审批')}
+          <section class="solid-card mb-4 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold">小学一年级奖励建议</p>
+                <p class="mt-1 text-xs leading-5 text-mira-muted">优先亲子活动、小特权和兴趣支持；物质奖励需要家长设置上限。</p>
+              </div>
+              <span class="pill bg-green-50 text-mira-green">可淡出</span>
+            </div>
+            <div class="mt-3 grid grid-cols-3 gap-2">
+              ${metric('亲子活动', '推荐', 'green')}
+              ${metric('小特权', '适合', 'blue')}
+              ${metric('物质', '限量', 'amber')}
+            </div>
+          </section>
           <section class="space-y-3">
             ${rewardCard('周末户外活动', '30 分', '小宇已申请，等待家长审批', 'reward')}
             ${rewardCard('睡前故事加 10 分钟', '18 分', '仅周五可兑换', 'toast')}
@@ -1316,7 +1364,7 @@
           <section class="space-y-3">
             ${settingRow('安全告警', 'SOS、门口、危险区域和异常声音', true)}
             ${settingRow('任务待确认', '作业证据、打卡素材和奖励审批', true)}
-            ${settingRow('流程提醒', '带书清单、睡前流程、晨起闹铃', true)}
+            ${settingRow('任务提醒', '带书清单、睡前任务、晨起闹铃', true)}
             ${settingRow('普通闲聊摘要', '每天最多一次，不打扰工作时间', false)}
           </section>
           <section class="glass-card mt-4 p-4">
@@ -1327,7 +1375,7 @@
         education: `
           ${header('学习内容', '内容生态入口')}
           <section class="solid-card p-4">
-            ${row('book-open', '课程表导入', '用于生成明日带书和学习任务', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已进入导入流程">导入</button>', 'blue')}
+            ${row('book-open', '课程表导入', '用于生成明日带书和学习任务', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已进入导入设置">导入</button>', 'blue')}
             ${row('graduation-cap', '合作内容', '预留学而思等授权内容入口', '<span class="pill bg-amber-50 text-mira-amber">规划中</span>', 'amber')}
             ${row('brain', '学习缺漏诊断', '长期数据积累后开启', '<span class="pill bg-slate-100 text-slate-700">P2</span>', 'slate')}
           </section>
@@ -1372,7 +1420,7 @@
               <span class="pill bg-blue-50 text-mira-blue">当前版本</span>
             </div>
             <div class="mt-4 space-y-3 text-sm leading-6 text-mira-muted">
-              <p>新增完整一日流程和带书清单。</p>
+              <p>新增任务模板、任务日历和带书清单。</p>
               <p>新增任务证据确认、奖励审批和安全事件处理。</p>
               <p>优化实时看护隐私提示和设备端工作状态展示。</p>
             </div>
@@ -1385,7 +1433,7 @@
         settings: `
           ${header('设置', '家庭与规则')}
           <section class="space-y-3">
-            ${settingsLink('孩子档案', '年龄段、年级、作息偏好', 'child', 'user-round')}
+            ${settingsLink('孩子档案', '当前年龄、就读阶段、班级/年级', 'child', 'user-round')}
             ${settingsLink('设备管理', '在线状态、云台、固件', 'device', 'camera')}
             ${settingsLink('家庭成员', '角色和通知分发', 'family', 'users')}
             ${settingsLink('对话与人设', '唤醒名、声线、聊天边界', 'conversation', 'message-circle')}
@@ -1426,6 +1474,23 @@
             <div>
               <p class="text-base font-semibold">${title}</p>
               <p class="mt-1 text-xs text-mira-muted">${type} · ${time}</p>
+            </div>
+            <span class="pill ${badge}">${status}</span>
+          </div>
+        </button>
+      `;
+    }
+
+    function templateCard(title, desc, status, tone) {
+      const badge = tone === 'green' ? 'bg-green-50 text-mira-green' : tone === 'amber' ? 'bg-amber-50 text-mira-amber' : 'bg-blue-50 text-mira-blue';
+      const action = status === '已启用' ? 'data-toast="已打开模板设置"' : 'data-sheet="task"';
+      return `
+        <button class="tap list-item list-card w-full p-4 text-left" ${action}>
+          <div class="flex items-center gap-3">
+            <span class="grid h-12 w-12 shrink-0 place-items-center rounded-[18px] ${badge}">${icon('sparkles')}</span>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold">${title}</p>
+              <p class="mt-1 text-xs leading-5 text-mira-muted">${desc}</p>
             </div>
             <span class="pill ${badge}">${status}</span>
           </div>
@@ -1528,8 +1593,8 @@
       `,
       flowItem: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
-        <h3 class="text-xl font-semibold">流程项操作</h3>
-        <p class="mt-2 text-sm leading-6 text-mira-muted">对卡住的流程项可以延后、跳过、完成或提醒，所有操作会进入处理记录。</p>
+        <h3 class="text-xl font-semibold">任务操作</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">对卡住的任务可以延后、跳过、完成或提醒，所有操作会进入处理记录。</p>
         <div class="mt-4 grid grid-cols-2 gap-2">
           <button class="tap min-h-[50px] rounded-[18px] bg-mira-blue text-sm font-semibold text-white" data-close data-toast="已延后 10 分钟">延后</button>
           <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已发送语音提醒">提醒</button>
@@ -1549,7 +1614,7 @@
       reward: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
         <h3 class="text-xl font-semibold">审批奖励兑换</h3>
-        <p class="mt-2 text-sm leading-6 text-mira-muted">小宇申请使用 30 分兑换“周末户外活动”。审批后会记录审批人和兑现状态。</p>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">小宇申请使用 30 分兑换“周末户外活动”。审批后会记录审批人和兑现状态；积分不建议随意扣回。</p>
         <div class="mt-4 grid grid-cols-2 gap-2">
           <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已批准兑换">批准</button>
           <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已暂缓兑换">暂缓</button>
@@ -1596,6 +1661,12 @@
         <h3 class="text-xl font-semibold">新建任务</h3>
         <div class="mt-4 space-y-3">
           <input value="英语听读" class="min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+          <div class="grid grid-cols-3 gap-2">
+            <button class="tap min-h-[48px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-toast="默认今天">今天</button>
+            <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已选择明天">明天</button>
+            <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已打开日期选择">未来</button>
+          </div>
+          <button class="tap min-h-[48px] w-full rounded-[18px] bg-blue-50 text-sm font-semibold text-mira-blue" data-toast="已套用小学一年级听读模板">套用任务模板</button>
           <button class="tap min-h-[48px] w-full rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已选择 20 分钟">预计 20 分钟</button>
         </div>
         <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="任务已创建">创建</button>
@@ -1609,8 +1680,9 @@
       `,
       rewardEdit: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
-        <h3 class="text-xl font-semibold">添加奖品</h3>
+        <h3 class="text-xl font-semibold">添加奖励</h3>
         <input value="周末一起骑车" class="mt-4 min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+        <button class="tap mt-3 min-h-[48px] w-full rounded-[18px] bg-orange-50 text-sm font-semibold text-mira-coral" data-toast="已套用亲子活动模板">套用亲子活动模板</button>
         <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="奖品已添加">保存</button>
       `,
       deleteData: `
@@ -1628,7 +1700,7 @@
       feedback: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
         <h3 class="text-xl font-semibold">提交产品反馈</h3>
-        <textarea class="mt-4 min-h-[120px] w-full rounded-[18px] border border-mira-line bg-white/80 p-4 text-sm font-semibold outline-none">希望报告里能单独看睡前流程。</textarea>
+        <textarea class="mt-4 min-h-[120px] w-full rounded-[18px] border border-mira-line bg-white/80 p-4 text-sm font-semibold outline-none">希望报告里能单独看睡前任务。</textarea>
         <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="反馈已提交">提交</button>
       `
     };
@@ -1645,7 +1717,7 @@
 
     function rootTabFor(screen) {
       return ['home', 'care', 'sleep'].includes(screen) ? 'home' :
-        ['flow', 'packing', 'tasks', 'taskDetail', 'focus'].includes(screen) ? 'flow' :
+        ['flow', 'packing', 'tasks', 'taskDetail', 'focus'].includes(screen) ? 'tasks' :
         ['watch', 'playback', 'zones', 'safety', 'safetyDetail'].includes(screen) ? 'watch' :
         ['report', 'weekly', 'moments', 'points', 'reward', 'checkin'].includes(screen) ? 'report' :
         ['settings', 'conversation', 'privacy', 'notifications', 'family', 'device', 'education', 'feedback', 'about', 'version', 'child', 'name', 'contacts'].includes(screen) ? 'settings' : '';
