@@ -1,0 +1,1755 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mira Guardian 家长端 App 全流程高保真原型</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23101828'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%23ffffff' fill-opacity='.9'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%232563EB'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Roboto', 'Segoe UI', 'sans-serif']
+          },
+          colors: {
+            mira: {
+              ink: '#101828',
+              muted: '#667085',
+              soft: '#F6F7F4',
+              line: '#E4E7EC',
+              blue: '#2563EB',
+              green: '#16A34A',
+              coral: '#F97316',
+              amber: '#D97706',
+              red: '#DC2626',
+              violet: '#7C3AED'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * { letter-spacing: 0; }
+    :root {
+      --glass: rgba(248, 250, 252, 0.74);
+      --glass-strong: rgba(255, 255, 255, 0.86);
+      --glass-dark: rgba(15, 23, 42, 0.48);
+      --line: rgba(255, 255, 255, 0.58);
+      --shadow: 0 28px 80px rgba(15, 23, 42, 0.18);
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #101828;
+      background: linear-gradient(180deg, #E4ECF4 0%, #D7E1EA 52%, #E9ECE7 100%);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(255,255,255,0) 42%, rgba(37,99,235,.055));
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(255,255,255,.16), rgba(255,255,255,0) 52%, rgba(16,24,40,.045));
+    }
+    button, a { cursor: pointer; }
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, .35);
+      outline-offset: 2px;
+    }
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.8fr) 460px minmax(300px, 1fr);
+      gap: 28px;
+      align-items: start;
+      width: min(1680px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 28px 0;
+    }
+    .glass-panel,
+    .phone-surface,
+    .glass-card,
+    .bottom-glass,
+    .sheet-panel {
+      border: 1px solid rgba(255, 255, 255, .62);
+      background: var(--glass);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(28px) saturate(175%);
+      -webkit-backdrop-filter: blur(28px) saturate(175%);
+    }
+    .glass-panel {
+      border-radius: 28px;
+      background: rgba(246, 249, 252, .78);
+    }
+    .glass-card { border-radius: 22px; box-shadow: 0 18px 55px rgba(15, 23, 42, .10); }
+    .solid-card {
+      border: 1px solid rgba(16, 24, 40, .08);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 16px 46px rgba(15, 23, 42, .09);
+    }
+    .solid-card:has(.list-item),
+    .glass-card:has(.list-item) {
+      border-color: rgba(255, 255, 255, .62);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.64), rgba(241,246,251,.48)),
+        rgba(246, 249, 252, .62);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.62),
+        0 18px 48px rgba(15, 23, 42, .075);
+      backdrop-filter: blur(24px) saturate(170%);
+      -webkit-backdrop-filter: blur(24px) saturate(170%);
+    }
+    .solid-card:has(> .list-item),
+    .glass-card:has(> .list-item) {
+      display: grid;
+      gap: 10px;
+    }
+    .list-item {
+      position: relative;
+      display: block;
+      overflow: hidden;
+      border: 1px solid rgba(16, 24, 40, .055);
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.82), rgba(248,250,252,.66)),
+        rgba(255,255,255,.68);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.72),
+        0 9px 20px rgba(15,23,42,.045);
+      backdrop-filter: blur(20px) saturate(170%);
+      -webkit-backdrop-filter: blur(20px) saturate(170%);
+    }
+    .list-item::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255,255,255,.72), transparent 36%),
+        linear-gradient(115deg, rgba(255,255,255,.38), transparent 42%, rgba(37,99,235,.055));
+      opacity: .5;
+      pointer-events: none;
+    }
+    .list-item > * {
+      position: relative;
+      z-index: 1;
+    }
+    .list-item.active {
+      border-color: rgba(37, 99, 235, .36);
+      background:
+        linear-gradient(180deg, rgba(239,245,255,.9), rgba(219,231,255,.72)),
+        rgba(37, 99, 235, .14);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.7),
+        0 12px 26px rgba(37,99,235,.12);
+    }
+    .list-item:hover {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.9), rgba(248,250,252,.74)),
+        rgba(255, 255, 255, .78);
+    }
+    .list-row {
+      display: flex !important;
+      min-height: 74px;
+      align-items: center;
+      gap: 12px;
+      padding: 12px !important;
+    }
+    .list-row .row-icon {
+      height: 46px;
+      width: 46px;
+      border-radius: 17px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+    }
+    .list-row .row-copy {
+      min-width: 0;
+      flex: 1;
+    }
+    .list-row .row-title {
+      overflow-wrap: anywhere;
+      font-size: 14px;
+      line-height: 1.35;
+      font-weight: 700;
+      color: #111827;
+    }
+    .list-row .row-desc {
+      margin-top: 3px;
+      overflow-wrap: anywhere;
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 600;
+      color: #667085;
+    }
+    .list-row .row-action {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: flex-end;
+      max-width: 92px;
+    }
+    .list-row .row-action:empty {
+      display: none;
+    }
+    .list-row .row-action .tap {
+      min-height: 34px;
+      white-space: nowrap;
+      box-shadow: 0 6px 14px rgba(15,23,42,.08);
+    }
+    .list-card {
+      min-height: 76px;
+      border-radius: 22px;
+    }
+    .timeline-list {
+      position: relative;
+      display: grid;
+      gap: 0;
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.46);
+      background: rgba(255,255,255,.38);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.56);
+      backdrop-filter: blur(14px) saturate(155%);
+      -webkit-backdrop-filter: blur(14px) saturate(155%);
+    }
+    .timeline-list::before {
+      content: "";
+      position: absolute;
+      left: 20px;
+      top: 28px;
+      bottom: 28px;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(148,163,184,.5) 14%, rgba(148,163,184,.5) 86%, transparent);
+    }
+    .timeline-item {
+      position: relative;
+      display: grid !important;
+      grid-template-columns: 40px minmax(0, 1fr) auto;
+      min-height: 72px;
+      align-items: center;
+      gap: 0;
+      padding: 12px 12px 12px 0 !important;
+      border-radius: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .timeline-item::after {
+      display: none;
+    }
+    .timeline-item + .timeline-item {
+      border-top: 1px solid rgba(148,163,184,.16);
+    }
+    .timeline-item:hover {
+      background: rgba(255,255,255,.34);
+    }
+    .timeline-dot-wrap {
+      display: grid;
+      place-items: center;
+      align-self: stretch;
+      position: relative;
+      z-index: 1;
+    }
+    .timeline-dot {
+      height: 14px;
+      width: 14px;
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,.86);
+      box-shadow: 0 4px 10px rgba(15,23,42,.12);
+    }
+    .timeline-copy {
+      min-width: 0;
+    }
+    .timeline-time {
+      align-self: start;
+      padding-top: 3px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #667085;
+    }
+    .media-list-card {
+      display: flex !important;
+      border-radius: 22px;
+    }
+    .phone-frame {
+      width: 430px;
+      height: 892px;
+      border-radius: 56px;
+      padding: 13px;
+      background: linear-gradient(145deg, #0B0F17, #222936 48%, #0A0D12);
+      box-shadow: 0 42px 100px rgba(10, 13, 18, .35);
+      position: sticky;
+      top: 24px;
+    }
+    .phone-surface {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 43px;
+      background: linear-gradient(180deg, #F7FAFD 0%, #E6EEF5 54%, #F1F3EE 100%);
+    }
+    .phone-surface::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, rgba(255,255,255,.42), rgba(255,255,255,.05) 48%, rgba(37,99,235,.06));
+      pointer-events: none;
+      z-index: 0;
+    }
+    .dynamic-island {
+      position: absolute;
+      top: 11px;
+      left: 50%;
+      z-index: 20;
+      width: 122px;
+      height: 34px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #080B10;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+    }
+    .status-bar {
+      position: absolute;
+      z-index: 12;
+      top: 14px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      justify-content: space-between;
+      color: rgba(16,24,40,.82);
+      font-size: 13px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+    .app-scroll {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 64px 20px 112px;
+      scrollbar-width: none;
+    }
+    .app-scroll::-webkit-scrollbar { display: none; }
+    .bottom-glass {
+      position: absolute;
+      z-index: 25;
+      left: 22px;
+      right: 22px;
+      bottom: 16px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      height: 64px;
+      padding: 7px 8px;
+      border-radius: 25px;
+      border: 1px solid rgba(255,255,255,.68);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.72), rgba(246,249,252,.46)),
+        rgba(248,250,252,.52);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.82),
+        inset 0 -9px 18px rgba(15,23,42,.03),
+        0 16px 36px rgba(15,23,42,.14);
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      overflow: hidden;
+      --active-opacity: 0;
+      --indicator-x: 0px;
+      --indicator-y: 5px;
+      --indicator-width: 68px;
+      --indicator-height: 54px;
+    }
+    .tab-indicator {
+      position: absolute;
+      z-index: 0;
+      left: 0;
+      top: 0;
+      width: var(--indicator-width);
+      height: var(--indicator-height);
+      opacity: var(--active-opacity);
+      transform: translate3d(var(--indicator-x), var(--indicator-y), 0);
+      transition:
+        transform .34s cubic-bezier(.25, .1, .25, 1),
+        width .24s var(--ease),
+        height .24s var(--ease),
+        opacity .18s var(--ease);
+      pointer-events: none;
+      will-change: transform, width, height, opacity;
+    }
+    .tab-indicator::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: var(--indicator-width);
+      border-radius: 21px;
+      border: 1px solid rgba(255,255,255,.5);
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,.78), rgba(255,255,255,.24) 48%, transparent 74%),
+        linear-gradient(145deg, rgba(255,255,255,.5), rgba(242,247,255,.28) 58%, rgba(37,99,235,.12)),
+        rgba(255,255,255,.24);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.74),
+        inset 0 -8px 16px rgba(37,99,235,.05),
+        0 7px 16px rgba(37,99,235,.09),
+        0 5px 14px rgba(15,23,42,.05);
+      backdrop-filter: blur(16px) saturate(165%);
+      -webkit-backdrop-filter: blur(16px) saturate(165%);
+      transform-origin: center;
+      will-change: transform, filter;
+    }
+    .tab-indicator::after {
+      content: "";
+      position: absolute;
+      inset: 2px 9px auto;
+      height: 14px;
+      border-radius: 999px;
+      opacity: .55;
+      background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0));
+      transform-origin: center;
+      will-change: transform, opacity;
+    }
+    .bottom-glass.is-switching .tab-indicator::before {
+      animation: tabLensWrap .28s cubic-bezier(.2, .8, .2, 1);
+      filter: brightness(1.02) saturate(1.04);
+    }
+    .bottom-glass.is-switching .tab-indicator::after {
+      animation: tabLensGlint .28s cubic-bezier(.2, .8, .2, 1);
+    }
+    @keyframes tabLensWrap {
+      0% { transform: scaleX(.98) scaleY(.98); }
+      45% { transform: scaleX(1.04) scaleY(1.01); }
+      100% { transform: scaleX(1) scaleY(1); }
+    }
+    @keyframes tabLensGlint {
+      0% { opacity: .38; transform: scaleX(.94); }
+      45% { opacity: .62; transform: scaleX(1.04); }
+      100% { opacity: .55; transform: scaleX(1); }
+    }
+    .nav-item {
+      position: relative;
+      z-index: 1;
+      min-height: 50px;
+      border-radius: 20px;
+      color: #5F6B7A;
+      transition: transform .28s cubic-bezier(.19, 1, .22, 1), color .24s var(--ease), opacity .2s var(--ease), filter .24s var(--ease);
+      cursor: pointer;
+    }
+    .nav-item.active {
+      color: #1D4ED8;
+      background: transparent;
+      box-shadow: none;
+      transform: translateY(-.5px);
+    }
+    .nav-item svg {
+      transition: transform .26s var(--ease), stroke-width .22s var(--ease), filter .22s var(--ease);
+    }
+    .nav-item.active svg {
+      transform: translateY(-.5px) scale(1.04);
+      stroke-width: 2.3;
+      filter: drop-shadow(0 3px 5px rgba(37,99,235,.16));
+    }
+    .nav-item span {
+      transition: transform .24s var(--ease), opacity .2s var(--ease);
+    }
+    .nav-item.active span {
+      transform: translateY(-1px);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tab-indicator,
+      .tab-indicator::before,
+      .tab-indicator::after,
+      .nav-item,
+      .nav-item svg,
+      .nav-item span {
+        animation: none !important;
+        transition-duration: .01ms !important;
+      }
+    }
+    .nav-item:active, .tap:active { transform: scale(.97); }
+    .tap {
+      transition: transform .16s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease), opacity .18s var(--ease);
+    }
+    .tap-flash {
+      animation: tapFlash .32s var(--ease);
+    }
+    @keyframes tapFlash {
+      0% { transform: scale(.985); filter: brightness(1.02); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+    .liquid {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.62);
+      background: rgba(255,255,255,.66);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+    }
+    .liquid::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(120deg, rgba(255,255,255,.72), rgba(255,255,255,0) 35%, rgba(37,99,235,.16) 72%, rgba(255,255,255,.44));
+      opacity: .64;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .liquid > * { position: relative; z-index: 1; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+      border-radius: 999px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sheet {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      align-items: end;
+      background: rgba(15, 23, 42, .22);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .sheet.open { display: flex; }
+    .sheet-panel {
+      width: 100%;
+      max-height: 78%;
+      overflow-y: auto;
+      border-radius: 30px 30px 42px 42px;
+      padding: 12px 18px 26px;
+      animation: sheetUp .36s var(--ease);
+    }
+    @keyframes sheetUp {
+      from { transform: translateY(28px); opacity: .3; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .toast {
+      position: absolute;
+      z-index: 45;
+      left: 50%;
+      bottom: 108px;
+      max-width: 310px;
+      transform: translate(-50%, 18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .24s var(--ease), transform .24s var(--ease);
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .screen-map button {
+      background: rgba(255, 255, 255, .78) !important;
+      border-color: rgba(16, 24, 40, .075) !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.44), 0 8px 18px rgba(15,23,42,.035);
+    }
+    .screen-map button.active {
+      background: rgba(37, 99, 235, .14) !important;
+      color: #1D4ED8;
+      border-color: rgba(37, 99, 235, .36) !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.34), 0 10px 24px rgba(37,99,235,.12);
+    }
+    .tiny-chart { display: flex; align-items: end; gap: 7px; height: 88px; }
+    .tiny-chart span { width: 20px; border-radius: 9px 9px 3px 3px; background: #2563EB; }
+    .progress-ring {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: conic-gradient(#2563EB 0 72%, rgba(37,99,235,.12) 72% 100%);
+      display: grid;
+      place-items: center;
+    }
+    .progress-ring::before {
+      content: "";
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.92);
+      position: absolute;
+    }
+    .progress-ring strong { position: relative; z-index: 1; }
+    @media (max-width: 1240px) {
+      .stage { grid-template-columns: 1fr; justify-items: center; }
+      .phone-frame { position: relative; top: 0; }
+      .glass-panel { width: min(100%, 760px); }
+    }
+    @media (max-width: 520px) {
+      .stage { width: 100%; padding: 0; gap: 0; }
+      .glass-panel { border-radius: 0; }
+      .phone-frame { width: 100vw; height: 100vh; border-radius: 0; padding: 0; }
+      .phone-surface { border-radius: 0; }
+      .dynamic-island { top: 10px; }
+    }
+  </style>
+</head>
+<body class="font-sans antialiased">
+  <main class="stage">
+    <aside class="glass-panel p-6">
+      <div class="flex items-center gap-3">
+        <span class="grid h-12 w-12 place-items-center rounded-[18px] bg-mira-ink text-white">
+          <i data-lucide="aperture" class="h-6 w-6"></i>
+        </span>
+        <div>
+          <p class="text-sm font-semibold text-mira-muted">Mira Guardian</p>
+          <h1 class="text-2xl font-semibold leading-tight text-mira-ink">全流程高保真 App 原型</h1>
+        </div>
+      </div>
+
+      <p class="mt-5 text-sm leading-6 text-mira-muted">风格以 Apple 的留白、层级、真实影像和 Liquid Glass 材质为主，兼顾家长端的可解释、低焦虑和安全优先。外部背景已改为纯 CSS 系统材质，不使用照片。点击手机内按钮或右侧页面地图，可以查看完整路径。</p>
+
+      <div class="mt-6 grid gap-3">
+        <div class="solid-card p-4">
+          <p class="text-sm font-semibold">本版覆盖</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="pill bg-white text-mira-ink">首次使用</span>
+            <span class="pill bg-white text-mira-ink">设备绑定</span>
+            <span class="pill bg-white text-mira-ink">孩子档案</span>
+            <span class="pill bg-white text-mira-ink">首页</span>
+            <span class="pill bg-white text-mira-ink">流程任务</span>
+            <span class="pill bg-white text-mira-ink">实时看护</span>
+            <span class="pill bg-white text-mira-ink">报告积分</span>
+            <span class="pill bg-white text-mira-ink">安全隐私</span>
+          </div>
+        </div>
+
+        <div class="solid-card p-4">
+          <p class="text-sm font-semibold">交互效果</p>
+          <ul class="mt-3 space-y-2 text-sm leading-6 text-mira-muted">
+            <li>点击态：按钮轻缩放与玻璃高光。</li>
+            <li>流程态：首次使用可以逐步推进。</li>
+            <li>抽屉态：证据确认、隐私提示、通话、奖励审批等。</li>
+            <li>反馈态：截图、保存、处理完成会显示 toast。</li>
+          </ul>
+        </div>
+
+        <div class="solid-card p-4">
+          <p class="text-sm font-semibold">参考应用方向</p>
+          <p class="mt-2 text-sm leading-6 text-mira-muted">Apple Home / Health / Photos、Google Nest Home、米家、Airbnb、Intercom。儿童和家长数据场景避免娱乐化，实时看护避免安防后台化。</p>
+        </div>
+      </div>
+    </aside>
+
+    <section class="phone-frame" aria-label="Mira Guardian App prototype">
+      <div class="phone-surface">
+        <div class="dynamic-island"></div>
+        <div class="status-bar">
+          <span>17:42</span>
+          <span class="flex items-center gap-1"><i data-lucide="wifi" class="h-3.5 w-3.5"></i><i data-lucide="battery-full" class="h-4 w-4"></i></span>
+        </div>
+        <div id="app" class="app-scroll"></div>
+        <nav id="bottomNav" class="bottom-glass" aria-label="App navigation"></nav>
+        <div id="sheet" class="sheet" aria-live="polite"></div>
+        <div id="toast" class="toast rounded-full bg-mira-ink px-4 py-3 text-sm font-semibold text-white shadow-2xl" role="status"></div>
+      </div>
+    </section>
+
+    <aside class="glass-panel p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold text-mira-muted">页面地图</p>
+          <h2 class="mt-1 text-2xl font-semibold">README MVP 全路径</h2>
+        </div>
+        <button class="tap min-h-[44px] rounded-full bg-mira-ink px-4 text-sm font-semibold text-white" data-go="welcome">从头开始</button>
+      </div>
+      <div id="screenMap" class="screen-map mt-5 space-y-5"></div>
+      <div class="mt-6 rounded-[22px] bg-white/70 p-4 text-sm leading-6 text-mira-muted">
+        <p class="font-semibold text-mira-ink">图片来源</p>
+        <p class="mt-2">外部舞台和手机底色使用 CSS 玻璃材质背景；Pexels 真实家庭与学习空间图片只用于实时看护、任务证据、成长时刻和绑定成功页。所有图片都不是占位图。</p>
+      </div>
+    </aside>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    const img = {
+      study: 'https://images.pexels.com/photos/10109025/pexels-photo-10109025.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      desk: 'https://images.pexels.com/photos/32206185/pexels-photo-32206185.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      room: 'https://images.pexels.com/photos/9328035/pexels-photo-9328035.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      family: 'https://images.pexels.com/photos/4148842/pexels-photo-4148842.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      table: 'https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=1200'
+    };
+
+    const groups = [
+      { title: '首次使用', items: [
+        ['welcome', '欢迎页'], ['login', '登录注册'], ['bind', '扫码绑定'], ['wifi', 'Wi-Fi 配网'], ['bindDone', '绑定成功'], ['child', '孩子档案'], ['name', '摄像头命名'], ['contacts', '紧急联系人']
+      ]},
+      { title: '今日工作台', items: [
+        ['home', '首页'], ['care', '协作待办'], ['sleep', '睡眠晨起']
+      ]},
+      { title: '流程与任务', items: [
+        ['flow', '一日流程'], ['packing', '带书清单'], ['tasks', '今日任务'], ['taskDetail', '任务详情'], ['focus', '专注计时']
+      ]},
+      { title: '看护与事件', items: [
+        ['watch', '实时看护'], ['playback', '事件回放'], ['zones', '安全区域'], ['safety', '安全事件'], ['safetyDetail', '事件详情']
+      ]},
+      { title: '报告与激励', items: [
+        ['report', '日报'], ['weekly', '周报'], ['moments', '成长时刻'], ['points', '积分'], ['reward', '奖励商店'], ['checkin', '打卡审核']
+      ]},
+      { title: '边界与设置', items: [
+        ['conversation', '对话人设'], ['privacy', '隐私权限'], ['notifications', '通知设置'], ['family', '家庭成员'], ['device', '设备管理'], ['education', '学习内容'], ['feedback', '帮助反馈'], ['about', '关于我们'], ['version', '版本更新'], ['settings', '设置总览']
+      ]}
+    ];
+
+    const nav = [
+      ['home', 'home', '首页'],
+      ['flow', 'list-checks', '流程'],
+      ['watch', 'video', '看护'],
+      ['report', 'chart-no-axes-column', '报告'],
+      ['settings', 'settings', '设置']
+    ];
+
+    let current = 'welcome';
+
+    const app = document.getElementById('app');
+    const bottomNav = document.getElementById('bottomNav');
+    const screenMap = document.getElementById('screenMap');
+    const sheet = document.getElementById('sheet');
+    const toast = document.getElementById('toast');
+
+    function icon(name, cls = 'h-5 w-5') {
+      return `<i data-lucide="${name}" class="${cls}"></i>`;
+    }
+
+    function header(kicker, title, action = '') {
+      return `
+        <header class="mb-5 flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-semibold text-mira-muted">${kicker}</p>
+            <h2 class="mt-1 text-[30px] font-semibold leading-tight text-mira-ink">${title}</h2>
+          </div>
+          ${action || `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="settings" aria-label="设置">${icon('settings')}</button>`}
+        </header>
+      `;
+    }
+
+    function primary(label, go, iconName = 'arrow-right', extra = '') {
+      return `<button class="tap flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-mira-ink px-4 text-[15px] font-semibold text-white shadow-xl shadow-slate-900/15 ${extra}" data-go="${go}">${label}${icon(iconName, 'h-4 w-4')}</button>`;
+    }
+
+    function secondary(label, go, iconName = 'chevron-right') {
+      return `<button class="tap list-item flex min-h-[48px] w-full items-center justify-between px-4 text-left text-sm font-semibold text-mira-ink" data-go="${go}"><span>${label}</span>${icon(iconName, 'h-4 w-4 text-mira-muted')}</button>`;
+    }
+
+    function metric(label, value, tone = 'blue') {
+      const colors = {
+        blue: 'text-mira-blue bg-blue-50',
+        green: 'text-mira-green bg-green-50',
+        coral: 'text-mira-coral bg-orange-50',
+        red: 'text-mira-red bg-red-50',
+        amber: 'text-mira-amber bg-amber-50'
+      };
+      return `<div class="rounded-[18px] ${colors[tone]} p-3"><p class="text-xl font-semibold">${value}</p><p class="mt-1 text-xs font-semibold opacity-80">${label}</p></div>`;
+    }
+
+    function row(iconName, title, desc, right = '', tone = 'blue') {
+      const tones = {
+        blue: 'bg-blue-50 text-mira-blue',
+        green: 'bg-green-50 text-mira-green',
+        coral: 'bg-orange-50 text-mira-coral',
+        red: 'bg-red-50 text-mira-red',
+        amber: 'bg-amber-50 text-mira-amber',
+        slate: 'bg-slate-100 text-slate-700'
+      };
+      return `
+        <div class="list-item list-row flex">
+          <span class="row-icon grid shrink-0 place-items-center ${tones[tone]}">${icon(iconName)}</span>
+          <div class="row-copy">
+            <p class="row-title">${title}</p>
+            <p class="row-desc">${desc}</p>
+          </div>
+          <div class="row-action">${right}</div>
+        </div>
+      `;
+    }
+
+    function screens() {
+      return {
+        welcome: `
+          <section class="min-h-full">
+            <div class="liquid mb-5 rounded-[30px] p-5">
+              <div class="flex items-center justify-between">
+                <span class="pill bg-white/70 text-mira-ink">${icon('sparkles', 'h-3.5 w-3.5')}家长端</span>
+                <span class="pill bg-white/70 text-mira-blue">iOS / Android</span>
+              </div>
+              <h2 class="mt-16 text-[38px] font-semibold leading-[1.05] text-mira-ink">让家长少催促，孩子更有节奏。</h2>
+              <p class="mt-4 text-[15px] leading-7 text-mira-muted">米拉把摄像头的观察、语音提醒、任务证据和每日报告收进一个安静可靠的 App。</p>
+            </div>
+            <div class="solid-card overflow-hidden">
+              <img src="${img.room}" alt="儿童学习空间" class="h-48 w-full object-cover" />
+              <div class="p-4">
+                <div class="grid grid-cols-3 gap-2">
+                  ${metric('流程', '72%', 'blue')}
+                  ${metric('待处理', '2', 'coral')}
+                  ${metric('安全', '正常', 'green')}
+                </div>
+              </div>
+            </div>
+            <div class="mt-5 space-y-3">
+              ${primary('开始设置', 'login')}
+              <button class="tap flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/74 px-4 text-sm font-semibold text-mira-ink" data-go="home">查看演示首页${icon('play', 'h-4 w-4')}</button>
+            </div>
+          </section>
+        `,
+        login: `
+          ${header('账户', '登录或创建家庭')}
+          <section class="solid-card p-4">
+            <label class="block text-sm font-semibold text-mira-ink" for="phone">手机号</label>
+            <input id="phone" inputmode="tel" value="138 0000 2026" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
+            <label class="mt-4 block text-sm font-semibold text-mira-ink" for="code">验证码</label>
+            <div class="mt-2 flex gap-2">
+              <input id="code" inputmode="numeric" value="0426" class="min-h-[52px] min-w-0 flex-1 rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
+              <button class="tap min-h-[52px] rounded-[18px] bg-slate-100 px-4 text-sm font-semibold" data-toast="验证码已发送">获取</button>
+            </div>
+            <p class="mt-4 text-xs leading-5 text-mira-muted">继续表示监护人同意创建家庭空间。儿童音视频采集会在绑定设备后单独授权。</p>
+          </section>
+          <div class="mt-5 space-y-3">
+            ${primary('继续', 'bind')}
+            ${secondary('查看隐私说明', 'privacy', 'shield-check')}
+          </div>
+        `,
+        bind: `
+          ${header('设备绑定', '扫描摄像头二维码', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="welcome" aria-label="返回">${icon('chevron-left')}</button>`)}
+          <section class="solid-card p-4">
+            <div class="grid h-72 place-items-center rounded-[26px] bg-mira-ink text-white">
+              <div class="relative grid h-48 w-48 place-items-center rounded-[26px] border border-white/18 bg-white/10">
+                <div class="grid h-32 w-32 grid-cols-3 gap-2 rounded-[18px] bg-white p-3">
+                  <span class="rounded bg-mira-ink"></span><span></span><span class="rounded bg-mira-ink"></span>
+                  <span></span><span class="rounded bg-mira-ink"></span><span></span>
+                  <span class="rounded bg-mira-ink"></span><span></span><span class="rounded bg-mira-ink"></span>
+                </div>
+                <span class="absolute inset-x-8 top-1/2 h-0.5 bg-mira-blue shadow-[0_0_22px_rgba(37,99,235,.85)]"></span>
+              </div>
+            </div>
+            <p class="mt-4 text-sm leading-6 text-mira-muted">摄像头底部或包装盒上有二维码。无法扫码时可以选择蓝牙发现。</p>
+          </section>
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <button class="tap min-h-[50px] rounded-[18px] bg-white/74 text-sm font-semibold" data-toast="已开始蓝牙发现">蓝牙发现</button>
+            <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-go="wifi">模拟扫码成功</button>
+          </div>
+        `,
+        wifi: `
+          ${header('配网', '连接家庭 Wi-Fi')}
+          <section class="solid-card p-4">
+            ${row('camera', 'Mira Cam M1', '已发现，距离约 1.8 米', '<span class="pill bg-green-50 text-mira-green">待配网</span>', 'green')}
+            <label class="mt-4 block text-sm font-semibold" for="ssid">Wi-Fi 名称</label>
+            <input id="ssid" value="Mira Home 5G" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
+            <label class="mt-4 block text-sm font-semibold" for="pwd">Wi-Fi 密码</label>
+            <input id="pwd" type="password" value="mira2026home" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
+            <div class="mt-4 rounded-[18px] bg-blue-50 p-3 text-sm leading-6 text-blue-800">配网过程中摄像头只接收网络信息，不会开始录像或录音。</div>
+          </section>
+          <div class="mt-5">${primary('开始绑定', 'bindDone', 'loader')}</div>
+        `,
+        bindDone: `
+          <section class="min-h-full">
+            <div class="liquid rounded-[30px] p-5 text-center">
+              <div class="mx-auto grid h-20 w-20 place-items-center rounded-full bg-green-50 text-mira-green">${icon('check', 'h-10 w-10')}</div>
+              <h2 class="mt-5 text-[30px] font-semibold">设备绑定成功</h2>
+              <p class="mt-2 text-sm leading-6 text-mira-muted">儿童房摄像头已加入“小宇家”。接下来创建孩子档案和紧急联系人。</p>
+            </div>
+            <div class="solid-card mt-5 overflow-hidden">
+              <img src="${img.desk}" alt="孩子房间书桌" class="h-56 w-full object-cover" />
+              <div class="p-4">
+                ${row('shield-check', '隐私灯测试通过', '远程查看时设备端会亮起提示', '', 'green')}
+              </div>
+            </div>
+            <div class="mt-5">${primary('创建孩子档案', 'child')}</div>
+          </section>
+        `,
+        child: `
+          ${header('孩子档案', '让提醒更合适')}
+          <section class="solid-card p-4">
+            <label class="block text-sm font-semibold" for="childName">孩子称呼</label>
+            <input id="childName" value="小宇" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              <button class="tap min-h-[48px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white">小学低年级</button>
+              <button class="tap min-h-[48px] rounded-[18px] bg-white/80 text-sm font-semibold">小学高年级</button>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              ${metric('作息', '21:30 睡', 'blue')}
+              ${metric('任务时长', '25/5', 'green')}
+            </div>
+            <p class="mt-4 text-xs leading-5 text-mira-muted">性别不是必填项。档案只用于提醒语气、任务时长和安全策略。</p>
+          </section>
+          <div class="mt-5">${primary('继续命名摄像头', 'name')}</div>
+        `,
+        name: `
+          ${header('人设与语音', '孩子给摄像头起名')}
+          <section class="solid-card p-4">
+            <div class="rounded-[24px] bg-mira-ink p-4 text-white">
+              <p class="text-sm text-white/64">摄像头会问孩子</p>
+              <p class="mt-3 text-xl font-semibold leading-8">“那你也给我起一个名字吧。以后你叫这个名字，我就知道你在找我。”</p>
+            </div>
+            <label class="mt-4 block text-sm font-semibold" for="wakeName">唤醒名</label>
+            <input id="wakeName" value="小豆" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              <button class="tap min-h-[48px] rounded-[18px] bg-blue-50 text-sm font-semibold text-mira-blue" data-toast="已播放温柔女声">试听声线</button>
+              <button class="tap min-h-[48px] rounded-[18px] bg-white/80 text-sm font-semibold" data-sheet="boundaries">互动边界</button>
+            </div>
+          </section>
+          <div class="mt-5">${primary('设置紧急联系人', 'contacts')}</div>
+        `,
+        contacts: `
+          ${header('安全', '添加紧急联系人')}
+          <section class="solid-card p-4">
+            ${row('user-round', '妈妈', '管理员，接收全部告警', '<span class="pill bg-green-50 text-mira-green">已验证</span>', 'green')}
+            ${row('user-plus', '爸爸', '第二联系人，SOS 兜底通知', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已发送邀请">邀请</button>', 'blue')}
+            <button class="tap mt-3 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/80 text-sm font-semibold" data-sheet="contact">${icon('plus', 'h-4 w-4')}添加联系人</button>
+          </section>
+          <div class="mt-5">${primary('进入首页', 'home')}</div>
+        `,
+        home: `
+          ${header('周一 19:42', '小宇今天', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="care" aria-label="待处理">${icon('bell')}</button>`)}
+          <section class="solid-card overflow-hidden">
+            <div class="relative h-60">
+              <img src="${img.study}" alt="孩子在书桌前写作业" class="h-full w-full object-cover" />
+              <div class="absolute left-3 top-3 flex gap-2">
+                <span class="pill bg-black/58 text-white">设备在线</span>
+                <span class="pill bg-white/76 text-mira-green">隐私灯亮起</span>
+              </div>
+              <div class="liquid absolute bottom-3 left-3 right-3 rounded-[24px] p-3">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <p class="text-xs font-semibold text-mira-muted">当前状态</p>
+                    <p class="mt-1 text-xl font-semibold">专注学习 18 分钟</p>
+                  </div>
+                  <span class="pill bg-green-50 text-mira-green">正常</span>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 p-3">
+              <button class="tap min-h-[48px] rounded-[16px] bg-mira-blue text-sm font-semibold text-white" data-go="watch">看护</button>
+              <button class="tap min-h-[48px] rounded-[16px] bg-slate-100 text-sm font-semibold" data-sheet="call">通话</button>
+              <button class="tap min-h-[48px] rounded-[16px] bg-slate-100 text-sm font-semibold" data-toast="已让摄像头温和提醒">提醒</button>
+            </div>
+          </section>
+          <section class="mt-4 grid grid-cols-3 gap-2">
+            ${metric('流程', '72%', 'blue')}
+            ${metric('任务', '4/6', 'green')}
+            ${metric('待处理', '2', 'coral')}
+          </section>
+          <section class="glass-card mt-4 p-4">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-semibold">下一项</p>
+              <button class="tap text-sm font-semibold text-mira-blue" data-go="flow">查看流程</button>
+            </div>
+            <div class="mt-3 space-y-2">
+              ${row('book-open-check', '数学作业进行中', '第 2 个专注轮次，剩余 12 分钟', '<span class="text-xs font-semibold text-mira-blue">进行中</span>', 'blue')}
+              ${row('file-check-2', '作业证据待确认', '确认后自动加 5 分', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-go="taskDetail">处理</button>', 'coral')}
+            </div>
+          </section>
+          <section class="mt-4 grid grid-cols-2 gap-3">
+            <button class="tap list-item p-4 text-left" data-go="sleep">
+              <span class="pill bg-blue-50 text-mira-blue">${icon('moon', 'h-3.5 w-3.5')}睡眠</span>
+              <p class="mt-3 text-lg font-semibold">21:30 睡前流程</p>
+              <p class="mt-1 text-xs text-mira-muted">剩洗漱和收书包</p>
+            </button>
+            <button class="tap list-item p-4 text-left" data-go="points">
+              <span class="pill bg-orange-50 text-mira-coral">${icon('star', 'h-3.5 w-3.5')}积分</span>
+              <p class="mt-3 text-lg font-semibold">今日 +12</p>
+              <p class="mt-1 text-xs text-mira-muted">可兑换 30 分奖励</p>
+            </button>
+          </section>
+        `,
+        care: `
+          ${header('家庭协作', '待处理事项')}
+          <section class="space-y-3">
+            ${row('file-check-2', '数学作业证据待确认', 'AI 判断完成 80%，需要家长确认', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-go="taskDetail">查看</button>', 'coral')}
+            ${row('gift', '奖励兑换审批', '小宇申请周末户外活动', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="reward">审批</button>', 'coral')}
+            ${row('shield-alert', '门口区域规则待设置', '建议添加“独自在家不开门”提醒', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="safety">设置</button>', 'red')}
+          </section>
+          <section class="glass-card mt-4 p-4">
+            <p class="text-sm font-semibold">处理记录</p>
+            <div class="mt-3 space-y-2 text-sm text-mira-muted">
+              <p>17:20 妈妈确认“整理书包”完成。</p>
+              <p>18:05 摄像头已提醒喝水，无需重复处理。</p>
+            </div>
+          </section>
+        `,
+        sleep: `
+          ${header('睡眠与晨起', '今晚作息')}
+          <section class="solid-card p-4">
+            <div class="flex items-center gap-4">
+              <div class="progress-ring relative"><strong class="text-lg">2/4</strong></div>
+              <div>
+                <p class="text-lg font-semibold">睡前流程进行中</p>
+                <p class="mt-2 text-sm leading-6 text-mira-muted">已完成晚饭和整理玩具，待洗漱、收书包。</p>
+              </div>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              ${metric('上床目标', '21:30', 'blue')}
+              ${metric('晨起闹铃', '07:05', 'green')}
+            </div>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${row('moon', '夜间免打扰', '只保留安全事件和异常声音', '<span class="pill bg-green-50 text-mira-green">开启</span>', 'green')}
+            ${row('alarm-clock', '延后次数', '最多 2 次，每次 5 分钟', '', 'blue')}
+          </section>
+        `,
+        flow: `
+          ${header('上学日模板', '今日一日流程', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-sheet="flowItem" aria-label="添加流程项">${icon('plus')}</button>`)}
+          <section class="solid-card p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold">放学后流程</p>
+                <p class="mt-1 text-xs text-mira-muted">16:30 - 21:30</p>
+              </div>
+              <span class="pill bg-green-50 text-mira-green">5/8</span>
+            </div>
+            <div class="timeline-list mt-4">
+              ${timeline('回家喝水', 'AI 自动确认，置信度 91%', '16:42', 'green')}
+              ${timeline('整理书包', '桌面截图已保存', '17:16', 'green')}
+              ${timeline('数学作业', '第 2 个专注轮次，剩余 12 分钟', '进行中', 'blue', 'taskDetail')}
+              ${timeline('语文背诵', '到点由摄像头语音提醒', '20:10', 'slate')}
+              ${timeline('睡前洗漱', '完成后进入故事时间', '21:10', 'slate')}
+            </div>
+          </section>
+          <section class="mt-4 grid grid-cols-2 gap-3">
+            <button class="tap list-item p-4 text-left" data-go="packing">${icon('backpack', 'mb-3 h-5 w-5 text-mira-blue')}<p class="font-semibold">带书清单</p><p class="mt-1 text-xs text-mira-muted">明天 2 项待确认</p></button>
+            <button class="tap list-item p-4 text-left" data-sheet="flowItem">${icon('calendar-clock', 'mb-3 h-5 w-5 text-mira-coral')}<p class="font-semibold">临时调整</p><p class="mt-1 text-xs text-mira-muted">延后、跳过、完成</p></button>
+          </section>
+        `,
+        packing: `
+          ${header('课程表', '明天要带什么')}
+          <section class="solid-card p-4">
+            ${row('check', '数学练习册', '已放进书包，摄像头确认', '<span class="pill bg-green-50 text-mira-green">已准备</span>', 'green')}
+            ${row('palette', '美术材料', '纸杯、彩纸、胶棒', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-toast="已加入早晨提醒">提醒</button>', 'coral')}
+            ${row('umbrella', '雨伞', '家长手动添加', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已标记完成">完成</button>', 'blue')}
+          </section>
+          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold" data-sheet="packing">${icon('plus', 'h-4 w-4')}添加临时物品</button>
+        `,
+        tasks: `
+          ${header('任务计划', '今日任务')}
+          <section class="space-y-3">
+            ${taskCard('数学作业', '学习', '19:00 - 19:40', '进行中', 'blue', 'taskDetail')}
+            ${taskCard('语文背诵', '学习', '20:10 - 20:25', '待开始', 'amber', 'flow')}
+            ${taskCard('整理玩具', '家务', '18:20 已完成', '+3 分', 'green', 'points')}
+            ${taskCard('睡前洗漱', '睡眠', '21:10', '待开始', 'blue', 'sleep')}
+          </section>
+          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="task">${icon('plus', 'h-4 w-4')}新建任务</button>
+        `,
+        taskDetail: `
+          ${header('任务证据', '数学作业')}
+          <section class="solid-card overflow-hidden">
+            <img src="${img.desk}" alt="作业桌面证据" class="h-56 w-full object-cover" />
+            <div class="p-4">
+              <div class="grid grid-cols-3 gap-2">
+                ${metric('置信度', '80%', 'blue')}
+                ${metric('离座', '1 次', 'amber')}
+                ${metric('积分', '+5', 'green')}
+              </div>
+              <p class="mt-4 text-sm leading-6 text-mira-muted">AI 判断：书写状态稳定，离座后 3 分钟内回座。建议确认完成，也可以改为部分完成。</p>
+            </div>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${row('message-circle', '学习求助', '问过 1 次同类题，未直接给答案', '', 'blue')}
+            ${row('clock', '专注轮次', '25 分钟学习 + 5 分钟休息', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="focus">查看</button>', 'green')}
+          </section>
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="evidence">处理证据</button>
+            <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已提醒孩子收尾">提醒收尾</button>
+          </div>
+        `,
+        focus: `
+          ${header('专注计时', '第 2 个轮次')}
+          <section class="liquid rounded-[32px] p-6 text-center">
+            <p class="text-sm font-semibold text-mira-muted">剩余时间</p>
+            <p class="mt-3 text-[68px] font-semibold leading-none text-mira-ink">12:18</p>
+            <p class="mt-3 text-sm text-mira-muted">坐姿正常，离座 0 次</p>
+            <div class="mt-6 grid grid-cols-3 gap-2">
+              <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已暂停">暂停</button>
+              <button class="tap min-h-[50px] rounded-[18px] bg-mira-blue text-sm font-semibold text-white" data-toast="已延后 10 分钟">延后</button>
+              <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已结束本轮">结束</button>
+            </div>
+          </section>
+          <section class="glass-card mt-4 p-4">
+            <p class="text-sm font-semibold">本次观察</p>
+            <div class="mt-3 space-y-2">
+              ${row('activity', '书写动作稳定', '连续 18 分钟', '', 'green')}
+              ${row('eye', '用眼距离正常', '无高风险提醒', '', 'green')}
+            </div>
+          </section>
+        `,
+        watch: `
+          <section class="-mx-20 -mt-16 h-[610px] bg-mira-ink text-white">
+            <div class="relative h-full">
+              <img src="${img.room}" alt="实时看护画面" class="h-full w-full object-cover opacity-88" />
+              <div class="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/60"></div>
+              <div class="absolute left-20 right-20 top-20 flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-semibold text-white/72">书桌视角</p>
+                  <h2 class="mt-1 text-[30px] font-semibold">实时看护</h2>
+                </div>
+                <span class="pill bg-white/18 text-white backdrop-blur-xl">隐私灯亮起</span>
+              </div>
+              <div class="liquid absolute bottom-6 left-20 right-20 rounded-[28px] bg-black/38 p-4 text-white">
+                <p class="text-sm font-semibold">设备端正在显示远程查看状态</p>
+                <p class="mt-1 text-xs leading-5 text-white/72">当前只保存事件截图，不保存连续录像。</p>
+              </div>
+            </div>
+          </section>
+          <section class="relative -mt-20 grid grid-cols-4 gap-2">
+            <button class="tap min-h-[62px] rounded-[20px] bg-white text-sm font-semibold" data-sheet="call">${icon('phone-call', 'mx-auto mb-1 h-5 w-5')}通话</button>
+            <button class="tap min-h-[62px] rounded-[20px] bg-white/78 text-sm font-semibold" data-toast="截图已保存到事件证据">${icon('camera', 'mx-auto mb-1 h-5 w-5')}截图</button>
+            <button class="tap min-h-[62px] rounded-[20px] bg-white/78 text-sm font-semibold" data-toast="已发送温和提醒">${icon('volume-2', 'mx-auto mb-1 h-5 w-5')}提醒</button>
+            <button class="tap min-h-[62px] rounded-[20px] bg-white/78 text-sm font-semibold" data-sheet="privacy">${icon('shield', 'mx-auto mb-1 h-5 w-5')}隐私</button>
+          </section>
+          <section class="glass-card mt-4 p-4">
+            <p class="text-sm font-semibold">常用视角</p>
+            <div class="mt-3 grid grid-cols-4 gap-2">
+              <button class="tap list-item active min-h-[44px] text-sm font-semibold">书桌</button>
+              <button class="tap list-item min-h-[44px] text-sm font-semibold">床</button>
+              <button class="tap list-item min-h-[44px] text-sm font-semibold">门口</button>
+              <button class="tap list-item min-h-[44px] text-sm font-semibold">玩具区</button>
+            </div>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${row('circle-play', '事件回放', '查看离座、任务、打卡、安全短片', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="playback">进入</button>', 'blue')}
+          </section>
+        `,
+        playback: `
+          ${header('事件回放', '最近片段')}
+          <section class="space-y-3">
+            ${videoCard('专注轮次完成', '19:30', img.study, 'green')}
+            ${videoCard('短暂离座后回座', '19:12', img.desk, 'amber')}
+            ${videoCard('整理书包完成', '17:16', img.room, 'blue')}
+          </section>
+        `,
+        zones: `
+          ${header('安全区域', '家庭风险边界')}
+          <section class="solid-card p-4">
+            ${row('door-open', '门口', '独自在家时不开门提醒', '<span class="pill bg-green-50 text-mira-green">已启用</span>', 'green')}
+            ${row('chef-hat', '厨房', '靠近灶台或刀具区域提醒', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="厨房规则已开启">开启</button>', 'amber')}
+            ${row('panel-top-open', '窗边 / 阳台', '长时间停留或攀爬风险提醒', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已进入区域校准">校准</button>', 'red')}
+          </section>
+          <section class="glass-card mt-4 p-4">
+            <p class="text-sm font-semibold">区域设置原则</p>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">安全区域只用于高风险提醒，不用于给孩子打分；每次触发都必须能查看证据和处理记录。</p>
+            <button class="tap mt-4 min-h-[48px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="zone">新增安全区域</button>
+          </section>
+        `,
+        safety: `
+          ${header('安全', '安全事件中心')}
+          <section class="solid-card p-4">
+            ${row('shield-check', '今日无紧急事件', 'SOS、陌生人、危险区域均正常', '<span class="pill bg-green-50 text-mira-green">正常</span>', 'green')}
+            ${row('door-open', '门口区域规则', '独自在家时不开门提醒', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="safetyDetail">查看</button>', 'red')}
+            ${row('volume-2', '异常声音', '夜间免打扰保留告警', '', 'amber')}
+          </section>
+          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-mira-red text-sm font-semibold text-white" data-sheet="safety">${icon('phone-call', 'h-4 w-4')}测试紧急联系人</button>
+        `,
+        safetyDetail: `
+          ${header('事件详情', '门口区域提醒')}
+          <section class="solid-card overflow-hidden">
+            <img src="${img.room}" alt="门口区域事件截图" class="h-56 w-full object-cover" />
+            <div class="p-4">
+              <span class="pill bg-red-50 text-mira-red">需要确认规则</span>
+              <h3 class="mt-3 text-xl font-semibold">孩子独自在家时，检测到门口声音。</h3>
+              <p class="mt-2 text-sm leading-6 text-mira-muted">建议开启“不开门提醒”：摄像头先提醒孩子不要开门，并同时通知家长。</p>
+            </div>
+          </section>
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <button class="tap min-h-[50px] rounded-[18px] bg-mira-red text-sm font-semibold text-white" data-sheet="call">联系孩子</button>
+            <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已标记为规则已处理">标记处理</button>
+          </div>
+        `,
+        report: `
+          ${header('2026 年 5 月 25 日', '今日报告')}
+          <section class="solid-card bg-mira-ink p-5 text-white">
+            <p class="text-sm font-semibold text-white/62">今日结论</p>
+            <h3 class="mt-2 text-2xl font-semibold leading-tight">流程完成稳定，作业中有一次短暂离座。</h3>
+            <p class="mt-3 text-sm leading-6 text-white/72">建议明天把语文背诵提前 15 分钟，睡前流程会更从容。</p>
+            <div class="mt-4 grid grid-cols-3 gap-2">
+              <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">72%</p><p class="mt-1 text-xs text-white/64">流程</p></div>
+              <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">43m</p><p class="mt-1 text-xs text-white/64">专注</p></div>
+              <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">+12</p><p class="mt-1 text-xs text-white/64">积分</p></div>
+            </div>
+          </section>
+          <section class="mt-4 grid grid-cols-[1fr_120px] gap-3">
+            <div class="solid-card p-4">
+              <p class="text-sm font-semibold">本周专注趋势</p>
+              <div class="tiny-chart mt-4">
+                <span style="height:42px"></span><span class="!bg-mira-green" style="height:64px"></span><span style="height:55px"></span><span class="!bg-mira-coral" style="height:76px"></span><span style="height:48px"></span><span class="!bg-mira-green" style="height:68px"></span>
+              </div>
+            </div>
+            <button class="tap solid-card overflow-hidden text-left" data-go="playback">
+              <img src="${img.study}" alt="成长时刻" class="h-[112px] w-full object-cover" />
+              <div class="p-3"><p class="text-xs font-semibold">成长时刻</p><p class="mt-1 text-xs text-mira-muted">主动整理书包</p></div>
+            </button>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${row('file-check-2', '作业证据待确认', '确认后加 5 分', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-go="taskDetail">处理</button>', 'coral')}
+            ${row('lightbulb', '明日建议', '语文背诵提前到晚饭后', '', 'green')}
+          </section>
+        `,
+        weekly: `
+          ${header('周报', '本周表现')}
+          <section class="solid-card p-4">
+            <p class="text-sm font-semibold">趋势摘要</p>
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              ${metric('按时开始', '86%', 'green')}
+              ${metric('专注时长', '4h12m', 'blue')}
+              ${metric('离座趋势', '-18%', 'green')}
+              ${metric('睡眠稳定', '4 天', 'amber')}
+            </div>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${row('brain', '学习求助', '同类题求助 3 次，建议关注概念理解', '', 'blue')}
+            ${row('users', '家庭协作', '爸爸处理 1 项，妈妈处理 5 项', '', 'green')}
+          </section>
+        `,
+        moments: `
+          ${header('成长时刻', '值得留下的片段')}
+          <section class="space-y-3">
+            <button class="tap solid-card w-full overflow-hidden text-left" data-sheet="moment">
+              <img src="${img.study}" alt="孩子主动完成作业的成长时刻" class="h-52 w-full object-cover" />
+              <div class="p-4">
+                <div class="flex items-center justify-between">
+                  <span class="pill bg-green-50 text-mira-green">积极片段</span>
+                  <span class="text-xs font-semibold text-mira-muted">今天 19:30</span>
+                </div>
+                <h3 class="mt-3 text-xl font-semibold">主动整理书包并开始作业</h3>
+                <p class="mt-2 text-sm leading-6 text-mira-muted">家长可收藏、删除、隐藏或分享到家庭成员，不把孩子失误做公开展示。</p>
+              </div>
+            </button>
+            ${videoCard('第一次独立完成睡前流程', '周日', img.room, 'blue')}
+            ${videoCard('主动收玩具', '周六', img.table, 'green')}
+          </section>
+        `,
+        points: `
+          ${header('积分', '正向激励')}
+          <section class="liquid rounded-[30px] p-5">
+            <p class="text-sm font-semibold text-mira-muted">当前积分</p>
+            <div class="mt-3 flex items-end justify-between">
+              <p class="text-[56px] font-semibold leading-none">86</p>
+              <button class="tap min-h-[44px] rounded-[16px] bg-mira-ink px-4 text-sm font-semibold text-white" data-go="reward">去兑换</button>
+            </div>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${row('plus', '数学作业确认完成', '+5 分，妈妈确认', '', 'green')}
+            ${row('plus', '整理书包', '+3 分，AI 自动记录', '', 'green')}
+            ${row('rotate-ccw', '撤销一次自动加分', '可在 24 小时内撤销', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已撤销">撤销</button>', 'amber')}
+          </section>
+        `,
+        reward: `
+          ${header('奖励商店', '兑换审批')}
+          <section class="space-y-3">
+            ${rewardCard('周末户外活动', '30 分', '小宇已申请，等待家长审批', 'reward')}
+            ${rewardCard('睡前故事加 10 分钟', '18 分', '仅周五可兑换', 'toast')}
+            ${rewardCard('选择一次晚餐水果', '12 分', '今天可兑换', 'toast')}
+          </section>
+          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold" data-sheet="rewardEdit">${icon('plus', 'h-4 w-4')}添加奖品</button>
+        `,
+        checkin: `
+          ${header('打卡助手', '素材审核')}
+          <section class="solid-card overflow-hidden">
+            <img src="${img.table}" alt="打卡素材" class="h-56 w-full object-cover" />
+            <div class="p-4">
+              <span class="pill bg-blue-50 text-mira-blue">兴趣班打卡</span>
+              <h3 class="mt-3 text-xl font-semibold">手工作业成品照</h3>
+              <p class="mt-2 text-sm leading-6 text-mira-muted">摄像头已拍摄 3 张素材，家长审核后可保存或分享到其他 App。</p>
+              <div class="mt-4 grid grid-cols-2 gap-3">
+                <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-toast="素材已通过">通过</button>
+                <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已驳回并要求重拍">重拍</button>
+              </div>
+            </div>
+          </section>
+        `,
+        conversation: `
+          ${header('对话与人设', '互动边界')}
+          <section class="solid-card p-4">
+            ${row('badge', '摄像头唤醒名', '小豆，支持近似发音', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="name">修改</button>', 'blue')}
+            ${row('volume-2', '原创声线', '温柔女声，语速偏慢', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已播放声线">试听</button>', 'coral')}
+            ${row('timer', '自由聊天时长', '单次 8 分钟，每日 25 分钟', '', 'green')}
+            ${row('file-text', '对话记录', '默认只保存主题摘要', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="boundaries">说明</button>', 'amber')}
+          </section>
+        `,
+        privacy: `
+          ${header('隐私与权限', '数据可控')}
+          <section class="space-y-3">
+            ${settingRow('隐私模式', '开启后实时看护和记录入口受限', true)}
+            ${settingRow('远程查看提示', '家长查看时设备端显示工作状态', true)}
+            ${settingRow('普通闲聊逐字记录', '默认关闭，只展示主题摘要', false)}
+            ${settingRow('只保存事件截图', '不保存全天连续录像', true)}
+          </section>
+          <section class="glass-card mt-4 p-4">
+            <p class="text-sm font-semibold">儿童数据权利</p>
+            <div class="mt-3 grid grid-cols-2 gap-2">
+              <button class="tap min-h-[46px] rounded-[16px] bg-white/76 text-sm font-semibold" data-toast="已导出请求">导出数据</button>
+              <button class="tap min-h-[46px] rounded-[16px] bg-red-50 text-sm font-semibold text-mira-red" data-sheet="deleteData">删除数据</button>
+            </div>
+          </section>
+        `,
+        family: `
+          ${header('家庭成员', '权限管理')}
+          <section class="space-y-3">
+            ${member('妈妈', '管理员', '全部权限', 'green')}
+            ${member('爸爸', '监护人', '看护、报告、安全事件', 'blue')}
+            ${member('奶奶', '临时查看者', '只看今日待办和提醒', 'amber')}
+          </section>
+          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="member">${icon('user-plus', 'h-4 w-4')}邀请成员</button>
+        `,
+        device: `
+          ${header('设备管理', '儿童房摄像头')}
+          <section class="solid-card p-4">
+            ${row('camera', 'Mira Cam M1', '在线，固件 1.2.8', '<span class="pill bg-green-50 text-mira-green">在线</span>', 'green')}
+            ${row('rotate-3d', '云台校准', '书桌、床、门口、玩具区', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已校准">校准</button>', 'blue')}
+            ${row('wifi', '网络状态', 'Mira Home 5G，信号良好', '', 'green')}
+            ${row('power', '解绑或转移', '需要管理员确认', '<button class="tap rounded-full bg-red-50 px-3 py-2 text-xs font-semibold text-mira-red" data-sheet="unbind">解绑</button>', 'red')}
+          </section>
+        `,
+        notifications: `
+          ${header('通知设置', '只提醒真正重要的事')}
+          <section class="space-y-3">
+            ${settingRow('安全告警', 'SOS、门口、危险区域和异常声音', true)}
+            ${settingRow('任务待确认', '作业证据、打卡素材和奖励审批', true)}
+            ${settingRow('流程提醒', '带书清单、睡前流程、晨起闹铃', true)}
+            ${settingRow('普通闲聊摘要', '每天最多一次，不打扰工作时间', false)}
+          </section>
+          <section class="glass-card mt-4 p-4">
+            <p class="text-sm font-semibold">通知分发</p>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">安全事件同时通知管理员和第二联系人；普通待办只通知当前负责照护人，避免多人重复处理。</p>
+          </section>
+        `,
+        education: `
+          ${header('学习内容', '内容生态入口')}
+          <section class="solid-card p-4">
+            ${row('book-open', '课程表导入', '用于生成明日带书和学习任务', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已进入导入流程">导入</button>', 'blue')}
+            ${row('graduation-cap', '合作内容', '预留学而思等授权内容入口', '<span class="pill bg-amber-50 text-mira-amber">规划中</span>', 'amber')}
+            ${row('brain', '学习缺漏诊断', '长期数据积累后开启', '<span class="pill bg-slate-100 text-slate-700">P2</span>', 'slate')}
+          </section>
+          <section class="glass-card mt-4 p-4">
+            <p class="text-sm font-semibold">边界说明</p>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">内容生态只做任务和资源授权，不绕过学校或第三方平台规则自动提交内容。</p>
+          </section>
+        `,
+        feedback: `
+          ${header('帮助与反馈', '让问题能被追踪')}
+          <section class="space-y-3">
+            ${row('message-square', '提交产品反馈', '体验问题、建议、误判样例', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="feedback">提交</button>', 'blue')}
+            ${row('bug', '上报 AI 误判', '关联证据、任务和处理结果', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已打开误判上报">上报</button>', 'amber')}
+            ${row('headphones', '联系客服', '工作日 9:00 - 21:00', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="正在连接客服">联系</button>', 'green')}
+          </section>
+          <section class="glass-card mt-4 p-4">
+            <p class="text-sm font-semibold">常见问题</p>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">包括设备离线、隐私模式、任务证据误判、语音唤醒不准、报告生成慢等问题。</p>
+          </section>
+        `,
+        about: `
+          ${header('关于我们', 'Mira Guardian')}
+          <section class="liquid rounded-[30px] p-5 text-center">
+            <div class="mx-auto grid h-20 w-20 place-items-center rounded-[24px] bg-mira-ink text-white">${icon('aperture', 'h-10 w-10')}</div>
+            <h3 class="mt-4 text-2xl font-semibold">Mira Guardian 米拉</h3>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">家庭 AI 智护与成长中枢。以家长规则为边界，以孩子真实生活场景为中心。</p>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${row('shield-check', '儿童隐私优先', '最小必要、监护人授权、可删除', '', 'green')}
+            ${row('heart-handshake', '温柔但有边界', '减少催促，不替代家长陪伴', '', 'coral')}
+            ${row('file-text', '服务协议与隐私政策', '查看条款和儿童数据说明', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="privacy">查看</button>', 'blue')}
+          </section>
+        `,
+        version: `
+          ${header('版本更新', '最近变化')}
+          <section class="solid-card p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-lg font-semibold">v0.8.0 内测版</p>
+                <p class="mt-1 text-xs text-mira-muted">2026.05.26</p>
+              </div>
+              <span class="pill bg-blue-50 text-mira-blue">当前版本</span>
+            </div>
+            <div class="mt-4 space-y-3 text-sm leading-6 text-mira-muted">
+              <p>新增完整一日流程和带书清单。</p>
+              <p>新增任务证据确认、奖励审批和安全事件处理。</p>
+              <p>优化实时看护隐私提示和设备端工作状态展示。</p>
+            </div>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${row('download-cloud', '检查更新', '有新版本时提示家长升级', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已是最新版本">检查</button>', 'blue')}
+            ${row('list-checks', '版本记录', '查看历史功能和修复项', '', 'slate')}
+          </section>
+        `,
+        settings: `
+          ${header('设置', '家庭与规则')}
+          <section class="space-y-3">
+            ${settingsLink('孩子档案', '年龄段、年级、作息偏好', 'child', 'user-round')}
+            ${settingsLink('设备管理', '在线状态、云台、固件', 'device', 'camera')}
+            ${settingsLink('家庭成员', '角色和通知分发', 'family', 'users')}
+            ${settingsLink('对话与人设', '唤醒名、声线、聊天边界', 'conversation', 'message-circle')}
+            ${settingsLink('隐私与权限', '记录策略、数据删除、隐私模式', 'privacy', 'shield-check')}
+            ${settingsLink('通知设置', '推送优先级和照护人分发', 'notifications', 'bell')}
+            ${settingsLink('安全区域', '门口、厨房、窗边、阳台', 'zones', 'shield-alert')}
+            ${settingsLink('学习内容', '课程表导入和合作内容入口', 'education', 'book-open')}
+            ${settingsLink('帮助与反馈', '误判上报、客服、常见问题', 'feedback', 'message-square')}
+            ${settingsLink('关于我们', '品牌、隐私承诺和服务条款', 'about', 'aperture')}
+            ${settingsLink('版本更新', '当前版本和更新记录', 'version', 'download-cloud')}
+          </section>
+        `
+      };
+    }
+
+    function timeline(title, desc, time, tone, go = '') {
+      const dot = tone === 'green' ? 'bg-mira-green' : tone === 'blue' ? 'bg-mira-blue' : 'bg-slate-300';
+      const attrs = go ? `data-go="${go}"` : 'data-sheet="flowItem"';
+      return `
+        <button class="tap timeline-item w-full text-left" ${attrs}>
+          <div class="timeline-dot-wrap">
+            <span class="timeline-dot ${dot}"></span>
+          </div>
+          <div class="timeline-copy">
+            <p class="text-sm font-semibold">${title}</p>
+            <p class="mt-1 truncate text-xs text-mira-muted">${desc}</p>
+          </div>
+          <span class="timeline-time">${time}</span>
+        </button>
+      `;
+    }
+
+    function taskCard(title, type, time, status, tone, go) {
+      const badge = tone === 'green' ? 'bg-green-50 text-mira-green' : tone === 'amber' ? 'bg-amber-50 text-mira-amber' : 'bg-blue-50 text-mira-blue';
+      return `
+        <button class="tap list-item list-card w-full p-4 text-left" data-go="${go}">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-base font-semibold">${title}</p>
+              <p class="mt-1 text-xs text-mira-muted">${type} · ${time}</p>
+            </div>
+            <span class="pill ${badge}">${status}</span>
+          </div>
+        </button>
+      `;
+    }
+
+    function videoCard(title, time, src, tone) {
+      const badge = tone === 'green' ? 'bg-green-50 text-mira-green' : tone === 'amber' ? 'bg-amber-50 text-mira-amber' : 'bg-blue-50 text-mira-blue';
+      return `
+        <button class="tap list-item media-list-card flex w-full overflow-hidden text-left" data-sheet="playback">
+          <img src="${src}" alt="${title}" class="h-28 w-32 shrink-0 object-cover" />
+          <div class="flex min-w-0 flex-1 flex-col justify-between p-3">
+            <div>
+              <span class="pill ${badge}">${time}</span>
+              <p class="mt-2 text-sm font-semibold">${title}</p>
+            </div>
+            <p class="text-xs text-mira-muted">点击查看证据片段</p>
+          </div>
+        </button>
+      `;
+    }
+
+    function rewardCard(title, cost, desc, action) {
+      const attrs = action === 'reward' ? 'data-sheet="reward"' : 'data-toast="兑换申请已发送"';
+      return `
+        <button class="tap list-item list-card w-full p-4 text-left" ${attrs}>
+          <div class="flex items-center gap-3">
+            <span class="grid h-12 w-12 place-items-center rounded-[18px] bg-orange-50 text-mira-coral">${icon('gift')}</span>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold">${title}</p>
+              <p class="mt-1 text-xs text-mira-muted">${desc}</p>
+            </div>
+            <span class="pill bg-white text-mira-coral">${cost}</span>
+          </div>
+        </button>
+      `;
+    }
+
+    function settingRow(title, desc, on) {
+      return `
+        <div class="list-item list-row flex">
+          <div class="row-copy">
+            <p class="row-title">${title}</p>
+            <p class="row-desc">${desc}</p>
+          </div>
+          <button class="tap relative h-8 w-[54px] rounded-full ${on ? 'bg-mira-blue' : 'bg-slate-300'}" data-toast="${title}${on ? '已开启' : '已关闭'}" aria-label="${title}">
+            <span class="absolute top-1 h-6 w-6 rounded-full bg-white shadow ${on ? 'right-1' : 'left-1'}"></span>
+          </button>
+        </div>
+      `;
+    }
+
+    function member(name, role, desc, tone) {
+      return row('user-round', name, `${role} · ${desc}`, `<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="member">权限</button>`, tone);
+    }
+
+    function settingsLink(title, desc, go, iconName) {
+      return row(iconName, title, desc, `<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="${go}">进入</button>`, 'slate');
+    }
+
+    const sheetContent = {
+      evidence: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">处理任务证据</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">确认结果会进入日报和积分流水。若 AI 判断不准，可以标记误判原因。</p>
+        <div class="mt-4 grid gap-2">
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已确认完成，积分 +5">确认完成</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已改为部分完成">改为部分完成</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-red-50 text-sm font-semibold text-mira-red" data-close data-toast="已驳回并记录误判">驳回</button>
+        </div>
+      `,
+      privacy: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">实时看护隐私提示</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">家长查看实时画面时，设备端会显示工作状态。隐私模式开启后，实时看护、录音、录像和记录入口会受限。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>我知道了</button>
+      `,
+      zone: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">新增安全区域</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">选择摄像头视角中的区域，设置触发条件、冷却时间和通知对象。安全区域不参与积分扣分。</p>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已选择门口区域">门口</button>
+          <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已选择厨房区域">厨房</button>
+          <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已选择窗边区域">窗边</button>
+          <button class="tap min-h-[48px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已开始自定义框选">自定义</button>
+        </div>
+      `,
+      moment: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">成长时刻操作</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">成长时刻优先收藏积极行为。家长可以收藏、隐藏、删除或分享给家庭成员。</p>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button class="tap min-h-[48px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已收藏">收藏</button>
+          <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已分享给爸爸">分享</button>
+          <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已隐藏">隐藏</button>
+          <button class="tap min-h-[48px] rounded-[18px] bg-red-50 text-sm font-semibold text-mira-red" data-close data-toast="已删除">删除</button>
+        </div>
+      `,
+      flowItem: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">流程项操作</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">对卡住的流程项可以延后、跳过、完成或提醒，所有操作会进入处理记录。</p>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-blue text-sm font-semibold text-white" data-close data-toast="已延后 10 分钟">延后</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已发送语音提醒">提醒</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-green-50 text-sm font-semibold text-mira-green" data-close data-toast="已标记完成">完成</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-red-50 text-sm font-semibold text-mira-red" data-close data-toast="已跳过并记录原因">跳过</button>
+        </div>
+      `,
+      call: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">发起音频通话</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">通话前设备端会提示孩子“妈妈正在联系你”。隐私模式开启时需要管理员确认。</p>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-green text-sm font-semibold text-white" data-close data-toast="正在发起通话">开始通话</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close>取消</button>
+        </div>
+      `,
+      reward: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">审批奖励兑换</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">小宇申请使用 30 分兑换“周末户外活动”。审批后会记录审批人和兑现状态。</p>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已批准兑换">批准</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已暂缓兑换">暂缓</button>
+        </div>
+      `,
+      safety: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">测试紧急联系人</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">测试会给管理员和第二联系人发送模拟安全通知，不会触发真实报警。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-red text-sm font-semibold text-white" data-close data-toast="测试通知已发送">发送测试</button>
+      `,
+      boundaries: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">互动边界</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">作业模式只允许任务相关问答；睡前模式不主动开启长时间自由聊天；普通闲聊默认只展示摘要。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>确定</button>
+      `,
+      contact: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">添加紧急联系人</h3>
+        <div class="mt-4 space-y-3">
+          <input value="外婆" class="min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+          <input value="138 1234 5678" inputmode="tel" class="min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+        </div>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="联系人已添加">保存</button>
+      `,
+      member: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">成员权限</h3>
+        <div class="mt-4 grid gap-2">
+          <button class="tap min-h-[48px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已设为管理员">管理员</button>
+          <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已设为监护人">监护人</button>
+          <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已设为临时查看者">临时查看者</button>
+        </div>
+      `,
+      packing: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">添加临时物品</h3>
+        <input value="校服外套" class="mt-4 min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已添加到带书清单">保存</button>
+      `,
+      task: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">新建任务</h3>
+        <div class="mt-4 space-y-3">
+          <input value="英语听读" class="min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+          <button class="tap min-h-[48px] w-full rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已选择 20 分钟">预计 20 分钟</button>
+        </div>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="任务已创建">创建</button>
+      `,
+      playback: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">回放片段</h3>
+        <img src="${img.study}" alt="事件回放片段" class="mt-4 h-44 w-full rounded-[22px] object-cover" />
+        <p class="mt-3 text-sm leading-6 text-mira-muted">片段只用于家长判断任务和安全事件，默认不会分享给家庭外成员。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>关闭</button>
+      `,
+      rewardEdit: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">添加奖品</h3>
+        <input value="周末一起骑车" class="mt-4 min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="奖品已添加">保存</button>
+      `,
+      deleteData: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">删除儿童数据</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">删除会影响报告、证据和成长时刻。安全事件按合规策略只保留最小必要内容。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-red text-sm font-semibold text-white" data-close data-toast="已提交删除申请">确认删除</button>
+      `,
+      unbind: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">解绑设备</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">解绑前请确认报告和证据已经同步。设备解绑后将停止远程看护和任务提醒。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-red text-sm font-semibold text-white" data-close data-toast="已进入管理员确认">继续</button>
+      `,
+      feedback: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">提交产品反馈</h3>
+        <textarea class="mt-4 min-h-[120px] w-full rounded-[18px] border border-mira-line bg-white/80 p-4 text-sm font-semibold outline-none">希望报告里能单独看睡前流程。</textarea>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="反馈已提交">提交</button>
+      `
+    };
+
+    function render() {
+      const allScreens = screens();
+      app.innerHTML = allScreens[current] || allScreens.home;
+      renderNav();
+      renderMap();
+      closeSheet();
+      app.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function rootTabFor(screen) {
+      return ['home', 'care', 'sleep'].includes(screen) ? 'home' :
+        ['flow', 'packing', 'tasks', 'taskDetail', 'focus'].includes(screen) ? 'flow' :
+        ['watch', 'playback', 'zones', 'safety', 'safetyDetail'].includes(screen) ? 'watch' :
+        ['report', 'weekly', 'moments', 'points', 'reward', 'checkin'].includes(screen) ? 'report' :
+        ['settings', 'conversation', 'privacy', 'notifications', 'family', 'device', 'education', 'feedback', 'about', 'version', 'child', 'name', 'contacts'].includes(screen) ? 'settings' : '';
+    }
+
+    function updateTabIndicator() {
+      const indicator = bottomNav.querySelector('.tab-indicator');
+      const activeButton = bottomNav.querySelector('.nav-item.active');
+      if (!indicator || !activeButton) {
+        bottomNav.style.setProperty('--active-opacity', 0);
+        return;
+      }
+      const indicatorWidth = Math.min(activeButton.offsetWidth + 8, bottomNav.clientWidth - 16);
+      const indicatorHeight = Math.min(activeButton.offsetHeight + 4, bottomNav.clientHeight - 10);
+      const indicatorX = activeButton.offsetLeft + activeButton.offsetWidth / 2 - indicatorWidth / 2;
+      const indicatorY = activeButton.offsetTop + activeButton.offsetHeight / 2 - indicatorHeight / 2;
+      bottomNav.style.setProperty('--indicator-x', `${indicatorX.toFixed(2)}px`);
+      bottomNav.style.setProperty('--indicator-y', `${indicatorY.toFixed(2)}px`);
+      bottomNav.style.setProperty('--indicator-width', `${indicatorWidth.toFixed(2)}px`);
+      bottomNav.style.setProperty('--indicator-height', `${indicatorHeight.toFixed(2)}px`);
+      bottomNav.style.setProperty('--active-opacity', 1);
+    }
+
+    function renderNav() {
+      const active = rootTabFor(current);
+      if (!bottomNav.querySelector('.nav-item')) {
+        bottomNav.innerHTML = `
+          <span class="tab-indicator" aria-hidden="true"></span>
+          ${nav.map(([screen, iconName, label]) => `
+            <button class="nav-item tap flex flex-col items-center justify-center gap-1" data-go="${screen}" aria-label="${label}" aria-current="false">
+              ${icon(iconName, 'h-5 w-5')}
+              <span class="text-[11px] font-semibold">${label}</span>
+            </button>
+          `).join('')}
+        `;
+      }
+      bottomNav.querySelectorAll('.nav-item').forEach(button => {
+        const isActive = button.dataset.go === active;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-current', isActive ? 'page' : 'false');
+      });
+      updateTabIndicator();
+    }
+
+    function renderMap() {
+      screenMap.innerHTML = groups.map(group => `
+        <section>
+          <p class="mb-2 text-xs font-bold uppercase tracking-wide text-mira-muted">${group.title}</p>
+          <div class="grid grid-cols-2 gap-2">
+            ${group.items.map(([screen, label]) => `
+              <button class="tap min-h-[42px] rounded-[16px] border border-white/70 bg-white/58 px-3 text-left text-sm font-semibold text-mira-ink ${current === screen ? 'active' : ''}" data-go="${screen}">${label}</button>
+            `).join('')}
+          </div>
+        </section>
+      `).join('');
+    }
+
+    function showSheet(name) {
+      sheet.innerHTML = `<div class="sheet-panel">${sheetContent[name] || sheetContent.privacy}</div>`;
+      sheet.classList.add('open');
+      lucide.createIcons();
+    }
+
+    function closeSheet() {
+      sheet.classList.remove('open');
+      sheet.innerHTML = '';
+    }
+
+    let toastTimer;
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    document.addEventListener('click', (event) => {
+      const target = event.target.closest('button, a');
+      if (!target) return;
+      const isBottomTabSwitch = !!target.closest('#bottomNav') && target.dataset.go && rootTabFor(target.dataset.go) !== rootTabFor(current);
+      target.classList.add('tap-flash');
+      setTimeout(() => target.classList.remove('tap-flash'), 340);
+
+      if (target.dataset.close !== undefined) closeSheet();
+      if (target.dataset.go) {
+        current = target.dataset.go;
+        render();
+        if (isBottomTabSwitch) {
+          bottomNav.classList.remove('is-switching');
+          void bottomNav.offsetWidth;
+          bottomNav.classList.add('is-switching');
+          setTimeout(() => bottomNav.classList.remove('is-switching'), 360);
+        }
+      }
+      if (target.dataset.sheet) showSheet(target.dataset.sheet);
+      if (target.dataset.toast) showToast(target.dataset.toast);
+      if (target === sheet) closeSheet();
+    });
+
+    sheet.addEventListener('click', (event) => {
+      if (event.target === sheet) closeSheet();
+    });
+
+    render();
+  </script>
+</body>
+</html>
