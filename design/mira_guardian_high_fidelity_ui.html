@@ -209,6 +209,44 @@
       min-height: 76px;
       border-radius: 22px;
     }
+    .reward-swipe-row {
+      position: relative;
+      min-height: 78px;
+      overflow: hidden;
+      border-radius: 22px;
+    }
+    .reward-swipe-actions {
+      position: absolute;
+      inset: 0 auto 0 0;
+      display: grid;
+      grid-template-columns: 58px 58px;
+      width: 116px;
+      overflow: hidden;
+      border-radius: 22px;
+      background: rgba(255,255,255,.64);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+    }
+    .reward-swipe-actions button {
+      min-height: 78px;
+      border-radius: 0;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .reward-swipe-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 78px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 12px 26px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.78);
+      touch-action: pan-y;
+      transition: transform .24s var(--ease), box-shadow .2s ease;
+    }
+    .reward-swipe-row.is-open .reward-swipe-card {
+      transform: translateX(112px);
+      box-shadow: 0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.82);
+    }
     .timeline-list {
       position: relative;
       display: grid;
@@ -277,6 +315,307 @@
       font-size: 12px;
       font-weight: 700;
       color: #667085;
+    }
+    .task-list::before {
+      left: 62px;
+      top: 34px;
+      bottom: 34px;
+      background: linear-gradient(180deg, transparent, rgba(148,163,184,.42) 12%, rgba(148,163,184,.42) 88%, transparent);
+    }
+    .task-row {
+      position: relative;
+      display: grid !important;
+      grid-template-columns: 74px minmax(0, 1fr) 22px;
+      min-height: 86px;
+      align-items: center;
+      gap: 0;
+      width: 100%;
+      padding: 12px 12px 12px 0 !important;
+      border-radius: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      text-align: left;
+    }
+    .task-row + .task-row {
+      border-top: 1px solid rgba(148,163,184,.16);
+    }
+    .task-row:hover {
+      background: rgba(255,255,255,.38);
+    }
+    .task-time-block {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      align-self: stretch;
+    }
+    .task-time-pill {
+      display: grid;
+      min-width: 54px;
+      place-items: center;
+      border-radius: 16px;
+      background: rgba(255,255,255,.78);
+      padding: 8px 6px;
+      color: #101828;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 8px 18px rgba(15,23,42,.06);
+    }
+    .task-status-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border-radius: 999px;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .week-nav-button {
+      display: grid;
+      height: 42px;
+      width: 42px;
+      place-items: center;
+      border-radius: 16px;
+      background: rgba(255,255,255,.72);
+      color: #101828;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.74), 0 10px 24px rgba(15,23,42,.06);
+    }
+    .week-day-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .week-day-chip {
+      min-height: 76px;
+      border-radius: 18px;
+      padding: 8px 4px;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.64), 0 8px 18px rgba(15,23,42,.045);
+    }
+    .task-empty-state {
+      min-height: 238px;
+      border-radius: 28px;
+      background: rgba(255,255,255,.78);
+      padding: 22px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 14px 34px rgba(15,23,42,.07);
+    }
+    .task-fab {
+      position: absolute;
+      z-index: 35;
+      right: 25px;
+      bottom: 112px;
+      height: 54px;
+      width: 54px;
+      display: none;
+      touch-action: none;
+      border: 1px solid rgba(255,255,255,.72);
+      border-radius: 999px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.78), rgba(246,249,252,.54)),
+        rgba(248,250,252,.58);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.86),
+        inset 0 -8px 16px rgba(37,99,235,.035),
+        0 16px 32px rgba(15,23,42,.12);
+      backdrop-filter: blur(26px) saturate(178%);
+      -webkit-backdrop-filter: blur(26px) saturate(178%);
+      overflow: hidden;
+      transform: translate(var(--fab-x, 0px), var(--fab-y, 0px));
+      transition:
+        width .26s cubic-bezier(.25,.1,.25,1),
+        border-radius .22s var(--ease),
+        opacity .2s ease,
+        transform .2s var(--ease),
+        box-shadow .22s ease;
+      will-change: transform;
+    }
+    .task-fab.show {
+      display: block;
+    }
+    .task-fab.open {
+      width: 178px;
+      border-radius: 25px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.88),
+        inset 0 -10px 18px rgba(37,99,235,.035),
+        0 18px 38px rgba(15,23,42,.13);
+    }
+    .task-fab::before {
+      content: "";
+      position: absolute;
+      inset: 1px 10px auto;
+      height: 16px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,0));
+      opacity: .62;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .task-fab.open::before {
+      opacity: .72;
+    }
+    .task-fab-main,
+    .task-fab-option {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .task-fab-main {
+      top: 6px;
+      right: 6px;
+      height: 42px;
+      width: 42px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.58);
+      background:
+        radial-gradient(circle at 32% 18%, rgba(255,255,255,.82), rgba(255,255,255,.18) 52%, transparent 76%),
+        linear-gradient(145deg, rgba(255,255,255,.54), rgba(242,247,255,.30) 58%, rgba(37,99,235,.12)),
+        rgba(255,255,255,.28);
+      color: #2563EB;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.74),
+        inset 0 -7px 14px rgba(37,99,235,.05),
+        0 7px 16px rgba(37,99,235,.09),
+        0 5px 14px rgba(15,23,42,.05);
+      backdrop-filter: blur(16px) saturate(165%);
+      -webkit-backdrop-filter: blur(16px) saturate(165%);
+      transition: transform .22s var(--ease), box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .task-fab-main:hover,
+    .task-fab-main:focus-visible {
+      border-color: rgba(37,99,235,.24);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.84),
+        inset 0 -7px 14px rgba(37,99,235,.06),
+        0 9px 18px rgba(37,99,235,.11),
+        0 6px 16px rgba(15,23,42,.06);
+    }
+    .task-fab-main::before {
+      display: none;
+    }
+    .task-fab-main svg {
+      position: relative;
+      z-index: 1;
+      height: 18px;
+      width: 18px;
+      transition: transform .22s ease;
+    }
+    .task-fab.open .task-fab-main svg {
+      transform: rotate(45deg);
+    }
+    .task-fab-option {
+      top: 7px;
+      height: 40px;
+      min-width: 56px;
+      gap: 5px;
+      padding: 0 10px;
+      border: 0;
+      background: transparent;
+      color: #344054;
+      font-size: 12px;
+      line-height: 1.2;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(12px) scale(.96);
+      transition: opacity .18s ease, transform .22s var(--ease), color .18s ease, background .18s ease;
+    }
+    .task-fab-option svg {
+      height: 15px;
+      width: 15px;
+      color: #2563EB;
+      opacity: .92;
+    }
+    .task-fab-option:hover,
+    .task-fab-option:focus-visible {
+      background: rgba(255,255,255,.50);
+      color: #101828;
+    }
+    .task-fab-option.primary {
+      color: #101828;
+    }
+    .task-fab.open .task-fab-option {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0) scale(1);
+    }
+    .task-fab.open .task-fab-option.add {
+      left: 7px;
+      transition-delay: .02s;
+    }
+    .task-fab.open .task-fab-option.template {
+      left: 70px;
+      transition-delay: .05s;
+    }
+    .task-fab.open .task-fab-option.today {
+      left: 7px;
+      min-width: 88px;
+      transition-delay: .02s;
+    }
+    .time-pair {
+      display: grid;
+      grid-template-columns: 1fr 34px 1fr;
+      align-items: center;
+      gap: 8px;
+    }
+    .time-card {
+      min-height: 78px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.78);
+      padding: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 10px 22px rgba(15,23,42,.055);
+    }
+    .template-option {
+      border-radius: 22px;
+      border: 1px solid rgba(16,24,40,.06);
+      background: rgba(255,255,255,.78);
+      padding: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 10px 24px rgba(15,23,42,.06);
+    }
+    .template-option.is-active {
+      border-color: rgba(37,99,235,.34);
+      background: linear-gradient(180deg, rgba(239,246,255,.96), rgba(255,255,255,.78));
+      box-shadow: inset 0 0 0 1px rgba(37,99,235,.16), 0 14px 30px rgba(37,99,235,.10);
+    }
+    .mini-flow {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      margin-left: 4px;
+      padding-left: 18px;
+    }
+    .mini-flow::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 9px;
+      bottom: 9px;
+      width: 1px;
+      background: rgba(148,163,184,.45);
+    }
+    .mini-flow-item {
+      position: relative;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #667085;
+    }
+    .mini-flow-item::before {
+      content: "";
+      position: absolute;
+      left: -17px;
+      top: 5px;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #2563EB;
+      border: 2px solid rgba(255,255,255,.92);
+      box-shadow: 0 4px 10px rgba(15,23,42,.10);
     }
     .media-list-card {
       display: flex !important;
@@ -350,8 +689,8 @@
       right: 22px;
       bottom: 16px;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 4px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
       height: 64px;
       padding: 7px 8px;
       border-radius: 25px;
@@ -369,7 +708,7 @@
       --active-opacity: 0;
       --indicator-x: 0px;
       --indicator-y: 5px;
-      --indicator-width: 68px;
+      --indicator-width: 78px;
       --indicator-height: 54px;
     }
     .tab-indicator {
@@ -524,18 +863,41 @@
       z-index: 40;
       display: none;
       align-items: end;
-      background: rgba(15, 23, 42, .22);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background:
+        radial-gradient(circle at 50% 88%, rgba(255,255,255,.16), transparent 34%),
+        rgba(15, 23, 42, .20);
+      backdrop-filter: blur(7px) saturate(118%);
+      -webkit-backdrop-filter: blur(7px) saturate(118%);
     }
     .sheet.open { display: flex; }
     .sheet-panel {
+      position: relative;
       width: 100%;
       max-height: 78%;
       overflow-y: auto;
       border-radius: 30px 30px 42px 42px;
       padding: 12px 18px 26px;
+      border-color: rgba(255,255,255,.78);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.66)),
+        rgba(255,255,255,.74);
+      box-shadow:
+        0 -22px 54px rgba(15,23,42,.16),
+        inset 0 1px 0 rgba(255,255,255,.95),
+        inset 0 -1px 0 rgba(255,255,255,.48);
+      backdrop-filter: blur(32px) saturate(176%);
+      -webkit-backdrop-filter: blur(32px) saturate(176%);
       animation: sheetUp .36s var(--ease);
+    }
+    .sheet-panel::before {
+      content: "";
+      position: sticky;
+      top: 0;
+      display: block;
+      height: 1px;
+      margin: -1px 18px 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.92), transparent);
+      pointer-events: none;
     }
     @keyframes sheetUp {
       from { transform: translateY(28px); opacity: .3; }
@@ -551,6 +913,16 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity .24s var(--ease), transform .24s var(--ease);
+      border: 1px solid rgba(255,255,255,.76);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.62)),
+        rgba(255,255,255,.74) !important;
+      color: #101828 !important;
+      box-shadow:
+        0 20px 42px rgba(15,23,42,.18),
+        inset 0 1px 0 rgba(255,255,255,.95);
+      backdrop-filter: blur(26px) saturate(170%);
+      -webkit-backdrop-filter: blur(26px) saturate(170%);
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
     .screen-map button {
@@ -632,7 +1004,7 @@
           <ul class="mt-3 space-y-2 text-sm leading-6 text-mira-muted">
             <li>点击态：按钮轻缩放与玻璃高光。</li>
             <li>引导态：首次使用可以逐步推进。</li>
-            <li>抽屉态：证据确认、隐私提示、通话、奖励审批等。</li>
+            <li>抽屉态：证据确认、隐私提示、通话、奖励申请等。</li>
             <li>反馈态：截图、保存、处理完成会显示 toast。</li>
           </ul>
         </div>
@@ -655,6 +1027,12 @@
         <nav id="bottomNav" class="bottom-glass" aria-label="App navigation"></nav>
         <div id="sheet" class="sheet" aria-live="polite"></div>
         <div id="toast" class="toast rounded-full bg-mira-ink px-4 py-3 text-sm font-semibold text-white shadow-2xl" role="status"></div>
+        <div id="taskFab" class="task-fab" aria-label="任务快捷操作">
+          <button class="tap task-fab-option primary add" data-action="add-selected-task"><i data-lucide="plus" class="h-4 w-4"></i>添加</button>
+          <button class="tap task-fab-option template" data-action="template-selected-day"><i data-lucide="sparkles" class="h-4 w-4"></i>模板</button>
+          <button class="tap task-fab-option today" data-action="task-view" data-view="today"><i data-lucide="calendar-check" class="h-4 w-4"></i>今天</button>
+          <button class="tap task-fab-main" data-action="task-fab-toggle" aria-label="展开任务快捷操作" aria-expanded="false"><i data-lucide="plus" class="h-5 w-5"></i></button>
+        </div>
       </div>
     </section>
 
@@ -686,22 +1064,19 @@
 
     const groups = [
       { title: '首次使用', items: [
-        ['welcome', '欢迎页'], ['login', '登录注册'], ['bind', '扫码绑定'], ['wifi', 'Wi-Fi 配网'], ['bindDone', '绑定成功'], ['child', '孩子档案'], ['name', '摄像头命名'], ['contacts', '紧急联系人']
+        ['welcome', '欢迎页'], ['login', '登录注册'], ['parentIdentity', '家长身份'], ['bind', '扫码绑定'], ['wifi', 'Wi-Fi 配网'], ['bindDone', '绑定成功'], ['child', '孩子档案'], ['name', '摄像头命名'], ['contacts', '紧急联系人']
       ]},
       { title: '今日工作台', items: [
         ['home', '首页'], ['care', '协作待办'], ['sleep', '睡眠晨起']
       ]},
       { title: '任务与模板', items: [
-        ['flow', '任务模板'], ['packing', '带书清单'], ['tasks', '任务日历'], ['taskDetail', '任务详情'], ['focus', '专注计时']
+        ['flow', '任务模板'], ['packing', '小书包'], ['tasks', '任务日历'], ['taskDetail', '任务详情'], ['focus', '专注计时']
       ]},
       { title: '看护与事件', items: [
         ['watch', '实时看护'], ['playback', '事件回放'], ['zones', '安全区域'], ['safety', '安全事件'], ['safetyDetail', '事件详情']
       ]},
-      { title: '报告与激励', items: [
-        ['report', '日报'], ['weekly', '周报'], ['moments', '成长时刻'], ['points', '积分'], ['reward', '奖励商店'], ['checkin', '打卡审核']
-      ]},
-      { title: '边界与设置', items: [
-        ['conversation', '对话人设'], ['privacy', '隐私权限'], ['notifications', '通知设置'], ['family', '家庭成员'], ['device', '设备管理'], ['education', '学习内容'], ['feedback', '帮助反馈'], ['about', '关于我们'], ['version', '版本更新'], ['settings', '设置总览']
+      { title: '我的', items: [
+        ['my', '我的总览'], ['accountProfile', '个人信息'], ['accountSecurity', '账号安全'], ['subscription', '订阅套餐'], ['report', '日报'], ['weekly', '周报'], ['moments', '成长时刻'], ['points', '积分'], ['reward', '奖励商店'], ['checkin', '打卡审核'], ['conversation', '对话人设'], ['privacy', '隐私权限'], ['notifications', '通知设置'], ['family', '家庭成员'], ['device', '设备管理'], ['education', '学习内容'], ['about', '关于我们']
       ]}
     ];
 
@@ -709,17 +1084,160 @@
       ['home', 'home', '首页'],
       ['tasks', 'list-checks', '任务'],
       ['watch', 'video', '看护'],
-      ['report', 'chart-no-axes-column', '报告'],
-      ['settings', 'settings', '设置']
+      ['my', 'user-round', '我的']
     ];
 
     let current = 'welcome';
+    let activeSheet = '';
 
     const app = document.getElementById('app');
     const bottomNav = document.getElementById('bottomNav');
     const screenMap = document.getElementById('screenMap');
     const sheet = document.getElementById('sheet');
     const toast = document.getElementById('toast');
+    const taskFab = document.getElementById('taskFab');
+
+    const state = {
+      taskView: 'today',
+      taskWeek: 'current',
+      taskWeekOffset: 0,
+      selectedDayId: '2026-05-26',
+      manualSelectedDateId: null,
+      manualDateSource: 'none',
+      taskFabOpen: false,
+      taskFabX: 0,
+      taskFabY: 0,
+      skipFabClick: false,
+      manualTaskDate: null,
+      manualTaskName: '英语听读',
+      manualStart: '19:50',
+      manualEnd: '20:05',
+      selectedDuration: '15 分钟',
+      selectedDayTemplate: 'schoolEvening',
+      templateApplyDate: 'today',
+      timePickerTarget: 'start',
+      timePickerContext: 'manual',
+      manualSessionCount: 0,
+      editingTask: null,
+      parentRole: '妈妈',
+      parentName: '妈妈',
+      childEntrySource: 'onboarding',
+      childName: '小宇',
+      childBirthday: '2019-03-12',
+      childStage: '小学',
+      childGrade: '一年级',
+      childClass: '3 班',
+      schoolbagMode: '部分书放学校',
+      packingDraft: '校服外套',
+      boundaryLevel: '平衡',
+      evidenceStatus: 'pending',
+      rewardStatus: 'requested',
+      pointBalance: 86,
+      pointThreshold: 10,
+      pointThresholdDraft: '10',
+      pointUnit: '积分',
+      milestoneHandled: false,
+      manualRewardKey: 'story',
+      lastManualReward: '',
+      childRewardDeducted: false,
+      rewardActionOpen: 'story',
+      rewardSwipeStartX: 0,
+      rewardSwipeStartKey: null,
+      skipRewardClick: false,
+      rewardEditingKey: null,
+      rewardDraftName: '周末一起骑车',
+      rewardDraftCost: '20',
+      rewardItems: [
+        { key: 'outdoor', title: '周末户外活动', cost: 30, desc: '亲子活动，建议每周最多 1 次', tone: 'green' },
+        { key: 'story', title: '睡前故事加 10 分钟', cost: 18, desc: '小特权，适合当天兑现', tone: 'blue' },
+        { key: 'fruit', title: '选择一次晚餐水果', cost: 12, desc: '低成本即时奖励', tone: 'amber' }
+      ],
+      packingExtra: [],
+      packingStatus: {
+        math: 'ready',
+        art: 'pending',
+        umbrella: 'pending',
+        water: 'ready',
+        clothes: 'pending',
+        notice: 'pending',
+        notebook: 'pending',
+        english: 'ready',
+        sports: 'pending'
+      },
+      settings: {
+        '安全告警': true,
+        '任务待确认': true,
+        '任务提醒': true,
+        '自由聊天': true,
+        '作业模式限制': true,
+        '睡前不主动聊天': true,
+        '普通闲聊摘要': false,
+        '隐私模式': true,
+        '远程查看提示': true,
+        '普通闲聊逐字记录': false,
+        '只保存事件截图': true
+      },
+      taskPlans: {
+        today: [
+          { time: '18:20', title: '整理玩具', desc: '已完成，AI 自动记录 +3 分', tone: 'green', go: 'points' },
+          { time: '19:00', title: '数学作业', desc: '19:00 - 19:40，第 2 个专注轮次进行中', tone: 'blue', go: 'taskDetail' },
+          { time: '19:50', title: '英语听读', desc: '模板建议：15 分钟，结束后只做鼓励反馈', tone: 'slate', go: 'taskDetail' },
+          { time: '20:10', title: '语文背诵', desc: '20:10 - 20:25，到点由摄像头温和提醒', tone: 'slate', go: 'taskDetail' },
+          { time: '21:10', title: '睡前洗漱', desc: '洗漱、检查小书包、上床目标 21:30', tone: 'slate', go: 'sleep' }
+        ],
+        tomorrow: [
+          { time: '07:25', title: '小书包复查', desc: '数学练习册、美术材料、雨伞', tone: 'amber', go: 'packing' },
+          { time: '19:00', title: '口算练习', desc: '10 分钟，完成后给具体表扬', tone: 'slate', go: 'taskDetail' },
+          { time: '20:00', title: '亲子阅读', desc: '15 分钟，默认不计高积分', tone: 'slate', go: 'taskDetail' }
+        ]
+      },
+      futureTasks: [
+        { time: '周五 07:30', title: '美术材料准备', desc: '纸杯、彩纸、胶棒', tone: 'amber', go: 'packing' }
+      ],
+      dateTaskPlans: {},
+      historyTasks: [
+        { time: '上周二 19:00', title: '数学作业', desc: '已完成，妈妈确认 +5 分', tone: 'green', go: 'taskDetail' },
+        { time: '上周三 20:30', title: '收拾书桌', desc: 'AI 自动记录，连续 4 天完成', tone: 'green', go: 'points' },
+        { time: '上周五 21:10', title: '睡前洗漱', desc: '延后 1 次后完成，日报已记录', tone: 'green', go: 'sleep' }
+      ]
+    };
+
+    const dayTemplates = {
+      schoolEvening: {
+        title: '小学上学日晚间模板',
+        desc: '放学缓冲、作业、阅读、睡前收尾',
+        tasks: [
+          { time: '17:30', title: '喝水休息', desc: '5 分钟，先缓冲不催作业', tone: 'green', go: 'taskDetail', fromTemplate: true },
+          { time: '18:20', title: '整理书桌', desc: '8 分钟，完成后具体表扬', tone: 'slate', go: 'points', fromTemplate: true },
+          { time: '19:00', title: '数学作业', desc: '20 分钟专注 + 5 分钟休息', tone: 'blue', go: 'taskDetail', fromTemplate: true },
+          { time: '20:10', title: '语文背诵', desc: '15 分钟，到点温和提醒', tone: 'slate', go: 'taskDetail', fromTemplate: true },
+          { time: '21:10', title: '睡前洗漱', desc: '检查小书包、洗漱、上床目标 21:30', tone: 'slate', go: 'sleep', fromTemplate: true }
+        ]
+      },
+      weekendHabit: {
+        title: '周末习惯模板',
+        desc: '阅读、运动、家务和兴趣任务',
+        tasks: [
+          { time: '09:30', title: '阅读 20 分钟', desc: '低压力阅读，完成后给具体表扬', tone: 'blue', go: 'taskDetail', fromTemplate: true },
+          { time: '10:20', title: '户外运动', desc: '30 分钟，记录完成即可', tone: 'green', go: 'taskDetail', fromTemplate: true },
+          { time: '16:30', title: '整理房间', desc: '10 分钟，前后对比确认', tone: 'slate', go: 'points', fromTemplate: true },
+          { time: '20:40', title: '检查小书包', desc: '校服、作业材料、老师通知', tone: 'amber', go: 'packing', fromTemplate: true }
+        ]
+      },
+      sleepOnly: {
+        title: '睡前任务模板',
+        desc: '适合只想快速安排晚间收尾',
+        tasks: [
+          { time: '20:30', title: '收拾书桌', desc: '8 分钟，减少第二天混乱', tone: 'slate', go: 'points', fromTemplate: true },
+          { time: '20:50', title: '亲子阅读', desc: '15 分钟，不做高积分刺激', tone: 'blue', go: 'taskDetail', fromTemplate: true },
+          { time: '21:10', title: '睡前洗漱', desc: '洗漱、检查小书包、上床目标 21:30', tone: 'slate', go: 'sleep', fromTemplate: true }
+        ]
+      }
+    };
+
+    const manualStartTimes = ['17:30', '18:20', '19:00', '19:50', '20:30', '21:10'];
+    const manualEndTimes = ['17:45', '18:40', '19:20', '20:05', '20:50', '21:30'];
+    const durationOptions = ['15 分钟', '20 分钟', '30 分钟'];
 
     function icon(name, cls = 'h-5 w-5') {
       return `<i data-lucide="${name}" class="${cls}"></i>`;
@@ -732,7 +1250,7 @@
             <p class="text-sm font-semibold text-mira-muted">${kicker}</p>
             <h2 class="mt-1 text-[30px] font-semibold leading-tight text-mira-ink">${title}</h2>
           </div>
-          ${action || `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="settings" aria-label="设置">${icon('settings')}</button>`}
+          ${action || `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="my" aria-label="我的">${icon('user-round')}</button>`}
         </header>
       `;
     }
@@ -770,10 +1288,723 @@
           <span class="row-icon grid shrink-0 place-items-center ${tones[tone]}">${icon(iconName)}</span>
           <div class="row-copy">
             <p class="row-title">${title}</p>
-            <p class="row-desc">${desc}</p>
+            <p class="row-desc">${rewardAwareText(desc)}</p>
           </div>
           <div class="row-action">${right}</div>
         </div>
+      `;
+    }
+
+    function cloneTasks(tasks) {
+      return tasks.map(task => ({ ...task }));
+    }
+
+    const weekDefinitions = {
+      '-1': {
+        label: '上一周',
+        range: '5月18日 - 5月24日',
+        days: [
+          { id: '2026-05-18', weekday: '周一', month: '5月', day: '18', relation: 'past' },
+          { id: '2026-05-19', weekday: '周二', month: '5月', day: '19', relation: 'past', historyIndex: 0 },
+          { id: '2026-05-20', weekday: '周三', month: '5月', day: '20', relation: 'past', historyIndex: 1 },
+          { id: '2026-05-21', weekday: '周四', month: '5月', day: '21', relation: 'past' },
+          { id: '2026-05-22', weekday: '周五', month: '5月', day: '22', relation: 'past', historyIndex: 2 },
+          { id: '2026-05-23', weekday: '周六', month: '5月', day: '23', relation: 'past' },
+          { id: '2026-05-24', weekday: '周日', month: '5月', day: '24', relation: 'past' }
+        ]
+      },
+      '0': {
+        label: '本周',
+        range: '5月25日 - 5月31日',
+        days: [
+          { id: '2026-05-25', weekday: '周一', month: '5月', day: '25', relation: 'past' },
+          { id: '2026-05-26', weekday: '周二', month: '5月', day: '26', relation: 'today', plan: 'today' },
+          { id: '2026-05-27', weekday: '周三', month: '5月', day: '27', relation: 'future', plan: 'tomorrow' },
+          { id: '2026-05-28', weekday: '周四', month: '5月', day: '28', relation: 'future' },
+          { id: '2026-05-29', weekday: '周五', month: '5月', day: '29', relation: 'future', plan: 'future' },
+          { id: '2026-05-30', weekday: '周六', month: '5月', day: '30', relation: 'future' },
+          { id: '2026-05-31', weekday: '周日', month: '5月', day: '31', relation: 'future' }
+        ]
+      },
+      '1': {
+        label: '下一周',
+        range: '6月1日 - 6月7日',
+        days: [
+          { id: '2026-06-01', weekday: '周一', month: '6月', day: '1', relation: 'future' },
+          { id: '2026-06-02', weekday: '周二', month: '6月', day: '2', relation: 'future' },
+          { id: '2026-06-03', weekday: '周三', month: '6月', day: '3', relation: 'future' },
+          { id: '2026-06-04', weekday: '周四', month: '6月', day: '4', relation: 'future' },
+          { id: '2026-06-05', weekday: '周五', month: '6月', day: '5', relation: 'future' },
+          { id: '2026-06-06', weekday: '周六', month: '6月', day: '6', relation: 'future' },
+          { id: '2026-06-07', weekday: '周日', month: '6月', day: '7', relation: 'future' }
+        ]
+      }
+    };
+
+    function weekForOffset(offset = state.taskWeekOffset) {
+      return weekDefinitions[String(offset)] || weekDefinitions['0'];
+    }
+
+    function allWeekDays() {
+      return Object.values(weekDefinitions).flatMap(week => week.days);
+    }
+
+    function dayById(id) {
+      return allWeekDays().find(day => day.id === id);
+    }
+
+    function defaultDayForWeek(offset) {
+      if (offset < 0) return '2026-05-18';
+      if (offset > 0) return '2026-06-01';
+      return '2026-05-26';
+    }
+
+    function selectedWeekDay() {
+      const week = weekForOffset();
+      return week.days.find(day => day.id === state.selectedDayId) || week.days.find(day => day.id === defaultDayForWeek(state.taskWeekOffset)) || week.days[0];
+    }
+
+    function weekOffsetForDay(dayId) {
+      return Number(Object.keys(weekDefinitions).find(offset => weekDefinitions[offset].days.some(day => day.id === dayId)) || 0);
+    }
+
+    function datePlanKeyForDay(day) {
+      if (day.plan) return day.plan;
+      if (day.relation === 'future') return `date:${day.id}`;
+      return 'history';
+    }
+
+    function stripWeekdayTime(task, weekday) {
+      return {
+        ...task,
+        time: task.time.replace(new RegExp(`^${weekday}\\s*`), '')
+      };
+    }
+
+    function tasksForDay(day) {
+      if (!day) return [];
+      if (day.plan === 'today') return state.taskPlans.today;
+      if (day.plan === 'tomorrow') return state.taskPlans.tomorrow;
+      if (day.plan === 'future') {
+        return [
+          ...state.futureTasks.map(task => stripWeekdayTime(task, day.weekday)),
+          ...(state.dateTaskPlans?.[day.id] || []).map(task => stripWeekdayTime(task, day.weekday))
+        ];
+      }
+      if (Number.isInteger(day.historyIndex)) return [state.historyTasks[day.historyIndex]];
+      return (state.dateTaskPlans?.[day.id] || []).map(task => stripWeekdayTime(task, day.weekday));
+    }
+
+    function currentPlanLabel() {
+      const day = selectedWeekDay();
+      return day ? `${day.month}${day.day}日` : '今天';
+    }
+
+    function sortByTime(tasks) {
+      return [...tasks].sort((a, b) => a.time.localeCompare(b.time, 'zh-Hans-CN', { numeric: true }));
+    }
+
+    function renderTaskTimeline(tasks, planKey = datePlanKeyForDay(selectedWeekDay())) {
+      return sortByTime(tasks).map((task, index) => taskTimeline(task, index, planKey)).join('');
+    }
+
+    function renderTaskRows(tasks) {
+      return tasks.map(task => row('calendar-clock', task.title, `${task.time} · ${task.desc}`, `<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="${task.go || 'taskDetail'}">查看</button>`, task.tone)).join('');
+    }
+
+    function taskDateSwitcher() {
+      const week = weekForOffset();
+      const canPrev = state.taskWeekOffset > -1;
+      const canNext = state.taskWeekOffset < 1;
+      const dayChip = (day) => {
+        const tasks = tasksForDay(day);
+        const active = selectedWeekDay().id === day.id;
+        const emptyFuture = day.relation === 'future' && !tasks.length;
+        const emptyPast = day.relation === 'past' && !tasks.length;
+        const meta = tasks.length ? `${tasks.length}项` : emptyFuture ? '添加' : emptyPast ? '空' : '今天';
+        const activeClass = active ? 'bg-mira-ink text-white shadow-xl shadow-slate-900/15' : emptyPast ? 'bg-white/46 text-mira-muted' : emptyFuture ? 'bg-blue-50/72 text-mira-blue' : 'bg-white/76 text-mira-ink';
+        return `
+          <button class="tap week-day-chip ${activeClass}" data-action="task-day" data-date="${day.id}">
+            <span class="block text-[10px] font-bold ${active ? 'text-white/70' : emptyFuture ? 'text-mira-blue/72' : 'text-mira-muted'}">${day.weekday.replace('周', '')}</span>
+            <span class="mt-1 block text-lg font-semibold leading-none">${day.day}</span>
+            <span class="mt-2 block text-[10px] font-bold ${active ? 'text-white/72' : emptyFuture ? 'text-mira-blue' : 'text-mira-muted'}">${meta}</span>
+          </button>
+        `;
+      };
+      return `
+        <section class="mb-4">
+          <div class="flex items-center justify-between gap-3 px-1">
+            <button class="tap week-nav-button ${canPrev ? '' : 'opacity-35'}" ${canPrev ? 'data-action="week-shift" data-dir="-1"' : 'data-toast="当前原型只展示上一周"'} aria-label="上一周">${icon('chevron-left', 'h-4 w-4')}</button>
+            <div class="min-w-0 text-center">
+              <p class="text-xs font-bold text-mira-muted">${week.label}</p>
+              <p class="mt-1 text-base font-semibold text-mira-ink">${week.range}</p>
+            </div>
+            <button class="tap week-nav-button ${canNext ? '' : 'opacity-35'}" ${canNext ? 'data-action="week-shift" data-dir="1"' : 'data-toast="当前原型只展示下一周"'} aria-label="下一周">${icon('chevron-right', 'h-4 w-4')}</button>
+          </div>
+          <div class="week-day-grid mt-3">
+            ${week.days.map(dayChip).join('')}
+          </div>
+        </section>
+      `;
+    }
+
+    function packingAction(item, label, nextStatus, tone = 'white') {
+      const cls = tone === 'dark' ? 'bg-mira-ink text-white' : 'bg-white text-mira-ink';
+      return `<button class="tap rounded-full ${cls} px-3 py-2 text-xs font-semibold" data-action="packing-status" data-item="${item}" data-status="${nextStatus}">${label}</button>`;
+    }
+
+    function packingStatusBadge(status) {
+      if (status === 'ready') return '<span class="pill bg-green-50 text-mira-green">已准备</span>';
+      if (status === 'reminded') return '<span class="pill bg-blue-50 text-mira-blue">早晨提醒</span>';
+      return '';
+    }
+
+    function renderPackingExtra() {
+      return state.packingExtra.map((item, index) => row('shirt', item, '家长刚添加，已进入小书包提醒', `<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-action="packing-extra-remove" data-index="${index}">移除</button>`, 'blue')).join('');
+    }
+
+    function childGradeOptions(stage = state.childStage) {
+      const options = {
+        '幼儿园': ['小班', '中班', '大班', '学前班'],
+        '小学': ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'],
+        '初中': ['七年级', '八年级', '九年级']
+      };
+      return options[stage] || options['小学'];
+    }
+
+    function defaultClassForStage(stage) {
+      if (stage === '幼儿园') return '向日葵班';
+      if (stage === '初中') return '2 班';
+      return '3 班';
+    }
+
+    function defaultBirthdayForStage(stage) {
+      if (stage === '幼儿园') return '2021-03-12';
+      if (stage === '初中') return '2013-03-12';
+      return '2019-03-12';
+    }
+
+    function childAgeYears() {
+      const birth = new Date(state.childBirthday);
+      const today = new Date('2026-05-27T00:00:00');
+      if (Number.isNaN(birth.getTime())) return '未填';
+      let age = today.getFullYear() - birth.getFullYear();
+      const birthdayThisYear = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+      if (today < birthdayThisYear) age -= 1;
+      return `${Math.max(0, age)} 岁`;
+    }
+
+    function childStagePreset(stage = state.childStage) {
+      const presets = {
+        '幼儿园': {
+          reminder: '短句、游戏化、先示范动作',
+          tasks: '生活自理、收纳、安全和亲子阅读'
+        },
+        '小学': {
+          reminder: '给一个小动作，不催促不比较',
+          tasks: '作业启动、阅读、小书包和运动'
+        },
+        '初中': {
+          reminder: '尊重自主计划，只在卡住时介入',
+          tasks: '自主计划、错题复盘、屏幕边界和运动'
+        }
+      };
+      return presets[stage] || presets['小学'];
+    }
+
+    function rewardOptions() {
+      return state.rewardItems;
+    }
+
+    function selectedRewardOption() {
+      return rewardOptions().find(option => option.key === state.manualRewardKey) || rewardOptions()[0] || { key: 'empty', title: '暂无奖品', cost: 0, desc: '请先添加奖励' };
+    }
+
+    function pointStageInfo() {
+      const threshold = Math.max(1, Number(state.pointThreshold) || 10);
+      const balance = Math.max(0, Number(state.pointBalance) || 0);
+      const fullStages = Math.floor(balance / threshold);
+      const remainder = balance % threshold;
+      const nextNeed = remainder === 0 ? threshold : threshold - remainder;
+      return {
+        threshold,
+        balance,
+        fullStages,
+        remainder,
+        nextNeed,
+        percent: Math.min(100, Math.round((remainder / threshold) * 100))
+      };
+    }
+
+    function stageProgressDots() {
+      const info = pointStageInfo();
+      const filled = Math.min(info.threshold, info.remainder === 0 && info.fullStages > 0 ? info.threshold : info.remainder);
+      return Array.from({ length: info.threshold }).map((_, index) => `
+        <span class="h-2.5 flex-1 rounded-full ${index < filled ? 'bg-mira-coral' : 'bg-slate-200'}"></span>
+      `).join('');
+    }
+
+    function pointUnitAmount(value) {
+      if (state.pointUnit === '小红花') return `${value} 朵小红花`;
+      if (state.pointUnit === '小星星') return `${value} 颗小星星`;
+      return `${value} 分`;
+    }
+
+    function pointUnitSuffix() {
+      if (state.pointUnit === '小红花') return '朵小红花';
+      if (state.pointUnit === '小星星') return '颗小星星';
+      return '分';
+    }
+
+    function pointStageLabel(count = 1) {
+      return `${count} 个阶段`;
+    }
+
+    function pointStageRuleText() {
+      return `${pointUnitAmount(pointStageInfo().threshold)}为一个阶段`;
+    }
+
+    function rewardAwareText(text = '') {
+      return String(text)
+        .replace(/\+(\d+)\s*分/g, (_, value) => `+${pointUnitAmount(Number(value))}`)
+        .replace(/高积分/g, `高${state.pointUnit}`);
+    }
+
+    function rewardOptionButton(option) {
+      const selected = state.manualRewardKey === option.key;
+      return `
+        <button class="tap flex min-h-[64px] w-full items-center justify-between gap-3 rounded-[20px] border px-4 text-left ${selected ? 'border-mira-blue bg-blue-50/80' : 'border-mira-line bg-white/76'}" data-action="manual-reward-select" data-reward="${option.key}">
+          <span>
+            <span class="block text-sm font-semibold">${option.title}</span>
+            <span class="mt-1 block text-xs leading-5 text-mira-muted">${option.desc}</span>
+          </span>
+          <span class="pill ${selected ? 'bg-mira-blue text-white' : 'bg-white text-mira-ink'}">${option.cost} 分</span>
+        </button>
+      `;
+    }
+
+    function childStageOptionsHtml() {
+      return ['幼儿园', '小学', '初中'].map(stage => `<option value="${stage}" ${state.childStage === stage ? 'selected' : ''}>${stage}</option>`).join('');
+    }
+
+    function childGradeOptionsHtml() {
+      return childGradeOptions().map(grade => `<option value="${grade}" ${state.childGrade === grade ? 'selected' : ''}>${grade}</option>`).join('');
+    }
+
+    function setChildStage(nextStage) {
+      if (!nextStage || nextStage === state.childStage) return false;
+      const demoBirthdays = ['2021-03-12', '2019-03-12', '2013-03-12'];
+      const nextConfig = schoolbagConfig(nextStage);
+      const shouldRefreshDemoBirthday = demoBirthdays.includes(state.childBirthday);
+      state.childStage = nextStage;
+      if (shouldRefreshDemoBirthday) state.childBirthday = defaultBirthdayForStage(nextStage);
+      state.childGrade = childGradeOptions(nextStage)[0];
+      state.childClass = defaultClassForStage(nextStage);
+      state.schoolbagMode = nextConfig.defaultMode;
+      state.packingDraft = nextConfig.addDefault;
+      return true;
+    }
+
+    function schoolbagConfig(stage = state.childStage) {
+      const configs = {
+        '幼儿园': {
+          title: '入园物品',
+          headline: '水杯、备用衣物和老师通知优先',
+          desc: '幼儿园不默认生成课本清单，只按每日固定物品、老师通知和临时活动生成提醒。',
+          profileDesc: '入园准备以水杯、备用衣物、园服、午睡用品、活动材料和通知回执为主。',
+          modes: ['按老师通知', '每日固定', '临时活动'],
+          defaultMode: '按老师通知',
+          addDefault: '备用袜子',
+          modeEffects: {
+            '按老师通知': '只把老师通知、园所群消息和临时活动变成清单，避免每天出现无关物品。',
+            '每日固定': '每天固定提醒水杯、备用衣物、园服和午睡用品，适合园所要求稳定的孩子。',
+            '临时活动': '平时少提醒，遇到手工、春游、运动会等活动时重点生成材料清单。'
+          },
+          rows: [
+            { key: 'water', iconName: 'cup-soda', title: '水杯', desc: '每日固定，入园前再提醒一次', tone: 'green', action: '完成', nextStatus: 'ready' },
+            { key: 'clothes', iconName: 'shirt', title: '备用衣物', desc: '按季节和老师通知准备', tone: 'blue', action: '完成', nextStatus: 'ready' },
+            { key: 'notice', iconName: 'file-check-2', title: '通知回执', desc: '需要家长确认是否放入书包', tone: 'amber', action: '提醒', nextStatus: 'reminded', actionTone: 'dark' }
+          ]
+        },
+        '小学': {
+          title: '课程表准备',
+          headline: '课本、练习册和临时材料分开看',
+          desc: '小学按课程表和老师通知生成准备项，避免一股脑把所有书都带回家。',
+          profileDesc: '小学重点是课程表、作业本、练习册、文具和运动/美术等临时材料。',
+          modes: ['部分书放学校', '每天带回', '有储物柜'],
+          defaultMode: '部分书放学校',
+          addDefault: '校服外套',
+          modeEffects: {
+            '部分书放学校': '默认不把留校课本加入晚间清单，只提醒需要带回家的作业本、练习册和临时材料。',
+            '每天带回': '每天晚间检查课本、作业本和文具，适合学校要求书本每天带回的情况。',
+            '有储物柜': '把清单分成“柜内保留”和“明天带回”，只在需要补充或带走时提醒。'
+          },
+          rows: [
+            { key: 'math', iconName: 'book-open-check', title: '数学练习册', desc: '已放进小书包，摄像头确认', tone: 'green', action: '完成', nextStatus: 'ready' },
+            { key: 'art', iconName: 'palette', title: '美术材料', desc: '纸杯、彩纸、胶棒，来自老师通知', tone: 'coral', action: '提醒', nextStatus: 'reminded', actionTone: 'dark' },
+            { key: 'umbrella', iconName: 'umbrella', title: '雨伞', desc: '家长手动添加，明早出门前复查', tone: 'blue', action: '完成', nextStatus: 'ready' }
+          ]
+        },
+        '初中': {
+          title: '自主清单',
+          headline: '按明日课表和自主管理提醒',
+          desc: '初中更强调孩子自己管理材料，家长只设规则、看漏带风险和必要提醒。',
+          profileDesc: '初中重点是学科资料、错题本、运动服、电子设备规则和储物柜策略。',
+          modes: ['只带明日', '有储物柜', '按老师通知'],
+          defaultMode: '只带明日',
+          addDefault: '运动服',
+          modeEffects: {
+            '只带明日': '只按第二天课表生成学科资料，减少书包重量，也减少家长逐项检查。',
+            '有储物柜': '默认把常用资料留在学校，只提醒错题本、作业材料和需要带回签字的内容。',
+            '按老师通知': '不强依赖课程表，主要根据老师通知、作业要求和临时活动生成清单。'
+          },
+          rows: [
+            { key: 'notebook', iconName: 'notebook-tabs', title: '错题本', desc: '数学和英语明天都要用', tone: 'blue', action: '完成', nextStatus: 'ready' },
+            { key: 'english', iconName: 'languages', title: '英语资料夹', desc: '已放入，孩子自查确认', tone: 'green', action: '完成', nextStatus: 'ready' },
+            { key: 'sports', iconName: 'dumbbell', title: '运动服', desc: '体育课临时提醒，明早复查', tone: 'coral', action: '提醒', nextStatus: 'reminded', actionTone: 'dark' }
+          ]
+        }
+      };
+      const config = configs[stage] || configs['小学'];
+      const selectedMode = config.modes.includes(state.schoolbagMode) ? state.schoolbagMode : config.defaultMode;
+      return { ...config, selectedMode };
+    }
+
+    function schoolbagModeEffect(mode = schoolbagConfig().selectedMode) {
+      const config = schoolbagConfig();
+      return config.modeEffects?.[mode] || '根据这个规则决定默认清单、提醒时机和需要家长确认的项目。';
+    }
+
+    function schoolbagModeButton(mode) {
+      const active = schoolbagConfig().selectedMode === mode;
+      return `<button class="tap min-h-[42px] rounded-[16px] ${active ? 'bg-mira-ink text-white shadow-lg shadow-slate-900/10' : 'bg-white/76 text-mira-ink'} px-3 text-xs font-semibold" data-action="schoolbag-mode" data-mode="${mode}">${mode}</button>`;
+    }
+
+    function renderSchoolbagRows() {
+      return schoolbagConfig().rows.map(item => {
+        const status = state.packingStatus[item.key] || 'pending';
+        const action = status === 'pending'
+          ? packingAction(item.key, item.action, item.nextStatus, item.actionTone || 'white')
+          : packingStatusBadge(status);
+        return row(item.iconName, item.title, item.desc, action, item.tone);
+      }).join('');
+    }
+
+    function boundaryConfig(level = state.boundaryLevel) {
+      const configs = {
+        '宽松': { single: '12 分钟', daily: '35 分钟', quiet: '21:30 后', desc: '适合周末或家长在旁边时使用，自由聊天更长。' },
+        '平衡': { single: '8 分钟', daily: '25 分钟', quiet: '21:00 后', desc: '默认方案，兼顾陪伴感和防沉迷。' },
+        '严格': { single: '5 分钟', daily: '15 分钟', quiet: '20:30 后', desc: '适合作业日或睡前更容易兴奋的孩子。' }
+      };
+      return configs[level] || configs['平衡'];
+    }
+
+    function boundaryLevelButton(level) {
+      const active = state.boundaryLevel === level;
+      return `<button class="tap min-h-[42px] rounded-[16px] ${active ? 'bg-mira-ink text-white shadow-lg shadow-slate-900/10' : 'bg-white/76 text-mira-ink'} px-3 text-xs font-semibold" data-action="boundary-level" data-level="${level}">${level}</button>`;
+    }
+
+    function emptyTaskState(day) {
+      const future = day.relation === 'future';
+      return `
+        <section class="task-empty-state grid content-center text-center">
+          <span class="mx-auto grid h-14 w-14 place-items-center rounded-[20px] ${future ? 'bg-blue-50 text-mira-blue' : 'bg-slate-100 text-slate-500'}">${icon(future ? 'plus' : 'calendar-x', 'h-6 w-6')}</span>
+          <h3 class="mt-4 text-lg font-semibold text-mira-ink">${future ? `${day.month}${day.day}日还没安排任务` : `${day.month}${day.day}日没有任务记录`}</h3>
+          <p class="mx-auto mt-2 max-w-[260px] text-sm leading-6 text-mira-muted">${future ? '可以先安排关键任务，也可以套用一天的模板后再删改。' : '过去没有排任务的日期保持空状态，只用于回看，不再补建任务。'}</p>
+          <div class="mt-5 grid grid-cols-2 gap-2">
+            ${future
+              ? `<button class="tap min-h-[46px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-action="add-selected-task">添加任务</button><button class="tap min-h-[46px] rounded-[18px] bg-white/76 text-sm font-semibold" data-action="template-selected-day">套模板</button>`
+              : `<button class="tap min-h-[46px] rounded-[18px] bg-white/76 text-sm font-semibold" data-go="report">看日报</button><button class="tap min-h-[46px] rounded-[18px] bg-white/76 text-sm font-semibold" data-go="weekly">看周报</button>`}
+          </div>
+        </section>
+      `;
+    }
+
+    function tasksScreenContent() {
+      const day = selectedWeekDay();
+      const tasks = tasksForDay(day);
+      if (!tasks.length) return emptyTaskState(day);
+      const readonly = day.relation === 'past';
+      const planKey = datePlanKeyForDay(day);
+      return `
+        <section class="solid-card p-4">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold">${day.relation === 'today' ? '今日任务' : `${day.month}${day.day}日 ${day.weekday}`}</p>
+              <p class="mt-1 text-xs text-mira-muted">${readonly ? '历史记录只读，用来回看证据和日报' : day.relation === 'future' ? '未来日期可以先安排，也可以稍后修改' : '放学后到睡前，只显示今天'}</p>
+            </div>
+            <span class="pill bg-blue-50 text-mira-blue">${tasks.length} 项</span>
+          </div>
+          ${readonly
+            ? `<div class="mt-4 space-y-2">${renderTaskRows(tasks)}</div>`
+            : `<div class="timeline-list task-list mt-4">${renderTaskTimeline(tasks, planKey)}</div>`}
+          ${day.relation === 'future' ? `<button class="tap mt-4 flex min-h-[46px] w-full items-center justify-center gap-2 rounded-[18px] bg-blue-50 text-sm font-semibold text-mira-blue" data-action="add-selected-task">${icon('plus', 'h-4 w-4')}继续添加这一天</button>` : ''}
+        </section>
+      `;
+    }
+
+    function dateCopy(date) {
+      if (!date) return '未选择日期';
+      if (date === 'today') return '今天';
+      if (date === 'tomorrow') return '明天';
+      const selected = selectedWeekDay();
+      const day = dayById(state.manualSelectedDateId) || (selected?.relation === 'future' ? selected : dayById('2026-05-29'));
+      return day ? `${day.month}${day.day}日` : '未来日期';
+    }
+
+    function dateButton(date, label, selected, action = 'manual-date') {
+      return `<button class="tap min-h-[48px] rounded-[18px] text-sm font-semibold ${selected === date ? 'bg-mira-ink text-white' : 'bg-white/76 text-mira-ink'}" data-action="${action}" data-date="${date}">${label}</button>`;
+    }
+
+    function manualDateDay() {
+      if (!state.manualTaskDate) return null;
+      if (state.manualTaskDate === 'today') return dayById('2026-05-26');
+      if (state.manualTaskDate === 'tomorrow') return dayById('2026-05-27');
+      return dayById(state.manualSelectedDateId);
+    }
+
+    function manualDateTitle() {
+      const day = manualDateDay();
+      if (!day) return '请选择任务日期';
+      const prefix = state.manualTaskDate === 'today' ? '今天' : state.manualTaskDate === 'tomorrow' ? '明天' : day.weekday;
+      return `${prefix} · ${day.month}${day.day}日`;
+    }
+
+    function manualDateHint() {
+      if (!state.manualTaskDate) return '从普通入口新建任务时，需要先确定日期';
+      if (state.manualDateSource === 'timeline') return '来自当前时间轴，可以继续添加这一天';
+      return '家长已手动选择，可随时修改';
+    }
+
+    function setManualDateForDay(day, source = 'manual') {
+      if (!day || day.relation === 'past') return;
+      if (day.plan === 'today') {
+        state.manualTaskDate = 'today';
+      } else if (day.plan === 'tomorrow') {
+        state.manualTaskDate = 'tomorrow';
+      } else {
+        state.manualTaskDate = 'future';
+      }
+      state.manualSelectedDateId = day.id;
+      state.manualDateSource = source;
+    }
+
+    function clearManualDateContext() {
+      state.manualTaskDate = null;
+      state.manualSelectedDateId = null;
+      state.manualDateSource = 'none';
+      state.manualSessionCount = 0;
+    }
+
+    function taskToneBadge(task) {
+      if (task.tone === 'green') return '<span class="task-status-chip bg-green-50 text-mira-green">已完成</span>';
+      if (task.tone === 'blue') return '<span class="task-status-chip bg-blue-50 text-mira-blue">进行中</span>';
+      if (task.tone === 'amber') return '<span class="task-status-chip bg-amber-50 text-mira-amber">待确认</span>';
+      if (task.fromTemplate) return '<span class="task-status-chip bg-blue-50 text-mira-blue">模板</span>';
+      return '<span class="task-status-chip bg-slate-100 text-slate-600">待开始</span>';
+    }
+
+    function templatePreview(tasks) {
+      return `<div class="mini-flow">${tasks.map(task => `<p class="mini-flow-item"><span class="font-bold text-mira-ink">${task.time}</span> ${task.title}</p>`).join('')}</div>`;
+    }
+
+    function openTimeButton(target, label, value) {
+      return `
+        <button class="tap time-card text-left" data-action="open-time-picker" data-target="${target}">
+          <p class="text-xs font-bold text-mira-muted">${label}</p>
+          <p class="mt-2 text-[28px] font-semibold leading-none text-mira-ink">${value}</p>
+          <p class="mt-2 text-xs font-semibold text-mira-blue">点击选择</p>
+        </button>
+      `;
+    }
+
+    function taskSheetHtml() {
+      const copy = dateCopy(state.manualTaskDate);
+      const hasDate = !!state.manualTaskDate;
+      const dateTitle = manualDateTitle();
+      const dateHint = manualDateHint();
+      const saveClass = hasDate ? 'bg-mira-ink text-white' : 'bg-slate-200 text-mira-muted';
+      const durationButton = (label) => `<button class="tap min-h-[42px] rounded-full px-4 text-xs font-semibold ${state.selectedDuration === label ? 'bg-mira-ink text-white' : 'bg-white/78 text-mira-ink'}" data-action="manual-duration" data-duration="${label}">${label}</button>`;
+      return `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="text-xl font-semibold">新建单个任务</h3>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">${hasDate ? `将添加到${copy}，保存后可以继续添加下一条。` : '先选择任务日期，再设置名称和时间。'}</p>
+          </div>
+          ${state.manualSessionCount ? `<span class="pill bg-blue-50 text-mira-blue">已加 ${state.manualSessionCount}</span>` : ''}
+        </div>
+        <div class="mt-4 space-y-3">
+          <label class="block text-xs font-bold text-mira-muted">任务名称</label>
+          <input value="${state.manualTaskName}" data-field="manualTaskName" class="min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+          <button class="tap flex min-h-[76px] w-full items-center justify-between rounded-[22px] border ${hasDate ? 'border-white/70 bg-white/72' : 'border-blue-200 bg-blue-50/80'} px-4 text-left" data-sheet="taskDate">
+            <span class="flex min-w-0 items-center gap-3">
+              <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[16px] ${hasDate ? 'bg-blue-50 text-mira-blue' : 'bg-white text-mira-blue'}">${icon('calendar-days', 'h-5 w-5')}</span>
+              <span class="min-w-0">
+                <span class="block text-xs font-bold text-mira-muted">任务日期</span>
+                <span class="mt-1 block text-base font-semibold text-mira-ink">${dateTitle}</span>
+                <span class="mt-1 block text-xs leading-5 text-mira-muted">${dateHint}</span>
+              </span>
+            </span>
+            <span class="ml-3 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/76 text-mira-muted">${icon('chevron-right', 'h-4 w-4')}</span>
+          </button>
+          <section class="rounded-[24px] bg-white/62 p-3">
+            <div class="flex items-center justify-between gap-3">
+              <p class="text-sm font-semibold">时间段</p>
+              <span class="text-xs font-bold text-mira-muted">${hasDate ? copy : '待选择'}</span>
+            </div>
+            <div class="time-pair mt-3">
+              ${openTimeButton('start', '开始', state.manualStart)}
+              <span class="grid h-9 w-9 place-items-center rounded-full bg-white/80 text-mira-muted">${icon('arrow-right', 'h-4 w-4')}</span>
+              ${openTimeButton('end', '结束', state.manualEnd)}
+            </div>
+            <div class="mt-3 flex gap-2">
+              ${durationOptions.map(durationButton).join('')}
+            </div>
+            <p class="mt-2 text-xs leading-5 text-mira-muted">快捷时长会自动推算结束时间，仍可手动微调。</p>
+          </section>
+          <button class="tap flex min-h-[54px] w-full items-center justify-between rounded-[20px] bg-blue-50 px-4 text-left text-sm font-semibold text-mira-blue" data-sheet="taskTemplates">
+            <span>想一次安排一整天？使用模板</span>${icon('chevron-right', 'h-4 w-4')}
+          </button>
+        </div>
+        <div class="mt-4 grid grid-cols-[1fr_1.1fr] gap-2">
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-action="manual-save-continue">保存并继续</button>
+          <button class="tap min-h-[50px] rounded-[18px] ${saveClass} text-sm font-semibold" data-action="manual-save">${hasDate ? '保存到任务' : '先选日期'}</button>
+        </div>
+      `;
+    }
+
+    function taskDateSheetHtml() {
+      const activeId = manualDateDay()?.id;
+      const sections = [
+        ['常用日期', [dayById('2026-05-26'), dayById('2026-05-27')]],
+        ['未来日期', [
+          ...weekDefinitions['0'].days.filter(day => day.relation === 'future' && day.id !== '2026-05-27'),
+          ...weekDefinitions['1'].days
+        ]]
+      ];
+      const option = (day) => {
+        const active = day.id === activeId;
+        const prefix = day.relation === 'today' ? '今天' : day.plan === 'tomorrow' ? '明天' : day.weekday;
+        const count = tasksForDay(day).length;
+        return `
+          <button class="tap flex min-h-[62px] w-full items-center justify-between rounded-[20px] px-4 text-left ${active ? 'bg-mira-ink text-white shadow-xl shadow-slate-900/15' : 'bg-white/76 text-mira-ink'}" data-action="manual-date-pick" data-date-id="${day.id}">
+            <span>
+              <span class="block text-sm font-semibold">${prefix} · ${day.month}${day.day}日</span>
+              <span class="mt-1 block text-xs ${active ? 'text-white/70' : 'text-mira-muted'}">${count ? `已有 ${count} 项任务` : '还没有任务'}</span>
+            </span>
+            <span class="grid h-8 w-8 place-items-center rounded-full ${active ? 'bg-white/14 text-white' : 'bg-blue-50 text-mira-blue'}">${active ? icon('check', 'h-4 w-4') : icon('plus', 'h-4 w-4')}</span>
+          </button>
+        `;
+      };
+      return `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">选择任务日期</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">从日历某一天进入会自动带入日期；从普通入口新建时，需要先选择日期。</p>
+        <div class="mt-4 space-y-4">
+          ${sections.map(([title, days]) => `
+            <section>
+              <p class="mb-2 text-xs font-bold text-mira-muted">${title}</p>
+              <div class="grid gap-2">${days.filter(Boolean).map(option).join('')}</div>
+            </section>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function dayTemplateSheetHtml() {
+      const selected = dayTemplates[state.selectedDayTemplate];
+      const templateCard = (key) => {
+        const template = dayTemplates[key];
+        const active = state.selectedDayTemplate === key;
+        return `
+          <button class="tap template-option w-full text-left ${active ? 'is-active' : ''}" data-action="day-template-select" data-template="${key}">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold ${active ? 'text-mira-blue' : 'text-mira-ink'}">${template.title}</p>
+                <p class="mt-1 text-xs leading-5 text-mira-muted">${template.desc}</p>
+              </div>
+              <span class="pill ${active ? 'bg-mira-ink text-white' : 'bg-white/82 text-mira-muted'}">${template.tasks.length} 项</span>
+            </div>
+          </button>
+        `;
+      };
+      return `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">套用一天任务模板</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">根据孩子年龄和年级生成一整天任务，套用后点任一任务继续调整。</p>
+        <div class="mt-4 grid grid-cols-3 gap-2">
+          ${dateButton('today', '今天', state.templateApplyDate, 'template-date')}
+          ${dateButton('tomorrow', '明天', state.templateApplyDate, 'template-date')}
+          ${dateButton('future', dateCopy('future'), state.templateApplyDate, 'template-date')}
+        </div>
+        <div class="mt-4 space-y-2">
+          ${templateCard('schoolEvening')}
+          ${templateCard('weekendHabit')}
+          ${templateCard('sleepOnly')}
+        </div>
+        <section class="mt-4 rounded-[22px] bg-white/72 p-4">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold">模板预览</p>
+            <span class="pill bg-blue-50 text-mira-blue">${selected.tasks.length} 项</span>
+          </div>
+          <div class="mt-3">${templatePreview(selected.tasks)}</div>
+        </section>
+        <div class="mt-4 grid grid-cols-[.9fr_1.2fr] gap-2">
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-sheet="task">返回手动添加</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-action="day-template-apply" data-date="${state.templateApplyDate}">套用到${dateCopy(state.templateApplyDate)}</button>
+        </div>
+      `;
+    }
+
+    function taskEditSheetHtml() {
+      const ref = state.editingTask;
+      const task = selectedTaskRef()?.task;
+      if (!task) return '<p class="text-sm text-mira-muted">没有找到要编辑的任务。</p>';
+      return `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="text-xl font-semibold">任务详情</h3>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">这里处理编辑、复制和删除，列表只保留浏览信息。</p>
+          </div>
+          ${taskToneBadge(task)}
+        </div>
+        <div class="mt-4 space-y-3">
+          <button class="tap flex min-h-[66px] w-full items-center justify-between rounded-[20px] bg-white/76 px-4 text-left" data-action="open-time-picker" data-target="start" data-context="edit">
+            <span><span class="block text-xs font-bold text-mira-muted">开始时间</span><span class="mt-1 block text-2xl font-semibold">${task.time}</span></span>
+            ${icon('chevron-right', 'h-4 w-4 text-mira-muted')}
+          </button>
+          <label class="block text-xs font-bold text-mira-muted">任务名称</label>
+          <input value="${task.title}" data-field="editingTaskTitle" class="min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+          <section class="rounded-[18px] bg-blue-50 p-3 text-xs leading-5 text-blue-800">
+            当前说明：${rewardAwareText(task.desc)}
+          </section>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-action="task-delay">延后 10 分钟</button>
+            <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-action="task-duplicate">复制到明天</button>
+          </div>
+        </div>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button class="tap min-h-[50px] rounded-[18px] bg-red-50 text-sm font-semibold text-mira-red" data-action="task-delete" data-plan="${ref.plan}" data-index="${ref.index}">删除</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-action="task-edit-save">保存修改</button>
+        </div>
+      `;
+    }
+
+    function timePickerSheetHtml() {
+      const isStart = state.timePickerTarget === 'start';
+      const slots = isStart ? manualStartTimes : manualEndTimes;
+      const selectedTask = state.timePickerContext === 'edit' ? selectedTaskRef()?.task : null;
+      const selected = selectedTask ? selectedTask.time : isStart ? state.manualStart : state.manualEnd;
+      return `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">选择${isStart ? '开始' : '结束'}时间</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">${state.timePickerContext === 'edit' ? '会同步更新当前任务。' : '选择后会回到新建任务表单。'}</p>
+        <div class="mt-4 grid grid-cols-3 gap-2">
+          ${slots.map(time => `<button class="tap min-h-[52px] rounded-[18px] text-sm font-semibold ${selected === time ? 'bg-mira-ink text-white' : 'bg-white/76 text-mira-ink'}" data-action="time-select" data-time="${time}">${time}</button>`).join('')}
+        </div>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-white/76 text-sm font-semibold" data-sheet="${state.timePickerContext === 'edit' ? 'taskEdit' : 'task'}">返回</button>
       `;
     }
 
@@ -807,7 +2038,7 @@
         `,
         login: `
           ${header('账户', '登录或创建家庭')}
-          <section class="solid-card p-4">
+          <section class="solid-card mt-4 p-4">
             <label class="block text-sm font-semibold text-mira-ink" for="phone">手机号</label>
             <input id="phone" inputmode="tel" value="138 0000 2026" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
             <label class="mt-4 block text-sm font-semibold text-mira-ink" for="code">验证码</label>
@@ -818,9 +2049,25 @@
             <p class="mt-4 text-xs leading-5 text-mira-muted">继续表示监护人同意创建家庭空间。儿童音视频采集会在绑定设备后单独授权。</p>
           </section>
           <div class="mt-5 space-y-3">
-            ${primary('继续', 'bind')}
-            ${secondary('查看隐私说明', 'privacy', 'shield-check')}
+            ${primary('继续', 'parentIdentity')}
+            <button class="tap list-item flex min-h-[48px] w-full items-center justify-between px-4 text-left text-sm font-semibold text-mira-ink" data-sheet="privacyNotice"><span>查看隐私说明</span>${icon('shield-check', 'h-4 w-4 text-mira-muted')}</button>
           </div>
+        `,
+        parentIdentity: `
+          ${header('家长身份', '怎么称呼你？', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="login" aria-label="返回">${icon('chevron-left')}</button>`)}
+          <section class="solid-card p-4">
+            <p class="text-sm leading-6 text-mira-muted">这会用于报告称呼、通知分发和处理记录。孩子资料单独录入，当前这一步只记录家长身份。</p>
+            <div class="mt-4 grid grid-cols-2 gap-2">
+              ${['妈妈', '爸爸', '祖辈', '其他照护人'].map(parentRoleButton).join('')}
+            </div>
+            <label class="mt-4 block text-sm font-semibold" for="parentName">家庭显示名</label>
+            <input id="parentName" data-field="parentName" value="${state.parentName}" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
+            <div class="mt-4 space-y-2">
+              ${row('shield-check', '家庭角色', '第一个创建家庭的家长默认为管理员', '<span class="pill bg-green-50 text-mira-green">管理员</span>', 'green')}
+              ${row('smartphone', '登录手机号', '138 **** 2026，用于安全验证和找回账号', '<span class="pill bg-blue-50 text-mira-blue">已验证</span>', 'blue')}
+            </div>
+          </section>
+          <div class="mt-5">${primary('继续绑定设备', 'bind')}</div>
         `,
         bind: `
           ${header('设备绑定', '扫描摄像头二维码', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="welcome" aria-label="返回">${icon('chevron-left')}</button>`)}
@@ -873,20 +2120,69 @@
         child: `
           ${header('孩子档案', '让任务更合适')}
           <section class="solid-card p-4">
-            <label class="block text-sm font-semibold" for="childName">孩子称呼</label>
-            <input id="childName" value="小宇" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
-            <div class="mt-4 grid grid-cols-3 gap-2">
-              <button class="tap min-h-[48px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white">7 岁</button>
-              <button class="tap min-h-[48px] rounded-[18px] bg-white/80 text-sm font-semibold">小学</button>
-              <button class="tap min-h-[48px] rounded-[18px] bg-white/80 text-sm font-semibold">一年级</button>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold uppercase text-mira-muted">基础信息</p>
+                <p class="mt-1 text-sm leading-6 text-mira-muted">这些信息会影响任务模板、提醒话术、小书包和奖励建议。</p>
+              </div>
+              <span class="pill bg-blue-50 text-mira-blue">${state.childStage}</span>
             </div>
-            <div class="mt-4 grid grid-cols-2 gap-3">
-              ${metric('作息建议', '21:30 睡', 'blue')}
-              ${metric('专注建议', '20/5', 'green')}
+            <label class="mt-4 block text-sm font-semibold" for="childName">孩子称呼</label>
+            <input id="childName" data-field="childName" value="${state.childName}" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
+
+            <div class="mt-4 grid grid-cols-[0.92fr_1.2fr] gap-3">
+              <div>
+                <div class="mb-1 flex items-center justify-between gap-2">
+                  <p class="text-[11px] font-semibold text-mira-muted">出生日期</p>
+                  <span class="text-[11px] font-semibold text-mira-blue">${childAgeYears()}</span>
+                </div>
+                <input type="date" data-field="childBirthday" value="${state.childBirthday}" class="min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-3 text-sm font-semibold outline-none" aria-label="出生日期" />
+              </div>
+              <div>
+                <p class="mb-1 text-[11px] font-semibold text-mira-muted">就读阶段</p>
+                <div class="relative">
+                  <select data-field="childStage" class="min-h-[52px] w-full appearance-none rounded-[18px] border border-mira-line bg-white/80 px-4 pr-10 text-sm font-semibold outline-none" aria-label="就读阶段">${childStageOptionsHtml()}</select>
+                  <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-mira-muted">${icon('chevron-down', 'h-4 w-4')}</span>
+                </div>
+              </div>
             </div>
-            <div class="mt-4 rounded-[18px] bg-blue-50 p-3 text-xs leading-5 text-blue-800">将按年龄、就读阶段和班级推荐任务模板、提醒话术、积分和奖励建议；性别不是必填项。</div>
+
+            <div class="mt-4">
+              <div class="flex items-center justify-between gap-3">
+                <p class="text-[11px] font-semibold text-mira-muted">年级/班级</p>
+                <p class="text-[11px] font-semibold text-mira-muted">按学段自动切换</p>
+              </div>
+              <div class="mt-2 grid grid-cols-[1fr_0.82fr] gap-2">
+                <div class="relative">
+                  <select data-field="childGrade" class="min-h-[50px] w-full appearance-none rounded-[18px] border border-mira-line bg-white/80 px-4 pr-10 text-sm font-semibold outline-none" aria-label="年级">${childGradeOptionsHtml()}</select>
+                  <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-mira-muted">${icon('chevron-down', 'h-4 w-4')}</span>
+                </div>
+                <input data-field="childClass" value="${state.childClass}" class="min-h-[50px] rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" aria-label="班级" placeholder="3 班" />
+              </div>
+            </div>
           </section>
-          <div class="mt-5">${primary('继续命名摄像头', 'name')}</div>
+
+          <section class="solid-card mt-4 p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold text-mira-muted">小书包</p>
+                <h3 class="mt-1 text-lg font-semibold">${schoolbagConfig().title}</h3>
+                <p class="mt-1 text-sm leading-6 text-mira-muted">${schoolbagConfig().profileDesc}</p>
+              </div>
+              <button class="tap shrink-0 rounded-full bg-blue-50 px-3 py-2 text-xs font-semibold text-mira-blue" data-go="packing">查看</button>
+            </div>
+            <div class="mt-3 grid grid-cols-3 gap-2">${schoolbagConfig().modes.map(schoolbagModeButton).join('')}</div>
+            <p class="mt-3 rounded-[18px] bg-white/68 p-3 text-xs leading-5 text-mira-muted">${schoolbagModeEffect()}</p>
+          </section>
+
+          <section class="mt-4 rounded-[24px] bg-blue-50 p-4 text-xs leading-5 text-blue-800">
+            <p class="font-semibold">这些资料怎么用</p>
+            <p class="mt-1">系统会根据生日推算年龄，再结合 ${state.childStage}${state.childGrade} 和 ${state.childClass || '班级'} 生成任务模板、提醒话术、小书包规则和奖励建议；不会让家长在档案页手动调作息或专注参数。</p>
+            <p class="mt-1">${childStagePreset().tasks} 会优先进入模板，提醒语保持 ${childStagePreset().reminder}。</p>
+          </section>
+          ${state.childEntrySource === 'onboarding'
+            ? `<div class="mt-5">${primary('继续命名摄像头', 'name')}</div>`
+            : `<button class="tap mt-5 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white shadow-xl shadow-slate-900/15" data-go="my" data-toast="孩子档案已保存">保存档案</button>`}
         `,
         name: `
           ${header('人设与语音', '孩子给摄像头起名')}
@@ -899,7 +2195,7 @@
             <input id="wakeName" value="小豆" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
             <div class="mt-4 grid grid-cols-2 gap-3">
               <button class="tap min-h-[48px] rounded-[18px] bg-blue-50 text-sm font-semibold text-mira-blue" data-toast="已播放温柔女声">试听声线</button>
-              <button class="tap min-h-[48px] rounded-[18px] bg-white/80 text-sm font-semibold" data-sheet="boundaries">互动边界</button>
+              <button class="tap min-h-[48px] rounded-[18px] bg-white/80 text-sm font-semibold" data-sheet="boundaries">边界说明</button>
             </div>
           </section>
           <div class="mt-5">${primary('设置紧急联系人', 'contacts')}</div>
@@ -914,12 +2210,12 @@
           <div class="mt-5">${primary('进入首页', 'home')}</div>
         `,
         home: `
-          ${header('周一 19:42', '小宇现在', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="care" aria-label="待处理">${icon('bell')}</button>`)}
+          ${header('周一 19:42', `${state.childName}现在`, `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="care" aria-label="待处理">${icon('bell')}</button>`)}
           <section class="liquid rounded-[30px] p-5">
             <div class="flex flex-wrap gap-2">
               <span class="pill bg-green-50 text-mira-green">${icon('wifi', 'h-3.5 w-3.5')}设备在线</span>
               <span class="pill bg-white/76 text-mira-blue">${icon('shield-check', 'h-3.5 w-3.5')}隐私灯亮起</span>
-              <span class="pill bg-blue-50 text-mira-blue">小学一年级</span>
+              <span class="pill bg-blue-50 text-mira-blue">${state.childStage}${state.childGrade}</span>
             </div>
             <h3 class="mt-5 text-[25px] font-semibold leading-tight text-mira-ink">书桌前写作业，状态正常。</h3>
             <p class="mt-2 text-sm leading-6 text-mira-muted">当前任务是数学作业，第 2 个专注轮次；12 分钟后需要家长确认证据。</p>
@@ -947,8 +2243,8 @@
               <button class="tap text-sm font-semibold text-mira-blue" data-go="care">全部</button>
             </div>
             <div class="mt-3 space-y-2">
-              ${row('file-check-2', '作业证据待确认', '确认后进入日报和积分流水', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-go="taskDetail">处理</button>', 'coral')}
-              ${row('gift', '奖励兑换审批', '小宇申请周末户外活动', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="reward">审批</button>', 'amber')}
+              ${row('file-check-2', '作业证据待确认', '确认后进入日报和奖励流水', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-go="taskDetail">处理</button>', 'coral')}
+              ${row('gift', state.rewardStatus === 'requested' ? '奖励申请待确认' : '奖励兑现记录', state.rewardStatus === 'fulfilled' ? '已同意并兑现，记录到奖励流水' : state.rewardStatus === 'planned' ? '已同意，周末提醒兑现' : state.rewardStatus === 'rejected' ? '已暂不兑换，摄像头已温和反馈' : '小宇对摄像头说想换周末户外活动', `<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="reward">${state.rewardStatus === 'requested' ? '确认' : '查看'}</button>`, 'amber')}
             </div>
           </section>
           <section class="solid-card mt-4 p-4">
@@ -961,13 +2257,13 @@
             </div>
             <div class="mt-4 space-y-2">
               ${row('book-open-check', '数学作业进行中', '剩余 12 分钟，结束后自动进入证据确认', '<span class="text-xs font-semibold text-mira-blue">进行中</span>', 'blue')}
-              ${row('moon', '睡前任务 21:10', '洗漱、收书包、上床目标 21:30', '<span class="text-xs font-semibold text-mira-muted">待开始</span>', 'slate')}
+              ${row('moon', '睡前任务 21:10', '洗漱、检查小书包、上床目标 21:30', '<span class="text-xs font-semibold text-mira-muted">待开始</span>', 'slate')}
             </div>
           </section>
           <section class="mt-4 grid grid-cols-2 gap-3">
             <button class="tap list-item p-4 text-left" data-go="packing">
-              <span class="pill bg-blue-50 text-mira-blue">${icon('backpack', 'h-3.5 w-3.5')}明日准备</span>
-              <p class="mt-3 text-lg font-semibold">带书清单</p>
+              <span class="pill bg-blue-50 text-mira-blue">${icon('backpack', 'h-3.5 w-3.5')}小书包</span>
+              <p class="mt-3 text-lg font-semibold">小书包</p>
               <p class="mt-1 text-xs text-mira-muted">2 项待确认</p>
             </button>
             <button class="tap list-item p-4 text-left" data-go="sleep">
@@ -983,7 +2279,7 @@
             <button class="tap list-item p-4 text-left" data-go="points">
               <span class="pill bg-orange-50 text-mira-coral">${icon('star', 'h-3.5 w-3.5')}积分</span>
               <p class="mt-3 text-lg font-semibold">今日 +12</p>
-              <p class="mt-1 text-xs text-mira-muted">可兑换 30 分奖励</p>
+              <p class="mt-1 text-xs text-mira-muted">有 1 个兑换申请</p>
             </button>
           </section>
         `,
@@ -991,13 +2287,13 @@
           ${header('家庭协作', '待处理事项')}
           <section class="space-y-3">
             ${row('file-check-2', '数学作业证据待确认', 'AI 判断完成 80%，需要家长确认', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-go="taskDetail">查看</button>', 'coral')}
-            ${row('gift', '奖励兑换审批', '小宇申请周末户外活动', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="reward">审批</button>', 'coral')}
+            ${row('gift', state.rewardStatus === 'requested' ? '奖励申请待确认' : '奖励兑现记录', state.rewardStatus === 'fulfilled' ? '已同意并兑现，记录到奖励流水' : state.rewardStatus === 'planned' ? '已同意，周末提醒兑现' : state.rewardStatus === 'rejected' ? '已暂不兑换，摄像头已温和反馈' : '小宇语音申请兑换，等待家长确认', `<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="reward">${state.rewardStatus === 'requested' ? '处理' : '查看'}</button>`, 'coral')}
             ${row('shield-alert', '门口区域规则待设置', '建议添加“独自在家不开门”提醒', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="safety">设置</button>', 'red')}
           </section>
           <section class="glass-card mt-4 p-4">
             <p class="text-sm font-semibold">处理记录</p>
             <div class="mt-3 space-y-2 text-sm text-mira-muted">
-              <p>17:20 妈妈确认“整理书包”完成。</p>
+              <p>17:20 妈妈确认“检查小书包”完成。</p>
               <p>18:05 摄像头已提醒喝水，无需重复处理。</p>
             </div>
           </section>
@@ -1009,7 +2305,7 @@
               <div class="progress-ring relative"><strong class="text-lg">2/4</strong></div>
               <div>
                 <p class="text-lg font-semibold">睡前任务进行中</p>
-                <p class="mt-2 text-sm leading-6 text-mira-muted">已完成晚饭和整理玩具，待洗漱、收书包。</p>
+                <p class="mt-2 text-sm leading-6 text-mira-muted">已完成晚饭和整理玩具，待洗漱、检查小书包。</p>
               </div>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-3">
@@ -1026,54 +2322,64 @@
           ${header('按档案推荐', '任务模板', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-sheet="task" aria-label="添加任务">${icon('plus')}</button>`)}
           <section class="liquid rounded-[30px] p-5">
             <div class="flex flex-wrap gap-2">
-              <span class="pill bg-white/76 text-mira-ink">7 岁</span>
-              <span class="pill bg-blue-50 text-mira-blue">小学一年级</span>
+              <span class="pill bg-white/76 text-mira-ink">${childAgeYears()}</span>
+              <span class="pill bg-blue-50 text-mira-blue">${state.childStage}${state.childGrade}</span>
               <span class="pill bg-green-50 text-mira-green">鼓励式提醒</span>
             </div>
             <h3 class="mt-4 text-2xl font-semibold leading-tight">系统已生成 6 个适龄任务模板。</h3>
-            <p class="mt-2 text-sm leading-6 text-mira-muted">家长可以一键启用、改日期、改积分或改提醒强度。新建任务默认今天，也可以安排到未来日期。</p>
+            <p class="mt-2 text-sm leading-6 text-mira-muted">家长可以一键启用、改日期、改奖励数量或改提醒强度。普通新建先选日期，从时间轴进入会自动带入当天。</p>
           </section>
           <section class="mt-4 space-y-3">
             ${templateCard('作业自启动', '每天 19:00 · 专注 20 分钟 + 休息 5 分钟', '启用', 'blue')}
             ${templateCard('阅读 15 分钟', '睡前低刺激任务，完成后只给具体表扬', '已启用', 'green')}
-            ${templateCard('整理书包', '前一晚提醒带书，早晨只复查关键物品', '启用', 'amber')}
-            ${templateCard('睡前任务', '洗漱、收书包、上床目标 21:30', '启用', 'blue')}
+            ${templateCard('小书包', '按学段准备入园或上学物品，避免漏带和多带', '启用', 'amber')}
+            ${templateCard('睡前任务', '洗漱、检查小书包、上床目标 21:30', '启用', 'blue')}
           </section>
           <section class="mt-4 grid grid-cols-2 gap-3">
-            <button class="tap list-item p-4 text-left" data-go="packing">${icon('backpack', 'mb-3 h-5 w-5 text-mira-blue')}<p class="font-semibold">带书清单</p><p class="mt-1 text-xs text-mira-muted">由任务和课程表生成</p></button>
+            <button class="tap list-item p-4 text-left" data-go="packing">${icon('backpack', 'mb-3 h-5 w-5 text-mira-blue')}<p class="font-semibold">小书包</p><p class="mt-1 text-xs text-mira-muted">按学段和明日安排生成</p></button>
             <button class="tap list-item p-4 text-left" data-go="reward">${icon('gift', 'mb-3 h-5 w-5 text-mira-coral')}<p class="font-semibold">奖励建议</p><p class="mt-1 text-xs text-mira-muted">优先表扬和小特权</p></button>
           </section>
         `,
         packing: `
-          ${header('课程表', '明天要带什么')}
-          <section class="solid-card p-4">
-            ${row('check', '数学练习册', '已放进书包，摄像头确认', '<span class="pill bg-green-50 text-mira-green">已准备</span>', 'green')}
-            ${row('palette', '美术材料', '纸杯、彩纸、胶棒', '<button class="tap rounded-full bg-mira-ink px-3 py-2 text-xs font-semibold text-white" data-toast="已加入早晨提醒">提醒</button>', 'coral')}
-            ${row('umbrella', '雨伞', '家长手动添加', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已标记完成">完成</button>', 'blue')}
+          ${header('小书包', schoolbagConfig().title)}
+          <section class="glass-card p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold uppercase text-mira-muted">准备规则</p>
+                <h3 class="mt-1 text-lg font-semibold">${state.childStage}${state.childGrade} · ${schoolbagConfig().selectedMode}</h3>
+                <p class="mt-1 text-sm leading-6 text-mira-muted">${schoolbagConfig().desc}</p>
+              </div>
+              <button class="tap shrink-0 rounded-full bg-white/76 px-3 py-2 text-xs font-semibold" data-go="child">改档案</button>
+            </div>
+            <div class="mt-4 grid grid-cols-3 gap-2">${schoolbagConfig().modes.map(schoolbagModeButton).join('')}</div>
+            <p class="mt-3 rounded-[18px] bg-white/68 p-3 text-xs leading-5 text-mira-muted">${schoolbagModeEffect()}</p>
           </section>
-          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold" data-sheet="packing">${icon('plus', 'h-4 w-4')}添加临时物品</button>
-        `,
-        tasks: `
-          ${header('任务', '今天', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-sheet="task" aria-label="新建任务">${icon('plus')}</button>`)}
-          <section class="glass-card mb-4 p-2">
-            <div class="grid grid-cols-4 gap-1">
-              <button class="tap min-h-[40px] rounded-[14px] bg-mira-ink text-xs font-semibold text-white">今天</button>
-              <button class="tap min-h-[40px] rounded-[14px] bg-white/70 text-xs font-semibold" data-toast="已切换到明天">明天</button>
-              <button class="tap min-h-[40px] rounded-[14px] bg-white/70 text-xs font-semibold" data-toast="已查看本周">本周</button>
-              <button class="tap min-h-[40px] rounded-[14px] bg-white/70 text-xs font-semibold" data-toast="已打开日历">日历</button>
+          <section class="mt-4 grid grid-cols-2 gap-3">
+            <div class="rounded-[22px] bg-white/76 p-4">
+              <p class="text-xs font-semibold text-mira-muted">明天</p>
+              <p class="mt-1 text-lg font-semibold">${schoolbagConfig().headline}</p>
+            </div>
+            <div class="rounded-[22px] bg-white/76 p-4">
+              <p class="text-xs font-semibold text-mira-muted">提醒方式</p>
+              <p class="mt-1 text-lg font-semibold">${state.childStage === '初中' ? '孩子自查' : '睡前 + 早晨'}</p>
             </div>
           </section>
-          <section class="space-y-3">
-            ${taskCard('数学作业', '学习', '今天 19:00 - 19:40', '进行中', 'blue', 'taskDetail')}
-            ${taskCard('语文背诵', '学习', '今天 20:10 - 20:25', '待开始', 'amber', 'taskDetail')}
-            ${taskCard('整理玩具', '家务', '今天 18:20 已完成', '+3 分', 'green', 'points')}
-            ${taskCard('睡前洗漱', '睡眠', '今天 21:10', '待开始', 'blue', 'sleep')}
-            ${taskCard('美术材料准备', '带书清单', '周五 07:30', '未来任务', 'amber', 'packing')}
+          <section class="solid-card mt-4 p-4">
+            <div class="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold">${schoolbagConfig().title}清单</p>
+                <p class="mt-1 text-xs text-mira-muted">可标记已准备，也可以只设为明早提醒</p>
+              </div>
+              <span class="pill bg-blue-50 text-mira-blue">${schoolbagConfig().rows.length + state.packingExtra.length} 项</span>
+            </div>
+            ${renderSchoolbagRows()}
+            ${renderPackingExtra()}
           </section>
-          <div class="mt-4 grid grid-cols-2 gap-3">
-            <button class="tap flex min-h-[50px] items-center justify-center gap-2 rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="task">${icon('plus', 'h-4 w-4')}新建任务</button>
-            <button class="tap flex min-h-[50px] items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold" data-go="flow">${icon('sparkles', 'h-4 w-4')}模板</button>
-          </div>
+          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold" data-sheet="packing">${icon('plus', 'h-4 w-4')}添加到小书包</button>
+        `,
+        tasks: `
+          ${taskDateSwitcher()}
+          ${tasksScreenContent()}
         `,
         taskDetail: `
           ${header('任务证据', '数学作业')}
@@ -1083,9 +2389,9 @@
               <div class="grid grid-cols-3 gap-2">
                 ${metric('置信度', '80%', 'blue')}
                 ${metric('离座', '1 次', 'amber')}
-                ${metric('积分', '+5', 'green')}
+                ${metric('结果', state.evidenceStatus === 'confirmed' ? `+${pointUnitAmount(5)}` : state.evidenceStatus === 'partial' ? `+${pointUnitAmount(2)}` : state.evidenceStatus === 'rejected' ? '驳回' : '待确认', state.evidenceStatus === 'rejected' ? 'red' : state.evidenceStatus === 'pending' ? 'amber' : 'green')}
               </div>
-              <p class="mt-4 text-sm leading-6 text-mira-muted">AI 判断：书写状态稳定，离座后 3 分钟内回座。建议确认完成，也可以改为部分完成。</p>
+              <p class="mt-4 text-sm leading-6 text-mira-muted">${state.evidenceStatus === 'pending' ? 'AI 判断：书写状态稳定，离座后 3 分钟内回座。建议确认完成，也可以改为部分完成。' : state.evidenceStatus === 'confirmed' ? `妈妈已确认完成，${pointUnitAmount(5)} 已进入流水，日报会收录这段证据。` : state.evidenceStatus === 'partial' ? `已改为部分完成，${pointUnitAmount(2)}，日报会记录“需要继续收尾”。` : `已驳回 AI 判断，并记录为误判样例，不发放${state.pointUnit}。`}</p>
             </div>
           </section>
           <section class="mt-4 space-y-3">
@@ -1093,7 +2399,7 @@
             ${row('clock', '专注轮次', '25 分钟学习 + 5 分钟休息', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="focus">查看</button>', 'green')}
           </section>
           <div class="mt-5 grid grid-cols-2 gap-3">
-            <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="evidence">处理证据</button>
+            <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="evidence">${state.evidenceStatus === 'pending' ? '处理证据' : '重新处理'}</button>
             <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已提醒孩子收尾">提醒收尾</button>
           </div>
         `,
@@ -1159,7 +2465,7 @@
           <section class="space-y-3">
             ${videoCard('专注轮次完成', '19:30', img.study, 'green')}
             ${videoCard('短暂离座后回座', '19:12', img.desk, 'amber')}
-            ${videoCard('整理书包完成', '17:16', img.room, 'blue')}
+            ${videoCard('小书包检查完成', '17:16', img.room, 'blue')}
           </section>
         `,
         zones: `
@@ -1208,7 +2514,7 @@
             <div class="mt-4 grid grid-cols-3 gap-2">
               <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">5/6</p><p class="mt-1 text-xs text-white/64">任务</p></div>
               <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">43m</p><p class="mt-1 text-xs text-white/64">专注</p></div>
-              <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">+12</p><p class="mt-1 text-xs text-white/64">积分</p></div>
+              <div class="rounded-[18px] bg-white/10 p-3"><p class="text-xl font-semibold">+12</p><p class="mt-1 text-xs text-white/64">${state.pointUnit}</p></div>
             </div>
           </section>
           <section class="mt-4 grid grid-cols-[1fr_120px] gap-3">
@@ -1220,7 +2526,7 @@
             </div>
             <button class="tap solid-card overflow-hidden text-left" data-go="playback">
               <img src="${img.study}" alt="成长时刻" class="h-[112px] w-full object-cover" />
-              <div class="p-3"><p class="text-xs font-semibold">成长时刻</p><p class="mt-1 text-xs text-mira-muted">主动整理书包</p></div>
+              <div class="p-3"><p class="text-xs font-semibold">成长时刻</p><p class="mt-1 text-xs text-mira-muted">主动检查小书包</p></div>
             </button>
           </section>
           <section class="mt-4 space-y-3">
@@ -1254,7 +2560,7 @@
                   <span class="pill bg-green-50 text-mira-green">积极片段</span>
                   <span class="text-xs font-semibold text-mira-muted">今天 19:30</span>
                 </div>
-                <h3 class="mt-3 text-xl font-semibold">主动整理书包并开始作业</h3>
+                <h3 class="mt-3 text-xl font-semibold">主动检查小书包并开始作业</h3>
                 <p class="mt-2 text-sm leading-6 text-mira-muted">家长可收藏、删除、隐藏或分享到家庭成员，不把孩子失误做公开展示。</p>
               </div>
             </button>
@@ -1263,23 +2569,58 @@
           </section>
         `,
         points: `
-          ${header('积分', '正向激励')}
+          ${header('积分奖励', '正向激励')}
           <section class="liquid rounded-[30px] p-5">
-            <p class="text-sm font-semibold text-mira-muted">当前积分</p>
-            <div class="mt-3 flex items-end justify-between">
-              <p class="text-[56px] font-semibold leading-none">86</p>
-              <button class="tap min-h-[44px] rounded-[16px] bg-mira-ink px-4 text-sm font-semibold text-white" data-go="reward">去兑换</button>
+            <div class="flex items-center justify-between gap-3">
+              <p class="text-sm font-semibold text-mira-muted">当前${state.pointUnit}</p>
+              <button class="tap min-h-[38px] rounded-[14px] bg-white/76 px-3 text-xs font-semibold" data-sheet="pointRule">阶段设置</button>
             </div>
-            <p class="mt-3 text-sm leading-6 text-mira-muted">作业自启动连续 5 天稳定，建议下周把积分从 +5 调为 +3，改用具体表扬和周末选择权。</p>
+            <div class="mt-3 flex items-end justify-between">
+              <p class="text-[56px] font-semibold leading-none">${pointStageInfo().balance}</p>
+              <button class="tap min-h-[44px] rounded-[16px] bg-mira-ink px-4 text-sm font-semibold text-white" data-sheet="manualReward">主动兑换</button>
+            </div>
+            <div class="mt-4 rounded-[22px] bg-white/58 p-4">
+              <div class="flex items-center justify-between text-sm">
+                <span class="font-semibold">${pointStageRuleText()}</span>
+                <span class="text-mira-coral">${pointStageLabel(pointStageInfo().fullStages)}已满</span>
+              </div>
+              <div class="mt-3 flex gap-1.5">${stageProgressDots()}</div>
+              <p class="mt-3 text-xs leading-5 text-mira-muted">本轮 ${pointUnitAmount(pointStageInfo().remainder)}/${pointUnitAmount(pointStageInfo().threshold)}；已达到 ${pointStageInfo().fullStages} 个阶段，可兑换奖品，也可以继续累积。</p>
+            </div>
+            ${pointStageInfo().fullStages > 0 && !state.milestoneHandled ? `<button class="tap mt-4 flex min-h-[50px] w-full items-center justify-between rounded-[18px] bg-orange-50 px-4 text-left text-sm font-semibold text-mira-coral" data-sheet="pointMilestone"><span>已积满 ${pointStageLabel(pointStageInfo().fullStages)}</span><span>处理</span></button>` : ''}
+            <p class="mt-3 text-sm leading-6 text-mira-muted">作业自启动连续 5 天稳定，建议下周把自动奖励从 ${pointUnitAmount(5)} 调为 ${pointUnitAmount(3)}，改用具体表扬和周末选择权。</p>
           </section>
           <section class="mt-4 space-y-3">
-            ${row('plus', '数学作业确认完成', '+5 分，妈妈确认', '', 'green')}
-            ${row('plus', '整理书包', '+3 分，AI 自动记录', '', 'green')}
+            ${state.lastManualReward ? row('gift', state.lastManualReward.startsWith('语音申请') ? '语音申请兑换' : '家长主动兑换', `${state.lastManualReward}，已扣除${state.pointUnit}`, '', 'coral') : ''}
+            ${row('plus', '数学作业确认完成', `+${pointUnitAmount(5)}，妈妈确认`, '', 'green')}
+            ${row('plus', '检查小书包', `+${pointUnitAmount(3)}，AI 自动记录`, '', 'green')}
             ${row('rotate-ccw', '撤销一次自动加分', '可在 24 小时内撤销', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已撤销">撤销</button>', 'amber')}
           </section>
         `,
         reward: `
-          ${header('奖励商店', '模板与审批')}
+          ${header('奖励商店', '语音申请与兑现')}
+          <section class="solid-card mb-4 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold">${state.pointUnit}阶段</p>
+                <p class="mt-1 text-xs leading-5 text-mira-muted">${pointStageRuleText()}；当前 ${pointStageLabel(pointStageInfo().fullStages)}已满，兑换后扣除对应${state.pointUnit}。</p>
+              </div>
+              <button class="tap min-h-[42px] rounded-[16px] bg-mira-ink px-4 text-xs font-semibold text-white" data-sheet="manualReward">主动兑换</button>
+            </div>
+          </section>
+          <section class="solid-card mb-4 p-4">
+            <div class="flex items-start gap-3">
+              <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] bg-blue-50 text-mira-blue">${icon('mic-2', 'h-5 w-5')}</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-3">
+                  <p class="text-sm font-semibold">来自摄像头的申请</p>
+                  <span class="pill ${state.rewardStatus === 'fulfilled' ? 'bg-green-50 text-mira-green' : state.rewardStatus === 'planned' ? 'bg-blue-50 text-mira-blue' : state.rewardStatus === 'rejected' ? 'bg-red-50 text-mira-red' : 'bg-amber-50 text-mira-amber'}">${state.rewardStatus === 'fulfilled' ? '已兑现' : state.rewardStatus === 'planned' ? '已安排' : state.rewardStatus === 'rejected' ? '已暂缓' : '待确认'}</span>
+                </div>
+                <p class="mt-2 text-sm leading-6 text-mira-muted">小宇刚说：“我想换周末户外活动。”摄像头只回复“我帮你问妈妈”，没有直接承诺。</p>
+                <button class="tap mt-3 min-h-[44px] rounded-[16px] bg-mira-ink px-4 text-sm font-semibold text-white" data-sheet="reward">${state.rewardStatus === 'requested' ? '确认申请' : '查看记录'}</button>
+              </div>
+            </div>
+          </section>
           <section class="solid-card mb-4 p-4">
             <div class="flex items-center justify-between gap-3">
               <div>
@@ -1295,11 +2636,9 @@
             </div>
           </section>
           <section class="space-y-3">
-            ${rewardCard('周末户外活动', '30 分', '小宇已申请，等待家长审批', 'reward')}
-            ${rewardCard('睡前故事加 10 分钟', '18 分', '仅周五可兑换', 'toast')}
-            ${rewardCard('选择一次晚餐水果', '12 分', '今天可兑换', 'toast')}
+            ${rewardOptions().map(rewardStoreRow).join('')}
           </section>
-          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold" data-sheet="rewardEdit">${icon('plus', 'h-4 w-4')}添加奖品</button>
+          <button class="tap mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold" data-action="reward-add-open">${icon('plus', 'h-4 w-4')}添加奖品</button>
         `,
         checkin: `
           ${header('打卡助手', '素材审核')}
@@ -1321,8 +2660,23 @@
           <section class="solid-card p-4">
             ${row('badge', '摄像头唤醒名', '小豆，支持近似发音', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="name">修改</button>', 'blue')}
             ${row('volume-2', '原创声线', '温柔女声，语速偏慢', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已播放声线">试听</button>', 'coral')}
-            ${row('timer', '自由聊天时长', '单次 8 分钟，每日 25 分钟', '', 'green')}
-            ${row('file-text', '对话记录', '默认只保存主题摘要', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="boundaries">说明</button>', 'amber')}
+          </section>
+          <section class="solid-card mt-4 p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold text-mira-muted">边界方案</p>
+                <h3 class="mt-1 text-lg font-semibold">${state.boundaryLevel}</h3>
+                <p class="mt-1 text-sm leading-6 text-mira-muted">${boundaryConfig().desc}</p>
+              </div>
+              <button class="tap shrink-0 rounded-full bg-blue-50 px-3 py-2 text-xs font-semibold text-mira-blue" data-sheet="boundaries">说明</button>
+            </div>
+            <div class="mt-3 grid grid-cols-3 gap-2">${['宽松', '平衡', '严格'].map(boundaryLevelButton).join('')}</div>
+          </section>
+          <section class="mt-4 space-y-3">
+            ${settingRow('自由聊天', `开启后单次 ${boundaryConfig().single}，每日 ${boundaryConfig().daily}`, true)}
+            ${settingRow('作业模式限制', '作业中只允许任务相关问答和温和提示', true)}
+            ${settingRow('睡前不主动聊天', `${boundaryConfig().quiet} 不主动开启长时间自由聊天`, true)}
+            ${row('file-text', '对话记录', '普通闲聊默认只保存主题摘要，逐字记录需要家长明确开启', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="privacy">隐私设置</button>', 'amber')}
           </section>
         `,
         privacy: `
@@ -1363,8 +2717,8 @@
           ${header('通知设置', '只提醒真正重要的事')}
           <section class="space-y-3">
             ${settingRow('安全告警', 'SOS、门口、危险区域和异常声音', true)}
-            ${settingRow('任务待确认', '作业证据、打卡素材和奖励审批', true)}
-            ${settingRow('任务提醒', '带书清单、睡前任务、晨起闹铃', true)}
+            ${settingRow('任务待确认', '作业证据、打卡素材和奖励申请确认', true)}
+            ${settingRow('任务提醒', '小书包、睡前任务、晨起闹铃', true)}
             ${settingRow('普通闲聊摘要', '每天最多一次，不打扰工作时间', false)}
           </section>
           <section class="glass-card mt-4 p-4">
@@ -1375,7 +2729,7 @@
         education: `
           ${header('学习内容', '内容生态入口')}
           <section class="solid-card p-4">
-            ${row('book-open', '课程表导入', '用于生成明日带书和学习任务', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已进入导入设置">导入</button>', 'blue')}
+            ${row('book-open', '小书包设置', '课程表、老师通知、入园和上学物品', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已进入小书包设置">设置</button>', 'blue')}
             ${row('graduation-cap', '合作内容', '预留学而思等授权内容入口', '<span class="pill bg-amber-50 text-mira-amber">规划中</span>', 'amber')}
             ${row('brain', '学习缺漏诊断', '长期数据积累后开启', '<span class="pill bg-slate-100 text-slate-700">P2</span>', 'slate')}
           </section>
@@ -1398,52 +2752,208 @@
         `,
         about: `
           ${header('关于我们', 'Mira Guardian')}
-          <section class="liquid rounded-[30px] p-5 text-center">
-            <div class="mx-auto grid h-20 w-20 place-items-center rounded-[24px] bg-mira-ink text-white">${icon('aperture', 'h-10 w-10')}</div>
+          <section class="px-2 pt-1 text-center">
+            <div class="mx-auto grid h-[72px] w-[72px] place-items-center rounded-[22px] bg-mira-ink text-white shadow-xl shadow-slate-900/15">${icon('aperture', 'h-9 w-9')}</div>
             <h3 class="mt-4 text-2xl font-semibold">Mira Guardian 米拉</h3>
-            <p class="mt-2 text-sm leading-6 text-mira-muted">家庭 AI 智护与成长中枢。以家长规则为边界，以孩子真实生活场景为中心。</p>
+            <p class="mx-auto mt-2 max-w-[286px] text-sm leading-6 text-mira-muted">家庭 AI 智护与成长中枢。以家长规则为边界，以孩子真实生活场景为中心。</p>
           </section>
-          <section class="mt-4 space-y-3">
-            ${row('shield-check', '儿童隐私优先', '最小必要、监护人授权、可删除', '', 'green')}
-            ${row('heart-handshake', '温柔但有边界', '减少催促，不替代家长陪伴', '', 'coral')}
-            ${row('file-text', '服务协议与隐私政策', '查看条款和儿童数据说明', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="privacy">查看</button>', 'blue')}
+
+          <section class="mt-6">
+            <p class="mb-2 px-1 text-xs font-bold text-mira-muted">应用信息</p>
+            <div class="solid-card overflow-hidden p-0">
+              ${aboutLine('message-square', '帮助与反馈', '误判上报、客服、常见问题', '<button class="tap flex min-h-[44px] items-center gap-1 px-1 text-xs font-semibold text-mira-blue" data-go="feedback">进入' + icon('chevron-right', 'h-3.5 w-3.5') + '</button>', 'blue')}
+              ${aboutLine('download-cloud', '当前版本', 'v0.8.0 内测版 · 2026.05.26', '<button class="tap min-h-[44px] px-1 text-xs font-semibold text-mira-blue" data-toast="已是最新版本">检查更新</button>', 'blue')}
+            </div>
+          </section>
+
+          <section class="mt-4">
+            <p class="mb-2 px-1 text-xs font-bold text-mira-muted">产品原则</p>
+            <div class="solid-card overflow-hidden p-0">
+              ${aboutLine('shield-check', '儿童隐私优先', '最小必要、监护人授权、可删除', '', 'green')}
+              ${aboutLine('heart-handshake', '温柔但有边界', '减少催促，不替代家长陪伴', '', 'coral')}
+            </div>
+          </section>
+
+          <section class="mt-4">
+            <p class="mb-2 px-1 text-xs font-bold text-mira-muted">法律与隐私</p>
+            <div class="solid-card overflow-hidden p-0">
+              ${aboutLine('file-text', '服务协议', '查看服务条款和家庭使用说明', '<button class="tap flex min-h-[44px] items-center gap-1 px-1 text-xs font-semibold text-mira-blue" data-sheet="terms">查看' + icon('chevron-right', 'h-3.5 w-3.5') + '</button>', 'slate')}
+              ${aboutLine('lock-keyhole', '隐私政策', '查看儿童数据、权限和删除说明', '<button class="tap flex min-h-[44px] items-center gap-1 px-1 text-xs font-semibold text-mira-blue" data-sheet="privacyPolicy">查看' + icon('chevron-right', 'h-3.5 w-3.5') + '</button>', 'slate')}
+            </div>
+          </section>
+          <p class="mt-5 pb-3 text-center text-xs font-semibold text-mira-muted">© 2026 Mira Guardian</p>
+        `,
+        my: `
+          ${header('家庭账户', '我的', `<button class="tap grid min-h-[46px] min-w-[46px] place-items-center rounded-[18px] liquid" data-go="notifications" aria-label="通知设置">${icon('bell')}</button>`)}
+          <button class="tap liquid w-full rounded-[30px] p-5 text-left" data-go="accountProfile">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="grid h-14 w-14 place-items-center rounded-[22px] bg-mira-ink text-white">${icon('user-round', 'h-7 w-7')}</div>
+                <div>
+                  <p class="text-lg font-semibold">${state.parentName}的家庭</p>
+                  <p class="mt-1 text-xs font-semibold text-mira-muted">${state.parentRole} · 管理员 · ${state.childName} ${childAgeYears()}</p>
+                </div>
+              </div>
+              <span class="flex shrink-0 items-center gap-1 rounded-full bg-white/76 px-3 py-2 text-xs font-semibold text-mira-muted">编辑资料${icon('chevron-right', 'h-3.5 w-3.5')}</span>
+            </div>
+            <div class="mt-5 grid grid-cols-3 gap-2">
+              ${metric('家庭成员', '3', 'blue')}
+              ${metric('设备', '1', 'green')}
+              ${metric('待处理', '2', 'coral')}
+            </div>
+          </button>
+
+          <button class="tap solid-card mt-4 w-full p-4 text-left" data-go="subscription">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex min-w-0 items-center gap-3">
+                <span class="grid h-12 w-12 shrink-0 place-items-center rounded-[18px] bg-blue-50 text-mira-blue">${icon('sparkles')}</span>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold">订阅与套餐</p>
+                  <p class="mt-1 text-xs leading-5 text-mira-muted">基础看护可用，会员增强长期报告、云存储和更多人设。</p>
+                </div>
+              </div>
+              ${icon('chevron-right', 'h-4 w-4 text-mira-muted')}
+            </div>
+          </button>
+
+          <section class="mt-4">
+            <div class="mb-2 flex items-center justify-between">
+              <p class="text-xs font-bold text-mira-muted">常用入口</p>
+              <span class="text-xs font-semibold text-mira-muted">2 项待处理</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              ${myHubCard('报告中心', '日报、周报、成长时刻', 'report', 'file-text', 'blue')}
+              ${myHubCard('积分奖励', '奖励流水和兑换申请', 'reward', 'gift', 'coral')}
+              ${myHubCard('打卡审核', '3 张素材待确认', 'checkin', 'file-check-2', 'green')}
+              ${myHubCard('家庭成员', '成员权限和协作交接', 'family', 'users', 'slate')}
+            </div>
+          </section>
+
+          <section class="mt-4">
+            <p class="mb-2 text-xs font-bold text-mira-muted">管理入口</p>
+            <div class="space-y-2">
+              ${settingsLink('孩子档案', '生日、就读阶段、年级/班级', 'child', 'user-round')}
+              ${settingsLink('账号安全', '手机号、登录设备、注销账号', 'accountSecurity', 'shield-check')}
+              ${settingsLink('设备与规则', '设备、联系人、对话边界和安全区域', 'settings', 'settings')}
+              ${settingsLink('隐私与数据', '记录策略、权限和儿童数据处理', 'privacy', 'lock-keyhole')}
+              ${settingsLink('关于我们', '帮助反馈、当前版本、服务协议和隐私承诺', 'about', 'aperture')}
+            </div>
+          </section>
+
+          <section class="mt-4 pb-4">
+            <button class="tap flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[18px] bg-white/76 text-sm font-semibold text-mira-ink" data-sheet="logout">${icon('log-out', 'h-4 w-4 text-mira-muted')}退出登录</button>
           </section>
         `,
-        version: `
-          ${header('版本更新', '最近变化')}
-          <section class="solid-card p-4">
-            <div class="flex items-center justify-between">
+        accountProfile: `
+          ${header('个人信息', '当前家长')}
+          <section class="liquid rounded-[30px] p-5">
+            <div class="flex items-center gap-3">
+              <div class="grid h-16 w-16 place-items-center rounded-[24px] bg-mira-ink text-white">${icon('user-round', 'h-8 w-8')}</div>
               <div>
-                <p class="text-lg font-semibold">v0.8.0 内测版</p>
-                <p class="mt-1 text-xs text-mira-muted">2026.05.26</p>
+                <p class="text-lg font-semibold">${state.parentName}</p>
+                <p class="mt-1 text-xs font-semibold text-mira-muted">${state.parentRole} · 家庭管理员</p>
               </div>
-              <span class="pill bg-blue-50 text-mira-blue">当前版本</span>
             </div>
-            <div class="mt-4 space-y-3 text-sm leading-6 text-mira-muted">
-              <p>新增任务模板、任务日历和带书清单。</p>
-              <p>新增任务证据确认、奖励审批和安全事件处理。</p>
-              <p>优化实时看护隐私提示和设备端工作状态展示。</p>
+            <button class="tap mt-4 min-h-[44px] w-full rounded-[16px] bg-white/76 text-sm font-semibold" data-toast="已打开头像选择">更换头像</button>
+          </section>
+          <section class="solid-card mt-4 p-4">
+            <label class="block text-sm font-semibold" for="profileName">家庭显示名</label>
+            <input id="profileName" data-field="parentName" value="${state.parentName}" class="mt-2 min-h-[52px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-base font-semibold outline-none" />
+            <p class="mt-4 text-xs font-bold text-mira-muted">家长身份</p>
+            <div class="mt-2 grid grid-cols-2 gap-2">
+              ${['妈妈', '爸爸', '祖辈', '其他照护人'].map(parentRoleButton).join('')}
+            </div>
+            <div class="mt-4 space-y-2">
+              ${row('smartphone', '手机号', '138 **** 2026，用于登录和安全验证', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="changePhone">更换</button>', 'blue')}
+              ${row('users', '家庭角色', '管理员，可管理成员、设备、订阅和儿童数据', '<span class="pill bg-green-50 text-mira-green">管理员</span>', 'green')}
             </div>
           </section>
+          <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-go="my" data-toast="个人信息已保存">保存</button>
+        `,
+        accountSecurity: `
+          ${header('账号安全', '登录与设备')}
+          <section class="space-y-3">
+            ${row('smartphone', '登录手机号', '138 **** 2026', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="changePhone">更换</button>', 'blue')}
+            ${row('monitor-smartphone', '登录设备', '本机 iPhone，今天 14:20 活跃', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="loginDevices">查看</button>', 'green')}
+          </section>
+          <section class="mt-4">
+            <button class="tap list-item list-row w-full text-left" data-sheet="deleteAccount">
+              <span class="row-icon grid shrink-0 place-items-center bg-red-50 text-mira-red">${icon('trash-2')}</span>
+              <div class="row-copy">
+                <p class="row-title text-mira-red">注销账号</p>
+                <p class="row-desc">注销前需要转移管理员或解绑设备</p>
+              </div>
+              <div class="row-action">${icon('chevron-right', 'h-4 w-4 text-mira-red')}</div>
+            </button>
+          </section>
+        `,
+        subscription: `
+          ${header('订阅与套餐', '米拉会员')}
+          <section class="solid-card bg-mira-ink p-5 text-white">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-white/62">当前套餐</p>
+                <h3 class="mt-2 text-2xl font-semibold">基础版</h3>
+                <p class="mt-2 text-sm leading-6 text-white/72">任务提醒、实时看护、本地日报、隐私控制和儿童数据删除保持可用。</p>
+              </div>
+              <span class="pill bg-white/14 text-white">内测</span>
+            </div>
+          </section>
+
           <section class="mt-4 space-y-3">
-            ${row('download-cloud', '检查更新', '有新版本时提示家长升级', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已是最新版本">检查</button>', 'blue')}
-            ${row('list-checks', '版本记录', '查看历史功能和修复项', '', 'slate')}
+            <button class="tap solid-card w-full p-4 text-left" data-toast="已保留基础版">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-sm font-semibold">基础版</p>
+                  <p class="mt-1 text-xs leading-5 text-mira-muted">随硬件包含基础提醒、实时查看、本地日报和隐私控制。</p>
+                </div>
+                <span class="pill bg-green-50 text-mira-green">已启用</span>
+              </div>
+            </button>
+            <button class="tap solid-card w-full p-4 text-left" data-toast="会员开通流程待接入">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-sm font-semibold">米拉会员</p>
+                  <p class="mt-1 text-xs leading-5 text-mira-muted">长期云端报告、高级趋势、题目辅导额度、更多人设和声线。</p>
+                </div>
+                <span class="pill bg-blue-50 text-mira-blue">19-39/月</span>
+              </div>
+            </button>
+            <button class="tap solid-card w-full p-4 text-left" data-toast="已加入家庭高级版候补">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-sm font-semibold">家庭高级版</p>
+                  <p class="mt-1 text-xs leading-5 text-mira-muted">多孩子、多设备、多联系人、长期成长档案和合作内容包。</p>
+                </div>
+                <span class="pill bg-amber-50 text-mira-amber">规划中</span>
+              </div>
+            </button>
+          </section>
+
+          <section class="glass-card mt-4 p-4">
+            <p class="text-sm font-semibold">权益用量</p>
+            <div class="mt-3 space-y-2">
+              ${row('cloud', '云端报告存储', '基础版保留 7 天，会员可长期回看', '<span class="text-xs font-semibold text-mira-muted">7 天</span>', 'blue')}
+              ${row('brain', '题目辅导额度', '只提示思路，不直接替孩子写答案', '<span class="text-xs font-semibold text-mira-muted">20 次/月</span>', 'green')}
+              ${row('mic-2', '人设与声线', '基础 1 套，会员可启用更多风格', '<span class="text-xs font-semibold text-mira-muted">1/3</span>', 'coral')}
+            </div>
+          </section>
+
+          <section class="mt-4 space-y-2">
+            ${row('receipt', '订单与发票', '查看购买、续费、退款和发票记录', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="订单记录待接入">查看</button>', 'slate')}
+            ${row('shield-check', '取消或降级说明', '不影响基础看护和儿童数据删除', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-sheet="subscriptionDowngrade">说明</button>', 'slate')}
           </section>
         `,
         settings: `
-          ${header('设置', '家庭与规则')}
+          ${header('设置项', '家庭与规则')}
           <section class="space-y-3">
-            ${settingsLink('孩子档案', '当前年龄、就读阶段、班级/年级', 'child', 'user-round')}
+            ${settingsLink('孩子档案', '生日、就读阶段、班级/年级', 'child', 'user-round')}
             ${settingsLink('设备管理', '在线状态、云台、固件', 'device', 'camera')}
             ${settingsLink('家庭成员', '角色和通知分发', 'family', 'users')}
             ${settingsLink('对话与人设', '唤醒名、声线、聊天边界', 'conversation', 'message-circle')}
-            ${settingsLink('隐私与权限', '记录策略、数据删除、隐私模式', 'privacy', 'shield-check')}
             ${settingsLink('通知设置', '推送优先级和照护人分发', 'notifications', 'bell')}
             ${settingsLink('安全区域', '门口、厨房、窗边、阳台', 'zones', 'shield-alert')}
-            ${settingsLink('学习内容', '课程表导入和合作内容入口', 'education', 'book-open')}
-            ${settingsLink('帮助与反馈', '误判上报、客服、常见问题', 'feedback', 'message-square')}
-            ${settingsLink('关于我们', '品牌、隐私承诺和服务条款', 'about', 'aperture')}
-            ${settingsLink('版本更新', '当前版本和更新记录', 'version', 'download-cloud')}
+            ${settingsLink('学习内容', '课程表、小书包和合作内容入口', 'education', 'book-open')}
           </section>
         `
       };
@@ -1459,9 +2969,27 @@
           </div>
           <div class="timeline-copy">
             <p class="text-sm font-semibold">${title}</p>
-            <p class="mt-1 truncate text-xs text-mira-muted">${desc}</p>
+            <p class="mt-1 truncate text-xs text-mira-muted">${rewardAwareText(desc)}</p>
           </div>
           <span class="timeline-time">${time}</span>
+        </button>
+      `;
+    }
+
+    function taskTimeline(task, index, planKey) {
+      return `
+        <button class="tap task-row" data-action="task-open" data-plan="${planKey}" data-index="${index}">
+          <div class="task-time-block">
+            <span class="task-time-pill">${task.time}</span>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <p class="truncate text-sm font-semibold">${task.title}</p>
+              ${taskToneBadge(task)}
+            </div>
+            <p class="mt-1 text-xs leading-5 text-mira-muted">${rewardAwareText(task.desc)}</p>
+          </div>
+          ${icon('chevron-right', 'h-4 w-4 text-mira-muted')}
         </button>
       `;
     }
@@ -1483,7 +3011,7 @@
 
     function templateCard(title, desc, status, tone) {
       const badge = tone === 'green' ? 'bg-green-50 text-mira-green' : tone === 'amber' ? 'bg-amber-50 text-mira-amber' : 'bg-blue-50 text-mira-blue';
-      const action = status === '已启用' ? 'data-toast="已打开模板设置"' : 'data-sheet="task"';
+      const action = 'data-sheet="taskTemplates"';
       return `
         <button class="tap list-item list-card w-full p-4 text-left" ${action}>
           <div class="flex items-center gap-3">
@@ -1514,31 +3042,49 @@
       `;
     }
 
-    function rewardCard(title, cost, desc, action) {
-      const attrs = action === 'reward' ? 'data-sheet="reward"' : 'data-toast="兑换申请已发送"';
+    function rewardStoreRow(option) {
+      const isRequestReward = option.key === 'outdoor';
+      const desc = isRequestReward
+        ? state.rewardStatus === 'fulfilled'
+          ? '已同意并兑现，记录到奖励流水'
+          : state.rewardStatus === 'planned'
+            ? '已同意，周末提醒兑现'
+            : state.rewardStatus === 'rejected'
+              ? '已暂不兑换，摄像头温和反馈'
+              : '小宇语音申请，待家长确认'
+        : option.desc || '家长可主动兑换';
+      const attrs = isRequestReward ? 'data-sheet="reward"' : `data-action="manual-reward-open" data-reward="${option.key}"`;
+      const open = state.rewardActionOpen === option.key;
       return `
-        <button class="tap list-item list-card w-full p-4 text-left" ${attrs}>
-          <div class="flex items-center gap-3">
-            <span class="grid h-12 w-12 place-items-center rounded-[18px] bg-orange-50 text-mira-coral">${icon('gift')}</span>
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-semibold">${title}</p>
-              <p class="mt-1 text-xs text-mira-muted">${desc}</p>
-            </div>
-            <span class="pill bg-white text-mira-coral">${cost}</span>
+        <div class="reward-swipe-row ${open ? 'is-open' : ''}" data-reward="${option.key}">
+          <div class="reward-swipe-actions">
+            <button class="tap bg-blue-50 text-mira-blue" data-action="reward-edit-open" data-reward="${option.key}">修改</button>
+            <button class="tap bg-red-50 text-mira-red" data-action="reward-delete" data-reward="${option.key}">删除</button>
           </div>
-        </button>
+          <button class="tap reward-swipe-card p-4 text-left" ${attrs}>
+            <div class="flex items-center gap-3">
+              <span class="grid h-12 w-12 place-items-center rounded-[18px] bg-orange-50 text-mira-coral">${icon('gift')}</span>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold">${option.title}</p>
+                <p class="mt-1 text-xs text-mira-muted">${desc}</p>
+              </div>
+              <span class="pill bg-white text-mira-coral">${pointUnitAmount(option.cost)}</span>
+            </div>
+          </button>
+        </div>
       `;
     }
 
     function settingRow(title, desc, on) {
+      const enabled = state.settings[title] ?? on;
       return `
         <div class="list-item list-row flex">
           <div class="row-copy">
             <p class="row-title">${title}</p>
             <p class="row-desc">${desc}</p>
           </div>
-          <button class="tap relative h-8 w-[54px] rounded-full ${on ? 'bg-mira-blue' : 'bg-slate-300'}" data-toast="${title}${on ? '已开启' : '已关闭'}" aria-label="${title}">
-            <span class="absolute top-1 h-6 w-6 rounded-full bg-white shadow ${on ? 'right-1' : 'left-1'}"></span>
+          <button class="tap relative h-8 w-[54px] rounded-full ${enabled ? 'bg-mira-blue' : 'bg-slate-300'}" data-action="setting-toggle" data-setting="${title}" aria-label="${title}">
+            <span class="absolute top-1 h-6 w-6 rounded-full bg-white shadow ${enabled ? 'right-1' : 'left-1'}"></span>
           </button>
         </div>
       `;
@@ -1552,15 +3098,57 @@
       return row(iconName, title, desc, `<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-go="${go}">进入</button>`, 'slate');
     }
 
+    function myHubCard(title, desc, go, iconName, tone = 'blue') {
+      const tones = {
+        blue: 'bg-blue-50 text-mira-blue',
+        green: 'bg-green-50 text-mira-green',
+        coral: 'bg-orange-50 text-mira-coral',
+        slate: 'bg-slate-100 text-slate-700',
+        amber: 'bg-amber-50 text-mira-amber'
+      };
+      return `
+        <button class="tap solid-card min-h-[108px] w-full p-3 text-left" data-go="${go}">
+          <span class="grid h-10 w-10 place-items-center rounded-[16px] ${tones[tone] || tones.blue}">${icon(iconName, 'h-5 w-5')}</span>
+          <p class="mt-3 text-sm font-semibold">${title}</p>
+          <p class="mt-1 text-xs leading-5 text-mira-muted">${desc}</p>
+        </button>
+      `;
+    }
+
+    function aboutLine(iconName, title, desc, right = '', tone = 'slate') {
+      const tones = {
+        blue: 'bg-blue-50 text-mira-blue',
+        green: 'bg-green-50 text-mira-green',
+        coral: 'bg-orange-50 text-mira-coral',
+        slate: 'bg-slate-100 text-slate-700',
+        amber: 'bg-amber-50 text-mira-amber'
+      };
+      return `
+        <div class="flex min-h-[72px] items-center gap-3 border-b border-mira-line/70 px-4 py-3 last:border-b-0">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-[13px] ${tones[tone] || tones.slate}">${icon(iconName, 'h-5 w-5')}</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-semibold">${title}</p>
+            <p class="mt-1 text-xs leading-5 text-mira-muted">${desc}</p>
+          </div>
+          ${right ? `<div class="shrink-0">${right}</div>` : ''}
+        </div>
+      `;
+    }
+
+    function parentRoleButton(label) {
+      const active = state.parentRole === label;
+      return `<button class="tap min-h-[52px] rounded-[18px] text-sm font-semibold ${active ? 'bg-mira-ink text-white' : 'bg-white/76 text-mira-ink'}" data-action="parent-role" data-role="${label}">${active ? icon('check', 'mr-1 inline h-4 w-4') : ''}${label}</button>`;
+    }
+
     const sheetContent = {
       evidence: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
         <h3 class="text-xl font-semibold">处理任务证据</h3>
-        <p class="mt-2 text-sm leading-6 text-mira-muted">确认结果会进入日报和积分流水。若 AI 判断不准，可以标记误判原因。</p>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">确认结果会进入日报和奖励流水。若 AI 判断不准，可以标记误判原因。</p>
         <div class="mt-4 grid gap-2">
-          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已确认完成，积分 +5">确认完成</button>
-          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已改为部分完成">改为部分完成</button>
-          <button class="tap min-h-[50px] rounded-[18px] bg-red-50 text-sm font-semibold text-mira-red" data-close data-toast="已驳回并记录误判">驳回</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-action="evidence-result" data-result="confirmed">确认完成</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-action="evidence-result" data-result="partial">改为部分完成</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-red-50 text-sm font-semibold text-mira-red" data-action="evidence-result" data-result="rejected">驳回</button>
         </div>
       `,
       privacy: `
@@ -1569,10 +3157,72 @@
         <p class="mt-2 text-sm leading-6 text-mira-muted">家长查看实时画面时，设备端会显示工作状态。隐私模式开启后，实时看护、录音、录像和记录入口会受限。</p>
         <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>我知道了</button>
       `,
+      privacyNotice: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">隐私说明</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">儿童音视频采集会在设备绑定后单独授权。默认只保存任务证据、事件截图和必要报告摘要，家长可在“我的 · 隐私与数据”统一管理。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>我知道了</button>
+      `,
+      terms: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">服务协议</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">服务协议包含家庭成员权限、设备绑定、订阅权益、客服支持和使用边界。正式版本会打开完整协议页面。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>知道了</button>
+      `,
+      privacyPolicy: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">隐私政策</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">隐私政策说明儿童数据采集、保存、查看、导出和删除规则。配置类开关请到“我的 · 隐私与数据”统一调整。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>知道了</button>
+      `,
+      subscriptionDowngrade: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">取消或降级说明</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">取消订阅不会影响任务提醒、实时查看、本地日报、隐私控制和儿童数据删除。云端长期报告、高级趋势和更多人设会在到期后停止。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>知道了</button>
+      `,
+      changePhone: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">更换手机号</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">更换后会用于登录、安全验证和重要通知。儿童数据删除、设备解绑等敏感操作仍需要管理员二次确认。</p>
+        <div class="mt-4 space-y-3">
+          <input value="138 **** 2026" disabled class="min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/52 px-4 text-sm font-semibold text-mira-muted outline-none" />
+          <input inputmode="tel" value="139 0000 2026" class="min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+          <div class="flex gap-2">
+            <input inputmode="numeric" value="0626" class="min-h-[50px] min-w-0 flex-1 rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+            <button class="tap min-h-[50px] rounded-[18px] bg-white/76 px-4 text-sm font-semibold" data-toast="验证码已发送">获取验证码</button>
+          </div>
+        </div>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="手机号已更新">确认更换</button>
+      `,
+      loginDevices: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">登录设备</h3>
+        <div class="mt-4 space-y-2">
+          ${row('smartphone', '本机 iPhone', '今天 14:20 活跃，当前设备', '<span class="pill bg-green-50 text-mira-green">当前</span>', 'green')}
+          ${row('monitor', 'MacBook Safari', '昨天 21:04 登录', '<button class="tap rounded-full bg-white px-3 py-2 text-xs font-semibold" data-toast="已移除该设备">移除</button>', 'slate')}
+        </div>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>完成</button>
+      `,
+      logout: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">退出登录</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">退出后不会影响摄像头继续执行任务和安全提醒。再次进入 App 需要手机号验证码。</p>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close>取消</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已退出登录">退出</button>
+        </div>
+      `,
+      deleteAccount: `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold text-mira-red">注销账号</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">注销前需要先转移家庭管理员或解绑设备。儿童照片、报告、对话摘要和任务证据会进入删除确认流程。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-red-50 text-sm font-semibold text-mira-red" data-close data-toast="已进入注销确认流程">了解并继续</button>
+      `,
       zone: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
         <h3 class="text-xl font-semibold">新增安全区域</h3>
-        <p class="mt-2 text-sm leading-6 text-mira-muted">选择摄像头视角中的区域，设置触发条件、冷却时间和通知对象。安全区域不参与积分扣分。</p>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">选择摄像头视角中的区域，设置触发条件、冷却时间和通知对象。安全区域不参与奖励扣减。</p>
         <div class="mt-4 grid grid-cols-2 gap-2">
           <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已选择门口区域">门口</button>
           <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已选择厨房区域">厨房</button>
@@ -1611,13 +3261,57 @@
           <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close>取消</button>
         </div>
       `,
-      reward: `
+      pointMilestone: () => `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
-        <h3 class="text-xl font-semibold">审批奖励兑换</h3>
-        <p class="mt-2 text-sm leading-6 text-mira-muted">小宇申请使用 30 分兑换“周末户外活动”。审批后会记录审批人和兑现状态；积分不建议随意扣回。</p>
+        <h3 class="text-xl font-semibold">${state.pointUnit}已积满</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">当前 ${pointUnitAmount(pointStageInfo().balance)}，按 ${pointStageRuleText()}，已经积满 ${pointStageLabel(pointStageInfo().fullStages)}。家长可以现在兑换奖品，也可以继续累积到更大的奖励。</p>
         <div class="mt-4 grid grid-cols-2 gap-2">
-          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已批准兑换">批准</button>
-          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已暂缓兑换">暂缓</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-sheet="manualReward">选择奖品</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-action="milestone-continue">继续累积</button>
+        </div>
+        <button class="tap mt-3 min-h-[48px] w-full rounded-[18px] bg-blue-50 text-sm font-semibold text-mira-blue" data-sheet="pointRule">调整阶段阈值</button>
+      `,
+      pointRule: () => `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">奖励阶段设置</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">家长可以选择积分、小红花或小星星作为计量方式。默认是积分，默认阈值 10；达到阈值后提醒家长兑换或继续累积。</p>
+        <label class="mt-4 block text-sm font-semibold" for="pointThresholdInput">每个阶段需要</label>
+        <div class="mt-2 flex min-h-[58px] items-center rounded-[20px] border border-mira-line bg-white/80 px-4">
+          <input id="pointThresholdInput" data-field="pointThresholdDraft" value="${state.pointThresholdDraft}" inputmode="numeric" maxlength="3" aria-label="阶段阈值" class="min-w-0 flex-1 bg-transparent text-2xl font-semibold outline-none" />
+          <span class="ml-3 shrink-0 text-sm font-semibold text-mira-muted">${pointUnitSuffix()}</span>
+        </div>
+        <p class="mt-2 text-xs leading-5 text-mira-muted">例如输入 10，就表示达到 ${pointUnitAmount(10)} 后提醒家长兑换或继续累积。</p>
+        <p class="mt-4 text-sm font-semibold">计量类型</p>
+        <div class="mt-2 grid grid-cols-3 gap-2">
+          ${['积分', '小红花', '小星星'].map(unit => `<button class="tap min-h-[46px] rounded-[16px] ${state.pointUnit === unit ? 'bg-mira-ink text-white' : 'bg-white/76'} text-sm font-semibold" data-action="point-unit" data-unit="${unit}">${unit}</button>`).join('')}
+        </div>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-action="point-rule-save">保存设置</button>
+      `,
+      manualReward: () => `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">家长主动兑换</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">不需要孩子先申请，家长可以直接选择奖品并兑换。确认后会扣除对应${state.pointUnit}，记录到流水和奖励兑现记录。</p>
+        <div class="mt-4 rounded-[22px] bg-white/68 p-4 text-sm leading-6">
+          <p class="font-semibold">当前可用：${pointUnitAmount(pointStageInfo().balance)}</p>
+          <p class="mt-1 text-mira-muted">阶段规则：${pointStageRuleText()}</p>
+        </div>
+        <div class="mt-4 space-y-2">
+          ${rewardOptions().map(rewardOptionButton).join('')}
+        </div>
+        <button class="tap mt-4 min-h-[52px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-action="manual-reward-confirm">确认兑换并扣 ${pointUnitAmount(selectedRewardOption().cost)}</button>
+      `,
+      reward: () => `
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
+        <h3 class="text-xl font-semibold">确认奖励申请</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">小宇对摄像头说“我想换周末户外活动”。摄像头已检查当前${state.pointUnit}足够，并回复“我帮你问妈妈，确认后再安排”，不会直接向孩子承诺奖励。</p>
+        <div class="mt-4 rounded-[22px] bg-blue-50/80 p-4 text-sm leading-6 text-blue-900">
+          <p class="font-semibold">申请来源：摄像头语音</p>
+          <p class="mt-1">当前 ${pointUnitAmount(pointStageInfo().balance)}，目标奖励需要 ${pointUnitAmount(30)}；本周还没有兑换过亲子活动。</p>
+        </div>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-action="reward-result" data-result="fulfilled">同意并兑现</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-action="reward-result" data-result="planned">同意稍后</button>
+          <button class="tap col-span-2 min-h-[50px] rounded-[18px] bg-red-50 text-sm font-semibold text-mira-red" data-action="reward-result" data-result="rejected">暂不兑换</button>
         </div>
       `,
       safety: `
@@ -1628,9 +3322,17 @@
       `,
       boundaries: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
-        <h3 class="text-xl font-semibold">互动边界</h3>
-        <p class="mt-2 text-sm leading-6 text-mira-muted">作业模式只允许任务相关问答；睡前模式不主动开启长时间自由聊天；普通闲聊默认只展示摘要。</p>
-        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>确定</button>
+        <h3 class="text-xl font-semibold">默认互动边界</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">命名这一步只说明默认规则，不要求家长马上配置。保存后可以在“我的 > 设备与规则 > 对话与人设”里调整时长、睡前限制和记录策略。</p>
+        <div class="mt-4 space-y-2">
+          ${row('book-open-check', '作业模式', '只允许任务相关问答和温和提示，不展开自由聊天', '', 'blue')}
+          ${row('moon', '睡前模式', '不主动开启长时间自由聊天，避免越聊越兴奋', '', 'slate')}
+          ${row('file-text', '记录策略', '普通闲聊默认只保存主题摘要，逐字记录需要家长明确开启', '', 'amber')}
+        </div>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <button class="tap min-h-[50px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close>知道了</button>
+          <button class="tap min-h-[50px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-go="conversation">去设置</button>
+        </div>
       `,
       contact: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
@@ -1650,27 +3352,18 @@
           <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-close data-toast="已设为临时查看者">临时查看者</button>
         </div>
       `,
-      packing: `
+      packing: () => `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
-        <h3 class="text-xl font-semibold">添加临时物品</h3>
-        <input value="校服外套" class="mt-4 min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
-        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="已添加到带书清单">保存</button>
+        <h3 class="text-xl font-semibold">添加到小书包</h3>
+        <p class="mt-2 text-sm leading-6 text-mira-muted">${state.childStage}会按“${schoolbagConfig().selectedMode}”准备，也可以临时加一项。</p>
+        <input data-field="packingDraft" value="${state.packingDraft || schoolbagConfig().addDefault}" class="mt-4 min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-action="packing-add">保存到小书包</button>
       `,
-      task: `
-        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
-        <h3 class="text-xl font-semibold">新建任务</h3>
-        <div class="mt-4 space-y-3">
-          <input value="英语听读" class="min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
-          <div class="grid grid-cols-3 gap-2">
-            <button class="tap min-h-[48px] rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-toast="默认今天">今天</button>
-            <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已选择明天">明天</button>
-            <button class="tap min-h-[48px] rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已打开日期选择">未来</button>
-          </div>
-          <button class="tap min-h-[48px] w-full rounded-[18px] bg-blue-50 text-sm font-semibold text-mira-blue" data-toast="已套用小学一年级听读模板">套用任务模板</button>
-          <button class="tap min-h-[48px] w-full rounded-[18px] bg-white/76 text-sm font-semibold" data-toast="已选择 20 分钟">预计 20 分钟</button>
-        </div>
-        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="任务已创建">创建</button>
-      `,
+      task: taskSheetHtml,
+      taskDate: taskDateSheetHtml,
+      taskTemplates: dayTemplateSheetHtml,
+      taskEdit: taskEditSheetHtml,
+      timePicker: timePickerSheetHtml,
       playback: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
         <h3 class="text-xl font-semibold">回放片段</h3>
@@ -1678,12 +3371,15 @@
         <p class="mt-3 text-sm leading-6 text-mira-muted">片段只用于家长判断任务和安全事件，默认不会分享给家庭外成员。</p>
         <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close>关闭</button>
       `,
-      rewardEdit: `
+      rewardEdit: () => `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
-        <h3 class="text-xl font-semibold">添加奖励</h3>
-        <input value="周末一起骑车" class="mt-4 min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
-        <button class="tap mt-3 min-h-[48px] w-full rounded-[18px] bg-orange-50 text-sm font-semibold text-mira-coral" data-toast="已套用亲子活动模板">套用亲子活动模板</button>
-        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-close data-toast="奖品已添加">保存</button>
+        <h3 class="text-xl font-semibold">${state.rewardEditingKey ? '修改奖励' : '添加奖励'}</h3>
+        <label class="mt-4 block text-sm font-semibold">奖品名称</label>
+        <input data-field="rewardDraftName" value="${state.rewardDraftName}" placeholder="例如：周末一起骑车" class="mt-2 min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+        <label class="mt-4 block text-sm font-semibold">所需${state.pointUnit}</label>
+        <input data-field="rewardDraftCost" value="${state.rewardDraftCost}" inputmode="numeric" placeholder="例如：20" class="mt-2 min-h-[50px] w-full rounded-[18px] border border-mira-line bg-white/80 px-4 text-sm font-semibold outline-none" />
+        <p class="mt-2 text-xs leading-5 text-mira-muted">保存后会出现在奖励商店，家长兑换时扣除对应${state.pointUnit}。</p>
+        <button class="tap mt-4 min-h-[50px] w-full rounded-[18px] bg-mira-ink text-sm font-semibold text-white" data-action="reward-save">${state.rewardEditingKey ? '保存修改' : '保存奖励'}</button>
       `,
       deleteData: `
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300"></div>
@@ -1712,15 +3408,27 @@
       renderMap();
       closeSheet();
       app.scrollTo({ top: 0, behavior: 'smooth' });
+      renderTaskFab();
       lucide.createIcons();
+    }
+
+    function renderTaskFab() {
+      const show = current === 'tasks';
+      taskFab.classList.toggle('show', show);
+      taskFab.classList.toggle('open', show && state.taskFabOpen);
+      taskFab.style.setProperty('--fab-x', `${state.taskFabX}px`);
+      taskFab.style.setProperty('--fab-y', `${state.taskFabY}px`);
+      taskFab.querySelector('.task-fab-main')?.setAttribute('aria-expanded', show && state.taskFabOpen ? 'true' : 'false');
+      taskFab.querySelector('.task-fab-option.add')?.classList.toggle('hidden', selectedWeekDay().relation === 'past');
+      taskFab.querySelector('.task-fab-option.template')?.classList.toggle('hidden', selectedWeekDay().relation === 'past');
+      taskFab.querySelector('.task-fab-option.today')?.classList.toggle('hidden', selectedWeekDay().relation !== 'past');
     }
 
     function rootTabFor(screen) {
       return ['home', 'care', 'sleep'].includes(screen) ? 'home' :
         ['flow', 'packing', 'tasks', 'taskDetail', 'focus'].includes(screen) ? 'tasks' :
         ['watch', 'playback', 'zones', 'safety', 'safetyDetail'].includes(screen) ? 'watch' :
-        ['report', 'weekly', 'moments', 'points', 'reward', 'checkin'].includes(screen) ? 'report' :
-        ['settings', 'conversation', 'privacy', 'notifications', 'family', 'device', 'education', 'feedback', 'about', 'version', 'child', 'name', 'contacts'].includes(screen) ? 'settings' : '';
+        ['my', 'accountProfile', 'accountSecurity', 'subscription', 'report', 'weekly', 'moments', 'points', 'reward', 'checkin', 'settings', 'conversation', 'privacy', 'notifications', 'family', 'device', 'education', 'feedback', 'about', 'parentIdentity', 'child', 'name', 'contacts'].includes(screen) ? 'my' : '';
     }
 
     function updateTabIndicator() {
@@ -1730,7 +3438,7 @@
         bottomNav.style.setProperty('--active-opacity', 0);
         return;
       }
-      const indicatorWidth = Math.min(activeButton.offsetWidth + 8, bottomNav.clientWidth - 16);
+      const indicatorWidth = Math.min(activeButton.offsetWidth - 2, bottomNav.clientWidth - 24);
       const indicatorHeight = Math.min(activeButton.offsetHeight + 4, bottomNav.clientHeight - 10);
       const indicatorX = activeButton.offsetLeft + activeButton.offsetWidth / 2 - indicatorWidth / 2;
       const indicatorY = activeButton.offsetTop + activeButton.offsetHeight / 2 - indicatorHeight / 2;
@@ -1776,14 +3484,20 @@
     }
 
     function showSheet(name) {
-      sheet.innerHTML = `<div class="sheet-panel">${sheetContent[name] || sheetContent.privacy}</div>`;
+      if (name === 'pointRule' && activeSheet !== 'pointRule') {
+        state.pointThresholdDraft = String(state.pointThreshold);
+      }
+      const content = sheetContent[name] || sheetContent.privacy;
+      sheet.innerHTML = `<div class="sheet-panel">${typeof content === 'function' ? content() : content}</div>`;
       sheet.classList.add('open');
+      activeSheet = name;
       lucide.createIcons();
     }
 
     function closeSheet() {
       sheet.classList.remove('open');
       sheet.innerHTML = '';
+      activeSheet = '';
     }
 
     let toastTimer;
@@ -1794,16 +3508,672 @@
       toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
     }
 
+    function cycleValue(currentValue, values) {
+      const index = values.indexOf(currentValue);
+      return values[(index + 1) % values.length];
+    }
+
+    function currentDraftTask() {
+      return {
+        time: state.manualStart,
+        title: state.manualTaskName.trim() || '自定义任务',
+        desc: `${state.manualStart} - ${state.manualEnd} · ${state.selectedDuration}`,
+        tone: 'blue',
+        go: 'taskDetail'
+      };
+    }
+
+    function updateManualEndFromDuration() {
+      const endByStart = {
+        '17:30': { '15 分钟': '17:45', '20 分钟': '17:50', '30 分钟': '18:00' },
+        '18:20': { '15 分钟': '18:35', '20 分钟': '18:40', '30 分钟': '18:50' },
+        '19:00': { '15 分钟': '19:15', '20 分钟': '19:20', '30 分钟': '19:30' },
+        '19:50': { '15 分钟': '20:05', '20 分钟': '20:10', '30 分钟': '20:20' },
+        '20:30': { '15 分钟': '20:45', '20 分钟': '20:50', '30 分钟': '21:00' },
+        '21:10': { '15 分钟': '21:25', '20 分钟': '21:30', '30 分钟': '21:40' }
+      };
+      state.manualEnd = endByStart[state.manualStart]?.[state.selectedDuration] || state.manualEnd;
+    }
+
+    function mergeTasks(existing, additions) {
+      return sortByTime([...existing, ...cloneTasks(additions)]);
+    }
+
+    function futureTaskFromManual(task, day = dayById(state.manualSelectedDateId) || selectedWeekDay()) {
+      return {
+        ...task,
+        time: `${day.weekday} ${task.time}`,
+        desc: `${task.desc} · ${day.month}${day.day}日`
+      };
+    }
+
+    function selectedTaskRef() {
+      const ref = state.editingTask;
+      if (!ref) return null;
+      const list = ref.plan === 'future'
+        ? state.futureTasks
+        : ref.plan?.startsWith('date:')
+          ? state.dateTaskPlans[ref.plan.replace('date:', '')]
+          : state.taskPlans[ref.plan];
+      const task = list?.[ref.index];
+      return task ? { ref, list, task } : null;
+    }
+
+    function saveTaskList(plan, list) {
+      if (plan === 'future') {
+        state.futureTasks = sortByTime(list);
+      } else if (plan?.startsWith('date:')) {
+        state.dateTaskPlans[plan.replace('date:', '')] = sortByTime(list);
+      } else {
+        state.taskPlans[plan] = sortByTime(list);
+      }
+    }
+
+    function addManualTaskToPlan() {
+      if (!state.manualTaskDate) return null;
+      const task = currentDraftTask();
+      if (state.manualTaskDate === 'future') {
+        const day = dayById(state.manualSelectedDateId) || dayById('2026-05-29');
+        const planKey = datePlanKeyForDay(day);
+        if (planKey === 'future') {
+          state.futureTasks = mergeTasks(state.futureTasks, [futureTaskFromManual(task, day)]);
+        } else {
+          state.dateTaskPlans[day.id] = mergeTasks(state.dateTaskPlans[day.id] || [], [futureTaskFromManual(task, day)]);
+        }
+        state.selectedDayId = day.id;
+        state.taskWeekOffset = weekOffsetForDay(day.id);
+      } else {
+        state.taskPlans[state.manualTaskDate] = mergeTasks(state.taskPlans[state.manualTaskDate], [task]);
+        state.selectedDayId = state.manualTaskDate === 'today' ? '2026-05-26' : '2026-05-27';
+        state.taskWeekOffset = 0;
+      }
+      state.taskView = 'date';
+      current = 'tasks';
+      return task;
+    }
+
+    function shiftTimeLabel(value, minutes) {
+      const match = value.match(/^(.*?)(\d{2}):(\d{2})$/);
+      if (!match) return value;
+      const [, prefix, hour, minute] = match;
+      const total = Number(hour) * 60 + Number(minute) + minutes;
+      const normalized = ((total % 1440) + 1440) % 1440;
+      const nextHour = String(Math.floor(normalized / 60)).padStart(2, '0');
+      const nextMinute = String(normalized % 60).padStart(2, '0');
+      return `${prefix}${nextHour}:${nextMinute}`;
+    }
+
+    function setSelectedTaskDay(dayId) {
+      const day = dayById(dayId) || dayById('2026-05-26');
+      state.selectedDayId = day.id;
+      state.taskWeekOffset = weekOffsetForDay(day.id);
+      state.taskView = 'date';
+      return day;
+    }
+
+    function currentEditableList(plan) {
+      if (plan === 'future') return state.futureTasks;
+      if (plan?.startsWith('date:')) return state.dateTaskPlans[plan.replace('date:', '')] || [];
+      return state.taskPlans[plan] || [];
+    }
+
+    function applyTemplateToFutureDay(day, tasks) {
+      const planKey = datePlanKeyForDay(day);
+      const additions = tasks.map(task => futureTaskFromManual(task, day));
+      if (planKey === 'future') {
+        state.futureTasks = mergeTasks(state.futureTasks, additions);
+      } else {
+        state.dateTaskPlans[day.id] = mergeTasks(state.dateTaskPlans[day.id] || [], additions);
+      }
+      setSelectedTaskDay(day.id);
+    }
+
+    function handleAction(target) {
+      const action = target.dataset.action;
+      if (!action) return false;
+
+      if (action === 'parent-role') {
+        const nextRole = target.dataset.role || state.parentRole;
+        if (!state.parentName || state.parentName === state.parentRole) state.parentName = nextRole;
+        state.parentRole = nextRole;
+        render();
+        return true;
+      }
+
+      if (action === 'child-stage') {
+        setChildStage(target.dataset.stage || state.childStage);
+        render();
+        return true;
+      }
+
+      if (action === 'schoolbag-mode') {
+        state.schoolbagMode = target.dataset.mode || state.schoolbagMode;
+        render();
+        return true;
+      }
+
+      if (action === 'boundary-level') {
+        state.boundaryLevel = target.dataset.level || state.boundaryLevel;
+        render();
+        return true;
+      }
+
+      if (action === 'task-fab-toggle') {
+        if (state.skipFabClick) return true;
+        state.taskFabOpen = !state.taskFabOpen;
+        renderTaskFab();
+        return true;
+      }
+
+      if (action === 'task-view') {
+        const view = target.dataset.view;
+        if (view === 'today') setSelectedTaskDay('2026-05-26');
+        else if (view === 'tomorrow') setSelectedTaskDay('2026-05-27');
+        else if (view === 'history') setSelectedTaskDay('2026-05-18');
+        else if (view === 'calendar') setSelectedTaskDay('2026-05-29');
+        else if (view === 'nextWeek') setSelectedTaskDay('2026-06-01');
+        current = 'tasks';
+        render();
+        return true;
+      }
+
+      if (action === 'week-shift') {
+        const nextOffset = Math.max(-1, Math.min(1, state.taskWeekOffset + Number(target.dataset.dir)));
+        state.taskWeekOffset = nextOffset;
+        state.selectedDayId = defaultDayForWeek(nextOffset);
+        state.taskView = 'date';
+        state.taskFabOpen = false;
+        current = 'tasks';
+        render();
+        return true;
+      }
+
+      if (action === 'task-day') {
+        setSelectedTaskDay(target.dataset.date);
+        state.taskFabOpen = false;
+        current = 'tasks';
+        render();
+        return true;
+      }
+
+      if (action === 'add-selected-task') {
+        const day = selectedWeekDay();
+        setManualDateForDay(day, 'timeline');
+        state.taskFabOpen = false;
+        renderTaskFab();
+        showSheet('task');
+        return true;
+      }
+
+      if (action === 'template-selected-day') {
+        const day = selectedWeekDay();
+        setManualDateForDay(day, 'timeline');
+        state.templateApplyDate = state.manualTaskDate;
+        state.taskFabOpen = false;
+        renderTaskFab();
+        showSheet('taskTemplates');
+        return true;
+      }
+
+      if (action === 'manual-date') {
+        state.manualTaskDate = target.dataset.date;
+        state.manualDateSource = 'manual';
+        if (state.manualTaskDate === 'future') {
+          const selected = selectedWeekDay();
+          state.manualSelectedDateId = selected.relation === 'future' ? selected.id : '2026-05-29';
+        } else {
+          state.manualSelectedDateId = state.manualTaskDate === 'today' ? '2026-05-26' : '2026-05-27';
+        }
+        showSheet('task');
+        return true;
+      }
+
+      if (action === 'manual-date-pick') {
+        const day = dayById(target.dataset.dateId);
+        setManualDateForDay(day, 'manual');
+        showSheet('task');
+        return true;
+      }
+
+      if (action === 'template-date') {
+        state.templateApplyDate = target.dataset.date;
+        if (state.templateApplyDate === 'future') {
+          const selected = selectedWeekDay();
+          state.manualSelectedDateId = selected.relation === 'future' ? selected.id : '2026-05-29';
+        }
+        showSheet('taskTemplates');
+        return true;
+      }
+
+      if (action === 'open-time-picker') {
+        state.timePickerTarget = target.dataset.target || 'start';
+        state.timePickerContext = target.dataset.context || 'manual';
+        showSheet('timePicker');
+        return true;
+      }
+
+      if (action === 'time-select') {
+        const time = target.dataset.time;
+        if (state.timePickerContext === 'edit') {
+          const selected = selectedTaskRef();
+          if (selected) {
+            selected.task.time = time;
+            selected.task.desc = `${time} 开始 · 已手动调整`;
+            saveTaskList(selected.ref.plan, selected.list);
+            const sortedList = currentEditableList(selected.ref.plan);
+            const nextIndex = sortedList.findIndex(task => task === selected.task);
+            state.editingTask = { ...selected.ref, index: Math.max(nextIndex, 0) };
+          }
+          showSheet('taskEdit');
+        } else {
+          if (state.timePickerTarget === 'start') {
+            state.manualStart = time;
+            updateManualEndFromDuration();
+          } else {
+            state.manualEnd = time;
+          }
+          showSheet('task');
+        }
+        return true;
+      }
+
+      if (action === 'manual-duration') {
+        state.selectedDuration = target.dataset.duration;
+        updateManualEndFromDuration();
+        showSheet('task');
+        return true;
+      }
+
+      if (action === 'manual-save') {
+        if (!state.manualTaskDate) {
+          showToast('请先选择任务日期');
+          showSheet('taskDate');
+          return true;
+        }
+        addManualTaskToPlan();
+        state.manualSessionCount = 0;
+        closeSheet();
+        render();
+        showToast(`已添加到${dateCopy(state.manualTaskDate)}任务`);
+        return true;
+      }
+
+      if (action === 'manual-save-continue') {
+        if (!state.manualTaskDate) {
+          showToast('请先选择任务日期');
+          showSheet('taskDate');
+          return true;
+        }
+        addManualTaskToPlan();
+        state.manualSessionCount += 1;
+        render();
+        showSheet('task');
+        showToast('已保存，可以继续添加下一条');
+        return true;
+      }
+
+      if (action === 'day-template-select') {
+        state.selectedDayTemplate = target.dataset.template;
+        showSheet('taskTemplates');
+        return true;
+      }
+
+      if (action === 'day-template-apply') {
+        const date = target.dataset.date;
+        const template = dayTemplates[state.selectedDayTemplate];
+        if (date === 'future') {
+          const day = dayById(state.manualSelectedDateId) || selectedWeekDay();
+          applyTemplateToFutureDay(day, template.tasks);
+        } else {
+          state.taskPlans[date] = mergeTasks(state.taskPlans[date], template.tasks);
+          setSelectedTaskDay(date === 'today' ? '2026-05-26' : '2026-05-27');
+        }
+        current = 'tasks';
+        closeSheet();
+        render();
+        showToast(`已套用${template.title}`);
+        return true;
+      }
+
+      if (action === 'task-open') {
+        state.editingTask = {
+          plan: target.dataset.plan,
+          index: Number(target.dataset.index)
+        };
+        showSheet('taskEdit');
+        return true;
+      }
+
+      if (action === 'task-delay') {
+        const selected = selectedTaskRef();
+        if (selected) {
+          selected.task.time = shiftTimeLabel(selected.task.time, 10);
+          selected.task.desc = `${selected.task.time} 开始 · 已延后 10 分钟`;
+          saveTaskList(selected.ref.plan, selected.list);
+          const nextIndex = currentEditableList(selected.ref.plan).findIndex(task => task === selected.task);
+          state.editingTask = { ...selected.ref, index: Math.max(nextIndex, 0) };
+        }
+        showSheet('taskEdit');
+        return true;
+      }
+
+      if (action === 'task-duplicate') {
+        const selected = selectedTaskRef();
+        if (selected) {
+          state.taskPlans.tomorrow = mergeTasks(state.taskPlans.tomorrow, [{ ...selected.task, tone: 'slate', desc: `${selected.task.desc} · 从今天复制` }]);
+        }
+        showSheet('taskEdit');
+        showToast('已复制到明天');
+        return true;
+      }
+
+      if (action === 'task-edit-save') {
+        current = 'tasks';
+        closeSheet();
+        render();
+        showToast('任务已更新');
+        return true;
+      }
+
+      if (action === 'task-delete') {
+        const plan = target.dataset.plan;
+        const index = Number(target.dataset.index);
+        if (plan === 'future') {
+          state.futureTasks = state.futureTasks.filter((_, itemIndex) => itemIndex !== index);
+          setSelectedTaskDay('2026-05-29');
+        } else if (plan?.startsWith('date:')) {
+          const dayId = plan.replace('date:', '');
+          state.dateTaskPlans[dayId] = (state.dateTaskPlans[dayId] || []).filter((_, itemIndex) => itemIndex !== index);
+          setSelectedTaskDay(dayId);
+        } else if (state.taskPlans[plan]) {
+          state.taskPlans[plan] = state.taskPlans[plan].filter((_, itemIndex) => itemIndex !== index);
+          setSelectedTaskDay(plan === 'today' ? '2026-05-26' : '2026-05-27');
+        }
+        state.editingTask = null;
+        current = 'tasks';
+        closeSheet();
+        render();
+        showToast('任务已删除');
+        return true;
+      }
+
+      if (action === 'setting-toggle') {
+        const key = target.dataset.setting;
+        state.settings[key] = !(state.settings[key] ?? false);
+        render();
+        return true;
+      }
+
+      if (action === 'evidence-result') {
+        state.evidenceStatus = target.dataset.result;
+        closeSheet();
+        current = 'taskDetail';
+        render();
+        return true;
+      }
+
+      if (action === 'point-unit') {
+        state.pointUnit = target.dataset.unit || state.pointUnit;
+        showSheet('pointRule');
+        return true;
+      }
+
+      if (action === 'milestone-continue') {
+        state.milestoneHandled = true;
+        closeSheet();
+        current = 'points';
+        render();
+        showToast('已继续累积');
+        return true;
+      }
+
+      if (action === 'point-rule-save') {
+        const nextThreshold = Number(state.pointThresholdDraft);
+        if (!Number.isInteger(nextThreshold) || nextThreshold < 1) {
+          showToast('请输入阶段阈值');
+          showSheet('pointRule');
+          return true;
+        }
+        state.pointThreshold = Math.min(999, nextThreshold);
+        state.pointThresholdDraft = String(state.pointThreshold);
+        state.milestoneHandled = false;
+        closeSheet();
+        current = current === 'reward' ? 'reward' : 'points';
+        render();
+        showToast('阶段规则已保存');
+        return true;
+      }
+
+      if (action === 'manual-reward-select') {
+        state.manualRewardKey = target.dataset.reward || state.manualRewardKey;
+        showSheet('manualReward');
+        return true;
+      }
+
+      if (action === 'manual-reward-open') {
+        state.manualRewardKey = target.dataset.reward || state.manualRewardKey;
+        showSheet('manualReward');
+        return true;
+      }
+
+      if (action === 'manual-reward-confirm') {
+        const reward = selectedRewardOption();
+        if (state.pointBalance < reward.cost) {
+          showToast(`${state.pointUnit}不足，先继续累积`);
+          return true;
+        }
+        state.pointBalance -= reward.cost;
+        state.lastManualReward = `${reward.title} -${pointUnitAmount(reward.cost)}`;
+        state.milestoneHandled = false;
+        closeSheet();
+        current = 'points';
+        render();
+        showToast(`已兑换并扣除${state.pointUnit}`);
+        return true;
+      }
+
+      if (action === 'reward-add-open') {
+        state.rewardEditingKey = null;
+        state.rewardDraftName = '周末一起骑车';
+        state.rewardDraftCost = '20';
+        showSheet('rewardEdit');
+        return true;
+      }
+
+      if (action === 'reward-edit-open') {
+        const reward = rewardOptions().find(item => item.key === target.dataset.reward);
+        if (!reward) return true;
+        state.rewardEditingKey = reward.key;
+        state.rewardDraftName = reward.title;
+        state.rewardDraftCost = String(reward.cost);
+        state.rewardActionOpen = reward.key;
+        showSheet('rewardEdit');
+        return true;
+      }
+
+      if (action === 'reward-delete') {
+        if (state.rewardItems.length <= 1) {
+          showToast('至少保留一个奖品');
+          return true;
+        }
+        const reward = rewardOptions().find(item => item.key === target.dataset.reward);
+        state.rewardItems = state.rewardItems.filter(item => item.key !== target.dataset.reward);
+        if (!state.rewardItems.find(item => item.key === state.manualRewardKey)) state.manualRewardKey = state.rewardItems[0]?.key || '';
+        state.rewardActionOpen = state.rewardItems[0]?.key || '';
+        current = 'reward';
+        render();
+        showToast(reward ? `${reward.title}已删除` : '奖品已删除');
+        return true;
+      }
+
+      if (action === 'reward-save') {
+        const title = state.rewardDraftName.trim();
+        const cost = Math.max(0, Number(state.rewardDraftCost));
+        if (!title || !cost) {
+          showToast('请填写奖品名称和所需数量');
+          return true;
+        }
+        if (state.rewardEditingKey) {
+          state.rewardItems = state.rewardItems.map(item => item.key === state.rewardEditingKey ? { ...item, title, cost } : item);
+          state.rewardActionOpen = state.rewardEditingKey;
+        } else {
+          const key = `custom-${Date.now()}`;
+          state.rewardItems = [...state.rewardItems, { key, title, cost, desc: '家长新增奖励', tone: 'blue' }];
+          state.rewardActionOpen = key;
+          state.manualRewardKey = key;
+        }
+        closeSheet();
+        current = 'reward';
+        render();
+        showToast(state.rewardEditingKey ? '奖励已修改' : '奖励已添加');
+        return true;
+      }
+
+      if (action === 'reward-result') {
+        if (target.dataset.result === 'fulfilled' && !state.childRewardDeducted) {
+          state.pointBalance = Math.max(0, state.pointBalance - 30);
+          state.childRewardDeducted = true;
+        }
+        state.rewardStatus = target.dataset.result;
+        state.lastManualReward = target.dataset.result === 'fulfilled' ? `语音申请：周末户外活动 -${pointUnitAmount(30)}` : state.lastManualReward;
+        state.milestoneHandled = false;
+        closeSheet();
+        current = 'reward';
+        render();
+        return true;
+      }
+
+      if (action === 'packing-status') {
+        state.packingStatus[target.dataset.item] = target.dataset.status;
+        current = 'packing';
+        render();
+        return true;
+      }
+
+      if (action === 'packing-add') {
+        const item = (state.packingDraft || schoolbagConfig().addDefault).trim();
+        if (item && !state.packingExtra.includes(item)) state.packingExtra.push(item);
+        state.packingDraft = schoolbagConfig().addDefault;
+        closeSheet();
+        current = 'packing';
+        render();
+        return true;
+      }
+
+      if (action === 'packing-extra-remove') {
+        const index = Number(target.dataset.index);
+        state.packingExtra = state.packingExtra.filter((_, itemIndex) => itemIndex !== index);
+        current = 'packing';
+        render();
+        return true;
+      }
+
+      return false;
+    }
+
+    function clampFabPosition(nextX, nextY) {
+      const surface = document.querySelector('.phone-surface');
+      const width = surface?.clientWidth || 404;
+      const height = surface?.clientHeight || 866;
+      return {
+        x: Math.max(-(width - 100), Math.min(12, nextX)),
+        y: Math.max(-(height - 198), Math.min(42, nextY))
+      };
+    }
+
+    const fabDrag = { active: false, moved: false, startX: 0, startY: 0, originX: 0, originY: 0, startTime: 0 };
+
+    taskFab.addEventListener('pointerdown', (event) => {
+      if (current !== 'tasks' || event.target.closest('.task-fab-option')) return;
+      fabDrag.active = true;
+      fabDrag.moved = false;
+      fabDrag.startX = event.clientX;
+      fabDrag.startY = event.clientY;
+      fabDrag.originX = state.taskFabX;
+      fabDrag.originY = state.taskFabY;
+      fabDrag.startTime = performance.now();
+    });
+
+    document.addEventListener('pointermove', (event) => {
+      if (!fabDrag.active) return;
+      const dx = event.clientX - fabDrag.startX;
+      const dy = event.clientY - fabDrag.startY;
+      if (Math.hypot(dx, dy) > 18 && performance.now() - fabDrag.startTime > 120) fabDrag.moved = true;
+      if (!fabDrag.moved) return;
+      const next = clampFabPosition(fabDrag.originX + dx, fabDrag.originY + dy);
+      state.taskFabX = next.x;
+      state.taskFabY = next.y;
+      state.taskFabOpen = false;
+      renderTaskFab();
+    });
+
+    document.addEventListener('pointerup', () => {
+      if (!fabDrag.active) return;
+      fabDrag.active = false;
+      if (fabDrag.moved) {
+        state.skipFabClick = true;
+        setTimeout(() => {
+          state.skipFabClick = false;
+        }, 120);
+      }
+    });
+
+    taskFab.querySelector('.task-fab-main').addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (state.skipFabClick) return;
+      state.taskFabOpen = !state.taskFabOpen;
+      renderTaskFab();
+    });
+
+    app.addEventListener('pointerdown', (event) => {
+      const card = event.target.closest('.reward-swipe-card');
+      if (current !== 'reward' || !card) return;
+      const row = card.closest('.reward-swipe-row');
+      state.rewardSwipeStartX = event.clientX;
+      state.rewardSwipeStartKey = row?.dataset.reward || null;
+    });
+
+    app.addEventListener('pointerup', (event) => {
+      if (current !== 'reward' || !state.rewardSwipeStartKey) return;
+      const dx = event.clientX - state.rewardSwipeStartX;
+      if (Math.abs(dx) > 38) {
+        state.rewardActionOpen = dx > 0 ? state.rewardSwipeStartKey : '';
+        state.skipRewardClick = true;
+        render();
+        setTimeout(() => {
+          state.skipRewardClick = false;
+        }, 160);
+      }
+      state.rewardSwipeStartX = 0;
+      state.rewardSwipeStartKey = null;
+    });
+
+    app.addEventListener('pointercancel', () => {
+      state.rewardSwipeStartX = 0;
+      state.rewardSwipeStartKey = null;
+    });
+
     document.addEventListener('click', (event) => {
       const target = event.target.closest('button, a');
       if (!target) return;
+      if (state.skipRewardClick && target.closest('.reward-swipe-card')) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
       const isBottomTabSwitch = !!target.closest('#bottomNav') && target.dataset.go && rootTabFor(target.dataset.go) !== rootTabFor(current);
       target.classList.add('tap-flash');
       setTimeout(() => target.classList.remove('tap-flash'), 340);
 
+      if (handleAction(target)) return;
+
       if (target.dataset.close !== undefined) closeSheet();
       if (target.dataset.go) {
-        current = target.dataset.go;
+        const nextScreen = target.dataset.go;
+        if (nextScreen === 'child') state.childEntrySource = current === 'bindDone' ? 'onboarding' : 'management';
+        state.taskFabOpen = false;
+        current = nextScreen;
         render();
         if (isBottomTabSwitch) {
           bottomNav.classList.remove('is-switching');
@@ -1812,7 +4182,10 @@
           setTimeout(() => bottomNav.classList.remove('is-switching'), 360);
         }
       }
-      if (target.dataset.sheet) showSheet(target.dataset.sheet);
+      if (target.dataset.sheet) {
+        if (target.dataset.sheet === 'task' && !target.closest('#sheet')) clearManualDateContext();
+        showSheet(target.dataset.sheet);
+      }
       if (target.dataset.toast) showToast(target.dataset.toast);
       if (target === sheet) closeSheet();
     });
@@ -1820,6 +4193,60 @@
     sheet.addEventListener('click', (event) => {
       if (event.target === sheet) closeSheet();
     });
+
+    function handleInputField(event) {
+      const field = event.target.dataset.field;
+      if (field === 'manualTaskName') {
+        state.manualTaskName = event.target.value;
+      }
+      if (field === 'parentName') {
+        state.parentName = event.target.value.trim() || state.parentRole;
+      }
+      if (field === 'childName') {
+        state.childName = event.target.value.trim() || '孩子';
+      }
+      if (field === 'childBirthday') {
+        state.childBirthday = event.target.value || state.childBirthday;
+        render();
+        return;
+      }
+      if (field === 'childStage') {
+        setChildStage(event.target.value);
+        render();
+        return;
+      }
+      if (field === 'childGrade') {
+        state.childGrade = event.target.value || state.childGrade;
+        render();
+        return;
+      }
+      if (field === 'childClass') {
+        state.childClass = event.target.value.trim();
+      }
+      if (field === 'packingDraft') {
+        state.packingDraft = event.target.value;
+      }
+      if (field === 'pointThresholdDraft') {
+        const cleanValue = event.target.value.replace(/[^\d]/g, '').slice(0, 3);
+        state.pointThresholdDraft = cleanValue;
+        event.target.value = cleanValue;
+      }
+      if (field === 'rewardDraftName') {
+        state.rewardDraftName = event.target.value;
+      }
+      if (field === 'rewardDraftCost') {
+        state.rewardDraftCost = event.target.value.replace(/[^\d]/g, '');
+      }
+      if (field === 'editingTaskTitle') {
+        const selected = selectedTaskRef();
+        if (selected) selected.task.title = event.target.value.trim() || '自定义任务';
+      }
+    }
+
+    app.addEventListener('input', handleInputField);
+    sheet.addEventListener('input', handleInputField);
+    app.addEventListener('change', handleInputField);
+    sheet.addEventListener('change', handleInputField);
 
     render();
   </script>

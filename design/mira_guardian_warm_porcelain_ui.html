@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mira Guardian · 暖瓷风格高保真原型 v2</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23C47B4B'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%23ffffff' fill-opacity='.9'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%23C47B4B'/%3E%3C/svg%3E"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter','-apple-system','BlinkMacSystemFont','SF Pro Display','Roboto','sans-serif'] },
+      colors: {
+        warm: { bg:'#FBF7F2', surface:'#FFFFFF', clay:'#C47B4B','clay-light':'#F5EDE6','clay-deep':'#A86335', sage:'#8B9D83','sage-light':'#EDF2EC', honey:'#E8A85D','honey-light':'#FDF5EB', red:'#D96C6C','red-light':'#FDF0F0', ink:'#3D3229', muted:'#9B8E82', sky:'#6B9BD2','sky-light':'#EDF3FA', line:'#E8E3DC' }
+      }
+    }
+  }
+};
+</script>
+<style>
+:root { --ease: cubic-bezier(.22,1,.36,1); }
+* { letter-spacing:0; }
+body {
+  min-height:100vh; overflow-x:hidden; color:#3D3229;
+  background: linear-gradient(175deg, #FBF7F2 0%, #F5EDE6 35%, #F2ECE5 65%, #F7F3EE 100%);
+}
+button,a { cursor:pointer; }
+button:focus-visible,a:focus-visible,input:focus-visible { outline:3px solid rgba(196,123,75,.30); outline-offset:2px; }
+
+/* Stage */
+.stage { display:grid; grid-template-columns:minmax(260px,.8fr) 460px minmax(300px,1fr); gap:32px; align-items:start; width:min(1680px,calc(100vw - 40px)); margin:0 auto; padding:32px 0; }
+.warm-panel { border:1px solid rgba(196,123,75,.06); border-radius:24px; background:rgba(255,255,255,.80); box-shadow:0 8px 32px rgba(139,119,90,.06); }
+
+/* Phone Frame */
+.phone-frame { width:430px; height:892px; border-radius:52px; padding:14px; background:linear-gradient(155deg,#3D3229,#5C4A3A 45%,#3D3229); box-shadow:0 32px 80px rgba(61,50,41,.24); position:sticky; top:24px; }
+.phone-surface { position:relative; width:100%; height:100%; overflow:hidden; border-radius:39px; background:linear-gradient(180deg,#FDFAF6 0%,#F7F1E9 50%,#F5EDE3 100%); }
+.dynamic-island { position:absolute; top:12px; left:50%; z-index:20; width:120px; height:33px; transform:translateX(-50%); border-radius:999px; background:#2A221D; }
+.status-bar { position:absolute; z-index:12; top:16px; left:26px; right:26px; display:flex; justify-content:space-between; color:rgba(61,50,41,.76); font-size:13px; font-weight:700; pointer-events:none; }
+.app-scroll { position:relative; z-index:2; height:100%; overflow-y:auto; overscroll-behavior:contain; padding:66px 20px 112px; scrollbar-width:none; }
+.app-scroll::-webkit-scrollbar { display:none; }
+
+/* Tap */
+.tap { transition:transform .16s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease),opacity .18s var(--ease); }
+.tap:active { transform:scale(.97); }
+.tap-flash { animation:tapFlash .32s var(--ease); }
+@keyframes tapFlash { 0%{transform:scale(.985);filter:brightness(1.03)} 100%{transform:scale(1);filter:brightness(1)} }
+
+/* ---- Core Components ---- */
+.hero-block { position:relative; overflow:hidden; border-radius:26px; background:linear-gradient(155deg,#FBF7F2,#F5EDE6 50%,#F2ECE5); border:1px solid rgba(196,123,75,.06); box-shadow:0 8px 32px rgba(139,119,90,.06); }
+.hero-dark { background:linear-gradient(155deg,#3D3229,#4A3D32 50%,#3D3229); color:#fff; }
+.card-base { border-radius:20px; background:#fff; border:1px solid rgba(196,123,75,.05); box-shadow:0 4px 16px rgba(139,119,90,.04); }
+.card-soft { border-radius:20px; background:rgba(255,255,255,.72); border:1px solid rgba(196,123,75,.04); box-shadow:0 2px 12px rgba(139,119,90,.03); }
+.card-accent { border-radius:20px; background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(251,247,242,.78)); border:1px solid rgba(196,123,75,.14); box-shadow:0 8px 28px rgba(139,119,90,.06); }
+
+/* Row */
+.warm-row { display:flex; min-height:68px; align-items:center; gap:14px; padding:14px 16px; border-radius:16px; background:rgba(255,255,255,.68); border:1px solid rgba(196,123,75,.04); box-shadow:0 2px 10px rgba(139,119,90,.02); transition:all .18s var(--ease); }
+.warm-row:hover { background:#fff; border-color:rgba(196,123,75,.10); box-shadow:0 6px 20px rgba(139,119,90,.06); }
+.warm-row .row-icon { flex-shrink:0; display:grid; height:44px; width:44px; place-items:center; border-radius:14px; }
+.warm-row .row-copy { min-width:0; flex:1; }
+.warm-row .row-title { font-size:14px; line-height:1.3; font-weight:700; color:#3D3229; }
+.warm-row .row-desc { margin-top:2px; font-size:12px; line-height:1.4; font-weight:600; color:#9B8E82; }
+.warm-row .row-action { display:flex; flex-shrink:0; align-items:center; }
+
+/* Chips */
+.chip { display:inline-flex; align-items:center; gap:5px; min-height:28px; border-radius:999px; padding:0 10px; font-size:11px; font-weight:700; white-space:nowrap; }
+.chip-clay { background:#F5EDE6; color:#C47B4B; } .chip-sage { background:#EDF2EC; color:#6B8D6E; }
+.chip-honey { background:#FDF5EB; color:#D4953B; } .chip-red { background:#FDF0F0; color:#D96C6C; }
+.chip-sky { background:#EDF3FA; color:#5B8EC2; } .chip-muted { background:#F5F3F0; color:#9B8E82; }
+.chip-ink { background:#3D3229; color:#fff; }
+.chip-white { background:rgba(255,255,255,.72); color:#3D3229; }
+
+/* Buttons */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; border:0; cursor:pointer; font-weight:700; transition:all .16s var(--ease); }
+.btn:active { transform:scale(.97); }
+.btn-primary { min-height:48px; width:100%; border-radius:16px; background:#C47B4B; color:#fff; font-size:14px; box-shadow:0 6px 20px rgba(196,123,75,.20); }
+.btn-primary:hover { background:#A86335; box-shadow:0 8px 24px rgba(196,123,75,.26); }
+.btn-ghost { min-height:46px; width:100%; border-radius:16px; background:rgba(255,255,255,.68); color:#3D3229; font-size:14px; border:1px solid rgba(196,123,75,.08); box-shadow:0 2px 8px rgba(139,119,90,.03); }
+.btn-ghost:hover { background:#fff; box-shadow:0 6px 18px rgba(139,119,90,.06); }
+.btn-sm { min-height:34px; border-radius:999px; padding:0 12px; font-size:11px; font-weight:700; background:rgba(255,255,255,.74); border:1px solid rgba(196,123,75,.06); color:#3D3229; box-shadow:0 2px 6px rgba(139,119,90,.03); cursor:pointer; transition:all .16s var(--ease); }
+.btn-sm:hover { background:#fff; box-shadow:0 4px 12px rgba(139,119,90,.06); }
+.btn-sm.dark { background:#3D3229; color:#fff; border-color:#3D3229; }
+.btn-sm.danger { background:#FDF0F0; color:#D96C6C; border-color:rgba(217,108,108,.10); }
+.btn-sm.sage { background:#EDF2EC; color:#6B8D6E; border-color:rgba(139,157,131,.12); }
+
+/* Progress Ring */
+.progress-ring { width:88px; height:88px; border-radius:50%; background:conic-gradient(#C47B4B 0 50%,rgba(196,123,75,.08) 50% 100%); display:grid; place-items:center; }
+.progress-ring::before { content:""; width:66px; height:66px; border-radius:50%; background:#fff; position:absolute; }
+.progress-ring strong { position:relative; z-index:1; }
+.tiny-chart { display:flex; align-items:end; gap:7px; height:80px; }
+.tiny-chart span { width:18px; border-radius:8px 8px 3px 3px; background:#C47B4B; }
+
+/* ---- Bottom Nav ---- */
+.bottom-nav { position:absolute; z-index:25; left:20px; right:20px; bottom:16px; display:grid; grid-template-columns:repeat(5,1fr); gap:2px; height:62px; padding:6px 6px; border-radius:22px; background:rgba(255,255,255,.86); border:1px solid rgba(196,123,75,.06); box-shadow:0 12px 40px rgba(139,119,90,.10); overflow:hidden; --active-opacity:0; --indicator-x:0px; --indicator-y:4px; --indicator-width:64px; --indicator-height:50px; }
+.tab-indicator { position:absolute; z-index:0; left:0; top:0; width:var(--indicator-width); height:var(--indicator-height); opacity:var(--active-opacity); transform:translate3d(var(--indicator-x),var(--indicator-y),0); transition:transform .34s cubic-bezier(.25,.1,.25,1),width .24s var(--ease),height .24s var(--ease),opacity .18s var(--ease); pointer-events:none; will-change:transform,width,height,opacity; }
+.tab-indicator::before { content:""; position:absolute; inset:0; width:var(--indicator-width); border-radius:18px; background:rgba(196,123,75,.08); border:1px solid rgba(196,123,75,.12); box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
+.nav-item { position:relative; z-index:1; min-height:48px; border-radius:16px; color:#9B8E82; transition:transform .28s cubic-bezier(.19,1,.22,1),color .24s var(--ease); cursor:pointer; }
+.nav-item.active { color:#C47B4B; background:transparent; transform:translateY(-1px); }
+.nav-item.active svg { transform:translateY(-1px) scale(1.04); stroke-width:2.4; filter:drop-shadow(0 2px 3px rgba(196,123,75,.10)); }
+.nav-item.active span { transform:translateY(-1px); }
+.nav-item svg,.nav-item span { transition:transform .24s var(--ease); }
+@media (prefers-reduced-motion:reduce) { .tab-indicator,.tab-indicator::before,.nav-item,.nav-item svg,.nav-item span { animation:none!important; transition-duration:.01ms!important; } }
+
+/* ---- Sheet ---- */
+.sheet { position:absolute; inset:0; z-index:40; display:none; align-items:end; background:rgba(61,50,41,.12); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
+.sheet.open { display:flex; }
+.sheet-panel { position:relative; width:100%; max-height:78%; overflow-y:auto; border-radius:28px 28px 38px 38px; padding:12px 18px 28px; border:1px solid rgba(196,123,75,.05); background:rgba(255,255,255,.96); box-shadow:0 -18px 48px rgba(139,119,90,.10); animation:sheetUp .36s var(--ease); }
+@keyframes sheetUp { from{transform:translateY(24px);opacity:.25} to{transform:translateY(0);opacity:1} }
+
+/* Toast */
+.toast { position:absolute; z-index:45; left:50%; bottom:108px; max-width:300px; transform:translate(-50%,16px); opacity:0; pointer-events:none; transition:opacity .24s var(--ease),transform .24s var(--ease); border-radius:999px; background:#3D3229; color:#fff; padding:10px 18px; font-size:13px; font-weight:700; box-shadow:0 12px 32px rgba(61,50,41,.18); }
+.toast.show { opacity:1; transform:translate(-50%,0); }
+
+/* FAB */
+.task-fab { position:absolute; z-index:35; right:24px; bottom:108px; height:52px; width:52px; display:none; border:0; border-radius:999px; background:#C47B4B; box-shadow:0 10px 28px rgba(196,123,75,.28); overflow:hidden; transform:translate(var(--fab-x,0px),var(--fab-y,0px)); transition:width .26s cubic-bezier(.25,.1,.25,1),border-radius .22s var(--ease),opacity .2s ease,transform .2s var(--ease),box-shadow .22s ease; will-change:transform; }
+.task-fab.show { display:block; }
+.task-fab.open { width:170px; border-radius:24px; box-shadow:0 14px 34px rgba(196,123,75,.32); }
+.task-fab-main,.task-fab-option { position:absolute; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; font-weight:800; white-space:nowrap; cursor:pointer; }
+.task-fab-main { top:7px; right:7px; height:38px; width:38px; border:0; background:rgba(255,255,255,.90); color:#C47B4B; box-shadow:0 3px 10px rgba(61,50,41,.10); transition:transform .22s var(--ease); }
+.task-fab-main:hover { background:#fff; }
+.task-fab-main svg { height:16px; width:16px; transition:transform .22s ease; }
+.task-fab.open .task-fab-main svg { transform:rotate(45deg); }
+.task-fab-option { top:8px; height:36px; min-width:52px; gap:4px; padding:0 10px; border:0; background:transparent; color:rgba(255,255,255,.90); font-size:12px; line-height:1.2; opacity:0; pointer-events:none; transform:translateX(10px) scale(.96); transition:opacity .18s ease,transform .22s var(--ease); }
+.task-fab-option svg { height:14px; width:14px; }
+.task-fab.open .task-fab-option { opacity:1; pointer-events:auto; transform:translateX(0) scale(1); }
+.task-fab.open .task-fab-option.add { left:7px; transition-delay:.02s; }
+.task-fab.open .task-fab-option.template { left:66px; transition-delay:.05s; }
+.task-fab.open .task-fab-option.today { left:7px; min-width:84px; transition-delay:.02s; }
+
+/* ---- Task Flow (NEW visual: node flow instead of timeline) ---- */
+.task-flow { position:relative; display:grid; gap:0; overflow:hidden; border-radius:18px; background:rgba(255,255,255,.46); border:1px solid rgba(196,123,75,.04); }
+.task-flow::before { content:""; position:absolute; left:38px; top:30px; bottom:30px; width:2px; background:linear-gradient(180deg,transparent,rgba(196,123,75,.14) 12%,rgba(196,123,75,.14) 88%,transparent); }
+.flow-node { position:relative; display:grid!important; grid-template-columns:40px minmax(0,1fr) auto; min-height:74px; align-items:center; gap:0; padding:12px 12px 12px 0!important; border-radius:0; border:0; background:transparent; box-shadow:none; text-align:left; }
+.flow-node+.flow-node { border-top:1px solid rgba(196,123,75,.06); }
+.flow-node:hover { background:rgba(255,255,255,.38); }
+.flow-dot { position:relative; z-index:1; justify-self:center; width:13px; height:13px; border-radius:999px; border:2.5px solid rgba(255,255,255,.80); box-shadow:0 3px 8px rgba(61,50,41,.08); }
+.flow-dot.sage { background:#8B9D83; } .flow-dot.sky { background:#6B9BD2; } .flow-dot.honey { background:#E8A85D; } .flow-dot.muted { background:#C4BDB5; }
+
+/* Week */
+.week-nav-btn { display:grid; height:40px; width:40px; place-items:center; border-radius:14px; background:rgba(255,255,255,.74); color:#3D3229; border:1px solid rgba(196,123,75,.04); box-shadow:0 2px 8px rgba(139,119,90,.03); cursor:pointer; }
+.week-day-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
+.day-chip { min-height:70px; border-radius:16px; padding:8px 2px; text-align:center; background:rgba(255,255,255,.62); border:1px solid rgba(196,123,75,.03); box-shadow:0 2px 8px rgba(139,119,90,.02); cursor:pointer; transition:all .18s var(--ease); }
+.day-chip:hover { background:rgba(255,255,255,.88); }
+
+/* Empty */
+.empty-state { min-height:210px; border-radius:24px; display:grid; align-content:center; text-align:center; background:rgba(255,255,255,.58); border:1.5px dashed rgba(196,123,75,.10); padding:24px; }
+
+/* Template card */
+.template-card { border-radius:18px; border:1px solid rgba(196,123,75,.05); background:rgba(255,255,255,.68); padding:14px; cursor:pointer; box-shadow:0 2px 10px rgba(139,119,90,.02); transition:all .18s var(--ease); }
+.template-card.active { border-color:rgba(196,123,75,.24); background:linear-gradient(180deg,rgba(251,247,242,.92),rgba(255,255,255,.72)); box-shadow:0 6px 22px rgba(139,119,90,.06); }
+
+/* Time */
+.time-pair { display:grid; grid-template-columns:1fr 30px 1fr; align-items:center; gap:8px; }
+.time-card { min-height:72px; border-radius:18px; background:rgba(255,255,255,.68); padding:12px; border:1px solid rgba(196,123,75,.04); box-shadow:0 2px 8px rgba(139,119,90,.02); }
+
+/* Screen map */
+.screen-map button { background:rgba(255,255,255,.68)!important; border-color:rgba(196,123,75,.04)!important; box-shadow:0 2px 6px rgba(139,119,90,.02); }
+.screen-map button.active { background:rgba(196,123,75,.10)!important; color:#C47B4B; border-color:rgba(196,123,75,.20)!important; box-shadow:0 4px 16px rgba(139,119,90,.05); }
+
+/* Horz scroll section */
+.horz-scroll { display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.horz-scroll::-webkit-scrollbar { display:none; }
+.horz-scroll>* { scroll-snap-align:start; flex-shrink:0; }
+
+@media (max-width:1240px) { .stage { grid-template-columns:1fr; justify-items:center; } .phone-frame { position:relative; top:0; } .warm-panel { width:min(100%,760px); } }
+@media (max-width:520px) { .stage { width:100%; padding:0; gap:0; } .warm-panel { border-radius:0; } .phone-frame { width:100vw; height:100vh; border-radius:0; padding:0; } .phone-surface { border-radius:0; } .dynamic-island { top:10px; } }
+</style>
+</head>
+<body class="font-sans antialiased">
+<main class="stage">
+
+<!-- LEFT SIDEBAR -->
+<aside class="warm-panel p-6">
+  <div class="flex items-center gap-3">
+    <span class="grid h-11 w-11 place-items-center rounded-[16px] bg-warm-clay text-white"><i data-lucide="aperture" class="h-5 w-5"></i></span>
+    <div><p class="text-sm font-semibold text-warm-muted">Mira Guardian</p><h1 class="text-xl font-semibold leading-tight text-warm-ink">暖瓷风格原型 v2</h1></div>
+  </div>
+  <p class="mt-4 text-sm leading-6 text-warm-muted">完全重新设计的布局与信息架构——每个页面的视觉结构都与原版不同。暖瓷色调、大量留白、创新的卡片形态。</p>
+  <div class="mt-5 grid gap-2">
+    <div class="card-soft p-3">
+      <p class="text-sm font-semibold text-warm-ink">覆盖范围</p>
+      <div class="mt-2 flex flex-wrap gap-1.5">
+        <span class="chip chip-clay">首次使用</span><span class="chip chip-sage">设备绑定</span><span class="chip chip-sky">首页</span><span class="chip chip-honey">任务系统</span><span class="chip chip-clay">实时看护</span><span class="chip chip-sage">报告积分</span><span class="chip chip-sky">安全隐私</span>
+      </div>
+    </div>
+    <div class="card-soft p-3">
+      <p class="text-sm font-semibold text-warm-ink">v2 设计创新</p>
+      <ul class="mt-2 space-y-1.5 text-xs leading-5 text-warm-muted">
+        <li><b>首页</b>：英雄区+横向滚动+呼吸留白</li>
+        <li><b>任务</b>：节点流视图替代竖线时间轴</li>
+        <li><b>报告</b>：叙事化日报替代指标卡片堆</li>
+        <li><b>看护</b>：沉浸全屏替代卡片叠加</li>
+        <li><b>设置</b>：分组卡片替代列表排列</li>
+      </ul>
+    </div>
+  </div>
+</aside>
+
+<!-- PHONE -->
+<section class="phone-frame" aria-label="Mira Guardian App">
+  <div class="phone-surface">
+    <div class="dynamic-island"></div>
+    <div class="status-bar"><span>17:42</span><span class="flex items-center gap-1"><i data-lucide="wifi" class="h-3.5 w-3.5"></i><i data-lucide="battery-full" class="h-4 w-4"></i></span></div>
+    <div id="app" class="app-scroll"></div>
+    <nav id="bottomNav" class="bottom-nav" aria-label="导航"></nav>
+    <div id="sheet" class="sheet" aria-live="polite"></div>
+    <div id="toast" class="toast" role="status"></div>
+    <div id="taskFab" class="task-fab" aria-label="任务快捷操作">
+      <button class="tap task-fab-option add" data-action="add-selected-task"><i data-lucide="plus" class="h-3.5 w-3.5"></i>添加</button>
+      <button class="tap task-fab-option template" data-action="template-selected-day"><i data-lucide="sparkles" class="h-3.5 w-3.5"></i>模板</button>
+      <button class="tap task-fab-option today" data-action="task-view" data-view="today"><i data-lucide="calendar-check" class="h-3.5 w-3.5"></i>今天</button>
+      <button class="tap task-fab-main" data-action="task-fab-toggle" aria-label="展开" aria-expanded="false"><i data-lucide="plus" class="h-4 w-4"></i></button>
+    </div>
+  </div>
+</section>
+
+<!-- RIGHT SIDEBAR -->
+<aside class="warm-panel p-6">
+  <div class="flex items-start justify-between gap-3">
+    <div><p class="text-sm font-semibold text-warm-muted">页面地图</p><h2 class="mt-1 text-xl font-semibold text-warm-ink">全路径导航</h2></div>
+    <button class="tap min-h-[42px] rounded-full bg-warm-clay px-4 text-sm font-semibold text-white" data-go="welcome">从头开始</button>
+  </div>
+  <div id="screenMap" class="screen-map mt-4 space-y-4"></div>
+  <div class="mt-5 rounded-[20px] bg-warm-clay-light p-3 text-sm leading-6 text-warm-muted">
+    <p class="font-semibold text-warm-ink">v2 设计说明</p>
+    <p class="mt-1.5">v2 在保留暖瓷色彩的前提下，将每个页面的布局结构完全重做：不用原版的卡片堆叠模式，改用英雄区+横向滚动、节点流视图、叙事化报告和沉浸式看护等全新布局。每个页面的信息层级和视觉结构均与原版不同。</p>
+  </div>
+</aside>
+</main>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+/* ====== DATA ====== */
+const img = {
+  study:'https://images.pexels.com/photos/10109025/pexels-photo-10109025.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  desk:'https://images.pexels.com/photos/32206185/pexels-photo-32206185.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  room:'https://images.pexels.com/photos/9328035/pexels-photo-9328035.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  family:'https://images.pexels.com/photos/4148842/pexels-photo-4148842.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  table:'https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=1200'
+};
+
+const groups = [
+  {title:'首次使用',items:[['welcome','欢迎页'],['login','登录注册'],['bind','扫码绑定'],['wifi','Wi-Fi配网'],['bindDone','绑定成功'],['child','孩子档案'],['name','摄像头命名'],['contacts','紧急联系人']]},
+  {title:'今日工作台',items:[['home','首页'],['care','协作待办'],['sleep','睡眠晨起']]},
+  {title:'任务与模板',items:[['flow','任务模板'],['packing','小书包'],['tasks','任务日历'],['taskDetail','任务详情'],['focus','专注计时']]},
+  {title:'看护与事件',items:[['watch','实时看护'],['playback','事件回放'],['zones','安全区域'],['safety','安全事件'],['safetyDetail','事件详情']]},
+  {title:'报告与激励',items:[['report','日报'],['weekly','周报'],['moments','成长时刻'],['points','积分'],['reward','奖励商店'],['checkin','打卡审核']]},
+  {title:'边界与设置',items:[['conversation','对话人设'],['privacy','隐私权限'],['notifications','通知设置'],['family','家庭成员'],['device','设备管理'],['education','学习内容'],['feedback','帮助反馈'],['about','关于我们'],['version','版本更新'],['settings','设置总览']]}
+];
+
+const nav = [['home','home','首页'],['tasks','list-checks','任务'],['watch','video','看护'],['report','chart-no-axes-column','报告'],['settings','settings','设置']];
+
+let current = 'welcome';
+const app = document.getElementById('app');
+const bottomNav = document.getElementById('bottomNav');
+const screenMap = document.getElementById('screenMap');
+const sheet = document.getElementById('sheet');
+const toast = document.getElementById('toast');
+const taskFab = document.getElementById('taskFab');
+
+const state = {
+  taskView:'today',taskWeekOffset:0,selectedDayId:'2026-05-26',manualSelectedDateId:'2026-05-26',
+  taskFabOpen:false,taskFabX:0,taskFabY:0,skipFabClick:false,
+  manualTaskDate:'today',manualTaskName:'英语听读',manualStart:'19:50',manualEnd:'20:05',
+  selectedDuration:'15 分钟',selectedDayTemplate:'schoolEvening',templateApplyDate:'today',
+  timePickerTarget:'start',timePickerContext:'manual',manualSessionCount:0,editingTask:null,
+  evidenceStatus:'pending',rewardStatus:'pending',packingExtra:[],
+  packingStatus:{math:'ready',art:'pending',umbrella:'pending'},
+  settings:{'安全告警':true,'任务待确认':true,'任务提醒':true,'普通闲聊摘要':false,'隐私模式':true,'远程查看提示':true,'普通闲聊逐字记录':false,'只保存事件截图':true},
+  taskPlans:{
+    today:[
+      {time:'18:20',title:'整理玩具',desc:'已完成，AI自动记录+3分',tone:'sage',go:'points'},
+      {time:'19:00',title:'数学作业',desc:'19:00-19:40，第2个专注轮次',tone:'sky',go:'taskDetail'},
+      {time:'19:50',title:'英语听读',desc:'模板建议：15分钟，只做鼓励反馈',tone:'muted',go:'taskDetail'},
+      {time:'20:10',title:'语文背诵',desc:'20:10-20:25，到点温和提醒',tone:'muted',go:'taskDetail'},
+      {time:'21:10',title:'睡前洗漱',desc:'洗漱、检查小书包、上床目标21:30',tone:'muted',go:'sleep'}
+    ],
+    tomorrow:[
+      {time:'07:25',title:'小书包复查',desc:'数学练习册、美术材料、雨伞',tone:'honey',go:'packing'},
+      {time:'19:00',title:'口算练习',desc:'10分钟，完成后具体表扬',tone:'muted',go:'taskDetail'},
+      {time:'20:00',title:'亲子阅读',desc:'15分钟，默认不计高积分',tone:'muted',go:'taskDetail'}
+    ]
+  },
+  futureTasks:[{time:'周五07:30',title:'美术材料准备',desc:'纸杯、彩纸、胶棒',tone:'honey',go:'packing'}],
+  dateTaskPlans:{},
+  historyTasks:[
+    {time:'上周二19:00',title:'数学作业',desc:'已完成，妈妈确认+5分',tone:'sage',go:'taskDetail'},
+    {time:'上周三20:30',title:'收拾书桌',desc:'AI自动记录，连续4天完成',tone:'sage',go:'points'},
+    {time:'上周五21:10',title:'睡前洗漱',desc:'延后1次后完成',tone:'sage',go:'sleep'}
+  ]
+};
+
+const dayTemplates = {
+  schoolEvening:{title:'小学上学日晚间模板',desc:'放学缓冲、作业、阅读、睡前收尾',tasks:[
+    {time:'17:30',title:'喝水休息',desc:'5分钟缓冲',tone:'sage',go:'taskDetail',fromTemplate:true},
+    {time:'18:20',title:'整理书桌',desc:'8分钟，完成后表扬',tone:'muted',go:'points',fromTemplate:true},
+    {time:'19:00',title:'数学作业',desc:'20分钟专注+5分钟休息',tone:'sky',go:'taskDetail',fromTemplate:true},
+    {time:'20:10',title:'语文背诵',desc:'15分钟，温和提醒',tone:'muted',go:'taskDetail',fromTemplate:true},
+    {time:'21:10',title:'睡前洗漱',desc:'检查小书包、上床目标21:30',tone:'muted',go:'sleep',fromTemplate:true}
+  ]},
+  weekendHabit:{title:'周末习惯模板',desc:'阅读、运动、家务和兴趣',tasks:[
+    {time:'09:30',title:'阅读20分钟',desc:'低压力阅读',tone:'sky',go:'taskDetail',fromTemplate:true},
+    {time:'10:20',title:'户外运动',desc:'30分钟',tone:'sage',go:'taskDetail',fromTemplate:true},
+    {time:'16:30',title:'整理房间',desc:'10分钟，前后对比',tone:'muted',go:'points',fromTemplate:true},
+    {time:'20:40',title:'检查小书包',desc:'校服、作业材料',tone:'honey',go:'packing',fromTemplate:true}
+  ]},
+  sleepOnly:{title:'睡前任务模板',desc:'晚间收尾专用',tasks:[
+    {time:'20:30',title:'收拾书桌',desc:'8分钟',tone:'muted',go:'points',fromTemplate:true},
+    {time:'20:50',title:'亲子阅读',desc:'15分钟',tone:'sky',go:'taskDetail',fromTemplate:true},
+    {time:'21:10',title:'睡前洗漱',desc:'检查小书包、上床目标21:30',tone:'muted',go:'sleep',fromTemplate:true}
+  ]}
+};
+
+const manualStartTimes = ['17:30','18:20','19:00','19:50','20:30','21:10'];
+const manualEndTimes = ['17:45','18:40','19:20','20:05','20:50','21:30'];
+const durationOptions = ['15 分钟','20 分钟','30 分钟'];
+
+/* ====== HELPERS ====== */
+function icon(name,cls='h-5 w-5'){return`<i data-lucide="${name}" class="${cls}"></i>`;}
+function hdr(kicker,title,action=''){
+  return`<header class="mb-5 flex items-start justify-between gap-3"><div><p class="text-sm font-semibold text-warm-muted">${kicker}</p><h2 class="mt-1 text-[26px] font-semibold leading-tight text-warm-ink">${title}</h2></div>${action||`<button class="tap grid min-h-[44px] min-w-[44px] place-items-center rounded-[16px] border border-warm-line bg-white/76 text-warm-ink" data-go="settings" aria-label="设置">${icon('settings')}</button>`}</header>`;
+}
+function btnPrimary(label,go,ic='arrow-right'){return`<button class="btn btn-primary tap" data-go="${go}">${label}${icon(ic,'h-4 w-4')}</button>`;}
+function btnGhost(label,go,ic='chevron-right'){return`<button class="btn btn-ghost tap" data-go="${go}"><span>${label}</span>${icon(ic,'h-4 w-4 text-warm-muted')}</button>`;}
+function metric(label,value,tone='sky'){
+  const m={sky:'bg-warm-sky-light text-warm-sky',sage:'bg-warm-sage-light text-warm-sage',honey:'bg-warm-honey-light text-warm-honey',red:'bg-warm-red-light text-warm-red',clay:'bg-warm-clay-light text-warm-clay',muted:'bg-[#F5F3F0] text-warm-muted'};
+  return`<div class="rounded-[16px] ${m[tone]||m.sky} p-3"><p class="text-xl font-semibold">${value}</p><p class="mt-1 text-xs font-semibold opacity-80">${label}</p></div>`;
+}
+function row(iconName,title,desc,right='',tone='sky'){
+  const t={sky:'bg-warm-sky-light text-warm-sky',sage:'bg-warm-sage-light text-warm-sage',honey:'bg-warm-honey-light text-warm-honey',red:'bg-warm-red-light text-warm-red',clay:'bg-warm-clay-light text-warm-clay',muted:'bg-[#F5F3F0] text-warm-muted'};
+  return`<div class="warm-row"><span class="row-icon ${t[tone]||t.muted}">${icon(iconName)}</span><div class="row-copy"><p class="row-title">${title}</p><p class="row-desc">${desc}</p></div><div class="row-action">${right}</div></div>`;
+}
+function chp(label,tone='muted'){
+  const m={sky:'chip chip-sky',sage:'chip chip-sage',honey:'chip chip-honey',red:'chip chip-red',clay:'chip chip-clay',muted:'chip chip-muted',ink:'chip chip-ink',white:'chip chip-white'};
+  return`<span class="${m[tone]||m.muted}">${label}</span>`;
+}
+function cloneTasks(tasks){return tasks.map(t=>({...t}));}
+
+/* ====== WEEK LOGIC ====== */
+const weekDefs = {
+  '-1':{label:'上一周',range:'5月18日-5月24日',days:[
+    {id:'2026-05-18',weekday:'周一',month:'5月',day:'18',relation:'past'},{id:'2026-05-19',weekday:'周二',month:'5月',day:'19',relation:'past',historyIndex:0},{id:'2026-05-20',weekday:'周三',month:'5月',day:'20',relation:'past',historyIndex:1},{id:'2026-05-21',weekday:'周四',month:'5月',day:'21',relation:'past'},{id:'2026-05-22',weekday:'周五',month:'5月',day:'22',relation:'past',historyIndex:2},{id:'2026-05-23',weekday:'周六',month:'5月',day:'23',relation:'past'},{id:'2026-05-24',weekday:'周日',month:'5月',day:'24',relation:'past'}
+  ]},
+  '0':{label:'本周',range:'5月25日-5月31日',days:[
+    {id:'2026-05-25',weekday:'周一',month:'5月',day:'25',relation:'past'},{id:'2026-05-26',weekday:'周二',month:'5月',day:'26',relation:'today',plan:'today'},{id:'2026-05-27',weekday:'周三',month:'5月',day:'27',relation:'future',plan:'tomorrow'},{id:'2026-05-28',weekday:'周四',month:'5月',day:'28',relation:'future'},{id:'2026-05-29',weekday:'周五',month:'5月',day:'29',relation:'future',plan:'future'},{id:'2026-05-30',weekday:'周六',month:'5月',day:'30',relation:'future'},{id:'2026-05-31',weekday:'周日',month:'5月',day:'31',relation:'future'}
+  ]},
+  '1':{label:'下一周',range:'6月1日-6月7日',days:[
+    {id:'2026-06-01',weekday:'周一',month:'6月',day:'1',relation:'future'},{id:'2026-06-02',weekday:'周二',month:'6月',day:'2',relation:'future'},{id:'2026-06-03',weekday:'周三',month:'6月',day:'3',relation:'future'},{id:'2026-06-04',weekday:'周四',month:'6月',day:'4',relation:'future'},{id:'2026-06-05',weekday:'周五',month:'6月',day:'5',relation:'future'},{id:'2026-06-06',weekday:'周六',month:'6月',day:'6',relation:'future'},{id:'2026-06-07',weekday:'周日',month:'6月',day:'7',relation:'future'}
+  ]}
+};
+function weekForOffset(o=state.taskWeekOffset){return weekDefs[String(o)]||weekDefs['0'];}
+function allWeekDays(){return Object.values(weekDefs).flatMap(w=>w.days);}
+function dayById(id){return allWeekDays().find(d=>d.id===id);}
+function defaultDayForWeek(o){return o<0?'2026-05-18':o>0?'2026-06-01':'2026-05-26';}
+function selectedWeekDay(){const w=weekForOffset();return w.days.find(d=>d.id===state.selectedDayId)||w.days.find(d=>d.id===defaultDayForWeek(state.taskWeekOffset))||w.days[0];}
+function weekOffsetForDay(id){return Number(Object.keys(weekDefs).find(o=>weekDefs[o].days.some(d=>d.id===id))||0);}
+function datePlanKeyForDay(d){if(d.plan)return d.plan;if(d.relation==='future')return`date:${d.id}`;return'history';}
+function stripWeekdayTime(t,wd){return{...t,time:t.time.replace(new RegExp(`^${wd}\\s*`),'')};}
+function tasksForDay(d){if(!d)return[];if(d.plan==='today')return state.taskPlans.today;if(d.plan==='tomorrow')return state.taskPlans.tomorrow;if(d.plan==='future')return[...state.futureTasks.map(t=>stripWeekdayTime(t,d.weekday)),...(state.dateTaskPlans?.[d.id]||[]).map(t=>stripWeekdayTime(t,d.weekday))];if(Number.isInteger(d.historyIndex))return[state.historyTasks[d.historyIndex]];return(state.dateTaskPlans?.[d.id]||[]).map(t=>stripWeekdayTime(t,d.weekday));}
+function sortByTime(tasks){return[...tasks].sort((a,b)=>a.time.localeCompare(b.time,'zh-Hans-CN',{numeric:true}));}
+
+/* ====== TASK RENDERING ====== */
+function taskBadge(task){
+  if(task.tone==='sage')return'<span class="chip chip-sage">已完成</span>';
+  if(task.tone==='sky')return'<span class="chip chip-sky">进行中</span>';
+  if(task.tone==='honey')return'<span class="chip chip-honey">待确认</span>';
+  if(task.fromTemplate)return'<span class="chip chip-clay">模板</span>';
+  return'<span class="chip chip-muted">待开始</span>';
+}
+function flowNode(task,index,planKey){
+  const dotTone=task.tone==='sage'?'sage':task.tone==='sky'?'sky':task.tone==='honey'?'honey':'muted';
+  return`<button class="tap flow-node" data-action="task-open" data-plan="${planKey}" data-index="${index}"><span class="flow-dot ${dotTone}"></span><div class="min-w-0 pl-3"><div class="flex items-center gap-2"><p class="truncate text-sm font-semibold">${task.title}</p>${taskBadge(task)}</div><p class="mt-1 text-xs leading-5 text-warm-muted">${task.desc}</p></div><span class="text-xs font-bold text-warm-muted pr-1">${task.time}</span></button>`;
+}
+function renderFlow(tasks){return sortByTime(tasks).map((t,i)=>flowNode(t,i)).join('');}
+function renderTaskRows(tasks){return tasks.map(t=>row('calendar-clock',t.title,`${t.time} · ${t.desc}`,`<button class="btn-sm tap" data-go="${t.go||'taskDetail'}">查看</button>`,t.tone)).join('');}
+
+function dateSwitcher(){
+  const week=weekForOffset();const canPrev=state.taskWeekOffset>-1,canNext=state.taskWeekOffset<1;
+  const dayChip=(d)=>{
+    const tasks=tasksForDay(d),active=selectedWeekDay().id===d.id;
+    const emptyF=d.relation==='future'&&!tasks.length,emptyP=d.relation==='past'&&!tasks.length;
+    const meta=tasks.length?`${tasks.length}项`:emptyF?'添加':emptyP?'空':'今天';
+    const ac=active?'bg-warm-clay text-white border-warm-clay':emptyP?'bg-white/30 text-warm-muted':emptyF?'bg-warm-clay-light text-warm-clay':'bg-white/66 text-warm-ink';
+    return`<button class="tap day-chip ${ac}" data-action="task-day" data-date="${d.id}"><span class="block text-[9px] font-bold ${active?'text-white/70':emptyF?'text-warm-clay/70':'text-warm-muted'}">${d.weekday.replace('周','')}</span><span class="mt-0.5 block text-lg font-semibold leading-none">${d.day}</span><span class="mt-1.5 block text-[9px] font-bold ${active?'text-white/72':emptyF?'text-warm-clay':'text-warm-muted'}">${meta}</span></button>`;
+  };
+  return`<section class="mb-4"><div class="flex items-center justify-between gap-3 px-1"><button class="tap week-nav-btn ${canPrev?'':'opacity-30'}" ${canPrev?'data-action="week-shift" data-dir="-1"':'data-toast="仅展示上一周"'} aria-label="上一周">${icon('chevron-left','h-4 w-4')}</button><div class="min-w-0 text-center"><p class="text-xs font-bold text-warm-muted">${week.label}</p><p class="mt-0.5 text-sm font-semibold text-warm-ink">${week.range}</p></div><button class="tap week-nav-btn ${canNext?'':'opacity-30'}" ${canNext?'data-action="week-shift" data-dir="1"':'data-toast="仅展示下一周"'} aria-label="下一周">${icon('chevron-right','h-4 w-4')}</button></div><div class="week-day-grid mt-3">${week.days.map(dayChip).join('')}</div></section>`;
+}
+
+function packingAction(item,label,nextStatus,dark=false){return`<button class="btn-sm ${dark?'dark':''} tap" data-action="packing-status" data-item="${item}" data-status="${nextStatus}">${label}</button>`;}
+function packingBadge(s){if(s==='ready')return'<span class="chip chip-sage">已准备</span>';if(s==='reminded')return'<span class="chip chip-sky">早晨提醒</span>';return'';}
+function renderPackingExtra(){return state.packingExtra.map((item,i)=>row('shirt',item,'家长刚添加，已进入提醒',`<button class="btn-sm tap" data-action="packing-extra-remove" data-index="${i}">移除</button>`,'clay')).join('');}
+
+function emptyTasks(day){
+  const f=day.relation==='future';
+  return`<section class="empty-state"><span class="mx-auto grid h-12 w-12 place-items-center rounded-[18px] ${f?'bg-warm-clay-light text-warm-clay':'bg-[#F5F3F0] text-warm-muted'}">${icon(f?'plus':'calendar-x','h-5 w-5')}</span><h3 class="mt-3 text-lg font-semibold text-warm-ink">${f?`${day.month}${day.day}日还没安排`:`${day.month}${day.day}日没有记录`}</h3><p class="mx-auto mt-2 max-w-[240px] text-sm leading-6 text-warm-muted">${f?'可以先安排关键任务，或套用模板再删改。':'过去日期保持空状态，只用于回看。'}</p><div class="mt-4 grid grid-cols-2 gap-2">${f?`<button class="btn btn-primary tap" data-action="add-selected-task">添加任务</button><button class="btn btn-ghost tap" data-action="template-selected-day">套模板</button>`:`<button class="btn btn-ghost tap" data-go="report">看日报</button><button class="btn btn-ghost tap" data-go="weekly">看周报</button>`}</div></section>`;
+}
+
+function tasksScreenContent(){
+  const day=selectedWeekDay(),tasks=tasksForDay(day);
+  if(!tasks.length)return emptyTasks(day);
+  const ro=day.relation==='past';
+  return`<section class="card-base p-4"><div class="flex items-center justify-between gap-3"><div><p class="text-sm font-semibold">${day.relation==='today'?'今日任务':`${day.month}${day.day}日 ${day.weekday}`}</p><p class="mt-1 text-xs text-warm-muted">${ro?'历史记录只读':day.relation==='future'?'可预先安排，也可稍后修改':'放学后到睡前'}</p></div><span class="chip chip-clay">${tasks.length}项</span></div>${ro?`<div class="mt-4 grid gap-2">${renderTaskRows(tasks)}</div>`:`<div class="task-flow mt-4">${renderFlow(tasks)}</div>`}${day.relation==='future'?`<button class="tap mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[16px] bg-warm-clay-light text-sm font-semibold text-warm-clay" data-action="add-selected-task">${icon('plus','h-4 w-4')}继续添加</button>`:''}</section>`;
+}
+
+function dateCopy(date){
+  if(date==='today')return'今天';if(date==='tomorrow')return'明天';
+  const day=dayById(state.manualSelectedDateId)||selectedWeekDay();
+  return day?`${day.month}${day.day}日`:'未来日期';
+}
+function dateBtn(date,label,selected,action='manual-date'){return`<button class="tap min-h-[46px] rounded-[16px] text-sm font-semibold ${selected===date?'bg-warm-clay text-white':'bg-white/66 text-warm-ink border border-warm-line'}" data-action="${action}" data-date="${date}">${label}</button>`;}
+function templatePreview(tasks){return`<div class="mt-2 grid gap-1.5 pl-3 border-l-2 border-warm-clay/20">${tasks.map(t=>`<p class="text-xs text-warm-muted"><span class="font-bold text-warm-ink">${t.time}</span> ${t.title}</p>`).join('')}</div>`;}
+function openTimeBtn(target,label,value){return`<button class="tap time-card text-left" data-action="open-time-picker" data-target="${target}"><p class="text-xs font-bold text-warm-muted">${label}</p><p class="mt-2 text-[26px] font-semibold leading-none text-warm-ink">${value}</p><p class="mt-2 text-xs font-semibold text-warm-clay">点击选择</p></button>`;}
+
+/* ====== SHEET HTML ====== */
+function taskSheetHtml(){
+  const copy=dateCopy(state.manualTaskDate);
+  const durBtn=(l)=>`<button class="tap min-h-[40px] rounded-full px-4 text-xs font-semibold ${state.selectedDuration===l?'bg-warm-clay text-white':'bg-white/72 text-warm-ink border border-warm-line'}" data-action="manual-duration" data-duration="${l}">${l}</button>`;
+  return`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><div class="flex items-start justify-between gap-3"><div><h3 class="text-xl font-semibold text-warm-ink">新建任务</h3><p class="mt-2 text-sm leading-6 text-warm-muted">默认添加到${copy}，可继续添加下一条。</p></div>${state.manualSessionCount?`<span class="chip chip-clay">已加${state.manualSessionCount}</span>`:''}</div><div class="mt-4 space-y-3"><label class="block text-xs font-bold text-warm-muted">任务名称</label><input value="${state.manualTaskName}" data-field="manualTaskName" class="min-h-[48px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-sm font-semibold text-warm-ink outline-none"/><div class="grid grid-cols-3 gap-2">${dateBtn('today','今天',state.manualTaskDate)}${dateBtn('tomorrow','明天',state.manualTaskDate)}${dateBtn('future',dateCopy('future'),state.manualTaskDate)}</div><section class="rounded-[22px] bg-warm-bg/50 p-3"><div class="flex items-center justify-between gap-3"><p class="text-sm font-semibold">时间段</p><span class="text-xs font-bold text-warm-muted">${copy}</span></div><div class="time-pair mt-3">${openTimeBtn('start','开始',state.manualStart)}<span class="grid h-8 w-8 place-items-center rounded-full bg-white/76 text-warm-muted">${icon('arrow-right','h-4 w-4')}</span>${openTimeBtn('end','结束',state.manualEnd)}</div><div class="mt-3 flex gap-2">${durationOptions.map(durBtn).join('')}</div></section><button class="tap flex min-h-[52px] w-full items-center justify-between rounded-[18px] bg-warm-clay-light px-4 text-left text-sm font-semibold text-warm-clay" data-sheet="taskTemplates"><span>想一次安排一整天？使用模板</span>${icon('chevron-right','h-4 w-4')}</button></div><div class="mt-4 grid grid-cols-[1fr_1.1fr] gap-2"><button class="btn btn-ghost tap" data-action="manual-save-continue">保存并继续</button><button class="btn btn-primary tap" data-action="manual-save">保存到任务</button></div>`;
+}
+
+function dayTemplateSheetHtml(){
+  const sel=dayTemplates[state.selectedDayTemplate];
+  const tCard=(key)=>{const t=dayTemplates[key];const a=state.selectedDayTemplate===key;return`<button class="tap template-card w-full text-left ${a?'active':''}" data-action="day-template-select" data-template="${key}"><div class="flex items-start justify-between gap-3"><div><p class="text-sm font-semibold ${a?'text-warm-clay':'text-warm-ink'}">${t.title}</p><p class="mt-1 text-xs leading-5 text-warm-muted">${t.desc}</p></div><span class="chip ${a?'chip-ink':'chip-muted'}">${t.tasks.length}项</span></div></button>`;};
+  return`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">套用一天任务模板</h3><p class="mt-2 text-sm leading-6 text-warm-muted">根据孩子年龄和年级生成一整天任务，套用后可逐个调整。</p><div class="mt-4 grid grid-cols-3 gap-2">${dateBtn('today','今天',state.templateApplyDate,'template-date')}${dateBtn('tomorrow','明天',state.templateApplyDate,'template-date')}${dateBtn('future',dateCopy('future'),state.templateApplyDate,'template-date')}</div><div class="mt-4 space-y-2">${tCard('schoolEvening')}${tCard('weekendHabit')}${tCard('sleepOnly')}</div><section class="mt-4 rounded-[20px] bg-warm-bg/60 p-4"><div class="flex items-center justify-between"><p class="text-sm font-semibold">模板预览</p><span class="chip chip-clay">${sel.tasks.length}项</span></div>${templatePreview(sel.tasks)}</section><div class="mt-4 grid grid-cols-[.9fr_1.2fr] gap-2"><button class="btn btn-ghost tap" data-sheet="task">返回手动添加</button><button class="btn btn-primary tap" data-action="day-template-apply" data-date="${state.templateApplyDate}">套用到${dateCopy(state.templateApplyDate)}</button></div>`;
+}
+
+function taskEditSheetHtml(){
+  const ref=state.editingTask;const task=selectedTaskRef()?.task;
+  if(!task)return'<p class="text-sm text-warm-muted">没有找到要编辑的任务。</p>';
+  return`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><div class="flex items-start justify-between gap-3"><div><h3 class="text-xl font-semibold text-warm-ink">任务详情</h3><p class="mt-2 text-sm leading-6 text-warm-muted">编辑、复制和删除操作。</p></div>${taskBadge(task)}</div><div class="mt-4 space-y-3"><button class="tap flex min-h-[64px] w-full items-center justify-between rounded-[18px] bg-white/72 px-4 text-left border border-warm-line" data-action="open-time-picker" data-target="start" data-context="edit"><span><span class="block text-xs font-bold text-warm-muted">开始时间</span><span class="mt-1 block text-2xl font-semibold">${task.time}</span></span>${icon('chevron-right','h-4 w-4 text-warm-muted')}</button><label class="block text-xs font-bold text-warm-muted">任务名称</label><input value="${task.title}" data-field="editingTaskTitle" class="min-h-[48px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-sm font-semibold text-warm-ink outline-none"/><section class="rounded-[16px] bg-warm-clay-light p-3 text-xs leading-5 text-warm-clay">当前说明：${task.desc}</section><div class="grid grid-cols-2 gap-2"><button class="btn btn-ghost tap" data-action="task-delay">延后10分钟</button><button class="btn btn-ghost tap" data-action="task-duplicate">复制到明天</button></div></div><div class="mt-4 grid grid-cols-2 gap-2"><button class="btn-sm danger tap min-h-[48px] rounded-[16px] justify-center text-sm" data-action="task-delete" data-plan="${ref.plan}" data-index="${ref.index}">删除</button><button class="btn btn-primary tap" data-action="task-edit-save">保存修改</button></div>`;
+}
+
+function timePickerSheetHtml(){
+  const isStart=state.timePickerTarget==='start';const slots=isStart?manualStartTimes:manualEndTimes;
+  const selTask=state.timePickerContext==='edit'?selectedTaskRef()?.task:null;
+  const sel=selTask?selTask.time:isStart?state.manualStart:state.manualEnd;
+  return`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">选择${isStart?'开始':'结束'}时间</h3><p class="mt-2 text-sm leading-6 text-warm-muted">${state.timePickerContext==='edit'?'同步更新当前任务。':'选择后回到表单。'}</p><div class="mt-4 grid grid-cols-3 gap-2">${slots.map(t=>`<button class="tap min-h-[50px] rounded-[16px] text-sm font-semibold ${sel===t?'bg-warm-clay text-white':'bg-white/66 text-warm-ink border border-warm-line'}" data-action="time-select" data-time="${t}">${t}</button>`).join('')}</div><button class="btn btn-ghost tap mt-4" data-sheet="${state.timePickerContext==='edit'?'taskEdit':'task'}">返回</button>`;
+}
+</script>
+</body>
+</html>
+/* ═══════════════════════════════════════
+   ALL 37 SCREENS — COMPLETELY REDESIGNED LAYOUTS
+   ═══════════════════════════════════════ */
+function screens(){return{
+welcome:`
+  <section class="min-h-full">
+    <div class="hero-block rounded-[28px] p-5 text-center">
+      <span class="chip chip-clay mx-auto">${icon('sparkles','h-3.5 w-3.5')}家长端</span>
+      <h2 class="mt-6 text-[32px] font-semibold leading-[1.1] text-warm-ink">少盯一点，<br/>孩子也能自己动起来。</h2>
+      <p class="mt-4 text-[15px] leading-7 text-warm-muted max-w-[280px] mx-auto">米拉把观察、提醒、陪伴、任务证据和每日报告收进一个安静可靠的 App。</p>
+    </div>
+    <div class="mt-4 card-base overflow-hidden"><img src="${img.room}" alt="儿童空间" class="h-40 w-full object-cover"/><div class="p-3"><div class="horz-scroll"><div class="rounded-[14px] bg-warm-sage-light px-4 py-3 text-center min-w-[90px]"><p class="text-lg font-bold text-warm-sage">正常</p><p class="text-[10px] font-semibold text-warm-muted">安全状态</p></div><div class="rounded-[14px] bg-warm-honey-light px-4 py-3 text-center min-w-[90px]"><p class="text-lg font-bold text-warm-honey">2</p><p class="text-[10px] font-semibold text-warm-muted">待处理</p></div><div class="rounded-[14px] bg-warm-sky-light px-4 py-3 text-center min-w-[90px]"><p class="text-lg font-bold text-warm-sky">在线</p><p class="text-[10px] font-semibold text-warm-muted">设备状态</p></div></div></div></div>
+    <div class="mt-4 space-y-3">${btnPrimary('开始设置','login')}<button class="btn btn-ghost tap" data-go="home">查看演示首页${icon('play','h-4 w-4')}</button></div>
+  </section>`,
+
+login:`
+  ${hdr('账户','登录或创建家庭')}
+  <div class="card-accent p-5 text-center mb-4"><span class="grid h-14 w-14 place-items-center rounded-[20px] bg-warm-clay-light text-warm-clay mx-auto">${icon('shield-check','h-7 w-7')}</span><p class="mt-3 text-sm leading-6 text-warm-muted">监护人创建家庭空间后，儿童音视频采集会在绑定设备时单独授权。</p></div>
+  <div class="card-base p-4">
+    <label class="block text-sm font-semibold text-warm-ink" for="phone">手机号</label>
+    <input id="phone" inputmode="tel" value="138 0000 2026" class="mt-2 min-h-[50px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-base font-semibold text-warm-ink outline-none"/>
+    <label class="mt-4 block text-sm font-semibold text-warm-ink" for="code">验证码</label>
+    <div class="mt-2 flex gap-2"><input id="code" inputmode="numeric" value="0426" class="min-h-[50px] min-w-0 flex-1 rounded-[16px] border border-warm-line bg-white/76 px-4 text-base font-semibold text-warm-ink outline-none"/><button class="tap min-h-[50px] rounded-[16px] bg-warm-clay-light px-4 text-sm font-semibold text-warm-clay" data-toast="验证码已发送">获取</button></div>
+  </div>
+  <div class="mt-4 space-y-3">${btnPrimary('继续','bind')}${btnGhost('查看隐私说明','privacy','shield-check')}</div>`,
+
+bind:`
+  ${hdr('设备绑定','扫描摄像头二维码',`<button class="tap grid min-h-[44px] min-w-[44px] place-items-center rounded-[16px] border border-warm-line bg-white/76 text-warm-ink" data-go="welcome" aria-label="返回">${icon('chevron-left')}</button>`)}
+  <div class="card-base p-4">
+    <div class="grid h-64 place-items-center rounded-[24px] bg-warm-ink text-white"><div class="relative grid h-44 w-44 place-items-center rounded-[24px] border border-white/16 bg-white/8"><div class="grid h-28 w-28 grid-cols-3 gap-2 rounded-[16px] bg-white p-3"><span class="rounded bg-warm-ink"></span><span></span><span class="rounded bg-warm-ink"></span><span></span><span class="rounded bg-warm-ink"></span><span></span><span class="rounded bg-warm-ink"></span><span></span><span class="rounded bg-warm-ink"></span></div><span class="absolute inset-x-6 top-1/2 h-0.5 bg-warm-clay shadow-[0_0_20px_rgba(196,123,75,.70)]"></span></div></div>
+    <p class="mt-4 text-sm leading-6 text-warm-muted">摄像头底部或包装盒上有二维码。无法扫码时可选择蓝牙发现。</p>
+  </div>
+  <div class="mt-4 grid grid-cols-2 gap-3"><button class="btn btn-ghost tap" data-toast="已开始蓝牙发现">蓝牙发现</button><button class="btn btn-primary tap" data-go="wifi">模拟扫码成功</button></div>`,
+
+wifi:`
+  ${hdr('配网','连接家庭 Wi-Fi')}
+  <div class="card-base p-4">
+    ${row('camera','Mira Cam M1','已发现，距离约1.8米',chp('待配网','sage'),'sage')}
+    <div class="mt-4 p-3 rounded-[16px] bg-warm-sky-light"><div class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-warm-sky"></span><span class="h-3 w-3 rounded-full bg-warm-sky opacity-70"></span><span class="h-3 w-3 rounded-full bg-warm-sky opacity-40"></span></div></div>
+    <label class="mt-4 block text-sm font-semibold" for="ssid">Wi-Fi 名称</label>
+    <input id="ssid" value="Mira Home 5G" class="mt-2 min-h-[50px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-base font-semibold text-warm-ink outline-none"/>
+    <label class="mt-4 block text-sm font-semibold" for="pwd">Wi-Fi 密码</label>
+    <input id="pwd" type="password" value="mira2026home" class="mt-2 min-h-[50px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-base font-semibold text-warm-ink outline-none"/>
+    <div class="mt-4 rounded-[16px] bg-warm-clay-light p-3 text-xs leading-5 text-warm-clay">配网过程中摄像头只接收网络信息，不会开始录像或录音。</div>
+  </div>
+  <div class="mt-4">${btnPrimary('开始绑定','bindDone','loader')}</div>`,
+
+bindDone:`
+  <section class="min-h-full text-center">
+    <div class="hero-block rounded-[28px] p-6"><div class="mx-auto grid h-18 w-18 place-items-center rounded-full bg-warm-sage-light text-warm-sage">${icon('check','h-9 w-9')}</div><h2 class="mt-4 text-[28px] font-semibold text-warm-ink">设备绑定成功</h2><p class="mt-2 text-sm leading-6 text-warm-muted">儿童房摄像头已加入"小宇家"。</p></div>
+    <div class="mt-4 card-base overflow-hidden"><img src="${img.desk}" alt="房间书桌" class="h-48 w-full object-cover"/><div class="p-3">${row('shield-check','隐私灯测试通过','远程查看时设备端会亮起提示','','sage')}</div></div>
+    <div class="mt-4">${btnPrimary('创建孩子档案','child')}</div>
+  </section>`,
+
+child:`
+  ${hdr('孩子档案','让任务更合适')}
+  <div class="card-base p-4">
+    <label class="block text-sm font-semibold text-warm-ink" for="childName">孩子称呼</label>
+    <input id="childName" value="小宇" class="mt-2 min-h-[50px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-base font-semibold text-warm-ink outline-none"/>
+    <div class="mt-4 p-3 rounded-[18px] bg-warm-bg/60"><p class="text-xs font-bold text-warm-muted mb-2">基本信息</p><div class="grid grid-cols-3 gap-2"><div><p class="text-[10px] font-semibold text-warm-muted mb-1">年龄</p><button class="tap min-h-[44px] w-full rounded-[14px] bg-warm-clay text-sm font-semibold text-white">7岁</button></div><div><p class="text-[10px] font-semibold text-warm-muted mb-1">阶段</p><button class="tap min-h-[44px] w-full rounded-[14px] bg-white/80 text-sm font-semibold border border-warm-line">小学</button></div><div><p class="text-[10px] font-semibold text-warm-muted mb-1">年级</p><button class="tap min-h-[44px] w-full rounded-[14px] bg-white/80 text-sm font-semibold border border-warm-line">一年级</button></div></div></div>
+    <div class="mt-3 grid grid-cols-2 gap-2">${metric('作息建议','21:30睡','clay')}${metric('专注建议','20/5','sage')}</div>
+    <div class="mt-3 rounded-[16px] bg-warm-clay-light p-3 text-xs leading-5 text-warm-clay">将按年龄、阶段和班级推荐任务模板、提醒话术、积分和奖励建议；性别不是必填项。</div>
+  </div>
+  <div class="mt-4">${btnPrimary('继续命名摄像头','name')}</div>`,
+
+name:`
+  ${hdr('人设与语音','孩子给摄像头起名')}
+  <div class="hero-dark rounded-[24px] p-5"><p class="text-sm text-white/60">摄像头会问孩子</p><p class="mt-4 text-xl font-semibold leading-8">"那你也给我起一个名字吧。以后你叫这个名字，我就知道你在找我。"</p><div class="mt-4 flex gap-2"><span class="chip" style="background:rgba(255,255,255,.14);color:#fff">温柔女声</span><span class="chip" style="background:rgba(255,255,255,.14);color:#fff">语速偏慢</span></div></div>
+  <div class="card-base mt-4 p-4">
+    <label class="block text-sm font-semibold text-warm-ink" for="wakeName">唤醒名</label>
+    <input id="wakeName" value="小豆" class="mt-2 min-h-[50px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-base font-semibold text-warm-ink outline-none"/>
+    <div class="mt-3 grid grid-cols-2 gap-2"><button class="btn btn-ghost tap" data-toast="已播放温柔女声">${icon('volume-2','h-4 w-4')}试听声线</button><button class="btn btn-ghost tap" data-sheet="boundaries">互动边界</button></div>
+  </div>
+  <div class="mt-4">${btnPrimary('设置紧急联系人','contacts')}</div>`,
+
+contacts:`
+  ${hdr('安全','添加紧急联系人')}
+  <div class="card-base p-4">
+    ${row('user-round','妈妈','管理员·接收全部告警',chp('已验证','sage'),'sage')}
+    ${row('user-plus','爸爸','第二联系人·SOS兜底通知','<button class="btn-sm tap" data-toast="已发送邀请">邀请</button>','sky')}
+    <button class="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[16px] bg-white/76 text-sm font-semibold border border-warm-line" data-sheet="contact">${icon('plus','h-4 w-4')}添加联系人</button>
+  </div>
+  <div class="mt-4">${btnPrimary('进入首页','home')}</div>`,
+
+home:`
+  ${hdr('周一 19:42','小宇现在',`<button class="tap grid min-h-[44px] min-w-[44px] place-items-center rounded-[16px] border border-warm-line bg-white/76 text-warm-ink relative" data-go="care" aria-label="待处理">${icon('bell')}<span class="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-warm-red"></span></button>`)}
+  <div class="hero-block rounded-[28px] p-5">
+    <div class="flex flex-wrap gap-1.5">${chp('设备在线','sage')}${chp('隐私灯亮起','sky')}${chp('小学一年级','clay')}</div>
+    <h3 class="mt-4 text-[24px] font-semibold leading-tight text-warm-ink">书桌前写作业，<br/>状态正常。</h3>
+    <p class="mt-2 text-sm leading-6 text-warm-muted">当前：数学作业第2个专注轮次。12分钟后需要确认证据。</p>
+    <div class="mt-5 horz-scroll">
+      <div class="rounded-[16px] bg-white/60 p-3 min-w-[95px] text-center"><p class="text-2xl font-bold text-warm-sage">正常</p><p class="mt-1 text-[10px] font-semibold text-warm-muted">安全</p></div>
+      <div class="rounded-[16px] bg-white/60 p-3 min-w-[95px] text-center"><p class="text-2xl font-bold text-warm-sky">12m</p><p class="mt-1 text-[10px] font-semibold text-warm-muted">下一步</p></div>
+      <div class="rounded-[16px] bg-white/60 p-3 min-w-[95px] text-center" style="border:2px solid rgba(232,168,93,.30)"><p class="text-2xl font-bold text-warm-honey">2</p><p class="mt-1 text-[10px] font-semibold text-warm-muted">待处理</p></div>
+    </div>
+  </div>
+  <div class="card-accent mt-4 p-4">
+    <div class="flex items-center justify-between"><p class="text-sm font-semibold">需要你处理</p><button class="tap text-xs font-semibold text-warm-clay" data-go="care">全部→</button></div>
+    <div class="mt-3 grid gap-2">
+      <button class="tap warm-row text-left w-full" data-go="taskDetail" style="border-color:rgba(232,168,93,.18)"><span class="row-icon bg-warm-honey-light text-warm-honey">${icon('file-check-2')}</span><div class="row-copy"><p class="row-title">作业证据待确认</p><p class="row-desc">确认后进入日报和积分流水</p></div><span class="btn-sm dark">处理</span></button>
+      <button class="tap warm-row text-left w-full" data-sheet="reward" style="border-color:rgba(232,168,93,.18)"><span class="row-icon bg-warm-honey-light text-warm-honey">${icon('gift')}</span><div class="row-copy"><p class="row-title">奖励兑换审批</p><p class="row-desc">小宇申请周末户外活动</p></div><span class="btn-sm">审批</span></button>
+    </div>
+  </div>
+  <div class="mt-4 horz-scroll">
+    <button class="tap card-base p-4 text-left min-w-[140px]" data-go="packing"><span class="chip chip-clay">${icon('backpack','h-3.5 w-3.5')}小书包</span><p class="mt-2 text-lg font-semibold">2项待确认</p><p class="mt-1 text-xs text-warm-muted">明天要带什么</p></button>
+    <button class="tap card-base p-4 text-left min-w-[140px]" data-go="sleep"><span class="chip chip-sky">${icon('moon','h-3.5 w-3.5')}睡眠</span><p class="mt-2 text-lg font-semibold">21:30目标</p><p class="mt-1 text-xs text-warm-muted">睡前任务待开始</p></button>
+    <button class="tap card-base p-4 text-left min-w-[140px]" data-go="report"><span class="chip chip-muted">${icon('file-text','h-3.5 w-3.5')}日报</span><p class="mt-2 text-lg font-semibold">今晚21:45</p><p class="mt-1 text-xs text-warm-muted">生成今日摘要</p></button>
+    <button class="tap card-base p-4 text-left min-w-[140px]" data-go="points"><span class="chip chip-honey">${icon('star','h-3.5 w-3.5')}积分</span><p class="mt-2 text-lg font-semibold">今日+12</p><p class="mt-1 text-xs text-warm-muted">可兑30分奖励</p></button>
+  </div>`,
+
+care:`
+  ${hdr('家庭协作','待处理事项')}
+  <div class="grid gap-2">
+    <div class="card-base p-4" style="border-left:3px solid #E8A85D">${row('file-check-2','数学作业证据待确认','AI判断完成80%，需家长确认','<button class="btn-sm dark tap" data-go="taskDetail">查看</button>','honey')}</div>
+    <div class="card-base p-4" style="border-left:3px solid #E8A85D">${row('gift','奖励兑换审批','小宇申请周末户外活动','<button class="btn-sm tap" data-sheet="reward">审批</button>','honey')}</div>
+    <div class="card-base p-4" style="border-left:3px solid #D96C6C">${row('shield-alert','门口规则待设置','建议添加"独自在家不开门"提醒','<button class="btn-sm tap" data-go="safety">设置</button>','red')}</div>
+  </div>
+  <div class="card-soft mt-3 p-4"><p class="text-sm font-semibold">处理记录</p><div class="mt-2 space-y-1.5 text-sm text-warm-muted"><p>17:20 妈妈确认"检查小书包"完成。</p><p>18:05 摄像头已提醒喝水，无需重复处理。</p></div></div>`,
+
+sleep:`
+  ${hdr('睡眠与晨起','今晚作息')}
+  <div class="hero-block rounded-[26px] p-5 text-center">
+    <div class="progress-ring mx-auto"><strong class="text-lg">2/4</strong></div>
+    <h3 class="mt-4 text-lg font-semibold">睡前任务进行中</h3>
+    <p class="mt-2 text-sm leading-6 text-warm-muted">已完成晚饭和整理玩具，待洗漱、检查小书包。</p>
+    <div class="mt-4 grid grid-cols-3 gap-2">
+      <div class="rounded-[14px] bg-white/60 p-2"><p class="text-lg font-bold text-warm-clay">21:30</p><p class="text-[10px] font-semibold text-warm-muted">上床目标</p></div>
+      <div class="rounded-[14px] bg-white/60 p-2"><p class="text-lg font-bold text-warm-sage">07:05</p><p class="text-[10px] font-semibold text-warm-muted">晨起闹铃</p></div>
+      <div class="rounded-[14px] bg-white/60 p-2"><p class="text-lg font-bold text-warm-sky">+2次</p><p class="text-[10px] font-semibold text-warm-muted">延后</p></div>
+    </div>
+  </div>
+  <div class="mt-3 grid gap-2">${row('moon','夜间免打扰','只保留安全事件和异常声音',chp('开启','sage'),'sage')}${row('alarm-clock','延后规则','最多2次，每次5分钟','','sky')}</div>`,
+
+flow:`
+  ${hdr('按档案推荐','任务模板',`<button class="tap grid min-h-[44px] min-w-[44px] place-items-center rounded-[16px] border border-warm-line bg-white/76 text-warm-ink" data-sheet="task" aria-label="添加">${icon('plus')}</button>`)}
+  <div class="hero-block rounded-[26px] p-4"><div class="flex flex-wrap gap-1.5">${chp('7岁','clay')}${chp('小学一年级','sky')}${chp('鼓励式','sage')}</div><h3 class="mt-3 text-xl font-semibold leading-tight">系统已生成6个适龄模板。</h3><p class="mt-1 text-sm leading-6 text-warm-muted">一键启用、改日期、改积分或改提醒强度。</p></div>
+  <div class="mt-3 grid gap-2">
+    <button class="tap warm-row text-left w-full" data-sheet="taskTemplates"><span class="row-icon bg-warm-sky-light text-warm-sky">${icon('sparkles')}</span><div class="row-copy"><p class="row-title">作业自启动</p><p class="row-desc">每天19:00·专注20分钟+休息5分钟</p></div><span class="chip chip-sky">启用</span></button>
+    <button class="tap warm-row text-left w-full" data-sheet="taskTemplates"><span class="row-icon bg-warm-sage-light text-warm-sage">${icon('sparkles')}</span><div class="row-copy"><p class="row-title">阅读15分钟</p><p class="row-desc">睡前低刺激任务，完成后只给具体表扬</p></div><span class="chip chip-sage">已启用</span></button>
+    <button class="tap warm-row text-left w-full" data-go="packing"><span class="row-icon bg-warm-honey-light text-warm-honey">${icon('sparkles')}</span><div class="row-copy"><p class="row-title">小书包</p><p class="row-desc">按学段准备物品，避免漏带和多带</p></div><span class="chip chip-honey">启用</span></button>
+    <button class="tap warm-row text-left w-full" data-sheet="taskTemplates"><span class="row-icon bg-warm-clay-light text-warm-clay">${icon('sparkles')}</span><div class="row-copy"><p class="row-title">睡前任务</p><p class="row-desc">洗漱、检查小书包、上床目标21:30</p></div><span class="chip chip-clay">启用</span></button>
+  </div>`,
+
+packing:`
+  ${hdr('小书包','明天要带什么')}
+  <div class="card-soft p-3 mb-3"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-bold text-warm-muted">准备规则</p><h3 class="mt-1 text-sm font-semibold">小学一年级·部分书放学校</h3></div><span class="chip chip-clay">可修改</span></div></div>
+  <div class="card-base p-4">
+    ${row('check','数学练习册','已放进小书包，摄像头确认',chp('已准备','sage'),'sage')}
+    ${row('palette','美术材料','纸杯、彩纸、胶棒',state.packingStatus.art==='pending'?packingAction('art','提醒','reminded',true):packingBadge(state.packingStatus.art),'honey')}
+    ${row('umbrella','雨伞','家长手动添加',state.packingStatus.umbrella==='pending'?packingAction('umbrella','完成','ready'):packingBadge(state.packingStatus.umbrella),'sky')}
+    ${renderPackingExtra()}
+  </div>
+  <button class="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[16px] bg-white/72 text-sm font-semibold border border-warm-line" data-sheet="packing">${icon('plus','h-4 w-4')}添加到小书包</button>`,
+
+tasks:`${dateSwitcher()}${tasksScreenContent()}`,
+
+taskDetail:`
+  ${hdr('任务证据','数学作业')}
+  <div class="card-base overflow-hidden"><img src="${img.desk}" alt="作业桌面" class="h-52 w-full object-cover"/><div class="p-4"><div class="horz-scroll">${metric('置信度','80%','clay')}${metric('离座','1次','honey')}${metric('结果',state.evidenceStatus==='confirmed'?'+5':state.evidenceStatus==='partial'?'+2':state.evidenceStatus==='rejected'?'驳回':'待确认',state.evidenceStatus==='rejected'?'red':state.evidenceStatus==='pending'?'honey':'sage')}</div><p class="mt-3 text-sm leading-6 text-warm-muted">${state.evidenceStatus==='pending'?'AI判断：书写状态稳定，离座后3分钟内回座。建议确认完成。':state.evidenceStatus==='confirmed'?'妈妈已确认完成，积分+5已进入流水。':state.evidenceStatus==='partial'?'已改为部分完成，积分+2，日报记录收尾建议。':'已驳回AI判断，记录为误判样例。'}</p></div></div>
+  <div class="mt-3 grid gap-2">
+    <button class="tap warm-row text-left w-full" data-go="focus"><span class="row-icon bg-warm-sky-light text-warm-sky">${icon('clock')}</span><div class="row-copy"><p class="row-title">专注轮次</p><p class="row-desc">25分钟学习+5分钟休息·离座1次</p></div>${icon('chevron-right','h-4 w-4 text-warm-muted')}</button>
+    ${row('message-circle','学习求助','问过1次同类题，未直接给答案','','sky')}
+  </div>
+  <div class="mt-4 grid grid-cols-2 gap-3"><button class="btn btn-primary tap" data-sheet="evidence">${state.evidenceStatus==='pending'?'处理证据':'重新处理'}</button><button class="btn btn-ghost tap" data-toast="已提醒孩子收尾">提醒收尾</button></div>`,
+
+focus:`
+  ${hdr('专注计时','第2个轮次')}
+  <div class="hero-block rounded-[30px] p-6 text-center">
+    <div class="progress-ring mx-auto" style="width:140px;height:140px;background:conic-gradient(#C47B4B 0 49%,rgba(196,123,75,.06) 49% 100%)"><strong style="font-size:42px">12:18</strong></div>
+    <p class="mt-4 text-sm text-warm-muted">坐姿正常·离座0次</p>
+    <div class="mt-5 grid grid-cols-3 gap-2"><button class="btn btn-ghost tap" data-toast="已暂停">暂停</button><button class="btn btn-primary tap" data-toast="已延后10分钟" style="width:auto">延后</button><button class="btn btn-ghost tap" data-toast="已结束本轮">结束</button></div>
+  </div>
+  <div class="card-soft mt-3 p-4"><p class="text-sm font-semibold">本次观察</p><div class="mt-2 grid gap-1">${row('activity','书写动作稳定','连续18分钟','','sage')}${row('eye','用眼距离正常','无高风险提醒','','sage')}</div></div>`,
+
+watch:`
+  <section class="-mx-20 -mt-16 h-[620px] bg-warm-ink text-white"><div class="relative h-full"><img src="${img.room}" alt="实时看护" class="h-full w-full object-cover opacity-90"/><div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/55"></div><div class="absolute left-20 right-20 top-20 flex items-center justify-between"><div><p class="text-sm font-semibold text-white/68">书桌视角</p><h2 class="mt-1 text-[28px] font-semibold">实时看护</h2></div><span class="chip-white">隐私灯亮起</span></div><div class="absolute bottom-6 left-20 right-20 rounded-[24px] bg-black/34 p-4"><p class="text-sm font-semibold">设备端正在显示远程查看状态</p><p class="mt-1 text-xs leading-5 text-white/68">当前只保存事件截图，不保存连续录像。</p></div></div></section>
+  <section class="relative -mt-16 grid grid-cols-4 gap-2">
+    <button class="tap min-h-[58px] rounded-[18px] bg-white text-sm font-semibold shadow-lg" data-sheet="call">${icon('phone-call','mx-auto mb-0.5 h-5 w-5')}通话</button>
+    <button class="tap min-h-[58px] rounded-[18px] bg-white/84 text-sm font-semibold shadow-lg" data-toast="截图已保存">${icon('camera','mx-auto mb-0.5 h-5 w-5')}截图</button>
+    <button class="tap min-h-[58px] rounded-[18px] bg-white/84 text-sm font-semibold shadow-lg" data-toast="已发送温和提醒">${icon('volume-2','mx-auto mb-0.5 h-5 w-5')}提醒</button>
+    <button class="tap min-h-[58px] rounded-[18px] bg-white/84 text-sm font-semibold shadow-lg" data-sheet="privacy">${icon('shield','mx-auto mb-0.5 h-5 w-5')}隐私</button>
+  </section>
+  <div class="card-base mt-3 p-3"><p class="text-xs font-semibold text-warm-muted mb-2">常用视角</p><div class="grid grid-cols-4 gap-2"><button class="tap min-h-[38px] rounded-[14px] text-xs font-semibold bg-warm-clay-light text-warm-clay">书桌</button><button class="tap min-h-[38px] rounded-[14px] text-xs font-semibold bg-white/72">床</button><button class="tap min-h-[38px] rounded-[14px] text-xs font-semibold bg-white/72">门口</button><button class="tap min-h-[38px] rounded-[14px] text-xs font-semibold bg-white/72">玩具区</button></div></div>
+  <div class="mt-3">${row('circle-play','事件回放','查看离座、任务、打卡、安全短片','<button class="btn-sm tap" data-go="playback">进入</button>','sky')}</div>`,
+
+playback:`
+  ${hdr('事件回放','最近片段')}
+  <div class="horz-scroll">
+    <button class="tap card-base overflow-hidden text-left min-w-[220px]" data-sheet="playback"><img src="${img.study}" alt="专注轮次" class="h-36 w-full object-cover"/><div class="p-3"><span class="chip chip-sage">19:30</span><h4 class="mt-2 text-sm font-semibold">专注轮次完成</h4><p class="mt-1 text-xs text-warm-muted">点击查看证据片段</p></div></button>
+    <button class="tap card-base overflow-hidden text-left min-w-[220px]" data-sheet="playback"><img src="${img.desk}" alt="离座" class="h-36 w-full object-cover"/><div class="p-3"><span class="chip chip-honey">19:12</span><h4 class="mt-2 text-sm font-semibold">短暂离座后回座</h4><p class="mt-1 text-xs text-warm-muted">点击查看证据片段</p></div></button>
+    <button class="tap card-base overflow-hidden text-left min-w-[220px]" data-sheet="playback"><img src="${img.room}" alt="小书包" class="h-36 w-full object-cover"/><div class="p-3"><span class="chip chip-sky">17:16</span><h4 class="mt-2 text-sm font-semibold">小书包检查完成</h4><p class="mt-1 text-xs text-warm-muted">点击查看证据片段</p></div></button>
+  </div>`,
+
+zones:`
+  ${hdr('安全区域','家庭风险边界')}
+  <div class="grid grid-cols-2 gap-2 mb-3">
+    <div class="card-base p-4 text-center" style="border-top:3px solid #8B9D83"><span class="grid h-10 w-10 place-items-center rounded-full bg-warm-sage-light text-warm-sage mx-auto">${icon('door-open')}</span><p class="mt-2 text-sm font-semibold">门口</p><p class="mt-1 text-xs text-warm-muted">已启用·不开门提醒</p></div>
+    <div class="card-base p-4 text-center" style="border-top:3px solid #E8A85D"><span class="grid h-10 w-10 place-items-center rounded-full bg-warm-honey-light text-warm-honey mx-auto">${icon('chef-hat')}</span><p class="mt-2 text-sm font-semibold">厨房</p><p class="mt-1 text-xs text-warm-muted">靠近灶台提醒</p></div>
+    <div class="card-base p-4 text-center" style="border-top:3px solid #D96C6C"><span class="grid h-10 w-10 place-items-center rounded-full bg-warm-red-light text-warm-red mx-auto">${icon('panel-top-open')}</span><p class="mt-2 text-sm font-semibold">窗边/阳台</p><p class="mt-1 text-xs text-warm-muted">攀爬风险提醒</p></div>
+    <div class="card-base p-4 text-center" style="border-top:3px solid #C4BDB5"><span class="grid h-10 w-10 place-items-center rounded-full bg-[#F5F3F0] text-warm-muted mx-auto">${icon('plus')}</span><p class="mt-2 text-sm font-semibold">新增区域</p><p class="mt-1 text-xs text-warm-muted">自定义框选</p></div>
+  </div>
+  <div class="card-soft p-3"><p class="text-xs leading-5 text-warm-muted">安全区域只用于高风险提醒，不参与积分扣分。</p><button class="btn btn-primary tap mt-2" data-sheet="zone">新增安全区域</button></div>`,
+
+safety:`
+  ${hdr('安全','安全事件中心')}
+  <div class="card-base p-4">
+    <div class="flex items-center gap-3 mb-3 p-3 rounded-[16px] bg-warm-sage-light"><span class="grid h-10 w-10 place-items-center rounded-full bg-warm-sage text-white">${icon('shield-check','h-5 w-5')}</span><div><p class="text-sm font-semibold text-warm-sage">今日无紧急事件</p><p class="text-xs text-warm-muted">SOS、陌生人、危险区域均正常</p></div></div>
+    ${row('door-open','门口区域规则','独自在家时不开门提醒','<button class="btn-sm tap" data-go="safetyDetail">查看</button>','red')}
+    ${row('volume-2','异常声音','夜间免打扰保留告警','','honey')}
+  </div>
+  <button class="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[16px] bg-warm-red text-sm font-semibold text-white shadow-lg" data-sheet="safety">${icon('phone-call','h-4 w-4')}测试紧急联系人</button>`,
+
+safetyDetail:`
+  ${hdr('事件详情','门口区域提醒')}
+  <div class="card-base overflow-hidden"><img src="${img.room}" alt="门口事件" class="h-48 w-full object-cover"/><div class="p-4"><span class="chip chip-red mb-2">需要确认规则</span><h3 class="mt-2 text-lg font-semibold">孩子独自在家时，检测到门口声音。</h3><p class="mt-2 text-sm leading-6 text-warm-muted">建议开启"不开门提醒"：摄像头先提醒孩子不要开门，并同时通知家长。</p></div></div>
+  <div class="mt-3 grid grid-cols-2 gap-2"><button class="btn btn-primary tap" data-sheet="call" style="background:#D96C6C">${icon('phone-call','h-4 w-4')}联系孩子</button><button class="btn btn-ghost tap" data-toast="已标记为规则已处理">标记处理</button></div>`,
+
+report:`
+  ${hdr('2026年5月25日','今日报告')}
+  <div class="hero-dark rounded-[26px] p-5">
+    <p class="text-xs font-semibold text-white/50 uppercase">今日结论</p>
+    <h3 class="mt-2 text-xl font-semibold leading-relaxed">任务完成稳定，作业中有一次短暂离座。建议明天把语文背诵提前15分钟，睡前会更从容。</h3>
+    <div class="mt-4 grid grid-cols-3 gap-2">
+      <div class="rounded-[14px] bg-white/8 p-3 text-center"><p class="text-xl font-bold">5/6</p><p class="mt-1 text-[10px] text-white/50">任务完成</p></div>
+      <div class="rounded-[14px] bg-white/8 p-3 text-center"><p class="text-xl font-bold">43m</p><p class="mt-1 text-[10px] text-white/50">专注时长</p></div>
+      <div class="rounded-[14px] bg-white/8 p-3 text-center"><p class="text-xl font-bold">+12</p><p class="mt-1 text-[10px] text-white/50">今日积分</p></div>
+    </div>
+  </div>
+  <div class="mt-3 grid grid-cols-[1fr_110px] gap-2">
+    <div class="card-base p-3"><p class="text-xs font-semibold">本周专注趋势</p><div class="tiny-chart mt-2"><span style="height:38px"></span><span class="!bg-warm-sage" style="height:58px"></span><span style="height:48px"></span><span class="!bg-warm-honey" style="height:68px"></span><span style="height:42px"></span><span class="!bg-warm-sage" style="height:60px"></span></div></div>
+    <button class="tap card-base overflow-hidden text-left p-0" data-go="moments"><img src="${img.study}" alt="成长时刻" class="h-[100px] w-full object-cover"/><div class="p-2"><p class="text-[10px] font-semibold">成长时刻</p><p class="text-[10px] text-warm-muted">主动检查小书包</p></div></button>
+  </div>
+  <div class="mt-2 grid gap-1">
+    ${row('file-check-2','作业证据待确认','确认后加5分','<button class="btn-sm dark tap" data-go="taskDetail">处理</button>','honey')}
+    ${row('lightbulb','明日建议','语文背诵提前到晚饭后','','sage')}
+  </div>`,
+
+weekly:`
+  ${hdr('周报','本周表现')}
+  <div class="hero-block rounded-[26px] p-4"><p class="text-sm font-semibold">趋势摘要</p><div class="mt-3 grid grid-cols-2 gap-2">${metric('按时开始','86%','sage')}${metric('专注时长','4h12m','sky')}${metric('离座趋势','-18%','sage')}${metric('睡眠稳定','4天','honey')}</div></div>
+  <div class="mt-3 grid gap-1">${row('brain','学习求助','同类题求助3次，建议关注概念理解','','sky')}${row('users','家庭协作','爸爸处理1项，妈妈处理5项','','sage')}</div>`,
+
+moments:`
+  ${hdr('成长时刻','值得留下的片段')}
+  <div class="grid grid-cols-2 gap-2">
+    <button class="tap card-base overflow-hidden text-left" data-sheet="moment"><img src="${img.study}" alt="成长时刻" class="h-40 w-full object-cover"/><div class="p-2"><span class="chip chip-sage">积极片段</span><p class="mt-1.5 text-sm font-semibold">主动检查小书包并开始作业</p></div></button>
+    <button class="tap card-base overflow-hidden text-left" data-sheet="moment"><img src="${img.room}" alt="睡前任务" class="h-40 w-full object-cover"/><div class="p-2"><span class="chip chip-sky">第一次</span><p class="mt-1.5 text-sm font-semibold">独立完成睡前任务</p></div></button>
+    <button class="tap card-base overflow-hidden text-left" data-sheet="moment"><img src="${img.table}" alt="收玩具" class="h-40 w-full object-cover"/><div class="p-2"><span class="chip chip-sage">好习惯</span><p class="mt-1.5 text-sm font-semibold">主动收玩具</p></div></button>
+    <button class="tap card-base overflow-hidden text-left" data-sheet="moment"><img src="${img.family}" alt="亲子" class="h-40 w-full object-cover"/><div class="p-2"><span class="chip chip-honey">亲子</span><p class="mt-1.5 text-sm font-semibold">一起阅读15分钟</p></div></button>
+  </div>`,
+
+points:`
+  ${hdr('积分','正向激励')}
+  <div class="hero-block rounded-[26px] p-5 text-center">
+    <p class="text-sm font-semibold text-warm-muted">当前积分</p>
+    <p class="mt-2 text-[64px] font-bold leading-none text-warm-ink">86</p>
+    <div class="mt-2 flex justify-center gap-2"><span class="chip chip-sage">今日+12</span><span class="chip chip-honey">可兑30分</span></div>
+    <p class="mt-3 text-sm leading-6 text-warm-muted">作业自启动连续5天稳定，建议下周积分从+5调为+3，改用具体表扬。</p>
+    <button class="btn btn-primary tap mt-3" data-go="reward">去兑换奖励</button>
+  </div>
+  <div class="mt-3 grid gap-1">
+    ${row('plus','数学作业确认完成','+5分，妈妈确认','','sage')}
+    ${row('plus','检查小书包','+3分，AI自动记录','','sage')}
+    ${row('rotate-ccw','撤销一次自动加分','可在24小时内撤销','<button class="btn-sm tap" data-toast="已撤销">撤销</button>','honey')}
+  </div>`,
+
+reward:`
+  ${hdr('奖励商店','模板与审批')}
+  <div class="card-soft p-3 mb-3"><div class="flex items-center justify-between gap-2"><div><p class="text-sm font-semibold">一年级奖励建议</p><p class="mt-1 text-xs text-warm-muted">优先亲子活动、小特权和兴趣支持。</p></div><span class="chip chip-sage">可淡出</span></div></div>
+  <div class="grid gap-2">
+    <button class="tap warm-row text-left w-full" data-sheet="reward" style="border-left:3px solid #E8A85D"><span class="row-icon bg-warm-honey-light text-warm-honey">${icon('gift')}</span><div class="row-copy"><p class="row-title">周末户外活动</p><p class="row-desc">${state.rewardStatus==='approved'?'已批准·周末兑现':state.rewardStatus==='paused'?'已暂缓·等待沟通':'小宇已申请·等待审批'}</p></div><span class="chip chip-honey">30分</span></button>
+    <button class="tap warm-row text-left w-full" data-toast="兑换申请已发送"><span class="row-icon bg-warm-sky-light text-warm-sky">${icon('gift')}</span><div class="row-copy"><p class="row-title">睡前故事加10分钟</p><p class="row-desc">仅周五可兑换</p></div><span class="chip chip-sky">18分</span></button>
+    <button class="tap warm-row text-left w-full" data-toast="兑换申请已发送"><span class="row-icon bg-warm-sage-light text-warm-sage">${icon('gift')}</span><div class="row-copy"><p class="row-title">选择一次晚餐水果</p><p class="row-desc">今天可兑换</p></div><span class="chip chip-sage">12分</span></button>
+  </div>
+  <button class="tap mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[16px] bg-white/72 text-sm font-semibold border border-warm-line" data-sheet="rewardEdit">${icon('plus','h-4 w-4')}添加奖品</button>`,
+
+checkin:`
+  ${hdr('打卡助手','素材审核')}
+  <div class="card-base overflow-hidden"><img src="${img.table}" alt="打卡素材" class="h-48 w-full object-cover"/><div class="p-4"><span class="chip chip-sky">兴趣班打卡</span><h3 class="mt-2 text-lg font-semibold">手工作业成品照</h3><p class="mt-1 text-sm leading-6 text-warm-muted">摄像头已拍摄3张素材，家长审核后可保存或分享。</p><div class="mt-3 grid grid-cols-3 gap-1">${icon('image','h-10 w-10 text-warm-muted')}${icon('image','h-10 w-10 text-warm-muted')}${icon('image','h-10 w-10 text-warm-muted')}</div><div class="mt-3 grid grid-cols-2 gap-2"><button class="btn btn-primary tap" data-toast="素材已通过">通过</button><button class="btn btn-ghost tap" data-toast="已驳回并要求重拍">重拍</button></div></div></div>`,
+
+conversation:`
+  ${hdr('对话与人设','互动边界')}
+  <div class="card-base p-4 grid gap-1">
+    ${row('badge','摄像头唤醒名','小豆·支持近似发音','<button class="btn-sm tap" data-go="name">修改</button>','sky')}
+    ${row('volume-2','原创声线','温柔女声·语速偏慢','<button class="btn-sm tap" data-toast="已播放声线">试听</button>','honey')}
+    ${row('timer','自由聊天','单次8分钟·每日25分钟','','sage')}
+    ${row('file-text','对话记录','默认只保存主题摘要','<button class="btn-sm tap" data-sheet="boundaries">说明</button>','honey')}
+  </div>`,
+
+privacy:`
+  ${hdr('隐私与权限','数据可控')}
+  <div class="grid gap-1">
+    ${settingRow('隐私模式','开启后实时看护和记录入口受限',true)}
+    ${settingRow('远程查看提示','家长查看时设备端显示工作状态',true)}
+    ${settingRow('普通闲聊逐字记录','默认关闭，只展示主题摘要',false)}
+    ${settingRow('只保存事件截图','不保存全天连续录像',true)}
+  </div>
+  <div class="card-base mt-3 p-4"><p class="text-sm font-semibold">儿童数据权利</p><div class="mt-2 grid grid-cols-2 gap-2"><button class="btn btn-ghost tap" data-toast="已导出请求">导出数据</button><button class="btn-sm danger tap min-h-[44px] rounded-[14px] justify-center text-sm" data-sheet="deleteData">删除数据</button></div></div>`,
+
+family:`
+  ${hdr('家庭成员','权限管理')}
+  <div class="grid gap-1">
+    ${row('user-round','妈妈','管理员·全部权限',chp('管理员','sage'),'sage')}
+    ${row('user-round','爸爸','监护人·看护/报告/安全事件',chp('监护人','sky'),'sky')}
+    ${row('user-round','奶奶','临时查看者·只看今天待办',chp('查看者','honey'),'honey')}
+  </div>
+  <button class="btn btn-primary tap mt-3" data-sheet="member">${icon('user-plus','h-4 w-4')}邀请成员</button>`,
+
+device:`
+  ${hdr('设备管理','儿童房摄像头')}
+  <div class="card-base p-4 grid gap-1">
+    ${row('camera','Mira Cam M1','在线·固件1.2.8',chp('在线','sage'),'sage')}
+    ${row('rotate-3d','云台校准','书桌/床/门口/玩具区','<button class="btn-sm tap" data-toast="已校准">校准</button>','sky')}
+    ${row('wifi','网络状态','Mira Home 5G·信号良好','','sage')}
+    ${row('power','解绑或转移','需要管理员确认','<button class="btn-sm danger tap" data-sheet="unbind">解绑</button>','red')}
+  </div>`,
+
+notifications:`
+  ${hdr('通知设置','只提醒真正重要的事')}
+  <div class="grid gap-1">
+    ${settingRow('安全告警','SOS、门口、危险区域和异常声音',true)}
+    ${settingRow('任务待确认','作业证据、打卡素材和奖励审批',true)}
+    ${settingRow('任务提醒','小书包、睡前任务、晨起闹铃',true)}
+    ${settingRow('普通闲聊摘要','每天最多一次，不打扰工作时间',false)}
+  </div>
+  <div class="card-soft mt-3 p-3"><p class="text-xs leading-5 text-warm-muted">安全事件同时通知管理员和第二联系人；普通待办只通知当前负责照护人。</p></div>`,
+
+education:`
+  ${hdr('学习内容','内容生态入口')}
+  <div class="card-base p-4 grid gap-1">
+    ${row('book-open','小书包设置','课程表、老师通知、入园物品','<button class="btn-sm tap" data-toast="已进入设置">设置</button>','sky')}
+    ${row('graduation-cap','合作内容','预留学而思等授权内容入口',chp('规划中','honey'),'honey')}
+    ${row('brain','学习缺漏诊断','长期数据积累后开启',chp('P2','muted'),'muted')}
+  </div>
+  <div class="card-soft mt-3 p-3"><p class="text-xs leading-5 text-warm-muted">内容生态只做任务和资源授权，不绕过学校或第三方平台规则。</p></div>`,
+
+feedback:`
+  ${hdr('帮助与反馈','让问题能被追踪')}
+  <div class="grid gap-1">
+    ${row('message-square','提交产品反馈','体验问题、建议、误判样例','<button class="btn-sm tap" data-sheet="feedback">提交</button>','sky')}
+    ${row('bug','上报AI误判','关联证据、任务和处理结果','<button class="btn-sm tap" data-toast="已打开误判上报">上报</button>','honey')}
+    ${row('headphones','联系客服','工作日9:00-21:00','<button class="btn-sm tap" data-toast="正在连接客服">联系</button>','sage')}
+  </div>
+  <div class="card-soft mt-3 p-3"><p class="text-xs font-semibold">常见问题</p><p class="mt-1 text-xs leading-5 text-warm-muted">设备离线、隐私模式、任务证据误判、语音唤醒不准、报告生成慢等。</p></div>`,
+
+about:`
+  ${hdr('关于我们','Mira Guardian')}
+  <div class="hero-block rounded-[26px] p-5 text-center"><div class="mx-auto grid h-16 w-16 place-items-center rounded-[20px] bg-warm-clay text-white">${icon('aperture','h-8 w-8')}</div><h3 class="mt-3 text-xl font-semibold text-warm-ink">Mira Guardian 米拉</h3><p class="mt-2 text-sm leading-6 text-warm-muted">家庭AI智护与成长中枢。以家长规则为边界，以孩子真实生活场景为中心。</p></div>
+  <div class="mt-3 grid gap-1">
+    ${row('shield-check','儿童隐私优先','最小必要、监护人授权、可删除','','sage')}
+    ${row('heart-handshake','温柔但有边界','减少催促，不替代家长陪伴','','honey')}
+    ${row('file-text','服务协议与隐私政策','查看条款和儿童数据说明','<button class="btn-sm tap" data-go="privacy">查看</button>','sky')}
+  </div>`,
+
+version:`
+  ${hdr('版本更新','最近变化')}
+  <div class="card-base p-4"><div class="flex items-center justify-between"><div><p class="text-lg font-semibold">v0.8.0 内测版</p><p class="mt-1 text-xs text-warm-muted">2026.05.26</p></div><span class="chip chip-clay">当前版本</span></div><div class="mt-3 space-y-2 text-sm leading-6 text-warm-muted"><p>新增任务模板、任务日历和小书包。</p><p>新增任务证据确认、奖励审批和安全事件处理。</p><p>优化实时看护隐私提示。</p></div></div>
+  <div class="mt-3 grid gap-1">${row('download-cloud','检查更新','有新版本时提示家长升级','<button class="btn-sm tap" data-toast="已是最新版本">检查</button>','sky')}${row('list-checks','版本记录','查看历史功能和修复项','','muted')}</div>`,
+
+settings:`
+  ${hdr('设置','家庭与规则')}
+  <div class="grid grid-cols-2 gap-2">
+    <button class="tap card-soft p-3 text-left" data-go="child"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-clay-light text-warm-clay mb-2">${icon('user-round','h-4 w-4')}</span><p class="text-sm font-semibold">孩子档案</p><p class="text-[10px] text-warm-muted">年龄/阶段/年级</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="device"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-sky-light text-warm-sky mb-2">${icon('camera','h-4 w-4')}</span><p class="text-sm font-semibold">设备管理</p><p class="text-[10px] text-warm-muted">在线/云台/固件</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="family"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-sage-light text-warm-sage mb-2">${icon('users','h-4 w-4')}</span><p class="text-sm font-semibold">家庭成员</p><p class="text-[10px] text-warm-muted">角色和通知分发</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="conversation"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-honey-light text-warm-honey mb-2">${icon('message-circle','h-4 w-4')}</span><p class="text-sm font-semibold">对话与人设</p><p class="text-[10px] text-warm-muted">唤醒名/声线/边界</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="privacy"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-sky-light text-warm-sky mb-2">${icon('shield-check','h-4 w-4')}</span><p class="text-sm font-semibold">隐私与权限</p><p class="text-[10px] text-warm-muted">记录/删除/模式</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="notifications"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-red-light text-warm-red mb-2">${icon('bell','h-4 w-4')}</span><p class="text-sm font-semibold">通知设置</p><p class="text-[10px] text-warm-muted">推送优先级</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="zones"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-honey-light text-warm-honey mb-2">${icon('shield-alert','h-4 w-4')}</span><p class="text-sm font-semibold">安全区域</p><p class="text-[10px] text-warm-muted">门口/厨房/窗边</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="education"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-[#F5F3F0] text-warm-muted mb-2">${icon('book-open','h-4 w-4')}</span><p class="text-sm font-semibold">学习内容</p><p class="text-[10px] text-warm-muted">课程表/合作入口</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="feedback"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-sky-light text-warm-sky mb-2">${icon('message-square','h-4 w-4')}</span><p class="text-sm font-semibold">帮助与反馈</p><p class="text-[10px] text-warm-muted">误判/客服/FAQ</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="about"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-clay-light text-warm-clay mb-2">${icon('aperture','h-4 w-4')}</span><p class="text-sm font-semibold">关于我们</p><p class="text-[10px] text-warm-muted">品牌/隐私/条款</p></button>
+    <button class="tap card-soft p-3 text-left" data-go="version"><span class="grid h-9 w-9 place-items-center rounded-[14px] bg-warm-sage-light text-warm-sage mb-2">${icon('download-cloud','h-4 w-4')}</span><p class="text-sm font-semibold">版本更新</p><p class="text-[10px] text-warm-muted">当前/更新记录</p></button>
+  </div>`
+};}
+
+/* ═══════════════════════════════════════
+   SHEET CONTENT
+   ═══════════════════════════════════════ */
+const sheetContent = {
+  evidence:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">处理任务证据</h3><p class="mt-2 text-sm leading-6 text-warm-muted">确认结果会进入日报和积分流水。若AI判断不准，可以标记误判原因。</p><div class="mt-4 grid gap-2"><button class="btn btn-primary tap" data-action="evidence-result" data-result="confirmed">确认完成</button><button class="btn btn-ghost tap" data-action="evidence-result" data-result="partial">改为部分完成</button><button class="btn-sm danger tap min-h-[48px] rounded-[16px] justify-center text-sm" data-action="evidence-result" data-result="rejected">驳回</button></div>`,
+  privacy:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">实时看护隐私提示</h3><p class="mt-2 text-sm leading-6 text-warm-muted">家长查看实时画面时，设备端会显示工作状态。隐私模式开启后，实时看护、录音、录像和记录入口会受限。</p><button class="btn btn-primary tap mt-4" data-close>我知道了</button>`,
+  zone:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">新增安全区域</h3><p class="mt-2 text-sm leading-6 text-warm-muted">选择摄像头视角中的区域，设置触发条件、冷却时间和通知对象。安全区域不参与积分扣分。</p><div class="mt-4 grid grid-cols-2 gap-2"><button class="btn btn-ghost tap" data-close data-toast="已选择门口区域">门口</button><button class="btn btn-ghost tap" data-close data-toast="已选择厨房区域">厨房</button><button class="btn btn-ghost tap" data-close data-toast="已选择窗边区域">窗边</button><button class="btn btn-primary tap" data-close data-toast="已开始自定义框选">自定义</button></div>`,
+  moment:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">成长时刻操作</h3><p class="mt-2 text-sm leading-6 text-warm-muted">成长时刻优先收藏积极行为。家长可以收藏、隐藏、删除或分享给家庭成员。</p><div class="mt-4 grid grid-cols-2 gap-2"><button class="btn btn-primary tap" data-close data-toast="已收藏">收藏</button><button class="btn btn-ghost tap" data-close data-toast="已分享给爸爸">分享</button><button class="btn btn-ghost tap" data-close data-toast="已隐藏">隐藏</button><button class="btn-sm danger tap min-h-[48px] rounded-[16px] justify-center text-sm" data-close data-toast="已删除">删除</button></div>`,
+  flowItem:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">任务操作</h3><p class="mt-2 text-sm leading-6 text-warm-muted">对卡住的任务可以延后、跳过、完成或提醒，所有操作会进入处理记录。</p><div class="mt-4 grid grid-cols-2 gap-2"><button class="btn btn-primary tap" style="background:#6B9BD2" data-close data-toast="已延后10分钟">延后</button><button class="btn btn-ghost tap" data-close data-toast="已发送语音提醒">提醒</button><button class="btn btn-ghost tap" data-close data-toast="已标记完成">完成</button><button class="btn-sm danger tap min-h-[48px] rounded-[16px] justify-center text-sm" data-close data-toast="已跳过并记录原因">跳过</button></div>`,
+  call:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">发起音频通话</h3><p class="mt-2 text-sm leading-6 text-warm-muted">通话前设备端会提示孩子"妈妈正在联系你"。隐私模式开启时需要管理员确认。</p><div class="mt-4 grid grid-cols-2 gap-2"><button class="btn btn-primary tap" style="background:#8B9D83" data-close data-toast="正在发起通话">开始通话</button><button class="btn btn-ghost tap" data-close>取消</button></div>`,
+  reward:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">审批奖励兑换</h3><p class="mt-2 text-sm leading-6 text-warm-muted">小宇申请使用30分兑换"周末户外活动"。审批后会记录审批人和兑现状态。</p><div class="mt-4 grid grid-cols-2 gap-2"><button class="btn btn-primary tap" data-action="reward-result" data-result="approved">批准</button><button class="btn btn-ghost tap" data-action="reward-result" data-result="paused">暂缓</button></div>`,
+  safety:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">测试紧急联系人</h3><p class="mt-2 text-sm leading-6 text-warm-muted">测试会给管理员和第二联系人发送模拟安全通知，不会触发真实报警。</p><button class="btn btn-primary tap mt-4" style="background:#D96C6C" data-close data-toast="测试通知已发送">发送测试</button>`,
+  boundaries:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">互动边界</h3><p class="mt-2 text-sm leading-6 text-warm-muted">作业模式只允许任务相关问答；睡前模式不主动开启长时间自由聊天；普通闲聊默认只展示摘要。</p><button class="btn btn-primary tap mt-4" data-close>确定</button>`,
+  contact:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">添加紧急联系人</h3><div class="mt-4 space-y-3"><input value="外婆" class="min-h-[48px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-sm font-semibold text-warm-ink outline-none"/><input value="138 1234 5678" inputmode="tel" class="min-h-[48px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-sm font-semibold text-warm-ink outline-none"/></div><button class="btn btn-primary tap mt-4" data-close data-toast="联系人已添加">保存</button>`,
+  member:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">成员权限</h3><div class="mt-4 grid gap-2"><button class="btn btn-primary tap" data-close data-toast="已设为管理员">管理员</button><button class="btn btn-ghost tap" data-close data-toast="已设为监护人">监护人</button><button class="btn btn-ghost tap" data-close data-toast="已设为临时查看者">临时查看者</button></div>`,
+  packing:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">添加到小书包</h3><input value="校服外套" class="mt-4 min-h-[48px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-sm font-semibold text-warm-ink outline-none"/><button class="btn btn-primary tap mt-4" data-action="packing-add">保存到小书包</button>`,
+  task:taskSheetHtml,taskTemplates:dayTemplateSheetHtml,taskEdit:taskEditSheetHtml,timePicker:timePickerSheetHtml,
+  playback:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">回放片段</h3><img src="${img.study}" alt="回放" class="mt-4 h-40 w-full rounded-[20px] object-cover"/><p class="mt-3 text-sm leading-6 text-warm-muted">片段只用于家长判断任务和安全事件，默认不会分享给家庭外成员。</p><button class="btn btn-primary tap mt-4" data-close>关闭</button>`,
+  rewardEdit:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">添加奖励</h3><input value="周末一起骑车" class="mt-4 min-h-[48px] w-full rounded-[16px] border border-warm-line bg-white/76 px-4 text-sm font-semibold text-warm-ink outline-none"/><button class="btn btn-ghost tap mt-3" data-toast="已套用亲子活动模板">套用亲子活动模板</button><button class="btn btn-primary tap mt-3" data-close data-toast="奖品已添加">保存</button>`,
+  deleteData:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">删除儿童数据</h3><p class="mt-2 text-sm leading-6 text-warm-muted">删除会影响报告、证据和成长时刻。安全事件按合规策略只保留最小必要内容。</p><button class="btn btn-primary tap mt-4" style="background:#D96C6C" data-close data-toast="已提交删除申请">确认删除</button>`,
+  unbind:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">解绑设备</h3><p class="mt-2 text-sm leading-6 text-warm-muted">解绑前请确认报告和证据已经同步。设备解绑后将停止远程看护和任务提醒。</p><button class="btn btn-primary tap mt-4" style="background:#D96C6C" data-close data-toast="已进入管理员确认">继续</button>`,
+  feedback:`<div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-warm-line"></div><h3 class="text-xl font-semibold text-warm-ink">提交产品反馈</h3><textarea class="mt-4 min-h-[110px] w-full rounded-[16px] border border-warm-line bg-white/76 p-4 text-sm font-semibold text-warm-ink outline-none">希望报告里能单独看睡前任务。</textarea><button class="btn btn-primary tap mt-4" data-close data-toast="反馈已提交">提交</button>`
+};
+
+function settingRow(title,desc,on){
+  const enabled=state.settings[title]??on;
+  return`<div class="warm-row"><div class="row-copy"><p class="row-title">${title}</p><p class="row-desc">${desc}</p></div><button class="tap relative h-8 w-[52px] rounded-full ${enabled?'bg-warm-clay':'bg-warm-line'}" data-action="setting-toggle" data-setting="${title}" aria-label="${title}"><span class="absolute top-1 h-6 w-6 rounded-full bg-white shadow ${enabled?'right-1':'left-1'}"></span></button></div>`;
+}
+
+/* ═══════════════════════════════════════
+   RENDER & NAVIGATION
+   ═══════════════════════════════════════ */
+function render(){
+  const allScreens=screens();
+  app.innerHTML=allScreens[current]||allScreens.home;
+  renderNav();renderMap();closeSheet();
+  app.scrollTo({top:0,behavior:'smooth'});
+  renderTaskFab();lucide.createIcons();
+}
+
+function renderTaskFab(){
+  const show=current==='tasks';
+  taskFab.classList.toggle('show',show);
+  taskFab.classList.toggle('open',show&&state.taskFabOpen);
+  taskFab.style.setProperty('--fab-x',`${state.taskFabX}px`);
+  taskFab.style.setProperty('--fab-y',`${state.taskFabY}px`);
+  taskFab.querySelector('.task-fab-main')?.setAttribute('aria-expanded',show&&state.taskFabOpen?'true':'false');
+  taskFab.querySelector('.task-fab-option.add')?.classList.toggle('hidden',selectedWeekDay().relation==='past');
+  taskFab.querySelector('.task-fab-option.template')?.classList.toggle('hidden',selectedWeekDay().relation==='past');
+  taskFab.querySelector('.task-fab-option.today')?.classList.toggle('hidden',selectedWeekDay().relation!=='past');
+}
+
+function rootTabFor(screen){
+  return['home','care','sleep'].includes(screen)?'home':
+    ['flow','packing','tasks','taskDetail','focus'].includes(screen)?'tasks':
+    ['watch','playback','zones','safety','safetyDetail'].includes(screen)?'watch':
+    ['report','weekly','moments','points','reward','checkin'].includes(screen)?'report':
+    ['settings','conversation','privacy','notifications','family','device','education','feedback','about','version','child','name','contacts'].includes(screen)?'settings':'';
+}
+
+function updateTabIndicator(){
+  const indicator=bottomNav.querySelector('.tab-indicator');
+  const activeButton=bottomNav.querySelector('.nav-item.active');
+  if(!indicator||!activeButton){bottomNav.style.setProperty('--active-opacity',0);return;}
+  const iw=Math.min(activeButton.offsetWidth+8,bottomNav.clientWidth-16);
+  const ih=Math.min(activeButton.offsetHeight+4,bottomNav.clientHeight-10);
+  const ix=activeButton.offsetLeft+activeButton.offsetWidth/2-iw/2;
+  const iy=activeButton.offsetTop+activeButton.offsetHeight/2-ih/2;
+  bottomNav.style.setProperty('--indicator-x',`${ix.toFixed(2)}px`);
+  bottomNav.style.setProperty('--indicator-y',`${iy.toFixed(2)}px`);
+  bottomNav.style.setProperty('--indicator-width',`${iw.toFixed(2)}px`);
+  bottomNav.style.setProperty('--indicator-height',`${ih.toFixed(2)}px`);
+  bottomNav.style.setProperty('--active-opacity',1);
+}
+
+function renderNav(){
+  const active=rootTabFor(current);
+  if(!bottomNav.querySelector('.nav-item')){
+    bottomNav.innerHTML=`<span class="tab-indicator" aria-hidden="true"></span>${nav.map(([screen,iconName,label])=>`<button class="nav-item tap flex flex-col items-center justify-center gap-1" data-go="${screen}" aria-label="${label}" aria-current="false">${icon(iconName,'h-5 w-5')}<span class="text-[11px] font-semibold">${label}</span></button>`).join('')}`;
+  }
+  bottomNav.querySelectorAll('.nav-item').forEach(button=>{
+    const isActive=button.dataset.go===active;
+    button.classList.toggle('active',isActive);
+    button.setAttribute('aria-current',isActive?'page':'false');
+  });
+  updateTabIndicator();
+}
+
+function renderMap(){
+  screenMap.innerHTML=groups.map(group=>`<section><p class="mb-2 text-xs font-bold uppercase tracking-wide text-warm-muted">${group.title}</p><div class="grid grid-cols-2 gap-2">${group.items.map(([screen,label])=>`<button class="tap min-h-[40px] rounded-[14px] border border-transparent bg-white/56 px-3 text-left text-sm font-semibold text-warm-ink ${current===screen?'active':''}" data-go="${screen}">${label}</button>`).join('')}</div></section>`).join('');
+}
+
+function showSheet(name){
+  const content=sheetContent[name]||sheetContent.privacy;
+  sheet.innerHTML=`<div class="sheet-panel">${typeof content==='function'?content():content}</div>`;
+  sheet.classList.add('open');lucide.createIcons();
+}
+function closeSheet(){sheet.classList.remove('open');sheet.innerHTML='';}
+
+let toastTimer;
+function showToast(message){
+  toast.textContent=message;toast.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),1800);
+}
+
+/* ═══════════════════════════════════════
+   STATE MANAGEMENT (reused logic)
+   ═══════════════════════════════════════ */
+function currentDraftTask(){return{time:state.manualStart,title:state.manualTaskName.trim()||'自定义任务',desc:`${state.manualStart}-${state.manualEnd}·${state.selectedDuration}`,tone:'sky',go:'taskDetail'};}
+
+function updateManualEndFromDuration(){
+  const e={ '17:30':{'15 分钟':'17:45','20 分钟':'17:50','30 分钟':'18:00'},'18:20':{'15 分钟':'18:35','20 分钟':'18:40','30 分钟':'18:50'},'19:00':{'15 分钟':'19:15','20 分钟':'19:20','30 分钟':'19:30'},'19:50':{'15 分钟':'20:05','20 分钟':'20:10','30 分钟':'20:20'},'20:30':{'15 分钟':'20:45','20 分钟':'20:50','30 分钟':'21:00'},'21:10':{'15 分钟':'21:25','20 分钟':'21:30','30 分钟':'21:40'} };
+  state.manualEnd=e[state.manualStart]?.[state.selectedDuration]||state.manualEnd;
+}
+
+function mergeTasks(existing,additions){return sortByTime([...existing,...cloneTasks(additions)]);}
+
+function futureTaskFromManual(task,day=dayById(state.manualSelectedDateId)||selectedWeekDay()){return{...task,time:`${day.weekday} ${task.time}`,desc:`${task.desc}·${day.month}${day.day}日`};}
+
+function selectedTaskRef(){
+  const ref=state.editingTask;if(!ref)return null;
+  const list=ref.plan==='future'?state.futureTasks:ref.plan?.startsWith('date:')?state.dateTaskPlans[ref.plan.replace('date:','')]:state.taskPlans[ref.plan];
+  const task=list?.[ref.index];return task?{ref,list,task}:null;
+}
+
+function saveTaskList(plan,list){
+  if(plan==='future')state.futureTasks=sortByTime(list);
+  else if(plan?.startsWith('date:'))state.dateTaskPlans[plan.replace('date:','')]=sortByTime(list);
+  else state.taskPlans[plan]=sortByTime(list);
+}
+
+function addManualTaskToPlan(){
+  const task=currentDraftTask();
+  if(state.manualTaskDate==='future'){
+    const day=dayById(state.manualSelectedDateId)||dayById('2026-05-29');
+    const planKey=datePlanKeyForDay(day);
+    if(planKey==='future')state.futureTasks=mergeTasks(state.futureTasks,[futureTaskFromManual(task,day)]);
+    else state.dateTaskPlans[day.id]=mergeTasks(state.dateTaskPlans[day.id]||[],[futureTaskFromManual(task,day)]);
+    state.selectedDayId=day.id;state.taskWeekOffset=weekOffsetForDay(day.id);
+  }else{
+    state.taskPlans[state.manualTaskDate]=mergeTasks(state.taskPlans[state.manualTaskDate],[task]);
+    state.selectedDayId=state.manualTaskDate==='today'?'2026-05-26':'2026-05-27';state.taskWeekOffset=0;
+  }
+  state.taskView='date';current='tasks';return task;
+}
+
+function shiftTimeLabel(value,minutes){
+  const match=value.match(/^(.*?)(\d{2}):(\d{2})$/);if(!match)return value;
+  const[,prefix,hour,minute]=match;
+  const total=Number(hour)*60+Number(minute)+minutes;
+  const normalized=((total%1440)+1440)%1440;
+  return`${prefix}${String(Math.floor(normalized/60)).padStart(2,'0')}:${String(normalized%60).padStart(2,'0')}`;
+}
+
+function setSelectedTaskDay(dayId){
+  const day=dayById(dayId)||dayById('2026-05-26');
+  state.selectedDayId=day.id;state.taskWeekOffset=weekOffsetForDay(day.id);state.taskView='date';return day;
+}
+
+function setManualDateForDay(day){
+  if(day.plan==='today')state.manualTaskDate='today';
+  else if(day.plan==='tomorrow')state.manualTaskDate='tomorrow';
+  else state.manualTaskDate='future';
+  state.manualSelectedDateId=day.id;
+}
+
+function currentEditableList(plan){
+  if(plan==='future')return state.futureTasks;
+  if(plan?.startsWith('date:'))return state.dateTaskPlans[plan.replace('date:','')]||[];
+  return state.taskPlans[plan]||[];
+}
+
+function applyTemplateToFutureDay(day,tasks){
+  const planKey=datePlanKeyForDay(day);
+  const additions=tasks.map(task=>futureTaskFromManual(task,day));
+  if(planKey==='future')state.futureTasks=mergeTasks(state.futureTasks,additions);
+  else state.dateTaskPlans[day.id]=mergeTasks(state.dateTaskPlans[day.id]||[],additions);
+  setSelectedTaskDay(day.id);
+}
+
+/* ═══════════════════════════════════════
+   EVENT HANDLING
+   ═══════════════════════════════════════ */
+function handleAction(target){
+  const action=target.dataset.action;if(!action)return false;
+  if(action==='task-fab-toggle'){if(state.skipFabClick)return true;state.taskFabOpen=!state.taskFabOpen;renderTaskFab();return true;}
+  if(action==='task-view'){const v=target.dataset.view;if(v==='today')setSelectedTaskDay('2026-05-26');else if(v==='tomorrow')setSelectedTaskDay('2026-05-27');else if(v==='history')setSelectedTaskDay('2026-05-18');else if(v==='calendar')setSelectedTaskDay('2026-05-29');else if(v==='nextWeek')setSelectedTaskDay('2026-06-01');current='tasks';render();return true;}
+  if(action==='week-shift'){const n=Math.max(-1,Math.min(1,state.taskWeekOffset+Number(target.dataset.dir)));state.taskWeekOffset=n;state.selectedDayId=defaultDayForWeek(n);state.taskView='date';state.taskFabOpen=false;current='tasks';render();return true;}
+  if(action==='task-day'){setSelectedTaskDay(target.dataset.date);state.taskFabOpen=false;current='tasks';render();return true;}
+  if(action==='add-selected-task'){const d=selectedWeekDay();setManualDateForDay(d);state.taskFabOpen=false;renderTaskFab();showSheet('task');return true;}
+  if(action==='template-selected-day'){const d=selectedWeekDay();setManualDateForDay(d);state.templateApplyDate=state.manualTaskDate;state.taskFabOpen=false;renderTaskFab();showSheet('taskTemplates');return true;}
+  if(action==='manual-date'){state.manualTaskDate=target.dataset.date;if(state.manualTaskDate==='future'){const s=selectedWeekDay();state.manualSelectedDateId=s.relation==='future'?s.id:'2026-05-29';}showSheet('task');return true;}
+  if(action==='template-date'){state.templateApplyDate=target.dataset.date;if(state.templateApplyDate==='future'){const s=selectedWeekDay();state.manualSelectedDateId=s.relation==='future'?s.id:'2026-05-29';}showSheet('taskTemplates');return true;}
+  if(action==='open-time-picker'){state.timePickerTarget=target.dataset.target||'start';state.timePickerContext=target.dataset.context||'manual';showSheet('timePicker');return true;}
+  if(action==='time-select'){const t=target.dataset.time;if(state.timePickerContext==='edit'){const s=selectedTaskRef();if(s){s.task.time=t;s.task.desc=`${t}开始·已手动调整`;saveTaskList(s.ref.plan,s.list);const sl=currentEditableList(s.ref.plan);const ni=sl.findIndex(task=>task===s.task);state.editingTask={...s.ref,index:Math.max(ni,0)};}showSheet('taskEdit');}else{if(state.timePickerTarget==='start'){state.manualStart=t;updateManualEndFromDuration();}else state.manualEnd=t;showSheet('task');}return true;}
+  if(action==='manual-duration'){state.selectedDuration=target.dataset.duration;updateManualEndFromDuration();showSheet('task');return true;}
+  if(action==='manual-save'){addManualTaskToPlan();state.manualSessionCount=0;closeSheet();render();showToast(`已添加到${dateCopy(state.manualTaskDate)}任务`);return true;}
+  if(action==='manual-save-continue'){addManualTaskToPlan();state.manualSessionCount+=1;render();showSheet('task');showToast('已保存，可继续添加');return true;}
+  if(action==='day-template-select'){state.selectedDayTemplate=target.dataset.template;showSheet('taskTemplates');return true;}
+  if(action==='day-template-apply'){const dt=target.dataset.date;const tpl=dayTemplates[state.selectedDayTemplate];if(dt==='future'){const d=dayById(state.manualSelectedDateId)||selectedWeekDay();applyTemplateToFutureDay(d,tpl.tasks);}else{state.taskPlans[dt]=mergeTasks(state.taskPlans[dt],tpl.tasks);setSelectedTaskDay(dt==='today'?'2026-05-26':'2026-05-27');}current='tasks';closeSheet();render();showToast(`已套用${tpl.title}`);return true;}
+  if(action==='task-open'){state.editingTask={plan:target.dataset.plan,index:Number(target.dataset.index)};showSheet('taskEdit');return true;}
+  if(action==='task-delay'){const s=selectedTaskRef();if(s){s.task.time=shiftTimeLabel(s.task.time,10);s.task.desc=`${s.task.time}开始·已延后10分钟`;saveTaskList(s.ref.plan,s.list);const ni=currentEditableList(s.ref.plan).findIndex(task=>task===s.task);state.editingTask={...s.ref,index:Math.max(ni,0)};}showSheet('taskEdit');return true;}
+  if(action==='task-duplicate'){const s=selectedTaskRef();if(s){state.taskPlans.tomorrow=mergeTasks(state.taskPlans.tomorrow,[{...s.task,tone:'muted',desc:`${s.task.desc}·从今天复制`}]);}showSheet('taskEdit');showToast('已复制到明天');return true;}
+  if(action==='task-edit-save'){current='tasks';closeSheet();render();showToast('任务已更新');return true;}
+  if(action==='task-delete'){const p=target.dataset.plan;const i=Number(target.dataset.index);if(p==='future'){state.futureTasks=state.futureTasks.filter((_,ix)=>ix!==i);setSelectedTaskDay('2026-05-29');}else if(p?.startsWith('date:')){const did=p.replace('date:','');state.dateTaskPlans[did]=(state.dateTaskPlans[did]||[]).filter((_,ix)=>ix!==i);setSelectedTaskDay(did);}else if(state.taskPlans[p]){state.taskPlans[p]=state.taskPlans[p].filter((_,ix)=>ix!==i);setSelectedTaskDay(p==='today'?'2026-05-26':'2026-05-27');}state.editingTask=null;current='tasks';closeSheet();render();showToast('任务已删除');return true;}
+  if(action==='setting-toggle'){const k=target.dataset.setting;state.settings[k]=!(state.settings[k]??false);render();return true;}
+  if(action==='evidence-result'){state.evidenceStatus=target.dataset.result;closeSheet();current='taskDetail';render();return true;}
+  if(action==='reward-result'){state.rewardStatus=target.dataset.result;closeSheet();current='reward';render();return true;}
+  if(action==='packing-status'){state.packingStatus[target.dataset.item]=target.dataset.status;current='packing';render();return true;}
+  if(action==='packing-add'){state.packingExtra.push('校服外套');closeSheet();current='packing';render();return true;}
+  if(action==='packing-extra-remove'){const i=Number(target.dataset.index);state.packingExtra=state.packingExtra.filter((_,ix)=>ix!==i);current='packing';render();return true;}
+  return false;
+}
+
+/* ═══════════════════════════════════════
+   FAB DRAG
+   ═══════════════════════════════════════ */
+function clampFabPosition(nx,ny){
+  const surface=document.querySelector('.phone-surface');
+  const w=surface?.clientWidth||404;const h=surface?.clientHeight||866;
+  return{x:Math.max(-(w-100),Math.min(12,nx)),y:Math.max(-(h-198),Math.min(42,ny))};
+}
+const fabDrag={active:false,moved:false,startX:0,startY:0,originX:0,originY:0,startTime:0};
+taskFab.addEventListener('pointerdown',(event)=>{
+  if(current!=='tasks'||event.target.closest('.task-fab-option'))return;
+  fabDrag.active=true;fabDrag.moved=false;fabDrag.startX=event.clientX;fabDrag.startY=event.clientY;
+  fabDrag.originX=state.taskFabX;fabDrag.originY=state.taskFabY;fabDrag.startTime=performance.now();
+});
+document.addEventListener('pointermove',(event)=>{
+  if(!fabDrag.active)return;
+  const dx=event.clientX-fabDrag.startX,dy=event.clientY-fabDrag.startY;
+  if(Math.hypot(dx,dy)>18&&performance.now()-fabDrag.startTime>120)fabDrag.moved=true;
+  if(!fabDrag.moved)return;
+  const next=clampFabPosition(fabDrag.originX+dx,fabDrag.originY+dy);
+  state.taskFabX=next.x;state.taskFabY=next.y;state.taskFabOpen=false;renderTaskFab();
+});
+document.addEventListener('pointerup',()=>{
+  if(!fabDrag.active)return;fabDrag.active=false;
+  if(fabDrag.moved){state.skipFabClick=true;setTimeout(()=>{state.skipFabClick=false;},120);}
+});
+taskFab.querySelector('.task-fab-main').addEventListener('click',(event)=>{
+  event.preventDefault();event.stopPropagation();
+  if(state.skipFabClick)return;
+  state.taskFabOpen=!state.taskFabOpen;renderTaskFab();
+});
+
+/* ═══════════════════════════════════════
+   GLOBAL CLICK HANDLER
+   ═══════════════════════════════════════ */
+document.addEventListener('click',(event)=>{
+  const target=event.target.closest('button, a');if(!target)return;
+  const isTabSwitch=!!target.closest('#bottomNav')&&target.dataset.go&&rootTabFor(target.dataset.go)!==rootTabFor(current);
+  target.classList.add('tap-flash');setTimeout(()=>target.classList.remove('tap-flash'),340);
+  if(handleAction(target))return;
+  if(target.dataset.close!==undefined)closeSheet();
+  if(target.dataset.go){state.taskFabOpen=false;current=target.dataset.go;render();}
+  if(target.dataset.sheet)showSheet(target.dataset.sheet);
+  if(target.dataset.toast)showToast(target.dataset.toast);
+  if(target===sheet)closeSheet();
+});
+sheet.addEventListener('click',(event)=>{if(event.target===sheet)closeSheet();});
+sheet.addEventListener('input',(event)=>{
+  const field=event.target.dataset.field;
+  if(field==='manualTaskName')state.manualTaskName=event.target.value;
+  if(field==='editingTaskTitle'){const s=selectedTaskRef();if(s)s.task.title=event.target.value.trim()||'自定义任务';}
+});
+
+render();
+</script>
+</body>
+</html>

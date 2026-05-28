@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mira Guardian v2 高保真原型</title>
+    <meta
+      name="description"
+      content="Mira Guardian 家长端 App v2 高保真原型：首页、任务首页、实时看护。"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./styles.css?v=full-flow-4" />
+  </head>
+  <body>
+    <main class="preview-wrap">
+      <section class="mira-device" aria-label="Mira Guardian v2 mobile prototype">
+        <div class="ios-line" aria-hidden="true">
+          <span>9:41</span>
+          <span class="status-dot"></span>
+        </div>
+        <div id="screen" class="screen-port" tabindex="-1"></div>
+        <nav id="dock" class="nav-dock" aria-label="底部导航"></nav>
+        <div id="toast" class="toast-lane" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="./app.js?v=full-flow-4"></script>
+  </body>
+</html>
