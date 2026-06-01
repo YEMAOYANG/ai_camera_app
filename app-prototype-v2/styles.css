@@ -3274,6 +3274,123 @@ button:focus-visible {
   text-align: left;
 }
 
+.action-row span {
+  justify-self: end;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.action-row.selected {
+  background: rgba(36, 120, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(36, 120, 255, 0.2);
+  color: var(--primary);
+}
+
+.bottom-sheet {
+  max-height: 82vh;
+  overflow: auto;
+}
+
+.sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.sheet-grid button,
+.role-grid button {
+  min-height: 46px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px rgba(125, 151, 176, 0.18);
+}
+
+.sheet-grid button.active,
+.role-grid button.active {
+  background: var(--ink);
+  color: white;
+  box-shadow: none;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 20px 0 14px;
+}
+
+.role-grid button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.app-field.quiet {
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.boundary-row {
+  margin: 6px 0 14px;
+}
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.status-tag.success {
+  background: #e7f8ef;
+  color: var(--success);
+}
+
+.status-tag.warning {
+  background: #fff2da;
+  color: #b7791f;
+}
+
+.status-tag.danger {
+  background: #ffe9e9;
+  color: var(--danger);
+}
+
+.status-tag.info {
+  background: var(--surface-blue);
+  color: var(--primary);
+}
+
+.auth-primary.danger {
+  background: var(--danger);
+}
+
+.compact-search {
+  margin: 10px 18px 8px;
+}
+
+.soft-cta,
+.primary-cta,
+.ghost-cta {
+  white-space: nowrap;
+}
+
+.mission-bottom .soft-cta {
+  min-width: 78px;
+}
+
 .chip.danger {
   background: #ffe9e9;
   color: var(--danger);

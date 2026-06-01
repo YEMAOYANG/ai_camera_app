@@ -29,6 +29,8 @@ const state = {
   bindingStatus: "default",
   permissionDenied: false,
   onboardingIndex: 0,
+  parentRole: "妈妈",
+  parentName: "妈妈",
   phone: "",
   agreed: false,
   loginError: "",
@@ -44,16 +46,70 @@ const state = {
     age: "8 岁",
     relation: "妈妈",
     grade: "二年级",
+    stage: "小学",
+    className: "二年级 3 班",
   },
   childDraft: {
-    name: "小宇",
-    age: "8",
+    name: "",
+    age: "",
     relation: "妈妈",
+    birthday: "2018-06-12",
+    stage: "小学",
+    grade: "二年级",
+    className: "二年级 3 班",
+  },
+  wakeName: "米拉",
+  boundaryLevel: "平衡",
+  contactDraft: {
+    name: "爸爸",
+    phone: "13900139000",
   },
   taskDraft: {
     title: "英语朗读 10 分钟",
     start: "20:10",
     reward: "3",
+  },
+  selectedTaskDate: "2026-05-28",
+  taskWeekOffset: 0,
+  taskView: "date",
+  evidenceStatus: "pending",
+  rewardStatus: "requested",
+  alertStatus: "unread",
+  safetyStatus: "unread",
+  pointBalance: 46,
+  pointUnit: "积分",
+  pointThreshold: 10,
+  pointThresholdDraft: "10",
+  milestoneHandled: false,
+  manualRewardKey: "outdoor",
+  rewardEditingKey: "",
+  rewardDraftName: "周末一起骑车",
+  rewardDraftCost: "20",
+  childRewardDeducted: false,
+  lastManualReward: "",
+  rewardItems: [
+    { key: "outdoor", title: "周末户外活动", cost: 20, desc: "和家长一起去公园或骑车", tone: "blue" },
+    { key: "story", title: "睡前故事加 10 分钟", cost: 10, desc: "适合睡前流程完成后兑现", tone: "warm" },
+    { key: "lego", title: "周五拼搭时间", cost: 30, desc: "需要提前安排 40 分钟", tone: "green" },
+  ],
+  schoolbagMode: "按课表",
+  packingStatus: {
+    mathbook: "done",
+    bottle: "missing",
+    scarf: "todo",
+    pencil: "done",
+  },
+  packingExtra: ["美术彩纸"],
+  packingDraft: "跳绳",
+  settings: {
+    remoteHint: true,
+    privacyMask: false,
+    taskEvidence: true,
+    freeChatLimit: true,
+    sleepDnd: true,
+    reportPush: true,
+    soundAlert: true,
+    deviceOffline: true,
   },
 };
 
@@ -133,20 +189,26 @@ const fullViews = {
         <div class="setup-bg" aria-hidden="true"></div>
         <header class="setup-step-head">
           <span>首次设置</span>
-          <b>1 / 5</b>
+          <b>1 / 9</b>
         </header>
         <section class="setup-hero-panel">
-          <span class="setup-icon">${icon("home", "w-6 h-6")}</span>
-          <h1>先把家庭看护基础搭好</h1>
-          <p>接下来会依次完成孩子资料、设备绑定、权限授权和隐私边界。未完成前不会开启远程看护。</p>
+          <span class="setup-icon">${icon("user-check", "w-6 h-6")}</span>
+          <h1>先确认家长身份</h1>
+          <p>后续绑定设备、处理告警、删除儿童数据都需要明确家庭管理员。这个身份只用于 App 内权限和通知文案。</p>
+          <div class="role-grid">
+            ${["妈妈", "爸爸", "祖辈", "其他照护人"].map((role) => `<button class="${state.parentRole === role ? "active" : ""}" data-action="parent-role" data-role="${role}">${state.parentRole === role ? icon("check", "w-4 h-4") : ""}${role}</button>`).join("")}
+          </div>
+          <label class="app-field quiet">
+            <span>你的称呼</span>
+            <input data-parent-name maxlength="10" value="${state.parentName}" placeholder="例如：妈妈" />
+          </label>
           <div class="setup-checks">
-            <span>${icon("user-round-plus", "w-4 h-4")}孩子档案</span>
-            <span>${icon("camera", "w-4 h-4")}设备绑定</span>
-            <span>${icon("shield-check", "w-4 h-4")}隐私权限</span>
+            <span>${icon("shield-check", "w-4 h-4")}手机号已验证</span>
+            <span>${icon("user-round-cog", "w-4 h-4")}默认管理员</span>
           </div>
         </section>
         <section class="setup-actions">
-          <button class="auth-primary" type="button" data-nav="setupChild">开始设置</button>
+          <button class="auth-primary" type="button" data-nav="setupDevice">继续绑定设备</button>
           <button class="auth-secondary" type="button" data-nav="home">稍后进入首页预览</button>
         </section>
       </section>
@@ -156,7 +218,8 @@ const fullViews = {
   setupChild() {
     return `
       <section class="setup-flow form-flow">
-        ${backHeader("孩子资料", "用于任务、证据和告警文案，后续可在我的页修改。", "setupStart")}
+        <header class="setup-step-head"><span>孩子档案</span><b>5 / 9</b></header>
+        ${backHeader("孩子资料", "用于任务、证据和告警文案，后续可在我的页修改。", "setupBindDone")}
         <form class="setup-form" novalidate>
           <label class="app-field ${state.setupError ? "error" : ""}">
             <span>孩子称呼</span>
@@ -169,8 +232,18 @@ const fullViews = {
               <input data-child-age inputmode="numeric" maxlength="2" value="${state.childDraft.age}" />
             </label>
             <label class="app-field">
-              <span>你的身份</span>
-              <input data-child-relation maxlength="8" value="${state.childDraft.relation}" />
+              <span>学段</span>
+              <input data-child-stage maxlength="8" value="${state.childDraft.stage}" />
+            </label>
+          </div>
+          <div class="two-fields">
+            <label class="app-field">
+              <span>年级</span>
+              <input data-child-grade maxlength="8" value="${state.childDraft.grade}" />
+            </label>
+            <label class="app-field">
+              <span>班级</span>
+              <input data-child-class maxlength="12" value="${state.childDraft.className}" />
             </label>
           </div>
           <section class="ai-bubble compact">
@@ -181,7 +254,7 @@ const fullViews = {
             <p>未绑定设备前，不会采集孩子画面；资料只用于后续提醒和证据归档。</p>
           </section>
           <button class="auth-primary ${state.setupSaving ? "loading" : ""}" type="button" data-save-child>
-            ${state.setupSaving ? `<span class="loading-dot"></span>保存中...` : "保存并继续"}
+            ${state.setupSaving ? `<span class="loading-dot"></span>保存中...` : "保存并设置称呼"}
           </button>
         </form>
       </section>
@@ -193,7 +266,8 @@ const fullViews = {
     const failed = state.bindingStatus === "failed";
     return `
       <section class="setup-flow">
-        ${backHeader("设备绑定", "扫码或蓝牙发现设备，绑定后再配置权限。", "setupChild")}
+        <header class="setup-step-head"><span>设备绑定</span><b>2 / 9</b></header>
+        ${backHeader("设备绑定", "扫码或蓝牙发现设备，绑定后进入 Wi-Fi 配网。", "setupStart")}
         <section class="device-bind-card ${failed ? "failed" : loading ? "loading" : ""}">
           <div class="scan-frame">
             ${loading ? `<span class="loading-dot blue"></span>` : icon(failed ? "wifi-off" : "scan-qr-code", "w-10 h-10")}
@@ -212,10 +286,48 @@ const fullViews = {
     `;
   },
 
+  setupWifi() {
+    return `
+      <section class="setup-flow form-flow">
+        <header class="setup-step-head"><span>Wi-Fi 配网</span><b>3 / 9</b></header>
+        ${backHeader("连接家庭网络", "已发现设备：书房摄像头 M1。", "setupDevice")}
+        <form class="setup-form" novalidate>
+          <label class="app-field"><span>家庭 Wi-Fi</span><input value="Home_5G" /></label>
+          <label class="app-field"><span>Wi-Fi 密码</span><input type="password" value="guardian2026" /></label>
+          <section class="ai-bubble compact">
+            <div class="ai-bubble-head"><span class="ai-mark">${icon("lock-keyhole", "w-4 h-4")}</span><div><strong>连接前不会开启看护</strong><small>设备只会完成网络校验和隐私灯测试</small></div></div>
+            <p>配网成功后会检测隐私灯、提示音和摄像头视角，确认后再创建孩子档案。</p>
+          </section>
+          <button type="button" class="auth-primary" data-nav="setupBindDone" data-toast="设备已连接 Home_5G">开始配网</button>
+        </form>
+      </section>
+    `;
+  },
+
+  setupBindDone() {
+    return `
+      <section class="setup-flow">
+        <header class="setup-step-head"><span>绑定完成</span><b>4 / 9</b></header>
+        <section class="done-card">
+          <span class="done-icon">${icon("check", "w-8 h-8")}</span>
+          <h1>设备已绑定</h1>
+          <p>隐私灯和提示音测试通过。接下来创建孩子档案，任务、证据和告警都会按孩子资料归档。</p>
+          <div class="setup-checks">
+            <span>${icon("wifi", "w-4 h-4")}网络稳定</span>
+            <span>${icon("lightbulb", "w-4 h-4")}隐私灯正常</span>
+            <span>${icon("camera", "w-4 h-4")}视角待校准</span>
+          </div>
+          <button class="auth-primary" data-nav="setupChild">创建孩子档案</button>
+        </section>
+      </section>
+    `;
+  },
+
   setupPermissions() {
     return `
       <section class="setup-flow">
-        ${backHeader("权限授权", "只开启必要权限，家长可随时在设置里修改。", "setupDevice")}
+        <header class="setup-step-head"><span>权限授权</span><b>8 / 9</b></header>
+        ${backHeader("权限授权", "只开启必要权限，家长可随时在设置里修改。", "setupContacts")}
         <section class="permission-stack">
           <button class="permission-card success" data-permission="notice">
             <span>${icon("bell-ring", "w-5 h-5")}</span>
@@ -239,9 +351,52 @@ const fullViews = {
     `;
   },
 
+  setupName() {
+    return `
+      <section class="setup-flow form-flow">
+        <header class="setup-step-head"><span>AI 称呼与边界</span><b>6 / 9</b></header>
+        ${backHeader("设置设备称呼", "孩子端唤醒和互动边界后续可修改。", "setupChild")}
+        <form class="setup-form" novalidate>
+          <label class="app-field">
+            <span>孩子呼叫设备时使用</span>
+            <input data-wake-name maxlength="8" value="${state.wakeName}" />
+          </label>
+          <section class="filter-row boundary-row" aria-label="互动边界">
+            ${["宽松", "平衡", "严格"].map((level) => `<button type="button" class="${state.boundaryLevel === level ? "active" : ""}" data-action="boundary-level" data-level="${level}">${level}</button>`).join("")}
+          </section>
+          <section class="ai-bubble compact">
+            <div class="ai-bubble-head"><span class="ai-mark">${icon("shield-check", "w-4 h-4")}</span><div><strong>默认互动边界</strong><small>${state.boundaryLevel}模式</small></div></div>
+            <p>作业模式只允许任务相关问答；睡前关闭长时间自由聊天；普通闲聊默认只保存主题摘要。</p>
+            <div class="chip-row"><button class="chip" type="button" data-sheet="boundaries">查看边界说明</button></div>
+          </section>
+          <button class="auth-primary" type="button" data-nav="setupContacts">继续设置联系人</button>
+        </form>
+      </section>
+    `;
+  },
+
+  setupContacts() {
+    return `
+      <section class="setup-flow form-flow">
+        <header class="setup-step-head"><span>紧急联系人</span><b>7 / 9</b></header>
+        ${backHeader("添加紧急联系人", "安全事件只在必要时通知家庭成员。", "setupName")}
+        <form class="setup-form" novalidate>
+          <label class="app-field"><span>联系人</span><input data-contact-name maxlength="10" value="${state.contactDraft.name}" /></label>
+          <label class="app-field"><span>手机号</span><input data-contact-phone inputmode="numeric" maxlength="11" value="${state.contactDraft.phone}" /></label>
+          <section class="mini-list">
+            <button type="button" class="settings-row" data-sheet="contact"><span>${icon("user-plus", "w-4 h-4")}</span><div><strong>再添加一位联系人</strong><small>例如外婆、爸爸或其他照护人</small></div>${icon("chevron-right", "w-4 h-4")}</button>
+            <button type="button" class="settings-row" data-toast="邀请已生成"><span>${icon("send", "w-4 h-4")}</span><div><strong>邀请另一位家长</strong><small>可处理告警和查看日报</small></div>${icon("chevron-right", "w-4 h-4")}</button>
+          </section>
+          <button class="auth-primary" type="button" data-nav="setupPermissions">继续权限授权</button>
+        </form>
+      </section>
+    `;
+  },
+
   setupPrivacy() {
     return `
       <section class="setup-flow">
+        <header class="setup-step-head"><span>隐私边界</span><b>9 / 9</b></header>
         ${backHeader("隐私边界", "看护不是全天监控，孩子端会看到远程查看提示。", "setupPermissions")}
         <section class="privacy-principles">
           <div><span>${icon("eye-off", "w-5 h-5")}</span><strong>不保存全天录像</strong><p>只围绕任务证据和安全事件保留必要片段。</p></div>
@@ -394,19 +549,20 @@ const fullViews = {
   },
 
   taskEvidence() {
+    const [label, tone] = evidenceLabel();
     return `
       <section class="scene app-page evidence-page">
-        ${backHeader("任务证据", "等待家长确认", "taskDetail")}
+        ${backHeader("任务证据", label, "taskDetail")}
         <section class="evidence-media">
           <img src="${refs.study}" alt="孩子在书桌前完成任务的证据截图" />
-          <span class="capsule">${icon("file-check-2", "w-3.5 h-3.5")}AI 证据片段</span>
+          <span class="capsule ${tone}">${icon("file-check-2", "w-3.5 h-3.5")}${label}</span>
         </section>
         <section class="detail-sheet inline">
           <section class="live-panel">
             <div class="ai-bubble-head"><span class="ai-mark">${icon("sparkles", "w-4 h-4")}</span><div><strong>AI 判断：完成度较高</strong><small>置信度 88% · 仍需家长确认</small></div></div>
             <p class="mt-3 text-[13px] font-semibold leading-6 text-[#697A89]">检测到书写动作持续 22 分钟，离席 1 次 40 秒。建议确认完成，并允许奖励积分自动入账。</p>
             <div class="decision-actions">
-              <button class="auth-primary" data-sheet="confirmEvidence">确认完成</button>
+              <button class="auth-primary" data-sheet="evidence">处理证据</button>
               <button class="auth-secondary" data-sheet="partialEvidence">部分完成</button>
               <button class="danger-link" data-sheet="rejectEvidence">驳回/误报</button>
             </div>
@@ -429,10 +585,11 @@ const fullViews = {
   },
 
   taskReward() {
+    const [label, tone] = rewardLabel();
     return `
       <section class="scene app-page">
         ${backHeader("奖励申请", "需要家长确认", "home")}
-        ${stateCard("warning", `${childName()} 申请兑换 20 积分`, "来源：本周 4 次任务完成。当前余额 46，兑换后剩余 26。", `<div class="chip-row center"><button class="chip primary" data-sheet="rewardApprove">同意兑现</button><button class="chip" data-toast="已安排周末提醒">同意稍后</button><button class="chip danger" data-sheet="rewardReject">暂不兑换</button></div>`)}
+        ${stateCard(tone, `${childName()} 申请兑换 20 ${state.pointUnit}`, `状态：${label}。来源：本周 4 次任务完成。当前余额 ${state.pointBalance}，兑换后剩余 ${Math.max(0, state.pointBalance - 20)}。`, `<div class="chip-row center"><button class="chip primary" data-sheet="reward">处理申请</button><button class="chip" data-action="reward-planned">同意稍后</button><button class="chip danger" data-sheet="rewardReject">暂不兑换</button></div>`)}
       </section>
     `;
   },
@@ -566,20 +723,21 @@ const fullViews = {
           <button class="summary-unit" data-nav="privacySettings"><strong>3</strong><span>隐私规则</span></button>
         </section>
         <section class="settings-groups">
-          <div class="settings-group"><h3>报告与奖励</h3>${[
-            ["report", "file-text", "今日报告", "结论、证据和待处理建议"],
-            ["points", "gift", "积分奖励", "奖励申请、商店和流水"],
-            ["checkin", "badge-check", "打卡审核", "素材通过后再发奖励"],
-          ].map(([route, ico, title, desc]) => `<button class="settings-row" data-nav="${route}"><span>${icon(ico, "w-4 h-4")}</span><div><strong>${title}</strong><small>${desc}</small></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}</div>
           <div class="settings-group"><h3>看护与规则</h3>${[
             ["deviceSettings", "camera", "设备管理", "网络、固件、解绑和房间视角"],
             ["aiRules", "bot", "AI 规则", "任务判断、自由聊天和睡前限制"],
             ["privacySettings", "lock-keyhole", "隐私与数据", "远程查看边界、数据删除"],
-            ["education", "book-open", "学习内容", "小书包和任务模板"],
+            ["education", "graduation-cap", "教育与内容边界", "小书包、答题边界和内容规则"],
+          ].map(([route, ico, title, desc]) => `<button class="settings-row" data-nav="${route}"><span>${icon(ico, "w-4 h-4")}</span><div><strong>${title}</strong><small>${desc}</small></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}</div>
+          <div class="settings-group"><h3>报告与奖励</h3>${[
+            ["report", "file-text", "今日日报", "任务完成、证据和 AI 建议"],
+            ["weekly", "chart-line", "本周趋势", "专注、睡前和安全变化"],
+            ["points", "badge-check", "积分与奖励", "阶段阈值、兑换和奖励商店"],
+            ["moments", "sparkles", "成长时刻", "收藏、隐藏和分享积极片段"],
           ].map(([route, ico, title, desc]) => `<button class="settings-row" data-nav="${route}"><span>${icon(ico, "w-4 h-4")}</span><div><strong>${title}</strong><small>${desc}</small></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}</div>
           <div class="settings-group"><h3>账号与通知</h3>${[
             ["notificationSettings", "bell-ring", "通知设置", "告警、任务、奖励申请"],
-            ["subscription", "credit-card", "订阅套餐", "设备数、回放和家庭权益"],
+            ["subscription", "badge-dollar-sign", "订阅与权益", "云端报告与高级趋势"],
             ["accountSettings", "shield", "账号安全", "手机号、登录设备、退出"],
             ["helpFeedback", "message-circle", "帮助与反馈", "提交问题和查看协议"],
           ].map(([route, ico, title, desc]) => `<button class="settings-row" data-nav="${route}"><span>${icon(ico, "w-4 h-4")}</span><div><strong>${title}</strong><small>${desc}</small></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}</div>
@@ -679,12 +837,18 @@ const fullViews = {
     `;
   },
 
-  packing() {
+  care() {
     return `
       <section class="scene app-page">
-        ${backHeader("小书包", "明早出门前确认", "tasks")}
-        <section class="detail-hero soft-blue"><span class="capsule blue">${icon("backpack", "w-3.5 h-3.5")}3 项待确认</span><h2>数学本、水杯、红领巾</h2><p>设备在线时，米拉会在孩子整理书包时轻提醒，不会持续录像。</p><button class="auth-primary" data-toast="已标记水杯完成">标记水杯已放入</button></section>
-        <section class="settings-group"><h3>清单</h3>${["数学本 · 待放入", "水杯 · 待确认", "红领巾 · 已完成", "美术材料 · 明天需要"].map((item, i) => `<button class="settings-row ${i === 2 ? "success" : ""}" data-toast="${item}"><span>${icon(i === 2 ? "check" : "circle", "w-4 h-4")}</span><div><strong>${item}</strong><small>${i === 2 ? "孩子已确认" : "明早 7:40 前提醒"}</small></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}</section>
+        ${appHeader("待家长处理", "只展示需要你判断的事", `<button class="round-action" data-toast="已按紧急程度排序">${icon("list-filter")}</button>`)}
+        <section class="priority-panel">
+          <div class="section-head compact"><div><span class="mini-kicker">今天</span><h3>4 件待处理</h3></div><button data-toast="已全部稍后提醒">稍后</button></div>
+          <button class="queue-item urgent" data-nav="taskEvidence"><span class="queue-icon">${icon("file-check-2", "w-4 h-4")}</span><span class="queue-copy"><strong>数学口算证据待确认</strong><small>确认后进入日报和积分流水</small></span>${icon("chevron-right", "w-4 h-4")}</button>
+          <button class="queue-item" data-nav="taskReward"><span class="queue-icon warm">${icon("gift", "w-4 h-4")}</span><span class="queue-copy"><strong>奖励申请待确认</strong><small>${childName()} 想兑换周末户外活动</small></span>${icon("chevron-right", "w-4 h-4")}</button>
+          <button class="queue-item" data-nav="safetyDetail"><span class="queue-icon danger">${icon("siren", "w-4 h-4")}</span><span class="queue-copy"><strong>门口声音片段待判断</strong><small>AI 建议先联系孩子确认</small></span>${icon("chevron-right", "w-4 h-4")}</button>
+          <button class="queue-item" data-sheet="boundaries"><span class="queue-icon">${icon("bot", "w-4 h-4")}</span><span class="queue-copy"><strong>AI 对话边界待确认</strong><small>睡前自由聊天限制建议开启</small></span>${icon("chevron-right", "w-4 h-4")}</button>
+        </section>
+        <section class="ai-bubble"><div class="ai-bubble-head"><span class="ai-mark">${icon("sparkles", "w-4 h-4")}</span><div><strong>处理建议</strong><small>先证据，再安全，再奖励</small></div></div><p>证据确认会影响积分；安全事件需要你决定处理或误报；奖励可以同意稍后兑现。</p></section>
       </section>
     `;
   },
@@ -692,23 +856,72 @@ const fullViews = {
   sleep() {
     return `
       <section class="scene app-page">
-        ${backHeader("睡眠晨起", "睡前少打扰，晨起看结果", "tasks")}
-        <section class="timer-card"><span>睡前流程</span><strong>21:10</strong><p>洗漱、整理桌面、关闭自由聊天。</p><div class="chip-row center"><button class="chip primary" data-toast="睡前提醒已开启">开启提醒</button><button class="chip" data-sheet="delayTask">延后 15 分钟</button></div></section>
-        <section class="ai-bubble"><div class="ai-bubble-head"><span class="ai-mark">${icon("moon", "w-4 h-4")}</span><div><strong>AI 建议：今晚不要加任务</strong><small>根据今日任务时长</small></div></div><p>20:35 后只保留小书包和睡前流程，避免把学习任务压到睡前。</p></section>
+        ${backHeader("睡前与晨起流程", "减少催促，把睡前拆成可完成步骤。", "home")}
+        <section class="detail-hero soft-blue">
+          <span class="capsule ai">${icon("moon", "w-3.5 h-3.5")}21:10 开始</span>
+          <h2>今晚睡前流程</h2>
+          <p>洗漱、整理桌面、书包放门口。睡前 21:15 后自动关闭自由聊天。</p>
+          <div class="progress-track"><span style="width: 35%"></span></div>
+          <div class="hero-actions static"><button class="primary-cta" data-sheet="flowItem">提醒下一步</button><button class="ghost-cta" data-toast="已延后 10 分钟">延后</button></div>
+        </section>
+        <section class="settings-group">
+          ${[
+            ["check-circle-2", "洗漱", "已完成 · 家长无需处理", "success"],
+            ["clock", "整理桌面", "待开始 · 预计 5 分钟", "warning"],
+            ["backpack", "小书包放门口", "和小书包清单联动", "info"],
+          ].map(([ico, title, desc, tone]) => `<button class="settings-row ${tone}" data-sheet="flowItem"><span>${icon(ico, "w-4 h-4")}</span><div><strong>${title}</strong><small>${desc}</small></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}
+        </section>
       </section>
     `;
+  },
+
+  flow() {
+    return `
+      <section class="scene app-page">
+        ${backHeader("任务模板", `${state.childProfile.stage} · ${state.childProfile.grade}`, "tasks")}
+        <section class="h-scroll">
+          ${[
+            ["book-open-check", "放学后基础流", "口算、朗读、小书包", "accent"],
+            ["moon", "睡前轻任务", "洗漱、整理、阅读", ""],
+            ["mic", "朗读打卡", "声音证据 + 家长抽查", ""],
+          ].map(([ico, title, desc, cls]) => `<button class="template-card ${cls}" data-sheet="taskTemplates"><span class="capsule blue">${icon(ico, "w-3.5 h-3.5")}模板</span><h4>${title}</h4><p>${desc}</p></button>`).join("")}
+        </section>
+        <section class="ai-bubble"><div class="ai-bubble-head"><span class="ai-mark">${icon("bot", "w-4 h-4")}</span><div><strong>AI 推荐</strong><small>基于今天任务和睡前时间</small></div></div><p>建议只套用“小书包检查”，避免增加新的学习任务。</p><div class="chip-row"><button class="chip primary" data-action="day-template-apply">套用推荐</button><button class="chip" data-nav="taskEdit">手动创建</button></div></section>
+      </section>
+    `;
+  },
+
+  packing() {
+    return `
+      <section class="scene app-page">
+        ${backHeader("小书包检查", `${state.schoolbagMode} · 明早 7:40 前`, "tasks")}
+        <section class="detail-hero soft-blue">
+          <span class="capsule warn">${icon("backpack", "w-3.5 h-3.5")}还有 2 项待确认</span>
+          <h2>明天上学物品</h2>
+          <p>AI 只做识别建议，缺失项需要家长或孩子最终确认。</p>
+          <div class="chip-row"><button class="chip primary" data-sheet="packing">临时加一项</button><button class="chip" data-toast="已发送小书包提醒">提醒孩子</button></div>
+        </section>
+        <section class="settings-group">${packingRows()}</section>
+        ${state.packingExtra.length ? `<section class="settings-group"><h3>临时物品</h3>${state.packingExtra.map((item, index) => `<button class="settings-row" data-action="packing-extra-remove" data-index="${index}"><span>${icon("plus-circle", "w-4 h-4")}</span><div><strong>${item}</strong><small>家长临时添加</small></div><b class="status-tag warning">移除</b></button>`).join("")}</section>` : ""}
+      </section>
+    `;
+  },
+
+  focus() {
+    return fullViews.taskRunning();
   },
 
   playback() {
     return `
       <section class="scene app-page">
-        ${backHeader("事件回放", "只保留必要片段", "watch")}
-        <section class="filter-row"><button class="active">全部</button><button>任务证据</button><button>安全事件</button><button>收藏</button></section>
-        <section class="alert-list">${[
-          ["任务证据", "数学口算完成片段", "22 分钟 · 待确认", "taskEvidence"],
-          ["安全事件", "门口异常声音", "12 秒 · 未读", "alertDetail"],
-          ["成长时刻", "主动整理书桌", "已收藏", "moments"],
-        ].map(([type, title, desc, route]) => `<button class="alert-item" data-nav="${route}"><span>${icon("play", "w-4 h-4")}</span><div><small>${type}</small><strong>${title}</strong><p>${desc}</p></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}</section>
+        ${backHeader("事件回放", "只保存任务证据和安全片段。", "watch")}
+        <section class="alert-list">
+          ${[
+            ["数学口算证据", "20:02 · 22 分钟 · 待确认", "taskEvidence", "file-check-2"],
+            ["门口声音片段", "19:18 · 12 秒 · 未升级", "safetyDetail", "siren"],
+            ["书桌离席片段", "18:36 · 40 秒 · 已归档", "alertDetail", "footprints"],
+          ].map(([title, desc, route, ico]) => `<button class="alert-item" data-nav="${route}"><span>${icon(ico, "w-4 h-4")}</span><div><small>回放片段</small><strong>${title}</strong><p>${desc}</p></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}
+        </section>
       </section>
     `;
   },
@@ -716,19 +929,44 @@ const fullViews = {
   zones() {
     return `
       <section class="scene app-page">
-        ${backHeader("安全区域", "只提醒真正需要家长判断的边界", "watch")}
-        <section class="device-card-large"><img src="${refs.room}" alt="家庭安全区域示意" /><div><span class="capsule blue">书房 + 门口</span><h2>2 个区域已启用</h2><p>离开书桌超过 8 分钟才会进入待确认，不打断正常活动。</p></div></section>
-        <section class="settings-group"><button class="settings-row" data-sheet="zoneSheet"><span>${icon("map", "w-4 h-4")}</span><div><strong>书桌专注区</strong><small>任务期间离开 8 分钟提醒</small></div>${icon("chevron-right", "w-4 h-4")}</button><button class="settings-row warning" data-sheet="zoneSheet"><span>${icon("door-open", "w-4 h-4")}</span><div><strong>门口安全区</strong><small>异常声音 + 人形才升级告警</small></div>${icon("chevron-right", "w-4 h-4")}</button></section>
+        ${backHeader("安全区域", "区域规则只用于安全提醒，不参与奖励扣减。", "watch")}
+        <section class="device-card-large"><img src="${refs.room}" alt="家庭空间安全区域视角" /><div><span class="capsule blue">3 个区域</span><h2>书房与门口边界</h2><p>门口、厨房、窗边区域已启用冷却时间。</p></div></section>
+        <section class="settings-group">
+          ${[
+            ["door-open", "门口区域", "陌生人/持续敲门 · 立即提醒", "danger"],
+            ["utensils", "厨房区域", "夜间进入 · 汇总提醒", "warning"],
+            ["scan", "自定义书桌区", "离开 5 分钟后提醒", "info"],
+          ].map(([ico, title, desc, tone]) => `<button class="settings-row ${tone}" data-sheet="zone"><span>${icon(ico, "w-4 h-4")}</span><div><strong>${title}</strong><small>${desc}</small></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}
+        </section>
+        <button class="auth-primary" data-sheet="zone">新增安全区域</button>
       </section>
     `;
+  },
+
+  safety() {
+    return `
+      <section class="scene app-page">
+        ${backHeader("安全中心", "先确认，再升级。", "watch")}
+        ${stateCard("warning", "1 条安全事件待判断", "门口短促声音，未检测到陌生人入画。AI 建议联系孩子确认。", `<div class="chip-row center"><button class="chip primary" data-nav="safetyDetail">查看事件</button><button class="chip" data-sheet="safety">测试联系人</button></div>`)}
+        <section class="settings-group">
+          <button class="settings-row success" data-nav="zones"><span>${icon("scan", "w-4 h-4")}</span><div><strong>安全区域</strong><small>3 个区域启用，门口规则较敏感</small></div>${icon("chevron-right", "w-4 h-4")}</button>
+          <button class="settings-row" data-nav="familySettings"><span>${icon("users", "w-4 h-4")}</span><div><strong>紧急联系人</strong><small>妈妈、爸爸，外婆待邀请</small></div>${icon("chevron-right", "w-4 h-4")}</button>
+        </section>
+      </section>
+    `;
+  },
+
+  safetyDetail() {
+    return fullViews.alertDetail().replace("告警详情", "安全事件详情").replace("alerts", "safety");
   },
 
   report() {
     return `
       <section class="scene app-page">
-        ${backHeader("今日报告", "先看结论，再看证据", "my")}
-        <section class="detail-hero soft-blue"><span class="capsule ai">${icon("sparkles", "w-3.5 h-3.5")}AI 摘要</span><h2>今天整体稳定</h2><p>完成 2 个任务，1 个奖励申请待确认，安全事件 1 条已归档。</p><button class="auth-primary" data-nav="taskEvidence">查看关键证据</button></section>
-        <section class="summary-strip app-summary"><button class="summary-unit"><strong>2/3</strong><span>任务完成</span></button><button class="summary-unit"><strong>1</strong><span>安全事件</span></button><button class="summary-unit"><strong>+8</strong><span>积分</span></button></section>
+        ${backHeader("今日日报", "自动汇总，不鼓励全天盯屏。", "home")}
+        <section class="summary-strip app-summary"><button class="summary-unit"><strong>4</strong><span>任务</span></button><button class="summary-unit"><strong>88%</strong><span>完成度</span></button><button class="summary-unit"><strong>1</strong><span>待确认</span></button></section>
+        <section class="ai-bubble"><div class="ai-bubble-head"><span class="ai-mark">${icon("sparkles", "w-4 h-4")}</span><div><strong>今日摘要</strong><small>AI 汇总 · 家长可纠错</small></div></div><p>${childName()} 晚间任务整体稳定，数学口算需要确认证据，睡前流程建议提前 10 分钟开始。</p><div class="chip-row"><button class="chip primary" data-nav="taskEvidence">确认关键证据</button><button class="chip" data-sheet="moment">收藏成长时刻</button></div></section>
+        <section class="settings-group"><button class="settings-row" data-nav="weekly"><span>${icon("chart-line", "w-4 h-4")}</span><div><strong>查看周报趋势</strong><small>专注时长、任务完成、睡前稳定性</small></div>${icon("chevron-right", "w-4 h-4")}</button></section>
       </section>
     `;
   },
@@ -736,8 +974,9 @@ const fullViews = {
   weekly() {
     return `
       <section class="scene app-page">
-        ${backHeader("周报", "趋势与家长建议", "my")}
-        ${stateCard("success", "本周任务节奏更稳定", "平均开始时间提前 11 分钟，睡前打扰减少 2 次。建议下周继续保留小书包检查。", `<button class="auth-primary" data-toast="周报已分享给家庭成员">分享周报</button>`)}
+        ${backHeader("本周趋势", "只看对家长决策有用的变化。", "report")}
+        <section class="detail-hero soft-blue"><span class="capsule ai">${icon("chart-no-axes-combined", "w-3.5 h-3.5")}7 天趋势</span><h2>睡前任务更稳定</h2><p>完成率从 71% 提升到 86%，但周三设备离线导致证据缺失 1 次。</p><div class="progress-track"><span style="width: 86%"></span></div></section>
+        <section class="settings-group">${["数学口算连续 4 天完成", "小书包漏带风险下降", "睡前自由聊天建议继续限制"].map((title) => `<button class="settings-row" data-toast="${title}"><span>${icon("check-circle-2", "w-4 h-4")}</span><div><strong>${title}</strong><small>已进入周报摘要</small></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}</section>
       </section>
     `;
   },
@@ -745,26 +984,44 @@ const fullViews = {
   moments() {
     return `
       <section class="scene app-page">
-        ${backHeader("成长时刻", "由家长收藏，不自动公开", "my")}
-        <section class="h-scroll">${["主动整理书桌", "按时完成朗读", "睡前自己收书包"].map((title) => `<button class="story-tile blue" data-toast="${title}"><span class="capsule blue">${icon("star", "w-3.5 h-3.5")}已收藏</span><h4>${title}</h4><p>来自任务证据和家长确认。</p></button>`).join("")}</section>
+        ${backHeader("成长时刻", "优先收藏积极行为。", "my")}
+        <section class="alert-list">${[
+          ["主动整理书桌", "今天 20:16 · 睡前流程"],
+          ["完成朗读后主动复盘", "昨天 20:42 · 英语朗读"],
+          ["小书包一次准备齐", "周二 21:03 · 小书包"],
+        ].map(([title, desc]) => `<button class="alert-item" data-sheet="moment"><span>${icon("sparkles", "w-4 h-4")}</span><div><small>成长时刻</small><strong>${title}</strong><p>${desc}</p></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}</section>
       </section>
     `;
   },
 
   points() {
+    const stage = Math.floor(state.pointBalance / state.pointThreshold);
+    const [status, tone] = stage > 0 && !state.milestoneHandled ? ["可兑换", "warning"] : ["继续累积", "info"];
     return `
       <section class="scene app-page">
-        ${backHeader("积分奖励", "奖励需要家长确认", "my")}
-        <section class="timer-card"><span>当前余额</span><strong>46</strong><p>本周已增加 8 分，待确认奖励申请 1 个。</p><div class="chip-row center"><button class="chip primary" data-nav="taskReward">处理申请</button><button class="chip" data-nav="rewardShop">奖励商店</button></div></section>
+        ${backHeader("积分与奖励", `${pointUnitAmount(state.pointBalance)} · ${status}`, "my")}
+        <section class="detail-hero soft-blue">
+          <span class="capsule ${tone}">${icon("badge-check", "w-3.5 h-3.5")}${state.pointUnit}阶段</span>
+          <h2>${pointUnitAmount(state.pointBalance)}</h2>
+          <p>每 ${state.pointThreshold} ${state.pointUnit}提醒家长选择兑换或继续累积。奖励必须由家长确认。</p>
+          <div class="progress-track"><span style="width: ${Math.min(100, (state.pointBalance % state.pointThreshold) / state.pointThreshold * 100)}%"></span></div>
+          <div class="hero-actions static"><button class="primary-cta" data-sheet="manualReward">家长主动兑换</button><button class="ghost-cta" data-sheet="pointRule">阶段规则</button></div>
+        </section>
+        ${stage > 0 && !state.milestoneHandled ? stateCard("warning", `${state.pointUnit}已积满`, "可以现在兑换奖品，也可以继续累积到更大的奖励。", `<div class="chip-row center"><button class="chip primary" data-sheet="manualReward">选择奖品</button><button class="chip" data-action="milestone-continue">继续累积</button></div>`) : ""}
+        <section class="settings-group"><button class="settings-row" data-nav="reward"><span>${icon("gift", "w-4 h-4")}</span><div><strong>奖励商店</strong><small>${rewardOptions().length} 个奖品可选</small></div>${icon("chevron-right", "w-4 h-4")}</button></section>
       </section>
     `;
   },
 
-  rewardShop() {
+  reward() {
+    const [label, tone] = rewardLabel();
     return `
       <section class="scene app-page">
-        ${backHeader("奖励商店", "由家长管理奖品", "points")}
-        <section class="alert-list">${["周末户外活动 · 20 分", "多 15 分钟阅读灯 · 8 分", "家庭电影夜 · 30 分"].map((item) => `<button class="alert-item" data-sheet="rewardApprove"><span>${icon("gift", "w-4 h-4")}</span><div><small>可兑换奖励</small><strong>${item}</strong><p>兑换需要家长确认。</p></div>${icon("chevron-right", "w-4 h-4")}</button>`).join("")}</section>
+        ${backHeader("奖励商店", `${label} · 当前 ${pointUnitAmount(state.pointBalance)}`, "points")}
+        ${stateCard(tone, `${childName()} 申请兑换周末户外活动`, "摄像头只转达申请，不会向孩子直接承诺奖励。", `<div class="chip-row center"><button class="chip primary" data-sheet="reward">处理申请</button><button class="chip" data-sheet="rewardEdit">新增奖励</button></div>`)}
+        <section class="settings-group">
+          ${rewardOptions().map((item) => `<button class="settings-row" data-action="manual-reward-open" data-reward="${item.key}"><span>${icon("gift", "w-4 h-4")}</span><div><strong>${item.title}</strong><small>${item.desc} · ${pointUnitAmount(item.cost)}</small></div><b class="status-tag info">兑换</b></button>`).join("")}
+        </section>
       </section>
     `;
   },
@@ -772,17 +1029,38 @@ const fullViews = {
   checkin() {
     return `
       <section class="scene app-page">
-        ${backHeader("打卡审核", "证据通过后再发奖励", "my")}
-        ${stateCard("warning", "1 条打卡素材待审核", "孩子提交了英语朗读打卡，AI 只判断音量和时长，是否通过由家长确认。", `<div class="chip-row center"><button class="chip primary" data-toast="打卡已通过">通过</button><button class="chip danger" data-toast="已要求重拍">重拍</button></div>`)}
+        ${backHeader("打卡审核", "家长确认后进入日报。", "tasks")}
+        ${stateCard("warning", "朗读打卡待审核", "检测到 10 分钟朗读声音，但有 2 分钟背景噪音较高。", `<div class="chip-row center"><button class="chip primary" data-toast="已通过打卡">通过</button><button class="chip danger" data-toast="已要求重拍">要求重拍</button></div>`)}
       </section>
     `;
+  },
+
+  settings() {
+    return fullViews.my();
+  },
+
+  conversation() {
+    return fullViews.aiRules();
+  },
+
+  accountProfile() {
+    return `
+      <section class="scene app-page">
+        ${backHeader("个人资料", "用于家庭成员和通知称呼。", "accountSettings")}
+        <section class="app-form-card"><label class="app-field"><span>称呼</span><input data-parent-name value="${state.parentName}" /></label><label class="app-field"><span>家庭角色</span><input value="${state.parentRole}" /></label><button class="auth-primary" data-save-form="profile">保存资料</button></section>
+      </section>
+    `;
+  },
+
+  accountSecurity() {
+    return fullViews.accountSettings();
   },
 
   subscription() {
     return `
       <section class="scene app-page">
-        ${backHeader("订阅套餐", "当前为家庭基础版", "my")}
-        ${stateCard("info", "基础版已足够完成 MVP 流程", "包含 1 台设备、7 天事件回放、任务证据和家庭成员管理。", `<button class="auth-secondary" data-sheet="subscriptionDowngrade">查看权益说明</button>`)}
+        ${backHeader("订阅与权益", "核心看护功能不因降级失效。", "my")}
+        <section class="detail-hero soft-blue"><span class="capsule blue">${icon("sparkles", "w-3.5 h-3.5")}家庭版</span><h2>云端报告高级版</h2><p>长期趋势、更多人设和多设备云备份。任务提醒、实时查看、本地日报、隐私控制仍为基础能力。</p><div class="hero-actions static"><button class="primary-cta" data-toast="已打开续费">续费</button><button class="ghost-cta" data-sheet="subscriptionDowngrade">取消或降级</button></div></section>
       </section>
     `;
   },
@@ -790,58 +1068,168 @@ const fullViews = {
   education() {
     return `
       <section class="scene app-page">
-        ${backHeader("学习内容", "小书包和任务模板", "my")}
-        <section class="settings-group"><button class="settings-row" data-nav="packing"><span>${icon("backpack", "w-4 h-4")}</span><div><strong>小书包模板</strong><small>按课程自动生成明日物品</small></div>${icon("chevron-right", "w-4 h-4")}</button><button class="settings-row" data-nav="sleep"><span>${icon("moon", "w-4 h-4")}</span><div><strong>睡前流程模板</strong><small>洗漱、整理、关闭自由聊天</small></div>${icon("chevron-right", "w-4 h-4")}</button></section>
+        ${backHeader("教育与内容边界", "摄像头不替代家长和老师。", "my")}
+        <section class="settings-group"><button class="settings-row" data-nav="packing"><span>${icon("backpack", "w-4 h-4")}</span><div><strong>小书包规则</strong><small>${state.schoolbagMode} · 按年级推荐</small></div>${icon("chevron-right", "w-4 h-4")}</button><button class="settings-row" data-nav="conversation"><span>${icon("bot", "w-4 h-4")}</span><div><strong>答题边界</strong><small>不直接给答案，只做提示</small></div>${icon("chevron-right", "w-4 h-4")}</button></section>
       </section>
     `;
   },
+
+  feedback() {
+    return fullViews.helpFeedback();
+  },
+
+  about() {
+    return `
+      <section class="scene app-page">
+        ${backHeader("关于", "版本、原则与协议", "my")}
+        <section class="settings-group"><button class="settings-row"><span>${icon("info", "w-4 h-4")}</span><div><strong>版本 0.9.2</strong><small>HTML 高保真原型</small></div></button><button class="settings-row" data-sheet="terms"><span>${icon("file-text", "w-4 h-4")}</span><div><strong>用户协议</strong><small>查看服务条款摘要</small></div>${icon("chevron-right", "w-4 h-4")}</button><button class="settings-row" data-sheet="privacyPolicy"><span>${icon("scroll-text", "w-4 h-4")}</span><div><strong>隐私政策</strong><small>儿童数据处理说明</small></div>${icon("chevron-right", "w-4 h-4")}</button></section>
+      </section>
+    `;
+  },
+
 };
 
 function renderOverlay() {
-  const titleMap = {
-    createTask: ["创建任务", "选择任务类型后进入编辑页。"],
-    sleepTask: ["睡前 / 打卡任务", "适合整理书桌、洗漱、睡前阅读。"],
-    confirmEvidence: ["确认任务完成", "确认后将进入日报，并按规则发放奖励积分。"],
-    partialEvidence: ["标记部分完成", "可以补充说明，避免 AI 误判影响孩子。"],
-    rejectEvidence: ["驳回 AI 判断", "本次不会发放奖励，系统会记录为一次纠错样本。"],
-    delayTask: ["延后任务", "设备在线时会同步轻提醒。"],
-    endTask: ["结束当前任务", "结束后会立即生成证据摘要。"],
-    rewardApprove: ["同意兑现奖励", "会扣除积分并记录到奖励流水。"],
-    rewardReject: ["暂不兑换", "孩子端会收到温和反馈，不显示拒绝理由。"],
-    callChild: ["联系孩子", "发起前设备端会提示远程通话。"],
-    resolveAlert: ["标记已处理", "处理记录会进入今日安全日志。"],
-    falseAlarm: ["标记误报", "这会帮助 AI 调整后续告警阈值。"],
-    unbindDevice: ["确认解绑设备", "解绑后无法查看实时画面和新证据。"],
-    privacyMode: ["远程查看提示", "建议保持开启，让孩子知道家长正在查看。"],
-    deleteData: ["删除儿童数据", "危险操作，需要管理员二次确认。"],
-    aiWarning: ["确认 AI 规则变更", "放宽聊天或记录策略前需要确认边界。"],
-    memberRole: ["成员权限", "可设置为管理员、处理告警或仅查看摘要。"],
-    changePhone: ["更换手机号", "需要验证码确认新的家长身份。"],
-    loginDevices: ["登录设备", "可移除不再使用的设备。"],
-    logout: ["退出登录", "不会删除已绑定家庭和设备。"],
-    terms: ["用户协议摘要", "正式版会打开完整协议文档。"],
-    privacyPolicy: ["隐私政策摘要", "说明儿童音视频数据的采集、保存和删除。"],
-    zoneSheet: ["安全区域规则", "区域变更会先保存到 App，设备在线时同步生效。"],
-    subscriptionDowngrade: ["套餐权益说明", "当前原型只展示家庭基础版，正式版再接入支付。"],
+  const key = state.sheet || state.modal;
+  const simple = (title, body, primary = "确认", action = "", danger = false) => `
+    <h2>${title}</h2>
+    <p>${body}</p>
+    <div class="sheet-actions">
+      <button class="auth-primary ${danger ? "danger" : ""}" ${action ? `data-action="${action}"` : `data-confirm="${title}"`}>${primary}</button>
+      <button class="auth-secondary" data-close-layer>取消</button>
+    </div>
+  `;
+  const contentMap = {
+    createTask: `
+      <h2>创建任务</h2>
+      <p>选择任务类型，后续仍由家长确认是否需要证据、奖励或提醒。</p>
+      <div class="sheet-actions">
+        <button class="action-row" data-nav="taskEdit">${icon("check-square", "w-4 h-4")}普通任务${icon("chevron-right", "w-4 h-4")}</button>
+        <button class="action-row" data-nav="packing">${icon("backpack", "w-4 h-4")}小书包${icon("chevron-right", "w-4 h-4")}</button>
+        <button class="action-row" data-nav="sleep">${icon("moon", "w-4 h-4")}睡前 / 打卡${icon("chevron-right", "w-4 h-4")}</button>
+        <button class="action-row" data-nav="flow">${icon("sparkles", "w-4 h-4")}AI 推荐模板${icon("chevron-right", "w-4 h-4")}</button>
+      </div>
+    `,
+    taskTemplates: `
+      <h2>套用任务模板</h2>
+      <p>模板会合并到当前日期，不会覆盖你已经创建的任务。</p>
+      <div class="sheet-actions">
+        <button class="action-row" data-action="day-template-apply">${icon("book-open-check", "w-4 h-4")}放学后基础流<span>3 项</span></button>
+        <button class="action-row" data-nav="sleep">${icon("moon", "w-4 h-4")}睡前轻任务<span>4 项</span></button>
+        <button class="action-row" data-nav="packing">${icon("backpack", "w-4 h-4")}小书包检查<span>明早</span></button>
+      </div>
+    `,
+    taskDate: `
+      <h2>选择任务日期</h2>
+      <p>历史日期只能查看和复制，不能新增任务。</p>
+      <div class="sheet-actions">
+        ${["今天", "明天", "周六", "下周一"].map((day) => `<button class="action-row" data-action="task-day" data-day-label="${day}">${icon("calendar-days", "w-4 h-4")}${day}${icon("chevron-right", "w-4 h-4")}</button>`).join("")}
+      </div>
+    `,
+    timePicker: `
+      <h2>选择开始时间</h2>
+      <p>任务结束时间会按持续时长自动推算。</p>
+      <div class="sheet-grid">
+        ${["18:30", "19:00", "19:30", "20:10", "20:35", "21:10"].map((time) => `<button data-action="time-select" data-time="${time}">${time}</button>`).join("")}
+      </div>
+    `,
+    confirmEvidence: simple("确认任务完成", "确认后将进入日报，并按规则发放奖励积分。", "确认完成", "evidence-confirm"),
+    partialEvidence: simple("标记部分完成", "可以补充说明，避免 AI 误判影响孩子。", "标记部分完成", "evidence-partial"),
+    rejectEvidence: simple("驳回 AI 判断", "本次不会发放奖励，系统会记录为一次纠错样本。", "驳回 / 误报", "evidence-reject", true),
+    evidence: `
+      <h2>处理任务证据</h2>
+      <p>确认结果会进入日报和奖励流水。若 AI 判断不准，可以标记误判原因。</p>
+      <div class="sheet-actions">
+        <button class="auth-primary" data-action="evidence-confirm">确认完成</button>
+        <button class="auth-secondary" data-action="evidence-partial">改为部分完成</button>
+        <button class="danger-link" data-action="evidence-reject">驳回 / 误报</button>
+      </div>
+    `,
+    delayTask: simple("延后任务", "设备在线时会同步轻提醒，处理记录会进入今日任务日志。", "延后 10 分钟", "task-delay"),
+    endTask: simple("结束当前任务", "结束后会立即生成证据摘要，并进入家长确认。", "结束并生成证据", "task-end", true),
+    flowItem: simple("任务操作", "对卡住的任务可以延后、提醒、完成或跳过，所有操作都会进入处理记录。", "发送温和提醒", "flow-remind"),
+    sleepTask: simple("睡前 / 打卡任务", "适合整理书桌、洗漱、睡前阅读。", "进入睡前流程", "open-sleep"),
+    rewardApprove: simple("同意兑现奖励", "会扣除积分并记录到奖励流水。孩子端只会收到温和确认。", "同意并兑现", "reward-fulfilled"),
+    rewardReject: simple("暂不兑换", "孩子端会收到温和反馈，不显示拒绝理由。", "暂不兑换", "reward-rejected", true),
+    reward: `
+      <h2>确认奖励申请</h2>
+      <p>${childName()} 申请兑换“周末户外活动”。当前 ${pointUnitAmount(state.pointBalance)}，该奖励需要 ${pointUnitAmount(20)}。</p>
+      <div class="sheet-actions">
+        <button class="auth-primary" data-action="reward-fulfilled">同意并兑现</button>
+        <button class="auth-secondary" data-action="reward-planned">同意稍后</button>
+        <button class="danger-link" data-action="reward-rejected">暂不兑换</button>
+      </div>
+    `,
+    manualReward: `
+      <h2>家长主动兑换</h2>
+      <p>当前可用 ${pointUnitAmount(state.pointBalance)}。确认后会扣除对应${state.pointUnit}，记录到奖励流水。</p>
+      <div class="sheet-actions">
+        ${rewardOptions().map((item) => `<button class="action-row ${state.manualRewardKey === item.key ? "selected" : ""}" data-action="manual-reward-select" data-reward="${item.key}">${icon("gift", "w-4 h-4")}${item.title}<span>${pointUnitAmount(item.cost)}</span></button>`).join("")}
+        <button class="auth-primary" data-action="manual-reward-confirm">确认兑换</button>
+      </div>
+    `,
+    pointRule: `
+      <h2>奖励阶段设置</h2>
+      <p>达到阈值后提醒家长兑换或继续累积，AI 不会自动承诺奖励。</p>
+      <label class="app-field quiet"><span>每个阶段需要</span><input data-point-threshold inputmode="numeric" value="${state.pointThresholdDraft}" /></label>
+      <div class="sheet-grid">${["积分", "小红花", "小星星"].map((unit) => `<button class="${state.pointUnit === unit ? "active" : ""}" data-action="point-unit" data-unit="${unit}">${unit}</button>`).join("")}</div>
+      <button class="auth-primary" data-action="point-rule-save">保存设置</button>
+    `,
+    rewardEdit: `
+      <h2>${state.rewardEditingKey ? "修改奖励" : "添加奖励"}</h2>
+      <label class="app-field quiet"><span>奖品名称</span><input data-reward-name value="${state.rewardDraftName}" /></label>
+      <label class="app-field quiet"><span>所需${state.pointUnit}</span><input data-reward-cost inputmode="numeric" value="${state.rewardDraftCost}" /></label>
+      <button class="auth-primary" data-action="reward-save">保存奖励</button>
+    `,
+    packing: `
+      <h2>添加到小书包</h2>
+      <p>${state.childProfile.stage}会按“${state.schoolbagMode}”准备，也可以临时加一项。</p>
+      <label class="app-field quiet"><span>物品名称</span><input data-packing-draft value="${state.packingDraft}" /></label>
+      <button class="auth-primary" data-action="packing-add">保存到小书包</button>
+    `,
+    boundaries: `
+      <h2>默认互动边界</h2>
+      <p>作业模式只允许任务相关问答；睡前限制自由聊天；普通闲聊默认只保存主题摘要。</p>
+      <div class="sheet-grid">${["宽松", "平衡", "严格"].map((level) => `<button class="${state.boundaryLevel === level ? "active" : ""}" data-action="boundary-level" data-level="${level}">${level}</button>`).join("")}</div>
+      <button class="auth-primary" data-nav="conversation">去设置</button>
+    `,
+    contact: `
+      <h2>添加紧急联系人</h2>
+      <label class="app-field quiet"><span>联系人</span><input data-contact-name value="${state.contactDraft.name}" /></label>
+      <label class="app-field quiet"><span>手机号</span><input data-contact-phone inputmode="numeric" value="${state.contactDraft.phone}" /></label>
+      <button class="auth-primary" data-confirm="联系人已添加">保存</button>
+    `,
+    memberRole: `
+      <h2>成员权限</h2>
+      <p>权限会影响是否能处理告警、解绑设备和删除儿童数据。</p>
+      <div class="sheet-actions">
+        ${["管理员", "监护人", "仅查看日报"].map((role) => `<button class="action-row" data-confirm="已设为${role}">${icon("user-round-cog", "w-4 h-4")}${role}${icon("chevron-right", "w-4 h-4")}</button>`).join("")}
+      </div>
+    `,
+    zone: simple("新增安全区域", "选择摄像头视角中的区域，设置触发条件、冷却时间和通知对象。", "开始自定义框选", "zone-save"),
+    moment: simple("成长时刻操作", "成长时刻优先收藏积极行为。家长可以收藏、隐藏、删除或分享给家庭成员。", "收藏", "moment-save"),
+    callChild: simple("发起音频通话", "通话前设备端会提示孩子“家长正在联系你”。", "开始通话", "call-child"),
+    resolveAlert: simple("标记已处理", "处理记录会进入今日安全日志，后续可在报告中查看。", "标记已处理", "alert-resolve"),
+    falseAlarm: simple("标记误报", "这会帮助 AI 调整后续告警阈值，本次不会升级给紧急联系人。", "确认误报", "alert-false", true),
+    safety: simple("测试紧急联系人", "测试会给管理员和第二联系人发送模拟安全通知，不会触发真实报警。", "发送测试", "safety-test"),
+    privacyMode: simple("远程查看提示", "建议保持开启，让孩子知道家长正在查看。", "保持开启", "toggle-remote-hint"),
+    deleteData: simple("删除儿童数据", "删除会影响报告、证据和成长时刻。安全事件只保留最小必要内容。", "提交删除申请", "delete-data", true),
+    unbindDevice: simple("确认解绑设备", "解绑后无法查看实时画面和新证据。需要管理员二次确认。", "继续解绑", "unbind-device", true),
+    changePhone: simple("更换手机号", "更换后用于登录、安全验证和重要通知。", "确认更换", "change-phone"),
+    loginDevices: simple("登录设备", "当前手机今天 14:20 活跃；MacBook Safari 昨天 21:04 登录。", "移除非当前设备", "remove-login-device"),
+    logout: simple("退出登录", "退出后不会影响设备继续执行任务和安全提醒。", "退出登录", "logout", true),
+    subscriptionDowngrade: simple("取消或降级说明", "取消订阅不会影响任务提醒、实时查看、本地日报、隐私控制和儿童数据删除。", "知道了", "subscription-read"),
+    terms: simple("用户协议摘要", "服务协议包含家庭成员权限、设备绑定、订阅权益、客服支持和使用边界。", "知道了"),
+    privacyPolicy: simple("隐私政策摘要", "隐私政策说明儿童数据采集、保存、查看、导出和删除规则。", "知道了"),
+    aiWarning: simple("确认 AI 规则变更", "放宽聊天或记录策略前需要确认边界，关键判断仍由家长处理。", "确认保存", "ai-rule-save"),
   };
-  const [title, body] = titleMap[state.sheet || state.modal] || ["确认操作", "请确认是否继续。"];
-  const danger = ["rejectEvidence", "falseAlarm", "unbindDevice", "deleteData", "logout", "rewardReject"].includes(state.sheet);
+  const content = contentMap[key] || simple("确认操作", "请确认是否继续。");
+  const danger = ["rejectEvidence", "falseAlarm", "unbindDevice", "deleteData", "logout", "rewardReject"].includes(key);
   return `
     <div class="overlay-scrim" data-close-layer></div>
-    <section class="bottom-sheet ${danger ? "danger" : ""}" role="dialog" aria-modal="true" aria-label="${title}">
+    <section class="bottom-sheet ${danger ? "danger" : ""}" role="dialog" aria-modal="true">
       <span class="sheet-handle" aria-hidden="true"></span>
-      <h2>${title}</h2>
-      <p>${body}</p>
-      <div class="sheet-actions">
-        ${state.sheet === "createTask" ? `
-          <button class="action-row" data-nav="taskEdit">${icon("check-square", "w-4 h-4")}普通任务${icon("chevron-right", "w-4 h-4")}</button>
-          <button class="action-row" data-nav="taskEdit">${icon("backpack", "w-4 h-4")}小书包${icon("chevron-right", "w-4 h-4")}</button>
-          <button class="action-row" data-nav="taskEdit">${icon("moon", "w-4 h-4")}睡前 / 打卡${icon("chevron-right", "w-4 h-4")}</button>
-        ` : `
-          <button class="auth-primary ${danger ? "danger" : ""}" data-confirm="${title}">${danger ? "确认继续" : "确认"}</button>
-          <button class="auth-secondary" data-close-layer>取消</button>
-        `}
-      </div>
+      ${content}
     </section>
   `;
 }
@@ -854,31 +1242,46 @@ const navItems = [
   ["my", "user-round", "我的"],
 ];
 
-const setupRoutes = ["setup", "setupStart", "setupChild", "setupDevice", "setupPermissions", "setupPrivacy", "setupDone"];
+const setupRoutes = [
+  "setup",
+  "setupStart",
+  "setupDevice",
+  "setupWifi",
+  "setupBindDone",
+  "setupChild",
+  "setupName",
+  "setupContacts",
+  "setupPermissions",
+  "setupPrivacy",
+  "setupDone",
+];
 
 const routeGroups = {
-  home: ["home", "homeEmpty", "homeOffline", "homeLoading", "homeError", "permissionDenied"],
-  tasks: ["tasks", "taskDetail", "taskEdit", "taskEvidence", "taskRunning", "taskReward", "taskNoResult", "packing", "sleep"],
-  watch: ["watch", "watchOffline", "watchAlert", "watchPrivacy", "watchUpdating", "watchAbnormal", "playback", "zones"],
+  home: ["home", "care", "sleep", "report", "weekly", "homeEmpty", "homeOffline", "homeLoading", "homeError", "permissionDenied"],
+  tasks: ["tasks", "flow", "packing", "taskDetail", "taskEdit", "taskEvidence", "taskRunning", "focus", "taskReward", "taskNoResult", "checkin"],
+  watch: ["watch", "playback", "zones", "safety", "safetyDetail", "watchOffline", "watchAlert", "watchPrivacy", "watchUpdating", "watchAbnormal"],
   my: [
     "my",
     "alerts",
     "alertDetail",
+    "moments",
+    "points",
+    "reward",
+    "settings",
     "deviceSettings",
     "privacySettings",
     "aiRules",
+    "conversation",
     "familySettings",
     "notificationSettings",
     "accountSettings",
-    "helpFeedback",
-    "report",
-    "weekly",
-    "moments",
-    "points",
-    "rewardShop",
-    "checkin",
+    "accountProfile",
+    "accountSecurity",
     "subscription",
     "education",
+    "helpFeedback",
+    "feedback",
+    "about",
     "unauthorized",
     "bindingFailed",
     "deviceAbnormal",
@@ -891,6 +1294,68 @@ function activeTabFor(view) {
 
 function childName() {
   return state.childProfile.name || "孩子";
+}
+
+function parentLabel() {
+  return state.parentName || state.parentRole || "家长";
+}
+
+function pointUnitAmount(amount) {
+  return `${amount} ${state.pointUnit}`;
+}
+
+function evidenceLabel() {
+  const map = {
+    pending: ["待确认", "warning"],
+    confirmed: ["已确认完成", "success"],
+    partial: ["部分完成", "warning"],
+    rejected: ["已驳回 / 误报", "danger"],
+  };
+  return map[state.evidenceStatus] || map.pending;
+}
+
+function rewardLabel() {
+  const map = {
+    requested: ["待家长确认", "warning"],
+    fulfilled: ["已兑现", "success"],
+    planned: ["已同意稍后兑现", "info"],
+    rejected: ["暂不兑换", "danger"],
+  };
+  return map[state.rewardStatus] || map.requested;
+}
+
+function rewardOptions() {
+  return state.rewardItems;
+}
+
+function selectedReward() {
+  return rewardOptions().find((item) => item.key === state.manualRewardKey) || rewardOptions()[0];
+}
+
+function packingRows() {
+  const labels = {
+    mathbook: ["book-open-check", "数学本", "明天第一节数学课"],
+    bottle: ["cup-soda", "水杯", "AI 未在书包侧袋识别到"],
+    scarf: ["badge-check", "红领巾", "早晨出门前提醒"],
+    pencil: ["pencil", "铅笔盒", "已在书桌右侧"],
+  };
+  const statusCopy = {
+    done: ["已确认", "success"],
+    missing: ["缺失", "danger"],
+    todo: ["待检查", "warning"],
+  };
+  return Object.entries(labels)
+    .map(([key, [ico, title, desc]]) => {
+      const [status, tone] = statusCopy[state.packingStatus[key] || "todo"];
+      return `
+        <button class="settings-row ${tone}" data-action="packing-status" data-item="${key}" data-status="${state.packingStatus[key] === "done" ? "todo" : "done"}">
+          <span>${icon(ico, "w-4 h-4")}</span>
+          <div><strong>${title}</strong><small>${desc}</small></div>
+          <b class="status-tag ${tone}">${status}</b>
+        </button>
+      `;
+    })
+    .join("");
 }
 
 const onboardingSlides = [
@@ -1013,8 +1478,8 @@ function renderDock() {
   return `
     <div class="create-fan" aria-hidden="${state.createOpen ? "false" : "true"}">
       <button class="fan-action" data-sheet="createTask">${icon("check-square")}</button>
-      <button class="fan-action" data-nav="taskEdit" data-toast="已打开小书包任务模板">${icon("backpack")}</button>
-      <button class="fan-action" data-sheet="sleepTask">${icon("moon")}</button>
+      <button class="fan-action" data-nav="packing">${icon("backpack")}</button>
+      <button class="fan-action" data-nav="sleep">${icon("moon")}</button>
     </div>
     <button class="create-core" aria-label="创建任务" aria-expanded="${state.createOpen}" data-create-toggle>
       ${icon("plus")}
@@ -1273,7 +1738,7 @@ const views = {
             </div>
             <button data-toast="已打开全部待确认">处理全部</button>
           </div>
-          <button class="queue-item urgent" data-toast="已打开数学口算证据">
+          <button class="queue-item urgent" data-nav="taskEvidence">
             <span class="queue-icon">${icon("file-check-2", "w-4 h-4")}</span>
             <span class="queue-copy">
               <strong>数学口算证据即将生成</strong>
@@ -1281,7 +1746,7 @@ const views = {
             </span>
             ${icon("chevron-right", "w-4 h-4")}
           </button>
-          <button class="queue-item" data-toast="已打开奖励申请">
+          <button class="queue-item" data-nav="taskReward">
             <span class="queue-icon warm">${icon("gift", "w-4 h-4")}</span>
             <span class="queue-copy">
               <strong>小宇申请兑换周末户外活动</strong>
@@ -1290,7 +1755,7 @@ const views = {
             ${icon("chevron-right", "w-4 h-4")}
           </button>
           <div class="quick-row">
-            <button class="chip primary" data-toast="已进入待确认队列">处理待确认</button>
+            <button class="chip primary" data-nav="care">处理待确认</button>
             <button class="chip" data-toast="已设置 20 分钟后提醒">稍后提醒</button>
           </div>
         </section>
@@ -1353,14 +1818,14 @@ const views = {
               <small>进行中 · 结束后证据确认</small>
             </div>
           </button>
-          <button class="plan-row" data-toast="已打开小书包检查">
+          <button class="plan-row" data-nav="packing">
             <span>20:35</span>
             <div>
               <strong>小书包检查</strong>
               <small>水杯、数学本、红领巾</small>
             </div>
           </button>
-          <button class="plan-row bedtime" data-toast="已设置睡前提醒">
+          <button class="plan-row bedtime" data-nav="sleep">
             <span>21:10</span>
             <div>
               <strong>睡前流程</strong>
@@ -1379,7 +1844,7 @@ const views = {
           </div>
           <p>书桌活动连续、没有异常声音，设备在线且隐私灯开启。建议等任务结束后一次处理证据和奖励申请。</p>
           <div class="chip-row">
-            <button class="chip primary" data-toast="已打开证据处理建议">查看处理建议</button>
+            <button class="chip primary" data-nav="report">查看处理建议</button>
             <button class="chip" data-toast="已标记稍后提醒">稍后提醒我</button>
           </div>
         </section>
@@ -1418,6 +1883,17 @@ const views = {
             .join("")}
         </section>
 
+        <section class="search-card compact-search">
+          <input data-task-search value="${state.taskSearch}" placeholder="搜索任务、模板、小书包" />
+          <button data-nav="${state.taskSearch ? "taskNoResult" : "flow"}">${state.taskSearch ? "搜索" : "筛选"}</button>
+        </section>
+        <section class="filter-row" aria-label="任务筛选">
+          ${["all:全部", "todo:待做", "doing:进行中", "done:已完成"].map((item) => {
+            const [id, label] = item.split(":");
+            return `<button class="${state.taskFilter === id ? "active" : ""}" data-task-filter="${id}">${label}</button>`;
+          }).join("")}
+        </section>
+
         <section class="mission-hero">
           <div class="mission-top">
             <div>
@@ -1433,7 +1909,7 @@ const views = {
                 结束后自动生成证据，家长只需确认完成/部分完成/驳回。
               </p>
             </div>
-            <button class="soft-cta" data-toast="已进入专注计时">${icon("play", "w-4 h-4")}查看</button>
+            <button class="soft-cta" data-nav="taskDetail">${icon("play", "w-4 h-4")}查看</button>
           </div>
         </section>
 
@@ -1452,7 +1928,7 @@ const views = {
             <h4>21:10 开始</h4>
             <p>洗漱、整理桌面、关闭自由聊天。</p>
           </button>
-          <button class="template-card" data-toast="已加入英语朗读">
+          <button class="template-card" data-nav="flow">
             <span class="capsule warn">${icon("mic", "w-3.5 h-3.5")}朗读</span>
             <h4>英语 10 分钟</h4>
             <p>声音检测 + 家长抽查，更适合睡前前置。</p>
@@ -1469,7 +1945,7 @@ const views = {
           </div>
           <p>今天 21:10 后有睡前流程。如果临时加任务，建议只加“小书包检查”，避免挤占上床时间。</p>
           <div class="chip-row">
-            <button class="chip primary" data-toast="已创建小书包检查">加小书包</button>
+              <button class="chip primary" data-nav="packing">加小书包</button>
             <button class="chip" data-toast="已延后英语朗读到明天">延到明天</button>
           </div>
         </section>
@@ -1514,8 +1990,8 @@ const views = {
               书桌区域连续活动 18 分钟，未检测到离席、异常声音或陌生人入画。证据只关联当前任务，不保存全天连续录像。
             </p>
             <div class="chip-row">
-              <button class="chip primary" data-toast="已打开证据说明">查看证据</button>
-              <button class="chip" data-toast="已打开隐私说明">隐私说明</button>
+              <button class="chip primary" data-nav="playback">查看证据</button>
+              <button class="chip" data-nav="privacySettings">隐私说明</button>
             </div>
           </section>
 
@@ -1529,15 +2005,10 @@ const views = {
               <h4>数学口算</h4>
               <p>剩余 12 分钟，结束后进入证据确认。</p>
             </button>
-            <button class="story-tile warm" data-nav="zones">
+            <button class="story-tile warm" data-nav="deviceSettings">
               <span class="capsule warn">${icon("signal", "w-3.5 h-3.5")}网络</span>
               <h4>低清稳定模式</h4>
               <p>保持流畅优先，截图仍可保存。</p>
-            </button>
-            <button class="story-tile blue" data-nav="playback">
-              <span class="capsule blue">${icon("play", "w-3.5 h-3.5")}回放</span>
-              <h4>事件片段</h4>
-              <p>只保留任务和安全事件的必要片段。</p>
             </button>
           </section>
         </section>
@@ -1558,14 +2029,246 @@ function showToast(message) {
   setTimeout(() => document.getElementById(id)?.remove(), 2600);
 }
 
+function closeActiveLayer() {
+  state.sheet = "";
+  state.modal = "";
+}
+
+function handleAction(target) {
+  const action = target.dataset.action;
+  if (!action) return false;
+
+  if (action === "parent-role") {
+    const role = target.dataset.role || state.parentRole;
+    state.parentRole = role;
+    if (!state.parentName || ["妈妈", "爸爸", "祖辈", "其他照护人"].includes(state.parentName)) state.parentName = role;
+    render();
+    return true;
+  }
+
+  if (action === "boundary-level") {
+    state.boundaryLevel = target.dataset.level || state.boundaryLevel;
+    render();
+    showToast(`已切换为${state.boundaryLevel}模式`);
+    return true;
+  }
+
+  if (action === "day-template-apply") {
+    closeActiveLayer();
+    state.selectedDay = "今天";
+    goTo("tasks");
+    showToast("已套用推荐任务模板");
+    return true;
+  }
+
+  if (action === "task-day") {
+    state.selectedDay = target.dataset.dayLabel || state.selectedDay;
+    closeActiveLayer();
+    goTo("tasks");
+    showToast(`已切换到${state.selectedDay}`);
+    return true;
+  }
+
+  if (action === "time-select") {
+    state.taskDraft.start = target.dataset.time || state.taskDraft.start;
+    closeActiveLayer();
+    goTo("taskEdit");
+    showToast(`开始时间已改为 ${state.taskDraft.start}`);
+    return true;
+  }
+
+  if (action.startsWith("evidence-")) {
+    const next = action === "evidence-confirm" ? "confirmed" : action === "evidence-partial" ? "partial" : "rejected";
+    state.evidenceStatus = next;
+    if (next === "confirmed") state.pointBalance += Number(state.taskDraft.reward || 3);
+    closeActiveLayer();
+    goTo("taskEvidence");
+    showToast(next === "confirmed" ? "已确认完成，积分已入账" : next === "partial" ? "已标记部分完成" : "已标记误报/驳回");
+    return true;
+  }
+
+  if (action === "task-delay") {
+    closeActiveLayer();
+    goTo("taskDetail");
+    showToast("已延后 10 分钟并同步设备");
+    return true;
+  }
+
+  if (action === "task-end") {
+    state.evidenceStatus = "pending";
+    closeActiveLayer();
+    goTo("taskEvidence");
+    showToast("已结束任务，正在生成证据");
+    return true;
+  }
+
+  if (action === "flow-remind") {
+    closeActiveLayer();
+    showToast("已发送温和提醒");
+    return true;
+  }
+
+  if (action === "open-sleep") {
+    closeActiveLayer();
+    goTo("sleep");
+    return true;
+  }
+
+  if (action.startsWith("reward-")) {
+    const next = action.replace("reward-", "");
+    state.rewardStatus = next === "fulfilled" ? "fulfilled" : next === "planned" ? "planned" : "rejected";
+    if (next === "fulfilled" && !state.childRewardDeducted) {
+      state.pointBalance = Math.max(0, state.pointBalance - 20);
+      state.childRewardDeducted = true;
+      state.lastManualReward = `语音申请：周末户外活动 -${pointUnitAmount(20)}`;
+    }
+    closeActiveLayer();
+    goTo("reward");
+    showToast(next === "fulfilled" ? "奖励已兑现并扣除积分" : next === "planned" ? "已同意稍后兑现" : "已暂不兑换");
+    return true;
+  }
+
+  if (action === "manual-reward-select" || action === "manual-reward-open") {
+    state.manualRewardKey = target.dataset.reward || state.manualRewardKey;
+    state.sheet = "manualReward";
+    render();
+    return true;
+  }
+
+  if (action === "manual-reward-confirm") {
+    const reward = selectedReward();
+    if (!reward) return true;
+    if (state.pointBalance < reward.cost) {
+      showToast(`${state.pointUnit}不足，先继续累积`);
+      return true;
+    }
+    state.pointBalance -= reward.cost;
+    state.lastManualReward = `${reward.title} -${pointUnitAmount(reward.cost)}`;
+    state.milestoneHandled = false;
+    closeActiveLayer();
+    goTo("points");
+    showToast(`已兑换 ${reward.title}`);
+    return true;
+  }
+
+  if (action === "point-unit") {
+    state.pointUnit = target.dataset.unit || state.pointUnit;
+    render();
+    return true;
+  }
+
+  if (action === "milestone-continue") {
+    state.milestoneHandled = true;
+    closeActiveLayer();
+    goTo("points");
+    showToast("已继续累积");
+    return true;
+  }
+
+  if (action === "point-rule-save") {
+    const nextThreshold = Number(state.pointThresholdDraft);
+    if (!Number.isInteger(nextThreshold) || nextThreshold < 1) {
+      showToast("请输入阶段阈值");
+      return true;
+    }
+    state.pointThreshold = Math.min(999, nextThreshold);
+    closeActiveLayer();
+    goTo("points");
+    showToast("阶段规则已保存");
+    return true;
+  }
+
+  if (action === "reward-save") {
+    const title = state.rewardDraftName.trim();
+    const cost = Number(state.rewardDraftCost);
+    if (!title || !cost) {
+      showToast("请填写奖品名称和所需数量");
+      return true;
+    }
+    if (state.rewardEditingKey) {
+      state.rewardItems = state.rewardItems.map((item) => (item.key === state.rewardEditingKey ? { ...item, title, cost } : item));
+    } else {
+      const key = `custom-${Date.now()}`;
+      state.rewardItems = [...state.rewardItems, { key, title, cost, desc: "家长新增奖励", tone: "blue" }];
+      state.manualRewardKey = key;
+    }
+    closeActiveLayer();
+    goTo("reward");
+    showToast(state.rewardEditingKey ? "奖励已修改" : "奖励已添加");
+    return true;
+  }
+
+  if (action === "packing-status") {
+    const item = target.dataset.item;
+    if (item) state.packingStatus[item] = target.dataset.status || "done";
+    render();
+    showToast("小书包状态已更新");
+    return true;
+  }
+
+  if (action === "packing-add") {
+    const item = (state.packingDraft || "").trim();
+    if (item && !state.packingExtra.includes(item)) state.packingExtra.push(item);
+    state.packingDraft = "跳绳";
+    closeActiveLayer();
+    goTo("packing");
+    showToast("已添加到小书包");
+    return true;
+  }
+
+  if (action === "packing-extra-remove") {
+    const index = Number(target.dataset.index);
+    state.packingExtra = state.packingExtra.filter((_, itemIndex) => itemIndex !== index);
+    render();
+    showToast("已移除临时物品");
+    return true;
+  }
+
+  const toastActions = {
+    "zone-save": "已开始自定义安全区域",
+    "moment-save": "已收藏成长时刻",
+    "call-child": "正在发起音频通话",
+    "alert-resolve": "已标记处理完成",
+    "alert-false": "已标记误报",
+    "safety-test": "测试通知已发送",
+    "toggle-remote-hint": "远程查看提示已保持开启",
+    "delete-data": "已提交删除申请",
+    "unbind-device": "已进入管理员确认",
+    "change-phone": "手机号已更新",
+    "remove-login-device": "已移除备用登录设备",
+    logout: "已退出登录",
+    "subscription-read": "已了解订阅降级说明",
+    "ai-rule-save": "AI 规则已保存",
+  };
+  if (toastActions[action]) {
+    if (action === "alert-resolve") state.alertStatus = "resolved";
+    if (action === "alert-false") state.alertStatus = "false";
+    closeActiveLayer();
+    render();
+    showToast(toastActions[action]);
+    return true;
+  }
+
+  return false;
+}
+
 document.addEventListener("click", (event) => {
   const closeLayer = event.target.closest("[data-close-layer]");
   if (closeLayer) {
-    state.sheet = "";
-    state.modal = "";
+    closeActiveLayer();
     render();
     return;
   }
+
+  const close = event.target.closest("[data-close]");
+  if (close) {
+    closeActiveLayer();
+    render();
+    return;
+  }
+
+  const action = event.target.closest("[data-action]");
+  if (action && handleAction(action)) return;
 
   const sheet = event.target.closest("[data-sheet]");
   if (sheet) {
@@ -1600,10 +2303,13 @@ document.addEventListener("click", (event) => {
     setTimeout(() => {
       state.childProfile.name = name;
       state.childProfile.age = `${state.childDraft.age || 8} 岁`;
-      state.childProfile.relation = state.childDraft.relation || "家长";
+      state.childProfile.relation = parentLabel();
+      state.childProfile.stage = state.childDraft.stage || "小学";
+      state.childProfile.grade = state.childDraft.grade || "二年级";
+      state.childProfile.className = state.childDraft.className || "";
       state.setupSaving = false;
       showToast("孩子资料已保存");
-      goTo("setupDevice");
+      goTo("setupName");
     }, 620);
     return;
   }
@@ -1615,7 +2321,7 @@ document.addEventListener("click", (event) => {
     setTimeout(() => {
       state.bindingStatus = "success";
       showToast("设备已识别");
-      goTo("setupPermissions");
+      goTo("setupWifi");
     }, 900);
     return;
   }
@@ -1660,6 +2366,14 @@ document.addEventListener("click", (event) => {
   if (alertFilter) {
     state.alertFilter = alertFilter.dataset.alertFilter;
     render();
+    return;
+  }
+
+  const taskFilter = event.target.closest("[data-task-filter]");
+  if (taskFilter) {
+    state.taskFilter = taskFilter.dataset.taskFilter;
+    render();
+    showToast(`已筛选${taskFilter.textContent.trim()}任务`);
     return;
   }
 
@@ -1826,6 +2540,13 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("input", (event) => {
+  const parentNameInput = event.target.closest("[data-parent-name]");
+  if (parentNameInput) {
+    state.parentName = parentNameInput.value;
+    state.childProfile.relation = parentNameInput.value || state.parentRole;
+    return;
+  }
+
   const childNameInput = event.target.closest("[data-child-name]");
   if (childNameInput) {
     state.childDraft.name = childNameInput.value;
@@ -1843,6 +2564,43 @@ document.addEventListener("input", (event) => {
   const childRelation = event.target.closest("[data-child-relation]");
   if (childRelation) {
     state.childDraft.relation = childRelation.value;
+    return;
+  }
+
+  const childStage = event.target.closest("[data-child-stage]");
+  if (childStage) {
+    state.childDraft.stage = childStage.value;
+    return;
+  }
+
+  const childGrade = event.target.closest("[data-child-grade]");
+  if (childGrade) {
+    state.childDraft.grade = childGrade.value;
+    return;
+  }
+
+  const childClass = event.target.closest("[data-child-class]");
+  if (childClass) {
+    state.childDraft.className = childClass.value;
+    return;
+  }
+
+  const wakeName = event.target.closest("[data-wake-name]");
+  if (wakeName) {
+    state.wakeName = wakeName.value;
+    return;
+  }
+
+  const contactName = event.target.closest("[data-contact-name]");
+  if (contactName) {
+    state.contactDraft.name = contactName.value;
+    return;
+  }
+
+  const contactPhone = event.target.closest("[data-contact-phone]");
+  if (contactPhone) {
+    state.contactDraft.phone = digitsOnly(contactPhone.value).slice(0, 11);
+    contactPhone.value = state.contactDraft.phone;
     return;
   }
 
@@ -1865,6 +2623,32 @@ document.addEventListener("input", (event) => {
   const taskSearch = event.target.closest("[data-task-search]");
   if (taskSearch) {
     state.taskSearch = taskSearch.value;
+    return;
+  }
+
+  const pointThreshold = event.target.closest("[data-point-threshold]");
+  if (pointThreshold) {
+    state.pointThresholdDraft = digitsOnly(pointThreshold.value).slice(0, 3);
+    pointThreshold.value = state.pointThresholdDraft;
+    return;
+  }
+
+  const rewardName = event.target.closest("[data-reward-name]");
+  if (rewardName) {
+    state.rewardDraftName = rewardName.value;
+    return;
+  }
+
+  const rewardCost = event.target.closest("[data-reward-cost]");
+  if (rewardCost) {
+    state.rewardDraftCost = digitsOnly(rewardCost.value).slice(0, 3);
+    rewardCost.value = state.rewardDraftCost;
+    return;
+  }
+
+  const packingDraft = event.target.closest("[data-packing-draft]");
+  if (packingDraft) {
+    state.packingDraft = packingDraft.value;
     return;
   }
 
