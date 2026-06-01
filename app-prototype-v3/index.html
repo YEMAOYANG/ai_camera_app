@@ -1,0 +1,2274 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mira Guardian v3 高保真 App 原型</title>
+  <link rel="icon" href="data:," />
+  <style>
+    :root {
+      --bg-dark: #050505;
+      --bg-dark-2: #0b0b0b;
+      --surface-dark: #121212;
+      --surface-dark-2: #1b1b1b;
+      --line-dark: #242424;
+      --ink-dark: #ffffff;
+      --muted-dark: #9a9a9a;
+      --bg-light: #f5f5f5;
+      --bg-light-2: #f7f7f7;
+      --surface-light: #ffffff;
+      --surface-light-2: #eeeeee;
+      --line-light: #e5e5e5;
+      --ink-light: #111111;
+      --muted-light: #666666;
+      --blue: #66a3ff;
+      --blue-deep: #1c64f2;
+      --success: #2fbe71;
+      --warning: #d99a24;
+      --danger: #e5484d;
+      --radius-card: 8px;
+      --radius-control: 8px;
+      --radius-sheet: 24px;
+      --shadow-compact: 0 8px 18px rgba(0,0,0,.18);
+      --dur-1: 140ms;
+      --dur-2: 220ms;
+      --dur-3: 320ms;
+      --ease-out: cubic-bezier(.16,1,.3,1);
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "HarmonyOS Sans", "MiSans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      background: #101010;
+      color: var(--ink-dark);
+      font-family: var(--font-sans);
+      letter-spacing: 0;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    button, input, select, textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+    .app-shell {
+      position: relative;
+      min-height: 100dvh;
+      height: 100dvh;
+      max-width: 430px;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--bg-dark);
+      color: var(--ink-dark);
+    }
+    .app-shell.light {
+      background: var(--bg-light);
+      color: var(--ink-light);
+    }
+    .app-scroll {
+      min-height: 100dvh;
+      height: 100%;
+      overflow-y: auto;
+      padding: calc(16px + env(safe-area-inset-top)) 18px 118px;
+      scrollbar-width: none;
+    }
+    .app-scroll::-webkit-scrollbar { display: none; }
+    .screen {
+      min-height: calc(100dvh - 136px);
+      animation: pageIn var(--dur-3) var(--ease-out);
+    }
+    @keyframes pageIn {
+      from { opacity: .72; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 46px;
+      margin-bottom: 16px;
+    }
+    .topbar-title {
+      min-width: 0;
+    }
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--muted-dark);
+      font-size: 13px;
+      font-weight: 650;
+      line-height: 1.2;
+    }
+    .light .eyebrow { color: var(--muted-light); }
+    h1, h2, h3, p { margin: 0; }
+    h1 {
+      color: inherit;
+      font-size: 32px;
+      line-height: 1.06;
+      font-weight: 760;
+      text-wrap: balance;
+    }
+    h2 {
+      font-size: 24px;
+      line-height: 1.14;
+      font-weight: 740;
+      text-wrap: balance;
+    }
+    h3 {
+      font-size: 17px;
+      line-height: 1.2;
+      font-weight: 720;
+    }
+    .copy {
+      color: var(--muted-dark);
+      font-size: 14px;
+      line-height: 1.56;
+      text-wrap: pretty;
+    }
+    .light .copy { color: var(--muted-light); }
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      flex: 0 0 auto;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .icon-button {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      color: var(--ink-dark);
+    }
+    .light .icon-button {
+      background: #fff;
+      color: var(--ink-light);
+    }
+    .hero-image {
+      position: relative;
+      min-height: 280px;
+      overflow: hidden;
+      border-radius: var(--radius-card);
+      background: #111;
+    }
+    .hero-image.small { min-height: 210px; }
+    .hero-image img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+    }
+    .hero-image::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.64));
+      pointer-events: none;
+    }
+    .hero-overlay {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      z-index: 1;
+      display: grid;
+      gap: 10px;
+    }
+    .panel {
+      border-radius: var(--radius-card);
+      background: var(--surface-dark);
+      border: 1px solid var(--line-dark);
+      padding: 16px;
+    }
+    .light .panel {
+      background: var(--surface-light);
+      border-color: var(--line-light);
+    }
+    .panel.flat {
+      border: 0;
+      background: var(--surface-dark-2);
+    }
+    .light .panel.flat { background: var(--surface-light); }
+    .panel.invert {
+      background: #fff;
+      color: #111;
+      border-color: #fff;
+    }
+    .section-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 20px 0 10px;
+    }
+    .section-title p {
+      margin-top: 5px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .metric {
+      min-height: 78px;
+      border-radius: var(--radius-card);
+      background: rgba(255,255,255,.08);
+      padding: 12px;
+    }
+    .light .metric { background: var(--surface-light-2); }
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 780;
+      font-variant-numeric: tabular-nums;
+    }
+    .metric span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted-dark);
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .light .metric span { color: var(--muted-light); }
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      border-radius: 999px;
+      padding: 0 10px;
+      background: rgba(255,255,255,.08);
+      color: var(--ink-dark);
+      font-size: 12px;
+      font-weight: 680;
+      white-space: nowrap;
+    }
+    .light .chip {
+      background: var(--surface-light-2);
+      color: var(--ink-light);
+    }
+    .chip.success { color: var(--success); }
+    .chip.warning { color: var(--warning); }
+    .chip.danger { color: var(--danger); }
+    .chip.info { color: var(--blue); }
+    .list {
+      display: grid;
+      gap: 8px;
+    }
+    .list-row {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 64px;
+      padding: 12px;
+      border: 0;
+      border-radius: var(--radius-card);
+      background: var(--surface-dark);
+      color: inherit;
+      text-align: left;
+    }
+    .light .list-row { background: var(--surface-light); }
+    .list-row .row-icon {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-card);
+      background: rgba(255,255,255,.08);
+      color: var(--ink-dark);
+    }
+    .light .list-row .row-icon {
+      background: var(--surface-light-2);
+      color: var(--ink-light);
+    }
+    .row-main { min-width: 0; }
+    .row-title {
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 720;
+      color: inherit;
+    }
+    .row-desc {
+      margin-top: 5px;
+      color: var(--muted-dark);
+      font-size: 12px;
+      line-height: 1.38;
+    }
+    .light .row-desc { color: var(--muted-light); }
+    .row-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted-dark);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .light .row-right { color: var(--muted-light); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      border: 0;
+      border-radius: var(--radius-control);
+      padding: 0 16px;
+      font-size: 14px;
+      font-weight: 740;
+      text-align: center;
+      transition: transform var(--dur-1) var(--ease-out), opacity var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+    }
+    .btn:active { transform: scale(.98); }
+    .btn.primary {
+      background: #fff;
+      color: #050505;
+    }
+    .light .btn.primary {
+      background: #111;
+      color: #fff;
+    }
+    .btn.secondary {
+      background: rgba(255,255,255,.1);
+      color: var(--ink-dark);
+    }
+    .light .btn.secondary {
+      background: var(--surface-light-2);
+      color: var(--ink-light);
+    }
+    .btn.danger {
+      background: rgba(229,72,77,.12);
+      color: var(--danger);
+    }
+    .btn.block { width: 100%; }
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .field label {
+      font-size: 13px;
+      font-weight: 720;
+      color: inherit;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      min-height: 50px;
+      border: 0;
+      border-radius: var(--radius-control);
+      background: var(--surface-light-2);
+      color: var(--ink-light);
+      padding: 0 14px;
+      outline: none;
+    }
+    .field textarea {
+      min-height: 112px;
+      padding: 14px;
+      resize: none;
+      line-height: 1.5;
+    }
+    .field .error {
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 650;
+      display: none;
+    }
+    .has-error .error { display: block; }
+    .has-error input { box-shadow: inset 0 0 0 1px var(--danger); }
+    .shake { animation: shake var(--dur-3) var(--ease-out); }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-7px); }
+      45% { transform: translateX(6px); }
+      70% { transform: translateX(-3px); }
+    }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 10px;
+    }
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 10px;
+      min-height: 56px;
+    }
+    .timeline-dot {
+      width: 12px;
+      height: 12px;
+      margin: 5px auto 0;
+      border-radius: 50%;
+      background: var(--line-dark);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.04);
+    }
+    .timeline-dot.on { background: var(--success); }
+    .timeline-dot.warn { background: var(--warning); }
+    .timeline-dot.danger { background: var(--danger); }
+    .light .timeline-dot { background: #d7d7d7; box-shadow: 0 0 0 6px rgba(0,0,0,.04); }
+    .segmented {
+      display: flex;
+      gap: 6px;
+      padding: 4px;
+      border-radius: var(--radius-control);
+      background: rgba(255,255,255,.08);
+    }
+    .light .segmented { background: var(--surface-light-2); }
+    .segmented button {
+      flex: 1;
+      min-height: 36px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: inherit;
+      font-size: 12px;
+      font-weight: 740;
+    }
+    .segmented button.active {
+      background: #fff;
+      color: #111;
+    }
+    .light .segmented button.active {
+      background: #111;
+      color: #fff;
+    }
+    .tabbar {
+      position: fixed;
+      left: 50%;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      z-index: 30;
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: 1fr 1fr 62px 1fr 1fr;
+      align-items: center;
+      width: min(398px, calc(100vw - 22px));
+      height: 74px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.96);
+      color: #111;
+      padding: 8px 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.22);
+    }
+    .tabbar.hidden { display: none; }
+    .nav-btn {
+      display: grid;
+      place-items: center;
+      gap: 3px;
+      min-height: 56px;
+      border: 0;
+      border-radius: 18px;
+      background: transparent;
+      color: #777;
+      font-size: 11px;
+      font-weight: 720;
+    }
+    .nav-btn.active {
+      color: #111;
+      background: #f1f1f1;
+    }
+    .main-fab {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 58px;
+      height: 58px;
+      margin: -24px auto 0;
+      border: 0;
+      border-radius: 50%;
+      background: #111;
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,.32);
+      transition: transform var(--dur-2) var(--ease-out);
+    }
+    .main-fab.open { transform: scale(1.05) rotate(45deg); }
+    .quick-actions {
+      position: fixed;
+      left: 50%;
+      bottom: 96px;
+      z-index: 29;
+      transform: translateX(-50%);
+      display: none;
+      width: min(350px, calc(100vw - 56px));
+      gap: 8px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .quick-actions.open { display: grid; animation: sheetUp var(--dur-2) var(--ease-out); }
+    .quick-actions button {
+      min-height: 48px;
+      border: 0;
+      border-radius: var(--radius-control);
+      background: #fff;
+      color: #111;
+      font-size: 12px;
+      font-weight: 760;
+      box-shadow: var(--shadow-compact);
+    }
+    .sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(0,0,0,.62);
+      padding: 0 10px max(10px, env(safe-area-inset-bottom));
+    }
+    .sheet.open { display: flex; }
+    .sheet-panel {
+      width: min(410px, 100%);
+      max-height: min(78dvh, 680px);
+      overflow-y: auto;
+      border-radius: var(--radius-sheet) var(--radius-sheet) 18px 18px;
+      background: #fff;
+      color: #111;
+      padding: 12px 16px 18px;
+      animation: sheetUp var(--dur-3) var(--ease-out);
+    }
+    @keyframes sheetUp {
+      from { opacity: .88; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .grabber {
+      width: 42px;
+      height: 4px;
+      margin: 0 auto 14px;
+      border-radius: 999px;
+      background: #d5d5d5;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 102px;
+      z-index: 80;
+      transform: translate(-50%, 16px);
+      opacity: 0;
+      pointer-events: none;
+      max-width: min(344px, calc(100vw - 44px));
+      border-radius: 999px;
+      background: #fff;
+      color: #111;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 720;
+      box-shadow: 0 10px 24px rgba(0,0,0,.24);
+      transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    .guide {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: none;
+      background: rgba(0,0,0,.74);
+      padding: 0 24px 110px;
+      align-items: flex-end;
+    }
+    .guide.open { display: flex; }
+    .guide-card {
+      position: relative;
+      width: min(382px, 100%);
+      margin: 0 auto;
+      border-radius: 24px;
+      background: #fff;
+      color: #111;
+      padding: 22px;
+      animation: sheetUp var(--dur-3) var(--ease-out);
+    }
+    .guide-card::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -28px;
+      width: 1px;
+      height: 28px;
+      border-left: 1px dashed #fff;
+    }
+    .guide-arrow {
+      position: fixed;
+      left: 50%;
+      bottom: 84px;
+      width: 18px;
+      height: 18px;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: translateX(-50%) rotate(45deg);
+    }
+    .skeleton {
+      overflow: hidden;
+      position: relative;
+      min-height: 18px;
+      border-radius: 6px;
+      background: rgba(255,255,255,.12);
+    }
+    .light .skeleton { background: #e6e6e6; }
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(100%); }
+    }
+    .pulse {
+      position: relative;
+    }
+    .pulse::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border: 1px solid currentColor;
+      border-radius: inherit;
+      opacity: .35;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      from { transform: scale(.9); opacity: .4; }
+      to { transform: scale(1.35); opacity: 0; }
+    }
+    .state-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .state-strip button {
+      min-height: 42px;
+      border: 0;
+      border-radius: var(--radius-control);
+      background: rgba(255,255,255,.08);
+      color: inherit;
+      font-size: 11px;
+      font-weight: 720;
+    }
+    .light .state-strip button { background: var(--surface-light-2); }
+
+    .onboard-shell,
+    .setup-shell {
+      min-height: calc(100dvh - 150px);
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+    .onboard-head,
+    .setup-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 44px;
+    }
+    .brand-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 760;
+    }
+    .brand-dot {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      color: #050505;
+    }
+    .light .brand-dot {
+      background: #111;
+      color: #fff;
+    }
+    .text-link {
+      min-height: 40px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font-size: 13px;
+      font-weight: 720;
+      opacity: .78;
+    }
+    .welcome-stage {
+      position: relative;
+      min-height: 374px;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #090909;
+      border: 1px solid var(--line-dark);
+      isolation: isolate;
+    }
+    .welcome-stage .scene {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .58;
+      filter: saturate(.7) contrast(1.05);
+      transform: scale(1.02);
+    }
+    .welcome-stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(5,5,5,.06), rgba(5,5,5,.34) 46%, rgba(5,5,5,.92)),
+        radial-gradient(circle at 78% 20%, rgba(255,255,255,.16), transparent 30%);
+      pointer-events: none;
+    }
+    .welcome-hardware {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) 112px;
+      align-items: end;
+      gap: 14px;
+    }
+    .welcome-phone {
+      min-height: 188px;
+      border-radius: 22px;
+      background: #f7f7f7;
+      color: #111;
+      padding: 10px;
+      box-shadow: 0 14px 34px rgba(0,0,0,.36);
+    }
+    .phone-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 760;
+      color: #666;
+    }
+    .phone-live {
+      position: relative;
+      min-height: 84px;
+      margin-top: 10px;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #101010;
+    }
+    .phone-live img {
+      width: 100%;
+      height: 100%;
+      min-height: 84px;
+      object-fit: cover;
+      opacity: .78;
+      filter: grayscale(.25);
+    }
+    .phone-card-line {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 36px;
+      margin-top: 8px;
+      border-radius: 10px;
+      background: #ececec;
+      padding: 8px;
+      font-size: 11px;
+      font-weight: 760;
+    }
+    .product-float {
+      display: grid;
+      place-items: center;
+      min-height: 158px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .product-float img {
+      width: 104px;
+      max-height: 144px;
+      object-fit: contain;
+      filter: drop-shadow(0 18px 24px rgba(0,0,0,.45));
+    }
+    .welcome-copy {
+      display: grid;
+      gap: 12px;
+    }
+    .welcome-copy h1 {
+      font-size: 34px;
+      line-height: 1.04;
+    }
+    .progress-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 18px;
+    }
+    .progress-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.24);
+      transition: width var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out);
+    }
+    .light .progress-dots span { background: rgba(17,17,17,.18); }
+    .progress-dots span.active {
+      width: 24px;
+      background: #fff;
+    }
+    .light .progress-dots span.active { background: #111; }
+    .flow-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 2px;
+    }
+    .auth-shell {
+      min-height: calc(100dvh - 150px);
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 18px;
+    }
+    .auth-hero {
+      display: grid;
+      gap: 8px;
+      padding-top: 18px;
+    }
+    .auth-hero h1 {
+      font-size: 36px;
+    }
+    .auth-card {
+      border-radius: 16px;
+      background: #fff;
+      padding: 16px;
+    }
+    .auth-field {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .auth-field:first-child { margin-top: 0; }
+    .auth-field label {
+      color: #111;
+      font-size: 13px;
+      font-weight: 760;
+    }
+    .auth-field .error {
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 720;
+    }
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 54px;
+      border-radius: 12px;
+      background: #f0f0f0;
+      padding: 0 12px;
+    }
+    .input-wrap input {
+      min-width: 0;
+      flex: 1;
+      border: 0;
+      background: transparent;
+      color: #111;
+      font-size: 16px;
+      font-weight: 720;
+      outline: none;
+    }
+    .input-wrap .inline-button {
+      min-height: 34px;
+      border: 0;
+      border-radius: 999px;
+      background: #111;
+      color: #fff;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+    .legal-line {
+      display: grid;
+      grid-template-columns: auto minmax(0,1fr);
+      gap: 8px;
+      align-items: start;
+      margin-top: 16px;
+      color: #555;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .legal-line input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: #111;
+    }
+    .micro-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      color: #666;
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .setup-kicker {
+      color: var(--muted-light);
+      font-size: 13px;
+      font-weight: 720;
+    }
+    .setup-progress {
+      display: grid;
+      gap: 8px;
+    }
+    .setup-progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted-light);
+      font-size: 12px;
+      font-weight: 760;
+    }
+    .progress-track {
+      height: 5px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e1e1e1;
+    }
+    .progress-track span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: #111;
+      transition: width var(--dur-2) var(--ease-out);
+    }
+    .relationship-card,
+    .profile-visual,
+    .contact-purpose {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #111;
+      color: #fff;
+      padding: 18px;
+      min-height: 164px;
+    }
+    .relationship-card::after,
+    .profile-visual::after,
+    .contact-purpose::after {
+      content: "";
+      position: absolute;
+      right: -42px;
+      bottom: -42px;
+      width: 154px;
+      height: 154px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 26px rgba(255,255,255,.03);
+    }
+    .relationship-ring {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 46px minmax(0,1fr);
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .relation-node {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: #fff;
+      color: #111;
+    }
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+    }
+    .choice-card {
+      display: grid;
+      gap: 8px;
+      min-height: 86px;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background: #fff;
+      color: #111;
+      padding: 13px;
+      text-align: left;
+    }
+    .choice-card strong {
+      font-size: 15px;
+      line-height: 1.2;
+    }
+    .choice-card span {
+      color: #666;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .choice-card.selected {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+    .choice-card.selected span { color: rgba(255,255,255,.7); }
+    .inline-error {
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 720;
+    }
+    .device-stage {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      min-height: 356px;
+      border: 1px solid var(--line-dark);
+      background:
+        radial-gradient(circle at 50% 25%, rgba(255,255,255,.14), transparent 28%),
+        linear-gradient(180deg, #111, #050505 72%);
+      padding: 18px;
+    }
+    .device-copy {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      gap: 8px;
+      max-width: 280px;
+    }
+    .device-orbit {
+      position: absolute;
+      inset: 76px 18px 64px;
+      display: grid;
+      place-items: center;
+    }
+    .device-orbit::before,
+    .device-orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.13);
+    }
+    .device-orbit::before { width: 254px; height: 254px; }
+    .device-orbit::after { width: 176px; height: 176px; }
+    .device-orbit.searching::before,
+    .device-orbit.searching::after,
+    .wifi-signal.searching::before,
+    .wifi-signal.searching::after {
+      animation: pulse 1.7s infinite;
+    }
+    .device-orbit img {
+      position: relative;
+      z-index: 1;
+      width: 170px;
+      max-height: 230px;
+      object-fit: contain;
+      filter: drop-shadow(0 24px 34px rgba(0,0,0,.55));
+    }
+    .device-status-card {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2;
+      display: grid;
+      gap: 8px;
+      border-radius: 14px;
+      background: #fff;
+      color: #111;
+      padding: 14px;
+    }
+    .status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: #666;
+      font-size: 12px;
+      font-weight: 720;
+    }
+    .prepare-list {
+      display: grid;
+      gap: 8px;
+    }
+    .prepare-item {
+      display: grid;
+      grid-template-columns: 32px minmax(0,1fr);
+      gap: 10px;
+      align-items: start;
+      min-height: 52px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.08);
+      padding: 12px;
+    }
+    .prepare-item .row-icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.09);
+    }
+    .wifi-visual {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 282px;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--line-dark);
+      background:
+        radial-gradient(circle at 50% 35%, rgba(255,255,255,.14), transparent 32%),
+        #080808;
+    }
+    .wifi-visual img {
+      width: 132px;
+      max-height: 190px;
+      object-fit: contain;
+      filter: drop-shadow(0 22px 30px rgba(0,0,0,.5));
+      z-index: 2;
+    }
+    .wifi-signal {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+    .wifi-signal::before,
+    .wifi-signal::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.16);
+    }
+    .wifi-signal::before { width: 246px; height: 246px; }
+    .wifi-signal::after { width: 168px; height: 168px; }
+    .wifi-sheet {
+      margin-top: -38px;
+      position: relative;
+      z-index: 3;
+      border-radius: 22px 22px 16px 16px;
+      background: #fff;
+      color: #111;
+      padding: 16px;
+      box-shadow: 0 -8px 24px rgba(0,0,0,.24);
+    }
+    .step-pills {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 6px;
+    }
+    .step-pill {
+      min-height: 30px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.62);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 760;
+    }
+    .step-pill.active {
+      background: #fff;
+      color: #111;
+    }
+    .success-stage {
+      position: relative;
+      display: grid;
+      gap: 16px;
+      min-height: calc(100dvh - 154px);
+      align-content: center;
+      text-align: center;
+    }
+    .success-product {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 296px;
+      overflow: hidden;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 50% 48%, rgba(47,190,113,.22), transparent 22%),
+        radial-gradient(circle at 50% 48%, rgba(255,255,255,.12), transparent 36%),
+        #080808;
+      border: 1px solid var(--line-dark);
+    }
+    .success-product::before {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      border: 1px solid rgba(47,190,113,.42);
+      animation: pulse 2.2s infinite;
+    }
+    .success-product img {
+      width: 152px;
+      max-height: 226px;
+      object-fit: contain;
+      filter: drop-shadow(0 24px 32px rgba(0,0,0,.48));
+      z-index: 1;
+    }
+    .device-facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 8px;
+    }
+    .device-fact {
+      min-height: 72px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.08);
+      padding: 10px;
+      text-align: left;
+    }
+    .device-fact span {
+      display: block;
+      color: var(--muted-dark);
+      font-size: 11px;
+      font-weight: 720;
+    }
+    .device-fact strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 15px;
+      line-height: 1.18;
+    }
+    .form-panel {
+      border-radius: 16px;
+      background: #fff;
+      padding: 16px;
+    }
+    .form-panel .field input,
+    .form-panel .field select,
+    .form-panel .field textarea {
+      border-radius: 12px;
+      background: #f0f0f0;
+    }
+    .profile-visual {
+      min-height: 148px;
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 10px;
+    }
+    .bottom-safe {
+      position: sticky;
+      bottom: -94px;
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 12px 0 0;
+      background: linear-gradient(180deg, transparent, var(--bg-light) 26%);
+      z-index: 4;
+    }
+    .state-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      border-radius: 12px;
+      background: #efefef;
+      padding: 10px 12px;
+      color: #555;
+      font-size: 12px;
+      font-weight: 680;
+    }
+    .contact-chain {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .contact-node {
+      min-height: 58px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.1);
+      padding: 10px;
+      text-align: left;
+    }
+    .contact-node strong {
+      display: block;
+      font-size: 13px;
+    }
+    .contact-node span {
+      display: block;
+      margin-top: 5px;
+      color: rgba(255,255,255,.64);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    @media (max-width: 382px) {
+      .welcome-stage { min-height: 352px; }
+      .welcome-hardware { grid-template-columns: 1fr 96px; }
+      .welcome-phone { min-height: 174px; }
+      .product-float img { width: 92px; }
+      .device-stage { min-height: 374px; }
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+    @media (min-width: 720px) {
+      body {
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at 18% 12%, rgba(255,255,255,.08), transparent 32%),
+          radial-gradient(circle at 72% 88%, rgba(102,163,255,.08), transparent 28%),
+          #111;
+      }
+      .app-shell {
+        min-height: min(100dvh, 900px);
+        height: min(900px, 100dvh);
+        border-radius: 30px;
+      }
+      .tabbar { position: absolute; }
+      .quick-actions, .sheet, .toast, .guide { position: absolute; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="shell" class="app-shell">
+    <main id="app" class="app-scroll" aria-live="polite"></main>
+    <div id="quickActions" class="quick-actions" aria-label="创建快捷操作">
+      <button data-sheet="task">普通任务</button>
+      <button data-go="packing">小书包</button>
+      <button data-go="sleep">睡前任务</button>
+    </div>
+    <nav id="tabbar" class="tabbar" aria-label="主导航"></nav>
+    <div id="sheet" class="sheet"></div>
+    <div id="guide" class="guide" role="dialog" aria-modal="true"></div>
+    <div id="toast" class="toast" role="status"></div>
+  </div>
+
+  <script>
+    const assets = {
+      camera: './assets/generated/camera-product-render.png',
+      home: './assets/generated/home-care-hero.png',
+      watch: './assets/generated/watch-study-scene.png',
+      alert: './assets/generated/alert-entryway-scene.png',
+      empty: './assets/generated/empty-device-state.png',
+      permission: './assets/generated/permission-setup-guide.png',
+      reward: './assets/generated/reward-confirmation-scene.png',
+      support: './assets/generated/support-service-scene.png'
+    };
+
+    const icons = {
+      home: '<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/>',
+      tasks: '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="m3 6 1 1 2-2"/><path d="m3 12 1 1 2-2"/><path d="m3 18 1 1 2-2"/>',
+      plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
+      watch: '<path d="M23 7 16 12l7 5V7Z"/><rect x="2" y="5" width="14" height="14" rx="2"/>',
+      user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+      bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>',
+      chevronLeft: '<path d="m15 18-6-6 6-6"/>',
+      chevronRight: '<path d="m9 18 6-6-6-6"/>',
+      shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-5"/>',
+      wifi: '<path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M12 20h.01"/>',
+      check: '<path d="M20 6 9 17l-5-5"/>',
+      alert: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+      clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      calendar: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4"/><path d="M16 2v4"/><path d="M3 10h18"/>',
+      gift: '<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M7.5 8a2.5 2.5 0 1 1 0-5c2.5 0 4.5 5 4.5 5"/><path d="M16.5 8a2.5 2.5 0 1 0 0-5c-2.5 0-4.5 5-4.5 5"/>',
+      book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15Z"/>',
+      moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/>',
+      backpack: '<path d="M6 20V9a6 6 0 0 1 12 0v11"/><path d="M8 8h8"/><path d="M8 13h8"/><path d="M9 20v-4h6v4"/><path d="M6 12H4v5"/><path d="M18 12h2v5"/>',
+      play: '<path d="m8 5 12 7-12 7V5Z"/>',
+      phone: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+      settings: '<path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 2l.04.04a2 2 0 0 1-2.83 2.83l-.04-.04a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1 1.63V21a2 2 0 0 1-4 0v-.06a1.8 1.8 0 0 0-1-1.63 1.8 1.8 0 0 0-2 .36l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04a1.8 1.8 0 0 0 .36-2 1.8 1.8 0 0 0-1.63-1H3a2 2 0 0 1 0-4h.06a1.8 1.8 0 0 0 1.63-1 1.8 1.8 0 0 0-.36-2l-.04-.04a2 2 0 1 1 2.83-2.83l.04.04a1.8 1.8 0 0 0 2 .36H10a1.8 1.8 0 0 0 1-1.63V3a2 2 0 0 1 4 0v.06a1.8 1.8 0 0 0 1 1.63 1.8 1.8 0 0 0 2-.36l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04a1.8 1.8 0 0 0-.36 2V10a1.8 1.8 0 0 0 1.63 1H21a2 2 0 0 1 0 4h-.06a1.8 1.8 0 0 0-1.54 1Z"/>',
+      lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+      users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+      camera: '<path d="M14.5 4 13 2h-2L9.5 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-4.5Z"/><circle cx="12" cy="12" r="4"/>',
+      file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h6"/>',
+      star: '<path d="m12 2 3 7 7 .6-5.3 4.6 1.6 6.8L12 17.3 5.7 21l1.6-6.8L2 9.6 9 9l3-7Z"/>',
+      mic: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+      logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+      trash: '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>',
+      download: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
+      rotate: '<path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>',
+      message: '<path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/>',
+      help: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 1 1 5.8 1c-.6 1.1-1.9 1.5-2.4 2.6"/><path d="M12 17h.01"/>',
+      search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+      x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+      image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5a2 2 0 0 0-3 0L5 21"/>',
+      chart: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/>',
+      spark: '<path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="M5 3v4"/><path d="M3 5h4"/><path d="M19 17v4"/><path d="M17 19h4"/>',
+      eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+      eyeOff: '<path d="m3 3 18 18"/><path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.8"/><path d="M9.9 4.2A10.7 10.7 0 0 1 12 4.0c6.5 0 10 8 10 8a18.5 18.5 0 0 1-2.9 4.1"/><path d="M6.6 6.6C3.6 8.6 2 12 2 12s3.5 8 10 8c1.6 0 3-.3 4.2-.8"/>',
+      menu: '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>'
+    };
+
+    const state = {
+      current: new URLSearchParams(location.search).get('screen') || 'welcome',
+      variant: new URLSearchParams(location.search).get('state') || '',
+      sheet: '',
+      guide: false,
+      fabOpen: false,
+      parentRole: '妈妈',
+      parentName: '妈妈',
+      childName: '小宇',
+      childStage: '小学',
+      childGrade: '一年级',
+      taskDay: 'today',
+      evidenceStatus: 'pending',
+      rewardStatus: 'requested',
+      pointBalance: 86,
+      pointUnit: '积分',
+      pointThresholdDraft: '10',
+      pointThreshold: 10,
+      loginError: new URLSearchParams(location.search).get('state') === 'login-error',
+      saveLoading: false,
+      welcomeSlide: 0,
+      identityError: false,
+      bindState: new URLSearchParams(location.search).get('state') === 'bind-failed' ? 'failed' : 'none',
+      wifiLoading: false,
+      wifiFail: new URLSearchParams(location.search).get('state') === 'wifi-error',
+      showWifiPassword: false,
+      toggles: {
+        '远程查看提示': true,
+        '只保存事件截图': true,
+        '普通闲聊逐字记录': false,
+        '安全告警': true,
+        '任务待确认': true,
+        '任务提醒': true,
+        '普通闲聊摘要': false
+      }
+    };
+
+    const app = document.getElementById('app');
+    const shell = document.getElementById('shell');
+    const tabbar = document.getElementById('tabbar');
+    const sheet = document.getElementById('sheet');
+    const toast = document.getElementById('toast');
+    const guide = document.getElementById('guide');
+    const quickActions = document.getElementById('quickActions');
+
+    const darkScreens = new Set(['welcome','bind','wifi','bindDone','home','care','sleep','flow','packing','tasks','taskDetail','focus','watch','playback','zones','safety','safetyDetail','report','weekly','moments','points','reward','checkin','device','homeEmpty','homeError','watchOffline','watchPrivacy','deviceOffline','componentStates']);
+    const onboardingScreens = new Set(['welcome','login','parentIdentity','bind','wifi','bindDone','child','name','contacts','permissionGuide','homeEmpty','homeError','watchOffline','watchPrivacy','deviceOffline','componentStates']);
+    const rootFor = id => ['home','care','sleep','homeEmpty','homeError'].includes(id) ? 'home' : ['tasks','flow','packing','taskDetail','focus'].includes(id) ? 'tasks' : ['watch','playback','zones','safety','safetyDetail','watchOffline','watchPrivacy'].includes(id) ? 'watch' : ['my','accountProfile','accountSecurity','subscription','report','weekly','moments','points','reward','checkin','settings','conversation','privacy','notifications','family','device','education','feedback','about','deviceOffline','componentStates'].includes(id) ? 'my' : '';
+
+    function svg(name, cls = '') {
+      const path = icons[name] || icons.spark;
+      return `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
+    }
+    function chip(label, tone = '', iconName = '') {
+      return `<span class="chip ${tone}">${iconName ? svg(iconName) : ''}${label}</span>`;
+    }
+    function btn(label, attrs = '', variant = 'primary', iconName = '') {
+      return `<button class="btn ${variant}" ${attrs}>${iconName ? svg(iconName) : ''}<span>${label}</span></button>`;
+    }
+    function row(iconName, title, desc, attrs = '', right = svg('chevronRight'), extra = '') {
+      const clickable = attrs ? 'button' : 'div';
+      return `<${clickable} class="list-row ${extra}" ${attrs}><span class="row-icon">${svg(iconName)}</span><span class="row-main"><span class="row-title">${title}</span><span class="row-desc">${desc}</span></span><span class="row-right">${right}</span></${clickable}>`;
+    }
+    function metric(label, value, tone = '') {
+      return `<div class="metric"><strong class="${tone}">${value}</strong><span>${label}</span></div>`;
+    }
+    function sectionTitle(title, desc = '', action = '') {
+      return `<div class="section-title"><div><h3>${title}</h3>${desc ? `<p class="copy">${desc}</p>` : ''}</div>${action}</div>`;
+    }
+    function topbar(eyebrow, title, opts = {}) {
+      const back = opts.back ? `<button class="icon-button" data-go="${opts.back}" aria-label="返回">${svg('chevronLeft')}</button>` : '<span></span>';
+      const action = opts.action || '<span></span>';
+      return `<header class="topbar">${back}<div class="topbar-title"><p class="eyebrow">${eyebrow}</p><h1>${title}</h1></div>${action}</header>`;
+    }
+    function page(eyebrow, title, content, opts = {}) {
+      return `<section class="screen">${topbar(eyebrow, title, opts)}${content}</section>`;
+    }
+    function visual(src, title, desc, chips = '') {
+      return `<div class="hero-image ${title.length < 8 ? 'small' : ''}"><img src="${src}" alt="${title}"><div class="hero-overlay">${chips ? `<div class="chip-row">${chips}</div>` : ''}<h2>${title}</h2><p class="copy" style="color:#d6d6d6">${desc}</p></div></div>`;
+    }
+    function formField(label, value, id, type = 'text', error = '') {
+      return `<div class="field ${error ? 'has-error' : ''}"><label for="${id}">${label}</label><input id="${id}" type="${type}" value="${value}">${error ? `<span class="error">${error}</span>` : ''}</div>`;
+    }
+    function dateTabs() {
+      const days = [['history','上周'],['today','今天'],['tomorrow','明天'],['future','周五']];
+      return `<div class="segmented">${days.map(([id,label]) => `<button class="${state.taskDay === id ? 'active' : ''}" data-action="task-day" data-day="${id}">${label}</button>`).join('')}</div>`;
+    }
+    function taskRows() {
+      const data = {
+        history: [['整理书桌','已完成，证据已归档','check'],['英语听读','已跳过，家长记录原因','clock']],
+        today: [['数学作业','进行中，第 2 个专注轮次','book'],['晚饭收尾','20:10 开始，摄像头语音提醒','clock'],['睡前洗漱','21:10，保护就寝时间','moon']],
+        tomorrow: [['小书包检查','按明日课表生成 5 项','backpack'],['英语听读','晚饭后 15 分钟','book']],
+        future: [['运动 30 分钟','周五 18:00，轻提醒','clock']]
+      };
+      return `<div class="list">${(data[state.taskDay] || data.today).map((item, index) => row(item[2], item[0], item[1], `data-action="task-open" data-index="${index}"`, '编辑')).join('')}</div>`;
+    }
+    function settingRow(title, desc) {
+      const on = !!state.toggles[title];
+      return row('settings', title, desc, `data-action="setting-toggle" data-setting="${title}"`, `<span class="chip ${on ? 'success' : ''}">${on ? '开' : '关'}</span>`);
+    }
+    function statusActions() {
+      return `<div class="state-strip">
+        <button data-go="homeEmpty">空状态</button>
+        <button data-go="homeError">错误态</button>
+        <button data-go="watchOffline">离线态</button>
+        <button data-go="componentStates">组件态</button>
+      </div>`;
+    }
+
+    function dots(active, total = 3) {
+      return `<div class="progress-dots" aria-label="欢迎进度">${Array.from({ length: total }, (_, index) => `<span class="${index === active ? 'active' : ''}"></span>`).join('')}</div>`;
+    }
+    function setupProgress(step, total, label) {
+      const width = Math.max(0, Math.min(100, Math.round((step / total) * 100)));
+      return `<div class="setup-progress"><div class="setup-progress-row"><span>${label}</span><span>${step}/${total}</span></div><div class="progress-track"><span style="width:${width}%"></span></div></div>`;
+    }
+    function actionStack(primaryHtml, secondaryHtml = '') {
+      return `<div class="flow-actions">${primaryHtml}${secondaryHtml}</div>`;
+    }
+    function authInput(label, id, value, type = 'text', error = '', trailing = '') {
+      return `<div class="auth-field ${error ? 'has-error' : ''}"><label for="${id}">${label}</label><div class="input-wrap"><input id="${id}" type="${type}" value="${value}">${trailing}</div>${error ? `<span class="error">${error}</span>` : ''}</div>`;
+    }
+    function roleChoice(role, desc) {
+      const selected = state.parentRole === role;
+      return `<button class="choice-card ${selected ? 'selected' : ''}" data-action="parent-role" data-role="${role}" aria-pressed="${selected}"><strong>${role}</strong><span>${desc}</span></button>`;
+    }
+    function prepareItem(iconName, title, desc) {
+      return `<div class="prepare-item"><span class="row-icon">${svg(iconName)}</span><span><span class="row-title">${title}</span><span class="row-desc">${desc}</span></span></div>`;
+    }
+    function deviceStatusCopy() {
+      const copies = {
+        none: ['未连接', '打开蓝牙或扫描设备二维码开始连接。', '待发现'],
+        searching: ['正在搜索附近设备', '保持手机靠近摄像头，设备指示灯应为慢闪。', '搜索中'],
+        found: ['发现 Mira Cam M1', '距离约 1.8 米，可以继续进入家庭 Wi-Fi 配置。', '可连接'],
+        failed: ['未找到设备', '请确认设备已通电并长按重置键进入配网模式。', '需重试']
+      };
+      return copies[state.bindState] || copies.none;
+    }
+    function wifiPasswordField() {
+      const trailing = `<button class="inline-button" data-action="wifi-toggle-password" aria-label="显示或隐藏密码">${state.showWifiPassword ? '隐藏' : '显示'}</button>`;
+      return authInput('Wi-Fi 密码', 'pwd', state.wifiFail ? 'mira2026' : 'mira2026home', state.showWifiPassword ? 'text' : 'password', state.wifiFail ? '密码错误，请重新输入或重试连接。' : '', trailing);
+    }
+    const welcomeSlides = [
+      {
+        title: '实时看护，只看需要判断的事。',
+        desc: '孩子在做什么、设备是否在线、下一步要不要你确认，第一眼就知道。',
+        img: assets.home,
+        phoneImg: assets.watch,
+        tags: ['设备在线', '状态正常', '待确认 2'],
+        card: '书桌前写作业'
+      },
+      {
+        title: 'AI 先判断，家长保留决定权。',
+        desc: '作业、离座、门口异常都会带证据出现，误判可以改，结果进入记录。',
+        img: assets.watch,
+        phoneImg: assets.alert,
+        tags: ['证据可用', '置信度 80%', '可纠错'],
+        card: '数学作业待确认'
+      },
+      {
+        title: '奖励和提醒，由家长确认。',
+        desc: '摄像头转达孩子的申请和任务进度，但不会替你承诺奖励。',
+        img: assets.reward,
+        phoneImg: assets.reward,
+        tags: ['奖励申请', '任务完成', '家长确认'],
+        card: '周末活动待处理'
+      }
+    ];
+
+    const routes = {
+      welcome: () => {
+        const slide = welcomeSlides[state.welcomeSlide] || welcomeSlides[0];
+        const isLast = state.welcomeSlide === welcomeSlides.length - 1;
+        return `<section class="screen onboard-shell">
+          <div class="onboard-head">
+            <div class="brand-lockup"><span class="brand-dot">${svg('camera')}</span><span>Mira Guardian</span></div>
+            <button class="text-link" data-go="login">跳过</button>
+          </div>
+          <div class="welcome-stage">
+            <img class="scene" src="${slide.img}" alt="${slide.title}">
+            <div class="welcome-hardware">
+              <div class="welcome-phone">
+                <div class="phone-top"><span>今天 19:42</span><span>安全</span></div>
+                <div class="phone-live"><img src="${slide.phoneImg}" alt="${slide.card}"></div>
+                <div class="phone-card-line"><span>${slide.card}</span><span>${svg('chevronRight')}</span></div>
+                <div class="phone-card-line"><span>${slide.tags[1]}</span><span>${slide.tags[2]}</span></div>
+              </div>
+              <div class="product-float"><img src="${assets.camera}" alt="AI 看护摄像头"></div>
+            </div>
+          </div>
+          <div class="welcome-copy">
+            <div class="chip-row">${slide.tags.map((tag, index) => chip(tag, index === 0 ? 'success' : index === 1 ? 'info' : 'warning', index === 0 ? 'wifi' : index === 1 ? 'spark' : 'bell')).join('')}</div>
+            <h1>${slide.title}</h1>
+            <p class="copy">${slide.desc}</p>
+          </div>
+          ${dots(state.welcomeSlide, welcomeSlides.length)}
+          ${actionStack(btn(isLast ? '开始使用' : '继续', isLast ? 'data-go="login"' : 'data-action="welcome-next"', 'primary', 'chevronRight'), btn('查看演示首页', 'data-go="home"', 'secondary', 'play'))}
+        </section>`;
+      },
+
+      login: () => `<section class="screen auth-shell">
+        <div class="setup-head">
+          <button class="icon-button" data-go="welcome" aria-label="返回">${svg('chevronLeft')}</button>
+          <button class="text-link" data-sheet="privacyNotice">隐私说明</button>
+        </div>
+        <div class="auth-hero">
+          <div class="brand-lockup"><span class="brand-dot">${svg('shield')}</span><span>家庭空间</span></div>
+          <h1>登录</h1>
+          <p class="copy">未注册手机号验证通过后将自动注册。</p>
+        </div>
+        <div>
+          <div class="auth-card">
+            ${authInput('手机号', 'phone', state.loginError ? '138 0000' : '138 0000 2026', 'tel', state.loginError ? '请输入 11 位手机号。' : '')}
+            ${authInput('验证码', 'code', state.loginError ? '0000' : '0426', 'tel', state.loginError ? '验证码错误，请重新输入。' : '', `<button class="inline-button" data-toast="验证码已发送">获取</button>`)}
+            <label class="legal-line"><input type="checkbox" checked><span>我已阅读并同意服务协议和隐私政策。设备绑定后会再次说明儿童音视频权限。</span></label>
+          </div>
+          <div class="micro-note">${svg('lock')}手机号仅用于登录、安全验证和重要通知。</div>
+        </div>
+        ${actionStack(btn('登录并继续', 'data-action="login-submit"', 'primary'), btn('错误状态演示', 'data-action="login-error-demo"', 'secondary', 'alert'))}
+      </section>`,
+
+      parentIdentity: () => `<section class="screen setup-shell">
+        <div class="setup-head">
+          <button class="icon-button" data-go="login" aria-label="返回">${svg('chevronLeft')}</button>
+          <span class="setup-kicker">建立家庭看护关系</span>
+        </div>
+        <div>
+          <h1>你和孩子的关系</h1>
+          <p class="copy" style="margin-top:10px">用于报告称呼、告警分发和处理记录。第一个创建家庭的家长默认为管理员。</p>
+        </div>
+        <div class="relationship-card">
+          <div class="chip-row">${chip('手机号已验证','success','check')}${chip('管理员','info','shield')}</div>
+          <div class="relationship-ring">
+            <span class="relation-node">${svg('user')}</span>
+            <div><h2>${state.parentRole || '选择家长身份'}</h2><p class="copy" style="color:rgba(255,255,255,.72);margin-top:6px">先确认谁来管理设备、成员和儿童数据。</p></div>
+          </div>
+        </div>
+        <div class="choice-grid">
+          ${roleChoice('妈妈','常用主照护人')}
+          ${roleChoice('爸爸','共同处理确认')}
+          ${roleChoice('祖辈','适合日常陪护')}
+          ${roleChoice('其他照护人','可稍后细分权限')}
+        </div>
+        ${state.identityError ? `<p class="inline-error">请选择家长身份后继续。</p>` : ''}
+        <div class="form-panel">
+          ${formField('家庭显示名', state.parentName, 'parentName')}
+          <div class="state-note" style="margin-top:12px">${svg('shield')}可管理设备、成员、订阅和儿童数据。</div>
+        </div>
+        <div class="bottom-safe">${btn('继续绑定设备','data-action="identity-submit"','primary','chevronRight')}</div>
+      </section>`,
+
+      bind: () => {
+        const [statusTitle, statusDesc, statusTag] = deviceStatusCopy();
+        return page('设备绑定', '连接你的 AI 看护摄像头', `
+          <div class="device-stage">
+            <div class="device-copy">
+              <div class="chip-row">${chip('AI 摄像头','info','camera')}${chip(statusTag, state.bindState === 'failed' ? 'danger' : state.bindState === 'found' ? 'success' : 'warning','wifi')}</div>
+              <h2>${statusTitle}</h2>
+              <p class="copy">${statusDesc}</p>
+            </div>
+            <div class="device-orbit ${state.bindState === 'searching' ? 'searching' : ''}"><img src="${assets.camera}" alt="AI 看护摄像头产品图"></div>
+            <div class="device-status-card">
+              <div class="status-line"><span>绑定前不会开始录音录像</span><strong>${state.bindState === 'found' ? 'Mira Cam M1' : state.bindState === 'failed' ? '未发现' : '待连接'}</strong></div>
+              <div class="grid-2">
+                ${btn(state.bindState === 'failed' ? '重新搜索' : state.bindState === 'found' ? '连接这台设备' : '开始连接', state.bindState === 'found' ? 'data-action="bind-connect"' : 'data-action="bind-search"', 'primary', state.bindState === 'found' ? 'chevronRight' : 'search')}
+                ${btn('模拟失败', 'data-action="bind-fail"', 'secondary', 'alert')}
+              </div>
+            </div>
+          </div>
+          ${sectionTitle('连接前准备','少量准备可以减少配网失败。')}
+          <div class="prepare-list">
+            ${prepareItem('wifi','2.4G / 5G 家庭 Wi-Fi','保证手机已连接家中网络。')}
+            ${prepareItem('shield','开启局域网与蓝牙','只用于发现和连接这台设备。')}
+            ${prepareItem('camera','设备处于慢闪状态','摄像头通电后进入配网模式。')}
+          </div>
+          <div class="grid-2" style="margin-top:14px">
+            ${btn('权限说明','data-go="permissionGuide"','secondary','shield')}
+            ${btn('绑定帮助','data-go="feedback"','secondary','help')}
+          </div>
+        `, { back: 'parentIdentity' });
+      },
+
+      wifi: () => page('配网', '连接家庭 Wi-Fi', `
+        <div class="step-pills"><span class="step-pill">发现设备</span><span class="step-pill active">连接网络</span><span class="step-pill">完成</span></div>
+        <div class="wifi-visual" style="margin-top:14px">
+          <div class="wifi-signal ${state.wifiLoading ? 'searching' : ''}"></div>
+          <img src="${assets.camera}" alt="Mira Cam M1">
+        </div>
+        <div class="wifi-sheet ${state.wifiFail ? 'shake' : ''}">
+          ${row('camera','Mira Cam M1','已发现，距离约 1.8 米','',chip('待配网','warning'))}
+          ${authInput('Wi-Fi 名称', 'ssid', 'Mira Home 5G')}
+          ${wifiPasswordField()}
+          <div class="state-note" style="margin-top:14px">${svg('shield')}配网过程中摄像头只接收网络信息，不会开始录像或录音。</div>
+          ${state.wifiLoading ? `<div class="skeleton" style="margin-top:14px;height:42px"></div>` : ''}
+          <div class="grid-2" style="margin-top:14px">
+            ${btn(state.wifiLoading ? '连接中' : state.wifiFail ? '重试连接' : '开始绑定', 'data-action="wifi-submit"', 'primary', 'wifi')}
+            ${btn(state.wifiFail ? '清除错误' : '模拟失败', state.wifiFail ? 'data-action="wifi-clear-error"' : 'data-action="wifi-fail-demo"', 'secondary', state.wifiFail ? 'rotate' : 'alert')}
+          </div>
+        </div>
+      `, { back: 'bind' }),
+
+      bindDone: () => `<section class="screen success-stage">
+        <div class="setup-head">
+          <button class="icon-button" data-go="wifi" aria-label="返回">${svg('chevronLeft')}</button>
+          <span class="setup-kicker" style="color:var(--muted-dark)">设备绑定</span>
+        </div>
+        <div class="success-product"><img src="${assets.camera}" alt="已绑定 AI 摄像头"></div>
+        <div>
+          <div class="chip-row" style="justify-content:center">${chip('在线','success','wifi')}${chip('隐私灯测试通过','info','shield')}</div>
+          <h1 style="margin-top:14px">设备已加入家庭</h1>
+          <p class="copy" style="margin-top:10px">儿童房摄像头会在远程查看时显示工作状态。接下来创建孩子档案和紧急联系人。</p>
+        </div>
+        <div class="device-facts">
+          <div class="device-fact"><span>设备名</span><strong>Mira Cam M1</strong></div>
+          <div class="device-fact"><span>位置</span><strong>儿童房</strong></div>
+          <div class="device-fact"><span>网络</span><strong>良好</strong></div>
+        </div>
+        ${actionStack(btn('创建孩子档案','data-go="child"','primary','chevronRight'), btn('查看设备详情','data-go="device"','secondary','camera'))}
+      </section>`,
+
+      child: () => page('孩子档案', '让任务更合适', `
+        ${setupProgress(1, 3, '家庭资料设置')}
+        <div class="profile-visual">
+          <div class="chip-row">${chip('小学任务模板','info','book')}${chip('小书包规则','warning','backpack')}</div>
+          <h2 style="margin-top:20px">先让 App 知道孩子处在哪个阶段。</h2>
+          <p class="copy" style="color:rgba(255,255,255,.7);margin-top:8px">资料只用于提醒话术、任务模板和家长报告。</p>
+        </div>
+        <div class="form-panel">
+          ${formField('孩子称呼', state.childName, 'childName')}
+          <div class="profile-grid">
+            ${formField('出生日期', '2019-03-12', 'birthday', 'date')}
+            ${formField('就读阶段', state.childStage, 'stage')}
+          </div>
+          ${formField('年级 / 班级', state.childGrade + ' 3 班', 'grade')}
+        </div>
+        <div class="form-panel">
+          <h3>小书包规则</h3>
+          <p class="copy" style="margin-top:6px">小学阶段按课程表、老师通知和留校书本规则生成。</p>
+          <div class="grid-3" style="margin-top:12px">${['部分书放学校','有储物柜','按老师通知'].map((m,i)=>`<button class="btn ${i===0?'primary':'secondary'}" data-action="schoolbag-mode">${m}</button>`).join('')}</div>
+          <div class="state-note" style="margin-top:12px">${svg('check')}输入中会即时保存到本机草稿。</div>
+        </div>
+        <div class="bottom-safe">${btn('继续命名摄像头','data-go="name"','primary','chevronRight')}${btn('保存档案','data-go="my" data-toast="孩子档案已保存"','secondary','check')}</div>
+      `, { back: 'bindDone' }),
+
+      name: () => page('人设与语音', '给摄像头起个名字', `
+        ${setupProgress(2, 3, '家庭资料设置')}
+        <div class="profile-visual">
+          <div class="chip-row">${chip('默认边界','success','shield')}${chip('可试听','info','mic')}</div>
+          <h2 style="margin-top:20px">孩子叫这个名字时，摄像头才回应。</h2>
+          <p class="copy" style="color:rgba(255,255,255,.7);margin-top:8px">它负责提醒和转达，不替家长做承诺。</p>
+        </div>
+        <div class="form-panel">
+          ${formField('唤醒名','小豆','wakeName')}
+          <div class="state-note" style="margin-top:12px">${svg('message')}建议用两个字或三个字，孩子容易记住，误唤醒也更少。</div>
+          <div class="grid-2" style="margin-top:14px">${btn('试听声线','data-toast="已播放温柔女声"','secondary','mic')}${btn('边界说明','data-sheet="boundaries"','secondary','shield')}</div>
+        </div>
+        <div class="bottom-safe">${btn('设置紧急联系人','data-go="contacts"','primary','chevronRight')}</div>
+      `, { back: 'child' }),
+
+      contacts: () => page('安全', '添加紧急联系人', `
+        ${setupProgress(3, 3, '家庭资料设置')}
+        <div class="contact-purpose">
+          <div class="chip-row">${chip('SOS 兜底','danger','bell')}${chip('可稍后调整','info','users')}</div>
+          <h2 style="margin-top:18px">当你没看到告警时，第二联系人接住通知。</h2>
+          <div class="contact-chain">
+            <div class="contact-node"><strong>设备</strong><span>触发事件</span></div>
+            <div class="contact-node"><strong>管理员</strong><span>优先处理</span></div>
+            <div class="contact-node"><strong>联系人</strong><span>兜底通知</span></div>
+          </div>
+        </div>
+        <div class="list">${row('user','妈妈','管理员，接收全部告警','',chip('已验证','success'))}${row('users','爸爸','第二联系人，SOS 兜底通知','data-toast="已发送邀请"',chip('邀请','info'))}</div>
+        <div class="form-panel">
+          <h3>联系人用途</h3>
+          <p class="copy" style="margin-top:6px">安全事件、SOS 和门口异常会按优先级通知。普通任务不会打扰紧急联系人。</p>
+          <div class="state-note" style="margin-top:12px">${svg('check')}保存后可以在家庭成员里修改权限。</div>
+        </div>
+        <div class="bottom-safe">${btn('添加联系人','data-sheet="contact"','secondary','plus')}${btn('进入首页','data-go="home"','primary','home')}</div>
+      `, { back: 'name' }),
+
+      home: () => page('周一 19:42', `${state.childName}现在`, `
+        ${visual(assets.home, '书桌前写作业，状态正常。', '当前任务是数学作业，第 2 个专注轮次；12 分钟后需要家长确认证据。', chip('设备在线','success','wifi') + chip('隐私灯亮起','info','shield') + chip('待处理 2','warning','bell'))}
+        <div class="grid-3" style="margin-top:10px">${metric('安全','正常','success')}${metric('下一步','12m','info')}${metric('待处理','2','warning')}</div>
+        ${sectionTitle('需要你处理','只放真正要家长决策的事',`<button class="btn secondary" data-go="care">全部</button>`)}
+        <div class="list">${row('file','作业证据待确认','确认后进入日报和奖励流水','data-go="taskDetail"', '处理')}${row('gift','奖励申请待确认','孩子通过摄像头语音申请周末户外活动','data-sheet="reward"', '确认')}</div>
+        ${sectionTitle('关键操作','今日计划、设备状态、AI 判断和异常入口集中在这里。')}
+        <div class="grid-2">${btn('实时看护','data-go="watch"','secondary','watch')}${btn('今日任务','data-go="tasks"','secondary','tasks')}${btn('小书包','data-go="packing"','secondary','backpack')}${btn('安全告警','data-go="safety"','secondary','alert')}</div>
+        ${statusActions()}
+      `, { action: `<button class="icon-button" data-go="care" aria-label="待处理">${svg('bell')}</button>` }),
+
+      care: () => page('协作待办', '需要家长确认的事', `
+        <div class="list">${row('file','数学作业证据待确认','AI 判断完成 80%，需要家长确认','data-go="taskDetail"', '查看')}${row('gift','奖励申请待确认','小宇语音申请兑换，等待家长确认','data-sheet="reward"', '处理')}${row('shield','门口区域规则待设置','建议添加“独自在家不开门”提醒','data-go="safety"', '设置')}</div>
+        <div class="panel" style="margin-top:14px"><h3>协作记录</h3><p class="copy">处理后会记录照护人、时间和结果，避免多人重复处理。</p></div>
+      `, { back: 'home' }),
+
+      sleep: () => page('睡眠晨起', '今晚 21:30 上床目标', `
+        <div class="panel flat"><div class="grid-3">${metric('洗漱','待开始','warning')}${metric('小书包','2 项','info')}${metric('闹铃','07:10','success')}</div></div>
+        <div class="timeline" style="margin-top:18px">
+          ${timelineItem('20:50','整理书包','待确认','warn')}${timelineItem('21:10','洗漱提醒','保护就寝时间','')}${timelineItem('21:30','上床目标','只保留安全事件通知','')}
+        </div>
+        <div class="grid-2" style="margin-top:18px">${btn('延后 10 分钟','data-sheet="flowItem"','secondary','clock')}${btn('查看日报','data-go="report"','primary','file')}</div>
+      `, { back: 'home' }),
+
+      flow: () => page('按档案推荐', '任务模板', `
+        <div class="hero-image small"><img src="${assets.reward}" alt="任务模板"><div class="hero-overlay"><h2>小学一年级晚间模板</h2><p class="copy" style="color:#d6d6d6">作业、运动、小书包和睡前任务会按年龄与就寝时间控制强度。</p></div></div>
+        <div class="list" style="margin-top:14px">${row('book','上学日晚间','作业、晚饭收尾、小书包、睡前洗漱','data-sheet="taskTemplates"', '套用')}${row('backpack','小书包','课程表与老师通知生成清单','data-go="packing"')}${row('gift','奖励建议','优先亲子活动和小特权','data-go="reward"')}</div>
+      `, { back: 'tasks' }),
+
+      packing: () => page('小书包', '明天要带什么', `
+        <div class="panel"><div class="chip-row">${chip('部分书放学校','info','backpack')}${chip('2 项待确认','warning','bell')}</div><h2 style="margin-top:14px">按明日课表生成，少提醒无关物品。</h2><p class="copy" style="margin-top:8px">小学阶段优先检查作业本、练习册、文具和老师临时通知。</p></div>
+        <div class="list" style="margin-top:14px">${['数学练习册','语文听写本','校服外套','水杯'].map((item,i)=>row('backpack',item,i<2?'摄像头已确认放入书包':'待孩子自查',`data-action="packing-status" data-item="${item}"`, i<2?chip('已确认','success'):chip('待确认','warning'))).join('')}</div>
+        <div style="margin-top:18px">${btn('添加临时物品','data-sheet="packing"','primary','plus')}</div>
+      `, { back: 'tasks' }),
+
+      tasks: () => page('任务', '今天的安排', `
+        ${dateTabs()}
+        ${sectionTitle('当前主任务','先看正在影响今天节奏的一件事。',`<button class="btn secondary" data-sheet="task">新建</button>`)}
+        <div class="panel flat"><div class="chip-row">${chip('进行中','info','clock')}${chip('证据待生成','warning','file')}</div><h2 style="margin-top:14px">数学作业进行中</h2><p class="copy" style="margin-top:8px">剩余 12 分钟，结束后自动进入证据确认。</p><div class="grid-2" style="margin-top:14px">${btn('查看详情','data-go="taskDetail"','primary','chevronRight')}${btn('延后','data-sheet="flowItem"','secondary','clock')}</div></div>
+        ${sectionTitle('日期任务','可创建今天、明天或未来日期的任务。')}
+        ${taskRows()}
+      `),
+
+      taskDetail: () => page('任务详情', '数学作业证据', `
+        ${visual(assets.watch, 'AI 判断：基本完成', '书桌前持续学习 23 分钟，离座 1 次，截图证据需要家长确认。', chip('置信度 80%','info','spark') + chip(state.evidenceStatus === 'confirmed' ? '已确认' : '待确认', state.evidenceStatus === 'confirmed' ? 'success' : 'warning','file'))}
+        <div class="grid-3" style="margin-top:10px">${metric('专注','23m','info')}${metric('离座','1','warning')}${metric('积分','+5','success')}</div>
+        ${sectionTitle('家长处理','AI 给结论，最终由家长确认。')}
+        <div class="grid-2">${btn('处理证据','data-sheet="evidence"','primary','check')}${btn('专注计时','data-go="focus"','secondary','clock')}</div>
+      `, { back: 'tasks' }),
+
+      focus: () => page('专注计时', '第 2 个专注轮次', `
+        <div class="panel flat" style="text-align:center;padding:28px 16px"><p class="copy">剩余</p><h1 style="font-size:64px;font-variant-numeric:tabular-nums;margin-top:8px">12:04</h1><p class="copy" style="margin-top:8px">当前未离座，坐姿提醒 1 次。</p></div>
+        <div class="grid-2" style="margin-top:18px">${btn('暂停','data-toast="已暂停"','secondary','clock')}${btn('延后 10 分钟','data-toast="已延后 10 分钟"','secondary','clock')}${btn('提醒回座','data-toast="已发送温和提醒"','secondary','message')}${btn('结束本轮','data-toast="已结束本轮"','primary','check')}</div>
+      `, { back: 'taskDetail' }),
+
+      watch: () => page('实时看护', '儿童房画面', `
+        ${visual(assets.watch, 'LIVE 书桌视角', '远程查看时设备端隐私灯亮起。画面只用于家长判断任务和安全状态。', chip('LIVE','danger','camera') + chip('隐私灯亮起','info','shield') + chip('网络良好','success','wifi'))}
+        <div class="grid-3" style="margin-top:10px">${btn('截图','data-toast="截图已保存到事件证据"','secondary','camera')}${btn('通话','data-sheet="call"','primary','phone')}${btn('提醒','data-toast="已发送温和提醒"','secondary','message')}</div>
+        ${sectionTitle('AI 状态解释','米拉只在状态变化、任务节点或家长主动查看时复核画面。')}
+        <div class="list">${row('book','数学作业进行中','结束后自动进入证据确认','data-go="taskDetail"')}${row('image','事件回放','查看安全、睡眠、任务短片','data-go="playback"')}${row('lock','隐私提示','查看实时画面前说明可见状态','data-sheet="privacy"')}</div>
+      `),
+
+      playback: () => page('事件回放', '今天的片段', `
+        <div class="list">${row('image','19:18 作业开始','书桌视角，23 秒','data-sheet="playback"', '查看')}${row('shield','18:42 门口声音','安全区域触发，已处理','data-go="safetyDetail"', '详情')}${row('star','昨天成长时刻','第一次主动整理书包','data-sheet="moment"', '操作')}</div>
+        <div class="panel" style="margin-top:14px"><h3>空状态规则</h3><p class="copy">没有片段时会说明“今天没有需要回看的事件”，并提供调整保存策略入口。</p></div>
+      `, { back: 'watch' }),
+
+      zones: () => page('安全区域', '门口、厨房、窗边', `
+        ${visual(assets.alert, '门口区域规则', '独自在家时，不回应陌生敲门。触发后通知管理员和第二联系人。', chip('已启用','success','shield'))}
+        <div class="list" style="margin-top:14px">${row('shield','门口','陌生人或敲门声音触发','',chip('启用','success'))}${row('alert','厨房','靠近灶台超过阈值提醒','',chip('平衡','warning'))}${row('camera','自定义区域','从当前画面框选','data-sheet="zone"', '新增')}</div>
+      `, { back: 'watch' }),
+
+      safety: () => page('安全事件', '今日 1 个待复核', `
+        <div class="list">${row('alert','18:42 门口区域触发','设备检测到敲门声和门口活动','data-go="safetyDetail"', chip('待复核','danger'))}${row('shield','安全区域','门口、厨房、窗边规则','data-go="zones"')}${row('phone','测试紧急联系人','发送模拟安全通知','data-sheet="safety"', '测试')}</div>
+        <div class="panel" style="margin-top:14px"><h3>告警状态</h3><p class="copy">待处理、已联系、已处理、误报和升级联系人都会进入处理记录。</p></div>
+      `, { back: 'watch' }),
+
+      safetyDetail: () => page('安全事件详情', '门口区域触发', `
+        ${visual(assets.alert, '18:42 门口有活动', '设备记录到敲门声，孩子未靠近门口。建议联系孩子确认。', chip('高优先级','danger','alert') + chip('证据可用','info','image'))}
+        <div class="timeline" style="margin-top:16px">${timelineItem('18:42','触发门口规则','检测到敲门声','danger')}${timelineItem('18:43','设备语音提醒','请不要开门，先问家长','warn')}${timelineItem('18:45','等待家长处理','尚未联系孩子','')}</div>
+        <div class="grid-2" style="margin-top:18px">${btn('联系孩子','data-sheet="call"','primary','phone')}${btn('标记已处理','data-toast="已标记为规则已处理"','secondary','check')}${btn('标记误报','data-toast="已记录误报原因"','secondary','alert')}${btn('升级联系人','data-sheet="safety"','danger','bell')}</div>
+      `, { back: 'safety' }),
+
+      report: () => page('日报', '今天 30 秒结论', `
+        <div class="panel flat"><h2>状态正常，作业证据待确认。</h2><p class="copy" style="margin-top:8px">孩子今天自启动 2 次，晚间任务节奏正常，安全事件 1 个已进入待办。</p></div>
+        <div class="grid-3" style="margin-top:10px">${metric('任务','5/7','info')}${metric('专注','48m','success')}${metric('待确认','2','warning')}</div>
+        <div class="list" style="margin-top:14px">${row('file','数学作业证据','等待家长确认','data-go="taskDetail"', '处理')}${row('moon','睡眠晨起','21:30 上床目标','data-go="sleep"')}${row('image','成长时刻','主动整理书包','data-go="moments"')}</div>
+      `, { back: 'my' }),
+
+      weekly: () => page('周报', '本周趋势', `
+        <div class="panel flat"><h2>自启动有所改善，晚间提醒次数下降。</h2><p class="copy" style="margin-top:8px">周三和周四作业开始更稳定，但英语听读仍需要家长设置更短时长。</p></div>
+        <div class="grid-3" style="margin-top:10px">${metric('按时开始','+18%','success')}${metric('求助','6','info')}${metric('晚睡','1','warning')}</div>
+        <div class="list" style="margin-top:14px">${row('chart','作业依赖风险','没有出现高频直接求答案','')}${row('moon','睡眠趋势','周五建议提前 15 分钟收尾','data-go="sleep"')}${row('star','成长时刻','3 个精选片段','data-go="moments"')}</div>
+      `, { back: 'my' }),
+
+      moments: () => page('成长时刻', '精选片段', `
+        <div class="hero-image small"><img src="${assets.reward}" alt="成长时刻"><div class="hero-overlay"><h2>第一次主动整理书包</h2><p class="copy" style="color:#d6d6d6">已收藏到本周报告，默认只给家庭成员可见。</p></div></div>
+        <div class="list" style="margin-top:14px">${row('star','连续专注 25 分钟','周一 19:23','data-sheet="moment"', '操作')}${row('image','主动收拾桌面','周二 20:02','data-sheet="moment"', '操作')}${row('shield','安全提醒后等待家长','周三 18:41','data-go="safetyDetail"', '详情')}</div>
+      `, { back: 'my' }),
+
+      points: () => page('积分', `${state.pointBalance} ${state.pointUnit}`, `
+        <div class="panel flat"><div class="chip-row">${chip('阶段阈值 ' + state.pointThreshold,'info','star')}${chip('可兑换','success','gift')}</div><h2 style="margin-top:14px">已经积满 8 个阶段，还差 4 分到下一个阶段。</h2><div class="grid-2" style="margin-top:14px">${btn('选择奖品','data-sheet="manualReward"','primary','gift')}${btn('阶段规则','data-sheet="pointRule"','secondary','settings')}</div></div>
+        <div class="list" style="margin-top:14px">${row('check','数学作业确认','+5 积分，妈妈确认','')}${row('gift','周末户外活动','语音申请待确认','data-sheet="reward"', '处理')}${row('file','撤销自动加分','误判时可撤销','data-sheet="evidence"', '处理')}</div>
+      `, { back: 'my' }),
+
+      reward: () => page('奖励商店', '正向激励', `
+        ${visual(assets.reward, '奖励由家长确认', '摄像头只负责转交申请，不直接承诺孩子奖励。', chip(state.rewardStatus === 'requested' ? '待确认' : '已处理', state.rewardStatus === 'requested' ? 'warning' : 'success','gift'))}
+        <div class="grid-2" style="margin-top:14px">${btn('处理语音申请','data-sheet="reward"','primary','gift')}${btn('添加奖品','data-action="reward-add-open"','secondary','plus')}</div>
+        <div class="list" style="margin-top:14px">${row('gift','周末户外活动','需要 30 积分，孩子已申请','data-sheet="reward"', '确认')}${row('star','一起骑车 30 分钟','需要 20 积分','data-action="reward-edit-open"', '修改')}${row('trash','删除奖品演示','右滑删除在 App 中实现','data-action="reward-delete"', '删除')}</div>
+      `, { back: 'my' }),
+
+      checkin: () => page('打卡审核', '3 张素材待确认', `
+        <div class="list">${row('image','英语朗读视频','孩子通过摄像头完成拍摄','data-toast="素材已通过"', '通过')}${row('image','体育跳绳片段','需要重拍，画面主体不完整','data-toast="已驳回并要求重拍"', '驳回')}${row('file','学校打卡任务','保存素材，家长手动转发','data-sheet="playback"', '查看')}</div>
+      `, { back: 'my' }),
+
+      conversation: () => page('对话与人设', '有边界的陪伴', `
+        <div class="panel">${formField('唤醒名','小豆','wakeName2')}${formField('自由聊天单次时长','8 分钟','chatTime')}<div class="grid-2" style="margin-top:14px">${btn('试听声线','data-toast="已播放声线"','secondary','mic')}${btn('默认边界','data-sheet="boundaries"','secondary','shield')}</div></div>
+        <div class="list" style="margin-top:14px">${row('book','作业模式','只允许任务相关问答和温和提示','')}${row('moon','睡前限制','不主动开启长时间自由聊天','')}${row('file','记录策略','普通闲聊只保存主题摘要','')}</div>
+      `, { back: 'settings' }),
+
+      privacy: () => page('隐私与权限', '儿童数据由家长控制', `
+        <div class="list">${settingRow('远程查看提示','家长查看时设备端显示工作状态')}${settingRow('普通闲聊逐字记录','默认关闭，只展示主题摘要')}${settingRow('只保存事件截图','不保存全天连续录像')}</div>
+        <div class="panel" style="margin-top:14px"><h3>儿童数据权利</h3><p class="copy" style="margin:8px 0 14px">可导出或删除照片、视频、对话摘要、报告和普通任务证据。</p><div class="grid-2">${btn('导出数据','data-toast="已导出请求"','secondary','download')}${btn('删除数据','data-sheet="deleteData"','danger','trash')}</div></div>
+      `, { back: 'my' }),
+
+      family: () => page('家庭成员', '权限管理', `
+        <div class="list">${row('user','妈妈','管理员，全部权限','data-sheet="member"', '权限')}${row('users','爸爸','监护人，看护、报告、安全事件','data-sheet="member"', '权限')}${row('users','奶奶','临时查看者，只看今日待办和提醒','data-sheet="member"', '权限')}</div>
+        <div style="margin-top:18px">${btn('邀请成员','data-sheet="member"','primary','plus')}</div>
+      `, { back: 'settings' }),
+
+      device: () => page('设备管理', '儿童房摄像头', `
+        ${visual(assets.camera, 'Mira Cam M1 在线', '固件 1.2.8，网络良好，隐私模式未开启。', chip('在线','success','wifi') + chip('可升级','info','download'))}
+        <div class="list" style="margin-top:14px">${row('rotate','云台校准','书桌、床、门口、玩具区','data-toast="已校准"', '校准')}${row('wifi','网络状态','Mira Home 5G，信号良好','')}${row('download','固件升级','下载中 62%，升级中不可解绑','data-go="deviceOffline"', '状态')}${row('logout','解绑或转移','需要管理员确认','data-sheet="unbind"', chip('危险','danger'))}</div>
+      `, { back: 'settings' }),
+
+      notifications: () => page('通知设置', '只提醒真正重要的事', `
+        <div class="list">${settingRow('安全告警','SOS、门口、危险区域和异常声音')}${settingRow('任务待确认','作业证据、打卡素材和奖励申请确认')}${settingRow('任务提醒','小书包、睡前任务、晨起闹铃')}${settingRow('普通闲聊摘要','每天最多一次，不打扰工作时间')}</div>
+        <div class="panel" style="margin-top:14px"><h3>通知权限状态</h3><p class="copy">如果系统通知被拒绝，会进入权限引导页，并保留 App 内待办。</p>${btn('查看权限引导','data-go="permissionGuide"','secondary','shield')}</div>
+      `, { back: 'settings' }),
+
+      education: () => page('学习内容', '内容生态入口', `
+        <div class="list">${row('backpack','小书包设置','课程表、老师通知、入园和上学物品','data-go="packing"', '进入')}${row('book','合作内容','预留授权内容入口','data-toast="合作内容入口规划中"', chip('规划中','warning'))}${row('chart','学习缺漏诊断','长期数据积累后开启','',chip('P2','info'))}</div>
+        <div class="panel" style="margin-top:14px"><h3>边界说明</h3><p class="copy">内容生态只做任务和资源授权，不绕过学校或第三方平台规则自动提交内容。</p></div>
+      `, { back: 'settings' }),
+
+      feedback: () => page('帮助与反馈', '让问题能被追踪', `
+        ${visual(assets.support, '服务支持', '设备离线、隐私模式、任务证据误判和报告生成慢都可以在这里提交。', chip('工作日 9:00-21:00','info','help'))}
+        <div class="list" style="margin-top:14px">${row('message','提交产品反馈','体验问题、建议、误判样例','data-sheet="feedback"', '提交')}${row('alert','上报 AI 误判','关联证据、任务和处理结果','data-toast="已打开误判上报"', '上报')}${row('help','联系客服','工作日 9:00 - 21:00','data-toast="正在连接客服"', '联系')}</div>
+      `, { back: 'about' }),
+
+      about: () => page('关于我们', 'Mira Guardian', `
+        <div class="panel" style="text-align:center"><span class="row-icon" style="display:inline-grid;width:68px;height:68px;background:#111;color:#fff">${svg('spark')}</span><h2 style="margin-top:14px">家庭 AI 智护与成长中枢</h2><p class="copy" style="margin-top:8px">以家长规则为边界，以孩子真实生活场景为中心。</p></div>
+        <div class="list" style="margin-top:14px">${row('message','帮助与反馈','误判上报、客服、常见问题','data-go="feedback"')}${row('download','当前版本','v0.9.0 v3 原型，2026.06.01','data-toast="已是最新版本"', '检查')}${row('file','服务协议','家庭使用说明和使用边界','data-sheet="terms"', '查看')}${row('lock','隐私政策','儿童数据、权限和删除说明','data-sheet="privacyPolicy"', '查看')}</div>
+      `, { back: 'my' }),
+
+      my: () => page('家庭账户', '我的', `
+        <button class="list-row" data-go="accountProfile"><span class="row-icon">${svg('user')}</span><span class="row-main"><span class="row-title">${state.parentName}的家庭</span><span class="row-desc">${state.parentRole} · 管理员 · ${state.childName} ${state.childGrade}</span></span><span class="row-right">编辑</span></button>
+        <button class="panel" style="width:100%;margin-top:10px;text-align:left;color:inherit" data-go="subscription"><div class="chip-row">${chip('基础版','success','shield')}${chip('核心看护可用','info','camera')}</div><h3 style="margin-top:12px">订阅与套餐</h3><p class="copy" style="margin-top:6px">基础看护、实时查看、本地日报、隐私控制和儿童数据删除保持可用。</p></button>
+        ${sectionTitle('常用入口','报告、奖励、打卡和家庭协作。')}
+        <div class="grid-2">${btn('报告中心','data-go="report"','secondary','file')}${btn('积分奖励','data-go="reward"','secondary','gift')}${btn('打卡审核','data-go="checkin"','secondary','image')}${btn('家庭成员','data-go="family"','secondary','users')}</div>
+        ${sectionTitle('管理入口')}
+        <div class="list">${row('user','孩子档案','生日、就读阶段、年级/班级','data-go="child"')}${row('shield','账号安全','手机号、登录设备、注销账号','data-go="accountSecurity"')}${row('settings','设备与规则','设备、成员、对话边界和安全区域','data-go="settings"')}${row('lock','隐私与数据','记录策略、权限和儿童数据处理','data-go="privacy"')}${row('help','关于我们','帮助反馈、版本、服务协议','data-go="about"')}</div>
+        <div style="margin-top:16px">${btn('退出登录','data-sheet="logout"','secondary','logout')}</div>
+      `, { action: `<button class="icon-button" data-go="notifications" aria-label="通知设置">${svg('bell')}</button>` }),
+
+      accountProfile: () => page('个人信息', '当前家长', `
+        <div class="panel"><div style="display:flex;align-items:center;gap:12px"><span class="row-icon" style="display:grid;width:58px;height:58px;background:#111;color:#fff">${svg('user')}</span><div><h3>${state.parentName}</h3><p class="copy">${state.parentRole} · 家庭管理员</p></div></div>${formField('家庭显示名', state.parentName, 'profileName')}<div class="grid-2" style="margin-top:14px">${['妈妈','爸爸','祖辈','其他照护人'].map(role => `<button class="btn ${state.parentRole === role ? 'primary' : 'secondary'}" data-action="parent-role" data-role="${role}">${role}</button>`).join('')}</div></div>
+        <div class="list" style="margin-top:14px">${row('phone','手机号','138 **** 2026，用于登录和安全验证','data-sheet="changePhone"', '更换')}${row('users','家庭角色','管理员，可管理成员、设备和儿童数据','',chip('管理员','success'))}</div>
+        <div style="margin-top:18px">${btn('保存','data-go="my" data-toast="个人信息已保存"','primary','check')}</div>
+      `, { back: 'my' }),
+
+      accountSecurity: () => page('账号安全', '登录与设备', `
+        <div class="list">${row('phone','登录手机号','138 **** 2026','data-sheet="changePhone"', '更换')}${row('phone','登录设备','本机 iPhone，今天 14:20 活跃','data-sheet="loginDevices"', '查看')}${row('trash','注销账号','注销前需要转移管理员或解绑设备','data-sheet="deleteAccount"', chip('危险','danger'))}</div>
+      `, { back: 'my' }),
+
+      subscription: () => page('订阅与套餐', '米拉会员', `
+        <div class="panel flat"><p class="copy">当前套餐</p><h2 style="margin-top:8px">基础版</h2><p class="copy" style="margin-top:8px">任务提醒、实时看护、本地日报、隐私控制和儿童数据删除保持可用。</p></div>
+        <div class="list" style="margin-top:14px">${row('shield','基础版','随硬件包含基础提醒、实时查看和隐私控制','data-toast="已保留基础版"', chip('已启用','success'))}${row('spark','米拉会员','长期云端报告、高级趋势、更多声线','data-toast="会员开通流程待接入"', '19-39/月')}${row('users','家庭高级版','多孩子、多设备、多联系人','data-toast="已加入家庭高级版候补"', chip('规划中','warning'))}${row('file','取消或降级说明','不影响基础看护和儿童数据删除','data-sheet="subscriptionDowngrade"', '说明')}</div>
+      `, { back: 'my' }),
+
+      settings: () => page('设置项', '家庭与规则', `
+        <div class="list">${row('user','孩子档案','生日、就读阶段、班级/年级','data-go="child"')}${row('camera','设备管理','在线状态、网络、固件、解绑','data-go="device"')}${row('users','家庭成员','角色和通知分发','data-go="family"')}${row('message','对话与人设','唤醒名、声线、聊天边界','data-go="conversation"')}${row('bell','通知设置','推送优先级和照护人分发','data-go="notifications"')}${row('shield','安全区域','门口、厨房、窗边、阳台','data-go="zones"')}${row('book','学习内容','课程表、小书包和合作内容入口','data-go="education"')}${row('spark','组件状态总览','按钮、表单、toast、空和错误状态','data-go="componentStates"')}</div>
+      `, { back: 'my' }),
+
+      permissionGuide: () => page('权限引导', '开启必要权限', `
+        ${visual(assets.permission, '授权前说明', '通知用于安全告警和任务确认，麦克风用于通话，本地素材权限仅在截图或素材审核时使用。', chip('系统权限','info','shield'))}
+        <div class="list" style="margin-top:14px">${row('bell','通知权限','安全告警、任务证据和奖励确认','',chip('待开启','warning'))}${row('mic','麦克风权限','音频通话和设备调试','',chip('可稍后','info'))}${row('wifi','局域网权限','发现并连接家庭摄像头','',chip('必需','warning'))}</div>
+        <div style="margin-top:18px">${btn('模拟授权完成','data-go="home" data-toast="权限已完成"','primary','check')}</div>
+      `, { back: 'bind' }),
+
+      homeEmpty: () => page('空状态', '还没有设备', `
+        <div class="panel" style="text-align:center"><img src="${assets.empty}" alt="无设备状态" style="width:100%;border-radius:8px"><h2 style="margin-top:14px">连接第一台 AI 摄像头</h2><p class="copy" style="margin-top:8px">绑定后首页会显示孩子当前状态、今日计划、设备状态和待处理事项。</p></div>
+        <div style="margin-top:18px">${btn('点击连接设备','data-go="bind"','primary','plus')}</div>
+      `, { back: 'home' }),
+
+      homeError: () => page('错误状态', '首页加载失败', `
+        <div class="panel" style="text-align:center"><span class="row-icon" style="display:inline-grid;width:64px;height:64px;color:var(--danger);background:rgba(229,72,77,.12)">${svg('alert')}</span><h2 style="margin-top:14px">暂时无法获取家庭状态</h2><p class="copy" style="margin-top:8px">请检查网络。设备仍会在本地执行任务提醒，安全事件会继续保存。</p></div>
+        <div class="grid-2" style="margin-top:18px">${btn('重试','data-toast="正在重新加载"','primary','rotate')}${btn('查看设备','data-go="device"','secondary','camera')}</div>
+      `, { back: 'home' }),
+
+      watchOffline: () => page('设备离线', '实时看护不可用', `
+        ${visual(assets.empty, '摄像头离线', '最后在线 18:32。本地任务提醒不可用，App 仍可编辑任务，设备上线后同步。', chip('离线','danger','wifi'))}
+        <div class="list" style="margin-top:14px">${row('wifi','检查家庭 Wi-Fi','确认路由器和摄像头供电','')}${row('camera','查看设备状态','网络、固件、隐私模式','data-go="device"')}${row('help','联系支持','保留设备日志，便于客服排查','data-go="feedback"')}</div>
+      `, { back: 'watch' }),
+
+      watchPrivacy: () => page('隐私模式', '实时画面已受限', `
+        <div class="panel" style="text-align:center"><span class="row-icon" style="display:inline-grid;width:64px;height:64px;background:#fff;color:#111">${svg('lock')}</span><h2 style="margin-top:14px">隐私模式开启中</h2><p class="copy" style="margin-top:8px">实时画面、录音、录像和记录入口会受限。管理员可在隐私与权限中调整。</p></div>
+        <div class="grid-2" style="margin-top:18px">${btn('查看隐私设置','data-go="privacy"','primary','lock')}${btn('返回看护','data-go="watch"','secondary','watch')}</div>
+      `, { back: 'watch' }),
+
+      deviceOffline: () => page('设备状态', '异常与升级', `
+        ${visual(assets.camera, '固件升级中', '升级进度 62%。升级中不可解绑或断电，实时看护会短暂不可用。', chip('updating','warning','download'))}
+        <div class="list" style="margin-top:14px">${row('download','固件升级','62%，预计还需 4 分钟','',chip('进行中','warning'))}${row('wifi','网络状态','信号弱，已切到低清看护','',chip('弱网','warning'))}${row('alert','摄像头异常','麦克风自检未完成','data-go="feedback"', '支持')}</div>
+      `, { back: 'device' }),
+
+      componentStates: () => page('组件状态', '验收状态总览', `
+        <div class="panel"><h3>按钮</h3><div class="grid-2" style="margin-top:12px">${btn('默认主按钮','data-toast="主按钮反馈"','primary')}${btn('次要按钮','data-toast="次要按钮反馈"','secondary')}${btn('危险按钮','data-sheet="deleteData"','danger')}${btn('加载按钮','data-action="fake-loading"','secondary')}</div></div>
+        <div class="panel" style="margin-top:12px"><h3>表单</h3>${formField('手机号','138 0000','statePhone','tel','请输入 11 位手机号')}${formField('禁用字段','系统生成，不可编辑','stateDisabled')}</div>
+        <div class="panel" style="margin-top:12px"><h3>加载、空、错误、成功</h3><div class="list" style="margin-top:12px">${row('rotate','骨架屏加载','用于报告生成、看护连接和列表拉取','data-go="reportLoading"', '查看')}${row('image','空状态','无设备、无任务、无报告','data-go="homeEmpty"', '查看')}${row('alert','错误状态','网络、证据、报告和保存失败','data-go="homeError"', '查看')}${row('check','成功状态','toast 与短暂成功标记','data-toast="操作已完成"', '触发')}</div></div>
+        <div class="panel" style="margin-top:12px"><h3>骨架屏</h3><div style="display:grid;gap:10px;margin-top:12px"><span class="skeleton" style="width:70%"></span><span class="skeleton" style="height:48px"></span><span class="skeleton" style="height:48px"></span></div></div>
+      `, { back: 'welcome' }),
+
+      reportLoading: () => page('日报生成中', '正在整理今天', `
+        <div class="panel"><span class="skeleton" style="width:60%"></span><div style="display:grid;gap:10px;margin-top:18px"><span class="skeleton" style="height:96px"></span><span class="skeleton" style="height:58px"></span><span class="skeleton" style="height:58px"></span></div></div>
+        <div style="margin-top:18px">${btn('模拟生成完成','data-go="report" data-toast="日报已生成"','primary','check')}</div>
+      `, { back: 'componentStates' })
+    };
+
+    function timelineItem(time, title, desc, tone = '') {
+      return `<div class="timeline-item"><span class="timeline-dot ${tone === 'danger' ? 'danger' : tone === 'warn' ? 'warn' : tone === 'on' ? 'on' : ''}"></span><div><h3>${title}</h3><p class="copy">${desc}</p></div><span class="row-right">${time}</span></div>`;
+    }
+
+    const sheetContent = {
+      evidence: () => sheetWrap('处理任务证据', '确认结果会进入日报和奖励流水。若 AI 判断不准，可以标记误判原因。', `
+        <div class="grid-2">${btn('确认完成','data-action="evidence-result" data-result="confirmed"','primary','check')}${btn('部分完成','data-action="evidence-result" data-result="partial"','secondary','file')}${btn('驳回','data-action="evidence-result" data-result="rejected"','danger','x')}${btn('误判说明','data-sheet="feedback"','secondary','message')}</div>`),
+      privacy: () => sheetWrap('实时看护隐私提示', '家长查看实时画面时，设备端会显示工作状态。隐私模式开启后，实时看护、录音、录像和记录入口会受限。', btn('我知道了','data-close','primary')),
+      privacyNotice: () => sheetWrap('隐私说明', '儿童音视频采集会在设备绑定后单独授权。默认只保存任务证据、事件截图和必要报告摘要。', btn('我知道了','data-close','primary')),
+      terms: () => sheetWrap('服务协议', '服务协议包含家庭成员权限、设备绑定、订阅权益、客服支持和使用边界。正式版本会打开完整协议页面。', btn('知道了','data-close','primary')),
+      privacyPolicy: () => sheetWrap('隐私政策', '隐私政策说明儿童数据采集、保存、查看、导出和删除规则。配置类开关请到隐私与数据统一调整。', btn('知道了','data-close','primary')),
+      subscriptionDowngrade: () => sheetWrap('取消或降级说明', '取消订阅不会影响任务提醒、实时查看、本地日报、隐私控制和儿童数据删除。', btn('知道了','data-close','primary')),
+      changePhone: () => sheetWrap('更换手机号', '更换后会用于登录、安全验证和重要通知。敏感操作仍需要管理员二次确认。', `${formField('新手机号','139 0000 2026','newPhone','tel')}${formField('验证码','0626','newCode','tel')}${btn('确认更换','data-close data-toast="手机号已更新"','primary')}`),
+      loginDevices: () => sheetWrap('登录设备', '', `<div class="list">${row('phone','本机 iPhone','今天 14:20 活跃，当前设备','',chip('当前','success'))}${row('phone','MacBook Safari','昨天 21:04 登录','data-toast="已移除该设备"', '移除')}</div>${btn('完成','data-close','primary')}`),
+      logout: () => sheetWrap('退出登录', '退出后不会影响摄像头继续执行任务和安全提醒。再次进入 App 需要手机号验证码。', `<div class="grid-2">${btn('取消','data-close','secondary')}${btn('退出','data-close data-toast="已退出登录"','primary')}</div>`),
+      deleteAccount: () => sheetWrap('注销账号', '注销前需要先转移家庭管理员或解绑设备。儿童照片、报告、对话摘要和任务证据会进入删除确认流程。', btn('了解并继续','data-close data-toast="已进入注销确认流程"','danger')),
+      zone: () => sheetWrap('新增安全区域', '选择摄像头视角中的区域，设置触发条件、冷却时间和通知对象。', `<div class="grid-2">${btn('门口','data-close data-toast="已选择门口区域"','secondary')}${btn('厨房','data-close data-toast="已选择厨房区域"','secondary')}${btn('窗边','data-close data-toast="已选择窗边区域"','secondary')}${btn('自定义','data-close data-toast="已开始自定义框选"','primary')}</div>`),
+      moment: () => sheetWrap('成长时刻操作', '成长时刻优先收藏积极行为。家长可以收藏、隐藏、删除或分享给家庭成员。', `<div class="grid-2">${btn('收藏','data-close data-toast="已收藏"','primary')}${btn('分享','data-close data-toast="已分享给爸爸"','secondary')}${btn('隐藏','data-close data-toast="已隐藏"','secondary')}${btn('删除','data-close data-toast="已删除"','danger')}</div>`),
+      flowItem: () => sheetWrap('任务操作', '对卡住的任务可以延后、跳过、完成或提醒，所有操作会进入处理记录。', `<div class="grid-2">${btn('延后','data-close data-toast="已延后 10 分钟"','secondary')}${btn('提醒','data-close data-toast="已发送语音提醒"','secondary')}${btn('完成','data-close data-toast="已标记完成"','primary')}${btn('跳过','data-close data-toast="已跳过并记录原因"','danger')}</div>`),
+      call: () => sheetWrap('发起音频通话', '通话前设备端会提示孩子“妈妈正在联系你”。隐私模式开启时需要管理员确认。', `<div class="grid-2">${btn('开始通话','data-close data-toast="正在发起通话"','primary','phone')}${btn('取消','data-close','secondary')}</div>`),
+      pointMilestone: () => sheetWrap(state.pointUnit + '已积满', `当前可用 ${state.pointBalance}，按每阶段 ${state.pointThreshold} ${state.pointUnit} 提醒兑换。`, `<div class="grid-2">${btn('选择奖品','data-sheet="manualReward"','primary')}${btn('继续累积','data-action="milestone-continue"','secondary')}</div>${btn('调整阶段阈值','data-sheet="pointRule"','secondary','settings')}`),
+      pointRule: () => sheetWrap('奖励阶段设置', '家长可以选择积分、小红花或小星星作为计量方式。默认阈值 10。', `${formField('每个阶段需要', state.pointThresholdDraft, 'pointRuleInput', 'number')}${btn('保存设置','data-action="point-rule-save"','primary')}`),
+      manualReward: () => sheetWrap('家长主动兑换', '不需要孩子先申请，家长可以直接选择奖品并兑换。', `<div class="list">${row('gift','周末一起骑车','需要 20 ' + state.pointUnit,'data-action="manual-reward-select"', '选择')}${row('star','晚饭后一起桌游','需要 30 ' + state.pointUnit,'data-action="manual-reward-select"', '选择')}</div>${btn('确认兑换并扣 20 ' + state.pointUnit,'data-action="manual-reward-confirm"','primary')}`),
+      reward: () => sheetWrap('确认奖励申请', `${state.childName}对摄像头说“我想换周末户外活动”。摄像头只转交申请，不直接承诺结果。`, `<div class="grid-2">${btn('同意并兑现','data-action="reward-result" data-result="fulfilled"','primary')}${btn('同意稍后','data-action="reward-result" data-result="planned"','secondary')}${btn('暂不兑换','data-action="reward-result" data-result="rejected"','danger')}</div>`),
+      safety: () => sheetWrap('测试紧急联系人', '测试会给管理员和第二联系人发送模拟安全通知，不会触发真实报警。', btn('发送测试','data-close data-toast="测试通知已发送"','danger')),
+      boundaries: () => sheetWrap('默认互动边界', '命名这一步只说明默认规则，不要求家长马上配置。保存后可在对话与人设中调整。', `<div class="list">${row('book','作业模式','只允许任务相关问答和温和提示','')}${row('moon','睡前模式','不主动开启长时间自由聊天','')}${row('file','记录策略','普通闲聊默认只保存主题摘要','')}</div><div class="grid-2">${btn('知道了','data-close','secondary')}${btn('去设置','data-go="conversation"','primary')}</div>`),
+      contact: () => sheetWrap('添加紧急联系人', '', `${formField('姓名','外婆','contactName')}${formField('手机号','138 1234 5678','contactPhone','tel')}${btn('保存','data-close data-toast="联系人已添加"','primary')}`),
+      member: () => sheetWrap('成员权限', '', `<div class="grid-2">${btn('管理员','data-close data-toast="已设为管理员"','primary')}${btn('监护人','data-close data-toast="已设为监护人"','secondary')}${btn('临时查看者','data-close data-toast="已设为临时查看者"','secondary')}</div>`),
+      packing: () => sheetWrap('添加到小书包', '可临时加入老师通知或活动材料。', `${formField('物品名称','校服外套','packingDraft')}${btn('保存到小书包','data-action="packing-add"','primary')}`),
+      task: () => sheetWrap('创建任务', '普通新建需要先选任务日期。保存后进入当天任务列表。', `${formField('任务名称','英语听读','taskName')}${formField('开始时间','19:50','taskStart','time')}<div class="grid-2" style="margin-top:12px">${btn('选择日期','data-sheet="taskDate"','secondary','calendar')}${btn('套模板','data-sheet="taskTemplates"','secondary','spark')}</div><div class="grid-2" style="margin-top:12px">${btn('保存并继续','data-action="manual-save-continue"','secondary')}${btn('保存到任务','data-action="manual-save"','primary')}</div>`),
+      taskDate: () => sheetWrap('选择任务日期', '可选择今天、明天或未来日期。', `<div class="grid-2">${btn('今天','data-action="manual-date" data-date="today"','primary')}${btn('明天','data-action="manual-date" data-date="tomorrow"','secondary')}${btn('本周五','data-action="manual-date" data-date="future"','secondary')}${btn('日历选择','data-action="manual-date-pick" data-date="future"','secondary')}</div>`),
+      taskTemplates: () => sheetWrap('套用一天任务模板', '模板会合并到选中的日期，不覆盖已有任务。', `<div class="list">${row('book','上学日晚间','作业、晚饭、小书包、睡前','data-action="day-template-select"', '选择')}${row('moon','睡前任务','洗漱、书包、上床','data-action="day-template-select"', '选择')}</div>${btn('套用模板','data-action="day-template-apply"','primary')}`),
+      taskEdit: () => sheetWrap('编辑任务', '支持修改、延后、复制到明天或删除。', `<div class="grid-2">${btn('延后 10 分钟','data-action="task-delay"','secondary')}${btn('复制到明天','data-action="task-duplicate"','secondary')}${btn('删除','data-action="task-delete"','danger')}${btn('保存修改','data-action="task-edit-save"','primary')}</div>`),
+      timePicker: () => sheetWrap('选择时间', '', `<div class="grid-3">${['17:30','18:20','19:00','19:50','20:30','21:10'].map(t=>`<button class="btn secondary" data-action="time-select" data-time="${t}">${t}</button>`).join('')}</div>`),
+      playback: () => sheetWrap('回放片段', '片段只用于家长判断任务和安全事件，默认不会分享给家庭外成员。', `<img src="${assets.watch}" alt="回放片段" style="width:100%;border-radius:8px;margin:10px 0 14px">${btn('关闭','data-close','primary')}`),
+      rewardEdit: () => sheetWrap('添加或修改奖励', '', `${formField('奖品名称','周末一起骑车','rewardName')}${formField('所需数量','20','rewardCost','number')}${btn('保存奖励','data-action="reward-save"','primary')}`),
+      deleteData: () => sheetWrap('删除儿童数据', '删除会影响报告、证据和成长时刻。安全事件按合规策略保留最小必要内容。', btn('确认删除','data-close data-toast="已提交删除申请"','danger')),
+      unbind: () => sheetWrap('解绑设备', '解绑前请确认报告和证据已经同步。设备解绑后将停止远程看护和任务提醒。', btn('继续','data-close data-toast="已进入管理员确认"','danger')),
+      feedback: () => sheetWrap('提交产品反馈', '', `<div class="field"><label for="feedbackText">问题说明</label><textarea id="feedbackText">希望报告里能单独看睡前任务。</textarea></div>${btn('提交','data-close data-toast="反馈已提交"','primary')}`)
+    };
+
+    function sheetWrap(title, desc, content) {
+      return `<div class="grabber"></div><h2>${title}</h2>${desc ? `<p class="copy" style="color:#666;margin-top:8px">${desc}</p>` : ''}<div style="margin-top:16px">${content}</div>`;
+    }
+
+    function setScreen(id) {
+      if (!routes[id]) id = 'home';
+      state.current = id;
+      state.fabOpen = false;
+      history.replaceState(null, '', `?screen=${encodeURIComponent(id)}`);
+      render();
+    }
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+    function showSheet(name) {
+      const content = sheetContent[name] || sheetContent.privacy;
+      sheet.innerHTML = `<div class="sheet-panel">${content()}</div>`;
+      sheet.classList.add('open');
+      state.sheet = name;
+    }
+    function closeSheet() {
+      sheet.classList.remove('open');
+      sheet.innerHTML = '';
+      state.sheet = '';
+    }
+    function showGuide() {
+      guide.innerHTML = `<div class="guide-card"><h2>首次进入看护</h2><p class="copy" style="color:#555;margin-top:8px">底部中间按钮用于快速创建任务。实时看护前会先说明设备端可见提示和隐私边界。</p><button class="btn primary block" data-close-guide style="margin-top:16px">我知道了</button></div><span class="guide-arrow" aria-hidden="true"></span>`;
+      guide.classList.add('open');
+    }
+
+    function handleAction(target) {
+      const action = target.dataset.action;
+      if (!action) return false;
+      if (action === 'login-submit') {
+        if (state.loginError) {
+          const panel = app.querySelector('.auth-card');
+          panel && panel.classList.add('shake');
+          showToast('验证码错误，请重新输入');
+        } else {
+          setScreen('parentIdentity');
+          showToast('登录成功');
+        }
+        return true;
+      }
+      if (action === 'welcome-next') {
+        state.welcomeSlide = Math.min(welcomeSlides.length - 1, state.welcomeSlide + 1);
+        render();
+        return true;
+      }
+      if (action === 'login-error-demo') { state.loginError = true; render(); return true; }
+      if (action === 'parent-role') { state.parentRole = target.dataset.role || state.parentRole; state.parentName = state.parentRole; state.identityError = false; render(); return true; }
+      if (action === 'identity-submit') {
+        if (!state.parentRole) {
+          state.identityError = true;
+          render();
+          showToast('请选择家长身份');
+        } else {
+          setScreen('bind');
+        }
+        return true;
+      }
+      if (action === 'bind-search') {
+        state.bindState = 'searching';
+        render();
+        showToast('正在搜索附近设备');
+        clearTimeout(handleAction.bindTimer);
+        handleAction.bindTimer = setTimeout(() => {
+          if (state.current === 'bind' && state.bindState === 'searching') {
+            state.bindState = 'found';
+            render();
+            showToast('发现 1 台摄像头');
+          }
+        }, 780);
+        return true;
+      }
+      if (action === 'bind-fail') { state.bindState = 'failed'; render(); showToast('未找到设备'); return true; }
+      if (action === 'bind-connect') { state.bindState = 'found'; setScreen('wifi'); return true; }
+      if (action === 'bind-submit') { showToast('正在绑定设备'); setTimeout(() => setScreen('bindDone'), 320); return true; }
+      if (action === 'wifi-toggle-password') { state.showWifiPassword = !state.showWifiPassword; render(); return true; }
+      if (action === 'wifi-fail-demo') { state.wifiFail = true; state.wifiLoading = false; render(); showToast('Wi-Fi 密码错误'); return true; }
+      if (action === 'wifi-clear-error') { state.wifiFail = false; render(); showToast('已清除错误'); return true; }
+      if (action === 'wifi-submit') {
+        if (state.wifiLoading) return true;
+        if (state.wifiFail) {
+          const panel = app.querySelector('.wifi-sheet');
+          panel && panel.classList.add('shake');
+          showToast('请检查密码后重试');
+          return true;
+        }
+        state.wifiLoading = true;
+        render();
+        showToast('正在连接 Wi-Fi');
+        clearTimeout(handleAction.wifiTimer);
+        handleAction.wifiTimer = setTimeout(() => {
+          state.wifiLoading = false;
+          state.wifiFail = false;
+          setScreen('bindDone');
+          showToast('设备绑定成功');
+        }, 900);
+        return true;
+      }
+      if (action === 'task-day') { state.taskDay = target.dataset.day || 'today'; render(); return true; }
+      if (action === 'task-open') { showSheet('taskEdit'); return true; }
+      if (['manual-date','manual-date-pick'].includes(action)) { closeSheet(); showSheet('task'); showToast('已选择任务日期'); return true; }
+      if (['manual-save','manual-save-continue'].includes(action)) { closeSheet(); setScreen('tasks'); showToast(action === 'manual-save' ? '任务已创建' : '已保存，可以继续添加下一条'); return true; }
+      if (['day-template-select'].includes(action)) { showToast('已选择模板'); return true; }
+      if (action === 'day-template-apply') { closeSheet(); setScreen('tasks'); showToast('已套用上学日晚间模板'); return true; }
+      if (['task-delay','task-duplicate','task-edit-save','task-delete'].includes(action)) { closeSheet(); setScreen('tasks'); showToast(action === 'task-delete' ? '任务已删除' : action === 'task-duplicate' ? '已复制到明天' : action === 'task-delay' ? '已延后 10 分钟' : '任务已更新'); return true; }
+      if (action === 'time-select') { closeSheet(); showSheet('task'); showToast('时间已更新'); return true; }
+      if (action === 'setting-toggle') { const key = target.dataset.setting; state.toggles[key] = !state.toggles[key]; render(); showToast('设置已保存'); return true; }
+      if (action === 'evidence-result') { state.evidenceStatus = target.dataset.result; closeSheet(); setScreen('taskDetail'); showToast(state.evidenceStatus === 'confirmed' ? '已确认完成' : state.evidenceStatus === 'partial' ? '已改为部分完成' : '已驳回 AI 判断'); return true; }
+      if (action === 'point-rule-save') { const input = document.getElementById('pointRuleInput'); const value = Number(input && input.value); if (!Number.isInteger(value) || value < 1) { showToast('请输入阶段阈值'); return true; } state.pointThreshold = value; state.pointThresholdDraft = String(value); closeSheet(); render(); showToast('阶段规则已保存'); return true; }
+      if (action === 'manual-reward-select') { showToast('已选择奖品'); return true; }
+      if (action === 'manual-reward-confirm') { state.pointBalance = Math.max(0, state.pointBalance - 20); closeSheet(); setScreen('points'); showToast('已兑换并扣除' + state.pointUnit); return true; }
+      if (action === 'reward-result') { state.rewardStatus = target.dataset.result; closeSheet(); setScreen('reward'); showToast(state.rewardStatus === 'fulfilled' ? '已同意并兑现' : state.rewardStatus === 'planned' ? '已同意稍后提醒' : '已暂不兑换'); return true; }
+      if (action === 'reward-add-open' || action === 'reward-edit-open') { showSheet('rewardEdit'); return true; }
+      if (action === 'reward-delete') { showToast('至少保留一个奖品'); return true; }
+      if (action === 'reward-save') { closeSheet(); setScreen('reward'); showToast('奖励已添加'); return true; }
+      if (action === 'packing-status') { showToast(`${target.dataset.item}状态已更新`); return true; }
+      if (action === 'packing-add') { closeSheet(); setScreen('packing'); showToast('已保存到小书包'); return true; }
+      if (action === 'schoolbag-mode') { showToast('小书包规则已更新'); return true; }
+      if (action === 'milestone-continue') { closeSheet(); setScreen('points'); showToast('已继续累积'); return true; }
+      if (action === 'fake-loading') { showToast('保存中'); setTimeout(() => showToast('操作已完成'), 650); return true; }
+      return false;
+    }
+
+    function renderNav() {
+      const root = rootFor(state.current);
+      const hidden = onboardingScreens.has(state.current) && !['homeEmpty','homeError','watchOffline','watchPrivacy','deviceOffline','componentStates'].includes(state.current);
+      tabbar.classList.toggle('hidden', hidden);
+      quickActions.classList.toggle('open', state.fabOpen && !hidden);
+      tabbar.innerHTML = [
+        ['home','home','首页'],
+        ['tasks','tasks','任务'],
+        ['plus','plus',''],
+        ['watch','watch','看护'],
+        ['my','user','我的']
+      ].map(([id, iconName, label]) => id === 'plus'
+        ? `<button class="main-fab ${state.fabOpen ? 'open' : ''}" data-action="fab-toggle" aria-label="创建任务">${svg('plus')}</button>`
+        : `<button class="nav-btn ${root === id ? 'active' : ''}" data-go="${id}" aria-current="${root === id ? 'page' : 'false'}">${svg(iconName)}<span>${label}</span></button>`
+      ).join('');
+    }
+
+    function render() {
+      const dark = darkScreens.has(state.current);
+      shell.classList.toggle('light', !dark);
+      app.innerHTML = routes[state.current] ? routes[state.current]() : routes.home();
+      renderNav();
+      closeSheet();
+      app.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    document.addEventListener('click', event => {
+      const target = event.target.closest('button, a');
+      if (!target) return;
+      if (target.dataset.close !== undefined) closeSheet();
+      if (target.dataset.closeGuide !== undefined) guide.classList.remove('open');
+      if (target.dataset.action === 'fab-toggle') {
+        state.fabOpen = !state.fabOpen;
+        renderNav();
+        return;
+      }
+      if (handleAction(target)) return;
+      if (target.dataset.go) setScreen(target.dataset.go);
+      if (target.dataset.sheet) showSheet(target.dataset.sheet);
+      if (target.dataset.toast) showToast(target.dataset.toast);
+    });
+    sheet.addEventListener('click', event => {
+      if (event.target === sheet) closeSheet();
+    });
+    guide.addEventListener('click', event => {
+      if (event.target === guide) guide.classList.remove('open');
+    });
+
+    render();
+    if (state.current === 'home' && !localStorage.getItem('mira-v3-guide-seen')) {
+      localStorage.setItem('mira-v3-guide-seen', '1');
+      setTimeout(showGuide, 500);
+    }
+  </script>
+</body>
+</html>

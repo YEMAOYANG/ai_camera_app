@@ -1,12 +1,10 @@
 const refs = {
-  study:
-    "https://images.unsplash.com/photo-1758612898114-4b1504db79a7?auto=format&fit=crop&w=1000&q=82",
-  room:
-    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1000&q=82",
-  desk:
-    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1000&q=82",
-  bedtime:
-    "https://images.unsplash.com/photo-1616627561950-9f746e330187?auto=format&fit=crop&w=1000&q=82",
+  study: "./assets/generated/care-scene.png",
+  room: "./assets/generated/alert-scene.png",
+  desk: "./assets/generated/care-scene.png",
+  device: "./assets/generated/device-setup.png",
+  empty: "./assets/generated/empty-state.png",
+  bedtime: "./assets/generated/care-scene.png",
 };
 
 const screen = document.getElementById("screen");
@@ -309,6 +307,7 @@ const fullViews = {
       <section class="setup-flow">
         <header class="setup-step-head"><span>绑定完成</span><b>4 / 9</b></header>
         <section class="done-card">
+          <img class="setup-result-image" src="${refs.device}" alt="摄像头连接成功的柔和插画" />
           <span class="done-icon">${icon("check", "w-8 h-8")}</span>
           <h1>设备已绑定</h1>
           <p>隐私灯和提示音测试通过。接下来创建孩子档案，任务、证据和告警都会按孩子资料归档。</p>
@@ -1213,6 +1212,8 @@ function renderOverlay() {
     falseAlarm: simple("标记误报", "这会帮助 AI 调整后续告警阈值，本次不会升级给紧急联系人。", "确认误报", "alert-false", true),
     safety: simple("测试紧急联系人", "测试会给管理员和第二联系人发送模拟安全通知，不会触发真实报警。", "发送测试", "safety-test"),
     privacyMode: simple("远程查看提示", "建议保持开启，让孩子知道家长正在查看。", "保持开启", "toggle-remote-hint"),
+    pauseCareConfirm: simple("暂停实时看护", "暂停后不会显示实时画面，也不会保存新的实时截图；安全告警仍按隐私规则运行。", "暂停 30 分钟", "toggle-remote-hint"),
+    deviceException: simple("设备异常处理", "建议先重启设备并测试麦克风。如果 5 分钟内仍异常，保留历史证据并联系家庭成员确认。", "按步骤处理", "safety-test"),
     deleteData: simple("删除儿童数据", "删除会影响报告、证据和成长时刻。安全事件只保留最小必要内容。", "提交删除申请", "delete-data", true),
     unbindDevice: simple("确认解绑设备", "解绑后无法查看实时画面和新证据。需要管理员二次确认。", "继续解绑", "unbind-device", true),
     changePhone: simple("更换手机号", "更换后用于登录、安全验证和重要通知。", "确认更换", "change-phone"),
@@ -1358,41 +1359,64 @@ function packingRows() {
     .join("");
 }
 
+const onboardingHabitAssets = {
+  companion: "./assets/onboarding/generated/habit-companion-welcome.webp",
+  selfStart: "./assets/onboarding/generated/habit-self-start.webp",
+  lifeTable: "./assets/onboarding/generated/habit-life-table.webp",
+  reward: "./assets/onboarding/generated/habit-reward-confirm.webp",
+  plan: "./assets/onboarding/generated/habit-plan-rhythm.webp",
+};
+
 const onboardingSlides = [
   {
-    asset: "./assets/onboarding/onboarding-01-parent-status.png",
-    title: "不用一直盯着屏幕",
-    description: "米拉帮你汇总孩子状态、任务进展和需要处理的事。",
-    kicker: "状态汇总",
-    alt: "家长拿着手机查看孩子状态，AI 摄像头在家庭书房中轻量守护",
+    asset: onboardingHabitAssets.companion,
+    titleLines: ["把今天的", "节奏理顺"],
+    description: "学习、餐桌、收纳和睡前任务会被整理好，需要你判断的事会放到前面。",
+    kicker: "习惯节奏",
+    support: "少催促",
+    supportIcon: "volume-1",
+    chips: ["自动整理", "关键在前", "少催促"],
+    alt: "家长安静查看手机，孩子在书桌前自己开始写作业，米拉在旁边温和陪伴",
   },
   {
-    asset: "./assets/onboarding/onboarding-02-child-task.png",
-    title: "知道孩子正在做什么",
-    description: "当前任务、剩余时间和完成证据，会在需要时整理给家长。",
-    kicker: "任务看护",
-    alt: "孩子在书桌前专注写作业，旁边有轻量任务进度提示",
+    asset: onboardingHabitAssets.selfStart,
+    titleLines: ["先让孩子", "自己开始"],
+    description: "AI 只给一个小动作提示，等孩子进入状态后，就安静记录进度。",
+    kicker: "自启动",
+    support: "低打扰",
+    supportIcon: "sparkles",
+    chips: ["一个动作", "低打扰", "看见进度"],
+    alt: "孩子在家庭书桌前自主开始学习，旁边有柔和的习惯节奏光层",
   },
   {
-    asset: "./assets/onboarding/onboarding-03-evidence-reward.png",
-    title: "该你确认时再提醒",
-    description: "任务完成、奖励申请、打卡证据，只在需要你判断时出现。",
-    kicker: "证据与奖励",
-    alt: "家长在手机上确认任务证据和奖励申请",
+    asset: onboardingHabitAssets.lifeTable,
+    titleLines: ["小习惯", "也能被看见"],
+    description: "吃饭收尾、小书包和玩具归位，会按家里规则拆成可完成的小步骤。",
+    kicker: "生活习惯",
+    support: "小步骤",
+    supportIcon: "utensils",
+    chips: ["餐桌收尾", "小书包", "睡前准备"],
+    alt: "温暖家庭场景中，孩子完成日常习惯任务，家长无需反复催促",
   },
   {
-    asset: "./assets/onboarding/onboarding-04-safety-boundary.png",
-    title: "安全提醒有边界",
-    description: "异常声音、离开区域、陌生人等事件会提示你，同时保留隐私提醒。",
-    kicker: "安全与隐私",
-    alt: "孩子在安全区域内，门口和隐私灯提示以柔和方式呈现",
+    asset: onboardingHabitAssets.reward,
+    titleLines: ["奖励这件事", "还是你决定"],
+    description: "AI 只转交申请和证据，是否兑现、何时兑现，由家长最后确认。",
+    kicker: "家长确认",
+    support: "有边界",
+    supportIcon: "shield-check",
+    chips: ["证据清楚", "申请转交", "家长确认"],
+    alt: "家长查看任务证据和奖励申请，AI 只提供建议，最终由家长确认",
   },
   {
-    asset: "./assets/onboarding/onboarding-05-start-family.png",
-    title: "开始设置家庭看护",
-    description: "先绑定设备并创建孩子档案，再开启任务、看护和安全提醒。",
+    asset: onboardingHabitAssets.plan,
+    titleLines: ["先设好", "今天怎么过"],
+    description: "创建档案后，把任务、提醒边界和奖励规则排好，少一点临时催促。",
     kicker: "准备开始",
-    alt: "家长、孩子和 AI 摄像头在同一家庭场景中准备开始家庭看护设置",
+    support: "家长可控",
+    supportIcon: "sliders-horizontal",
+    chips: ["任务节奏", "提醒边界", "奖励规则"],
+    alt: "家长和孩子在温暖书房中准备使用米拉设置每日习惯节奏",
   },
 ];
 
@@ -1506,6 +1530,11 @@ const views = {
   welcome() {
     const slide = onboardingSlides[state.onboardingIndex];
     const isLast = state.onboardingIndex === onboardingSlides.length - 1;
+    const titleLines = slide.titleLines || [slide.title];
+    const titleMarkup = titleLines
+      .map((line, index) => `<span class="${index === titleLines.length - 1 ? "title-emphasis" : ""}">${line}</span>`)
+      .join("");
+    const valueChips = (slide.chips || []).map((chip) => `<span>${chip}</span>`).join("");
     return `
       <section class="onboarding-scene" aria-labelledby="welcome-title">
         <header class="onboard-top">
@@ -1521,20 +1550,27 @@ const views = {
           </div>
           <span class="arc-cut arc-left" aria-hidden="true"></span>
           <span class="arc-cut arc-right" aria-hidden="true"></span>
-          <img class="onboard-illustration" src="${slide.asset}" alt="${slide.alt}" />
+          <div class="onboard-image-frame">
+            <img class="onboard-illustration" src="${slide.asset}" alt="${slide.alt}" />
+            <div class="onboard-image-glow" aria-hidden="true"></div>
+            <div class="onboard-mini-rhythm" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
           <div class="onboard-float float-status">
-            ${icon(state.onboardingIndex === 3 ? "lock-keyhole" : "sparkles", "w-4 h-4")}
+            ${icon(state.onboardingIndex === 3 ? "check-circle-2" : "sparkles", "w-4 h-4")}
             <span>${slide.kicker}</span>
           </div>
           <div class="onboard-float float-ai">
-            ${icon("camera", "w-4 h-4")}
-            <span>AI 轻量守护</span>
+            ${icon(slide.supportIcon || "sparkles", "w-4 h-4")}
+            <span>${slide.support}</span>
           </div>
         </section>
 
         <section class="onboard-copy">
-          <h1 id="welcome-title">${slide.title}</h1>
+          <h1 id="welcome-title">${titleMarkup}</h1>
           <p>${slide.description}</p>
+          ${valueChips ? `<div class="onboard-value-row" aria-label="本页重点">${valueChips}</div>` : ""}
         </section>
 
         <footer class="onboard-footer">
@@ -1569,9 +1605,8 @@ const views = {
         <div class="auth-calm-space" aria-hidden="true"></div>
 
         <section class="auth-copy-block">
-          <p class="auth-eyebrow">家长端 AI 摄像头助手</p>
           <h1 id="login-title">用手机号继续</h1>
-          <p>验证家长身份，继续设置家庭看护。</p>
+          <p>验证家长身份，继续设置家庭看护</p>
         </section>
 
         <form class="auth-form" novalidate>
@@ -1603,7 +1638,7 @@ const views = {
             ${state.loginLoading ? `<span class="loading-dot"></span>获取中...` : "获取验证码"}
           </button>
 
-          <p class="auth-footnote">未注册手机号验证后将自动创建家长账户。</p>
+          <p class="auth-footnote">未注册手机号验证后将自动创建家长账户</p>
         </form>
       </section>
     `;
@@ -1619,13 +1654,11 @@ const views = {
 
         <button class="auth-back" data-auth-back>
           ${icon("chevron-left", "w-4 h-4")}
-          修改手机号
         </button>
 
         <section class="auth-copy-block">
-          <p class="auth-eyebrow">安全验证</p>
           <h1 id="verify-title">输入验证码</h1>
-          <p>已发送至 <strong>+86 ${formatPhone(phone)}</strong></p>
+          <p>验证码已发送至 <strong>+86 ${formatPhone(phone)}</strong></p>
         </section>
 
         <form class="auth-form verify-form" novalidate>
@@ -2018,6 +2051,1087 @@ const views = {
 };
 
 Object.assign(views, fullViews);
+
+const premiumViewAliases = {
+  setupComplete: "setupDone",
+  setupChildError: "setupChild",
+  setupDeviceFailed: "bindingFailed",
+  setupPermissionsFailed: "permissionDenied",
+  watchPrivacyPaused: "watchPrivacy",
+  taskSearchNoResult: "taskNoResult",
+  pendingDecisions: "care",
+};
+
+function pStatus(label, tone = "info", iconName = "sparkles") {
+  return `<span class="p-status ${tone}">${icon(iconName, "w-3.5 h-3.5")}<span>${label}</span></span>`;
+}
+
+function pHeader({ kicker, title, subtitle = "", back = "", action = "" }) {
+  return `
+    <header class="p-header">
+      ${back ? `<button class="p-icon-button" data-nav="${back}" aria-label="返回">${icon("chevron-left")}</button>` : ""}
+      <div class="p-header-copy">
+        <p>${kicker}</p>
+        <h1>${title}</h1>
+        ${subtitle ? `<span>${subtitle}</span>` : ""}
+      </div>
+      ${action || `<button class="p-icon-button notice-dot" data-nav="alerts" aria-label="通知">${icon("bell")}</button>`}
+    </header>
+  `;
+}
+
+function pShell({ kicker, title, subtitle = "", back = "", action = "", cls = "", body = "" }) {
+  return `
+    <section class="scene premium-app ${cls}">
+      <div class="p-light-field" aria-hidden="true"></div>
+      ${pHeader({ kicker, title, subtitle, back, action })}
+      <div class="p-stack">${body}</div>
+    </section>
+  `;
+}
+
+function pActionRow(actions = []) {
+  return `<div class="p-action-row">${actions.map(([label, attrs = "", tone = ""]) => `<button class="p-button ${tone}" ${attrs}>${label}</button>`).join("")}</div>`;
+}
+
+function pAiCard({ title, body, confidence = "91%", evidence = "3 项证据", tone = "ai", actions = [] }) {
+  return `
+    <section class="p-ai-card ${tone}">
+      <div class="p-card-sheen" aria-hidden="true"></div>
+      <div class="p-ai-head">
+        <span class="p-ai-orb">${icon("sparkles", "w-4 h-4")}</span>
+        <div>
+          <strong>${title}</strong>
+          <small>AI-generated · 置信度 ${confidence} · ${evidence}</small>
+        </div>
+      </div>
+      <p>${body}</p>
+      ${actions.length ? pActionRow(actions) : ""}
+    </section>
+  `;
+}
+
+function pEvidenceCard(title, desc, tone = "info", route = "evidencePreview") {
+  const iconMap = { info: "file-check-2", success: "check-circle-2", warning: "triangle-alert", danger: "siren", ai: "bot" };
+  return `
+    <button class="p-evidence-card ${tone}" data-nav="${route}">
+      <span>${icon(iconMap[tone] || "file-check-2", "w-4 h-4")}</span>
+      <div><strong>${title}</strong><small>${desc}</small></div>
+      ${icon("chevron-right", "w-4 h-4")}
+    </button>
+  `;
+}
+
+function pMetric(label, value, desc, tone = "info") {
+  return `<div class="p-metric ${tone}"><strong>${value}</strong><span>${label}</span><small>${desc}</small></div>`;
+}
+
+function pBentoCard({ cls = "", eyebrow = "", title = "", desc = "", status = "", route = "", children = "", action = "" }) {
+  const tag = route ? "button" : "section";
+  const routeAttr = route ? `data-nav="${route}"` : "";
+  return `
+    <${tag} class="p-bento-card ${cls}" ${routeAttr}>
+      <div class="p-card-sheen" aria-hidden="true"></div>
+      ${status ? `<div class="p-bento-status">${status}</div>` : ""}
+      ${eyebrow ? `<span class="p-eyebrow">${eyebrow}</span>` : ""}
+      ${title ? `<h2>${title}</h2>` : ""}
+      ${desc ? `<p>${desc}</p>` : ""}
+      ${children}
+      ${action}
+    </${tag}>
+  `;
+}
+
+function pStatePage({ kind = "info", title, body, back = "home", actions = [], extra = "" }) {
+  const iconMap = {
+    info: "info",
+    loading: "loader-2",
+    empty: "circle-dashed",
+    error: "cloud-off",
+    danger: "triangle-alert",
+    warning: "octagon-alert",
+    success: "check-circle-2",
+    offline: "wifi-off",
+  };
+  return pShell({
+    kicker: "状态说明",
+    title,
+    subtitle: body,
+    back,
+    cls: `state-lab ${kind}`,
+    body: `
+      <section class="p-state-hero ${kind}">
+        <span class="p-state-icon">${icon(iconMap[kind] || "info", "w-7 h-7")}</span>
+        <h2>${title}</h2>
+        <p>${body}</p>
+        ${actions.length ? pActionRow(actions) : ""}
+      </section>
+      ${extra}
+    `,
+  });
+}
+
+function pInlineState({ kind = "info", title, body, actions = [] }) {
+  return `
+    <section class="p-state-hero ${kind} compact">
+      <span class="p-state-icon">${icon(kind === "warning" ? "octagon-alert" : kind === "danger" ? "triangle-alert" : kind === "success" ? "check-circle-2" : "info", "w-6 h-6")}</span>
+      <h2>${title}</h2>
+      <p>${body}</p>
+      ${actions.length ? pActionRow(actions) : ""}
+    </section>
+  `;
+}
+
+function pDecisionList(items) {
+  return `<section class="p-decision-list">${items.map(([title, desc, tone, route, meta = "待家长判断"]) => pEvidenceCard(title, `${meta} · ${desc}`, tone, route)).join("")}</section>`;
+}
+
+function pLiveLens({ mode = "normal", title = "书桌视角已连接", desc = "米拉建议保持观察，不主动打断。", badges = [], actions = true }) {
+  const modeTone = {
+    normal: "success",
+    alert: "danger",
+    offline: "danger",
+    privacy: "info",
+    low: "warning",
+    updating: "warning",
+  };
+  const defaultBadges = badges.length ? badges : [
+    ["LIVE", "radio", "success"],
+    ["38ms", "wifi", "info"],
+    ["隐私提示中", "shield-check", "ai"],
+  ];
+  return `
+    <section class="p-live-lens ${mode}">
+      <img src="${refs.desk}" alt="家庭书桌看护画面" />
+      <div class="p-live-overlay" aria-hidden="true"></div>
+      <div class="p-live-top">${defaultBadges.map(([label, ico, tone]) => pStatus(label, tone, ico)).join("")}</div>
+      <div class="p-live-copy">
+        ${pStatus(mode === "normal" ? "安全正常" : mode === "privacy" ? "隐私暂停" : mode === "low" ? "低置信度" : mode === "offline" ? "设备离线" : "需要判断", modeTone[mode] || "info", mode === "offline" ? "wifi-off" : "sparkles")}
+        <h2>${title}</h2>
+        <p>${desc}</p>
+      </div>
+      ${
+        actions
+          ? `<div class="p-live-tools">
+              <button aria-label="截图" data-toast="截图已保存到证据预览">${icon("camera")}</button>
+              <button class="primary" aria-label="通话" data-sheet="callChild">${icon("phone")}</button>
+              <button aria-label="提醒" data-toast="已发送温和提醒">${icon("bell-ring")}</button>
+            </div>`
+          : ""
+      }
+    </section>
+  `;
+}
+
+function pSettingsGroup(title, rows) {
+  return `
+    <section class="p-control-group">
+      <div class="p-section-title"><h3>${title}</h3></div>
+      ${rows.map(([ico, label, desc, route, tone = ""]) => pEvidenceCard(label, desc, tone || "info", route)).join("")}
+    </section>
+  `;
+}
+
+function pNotificationPage(type, title, desc, tone = "info") {
+  return pShell({
+    kicker: "通知详情",
+    title,
+    subtitle: desc,
+    back: "alerts",
+    body: `
+      ${pBentoCard({
+        cls: `wide ${tone}`,
+        status: pStatus(type, tone, tone === "danger" ? "siren" : "bell"),
+        title,
+        desc,
+        children: `<div class="p-evidence-grid">${pMetric("触达", "已读", "妈妈 19:22 查看", "success")}${pMetric("处理", "待确认", "保留 24 小时", tone)}</div>`,
+      })}
+      ${pAiCard({ title: "建议处理方式", body: "先查看证据，再决定标记已处理、误报或稍后提醒。所有处理都会进入今日报告。", confidence: "88%", evidence: "通知来源 / 设备状态", actions: [["查看证据", 'data-nav="evidencePreview"', "primary"], ["稍后提醒", 'data-toast="已设置稍后提醒"', "secondary"]] })}
+    `,
+  });
+}
+
+function authStatePage({ kind = "error", title, body, back = "login", actions = [] }) {
+  const iconName = kind === "loading" ? "loader-2" : kind === "success" ? "check-circle-2" : "circle-alert";
+  return `
+    <section class="auth-scene auth-state-scene ${kind}" aria-labelledby="${kind}-auth-title">
+      <div class="auth-calm-space" aria-hidden="true"></div>
+      <button class="auth-back" data-nav="${back}" aria-label="返回">
+        ${icon("chevron-left", "w-4 h-4")}
+      </button>
+      <section class="auth-state-copy">
+        <span class="auth-state-mark ${kind}">${icon(iconName, "w-7 h-7")}</span>
+        <h1 id="${kind}-auth-title">${title}</h1>
+        <p>${body}</p>
+        ${
+          actions.length
+            ? `<div class="auth-state-actions">
+                ${actions
+                  .map(
+                    ({ label, attrs = "", tone = "primary", loading = false }) => `
+                      <button class="auth-primary ${tone} ${loading ? "loading" : ""}" type="button" ${attrs}>
+                        ${loading ? `<span class="loading-dot"></span>` : ""}${label}
+                      </button>
+                    `,
+                  )
+                  .join("")}
+              </div>`
+            : ""
+        }
+      </section>
+    </section>
+  `;
+}
+
+const premiumViews = {
+  setup() {
+    return pShell({
+      kicker: "新用户设置",
+      title: "家庭看护指挥台已准备好",
+      subtitle: "老用户会直接进入首页；新用户先完成设备、孩子档案、权限和隐私边界。",
+      cls: "setup-command",
+      action: `<button class="p-icon-button" data-nav="login" aria-label="返回登录">${icon("x")}</button>`,
+      body: `
+        ${pBentoCard({
+          cls: "hero ai",
+          status: pStatus("新用户路径", "ai", "sparkles"),
+          title: "先把看护边界设清楚",
+          desc: "绑定设备后，米拉只在任务、安全和家长确认场景下整理证据。",
+          action: pActionRow([["开始设置", 'data-nav="setupStart"', "primary"], ["老用户预览", 'data-nav="home"', "secondary"]]),
+        })}
+        <section class="p-step-rail">
+          ${["家长身份", "绑定设备", "孩子档案", "权限授权", "隐私边界"].map((label, index) => `<span class="${index === 0 ? "active" : ""}"><b>${index + 1}</b>${label}</span>`).join("")}
+        </section>
+      `,
+    });
+  },
+
+  loginError() {
+    return authStatePage({
+      kind: "error",
+      title: "登录暂时失败",
+      body: "网络异常或手机号格式不正确。请检查后重新获取验证码。",
+      back: "login",
+      actions: [
+        { label: "返回登录", attrs: 'data-nav="login"' },
+        { label: "隐私说明", attrs: 'data-sheet="privacyPolicy"', tone: "secondary" },
+      ],
+    });
+  },
+
+  verifyError() {
+    return authStatePage({
+      kind: "error",
+      title: "验证码不正确",
+      body: "请输入短信中的 6 位验证码，或重新发送验证码。",
+      back: "verify",
+      actions: [
+        { label: "重新输入", attrs: 'data-nav="verify"' },
+        { label: "重新发送", attrs: 'data-toast="验证码已重新发送"', tone: "secondary" },
+      ],
+    });
+  },
+
+  verifyLoading() {
+    return authStatePage({
+      kind: "loading",
+      title: "正在验证",
+      body: "正在确认家长身份，请稍等。",
+      back: "verify",
+      actions: [{ label: "验证中...", attrs: "disabled", loading: true }],
+    });
+  },
+
+  newUserBranch() {
+    return pStatePage({ kind: "success", title: "已创建家长账户", body: "接下来完成设备绑定、孩子档案、权限和隐私边界。", back: "login", actions: [["开始设置", 'data-nav="setupStart"', "primary"]] });
+  },
+
+  returningUserBranch() {
+    return pStatePage({ kind: "success", title: "欢迎回来", body: "已识别家庭账户，正在进入今日家庭决策台。", back: "login", actions: [["进入首页", 'data-nav="home"', "primary"], ["查看告警", 'data-nav="alerts"', "secondary"]] });
+  },
+
+  home() {
+    return pShell({
+      kicker: "周一 19:42 · 米拉陪伴中",
+      title: "小宇的习惯节奏",
+      subtitle: "今晚重点练习学习自启动、餐桌收尾和睡前准备；1 件需要你确认。",
+      cls: "home-command habit-home",
+      body: `
+        <section class="habit-hero" aria-label="今日主习惯">
+          <img src="${refs.study}" alt="孩子在书桌前开始学习" />
+          <div class="habit-hero-glow" aria-hidden="true"></div>
+          <div class="habit-hero-copy">
+            <div class="habit-status-row">
+              ${pStatus("米拉陪伴中", "ai", "sparkles")}
+              ${pStatus("低打扰", "success", "volume-1")}
+            </div>
+            <span class="habit-label">今日主练习</span>
+            <h2>自己启动数学口算</h2>
+            <p>米拉只做短句提醒：坐好、拿出口算本、先完成前 20 题。现在不用家长催。</p>
+          </div>
+          <div class="habit-orbit-panel">
+            <div class="habit-ring" aria-label="自启动进度 72%">
+              <strong>72%</strong>
+              <span>自启动</span>
+            </div>
+            <div class="habit-next">
+              <strong>8 分钟</strong>
+              <span>后提醒休息</span>
+            </div>
+          </div>
+          <div class="habit-hero-actions">
+            <button class="p-button primary" data-nav="care">处理待确认</button>
+            <button class="p-button secondary" data-nav="watch">看一眼画面</button>
+          </div>
+        </section>
+
+        <section class="habit-rhythm-strip" aria-label="今晚习惯节奏">
+          <button class="done" data-nav="taskDetail">
+            <b>19:30</b>
+            <strong>作业启动</strong>
+            <small>已自启</small>
+          </button>
+          <button class="active" data-nav="taskDetail">
+            <b>19:42</b>
+            <strong>口算中</strong>
+            <small>18 分钟</small>
+          </button>
+          <button data-nav="packing">
+            <b>20:20</b>
+            <strong>小书包</strong>
+            <small>检查水杯</small>
+          </button>
+          <button data-nav="sleep">
+            <b>21:10</b>
+            <strong>睡前</strong>
+            <small>少催促</small>
+          </button>
+        </section>
+
+        <section class="habit-bento-grid" aria-label="家长今日需要看什么">
+          <button class="habit-card parent" data-nav="taskEvidence">
+            <span>${icon("file-check-2", "w-4 h-4")}</span>
+            <small>家长确认</small>
+            <strong>口算证据稍后生成</strong>
+            <p>完成后确认 / 部分完成 / 驳回 AI 判断。</p>
+          </button>
+          <button class="habit-card reward" data-nav="rewardRequest">
+            <span>${icon("gift", "w-4 h-4")}</span>
+            <small>奖励申请</small>
+            <strong>想换周末骑车</strong>
+            <p>米拉只转交，不向孩子承诺。</p>
+          </button>
+          <button class="habit-card table" data-nav="tasks">
+            <span>${icon("utensils", "w-4 h-4")}</span>
+            <small>餐桌习惯</small>
+            <strong>晚饭收尾更快</strong>
+            <p>比昨天少 9 分钟，明天继续低频提醒。</p>
+          </button>
+          <button class="habit-card sleep" data-nav="sleep">
+            <span>${icon("moon", "w-4 h-4")}</span>
+            <small>睡前准备</small>
+            <strong>建议提前 10 分钟</strong>
+            <p>小书包和洗漱不要挤到最后。</p>
+          </button>
+        </section>
+
+        <section class="habit-coach-card" aria-label="米拉陪伴说明">
+          <div class="habit-coach-head">
+            <span>${icon("sparkles", "w-4 h-4")}</span>
+            <div>
+              <strong>米拉建议：继续练“自己开始”</strong>
+              <small>证据：提醒记录 / 响应时间 / 任务进度 · 置信度 88%</small>
+            </div>
+          </div>
+          <p>今天小宇在第二次短提醒后自己回到书桌。建议今晚不要追加新学习任务，只在口算结束后确认证据，并用一句具体表扬收尾。</p>
+          <div class="habit-coach-steps">
+            <span>少催促</span>
+            <span>先自启</span>
+            <span>证据后确认</span>
+          </div>
+          ${pActionRow([["查看证据", 'data-nav="evidencePreview"', "primary"], ["调整明日节奏", 'data-nav="tasks"', "secondary"], ["今日报告", 'data-nav="dailyReportDetail"', "secondary"]])}
+        </section>
+      `,
+    });
+  },
+
+  homeLoading() {
+    return pStatePage({
+      kind: "loading",
+      title: "正在汇总家庭状态",
+      body: "米拉正在同步设备、任务、告警和今日报告。",
+      actions: [["查看离线摘要", 'data-nav="homeOffline"', "secondary"]],
+      extra: `<section class="p-skeleton-stack"><span></span><span></span><span></span></section>`,
+    });
+  },
+
+  homeEmpty() {
+    return pStatePage({
+      kind: "empty",
+      title: "还没有家庭看护数据",
+      body: "先绑定设备并创建孩子档案，首页会变成每日决策台。",
+      actions: [["开始设置", 'data-nav="setupStart"', "primary"], ["创建孩子档案", 'data-nav="setupChild"', "secondary"]],
+      extra: `
+        <img class="p-state-image" src="${refs.empty}" alt="空桌面、家庭摄像头和待开始文件夹的空状态插画" />
+        <section class="p-bento-grid two">${pBentoCard({ title: "设备", desc: "扫码或蓝牙发现摄像头", route: "setupDevice", status: pStatus("未绑定", "warning", "camera") })}${pBentoCard({ title: "权限", desc: "通知、相机、麦克风说明", route: "setupPermissions", status: pStatus("待开启", "info", "bell") })}</section>
+      `,
+    });
+  },
+
+  homeOffline() {
+    return pStatePage({
+      kind: "offline",
+      title: "书房摄像头已离线",
+      body: "最后在线 18:42。任务计划、历史证据和日报仍可查看。",
+      actions: [["重连设备", 'data-nav="deviceSettings"', "primary"], ["看历史证据", 'data-nav="evidencePreview"', "secondary"]],
+      extra: pAiCard({ title: "离线期间如何处理？", body: "设备上线后会同步提醒和本地任务变更。安全告警无法实时触发，建议先检查电源和路由器。", confidence: "设备状态", evidence: "最后心跳 / Wi-Fi 记录", actions: [["稍后提醒", 'data-toast="已在 20 分钟后提醒检查设备"', "secondary"]] }),
+    });
+  },
+
+  homeAbnormal() {
+    return pStatePage({
+      kind: "warning",
+      title: "今日有 1 条异常需要判断",
+      body: "19:18 门口短促声音，未检测到陌生人入画。建议先联系孩子确认。",
+      actions: [["查看安全事件", 'data-nav="safetyDetail"', "primary"], ["标记误报", 'data-sheet="falseAlarm"', "danger"]],
+      extra: pDecisionList([["门口异常声音", "8 秒声音片段，未升级紧急联系人", "danger", "safetyDetail", "安全事件"], ["设备麦克风采集波动", "实时画面可用，声音告警可能延迟", "warning", "deviceSettings", "设备异常"]]),
+    });
+  },
+
+  homeError() {
+    return pStatePage({ kind: "error", title: "家庭状态暂时无法加载", body: "网络请求失败。你可以重试，或直接查看任务与本地缓存。", actions: [["重试", 'data-toast="正在重新加载"', "primary"], ["去任务", 'data-nav="tasks"', "secondary"]] });
+  },
+
+  todayStatusDetail() {
+    return pShell({
+      kicker: "今日状态详情",
+      title: "孩子、任务、设备一页看清",
+      subtitle: "按家长决策顺序组织，而不是流水账。",
+      back: "home",
+      body: `
+        <section class="p-evidence-grid">${pMetric("专注", "18m", "连续书桌活动", "success")}${pMetric("任务", "68%", "口算进行中", "ai")}${pMetric("安全", "0", "未升级事件", "success")}</section>
+        ${pDecisionList([["当前任务", "数学口算剩余 12 分钟", "ai", "taskDetail", "进行中"], ["设备边界", "隐私提示灯开启，低清稳定", "success", "privacySettings", "正常"], ["奖励申请", "周末户外活动等待确认", "warning", "rewardRequest", "待判断"]])}
+        ${pAiCard({ title: "今日重点", body: "不要新增学习任务。建议保留小书包检查，把睡前流程提前 10 分钟。", actions: [["查看日报", 'data-nav="dailyReportDetail"', "primary"], ["管理任务", 'data-nav="tasks"', "secondary"]] })}
+      `,
+    });
+  },
+
+  care() {
+    return pShell({
+      kicker: "待确认事项",
+      title: "只处理需要你判断的事",
+      subtitle: "AI 可以整理证据，但不会替家长下结论。",
+      back: "home",
+      body: `
+        ${pDecisionList([["数学口算证据", "确认完成、部分完成或误报", "warning", "taskEvidence", "任务证据"], ["周末户外活动", "20 积分奖励申请", "ai", "rewardRequest", "奖励申请"], ["门口声音片段", "建议先联系孩子确认", "danger", "safetyDetail", "安全事件"], ["AI 对话边界", "睡前自由聊天限制建议开启", "info", "conversation", "规则确认"]])}
+        ${pAiCard({ title: "处理顺序建议", body: "先处理安全事件，再确认任务证据，最后处理奖励申请。所有操作会进入今日报告。", actions: [["全部稍后提醒", 'data-toast="已设置稍后提醒"', "secondary"]] })}
+      `,
+    });
+  },
+
+  aiSuggestionDetail() {
+    return pShell({
+      kicker: "AI 建议详情",
+      title: "为什么现在不用打断孩子",
+      subtitle: "建议只作为辅助判断，最终由家长确认。",
+      back: "home",
+      body: `
+        ${pAiCard({ title: "建议结论", body: "保持观察，等待任务结束后一次处理证据和奖励。", confidence: "91%", evidence: "活动连续性 / 声音 / 任务进度", actions: [["接受建议", 'data-toast="已接受建议"', "primary"], ["稍后提醒", 'data-toast="已稍后提醒"', "secondary"], ["标记不准", 'data-sheet="falseAlarm"', "danger"]] })}
+        ${pDecisionList([["证据 1：书桌活动连续", "18 分钟内没有离席", "success", "evidencePreview"], ["证据 2：无异常声音", "仅有键盘和翻书声", "success", "playback"], ["证据 3：任务仍在进行", "剩余 12 分钟，不宜打断", "ai", "taskDetail"]])}
+      `,
+    });
+  },
+
+  evidencePreview() {
+    return pShell({
+      kicker: "证据快速预览",
+      title: "只看和判断有关的片段",
+      subtitle: "证据按任务和事件保存，不做全天连续录像。",
+      back: "home",
+      body: `
+        ${pBentoCard({ cls: "hero visual evidence", status: pStatus("任务证据", "ai", "file-check-2"), title: "数学口算关键片段", desc: "3 张关键帧 + 18 分钟活动摘要。", children: `<img src="${refs.study}" alt="任务证据预览" />`, action: pActionRow([["确认完成", 'data-sheet="confirmEvidence"', "primary"], ["部分完成", 'data-sheet="partialEvidence"', "secondary"], ["误报", 'data-sheet="rejectEvidence"', "danger"]]) })}
+        ${pAiCard({ title: "证据说明", body: "系统只抽取任务开始、稳定进行、结束前的关键帧。家长可以改判，改判会影响奖励和报告。", confidence: "89%", evidence: "关键帧 / 活动时间 / 声音状态" })}
+      `,
+    });
+  },
+
+  tasks() {
+    return pShell({
+      kicker: "任务节奏板",
+      title: "今天只盯关键任务",
+      subtitle: "时间、证据、奖励和确认状态集中到一张节奏板。",
+      cls: "task-command",
+      action: `<button class="p-icon-button" data-sheet="taskTemplates" aria-label="模板">${icon("sparkles")}</button>`,
+      body: `
+        <section class="p-date-rail">${["今天:28", "明天:29", "周六:30", "周日:31", "周一:01"].map((item) => { const [label, num] = item.split(":"); return `<button class="${state.selectedDay === label ? "active" : ""}" data-day="${label}"><b>${num}</b><span>${label}</span></button>`; }).join("")}</section>
+        <section class="p-searchbar"><input data-task-search value="${state.taskSearch}" placeholder="搜索任务、模板、小书包" /><button data-nav="${state.taskSearch ? "taskSearchNoResult" : "flow"}">${state.taskSearch ? "搜索" : "筛选"}</button></section>
+        <section class="p-filter-rail">${["all:全部", "todo:待做", "doing:进行中", "done:已完成"].map((item) => { const [id, label] = item.split(":"); return `<button class="${state.taskFilter === id ? "active" : ""}" data-task-filter="${id}">${label}</button>`; }).join("")}</section>
+        ${pBentoCard({ cls: "hero mission", status: `${pStatus("进行中", "ai", "timer")}${pStatus("证据待生成", "warning", "file-check-2")}`, title: "数学口算 20 题", desc: "剩余 12 分钟。结束后自动生成证据，家长确认后进入积分流水。", children: `<div class="p-progress-orbit"><span>68%</span></div>`, action: pActionRow([["查看任务", 'data-nav="taskDetail"', "primary"], ["结束并确认", 'data-nav="taskConfirm"', "secondary"]]) })}
+        <section class="p-bento-grid three">
+          ${pBentoCard({ title: "小书包", desc: "明早 7:40 前确认 4 项", route: "packing", status: pStatus("2 项待补", "warning", "backpack") })}
+          ${pBentoCard({ title: "睡前流程", desc: "21:10 开始，建议提前 10 分钟", route: "sleep", status: pStatus("今晚", "info", "moon") })}
+          ${pBentoCard({ title: "模板库", desc: "朗读、打卡、周五检查", route: "flow", status: pStatus("AI 推荐", "ai", "sparkles") })}
+        </section>
+        ${pAiCard({ title: "AI 建议：不要再加新学习任务", body: "今天 21:10 后有睡前流程。如果临时加任务，建议只加小书包检查。", evidence: "任务时长 / 睡前目标", actions: [["加小书包", 'data-nav="packing"', "primary"], ["延到明天", 'data-toast="已延后英语朗读到明天"', "secondary"]] })}
+      `,
+    });
+  },
+
+  taskDetail() {
+    return pShell({
+      kicker: "任务详情",
+      title: "数学口算 20 题",
+      subtitle: "进行中 · 证据将在结束后由家长确认。",
+      back: "tasks",
+      body: `
+        ${pBentoCard({ cls: "hero mission", status: pStatus("进行中 · 第二轮", "ai", "timer"), title: "剩余 12 分钟", desc: "Mira 正在观察书桌活动、离席和异常声音。", children: `<div class="p-progress-line"><span style="width:68%"></span></div>`, action: pActionRow([["查看证据", 'data-nav="taskEvidence"', "primary"], ["编辑", 'data-nav="taskEdit"', "secondary"], ["延后", 'data-sheet="delayTask"', "secondary"]]) })}
+        ${pDecisionList([["证据策略", "AI 观察 + 家长确认", "ai", "taskEvidence"], ["奖励规则", `完成后 +${state.taskDraft.reward || 3} ${state.pointUnit}`, "success", "points"], ["超时处理", "超过 20:05 自动转待确认", "warning", "taskTimeout"]])}
+      `,
+    });
+  },
+
+  taskEdit() {
+    return pShell({
+      kicker: "编辑任务",
+      title: "任务规则由家长确认",
+      subtitle: "AI 只负责提醒和整理证据。",
+      back: "taskDetail",
+      body: `
+        <section class="p-form-card">
+          <label class="app-field ${state.taskDraft.title ? "" : "error"}"><span>任务名称</span><input data-task-title value="${state.taskDraft.title}" placeholder="例如：英语朗读 10 分钟" />${state.taskDraft.title ? "" : "<small>请输入任务名称</small>"}</label>
+          <div class="two-fields"><label class="app-field"><span>开始时间</span><input value="${state.taskDraft.start}" /></label><label class="app-field"><span>奖励${state.pointUnit}</span><input data-task-reward inputmode="numeric" value="${state.taskDraft.reward}" /></label></div>
+          ${pDecisionList([["AI 观察 + 家长确认", "推荐：只在任务结束时整理证据", "ai", "taskEvidence"], ["仅家长打卡", "不调用摄像头判断", "info", "taskConfirm"]])}
+          <button class="auth-primary ${state.formStatus === "saving" ? "loading" : state.formStatus === "saved" ? "success" : ""}" data-save-form="${state.taskDraft.title ? "task" : "invalid"}" ${state.taskDraft.title ? "" : "disabled"}>${state.formStatus === "saving" ? "保存中..." : state.formStatus === "saved" ? "已保存" : "保存任务"}</button>
+        </section>
+      `,
+    });
+  },
+
+  taskEvidence() {
+    const [label, tone] = evidenceLabel();
+    return pShell({
+      kicker: "任务证据",
+      title: "数学口算证据待确认",
+      subtitle: `当前状态：${label}`,
+      back: "tasks",
+      body: `
+        ${pBentoCard({ cls: `hero visual evidence ${tone}`, status: pStatus(label, tone, "file-check-2"), title: "18 分钟书桌活动摘要", desc: "AI 判断完成度较高，但奖励必须由家长确认。", children: `<img src="${refs.study}" alt="数学任务证据" />`, action: pActionRow([["确认完成", 'data-sheet="confirmEvidence"', "primary"], ["部分完成", 'data-sheet="partialEvidence"', "secondary"], ["驳回/误报", 'data-sheet="rejectEvidence"', "danger"]]) })}
+        ${pAiCard({ title: "为什么给出这个判断？", body: "任务时间内书桌区域活动连续，未检测到长时间离席。题目内容不被识别，仅判断任务流程。", confidence: "89%", evidence: "活动连续性 / 任务时间 / 关键帧" })}
+      `,
+    });
+  },
+
+  taskConfirm() {
+    return pStatePage({ kind: "success", title: "任务确认完成", body: "确认后进入今日报告和积分流水。", back: "tasks", actions: [["确认完成", 'data-sheet="confirmEvidence"', "primary"], ["查看证据", 'data-nav="taskEvidence"', "secondary"]] });
+  },
+
+  taskReward() {
+    return premiumViews.rewardRequest();
+  },
+
+  taskTimeout() {
+    return pStatePage({ kind: "warning", title: "任务已超时", body: "Mira 暂停自动提醒，等待家长决定延后、结束或跳过。", back: "tasks", actions: [["延后 10 分钟", 'data-sheet="delayTask"', "primary"], ["结束任务", 'data-sheet="endTask"', "danger"]] });
+  },
+
+  taskFailed() {
+    return pStatePage({ kind: "danger", title: "任务提醒发送失败", body: "设备离线或网络不稳定，任务已保存到 App，设备上线后同步。", back: "tasks", actions: [["查看设备", 'data-nav="deviceSettings"', "primary"], ["稍后同步", 'data-toast="已稍后同步"', "secondary"]] });
+  },
+
+  taskEmpty() {
+    return pStatePage({ kind: "empty", title: "今天还没有任务", body: "可以从模板开始，或创建一个只需家长确认的轻任务。", back: "tasks", actions: [["套用模板", 'data-sheet="taskTemplates"', "primary"], ["手动创建", 'data-nav="taskEdit"', "secondary"]] });
+  },
+
+  taskNoResult() {
+    return pStatePage({ kind: "empty", title: "没有找到匹配任务", body: "清除筛选，或从模板新建一个任务。", back: "tasks", actions: [["清除筛选", 'data-toast="已清除筛选"', "secondary"], ["创建任务", 'data-nav="taskEdit"', "primary"]] });
+  },
+
+  taskSearchNoResult() {
+    return premiumViews.taskNoResult();
+  },
+
+  flow() {
+    return pShell({
+      kicker: "模板和小书包",
+      title: "按今天节奏推荐任务",
+      subtitle: "模板不会覆盖已有任务，只会追加到当前日期。",
+      back: "tasks",
+      body: `
+        <section class="p-bento-grid two">
+          ${pBentoCard({ cls: "ai", title: "放学后基础流", desc: "口算、阅读、小书包 3 项", route: "tasks", status: pStatus("推荐", "ai", "sparkles"), action: pActionRow([["套用", 'data-action="day-template-apply"', "primary"]]) })}
+          ${pBentoCard({ title: "睡前轻任务", desc: "洗漱、整理、关闭自由聊天", route: "sleep", status: pStatus("21:10", "info", "moon") })}
+          ${pBentoCard({ title: "小书包检查", desc: "按明日课表自动生成", route: "packing", status: pStatus("明早", "warning", "backpack") })}
+          ${pBentoCard({ title: "英语朗读", desc: "声音检测 + 家长抽查", route: "taskEdit", status: pStatus("可延后", "info", "mic") })}
+        </section>
+        ${pAiCard({ title: "今日模板建议", body: "只套用小书包，避免新增学习任务挤压睡前流程。", actions: [["套用推荐", 'data-action="day-template-apply"', "primary"], ["手动创建", 'data-nav="taskEdit"', "secondary"]] })}
+      `,
+    });
+  },
+
+  packing() {
+    return pShell({
+      kicker: "小书包",
+      title: "明早前确认 4 项物品",
+      subtitle: "摄像头只辅助识别，不替代孩子自己整理。",
+      back: "tasks",
+      body: `
+        ${pBentoCard({ cls: "hero warm", status: pStatus("2 项待处理", "warning", "backpack"), title: "水杯可能漏带", desc: "AI 未在书包侧袋识别到水杯，建议睡前提醒孩子自己确认。", action: pActionRow([["添加物品", 'data-sheet="packing"', "primary"], ["查看规则", 'data-nav="education"', "secondary"]]) })}
+        <section class="p-decision-list">${packingRows()}</section>
+        ${state.packingExtra.length ? `<section class="p-control-group"><div class="p-section-title"><h3>临时添加</h3></div>${state.packingExtra.map((item, index) => `<button class="p-evidence-card info" data-action="packing-extra-remove" data-index="${index}"><span>${icon("plus", "w-4 h-4")}</span><div><strong>${item}</strong><small>点击移除临时物品</small></div>${icon("x", "w-4 h-4")}</button>`).join("")}</section>` : ""}
+      `,
+    });
+  },
+
+  sleep() {
+    return pShell({
+      kicker: "睡前 / 晨起",
+      title: "把节奏提前，不催促",
+      subtitle: "睡前流程强调边界和温和提醒。",
+      back: "tasks",
+      body: `
+        ${pBentoCard({ cls: "hero night", status: pStatus("21:10 开始", "info", "moon"), title: "今晚建议 21:00 提前准备", desc: "当前任务可能延后，睡前自由聊天会在 21:15 后关闭。", action: pActionRow([["提醒孩子", 'data-toast="已发送睡前轻提醒"', "primary"], ["调整规则", 'data-nav="conversation"', "secondary"]]) })}
+        ${pDecisionList([["洗漱", "语音提醒，不保存证据", "info", "sleep"], ["整理桌面", "任务区收纳确认", "ai", "evidencePreview"], ["关闭自由聊天", "睡前边界自动启用", "success", "conversation"]])}
+      `,
+    });
+  },
+
+  focus() {
+    return pStatePage({ kind: "info", title: "专注计时中", body: "当前任务剩余 12 分钟。家长可以暂停、延后或结束。", back: "taskDetail", actions: [["暂停", 'data-toast="已暂停任务"', "secondary"], ["延后", 'data-sheet="delayTask"', "primary"], ["结束", 'data-sheet="endTask"', "danger"]] });
+  },
+
+  watch() {
+    return pShell({
+      kicker: "AI 安全镜头",
+      title: "摘要优先，不鼓励盯屏",
+      subtitle: "实时画面只用于需要判断的片段和家长主动查看。",
+      cls: "watch-command",
+      body: `
+        ${pLiveLens({ mode: "normal" })}
+        ${pAiCard({ title: "为什么判断正常？", body: "书桌区域连续活动 18 分钟，未检测到离席、异常声音或陌生人入画。证据只关联当前任务。", evidence: "区域活动 / 声音 / 安全区域", actions: [["AI 判断详情", 'data-nav="aiJudgementDetail"', "primary"], ["隐私说明", 'data-nav="privacySettings"', "secondary"], ["暂停看护", 'data-sheet="pauseCareConfirm"', "secondary"]] })}
+        <section class="p-bento-grid two">${pBentoCard({ title: "当前任务", desc: "数学口算剩余 12 分钟", route: "taskDetail", status: pStatus("进行中", "ai", "timer") })}${pBentoCard({ title: "事件回放", desc: "只保存任务和告警相关片段", route: "playback", status: pStatus("3 段", "info", "history") })}</section>
+      `,
+    });
+  },
+
+  watchOffline() {
+    return pShell({
+      kicker: "实时看护",
+      title: "设备离线，实时画面不可用",
+      subtitle: "历史证据仍可查看，任务编辑会待同步。",
+      back: "watch",
+      body: `${pLiveLens({ mode: "offline", title: "书房摄像头离线", desc: "最后在线 18:42。请检查电源和路由器。", badges: [["OFFLINE", "wifi-off", "danger"], ["历史可看", "history", "info"]], actions: false })}${pAiCard({ title: "离线处理建议", body: "如果孩子端断电，安全告警无法实时触发。可以先查看历史片段，并在设备管理里按步骤重连。", confidence: "设备状态", evidence: "最后心跳 / Wi-Fi", actions: [["重连设备", 'data-nav="deviceSettings"', "primary"], ["看历史事件", 'data-nav="playback"', "secondary"]] })}`,
+    });
+  },
+
+  watchAlert() {
+    return pShell({
+      kicker: "实时看护",
+      title: "有安全事件需要判断",
+      subtitle: "门口短促声音，未检测到陌生人入画。",
+      back: "watch",
+      body: `${pLiveLens({ mode: "alert", title: "门口声音片段待判断", desc: "AI 建议先联系孩子确认，再决定是否标记误报。", badges: [["ALERT", "siren", "danger"], ["置信度 76%", "sparkles", "warning"]] })}${pActionRow([["联系孩子", 'data-sheet="callChild"', "primary"], ["标记已处理", 'data-sheet="resolveAlert"', "secondary"], ["误报", 'data-sheet="falseAlarm"', "danger"]])}`,
+    });
+  },
+
+  watchPrivacy() {
+    return pShell({
+      kicker: "隐私暂停",
+      title: "孩子端开启了隐私遮罩",
+      subtitle: "实时画面暂停，但安全告警和任务摘要仍可工作。",
+      back: "watch",
+      body: `${pLiveLens({ mode: "privacy", title: "实时画面已遮罩", desc: "此状态下不会显示画面，也不会保存新的实时截图。", badges: [["隐私暂停", "lock-keyhole", "info"], ["边界生效", "shield-check", "success"]], actions: false })}${pAiCard({ title: "隐私边界说明", body: "孩子端可以在特定时段启用隐私遮罩。管理员可查看规则，但不建议绕过孩子端提示。", confidence: "规则说明", evidence: "隐私设置 / 时间段", actions: [["查看隐私规则", 'data-nav="privacySettings"', "primary"], ["稍后提醒", 'data-toast="已稍后提醒"', "secondary"]] })}`,
+    });
+  },
+
+  watchPrivacyPaused() {
+    return premiumViews.watchPrivacy();
+  },
+
+  watchLowConfidence() {
+    return pShell({
+      kicker: "AI 判断详情",
+      title: "低置信度，需要家长判断",
+      subtitle: "光线偏暗，书桌区域被遮挡，AI 不做强结论。",
+      back: "watch",
+      body: `${pLiveLens({ mode: "low", title: "画面置信度较低", desc: "建议查看证据片段或稍后再判断，不自动发放奖励。", badges: [["置信度 54%", "sparkles", "warning"], ["低光", "moon", "warning"]] })}${pAiCard({ title: "为什么不自动确认？", body: "孩子手部和书本区域被遮挡，任务完成度无法稳定判断。建议家长确认关键帧。", confidence: "54%", evidence: "低光 / 遮挡 / 活动不足", actions: [["查看证据", 'data-nav="evidencePreview"', "primary"], ["标记不确定", 'data-toast="已标记不确定"', "secondary"]] })}`,
+    });
+  },
+
+  watchUpdating() {
+    return pStatePage({ kind: "warning", title: "固件更新中 62%", body: "更新期间暂停实时画面、通话和解绑操作。预计 4 分钟后恢复。", back: "watch", actions: [["完成后提醒我", 'data-toast="已开启完成提醒"', "primary"], ["设备管理", 'data-nav="deviceSettings"', "secondary"]] });
+  },
+
+  watchAbnormal() {
+    return pStatePage({ kind: "warning", title: "麦克风采集异常", body: "实时画面仍可用，但声音告警可能延迟。建议重启设备后测试麦克风。", back: "watch", actions: [["进入设备管理", 'data-nav="deviceSettings"', "primary"], ["查看安全事件", 'data-nav="safety"', "secondary"]] });
+  },
+
+  realtimeDetail() {
+    return premiumViews.watch();
+  },
+
+  aiJudgementDetail() {
+    return pShell({
+      kicker: "AI 判断详情",
+      title: "当前安全正常的证据",
+      subtitle: "AI 只给建议，不替家长做不可逆决定。",
+      back: "watch",
+      body: `
+        ${pAiCard({ title: "判断结论", body: "保持观察，不主动打断。当前任务仍在进行，安全区域无异常。", confidence: "91%", evidence: "3 类信号", actions: [["接受", 'data-toast="已接受判断"', "primary"], ["查看证据", 'data-nav="evidenceExplain"', "secondary"], ["标记不准", 'data-sheet="falseAlarm"', "danger"]] })}
+        ${pDecisionList([["区域活动", "书桌区域连续活动 18 分钟", "success", "evidenceExplain"], ["声音", "无异常尖锐声或门口持续声", "success", "playback"], ["安全区域", "门口区域未出现陌生人", "success", "zones"]])}
+      `,
+    });
+  },
+
+  evidenceExplain() {
+    return pShell({
+      kicker: "证据说明",
+      title: "证据如何被生成和保存",
+      subtitle: "默认只保存任务与事件相关片段。",
+      back: "watch",
+      body: `
+        ${pDecisionList([["任务证据", "开始、稳定、结束前关键帧", "ai", "taskEvidence"], ["安全事件", "触发前后短片段和规则", "danger", "safetyDetail"], ["隐私边界", "隐私遮罩期间不保存实时画面", "info", "privacySettings"]])}
+        ${pAiCard({ title: "家长可纠错", body: "任何 AI 判断都可以被标记误报或改判，改判会记录到报告，不会直接对孩子做负面反馈。", confidence: "产品规则", evidence: "隐私策略 / 家长确认" })}
+      `,
+    });
+  },
+
+  playback() {
+    return pShell({
+      kicker: "事件回放",
+      title: "只回看关键片段",
+      subtitle: "按任务、告警、成长时刻分类，不做全天浏览。",
+      back: "watch",
+      body: `${pDecisionList([["数学口算关键帧", "任务证据 · 3 张关键帧", "ai", "taskEvidence"], ["门口声音片段", "安全事件 · 8 秒", "danger", "safetyDetail"], ["整理桌面", "成长时刻 · 可收藏", "success", "moments"]])}${pAiCard({ title: "回放边界", body: "回放保留最小必要内容，家长可隐藏或删除成长时刻。", confidence: "隐私规则", evidence: "保存策略", actions: [["管理隐私", 'data-nav="privacySettings"', "primary"]] })}`,
+    });
+  },
+
+  zones() {
+    return pShell({
+      kicker: "安全区域",
+      title: "区域规则要清楚，不制造焦虑",
+      subtitle: "门口、窗边、书桌三类区域启用。",
+      back: "watch",
+      body: `
+        ${pDecisionList([["门口区域", "短促声音触发待判断", "warning", "safetyDetail"], ["书桌区域", "任务活动识别稳定", "success", "watch"], ["窗边区域", "仅异常停留提醒", "info", "zones"]])}
+        <button class="auth-primary" data-sheet="zone">新增安全区域</button>
+      `,
+    });
+  },
+
+  safety() {
+    return pShell({
+      kicker: "安全中心",
+      title: "安全事件按判断处理",
+      subtitle: "不把所有通知都变成警报。",
+      back: "watch",
+      body: `${pDecisionList([["门口异常声音", "未检测到陌生人入画", "danger", "safetyDetail"], ["紧急联系人", "妈妈、爸爸，外婆待邀请", "info", "familySettings"], ["安全区域", "3 个区域启用，门口规则较敏感", "success", "zones"]])}${pActionRow([["测试联系人", 'data-sheet="safety"', "secondary"], ["查看告警", 'data-nav="alerts"', "primary"]])}`,
+    });
+  },
+
+  safetyDetail() {
+    return premiumViews.alertDetail("安全事件详情", "门口异常声音");
+  },
+
+  alerts() {
+    const filters = ["unread:未读", "processing:处理中", "resolved:已处理", "false:误报"];
+    return pShell({
+      kicker: "决策 inbox",
+      title: "先处理需要判断的事",
+      subtitle: "消息按安全、任务、设备、系统分组。",
+      cls: "alert-command",
+      action: `<button class="p-icon-button" data-toast="已全部标记已读" aria-label="全部已读">${icon("check-check")}</button>`,
+      body: `
+        <section class="p-filter-rail">${filters.map((item) => { const [id, label] = item.split(":"); return `<button class="${state.alertFilter === id ? "active" : ""}" data-alert-filter="${id}" data-nav="${id === "false" ? "falseAlarm" : id}">${label}</button>`; }).join("")}</section>
+        ${pDecisionList([["19:18 门口异常声音", "安全事件 · 未读", "danger", "safetyNotification"], ["数学口算证据待确认", "任务提醒 · 处理中", "warning", "taskNotification"], ["书房设备离线后重连", "设备事件 · 已读", "info", "deviceNotification"], ["隐私政策摘要已更新", "系统通知 · 已读", "info", "systemNotification"]])}
+      `,
+    });
+  },
+
+  alertDetail(title = "告警详情", eventTitle = "门口异常声音") {
+    return pShell({
+      kicker: "安全事件",
+      title: eventTitle,
+      subtitle: "需要家长确认后归档。",
+      back: "alerts",
+      body: `
+        ${pBentoCard({ cls: "hero visual alert", status: pStatus("待判断", "danger", "siren"), title: "19:18 门口短促声音", desc: "未检测到陌生人入画。AI 建议先联系孩子确认。", children: `<img src="${refs.room}" alt="家庭门口安全事件证据" />`, action: pActionRow([["联系孩子", 'data-sheet="callChild"', "primary"], ["标记已处理", 'data-sheet="resolveAlert"', "secondary"], ["误报", 'data-sheet="falseAlarm"', "danger"]]) })}
+        ${pAiCard({ title: "触发规则", body: "门口区域在 6 秒内出现高于阈值的短促声音，但画面未出现陌生人。", confidence: "76%", evidence: "声音片段 / 门口区域 / 规则阈值" })}
+      `,
+    });
+  },
+
+  unread() {
+    return premiumViews.alerts();
+  },
+
+  processing() {
+    return pNotificationPage("处理中", "数学口算证据待确认", "已进入今日记录，等待家长完成证据判断。", "warning");
+  },
+
+  resolved() {
+    return pNotificationPage("已处理", "书房设备已恢复在线", "设备在 18:47 重新连接，离线期间的任务变更已同步。", "success");
+  },
+
+  falseAlarm() {
+    return pNotificationPage("误报", "门口声音已标记误报", "本次不会升级联系人，AI 会降低相似场景敏感度。", "danger");
+  },
+
+  systemNotification() {
+    return pNotificationPage("系统通知", "隐私政策摘要已更新", "新增儿童数据删除和证据保存周期说明。", "info");
+  },
+
+  deviceNotification() {
+    return pNotificationPage("设备通知", "书房设备离线后重连", "离线 5 分钟后恢复，期间未触发安全事件。", "info");
+  },
+
+  taskNotification() {
+    return pNotificationPage("任务通知", "数学口算证据待确认", "任务结束后生成 3 张关键帧和活动摘要。", "warning");
+  },
+
+  safetyNotification() {
+    return premiumViews.alertDetail("安全通知", "门口异常声音");
+  },
+
+  my() {
+    return pShell({
+      kicker: "家庭控制台",
+      title: "小宇的家庭看护",
+      subtitle: "成员、设备、隐私、AI 规则集中管理。",
+      cls: "settings-command",
+      body: `
+        ${pBentoCard({ cls: "hero account", status: pStatus("管理员", "ai", "user-round-cog"), title: "妈妈 · 2 名家庭成员 · 1 台设备", desc: "看护规则、隐私边界和数据删除需要管理员确认。", action: pActionRow([["成员", 'data-nav="familySettings"', "primary"], ["权限管理", 'data-nav="permissionManagement"', "secondary"]]) })}
+        <section class="p-evidence-grid">${pMetric("待处理", "2", "证据与奖励", "warning")}${pMetric("设备", "1", "在线", "success")}${pMetric("隐私", "3", "规则启用", "ai")}</section>
+        ${pSettingsGroup("看护与规则", [["camera", "设备管理", "网络、固件、解绑和房间视角", "deviceSettings", "info"], ["bot", "AI 规则", "任务判断、自由聊天和睡前限制", "aiRules", "ai"], ["lock-keyhole", "隐私与数据", "远程查看边界、数据删除", "privacySettings", "info"], ["graduation-cap", "教育与内容边界", "小书包、答题边界和内容规则", "education", "info"]])}
+        ${pSettingsGroup("报告与奖励", [["chart-line", "本周趋势", "专注、睡前和安全变化", "weekly", "success"], ["gift", "积分奖励", `${state.pointBalance} ${state.pointUnit} 可用`, "points", "warning"], ["sparkles", "成长时刻", "收藏积极片段", "moments", "ai"]])}
+      `,
+    });
+  },
+
+  settings() {
+    return premiumViews.my();
+  },
+
+  deviceSettings() {
+    return pShell({
+      kicker: "设备管理",
+      title: "书房摄像头",
+      subtitle: "在线 · 电量 86% · Wi-Fi 稳定。",
+      back: "my",
+      body: `
+        ${pBentoCard({ cls: "hero device visual", status: `${pStatus("在线", "success", "wifi")}${pStatus("固件 1.8.2", "info", "download-cloud")}`, title: "设备状态正常", desc: "实时看护、任务证据和安全区域均可用。", children: `<img src="${refs.device}" alt="摄像头连接成功的设备状态插画" />`, action: pActionRow([["校准视角", 'data-toast="正在校准视角"', "primary"], ["异常处理", 'data-sheet="deviceException"', "secondary"]]) })}
+        ${pSettingsGroup("设备操作", [["scan", "房间视角", "重新确认书桌和门口区域", "zones", "info"], ["download-cloud", "固件更新", "已是最新版本，可查看更新状态", "watchUpdating", "success"], ["wifi-off", "离线处理", "重连步骤和历史证据说明", "watchOffline", "warning"], ["unlink", "解绑设备", "危险操作，需要管理员二次确认", "deviceSettings", "danger"]])}
+        <button class="danger-link" data-sheet="unbindDevice">解绑设备</button>
+      `,
+    });
+  },
+
+  privacySettings() {
+    return pShell({
+      kicker: "隐私与数据",
+      title: "看护要有边界",
+      subtitle: "儿童数据、实时画面和证据保存都需要透明规则。",
+      back: "my",
+      body: `
+        ${pBentoCard({ cls: "hero privacy", status: pStatus("隐私提示开启", "success", "lock-keyhole"), title: "远程查看会提示孩子", desc: "隐私遮罩期间不显示画面，也不保存新截图。", action: pActionRow([["权限管理", 'data-nav="permissionManagement"', "primary"], ["数据删除", 'data-nav="dataDeletion"', "danger"]]) })}
+        ${pSettingsGroup("隐私规则", [["eye", "远程查看提示", "设备端亮灯并提示", "privacySettings", "success"], ["database", "证据保存周期", "任务 30 天，安全事件 90 天", "evidenceExplain", "info"], ["trash-2", "删除儿童数据", "需要管理员确认", "dataDeletion", "danger"]])}
+        <button class="auth-primary ${state.formStatus === "saving" ? "loading" : ""}" data-save-form="privacy">保存隐私设置</button>
+      `,
+    });
+  },
+
+  permissionManagement() {
+    return pShell({
+      kicker: "权限管理",
+      title: "谁能看、谁能改、谁能删除",
+      subtitle: "权限影响告警处理、解绑设备和数据删除。",
+      back: "privacySettings",
+      body: `${pDecisionList([["妈妈", "管理员 · 可管理全部规则", "success", "familySettings"], ["爸爸", "可处理告警和查看日报", "info", "familySettings"], ["外婆", "仅查看日报，不能查看实时画面", "warning", "familySettings"]])}${pAiCard({ title: "权限建议", body: "只给主要照护人处理安全事件权限，数据删除和解绑设备保留管理员二次确认。", confidence: "规则建议", evidence: "家庭成员 / 操作风险" })}`,
+    });
+  },
+
+  dataDeletion() {
+    return pShell({
+      kicker: "数据删除",
+      title: "删除儿童数据需要二次确认",
+      subtitle: "删除会影响报告、证据和成长时刻。",
+      back: "privacySettings",
+      body: `${pBentoCard({ cls: "hero danger", status: pStatus("危险操作", "danger", "trash-2"), title: "可删除任务证据、报告和成长时刻", desc: "安全事件会保留最小必要处理记录，用于家庭安全审计。", action: pActionRow([["提交删除申请", 'data-sheet="deleteData"', "danger"], ["导出说明", 'data-toast="正式版将打开导出说明"', "secondary"]]) })}${pAiCard({ title: "删除前请确认", body: "删除后无法恢复。建议先导出报告或只删除指定时间段证据。", confidence: "产品规则", evidence: "数据权利 / 安全审计" })}`,
+    });
+  },
+
+  familySettings() {
+    return pShell({
+      kicker: "家庭成员",
+      title: "家庭权限按照护责任分层",
+      subtitle: "新增成员默认不能删除数据或解绑设备。",
+      back: "my",
+      body: `${pDecisionList([["妈妈 · 管理员", "设备、隐私、成员、删除数据", "success", "permissionManagement"], ["爸爸 · 可处理告警", "可联系孩子和标记已处理", "ai", "permissionManagement"], ["外婆 · 仅查看日报", "不可查看实时画面", "info", "permissionManagement"]])}${pActionRow([["邀请成员", 'data-sheet="contact"', "primary"], ["修改权限", 'data-sheet="memberRole"', "secondary"]])}`,
+    });
+  },
+
+  childProfile() {
+    return pShell({
+      kicker: "孩子资料",
+      title: `${childName()} 的档案`,
+      subtitle: "用于任务、证据和告警文案，不用于营销画像。",
+      back: "my",
+      body: `<section class="p-form-card"><label class="app-field"><span>称呼</span><input data-child-name value="${state.childProfile.name}" /></label><div class="two-fields"><label class="app-field"><span>年龄</span><input data-child-age value="8" /></label><label class="app-field"><span>年级</span><input data-child-grade value="${state.childProfile.grade}" /></label></div><button class="auth-primary" data-save-form="profile">保存资料</button></section>`,
+    });
+  },
+
+  notificationSettings() {
+    return pShell({
+      kicker: "通知设置",
+      title: "通知只打扰重要判断",
+      subtitle: "安全告警即时推送，报告类汇总提醒。",
+      back: "my",
+      body: pSettingsGroup("通知类型", [["siren", "安全告警", "立即推送", "safetyNotification", "danger"], ["file-check-2", "任务证据确认", "即时提醒", "taskNotification", "warning"], ["gift", "奖励申请", "汇总提醒", "rewardRequest", "ai"], ["wifi-off", "设备离线", "5 分钟后提醒", "deviceNotification", "info"], ["chart-line", "日报生成", "每日 21:30", "dailyReportDetail", "success"]]),
+    });
+  },
+
+  aiRules() {
+    return pShell({
+      kicker: "AI 规则",
+      title: "AI 只做判断建议",
+      subtitle: "任务、聊天、睡前边界都需要家长确认。",
+      back: "my",
+      body: `${pBentoCard({ cls: "hero ai", status: pStatus("Human in control", "ai", "sparkles"), title: "所有 AI 建议都有确认入口", desc: "确认、稍后提醒、误报和查看证据是所有建议的基础动作。", action: pActionRow([["保存规则", 'data-sheet="aiWarning"', "primary"], ["查看边界", 'data-sheet="boundaries"', "secondary"]]) })}${pDecisionList([["任务判断", "证据必须由家长确认", "ai", "taskEvidence"], ["自由聊天", "睡前 21:15 后关闭", "warning", "conversation"], ["安全告警", "未确认前不升级联系人", "danger", "safety"]])}`,
+    });
+  },
+
+  conversation() {
+    return premiumViews.aiRules();
+  },
+
+  education() {
+    return pShell({
+      kicker: "教育与内容边界",
+      title: "辅助习惯，不替孩子完成",
+      subtitle: "小书包、答题边界和内容规则统一管理。",
+      back: "my",
+      body: `${pDecisionList([["小书包规则", `${state.schoolbagMode} · 按年级推荐`, "warning", "packing"], ["答题边界", "不直接给答案，只做提示", "ai", "conversation"], ["内容边界", "睡前减少自由聊天和视频内容", "info", "sleep"]])}${pAiCard({ title: "教育边界建议", body: "任务提醒保持温和，不用摄像头评价孩子表现，只在家长需要判断时整理证据。", confidence: "产品原则", evidence: "任务规则 / 睡前目标" })}`,
+    });
+  },
+
+  accountSettings() {
+    return pShell({
+      kicker: "账号设置",
+      title: "家长账户安全",
+      subtitle: "手机号、登录设备和退出登录。",
+      back: "my",
+      body: pSettingsGroup("账号", [["smartphone", "手机号", "+86 138 0013 8000", "accountSecurity", "info"], ["monitor-smartphone", "登录设备", "当前手机 + 1 台备用设备", "accountSecurity", "info"], ["user-round", "个人信息", "称呼和家庭角色", "accountProfile", "ai"]]) + `<button class="danger-link" data-sheet="logout">退出登录</button>`,
+    });
+  },
+
+  accountProfile() {
+    return pShell({ kicker: "个人信息", title: "家长资料", subtitle: "影响家庭内称呼和通知文案。", back: "accountSettings", body: `<section class="p-form-card"><label class="app-field"><span>称呼</span><input data-parent-name value="${state.parentName}" /></label><label class="app-field"><span>家庭角色</span><input value="${state.parentRole}" /></label><button class="auth-primary" data-save-form="profile">保存资料</button></section>` });
+  },
+
+  accountSecurity() {
+    return pShell({ kicker: "账号安全", title: "登录与验证", subtitle: "关键操作需要二次验证。", back: "accountSettings", body: pSettingsGroup("安全", [["smartphone", "更换手机号", "用于登录和安全验证", "accountSecurity", "info"], ["monitor-smartphone", "登录设备", "MacBook Safari 昨天登录", "accountSecurity", "warning"], ["shield-check", "关键操作验证", "删除数据、解绑设备必须确认", "dataDeletion", "success"]]) + pActionRow([["更换手机号", 'data-sheet="changePhone"', "primary"], ["管理登录设备", 'data-sheet="loginDevices"', "secondary"]]) });
+  },
+
+  helpFeedback() {
+    return premiumViews.feedback();
+  },
+
+  feedback() {
+    return pShell({ kicker: "帮助反馈", title: "告诉我们哪里不够清楚", subtitle: "反馈不会上传儿童画面。", back: "my", body: `<section class="p-form-card"><label class="app-field"><span>反馈内容</span><textarea data-feedback placeholder="例如：设备离线时希望先看到哪些信息？"></textarea></label><button class="auth-primary" data-save-form="feedback">提交反馈</button></section>${pSettingsGroup("帮助", [["file-text", "用户协议", "查看服务条款摘要", "about", "info"], ["scroll-text", "隐私政策", "儿童数据处理说明", "privacySettings", "info"]])}` });
+  },
+
+  subscription() {
+    return pShell({ kicker: "订阅套餐", title: "家庭版权益", subtitle: "基础看护能力不因取消订阅失效。", back: "my", body: `${pBentoCard({ cls: "hero ai", status: pStatus("家庭版", "ai", "sparkles"), title: "云端报告高级版", desc: "长期趋势、更多人设和多设备云备份。", action: pActionRow([["续费", 'data-toast="已打开续费"', "primary"], ["取消或降级", 'data-sheet="subscriptionDowngrade"', "secondary"]]) })}` });
+  },
+
+  about() {
+    return pShell({ kicker: "关于 Mira", title: "可信家庭 AI 摄像头", subtitle: "版本 0.9.2 · HTML 高保真原型。", back: "my", body: pSettingsGroup("协议与版本", [["info", "版本", "0.9.2", "about", "info"], ["file-text", "用户协议", "查看服务条款摘要", "about", "info"], ["scroll-text", "隐私政策", "儿童数据处理说明", "privacySettings", "info"]]) });
+  },
+
+  report() {
+    return premiumViews.dailyReportDetail();
+  },
+
+  dailyReportDetail() {
+    return pShell({
+      kicker: "今日报告",
+      title: "今天的关键判断",
+      subtitle: "报告强调建议和待确认，不评价孩子。",
+      back: "home",
+      body: `
+        ${pBentoCard({ cls: "hero report", status: pStatus("AI 汇总 · 可纠错", "ai", "sparkles"), title: "整体稳定，睡前建议提前 10 分钟", desc: "数学口算需要确认证据，小书包水杯待补，奖励申请待处理。", action: pActionRow([["确认关键证据", 'data-nav="taskEvidence"', "primary"], ["收藏成长时刻", 'data-sheet="moment"', "secondary"]]) })}
+        <section class="p-evidence-grid">${pMetric("专注", "32m", "比昨天 +8m", "success")}${pMetric("待确认", "2", "证据 / 奖励", "warning")}${pMetric("告警", "1", "未升级", "danger")}</section>
+        ${pAiCard({ title: "明天建议", body: "保留小书包检查，把英语朗读放到晚饭后，不建议睡前新增学习任务。", confidence: "86%", evidence: "今日任务 / 睡前节奏" })}
+      `,
+    });
+  },
+
+  reportLoading() {
+    return pStatePage({ kind: "loading", title: "正在生成今日报告", body: "米拉正在汇总任务、奖励、安全和睡前节奏。", back: "my", extra: `<section class="p-skeleton-stack"><span></span><span></span><span></span></section>` });
+  },
+
+  reportEmpty() {
+    return pStatePage({ kind: "empty", title: "今天还没有报告", body: "绑定设备并完成至少一个任务后，报告会在睡前生成。", back: "my", actions: [["去任务", 'data-nav="tasks"', "primary"], ["看设置", 'data-nav="setupStart"', "secondary"]] });
+  },
+
+  weekly() {
+    return pShell({ kicker: "周报趋势", title: "一周只看趋势，不看碎片", subtitle: "专注、睡前、漏带风险和安全事件。", back: "my", body: `<section class="p-evidence-grid">${pMetric("专注", "+18%", "比上周", "success")}${pMetric("漏带", "-2", "小书包改善", "success")}${pMetric("睡前", "21:18", "平均上床前准备", "ai")}</section>${pDecisionList([["数学口算连续 4 天完成", "进入周报摘要", "success", "dailyReportDetail"], ["小书包漏带风险下降", "水杯仍需提醒", "warning", "packing"], ["睡前自由聊天建议继续限制", "规则稳定", "ai", "conversation"]])}` });
+  },
+
+  points() {
+    const stage = Math.floor(state.pointBalance / state.pointThreshold);
+    return pShell({ kicker: "积分与奖励", title: `${state.pointBalance} ${state.pointUnit} 可用`, subtitle: "奖励由家长确认，AI 不会承诺。", back: "my", body: `${pBentoCard({ cls: "hero reward", status: pStatus(`阶段 ${stage}`, "warning", "gift"), title: "奖励余额", desc: `每 ${state.pointThreshold} ${state.pointUnit} 一个阶段。`, action: pActionRow([["家长主动兑换", 'data-sheet="manualReward"', "primary"], ["阶段规则", 'data-sheet="pointRule"', "secondary"]]) })}${state.milestoneHandled ? "" : pInlineState({ kind: "warning", title: `${state.pointUnit}已积满`, body: "可以现在兑换奖品，也可以继续累积。", actions: [["选择奖品", 'data-sheet="manualReward"', "primary"], ["继续累积", 'data-action="milestone-continue"', "secondary"]] })}${pSettingsGroup("奖励", [["gift", "奖励商店", `${rewardOptions().length} 个奖品可选`, "reward", "warning"], ["chart-line", "奖励流水", state.lastManualReward || "暂无兑换", "points", "info"]])}` });
+  },
+
+  reward() {
+    return pShell({ kicker: "奖励商店", title: "奖励是家长承诺，不是 AI 承诺", subtitle: "孩子申请后需要家长确认。", back: "points", body: `${premiumViews.rewardRequest().match(/<section class="p-state-hero[\s\S]*?<\/section>/)?.[0] || ""}<section class="p-decision-list">${rewardOptions().map((item) => `<button class="p-evidence-card info" data-action="manual-reward-open" data-reward="${item.key}"><span>${icon("gift", "w-4 h-4")}</span><div><strong>${item.title}</strong><small>${item.desc} · ${pointUnitAmount(item.cost)}</small></div><b class="status-tag info">兑换</b></button>`).join("")}</section><button class="auth-secondary" data-sheet="rewardEdit">新增奖励</button>` });
+  },
+
+  rewardRequest() {
+    const [label, tone] = rewardLabel();
+    return pStatePage({ kind: tone === "danger" ? "warning" : tone, title: `${childName()} 申请兑换周末户外活动`, body: `状态：${label}。当前余额 ${state.pointBalance}，该奖励需要 20 ${state.pointUnit}。`, back: "points", actions: [["同意兑现", 'data-action="reward-fulfilled"', "primary"], ["同意稍后", 'data-action="reward-planned"', "secondary"], ["暂不兑换", 'data-sheet="rewardReject"', "danger"]] });
+  },
+
+  rewardApproved() {
+    return pStatePage({ kind: "success", title: "奖励已同意兑现", body: "积分已扣除，孩子端收到温和确认。", back: "reward", actions: [["查看流水", 'data-nav="points"', "primary"]] });
+  },
+
+  rewardRejected() {
+    return pStatePage({ kind: "warning", title: "奖励暂不兑换", body: "孩子端只会收到温和反馈，不显示拒绝理由。", back: "reward", actions: [["返回奖励", 'data-nav="reward"', "primary"]] });
+  },
+
+  moments() {
+    return pShell({ kicker: "成长时刻", title: "只收藏积极片段", subtitle: "家长可隐藏、删除或分享给家庭成员。", back: "my", body: pDecisionList([["主动整理桌面", "可收藏到周报", "success", "moments"], ["读完睡前故事", "只保存摘要", "ai", "dailyReportDetail"]]) + pActionRow([["收藏", 'data-sheet="moment"', "primary"], ["管理隐私", 'data-nav="privacySettings"', "secondary"]]) });
+  },
+
+  checkin() {
+    return pStatePage({ kind: "warning", title: "朗读打卡待审核", body: "检测到 10 分钟朗读声音，但有 2 分钟背景噪音较高。", back: "my", actions: [["通过", 'data-toast="已通过打卡"', "primary"], ["要求重拍", 'data-toast="已要求重拍"', "danger"]] });
+  },
+
+  componentStates() {
+    return pShell({
+      kicker: "组件状态实验台",
+      title: "全局状态覆盖",
+      subtitle: "按钮、chips、证据卡、AI 卡、空错加载、危险确认。",
+      back: "my",
+      body: `
+        ${pBentoCard({ title: "按钮状态", desc: "default / pressed / disabled / loading / success / danger", children: `<div class="p-button-demo"><button class="p-button primary">Default</button><button class="p-button secondary">Secondary</button><button class="p-button" disabled>Disabled</button><button class="p-button loading"><span class="loading-dot blue"></span>Loading</button><button class="p-button danger">Danger</button></div>` })}
+        ${pAiCard({ title: "AI 解释卡", body: "所有 AI 建议都有置信度、证据和家长确认入口。", actions: [["确认", 'data-toast="已确认"', "primary"], ["误报", 'data-sheet="falseAlarm"', "danger"]] })}
+        ${pDecisionList([["Loading skeleton", "见 reportLoading", "info", "reportLoading"], ["Empty state", "见 reportEmpty", "info", "reportEmpty"], ["Danger confirm", "见删除数据", "danger", "dataDeletion"]])}
+      `,
+    });
+  },
+};
+
+Object.entries(premiumViewAliases).forEach(([alias, target]) => {
+  premiumViews[alias] = () => premiumViews[target] ? premiumViews[target]() : views[target]();
+});
+
+Object.assign(views, premiumViews);
+
+setupRoutes.push("loginError", "verifyError", "verifyLoading", "newUserBranch", "returningUserBranch", "setupChildError", "setupDeviceFailed", "setupPermissionsFailed", "setupComplete");
+routeGroups.home.push("homeAbnormal", "todayStatusDetail", "pendingDecisions", "aiSuggestionDetail", "evidencePreview", "dailyReportDetail", "reportLoading", "reportEmpty");
+routeGroups.tasks.push("taskConfirm", "taskTimeout", "taskFailed", "taskEmpty", "taskSearchNoResult");
+routeGroups.watch.push("watchPrivacyPaused", "watchLowConfidence", "realtimeDetail", "aiJudgementDetail", "evidenceExplain");
+routeGroups.my.push("childProfile", "permissionManagement", "dataDeletion", "rewardRequest", "rewardApproved", "rewardRejected", "dailyReportDetail", "reportLoading", "reportEmpty", "componentStates", "systemNotification", "deviceNotification", "taskNotification", "safetyNotification", "unread", "processing", "resolved", "falseAlarm");
 
 function showToast(message) {
   const id = `toast-${Date.now()}`;
