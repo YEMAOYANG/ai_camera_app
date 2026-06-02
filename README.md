@@ -4,7 +4,25 @@ Mira Guardian（米拉）家长端 App 是 AI 智护摄像头产品的家长管�
 
 本 README 只描述家长端 App 的产品功能、页面内容、MVP 范围和开发计划。更完整的需求来源见 [docs/ai_camera_parent_needs_product_tech_plan.md](docs/ai_camera_parent_needs_product_tech_plan.md)。
 
-当前仓库还没有初始化 Flutter 工程，本文档先作为家长端 App 的研发入口。
+当前仓库已在 `mobile/` 初始化 Flutter 工程，本文档继续作为家长端 App 的产品与研发入口。
+
+## Flutter 工程入口
+
+```bash
+cd mobile
+flutter pub get
+flutter run
+```
+
+验证命令：
+
+```bash
+cd mobile
+flutter analyze
+flutter test
+```
+
+当前工程采用 Flutter + Riverpod + go_router + Dio 的组合，先搭好首页、任务、实时看护、告警和我的五个家长端主入口。框架选型记录见 [docs/flutter_framework_decision.md](docs/flutter_framework_decision.md)。
 
 ## App 定位
 
@@ -719,22 +737,31 @@ Realtime
   RTC    /rtc/offer, /rtc/answer, /rtc/ice
 ```
 
-## 推荐 Flutter 技术栈
+## Flutter 技术栈
+
+首批已接入：
 
 ```yaml
 dependencies:
-  flutter_riverpod: ^2.5.0
-  dio: ^5.4.0
-  go_router: ^14.0.0
+  flutter_riverpod: ^3.3.1
+  dio: ^5.9.2
+  go_router: ^17.2.3
+  intl: ^0.20.2
+```
+
+后续按功能接入：
+
+```yaml
+dependencies:
   web_socket_channel: ^3.0.0
-  flutter_webrtc: ^0.12.0
-  freezed_annotation: ^2.4.0
+  flutter_webrtc: ^1.2.0
+  freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
-  shared_preferences: ^2.3.0
+  shared_preferences: ^2.5.0
   sqflite: ^2.4.0
-  fl_chart: ^0.69.0
+  fl_chart: ^1.2.0
   cached_network_image: ^3.4.0
-  flutter_local_notifications: ^18.0.0
+  flutter_local_notifications: ^19.5.0
 ```
 
 推送服务可根据最终发布地区选择 Firebase Messaging、极光、个推或厂商推送聚合。
@@ -743,43 +770,45 @@ dependencies:
 
 ```text
 lib/
-  app/
-    app.dart
-    router.dart
-  core/
-    config/
-    network/
-    realtime/
-    storage/
-    theme/
-  features/
-    auth/
-    home/
-    onboarding/
-    child_profile/
-    device/
-    daily_flow/
-    packing/
-    tasks/
-    task_evidence/
-    focus/
-    sleep/
-    watch/
-    reports/
-    points/
-    rewards/
-    checkin/
-    conversation/
-    moments/
-    emergency/
-    safety_zones/
-    care/
-    privacy/
-    settings/
-  shared/
-    models/
-    widgets/
-    utils/
+  src/
+    app/
+      app.dart
+      router/
+      shell/
+    core/
+      config/
+      network/
+      realtime/
+      storage/
+      theme/
+    features/
+      auth/
+      home/
+      onboarding/
+      child_profile/
+      device/
+      daily_flow/
+      packing/
+      tasks/
+      task_evidence/
+      focus/
+      sleep/
+      live_care/
+      reports/
+      points/
+      rewards/
+      checkin/
+      conversation/
+      moments/
+      emergency/
+      safety_zones/
+      care/
+      privacy/
+      settings/
+    shared/
+      models/
+      widgets/
+      utils/
 test/
 ```
 
@@ -835,23 +864,17 @@ test/
 
 ```text
 .
+├── mobile/
+│   ├── lib/
+│   ├── test/
+│   └── pubspec.yaml
 ├── README.md
 └── docs/
+    ├── flutter_framework_decision.md
     └── ai_camera_parent_needs_product_tech_plan.md
 ```
 
-## 后续工程初始化建议
-
-当前还没有 Flutter 代码。进入实现阶段后建议：
-
-```bash
-flutter create .
-flutter pub get
-flutter run
-flutter test
-```
-
-工程落地前优先补齐：
+## 后续工程建议
 
 1. App 主题、字体、颜色、间距和基础组件。
 2. 登录、家庭、孩子、设备、任务、报告的数据模型。
