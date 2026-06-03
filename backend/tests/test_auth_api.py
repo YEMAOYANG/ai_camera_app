@@ -28,6 +28,8 @@ class AuthApiTest(unittest.TestCase):
         sms = self.client.post("/api/auth/sms/request", json={"phone": "13800002026"})
         self.assertEqual(sms.status_code, 200)
         self.assertTrue(sms.json["codeSent"])
+        self.assertEqual(sms.json["provider"], "mock")
+        self.assertEqual(sms.json["deliveryStatus"], "delivered")
 
         login = self.client.post(
             "/api/auth/sms/login",
@@ -68,6 +70,27 @@ class AuthApiTest(unittest.TestCase):
         )
         self.assertEqual(login.status_code, 400)
         self.assertEqual(login.json["error"], "invalid_code")
+
+    def test_logout_revokes_current_session(self):
+        self.client.post("/api/auth/sms/request", json={"phone": "13800002026"})
+        login = self.client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13800002026", "code": "0426"},
+        )
+        tokens = login.json["tokens"]
+
+        logout = self.client.post(
+            "/api/auth/logout",
+            json={"refreshToken": tokens["refreshToken"]},
+            headers={"Authorization": f"Bearer {tokens['accessToken']}"},
+        )
+        self.assertEqual(logout.status_code, 200)
+
+        session = self.client.get(
+            "/api/auth/session",
+            headers={"Authorization": f"Bearer {tokens['accessToken']}"},
+        )
+        self.assertEqual(session.status_code, 401)
 
 
 if __name__ == "__main__":

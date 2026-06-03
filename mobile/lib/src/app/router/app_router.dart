@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
+import 'package:mira_guardian_app/src/app/router/startup_gate.dart';
 import 'package:mira_guardian_app/src/app/shell/app_shell.dart';
-import 'package:mira_guardian_app/src/core/storage/onboarding_store.dart';
+import 'package:mira_guardian_app/src/core/config/app_environment.dart';
 import 'package:mira_guardian_app/src/core/storage/auth_session_store.dart';
+import 'package:mira_guardian_app/src/core/storage/onboarding_store.dart';
 import 'package:mira_guardian_app/src/core/storage/setup_store.dart';
 import 'package:mira_guardian_app/src/features/alerts/presentation/alerts_screen.dart';
 import 'package:mira_guardian_app/src/features/auth/presentation/login_screen.dart';
@@ -11,7 +13,10 @@ import 'package:mira_guardian_app/src/features/home/presentation/home_screen.dar
 import 'package:mira_guardian_app/src/features/legal/presentation/privacy_policy_screen.dart';
 import 'package:mira_guardian_app/src/features/legal/presentation/user_agreement_screen.dart';
 import 'package:mira_guardian_app/src/features/live_care/presentation/live_care_screen.dart';
+import 'package:mira_guardian_app/src/features/points/presentation/points_screen.dart';
 import 'package:mira_guardian_app/src/features/profile/presentation/profile_screen.dart';
+import 'package:mira_guardian_app/src/features/rewards/presentation/reward_detail_screen.dart';
+import 'package:mira_guardian_app/src/features/rewards/presentation/rewards_screen.dart';
 import 'package:mira_guardian_app/src/features/setup/presentation/setup_flow_screens.dart';
 import 'package:mira_guardian_app/src/features/tasks/presentation/task_detail_screen.dart';
 import 'package:mira_guardian_app/src/features/tasks/presentation/tasks_screen.dart';
@@ -19,22 +24,20 @@ import 'package:mira_guardian_app/src/features/welcome/presentation/welcome_scre
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final onboardingStore = ref.watch(onboardingStoreProvider);
-  final authSessionStore = ref.watch(authSessionStoreProvider);
+  final sessionStore = ref.watch(authSessionStoreProvider);
   final setupStore = ref.watch(setupStoreProvider);
-  final signedInPath = setupStore.hasCompletedInitialSetup
-      ? AppRoute.home.path
-      : setupParentIdentityPath;
-  final hasSession = authSessionStore.hasUsableSession;
-  final initialLocation = onboardingStore.hasSeenOnboarding
-      ? hasSession
-            ? signedInPath
-            : loginPath
-      : welcomePath;
+  final environment = ref.watch(appEnvironmentProvider);
+  final initialLocation = _initialLocation(
+    onboardingStore: onboardingStore,
+    sessionStore: sessionStore,
+    setupStore: setupStore,
+    environment: environment,
+  );
 
   return GoRouter(
     initialLocation: initialLocation,
     routes: [
-      GoRoute(path: '/', redirect: (_, _) => initialLocation),
+      GoRoute(path: '/', builder: (_, _) => const StartupGate()),
       GoRoute(
         path: welcomePath,
         name: 'welcome',
@@ -122,6 +125,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
           GoRoute(
+            path: pointsPath,
+            name: 'points',
+            builder: (_, _) => const PointsScreen(),
+          ),
+          GoRoute(
+            path: rewardsPath,
+            name: 'rewards',
+            builder: (_, _) => const RewardsScreen(),
+          ),
+          GoRoute(
+            path: '$rewardDetailPath/:itemId',
+            name: 'rewardDetail',
+            builder: (_, state) {
+              return RewardDetailScreen(
+                itemId: state.pathParameters['itemId'] ?? 'reward-family-game',
+              );
+            },
+          ),
+          GoRoute(
             path: AppRoute.live.path,
             name: AppRoute.live.name,
             builder: (_, _) => const LiveCareScreen(),
@@ -141,6 +163,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+String _initialLocation({
+  required OnboardingStore onboardingStore,
+  required AuthSessionStore sessionStore,
+  required SetupStore setupStore,
+  required AppEnvironment environment,
+}) {
+  if (!onboardingStore.hasSeenOnboarding) return welcomePath;
+  if (!sessionStore.hasUsableSession) return loginPath;
+  if (environment.useMockData && setupStore.hasCompletedInitialSetup) {
+    return AppRoute.home.path;
+  }
+  return '/';
+}
 
 AppRoute routeFromLocation(String location) {
   return AppRoute.values.firstWhere(

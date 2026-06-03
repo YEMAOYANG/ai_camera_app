@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
+import 'package:mira_guardian_app/src/core/storage/auth_session_store.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
 import 'package:mira_guardian_app/src/features/auth/application/auth_repository.dart';
+import 'package:mira_guardian_app/src/features/devices/application/device_repository.dart';
+import 'package:mira_guardian_app/src/features/devices/domain/device_models.dart';
+import 'package:mira_guardian_app/src/features/live_care/application/camera_repository.dart';
+import 'package:mira_guardian_app/src/features/live_care/domain/camera_models.dart';
 import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
 import 'package:mira_guardian_app/src/features/mvp/domain/mvp_models.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
@@ -18,22 +23,36 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(guardianMvpSnapshotProvider);
+    final session = ref.watch(authSessionStoreProvider).currentSession;
+    final deviceOverview = ref.watch(primaryDeviceOverviewProvider);
+    final cameraHealth = ref.watch(cameraHealthProvider);
 
     return MiraScreen(
       title: '我的',
       subtitle: '家庭、设备、AI 规则和隐私权限',
       children: [
-        _FamilyAccountPanel(snapshot: snapshot),
+        _FamilyAccountPanel(
+          snapshot: snapshot,
+          phone: session?.phone,
+          deviceOverview: deviceOverview,
+        ),
+        const SizedBox(height: 14),
+        _DeviceBackendPanel(
+          deviceOverview: deviceOverview,
+          cameraHealth: cameraHealth,
+        ),
         const SizedBox(height: 14),
         _SettingsGroup(
           title: '家庭管理',
-          entries: snapshot.settings.take(5).toList(),
+          entries: snapshot.settings.take(7).toList(),
         ),
         const SizedBox(height: 14),
         _SettingsGroup(
           title: '法律与隐私',
-          entries: snapshot.settings.skip(5).toList(),
+          entries: snapshot.settings.skip(7).toList(),
         ),
+        const SizedBox(height: 14),
+        const _V1BoundaryPanel(),
         const SizedBox(height: 16),
         MiraSecondaryButton(
           label: '退出登录',
@@ -46,12 +65,28 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 class _FamilyAccountPanel extends StatelessWidget {
-  const _FamilyAccountPanel({required this.snapshot});
+  const _FamilyAccountPanel({
+    required this.snapshot,
+    required this.deviceOverview,
+    this.phone,
+  });
 
   final GuardianMvpSnapshot snapshot;
+  final String? phone;
+  final AsyncValue<DeviceOverview?> deviceOverview;
 
   @override
   Widget build(BuildContext context) {
+    final device = deviceOverview.asData?.value;
+    final deviceCount = deviceOverview.hasError
+        ? '--'
+        : device == null && !deviceOverview.isLoading
+        ? '0'
+        : '1';
+    final accountLabel = phone == null || phone!.isEmpty
+        ? '家长管理员'
+        : '账号 $phone';
+
     return MiraSurface(
       color: AppColors.ink,
       borderColor: AppColors.ink,
@@ -95,7 +130,7 @@ class _FamilyAccountPanel extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${snapshot.child.name} · ${snapshot.child.stage}${snapshot.child.grade}',
+                      '$accountLabel · ${snapshot.child.name} ${snapshot.child.stage}${snapshot.child.grade}',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.64),
                         fontFamily: AppTypography.systemFont,
@@ -118,13 +153,128 @@ class _FamilyAccountPanel extends StatelessWidget {
                 value: '${snapshot.familyMembers.length}',
               ),
               const SizedBox(width: 8),
-              _ProfileMetric(label: '设备', value: '1'),
+              _ProfileMetric(label: '设备', value: deviceCount),
               const SizedBox(width: 8),
               _ProfileMetric(
                 label: '待处理',
                 value: '${snapshot.pendingItems.length}',
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DeviceBackendPanel extends StatelessWidget {
+  const _DeviceBackendPanel({
+    required this.deviceOverview,
+    required this.cameraHealth,
+  });
+
+  final AsyncValue<DeviceOverview?> deviceOverview;
+  final AsyncValue<CameraHealth> cameraHealth;
+
+  @override
+  Widget build(BuildContext context) {
+    final overview = deviceOverview.asData?.value;
+    final health = cameraHealth.asData?.value;
+
+    return MiraSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '设备与后端状态',
+            style: TextStyle(
+              color: AppColors.ink,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0,
+            ),
+          ),
+          const SizedBox(height: 8),
+          MiraListRow(
+            icon: Icons.videocam_outlined,
+            title: overview?.device.displayName ?? 'Mira 设备',
+            subtitle: overview?.capabilitySummary ?? '正在同步设备能力和网络状态',
+            tone: overview?.isOnline == false
+                ? MiraListRowTone.red
+                : MiraListRowTone.green,
+            trailing: StatusChip(
+              label: overview?.connectionLabel ?? '同步中',
+              tone: overview?.tone ?? StatusTone.neutral,
+            ),
+            onTap: () => context.go(AppRoute.live.path),
+          ),
+          MiraListRow(
+            icon: Icons.memory_outlined,
+            title: health?.label ?? '摄像头适配器',
+            subtitle: health?.message ?? '后端 camera adapter 状态同步中',
+            tone: health?.reachable == false
+                ? MiraListRowTone.red
+                : MiraListRowTone.blue,
+            trailing: StatusChip(
+              label: health?.reachable == true ? '可达' : '降级',
+              tone: health?.tone ?? StatusTone.neutral,
+            ),
+            onTap: () => context.go(AppRoute.live.path),
+          ),
+          if (deviceOverview.hasError || cameraHealth.hasError) ...[
+            const SizedBox(height: 8),
+            const Text(
+              '后端不可用时，本页保留最近的基础信息，登录和设置恢复后会重新同步。',
+              style: TextStyle(
+                color: AppColors.muted,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                height: 1.45,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _V1BoundaryPanel extends StatelessWidget {
+  const _V1BoundaryPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return MiraSurface(
+      color: AppColors.brand.withValues(alpha: 0.07),
+      borderColor: AppColors.brand.withValues(alpha: 0.10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'V1 能力边界',
+            style: TextStyle(
+              color: AppColors.ink,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0,
+            ),
+          ),
+          SizedBox(height: 8),
+          MiraListRow(
+            icon: Icons.notifications_outlined,
+            title: '告警',
+            subtitle: '当前只保留普通告警摘要和处理状态，不进入安全事件流。',
+            tone: MiraListRowTone.blue,
+          ),
+          MiraListRow(
+            icon: Icons.shield_outlined,
+            title: '安全区域 / 安全事件',
+            subtitle: '后续版本能力，V1 不开放完整业务入口。',
+            tone: MiraListRowTone.neutral,
           ),
         ],
       ),
@@ -220,6 +370,8 @@ class _SettingsGroup extends StatelessWidget {
       MvpSettingKind.family => Icons.groups_outlined,
       MvpSettingKind.child => Icons.child_care_outlined,
       MvpSettingKind.device => Icons.videocam_outlined,
+      MvpSettingKind.points => Icons.stars_outlined,
+      MvpSettingKind.rewards => Icons.card_giftcard_outlined,
       MvpSettingKind.aiRules => Icons.auto_awesome_outlined,
       MvpSettingKind.privacy => Icons.privacy_tip_outlined,
       MvpSettingKind.userAgreement => Icons.description_outlined,
@@ -231,6 +383,8 @@ class _SettingsGroup extends StatelessWidget {
   MiraListRowTone _toneFor(MvpSettingKind kind) {
     return switch (kind) {
       MvpSettingKind.device => MiraListRowTone.green,
+      MvpSettingKind.points => MiraListRowTone.amber,
+      MvpSettingKind.rewards => MiraListRowTone.blue,
       MvpSettingKind.aiRules => MiraListRowTone.blue,
       MvpSettingKind.privacy => MiraListRowTone.amber,
       MvpSettingKind.userAgreement ||
@@ -246,6 +400,10 @@ void _handleSettingTap(BuildContext context, MvpSettingEntry entry) {
       context.push(userAgreementPath);
     case MvpSettingKind.privacyPolicy:
       context.push(privacyPolicyPath);
+    case MvpSettingKind.points:
+      context.go(pointsPath);
+    case MvpSettingKind.rewards:
+      context.go(rewardsPath);
     case MvpSettingKind.child:
       _showProfileSheet(
         context,

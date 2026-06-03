@@ -193,6 +193,46 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('家庭管理'), findsOneWidget);
   });
+
+  testWidgets('opens points and rewards flows from profile', (tester) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'mock_access_saved',
+        authRefreshTokenKey: 'mock_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'mock_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text('我的').last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('积分').last);
+    await tester.pumpAndSettle();
+    expect(find.text('积分流水'), findsOneWidget);
+    expect(find.text('手动调整积分'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.card_giftcard_outlined).last);
+    await tester.pumpAndSettle();
+    expect(find.text('奖励商店'), findsOneWidget);
+    expect(find.text('兑换记录'), findsOneWidget);
+
+    await tester.tap(find.text('周末亲子游戏 20 分钟').first);
+    await tester.pumpAndSettle();
+    expect(find.text('兑换说明'), findsOneWidget);
+    expect(find.text('兑换奖励'), findsOneWidget);
+  });
 }
 
 Future<void> _loginSuccessfully(WidgetTester tester) async {

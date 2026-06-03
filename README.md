@@ -32,11 +32,11 @@ flutter test
 
 ```bash
 cd backend
-python -m pip install -r requirements.txt
-python app.py
+python3 -m pip install -r requirements.txt
+python3 app.py
 ```
 
-接口说明见 [docs/backend_api.md](docs/backend_api.md)。摄像头 RTSP、go2rtc、语音唤醒、喇叭播放和实时观察能力仍保留在原测试后端 `/Users/sqcopenclaw/.openclaw/workspace/ai_camera_test`，当前 App 后端默认通过 `MIRA_CAMERA_BACKEND_URL=http://127.0.0.1:8767` 转接。
+接口说明见 [docs/backend_api.md](docs/backend_api.md)。摄像头底层运行能力仍保留在原测试后端 `/Users/sqcopenclaw/.openclaw/workspace/ai_camera_test`，当前 App 后端通过 adapter/bridge 读取或代理必要状态；Flutter 只调用 App 后端接口，不直接接触底层流媒体或硬件私有协议。
 
 ## App 定位
 
@@ -562,35 +562,28 @@ App
 
 ## MVP 范围
 
-第一版家长端 App 建议聚焦以下闭环：
+当前 V1 聚焦家长端最小闭环，而不是一次性实现所有长期功能。
 
-1. 登录、家庭创建、设备绑定入口。
-2. 当前家长身份、个人信息和账号安全。
-3. 孩子档案创建和编辑。
-4. 首页状态页。
-5. 任务创建、任务模板和任务日历。
-6. 小书包。
-7. 任务证据和专注计时。
-8. 睡眠与晨起基础卡片。
-9. 实时看护和事件回放页面。
-10. 日报页面。
-11. 奖励计量流水、奖励规则和奖励商店。
-12. 打卡素材审核。
-13. 对话摘要、人设设置和互动边界。
-14. SOS、安全事件处理和紧急联系人。
-15. 隐私模式、权限和通知设置。
-16. “我的”页和订阅权益说明页。
+已完成或当前阶段可验收的 V1 能力：
 
-暂缓到后续版本：
+1. welcome/onboarding、手机号验证码登录、refresh token 登录态保持。
+2. 首次设置流程：家长身份、设备绑定入口、Wi-Fi 配网、绑定成功、孩子资料、紧急联系人。
+3. 主 Tab：首页、任务、看护、告警、我的。
+4. 首页核心看护状态、今日任务摘要、设备/摄像头基础状态、积分奖励轻入口。
+5. 任务列表、任务详情、任务完成、家长确认、驳回确认。
+6. 积分账户、积分流水、任务确认发放积分、家长手动调整。
+7. 奖励列表、奖励详情、兑换、取消兑换、手动标记兑现。
+8. 实时看护基础入口：camera health、runtime、snapshot/stream 边界；真实流不可用时降级展示。
+9. 我的/设置页：家庭、孩子、设备基础信息，积分/奖励、用户协议、隐私政策入口。
+10. 后端 V1 边界：Mock SMS provider、prompt registry / AI config、firmware/OTA reserved API。
 
-- 多孩子复杂切换。
-- 多设备联动。
-- 完整学习缺漏诊断。
-- 第三方学校平台自动提交。
-- 高级家庭成员审计。
-- 长期成长档案导出。
-- 睡眠趋势高级分析。
-- 危险区域自动规则推荐。
+V1 只做结构预留或轻量摘要，不实现完整业务闭环：
+
+- 告警中心只保留普通摘要和处理状态，不实现安全事件详情和复杂事件流。
+- 安全区域、安全事件、SOS 完整处理、地理围栏不进入 V1。
+- 打卡、日报/周报、成长时刻、订阅、支付、复杂家庭审计留到后续版本。
+- 子端奖励申请只保留状态/API 边界，不做完整孩子端 UI。
+- 真实短信供应商、真实 OTA 执行、复杂 AI eval 后台 UI 暂不实现。
 
 ## 核心状态模型
 
@@ -634,7 +627,7 @@ App
 
 ## App 接口依赖
 
-家长端需要与服务端约定这些能力，但 README 不描述服务端实现细节。
+当前 V1 Flutter 已接入或按同一合同预留以下 App 后端接口。README 只列当前阶段合同；更完整字段说明见 [docs/backend_api.md](docs/backend_api.md)。
 
 ```text
 Auth
@@ -643,121 +636,65 @@ Auth
   POST /api/auth/token/refresh
   GET  /api/auth/session
   POST /api/auth/logout
-  PATCH /api/auth/me/profile
-  POST /api/auth/phone/change/request
-  POST /api/auth/phone/change/confirm
-  GET  /api/auth/devices
-  DELETE /api/auth/devices/{id}
 
-Camera Bridge
-  GET  /api/camera/health
-  GET  /api/camera/runtime
-  GET  /api/camera/speaker/status
-  GET  /api/camera/snapshot
-
-Family
-  GET    /api/families/current
-  POST   /api/families
-  POST   /api/families/invite
-  PATCH  /api/families/members/{id}
-
-Device
-  GET    /api/devices
-  POST   /api/devices/bind
-  PATCH  /api/devices/{id}
-  POST   /api/devices/{id}/privacy
-
-Child
-  GET    /api/children
-  POST   /api/children
-  PATCH  /api/children/{id}
-
-Daily Flow
-  GET    /api/daily-flows/today
-  POST   /api/daily-flow-templates
-  PATCH  /api/daily-flows/items/{id}
-
-Packing
-  GET    /api/packing-lists/tomorrow
-  POST   /api/packing-lists/items
-  PATCH  /api/packing-lists/items/{id}
+Setup
+  GET  /api/setup/status
+  POST /api/setup/parent-identity
+  POST /api/setup/device
+  POST /api/setup/wifi
+  POST /api/setup/child
+  POST /api/setup/contacts
+  POST /api/setup/complete
 
 Tasks
-  GET    /api/tasks/today
-  POST   /api/tasks
-  PATCH  /api/tasks/{id}
-  POST   /api/tasks/{id}/pause
-  POST   /api/tasks/{id}/delay
-  POST   /api/tasks/{id}/complete
-  GET    /api/tasks/{id}/evidence
-  POST   /api/tasks/{id}/confirm
-  POST   /api/tasks/{id}/reject
-
-Sleep
-  GET    /api/sleep/today
-  GET    /api/sleep/summary?date=YYYY-MM-DD
-  PATCH  /api/sleep/settings
-
-Watch
-  GET    /api/watch/status
-  POST   /api/watch/snapshot
-  POST   /api/watch/talk/start
-  POST   /api/watch/talk/end
-
-Reports
-  GET    /api/reports/daily?date=YYYY-MM-DD
-  GET    /api/reports/weekly?week=YYYY-WW
+  GET   /api/tasks/today
+  GET   /api/tasks
+  GET   /api/tasks/{taskId}
+  POST  /api/tasks
+  PATCH /api/tasks/{taskId}
+  POST  /api/tasks/{taskId}/complete
+  POST  /api/tasks/{taskId}/parent-confirm
+  POST  /api/tasks/{taskId}/reject-confirmation
 
 Points
-  GET    /api/points/summary
-  GET    /api/points/ledger
-  POST   /api/points/rules
-  PATCH  /api/points/stage-rule
-  POST   /api/points/manual-adjust
+  GET  /api/points/account
+  GET  /api/points/ledger
+  POST /api/points/adjust
 
 Rewards
-  GET    /api/rewards
-  POST   /api/rewards
-  PATCH  /api/rewards/{id}
-  GET    /api/rewards/requests
-  POST   /api/rewards/requests
-  POST   /api/rewards/requests/{id}/approve
-  POST   /api/rewards/requests/{id}/reject
-  GET    /api/rewards/redemptions
-  POST   /api/rewards/redemptions
-  POST   /api/rewards/redemptions/{id}/fulfill
+  GET   /api/rewards/items
+  GET   /api/rewards/items/{itemId}
+  POST  /api/rewards/items
+  PATCH /api/rewards/items/{itemId}
+  GET   /api/rewards/redemptions
+  POST  /api/rewards/redemptions
+  POST  /api/rewards/redemptions/{id}/fulfill
+  POST  /api/rewards/redemptions/{id}/cancel
 
-Checkin
-  GET    /api/checkins/assets
-  PATCH  /api/checkins/assets/{id}
+Device
+  GET /api/devices
+  GET /api/devices/{deviceId}
+  GET /api/devices/{deviceId}/status
 
-Conversation
-  GET    /api/conversations/summary?date=YYYY-MM-DD
-  PATCH  /api/conversations/boundaries
-  PATCH  /api/conversations/retention
+Camera Bridge
+  GET /api/camera/health
+  GET /api/camera/runtime
+  GET /api/camera/snapshot
+  GET /api/camera/stream
 
-Moments
-  GET    /api/moments
-  POST   /api/moments/{id}/favorite
-  DELETE /api/moments/{id}
+AI / Prompt
+  GET /api/ai/config
+  GET /api/ai/prompts
+  GET /api/ai/models
+  GET /api/ai/eval-cases
 
-Emergency
-  GET    /api/emergency/events
-  POST   /api/emergency/contacts
-  POST   /api/emergency/events/{id}/resolve
-  GET    /api/safety-zones
-  POST   /api/safety-zones
-  PATCH  /api/safety-zones/{id}
-
-Care
-  GET    /api/care/todos
-  PATCH  /api/care/todos/{id}
-  GET    /api/care/handoffs
-
-Realtime
-  WS     /ws/events
-  RTC    /rtc/offer, /rtc/answer, /rtc/ice
+Firmware / OTA reserved boundary
+  GET  /api/firmware/devices/{deviceId}/status
+  GET  /api/firmware/packages
+  POST /api/firmware/jobs
 ```
+
+今日内容统一来自 `tasks`。V1 不提供独立 day-plan API，也不提供独立 daily flow / daily plan 模块。
 
 ## Flutter 技术栈
 
@@ -809,7 +746,6 @@ lib/
       onboarding/
       child_profile/
       device/
-      daily_flow/
       packing/
       tasks/
       task_evidence/

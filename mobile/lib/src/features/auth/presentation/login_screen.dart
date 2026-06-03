@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/storage/setup_store.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
 import 'package:mira_guardian_app/src/features/auth/application/auth_repository.dart';
+import 'package:mira_guardian_app/src/features/setup/application/setup_repository.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -265,12 +265,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     await Future<void>.delayed(const Duration(milliseconds: 420));
     if (!mounted) return;
 
-    final setupStore = ref.read(setupStoreProvider);
-    context.go(
-      setupStore.hasCompletedInitialSetup
-          ? AppRoute.home.path
-          : setupParentIdentityPath,
-    );
+    try {
+      final setupStatus = await ref.read(setupRepositoryProvider).status();
+      if (!mounted) return;
+      context.go(setupStatus.routePath);
+    } on SetupException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _success = false;
+        _statusMessage = error.message;
+      });
+    }
   }
 
   void _focusCodeField() {

@@ -63,6 +63,23 @@ When adding a page:
 - Keep one-off onboarding/auth/setup pages outside the tab shell unless the user says otherwise.
 - Avoid dead ends. Detail/setup pages need an obvious way back except where the product flow intentionally disallows it.
 
+## API and Feature Boundaries
+
+Flutter pages must not assemble raw API URLs or depend on RTSP, go2rtc, specific camera models, device private protocols, SMS providers, AI provider keys, or prompt text. Pages should read and mutate data through feature repositories/use cases backed by the shared Dio API client.
+
+Keep clear feature boundaries for login, setup, family, child, device, camera, tasks, points, rewards, AI summaries, and legal/privacy. Do not add one-off mock structures inside a screen if the data shape should become a backend contract; mock data should resemble the API response that will replace it.
+
+App startup routing should combine:
+
+- onboarding status
+- auth session / refresh token
+- backend setup status
+- device binding status
+
+Do not rely on one local boolean to represent the whole lifecycle.
+
+Do not create a standalone `daily_flow`, `daily_plan`, "今日流程", or "今日计划" feature. Day-specific content belongs to `tasks`; home may render a today task summary, but it should still come from task data.
+
 ## Welcome and Login Rules
 
 The welcome/onboarding screen is already a designed flow. Do not redesign it unless the user explicitly asks.

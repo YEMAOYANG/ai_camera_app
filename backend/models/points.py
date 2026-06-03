@@ -1,0 +1,16 @@
+from __future__ import annotations
+
+
+LEDGER_TASK_COMPLETED = "task_completed"
+LEDGER_PARENT_ADJUSTMENT = "parent_adjustment"
+LEDGER_REDEMPTION_SPENT = "redemption_spent"
+LEDGER_REDEMPTION_CANCELLED = "redemption_cancelled"
+LEDGER_SYSTEM_ADJUSTMENT = "system_adjustment"
+
+LEDGER_TYPES = {
+    LEDGER_TASK_COMPLETED,
+    LEDGER_PARENT_ADJUSTMENT,
+    LEDGER_REDEMPTION_SPENT,
+    LEDGER_REDEMPTION_CANCELLED,
+    LEDGER_SYSTEM_ADJUSTMENT,
+}

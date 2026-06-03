@@ -1,0 +1,279 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mira_guardian_app/src/app/router/app_route.dart';
+import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
+import 'package:mira_guardian_app/src/features/rewards/application/reward_repository.dart';
+import 'package:mira_guardian_app/src/features/rewards/domain/reward_models.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
+import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+
+class RewardDetailScreen extends ConsumerWidget {
+  const RewardDetailScreen({required this.itemId, super.key});
+
+  final String itemId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final itemValue = ref.watch(rewardDetailProvider(itemId));
+    final points = ref.watch(pointsSummaryProvider);
+
+    return itemValue.when(
+      data: (item) {
+        final balance = points.asData?.value.account.balance ?? 0;
+        final canRedeem =
+            item.available &&
+            points.asData?.value != null &&
+            balance >= item.pointsCost;
+
+        return MiraScreen(
+          title: item.title,
+          subtitle: '${item.pointsCost} 分兑换',
+          fixedHeader: true,
+          backLabel: '返回奖励',
+          onBack: () => context.go(rewardsPath),
+          children: [
+            _RewardHero(item: item, balance: balance),
+            const SizedBox(height: 14),
+            MiraSurface(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _SectionTitle('兑换说明'),
+                  const SizedBox(height: 10),
+                  Text(
+                    item.description.isEmpty
+                        ? '该奖励由家长确认并手动兑现。'
+                        : item.description,
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      height: 1.55,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  MiraListRow(
+                    icon: Icons.stars_outlined,
+                    title: '所需积分',
+                    subtitle: '兑换后会立即扣减积分并写入流水。',
+                    tone: MiraListRowTone.amber,
+                    trailing: Text(
+                      '${item.pointsCost}',
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontFamily: AppTypography.systemFont,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+            MiraPrimaryButton(
+              label: canRedeem ? '兑换奖励' : '积分不足',
+              trailing: const MiraButtonGlyph(icon: Icons.redeem_outlined),
+              onTap: canRedeem
+                  ? () => _showRedeemDialog(context, ref, item)
+                  : null,
+            ),
+            const SizedBox(height: 10),
+            MiraSecondaryButton(
+              label: '查看兑换记录',
+              trailing: const Icon(Icons.history_outlined, size: 18),
+              onTap: () => context.go(rewardsPath),
+            ),
+          ],
+        );
+      },
+      loading: () => MiraScreen(
+        title: '奖励详情',
+        fixedHeader: true,
+        backLabel: '返回奖励',
+        onBack: () => context.go(rewardsPath),
+        children: const [_RewardDetailLoading()],
+      ),
+      error: (error, _) => MiraScreen(
+        title: '奖励详情',
+        fixedHeader: true,
+        backLabel: '返回奖励',
+        onBack: () => context.go(rewardsPath),
+        children: [
+          MiraEmptyState(
+            icon: Icons.cloud_off_outlined,
+            title: '奖励详情加载失败',
+            message: error is RewardException ? error.message : '请稍后重试。',
+            action: TextButton(
+              onPressed: () => ref.invalidate(rewardDetailProvider(itemId)),
+              child: const Text('重新加载'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RewardHero extends StatelessWidget {
+  const _RewardHero({required this.item, required this.balance});
+
+  final RewardItem item;
+  final int balance;
+
+  @override
+  Widget build(BuildContext context) {
+    return MiraSurface(
+      color: AppColors.ink,
+      borderColor: AppColors.ink,
+      radius: 24,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              StatusChip(label: item.statusLabel),
+              const Spacer(),
+              Text(
+                '余额 $balance',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.68),
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text(
+            item.title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              height: 1.16,
+              letterSpacing: 0,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${item.pointsCost} 分兑换，家长手动兑现。',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.72),
+              fontFamily: AppTypography.systemFont,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.55,
+              letterSpacing: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: AppColors.ink,
+        fontFamily: AppTypography.systemFont,
+        fontSize: 16,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0,
+      ),
+    );
+  }
+}
+
+class _RewardDetailLoading extends StatelessWidget {
+  const _RewardDetailLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return MiraSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          _SectionTitle('正在加载奖励'),
+          SizedBox(height: 12),
+          LinearProgressIndicator(minHeight: 3),
+        ],
+      ),
+    );
+  }
+}
+
+void _showRedeemDialog(BuildContext context, WidgetRef ref, RewardItem item) {
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        title: const Text('确认兑换'),
+        content: Text('将使用 ${item.pointsCost} 分兑换「${item.title}」。兑换后会生成待兑现记录。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              await _redeem(context, ref, item);
+            },
+            child: const Text('确认兑换'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> _redeem(
+  BuildContext context,
+  WidgetRef ref,
+  RewardItem item,
+) async {
+  try {
+    await ref.read(rewardRepositoryProvider).createRedemption(item.id);
+    ref
+      ..invalidate(rewardsSummaryProvider)
+      ..invalidate(rewardRedemptionsProvider)
+      ..invalidate(pointsSummaryProvider);
+    if (context.mounted) {
+      _showToast(context, '兑换成功，已生成待兑现记录');
+      context.go(rewardsPath);
+    }
+  } on RewardException catch (error) {
+    if (context.mounted) _showToast(context, error.message);
+  }
+}
+
+void _showToast(BuildContext context, String message) {
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.ink,
+      ),
+    );
+}

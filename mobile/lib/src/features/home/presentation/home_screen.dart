@@ -3,8 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:mira_guardian_app/src/features/devices/application/device_repository.dart';
+import 'package:mira_guardian_app/src/features/devices/domain/device_models.dart';
+import 'package:mira_guardian_app/src/features/live_care/application/camera_repository.dart';
+import 'package:mira_guardian_app/src/features/live_care/domain/camera_models.dart';
 import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
 import 'package:mira_guardian_app/src/features/mvp/domain/mvp_models.dart';
+import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
+import 'package:mira_guardian_app/src/features/points/domain/point_models.dart';
+import 'package:mira_guardian_app/src/features/rewards/application/reward_repository.dart';
+import 'package:mira_guardian_app/src/features/rewards/domain/reward_models.dart';
+import 'package:mira_guardian_app/src/features/tasks/application/task_repository.dart';
+import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
@@ -16,31 +26,59 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(guardianMvpSnapshotProvider);
-    final deviceCareState = snapshot.device.online ? '在线看护中' : '设备离线';
+    final todayTasks = ref.watch(todayTasksProvider);
+    final redemptions = ref.watch(rewardRedemptionsProvider);
+    final points = ref.watch(pointsSummaryProvider);
+    final deviceOverview = ref.watch(primaryDeviceOverviewProvider);
+    final cameraHealth = ref.watch(cameraHealthProvider);
+    final deviceStatus = _deviceStatusLabel(snapshot, deviceOverview);
 
     return MiraScreen(
       title: 'Mira Guardian',
-      subtitle: '${snapshot.device.name} · $deviceCareState',
-      headerContent: _HomeBrandHeader(
-        deviceStatus: '${snapshot.device.name} · $deviceCareState',
-      ),
+      subtitle: deviceStatus,
+      headerContent: _HomeBrandHeader(deviceStatus: deviceStatus),
       trailing: MiraIconButton(
         icon: Icons.notifications_outlined,
         label: '未处理提醒',
         onTap: () => context.go(AppRoute.alerts.path),
       ),
       children: [
-        _CurrentStatePanel(snapshot: snapshot),
+        _CurrentStatePanel(
+          snapshot: snapshot,
+          deviceOverview: deviceOverview,
+          cameraHealth: cameraHealth,
+        ),
         const SizedBox(height: 14),
-        _PendingQueue(snapshot: snapshot),
+        _PendingQueue(tasks: todayTasks, redemptions: redemptions),
         const SizedBox(height: 14),
-        _TodayPlan(snapshot: snapshot),
+        _TodayPlan(tasks: todayTasks),
+        const SizedBox(height: 14),
+        _PointsRewardsPanel(points: points, redemptions: redemptions),
         const SizedBox(height: 14),
         _AiAdvicePanel(snapshot: snapshot),
         const SizedBox(height: 14),
-        _DeviceSummaryPanel(snapshot: snapshot),
+        _DeviceSummaryPanel(
+          snapshot: snapshot,
+          deviceOverview: deviceOverview,
+          cameraHealth: cameraHealth,
+        ),
       ],
     );
+  }
+
+  String _deviceStatusLabel(
+    GuardianMvpSnapshot snapshot,
+    AsyncValue<DeviceOverview?> overview,
+  ) {
+    final device = overview.asData?.value;
+    if (device != null) {
+      final careState = device.isOnline ? '在线看护中' : '设备离线';
+      return '${device.device.displayName} · $careState';
+    }
+    if (overview.isLoading) return '${snapshot.device.name} · 状态同步中';
+    if (overview.hasError) return '${snapshot.device.name} · 后端待恢复';
+    final fallback = snapshot.device.online ? '在线看护中' : '设备离线';
+    return '${snapshot.device.name} · $fallback';
   }
 }
 
@@ -119,12 +157,23 @@ class _HomeBrandHeader extends StatelessWidget {
 }
 
 class _CurrentStatePanel extends StatelessWidget {
-  const _CurrentStatePanel({required this.snapshot});
+  const _CurrentStatePanel({
+    required this.snapshot,
+    required this.deviceOverview,
+    required this.cameraHealth,
+  });
 
   final GuardianMvpSnapshot snapshot;
+  final AsyncValue<DeviceOverview?> deviceOverview;
+  final AsyncValue<CameraHealth> cameraHealth;
 
   @override
   Widget build(BuildContext context) {
+    final overview = deviceOverview.asData?.value;
+    final health = cameraHealth.asData?.value;
+    final deviceOnline = overview?.isOnline ?? snapshot.device.online;
+    final cameraOnline = health?.reachable ?? snapshot.device.cameraEnabled;
+
     return MiraSurface(
       color: AppColors.ink,
       borderColor: AppColors.ink,
@@ -136,17 +185,13 @@ class _CurrentStatePanel extends StatelessWidget {
           Row(
             children: [
               StatusChip(
-                label: snapshot.device.online ? '设备在线' : '设备离线',
-                tone: snapshot.device.online
-                    ? StatusTone.success
-                    : StatusTone.danger,
+                label: deviceOnline ? '设备在线' : '设备离线',
+                tone: deviceOnline ? StatusTone.success : StatusTone.danger,
               ),
               const SizedBox(width: 8),
               StatusChip(
-                label: snapshot.device.privacyLightOn ? '隐私灯亮起' : '隐私待确认',
-                tone: snapshot.device.privacyLightOn
-                    ? StatusTone.neutral
-                    : StatusTone.warning,
+                label: cameraOnline ? '摄像头可达' : '看护降级',
+                tone: cameraOnline ? StatusTone.success : StatusTone.warning,
               ),
             ],
           ),
@@ -179,7 +224,7 @@ class _CurrentStatePanel extends StatelessWidget {
             children: [
               _StateMetric(
                 label: '安全',
-                value: '正常',
+                value: cameraOnline ? '正常' : '降级',
                 color: const Color(0xFF6EE7B7),
               ),
               const SizedBox(width: 8),
@@ -257,81 +302,266 @@ class _StateMetric extends StatelessWidget {
 }
 
 class _PendingQueue extends StatelessWidget {
-  const _PendingQueue({required this.snapshot});
+  const _PendingQueue({required this.tasks, required this.redemptions});
 
-  final GuardianMvpSnapshot snapshot;
+  final AsyncValue<List<GuardianTask>> tasks;
+  final AsyncValue<List<RewardRedemption>> redemptions;
 
   @override
   Widget build(BuildContext context) {
+    return tasks.when(
+      data: (taskList) {
+        final pendingTasks = taskList.where((task) => task.status.awaitsParent);
+        final redemptionList = redemptions.asData?.value ?? const [];
+        final pendingRedemptions = redemptionList.where(
+          (redemption) => redemption.status == RedemptionStatus.redeemed,
+        );
+        final total = pendingTasks.length + pendingRedemptions.length;
+
+        return MiraSurface(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionHeader(title: '需要你处理', action: '$total 项'),
+              const SizedBox(height: 8),
+              if (total == 0)
+                const Text(
+                  '暂无待确认任务或待兑现奖励。',
+                  style: TextStyle(
+                    color: AppColors.muted,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    height: 1.55,
+                    letterSpacing: 0,
+                  ),
+                ),
+              for (final task in pendingTasks)
+                MiraListRow(
+                  icon: Icons.fact_check_outlined,
+                  title: '${task.title}待确认',
+                  subtitle: '${task.evidenceText} · +${task.rewardPoints} 分',
+                  tone: MiraListRowTone.amber,
+                  trailing: TextButton(
+                    onPressed: () => context.go('$taskDetailPath/${task.id}'),
+                    child: const Text('处理'),
+                  ),
+                ),
+              for (final redemption in pendingRedemptions)
+                MiraListRow(
+                  icon: Icons.card_giftcard_outlined,
+                  title: '奖励待兑现',
+                  subtitle:
+                      '${redemption.rewardTitle} · ${redemption.pointsCost} 分',
+                  tone: MiraListRowTone.blue,
+                  trailing: TextButton(
+                    onPressed: () => context.go(rewardsPath),
+                    child: const Text('确认'),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+      loading: () => const _HomeLoadingPanel(title: '需要你处理'),
+      error: (error, _) =>
+          _HomeErrorPanel(title: '需要你处理', message: '待处理事项同步失败，请稍后重试。'),
+    );
+  }
+}
+
+class _TodayPlan extends StatelessWidget {
+  const _TodayPlan({required this.tasks});
+
+  final AsyncValue<List<GuardianTask>> tasks;
+
+  @override
+  Widget build(BuildContext context) {
+    return tasks.when(
+      data: (taskList) => MiraSurface(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _SectionHeader(
+              title: '今日任务摘要',
+              action: '查看全部',
+              onAction: () => context.go(AppRoute.tasks.path),
+            ),
+            const SizedBox(height: 10),
+            if (taskList.isEmpty)
+              const Text(
+                '今天暂无任务。后端写入 tasks 后，首页会自动展示今日任务摘要。',
+                style: TextStyle(
+                  color: AppColors.muted,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  height: 1.55,
+                  letterSpacing: 0,
+                ),
+              ),
+            for (final task in taskList.take(3))
+              MiraListRow(
+                icon: task.status == GuardianTaskStatus.inProgress
+                    ? Icons.play_circle_outline
+                    : Icons.check_circle_outline,
+                title: task.title,
+                subtitle: '${task.timeLabel} · ${task.nextStep}',
+                tone: task.status == GuardianTaskStatus.inProgress
+                    ? MiraListRowTone.blue
+                    : MiraListRowTone.neutral,
+                trailing: StatusChip(
+                  label: task.status.label,
+                  tone: task.status.tone,
+                ),
+                onTap: () => context.go('$taskDetailPath/${task.id}'),
+              ),
+          ],
+        ),
+      ),
+      loading: () => const _HomeLoadingPanel(title: '今日任务摘要'),
+      error: (error, _) =>
+          _HomeErrorPanel(title: '今日任务摘要', message: '今日任务同步失败，请稍后重试。'),
+    );
+  }
+}
+
+class _PointsRewardsPanel extends StatelessWidget {
+  const _PointsRewardsPanel({required this.points, required this.redemptions});
+
+  final AsyncValue<PointsSummary> points;
+  final AsyncValue<List<RewardRedemption>> redemptions;
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = points.asData?.value;
+    final pending =
+        redemptions.asData?.value
+            .where((item) => item.status == RedemptionStatus.redeemed)
+            .length ??
+        0;
+
     return MiraSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionHeader(
-            title: '需要你处理',
-            action: '${snapshot.pendingItems.length} 项',
+            title: '积分与奖励',
+            action: points.isLoading ? '同步中' : '查看',
+            onAction: () => context.go(pointsPath),
           ),
           const SizedBox(height: 8),
-          for (final item in snapshot.pendingItems)
-            MiraListRow(
-              icon: item.taskId == null
-                  ? Icons.card_giftcard_outlined
-                  : Icons.fact_check_outlined,
-              title: item.title,
-              subtitle: item.detail,
-              tone: item.tone == StatusTone.warning
-                  ? MiraListRowTone.amber
-                  : MiraListRowTone.blue,
-              trailing: TextButton(
-                onPressed: () {
-                  if (item.taskId != null) {
-                    context.go('$taskDetailPath/${item.taskId}');
-                    return;
-                  }
-                  _showToast(context, '奖励申请已进入确认队列');
-                },
-                child: Text(item.actionLabel),
+          Row(
+            children: [
+              Expanded(
+                child: _CompactEntry(
+                  icon: Icons.stars_outlined,
+                  title: summary == null ? '--' : '${summary.account.balance}',
+                  subtitle: '当前积分',
+                  tone: MiraListRowTone.amber,
+                  onTap: () => context.go(pointsPath),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _CompactEntry(
+                  icon: Icons.card_giftcard_outlined,
+                  title: '$pending',
+                  subtitle: '待兑现奖励',
+                  tone: MiraListRowTone.blue,
+                  onTap: () => context.go(rewardsPath),
+                ),
+              ),
+            ],
+          ),
+          if (points.hasError) ...[
+            const SizedBox(height: 10),
+            const Text(
+              '积分数据同步失败，任务和看护功能仍可继续使用。',
+              style: TextStyle(
+                color: AppColors.muted,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                height: 1.45,
+                letterSpacing: 0,
               ),
             ),
+          ],
         ],
       ),
     );
   }
 }
 
-class _TodayPlan extends StatelessWidget {
-  const _TodayPlan({required this.snapshot});
+class _CompactEntry extends StatelessWidget {
+  const _CompactEntry({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.tone,
+    required this.onTap,
+  });
 
-  final GuardianMvpSnapshot snapshot;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final MiraListRowTone tone;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final color = switch (tone) {
+      MiraListRowTone.blue => AppColors.brand,
+      MiraListRowTone.green => const Color(0xFF2F8F68),
+      MiraListRowTone.amber => const Color(0xFFD8922B),
+      MiraListRowTone.red => const Color(0xFFB64A4A),
+      MiraListRowTone.neutral => AppColors.ink,
+    };
+
     return MiraSurface(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      radius: 15,
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 11),
+      color: color.withValues(alpha: 0.07),
+      borderColor: color.withValues(alpha: 0.10),
+      onTap: onTap,
+      child: Row(
         children: [
-          _SectionHeader(
-            title: '今日计划',
-            action: '查看全部',
-            onAction: () => context.go(AppRoute.tasks.path),
-          ),
-          const SizedBox(height: 10),
-          for (final task in snapshot.tasks.take(3))
-            MiraListRow(
-              icon: task.status == MvpTaskStatus.running
-                  ? Icons.play_circle_outline
-                  : Icons.check_circle_outline,
-              title: task.title,
-              subtitle: '${task.timeLabel} · ${task.nextStep}',
-              tone: task.status == MvpTaskStatus.running
-                  ? MiraListRowTone.blue
-                  : MiraListRowTone.neutral,
-              trailing: StatusChip(
-                label: task.status.label,
-                tone: task.status.tone,
-              ),
-              onTap: () => context.go('$taskDetailPath/${task.id}'),
+          Icon(icon, color: color, size: 19),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.ink,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.muted,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -393,12 +623,33 @@ class _AiAdvicePanel extends StatelessWidget {
 }
 
 class _DeviceSummaryPanel extends StatelessWidget {
-  const _DeviceSummaryPanel({required this.snapshot});
+  const _DeviceSummaryPanel({
+    required this.snapshot,
+    required this.deviceOverview,
+    required this.cameraHealth,
+  });
 
   final GuardianMvpSnapshot snapshot;
+  final AsyncValue<DeviceOverview?> deviceOverview;
+  final AsyncValue<CameraHealth> cameraHealth;
 
   @override
   Widget build(BuildContext context) {
+    final overview = deviceOverview.asData?.value;
+    final health = cameraHealth.asData?.value;
+    final title = overview?.device.displayName ?? snapshot.device.name;
+    final subtitle =
+        overview?.subtitle ??
+        '${snapshot.device.room} · ${snapshot.device.networkLabel}';
+    final statusLabel =
+        overview?.connectionLabel ?? snapshot.device.connectionLabel;
+    final statusTone =
+        overview?.tone ??
+        (snapshot.device.online ? StatusTone.success : StatusTone.danger);
+    final rowTone = (overview?.isOnline ?? snapshot.device.online)
+        ? MiraListRowTone.green
+        : MiraListRowTone.red;
+
     return MiraSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -411,19 +662,40 @@ class _DeviceSummaryPanel extends StatelessWidget {
           const SizedBox(height: 10),
           MiraListRow(
             icon: Icons.videocam_outlined,
-            title: snapshot.device.name,
-            subtitle:
-                '${snapshot.device.room} · ${snapshot.device.networkLabel}',
-            tone: snapshot.device.online
-                ? MiraListRowTone.green
-                : MiraListRowTone.red,
-            trailing: StatusChip(
-              label: snapshot.device.connectionLabel,
-              tone: snapshot.device.online
-                  ? StatusTone.success
-                  : StatusTone.danger,
-            ),
+            title: title,
+            subtitle: subtitle,
+            tone: rowTone,
+            trailing: StatusChip(label: statusLabel, tone: statusTone),
+            onTap: () => context.go(AppRoute.live.path),
           ),
+          if (health != null && !health.reachable) ...[
+            const SizedBox(height: 8),
+            const Text(
+              '摄像头运行服务不可达，首页已切换为降级状态。',
+              style: TextStyle(
+                color: AppColors.muted,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                height: 1.45,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+          if (deviceOverview.hasError) ...[
+            const SizedBox(height: 8),
+            const Text(
+              '设备接口暂时不可用，仍可进入看护页查看 camera adapter 状态。',
+              style: TextStyle(
+                color: AppColors.muted,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                height: 1.45,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -463,14 +735,53 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-void _showToast(BuildContext context, String message) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.ink,
+class _HomeLoadingPanel extends StatelessWidget {
+  const _HomeLoadingPanel({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return MiraSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(title: title, action: '同步中'),
+          const SizedBox(height: 12),
+          const LinearProgressIndicator(minHeight: 3),
+        ],
       ),
     );
+  }
+}
+
+class _HomeErrorPanel extends StatelessWidget {
+  const _HomeErrorPanel({required this.title, required this.message});
+
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return MiraSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(title: title, action: '异常'),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            style: const TextStyle(
+              color: AppColors.muted,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.55,
+              letterSpacing: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

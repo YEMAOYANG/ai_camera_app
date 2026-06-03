@@ -1491,10 +1491,8 @@ POST   /api/tasks/{id}/complete
 GET    /api/tasks/{id}/evidence
 POST   /api/tasks/{id}/confirm
 POST   /api/tasks/{id}/reject
-GET    /api/daily_flows/today
-POST   /api/daily_flows/templates
-PATCH  /api/daily_flows/items/{id}
-POST   /api/daily_flows/items/{id}/complete
+GET    /api/task_templates
+POST   /api/tasks/templates/apply
 GET    /api/packing_lists/tomorrow
 POST   /api/packing_lists/items
 PATCH  /api/packing_lists/items/{id}

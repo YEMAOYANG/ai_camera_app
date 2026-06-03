@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/storage/setup_store.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:mira_guardian_app/src/features/setup/application/setup_repository.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
 
 final setupDraftProvider = StateProvider<SetupDraft>((ref) {
@@ -129,7 +129,19 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
       primaryLabel: '继续绑定设备',
       onPrimary: draft.parentName.trim().isEmpty
           ? null
-          : () => context.go(setupDevicePath),
+          : () async {
+              final saved = await _submitSetupStep(
+                context,
+                ref,
+                () => ref.read(setupRepositoryProvider).saveParentIdentity(
+                  displayName: draft.parentName,
+                  relationship: draft.parentIdentity,
+                ),
+              );
+              if (saved && context.mounted) {
+                context.go(setupDevicePath);
+              }
+            },
     );
   }
 }
@@ -185,7 +197,19 @@ class DeviceEntrySetupScreen extends ConsumerWidget {
       onSecondary: () => _showSetupToast(context, '已重新扫描附近设备'),
       onPrimary: draft.deviceName.trim().isEmpty || draft.room.trim().isEmpty
           ? null
-          : () => context.go(setupWifiPath),
+          : () async {
+              final saved = await _submitSetupStep(
+                context,
+                ref,
+                () => ref.read(setupRepositoryProvider).saveDevice(
+                  deviceName: draft.deviceName,
+                  location: draft.room,
+                ),
+              );
+              if (saved && context.mounted) {
+                context.go(setupWifiPath);
+              }
+            },
     );
   }
 }
@@ -271,9 +295,22 @@ class _WifiSetupScreenState extends ConsumerState<WifiSetupScreen> {
 
     FocusScope.of(context).unfocus();
     setState(() => _connecting = true);
-    await Future<void>.delayed(const Duration(milliseconds: 720));
-    if (!mounted) return;
-    context.go(setupBindSuccessPath);
+    try {
+      await ref.read(setupRepositoryProvider).saveWifi(
+        ssid: draft.wifiName,
+        password: draft.wifiPassword,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 420));
+      if (!mounted) return;
+      context.go(setupBindSuccessPath);
+    } on SetupException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _connecting = false;
+        _errorText = error.message;
+      });
+      _showSetupToast(context, error.message);
+    }
   }
 }
 
@@ -385,7 +422,21 @@ class ChildProfileSetupScreen extends ConsumerWidget {
       primaryLabel: '设置紧急联系人',
       onPrimary: draft.childName.trim().isEmpty
           ? null
-          : () => context.go(setupEmergencyContactsPath),
+          : () async {
+              final saved = await _submitSetupStep(
+                context,
+                ref,
+                () => ref.read(setupRepositoryProvider).saveChild(
+                  name: draft.childName,
+                  nickname: draft.childName,
+                  ageStage: '${draft.childStage} ${draft.childGrade}',
+                  birthday: draft.childBirthday,
+                ),
+              );
+              if (saved && context.mounted) {
+                context.go(setupEmergencyContactsPath);
+              }
+            },
     );
   }
 
@@ -474,10 +525,21 @@ class _EmergencyContactsSetupScreenState
     }
 
     setState(() => _saving = true);
-    await ref.read(setupStoreProvider).markCompleted();
-    await Future<void>.delayed(const Duration(milliseconds: 460));
-    if (!mounted) return;
-    context.go(AppRoute.home.path);
+    try {
+      await ref.read(setupRepositoryProvider).saveContacts(
+        name: draft.emergencyName,
+        phone: draft.emergencyPhone,
+        relationship: 'guardian',
+      );
+      final status = await ref.read(setupRepositoryProvider).complete();
+      await Future<void>.delayed(const Duration(milliseconds: 320));
+      if (!mounted) return;
+      context.go(status.completed ? AppRoute.home.path : status.routePath);
+    } on SetupException catch (error) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      _showSetupToast(context, error.message);
+    }
   }
 }
 
@@ -1198,6 +1260,22 @@ class _SuccessOrb extends StatelessWidget {
 }
 
 enum _SetupTone { neutral, blue, green }
+
+Future<bool> _submitSetupStep(
+  BuildContext context,
+  WidgetRef ref,
+  Future<SetupStatus> Function() action,
+) async {
+  try {
+    await action();
+    return true;
+  } on SetupException catch (error) {
+    if (context.mounted) {
+      _showSetupToast(context, error.message);
+    }
+    return false;
+  }
+}
 
 void _showSetupToast(BuildContext context, String message) {
   ScaffoldMessenger.of(context)

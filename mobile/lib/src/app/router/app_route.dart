@@ -11,6 +11,9 @@ const setupBindSuccessPath = '/setup/bind-success';
 const setupChildProfilePath = '/setup/child-profile';
 const setupEmergencyContactsPath = '/setup/emergency-contacts';
 const taskDetailPath = '/tasks/detail';
+const pointsPath = '/points';
+const rewardsPath = '/rewards';
+const rewardDetailPath = '/rewards/detail';
 
 enum AppRoute {
   home('/home', '首页', Icons.home_outlined, Icons.home),

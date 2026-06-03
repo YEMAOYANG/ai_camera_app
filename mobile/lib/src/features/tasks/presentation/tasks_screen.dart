@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
-import 'package:mira_guardian_app/src/features/mvp/domain/mvp_models.dart';
+import 'package:mira_guardian_app/src/features/tasks/application/task_repository.dart';
+import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
@@ -22,12 +22,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final snapshot = ref.watch(guardianMvpSnapshotProvider);
-    final tasks = _filteredTasks(snapshot.tasks);
-    final mainTask = snapshot.tasks.firstWhere(
-      (task) => task.status == MvpTaskStatus.running,
-      orElse: () => snapshot.tasks.first,
-    );
+    final tasksValue = ref.watch(taskListProvider);
 
     return MiraScreen(
       title: '任务',
@@ -37,88 +32,128 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         label: '新建任务',
         onTap: () => _showTaskCreateSheet(context),
       ),
-      children: [
-        _MainTaskPanel(task: mainTask),
-        const SizedBox(height: 14),
-        _FilterBar(
-          selected: _filter,
-          onSelect: (value) => setState(() => _filter = value),
-        ),
-        const SizedBox(height: 14),
-        if (tasks.isEmpty)
-          MiraEmptyState(
-            icon: Icons.event_available_outlined,
-            title: '这个筛选下没有任务',
-            message: '首版只展示今天的 mock 任务。后续可以接日历、模板和重复规则。',
-            action: TextButton(
-              onPressed: () => setState(() => _filter = _TaskFilter.today),
-              child: const Text('回到今日'),
+      children: tasksValue.when(
+        data: (allTasks) {
+          final tasks = _filteredTasks(allTasks);
+          final mainTask = allTasks.firstWhere(
+            (task) => task.status == GuardianTaskStatus.inProgress,
+            orElse: () =>
+                allTasks.isNotEmpty ? allTasks.first : _emptyMainTask(),
+          );
+
+          return [
+            if (allTasks.isNotEmpty) ...[
+              _MainTaskPanel(task: mainTask),
+              const SizedBox(height: 14),
+            ],
+            _FilterBar(
+              selected: _filter,
+              onSelect: (value) => setState(() => _filter = value),
             ),
-          )
-        else
-          MiraSurface(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const _SectionTitle('任务列表'),
-                const SizedBox(height: 8),
-                for (final task in tasks)
-                  MiraListRow(
-                    icon: _iconForTask(task),
-                    title: task.title,
-                    subtitle: '${task.timeLabel} · ${task.durationLabel}',
-                    tone: _toneForTask(task),
-                    trailing: StatusChip(
-                      label: task.status.label,
-                      tone: task.status.tone,
-                    ),
-                    onTap: () => context.go('$taskDetailPath/${task.id}'),
-                  ),
-              ],
-            ),
+            const SizedBox(height: 14),
+            if (tasks.isEmpty)
+              MiraEmptyState(
+                icon: Icons.event_available_outlined,
+                title: '这个筛选下没有任务',
+                message: allTasks.isEmpty
+                    ? '后端当前还没有任务数据。完成孩子资料后，可由后台或后续任务创建流程写入 tasks。'
+                    : '当前筛选没有匹配任务，可以回到今日任务继续查看。',
+                action: TextButton(
+                  onPressed: () => setState(() => _filter = _TaskFilter.today),
+                  child: const Text('回到今日'),
+                ),
+              )
+            else
+              MiraSurface(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _SectionTitle('任务列表'),
+                    const SizedBox(height: 8),
+                    for (final task in tasks)
+                      MiraListRow(
+                        icon: _iconForTask(task),
+                        title: task.title,
+                        subtitle: '${task.timeLabel} · ${task.durationLabel}',
+                        tone: _toneForTask(task),
+                        trailing: StatusChip(
+                          label: task.status.label,
+                          tone: task.status.tone,
+                        ),
+                        onTap: () => context.go('$taskDetailPath/${task.id}'),
+                      ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 14),
+            const _TemplateHintPanel(),
+          ];
+        },
+        loading: () => const [_TaskLoadingState()],
+        error: (error, _) => [
+          _TaskErrorState(
+            message: error is TaskException ? error.message : '任务数据加载失败',
+            onRetry: () => ref.invalidate(taskListProvider),
           ),
-        const SizedBox(height: 14),
-        _TemplateHintPanel(snapshot: snapshot),
-      ],
+        ],
+      ),
     );
   }
 
-  List<MvpTask> _filteredTasks(List<MvpTask> tasks) {
+  List<GuardianTask> _filteredTasks(List<GuardianTask> tasks) {
     return switch (_filter) {
       _TaskFilter.today => tasks,
       _TaskFilter.confirm =>
-        tasks
-            .where((task) => task.status == MvpTaskStatus.needsConfirmation)
-            .toList(),
+        tasks.where((task) => task.status.awaitsParent).toList(),
       _TaskFilter.abnormal =>
-        tasks.where((task) => task.status == MvpTaskStatus.abnormal).toList(),
+        tasks
+            .where(
+              (task) =>
+                  task.status == GuardianTaskStatus.rejected ||
+                  task.status == GuardianTaskStatus.expired,
+            )
+            .toList(),
     };
   }
 
-  IconData _iconForTask(MvpTask task) {
+  IconData _iconForTask(GuardianTask task) {
     return switch (task.type) {
-      '学习' => Icons.menu_book_outlined,
-      '作息' => Icons.nights_stay_outlined,
-      '生活' => Icons.backpack_outlined,
+      'learning' => Icons.menu_book_outlined,
+      'sleep' => Icons.nights_stay_outlined,
+      'life' || 'schoolbag' => Icons.backpack_outlined,
       _ => Icons.task_alt_outlined,
     };
   }
 
-  MiraListRowTone _toneForTask(MvpTask task) {
+  MiraListRowTone _toneForTask(GuardianTask task) {
     return switch (task.status) {
-      MvpTaskStatus.running => MiraListRowTone.blue,
-      MvpTaskStatus.completed => MiraListRowTone.green,
-      MvpTaskStatus.needsConfirmation => MiraListRowTone.amber,
-      MvpTaskStatus.abnormal => MiraListRowTone.red,
-      MvpTaskStatus.pendingStart => MiraListRowTone.neutral,
+      GuardianTaskStatus.inProgress => MiraListRowTone.blue,
+      GuardianTaskStatus.completed ||
+      GuardianTaskStatus.confirmed => MiraListRowTone.green,
+      GuardianTaskStatus.awaitingParentConfirmation => MiraListRowTone.amber,
+      GuardianTaskStatus.rejected ||
+      GuardianTaskStatus.expired => MiraListRowTone.red,
+      _ => MiraListRowTone.neutral,
     };
+  }
+
+  GuardianTask _emptyMainTask() {
+    final today = DateTime.now().toIso8601String().substring(0, 10);
+    return GuardianTask.fromJson({
+      'id': 'empty',
+      'title': '暂无任务',
+      'type': 'learning',
+      'status': 'pending',
+      'scheduledDate': today,
+      'rewardPoints': 0,
+    });
   }
 }
 
 class _MainTaskPanel extends StatelessWidget {
   const _MainTaskPanel({required this.task});
 
-  final MvpTask task;
+  final GuardianTask task;
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +169,7 @@ class _MainTaskPanel extends StatelessWidget {
               StatusChip(label: task.status.label, tone: task.status.tone),
               const Spacer(),
               Text(
-                '+${task.points} 分',
+                '+${task.rewardPoints} 分',
                 style: const TextStyle(
                   color: AppColors.brand,
                   fontFamily: AppTypography.systemFont,
@@ -148,7 +183,7 @@ class _MainTaskPanel extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             task.title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.ink,
               fontFamily: AppTypography.systemFont,
               fontSize: 24,
@@ -174,7 +209,7 @@ class _MainTaskPanel extends StatelessWidget {
             children: [
               _MiniMetric(label: '时间', value: task.timeLabel),
               const SizedBox(width: 8),
-              _MiniMetric(label: '证据', value: task.evidence.parentDecision),
+              _MiniMetric(label: '证据', value: task.parentDecisionLabel),
             ],
           ),
         ],
@@ -299,9 +334,7 @@ class _FilterChip extends StatelessWidget {
 }
 
 class _TemplateHintPanel extends StatelessWidget {
-  const _TemplateHintPanel({required this.snapshot});
-
-  final GuardianMvpSnapshot snapshot;
+  const _TemplateHintPanel();
 
   @override
   Widget build(BuildContext context) {
@@ -311,9 +344,9 @@ class _TemplateHintPanel extends StatelessWidget {
         children: [
           const _SectionTitle('按档案推荐'),
           const SizedBox(height: 8),
-          Text(
-            '${snapshot.child.stage}${snapshot.child.grade}优先推荐作业自启动、小书包和睡前任务。首版只展示模板建议，不实现完整模板库。',
-            style: const TextStyle(
+          const Text(
+            '今日内容统一来自 tasks；小书包、睡前和学习内容只是不同任务类型。',
+            style: TextStyle(
               color: AppColors.muted,
               fontFamily: AppTypography.systemFont,
               fontSize: 13,
@@ -324,6 +357,53 @@ class _TemplateHintPanel extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _TaskLoadingState extends StatelessWidget {
+  const _TaskLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return MiraSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          _SectionTitle('正在加载任务'),
+          SizedBox(height: 12),
+          LinearProgressIndicator(minHeight: 3),
+          SizedBox(height: 12),
+          Text(
+            '正在同步今日任务、确认状态和奖励积分。',
+            style: TextStyle(
+              color: AppColors.muted,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.55,
+              letterSpacing: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TaskErrorState extends StatelessWidget {
+  const _TaskErrorState({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return MiraEmptyState(
+      icon: Icons.cloud_off_outlined,
+      title: '任务同步失败',
+      message: message,
+      action: TextButton(onPressed: onRetry, child: const Text('重新加载')),
     );
   }
 }

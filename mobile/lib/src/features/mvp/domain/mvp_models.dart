@@ -202,6 +202,8 @@ enum MvpSettingKind {
   family,
   child,
   device,
+  points,
+  rewards,
   aiRules,
   privacy,
   userAgreement,

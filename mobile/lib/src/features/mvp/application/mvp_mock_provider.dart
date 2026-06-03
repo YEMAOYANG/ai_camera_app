@@ -203,6 +203,16 @@ final guardianMvpSnapshotProvider = Provider<GuardianMvpSnapshot>((ref) {
         kind: MvpSettingKind.device,
       ),
       MvpSettingEntry(
+        title: '积分',
+        subtitle: '余额、任务奖励和兑换流水',
+        kind: MvpSettingKind.points,
+      ),
+      MvpSettingEntry(
+        title: '奖励',
+        subtitle: '奖励项、兑换记录和手动兑现',
+        kind: MvpSettingKind.rewards,
+      ),
+      MvpSettingEntry(
         title: 'AI 规则设置',
         subtitle: '提醒语气、作业模式和误判纠正',
         kind: MvpSettingKind.aiRules,

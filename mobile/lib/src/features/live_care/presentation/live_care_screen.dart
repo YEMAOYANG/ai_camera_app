@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:mira_guardian_app/src/features/devices/application/device_repository.dart';
+import 'package:mira_guardian_app/src/features/devices/domain/device_models.dart';
+import 'package:mira_guardian_app/src/features/live_care/application/camera_repository.dart';
+import 'package:mira_guardian_app/src/features/live_care/domain/camera_models.dart';
 import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
@@ -8,103 +12,71 @@ import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
 import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
 
-class LiveCareScreen extends ConsumerStatefulWidget {
+class LiveCareScreen extends ConsumerWidget {
   const LiveCareScreen({super.key});
 
   @override
-  ConsumerState<LiveCareScreen> createState() => _LiveCareScreenState();
-}
-
-class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
-  var _state = _LiveState.online;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(guardianMvpSnapshotProvider);
+    final deviceOverview = ref.watch(primaryDeviceOverviewProvider);
+    final liveStatus = ref.watch(liveCareStatusProvider);
+    final snapshotFrame = ref.watch(cameraSnapshotProvider);
+    final titleDevice = deviceOverview.asData?.value?.device;
+    final subtitle = titleDevice == null
+        ? '${snapshot.device.room} · ${snapshot.device.name}'
+        : '${titleDevice.displayLocation} · ${titleDevice.displayName}';
 
     return MiraScreen(
       title: '实时看护',
-      subtitle: '${snapshot.device.room} · ${snapshot.device.name}',
+      subtitle: subtitle,
       children: [
-        _LiveViewport(state: _state),
+        _LiveViewport(status: liveStatus, snapshot: snapshotFrame),
         const SizedBox(height: 14),
-        _StateSwitcher(
-          selected: _state,
-          onSelect: (value) => setState(() => _state = value),
+        _LiveActions(
+          status: liveStatus,
+          snapshot: snapshotFrame,
+          onRefresh: () => _refreshLiveCare(ref),
         ),
         const SizedBox(height: 14),
-        _LiveActions(state: _state),
+        _ObservationPanel(status: liveStatus),
         const SizedBox(height: 14),
-        MiraSurface(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _SectionTitle('AI 观察摘要'),
-              const SizedBox(height: 10),
-              Text(
-                _state.summary,
-                style: const TextStyle(
-                  color: AppColors.muted,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  height: 1.55,
-                  letterSpacing: 0,
-                ),
-              ),
-              const SizedBox(height: 10),
-              MiraListRow(
-                icon: Icons.fact_check_outlined,
-                title: '家长确认入口',
-                subtitle: _state == _LiveState.offline
-                    ? '设备离线时只能查看最后一次摘要'
-                    : '确认当前观察，或标记 AI 判断需要调整',
-                tone: _state == _LiveState.error
-                    ? MiraListRowTone.red
-                    : MiraListRowTone.blue,
-                onTap: () => _showLiveConfirmSheet(context, _state),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
-        MiraSurface(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _SectionTitle('设备状态'),
-              const SizedBox(height: 8),
-              MiraListRow(
-                icon: Icons.wifi_outlined,
-                title: snapshot.device.networkLabel,
-                subtitle: snapshot.device.lastOnlineLabel,
-                tone: snapshot.device.online
-                    ? MiraListRowTone.green
-                    : MiraListRowTone.red,
-                trailing: StatusChip(label: _state.label, tone: _state.tone),
-              ),
-              MiraListRow(
-                icon: Icons.privacy_tip_outlined,
-                title: snapshot.device.privacyLightOn ? '隐私灯亮起' : '隐私灯待确认',
-                subtitle: '家长查看实时画面时，设备端会显示工作状态。',
-                tone: MiraListRowTone.blue,
-              ),
-            ],
-          ),
+        _DeviceRuntimePanel(
+          deviceOverview: deviceOverview,
+          liveStatus: liveStatus,
         ),
       ],
     );
   }
+
+  void _refreshLiveCare(WidgetRef ref) {
+    ref
+      ..invalidate(liveCareStatusProvider)
+      ..invalidate(cameraHealthProvider)
+      ..invalidate(cameraRuntimeProvider)
+      ..invalidate(cameraSnapshotProvider)
+      ..invalidate(primaryDeviceOverviewProvider);
+  }
 }
 
 class _LiveViewport extends StatelessWidget {
-  const _LiveViewport({required this.state});
+  const _LiveViewport({required this.status, required this.snapshot});
 
-  final _LiveState state;
+  final AsyncValue<LiveCareStatus> status;
+  final AsyncValue<CameraSnapshotFrame> snapshot;
 
   @override
   Widget build(BuildContext context) {
-    final online = state == _LiveState.online || state == _LiveState.connecting;
+    final care = status.asData?.value;
+    final frame = snapshot.asData?.value;
+    final available = care?.isAvailable ?? false;
+    final icon = available
+        ? Icons.videocam_outlined
+        : Icons.videocam_off_outlined;
+    final label = care?.label ?? (status.isLoading ? '同步中' : '看护服务异常');
+    final tone =
+        care?.tone ??
+        (status.isLoading ? StatusTone.neutral : StatusTone.danger);
+    final copy = _viewportCopy(status, snapshot);
 
     return MiraSurface(
       color: AppColors.ink,
@@ -113,145 +85,249 @@ class _LiveViewport extends StatelessWidget {
       padding: EdgeInsets.zero,
       child: AspectRatio(
         aspectRatio: 16 / 11.2,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF101A28),
-                  borderRadius: BorderRadius.circular(24),
-                  gradient: online
-                      ? const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFF182A3E), Color(0xFF0F172A)],
-                        )
-                      : null,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF101A28),
+                    gradient: available
+                        ? const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF182A3E), Color(0xFF0F172A)],
+                          )
+                        : null,
+                  ),
                 ),
               ),
-            ),
-            Positioned.fill(
-              child: Center(
-                child: Icon(
-                  state.icon,
-                  color: Colors.white.withValues(alpha: 0.68),
-                  size: 54,
-                ),
+              if (frame?.available == true && frame?.bytes != null)
+                Positioned.fill(
+                  child: Image.memory(
+                    frame!.bytes!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) =>
+                        const _ViewportIcon(icon: Icons.broken_image_outlined),
+                  ),
+                )
+              else
+                Positioned.fill(child: _ViewportIcon(icon: icon)),
+              Positioned(
+                left: 16,
+                top: 16,
+                child: StatusChip(label: label, tone: tone),
               ),
-            ),
-            Positioned(
-              left: 16,
-              top: 16,
-              child: StatusChip(label: state.label, tone: state.tone),
-            ),
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.26),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(13),
-                  child: Text(
-                    state.viewportCopy,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.82),
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      height: 1.45,
-                      letterSpacing: 0,
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 16,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.30),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(13),
+                    child: Text(
+                      copy,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.84),
+                        fontFamily: AppTypography.systemFont,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        height: 1.45,
+                        letterSpacing: 0,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
+  String _viewportCopy(
+    AsyncValue<LiveCareStatus> status,
+    AsyncValue<CameraSnapshotFrame> snapshot,
+  ) {
+    final care = status.asData?.value;
+    final frame = snapshot.asData?.value;
+    if (status.isLoading) return '正在同步摄像头健康状态和运行状态。';
+    if (care == null) return '摄像头后端暂时不可用，请稍后刷新。';
+    if (!care.isAvailable) return care.detail;
+    if (frame?.available == true) {
+      return '快照来自后端 camera adapter，画面仅作为 V1 看护入口展示。';
+    }
+    if (snapshot.isLoading) return '摄像头服务在线，正在获取后端快照。';
+    return frame?.message ?? '摄像头服务在线，真实画面暂未返回。';
+  }
 }
 
-class _StateSwitcher extends StatelessWidget {
-  const _StateSwitcher({required this.selected, required this.onSelect});
+class _ViewportIcon extends StatelessWidget {
+  const _ViewportIcon({required this.icon});
 
-  final _LiveState selected;
-  final ValueChanged<_LiveState> onSelect;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
+    return Center(
+      child: Icon(icon, color: Colors.white.withValues(alpha: 0.68), size: 54),
+    );
+  }
+}
+
+class _LiveActions extends StatelessWidget {
+  const _LiveActions({
+    required this.status,
+    required this.snapshot,
+    required this.onRefresh,
+  });
+
+  final AsyncValue<LiveCareStatus> status;
+  final AsyncValue<CameraSnapshotFrame> snapshot;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    final available = status.asData?.value.isAvailable ?? false;
+    final frameAvailable = snapshot.asData?.value.available ?? false;
+
+    return Row(
+      children: [
+        Expanded(
+          child: MiraSecondaryButton(
+            label: '刷新状态',
+            trailing: const Icon(Icons.refresh_outlined, size: 18),
+            onTap: onRefresh,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: MiraSecondaryButton(
+            label: '确认观察',
+            trailing: const Icon(Icons.fact_check_outlined, size: 18),
+            onTap: available
+                ? () => _showLiveConfirmSheet(context, status.asData!.value)
+                : null,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: MiraSecondaryButton(
+            label: '快照',
+            trailing: const Icon(Icons.camera_alt_outlined, size: 18),
+            onTap: frameAvailable ? () => _showToast(context, '后端快照已同步') : null,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ObservationPanel extends StatelessWidget {
+  const _ObservationPanel({required this.status});
+
+  final AsyncValue<LiveCareStatus> status;
+
+  @override
+  Widget build(BuildContext context) {
+    final care = status.asData?.value;
+
+    return MiraSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final state in _LiveState.values) ...[
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => onSelect(state),
-              child: AnimatedContainer(
-                duration: AppMotion.duration(context, 160),
-                constraints: const BoxConstraints(minHeight: 40),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: selected == state
-                      ? AppColors.ink
-                      : Colors.white.withValues(alpha: 0.72),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Text(
-                  state.label,
-                  style: TextStyle(
-                    color: selected == state ? Colors.white : AppColors.ink,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
+          const _SectionTitle('AI 观察摘要'),
+          const SizedBox(height: 10),
+          Text(
+            care?.runtime.summary ??
+                (status.isLoading ? '正在同步运行摘要。' : '后端不可用时，AI 观察摘要会显示为降级状态。'),
+            style: const TextStyle(
+              color: AppColors.muted,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.55,
+              letterSpacing: 0,
             ),
-            const SizedBox(width: 8),
-          ],
+          ),
+          const SizedBox(height: 10),
+          MiraListRow(
+            icon: Icons.fact_check_outlined,
+            title: '家长确认入口',
+            subtitle: care?.isAvailable == true
+                ? '确认当前观察，或标记 AI 判断需要调整'
+                : '真实画面不可用时，仅保留状态确认入口',
+            tone: care?.isAvailable == true
+                ? MiraListRowTone.blue
+                : MiraListRowTone.amber,
+            onTap: care == null
+                ? null
+                : () => _showLiveConfirmSheet(context, care),
+          ),
         ],
       ),
     );
   }
 }
 
-class _LiveActions extends StatelessWidget {
-  const _LiveActions({required this.state});
+class _DeviceRuntimePanel extends StatelessWidget {
+  const _DeviceRuntimePanel({
+    required this.deviceOverview,
+    required this.liveStatus,
+  });
 
-  final _LiveState state;
+  final AsyncValue<DeviceOverview?> deviceOverview;
+  final AsyncValue<LiveCareStatus> liveStatus;
 
   @override
   Widget build(BuildContext context) {
-    final available = state == _LiveState.online;
+    final overview = deviceOverview.asData?.value;
+    final care = liveStatus.asData?.value;
 
-    return Row(
-      children: [
-        Expanded(
-          child: MiraSecondaryButton(
-            label: '通话',
-            trailing: const Icon(Icons.phone_outlined, size: 18),
-            onTap: available ? () => _showToast(context, '已发起 mock 通话') : null,
+    return MiraSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _SectionTitle('设备状态'),
+          const SizedBox(height: 8),
+          MiraListRow(
+            icon: Icons.wifi_outlined,
+            title: overview?.device.displayName ?? 'Mira 设备',
+            subtitle: overview?.subtitle ?? '正在读取设备绑定状态',
+            tone: overview?.isOnline == false
+                ? MiraListRowTone.red
+                : MiraListRowTone.green,
+            trailing: StatusChip(
+              label: overview?.connectionLabel ?? '同步中',
+              tone: overview?.tone ?? StatusTone.neutral,
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: MiraSecondaryButton(
-            label: '截图',
-            trailing: const Icon(Icons.camera_alt_outlined, size: 18),
-            onTap: available ? () => _showToast(context, '截图已保存到事件证据') : null,
+          MiraListRow(
+            icon: Icons.memory_outlined,
+            title: care?.runtime.stateLabel ?? 'Camera adapter',
+            subtitle: care?.health.message ?? '状态来自后端 camera adapter',
+            tone: care?.isAvailable == false
+                ? MiraListRowTone.red
+                : MiraListRowTone.blue,
+            trailing: StatusChip(
+              label: care?.health.reachable == true ? '可达' : '降级',
+              tone: care?.health.tone ?? StatusTone.neutral,
+            ),
           ),
-        ),
-      ],
+          MiraListRow(
+            icon: Icons.privacy_tip_outlined,
+            title: '隐私与能力边界',
+            subtitle: 'V1 仅读取后端代理状态，底层流媒体细节不进入家长端。',
+            tone: MiraListRowTone.neutral,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -276,52 +352,7 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-enum _LiveState {
-  online(
-    '在线',
-    StatusTone.success,
-    Icons.videocam_outlined,
-    '设备端正在显示远程查看状态，当前只保存任务和告警相关截图。',
-    '孩子在书桌区写作业，坐姿正常。当前建议继续低打扰观察。',
-  ),
-  connecting(
-    '连接中',
-    StatusTone.warning,
-    Icons.sync_outlined,
-    '正在连接设备画面，网络恢复后会自动进入实时看护。',
-    '正在获取最新状态。若超过 20 秒未恢复，建议查看设备网络。',
-  ),
-  offline(
-    '离线',
-    StatusTone.danger,
-    Icons.wifi_off_outlined,
-    '设备离线，无法查看实时画面。',
-    '设备最后在线于刚刚，仍可查看最后一次任务摘要和告警记录。',
-  ),
-  error(
-    '异常',
-    StatusTone.danger,
-    Icons.error_outline,
-    '设备连接异常，画面暂不可用。',
-    '建议检查电源和网络；首版只提供普通异常摘要，不进入复杂安全事件流。',
-  );
-
-  const _LiveState(
-    this.label,
-    this.tone,
-    this.icon,
-    this.viewportCopy,
-    this.summary,
-  );
-
-  final String label;
-  final StatusTone tone;
-  final IconData icon;
-  final String viewportCopy;
-  final String summary;
-}
-
-void _showLiveConfirmSheet(BuildContext context, _LiveState state) {
+void _showLiveConfirmSheet(BuildContext context, LiveCareStatus status) {
   showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
@@ -345,7 +376,7 @@ void _showLiveConfirmSheet(BuildContext context, _LiveState state) {
             ),
             const SizedBox(height: 8),
             Text(
-              state.summary,
+              status.runtime.summary,
               style: const TextStyle(
                 color: AppColors.muted,
                 fontFamily: AppTypography.systemFont,
