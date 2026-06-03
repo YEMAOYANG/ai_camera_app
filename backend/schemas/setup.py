@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import sqlite3
+from core.database import DatabaseRow
 
 from models.setup import SETUP_DONE, SetupProgress
 
 
-def setup_progress_from_row(row: sqlite3.Row) -> SetupProgress:
+def setup_progress_from_row(row: DatabaseRow) -> SetupProgress:
     return SetupProgress(
         family_id=row["family_id"],
         completed=bool(row["completed"]),

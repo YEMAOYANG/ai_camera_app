@@ -2,36 +2,48 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from core.database import SQLiteDatabase
+from core.database import Database
 from core.errors import AuthError
 from core.security import hash_value, new_token, now_ms
 from models.auth import AuthSession
 from repositories.auth_repository import AuthRepository
 from schemas.auth import family_payload, normalize_phone, session_payload, user_payload
-from services.sms_provider import MockSmsProvider, SmsProvider
+from services.sms_provider import SmsProvider, UnavailableSmsProvider
 
 
 class AuthService:
     def __init__(
         self,
-        db_path: str | Path,
+        database_url: str | Path,
         *,
         access_token_seconds: int = 900,
         refresh_token_seconds: int = 60 * 60 * 24 * 30,
-        dev_sms_code: str = "0426",
+        sms_code_ttl_seconds: int = 300,
+        sms_resend_cooldown_seconds: int = 60,
+        sms_max_attempts: int = 5,
         sms_provider: SmsProvider | None = None,
     ):
         self.access_token_seconds = access_token_seconds
         self.refresh_token_seconds = refresh_token_seconds
-        self.dev_sms_code = dev_sms_code
-        self.sms_provider = sms_provider or MockSmsProvider(dev_sms_code)
-        self.repository = AuthRepository(SQLiteDatabase(db_path))
+        self.sms_code_ttl_seconds = sms_code_ttl_seconds
+        self.sms_resend_cooldown_seconds = sms_resend_cooldown_seconds
+        self.sms_max_attempts = sms_max_attempts
+        self.sms_provider = sms_provider or UnavailableSmsProvider()
+        self.repository = AuthRepository(Database(database_url))
 
     def request_sms_code(self, phone: str) -> dict:
         normalized = normalize_phone(phone)
-        delivery = self.sms_provider.issue_verification_code(normalized)
         now = now_ms()
-        expires_at = now + 5 * 60 * 1000
+        with self.repository.transaction() as conn:
+            existing = self.repository.find_sms_code(conn, normalized)
+            if (
+                existing
+                and existing["last_sent_at"] + self.sms_resend_cooldown_seconds * 1000 > now
+            ):
+                raise AuthError("sms_resend_too_soon", "验证码发送太频繁，请稍后再试", 429)
+
+        delivery = self.sms_provider.issue_verification_code(normalized)
+        expires_at = now + self.sms_code_ttl_seconds * 1000
         with self.repository.transaction() as conn:
             self.repository.upsert_sms_code(
                 conn,
@@ -58,7 +70,12 @@ class AuthService:
         now = now_ms()
         with self.repository.transaction() as conn:
             sms = self.repository.find_sms_code(conn, normalized)
-            if not sms or sms["expires_at"] < now or sms["code_hash"] != hash_value(code):
+            if not sms or sms["expires_at"] < now:
+                raise AuthError("invalid_code", "验证码不正确，请重新输入")
+            if sms["attempt_count"] >= self.sms_max_attempts:
+                raise AuthError("sms_attempts_exceeded", "验证码错误次数过多，请重新获取验证码", 429)
+            if sms["code_hash"] != hash_value(code):
+                self.repository.increment_sms_attempts(conn, normalized)
                 raise AuthError("invalid_code", "验证码不正确，请重新输入")
 
             user = self.repository.find_user_by_phone(conn, normalized)

@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_background.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -126,50 +127,33 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
-        body: DecoratedBox(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.appBackground,
-                AppColors.appBackgroundMid,
-                AppColors.appBackgroundWarm,
-              ],
-              stops: [0, 0.52, 1],
-            ),
-          ),
-          child: Stack(
-            children: [
-              const Positioned.fill(child: _SurfaceWash()),
-              SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(18, 60, 18, bottomInset + 32),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _WelcomeArt(
-                        slide: slide,
-                        height: artHeight,
-                        floatController: _floatController,
-                      ),
-                      const SizedBox(height: 16),
-                      _WelcomeCopy(
-                        slide: slide,
-                        currentStep: _step,
-                        slideCount: _slides.length,
-                        isLast: isLast,
-                        loading: _loading,
-                        onDotTap: _jumpTo,
-                        onNext: _next,
-                        onLogin: _finishOnboarding,
-                      ),
-                    ],
+        body: MiraAppBackground(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(18, 60, 18, bottomInset + 32),
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _WelcomeArt(
+                    slide: slide,
+                    height: artHeight,
+                    floatController: _floatController,
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  _WelcomeCopy(
+                    slide: slide,
+                    currentStep: _step,
+                    slideCount: _slides.length,
+                    isLast: isLast,
+                    loading: _loading,
+                    onDotTap: _jumpTo,
+                    onNext: _next,
+                    onLogin: _finishOnboarding,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -763,24 +747,6 @@ class _ArtOverlay extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _SurfaceWash extends StatelessWidget {
-  const _SurfaceWash();
-
-  @override
-  Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0x6BFFFFFF), Color(0x0DFFFFFF), Color(0x102F6CF6)],
-          stops: [0, 0.48, 1],
-        ),
-      ),
     );
   }
 }

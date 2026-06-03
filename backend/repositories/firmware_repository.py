@@ -1,50 +1,51 @@
 from __future__ import annotations
 
-import sqlite3
 import uuid
 from contextlib import contextmanager
 from typing import Iterator
 
-from core.database import SQLiteDatabase
+from core.database import Database, DatabaseConnection, DatabaseRow
 from models.firmware import FIRMWARE_PACKAGE_ACTIVE, FIRMWARE_SCHEDULED
 
 
 class FirmwareRepository:
-    def __init__(self, database: SQLiteDatabase):
+    def __init__(self, database: Database):
         self.database = database
         self.ensure_schema()
 
     @contextmanager
-    def transaction(self) -> Iterator[sqlite3.Connection]:
+    def transaction(self) -> Iterator[DatabaseConnection]:
         with self.database.transaction() as conn:
             yield conn
 
     def ensure_schema(self) -> None:
+        if not self.database.allow_runtime_schema_creation:
+            return
         with self.transaction() as conn:
             conn.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS firmware_packages (
-                  id TEXT PRIMARY KEY,
-                  version TEXT NOT NULL,
-                  channel TEXT NOT NULL,
-                  status TEXT NOT NULL,
+                  id VARCHAR(255) PRIMARY KEY,
+                  version VARCHAR(255) NOT NULL,
+                  channel VARCHAR(255) NOT NULL,
+                  status VARCHAR(255) NOT NULL,
                   notes TEXT,
-                  created_at INTEGER NOT NULL
+                  created_at BIGINT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS firmware_jobs (
-                  id TEXT PRIMARY KEY,
-                  family_id TEXT NOT NULL,
-                  device_id TEXT NOT NULL,
-                  package_id TEXT NOT NULL,
-                  status TEXT NOT NULL,
-                  created_at INTEGER NOT NULL,
-                  updated_at INTEGER NOT NULL
+                  id VARCHAR(255) PRIMARY KEY,
+                  family_id VARCHAR(255) NOT NULL,
+                  device_id VARCHAR(255) NOT NULL,
+                  package_id VARCHAR(255) NOT NULL,
+                  status VARCHAR(255) NOT NULL,
+                  created_at BIGINT NOT NULL,
+                  updated_at BIGINT NOT NULL
                 );
                 """
             )
 
-    def list_packages(self, conn: sqlite3.Connection) -> list[sqlite3.Row]:
+    def list_packages(self, conn: DatabaseConnection) -> list[DatabaseRow]:
         rows = list(
             conn.execute(
                 "SELECT * FROM firmware_packages WHERE status = ? ORDER BY created_at DESC",
@@ -74,7 +75,7 @@ class FirmwareRepository:
             ).fetchall()
         )
 
-    def get_package(self, conn: sqlite3.Connection, package_id: str) -> sqlite3.Row | None:
+    def get_package(self, conn: DatabaseConnection, package_id: str) -> DatabaseRow | None:
         return conn.execute(
             "SELECT * FROM firmware_packages WHERE id = ?",
             (package_id,),
@@ -82,11 +83,11 @@ class FirmwareRepository:
 
     def latest_job_for_device(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         device_id: str,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         return conn.execute(
             """
             SELECT * FROM firmware_jobs
@@ -99,13 +100,13 @@ class FirmwareRepository:
 
     def create_job(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         device_id: str,
         package_id: str,
         now: int,
-    ) -> sqlite3.Row:
+    ) -> DatabaseRow:
         job_id = f"fwjob_{uuid.uuid4().hex}"
         conn.execute(
             """

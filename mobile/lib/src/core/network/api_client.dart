@@ -52,6 +52,10 @@ class ApiClient {
   Future<Response<dynamic>> post(String path, {Object? data}) {
     return _dio.post<dynamic>(path, data: data);
   }
+
+  Future<Response<dynamic>> patch(String path, {Object? data}) {
+    return _dio.patch<dynamic>(path, data: data);
+  }
 }
 
 class AuthTokenInterceptor extends Interceptor {

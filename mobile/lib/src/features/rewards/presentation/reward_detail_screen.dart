@@ -9,6 +9,7 @@ import 'package:mira_guardian_app/src/features/rewards/domain/reward_models.dart
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
 import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
 
@@ -62,7 +63,7 @@ class RewardDetailScreen extends ConsumerWidget {
                   MiraListRow(
                     icon: Icons.stars_outlined,
                     title: '所需积分',
-                    subtitle: '兑换后会立即扣减积分并写入流水。',
+                    subtitle: '兑换后会立即扣减积分，并留下清楚记录。',
                     tone: MiraListRowTone.amber,
                     trailing: Text(
                       '${item.pointsCost}',
@@ -107,14 +108,12 @@ class RewardDetailScreen extends ConsumerWidget {
         backLabel: '返回奖励',
         onBack: () => context.go(rewardsPath),
         children: [
-          MiraEmptyState(
-            icon: Icons.cloud_off_outlined,
-            title: '奖励详情加载失败',
+          MiraStateView(
+            variant: MiraStateVariant.serviceUnavailable,
+            title: '奖励详情暂时打不开',
             message: error is RewardException ? error.message : '请稍后重试。',
-            action: TextButton(
-              onPressed: () => ref.invalidate(rewardDetailProvider(itemId)),
-              child: const Text('重新加载'),
-            ),
+            primaryActionLabel: '重新加载',
+            onPrimaryAction: () => ref.invalidate(rewardDetailProvider(itemId)),
           ),
         ],
       ),
@@ -134,48 +133,69 @@ class _RewardHero extends StatelessWidget {
       color: AppColors.ink,
       borderColor: AppColors.ink,
       radius: 24,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      child: Stack(
         children: [
-          Row(
+          Positioned(
+            right: -42,
+            bottom: -50,
+            width: 150,
+            height: 150,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.brandSoft.withValues(alpha: 0.24),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              StatusChip(label: item.statusLabel),
-              const Spacer(),
+              Row(
+                children: [
+                  StatusChip(label: item.statusLabel),
+                  const Spacer(),
+                  Text(
+                    '余额 $balance',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.68),
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
               Text(
-                '余额 $balance',
+                item.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w900,
+                  height: 1.16,
+                  letterSpacing: 0,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '${item.pointsCost} 分兑换，家长手动兑现。',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.68),
+                  color: Colors.white.withValues(alpha: 0.72),
                   fontFamily: AppTypography.systemFont,
                   fontSize: 13,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
+                  height: 1.55,
                   letterSpacing: 0,
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 18),
-          Text(
-            item.title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 26,
-              fontWeight: FontWeight.w900,
-              height: 1.16,
-              letterSpacing: 0,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            '${item.pointsCost} 分兑换，家长手动兑现。',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.72),
-              fontFamily: AppTypography.systemFont,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              height: 1.55,
-              letterSpacing: 0,
-            ),
           ),
         ],
       ),
@@ -208,16 +228,7 @@ class _RewardDetailLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          _SectionTitle('正在加载奖励'),
-          SizedBox(height: 12),
-          LinearProgressIndicator(minHeight: 3),
-        ],
-      ),
-    );
+    return const MiraLoadingState(title: '正在加载奖励', message: '正在确认积分余额和兑换规则。');
   }
 }
 

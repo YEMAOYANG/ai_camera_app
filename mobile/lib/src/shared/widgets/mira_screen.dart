@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_background.dart';
 
 class MiraScreen extends StatelessWidget {
   const MiraScreen({
@@ -14,6 +15,7 @@ class MiraScreen extends StatelessWidget {
     this.onBack,
     this.backLabel = '返回',
     this.fixedHeader = true,
+    this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
     this.padding = const EdgeInsets.fromLTRB(20, 16, 20, 28),
     super.key,
   });
@@ -25,6 +27,7 @@ class MiraScreen extends StatelessWidget {
   final VoidCallback? onBack;
   final String backLabel;
   final bool fixedHeader;
+  final double pinnedHeaderHeight;
   final List<Widget> children;
   final EdgeInsetsGeometry padding;
 
@@ -38,7 +41,7 @@ class MiraScreen extends StatelessWidget {
         ? chromeBottom
         : basePadding.bottom;
     final topPadding = fixedHeader
-        ? safeArea.top + AppChrome.pinnedHeaderHeight + basePadding.top
+        ? safeArea.top + pinnedHeaderHeight + basePadding.top
         : basePadding.top + safeArea.top + 2;
     final adjustedPadding = EdgeInsets.fromLTRB(
       basePadding.left,
@@ -55,7 +58,7 @@ class MiraScreen extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          const Positioned.fill(child: _MiraScreenBackground()),
+          const Positioned.fill(child: MiraScreenBackground()),
           ListView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: adjustedPadding,
@@ -80,6 +83,7 @@ class MiraScreen extends StatelessWidget {
               backLabel: backLabel,
               trailing: trailing,
               headerContent: headerContent,
+              headerHeight: pinnedHeaderHeight,
             ),
         ],
       ),
@@ -150,6 +154,7 @@ class _MiraPinnedHeader extends StatelessWidget {
     this.onBack,
     this.trailing,
     this.headerContent,
+    this.headerHeight = AppChrome.pinnedHeaderHeight,
   });
 
   final String title;
@@ -159,6 +164,7 @@ class _MiraPinnedHeader extends StatelessWidget {
   final String backLabel;
   final Widget? trailing;
   final Widget? headerContent;
+  final double headerHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +190,7 @@ class _MiraPinnedHeader extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.fromLTRB(20, safeTop, 20, 0),
               child: SizedBox(
-                height: AppChrome.pinnedHeaderHeight,
+                height: headerHeight,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -244,29 +250,6 @@ class _MiraPinnedHeader extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MiraScreenBackground extends StatelessWidget {
-  const _MiraScreenBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.appBackground,
-            AppColors.appBackgroundMid,
-            AppColors.appBackgroundWarm,
-            AppColors.appBackgroundWarm,
-          ],
-          stops: [0, 0.44, 0.78, 1],
         ),
       ),
     );

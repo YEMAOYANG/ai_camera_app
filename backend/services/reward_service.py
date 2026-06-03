@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from pathlib import Path
 
-from core.database import SQLiteDatabase
+from core.database import Database
 from core.errors import ApiError
 from core.security import now_ms
 from models.points import LEDGER_REDEMPTION_CANCELLED, LEDGER_REDEMPTION_SPENT
@@ -17,12 +17,12 @@ from services.point_service import PointService
 
 
 class RewardService:
-    def __init__(self, db_path: str | Path, *, auth_service: AuthService):
+    def __init__(self, database_url: str | Path, *, auth_service: AuthService):
         self.auth_service = auth_service
-        database = SQLiteDatabase(db_path)
+        database = Database(database_url)
         self.repository = RewardRepository(database)
         self.point_repository = PointRepository(database)
-        self.point_service = PointService(db_path, auth_service=auth_service)
+        self.point_service = PointService(database_url, auth_service=auth_service)
 
     def list_items(self, access_token: str, query: dict) -> dict:
         context = self._auth_context(access_token)

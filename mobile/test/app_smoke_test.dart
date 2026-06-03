@@ -6,6 +6,7 @@ import 'package:mira_guardian_app/src/core/config/app_environment.dart';
 import 'package:mira_guardian_app/src/core/storage/auth_session_store.dart';
 import 'package:mira_guardian_app/src/core/storage/onboarding_store.dart';
 import 'package:mira_guardian_app/src/core/storage/setup_store.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -86,11 +87,14 @@ void main() {
     await tester.tap(find.text('继续绑定设备'));
     await tester.pumpAndSettle();
 
-    expect(find.text('绑定 Mira 设备'), findsOneWidget);
+    expect(find.text('绑定看护设备'), findsOneWidget);
     await tester.tap(find.text('配置 Wi-Fi'));
     await tester.pumpAndSettle();
 
     expect(find.text('Wi-Fi 配网'), findsOneWidget);
+    await tester.enterText(find.byType(EditableText).at(0), 'Mira Home 2.4G');
+    await tester.enterText(find.byType(EditableText).at(1), 'mira2026home');
+    await tester.pump();
     await tester.tap(find.text('开始绑定'));
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
@@ -100,6 +104,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('孩子资料'), findsOneWidget);
+    await tester.enterText(find.byType(EditableText).at(0), '小宇');
+    await tester.pump();
     await tester.tap(find.text('设置紧急联系人'));
     await tester.pumpAndSettle();
 
@@ -172,11 +178,11 @@ void main() {
 
     await tester.tap(find.text('任务').last);
     await tester.pumpAndSettle();
-    expect(find.text('今日任务'), findsOneWidget);
+    expect(find.text('数学作业'), findsWidgets);
 
     await tester.tap(find.text('数学作业').last);
     await tester.pumpAndSettle();
-    expect(find.text('AI 判断建议'), findsOneWidget);
+    expect(find.text('观察建议'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
     await tester.pumpAndSettle();
@@ -184,10 +190,6 @@ void main() {
     await tester.tap(find.text('看护').last);
     await tester.pumpAndSettle();
     expect(find.text('实时看护'), findsOneWidget);
-
-    await tester.tap(find.text('告警').last);
-    await tester.pumpAndSettle();
-    expect(find.text('告警列表'), findsOneWidget);
 
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
@@ -221,7 +223,7 @@ void main() {
     await tester.tap(find.text('积分').last);
     await tester.pumpAndSettle();
     expect(find.text('积分流水'), findsOneWidget);
-    expect(find.text('手动调整积分'), findsOneWidget);
+    expect(find.text('补发或更正积分'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.card_giftcard_outlined).last);
     await tester.pumpAndSettle();
@@ -232,6 +234,147 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('兑换说明'), findsOneWidget);
     expect(find.text('兑换奖励'), findsOneWidget);
+  });
+
+  testWidgets('tasks screen adapts to common phone sizes', (tester) async {
+    final now = DateTime.now();
+    final preferences = {
+      hasSeenOnboardingKey: true,
+      hasCompletedInitialSetupKey: true,
+      authAccessTokenKey: 'mock_access_saved',
+      authRefreshTokenKey: 'mock_refresh_saved',
+      authAccessTokenExpiresAtKey: now
+          .add(const Duration(minutes: 15))
+          .millisecondsSinceEpoch,
+      authRefreshTokenExpiresAtKey: now
+          .add(const Duration(days: 30))
+          .millisecondsSinceEpoch,
+      authUserIdKey: 'mock_parent_13800002026',
+      authPhoneKey: '13800002026',
+    };
+    const sizes = [
+      Size(320, 568),
+      Size(390, 844),
+      Size(430, 932),
+      Size(360, 740),
+      Size(412, 915),
+    ];
+
+    for (final size in sizes) {
+      await _pumpApp(tester, preferences: preferences, logicalSize: size);
+      await tester.pump(const Duration(milliseconds: 500));
+
+      await tester.tap(find.text('任务').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('数学作业'), findsWidgets);
+      expect(find.text('本周'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.byIcon(Icons.add).first);
+      await tester.pumpAndSettle();
+      expect(find.text('添加孩子的新任务'), findsOneWidget);
+      expect(find.text('保存并继续添加'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.text('学习任务').first);
+      await tester.pumpAndSettle();
+      expect(find.text('选择任务类型'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.text('生活习惯').last);
+      await tester.pumpAndSettle();
+      expect(find.text('习惯名称'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('task creation supports continue and day arrangement templates', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'mock_access_saved',
+        authRefreshTokenKey: 'mock_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'mock_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+      logicalSize: const Size(430, 932),
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text('任务').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.add).first);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(EditableText).at(1), '语文阅读');
+    await tester.ensureVisible(find.text('保存并继续添加'));
+    await tester.tap(find.text('保存并继续添加'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('已添加，继续安排下一项'), findsOneWidget);
+    expect(find.text('添加孩子的新任务'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('一天安排'));
+    await tester.tap(find.text('一天安排'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('从模板添加'));
+    await tester.pumpAndSettle();
+    expect(find.text('选择一个常用安排'), findsOneWidget);
+
+    await tester.tap(find.text('放学后学习'));
+    await tester.pumpAndSettle();
+    expect(find.text('保存一天安排'), findsOneWidget);
+    expect(find.text('阅读'), findsWidgets);
+
+    await tester.ensureVisible(find.text('保存一天安排'));
+    await tester.tap(find.text('保存一天安排'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('保存一天安排'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('product state views render on small and large phones', (
+    tester,
+  ) async {
+    const sizes = [Size(320, 568), Size(430, 932)];
+
+    for (final size in sizes) {
+      await _pumpStateView(tester, logicalSize: size);
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('暂时连不上服务'), findsOneWidget);
+      expect(find.text('重新连接'), findsOneWidget);
+      expect(find.textContaining('后端'), findsNothing);
+      expect(find.textContaining('API'), findsNothing);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('product state views respect reduced motion', (tester) async {
+    await _pumpStateView(
+      tester,
+      logicalSize: const Size(320, 568),
+      disableAnimations: true,
+    );
+    await tester.pump();
+
+    expect(find.text('暂时连不上服务'), findsOneWidget);
+    expect(find.text('重新连接'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
 
@@ -249,7 +392,7 @@ Future<void> _loginSuccessfully(WidgetTester tester) async {
 
   await tester.tap(find.textContaining('我已阅读并同意'));
   await tester.pump(const Duration(milliseconds: 250));
-  await tester.enterText(find.byType(EditableText).at(1), '0426');
+  await tester.enterText(find.byType(EditableText).at(1), '123456');
   await tester.tap(find.text('继续'));
   await tester.pump(const Duration(milliseconds: 120));
   expect(find.text('正在确认'), findsOneWidget);
@@ -261,10 +404,12 @@ Future<void> _loginSuccessfully(WidgetTester tester) async {
 Future<void> _pumpApp(
   WidgetTester tester, {
   required Map<String, Object> preferences,
+  Size logicalSize = const Size(393, 852),
+  double devicePixelRatio = 3,
 }) async {
   tester.view
-    ..physicalSize = const Size(1179, 2556)
-    ..devicePixelRatio = 3;
+    ..physicalSize = logicalSize * devicePixelRatio
+    ..devicePixelRatio = devicePixelRatio;
   addTearDown(() {
     tester.view.resetPhysicalSize();
     tester.view.resetDevicePixelRatio();
@@ -276,10 +421,50 @@ Future<void> _pumpApp(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        appEnvironmentProvider.overrideWithValue(AppEnvironment.development()),
+        appEnvironmentProvider.overrideWithValue(AppEnvironment.mock()),
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
       child: const MiraGuardianApp(),
+    ),
+  );
+}
+
+Future<void> _pumpStateView(
+  WidgetTester tester, {
+  required Size logicalSize,
+  double devicePixelRatio = 3,
+  bool disableAnimations = false,
+}) async {
+  tester.view
+    ..physicalSize = logicalSize * devicePixelRatio
+    ..devicePixelRatio = devicePixelRatio;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+
+  await tester.pumpWidget(
+    MaterialApp(
+      home: MediaQuery(
+        data: MediaQueryData(
+          size: logicalSize,
+          devicePixelRatio: devicePixelRatio,
+          disableAnimations: disableAnimations,
+        ),
+        child: const Scaffold(
+          body: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: MiraStateView(
+                variant: MiraStateVariant.serviceUnavailable,
+                title: '暂时连不上服务',
+                message: '可能是网络不稳定，或者服务正在重启。你可以稍后再试。',
+                primaryActionLabel: '重新连接',
+              ),
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }

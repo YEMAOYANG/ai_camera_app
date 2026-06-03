@@ -1,62 +1,63 @@
 from __future__ import annotations
 
-import sqlite3
 import uuid
 from contextlib import contextmanager
 from typing import Iterator
 
-from core.database import SQLiteDatabase
+from core.database import Database, DatabaseConnection, DatabaseRow
 from models.rewards import REDEMPTION_CANCELLED, REDEMPTION_FULFILLED, REDEMPTION_REDEEMED, REWARD_ACTIVE
 
 
 class RewardRepository:
-    def __init__(self, database: SQLiteDatabase):
+    def __init__(self, database: Database):
         self.database = database
         self.ensure_schema()
 
     @contextmanager
-    def transaction(self) -> Iterator[sqlite3.Connection]:
+    def transaction(self) -> Iterator[DatabaseConnection]:
         with self.database.transaction() as conn:
             yield conn
 
     def ensure_schema(self) -> None:
+        if not self.database.allow_runtime_schema_creation:
+            return
         with self.transaction() as conn:
             conn.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS reward_items (
-                  id TEXT PRIMARY KEY,
-                  family_id TEXT NOT NULL,
-                  child_id TEXT NOT NULL,
-                  title TEXT NOT NULL,
+                  id VARCHAR(255) PRIMARY KEY,
+                  family_id VARCHAR(255) NOT NULL,
+                  child_id VARCHAR(255) NOT NULL,
+                  title VARCHAR(255) NOT NULL,
                   description TEXT,
                   points_cost INTEGER NOT NULL,
-                  category TEXT,
-                  status TEXT NOT NULL,
-                  icon TEXT,
-                  created_by TEXT,
-                  created_at INTEGER NOT NULL,
-                  updated_at INTEGER NOT NULL
+                  category VARCHAR(255),
+                  status VARCHAR(255) NOT NULL,
+                  icon VARCHAR(255),
+                  created_by VARCHAR(255),
+                  created_at BIGINT NOT NULL,
+                  updated_at BIGINT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS reward_redemptions (
-                  id TEXT PRIMARY KEY,
-                  family_id TEXT NOT NULL,
-                  child_id TEXT NOT NULL,
-                  reward_item_id TEXT NOT NULL,
-                  reward_title TEXT NOT NULL,
+                  id VARCHAR(255) PRIMARY KEY,
+                  family_id VARCHAR(255) NOT NULL,
+                  child_id VARCHAR(255) NOT NULL,
+                  reward_item_id VARCHAR(255) NOT NULL,
+                  reward_title VARCHAR(255) NOT NULL,
                   points_cost INTEGER NOT NULL,
-                  status TEXT NOT NULL,
-                  requested_by TEXT NOT NULL,
-                  fulfilled_by TEXT,
-                  cancelled_by TEXT,
-                  requested_at INTEGER NOT NULL,
-                  fulfilled_at INTEGER,
-                  cancelled_at INTEGER
+                  status VARCHAR(255) NOT NULL,
+                  requested_by VARCHAR(255) NOT NULL,
+                  fulfilled_by VARCHAR(255),
+                  cancelled_by VARCHAR(255),
+                  requested_at BIGINT NOT NULL,
+                  fulfilled_at BIGINT,
+                  cancelled_at BIGINT
                 );
                 """
             )
 
-    def child_exists(self, conn: sqlite3.Connection, *, family_id: str, child_id: str) -> bool:
+    def child_exists(self, conn: DatabaseConnection, *, family_id: str, child_id: str) -> bool:
         row = conn.execute(
             "SELECT id FROM children WHERE family_id = ? AND id = ?",
             (family_id, child_id),
@@ -65,7 +66,7 @@ class RewardRepository:
 
     def create_item(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         child_id: str,
@@ -76,7 +77,7 @@ class RewardRepository:
         icon: str | None,
         created_by: str | None,
         now: int,
-    ) -> sqlite3.Row:
+    ) -> DatabaseRow:
         item_id = f"reward_{uuid.uuid4().hex}"
         conn.execute(
             """
@@ -105,12 +106,12 @@ class RewardRepository:
 
     def list_items(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         child_id: str | None = None,
         status: str | None = None,
-    ) -> list[sqlite3.Row]:
+    ) -> list[DatabaseRow]:
         clauses = ["family_id = ?"]
         values: list[str] = [family_id]
         if child_id:
@@ -132,11 +133,11 @@ class RewardRepository:
 
     def get_item(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         item_id: str,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         return conn.execute(
             "SELECT * FROM reward_items WHERE family_id = ? AND id = ?",
             (family_id, item_id),
@@ -144,13 +145,13 @@ class RewardRepository:
 
     def update_item(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         item_id: str,
         fields: dict,
         now: int,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         if fields:
             assignments = [f"{column} = ?" for column in fields]
             values = list(fields.values()) + [now, family_id, item_id]
@@ -166,7 +167,7 @@ class RewardRepository:
 
     def create_redemption(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         redemption_id: str,
         family_id: str,
@@ -176,7 +177,7 @@ class RewardRepository:
         points_cost: int,
         requested_by: str,
         now: int,
-    ) -> sqlite3.Row:
+    ) -> DatabaseRow:
         conn.execute(
             """
             INSERT INTO reward_redemptions(
@@ -201,12 +202,12 @@ class RewardRepository:
 
     def list_redemptions(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         child_id: str | None = None,
         status: str | None = None,
-    ) -> list[sqlite3.Row]:
+    ) -> list[DatabaseRow]:
         clauses = ["family_id = ?"]
         values: list[str] = [family_id]
         if child_id:
@@ -228,11 +229,11 @@ class RewardRepository:
 
     def get_redemption(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         redemption_id: str,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         return conn.execute(
             "SELECT * FROM reward_redemptions WHERE family_id = ? AND id = ?",
             (family_id, redemption_id),
@@ -240,13 +241,13 @@ class RewardRepository:
 
     def fulfill_redemption(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         redemption_id: str,
         fulfilled_by: str,
         now: int,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         conn.execute(
             """
             UPDATE reward_redemptions
@@ -259,13 +260,13 @@ class RewardRepository:
 
     def cancel_redemption(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         redemption_id: str,
         cancelled_by: str,
         now: int,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         conn.execute(
             """
             UPDATE reward_redemptions

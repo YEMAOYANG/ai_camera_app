@@ -6,9 +6,11 @@ import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
 import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
 import 'package:mira_guardian_app/src/features/tasks/application/task_repository.dart';
 import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
+import 'package:mira_guardian_app/src/features/tasks/presentation/tasks_screen.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
 import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
 
@@ -36,10 +38,10 @@ class TaskDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _SectionTitle('AI 判断建议'),
+                const _SectionTitle('观察建议'),
                 const SizedBox(height: 10),
                 Text(
-                  task.aiAdvice,
+                  task.observationText,
                   style: const TextStyle(
                     color: AppColors.muted,
                     fontFamily: AppTypography.systemFont,
@@ -57,17 +59,17 @@ class TaskDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _SectionTitle('任务记录'),
+                const _SectionTitle('时间和奖励'),
                 const SizedBox(height: 8),
                 MiraListRow(
                   icon: Icons.timer_outlined,
-                  title: task.durationLabel,
-                  subtitle: task.nextStep,
+                  title: task.timeLabel,
+                  subtitle: '${task.scheduleLabel} · ${task.durationLabel}',
                   tone: MiraListRowTone.blue,
                 ),
                 MiraListRow(
-                  icon: Icons.event_note_outlined,
-                  title: '家长确认',
+                  icon: Icons.stars_outlined,
+                  title: '+${task.rewardPoints} 分',
                   subtitle: task.parentDecisionLabel,
                   tone: task.status.awaitsParent
                       ? MiraListRowTone.amber
@@ -104,6 +106,21 @@ class TaskDetailScreen extends ConsumerWidget {
             trailing: const Icon(Icons.volume_up_outlined, size: 18),
             onTap: () => _showToast(context, '已发送温和提醒'),
           ),
+          const SizedBox(height: 10),
+          MiraSecondaryButton(
+            label: '编辑任务',
+            trailing: const Icon(Icons.edit_outlined, size: 18),
+            onTap: () => _editTask(context, ref, task),
+          ),
+          if (task.status != GuardianTaskStatus.cancelled &&
+              task.status != GuardianTaskStatus.confirmed) ...[
+            const SizedBox(height: 10),
+            MiraSecondaryButton(
+              label: '取消任务',
+              trailing: const Icon(Icons.event_busy_outlined, size: 18),
+              onTap: () => _cancelTask(context, ref, task),
+            ),
+          ],
         ],
       ),
       loading: () => MiraScreen(
@@ -119,14 +136,12 @@ class TaskDetailScreen extends ConsumerWidget {
         backLabel: '返回任务',
         onBack: () => context.go(AppRoute.tasks.path),
         children: [
-          MiraEmptyState(
-            icon: Icons.cloud_off_outlined,
-            title: '任务详情加载失败',
+          MiraStateView(
+            variant: MiraStateVariant.serviceUnavailable,
+            title: '任务详情暂时打不开',
             message: error is TaskException ? error.message : '请稍后重试。',
-            action: TextButton(
-              onPressed: () => ref.invalidate(taskDetailProvider(taskId)),
-              child: const Text('重新加载'),
-            ),
+            primaryActionLabel: '重新加载',
+            onPrimaryAction: () => ref.invalidate(taskDetailProvider(taskId)),
           ),
         ],
       ),
@@ -165,23 +180,7 @@ class _EvidencePanel extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: SizedBox(
-              height: 132,
-              width: double.infinity,
-              child: Center(
-                child: Icon(
-                  Icons.image_outlined,
-                  color: Colors.white.withValues(alpha: 0.72),
-                  size: 42,
-                ),
-              ),
-            ),
-          ),
+          _EvidenceStoryCard(task: task),
           const SizedBox(height: 14),
           Text(
             task.evidenceText,
@@ -202,15 +201,87 @@ class _EvidencePanel extends StatelessWidget {
                 value: task.status.awaitsParent ? '待确认' : '已记录',
               ),
               const SizedBox(width: 8),
-              _EvidenceMetric(
-                label: '积分',
-                value: '+${task.rewardPoints}',
-              ),
+              _EvidenceMetric(label: '积分', value: '+${task.rewardPoints}'),
               const SizedBox(width: 8),
               _EvidenceMetric(label: '结果', value: task.parentDecisionLabel),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EvidenceStoryCard extends StatelessWidget {
+  const _EvidenceStoryCard({required this.task});
+
+  final GuardianTask task;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const SizedBox(
+                width: 48,
+                height: 48,
+                child: Center(
+                  child: Icon(
+                    Icons.center_focus_strong_outlined,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    task.status.awaitsParent ? '等待你确认完成情况' : '完成线索已记录',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      height: 1.25,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    task.observationText,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.70),
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      height: 1.45,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -289,20 +360,18 @@ class _TaskDetailLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          _SectionTitle('正在加载任务详情'),
-          SizedBox(height: 12),
-          LinearProgressIndicator(minHeight: 3),
-        ],
-      ),
+    return const MiraLoadingState(
+      title: '正在加载任务详情',
+      message: '正在整理任务时间、证据和奖励信息。',
     );
   }
 }
 
-void _showEvidenceSheet(BuildContext context, WidgetRef ref, GuardianTask task) {
+void _showEvidenceSheet(
+  BuildContext context,
+  WidgetRef ref,
+  GuardianTask task,
+) {
   showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
@@ -379,10 +448,9 @@ Future<void> _completeTask(
   GuardianTask task,
 ) async {
   try {
-    await ref.read(taskRepositoryProvider).completeTask(
-      task.id,
-      evidenceSummary: task.evidenceText,
-    );
+    await ref
+        .read(taskRepositoryProvider)
+        .completeTask(task.id, evidenceSummary: task.evidenceText);
     _invalidateTaskData(ref, task.id);
     if (context.mounted) _showToast(context, '任务已进入家长确认状态');
   } on TaskException catch (error) {
@@ -413,12 +481,66 @@ Future<void> _rejectTask(
   GuardianTask task,
 ) async {
   try {
-    await ref.read(taskRepositoryProvider).rejectConfirmation(
-      task.id,
-      reason: '证据不足，等待孩子补充完成。',
-    );
+    await ref
+        .read(taskRepositoryProvider)
+        .rejectConfirmation(task.id, reason: '证据不足，等待孩子补充完成。');
     _invalidateTaskData(ref, task.id);
     if (context.mounted) _showToast(context, '已驳回任务证据');
+  } on TaskException catch (error) {
+    if (context.mounted) _showToast(context, error.message);
+  }
+}
+
+Future<void> _editTask(
+  BuildContext context,
+  WidgetRef ref,
+  GuardianTask task,
+) async {
+  final initialDate = DateTime.tryParse(task.scheduledDate) ?? DateTime.now();
+  final savedDate = await showTaskFormSheet(
+    context,
+    childId: task.childId,
+    initialDate: initialDate,
+    childAgeGroup: TaskAgeGroup.lowerPrimary,
+    task: task,
+  );
+
+  if (savedDate != null) {
+    _invalidateTaskData(ref, task.id);
+    if (context.mounted) _showToast(context, '任务已更新');
+  }
+}
+
+Future<void> _cancelTask(
+  BuildContext context,
+  WidgetRef ref,
+  GuardianTask task,
+) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('取消任务'),
+        content: Text('确认取消“${task.title}”？取消后仍会保留记录。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('先不取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('确认取消'),
+          ),
+        ],
+      );
+    },
+  );
+  if (confirmed != true) return;
+
+  try {
+    await ref.read(taskRepositoryProvider).cancelTask(task.id);
+    _invalidateTaskData(ref, task.id);
+    if (context.mounted) _showToast(context, '任务已取消');
   } on TaskException catch (error) {
     if (context.mounted) _showToast(context, error.message);
   }
@@ -428,7 +550,8 @@ void _invalidateTaskData(WidgetRef ref, String taskId) {
   ref
     ..invalidate(taskDetailProvider(taskId))
     ..invalidate(taskListProvider)
-    ..invalidate(todayTasksProvider);
+    ..invalidate(todayTasksProvider)
+    ..invalidate(taskWeekProvider);
 }
 
 void _showToast(BuildContext context, String message) {

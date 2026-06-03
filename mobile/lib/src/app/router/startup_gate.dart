@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
 import 'package:mira_guardian_app/src/core/storage/auth_session_store.dart';
 import 'package:mira_guardian_app/src/core/storage/onboarding_store.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
 import 'package:mira_guardian_app/src/features/setup/application/setup_repository.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_background.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
 
 class StartupGate extends ConsumerStatefulWidget {
   const StartupGate({super.key});
@@ -58,74 +58,33 @@ class _StartupGateState extends ConsumerState<StartupGate> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.appBackgroundWarm,
-      body: SafeArea(
+    return MiraBackgroundScaffold(
+      child: SafeArea(
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.ink,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: const SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: Center(
-                      child: Icon(
-                        Icons.center_focus_strong_outlined,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  _checking ? '正在确认登录状态' : '后端连接异常',
-                  style: const TextStyle(
-                    color: AppColors.ink,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  _errorText ?? '正在同步家庭账户和首次设置进度。',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.muted,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    height: 1.55,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (_checking)
-                  const SizedBox(
-                    width: 26,
-                    height: 26,
-                    child: CircularProgressIndicator(strokeWidth: 3),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: _checking
+                ? const MiraLoadingState(
+                    title: '正在确认家庭信息',
+                    message: '正在同步登录状态和首次设置进度。',
                   )
-                else
-                  MiraPrimaryButton(
-                    label: '重试',
-                    trailing: const MiraButtonGlyph(icon: Icons.refresh),
-                    onTap: _resolve,
+                : MiraStateView(
+                    variant: MiraStateVariant.serviceUnavailable,
+                    title: '暂时连不上服务',
+                    message: _serviceUnavailableMessage(_errorText),
+                    primaryActionLabel: '重新连接',
+                    onPrimaryAction: _resolve,
                   ),
-              ],
-            ),
           ),
         ),
       ),
     );
+  }
+
+  String _serviceUnavailableMessage(String? errorText) {
+    if (errorText == null || errorText.isEmpty) {
+      return '可能是网络不稳定，或者服务正在重启。你可以稍后再试。';
+    }
+    return '我们没有拿到最新数据。可能是网络不稳定，或者服务正在重启。你可以稍后再试。';
   }
 }

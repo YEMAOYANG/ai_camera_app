@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import sqlite3
+from core.database import DatabaseRow
 
 from core.errors import ApiError
 from models.rewards import REWARD_STATUSES
 
 
-def reward_item_payload(row: sqlite3.Row) -> dict:
+def reward_item_payload(row: DatabaseRow) -> dict:
     return {
         "id": row["id"],
         "familyId": row["family_id"],
@@ -23,7 +23,7 @@ def reward_item_payload(row: sqlite3.Row) -> dict:
     }
 
 
-def redemption_payload(row: sqlite3.Row) -> dict:
+def redemption_payload(row: DatabaseRow) -> dict:
     return {
         "id": row["id"],
         "familyId": row["family_id"],

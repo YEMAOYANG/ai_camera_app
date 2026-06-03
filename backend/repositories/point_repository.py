@@ -1,67 +1,76 @@
 from __future__ import annotations
 
-import sqlite3
 import uuid
 from contextlib import contextmanager
 from typing import Iterator
 
-from core.database import SQLiteDatabase
+from core.database import Database, DatabaseConnection, DatabaseRow
 from core.errors import ApiError
 
 
 class PointRepository:
-    def __init__(self, database: SQLiteDatabase):
+    def __init__(self, database: Database):
         self.database = database
         self.ensure_schema()
 
     @contextmanager
-    def transaction(self) -> Iterator[sqlite3.Connection]:
+    def transaction(self) -> Iterator[DatabaseConnection]:
         with self.database.transaction() as conn:
             yield conn
 
     def ensure_schema(self) -> None:
+        if not self.database.allow_runtime_schema_creation:
+            return
         with self.transaction() as conn:
             conn.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS point_accounts (
-                  family_id TEXT NOT NULL,
-                  child_id TEXT NOT NULL,
+                  family_id VARCHAR(255) NOT NULL,
+                  child_id VARCHAR(255) NOT NULL,
                   balance INTEGER NOT NULL DEFAULT 0,
-                  created_at INTEGER NOT NULL,
-                  updated_at INTEGER NOT NULL,
+                  created_at BIGINT NOT NULL,
+                  updated_at BIGINT NOT NULL,
                   PRIMARY KEY (family_id, child_id)
                 );
 
                 CREATE TABLE IF NOT EXISTS point_ledger (
-                  id TEXT PRIMARY KEY,
-                  family_id TEXT NOT NULL,
-                  child_id TEXT NOT NULL,
+                  id VARCHAR(255) PRIMARY KEY,
+                  family_id VARCHAR(255) NOT NULL,
+                  child_id VARCHAR(255) NOT NULL,
                   delta INTEGER NOT NULL,
                   balance_after INTEGER NOT NULL,
-                  type TEXT NOT NULL,
-                  source_type TEXT,
-                  source_id TEXT,
+                  type VARCHAR(255) NOT NULL,
+                  source_type VARCHAR(255),
+                  source_id VARCHAR(255),
                   note TEXT,
-                  created_at INTEGER NOT NULL
+                  created_at BIGINT NOT NULL
                 );
                 """
             )
 
-    def child_exists(self, conn: sqlite3.Connection, *, family_id: str, child_id: str) -> bool:
+    def child_exists(self, conn: DatabaseConnection, *, family_id: str, child_id: str) -> bool:
         row = conn.execute(
             "SELECT id FROM children WHERE family_id = ? AND id = ?",
             (family_id, child_id),
         ).fetchone()
         return row is not None
 
+    def list_children(self, conn: DatabaseConnection, *, family_id: str) -> list[DatabaseRow]:
+        return list(
+            conn.execute(
+                "SELECT * FROM children WHERE family_id = ? ORDER BY created_at",
+                (family_id,),
+            ).fetchall()
+        )
+
     def get_or_create_account(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         child_id: str,
         now: int,
-    ) -> sqlite3.Row:
+    ) -> DatabaseRow:
         row = conn.execute(
             "SELECT * FROM point_accounts WHERE family_id = ? AND child_id = ?",
             (family_id, child_id),
@@ -80,7 +89,7 @@ class PointRepository:
             ).fetchone()
         return row
 
-    def list_accounts(self, conn: sqlite3.Connection, *, family_id: str) -> list[sqlite3.Row]:
+    def list_accounts(self, conn: DatabaseConnection, *, family_id: str) -> list[DatabaseRow]:
         return list(
             conn.execute(
                 "SELECT * FROM point_accounts WHERE family_id = ? ORDER BY created_at",
@@ -90,7 +99,7 @@ class PointRepository:
 
     def adjust_points(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         child_id: str,
@@ -100,7 +109,7 @@ class PointRepository:
         source_id: str | None,
         note: str | None,
         now: int,
-    ) -> sqlite3.Row:
+    ) -> DatabaseRow:
         account = self.get_or_create_account(conn, family_id=family_id, child_id=child_id, now=now)
         balance_after = account["balance"] + delta
         if balance_after < 0:
@@ -138,11 +147,11 @@ class PointRepository:
 
     def list_ledger(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         child_id: str | None = None,
-    ) -> list[sqlite3.Row]:
+    ) -> list[DatabaseRow]:
         clauses = ["family_id = ?"]
         values: list[str] = [family_id]
         if child_id:

@@ -5,7 +5,7 @@ import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 
-from core.config import AppConfig
+from core.config import AppConfig, apply_test_defaults, validate_flask_config
 from routes.api.v1.ai import ai_bp
 from routes.api.v1.auth import auth_bp
 from routes.api.v1.camera_bridge import camera_bp
@@ -21,9 +21,10 @@ def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__)
     app.config.update(AppConfig.from_env().to_flask_config())
     if test_config:
-        app.config.update(test_config)
+        app.config.update(apply_test_defaults(test_config))
 
-    CORS(app)
+    validate_flask_config(app.config)
+    CORS(app, origins=app.config["CORS_ORIGINS"])
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(setup_bp, url_prefix="/api/setup")
@@ -40,12 +41,13 @@ def create_app(test_config: dict | None = None) -> Flask:
         return jsonify(
             {
                 "ok": True,
-                "service": "mira-guardian-app-backend",
+                "service": app.config["SERVICE_NAME"],
                 "auth": "ready",
                 "apiVersion": "v1",
+                "environment": app.config["APP_ENV"],
                 "cameraBridge": {
-                    "target": app.config["CAMERA_BACKEND_URL"],
-                    "mode": "proxy-to-ai-camera-test",
+                    "adapter": app.config["CAMERA_RUNTIME_ADAPTER"],
+                    "configured": bool(app.config["CAMERA_BACKEND_URL"]),
                 },
             }
         )
@@ -57,5 +59,5 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", "8000"))
-    app.run(host="127.0.0.1", port=port, debug=os.getenv("FLASK_DEBUG") == "1")
+    port = int(os.getenv("APP_PORT", os.getenv("PORT", app.config["PORT"])))
+    app.run(host=app.config["HOST"], port=port, debug=app.config["DEBUG"])

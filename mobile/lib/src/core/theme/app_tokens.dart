@@ -40,7 +40,7 @@ class AppMotion {
 class AppChrome {
   const AppChrome._();
 
-  static const tabBarHeight = 58.0;
+  static const tabBarHeight = 72.0;
   static const tabBarContentGap = 12.0;
   static const pinnedHeaderHeight = 96.0;
 }

@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from flask import Blueprint, Response, current_app, jsonify, stream_with_context
+from flask import Blueprint, Response, jsonify, stream_with_context
 
+from core.errors import ApiError, error_response
 from services.camera_bridge_service import CameraBridgeError, CameraBridgeService
+from services.service_factory import camera_bridge_service
 
 
 camera_bp = Blueprint("camera", __name__)
-
-
-def _camera_bridge() -> CameraBridgeService:
-    return CameraBridgeService(current_app.config["CAMERA_BACKEND_URL"])
 
 
 def _json_response(payload: dict):
@@ -20,23 +18,32 @@ def _json_response(payload: dict):
 
 @camera_bp.get("/health")
 def camera_health():
-    return _json_response(_camera_bridge().health())
+    try:
+        return _json_response(camera_bridge_service().health())
+    except ApiError as exc:
+        return error_response(exc)
 
 
 @camera_bp.get("/runtime")
 def camera_runtime():
-    return _json_response(_camera_bridge().runtime())
+    try:
+        return _json_response(camera_bridge_service().runtime())
+    except ApiError as exc:
+        return error_response(exc)
 
 
 @camera_bp.get("/speaker/status")
 def speaker_status():
-    return _json_response(_camera_bridge().speaker_status())
+    try:
+        return _json_response(camera_bridge_service().speaker_status())
+    except ApiError as exc:
+        return error_response(exc)
 
 
 @camera_bp.get("/snapshot")
 def snapshot():
     try:
-        result = _camera_bridge().fetch_snapshot()
+        result = camera_bridge_service().fetch_snapshot()
         return Response(
             result.body,
             mimetype=result.content_type,
@@ -44,12 +51,14 @@ def snapshot():
         )
     except CameraBridgeError as exc:
         return jsonify({"ok": False, "error": exc.code, "message": exc.message}), exc.status_code
+    except ApiError as exc:
+        return error_response(exc)
 
 
 @camera_bp.get("/stream")
 def stream():
     try:
-        upstream = _camera_bridge().open_stream()
+        upstream = camera_bridge_service().open_stream()
         content_type = upstream.headers.get("content-type", "multipart/x-mixed-replace")
 
         def generate():
@@ -67,3 +76,5 @@ def stream():
         )
     except CameraBridgeError as exc:
         return jsonify({"ok": False, "error": exc.code, "message": exc.message}), exc.status_code
+    except ApiError as exc:
+        return error_response(exc)

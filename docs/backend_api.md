@@ -2,9 +2,9 @@
 
 更新日期：2026-06-03
 
-本文档描述当前家长端 App 第一版已经实现或明确预留的后端接口。后端先采用轻量 Flask 服务，负责 App 登录态、首次设置、任务、积分、奖励、设备状态、摄像头测试后端桥接，以及 AI / Prompt / Firmware 的轻量边界。
+本文档描述当前家长端 App 第一版已经实现或明确预留的后端接口。后端当前保留 Flask 服务，负责 App 登录态、首次设置、任务、积分、奖励、设备状态，以及 AI / Prompt / Camera / Firmware 的轻量边界。
 
-摄像头底层运行能力仍由 `/Users/sqcopenclaw/.openclaw/workspace/ai_camera_test` 保持，当前 App 后端只通过 adapter/bridge 读取或代理必要状态。Flutter 合同只面向 App 后端 API，不直接暴露底层流媒体、硬件私有协议或旧测试项目路径。
+Flutter 合同只面向 App 后端 API，不直接暴露底层流媒体、RTSP/go2rtc、硬件私有协议、短信供应商、AI provider key 或旧测试项目路径。开发/测试环境可以通过 adapter 桥接旧测试运行时，production 必须使用正式 adapter 或返回清晰的未配置状态。
 
 ## 认证模型
 
@@ -20,11 +20,16 @@ Token：
 - App 启动时只要 refresh token 未过期，就不回到登录页。
 - 普通 API 请求 access token 过期时，客户端自动调用 refresh 接口并重试一次。
 
-开发验证码：
+开发/测试验证码：
 
 ```text
-MIRA_AUTH_DEV_SMS_CODE=0426
+APP_ENV=development
+APP_ENABLE_DEV_ADAPTERS=1
+APP_SMS_PROVIDER=development
 ```
+
+development/test 短信 provider 每次请求会生成随机 6 位验证码，并在接口返回
+`debugCode`，方便本地调试。production 不允许启用 development provider，后续接入真实短信供应商后替换 provider 即可。
 
 ## Auth
 
@@ -47,7 +52,9 @@ Response:
   "ok": true,
   "codeSent": true,
   "expiresAt": 1780390000000,
-  "debugCode": "0426",
+  "debugCode": "593204",
+  "provider": "development",
+  "deliveryStatus": "delivered",
   "message": "验证码已发送"
 }
 ```
@@ -61,7 +68,7 @@ Request:
 ```json
 {
   "phone": "13800002026",
-  "code": "0426"
+  "code": "593204"
 }
 ```
 
@@ -152,27 +159,30 @@ Request:
 
 ## Camera Bridge
 
-Bridge 目标由环境变量控制：
+摄像头运行时由 adapter 控制。默认 production 路径为 `disabled`，真实硬件/摄像头 runtime 接入前返回清晰的不可用状态。开发/测试如需桥接旧测试运行时，显式配置：
 
 ```text
-MIRA_CAMERA_BACKEND_URL=http://127.0.0.1:8767
+APP_ENV=development
+APP_ENABLE_DEV_ADAPTERS=1
+APP_CAMERA_RUNTIME_ADAPTER=ai_camera_test
+APP_CAMERA_BACKEND_URL=http://127.0.0.1:8767
 ```
 
 ### GET `/api/camera/health`
 
-代理原测试后端 `/api/health`，用于确认摄像头、voice runtime、monitor runtime、speaker runtime 是否可达。
+返回 camera runtime adapter 健康状态。
 
 ### GET `/api/camera/runtime`
 
-代理原测试后端 `/api/voice/runtime`，用于 App 或调试页读取唤醒监听和语音交互状态。
+返回 camera runtime 摘要状态。Flutter 不直接接触 RTSP、go2rtc 或旧测试服务路径。
 
 ### GET `/api/camera/speaker/status`
 
-代理原测试后端 `/api/camera/speaker/status`，用于读取喇叭播放队列、busy、cooldown 和错误。
+返回后端 adapter 暴露的喇叭/播放状态；未配置时返回降级状态。
 
 ### GET `/api/camera/snapshot`
 
-代理原测试后端 `/api/camera/snapshot`，返回 JPEG。用于 App 看护页后续接真实画面预览。
+返回后端 adapter 提供的 JPEG 快照；未配置或不可达时返回明确错误。
 
 ## V1 App API Contract
 
@@ -230,13 +240,102 @@ Tasks
   GET    /api/tasks
   GET    /api/tasks/{taskId}
   POST   /api/tasks
+  POST   /api/tasks/batch
   PATCH  /api/tasks/{id}
   POST   /api/tasks/{id}/complete
   POST   /api/tasks/{id}/parent-confirm
   POST   /api/tasks/{id}/reject-confirmation
 ```
 
-Task templates, pause/delay, and standalone evidence endpoints are future expansions. V1 evidence summary is embedded in task payloads.
+`GET /api/tasks` supports `childId`, `date`, `startDate`, `endDate`, and
+`status`. Flutter uses `startDate` / `endDate` for the weekly task view. There
+is no standalone day-plan API.
+
+`POST /api/tasks/batch` creates several ordinary task records in one request.
+It is intended for applying a common day arrangement or saving several time
+blocks together. The operation validates each row inside one transaction; if a
+row fails, the response message identifies the row and no rows are committed.
+
+Batch create request:
+
+```json
+{
+  "date": "2026-06-05",
+  "tasks": [
+    {
+      "childId": "child_xxx",
+      "title": "数学作业",
+      "taskType": "learning",
+      "startAt": "2026-06-05T19:00:00",
+      "dueAt": "2026-06-05T19:30:00",
+      "rewardPoints": 3,
+      "requiresParentConfirmation": true
+    }
+  ]
+}
+```
+
+Batch create response:
+
+```json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "task_xxx",
+      "taskId": "task_xxx",
+      "title": "数学作业",
+      "taskType": "learning",
+      "scheduledDate": "2026-06-05",
+      "scheduledStart": "19:00",
+      "scheduledEnd": "19:30",
+      "rewardPoints": 3,
+      "requiresParentConfirmation": true
+    }
+  ]
+}
+```
+
+Task templates, pause/delay, and standalone evidence endpoints are future
+expansions. V1 evidence summary is embedded in task payloads.
+
+Task payload:
+
+```json
+{
+  "id": "task_xxx",
+  "taskId": "task_xxx",
+  "familyId": "fam_xxx",
+  "childId": "child_xxx",
+  "title": "数学作业",
+  "description": "25 分钟专注 + 5 分钟休息",
+  "type": "learning",
+  "taskType": "learning",
+  "scheduleType": "weekly",
+  "startAt": "2026-06-03T19:00:00",
+  "dueAt": "2026-06-03T19:40:00",
+  "repeatRule": {"freq": "weekly", "days": [1, 2, 3, 4, 5]},
+  "status": "awaiting_parent_confirmation",
+  "priority": 2,
+  "scheduledDate": "2026-06-03",
+  "scheduledStart": "19:00",
+  "scheduledEnd": "19:40",
+  "rewardPoints": 5,
+  "requiresParentConfirmation": true,
+  "completionSource": "camera",
+  "evidence": {"confidence": 0.86},
+  "evidenceSummary": "书写状态稳定，离座后 3 分钟内回座。",
+  "aiObservationSummary": "AI 判断任务已完成，建议家长确认。",
+  "rejectionReason": null,
+  "createdBy": "user_xxx",
+  "createdAt": 1780390000000,
+  "updatedAt": 1780390000000,
+  "completedAt": 1780390000000,
+  "confirmedAt": null,
+  "rejectedAt": null,
+  "pointsGrantedAt": null
+}
+```
 
 Task status:
 
@@ -259,6 +358,9 @@ life
 housework
 sleep
 schoolbag
+reading_interest
+sports_outdoor
+custom
 checkin
 parent_confirmation
 ai_observed

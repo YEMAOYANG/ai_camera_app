@@ -1217,7 +1217,7 @@ TP-LINK、海雀、萤石等第三方摄像头适合研发阶段验证 RTSP 拉�
 | 单文件 `server.py` 过大 | 难维护、难测试 | 按 AI、Camera、Task、Report、Safety、API 分层 |
 | 前端浏览器语音依赖 Web Speech API | 设备端不可用、兼容性不稳定 | 产品化改为摄像头端音频流 + VAD/STT/TTS |
 | 行为判断主要靠大模型单帧 | 成本高、延迟高、误判 | 端侧轻量模型做预判，大模型只做复杂复核 |
-| 数据存在内存和 `data/` 文件夹 | 重启丢失、无法多设备 | SQLite 起步，后续 PostgreSQL |
+| 数据存在内存和 `data/` 文件夹 | 重启丢失、无法多设备 | 正式后端主库使用 MySQL，测试环境才允许隔离 SQLite |
 | 无用户/家庭/设备权限体系 | 隐私风险 | 增加家庭、成员、角色、设备授权 |
 
 ### 7.3 分阶段迁移路线
@@ -1303,7 +1303,6 @@ dependencies:
   freezed_annotation: ^2.4.0
   json_annotation: ^4.9.0
   shared_preferences: ^2.3.0
-  sqflite: ^2.4.0
   fl_chart: ^0.69.0
   cached_network_image: ^3.4.0
   firebase_messaging: ^15.0.0

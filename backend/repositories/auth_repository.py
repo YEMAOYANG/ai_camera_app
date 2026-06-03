@@ -1,105 +1,122 @@
 from __future__ import annotations
 
-import sqlite3
 import uuid
 from contextlib import contextmanager
 from typing import Iterator
 
-from core.database import SQLiteDatabase
+from core.database import Database, DatabaseConnection, DatabaseRow
 
 
 class AuthRepository:
-    def __init__(self, database: SQLiteDatabase):
+    def __init__(self, database: Database):
         self.database = database
         self.ensure_schema()
 
     @contextmanager
-    def transaction(self) -> Iterator[sqlite3.Connection]:
+    def transaction(self) -> Iterator[DatabaseConnection]:
         with self.database.transaction() as conn:
             yield conn
 
     def ensure_schema(self) -> None:
+        if not self.database.allow_runtime_schema_creation:
+            return
         with self.transaction() as conn:
             conn.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS families (
-                  id TEXT PRIMARY KEY,
-                  name TEXT NOT NULL,
-                  created_at INTEGER NOT NULL
+                  id VARCHAR(255) PRIMARY KEY,
+                  name VARCHAR(255) NOT NULL,
+                  created_at BIGINT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS users (
-                  id TEXT PRIMARY KEY,
-                  phone TEXT NOT NULL UNIQUE,
-                  family_id TEXT NOT NULL,
-                  display_name TEXT NOT NULL,
-                  created_at INTEGER NOT NULL
+                  id VARCHAR(255) PRIMARY KEY,
+                  phone VARCHAR(255) NOT NULL UNIQUE,
+                  family_id VARCHAR(255) NOT NULL,
+                  display_name VARCHAR(255) NOT NULL,
+                  created_at BIGINT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS sms_codes (
-                  phone TEXT PRIMARY KEY,
-                  code_hash TEXT NOT NULL,
-                  expires_at INTEGER NOT NULL,
-                  created_at INTEGER NOT NULL
+                  phone VARCHAR(255) PRIMARY KEY,
+                  code_hash VARCHAR(255) NOT NULL,
+                  expires_at BIGINT NOT NULL,
+                  created_at BIGINT NOT NULL,
+                  attempt_count INTEGER NOT NULL DEFAULT 0,
+                  last_sent_at BIGINT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS sessions (
-                  id TEXT PRIMARY KEY,
-                  user_id TEXT NOT NULL,
-                  access_hash TEXT NOT NULL UNIQUE,
-                  refresh_hash TEXT NOT NULL UNIQUE,
-                  access_expires_at INTEGER NOT NULL,
-                  refresh_expires_at INTEGER NOT NULL,
-                  created_at INTEGER NOT NULL,
-                  rotated_at INTEGER,
-                  revoked_at INTEGER
+                  id VARCHAR(255) PRIMARY KEY,
+                  user_id VARCHAR(255) NOT NULL,
+                  access_hash VARCHAR(255) NOT NULL UNIQUE,
+                  refresh_hash VARCHAR(255) NOT NULL UNIQUE,
+                  access_expires_at BIGINT NOT NULL,
+                  refresh_expires_at BIGINT NOT NULL,
+                  created_at BIGINT NOT NULL,
+                  rotated_at BIGINT,
+                  revoked_at BIGINT
                 );
                 """
             )
 
     def upsert_sms_code(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         phone: str,
         code_hash: str,
         expires_at: int,
         created_at: int,
     ) -> None:
+        existing = self.find_sms_code(conn, phone)
+        if existing:
+            conn.execute(
+                """
+                UPDATE sms_codes
+                SET code_hash = ?, expires_at = ?, created_at = ?, attempt_count = 0, last_sent_at = ?
+                WHERE phone = ?
+                """,
+                (code_hash, expires_at, created_at, created_at, phone),
+            )
+            return
+
         conn.execute(
             """
-            INSERT INTO sms_codes(phone, code_hash, expires_at, created_at)
-            VALUES (?, ?, ?, ?)
-            ON CONFLICT(phone) DO UPDATE SET
-              code_hash = excluded.code_hash,
-              expires_at = excluded.expires_at,
-              created_at = excluded.created_at
+            INSERT INTO sms_codes(phone, code_hash, expires_at, created_at, attempt_count, last_sent_at)
+            VALUES (?, ?, ?, ?, 0, ?)
             """,
-            (phone, code_hash, expires_at, created_at),
+            (phone, code_hash, expires_at, created_at, created_at),
         )
 
-    def find_sms_code(self, conn: sqlite3.Connection, phone: str) -> sqlite3.Row | None:
+    def find_sms_code(self, conn: DatabaseConnection, phone: str) -> DatabaseRow | None:
         return conn.execute("SELECT * FROM sms_codes WHERE phone = ?", (phone,)).fetchone()
 
-    def delete_sms_code(self, conn: sqlite3.Connection, phone: str) -> None:
+    def delete_sms_code(self, conn: DatabaseConnection, phone: str) -> None:
         conn.execute("DELETE FROM sms_codes WHERE phone = ?", (phone,))
 
-    def find_user_by_phone(self, conn: sqlite3.Connection, phone: str) -> sqlite3.Row | None:
+    def increment_sms_attempts(self, conn: DatabaseConnection, phone: str) -> None:
+        conn.execute(
+            "UPDATE sms_codes SET attempt_count = attempt_count + 1 WHERE phone = ?",
+            (phone,),
+        )
+
+    def find_user_by_phone(self, conn: DatabaseConnection, phone: str) -> DatabaseRow | None:
         return conn.execute("SELECT * FROM users WHERE phone = ?", (phone,)).fetchone()
 
-    def find_user_by_id(self, conn: sqlite3.Connection, user_id: str) -> sqlite3.Row | None:
+    def find_user_by_id(self, conn: DatabaseConnection, user_id: str) -> DatabaseRow | None:
         return conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
 
-    def find_family_by_id(self, conn: sqlite3.Connection, family_id: str) -> sqlite3.Row | None:
+    def find_family_by_id(self, conn: DatabaseConnection, family_id: str) -> DatabaseRow | None:
         return conn.execute("SELECT * FROM families WHERE id = ?", (family_id,)).fetchone()
 
     def create_parent_user(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         phone: str,
         now: int,
-    ) -> sqlite3.Row:
+    ) -> DatabaseRow:
         family_id = f"fam_{uuid.uuid4().hex}"
         user_id = f"user_{uuid.uuid4().hex}"
         conn.execute(
@@ -120,7 +137,7 @@ class AuthRepository:
 
     def create_session(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         user_id: str,
         access_hash: str,
@@ -150,9 +167,9 @@ class AuthRepository:
 
     def find_session_by_refresh_hash(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         refresh_hash: str,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         return conn.execute(
             """
             SELECT * FROM sessions
@@ -163,9 +180,9 @@ class AuthRepository:
 
     def find_session_by_access_hash(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         access_hash: str,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         return conn.execute(
             """
             SELECT * FROM sessions
@@ -176,7 +193,7 @@ class AuthRepository:
 
     def rotate_session(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         session_id: str,
         access_hash: str,

@@ -8,6 +8,7 @@ import 'package:mira_guardian_app/src/features/points/domain/point_models.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
 
 class PointsScreen extends ConsumerWidget {
@@ -35,23 +36,21 @@ class PointsScreen extends ConsumerWidget {
           _LedgerPanel(entries: data.ledger),
           const SizedBox(height: 14),
           MiraSecondaryButton(
-            label: '手动调整积分',
+            label: '补发或更正积分',
             trailing: const Icon(Icons.tune_outlined, size: 18),
             onTap: data.account.childId.isEmpty
-                ? () => _showToast(context, '后端还没有孩子积分账户，完成任务确认后会自动创建。')
+                ? () => _showToast(context, '还没有可调整的积分账户，完成任务确认后会自动准备。')
                 : () => _showAdjustSheet(context, ref, data.account),
           ),
         ],
         loading: () => const [_PointsLoading()],
         error: (error, _) => [
-          MiraEmptyState(
-            icon: Icons.cloud_off_outlined,
-            title: '积分加载失败',
+          MiraStateView(
+            variant: MiraStateVariant.serviceUnavailable,
+            title: '积分暂时没有更新',
             message: error is PointException ? error.message : '请稍后重试。',
-            action: TextButton(
-              onPressed: () => ref.invalidate(pointsSummaryProvider),
-              child: const Text('重新加载'),
-            ),
+            primaryActionLabel: '重新加载',
+            onPrimaryAction: () => ref.invalidate(pointsSummaryProvider),
           ),
         ],
       ),
@@ -100,7 +99,7 @@ class _BalancePanel extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '所有积分变更都会写入流水。',
+                  '每一次奖励和兑换都会留下记录。',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.62),
                     fontFamily: AppTypography.systemFont,
@@ -138,6 +137,15 @@ class _LedgerPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (entries.isEmpty) {
+      return const MiraStateView(
+        variant: MiraStateVariant.emptyLedger,
+        title: '还没有积分流水',
+        message: '家长确认任务或兑换奖励后，积分变化会显示在这里。',
+        compact: true,
+      );
+    }
+
     return MiraSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,18 +161,6 @@ class _LedgerPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          if (entries.isEmpty)
-            const Text(
-              '暂无积分流水。家长确认任务或兑换奖励后会显示在这里。',
-              style: TextStyle(
-                color: AppColors.muted,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                height: 1.55,
-                letterSpacing: 0,
-              ),
-            ),
           for (final entry in entries)
             MiraListRow(
               icon: entry.delta >= 0
@@ -201,25 +197,7 @@ class _PointsLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            '正在同步积分',
-            style: TextStyle(
-              color: AppColors.ink,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0,
-            ),
-          ),
-          SizedBox(height: 12),
-          LinearProgressIndicator(minHeight: 3),
-        ],
-      ),
-    );
+    return const MiraLoadingState(title: '正在同步积分', message: '正在整理余额和最近的积分变化。');
   }
 }
 
@@ -241,7 +219,7 @@ void _showAdjustSheet(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '手动调整积分',
+              '补发或更正积分',
               style: TextStyle(
                 color: AppColors.ink,
                 fontFamily: AppTypography.systemFont,
@@ -252,7 +230,7 @@ void _showAdjustSheet(
             ),
             const SizedBox(height: 8),
             const Text(
-              '用于家长临时补发或扣回积分，会写入 parent_adjustment 流水。',
+              '用于家长临时补发或扣回积分，调整记录会保留在这里。',
               style: TextStyle(
                 color: AppColors.muted,
                 fontFamily: AppTypography.systemFont,
@@ -291,11 +269,13 @@ Future<void> _adjust(
   int delta,
 ) async {
   try {
-    await ref.read(pointRepositoryProvider).adjust(
-      childId: account.childId,
-      delta: delta,
-      note: delta > 0 ? '家长手动补发' : '家长更正扣回',
-    );
+    await ref
+        .read(pointRepositoryProvider)
+        .adjust(
+          childId: account.childId,
+          delta: delta,
+          note: delta > 0 ? '家长手动补发' : '家长更正扣回',
+        );
     ref.invalidate(pointsSummaryProvider);
     if (context.mounted) {
       Navigator.of(context).pop();

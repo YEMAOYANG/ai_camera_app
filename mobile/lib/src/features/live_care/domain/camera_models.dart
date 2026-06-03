@@ -35,7 +35,7 @@ class CameraHealth {
       adapter: _asString(runtime['adapter']),
       serviceLabel: _asString(data['service'], fallback: 'camera runtime'),
       message: reachable
-          ? '后端摄像头适配器可达'
+          ? '摄像头服务在线'
           : error.isNotEmpty
           ? error
           : '摄像头运行服务暂时不可用',
@@ -47,7 +47,7 @@ class CameraHealth {
     reachable: true,
     adapter: 'mock_camera_runtime',
     serviceLabel: 'Mira Camera Runtime',
-    message: '后端摄像头适配器可达',
+    message: '摄像头服务在线',
   );
 }
 
@@ -82,7 +82,7 @@ class CameraRuntime {
   String get summary {
     if (!reachable) return message;
     if (voiceRunning) return '设备正在处理语音/看护运行状态，家长可稍后刷新查看。';
-    return '设备运行正常，当前只展示后端适配器提供的 V1 基础状态。';
+    return '设备运行正常，基础看护状态已同步。';
   }
 
   static CameraRuntime fromJson(Map<String, dynamic> json) {
@@ -153,9 +153,7 @@ class LiveCareStatus {
   }
 
   String get detail {
-    return isAvailable
-        ? runtime.summary
-        : 'App 只读取后端 camera adapter 返回的状态，底层流媒体细节不进入家长端。';
+    return isAvailable ? runtime.summary : '我们暂时拿不到实时画面。请确认设备电源和家庭网络后再刷新。';
   }
 }
 

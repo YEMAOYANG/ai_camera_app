@@ -23,10 +23,10 @@ class MiraSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final box = DecoratedBox(
       decoration: BoxDecoration(
-        color: color ?? Colors.white.withValues(alpha: 0.58),
+        color: color ?? Colors.white.withValues(alpha: 0.50),
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: borderColor ?? Colors.white.withValues(alpha: 0.76),
+          color: borderColor ?? Colors.white.withValues(alpha: 0.68),
         ),
       ),
       child: Padding(padding: padding, child: child),

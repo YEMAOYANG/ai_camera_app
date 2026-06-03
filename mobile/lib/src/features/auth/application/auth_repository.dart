@@ -51,7 +51,7 @@ class AuthRepository {
   }) async {
     if (_environment.useMockData) {
       await Future<void>.delayed(const Duration(milliseconds: 420));
-      if (code.trim() != '0426') {
+      if (!RegExp(r'^\d{4,6}$').hasMatch(code.trim())) {
         throw const AuthException('验证码不正确，请重新输入', code: 'invalid_code');
       }
       final session = _mockSession(phone);

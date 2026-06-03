@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
+import 'package:mira_guardian_app/src/core/platform/native_date_picker.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
 import 'package:mira_guardian_app/src/features/setup/application/setup_repository.dart';
+import 'package:mira_guardian_app/src/features/setup/application/wifi_network_repository.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
 
 final setupDraftProvider = StateProvider<SetupDraft>((ref) {
@@ -19,10 +21,10 @@ class SetupDraft {
     this.familyRole = '管理员',
     this.deviceName = '客厅米拉',
     this.room = '客厅书桌区',
-    this.wifiName = 'Mira Home 5G',
-    this.wifiPassword = 'mira2026home',
-    this.childName = '小宇',
-    this.childBirthday = '2019-03-12',
+    this.wifiName = '',
+    this.wifiPassword = '',
+    this.childName = '',
+    this.childBirthday = '',
     this.childStage = '小学',
     this.childGrade = '一年级',
     this.emergencyName = '爸爸',
@@ -133,10 +135,12 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
               final saved = await _submitSetupStep(
                 context,
                 ref,
-                () => ref.read(setupRepositoryProvider).saveParentIdentity(
-                  displayName: draft.parentName,
-                  relationship: draft.parentIdentity,
-                ),
+                () => ref
+                    .read(setupRepositoryProvider)
+                    .saveParentIdentity(
+                      displayName: draft.parentName,
+                      relationship: draft.parentIdentity,
+                    ),
               );
               if (saved && context.mounted) {
                 context.go(setupDevicePath);
@@ -155,7 +159,7 @@ class DeviceEntrySetupScreen extends ConsumerWidget {
 
     return _SetupScreenShell(
       step: 2,
-      title: '绑定 Mira 设备',
+      title: '绑定看护设备',
       subtitle: '先确认设备和房间，摄像头绑定成功后再单独授权音视频采集。',
       leadingIcon: Icons.qr_code_scanner_outlined,
       body: Column(
@@ -163,7 +167,7 @@ class DeviceEntrySetupScreen extends ConsumerWidget {
           _SetupStatusPanel(
             icon: Icons.sensors_outlined,
             title: '已发现附近设备',
-            detail: 'Mira Camera A12 · 等待加入家庭账户',
+            detail: '待绑定设备 · 等待加入家庭账户',
             tone: _SetupTone.blue,
           ),
           const SizedBox(height: 18),
@@ -189,7 +193,7 @@ class DeviceEntrySetupScreen extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 14),
-          const _SetupNote(text: '第一版先使用扫码/发现设备的 mock 流程，不接真实蓝牙或二维码接口。'),
+          const _SetupNote(text: '当前先保存设备名称和位置，后续可继续补充扫码、蓝牙发现等绑定方式。'),
         ],
       ),
       primaryLabel: '配置 Wi-Fi',
@@ -201,10 +205,12 @@ class DeviceEntrySetupScreen extends ConsumerWidget {
               final saved = await _submitSetupStep(
                 context,
                 ref,
-                () => ref.read(setupRepositoryProvider).saveDevice(
-                  deviceName: draft.deviceName,
-                  location: draft.room,
-                ),
+                () => ref
+                    .read(setupRepositoryProvider)
+                    .saveDevice(
+                      deviceName: draft.deviceName,
+                      location: draft.room,
+                    ),
               );
               if (saved && context.mounted) {
                 context.go(setupWifiPath);
@@ -223,7 +229,16 @@ class WifiSetupScreen extends ConsumerStatefulWidget {
 
 class _WifiSetupScreenState extends ConsumerState<WifiSetupScreen> {
   var _connecting = false;
-  String? _errorText;
+  var _detectingWifi = true;
+  String? _wifiNameErrorText;
+  String? _wifiPasswordErrorText;
+  WifiNetworkResult? _wifiResult;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(_detectCurrentWifi);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -236,12 +251,25 @@ class _WifiSetupScreenState extends ConsumerState<WifiSetupScreen> {
       leadingIcon: Icons.wifi_outlined,
       body: Column(
         children: [
+          _WifiDetectionPanel(
+            detecting: _detectingWifi,
+            result: _wifiResult,
+            onRetry: _detectCurrentWifi,
+          ),
+          const SizedBox(height: 14),
+          const _SetupNote(
+            text: '请确认手机已连接要给设备使用的家庭网络。若设备提示仅支持 2.4GHz，请先切换到 2.4GHz Wi-Fi。',
+          ),
+          const SizedBox(height: 14),
           _SetupTextField(
             label: 'Wi-Fi 名称',
             value: draft.wifiName,
             icon: Icons.router_outlined,
+            errorText: _wifiNameErrorText,
             onChanged: (value) {
-              ref.read(setupDraftProvider.notifier).state = draft.copyWith(
+              setState(() => _wifiNameErrorText = null);
+              final latest = ref.read(setupDraftProvider);
+              ref.read(setupDraftProvider.notifier).state = latest.copyWith(
                 wifiName: value,
               );
             },
@@ -252,10 +280,11 @@ class _WifiSetupScreenState extends ConsumerState<WifiSetupScreen> {
             value: draft.wifiPassword,
             icon: Icons.lock_outline,
             obscureText: true,
-            errorText: _errorText,
+            errorText: _wifiPasswordErrorText,
             onChanged: (value) {
-              setState(() => _errorText = null);
-              ref.read(setupDraftProvider.notifier).state = draft.copyWith(
+              setState(() => _wifiPasswordErrorText = null);
+              final latest = ref.read(setupDraftProvider);
+              ref.read(setupDraftProvider.notifier).state = latest.copyWith(
                 wifiPassword: value,
               );
             },
@@ -287,19 +316,40 @@ class _WifiSetupScreenState extends ConsumerState<WifiSetupScreen> {
     );
   }
 
+  Future<void> _detectCurrentWifi() async {
+    setState(() => _detectingWifi = true);
+    final result = await ref.read(wifiNetworkRepositoryProvider).currentWifi();
+    if (!mounted) return;
+
+    final currentDraft = ref.read(setupDraftProvider);
+    if (result.hasSsid && currentDraft.wifiName.trim().isEmpty) {
+      ref.read(setupDraftProvider.notifier).state = currentDraft.copyWith(
+        wifiName: result.ssid,
+      );
+    }
+
+    setState(() {
+      _wifiResult = result;
+      _detectingWifi = false;
+    });
+  }
+
   Future<void> _connect(SetupDraft draft) async {
-    if (draft.wifiName.trim().isEmpty || draft.wifiPassword.length < 6) {
-      setState(() => _errorText = '请输入至少 6 位 Wi-Fi 密码');
+    if (draft.wifiName.trim().isEmpty) {
+      setState(() => _wifiNameErrorText = '请输入 Wi-Fi 名称');
+      return;
+    }
+    if (draft.wifiPassword.length < 6) {
+      setState(() => _wifiPasswordErrorText = '请输入至少 6 位 Wi-Fi 密码');
       return;
     }
 
     FocusScope.of(context).unfocus();
     setState(() => _connecting = true);
     try {
-      await ref.read(setupRepositoryProvider).saveWifi(
-        ssid: draft.wifiName,
-        password: draft.wifiPassword,
-      );
+      await ref
+          .read(setupRepositoryProvider)
+          .saveWifi(ssid: draft.wifiName, password: draft.wifiPassword);
       await Future<void>.delayed(const Duration(milliseconds: 420));
       if (!mounted) return;
       context.go(setupBindSuccessPath);
@@ -307,10 +357,55 @@ class _WifiSetupScreenState extends ConsumerState<WifiSetupScreen> {
       if (!mounted) return;
       setState(() {
         _connecting = false;
-        _errorText = error.message;
+        _wifiPasswordErrorText = error.message;
       });
       _showSetupToast(context, error.message);
     }
+  }
+}
+
+class _WifiDetectionPanel extends StatelessWidget {
+  const _WifiDetectionPanel({
+    required this.detecting,
+    required this.result,
+    required this.onRetry,
+  });
+
+  final bool detecting;
+  final WifiNetworkResult? result;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = result;
+    final title = detecting
+        ? '正在识别当前 Wi-Fi'
+        : current?.hasSsid == true
+        ? '已识别当前 Wi-Fi'
+        : '未自动识别 Wi-Fi';
+    final detail = detecting
+        ? '真机会尝试读取当前连接的家庭网络；模拟器通常无法返回真实 Wi-Fi。'
+        : current?.hasSsid == true
+        ? '${current!.ssid} · 请确认这是设备要加入的家庭网络'
+        : current?.message ?? '你可以直接手动输入 Wi-Fi 名称。';
+    final tone = detecting
+        ? _SetupTone.blue
+        : current?.hasSsid == true
+        ? _SetupTone.green
+        : _SetupTone.neutral;
+
+    return _SetupStatusPanel(
+      icon: detecting
+          ? Icons.sync_outlined
+          : current?.hasSsid == true
+          ? Icons.wifi_outlined
+          : Icons.edit_outlined,
+      title: title,
+      detail: detail,
+      tone: tone,
+      actionLabel: detecting ? null : '重新识别',
+      onAction: detecting ? null : onRetry,
+    );
   }
 }
 
@@ -357,6 +452,13 @@ class ChildProfileSetupScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final draft = ref.watch(setupDraftProvider);
+    final recommended = _educationRecommendationFromBirthday(
+      draft.childBirthday,
+    );
+    final gradeOptions = _gradesForStage(draft.childStage);
+    final selectedGrade = gradeOptions.contains(draft.childGrade)
+        ? draft.childGrade
+        : gradeOptions.first;
 
     return _SetupScreenShell(
       step: 5,
@@ -381,34 +483,57 @@ class ChildProfileSetupScreen extends ConsumerWidget {
             label: '出生日期',
             value: draft.childBirthday,
             icon: Icons.cake_outlined,
-            keyboardType: TextInputType.datetime,
-            onChanged: (value) {
-              ref.read(setupDraftProvider.notifier).state = draft.copyWith(
-                childBirthday: value,
-              );
+            readOnly: true,
+            suffixIcon: Icons.calendar_month_outlined,
+            onTap: () async {
+              FocusScope.of(context).unfocus();
+              final picked = await _pickBirthday(context, draft.childBirthday);
+              if (picked == null || !context.mounted) return;
+
+              final value = _formatBirthday(picked);
+              final latest = ref.read(setupDraftProvider);
+              final next = _educationRecommendationFromBirthday(value);
+              ref.read(setupDraftProvider.notifier).state = next == null
+                  ? latest.copyWith(childBirthday: value)
+                  : latest.copyWith(
+                      childBirthday: value,
+                      childStage: next.stage,
+                      childGrade: next.grade,
+                    );
             },
+            onChanged: (_) {},
           ),
+          if (recommended != null) ...[
+            const SizedBox(height: 12),
+            _SetupStatusPanel(
+              icon: Icons.auto_awesome_outlined,
+              title: '已根据生日推荐',
+              detail: '${recommended.stage} · ${recommended.grade}，你也可以手动调整。',
+              tone: _SetupTone.blue,
+            ),
+          ],
           const SizedBox(height: 18),
           _ChoiceGrid(
             label: '就读阶段',
             options: const ['幼儿园', '小学', '初中'],
             selected: draft.childStage,
             onSelect: (value) {
+              final next = _educationRecommendationFromBirthday(
+                draft.childBirthday,
+              );
               ref.read(setupDraftProvider.notifier).state = draft.copyWith(
                 childStage: value,
-                childGrade: value == '幼儿园'
-                    ? '大班'
-                    : value == '小学'
-                    ? '一年级'
-                    : '七年级',
+                childGrade: next != null && next.stage == value
+                    ? next.grade
+                    : _defaultGradeForStage(value),
               );
             },
           ),
           const SizedBox(height: 18),
           _ChoiceGrid(
             label: '年级',
-            options: _gradesForStage(draft.childStage),
-            selected: draft.childGrade,
+            options: gradeOptions,
+            selected: selectedGrade,
             onSelect: (value) {
               ref.read(setupDraftProvider.notifier).state = draft.copyWith(
                 childGrade: value,
@@ -416,7 +541,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 14),
-          const _SetupNote(text: '系统会根据生日和学段推荐任务模板，档案页不展示作息建议等中间参数。'),
+          const _SetupNote(text: '系统会根据生日、当前学年和学段推荐任务模板，档案页不展示作息建议等中间参数。'),
         ],
       ),
       primaryLabel: '设置紧急联系人',
@@ -426,12 +551,14 @@ class ChildProfileSetupScreen extends ConsumerWidget {
               final saved = await _submitSetupStep(
                 context,
                 ref,
-                () => ref.read(setupRepositoryProvider).saveChild(
-                  name: draft.childName,
-                  nickname: draft.childName,
-                  ageStage: '${draft.childStage} ${draft.childGrade}',
-                  birthday: draft.childBirthday,
-                ),
+                () => ref
+                    .read(setupRepositoryProvider)
+                    .saveChild(
+                      name: draft.childName,
+                      nickname: draft.childName,
+                      ageStage: '${draft.childStage} $selectedGrade',
+                      birthday: draft.childBirthday,
+                    ),
               );
               if (saved && context.mounted) {
                 context.go(setupEmergencyContactsPath);
@@ -440,13 +567,122 @@ class ChildProfileSetupScreen extends ConsumerWidget {
     );
   }
 
-  List<String> _gradesForStage(String stage) {
+  static List<String> _gradesForStage(String stage) {
     return switch (stage) {
       '幼儿园' => const ['小班', '中班', '大班'],
-      '初中' => const ['七年级', '八年级', '九年级'],
+      '初中' => const ['初一', '初二', '初三'],
       _ => const ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'],
     };
   }
+
+  static String _defaultGradeForStage(String stage) {
+    return switch (stage) {
+      '幼儿园' => '大班',
+      '初中' => '初一',
+      _ => '一年级',
+    };
+  }
+
+  static Future<DateTime?> _pickBirthday(
+    BuildContext context,
+    String currentValue,
+  ) {
+    final now = DateTime.now();
+    final firstDate = DateTime(now.year - 18, now.month, now.day);
+    final fallbackDate = DateTime(now.year - 7, now.month, now.day);
+    final parsed = _parseBirthday(currentValue);
+    final initialDate = _clampDate(parsed ?? fallbackDate, firstDate, now);
+
+    return NativeDatePicker.pickDate(
+      title: '选择出生日期',
+      initialDate: initialDate,
+      minDate: firstDate,
+      maxDate: now,
+    );
+  }
+
+  static DateTime _clampDate(
+    DateTime value,
+    DateTime firstDate,
+    DateTime lastDate,
+  ) {
+    if (value.isBefore(firstDate)) return firstDate;
+    if (value.isAfter(lastDate)) return lastDate;
+    return value;
+  }
+
+  static String _formatBirthday(DateTime value) {
+    final month = value.month.toString().padLeft(2, '0');
+    final day = value.day.toString().padLeft(2, '0');
+    return '${value.year}-$month-$day';
+  }
+
+  static _EducationRecommendation? _educationRecommendationFromBirthday(
+    String value,
+  ) {
+    final birthday = _parseBirthday(value);
+    if (birthday == null) return null;
+
+    final now = DateTime.now();
+    final schoolYearStart = DateTime(
+      now.month >= 9 ? now.year : now.year - 1,
+      9,
+      1,
+    );
+    final age = _ageAt(birthday, schoolYearStart);
+    if (age < 0) return null;
+
+    if (age <= 5) {
+      final kindergarten = _gradesForStage('幼儿园');
+      final index = (age - 3).clamp(0, kindergarten.length - 1).toInt();
+      return _EducationRecommendation(stage: '幼儿园', grade: kindergarten[index]);
+    }
+
+    if (age <= 11) {
+      final primary = _gradesForStage('小学');
+      return _EducationRecommendation(
+        stage: '小学',
+        grade: primary[(age - 6).clamp(0, primary.length - 1).toInt()],
+      );
+    }
+
+    final junior = _gradesForStage('初中');
+    return _EducationRecommendation(
+      stage: '初中',
+      grade: junior[(age - 12).clamp(0, junior.length - 1).toInt()],
+    );
+  }
+
+  static DateTime? _parseBirthday(String value) {
+    final trimmed = value.trim();
+    final match = RegExp(r'^(\d{4})-(\d{1,2})-(\d{1,2})$').firstMatch(trimmed);
+    if (match == null) return null;
+
+    final year = int.tryParse(match.group(1)!);
+    final month = int.tryParse(match.group(2)!);
+    final day = int.tryParse(match.group(3)!);
+    if (year == null || month == null || day == null) return null;
+
+    final parsed = DateTime(year, month, day);
+    if (parsed.year != year || parsed.month != month || parsed.day != day) {
+      return null;
+    }
+    return parsed;
+  }
+
+  static int _ageAt(DateTime birthday, DateTime date) {
+    var age = date.year - birthday.year;
+    final birthdayThisYear = DateTime(date.year, birthday.month, birthday.day);
+    if (birthdayThisYear.isAfter(date)) age -= 1;
+    return age;
+  }
+}
+
+class _EducationRecommendation {
+  const _EducationRecommendation({required this.stage, required this.grade});
+
+  final String stage;
+  final String grade;
 }
 
 class EmergencyContactsSetupScreen extends ConsumerStatefulWidget {
@@ -526,11 +762,13 @@ class _EmergencyContactsSetupScreenState
 
     setState(() => _saving = true);
     try {
-      await ref.read(setupRepositoryProvider).saveContacts(
-        name: draft.emergencyName,
-        phone: draft.emergencyPhone,
-        relationship: 'guardian',
-      );
+      await ref
+          .read(setupRepositoryProvider)
+          .saveContacts(
+            name: draft.emergencyName,
+            phone: draft.emergencyPhone,
+            relationship: 'guardian',
+          );
       final status = await ref.read(setupRepositoryProvider).complete();
       await Future<void>.delayed(const Duration(milliseconds: 320));
       if (!mounted) return;
@@ -951,6 +1189,9 @@ class _SetupTextField extends StatefulWidget {
     this.inputFormatters,
     this.errorText,
     this.obscureText = false,
+    this.readOnly = false,
+    this.onTap,
+    this.suffixIcon,
   });
 
   final String label;
@@ -961,6 +1202,9 @@ class _SetupTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final String? errorText;
   final bool obscureText;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final IconData? suffixIcon;
 
   @override
   State<_SetupTextField> createState() => _SetupTextFieldState();
@@ -1040,8 +1284,11 @@ class _SetupTextFieldState extends State<_SetupTextField> {
                       controller: _controller,
                       focusNode: _focusNode,
                       obscureText: widget.obscureText,
+                      readOnly: widget.readOnly,
+                      showCursor: widget.readOnly ? false : null,
                       keyboardType: widget.keyboardType,
                       inputFormatters: widget.inputFormatters,
+                      onTap: widget.onTap,
                       onChanged: widget.onChanged,
                       style: const TextStyle(
                         color: AppColors.ink,
@@ -1057,6 +1304,16 @@ class _SetupTextFieldState extends State<_SetupTextField> {
                       ),
                     ),
                   ),
+                  if (widget.suffixIcon != null) ...[
+                    const SizedBox(width: 8),
+                    Icon(
+                      widget.suffixIcon,
+                      color: focused
+                          ? AppColors.primaryButtonStart
+                          : const Color(0x99526579),
+                      size: 18,
+                    ),
+                  ],
                   const SizedBox(width: 12),
                 ],
               ),
@@ -1112,6 +1369,8 @@ class _SetupStatusPanel extends StatelessWidget {
     required this.title,
     required this.detail,
     required this.tone,
+    this.actionLabel,
+    this.onAction,
     super.key,
   });
 
@@ -1119,6 +1378,8 @@ class _SetupStatusPanel extends StatelessWidget {
   final String title;
   final String detail;
   final _SetupTone tone;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -1179,6 +1440,10 @@ class _SetupStatusPanel extends StatelessWidget {
                 ],
               ),
             ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(width: 8),
+              TextButton(onPressed: onAction, child: Text(actionLabel!)),
+            ],
           ],
         ),
       ),

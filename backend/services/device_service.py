@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from core.database import SQLiteDatabase
+from core.database import Database
 from core.errors import ApiError
 from integrations.hardware.base import HardwareDeviceAdapter
-from integrations.hardware.mock_adapter import MockHardwareDeviceAdapter
+from integrations.hardware.disabled_adapter import DisabledHardwareDeviceAdapter
 from repositories.device_repository import DeviceRepository
 from schemas.devices import device_payload
 from services.auth_service import AuthService
@@ -14,14 +14,14 @@ from services.auth_service import AuthService
 class DeviceService:
     def __init__(
         self,
-        db_path: str | Path,
+        database_url: str | Path,
         *,
         auth_service: AuthService,
         hardware_adapter: HardwareDeviceAdapter | None = None,
     ):
         self.auth_service = auth_service
-        self.repository = DeviceRepository(SQLiteDatabase(db_path))
-        self.hardware_adapter = hardware_adapter or MockHardwareDeviceAdapter()
+        self.repository = DeviceRepository(Database(database_url))
+        self.hardware_adapter = hardware_adapter or DisabledHardwareDeviceAdapter()
 
     def list_devices(self, access_token: str) -> dict:
         context = self._auth_context(access_token)

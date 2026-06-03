@@ -17,6 +17,7 @@ import 'package:mira_guardian_app/src/features/tasks/application/task_repository
 import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
 import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
 
@@ -76,7 +77,7 @@ class HomeScreen extends ConsumerWidget {
       return '${device.device.displayName} · $careState';
     }
     if (overview.isLoading) return '${snapshot.device.name} · 状态同步中';
-    if (overview.hasError) return '${snapshot.device.name} · 后端待恢复';
+    if (overview.hasError) return '${snapshot.device.name} · 暂未更新';
     final fallback = snapshot.device.online ? '在线看护中' : '设备离线';
     return '${snapshot.device.name} · $fallback';
   }
@@ -339,12 +340,12 @@ class _PendingQueue extends StatelessWidget {
               for (final task in pendingTasks)
                 MiraListRow(
                   icon: Icons.fact_check_outlined,
-                  title: '${task.title}待确认',
+                  title: '${task.title} 等待确认',
                   subtitle: '${task.evidenceText} · +${task.rewardPoints} 分',
                   tone: MiraListRowTone.amber,
-                  trailing: TextButton(
-                    onPressed: () => context.go('$taskDetailPath/${task.id}'),
-                    child: const Text('处理'),
+                  trailing: _HeaderAction(
+                    label: '处理',
+                    onTap: () => context.go('$taskDetailPath/${task.id}'),
                   ),
                 ),
               for (final redemption in pendingRedemptions)
@@ -354,9 +355,9 @@ class _PendingQueue extends StatelessWidget {
                   subtitle:
                       '${redemption.rewardTitle} · ${redemption.pointsCost} 分',
                   tone: MiraListRowTone.blue,
-                  trailing: TextButton(
-                    onPressed: () => context.go(rewardsPath),
-                    child: const Text('确认'),
+                  trailing: _HeaderAction(
+                    label: '确认',
+                    onTap: () => context.go(rewardsPath),
                   ),
                 ),
             ],
@@ -390,7 +391,7 @@ class _TodayPlan extends StatelessWidget {
             const SizedBox(height: 10),
             if (taskList.isEmpty)
               const Text(
-                '今天暂无任务。后端写入 tasks 后，首页会自动展示今日任务摘要。',
+                '今天暂无任务，可以先让安排轻一点，或去任务页添加新的提醒。',
                 style: TextStyle(
                   color: AppColors.muted,
                   fontFamily: AppTypography.systemFont,
@@ -477,7 +478,7 @@ class _PointsRewardsPanel extends StatelessWidget {
           if (points.hasError) ...[
             const SizedBox(height: 10),
             const Text(
-              '积分数据同步失败，任务和看护功能仍可继续使用。',
+              '积分暂时没有更新，任务和看护功能仍可继续使用。',
               style: TextStyle(
                 color: AppColors.muted,
                 fontFamily: AppTypography.systemFont,
@@ -592,7 +593,7 @@ class _AiAdvicePanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'AI 判断建议',
+                  '观察建议',
                   style: TextStyle(
                     color: AppColors.ink,
                     fontFamily: AppTypography.systemFont,
@@ -671,7 +672,7 @@ class _DeviceSummaryPanel extends StatelessWidget {
           if (health != null && !health.reachable) ...[
             const SizedBox(height: 8),
             const Text(
-              '摄像头运行服务不可达，首页已切换为降级状态。',
+              '摄像头暂时不在线，首页已切换为降级状态。',
               style: TextStyle(
                 color: AppColors.muted,
                 fontFamily: AppTypography.systemFont,
@@ -685,7 +686,7 @@ class _DeviceSummaryPanel extends StatelessWidget {
           if (deviceOverview.hasError) ...[
             const SizedBox(height: 8),
             const Text(
-              '设备接口暂时不可用，仍可进入看护页查看 camera adapter 状态。',
+              '设备状态暂时没有更新，仍可进入看护页查看最新情况。',
               style: TextStyle(
                 color: AppColors.muted,
                 fontFamily: AppTypography.systemFont,
@@ -729,8 +730,49 @@ class _SectionHeader extends StatelessWidget {
             ),
           ),
         ),
-        TextButton(onPressed: onAction, child: Text(action)),
+        _HeaderAction(label: action, onTap: onAction),
       ],
+    );
+  }
+}
+
+class _HeaderAction extends StatelessWidget {
+  const _HeaderAction({required this.label, this.onTap});
+
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Opacity(
+        opacity: enabled ? 1 : 0.62,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: enabled
+                ? Colors.white.withValues(alpha: 0.74)
+                : Colors.white.withValues(alpha: 0.42),
+            borderRadius: BorderRadius.circular(AppRadii.full),
+            border: Border.all(color: AppColors.ink.withValues(alpha: 0.05)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.ink,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -742,15 +784,16 @@ class _HomeLoadingPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionHeader(title: title, action: '同步中'),
-          const SizedBox(height: 12),
-          const LinearProgressIndicator(minHeight: 3),
-        ],
-      ),
+    final loadingTitle = switch (title) {
+      '需要你处理' => '正在整理待处理事项',
+      '今日任务摘要' => '正在整理今日任务',
+      _ => '正在同步最新内容',
+    };
+
+    return MiraLoadingState(
+      title: loadingTitle,
+      message: '正在整理最新的家庭看护信息。',
+      compact: true,
     );
   }
 }
@@ -763,25 +806,10 @@ class _HomeErrorPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionHeader(title: title, action: '异常'),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            style: const TextStyle(
-              color: AppColors.muted,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              height: 1.55,
-              letterSpacing: 0,
-            ),
-          ),
-        ],
-      ),
+    return MiraInlineState(
+      variant: MiraStateVariant.serviceUnavailable,
+      title: '$title暂时没有更新',
+      message: message,
     );
   }
 }

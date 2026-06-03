@@ -123,10 +123,13 @@ class SetupRepository {
     required String location,
     String? bindingCode,
   }) {
+    final effectiveBindingCode =
+        bindingCode ??
+        (_environment.useMockData ? 'TEST-DEVICE-DISCOVERY' : null);
     return _postStep('/setup/device', {
       'deviceName': deviceName,
       'location': location,
-      'bindingCode': bindingCode ?? 'MIRA-MOCK-DISCOVERY',
+      'bindingCode': effectiveBindingCode,
     });
   }
 
@@ -221,10 +224,7 @@ class SetupRepository {
         );
       }
     }
-    return const SetupException(
-      '后端服务暂时不可用，请确认本机后端已启动后重试。',
-      code: 'network_error',
-    );
+    return const SetupException('暂时连不上服务，请稍后再试。', code: 'network_error');
   }
 }
 

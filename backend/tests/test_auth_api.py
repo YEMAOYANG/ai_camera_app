@@ -1,39 +1,27 @@
 from __future__ import annotations
 
-import tempfile
 import unittest
-from pathlib import Path
 
 from app import create_app
+from tests.support import fresh_test_config, request_debug_code
 
 
 class AuthApiTest(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.app = create_app(
-            {
-                "TESTING": True,
-                "AUTH_DB_PATH": str(Path(self.tmp.name) / "auth.db"),
-                "AUTH_ACCESS_TOKEN_SECONDS": 1,
-                "AUTH_REFRESH_TOKEN_SECONDS": 3600,
-                "AUTH_DEV_SMS_CODE": "0426",
-            }
-        )
+        self.app = create_app(fresh_test_config(AUTH_ACCESS_TOKEN_SECONDS=1))
         self.client = self.app.test_client()
-
-    def tearDown(self):
-        self.tmp.cleanup()
 
     def test_sms_login_creates_family_and_session(self):
         sms = self.client.post("/api/auth/sms/request", json={"phone": "13800002026"})
         self.assertEqual(sms.status_code, 200)
         self.assertTrue(sms.json["codeSent"])
-        self.assertEqual(sms.json["provider"], "mock")
+        self.assertEqual(sms.json["provider"], "development")
         self.assertEqual(sms.json["deliveryStatus"], "delivered")
+        self.assertRegex(sms.json["debugCode"], r"^\d{6}$")
 
         login = self.client.post(
             "/api/auth/sms/login",
-            json={"phone": "13800002026", "code": "0426"},
+            json={"phone": "13800002026", "code": sms.json["debugCode"]},
         )
         self.assertEqual(login.status_code, 200)
         self.assertEqual(login.json["user"]["phone"], "13800002026")
@@ -48,10 +36,10 @@ class AuthApiTest(unittest.TestCase):
         self.assertEqual(session.json["family"]["id"], login.json["family"]["id"])
 
     def test_refresh_rotates_refresh_token(self):
-        self.client.post("/api/auth/sms/request", json={"phone": "13800002026"})
+        code = request_debug_code(self.client, "13800002026")
         login = self.client.post(
             "/api/auth/sms/login",
-            json={"phone": "13800002026", "code": "0426"},
+            json={"phone": "13800002026", "code": code},
         )
         old_refresh = login.json["tokens"]["refreshToken"]
 
@@ -63,7 +51,7 @@ class AuthApiTest(unittest.TestCase):
         self.assertEqual(stale.status_code, 401)
 
     def test_invalid_code_returns_clear_error(self):
-        self.client.post("/api/auth/sms/request", json={"phone": "13800002026"})
+        request_debug_code(self.client, "13800002026")
         login = self.client.post(
             "/api/auth/sms/login",
             json={"phone": "13800002026", "code": "0000"},
@@ -72,10 +60,10 @@ class AuthApiTest(unittest.TestCase):
         self.assertEqual(login.json["error"], "invalid_code")
 
     def test_logout_revokes_current_session(self):
-        self.client.post("/api/auth/sms/request", json={"phone": "13800002026"})
+        code = request_debug_code(self.client, "13800002026")
         login = self.client.post(
             "/api/auth/sms/login",
-            json={"phone": "13800002026", "code": "0426"},
+            json={"phone": "13800002026", "code": code},
         )
         tokens = login.json["tokens"]
 

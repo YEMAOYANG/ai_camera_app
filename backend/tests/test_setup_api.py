@@ -1,28 +1,15 @@
 from __future__ import annotations
 
-import tempfile
 import unittest
-from pathlib import Path
 
 from app import create_app
+from tests.support import fresh_test_config, request_debug_code
 
 
 class SetupApiTest(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.app = create_app(
-            {
-                "TESTING": True,
-                "AUTH_DB_PATH": str(Path(self.tmp.name) / "auth.db"),
-                "AUTH_ACCESS_TOKEN_SECONDS": 900,
-                "AUTH_REFRESH_TOKEN_SECONDS": 3600,
-                "AUTH_DEV_SMS_CODE": "0426",
-            }
-        )
+        self.app = create_app(fresh_test_config())
         self.client = self.app.test_client()
-
-    def tearDown(self):
-        self.tmp.cleanup()
 
     def test_setup_status_initial_state(self):
         access_token = self._login()
@@ -123,10 +110,10 @@ class SetupApiTest(unittest.TestCase):
         self.assertEqual(complete.json["error"], "setup_incomplete")
 
     def _login(self) -> str:
-        self.client.post("/api/auth/sms/request", json={"phone": "13800002026"})
+        code = request_debug_code(self.client, "13800002026")
         login = self.client.post(
             "/api/auth/sms/login",
-            json={"phone": "13800002026", "code": "0426"},
+            json={"phone": "13800002026", "code": code},
         )
         self.assertEqual(login.status_code, 200)
         return login.json["tokens"]["accessToken"]

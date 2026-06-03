@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import sqlite3
+from core.database import DatabaseRow
 
 
-def device_payload(row: sqlite3.Row) -> dict:
+def device_payload(row: DatabaseRow) -> dict:
     return {
         "id": row["id"],
         "familyId": row["family_id"],

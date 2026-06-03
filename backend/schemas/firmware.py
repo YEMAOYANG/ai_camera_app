@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import sqlite3
+from core.database import DatabaseRow
 
 
-def firmware_package_payload(row: sqlite3.Row) -> dict:
+def firmware_package_payload(row: DatabaseRow) -> dict:
     return {
         "id": row["id"],
         "version": row["version"],
@@ -14,7 +14,7 @@ def firmware_package_payload(row: sqlite3.Row) -> dict:
     }
 
 
-def firmware_job_payload(row: sqlite3.Row) -> dict:
+def firmware_job_payload(row: DatabaseRow) -> dict:
     return {
         "id": row["id"],
         "deviceId": row["device_id"],

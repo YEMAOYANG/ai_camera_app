@@ -1,27 +1,59 @@
 from __future__ import annotations
 
 
-def ai_config_payload() -> dict:
+def ai_config_payload(
+    *,
+    provider: str,
+    model: str,
+    eval_enabled: bool,
+    dev_adapters_enabled: bool,
+) -> dict:
+    provider_configured = bool(provider)
+    provider_name = provider if provider_configured else "unconfigured"
     return {
         "ok": True,
-        "providers": ["mock"],
-        "defaultModelPolicy": "development",
+        "providers": [provider_name],
+        "providerConfigured": provider_configured,
+        "defaultModelPolicy": "configured" if provider_configured else "unconfigured",
+        "defaultModel": model or None,
         "promptRegistry": "file",
+        "evalEnabled": eval_enabled,
+        "devAdaptersEnabled": dev_adapters_enabled,
     }
 
 
-def model_payloads() -> list[dict]:
+def model_payloads(*, provider: str, model: str, dev_adapters_enabled: bool) -> list[dict]:
+    if provider and model:
+        return [
+            {
+                "id": model,
+                "provider": provider,
+                "capabilities": ["text", "vision-summary", "task-summary"],
+                "status": "configured",
+            }
+        ]
+    if dev_adapters_enabled:
+        return [
+            {
+                "id": "development.guardian-v1",
+                "provider": "development",
+                "capabilities": ["text", "vision-summary", "task-summary"],
+                "status": "development",
+            }
+        ]
     return [
         {
-            "id": "mock.guardian-v1",
-            "provider": "mock",
-            "capabilities": ["text", "vision-summary", "task-summary"],
-            "status": "development",
+            "id": "unconfigured",
+            "provider": "unconfigured",
+            "capabilities": [],
+            "status": "unconfigured",
         }
     ]
 
 
-def eval_case_payloads() -> list[dict]:
+def eval_case_payloads(*, eval_enabled: bool) -> list[dict]:
+    if not eval_enabled:
+        return []
     return [
         {
             "id": "task-observation-summary-basic",

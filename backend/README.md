@@ -1,21 +1,17 @@
-# Mira Guardian App Backend
+# AI Camera Parent App Backend
 
-This lightweight backend is the parent-app API boundary. It owns app auth/session
-state and proxies selected camera runtime endpoints to the existing
-`ai_camera_test` Flask service.
+This backend is the parent-app API boundary. It owns app auth/session state,
+first setup, tasks, points, rewards, device status, prompt registry, and reserved
+camera/AI/OTA boundaries.
 
-It intentionally does not copy or replace the camera runtime. Keep RTSP, go2rtc,
-voice wake, camera speaker, monitor workers, and prompt policy in:
+It intentionally does not expose RTSP, go2rtc, device private protocols, SMS
+provider details, AI provider keys, or raw prompts to Flutter. Camera and
+hardware integrations must stay behind backend adapters.
 
-```text
-/Users/sqcopenclaw/.openclaw/workspace/ai_camera_test
-```
-
-Default ports:
+Local default port:
 
 ```text
-Mira app backend:        http://127.0.0.1:8000
-ai_camera_test backend:  http://127.0.0.1:8767
+App backend: http://127.0.0.1:8000
 ```
 
 Install and run:
@@ -23,8 +19,35 @@ Install and run:
 ```sh
 cd backend
 python3 -m pip install -r requirements.txt
+cp .env.example .env
+python3 scripts/migrate.py
 python3 app.py
 ```
+
+Production runtime expects a MySQL-compatible database. Create the database and
+grant an application user before starting the service:
+
+```sql
+CREATE DATABASE IF NOT EXISTS ai_camera_app_dev
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+CREATE DATABASE IF NOT EXISTS ai_camera_app_test
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+CREATE USER IF NOT EXISTS 'ai_camera_app'@'localhost'
+  IDENTIFIED BY 'replace-with-a-strong-password';
+
+GRANT ALL PRIVILEGES ON ai_camera_app_dev.* TO 'ai_camera_app'@'localhost';
+GRANT ALL PRIVILEGES ON ai_camera_app_test.* TO 'ai_camera_app'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Development manual debugging uses `ai_camera_app_dev`. Unit tests use
+`ai_camera_app_test` and reset it. Production must set `APP_DATABASE_URL`
+explicitly to a production database; the backend does not provide a production
+fallback database URL.
 
 Run tests:
 
@@ -33,18 +56,32 @@ cd backend
 python3 -m unittest discover -s tests -v
 ```
 
+Tests use the isolated MySQL database configured by `APP_TEST_DATABASE_URL`
+or the default local `ai_camera_app_test` database. The test runner resets that
+database before each test case and then applies migrations. Development,
+test, staging, and production all use MySQL.
+
 Environment:
 
 ```text
-MIRA_AUTH_DEV_SMS_CODE=0426
-MIRA_AUTH_ACCESS_SECONDS=900
-MIRA_AUTH_REFRESH_SECONDS=2592000
-MIRA_CAMERA_BACKEND_URL=http://127.0.0.1:8767
+APP_ENV=development
+APP_DATABASE_URL=mysql+pymysql://ai_camera_app:ai_camera_app_dev@127.0.0.1:3306/ai_camera_app_dev?charset=utf8mb4
+APP_TEST_DATABASE_URL=mysql+pymysql://ai_camera_app:ai_camera_app_dev@127.0.0.1:3306/ai_camera_app_test?charset=utf8mb4
+APP_AUTH_ACCESS_SECONDS=900
+APP_AUTH_REFRESH_SECONDS=2592000
+APP_ENABLE_DEV_ADAPTERS=1
+APP_SMS_PROVIDER=development
+APP_HARDWARE_ADAPTER=disabled
+APP_CAMERA_RUNTIME_ADAPTER=disabled
+APP_AI_PROVIDER=
+APP_AI_MODEL=
 ```
 
-Auth uses an `SmsProvider` abstraction. The default implementation is
-`MockSmsProvider`, which keeps the dev verification code stable while reserving
-room for Aliyun, Tencent Cloud, Ronglian, Twilio, or another SMS provider.
+Auth uses an `SmsProvider` abstraction. `DevelopmentSmsProvider` is allowed only
+in development/test with `APP_ENABLE_DEV_ADAPTERS=1`; it generates a random
+6-digit code and returns it in the API response for local development. Production
+must configure a real SMS provider; otherwise SMS login returns a clear
+provider-not-configured error.
 
 Setup V1 is available after login:
 
@@ -59,8 +96,8 @@ POST /api/setup/complete
 ```
 
 All setup APIs require `Authorization: Bearer <accessToken>`. Setup data is
-stored in SQLite and returns the next onboarding step so Flutter can resume the
-flow after restart.
+stored in the configured production database and returns the next onboarding
+step so Flutter can resume the flow after restart.
 
 Tasks, points, rewards, and redemptions V1 are available after login:
 
@@ -123,12 +160,17 @@ Firmware / OTA
   POST /api/firmware/jobs
 ```
 
-Camera access is wrapped by `CameraRuntimeAdapter`. The current implementation
-can bridge the old `ai_camera_test` backend, but public App contracts never
-return RTSP URLs, go2rtc URLs, old project paths, provider keys, or raw prompt
-files. Device status is wrapped by `HardwareDeviceAdapter`; V1 uses a mock
-adapter and reserves room for future self-developed hardware. OTA creates
-scheduled mock jobs only; it does not upload, sign, roll out, execute, or verify
+Camera access is wrapped by `CameraRuntimeAdapter`. The development/test profile
+may opt in to `APP_CAMERA_RUNTIME_ADAPTER=ai_camera_test` with
+`APP_CAMERA_BACKEND_URL`, but this bridge is not a production path. Production
+defaults to `disabled` until a real camera runtime adapter is configured. Public
+App contracts never return RTSP URLs, go2rtc URLs, old project paths, provider
+keys, or raw prompt files.
+
+Device status is wrapped by `HardwareDeviceAdapter`. Production defaults to
+`disabled_hardware_device` until a real hardware adapter is configured. The
+mock hardware adapter is development/test only. OTA creates scheduled V1
+boundary jobs only; it does not upload, sign, roll out, execute, or verify
 firmware on a real device.
 
 Prompt files live under `backend/prompts/` and are referenced by
@@ -146,10 +188,12 @@ backend/
   core/                   # config, database, errors, security helpers
   routes/api/v1/          # HTTP route layer
   services/               # business orchestration
-  repositories/           # SQLite and file-backed data access
+  repositories/           # database and file-backed data access
   models/                 # internal dataclasses
   schemas/                # request/response shaping and validation helpers
   prompts/                # versioned prompt files
+  migrations/             # MySQL SQL migrations
+  scripts/migrate.py      # migration runner
   tests/                  # unittest coverage
 ```
 
@@ -158,12 +202,15 @@ Layering rules:
 - Routes parse HTTP input and return HTTP responses only.
 - Services own product behavior and call repositories/providers.
 - Repositories own SQL or filesystem access.
-- SQLite remains acceptable for V1, but route handlers must not write SQL.
+- All environments use MySQL through `APP_DATABASE_URL` or
+  `APP_TEST_DATABASE_URL`.
+- Development, test, staging, and production should run migrations instead of
+  relying on runtime schema creation.
 - `tasks` is the only task/plan module. Do not add a separate day-plan domain.
 - Flutter must call backend APIs rather than RTSP, go2rtc, SMS providers, AI
   provider keys, or raw prompt files directly.
 
-Current SQLite tables:
+Current database tables:
 
 ```text
 families

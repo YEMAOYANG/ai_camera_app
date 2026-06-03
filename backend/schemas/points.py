@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import sqlite3
+from core.database import DatabaseRow
 
 
-def point_account_payload(row: sqlite3.Row) -> dict:
+def point_account_payload(row: DatabaseRow) -> dict:
     return {
         "familyId": row["family_id"],
         "childId": row["child_id"],
@@ -13,7 +13,7 @@ def point_account_payload(row: sqlite3.Row) -> dict:
     }
 
 
-def point_ledger_payload(row: sqlite3.Row) -> dict:
+def point_ledger_payload(row: DatabaseRow) -> dict:
     return {
         "id": row["id"],
         "familyId": row["family_id"],

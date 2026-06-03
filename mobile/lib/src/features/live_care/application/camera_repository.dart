@@ -78,7 +78,7 @@ class CameraRepository {
         available: false,
         bytes: null,
         contentType: '',
-        message: '开发模式下未拉取真实快照',
+        message: '真实快照暂不可用',
       );
     }
 
@@ -93,14 +93,14 @@ class CameraRepository {
           available: false,
           bytes: null,
           contentType: '',
-          message: '后端未返回可用快照',
+          message: '暂时没有可用快照',
         );
       }
       return CameraSnapshotFrame(
         available: true,
         bytes: Uint8List.fromList(bytes),
         contentType: response.headers.value('content-type') ?? 'image/jpeg',
-        message: '快照已从后端代理同步',
+        message: '快照已更新',
       );
     } on DioException catch (error) {
       final data = error.response?.data;

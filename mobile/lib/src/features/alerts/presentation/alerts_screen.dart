@@ -5,6 +5,7 @@ import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider
 import 'package:mira_guardian_app/src/features/mvp/domain/mvp_models.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
 import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
 
@@ -37,14 +38,13 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
         ),
         const SizedBox(height: 14),
         if (alerts.isEmpty)
-          MiraEmptyState(
-            icon: Icons.notifications_none_outlined,
+          MiraStateView(
+            variant: MiraStateVariant.noData,
             title: '没有这类告警',
-            message: '首版只保留普通告警摘要。安全事件详情、复杂事件流留到后续版本。',
-            action: TextButton(
-              onPressed: () => setState(() => _filter = null),
-              child: const Text('查看全部'),
-            ),
+            message: '当前筛选下没有需要处理的提醒。',
+            primaryActionLabel: '查看全部',
+            onPrimaryAction: () => setState(() => _filter = null),
+            compact: true,
           )
         else
           MiraSurface(

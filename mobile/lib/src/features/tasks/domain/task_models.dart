@@ -26,8 +26,18 @@ enum GuardianTaskStatus {
         this == GuardianTaskStatus.rejected;
   }
 
-  bool get awaitsParent {
-    return this == GuardianTaskStatus.awaitingParentConfirmation;
+  bool get awaitsParent =>
+      this == GuardianTaskStatus.awaitingParentConfirmation;
+
+  bool get isDone {
+    return this == GuardianTaskStatus.completed ||
+        this == GuardianTaskStatus.confirmed;
+  }
+
+  bool get needsCare {
+    return this == GuardianTaskStatus.awaitingParentConfirmation ||
+        this == GuardianTaskStatus.rejected ||
+        this == GuardianTaskStatus.expired;
   }
 
   static GuardianTaskStatus fromValue(String value) {
@@ -35,6 +45,56 @@ enum GuardianTaskStatus {
       (status) => status.value == value,
       orElse: () => GuardianTaskStatus.pending,
     );
+  }
+}
+
+class GuardianTaskDraft {
+  const GuardianTaskDraft({
+    required this.childId,
+    required this.title,
+    required this.taskType,
+    required this.date,
+    required this.startTime,
+    required this.dueTime,
+    required this.rewardPoints,
+    required this.requiresParentConfirmation,
+    this.description = '',
+    this.scheduleType = 'one_time',
+    this.repeatRule,
+    this.priority = 3,
+  });
+
+  final String childId;
+  final String title;
+  final String description;
+  final String taskType;
+  final DateTime date;
+  final String startTime;
+  final String dueTime;
+  final String scheduleType;
+  final Object? repeatRule;
+  final int priority;
+  final int rewardPoints;
+  final bool requiresParentConfirmation;
+
+  Map<String, dynamic> toJson() {
+    final dateText = _dateText(date);
+    return {
+      'childId': childId,
+      'title': title,
+      'description': description,
+      'taskType': taskType,
+      'scheduledDate': dateText,
+      'scheduledStart': startTime,
+      'scheduledEnd': dueTime,
+      'startAt': _dateTimeText(dateText, startTime),
+      'dueAt': _dateTimeText(dateText, dueTime),
+      'scheduleType': scheduleType,
+      'repeatRule': repeatRule,
+      'priority': priority,
+      'rewardPoints': rewardPoints,
+      'requiresParentConfirmation': requiresParentConfirmation,
+    };
   }
 }
 
@@ -46,16 +106,28 @@ class GuardianTask {
     required this.title,
     required this.description,
     required this.type,
+    required this.scheduleType,
+    required this.startAt,
+    required this.dueAt,
+    required this.repeatRule,
     required this.status,
+    required this.priority,
     required this.scheduledDate,
     required this.scheduledStart,
     required this.scheduledEnd,
     required this.rewardPoints,
     required this.requiresParentConfirmation,
+    required this.completionSource,
+    required this.evidence,
     required this.evidenceSummary,
+    required this.aiObservationSummary,
     required this.rejectionReason,
+    required this.createdBy,
+    required this.createdAt,
+    required this.updatedAt,
     required this.completedAt,
     required this.confirmedAt,
+    required this.rejectedAt,
     required this.pointsGrantedAt,
   });
 
@@ -65,16 +137,28 @@ class GuardianTask {
   final String title;
   final String description;
   final String type;
+  final String scheduleType;
+  final String startAt;
+  final String dueAt;
+  final Object? repeatRule;
   final GuardianTaskStatus status;
+  final int priority;
   final String scheduledDate;
   final String scheduledStart;
   final String scheduledEnd;
   final int rewardPoints;
   final bool requiresParentConfirmation;
+  final String completionSource;
+  final Map<String, dynamic> evidence;
   final String evidenceSummary;
+  final String aiObservationSummary;
   final String rejectionReason;
+  final String createdBy;
+  final int createdAt;
+  final int updatedAt;
   final int? completedAt;
   final int? confirmedAt;
+  final int? rejectedAt;
   final int? pointsGrantedAt;
 
   String get typeLabel {
@@ -84,10 +168,22 @@ class GuardianTask {
       'housework' => '家务',
       'sleep' => '作息',
       'schoolbag' => '小书包',
+      'reading_interest' => '阅读/兴趣',
+      'sports_outdoor' => '运动/户外',
+      'custom' => '自定义',
       'checkin' => '记录',
       'parent_confirmation' => '家长确认',
       'ai_observed' => 'AI 观察',
       _ => '任务',
+    };
+  }
+
+  String get scheduleLabel {
+    return switch (scheduleType) {
+      'daily' => '每天重复',
+      'weekly' => '每周重复',
+      'weekday' => '工作日',
+      _ => '单次任务',
     };
   }
 
@@ -96,99 +192,167 @@ class GuardianTask {
       return '$scheduledStart - $scheduledEnd';
     }
     if (scheduledStart.isNotEmpty) return scheduledStart;
+    if (scheduledEnd.isNotEmpty) return '截止 $scheduledEnd';
     return scheduledDate;
   }
 
   String get durationLabel {
     if (description.isNotEmpty) return description;
-    return scheduledEnd.isNotEmpty ? '按计划执行' : '今日安排';
+    return scheduledEnd.isNotEmpty ? '按计划执行' : '当天安排';
   }
 
   String get parentDecisionLabel {
-    if (status.awaitsParent) return '待家长确认';
+    if (status.awaitsParent) return '等待你确认完成情况';
     if (status == GuardianTaskStatus.confirmed) return '家长已确认';
     if (status == GuardianTaskStatus.rejected) return '已驳回';
     if (status == GuardianTaskStatus.completed) return '已完成';
-    return '未确认';
+    if (!requiresParentConfirmation) return '完成后自动记录';
+    return '需要家长确认';
   }
 
   String get evidenceText {
     if (evidenceSummary.isNotEmpty) return evidenceSummary;
-    if (status.awaitsParent) return '任务已完成，等待家长确认后写入积分流水。';
-    return '暂无证据摘要，完成任务后会在这里显示 AI 观察和家长确认记录。';
+    final summary = evidence['summary'];
+    if (summary is String && summary.isNotEmpty) return summary;
+    if (status.awaitsParent) return '任务已完成，等待你确认后写入积分流水。';
+    return '完成后会在这里显示观察摘要和处理记录。';
+  }
+
+  String get observationText {
+    if (aiObservationSummary.isNotEmpty) return aiObservationSummary;
+    return evidenceText;
   }
 
   String get aiAdvice {
     if (status.awaitsParent) {
-      return '建议核对任务证据后再确认积分，必要时可以驳回并让孩子补充完成。';
+      return '建议先核对证据，再确认是否发放积分。';
     }
     if (status == GuardianTaskStatus.confirmed) {
       return '任务已经确认，奖励积分已写入流水。';
     }
     if (status == GuardianTaskStatus.inProgress) {
-      return '任务正在进行，保持低打扰观察，完成后再进入家长确认。';
+      return '任务进行中，保持低打扰提醒。';
     }
-    return '按孩子当前节奏推进，避免为了积分打断任务本身。';
+    if (status == GuardianTaskStatus.rejected) {
+      return rejectionReason.isNotEmpty ? rejectionReason : '证据不足，等待补充完成。';
+    }
+    return '按孩子当前节奏推进，不为了积分打断任务本身。';
   }
 
   String get nextStep {
-    if (status.awaitsParent) return '等待家长处理任务证据。';
+    if (status.awaitsParent) return '等待你处理任务证据。';
     if (status == GuardianTaskStatus.pending) return '到点后提醒孩子开始。';
     if (status == GuardianTaskStatus.inProgress) return '完成后进入家长确认。';
-    if (status == GuardianTaskStatus.rejected) return rejectionReason;
+    if (status == GuardianTaskStatus.rejected) {
+      return rejectionReason.isNotEmpty ? rejectionReason : '等待补充完成。';
+    }
+    if (status == GuardianTaskStatus.cancelled) return '任务已取消。';
     return '已进入任务记录。';
   }
 
   GuardianTask copyWith({
+    String? title,
+    String? description,
+    String? type,
+    String? scheduleType,
+    String? startAt,
+    String? dueAt,
+    Object? repeatRule,
     GuardianTaskStatus? status,
+    int? priority,
+    String? scheduledDate,
+    String? scheduledStart,
+    String? scheduledEnd,
+    int? rewardPoints,
+    bool? requiresParentConfirmation,
+    String? completionSource,
+    Map<String, dynamic>? evidence,
     String? evidenceSummary,
+    String? aiObservationSummary,
     String? rejectionReason,
     int? completedAt,
     int? confirmedAt,
+    int? rejectedAt,
     int? pointsGrantedAt,
   }) {
     return GuardianTask(
       id: id,
       familyId: familyId,
       childId: childId,
-      title: title,
-      description: description,
-      type: type,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      type: type ?? this.type,
+      scheduleType: scheduleType ?? this.scheduleType,
+      startAt: startAt ?? this.startAt,
+      dueAt: dueAt ?? this.dueAt,
+      repeatRule: repeatRule ?? this.repeatRule,
       status: status ?? this.status,
-      scheduledDate: scheduledDate,
-      scheduledStart: scheduledStart,
-      scheduledEnd: scheduledEnd,
-      rewardPoints: rewardPoints,
-      requiresParentConfirmation: requiresParentConfirmation,
+      priority: priority ?? this.priority,
+      scheduledDate: scheduledDate ?? this.scheduledDate,
+      scheduledStart: scheduledStart ?? this.scheduledStart,
+      scheduledEnd: scheduledEnd ?? this.scheduledEnd,
+      rewardPoints: rewardPoints ?? this.rewardPoints,
+      requiresParentConfirmation:
+          requiresParentConfirmation ?? this.requiresParentConfirmation,
+      completionSource: completionSource ?? this.completionSource,
+      evidence: evidence ?? this.evidence,
       evidenceSummary: evidenceSummary ?? this.evidenceSummary,
+      aiObservationSummary: aiObservationSummary ?? this.aiObservationSummary,
       rejectionReason: rejectionReason ?? this.rejectionReason,
+      createdBy: createdBy,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
       completedAt: completedAt ?? this.completedAt,
       confirmedAt: confirmedAt ?? this.confirmedAt,
+      rejectedAt: rejectedAt ?? this.rejectedAt,
       pointsGrantedAt: pointsGrantedAt ?? this.pointsGrantedAt,
     );
   }
 
   static GuardianTask fromJson(Map<String, dynamic> json) {
+    final scheduledDate = _asString(json['scheduledDate']);
+    final scheduledStart = _asString(json['scheduledStart']);
+    final scheduledEnd = _asString(json['scheduledEnd']);
     return GuardianTask(
-      id: _asString(json['id']),
+      id: _asString(json['taskId'], fallback: _asString(json['id'])),
       familyId: _asString(json['familyId']),
       childId: _asString(json['childId']),
       title: _asString(json['title'], fallback: '未命名任务'),
       description: _asString(json['description']),
-      type: _asString(json['type'], fallback: 'learning'),
+      type: _asString(
+        json['taskType'],
+        fallback: _asString(json['type'], fallback: 'learning'),
+      ),
+      scheduleType: _asString(json['scheduleType'], fallback: 'one_time'),
+      startAt: _asString(
+        json['startAt'],
+        fallback: _dateTimeText(scheduledDate, scheduledStart),
+      ),
+      dueAt: _asString(
+        json['dueAt'],
+        fallback: _dateTimeText(scheduledDate, scheduledEnd),
+      ),
+      repeatRule: json['repeatRule'],
       status: GuardianTaskStatus.fromValue(_asString(json['status'])),
-      scheduledDate: _asString(json['scheduledDate']),
-      scheduledStart: _asString(json['scheduledStart']),
-      scheduledEnd: _asString(json['scheduledEnd']),
+      priority: _asInt(json['priority'], fallback: 3),
+      scheduledDate: scheduledDate,
+      scheduledStart: scheduledStart,
+      scheduledEnd: scheduledEnd,
       rewardPoints: _asInt(json['rewardPoints']),
-      requiresParentConfirmation:
-          json['requiresParentConfirmation'] is bool
+      requiresParentConfirmation: json['requiresParentConfirmation'] is bool
           ? json['requiresParentConfirmation'] as bool
           : true,
+      completionSource: _asString(json['completionSource']),
+      evidence: _asMap(json['evidence']),
       evidenceSummary: _asString(json['evidenceSummary']),
+      aiObservationSummary: _asString(json['aiObservationSummary']),
       rejectionReason: _asString(json['rejectionReason']),
+      createdBy: _asString(json['createdBy']),
+      createdAt: _asInt(json['createdAt']),
+      updatedAt: _asInt(json['updatedAt']),
       completedAt: _asNullableInt(json['completedAt']),
       confirmedAt: _asNullableInt(json['confirmedAt']),
+      rejectedAt: _asNullableInt(json['rejectedAt']),
       pointsGrantedAt: _asNullableInt(json['pointsGrantedAt']),
     );
   }
@@ -196,21 +360,35 @@ class GuardianTask {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'taskId': id,
       'familyId': familyId,
       'childId': childId,
       'title': title,
       'description': description,
       'type': type,
+      'taskType': type,
+      'scheduleType': scheduleType,
+      'startAt': startAt,
+      'dueAt': dueAt,
+      'repeatRule': repeatRule,
       'status': status.value,
+      'priority': priority,
       'scheduledDate': scheduledDate,
       'scheduledStart': scheduledStart,
       'scheduledEnd': scheduledEnd,
       'rewardPoints': rewardPoints,
       'requiresParentConfirmation': requiresParentConfirmation,
+      'completionSource': completionSource,
+      'evidence': evidence,
       'evidenceSummary': evidenceSummary,
+      'aiObservationSummary': aiObservationSummary,
       'rejectionReason': rejectionReason,
+      'createdBy': createdBy,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
       'completedAt': completedAt,
       'confirmedAt': confirmedAt,
+      'rejectedAt': rejectedAt,
       'pointsGrantedAt': pointsGrantedAt,
     };
   }
@@ -220,11 +398,11 @@ String _asString(dynamic value, {String fallback = ''}) {
   return value is String && value.isNotEmpty ? value : fallback;
 }
 
-int _asInt(dynamic value) {
+int _asInt(dynamic value, {int fallback = 0}) {
   if (value is int) return value;
   if (value is num) return value.toInt();
-  if (value is String) return int.tryParse(value) ?? 0;
-  return 0;
+  if (value is String) return int.tryParse(value) ?? fallback;
+  return fallback;
 }
 
 int? _asNullableInt(dynamic value) {
@@ -233,4 +411,21 @@ int? _asNullableInt(dynamic value) {
   if (value is num) return value.toInt();
   if (value is String) return int.tryParse(value);
   return null;
+}
+
+Map<String, dynamic> _asMap(dynamic value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return Map<String, dynamic>.from(value);
+  return <String, dynamic>{};
+}
+
+String _dateText(DateTime date) {
+  final month = date.month.toString().padLeft(2, '0');
+  final day = date.day.toString().padLeft(2, '0');
+  return '${date.year}-$month-$day';
+}
+
+String _dateTimeText(String date, String time) {
+  if (date.isEmpty || time.isEmpty) return '';
+  return '${date}T$time:00';
 }

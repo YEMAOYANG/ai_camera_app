@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import json
-import tempfile
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
 
 from app import create_app
+from tests.support import fresh_test_config, request_debug_code
 
 
 class _CameraRuntimeHandler(BaseHTTPRequestHandler):
@@ -38,20 +37,16 @@ class _CameraRuntimeHandler(BaseHTTPRequestHandler):
 
 class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
         self.camera_server = ThreadingHTTPServer(("127.0.0.1", 0), _CameraRuntimeHandler)
         self.camera_thread = threading.Thread(target=self.camera_server.serve_forever, daemon=True)
         self.camera_thread.start()
         self.camera_url = f"http://127.0.0.1:{self.camera_server.server_port}"
         self.app = create_app(
-            {
-                "TESTING": True,
-                "AUTH_DB_PATH": str(Path(self.tmp.name) / "auth.db"),
-                "AUTH_ACCESS_TOKEN_SECONDS": 900,
-                "AUTH_REFRESH_TOKEN_SECONDS": 3600,
-                "AUTH_DEV_SMS_CODE": "0426",
-                "CAMERA_BACKEND_URL": self.camera_url,
-            }
+            fresh_test_config(
+                HARDWARE_ADAPTER="mock",
+                CAMERA_RUNTIME_ADAPTER="ai_camera_test",
+                CAMERA_BACKEND_URL=self.camera_url,
+            )
         )
         self.client = self.app.test_client()
         self.access_token = self._login()
@@ -60,7 +55,6 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
     def tearDown(self):
         self.camera_server.shutdown()
         self.camera_server.server_close()
-        self.tmp.cleanup()
 
     def test_devices_status_mock(self):
         devices = self.client.get("/api/devices", headers=self._auth_headers())
@@ -87,11 +81,10 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(reachable.json["cameraRuntime"]["data"]["service"], "fake-camera-runtime")
 
         unreachable_app = create_app(
-            {
-                "TESTING": True,
-                "AUTH_DB_PATH": str(Path(self.tmp.name) / "unreachable.db"),
-                "CAMERA_BACKEND_URL": "http://127.0.0.1:1",
-            }
+            fresh_test_config(
+                CAMERA_RUNTIME_ADAPTER="ai_camera_test",
+                CAMERA_BACKEND_URL="http://127.0.0.1:1",
+            )
         )
         unreachable = unreachable_app.test_client().get("/api/camera/health")
         self.assertEqual(unreachable.status_code, 502)
@@ -104,7 +97,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
 
         models = self.client.get("/api/ai/models")
         self.assertEqual(models.status_code, 200)
-        self.assertEqual(models.json["models"][0]["provider"], "mock")
+        self.assertEqual(models.json["models"][0]["provider"], "development")
 
         prompts = self.client.get("/api/ai/prompts")
         self.assertEqual(prompts.status_code, 200)
@@ -141,10 +134,10 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(status_after.json["firmware"]["lastJob"]["id"], job.json["job"]["id"])
 
     def _login(self) -> str:
-        self.client.post("/api/auth/sms/request", json={"phone": "13800002026"})
+        code = request_debug_code(self.client, "13800002026")
         login = self.client.post(
             "/api/auth/sms/login",
-            json={"phone": "13800002026", "code": "0426"},
+            json={"phone": "13800002026", "code": code},
         )
         self.assertEqual(login.status_code, 200)
         return login.json["tokens"]["accessToken"]

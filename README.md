@@ -26,7 +26,7 @@ flutter test
 
 ## App 后端接口
 
-当前仓库已新增 `backend/` 作为家长端 App 的轻量接口服务，先承载手机号验证码登录、access/refresh token 登录态、session 查询、退出登录，以及对原摄像头测试后端的 bridge。
+当前仓库已新增 `backend/` 作为家长端 App 的接口服务，承载手机号验证码登录、access/refresh token 登录态、session 查询、首次设置、任务、积分、奖励、设备状态，以及摄像头/AI/OTA 的后端 adapter 边界。
 
 后端启动：
 
@@ -36,7 +36,7 @@ python3 -m pip install -r requirements.txt
 python3 app.py
 ```
 
-接口说明见 [docs/backend_api.md](docs/backend_api.md)。摄像头底层运行能力仍保留在原测试后端 `/Users/sqcopenclaw/.openclaw/workspace/ai_camera_test`，当前 App 后端通过 adapter/bridge 读取或代理必要状态；Flutter 只调用 App 后端接口，不直接接触底层流媒体或硬件私有协议。
+接口说明见 [docs/backend_api.md](docs/backend_api.md)。Flutter 只调用 App 后端接口，不直接接触底层流媒体、RTSP/go2rtc、硬件私有协议、短信供应商或 AI provider key。旧测试运行时只能作为 development/test adapter 显式启用，不能成为 production 主路径。
 
 ## App 定位
 
@@ -575,7 +575,7 @@ App
 7. 奖励列表、奖励详情、兑换、取消兑换、手动标记兑现。
 8. 实时看护基础入口：camera health、runtime、snapshot/stream 边界；真实流不可用时降级展示。
 9. 我的/设置页：家庭、孩子、设备基础信息，积分/奖励、用户协议、隐私政策入口。
-10. 后端 V1 边界：Mock SMS provider、prompt registry / AI config、firmware/OTA reserved API。
+10. 后端 V1 边界：SmsProvider 抽象、prompt registry / AI config、firmware/OTA reserved API。
 
 V1 只做结构预留或轻量摘要，不实现完整业务闭环：
 
@@ -717,7 +717,6 @@ dependencies:
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
   shared_preferences: ^2.5.0
-  sqflite: ^2.4.0
   fl_chart: ^1.2.0
   cached_network_image: ^3.4.0
   flutter_local_notifications: ^19.5.0

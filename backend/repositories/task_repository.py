@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-import sqlite3
 import uuid
 from contextlib import contextmanager
 from typing import Iterator
 
-from core.database import SQLiteDatabase
+from core.database import Database, DatabaseConnection, DatabaseRow
 from models.tasks import (
     TASK_AWAITING_PARENT_CONFIRMATION,
+    TASK_COMPLETED,
     TASK_CONFIRMED,
     TASK_PENDING,
     TASK_REJECTED,
@@ -15,45 +15,56 @@ from models.tasks import (
 
 
 class TaskRepository:
-    def __init__(self, database: SQLiteDatabase):
+    def __init__(self, database: Database):
         self.database = database
         self.ensure_schema()
 
     @contextmanager
-    def transaction(self) -> Iterator[sqlite3.Connection]:
+    def transaction(self) -> Iterator[DatabaseConnection]:
         with self.database.transaction() as conn:
             yield conn
 
     def ensure_schema(self) -> None:
+        if not self.database.allow_runtime_schema_creation:
+            return
         with self.transaction() as conn:
             conn.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS tasks (
-                  id TEXT PRIMARY KEY,
-                  family_id TEXT NOT NULL,
-                  child_id TEXT NOT NULL,
-                  title TEXT NOT NULL,
+                  id VARCHAR(255) PRIMARY KEY,
+                  family_id VARCHAR(255) NOT NULL,
+                  child_id VARCHAR(255) NOT NULL,
+                  title VARCHAR(255) NOT NULL,
                   description TEXT,
-                  type TEXT NOT NULL,
-                  status TEXT NOT NULL,
-                  scheduled_date TEXT NOT NULL,
-                  scheduled_start TEXT,
-                  scheduled_end TEXT,
+                  type VARCHAR(255) NOT NULL,
+                  status VARCHAR(255) NOT NULL,
+                  scheduled_date VARCHAR(255) NOT NULL,
+                  scheduled_start VARCHAR(255),
+                  scheduled_end VARCHAR(255),
+                  schedule_type VARCHAR(255) NOT NULL DEFAULT 'one_time',
+                  start_at VARCHAR(255),
+                  due_at VARCHAR(255),
+                  repeat_rule TEXT,
+                  priority INTEGER NOT NULL DEFAULT 3,
                   reward_points INTEGER NOT NULL DEFAULT 0,
                   requires_parent_confirmation INTEGER NOT NULL DEFAULT 1,
+                  completion_source VARCHAR(255),
+                  evidence TEXT,
                   evidence_summary TEXT,
+                  ai_observation_summary TEXT,
                   rejection_reason TEXT,
-                  created_at INTEGER NOT NULL,
-                  updated_at INTEGER NOT NULL,
-                  completed_at INTEGER,
-                  confirmed_at INTEGER,
-                  rejected_at INTEGER,
-                  points_granted_at INTEGER
+                  created_by VARCHAR(255),
+                  created_at BIGINT NOT NULL,
+                  updated_at BIGINT NOT NULL,
+                  completed_at BIGINT,
+                  confirmed_at BIGINT,
+                  rejected_at BIGINT,
+                  points_granted_at BIGINT
                 );
                 """
             )
 
-    def child_exists(self, conn: sqlite3.Connection, *, family_id: str, child_id: str) -> bool:
+    def child_exists(self, conn: DatabaseConnection, *, family_id: str, child_id: str) -> bool:
         row = conn.execute(
             "SELECT id FROM children WHERE family_id = ? AND id = ?",
             (family_id, child_id),
@@ -62,7 +73,7 @@ class TaskRepository:
 
     def create_task(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         child_id: str,
@@ -72,19 +83,28 @@ class TaskRepository:
         scheduled_date: str,
         scheduled_start: str | None,
         scheduled_end: str | None,
+        schedule_type: str,
+        start_at: str | None,
+        due_at: str | None,
+        repeat_rule: str | None,
+        priority: int,
         reward_points: int,
         requires_parent_confirmation: bool,
+        ai_observation_summary: str | None,
+        created_by: str | None,
         now: int,
-    ) -> sqlite3.Row:
+    ) -> DatabaseRow:
         task_id = f"task_{uuid.uuid4().hex}"
         conn.execute(
             """
             INSERT INTO tasks(
               id, family_id, child_id, title, description, type, status,
-              scheduled_date, scheduled_start, scheduled_end, reward_points,
-              requires_parent_confirmation, created_at, updated_at
+              scheduled_date, scheduled_start, scheduled_end, schedule_type,
+              start_at, due_at, repeat_rule, priority, reward_points,
+              requires_parent_confirmation, ai_observation_summary, created_by,
+              created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 task_id,
@@ -97,8 +117,15 @@ class TaskRepository:
                 scheduled_date,
                 scheduled_start,
                 scheduled_end,
+                schedule_type,
+                start_at,
+                due_at,
+                repeat_rule,
+                priority,
                 reward_points,
                 int(requires_parent_confirmation),
+                ai_observation_summary,
+                created_by,
                 now,
                 now,
             ),
@@ -107,13 +134,15 @@ class TaskRepository:
 
     def list_tasks(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         child_id: str | None = None,
         scheduled_date: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
         status: str | None = None,
-    ) -> list[sqlite3.Row]:
+    ) -> list[DatabaseRow]:
         clauses = ["family_id = ?"]
         values: list[str] = [family_id]
         if child_id:
@@ -122,6 +151,12 @@ class TaskRepository:
         if scheduled_date:
             clauses.append("scheduled_date = ?")
             values.append(scheduled_date)
+        if start_date:
+            clauses.append("scheduled_date >= ?")
+            values.append(start_date)
+        if end_date:
+            clauses.append("scheduled_date <= ?")
+            values.append(end_date)
         if status:
             clauses.append("status = ?")
             values.append(status)
@@ -138,11 +173,11 @@ class TaskRepository:
 
     def get_task(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         task_id: str,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         return conn.execute(
             "SELECT * FROM tasks WHERE family_id = ? AND id = ?",
             (family_id, task_id),
@@ -150,13 +185,13 @@ class TaskRepository:
 
     def update_task(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         task_id: str,
         fields: dict,
         now: int,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         if not fields:
             return self.get_task(conn, family_id=family_id, task_id=task_id)
         assignments = [f"{column} = ?" for column in fields]
@@ -173,32 +208,55 @@ class TaskRepository:
 
     def mark_completed(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         task_id: str,
         evidence_summary: str | None,
+        completion_source: str | None,
+        evidence: str | None,
+        ai_observation_summary: str | None,
+        requires_parent_confirmation: bool,
         now: int,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
+        next_status = (
+            TASK_AWAITING_PARENT_CONFIRMATION
+            if requires_parent_confirmation
+            else TASK_COMPLETED
+        )
         conn.execute(
             """
             UPDATE tasks
-            SET status = ?, evidence_summary = COALESCE(?, evidence_summary),
+            SET status = ?,
+              evidence_summary = COALESCE(?, evidence_summary),
+              completion_source = COALESCE(?, completion_source),
+              evidence = COALESCE(?, evidence),
+              ai_observation_summary = COALESCE(?, ai_observation_summary),
               completed_at = ?, updated_at = ?
             WHERE family_id = ? AND id = ?
             """,
-            (TASK_AWAITING_PARENT_CONFIRMATION, evidence_summary, now, now, family_id, task_id),
+            (
+                next_status,
+                evidence_summary,
+                completion_source,
+                evidence,
+                ai_observation_summary,
+                now,
+                now,
+                family_id,
+                task_id,
+            ),
         )
         return self.get_task(conn, family_id=family_id, task_id=task_id)
 
     def mark_confirmed(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         task_id: str,
         now: int,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         conn.execute(
             """
             UPDATE tasks
@@ -211,12 +269,12 @@ class TaskRepository:
 
     def mark_points_granted(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         task_id: str,
         now: int,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         conn.execute(
             """
             UPDATE tasks
@@ -229,13 +287,13 @@ class TaskRepository:
 
     def mark_rejected(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         task_id: str,
         reason: str | None,
         now: int,
-    ) -> sqlite3.Row | None:
+    ) -> DatabaseRow | None:
         conn.execute(
             """
             UPDATE tasks

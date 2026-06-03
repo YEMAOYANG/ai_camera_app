@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from core.database import SQLiteDatabase
+from core.database import Database
 from core.errors import ApiError
 from core.security import now_ms
 from repositories.setup_repository import SetupRepository
@@ -14,12 +14,12 @@ from services.auth_service import AuthService
 class SetupService:
     def __init__(
         self,
-        db_path: str | Path,
+        database_url: str | Path,
         *,
         auth_service: AuthService,
     ):
         self.auth_service = auth_service
-        self.repository = SetupRepository(SQLiteDatabase(db_path))
+        self.repository = SetupRepository(Database(database_url))
 
     def status(self, access_token: str) -> dict:
         context = self._auth_context(access_token)

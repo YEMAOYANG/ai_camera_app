@@ -1,30 +1,17 @@
 from __future__ import annotations
 
-import tempfile
 import unittest
-from pathlib import Path
 
 from app import create_app
+from tests.support import fresh_test_config, request_debug_code
 
 
 class TasksPointsRewardsApiTest(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.app = create_app(
-            {
-                "TESTING": True,
-                "AUTH_DB_PATH": str(Path(self.tmp.name) / "auth.db"),
-                "AUTH_ACCESS_TOKEN_SECONDS": 900,
-                "AUTH_REFRESH_TOKEN_SECONDS": 3600,
-                "AUTH_DEV_SMS_CODE": "0426",
-            }
-        )
+        self.app = create_app(fresh_test_config())
         self.client = self.app.test_client()
         self.access_token = self._login("13800002026")
         self.child_id = self._create_child("小宇")
-
-    def tearDown(self):
-        self.tmp.cleanup()
 
     def test_task_confirmation_grants_points_and_ledger(self):
         task = self._create_task(reward_points=20)
@@ -70,6 +57,177 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(ledger.status_code, 200)
         self.assertEqual(ledger.json["ledger"][0]["type"], "task_completed")
         self.assertEqual(ledger.json["ledger"][0]["delta"], 20)
+
+    def test_task_contract_supports_week_fields_and_updates(self):
+        response = self.client.post(
+            "/api/tasks",
+            json={
+                "childId": self.child_id,
+                "title": "检查小书包",
+                "description": "按明天课程准备材料",
+                "taskType": "schoolbag",
+                "scheduleType": "weekly",
+                "startAt": "2026-06-03T20:10:00",
+                "dueAt": "2026-06-03T20:30:00",
+                "repeatRule": {"freq": "weekly", "days": [3]},
+                "priority": 2,
+                "rewardPoints": 4,
+                "requiresParentConfirmation": True,
+                "aiObservationSummary": "摄像头会在睡前观察桌面和书包区域。",
+            },
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        task = response.json["task"]
+        self.assertEqual(task["taskId"], task["id"])
+        self.assertEqual(task["taskType"], "schoolbag")
+        self.assertEqual(task["scheduleType"], "weekly")
+        self.assertEqual(task["scheduledDate"], "2026-06-03")
+        self.assertEqual(task["scheduledStart"], "20:10")
+        self.assertEqual(task["priority"], 2)
+        self.assertEqual(task["repeatRule"]["freq"], "weekly")
+
+        week = self.client.get(
+            "/api/tasks",
+            query_string={
+                "childId": self.child_id,
+                "startDate": "2026-06-01",
+                "endDate": "2026-06-07",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(week.status_code, 200)
+        self.assertEqual([item["id"] for item in week.json["tasks"]], [task["id"]])
+
+        patch = self.client.patch(
+            f"/api/tasks/{task['id']}",
+            json={
+                "title": "检查小书包和美术材料",
+                "rewardPoints": 5,
+                "priority": 1,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(patch.status_code, 200)
+        self.assertEqual(patch.json["task"]["title"], "检查小书包和美术材料")
+        self.assertEqual(patch.json["task"]["rewardPoints"], 5)
+        self.assertEqual(patch.json["task"]["priority"], 1)
+
+        complete = self.client.post(
+            f"/api/tasks/{task['id']}/complete",
+            json={
+                "completionSource": "camera",
+                "evidenceSummary": "书包区截图显示材料已放入。",
+                "evidence": {"confidence": 0.86, "clips": ["snapshot_1"]},
+                "aiObservationSummary": "AI 判断材料已准备，建议家长确认。",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(complete.status_code, 200)
+        self.assertEqual(complete.json["task"]["status"], "awaiting_parent_confirmation")
+        self.assertEqual(complete.json["task"]["completionSource"], "camera")
+        self.assertEqual(complete.json["task"]["evidence"]["confidence"], 0.86)
+        self.assertEqual(
+            complete.json["task"]["aiObservationSummary"],
+            "AI 判断材料已准备，建议家长确认。",
+        )
+
+    def test_task_batch_creation_supports_day_schedule_rows(self):
+        response = self.client.post(
+            "/api/tasks/batch",
+            json={
+                "date": "2026-06-05",
+                "tasks": [
+                    {
+                        "childId": self.child_id,
+                        "title": "数学作业",
+                        "taskType": "learning",
+                        "startAt": "2026-06-05T19:00:00",
+                        "dueAt": "2026-06-05T19:30:00",
+                        "rewardPoints": 3,
+                        "requiresParentConfirmation": True,
+                    },
+                    {
+                        "childId": self.child_id,
+                        "title": "阅读",
+                        "taskType": "reading_interest",
+                        "scheduledStart": "20:00",
+                        "scheduledEnd": "20:20",
+                        "rewardPoints": 2,
+                        "requiresParentConfirmation": False,
+                    },
+                    {
+                        "childId": self.child_id,
+                        "title": "户外运动",
+                        "taskType": "sports_outdoor",
+                        "scheduledStart": "10:00",
+                        "scheduledEnd": "10:30",
+                        "rewardPoints": 4,
+                    },
+                ],
+            },
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json["tasks"]), 3)
+        self.assertEqual(response.json["tasks"][1]["taskType"], "reading_interest")
+        self.assertEqual(response.json["tasks"][1]["scheduledDate"], "2026-06-05")
+        self.assertFalse(response.json["tasks"][1]["requiresParentConfirmation"])
+
+        week = self.client.get(
+            "/api/tasks",
+            query_string={
+                "childId": self.child_id,
+                "startDate": "2026-06-05",
+                "endDate": "2026-06-05",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(week.status_code, 200)
+        self.assertEqual(len(week.json["tasks"]), 3)
+
+    def test_task_batch_creation_reports_row_error_and_rolls_back(self):
+        response = self.client.post(
+            "/api/tasks/batch",
+            json={
+                "date": "2026-06-06",
+                "tasks": [
+                    {
+                        "childId": self.child_id,
+                        "title": "阅读",
+                        "taskType": "reading_interest",
+                        "scheduledStart": "20:00",
+                        "scheduledEnd": "20:20",
+                        "rewardPoints": 2,
+                    },
+                    {
+                        "childId": self.child_id,
+                        "title": "",
+                        "taskType": "learning",
+                        "scheduledStart": "20:30",
+                        "scheduledEnd": "21:00",
+                    },
+                ],
+            },
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("第 2 项", response.json["message"])
+
+        week = self.client.get(
+            "/api/tasks",
+            query_string={
+                "childId": self.child_id,
+                "startDate": "2026-06-06",
+                "endDate": "2026-06-06",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(week.status_code, 200)
+        self.assertEqual(week.json["tasks"], [])
 
     def test_reward_redemption_spends_cancels_and_fulfills_points(self):
         task = self._create_task(reward_points=30)
@@ -166,6 +324,14 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(adjust.json["account"]["balance"], 5)
         self.assertEqual(adjust.json["ledgerEntry"]["type"], "parent_adjustment")
 
+    def test_point_account_lists_existing_child_before_any_ledger(self):
+        response = self.client.get("/api/points/account", headers=self._auth_headers())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json["accounts"]), 1)
+        self.assertEqual(response.json["accounts"][0]["childId"], self.child_id)
+        self.assertEqual(response.json["accounts"][0]["balance"], 0)
+
     def test_task_isolation_by_family(self):
         task = self._create_task(reward_points=10)
         other_token = self._login("13900002026")
@@ -194,8 +360,8 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         return response.json["task"]
 
     def _login(self, phone: str) -> str:
-        self.client.post("/api/auth/sms/request", json={"phone": phone})
-        login = self.client.post("/api/auth/sms/login", json={"phone": phone, "code": "0426"})
+        code = request_debug_code(self.client, phone)
+        login = self.client.post("/api/auth/sms/login", json={"phone": phone, "code": code})
         self.assertEqual(login.status_code, 200)
         return login.json["tokens"]["accessToken"]
 

@@ -17,25 +17,33 @@ class MiraPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final enabled = onTap != null && !loading;
     return _TapScale(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppRadii.button),
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadii.button),
             border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppColors.primaryButtonStart,
-                AppColors.primaryButtonEnd,
+                if (enabled || loading) ...[
+                  AppColors.primaryButtonStart,
+                  AppColors.primaryButtonEnd,
+                ] else ...[
+                  AppColors.muted.withValues(alpha: 0.54),
+                  AppColors.muted.withValues(alpha: 0.40),
+                ],
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryButtonShadow.withValues(alpha: 0.24),
+                color: AppColors.primaryButtonShadow.withValues(
+                  alpha: enabled || loading ? 0.24 : 0.06,
+                ),
                 blurRadius: 24,
                 offset: const Offset(0, 15),
               ),
@@ -81,7 +89,7 @@ class MiraPrimaryButton extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontFamily: AppTypography.systemFont,
                         fontSize: 15,
@@ -118,46 +126,52 @@ class MiraSecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final enabled = onTap != null;
     return _TapScale(
-      onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppRadii.buttonSecondary),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.white.withValues(alpha: 0.78),
-              Colors.white.withValues(alpha: 0.54),
+      onTap: enabled ? onTap : null,
+      child: Opacity(
+        opacity: enabled ? 1 : 0.58,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadii.buttonSecondary),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.white.withValues(alpha: 0.78),
+                Colors.white.withValues(alpha: 0.54),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(
+                  0xFF4C6685,
+                ).withValues(alpha: enabled ? 0.07 : 0.03),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
+              ),
             ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF4C6685).withValues(alpha: 0.07),
-              blurRadius: 18,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: SizedBox(
-          height: 50,
-          width: double.infinity,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  color: AppColors.ink,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0,
+          child: SizedBox(
+            height: 50,
+            width: double.infinity,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: AppColors.ink,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0,
+                  ),
                 ),
-              ),
-              if (trailing != null) ...[const SizedBox(width: 8), trailing!],
-            ],
+                if (trailing != null) ...[const SizedBox(width: 8), trailing!],
+              ],
+            ),
           ),
         ),
       ),

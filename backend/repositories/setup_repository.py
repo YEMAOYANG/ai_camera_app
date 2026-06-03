@@ -1,94 +1,95 @@
 from __future__ import annotations
 
-import sqlite3
 import uuid
 from contextlib import contextmanager
 from typing import Iterator
 
-from core.database import SQLiteDatabase
+from core.database import Database, DatabaseConnection, DatabaseRow
 from models.setup import SETUP_DONE, SETUP_PENDING, SetupProgress
 from schemas.setup import setup_progress_from_row
 
 
 class SetupRepository:
-    def __init__(self, database: SQLiteDatabase):
+    def __init__(self, database: Database):
         self.database = database
         self.ensure_schema()
 
     @contextmanager
-    def transaction(self) -> Iterator[sqlite3.Connection]:
+    def transaction(self) -> Iterator[DatabaseConnection]:
         with self.database.transaction() as conn:
             yield conn
 
     def ensure_schema(self) -> None:
+        if not self.database.allow_runtime_schema_creation:
+            return
         with self.transaction() as conn:
             conn.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS setup_progress (
-                  family_id TEXT PRIMARY KEY,
+                  family_id VARCHAR(255) PRIMARY KEY,
                   completed INTEGER NOT NULL DEFAULT 0,
-                  parent_identity_status TEXT NOT NULL DEFAULT 'pending',
-                  device_binding_status TEXT NOT NULL DEFAULT 'pending',
-                  wifi_status TEXT NOT NULL DEFAULT 'pending',
-                  child_profile_status TEXT NOT NULL DEFAULT 'pending',
-                  contacts_status TEXT NOT NULL DEFAULT 'pending',
-                  created_at INTEGER NOT NULL,
-                  updated_at INTEGER NOT NULL,
-                  completed_at INTEGER
+                  parent_identity_status VARCHAR(255) NOT NULL DEFAULT 'pending',
+                  device_binding_status VARCHAR(255) NOT NULL DEFAULT 'pending',
+                  wifi_status VARCHAR(255) NOT NULL DEFAULT 'pending',
+                  child_profile_status VARCHAR(255) NOT NULL DEFAULT 'pending',
+                  contacts_status VARCHAR(255) NOT NULL DEFAULT 'pending',
+                  created_at BIGINT NOT NULL,
+                  updated_at BIGINT NOT NULL,
+                  completed_at BIGINT
                 );
 
                 CREATE TABLE IF NOT EXISTS parent_identities (
-                  family_id TEXT PRIMARY KEY,
-                  display_name TEXT NOT NULL,
-                  relationship TEXT NOT NULL,
-                  confirmed_at INTEGER NOT NULL
+                  family_id VARCHAR(255) PRIMARY KEY,
+                  display_name VARCHAR(255) NOT NULL,
+                  relationship VARCHAR(255) NOT NULL,
+                  confirmed_at BIGINT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS devices (
-                  id TEXT PRIMARY KEY,
-                  family_id TEXT NOT NULL,
-                  binding_code TEXT,
-                  name TEXT NOT NULL,
-                  location TEXT,
-                  status TEXT NOT NULL,
-                  created_at INTEGER NOT NULL,
-                  updated_at INTEGER NOT NULL
+                  id VARCHAR(255) PRIMARY KEY,
+                  family_id VARCHAR(255) NOT NULL,
+                  binding_code VARCHAR(255),
+                  name VARCHAR(255) NOT NULL,
+                  location VARCHAR(255),
+                  status VARCHAR(255) NOT NULL,
+                  created_at BIGINT NOT NULL,
+                  updated_at BIGINT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS wifi_configs (
-                  family_id TEXT PRIMARY KEY,
-                  ssid TEXT NOT NULL,
-                  auth_type TEXT NOT NULL,
+                  family_id VARCHAR(255) PRIMARY KEY,
+                  ssid VARCHAR(255) NOT NULL,
+                  auth_type VARCHAR(255) NOT NULL,
                   password_set INTEGER NOT NULL,
-                  saved_at INTEGER NOT NULL
+                  saved_at BIGINT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS children (
-                  id TEXT PRIMARY KEY,
-                  family_id TEXT NOT NULL,
-                  name TEXT NOT NULL,
-                  nickname TEXT,
-                  age_stage TEXT,
-                  birthday TEXT,
-                  created_at INTEGER NOT NULL,
-                  updated_at INTEGER NOT NULL
+                  id VARCHAR(255) PRIMARY KEY,
+                  family_id VARCHAR(255) NOT NULL,
+                  name VARCHAR(255) NOT NULL,
+                  nickname VARCHAR(255),
+                  age_stage VARCHAR(255),
+                  birthday VARCHAR(255),
+                  created_at BIGINT NOT NULL,
+                  updated_at BIGINT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS emergency_contacts (
-                  id TEXT PRIMARY KEY,
-                  family_id TEXT NOT NULL,
-                  name TEXT NOT NULL,
-                  phone TEXT NOT NULL,
-                  relationship TEXT,
+                  id VARCHAR(255) PRIMARY KEY,
+                  family_id VARCHAR(255) NOT NULL,
+                  name VARCHAR(255) NOT NULL,
+                  phone VARCHAR(255) NOT NULL,
+                  relationship VARCHAR(255),
                   priority INTEGER NOT NULL,
-                  created_at INTEGER NOT NULL
+                  created_at BIGINT NOT NULL
                 );
                 """
             )
 
     def get_or_create_progress(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         now: int,
@@ -125,7 +126,7 @@ class SetupRepository:
 
     def mark_step_done(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         column: str,
@@ -147,28 +148,39 @@ class SetupRepository:
 
     def save_parent_identity(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         display_name: str,
         relationship: str,
         now: int,
     ) -> None:
+        existing = conn.execute(
+            "SELECT family_id FROM parent_identities WHERE family_id = ?",
+            (family_id,),
+        ).fetchone()
+        if existing:
+            conn.execute(
+                """
+                UPDATE parent_identities
+                SET display_name = ?, relationship = ?, confirmed_at = ?
+                WHERE family_id = ?
+                """,
+                (display_name, relationship, now, family_id),
+            )
+            return
+
         conn.execute(
             """
             INSERT INTO parent_identities(family_id, display_name, relationship, confirmed_at)
             VALUES (?, ?, ?, ?)
-            ON CONFLICT(family_id) DO UPDATE SET
-              display_name = excluded.display_name,
-              relationship = excluded.relationship,
-              confirmed_at = excluded.confirmed_at
             """,
             (family_id, display_name, relationship, now),
         )
 
     def save_device(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         binding_code: str | None,
@@ -203,7 +215,7 @@ class SetupRepository:
 
     def save_wifi(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         ssid: str,
@@ -211,22 +223,32 @@ class SetupRepository:
         password_set: bool,
         now: int,
     ) -> None:
+        existing = conn.execute(
+            "SELECT family_id FROM wifi_configs WHERE family_id = ?",
+            (family_id,),
+        ).fetchone()
+        if existing:
+            conn.execute(
+                """
+                UPDATE wifi_configs
+                SET ssid = ?, auth_type = ?, password_set = ?, saved_at = ?
+                WHERE family_id = ?
+                """,
+                (ssid, auth_type, int(password_set), now, family_id),
+            )
+            return
+
         conn.execute(
             """
             INSERT INTO wifi_configs(family_id, ssid, auth_type, password_set, saved_at)
             VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT(family_id) DO UPDATE SET
-              ssid = excluded.ssid,
-              auth_type = excluded.auth_type,
-              password_set = excluded.password_set,
-              saved_at = excluded.saved_at
             """,
             (family_id, ssid, auth_type, int(password_set), now),
         )
 
     def save_child(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         name: str,
@@ -262,7 +284,7 @@ class SetupRepository:
 
     def replace_contacts(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         contacts: list[dict],
@@ -294,7 +316,7 @@ class SetupRepository:
 
     def complete_setup(
         self,
-        conn: sqlite3.Connection,
+        conn: DatabaseConnection,
         *,
         family_id: str,
         now: int,

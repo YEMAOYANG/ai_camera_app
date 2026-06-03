@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import urllib.error
 
-from integrations.camera_runtime.ai_camera_test_adapter import AiCameraTestRuntimeAdapter
 from integrations.camera_runtime.base import CameraRuntimeAdapter, CameraSnapshot
 
 
@@ -15,8 +14,8 @@ class CameraBridgeError(Exception):
 
 
 class CameraBridgeService:
-    def __init__(self, base_url: str, *, adapter: CameraRuntimeAdapter | None = None):
-        self.adapter = adapter or AiCameraTestRuntimeAdapter(base_url)
+    def __init__(self, base_url: str | None = None, *, adapter: CameraRuntimeAdapter):
+        self.adapter = adapter
 
     def health(self) -> dict:
         return self._runtime_json(self.adapter.health)
@@ -30,6 +29,15 @@ class CameraBridgeService:
     def _runtime_json(self, getter) -> dict:
         try:
             payload = getter()
+            if isinstance(payload, dict) and payload.get("ok") is False:
+                return {
+                    "ok": False,
+                    "cameraRuntime": {
+                        "reachable": False,
+                        "adapter": self.adapter.adapter_name,
+                        "data": payload,
+                    },
+                }
             return {
                 "ok": True,
                 "cameraRuntime": {

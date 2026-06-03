@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import sqlite3
+from core.database import DatabaseRow
 
 from flask import Request
 
@@ -28,7 +28,7 @@ def bearer_token(request: Request) -> str:
     return value[len(prefix) :].strip() if value.startswith(prefix) else ""
 
 
-def user_payload(row: sqlite3.Row) -> dict:
+def user_payload(row: DatabaseRow) -> dict:
     return {
         "id": row["id"],
         "phone": row["phone"],
@@ -37,7 +37,7 @@ def user_payload(row: sqlite3.Row) -> dict:
     }
 
 
-def family_payload(row: sqlite3.Row) -> dict:
+def family_payload(row: DatabaseRow) -> dict:
     return {"id": row["id"], "name": row["name"]}
 
 

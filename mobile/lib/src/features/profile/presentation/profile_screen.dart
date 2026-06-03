@@ -37,7 +37,7 @@ class ProfileScreen extends ConsumerWidget {
           deviceOverview: deviceOverview,
         ),
         const SizedBox(height: 14),
-        _DeviceBackendPanel(
+        _DeviceCarePanel(
           deviceOverview: deviceOverview,
           cameraHealth: cameraHealth,
         ),
@@ -52,7 +52,7 @@ class ProfileScreen extends ConsumerWidget {
           entries: snapshot.settings.skip(7).toList(),
         ),
         const SizedBox(height: 14),
-        const _V1BoundaryPanel(),
+        const _CareBoundariesPanel(),
         const SizedBox(height: 16),
         MiraSecondaryButton(
           label: '退出登录',
@@ -167,8 +167,8 @@ class _FamilyAccountPanel extends StatelessWidget {
   }
 }
 
-class _DeviceBackendPanel extends StatelessWidget {
-  const _DeviceBackendPanel({
+class _DeviceCarePanel extends StatelessWidget {
+  const _DeviceCarePanel({
     required this.deviceOverview,
     required this.cameraHealth,
   });
@@ -186,7 +186,7 @@ class _DeviceBackendPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '设备与后端状态',
+            '设备与看护状态',
             style: TextStyle(
               color: AppColors.ink,
               fontFamily: AppTypography.systemFont,
@@ -211,8 +211,8 @@ class _DeviceBackendPanel extends StatelessWidget {
           ),
           MiraListRow(
             icon: Icons.memory_outlined,
-            title: health?.label ?? '摄像头适配器',
-            subtitle: health?.message ?? '后端 camera adapter 状态同步中',
+            title: health?.label ?? '摄像头运行状态',
+            subtitle: health?.message ?? '正在同步摄像头状态',
             tone: health?.reachable == false
                 ? MiraListRowTone.red
                 : MiraListRowTone.blue,
@@ -225,7 +225,7 @@ class _DeviceBackendPanel extends StatelessWidget {
           if (deviceOverview.hasError || cameraHealth.hasError) ...[
             const SizedBox(height: 8),
             const Text(
-              '后端不可用时，本页保留最近的基础信息，登录和设置恢复后会重新同步。',
+              '暂时没有拿到最新状态时，本页会保留最近的基础信息。',
               style: TextStyle(
                 color: AppColors.muted,
                 fontFamily: AppTypography.systemFont,
@@ -242,8 +242,8 @@ class _DeviceBackendPanel extends StatelessWidget {
   }
 }
 
-class _V1BoundaryPanel extends StatelessWidget {
-  const _V1BoundaryPanel();
+class _CareBoundariesPanel extends StatelessWidget {
+  const _CareBoundariesPanel();
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +254,7 @@ class _V1BoundaryPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           Text(
-            'V1 能力边界',
+            '看护与安全说明',
             style: TextStyle(
               color: AppColors.ink,
               fontFamily: AppTypography.systemFont,
@@ -267,13 +267,13 @@ class _V1BoundaryPanel extends StatelessWidget {
           MiraListRow(
             icon: Icons.notifications_outlined,
             title: '告警',
-            subtitle: '当前只保留普通告警摘要和处理状态，不进入安全事件流。',
+            subtitle: '先展示需要家长留意的摘要和处理状态。',
             tone: MiraListRowTone.blue,
           ),
           MiraListRow(
             icon: Icons.shield_outlined,
             title: '安全区域 / 安全事件',
-            subtitle: '后续版本能力，V1 不开放完整业务入口。',
+            subtitle: '更完整的规则会逐步放进隐私和安全设置里。',
             tone: MiraListRowTone.neutral,
           ),
         ],

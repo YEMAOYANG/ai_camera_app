@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from core.database import SQLiteDatabase
+from core.database import Database
 from core.errors import ApiError
 from core.security import now_ms
 from models.points import LEDGER_PARENT_ADJUSTMENT, LEDGER_TYPES
@@ -12,9 +12,9 @@ from services.auth_service import AuthService
 
 
 class PointService:
-    def __init__(self, db_path: str | Path, *, auth_service: AuthService):
+    def __init__(self, database_url: str | Path, *, auth_service: AuthService):
         self.auth_service = auth_service
-        self.repository = PointRepository(SQLiteDatabase(db_path))
+        self.repository = PointRepository(Database(database_url))
 
     def account(self, access_token: str, *, child_id: str | None = None) -> dict:
         context = self._auth_context(access_token)
@@ -33,6 +33,19 @@ class PointService:
                 point_account_payload(row)
                 for row in self.repository.list_accounts(conn, family_id=context["family"]["id"])
             ]
+            if not accounts:
+                children = self.repository.list_children(conn, family_id=context["family"]["id"])
+                accounts = [
+                    point_account_payload(
+                        self.repository.get_or_create_account(
+                            conn,
+                            family_id=context["family"]["id"],
+                            child_id=child["id"],
+                            now=now,
+                        )
+                    )
+                    for child in children
+                ]
             return {"ok": True, "accounts": accounts}
 
     def ledger(self, access_token: str, *, child_id: str | None = None) -> dict:

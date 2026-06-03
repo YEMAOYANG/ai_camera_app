@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
 import 'package:mira_guardian_app/src/features/legal/domain/legal_document.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_background.dart';
 
 class LegalDocumentScreen extends StatelessWidget {
   const LegalDocumentScreen({required this.document, super.key});
@@ -26,7 +27,7 @@ class LegalDocumentScreen extends StatelessWidget {
         backgroundColor: AppColors.appBackgroundWarm,
         body: Stack(
           children: [
-            const Positioned.fill(child: _LegalBackground()),
+            const Positioned.fill(child: MiraScreenBackground()),
             Column(
               children: [
                 _LegalTopBar(title: document.title, safeTop: safeArea.top),
@@ -55,29 +56,6 @@ class LegalDocumentScreen extends StatelessWidget {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LegalBackground extends StatelessWidget {
-  const _LegalBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.appBackground,
-            AppColors.appBackgroundMid,
-            AppColors.appBackgroundWarm,
-            AppColors.appBackgroundWarm,
-          ],
-          stops: [0, 0.48, 0.76, 1],
         ),
       ),
     );

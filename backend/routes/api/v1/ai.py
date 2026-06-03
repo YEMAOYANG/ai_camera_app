@@ -15,7 +15,14 @@ def _prompt_registry() -> PromptRegistry:
 
 @ai_bp.get("/config")
 def ai_config():
-    return jsonify(ai_config_payload())
+    return jsonify(
+        ai_config_payload(
+            provider=current_app.config["AI_PROVIDER"],
+            model=current_app.config["AI_MODEL"],
+            eval_enabled=current_app.config["AI_EVAL_ENABLED"],
+            dev_adapters_enabled=current_app.config["DEV_ADAPTERS_ENABLED"],
+        )
+    )
 
 
 @ai_bp.get("/prompts")
@@ -30,9 +37,23 @@ def prompts():
 
 @ai_bp.get("/models")
 def models():
-    return jsonify({"ok": True, "models": model_payloads()})
+    return jsonify(
+        {
+            "ok": True,
+            "models": model_payloads(
+                provider=current_app.config["AI_PROVIDER"],
+                model=current_app.config["AI_MODEL"],
+                dev_adapters_enabled=current_app.config["DEV_ADAPTERS_ENABLED"],
+            ),
+        }
+    )
 
 
 @ai_bp.get("/eval-cases")
 def eval_cases():
-    return jsonify({"ok": True, "evalCases": eval_case_payloads()})
+    return jsonify(
+        {
+            "ok": True,
+            "evalCases": eval_case_payloads(eval_enabled=current_app.config["AI_EVAL_ENABLED"]),
+        }
+    )

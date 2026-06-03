@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from core.database import SQLiteDatabase
+from core.database import Database
 from core.errors import ApiError
 from core.security import now_ms
 from repositories.device_repository import DeviceRepository
@@ -13,9 +13,9 @@ from services.auth_service import AuthService
 
 
 class FirmwareService:
-    def __init__(self, db_path: str | Path, *, auth_service: AuthService):
+    def __init__(self, database_url: str | Path, *, auth_service: AuthService):
         self.auth_service = auth_service
-        database = SQLiteDatabase(db_path)
+        database = Database(database_url)
         self.device_repository = DeviceRepository(database)
         self.repository = FirmwareRepository(database)
 
