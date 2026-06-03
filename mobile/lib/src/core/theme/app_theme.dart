@@ -1,51 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
 
 class AppTheme {
   const AppTheme._();
 
-  static const _seed = Color(0xFF326C8F);
-  static const _surface = Color(0xFFF7F9FA);
-  static const _ink = Color(0xFF1E2933);
-
   static ThemeData get light {
     final scheme = ColorScheme.fromSeed(
-      seedColor: _seed,
+      seedColor: AppColors.brand,
       brightness: Brightness.light,
-      surface: _surface,
+      surface: AppColors.appBackground,
       error: const Color(0xFFB64A4A),
     );
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      scaffoldBackgroundColor: _surface,
-      fontFamily: 'Roboto',
+      scaffoldBackgroundColor: AppColors.appBackground,
+      fontFamily: AppTypography.systemFont,
       textTheme: const TextTheme(
         headlineSmall: TextStyle(
-          color: _ink,
+          color: AppColors.ink,
           fontSize: 24,
           fontWeight: FontWeight.w700,
         ),
         titleLarge: TextStyle(
-          color: _ink,
+          color: AppColors.ink,
           fontSize: 20,
           fontWeight: FontWeight.w700,
         ),
         titleMedium: TextStyle(
-          color: _ink,
+          color: AppColors.ink,
           fontSize: 16,
           fontWeight: FontWeight.w700,
         ),
-        bodyLarge: TextStyle(color: _ink, fontSize: 16, height: 1.45),
+        bodyLarge: TextStyle(color: AppColors.ink, fontSize: 16, height: 1.45),
         bodyMedium: TextStyle(
-          color: Color(0xFF52606D),
+          color: AppColors.muted,
           fontSize: 14,
           height: 1.45,
         ),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: _surface,
-        foregroundColor: _ink,
+        backgroundColor: AppColors.appBackground,
+        foregroundColor: AppColors.ink,
         elevation: 0,
         centerTitle: false,
       ),
@@ -54,7 +51,7 @@ class AppTheme {
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppRadii.card),
           side: const BorderSide(color: Color(0xFFE2E8EE)),
         ),
       ),
@@ -74,13 +71,20 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(44, 44),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: AppColors.brand,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadii.card),
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size(44, 44),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          foregroundColor: AppColors.ink,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadii.card),
+          ),
         ),
       ),
     );

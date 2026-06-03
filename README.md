@@ -24,6 +24,20 @@ flutter test
 
 当前工程采用 Flutter + Riverpod + go_router + Dio 的组合，先搭好首页、任务、实时看护、告警和我的五个家长端主入口。框架选型记录见 [docs/flutter_framework_decision.md](docs/flutter_framework_decision.md)。
 
+## App 后端接口
+
+当前仓库已新增 `backend/` 作为家长端 App 的轻量接口服务，先承载手机号验证码登录、access/refresh token 登录态、session 查询、退出登录，以及对原摄像头测试后端的 bridge。
+
+后端启动：
+
+```bash
+cd backend
+python -m pip install -r requirements.txt
+python app.py
+```
+
+接口说明见 [docs/backend_api.md](docs/backend_api.md)。摄像头 RTSP、go2rtc、语音唤醒、喇叭播放和实时观察能力仍保留在原测试后端 `/Users/sqcopenclaw/.openclaw/workspace/ai_camera_test`，当前 App 后端默认通过 `MIRA_CAMERA_BACKEND_URL=http://127.0.0.1:8767` 转接。
+
 ## App 定位
 
 家长端 App 的核心目标是解放家长，把“盯作业、反复催、陪玩、检查任务、提醒睡觉、确认安全”这些高频重复劳动交给摄像头和 App 的任务系统。家长不需要一直盯着孩子，也不需要每件小事都亲自催；家长主要负责设置规则、处理异常、确认重要结果和给孩子真实的情感支持。
@@ -624,14 +638,22 @@ App
 
 ```text
 Auth
-  POST /api/auth/login
+  POST /api/auth/sms/request
+  POST /api/auth/sms/login
+  POST /api/auth/token/refresh
+  GET  /api/auth/session
   POST /api/auth/logout
-  GET  /api/auth/me
   PATCH /api/auth/me/profile
   POST /api/auth/phone/change/request
   POST /api/auth/phone/change/confirm
   GET  /api/auth/devices
   DELETE /api/auth/devices/{id}
+
+Camera Bridge
+  GET  /api/camera/health
+  GET  /api/camera/runtime
+  GET  /api/camera/speaker/status
+  GET  /api/camera/snapshot
 
 Family
   GET    /api/families/current

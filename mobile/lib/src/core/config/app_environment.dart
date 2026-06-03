@@ -17,6 +17,14 @@ class AppEnvironment {
     );
   }
 
+  factory AppEnvironment.localBackend() {
+    return const AppEnvironment(
+      flavor: AppFlavor.development,
+      apiBaseUrl: 'http://127.0.0.1:8000/api',
+      useMockData: false,
+    );
+  }
+
   factory AppEnvironment.staging() {
     return const AppEnvironment(
       flavor: AppFlavor.staging,
