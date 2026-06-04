@@ -4,6 +4,7 @@ from pathlib import Path
 
 from core.database import Database
 from core.errors import ApiError
+from core.security import now_ms
 from integrations.hardware.base import HardwareDeviceAdapter
 from integrations.hardware.disabled_adapter import DisabledHardwareDeviceAdapter
 from repositories.device_repository import DeviceRepository
@@ -36,6 +37,55 @@ class DeviceService:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
             device = self._device_or_error(conn, context["family"]["id"], device_id)
+            return {"ok": True, "device": device_payload(device)}
+
+    def update_device(self, access_token: str, device_id: str, data: dict) -> dict:
+        context = self._auth_context(access_token)
+        fields: dict = {}
+        if "name" in data:
+            fields["name"] = self._required_text(data, "name", "请输入设备名称")
+        if "location" in data:
+            fields["location"] = self._optional_text(data, "location")
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            self._device_or_error(conn, context["family"]["id"], device_id)
+            device = self.repository.update_device(
+                conn,
+                family_id=context["family"]["id"],
+                device_id=device_id,
+                fields=fields,
+                now=now,
+            )
+            return {"ok": True, "device": device_payload(device)}
+
+    def rename_device(self, access_token: str, device_id: str, data: dict) -> dict:
+        context = self._auth_context(access_token)
+        name = self._required_text(data, "name", "请输入设备名称")
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            self._device_or_error(conn, context["family"]["id"], device_id)
+            device = self.repository.update_device(
+                conn,
+                family_id=context["family"]["id"],
+                device_id=device_id,
+                fields={"name": name},
+                now=now,
+            )
+            return {"ok": True, "device": device_payload(device)}
+
+    def unbind_device(self, access_token: str, device_id: str) -> dict:
+        context = self._auth_context(access_token)
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            device = self._device_or_error(conn, context["family"]["id"], device_id)
+            if device["status"] == "unbound":
+                return {"ok": True, "device": device_payload(device)}
+            device = self.repository.unbind_device(
+                conn,
+                family_id=context["family"]["id"],
+                device_id=device_id,
+                now=now,
+            )
             return {"ok": True, "device": device_payload(device)}
 
     def device_status(self, access_token: str, device_id: str) -> dict:
@@ -82,3 +132,16 @@ class DeviceService:
             "capabilities": capabilities,
             "camera": camera_status,
         }
+
+    def _required_text(self, data: dict, key: str, message: str) -> str:
+        value = self._optional_text(data, key)
+        if not value:
+            raise ApiError(f"missing_{key}", message)
+        return value
+
+    def _optional_text(self, data: dict, key: str) -> str | None:
+        value = data.get(key)
+        if value is None:
+            return None
+        value = str(value).strip()
+        return value or None

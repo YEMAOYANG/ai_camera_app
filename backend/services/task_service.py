@@ -277,7 +277,6 @@ class TaskService:
                 *TASK_ACTIVE_SCHEDULED_STATUSES,
                 TASK_IN_PROGRESS,
                 TASK_DELAYED,
-                "rejected",
             ):
                 raise ApiError("task_cannot_start", "这个任务暂时不能开始")
             task = self.repository.mark_in_progress(
@@ -382,6 +381,14 @@ class TaskService:
                 "parent_rejected",
                 "家长已驳回完成确认",
                 {"reason": self._optional_text(data, "reason")},
+                now,
+            )
+            self._add_event(
+                conn,
+                task,
+                "points_award_skipped",
+                "本次任务未发放积分",
+                {"reason": "parent_rejected"},
                 now,
             )
             return {"ok": True, "task": task_payload(task)}

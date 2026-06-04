@@ -13,4 +13,5 @@ def device_payload(row: DatabaseRow) -> dict:
         "status": row["status"],
         "createdAt": row["created_at"],
         "updatedAt": row["updated_at"],
+        "unboundAt": row.get("unbound_at"),
     }

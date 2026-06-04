@@ -47,7 +47,7 @@ def task_payload(row: DatabaseRow) -> dict:
         "evidence": evidence,
         "evidenceSummary": row["evidence_summary"],
         "aiObservationSummary": row.get("ai_observation_summary"),
-        "rejectionReason": row["rejection_reason"],
+        "rejectionReason": _normalize_rejection_reason(row["rejection_reason"]),
         "createdBy": row.get("created_by"),
         "createdAt": row["created_at"],
         "updatedAt": row["updated_at"],
@@ -83,6 +83,20 @@ def task_event_payload(row: DatabaseRow) -> dict:
 def validate_task_type(value: str) -> str:
     if value not in TASK_TYPES:
         raise ApiError("invalid_task_type", "任务类型不支持")
+    return value
+
+
+def _normalize_rejection_reason(value: str | None) -> str | None:
+    if not value:
+        return value
+    legacy_phrases = (
+        "等待孩子补充完成",
+        "等待补充完成",
+        "孩子补充",
+        "补充完成",
+    )
+    if any(phrase in value for phrase in legacy_phrases):
+        return "证据不足，未通过家长确认。"
     return value
 
 

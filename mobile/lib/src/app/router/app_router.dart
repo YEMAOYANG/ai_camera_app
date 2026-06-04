@@ -15,6 +15,7 @@ import 'package:mira_guardian_app/src/features/legal/presentation/user_agreement
 import 'package:mira_guardian_app/src/features/live_care/presentation/live_monitor_screen.dart';
 import 'package:mira_guardian_app/src/features/live_care/presentation/live_care_screen.dart';
 import 'package:mira_guardian_app/src/features/points/presentation/points_screen.dart';
+import 'package:mira_guardian_app/src/features/profile/presentation/profile_pages.dart';
 import 'package:mira_guardian_app/src/features/profile/presentation/profile_screen.dart';
 import 'package:mira_guardian_app/src/features/rewards/presentation/reward_detail_screen.dart';
 import 'package:mira_guardian_app/src/features/rewards/presentation/rewards_screen.dart';
@@ -70,6 +71,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: privacyPolicyPath,
         name: 'legalPrivacyPolicy',
         builder: (_, _) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: profileChildPrivacyPath,
+        name: 'legalChildPrivacyAuthorization',
+        builder: (_, _) => const LegalRemoteDocumentPage(
+          documentKey: 'child-privacy-authorization',
+        ),
       ),
       GoRoute(
         path: setupParentIdentityPath,
@@ -141,6 +149,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (_, _) => const RewardsScreen(),
           ),
           GoRoute(
+            path: redemptionsPath,
+            name: 'redemptions',
+            builder: (_, _) => const RedemptionsPage(),
+          ),
+          GoRoute(
+            path: rewardEditPath,
+            name: 'rewardCreate',
+            builder: (_, _) => const RewardEditPage(),
+          ),
+          GoRoute(
+            path: '$rewardEditPath/:itemId',
+            name: 'rewardEdit',
+            builder: (_, state) {
+              return RewardEditPage(itemId: state.pathParameters['itemId']);
+            },
+          ),
+          GoRoute(
             path: '$rewardDetailPath/:itemId',
             name: 'rewardDetail',
             builder: (_, state) {
@@ -168,6 +193,105 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: AppRoute.profile.path,
             name: AppRoute.profile.name,
             builder: (_, _) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: profileAccountPath,
+            name: 'profileAccount',
+            builder: (_, _) => const AccountProfilePage(),
+          ),
+          GoRoute(
+            path: profileSecurityPath,
+            name: 'profileSecurity',
+            builder: (_, _) => const AccountSecurityPage(),
+          ),
+          GoRoute(
+            path: profileFamilyMembersPath,
+            name: 'profileFamilyMembers',
+            builder: (_, _) => const FamilyMembersPage(),
+          ),
+          GoRoute(
+            path: profileChildPath,
+            name: 'profileChild',
+            builder: (_, _) => const ChildProfilePage(),
+          ),
+          GoRoute(
+            path: profileContactsPath,
+            name: 'profileContacts',
+            builder: (_, _) => const EmergencyContactsPage(),
+          ),
+          GoRoute(
+            path: profileDevicesPath,
+            name: 'profileDevices',
+            builder: (_, _) => const DeviceManagementPage(),
+          ),
+          GoRoute(
+            path: '$profileDeviceDetailPath/:deviceId',
+            name: 'profileDeviceDetail',
+            builder: (_, state) {
+              return DeviceDetailPage(
+                deviceId: state.pathParameters['deviceId'] ?? '',
+              );
+            },
+          ),
+          GoRoute(
+            path: profileCameraStatusPath,
+            name: 'profileCameraStatus',
+            builder: (_, _) => const CameraCareStatusPage(),
+          ),
+          GoRoute(
+            path: profileAiRulesPath,
+            name: 'profileAiRules',
+            builder: (_, _) => const AiCareRulesPage(),
+          ),
+          GoRoute(
+            path: profileNotificationsPath,
+            name: 'profileNotifications',
+            builder: (_, _) => const NotificationSettingsPage(),
+          ),
+          GoRoute(
+            path: profilePrivacyPath,
+            name: 'profilePrivacy',
+            builder: (_, _) => const PrivacyPermissionsPage(),
+          ),
+          GoRoute(
+            path: profileConversationPath,
+            name: 'profileConversation',
+            builder: (_, _) => const ConversationRulesPage(),
+          ),
+          GoRoute(
+            path: profileEducationPath,
+            name: 'profileEducation',
+            builder: (_, _) => const EducationContentPage(),
+          ),
+          GoRoute(
+            path: profileAboutPath,
+            name: 'profileAbout',
+            builder: (_, _) => const AboutPage(),
+          ),
+          GoRoute(
+            path: profileSubscriptionPath,
+            name: 'profileSubscription',
+            builder: (_, _) => const SubscriptionPage(),
+          ),
+          GoRoute(
+            path: profileDailyReportPath,
+            name: 'profileDailyReport',
+            builder: (_, _) => const DailyReportPage(),
+          ),
+          GoRoute(
+            path: profileWeeklyReportPath,
+            name: 'profileWeeklyReport',
+            builder: (_, _) => const WeeklyReportPage(),
+          ),
+          GoRoute(
+            path: profileMomentsPath,
+            name: 'profileMoments',
+            builder: (_, _) => const GrowthMomentsPage(),
+          ),
+          GoRoute(
+            path: profileFeedbackPath,
+            name: 'profileFeedback',
+            builder: (_, _) => const FeedbackPage(),
           ),
         ],
       ),

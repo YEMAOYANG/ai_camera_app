@@ -14,8 +14,30 @@ const taskDetailPath = '/tasks/detail';
 const pointsPath = '/points';
 const rewardsPath = '/rewards';
 const rewardDetailPath = '/rewards/detail';
+const rewardEditPath = '/rewards/edit';
+const redemptionsPath = '/rewards/redemptions';
 const liveMonitorPath = '/live/monitor';
 const liveEventsPath = '/live/events';
+const profileAccountPath = '/profile/account';
+const profileSecurityPath = '/profile/security';
+const profileFamilyMembersPath = '/profile/family-members';
+const profileChildPath = '/profile/child';
+const profileContactsPath = '/profile/emergency-contacts';
+const profileDevicesPath = '/profile/devices';
+const profileDeviceDetailPath = '/profile/devices/detail';
+const profileCameraStatusPath = '/profile/camera-status';
+const profileAiRulesPath = '/profile/ai-care-rules';
+const profileNotificationsPath = '/profile/notifications';
+const profilePrivacyPath = '/profile/privacy';
+const profileChildPrivacyPath = '/legal/child-privacy-authorization';
+const profileAboutPath = '/profile/about';
+const profileSubscriptionPath = '/profile/subscription';
+const profileDailyReportPath = '/profile/reports/daily';
+const profileWeeklyReportPath = '/profile/reports/weekly';
+const profileMomentsPath = '/profile/moments';
+const profileConversationPath = '/profile/conversation';
+const profileEducationPath = '/profile/education';
+const profileFeedbackPath = '/profile/feedback';
 
 enum AppRoute {
   home('/home', '首页', Icons.home_outlined, Icons.home),

@@ -81,6 +81,74 @@ class DeviceRepository {
     }
   }
 
+  Future<GuardianDevice> updateDevice({
+    required String deviceId,
+    String? name,
+    String? location,
+  }) async {
+    if (_environment.useMockData) {
+      final current = _mockDevices.firstWhere((device) => device.id == deviceId);
+      return GuardianDevice(
+        id: current.id,
+        familyId: current.familyId,
+        bindingCode: current.bindingCode,
+        name: name ?? current.name,
+        location: location ?? current.location,
+        status: current.status,
+        createdAt: current.createdAt,
+        updatedAt: DateTime.now().millisecondsSinceEpoch,
+      );
+    }
+
+    try {
+      final response = await _apiClient.patch(
+        '/devices/$deviceId',
+        data: {'name': name, 'location': location},
+      );
+      return GuardianDevice.fromJson(_asMap(_asMap(response.data)['device']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<GuardianDevice> renameDevice(String deviceId, String name) async {
+    if (_environment.useMockData) {
+      return updateDevice(deviceId: deviceId, name: name);
+    }
+    try {
+      final response = await _apiClient.post(
+        '/devices/$deviceId/rename',
+        data: {'name': name},
+      );
+      return GuardianDevice.fromJson(_asMap(_asMap(response.data)['device']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<GuardianDevice> unbindDevice(String deviceId) async {
+    if (_environment.useMockData) {
+      final current = _mockDevices.firstWhere((device) => device.id == deviceId);
+      return GuardianDevice(
+        id: current.id,
+        familyId: current.familyId,
+        bindingCode: current.bindingCode,
+        name: current.name,
+        location: current.location,
+        status: 'unbound',
+        createdAt: current.createdAt,
+        updatedAt: DateTime.now().millisecondsSinceEpoch,
+        unboundAt: DateTime.now().millisecondsSinceEpoch,
+      );
+    }
+    try {
+      final response = await _apiClient.post('/devices/$deviceId/unbind');
+      return GuardianDevice.fromJson(_asMap(_asMap(response.data)['device']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
   DeviceException _fromDio(DioException error) {
     final data = error.response?.data;
     if (data is Map) {

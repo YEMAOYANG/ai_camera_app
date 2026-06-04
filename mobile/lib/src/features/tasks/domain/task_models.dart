@@ -29,8 +29,7 @@ enum GuardianTaskStatus {
         this == GuardianTaskStatus.pending ||
         this == GuardianTaskStatus.reminderSent ||
         this == GuardianTaskStatus.inProgress ||
-        this == GuardianTaskStatus.delayed ||
-        this == GuardianTaskStatus.rejected;
+        this == GuardianTaskStatus.delayed;
   }
 
   bool get awaitsParent =>
@@ -38,12 +37,12 @@ enum GuardianTaskStatus {
 
   bool get isDone {
     return this == GuardianTaskStatus.completed ||
-        this == GuardianTaskStatus.confirmed;
+        this == GuardianTaskStatus.confirmed ||
+        this == GuardianTaskStatus.rejected;
   }
 
   bool get needsCare {
     return this == GuardianTaskStatus.awaitingParentConfirmation ||
-        this == GuardianTaskStatus.rejected ||
         this == GuardianTaskStatus.delayed ||
         this == GuardianTaskStatus.missed ||
         this == GuardianTaskStatus.expired;
@@ -236,11 +235,17 @@ class GuardianTask {
 
   String get parentDecisionLabel {
     if (status.awaitsParent) return '等待你确认完成情况';
-    if (status == GuardianTaskStatus.confirmed) return '家长已确认';
-    if (status == GuardianTaskStatus.rejected) return '已驳回';
+    if (status == GuardianTaskStatus.confirmed) {
+      return rewardPoints > 0 ? '积分已发放' : '已确认';
+    }
+    if (status == GuardianTaskStatus.rejected) {
+      return rewardPoints > 0 ? '未发放积分' : '已驳回';
+    }
     if (status == GuardianTaskStatus.delayed) return '需要温和提醒';
     if (status == GuardianTaskStatus.missed) return '未完成';
-    if (status == GuardianTaskStatus.completed) return '已完成';
+    if (status == GuardianTaskStatus.completed) {
+      return pointsGrantedAt != null && rewardPoints > 0 ? '积分已发放' : '已完成';
+    }
     if (!requiresParentConfirmation) return '完成后自动记录';
     return '需要家长确认';
   }
@@ -249,7 +254,9 @@ class GuardianTask {
     if (evidenceSummary.isNotEmpty) return evidenceSummary;
     final summary = evidence['summary'];
     if (summary is String && summary.isNotEmpty) return summary;
-    if (status.awaitsParent) return '任务已完成，等待你确认后写入积分流水。';
+    if (status.awaitsParent) {
+      return rewardPoints > 0 ? '任务已完成，等待你确认后写入积分流水。' : '任务已完成，等待你确认。';
+    }
     return '完成后会在这里显示观察摘要和处理记录。';
   }
 
@@ -260,10 +267,10 @@ class GuardianTask {
 
   String get aiAdvice {
     if (status.awaitsParent) {
-      return '建议先核对证据，再确认是否发放积分。';
+      return rewardPoints > 0 ? '建议先核对证据，再确认是否发放积分。' : '建议先核对记录，再确认是否完成。';
     }
     if (status == GuardianTaskStatus.confirmed) {
-      return '任务已经确认，奖励积分已写入流水。';
+      return rewardPoints > 0 ? '任务已经确认，奖励积分已写入流水。' : '任务已经确认，已进入记录。';
     }
     if (status == GuardianTaskStatus.inProgress) {
       return '任务进行中，保持低打扰提醒。';
@@ -275,7 +282,9 @@ class GuardianTask {
       return '这项任务没有按时完成，可以重新安排一个时间。';
     }
     if (status == GuardianTaskStatus.rejected) {
-      return rejectionReason.isNotEmpty ? rejectionReason : '证据不足，等待补充完成。';
+      return rejectionReason.isNotEmpty
+          ? '原因：$rejectionReason'
+          : '本次任务未通过确认，未发放积分。';
     }
     return '按孩子当前节奏推进，不为了积分打断任务本身。';
   }
@@ -291,7 +300,7 @@ class GuardianTask {
     if (status == GuardianTaskStatus.delayed) return '系统会继续温和提醒。';
     if (status == GuardianTaskStatus.missed) return '任务未完成。';
     if (status == GuardianTaskStatus.rejected) {
-      return rejectionReason.isNotEmpty ? rejectionReason : '等待补充完成。';
+      return '本次任务未通过确认，未发放积分。';
     }
     if (status == GuardianTaskStatus.cancelled) return '任务已取消。';
     return '已进入任务记录。';
@@ -357,7 +366,9 @@ class GuardianTask {
       evidence: evidence ?? this.evidence,
       evidenceSummary: evidenceSummary ?? this.evidenceSummary,
       aiObservationSummary: aiObservationSummary ?? this.aiObservationSummary,
-      rejectionReason: rejectionReason ?? this.rejectionReason,
+      rejectionReason: rejectionReason == null
+          ? this.rejectionReason
+          : _normalizeRejectionReason(rejectionReason),
       createdBy: createdBy,
       createdAt: createdAt,
       updatedAt: updatedAt,
@@ -419,7 +430,9 @@ class GuardianTask {
       evidence: _asMap(json['evidence']),
       evidenceSummary: _asString(json['evidenceSummary']),
       aiObservationSummary: _asString(json['aiObservationSummary']),
-      rejectionReason: _asString(json['rejectionReason']),
+      rejectionReason: _normalizeRejectionReason(
+        _asString(json['rejectionReason']),
+      ),
       createdBy: _asString(json['createdBy']),
       createdAt: _asInt(json['createdAt']),
       updatedAt: _asInt(json['updatedAt']),
@@ -431,10 +444,7 @@ class GuardianTask {
       lastReminderAt: _asNullableInt(json['lastReminderAt']),
       nextReminderAt: _asNullableInt(json['nextReminderAt']),
       delayReminderCount: _asInt(json['delayReminderCount']),
-      reminderMinutesBefore: _asInt(
-        json['reminderMinutesBefore'],
-        fallback: 5,
-      ),
+      reminderMinutesBefore: _asInt(json['reminderMinutesBefore'], fallback: 5),
       reminderStatus: _asString(json['reminderStatus'], fallback: 'pending'),
       cameraObservationStatus: _asString(
         json['cameraObservationStatus'],
@@ -537,10 +547,10 @@ class GuardianTaskEvent {
       'completed' => '任务已完成',
       'missed' => '任务未完成',
       'points_awarded' => '积分已发放',
-      'points_award_skipped' => '积分已记录',
+      'points_award_skipped' => '未发放积分',
       'task_completed' => '任务已完成',
       'parent_confirmed' => '家长已确认',
-      'confirmation_rejected' || 'parent_rejected' => '确认已驳回',
+      'confirmation_rejected' || 'parent_rejected' => '家长驳回确认',
       _ => message.isNotEmpty ? message : '任务记录',
     };
   }
@@ -558,7 +568,8 @@ class GuardianTaskEvent {
       'child_not_ready' ||
       'delayed' ||
       'camera_command_failed' ||
-      'confirmation_rejected' => StatusTone.warning,
+      'confirmation_rejected' ||
+      'parent_rejected' => StatusTone.danger,
       'parent_confirmed' ||
       'task_completed' ||
       'points_awarded' ||
@@ -616,4 +627,13 @@ String _dateText(DateTime date) {
 String _dateTimeText(String date, String time) {
   if (date.isEmpty || time.isEmpty) return '';
   return '${date}T$time:00';
+}
+
+String _normalizeRejectionReason(String value) {
+  if (value.isEmpty) return value;
+  const legacyPhrases = ['等待孩子补充完成', '等待补充完成', '孩子补充', '补充完成'];
+  if (legacyPhrases.any((phrase) => value.contains(phrase))) {
+    return '证据不足，未通过家长确认。';
+  }
+  return value;
 }

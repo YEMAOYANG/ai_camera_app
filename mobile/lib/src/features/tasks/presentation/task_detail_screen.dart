@@ -9,7 +9,6 @@ import 'package:mira_guardian_app/src/features/points/application/point_reposito
 import 'package:mira_guardian_app/src/features/tasks/application/task_repository.dart';
 import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
 import 'package:mira_guardian_app/src/features/tasks/presentation/tasks_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
@@ -49,7 +48,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
         onBack: () => context.go(AppRoute.tasks.path),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 118),
         children: [
-          _EvidencePanel(task: task),
+          _EvidencePanel(task: task, ref: ref),
           const SizedBox(height: 14),
           MiraSurface(
             child: Column(
@@ -63,21 +62,20 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
                   subtitle: '${task.scheduleLabel} · ${task.durationLabel}',
                   tone: MiraListRowTone.blue,
                 ),
-                MiraListRow(
-                  icon: Icons.stars_outlined,
-                  title: '+${task.rewardPoints} 分',
-                  subtitle: task.parentDecisionLabel,
-                  tone: task.status.awaitsParent
-                      ? MiraListRowTone.amber
-                      : MiraListRowTone.neutral,
-                ),
+                if (task.rewardPoints > 0)
+                  MiraListRow(
+                    icon: Icons.stars_outlined,
+                    title: '+${task.rewardPoints} 分',
+                    subtitle: task.parentDecisionLabel,
+                    tone: task.status.awaitsParent
+                        ? MiraListRowTone.amber
+                        : MiraListRowTone.neutral,
+                  ),
               ],
             ),
           ),
           const SizedBox(height: 14),
           _TaskEventsPanel(events: eventsValue),
-          const SizedBox(height: 18),
-          _TaskDetailActions(task: task, ref: ref),
         ],
       ),
       loading: () => MiraScreen(
@@ -184,7 +182,8 @@ class _TaskEventsPanel extends StatelessWidget {
       'camera_monitor_started' => Icons.center_focus_strong_outlined,
       'camera_command_failed' => Icons.videocam_off_outlined,
       'parent_confirmed' => Icons.verified_outlined,
-      'confirmation_rejected' => Icons.rule_outlined,
+      'confirmation_rejected' || 'parent_rejected' => Icons.rule_outlined,
+      'points_award_skipped' => Icons.block_outlined,
       _ => Icons.history_outlined,
     };
   }
@@ -199,98 +198,101 @@ class _TaskEventsPanel extends StatelessWidget {
   }
 }
 
-class _TaskDetailActions extends StatelessWidget {
-  const _TaskDetailActions({required this.task, required this.ref});
+class _TaskHeroActions extends StatelessWidget {
+  const _TaskHeroActions({required this.task, required this.ref});
 
   final GuardianTask task;
   final WidgetRef ref;
 
   @override
   Widget build(BuildContext context) {
-    final canStart = _canStartTask(task);
     final canEditSchedule = _canEditSchedule(task);
     final canSendWrapUpReminder = _canSendWrapUpReminder(task);
     final canSendStartReminder = task.status == GuardianTaskStatus.delayed;
 
-    final actions = <Widget>[];
-    if (canStart) {
-      actions.add(
-        MiraPrimaryButton(
-          label: '开始任务',
-          trailing: const MiraButtonGlyph(icon: Icons.play_arrow_outlined),
-          onTap: () => _startTask(context, ref, task),
-        ),
-      );
-    } else if (task.status.awaitsParent) {
-      actions.add(
-        MiraPrimaryButton(
-          label: '确认完成并发放积分',
-          trailing: const MiraButtonGlyph(icon: Icons.fact_check_outlined),
-          onTap: () => _confirmTask(context, ref, task),
-        ),
-      );
-      actions.add(
-        MiraSecondaryButton(
-          label: '驳回证据',
-          trailing: const Icon(Icons.rule_outlined, size: 18),
-          onTap: () => _rejectTask(context, ref, task),
-        ),
-      );
+    final actions = <_HeroActionData>[];
+    if (task.status.awaitsParent) {
+      actions
+        ..add(
+          _HeroActionData(
+            label: '确认完成',
+            icon: Icons.fact_check_outlined,
+            tone: _HeroActionTone.primary,
+            onTap: () => _confirmTask(context, ref, task),
+          ),
+        )
+        ..add(
+          _HeroActionData(
+            label: '驳回',
+            icon: Icons.rule_outlined,
+            tone: _HeroActionTone.danger,
+            onTap: () => _rejectTask(context, ref, task),
+          ),
+        );
     } else if (task.status == GuardianTaskStatus.inProgress) {
       actions.add(
-        MiraPrimaryButton(
+        _HeroActionData(
           label: '标记任务完成',
-          trailing: const MiraButtonGlyph(icon: Icons.task_alt_outlined),
+          icon: Icons.task_alt_outlined,
+          tone: _HeroActionTone.primary,
           onTap: () => _completeTask(context, ref, task),
         ),
       );
-    }
-
-    if (canSendStartReminder) {
-      actions.add(
-        MiraSecondaryButton(
-          label: '提醒孩子开始',
-          trailing: const Icon(Icons.volume_up_outlined, size: 18),
-          onTap: () => _sendTaskReminder(
-            context,
-            ref,
-            task,
-            text: '“${task.title}”时间到了，我们先坐好，从第一步开始。',
-            toast: '已发送温和提醒',
+      if (canSendWrapUpReminder) {
+        actions.add(
+          _HeroActionData(
+            label: '提醒收尾',
+            icon: Icons.volume_up_outlined,
+            tone: _HeroActionTone.secondary,
+            onTap: () => _sendTaskReminder(
+              context,
+              ref,
+              task,
+              text: '“${task.title}”快到收尾时间了，我们准备整理一下吧。',
+              toast: '已提醒孩子准备收尾',
+            ),
           ),
-        ),
-      );
-    }
-
-    if (canSendWrapUpReminder) {
-      actions.add(
-        MiraSecondaryButton(
-          label: '提醒孩子收尾',
-          trailing: const Icon(Icons.volume_up_outlined, size: 18),
-          onTap: () => _sendTaskReminder(
-            context,
-            ref,
-            task,
-            text: '“${task.title}”快到收尾时间了，我们准备整理一下吧。',
-            toast: '已提醒孩子准备收尾',
-          ),
-        ),
-      );
-    }
-
-    if (canEditSchedule) {
+        );
+      }
+    } else if (canSendStartReminder) {
       actions
         ..add(
-          MiraSecondaryButton(
+          _HeroActionData(
+            label: '再提醒一次',
+            icon: Icons.volume_up_outlined,
+            tone: _HeroActionTone.primary,
+            onTap: () => _sendTaskReminder(
+              context,
+              ref,
+              task,
+              text: '“${task.title}”时间到了，我们先坐好，从第一步开始。',
+              toast: '已发送温和提醒',
+            ),
+          ),
+        )
+        ..add(
+          _HeroActionData(
+            label: '标记完成',
+            icon: Icons.task_alt_outlined,
+            tone: _HeroActionTone.secondary,
+            onTap: () => _completeTask(context, ref, task),
+          ),
+        );
+    } else if (canEditSchedule) {
+      actions
+        ..add(
+          _HeroActionData(
             label: '编辑任务',
-            trailing: const Icon(Icons.edit_outlined, size: 18),
+            icon: Icons.edit_outlined,
+            tone: _HeroActionTone.secondary,
             onTap: () => _editTask(context, ref, task),
           ),
         )
         ..add(
-          MiraSecondaryButton(
+          _HeroActionData(
             label: '取消任务',
-            trailing: const Icon(Icons.event_busy_outlined, size: 18),
+            icon: Icons.event_busy_outlined,
+            tone: _HeroActionTone.secondary,
             onTap: () => _cancelTask(context, ref, task),
           ),
         );
@@ -299,19 +301,111 @@ class _TaskDetailActions extends StatelessWidget {
     if (actions.isEmpty) return const SizedBox.shrink();
     return Column(
       children: [
-        for (var index = 0; index < actions.length; index++) ...[
-          if (index > 0) const SizedBox(height: 10),
-          actions[index],
-        ],
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            for (
+              var index = 0;
+              index < actions.length && index < 2;
+              index++
+            ) ...[
+              if (index > 0) const SizedBox(width: 10),
+              Expanded(child: _HeroActionButton(data: actions[index])),
+            ],
+          ],
+        ),
       ],
     );
   }
 }
 
+class _HeroActionData {
+  const _HeroActionData({
+    required this.label,
+    required this.icon,
+    required this.tone,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final _HeroActionTone tone;
+  final VoidCallback onTap;
+}
+
+enum _HeroActionTone { primary, secondary, danger }
+
+class _HeroActionButton extends StatelessWidget {
+  const _HeroActionButton({required this.data});
+
+  final _HeroActionData data;
+
+  @override
+  Widget build(BuildContext context) {
+    final foreground = switch (data.tone) {
+      _HeroActionTone.primary => AppColors.ink,
+      _HeroActionTone.secondary => Colors.white,
+      _HeroActionTone.danger => AppColors.danger,
+    };
+    final background = switch (data.tone) {
+      _HeroActionTone.primary => Colors.white,
+      _HeroActionTone.secondary => Colors.white.withValues(alpha: 0.10),
+      _HeroActionTone.danger => AppColors.dangerWash,
+    };
+    final border = switch (data.tone) {
+      _HeroActionTone.primary => Colors.white,
+      _HeroActionTone.secondary => Colors.white.withValues(alpha: 0.14),
+      _HeroActionTone.danger => AppColors.dangerWash,
+    };
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: data.onTap,
+        splashColor: Colors.white.withValues(alpha: 0.08),
+        highlightColor: Colors.white.withValues(alpha: 0.06),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: border),
+          ),
+          child: SizedBox(
+            height: 46,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(data.icon, color: foreground, size: 17),
+                const SizedBox(width: 7),
+                Flexible(
+                  child: Text(
+                    data.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: foreground,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _EvidencePanel extends StatelessWidget {
-  const _EvidencePanel({required this.task});
+  const _EvidencePanel({required this.task, required this.ref});
 
   final GuardianTask task;
+  final WidgetRef ref;
 
   @override
   Widget build(BuildContext context) {
@@ -326,23 +420,35 @@ class _EvidencePanel extends StatelessWidget {
           Row(
             children: [
               StatusChip(label: task.status.label, tone: task.status.tone),
-              const Spacer(),
-              Text(
-                '+${task.rewardPoints} 分',
-                style: const TextStyle(
-                  color: Color(0xFFFDBA74),
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
+              if (_heroTrailingLabel(task).isNotEmpty) ...[
+                const Spacer(),
+                Text(
+                  _heroTrailingLabel(task),
+                  style: const TextStyle(
+                    color: Color(0xFFFDBA74),
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
-          const SizedBox(height: 16),
-          _EvidenceStoryCard(task: task),
           const SizedBox(height: 14),
           Text(
-            task.nextStep,
+            _heroTitle(task),
+            style: const TextStyle(
+              color: Colors.white,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              height: 1.2,
+              letterSpacing: 0,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _heroDescription(task),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.78),
               fontFamily: AppTypography.systemFont,
@@ -353,26 +459,16 @@ class _EvidencePanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          Row(
-            children: [
-              _EvidenceMetric(label: '时间', value: task.timeLabel),
-              const SizedBox(width: 8),
-              _EvidenceMetric(label: '积分', value: '+${task.rewardPoints}'),
-              const SizedBox(width: 8),
-              _EvidenceMetric(
-                label: '确认',
-                value: _confirmationShortLabel(task),
-              ),
-            ],
-          ),
+          _HeroInsightCard(task: task),
+          _TaskHeroActions(task: task, ref: ref),
         ],
       ),
     );
   }
 }
 
-class _EvidenceStoryCard extends StatelessWidget {
-  const _EvidenceStoryCard({required this.task});
+class _HeroInsightCard extends StatelessWidget {
+  const _HeroInsightCard({required this.task});
 
   final GuardianTask task;
 
@@ -394,12 +490,12 @@ class _EvidenceStoryCard extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const SizedBox(
+              child: SizedBox(
                 width: 48,
                 height: 48,
                 child: Center(
                   child: Icon(
-                    Icons.center_focus_strong_outlined,
+                    _heroInsightIcon(task),
                     color: Colors.white,
                     size: 24,
                   ),
@@ -412,7 +508,7 @@ class _EvidenceStoryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _observationTitle(task),
+                    _heroInsightTitle(task),
                     style: const TextStyle(
                       color: Colors.white,
                       fontFamily: AppTypography.systemFont,
@@ -424,7 +520,7 @@ class _EvidenceStoryCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 7),
                   Text(
-                    task.observationText,
+                    _heroInsightBody(task),
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -440,54 +536,6 @@ class _EvidenceStoryCard extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _EvidenceMetric extends StatelessWidget {
-  const _EvidenceMetric({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(13),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.58),
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -526,13 +574,6 @@ class _TaskDetailLoading extends StatelessWidget {
   }
 }
 
-bool _canStartTask(GuardianTask task) {
-  return task.status == GuardianTaskStatus.scheduled ||
-      task.status == GuardianTaskStatus.pending ||
-      task.status == GuardianTaskStatus.reminderSent ||
-      task.status == GuardianTaskStatus.delayed;
-}
-
 bool _canEditSchedule(GuardianTask task) {
   return task.status == GuardianTaskStatus.scheduled ||
       task.status == GuardianTaskStatus.pending ||
@@ -547,23 +588,132 @@ bool _canSendWrapUpReminder(GuardianTask task) {
   return !remaining.isNegative && remaining <= const Duration(minutes: 5);
 }
 
-String _observationTitle(GuardianTask task) {
-  if (task.status == GuardianTaskStatus.inProgress) return '实时观察建议';
-  if (task.status == GuardianTaskStatus.delayed) return '需要提醒';
-  if (task.status.awaitsParent) return '等待你确认完成情况';
+String _heroTrailingLabel(GuardianTask task) {
+  if (task.status == GuardianTaskStatus.rejected) return '未发放';
   if (task.status == GuardianTaskStatus.completed ||
       task.status == GuardianTaskStatus.confirmed) {
-    return '完成记录';
+    return task.pointsGrantedAt != null && task.rewardPoints > 0
+        ? '+${task.rewardPoints} 分'
+        : '已记录';
   }
-  if (task.status == GuardianTaskStatus.missed) return '任务未完成';
-  return '任务安排';
+  return '';
 }
 
-String _confirmationShortLabel(GuardianTask task) {
-  if (!task.requiresParentConfirmation) return '自动记录';
-  if (task.status.awaitsParent) return '待确认';
-  if (task.status == GuardianTaskStatus.confirmed) return '已确认';
-  return '需确认';
+String _heroTitle(GuardianTask task) {
+  return switch (task.status) {
+    GuardianTaskStatus.scheduled || GuardianTaskStatus.pending => '任务还没开始',
+    GuardianTaskStatus.reminderSent => '即将开始',
+    GuardianTaskStatus.inProgress => '任务进行中',
+    GuardianTaskStatus.delayed => '还没有开始',
+    GuardianTaskStatus.awaitingParentConfirmation => '等待你确认',
+    GuardianTaskStatus.completed || GuardianTaskStatus.confirmed => '已完成',
+    GuardianTaskStatus.rejected => '已驳回',
+    GuardianTaskStatus.missed || GuardianTaskStatus.expired => '已错过',
+    GuardianTaskStatus.cancelled => '已取消',
+  };
+}
+
+String _heroDescription(GuardianTask task) {
+  return switch (task.status) {
+    GuardianTaskStatus.scheduled ||
+    GuardianTaskStatus.pending => '到时间后会提醒孩子开始。',
+    GuardianTaskStatus.reminderSent => '已经提醒孩子，等待任务开始。',
+    GuardianTaskStatus.inProgress =>
+      task.requiresParentConfirmation
+          ? '正在记录任务状态，完成后会进入确认。'
+          : '正在记录任务状态，结束后会进入记录。',
+    GuardianTaskStatus.delayed => '已提醒孩子开始，可以稍后再看或手动处理。',
+    GuardianTaskStatus.awaitingParentConfirmation => '任务时间已结束，请确认孩子是否完成。',
+    GuardianTaskStatus.completed || GuardianTaskStatus.confirmed =>
+      task.pointsGrantedAt != null && task.rewardPoints > 0
+          ? '已确认完成并发放积分。'
+          : '任务已完成并进入记录。',
+    GuardianTaskStatus.rejected => '本次任务未通过确认，未发放积分。',
+    GuardianTaskStatus.missed ||
+    GuardianTaskStatus.expired => '任务时间已过，本次未记录完成。',
+    GuardianTaskStatus.cancelled => '任务已取消，记录仍会保留。',
+  };
+}
+
+IconData _heroInsightIcon(GuardianTask task) {
+  return switch (task.status) {
+    GuardianTaskStatus.awaitingParentConfirmation => Icons.fact_check_outlined,
+    GuardianTaskStatus.completed ||
+    GuardianTaskStatus.confirmed => Icons.verified_outlined,
+    GuardianTaskStatus.rejected => Icons.rule_outlined,
+    GuardianTaskStatus.inProgress => Icons.center_focus_strong_outlined,
+    GuardianTaskStatus.delayed => Icons.volume_up_outlined,
+    GuardianTaskStatus.missed ||
+    GuardianTaskStatus.expired => Icons.event_busy_outlined,
+    _ => Icons.schedule_outlined,
+  };
+}
+
+String _heroInsightTitle(GuardianTask task) {
+  return switch (task.status) {
+    GuardianTaskStatus.awaitingParentConfirmation => '观察摘要',
+    GuardianTaskStatus.completed || GuardianTaskStatus.confirmed => '完成记录',
+    GuardianTaskStatus.rejected => '驳回原因',
+    GuardianTaskStatus.inProgress => '当前观察',
+    GuardianTaskStatus.delayed => '提醒记录',
+    GuardianTaskStatus.missed || GuardianTaskStatus.expired => '任务记录',
+    _ => '任务安排',
+  };
+}
+
+String _heroInsightBody(GuardianTask task) {
+  if (task.status == GuardianTaskStatus.rejected) {
+    return task.rejectionReason.isNotEmpty
+        ? '原因：${task.rejectionReason}'
+        : '本次任务未通过确认，未发放积分。';
+  }
+  if (task.status == GuardianTaskStatus.delayed) {
+    if (task.delayReminderCount > 0) {
+      return '已温和提醒 ${task.delayReminderCount} 次，可以稍后再看任务状态。';
+    }
+    return '孩子还没有开始，必要时可以再提醒一次。';
+  }
+  if (task.status == GuardianTaskStatus.inProgress) {
+    if (task.cameraObservationStatus == 'unavailable' ||
+        task.cameraObservationStatus == 'offline') {
+      return '摄像头暂时离线，任务仍会记录，恢复后继续同步。';
+    }
+    return task.observationText;
+  }
+  if (task.status.awaitsParent) {
+    if (task.aiObservationSummary.isNotEmpty ||
+        task.evidenceSummary.isNotEmpty ||
+        task.evidence.isNotEmpty) {
+      return task.observationText;
+    }
+    return '暂未获得完整观察结果，可根据实际情况确认。';
+  }
+  if (task.status == GuardianTaskStatus.completed ||
+      task.status == GuardianTaskStatus.confirmed) {
+    if (task.pointsGrantedAt != null && task.rewardPoints > 0) {
+      return '+${task.rewardPoints} 分已发放，任务已进入记录。';
+    }
+    return '任务时间已结束，已记录完成。';
+  }
+  if (task.status == GuardianTaskStatus.missed ||
+      task.status == GuardianTaskStatus.expired) {
+    return '任务时间已过，本次没有记录到完成结果。';
+  }
+  return _timeUntilStartLabel(task);
+}
+
+String _timeUntilStartLabel(GuardianTask task) {
+  final startAt = DateTime.tryParse(task.startAt);
+  if (startAt == null) return '到时间后会提醒孩子开始。';
+  final remaining = startAt.difference(DateTime.now());
+  if (remaining.isNegative) return '任务即将进入下一步记录。';
+  if (remaining.inHours >= 1) {
+    final hours = remaining.inHours;
+    final minutes = remaining.inMinutes.remainder(60);
+    return minutes > 0 ? '距离开始还有 $hours 小时 $minutes 分钟。' : '距离开始还有 $hours 小时。';
+  }
+  final minutes = remaining.inMinutes <= 0 ? 1 : remaining.inMinutes;
+  return '距离开始还有 $minutes 分钟。';
 }
 
 Future<void> _completeTask(
@@ -577,20 +727,6 @@ Future<void> _completeTask(
         .completeTask(task.id, evidenceSummary: task.evidenceText);
     _invalidateTaskData(ref, task.id);
     if (context.mounted) _showToast(context, '任务已进入家长确认状态');
-  } on TaskException catch (error) {
-    if (context.mounted) _showToast(context, error.message);
-  }
-}
-
-Future<void> _startTask(
-  BuildContext context,
-  WidgetRef ref,
-  GuardianTask task,
-) async {
-  try {
-    await ref.read(taskRepositoryProvider).startTask(task.id);
-    _invalidateTaskData(ref, task.id);
-    if (context.mounted) _showToast(context, '任务已开始');
   } on TaskException catch (error) {
     if (context.mounted) _showToast(context, error.message);
   }
@@ -622,7 +758,10 @@ Future<void> _confirmTask(
     _invalidateTaskData(ref, task.id);
     ref.invalidate(pointsSummaryProvider);
     if (context.mounted) {
-      _showToast(context, '已确认完成，+${task.rewardPoints} 积分已写入流水');
+      final message = task.rewardPoints > 0
+          ? '已确认完成，+${task.rewardPoints} 积分已写入流水'
+          : '已确认完成，任务已进入记录';
+      _showToast(context, message);
     }
   } on TaskException catch (error) {
     if (context.mounted) _showToast(context, error.message);
@@ -637,9 +776,9 @@ Future<void> _rejectTask(
   try {
     await ref
         .read(taskRepositoryProvider)
-        .rejectConfirmation(task.id, reason: '证据不足，等待孩子补充完成。');
+        .rejectConfirmation(task.id, reason: '证据不足，未通过家长确认。');
     _invalidateTaskData(ref, task.id);
-    if (context.mounted) _showToast(context, '已驳回任务证据');
+    if (context.mounted) _showToast(context, '已驳回，本次不发放积分');
   } on TaskException catch (error) {
     if (context.mounted) _showToast(context, error.message);
   }

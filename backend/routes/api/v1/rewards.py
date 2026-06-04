@@ -42,6 +42,14 @@ def update_item(item_id: str):
         return error_response(exc)
 
 
+@rewards_bp.delete("/items/<item_id>")
+def delete_item(item_id: str):
+    try:
+        return jsonify(reward_service().delete_item(bearer_token(request), item_id))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @rewards_bp.get("/redemptions")
 def list_redemptions():
     try:

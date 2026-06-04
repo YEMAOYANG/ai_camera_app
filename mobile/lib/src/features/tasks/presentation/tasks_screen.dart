@@ -724,7 +724,8 @@ class _TaskTimelineCard extends StatelessWidget {
                   children: [
                     _TaskMetaPill(label: task.typeLabel),
                     _TaskMetaPill(label: task.timeLabel),
-                    _TaskMetaPill(label: '+${task.rewardPoints} 分'),
+                    if (task.rewardPoints > 0)
+                      _TaskMetaPill(label: '+${task.rewardPoints} 分'),
                     if (task.requiresParentConfirmation)
                       const _TaskMetaPill(label: '需家长确认'),
                   ],
@@ -899,7 +900,11 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     );
     _sheetScrollController = ScrollController();
     _rewardController = TextEditingController(
-      text: '${task?.rewardPoints ?? 3}',
+      text: task == null
+          ? '3'
+          : task.rewardPoints > 0
+          ? '${task.rewardPoints}'
+          : '',
     );
     _date = task == null
         ? widget.initialDate

@@ -26,10 +26,21 @@ class RewardsScreen extends ConsumerWidget {
       fixedHeader: true,
       backLabel: '返回我的',
       onBack: () => context.go(AppRoute.profile.path),
-      trailing: MiraIconButton(
-        icon: Icons.stars_outlined,
-        label: '积分',
-        onTap: () => context.go(pointsPath),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MiraIconButton(
+            icon: Icons.add,
+            label: '新增奖励',
+            onTap: () => context.push(rewardEditPath),
+          ),
+          const SizedBox(width: 8),
+          MiraIconButton(
+            icon: Icons.stars_outlined,
+            label: '积分',
+            onTap: () => context.go(pointsPath),
+          ),
+        ],
       ),
       children: [
         _RewardBalancePanel(balance: points.asData?.value.account.balance),
@@ -161,7 +172,10 @@ class _RewardItemsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) {
+    final activeItems = items
+        .where((item) => item.status != 'archived')
+        .toList();
+    if (activeItems.isEmpty) {
       return const MiraStateView(
         variant: MiraStateVariant.emptyRewards,
         title: '还没有奖励项',
@@ -176,7 +190,7 @@ class _RewardItemsPanel extends StatelessWidget {
         children: [
           const _PanelTitle('奖励商店'),
           const SizedBox(height: 8),
-          for (final item in items)
+          for (final item in activeItems)
             MiraListRow(
               icon: _iconForReward(item),
               title: item.title,
@@ -187,6 +201,14 @@ class _RewardItemsPanel extends StatelessWidget {
               trailing: StatusChip(label: item.statusLabel),
               onTap: () => context.go('$rewardDetailPath/${item.id}'),
             ),
+          const SizedBox(height: 10),
+          MiraListRow(
+            icon: Icons.add_circle_outline,
+            title: '添加奖励',
+            subtitle: '家长可以创建新的兑换目标',
+            tone: MiraListRowTone.green,
+            onTap: () => context.push(rewardEditPath),
+          ),
         ],
       ),
     );

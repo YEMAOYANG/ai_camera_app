@@ -105,6 +105,98 @@ class RewardRepository {
     }
   }
 
+  Future<RewardItem> createItem({
+    required String childId,
+    required String title,
+    required int pointsCost,
+    String? description,
+    String? category,
+    String? icon,
+  }) async {
+    final body = {
+      'childId': childId,
+      'title': title,
+      'pointsCost': pointsCost,
+      'description': description,
+      'category': category,
+      'icon': icon,
+    };
+    if (_environment.useMockData) {
+      final item = RewardItem.fromJson({
+        'id': 'reward_mock_${DateTime.now().millisecondsSinceEpoch}',
+        'familyId': 'mock_family',
+        ...body,
+        'status': 'active',
+      });
+      _mockItems = [item, ..._mockItems];
+      return item;
+    }
+
+    try {
+      final response = await _apiClient.post('/rewards/items', data: body);
+      return RewardItem.fromJson(_asMap(_asMap(response.data)['item']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<RewardItem> updateItem({
+    required String itemId,
+    required String title,
+    required int pointsCost,
+    String? description,
+    String? category,
+    String? icon,
+  }) async {
+    final body = {
+      'title': title,
+      'pointsCost': pointsCost,
+      'description': description,
+      'category': category,
+      'icon': icon,
+    };
+    if (_environment.useMockData) {
+      final index = _mockItems.indexWhere((item) => item.id == itemId);
+      if (index < 0) return _mockItems.first;
+      final current = _mockItems[index];
+      final item = RewardItem(
+        id: current.id,
+        familyId: current.familyId,
+        childId: current.childId,
+        title: title,
+        description: description ?? current.description,
+        pointsCost: pointsCost,
+        category: category ?? current.category,
+        status: current.status,
+        icon: icon ?? current.icon,
+      );
+      _mockItems = [..._mockItems]..[index] = item;
+      return item;
+    }
+
+    try {
+      final response = await _apiClient.patch(
+        '/rewards/items/$itemId',
+        data: body,
+      );
+      return RewardItem.fromJson(_asMap(_asMap(response.data)['item']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<void> deleteItem(String itemId) async {
+    if (_environment.useMockData) {
+      _mockItems = _mockItems.where((item) => item.id != itemId).toList();
+      return;
+    }
+    try {
+      await _apiClient.delete('/rewards/items/$itemId');
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
   Future<RewardRedemption> createRedemption(String rewardItemId) async {
     if (_environment.useMockData) {
       final item = await this.item(rewardItemId);

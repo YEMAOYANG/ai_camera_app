@@ -101,6 +101,20 @@ class RewardService:
             )
             return {"ok": True, "item": reward_item_payload(item)}
 
+    def delete_item(self, access_token: str, item_id: str) -> dict:
+        context = self._auth_context(access_token)
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            self._item_or_error(conn, context["family"]["id"], item_id)
+            item = self.repository.update_item(
+                conn,
+                family_id=context["family"]["id"],
+                item_id=item_id,
+                fields={"status": "archived"},
+                now=now,
+            )
+            return {"ok": True, "item": reward_item_payload(item)}
+
     def list_redemptions(self, access_token: str, query: dict) -> dict:
         context = self._auth_context(access_token)
         child_id = self._optional_text(query, "childId")

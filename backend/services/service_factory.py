@@ -14,6 +14,7 @@ from services.camera_command_service import CameraCommandService
 from services.device_service import DeviceService
 from services.firmware_service import FirmwareService
 from services.point_service import PointService
+from services.profile_service import ProfileService
 from services.reward_service import RewardService
 from services.setup_service import SetupService
 from services.sms_provider import DevelopmentSmsProvider, SmsProvider, UnavailableSmsProvider
@@ -47,6 +48,10 @@ def point_service() -> PointService:
 
 def reward_service() -> RewardService:
     return RewardService(current_app.config["DATABASE_URL"], auth_service=auth_service())
+
+
+def profile_service() -> ProfileService:
+    return ProfileService(current_app.config["DATABASE_URL"], auth_service=auth_service())
 
 
 def device_service() -> DeviceService:

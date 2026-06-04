@@ -179,10 +179,13 @@ void main() {
     await tester.tap(find.text('任务').last);
     await tester.pumpAndSettle();
     expect(find.text('数学作业'), findsWidgets);
+    expect(find.text('+0 分'), findsNothing);
 
     await tester.tap(find.text('数学作业').last);
     await tester.pumpAndSettle();
-    expect(find.text('实时观察建议'), findsOneWidget);
+    expect(find.text('任务进行中'), findsOneWidget);
+    expect(find.text('当前观察'), findsOneWidget);
+    expect(find.text('时间和奖励'), findsOneWidget);
     expect(find.text('任务记录'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
@@ -194,7 +197,45 @@ void main() {
 
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
-    expect(find.text('家庭管理'), findsOneWidget);
+    expect(find.text('家庭看护空间'), findsOneWidget);
+    expect(find.text('家庭与孩子'), findsOneWidget);
+  });
+
+  testWidgets('rejecting a confirmation task is final in V1 copy', (
+    tester,
+  ) async {
+    await _pumpApp(
+      tester,
+      preferences: const {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+      },
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await _loginSuccessfully(tester);
+
+    await tester.tap(find.text('任务').last);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('英语听读').last);
+    await tester.tap(find.text('英语听读').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('等待你确认'), findsOneWidget);
+    expect(find.text('确认完成'), findsOneWidget);
+    expect(find.text('驳回'), findsOneWidget);
+
+    await tester.tap(find.text('驳回'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('已驳回'), findsWidgets);
+    expect(find.text('本次任务未通过确认，未发放积分。'), findsWidgets);
+    expect(find.text('原因：证据不足，未通过家长确认。'), findsOneWidget);
+    expect(find.text('时间和奖励'), findsOneWidget);
+    expect(find.text('任务记录'), findsOneWidget);
+    expect(find.text('确认完成'), findsNothing);
+    expect(find.textContaining('等待孩子补充'), findsNothing);
+    expect(find.textContaining('补充完成'), findsNothing);
   });
 
   testWidgets('opens points and rewards flows from profile', (tester) async {
@@ -221,12 +262,28 @@ void main() {
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('积分').last);
+    final pointsEntry = find.text('积分账户');
+    await tester.scrollUntilVisible(pointsEntry, 400);
+    await Scrollable.ensureVisible(
+      tester.element(pointsEntry),
+      alignment: 0.35,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(pointsEntry);
     await tester.pumpAndSettle();
     expect(find.text('积分流水'), findsOneWidget);
     expect(find.text('补发或更正积分'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.card_giftcard_outlined).last);
+    await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+    await tester.pumpAndSettle();
+    final rewardsEntry = find.text('奖励中心');
+    await tester.scrollUntilVisible(rewardsEntry, 400);
+    await Scrollable.ensureVisible(
+      tester.element(rewardsEntry),
+      alignment: 0.35,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(rewardsEntry);
     await tester.pumpAndSettle();
     expect(find.text('奖励商店'), findsOneWidget);
     expect(find.text('兑换记录'), findsOneWidget);
@@ -235,6 +292,57 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('兑换说明'), findsOneWidget);
     expect(find.text('兑换奖励'), findsOneWidget);
+  });
+
+  testWidgets('profile tab opens formal secondary pages', (tester) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'mock_access_saved',
+        authRefreshTokenKey: 'mock_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'mock_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text('我的').last);
+    await tester.pumpAndSettle();
+    expect(find.text('家庭看护空间'), findsOneWidget);
+
+    for (final entry in const [
+      ['家庭成员', '家庭成员'],
+      ['孩子资料', '孩子资料'],
+      ['紧急联系人', '紧急联系人'],
+      ['设备管理', '设备管理'],
+      ['摄像头与看护状态', '摄像头与看护'],
+      ['AI 看护规则', 'AI 看护规则'],
+      ['通知与提醒', '通知与提醒'],
+      ['隐私与权限', '隐私与权限'],
+      ['对话与人设', '对话与人设'],
+      ['学习内容', '学习内容'],
+      ['今日报告', '今日报告'],
+      ['周报', '周报'],
+      ['成长时刻', '成长时刻'],
+      ['个人信息', '个人信息'],
+      ['账号安全', '账号安全'],
+      ['订阅与套餐', '订阅与套餐'],
+      ['关于', '关于'],
+    ]) {
+      await _openProfileEntry(tester, entry.first, expectedTitle: entry.last);
+    }
+
+    expect(find.text('安全区域'), findsNothing);
+    expect(find.text('打卡审核'), findsNothing);
   });
 
   testWidgets('tasks screen adapts to common phone sizes', (tester) async {
@@ -399,6 +507,24 @@ Future<void> _loginSuccessfully(WidgetTester tester) async {
   expect(find.text('正在确认'), findsOneWidget);
 
   await tester.pump(const Duration(seconds: 2));
+  await tester.pumpAndSettle();
+}
+
+Future<void> _openProfileEntry(
+  WidgetTester tester,
+  String label, {
+  required String expectedTitle,
+}) async {
+  final entry = find.text(label).last;
+  await tester.scrollUntilVisible(entry, 420);
+  await tester.ensureVisible(entry);
+  await tester.pumpAndSettle();
+  await tester.tap(entry);
+  await tester.pumpAndSettle();
+  expect(find.text(expectedTitle), findsWidgets);
+  expect(find.textContaining('backend'), findsNothing);
+  expect(find.textContaining('API'), findsNothing);
+  await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
   await tester.pumpAndSettle();
 }
 

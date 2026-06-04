@@ -10,6 +10,7 @@ class GuardianDevice {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    this.unboundAt,
   });
 
   final String id;
@@ -20,6 +21,7 @@ class GuardianDevice {
   final String status;
   final int createdAt;
   final int updatedAt;
+  final int? unboundAt;
 
   bool get isOnlineLike => status == 'bound' || status == 'online';
 
@@ -37,6 +39,7 @@ class GuardianDevice {
       status: _asString(json['status']),
       createdAt: _asInt(json['createdAt']),
       updatedAt: _asInt(json['updatedAt']),
+      unboundAt: _asNullableInt(json['unboundAt']),
     );
   }
 }

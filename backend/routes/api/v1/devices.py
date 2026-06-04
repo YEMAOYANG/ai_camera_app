@@ -26,6 +26,30 @@ def get_device(device_id: str):
         return error_response(exc)
 
 
+@devices_bp.patch("/<device_id>")
+def update_device(device_id: str):
+    try:
+        return jsonify(device_service().update_device(bearer_token(request), device_id, json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@devices_bp.post("/<device_id>/rename")
+def rename_device(device_id: str):
+    try:
+        return jsonify(device_service().rename_device(bearer_token(request), device_id, json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@devices_bp.post("/<device_id>/unbind")
+def unbind_device(device_id: str):
+    try:
+        return jsonify(device_service().unbind_device(bearer_token(request), device_id))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @devices_bp.get("/<device_id>/status")
 def device_status(device_id: str):
     try:

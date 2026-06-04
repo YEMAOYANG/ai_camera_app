@@ -15,6 +15,7 @@ class MiraScreen extends StatelessWidget {
     this.onBack,
     this.backLabel = '返回',
     this.fixedHeader = true,
+    this.showHeader = true,
     this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
     this.padding = const EdgeInsets.fromLTRB(20, 16, 20, 28),
     super.key,
@@ -27,6 +28,7 @@ class MiraScreen extends StatelessWidget {
   final VoidCallback? onBack;
   final String backLabel;
   final bool fixedHeader;
+  final bool showHeader;
   final double pinnedHeaderHeight;
   final List<Widget> children;
   final EdgeInsetsGeometry padding;
@@ -65,7 +67,7 @@ class MiraScreen extends StatelessWidget {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: adjustedPadding,
             children: [
-              if (!fixedHeader) ...[
+              if (!fixedHeader && showHeader) ...[
                 _MiraLargeHeader(
                   title: title,
                   subtitle: subtitle,
@@ -76,7 +78,7 @@ class MiraScreen extends StatelessWidget {
               ...children,
             ],
           ),
-          if (fixedHeader)
+          if (fixedHeader && showHeader)
             _MiraPinnedHeader(
               title: title,
               subtitle: subtitle,

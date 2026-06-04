@@ -276,7 +276,9 @@ class TaskRepository {
           status: task.requiresParentConfirmation
               ? GuardianTaskStatus.awaitingParentConfirmation
               : GuardianTaskStatus.completed,
-          evidenceSummary: evidenceSummary ?? '任务已完成，等待家长确认后发放积分。',
+          evidenceSummary:
+              evidenceSummary ??
+              (task.rewardPoints > 0 ? '任务已完成，等待家长确认后发放积分。' : '任务已完成，等待家长确认。'),
           completionSource: completionSource,
           completedAt: DateTime.now().millisecondsSinceEpoch,
         ),
@@ -299,12 +301,13 @@ class TaskRepository {
 
   Future<GuardianTask> parentConfirm(String taskId) async {
     if (_environment.useMockData) {
+      final now = DateTime.now().millisecondsSinceEpoch;
       return _updateMockTask(
         taskId,
         (task) => task.copyWith(
           status: GuardianTaskStatus.confirmed,
-          confirmedAt: DateTime.now().millisecondsSinceEpoch,
-          pointsGrantedAt: DateTime.now().millisecondsSinceEpoch,
+          confirmedAt: now,
+          pointsGrantedAt: task.rewardPoints > 0 ? now : task.pointsGrantedAt,
         ),
       );
     }
@@ -326,7 +329,8 @@ class TaskRepository {
         taskId,
         (task) => task.copyWith(
           status: GuardianTaskStatus.rejected,
-          rejectionReason: reason ?? '证据不足，等待孩子补充完成。',
+          rejectionReason: reason ?? '证据不足，未通过家长确认。',
+          rejectedAt: DateTime.now().millisecondsSinceEpoch,
         ),
       );
     }
@@ -442,12 +446,11 @@ List<GuardianTask> _buildMockTasks() {
       'scheduledDate': today,
       'scheduledStart': '17:30',
       'scheduledEnd': '',
-      'rewardPoints': 1,
+      'rewardPoints': 0,
       'priority': 3,
       'requiresParentConfirmation': true,
       'evidenceSummary': '摄像头完成一次温和提醒，孩子已喝水。',
       'aiObservationSummary': '状态平稳，适合作为作业前缓冲。',
-      'pointsGrantedAt': now.millisecondsSinceEpoch,
       'createdAt': now.millisecondsSinceEpoch,
       'updatedAt': now.millisecondsSinceEpoch,
     },

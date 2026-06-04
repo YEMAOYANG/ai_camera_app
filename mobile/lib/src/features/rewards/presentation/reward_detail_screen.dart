@@ -37,6 +37,11 @@ class RewardDetailScreen extends ConsumerWidget {
           fixedHeader: true,
           backLabel: '返回奖励',
           onBack: () => context.go(rewardsPath),
+          trailing: MiraIconButton(
+            icon: Icons.edit_outlined,
+            label: '编辑奖励',
+            onTap: () => context.push('$rewardEditPath/${item.id}'),
+          ),
           children: [
             _RewardHero(item: item, balance: balance),
             const SizedBox(height: 14),

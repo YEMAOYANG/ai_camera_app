@@ -61,6 +61,84 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(ledger.json["ledger"][0]["type"], "task_completed")
         self.assertEqual(ledger.json["ledger"][0]["delta"], 20)
 
+    def test_parent_reject_is_terminal_and_skips_points(self):
+        task = self._create_task(reward_points=12)
+
+        complete = self.client.post(
+            f"/api/tasks/{task['id']}/complete",
+            json={"evidenceSummary": "观察结果不完整"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(complete.status_code, 200)
+        self.assertEqual(complete.json["task"]["status"], "awaiting_parent_confirmation")
+
+        reject = self.client.post(
+            f"/api/tasks/{task['id']}/reject",
+            json={"reason": "证据不足，未通过家长确认。"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(reject.status_code, 200)
+        self.assertEqual(reject.json["task"]["status"], "rejected")
+        self.assertEqual(reject.json["task"]["rejectionReason"], "证据不足，未通过家长确认。")
+        self.assertIsNone(reject.json.get("ledgerEntry"))
+
+        events = self.client.get(
+            f"/api/tasks/{task['id']}/events",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200)
+        event_types = [event["eventType"] for event in events.json["events"]]
+        self.assertIn("parent_rejected", event_types)
+        self.assertIn("points_award_skipped", event_types)
+
+        ledger = self.client.get(
+            "/api/points/ledger",
+            query_string={"childId": self.child_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(ledger.status_code, 200)
+        task_entries = [
+            entry
+            for entry in ledger.json["ledger"]
+            if entry["sourceId"] == task["id"] and entry["type"] == "task_completed"
+        ]
+        self.assertEqual(task_entries, [])
+
+        confirm_again = self.client.post(
+            f"/api/tasks/{task['id']}/parent-confirm",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(confirm_again.status_code, 400)
+
+        start_again = self.client.post(
+            f"/api/tasks/{task['id']}/start",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(start_again.status_code, 400)
+
+    def test_completed_task_cannot_be_rejected_without_reversal_flow(self):
+        task = self._create_task_at(
+            start_at=datetime.now().astimezone() - timedelta(minutes=10),
+            due_at=datetime.now().astimezone() - timedelta(minutes=1),
+            reward_points=5,
+            requires_parent_confirmation=False,
+        )
+        complete = self.client.post(
+            f"/api/tasks/{task['id']}/complete",
+            json={"evidenceSummary": "家长手动确认已完成"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(complete.status_code, 200)
+        self.assertEqual(complete.json["task"]["status"], "completed")
+        self.assertIsNotNone(complete.json["ledgerEntry"])
+
+        reject = self.client.post(
+            f"/api/tasks/{task['id']}/reject",
+            json={"reason": "事后驳回"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(reject.status_code, 400)
+
     def test_task_contract_supports_week_fields_and_updates(self):
         response = self.client.post(
             "/api/tasks",

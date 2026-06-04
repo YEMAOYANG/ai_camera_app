@@ -54,3 +54,43 @@ class DeviceRepository:
             "SELECT * FROM devices WHERE family_id = ? AND id = ?",
             (family_id, device_id),
         ).fetchone()
+
+    def update_device(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        device_id: str,
+        fields: dict,
+        now: int,
+    ) -> DatabaseRow | None:
+        if fields:
+            assignments = [f"{column} = ?" for column in fields]
+            values = list(fields.values()) + [now, family_id, device_id]
+            conn.execute(
+                f"""
+                UPDATE devices
+                SET {', '.join(assignments)}, updated_at = ?
+                WHERE family_id = ? AND id = ?
+                """,
+                values,
+            )
+        return self.get_device(conn, family_id=family_id, device_id=device_id)
+
+    def unbind_device(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        device_id: str,
+        now: int,
+    ) -> DatabaseRow | None:
+        conn.execute(
+            """
+            UPDATE devices
+            SET status = 'unbound', updated_at = ?, unbound_at = ?
+            WHERE family_id = ? AND id = ?
+            """,
+            (now, now, family_id, device_id),
+        )
+        return self.get_device(conn, family_id=family_id, device_id=device_id)
