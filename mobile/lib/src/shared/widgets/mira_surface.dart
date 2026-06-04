@@ -7,7 +7,7 @@ class MiraSurface extends StatelessWidget {
     this.padding = const EdgeInsets.all(16),
     this.color,
     this.borderColor,
-    this.radius = 18,
+    this.radius = 16,
     this.onTap,
     super.key,
   });
@@ -23,11 +23,9 @@ class MiraSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final box = DecoratedBox(
       decoration: BoxDecoration(
-        color: color ?? Colors.white.withValues(alpha: 0.50),
+        color: color ?? AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(
-          color: borderColor ?? Colors.white.withValues(alpha: 0.68),
-        ),
+        border: Border.all(color: borderColor ?? AppColors.borderSoft),
       ),
       child: Padding(padding: padding, child: child),
     );
@@ -61,7 +59,7 @@ class MiraEmptyState extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               color: AppColors.brand.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadii.control),
             ),
             child: SizedBox(
               width: 46,
@@ -79,7 +77,7 @@ class MiraEmptyState extends StatelessWidget {
               color: AppColors.ink,
               fontFamily: AppTypography.systemFont,
               fontSize: 17,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
               height: 1.25,
               letterSpacing: 0,
             ),
@@ -92,7 +90,7 @@ class MiraEmptyState extends StatelessWidget {
               color: AppColors.muted,
               fontFamily: AppTypography.systemFont,
               fontSize: 13,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
               height: 1.55,
               letterSpacing: 0,
             ),

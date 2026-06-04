@@ -23,9 +23,9 @@ class MiraListRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = switch (tone) {
       MiraListRowTone.blue => AppColors.brand,
-      MiraListRowTone.green => const Color(0xFF2F8F68),
-      MiraListRowTone.amber => const Color(0xFFD8922B),
-      MiraListRowTone.red => const Color(0xFFB64A4A),
+      MiraListRowTone.green => AppColors.success,
+      MiraListRowTone.amber => AppColors.warning,
+      MiraListRowTone.red => AppColors.danger,
       MiraListRowTone.neutral => AppColors.ink,
     };
 
@@ -58,7 +58,7 @@ class MiraListRow extends StatelessWidget {
                     color: AppColors.ink,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 14,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     height: 1.25,
                     letterSpacing: 0,
                   ),
@@ -72,7 +72,7 @@ class MiraListRow extends StatelessWidget {
                     color: AppColors.muted,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                     height: 1.42,
                     letterSpacing: 0,
                   ),

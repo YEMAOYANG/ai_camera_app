@@ -778,7 +778,7 @@ class _AuthTextField extends StatelessWidget {
                     color: AppColors.ink,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 0,
                   ),
                 ),
@@ -786,10 +786,10 @@ class _AuthTextField extends StatelessWidget {
                 Text(
                   helper,
                   style: const TextStyle(
-                    color: Color(0x99526579),
+                    color: AppColors.subtle,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 11,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w500,
                     letterSpacing: 0,
                   ),
                 ),
@@ -800,23 +800,24 @@ class _AuthTextField extends StatelessWidget {
               duration: AppMotion.duration(context, 180),
               curve: Curves.easeOutCubic,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: filled ? 0.9 : 0.7),
-                borderRadius: BorderRadius.circular(17),
+                color: filled
+                    ? AppColors.surfaceElevated
+                    : AppColors.surfaceSoft,
+                borderRadius: BorderRadius.circular(AppRadii.input),
                 border: Border.all(
                   color: hasError
-                      ? const Color(0xFFB64A4A)
+                      ? AppColors.danger
                       : focused
-                      ? AppColors.primaryButtonStart.withValues(alpha: 0.72)
-                      : Colors.white.withValues(alpha: 0.82),
+                      ? AppColors.focus
+                      : AppColors.borderSoft,
+                  width: focused ? 1.1 : 1,
                 ),
                 boxShadow: focused
                     ? [
                         BoxShadow(
-                          color: AppColors.primaryButtonShadow.withValues(
-                            alpha: 0.12,
-                          ),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
+                          color: AppColors.focus.withValues(alpha: 0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 5),
                         ),
                       ]
                     : null,
@@ -827,10 +828,10 @@ class _AuthTextField extends StatelessWidget {
                   Icon(
                     icon,
                     color: hasError
-                        ? const Color(0xFFB64A4A)
+                        ? AppColors.danger
                         : focused
-                        ? AppColors.primaryButtonStart
-                        : const Color(0x99526579),
+                        ? AppColors.brandDeep
+                        : AppColors.subtle,
                     size: 18,
                   ),
                   const SizedBox(width: 9),
@@ -846,19 +847,19 @@ class _AuthTextField extends StatelessWidget {
                         color: AppColors.ink,
                         fontFamily: AppTypography.systemFont,
                         fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 0,
                       ),
                       decoration: InputDecoration(
                         hintText: placeholder,
                         hintStyle: const TextStyle(
-                          color: Color(0x76526579),
-                          fontWeight: FontWeight.w600,
+                          color: AppColors.subtle,
+                          fontWeight: FontWeight.w500,
                         ),
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
-                          vertical: 17,
+                          vertical: 14,
                         ),
                       ),
                     ),
@@ -881,10 +882,10 @@ class _AuthTextField extends StatelessWidget {
                       child: Text(
                         errorText!,
                         style: const TextStyle(
-                          color: Color(0xFFB64A4A),
+                          color: AppColors.danger,
                           fontFamily: AppTypography.systemFont,
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           height: 1.3,
                           letterSpacing: 0,
                         ),
@@ -924,18 +925,23 @@ class _CodeRequestButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: active
-              ? AppColors.ink.withValues(alpha: 0.08)
-              : AppColors.brand.withValues(alpha: 0.1),
+              ? AppColors.brandWash
+              : AppColors.disabledFill.withValues(alpha: 0.76),
           borderRadius: BorderRadius.circular(13),
+          border: Border.all(
+            color: active
+                ? AppColors.brand.withValues(alpha: 0.10)
+                : AppColors.borderSoft,
+          ),
         ),
         child: Center(
           child: Text(
             label,
             style: TextStyle(
-              color: active ? AppColors.ink : AppColors.brand,
+              color: active ? AppColors.brandDeep : AppColors.disabledInk,
               fontFamily: AppTypography.systemFont,
               fontSize: 12,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0,
             ),
           ),
@@ -988,25 +994,21 @@ class _AgreementRow extends StatelessWidget {
                   width: 22,
                   height: 22,
                   decoration: BoxDecoration(
-                    color: accepted
-                        ? AppColors.ink
-                        : Colors.white.withValues(alpha: 0.7),
+                    color: accepted ? AppColors.brand : AppColors.surfaceSoft,
                     borderRadius: BorderRadius.circular(7),
                     border: Border.all(
                       color: errorText != null
-                          ? const Color(0xFFB64A4A)
+                          ? AppColors.danger
                           : accepted
-                          ? AppColors.ink
-                          : Colors.white.withValues(alpha: 0.86),
+                          ? AppColors.brand
+                          : AppColors.borderSoft,
                     ),
                     boxShadow: accepted
                         ? [
                             BoxShadow(
-                              color: AppColors.primaryButtonShadow.withValues(
-                                alpha: 0.16,
-                              ),
-                              blurRadius: 12,
-                              offset: const Offset(0, 7),
+                              color: AppColors.brand.withValues(alpha: 0.14),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
                             ),
                           ]
                         : null,
@@ -1045,10 +1047,10 @@ class _AgreementRow extends StatelessWidget {
                   child: Text(
                     errorText!,
                     style: const TextStyle(
-                      color: Color(0xFFB64A4A),
+                      color: AppColors.danger,
                       fontFamily: AppTypography.systemFont,
                       fontSize: 12,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       height: 1.3,
                       letterSpacing: 0,
                     ),

@@ -81,21 +81,44 @@ class AppShell extends ConsumerWidget {
       return;
     }
     final resolvedChildId = childId;
+    final selectedDate = ref.read(taskSelectedDateProvider);
+    final selectedWeekStart = _startOfWeek(selectedDate);
+    final selectedWeekQuery = TaskWeekQuery(
+      startDate: selectedWeekStart,
+      endDate: selectedWeekStart.add(const Duration(days: 6)),
+      childId: resolvedChildId,
+    );
+    var existingTasks = ref
+        .read(taskWeekProvider(selectedWeekQuery))
+        .asData
+        ?.value;
+    if (existingTasks == null) {
+      try {
+        existingTasks = await ref.read(
+          taskWeekProvider(selectedWeekQuery).future,
+        );
+      } catch (_) {
+        existingTasks = const [];
+      }
+    }
+    if (!context.mounted) return;
 
     final snapshot = ref.read(guardianMvpSnapshotProvider);
     final savedDate = await showTaskFormSheet(
       context,
       childId: resolvedChildId,
-      initialDate: DateTime.now(),
+      initialDate: selectedDate,
       childAgeGroup: taskAgeGroupForChild(
         stage: snapshot.child.stage,
         grade: snapshot.child.grade,
       ),
       onSavedProgress: () =>
-          _invalidateTaskLists(ref, resolvedChildId, DateTime.now()),
+          _invalidateTaskLists(ref, resolvedChildId, selectedDate),
+      existingTasks: existingTasks ?? const [],
     );
 
     if (savedDate == null) return;
+    ref.read(taskSelectedDateProvider.notifier).state = _dayOnly(savedDate);
     _invalidateTaskLists(ref, resolvedChildId, savedDate);
     if (context.mounted) {
       context.go(AppRoute.tasks.path);
@@ -353,6 +376,8 @@ DateTime _startOfWeek(DateTime date) {
   final normalized = DateTime(date.year, date.month, date.day);
   return normalized.subtract(Duration(days: normalized.weekday - 1));
 }
+
+DateTime _dayOnly(DateTime date) => DateTime(date.year, date.month, date.day);
 
 void _showShellToast(BuildContext context, String message) {
   ScaffoldMessenger.of(context)

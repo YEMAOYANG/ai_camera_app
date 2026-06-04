@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mira_guardian_app/src/app/router/app_route.dart';
 import 'package:mira_guardian_app/src/core/platform/native_date_picker.dart';
@@ -11,10 +12,15 @@ import 'package:mira_guardian_app/src/features/points/application/point_reposito
 import 'package:mira_guardian_app/src/features/tasks/application/task_repository.dart';
 import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
+import 'package:mira_guardian_app/src/shared/widgets/mira_compact_toggle.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
 import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
 import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+
+final taskSelectedDateProvider = StateProvider<DateTime>((ref) {
+  return _dayOnly(DateTime.now());
+});
 
 class TasksScreen extends ConsumerStatefulWidget {
   const TasksScreen({super.key});
@@ -30,9 +36,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
   @override
   void initState() {
     super.initState();
-    final today = _dayOnly(DateTime.now());
-    _selectedDate = today;
-    _weekStart = _startOfWeek(today);
+    final selectedDate = _dayOnly(ref.read(taskSelectedDateProvider));
+    _selectedDate = selectedDate;
+    _weekStart = _startOfWeek(selectedDate);
   }
 
   @override
@@ -62,7 +68,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         onPrevious: () => _shiftWeek(-1),
         onNext: () => _shiftWeek(1),
         onToday: _goToToday,
-        onSelectDate: (date) => setState(() => _selectedDate = date),
+        onSelectDate: (date) => _selectDate(date),
       ),
       children: [
         weekTasks.when(
@@ -113,6 +119,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       _weekStart = nextStart;
       _selectedDate = nextStart;
     });
+    ref.read(taskSelectedDateProvider.notifier).state = _dayOnly(nextStart);
   }
 
   void _goToToday() {
@@ -121,6 +128,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       _selectedDate = today;
       _weekStart = _startOfWeek(today);
     });
+    ref.read(taskSelectedDateProvider.notifier).state = today;
+  }
+
+  void _selectDate(DateTime date) {
+    final selected = _dayOnly(date);
+    setState(() => _selectedDate = selected);
+    ref.read(taskSelectedDateProvider.notifier).state = selected;
   }
 
   Future<void> _openCreateSheet(
@@ -134,6 +148,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       _showToast(context, '请先完成孩子资料，再添加孩子的新任务。');
       return;
     }
+    final query = TaskWeekQuery(
+      startDate: _weekStart,
+      endDate: _weekStart.add(const Duration(days: 6)),
+      childId: fallbackChildId,
+    );
+    final existingTasks = ref.read(taskWeekProvider(query)).asData?.value;
 
     final savedDate = await showTaskFormSheet(
       context,
@@ -143,6 +163,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       initialMode: initialMode,
       showTemplatePicker: showTemplatePicker,
       onSavedProgress: _refreshTasks,
+      existingTasks: existingTasks ?? const [],
     );
 
     if (!mounted) return;
@@ -152,6 +173,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         _selectedDate = targetDate;
         _weekStart = _startOfWeek(targetDate);
       });
+      ref.read(taskSelectedDateProvider.notifier).state = targetDate;
       _refreshTasks();
       showMiraStateSnackBar(
         context,
@@ -203,6 +225,7 @@ Future<DateTime?> showTaskFormSheet(
   bool showTemplatePicker = false,
   VoidCallback? onSavedProgress,
   GuardianTask? task,
+  List<GuardianTask> existingTasks = const [],
 }) {
   return showModalBottomSheet<DateTime>(
     context: context,
@@ -224,6 +247,7 @@ Future<DateTime?> showTaskFormSheet(
         showTemplatePicker: showTemplatePicker,
         onSavedProgress: onSavedProgress,
         task: task,
+        existingTasks: existingTasks,
       );
     },
   );
@@ -334,7 +358,7 @@ class _BackToThisWeekButton extends StatelessWidget {
       onTap: onTap,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.brand.withValues(alpha: 0.10),
+          color: AppColors.primarySoft,
           borderRadius: BorderRadius.circular(999),
         ),
         child: const Padding(
@@ -342,7 +366,7 @@ class _BackToThisWeekButton extends StatelessWidget {
           child: Text(
             '回到本周',
             style: TextStyle(
-              color: AppColors.brand,
+              color: AppColors.primary,
               fontFamily: AppTypography.systemFont,
               fontSize: 12,
               fontWeight: FontWeight.w900,
@@ -407,17 +431,17 @@ class _DayChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.ink
+              ? AppColors.primary
               : isToday
-              ? AppColors.brand.withValues(alpha: 0.10)
-              : Colors.white.withValues(alpha: 0.70),
-          borderRadius: BorderRadius.circular(18),
+              ? AppColors.selectedBg
+              : AppColors.surfaceSoft,
+          borderRadius: BorderRadius.circular(AppRadii.control),
           border: Border.all(
             color: selected
-                ? AppColors.ink
+                ? AppColors.primary
                 : isToday
-                ? AppColors.brand.withValues(alpha: 0.14)
-                : Colors.white.withValues(alpha: 0.82),
+                ? AppColors.primary.withValues(alpha: 0.14)
+                : AppColors.borderSoft,
           ),
         ),
         child: Column(
@@ -430,7 +454,7 @@ class _DayChip extends StatelessWidget {
                     : AppColors.muted,
                 fontFamily: AppTypography.systemFont,
                 fontSize: 11,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 letterSpacing: 0,
               ),
             ),
@@ -441,7 +465,7 @@ class _DayChip extends StatelessWidget {
                 color: selected ? Colors.white : AppColors.ink,
                 fontFamily: AppTypography.systemFont,
                 fontSize: 20,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
                 height: 1,
                 letterSpacing: 0,
               ),
@@ -455,11 +479,11 @@ class _DayChip extends StatelessWidget {
                 color: selected
                     ? Colors.white.withValues(alpha: 0.72)
                     : isToday
-                    ? AppColors.brand
+                    ? AppColors.primary
                     : AppColors.muted,
                 fontFamily: AppTypography.systemFont,
                 fontSize: 10.5,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 letterSpacing: 0,
               ),
             ),
@@ -820,6 +844,7 @@ class TaskFormSheet extends ConsumerStatefulWidget {
     this.showTemplatePicker = false,
     this.onSavedProgress,
     this.task,
+    this.existingTasks = const [],
     super.key,
   });
 
@@ -830,6 +855,7 @@ class TaskFormSheet extends ConsumerStatefulWidget {
   final bool showTemplatePicker;
   final VoidCallback? onSavedProgress;
   final GuardianTask? task;
+  final List<GuardianTask> existingTasks;
 
   @override
   ConsumerState<TaskFormSheet> createState() => _TaskFormSheetState();
@@ -859,10 +885,15 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
   void initState() {
     super.initState();
     final task = widget.task;
+    _taskType = task?.type ?? 'learning';
+    final descriptionFields = _splitTaskDescription(
+      task?.description ?? '',
+      _taskConfig(_taskType),
+    );
     _titleController = TextEditingController(text: task?.title ?? '');
-    _extraController = TextEditingController();
+    _extraController = TextEditingController(text: descriptionFields.extra);
     _descriptionController = TextEditingController(
-      text: task?.description ?? '',
+      text: descriptionFields.detail,
     );
     _sheetScrollController = ScrollController();
     _rewardController = TextEditingController(
@@ -871,10 +902,10 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     _date = task == null
         ? widget.initialDate
         : (_parseDate(task.scheduledDate) ?? widget.initialDate);
-    _taskType = task?.type ?? 'learning';
+    final suggestedStartTime = _suggestedStartTimeForDate(_date);
     _startTime = task?.scheduledStart.isNotEmpty == true
         ? task!.scheduledStart
-        : '19:00';
+        : suggestedStartTime;
     _dueTime = task?.scheduledEnd.isNotEmpty == true
         ? task!.scheduledEnd
         : _addMinutes(_startTime, _durationForType(_taskType));
@@ -977,10 +1008,10 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
                                 Text(
                                   _error!,
                                   style: const TextStyle(
-                                    color: Color(0xFFB64A4A),
+                                    color: AppColors.danger,
                                     fontFamily: AppTypography.systemFont,
                                     fontSize: 13,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w600,
                                     height: 1.4,
                                   ),
                                 ),
@@ -1207,6 +1238,13 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
       });
       return;
     }
+    if (_startsBeforeAllowedDate(_startTime, _date)) {
+      setState(() {
+        _error = '开始时间不能早于现在。';
+        _saveFailed = false;
+      });
+      return;
+    }
     if (_minutesOfDay(_dueTime) <= _minutesOfDay(_startTime)) {
       setState(() {
         _error = '结束时间要晚于开始时间。';
@@ -1224,8 +1262,9 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
 
     try {
       final repository = ref.read(taskRepositoryProvider);
+      final config = _taskConfig(_taskType);
       final description = _combinedDescription(
-        _extraController.text.trim(),
+        config.extraLabel == null ? '' : _extraController.text.trim(),
         _descriptionController.text.trim(),
       );
       if (widget.task == null) {
@@ -1264,7 +1303,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
       }
       if (!mounted) return;
       if (continueAdding) {
-        final nextStart = _dueTime;
+        final nextStart = _normalizedStartTimeForDate(_date, _dueTime);
         setState(() {
           _saving = false;
           _savingContinue = false;
@@ -1343,6 +1382,10 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
         errors[row.id] = '请输入任务名称';
         continue;
       }
+      if (_startsBeforeAllowedDate(row.startTime, _date)) {
+        errors[row.id] = '开始时间不能早于现在';
+        continue;
+      }
       if (_minutesOfDay(row.endTime) <= _minutesOfDay(row.startTime)) {
         errors[row.id] = '结束时间要晚于开始时间';
         continue;
@@ -1386,13 +1429,21 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
       maxDate: DateTime(now.year + 2, now.month, now.day),
     );
     if (picked == null || !mounted) return;
-    setState(() => _date = _dayOnly(picked));
+    setState(() {
+      _date = _dayOnly(picked);
+      if (widget.task == null && _mode == TaskEntryMode.single) {
+        _startTime = _suggestedStartTimeForDate(_date);
+        _dueTime = _addMinutes(_startTime, _durationForType(_taskType));
+      }
+      _rows = _normalizedRowsForSelectedDate();
+    });
   }
 
   Future<String?> _pickTime(
     String initial, {
     String? minTime,
     String? maxTime,
+    String invalidMessage = '结束时间要晚于开始时间',
   }) {
     return showModalBottomSheet<String>(
       context: context,
@@ -1408,15 +1459,18 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
         initialValue: initial,
         minMinutes: minTime == null ? 0 : _minutesOfDay(minTime),
         maxMinutes: maxTime == null ? 23 * 60 + 59 : _minutesOfDay(maxTime),
+        invalidMessage: invalidMessage,
       ),
     );
   }
 
   Future<void> _pickSingleTime({required bool start}) async {
+    final minStart = _minimumStartTimeForDate(_date);
     final picked = await _pickTime(
       start ? _startTime : _dueTime,
-      minTime: start ? null : _addMinutes(_startTime, 1),
+      minTime: start ? minStart : _addMinutes(_startTime, 1),
       maxTime: start ? '23:58' : null,
+      invalidMessage: start ? '开始时间不能早于现在' : '结束时间要晚于开始时间',
     );
     if (picked == null) return;
     var shiftedEnd = false;
@@ -1438,10 +1492,12 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     _ScheduleDraftRow row, {
     required bool start,
   }) async {
+    final minStart = _minimumStartTimeForDate(_date);
     final picked = await _pickTime(
       start ? row.startTime : row.endTime,
-      minTime: start ? null : _addMinutes(row.startTime, 1),
+      minTime: start ? minStart : _addMinutes(row.startTime, 1),
       maxTime: start ? '23:58' : null,
+      invalidMessage: start ? '开始时间不能早于现在' : '结束时间要晚于开始时间',
     );
     if (picked == null) return;
     var shiftedEnd = false;
@@ -1466,10 +1522,12 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     final selected = await _showTaskTypePicker(_taskType);
     if (selected == null || !mounted) return;
     final duration = _durationForType(selected);
+    final selectedConfig = _taskConfig(selected);
     setState(() {
       _taskType = selected;
       _dueTime = _addMinutes(_startTime, duration);
-      _rewardController.text = '${_taskConfig(selected).defaultReward}';
+      _rewardController.text = '${selectedConfig.defaultReward}';
+      if (selectedConfig.extraLabel == null) _extraController.clear();
       _error = null;
     });
   }
@@ -1602,7 +1660,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     if (selected == null || !mounted) return;
     setState(() {
       _mode = TaskEntryMode.day;
-      _rows = selected.rows.map(_rowFromTemplate).toList();
+      _rows = _rowsFromTemplate(selected.rows);
       _scheduleType = selected.scheduleType;
       _error = null;
       _saveFailed = false;
@@ -1610,11 +1668,30 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     if (mounted) _showToast(context, '已套用，可继续修改');
   }
 
-  _ScheduleDraftRow _rowFromTemplate(_TaskTemplateRow row) {
+  List<_ScheduleDraftRow> _rowsFromTemplate(List<_TaskTemplateRow> rows) {
+    if (rows.isEmpty) return const [];
+    final firstStart = rows
+        .map((row) => _minutesOfDay(row.startTime))
+        .reduce((a, b) => a < b ? a : b);
+    final targetStart = _minutesOfDay(_suggestedStartTimeForDate(_date));
+    final offset = targetStart > firstStart ? targetStart - firstStart : 0;
+    return rows
+        .map((row) => _rowFromTemplate(row, minuteOffset: offset))
+        .toList();
+  }
+
+  _ScheduleDraftRow _rowFromTemplate(
+    _TaskTemplateRow row, {
+    int minuteOffset = 0,
+  }) {
+    final startTime = _shiftTime(row.startTime, minuteOffset);
+    final endTime = _shiftTime(row.endTime, minuteOffset);
     return _ScheduleDraftRow(
       id: 'row_${_rowSequence++}',
-      startTime: row.startTime,
-      endTime: row.endTime,
+      startTime: startTime,
+      endTime: _minutesOfDay(endTime) > _minutesOfDay(startTime)
+          ? endTime
+          : _addMinutes(startTime, _durationForType(row.taskType)),
       taskType: row.taskType,
       title: row.title,
       rewardPoints: row.rewardPoints,
@@ -1629,11 +1706,15 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
             _minutesOfDay(a.startTime).compareTo(_minutesOfDay(b.startTime)),
       );
     final last = sorted.isEmpty ? null : sorted.last;
+    final nextStart = _normalizedStartTimeForDate(
+      _date,
+      last == null ? _suggestedStartTimeForDate(_date) : last.endTime,
+    );
     setState(() {
       _rows = [
         ..._rows,
         _newScheduleRow(
-          startTime: last == null ? '19:00' : last.endTime,
+          startTime: nextStart,
           taskType:
               last?.taskType ?? _recommendedTaskType(widget.childAgeGroup),
         ),
@@ -1675,6 +1756,83 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
       _rows = _rows.map((row) => row.id == source.id ? next : row).toList();
       _error = null;
     });
+  }
+
+  String _suggestedStartTimeForDate(DateTime date) {
+    return _normalizedStartTimeForDate(
+      date,
+      _latestExistingEndTimeForDate(date) ?? '19:00',
+    );
+  }
+
+  String _normalizedStartTimeForDate(DateTime date, String preferredTime) {
+    final minMinutes = _minimumStartMinutesForDate(date);
+    final preferredMinutes = _minutesOfDay(preferredTime);
+    final nextMinutes = minMinutes == null
+        ? preferredMinutes
+        : (preferredMinutes < minMinutes ? minMinutes : preferredMinutes);
+    return _minuteText(nextMinutes.clamp(0, 23 * 60 + 59).toInt());
+  }
+
+  List<_ScheduleDraftRow> _normalizedRowsForSelectedDate() {
+    final minMinutes = _minimumStartMinutesForDate(_date);
+    if (minMinutes == null) {
+      return _rows.map((row) => row.copyWith(clearError: true)).toList();
+    }
+    final sorted = _rows.toList()
+      ..sort(
+        (a, b) =>
+            _minutesOfDay(a.startTime).compareTo(_minutesOfDay(b.startTime)),
+      );
+    var cursor = minMinutes;
+    final normalizedById = <String, _ScheduleDraftRow>{};
+    for (final row in sorted) {
+      final startMinutes = _minutesOfDay(row.startTime);
+      final endMinutes = _minutesOfDay(row.endTime);
+      final duration = (endMinutes - startMinutes).clamp(1, 23 * 60 + 59);
+      final nextStart = startMinutes < cursor ? cursor : startMinutes;
+      final nextEnd = (nextStart + duration).clamp(0, 23 * 60 + 59).toInt();
+      normalizedById[row.id] = row.copyWith(
+        startTime: _minuteText(nextStart),
+        endTime: _minuteText(nextEnd <= nextStart ? nextStart : nextEnd),
+        clearError: true,
+      );
+      cursor = nextEnd;
+    }
+    return _rows.map((row) => normalizedById[row.id] ?? row).toList();
+  }
+
+  String? _latestExistingEndTimeForDate(DateTime date) {
+    final selectedDate = _dateText(date);
+    final times =
+        widget.existingTasks
+            .where(
+              (task) =>
+                  task.scheduledDate == selectedDate &&
+                  task.id != widget.task?.id &&
+                  task.status != GuardianTaskStatus.cancelled &&
+                  task.scheduledEnd.isNotEmpty,
+            )
+            .map((task) => task.scheduledEnd)
+            .toList()
+          ..sort((a, b) => _minutesOfDay(a).compareTo(_minutesOfDay(b)));
+    return times.isEmpty ? null : times.last;
+  }
+
+  int? _minimumStartMinutesForDate(DateTime date) {
+    final now = DateTime.now();
+    if (!_sameDay(date, now)) return null;
+    return _currentSelectableMinute(now);
+  }
+
+  String? _minimumStartTimeForDate(DateTime date) {
+    final minutes = _minimumStartMinutesForDate(date);
+    return minutes == null ? null : _minuteText(minutes);
+  }
+
+  bool _startsBeforeAllowedDate(String time, DateTime date) {
+    final minMinutes = _minimumStartMinutesForDate(date);
+    return minMinutes != null && _minutesOfDay(time) < minMinutes;
   }
 
   _ScheduleDraftRow _newScheduleRow({
@@ -1736,10 +1894,8 @@ class _SheetTopBar extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.72),
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.84),
-                    ),
+                    borderRadius: BorderRadius.circular(AppRadii.full),
+                    border: Border.all(color: AppColors.borderSoft),
                   ),
                   child: const SizedBox(
                     width: 34,
@@ -1846,11 +2002,13 @@ class _MiraTimePickerSheet extends StatefulWidget {
     required this.initialValue,
     required this.minMinutes,
     required this.maxMinutes,
+    required this.invalidMessage,
   });
 
   final String initialValue;
   final int minMinutes;
   final int maxMinutes;
+  final String invalidMessage;
 
   @override
   State<_MiraTimePickerSheet> createState() => _MiraTimePickerSheetState();
@@ -1941,7 +2099,8 @@ class _MiraTimePickerSheetState extends State<_MiraTimePickerSheet> {
                   horizontal: 12,
                   vertical: 10,
                 ),
-                color: Colors.white.withValues(alpha: 0.66),
+                color: AppColors.surfaceSoft,
+                borderColor: AppColors.borderSoft,
                 child: SizedBox(
                   height: 174,
                   child: Row(
@@ -1973,13 +2132,13 @@ class _MiraTimePickerSheetState extends State<_MiraTimePickerSheet> {
               ),
               if (!valid) ...[
                 const SizedBox(height: 9),
-                const Text(
-                  '结束时间要晚于开始时间',
-                  style: TextStyle(
-                    color: Color(0xFFB64A4A),
+                Text(
+                  widget.invalidMessage,
+                  style: const TextStyle(
+                    color: AppColors.danger,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 0,
                   ),
                 ),
@@ -2041,7 +2200,7 @@ class _TimeWheel extends StatelessWidget {
       squeeze: 1.04,
       selectionOverlay: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.brand.withValues(alpha: 0.08),
+          color: AppColors.primary.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(14),
         ),
       ),
@@ -2055,7 +2214,7 @@ class _TimeWheel extends StatelessWidget {
                 color: AppColors.ink,
                 fontFamily: AppTypography.systemFont,
                 fontSize: 19,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
                 letterSpacing: 0,
               ),
             ),
@@ -2075,8 +2234,9 @@ class _TaskModeSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.58),
-        borderRadius: BorderRadius.circular(18),
+        color: AppColors.surfaceSoft,
+        borderRadius: BorderRadius.circular(AppRadii.button),
+        border: Border.all(color: AppColors.borderSoft),
       ),
       child: Padding(
         padding: const EdgeInsets.all(4),
@@ -2090,19 +2250,23 @@ class _TaskModeSwitch extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: AppMotion.duration(context, 160),
                     curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 9),
                     decoration: BoxDecoration(
-                      color: value == mode ? AppColors.ink : Colors.transparent,
-                      borderRadius: BorderRadius.circular(14),
+                      color: value == mode
+                          ? AppColors.selectedBg
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(AppRadii.control),
                     ),
                     child: Text(
                       mode.label,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: value == mode ? Colors.white : AppColors.muted,
+                        color: value == mode
+                            ? AppColors.primary
+                            : AppColors.muted,
                         fontFamily: AppTypography.systemFont,
                         fontSize: 13,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 0,
                       ),
                     ),
@@ -2135,12 +2299,13 @@ class _PickerField extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: MiraSurface(
-        radius: 17,
+        radius: AppRadii.input,
         padding: const EdgeInsets.fromLTRB(13, 11, 12, 11),
-        color: Colors.white.withValues(alpha: 0.68),
+        color: AppColors.surfaceSoft,
+        borderColor: AppColors.borderSoft,
         child: Row(
           children: [
-            Icon(icon, color: AppColors.brand, size: 20),
+            Icon(icon, color: AppColors.primary, size: 18),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -2154,7 +2319,7 @@ class _PickerField extends StatelessWidget {
                       color: AppColors.ink,
                       fontFamily: AppTypography.systemFont,
                       fontSize: 14,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: 0,
                     ),
                   ),
@@ -2168,7 +2333,7 @@ class _PickerField extends StatelessWidget {
                         color: AppColors.muted,
                         fontFamily: AppTypography.systemFont,
                         fontSize: 11.5,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w500,
                         letterSpacing: 0,
                       ),
                     ),
@@ -2202,18 +2367,20 @@ class _CompactActionButton extends StatelessWidget {
       onTap: onTap,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.68),
-          borderRadius: BorderRadius.circular(17),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.72)),
+          color: AppColors.surfaceSoft,
+          borderRadius: BorderRadius.circular(AppRadii.input),
+          border: Border.all(color: AppColors.borderSoft),
         ),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 58),
+          constraints: const BoxConstraints(
+            minHeight: AppControls.compactButtonHeight,
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: AppColors.brand, size: 18),
+                Icon(icon, color: AppColors.primary, size: 18),
                 const SizedBox(width: 7),
                 Flexible(
                   child: Text(
@@ -2224,7 +2391,7 @@ class _CompactActionButton extends StatelessWidget {
                       color: AppColors.ink,
                       fontFamily: AppTypography.systemFont,
                       fontSize: 13,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: 0,
                     ),
                   ),
@@ -2267,12 +2434,12 @@ class _ScheduleRowCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final config = _taskConfig(row.taskType);
     return MiraSurface(
-      radius: 19,
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-      color: Colors.white.withValues(alpha: 0.66),
+      radius: 16,
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 11),
+      color: AppColors.surfaceSoft,
       borderColor: row.error == null
-          ? Colors.white.withValues(alpha: 0.64)
-          : const Color(0xFFB64A4A).withValues(alpha: 0.28),
+          ? AppColors.borderSoft
+          : AppColors.danger.withValues(alpha: 0.26),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -2314,7 +2481,7 @@ class _ScheduleRowCard extends StatelessWidget {
                                 Icon(
                                   config.icon,
                                   size: 17,
-                                  color: AppColors.brand,
+                                  color: AppColors.primary,
                                 ),
                                 const SizedBox(width: 6),
                                 Flexible(
@@ -2326,7 +2493,7 @@ class _ScheduleRowCard extends StatelessWidget {
                                       color: AppColors.ink,
                                       fontFamily: AppTypography.systemFont,
                                       fontSize: 13,
-                                      fontWeight: FontWeight.w900,
+                                      fontWeight: FontWeight.w600,
                                       letterSpacing: 0,
                                     ),
                                   ),
@@ -2349,6 +2516,7 @@ class _ScheduleRowCard extends StatelessWidget {
                           ),
                       ],
                     ),
+                    const SizedBox(height: 11),
                     TextFormField(
                       key: ValueKey('title_${row.id}'),
                       initialValue: row.title,
@@ -2358,19 +2526,19 @@ class _ScheduleRowCard extends StatelessWidget {
                         color: AppColors.ink,
                         fontFamily: AppTypography.systemFont,
                         fontSize: 15,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 0,
                       ),
                       decoration: InputDecoration(
                         hintText: '任务名称',
                         hintStyle: const TextStyle(
-                          color: AppColors.muted,
-                          fontWeight: FontWeight.w600,
+                          color: AppColors.subtle,
+                          fontWeight: FontWeight.w500,
                         ),
                         isDense: true,
                         filled: true,
                         fillColor: AppColors.appBackgroundMid.withValues(
-                          alpha: 0.58,
+                          alpha: 0.42,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -2378,11 +2546,26 @@ class _ScheduleRowCard extends StatelessWidget {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide.none,
+                          borderSide: const BorderSide(
+                            color: AppColors.borderSubtle,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(
+                            color: AppColors.borderSubtle,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(
+                            color: AppColors.focusRing,
+                            width: 1.0,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 9),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         SizedBox(
@@ -2399,7 +2582,7 @@ class _ScheduleRowCard extends StatelessWidget {
                               color: AppColors.ink,
                               fontFamily: AppTypography.systemFont,
                               fontSize: 13,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w600,
                             ),
                             decoration: InputDecoration(
                               prefixText: '+',
@@ -2407,7 +2590,7 @@ class _ScheduleRowCard extends StatelessWidget {
                               isDense: true,
                               filled: true,
                               fillColor: AppColors.appBackgroundMid.withValues(
-                                alpha: 0.58,
+                                alpha: 0.42,
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -2415,15 +2598,31 @@ class _ScheduleRowCard extends StatelessWidget {
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(13),
-                                borderSide: BorderSide.none,
+                                borderSide: const BorderSide(
+                                  color: AppColors.borderSubtle,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(13),
+                                borderSide: const BorderSide(
+                                  color: AppColors.borderSubtle,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(13),
+                                borderSide: const BorderSide(
+                                  color: AppColors.focusRing,
+                                  width: 1.0,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               const Flexible(
                                 child: Text(
@@ -2434,15 +2633,16 @@ class _ScheduleRowCard extends StatelessWidget {
                                     color: AppColors.muted,
                                     fontFamily: AppTypography.systemFont,
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w600,
                                     letterSpacing: 0,
                                   ),
                                 ),
                               ),
-                              Switch(
+                              const SizedBox(width: 6),
+                              MiraCompactToggle(
                                 value: row.requiresParentConfirmation,
-                                activeThumbColor: AppColors.brand,
                                 onChanged: onConfirmChanged,
+                                label: '家长确认',
                               ),
                             ],
                           ),
@@ -2459,10 +2659,10 @@ class _ScheduleRowCard extends StatelessWidget {
             Text(
               row.error!,
               style: const TextStyle(
-                color: Color(0xFFB64A4A),
+                color: AppColors.danger,
                 fontFamily: AppTypography.systemFont,
                 fontSize: 12.5,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 letterSpacing: 0,
               ),
             ),
@@ -2486,8 +2686,9 @@ class _TimeBlockButton extends StatelessWidget {
       onTap: onTap,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.ink.withValues(alpha: 0.06),
+          color: AppColors.appBackgroundMid.withValues(alpha: 0.62),
           borderRadius: BorderRadius.circular(13),
+          border: Border.all(color: AppColors.borderSoft),
         ),
         child: SizedBox(
           width: 68,
@@ -2499,7 +2700,7 @@ class _TimeBlockButton extends StatelessWidget {
                 color: AppColors.ink,
                 fontFamily: AppTypography.systemFont,
                 fontSize: 13,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
                 letterSpacing: 0,
               ),
             ),
@@ -2533,17 +2734,19 @@ class _PickerListTile extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: MiraSurface(
-          radius: 17,
+          radius: AppRadii.input,
           padding: const EdgeInsets.fromLTRB(14, 12, 13, 12),
-          color: selected
-              ? AppColors.brand.withValues(alpha: 0.10)
-              : Colors.white.withValues(alpha: 0.64),
+          color: selected ? AppColors.selectedBg : AppColors.surfaceSoft,
           borderColor: selected
-              ? AppColors.brand.withValues(alpha: 0.20)
-              : Colors.white.withValues(alpha: 0.70),
+              ? AppColors.primary.withValues(alpha: 0.16)
+              : AppColors.borderSoft,
           child: Row(
             children: [
-              Icon(icon, color: selected ? AppColors.brand : AppColors.muted),
+              Icon(
+                icon,
+                color: selected ? AppColors.primary : AppColors.muted,
+                size: 19,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -2555,7 +2758,7 @@ class _PickerListTile extends StatelessWidget {
                         color: AppColors.ink,
                         fontFamily: AppTypography.systemFont,
                         fontSize: 14,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 0,
                       ),
                     ),
@@ -2568,7 +2771,7 @@ class _PickerListTile extends StatelessWidget {
                         color: AppColors.muted,
                         fontFamily: AppTypography.systemFont,
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w500,
                         height: 1.35,
                         letterSpacing: 0,
                       ),
@@ -2579,7 +2782,7 @@ class _PickerListTile extends StatelessWidget {
               if (selected)
                 const Icon(
                   Icons.check_circle,
-                  color: AppColors.brand,
+                  color: AppColors.primary,
                   size: 19,
                 ),
             ],
@@ -2758,27 +2961,31 @@ class _TaskTextField extends StatelessWidget {
         color: AppColors.ink,
         fontFamily: AppTypography.systemFont,
         fontSize: 15,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w600,
       ),
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(
-          color: AppColors.muted,
-          fontWeight: FontWeight.w600,
+          color: AppColors.subtle,
+          fontWeight: FontWeight.w500,
         ),
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.72),
+        fillColor: AppColors.surfaceSoft,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 14,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(17),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(AppRadii.input),
+          borderSide: const BorderSide(color: AppColors.borderSoft),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadii.input),
+          borderSide: const BorderSide(color: AppColors.borderSoft),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(17),
-          borderSide: const BorderSide(color: AppColors.brand, width: 1.2),
+          borderRadius: BorderRadius.circular(AppRadii.input),
+          borderSide: const BorderSide(color: AppColors.focus, width: 1.1),
         ),
       ),
     );
@@ -2794,9 +3001,10 @@ class _ConfirmSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MiraSurface(
-      radius: 17,
+      radius: AppRadii.input,
       padding: const EdgeInsets.fromLTRB(14, 11, 12, 11),
-      color: Colors.white.withValues(alpha: 0.60),
+      color: AppColors.surfaceSoft,
+      borderColor: AppColors.borderSoft,
       child: Row(
         children: [
           const Expanded(
@@ -2809,7 +3017,7 @@ class _ConfirmSwitch extends StatelessWidget {
                     color: AppColors.ink,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 14,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 0,
                   ),
                 ),
@@ -2828,10 +3036,10 @@ class _ConfirmSwitch extends StatelessWidget {
               ],
             ),
           ),
-          Switch(
+          MiraCompactToggle(
             value: value,
-            activeThumbColor: AppColors.brand,
             onChanged: onChanged,
+            label: '需要家长确认',
           ),
         ],
       ),
@@ -3350,6 +3558,31 @@ String _scheduleLabel(String value) {
 
 int _durationForType(String taskType) => _taskConfig(taskType).defaultMinutes;
 
+class _TaskDescriptionFields {
+  const _TaskDescriptionFields({required this.extra, required this.detail});
+
+  final String extra;
+  final String detail;
+}
+
+_TaskDescriptionFields _splitTaskDescription(
+  String description,
+  _TaskTypeConfig config,
+) {
+  final text = description.trim();
+  if (text.isEmpty || config.extraLabel == null) {
+    return _TaskDescriptionFields(extra: '', detail: text);
+  }
+  final parts = text.split(' · ');
+  if (parts.length >= 2) {
+    return _TaskDescriptionFields(
+      extra: parts.first.trim(),
+      detail: parts.skip(1).join(' · ').trim(),
+    );
+  }
+  return _TaskDescriptionFields(extra: text, detail: '');
+}
+
 String _combinedDescription(String extra, String detail) {
   final parts = [
     extra,
@@ -3370,6 +3603,20 @@ String _addMinutes(String time, int minutes) {
   final hour = (next ~/ 60).toString().padLeft(2, '0');
   final minute = (next % 60).toString().padLeft(2, '0');
   return '$hour:$minute';
+}
+
+String _shiftTime(String time, int minutes) {
+  return _minuteText(
+    (_minutesOfDay(time) + minutes).clamp(0, 23 * 60 + 59).toInt(),
+  );
+}
+
+int _currentSelectableMinute(DateTime now) {
+  final extraMinute =
+      now.second > 0 || now.millisecond > 0 || now.microsecond > 0 ? 1 : 0;
+  return (now.hour * 60 + now.minute + extraMinute)
+      .clamp(0, 23 * 60 + 59)
+      .toInt();
 }
 
 TimeOfDay _timeOfDay(String time) {
@@ -3420,12 +3667,12 @@ IconData _iconForTask(GuardianTask task) {
 
 Color _toneColor(GuardianTask task) {
   return switch (task.status) {
-    GuardianTaskStatus.inProgress => AppColors.brand,
+    GuardianTaskStatus.inProgress => AppColors.primary,
     GuardianTaskStatus.completed ||
     GuardianTaskStatus.confirmed => const Color(0xFF2F8F68),
     GuardianTaskStatus.awaitingParentConfirmation => const Color(0xFFD8922B),
     GuardianTaskStatus.rejected ||
-    GuardianTaskStatus.expired => const Color(0xFFB64A4A),
+    GuardianTaskStatus.expired => AppColors.danger,
     _ => AppColors.muted,
   };
 }

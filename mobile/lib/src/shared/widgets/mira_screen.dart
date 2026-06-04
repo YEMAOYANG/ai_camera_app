@@ -278,21 +278,21 @@ class MiraIconButton extends StatelessWidget {
         label: label,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.76),
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.86)),
+            color: AppColors.surfaceSoft,
+            borderRadius: BorderRadius.circular(AppRadii.control),
+            border: Border.all(color: AppColors.borderSoft),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF4C6685).withValues(alpha: 0.06),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+                color: const Color(0xFF4C6685).withValues(alpha: 0.035),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
               ),
             ],
           ),
           child: SizedBox(
-            width: 44,
-            height: 44,
-            child: Center(child: Icon(icon, color: AppColors.ink, size: 20)),
+            width: AppControls.iconButtonSize,
+            height: AppControls.iconButtonSize,
+            child: Center(child: Icon(icon, color: AppColors.ink, size: 18)),
           ),
         ),
       ),

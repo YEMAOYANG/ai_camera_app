@@ -189,17 +189,24 @@ class _AlertFilter extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: selected == item.$2
-                      ? AppColors.ink
-                      : Colors.white.withValues(alpha: 0.72),
-                  borderRadius: BorderRadius.circular(14),
+                      ? AppColors.brandWash
+                      : AppColors.surfaceSoft,
+                  borderRadius: BorderRadius.circular(AppRadii.control),
+                  border: Border.all(
+                    color: selected == item.$2
+                        ? AppColors.brand.withValues(alpha: 0.18)
+                        : AppColors.borderSoft,
+                  ),
                 ),
                 child: Text(
                   item.$1,
                   style: TextStyle(
-                    color: selected == item.$2 ? Colors.white : AppColors.ink,
+                    color: selected == item.$2
+                        ? AppColors.brandDeep
+                        : AppColors.ink,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 13,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 0,
                   ),
                 ),

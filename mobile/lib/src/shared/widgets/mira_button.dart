@@ -25,7 +25,7 @@ class MiraPrimaryButton extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadii.button),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -34,18 +34,18 @@ class MiraPrimaryButton extends StatelessWidget {
                   AppColors.primaryButtonStart,
                   AppColors.primaryButtonEnd,
                 ] else ...[
-                  AppColors.muted.withValues(alpha: 0.54),
-                  AppColors.muted.withValues(alpha: 0.40),
+                  AppColors.disabledFill,
+                  AppColors.disabledFill,
                 ],
               ],
             ),
             boxShadow: [
               BoxShadow(
                 color: AppColors.primaryButtonShadow.withValues(
-                  alpha: enabled || loading ? 0.24 : 0.06,
+                  alpha: enabled || loading ? 0.16 : 0.02,
                 ),
-                blurRadius: 24,
-                offset: const Offset(0, 15),
+                blurRadius: 14,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -76,13 +76,13 @@ class MiraPrimaryButton extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: RadialGradient(
-                      colors: [Color(0x183B82F6), Color(0x003B82F6)],
+                      colors: [Color(0x123B82F6), Color(0x003B82F6)],
                     ),
                   ),
                 ),
               ),
               SizedBox(
-                height: 56,
+                height: AppControls.buttonHeight,
                 width: double.infinity,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -90,15 +90,17 @@ class MiraPrimaryButton extends StatelessWidget {
                     Text(
                       label,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: enabled || loading
+                            ? Colors.white
+                            : AppColors.disabledInk,
                         fontFamily: AppTypography.systemFont,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 0,
                       ),
                     ),
                     if (loading || trailing != null) ...[
-                      const SizedBox(width: 9),
+                      const SizedBox(width: 8),
                       loading ? const MiraButtonSpinner() : trailing!,
                     ],
                   ],
@@ -134,38 +136,37 @@ class MiraSecondaryButton extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadii.buttonSecondary),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+            border: Border.all(color: AppColors.borderSoft),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.white.withValues(alpha: 0.78),
-                Colors.white.withValues(alpha: 0.54),
+                AppColors.surface.withValues(alpha: 0.82),
+                AppColors.surfaceSoft.withValues(alpha: 0.70),
               ],
             ),
             boxShadow: [
-              BoxShadow(
-                color: const Color(
-                  0xFF4C6685,
-                ).withValues(alpha: enabled ? 0.07 : 0.03),
-                blurRadius: 18,
-                offset: const Offset(0, 10),
-              ),
+              if (enabled)
+                BoxShadow(
+                  color: const Color(0xFF4C6685).withValues(alpha: 0.035),
+                  blurRadius: 9,
+                  offset: const Offset(0, 5),
+                ),
             ],
           ),
           child: SizedBox(
-            height: 50,
+            height: AppControls.compactButtonHeight,
             width: double.infinity,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
-                    color: AppColors.ink,
+                  style: TextStyle(
+                    color: enabled ? AppColors.ink : AppColors.disabledInk,
                     fontFamily: AppTypography.systemFont,
                     fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 0,
                   ),
                 ),
@@ -193,9 +194,9 @@ class MiraButtonGlyph extends StatelessWidget {
         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: SizedBox(
-        width: 22,
-        height: 22,
-        child: Center(child: Icon(icon, color: Colors.white, size: 15)),
+        width: 20,
+        height: 20,
+        child: Center(child: Icon(icon, color: Colors.white, size: 14)),
       ),
     );
   }
@@ -212,14 +213,14 @@ class MiraButtonSpinner extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(AppRadii.full)),
       ),
       child: SizedBox(
-        width: 22,
-        height: 22,
+        width: 20,
+        height: 20,
         child: Center(
           child: SizedBox(
-            width: 13,
-            height: 13,
+            width: 12,
+            height: 12,
             child: CircularProgressIndicator(
-              strokeWidth: 2,
+              strokeWidth: 1.8,
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               backgroundColor: Color(0x55FFFFFF),
             ),
@@ -263,7 +264,7 @@ class _TapScaleState extends State<_TapScale> {
           : (_) => setState(() => _pressed = false),
       child: AnimatedScale(
         scale: scale,
-        duration: AppMotion.duration(context, 180),
+        duration: AppMotion.duration(context, 150),
         curve: Curves.easeOutCubic,
         child: widget.child,
       ),

@@ -1003,9 +1003,9 @@ class _SetupHero extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.62),
+        color: AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.78)),
+        border: Border.all(color: AppColors.borderSoft),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 17),
@@ -1016,7 +1016,7 @@ class _SetupHero extends StatelessWidget {
               children: [
                 DecoratedBox(
                   decoration: BoxDecoration(
-                    color: AppColors.ink,
+                    color: AppColors.brandDeep,
                     borderRadius: BorderRadius.circular(13),
                   ),
                   child: SizedBox(
@@ -1035,7 +1035,7 @@ class _SetupHero extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 6,
-                      backgroundColor: AppColors.ink.withValues(alpha: 0.08),
+                      backgroundColor: AppColors.brandWash,
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         AppColors.brand,
                       ),
@@ -1151,26 +1151,26 @@ class _ChoiceChipButton extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: AppMotion.duration(context, 160),
-        constraints: const BoxConstraints(minHeight: 42),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        constraints: const BoxConstraints(
+          minHeight: AppControls.minTouchTarget,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.ink
-              : Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(14),
+          color: selected ? AppColors.brandWash : AppColors.surfaceSoft,
+          borderRadius: BorderRadius.circular(AppRadii.control),
           border: Border.all(
             color: selected
-                ? AppColors.ink
-                : Colors.white.withValues(alpha: 0.84),
+                ? AppColors.brand.withValues(alpha: 0.18)
+                : AppColors.borderSoft,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? Colors.white : AppColors.ink,
+            color: selected ? AppColors.brandDeep : AppColors.ink,
             fontFamily: AppTypography.systemFont,
             fontSize: 13,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
             letterSpacing: 0,
           ),
         ),
@@ -1244,7 +1244,7 @@ class _SetupTextFieldState extends State<_SetupTextField> {
     final hasError = widget.errorText != null;
 
     return ListenableBuilder(
-      listenable: _focusNode,
+      listenable: Listenable.merge([_controller, _focusNode]),
       builder: (context, _) {
         final focused = _focusNode.hasFocus;
 
@@ -1256,14 +1256,17 @@ class _SetupTextFieldState extends State<_SetupTextField> {
             AnimatedContainer(
               duration: AppMotion.duration(context, 160),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.76),
-                borderRadius: BorderRadius.circular(16),
+                color: _controller.text.trim().isEmpty
+                    ? AppColors.surfaceSoft
+                    : AppColors.surfaceElevated,
+                borderRadius: BorderRadius.circular(AppRadii.input),
                 border: Border.all(
                   color: hasError
-                      ? const Color(0xFFB64A4A)
+                      ? AppColors.danger
                       : focused
-                      ? AppColors.primaryButtonStart.withValues(alpha: 0.7)
-                      : Colors.white.withValues(alpha: 0.86),
+                      ? AppColors.focus
+                      : AppColors.borderSoft,
+                  width: focused ? 1.1 : 1,
                 ),
               ),
               child: Row(
@@ -1272,10 +1275,10 @@ class _SetupTextFieldState extends State<_SetupTextField> {
                   Icon(
                     widget.icon,
                     color: hasError
-                        ? const Color(0xFFB64A4A)
+                        ? AppColors.danger
                         : focused
-                        ? AppColors.primaryButtonStart
-                        : const Color(0x99526579),
+                        ? AppColors.brandDeep
+                        : AppColors.subtle,
                     size: 18,
                   ),
                   const SizedBox(width: 9),
@@ -1294,13 +1297,13 @@ class _SetupTextFieldState extends State<_SetupTextField> {
                         color: AppColors.ink,
                         fontFamily: AppTypography.systemFont,
                         fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         height: 1.2,
                       ),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         isCollapsed: true,
-                        contentPadding: EdgeInsets.symmetric(vertical: 17),
+                        contentPadding: EdgeInsets.symmetric(vertical: 14),
                       ),
                     ),
                   ),
@@ -1308,9 +1311,7 @@ class _SetupTextFieldState extends State<_SetupTextField> {
                     const SizedBox(width: 8),
                     Icon(
                       widget.suffixIcon,
-                      color: focused
-                          ? AppColors.primaryButtonStart
-                          : const Color(0x99526579),
+                      color: focused ? AppColors.brandDeep : AppColors.subtle,
                       size: 18,
                     ),
                   ],
@@ -1328,10 +1329,10 @@ class _SetupTextFieldState extends State<_SetupTextField> {
                       child: Text(
                         widget.errorText!,
                         style: const TextStyle(
-                          color: Color(0xFFB64A4A),
+                          color: AppColors.danger,
                           fontFamily: AppTypography.systemFont,
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -1356,7 +1357,7 @@ class _FieldLabel extends StatelessWidget {
         color: AppColors.ink,
         fontFamily: AppTypography.systemFont,
         fontSize: 13,
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w600,
         letterSpacing: 0,
       ),
     );

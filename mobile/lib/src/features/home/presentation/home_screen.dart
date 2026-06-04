@@ -514,9 +514,9 @@ class _CompactEntry extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = switch (tone) {
       MiraListRowTone.blue => AppColors.brand,
-      MiraListRowTone.green => const Color(0xFF2F8F68),
-      MiraListRowTone.amber => const Color(0xFFD8922B),
-      MiraListRowTone.red => const Color(0xFFB64A4A),
+      MiraListRowTone.green => AppColors.success,
+      MiraListRowTone.amber => AppColors.warning,
+      MiraListRowTone.red => AppColors.danger,
       MiraListRowTone.neutral => AppColors.ink,
     };
 

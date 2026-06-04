@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
 import 'package:mira_guardian_app/src/features/home/domain/guardian_snapshot.dart';
 
 enum StatusTone { neutral, success, warning, danger }
@@ -21,15 +22,16 @@ class StatusChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.background,
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.border),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
         child: Text(
           label,
           style: TextStyle(
             color: colors.foreground,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -40,21 +42,25 @@ class StatusChip extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return switch (tone) {
-      StatusTone.success => const _ChipColors(
-        background: Color(0xFFE3F4EA),
-        foreground: Color(0xFF236044),
+      StatusTone.success => _ChipColors(
+        background: AppColors.successWash,
+        foreground: AppColors.success,
+        border: AppColors.success.withValues(alpha: 0.10),
       ),
-      StatusTone.warning => const _ChipColors(
-        background: Color(0xFFFFF1D8),
-        foreground: Color(0xFF8A5A00),
+      StatusTone.warning => _ChipColors(
+        background: AppColors.warningWash,
+        foreground: AppColors.warning,
+        border: AppColors.warning.withValues(alpha: 0.12),
       ),
-      StatusTone.danger => const _ChipColors(
-        background: Color(0xFFFFE0E0),
-        foreground: Color(0xFF8E2D2D),
+      StatusTone.danger => _ChipColors(
+        background: AppColors.dangerWash,
+        foreground: AppColors.danger,
+        border: AppColors.danger.withValues(alpha: 0.10),
       ),
       StatusTone.neutral => _ChipColors(
-        background: scheme.surfaceContainerHighest,
+        background: AppColors.surfaceSoft,
         foreground: scheme.onSurfaceVariant,
+        border: AppColors.borderSoft,
       ),
     };
   }
@@ -70,15 +76,20 @@ class StatusToneMapper {
 
     return switch (level) {
       AttentionLevel.normal => scheme.primary,
-      AttentionLevel.watch => const Color(0xFF9A6500),
+      AttentionLevel.watch => AppColors.warning,
       AttentionLevel.urgent => scheme.error,
     };
   }
 }
 
 class _ChipColors {
-  const _ChipColors({required this.background, required this.foreground});
+  const _ChipColors({
+    required this.background,
+    required this.foreground,
+    required this.border,
+  });
 
   final Color background;
   final Color foreground;
+  final Color border;
 }

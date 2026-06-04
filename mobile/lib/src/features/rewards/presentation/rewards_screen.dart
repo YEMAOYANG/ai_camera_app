@@ -280,14 +280,12 @@ class _RedemptionActionButton extends StatelessWidget {
       onTap: onTap,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: highlight
-              ? AppColors.ink
-              : Colors.white.withValues(alpha: 0.72),
+          color: highlight ? AppColors.brandWash : AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(AppRadii.full),
           border: Border.all(
             color: highlight
-                ? AppColors.ink
-                : AppColors.ink.withValues(alpha: 0.06),
+                ? AppColors.brand.withValues(alpha: 0.18)
+                : AppColors.borderSoft,
           ),
         ),
         child: Padding(
@@ -295,10 +293,10 @@ class _RedemptionActionButton extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: highlight ? Colors.white : AppColors.ink,
+              color: highlight ? AppColors.brandDeep : AppColors.ink,
               fontFamily: AppTypography.systemFont,
               fontSize: 12,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0,
             ),
           ),
