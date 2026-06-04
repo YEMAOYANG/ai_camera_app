@@ -120,8 +120,11 @@ const _mockDeviceStatus = GuardianDeviceStatus(
   snapshotSupported: true,
   streamSupported: true,
   twoWayAudioSupported: false,
+  monitorSupported: true,
   otaSupported: false,
   adapter: 'mock_hardware_device',
+  lastSeenAt: null,
+  message: '设备在线，状态已同步。',
 );
 
 Map<String, dynamic> _asMap(dynamic value) {

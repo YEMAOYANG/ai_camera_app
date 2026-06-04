@@ -36,7 +36,9 @@ class MiraScreen extends StatelessWidget {
     final safeArea = MediaQuery.paddingOf(context);
     final basePadding = padding.resolve(Directionality.of(context));
     final chromeBottom =
-        safeArea.bottom + AppChrome.tabBarHeight + AppChrome.tabBarContentGap;
+        AppChrome.tabBarBottomGap(safeArea.bottom) +
+        AppChrome.tabBarHeight +
+        AppChrome.tabBarContentGap;
     final bottomPadding = chromeBottom > basePadding.bottom
         ? chromeBottom
         : basePadding.bottom;

@@ -41,6 +41,8 @@ def task_payload(row: DatabaseRow) -> dict:
         "scheduledEnd": row["scheduled_end"],
         "rewardPoints": row["reward_points"],
         "requiresParentConfirmation": bool(row["requires_parent_confirmation"]),
+        "reminderMinutesBefore": row.get("reminder_minutes_before") or 5,
+        "reminderStatus": row.get("reminder_status") or "pending",
         "completionSource": row.get("completion_source"),
         "evidence": evidence,
         "evidenceSummary": row["evidence_summary"],
@@ -49,10 +51,32 @@ def task_payload(row: DatabaseRow) -> dict:
         "createdBy": row.get("created_by"),
         "createdAt": row["created_at"],
         "updatedAt": row["updated_at"],
+        "startedAt": row.get("started_at"),
+        "endedAt": row.get("ended_at"),
+        "missedAt": row.get("missed_at"),
+        "delayedAt": row.get("delayed_at"),
+        "lastReminderAt": row.get("last_reminder_at"),
+        "nextReminderAt": row.get("next_reminder_at"),
+        "delayReminderCount": row.get("delay_reminder_count") or 0,
+        "cameraObservationStatus": row.get("camera_observation_status") or "unknown",
+        "deviceId": row.get("device_id"),
+        "timezone": row.get("timezone") or "Asia/Shanghai",
         "completedAt": row["completed_at"],
         "confirmedAt": row["confirmed_at"],
         "rejectedAt": row["rejected_at"],
         "pointsGrantedAt": row["points_granted_at"],
+    }
+
+
+def task_event_payload(row: DatabaseRow) -> dict:
+    return {
+        "id": row["id"],
+        "familyId": row["family_id"],
+        "taskId": row["task_id"],
+        "eventType": row["event_type"],
+        "message": row.get("message") or "",
+        "payload": _parse_json_object(row.get("payload")),
+        "createdAt": row["created_at"],
     }
 
 

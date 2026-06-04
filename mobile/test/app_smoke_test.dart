@@ -182,7 +182,8 @@ void main() {
 
     await tester.tap(find.text('数学作业').last);
     await tester.pumpAndSettle();
-    expect(find.text('观察建议'), findsOneWidget);
+    expect(find.text('实时观察建议'), findsOneWidget);
+    expect(find.text('任务记录'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
     await tester.pumpAndSettle();

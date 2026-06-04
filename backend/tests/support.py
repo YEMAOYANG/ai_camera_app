@@ -24,6 +24,11 @@ def fresh_test_config(**overrides: Any) -> dict:
         "AUTH_REFRESH_TOKEN_SECONDS": 3600,
         "SMS_PROVIDER": "development",
         "DEV_ADAPTERS_ENABLED": True,
+        "CAMERA_RUNTIME_PROVIDER": "disabled",
+        "CAMERA_RUNTIME_ADAPTER": "disabled",
+        "AI_CAMERA_TEST_BASE_URL": "",
+        "CAMERA_BACKEND_URL": "",
+        "TASK_WEBSOCKET_ENABLED": False,
     }
     config.update(overrides)
     return config

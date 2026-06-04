@@ -37,6 +37,11 @@ final taskDetailProvider = FutureProvider.family<GuardianTask, String>((
   return ref.watch(taskRepositoryProvider).task(taskId);
 });
 
+final taskEventsProvider =
+    FutureProvider.family<List<GuardianTaskEvent>, String>((ref, taskId) {
+      return ref.watch(taskRepositoryProvider).taskEvents(taskId);
+    });
+
 class TaskWeekQuery {
   const TaskWeekQuery({
     required this.startDate,
@@ -226,6 +231,37 @@ class TaskRepository {
 
   Future<GuardianTask> cancelTask(String taskId) {
     return updateTask(taskId, {'status': GuardianTaskStatus.cancelled.value});
+  }
+
+  Future<GuardianTask> startTask(String taskId) async {
+    if (_environment.useMockData) {
+      return _updateMockTask(
+        taskId,
+        (task) => task.copyWith(status: GuardianTaskStatus.inProgress),
+      );
+    }
+
+    try {
+      final response = await _apiClient.post('/tasks/$taskId/start');
+      return GuardianTask.fromJson(_asMap(_asMap(response.data)['task']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<List<GuardianTaskEvent>> taskEvents(String taskId) async {
+    if (_environment.useMockData) return _mockEventsFor(taskId);
+
+    try {
+      final response = await _apiClient.get('/tasks/$taskId/events');
+      final raw = _asMap(response.data)['events'];
+      if (raw is! List) return const [];
+      return raw
+          .map((event) => GuardianTaskEvent.fromJson(_asMap(event)))
+          .toList();
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
   }
 
   Future<GuardianTask> completeTask(
@@ -501,6 +537,33 @@ List<GuardianTask> _buildMockTasks() {
       'updatedAt': now.millisecondsSinceEpoch,
     },
   ].map(GuardianTask.fromJson).toList();
+}
+
+List<GuardianTaskEvent> _mockEventsFor(String taskId) {
+  final now = DateTime.now().millisecondsSinceEpoch;
+  return [
+    {
+      'id': 'event_${taskId}_created',
+      'taskId': taskId,
+      'eventType': 'task_created',
+      'message': '任务已创建',
+      'createdAt': now - 600000,
+    },
+    {
+      'id': 'event_${taskId}_reminder',
+      'taskId': taskId,
+      'eventType': 'reminder_sent',
+      'message': '已提醒孩子准备开始',
+      'createdAt': now - 300000,
+    },
+    {
+      'id': 'event_${taskId}_started',
+      'taskId': taskId,
+      'eventType': 'auto_started',
+      'message': '任务已自动开始',
+      'createdAt': now - 120000,
+    },
+  ].map((event) => GuardianTaskEvent.fromJson(event)).toList();
 }
 
 Map<String, Object?> _compactQuery(Map<String, Object?> query) {

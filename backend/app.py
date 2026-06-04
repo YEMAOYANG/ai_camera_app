@@ -9,12 +9,15 @@ from core.config import AppConfig, apply_test_defaults, validate_flask_config
 from routes.api.v1.ai import ai_bp
 from routes.api.v1.auth import auth_bp
 from routes.api.v1.camera_bridge import camera_bp
+from routes.api.v1.dev import dev_bp
 from routes.api.v1.devices import devices_bp
 from routes.api.v1.firmware import firmware_bp
 from routes.api.v1.points import points_bp
 from routes.api.v1.rewards import rewards_bp
 from routes.api.v1.setup import setup_bp
 from routes.api.v1.tasks import tasks_bp
+from services.task_event_stream import start_task_event_stream
+from services.task_scheduler_runner import start_task_scheduler
 
 
 def create_app(test_config: dict | None = None) -> Flask:
@@ -34,6 +37,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.register_blueprint(rewards_bp, url_prefix="/api/rewards")
     app.register_blueprint(firmware_bp, url_prefix="/api/firmware")
     app.register_blueprint(camera_bp, url_prefix="/api/camera")
+    app.register_blueprint(dev_bp, url_prefix="/api/dev")
     app.register_blueprint(ai_bp, url_prefix="/api/ai")
 
     @app.get("/api/health")
@@ -46,11 +50,14 @@ def create_app(test_config: dict | None = None) -> Flask:
                 "apiVersion": "v1",
                 "environment": app.config["APP_ENV"],
                 "cameraBridge": {
-                    "adapter": app.config["CAMERA_RUNTIME_ADAPTER"],
-                    "configured": bool(app.config["CAMERA_BACKEND_URL"]),
+                    "adapter": app.config["CAMERA_RUNTIME_PROVIDER"],
+                    "configured": bool(app.config["AI_CAMERA_TEST_BASE_URL"]),
                 },
             }
         )
+
+    start_task_event_stream(app)
+    start_task_scheduler(app)
 
     return app
 

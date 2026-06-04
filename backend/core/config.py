@@ -38,8 +38,25 @@ class AppConfig:
     SMS_RESEND_COOLDOWN_SECONDS: int
     SMS_MAX_ATTEMPTS: int
     DEV_ADAPTERS_ENABLED: bool
+    CAMERA_RUNTIME_PROVIDER: str
     CAMERA_RUNTIME_ADAPTER: str
+    AI_CAMERA_TEST_BASE_URL: str
+    AI_CAMERA_TEST_WORKSPACE: str
     CAMERA_BACKEND_URL: str
+    CAMERA_COMMAND_TIMEOUT: float
+    CAMERA_MONITOR_ENABLED: bool
+    CAMERA_SPEAKER_ENABLED: bool
+    CAMERA_STREAM_URL: str
+    CAMERA_SNAPSHOT_URL: str
+    TASK_REMINDER_LEAD_SECONDS: int
+    TASK_SCHEDULER_ENABLED: bool
+    TASK_SCHEDULER_INTERVAL_SECONDS: int
+    TASK_WEBSOCKET_ENABLED: bool
+    TASK_WEBSOCKET_HOST: str
+    TASK_WEBSOCKET_PORT: int
+    TASK_WEBSOCKET_PATH: str
+    TASK_DELAY_REMINDER_INTERVAL_SECONDS: int
+    TASK_DELAY_REMINDER_MAX_COUNT: int
     HARDWARE_ADAPTER: str
     PROMPT_ROOT: str
     AI_PROVIDER: str
@@ -54,6 +71,14 @@ class AppConfig:
         app_env = _env("APP_ENV", "development").strip().lower()
         dev_adapters_enabled_default = "1" if app_env in {"development", "test"} else "0"
         database_url = _database_url_for_env(app_env)
+        camera_runtime_provider = _env(
+            "CAMERA_RUNTIME_PROVIDER",
+            _env("APP_CAMERA_RUNTIME_ADAPTER", "disabled"),
+        ).strip()
+        ai_camera_test_base_url = _env(
+            "AI_CAMERA_TEST_BASE_URL",
+            _env("APP_CAMERA_BACKEND_URL", ""),
+        ).strip()
         return cls(
             APP_ENV=app_env,
             SERVICE_NAME=_env("APP_SERVICE_NAME", "ai-camera-app-backend"),
@@ -69,8 +94,37 @@ class AppConfig:
             SMS_RESEND_COOLDOWN_SECONDS=int(_env("APP_SMS_RESEND_COOLDOWN_SECONDS", "60")),
             SMS_MAX_ATTEMPTS=int(_env("APP_SMS_MAX_ATTEMPTS", "5")),
             DEV_ADAPTERS_ENABLED=_bool(_env("APP_ENABLE_DEV_ADAPTERS", dev_adapters_enabled_default)),
-            CAMERA_RUNTIME_ADAPTER=_env("APP_CAMERA_RUNTIME_ADAPTER", "disabled").strip(),
-            CAMERA_BACKEND_URL=_env("APP_CAMERA_BACKEND_URL", ""),
+            CAMERA_RUNTIME_PROVIDER=camera_runtime_provider,
+            CAMERA_RUNTIME_ADAPTER=camera_runtime_provider,
+            AI_CAMERA_TEST_BASE_URL=ai_camera_test_base_url,
+            AI_CAMERA_TEST_WORKSPACE=_env("AI_CAMERA_TEST_WORKSPACE", ""),
+            CAMERA_BACKEND_URL=ai_camera_test_base_url,
+            CAMERA_COMMAND_TIMEOUT=float(_env("CAMERA_COMMAND_TIMEOUT", "8")),
+            CAMERA_MONITOR_ENABLED=_bool(_env("CAMERA_MONITOR_ENABLED", "1")),
+            CAMERA_SPEAKER_ENABLED=_bool(_env("CAMERA_SPEAKER_ENABLED", "1")),
+            CAMERA_STREAM_URL=_env("CAMERA_STREAM_URL", ""),
+            CAMERA_SNAPSHOT_URL=_env("CAMERA_SNAPSHOT_URL", ""),
+            TASK_REMINDER_LEAD_SECONDS=int(_env("TASK_REMINDER_LEAD_SECONDS", "300")),
+            TASK_SCHEDULER_ENABLED=_bool(
+                _env(
+                    "TASK_SCHEDULER_ENABLED",
+                    "1" if app_env == "development" else "0",
+                )
+            ),
+            TASK_SCHEDULER_INTERVAL_SECONDS=int(_env("TASK_SCHEDULER_INTERVAL_SECONDS", "15")),
+            TASK_WEBSOCKET_ENABLED=_bool(
+                _env(
+                    "TASK_WEBSOCKET_ENABLED",
+                    "1" if app_env in {"development", "staging", "production"} else "0",
+                )
+            ),
+            TASK_WEBSOCKET_HOST=_env("TASK_WEBSOCKET_HOST", _env("APP_HOST", "127.0.0.1")),
+            TASK_WEBSOCKET_PORT=int(_env("TASK_WEBSOCKET_PORT", "8001")),
+            TASK_WEBSOCKET_PATH=_env("TASK_WEBSOCKET_PATH", "/api/tasks/stream"),
+            TASK_DELAY_REMINDER_INTERVAL_SECONDS=int(
+                _env("TASK_DELAY_REMINDER_INTERVAL_SECONDS", "180")
+            ),
+            TASK_DELAY_REMINDER_MAX_COUNT=int(_env("TASK_DELAY_REMINDER_MAX_COUNT", "3")),
             HARDWARE_ADAPTER=_env("APP_HARDWARE_ADAPTER", "disabled").strip(),
             PROMPT_ROOT=_env("APP_PROMPT_ROOT", str(BACKEND_ROOT / "prompts")),
             AI_PROVIDER=_env("APP_AI_PROVIDER", "").strip(),
@@ -102,6 +156,8 @@ class AppConfig:
                 raise ConfigError("APP_ENABLE_DEV_ADAPTERS must be false in production.")
             if self.SMS_PROVIDER == "development":
                 raise ConfigError("APP_SMS_PROVIDER=development is not allowed in production.")
+            if self.CAMERA_RUNTIME_PROVIDER in {"ai_camera_test", "mock"}:
+                raise ConfigError("CAMERA_RUNTIME_PROVIDER cannot use development adapters in production.")
 
 
 def apply_test_defaults(config: dict) -> dict:
@@ -109,6 +165,8 @@ def apply_test_defaults(config: dict) -> dict:
     next_config.setdefault("APP_ENV", "test")
     next_config.setdefault("DEV_ADAPTERS_ENABLED", True)
     next_config.setdefault("SMS_PROVIDER", "development")
+    next_config.setdefault("TASK_SCHEDULER_ENABLED", False)
+    next_config.setdefault("TASK_WEBSOCKET_ENABLED", False)
     return next_config
 
 
@@ -126,6 +184,11 @@ def validate_flask_config(config: dict) -> None:
             raise ConfigError("APP_ENABLE_DEV_ADAPTERS must be false in production.")
         if str(config.get("SMS_PROVIDER", "")).lower() == "development":
             raise ConfigError("APP_SMS_PROVIDER=development is not allowed in production.")
+        if str(config.get("CAMERA_RUNTIME_PROVIDER", config.get("CAMERA_RUNTIME_ADAPTER", ""))).lower() in {
+            "ai_camera_test",
+            "mock",
+        }:
+            raise ConfigError("CAMERA_RUNTIME_PROVIDER cannot use development adapters in production.")
         origins = config.get("CORS_ORIGINS") or []
         if not origins or "*" in origins:
             raise ConfigError("APP_CORS_ORIGINS must be explicit in production.")

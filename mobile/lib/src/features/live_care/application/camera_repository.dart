@@ -22,6 +22,14 @@ final cameraRuntimeProvider = FutureProvider<CameraRuntime>((ref) {
   return ref.watch(cameraRepositoryProvider).runtime();
 });
 
+final cameraStatusProvider = FutureProvider<CameraStatus>((ref) {
+  return ref.watch(cameraRepositoryProvider).status();
+});
+
+final cameraMonitorStatusProvider = FutureProvider<CameraMonitorStatus>((ref) {
+  return ref.watch(cameraRepositoryProvider).monitorStatus();
+});
+
 final cameraSnapshotProvider = FutureProvider<CameraSnapshotFrame>((ref) {
   return ref.watch(cameraRepositoryProvider).snapshot();
 });
@@ -30,7 +38,14 @@ final liveCareStatusProvider = FutureProvider<LiveCareStatus>((ref) async {
   final repository = ref.watch(cameraRepositoryProvider);
   final health = await repository.health();
   final runtime = await repository.runtime();
-  return LiveCareStatus(health: health, runtime: runtime);
+  final status = await repository.status();
+  final monitor = await repository.monitorStatus();
+  return LiveCareStatus(
+    health: health,
+    runtime: runtime,
+    cameraStatus: status,
+    monitorStatus: monitor,
+  );
 });
 
 class CameraRepository {
@@ -69,6 +84,32 @@ class CameraRepository {
       final data = error.response?.data;
       if (data is Map) return CameraRuntime.fromJson(_asMap(data));
       throw _fromDio(error, fallback: '摄像头运行状态暂时不可用。');
+    }
+  }
+
+  Future<CameraStatus> status() async {
+    if (_environment.useMockData) return CameraStatus.mock;
+
+    try {
+      final response = await _apiClient.get('/camera/status');
+      return CameraStatus.fromJson(_asMap(response.data));
+    } on DioException catch (error) {
+      final data = error.response?.data;
+      if (data is Map) return CameraStatus.fromJson(_asMap(data));
+      throw _fromDio(error, fallback: '摄像头状态暂时不可用。');
+    }
+  }
+
+  Future<CameraMonitorStatus> monitorStatus() async {
+    if (_environment.useMockData) return CameraMonitorStatus.mock;
+
+    try {
+      final response = await _apiClient.get('/camera/monitor/status');
+      return CameraMonitorStatus.fromJson(_asMap(response.data));
+    } on DioException catch (error) {
+      final data = error.response?.data;
+      if (data is Map) return CameraMonitorStatus.fromJson(_asMap(data));
+      throw _fromDio(error, fallback: '观察状态暂时不可用。');
     }
   }
 
@@ -121,6 +162,38 @@ class CameraRepository {
         contentType: '',
         message: '真实快照暂不可用',
       );
+    }
+  }
+
+  Future<CameraWebRtcSession> createWebRtcSession() async {
+    if (_environment.useMockData) {
+      return const CameraWebRtcSession(
+        signalingUrl: 'ws://127.0.0.1:1984/api/ws?src=mock',
+        message: '实时画面连接已准备好。',
+      );
+    }
+
+    try {
+      final response = await _apiClient.get('/camera/webrtc/session');
+      return CameraWebRtcSession.fromJson(_asMap(response.data));
+    } on DioException catch (error) {
+      throw _fromDio(error, fallback: '实时画面暂时无法连接，请稍后再试。');
+    }
+  }
+
+  Future<void> speak(String text, {String? taskId}) async {
+    if (_environment.useMockData) return;
+
+    try {
+      await _apiClient.post(
+        '/camera/commands/speak',
+        data: {
+          'text': text,
+          if (taskId != null && taskId.isNotEmpty) 'taskId': taskId,
+        },
+      );
+    } on DioException catch (error) {
+      throw _fromDio(error, fallback: '暂时没能发出提醒，请稍后再试。');
     }
   }
 

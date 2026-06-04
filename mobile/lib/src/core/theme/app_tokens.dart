@@ -39,6 +39,18 @@ class AppColors {
   static const primaryButtonStart = Color(0xFF1C2940);
   static const primaryButtonEnd = Color(0xFF111827);
   static const primaryButtonShadow = Color(0xFF172033);
+  static const navDockBg = Color(0xE8FFFFFF);
+  static const navDockBgWarm = Color(0xD5FAFBFE);
+  static const navDockBorder = Color(0x8CFFFFFF);
+  static const navDockShadow = Color(0xFF18243A);
+  static const navActiveBg = Color(0xEDF0F5FF);
+  static const navActiveFg = brandDeep;
+  static const navInactiveFg = muted;
+  static const navFabBg = primaryButtonStart;
+  static const navFabFg = Color(0xFFFFFFFF);
+  static const navItemActiveBg = navActiveBg;
+  static const navItemActiveFg = navActiveFg;
+  static const navItemInactiveFg = navInactiveFg;
 }
 
 class AppRadii {
@@ -78,9 +90,16 @@ class AppControls {
 class AppChrome {
   const AppChrome._();
 
-  static const tabBarHeight = 72.0;
-  static const tabBarContentGap = 12.0;
+  static const tabBarHeight = 62.0;
+  static const tabBarDockRadius = 31.0;
+  static const tabBarContentGap = 8.0;
   static const pinnedHeaderHeight = 96.0;
+
+  static double tabBarBottomGap(double safeAreaBottom) {
+    return safeAreaBottom > 0
+        ? (safeAreaBottom * 0.45).clamp(12.0, 18.0)
+        : 10.0;
+  }
 }
 
 class AppTypography {

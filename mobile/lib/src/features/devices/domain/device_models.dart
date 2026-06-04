@@ -52,8 +52,11 @@ class GuardianDeviceStatus {
     required this.snapshotSupported,
     required this.streamSupported,
     required this.twoWayAudioSupported,
+    required this.monitorSupported,
     required this.otaSupported,
     required this.adapter,
+    required this.lastSeenAt,
+    required this.message,
   });
 
   final String deviceId;
@@ -65,8 +68,11 @@ class GuardianDeviceStatus {
   final bool snapshotSupported;
   final bool streamSupported;
   final bool twoWayAudioSupported;
+  final bool monitorSupported;
   final bool otaSupported;
   final String adapter;
+  final int? lastSeenAt;
+  final String message;
 
   bool get isOnline => connectionStatus == 'online';
 
@@ -118,8 +124,11 @@ class GuardianDeviceStatus {
       snapshotSupported: capabilities['snapshot'] == true,
       streamSupported: capabilities['stream'] == true,
       twoWayAudioSupported: capabilities['twoWayAudio'] == true,
+      monitorSupported: capabilities['monitor'] == true,
       otaSupported: capabilities['ota'] == true,
       adapter: _asString(json['adapter']),
+      lastSeenAt: _asNullableInt(json['lastSeenAt']),
+      message: _asString(json['message']),
     );
   }
 }
@@ -156,6 +165,7 @@ class DeviceOverview {
       if (current.snapshotSupported) '快照',
       if (current.streamSupported) '实时画面',
       if (current.twoWayAudioSupported) '双向语音',
+      if (current.monitorSupported) '任务观察',
     ];
     if (parts.isEmpty) return '基础状态可查看';
     return parts.join(' / ');
@@ -178,6 +188,14 @@ int _asInt(dynamic value) {
   if (value is num) return value.toInt();
   if (value is String) return int.tryParse(value) ?? 0;
   return 0;
+}
+
+int? _asNullableInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
 }
 
 Map<String, dynamic> _asMap(dynamic value) {

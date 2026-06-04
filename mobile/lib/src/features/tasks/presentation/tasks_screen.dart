@@ -22,6 +22,8 @@ final taskSelectedDateProvider = StateProvider<DateTime>((ref) {
   return _dayOnly(DateTime.now());
 });
 
+const _taskStartPreparationMinutes = 5;
+
 class TasksScreen extends ConsumerStatefulWidget {
   const TasksScreen({super.key});
 
@@ -1303,7 +1305,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
       }
       if (!mounted) return;
       if (continueAdding) {
-        final nextStart = _normalizedStartTimeForDate(_date, _dueTime);
+        final nextStart = _suggestedStartAfterBoundary(_date, _dueTime);
         setState(() {
           _saving = false;
           _savingContinue = false;
@@ -1706,10 +1708,9 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
             _minutesOfDay(a.startTime).compareTo(_minutesOfDay(b.startTime)),
       );
     final last = sorted.isEmpty ? null : sorted.last;
-    final nextStart = _normalizedStartTimeForDate(
-      _date,
-      last == null ? _suggestedStartTimeForDate(_date) : last.endTime,
-    );
+    final nextStart = last == null
+        ? _suggestedStartTimeForDate(_date)
+        : _suggestedStartAfterBoundary(_date, last.endTime);
     setState(() {
       _rows = [
         ..._rows,
@@ -1759,19 +1760,26 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
   }
 
   String _suggestedStartTimeForDate(DateTime date) {
-    return _normalizedStartTimeForDate(
-      date,
-      _latestExistingEndTimeForDate(date) ?? '19:00',
-    );
+    final latestEnd = _latestExistingEndTimeForDate(date);
+    if (latestEnd != null) {
+      return _suggestedStartAfterBoundary(date, latestEnd);
+    }
+    final minTime = _minimumStartTimeForDate(date);
+    if (minTime != null) return _suggestedStartAfterBoundary(date, minTime);
+    return '19:00';
   }
 
-  String _normalizedStartTimeForDate(DateTime date, String preferredTime) {
+  String _suggestedStartAfterBoundary(DateTime date, String boundaryTime) {
     final minMinutes = _minimumStartMinutesForDate(date);
-    final preferredMinutes = _minutesOfDay(preferredTime);
-    final nextMinutes = minMinutes == null
-        ? preferredMinutes
-        : (preferredMinutes < minMinutes ? minMinutes : preferredMinutes);
-    return _minuteText(nextMinutes.clamp(0, 23 * 60 + 59).toInt());
+    final boundaryMinutes = _minutesOfDay(boundaryTime);
+    final baseMinutes = minMinutes == null
+        ? boundaryMinutes
+        : (boundaryMinutes < minMinutes ? minMinutes : boundaryMinutes);
+    return _minuteText(
+      (baseMinutes + _taskStartPreparationMinutes)
+          .clamp(0, 23 * 60 + 59)
+          .toInt(),
+    );
   }
 
   List<_ScheduleDraftRow> _normalizedRowsForSelectedDate() {
@@ -3670,8 +3678,10 @@ Color _toneColor(GuardianTask task) {
     GuardianTaskStatus.inProgress => AppColors.primary,
     GuardianTaskStatus.completed ||
     GuardianTaskStatus.confirmed => const Color(0xFF2F8F68),
-    GuardianTaskStatus.awaitingParentConfirmation => const Color(0xFFD8922B),
+    GuardianTaskStatus.awaitingParentConfirmation ||
+    GuardianTaskStatus.delayed => const Color(0xFFD8922B),
     GuardianTaskStatus.rejected ||
+    GuardianTaskStatus.missed ||
     GuardianTaskStatus.expired => AppColors.danger,
     _ => AppColors.muted,
   };

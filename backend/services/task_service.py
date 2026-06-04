@@ -8,10 +8,16 @@ from core.database import Database
 from core.errors import ApiError
 from core.security import now_ms
 from models.points import LEDGER_TASK_COMPLETED
-from models.tasks import TASK_AWAITING_PARENT_CONFIRMATION, TASK_CONFIRMED
+from models.tasks import (
+    TASK_ACTIVE_SCHEDULED_STATUSES,
+    TASK_AWAITING_PARENT_CONFIRMATION,
+    TASK_CONFIRMED,
+    TASK_DELAYED,
+    TASK_IN_PROGRESS,
+)
 from repositories.point_repository import PointRepository
 from repositories.task_repository import TaskRepository
-from schemas.tasks import task_payload, validate_task_status, validate_task_type
+from schemas.tasks import task_event_payload, task_payload, validate_task_status, validate_task_type
 from services.auth_service import AuthService
 from services.point_service import PointService
 
@@ -72,10 +78,28 @@ class TaskService:
             task = self._task_or_error(conn, context["family"]["id"], task_id)
             return {"ok": True, "task": task_payload(task)}
 
+    def current_in_progress(self, access_token: str) -> dict | None:
+        context = self._auth_context(access_token)
+        with self.repository.transaction() as conn:
+            rows = self.repository.list_in_progress_tasks(
+                conn,
+                family_id=context["family"]["id"],
+                scheduled_date=date.today().isoformat(),
+            )
+            return task_payload(rows[0]) if rows else None
+
     def create_task(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
             task = self._create_task_from_data(conn, context, data)
+            self._add_event(
+                conn,
+                task,
+                "task_created",
+                "任务已创建",
+                {"source": "parent"},
+                now_ms(),
+            )
             return {"ok": True, "task": task_payload(task)}
 
     def create_tasks_batch(self, access_token: str, data: dict) -> dict:
@@ -108,6 +132,14 @@ class TaskService:
                         exc.status_code,
                     ) from exc
                 created.append(task_payload(task))
+                self._add_event(
+                    conn,
+                    task,
+                    "task_created",
+                    "任务已创建",
+                    {"source": "parent_batch", "row": index + 1},
+                    now_ms(),
+                )
             return {"ok": True, "tasks": created}
 
     def _create_task_from_data(self, conn, context: dict, data: dict):
@@ -129,6 +161,10 @@ class TaskService:
         scheduled_start = self._optional_text(data, "scheduledStart") or self._time_part(start_at)
         scheduled_end = self._optional_text(data, "scheduledEnd") or self._time_part(due_at)
         reward_points = self._non_negative_int(data.get("rewardPoints", 0), "rewardPoints")
+        reminder_minutes_before = self._non_negative_int(
+            data.get("reminderMinutesBefore", 5),
+            "reminderMinutesBefore",
+        )
         priority = self._priority(data.get("priority", 3))
         now = now_ms()
         self._ensure_child(conn, context["family"]["id"], child_id)
@@ -151,6 +187,9 @@ class TaskService:
             requires_parent_confirmation=bool(data.get("requiresParentConfirmation", True)),
             ai_observation_summary=self._optional_text(data, "aiObservationSummary"),
             created_by=context["user"]["id"],
+            reminder_minutes_before=reminder_minutes_before,
+            device_id=self._optional_text(data, "deviceId"),
+            timezone=self._optional_text(data, "timezone") or "Asia/Shanghai",
             now=now,
         )
 
@@ -173,6 +212,9 @@ class TaskService:
             "scheduledEnd": "scheduled_end",
             "rewardPoints": "reward_points",
             "requiresParentConfirmation": "requires_parent_confirmation",
+            "reminderMinutesBefore": "reminder_minutes_before",
+            "deviceId": "device_id",
+            "timezone": "timezone",
             "aiObservationSummary": "ai_observation_summary",
         }
         for key, column in mapping.items():
@@ -183,6 +225,8 @@ class TaskService:
             elif key == "status":
                 fields[column] = validate_task_status(str(data[key]))
             elif key == "rewardPoints":
+                fields[column] = self._non_negative_int(data[key], key)
+            elif key == "reminderMinutesBefore":
                 fields[column] = self._non_negative_int(data[key], key)
             elif key == "requiresParentConfirmation":
                 fields[column] = int(bool(data[key]))
@@ -214,7 +258,48 @@ class TaskService:
                 fields=fields,
                 now=now,
             )
+            self._add_event(
+                conn,
+                task,
+                "task_updated",
+                "任务已更新",
+                {"fields": list(fields.keys())},
+                now,
+            )
             return {"ok": True, "task": task_payload(task)}
+
+    def start_task(self, access_token: str, task_id: str) -> dict:
+        context = self._auth_context(access_token)
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            task = self._task_or_error(conn, context["family"]["id"], task_id)
+            if task["status"] not in (
+                *TASK_ACTIVE_SCHEDULED_STATUSES,
+                TASK_IN_PROGRESS,
+                TASK_DELAYED,
+                "rejected",
+            ):
+                raise ApiError("task_cannot_start", "这个任务暂时不能开始")
+            task = self.repository.mark_in_progress(
+                conn,
+                family_id=context["family"]["id"],
+                task_id=task_id,
+                observation_status="parent_started",
+                now=now,
+            )
+            self._add_event(conn, task, "manual_started", "任务已开始", {"source": "parent"}, now)
+            return {"ok": True, "task": task_payload(task)}
+
+    def list_task_events(self, access_token: str, task_id: str) -> dict:
+        context = self._auth_context(access_token)
+        with self.repository.transaction() as conn:
+            self._task_or_error(conn, context["family"]["id"], task_id)
+            rows = self.repository.list_events(
+                conn,
+                family_id=context["family"]["id"],
+                task_id=task_id,
+            )
+            return {"ok": True, "events": [task_event_payload(row) for row in rows]}
 
     def complete_task(self, access_token: str, task_id: str, data: dict) -> dict:
         context = self._auth_context(access_token)
@@ -235,7 +320,25 @@ class TaskService:
                 requires_parent_confirmation=bool(task["requires_parent_confirmation"]),
                 now=now,
             )
-            return {"ok": True, "task": task_payload(task)}
+            self._add_event(
+                conn,
+                task,
+                "task_completed",
+                "任务已完成",
+                {"completionSource": self._optional_text(data, "completionSource") or "parent"},
+                now,
+            )
+            ledger_payload = None
+            if task["status"] == "completed":
+                ledger_payload = self._grant_task_points_if_needed(conn, context, task, now)
+                if ledger_payload:
+                    self._add_event(conn, task, "points_awarded", "奖励积分已发放", ledger_payload, now)
+                else:
+                    self._add_event(conn, task, "points_award_skipped", "没有重复发放积分", {}, now)
+            payload = {"ok": True, "task": task_payload(task)}
+            if ledger_payload:
+                payload["ledgerEntry"] = ledger_payload
+            return payload
 
     def parent_confirm(self, access_token: str, task_id: str) -> dict:
         context = self._auth_context(access_token)
@@ -245,31 +348,7 @@ class TaskService:
             if task["status"] not in (TASK_AWAITING_PARENT_CONFIRMATION, TASK_CONFIRMED):
                 raise ApiError("task_not_awaiting_confirmation", "任务还不能确认")
 
-            ledger_payload = None
-            if not task["points_granted_at"] and task["reward_points"] > 0:
-                ledger = self.point_service.apply_delta(
-                    conn,
-                    family_id=context["family"]["id"],
-                    child_id=task["child_id"],
-                    delta=task["reward_points"],
-                    ledger_type=LEDGER_TASK_COMPLETED,
-                    source_type="task",
-                    source_id=task["id"],
-                    note=f"任务确认奖励：{task['title']}",
-                    now=now,
-                )
-                ledger_payload = {
-                    "id": ledger["id"],
-                    "delta": ledger["delta"],
-                    "balanceAfter": ledger["balance_after"],
-                    "type": ledger["type"],
-                }
-                self.repository.mark_points_granted(
-                    conn,
-                    family_id=context["family"]["id"],
-                    task_id=task_id,
-                    now=now,
-                )
+            ledger_payload = self._grant_task_points_if_needed(conn, context, task, now)
 
             task = self.repository.mark_confirmed(
                 conn,
@@ -277,6 +356,7 @@ class TaskService:
                 task_id=task_id,
                 now=now,
             )
+            self._add_event(conn, task, "parent_confirmed", "家长已确认完成情况", {}, now)
             payload = {"ok": True, "task": task_payload(task)}
             if ledger_payload:
                 payload["ledgerEntry"] = ledger_payload
@@ -296,7 +376,69 @@ class TaskService:
                 reason=self._optional_text(data, "reason"),
                 now=now,
             )
+            self._add_event(
+                conn,
+                task,
+                "parent_rejected",
+                "家长已驳回完成确认",
+                {"reason": self._optional_text(data, "reason")},
+                now,
+            )
             return {"ok": True, "task": task_payload(task)}
+
+    def _grant_task_points_if_needed(
+        self,
+        conn,
+        context: dict,
+        task,
+        now: int,
+    ) -> dict | None:
+        if task["points_granted_at"] or task["reward_points"] <= 0:
+            return None
+        ledger = self.point_service.apply_delta(
+            conn,
+            family_id=context["family"]["id"],
+            child_id=task["child_id"],
+            delta=task["reward_points"],
+            ledger_type=LEDGER_TASK_COMPLETED,
+            source_type="task",
+            source_id=task["id"],
+            note=f"任务完成奖励：{task['title']}",
+            now=now,
+        )
+        self.repository.mark_points_granted(
+            conn,
+            family_id=context["family"]["id"],
+            task_id=task["id"],
+            now=now,
+        )
+        return {
+            "id": ledger["id"],
+            "delta": ledger["delta"],
+            "balanceAfter": ledger["balance_after"],
+            "type": ledger["type"],
+        }
+
+    def _add_event(
+        self,
+        conn,
+        task,
+        event_type: str,
+        message: str,
+        payload: dict | None,
+        now: int,
+    ) -> None:
+        if not task:
+            return
+        self.repository.add_event(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            event_type=event_type,
+            message=message,
+            payload=payload,
+            now=now,
+        )
 
     def _auth_context(self, access_token: str) -> dict:
         return self.auth_service.authenticate(access_token)

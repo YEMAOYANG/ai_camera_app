@@ -1,6 +1,6 @@
 # Mira Guardian App Backend API v1
 
-更新日期：2026-06-03
+更新日期：2026-06-04
 
 本文档描述当前家长端 App 第一版已经实现或明确预留的后端接口。后端当前保留 Flask 服务，负责 App 登录态、首次设置、任务、积分、奖励、设备状态，以及 AI / Prompt / Camera / Firmware 的轻量边界。
 
@@ -164,13 +164,47 @@ Request:
 ```text
 APP_ENV=development
 APP_ENABLE_DEV_ADAPTERS=1
-APP_CAMERA_RUNTIME_ADAPTER=ai_camera_test
-APP_CAMERA_BACKEND_URL=http://127.0.0.1:8767
+CAMERA_RUNTIME_PROVIDER=ai_camera_test
+AI_CAMERA_TEST_BASE_URL=http://127.0.0.1:8767
+CAMERA_MONITOR_ENABLED=1
+CAMERA_SPEAKER_ENABLED=1
+TASK_REMINDER_LEAD_SECONDS=300
 ```
+
+旧配置名 `APP_CAMERA_RUNTIME_ADAPTER`、`APP_CAMERA_BACKEND_URL` 仍兼容，
+但新项目配置优先使用 `CAMERA_RUNTIME_PROVIDER` 和
+`AI_CAMERA_TEST_BASE_URL`。production 不允许默认连接本地旧测试运行时。
 
 ### GET `/api/camera/health`
 
 返回 camera runtime adapter 健康状态。
+
+### GET `/api/camera/status`
+
+Headers:
+
+```text
+Authorization: Bearer mga_xxx
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "status": {
+    "connectionStatus": "online",
+    "streamAvailable": true,
+    "snapshotAvailable": true,
+    "speakerAvailable": true,
+    "monitorAvailable": true,
+    "lastSeenAt": 1780390000000,
+    "runtimeProvider": "ai_camera_test_bridge",
+    "currentTask": null,
+    "message": "摄像头在线，最新状态已同步。"
+  }
+}
+```
 
 ### GET `/api/camera/runtime`
 
@@ -183,6 +217,121 @@ APP_CAMERA_BACKEND_URL=http://127.0.0.1:8767
 ### GET `/api/camera/snapshot`
 
 返回后端 adapter 提供的 JPEG 快照；未配置或不可达时返回明确错误。
+
+### GET `/api/camera/stream`
+
+返回后端代理的兼容流响应，保留给调试和降级路径。正式 Flutter 实时看护优先使用 WebRTC session 合同，不使用 MJPEG 作为主路径。
+
+### GET `/api/camera/webrtc/session`
+
+Flutter 全屏实时监控页使用。Flutter 先向当前后端申请实时画面连接信息，再用 WebRTC 建立真实流播放。
+
+Headers:
+
+```text
+Authorization: Bearer mga_xxx
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "session": {
+    "signalingUrl": "ws://127.0.0.1:1984/api/ws?src=ipc45aw_hd",
+    "message": "实时画面连接已准备好。"
+  }
+}
+```
+
+### POST `/api/camera/webrtc/offer`
+
+兼容测试接口。实时监控主路径使用 `GET /api/camera/webrtc/session`，以便持续交换 WebRTC candidate。
+
+Headers:
+
+```text
+Authorization: Bearer mga_xxx
+```
+
+Request:
+
+```json
+{
+  "sdp": "v=0\r\n..."
+}
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "session": {
+    "type": "answer",
+    "sdp": "v=0\r\n...",
+    "candidates": [],
+    "message": "实时画面连接已准备好。"
+  }
+}
+```
+
+### POST `/api/camera/commands/speak`
+
+Request:
+
+```json
+{
+  "text": "数学作业快到时间了，我们准备开始吧。",
+  "taskId": "task_xxx"
+}
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "command": {
+    "commandId": "cmd_xxx",
+    "commandType": "speak",
+    "status": "succeeded",
+    "taskId": "task_xxx",
+    "createdAt": 1780390000000,
+    "completedAt": 1780390000123,
+    "message": "已执行"
+  }
+}
+```
+
+### POST `/api/camera/commands/snapshot`
+
+触发一次快照命令并记录命令结果。
+
+### POST `/api/camera/monitor/start`
+
+启动任务观察并记录命令结果。
+
+### POST `/api/camera/monitor/stop`
+
+停止任务观察并记录命令结果。
+
+### GET `/api/camera/monitor/status`
+
+返回当前观察状态：
+
+```json
+{
+  "ok": true,
+  "monitor": {
+    "running": false,
+    "status": "idle",
+    "lastObservation": null,
+    "lastReminder": "",
+    "message": "当前没有进行中的观察"
+  }
+}
+```
 
 ## V1 App API Contract
 
@@ -226,7 +375,13 @@ Device
   GET    /api/devices
   GET    /api/devices/{deviceId}
   GET    /api/devices/{deviceId}/status
+  POST   /api/devices/{deviceId}/commands
 ```
+
+`GET /api/devices/{deviceId}/status` 会合并摄像头运行时状态，返回
+`connectionStatus`、`lastSeenAt`、`message` 以及 `capabilities.snapshot /
+stream / twoWayAudio / monitor`。Flutter 仍然只消费 App 后端字段，不接触底层
+runtime 地址或流媒体配置。
 
 ### Tasks
 
@@ -242,9 +397,13 @@ Tasks
   POST   /api/tasks
   POST   /api/tasks/batch
   PATCH  /api/tasks/{id}
+  POST   /api/tasks/{id}/start
   POST   /api/tasks/{id}/complete
   POST   /api/tasks/{id}/parent-confirm
   POST   /api/tasks/{id}/reject-confirmation
+  POST   /api/tasks/{id}/reject
+  GET    /api/tasks/{id}/events
+  WS     /api/tasks/stream
 ```
 
 `GET /api/tasks` supports `childId`, `date`, `startDate`, `endDate`, and
@@ -296,8 +455,63 @@ Batch create response:
 }
 ```
 
-Task templates, pause/delay, and standalone evidence endpoints are future
-expansions. V1 evidence summary is embedded in task payloads.
+Task payloads include runtime fields used by the parent app:
+
+- `status`: `scheduled`, `pending`, `reminder_sent`, `in_progress`, `delayed`,
+  `awaiting_parent_confirmation`, `completed`, `confirmed`, `rejected`,
+  `missed`, `expired`, `cancelled`
+- `reminderMinutesBefore`, `reminderStatus`
+- `startedAt`, `endedAt`, `missedAt`, `delayedAt`
+- `lastReminderAt`, `nextReminderAt`, `delayReminderCount`
+- `cameraObservationStatus`, `deviceId`, `timezone`
+
+There is still no standalone day-plan API. Delay/procrastination handling is
+part of the tasks runtime state machine.
+
+`POST /api/tasks/{id}/start` 将任务切到 `in_progress`，用于家长手动开始。
+自动开始由后端 scheduler 触发；本地开发也可以手动调用 dev tick 复现。
+
+`GET /api/tasks/{id}/events` 返回提醒、自动开始、摄像头命令、完成和确认记录：
+
+```json
+{
+  "ok": true,
+  "events": [
+    {
+      "id": "evt_xxx",
+      "familyId": "fam_xxx",
+      "taskId": "task_xxx",
+      "eventType": "auto_started",
+      "message": "任务已自动开始",
+      "payload": {},
+      "createdAt": 1780390000000
+    }
+  ]
+}
+```
+
+`WS /api/tasks/stream?token={accessToken}` is the authenticated task realtime
+channel. The backend sends a message whenever a task action or scheduler tick
+changes task state or adds task events. Flutter must refresh backend data after
+receiving this message; it must not mutate task status locally.
+
+```json
+{
+  "type": "task.updated",
+  "source": "scheduler",
+  "taskIds": ["task_xxx"],
+  "tasks": [],
+  "events": [
+    {
+      "familyId": "fam_xxx",
+      "taskId": "task_xxx",
+      "eventType": "auto_started"
+    }
+  ],
+  "checkedAt": 1780390000000,
+  "sentAt": 1780390000200
+}
+```
 
 Task payload:
 
@@ -417,17 +631,25 @@ approved
 rejected
 ```
 
-### Camera
+### Dev Only
 
-Flutter should call backend camera APIs, not underlying stream/runtime protocols directly. V1 does not expose a separate `watch` module.
+仅 `development/test + APP_ENABLE_DEV_ADAPTERS=1` 可用；production 不注册为真实业务入口。
 
 ```text
-Camera Bridge
-  GET  /api/camera/health
-  GET  /api/camera/snapshot
-  GET  /api/camera/stream
-  GET  /api/camera/runtime
+Dev
+  POST /api/dev/tasks/scheduler/tick
+  GET  /api/dev/tasks/scheduler/status
+  POST /api/dev/camera/test-speak
+  POST /api/dev/camera/test-snapshot
 ```
+
+`POST /api/dev/tasks/scheduler/tick` 扫描今天及历史未终态任务：提前提醒、
+到点自动开始、拖拉提醒、结束处理和历史补偿。摄像头离线时，任务状态仍合理
+推进，同时写入 `reminder_failed`、`monitor_failed` 或
+`observation_unavailable` 等事件。
+
+`GET /api/dev/tasks/scheduler/status` 返回本地 scheduler runner 是否运行、
+最近 tick 时间、下次 tick 时间和最近结果。
 
 ### AI / Prompt Registry
 

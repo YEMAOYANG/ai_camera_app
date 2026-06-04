@@ -14,6 +14,8 @@ const taskDetailPath = '/tasks/detail';
 const pointsPath = '/points';
 const rewardsPath = '/rewards';
 const rewardDetailPath = '/rewards/detail';
+const liveMonitorPath = '/live/monitor';
+const liveEventsPath = '/live/events';
 
 enum AppRoute {
   home('/home', '首页', Icons.home_outlined, Icons.home),

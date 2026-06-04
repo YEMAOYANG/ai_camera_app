@@ -12,6 +12,7 @@ import 'package:mira_guardian_app/src/features/auth/presentation/login_screen.da
 import 'package:mira_guardian_app/src/features/home/presentation/home_screen.dart';
 import 'package:mira_guardian_app/src/features/legal/presentation/privacy_policy_screen.dart';
 import 'package:mira_guardian_app/src/features/legal/presentation/user_agreement_screen.dart';
+import 'package:mira_guardian_app/src/features/live_care/presentation/live_monitor_screen.dart';
 import 'package:mira_guardian_app/src/features/live_care/presentation/live_care_screen.dart';
 import 'package:mira_guardian_app/src/features/points/presentation/points_screen.dart';
 import 'package:mira_guardian_app/src/features/profile/presentation/profile_screen.dart';
@@ -100,6 +101,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'setupEmergencyContacts',
         builder: (_, _) => const EmergencyContactsSetupScreen(),
       ),
+      GoRoute(
+        path: liveMonitorPath,
+        name: 'liveMonitor',
+        builder: (_, _) => const LiveMonitorScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) {
           return AppShell(child: child);
@@ -147,6 +153,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: AppRoute.live.path,
             name: AppRoute.live.name,
             builder: (_, _) => const LiveCareScreen(),
+          ),
+          GoRoute(
+            path: liveEventsPath,
+            name: 'liveEvents',
+            builder: (_, _) => const LiveEventsScreen(),
           ),
           GoRoute(
             path: AppRoute.alerts.path,

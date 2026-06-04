@@ -1,8 +1,11 @@
 import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
 
 enum GuardianTaskStatus {
+  scheduled('scheduled', '待开始', StatusTone.neutral),
   pending('pending', '待开始', StatusTone.neutral),
+  reminderSent('reminder_sent', '即将开始', StatusTone.neutral),
   inProgress('in_progress', '进行中', StatusTone.success),
+  delayed('delayed', '需要提醒', StatusTone.warning),
   completed('completed', '已完成', StatusTone.success),
   awaitingParentConfirmation(
     'awaiting_parent_confirmation',
@@ -11,6 +14,7 @@ enum GuardianTaskStatus {
   ),
   confirmed('confirmed', '已确认', StatusTone.success),
   rejected('rejected', '已驳回', StatusTone.danger),
+  missed('missed', '未完成', StatusTone.danger),
   expired('expired', '已过期', StatusTone.danger),
   cancelled('cancelled', '已取消', StatusTone.neutral);
 
@@ -21,8 +25,11 @@ enum GuardianTaskStatus {
   final StatusTone tone;
 
   bool get canComplete {
-    return this == GuardianTaskStatus.pending ||
+    return this == GuardianTaskStatus.scheduled ||
+        this == GuardianTaskStatus.pending ||
+        this == GuardianTaskStatus.reminderSent ||
         this == GuardianTaskStatus.inProgress ||
+        this == GuardianTaskStatus.delayed ||
         this == GuardianTaskStatus.rejected;
   }
 
@@ -37,6 +44,8 @@ enum GuardianTaskStatus {
   bool get needsCare {
     return this == GuardianTaskStatus.awaitingParentConfirmation ||
         this == GuardianTaskStatus.rejected ||
+        this == GuardianTaskStatus.delayed ||
+        this == GuardianTaskStatus.missed ||
         this == GuardianTaskStatus.expired;
   }
 
@@ -126,6 +135,18 @@ class GuardianTask {
     required this.createdAt,
     required this.updatedAt,
     required this.completedAt,
+    required this.startedAt,
+    required this.endedAt,
+    required this.missedAt,
+    required this.delayedAt,
+    required this.lastReminderAt,
+    required this.nextReminderAt,
+    required this.delayReminderCount,
+    required this.reminderMinutesBefore,
+    required this.reminderStatus,
+    required this.cameraObservationStatus,
+    required this.deviceId,
+    required this.timezone,
     required this.confirmedAt,
     required this.rejectedAt,
     required this.pointsGrantedAt,
@@ -157,6 +178,18 @@ class GuardianTask {
   final int createdAt;
   final int updatedAt;
   final int? completedAt;
+  final int? startedAt;
+  final int? endedAt;
+  final int? missedAt;
+  final int? delayedAt;
+  final int? lastReminderAt;
+  final int? nextReminderAt;
+  final int delayReminderCount;
+  final int reminderMinutesBefore;
+  final String reminderStatus;
+  final String cameraObservationStatus;
+  final String deviceId;
+  final String timezone;
   final int? confirmedAt;
   final int? rejectedAt;
   final int? pointsGrantedAt;
@@ -205,6 +238,8 @@ class GuardianTask {
     if (status.awaitsParent) return '等待你确认完成情况';
     if (status == GuardianTaskStatus.confirmed) return '家长已确认';
     if (status == GuardianTaskStatus.rejected) return '已驳回';
+    if (status == GuardianTaskStatus.delayed) return '需要温和提醒';
+    if (status == GuardianTaskStatus.missed) return '未完成';
     if (status == GuardianTaskStatus.completed) return '已完成';
     if (!requiresParentConfirmation) return '完成后自动记录';
     return '需要家长确认';
@@ -233,6 +268,12 @@ class GuardianTask {
     if (status == GuardianTaskStatus.inProgress) {
       return '任务进行中，保持低打扰提醒。';
     }
+    if (status == GuardianTaskStatus.delayed) {
+      return '孩子还没有开始，系统会继续温和提醒。';
+    }
+    if (status == GuardianTaskStatus.missed) {
+      return '这项任务没有按时完成，可以重新安排一个时间。';
+    }
     if (status == GuardianTaskStatus.rejected) {
       return rejectionReason.isNotEmpty ? rejectionReason : '证据不足，等待补充完成。';
     }
@@ -241,8 +282,14 @@ class GuardianTask {
 
   String get nextStep {
     if (status.awaitsParent) return '等待你处理任务证据。';
-    if (status == GuardianTaskStatus.pending) return '到点后提醒孩子开始。';
+    if (status == GuardianTaskStatus.scheduled ||
+        status == GuardianTaskStatus.pending) {
+      return '到点后提醒孩子开始。';
+    }
+    if (status == GuardianTaskStatus.reminderSent) return '已经提醒，等待开始。';
     if (status == GuardianTaskStatus.inProgress) return '完成后进入家长确认。';
+    if (status == GuardianTaskStatus.delayed) return '系统会继续温和提醒。';
+    if (status == GuardianTaskStatus.missed) return '任务未完成。';
     if (status == GuardianTaskStatus.rejected) {
       return rejectionReason.isNotEmpty ? rejectionReason : '等待补充完成。';
     }
@@ -271,6 +318,18 @@ class GuardianTask {
     String? aiObservationSummary,
     String? rejectionReason,
     int? completedAt,
+    int? startedAt,
+    int? endedAt,
+    int? missedAt,
+    int? delayedAt,
+    int? lastReminderAt,
+    int? nextReminderAt,
+    int? delayReminderCount,
+    int? reminderMinutesBefore,
+    String? reminderStatus,
+    String? cameraObservationStatus,
+    String? deviceId,
+    String? timezone,
     int? confirmedAt,
     int? rejectedAt,
     int? pointsGrantedAt,
@@ -303,6 +362,20 @@ class GuardianTask {
       createdAt: createdAt,
       updatedAt: updatedAt,
       completedAt: completedAt ?? this.completedAt,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      missedAt: missedAt ?? this.missedAt,
+      delayedAt: delayedAt ?? this.delayedAt,
+      lastReminderAt: lastReminderAt ?? this.lastReminderAt,
+      nextReminderAt: nextReminderAt ?? this.nextReminderAt,
+      delayReminderCount: delayReminderCount ?? this.delayReminderCount,
+      reminderMinutesBefore:
+          reminderMinutesBefore ?? this.reminderMinutesBefore,
+      reminderStatus: reminderStatus ?? this.reminderStatus,
+      cameraObservationStatus:
+          cameraObservationStatus ?? this.cameraObservationStatus,
+      deviceId: deviceId ?? this.deviceId,
+      timezone: timezone ?? this.timezone,
       confirmedAt: confirmedAt ?? this.confirmedAt,
       rejectedAt: rejectedAt ?? this.rejectedAt,
       pointsGrantedAt: pointsGrantedAt ?? this.pointsGrantedAt,
@@ -351,6 +424,24 @@ class GuardianTask {
       createdAt: _asInt(json['createdAt']),
       updatedAt: _asInt(json['updatedAt']),
       completedAt: _asNullableInt(json['completedAt']),
+      startedAt: _asNullableInt(json['startedAt']),
+      endedAt: _asNullableInt(json['endedAt']),
+      missedAt: _asNullableInt(json['missedAt']),
+      delayedAt: _asNullableInt(json['delayedAt']),
+      lastReminderAt: _asNullableInt(json['lastReminderAt']),
+      nextReminderAt: _asNullableInt(json['nextReminderAt']),
+      delayReminderCount: _asInt(json['delayReminderCount']),
+      reminderMinutesBefore: _asInt(
+        json['reminderMinutesBefore'],
+        fallback: 5,
+      ),
+      reminderStatus: _asString(json['reminderStatus'], fallback: 'pending'),
+      cameraObservationStatus: _asString(
+        json['cameraObservationStatus'],
+        fallback: 'unknown',
+      ),
+      deviceId: _asString(json['deviceId']),
+      timezone: _asString(json['timezone'], fallback: 'Asia/Shanghai'),
       confirmedAt: _asNullableInt(json['confirmedAt']),
       rejectedAt: _asNullableInt(json['rejectedAt']),
       pointsGrantedAt: _asNullableInt(json['pointsGrantedAt']),
@@ -387,10 +478,107 @@ class GuardianTask {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'completedAt': completedAt,
+      'startedAt': startedAt,
+      'endedAt': endedAt,
+      'missedAt': missedAt,
+      'delayedAt': delayedAt,
+      'lastReminderAt': lastReminderAt,
+      'nextReminderAt': nextReminderAt,
+      'delayReminderCount': delayReminderCount,
+      'reminderMinutesBefore': reminderMinutesBefore,
+      'reminderStatus': reminderStatus,
+      'cameraObservationStatus': cameraObservationStatus,
+      'deviceId': deviceId,
+      'timezone': timezone,
       'confirmedAt': confirmedAt,
       'rejectedAt': rejectedAt,
       'pointsGrantedAt': pointsGrantedAt,
     };
+  }
+}
+
+class GuardianTaskEvent {
+  const GuardianTaskEvent({
+    required this.id,
+    required this.taskId,
+    required this.eventType,
+    required this.message,
+    required this.payload,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String taskId;
+  final String eventType;
+  final String message;
+  final Map<String, dynamic> payload;
+  final int createdAt;
+
+  String get title {
+    return switch (eventType) {
+      'task_created' => '任务已创建',
+      'task_updated' => '任务已更新',
+      'manual_started' => '任务已开始',
+      'reminder_due' => '准备提醒',
+      'reminder_sent' => '已提醒孩子',
+      'reminder_failed' => '提醒未送达',
+      'auto_started' => '任务自动开始',
+      'observation_unavailable' => '观察暂不可用',
+      'child_not_ready' => '还没开始',
+      'delayed' => '需要提醒',
+      'delay_reminder_sent' => '已再次提醒',
+      'delay_reminder_failed' => '再次提醒未送达',
+      'monitor_started' => '开始观察',
+      'monitor_failed' => '观察暂不可用',
+      'camera_monitor_started' => '摄像头开始观察',
+      'camera_command_failed' => '摄像头暂时离线',
+      'ended' || 'auto_finished' => '任务时间已结束',
+      'awaiting_parent_confirmation' => '等待确认',
+      'completed' => '任务已完成',
+      'missed' => '任务未完成',
+      'points_awarded' => '积分已发放',
+      'points_award_skipped' => '积分已记录',
+      'task_completed' => '任务已完成',
+      'parent_confirmed' => '家长已确认',
+      'confirmation_rejected' || 'parent_rejected' => '确认已驳回',
+      _ => message.isNotEmpty ? message : '任务记录',
+    };
+  }
+
+  String get displayMessage {
+    if (message.isNotEmpty) return message;
+    return title;
+  }
+
+  StatusTone get tone {
+    return switch (eventType) {
+      'reminder_failed' ||
+      'delay_reminder_failed' ||
+      'monitor_failed' ||
+      'child_not_ready' ||
+      'delayed' ||
+      'camera_command_failed' ||
+      'confirmation_rejected' => StatusTone.warning,
+      'parent_confirmed' ||
+      'task_completed' ||
+      'points_awarded' ||
+      'completed' ||
+      'auto_started' ||
+      'camera_monitor_started' ||
+      'monitor_started' => StatusTone.success,
+      _ => StatusTone.neutral,
+    };
+  }
+
+  static GuardianTaskEvent fromJson(Map<String, dynamic> json) {
+    return GuardianTaskEvent(
+      id: _asString(json['id']),
+      taskId: _asString(json['taskId']),
+      eventType: _asString(json['eventType']),
+      message: _asString(json['message']),
+      payload: _asMap(json['payload']),
+      createdAt: _asInt(json['createdAt']),
+    );
   }
 }
 

@@ -7,12 +7,14 @@ class AppEnvironment {
     required this.flavor,
     required this.apiBaseUrl,
     required this.useMockData,
+    this.taskWebSocketBaseUrl = '',
   });
 
   factory AppEnvironment.development() {
     return const AppEnvironment(
       flavor: AppFlavor.development,
       apiBaseUrl: 'http://127.0.0.1:8000/api',
+      taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',
       useMockData: false,
     );
   }
@@ -21,22 +23,33 @@ class AppEnvironment {
     return const AppEnvironment(
       flavor: AppFlavor.development,
       apiBaseUrl: 'http://127.0.0.1:8000/api',
+      taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',
       useMockData: false,
     );
   }
 
   factory AppEnvironment.staging() {
+    final apiBaseUrl = _requiredApiBaseUrl(AppFlavor.staging);
     return AppEnvironment(
       flavor: AppFlavor.staging,
-      apiBaseUrl: _requiredApiBaseUrl(AppFlavor.staging),
+      apiBaseUrl: apiBaseUrl,
+      taskWebSocketBaseUrl: _defaultTaskWebSocketBaseUrl(
+        apiBaseUrl,
+        AppFlavor.staging,
+      ),
       useMockData: false,
     );
   }
 
   factory AppEnvironment.production() {
+    final apiBaseUrl = _requiredApiBaseUrl(AppFlavor.production);
     return AppEnvironment(
       flavor: AppFlavor.production,
-      apiBaseUrl: _requiredApiBaseUrl(AppFlavor.production),
+      apiBaseUrl: apiBaseUrl,
+      taskWebSocketBaseUrl: _defaultTaskWebSocketBaseUrl(
+        apiBaseUrl,
+        AppFlavor.production,
+      ),
       useMockData: false,
     );
   }
@@ -62,6 +75,7 @@ class AppEnvironment {
       'USE_MOCK_DATA',
       defaultValue: false,
     );
+    const taskWsBaseUrl = String.fromEnvironment('TASK_WS_BASE_URL');
     final flavor = switch (flavorName) {
       'production' => AppFlavor.production,
       'staging' => AppFlavor.staging,
@@ -77,12 +91,16 @@ class AppEnvironment {
     return AppEnvironment(
       flavor: flavor,
       apiBaseUrl: apiBaseUrl,
+      taskWebSocketBaseUrl: taskWsBaseUrl.trim().isEmpty
+          ? _defaultTaskWebSocketBaseUrl(apiBaseUrl, flavor)
+          : taskWsBaseUrl,
       useMockData: useMockData,
     );
   }
 
   final AppFlavor flavor;
   final String apiBaseUrl;
+  final String taskWebSocketBaseUrl;
   final bool useMockData;
 }
 
@@ -92,6 +110,16 @@ String _requiredApiBaseUrl(AppFlavor flavor) {
     throw UnsupportedError('API_BASE_URL is required for $flavor.');
   }
   return apiBaseUrl;
+}
+
+String _defaultTaskWebSocketBaseUrl(String apiBaseUrl, AppFlavor flavor) {
+  if (flavor == AppFlavor.development) {
+    return 'ws://127.0.0.1:8001/api';
+  }
+  final uri = Uri.tryParse(apiBaseUrl);
+  if (uri == null || uri.host.isEmpty) return '';
+  final scheme = uri.scheme == 'https' ? 'wss' : 'ws';
+  return uri.replace(scheme: scheme).toString();
 }
 
 final appEnvironmentProvider = Provider<AppEnvironment>((ref) {

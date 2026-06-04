@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mira_guardian_app/src/app/router/app_route.dart';
 import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
 import 'package:mira_guardian_app/src/features/devices/application/device_repository.dart';
-import 'package:mira_guardian_app/src/features/devices/domain/device_models.dart';
 import 'package:mira_guardian_app/src/features/live_care/application/camera_repository.dart';
 import 'package:mira_guardian_app/src/features/live_care/domain/camera_models.dart';
 import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
@@ -43,12 +44,7 @@ class LiveCareScreen extends ConsumerWidget {
           onRefresh: () => _refreshLiveCare(ref),
         ),
         const SizedBox(height: 14),
-        _ObservationPanel(status: liveStatus),
-        const SizedBox(height: 14),
-        _DeviceRuntimePanel(
-          deviceOverview: deviceOverview,
-          liveStatus: liveStatus,
-        ),
+        _CareFocusPanel(status: liveStatus),
       ],
     );
   }
@@ -58,6 +54,8 @@ class LiveCareScreen extends ConsumerWidget {
       ..invalidate(liveCareStatusProvider)
       ..invalidate(cameraHealthProvider)
       ..invalidate(cameraRuntimeProvider)
+      ..invalidate(cameraStatusProvider)
+      ..invalidate(cameraMonitorStatusProvider)
       ..invalidate(cameraSnapshotProvider)
       ..invalidate(primaryDeviceOverviewProvider);
   }
@@ -186,8 +184,12 @@ class _LiveViewport extends StatelessWidget {
     if (status.isLoading) return '正在同步摄像头状态。';
     if (care == null) return '摄像头暂时不在线，请稍后刷新。';
     if (!care.isAvailable) return care.detail;
+    final currentTask = care.currentTask;
+    if (currentTask != null) {
+      return '正在看护“${currentTask.title}”，任务状态会随进度同步更新。';
+    }
     if (frame?.available == true) {
-      return '快照已更新，画面仅用于家长查看当前状态。';
+      return '这是最近预览画面，点击查看实时画面可进入横屏监控。';
     }
     if (snapshot.isLoading) return '摄像头在线，正在获取最新快照。';
     return frame?.message ?? '摄像头服务在线，真实画面暂未返回。';
@@ -221,93 +223,87 @@ class _LiveActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final available = status.asData?.value.isAvailable ?? false;
+    final streamAvailable =
+        status.asData?.value.cameraStatus?.streamAvailable ?? available;
     final frameAvailable = snapshot.asData?.value.available ?? false;
-    final buttons = [
-      MiraSecondaryButton(
-        label: '刷新状态',
-        trailing: const Icon(Icons.refresh_outlined, size: 18),
-        onTap: onRefresh,
-      ),
-      MiraSecondaryButton(
-        label: '确认观察',
-        trailing: const Icon(Icons.fact_check_outlined, size: 18),
-        onTap: available
-            ? () => _showLiveConfirmSheet(context, status.asData!.value)
-            : null,
-      ),
-      MiraSecondaryButton(
-        label: '快照',
-        trailing: const Icon(Icons.camera_alt_outlined, size: 18),
-        onTap: frameAvailable ? () => _showToast(context, '快照已更新') : null,
-      ),
-    ];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 360) {
-          return Column(
-            children: [
-              for (var index = 0; index < buttons.length; index++) ...[
-                buttons[index],
-                if (index != buttons.length - 1) const SizedBox(height: 10),
-              ],
-            ],
-          );
-        }
-
-        return Row(
+    return Column(
+      children: [
+        MiraPrimaryButton(
+          label: '查看实时画面',
+          trailing: const MiraButtonGlyph(icon: Icons.play_arrow_rounded),
+          onTap: available && streamAvailable
+              ? () => context.go(liveMonitorPath)
+              : null,
+        ),
+        const SizedBox(height: 10),
+        Row(
           children: [
-            for (var index = 0; index < buttons.length; index++) ...[
-              Expanded(child: buttons[index]),
-              if (index != buttons.length - 1) const SizedBox(width: 10),
-            ],
+            Expanded(
+              child: MiraSecondaryButton(
+                label: available ? '刷新预览' : '重新连接',
+                trailing: const Icon(Icons.refresh_outlined, size: 18),
+                onTap: onRefresh,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: MiraSecondaryButton(
+                label: '快照',
+                trailing: const Icon(Icons.camera_alt_outlined, size: 18),
+                onTap: frameAvailable
+                    ? () => _showToast(context, '已保存当前画面')
+                    : null,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: MiraSecondaryButton(
+                label: '回放',
+                trailing: const Icon(Icons.play_circle_outline, size: 18),
+                onTap: () => context.go(liveEventsPath),
+              ),
+            ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 }
 
-class _ObservationPanel extends StatelessWidget {
-  const _ObservationPanel({required this.status});
+class _CareFocusPanel extends StatelessWidget {
+  const _CareFocusPanel({required this.status});
 
   final AsyncValue<LiveCareStatus> status;
 
   @override
   Widget build(BuildContext context) {
     final care = status.asData?.value;
+    final currentTask = care?.currentTask;
 
     return MiraSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle('AI 观察摘要'),
-          const SizedBox(height: 10),
-          Text(
-            care?.runtime.summary ??
-                (status.isLoading ? '正在同步观察摘要。' : '暂时没有拿到最新观察摘要。'),
-            style: const TextStyle(
-              color: AppColors.muted,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              height: 1.55,
-              letterSpacing: 0,
-            ),
-          ),
-          const SizedBox(height: 10),
+          const _SectionTitle('当前看护'),
+          const SizedBox(height: 8),
           MiraListRow(
-            icon: Icons.fact_check_outlined,
-            title: '家长确认入口',
-            subtitle: care?.isAvailable == true
-                ? '确认当前观察，或标记 AI 判断需要调整'
-                : '真实画面不可用时，仅保留状态确认入口',
+            icon: currentTask == null
+                ? Icons.shield_outlined
+                : Icons.play_circle_outline,
+            title: currentTask == null ? '当前没有进行中的任务' : currentTask.title,
+            subtitle: currentTask == null
+                ? '需要查看时进入实时画面，普通状态不会打扰孩子。'
+                : '${currentTask.timeLabel} · 任务状态会随进度同步更新',
             tone: care?.isAvailable == true
-                ? MiraListRowTone.blue
+                ? MiraListRowTone.green
                 : MiraListRowTone.amber,
-            onTap: care == null
-                ? null
-                : () => _showLiveConfirmSheet(context, care),
+          ),
+          MiraListRow(
+            icon: Icons.play_circle_outline,
+            title: '事件回放',
+            subtitle: '查看最近的任务、提醒和看护片段',
+            tone: MiraListRowTone.blue,
+            onTap: () => context.go(liveEventsPath),
           ),
         ],
       ),
@@ -315,57 +311,86 @@ class _ObservationPanel extends StatelessWidget {
   }
 }
 
-class _DeviceRuntimePanel extends StatelessWidget {
-  const _DeviceRuntimePanel({
-    required this.deviceOverview,
-    required this.liveStatus,
+class LiveEventsScreen extends ConsumerWidget {
+  const LiveEventsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final monitor = ref.watch(cameraMonitorStatusProvider);
+    return MiraScreen(
+      title: '事件回放',
+      subtitle: '最近片段',
+      onBack: () => context.go(AppRoute.live.path),
+      children: [
+        monitor.when(
+          loading: () =>
+              const MiraLoadingState(title: '正在整理最近片段', message: '请稍等一下。'),
+          error: (_, _) => const MiraStateView(
+            variant: MiraStateVariant.serviceUnavailable,
+            title: '暂时拿不到回放',
+            message: '稍后再试，任务记录不会受到影响。',
+          ),
+          data: (value) {
+            if (value.lastObservation.isEmpty && value.lastReminder.isEmpty) {
+              return const MiraStateView(
+                variant: MiraStateVariant.noData,
+                title: '还没有可回放的片段',
+                message: '当任务提醒或看护片段产生后，会在这里显示。',
+              );
+            }
+            return Column(
+              children: [
+                if (value.lastObservation.isNotEmpty)
+                  _PlaybackCard(
+                    icon: Icons.visibility_outlined,
+                    title: '最近看护片段',
+                    time: '刚刚',
+                    message: value.lastObservation,
+                    tone: MiraListRowTone.blue,
+                  ),
+                if (value.lastObservation.isNotEmpty &&
+                    value.lastReminder.isNotEmpty)
+                  const SizedBox(height: 12),
+                if (value.lastReminder.isNotEmpty)
+                  _PlaybackCard(
+                    icon: Icons.notifications_active_outlined,
+                    title: '最近提醒',
+                    time: '刚刚',
+                    message: value.lastReminder,
+                    tone: MiraListRowTone.amber,
+                  ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _PlaybackCard extends StatelessWidget {
+  const _PlaybackCard({
+    required this.icon,
+    required this.title,
+    required this.time,
+    required this.message,
+    required this.tone,
   });
 
-  final AsyncValue<DeviceOverview?> deviceOverview;
-  final AsyncValue<LiveCareStatus> liveStatus;
+  final IconData icon;
+  final String title;
+  final String time;
+  final String message;
+  final MiraListRowTone tone;
 
   @override
   Widget build(BuildContext context) {
-    final overview = deviceOverview.asData?.value;
-    final care = liveStatus.asData?.value;
-
     return MiraSurface(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _SectionTitle('设备状态'),
-          const SizedBox(height: 8),
-          MiraListRow(
-            icon: Icons.wifi_outlined,
-            title: overview?.device.displayName ?? 'Mira 设备',
-            subtitle: overview?.subtitle ?? '正在读取设备绑定状态',
-            tone: overview?.isOnline == false
-                ? MiraListRowTone.red
-                : MiraListRowTone.green,
-            trailing: StatusChip(
-              label: overview?.connectionLabel ?? '同步中',
-              tone: overview?.tone ?? StatusTone.neutral,
-            ),
-          ),
-          MiraListRow(
-            icon: Icons.memory_outlined,
-            title: care?.runtime.stateLabel ?? '摄像头运行状态',
-            subtitle: care?.health.message ?? '正在同步摄像头状态',
-            tone: care?.isAvailable == false
-                ? MiraListRowTone.red
-                : MiraListRowTone.blue,
-            trailing: StatusChip(
-              label: care?.health.reachable == true ? '可达' : '降级',
-              tone: care?.health.tone ?? StatusTone.neutral,
-            ),
-          ),
-          MiraListRow(
-            icon: Icons.privacy_tip_outlined,
-            title: '隐私与能力边界',
-            subtitle: '实时看护只展示家长需要确认的画面和观察摘要。',
-            tone: MiraListRowTone.neutral,
-          ),
-        ],
+      child: MiraListRow(
+        icon: icon,
+        title: title,
+        subtitle: '$time · $message',
+        tone: tone,
       ),
     );
   }
@@ -389,67 +414,6 @@ class _SectionTitle extends StatelessWidget {
       ),
     );
   }
-}
-
-void _showLiveConfirmSheet(BuildContext context, LiveCareStatus status) {
-  showModalBottomSheet<void>(
-    context: context,
-    useRootNavigator: true,
-    showDragHandle: true,
-    backgroundColor: AppColors.appBackgroundWarm,
-    builder: (context) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '家长确认',
-              style: TextStyle(
-                color: AppColors.ink,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              status.runtime.summary,
-              style: const TextStyle(
-                color: AppColors.muted,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                height: 1.55,
-              ),
-            ),
-            const SizedBox(height: 16),
-            MiraListRow(
-              icon: Icons.check_circle_outline,
-              title: '确认当前状态',
-              subtitle: '写入今日看护记录',
-              tone: MiraListRowTone.green,
-              onTap: () {
-                Navigator.of(context).pop();
-                _showToast(context, '已确认当前观察');
-              },
-            ),
-            MiraListRow(
-              icon: Icons.report_outlined,
-              title: '标记观察不准确',
-              subtitle: '后续提醒会参考这次反馈',
-              tone: MiraListRowTone.amber,
-              onTap: () {
-                Navigator.of(context).pop();
-                _showToast(context, '已记录 AI 判断反馈');
-              },
-            ),
-          ],
-        ),
-      );
-    },
-  );
 }
 
 void _showToast(BuildContext context, String message) {

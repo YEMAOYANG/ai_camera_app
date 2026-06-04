@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 import unittest
 
 from app import create_app
+from integrations.camera_runtime.mock_adapter import MockCameraRuntimeAdapter
+from services.task_event_stream import task_runtime_messages_by_family
 from tests.support import fresh_test_config, request_debug_code
 
 
 class TasksPointsRewardsApiTest(unittest.TestCase):
     def setUp(self):
-        self.app = create_app(fresh_test_config())
+        self.app = create_app(fresh_test_config(CAMERA_RUNTIME_PROVIDER="mock"))
         self.client = self.app.test_client()
         self.access_token = self._login("13800002026")
         self.child_id = self._create_child("小宇")
@@ -217,6 +220,35 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("第 2 项", response.json["message"])
 
+    def test_task_runtime_result_builds_family_scoped_websocket_update(self):
+        messages = task_runtime_messages_by_family(
+            {
+                "checkedAt": 1780000000000,
+                "changedTasks": [
+                    {
+                        "taskId": "task_1",
+                        "familyId": "family_1",
+                        "status": "in_progress",
+                    }
+                ],
+                "events": [
+                    {
+                        "id": "event_1",
+                        "familyId": "family_1",
+                        "taskId": "task_1",
+                        "eventType": "auto_started",
+                    }
+                ],
+            }
+        )
+
+        self.assertIn("family_1", messages)
+        message = messages["family_1"]
+        self.assertEqual(message["type"], "task.updated")
+        self.assertEqual(message["source"], "scheduler")
+        self.assertEqual(message["taskIds"], ["task_1"])
+        self.assertEqual(message["checkedAt"], 1780000000000)
+
         week = self.client.get(
             "/api/tasks",
             query_string={
@@ -343,6 +375,223 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_task_start_and_events_contract(self):
+        task = self._create_task(reward_points=5)
+
+        start = self.client.post(
+            f"/api/tasks/{task['id']}/start",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(start.status_code, 200)
+        self.assertEqual(start.json["task"]["status"], "in_progress")
+
+        events = self.client.get(
+            f"/api/tasks/{task['id']}/events",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200)
+        event_types = {event["eventType"] for event in events.json["events"]}
+        self.assertIn("task_created", event_types)
+        self.assertIn("manual_started", event_types)
+
+    def test_scheduler_tick_auto_starts_task_and_records_camera_events(self):
+        now = datetime.now().astimezone()
+        start_at = now - timedelta(minutes=1)
+        due_at = now + timedelta(minutes=2)
+        task = self._create_task_at(start_at=start_at, due_at=due_at, reward_points=6)
+
+        tick = self.client.post("/api/dev/tasks/scheduler/tick")
+        self.assertEqual(tick.status_code, 200)
+        self.assertEqual(tick.json["changedTasks"][0]["id"], task["id"])
+        self.assertEqual(tick.json["changedTasks"][0]["status"], "in_progress")
+        tick_event_types = {event["eventType"] for event in tick.json["events"]}
+        self.assertIn("auto_started", tick_event_types)
+        self.assertIn("monitor_started", tick_event_types)
+
+        detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
+        self.assertEqual(detail.status_code, 200)
+        self.assertEqual(detail.json["task"]["status"], "in_progress")
+
+        events = self.client.get(
+            f"/api/tasks/{task['id']}/events",
+            headers=self._auth_headers(),
+        )
+        event_types = {event["eventType"] for event in events.json["events"]}
+        self.assertIn("auto_started", event_types)
+        self.assertIn("monitor_started", event_types)
+
+    def test_scheduler_tick_records_offline_camera_without_blocking_task(self):
+        offline_app = create_app(fresh_test_config(CAMERA_RUNTIME_PROVIDER="disabled"))
+        offline_client = offline_app.test_client()
+        offline_token = self._login_with_client(offline_client, "13700002026")
+        offline_child = self._create_child_with_client(offline_client, offline_token, "小北")
+        now = datetime.now().astimezone()
+        response = offline_client.post(
+            "/api/tasks",
+            json={
+                "childId": offline_child,
+                "title": "整理书包",
+                "taskType": "schoolbag",
+                "startAt": (now - timedelta(minutes=1)).isoformat(),
+                "dueAt": (now + timedelta(minutes=2)).isoformat(),
+                "rewardPoints": 2,
+            },
+            headers={"Authorization": f"Bearer {offline_token}"},
+        )
+        self.assertEqual(response.status_code, 200)
+        task = response.json["task"]
+
+        tick = offline_client.post("/api/dev/tasks/scheduler/tick")
+        self.assertEqual(tick.status_code, 200)
+        self.assertEqual(tick.json["changedTasks"][0]["status"], "in_progress")
+        event_types = {event["eventType"] for event in tick.json["events"]}
+        self.assertIn("auto_started", event_types)
+        self.assertIn("monitor_failed", event_types)
+
+        events = offline_client.get(
+            f"/api/tasks/{task['id']}/events",
+            headers={"Authorization": f"Bearer {offline_token}"},
+        )
+        self.assertEqual(events.status_code, 200)
+        messages = [event["message"] for event in events.json["events"]]
+        self.assertIn("摄像头暂时离线，任务仍会记录", messages)
+
+    def test_scheduler_sends_reminder_once_before_start(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            start_at=now + timedelta(minutes=1),
+            due_at=now + timedelta(minutes=5),
+            reward_points=2,
+            reminder_minutes_before=2,
+        )
+
+        first = self.client.post("/api/dev/tasks/scheduler/tick")
+        second = self.client.post("/api/dev/tasks/scheduler/tick")
+
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 200)
+        self.assertIn("reminder_sent", {event["eventType"] for event in first.json["events"]})
+        self.assertNotIn("reminder_sent", {event["eventType"] for event in second.json["events"]})
+
+        detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
+        self.assertEqual(detail.json["task"]["status"], "reminder_sent")
+        self.assertEqual(detail.json["task"]["reminderStatus"], "sent")
+
+    def test_scheduler_marks_child_not_ready_as_delayed_and_nudges(self):
+        original = MockCameraRuntimeAdapter.task_observation
+        MockCameraRuntimeAdapter.task_observation = lambda self, task: {
+            "verdict": "not_started",
+            "reason": "child_not_present",
+            "confidence": 0.8,
+            "evidence": {"hasPerson": False},
+        }
+        try:
+            now = datetime.now().astimezone()
+            task = self._create_task_at(
+                start_at=now - timedelta(minutes=1),
+                due_at=now + timedelta(minutes=10),
+                reward_points=2,
+            )
+            tick = self.client.post("/api/dev/tasks/scheduler/tick")
+        finally:
+            MockCameraRuntimeAdapter.task_observation = original
+
+        self.assertEqual(tick.status_code, 200)
+        self.assertEqual(tick.json["changedTasks"][0]["status"], "delayed")
+        event_types = {event["eventType"] for event in tick.json["events"]}
+        self.assertIn("child_not_ready", event_types)
+        self.assertIn("delayed", event_types)
+        self.assertIn("delay_reminder_sent", event_types)
+
+        detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
+        self.assertEqual(detail.json["task"]["status"], "delayed")
+        self.assertEqual(detail.json["task"]["delayReminderCount"], 1)
+
+    def test_scheduler_starts_life_task_without_seat_observation(self):
+        original = MockCameraRuntimeAdapter.task_observation
+        MockCameraRuntimeAdapter.task_observation = lambda self, task: {
+            "verdict": "not_started",
+            "reason": "child_not_present",
+            "confidence": 0.8,
+            "evidence": {"hasPerson": False},
+        }
+        try:
+            now = datetime.now().astimezone()
+            task = self._create_task_at(
+                title="喝水",
+                task_type="life",
+                start_at=now - timedelta(minutes=1),
+                due_at=now + timedelta(minutes=5),
+                reward_points=1,
+                requires_parent_confirmation=False,
+            )
+            tick = self.client.post("/api/dev/tasks/scheduler/tick")
+        finally:
+            MockCameraRuntimeAdapter.task_observation = original
+
+        self.assertEqual(tick.status_code, 200)
+        self.assertEqual(tick.json["changedTasks"][0]["status"], "in_progress")
+        event_types = {event["eventType"] for event in tick.json["events"]}
+        self.assertIn("auto_started", event_types)
+        self.assertNotIn("child_not_ready", event_types)
+        self.assertNotIn("delayed", event_types)
+
+        detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
+        self.assertEqual(detail.json["task"]["status"], "in_progress")
+        self.assertEqual(detail.json["task"]["cameraObservationStatus"], "not_required")
+
+    def test_scheduler_marks_past_unstarted_task_missed(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            start_at=now - timedelta(days=1, hours=1),
+            due_at=now - timedelta(days=1, minutes=30),
+            reward_points=2,
+        )
+
+        tick = self.client.post("/api/dev/tasks/scheduler/tick")
+
+        self.assertEqual(tick.status_code, 200)
+        self.assertEqual(tick.json["changedTasks"][0]["status"], "missed")
+        event_types = {event["eventType"] for event in tick.json["events"]}
+        self.assertIn("missed", event_types)
+
+        detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
+        self.assertEqual(detail.json["task"]["status"], "missed")
+        self.assertIsNotNone(detail.json["task"]["missedAt"])
+
+    def test_scheduler_finishes_unconfirmed_task_and_grants_points_once(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            start_at=now - timedelta(minutes=10),
+            due_at=now - timedelta(minutes=1),
+            reward_points=7,
+            requires_parent_confirmation=False,
+        )
+        start = self.client.post(f"/api/tasks/{task['id']}/start", headers=self._auth_headers())
+        self.assertEqual(start.status_code, 200)
+
+        first = self.client.post("/api/dev/tasks/scheduler/tick")
+        second = self.client.post("/api/dev/tasks/scheduler/tick")
+
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 200)
+        detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
+        self.assertEqual(detail.json["task"]["status"], "completed")
+        self.assertIsNotNone(detail.json["task"]["pointsGrantedAt"])
+
+        ledger = self.client.get(
+            "/api/points/ledger",
+            query_string={"childId": self.child_id},
+            headers=self._auth_headers(),
+        )
+        task_entries = [
+            entry
+            for entry in ledger.json["ledger"]
+            if entry["sourceId"] == task["id"] and entry["type"] == "task_completed"
+        ]
+        self.assertEqual(len(task_entries), 1)
+        self.assertEqual(task_entries[0]["delta"], 7)
+
     def _create_task(self, *, reward_points: int) -> dict:
         response = self.client.post(
             "/api/tasks",
@@ -359,17 +608,55 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         return response.json["task"]
 
+    def _create_task_at(
+        self,
+        *,
+        start_at: datetime,
+        due_at: datetime,
+        reward_points: int,
+        title: str = "阅读任务",
+        task_type: str = "reading_interest",
+        reminder_minutes_before: int | None = None,
+        requires_parent_confirmation: bool = True,
+    ) -> dict:
+        response = self.client.post(
+            "/api/tasks",
+            json={
+                "childId": self.child_id,
+                "title": title,
+                "taskType": task_type,
+                "startAt": start_at.isoformat(),
+                "dueAt": due_at.isoformat(),
+                "rewardPoints": reward_points,
+                "requiresParentConfirmation": requires_parent_confirmation,
+                **(
+                    {"reminderMinutesBefore": reminder_minutes_before}
+                    if reminder_minutes_before is not None
+                    else {}
+                ),
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200)
+        return response.json["task"]
+
     def _login(self, phone: str) -> str:
-        code = request_debug_code(self.client, phone)
-        login = self.client.post("/api/auth/sms/login", json={"phone": phone, "code": code})
+        return self._login_with_client(self.client, phone)
+
+    def _login_with_client(self, client, phone: str) -> str:
+        code = request_debug_code(client, phone)
+        login = client.post("/api/auth/sms/login", json={"phone": phone, "code": code})
         self.assertEqual(login.status_code, 200)
         return login.json["tokens"]["accessToken"]
 
     def _create_child(self, name: str) -> str:
-        response = self.client.post(
+        return self._create_child_with_client(self.client, self.access_token, name)
+
+    def _create_child_with_client(self, client, access_token: str, name: str) -> str:
+        response = client.post(
             "/api/setup/child",
             json={"name": name, "nickname": name, "ageStage": "primary"},
-            headers=self._auth_headers(),
+            headers={"Authorization": f"Bearer {access_token}"},
         )
         self.assertEqual(response.status_code, 200)
         return response.json["child"]["id"]

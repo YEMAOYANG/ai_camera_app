@@ -32,7 +32,12 @@ class HomeScreen extends ConsumerWidget {
     final points = ref.watch(pointsSummaryProvider);
     final deviceOverview = ref.watch(primaryDeviceOverviewProvider);
     final cameraHealth = ref.watch(cameraHealthProvider);
-    final deviceStatus = _deviceStatusLabel(snapshot, deviceOverview);
+    final cameraStatus = ref.watch(cameraStatusProvider);
+    final deviceStatus = _deviceStatusLabel(
+      snapshot,
+      deviceOverview,
+      cameraStatus,
+    );
 
     return MiraScreen(
       title: 'Mira Guardian',
@@ -48,6 +53,7 @@ class HomeScreen extends ConsumerWidget {
           snapshot: snapshot,
           deviceOverview: deviceOverview,
           cameraHealth: cameraHealth,
+          cameraStatus: cameraStatus,
         ),
         const SizedBox(height: 14),
         _PendingQueue(tasks: todayTasks, redemptions: redemptions),
@@ -62,6 +68,7 @@ class HomeScreen extends ConsumerWidget {
           snapshot: snapshot,
           deviceOverview: deviceOverview,
           cameraHealth: cameraHealth,
+          cameraStatus: cameraStatus,
         ),
       ],
     );
@@ -70,7 +77,15 @@ class HomeScreen extends ConsumerWidget {
   String _deviceStatusLabel(
     GuardianMvpSnapshot snapshot,
     AsyncValue<DeviceOverview?> overview,
+    AsyncValue<CameraStatus> cameraStatus,
   ) {
+    final camera = cameraStatus.asData?.value;
+    if (camera?.currentTask != null) {
+      return '${snapshot.device.name} · ${camera!.currentTask!.title}进行中';
+    }
+    if (camera != null) {
+      return '${snapshot.device.name} · ${camera.isOnline ? '在线看护中' : '设备离线'}';
+    }
     final device = overview.asData?.value;
     if (device != null) {
       final careState = device.isOnline ? '在线看护中' : '设备离线';
@@ -162,18 +177,23 @@ class _CurrentStatePanel extends StatelessWidget {
     required this.snapshot,
     required this.deviceOverview,
     required this.cameraHealth,
+    required this.cameraStatus,
   });
 
   final GuardianMvpSnapshot snapshot;
   final AsyncValue<DeviceOverview?> deviceOverview;
   final AsyncValue<CameraHealth> cameraHealth;
+  final AsyncValue<CameraStatus> cameraStatus;
 
   @override
   Widget build(BuildContext context) {
     final overview = deviceOverview.asData?.value;
     final health = cameraHealth.asData?.value;
-    final deviceOnline = overview?.isOnline ?? snapshot.device.online;
-    final cameraOnline = health?.reachable ?? snapshot.device.cameraEnabled;
+    final camera = cameraStatus.asData?.value;
+    final deviceOnline =
+        overview?.isOnline ?? camera?.isOnline ?? snapshot.device.online;
+    final cameraOnline =
+        camera?.isOnline ?? health?.reachable ?? snapshot.device.cameraEnabled;
 
     return MiraSurface(
       color: AppColors.ink,
@@ -231,7 +251,7 @@ class _CurrentStatePanel extends StatelessWidget {
               const SizedBox(width: 8),
               _StateMetric(
                 label: '下一步',
-                value: '12m',
+                value: camera?.currentTask == null ? '待安排' : '进行中',
                 color: const Color(0xFF93C5FD),
               ),
               const SizedBox(width: 8),
@@ -628,26 +648,34 @@ class _DeviceSummaryPanel extends StatelessWidget {
     required this.snapshot,
     required this.deviceOverview,
     required this.cameraHealth,
+    required this.cameraStatus,
   });
 
   final GuardianMvpSnapshot snapshot;
   final AsyncValue<DeviceOverview?> deviceOverview;
   final AsyncValue<CameraHealth> cameraHealth;
+  final AsyncValue<CameraStatus> cameraStatus;
 
   @override
   Widget build(BuildContext context) {
     final overview = deviceOverview.asData?.value;
     final health = cameraHealth.asData?.value;
+    final camera = cameraStatus.asData?.value;
     final title = overview?.device.displayName ?? snapshot.device.name;
     final subtitle =
         overview?.subtitle ??
-        '${snapshot.device.room} · ${snapshot.device.networkLabel}';
+        (camera?.summary ??
+            '${snapshot.device.room} · ${snapshot.device.networkLabel}');
     final statusLabel =
-        overview?.connectionLabel ?? snapshot.device.connectionLabel;
+        overview?.connectionLabel ??
+        camera?.label ??
+        snapshot.device.connectionLabel;
     final statusTone =
         overview?.tone ??
+        camera?.tone ??
         (snapshot.device.online ? StatusTone.success : StatusTone.danger);
-    final rowTone = (overview?.isOnline ?? snapshot.device.online)
+    final rowTone =
+        (overview?.isOnline ?? camera?.isOnline ?? snapshot.device.online)
         ? MiraListRowTone.green
         : MiraListRowTone.red;
 
@@ -671,8 +699,8 @@ class _DeviceSummaryPanel extends StatelessWidget {
           ),
           if (health != null && !health.reachable) ...[
             const SizedBox(height: 8),
-            const Text(
-              '摄像头暂时不在线，首页已切换为降级状态。',
+            Text(
+              camera?.summary ?? '摄像头暂时不在线，首页已切换为降级状态。',
               style: TextStyle(
                 color: AppColors.muted,
                 fontFamily: AppTypography.systemFont,
