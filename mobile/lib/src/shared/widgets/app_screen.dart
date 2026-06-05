@@ -18,7 +18,12 @@ class AppScreen extends StatelessWidget {
     this.showHeader = true,
     this.reserveBottomNavigation = true,
     this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
-    this.padding = const EdgeInsets.fromLTRB(20, 10, 20, 28),
+    this.padding = const EdgeInsets.fromLTRB(
+      AppSpacing.pageHorizontal,
+      10,
+      AppSpacing.pageHorizontal,
+      AppSpacing.pageBottom,
+    ),
     super.key,
   });
 
@@ -198,7 +203,12 @@ class _AppPinnedHeader extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20, safeTop, 20, 0),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.pageHorizontal,
+                safeTop,
+                AppSpacing.pageHorizontal,
+                0,
+              ),
               child: SizedBox(
                 height: headerHeight,
                 child: Row(

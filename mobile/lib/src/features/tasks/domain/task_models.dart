@@ -532,6 +532,16 @@ class GuardianTaskEvent {
       'reminder_due' => '准备提醒',
       'reminder_sent' => '已提醒孩子',
       'reminder_failed' => '提醒未送达',
+      'start_reminder_sent' || 'manual_start_reminder_sent' => '已提醒开始',
+      'start_reminder_failed' || 'manual_start_reminder_failed' => '开始提醒未送达',
+      'manual_prepare_reminder_sent' => '已提醒准备',
+      'manual_prepare_reminder_failed' => '准备提醒未送达',
+      'manual_reminder_sent' => '已提醒孩子',
+      'manual_reminder_failed' => '提醒未送达',
+      'wrap_up_reminder_sent' => '已提醒收尾',
+      'wrap_up_reminder_failed' => '收尾提醒未送达',
+      'finish_reminder_sent' || 'manual_finish_reminder_sent' => '已提醒结束',
+      'finish_reminder_failed' || 'manual_finish_reminder_failed' => '结束提醒未送达',
       'auto_started' => '任务自动开始',
       'observation_unavailable' => '观察暂不可用',
       'child_not_ready' => '还没开始',
@@ -563,6 +573,13 @@ class GuardianTaskEvent {
   StatusTone get tone {
     return switch (eventType) {
       'reminder_failed' ||
+      'start_reminder_failed' ||
+      'manual_start_reminder_failed' ||
+      'manual_prepare_reminder_failed' ||
+      'manual_reminder_failed' ||
+      'wrap_up_reminder_failed' ||
+      'finish_reminder_failed' ||
+      'manual_finish_reminder_failed' ||
       'delay_reminder_failed' ||
       'monitor_failed' ||
       'child_not_ready' ||
@@ -575,6 +592,13 @@ class GuardianTaskEvent {
       'points_awarded' ||
       'completed' ||
       'auto_started' ||
+      'start_reminder_sent' ||
+      'manual_start_reminder_sent' ||
+      'manual_prepare_reminder_sent' ||
+      'manual_reminder_sent' ||
+      'wrap_up_reminder_sent' ||
+      'finish_reminder_sent' ||
+      'manual_finish_reminder_sent' ||
       'camera_monitor_started' ||
       'monitor_started' => StatusTone.success,
       _ => StatusTone.neutral,

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/home/domain/guardian_snapshot.dart';
 
 enum StatusTone { neutral, success, warning, danger }
+
+enum AttentionLevel { normal, watch, urgent }
 
 class StatusChip extends StatelessWidget {
   const StatusChip({

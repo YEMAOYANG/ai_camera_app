@@ -119,12 +119,14 @@ class AppSecondaryButton extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.trailing,
+    this.height = AppControls.compactButtonHeight,
     super.key,
   });
 
   final String label;
   final VoidCallback? onTap;
   final Widget? trailing;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +157,7 @@ class AppSecondaryButton extends StatelessWidget {
             ],
           ),
           child: SizedBox(
-            height: AppControls.compactButtonHeight,
+            height: height,
             width: double.infinity,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

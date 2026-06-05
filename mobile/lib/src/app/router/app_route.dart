@@ -23,6 +23,7 @@ const profileDeviceHubPath = '/profile/device-care';
 const profileTaskRewardHubPath = '/profile/task-rewards';
 const profileRulesHubPath = '/profile/rules-reminders';
 const profilePrivacyHubPath = '/profile/privacy-authorization';
+const profileAccountSettingsPath = '/profile/account-settings';
 const profileAccountPath = '/profile/account';
 const profileSecurityPath = '/profile/security';
 const profileFamilyMembersPath = '/profile/family-members';

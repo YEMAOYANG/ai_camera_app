@@ -3,15 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/app/router/startup_gate.dart';
 import 'package:guardian_parent_app/src/app/shell/app_shell.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
 import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
-import 'package:guardian_parent_app/src/core/storage/setup_store.dart';
 import 'package:guardian_parent_app/src/features/alerts/presentation/alerts_screen.dart';
 import 'package:guardian_parent_app/src/features/auth/presentation/login_screen.dart';
 import 'package:guardian_parent_app/src/features/home/presentation/home_screen.dart';
-import 'package:guardian_parent_app/src/features/legal/presentation/privacy_policy_screen.dart';
-import 'package:guardian_parent_app/src/features/legal/presentation/user_agreement_screen.dart';
 import 'package:guardian_parent_app/src/features/live_care/presentation/live_monitor_screen.dart';
 import 'package:guardian_parent_app/src/features/live_care/presentation/live_care_screen.dart';
 import 'package:guardian_parent_app/src/features/points/presentation/points_screen.dart';
@@ -27,13 +23,9 @@ import 'package:guardian_parent_app/src/features/welcome/presentation/welcome_sc
 final appRouterProvider = Provider<GoRouter>((ref) {
   final onboardingStore = ref.watch(onboardingStoreProvider);
   final sessionStore = ref.watch(authSessionStoreProvider);
-  final setupStore = ref.watch(setupStoreProvider);
-  final environment = ref.watch(appEnvironmentProvider);
   final initialLocation = _initialLocation(
     onboardingStore: onboardingStore,
     sessionStore: sessionStore,
-    setupStore: setupStore,
-    environment: environment,
   );
 
   return GoRouter(
@@ -65,12 +57,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: userAgreementPath,
         name: 'legalUserAgreement',
-        builder: (_, _) => const UserAgreementScreen(),
+        builder: (_, _) => const LegalRemoteDocumentPage(
+          documentKey: 'user-agreement',
+        ),
       ),
       GoRoute(
         path: privacyPolicyPath,
         name: 'legalPrivacyPolicy',
-        builder: (_, _) => const PrivacyPolicyScreen(),
+        builder: (_, _) => const LegalRemoteDocumentPage(
+          documentKey: 'privacy-policy',
+        ),
       ),
       GoRoute(
         path: profileChildPrivacyPath,
@@ -188,6 +184,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: profilePrivacyHubPath,
         name: 'profilePrivacyHub',
         builder: (_, _) => const PrivacyAuthorizationHubPage(),
+      ),
+      GoRoute(
+        path: profileAccountSettingsPath,
+        name: 'profileAccountSettings',
+        builder: (_, _) => const AccountSettingsHubPage(),
       ),
       GoRoute(
         path: profileAccountPath,
@@ -327,14 +328,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 String _initialLocation({
   required OnboardingStore onboardingStore,
   required AuthSessionStore sessionStore,
-  required SetupStore setupStore,
-  required AppEnvironment environment,
 }) {
   if (!onboardingStore.hasSeenOnboarding) return welcomePath;
   if (!sessionStore.hasUsableSession) return loginPath;
-  if (environment.useMockData && setupStore.hasCompletedInitialSetup) {
-    return AppRoute.home.path;
-  }
   return '/';
 }
 

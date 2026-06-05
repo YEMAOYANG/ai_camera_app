@@ -12,7 +12,6 @@ final dioProvider = Provider<Dio>((ref) {
   final dio = _buildDio(environment);
   dio.interceptors.add(
     AuthTokenInterceptor(
-      environment: environment,
       sessionStore: ref.watch(authSessionStoreProvider),
       refreshDio: ref.watch(rawDioProvider),
       dio: dio,
@@ -64,16 +63,13 @@ class ApiClient {
 
 class AuthTokenInterceptor extends Interceptor {
   AuthTokenInterceptor({
-    required AppEnvironment environment,
     required AuthSessionStore sessionStore,
     required Dio refreshDio,
     required Dio dio,
-  }) : _environment = environment,
-       _sessionStore = sessionStore,
+  }) : _sessionStore = sessionStore,
        _refreshDio = refreshDio,
        _dio = dio;
 
-  final AppEnvironment _environment;
   final AuthSessionStore _sessionStore;
   final Dio _refreshDio;
   final Dio _dio;
@@ -156,18 +152,6 @@ class AuthTokenInterceptor extends Interceptor {
     if (session == null || !session.canRefresh) {
       await _sessionStore.clear();
       return null;
-    }
-
-    if (_environment.useMockData) {
-      final now = DateTime.now();
-      final refreshed = session.copyWith(
-        accessToken: 'mock_access_${now.millisecondsSinceEpoch}',
-        refreshToken: 'mock_refresh_${now.millisecondsSinceEpoch}',
-        accessTokenExpiresAt: now.add(const Duration(minutes: 15)),
-        refreshTokenExpiresAt: now.add(const Duration(days: 30)),
-      );
-      await _sessionStore.save(refreshed);
-      return refreshed;
     }
 
     try {

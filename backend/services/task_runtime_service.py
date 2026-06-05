@@ -13,9 +13,11 @@ from models.tasks import (
     TASK_IN_PROGRESS,
 )
 from repositories.point_repository import PointRepository
+from repositories.profile_repository import ProfileRepository
 from repositories.task_repository import TaskRepository
 from schemas.tasks import task_event_payload, task_payload
 from services.camera_command_service import CameraCommandService
+from services.task_reminder_policy import build_task_reminder
 
 
 TASK_TYPES_REQUIRING_START_OBSERVATION = {
@@ -39,6 +41,7 @@ class TaskRuntimeService:
         database = Database(database_url)
         self.repository = TaskRepository(database)
         self.point_repository = PointRepository(database)
+        self.profile_repository = ProfileRepository(database)
         self.camera_command_service = camera_command_service
         self.reminder_lead_seconds = max(0, int(reminder_lead_seconds))
         self.delay_reminder_interval_seconds = max(30, int(delay_reminder_interval_seconds))
@@ -112,7 +115,8 @@ class TaskRuntimeService:
             payload={},
             now=current_ms,
         )
-        text = self._reminder_text(task)
+        reminder = self._task_reminder(conn, task, phase="prepare")
+        text = reminder["text"]
         command = None
         sent = False
         if self.speaker_enabled:
@@ -136,7 +140,7 @@ class TaskRuntimeService:
             task_id=task["id"],
             event_type="reminder_sent" if sent else "reminder_failed",
             message="已提醒孩子准备开始" if sent else "摄像头暂时离线，提醒没有播出",
-            payload={"command": command, "text": text},
+            payload={"command": command, **reminder},
             now=current_ms,
         )
         return updated, event
@@ -172,6 +176,18 @@ class TaskRuntimeService:
                 now=current_ms,
             )
         ]
+        start_event = self._send_phase_reminder(
+            conn,
+            updated,
+            phase="start",
+            now_ms_value=current_ms,
+            success_event_type="start_reminder_sent",
+            failed_event_type="start_reminder_failed",
+            success_message="已提醒孩子开始",
+            failed_message="摄像头暂时离线，开始提醒没有播出",
+        )
+        if start_event:
+            events.append(start_event)
         if verdict in {"insufficient", "unavailable"}:
             events.append(
                 self.repository.add_event(
@@ -207,6 +223,18 @@ class TaskRuntimeService:
                 now=current_ms,
             )
         ]
+        start_event = self._send_phase_reminder(
+            conn,
+            updated,
+            phase="start",
+            now_ms_value=current_ms,
+            success_event_type="start_reminder_sent",
+            failed_event_type="start_reminder_failed",
+            success_message="已提醒孩子开始",
+            failed_message="摄像头暂时离线，开始提醒没有播出",
+        )
+        if start_event:
+            events.append(start_event)
         events.extend(self._start_monitor(conn, task, now_ms_value=current_ms))
         return updated, events
 
@@ -267,7 +295,20 @@ class TaskRuntimeService:
                 payload={"observation": observation, "from": "delayed"},
                 now=current_ms,
             )
-            return updated, [event]
+            events = [event]
+            start_event = self._send_phase_reminder(
+                conn,
+                updated,
+                phase="start",
+                now_ms_value=current_ms,
+                success_event_type="start_reminder_sent",
+                failed_event_type="start_reminder_failed",
+                success_message="已提醒孩子开始",
+                failed_message="摄像头暂时离线，开始提醒没有播出",
+            )
+            if start_event:
+                events.append(start_event)
+            return updated, events
 
         next_reminder_at = int(task.get("next_reminder_at") or 0)
         delay_count = int(task.get("delay_reminder_count") or 0)
@@ -281,7 +322,14 @@ class TaskRuntimeService:
             return None
         current_ms = self._now_ms(now)
         next_reminder = self._plus_seconds_ms(now, self.delay_reminder_interval_seconds)
-        text = self._delay_text(task, int(task.get("delay_reminder_count") or 0) + 1)
+        reminder_count = int(task.get("delay_reminder_count") or 0) + 1
+        reminder = self._task_reminder(
+            conn,
+            task,
+            phase="delay",
+            count=reminder_count,
+        )
+        text = reminder["text"]
         command = None
         sent = False
         if self.speaker_enabled:
@@ -306,7 +354,7 @@ class TaskRuntimeService:
             task_id=task["id"],
             event_type="delay_reminder_sent" if sent else "delay_reminder_failed",
             message="已温和提醒孩子开始" if sent else "摄像头暂时离线，跟进提醒没有播出",
-            payload={"command": command, "text": text, "nextReminderAt": next_reminder},
+            payload={"command": command, **reminder, "nextReminderAt": next_reminder},
             now=current_ms,
         )
 
@@ -338,6 +386,18 @@ class TaskRuntimeService:
                 now=current_ms,
             )
         ]
+        finish_event = self._send_phase_reminder(
+            conn,
+            updated,
+            phase="finish",
+            now_ms_value=current_ms,
+            success_event_type="finish_reminder_sent",
+            failed_event_type="finish_reminder_failed",
+            success_message="已提醒孩子结束",
+            failed_message="摄像头暂时离线，结束提醒没有播出",
+        )
+        if finish_event:
+            events.append(finish_event)
         if updated["status"] == "awaiting_parent_confirmation":
             events.append(
                 self.repository.add_event(
@@ -429,6 +489,49 @@ class TaskRuntimeService:
             )
         ]
 
+    def _send_phase_reminder(
+        self,
+        conn,
+        task,
+        *,
+        phase: str,
+        now_ms_value: int,
+        success_event_type: str,
+        failed_event_type: str,
+        success_message: str,
+        failed_message: str,
+    ):
+        if task is None:
+            return None
+        reminder = self._task_reminder(conn, task, phase=phase)
+        command = None
+        sent = False
+        if self.speaker_enabled:
+            command = self.camera_command_service.internal_speak(
+                family_id=task["family_id"],
+                task_id=task["id"],
+                device_id=task.get("device_id"),
+                text=reminder["text"],
+            )
+            sent = command.get("status") != "failed"
+        return self.repository.add_event(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            event_type=success_event_type if sent else failed_event_type,
+            message=success_message if sent else failed_message,
+            payload={"command": command, **reminder},
+            now=now_ms_value,
+        )
+
+    def _task_reminder(self, conn, task, *, phase: str, count: int = 0) -> dict:
+        child = self.profile_repository.get_child(
+            conn,
+            family_id=task["family_id"],
+            child_id=task["child_id"],
+        )
+        return build_task_reminder(task, phase=phase, child=child, count=count)
+
     def _grant_points_if_needed(self, conn, task, now: int) -> dict | None:
         if task["points_granted_at"] or int(task["reward_points"] or 0) <= 0:
             return None
@@ -507,12 +610,3 @@ class TaskRuntimeService:
 
     def _plus_seconds_ms(self, now: datetime, seconds: int) -> int:
         return self._now_ms(now + timedelta(seconds=seconds))
-
-    def _reminder_text(self, task) -> str:
-        return f"{task['title']}快到时间了，我们准备开始吧。"
-
-    def _delay_text(self, task, count: int) -> str:
-        title = task["title"]
-        if count <= 1:
-            return "现在到学习时间啦，先坐好，我们从第一题开始。"
-        return f"还没开始也没关系，先把{title}需要的东西准备好。"

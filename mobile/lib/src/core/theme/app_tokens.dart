@@ -7,6 +7,10 @@ class AppColors {
   static const brandSoft = Color(0xFF7FA6FF);
   static const brandDeep = Color(0xFF2459D6);
   static const brandWash = Color(0xFFEAF1FF);
+  static const brandSage = Color(0xFF4F8F7A);
+  static const brandSageWash = Color(0xFFE9F4EF);
+  static const brandWarm = Color(0xFFE0A24B);
+  static const brandWarmWash = Color(0xFFFFF1DE);
   static const primary = primaryButtonStart;
   static const primaryPressed = primaryButtonEnd;
   static const primarySoft = Color(0xFFEFF3F8);
@@ -23,6 +27,8 @@ class AppColors {
   static const surface = Color(0xF2FFFFFF);
   static const surfaceSoft = Color(0xCCFFFFFF);
   static const surfaceElevated = Color(0xFFFFFFFF);
+  static const surfaceStrong = Color(0xFFEFF4F8);
+  static const surfaceTinted = Color(0xFFF3F7F8);
   static const border = Color(0xFFE2E8F0);
   static const borderSoft = Color(0xFFEAF0F6);
   static const borderSubtle = borderSoft;
@@ -61,8 +67,32 @@ class AppRadii {
   static const input = 15.0;
   static const control = 14.0;
   static const card = 8.0;
+  static const cardMedium = 16.0;
+  static const cardLarge = 22.0;
+  static const hero = 28.0;
   static const welcomeArt = 26.0;
   static const full = 999.0;
+}
+
+class AppSpacing {
+  const AppSpacing._();
+
+  static const pageHorizontalCompact = 14.0;
+  static const pageHorizontal = 16.0;
+  static const pageHorizontalExpanded = 18.0;
+  static const pageSectionGap = 12.0;
+  static const pageHeroPadding = 16.0;
+  static const pageBottom = 28.0;
+}
+
+class AppHomeHero {
+  const AppHomeHero._();
+
+  static const minHeight = 318.0;
+  static const maxHeight = 390.0;
+  static const panelOverlap = 52.0;
+  static const panelRadius = 34.0;
+  static const contentTopPadding = 18.0;
 }
 
 class AppMotion {

@@ -1,13 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/core/storage/setup_store.dart';
 
 final setupRepositoryProvider = Provider<SetupRepository>((ref) {
   return SetupRepository(
-    environment: ref.watch(appEnvironmentProvider),
     apiClient: ref.watch(apiClientProvider),
     setupStore: ref.watch(setupStoreProvider),
   );
@@ -66,38 +64,19 @@ class SetupStatus {
       nextStep: _asString(setup['nextStep'], fallback: 'parentIdentity'),
     );
   }
-
-  static SetupStatus mock({required bool completed}) {
-    return SetupStatus(
-      completed: completed,
-      parentIdentity: completed ? 'done' : 'pending',
-      deviceBinding: completed ? 'done' : 'pending',
-      wifi: completed ? 'done' : 'pending',
-      childProfile: completed ? 'done' : 'pending',
-      contacts: completed ? 'done' : 'pending',
-      nextStep: completed ? 'home' : 'parentIdentity',
-    );
-  }
 }
 
 class SetupRepository {
   const SetupRepository({
-    required AppEnvironment environment,
     required ApiClient apiClient,
     required SetupStore setupStore,
-  }) : _environment = environment,
-       _apiClient = apiClient,
+  }) : _apiClient = apiClient,
        _setupStore = setupStore;
 
-  final AppEnvironment _environment;
   final ApiClient _apiClient;
   final SetupStore _setupStore;
 
   Future<SetupStatus> status() async {
-    if (_environment.useMockData) {
-      return SetupStatus.mock(completed: _setupStore.hasCompletedInitialSetup);
-    }
-
     try {
       final response = await _apiClient.get('/setup/status');
       final status = SetupStatus.fromResponse(response.data);
@@ -123,13 +102,10 @@ class SetupRepository {
     required String location,
     String? bindingCode,
   }) {
-    final effectiveBindingCode =
-        bindingCode ??
-        (_environment.useMockData ? 'TEST-DEVICE-DISCOVERY' : null);
     return _postStep('/setup/device', {
       'deviceName': deviceName,
       'location': location,
-      'bindingCode': effectiveBindingCode,
+      'bindingCode': bindingCode,
     });
   }
 
@@ -176,12 +152,6 @@ class SetupRepository {
   }
 
   Future<SetupStatus> complete() async {
-    if (_environment.useMockData) {
-      await Future<void>.delayed(const Duration(milliseconds: 160));
-      await _setupStore.markCompleted();
-      return SetupStatus.mock(completed: true);
-    }
-
     final status = await _postStep('/setup/complete', const {});
     if (status.completed) {
       await _setupStore.markCompleted();
@@ -190,10 +160,6 @@ class SetupRepository {
   }
 
   Future<SetupStatus> _postStep(String path, Map<String, Object?> body) async {
-    if (_environment.useMockData) {
-      return SetupStatus.mock(completed: _setupStore.hasCompletedInitialSetup);
-    }
-
     try {
       final response = await _apiClient.post(path, data: body);
       final status = SetupStatus.fromResponse(response.data);

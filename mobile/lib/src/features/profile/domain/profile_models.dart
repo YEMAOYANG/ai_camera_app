@@ -6,6 +6,7 @@ class ProfileSummary {
     required this.displayName,
     required this.phone,
     required this.roleLabel,
+    required this.avatarPersona,
     required this.memberCount,
     required this.deviceCount,
     required this.pendingItemCount,
@@ -18,6 +19,7 @@ class ProfileSummary {
   final String displayName;
   final String phone;
   final String roleLabel;
+  final String avatarPersona;
   final int memberCount;
   final int deviceCount;
   final int pendingItemCount;
@@ -31,6 +33,7 @@ class ProfileSummary {
       displayName: _asString(json['displayName'], fallback: '家长'),
       phone: _asString(json['phone']),
       roleLabel: _asString(json['roleLabel'], fallback: '管理员'),
+      avatarPersona: _asString(json['avatarPersona']),
       memberCount: _asInt(json['memberCount']),
       deviceCount: _asInt(json['deviceCount']),
       pendingItemCount: _asInt(json['pendingItemCount']),
@@ -227,6 +230,9 @@ class AccountProfile {
     required this.familyName,
     required this.relationship,
     required this.role,
+    required this.avatarPersona,
+    required this.gender,
+    required this.ageGroup,
   });
 
   final String userId;
@@ -235,6 +241,9 @@ class AccountProfile {
   final String familyName;
   final String relationship;
   final String role;
+  final String avatarPersona;
+  final String gender;
+  final String ageGroup;
 
   static AccountProfile fromJson(Map<String, dynamic> json) {
     return AccountProfile(
@@ -244,6 +253,9 @@ class AccountProfile {
       familyName: _asString(json['familyName'], fallback: '我的家庭空间'),
       relationship: _asString(json['relationship']),
       role: _asString(json['role'], fallback: 'admin'),
+      avatarPersona: _asString(json['avatarPersona']),
+      gender: _asString(json['gender']),
+      ageGroup: _asString(json['ageGroup']),
     );
   }
 }

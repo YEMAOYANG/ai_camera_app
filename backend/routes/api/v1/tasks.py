@@ -88,6 +88,20 @@ def start_task(task_id: str):
         return error_response(exc)
 
 
+@tasks_bp.post("/<task_id>/reminder")
+def send_task_reminder(task_id: str):
+    try:
+        return _task_response(
+            task_service().send_reminder(
+                bearer_token(request),
+                task_id,
+                json_body(request),
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @tasks_bp.post("/<task_id>/parent-confirm")
 def parent_confirm(task_id: str):
     try:

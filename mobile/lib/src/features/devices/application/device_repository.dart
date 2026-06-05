@@ -1,12 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
 
 final deviceRepositoryProvider = Provider<DeviceRepository>((ref) {
   return DeviceRepository(
-    environment: ref.watch(appEnvironmentProvider),
     apiClient: ref.watch(apiClientProvider),
   );
 });
@@ -28,17 +26,12 @@ final deviceOverviewProvider = FutureProvider.family<DeviceOverview, String>((
 
 class DeviceRepository {
   const DeviceRepository({
-    required AppEnvironment environment,
     required ApiClient apiClient,
-  }) : _environment = environment,
-       _apiClient = apiClient;
+  }) : _apiClient = apiClient;
 
-  final AppEnvironment _environment;
   final ApiClient _apiClient;
 
   Future<List<GuardianDevice>> devices() async {
-    if (_environment.useMockData) return _mockDevices;
-
     try {
       final response = await _apiClient.get('/devices');
       final raw = _asMap(response.data)['devices'];
@@ -61,11 +54,6 @@ class DeviceRepository {
     String deviceId, {
     GuardianDevice? fallback,
   }) async {
-    if (_environment.useMockData) {
-      final device = fallback ?? _mockDevices.first;
-      return DeviceOverview(device: device, status: _mockDeviceStatus);
-    }
-
     try {
       final response = await _apiClient.get('/devices/$deviceId/status');
       final map = _asMap(response.data);
@@ -86,20 +74,6 @@ class DeviceRepository {
     String? name,
     String? location,
   }) async {
-    if (_environment.useMockData) {
-      final current = _mockDevices.firstWhere((device) => device.id == deviceId);
-      return GuardianDevice(
-        id: current.id,
-        familyId: current.familyId,
-        bindingCode: current.bindingCode,
-        name: name ?? current.name,
-        location: location ?? current.location,
-        status: current.status,
-        createdAt: current.createdAt,
-        updatedAt: DateTime.now().millisecondsSinceEpoch,
-      );
-    }
-
     try {
       final response = await _apiClient.patch(
         '/devices/$deviceId',
@@ -112,9 +86,6 @@ class DeviceRepository {
   }
 
   Future<GuardianDevice> renameDevice(String deviceId, String name) async {
-    if (_environment.useMockData) {
-      return updateDevice(deviceId: deviceId, name: name);
-    }
     try {
       final response = await _apiClient.post(
         '/devices/$deviceId/rename',
@@ -127,20 +98,6 @@ class DeviceRepository {
   }
 
   Future<GuardianDevice> unbindDevice(String deviceId) async {
-    if (_environment.useMockData) {
-      final current = _mockDevices.firstWhere((device) => device.id == deviceId);
-      return GuardianDevice(
-        id: current.id,
-        familyId: current.familyId,
-        bindingCode: current.bindingCode,
-        name: current.name,
-        location: current.location,
-        status: 'unbound',
-        createdAt: current.createdAt,
-        updatedAt: DateTime.now().millisecondsSinceEpoch,
-        unboundAt: DateTime.now().millisecondsSinceEpoch,
-      );
-    }
     try {
       final response = await _apiClient.post('/devices/$deviceId/unbind');
       return GuardianDevice.fromJson(_asMap(_asMap(response.data)['device']));
@@ -164,36 +121,6 @@ class DeviceRepository {
     return const DeviceException('设备状态暂时不可用，请稍后重试。', code: 'network_error');
   }
 }
-
-final _mockDevices = [
-  GuardianDevice(
-    id: 'mock_device_living_room',
-    familyId: 'mock_family',
-    bindingCode: 'MIRA-MOCK-DISCOVERY',
-    name: '客厅设备',
-    location: '客厅书桌区',
-    status: 'bound',
-    createdAt: DateTime.now().millisecondsSinceEpoch,
-    updatedAt: DateTime.now().millisecondsSinceEpoch,
-  ),
-];
-
-const _mockDeviceStatus = GuardianDeviceStatus(
-  deviceId: 'mock_device_living_room',
-  connectionStatus: 'online',
-  privacyMode: false,
-  firmwareVersion: '0.1.0-dev',
-  networkType: 'wifi',
-  networkQuality: 'good',
-  snapshotSupported: true,
-  streamSupported: true,
-  twoWayAudioSupported: false,
-  monitorSupported: true,
-  otaSupported: false,
-  adapter: 'mock_hardware_device',
-  lastSeenAt: null,
-  message: '设备在线，状态已同步。',
-);
 
 Map<String, dynamic> _asMap(dynamic value) {
   if (value is Map<String, dynamic>) return value;

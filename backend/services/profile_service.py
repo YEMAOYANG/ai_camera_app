@@ -17,7 +17,6 @@ from schemas.profile import (
     family_invitation_payload,
     family_member_payload,
     feedback_payload,
-    legal_document_payload,
     setting_payload,
 )
 from services.auth_service import AuthService
@@ -26,6 +25,7 @@ from services.auth_service import AuthService
 MEMBER_ROLES = {"admin", "guardian", "caregiver", "viewer"}
 MEMBER_STATUSES = {"active", "invited", "disabled"}
 INVITATION_TTL_MS = 7 * 24 * 60 * 60 * 1000
+CONTENT_ROOT = Path(__file__).resolve().parents[1] / "content"
 
 SETTING_DEFAULTS = {
     "ai-care-rules": {
@@ -74,51 +74,6 @@ SETTING_DEFAULTS = {
         "notes": "",
     },
 }
-
-SUBSCRIPTION_PLANS = [
-    {
-        "id": "basic",
-        "title": "基础版",
-        "subtitle": "随设备提供基础看护能力，适合先完成家庭任务闭环。",
-        "price": "随设备提供",
-        "billing": "无需额外订阅",
-        "recommended": False,
-        "ctaLabel": "当前套餐",
-        "features": ["任务提醒", "实时看护", "本地日报", "隐私控制"],
-        "highlights": ["基础提醒", "实时查看", "本地日报", "隐私控制"],
-    },
-    {
-        "id": "member",
-        "title": "会员版",
-        "subtitle": "给需要长期报告和学习辅助额度的家庭。",
-        "price": "¥29",
-        "billing": "/月",
-        "recommended": True,
-        "ctaLabel": "开通会员版",
-        "features": ["云端长期报告", "高级趋势", "题目辅导颗粒度", "更多提醒基线"],
-        "highlights": ["长期报告", "趋势洞察", "提醒升级", "辅导额度"],
-    },
-    {
-        "id": "family_plus",
-        "title": "家庭高级版",
-        "subtitle": "适合多孩子、多设备和多人协作的家庭空间。",
-        "price": "¥59",
-        "billing": "/月起",
-        "recommended": False,
-        "ctaLabel": "查看家庭高级版",
-        "features": ["多孩子与多设备", "多联系人协作", "长期成长档案", "合作内容包"],
-        "highlights": ["多设备", "多人协作", "成长档案", "内容包"],
-    },
-]
-
-SUBSCRIPTION_ENTITLEMENTS = [
-    {"key": "task_reminders", "name": "任务提醒", "basic": True, "member": True, "family_plus": True},
-    {"key": "live_care", "name": "实时看护", "basic": True, "member": True, "family_plus": True},
-    {"key": "local_daily_report", "name": "本地日报", "basic": True, "member": True, "family_plus": True},
-    {"key": "long_term_reports", "name": "长期云端报告", "basic": False, "member": True, "family_plus": True},
-    {"key": "advanced_trends", "name": "高级趋势", "basic": False, "member": True, "family_plus": True},
-    {"key": "multi_device_family", "name": "多孩子与多设备", "basic": False, "member": False, "family_plus": True},
-]
 
 
 class ProfileService:
@@ -478,7 +433,7 @@ class ProfileService:
 
     def subscription_status(self, access_token: str) -> dict:
         self._auth_context(access_token)
-        current = self._current_subscription_payload()
+        current = self._current_subscription_payload(_subscription_entitlements())
         return {
             "ok": True,
             "subscription": current,
@@ -486,20 +441,20 @@ class ProfileService:
 
     def subscription_plans(self, access_token: str) -> dict:
         self._auth_context(access_token)
-        return {"ok": True, "plans": SUBSCRIPTION_PLANS}
+        return {"ok": True, "plans": _subscription_plans()}
 
     def subscription_current(self, access_token: str) -> dict:
         self._auth_context(access_token)
-        return {"ok": True, "subscription": self._current_subscription_payload()}
+        return {"ok": True, "subscription": self._current_subscription_payload(_subscription_entitlements())}
 
     def subscription_entitlements(self, access_token: str) -> dict:
         self._auth_context(access_token)
-        return {"ok": True, "entitlements": SUBSCRIPTION_ENTITLEMENTS}
+        return {"ok": True, "entitlements": _subscription_entitlements()}
 
     def subscription_checkout_session(self, access_token: str, data: dict) -> dict:
         self._auth_context(access_token)
         plan_id = self._optional_text(data, "planId")
-        plan = next((item for item in SUBSCRIPTION_PLANS if item["id"] == plan_id), None)
+        plan = next((item for item in _subscription_plans() if item["id"] == plan_id), None)
         if plan is None or plan["id"] == "basic":
             raise ApiError("invalid_subscription_plan", "套餐不可开通", 400)
         return {
@@ -520,12 +475,12 @@ class ProfileService:
         return {
             "ok": True,
             "restore": {
-                "status": "no_previous_purchase",
+                "status": "no_purchase_record",
                 "message": "暂未找到可恢复的订阅记录。",
             },
         }
 
-    def _current_subscription_payload(self) -> dict:
+    def _current_subscription_payload(self, entitlements: list[dict]) -> dict:
         return {
             "plan": "basic",
             "planId": "basic",
@@ -540,7 +495,7 @@ class ProfileService:
                     "name": item["name"],
                     "enabled": bool(item["basic"]),
                 }
-                for item in SUBSCRIPTION_ENTITLEMENTS
+                for item in entitlements
             ],
         }
 
@@ -573,7 +528,7 @@ class ProfileService:
                     "taskCompleted": completed,
                     "pendingItems": pending,
                     "pointsEarned": points,
-                    "suggestion": "可以根据今天的完成节奏微调明天的任务时间。",
+                    "suggestion": _daily_suggestion(total, completed, pending),
                 },
             }
 
@@ -603,7 +558,7 @@ class ProfileService:
                     "taskCompleted": completed,
                     "completionRate": round(completed / total, 2) if total else 0,
                     "pointsEarned": points,
-                    "summary": "本周记录会随着任务和家长确认逐步生成。",
+                    "summary": _weekly_summary(total, completed),
                 },
             }
 
@@ -612,7 +567,6 @@ class ProfileService:
         return {
             "ok": True,
             "moments": [],
-            "message": "成长时刻会在家长确认保存后显示。",
         }
 
     def legal_document(self, key: str) -> dict:
@@ -624,14 +578,7 @@ class ProfileService:
     def app_about(self) -> dict:
         return {
             "ok": True,
-            "about": {
-                "appName": "家庭看护",
-                "displayName": "家庭看护",
-                "version": "1.0.0",
-                "build": "2026.06",
-                "description": "面向家长的家庭 AI 看护与成长记录 App。",
-                "principles": ["儿童隐私优先", "关键决定由家长确认", "温和提醒，不过度打扰"],
-            },
+            "about": _app_about(),
         }
 
     def create_feedback(self, access_token: str, data: dict) -> dict:
@@ -766,89 +713,54 @@ def _daily_summary(total: int, completed: int, pending: int) -> str:
     return "今天的任务正在记录中。"
 
 
+def _daily_suggestion(total: int, completed: int, pending: int) -> str:
+    if total == 0:
+        return "可以先为今天添加一两件最重要的小任务。"
+    if pending:
+        return "先看一眼需要确认的记录，再决定是否写入成长记录。"
+    if completed == total:
+        return "今天节奏很稳定，晚些时候可以补充奖励或备注。"
+    return "等任务到点后，系统会继续记录完成情况。"
+
+
+def _weekly_summary(total: int, completed: int) -> str:
+    if total == 0:
+        return "本周还没有任务记录。"
+    if completed == total:
+        return "本周任务都已完成。"
+    return f"本周完成 {completed} / {total} 项任务。"
+
+
 def _legal_document(key: str) -> dict | None:
-    documents = {
-        "user-agreement": legal_document_payload(
-            key="user-agreement",
-            title="用户协议",
-            summary="本协议说明家庭看护空间的使用边界、账号规则、设备使用和家长确认责任。",
-            version="1.0",
-            effective_date="2026-06-04",
-            sections=[
-                {
-                    "title": "服务范围",
-                    "paragraphs": [
-                        "家庭看护 为家长提供孩子资料、设备绑定、任务看护、积分奖励、家庭协作和隐私管理能力。",
-                        "AI 观察仅作辅助参考，不能替代家长监护、医疗判断、安防服务或紧急救援。",
-                    ],
-                },
-                {
-                    "title": "账号与家庭空间",
-                    "paragraphs": [
-                        "手机号验证码通过后会创建或进入家庭看护空间。管理员应确保家庭成员和儿童资料均已获得必要授权。",
-                    ],
-                },
-                {
-                    "title": "家长确认责任",
-                    "paragraphs": [
-                        "任务完成、奖励发放、数据删除和成员权限等关键动作由家长确认，系统不会替家长作最终决定。",
-                    ],
-                },
-            ],
-        ),
-        "privacy-policy": legal_document_payload(
-            key="privacy-policy",
-            title="隐私政策",
-            summary="本政策说明我们如何处理家长账号、儿童资料、设备状态、任务记录和看护证据。",
-            version="1.0",
-            effective_date="2026-06-04",
-            sections=[
-                {
-                    "title": "数据类型",
-                    "paragraphs": [
-                        "我们会在必要范围内处理手机号、家庭成员、孩子资料、设备状态、任务记录、积分奖励和家长设置。",
-                    ],
-                },
-                {
-                    "title": "儿童数据",
-                    "paragraphs": [
-                        "儿童相关数据仅面向家长或合法照护者使用，不用于广告画像，不向家庭外成员公开展示。",
-                    ],
-                },
-                {
-                    "title": "权限与删除",
-                    "paragraphs": [
-                        "家长可以在隐私与权限页面管理摄像头采集、语音播报、儿童隐私授权和数据保留策略。",
-                    ],
-                },
-            ],
-        ),
-        "child-privacy-authorization": legal_document_payload(
-            key="child-privacy-authorization",
-            title="儿童隐私授权说明",
-            summary="请确认你具有为孩子配置家庭看护设备和管理相关数据的合法权限。",
-            version="1.0",
-            effective_date="2026-06-04",
-            sections=[
-                {
-                    "title": "授权前提",
-                    "paragraphs": [
-                        "设备采集、任务证据、语音提醒和看护摘要应由父母或合法监护人授权后使用。",
-                    ],
-                },
-                {
-                    "title": "最小必要",
-                    "paragraphs": [
-                        "我们优先保存任务和事件所需的最小记录，不把全天连续画面作为默认保存内容。",
-                    ],
-                },
-                {
-                    "title": "家长控制",
-                    "paragraphs": [
-                        "家长可随时关闭相关授权、导出或删除儿童数据。关闭授权后，部分看护能力可能不可用。",
-                    ],
-                },
-            ],
-        ),
-    }
+    documents = _content_json("legal_documents.json", {})
     return documents.get(key)
+
+
+def _subscription_plans() -> list[dict]:
+    return _content_json("subscription_plans.json", [])
+
+
+def _subscription_entitlements() -> list[dict]:
+    return _content_json("subscription_entitlements.json", [])
+
+
+def _app_about() -> dict:
+    return _content_json(
+        "app_about.json",
+        {
+            "appName": "",
+            "displayName": "",
+            "version": "",
+            "build": "",
+            "description": "",
+            "principles": [],
+        },
+    )
+
+
+def _content_json(filename: str, fallback):
+    path = CONTENT_ROOT / filename
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return fallback

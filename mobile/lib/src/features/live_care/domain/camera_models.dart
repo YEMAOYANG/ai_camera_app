@@ -43,13 +43,6 @@ class CameraHealth {
     );
   }
 
-  static const mock = CameraHealth(
-    ok: true,
-    reachable: true,
-    adapter: 'mock_camera_runtime',
-    serviceLabel: '摄像头运行服务',
-    message: '摄像头服务在线',
-  );
 }
 
 class CameraRuntime {
@@ -106,14 +99,6 @@ class CameraRuntime {
     );
   }
 
-  static const mock = CameraRuntime(
-    ok: true,
-    reachable: true,
-    adapter: 'mock_camera_runtime',
-    voiceState: 'idle',
-    voiceRunning: false,
-    message: '运行状态已同步',
-  );
 }
 
 class CameraSnapshotFrame {
@@ -223,16 +208,6 @@ class CameraStatus {
     );
   }
 
-  static const mock = CameraStatus(
-    connectionStatus: 'online',
-    streamAvailable: true,
-    snapshotAvailable: false,
-    speakerAvailable: true,
-    monitorAvailable: true,
-    lastSeenAt: null,
-    runtimeProvider: 'mock_camera_runtime',
-    message: '摄像头在线，最新状态已同步。',
-  );
 }
 
 class CameraMonitorStatus {
@@ -265,13 +240,6 @@ class CameraMonitorStatus {
     );
   }
 
-  static const mock = CameraMonitorStatus(
-    running: false,
-    status: 'idle',
-    message: '当前没有进行中的观察',
-    lastObservation: '',
-    lastReminder: '',
-  );
 }
 
 class LiveCareStatus {

@@ -6,7 +6,6 @@ class AppEnvironment {
   const AppEnvironment({
     required this.flavor,
     required this.apiBaseUrl,
-    required this.useMockData,
     this.taskWebSocketBaseUrl = '',
   });
 
@@ -15,7 +14,6 @@ class AppEnvironment {
       flavor: AppFlavor.development,
       apiBaseUrl: 'http://127.0.0.1:8000/api',
       taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',
-      useMockData: false,
     );
   }
 
@@ -24,7 +22,6 @@ class AppEnvironment {
       flavor: AppFlavor.development,
       apiBaseUrl: 'http://127.0.0.1:8000/api',
       taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',
-      useMockData: false,
     );
   }
 
@@ -37,7 +34,6 @@ class AppEnvironment {
         apiBaseUrl,
         AppFlavor.staging,
       ),
-      useMockData: false,
     );
   }
 
@@ -50,15 +46,6 @@ class AppEnvironment {
         apiBaseUrl,
         AppFlavor.production,
       ),
-      useMockData: false,
-    );
-  }
-
-  factory AppEnvironment.mock() {
-    return const AppEnvironment(
-      flavor: AppFlavor.test,
-      apiBaseUrl: 'mock://local/api',
-      useMockData: true,
     );
   }
 
@@ -71,10 +58,6 @@ class AppEnvironment {
       'API_BASE_URL',
       defaultValue: 'http://127.0.0.1:8000/api',
     );
-    const useMockData = bool.fromEnvironment(
-      'USE_MOCK_DATA',
-      defaultValue: false,
-    );
     const taskWsBaseUrl = String.fromEnvironment('TASK_WS_BASE_URL');
     final flavor = switch (flavorName) {
       'production' => AppFlavor.production,
@@ -82,9 +65,6 @@ class AppEnvironment {
       'test' => AppFlavor.test,
       _ => AppFlavor.development,
     };
-    if (flavor == AppFlavor.production && useMockData) {
-      throw UnsupportedError('USE_MOCK_DATA cannot be true in production.');
-    }
     if (flavor == AppFlavor.production && apiBaseUrl.trim().isEmpty) {
       throw UnsupportedError('API_BASE_URL is required in production.');
     }
@@ -94,14 +74,12 @@ class AppEnvironment {
       taskWebSocketBaseUrl: taskWsBaseUrl.trim().isEmpty
           ? _defaultTaskWebSocketBaseUrl(apiBaseUrl, flavor)
           : taskWsBaseUrl,
-      useMockData: useMockData,
     );
   }
 
   final AppFlavor flavor;
   final String apiBaseUrl;
   final String taskWebSocketBaseUrl;
-  final bool useMockData;
 }
 
 String _requiredApiBaseUrl(AppFlavor flavor) {

@@ -8,7 +8,6 @@ void main() {
       flavor: AppFlavor.development,
       apiBaseUrl: 'http://127.0.0.1:8000/api',
       taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',
-      useMockData: false,
     );
 
     final uri = taskRealtimeUri(environment, 'access_token');
@@ -23,7 +22,6 @@ void main() {
     const environment = AppEnvironment(
       flavor: AppFlavor.staging,
       apiBaseUrl: 'https://app.example.com/api',
-      useMockData: false,
     );
 
     final uri = taskRealtimeUri(environment, 'access_token');

@@ -19,16 +19,16 @@ class SetupDraft {
     this.parentIdentity = '妈妈',
     this.parentName = '妈妈',
     this.familyRole = '管理员',
-    this.deviceName = '客厅设备',
-    this.room = '客厅书桌区',
+    this.deviceName = '',
+    this.room = '',
     this.wifiName = '',
     this.wifiPassword = '',
     this.childName = '',
     this.childBirthday = '',
-    this.childStage = '小学',
-    this.childGrade = '一年级',
-    this.emergencyName = '爸爸',
-    this.emergencyPhone = '13800002026',
+    this.childStage = '幼儿园',
+    this.childGrade = '大班',
+    this.emergencyName = '',
+    this.emergencyPhone = '',
   });
 
   final String parentIdentity;

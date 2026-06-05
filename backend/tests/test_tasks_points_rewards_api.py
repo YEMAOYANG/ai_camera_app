@@ -555,6 +555,37 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(detail.json["task"]["status"], "reminder_sent")
         self.assertEqual(detail.json["task"]["reminderStatus"], "sent")
 
+    def test_task_reminder_uses_task_title_type_and_age_context(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            title="打篮球",
+            task_type="sports_outdoor",
+            start_at=now + timedelta(minutes=1),
+            due_at=now + timedelta(minutes=20),
+            reward_points=2,
+            requires_parent_confirmation=False,
+        )
+
+        response = self.client.post(
+            f"/api/tasks/{task['id']}/reminder",
+            json={"phase": "start"},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        reminder = response.json["reminder"]
+        self.assertEqual(reminder["phase"], "start")
+        self.assertEqual(reminder["category"], "sports_ball")
+        self.assertIn("打篮球", reminder["text"])
+        self.assertIn("安全", reminder["text"])
+
+        events = self.client.get(
+            f"/api/tasks/{task['id']}/events",
+            headers=self._auth_headers(),
+        )
+        event_types = {event["eventType"] for event in events.json["events"]}
+        self.assertIn("manual_start_reminder_sent", event_types)
+
     def test_scheduler_marks_child_not_ready_as_delayed_and_nudges(self):
         original = MockCameraRuntimeAdapter.task_observation
         MockCameraRuntimeAdapter.task_observation = lambda self, task: {
@@ -617,6 +648,40 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
         self.assertEqual(detail.json["task"]["status"], "in_progress")
         self.assertEqual(detail.json["task"]["cameraObservationStatus"], "not_required")
+
+    def test_scheduler_announces_task_start_and_finish(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            title="打篮球",
+            task_type="sports_outdoor",
+            start_at=now - timedelta(minutes=1),
+            due_at=now + timedelta(minutes=4),
+            reward_points=2,
+            requires_parent_confirmation=False,
+        )
+
+        start_tick = self.client.post("/api/dev/tasks/scheduler/tick")
+
+        self.assertEqual(start_tick.status_code, 200)
+        start_event = next(
+            event for event in start_tick.json["events"] if event["eventType"] == "start_reminder_sent"
+        )
+        self.assertIn("打篮球", start_event["payload"]["text"])
+
+        self.client.patch(
+            f"/api/tasks/{task['id']}",
+            json={"dueAt": (now - timedelta(seconds=5)).isoformat()},
+            headers=self._auth_headers(),
+        )
+        finish_tick = self.client.post("/api/dev/tasks/scheduler/tick")
+
+        self.assertEqual(finish_tick.status_code, 200)
+        finish_event = next(
+            event
+            for event in finish_tick.json["events"]
+            if event["eventType"] == "finish_reminder_sent"
+        )
+        self.assertIn("打篮球", finish_event["payload"]["text"])
 
     def test_scheduler_marks_past_unstarted_task_missed(self):
         now = datetime.now().astimezone()

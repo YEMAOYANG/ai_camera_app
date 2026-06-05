@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
-import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
@@ -178,7 +176,22 @@ class _TaskEventsPanel extends StatelessWidget {
 
   IconData _eventIcon(String eventType) {
     return switch (eventType) {
-      'reminder_sent' || 'reminder_failed' => Icons.volume_up_outlined,
+      'reminder_sent' ||
+      'reminder_failed' ||
+      'start_reminder_sent' ||
+      'start_reminder_failed' ||
+      'manual_start_reminder_sent' ||
+      'manual_start_reminder_failed' ||
+      'manual_prepare_reminder_sent' ||
+      'manual_prepare_reminder_failed' ||
+      'manual_reminder_sent' ||
+      'manual_reminder_failed' ||
+      'wrap_up_reminder_sent' ||
+      'wrap_up_reminder_failed' ||
+      'finish_reminder_sent' ||
+      'finish_reminder_failed' ||
+      'manual_finish_reminder_sent' ||
+      'manual_finish_reminder_failed' => Icons.volume_up_outlined,
       'auto_started' || 'manual_started' => Icons.play_circle_outline,
       'camera_monitor_started' => Icons.center_focus_strong_outlined,
       'camera_command_failed' => Icons.videocam_off_outlined,
@@ -249,7 +262,7 @@ class _TaskHeroActions extends StatelessWidget {
               context,
               ref,
               task,
-              text: '“${task.title}”快到收尾时间了，我们准备整理一下吧。',
+              phase: TaskReminderPhase.wrapUp,
               toast: '已提醒孩子准备收尾',
             ),
           ),
@@ -266,7 +279,7 @@ class _TaskHeroActions extends StatelessWidget {
               context,
               ref,
               task,
-              text: '“${task.title}”时间到了，我们先坐好，从第一步开始。',
+              phase: TaskReminderPhase.start,
               toast: '已发送温和提醒',
             ),
           ),
@@ -737,14 +750,16 @@ Future<void> _sendTaskReminder(
   BuildContext context,
   WidgetRef ref,
   GuardianTask task, {
-  required String text,
+  required TaskReminderPhase phase,
   required String toast,
 }) async {
   try {
-    await ref.read(cameraRepositoryProvider).speak(text, taskId: task.id);
+    await ref
+        .read(taskRepositoryProvider)
+        .sendReminder(task.id, phase: phase);
     _invalidateTaskData(ref, task.id);
     if (context.mounted) _showToast(context, toast);
-  } on CameraException catch (error) {
+  } on TaskException catch (error) {
     if (context.mounted) _showToast(context, error.message);
   }
 }

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from datetime import date
 from pathlib import Path
+from typing import Callable
 
 from core.database import Database
 from core.errors import ApiError
@@ -16,18 +17,31 @@ from models.tasks import (
     TASK_IN_PROGRESS,
 )
 from repositories.point_repository import PointRepository
+from repositories.profile_repository import ProfileRepository
 from repositories.task_repository import TaskRepository
 from schemas.tasks import task_event_payload, task_payload, validate_task_status, validate_task_type
 from services.auth_service import AuthService
+from services.camera_command_service import CameraCommandService
 from services.point_service import PointService
+from services.task_reminder_policy import build_task_reminder, normalize_task_reminder_phase
 
 
 class TaskService:
-    def __init__(self, database_url: str | Path, *, auth_service: AuthService):
+    def __init__(
+        self,
+        database_url: str | Path,
+        *,
+        auth_service: AuthService,
+        camera_command_service: CameraCommandService | None = None,
+        camera_command_service_factory: Callable[[], CameraCommandService] | None = None,
+    ):
         self.auth_service = auth_service
         database = Database(database_url)
         self.repository = TaskRepository(database)
         self.point_repository = PointRepository(database)
+        self.profile_repository = ProfileRepository(database)
+        self._camera_command_service = camera_command_service
+        self._camera_command_service_factory = camera_command_service_factory
         self.point_service = PointService(database_url, auth_service=auth_service)
 
     def list_today(self, access_token: str, query: dict) -> dict:
@@ -289,6 +303,45 @@ class TaskService:
             self._add_event(conn, task, "manual_started", "任务已开始", {"source": "parent"}, now)
             return {"ok": True, "task": task_payload(task)}
 
+    def send_reminder(self, access_token: str, task_id: str, data: dict) -> dict:
+        context = self._auth_context(access_token)
+        phase = normalize_task_reminder_phase(
+            self._optional_text(data, "phase"),
+            default="follow_up",
+        )
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            task = self._task_or_error(conn, context["family"]["id"], task_id)
+            child = self.profile_repository.get_child(
+                conn,
+                family_id=context["family"]["id"],
+                child_id=task["child_id"],
+            )
+            reminder = build_task_reminder(task, phase=phase, child=child)
+            command = self.camera_command_service.internal_speak(
+                family_id=context["family"]["id"],
+                task_id=task["id"],
+                device_id=task.get("device_id"),
+                text=reminder["text"],
+            )
+            sent = command.get("status") != "failed"
+            event_type = self._manual_reminder_event_type(phase, sent=sent)
+            self._add_event(
+                conn,
+                task,
+                event_type,
+                self._manual_reminder_message(phase, sent=sent),
+                {"command": command, **reminder},
+                now,
+            )
+            refreshed = self._task_or_error(conn, context["family"]["id"], task_id)
+            return {
+                "ok": True,
+                "task": task_payload(refreshed),
+                "command": command,
+                "reminder": reminder,
+            }
+
     def list_task_events(self, access_token: str, task_id: str) -> dict:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
@@ -447,8 +500,39 @@ class TaskService:
             now=now,
         )
 
+    def _manual_reminder_event_type(self, phase: str, *, sent: bool) -> str:
+        suffix = "sent" if sent else "failed"
+        return {
+            "prepare": f"manual_prepare_reminder_{suffix}",
+            "start": f"manual_start_reminder_{suffix}",
+            "follow_up": f"manual_reminder_{suffix}",
+            "delay": f"manual_reminder_{suffix}",
+            "wrap_up": f"wrap_up_reminder_{suffix}",
+            "finish": f"manual_finish_reminder_{suffix}",
+        }.get(phase, f"manual_reminder_{suffix}")
+
+    def _manual_reminder_message(self, phase: str, *, sent: bool) -> str:
+        if not sent:
+            return "摄像头暂时离线，提醒没有播出"
+        return {
+            "prepare": "已提醒孩子准备",
+            "start": "已提醒孩子开始",
+            "follow_up": "已提醒孩子",
+            "delay": "已提醒孩子",
+            "wrap_up": "已提醒孩子收尾",
+            "finish": "已提醒孩子结束",
+        }.get(phase, "已提醒孩子")
+
     def _auth_context(self, access_token: str) -> dict:
         return self.auth_service.authenticate(access_token)
+
+    @property
+    def camera_command_service(self) -> CameraCommandService:
+        if self._camera_command_service is None:
+            if self._camera_command_service_factory is None:
+                raise ApiError("camera_command_not_configured", "摄像头提醒暂时不可用", 503)
+            self._camera_command_service = self._camera_command_service_factory()
+        return self._camera_command_service
 
     def _task_or_error(self, conn, family_id: str, task_id: str):
         task = self.repository.get_task(conn, family_id=family_id, task_id=task_id)

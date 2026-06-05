@@ -10,8 +10,6 @@ final taskRealtimeProvider = StreamProvider.autoDispose<TaskRealtimeEvent>((
   ref,
 ) async* {
   final environment = ref.watch(appEnvironmentProvider);
-  if (environment.useMockData) return;
-
   final session = ref.watch(authSessionStoreProvider).currentSession;
   final token = session?.accessToken ?? '';
   if (token.isEmpty) return;

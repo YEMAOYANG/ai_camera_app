@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/platform/native_date_picker.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/mvp/application/mvp_mock_provider.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
@@ -47,12 +47,20 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     final points = ref.watch(pointsSummaryProvider);
-    final snapshot = ref.watch(guardianMvpSnapshotProvider);
+    final profileSummary = ref.watch(profileSummaryProvider);
+    final child = profileSummary.asData?.value.child;
     final childAgeGroup = taskAgeGroupForChild(
-      stage: snapshot.child.stage,
-      grade: snapshot.child.grade,
+      stage: child == null
+          ? ''
+          : child.educationStage.isNotEmpty
+          ? child.educationStage
+          : child.ageStage,
+      grade: child?.grade ?? '',
     );
-    final childId = points.asData?.value.account.childId;
+    final profileChildId = child?.id;
+    final childId = profileChildId != null && profileChildId.isNotEmpty
+        ? profileChildId
+        : points.asData?.value.account.childId;
     final query = TaskWeekQuery(
       startDate: _weekStart,
       endDate: _weekStart.add(const Duration(days: 6)),
@@ -62,8 +70,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
     return AppScreen(
       title: '任务',
-      pinnedHeaderHeight: 146,
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+      pinnedHeaderHeight: 154,
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.pageHorizontal,
+        6,
+        AppSpacing.pageHorizontal,
+        AppSpacing.pageBottom,
+      ),
       headerContent: _WeekHeader(
         weekStart: _weekStart,
         selectedDate: _selectedDate,
@@ -232,7 +245,7 @@ Future<DateTime?> showTaskFormSheet(
 }) {
   return showAppBottomSheet<DateTime>(
     context: context,
-    maxHeightFactor: 0.92,
+    maxHeightFactor: 0.88,
     child: TaskFormSheet(
       childId: childId,
       initialDate: initialDate,
@@ -267,74 +280,78 @@ class _WeekHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width <= 340;
     final weekEnd = weekStart.add(const Duration(days: 6));
     final isCurrentWeek = _isSameWeek(weekStart, DateTime.now());
     final days = List.generate(7, (index) {
       return weekStart.add(Duration(days: index));
     });
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            _WeekNavButton(icon: Icons.chevron_left, onTap: onPrevious),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    isCurrentWeek ? '本周' : '任务周',
-                    style: const TextStyle(
-                      color: AppColors.muted,
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    '${_dateShort(weekStart)} - ${_dateShort(weekEnd)}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.ink,
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
-            if (!isCurrentWeek) ...[
-              _BackToThisWeekButton(onTap: onToday),
-              const SizedBox(width: 8),
-            ],
-            _WeekNavButton(icon: Icons.chevron_right, onTap: onNext),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            for (var index = 0; index < days.length; index++) ...[
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, compact ? 4 : 6, 0, compact ? 6 : 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _WeekNavButton(icon: Icons.chevron_left, onTap: onPrevious),
+              SizedBox(width: compact ? 6 : 8),
               Expanded(
-                child: _DayChip(
-                  date: days[index],
-                  selected: _sameDay(days[index], selectedDate),
-                  count: _countForDate(tasks, days[index]),
-                  onTap: () => onSelectDate(days[index]),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      isCurrentWeek ? '本周' : '任务周',
+                      style: const TextStyle(
+                        color: AppColors.muted,
+                        fontFamily: AppTypography.systemFont,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${_dateShort(weekStart)} - ${_dateShort(weekEnd)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontFamily: AppTypography.systemFont,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              if (index != days.length - 1) const SizedBox(width: 5),
+              SizedBox(width: compact ? 6 : 8),
+              if (!isCurrentWeek) ...[
+                _BackToThisWeekButton(onTap: onToday),
+                SizedBox(width: compact ? 6 : 8),
+              ],
+              _WeekNavButton(icon: Icons.chevron_right, onTap: onNext),
             ],
-          ],
-        ),
-      ],
+          ),
+          SizedBox(height: compact ? 8 : 10),
+          Row(
+            children: [
+              for (var index = 0; index < days.length; index++) ...[
+                Expanded(
+                  child: _DayChip(
+                    date: days[index],
+                    selected: _sameDay(days[index], selectedDate),
+                    count: _countForDate(tasks, days[index]),
+                    onTap: () => onSelectDate(days[index]),
+                  ),
+                ),
+                if (index != days.length - 1) SizedBox(width: compact ? 3 : 5),
+              ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -355,7 +372,7 @@ class _BackToThisWeekButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
         ),
         child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 9, vertical: 7),
           child: Text(
             '回到本周',
             style: TextStyle(
@@ -385,13 +402,14 @@ class _WeekNavButton extends StatelessWidget {
       onTap: onTap,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.74),
-          borderRadius: BorderRadius.circular(14),
+          color: AppColors.surfaceStrong.withValues(alpha: 0.90),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.72)),
         ),
         child: SizedBox(
-          width: 40,
-          height: 40,
-          child: Center(child: Icon(icon, color: AppColors.ink, size: 20)),
+          width: 34,
+          height: 34,
+          child: Center(child: Icon(icon, color: AppColors.ink, size: 19)),
         ),
       ),
     );
@@ -413,31 +431,37 @@ class _DayChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width <= 340;
     final isToday = _sameDay(date, DateTime.now());
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: AnimatedContainer(
-        constraints: const BoxConstraints(minHeight: 66),
+        constraints: BoxConstraints(minHeight: compact ? 50 : 56),
         duration: AppMotion.duration(context, 180),
         curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 2 : 3,
+          vertical: compact ? 4 : 6,
+        ),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.primary
+              ? AppColors.ink
               : isToday
-              ? AppColors.selectedBg
-              : AppColors.surfaceSoft,
-          borderRadius: BorderRadius.circular(AppRadii.control),
+              ? AppColors.brandSageWash.withValues(alpha: 0.80)
+              : Colors.white.withValues(alpha: 0.36),
+          borderRadius: BorderRadius.circular(13),
           border: Border.all(
             color: selected
-                ? AppColors.primary
+                ? AppColors.ink
                 : isToday
-                ? AppColors.primary.withValues(alpha: 0.14)
-                : AppColors.borderSoft,
+                ? AppColors.brandSage.withValues(alpha: 0.18)
+                : Colors.white.withValues(alpha: 0.58),
           ),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               _weekdayShort(date),
@@ -446,24 +470,25 @@ class _DayChip extends StatelessWidget {
                     ? Colors.white.withValues(alpha: 0.72)
                     : AppColors.muted,
                 fontFamily: AppTypography.systemFont,
-                fontSize: 11,
+                fontSize: compact ? 10 : 11,
                 fontWeight: FontWeight.w600,
+                height: 1.1,
                 letterSpacing: 0,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: compact ? 3 : 5),
             Text(
               '${date.day}',
               style: TextStyle(
                 color: selected ? Colors.white : AppColors.ink,
                 fontFamily: AppTypography.systemFont,
-                fontSize: 20,
+                fontSize: compact ? 17 : 19,
                 fontWeight: FontWeight.w700,
                 height: 1,
                 letterSpacing: 0,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: compact ? 3 : 5),
             Text(
               count > 0 ? '$count项' : (isToday ? '今天' : ''),
               maxLines: 1,
@@ -472,11 +497,12 @@ class _DayChip extends StatelessWidget {
                 color: selected
                     ? Colors.white.withValues(alpha: 0.72)
                     : isToday
-                    ? AppColors.primary
+                    ? AppColors.brandSage
                     : AppColors.muted,
                 fontFamily: AppTypography.systemFont,
-                fontSize: 10.5,
+                fontSize: compact ? 9.5 : 10.5,
                 fontWeight: FontWeight.w600,
+                height: 1.1,
                 letterSpacing: 0,
               ),
             ),
@@ -532,7 +558,7 @@ class _GroupedTaskList extends StatelessWidget {
       children: [
         for (var index = 0; index < sections.length; index++) ...[
           _TaskSection(section: sections[index], onOpen: onOpen),
-          if (index != sections.length - 1) const SizedBox(height: 16),
+          if (index != sections.length - 1) const SizedBox(height: 12),
         ],
       ],
     );
@@ -583,7 +609,7 @@ class _TaskSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _TaskTimeline(
           tasks: section.tasks,
           muted: section.muted,
@@ -644,7 +670,7 @@ class _TaskTimelineCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 42,
+          width: 34,
           child: Column(
             children: [
               DecoratedBox(
@@ -653,18 +679,18 @@ class _TaskTimelineCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: SizedBox(
-                  width: 36,
-                  height: 36,
+                  width: 32,
+                  height: 32,
                   child: Center(
-                    child: Icon(_iconForTask(task), color: tone, size: 19),
+                    child: Icon(_iconForTask(task), color: tone, size: 18),
                   ),
                 ),
               ),
               if (!isLast)
                 Container(
                   width: 2,
-                  height: 68,
-                  margin: const EdgeInsets.symmetric(vertical: 5),
+                  height: 56,
+                  margin: const EdgeInsets.symmetric(vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.muted.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(2),
@@ -673,13 +699,15 @@ class _TaskTimelineCard extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         Expanded(
           child: AppSurface(
             onTap: onTap,
-            padding: const EdgeInsets.fromLTRB(15, 14, 14, 14),
-            radius: 18,
-            color: Colors.white.withValues(alpha: muted ? 0.44 : 0.72),
+            padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
+            radius: 16,
+            color: muted
+                ? Colors.white.withValues(alpha: 0.44)
+                : Colors.white.withValues(alpha: 0.74),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -708,10 +736,10 @@ class _TaskTimelineCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 7),
                 Wrap(
-                  spacing: 7,
-                  runSpacing: 7,
+                  spacing: 6,
+                  runSpacing: 6,
                   children: [
                     _TaskMetaPill(label: task.typeLabel),
                     _TaskMetaPill(label: task.timeLabel),
@@ -722,7 +750,7 @@ class _TaskTimelineCard extends StatelessWidget {
                   ],
                 ),
                 if (showObservation) ...[
-                  const SizedBox(height: 9),
+                  const SizedBox(height: 8),
                   Text(
                     task.observationText,
                     maxLines: 2,
@@ -879,10 +907,11 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
   void initState() {
     super.initState();
     final task = widget.task;
-    _taskType = task?.type ?? 'learning';
+    _taskType = task?.type ?? _recommendedTaskType(widget.childAgeGroup);
+    final selectedConfig = _taskConfig(_taskType);
     final descriptionFields = _splitTaskDescription(
       task?.description ?? '',
-      _taskConfig(_taskType),
+      selectedConfig,
     );
     _titleController = TextEditingController(text: task?.title ?? '');
     _extraController = TextEditingController(text: descriptionFields.extra);
@@ -892,7 +921,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     _sheetScrollController = ScrollController();
     _rewardController = TextEditingController(
       text: task == null
-          ? '3'
+          ? '${selectedConfig.defaultReward}'
           : task.rewardPoints > 0
           ? '${task.rewardPoints}'
           : '',
@@ -908,7 +937,9 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
         ? task!.scheduledEnd
         : _addMinutes(_startTime, _durationForType(_taskType));
     _scheduleType = task?.scheduleType ?? 'one_time';
-    _requiresParentConfirmation = task?.requiresParentConfirmation ?? true;
+    _requiresParentConfirmation =
+        task?.requiresParentConfirmation ??
+        selectedConfig.defaultRequiresConfirmation;
     _mode = widget.task == null ? widget.initialMode : TaskEntryMode.single;
     _rows = [
       _newScheduleRow(
@@ -935,116 +966,110 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-    return Padding(
-      padding: EdgeInsets.only(bottom: bottomInset),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final sheetHeight = constraints.maxHeight.isFinite
-              ? constraints.maxHeight
-              : MediaQuery.sizeOf(context).height - bottomInset;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final sheetHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : MediaQuery.sizeOf(context).height;
 
-          return SizedBox(
-            height: sheetHeight,
-            child: SafeArea(
-              top: false,
-              bottom: true,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const AppSheetHandle(),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        controller: _sheetScrollController,
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.task == null
-                                  ? (_mode == TaskEntryMode.day
-                                        ? '一天安排'
-                                        : '添加孩子的新任务')
-                                  : '编辑任务',
-                              style: const TextStyle(
-                                color: AppColors.ink,
-                                fontFamily: AppTypography.systemFont,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0,
-                              ),
-                            ),
-                            if (widget.task == null) ...[
-                              const SizedBox(height: 14),
-                              _TaskModeSwitch(
-                                value: _mode,
-                                onChanged: (mode) => setState(() {
-                                  _mode = mode;
-                                  _error = null;
-                                }),
-                              ),
-                            ],
-                            const SizedBox(height: 16),
-                            if (_mode == TaskEntryMode.single)
-                              _buildSingleTaskForm()
+        return SizedBox(
+          height: sheetHeight,
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppSheetHandle(),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.task == null
+                        ? (_mode == TaskEntryMode.day ? '一天安排' : '添加孩子的新任务')
+                        : '编辑任务',
+                    style: const TextStyle(
+                      color: AppColors.ink,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  if (widget.task == null) ...[
+                    const SizedBox(height: 12),
+                    _TaskModeSwitch(
+                      value: _mode,
+                      onChanged: (mode) => setState(() {
+                        _mode = mode;
+                        _error = null;
+                      }),
+                    ),
+                  ],
+                  const SizedBox(height: 14),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: _sheetScrollController,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_mode == TaskEntryMode.single)
+                            _buildSingleTaskForm()
+                          else
+                            _buildDayScheduleForm(),
+                          if (_error != null) ...[
+                            const SizedBox(height: 12),
+                            if (_saveFailed)
+                              AppInlineState(
+                                variant: AppStateVariant.saveFailed,
+                                title: '保存失败',
+                                message: _error!,
+                              )
                             else
-                              _buildDayScheduleForm(),
-                            if (_error != null) ...[
-                              const SizedBox(height: 12),
-                              if (_saveFailed)
-                                AppInlineState(
-                                  variant: AppStateVariant.saveFailed,
-                                  title: '保存失败',
-                                  message: _error!,
-                                )
-                              else
-                                Text(
-                                  _error!,
-                                  style: const TextStyle(
-                                    color: AppColors.danger,
-                                    fontFamily: AppTypography.systemFont,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.4,
-                                  ),
+                              Text(
+                                _error!,
+                                style: const TextStyle(
+                                  color: AppColors.danger,
+                                  fontFamily: AppTypography.systemFont,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.4,
                                 ),
-                            ],
+                              ),
                           ],
-                        ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    if (_mode == TaskEntryMode.single)
-                      _SingleTaskActions(
-                        editing: widget.task != null,
-                        saving: _saving,
-                        savingContinue: _savingContinue,
-                        onSave: _saving
-                            ? null
-                            : () => _saveSingle(continueAdding: false),
-                        onSaveAndContinue: _saving || widget.task != null
-                            ? null
-                            : () => _saveSingle(continueAdding: true),
-                      )
-                    else
-                      AppPrimaryButton(
-                        label: _saving ? '保存中' : '保存一天安排',
-                        loading: _saving,
-                        trailing: const AppButtonGlyph(icon: Icons.check),
-                        onTap: _saving ? null : _saveDaySchedule,
-                      ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 10),
+                  if (_mode == TaskEntryMode.single)
+                    _SingleTaskActions(
+                      editing: widget.task != null,
+                      saving: _saving,
+                      savingContinue: _savingContinue,
+                      onSave: _saving
+                          ? null
+                          : () => _saveSingle(continueAdding: false),
+                      onSaveAndContinue: _saving || widget.task != null
+                          ? null
+                          : () => _saveSingle(continueAdding: true),
+                    )
+                  else
+                    AppPrimaryButton(
+                      label: _saving ? '保存中' : '保存一天安排',
+                      loading: _saving,
+                      trailing: const AppButtonGlyph(icon: Icons.check),
+                      onTap: _saving ? null : _saveDaySchedule,
+                    ),
+                ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -2728,6 +2753,7 @@ class _SingleTaskActions extends StatelessWidget {
         final vertical = constraints.maxWidth < 360;
         final secondary = AppSecondaryButton(
           label: savingContinue ? '保存中' : '保存并继续添加',
+          height: AppControls.buttonHeight,
           onTap: onSaveAndContinue,
         );
         final primary = AppPrimaryButton(
@@ -3033,13 +3059,13 @@ const _taskTypeConfigs = [
     label: '运动/户外',
     description: '跳绳、散步、球类和户外活动',
     icon: Icons.directions_run_outlined,
-    defaultMinutes: 30,
-    defaultReward: 3,
+    defaultMinutes: 25,
+    defaultReward: 2,
     defaultRequiresConfirmation: false,
     titleLabel: '活动内容',
-    titleHint: '例如：跳绳练习',
+    titleHint: '例如：打篮球',
     detailLabel: '安全提醒',
-    detailHint: '例如：运动前喝水，结束后整理物品',
+    detailHint: '例如：先看周围安全，结束后喝水',
   ),
   _TaskTypeConfig(
     value: 'custom',
@@ -3137,6 +3163,37 @@ class _TaskTemplateRow {
 
 const _taskTemplates = [
   _TaskTemplate(
+    title: '幼儿园放学后',
+    subtitle: '喝水、运动和整理，适合幼儿的短节奏安排',
+    ageGroups: [TaskAgeGroup.preschool],
+    rows: [
+      _TaskTemplateRow(
+        startTime: '17:20',
+        endTime: '17:30',
+        taskType: 'life',
+        title: '喝水休息',
+        rewardPoints: 1,
+        requiresParentConfirmation: false,
+      ),
+      _TaskTemplateRow(
+        startTime: '17:35',
+        endTime: '18:00',
+        taskType: 'sports_outdoor',
+        title: '打篮球',
+        rewardPoints: 2,
+        requiresParentConfirmation: false,
+      ),
+      _TaskTemplateRow(
+        startTime: '18:00',
+        endTime: '18:10',
+        taskType: 'life',
+        title: '整理玩具',
+        rewardPoints: 1,
+        requiresParentConfirmation: false,
+      ),
+    ],
+  ),
+  _TaskTemplate(
     title: '放学后学习',
     subtitle: '适合小学阶段的作业、休息和阅读节奏',
     ageGroups: [TaskAgeGroup.lowerPrimary, TaskAgeGroup.upperPrimary],
@@ -3145,7 +3202,7 @@ const _taskTemplates = [
         startTime: '19:00',
         endTime: '19:40',
         taskType: 'learning',
-        title: '数学作业',
+        title: '作业整理',
         rewardPoints: 3,
         requiresParentConfirmation: true,
       ),
@@ -3318,6 +3375,21 @@ _TaskTypeConfig _taskConfig(String value) {
 }
 
 List<_TaskTypeConfig> _taskTypeConfigsForAge(TaskAgeGroup ageGroup) {
+  if (ageGroup == TaskAgeGroup.preschool) {
+    const order = [
+      'life',
+      'sports_outdoor',
+      'reading_interest',
+      'schoolbag',
+      'sleep',
+      'custom',
+    ];
+    final ordered = [for (final value in order) _taskConfig(value)];
+    final rest = _taskTypeConfigs
+        .where((config) => !order.contains(config.value))
+        .toList();
+    return [...ordered, ...rest];
+  }
   final recommended = _taskTypeConfigs
       .where((config) => config.ageGroups.contains(ageGroup))
       .toList();
@@ -3348,20 +3420,44 @@ TaskAgeGroup taskAgeGroupForChild({
   required String stage,
   required String grade,
 }) {
-  final text = '$stage $grade';
-  if (text.contains('幼') || text.contains('学前')) {
+  final text = '$stage $grade'.trim().toLowerCase();
+  if (text.isEmpty) {
     return TaskAgeGroup.preschool;
   }
-  if (text.contains('五') || text.contains('六') || text.contains('高年级')) {
+  if (text.contains('幼') ||
+      text.contains('学前') ||
+      text.contains('托班') ||
+      text.contains('小班') ||
+      text.contains('中班') ||
+      text.contains('大班') ||
+      text.contains('preschool') ||
+      text.contains('kindergarten')) {
+    return TaskAgeGroup.preschool;
+  }
+  if (text.contains('五') ||
+      text.contains('六') ||
+      text.contains('高年级') ||
+      text.contains('upper')) {
     return TaskAgeGroup.upperPrimary;
   }
   if (text.contains('初') ||
       text.contains('中学') ||
       text.contains('更大') ||
-      text.contains('青少年')) {
+      text.contains('青少年') ||
+      text.contains('teen') ||
+      text.contains('junior')) {
     return TaskAgeGroup.teen;
   }
-  return TaskAgeGroup.lowerPrimary;
+  if (text.contains('小学') ||
+      text.contains('一年级') ||
+      text.contains('二年级') ||
+      text.contains('三年级') ||
+      text.contains('四年级') ||
+      text.contains('primary') ||
+      text.contains('lower')) {
+    return TaskAgeGroup.lowerPrimary;
+  }
+  return TaskAgeGroup.preschool;
 }
 
 String _scheduleLabel(String value) {

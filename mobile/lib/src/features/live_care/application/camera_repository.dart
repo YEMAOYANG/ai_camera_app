@@ -2,13 +2,11 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
 
 final cameraRepositoryProvider = Provider<CameraRepository>((ref) {
   return CameraRepository(
-    environment: ref.watch(appEnvironmentProvider),
     apiClient: ref.watch(apiClientProvider),
     dio: ref.watch(dioProvider),
   );
@@ -50,20 +48,15 @@ final liveCareStatusProvider = FutureProvider<LiveCareStatus>((ref) async {
 
 class CameraRepository {
   const CameraRepository({
-    required AppEnvironment environment,
     required ApiClient apiClient,
     required Dio dio,
-  }) : _environment = environment,
-       _apiClient = apiClient,
+  }) : _apiClient = apiClient,
        _dio = dio;
 
-  final AppEnvironment _environment;
   final ApiClient _apiClient;
   final Dio _dio;
 
   Future<CameraHealth> health() async {
-    if (_environment.useMockData) return CameraHealth.mock;
-
     try {
       final response = await _apiClient.get('/camera/health');
       return CameraHealth.fromJson(_asMap(response.data));
@@ -75,8 +68,6 @@ class CameraRepository {
   }
 
   Future<CameraRuntime> runtime() async {
-    if (_environment.useMockData) return CameraRuntime.mock;
-
     try {
       final response = await _apiClient.get('/camera/runtime');
       return CameraRuntime.fromJson(_asMap(response.data));
@@ -88,8 +79,6 @@ class CameraRepository {
   }
 
   Future<CameraStatus> status() async {
-    if (_environment.useMockData) return CameraStatus.mock;
-
     try {
       final response = await _apiClient.get('/camera/status');
       return CameraStatus.fromJson(_asMap(response.data));
@@ -101,8 +90,6 @@ class CameraRepository {
   }
 
   Future<CameraMonitorStatus> monitorStatus() async {
-    if (_environment.useMockData) return CameraMonitorStatus.mock;
-
     try {
       final response = await _apiClient.get('/camera/monitor/status');
       return CameraMonitorStatus.fromJson(_asMap(response.data));
@@ -114,15 +101,6 @@ class CameraRepository {
   }
 
   Future<CameraSnapshotFrame> snapshot() async {
-    if (_environment.useMockData) {
-      return const CameraSnapshotFrame(
-        available: false,
-        bytes: null,
-        contentType: '',
-        message: '真实快照暂不可用',
-      );
-    }
-
     try {
       final response = await _dio.get<List<int>>(
         '/camera/snapshot',
@@ -166,13 +144,6 @@ class CameraRepository {
   }
 
   Future<CameraWebRtcSession> createWebRtcSession() async {
-    if (_environment.useMockData) {
-      return const CameraWebRtcSession(
-        signalingUrl: 'ws://127.0.0.1:1984/api/ws?src=mock',
-        message: '实时画面连接已准备好。',
-      );
-    }
-
     try {
       final response = await _apiClient.get('/camera/webrtc/session');
       return CameraWebRtcSession.fromJson(_asMap(response.data));
@@ -182,8 +153,6 @@ class CameraRepository {
   }
 
   Future<void> speak(String text, {String? taskId}) async {
-    if (_environment.useMockData) return;
-
     try {
       await _apiClient.post(
         '/camera/commands/speak',

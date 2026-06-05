@@ -583,7 +583,7 @@ class TaskRewardHubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const _HubPage(
-      title: '任务与奖励',
+      title: '积分与奖励',
       sections: [
         _HubSection(
           title: '积分与奖励',
@@ -718,6 +718,48 @@ class PrivacyAuthorizationHubPage extends StatelessWidget {
               title: '隐私政策',
               subtitle: '数据收集、使用和保护说明',
               path: privacyPolicyPath,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class AccountSettingsHubPage extends StatelessWidget {
+  const AccountSettingsHubPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _HubPage(
+      title: '账号设置',
+      sections: [
+        _HubSection(
+          title: '资料与安全',
+          rows: [
+            _HubRow(
+              icon: Icons.account_circle_outlined,
+              title: '个人信息',
+              subtitle: '显示名、家庭名称和家庭身份',
+              path: profileAccountPath,
+            ),
+            _HubRow(
+              icon: Icons.verified_user_outlined,
+              title: '账号安全',
+              subtitle: '手机号、登录方式和登录设备',
+              path: profileSecurityPath,
+              tone: AppListRowTone.green,
+            ),
+          ],
+        ),
+        _HubSection(
+          title: '支持',
+          rows: [
+            _HubRow(
+              icon: Icons.info_outline,
+              title: '关于',
+              subtitle: '帮助反馈、当前版本和协议政策',
+              path: profileAboutPath,
             ),
           ],
         ),

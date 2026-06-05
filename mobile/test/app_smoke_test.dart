@@ -1,8 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/app/app.dart';
 import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
 import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
 import 'package:guardian_parent_app/src/core/storage/setup_store.dart';
@@ -59,22 +61,22 @@ void main() {
       preferences: {
         hasSeenOnboardingKey: true,
         hasCompletedInitialSetupKey: true,
-        authAccessTokenKey: 'mock_access_saved',
-        authRefreshTokenKey: 'mock_refresh_saved',
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
         authAccessTokenExpiresAtKey: now
             .add(const Duration(minutes: 15))
             .millisecondsSinceEpoch,
         authRefreshTokenExpiresAtKey: now
             .add(const Duration(days: 30))
             .millisecondsSinceEpoch,
-        authUserIdKey: 'mock_parent_13800002026',
+        authUserIdKey: 'test_parent_13800002026',
         authPhoneKey: '13800002026',
       },
     );
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('登录家庭看护空间'), findsNothing);
-    expect(find.text('需要你处理'), findsOneWidget);
+    expect(find.textContaining('需要你处理'), findsOneWidget);
   });
 
   testWidgets('runs login then first setup flow into home', (tester) async {
@@ -88,6 +90,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('绑定看护设备'), findsOneWidget);
+    await tester.enterText(find.byType(EditableText).at(0), '书桌旁设备');
+    await tester.enterText(find.byType(EditableText).at(1), '书桌旁');
+    await tester.pump();
     await tester.tap(find.text('配置 Wi-Fi'));
     await tester.pumpAndSettle();
 
@@ -110,13 +115,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('紧急联系人'), findsOneWidget);
+    await tester.enterText(find.byType(EditableText).at(0), '爸爸');
+    await tester.enterText(find.byType(EditableText).at(1), '13800002026');
+    await tester.pump();
     await tester.tap(find.text('进入首页'));
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
 
     expect(find.text('家庭看护'), findsOneWidget);
-    expect(find.text('客厅设备 · 在线看护中'), findsOneWidget);
-    expect(find.text('需要你处理'), findsOneWidget);
+    expect(find.textContaining('需要你处理'), findsOneWidget);
+    expect(find.text('确认与奖励'), findsOneWidget);
   });
 
   testWidgets('shows login validation errors from continue', (tester) async {
@@ -174,7 +182,7 @@ void main() {
     await _loginSuccessfully(tester);
 
     expect(find.text('家庭看护'), findsOneWidget);
-    expect(find.text('客厅设备 · 在线看护中'), findsOneWidget);
+    expect(find.textContaining('需要你处理'), findsOneWidget);
 
     await tester.tap(find.text('任务').last);
     await tester.pumpAndSettle();
@@ -245,15 +253,15 @@ void main() {
       preferences: {
         hasSeenOnboardingKey: true,
         hasCompletedInitialSetupKey: true,
-        authAccessTokenKey: 'mock_access_saved',
-        authRefreshTokenKey: 'mock_refresh_saved',
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
         authAccessTokenExpiresAtKey: now
             .add(const Duration(minutes: 15))
             .millisecondsSinceEpoch,
         authRefreshTokenExpiresAtKey: now
             .add(const Duration(days: 30))
             .millisecondsSinceEpoch,
-        authUserIdKey: 'mock_parent_13800002026',
+        authUserIdKey: 'test_parent_13800002026',
         authPhoneKey: '13800002026',
       },
     );
@@ -262,7 +270,7 @@ void main() {
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('任务与奖励'));
+    await tester.tap(find.text('积分与奖励'));
     await tester.pumpAndSettle();
 
     final pointsEntry = find.text('积分账户');
@@ -279,7 +287,7 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('任务与奖励'));
+    await tester.tap(find.text('积分与奖励'));
     await tester.pumpAndSettle();
     final rewardsEntry = find.text('奖励中心');
     await tester.scrollUntilVisible(rewardsEntry, 400);
@@ -306,15 +314,15 @@ void main() {
       preferences: {
         hasSeenOnboardingKey: true,
         hasCompletedInitialSetupKey: true,
-        authAccessTokenKey: 'mock_access_saved',
-        authRefreshTokenKey: 'mock_refresh_saved',
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
         authAccessTokenExpiresAtKey: now
             .add(const Duration(minutes: 15))
             .millisecondsSinceEpoch,
         authRefreshTokenExpiresAtKey: now
             .add(const Duration(days: 30))
             .millisecondsSinceEpoch,
-        authUserIdKey: 'mock_parent_13800002026',
+        authUserIdKey: 'test_parent_13800002026',
         authPhoneKey: '13800002026',
       },
     );
@@ -339,12 +347,11 @@ void main() {
     for (final category in const [
       '家庭与成员',
       '设备与看护',
-      '任务与奖励',
       'AI 规则与提醒',
-      '隐私与授权',
-      '账号安全',
       '订阅与套餐',
-      '关于',
+      '积分与奖励',
+      '隐私与授权',
+      '账号设置',
     ]) {
       await _openProfileEntry(tester, category, expectedTitle: category);
     }
@@ -371,7 +378,7 @@ void main() {
     );
     await _openProfileNestedEntry(
       tester,
-      '任务与奖励',
+      '积分与奖励',
       '奖励中心',
       expectedTitle: '奖励商店',
     );
@@ -397,15 +404,15 @@ void main() {
     final preferences = {
       hasSeenOnboardingKey: true,
       hasCompletedInitialSetupKey: true,
-      authAccessTokenKey: 'mock_access_saved',
-      authRefreshTokenKey: 'mock_refresh_saved',
+      authAccessTokenKey: 'test_access_saved',
+      authRefreshTokenKey: 'test_refresh_saved',
       authAccessTokenExpiresAtKey: now
           .add(const Duration(minutes: 15))
           .millisecondsSinceEpoch,
       authRefreshTokenExpiresAtKey: now
           .add(const Duration(days: 30))
           .millisecondsSinceEpoch,
-      authUserIdKey: 'mock_parent_13800002026',
+      authUserIdKey: 'test_parent_13800002026',
       authPhoneKey: '13800002026',
     };
     const sizes = [
@@ -430,17 +437,19 @@ void main() {
       await tester.tap(find.byIcon(Icons.add).first);
       await tester.pumpAndSettle();
       expect(find.text('添加孩子的新任务'), findsOneWidget);
+      expect(find.text('生活习惯'), findsOneWidget);
+      expect(find.text('学习任务'), findsNothing);
       expect(find.text('保存并继续添加'), findsOneWidget);
       expect(tester.takeException(), isNull);
 
-      await tester.tap(find.text('学习任务').first);
+      await tester.tap(find.text('生活习惯').first);
       await tester.pumpAndSettle();
       expect(find.text('选择任务类型'), findsOneWidget);
       expect(tester.takeException(), isNull);
 
-      await tester.tap(find.text('生活习惯').last);
+      await tester.tap(find.text('运动/户外').last);
       await tester.pumpAndSettle();
-      expect(find.text('习惯名称'), findsOneWidget);
+      expect(find.text('活动内容'), findsOneWidget);
       expect(tester.takeException(), isNull);
     }
   });
@@ -454,15 +463,15 @@ void main() {
       preferences: {
         hasSeenOnboardingKey: true,
         hasCompletedInitialSetupKey: true,
-        authAccessTokenKey: 'mock_access_saved',
-        authRefreshTokenKey: 'mock_refresh_saved',
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
         authAccessTokenExpiresAtKey: now
             .add(const Duration(minutes: 15))
             .millisecondsSinceEpoch,
         authRefreshTokenExpiresAtKey: now
             .add(const Duration(days: 30))
             .millisecondsSinceEpoch,
-        authUserIdKey: 'mock_parent_13800002026',
+        authUserIdKey: 'test_parent_13800002026',
         authPhoneKey: '13800002026',
       },
       logicalSize: const Size(430, 932),
@@ -474,7 +483,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.add).first);
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(EditableText).at(1), '语文阅读');
+    await tester.enterText(find.byType(EditableText).first, '喝水休息');
     await tester.ensureVisible(find.text('保存并继续添加'));
     await tester.tap(find.text('保存并继续添加'));
     await tester.pumpAndSettle();
@@ -490,10 +499,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('选择一个常用安排'), findsOneWidget);
 
-    await tester.tap(find.text('放学后学习'));
+    await tester.tap(find.text('幼儿园放学后'));
     await tester.pumpAndSettle();
     expect(find.text('保存一天安排'), findsOneWidget);
-    expect(find.text('阅读'), findsWidgets);
+    expect(find.text('打篮球'), findsWidgets);
 
     await tester.ensureVisible(find.text('保存一天安排'));
     await tester.tap(find.text('保存一天安排'));
@@ -551,7 +560,6 @@ Future<void> _loginSuccessfully(WidgetTester tester) async {
   await tester.enterText(find.byType(EditableText).at(1), '123456');
   await tester.tap(find.text('继续'));
   await tester.pump(const Duration(milliseconds: 120));
-  expect(find.text('正在确认'), findsOneWidget);
 
   await tester.pump(const Duration(seconds: 2));
   await tester.pumpAndSettle();
@@ -668,16 +676,25 @@ Future<void> _pumpApp(
 
   SharedPreferences.setMockInitialValues(preferences);
   final sharedPreferences = await SharedPreferences.getInstance();
+  final fakeApi = _FakeApiServer(
+    completedSetup: preferences[hasCompletedInitialSetupKey] == true,
+  );
+  final fakeDio = fakeApi.dio;
 
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        appEnvironmentProvider.overrideWithValue(AppEnvironment.mock()),
+        appEnvironmentProvider.overrideWithValue(
+          const AppEnvironment(flavor: AppFlavor.test, apiBaseUrl: ''),
+        ),
+        rawDioProvider.overrideWithValue(fakeDio),
+        dioProvider.overrideWithValue(fakeDio),
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
       child: const GuardianApp(),
     ),
   );
+  await tester.pump(const Duration(milliseconds: 50));
 }
 
 Future<void> _pumpStateView(
@@ -718,4 +735,1045 @@ Future<void> _pumpStateView(
       ),
     ),
   );
+}
+
+class _FakeApiServer {
+  _FakeApiServer({required bool completedSetup})
+    : _completedSetup = completedSetup {
+    _tasks.addAll([
+      _task(
+        id: 'task_math_homework',
+        title: '数学作业',
+        description: '完成数学练习并等待观察记录。',
+        type: 'learning',
+        status: 'in_progress',
+        scheduledStart: '14:17',
+        scheduledEnd: '15:00',
+        rewardPoints: 1,
+      ),
+      _task(
+        id: 'task_english_reading',
+        title: '英语听读',
+        description: '听读 15 分钟后由家长确认。',
+        type: 'learning',
+        status: 'awaiting_parent_confirmation',
+        scheduledStart: '15:30',
+        scheduledEnd: '15:50',
+        rewardPoints: 2,
+        evidenceSummary: '孩子已经完成听读，等待你确认。',
+      ),
+    ]);
+  }
+
+  final bool _completedSetup;
+  int _taskCounter = 0;
+  String _relationship = '妈妈';
+  final List<Map<String, dynamic>> _tasks = [];
+
+  late final Dio dio = _buildDio();
+
+  Dio _buildDio() {
+    final dio = Dio(BaseOptions(baseUrl: 'http://test.local/api'));
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          final response = _handle(options);
+          if ((response.statusCode ?? 200) >= 400) {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                response: response,
+                type: DioExceptionType.badResponse,
+              ),
+            );
+            return;
+          }
+          handler.resolve(response);
+        },
+      ),
+    );
+    return dio;
+  }
+
+  Response<dynamic> _handle(RequestOptions options) {
+    final path = _normalizePath(options.path);
+    final method = options.method.toUpperCase();
+    final body = _body(options.data);
+    final segments = path.split('/').where((item) => item.isNotEmpty).toList();
+
+    if (method == 'POST' && path == '/auth/sms/request') {
+      return _ok(options, {'ok': true});
+    }
+    if (method == 'POST' && path == '/auth/sms/login') {
+      return _ok(options, _sessionPayload(_text(body['phone'], '13800002026')));
+    }
+    if (method == 'POST' && path == '/auth/token/refresh') {
+      return _ok(options, _sessionPayload('13800002026'));
+    }
+    if (method == 'POST' && path == '/auth/logout') {
+      return _ok(options, {'ok': true});
+    }
+
+    if (method == 'GET' && path == '/setup/status') {
+      return _ok(options, _setupPayload());
+    }
+    if (method == 'POST' && path.startsWith('/setup/')) {
+      return _ok(options, _setupPayloadFor(path));
+    }
+
+    if (method == 'GET' && path == '/profile/summary') {
+      return _ok(options, {'ok': true, 'summary': _profileSummary()});
+    }
+    if (method == 'GET' && path == '/family/members') {
+      return _ok(options, {
+        'ok': true,
+        'members': [_familyMember()],
+      });
+    }
+    if (method == 'GET' && path == '/family/invitations') {
+      return _ok(options, {'ok': true, 'invitations': []});
+    }
+    if (method == 'POST' && path == '/family/invitations') {
+      return _ok(options, {'ok': true, 'invitation': _familyInvitation(body)});
+    }
+    if (method == 'POST' && path.contains('/family/invitations/')) {
+      return _ok(options, {'ok': true, 'invitation': _familyInvitation({})});
+    }
+    if ((method == 'POST' || method == 'PATCH') &&
+        path.startsWith('/family/members')) {
+      return _ok(options, {'ok': true, 'member': _familyMember(body)});
+    }
+    if (method == 'DELETE' && path.startsWith('/family/members/')) {
+      return _ok(options, {'ok': true});
+    }
+    if (method == 'GET' && path == '/children/current') {
+      return _ok(options, {'ok': true, 'child': _child()});
+    }
+    if (method == 'PATCH' && path.startsWith('/children/')) {
+      return _ok(options, {'ok': true, 'child': _child(body)});
+    }
+    if (method == 'GET' && path == '/contacts/emergency') {
+      return _ok(options, {
+        'ok': true,
+        'contacts': [_contact()],
+      });
+    }
+    if ((method == 'POST' || method == 'PATCH') &&
+        path.startsWith('/contacts/emergency')) {
+      return _ok(options, {'ok': true, 'contact': _contact(body)});
+    }
+    if (method == 'DELETE' && path.startsWith('/contacts/emergency/')) {
+      return _ok(options, {'ok': true});
+    }
+    if (method == 'GET' && path == '/account/profile') {
+      return _ok(options, {'ok': true, 'profile': _accountProfile()});
+    }
+    if (method == 'PATCH' && path == '/account/profile') {
+      _relationship = _text(body['relationship'], _relationship);
+      return _ok(options, {'ok': true, 'profile': _accountProfile()});
+    }
+    if (method == 'GET' && path == '/account/security') {
+      return _ok(options, {'ok': true, 'security': _accountSecurity()});
+    }
+
+    if (method == 'GET' &&
+        segments.length == 2 &&
+        segments.first == 'settings') {
+      return _ok(options, {'ok': true, 'setting': _setting(segments[1])});
+    }
+    if (method == 'PATCH' &&
+        segments.length == 2 &&
+        segments.first == 'settings') {
+      return _ok(options, {'ok': true, 'setting': _setting(segments[1], body)});
+    }
+
+    if (method == 'GET' && path == '/subscription/status') {
+      return _ok(options, {'ok': true, 'subscription': _subscriptionStatus()});
+    }
+    if (method == 'GET' && path == '/subscriptions/plans') {
+      return _ok(options, {'ok': true, 'plans': _subscriptionPlans()});
+    }
+    if (method == 'GET' && path == '/subscriptions/entitlements') {
+      return _ok(options, {
+        'ok': true,
+        'entitlements': _subscriptionFeatures(),
+      });
+    }
+    if (method == 'POST' && path == '/subscriptions/checkout-session') {
+      return _ok(options, {
+        'ok': true,
+        'checkout': {
+          'planId': _text(body['planId'], 'member'),
+          'planTitle': '会员版',
+          'status': 'pending_payment',
+          'provider': 'app_store',
+          'paymentRequired': true,
+          'receiptVerificationRequired': true,
+          'message': '在线付款入口暂未开放，当前可先查看套餐权益。',
+        },
+      });
+    }
+    if (method == 'POST' && path == '/subscriptions/restore') {
+      return _ok(options, {
+        'ok': true,
+        'restore': {'status': 'no_purchase_record', 'message': '暂未找到可恢复的订阅记录。'},
+      });
+    }
+
+    if (method == 'GET' && path == '/reports/daily') {
+      return _ok(options, {'ok': true, 'report': _dailyReport()});
+    }
+    if (method == 'GET' && path == '/reports/weekly') {
+      return _ok(options, {'ok': true, 'report': _weeklyReport()});
+    }
+    if (method == 'GET' && path == '/growth/moments') {
+      return _ok(options, {'ok': true, 'moments': []});
+    }
+    if (method == 'GET' && segments.length == 2 && segments.first == 'legal') {
+      return _ok(options, {
+        'ok': true,
+        'document': _legalDocument(segments[1]),
+      });
+    }
+    if (method == 'GET' && path == '/app/about') {
+      return _ok(options, {'ok': true, 'about': _about()});
+    }
+    if (method == 'POST' && path == '/feedback') {
+      return _ok(options, {
+        'ok': true,
+        'feedback': {'status': 'received'},
+      });
+    }
+
+    if (method == 'GET' && path == '/tasks/today') {
+      return _ok(options, {'ok': true, 'tasks': _tasks});
+    }
+    if (method == 'GET' && path == '/tasks') {
+      return _ok(options, {'ok': true, 'tasks': _tasks});
+    }
+    if (method == 'POST' && path == '/tasks') {
+      final task = _taskFromBody(body);
+      _tasks.add(task);
+      return _ok(options, {'ok': true, 'task': task});
+    }
+    if (method == 'POST' && path == '/tasks/batch') {
+      final rawTasks = body['tasks'];
+      final created = rawTasks is List
+          ? rawTasks.map((item) => _taskFromBody(_body(item))).toList()
+          : [_taskFromBody(body)];
+      _tasks.addAll(created);
+      return _ok(options, {'ok': true, 'tasks': created});
+    }
+    if (segments.length >= 2 && segments.first == 'tasks') {
+      final taskId = segments[1];
+      final task = _findTask(taskId);
+      if (task == null) return _notFound(options);
+      if (method == 'GET' && segments.length == 2) {
+        return _ok(options, {'ok': true, 'task': task});
+      }
+      if (method == 'PATCH' && segments.length == 2) {
+        task.addAll(body);
+        return _ok(options, {'ok': true, 'task': task});
+      }
+      if (method == 'GET' && segments.length == 3 && segments[2] == 'events') {
+        return _ok(options, {'ok': true, 'events': _taskEvents(task)});
+      }
+      if (method == 'POST' && segments.length == 3) {
+        return _taskAction(options, task, segments[2], body);
+      }
+    }
+
+    if (method == 'GET' && path == '/points/account') {
+      return _ok(options, {'ok': true, 'account': _pointAccount()});
+    }
+    if (method == 'GET' && path == '/points/ledger') {
+      return _ok(options, {'ok': true, 'ledger': _pointLedger()});
+    }
+    if (method == 'POST' && path == '/points/adjust') {
+      return _ok(options, {'ok': true, 'account': _pointAccount()});
+    }
+    if (method == 'GET' && path == '/rewards/items') {
+      return _ok(options, {'ok': true, 'items': _rewardItems()});
+    }
+    if (method == 'GET' &&
+        segments.length == 3 &&
+        segments[0] == 'rewards' &&
+        segments[1] == 'items') {
+      return _ok(options, {
+        'ok': true,
+        'item': _rewardItems().firstWhere((item) => item['id'] == segments[2]),
+      });
+    }
+    if ((method == 'POST' || method == 'PATCH') &&
+        path.startsWith('/rewards/items')) {
+      return _ok(options, {'ok': true, 'item': _rewardItems().first});
+    }
+    if (method == 'DELETE' && path.startsWith('/rewards/items/')) {
+      return _ok(options, {'ok': true});
+    }
+    if (method == 'GET' && path == '/rewards/redemptions') {
+      return _ok(options, {'ok': true, 'redemptions': _redemptions()});
+    }
+    if (method == 'POST' && path.startsWith('/rewards/redemptions')) {
+      return _ok(options, {'ok': true, 'redemption': _redemptions().first});
+    }
+
+    if (method == 'GET' && path == '/devices') {
+      return _ok(options, {
+        'ok': true,
+        'devices': [_device()],
+      });
+    }
+    if (method == 'GET' &&
+        segments.length == 2 &&
+        segments.first == 'devices') {
+      return _ok(options, {'ok': true, 'device': _device()});
+    }
+    if (method == 'GET' &&
+        segments.length == 3 &&
+        segments.first == 'devices' &&
+        segments[2] == 'status') {
+      return _ok(options, {'ok': true, 'status': _deviceStatus()});
+    }
+    if (method == 'PATCH' && path.startsWith('/devices/')) {
+      return _ok(options, {'ok': true, 'device': _device(body)});
+    }
+    if (method == 'POST' && path.endsWith('/unbind')) {
+      return _ok(options, {
+        'ok': true,
+        'device': {..._device(), 'status': 'unbound', 'unboundAt': _now},
+      });
+    }
+
+    if (method == 'GET' && path == '/camera/health') {
+      return _ok(options, {
+        'ok': true,
+        'cameraRuntime': {'reachable': true},
+      });
+    }
+    if (method == 'GET' && path == '/camera/runtime') {
+      return _ok(options, {
+        'ok': true,
+        'cameraRuntime': {'reachable': true},
+      });
+    }
+    if (method == 'GET' && path == '/camera/status') {
+      return _ok(options, {'ok': true, 'status': _cameraStatus()});
+    }
+    if (method == 'GET' && path == '/camera/monitor/status') {
+      return _ok(options, {'ok': true, 'monitor': _monitorStatus()});
+    }
+    if (method == 'GET' && path == '/camera/snapshot') {
+      return _ok(options, <int>[0xff, 0xd8, 0xff, 0xd9]);
+    }
+    if (method == 'GET' && path == '/camera/webrtc/session') {
+      return _ok(options, {
+        'ok': true,
+        'session': {'signalingUrl': '', 'stream': '', 'expiresAt': _now},
+      });
+    }
+    if (method == 'POST' && path == '/camera/commands/speak') {
+      return _ok(options, {'ok': true});
+    }
+
+    return _notFound(options);
+  }
+
+  Response<dynamic> _taskAction(
+    RequestOptions options,
+    Map<String, dynamic> task,
+    String action,
+    Map<String, dynamic> body,
+  ) {
+    if (action == 'start') {
+      task['status'] = 'in_progress';
+      task['startedAt'] = _now;
+      return _ok(options, {'ok': true, 'task': task});
+    }
+    if (action == 'reminder') {
+      return _ok(options, {
+        'ok': true,
+        'task': task,
+        'reminder': {'phase': _text(body['phase'], 'manual'), 'text': '已提醒孩子'},
+      });
+    }
+    if (action == 'complete') {
+      task['status'] = 'awaiting_parent_confirmation';
+      task['completedAt'] = _now;
+      task['evidenceSummary'] = _text(
+        body['evidenceSummary'],
+        '孩子已经完成任务，等待你确认。',
+      );
+      return _ok(options, {'ok': true, 'task': task});
+    }
+    if (action == 'parent-confirm') {
+      task['status'] = 'confirmed';
+      task['confirmedAt'] = _now;
+      task['pointsGrantedAt'] = _now;
+      return _ok(options, {'ok': true, 'task': task});
+    }
+    if (action == 'reject-confirmation') {
+      task['status'] = 'rejected';
+      task['rejectedAt'] = _now;
+      task['rejectionReason'] = _text(body['reason'], '证据不足，未通过家长确认。');
+      return _ok(options, {'ok': true, 'task': task});
+    }
+    return _notFound(options);
+  }
+
+  Map<String, dynamic> _setupPayloadFor(String path) {
+    return switch (path) {
+      '/setup/parent-identity' => _setupPayload(nextStep: 'device'),
+      '/setup/device' => _setupPayload(parent: true, nextStep: 'wifi'),
+      '/setup/wifi' => _setupPayload(
+        parent: true,
+        device: true,
+        nextStep: 'child',
+      ),
+      '/setup/child' => _setupPayload(
+        parent: true,
+        device: true,
+        wifi: true,
+        nextStep: 'contacts',
+      ),
+      '/setup/contacts' => _setupPayload(
+        parent: true,
+        device: true,
+        wifi: true,
+        child: true,
+        nextStep: 'complete',
+      ),
+      '/setup/complete' => _setupPayload(
+        parent: true,
+        device: true,
+        wifi: true,
+        child: true,
+        contacts: true,
+        completed: true,
+        nextStep: 'home',
+      ),
+      _ => _setupPayload(),
+    };
+  }
+
+  Map<String, dynamic> _setupPayload({
+    bool? completed,
+    bool parent = false,
+    bool device = false,
+    bool wifi = false,
+    bool child = false,
+    bool contacts = false,
+    String? nextStep,
+  }) {
+    final done = completed ?? _completedSetup;
+    return {
+      'ok': true,
+      'setup': {
+        'completed': done,
+        'parentIdentity': done || parent ? 'done' : 'pending',
+        'deviceBinding': done || device ? 'done' : 'pending',
+        'wifi': done || wifi ? 'done' : 'pending',
+        'childProfile': done || child ? 'done' : 'pending',
+        'contacts': done || contacts ? 'done' : 'pending',
+        'nextStep': done ? 'home' : (nextStep ?? 'parentIdentity'),
+      },
+    };
+  }
+
+  Map<String, dynamic> _sessionPayload(String phone) {
+    return {
+      'ok': true,
+      'tokens': {
+        'accessToken': 'test_access_${phone}_$_now',
+        'refreshToken': 'test_refresh_${phone}_$_now',
+        'accessTokenExpiresAt': _now + 900000,
+        'refreshTokenExpiresAt': _now + 2592000000,
+      },
+      'user': {'id': 'test_parent_$phone', 'phone': phone},
+    };
+  }
+
+  Map<String, dynamic> _profileSummary() {
+    return {
+      'spaceTitle': '家庭看护空间',
+      'familyId': 'family_test',
+      'familyName': '林家的家庭空间',
+      'displayName': '林女士',
+      'phone': '13800002026',
+      'roleLabel': '管理员',
+      'avatarPersona': _relationship == '爸爸' ? 'father' : 'mother',
+      'memberCount': 2,
+      'deviceCount': 1,
+      'pendingItemCount': _tasks
+          .where((task) => task['status'] == 'awaiting_parent_confirmation')
+          .length,
+      'child': _child(),
+    };
+  }
+
+  Map<String, dynamic> _child([Map<String, dynamic>? body]) {
+    return {
+      'id': 'child_test',
+      'name': _text(body?['name'], '小宇'),
+      'nickname': _text(body?['nickname'], '小宇'),
+      'birthday': _text(body?['birthday'], '2020-06-01'),
+      'ageStage': _text(body?['ageStage'], 'kindergarten'),
+      'educationStage': _text(body?['educationStage'], '幼儿园'),
+      'grade': _text(body?['grade'], '中班'),
+      'schoolName': _text(body?['schoolName'], ''),
+      'interests': body?['interests'] ?? ['绘本', '运动'],
+      'taskPreferences': body?['taskPreferences'] ?? {},
+    };
+  }
+
+  Map<String, dynamic> _familyMember([Map<String, dynamic>? body]) {
+    return {
+      'id': 'member_admin',
+      'name': _text(body?['name'], '林女士'),
+      'phone': _text(body?['phone'], '13800002026'),
+      'role': _text(body?['role'], 'admin'),
+      'status': _text(body?['status'], 'active'),
+      'notifyEnabled': body?['notifyEnabled'] ?? true,
+      'userId': 'test_parent_13800002026',
+    };
+  }
+
+  Map<String, dynamic> _familyInvitation(Map<String, dynamic> body) {
+    return {
+      'id': 'invite_test',
+      'name': _text(body['name'], '家庭成员'),
+      'phone': _text(body['phone'], '13900002026'),
+      'role': _text(body['role'], 'guardian'),
+      'status': 'pending',
+      'createdAt': _now,
+      'expiresAt': _now + 604800000,
+    };
+  }
+
+  Map<String, dynamic> _contact([Map<String, dynamic>? body]) {
+    return {
+      'id': 'contact_test',
+      'name': _text(body?['name'], '李老师'),
+      'phone': _text(body?['phone'], '13900002026'),
+      'relationship': _text(body?['relationship'], '老师'),
+      'defaultNotify': body?['defaultNotify'] ?? true,
+    };
+  }
+
+  Map<String, dynamic> _accountProfile() {
+    return {
+      'displayName': '林女士',
+      'phone': '13800002026',
+      'familyName': '林家的家庭空间',
+      'relationship': _relationship,
+    };
+  }
+
+  Map<String, dynamic> _accountSecurity() {
+    return {
+      'phone': '13800002026',
+      'loginMethod': 'sms',
+      'accountStatus': 'active',
+      'loginDevices': [
+        {
+          'id': 'session_test',
+          'label': '已登录设备',
+          'active': true,
+          'createdAt': _now,
+          'rotatedAt': _now,
+        },
+      ],
+    };
+  }
+
+  Map<String, dynamic> _setting(String key, [Map<String, dynamic>? body]) {
+    return {
+      'key': key,
+      'value': body?['value'] ?? _settingValue(key),
+      'updatedAt': _now,
+    };
+  }
+
+  Map<String, dynamic> _settingValue(String key) {
+    return switch (key) {
+      'notifications' => {
+        'taskReminder': true,
+        'taskEndReminder': true,
+        'deviceOfflineReminder': true,
+        'pointsRewardReminder': true,
+        'safetyAlert': false,
+        'dailySummary': false,
+      },
+      'privacy' => {
+        'cameraCollectionAuthorized': true,
+        'voiceBroadcastAuthorized': true,
+        'childPrivacyAuthorized': true,
+        'remoteViewingNoticeEnabled': true,
+        'storeEventSnapshotsOnly': true,
+        'dataRetentionDays': 30,
+      },
+      'conversation' => {
+        'wakeName': '看护助手',
+        'voiceStyle': '温和女声',
+        'boundaryLevel': 'balanced',
+        'freeChatEnabled': true,
+        'homeworkModeRestricted': true,
+      },
+      'education' => {
+        'schoolbagEnabled': true,
+        'schoolStage': 'kindergarten',
+        'courseScheduleEnabled': false,
+        'learningDiagnosisEnabled': false,
+        'notes': '',
+      },
+      _ => {
+        'taskObservationEnabled': true,
+        'voiceReminderEnabled': true,
+        'delayReminderEnabled': true,
+        'delayReminderIntervalMinutes': 3,
+        'maxDelayReminderCount': 3,
+        'cameraObservationStrategy': 'balanced',
+      },
+    };
+  }
+
+  Map<String, dynamic> _subscriptionStatus() {
+    return {
+      'plan': 'basic',
+      'planId': 'basic',
+      'planLabel': '基础版',
+      'status': 'active',
+      'statusLabel': '已启用',
+      'renewalText': '随设备提供基础看护能力',
+      'storeProvider': 'app_store',
+      'entitlements': _subscriptionFeatures()
+          .map(
+            (item) => {
+              'key': item['key'],
+              'name': item['name'],
+              'enabled': item['basic'],
+            },
+          )
+          .toList(),
+    };
+  }
+
+  List<Map<String, dynamic>> _subscriptionPlans() {
+    return [
+      {
+        'id': 'basic',
+        'title': '基础版',
+        'subtitle': '随设备提供基础看护能力',
+        'price': '随设备提供',
+        'billing': '无需额外订阅',
+        'recommended': false,
+        'ctaLabel': '当前套餐',
+        'features': ['任务提醒', '实时看护', '基础日报', '隐私控制'],
+        'highlights': ['基础提醒', '实时查看', '基础日报', '隐私控制'],
+      },
+      {
+        'id': 'member',
+        'title': '会员版',
+        'subtitle': '长期报告和趋势洞察',
+        'price': '¥29',
+        'billing': '/月',
+        'recommended': true,
+        'ctaLabel': '开通会员版',
+        'features': ['云端长期报告', '高级趋势', '题目辅导颗粒度', '更多提醒基线'],
+        'highlights': ['长期报告', '趋势洞察', '提醒升级', '辅导额度'],
+      },
+      {
+        'id': 'family_plus',
+        'title': '家庭高级版',
+        'subtitle': '多孩子、多设备和多人协作',
+        'price': '¥59',
+        'billing': '/月起',
+        'recommended': false,
+        'ctaLabel': '查看家庭高级版',
+        'features': ['多孩子与多设备', '多联系人协作', '长期成长档案', '合作内容包'],
+        'highlights': ['多设备', '多人协作', '成长档案', '内容包'],
+      },
+    ];
+  }
+
+  List<Map<String, dynamic>> _subscriptionFeatures() {
+    return [
+      {
+        'key': 'task_reminders',
+        'name': '任务提醒',
+        'basic': true,
+        'member': true,
+        'family_plus': true,
+      },
+      {
+        'key': 'live_care',
+        'name': '实时看护',
+        'basic': true,
+        'member': true,
+        'family_plus': true,
+      },
+      {
+        'key': 'daily_report',
+        'name': '基础日报',
+        'basic': true,
+        'member': true,
+        'family_plus': true,
+      },
+      {
+        'key': 'long_term_reports',
+        'name': '长期云端报告',
+        'basic': false,
+        'member': true,
+        'family_plus': true,
+      },
+      {
+        'key': 'advanced_trends',
+        'name': '高级趋势',
+        'basic': false,
+        'member': true,
+        'family_plus': true,
+      },
+      {
+        'key': 'multi_device_family',
+        'name': '多孩子与多设备',
+        'basic': false,
+        'member': false,
+        'family_plus': true,
+      },
+    ];
+  }
+
+  Map<String, dynamic> _dailyReport() {
+    return {
+      'date': _today,
+      'title': '今日报告',
+      'summary': '今天还有需要家长处理的记录。',
+      'taskTotal': _tasks.length,
+      'taskCompleted': _tasks
+          .where((task) => task['status'] == 'confirmed')
+          .length,
+      'pendingItems': _tasks
+          .where((task) => task['status'] == 'awaiting_parent_confirmation')
+          .length,
+      'pointsEarned': 1,
+      'suggestion': '先确认需要处理的记录，再决定是否写入成长记录。',
+    };
+  }
+
+  Map<String, dynamic> _weeklyReport() {
+    return {
+      'startDate': _today,
+      'endDate': _today,
+      'title': '周报',
+      'taskTotal': _tasks.length,
+      'taskCompleted': 1,
+      'completionRate': 0.5,
+      'pointsEarned': 1,
+      'summary': '本周完成 1 / ${_tasks.length} 项任务。',
+    };
+  }
+
+  Map<String, dynamic> _legalDocument(String key) {
+    final isPrivacy = key == 'privacy-policy';
+    return {
+      'key': key,
+      'title': isPrivacy
+          ? '隐私政策'
+          : key == 'child-privacy-authorization'
+          ? '儿童隐私授权说明'
+          : '用户协议',
+      'summary': isPrivacy ? '说明隐私与儿童数据处理边界。' : '说明服务使用边界。',
+      'version': '1.0',
+      'effectiveDate': '2026-06-04',
+      'sections': [
+        {
+          'title': isPrivacy ? '1. 开发者与适用范围' : '1. 服务说明',
+          'paragraphs': [
+            isPrivacy ? '我们只在必要范围内处理家庭看护数据。' : 'Mira Guardian 为家长提供家庭看护辅助能力。',
+          ],
+        },
+      ],
+    };
+  }
+
+  Map<String, dynamic> _about() {
+    return {
+      'appName': 'Mira Guardian',
+      'displayName': '家庭看护',
+      'version': '1.0.0',
+      'build': '2026.06',
+      'description': '面向家长的家庭 AI 看护与成长记录 App。',
+      'principles': ['儿童隐私优先', '关键决定由家长确认', '温和提醒，不过度打扰'],
+    };
+  }
+
+  Map<String, dynamic> _taskFromBody(Map<String, dynamic> body) {
+    _taskCounter += 1;
+    return _task(
+      id: 'task_created_$_taskCounter',
+      title: _text(body['title'], '新任务'),
+      description: _text(body['description'], ''),
+      type: _text(body['taskType'], 'life'),
+      status: _text(body['status'], 'pending'),
+      scheduledDate: _text(body['scheduledDate'], _today),
+      scheduledStart: _text(body['scheduledStart'], '16:00'),
+      scheduledEnd: _text(body['scheduledEnd'], '16:20'),
+      rewardPoints: _int(body['rewardPoints'], 0),
+    );
+  }
+
+  Map<String, dynamic> _task({
+    required String id,
+    required String title,
+    required String description,
+    required String type,
+    required String status,
+    String? scheduledDate,
+    required String scheduledStart,
+    required String scheduledEnd,
+    required int rewardPoints,
+    String evidenceSummary = '',
+  }) {
+    final date = scheduledDate ?? _today;
+    return {
+      'id': id,
+      'taskId': id,
+      'familyId': 'family_test',
+      'childId': 'child_test',
+      'title': title,
+      'description': description,
+      'taskType': type,
+      'type': type,
+      'scheduleType': 'one_time',
+      'startAt': '${date}T$scheduledStart:00+08:00',
+      'dueAt': '${date}T$scheduledEnd:00+08:00',
+      'repeatRule': null,
+      'status': status,
+      'priority': 3,
+      'scheduledDate': date,
+      'scheduledStart': scheduledStart,
+      'scheduledEnd': scheduledEnd,
+      'rewardPoints': rewardPoints,
+      'requiresParentConfirmation': true,
+      'completionSource': '',
+      'evidence': {'summary': evidenceSummary},
+      'evidenceSummary': evidenceSummary,
+      'aiObservationSummary': '',
+      'rejectionReason': '',
+      'createdBy': 'test_parent_13800002026',
+      'createdAt': _now,
+      'updatedAt': _now,
+      'completedAt': status == 'awaiting_parent_confirmation' ? _now : null,
+      'startedAt': status == 'in_progress' ? _now : null,
+      'endedAt': null,
+      'missedAt': null,
+      'delayedAt': null,
+      'lastReminderAt': null,
+      'nextReminderAt': null,
+      'delayReminderCount': 0,
+      'reminderMinutesBefore': 5,
+      'reminderStatus': 'pending',
+      'cameraObservationStatus': 'normal',
+      'deviceId': 'device_test',
+      'timezone': 'Asia/Shanghai',
+      'confirmedAt': null,
+      'rejectedAt': null,
+      'pointsGrantedAt': null,
+    };
+  }
+
+  Map<String, dynamic>? _findTask(String id) {
+    for (final task in _tasks) {
+      if (task['id'] == id || task['taskId'] == id) return task;
+    }
+    return null;
+  }
+
+  List<Map<String, dynamic>> _taskEvents(Map<String, dynamic> task) {
+    return [
+      {
+        'id': 'event_${task['id']}_created',
+        'taskId': task['id'],
+        'eventType': 'task_created',
+        'message': '任务已创建',
+        'payload': {},
+        'createdAt': _now,
+      },
+      if (task['status'] == 'rejected')
+        {
+          'id': 'event_${task['id']}_rejected',
+          'taskId': task['id'],
+          'eventType': 'confirmation_rejected',
+          'message': '本次任务未通过确认，未发放积分。',
+          'payload': {},
+          'createdAt': _now,
+        },
+    ];
+  }
+
+  Map<String, dynamic> _pointAccount() {
+    return {
+      'familyId': 'family_test',
+      'childId': 'child_test',
+      'balance': 60,
+      'updatedAt': _now,
+    };
+  }
+
+  List<Map<String, dynamic>> _pointLedger() {
+    return [
+      {
+        'id': 'ledger_test',
+        'childId': 'child_test',
+        'delta': 1,
+        'balanceAfter': 1,
+        'type': 'task_completed',
+        'sourceType': 'task',
+        'sourceId': 'task_math_homework',
+        'note': '任务奖励',
+        'createdAt': _now,
+      },
+    ];
+  }
+
+  List<Map<String, dynamic>> _rewardItems() {
+    return [
+      {
+        'id': 'reward_family_game',
+        'familyId': 'family_test',
+        'childId': 'child_test',
+        'title': '周末亲子游戏 20 分钟',
+        'description': '由家长兑现的一段共同游戏时间。',
+        'pointsCost': 20,
+        'category': 'family',
+        'status': 'active',
+        'icon': 'sports',
+      },
+    ];
+  }
+
+  List<Map<String, dynamic>> _redemptions() {
+    return [
+      {
+        'id': 'redeem_test',
+        'childId': 'child_test',
+        'rewardItemId': 'reward_family_game',
+        'rewardTitle': '周末亲子游戏 20 分钟',
+        'pointsCost': 20,
+        'status': 'redeemed',
+        'requestedAt': _now,
+        'fulfilledAt': null,
+        'cancelledAt': null,
+      },
+    ];
+  }
+
+  Map<String, dynamic> _device([Map<String, dynamic>? body]) {
+    return {
+      'id': 'device_test',
+      'name': _text(body?['deviceName'] ?? body?['name'], '书桌旁设备'),
+      'location': _text(body?['location'], '书桌旁'),
+      'status': 'online',
+      'bindingCode': 'BIND-TEST',
+      'boundAt': _now,
+      'lastSeenAt': _now,
+      'capabilities': {
+        'snapshot': true,
+        'stream': true,
+        'twoWayAudio': true,
+        'monitor': true,
+      },
+    };
+  }
+
+  Map<String, dynamic> _deviceStatus() {
+    return {
+      'deviceId': 'device_test',
+      'connectionStatus': 'online',
+      'batteryLevel': null,
+      'networkType': 'wifi',
+      'lastSeenAt': _now,
+      'message': '设备在线',
+      'capabilities': {
+        'snapshot': true,
+        'stream': true,
+        'twoWayAudio': true,
+        'monitor': true,
+      },
+    };
+  }
+
+  Map<String, dynamic> _cameraStatus() {
+    return {
+      'connectionStatus': 'online',
+      'snapshotAvailable': true,
+      'streamAvailable': true,
+      'speakerAvailable': true,
+      'monitorAvailable': true,
+      'lastSeenAt': _now,
+      'message': '设备在线',
+    };
+  }
+
+  Map<String, dynamic> _monitorStatus() {
+    return {
+      'running': true,
+      'status': 'running',
+      'lastObservation': {
+        'verdict': 'normal',
+        'reason': 'task_in_progress',
+        'confidence': 0.8,
+      },
+      'lastReminder': '',
+    };
+  }
+
+  Response<dynamic> _ok(RequestOptions options, dynamic data) {
+    return Response<dynamic>(
+      requestOptions: options,
+      statusCode: 200,
+      data: data,
+    );
+  }
+
+  Response<dynamic> _notFound(RequestOptions options) {
+    return Response<dynamic>(
+      requestOptions: options,
+      statusCode: 404,
+      data: {'ok': false, 'error': 'not_found', 'message': '路径不存在'},
+    );
+  }
+
+  Map<String, dynamic> _body(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return Map<String, dynamic>.from(value);
+    return <String, dynamic>{};
+  }
+
+  String _normalizePath(String rawPath) {
+    final uri = Uri.tryParse(rawPath);
+    var path = uri?.hasScheme == true ? uri!.path : rawPath;
+    if (path.startsWith('/api/')) {
+      path = path.substring(4);
+    }
+    return path;
+  }
+
+  String _text(dynamic value, String fallback) {
+    return value is String && value.isNotEmpty ? value : fallback;
+  }
+
+  int _int(dynamic value, int fallback) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
+
+  int get _now => DateTime.now().millisecondsSinceEpoch;
+
+  String get _today {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
 }

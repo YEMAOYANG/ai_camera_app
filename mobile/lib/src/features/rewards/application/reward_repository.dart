@@ -1,12 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
 
 final rewardRepositoryProvider = Provider<RewardRepository>((ref) {
   return RewardRepository(
-    environment: ref.watch(appEnvironmentProvider),
     apiClient: ref.watch(apiClientProvider),
   );
 });
@@ -41,23 +39,11 @@ class RewardException implements Exception {
 }
 
 class RewardRepository {
-  RewardRepository({
-    required AppEnvironment environment,
-    required ApiClient apiClient,
-  }) : _environment = environment,
-       _apiClient = apiClient {
-    _mockItems = _buildMockItems();
-    _mockRedemptions = _buildMockRedemptions();
-  }
+  RewardRepository({required ApiClient apiClient}) : _apiClient = apiClient;
 
-  final AppEnvironment _environment;
   final ApiClient _apiClient;
-  late List<RewardItem> _mockItems;
-  late List<RewardRedemption> _mockRedemptions;
 
   Future<List<RewardItem>> items({String? childId}) async {
-    if (_environment.useMockData) return _mockItems;
-
     try {
       final response = await _apiClient.get(
         '/rewards/items',
@@ -72,13 +58,6 @@ class RewardRepository {
   }
 
   Future<RewardItem> item(String itemId) async {
-    if (_environment.useMockData) {
-      return _mockItems.firstWhere(
-        (item) => item.id == itemId,
-        orElse: () => _mockItems.first,
-      );
-    }
-
     try {
       final response = await _apiClient.get('/rewards/items/$itemId');
       return RewardItem.fromJson(_asMap(_asMap(response.data)['item']));
@@ -88,8 +67,6 @@ class RewardRepository {
   }
 
   Future<List<RewardRedemption>> redemptions({String? childId}) async {
-    if (_environment.useMockData) return _mockRedemptions;
-
     try {
       final response = await _apiClient.get(
         '/rewards/redemptions',
@@ -121,17 +98,6 @@ class RewardRepository {
       'category': category,
       'icon': icon,
     };
-    if (_environment.useMockData) {
-      final item = RewardItem.fromJson({
-        'id': 'reward_mock_${DateTime.now().millisecondsSinceEpoch}',
-        'familyId': 'mock_family',
-        ...body,
-        'status': 'active',
-      });
-      _mockItems = [item, ..._mockItems];
-      return item;
-    }
-
     try {
       final response = await _apiClient.post('/rewards/items', data: body);
       return RewardItem.fromJson(_asMap(_asMap(response.data)['item']));
@@ -155,25 +121,6 @@ class RewardRepository {
       'category': category,
       'icon': icon,
     };
-    if (_environment.useMockData) {
-      final index = _mockItems.indexWhere((item) => item.id == itemId);
-      if (index < 0) return _mockItems.first;
-      final current = _mockItems[index];
-      final item = RewardItem(
-        id: current.id,
-        familyId: current.familyId,
-        childId: current.childId,
-        title: title,
-        description: description ?? current.description,
-        pointsCost: pointsCost,
-        category: category ?? current.category,
-        status: current.status,
-        icon: icon ?? current.icon,
-      );
-      _mockItems = [..._mockItems]..[index] = item;
-      return item;
-    }
-
     try {
       final response = await _apiClient.patch(
         '/rewards/items/$itemId',
@@ -186,10 +133,6 @@ class RewardRepository {
   }
 
   Future<void> deleteItem(String itemId) async {
-    if (_environment.useMockData) {
-      _mockItems = _mockItems.where((item) => item.id != itemId).toList();
-      return;
-    }
     try {
       await _apiClient.delete('/rewards/items/$itemId');
     } on DioException catch (error) {
@@ -198,23 +141,6 @@ class RewardRepository {
   }
 
   Future<RewardRedemption> createRedemption(String rewardItemId) async {
-    if (_environment.useMockData) {
-      final item = await this.item(rewardItemId);
-      final redemption = RewardRedemption(
-        id: 'redemption_mock_${DateTime.now().millisecondsSinceEpoch}',
-        childId: item.childId,
-        rewardItemId: item.id,
-        rewardTitle: item.title,
-        pointsCost: item.pointsCost,
-        status: RedemptionStatus.redeemed,
-        requestedAt: DateTime.now().millisecondsSinceEpoch,
-        fulfilledAt: null,
-        cancelledAt: null,
-      );
-      _mockRedemptions = [redemption, ..._mockRedemptions];
-      return redemption;
-    }
-
     try {
       final response = await _apiClient.post(
         '/rewards/redemptions',
@@ -229,23 +155,6 @@ class RewardRepository {
   }
 
   Future<RewardRedemption> fulfillRedemption(String redemptionId) async {
-    if (_environment.useMockData) {
-      return _updateMockRedemption(
-        redemptionId,
-        (redemption) => RewardRedemption(
-          id: redemption.id,
-          childId: redemption.childId,
-          rewardItemId: redemption.rewardItemId,
-          rewardTitle: redemption.rewardTitle,
-          pointsCost: redemption.pointsCost,
-          status: RedemptionStatus.fulfilled,
-          requestedAt: redemption.requestedAt,
-          fulfilledAt: DateTime.now().millisecondsSinceEpoch,
-          cancelledAt: redemption.cancelledAt,
-        ),
-      );
-    }
-
     try {
       final response = await _apiClient.post(
         '/rewards/redemptions/$redemptionId/fulfill',
@@ -259,23 +168,6 @@ class RewardRepository {
   }
 
   Future<RewardRedemption> cancelRedemption(String redemptionId) async {
-    if (_environment.useMockData) {
-      return _updateMockRedemption(
-        redemptionId,
-        (redemption) => RewardRedemption(
-          id: redemption.id,
-          childId: redemption.childId,
-          rewardItemId: redemption.rewardItemId,
-          rewardTitle: redemption.rewardTitle,
-          pointsCost: redemption.pointsCost,
-          status: RedemptionStatus.cancelled,
-          requestedAt: redemption.requestedAt,
-          fulfilledAt: redemption.fulfilledAt,
-          cancelledAt: DateTime.now().millisecondsSinceEpoch,
-        ),
-      );
-    }
-
     try {
       final response = await _apiClient.post(
         '/rewards/redemptions/$redemptionId/cancel',
@@ -286,19 +178,6 @@ class RewardRepository {
     } on DioException catch (error) {
       throw _fromDio(error);
     }
-  }
-
-  RewardRedemption _updateMockRedemption(
-    String redemptionId,
-    RewardRedemption Function(RewardRedemption redemption) update,
-  ) {
-    final index = _mockRedemptions.indexWhere(
-      (redemption) => redemption.id == redemptionId,
-    );
-    if (index < 0) return _mockRedemptions.first;
-    final next = update(_mockRedemptions[index]);
-    _mockRedemptions = [..._mockRedemptions]..[index] = next;
-    return next;
   }
 
   RewardException _fromDio(DioException error) {
@@ -315,58 +194,6 @@ class RewardRepository {
     }
     return const RewardException('奖励数据暂时不可用，请稍后重试。', code: 'network_error');
   }
-}
-
-List<RewardItem> _buildMockItems() {
-  return [
-    {
-      'id': 'reward-family-game',
-      'familyId': 'mock_family',
-      'childId': 'mock_child',
-      'title': '周末亲子游戏 20 分钟',
-      'description': '由家长兑现，适合作业和睡前任务稳定完成后兑换。',
-      'pointsCost': 10,
-      'category': 'family',
-      'status': 'active',
-      'icon': 'game',
-    },
-    {
-      'id': 'reward-story',
-      'familyId': 'mock_family',
-      'childId': 'mock_child',
-      'title': '睡前故事加一篇',
-      'description': '温和的小奖励，不把屏幕时间作为默认激励。',
-      'pointsCost': 6,
-      'category': 'bedtime',
-      'status': 'active',
-      'icon': 'book',
-    },
-    {
-      'id': 'reward-park',
-      'familyId': 'mock_family',
-      'childId': 'mock_child',
-      'title': '周末公园选择权',
-      'description': '让孩子选择一次家庭活动路线。',
-      'pointsCost': 18,
-      'category': 'outing',
-      'status': 'active',
-      'icon': 'park',
-    },
-  ].map(RewardItem.fromJson).toList();
-}
-
-List<RewardRedemption> _buildMockRedemptions() {
-  return [
-    {
-      'id': 'redemption_mock_board_game',
-      'childId': 'mock_child',
-      'rewardItemId': 'reward-family-game',
-      'rewardTitle': '周末亲子游戏 20 分钟',
-      'pointsCost': 10,
-      'status': 'redeemed',
-      'requestedAt': DateTime.now().millisecondsSinceEpoch - 1000 * 60 * 40,
-    },
-  ].map(RewardRedemption.fromJson).toList();
 }
 
 Map<String, dynamic> _asMap(dynamic value) {

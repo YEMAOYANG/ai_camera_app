@@ -46,28 +46,6 @@ class FirmwareRepository:
             )
 
     def list_packages(self, conn: DatabaseConnection) -> list[DatabaseRow]:
-        rows = list(
-            conn.execute(
-                "SELECT * FROM firmware_packages WHERE status = ? ORDER BY created_at DESC",
-                (FIRMWARE_PACKAGE_ACTIVE,),
-            ).fetchall()
-        )
-        if rows:
-            return rows
-        conn.execute(
-            """
-            INSERT INTO firmware_packages(id, version, channel, status, notes, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            (
-                "fw_dev_0_1_0",
-                "0.1.0-dev",
-                "dev",
-                FIRMWARE_PACKAGE_ACTIVE,
-                "V1 boundary package for mock OTA status only.",
-                0,
-            ),
-        )
         return list(
             conn.execute(
                 "SELECT * FROM firmware_packages WHERE status = ? ORDER BY created_at DESC",

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
@@ -80,8 +82,12 @@ class AppBottomSheetFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-    final maxHeight =
-        MediaQuery.sizeOf(context).height * maxHeightFactor.clamp(0.32, 0.94);
+    final size = MediaQuery.sizeOf(context);
+    final viewPadding = MediaQuery.viewPaddingOf(context);
+    final topGap = viewPadding.top + 12;
+    final availableHeight = math.max(280.0, size.height - bottomInset - topGap);
+    final preferredHeight = size.height * maxHeightFactor.clamp(0.32, 0.94);
+    final maxHeight = math.min(preferredHeight, availableHeight);
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: SafeArea(

@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/app/router/app_router.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/mvp/application/mvp_mock_provider.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/application/task_realtime_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/presentation/tasks_screen.dart';
@@ -62,11 +62,27 @@ class AppShell extends ConsumerWidget {
 
   Future<void> _openTaskSheet(BuildContext context, WidgetRef ref) async {
     String? childId;
+    var childAgeGroup = TaskAgeGroup.preschool;
     try {
-      childId = (await ref.read(pointsSummaryProvider.future)).account.childId;
+      final summary = await ref.read(profileSummaryProvider.future);
+      final child = summary.child;
+      if (child != null) {
+        childId = child.id.isNotEmpty ? child.id : null;
+        childAgeGroup = taskAgeGroupForChild(
+          stage: child.educationStage.isNotEmpty
+              ? child.educationStage
+              : child.ageStage,
+          grade: child.grade,
+        );
+      }
     } catch (_) {
       childId = null;
     }
+    try {
+      childId ??= (await ref.read(
+        pointsSummaryProvider.future,
+      )).account.childId;
+    } catch (_) {}
     if (childId == null || childId.isEmpty) {
       try {
         final tasks = await ref.read(taskListProvider.future);
@@ -113,15 +129,11 @@ class AppShell extends ConsumerWidget {
     }
     if (!context.mounted) return;
 
-    final snapshot = ref.read(guardianMvpSnapshotProvider);
     final savedDate = await showTaskFormSheet(
       context,
       childId: resolvedChildId,
       initialDate: selectedDate,
-      childAgeGroup: taskAgeGroupForChild(
-        stage: snapshot.child.stage,
-        grade: snapshot.child.grade,
-      ),
+      childAgeGroup: childAgeGroup,
       onSavedProgress: () =>
           _invalidateTaskLists(ref, resolvedChildId, selectedDate),
       existingTasks: existingTasks ?? const [],
@@ -358,7 +370,7 @@ class _BottomNavItem extends StatelessWidget {
           onTap: onTap,
           splashColor: Colors.transparent,
           child: SizedBox(
-            height: 48,
+            height: 50,
             child: Center(
               child: AnimatedOpacity(
                 opacity: selected ? 1 : 0.88,
@@ -369,6 +381,7 @@ class _BottomNavItem extends StatelessWidget {
                   duration: duration,
                   curve: Curves.easeOutCubic,
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       AnimatedSwitcher(
@@ -397,19 +410,19 @@ class _BottomNavItem extends StatelessWidget {
                             return Icon(
                               selected ? route.selectedIcon : route.icon,
                               color: color,
-                              size: selected ? 22 : 21,
+                              size: selected ? 21 : 20,
                             );
                           },
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       AnimatedDefaultTextStyle(
                         duration: duration,
                         curve: Curves.easeOutCubic,
                         style: TextStyle(
                           color: foreground,
                           fontFamily: AppTypography.systemFont,
-                          fontSize: 10.8,
+                          fontSize: 10.4,
                           fontWeight: selected
                               ? FontWeight.w700
                               : FontWeight.w600,

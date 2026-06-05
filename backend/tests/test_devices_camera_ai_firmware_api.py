@@ -6,6 +6,8 @@ import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from app import create_app
+from core.database import Database
+from models.firmware import FIRMWARE_PACKAGE_ACTIVE
 from tests.support import fresh_test_config, request_debug_code
 
 
@@ -243,17 +245,23 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         ids = {(item["id"], item["version"]) for item in prompts.json["prompts"]}
         self.assertIn(("task.observation.summary", "v1"), ids)
 
-    def test_firmware_status_packages_and_mock_job(self):
+    def test_firmware_status_packages_and_job(self):
         status = self.client.get(
             f"/api/firmware/devices/{self.device_id}/status",
             headers=self._auth_headers(),
         )
         self.assertEqual(status.status_code, 200)
-        self.assertEqual(status.json["firmware"]["execution"], "reserved_boundary_only")
+        self.assertEqual(status.json["firmware"]["execution"], "not_configured")
+        self.assertFalse(status.json["firmware"]["updateAvailable"])
 
         packages = self.client.get("/api/firmware/packages", headers=self._auth_headers())
         self.assertEqual(packages.status_code, 200)
-        self.assertGreaterEqual(len(packages.json["packages"]), 1)
+        self.assertEqual(packages.json["packages"], [])
+
+        self._create_firmware_package("fw_2026_06", "2026.06.1")
+        packages = self.client.get("/api/firmware/packages", headers=self._auth_headers())
+        self.assertEqual(packages.status_code, 200)
+        self.assertEqual(len(packages.json["packages"]), 1)
         package_id = packages.json["packages"][0]["id"]
 
         job = self.client.post(
@@ -263,13 +271,14 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         )
         self.assertEqual(job.status_code, 200)
         self.assertEqual(job.json["job"]["status"], "scheduled")
-        self.assertEqual(job.json["execution"], "reserved_boundary_only")
+        self.assertEqual(job.json["execution"], "scheduled")
 
         status_after = self.client.get(
             f"/api/firmware/devices/{self.device_id}/status",
             headers=self._auth_headers(),
         )
         self.assertEqual(status_after.status_code, 200)
+        self.assertEqual(status_after.json["firmware"]["execution"], "available")
         self.assertEqual(status_after.json["firmware"]["lastJob"]["id"], job.json["job"]["id"])
 
     def _login(self) -> str:
@@ -289,6 +298,24 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         return response.json["device"]["id"]
+
+    def _create_firmware_package(self, package_id: str, version: str) -> None:
+        database = Database(self.app.config["DATABASE_URL"])
+        with database.transaction() as conn:
+            conn.execute(
+                """
+                INSERT INTO firmware_packages(id, version, channel, status, notes, created_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    package_id,
+                    version,
+                    "stable",
+                    FIRMWARE_PACKAGE_ACTIVE,
+                    "测试固件包",
+                    1,
+                ),
+            )
 
     def _auth_headers(self) -> dict:
         return {"Authorization": f"Bearer {self.access_token}"}

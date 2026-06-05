@@ -229,7 +229,8 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
 
         about = self.client.get("/api/app/about")
         self.assertEqual(about.status_code, 200)
-        self.assertEqual(about.json["about"]["appName"], "家庭看护")
+        self.assertEqual(about.json["about"]["appName"], "Mira Guardian")
+        self.assertEqual(about.json["about"]["displayName"], "家庭看护")
 
         subscription = self.client.get("/api/subscription/status", headers=self._auth_headers())
         self.assertEqual(subscription.status_code, 200)
@@ -262,7 +263,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
 
         restore = self.client.post("/api/subscriptions/restore", headers=self._auth_headers())
         self.assertEqual(restore.status_code, 200)
-        self.assertEqual(restore.json["restore"]["status"], "no_previous_purchase")
+        self.assertEqual(restore.json["restore"]["status"], "no_purchase_record")
 
         daily = self.client.get("/api/reports/daily", headers=self._auth_headers())
         weekly = self.client.get("/api/reports/weekly", headers=self._auth_headers())

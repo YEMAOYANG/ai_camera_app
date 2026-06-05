@@ -33,11 +33,11 @@ class FirmwareService:
                 "ok": True,
                 "device": device_payload(device),
                 "firmware": {
-                    "currentVersion": "0.1.0-dev",
-                    "updateAvailable": False,
+                    "currentVersion": device.get("firmware_version") or "",
+                    "updateAvailable": bool(packages),
                     "latestPackage": firmware_package_payload(packages[0]) if packages else None,
                     "lastJob": firmware_job_payload(latest_job) if latest_job else None,
-                    "execution": "reserved_boundary_only",
+                    "execution": "available" if packages else "not_configured",
                 },
             }
             return payload
@@ -68,7 +68,7 @@ class FirmwareService:
             return {
                 "ok": True,
                 "job": firmware_job_payload(job),
-                "execution": "reserved_boundary_only",
+                "execution": "scheduled",
             }
 
     def _auth_context(self, access_token: str) -> dict:
