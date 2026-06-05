@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mira_guardian_app/src/core/config/app_environment.dart';
-import 'package:mira_guardian_app/src/core/storage/auth_session_store.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
 
 final taskRealtimeProvider = StreamProvider.autoDispose<TaskRealtimeEvent>((
   ref,

@@ -204,7 +204,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
 
         offer = client.post(
             "/api/camera/webrtc/offer",
-            json={"sdp": "v=0\r\ns=Mira Test Offer\r\n"},
+            json={"sdp": "v=0\r\ns=Camera Test Offer\r\n"},
             headers={"Authorization": f"Bearer {login.json['tokens']['accessToken']}"},
         )
         self.assertEqual(offer.status_code, 200)
@@ -284,7 +284,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
     def _create_device(self) -> str:
         response = self.client.post(
             "/api/setup/device",
-            json={"bindingCode": "MIRA-BOUNDARY", "deviceName": "客厅米拉", "location": "客厅"},
+            json={"bindingCode": "BIND-BOUNDARY", "deviceName": "客厅设备", "location": "客厅"},
             headers=self._auth_headers(),
         )
         self.assertEqual(response.status_code, 200)

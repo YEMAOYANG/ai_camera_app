@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
-import 'package:mira_guardian_app/src/features/rewards/application/reward_repository.dart';
-import 'package:mira_guardian_app/src/features/rewards/domain/reward_models.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
+import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class RewardsScreen extends ConsumerWidget {
   const RewardsScreen({super.key});
@@ -20,7 +20,7 @@ class RewardsScreen extends ConsumerWidget {
     final summary = ref.watch(rewardsSummaryProvider);
     final points = ref.watch(pointsSummaryProvider);
 
-    return MiraScreen(
+    return AppScreen(
       title: '奖励',
       subtitle: '奖励项、兑换和兑现记录',
       fixedHeader: true,
@@ -29,13 +29,13 @@ class RewardsScreen extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          MiraIconButton(
+          AppIconButton(
             icon: Icons.add,
             label: '新增奖励',
             onTap: () => context.push(rewardEditPath),
           ),
           const SizedBox(width: 8),
-          MiraIconButton(
+          AppIconButton(
             icon: Icons.stars_outlined,
             label: '积分',
             onTap: () => context.go(pointsPath),
@@ -53,8 +53,8 @@ class RewardsScreen extends ConsumerWidget {
           ],
           loading: () => const [_RewardsLoading()],
           error: (error, _) => [
-            MiraStateView(
-              variant: MiraStateVariant.serviceUnavailable,
+            AppStateView(
+              variant: AppStateVariant.serviceUnavailable,
               title: '奖励暂时没有更新',
               message: error is RewardException ? error.message : '请稍后重试。',
               primaryActionLabel: '重新加载',
@@ -74,7 +74,7 @@ class _RewardBalancePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
+    return AppSurface(
       color: AppColors.ink,
       borderColor: AppColors.ink,
       radius: 24,
@@ -176,37 +176,37 @@ class _RewardItemsPanel extends StatelessWidget {
         .where((item) => item.status != 'archived')
         .toList();
     if (activeItems.isEmpty) {
-      return const MiraStateView(
-        variant: MiraStateVariant.emptyRewards,
+      return const AppStateView(
+        variant: AppStateVariant.emptyRewards,
         title: '还没有奖励项',
         message: '家长添加奖励后，孩子可以用完成任务获得的积分来兑换。',
         compact: true,
       );
     }
 
-    return MiraSurface(
+    return AppSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _PanelTitle('奖励商店'),
           const SizedBox(height: 8),
           for (final item in activeItems)
-            MiraListRow(
+            AppListRow(
               icon: _iconForReward(item),
               title: item.title,
               subtitle: item.description.isEmpty
                   ? '${item.pointsCost} 分兑换'
                   : '${item.description} · ${item.pointsCost} 分',
-              tone: MiraListRowTone.blue,
+              tone: AppListRowTone.blue,
               trailing: StatusChip(label: item.statusLabel),
               onTap: () => context.go('$rewardDetailPath/${item.id}'),
             ),
           const SizedBox(height: 10),
-          MiraListRow(
+          AppListRow(
             icon: Icons.add_circle_outline,
             title: '添加奖励',
             subtitle: '家长可以创建新的兑换目标',
-            tone: MiraListRowTone.green,
+            tone: AppListRowTone.green,
             onTap: () => context.push(rewardEditPath),
           ),
         ],
@@ -232,31 +232,31 @@ class _RedemptionsPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (redemptions.isEmpty) {
-      return const MiraStateView(
-        variant: MiraStateVariant.emptyRewards,
+      return const AppStateView(
+        variant: AppStateVariant.emptyRewards,
         title: '还没有兑换记录',
         message: '兑换奖励后，兑现进度会在这里清楚展示。',
         compact: true,
       );
     }
 
-    return MiraSurface(
+    return AppSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _PanelTitle('兑换记录'),
           const SizedBox(height: 8),
           for (final redemption in redemptions)
-            MiraListRow(
+            AppListRow(
               icon: Icons.redeem_outlined,
               title: redemption.rewardTitle,
               subtitle:
                   '${redemption.pointsCost} 分 · ${redemption.status.label}',
               tone: redemption.status == RedemptionStatus.fulfilled
-                  ? MiraListRowTone.green
+                  ? AppListRowTone.green
                   : redemption.status == RedemptionStatus.cancelled
-                  ? MiraListRowTone.neutral
-                  : MiraListRowTone.amber,
+                  ? AppListRowTone.neutral
+                  : AppListRowTone.amber,
               trailing: redemption.canFulfill
                   ? Row(
                       mainAxisSize: MainAxisSize.min,
@@ -353,7 +353,7 @@ class _RewardsLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MiraLoadingState(title: '正在同步奖励', message: '正在整理奖励项和兑换进度。');
+    return const AppLoadingState(title: '正在同步奖励', message: '正在整理奖励项和兑换进度。');
   }
 }
 

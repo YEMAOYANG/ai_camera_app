@@ -14,6 +14,7 @@ from schemas.profile import (
     account_security_payload,
     child_profile_payload,
     emergency_contact_payload,
+    family_invitation_payload,
     family_member_payload,
     feedback_payload,
     legal_document_payload,
@@ -24,6 +25,7 @@ from services.auth_service import AuthService
 
 MEMBER_ROLES = {"admin", "guardian", "caregiver", "viewer"}
 MEMBER_STATUSES = {"active", "invited", "disabled"}
+INVITATION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
 SETTING_DEFAULTS = {
     "ai-care-rules": {
@@ -55,7 +57,7 @@ SETTING_DEFAULTS = {
         "dataRetentionDays": 30,
     },
     "conversation": {
-        "wakeName": "米拉",
+        "wakeName": "看护助手",
         "voiceStyle": "温和女声",
         "boundaryLevel": "balanced",
         "freeChatEnabled": True,
@@ -72,6 +74,51 @@ SETTING_DEFAULTS = {
         "notes": "",
     },
 }
+
+SUBSCRIPTION_PLANS = [
+    {
+        "id": "basic",
+        "title": "基础版",
+        "subtitle": "随设备提供基础看护能力，适合先完成家庭任务闭环。",
+        "price": "随设备提供",
+        "billing": "无需额外订阅",
+        "recommended": False,
+        "ctaLabel": "当前套餐",
+        "features": ["任务提醒", "实时看护", "本地日报", "隐私控制"],
+        "highlights": ["基础提醒", "实时查看", "本地日报", "隐私控制"],
+    },
+    {
+        "id": "member",
+        "title": "会员版",
+        "subtitle": "给需要长期报告和学习辅助额度的家庭。",
+        "price": "¥29",
+        "billing": "/月",
+        "recommended": True,
+        "ctaLabel": "开通会员版",
+        "features": ["云端长期报告", "高级趋势", "题目辅导颗粒度", "更多提醒基线"],
+        "highlights": ["长期报告", "趋势洞察", "提醒升级", "辅导额度"],
+    },
+    {
+        "id": "family_plus",
+        "title": "家庭高级版",
+        "subtitle": "适合多孩子、多设备和多人协作的家庭空间。",
+        "price": "¥59",
+        "billing": "/月起",
+        "recommended": False,
+        "ctaLabel": "查看家庭高级版",
+        "features": ["多孩子与多设备", "多联系人协作", "长期成长档案", "合作内容包"],
+        "highlights": ["多设备", "多人协作", "成长档案", "内容包"],
+    },
+]
+
+SUBSCRIPTION_ENTITLEMENTS = [
+    {"key": "task_reminders", "name": "任务提醒", "basic": True, "member": True, "family_plus": True},
+    {"key": "live_care", "name": "实时看护", "basic": True, "member": True, "family_plus": True},
+    {"key": "local_daily_report", "name": "本地日报", "basic": True, "member": True, "family_plus": True},
+    {"key": "long_term_reports", "name": "长期云端报告", "basic": False, "member": True, "family_plus": True},
+    {"key": "advanced_trends", "name": "高级趋势", "basic": False, "member": True, "family_plus": True},
+    {"key": "multi_device_family", "name": "多孩子与多设备", "basic": False, "member": False, "family_plus": True},
+]
 
 
 class ProfileService:
@@ -192,6 +239,71 @@ class ProfileService:
                 member_id=member_id,
             )
             return {"ok": True}
+
+    def list_family_invitations(self, access_token: str) -> dict:
+        context = self._auth_context(access_token)
+        with self.repository.transaction() as conn:
+            rows = self.repository.list_family_invitations(
+                conn,
+                family_id=context["family"]["id"],
+            )
+            return {
+                "ok": True,
+                "invitations": [family_invitation_payload(row) for row in rows],
+            }
+
+    def create_family_invitation(self, access_token: str, data: dict) -> dict:
+        context = self._auth_context(access_token)
+        name = self._required_text(data, "name", "请输入成员称呼")
+        phone = self._required_phone(data.get("phone"))
+        role = self._member_role(self._optional_text(data, "role") or "guardian")
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            invitation = self.repository.create_family_invitation(
+                conn,
+                family_id=context["family"]["id"],
+                name=name,
+                phone=phone,
+                role=role,
+                created_by=context["user"]["id"],
+                now=now,
+                expires_at=now + INVITATION_TTL_MS,
+            )
+            return {"ok": True, "invitation": family_invitation_payload(invitation)}
+
+    def resend_family_invitation(self, access_token: str, invitation_id: str) -> dict:
+        context = self._auth_context(access_token)
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            invitation = self._invitation_or_error(
+                conn,
+                context["family"]["id"],
+                invitation_id,
+            )
+            if invitation["status"] != "pending":
+                raise ApiError("invitation_not_pending", "这条邀请已经不可重发")
+            invitation = self.repository.update_family_invitation(
+                conn,
+                family_id=context["family"]["id"],
+                invitation_id=invitation_id,
+                fields={"created_at": now, "expires_at": now + INVITATION_TTL_MS},
+                now=now,
+            )
+            return {"ok": True, "invitation": family_invitation_payload(invitation)}
+
+    def cancel_family_invitation(self, access_token: str, invitation_id: str) -> dict:
+        context = self._auth_context(access_token)
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            self._invitation_or_error(conn, context["family"]["id"], invitation_id)
+            invitation = self.repository.update_family_invitation(
+                conn,
+                family_id=context["family"]["id"],
+                invitation_id=invitation_id,
+                fields={"status": "cancelled"},
+                now=now,
+            )
+            return {"ok": True, "invitation": family_invitation_payload(invitation)}
 
     def current_child(self, access_token: str) -> dict:
         context = self._auth_context(access_token)
@@ -366,21 +478,70 @@ class ProfileService:
 
     def subscription_status(self, access_token: str) -> dict:
         self._auth_context(access_token)
+        current = self._current_subscription_payload()
         return {
             "ok": True,
-            "subscription": {
-                "plan": "basic",
-                "planLabel": "基础版",
-                "status": "active",
-                "statusLabel": "已启用",
-                "renewalText": "随设备提供基础看护能力",
-                "entitlements": [
-                    {"name": "任务提醒", "enabled": True},
-                    {"name": "实时看护", "enabled": True},
-                    {"name": "积分与奖励", "enabled": True},
-                    {"name": "长期云端报告", "enabled": False},
-                ],
+            "subscription": current,
+        }
+
+    def subscription_plans(self, access_token: str) -> dict:
+        self._auth_context(access_token)
+        return {"ok": True, "plans": SUBSCRIPTION_PLANS}
+
+    def subscription_current(self, access_token: str) -> dict:
+        self._auth_context(access_token)
+        return {"ok": True, "subscription": self._current_subscription_payload()}
+
+    def subscription_entitlements(self, access_token: str) -> dict:
+        self._auth_context(access_token)
+        return {"ok": True, "entitlements": SUBSCRIPTION_ENTITLEMENTS}
+
+    def subscription_checkout_session(self, access_token: str, data: dict) -> dict:
+        self._auth_context(access_token)
+        plan_id = self._optional_text(data, "planId")
+        plan = next((item for item in SUBSCRIPTION_PLANS if item["id"] == plan_id), None)
+        if plan is None or plan["id"] == "basic":
+            raise ApiError("invalid_subscription_plan", "套餐不可开通", 400)
+        return {
+            "ok": True,
+            "checkout": {
+                "planId": plan["id"],
+                "planTitle": plan["title"],
+                "status": "pending_payment",
+                "provider": "app_store",
+                "paymentRequired": True,
+                "receiptVerificationRequired": True,
+                "message": "在线付款入口即将开放，当前可先查看套餐权益。",
             },
+        }
+
+    def subscription_restore(self, access_token: str) -> dict:
+        self._auth_context(access_token)
+        return {
+            "ok": True,
+            "restore": {
+                "status": "no_previous_purchase",
+                "message": "暂未找到可恢复的订阅记录。",
+            },
+        }
+
+    def _current_subscription_payload(self) -> dict:
+        return {
+            "plan": "basic",
+            "planId": "basic",
+            "planLabel": "基础版",
+            "status": "active",
+            "statusLabel": "已启用",
+            "renewalText": "随设备提供基础看护能力",
+            "storeProvider": "app_store",
+            "entitlements": [
+                {
+                    "key": item["key"],
+                    "name": item["name"],
+                    "enabled": bool(item["basic"]),
+                }
+                for item in SUBSCRIPTION_ENTITLEMENTS
+            ],
         }
 
     def daily_report(self, access_token: str, query: dict) -> dict:
@@ -464,8 +625,8 @@ class ProfileService:
         return {
             "ok": True,
             "about": {
-                "appName": "Mira Guardian",
-                "displayName": "米拉家庭看护",
+                "appName": "家庭看护",
+                "displayName": "家庭看护",
                 "version": "1.0.0",
                 "build": "2026.06",
                 "description": "面向家长的家庭 AI 看护与成长记录 App。",
@@ -510,6 +671,16 @@ class ProfileService:
             raise ApiError("member_not_found", "家庭成员不存在", 404)
         return member
 
+    def _invitation_or_error(self, conn, family_id: str, invitation_id: str):
+        invitation = self.repository.get_family_invitation(
+            conn,
+            family_id=family_id,
+            invitation_id=invitation_id,
+        )
+        if invitation is None:
+            raise ApiError("invitation_not_found", "邀请不存在", 404)
+        return invitation
+
     def _child_or_error(self, conn, family_id: str, child_id: str):
         child = self.repository.get_child(conn, family_id=family_id, child_id=child_id)
         if child is None:
@@ -538,6 +709,12 @@ class ProfileService:
     def _optional_phone(self, value: object) -> str | None:
         raw = str(value or "").strip()
         return normalize_phone(raw) if raw else None
+
+    def _required_phone(self, value: object) -> str:
+        phone = self._optional_phone(value)
+        if not phone:
+            raise ApiError("missing_phone", "请输入手机号")
+        return phone
 
     def _member_role(self, value: str) -> str:
         value = value.strip()
@@ -601,7 +778,7 @@ def _legal_document(key: str) -> dict | None:
                 {
                     "title": "服务范围",
                     "paragraphs": [
-                        "Mira Guardian 为家长提供孩子资料、设备绑定、任务看护、积分奖励、家庭协作和隐私管理能力。",
+                        "家庭看护 为家长提供孩子资料、设备绑定、任务看护、积分奖励、家庭协作和隐私管理能力。",
                         "AI 观察仅作辅助参考，不能替代家长监护、医疗判断、安防服务或紧急救援。",
                     ],
                 },

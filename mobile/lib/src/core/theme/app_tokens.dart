@@ -93,7 +93,7 @@ class AppChrome {
   static const tabBarHeight = 62.0;
   static const tabBarDockRadius = 31.0;
   static const tabBarContentGap = 8.0;
-  static const pinnedHeaderHeight = 96.0;
+  static const pinnedHeaderHeight = 78.0;
 
   static double tabBarBottomGap(double safeAreaBottom) {
     return safeAreaBottom > 0

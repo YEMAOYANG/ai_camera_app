@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mira_guardian_app/src/core/config/app_environment.dart';
-import 'package:mira_guardian_app/src/core/network/api_client.dart';
-import 'package:mira_guardian_app/src/features/rewards/domain/reward_models.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/network/api_client.dart';
+import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
 
 final rewardRepositoryProvider = Provider<RewardRepository>((ref) {
   return RewardRepository(

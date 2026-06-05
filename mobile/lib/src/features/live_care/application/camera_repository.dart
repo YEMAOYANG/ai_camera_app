@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mira_guardian_app/src/core/config/app_environment.dart';
-import 'package:mira_guardian_app/src/core/network/api_client.dart';
-import 'package:mira_guardian_app/src/features/live_care/domain/camera_models.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/network/api_client.dart';
+import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
 
 final cameraRepositoryProvider = Provider<CameraRepository>((ref) {
   return CameraRepository(

@@ -7,10 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/live_care/application/camera_repository.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class LiveMonitorScreen extends ConsumerStatefulWidget {
   const LiveMonitorScreen({super.key});

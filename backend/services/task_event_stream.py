@@ -77,7 +77,7 @@ class TaskEventStreamServer:
         self._thread = threading.Thread(
             target=self._run,
             args=(host, port),
-            name="mira-task-websocket",
+            name="task-websocket",
             daemon=True,
         )
         self._thread.start()

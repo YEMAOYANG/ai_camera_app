@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class CameraHealth {
   const CameraHealth({
@@ -47,7 +47,7 @@ class CameraHealth {
     ok: true,
     reachable: true,
     adapter: 'mock_camera_runtime',
-    serviceLabel: 'Mira Camera Runtime',
+    serviceLabel: '摄像头运行服务',
     message: '摄像头服务在线',
   );
 }

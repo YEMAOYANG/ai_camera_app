@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mira_guardian_app/src/app/app.dart';
-import 'package:mira_guardian_app/src/core/config/app_environment.dart';
-import 'package:mira_guardian_app/src/core/storage/onboarding_store.dart';
+import 'package:guardian_parent_app/src/app/app.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> bootstrap(AppEnvironment environment) async {
@@ -14,7 +14,7 @@ Future<void> bootstrap(AppEnvironment environment) async {
         appEnvironmentProvider.overrideWithValue(environment),
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
-      child: const MiraGuardianApp(),
+      child: const GuardianApp(),
     ),
   );
 }

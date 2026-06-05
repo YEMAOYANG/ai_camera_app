@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/devices/application/device_repository.dart';
-import 'package:mira_guardian_app/src/features/devices/domain/device_models.dart';
-import 'package:mira_guardian_app/src/features/live_care/application/camera_repository.dart';
-import 'package:mira_guardian_app/src/features/live_care/domain/camera_models.dart';
-import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
-import 'package:mira_guardian_app/src/features/mvp/domain/mvp_models.dart';
-import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
-import 'package:mira_guardian_app/src/features/points/domain/point_models.dart';
-import 'package:mira_guardian_app/src/features/rewards/application/reward_repository.dart';
-import 'package:mira_guardian_app/src/features/rewards/domain/reward_models.dart';
-import 'package:mira_guardian_app/src/features/tasks/application/task_repository.dart';
-import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
+import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
+import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
+import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
+import 'package:guardian_parent_app/src/features/mvp/application/mvp_mock_provider.dart';
+import 'package:guardian_parent_app/src/features/mvp/domain/mvp_models.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/points/domain/point_models.dart';
+import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
+import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
+import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
+import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -39,11 +39,11 @@ class HomeScreen extends ConsumerWidget {
       cameraStatus,
     );
 
-    return MiraScreen(
-      title: 'Mira Guardian',
+    return AppScreen(
+      title: '家庭看护',
       subtitle: deviceStatus,
       headerContent: _HomeBrandHeader(deviceStatus: deviceStatus),
-      trailing: MiraIconButton(
+      trailing: AppIconButton(
         icon: Icons.notifications_outlined,
         label: '未处理提醒',
         onTap: () => context.go(AppRoute.alerts.path),
@@ -138,7 +138,7 @@ class _HomeBrandHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Mira Guardian',
+                '家庭看护',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -195,7 +195,7 @@ class _CurrentStatePanel extends StatelessWidget {
     final cameraOnline =
         camera?.isOnline ?? health?.reachable ?? snapshot.device.cameraEnabled;
 
-    return MiraSurface(
+    return AppSurface(
       color: AppColors.ink,
       borderColor: AppColors.ink,
       radius: 24,
@@ -339,7 +339,7 @@ class _PendingQueue extends StatelessWidget {
         );
         final total = pendingTasks.length + pendingRedemptions.length;
 
-        return MiraSurface(
+        return AppSurface(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -358,23 +358,23 @@ class _PendingQueue extends StatelessWidget {
                   ),
                 ),
               for (final task in pendingTasks)
-                MiraListRow(
+                AppListRow(
                   icon: Icons.fact_check_outlined,
                   title: '${task.title} 等待确认',
                   subtitle: '${task.evidenceText} · +${task.rewardPoints} 分',
-                  tone: MiraListRowTone.amber,
+                  tone: AppListRowTone.amber,
                   trailing: _HeaderAction(
                     label: '处理',
                     onTap: () => context.go('$taskDetailPath/${task.id}'),
                   ),
                 ),
               for (final redemption in pendingRedemptions)
-                MiraListRow(
+                AppListRow(
                   icon: Icons.card_giftcard_outlined,
                   title: '奖励待兑现',
                   subtitle:
                       '${redemption.rewardTitle} · ${redemption.pointsCost} 分',
-                  tone: MiraListRowTone.blue,
+                  tone: AppListRowTone.blue,
                   trailing: _HeaderAction(
                     label: '确认',
                     onTap: () => context.go(rewardsPath),
@@ -399,7 +399,7 @@ class _TodayPlan extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return tasks.when(
-      data: (taskList) => MiraSurface(
+      data: (taskList) => AppSurface(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -422,15 +422,15 @@ class _TodayPlan extends StatelessWidget {
                 ),
               ),
             for (final task in taskList.take(3))
-              MiraListRow(
+              AppListRow(
                 icon: task.status == GuardianTaskStatus.inProgress
                     ? Icons.play_circle_outline
                     : Icons.check_circle_outline,
                 title: task.title,
                 subtitle: '${task.timeLabel} · ${task.nextStep}',
                 tone: task.status == GuardianTaskStatus.inProgress
-                    ? MiraListRowTone.blue
-                    : MiraListRowTone.neutral,
+                    ? AppListRowTone.blue
+                    : AppListRowTone.neutral,
                 trailing: StatusChip(
                   label: task.status.label,
                   tone: task.status.tone,
@@ -462,7 +462,7 @@ class _PointsRewardsPanel extends StatelessWidget {
             .length ??
         0;
 
-    return MiraSurface(
+    return AppSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -479,7 +479,7 @@ class _PointsRewardsPanel extends StatelessWidget {
                   icon: Icons.stars_outlined,
                   title: summary == null ? '--' : '${summary.account.balance}',
                   subtitle: '当前积分',
-                  tone: MiraListRowTone.amber,
+                  tone: AppListRowTone.amber,
                   onTap: () => context.go(pointsPath),
                 ),
               ),
@@ -489,7 +489,7 @@ class _PointsRewardsPanel extends StatelessWidget {
                   icon: Icons.card_giftcard_outlined,
                   title: '$pending',
                   subtitle: '待兑现奖励',
-                  tone: MiraListRowTone.blue,
+                  tone: AppListRowTone.blue,
                   onTap: () => context.go(rewardsPath),
                 ),
               ),
@@ -527,20 +527,20 @@ class _CompactEntry extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final MiraListRowTone tone;
+  final AppListRowTone tone;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final color = switch (tone) {
-      MiraListRowTone.blue => AppColors.brand,
-      MiraListRowTone.green => AppColors.success,
-      MiraListRowTone.amber => AppColors.warning,
-      MiraListRowTone.red => AppColors.danger,
-      MiraListRowTone.neutral => AppColors.ink,
+      AppListRowTone.blue => AppColors.brand,
+      AppListRowTone.green => AppColors.success,
+      AppListRowTone.amber => AppColors.warning,
+      AppListRowTone.red => AppColors.danger,
+      AppListRowTone.neutral => AppColors.ink,
     };
 
-    return MiraSurface(
+    return AppSurface(
       radius: 15,
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 11),
       color: color.withValues(alpha: 0.07),
@@ -596,7 +596,7 @@ class _AiAdvicePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
+    return AppSurface(
       color: AppColors.brand.withValues(alpha: 0.08),
       borderColor: AppColors.brand.withValues(alpha: 0.12),
       child: Row(
@@ -676,10 +676,10 @@ class _DeviceSummaryPanel extends StatelessWidget {
         (snapshot.device.online ? StatusTone.success : StatusTone.danger);
     final rowTone =
         (overview?.isOnline ?? camera?.isOnline ?? snapshot.device.online)
-        ? MiraListRowTone.green
-        : MiraListRowTone.red;
+        ? AppListRowTone.green
+        : AppListRowTone.red;
 
-    return MiraSurface(
+    return AppSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -689,7 +689,7 @@ class _DeviceSummaryPanel extends StatelessWidget {
             onAction: () => context.go(AppRoute.live.path),
           ),
           const SizedBox(height: 10),
-          MiraListRow(
+          AppListRow(
             icon: Icons.videocam_outlined,
             title: title,
             subtitle: subtitle,
@@ -818,7 +818,7 @@ class _HomeLoadingPanel extends StatelessWidget {
       _ => '正在同步最新内容',
     };
 
-    return MiraLoadingState(
+    return AppLoadingState(
       title: loadingTitle,
       message: '正在整理最新的家庭看护信息。',
       compact: true,
@@ -834,8 +834,8 @@ class _HomeErrorPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraInlineState(
-      variant: MiraStateVariant.serviceUnavailable,
+    return AppInlineState(
+      variant: AppStateVariant.serviceUnavailable,
       title: '$title暂时没有更新',
       message: message,
     );

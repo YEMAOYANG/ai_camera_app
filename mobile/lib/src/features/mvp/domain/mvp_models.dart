@@ -1,4 +1,4 @@
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class GuardianMvpSnapshot {
   const GuardianMvpSnapshot({

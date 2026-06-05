@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mira_guardian_app/src/core/config/app_environment.dart';
-import 'package:mira_guardian_app/src/core/network/api_client.dart';
-import 'package:mira_guardian_app/src/features/profile/domain/profile_models.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/network/api_client.dart';
+import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   return ProfileRepository(
@@ -17,6 +17,10 @@ final profileSummaryProvider = FutureProvider<ProfileSummary>((ref) {
 
 final familyMembersProvider = FutureProvider<List<FamilyMember>>((ref) {
   return ref.watch(profileRepositoryProvider).familyMembers();
+});
+
+final familyInvitationsProvider = FutureProvider<List<FamilyInvitation>>((ref) {
+  return ref.watch(profileRepositoryProvider).familyInvitations();
 });
 
 final currentChildProvider = FutureProvider<ChildProfile?>((ref) {
@@ -38,6 +42,15 @@ final accountSecurityProvider = FutureProvider<AccountSecurity>((ref) {
 final subscriptionStatusProvider = FutureProvider<SubscriptionStatus>((ref) {
   return ref.watch(profileRepositoryProvider).subscriptionStatus();
 });
+
+final subscriptionPlansProvider = FutureProvider<List<SubscriptionPlan>>((ref) {
+  return ref.watch(profileRepositoryProvider).subscriptionPlans();
+});
+
+final subscriptionEntitlementsProvider =
+    FutureProvider<List<SubscriptionFeatureComparison>>((ref) {
+      return ref.watch(profileRepositoryProvider).subscriptionEntitlements();
+    });
 
 final dailyReportProvider = FutureProvider<ReportData>((ref) {
   return ref.watch(profileRepositoryProvider).dailyReport();
@@ -62,10 +75,12 @@ final profileSettingProvider = FutureProvider.family<ProfileSetting, String>((
   return ref.watch(profileRepositoryProvider).setting(key);
 });
 
-final legalDocumentProvider =
-    FutureProvider.family<LegalDocumentData, String>((ref, key) {
-      return ref.watch(profileRepositoryProvider).legalDocument(key);
-    });
+final legalDocumentProvider = FutureProvider.family<LegalDocumentData, String>((
+  ref,
+  key,
+) {
+  return ref.watch(profileRepositoryProvider).legalDocument(key);
+});
 
 class ProfileRepository {
   const ProfileRepository({
@@ -89,6 +104,54 @@ class ProfileRepository {
     final raw = _asMap(response.data)['members'];
     if (raw is! List) return const [];
     return raw.map((item) => FamilyMember.fromJson(_asMap(item))).toList();
+  }
+
+  Future<List<FamilyInvitation>> familyInvitations() async {
+    if (_environment.useMockData) return const [];
+    final response = await _get('/family/invitations');
+    final raw = _asMap(response.data)['invitations'];
+    if (raw is! List) return const [];
+    return raw.map((item) => FamilyInvitation.fromJson(_asMap(item))).toList();
+  }
+
+  Future<FamilyInvitation> sendFamilyInvitation({
+    required String name,
+    required String phone,
+    required String role,
+  }) async {
+    final body = {'name': name, 'phone': phone, 'role': role};
+    if (_environment.useMockData) {
+      return FamilyInvitation.fromJson({
+        'id': 'invite_mock_new',
+        ...body,
+        'status': 'pending',
+      });
+    }
+    final response = await _post('/family/invitations', data: body);
+    return FamilyInvitation.fromJson(
+      _asMap(_asMap(response.data)['invitation']),
+    );
+  }
+
+  Future<FamilyInvitation> resendFamilyInvitation(String id) async {
+    if (_environment.useMockData) {
+      return FamilyInvitation.fromJson({
+        'id': id,
+        'name': '家庭成员',
+        'phone': '',
+        'role': 'guardian',
+        'status': 'pending',
+      });
+    }
+    final response = await _post('/family/invitations/$id/resend');
+    return FamilyInvitation.fromJson(
+      _asMap(_asMap(response.data)['invitation']),
+    );
+  }
+
+  Future<void> cancelFamilyInvitation(String id) async {
+    if (_environment.useMockData) return;
+    await _post('/family/invitations/$id/cancel');
   }
 
   Future<FamilyMember> saveFamilyMember({
@@ -170,7 +233,10 @@ class ProfileRepository {
       'defaultNotify': defaultNotify,
     };
     if (_environment.useMockData) {
-      return EmergencyContact.fromJson({'id': id ?? 'contact_mock_new', ...body});
+      return EmergencyContact.fromJson({
+        'id': id ?? 'contact_mock_new',
+        ...body,
+      });
     }
     final response = id == null
         ? await _post('/contacts/emergency', data: body)
@@ -204,11 +270,14 @@ class ProfileRepository {
         role: _mockAccountProfile.role,
       );
     }
-    final response = await _patch('/account/profile', data: {
-      'displayName': displayName,
-      'familyName': familyName,
-      'relationship': relationship,
-    });
+    final response = await _patch(
+      '/account/profile',
+      data: {
+        'displayName': displayName,
+        'familyName': familyName,
+        'relationship': relationship,
+      },
+    );
     return AccountProfile.fromJson(_asMap(_asMap(response.data)['profile']));
   }
 
@@ -243,6 +312,61 @@ class ProfileRepository {
     );
   }
 
+  Future<List<SubscriptionPlan>> subscriptionPlans() async {
+    if (_environment.useMockData) return _mockSubscriptionPlans;
+    final response = await _get('/subscriptions/plans');
+    final raw = _asMap(response.data)['plans'];
+    if (raw is! List) return const [];
+    return raw.map((item) => SubscriptionPlan.fromJson(_asMap(item))).toList();
+  }
+
+  Future<List<SubscriptionFeatureComparison>> subscriptionEntitlements() async {
+    if (_environment.useMockData) return _mockSubscriptionEntitlements;
+    final response = await _get('/subscriptions/entitlements');
+    final raw = _asMap(response.data)['entitlements'];
+    if (raw is! List) return const [];
+    return raw
+        .map((item) => SubscriptionFeatureComparison.fromJson(_asMap(item)))
+        .toList();
+  }
+
+  Future<SubscriptionCheckoutResult> startSubscriptionCheckout(
+    String planId,
+  ) async {
+    if (_environment.useMockData) {
+      final plan = _mockSubscriptionPlans.firstWhere(
+        (item) => item.id == planId,
+        orElse: () => _mockSubscriptionPlans[1],
+      );
+      return SubscriptionCheckoutResult(
+        planId: plan.id,
+        planTitle: plan.title,
+        status: 'pending_payment',
+        message: '在线付款入口暂未开放。你可以先查看套餐权益。',
+      );
+    }
+    final response = await _post(
+      '/subscriptions/checkout-session',
+      data: {'planId': planId},
+    );
+    return SubscriptionCheckoutResult.fromJson(
+      _asMap(_asMap(response.data)['checkout']),
+    );
+  }
+
+  Future<SubscriptionRestoreResult> restoreSubscription() async {
+    if (_environment.useMockData) {
+      return const SubscriptionRestoreResult(
+        status: 'no_previous_purchase',
+        message: '暂未找到可恢复的订阅记录。',
+      );
+    }
+    final response = await _post('/subscriptions/restore');
+    return SubscriptionRestoreResult.fromJson(
+      _asMap(_asMap(response.data)['restore']),
+    );
+  }
+
   Future<ReportData> dailyReport() async {
     if (_environment.useMockData) return _mockReport('今日报告');
     final response = await _get('/reports/daily');
@@ -266,7 +390,9 @@ class ProfileRepository {
   Future<LegalDocumentData> legalDocument(String key) async {
     if (_environment.useMockData) return _mockLegal(key);
     final response = await _get('/legal/$key');
-    return LegalDocumentData.fromJson(_asMap(_asMap(response.data)['document']));
+    return LegalDocumentData.fromJson(
+      _asMap(_asMap(response.data)['document']),
+    );
   }
 
   Future<AboutInfo> aboutInfo() async {
@@ -401,15 +527,107 @@ const _mockSecurity = AccountSecurity(
 );
 
 const _mockSubscription = SubscriptionStatus(
+  planId: 'basic',
   planLabel: '基础版',
+  status: 'active',
   statusLabel: '已启用',
   renewalText: '随设备提供基础看护能力',
   entitlements: [
-    SubscriptionEntitlement(name: '任务提醒', enabled: true),
-    SubscriptionEntitlement(name: '实时看护', enabled: true),
-    SubscriptionEntitlement(name: '积分与奖励', enabled: true),
+    SubscriptionEntitlement(key: 'task_reminders', name: '任务提醒', enabled: true),
+    SubscriptionEntitlement(key: 'live_care', name: '实时看护', enabled: true),
+    SubscriptionEntitlement(
+      key: 'local_daily_report',
+      name: '本地日报',
+      enabled: true,
+    ),
+    SubscriptionEntitlement(
+      key: 'long_term_reports',
+      name: '长期云端报告',
+      enabled: false,
+    ),
   ],
 );
+
+const _mockSubscriptionPlans = [
+  SubscriptionPlan(
+    id: 'basic',
+    title: '基础版',
+    subtitle: '随设备提供基础看护能力，适合先完成家庭任务闭环。',
+    price: '随设备提供',
+    billing: '无需额外订阅',
+    recommended: false,
+    ctaLabel: '当前套餐',
+    features: ['任务提醒', '实时看护', '本地日报', '隐私控制'],
+    highlights: ['基础提醒', '实时查看', '本地日报', '隐私控制'],
+  ),
+  SubscriptionPlan(
+    id: 'member',
+    title: '会员版',
+    subtitle: '给需要长期报告和学习辅助额度的家庭。',
+    price: '¥29',
+    billing: '/月',
+    recommended: true,
+    ctaLabel: '开通会员版',
+    features: ['云端长期报告', '高级趋势', '题目辅导颗粒度', '更多提醒基线'],
+    highlights: ['长期报告', '趋势洞察', '提醒升级', '辅导额度'],
+  ),
+  SubscriptionPlan(
+    id: 'family_plus',
+    title: '家庭高级版',
+    subtitle: '适合多孩子、多设备和多人协作的家庭空间。',
+    price: '¥59',
+    billing: '/月起',
+    recommended: false,
+    ctaLabel: '查看家庭高级版',
+    features: ['多孩子与多设备', '多联系人协作', '长期成长档案', '合作内容包'],
+    highlights: ['多设备', '多人协作', '成长档案', '内容包'],
+  ),
+];
+
+const _mockSubscriptionEntitlements = [
+  SubscriptionFeatureComparison(
+    key: 'task_reminders',
+    name: '任务提醒',
+    basic: true,
+    member: true,
+    familyPlus: true,
+  ),
+  SubscriptionFeatureComparison(
+    key: 'live_care',
+    name: '实时看护',
+    basic: true,
+    member: true,
+    familyPlus: true,
+  ),
+  SubscriptionFeatureComparison(
+    key: 'local_daily_report',
+    name: '本地日报',
+    basic: true,
+    member: true,
+    familyPlus: true,
+  ),
+  SubscriptionFeatureComparison(
+    key: 'long_term_reports',
+    name: '长期云端报告',
+    basic: false,
+    member: true,
+    familyPlus: true,
+  ),
+  SubscriptionFeatureComparison(
+    key: 'advanced_trends',
+    name: '高级趋势',
+    basic: false,
+    member: true,
+    familyPlus: true,
+  ),
+  SubscriptionFeatureComparison(
+    key: 'multi_device_family',
+    name: '多孩子与多设备',
+    basic: false,
+    member: false,
+    familyPlus: true,
+  ),
+];
 
 Map<String, dynamic> _mockSetting(String key) {
   return switch (key) {
@@ -426,7 +644,7 @@ Map<String, dynamic> _mockSetting(String key) {
       'remoteViewingNoticeEnabled': true,
     },
     'conversation' => {
-      'wakeName': '米拉',
+      'wakeName': '看护助手',
       'voiceStyle': '温和女声',
       'boundaryLevel': 'balanced',
       'freeChatEnabled': true,
@@ -472,8 +690,8 @@ LegalDocumentData _mockLegal(String key) {
 }
 
 const _mockAbout = AboutInfo(
-  appName: 'Mira Guardian',
-  displayName: '米拉家庭看护',
+  appName: '家庭看护',
+  displayName: '家庭看护',
   version: '1.0.0',
   description: '面向家长的家庭 AI 看护与成长记录 App。',
   principles: ['儿童隐私优先', '关键决定由家长确认'],

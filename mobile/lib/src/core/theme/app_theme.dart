@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 
 class AppTheme {
   const AppTheme._();

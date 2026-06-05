@@ -25,7 +25,7 @@ from routes.api.v1.reports import growth_bp, reports_bp
 from routes.api.v1.rewards import rewards_bp
 from routes.api.v1.settings import settings_bp
 from routes.api.v1.setup import setup_bp
-from routes.api.v1.subscription import subscription_bp
+from routes.api.v1.subscription import subscription_bp, subscriptions_bp
 from routes.api.v1.tasks import tasks_bp
 from services.task_event_stream import start_task_event_stream
 from services.task_scheduler_runner import start_task_scheduler
@@ -57,6 +57,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.register_blueprint(reports_bp, url_prefix="/api/reports")
     app.register_blueprint(growth_bp, url_prefix="/api/growth")
     app.register_blueprint(subscription_bp, url_prefix="/api/subscription")
+    app.register_blueprint(subscriptions_bp, url_prefix="/api/subscriptions")
     app.register_blueprint(feedback_bp, url_prefix="/api/feedback")
     app.register_blueprint(firmware_bp, url_prefix="/api/firmware")
     app.register_blueprint(camera_bp, url_prefix="/api/camera")

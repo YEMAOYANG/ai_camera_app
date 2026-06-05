@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
-import 'package:mira_guardian_app/src/features/mvp/domain/mvp_models.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/mvp/application/mvp_mock_provider.dart';
+import 'package:guardian_parent_app/src/features/mvp/domain/mvp_models.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class AlertsScreen extends ConsumerStatefulWidget {
   const AlertsScreen({super.key});
@@ -26,7 +27,7 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
         ? snapshot.alerts
         : snapshot.alerts.where((alert) => alert.state == _filter).toList();
 
-    return MiraScreen(
+    return AppScreen(
       title: '告警',
       subtitle: '普通告警摘要和处理状态',
       children: [
@@ -38,8 +39,8 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
         ),
         const SizedBox(height: 14),
         if (alerts.isEmpty)
-          MiraStateView(
-            variant: MiraStateVariant.noData,
+          AppStateView(
+            variant: AppStateVariant.noData,
             title: '没有这类告警',
             message: '当前筛选下没有需要处理的提醒。',
             primaryActionLabel: '查看全部',
@@ -47,14 +48,14 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
             compact: true,
           )
         else
-          MiraSurface(
+          AppSurface(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const _SectionTitle('告警列表'),
                 const SizedBox(height: 8),
                 for (final alert in alerts)
-                  MiraListRow(
+                  AppListRow(
                     icon: _iconForAlert(alert),
                     title: alert.title,
                     subtitle: '${alert.timeLabel} · ${alert.summary}',
@@ -82,13 +83,13 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
     };
   }
 
-  MiraListRowTone _toneForAlert(MvpAlert alert) {
+  AppListRowTone _toneForAlert(MvpAlert alert) {
     return switch (alert.state) {
-      AlertState.unread => MiraListRowTone.red,
-      AlertState.processing => MiraListRowTone.amber,
-      AlertState.handled => MiraListRowTone.green,
-      AlertState.falseAlarm => MiraListRowTone.neutral,
-      AlertState.read => MiraListRowTone.blue,
+      AlertState.unread => AppListRowTone.red,
+      AlertState.processing => AppListRowTone.amber,
+      AlertState.handled => AppListRowTone.green,
+      AlertState.falseAlarm => AppListRowTone.neutral,
+      AlertState.read => AppListRowTone.blue,
     };
   }
 }
@@ -108,7 +109,7 @@ class _AlertSummary extends StatelessWidget {
         )
         .length;
 
-    return MiraSurface(
+    return AppSurface(
       color: active > 0 ? const Color(0xFFFFF1D8) : const Color(0xFFE9F6EF),
       borderColor: Colors.transparent,
       radius: 22,
@@ -241,64 +242,49 @@ class _SectionTitle extends StatelessWidget {
 }
 
 void _showAlertSheet(BuildContext context, MvpAlert alert) {
-  showModalBottomSheet<void>(
+  showAppBottomSheet<void>(
     context: context,
-    useRootNavigator: true,
-    showDragHandle: true,
-    backgroundColor: AppColors.appBackgroundWarm,
-    builder: (context) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              alert.title,
-              style: const TextStyle(
-                color: AppColors.ink,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${alert.summary}\n建议：${alert.suggestedAction}',
-              style: const TextStyle(
-                color: AppColors.muted,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                height: 1.55,
-              ),
-            ),
-            const SizedBox(height: 16),
-            MiraListRow(
-              icon: Icons.check_circle_outline,
-              title: '标记已处理',
-              subtitle: '写入处理记录',
-              tone: MiraListRowTone.green,
-              onTap: () {
-                Navigator.of(context).pop();
-                _showToast(context, '已标记为已处理');
-              },
-            ),
-            MiraListRow(
-              icon: Icons.rule_outlined,
-              title: '标记误报',
-              subtitle: '后续降低同类提醒权重',
-              tone: MiraListRowTone.amber,
-              onTap: () {
-                Navigator.of(context).pop();
-                _showToast(context, '已标记为误报');
-              },
-            ),
-          ],
-        ),
-      );
-    },
+    maxHeightFactor: 0.56,
+    child: _AlertActionSheet(alert: alert),
   );
+}
+
+class _AlertActionSheet extends StatelessWidget {
+  const _AlertActionSheet({required this.alert});
+
+  final MvpAlert alert;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBottomSheetBody(
+      title: alert.title,
+      subtitle: '${alert.summary}\n建议：${alert.suggestedAction}',
+      child: Column(
+        children: [
+          AppListRow(
+            icon: Icons.check_circle_outline,
+            title: '标记已处理',
+            subtitle: '写入处理记录',
+            tone: AppListRowTone.green,
+            onTap: () {
+              Navigator.of(context).pop();
+              _showToast(context, '已标记为已处理');
+            },
+          ),
+          AppListRow(
+            icon: Icons.rule_outlined,
+            title: '标记误报',
+            subtitle: '后续降低同类提醒权重',
+            tone: AppListRowTone.amber,
+            onTap: () {
+              Navigator.of(context).pop();
+              _showToast(context, '已标记为误报');
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 void _showToast(BuildContext context, String message) {

@@ -43,7 +43,7 @@ def test_speak():
     try:
         _ensure_dev_enabled()
         data = json_body(request)
-        text = str(data.get("text") or "米拉提醒测试。").strip()
+        text = str(data.get("text") or "看护提醒测试。").strip()
         command = camera_command_service()._execute_command(
             family_id="dev_family",
             command_type="speak",

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
-import 'package:mira_guardian_app/src/features/points/domain/point_models.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/points/domain/point_models.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
 
 class PointsScreen extends ConsumerWidget {
   const PointsScreen({super.key});
@@ -18,13 +19,13 @@ class PointsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final summary = ref.watch(pointsSummaryProvider);
 
-    return MiraScreen(
+    return AppScreen(
       title: '积分',
       subtitle: '余额、任务奖励和兑换流水',
       fixedHeader: true,
       backLabel: '返回我的',
       onBack: () => context.go(AppRoute.profile.path),
-      trailing: MiraIconButton(
+      trailing: AppIconButton(
         icon: Icons.card_giftcard_outlined,
         label: '奖励',
         onTap: () => context.go(rewardsPath),
@@ -35,7 +36,7 @@ class PointsScreen extends ConsumerWidget {
           const SizedBox(height: 14),
           _LedgerPanel(entries: data.ledger),
           const SizedBox(height: 14),
-          MiraSecondaryButton(
+          AppSecondaryButton(
             label: '补发或更正积分',
             trailing: const Icon(Icons.tune_outlined, size: 18),
             onTap: data.account.childId.isEmpty
@@ -45,8 +46,8 @@ class PointsScreen extends ConsumerWidget {
         ],
         loading: () => const [_PointsLoading()],
         error: (error, _) => [
-          MiraStateView(
-            variant: MiraStateVariant.serviceUnavailable,
+          AppStateView(
+            variant: AppStateVariant.serviceUnavailable,
             title: '积分暂时没有更新',
             message: error is PointException ? error.message : '请稍后重试。',
             primaryActionLabel: '重新加载',
@@ -65,7 +66,7 @@ class _BalancePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
+    return AppSurface(
       color: AppColors.ink,
       borderColor: AppColors.ink,
       radius: 24,
@@ -138,15 +139,15 @@ class _LedgerPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (entries.isEmpty) {
-      return const MiraStateView(
-        variant: MiraStateVariant.emptyLedger,
+      return const AppStateView(
+        variant: AppStateVariant.emptyLedger,
         title: '还没有积分流水',
         message: '家长确认任务或兑换奖励后，积分变化会显示在这里。',
         compact: true,
       );
     }
 
-    return MiraSurface(
+    return AppSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -162,7 +163,7 @@ class _LedgerPanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           for (final entry in entries)
-            MiraListRow(
+            AppListRow(
               icon: entry.delta >= 0
                   ? Icons.add_circle_outline
                   : Icons.remove_circle_outline,
@@ -171,8 +172,8 @@ class _LedgerPanel extends StatelessWidget {
                   ? '余额 ${entry.balanceAfter}'
                   : '${entry.note} · 余额 ${entry.balanceAfter}',
               tone: entry.delta >= 0
-                  ? MiraListRowTone.green
-                  : MiraListRowTone.amber,
+                  ? AppListRowTone.green
+                  : AppListRowTone.amber,
               trailing: Text(
                 '${entry.delta >= 0 ? '+' : ''}${entry.delta}',
                 style: TextStyle(
@@ -197,7 +198,7 @@ class _PointsLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MiraLoadingState(title: '正在同步积分', message: '正在整理余额和最近的积分变化。');
+    return const AppLoadingState(title: '正在同步积分', message: '正在整理余额和最近的积分变化。');
   }
 }
 
@@ -206,60 +207,44 @@ void _showAdjustSheet(
   WidgetRef ref,
   PointAccount account,
 ) {
-  showModalBottomSheet<void>(
+  showAppBottomSheet<void>(
     context: context,
-    useRootNavigator: true,
-    showDragHandle: true,
-    backgroundColor: AppColors.appBackgroundWarm,
-    builder: (context) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '补发或更正积分',
-              style: TextStyle(
-                color: AppColors.ink,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              '用于家长临时补发或扣回积分，调整记录会保留在这里。',
-              style: TextStyle(
-                color: AppColors.muted,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                height: 1.55,
-                letterSpacing: 0,
-              ),
-            ),
-            const SizedBox(height: 16),
-            MiraListRow(
-              icon: Icons.add_circle_outline,
-              title: '补发 5 分',
-              subtitle: '家长手动补发',
-              tone: MiraListRowTone.green,
-              onTap: () => _adjust(context, ref, account, 5),
-            ),
-            MiraListRow(
-              icon: Icons.remove_circle_outline,
-              title: '扣回 5 分',
-              subtitle: '更正误发积分',
-              tone: MiraListRowTone.amber,
-              onTap: () => _adjust(context, ref, account, -5),
-            ),
-          ],
-        ),
-      );
-    },
+    maxHeightFactor: 0.48,
+    child: _PointsAdjustSheet(ref: ref, account: account),
   );
+}
+
+class _PointsAdjustSheet extends StatelessWidget {
+  const _PointsAdjustSheet({required this.ref, required this.account});
+
+  final WidgetRef ref;
+  final PointAccount account;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBottomSheetBody(
+      title: '补发或更正积分',
+      subtitle: '用于家长临时补发或扣回积分，调整记录会保留在这里。',
+      child: Column(
+        children: [
+          AppListRow(
+            icon: Icons.add_circle_outline,
+            title: '补发 5 分',
+            subtitle: '家长手动补发',
+            tone: AppListRowTone.green,
+            onTap: () => _adjust(context, ref, account, 5),
+          ),
+          AppListRow(
+            icon: Icons.remove_circle_outline,
+            title: '扣回 5 分',
+            subtitle: '更正误发积分',
+            tone: AppListRowTone.amber,
+            onTap: () => _adjust(context, ref, account, -5),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 Future<void> _adjust(

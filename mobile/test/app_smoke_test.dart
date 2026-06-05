@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mira_guardian_app/src/app/app.dart';
-import 'package:mira_guardian_app/src/core/config/app_environment.dart';
-import 'package:mira_guardian_app/src/core/storage/auth_session_store.dart';
-import 'package:mira_guardian_app/src/core/storage/onboarding_store.dart';
-import 'package:mira_guardian_app/src/core/storage/setup_store.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
+import 'package:guardian_parent_app/src/app/app.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
+import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
+import 'package:guardian_parent_app/src/core/storage/setup_store.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -47,7 +47,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('登录家庭看护空间'), findsOneWidget);
-    expect(find.text('家庭看护'), findsNothing);
+    expect(find.text('少盯一点，也能知道孩子现在怎么样。'), findsNothing);
   });
 
   testWidgets('starts at home when refresh session is still valid', (
@@ -92,8 +92,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Wi-Fi 配网'), findsOneWidget);
-    await tester.enterText(find.byType(EditableText).at(0), 'Mira Home 2.4G');
-    await tester.enterText(find.byType(EditableText).at(1), 'mira2026home');
+    await tester.enterText(find.byType(EditableText).at(0), 'Home Wi-Fi 2.4G');
+    await tester.enterText(find.byType(EditableText).at(1), 'home2026wifi');
     await tester.pump();
     await tester.tap(find.text('开始绑定'));
     await tester.pump(const Duration(seconds: 1));
@@ -114,8 +114,8 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
 
-    expect(find.text('Mira Guardian'), findsOneWidget);
-    expect(find.text('客厅米拉 · 在线看护中'), findsOneWidget);
+    expect(find.text('家庭看护'), findsOneWidget);
+    expect(find.text('客厅设备 · 在线看护中'), findsOneWidget);
     expect(find.text('需要你处理'), findsOneWidget);
   });
 
@@ -173,8 +173,8 @@ void main() {
 
     await _loginSuccessfully(tester);
 
-    expect(find.text('Mira Guardian'), findsOneWidget);
-    expect(find.text('客厅米拉 · 在线看护中'), findsOneWidget);
+    expect(find.text('家庭看护'), findsOneWidget);
+    expect(find.text('客厅设备 · 在线看护中'), findsOneWidget);
 
     await tester.tap(find.text('任务').last);
     await tester.pumpAndSettle();
@@ -198,7 +198,7 @@ void main() {
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
     expect(find.text('家庭看护空间'), findsOneWidget);
-    expect(find.text('家庭与孩子'), findsOneWidget);
+    expect(find.text('家庭与成员'), findsOneWidget);
   });
 
   testWidgets('rejecting a confirmation task is final in V1 copy', (
@@ -262,6 +262,9 @@ void main() {
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('任务与奖励'));
+    await tester.pumpAndSettle();
+
     final pointsEntry = find.text('积分账户');
     await tester.scrollUntilVisible(pointsEntry, 400);
     await Scrollable.ensureVisible(
@@ -275,6 +278,8 @@ void main() {
     expect(find.text('补发或更正积分'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('任务与奖励'));
     await tester.pumpAndSettle();
     final rewardsEntry = find.text('奖励中心');
     await tester.scrollUntilVisible(rewardsEntry, 400);
@@ -319,27 +324,69 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('家庭看护空间'), findsOneWidget);
 
-    for (final entry in const [
-      ['家庭成员', '家庭成员'],
-      ['孩子资料', '孩子资料'],
-      ['紧急联系人', '紧急联系人'],
-      ['设备管理', '设备管理'],
-      ['摄像头与看护状态', '摄像头与看护'],
-      ['AI 看护规则', 'AI 看护规则'],
-      ['通知与提醒', '通知与提醒'],
-      ['隐私与权限', '隐私与权限'],
-      ['对话与人设', '对话与人设'],
-      ['学习内容', '学习内容'],
-      ['今日报告', '今日报告'],
-      ['周报', '周报'],
-      ['成长时刻', '成长时刻'],
-      ['个人信息', '个人信息'],
-      ['账号安全', '账号安全'],
-      ['订阅与套餐', '订阅与套餐'],
-      ['关于', '关于'],
+    await tester.tap(find.text('家庭看护空间').first);
+    await tester.pumpAndSettle();
+    expect(find.text('个人信息'), findsWidgets);
+    await tester.tap(find.text('家庭身份').last);
+    await tester.pumpAndSettle();
+    expect(find.text('选择家庭身份'), findsOneWidget);
+    await tester.tap(find.text('爸爸').last);
+    await tester.pumpAndSettle();
+    expect(find.text('爸爸'), findsWidgets);
+    await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+    await tester.pumpAndSettle();
+
+    for (final category in const [
+      '家庭与成员',
+      '设备与看护',
+      '任务与奖励',
+      'AI 规则与提醒',
+      '隐私与授权',
+      '账号安全',
+      '订阅与套餐',
+      '关于',
     ]) {
-      await _openProfileEntry(tester, entry.first, expectedTitle: entry.last);
+      await _openProfileEntry(tester, category, expectedTitle: category);
     }
+
+    await _openProfileSubscription(tester);
+
+    await _openProfileNestedEntry(
+      tester,
+      '家庭与成员',
+      '家庭成员',
+      expectedTitle: '家庭成员',
+    );
+    await _openProfileNestedEntry(
+      tester,
+      '家庭与成员',
+      '孩子资料',
+      expectedTitle: '孩子资料',
+    );
+    await _openProfileNestedEntry(
+      tester,
+      '设备与看护',
+      '设备管理',
+      expectedTitle: '设备管理',
+    );
+    await _openProfileNestedEntry(
+      tester,
+      '任务与奖励',
+      '奖励中心',
+      expectedTitle: '奖励商店',
+    );
+    await _openProfileNestedEntry(
+      tester,
+      'AI 规则与提醒',
+      '通知与提醒',
+      expectedTitle: '通知与提醒',
+    );
+    await _openProfileNestedEntry(
+      tester,
+      '隐私与授权',
+      '隐私与权限',
+      expectedTitle: '隐私与权限',
+    );
 
     expect(find.text('安全区域'), findsNothing);
     expect(find.text('打卡审核'), findsNothing);
@@ -528,6 +575,83 @@ Future<void> _openProfileEntry(
   await tester.pumpAndSettle();
 }
 
+Future<void> _openProfileSubscription(WidgetTester tester) async {
+  final entry = find.text('订阅与套餐').last;
+  await tester.scrollUntilVisible(entry, 420);
+  await tester.ensureVisible(entry);
+  await tester.pumpAndSettle();
+  await tester.tap(entry);
+  await tester.pumpAndSettle();
+
+  expect(find.text('让看护更完整'), findsOneWidget);
+  expect(find.byKey(const ValueKey('subscriptionHeroImage')), findsOneWidget);
+  await tester.ensureVisible(find.text('¥29').first);
+  expect(find.text('¥29'), findsWidgets);
+  expect(find.text('开通会员版'), findsOneWidget);
+  await tester.tap(find.text('开通会员版'));
+  await tester.pump(const Duration(milliseconds: 350));
+  expect(find.textContaining('在线付款入口暂未开放'), findsOneWidget);
+  Navigator.of(
+    tester.element(find.textContaining('在线付款入口暂未开放')),
+    rootNavigator: true,
+  ).pop();
+  await tester.pumpAndSettle();
+  await tester.drag(find.byType(PageView).first, const Offset(-320, 0));
+  await tester.pumpAndSettle();
+  expect(find.text('¥59'), findsWidgets);
+  await tester.ensureVisible(find.text('恢复购买'));
+  expect(find.text('恢复购买'), findsOneWidget);
+  expect(find.text('用户协议'), findsOneWidget);
+  expect(find.text('隐私政策'), findsOneWidget);
+  expect(find.text('儿童隐私授权说明'), findsOneWidget);
+  await tester.tap(find.text('恢复购买'));
+  await tester.pump(const Duration(milliseconds: 350));
+  expect(find.textContaining('暂未找到可恢复的订阅记录'), findsOneWidget);
+  Navigator.of(
+    tester.element(find.textContaining('暂未找到可恢复的订阅记录')),
+    rootNavigator: true,
+  ).pop();
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('用户协议'));
+  await tester.pumpAndSettle();
+  expect(find.text('用户协议'), findsWidgets);
+  await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+  await tester.pumpAndSettle();
+}
+
+Future<void> _openProfileNestedEntry(
+  WidgetTester tester,
+  String category,
+  String label, {
+  required String expectedTitle,
+}) async {
+  final categoryEntry = find.text(category).last;
+  await tester.scrollUntilVisible(categoryEntry, 420);
+  await tester.ensureVisible(categoryEntry);
+  await tester.pumpAndSettle();
+  await tester.tap(categoryEntry);
+  await tester.pumpAndSettle();
+  expect(find.text(category), findsWidgets);
+
+  final nested = find.text(label).last;
+  await tester.scrollUntilVisible(nested, 420);
+  await tester.ensureVisible(nested);
+  await tester.pumpAndSettle();
+  await tester.tap(nested);
+  await tester.pumpAndSettle();
+  expect(find.text(expectedTitle), findsWidgets);
+  expect(find.textContaining('backend'), findsNothing);
+  expect(find.textContaining('API'), findsNothing);
+  await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+  await tester.pumpAndSettle();
+  if (find.byIcon(Icons.arrow_back_ios_new).evaluate().isNotEmpty) {
+    await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+    await tester.pumpAndSettle();
+  }
+}
+
 Future<void> _pumpApp(
   WidgetTester tester, {
   required Map<String, Object> preferences,
@@ -551,7 +675,7 @@ Future<void> _pumpApp(
         appEnvironmentProvider.overrideWithValue(AppEnvironment.mock()),
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
-      child: const MiraGuardianApp(),
+      child: const GuardianApp(),
     ),
   );
 }
@@ -582,8 +706,8 @@ Future<void> _pumpStateView(
           body: SafeArea(
             child: Padding(
               padding: EdgeInsets.all(20),
-              child: MiraStateView(
-                variant: MiraStateVariant.serviceUnavailable,
+              child: AppStateView(
+                variant: AppStateVariant.serviceUnavailable,
                 title: '暂时连不上服务',
                 message: '可能是网络不稳定，或者服务正在重启。你可以稍后再试。',
                 primaryActionLabel: '重新连接',

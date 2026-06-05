@@ -4,19 +4,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/platform/native_date_picker.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
-import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
-import 'package:mira_guardian_app/src/features/tasks/application/task_repository.dart';
-import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_compact_toggle.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/platform/native_date_picker.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/mvp/application/mvp_mock_provider.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
+import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_compact_toggle.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 final taskSelectedDateProvider = StateProvider<DateTime>((ref) {
   return _dayOnly(DateTime.now());
@@ -59,7 +60,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     );
     final weekTasks = ref.watch(taskWeekProvider(query));
 
-    return MiraScreen(
+    return AppScreen(
       title: '任务',
       pinnedHeaderHeight: 146,
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -96,7 +97,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               onOpen: (task) => context.go('$taskDetailPath/${task.id}'),
             );
           },
-          loading: () => const MiraLoadingState(
+          loading: () => const AppLoadingState(
             title: '正在整理本周任务',
             message: '正在同步今天和这一周的安排。',
           ),
@@ -177,9 +178,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       });
       ref.read(taskSelectedDateProvider.notifier).state = targetDate;
       _refreshTasks();
-      showMiraStateSnackBar(
+      showAppStateSnackBar(
         context,
-        variant: MiraStateVariant.saved,
+        variant: AppStateVariant.saved,
         title: '已保存',
         message: '任务已加入本周安排。',
       );
@@ -229,29 +230,19 @@ Future<DateTime?> showTaskFormSheet(
   GuardianTask? task,
   List<GuardianTask> existingTasks = const [],
 }) {
-  return showModalBottomSheet<DateTime>(
+  return showAppBottomSheet<DateTime>(
     context: context,
-    isScrollControlled: true,
-    useRootNavigator: true,
-    useSafeArea: true,
-    showDragHandle: false,
-    backgroundColor: AppColors.appBackgroundWarm,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    maxHeightFactor: 0.92,
+    child: TaskFormSheet(
+      childId: childId,
+      initialDate: initialDate,
+      childAgeGroup: childAgeGroup,
+      initialMode: initialMode,
+      showTemplatePicker: showTemplatePicker,
+      onSavedProgress: onSavedProgress,
+      task: task,
+      existingTasks: existingTasks,
     ),
-    clipBehavior: Clip.antiAlias,
-    builder: (context) {
-      return TaskFormSheet(
-        childId: childId,
-        initialDate: initialDate,
-        childAgeGroup: childAgeGroup,
-        initialMode: initialMode,
-        showTemplatePicker: showTemplatePicker,
-        onSavedProgress: onSavedProgress,
-        task: task,
-        existingTasks: existingTasks,
-      );
-    },
   );
 }
 
@@ -684,7 +675,7 @@ class _TaskTimelineCard extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: MiraSurface(
+          child: AppSurface(
             onTap: onTap,
             padding: const EdgeInsets.fromLTRB(15, 14, 14, 14),
             radius: 18,
@@ -808,8 +799,8 @@ class _TaskEmptyState extends StatelessWidget {
         : '${_dateShort(selectedDate)}没有任务';
     final message = isPast ? '这一天没有安排记录。' : '添加一个任务，帮孩子把安排记清楚。';
 
-    return MiraStateView(
-      variant: MiraStateVariant.emptyTasks,
+    return AppStateView(
+      variant: AppStateVariant.emptyTasks,
       title: title,
       message: message,
       primaryActionLabel: isPast ? null : '添加孩子的新任务',
@@ -828,8 +819,8 @@ class _TaskErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraStateView(
-      variant: MiraStateVariant.serviceUnavailable,
+    return AppStateView(
+      variant: AppStateVariant.serviceUnavailable,
       title: '任务更新失败',
       message: message,
       primaryActionLabel: '重新加载',
@@ -963,7 +954,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _SheetTopBar(),
+                    const AppSheetHandle(),
                     const SizedBox(height: 10),
                     Expanded(
                       child: SingleChildScrollView(
@@ -1006,8 +997,8 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
                             if (_error != null) ...[
                               const SizedBox(height: 12),
                               if (_saveFailed)
-                                MiraInlineState(
-                                  variant: MiraStateVariant.saveFailed,
+                                AppInlineState(
+                                  variant: AppStateVariant.saveFailed,
                                   title: '保存失败',
                                   message: _error!,
                                 )
@@ -1041,10 +1032,10 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
                             : () => _saveSingle(continueAdding: true),
                       )
                     else
-                      MiraPrimaryButton(
+                      AppPrimaryButton(
                         label: _saving ? '保存中' : '保存一天安排',
                         loading: _saving,
-                        trailing: const MiraButtonGlyph(icon: Icons.check),
+                        trailing: const AppButtonGlyph(icon: Icons.check),
                         onTap: _saving ? null : _saveDaySchedule,
                       ),
                   ],
@@ -1452,17 +1443,10 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     String? maxTime,
     String invalidMessage = '结束时间要晚于开始时间',
   }) {
-    return showModalBottomSheet<String>(
+    return showAppBottomSheet<String>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      showDragHandle: false,
-      backgroundColor: AppColors.appBackgroundWarm,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      builder: (context) => _MiraTimePickerSheet(
+      maxHeightFactor: 0.58,
+      child: _AppTimePickerSheet(
         initialValue: initial,
         minMinutes: minTime == null ? 0 : _minutesOfDay(minTime),
         maxMinutes: maxTime == null ? 23 * 60 + 59 : _minutesOfDay(maxTime),
@@ -1558,66 +1542,46 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
 
   Future<String?> _showTaskTypePicker(String current) {
     final configs = _taskTypeConfigsForAge(widget.childAgeGroup);
-    return showModalBottomSheet<String>(
+    return showAppBottomSheet<String>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      showDragHandle: false,
-      backgroundColor: AppColors.appBackgroundWarm,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      child: _PickerSheetScaffold(
+        title: '选择任务类型',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final config in configs)
+              _PickerListTile(
+                icon: config.icon,
+                title: config.label,
+                message: config.description,
+                selected: current == config.value,
+                onTap: () => Navigator.of(context).pop(config.value),
+              ),
+          ],
+        ),
       ),
-      clipBehavior: Clip.antiAlias,
-      builder: (context) {
-        return _PickerSheetScaffold(
-          title: '选择任务类型',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final config in configs)
-                _PickerListTile(
-                  icon: config.icon,
-                  title: config.label,
-                  message: config.description,
-                  selected: current == config.value,
-                  onTap: () => Navigator.of(context).pop(config.value),
-                ),
-            ],
-          ),
-        );
-      },
     );
   }
 
   Future<void> _chooseScheduleType() async {
-    final selected = await showModalBottomSheet<String>(
+    final selected = await showAppBottomSheet<String>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      showDragHandle: false,
-      backgroundColor: AppColors.appBackgroundWarm,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      child: _PickerSheetScaffold(
+        title: '重复规则',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final option in _scheduleOptions)
+              _PickerListTile(
+                icon: Icons.repeat_outlined,
+                title: option.label,
+                message: option.message,
+                selected: _scheduleType == option.value,
+                onTap: () => Navigator.of(context).pop(option.value),
+              ),
+          ],
+        ),
       ),
-      clipBehavior: Clip.antiAlias,
-      builder: (context) {
-        return _PickerSheetScaffold(
-          title: '重复规则',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final option in _scheduleOptions)
-                _PickerListTile(
-                  icon: Icons.repeat_outlined,
-                  title: option.label,
-                  message: option.message,
-                  selected: _scheduleType == option.value,
-                  onTap: () => Navigator.of(context).pop(option.value),
-                ),
-            ],
-          ),
-        );
-      },
     );
     if (selected == null || !mounted) return;
     setState(() => _scheduleType = selected);
@@ -1628,41 +1592,31 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     final others = _taskTemplates
         .where((template) => !recommended.contains(template))
         .toList();
-    final selected = await showModalBottomSheet<_TaskTemplate>(
+    final selected = await showAppBottomSheet<_TaskTemplate>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      showDragHandle: false,
-      backgroundColor: AppColors.appBackgroundWarm,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      builder: (context) {
-        return _PickerSheetScaffold(
-          title: '选择一个常用安排',
-          subtitle: '套用后可以继续修改。',
-          maxHeightFactor: 0.78,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+      maxHeightFactor: 0.78,
+      child: _PickerSheetScaffold(
+        title: '选择一个常用安排',
+        subtitle: '套用后可以继续修改。',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _TemplateSection(
+              title: '推荐',
+              templates: recommended,
+              onSelect: (template) => Navigator.of(context).pop(template),
+            ),
+            if (others.isNotEmpty) ...[
+              const SizedBox(height: 16),
               _TemplateSection(
-                title: '推荐',
-                templates: recommended,
+                title: '更多安排',
+                templates: others,
                 onSelect: (template) => Navigator.of(context).pop(template),
               ),
-              if (others.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                _TemplateSection(
-                  title: '更多安排',
-                  templates: others,
-                  onSelect: (template) => Navigator.of(context).pop(template),
-                ),
-              ],
             ],
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
     if (selected == null || !mounted) return;
     setState(() {
@@ -1886,132 +1840,25 @@ class _FieldLabel extends StatelessWidget {
   }
 }
 
-class _SheetTopBar extends StatelessWidget {
-  const _SheetTopBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 36,
-      child: Stack(
-        children: [
-          const Align(alignment: Alignment.center, child: _SheetGrabber()),
-          Align(
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => Navigator.of(context).pop(),
-              child: Semantics(
-                button: true,
-                label: '关闭',
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.72),
-                    borderRadius: BorderRadius.circular(AppRadii.full),
-                    border: Border.all(color: AppColors.borderSoft),
-                  ),
-                  child: const SizedBox(
-                    width: 34,
-                    height: 34,
-                    child: Center(
-                      child: Icon(
-                        Icons.close,
-                        color: AppColors.muted,
-                        size: 18,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SheetGrabber extends StatelessWidget {
-  const _SheetGrabber();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.muted.withValues(alpha: 0.64),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: const SizedBox(width: 32, height: 4),
-      ),
-    );
-  }
-}
-
 class _PickerSheetScaffold extends StatelessWidget {
   const _PickerSheetScaffold({
     required this.title,
     required this.child,
     this.subtitle,
-    this.maxHeightFactor = 0.68,
   });
 
   final String title;
   final String? subtitle;
   final Widget child;
-  final double maxHeightFactor;
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(context).height * maxHeightFactor,
-        ),
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _SheetTopBar(),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.ink,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                ),
-              ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 5),
-                Text(
-                  subtitle!,
-                  style: const TextStyle(
-                    color: AppColors.muted,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ],
-              const SizedBox(height: 14),
-              child,
-            ],
-          ),
-        ),
-      ),
-    );
+    return AppBottomSheetBody(title: title, subtitle: subtitle, child: child);
   }
 }
 
-class _MiraTimePickerSheet extends StatefulWidget {
-  const _MiraTimePickerSheet({
+class _AppTimePickerSheet extends StatefulWidget {
+  const _AppTimePickerSheet({
     required this.initialValue,
     required this.minMinutes,
     required this.maxMinutes,
@@ -2024,10 +1871,10 @@ class _MiraTimePickerSheet extends StatefulWidget {
   final String invalidMessage;
 
   @override
-  State<_MiraTimePickerSheet> createState() => _MiraTimePickerSheetState();
+  State<_AppTimePickerSheet> createState() => _AppTimePickerSheetState();
 }
 
-class _MiraTimePickerSheetState extends State<_MiraTimePickerSheet> {
+class _AppTimePickerSheetState extends State<_AppTimePickerSheet> {
   late final FixedExtentScrollController _hourController;
   late final FixedExtentScrollController _minuteController;
   late int _hour;
@@ -2068,124 +1915,85 @@ class _MiraTimePickerSheetState extends State<_MiraTimePickerSheet> {
     final rangeLabel = _minMinutes == 0 && _maxMinutes == 23 * 60 + 59
         ? null
         : '可选择 ${_minuteText(_minMinutes)} - ${_minuteText(_maxMinutes)}';
-    return SafeArea(
-      top: false,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(context).height * 0.58,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _SheetTopBar(),
-              const SizedBox(height: 10),
-              const Text(
-                '选择时间',
-                style: TextStyle(
-                  color: AppColors.ink,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                ),
-              ),
-              const SizedBox(height: 14),
-              if (rangeLabel != null) ...[
-                Text(
-                  rangeLabel,
-                  style: const TextStyle(
-                    color: AppColors.muted,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 10),
-              ],
-              MiraSurface(
-                radius: 20,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                color: AppColors.surfaceSoft,
-                borderColor: AppColors.borderSoft,
-                child: SizedBox(
-                  height: 174,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _TimeWheel(
-                          controller: _hourController,
-                          values: List.generate(24, (index) => index),
-                          suffix: '时',
-                          onChanged: (value) => setState(() => _hour = value),
-                        ),
-                      ),
-                      Container(
-                        width: 1,
-                        height: 116,
-                        color: AppColors.muted.withValues(alpha: 0.12),
-                      ),
-                      Expanded(
-                        child: _TimeWheel(
-                          controller: _minuteController,
-                          values: List.generate(60, (index) => index),
-                          suffix: '分',
-                          onChanged: (value) => setState(() => _minute = value),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (!valid) ...[
-                const SizedBox(height: 9),
-                Text(
-                  widget.invalidMessage,
-                  style: const TextStyle(
-                    color: AppColors.danger,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ],
-              const SizedBox(height: 14),
-              Row(
+    return AppBottomSheetBody(
+      title: '选择时间',
+      subtitle: rangeLabel,
+      scrollable: false,
+      footer: Row(
+        children: [
+          Expanded(
+            child: AppSecondaryButton(
+              label: '取消',
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: AppPrimaryButton(
+              label: '确定',
+              trailing: const AppButtonGlyph(icon: Icons.check),
+              onTap: valid
+                  ? () {
+                      Navigator.of(
+                        context,
+                      ).pop(_timeText(TimeOfDay(hour: _hour, minute: _minute)));
+                    }
+                  : null,
+            ),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppSurface(
+            radius: 20,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            color: AppColors.surfaceSoft,
+            borderColor: AppColors.borderSoft,
+            child: SizedBox(
+              height: 174,
+              child: Row(
                 children: [
                   Expanded(
-                    child: MiraSecondaryButton(
-                      label: '取消',
-                      onTap: () => Navigator.of(context).pop(),
+                    child: _TimeWheel(
+                      controller: _hourController,
+                      values: List.generate(24, (index) => index),
+                      suffix: '时',
+                      onChanged: (value) => setState(() => _hour = value),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  Container(
+                    width: 1,
+                    height: 116,
+                    color: AppColors.muted.withValues(alpha: 0.12),
+                  ),
                   Expanded(
-                    child: MiraPrimaryButton(
-                      label: '确定',
-                      trailing: const MiraButtonGlyph(icon: Icons.check),
-                      onTap: valid
-                          ? () {
-                              Navigator.of(context).pop(
-                                _timeText(
-                                  TimeOfDay(hour: _hour, minute: _minute),
-                                ),
-                              );
-                            }
-                          : null,
+                    child: _TimeWheel(
+                      controller: _minuteController,
+                      values: List.generate(60, (index) => index),
+                      suffix: '分',
+                      onChanged: (value) => setState(() => _minute = value),
                     ),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+          if (!valid) ...[
+            const SizedBox(height: 9),
+            Text(
+              widget.invalidMessage,
+              style: const TextStyle(
+                color: AppColors.danger,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -2311,7 +2119,7 @@ class _PickerField extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: MiraSurface(
+      child: AppSurface(
         radius: AppRadii.input,
         padding: const EdgeInsets.fromLTRB(13, 11, 12, 11),
         color: AppColors.surfaceSoft,
@@ -2446,7 +2254,7 @@ class _ScheduleRowCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = _taskConfig(row.taskType);
-    return MiraSurface(
+    return AppSurface(
       radius: 16,
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 11),
       color: AppColors.surfaceSoft,
@@ -2652,7 +2460,7 @@ class _ScheduleRowCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              MiraCompactToggle(
+                              AppCompactToggle(
                                 value: row.requiresParentConfirmation,
                                 onChanged: onConfirmChanged,
                                 label: '家长确认',
@@ -2746,7 +2554,7 @@ class _PickerListTile extends StatelessWidget {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8),
-        child: MiraSurface(
+        child: AppSurface(
           radius: AppRadii.input,
           padding: const EdgeInsets.fromLTRB(14, 12, 13, 12),
           color: selected ? AppColors.selectedBg : AppColors.surfaceSoft,
@@ -2831,7 +2639,7 @@ class _TemplateSection extends StatelessWidget {
             onTap: () => onSelect(template),
             child: Padding(
               padding: const EdgeInsets.only(bottom: 9),
-              child: MiraSurface(
+              child: AppSurface(
                 radius: 18,
                 padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
                 color: Colors.white.withValues(alpha: 0.66),
@@ -2908,24 +2716,24 @@ class _SingleTaskActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (editing) {
-      return MiraPrimaryButton(
+      return AppPrimaryButton(
         label: saving ? '保存中' : '保存',
         loading: saving,
-        trailing: const MiraButtonGlyph(icon: Icons.check),
+        trailing: const AppButtonGlyph(icon: Icons.check),
         onTap: onSave,
       );
     }
     return LayoutBuilder(
       builder: (context, constraints) {
         final vertical = constraints.maxWidth < 360;
-        final secondary = MiraSecondaryButton(
+        final secondary = AppSecondaryButton(
           label: savingContinue ? '保存中' : '保存并继续添加',
           onTap: onSaveAndContinue,
         );
-        final primary = MiraPrimaryButton(
+        final primary = AppPrimaryButton(
           label: saving && !savingContinue ? '保存中' : '保存',
           loading: saving && !savingContinue,
-          trailing: const MiraButtonGlyph(icon: Icons.check),
+          trailing: const AppButtonGlyph(icon: Icons.check),
           onTap: onSave,
         );
         if (vertical) {
@@ -3013,7 +2821,7 @@ class _ConfirmSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
+    return AppSurface(
       radius: AppRadii.input,
       padding: const EdgeInsets.fromLTRB(14, 11, 12, 11),
       color: AppColors.surfaceSoft,
@@ -3049,11 +2857,7 @@ class _ConfirmSwitch extends StatelessWidget {
               ],
             ),
           ),
-          MiraCompactToggle(
-            value: value,
-            onChanged: onChanged,
-            label: '需要家长确认',
-          ),
+          AppCompactToggle(value: value, onChanged: onChanged, label: '需要家长确认'),
         ],
       ),
     );

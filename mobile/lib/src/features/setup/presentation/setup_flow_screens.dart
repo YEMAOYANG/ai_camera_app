@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/platform/native_date_picker.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/setup/application/setup_repository.dart';
-import 'package:mira_guardian_app/src/features/setup/application/wifi_network_repository.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/platform/native_date_picker.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
+import 'package:guardian_parent_app/src/features/setup/application/wifi_network_repository.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 
 final setupDraftProvider = StateProvider<SetupDraft>((ref) {
   return const SetupDraft();
@@ -19,7 +19,7 @@ class SetupDraft {
     this.parentIdentity = '妈妈',
     this.parentName = '妈妈',
     this.familyRole = '管理员',
-    this.deviceName = '客厅米拉',
+    this.deviceName = '客厅设备',
     this.room = '客厅书桌区',
     this.wifiName = '',
     this.wifiPassword = '',
@@ -902,17 +902,17 @@ class _SetupActionDock extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (secondaryLabel != null && onSecondary != null) ...[
-              MiraSecondaryButton(label: secondaryLabel!, onTap: onSecondary),
+              AppSecondaryButton(label: secondaryLabel!, onTap: onSecondary),
               const SizedBox(height: 10),
             ],
             Opacity(
               opacity: onPrimary == null ? 0.5 : 1,
-              child: MiraPrimaryButton(
+              child: AppPrimaryButton(
                 label: primaryLabel,
                 loading: loading,
                 trailing: loading
                     ? null
-                    : const MiraButtonGlyph(icon: Icons.arrow_forward),
+                    : const AppButtonGlyph(icon: Icons.arrow_forward),
                 onTap: onPrimary,
               ),
             ),

@@ -1,5 +1,5 @@
-name: mira_guardian_app
-description: "Mira Guardian parent-facing Flutter app."
+name: guardian_parent_app
+description: "家庭看护 parent-facing Flutter app."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -70,6 +70,7 @@ flutter:
   assets:
     - assets/images/welcome/
     - assets/images/states/
+    - assets/images/subscription/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

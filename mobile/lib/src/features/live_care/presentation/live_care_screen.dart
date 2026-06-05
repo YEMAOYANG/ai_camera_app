@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/devices/application/device_repository.dart';
-import 'package:mira_guardian_app/src/features/live_care/application/camera_repository.dart';
-import 'package:mira_guardian_app/src/features/live_care/domain/camera_models.dart';
-import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
+import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
+import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
+import 'package:guardian_parent_app/src/features/mvp/application/mvp_mock_provider.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class LiveCareScreen extends ConsumerWidget {
   const LiveCareScreen({super.key});
@@ -28,7 +28,7 @@ class LiveCareScreen extends ConsumerWidget {
         ? '${snapshot.device.room} · ${snapshot.device.name}'
         : '${titleDevice.displayLocation} · ${titleDevice.displayName}';
 
-    return MiraScreen(
+    return AppScreen(
       title: '实时看护',
       subtitle: subtitle,
       children: [
@@ -79,15 +79,15 @@ class _LiveViewport extends StatelessWidget {
     final available = care?.isAvailable ?? false;
 
     if (status.isLoading) {
-      return const MiraLoadingState(
+      return const AppLoadingState(
         title: '正在连接摄像头',
         message: '正在确认设备在线状态和实时看护能力。',
       );
     }
 
     if (care == null || !available) {
-      return MiraStateView(
-        variant: MiraStateVariant.cameraUnavailable,
+      return AppStateView(
+        variant: AppStateVariant.cameraUnavailable,
         title: '摄像头暂时不在线',
         message: care?.detail ?? '我们暂时拿不到实时画面。请确认设备电源和家庭网络后再刷新。',
         primaryActionLabel: '刷新状态',
@@ -102,7 +102,7 @@ class _LiveViewport extends StatelessWidget {
     final tone = care.tone;
     final copy = _viewportCopy(status, snapshot);
 
-    return MiraSurface(
+    return AppSurface(
       color: AppColors.ink,
       borderColor: AppColors.ink,
       radius: 24,
@@ -228,9 +228,9 @@ class _LiveActions extends StatelessWidget {
     final frameAvailable = snapshot.asData?.value.available ?? false;
     return Column(
       children: [
-        MiraPrimaryButton(
+        AppPrimaryButton(
           label: '查看实时画面',
-          trailing: const MiraButtonGlyph(icon: Icons.play_arrow_rounded),
+          trailing: const AppButtonGlyph(icon: Icons.play_arrow_rounded),
           onTap: available && streamAvailable
               ? () => context.go(liveMonitorPath)
               : null,
@@ -239,7 +239,7 @@ class _LiveActions extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: MiraSecondaryButton(
+              child: AppSecondaryButton(
                 label: available ? '刷新预览' : '重新连接',
                 trailing: const Icon(Icons.refresh_outlined, size: 18),
                 onTap: onRefresh,
@@ -247,7 +247,7 @@ class _LiveActions extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: MiraSecondaryButton(
+              child: AppSecondaryButton(
                 label: '快照',
                 trailing: const Icon(Icons.camera_alt_outlined, size: 18),
                 onTap: frameAvailable
@@ -257,7 +257,7 @@ class _LiveActions extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: MiraSecondaryButton(
+              child: AppSecondaryButton(
                 label: '回放',
                 trailing: const Icon(Icons.play_circle_outline, size: 18),
                 onTap: () => context.go(liveEventsPath),
@@ -280,13 +280,13 @@ class _CareFocusPanel extends StatelessWidget {
     final care = status.asData?.value;
     final currentTask = care?.currentTask;
 
-    return MiraSurface(
+    return AppSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _SectionTitle('当前看护'),
           const SizedBox(height: 8),
-          MiraListRow(
+          AppListRow(
             icon: currentTask == null
                 ? Icons.shield_outlined
                 : Icons.play_circle_outline,
@@ -295,14 +295,14 @@ class _CareFocusPanel extends StatelessWidget {
                 ? '需要查看时进入实时画面，普通状态不会打扰孩子。'
                 : '${currentTask.timeLabel} · 任务状态会随进度同步更新',
             tone: care?.isAvailable == true
-                ? MiraListRowTone.green
-                : MiraListRowTone.amber,
+                ? AppListRowTone.green
+                : AppListRowTone.amber,
           ),
-          MiraListRow(
+          AppListRow(
             icon: Icons.play_circle_outline,
             title: '事件回放',
             subtitle: '查看最近的任务、提醒和看护片段',
-            tone: MiraListRowTone.blue,
+            tone: AppListRowTone.blue,
             onTap: () => context.go(liveEventsPath),
           ),
         ],
@@ -317,23 +317,23 @@ class LiveEventsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final monitor = ref.watch(cameraMonitorStatusProvider);
-    return MiraScreen(
+    return AppScreen(
       title: '事件回放',
       subtitle: '最近片段',
       onBack: () => context.go(AppRoute.live.path),
       children: [
         monitor.when(
           loading: () =>
-              const MiraLoadingState(title: '正在整理最近片段', message: '请稍等一下。'),
-          error: (_, _) => const MiraStateView(
-            variant: MiraStateVariant.serviceUnavailable,
+              const AppLoadingState(title: '正在整理最近片段', message: '请稍等一下。'),
+          error: (_, _) => const AppStateView(
+            variant: AppStateVariant.serviceUnavailable,
             title: '暂时拿不到回放',
             message: '稍后再试，任务记录不会受到影响。',
           ),
           data: (value) {
             if (value.lastObservation.isEmpty && value.lastReminder.isEmpty) {
-              return const MiraStateView(
-                variant: MiraStateVariant.noData,
+              return const AppStateView(
+                variant: AppStateVariant.noData,
                 title: '还没有可回放的片段',
                 message: '当任务提醒或看护片段产生后，会在这里显示。',
               );
@@ -346,7 +346,7 @@ class LiveEventsScreen extends ConsumerWidget {
                     title: '最近看护片段',
                     time: '刚刚',
                     message: value.lastObservation,
-                    tone: MiraListRowTone.blue,
+                    tone: AppListRowTone.blue,
                   ),
                 if (value.lastObservation.isNotEmpty &&
                     value.lastReminder.isNotEmpty)
@@ -357,7 +357,7 @@ class LiveEventsScreen extends ConsumerWidget {
                     title: '最近提醒',
                     time: '刚刚',
                     message: value.lastReminder,
-                    tone: MiraListRowTone.amber,
+                    tone: AppListRowTone.amber,
                   ),
               ],
             );
@@ -381,12 +381,12 @@ class _PlaybackCard extends StatelessWidget {
   final String title;
   final String time;
   final String message;
-  final MiraListRowTone tone;
+  final AppListRowTone tone;
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
-      child: MiraListRow(
+    return AppSurface(
+      child: AppListRow(
         icon: icon,
         title: title,
         subtitle: '$time · $message',

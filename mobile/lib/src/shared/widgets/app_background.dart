@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 
-class MiraAppBackground extends StatelessWidget {
-  const MiraAppBackground({required this.child, super.key});
+class AppBackground extends StatelessWidget {
+  const AppBackground({required this.child, super.key});
 
   final Widget child;
 
@@ -25,7 +25,7 @@ class MiraAppBackground extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          const Positioned.fill(child: _MiraAmbientWash()),
+          const Positioned.fill(child: _AppAmbientWash()),
           child,
         ],
       ),
@@ -33,17 +33,17 @@ class MiraAppBackground extends StatelessWidget {
   }
 }
 
-class MiraScreenBackground extends StatelessWidget {
-  const MiraScreenBackground({super.key});
+class AppScreenBackground extends StatelessWidget {
+  const AppScreenBackground({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MiraAppBackground(child: SizedBox.expand());
+    return const AppBackground(child: SizedBox.expand());
   }
 }
 
-class MiraBackgroundScaffold extends StatelessWidget {
-  const MiraBackgroundScaffold({
+class AppBackgroundScaffold extends StatelessWidget {
+  const AppBackgroundScaffold({
     required this.child,
     this.extendBody = false,
     super.key,
@@ -63,14 +63,14 @@ class MiraBackgroundScaffold extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
         extendBody: extendBody,
-        body: MiraAppBackground(child: child),
+        body: AppBackground(child: child),
       ),
     );
   }
 }
 
-class _MiraAmbientWash extends StatelessWidget {
-  const _MiraAmbientWash();
+class _AppAmbientWash extends StatelessWidget {
+  const _AppAmbientWash();
 
   @override
   Widget build(BuildContext context) {

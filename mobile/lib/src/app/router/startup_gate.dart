@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/storage/auth_session_store.dart';
-import 'package:mira_guardian_app/src/core/storage/onboarding_store.dart';
-import 'package:mira_guardian_app/src/features/setup/application/setup_repository.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_background.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
+import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
+import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 
 class StartupGate extends ConsumerStatefulWidget {
   const StartupGate({super.key});
@@ -58,18 +58,18 @@ class _StartupGateState extends ConsumerState<StartupGate> {
 
   @override
   Widget build(BuildContext context) {
-    return MiraBackgroundScaffold(
+    return AppBackgroundScaffold(
       child: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: _checking
-                ? const MiraLoadingState(
+                ? const AppLoadingState(
                     title: '正在确认家庭信息',
                     message: '正在同步登录状态和首次设置进度。',
                   )
-                : MiraStateView(
-                    variant: MiraStateVariant.serviceUnavailable,
+                : AppStateView(
+                    variant: AppStateVariant.serviceUnavailable,
                     title: '暂时连不上服务',
                     message: _serviceUnavailableMessage(_errorText),
                     primaryActionLabel: '重新连接',

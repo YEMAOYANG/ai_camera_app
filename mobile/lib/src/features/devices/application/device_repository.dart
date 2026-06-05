@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mira_guardian_app/src/core/config/app_environment.dart';
-import 'package:mira_guardian_app/src/core/network/api_client.dart';
-import 'package:mira_guardian_app/src/features/devices/domain/device_models.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/network/api_client.dart';
+import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
 
 final deviceRepositoryProvider = Provider<DeviceRepository>((ref) {
   return DeviceRepository(
@@ -170,7 +170,7 @@ final _mockDevices = [
     id: 'mock_device_living_room',
     familyId: 'mock_family',
     bindingCode: 'MIRA-MOCK-DISCOVERY',
-    name: '客厅米拉',
+    name: '客厅设备',
     location: '客厅书桌区',
     status: 'bound',
     createdAt: DateTime.now().millisecondsSinceEpoch,

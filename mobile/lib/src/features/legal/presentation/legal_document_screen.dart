@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/legal/domain/legal_document.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_background.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/legal/domain/legal_document.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
 
 class LegalDocumentScreen extends StatelessWidget {
   const LegalDocumentScreen({required this.document, super.key});
@@ -27,7 +27,7 @@ class LegalDocumentScreen extends StatelessWidget {
         backgroundColor: AppColors.appBackgroundWarm,
         body: Stack(
           children: [
-            const Positioned.fill(child: MiraScreenBackground()),
+            const Positioned.fill(child: AppScreenBackground()),
             Column(
               children: [
                 _LegalTopBar(title: document.title, safeTop: safeArea.top),

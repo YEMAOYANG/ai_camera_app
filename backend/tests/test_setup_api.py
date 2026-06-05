@@ -39,7 +39,7 @@ class SetupApiTest(unittest.TestCase):
 
         device = self.client.post(
             "/api/setup/device",
-            json={"bindingCode": "MIRA-2026", "deviceName": "客厅米拉", "location": "客厅"},
+            json={"bindingCode": "BIND-2026", "deviceName": "客厅设备", "location": "客厅"},
             headers=self._auth_headers(access_token),
         )
         self.assertEqual(device.status_code, 200)

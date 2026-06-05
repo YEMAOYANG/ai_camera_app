@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/live_care/application/camera_repository.dart';
-import 'package:mira_guardian_app/src/features/live_care/domain/camera_models.dart';
-import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
-import 'package:mira_guardian_app/src/features/tasks/application/task_repository.dart';
-import 'package:mira_guardian_app/src/features/tasks/domain/task_models.dart';
-import 'package:mira_guardian_app/src/features/tasks/presentation/tasks_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
+import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
+import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
+import 'package:guardian_parent_app/src/features/tasks/presentation/tasks_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class TaskDetailScreen extends ConsumerStatefulWidget {
   const TaskDetailScreen({required this.taskId, super.key});
@@ -40,7 +41,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
     final eventsValue = ref.watch(taskEventsProvider(widget.taskId));
 
     return taskValue.when(
-      data: (task) => MiraScreen(
+      data: (task) => AppScreen(
         title: task.title,
         subtitle: '${task.typeLabel} · ${task.timeLabel}',
         fixedHeader: true,
@@ -50,26 +51,26 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
         children: [
           _EvidencePanel(task: task, ref: ref),
           const SizedBox(height: 14),
-          MiraSurface(
+          AppSurface(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const _SectionTitle('时间和奖励'),
                 const SizedBox(height: 8),
-                MiraListRow(
+                AppListRow(
                   icon: Icons.timer_outlined,
                   title: task.timeLabel,
                   subtitle: '${task.scheduleLabel} · ${task.durationLabel}',
-                  tone: MiraListRowTone.blue,
+                  tone: AppListRowTone.blue,
                 ),
                 if (task.rewardPoints > 0)
-                  MiraListRow(
+                  AppListRow(
                     icon: Icons.stars_outlined,
                     title: '+${task.rewardPoints} 分',
                     subtitle: task.parentDecisionLabel,
                     tone: task.status.awaitsParent
-                        ? MiraListRowTone.amber
-                        : MiraListRowTone.neutral,
+                        ? AppListRowTone.amber
+                        : AppListRowTone.neutral,
                   ),
               ],
             ),
@@ -78,21 +79,21 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
           _TaskEventsPanel(events: eventsValue),
         ],
       ),
-      loading: () => MiraScreen(
+      loading: () => AppScreen(
         title: '任务详情',
         fixedHeader: true,
         backLabel: '返回任务',
         onBack: () => context.go(AppRoute.tasks.path),
         children: const [_TaskDetailLoading()],
       ),
-      error: (error, _) => MiraScreen(
+      error: (error, _) => AppScreen(
         title: '任务详情',
         fixedHeader: true,
         backLabel: '返回任务',
         onBack: () => context.go(AppRoute.tasks.path),
         children: [
-          MiraStateView(
-            variant: MiraStateVariant.serviceUnavailable,
+          AppStateView(
+            variant: AppStateVariant.serviceUnavailable,
             title: '任务详情暂时打不开',
             message: error is TaskException ? error.message : '请稍后重试。',
             primaryActionLabel: '重新加载',
@@ -111,7 +112,7 @@ class _TaskEventsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
+    return AppSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -138,7 +139,7 @@ class _TaskEventsPanel extends StatelessWidget {
                     index < items.length && index < 5;
                     index++
                   )
-                    MiraListRow(
+                    AppListRow(
                       icon: _eventIcon(items[index].eventType),
                       title: items[index].title,
                       subtitle:
@@ -188,12 +189,12 @@ class _TaskEventsPanel extends StatelessWidget {
     };
   }
 
-  MiraListRowTone _eventTone(StatusTone tone) {
+  AppListRowTone _eventTone(StatusTone tone) {
     return switch (tone) {
-      StatusTone.success => MiraListRowTone.green,
-      StatusTone.warning => MiraListRowTone.amber,
-      StatusTone.danger => MiraListRowTone.red,
-      _ => MiraListRowTone.neutral,
+      StatusTone.success => AppListRowTone.green,
+      StatusTone.warning => AppListRowTone.amber,
+      StatusTone.danger => AppListRowTone.red,
+      _ => AppListRowTone.neutral,
     };
   }
 }
@@ -409,7 +410,7 @@ class _EvidencePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
+    return AppSurface(
       color: AppColors.ink,
       borderColor: AppColors.ink,
       radius: 24,
@@ -567,7 +568,7 @@ class _TaskDetailLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MiraLoadingState(
+    return const AppLoadingState(
       title: '正在加载任务详情',
       message: '正在整理任务时间、证据和奖励信息。',
     );
@@ -809,26 +810,15 @@ Future<void> _cancelTask(
   WidgetRef ref,
   GuardianTask task,
 ) async {
-  final confirmed = await showDialog<bool>(
+  final confirmed = await showAppConfirmSheet(
     context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('取消任务'),
-        content: Text('确认取消“${task.title}”？取消后仍会保留记录。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('先不取消'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('确认取消'),
-          ),
-        ],
-      );
-    },
+    title: '取消任务',
+    message: '确认取消“${task.title}”？取消后仍会保留记录。',
+    confirmLabel: '确认取消',
+    cancelLabel: '先不取消',
+    danger: true,
   );
-  if (confirmed != true) return;
+  if (!confirmed) return;
 
   try {
     await ref.read(taskRepositoryProvider).cancelTask(task.id);

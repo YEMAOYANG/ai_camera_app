@@ -20,6 +20,21 @@ def family_member_payload(row: DatabaseRow) -> dict:
     }
 
 
+def family_invitation_payload(row: DatabaseRow) -> dict:
+    return {
+        "id": row["id"],
+        "familyId": row["family_id"],
+        "name": row["name"],
+        "phone": row["phone"] or "",
+        "role": row["role"],
+        "status": row["status"],
+        "createdBy": row["created_by"],
+        "createdAt": row["created_at"],
+        "updatedAt": row["updated_at"],
+        "expiresAt": row.get("expires_at"),
+    }
+
+
 def child_profile_payload(row: DatabaseRow | None) -> dict | None:
     if row is None:
         return None

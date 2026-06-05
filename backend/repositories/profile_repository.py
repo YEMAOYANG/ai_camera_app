@@ -214,6 +214,90 @@ class ProfileRepository:
             (family_id, member_id),
         )
 
+    def list_family_invitations(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+    ) -> list[DatabaseRow]:
+        return list(
+            conn.execute(
+                """
+                SELECT * FROM family_invitations
+                WHERE family_id = ? AND status = 'pending'
+                ORDER BY created_at DESC
+                """,
+                (family_id,),
+            ).fetchall()
+        )
+
+    def get_family_invitation(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        invitation_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT * FROM family_invitations WHERE family_id = ? AND id = ?",
+            (family_id, invitation_id),
+        ).fetchone()
+
+    def create_family_invitation(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        name: str,
+        phone: str,
+        role: str,
+        created_by: str,
+        now: int,
+        expires_at: int | None,
+    ) -> DatabaseRow:
+        invitation_id = f"invite_{uuid.uuid4().hex}"
+        conn.execute(
+            """
+            INSERT INTO family_invitations(
+              id, family_id, name, phone, role, status, created_by,
+              created_at, updated_at, expires_at
+            )
+            VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)
+            """,
+            (invitation_id, family_id, name, phone, role, created_by, now, now, expires_at),
+        )
+        return self.get_family_invitation(
+            conn,
+            family_id=family_id,
+            invitation_id=invitation_id,
+        )
+
+    def update_family_invitation(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        invitation_id: str,
+        fields: dict,
+        now: int,
+    ) -> DatabaseRow | None:
+        if fields:
+            assignments = [f"{column} = ?" for column in fields]
+            values = list(fields.values()) + [now, family_id, invitation_id]
+            conn.execute(
+                f"""
+                UPDATE family_invitations
+                SET {', '.join(assignments)}, updated_at = ?
+                WHERE family_id = ? AND id = ?
+                """,
+                values,
+            )
+        return self.get_family_invitation(
+            conn,
+            family_id=family_id,
+            invitation_id=invitation_id,
+        )
+
     def list_children(self, conn: DatabaseConnection, *, family_id: str) -> list[DatabaseRow]:
         return list(
             conn.execute(

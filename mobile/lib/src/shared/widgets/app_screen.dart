@@ -2,11 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_background.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
 
-class MiraScreen extends StatelessWidget {
-  const MiraScreen({
+class AppScreen extends StatelessWidget {
+  const AppScreen({
     required this.title,
     required this.children,
     this.subtitle,
@@ -16,8 +16,9 @@ class MiraScreen extends StatelessWidget {
     this.backLabel = '返回',
     this.fixedHeader = true,
     this.showHeader = true,
+    this.reserveBottomNavigation = true,
     this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
-    this.padding = const EdgeInsets.fromLTRB(20, 16, 20, 28),
+    this.padding = const EdgeInsets.fromLTRB(20, 10, 20, 28),
     super.key,
   });
 
@@ -29,6 +30,7 @@ class MiraScreen extends StatelessWidget {
   final String backLabel;
   final bool fixedHeader;
   final bool showHeader;
+  final bool reserveBottomNavigation;
   final double pinnedHeaderHeight;
   final List<Widget> children;
   final EdgeInsetsGeometry padding;
@@ -37,10 +39,11 @@ class MiraScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final safeArea = MediaQuery.paddingOf(context);
     final basePadding = padding.resolve(Directionality.of(context));
-    final chromeBottom =
-        AppChrome.tabBarBottomGap(safeArea.bottom) +
-        AppChrome.tabBarHeight +
-        AppChrome.tabBarContentGap;
+    final chromeBottom = reserveBottomNavigation
+        ? AppChrome.tabBarBottomGap(safeArea.bottom) +
+              AppChrome.tabBarHeight +
+              AppChrome.tabBarContentGap
+        : safeArea.bottom + 18;
     final bottomPadding = chromeBottom > basePadding.bottom
         ? chromeBottom
         : basePadding.bottom;
@@ -60,43 +63,46 @@ class MiraScreen extends StatelessWidget {
         systemNavigationBarColor: AppColors.appBackgroundWarm,
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
-      child: Stack(
-        children: [
-          const Positioned.fill(child: MiraScreenBackground()),
-          ListView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: adjustedPadding,
-            children: [
-              if (!fixedHeader && showHeader) ...[
-                _MiraLargeHeader(
-                  title: title,
-                  subtitle: subtitle,
-                  trailing: trailing,
-                ),
-                const SizedBox(height: 18),
+      child: Scaffold(
+        backgroundColor: AppColors.appBackground,
+        body: Stack(
+          children: [
+            const Positioned.fill(child: AppScreenBackground()),
+            ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: adjustedPadding,
+              children: [
+                if (!fixedHeader && showHeader) ...[
+                  _AppLargeHeader(
+                    title: title,
+                    subtitle: subtitle,
+                    trailing: trailing,
+                  ),
+                  const SizedBox(height: 18),
+                ],
+                ...children,
               ],
-              ...children,
-            ],
-          ),
-          if (fixedHeader && showHeader)
-            _MiraPinnedHeader(
-              title: title,
-              subtitle: subtitle,
-              safeTop: safeArea.top,
-              onBack: onBack,
-              backLabel: backLabel,
-              trailing: trailing,
-              headerContent: headerContent,
-              headerHeight: pinnedHeaderHeight,
             ),
-        ],
+            if (fixedHeader && showHeader)
+              _AppPinnedHeader(
+                title: title,
+                subtitle: subtitle,
+                safeTop: safeArea.top,
+                onBack: onBack,
+                backLabel: backLabel,
+                trailing: trailing,
+                headerContent: headerContent,
+                headerHeight: pinnedHeaderHeight,
+              ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _MiraLargeHeader extends StatelessWidget {
-  const _MiraLargeHeader({
+class _AppLargeHeader extends StatelessWidget {
+  const _AppLargeHeader({
     required this.title,
     required this.subtitle,
     required this.trailing,
@@ -149,8 +155,8 @@ class _MiraLargeHeader extends StatelessWidget {
   }
 }
 
-class _MiraPinnedHeader extends StatelessWidget {
-  const _MiraPinnedHeader({
+class _AppPinnedHeader extends StatelessWidget {
+  const _AppPinnedHeader({
     required this.title,
     required this.subtitle,
     required this.safeTop,
@@ -199,7 +205,7 @@ class _MiraPinnedHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     if (hasBack) ...[
-                      MiraIconButton(
+                      AppIconButton(
                         icon: Icons.arrow_back_ios_new,
                         label: backLabel,
                         onTap: onBack!,
@@ -260,8 +266,8 @@ class _MiraPinnedHeader extends StatelessWidget {
   }
 }
 
-class MiraIconButton extends StatelessWidget {
-  const MiraIconButton({
+class AppIconButton extends StatelessWidget {
+  const AppIconButton({
     required this.icon,
     required this.onTap,
     this.label,

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
-import 'package:mira_guardian_app/src/features/rewards/application/reward_repository.dart';
-import 'package:mira_guardian_app/src/features/rewards/domain/reward_models.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_list_row.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
+import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class RewardDetailScreen extends ConsumerWidget {
   const RewardDetailScreen({required this.itemId, super.key});
@@ -31,13 +32,13 @@ class RewardDetailScreen extends ConsumerWidget {
             points.asData?.value != null &&
             balance >= item.pointsCost;
 
-        return MiraScreen(
+        return AppScreen(
           title: item.title,
           subtitle: '${item.pointsCost} 分兑换',
           fixedHeader: true,
           backLabel: '返回奖励',
           onBack: () => context.go(rewardsPath),
-          trailing: MiraIconButton(
+          trailing: AppIconButton(
             icon: Icons.edit_outlined,
             label: '编辑奖励',
             onTap: () => context.push('$rewardEditPath/${item.id}'),
@@ -45,7 +46,7 @@ class RewardDetailScreen extends ConsumerWidget {
           children: [
             _RewardHero(item: item, balance: balance),
             const SizedBox(height: 14),
-            MiraSurface(
+            AppSurface(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -65,11 +66,11 @@ class RewardDetailScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  MiraListRow(
+                  AppListRow(
                     icon: Icons.stars_outlined,
                     title: '所需积分',
                     subtitle: '兑换后会立即扣减积分，并留下清楚记录。',
-                    tone: MiraListRowTone.amber,
+                    tone: AppListRowTone.amber,
                     trailing: Text(
                       '${item.pointsCost}',
                       style: const TextStyle(
@@ -84,15 +85,15 @@ class RewardDetailScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 18),
-            MiraPrimaryButton(
+            AppPrimaryButton(
               label: canRedeem ? '兑换奖励' : '积分不足',
-              trailing: const MiraButtonGlyph(icon: Icons.redeem_outlined),
+              trailing: const AppButtonGlyph(icon: Icons.redeem_outlined),
               onTap: canRedeem
                   ? () => _showRedeemDialog(context, ref, item)
                   : null,
             ),
             const SizedBox(height: 10),
-            MiraSecondaryButton(
+            AppSecondaryButton(
               label: '查看兑换记录',
               trailing: const Icon(Icons.history_outlined, size: 18),
               onTap: () => context.go(rewardsPath),
@@ -100,21 +101,21 @@ class RewardDetailScreen extends ConsumerWidget {
           ],
         );
       },
-      loading: () => MiraScreen(
+      loading: () => AppScreen(
         title: '奖励详情',
         fixedHeader: true,
         backLabel: '返回奖励',
         onBack: () => context.go(rewardsPath),
         children: const [_RewardDetailLoading()],
       ),
-      error: (error, _) => MiraScreen(
+      error: (error, _) => AppScreen(
         title: '奖励详情',
         fixedHeader: true,
         backLabel: '返回奖励',
         onBack: () => context.go(rewardsPath),
         children: [
-          MiraStateView(
-            variant: MiraStateVariant.serviceUnavailable,
+          AppStateView(
+            variant: AppStateVariant.serviceUnavailable,
             title: '奖励详情暂时打不开',
             message: error is RewardException ? error.message : '请稍后重试。',
             primaryActionLabel: '重新加载',
@@ -134,7 +135,7 @@ class _RewardHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
+    return AppSurface(
       color: AppColors.ink,
       borderColor: AppColors.ink,
       radius: 24,
@@ -233,33 +234,23 @@ class _RewardDetailLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MiraLoadingState(title: '正在加载奖励', message: '正在确认积分余额和兑换规则。');
+    return const AppLoadingState(title: '正在加载奖励', message: '正在确认积分余额和兑换规则。');
   }
 }
 
-void _showRedeemDialog(BuildContext context, WidgetRef ref, RewardItem item) {
-  showDialog<void>(
+Future<void> _showRedeemDialog(
+  BuildContext context,
+  WidgetRef ref,
+  RewardItem item,
+) async {
+  final confirmed = await showAppConfirmSheet(
     context: context,
-    builder: (dialogContext) {
-      return AlertDialog(
-        title: const Text('确认兑换'),
-        content: Text('将使用 ${item.pointsCost} 分兑换「${item.title}」。兑换后会生成待兑现记录。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              await _redeem(context, ref, item);
-            },
-            child: const Text('确认兑换'),
-          ),
-        ],
-      );
-    },
+    title: '确认兑换',
+    message: '将使用 ${item.pointsCost} 分兑换「${item.title}」。兑换后会生成待兑现记录。',
+    confirmLabel: '确认兑换',
   );
+  if (!confirmed || !context.mounted) return;
+  await _redeem(context, ref, item);
 }
 
 Future<void> _redeem(

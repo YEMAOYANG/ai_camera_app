@@ -22,7 +22,7 @@ class GuardianSnapshot {
       currentTask: '数学练习 25 分钟',
       nextCareAction: '19:35 进入 5 分钟休息',
       device: const DeviceSummary(
-        name: '客厅米拉',
+        name: '客厅设备',
         online: true,
         privacyMode: false,
         audioEnabled: true,

@@ -1,11 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_surface.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
 
-enum MiraStateVariant {
+enum AppStateVariant {
   serviceUnavailable,
   networkUnavailable,
   deviceOffline,
@@ -21,8 +21,8 @@ enum MiraStateVariant {
   noData,
 }
 
-class MiraStateAssets {
-  const MiraStateAssets._();
+class AppStateAssets {
+  const AppStateAssets._();
 
   static const serviceUnavailable =
       'assets/images/states/service-unavailable.png';
@@ -33,8 +33,8 @@ class MiraStateAssets {
   static const successSaved = 'assets/images/states/success-saved.png';
 }
 
-class MiraStateView extends StatelessWidget {
-  const MiraStateView({
+class AppStateView extends StatelessWidget {
+  const AppStateView({
     required this.variant,
     required this.title,
     required this.message,
@@ -49,7 +49,7 @@ class MiraStateView extends StatelessWidget {
     super.key,
   });
 
-  final MiraStateVariant variant;
+  final AppStateVariant variant;
   final String title;
   final String message;
   final String? illustrationAsset;
@@ -83,8 +83,8 @@ class MiraStateView extends StatelessWidget {
               asset: illustrationAsset ?? variant._asset,
               accent: accent,
               size: artSize,
-              success: variant == MiraStateVariant.saved,
-              loading: variant == MiraStateVariant.loading,
+              success: variant == AppStateVariant.saved,
+              loading: variant == AppStateVariant.loading,
             ),
             SizedBox(height: compact ? 12 : 16),
             Text(
@@ -120,11 +120,11 @@ class MiraStateView extends StatelessWidget {
             if (primaryActionLabel != null)
               SizedBox(
                 width: buttonWidth,
-                child: MiraPrimaryButton(
+                child: AppPrimaryButton(
                   label: primaryActionLabel!,
                   trailing: primaryIcon == null
                       ? null
-                      : MiraButtonGlyph(icon: primaryIcon),
+                      : AppButtonGlyph(icon: primaryIcon),
                   onTap: onPrimaryAction,
                 ),
               ),
@@ -132,7 +132,7 @@ class MiraStateView extends StatelessWidget {
               const SizedBox(height: 10),
               SizedBox(
                 width: buttonWidth,
-                child: MiraSecondaryButton(
+                child: AppSecondaryButton(
                   label: secondaryActionLabel!,
                   onTap: onSecondaryAction,
                 ),
@@ -150,7 +150,7 @@ class MiraStateView extends StatelessWidget {
       );
     }
 
-    return MiraSurface(
+    return AppSurface(
       color: Colors.white.withValues(alpha: 0.34),
       borderColor: Colors.white.withValues(alpha: 0.58),
       radius: 16,
@@ -164,8 +164,8 @@ class MiraStateView extends StatelessWidget {
   }
 }
 
-class MiraInlineState extends StatelessWidget {
-  const MiraInlineState({
+class AppInlineState extends StatelessWidget {
+  const AppInlineState({
     required this.variant,
     required this.title,
     required this.message,
@@ -174,7 +174,7 @@ class MiraInlineState extends StatelessWidget {
     super.key,
   });
 
-  final MiraStateVariant variant;
+  final AppStateVariant variant;
   final String title;
   final String message;
   final String? actionLabel;
@@ -182,7 +182,7 @@ class MiraInlineState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraStateView(
+    return AppStateView(
       variant: variant,
       title: title,
       message: message,
@@ -193,8 +193,8 @@ class MiraInlineState extends StatelessWidget {
   }
 }
 
-class MiraLoadingState extends StatelessWidget {
-  const MiraLoadingState({
+class AppLoadingState extends StatelessWidget {
+  const AppLoadingState({
     required this.title,
     this.message = '正在同步最新内容',
     this.rows = 3,
@@ -209,7 +209,7 @@ class MiraLoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
+    return AppSurface(
       padding: EdgeInsets.fromLTRB(
         16,
         compact ? 16 : 20,
@@ -266,9 +266,9 @@ class MiraLoadingState extends StatelessWidget {
   }
 }
 
-void showMiraStateSnackBar(
+void showAppStateSnackBar(
   BuildContext context, {
-  required MiraStateVariant variant,
+  required AppStateVariant variant,
   required String title,
   String? message,
 }) {
@@ -558,58 +558,58 @@ class _SkeletonBar extends StatelessWidget {
   }
 }
 
-extension on MiraStateVariant {
+extension on AppStateVariant {
   String get _asset {
     return switch (this) {
-      MiraStateVariant.emptyTasks => MiraStateAssets.emptyTasks,
-      MiraStateVariant.deviceOffline ||
-      MiraStateVariant.cameraUnavailable ||
-      MiraStateVariant.permission => MiraStateAssets.deviceOffline,
-      MiraStateVariant.emptyRewards ||
-      MiraStateVariant.emptyLedger => MiraStateAssets.emptyRewards,
-      MiraStateVariant.searchEmpty => MiraStateAssets.searchEmpty,
-      MiraStateVariant.saved => MiraStateAssets.successSaved,
-      MiraStateVariant.serviceUnavailable ||
-      MiraStateVariant.networkUnavailable ||
-      MiraStateVariant.loading ||
-      MiraStateVariant.saveFailed ||
-      MiraStateVariant.noData => MiraStateAssets.serviceUnavailable,
+      AppStateVariant.emptyTasks => AppStateAssets.emptyTasks,
+      AppStateVariant.deviceOffline ||
+      AppStateVariant.cameraUnavailable ||
+      AppStateVariant.permission => AppStateAssets.deviceOffline,
+      AppStateVariant.emptyRewards ||
+      AppStateVariant.emptyLedger => AppStateAssets.emptyRewards,
+      AppStateVariant.searchEmpty => AppStateAssets.searchEmpty,
+      AppStateVariant.saved => AppStateAssets.successSaved,
+      AppStateVariant.serviceUnavailable ||
+      AppStateVariant.networkUnavailable ||
+      AppStateVariant.loading ||
+      AppStateVariant.saveFailed ||
+      AppStateVariant.noData => AppStateAssets.serviceUnavailable,
     };
   }
 
   Color get _accent {
     return switch (this) {
-      MiraStateVariant.emptyRewards ||
-      MiraStateVariant.emptyLedger => const Color(0xFFD8922B),
-      MiraStateVariant.saved => const Color(0xFF2F8F68),
-      MiraStateVariant.deviceOffline ||
-      MiraStateVariant.cameraUnavailable ||
-      MiraStateVariant.permission => const Color(0xFF58728C),
-      MiraStateVariant.emptyTasks ||
-      MiraStateVariant.searchEmpty => AppColors.brand,
-      MiraStateVariant.serviceUnavailable ||
-      MiraStateVariant.networkUnavailable ||
-      MiraStateVariant.loading ||
-      MiraStateVariant.saveFailed ||
-      MiraStateVariant.noData => AppColors.brandSoft,
+      AppStateVariant.emptyRewards ||
+      AppStateVariant.emptyLedger => const Color(0xFFD8922B),
+      AppStateVariant.saved => const Color(0xFF2F8F68),
+      AppStateVariant.deviceOffline ||
+      AppStateVariant.cameraUnavailable ||
+      AppStateVariant.permission => const Color(0xFF58728C),
+      AppStateVariant.emptyTasks ||
+      AppStateVariant.searchEmpty => AppColors.brand,
+      AppStateVariant.serviceUnavailable ||
+      AppStateVariant.networkUnavailable ||
+      AppStateVariant.loading ||
+      AppStateVariant.saveFailed ||
+      AppStateVariant.noData => AppColors.brandSoft,
     };
   }
 
   IconData? get _primaryIcon {
     return switch (this) {
-      MiraStateVariant.emptyTasks => Icons.add,
-      MiraStateVariant.saved => Icons.check,
-      MiraStateVariant.permission => Icons.settings_outlined,
-      MiraStateVariant.searchEmpty => Icons.search,
-      MiraStateVariant.serviceUnavailable ||
-      MiraStateVariant.networkUnavailable ||
-      MiraStateVariant.deviceOffline ||
-      MiraStateVariant.cameraUnavailable ||
-      MiraStateVariant.loading ||
-      MiraStateVariant.saveFailed ||
-      MiraStateVariant.emptyRewards ||
-      MiraStateVariant.emptyLedger ||
-      MiraStateVariant.noData => Icons.refresh,
+      AppStateVariant.emptyTasks => Icons.add,
+      AppStateVariant.saved => Icons.check,
+      AppStateVariant.permission => Icons.settings_outlined,
+      AppStateVariant.searchEmpty => Icons.search,
+      AppStateVariant.serviceUnavailable ||
+      AppStateVariant.networkUnavailable ||
+      AppStateVariant.deviceOffline ||
+      AppStateVariant.cameraUnavailable ||
+      AppStateVariant.loading ||
+      AppStateVariant.saveFailed ||
+      AppStateVariant.emptyRewards ||
+      AppStateVariant.emptyLedger ||
+      AppStateVariant.noData => Icons.refresh,
     };
   }
 }

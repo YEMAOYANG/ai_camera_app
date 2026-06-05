@@ -41,7 +41,7 @@ class MockCameraRuntimeAdapter(CameraRuntimeAdapter):
             "ok": True,
             "answer": {
                 "type": "answer",
-                "sdp": "v=0\r\ns=Mock Mira WebRTC\r\n",
+                "sdp": "v=0\r\ns=Mock Camera WebRTC\r\n",
                 "candidates": [],
             },
         }

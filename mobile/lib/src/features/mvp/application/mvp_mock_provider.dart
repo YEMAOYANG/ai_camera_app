@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mira_guardian_app/src/core/config/app_environment.dart';
-import 'package:mira_guardian_app/src/features/mvp/domain/mvp_models.dart';
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/features/mvp/domain/mvp_models.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 final guardianMvpSnapshotProvider = Provider<GuardianMvpSnapshot>((ref) {
   final environment = ref.watch(appEnvironmentProvider);
@@ -48,17 +48,17 @@ const _mockSnapshot = GuardianMvpSnapshot(
     todayFocus: '练习作业自启动，减少家长重复催促',
   ),
   device: GuardianDeviceSummary(
-    name: '客厅米拉',
+    name: '客厅设备',
     room: '客厅书桌区',
     online: true,
     connectionLabel: '在线',
-    networkLabel: 'Mira Home 5G · 信号良好',
+    networkLabel: 'Home Wi-Fi 5G · 信号良好',
     privacyLightOn: true,
     cameraEnabled: true,
     microphoneEnabled: true,
     lastOnlineLabel: '刚刚在线',
   ),
-  aiSummary: '米拉已提醒 2 次，孩子在 3 分钟内回到书桌。当前不需要家长介入，12 分钟后需要确认证据。',
+  aiSummary: '看护助手已提醒 2 次，孩子在 3 分钟内回到书桌。当前不需要家长介入，12 分钟后需要确认证据。',
   nextAction: '19:35 进入休息，之后确认数学作业证据。',
   pendingItems: [
     PendingCareItem(

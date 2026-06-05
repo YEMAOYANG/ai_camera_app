@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 
-class MiraSurface extends StatelessWidget {
-  const MiraSurface({
+class AppSurface extends StatelessWidget {
+  const AppSurface({
     required this.child,
     this.padding = const EdgeInsets.all(16),
     this.color,
@@ -36,8 +36,8 @@ class MiraSurface extends StatelessWidget {
   }
 }
 
-class MiraEmptyState extends StatelessWidget {
-  const MiraEmptyState({
+class AppEmptyState extends StatelessWidget {
+  const AppEmptyState({
     required this.icon,
     required this.title,
     required this.message,
@@ -52,7 +52,7 @@ class MiraEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MiraSurface(
+    return AppSurface(
       padding: const EdgeInsets.fromLTRB(18, 28, 18, 26),
       child: Column(
         children: [

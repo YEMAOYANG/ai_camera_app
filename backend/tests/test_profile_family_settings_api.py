@@ -76,6 +76,50 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(deleted.status_code, 200)
 
+    def test_family_invitations_create_resend_cancel_and_isolation(self):
+        created = self.client.post(
+            "/api/family/invitations",
+            json={"name": "外婆", "phone": "13600002026", "role": "viewer"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(created.status_code, 200)
+        invitation = created.json["invitation"]
+        self.assertEqual(invitation["name"], "外婆")
+        self.assertEqual(invitation["status"], "pending")
+        self.assertEqual(invitation["role"], "viewer")
+
+        listed = self.client.get("/api/family/invitations", headers=self._auth_headers())
+        self.assertEqual(listed.status_code, 200)
+        self.assertEqual(len(listed.json["invitations"]), 1)
+
+        resent = self.client.post(
+            f"/api/family/invitations/{invitation['id']}/resend",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(resent.status_code, 200)
+        self.assertEqual(resent.json["invitation"]["status"], "pending")
+
+        other_token = self._login("13700002026")
+        isolated = self.client.post(
+            f"/api/family/invitations/{invitation['id']}/cancel",
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(isolated.status_code, 404)
+
+        cancelled = self.client.post(
+            f"/api/family/invitations/{invitation['id']}/cancel",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(cancelled.status_code, 200)
+        self.assertEqual(cancelled.json["invitation"]["status"], "cancelled")
+
+        listed_after_cancel = self.client.get(
+            "/api/family/invitations",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(listed_after_cancel.status_code, 200)
+        self.assertEqual(listed_after_cancel.json["invitations"], [])
+
     def test_child_profile_and_emergency_contacts_crud(self):
         child = self.client.patch(
             f"/api/children/{self.child_id}",
@@ -84,7 +128,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
                 "nickname": "小宇",
                 "educationStage": "小学",
                 "grade": "一年级",
-                "schoolName": "米拉小学",
+                "schoolName": "示例小学",
                 "interests": ["阅读", "搭积木"],
                 "taskPreferences": {"pace": "gentle"},
             },
@@ -96,7 +140,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
 
         current = self.client.get("/api/children/current", headers=self._auth_headers())
         self.assertEqual(current.status_code, 200)
-        self.assertEqual(current.json["child"]["schoolName"], "米拉小学")
+        self.assertEqual(current.json["child"]["schoolName"], "示例小学")
 
         contact = self.client.post(
             "/api/contacts/emergency",
@@ -128,11 +172,11 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
     def test_device_management_and_status(self):
         renamed = self.client.post(
             f"/api/devices/{self.device_id}/rename",
-            json={"name": "书房米拉"},
+            json={"name": "书房设备"},
             headers=self._auth_headers(),
         )
         self.assertEqual(renamed.status_code, 200)
-        self.assertEqual(renamed.json["device"]["name"], "书房米拉")
+        self.assertEqual(renamed.json["device"]["name"], "书房设备")
 
         patched = self.client.patch(
             f"/api/devices/{self.device_id}",
@@ -185,11 +229,40 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
 
         about = self.client.get("/api/app/about")
         self.assertEqual(about.status_code, 200)
-        self.assertEqual(about.json["about"]["appName"], "Mira Guardian")
+        self.assertEqual(about.json["about"]["appName"], "家庭看护")
 
         subscription = self.client.get("/api/subscription/status", headers=self._auth_headers())
         self.assertEqual(subscription.status_code, 200)
         self.assertEqual(subscription.json["subscription"]["status"], "active")
+
+        plans = self.client.get("/api/subscriptions/plans", headers=self._auth_headers())
+        self.assertEqual(plans.status_code, 200)
+        self.assertEqual([plan["id"] for plan in plans.json["plans"]], ["basic", "member", "family_plus"])
+        self.assertEqual(plans.json["plans"][1]["price"], "¥29")
+
+        current = self.client.get("/api/subscriptions/current", headers=self._auth_headers())
+        self.assertEqual(current.status_code, 200)
+        self.assertEqual(current.json["subscription"]["planId"], "basic")
+
+        entitlements = self.client.get(
+            "/api/subscriptions/entitlements",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(entitlements.status_code, 200)
+        self.assertTrue(entitlements.json["entitlements"][0]["basic"])
+
+        checkout = self.client.post(
+            "/api/subscriptions/checkout-session",
+            json={"planId": "member"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(checkout.status_code, 200)
+        self.assertEqual(checkout.json["checkout"]["status"], "pending_payment")
+        self.assertTrue(checkout.json["checkout"]["receiptVerificationRequired"])
+
+        restore = self.client.post("/api/subscriptions/restore", headers=self._auth_headers())
+        self.assertEqual(restore.status_code, 200)
+        self.assertEqual(restore.json["restore"]["status"], "no_previous_purchase")
 
         daily = self.client.get("/api/reports/daily", headers=self._auth_headers())
         weekly = self.client.get("/api/reports/weekly", headers=self._auth_headers())
@@ -239,9 +312,9 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         response = self.client.post(
             "/api/setup/device",
             json={
-                "deviceName": "客厅米拉",
+                "deviceName": "客厅设备",
                 "location": "客厅书桌区",
-                "bindingCode": "MIRA-2026",
+                "bindingCode": "BIND-2026",
             },
             headers=self._auth_headers(),
         )

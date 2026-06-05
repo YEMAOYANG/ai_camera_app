@@ -40,3 +40,50 @@ def delete_member(member_id: str):
         return jsonify(profile_service().delete_family_member(bearer_token(request), member_id))
     except ApiError as exc:
         return error_response(exc)
+
+
+@family_bp.get("/invitations")
+def list_invitations():
+    try:
+        return jsonify(profile_service().list_family_invitations(bearer_token(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@family_bp.post("/invitations")
+def create_invitation():
+    try:
+        return jsonify(
+            profile_service().create_family_invitation(
+                bearer_token(request),
+                json_body(request),
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@family_bp.post("/invitations/<invitation_id>/resend")
+def resend_invitation(invitation_id: str):
+    try:
+        return jsonify(
+            profile_service().resend_family_invitation(
+                bearer_token(request),
+                invitation_id,
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@family_bp.post("/invitations/<invitation_id>/cancel")
+def cancel_invitation(invitation_id: str):
+    try:
+        return jsonify(
+            profile_service().cancel_family_invitation(
+                bearer_token(request),
+                invitation_id,
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mira_guardian_app/src/features/legal/domain/legal_document.dart';
-import 'package:mira_guardian_app/src/features/legal/presentation/legal_document_screen.dart';
+import 'package:guardian_parent_app/src/features/legal/domain/legal_document.dart';
+import 'package:guardian_parent_app/src/features/legal/presentation/legal_document_screen.dart';
 
 class UserAgreementScreen extends StatelessWidget {
   const UserAgreementScreen({super.key});

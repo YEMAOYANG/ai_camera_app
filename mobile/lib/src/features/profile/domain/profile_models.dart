@@ -92,6 +92,58 @@ class FamilyMember {
   }
 }
 
+class FamilyInvitation {
+  const FamilyInvitation({
+    required this.id,
+    required this.name,
+    required this.phone,
+    required this.role,
+    required this.status,
+    required this.createdAt,
+    required this.expiresAt,
+  });
+
+  final String id;
+  final String name;
+  final String phone;
+  final String role;
+  final String status;
+  final int createdAt;
+  final int? expiresAt;
+
+  String get roleLabel {
+    return switch (role) {
+      'admin' => '管理员',
+      'guardian' => '监护人',
+      'viewer' => '仅接收通知',
+      'caregiver' => '照护人',
+      _ => '成员',
+    };
+  }
+
+  String get statusLabel {
+    return switch (status) {
+      'pending' => '待接受',
+      'accepted' => '已接受',
+      'cancelled' => '已取消',
+      'expired' => '已过期',
+      _ => '待接受',
+    };
+  }
+
+  static FamilyInvitation fromJson(Map<String, dynamic> json) {
+    return FamilyInvitation(
+      id: _asString(json['id']),
+      name: _asString(json['name'], fallback: '家庭成员'),
+      phone: _asString(json['phone']),
+      role: _asString(json['role'], fallback: 'guardian'),
+      status: _asString(json['status'], fallback: 'pending'),
+      createdAt: _asInt(json['createdAt']),
+      expiresAt: _asNullableInt(json['expiresAt']),
+    );
+  }
+}
+
 class ChildProfile {
   const ChildProfile({
     required this.id,
@@ -330,8 +382,8 @@ class AboutInfo {
 
   static AboutInfo fromJson(Map<String, dynamic> json) {
     return AboutInfo(
-      appName: _asString(json['appName'], fallback: 'Mira Guardian'),
-      displayName: _asString(json['displayName'], fallback: '米拉家庭看护'),
+      appName: _asString(json['appName'], fallback: '家庭看护'),
+      displayName: _asString(json['displayName'], fallback: '家庭看护'),
       version: _asString(json['version']),
       description: _asString(json['description']),
       principles: _asStringList(json['principles']),
@@ -341,13 +393,17 @@ class AboutInfo {
 
 class SubscriptionStatus {
   const SubscriptionStatus({
+    required this.planId,
     required this.planLabel,
+    required this.status,
     required this.statusLabel,
     required this.renewalText,
     required this.entitlements,
   });
 
+  final String planId;
   final String planLabel;
+  final String status;
   final String statusLabel;
   final String renewalText;
   final List<SubscriptionEntitlement> entitlements;
@@ -355,7 +411,9 @@ class SubscriptionStatus {
   static SubscriptionStatus fromJson(Map<String, dynamic> json) {
     final entitlements = json['entitlements'];
     return SubscriptionStatus(
+      planId: _asString(json['planId'], fallback: _asString(json['plan'])),
       planLabel: _asString(json['planLabel']),
+      status: _asString(json['status']),
       statusLabel: _asString(json['statusLabel']),
       renewalText: _asString(json['renewalText']),
       entitlements: entitlements is List
@@ -368,15 +426,125 @@ class SubscriptionStatus {
 }
 
 class SubscriptionEntitlement {
-  const SubscriptionEntitlement({required this.name, required this.enabled});
+  const SubscriptionEntitlement({
+    required this.name,
+    required this.enabled,
+    this.key = '',
+  });
 
+  final String key;
   final String name;
   final bool enabled;
 
   static SubscriptionEntitlement fromJson(Map<String, dynamic> json) {
     return SubscriptionEntitlement(
+      key: _asString(json['key']),
       name: _asString(json['name']),
       enabled: json['enabled'] == true,
+    );
+  }
+}
+
+class SubscriptionPlan {
+  const SubscriptionPlan({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.price,
+    required this.billing,
+    required this.recommended,
+    required this.ctaLabel,
+    required this.features,
+    required this.highlights,
+  });
+
+  final String id;
+  final String title;
+  final String subtitle;
+  final String price;
+  final String billing;
+  final bool recommended;
+  final String ctaLabel;
+  final List<String> features;
+  final List<String> highlights;
+
+  static SubscriptionPlan fromJson(Map<String, dynamic> json) {
+    return SubscriptionPlan(
+      id: _asString(json['id']),
+      title: _asString(json['title']),
+      subtitle: _asString(json['subtitle']),
+      price: _asString(json['price']),
+      billing: _asString(json['billing']),
+      recommended: json['recommended'] == true,
+      ctaLabel: _asString(json['ctaLabel']),
+      features: _asStringList(json['features']),
+      highlights: _asStringList(json['highlights']),
+    );
+  }
+}
+
+class SubscriptionFeatureComparison {
+  const SubscriptionFeatureComparison({
+    required this.key,
+    required this.name,
+    required this.basic,
+    required this.member,
+    required this.familyPlus,
+  });
+
+  final String key;
+  final String name;
+  final bool basic;
+  final bool member;
+  final bool familyPlus;
+
+  static SubscriptionFeatureComparison fromJson(Map<String, dynamic> json) {
+    return SubscriptionFeatureComparison(
+      key: _asString(json['key']),
+      name: _asString(json['name']),
+      basic: json['basic'] == true,
+      member: json['member'] == true,
+      familyPlus: json['family_plus'] == true || json['familyPlus'] == true,
+    );
+  }
+}
+
+class SubscriptionCheckoutResult {
+  const SubscriptionCheckoutResult({
+    required this.planId,
+    required this.planTitle,
+    required this.status,
+    required this.message,
+  });
+
+  final String planId;
+  final String planTitle;
+  final String status;
+  final String message;
+
+  static SubscriptionCheckoutResult fromJson(Map<String, dynamic> json) {
+    return SubscriptionCheckoutResult(
+      planId: _asString(json['planId']),
+      planTitle: _asString(json['planTitle']),
+      status: _asString(json['status']),
+      message: _asString(json['message']),
+    );
+  }
+}
+
+class SubscriptionRestoreResult {
+  const SubscriptionRestoreResult({
+    required this.status,
+    required this.message,
+  });
+
+  final String status;
+  final String message;
+
+  static SubscriptionRestoreResult fromJson(Map<String, dynamic> json) {
+    return SubscriptionRestoreResult(
+      status: _asString(json['status']),
+      message: _asString(json['message']),
     );
   }
 }
@@ -417,7 +585,10 @@ class GrowthMoment {
   final String title;
 
   static GrowthMoment fromJson(Map<String, dynamic> json) {
-    return GrowthMoment(id: _asString(json['id']), title: _asString(json['title']));
+    return GrowthMoment(
+      id: _asString(json['id']),
+      title: _asString(json['title']),
+    );
   }
 }
 
@@ -449,7 +620,10 @@ int? _asNullableInt(dynamic value) {
 
 List<String> _asStringList(dynamic value) {
   if (value is! List) return const [];
-  return value.map((item) => '$item'.trim()).where((item) => item.isNotEmpty).toList();
+  return value
+      .map((item) => '$item'.trim())
+      .where((item) => item.isNotEmpty)
+      .toList();
 }
 
 Map<String, dynamic> _asMap(dynamic value) {

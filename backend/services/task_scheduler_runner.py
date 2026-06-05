@@ -34,7 +34,7 @@ class TaskSchedulerRunner:
         self._thread = threading.Thread(
             target=self._run,
             args=(app, interval),
-            name="mira-task-scheduler",
+            name="task-scheduler",
             daemon=True,
         )
         self._thread.start()

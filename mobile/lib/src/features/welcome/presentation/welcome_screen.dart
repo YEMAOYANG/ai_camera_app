@@ -3,9 +3,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_background.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({this.onComplete, super.key});
@@ -25,7 +25,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       badge: '家庭看护',
       icon: _WelcomeIcon.sparkles,
       title: '少盯一点，也能知道孩子现在怎么样。',
-      desc: '米拉把观察、任务、提醒和证据整理好，让家长先看到孩子状态，再处理真正需要判断的事。',
+      desc: '看护助手会把观察、任务、提醒和证据整理好，让家长先看到孩子状态，再处理真正需要判断的事。',
     ),
     _WelcomeSlide(
       image: 'assets/images/welcome/welcome-child-study.png',
@@ -127,7 +127,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
-        body: MiraAppBackground(
+        body: AppBackground(
           child: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(18, 60, 18, bottomInset + 32),
             child: SizedBox(
@@ -222,16 +222,16 @@ class _WelcomeCopy extends StatelessWidget {
                 onDotTap: onDotTap,
               ),
               const SizedBox(height: 22),
-              MiraPrimaryButton(
+              AppPrimaryButton(
                 label: isLast ? '开始设置' : '继续',
                 loading: loading,
-                trailing: MiraButtonGlyph(
+                trailing: AppButtonGlyph(
                   icon: isLast ? Icons.arrow_forward : Icons.chevron_right,
                 ),
                 onTap: loading ? null : onNext,
               ),
               const SizedBox(height: 12),
-              MiraSecondaryButton(
+              AppSecondaryButton(
                 label: '登录或创建家庭',
                 onTap: loading ? null : onLogin,
                 trailing: const Icon(

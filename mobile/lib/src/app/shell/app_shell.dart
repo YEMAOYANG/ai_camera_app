@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/app/router/app_router.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/mvp/application/mvp_mock_provider.dart';
-import 'package:mira_guardian_app/src/features/points/application/point_repository.dart';
-import 'package:mira_guardian_app/src/features/tasks/application/task_realtime_repository.dart';
-import 'package:mira_guardian_app/src/features/tasks/application/task_repository.dart';
-import 'package:mira_guardian_app/src/features/tasks/presentation/tasks_screen.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_state_view.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/app/router/app_router.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/mvp/application/mvp_mock_provider.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/tasks/application/task_realtime_repository.dart';
+import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
+import 'package:guardian_parent_app/src/features/tasks/presentation/tasks_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 
 class AppShell extends ConsumerWidget {
   const AppShell({required this.child, super.key});
@@ -48,7 +48,7 @@ class AppShell extends ConsumerWidget {
               left: 0,
               right: 0,
               bottom: 0,
-              child: _MiraBottomNavigation(
+              child: _AppBottomNavigation(
                 selectedRoute: selectedRoute,
                 onSelected: (route) => context.go(route.path),
                 onAddTask: () => _openTaskSheet(context, ref),
@@ -132,9 +132,9 @@ class AppShell extends ConsumerWidget {
     _invalidateTaskLists(ref, resolvedChildId, savedDate);
     if (context.mounted) {
       context.go(AppRoute.tasks.path);
-      showMiraStateSnackBar(
+      showAppStateSnackBar(
         context,
-        variant: MiraStateVariant.saved,
+        variant: AppStateVariant.saved,
         title: '已保存',
         message: '任务已加入安排。',
       );
@@ -170,8 +170,8 @@ class AppShell extends ConsumerWidget {
   }
 }
 
-class _MiraBottomNavigation extends StatelessWidget {
-  const _MiraBottomNavigation({
+class _AppBottomNavigation extends StatelessWidget {
+  const _AppBottomNavigation({
     required this.selectedRoute,
     required this.onSelected,
     required this.onAddTask,

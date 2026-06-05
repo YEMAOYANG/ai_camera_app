@@ -1,4 +1,4 @@
-import 'package:mira_guardian_app/src/shared/widgets/status_chip.dart';
+import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class GuardianDevice {
   const GuardianDevice({
@@ -25,7 +25,7 @@ class GuardianDevice {
 
   bool get isOnlineLike => status == 'bound' || status == 'online';
 
-  String get displayName => name.isNotEmpty ? name : 'Mira 设备';
+  String get displayName => name.isNotEmpty ? name : '家庭设备';
 
   String get displayLocation => location.isNotEmpty ? location : '家庭空间';
 

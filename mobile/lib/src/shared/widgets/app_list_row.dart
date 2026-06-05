@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 
-class MiraListRow extends StatelessWidget {
-  const MiraListRow({
+class AppListRow extends StatelessWidget {
+  const AppListRow({
     required this.icon,
     required this.title,
     required this.subtitle,
     this.trailing,
-    this.tone = MiraListRowTone.neutral,
+    this.tone = AppListRowTone.neutral,
     this.onTap,
     super.key,
   });
@@ -16,17 +16,17 @@ class MiraListRow extends StatelessWidget {
   final String title;
   final String subtitle;
   final Widget? trailing;
-  final MiraListRowTone tone;
+  final AppListRowTone tone;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final color = switch (tone) {
-      MiraListRowTone.blue => AppColors.brand,
-      MiraListRowTone.green => AppColors.success,
-      MiraListRowTone.amber => AppColors.warning,
-      MiraListRowTone.red => AppColors.danger,
-      MiraListRowTone.neutral => AppColors.ink,
+      AppListRowTone.blue => AppColors.brand,
+      AppListRowTone.green => AppColors.success,
+      AppListRowTone.amber => AppColors.warning,
+      AppListRowTone.red => AppColors.danger,
+      AppListRowTone.neutral => AppColors.ink,
     };
 
     final child = Padding(
@@ -99,4 +99,4 @@ class MiraListRow extends StatelessWidget {
   }
 }
 
-enum MiraListRowTone { neutral, blue, green, amber, red }
+enum AppListRowTone { neutral, blue, green, amber, red }

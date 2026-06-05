@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 
-class MiraPrimaryButton extends StatelessWidget {
-  const MiraPrimaryButton({
+class AppPrimaryButton extends StatelessWidget {
+  const AppPrimaryButton({
     required this.label,
     required this.onTap,
     this.loading = false,
@@ -101,7 +101,7 @@ class MiraPrimaryButton extends StatelessWidget {
                     ),
                     if (loading || trailing != null) ...[
                       const SizedBox(width: 8),
-                      loading ? const MiraButtonSpinner() : trailing!,
+                      loading ? const AppButtonSpinner() : trailing!,
                     ],
                   ],
                 ),
@@ -114,8 +114,8 @@ class MiraPrimaryButton extends StatelessWidget {
   }
 }
 
-class MiraSecondaryButton extends StatelessWidget {
-  const MiraSecondaryButton({
+class AppSecondaryButton extends StatelessWidget {
+  const AppSecondaryButton({
     required this.label,
     required this.onTap,
     this.trailing,
@@ -180,8 +180,8 @@ class MiraSecondaryButton extends StatelessWidget {
   }
 }
 
-class MiraButtonGlyph extends StatelessWidget {
-  const MiraButtonGlyph({required this.icon, super.key});
+class AppButtonGlyph extends StatelessWidget {
+  const AppButtonGlyph({required this.icon, super.key});
 
   final IconData icon;
 
@@ -202,8 +202,8 @@ class MiraButtonGlyph extends StatelessWidget {
   }
 }
 
-class MiraButtonSpinner extends StatelessWidget {
-  const MiraButtonSpinner({super.key});
+class AppButtonSpinner extends StatelessWidget {
+  const AppButtonSpinner({super.key});
 
   @override
   Widget build(BuildContext context) {

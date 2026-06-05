@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mira_guardian_app/src/app/router/app_route.dart';
-import 'package:mira_guardian_app/src/core/theme/app_tokens.dart';
-import 'package:mira_guardian_app/src/features/auth/application/auth_repository.dart';
-import 'package:mira_guardian_app/src/features/setup/application/setup_repository.dart';
-import 'package:mira_guardian_app/src/shared/widgets/mira_button.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
+import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -473,10 +473,10 @@ class _LoginContent extends StatelessWidget {
         const SizedBox(height: 18),
         Opacity(
           opacity: canSubmit ? 1 : 0.48,
-          child: MiraPrimaryButton(
+          child: AppPrimaryButton(
             label: loading ? '正在确认' : '继续',
             loading: loading,
-            trailing: const MiraButtonGlyph(icon: Icons.arrow_forward),
+            trailing: const AppButtonGlyph(icon: Icons.arrow_forward),
             onTap: canSubmit ? onSubmit : null,
           ),
         ),
@@ -547,7 +547,7 @@ class _LoginHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Mira Guardian',
+                      '家庭看护',
                       style: TextStyle(
                         color: AppColors.ink,
                         fontFamily: AppTypography.systemFont,
