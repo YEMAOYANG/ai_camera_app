@@ -6,6 +6,7 @@ import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
 import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
 import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
@@ -263,6 +264,7 @@ class _RedemptionsPanel extends ConsumerWidget {
                       children: [
                         _RedemptionActionButton(
                           label: '取消',
+                          danger: true,
                           onTap: () => _cancel(context, ref, redemption),
                         ),
                         const SizedBox(width: 7),
@@ -289,11 +291,13 @@ class _RedemptionActionButton extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.highlight = false,
+    this.danger = false,
   });
 
   final String label;
   final VoidCallback onTap;
   final bool highlight;
+  final bool danger;
 
   @override
   Widget build(BuildContext context) {
@@ -302,24 +306,39 @@ class _RedemptionActionButton extends StatelessWidget {
       onTap: onTap,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: highlight ? AppColors.brandWash : AppColors.surfaceSoft,
+          color: danger
+              ? AppColors.dangerWash
+              : highlight
+              ? AppColors.brandWash
+              : AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(AppRadii.full),
           border: Border.all(
-            color: highlight
+            color: danger
+                ? AppColors.danger.withValues(alpha: 0.16)
+                : highlight
                 ? AppColors.brand.withValues(alpha: 0.18)
                 : AppColors.borderSoft,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: highlight ? AppColors.brandDeep : AppColors.ink,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0,
+        child: SizedBox(
+          height: AppControls.buttonHeight,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: danger
+                      ? AppColors.danger
+                      : highlight
+                      ? AppColors.brandDeep
+                      : AppColors.ink,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 12,
+                  fontWeight: danger ? FontWeight.w800 : FontWeight.w600,
+                  letterSpacing: 0,
+                ),
+              ),
             ),
           ),
         ),
@@ -377,6 +396,16 @@ Future<void> _cancel(
   WidgetRef ref,
   RewardRedemption redemption,
 ) async {
+  final confirmed = await showAppConfirmSheet(
+    context: context,
+    title: '取消兑换',
+    message: '确认取消「${redemption.rewardTitle}」？取消后积分会返还到孩子积分账户。',
+    confirmLabel: '确认取消',
+    cancelLabel: '先不取消',
+    danger: true,
+  );
+  if (!confirmed) return;
+
   try {
     await ref.read(rewardRepositoryProvider).cancelRedemption(redemption.id);
     ref

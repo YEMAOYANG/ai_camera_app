@@ -57,16 +57,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: userAgreementPath,
         name: 'legalUserAgreement',
-        builder: (_, _) => const LegalRemoteDocumentPage(
-          documentKey: 'user-agreement',
-        ),
+        builder: (_, _) =>
+            const LegalRemoteDocumentPage(documentKey: 'user-agreement'),
       ),
       GoRoute(
         path: privacyPolicyPath,
         name: 'legalPrivacyPolicy',
-        builder: (_, _) => const LegalRemoteDocumentPage(
-          documentKey: 'privacy-policy',
-        ),
+        builder: (_, _) =>
+            const LegalRemoteDocumentPage(documentKey: 'privacy-policy'),
       ),
       GoRoute(
         path: profileChildPrivacyPath,
@@ -91,14 +89,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const WifiSetupScreen(),
       ),
       GoRoute(
-        path: setupBindSuccessPath,
-        name: 'setupBindSuccess',
-        builder: (_, _) => const BindSuccessSetupScreen(),
-      ),
-      GoRoute(
         path: setupChildProfilePath,
         name: 'setupChildProfile',
         builder: (_, _) => const ChildProfileSetupScreen(),
+      ),
+      GoRoute(
+        path: setupCameraNamePath,
+        name: 'setupCameraName',
+        builder: (_, _) => const CameraNameSetupScreen(),
       ),
       GoRoute(
         path: setupEmergencyContactsPath,
@@ -168,7 +166,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: profileDeviceHubPath,
         name: 'profileDeviceHub',
-        builder: (_, _) => const DeviceCareHubPage(),
+        builder: (_, _) => const DeviceManagementPage(),
       ),
       GoRoute(
         path: profileTaskRewardHubPath,
@@ -184,11 +182,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: profilePrivacyHubPath,
         name: 'profilePrivacyHub',
         builder: (_, _) => const PrivacyAuthorizationHubPage(),
-      ),
-      GoRoute(
-        path: profileAccountSettingsPath,
-        name: 'profileAccountSettings',
-        builder: (_, _) => const AccountSettingsHubPage(),
       ),
       GoRoute(
         path: profileAccountPath,
@@ -228,11 +221,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             deviceId: state.pathParameters['deviceId'] ?? '',
           );
         },
-      ),
-      GoRoute(
-        path: profileCameraStatusPath,
-        name: 'profileCameraStatus',
-        builder: (_, _) => const CameraCareStatusPage(),
       ),
       GoRoute(
         path: profileAiRulesPath,

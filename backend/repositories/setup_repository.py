@@ -32,6 +32,9 @@ class SetupRepository:
                   device_binding_status VARCHAR(255) NOT NULL DEFAULT 'pending',
                   wifi_status VARCHAR(255) NOT NULL DEFAULT 'pending',
                   child_profile_status VARCHAR(255) NOT NULL DEFAULT 'pending',
+                  camera_name_status VARCHAR(255) NOT NULL DEFAULT 'pending',
+                  camera_name_intro_status VARCHAR(255) NOT NULL DEFAULT 'pending',
+                  camera_name_intro_at BIGINT,
                   contacts_status VARCHAR(255) NOT NULL DEFAULT 'pending',
                   created_at BIGINT NOT NULL,
                   updated_at BIGINT NOT NULL,
@@ -42,6 +45,7 @@ class SetupRepository:
                   family_id VARCHAR(255) PRIMARY KEY,
                   display_name VARCHAR(255) NOT NULL,
                   relationship VARCHAR(255) NOT NULL,
+                  relationship_key VARCHAR(255),
                   confirmed_at BIGINT NOT NULL
                 );
 
@@ -50,6 +54,7 @@ class SetupRepository:
                   family_id VARCHAR(255) NOT NULL,
                   binding_code VARCHAR(255),
                   name VARCHAR(255) NOT NULL,
+                  wake_name VARCHAR(255),
                   location VARCHAR(255),
                   status VARCHAR(255) NOT NULL,
                   created_at BIGINT NOT NULL,
@@ -69,7 +74,10 @@ class SetupRepository:
                   family_id VARCHAR(255) NOT NULL,
                   name VARCHAR(255) NOT NULL,
                   nickname VARCHAR(255),
+                  gender VARCHAR(255) NOT NULL DEFAULT 'unspecified',
                   age_stage VARCHAR(255),
+                  education_stage VARCHAR(255),
+                  grade VARCHAR(255),
                   birthday VARCHAR(255),
                   created_at BIGINT NOT NULL,
                   updated_at BIGINT NOT NULL
@@ -81,6 +89,7 @@ class SetupRepository:
                   name VARCHAR(255) NOT NULL,
                   phone VARCHAR(255) NOT NULL,
                   relationship VARCHAR(255),
+                  relationship_key VARCHAR(255),
                   priority INTEGER NOT NULL,
                   created_at BIGINT NOT NULL
                 );
@@ -103,12 +112,15 @@ class SetupRepository:
                 """
                 INSERT INTO setup_progress(
                   family_id, completed, parent_identity_status, device_binding_status,
-                  wifi_status, child_profile_status, contacts_status, created_at, updated_at
+                  wifi_status, child_profile_status, camera_name_status,
+                  camera_name_intro_status, contacts_status, created_at, updated_at
                 )
-                VALUES (?, 0, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     family_id,
+                    SETUP_PENDING,
+                    SETUP_PENDING,
                     SETUP_PENDING,
                     SETUP_PENDING,
                     SETUP_PENDING,
@@ -137,6 +149,8 @@ class SetupRepository:
             "device_binding_status",
             "wifi_status",
             "child_profile_status",
+            "camera_name_status",
+            "camera_name_intro_status",
             "contacts_status",
         }
         if column not in allowed:
@@ -153,6 +167,7 @@ class SetupRepository:
         family_id: str,
         display_name: str,
         relationship: str,
+        relationship_key: str,
         now: int,
     ) -> None:
         existing = conn.execute(
@@ -163,20 +178,51 @@ class SetupRepository:
             conn.execute(
                 """
                 UPDATE parent_identities
-                SET display_name = ?, relationship = ?, confirmed_at = ?
+                SET display_name = ?, relationship = ?, relationship_key = ?, confirmed_at = ?
                 WHERE family_id = ?
                 """,
-                (display_name, relationship, now, family_id),
+                (display_name, relationship, relationship_key, now, family_id),
             )
             return
 
         conn.execute(
             """
-            INSERT INTO parent_identities(family_id, display_name, relationship, confirmed_at)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO parent_identities(
+              family_id, display_name, relationship, relationship_key, confirmed_at
+            )
+            VALUES (?, ?, ?, ?, ?)
             """,
-            (family_id, display_name, relationship, now),
+            (family_id, display_name, relationship, relationship_key, now),
         )
+
+    def list_app_option_items(
+        self,
+        conn: DatabaseConnection,
+        *,
+        catalog_key: str,
+    ) -> list[DatabaseRow]:
+        return list(
+            conn.execute(
+                """
+                SELECT *
+                FROM app_option_items
+                WHERE catalog_key = ? AND enabled = 1
+                ORDER BY COALESCE(parent_key, ''), sort_order, item_key
+                """,
+                (catalog_key,),
+            ).fetchall()
+        )
+
+    def get_parent_identity(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT * FROM parent_identities WHERE family_id = ?",
+            (family_id,),
+        ).fetchone()
 
     def save_device(
         self,
@@ -246,6 +292,17 @@ class SetupRepository:
             (family_id, ssid, auth_type, int(password_set), now),
         )
 
+    def current_wifi(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT * FROM wifi_configs WHERE family_id = ?",
+            (family_id,),
+        ).fetchone()
+
     def save_child(
         self,
         conn: DatabaseConnection,
@@ -253,7 +310,10 @@ class SetupRepository:
         family_id: str,
         name: str,
         nickname: str | None,
+        gender: str,
         age_stage: str | None,
+        education_stage: str | None,
+        grade: str | None,
         birthday: str | None,
         now: int,
     ) -> str:
@@ -265,22 +325,107 @@ class SetupRepository:
         if row:
             conn.execute(
                 """
-                UPDATE children SET name = ?, nickname = ?, age_stage = ?,
+                UPDATE children SET name = ?, nickname = ?, gender = ?,
+                  age_stage = ?, education_stage = ?, grade = ?,
                   birthday = ?, updated_at = ? WHERE id = ?
                 """,
-                (name, nickname, age_stage, birthday, now, child_id),
+                (
+                    name,
+                    nickname,
+                    gender,
+                    age_stage,
+                    education_stage,
+                    grade,
+                    birthday,
+                    now,
+                    child_id,
+                ),
             )
         else:
             conn.execute(
                 """
                 INSERT INTO children(
-                  id, family_id, name, nickname, age_stage, birthday, created_at, updated_at
+                  id, family_id, name, nickname, gender, age_stage, education_stage,
+                  grade, birthday, created_at, updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (child_id, family_id, name, nickname, age_stage, birthday, now, now),
+                (
+                    child_id,
+                    family_id,
+                    name,
+                    nickname,
+                    gender,
+                    age_stage,
+                    education_stage,
+                    grade,
+                    birthday,
+                    now,
+                    now,
+                ),
             )
         return child_id
+
+    def current_child(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT * FROM children WHERE family_id = ? ORDER BY created_at LIMIT 1",
+            (family_id,),
+        ).fetchone()
+
+    def current_device(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT * FROM devices WHERE family_id = ? ORDER BY created_at LIMIT 1",
+            (family_id,),
+        ).fetchone()
+
+    def save_camera_name(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        wake_name: str,
+        now: int,
+    ) -> str | None:
+        row = conn.execute(
+            "SELECT id FROM devices WHERE family_id = ? AND status <> 'unbound' ORDER BY created_at LIMIT 1",
+            (family_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        conn.execute(
+            """
+            UPDATE devices SET wake_name = ?, updated_at = ?
+            WHERE family_id = ? AND id = ?
+            """,
+            (wake_name, now, family_id, row["id"]),
+        )
+        return row["id"]
+
+    def mark_camera_name_intro_attempt(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        now: int,
+    ) -> None:
+        conn.execute(
+            """
+            UPDATE setup_progress
+            SET camera_name_intro_status = ?, camera_name_intro_at = ?, updated_at = ?
+            WHERE family_id = ?
+            """,
+            (SETUP_DONE, now, now, family_id),
+        )
 
     def replace_contacts(
         self,
@@ -298,9 +443,9 @@ class SetupRepository:
             conn.execute(
                 """
                 INSERT INTO emergency_contacts(
-                  id, family_id, name, phone, relationship, priority, created_at
+                  id, family_id, name, phone, relationship, relationship_key, priority, created_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     contact_id,
@@ -308,6 +453,7 @@ class SetupRepository:
                     contact["name"],
                     contact["phone"],
                     contact.get("relationship"),
+                    contact.get("relationship_key"),
                     index + 1,
                     now,
                 ),

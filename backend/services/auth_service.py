@@ -61,7 +61,7 @@ class AuthService:
             "deliveryStatus": delivery.delivery_status,
         }
 
-    def login_with_sms(self, phone: str, code: str) -> dict:
+    def login_with_sms(self, phone: str, code: str, client_device: dict | None = None) -> dict:
         normalized = normalize_phone(phone)
         code = (code or "").strip()
         if not code:
@@ -81,12 +81,19 @@ class AuthService:
             user = self.repository.find_user_by_phone(conn, normalized)
             if user is None:
                 user = self.repository.create_parent_user(conn, phone=normalized, now=now)
+            elif user.get("account_status") != "active":
+                raise AuthError("account_inactive", "账号已提交注销申请，无法继续登录", 403)
 
             self.repository.delete_sms_code(conn, normalized)
             session = self._new_session(now)
+            device = self._client_device(client_device)
             self.repository.create_session(
                 conn,
                 user_id=user["id"],
+                device_label=device["label"],
+                device_type=device["type"],
+                platform=device["platform"],
+                app_version=device["appVersion"],
                 access_hash=hash_value(session.access_token),
                 refresh_hash=hash_value(session.refresh_token),
                 access_expires_at=session.access_expires_at,
@@ -95,7 +102,7 @@ class AuthService:
             )
             return self._session_payload(conn, user["id"], session)
 
-    def refresh(self, refresh_token: str) -> dict:
+    def refresh(self, refresh_token: str, client_device: dict | None = None) -> dict:
         refresh_token = (refresh_token or "").strip()
         if not refresh_token:
             raise AuthError("missing_refresh_token", "缺少 refresh token", 401)
@@ -107,9 +114,14 @@ class AuthService:
                 raise AuthError("refresh_expired", "登录状态已过期，请重新登录", 401)
 
             session = self._new_session(now)
+            device = self._client_device(client_device, fallback=row)
             self.repository.rotate_session(
                 conn,
                 session_id=row["id"],
+                device_label=device["label"],
+                device_type=device["type"],
+                platform=device["platform"],
+                app_version=device["appVersion"],
                 access_hash=hash_value(session.access_token),
                 refresh_hash=hash_value(session.refresh_token),
                 access_expires_at=session.access_expires_at,
@@ -128,6 +140,7 @@ class AuthService:
             row = self.repository.find_session_by_access_hash(conn, hash_value(access_token))
             if row is None or row["access_expires_at"] < now:
                 raise AuthError("access_expired", "登录状态需要刷新", 401)
+            self.repository.touch_session(conn, session_id=row["id"], last_active_at=now)
             user = self._user_payload(conn, row["user_id"])
             return {"user": user, "family": self._family_payload(conn, user["familyId"])}
 
@@ -159,6 +172,8 @@ class AuthService:
         row = self.repository.find_user_by_id(conn, user_id)
         if row is None:
             raise AuthError("user_not_found", "用户不存在", 404)
+        if row.get("account_status") != "active":
+            raise AuthError("account_inactive", "账号已提交注销申请，无法继续使用", 403)
         return user_payload(row)
 
     def _family_payload(self, conn, family_id: str) -> dict:
@@ -166,3 +181,45 @@ class AuthService:
         if row is None:
             raise AuthError("family_not_found", "家庭账户不存在", 404)
         return family_payload(row)
+
+    def _client_device(
+        self,
+        data: dict | None,
+        *,
+        fallback=None,
+    ) -> dict:
+        raw = data if isinstance(data, dict) else {}
+        platform = _clean(raw.get("platform")) or _clean(fallback.get("platform") if fallback else "")
+        device_type = _clean(raw.get("type")) or _clean(fallback.get("device_type") if fallback else "")
+        label = _clean(raw.get("label")) or _clean(fallback.get("device_label") if fallback else "")
+        app_version = _clean(raw.get("appVersion")) or _clean(
+            fallback.get("app_version") if fallback else ""
+        )
+
+        if not platform:
+            platform = "unknown"
+        if not device_type:
+            device_type = "unknown"
+        if not label:
+            label = _default_device_label(platform, device_type)
+        return {
+            "label": label[:80],
+            "type": device_type[:40],
+            "platform": platform[:40],
+            "appVersion": app_version[:40],
+        }
+
+
+def _clean(value: object) -> str:
+    return str(value or "").strip()
+
+
+def _default_device_label(platform: str, device_type: str) -> str:
+    normalized = f"{platform} {device_type}".lower()
+    if "ios" in normalized or "iphone" in normalized:
+        return "本机 iPhone"
+    if "android" in normalized:
+        return "Android 手机"
+    if "mac" in normalized:
+        return "Mac 设备"
+    return "已登录设备"

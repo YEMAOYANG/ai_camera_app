@@ -194,7 +194,7 @@ const fullViews = {
           <h1>先确认家长身份</h1>
           <p>后续绑定设备、处理告警、删除儿童数据都需要明确家庭管理员。这个身份只用于 App 内权限和通知文案。</p>
           <div class="role-grid">
-            ${["妈妈", "爸爸", "祖辈", "其他照护人"].map((role) => `<button class="${state.parentRole === role ? "active" : ""}" data-action="parent-role" data-role="${role}">${state.parentRole === role ? icon("check", "w-4 h-4") : ""}${role}</button>`).join("")}
+            ${["妈妈", "爸爸", "祖辈", "其他家人"].map((role) => `<button class="${state.parentRole === role ? "active" : ""}" data-action="parent-role" data-role="${role}">${state.parentRole === role ? icon("check", "w-4 h-4") : ""}${role}</button>`).join("")}
           </div>
           <label class="app-field quiet">
             <span>你的称呼</span>
@@ -383,7 +383,7 @@ const fullViews = {
           <label class="app-field"><span>联系人</span><input data-contact-name maxlength="10" value="${state.contactDraft.name}" /></label>
           <label class="app-field"><span>手机号</span><input data-contact-phone inputmode="numeric" maxlength="11" value="${state.contactDraft.phone}" /></label>
           <section class="mini-list">
-            <button type="button" class="settings-row" data-sheet="contact"><span>${icon("user-plus", "w-4 h-4")}</span><div><strong>再添加一位联系人</strong><small>例如外婆、爸爸或其他照护人</small></div>${icon("chevron-right", "w-4 h-4")}</button>
+            <button type="button" class="settings-row" data-sheet="contact"><span>${icon("user-plus", "w-4 h-4")}</span><div><strong>再添加一位联系人</strong><small>例如外婆、爸爸或其他家人</small></div>${icon("chevron-right", "w-4 h-4")}</button>
             <button type="button" class="settings-row" data-toast="邀请已生成"><span>${icon("send", "w-4 h-4")}</span><div><strong>邀请另一位家长</strong><small>可处理告警和查看日报</small></div>${icon("chevron-right", "w-4 h-4")}</button>
           </section>
           <button class="auth-primary" type="button" data-nav="setupPermissions">继续权限授权</button>
@@ -3155,7 +3155,7 @@ function handleAction(target) {
   if (action === "parent-role") {
     const role = target.dataset.role || state.parentRole;
     state.parentRole = role;
-    if (!state.parentName || ["妈妈", "爸爸", "祖辈", "其他照护人"].includes(state.parentName)) state.parentName = role;
+    if (!state.parentName || ["妈妈", "爸爸", "祖辈", "其他家人"].includes(state.parentName)) state.parentName = role;
     render();
     return true;
   }

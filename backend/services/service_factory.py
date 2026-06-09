@@ -35,7 +35,11 @@ def auth_service() -> AuthService:
 
 
 def setup_service() -> SetupService:
-    return SetupService(current_app.config["DATABASE_URL"], auth_service=auth_service())
+    return SetupService(
+        current_app.config["DATABASE_URL"],
+        auth_service=auth_service(),
+        camera_command_service_factory=camera_command_service,
+    )
 
 
 def task_service() -> TaskService:

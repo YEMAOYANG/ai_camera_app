@@ -5,6 +5,7 @@ import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
 import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
 import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
+import 'package:guardian_parent_app/src/features/setup/presentation/setup_flow_screens.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 
@@ -46,6 +47,7 @@ class _StartupGateState extends ConsumerState<StartupGate> {
     try {
       final setupStatus = await ref.read(setupRepositoryProvider).status();
       if (!mounted) return;
+      syncSetupDraftFromStatus(ref, setupStatus);
       context.go(setupStatus.routePath);
     } on SetupException catch (error) {
       if (!mounted) return;

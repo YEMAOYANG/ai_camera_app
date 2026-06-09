@@ -306,7 +306,7 @@ class _TaskHeroActions extends StatelessWidget {
           _HeroActionData(
             label: '取消任务',
             icon: Icons.event_busy_outlined,
-            tone: _HeroActionTone.secondary,
+            tone: _HeroActionTone.danger,
             onTap: () => _cancelTask(context, ref, task),
           ),
         );
@@ -386,7 +386,7 @@ class _HeroActionButton extends StatelessWidget {
             border: Border.all(color: border),
           ),
           child: SizedBox(
-            height: 46,
+            height: AppControls.buttonHeight,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -754,9 +754,7 @@ Future<void> _sendTaskReminder(
   required String toast,
 }) async {
   try {
-    await ref
-        .read(taskRepositoryProvider)
-        .sendReminder(task.id, phase: phase);
+    await ref.read(taskRepositoryProvider).sendReminder(task.id, phase: phase);
     _invalidateTaskData(ref, task.id);
     if (context.mounted) _showToast(context, toast);
   } on TaskException catch (error) {
@@ -789,6 +787,16 @@ Future<void> _rejectTask(
   WidgetRef ref,
   GuardianTask task,
 ) async {
+  final confirmed = await showAppConfirmSheet(
+    context: context,
+    title: '驳回完成确认',
+    message: '确认驳回“${task.title}”？驳回后本次不会发放积分。',
+    confirmLabel: '确认驳回',
+    cancelLabel: '先不驳回',
+    danger: true,
+  );
+  if (!confirmed) return;
+
   try {
     await ref
         .read(taskRepositoryProvider)

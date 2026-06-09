@@ -16,3 +16,11 @@ def summary():
         return jsonify(profile_service().summary(bearer_token(request)))
     except ApiError as exc:
         return error_response(exc)
+
+
+@profile_bp.get("/guardian-identity-options")
+def guardian_identity_options():
+    try:
+        return jsonify(profile_service().guardian_identity_options(bearer_token(request)))
+    except ApiError as exc:
+        return error_response(exc)

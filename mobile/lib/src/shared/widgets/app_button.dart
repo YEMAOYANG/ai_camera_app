@@ -182,6 +182,76 @@ class AppSecondaryButton extends StatelessWidget {
   }
 }
 
+class AppDangerButton extends StatelessWidget {
+  const AppDangerButton({
+    required this.label,
+    required this.onTap,
+    this.trailing,
+    this.height = AppControls.buttonHeight,
+    super.key,
+  });
+
+  final String label;
+  final VoidCallback? onTap;
+  final Widget? trailing;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    return _TapScale(
+      onTap: enabled ? onTap : null,
+      child: Opacity(
+        opacity: enabled ? 1 : 0.58,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.dangerWash,
+            borderRadius: BorderRadius.circular(AppRadii.buttonSecondary),
+            border: Border.all(color: AppColors.danger.withValues(alpha: 0.16)),
+            boxShadow: [
+              if (enabled)
+                BoxShadow(
+                  color: AppColors.danger.withValues(alpha: 0.05),
+                  blurRadius: 9,
+                  offset: const Offset(0, 5),
+                ),
+            ],
+          ),
+          child: SizedBox(
+            height: height,
+            width: double.infinity,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: enabled ? AppColors.danger : AppColors.disabledInk,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0,
+                  ),
+                ),
+                if (trailing != null) ...[
+                  const SizedBox(width: 8),
+                  IconTheme.merge(
+                    data: IconThemeData(
+                      color: enabled ? AppColors.danger : AppColors.disabledInk,
+                      size: 18,
+                    ),
+                    child: trailing!,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class AppButtonGlyph extends StatelessWidget {
   const AppButtonGlyph({required this.icon, super.key});
 

@@ -1681,7 +1681,7 @@
           ${roleChoice('妈妈','常用主照护人')}
           ${roleChoice('爸爸','共同处理确认')}
           ${roleChoice('祖辈','适合日常陪护')}
-          ${roleChoice('其他照护人','可稍后细分权限')}
+          ${roleChoice('其他家人','可稍后细分权限')}
         </div>
         ${state.identityError ? `<p class="inline-error">请选择家长身份后继续。</p>` : ''}
         <div class="form-panel">
@@ -1984,7 +1984,7 @@
       `, { action: `<button class="icon-button" data-go="notifications" aria-label="通知设置">${svg('bell')}</button>` }),
 
       accountProfile: () => page('个人信息', '当前家长', `
-        <div class="panel"><div style="display:flex;align-items:center;gap:12px"><span class="row-icon" style="display:grid;width:58px;height:58px;background:#111;color:#fff">${svg('user')}</span><div><h3>${state.parentName}</h3><p class="copy">${state.parentRole} · 家庭管理员</p></div></div>${formField('家庭显示名', state.parentName, 'profileName')}<div class="grid-2" style="margin-top:14px">${['妈妈','爸爸','祖辈','其他照护人'].map(role => `<button class="btn ${state.parentRole === role ? 'primary' : 'secondary'}" data-action="parent-role" data-role="${role}">${role}</button>`).join('')}</div></div>
+        <div class="panel"><div style="display:flex;align-items:center;gap:12px"><span class="row-icon" style="display:grid;width:58px;height:58px;background:#111;color:#fff">${svg('user')}</span><div><h3>${state.parentName}</h3><p class="copy">${state.parentRole} · 家庭管理员</p></div></div>${formField('家庭显示名', state.parentName, 'profileName')}<div class="grid-2" style="margin-top:14px">${['妈妈','爸爸','祖辈','其他家人'].map(role => `<button class="btn ${state.parentRole === role ? 'primary' : 'secondary'}" data-action="parent-role" data-role="${role}">${role}</button>`).join('')}</div></div>
         <div class="list" style="margin-top:14px">${row('phone','手机号','138 **** 2026，用于登录和安全验证','data-sheet="changePhone"', '更换')}${row('users','家庭角色','管理员，可管理成员、设备和儿童数据','',chip('管理员','success'))}</div>
         <div style="margin-top:18px">${btn('保存','data-go="my" data-toast="个人信息已保存"','primary','check')}</div>
       `, { back: 'my' }),

@@ -43,15 +43,22 @@ def request_sms_code():
 def login_with_sms():
     data = json_body(request)
     try:
-        return jsonify(auth_service().login_with_sms(data.get("phone", ""), data.get("code", "")))
+        return jsonify(
+            auth_service().login_with_sms(
+                data.get("phone", ""),
+                data.get("code", ""),
+                data.get("clientDevice"),
+            )
+        )
     except ApiError as exc:
         return error_response(exc)
 
 
 @auth_bp.post("/token/refresh")
 def refresh_token():
+    data = json_body(request)
     try:
-        return jsonify(auth_service().refresh(json_body(request).get("refreshToken", "")))
+        return jsonify(auth_service().refresh(data.get("refreshToken", ""), data.get("clientDevice")))
     except ApiError as exc:
         return error_response(exc)
 

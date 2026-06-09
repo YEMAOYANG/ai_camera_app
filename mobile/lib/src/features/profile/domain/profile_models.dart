@@ -5,6 +5,8 @@ class ProfileSummary {
     required this.familyName,
     required this.displayName,
     required this.phone,
+    required this.relationship,
+    required this.relationshipKey,
     required this.roleLabel,
     required this.avatarPersona,
     required this.memberCount,
@@ -18,6 +20,8 @@ class ProfileSummary {
   final String familyName;
   final String displayName;
   final String phone;
+  final String relationship;
+  final String relationshipKey;
   final String roleLabel;
   final String avatarPersona;
   final int memberCount;
@@ -32,7 +36,9 @@ class ProfileSummary {
       familyName: _asString(json['familyName'], fallback: '我的家庭空间'),
       displayName: _asString(json['displayName'], fallback: '家长'),
       phone: _asString(json['phone']),
-      roleLabel: _asString(json['roleLabel'], fallback: '管理员'),
+      relationship: _asString(json['relationship']),
+      relationshipKey: _asString(json['relationshipKey']),
+      roleLabel: _asString(json['roleLabel']),
       avatarPersona: _asString(json['avatarPersona']),
       memberCount: _asInt(json['memberCount']),
       deviceCount: _asInt(json['deviceCount']),
@@ -64,13 +70,7 @@ class FamilyMember {
   final String userId;
 
   String get roleLabel {
-    return switch (role) {
-      'admin' => '管理员',
-      'guardian' => '监护人',
-      'caregiver' => '照护人',
-      'viewer' => '查看者',
-      _ => '成员',
-    };
+    return role;
   }
 
   String get statusLabel {
@@ -87,7 +87,7 @@ class FamilyMember {
       id: _asString(json['id']),
       name: _asString(json['name'], fallback: '家庭成员'),
       phone: _asString(json['phone']),
-      role: _asString(json['role'], fallback: 'guardian'),
+      role: _asString(json['role']),
       status: _asString(json['status'], fallback: 'active'),
       notifyEnabled: json['notifyEnabled'] == true,
       userId: _asString(json['userId']),
@@ -115,13 +115,7 @@ class FamilyInvitation {
   final int? expiresAt;
 
   String get roleLabel {
-    return switch (role) {
-      'admin' => '管理员',
-      'guardian' => '监护人',
-      'viewer' => '仅接收通知',
-      'caregiver' => '照护人',
-      _ => '成员',
-    };
+    return role;
   }
 
   String get statusLabel {
@@ -139,7 +133,7 @@ class FamilyInvitation {
       id: _asString(json['id']),
       name: _asString(json['name'], fallback: '家庭成员'),
       phone: _asString(json['phone']),
-      role: _asString(json['role'], fallback: 'guardian'),
+      role: _asString(json['role']),
       status: _asString(json['status'], fallback: 'pending'),
       createdAt: _asInt(json['createdAt']),
       expiresAt: _asNullableInt(json['expiresAt']),
@@ -152,6 +146,7 @@ class ChildProfile {
     required this.id,
     required this.name,
     required this.nickname,
+    required this.gender,
     required this.birthday,
     required this.ageStage,
     required this.educationStage,
@@ -164,6 +159,7 @@ class ChildProfile {
   final String id;
   final String name;
   final String nickname;
+  final String gender;
   final String birthday;
   final String ageStage;
   final String educationStage;
@@ -185,6 +181,7 @@ class ChildProfile {
       id: _asString(json['id']),
       name: _asString(json['name'], fallback: '孩子'),
       nickname: _asString(json['nickname']),
+      gender: _asString(json['gender'], fallback: 'unspecified'),
       birthday: _asString(json['birthday']),
       ageStage: _asString(json['ageStage']),
       educationStage: _asString(json['educationStage']),
@@ -202,6 +199,7 @@ class EmergencyContact {
     required this.name,
     required this.phone,
     required this.relationship,
+    required this.relationshipKey,
     required this.defaultNotify,
   });
 
@@ -209,6 +207,7 @@ class EmergencyContact {
   final String name;
   final String phone;
   final String relationship;
+  final String relationshipKey;
   final bool defaultNotify;
 
   static EmergencyContact fromJson(Map<String, dynamic> json) {
@@ -217,6 +216,7 @@ class EmergencyContact {
       name: _asString(json['name'], fallback: '联系人'),
       phone: _asString(json['phone']),
       relationship: _asString(json['relationship']),
+      relationshipKey: _asString(json['relationshipKey']),
       defaultNotify: json['defaultNotify'] == true,
     );
   }
@@ -229,6 +229,7 @@ class AccountProfile {
     required this.displayName,
     required this.familyName,
     required this.relationship,
+    required this.relationshipKey,
     required this.role,
     required this.avatarPersona,
     required this.gender,
@@ -240,6 +241,7 @@ class AccountProfile {
   final String displayName;
   final String familyName;
   final String relationship;
+  final String relationshipKey;
   final String role;
   final String avatarPersona;
   final String gender;
@@ -252,7 +254,8 @@ class AccountProfile {
       displayName: _asString(json['displayName'], fallback: '家长'),
       familyName: _asString(json['familyName'], fallback: '我的家庭空间'),
       relationship: _asString(json['relationship']),
-      role: _asString(json['role'], fallback: 'admin'),
+      relationshipKey: _asString(json['relationshipKey']),
+      role: _asString(json['role']),
       avatarPersona: _asString(json['avatarPersona']),
       gender: _asString(json['gender']),
       ageGroup: _asString(json['ageGroup']),
@@ -286,28 +289,87 @@ class AccountSecurity {
   }
 }
 
+class PhoneChangeCodeResult {
+  const PhoneChangeCodeResult({
+    required this.codeSent,
+    required this.expiresAt,
+    required this.message,
+    this.debugCode = '',
+  });
+
+  final bool codeSent;
+  final int expiresAt;
+  final String message;
+  final String debugCode;
+
+  static PhoneChangeCodeResult fromJson(Map<String, dynamic> json) {
+    return PhoneChangeCodeResult(
+      codeSent: json['codeSent'] == true,
+      expiresAt: _asInt(json['expiresAt']),
+      message: _asString(json['message'], fallback: '验证码已发送'),
+      debugCode: _asString(json['debugCode']),
+    );
+  }
+}
+
 class LoginDevice {
   const LoginDevice({
     required this.id,
     required this.label,
+    required this.deviceType,
+    required this.platform,
+    required this.appVersion,
     required this.active,
+    required this.current,
     required this.createdAt,
+    required this.lastActiveAt,
     required this.rotatedAt,
   });
 
   final String id;
   final String label;
+  final String deviceType;
+  final String platform;
+  final String appVersion;
   final bool active;
+  final bool current;
   final int createdAt;
+  final int lastActiveAt;
   final int? rotatedAt;
 
   static LoginDevice fromJson(Map<String, dynamic> json) {
     return LoginDevice(
       id: _asString(json['id']),
       label: _asString(json['label'], fallback: '已登录设备'),
+      deviceType: _asString(json['deviceType'], fallback: 'unknown'),
+      platform: _asString(json['platform'], fallback: 'unknown'),
+      appVersion: _asString(json['appVersion']),
       active: json['active'] == true,
+      current: json['current'] == true,
       createdAt: _asInt(json['createdAt']),
+      lastActiveAt: _asInt(json['lastActiveAt']),
       rotatedAt: _asNullableInt(json['rotatedAt']),
+    );
+  }
+}
+
+class AccountDeletionResult {
+  const AccountDeletionResult({
+    required this.status,
+    required this.requestedAt,
+    required this.message,
+  });
+
+  final String status;
+  final int requestedAt;
+  final String message;
+
+  static AccountDeletionResult fromJson(Map<String, dynamic> json) {
+    final request = _asMap(json['deletionRequest']);
+    return AccountDeletionResult(
+      status: _asString(request['status'], fallback: 'requested'),
+      requestedAt: _asInt(request['requestedAt']),
+      message: _asString(json['message'], fallback: '账号注销申请已提交'),
     );
   }
 }

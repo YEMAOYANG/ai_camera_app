@@ -20,8 +20,29 @@ class ProfileRepository:
     def get_user(self, conn: DatabaseConnection, user_id: str) -> DatabaseRow | None:
         return conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
 
+    def get_user_by_phone(self, conn: DatabaseConnection, phone: str) -> DatabaseRow | None:
+        return conn.execute("SELECT * FROM users WHERE phone = ?", (phone,)).fetchone()
+
     def get_family(self, conn: DatabaseConnection, family_id: str) -> DatabaseRow | None:
         return conn.execute("SELECT * FROM families WHERE id = ?", (family_id,)).fetchone()
+
+    def list_app_option_items(
+        self,
+        conn: DatabaseConnection,
+        *,
+        catalog_key: str,
+    ) -> list[DatabaseRow]:
+        return list(
+            conn.execute(
+                """
+                SELECT *
+                FROM app_option_items
+                WHERE catalog_key = ? AND enabled = 1
+                ORDER BY COALESCE(parent_key, ''), sort_order, item_key
+                """,
+                (catalog_key,),
+            ).fetchall()
+        )
 
     def get_parent_identity(
         self,
@@ -45,6 +66,16 @@ class ProfileRepository:
             conn.execute("UPDATE users SET display_name = ? WHERE id = ?", (display_name, user_id))
         return self.get_user(conn, user_id)
 
+    def update_user_phone(
+        self,
+        conn: DatabaseConnection,
+        *,
+        user_id: str,
+        phone: str,
+    ) -> DatabaseRow:
+        conn.execute("UPDATE users SET phone = ? WHERE id = ?", (phone, user_id))
+        return self.get_user(conn, user_id)
+
     def update_family_name(
         self,
         conn: DatabaseConnection,
@@ -63,6 +94,7 @@ class ProfileRepository:
         family_id: str,
         display_name: str,
         relationship: str,
+        relationship_key: str,
         now: int,
     ) -> DatabaseRow:
         existing = self.get_parent_identity(conn, family_id=family_id)
@@ -70,18 +102,20 @@ class ProfileRepository:
             conn.execute(
                 """
                 UPDATE parent_identities
-                SET display_name = ?, relationship = ?, confirmed_at = ?
+                SET display_name = ?, relationship = ?, relationship_key = ?, confirmed_at = ?
                 WHERE family_id = ?
                 """,
-                (display_name, relationship, now, family_id),
+                (display_name, relationship, relationship_key, now, family_id),
             )
         else:
             conn.execute(
                 """
-                INSERT INTO parent_identities(family_id, display_name, relationship, confirmed_at)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO parent_identities(
+                  family_id, display_name, relationship, relationship_key, confirmed_at
+                )
+                VALUES (?, ?, ?, ?, ?)
                 """,
-                (family_id, display_name, relationship, now),
+                (family_id, display_name, relationship, relationship_key, now),
             )
         return self.get_parent_identity(conn, family_id=family_id)
 
@@ -90,13 +124,107 @@ class ProfileRepository:
             conn.execute(
                 """
                 SELECT * FROM sessions
-                WHERE user_id = ?
-                ORDER BY COALESCE(rotated_at, created_at) DESC
+                WHERE user_id = ? AND revoked_at IS NULL
+                ORDER BY COALESCE(last_active_at, rotated_at, created_at) DESC
                 LIMIT 8
                 """,
                 (user_id,),
             ).fetchall()
         )
+
+    def get_session(
+        self,
+        conn: DatabaseConnection,
+        *,
+        user_id: str,
+        session_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT * FROM sessions
+            WHERE user_id = ? AND id = ?
+            LIMIT 1
+            """,
+            (user_id, session_id),
+        ).fetchone()
+
+    def revoke_session(
+        self,
+        conn: DatabaseConnection,
+        *,
+        user_id: str,
+        session_id: str,
+        revoked_at: int,
+    ) -> DatabaseRow | None:
+        row = self.get_session(conn, user_id=user_id, session_id=session_id)
+        if row is None:
+            return None
+        conn.execute(
+            """
+            UPDATE sessions
+            SET revoked_at = ?
+            WHERE user_id = ? AND id = ? AND revoked_at IS NULL
+            """,
+            (revoked_at, user_id, session_id),
+        )
+        return self.get_session(conn, user_id=user_id, session_id=session_id)
+
+    def mark_user_deletion_requested(
+        self,
+        conn: DatabaseConnection,
+        *,
+        user_id: str,
+        requested_at: int,
+    ) -> DatabaseRow:
+        conn.execute(
+            """
+            UPDATE users
+            SET account_status = 'deletion_requested', deletion_requested_at = ?
+            WHERE id = ?
+            """,
+            (requested_at, user_id),
+        )
+        return self.get_user(conn, user_id)
+
+    def revoke_user_sessions(
+        self,
+        conn: DatabaseConnection,
+        *,
+        user_id: str,
+        revoked_at: int,
+    ) -> None:
+        conn.execute(
+            """
+            UPDATE sessions
+            SET revoked_at = ?
+            WHERE user_id = ? AND revoked_at IS NULL
+            """,
+            (revoked_at, user_id),
+        )
+
+    def create_account_deletion_request(
+        self,
+        conn: DatabaseConnection,
+        *,
+        user_id: str,
+        family_id: str,
+        reason: str | None,
+        requested_at: int,
+    ) -> DatabaseRow:
+        request_id = f"acct_del_{uuid.uuid4().hex}"
+        conn.execute(
+            """
+            INSERT INTO account_deletion_requests(
+              id, user_id, family_id, status, reason, requested_at
+            )
+            VALUES (?, ?, ?, 'requested', ?, ?)
+            """,
+            (request_id, user_id, family_id, reason, requested_at),
+        )
+        return conn.execute(
+            "SELECT * FROM account_deletion_requests WHERE id = ?",
+            (request_id,),
+        ).fetchone()
 
     def ensure_owner_member(
         self,
@@ -117,7 +245,15 @@ class ProfileRepository:
             (family_id, user_id),
         ).fetchone()
         if row:
-            return row
+            conn.execute(
+                """
+                UPDATE family_members
+                SET name = ?, phone = ?, updated_at = ?
+                WHERE id = ?
+                """,
+                (name or row["name"], phone, now, row["id"]),
+            )
+            return self.get_family_member(conn, family_id=family_id, member_id=row["id"])
         member_id = f"member_{uuid.uuid4().hex}"
         conn.execute(
             """
@@ -130,6 +266,18 @@ class ProfileRepository:
             (member_id, family_id, user_id, name or "家长", phone, now, now),
         )
         return self.get_family_member(conn, family_id=family_id, member_id=member_id)
+
+    def find_sms_code(self, conn: DatabaseConnection, phone: str) -> DatabaseRow | None:
+        return conn.execute("SELECT * FROM sms_codes WHERE phone = ?", (phone,)).fetchone()
+
+    def increment_sms_attempts(self, conn: DatabaseConnection, phone: str) -> None:
+        conn.execute(
+            "UPDATE sms_codes SET attempt_count = attempt_count + 1 WHERE phone = ?",
+            (phone,),
+        )
+
+    def delete_sms_code(self, conn: DatabaseConnection, phone: str) -> None:
+        conn.execute("DELETE FROM sms_codes WHERE phone = ?", (phone,))
 
     def list_family_members(self, conn: DatabaseConnection, *, family_id: str) -> list[DatabaseRow]:
         return list(
@@ -378,6 +526,7 @@ class ProfileRepository:
         name: str,
         phone: str,
         relationship: str | None,
+        relationship_key: str | None,
         default_notify: bool,
         now: int,
     ) -> DatabaseRow:
@@ -390,12 +539,23 @@ class ProfileRepository:
         conn.execute(
             """
             INSERT INTO emergency_contacts(
-              id, family_id, name, phone, relationship, priority,
+              id, family_id, name, phone, relationship, relationship_key, priority,
               default_notify, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (contact_id, family_id, name, phone, relationship, priority, int(default_notify), now, now),
+            (
+                contact_id,
+                family_id,
+                name,
+                phone,
+                relationship,
+                relationship_key,
+                priority,
+                int(default_notify),
+                now,
+                now,
+            ),
         )
         return self.get_contact(conn, family_id=family_id, contact_id=contact_id)
 

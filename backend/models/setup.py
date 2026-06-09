@@ -15,6 +15,9 @@ class SetupProgress:
     device_binding: str
     wifi: str
     child_profile: str
+    camera_name: str
+    camera_name_intro: str
+    camera_name_intro_at: int | None
     contacts: str
     created_at: int
     updated_at: int

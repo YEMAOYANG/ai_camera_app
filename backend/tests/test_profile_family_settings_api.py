@@ -25,19 +25,188 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         profile = self.client.patch(
             "/api/account/profile",
             json={
-                "displayName": "家长甲",
+                "displayName": "爸爸",
                 "familyName": "我的家庭空间",
-                "relationship": "监护人",
+                "relationship": "爸爸",
+                "relationshipKey": "dad",
             },
             headers=self._auth_headers(),
         )
         self.assertEqual(profile.status_code, 200)
-        self.assertEqual(profile.json["profile"]["displayName"], "家长甲")
+        self.assertEqual(profile.json["profile"]["displayName"], "爸爸")
         self.assertEqual(profile.json["profile"]["familyName"], "我的家庭空间")
+        self.assertEqual(profile.json["profile"]["relationship"], "爸爸")
+        self.assertEqual(profile.json["profile"]["relationshipKey"], "dad")
+
+        updated_summary = self.client.get("/api/profile/summary", headers=self._auth_headers())
+        self.assertEqual(updated_summary.status_code, 200)
+        self.assertEqual(updated_summary.json["summary"]["displayName"], "爸爸")
+        self.assertEqual(updated_summary.json["summary"]["relationshipKey"], "dad")
+
+        account = self.client.get("/api/account/profile", headers=self._auth_headers())
+        self.assertEqual(account.status_code, 200)
+        self.assertEqual(account.json["profile"]["displayName"], "爸爸")
+        self.assertEqual(account.json["profile"]["relationship"], "爸爸")
+        self.assertEqual(account.json["profile"]["relationshipKey"], "dad")
 
         security = self.client.get("/api/account/security", headers=self._auth_headers())
         self.assertEqual(security.status_code, 200)
         self.assertEqual(security.json["security"]["loginMethod"], "sms")
+
+        phone_code = self.client.post(
+            "/api/account/phone/code",
+            json={"phone": "13900002026"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(phone_code.status_code, 200)
+        self.assertRegex(phone_code.json["debugCode"], r"^\d{6}$")
+
+        changed_phone = self.client.patch(
+            "/api/account/phone",
+            json={"phone": "13900002026", "code": phone_code.json["debugCode"]},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(changed_phone.status_code, 200)
+        self.assertEqual(changed_phone.json["profile"]["phone"], "13900002026")
+        self.assertEqual(changed_phone.json["security"]["phone"], "13900002026")
+
+        members_after_phone = self.client.get(
+            "/api/family/members",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(members_after_phone.status_code, 200)
+        self.assertEqual(members_after_phone.json["members"][0]["phone"], "13900002026")
+
+    def test_guardian_identity_options_are_served_by_backend(self):
+        response = self.client.get(
+            "/api/profile/guardian-identity-options",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200)
+        options = response.json["options"]
+
+        groups = {item["key"]: item for item in options["identityGroups"]}
+        self.assertEqual(groups["parent"]["label"], "父母")
+        self.assertEqual(groups["parent"]["defaultLabel"], "妈妈")
+        self.assertEqual(
+            [item["label"] for item in groups["parent"]["labels"]],
+            ["妈妈", "爸爸"],
+        )
+        self.assertEqual(groups["parent"]["labels"][0]["imageAsset"], "assets/images/guardian/guardian_mom.png")
+        grandparent_assets = {
+            item["label"]: item["imageAsset"]
+            for item in groups["grandparent"]["labels"]
+        }
+        self.assertEqual(
+            grandparent_assets["外公"],
+            "assets/images/guardian/guardian_maternal_grandpa.png",
+        )
+        self.assertEqual(
+            grandparent_assets["爷爷"],
+            "assets/images/guardian/guardian_grandpa.png",
+        )
+        family_assets = {
+            item["label"]: item["imageAsset"]
+            for item in groups["family"]["labels"]
+        }
+        self.assertEqual(
+            family_assets["叔叔"],
+            "assets/images/guardian/guardian_uncle.png",
+        )
+        self.assertEqual(
+            family_assets["舅舅"],
+            "assets/images/guardian/guardian_maternal_uncle.png",
+        )
+
+        roles = {item["key"]: item["label"] for item in options["familyRoles"]}
+        self.assertEqual(roles["admin"], "管理员")
+        self.assertEqual(roles["guardian"], "监护人")
+        self.assertEqual(roles["viewer"], "临时查看者")
+
+    def test_account_security_devices_revoke_and_deletion_request(self):
+        phone = "13800002126"
+        code = request_debug_code(self.client, phone)
+        mobile_login = self.client.post(
+            "/api/auth/sms/login",
+            json={
+                "phone": phone,
+                "code": code,
+                "clientDevice": {
+                    "label": "本机 iPhone",
+                    "type": "phone",
+                    "platform": "ios",
+                },
+            },
+        )
+        self.assertEqual(mobile_login.status_code, 200)
+        mobile_access = mobile_login.json["tokens"]["accessToken"]
+
+        code = request_debug_code(self.client, phone)
+        browser_login = self.client.post(
+            "/api/auth/sms/login",
+            json={
+                "phone": phone,
+                "code": code,
+                "clientDevice": {
+                    "label": "MacBook Safari",
+                    "type": "browser",
+                    "platform": "macos",
+                },
+            },
+        )
+        self.assertEqual(browser_login.status_code, 200)
+
+        security = self.client.get(
+            "/api/account/security",
+            headers={"Authorization": f"Bearer {mobile_access}"},
+        )
+        self.assertEqual(security.status_code, 200)
+        devices = security.json["security"]["loginDevices"]
+        self.assertEqual(len(devices), 2)
+        current = next(item for item in devices if item["current"])
+        removable = next(item for item in devices if not item["current"])
+        self.assertEqual(current["label"], "本机 iPhone")
+        self.assertEqual(removable["label"], "MacBook Safari")
+
+        current_revoke = self.client.post(
+            f"/api/account/sessions/{current['id']}/revoke",
+            headers={"Authorization": f"Bearer {mobile_access}"},
+        )
+        self.assertEqual(current_revoke.status_code, 400)
+        self.assertEqual(current_revoke.json["error"], "cannot_revoke_current_session")
+
+        removed = self.client.post(
+            f"/api/account/sessions/{removable['id']}/revoke",
+            headers={"Authorization": f"Bearer {mobile_access}"},
+        )
+        self.assertEqual(removed.status_code, 200)
+        remaining_labels = [
+            item["label"] for item in removed.json["security"]["loginDevices"]
+        ]
+        self.assertEqual(remaining_labels, ["本机 iPhone"])
+
+        deletion = self.client.post(
+            "/api/account/deletion",
+            json={"reason": "user_requested"},
+            headers={"Authorization": f"Bearer {mobile_access}"},
+        )
+        self.assertEqual(deletion.status_code, 200)
+        self.assertEqual(deletion.json["accountStatus"], "deletion_requested")
+        self.assertEqual(deletion.json["deletionRequest"]["status"], "requested")
+
+        session = self.client.get(
+            "/api/auth/session",
+            headers={"Authorization": f"Bearer {mobile_access}"},
+        )
+        self.assertEqual(session.status_code, 401)
+
+        code = request_debug_code(self.client, phone)
+        relogin = self.client.post(
+            "/api/auth/sms/login",
+            json={"phone": phone, "code": code},
+        )
+        self.assertEqual(relogin.status_code, 403)
+        self.assertEqual(relogin.json["error"], "account_inactive")
 
     def test_family_members_crud_and_family_isolation(self):
         created = self.client.post(
@@ -56,11 +225,11 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
 
         updated = self.client.patch(
             f"/api/family/members/{member['id']}",
-            json={"role": "caregiver"},
+            json={"role": "viewer"},
             headers=self._auth_headers(),
         )
         self.assertEqual(updated.status_code, 200)
-        self.assertEqual(updated.json["member"]["role"], "caregiver")
+        self.assertEqual(updated.json["member"]["role"], "viewer")
 
         other_token = self._login("13700002026")
         isolated = self.client.patch(
@@ -120,6 +289,103 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(listed_after_cancel.status_code, 200)
         self.assertEqual(listed_after_cancel.json["invitations"], [])
 
+    def test_unique_guardian_identity_and_admin_role_are_enforced(self):
+        self.client.get("/api/family/members", headers=self._auth_headers())
+
+        duplicate_admin_member = self.client.post(
+            "/api/family/members",
+            json={
+                "name": "外公",
+                "phone": "13500002026",
+                "role": "admin",
+                "status": "active",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(duplicate_admin_member.status_code, 400)
+        self.assertEqual(duplicate_admin_member.json["error"], "duplicate_family_admin")
+
+        duplicate_admin_invitation = self.client.post(
+            "/api/family/invitations",
+            json={"name": "外婆", "phone": "13600002026", "role": "admin"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(duplicate_admin_invitation.status_code, 400)
+        self.assertEqual(
+            duplicate_admin_invitation.json["error"],
+            "duplicate_family_admin",
+        )
+
+        profile = self.client.patch(
+            "/api/account/profile",
+            json={
+                "displayName": "爸爸",
+                "familyName": "我的家庭空间",
+                "relationship": "爸爸",
+                "relationshipKey": "dad",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(profile.status_code, 200)
+
+        duplicate_parent_contact = self.client.post(
+            "/api/contacts/emergency",
+            json={
+                "name": "爸爸",
+                "phone": "13700002026",
+                "relationship": "爸爸",
+                "relationshipKey": "dad",
+                "defaultNotify": True,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(duplicate_parent_contact.status_code, 400)
+        self.assertEqual(
+            duplicate_parent_contact.json["error"],
+            "duplicate_guardian_identity",
+        )
+
+        grandma_contact = self.client.post(
+            "/api/contacts/emergency",
+            json={
+                "name": "外婆",
+                "phone": "13800002027",
+                "relationship": "外婆",
+                "relationshipKey": "maternal_grandma",
+                "defaultNotify": True,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(grandma_contact.status_code, 200)
+
+        duplicate_grandma_invitation = self.client.post(
+            "/api/family/invitations",
+            json={
+                "name": "外婆",
+                "phone": "13900002027",
+                "role": "guardian",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(duplicate_grandma_invitation.status_code, 400)
+        self.assertEqual(
+            duplicate_grandma_invitation.json["error"],
+            "duplicate_guardian_identity",
+        )
+
+        repeated_family_default = self.client.post(
+            "/api/contacts/emergency",
+            json={
+                "name": "李老师",
+                "phone": "13900002028",
+                "relationship": "其他家人",
+                "relationshipKey": "family_default",
+                "defaultNotify": False,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(repeated_family_default.status_code, 200)
+
     def test_child_profile_and_emergency_contacts_crud(self):
         child = self.client.patch(
             f"/api/children/{self.child_id}",
@@ -147,21 +413,54 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
             json={
                 "name": "外婆",
                 "phone": "13600002026",
-                "relationship": "家人",
+                "relationship": "外婆",
+                "relationshipKey": "maternal_grandma",
                 "defaultNotify": True,
             },
             headers=self._auth_headers(),
         )
         self.assertEqual(contact.status_code, 200)
         contact_id = contact.json["contact"]["id"]
+        self.assertEqual(contact.json["contact"]["relationship"], "外婆")
+        self.assertEqual(
+            contact.json["contact"]["relationshipKey"],
+            "maternal_grandma",
+        )
+
+        listed = self.client.get(
+            "/api/contacts/emergency",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(listed.status_code, 200)
+        self.assertEqual(listed.json["contacts"][0]["relationship"], "外婆")
+        self.assertEqual(
+            listed.json["contacts"][0]["relationshipKey"],
+            "maternal_grandma",
+        )
 
         updated = self.client.patch(
             f"/api/contacts/emergency/{contact_id}",
-            json={"defaultNotify": False},
+            json={"relationshipKey": "family_default", "defaultNotify": False},
             headers=self._auth_headers(),
         )
         self.assertEqual(updated.status_code, 200)
         self.assertFalse(updated.json["contact"]["defaultNotify"])
+        self.assertEqual(updated.json["contact"]["relationship"], "其他家人")
+        self.assertEqual(updated.json["contact"]["relationshipKey"], "family_default")
+
+        legacy = self.client.post(
+            "/api/contacts/emergency",
+            json={
+                "name": "李老师",
+                "phone": "13700002026",
+                "relationship": "guardian",
+                "defaultNotify": True,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(legacy.status_code, 200)
+        self.assertEqual(legacy.json["contact"]["relationship"], "其他家人")
+        self.assertEqual(legacy.json["contact"]["relationshipKey"], "family_default")
 
         deleted = self.client.delete(
             f"/api/contacts/emergency/{contact_id}",

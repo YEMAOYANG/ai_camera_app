@@ -93,7 +93,7 @@ Mira Guardian 家长端 App
 |---|---|---|---|---|---|
 | `welcome` | 欢迎页 | 主流程 | 首次打开 | HTML | 可作为 onboarding 首屏 |
 | `login` | 登录注册 | 主流程 | 欢迎页 | HTML/README | 手机号+验证码 |
-| `parentIdentity` | 家长身份 | 主流程 | 登录后 | HTML/README | 妈妈/爸爸/祖辈/其他照护人 |
+| `parentIdentity` | 家长身份 | 主流程 | 登录后 | HTML/README | 妈妈/爸爸/祖辈/其他家人 |
 | `bind` | 扫码绑定 | 主流程 | 家长身份后 | HTML/README | 二维码、蓝牙发现 |
 | `wifi` | Wi-Fi 配网 | 主流程 | 扫码成功 | HTML/需求补齐 | 需要 loading/error/offline |
 | `bindDone` | 绑定成功 | 主流程 | 配网成功 | HTML | 进入孩子档案 |
@@ -185,7 +185,7 @@ Mira Guardian 家长端 App
 | 弱网/重连状态 | 看护页必备 | 看护页面局部状态 |
 | 隐私模式阻断页 | 看护和记录入口受限 | 必须独立高保真 |
 | 搜索/筛选无结果 | 任务、报告、事件回放、奖励商店 | 组件状态 |
-| 角色无权限 | 祖辈/保姆/临时查看者场景 | 组件状态 + 权限说明页 |
+| 角色无权限 | 祖辈/其他家人/临时查看者场景 | 组件状态 + 权限说明页 |
 | 多设备/多孩预留空状态 | 后续扩展但 MVP 暂缓 | 空状态组件 |
 | AI 误判上报 | 任务证据、看护事件 | sheet 或详情页入口 |
 | 权限引导独立页 `permissions` | 通知、相机、麦克风、相册权限贯穿 onboarding、看护、打卡 | 必须有可点击页面，支持 default/loading/error/success/permission denied |

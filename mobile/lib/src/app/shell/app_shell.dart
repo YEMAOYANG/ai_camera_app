@@ -370,7 +370,7 @@ class _BottomNavItem extends StatelessWidget {
           onTap: onTap,
           splashColor: Colors.transparent,
           child: SizedBox(
-            height: 50,
+            height: AppControls.minTouchTarget,
             child: Center(
               child: AnimatedOpacity(
                 opacity: selected ? 1 : 0.88,
@@ -496,8 +496,8 @@ class _BottomNavAddActionState extends State<_BottomNavAddAction> {
                 ],
               ),
               child: const SizedBox(
-                width: 50,
-                height: 50,
+                width: AppControls.minTouchTarget,
+                height: AppControls.minTouchTarget,
                 child: Center(
                   child: Icon(Icons.add, color: AppColors.navFabFg, size: 22),
                 ),

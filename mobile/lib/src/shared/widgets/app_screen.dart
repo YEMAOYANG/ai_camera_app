@@ -12,6 +12,7 @@ class AppScreen extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.headerContent,
+    this.footer,
     this.onBack,
     this.backLabel = '返回',
     this.fixedHeader = true,
@@ -31,6 +32,7 @@ class AppScreen extends StatelessWidget {
   final String? subtitle;
   final Widget? trailing;
   final Widget? headerContent;
+  final Widget? footer;
   final VoidCallback? onBack;
   final String backLabel;
   final bool fixedHeader;
@@ -44,14 +46,20 @@ class AppScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final safeArea = MediaQuery.paddingOf(context);
     final basePadding = padding.resolve(Directionality.of(context));
+    final hasFooter = footer != null;
     final chromeBottom = reserveBottomNavigation
         ? AppChrome.tabBarBottomGap(safeArea.bottom) +
               AppChrome.tabBarHeight +
               AppChrome.tabBarContentGap
         : safeArea.bottom + 18;
-    final bottomPadding = chromeBottom > basePadding.bottom
-        ? chromeBottom
-        : basePadding.bottom;
+    final footerBottomPadding = hasFooter
+        ? safeArea.bottom + AppControls.buttonHeight + 46
+        : 0.0;
+    final bottomPadding = [
+      basePadding.bottom,
+      chromeBottom,
+      footerBottomPadding,
+    ].reduce((value, item) => value > item ? value : item);
     final topPadding = fixedHeader
         ? safeArea.top + pinnedHeaderHeight + basePadding.top
         : basePadding.top + safeArea.top + 2;
@@ -99,7 +107,48 @@ class AppScreen extends StatelessWidget {
                 headerContent: headerContent,
                 headerHeight: pinnedHeaderHeight,
               ),
+            if (footer != null)
+              _AppScreenFooter(safeBottom: safeArea.bottom, child: footer!),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppScreenFooter extends StatelessWidget {
+  const _AppScreenFooter({required this.safeBottom, required this.child});
+
+  final double safeBottom;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.appBackground.withValues(alpha: 0),
+              AppColors.appBackground.withValues(alpha: 0.94),
+              AppColors.appBackground,
+            ],
+            stops: const [0, 0.34, 1],
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.pageHorizontal,
+            12,
+            AppSpacing.pageHorizontal,
+            safeBottom + 12,
+          ),
+          child: child,
         ),
       ),
     );

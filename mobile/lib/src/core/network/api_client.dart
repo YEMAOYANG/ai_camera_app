@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
@@ -157,7 +158,10 @@ class AuthTokenInterceptor extends Interceptor {
     try {
       final response = await _refreshDio.post<dynamic>(
         '/auth/token/refresh',
-        data: {'refreshToken': session.refreshToken},
+        data: {
+          'refreshToken': session.refreshToken,
+          'clientDevice': _clientDevicePayload(),
+        },
       );
       final refreshed = _parseRemoteSession(response.data);
       await _sessionStore.save(refreshed);
@@ -187,6 +191,26 @@ class AuthTokenInterceptor extends Interceptor {
         path.startsWith('/auth/token/refresh') ||
         path.startsWith('/auth/logout');
   }
+}
+
+Map<String, String> _clientDevicePayload() {
+  final platform = defaultTargetPlatform.name.toLowerCase();
+  final isPhone =
+      defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.android;
+  final label = switch (defaultTargetPlatform) {
+    TargetPlatform.iOS => '本机 iPhone',
+    TargetPlatform.android => 'Android 手机',
+    TargetPlatform.macOS => 'Mac 设备',
+    TargetPlatform.windows => 'Windows 设备',
+    TargetPlatform.linux => 'Linux 设备',
+    TargetPlatform.fuchsia => '已登录设备',
+  };
+  return {
+    'label': label,
+    'type': isPhone ? 'phone' : 'desktop',
+    'platform': platform,
+  };
 }
 
 Map<String, dynamic> _asMap(dynamic value) {

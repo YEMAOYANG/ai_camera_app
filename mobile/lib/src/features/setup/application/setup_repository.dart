@@ -25,8 +25,23 @@ class SetupStatus {
     required this.deviceBinding,
     required this.wifi,
     required this.childProfile,
+    required this.cameraName,
+    required this.cameraNameIntro,
+    required this.cameraNameIntroAt,
     required this.contacts,
     required this.nextStep,
+    required this.parentDisplayName,
+    required this.parentRelationship,
+    required this.parentRelationshipKey,
+    required this.deviceName,
+    required this.deviceLocation,
+    required this.wifiName,
+    required this.childName,
+    required this.childGender,
+    required this.childBirthday,
+    required this.childEducationStage,
+    required this.childGrade,
+    required this.cameraWakeName,
   });
 
   final bool completed;
@@ -34,8 +49,23 @@ class SetupStatus {
   final String deviceBinding;
   final String wifi;
   final String childProfile;
+  final String cameraName;
+  final String cameraNameIntro;
+  final int? cameraNameIntroAt;
   final String contacts;
   final String nextStep;
+  final String parentDisplayName;
+  final String parentRelationship;
+  final String parentRelationshipKey;
+  final String deviceName;
+  final String deviceLocation;
+  final String wifiName;
+  final String childName;
+  final String childGender;
+  final String childBirthday;
+  final String childEducationStage;
+  final String childGrade;
+  final String cameraWakeName;
 
   bool get hasDeviceBinding => deviceBinding == 'done';
 
@@ -46,6 +76,7 @@ class SetupStatus {
       'device' => setupDevicePath,
       'wifi' => setupWifiPath,
       'child' => setupChildProfilePath,
+      'cameraName' => setupCameraNamePath,
       'contacts' || 'complete' => setupEmergencyContactsPath,
       _ => setupParentIdentityPath,
     };
@@ -54,14 +85,55 @@ class SetupStatus {
   static SetupStatus fromResponse(dynamic data) {
     final map = _asMap(data);
     final setup = _asMap(map['setup']);
+    final parent = _asMap(map['parentIdentity']);
+    final device = _asMap(map['device']);
+    final wifi = _asMap(map['wifi']);
+    final child = _asMap(map['child']);
+    final cameraName = _asMap(map['cameraName']);
     return SetupStatus(
       completed: setup['completed'] == true,
       parentIdentity: _asString(setup['parentIdentity'], fallback: 'pending'),
       deviceBinding: _asString(setup['deviceBinding'], fallback: 'pending'),
       wifi: _asString(setup['wifi'], fallback: 'pending'),
       childProfile: _asString(setup['childProfile'], fallback: 'pending'),
+      cameraName: _asString(setup['cameraName'], fallback: 'pending'),
+      cameraNameIntro: _asString(setup['cameraNameIntro'], fallback: 'pending'),
+      cameraNameIntroAt: _asNullableInt(setup['cameraNameIntroAt']),
       contacts: _asString(setup['contacts'], fallback: 'pending'),
       nextStep: _asString(setup['nextStep'], fallback: 'parentIdentity'),
+      parentDisplayName: _asString(parent['displayName']),
+      parentRelationship: _asString(parent['relationship']),
+      parentRelationshipKey: _asString(parent['relationshipKey']),
+      deviceName: _asString(device['name']),
+      deviceLocation: _asString(device['location']),
+      wifiName: _asString(wifi['ssid']),
+      childName: _asString(child['name']),
+      childGender: _asString(child['gender'], fallback: 'unspecified'),
+      childBirthday: _asString(child['birthday']),
+      childEducationStage: _asString(child['educationStage']),
+      childGrade: _asString(child['grade']),
+      cameraWakeName: _asString(cameraName['wakeName']),
+    );
+  }
+}
+
+class SetupBroadcastResult {
+  const SetupBroadcastResult({
+    required this.played,
+    required this.status,
+    required this.message,
+  });
+
+  final bool played;
+  final String status;
+  final String message;
+
+  static SetupBroadcastResult fromResponse(dynamic data) {
+    final broadcast = _asMap(_asMap(data)['broadcast']);
+    return SetupBroadcastResult(
+      played: broadcast['played'] == true,
+      status: _asString(broadcast['status']),
+      message: _asString(broadcast['message'], fallback: '摄像头暂时不在线，稍后可以再试听。'),
     );
   }
 }
@@ -90,10 +162,12 @@ class SetupRepository {
   Future<SetupStatus> saveParentIdentity({
     required String displayName,
     required String relationship,
+    required String relationshipKey,
   }) {
     return _postStep('/setup/parent-identity', {
       'displayName': displayName,
       'relationship': relationship,
+      'relationshipKey': relationshipKey,
     });
   }
 
@@ -124,15 +198,48 @@ class SetupRepository {
   Future<SetupStatus> saveChild({
     required String name,
     String? nickname,
+    String gender = 'unspecified',
     String? ageStage,
+    String? educationStage,
+    String? grade,
     String? birthday,
   }) {
     return _postStep('/setup/child', {
       'name': name,
       'nickname': nickname,
+      'gender': gender,
       'ageStage': ageStage,
+      'educationStage': educationStage,
+      'grade': grade,
       'birthday': birthday,
     });
+  }
+
+  Future<SetupStatus> saveCameraName({required String wakeName}) {
+    return _postStep('/setup/camera-name', {'wakeName': wakeName});
+  }
+
+  Future<SetupBroadcastResult> playCameraNameIntro() async {
+    try {
+      final response = await _apiClient.post('/setup/camera-name/intro');
+      return SetupBroadcastResult.fromResponse(response.data);
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<SetupBroadcastResult> previewCameraName({
+    required String wakeName,
+  }) async {
+    try {
+      final response = await _apiClient.post(
+        '/setup/camera-name/preview',
+        data: {'wakeName': wakeName},
+      );
+      return SetupBroadcastResult.fromResponse(response.data);
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
   }
 
   Future<SetupStatus> saveContacts({
@@ -202,4 +309,11 @@ Map<String, dynamic> _asMap(dynamic value) {
 
 String _asString(dynamic value, {String fallback = ''}) {
   return value is String && value.isNotEmpty ? value : fallback;
+}
+
+int? _asNullableInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
 }

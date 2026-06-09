@@ -34,20 +34,102 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('家庭看护空间'), findsOneWidget);
-    expect(find.text('监护人A · 138 **** 9696'), findsOneWidget);
+    expect(find.text('家长 · 138 **** 9696'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('guardianPersona:guardian_default')),
       findsOneWidget,
     );
-    expect(find.text('家庭与成员'), findsOneWidget);
-    expect(find.text('设备与看护'), findsOneWidget);
+    expect(find.text('家庭成员'), findsWidgets);
+    expect(find.text('紧急联系人'), findsOneWidget);
+    expect(find.text('家庭与成员'), findsNothing);
+    expect(find.text('设备管理'), findsOneWidget);
     expect(find.text('AI 规则与提醒'), findsOneWidget);
     expect(find.text('订阅与套餐'), findsOneWidget);
     expect(find.text('积分与奖励'), findsOneWidget);
     expect(find.text('隐私与授权'), findsOneWidget);
-    expect(find.text('账号设置'), findsOneWidget);
+    expect(find.text('账号安全'), findsOneWidget);
+    expect(find.text('关于'), findsOneWidget);
+    expect(find.text('账号设置'), findsNothing);
     expect(find.text('任务与奖励'), findsNothing);
+
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -520));
+    await tester.pumpAndSettle();
+    expect(find.text('退出登录'), findsOneWidget);
   });
+
+  testWidgets(
+    'profile screen uses mom animated guardian when motion is allowed',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(393, 852));
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            profileSummaryProvider.overrideWith((ref) async => _summary()),
+            accountProfileProvider.overrideWith(
+              (ref) async => _account('妈妈', displayName: '妈妈本人'),
+            ),
+            subscriptionStatusProvider.overrideWith(
+              (ref) async => const SubscriptionStatus(
+                planId: 'basic',
+                planLabel: '基础版',
+                status: 'active',
+                statusLabel: '已启用',
+                renewalText: '基础看护保持可用',
+                entitlements: [],
+              ),
+            ),
+          ],
+          child: const MaterialApp(home: ProfileScreen()),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('妈妈本人 · 138 **** 9696'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('guardianPersonaAnimated:guardian_mom')),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'profile screen uses dad animated guardian when motion is allowed',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(393, 852));
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            profileSummaryProvider.overrideWith((ref) async => _summary()),
+            accountProfileProvider.overrideWith(
+              (ref) async => _account('爸爸', displayName: '阿米爸爸'),
+            ),
+            subscriptionStatusProvider.overrideWith(
+              (ref) async => const SubscriptionStatus(
+                planId: 'basic',
+                planLabel: '基础版',
+                status: 'active',
+                statusLabel: '已启用',
+                renewalText: '基础看护保持可用',
+                entitlements: [],
+              ),
+            ),
+          ],
+          child: const MaterialApp(home: ProfileScreen()),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('阿米爸爸 · 138 **** 9696'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('guardianPersonaAnimated:guardian_dad')),
+        findsOneWidget,
+      );
+    },
+  );
 }
 
 ProfileSummary _summary() {
@@ -57,6 +139,8 @@ ProfileSummary _summary() {
     familyName: '我的家庭空间',
     displayName: '家长',
     phone: '13812349696',
+    relationship: '',
+    relationshipKey: '',
     roleLabel: '管理员',
     avatarPersona: '',
     memberCount: 4,
@@ -71,16 +155,25 @@ ProfileSummary _summary() {
   );
 }
 
-AccountProfile _account(String relationship) {
+AccountProfile _account(String relationship, {String displayName = '家长'}) {
   return AccountProfile(
     userId: 'user_test',
     phone: '13812349696',
-    displayName: '家长',
+    displayName: displayName,
     familyName: '我的家庭空间',
     relationship: relationship,
+    relationshipKey: _relationshipKeyForTest(relationship),
     role: 'admin',
     avatarPersona: '',
     gender: '',
     ageGroup: '',
   );
+}
+
+String _relationshipKeyForTest(String relationship) {
+  return switch (relationship) {
+    '妈妈' => 'mom',
+    '爸爸' => 'dad',
+    _ => '',
+  };
 }

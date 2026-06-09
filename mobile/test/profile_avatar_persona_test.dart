@@ -26,11 +26,21 @@ void main() {
       expect(_resolve('家人').id, 'guardian_default');
     });
 
-    test('uses explicit avatar persona before relationship text', () {
+    test('uses relationship key before explicit avatar persona', () {
       final persona = resolveGuardianAvatarPersona(
         account: _account(relationship: '妈妈', avatarPersona: 'guardian_dad'),
         summary: _summary(),
         relationship: '妈妈',
+      );
+
+      expect(persona.id, 'guardian_mom');
+    });
+
+    test('uses explicit avatar persona when relationship key is missing', () {
+      final persona = resolveGuardianAvatarPersona(
+        account: _account(relationship: '监护人', avatarPersona: 'guardian_dad'),
+        summary: _summary(),
+        relationship: '监护人',
       );
 
       expect(persona.id, 'guardian_dad');
@@ -48,6 +58,21 @@ void main() {
         expect(persona.id, 'guardian_grandma');
       },
     );
+
+    test('uses transparent animated WebP only for enabled personas', () {
+      expect(
+        guardianMomPersona.loopAssetPath,
+        'assets/images/guardian/animated/guardian_mom_loop.webp',
+      );
+      expect(
+        guardianDadPersona.loopAssetPath,
+        'assets/images/guardian/animated/guardian_dad_loop.webp',
+      );
+      expect(guardianMomPersona.loopAssetPath.endsWith('.webp'), isTrue);
+      expect(guardianDadPersona.loopAssetPath.endsWith('.webp'), isTrue);
+      expect(guardianGrandmaPersona.loopAssetPath.endsWith('.mp4'), isTrue);
+      expect(guardianGrandpaPersona.loopAssetPath.endsWith('.mp4'), isTrue);
+    });
   });
 }
 
@@ -66,6 +91,8 @@ ProfileSummary _summary({String avatarPersona = ''}) {
     familyName: '我的家庭空间',
     displayName: '家长',
     phone: '13800002026',
+    relationship: '',
+    relationshipKey: '',
     roleLabel: '管理员',
     avatarPersona: avatarPersona,
     memberCount: 1,
@@ -87,9 +114,21 @@ AccountProfile _account({
     displayName: '家长',
     familyName: '我的家庭空间',
     relationship: relationship,
+    relationshipKey: _relationshipKeyForTest(relationship),
     role: 'admin',
     avatarPersona: avatarPersona,
     gender: gender,
     ageGroup: ageGroup,
   );
+}
+
+String _relationshipKeyForTest(String relationship) {
+  return switch (relationship) {
+    '妈妈' => 'mom',
+    '爸爸' => 'dad',
+    '爷爷' || '外公' => 'grandpa',
+    '奶奶' || '外婆' => 'grandma',
+    '叔叔' || '舅舅' => 'uncle',
+    _ => '',
+  };
 }

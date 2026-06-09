@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS parent_identities (
   family_id VARCHAR(255) PRIMARY KEY,
   display_name VARCHAR(255) NOT NULL,
   relationship VARCHAR(255) NOT NULL,
+  relationship_key VARCHAR(255),
   confirmed_at BIGINT NOT NULL
 );
 
@@ -94,6 +95,7 @@ CREATE TABLE IF NOT EXISTS emergency_contacts (
   name VARCHAR(255) NOT NULL,
   phone VARCHAR(255) NOT NULL,
   relationship VARCHAR(255),
+  relationship_key VARCHAR(255),
   priority INTEGER NOT NULL,
   created_at BIGINT NOT NULL
 );

@@ -110,10 +110,10 @@ class AppMotion {
 class AppControls {
   const AppControls._();
 
-  static const buttonHeight = 50.0;
-  static const compactButtonHeight = 46.0;
+  static const buttonHeight = 44.0;
+  static const compactButtonHeight = 44.0;
   static const fieldHeight = 48.0;
-  static const iconButtonSize = 40.0;
+  static const iconButtonSize = 44.0;
   static const minTouchTarget = 44.0;
 }
 

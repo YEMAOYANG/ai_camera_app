@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_avatar_persona.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
+import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
@@ -19,6 +23,7 @@ class ProfileScreen extends ConsumerWidget {
     final summary = ref.watch(profileSummaryProvider);
     final subscription = ref.watch(subscriptionStatusProvider);
     final account = ref.watch(accountProfileProvider);
+    final identityOptions = ref.watch(guardianIdentityOptionsProvider);
 
     return AppScreen(
       title: '我的',
@@ -36,6 +41,7 @@ class ProfileScreen extends ConsumerWidget {
             summary: data,
             subscription: subscription.asData?.value,
             account: account.asData?.value,
+            identityOptions: identityOptions.asData?.value,
           ),
           loading: () => const _FamilySpaceLoading(),
           error: (error, _) => AppStateView(
@@ -55,16 +61,22 @@ class ProfileScreen extends ConsumerWidget {
               rows: [
                 _ProfileCategory(
                   icon: Icons.groups_outlined,
-                  title: '家庭与成员',
-                  subtitle: '成员邀请、孩子资料和紧急联系人',
-                  path: profileFamilyHubPath,
+                  title: '家庭成员',
+                  subtitle: '成员邀请、权限和通知范围',
+                  path: profileFamilyMembersPath,
                   tone: AppListRowTone.green,
                 ),
                 _ProfileCategory(
+                  icon: Icons.contact_phone_outlined,
+                  title: '紧急联系人',
+                  subtitle: '重要情况的通知对象',
+                  path: profileContactsPath,
+                ),
+                _ProfileCategory(
                   icon: Icons.videocam_outlined,
-                  title: '设备与看护',
-                  subtitle: '设备、网络、摄像头和看护授权',
-                  path: profileDeviceHubPath,
+                  title: '设备管理',
+                  subtitle: '在线状态、网络、固件和解绑状态',
+                  path: profileDevicesPath,
                   tone: AppListRowTone.blue,
                 ),
                 _ProfileCategory(
@@ -95,23 +107,54 @@ class ProfileScreen extends ConsumerWidget {
                 _ProfileCategory(
                   icon: Icons.lock_outline,
                   title: '隐私与授权',
-                  subtitle: '采集授权、儿童隐私和协议政策',
+                  subtitle: '隐私模式、儿童数据和协议政策',
                   path: profilePrivacyHubPath,
                 ),
                 _ProfileCategory(
-                  icon: Icons.manage_accounts_outlined,
-                  title: '账号设置',
-                  subtitle: '个人资料、账号安全和关于',
-                  path: profileAccountSettingsPath,
+                  icon: Icons.admin_panel_settings_outlined,
+                  title: '账号安全',
+                  subtitle: '登录设备和账号注销',
+                  path: profileSecurityPath,
+                  tone: AppListRowTone.green,
+                ),
+              ],
+            ),
+            _ProfileCategorySection(
+              title: '支持',
+              rows: [
+                _ProfileCategory(
+                  icon: Icons.info_outline,
+                  title: '关于',
+                  subtitle: '帮助反馈、当前版本和协议政策',
+                  path: profileAboutPath,
                   tone: AppListRowTone.green,
                 ),
               ],
             ),
           ],
         ),
+        const SizedBox(height: 18),
+        AppDangerButton(
+          label: '退出登录',
+          trailing: const Icon(Icons.logout_outlined, size: 18),
+          onTap: () => _confirmProfileLogout(context, ref),
+        ),
       ],
     );
   }
+}
+
+Future<void> _confirmProfileLogout(BuildContext context, WidgetRef ref) async {
+  final confirmed = await showAppConfirmSheet(
+    context: context,
+    title: '退出登录',
+    message: '退出后再次进入需要手机号验证码，设备会继续执行已配置的任务和提醒。',
+    confirmLabel: '退出',
+    danger: true,
+  );
+  if (!confirmed) return;
+  await ref.read(authRepositoryProvider).logout();
+  if (context.mounted) context.go(loginPath);
 }
 
 class _FamilySpaceHero extends StatelessWidget {
@@ -119,11 +162,13 @@ class _FamilySpaceHero extends StatelessWidget {
     required this.summary,
     required this.subscription,
     required this.account,
+    required this.identityOptions,
   });
 
   final ProfileSummary summary;
   final SubscriptionStatus? subscription;
   final AccountProfile? account;
+  final GuardianIdentityOptions? identityOptions;
 
   @override
   Widget build(BuildContext context) {
@@ -141,21 +186,35 @@ class _FamilySpaceHero extends StatelessWidget {
       summary: summary,
       displayName: displayName,
     );
+    final relationshipKey = _relationshipKey(
+      account: account,
+      summary: summary,
+      identityOptions: identityOptions,
+      relationship: relationship,
+      displayName: displayName,
+    );
     final planLabel = subscription?.planLabel.isNotEmpty == true
         ? subscription!.planLabel
         : '基础版';
-    final persona = resolveGuardianAvatarPersona(
+    final resolvedPersona = resolveGuardianAvatarPersona(
       account: account,
       summary: summary,
       relationship: relationship,
+      relationshipKey: relationshipKey,
     );
+    final configuredAsset =
+        identityOptions?.imageAssetForKey(relationshipKey) ?? '';
+    final persona = configuredAsset.isEmpty
+        ? resolvedPersona
+        : resolvedPersona.copyWith(assetPath: configuredAsset);
 
     return _HeroPressable(
       onTap: () => context.push(profileAccountPath),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final compact = constraints.maxWidth < 350;
-          final artWidth = compact ? 116.0 : 138.0;
+          final artWidth = compact ? 124.0 : 148.0;
+          final artHeight = compact ? 192.0 : 204.0;
           final rightReserve = compact ? 88.0 : 118.0;
 
           return ClipRRect(
@@ -205,6 +264,7 @@ class _FamilySpaceHero extends StatelessWidget {
                     child: _GuardianCharacterArt(
                       persona: persona,
                       width: artWidth,
+                      height: artHeight,
                     ),
                   ),
                   Padding(
@@ -245,7 +305,7 @@ class _FamilySpaceHero extends StatelessWidget {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                '$relationship · ${_phoneMask(summary.phone)}',
+                                '$displayName · ${_phoneMask(summary.phone)}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -364,6 +424,8 @@ class _ChildProfileEntry extends StatelessWidget {
       onTap: () => context.push(profileChildPath),
       child: Semantics(
         button: true,
+        container: true,
+        excludeSemantics: true,
         label: '查看孩子资料',
         child: DecoratedBox(
           decoration: BoxDecoration(
@@ -412,41 +474,56 @@ class _ChildProfileEntry extends StatelessWidget {
 }
 
 class _GuardianCharacterArt extends StatelessWidget {
-  const _GuardianCharacterArt({required this.persona, required this.width});
+  const _GuardianCharacterArt({
+    required this.persona,
+    required this.width,
+    required this.height,
+  });
 
   final GuardianAvatarPersona persona;
   final double width;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
-    final image = Image.asset(
+    final staticImage = Image.asset(
       persona.assetPath,
       key: ValueKey('guardianPersona:${persona.id}'),
       width: width,
+      height: height,
       fit: BoxFit.contain,
-      filterQuality: FilterQuality.medium,
+      alignment: Alignment.bottomCenter,
+      filterQuality: FilterQuality.high,
       excludeFromSemantics: true,
     );
+    final shouldAnimate =
+        _hasGuardianLoop(persona) && !MediaQuery.of(context).disableAnimations;
+    final image = shouldAnimate
+        ? Image.asset(
+            persona.loopAssetPath,
+            key: ValueKey('guardianPersonaAnimated:${persona.id}'),
+            width: width,
+            height: height,
+            fit: BoxFit.contain,
+            alignment: Alignment.bottomCenter,
+            filterQuality: FilterQuality.high,
+            gaplessPlayback: true,
+            excludeFromSemantics: true,
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if (wasSynchronouslyLoaded || frame != null) return child;
+              return staticImage;
+            },
+            errorBuilder: (context, error, stackTrace) => staticImage,
+          )
+        : staticImage;
 
-    return Semantics(
-      image: true,
-      label: persona.semanticLabel,
-      child: MediaQuery.of(context).disableAnimations
-          ? image
-          : TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0.965, end: 1),
-              duration: AppMotion.duration(context, 360),
-              curve: Curves.easeOutCubic,
-              builder: (context, value, child) {
-                return Transform.translate(
-                  offset: Offset(0, (1 - value) * 18),
-                  child: Transform.scale(scale: value, child: child),
-                );
-              },
-              child: image,
-            ),
-    );
+    return Semantics(image: true, label: persona.semanticLabel, child: image);
   }
+}
+
+bool _hasGuardianLoop(GuardianAvatarPersona persona) {
+  return persona.id == guardianMomPersona.id ||
+      persona.id == guardianDadPersona.id;
 }
 
 class _FamilySpaceLoading extends StatelessWidget {
@@ -830,10 +907,29 @@ String _relationshipLabel({
 }) {
   final relationship = account?.relationship.trim() ?? '';
   if (relationship.isNotEmpty) return relationship;
+  final summaryRelationship = summary.relationship.trim();
+  if (summaryRelationship.isNotEmpty) return summaryRelationship;
   final roleLabel = summary.roleLabel.trim();
   if (roleLabel.isNotEmpty) return roleLabel;
   if (displayName.trim().isNotEmpty) return displayName.trim();
   return '监护人';
+}
+
+String _relationshipKey({
+  required AccountProfile? account,
+  required ProfileSummary summary,
+  required GuardianIdentityOptions? identityOptions,
+  required String relationship,
+  required String displayName,
+}) {
+  final accountKey = account?.relationshipKey.trim() ?? '';
+  if (accountKey.isNotEmpty) return accountKey;
+  final summaryKey = summary.relationshipKey.trim();
+  if (summaryKey.isNotEmpty) return summaryKey;
+  if (identityOptions == null) return '';
+  final relationshipKey = identityOptions.keyForValue(relationship);
+  if (relationshipKey.isNotEmpty) return relationshipKey;
+  return identityOptions.keyForValue(displayName);
 }
 
 String _phoneMask(String phone) {

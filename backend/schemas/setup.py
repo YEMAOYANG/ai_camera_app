@@ -13,6 +13,9 @@ def setup_progress_from_row(row: DatabaseRow) -> SetupProgress:
         device_binding=row["device_binding_status"],
         wifi=row["wifi_status"],
         child_profile=row["child_profile_status"],
+        camera_name=row.get("camera_name_status") or SETUP_DONE,
+        camera_name_intro=row.get("camera_name_intro_status") or "pending",
+        camera_name_intro_at=row.get("camera_name_intro_at"),
         contacts=row["contacts_status"],
         created_at=row["created_at"],
         updated_at=row["updated_at"],
@@ -31,6 +34,8 @@ def next_setup_step(progress: SetupProgress) -> str:
         return "wifi"
     if progress.child_profile != SETUP_DONE:
         return "child"
+    if progress.camera_name != SETUP_DONE:
+        return "cameraName"
     if progress.contacts != SETUP_DONE:
         return "contacts"
     return "complete"
@@ -43,6 +48,9 @@ def setup_payload(progress: SetupProgress) -> dict:
         "deviceBinding": progress.device_binding,
         "wifi": progress.wifi,
         "childProfile": progress.child_profile,
+        "cameraName": progress.camera_name,
+        "cameraNameIntro": progress.camera_name_intro,
+        "cameraNameIntroAt": progress.camera_name_intro_at,
         "contacts": progress.contacts,
         "nextStep": next_setup_step(progress),
         "updatedAt": progress.updated_at,

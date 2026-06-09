@@ -6,10 +6,11 @@ from pathlib import Path
 
 from core.database import Database
 from core.errors import ApiError
-from core.security import now_ms
+from core.security import hash_value, now_ms
 from repositories.profile_repository import ProfileRepository
 from schemas.auth import normalize_phone
 from schemas.profile import (
+    account_deletion_request_payload,
     account_profile_payload,
     account_security_payload,
     child_profile_payload,
@@ -17,15 +18,45 @@ from schemas.profile import (
     family_invitation_payload,
     family_member_payload,
     feedback_payload,
+    guardian_identity_options_payload,
     setting_payload,
 )
 from services.auth_service import AuthService
 
 
-MEMBER_ROLES = {"admin", "guardian", "caregiver", "viewer"}
 MEMBER_STATUSES = {"active", "invited", "disabled"}
 INVITATION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 CONTENT_ROOT = Path(__file__).resolve().parents[1] / "content"
+UNIQUE_GUARDIAN_IDENTITY_KEYS = {
+    "mom",
+    "dad",
+    "maternal_grandpa",
+    "maternal_grandma",
+    "grandpa",
+    "grandma",
+}
+
+LEGACY_GUARDIAN_IDENTITY_KEYS = {
+    "母亲": "mom",
+    "妈妈": "mom",
+    "mother": "mom",
+    "mom": "mom",
+    "父亲": "dad",
+    "爸爸": "dad",
+    "father": "dad",
+    "dad": "dad",
+    "外公": "maternal_grandpa",
+    "外婆": "maternal_grandma",
+    "爷爷": "grandpa",
+    "奶奶": "grandma",
+    "guardian": "family_default",
+    "caregiver": "family_default",
+    "family": "family_default",
+    "member": "family_default",
+    "other": "family_default",
+    "unknown": "family_default",
+    "grandparent": "family_default",
+}
 
 SETTING_DEFAULTS = {
     "ai-care-rules": {
@@ -87,7 +118,7 @@ class ProfileService:
         with self.repository.transaction() as conn:
             user = self._user_or_error(conn, context["user"]["id"])
             family = self._family_or_error(conn, context["family"]["id"])
-            self.repository.ensure_owner_member(
+            member = self.repository.ensure_owner_member(
                 conn,
                 family_id=family["id"],
                 user_id=user["id"],
@@ -98,17 +129,27 @@ class ProfileService:
             members = self.repository.list_family_members(conn, family_id=family["id"])
             child = self.repository.current_child(conn, family_id=family["id"])
             profile = self.repository.get_parent_identity(conn, family_id=family["id"])
+            relationship_key = self._relationship_key_for_parent_identity(
+                conn,
+                profile,
+            )
+            display_name = (
+                profile["display_name"]
+                if profile and profile["display_name"]
+                else user["display_name"]
+            )
             return {
                 "ok": True,
                 "summary": {
                     "spaceTitle": "家庭看护空间",
                     "familyId": family["id"],
                     "familyName": family["name"],
-                    "displayName": user["display_name"],
+                    "displayName": display_name,
                     "phone": user["phone"],
-                    "role": "admin",
-                    "roleLabel": "管理员",
+                    "role": member["role"],
+                    "roleLabel": self._family_role_label(conn, member["role"]),
                     "relationship": profile["relationship"] if profile else "",
+                    "relationshipKey": relationship_key,
                     "memberCount": len(members),
                     "deviceCount": self.repository.count_devices(conn, family_id=family["id"]),
                     "pendingItemCount": self.repository.count_pending_items(
@@ -117,6 +158,27 @@ class ProfileService:
                     ),
                     "child": child_profile_payload(child),
                 },
+            }
+
+    def guardian_identity_options(self, access_token: str) -> dict:
+        self._auth_context(access_token)
+        with self.repository.transaction() as conn:
+            return {
+                "ok": True,
+                "options": guardian_identity_options_payload(
+                    self.repository.list_app_option_items(
+                        conn,
+                        catalog_key="guardian_identity_group",
+                    ),
+                    self.repository.list_app_option_items(
+                        conn,
+                        catalog_key="guardian_identity_label",
+                    ),
+                    self.repository.list_app_option_items(
+                        conn,
+                        catalog_key="family_role",
+                    ),
+                ),
             }
 
     def list_family_members(self, access_token: str) -> dict:
@@ -138,11 +200,24 @@ class ProfileService:
     def create_family_member(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
         name = self._required_text(data, "name", "请输入成员姓名")
-        role = self._member_role(self._optional_text(data, "role") or "guardian")
         status = self._member_status(self._optional_text(data, "status") or "active")
         phone = self._optional_phone(data.get("phone"))
         now = now_ms()
         with self.repository.transaction() as conn:
+            role = self._member_role(
+                conn,
+                self._optional_text(data, "role") or self._default_member_role(conn),
+            )
+            self._assert_member_role_available(
+                conn,
+                family_id=context["family"]["id"],
+                role=role,
+            )
+            self._assert_guardian_identity_available(
+                conn,
+                family_id=context["family"]["id"],
+                relationship_key=self._guardian_identity_key_for_value(conn, name),
+            )
             member = self.repository.create_family_member(
                 conn,
                 family_id=context["family"]["id"],
@@ -163,16 +238,34 @@ class ProfileService:
             fields["name"] = self._required_text(data, "name", "请输入成员姓名")
         if "phone" in data:
             fields["phone"] = self._optional_phone(data.get("phone"))
-        if "role" in data:
-            fields["role"] = self._member_role(str(data["role"]))
+        raw_role = str(data["role"]) if "role" in data else None
         if "status" in data:
             fields["status"] = self._member_status(str(data["status"]))
         if "notifyEnabled" in data:
             fields["notify_enabled"] = int(bool(data["notifyEnabled"]))
         with self.repository.transaction() as conn:
+            if raw_role is not None:
+                fields["role"] = self._member_role(conn, raw_role)
             member = self._member_or_error(conn, context["family"]["id"], member_id)
             if member["user_id"] == context["user"]["id"] and fields.get("role") not in {None, "admin"}:
                 raise ApiError("cannot_downgrade_self", "不能降低当前管理员自己的权限")
+            if fields.get("role"):
+                self._assert_member_role_available(
+                    conn,
+                    family_id=context["family"]["id"],
+                    role=fields["role"],
+                    exclude_member_id=member_id,
+                )
+            if fields.get("name"):
+                self._assert_guardian_identity_available(
+                    conn,
+                    family_id=context["family"]["id"],
+                    relationship_key=self._guardian_identity_key_for_value(
+                        conn,
+                        fields["name"],
+                    ),
+                    exclude_member_id=member_id,
+                )
             member = self.repository.update_family_member(
                 conn,
                 family_id=context["family"]["id"],
@@ -211,9 +304,22 @@ class ProfileService:
         context = self._auth_context(access_token)
         name = self._required_text(data, "name", "请输入成员称呼")
         phone = self._required_phone(data.get("phone"))
-        role = self._member_role(self._optional_text(data, "role") or "guardian")
         now = now_ms()
         with self.repository.transaction() as conn:
+            role = self._member_role(
+                conn,
+                self._optional_text(data, "role") or self._default_member_role(conn),
+            )
+            self._assert_member_role_available(
+                conn,
+                family_id=context["family"]["id"],
+                role=role,
+            )
+            self._assert_guardian_identity_available(
+                conn,
+                family_id=context["family"]["id"],
+                relationship_key=self._guardian_identity_key_for_value(conn, name),
+            )
             invitation = self.repository.create_family_invitation(
                 conn,
                 family_id=context["family"]["id"],
@@ -272,6 +378,7 @@ class ProfileService:
         mapping = {
             "name": "name",
             "nickname": "nickname",
+            "gender": "gender",
             "birthday": "birthday",
             "ageStage": "age_stage",
             "educationStage": "education_stage",
@@ -280,11 +387,12 @@ class ProfileService:
         }
         for key, column in mapping.items():
             if key in data:
-                fields[column] = (
-                    self._required_text(data, key, "请输入孩子姓名")
-                    if key == "name"
-                    else self._optional_text(data, key)
-                )
+                if key == "name":
+                    fields[column] = self._required_text(data, key, "请输入孩子姓名")
+                elif key == "gender":
+                    fields[column] = self._gender(self._optional_text(data, key))
+                else:
+                    fields[column] = self._optional_text(data, key)
         if "interests" in data:
             fields["interests"] = self._json_list(data["interests"])
         if "taskPreferences" in data:
@@ -305,25 +413,46 @@ class ProfileService:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
             rows = self.repository.list_contacts(conn, family_id=context["family"]["id"])
-            return {"ok": True, "contacts": [emergency_contact_payload(row) for row in rows]}
+            return {
+                "ok": True,
+                "contacts": [
+                    self._emergency_contact_payload(conn, row) for row in rows
+                ],
+            }
 
     def create_contact(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
         name = self._required_text(data, "name", "请输入联系人姓名")
         phone = normalize_phone(str(data.get("phone") or ""))
         relationship = self._optional_text(data, "relationship")
+        relationship_key = self._optional_text(data, "relationshipKey")
         now = now_ms()
         with self.repository.transaction() as conn:
+            relationship, relationship_key = self._guardian_identity_value(
+                conn,
+                relationship_key=relationship_key,
+                relationship=relationship,
+                allow_legacy_fallback=True,
+            )
+            self._assert_guardian_identity_available(
+                conn,
+                family_id=context["family"]["id"],
+                relationship_key=relationship_key,
+            )
             contact = self.repository.create_contact(
                 conn,
                 family_id=context["family"]["id"],
                 name=name,
                 phone=phone,
                 relationship=relationship,
+                relationship_key=relationship_key,
                 default_notify=bool(data.get("defaultNotify", True)),
                 now=now,
             )
-            return {"ok": True, "contact": emergency_contact_payload(contact)}
+            return {
+                "ok": True,
+                "contact": self._emergency_contact_payload(conn, contact),
+            }
 
     def update_contact(self, access_token: str, contact_id: str, data: dict) -> dict:
         context = self._auth_context(access_token)
@@ -332,13 +461,26 @@ class ProfileService:
             fields["name"] = self._required_text(data, "name", "请输入联系人姓名")
         if "phone" in data:
             fields["phone"] = normalize_phone(str(data.get("phone") or ""))
-        if "relationship" in data:
-            fields["relationship"] = self._optional_text(data, "relationship")
         if "defaultNotify" in data:
             fields["default_notify"] = int(bool(data["defaultNotify"]))
         now = now_ms()
         with self.repository.transaction() as conn:
             self._contact_or_error(conn, context["family"]["id"], contact_id)
+            if "relationship" in data or "relationshipKey" in data:
+                relationship, relationship_key = self._guardian_identity_value(
+                    conn,
+                    relationship_key=self._optional_text(data, "relationshipKey"),
+                    relationship=self._optional_text(data, "relationship"),
+                    allow_legacy_fallback=True,
+                )
+                self._assert_guardian_identity_available(
+                    conn,
+                    family_id=context["family"]["id"],
+                    relationship_key=relationship_key,
+                    exclude_contact_id=contact_id,
+                )
+                fields["relationship"] = relationship
+                fields["relationship_key"] = relationship_key
             contact = self.repository.update_contact(
                 conn,
                 family_id=context["family"]["id"],
@@ -346,7 +488,7 @@ class ProfileService:
                 fields=fields,
                 now=now,
             )
-            return {"ok": True, "contact": emergency_contact_payload(contact)}
+            return {"ok": True, "contact": self._emergency_contact_payload(conn, contact)}
 
     def delete_contact(self, access_token: str, contact_id: str) -> dict:
         context = self._auth_context(access_token)
@@ -388,33 +530,16 @@ class ProfileService:
 
     def account_profile(self, access_token: str) -> dict:
         context = self._auth_context(access_token)
-        with self.repository.transaction() as conn:
-            user = self._user_or_error(conn, context["user"]["id"])
-            family = self._family_or_error(conn, context["family"]["id"])
-            parent_identity = self.repository.get_parent_identity(conn, family_id=family["id"])
-            return {"ok": True, "profile": account_profile_payload(user, family, parent_identity)}
-
-    def update_account_profile(self, access_token: str, data: dict) -> dict:
-        context = self._auth_context(access_token)
-        display_name = self._optional_text(data, "displayName")
-        family_name = self._optional_text(data, "familyName")
-        relationship = self._optional_text(data, "relationship")
         now = now_ms()
         with self.repository.transaction() as conn:
             user = self._user_or_error(conn, context["user"]["id"])
             family = self._family_or_error(conn, context["family"]["id"])
-            user = self.repository.update_user_profile(conn, user_id=user["id"], display_name=display_name)
-            family = self.repository.update_family_name(conn, family_id=family["id"], name=family_name)
             parent_identity = self.repository.get_parent_identity(conn, family_id=family["id"])
-            if relationship is not None:
-                parent_identity = self.repository.upsert_parent_identity(
-                    conn,
-                    family_id=family["id"],
-                    display_name=display_name or user["display_name"],
-                    relationship=relationship,
-                    now=now,
-                )
-            self.repository.ensure_owner_member(
+            relationship_key = self._relationship_key_for_parent_identity(
+                conn,
+                parent_identity,
+            )
+            member = self.repository.ensure_owner_member(
                 conn,
                 family_id=family["id"],
                 user_id=user["id"],
@@ -422,14 +547,220 @@ class ProfileService:
                 phone=user["phone"],
                 now=now,
             )
-            return {"ok": True, "profile": account_profile_payload(user, family, parent_identity)}
+            return {
+                "ok": True,
+                "profile": account_profile_payload(
+                    user,
+                    family,
+                    parent_identity,
+                    role=member["role"],
+                    relationship_key=relationship_key,
+                ),
+            }
+
+    def update_account_profile(self, access_token: str, data: dict) -> dict:
+        context = self._auth_context(access_token)
+        display_name = self._optional_text(data, "displayName")
+        family_name = self._optional_text(data, "familyName")
+        relationship = self._optional_text(data, "relationship")
+        relationship_key = self._optional_text(data, "relationshipKey")
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            user = self._user_or_error(conn, context["user"]["id"])
+            family = self._family_or_error(conn, context["family"]["id"])
+            user = self.repository.update_user_profile(conn, user_id=user["id"], display_name=display_name)
+            family = self.repository.update_family_name(conn, family_id=family["id"], name=family_name)
+            parent_identity = self.repository.get_parent_identity(conn, family_id=family["id"])
+            if relationship is not None or relationship_key is not None:
+                relationship, relationship_key = self._guardian_identity_value(
+                    conn,
+                    relationship_key=relationship_key,
+                    relationship=relationship or display_name,
+                )
+                self._assert_guardian_identity_available(
+                    conn,
+                    family_id=family["id"],
+                    relationship_key=relationship_key,
+                    exclude_parent_identity=True,
+                    exclude_member_user_id=user["id"],
+                )
+                parent_identity = self.repository.upsert_parent_identity(
+                    conn,
+                    family_id=family["id"],
+                    display_name=relationship,
+                    relationship=relationship,
+                    relationship_key=relationship_key,
+                    now=now,
+                )
+            resolved_relationship_key = self._relationship_key_for_parent_identity(
+                conn,
+                parent_identity,
+            )
+            member = self.repository.ensure_owner_member(
+                conn,
+                family_id=family["id"],
+                user_id=user["id"],
+                name=user["display_name"],
+                phone=user["phone"],
+                now=now,
+            )
+            return {
+                "ok": True,
+                "profile": account_profile_payload(
+                    user,
+                    family,
+                    parent_identity,
+                    role=member["role"],
+                    relationship_key=resolved_relationship_key,
+                ),
+            }
 
     def account_security(self, access_token: str) -> dict:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
             user = self._user_or_error(conn, context["user"]["id"])
             sessions = self.repository.list_sessions(conn, user_id=user["id"])
-            return {"ok": True, "security": account_security_payload(user, sessions)}
+            return {
+                "ok": True,
+                "security": account_security_payload(
+                    user,
+                    sessions,
+                    current_access_hash=hash_value(access_token),
+                ),
+            }
+
+    def revoke_account_session(self, access_token: str, session_id: str) -> dict:
+        context = self._auth_context(access_token)
+        now = now_ms()
+        current_access_hash = hash_value(access_token)
+        with self.repository.transaction() as conn:
+            user = self._user_or_error(conn, context["user"]["id"])
+            session = self.repository.get_session(conn, user_id=user["id"], session_id=session_id)
+            if session is None:
+                raise ApiError("session_not_found", "登录设备不存在", 404)
+            if session.get("access_hash") == current_access_hash:
+                raise ApiError("cannot_revoke_current_session", "当前设备不能在这里移除")
+            self.repository.revoke_session(
+                conn,
+                user_id=user["id"],
+                session_id=session_id,
+                revoked_at=now,
+            )
+            sessions = self.repository.list_sessions(conn, user_id=user["id"])
+            return {
+                "ok": True,
+                "message": "设备已移除",
+                "security": account_security_payload(
+                    user,
+                    sessions,
+                    current_access_hash=current_access_hash,
+                ),
+            }
+
+    def request_account_deletion(self, access_token: str, data: dict) -> dict:
+        context = self._auth_context(access_token)
+        now = now_ms()
+        reason = str(data.get("reason") or "").strip() or None
+        with self.repository.transaction() as conn:
+            user = self._user_or_error(conn, context["user"]["id"])
+            family = self._family_or_error(conn, context["family"]["id"])
+            deletion_request = self.repository.create_account_deletion_request(
+                conn,
+                user_id=user["id"],
+                family_id=family["id"],
+                reason=reason,
+                requested_at=now,
+            )
+            user = self.repository.mark_user_deletion_requested(
+                conn,
+                user_id=user["id"],
+                requested_at=now,
+            )
+            self.repository.revoke_user_sessions(
+                conn,
+                user_id=user["id"],
+                revoked_at=now,
+            )
+            return {
+                "ok": True,
+                "message": "账号注销申请已提交",
+                "accountStatus": user.get("account_status") or "deletion_requested",
+                "deletionRequest": account_deletion_request_payload(deletion_request),
+            }
+
+    def request_account_phone_code(self, access_token: str, data: dict) -> dict:
+        context = self._auth_context(access_token)
+        phone = normalize_phone(str(data.get("phone") or ""))
+        with self.repository.transaction() as conn:
+            user = self._user_or_error(conn, context["user"]["id"])
+            if user["phone"] == phone:
+                raise ApiError("same_phone", "请填写一个新的手机号")
+            existing = self.repository.get_user_by_phone(conn, phone)
+            if existing is not None:
+                raise ApiError("phone_in_use", "该手机号已被其他账号使用")
+
+        result = self.auth_service.request_sms_code(phone)
+        payload = {
+            "ok": True,
+            "codeSent": True,
+            "expiresAt": result["expiresAt"],
+            "provider": result["provider"],
+            "templateId": result["templateId"],
+            "deliveryStatus": result["deliveryStatus"],
+            "message": "验证码已发送",
+        }
+        if result["debugCode"] is not None:
+            payload["debugCode"] = result["debugCode"]
+        return payload
+
+    def change_account_phone(self, access_token: str, data: dict) -> dict:
+        context = self._auth_context(access_token)
+        phone = normalize_phone(str(data.get("phone") or ""))
+        code = self._required_text(data, "code", "请输入验证码")
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            user = self._user_or_error(conn, context["user"]["id"])
+            family = self._family_or_error(conn, context["family"]["id"])
+            if user["phone"] == phone:
+                raise ApiError("same_phone", "请填写一个新的手机号")
+            existing = self.repository.get_user_by_phone(conn, phone)
+            if existing is not None and existing["id"] != user["id"]:
+                raise ApiError("phone_in_use", "该手机号已被其他账号使用")
+
+            sms = self.repository.find_sms_code(conn, phone)
+            if not sms or sms["expires_at"] < now:
+                raise ApiError("invalid_code", "验证码不正确，请重新输入")
+            if sms["attempt_count"] >= self.auth_service.sms_max_attempts:
+                raise ApiError("sms_attempts_exceeded", "验证码错误次数过多，请重新获取验证码", 429)
+            if sms["code_hash"] != hash_value(code):
+                self.repository.increment_sms_attempts(conn, phone)
+                raise ApiError("invalid_code", "验证码不正确，请重新输入")
+
+            self.repository.delete_sms_code(conn, phone)
+            user = self.repository.update_user_phone(conn, user_id=user["id"], phone=phone)
+            parent_identity = self.repository.get_parent_identity(conn, family_id=family["id"])
+            relationship_key = self._relationship_key_for_parent_identity(conn, parent_identity)
+            member = self.repository.ensure_owner_member(
+                conn,
+                family_id=family["id"],
+                user_id=user["id"],
+                name=user["display_name"],
+                phone=user["phone"],
+                now=now,
+            )
+            sessions = self.repository.list_sessions(conn, user_id=user["id"])
+            return {
+                "ok": True,
+                "message": "手机号已更新",
+                "profile": account_profile_payload(
+                    user,
+                    family,
+                    parent_identity,
+                    role=member["role"],
+                    relationship_key=relationship_key,
+                ),
+                "security": account_security_payload(user, sessions),
+            }
 
     def subscription_status(self, access_token: str) -> dict:
         self._auth_context(access_token)
@@ -663,17 +994,223 @@ class ProfileService:
             raise ApiError("missing_phone", "请输入手机号")
         return phone
 
-    def _member_role(self, value: str) -> str:
+    def _member_role(self, conn, value: str) -> str:
         value = value.strip()
-        if value not in MEMBER_ROLES:
+        role_keys = {
+            row["item_key"]
+            for row in self.repository.list_app_option_items(
+                conn,
+                catalog_key="family_role",
+            )
+        }
+        if value not in role_keys:
             raise ApiError("invalid_member_role", "成员角色不支持")
         return value
+
+    def _default_member_role(self, conn) -> str:
+        roles = self.repository.list_app_option_items(conn, catalog_key="family_role")
+        for row in roles:
+            if row["item_key"] == "guardian":
+                return row["item_key"]
+        if roles:
+            return roles[0]["item_key"]
+        raise ApiError("family_role_options_missing", "家庭角色配置不可用", 503)
+
+    def _family_role_label(self, conn, role: str) -> str:
+        for row in self.repository.list_app_option_items(
+            conn,
+            catalog_key="family_role",
+        ):
+            if row["item_key"] == role:
+                return row["label"]
+        return role
+
+    def _assert_member_role_available(
+        self,
+        conn,
+        *,
+        family_id: str,
+        role: str,
+        exclude_member_id: str | None = None,
+        exclude_invitation_id: str | None = None,
+    ) -> None:
+        if role != "admin":
+            return
+        for member in self.repository.list_family_members(conn, family_id=family_id):
+            if exclude_member_id and member["id"] == exclude_member_id:
+                continue
+            if member["role"] == "admin":
+                raise ApiError("duplicate_family_admin", "一个家庭只能有一个管理员")
+        for invitation in self.repository.list_family_invitations(conn, family_id=family_id):
+            if exclude_invitation_id and invitation["id"] == exclude_invitation_id:
+                continue
+            if invitation["role"] == "admin":
+                raise ApiError("duplicate_family_admin", "一个家庭只能有一个管理员")
+
+    def _assert_guardian_identity_available(
+        self,
+        conn,
+        *,
+        family_id: str,
+        relationship_key: str,
+        exclude_member_id: str | None = None,
+        exclude_member_user_id: str | None = None,
+        exclude_invitation_id: str | None = None,
+        exclude_contact_id: str | None = None,
+        exclude_parent_identity: bool = False,
+    ) -> None:
+        if relationship_key not in UNIQUE_GUARDIAN_IDENTITY_KEYS:
+            return
+        if not exclude_parent_identity:
+            parent_identity = self.repository.get_parent_identity(
+                conn,
+                family_id=family_id,
+            )
+            if (
+                parent_identity
+                and self._relationship_key_for_parent_identity(conn, parent_identity)
+                == relationship_key
+            ):
+                self._raise_duplicate_guardian_identity(conn, relationship_key)
+        for member in self.repository.list_family_members(conn, family_id=family_id):
+            if exclude_member_id and member["id"] == exclude_member_id:
+                continue
+            if exclude_member_user_id and member.get("user_id") == exclude_member_user_id:
+                continue
+            if self._guardian_identity_key_for_value(conn, member["name"]) == relationship_key:
+                self._raise_duplicate_guardian_identity(conn, relationship_key)
+        for invitation in self.repository.list_family_invitations(conn, family_id=family_id):
+            if exclude_invitation_id and invitation["id"] == exclude_invitation_id:
+                continue
+            if self._guardian_identity_key_for_value(conn, invitation["name"]) == relationship_key:
+                self._raise_duplicate_guardian_identity(conn, relationship_key)
+        for contact in self.repository.list_contacts(conn, family_id=family_id):
+            if exclude_contact_id and contact["id"] == exclude_contact_id:
+                continue
+            contact_key = contact.get("relationship_key") or self._guardian_identity_key_for_value(
+                conn,
+                contact.get("relationship") or "",
+            )
+            if contact_key == relationship_key:
+                self._raise_duplicate_guardian_identity(conn, relationship_key)
+
+    def _raise_duplicate_guardian_identity(self, conn, relationship_key: str) -> None:
+        label = self._guardian_identity_label_for_key(conn, relationship_key)
+        raise ApiError(
+            "duplicate_guardian_identity",
+            f"家庭里已经有“{label}”这个称呼了，请选择其他称呼",
+        )
+
+    def _guardian_identity_label_for_key(self, conn, relationship_key: str) -> str:
+        for row in self.repository.list_app_option_items(
+            conn,
+            catalog_key="guardian_identity_label",
+        ):
+            if row["item_key"] == relationship_key:
+                return row["label"]
+        return relationship_key
+
+    def _guardian_identity_key_for_value(self, conn, value: str | None) -> str:
+        normalized = (value or "").strip()
+        if not normalized:
+            return ""
+        for row in self.repository.list_app_option_items(
+            conn,
+            catalog_key="guardian_identity_label",
+        ):
+            if row["item_key"] == normalized or row["label"] == normalized:
+                return row["item_key"]
+        return self._legacy_guardian_identity_key(normalized)
+
+    def _guardian_identity_value(
+        self,
+        conn,
+        *,
+        relationship_key: str | None,
+        relationship: str | None,
+        allow_legacy_fallback: bool = False,
+    ) -> tuple[str, str]:
+        rows = self.repository.list_app_option_items(
+            conn,
+            catalog_key="guardian_identity_label",
+        )
+        if relationship_key:
+            for row in rows:
+                if row["item_key"] == relationship_key:
+                    return row["label"], row["item_key"]
+            legacy_key = self._legacy_guardian_identity_key(relationship_key)
+            if legacy_key:
+                for row in rows:
+                    if row["item_key"] == legacy_key:
+                        return row["label"], row["item_key"]
+            raise ApiError("invalid_guardian_identity", "请选择有效的家庭称呼")
+        if relationship:
+            for row in rows:
+                if row["item_key"] == relationship or row["label"] == relationship:
+                    return row["label"], row["item_key"]
+            legacy_key = self._legacy_guardian_identity_key(relationship)
+            if legacy_key:
+                for row in rows:
+                    if row["item_key"] == legacy_key:
+                        return row["label"], row["item_key"]
+        if allow_legacy_fallback:
+            for row in rows:
+                if row["item_key"] == "family_default":
+                    return row["label"], row["item_key"]
+            if rows:
+                return rows[-1]["label"], rows[-1]["item_key"]
+        raise ApiError("invalid_guardian_identity", "请选择有效的家庭称呼")
+
+    def _emergency_contact_payload(self, conn, row) -> dict:
+        try:
+            relationship, relationship_key = self._guardian_identity_value(
+                conn,
+                relationship_key=row.get("relationship_key") or None,
+                relationship=row.get("relationship") or None,
+                allow_legacy_fallback=True,
+            )
+        except ApiError:
+            relationship = row.get("relationship") or ""
+            relationship_key = row.get("relationship_key") or ""
+        return emergency_contact_payload(
+            row,
+            relationship=relationship,
+            relationship_key=relationship_key,
+        )
+
+    def _legacy_guardian_identity_key(self, value: str | None) -> str:
+        if not value:
+            return ""
+        return LEGACY_GUARDIAN_IDENTITY_KEYS.get(value.strip().lower(), "")
+
+    def _relationship_key_for_parent_identity(self, conn, parent_identity) -> str:
+        if not parent_identity:
+            return ""
+        current = parent_identity.get("relationship_key") or ""
+        if current:
+            return current
+        relationship = parent_identity.get("relationship") or ""
+        if not relationship:
+            return ""
+        for row in self.repository.list_app_option_items(
+            conn,
+            catalog_key="guardian_identity_label",
+        ):
+            if row["item_key"] == relationship or row["label"] == relationship:
+                return row["item_key"]
+        return ""
 
     def _member_status(self, value: str) -> str:
         value = value.strip()
         if value not in MEMBER_STATUSES:
             raise ApiError("invalid_member_status", "成员状态不支持")
         return value
+
+    def _gender(self, value: str | None) -> str:
+        normalized = value or "unspecified"
+        if normalized not in {"male", "female", "unspecified"}:
+            raise ApiError("invalid_gender", "请选择有效的孩子资料选项")
+        return normalized
 
     def _json_list(self, value: object) -> str:
         if not isinstance(value, list):

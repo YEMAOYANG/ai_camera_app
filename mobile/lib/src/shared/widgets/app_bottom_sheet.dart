@@ -237,6 +237,88 @@ class AppSheetHandle extends StatelessWidget {
   }
 }
 
+class AppSheetFooterActions extends StatelessWidget {
+  const AppSheetFooterActions({required this.children, super.key});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (var index = 0; index < children.length; index++) ...[
+          if (index > 0) const SizedBox(width: 10),
+          Expanded(child: children[index]),
+        ],
+      ],
+    );
+  }
+}
+
+class AppSheetPrimaryButton extends StatelessWidget {
+  const AppSheetPrimaryButton({
+    required this.label,
+    required this.onTap,
+    this.loading = false,
+    this.trailing,
+    super.key,
+  });
+
+  final String label;
+  final VoidCallback? onTap;
+  final bool loading;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppPrimaryButton(
+      label: label,
+      loading: loading,
+      trailing: trailing,
+      onTap: onTap,
+    );
+  }
+}
+
+class AppSheetSecondaryButton extends StatelessWidget {
+  const AppSheetSecondaryButton({
+    required this.label,
+    required this.onTap,
+    this.trailing,
+    super.key,
+  });
+
+  final String label;
+  final VoidCallback? onTap;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSecondaryButton(
+      label: label,
+      height: AppControls.buttonHeight,
+      trailing: trailing,
+      onTap: onTap,
+    );
+  }
+}
+
+class AppSheetDangerButton extends StatelessWidget {
+  const AppSheetDangerButton({
+    required this.label,
+    required this.onTap,
+    super.key,
+  });
+
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppDangerButton(label: label, onTap: onTap);
+  }
+}
+
 class AppPickerOption<T> {
   const AppPickerOption({
     required this.value,
@@ -384,61 +466,24 @@ class AppConfirmSheet extends StatelessWidget {
       title: title,
       subtitle: message,
       scrollable: false,
-      footer: Row(
+      footer: AppSheetFooterActions(
         children: [
-          Expanded(
-            child: AppSecondaryButton(
-              label: cancelLabel,
-              onTap: () => Navigator.of(context).pop(false),
-            ),
+          AppSheetSecondaryButton(
+            label: cancelLabel,
+            onTap: () => Navigator.of(context).pop(false),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: danger
-                ? _DangerButton(
-                    label: confirmLabel,
-                    onTap: () => Navigator.of(context).pop(true),
-                  )
-                : AppPrimaryButton(
-                    label: confirmLabel,
-                    onTap: () => Navigator.of(context).pop(true),
-                  ),
-          ),
+          danger
+              ? AppSheetDangerButton(
+                  label: confirmLabel,
+                  onTap: () => Navigator.of(context).pop(true),
+                )
+              : AppSheetPrimaryButton(
+                  label: confirmLabel,
+                  onTap: () => Navigator.of(context).pop(true),
+                ),
         ],
       ),
       child: const SizedBox.shrink(),
-    );
-  }
-}
-
-class _DangerButton extends StatelessWidget {
-  const _DangerButton({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppSurface(
-      radius: AppRadii.button,
-      color: AppColors.dangerWash,
-      borderColor: AppColors.dangerWash,
-      onTap: onTap,
-      child: SizedBox(
-        height: AppControls.compactButtonHeight - 2,
-        child: Center(
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.danger,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

@@ -104,13 +104,18 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
 
-    expect(find.text('设备绑定成功'), findsOneWidget);
-    await tester.tap(find.text('创建孩子资料'));
-    await tester.pumpAndSettle();
-
+    expect(find.text('设备绑定成功'), findsNothing);
     expect(find.text('孩子资料'), findsOneWidget);
+    expect(find.text('书桌旁设备已接入家庭网络'), findsOneWidget);
     await tester.enterText(find.byType(EditableText).at(0), '小宇');
     await tester.pump();
+    await tester.tap(find.text('继续给摄像头起名'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('给摄像头起名'), findsOneWidget);
+    expect(find.text('摄像头暂时不在线，稍后可以再试听。'), findsOneWidget);
+    await tester.tap(find.text('试听声线'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('设置紧急联系人'));
     await tester.pumpAndSettle();
 
@@ -206,7 +211,9 @@ void main() {
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
     expect(find.text('家庭看护空间'), findsOneWidget);
-    expect(find.text('家庭与成员'), findsOneWidget);
+    expect(find.text('家庭成员'), findsWidgets);
+    expect(find.text('紧急联系人'), findsOneWidget);
+    expect(find.text('家庭与成员'), findsNothing);
   });
 
   testWidgets('rejecting a confirmation task is final in V1 copy', (
@@ -234,6 +241,12 @@ void main() {
     expect(find.text('驳回'), findsOneWidget);
 
     await tester.tap(find.text('驳回'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('驳回完成确认'), findsOneWidget);
+    expect(find.text('确认驳回'), findsOneWidget);
+
+    await tester.tap(find.text('确认驳回'));
     await tester.pumpAndSettle();
 
     expect(find.text('已驳回'), findsWidgets);
@@ -334,48 +347,104 @@ void main() {
 
     await tester.tap(find.text('家庭看护空间').first);
     await tester.pumpAndSettle();
-    expect(find.text('个人信息'), findsWidgets);
-    await tester.tap(find.text('家庭身份').last);
+    expect(find.text('个人信息'), findsOneWidget);
+    expect(find.text('身份已确认'), findsNothing);
+    expect(find.text('显示称呼'), findsNothing);
+    expect(find.text('手机号'), findsWidgets);
+    expect(find.text('更换'), findsOneWidget);
+    await tester.tap(find.text('更换'));
     await tester.pumpAndSettle();
-    expect(find.text('选择家庭身份'), findsOneWidget);
-    await tester.tap(find.text('爸爸').last);
+    expect(find.text('更换手机号'), findsOneWidget);
+    expect(find.text('当前手机号'), findsOneWidget);
+    await tester.tap(find.text('取消').last);
     await tester.pumpAndSettle();
-    expect(find.text('爸爸'), findsWidgets);
+    expect(
+      find.byKey(const ValueKey('accountIdentityGroupSelect')),
+      findsNothing,
+    );
+    expect(find.byKey(const ValueKey('accountDisplayNameCards')), findsNothing);
+    await tester.tap(find.text('保存'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+    await tester.pumpAndSettle();
+    expect(find.text('家庭看护空间'), findsOneWidget);
+
+    final familyMembersEntry = find.text('家庭成员').last;
+    await tester.scrollUntilVisible(familyMembersEntry, 420);
+    await tester.ensureVisible(familyMembersEntry);
+    await tester.pumpAndSettle();
+    await tester.tap(familyMembersEntry);
+    await tester.pumpAndSettle();
+    expect(find.text('家庭成员'), findsWidgets);
+    expect(find.text('妈妈'), findsWidgets);
+    expect(find.text('家长'), findsNothing);
+    await tester.tap(find.byIcon(Icons.person_add_outlined));
+    await tester.pumpAndSettle();
+    expect(find.text('邀请家庭成员'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('memberIdentityGroupSelect')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('memberDisplayNameCards')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('memberDisplayNameCard_妈妈')),
+      findsOneWidget,
+    );
+    expect(find.text('家庭身份'), findsOneWidget);
+    expect(find.text('显示称呼'), findsOneWidget);
+    expect(find.text('权限角色'), findsOneWidget);
+    await tester.tap(find.text('取消').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+    await tester.pumpAndSettle();
+
+    await _openProfileEntry(
+      tester,
+      '紧急联系人',
+      expectedTitle: '紧急联系人',
+      expectedTexts: const ['其他家人 · 139 **** 2026'],
+      absentTexts: const ['guardian'],
+    );
+    final emergencyEntry = find.text('紧急联系人').last;
+    await tester.scrollUntilVisible(emergencyEntry, 420);
+    await tester.ensureVisible(emergencyEntry);
+    await tester.pumpAndSettle();
+    await tester.tap(emergencyEntry);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('编辑').first);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('contactIdentityGroupSelect')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('contactDisplayNameCards')),
+      findsOneWidget,
+    );
+    expect(find.text('家庭身份'), findsOneWidget);
+    expect(find.text('显示称呼'), findsOneWidget);
+    expect(find.text('guardian'), findsNothing);
+    await tester.tap(find.text('取消').last);
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
     await tester.pumpAndSettle();
 
     for (final category in const [
-      '家庭与成员',
-      '设备与看护',
+      '设备管理',
       'AI 规则与提醒',
       '订阅与套餐',
       '积分与奖励',
       '隐私与授权',
-      '账号设置',
+      '账号安全',
+      '关于',
     ]) {
       await _openProfileEntry(tester, category, expectedTitle: category);
     }
 
     await _openProfileSubscription(tester);
-
-    await _openProfileNestedEntry(
-      tester,
-      '家庭与成员',
-      '家庭成员',
-      expectedTitle: '家庭成员',
-    );
-    await _openProfileNestedEntry(
-      tester,
-      '家庭与成员',
-      '孩子资料',
-      expectedTitle: '孩子资料',
-    );
-    await _openProfileNestedEntry(
-      tester,
-      '设备与看护',
-      '设备管理',
-      expectedTitle: '设备管理',
-    );
     await _openProfileNestedEntry(
       tester,
       '积分与奖励',
@@ -569,6 +638,8 @@ Future<void> _openProfileEntry(
   WidgetTester tester,
   String label, {
   required String expectedTitle,
+  List<String> expectedTexts = const [],
+  List<String> absentTexts = const [],
 }) async {
   final entry = find.text(label).last;
   await tester.scrollUntilVisible(entry, 420);
@@ -577,6 +648,12 @@ Future<void> _openProfileEntry(
   await tester.tap(entry);
   await tester.pumpAndSettle();
   expect(find.text(expectedTitle), findsWidgets);
+  for (final text in expectedTexts) {
+    expect(find.text(text), findsWidgets);
+  }
+  for (final text in absentTexts) {
+    expect(find.textContaining(text), findsNothing);
+  }
   expect(find.textContaining('backend'), findsNothing);
   expect(find.textContaining('API'), findsNothing);
   await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
@@ -634,6 +711,7 @@ Future<void> _openProfileNestedEntry(
   String category,
   String label, {
   required String expectedTitle,
+  List<String> expectedTexts = const [],
 }) async {
   final categoryEntry = find.text(category).last;
   await tester.scrollUntilVisible(categoryEntry, 420);
@@ -650,6 +728,9 @@ Future<void> _openProfileNestedEntry(
   await tester.tap(nested);
   await tester.pumpAndSettle();
   expect(find.text(expectedTitle), findsWidgets);
+  for (final text in expectedTexts) {
+    expect(find.text(text), findsWidgets);
+  }
   expect(find.textContaining('backend'), findsNothing);
   expect(find.textContaining('API'), findsNothing);
   await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
@@ -768,6 +849,8 @@ class _FakeApiServer {
   final bool _completedSetup;
   int _taskCounter = 0;
   String _relationship = '妈妈';
+  String _relationshipKey = 'mom';
+  String _phone = '13800002026';
   final List<Map<String, dynamic>> _tasks = [];
 
   late final Dio dio = _buildDio();
@@ -818,11 +901,18 @@ class _FakeApiServer {
       return _ok(options, _setupPayload());
     }
     if (method == 'POST' && path.startsWith('/setup/')) {
+      if (path == '/setup/parent-identity') {
+        _relationship = _text(body['relationship'], _relationship);
+        _relationshipKey = _text(body['relationshipKey'], _relationshipKey);
+      }
       return _ok(options, _setupPayloadFor(path));
     }
 
     if (method == 'GET' && path == '/profile/summary') {
       return _ok(options, {'ok': true, 'summary': _profileSummary()});
+    }
+    if (method == 'GET' && path == '/profile/guardian-identity-options') {
+      return _ok(options, {'ok': true, 'options': _identityOptions()});
     }
     if (method == 'GET' && path == '/family/members') {
       return _ok(options, {
@@ -870,10 +960,29 @@ class _FakeApiServer {
     }
     if (method == 'PATCH' && path == '/account/profile') {
       _relationship = _text(body['relationship'], _relationship);
+      _relationshipKey = _text(body['relationshipKey'], _relationshipKey);
       return _ok(options, {'ok': true, 'profile': _accountProfile()});
     }
     if (method == 'GET' && path == '/account/security') {
       return _ok(options, {'ok': true, 'security': _accountSecurity()});
+    }
+    if (method == 'POST' && path == '/account/phone/code') {
+      return _ok(options, {
+        'ok': true,
+        'codeSent': true,
+        'expiresAt': _now + 300000,
+        'debugCode': '123456',
+        'message': '验证码已发送',
+      });
+    }
+    if (method == 'PATCH' && path == '/account/phone') {
+      _phone = _text(body['phone'], _phone);
+      return _ok(options, {
+        'ok': true,
+        'message': '手机号已更新',
+        'profile': _accountProfile(),
+        'security': _accountSecurity(),
+      });
     }
 
     if (method == 'GET' &&
@@ -1134,6 +1243,43 @@ class _FakeApiServer {
         parent: true,
         device: true,
         wifi: true,
+        child: true,
+        nextStep: 'cameraName',
+      ),
+      '/setup/camera-name/intro' => {
+        ..._setupPayload(
+          parent: true,
+          device: true,
+          wifi: true,
+          child: true,
+          nextStep: 'cameraName',
+        ),
+        'broadcast': {
+          'played': false,
+          'status': 'offline',
+          'message': '摄像头暂时不在线，稍后可以再试听。',
+        },
+      },
+      '/setup/camera-name/preview' => {
+        ..._setupPayload(
+          parent: true,
+          device: true,
+          wifi: true,
+          child: true,
+          nextStep: 'cameraName',
+        ),
+        'broadcast': {
+          'played': false,
+          'status': 'offline',
+          'message': '摄像头暂时不在线，稍后可以再试听。',
+        },
+      },
+      '/setup/camera-name' => _setupPayload(
+        parent: true,
+        device: true,
+        wifi: true,
+        child: true,
+        cameraName: true,
         nextStep: 'contacts',
       ),
       '/setup/contacts' => _setupPayload(
@@ -1141,6 +1287,7 @@ class _FakeApiServer {
         device: true,
         wifi: true,
         child: true,
+        cameraName: true,
         nextStep: 'complete',
       ),
       '/setup/complete' => _setupPayload(
@@ -1148,6 +1295,7 @@ class _FakeApiServer {
         device: true,
         wifi: true,
         child: true,
+        cameraName: true,
         contacts: true,
         completed: true,
         nextStep: 'home',
@@ -1162,6 +1310,7 @@ class _FakeApiServer {
     bool device = false,
     bool wifi = false,
     bool child = false,
+    bool cameraName = false,
     bool contacts = false,
     String? nextStep,
   }) {
@@ -1174,9 +1323,34 @@ class _FakeApiServer {
         'deviceBinding': done || device ? 'done' : 'pending',
         'wifi': done || wifi ? 'done' : 'pending',
         'childProfile': done || child ? 'done' : 'pending',
+        'cameraName': done || cameraName ? 'done' : 'pending',
+        'cameraNameIntro': done || cameraName ? 'done' : 'pending',
+        'cameraNameIntroAt': done || cameraName ? _now : null,
         'contacts': done || contacts ? 'done' : 'pending',
         'nextStep': done ? 'home' : (nextStep ?? 'parentIdentity'),
       },
+      'parentIdentity': parent
+          ? {
+              'displayName': _relationship,
+              'relationship': _relationship,
+              'relationshipKey': _relationshipKey,
+            }
+          : null,
+      'device': device
+          ? {'id': 'device_test', 'name': '书桌旁设备', 'location': '书桌旁'}
+          : null,
+      'wifi': wifi ? {'ssid': 'Home Wi-Fi 2.4G'} : null,
+      'child': child
+          ? {
+              'id': 'child_test',
+              'name': '小宇',
+              'gender': 'unspecified',
+              'educationStage': '幼儿园',
+              'grade': '大班',
+              'birthday': '',
+            }
+          : null,
+      'cameraName': cameraName ? {'wakeName': '小豆'} : null,
     };
   }
 
@@ -1201,7 +1375,9 @@ class _FakeApiServer {
       'displayName': '林女士',
       'phone': '13800002026',
       'roleLabel': '管理员',
-      'avatarPersona': _relationship == '爸爸' ? 'father' : 'mother',
+      'relationship': _relationship,
+      'relationshipKey': _relationshipKey,
+      'avatarPersona': _relationshipKey == 'dad' ? 'father' : 'mother',
       'memberCount': 2,
       'deviceCount': 1,
       'pendingItemCount': _tasks
@@ -1216,6 +1392,7 @@ class _FakeApiServer {
       'id': 'child_test',
       'name': _text(body?['name'], '小宇'),
       'nickname': _text(body?['nickname'], '小宇'),
+      'gender': _text(body?['gender'], 'unspecified'),
       'birthday': _text(body?['birthday'], '2020-06-01'),
       'ageStage': _text(body?['ageStage'], 'kindergarten'),
       'educationStage': _text(body?['educationStage'], '幼儿园'),
@@ -1229,8 +1406,8 @@ class _FakeApiServer {
   Map<String, dynamic> _familyMember([Map<String, dynamic>? body]) {
     return {
       'id': 'member_admin',
-      'name': _text(body?['name'], '林女士'),
-      'phone': _text(body?['phone'], '13800002026'),
+      'name': _text(body?['name'], '家长'),
+      'phone': _text(body?['phone'], _phone),
       'role': _text(body?['role'], 'admin'),
       'status': _text(body?['status'], 'active'),
       'notifyEnabled': body?['notifyEnabled'] ?? true,
@@ -1250,12 +1427,116 @@ class _FakeApiServer {
     };
   }
 
+  Map<String, dynamic> _identityOptions() {
+    return {
+      'identityGroups': [
+        {
+          'key': 'parent',
+          'label': '父母',
+          'defaultKey': 'mom',
+          'defaultLabel': '妈妈',
+          'labels': [
+            {
+              'key': 'mom',
+              'label': '妈妈',
+              'imageAsset': 'assets/images/guardian/guardian_mom.png',
+            },
+            {
+              'key': 'dad',
+              'label': '爸爸',
+              'imageAsset': 'assets/images/guardian/guardian_dad.png',
+            },
+          ],
+        },
+        {
+          'key': 'grandparent',
+          'label': '祖辈',
+          'defaultKey': 'maternal_grandpa',
+          'defaultLabel': '外公',
+          'labels': [
+            {
+              'key': 'maternal_grandpa',
+              'label': '外公',
+              'imageAsset':
+                  'assets/images/guardian/guardian_maternal_grandpa.png',
+            },
+            {
+              'key': 'maternal_grandma',
+              'label': '外婆',
+              'imageAsset':
+                  'assets/images/guardian/guardian_maternal_grandma.png',
+            },
+            {
+              'key': 'grandpa',
+              'label': '爷爷',
+              'imageAsset': 'assets/images/guardian/guardian_grandpa.png',
+            },
+            {
+              'key': 'grandma',
+              'label': '奶奶',
+              'imageAsset': 'assets/images/guardian/guardian_grandma.png',
+            },
+          ],
+        },
+        {
+          'key': 'family',
+          'label': '其他家人',
+          'defaultKey': 'family_default',
+          'defaultLabel': '其他家人',
+          'labels': [
+            {
+              'key': 'aunt',
+              'label': '阿姨',
+              'imageAsset': 'assets/images/guardian/guardian_aunt.png',
+            },
+            {
+              'key': 'uncle',
+              'label': '叔叔',
+              'imageAsset': 'assets/images/guardian/guardian_uncle.png',
+            },
+            {
+              'key': 'paternal_aunt',
+              'label': '姑姑',
+              'imageAsset': 'assets/images/guardian/guardian_paternal_aunt.png',
+            },
+            {
+              'key': 'maternal_uncle',
+              'label': '舅舅',
+              'imageAsset':
+                  'assets/images/guardian/guardian_maternal_uncle.png',
+            },
+            {
+              'key': 'family_default',
+              'label': '其他家人',
+              'imageAsset': 'assets/images/guardian/guardian_default.png',
+            },
+          ],
+        },
+      ],
+      'familyRoles': [
+        {'key': 'admin', 'label': '管理员', 'description': '可管理成员、设备和全部设置。'},
+        {'key': 'guardian', 'label': '监护人', 'description': '可查看看护状态并处理任务确认。'},
+        {'key': 'viewer', 'label': '临时查看者', 'description': '可接收必要提醒，不管理设置。'},
+      ],
+    };
+  }
+
   Map<String, dynamic> _contact([Map<String, dynamic>? body]) {
+    final relationshipKey = _text(body?['relationshipKey'], 'family_default');
+    final relationship = _text(
+      body?['relationship'],
+      relationshipKey == 'mom'
+          ? '妈妈'
+          : relationshipKey == 'dad'
+          ? '爸爸'
+          : '其他家人',
+    );
     return {
       'id': 'contact_test',
       'name': _text(body?['name'], '李老师'),
       'phone': _text(body?['phone'], '13900002026'),
-      'relationship': _text(body?['relationship'], '老师'),
+      'relationship': relationship,
+      'relationshipKey': relationshipKey,
       'defaultNotify': body?['defaultNotify'] ?? true,
     };
   }
@@ -1263,23 +1544,29 @@ class _FakeApiServer {
   Map<String, dynamic> _accountProfile() {
     return {
       'displayName': '林女士',
-      'phone': '13800002026',
+      'phone': _phone,
       'familyName': '林家的家庭空间',
       'relationship': _relationship,
+      'relationshipKey': _relationshipKey,
     };
   }
 
   Map<String, dynamic> _accountSecurity() {
     return {
-      'phone': '13800002026',
+      'phone': _phone,
       'loginMethod': 'sms',
       'accountStatus': 'active',
       'loginDevices': [
         {
           'id': 'session_test',
-          'label': '已登录设备',
+          'label': '本机 iPhone',
+          'deviceType': 'phone',
+          'platform': 'ios',
+          'appVersion': '',
           'active': true,
+          'current': true,
           'createdAt': _now,
+          'lastActiveAt': _now,
           'rotatedAt': _now,
         },
       ],

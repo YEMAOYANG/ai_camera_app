@@ -238,7 +238,7 @@ class _PointsAdjustSheet extends StatelessWidget {
             icon: Icons.remove_circle_outline,
             title: '扣回 5 分',
             subtitle: '更正误发积分',
-            tone: AppListRowTone.amber,
+            tone: AppListRowTone.red,
             onTap: () => _adjust(context, ref, account, -5),
           ),
         ],
@@ -253,6 +253,18 @@ Future<void> _adjust(
   PointAccount account,
   int delta,
 ) async {
+  if (delta < 0) {
+    final confirmed = await showAppConfirmSheet(
+      context: context,
+      title: '扣回积分',
+      message: '确认从孩子积分账户扣回 ${delta.abs()} 分？扣回后会保留调整流水。',
+      confirmLabel: '确认扣回',
+      cancelLabel: '先不扣回',
+      danger: true,
+    );
+    if (!confirmed) return;
+  }
+
   try {
     await ref
         .read(pointRepositoryProvider)

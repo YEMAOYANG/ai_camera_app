@@ -55,6 +55,30 @@ def child():
         return error_response(exc)
 
 
+@setup_bp.post("/camera-name")
+def camera_name():
+    try:
+        return jsonify(setup_service().save_camera_name(bearer_token(request), json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@setup_bp.post("/camera-name/intro")
+def camera_name_intro():
+    try:
+        return jsonify(setup_service().camera_name_intro(bearer_token(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@setup_bp.post("/camera-name/preview")
+def camera_name_preview():
+    try:
+        return jsonify(setup_service().camera_name_preview(bearer_token(request), json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @setup_bp.post("/contacts")
 def contacts():
     try:

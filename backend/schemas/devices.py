@@ -9,6 +9,7 @@ def device_payload(row: DatabaseRow) -> dict:
         "familyId": row["family_id"],
         "bindingCode": row["binding_code"],
         "name": row["name"],
+        "wakeName": row.get("wake_name") or "",
         "location": row["location"],
         "status": row["status"],
         "createdAt": row["created_at"],

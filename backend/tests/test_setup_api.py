@@ -30,12 +30,27 @@ class SetupApiTest(unittest.TestCase):
 
         parent = self.client.post(
             "/api/setup/parent-identity",
-            json={"displayName": "妈妈", "relationship": "mother"},
+            json={
+                "displayName": "爸爸",
+                "relationship": "爸爸",
+                "relationshipKey": "dad",
+            },
             headers=self._auth_headers(access_token),
         )
         self.assertEqual(parent.status_code, 200)
         self.assertEqual(parent.json["setup"]["parentIdentity"], "done")
+        self.assertEqual(parent.json["parentIdentity"]["displayName"], "爸爸")
+        self.assertEqual(parent.json["parentIdentity"]["relationshipKey"], "dad")
         self.assertEqual(parent.json["setup"]["nextStep"], "device")
+
+        parent_status = self.client.get(
+            "/api/setup/status",
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(parent_status.status_code, 200)
+        self.assertEqual(parent_status.json["parentIdentity"]["displayName"], "爸爸")
+        self.assertEqual(parent_status.json["parentIdentity"]["relationship"], "爸爸")
+        self.assertEqual(parent_status.json["parentIdentity"]["relationshipKey"], "dad")
 
         device = self.client.post(
             "/api/setup/device",
@@ -59,19 +74,60 @@ class SetupApiTest(unittest.TestCase):
 
         child = self.client.post(
             "/api/setup/child",
-            json={"name": "小宇", "nickname": "小宇", "ageStage": "primary"},
+            json={
+                "name": "小宇",
+                "nickname": "小宇",
+                "gender": "unspecified",
+                "ageStage": "primary",
+                "educationStage": "小学",
+                "grade": "一年级",
+            },
             headers=self._auth_headers(access_token),
         )
         self.assertEqual(child.status_code, 200)
         self.assertEqual(child.json["setup"]["childProfile"], "done")
         self.assertEqual(child.json["child"]["name"], "小宇")
-        self.assertEqual(child.json["setup"]["nextStep"], "contacts")
+        self.assertEqual(child.json["child"]["gender"], "unspecified")
+        self.assertEqual(child.json["setup"]["nextStep"], "cameraName")
+
+        intro = self.client.post(
+            "/api/setup/camera-name/intro",
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(intro.status_code, 200)
+        self.assertEqual(intro.json["setup"]["cameraNameIntro"], "done")
+        self.assertEqual(intro.json["broadcast"]["status"], "offline")
+
+        intro_again = self.client.post(
+            "/api/setup/camera-name/intro",
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(intro_again.status_code, 200)
+        self.assertEqual(intro_again.json["broadcast"]["status"], "alreadyPlayed")
+
+        preview = self.client.post(
+            "/api/setup/camera-name/preview",
+            json={"wakeName": "小豆"},
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(preview.status_code, 200)
+        self.assertEqual(preview.json["broadcast"]["status"], "offline")
+
+        camera_name = self.client.post(
+            "/api/setup/camera-name",
+            json={"wakeName": "小豆"},
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(camera_name.status_code, 200)
+        self.assertEqual(camera_name.json["setup"]["cameraName"], "done")
+        self.assertEqual(camera_name.json["cameraName"]["wakeName"], "小豆")
+        self.assertEqual(camera_name.json["setup"]["nextStep"], "contacts")
 
         contacts = self.client.post(
             "/api/setup/contacts",
             json={
                 "contacts": [
-                    {"name": "爸爸", "phone": "13900002026", "relationship": "father"},
+                    {"name": "妈妈", "phone": "13900002026", "relationship": "mother"},
                     {"name": "外婆", "phone": "13800002027", "relationship": "grandparent"},
                 ]
             },
@@ -98,6 +154,45 @@ class SetupApiTest(unittest.TestCase):
         self.assertTrue(status.json["setup"]["completed"])
         self.assertEqual(status.json["setup"]["nextStep"], "home")
 
+    def test_setup_contacts_reject_duplicate_unique_guardian_identity(self):
+        access_token = self._login("13800003026")
+
+        parent = self.client.post(
+            "/api/setup/parent-identity",
+            json={
+                "displayName": "爸爸",
+                "relationship": "爸爸",
+                "relationshipKey": "dad",
+            },
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(parent.status_code, 200)
+
+        duplicate_parent = self.client.post(
+            "/api/setup/contacts",
+            json={
+                "contacts": [
+                    {"name": "爸爸", "phone": "13900003026", "relationship": "father"},
+                ]
+            },
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(duplicate_parent.status_code, 400)
+        self.assertEqual(duplicate_parent.json["error"], "duplicate_guardian_identity")
+
+        duplicate_contacts = self.client.post(
+            "/api/setup/contacts",
+            json={
+                "contacts": [
+                    {"name": "外婆", "phone": "13900003027", "relationshipKey": "maternal_grandma"},
+                    {"name": "外婆", "phone": "13900003028", "relationship": "外婆"},
+                ]
+            },
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(duplicate_contacts.status_code, 400)
+        self.assertEqual(duplicate_contacts.json["error"], "duplicate_guardian_identity")
+
     def test_setup_complete_requires_all_steps(self):
         access_token = self._login()
 
@@ -109,11 +204,11 @@ class SetupApiTest(unittest.TestCase):
         self.assertEqual(complete.status_code, 400)
         self.assertEqual(complete.json["error"], "setup_incomplete")
 
-    def _login(self) -> str:
-        code = request_debug_code(self.client, "13800002026")
+    def _login(self, phone: str = "13800002026") -> str:
+        code = request_debug_code(self.client, phone)
         login = self.client.post(
             "/api/auth/sms/login",
-            json={"phone": "13800002026", "code": code},
+            json={"phone": phone, "code": code},
         )
         self.assertEqual(login.status_code, 200)
         return login.json["tokens"]["accessToken"]

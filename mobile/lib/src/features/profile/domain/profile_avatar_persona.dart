@@ -12,19 +12,28 @@ class GuardianAvatarPersona {
   final String assetPath;
   final String loopAssetPath;
   final String semanticLabel;
+
+  GuardianAvatarPersona copyWith({String? assetPath}) {
+    return GuardianAvatarPersona(
+      id: id,
+      assetPath: assetPath ?? this.assetPath,
+      loopAssetPath: loopAssetPath,
+      semanticLabel: semanticLabel,
+    );
+  }
 }
 
 const guardianMomPersona = GuardianAvatarPersona(
   id: 'guardian_mom',
   assetPath: 'assets/images/guardian/guardian_mom.png',
-  loopAssetPath: 'assets/images/guardian/guardian_mom_loop.mp4',
+  loopAssetPath: 'assets/images/guardian/animated/guardian_mom_loop.webp',
   semanticLabel: '妈妈监护人形象',
 );
 
 const guardianDadPersona = GuardianAvatarPersona(
   id: 'guardian_dad',
   assetPath: 'assets/images/guardian/guardian_dad.png',
-  loopAssetPath: 'assets/images/guardian/guardian_dad_loop.mp4',
+  loopAssetPath: 'assets/images/guardian/animated/guardian_dad_loop.webp',
   semanticLabel: '爸爸监护人形象',
 );
 
@@ -67,7 +76,14 @@ GuardianAvatarPersona resolveGuardianAvatarPersona({
   required AccountProfile? account,
   required ProfileSummary summary,
   required String relationship,
+  String relationshipKey = '',
 }) {
+  final keyed =
+      _fromIdentityKey(relationshipKey) ??
+      _fromIdentityKey(account?.relationshipKey ?? '') ??
+      _fromIdentityKey(summary.relationshipKey);
+  if (keyed != null) return keyed;
+
   final explicit =
       _fromPersona(account?.avatarPersona) ??
       _fromPersona(summary.avatarPersona);
@@ -140,6 +156,19 @@ GuardianAvatarPersona resolveGuardianAvatarPersona({
   }
 
   return guardianDefaultPersona;
+}
+
+GuardianAvatarPersona? _fromIdentityKey(String value) {
+  return switch (_normalizeRoleText(value)) {
+    'mom' => guardianMomPersona,
+    'dad' => guardianDadPersona,
+    'grandpa' || 'maternalgrandpa' => guardianGrandpaPersona,
+    'grandma' || 'maternalgrandma' => guardianGrandmaPersona,
+    'aunt' || 'paternalaunt' => guardianFemaleAdultPersona,
+    'uncle' || 'maternaluncle' => guardianMaleAdultPersona,
+    'familydefault' => guardianDefaultPersona,
+    _ => null,
+  };
 }
 
 GuardianAvatarPersona? _fromPersona(String? value) {

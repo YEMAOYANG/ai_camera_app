@@ -1944,27 +1944,22 @@ class _AppTimePickerSheetState extends State<_AppTimePickerSheet> {
       title: '选择时间',
       subtitle: rangeLabel,
       scrollable: false,
-      footer: Row(
+      footer: AppSheetFooterActions(
         children: [
-          Expanded(
-            child: AppSecondaryButton(
-              label: '取消',
-              onTap: () => Navigator.of(context).pop(),
-            ),
+          AppSheetSecondaryButton(
+            label: '取消',
+            onTap: () => Navigator.of(context).pop(),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: AppPrimaryButton(
-              label: '确定',
-              trailing: const AppButtonGlyph(icon: Icons.check),
-              onTap: valid
-                  ? () {
-                      Navigator.of(
-                        context,
-                      ).pop(_timeText(TimeOfDay(hour: _hour, minute: _minute)));
-                    }
-                  : null,
-            ),
+          AppSheetPrimaryButton(
+            label: '确定',
+            trailing: const AppButtonGlyph(icon: Icons.check),
+            onTap: valid
+                ? () {
+                    Navigator.of(
+                      context,
+                    ).pop(_timeText(TimeOfDay(hour: _hour, minute: _minute)));
+                  }
+                : null,
           ),
         ],
       ),

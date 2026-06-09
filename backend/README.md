@@ -99,6 +99,24 @@ All setup APIs require `Authorization: Bearer <accessToken>`. Setup data is
 stored in the configured production database and returns the next onboarding
 step so Flutter can resume the flow after restart.
 
+Account and profile APIs are available after login:
+
+```text
+GET   /api/account/profile
+PATCH /api/account/profile
+GET   /api/account/security
+POST  /api/account/sessions/{sessionId}/revoke
+POST  /api/account/phone/code
+PATCH /api/account/phone
+POST  /api/account/deletion
+```
+
+`/api/account/security` returns the current active login-device list. The app
+may revoke non-current sessions; the current session cannot be removed from this
+endpoint. Account deletion records a deletion request, marks the user account as
+pending deletion, and revokes active sessions while preserving required audit
+and statutory-retention boundaries.
+
 Tasks, points, rewards, and redemptions V1 are available after login:
 
 ```text

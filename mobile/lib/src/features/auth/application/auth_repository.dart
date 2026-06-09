@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
@@ -42,7 +43,11 @@ class AuthRepository {
     try {
       final response = await _dio.post<dynamic>(
         '/auth/sms/login',
-        data: {'phone': phone, 'code': code},
+        data: {
+          'phone': phone,
+          'code': code,
+          'clientDevice': _clientDevicePayload(),
+        },
       );
       final session = _parseSession(response.data);
       await _sessionStore.save(session);
@@ -62,7 +67,10 @@ class AuthRepository {
     try {
       final response = await _dio.post<dynamic>(
         '/auth/token/refresh',
-        data: {'refreshToken': session.refreshToken},
+        data: {
+          'refreshToken': session.refreshToken,
+          'clientDevice': _clientDevicePayload(),
+        },
       );
       final refreshed = _parseSession(response.data);
       await _sessionStore.save(refreshed);
@@ -119,6 +127,26 @@ class AuthRepository {
     }
     return const AuthException('网络异常，请稍后重试', code: 'network_error');
   }
+}
+
+Map<String, String> _clientDevicePayload() {
+  final platform = defaultTargetPlatform.name.toLowerCase();
+  final isPhone =
+      defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.android;
+  final label = switch (defaultTargetPlatform) {
+    TargetPlatform.iOS => '本机 iPhone',
+    TargetPlatform.android => 'Android 手机',
+    TargetPlatform.macOS => 'Mac 设备',
+    TargetPlatform.windows => 'Windows 设备',
+    TargetPlatform.linux => 'Linux 设备',
+    TargetPlatform.fuchsia => '已登录设备',
+  };
+  return {
+    'label': label,
+    'type': isPhone ? 'phone' : 'desktop',
+    'platform': platform,
+  };
 }
 
 Map<String, dynamic> _asMap(dynamic value) {

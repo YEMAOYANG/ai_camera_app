@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
+import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   return ProfileRepository(apiClient: ref.watch(apiClientProvider));
@@ -10,6 +11,12 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 final profileSummaryProvider = FutureProvider<ProfileSummary>((ref) {
   return ref.watch(profileRepositoryProvider).summary();
 });
+
+final guardianIdentityOptionsProvider = FutureProvider<GuardianIdentityOptions>(
+  (ref) {
+    return ref.watch(profileRepositoryProvider).guardianIdentityOptions();
+  },
+);
 
 final familyMembersProvider = FutureProvider<List<FamilyMember>>((ref) {
   return ref.watch(profileRepositoryProvider).familyMembers();
@@ -89,6 +96,13 @@ class ProfileRepository {
     return ProfileSummary.fromJson(_asMap(_asMap(response.data)['summary']));
   }
 
+  Future<GuardianIdentityOptions> guardianIdentityOptions() async {
+    final response = await _get('/profile/guardian-identity-options');
+    return GuardianIdentityOptions.fromJson(
+      _asMap(_asMap(response.data)['options']),
+    );
+  }
+
   Future<List<FamilyMember>> familyMembers() async {
     final response = await _get('/family/members');
     final raw = _asMap(response.data)['members'];
@@ -161,6 +175,7 @@ class ProfileRepository {
     final body = {
       'name': child.name,
       'nickname': child.nickname,
+      'gender': child.gender,
       'birthday': child.birthday,
       'ageStage': child.ageStage,
       'educationStage': child.educationStage,
@@ -185,12 +200,14 @@ class ProfileRepository {
     required String name,
     required String phone,
     required String relationship,
+    required String relationshipKey,
     required bool defaultNotify,
   }) async {
     final body = {
       'name': name,
       'phone': phone,
       'relationship': relationship,
+      'relationshipKey': relationshipKey,
       'defaultNotify': defaultNotify,
     };
     final response = id == null
@@ -209,24 +226,51 @@ class ProfileRepository {
   }
 
   Future<AccountProfile> updateAccountProfile({
-    required String displayName,
-    required String familyName,
-    required String relationship,
+    String? displayName,
+    String? familyName,
+    String? relationship,
+    String? relationshipKey,
   }) async {
-    final response = await _patch(
-      '/account/profile',
-      data: {
-        'displayName': displayName,
-        'familyName': familyName,
-        'relationship': relationship,
-      },
-    );
+    final data = <String, String>{};
+    if (displayName != null) data['displayName'] = displayName;
+    if (familyName != null) data['familyName'] = familyName;
+    if (relationship != null) data['relationship'] = relationship;
+    if (relationshipKey != null) data['relationshipKey'] = relationshipKey;
+    final response = await _patch('/account/profile', data: data);
     return AccountProfile.fromJson(_asMap(_asMap(response.data)['profile']));
   }
 
   Future<AccountSecurity> accountSecurity() async {
     final response = await _get('/account/security');
     return AccountSecurity.fromJson(_asMap(_asMap(response.data)['security']));
+  }
+
+  Future<AccountSecurity> revokeLoginDevice(String sessionId) async {
+    final response = await _post('/account/sessions/$sessionId/revoke');
+    return AccountSecurity.fromJson(_asMap(_asMap(response.data)['security']));
+  }
+
+  Future<AccountDeletionResult> requestAccountDeletion({
+    String reason = 'user_requested',
+  }) async {
+    final response = await _post('/account/deletion', data: {'reason': reason});
+    return AccountDeletionResult.fromJson(_asMap(response.data));
+  }
+
+  Future<PhoneChangeCodeResult> requestAccountPhoneCode(String phone) async {
+    final response = await _post('/account/phone/code', data: {'phone': phone});
+    return PhoneChangeCodeResult.fromJson(_asMap(response.data));
+  }
+
+  Future<AccountProfile> updateAccountPhone({
+    required String phone,
+    required String code,
+  }) async {
+    final response = await _patch(
+      '/account/phone',
+      data: {'phone': phone, 'code': code},
+    );
+    return AccountProfile.fromJson(_asMap(_asMap(response.data)['profile']));
   }
 
   Future<ProfileSetting> setting(String key) async {

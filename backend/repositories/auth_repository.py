@@ -34,7 +34,10 @@ class AuthRepository:
                   phone VARCHAR(255) NOT NULL UNIQUE,
                   family_id VARCHAR(255) NOT NULL,
                   display_name VARCHAR(255) NOT NULL,
-                  created_at BIGINT NOT NULL
+                  account_status VARCHAR(255) NOT NULL DEFAULT 'active',
+                  created_at BIGINT NOT NULL,
+                  deletion_requested_at BIGINT,
+                  deleted_at BIGINT
                 );
 
                 CREATE TABLE IF NOT EXISTS sms_codes (
@@ -49,6 +52,11 @@ class AuthRepository:
                 CREATE TABLE IF NOT EXISTS sessions (
                   id VARCHAR(255) PRIMARY KEY,
                   user_id VARCHAR(255) NOT NULL,
+                  device_label VARCHAR(255),
+                  device_type VARCHAR(255),
+                  platform VARCHAR(255),
+                  app_version VARCHAR(255),
+                  last_active_at BIGINT,
                   access_hash VARCHAR(255) NOT NULL UNIQUE,
                   refresh_hash VARCHAR(255) NOT NULL UNIQUE,
                   access_expires_at BIGINT NOT NULL,
@@ -140,6 +148,10 @@ class AuthRepository:
         conn: DatabaseConnection,
         *,
         user_id: str,
+        device_label: str,
+        device_type: str,
+        platform: str,
+        app_version: str,
         access_hash: str,
         refresh_hash: str,
         access_expires_at: int,
@@ -149,14 +161,20 @@ class AuthRepository:
         conn.execute(
             """
             INSERT INTO sessions(
-              id, user_id, access_hash, refresh_hash,
+              id, user_id, device_label, device_type, platform, app_version, last_active_at,
+              access_hash, refresh_hash,
               access_expires_at, refresh_expires_at, created_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 f"sess_{uuid.uuid4().hex}",
                 user_id,
+                device_label,
+                device_type,
+                platform,
+                app_version,
+                created_at,
                 access_hash,
                 refresh_hash,
                 access_expires_at,
@@ -196,6 +214,10 @@ class AuthRepository:
         conn: DatabaseConnection,
         *,
         session_id: str,
+        device_label: str,
+        device_type: str,
+        platform: str,
+        app_version: str,
         access_hash: str,
         refresh_hash: str,
         access_expires_at: int,
@@ -205,6 +227,11 @@ class AuthRepository:
         conn.execute(
             """
             UPDATE sessions SET
+              device_label = ?,
+              device_type = ?,
+              platform = ?,
+              app_version = ?,
+              last_active_at = ?,
               access_hash = ?,
               refresh_hash = ?,
               access_expires_at = ?,
@@ -213,6 +240,11 @@ class AuthRepository:
             WHERE id = ?
             """,
             (
+                device_label,
+                device_type,
+                platform,
+                app_version,
+                rotated_at,
                 access_hash,
                 refresh_hash,
                 access_expires_at,
@@ -220,6 +252,18 @@ class AuthRepository:
                 rotated_at,
                 session_id,
             ),
+        )
+
+    def touch_session(
+        self,
+        conn: DatabaseConnection,
+        *,
+        session_id: str,
+        last_active_at: int,
+    ) -> None:
+        conn.execute(
+            "UPDATE sessions SET last_active_at = ? WHERE id = ?",
+            (last_active_at, session_id),
         )
 
     def revoke_sessions(
