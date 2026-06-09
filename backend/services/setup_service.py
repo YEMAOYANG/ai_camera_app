@@ -581,12 +581,6 @@ class SetupService:
             if relationship_key in seen:
                 self._raise_duplicate_guardian_identity(conn, relationship_key)
             seen.add(relationship_key)
-            self._assert_guardian_identity_available(
-                conn,
-                family_id=family_id,
-                relationship_key=relationship_key,
-                include_existing_contacts=False,
-            )
 
     def _assert_guardian_identity_available(
         self,
@@ -595,7 +589,6 @@ class SetupService:
         family_id: str,
         relationship_key: str,
         exclude_parent_identity: bool = False,
-        include_existing_contacts: bool = True,
     ) -> None:
         if relationship_key not in UNIQUE_GUARDIAN_IDENTITY_KEYS:
             return
@@ -603,22 +596,6 @@ class SetupService:
             parent = self.repository.get_parent_identity(conn, family_id=family_id)
             if parent and self._relationship_key_for_parent_identity(conn, parent) == relationship_key:
                 self._raise_duplicate_guardian_identity(conn, relationship_key)
-        if include_existing_contacts:
-            rows = conn.execute(
-                """
-                SELECT relationship, relationship_key
-                FROM emergency_contacts
-                WHERE family_id = ?
-                """,
-                (family_id,),
-            ).fetchall()
-            for row in rows:
-                contact_key = row.get("relationship_key") or self._guardian_identity_key_for_value(
-                    conn,
-                    row.get("relationship") or "",
-                )
-                if contact_key == relationship_key:
-                    self._raise_duplicate_guardian_identity(conn, relationship_key)
 
     def _raise_duplicate_guardian_identity(self, conn, relationship_key: str) -> None:
         label = self._guardian_identity_label_for_key(conn, relationship_key)

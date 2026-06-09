@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from app import create_app
+from core.database import Database
 from tests.support import fresh_test_config, request_debug_code
 
 
@@ -128,14 +129,15 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         code = request_debug_code(self.client, phone)
         mobile_login = self.client.post(
             "/api/auth/sms/login",
-            json={
-                "phone": phone,
-                "code": code,
-                "clientDevice": {
-                    "label": "本机 iPhone",
-                    "type": "phone",
-                    "platform": "ios",
-                },
+            json={"phone": phone, "code": code},
+            headers={
+                "X-Mira-Device-Label": "iPhone 17 Pro Max",
+                "X-Mira-Device-Type": "phone",
+                "X-Mira-Device-Platform": "ios",
+                "X-Mira-Device-Model": "iPhone",
+                "X-Mira-Device-Hardware": "iPhone18,2",
+                "X-Mira-OS-Version": "iOS 26.1",
+                "X-Mira-App-Version": "1.0.0+1",
             },
         )
         self.assertEqual(mobile_login.status_code, 200)
@@ -165,7 +167,10 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(len(devices), 2)
         current = next(item for item in devices if item["current"])
         removable = next(item for item in devices if not item["current"])
-        self.assertEqual(current["label"], "本机 iPhone")
+        self.assertEqual(current["label"], "iPhone 17 Pro Max")
+        self.assertEqual(current["hardware"], "iPhone18,2")
+        self.assertEqual(current["osVersion"], "iOS 26.1")
+        self.assertEqual(current["appVersion"], "1.0.0+1")
         self.assertEqual(removable["label"], "MacBook Safari")
 
         current_revoke = self.client.post(
@@ -183,7 +188,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         remaining_labels = [
             item["label"] for item in removed.json["security"]["loginDevices"]
         ]
-        self.assertEqual(remaining_labels, ["本机 iPhone"])
+        self.assertEqual(remaining_labels, ["iPhone 17 Pro Max"])
 
         deletion = self.client.post(
             "/api/account/deletion",
@@ -245,15 +250,88 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(deleted.status_code, 200)
 
+    def test_family_admin_permissions_and_transfer(self):
+        created = self.client.post(
+            "/api/family/members",
+            json={
+                "name": "爸爸",
+                "phone": "13600002126",
+                "role": "guardian",
+                "status": "active",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(created.status_code, 200)
+        target = created.json["member"]
+        target_access = self._attach_user_to_member("13600002126", target["id"])
+
+        denied_create = self.client.post(
+            "/api/family/members",
+            json={"name": "外公", "phone": "13500002126", "role": "guardian"},
+            headers={"Authorization": f"Bearer {target_access}"},
+        )
+        self.assertEqual(denied_create.status_code, 403)
+        self.assertEqual(denied_create.json["error"], "permission_denied")
+
+        denied_device = self.client.post(
+            f"/api/devices/{self.device_id}/rename",
+            json={"name": "非管理员改名"},
+            headers={"Authorization": f"Bearer {target_access}"},
+        )
+        self.assertEqual(denied_device.status_code, 403)
+        self.assertEqual(denied_device.json["error"], "permission_denied")
+
+        deletion_blocked = self.client.post(
+            "/api/account/deletion",
+            json={"reason": "user_requested"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(deletion_blocked.status_code, 409)
+        self.assertEqual(deletion_blocked.json["error"], "admin_transfer_required")
+
+        transferred = self.client.post(
+            f"/api/family/members/{target['id']}/transfer-admin",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(transferred.status_code, 200)
+        roles = {member["id"]: member["role"] for member in transferred.json["members"]}
+        self.assertEqual(roles[target["id"]], "admin")
+
+        old_profile = self.client.get("/api/account/profile", headers=self._auth_headers())
+        self.assertEqual(old_profile.status_code, 200)
+        self.assertEqual(old_profile.json["profile"]["role"], "guardian")
+
+        old_admin_denied = self.client.post(
+            "/api/family/members",
+            json={"name": "外婆", "phone": "13500002127", "role": "guardian"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(old_admin_denied.status_code, 403)
+        self.assertEqual(old_admin_denied.json["error"], "permission_denied")
+
+        renamed = self.client.post(
+            f"/api/devices/{self.device_id}/rename",
+            json={"name": "管理员设备"},
+            headers={"Authorization": f"Bearer {target_access}"},
+        )
+        self.assertEqual(renamed.status_code, 200)
+        self.assertEqual(renamed.json["device"]["name"], "管理员设备")
+
     def test_family_invitations_create_resend_cancel_and_isolation(self):
         created = self.client.post(
             "/api/family/invitations",
-            json={"name": "外婆", "phone": "13600002026", "role": "viewer"},
+            json={
+                "name": "外婆",
+                "relationshipKey": "maternal_grandma",
+                "phone": "13600002026",
+                "role": "viewer",
+            },
             headers=self._auth_headers(),
         )
         self.assertEqual(created.status_code, 200)
         invitation = created.json["invitation"]
         self.assertEqual(invitation["name"], "外婆")
+        self.assertEqual(invitation["relationshipKey"], "maternal_grandma")
         self.assertEqual(invitation["status"], "pending")
         self.assertEqual(invitation["role"], "viewer")
 
@@ -288,6 +366,258 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(listed_after_cancel.status_code, 200)
         self.assertEqual(listed_after_cancel.json["invitations"], [])
+
+    def test_pending_invitation_can_be_accepted_after_login(self):
+        owner_profile = self.client.patch(
+            "/api/account/profile",
+            json={
+                "displayName": "爸爸",
+                "familyName": "我的家庭空间",
+                "relationship": "爸爸",
+                "relationshipKey": "dad",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(owner_profile.status_code, 200)
+
+        created = self.client.post(
+            "/api/family/invitations",
+            json={
+                "name": "妈妈",
+                "relationshipKey": "mom",
+                "phone": "13600002226",
+                "role": "guardian",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(created.status_code, 200)
+        invitation = created.json["invitation"]
+        self.assertEqual(invitation["name"], "妈妈")
+        self.assertEqual(invitation["relationshipKey"], "mom")
+        self.assertEqual(created.json["deliveryStatus"], "not_configured")
+        self.assertIn("短信邀请暂未接入", created.json["deliveryNotice"])
+
+        code = request_debug_code(self.client, "13600002226")
+        login = self.client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13600002226", "code": code},
+        )
+        self.assertEqual(login.status_code, 200)
+        pending = login.json["pendingJoins"]
+        self.assertEqual(len(pending), 1)
+        self.assertEqual(pending[0]["id"], invitation["id"])
+        self.assertEqual(pending[0]["name"], "妈妈")
+        self.assertEqual(pending[0]["relationshipKey"], "mom")
+        self.assertEqual(pending[0]["role"], "guardian")
+        invited_user_id = login.json["user"]["id"]
+        invited_access = login.json["tokens"]["accessToken"]
+
+        accepted = self.client.post(
+            f"/api/family/invitations/{invitation['id']}/accept",
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(accepted.status_code, 200)
+        self.assertEqual(accepted.json["member"]["name"], "妈妈")
+        self.assertEqual(accepted.json["member"]["relationshipKey"], "mom")
+        self.assertEqual(accepted.json["member"]["role"], "guardian")
+        self.assertEqual(accepted.json["invitation"]["status"], "accepted")
+
+        profile = self.client.get(
+            "/api/account/profile",
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(profile.status_code, 200)
+        self.assertEqual(profile.json["profile"]["displayName"], "妈妈")
+        self.assertEqual(profile.json["profile"]["relationship"], "妈妈")
+        self.assertEqual(profile.json["profile"]["relationshipKey"], "mom")
+        self.assertEqual(profile.json["profile"]["role"], "guardian")
+        capabilities = profile.json["profile"]["capabilities"]
+        self.assertIn("manage_child_profile", capabilities)
+        self.assertIn("manage_child_settings", capabilities)
+        self.assertIn("manage_emergency_contacts", capabilities)
+        self.assertIn("manage_tasks", capabilities)
+        self.assertIn("confirm_tasks", capabilities)
+        self.assertIn("manage_rewards", capabilities)
+        self.assertNotIn("manage_family_members", capabilities)
+        self.assertNotIn("manage_devices", capabilities)
+        self.assertNotIn("manage_subscription", capabilities)
+
+        summary = self.client.get(
+            "/api/profile/summary",
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(summary.status_code, 200)
+        self.assertEqual(summary.json["summary"]["displayName"], "妈妈")
+        self.assertEqual(summary.json["summary"]["relationship"], "妈妈")
+        self.assertEqual(summary.json["summary"]["relationshipKey"], "mom")
+
+        members = self.client.get(
+            "/api/family/members",
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(members.status_code, 200)
+        invited_member = next(
+            member
+            for member in members.json["members"]
+            if member["userId"] == invited_user_id
+        )
+        self.assertEqual(invited_member["name"], "妈妈")
+        self.assertEqual(invited_member["relationshipKey"], "mom")
+        self.assertEqual(invited_member["phone"], "13600002226")
+        self.assertEqual(invited_member["role"], "guardian")
+
+        owner_invitations = self.client.get(
+            "/api/family/invitations",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(owner_invitations.status_code, 200)
+        self.assertEqual(owner_invitations.json["invitations"], [])
+
+        invited_invitations = self.client.get(
+            "/api/family/invitations",
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(invited_invitations.status_code, 200)
+        self.assertEqual(invited_invitations.json["invitations"], [])
+
+        denied = self.client.post(
+            "/api/family/members",
+            json={"name": "奶奶", "phone": "13600002227", "role": "guardian"},
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(denied.status_code, 403)
+        self.assertEqual(denied.json["error"], "permission_denied")
+
+        denied_device = self.client.post(
+            f"/api/devices/{self.device_id}/rename",
+            json={"name": "监护人改设备名"},
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(denied_device.status_code, 403)
+        self.assertEqual(denied_device.json["error"], "permission_denied")
+
+        child = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={"name": "小宇", "educationStage": "幼儿园", "grade": "中班"},
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(child.status_code, 200)
+        self.assertEqual(child.json["child"]["name"], "小宇")
+
+        contact = self.client.post(
+            "/api/contacts/emergency",
+            json={
+                "name": "李老师",
+                "phone": "13600002228",
+                "relationship": "其他家人",
+                "relationshipKey": "family_default",
+                "defaultNotify": True,
+            },
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(contact.status_code, 200)
+        self.assertEqual(contact.json["contact"]["name"], "李老师")
+
+        task = self.client.post(
+            "/api/tasks",
+            json={
+                "childId": self.child_id,
+                "title": "整理书包",
+                "type": "learning",
+                "rewardPoints": 2,
+                "scheduledStart": "19:00",
+                "scheduledEnd": "19:20",
+            },
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(task.status_code, 200)
+        self.assertEqual(task.json["task"]["title"], "整理书包")
+
+        reward = self.client.post(
+            "/api/rewards/items",
+            json={
+                "childId": self.child_id,
+                "title": "贴纸奖励",
+                "pointsCost": 8,
+            },
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(reward.status_code, 200)
+        self.assertEqual(reward.json["item"]["title"], "贴纸奖励")
+
+        child_setting = self.client.patch(
+            "/api/settings/ai-care-rules",
+            json={"value": {"voiceReminderEnabled": False}},
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(child_setting.status_code, 200)
+        self.assertFalse(
+            child_setting.json["setting"]["value"]["voiceReminderEnabled"],
+        )
+
+        privacy_denied = self.client.patch(
+            "/api/settings/privacy",
+            json={"value": {"childPrivacyAuthorized": True}},
+            headers={"Authorization": f"Bearer {invited_access}"},
+        )
+        self.assertEqual(privacy_denied.status_code, 403)
+        self.assertEqual(privacy_denied.json["error"], "permission_denied")
+
+    def test_family_code_preview_accept_and_viewer_permissions(self):
+        self._mark_setup_completed()
+
+        code_response = self.client.get("/api/family/code", headers=self._auth_headers())
+        self.assertEqual(code_response.status_code, 200)
+        family_code = code_response.json["familyCode"]["code"]
+        self.assertRegex(family_code, r"^[A-Z0-9]{6,16}$")
+
+        guest_access = self._login("13600002326")
+        preview = self.client.post(
+            "/api/family/join-code/preview",
+            json={"familyCode": family_code.lower()},
+            headers={"Authorization": f"Bearer {guest_access}"},
+        )
+        self.assertEqual(preview.status_code, 200)
+        self.assertEqual(preview.json["preview"]["role"], "viewer")
+        self.assertEqual(preview.json["preview"]["roleLabel"], "临时查看者")
+
+        accepted = self.client.post(
+            "/api/family/join-code/accept",
+            json={"familyCode": family_code},
+            headers={"Authorization": f"Bearer {guest_access}"},
+        )
+        self.assertEqual(accepted.status_code, 200)
+        self.assertEqual(accepted.json["member"]["role"], "viewer")
+
+        status = self.client.get(
+            "/api/setup/status",
+            headers={"Authorization": f"Bearer {guest_access}"},
+        )
+        self.assertEqual(status.status_code, 200)
+        self.assertTrue(status.json["setup"]["completed"])
+
+        denied = self.client.post(
+            f"/api/devices/{self.device_id}/rename",
+            json={"name": "访客改名"},
+            headers={"Authorization": f"Bearer {guest_access}"},
+        )
+        self.assertEqual(denied.status_code, 403)
+        self.assertEqual(denied.json["error"], "permission_denied")
+
+        second_family_access = self._login("13600002327")
+        self._mark_setup_completed(second_family_access)
+        second_code = self.client.get(
+            "/api/family/code",
+            headers={"Authorization": f"Bearer {second_family_access}"},
+        )
+        self.assertEqual(second_code.status_code, 200)
+        blocked_switch = self.client.post(
+            "/api/family/join-code/preview",
+            json={"familyCode": second_code.json["familyCode"]["code"]},
+            headers={"Authorization": f"Bearer {guest_access}"},
+        )
+        self.assertEqual(blocked_switch.status_code, 400)
+        self.assertEqual(blocked_switch.json["error"], "family_switch_not_supported")
 
     def test_unique_guardian_identity_and_admin_role_are_enforced(self):
         self.client.get("/api/family/members", headers=self._auth_headers())
@@ -328,7 +658,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(profile.status_code, 200)
 
-        duplicate_parent_contact = self.client.post(
+        parent_contact = self.client.post(
             "/api/contacts/emergency",
             json={
                 "name": "爸爸",
@@ -339,11 +669,21 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
             },
             headers=self._auth_headers(),
         )
-        self.assertEqual(duplicate_parent_contact.status_code, 400)
-        self.assertEqual(
-            duplicate_parent_contact.json["error"],
-            "duplicate_guardian_identity",
+        self.assertEqual(parent_contact.status_code, 200)
+
+        duplicate_parent_contact = self.client.post(
+            "/api/contacts/emergency",
+            json={
+                "name": "爸爸",
+                "phone": "13700002029",
+                "relationship": "爸爸",
+                "relationshipKey": "dad",
+                "defaultNotify": True,
+            },
+            headers=self._auth_headers(),
         )
+        self.assertEqual(duplicate_parent_contact.status_code, 400)
+        self.assertEqual(duplicate_parent_contact.json["error"], "duplicate_guardian_identity")
 
         grandma_contact = self.client.post(
             "/api/contacts/emergency",
@@ -358,11 +698,22 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(grandma_contact.status_code, 200)
 
-        duplicate_grandma_invitation = self.client.post(
+        grandma_invitation = self.client.post(
             "/api/family/invitations",
             json={
                 "name": "外婆",
                 "phone": "13900002027",
+                "role": "guardian",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(grandma_invitation.status_code, 200)
+
+        duplicate_grandma_invitation = self.client.post(
+            "/api/family/invitations",
+            json={
+                "name": "外婆",
+                "phone": "13900002030",
                 "role": "guardian",
             },
             headers=self._auth_headers(),
@@ -599,6 +950,34 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(login.status_code, 200)
         return login.json["tokens"]["accessToken"]
 
+    def _attach_user_to_member(self, phone: str, member_id: str) -> str:
+        access_token = self._login(phone)
+        database = Database(self.app.config["DATABASE_URL"])
+        with database.transaction() as conn:
+            owner = conn.execute(
+                "SELECT * FROM users WHERE phone = ?",
+                ("13800002026",),
+            ).fetchone()
+            target = conn.execute(
+                "SELECT * FROM users WHERE phone = ?",
+                (phone,),
+            ).fetchone()
+            self.assertIsNotNone(owner)
+            self.assertIsNotNone(target)
+            conn.execute(
+                "UPDATE users SET family_id = ? WHERE id = ?",
+                (owner["family_id"], target["id"]),
+            )
+            conn.execute(
+                """
+                UPDATE family_members
+                SET user_id = ?, phone = ?, status = 'active'
+                WHERE id = ?
+                """,
+                (target["id"], phone, member_id),
+            )
+        return access_token
+
     def _create_child(self, name: str) -> str:
         response = self.client.post(
             "/api/setup/child",
@@ -620,6 +999,39 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         return response.json["device"]["id"]
+
+    def _mark_setup_completed(self, access_token: str | None = None) -> None:
+        token = access_token or self.access_token
+        summary = self.client.get(
+            "/api/profile/summary",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        self.assertEqual(summary.status_code, 200)
+        family_id = summary.json["summary"]["familyId"]
+        database = Database(self.app.config["DATABASE_URL"])
+        with database.transaction() as conn:
+            conn.execute(
+                """
+                INSERT INTO setup_progress(
+                  family_id, completed, parent_identity_status, device_binding_status,
+                  wifi_status, child_profile_status, camera_name_status,
+                  camera_name_intro_status, contacts_status, created_at, updated_at, completed_at
+                )
+                VALUES (?, 1, 'done', 'done', 'done', 'done', 'done', 'done', 'done', 1, 1, 1)
+                ON DUPLICATE KEY UPDATE
+                  completed = 1,
+                  parent_identity_status = 'done',
+                  device_binding_status = 'done',
+                  wifi_status = 'done',
+                  child_profile_status = 'done',
+                  camera_name_status = 'done',
+                  camera_name_intro_status = 'done',
+                  contacts_status = 'done',
+                  updated_at = 1,
+                  completed_at = 1
+                """,
+                (family_id,),
+            )
 
     def _auth_headers(self) -> dict:
         return {"Authorization": f"Bearer {self.access_token}"}

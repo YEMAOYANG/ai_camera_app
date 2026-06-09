@@ -9,11 +9,20 @@ from core.security import now_ms
 from models.points import LEDGER_REDEMPTION_CANCELLED, LEDGER_REDEMPTION_SPENT
 from models.rewards import REDEMPTION_CANCELLED, REDEMPTION_FULFILLED, REDEMPTION_REDEEMED, REWARD_ACTIVE
 from repositories.point_repository import PointRepository
+from repositories.profile_repository import ProfileRepository
 from repositories.reward_repository import RewardRepository
 from schemas.points import point_account_payload, point_ledger_payload
+from schemas.profile import role_capabilities_from_option
 from schemas.rewards import redemption_payload, reward_item_payload, validate_reward_status
 from services.auth_service import AuthService
 from services.point_service import PointService
+
+
+FALLBACK_ROLE_CAPABILITIES = {
+    "admin": {"manage_rewards"},
+    "guardian": {"manage_rewards"},
+    "viewer": set(),
+}
 
 
 class RewardService:
@@ -22,6 +31,7 @@ class RewardService:
         database = Database(database_url)
         self.repository = RewardRepository(database)
         self.point_repository = PointRepository(database)
+        self.profile_repository = ProfileRepository(database)
         self.point_service = PointService(database_url, auth_service=auth_service)
 
     def list_items(self, access_token: str, query: dict) -> dict:
@@ -54,6 +64,7 @@ class RewardService:
         points_cost = self._positive_int(data.get("pointsCost"), "pointsCost")
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_rewards")
             self._ensure_child(conn, context["family"]["id"], child_id)
             item = self.repository.create_item(
                 conn,
@@ -91,6 +102,7 @@ class RewardService:
                 fields[column] = self._optional_text(data, key)
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_rewards")
             self._item_or_error(conn, context["family"]["id"], item_id)
             item = self.repository.update_item(
                 conn,
@@ -105,6 +117,7 @@ class RewardService:
         context = self._auth_context(access_token)
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_rewards")
             self._item_or_error(conn, context["family"]["id"], item_id)
             item = self.repository.update_item(
                 conn,
@@ -135,6 +148,7 @@ class RewardService:
         reward_item_id = self._required_text(data, "rewardItemId", "缺少奖励 ID")
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_rewards")
             item = self._item_or_error(conn, context["family"]["id"], reward_item_id)
             if item["status"] != REWARD_ACTIVE:
                 raise ApiError("reward_unavailable", "奖励当前不可兑换")
@@ -178,6 +192,7 @@ class RewardService:
         context = self._auth_context(access_token)
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_rewards")
             redemption = self._redemption_or_error(conn, context["family"]["id"], redemption_id)
             if redemption["status"] == REDEMPTION_CANCELLED:
                 raise ApiError("redemption_cancelled", "已取消的兑换不能兑现")
@@ -195,6 +210,7 @@ class RewardService:
         context = self._auth_context(access_token)
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_rewards")
             redemption = self._redemption_or_error(conn, context["family"]["id"], redemption_id)
             if redemption["status"] == REDEMPTION_FULFILLED:
                 raise ApiError("redemption_fulfilled", "已兑现的兑换不能取消")
@@ -240,6 +256,34 @@ class RewardService:
     def _ensure_child(self, conn, family_id: str, child_id: str) -> None:
         if not self.repository.child_exists(conn, family_id=family_id, child_id=child_id):
             raise ApiError("child_not_found", "孩子资料不存在", 404)
+
+    def _assert_capability(self, conn, context: dict, capability: str) -> None:
+        member = self.profile_repository.get_family_member_by_user(
+            conn,
+            family_id=context["family"]["id"],
+            user_id=context["user"]["id"],
+        )
+        if member is None:
+            member = self.profile_repository.ensure_owner_member(
+                conn,
+                family_id=context["family"]["id"],
+                user_id=context["user"]["id"],
+                name=context["user"].get("displayName") or "家长",
+                phone=context["user"].get("phone") or "",
+                now=now_ms(),
+            )
+        role = member["role"]
+        row = self.profile_repository.get_app_option_item(
+            conn,
+            catalog_key="family_role",
+            item_key=role,
+        )
+        capabilities = set(role_capabilities_from_option(row)) or FALLBACK_ROLE_CAPABILITIES.get(
+            role,
+            set(),
+        )
+        if capability not in capabilities:
+            raise ApiError("permission_denied", "当前身份不能进行此操作", 403)
 
     def _item_or_error(self, conn, family_id: str, item_id: str):
         item = self.repository.get_item(conn, family_id=family_id, item_id=item_id)

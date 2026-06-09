@@ -4,9 +4,7 @@ import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
 
 final rewardRepositoryProvider = Provider<RewardRepository>((ref) {
-  return RewardRepository(
-    apiClient: ref.watch(apiClientProvider),
-  );
+  return RewardRepository(apiClient: ref.watch(apiClientProvider));
 });
 
 final rewardItemsProvider = FutureProvider<List<RewardItem>>((ref) {
@@ -39,7 +37,7 @@ class RewardException implements Exception {
 }
 
 class RewardRepository {
-  RewardRepository({required ApiClient apiClient}) : _apiClient = apiClient;
+  RewardRepository({required this._apiClient});
 
   final ApiClient _apiClient;
 

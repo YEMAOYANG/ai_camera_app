@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
@@ -19,11 +18,7 @@ class AuthException implements Exception {
 }
 
 class AuthRepository {
-  const AuthRepository({
-    required Dio dio,
-    required AuthSessionStore sessionStore,
-  }) : _dio = dio,
-       _sessionStore = sessionStore;
+  const AuthRepository({required this._dio, required this._sessionStore});
 
   final Dio _dio;
   final AuthSessionStore _sessionStore;
@@ -36,22 +31,21 @@ class AuthRepository {
     }
   }
 
-  Future<AuthSession> loginWithSms({
+  Future<AuthLoginResult> loginWithSms({
     required String phone,
     required String code,
   }) async {
     try {
       final response = await _dio.post<dynamic>(
         '/auth/sms/login',
-        data: {
-          'phone': phone,
-          'code': code,
-          'clientDevice': _clientDevicePayload(),
-        },
+        data: {'phone': phone, 'code': code},
       );
       final session = _parseSession(response.data);
       await _sessionStore.save(session);
-      return session;
+      return AuthLoginResult(
+        session: session,
+        pendingJoins: _parsePendingJoins(response.data),
+      );
     } on DioException catch (error) {
       throw _fromDio(error);
     }
@@ -67,10 +61,7 @@ class AuthRepository {
     try {
       final response = await _dio.post<dynamic>(
         '/auth/token/refresh',
-        data: {
-          'refreshToken': session.refreshToken,
-          'clientDevice': _clientDevicePayload(),
-        },
+        data: {'refreshToken': session.refreshToken},
       );
       final refreshed = _parseSession(response.data);
       await _sessionStore.save(refreshed);
@@ -113,6 +104,12 @@ class AuthRepository {
     );
   }
 
+  List<PendingFamilyJoin> _parsePendingJoins(dynamic data) {
+    final raw = _asMap(data)['pendingJoins'];
+    if (raw is! List) return const [];
+    return raw.map((item) => PendingFamilyJoin.fromJson(_asMap(item))).toList();
+  }
+
   AuthException _fromDio(DioException error) {
     final data = error.response?.data;
     if (data is Map) {
@@ -129,24 +126,49 @@ class AuthRepository {
   }
 }
 
-Map<String, String> _clientDevicePayload() {
-  final platform = defaultTargetPlatform.name.toLowerCase();
-  final isPhone =
-      defaultTargetPlatform == TargetPlatform.iOS ||
-      defaultTargetPlatform == TargetPlatform.android;
-  final label = switch (defaultTargetPlatform) {
-    TargetPlatform.iOS => '本机 iPhone',
-    TargetPlatform.android => 'Android 手机',
-    TargetPlatform.macOS => 'Mac 设备',
-    TargetPlatform.windows => 'Windows 设备',
-    TargetPlatform.linux => 'Linux 设备',
-    TargetPlatform.fuchsia => '已登录设备',
-  };
-  return {
-    'label': label,
-    'type': isPhone ? 'phone' : 'desktop',
-    'platform': platform,
-  };
+class AuthLoginResult {
+  const AuthLoginResult({required this.session, required this.pendingJoins});
+
+  final AuthSession session;
+  final List<PendingFamilyJoin> pendingJoins;
+}
+
+class PendingFamilyJoin {
+  const PendingFamilyJoin({
+    required this.id,
+    required this.familyId,
+    required this.familyName,
+    required this.name,
+    required this.phone,
+    required this.role,
+    required this.roleLabel,
+    required this.status,
+    this.expiresAt,
+  });
+
+  final String id;
+  final String familyId;
+  final String familyName;
+  final String name;
+  final String phone;
+  final String role;
+  final String roleLabel;
+  final String status;
+  final int? expiresAt;
+
+  static PendingFamilyJoin fromJson(Map<String, dynamic> json) {
+    return PendingFamilyJoin(
+      id: _asString(json['id']),
+      familyId: _asString(json['familyId']),
+      familyName: _asString(json['familyName']),
+      name: _asString(json['name']),
+      phone: _asString(json['phone']),
+      role: _asString(json['role']),
+      roleLabel: _asString(json['roleLabel']),
+      status: _asString(json['status']),
+      expiresAt: _asNullableInt(json['expiresAt']),
+    );
+  }
 }
 
 Map<String, dynamic> _asMap(dynamic value) {
@@ -169,4 +191,12 @@ DateTime _asDateTime(dynamic value) {
     if (parsed != null) return parsed;
   }
   return DateTime.now();
+}
+
+int? _asNullableInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
 }

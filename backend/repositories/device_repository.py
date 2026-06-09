@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from typing import Iterator
+import uuid
 
 from core.database import Database, DatabaseConnection, DatabaseRow
 
@@ -54,6 +55,73 @@ class DeviceRepository:
             "SELECT * FROM devices WHERE family_id = ? AND id = ?",
             (family_id, device_id),
         ).fetchone()
+
+    def get_family_member_by_user(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        user_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT * FROM family_members
+            WHERE family_id = ? AND user_id = ?
+            LIMIT 1
+            """,
+            (family_id, user_id),
+        ).fetchone()
+
+    def get_app_option_item(
+        self,
+        conn: DatabaseConnection,
+        *,
+        catalog_key: str,
+        item_key: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT *
+            FROM app_option_items
+            WHERE catalog_key = ? AND item_key = ? AND enabled = 1
+            LIMIT 1
+            """,
+            (catalog_key, item_key),
+        ).fetchone()
+
+    def ensure_owner_member(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        user_id: str,
+        name: str,
+        phone: str,
+        now: int,
+    ) -> DatabaseRow:
+        row = self.get_family_member_by_user(
+            conn,
+            family_id=family_id,
+            user_id=user_id,
+        )
+        if row:
+            return row
+        member_id = f"member_{uuid.uuid4().hex}"
+        conn.execute(
+            """
+            INSERT INTO family_members(
+              id, family_id, user_id, name, phone, role, status,
+              notify_enabled, created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, 'admin', 'active', 1, ?, ?)
+            """,
+            (member_id, family_id, user_id, name or "家长", phone, now, now),
+        )
+        return self.get_family_member_by_user(
+            conn,
+            family_id=family_id,
+            user_id=user_id,
+        )
 
     def update_device(
         self,

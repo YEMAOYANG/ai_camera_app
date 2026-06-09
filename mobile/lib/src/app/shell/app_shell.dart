@@ -32,6 +32,9 @@ class AppShell extends ConsumerWidget {
 
     final location = GoRouterState.of(context).uri.path;
     final selectedRoute = routeFromLocation(location);
+    final canAddTask =
+        ref.watch(profileSummaryProvider).asData?.value.can('manage_tasks') ??
+        false;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark.copyWith(
@@ -51,6 +54,7 @@ class AppShell extends ConsumerWidget {
               child: _AppBottomNavigation(
                 selectedRoute: selectedRoute,
                 onSelected: (route) => context.go(route.path),
+                canAddTask: canAddTask,
                 onAddTask: () => _openTaskSheet(context, ref),
               ),
             ),
@@ -61,6 +65,13 @@ class AppShell extends ConsumerWidget {
   }
 
   Future<void> _openTaskSheet(BuildContext context, WidgetRef ref) async {
+    final canAddTask =
+        ref.read(profileSummaryProvider).asData?.value.can('manage_tasks') ??
+        false;
+    if (!canAddTask) {
+      _showShellToast(context, '当前身份不能新增任务');
+      return;
+    }
     String? childId;
     var childAgeGroup = TaskAgeGroup.preschool;
     try {
@@ -186,11 +197,13 @@ class _AppBottomNavigation extends StatelessWidget {
   const _AppBottomNavigation({
     required this.selectedRoute,
     required this.onSelected,
+    required this.canAddTask,
     required this.onAddTask,
   });
 
   final AppRoute selectedRoute;
   final ValueChanged<AppRoute> onSelected;
+  final bool canAddTask;
   final VoidCallback onAddTask;
 
   static const _tabRoutes = [
@@ -259,13 +272,15 @@ class _AppBottomNavigation extends StatelessWidget {
                       ),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
+                          final addSlotWidth = canAddTask ? _addSlotWidth : 0.0;
                           final itemWidth =
-                              (constraints.maxWidth - _addSlotWidth) /
+                              (constraints.maxWidth - addSlotWidth) /
                               _tabRoutes.length;
                           final indicatorLeft =
-                              (selectedIndex < 2
-                                  ? selectedIndex * itemWidth
-                                  : selectedIndex * itemWidth + _addSlotWidth) +
+                              selectedIndex * itemWidth +
+                              (canAddTask && selectedIndex >= 2
+                                  ? _addSlotWidth
+                                  : 0) +
                               2;
                           final indicatorWidth = itemWidth - 4;
                           final indicatorTop =
@@ -301,11 +316,13 @@ class _AppBottomNavigation extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   for (final route in _tabRoutes) ...[
-                                    if (route == AppRoute.live)
+                                    if (route == AppRoute.live && canAddTask)
                                       SizedBox(
                                         width: _addSlotWidth,
-                                        child: _BottomNavAddAction(
-                                          onTap: onAddTask,
+                                        child: Center(
+                                          child: _BottomNavAddAction(
+                                            onTap: onAddTask,
+                                          ),
                                         ),
                                       ),
                                     Expanded(
@@ -465,10 +482,10 @@ class _BottomNavAddActionState extends State<_BottomNavAddAction> {
     return Semantics(
       button: true,
       label: '新增任务',
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: SizedBox.square(
+        key: const ValueKey('bottomNavAddAction'),
+        dimension: AppControls.minTouchTarget,
         child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
           onTapDown: (_) => setState(() => _pressed = true),
           onTapCancel: () => setState(() => _pressed = false),
           onTapUp: (_) => setState(() => _pressed = false),
@@ -477,28 +494,29 @@ class _BottomNavAddActionState extends State<_BottomNavAddAction> {
             scale: reduceMotion || !_pressed ? 1 : 0.965,
             duration: AppMotion.duration(context, 120),
             curve: Curves.easeOutCubic,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.navFabBg,
-                borderRadius: BorderRadius.circular(AppRadii.full),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.navDockShadow.withValues(alpha: 0.10),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
-                  ),
-                  BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.14),
-                    blurRadius: 1,
-                    offset: const Offset(0, 1),
-                    spreadRadius: -1,
-                  ),
-                ],
-              ),
-              child: const SizedBox(
-                width: AppControls.minTouchTarget,
-                height: AppControls.minTouchTarget,
-                child: Center(
+            child: Material(
+              color: AppColors.navFabBg,
+              shape: const CircleBorder(),
+              elevation: 0,
+              shadowColor: Colors.transparent,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.navDockShadow.withValues(alpha: 0.10),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.14),
+                      blurRadius: 1,
+                      offset: const Offset(0, 1),
+                      spreadRadius: -1,
+                    ),
+                  ],
+                ),
+                child: const Center(
                   child: Icon(Icons.add, color: AppColors.navFabFg, size: 22),
                 ),
               ),

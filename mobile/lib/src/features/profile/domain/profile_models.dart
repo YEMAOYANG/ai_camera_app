@@ -7,7 +7,9 @@ class ProfileSummary {
     required this.phone,
     required this.relationship,
     required this.relationshipKey,
+    required this.role,
     required this.roleLabel,
+    required this.capabilities,
     required this.avatarPersona,
     required this.memberCount,
     required this.deviceCount,
@@ -22,7 +24,9 @@ class ProfileSummary {
   final String phone;
   final String relationship;
   final String relationshipKey;
+  final String role;
   final String roleLabel;
+  final List<String> capabilities;
   final String avatarPersona;
   final int memberCount;
   final int deviceCount;
@@ -38,7 +42,9 @@ class ProfileSummary {
       phone: _asString(json['phone']),
       relationship: _asString(json['relationship']),
       relationshipKey: _asString(json['relationshipKey']),
+      role: _asString(json['role']),
       roleLabel: _asString(json['roleLabel']),
+      capabilities: _asStringList(json['capabilities']),
       avatarPersona: _asString(json['avatarPersona']),
       memberCount: _asInt(json['memberCount']),
       deviceCount: _asInt(json['deviceCount']),
@@ -48,12 +54,15 @@ class ProfileSummary {
           : null,
     );
   }
+
+  bool can(String capability) => capabilities.contains(capability);
 }
 
 class FamilyMember {
   const FamilyMember({
     required this.id,
     required this.name,
+    required this.relationshipKey,
     required this.phone,
     required this.role,
     required this.status,
@@ -63,6 +72,7 @@ class FamilyMember {
 
   final String id;
   final String name;
+  final String relationshipKey;
   final String phone;
   final String role;
   final String status;
@@ -86,6 +96,7 @@ class FamilyMember {
     return FamilyMember(
       id: _asString(json['id']),
       name: _asString(json['name'], fallback: '家庭成员'),
+      relationshipKey: _asString(json['relationshipKey']),
       phone: _asString(json['phone']),
       role: _asString(json['role']),
       status: _asString(json['status'], fallback: 'active'),
@@ -99,20 +110,26 @@ class FamilyInvitation {
   const FamilyInvitation({
     required this.id,
     required this.name,
+    required this.relationshipKey,
     required this.phone,
     required this.role,
     required this.status,
     required this.createdAt,
     required this.expiresAt,
+    required this.deliveryStatus,
+    required this.deliveryNotice,
   });
 
   final String id;
   final String name;
+  final String relationshipKey;
   final String phone;
   final String role;
   final String status;
   final int createdAt;
   final int? expiresAt;
+  final String deliveryStatus;
+  final String deliveryNotice;
 
   String get roleLabel {
     return role;
@@ -132,11 +149,14 @@ class FamilyInvitation {
     return FamilyInvitation(
       id: _asString(json['id']),
       name: _asString(json['name'], fallback: '家庭成员'),
+      relationshipKey: _asString(json['relationshipKey']),
       phone: _asString(json['phone']),
       role: _asString(json['role']),
       status: _asString(json['status'], fallback: 'pending'),
       createdAt: _asInt(json['createdAt']),
       expiresAt: _asNullableInt(json['expiresAt']),
+      deliveryStatus: _asString(json['deliveryStatus']),
+      deliveryNotice: _asString(json['deliveryNotice']),
     );
   }
 }
@@ -231,6 +251,8 @@ class AccountProfile {
     required this.relationship,
     required this.relationshipKey,
     required this.role,
+    required this.roleLabel,
+    required this.capabilities,
     required this.avatarPersona,
     required this.gender,
     required this.ageGroup,
@@ -243,6 +265,8 @@ class AccountProfile {
   final String relationship;
   final String relationshipKey;
   final String role;
+  final String roleLabel;
+  final List<String> capabilities;
   final String avatarPersona;
   final String gender;
   final String ageGroup;
@@ -256,9 +280,65 @@ class AccountProfile {
       relationship: _asString(json['relationship']),
       relationshipKey: _asString(json['relationshipKey']),
       role: _asString(json['role']),
+      roleLabel: _asString(json['roleLabel']),
+      capabilities: _asStringList(json['capabilities']),
       avatarPersona: _asString(json['avatarPersona']),
       gender: _asString(json['gender']),
       ageGroup: _asString(json['ageGroup']),
+    );
+  }
+
+  bool can(String capability) => capabilities.contains(capability);
+}
+
+class FamilyCodeInfo {
+  const FamilyCodeInfo({
+    required this.familyId,
+    required this.familyName,
+    required this.code,
+    required this.updatedAt,
+  });
+
+  final String familyId;
+  final String familyName;
+  final String code;
+  final int? updatedAt;
+
+  static FamilyCodeInfo fromJson(Map<String, dynamic> json) {
+    return FamilyCodeInfo(
+      familyId: _asString(json['familyId']),
+      familyName: _asString(json['familyName']),
+      code: _asString(json['code']),
+      updatedAt: _asNullableInt(json['updatedAt']),
+    );
+  }
+}
+
+class FamilyCodePreview {
+  const FamilyCodePreview({
+    required this.familyId,
+    required this.familyName,
+    required this.familyCode,
+    required this.role,
+    required this.roleLabel,
+    required this.message,
+  });
+
+  final String familyId;
+  final String familyName;
+  final String familyCode;
+  final String role;
+  final String roleLabel;
+  final String message;
+
+  static FamilyCodePreview fromJson(Map<String, dynamic> json) {
+    return FamilyCodePreview(
+      familyId: _asString(json['familyId']),
+      familyName: _asString(json['familyName']),
+      familyCode: _asString(json['familyCode']),
+      role: _asString(json['role']),
+      roleLabel: _asString(json['roleLabel']),
+      message: _asString(json['message']),
     );
   }
 }
@@ -317,7 +397,10 @@ class LoginDevice {
     required this.id,
     required this.label,
     required this.deviceType,
+    required this.model,
+    required this.hardware,
     required this.platform,
+    required this.osVersion,
     required this.appVersion,
     required this.active,
     required this.current,
@@ -329,7 +412,10 @@ class LoginDevice {
   final String id;
   final String label;
   final String deviceType;
+  final String model;
+  final String hardware;
   final String platform;
+  final String osVersion;
   final String appVersion;
   final bool active;
   final bool current;
@@ -342,7 +428,10 @@ class LoginDevice {
       id: _asString(json['id']),
       label: _asString(json['label'], fallback: '已登录设备'),
       deviceType: _asString(json['deviceType'], fallback: 'unknown'),
+      model: _asString(json['model']),
+      hardware: _asString(json['hardware']),
       platform: _asString(json['platform'], fallback: 'unknown'),
+      osVersion: _asString(json['osVersion']),
       appVersion: _asString(json['appVersion']),
       active: json['active'] == true,
       current: json['current'] == true,

@@ -26,6 +26,8 @@ class AuthRepository:
                 CREATE TABLE IF NOT EXISTS families (
                   id VARCHAR(255) PRIMARY KEY,
                   name VARCHAR(255) NOT NULL,
+                  family_code VARCHAR(32) UNIQUE,
+                  family_code_updated_at BIGINT,
                   created_at BIGINT NOT NULL
                 );
 
@@ -54,7 +56,10 @@ class AuthRepository:
                   user_id VARCHAR(255) NOT NULL,
                   device_label VARCHAR(255),
                   device_type VARCHAR(255),
+                  device_model VARCHAR(255),
+                  device_hardware VARCHAR(255),
                   platform VARCHAR(255),
+                  os_version VARCHAR(255),
                   app_version VARCHAR(255),
                   last_active_at BIGINT,
                   access_hash VARCHAR(255) NOT NULL UNIQUE,
@@ -118,6 +123,40 @@ class AuthRepository:
     def find_family_by_id(self, conn: DatabaseConnection, family_id: str) -> DatabaseRow | None:
         return conn.execute("SELECT * FROM families WHERE id = ?", (family_id,)).fetchone()
 
+    def list_pending_family_invitations_by_phone(
+        self,
+        conn: DatabaseConnection,
+        phone: str,
+        *,
+        now: int,
+    ) -> list[DatabaseRow]:
+        return list(
+            conn.execute(
+                """
+                SELECT fi.*, f.name AS family_name, role_item.label AS role_label
+                FROM family_invitations fi
+                JOIN families f ON f.id = fi.family_id
+                LEFT JOIN app_option_items role_item
+                  ON role_item.catalog_key = 'family_role'
+                 AND role_item.item_key = fi.role
+                 AND role_item.enabled = 1
+                WHERE fi.phone = ?
+                  AND fi.status = 'pending'
+                  AND (fi.expires_at IS NULL OR fi.expires_at >= ?)
+                  AND NOT EXISTS (
+                    SELECT 1
+                    FROM family_members fm
+                    WHERE fm.family_id = fi.family_id
+                      AND fm.phone = fi.phone
+                      AND fm.status = 'active'
+                      AND fm.user_id IS NOT NULL
+                  )
+                ORDER BY fi.created_at DESC
+                """,
+                (phone, now),
+            ).fetchall()
+        )
+
     def create_parent_user(
         self,
         conn: DatabaseConnection,
@@ -127,9 +166,10 @@ class AuthRepository:
     ) -> DatabaseRow:
         family_id = f"fam_{uuid.uuid4().hex}"
         user_id = f"user_{uuid.uuid4().hex}"
+        family_code = _new_family_code()
         conn.execute(
-            "INSERT INTO families(id, name, created_at) VALUES (?, ?, ?)",
-            (family_id, "我的家庭", now),
+            "INSERT INTO families(id, name, family_code, family_code_updated_at, created_at) VALUES (?, ?, ?, ?, ?)",
+            (family_id, "我的家庭", family_code, now, now),
         )
         conn.execute(
             """
@@ -150,7 +190,10 @@ class AuthRepository:
         user_id: str,
         device_label: str,
         device_type: str,
+        device_model: str,
+        device_hardware: str,
         platform: str,
+        os_version: str,
         app_version: str,
         access_hash: str,
         refresh_hash: str,
@@ -161,18 +204,22 @@ class AuthRepository:
         conn.execute(
             """
             INSERT INTO sessions(
-              id, user_id, device_label, device_type, platform, app_version, last_active_at,
+              id, user_id, device_label, device_type, device_model, device_hardware,
+              platform, os_version, app_version, last_active_at,
               access_hash, refresh_hash,
               access_expires_at, refresh_expires_at, created_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 f"sess_{uuid.uuid4().hex}",
                 user_id,
                 device_label,
                 device_type,
+                device_model,
+                device_hardware,
                 platform,
+                os_version,
                 app_version,
                 created_at,
                 access_hash,
@@ -216,7 +263,10 @@ class AuthRepository:
         session_id: str,
         device_label: str,
         device_type: str,
+        device_model: str,
+        device_hardware: str,
         platform: str,
+        os_version: str,
         app_version: str,
         access_hash: str,
         refresh_hash: str,
@@ -229,7 +279,10 @@ class AuthRepository:
             UPDATE sessions SET
               device_label = ?,
               device_type = ?,
+              device_model = ?,
+              device_hardware = ?,
               platform = ?,
+              os_version = ?,
               app_version = ?,
               last_active_at = ?,
               access_hash = ?,
@@ -242,7 +295,10 @@ class AuthRepository:
             (
                 device_label,
                 device_type,
+                device_model,
+                device_hardware,
                 platform,
+                os_version,
                 app_version,
                 rotated_at,
                 access_hash,
@@ -288,3 +344,7 @@ class AuthRepository:
                 f"UPDATE sessions SET revoked_at = ? WHERE revoked_at IS NULL AND ({' OR '.join(clauses)})",
                 values,
             )
+
+
+def _new_family_code() -> str:
+    return uuid.uuid4().hex[:8].upper()

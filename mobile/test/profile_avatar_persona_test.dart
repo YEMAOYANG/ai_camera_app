@@ -93,7 +93,9 @@ ProfileSummary _summary({String avatarPersona = ''}) {
     phone: '13800002026',
     relationship: '',
     relationshipKey: '',
+    role: 'admin',
     roleLabel: '管理员',
+    capabilities: _adminCapabilities,
     avatarPersona: avatarPersona,
     memberCount: 1,
     deviceCount: 1,
@@ -116,11 +118,31 @@ AccountProfile _account({
     relationship: relationship,
     relationshipKey: _relationshipKeyForTest(relationship),
     role: 'admin',
+    roleLabel: '管理员',
+    capabilities: _adminCapabilities,
     avatarPersona: avatarPersona,
     gender: gender,
     ageGroup: ageGroup,
   );
 }
+
+const _adminCapabilities = [
+  'manage_family_members',
+  'manage_family_code',
+  'manage_devices',
+  'manage_privacy',
+  'manage_subscription',
+  'manage_child_profile',
+  'manage_child_settings',
+  'manage_emergency_contacts',
+  'manage_rewards',
+  'manage_tasks',
+  'confirm_tasks',
+  'view_live_care',
+  'view_reports',
+  'view_points_rewards',
+  'manage_account_security',
+];
 
 String _relationshipKeyForTest(String relationship) {
   return switch (relationship) {

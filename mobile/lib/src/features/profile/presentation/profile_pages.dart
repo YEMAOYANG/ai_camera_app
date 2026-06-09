@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/platform/contact_picker.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
+import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
 import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
@@ -160,7 +162,8 @@ class _AccountProfileFormState extends ConsumerState<_AccountProfileForm> {
         : _family.text.trim();
     final roleLabel = widget.options.roleLabelFor(widget.profile.role);
     final normalizedRole = roleLabel.isEmpty ? '管理员' : roleLabel;
-    final canSave = !_saving && _family.text.trim().isNotEmpty;
+    final canEditFamily = widget.profile.can('manage_family_members');
+    final canSave = canEditFamily && !_saving && _family.text.trim().isNotEmpty;
 
     return _PersonalProfileScaffold(
       identityLabel: relationshipLabel,
@@ -176,6 +179,7 @@ class _AccountProfileFormState extends ConsumerState<_AccountProfileForm> {
       child: _PersonalProfilePanel(
         familyController: _family,
         phone: widget.profile.phone,
+        canEditFamily: canEditFamily,
         onPhoneChange: _changePhone,
       ),
     );
@@ -429,11 +433,13 @@ class _PersonalProfilePanel extends StatelessWidget {
   const _PersonalProfilePanel({
     required this.familyController,
     required this.phone,
+    required this.canEditFamily,
     required this.onPhoneChange,
   });
 
   final TextEditingController familyController;
   final String phone;
+  final bool canEditFamily;
   final VoidCallback onPhoneChange;
 
   @override
@@ -447,6 +453,7 @@ class _PersonalProfilePanel extends StatelessWidget {
           label: '家庭空间名称',
           controller: familyController,
           hint: '例如：我的家庭空间',
+          readOnly: !canEditFamily,
         ),
         const SizedBox(height: 12),
         AppListRow(
@@ -543,12 +550,14 @@ class _ProfileTextField extends StatelessWidget {
     required this.label,
     required this.controller,
     this.hint,
+    this.readOnly = false,
   });
 
   final IconData icon;
   final String label;
   final TextEditingController controller;
   final String? hint;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -557,6 +566,7 @@ class _ProfileTextField extends StatelessWidget {
       icon: icon,
       controller: controller,
       hintText: hint,
+      readOnly: readOnly,
     );
   }
 }
@@ -672,6 +682,7 @@ class _AccountSecurityPageState extends ConsumerState<AccountSecurityPage> {
     try {
       await ref.read(profileRepositoryProvider).requestAccountDeletion();
       await ref.read(authRepositoryProvider).logout();
+      invalidateAuthenticatedSessionData(ref);
       if (mounted) context.go(loginPath);
     } on ProfileException catch (error) {
       if (mounted) {
@@ -849,8 +860,8 @@ class _LoginDeviceCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${_formatSessionTime(device.lastActiveAt)} · ${device.current ? '当前设备' : '已登录'}',
-                  maxLines: 1,
+                  _loginDeviceSubtitle(device),
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: _mutedText,
                 ),
@@ -1129,6 +1140,12 @@ IconData _deviceIcon(LoginDevice device) {
 }
 
 String _displayDeviceLabel(BuildContext context, LoginDevice device) {
+  if (device.label.isNotEmpty && device.label != '已登录设备') return device.label;
+  if (device.model.isNotEmpty &&
+      !device.model.toLowerCase().contains('iphone')) {
+    return device.model;
+  }
+  if (device.hardware.isNotEmpty) return device.hardware;
   if (device.label != '已登录设备' || !device.current) return device.label;
   return switch (Theme.of(context).platform) {
     TargetPlatform.iOS => '本机 iPhone',
@@ -1138,6 +1155,16 @@ String _displayDeviceLabel(BuildContext context, LoginDevice device) {
     TargetPlatform.linux => 'Linux 设备',
     TargetPlatform.fuchsia => device.label,
   };
+}
+
+String _loginDeviceSubtitle(LoginDevice device) {
+  final parts = <String>[
+    _formatSessionTime(device.lastActiveAt),
+    device.current ? '当前设备' : '已登录',
+  ];
+  if (device.osVersion.isNotEmpty) parts.add(device.osVersion);
+  if (device.appVersion.isNotEmpty) parts.add('App ${device.appVersion}');
+  return parts.join(' · ');
 }
 
 String _formatSessionTime(int epochMillis) {
@@ -1368,110 +1395,82 @@ class FamilyMembersPage extends ConsumerWidget {
     final members = ref.watch(familyMembersProvider);
     final invitations = ref.watch(familyInvitationsProvider);
     final account = ref.watch(accountProfileProvider).asData?.value;
+    final canManage = account?.can('manage_family_members') ?? false;
+    final canManageFamilyCode = account?.can('manage_family_code') ?? false;
+    final familyCode = canManageFamilyCode
+        ? ref.watch(familyCodeProvider)
+        : null;
     final identityOptions = ref
         .watch(guardianIdentityOptionsProvider)
         .asData
         ?.value;
     return _Page(
       title: '家庭成员',
-      trailing: AppIconButton(
-        icon: Icons.person_add_outlined,
-        label: '新增成员',
-        onTap: () => _editMember(context, ref),
-      ),
+      subtitle: canManage ? '邀请成员，管理加入状态' : '查看家庭成员和邀请状态',
+      trailing: canManage
+          ? AppIconButton(
+              icon: Icons.person_add_outlined,
+              label: '新增成员',
+              onTap: () => _editMember(context, ref),
+            )
+          : null,
       children: members.when(
         data: (items) => [
-          if (items.isEmpty)
-            const AppStateView(
-              variant: AppStateVariant.noData,
-              title: '还没有家庭成员',
-              message: '添加照护人后，可一起处理任务确认和重要提醒。',
-              compact: true,
-            )
-          else
-            AppSurface(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _SectionTitle('家庭成员'),
-                  const SizedBox(height: 8),
-                  for (final member in items)
-                    AppListRow(
-                      icon: Icons.group_outlined,
-                      title: _familyMemberTitle(member, account),
-                      subtitle:
-                          '${_familyRoleLabel(identityOptions, member.role, member.roleLabel)} · ${member.statusLabel}${member.phone.isEmpty ? '' : ' · ${_phoneMask(member.phone)}'}',
-                      tone: member.role == 'admin'
-                          ? AppListRowTone.green
-                          : AppListRowTone.blue,
-                      trailing: member.userId.isEmpty
-                          ? TextButton(
-                              style: _inlineTextButtonStyle(),
-                              onPressed: () =>
-                                  _editMember(context, ref, member: member),
-                              child: const Text('编辑'),
-                            )
-                          : const StatusChip(
-                              label: '本人',
-                              tone: StatusTone.success,
-                            ),
-                    ),
-                ],
+          if (canManageFamilyCode) ...[
+            familyCode!.when(
+              data: (code) => _FamilyCodePanel(
+                code: code,
+                onTap: () => _showFamilyCodeSheet(context, ref, code),
+              ),
+              loading: () => const _FamilyPanel(
+                title: '家庭号',
+                subtitle: '正在同步家庭号',
+                child: AppLoadingState(
+                  title: '正在同步家庭号',
+                  message: '请稍候。',
+                  compact: true,
+                ),
+              ),
+              error: (error, _) => AppStateView(
+                variant: AppStateVariant.serviceUnavailable,
+                title: '家庭号暂时无法同步',
+                message: error is ProfileException ? error.message : '请稍后重试。',
+                primaryActionLabel: '重新加载',
+                onPrimaryAction: () => ref.invalidate(familyCodeProvider),
+                compact: true,
               ),
             ),
-          invitations.when(
-            data: (items) => items.isEmpty
-                ? const SizedBox.shrink()
-                : AppSurface(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const _SectionTitle('待接受邀请'),
-                        const SizedBox(height: 8),
-                        for (final invitation in items)
-                          AppListRow(
-                            icon: Icons.mail_outline,
-                            title: invitation.name,
-                            subtitle:
-                                '${_familyRoleLabel(identityOptions, invitation.role, invitation.roleLabel)} · ${invitation.statusLabel}${invitation.phone.isEmpty ? '' : ' · ${_phoneMask(invitation.phone)}'}',
-                            tone: AppListRowTone.amber,
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextButton(
-                                  style: _inlineTextButtonStyle(),
-                                  onPressed: () => _resendInvitation(
-                                    context,
-                                    ref,
-                                    invitation,
-                                  ),
-                                  child: const Text('重发'),
-                                ),
-                                TextButton(
-                                  style: _inlineTextButtonStyle(danger: true),
-                                  onPressed: () => _cancelInvitation(
-                                    context,
-                                    ref,
-                                    invitation,
-                                  ),
-                                  child: const Text('取消邀请'),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-            loading: () =>
-                const AppLoadingState(title: '正在同步邀请', message: '请稍候。'),
-            error: (error, _) => AppStateView(
-              variant: AppStateVariant.serviceUnavailable,
-              title: '邀请暂时无法同步',
-              message: error is ProfileException ? error.message : '请稍后重试。',
-              primaryActionLabel: '重新加载',
-              onPrimaryAction: () => ref.invalidate(familyInvitationsProvider),
-              compact: true,
+            const SizedBox(height: 14),
+          ],
+          if (items.isEmpty)
+            _FamilyEmptyPanel(
+              canManage: canManage,
+              onAdd: canManage ? () => _editMember(context, ref) : null,
+            )
+          else
+            _FamilyMembersPanel(
+              members: items,
+              account: account,
+              options: identityOptions,
+              canManage: canManage,
+              onMemberAction: (member) =>
+                  _showMemberActions(context, ref, member, account),
             ),
+          const SizedBox(height: 14),
+          invitations.when(
+            data: (pending) => pending.isEmpty
+                ? const SizedBox.shrink()
+                : _FamilyInvitationsPanel(
+                    invitations: pending,
+                    options: identityOptions,
+                    canManage: canManage,
+                    onResend: (invitation) =>
+                        _resendInvitation(context, ref, invitation),
+                    onCancel: (invitation) =>
+                        _cancelInvitation(context, ref, invitation),
+                  ),
+            loading: () => const SizedBox.shrink(),
+            error: (error, _) => const SizedBox.shrink(),
           ),
         ],
         loading: () => const [_Loading(title: '正在同步家庭成员')],
@@ -1481,6 +1480,698 @@ class FamilyMembersPage extends ConsumerWidget {
             onRetry: () => ref.invalidate(familyMembersProvider),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FamilyMembersPanel extends StatelessWidget {
+  const _FamilyMembersPanel({
+    required this.members,
+    required this.account,
+    required this.options,
+    required this.canManage,
+    required this.onMemberAction,
+  });
+
+  final List<FamilyMember> members;
+  final AccountProfile? account;
+  final GuardianIdentityOptions? options;
+  final bool canManage;
+  final ValueChanged<FamilyMember> onMemberAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return _FamilyPanel(
+      title: '已加入成员',
+      subtitle: canManage ? '管理员可以调整成员与设备权限。' : '成员权限由家庭管理员维护。',
+      child: Column(
+        children: [
+          for (var index = 0; index < members.length; index++) ...[
+            _FamilyMemberTile(
+              member: members[index],
+              title: _familyMemberTitle(members[index], options),
+              roleLabel: _familyRoleLabel(
+                options,
+                members[index].role,
+                members[index].roleLabel,
+              ),
+              isCurrentUser:
+                  members[index].userId.isNotEmpty &&
+                  members[index].userId == account?.userId,
+              canManage: canManage,
+              onManage: () => onMemberAction(members[index]),
+            ),
+            if (index != members.length - 1) const _FamilyDivider(),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _FamilyCodePanel extends StatelessWidget {
+  const _FamilyCodePanel({required this.code, required this.onTap});
+
+  final FamilyCodeInfo code;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final displayCode = code.code.isEmpty ? '未生成' : code.code;
+    final familyName = code.familyName.isEmpty ? '我的家庭' : code.familyName;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.brandWash.withValues(alpha: 0.86),
+              Colors.white.withValues(alpha: 0.92),
+            ],
+          ),
+          border: Border.all(color: AppColors.brand.withValues(alpha: 0.14)),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF557A86).withValues(alpha: 0.06),
+              blurRadius: 14,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(15, 14, 13, 13),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const _FamilyAvatar(
+                    icon: Icons.tag_outlined,
+                    tone: AppColors.brand,
+                    fill: Colors.white,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Text('家庭号', style: _sectionTitleStyle),
+                            const SizedBox(width: 8),
+                            _SoftTextBadge(
+                              label: '新成员入口',
+                              tone: AppColors.brand,
+                              fill: Colors.white.withValues(alpha: 0.72),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          '输入家庭号会以临时查看者加入。',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: _mutedText,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.chevron_right,
+                    color: AppColors.muted,
+                    size: 22,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 13),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.84),
+                  borderRadius: BorderRadius.circular(17),
+                  border: Border.all(
+                    color: AppColors.brand.withValues(alpha: 0.10),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 11, 12, 11),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          displayCode,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.ink,
+                            fontFamily: 'SF Mono',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      _SoftTextBadge(
+                        label: familyName,
+                        tone: AppColors.ink,
+                        fill: AppColors.surfaceStrong,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 9),
+              const Text('重置只会让旧家庭号失效，不影响已加入成员。', style: _mutedText),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FamilyCodeRule extends StatelessWidget {
+  const _FamilyCodeRule({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSoft.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: AppColors.borderSoft),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(13, 12, 13, 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.78),
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: SizedBox(
+                width: 38,
+                height: 38,
+                child: Center(
+                  child: Icon(icon, color: AppColors.brand, size: 18),
+                ),
+              ),
+            ),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: AppColors.ink,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w900,
+                      height: 1.2,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    message,
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.42,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FamilyInvitationsPanel extends StatelessWidget {
+  const _FamilyInvitationsPanel({
+    required this.invitations,
+    required this.options,
+    required this.canManage,
+    required this.onResend,
+    required this.onCancel,
+  });
+
+  final List<FamilyInvitation> invitations;
+  final GuardianIdentityOptions? options;
+  final bool canManage;
+  final ValueChanged<FamilyInvitation> onResend;
+  final ValueChanged<FamilyInvitation> onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    return _FamilyPanel(
+      title: '待接受邀请',
+      subtitle: '对方接受后会加入家庭空间。',
+      accent: AppColors.warning,
+      child: Column(
+        children: [
+          for (var index = 0; index < invitations.length; index++) ...[
+            _FamilyInvitationTile(
+              invitation: invitations[index],
+              roleLabel: _familyRoleLabel(
+                options,
+                invitations[index].role,
+                invitations[index].roleLabel,
+              ),
+              canManage: canManage,
+              onResend: () => onResend(invitations[index]),
+              onCancel: () => onCancel(invitations[index]),
+            ),
+            if (index != invitations.length - 1) const _FamilyDivider(),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _FamilyPanel extends StatelessWidget {
+  const _FamilyPanel({
+    required this.title,
+    required this.subtitle,
+    required this.child,
+    this.accent = AppColors.brandSage,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget child;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.90),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.borderSoft),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF31445A).withValues(alpha: 0.045),
+            blurRadius: 12,
+            offset: const Offset(0, 7),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(15, 15, 15, 13),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  child: SizedBox(
+                    width: 7,
+                    height: 24,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.32),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: _sectionTitleStyle),
+                      const SizedBox(height: 3),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: _mutedText,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FamilyMemberTile extends StatelessWidget {
+  const _FamilyMemberTile({
+    required this.member,
+    required this.title,
+    required this.roleLabel,
+    required this.isCurrentUser,
+    required this.canManage,
+    required this.onManage,
+  });
+
+  final FamilyMember member;
+  final String title;
+  final String roleLabel;
+  final bool isCurrentUser;
+  final bool canManage;
+  final VoidCallback onManage;
+
+  @override
+  Widget build(BuildContext context) {
+    final isAdmin = member.role == 'admin';
+    final tone = isAdmin ? AppColors.brandSage : AppColors.brand;
+    final fill = isAdmin ? AppColors.brandSageWash : AppColors.brandWash;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _FamilyAvatar(
+            icon: isAdmin
+                ? Icons.admin_panel_settings_outlined
+                : Icons.person_outline,
+            tone: tone,
+            fill: fill,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.ink,
+                          fontFamily: AppTypography.systemFont,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          height: 1.18,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                    ),
+                    if (isCurrentUser) ...[
+                      const SizedBox(width: 8),
+                      const StatusChip(label: '本人', tone: StatusTone.success),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 7,
+                  runSpacing: 5,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    _SoftTextBadge(label: roleLabel, tone: tone, fill: fill),
+                    if (member.phone.isNotEmpty)
+                      _SoftTextBadge(
+                        label: _phoneMask(member.phone),
+                        tone: AppColors.ink,
+                        fill: AppColors.surfaceStrong,
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (canManage && !isCurrentUser) ...[
+            const SizedBox(width: 8),
+            _MiniActionButton(label: '管理', onTap: onManage),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _FamilyInvitationTile extends StatelessWidget {
+  const _FamilyInvitationTile({
+    required this.invitation,
+    required this.roleLabel,
+    required this.canManage,
+    required this.onResend,
+    required this.onCancel,
+  });
+
+  final FamilyInvitation invitation;
+  final String roleLabel;
+  final bool canManage;
+  final VoidCallback onResend;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _FamilyAvatar(
+            icon: Icons.mail_outline,
+            tone: AppColors.warning,
+            fill: AppColors.warningWash,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  invitation.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.ink,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    height: 1.18,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 7,
+                  runSpacing: 5,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    _SoftTextBadge(
+                      label: roleLabel,
+                      tone: AppColors.warning,
+                      fill: AppColors.warningWash,
+                    ),
+                    _SoftTextBadge(
+                      label: invitation.statusLabel,
+                      tone: AppColors.ink,
+                      fill: AppColors.surfaceStrong,
+                    ),
+                    if (invitation.phone.isNotEmpty)
+                      Text(_phoneMask(invitation.phone), style: _mutedText),
+                  ],
+                ),
+                if (canManage) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      _MiniActionButton(label: '重发邀请', onTap: onResend),
+                      const SizedBox(width: 8),
+                      _MiniActionButton(
+                        label: '取消',
+                        danger: true,
+                        onTap: onCancel,
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FamilyEmptyPanel extends StatelessWidget {
+  const _FamilyEmptyPanel({required this.canManage, required this.onAdd});
+
+  final bool canManage;
+  final VoidCallback? onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppStateView(
+      variant: AppStateVariant.noData,
+      title: '还没有家庭成员',
+      message: canManage ? '邀请照护人后，可以一起处理任务确认和重要提醒。' : '管理员邀请成员后会显示在这里。',
+      primaryActionLabel: canManage ? '邀请成员' : null,
+      onPrimaryAction: onAdd,
+      compact: true,
+    );
+  }
+}
+
+class _FamilyAvatar extends StatelessWidget {
+  const _FamilyAvatar({
+    required this.icon,
+    required this.tone,
+    required this.fill,
+  });
+
+  final IconData icon;
+  final Color tone;
+  final Color fill;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: SizedBox(
+        width: 46,
+        height: 46,
+        child: Center(child: Icon(icon, color: tone, size: 21)),
+      ),
+    );
+  }
+}
+
+class _SoftTextBadge extends StatelessWidget {
+  const _SoftTextBadge({
+    required this.label,
+    required this.tone,
+    required this.fill,
+  });
+
+  final String label;
+  final Color tone;
+  final Color fill;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: tone,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w800,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniActionButton extends StatelessWidget {
+  const _MiniActionButton({
+    required this.label,
+    required this.onTap,
+    this.danger = false,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+  final bool danger;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = danger ? AppColors.danger : AppColors.brandDeep;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 44, minWidth: 54),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: danger ? 0.10 : 0.09),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: color.withValues(alpha: 0.12)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FamilyDivider extends StatelessWidget {
+  const _FamilyDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 58),
+      child: Divider(
+        height: 1,
+        thickness: 1,
+        color: AppColors.borderSoft.withValues(alpha: 0.80),
       ),
     );
   }
@@ -1556,6 +2247,8 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
 
   @override
   Widget build(BuildContext context) {
+    final account = ref.watch(accountProfileProvider).asData?.value;
+    final canManageChildProfile = account?.can('manage_child_profile') ?? false;
     final canSave = !_saving && _value.name.trim().isNotEmpty;
 
     return AppScreen(
@@ -1571,21 +2264,31 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
         }
       },
       footer: AppPrimaryButton(
-        label: _saving ? '保存中' : '保存资料',
+        label: !canManageChildProfile
+            ? '仅可查看'
+            : _saving
+            ? '保存中'
+            : '保存资料',
         loading: _saving,
-        onTap: canSave ? _save : null,
+        onTap: canManageChildProfile && canSave ? _save : null,
       ),
       children: [
         AppSurface(
           radius: 22,
           padding: const EdgeInsets.fromLTRB(15, 16, 15, 15),
-          child: ChildProfileEditorPanel(
-            value: _value,
-            includeExtendedFields: true,
-            noteText: '资料用于提醒节奏、任务模板和家庭协作展示；性别可以不设置。',
-            onChanged: (value) {
-              setState(() => _value = value);
-            },
+          child: AbsorbPointer(
+            absorbing: !canManageChildProfile,
+            child: Opacity(
+              opacity: canManageChildProfile ? 1 : 0.76,
+              child: ChildProfileEditorPanel(
+                value: _value,
+                includeExtendedFields: true,
+                noteText: '资料用于提醒节奏、任务模板和家庭协作展示；性别可以不设置。',
+                onChanged: (value) {
+                  if (canManageChildProfile) setState(() => _value = value);
+                },
+              ),
+            ),
           ),
         ),
       ],
@@ -1636,13 +2339,19 @@ class EmergencyContactsPage extends ConsumerWidget {
         .watch(guardianIdentityOptionsProvider)
         .asData
         ?.value;
+    final account = ref.watch(accountProfileProvider).asData?.value;
+    final canManageContacts =
+        account?.can('manage_emergency_contacts') ?? false;
     return _Page(
       title: '紧急联系人',
-      trailing: AppIconButton(
-        icon: Icons.add,
-        label: '新增联系人',
-        onTap: () => _editContact(context, ref),
-      ),
+      subtitle: canManageContacts ? '维护重要情况通知对象' : '查看重要情况通知对象',
+      trailing: canManageContacts
+          ? AppIconButton(
+              icon: Icons.add,
+              label: '新增联系人',
+              onTap: () => _editContact(context, ref),
+            )
+          : null,
       children: contacts.when(
         data: (items) => [
           if (items.isEmpty)
@@ -1664,12 +2373,14 @@ class EmergencyContactsPage extends ConsumerWidget {
                       tone: contact.defaultNotify
                           ? AppListRowTone.green
                           : AppListRowTone.neutral,
-                      trailing: TextButton(
-                        style: _inlineTextButtonStyle(),
-                        onPressed: () =>
-                            _editContact(context, ref, contact: contact),
-                        child: const Text('编辑'),
-                      ),
+                      trailing: canManageContacts
+                          ? TextButton(
+                              style: _inlineTextButtonStyle(),
+                              onPressed: () =>
+                                  _editContact(context, ref, contact: contact),
+                              child: const Text('编辑'),
+                            )
+                          : null,
                     ),
                 ],
               ),
@@ -1766,6 +2477,9 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
   @override
   Widget build(BuildContext context) {
     final overview = ref.watch(deviceOverviewProvider(widget.deviceId));
+    final canManage =
+        ref.watch(accountProfileProvider).asData?.value.can('manage_devices') ??
+        false;
     return _Page(
       title: '设备详情',
       children: overview.when(
@@ -1781,6 +2495,7 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
               name: _name,
               location: _location,
               saving: _saving,
+              canManage: canManage,
               onSave: _save,
               onUnbind: _unbind,
             ),
@@ -1842,6 +2557,7 @@ class _DeviceDetailBody extends StatelessWidget {
     required this.name,
     required this.location,
     required this.saving,
+    required this.canManage,
     required this.onSave,
     required this.onUnbind,
   });
@@ -1850,6 +2566,7 @@ class _DeviceDetailBody extends StatelessWidget {
   final TextEditingController name;
   final TextEditingController location;
   final bool saving;
+  final bool canManage;
   final VoidCallback onSave;
   final VoidCallback onUnbind;
 
@@ -1889,9 +2606,9 @@ class _DeviceDetailBody extends StatelessWidget {
         AppSurface(
           child: Column(
             children: [
-              _Input(label: '设备名称', controller: name),
+              _Input(label: '设备名称', controller: name, readOnly: !canManage),
               const SizedBox(height: 12),
-              _Input(label: '房间位置', controller: location),
+              _Input(label: '房间位置', controller: location, readOnly: !canManage),
               const SizedBox(height: 12),
               AppListRow(
                 icon: Icons.wifi_outlined,
@@ -1923,16 +2640,28 @@ class _DeviceDetailBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        AppPrimaryButton(
-          label: saving ? '保存中' : '保存设备信息',
-          onTap: saving ? null : onSave,
-        ),
-        const SizedBox(height: 10),
-        AppDangerButton(
-          label: '解绑设备',
-          trailing: const Icon(Icons.power_settings_new_outlined, size: 18),
-          onTap: onUnbind,
-        ),
+        if (canManage) ...[
+          AppPrimaryButton(
+            label: saving ? '保存中' : '保存设备信息',
+            onTap: saving ? null : onSave,
+          ),
+          const SizedBox(height: 10),
+          AppDangerButton(
+            label: '解绑设备',
+            trailing: const Icon(Icons.power_settings_new_outlined, size: 18),
+            onTap: onUnbind,
+          ),
+        ] else
+          AppSurface(
+            color: AppColors.surfaceSoft,
+            borderColor: AppColors.borderSoft,
+            child: const AppListRow(
+              icon: Icons.lock_outline,
+              title: '仅管理员可修改设备',
+              subtitle: '当前账号可以查看设备状态，设备改名和解绑需要管理员处理。',
+              tone: AppListRowTone.neutral,
+            ),
+          ),
       ],
     );
   }
@@ -2074,6 +2803,16 @@ class _BooleanSettingsPageState extends ConsumerState<_BooleanSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final setting = ref.watch(profileSettingProvider(widget.settingKey));
+    final requiredCapability = widget.settingKey == 'privacy'
+        ? 'manage_privacy'
+        : 'manage_child_settings';
+    final canManageSetting =
+        ref
+            .watch(profileSummaryProvider)
+            .asData
+            ?.value
+            .can(requiredCapability) ??
+        false;
     return _Page(
       title: widget.title,
       children: setting.when(
@@ -2088,12 +2827,24 @@ class _BooleanSettingsPageState extends ConsumerState<_BooleanSettingsPage> {
                       title: row.title,
                       subtitle: row.subtitle,
                       value: _draft![row.key] == true,
-                      onChanged: (value) =>
-                          setState(() => _draft![row.key] = value),
+                      onChanged: canManageSetting
+                          ? (value) => setState(() => _draft![row.key] = value)
+                          : null,
                     ),
                 ],
               ),
             ),
+            if (!canManageSetting) ...[
+              const SizedBox(height: 12),
+              AppListRow(
+                icon: Icons.lock_outline,
+                title: '当前为只读',
+                subtitle: widget.settingKey == 'privacy'
+                    ? '隐私授权由家庭管理员维护。'
+                    : '查看者不能修改孩子看护设置。',
+                tone: AppListRowTone.neutral,
+              ),
+            ],
             if (widget.extraLegalLink) ...[
               const SizedBox(height: 14),
               AppSecondaryButton(
@@ -2102,11 +2853,13 @@ class _BooleanSettingsPageState extends ConsumerState<_BooleanSettingsPage> {
                 onTap: () => context.push(profileChildPrivacyPath),
               ),
             ],
-            const SizedBox(height: 14),
-            AppPrimaryButton(
-              label: _saving ? '保存中' : '保存设置',
-              onTap: _saving ? null : _save,
-            ),
+            if (canManageSetting) ...[
+              const SizedBox(height: 14),
+              AppPrimaryButton(
+                label: _saving ? '保存中' : '保存设置',
+                onTap: _saving ? null : _save,
+              ),
+            ],
           ];
         },
         loading: () => const [_Loading(title: '正在同步设置')],
@@ -2296,13 +3049,26 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     final subscription = ref.watch(subscriptionStatusProvider);
     final plans = ref.watch(subscriptionPlansProvider);
     final entitlements = ref.watch(subscriptionEntitlementsProvider);
-    return _subscriptionScreen(subscription, plans, entitlements);
+    final canManageSubscription =
+        ref
+            .watch(profileSummaryProvider)
+            .asData
+            ?.value
+            .can('manage_subscription') ??
+        false;
+    return _subscriptionScreen(
+      subscription,
+      plans,
+      entitlements,
+      canManageSubscription,
+    );
   }
 
   Widget _subscriptionScreen(
     AsyncValue<SubscriptionStatus> subscription,
     AsyncValue<List<SubscriptionPlan>> plans,
     AsyncValue<List<SubscriptionFeatureComparison>> entitlements,
+    bool canManageSubscription,
   ) {
     final loading =
         subscription.isLoading || plans.isLoading || entitlements.isLoading;
@@ -2360,6 +3126,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       plans: visiblePlans,
       selectedIndex: safeIndex,
       selectedPlan: selectedPlan,
+      canManageSubscription: canManageSubscription,
       planController: _planController,
       loadingPlanId: _loadingPlanId,
       restoring: _restoring,
@@ -2388,6 +3155,21 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   }
 
   Future<void> _startCheckout(SubscriptionPlan plan) async {
+    final canManageSubscription =
+        ref
+            .read(profileSummaryProvider)
+            .asData
+            ?.value
+            .can('manage_subscription') ??
+        false;
+    if (!canManageSubscription) {
+      await _showSubscriptionResult(
+        context,
+        title: plan.title,
+        message: '当前身份不能开通或变更套餐，请联系家庭管理员。',
+      );
+      return;
+    }
     if (_loadingPlanId != null || _restoring) return;
     setState(() => _loadingPlanId = plan.id);
     try {
@@ -2414,6 +3196,21 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   }
 
   Future<void> _restore() async {
+    final canManageSubscription =
+        ref
+            .read(profileSummaryProvider)
+            .asData
+            ?.value
+            .can('manage_subscription') ??
+        false;
+    if (!canManageSubscription) {
+      await _showSubscriptionResult(
+        context,
+        title: '恢复购买',
+        message: '当前身份不能恢复购买，请联系家庭管理员。',
+      );
+      return;
+    }
     if (_restoring || _loadingPlanId != null) return;
     setState(() => _restoring = true);
     try {
@@ -2449,6 +3246,7 @@ class _SubscriptionPaywallScaffold extends StatelessWidget {
     required this.plans,
     required this.selectedIndex,
     required this.selectedPlan,
+    required this.canManageSubscription,
     required this.planController,
     required this.loadingPlanId,
     required this.restoring,
@@ -2467,6 +3265,7 @@ class _SubscriptionPaywallScaffold extends StatelessWidget {
   final List<SubscriptionPlan> plans;
   final int selectedIndex;
   final SubscriptionPlan selectedPlan;
+  final bool canManageSubscription;
   final PageController planController;
   final String? loadingPlanId;
   final bool restoring;
@@ -2543,6 +3342,7 @@ class _SubscriptionPaywallScaffold extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: _PaywallFinePrint(
                     restoring: restoring,
+                    canManageSubscription: canManageSubscription,
                     onRestore: onRestore,
                     onUserAgreement: onUserAgreement,
                     onPrivacyPolicy: onPrivacyPolicy,
@@ -2566,6 +3366,7 @@ class _SubscriptionPaywallScaffold extends StatelessWidget {
                 plan: selectedPlan,
                 active: selectedIsCurrent,
                 loading: loading,
+                canManageSubscription: canManageSubscription,
                 onCheckout: onCheckout,
               ),
             ),
@@ -3019,6 +3820,7 @@ class _PaywallPageDots extends StatelessWidget {
 class _PaywallFinePrint extends StatelessWidget {
   const _PaywallFinePrint({
     required this.restoring,
+    required this.canManageSubscription,
     required this.onRestore,
     required this.onUserAgreement,
     required this.onPrivacyPolicy,
@@ -3026,6 +3828,7 @@ class _PaywallFinePrint extends StatelessWidget {
   });
 
   final bool restoring;
+  final bool canManageSubscription;
   final VoidCallback onRestore;
   final VoidCallback onUserAgreement;
   final VoidCallback onPrivacyPolicy;
@@ -3037,8 +3840,15 @@ class _PaywallFinePrint extends StatelessWidget {
       children: [
         TextButton(
           style: _inlineTextButtonStyle(),
-          onPressed: restoring ? null : onRestore,
-          child: Text(restoring ? '恢复中' : '恢复购买', style: _paywallLinkText),
+          onPressed: restoring || !canManageSubscription ? null : onRestore,
+          child: Text(
+            restoring
+                ? '恢复中'
+                : canManageSubscription
+                ? '恢复购买'
+                : '仅管理员可恢复购买',
+            style: _paywallLinkText,
+          ),
         ),
         const SizedBox(height: 2),
         Wrap(
@@ -3085,6 +3895,7 @@ class _PaywallBottomBar extends StatelessWidget {
     required this.plan,
     required this.active,
     required this.loading,
+    required this.canManageSubscription,
     required this.onCheckout,
   });
 
@@ -3092,11 +3903,12 @@ class _PaywallBottomBar extends StatelessWidget {
   final SubscriptionPlan plan;
   final bool active;
   final bool loading;
+  final bool canManageSubscription;
   final VoidCallback onCheckout;
 
   @override
   Widget build(BuildContext context) {
-    final enabled = !active && !loading;
+    final enabled = !active && !loading && canManageSubscription;
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -3115,7 +3927,11 @@ class _PaywallBottomBar extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(22, 22, 22, safeBottom + 16),
             child: Semantics(
               button: true,
-              label: active ? '当前套餐' : plan.ctaLabel,
+              label: active
+                  ? '当前套餐'
+                  : canManageSubscription
+                  ? plan.ctaLabel
+                  : '当前身份不可开通',
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: enabled ? onCheckout : null,
@@ -3124,12 +3940,12 @@ class _PaywallBottomBar extends StatelessWidget {
                   curve: Curves.easeOutCubic,
                   height: 54,
                   decoration: BoxDecoration(
-                    color: active
+                    color: active || !canManageSubscription
                         ? Colors.white.withValues(alpha: 0.16)
                         : const Color(0xFFB8F2CF),
                     borderRadius: BorderRadius.circular(AppRadii.full),
                     boxShadow: [
-                      if (!active)
+                      if (!active && canManageSubscription)
                         BoxShadow(
                           color: const Color(
                             0xFFB8F2CF,
@@ -3143,9 +3959,15 @@ class _PaywallBottomBar extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        loading ? '处理中' : (active ? '当前套餐' : plan.ctaLabel),
+                        loading
+                            ? '处理中'
+                            : active
+                            ? '当前套餐'
+                            : canManageSubscription
+                            ? plan.ctaLabel
+                            : '当前身份不可开通',
                         style: TextStyle(
-                          color: active
+                          color: active || !canManageSubscription
                               ? Colors.white.withValues(alpha: 0.72)
                               : AppColors.ink,
                           fontFamily: AppTypography.systemFont,
@@ -3624,6 +4446,28 @@ class _RewardEditPageState extends ConsumerState<RewardEditPage> {
   }
 
   Widget _body(RewardItem? item) {
+    final profile = ref.watch(profileSummaryProvider);
+    if (profile.isLoading) {
+      return const _Page(
+        title: '奖励',
+        children: [_Loading(title: '正在确认权限')],
+      );
+    }
+    final canManageRewards =
+        profile.asData?.value.can('manage_rewards') ?? false;
+    if (!canManageRewards) {
+      return const _Page(
+        title: '奖励',
+        children: [
+          AppStateView(
+            variant: AppStateVariant.noData,
+            title: '当前身份不能管理奖励',
+            message: '你可以查看奖励和兑换记录，新增、编辑和删除由管理员处理。',
+            compact: true,
+          ),
+        ],
+      );
+    }
     return _Page(
       title: item == null ? '添加奖励' : '编辑奖励',
       children: [
@@ -4154,12 +4998,14 @@ class _Input extends StatelessWidget {
     required this.controller,
     this.minLines = 1,
     this.keyboardType,
+    this.readOnly = false,
   });
 
   final String label;
   final TextEditingController controller;
   final int minLines;
   final TextInputType? keyboardType;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -4169,6 +5015,7 @@ class _Input extends StatelessWidget {
       controller: controller,
       minLines: minLines,
       keyboardType: keyboardType,
+      readOnly: readOnly,
     );
   }
 }
@@ -4401,7 +5248,7 @@ class _SwitchRow extends StatelessWidget {
   final String title;
   final String subtitle;
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -4473,6 +5320,232 @@ class _ErrorState extends StatelessWidget {
   }
 }
 
+Future<void> _showFamilyCodeSheet(
+  BuildContext context,
+  WidgetRef ref,
+  FamilyCodeInfo code,
+) async {
+  final displayCode = code.code.isEmpty ? '家庭号未生成' : code.code;
+  final familyName = code.familyName.isEmpty ? '我的家庭' : code.familyName;
+  final action = await showAppBottomSheet<String>(
+    context: context,
+    maxHeightFactor: 0.54,
+    child: AppBottomSheetBody(
+      title: '家庭号',
+      subtitle: '给已经信任的家人使用。新成员加入后默认是临时查看者。',
+      footer: AppSheetFooterActions(
+        children: [
+          AppSheetSecondaryButton(
+            label: '复制',
+            onTap: () => Navigator.of(context).pop('copy'),
+          ),
+          AppSheetDangerButton(
+            label: '重置',
+            onTap: () => Navigator.of(context).pop('reset'),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.ink, AppColors.ink.withValues(alpha: 0.88)],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryButtonShadow.withValues(alpha: 0.16),
+                  blurRadius: 18,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 17, 18, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.10),
+                          ),
+                        ),
+                        child: const SizedBox(
+                          width: 42,
+                          height: 42,
+                          child: Center(
+                            child: Icon(
+                              Icons.tag_outlined,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              familyName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.78),
+                                fontFamily: AppTypography.systemFont,
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                height: 1.2,
+                                letterSpacing: 0,
+                              ),
+                            ),
+                            const SizedBox(height: 7),
+                            Text(
+                              displayCode,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'SF Mono',
+                                fontSize: 25,
+                                fontWeight: FontWeight.w900,
+                                height: 1,
+                                letterSpacing: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    '输入家庭号加入的人不会自动获得管理权限。',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.70),
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.4,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          const _FamilyCodeRule(
+            icon: Icons.visibility_outlined,
+            title: '默认临时查看者',
+            message: '通过家庭号加入后，只能查看基础状态。管理员可以在家庭成员里调整权限。',
+          ),
+          const SizedBox(height: 10),
+          const _FamilyCodeRule(
+            icon: Icons.refresh_outlined,
+            title: '重置不影响已加入成员',
+            message: '重置只会让旧家庭号失效。已加入成员、管理员和权限不会被改变。',
+          ),
+        ],
+      ),
+    ),
+  );
+  if (!context.mounted || action == null) return;
+  if (action == 'copy') {
+    await Clipboard.setData(ClipboardData(text: code.code));
+    if (context.mounted) _toast(context, '家庭号已复制');
+    return;
+  }
+
+  final confirmed = await _confirm(
+    context,
+    title: '重置家庭号',
+    message: '重置后旧家庭号不能再用于新加入。已经加入家庭的成员不会被移出，权限也不会改变。',
+    danger: true,
+  );
+  if (!confirmed || !context.mounted) return;
+  try {
+    await ref.read(profileRepositoryProvider).resetFamilyCode();
+    ref.invalidate(familyCodeProvider);
+    if (context.mounted) _toast(context, '家庭号已重置');
+  } on ProfileException catch (error) {
+    if (context.mounted) _toast(context, error.message);
+  }
+}
+
+Future<void> _showMemberActions(
+  BuildContext context,
+  WidgetRef ref,
+  FamilyMember member,
+  AccountProfile? account,
+) async {
+  final canTransfer =
+      member.userId.isNotEmpty &&
+      member.userId != account?.userId &&
+      member.status == 'active';
+  final action = await showAppBottomSheet<String>(
+    context: context,
+    maxHeightFactor: 0.56,
+    child: AppBottomSheetBody(
+      title: '管理成员',
+      subtitle: '${member.name} · ${member.statusLabel}',
+      footer: AppSheetSecondaryButton(
+        label: '取消',
+        onTap: () => Navigator.of(context).pop(),
+      ),
+      child: Column(
+        children: [
+          if (member.userId.isEmpty)
+            AppListRow(
+              icon: Icons.edit_outlined,
+              title: '编辑成员资料',
+              subtitle: '调整称呼、手机号和权限角色。',
+              tone: AppListRowTone.blue,
+              onTap: () => Navigator.of(context).pop('edit'),
+            ),
+          if (canTransfer)
+            AppListRow(
+              icon: Icons.admin_panel_settings_outlined,
+              title: '转移管理员',
+              subtitle: '对方将成为家庭管理员，你会变为监护人。',
+              tone: AppListRowTone.amber,
+              onTap: () => Navigator.of(context).pop('transfer'),
+            ),
+          AppListRow(
+            icon: Icons.person_remove_outlined,
+            title: '移除成员',
+            subtitle: '移除后，对方不能再查看这个家庭空间。',
+            tone: AppListRowTone.red,
+            onTap: () => Navigator.of(context).pop('remove'),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (action == null || !context.mounted) return;
+  switch (action) {
+    case 'edit':
+      await _editMember(context, ref, member: member);
+      break;
+    case 'transfer':
+      await _transferAdmin(context, ref, member);
+      break;
+    case 'remove':
+      await _removeMember(context, ref, member);
+      break;
+  }
+}
+
 Future<void> _editMember(
   BuildContext context,
   WidgetRef ref, {
@@ -4490,15 +5563,12 @@ Future<void> _editMember(
   final members = ref.read(familyMembersProvider).asData?.value ?? const [];
   final invitations =
       ref.read(familyInvitationsProvider).asData?.value ?? const [];
-  final contacts =
-      ref.read(emergencyContactsProvider).asData?.value ?? const [];
   final account = ref.read(accountProfileProvider).asData?.value;
   final reservedIdentityKeys = _reservedGuardianIdentityKeys(
     identityOptions,
     account: account,
     members: members,
     invitations: invitations,
-    contacts: contacts,
     excludeMemberId: member?.id,
   );
   final reservedRoleKeys = _reservedFamilyRoleKeys(
@@ -4520,9 +5590,11 @@ Future<void> _editMember(
   if (result == null) return;
   try {
     final repository = ref.read(profileRepositoryProvider);
+    FamilyInvitation? invitation;
     if (member == null) {
-      await repository.sendFamilyInvitation(
+      invitation = await repository.sendFamilyInvitation(
         name: result.name,
+        relationshipKey: result.relationshipKey,
         phone: result.phone,
         role: result.role,
       );
@@ -4530,6 +5602,7 @@ Future<void> _editMember(
       await repository.saveFamilyMember(
         id: member.id,
         name: result.name,
+        relationshipKey: result.relationshipKey,
         phone: result.phone,
         role: result.role,
       );
@@ -4537,7 +5610,62 @@ Future<void> _editMember(
     ref.invalidate(familyMembersProvider);
     ref.invalidate(familyInvitationsProvider);
     ref.invalidate(profileSummaryProvider);
-    if (context.mounted) _toast(context, member == null ? '邀请已发送' : '已保存');
+    if (context.mounted) {
+      final notice = invitation?.deliveryNotice.trim();
+      _toast(
+        context,
+        notice != null && notice.isNotEmpty
+            ? notice
+            : member == null
+            ? '邀请已保存'
+            : '已保存',
+      );
+    }
+  } on ProfileException catch (error) {
+    if (context.mounted) _toast(context, error.message);
+  }
+}
+
+Future<void> _transferAdmin(
+  BuildContext context,
+  WidgetRef ref,
+  FamilyMember member,
+) async {
+  final confirmed = await showAppConfirmSheet(
+    context: context,
+    title: '转移管理员',
+    message: '确认把家庭管理员转移给${member.name}吗？转移后，你将变为监护人，不能继续管理成员和设备。',
+    confirmLabel: '确认转移',
+  );
+  if (!confirmed) return;
+  try {
+    await ref.read(profileRepositoryProvider).transferFamilyAdmin(member.id);
+    ref.invalidate(familyMembersProvider);
+    ref.invalidate(accountProfileProvider);
+    ref.invalidate(profileSummaryProvider);
+    if (context.mounted) _toast(context, '管理员已转移');
+  } on ProfileException catch (error) {
+    if (context.mounted) _toast(context, error.message);
+  }
+}
+
+Future<void> _removeMember(
+  BuildContext context,
+  WidgetRef ref,
+  FamilyMember member,
+) async {
+  final confirmed = await _confirm(
+    context,
+    title: '移除成员',
+    message: '确认移除${member.name}吗？移除后，对方不能再查看这个家庭空间。',
+    danger: true,
+  );
+  if (!confirmed) return;
+  try {
+    await ref.read(profileRepositoryProvider).deleteFamilyMember(member.id);
+    ref.invalidate(familyMembersProvider);
+    ref.invalidate(profileSummaryProvider);
+    if (context.mounted) _toast(context, '成员已移除');
   } on ProfileException catch (error) {
     if (context.mounted) _toast(context, error.message);
   }
@@ -4557,17 +5685,10 @@ Future<void> _editContact(
     if (context.mounted) _toast(context, '正在同步身份配置，请稍后再试');
     return;
   }
-  final members = ref.read(familyMembersProvider).asData?.value ?? const [];
-  final invitations =
-      ref.read(familyInvitationsProvider).asData?.value ?? const [];
   final contacts =
       ref.read(emergencyContactsProvider).asData?.value ?? const [];
-  final account = ref.read(accountProfileProvider).asData?.value;
-  final reservedIdentityKeys = _reservedGuardianIdentityKeys(
+  final reservedIdentityKeys = _reservedContactIdentityKeys(
     identityOptions,
-    account: account,
-    members: members,
-    invitations: invitations,
     contacts: contacts,
     excludeContactId: contact?.id,
   );
@@ -4625,11 +5746,14 @@ Future<void> _resendInvitation(
   FamilyInvitation invitation,
 ) async {
   try {
-    await ref
+    final updatedInvitation = await ref
         .read(profileRepositoryProvider)
         .resendFamilyInvitation(invitation.id);
     ref.invalidate(familyInvitationsProvider);
-    if (context.mounted) _toast(context, '邀请已重发');
+    if (context.mounted) {
+      final notice = updatedInvitation.deliveryNotice.trim();
+      _toast(context, notice.isEmpty ? '邀请已重发' : notice);
+    }
   } on ProfileException catch (error) {
     if (context.mounted) _toast(context, error.message);
   }
@@ -4661,11 +5785,13 @@ Future<void> _cancelInvitation(
 class _MemberEditResult {
   const _MemberEditResult({
     required this.name,
+    required this.relationshipKey,
     required this.phone,
     required this.role,
   });
 
   final String name;
+  final String relationshipKey;
   final String phone;
   final String role;
 }
@@ -4761,6 +5887,7 @@ class _MemberEditSheetState extends State<_MemberEditSheet> {
                 ? () => Navigator.of(context).pop(
                     _MemberEditResult(
                       name: relationshipLabel,
+                      relationshipKey: _relationshipKey,
                       phone: _phone.text.trim(),
                       role: _role,
                     ),
@@ -4928,6 +6055,12 @@ class _ContactEditSheetState extends State<_ContactEditSheet> {
       ),
       child: Column(
         children: [
+          AppSecondaryButton(
+            label: '从通讯录选择',
+            trailing: const Icon(Icons.contacts_outlined, size: 17),
+            onTap: _pickFromContacts,
+          ),
+          const SizedBox(height: 12),
           _Input(label: '姓名', controller: _name),
           const SizedBox(height: 12),
           _Input(
@@ -4975,6 +6108,27 @@ class _ContactEditSheetState extends State<_ContactEditSheet> {
         ],
       ),
     );
+  }
+
+  Future<void> _pickFromContacts() async {
+    try {
+      final picked = await pickPhoneContact();
+      if (!mounted || picked == null) return;
+      final candidateKey = widget.options.keyForValue(picked.name);
+      setState(() {
+        if (picked.name.isNotEmpty) _name.text = picked.name;
+        if (picked.phone.isNotEmpty) _phone.text = picked.phone;
+        if (candidateKey.isNotEmpty &&
+            !widget.reservedIdentityKeys.contains(candidateKey)) {
+          _relationshipKey = candidateKey;
+        }
+      });
+      if (picked.phone.isEmpty) {
+        _toast(context, '这个联系人没有可用手机号，请手动填写');
+      }
+    } on ContactPickerException catch (error) {
+      if (mounted) _toast(context, error.message);
+    }
   }
 }
 
@@ -5086,10 +6240,8 @@ Set<String> _reservedGuardianIdentityKeys(
   AccountProfile? account,
   List<FamilyMember> members = const [],
   List<FamilyInvitation> invitations = const [],
-  List<EmergencyContact> contacts = const [],
   String? excludeMemberId,
   String? excludeInvitationId,
-  String? excludeContactId,
   bool excludeAccount = false,
 }) {
   final keys = <String>{};
@@ -5115,12 +6267,34 @@ Set<String> _reservedGuardianIdentityKeys(
         member.userId == account.userId) {
       continue;
     }
-    addKey(member.name);
+    addKey(
+      member.relationshipKey.isNotEmpty ? member.relationshipKey : member.name,
+    );
   }
   for (final invitation in invitations) {
     if (invitation.id == excludeInvitationId) continue;
-    addKey(invitation.name);
+    addKey(
+      invitation.relationshipKey.isNotEmpty
+          ? invitation.relationshipKey
+          : invitation.name,
+    );
   }
+  return keys;
+}
+
+Set<String> _reservedContactIdentityKeys(
+  GuardianIdentityOptions options, {
+  List<EmergencyContact> contacts = const [],
+  String? excludeContactId,
+}) {
+  final keys = <String>{};
+  void addKey(String value) {
+    final key = options.keyForValue(value);
+    if (key.isNotEmpty && options.isExclusiveIdentityKey(key)) {
+      keys.add(key);
+    }
+  }
+
   for (final contact in contacts) {
     if (contact.id == excludeContactId) continue;
     addKey(
@@ -5180,23 +6354,16 @@ bool _looksLikeStoredRelationshipKey(String value) {
   return RegExp(r'^[a-z][a-z0-9_ -]*$').hasMatch(value.trim());
 }
 
-String _familyMemberTitle(FamilyMember member, AccountProfile? account) {
-  if (member.userId.isEmpty || !_isGenericFamilyMemberName(member.name)) {
-    return member.name;
-  }
-  final relationship = account?.relationship.trim() ?? '';
-  if (relationship.isNotEmpty) {
-    return relationship;
-  }
-  final displayName = account?.displayName.trim() ?? '';
-  if (displayName.isNotEmpty && !_isGenericFamilyMemberName(displayName)) {
-    return displayName;
+String _familyMemberTitle(
+  FamilyMember member,
+  GuardianIdentityOptions? options,
+) {
+  final relationshipKey = member.relationshipKey.trim();
+  if (relationshipKey.isNotEmpty) {
+    final label = options?.labelForKey(relationshipKey) ?? '';
+    if (label.isNotEmpty) return label;
   }
   return member.name;
-}
-
-bool _isGenericFamilyMemberName(String value) {
-  return const {'家长', '家庭成员', '成员', '监护人'}.contains(value.trim());
 }
 
 Future<bool> _confirm(

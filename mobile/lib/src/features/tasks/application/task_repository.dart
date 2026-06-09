@@ -94,7 +94,7 @@ class TaskReminderResult {
 }
 
 class TaskRepository {
-  TaskRepository({required ApiClient apiClient}) : _apiClient = apiClient;
+  TaskRepository({required this._apiClient});
 
   final ApiClient _apiClient;
 

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
 import 'package:guardian_parent_app/src/features/tasks/presentation/tasks_screen.dart';
@@ -223,9 +224,12 @@ class _TaskHeroActions extends StatelessWidget {
     final canEditSchedule = _canEditSchedule(task);
     final canSendWrapUpReminder = _canSendWrapUpReminder(task);
     final canSendStartReminder = task.status == GuardianTaskStatus.delayed;
+    final profile = ref.watch(profileSummaryProvider).asData?.value;
+    final canManageTasks = profile?.can('manage_tasks') ?? false;
+    final canConfirmTasks = profile?.can('confirm_tasks') ?? false;
 
     final actions = <_HeroActionData>[];
-    if (task.status.awaitsParent) {
+    if (task.status.awaitsParent && canConfirmTasks) {
       actions
         ..add(
           _HeroActionData(
@@ -244,15 +248,17 @@ class _TaskHeroActions extends StatelessWidget {
           ),
         );
     } else if (task.status == GuardianTaskStatus.inProgress) {
-      actions.add(
-        _HeroActionData(
-          label: '标记任务完成',
-          icon: Icons.task_alt_outlined,
-          tone: _HeroActionTone.primary,
-          onTap: () => _completeTask(context, ref, task),
-        ),
-      );
-      if (canSendWrapUpReminder) {
+      if (canConfirmTasks) {
+        actions.add(
+          _HeroActionData(
+            label: '标记任务完成',
+            icon: Icons.task_alt_outlined,
+            tone: _HeroActionTone.primary,
+            onTap: () => _completeTask(context, ref, task),
+          ),
+        );
+      }
+      if (canManageTasks && canSendWrapUpReminder) {
         actions.add(
           _HeroActionData(
             label: '提醒收尾',
@@ -268,9 +274,9 @@ class _TaskHeroActions extends StatelessWidget {
           ),
         );
       }
-    } else if (canSendStartReminder) {
-      actions
-        ..add(
+    } else if (canSendStartReminder && (canManageTasks || canConfirmTasks)) {
+      if (canManageTasks) {
+        actions.add(
           _HeroActionData(
             label: '再提醒一次',
             icon: Icons.volume_up_outlined,
@@ -283,8 +289,10 @@ class _TaskHeroActions extends StatelessWidget {
               toast: '已发送温和提醒',
             ),
           ),
-        )
-        ..add(
+        );
+      }
+      if (canConfirmTasks) {
+        actions.add(
           _HeroActionData(
             label: '标记完成',
             icon: Icons.task_alt_outlined,
@@ -292,24 +300,24 @@ class _TaskHeroActions extends StatelessWidget {
             onTap: () => _completeTask(context, ref, task),
           ),
         );
-    } else if (canEditSchedule) {
-      actions
-        ..add(
-          _HeroActionData(
-            label: '编辑任务',
-            icon: Icons.edit_outlined,
-            tone: _HeroActionTone.secondary,
-            onTap: () => _editTask(context, ref, task),
-          ),
-        )
-        ..add(
-          _HeroActionData(
-            label: '取消任务',
-            icon: Icons.event_busy_outlined,
-            tone: _HeroActionTone.danger,
-            onTap: () => _cancelTask(context, ref, task),
-          ),
-        );
+      }
+    } else if (canEditSchedule && canManageTasks) {
+      actions.add(
+        _HeroActionData(
+          label: '编辑任务',
+          icon: Icons.edit_outlined,
+          tone: _HeroActionTone.secondary,
+          onTap: () => _editTask(context, ref, task),
+        ),
+      );
+      actions.add(
+        _HeroActionData(
+          label: '取消任务',
+          icon: Icons.event_busy_outlined,
+          tone: _HeroActionTone.danger,
+          onTap: () => _cancelTask(context, ref, task),
+        ),
+      );
     }
 
     if (actions.isEmpty) return const SizedBox.shrink();

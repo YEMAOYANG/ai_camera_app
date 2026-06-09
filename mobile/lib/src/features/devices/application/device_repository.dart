@@ -4,9 +4,7 @@ import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
 
 final deviceRepositoryProvider = Provider<DeviceRepository>((ref) {
-  return DeviceRepository(
-    apiClient: ref.watch(apiClientProvider),
-  );
+  return DeviceRepository(apiClient: ref.watch(apiClientProvider));
 });
 
 final devicesProvider = FutureProvider<List<GuardianDevice>>((ref) {
@@ -25,9 +23,7 @@ final deviceOverviewProvider = FutureProvider.family<DeviceOverview, String>((
 });
 
 class DeviceRepository {
-  const DeviceRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const DeviceRepository({required this._apiClient});
 
   final ApiClient _apiClient;
 

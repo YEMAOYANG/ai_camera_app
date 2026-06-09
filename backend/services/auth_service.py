@@ -8,6 +8,7 @@ from core.security import hash_value, new_token, now_ms
 from models.auth import AuthSession
 from repositories.auth_repository import AuthRepository
 from schemas.auth import family_payload, normalize_phone, session_payload, user_payload
+from schemas.profile import pending_join_payload
 from services.sms_provider import SmsProvider, UnavailableSmsProvider
 
 
@@ -92,7 +93,10 @@ class AuthService:
                 user_id=user["id"],
                 device_label=device["label"],
                 device_type=device["type"],
+                device_model=device["model"],
+                device_hardware=device["hardware"],
                 platform=device["platform"],
+                os_version=device["osVersion"],
                 app_version=device["appVersion"],
                 access_hash=hash_value(session.access_token),
                 refresh_hash=hash_value(session.refresh_token),
@@ -100,7 +104,19 @@ class AuthService:
                 refresh_expires_at=session.refresh_expires_at,
                 created_at=now,
             )
-            return self._session_payload(conn, user["id"], session)
+            return self._session_payload(
+                conn,
+                user["id"],
+                session,
+                pending_joins=[
+                    pending_join_payload(row)
+                    for row in self.repository.list_pending_family_invitations_by_phone(
+                        conn,
+                        normalized,
+                        now=now,
+                    )
+                ],
+            )
 
     def refresh(self, refresh_token: str, client_device: dict | None = None) -> dict:
         refresh_token = (refresh_token or "").strip()
@@ -120,7 +136,10 @@ class AuthService:
                 session_id=row["id"],
                 device_label=device["label"],
                 device_type=device["type"],
+                device_model=device["model"],
+                device_hardware=device["hardware"],
                 platform=device["platform"],
+                os_version=device["osVersion"],
                 app_version=device["appVersion"],
                 access_hash=hash_value(session.access_token),
                 refresh_hash=hash_value(session.refresh_token),
@@ -159,13 +178,21 @@ class AuthService:
             refresh_expires_at=now + self.refresh_token_seconds * 1000,
         )
 
-    def _session_payload(self, conn, user_id: str, session: AuthSession) -> dict:
+    def _session_payload(
+        self,
+        conn,
+        user_id: str,
+        session: AuthSession,
+        *,
+        pending_joins: list[dict] | None = None,
+    ) -> dict:
         user = self._user_payload(conn, user_id)
         return session_payload(
             user=user,
             family=self._family_payload(conn, user["familyId"]),
             session=session,
             access_token_seconds=self.access_token_seconds,
+            pending_joins=pending_joins,
         )
 
     def _user_payload(self, conn, user_id: str) -> dict:
@@ -191,6 +218,15 @@ class AuthService:
         raw = data if isinstance(data, dict) else {}
         platform = _clean(raw.get("platform")) or _clean(fallback.get("platform") if fallback else "")
         device_type = _clean(raw.get("type")) or _clean(fallback.get("device_type") if fallback else "")
+        device_model = _clean(raw.get("model")) or _clean(
+            fallback.get("device_model") if fallback else ""
+        )
+        device_hardware = _clean(raw.get("hardware")) or _clean(
+            fallback.get("device_hardware") if fallback else ""
+        )
+        os_version = _clean(raw.get("osVersion")) or _clean(
+            fallback.get("os_version") if fallback else ""
+        )
         label = _clean(raw.get("label")) or _clean(fallback.get("device_label") if fallback else "")
         app_version = _clean(raw.get("appVersion")) or _clean(
             fallback.get("app_version") if fallback else ""
@@ -205,7 +241,10 @@ class AuthService:
         return {
             "label": label[:80],
             "type": device_type[:40],
+            "model": device_model[:80],
+            "hardware": device_hardware[:80],
             "platform": platform[:40],
+            "osVersion": os_version[:40],
             "appVersion": app_version[:40],
         }
 

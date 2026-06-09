@@ -34,7 +34,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('家庭看护空间'), findsOneWidget);
-    expect(find.text('家长 · 138 **** 9696'), findsOneWidget);
+    expect(find.text('监护人A · 138 **** 9696'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('guardianPersona:guardian_default')),
       findsOneWidget,
@@ -86,7 +86,8 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.text('妈妈本人 · 138 **** 9696'), findsOneWidget);
+      expect(find.text('妈妈 · 138 **** 9696'), findsOneWidget);
+      expect(find.text('妈妈'), findsNothing);
       expect(
         find.byKey(const ValueKey('guardianPersonaAnimated:guardian_mom')),
         findsOneWidget,
@@ -123,7 +124,8 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.text('阿米爸爸 · 138 **** 9696'), findsOneWidget);
+      expect(find.text('爸爸 · 138 **** 9696'), findsOneWidget);
+      expect(find.text('爸爸'), findsNothing);
       expect(
         find.byKey(const ValueKey('guardianPersonaAnimated:guardian_dad')),
         findsOneWidget,
@@ -141,7 +143,9 @@ ProfileSummary _summary() {
     phone: '13812349696',
     relationship: '',
     relationshipKey: '',
+    role: 'admin',
     roleLabel: '管理员',
+    capabilities: _adminCapabilities,
     avatarPersona: '',
     memberCount: 4,
     deviceCount: 2,
@@ -164,11 +168,31 @@ AccountProfile _account(String relationship, {String displayName = '家长'}) {
     relationship: relationship,
     relationshipKey: _relationshipKeyForTest(relationship),
     role: 'admin',
+    roleLabel: '管理员',
+    capabilities: _adminCapabilities,
     avatarPersona: '',
     gender: '',
     ageGroup: '',
   );
 }
+
+const _adminCapabilities = [
+  'manage_family_members',
+  'manage_family_code',
+  'manage_devices',
+  'manage_privacy',
+  'manage_subscription',
+  'manage_child_profile',
+  'manage_child_settings',
+  'manage_emergency_contacts',
+  'manage_rewards',
+  'manage_tasks',
+  'confirm_tasks',
+  'view_live_care',
+  'view_reports',
+  'view_points_rewards',
+  'manage_account_security',
+];
 
 String _relationshipKeyForTest(String relationship) {
   return switch (relationship) {

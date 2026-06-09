@@ -3,21 +3,11 @@ PODS:
   - flutter_webrtc (1.4.0):
     - Flutter
     - WebRTC-SDK (= 144.7559.01)
-  - network_info_plus (0.0.1):
-    - Flutter
-  - permission_handler_apple (9.4.8):
-    - Flutter
-  - shared_preferences_foundation (0.0.1):
-    - Flutter
-    - FlutterMacOS
   - WebRTC-SDK (144.7559.01)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
-  - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
-  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -28,19 +18,10 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_webrtc:
     :path: ".symlinks/plugins/flutter_webrtc/ios"
-  network_info_plus:
-    :path: ".symlinks/plugins/network_info_plus/ios"
-  permission_handler_apple:
-    :path: ".symlinks/plugins/permission_handler_apple/ios"
-  shared_preferences_foundation:
-    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_webrtc: ec91d94b484ad49cf191ef93413f64a40ffd3b4c
-  network_info_plus: cf61925ab5205dce05a4f0895989afdb6aade5fc
-  permission_handler_apple: 92d754bbaa7361d436db2d6c3c1c2a0fdcec462e
-  shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   WebRTC-SDK: ab9b5319e458c2bfebdc92b3600740da35d5630d
 
 PODFILE CHECKSUM: 785c18dfa6deb3868bd422c292e2ccfbd8421a49

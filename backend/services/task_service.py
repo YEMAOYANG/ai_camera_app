@@ -19,11 +19,19 @@ from models.tasks import (
 from repositories.point_repository import PointRepository
 from repositories.profile_repository import ProfileRepository
 from repositories.task_repository import TaskRepository
+from schemas.profile import role_capabilities_from_option
 from schemas.tasks import task_event_payload, task_payload, validate_task_status, validate_task_type
 from services.auth_service import AuthService
 from services.camera_command_service import CameraCommandService
 from services.point_service import PointService
 from services.task_reminder_policy import build_task_reminder, normalize_task_reminder_phase
+
+
+FALLBACK_ROLE_CAPABILITIES = {
+    "admin": {"manage_tasks", "confirm_tasks"},
+    "guardian": {"manage_tasks", "confirm_tasks"},
+    "viewer": set(),
+}
 
 
 class TaskService:
@@ -105,6 +113,7 @@ class TaskService:
     def create_task(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_tasks")
             task = self._create_task_from_data(conn, context, data)
             self._add_event(
                 conn,
@@ -126,6 +135,7 @@ class TaskService:
             raise ApiError("too_many_tasks", "一次最多添加 30 个任务")
 
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_tasks")
             created = []
             for index, item in enumerate(items):
                 if not isinstance(item, dict):
@@ -264,6 +274,7 @@ class TaskService:
                 fields["scheduled_end"] = due_time
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_tasks")
             self._task_or_error(conn, context["family"]["id"], task_id)
             task = self.repository.update_task(
                 conn,
@@ -286,6 +297,7 @@ class TaskService:
         context = self._auth_context(access_token)
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
             if task["status"] not in (
                 *TASK_ACTIVE_SCHEDULED_STATUSES,
@@ -311,6 +323,7 @@ class TaskService:
         )
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
             child = self.profile_repository.get_child(
                 conn,
@@ -357,6 +370,7 @@ class TaskService:
         context = self._auth_context(access_token)
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "confirm_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
             evidence_summary = self._optional_text(data, "evidenceSummary")
             evidence = self._json_text(data.get("evidence"))
@@ -396,6 +410,7 @@ class TaskService:
         context = self._auth_context(access_token)
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "confirm_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
             if task["status"] not in (TASK_AWAITING_PARENT_CONFIRMATION, TASK_CONFIRMED):
                 raise ApiError("task_not_awaiting_confirmation", "任务还不能确认")
@@ -418,6 +433,7 @@ class TaskService:
         context = self._auth_context(access_token)
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "confirm_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
             if task["status"] != TASK_AWAITING_PARENT_CONFIRMATION:
                 raise ApiError("task_not_awaiting_confirmation", "任务还不能驳回")
@@ -543,6 +559,34 @@ class TaskService:
     def _ensure_child(self, conn, family_id: str, child_id: str) -> None:
         if not self.repository.child_exists(conn, family_id=family_id, child_id=child_id):
             raise ApiError("child_not_found", "孩子资料不存在", 404)
+
+    def _assert_capability(self, conn, context: dict, capability: str) -> None:
+        member = self.profile_repository.get_family_member_by_user(
+            conn,
+            family_id=context["family"]["id"],
+            user_id=context["user"]["id"],
+        )
+        if member is None:
+            member = self.profile_repository.ensure_owner_member(
+                conn,
+                family_id=context["family"]["id"],
+                user_id=context["user"]["id"],
+                name=context["user"].get("displayName") or "家长",
+                phone=context["user"].get("phone") or "",
+                now=now_ms(),
+            )
+        role = member["role"]
+        row = self.profile_repository.get_app_option_item(
+            conn,
+            catalog_key="family_role",
+            item_key=role,
+        )
+        capabilities = set(role_capabilities_from_option(row)) or FALLBACK_ROLE_CAPABILITIES.get(
+            role,
+            set(),
+        )
+        if capability not in capabilities:
+            raise ApiError("permission_denied", "当前身份不能进行此操作", 403)
 
     def _required_text(self, data: dict, key: str, message: str) -> str:
         value = self._optional_text(data, key)

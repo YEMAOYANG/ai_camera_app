@@ -9,8 +9,15 @@ from integrations.hardware.base import HardwareDeviceAdapter
 from integrations.hardware.disabled_adapter import DisabledHardwareDeviceAdapter
 from repositories.device_repository import DeviceRepository
 from schemas.devices import device_payload
+from schemas.profile import role_capabilities_from_option
 from services.camera_bridge_service import CameraBridgeService
 from services.auth_service import AuthService
+
+FALLBACK_ROLE_CAPABILITIES = {
+    "admin": ["manage_devices"],
+    "guardian": [],
+    "viewer": [],
+}
 
 
 class DeviceService:
@@ -48,6 +55,7 @@ class DeviceService:
             fields["location"] = self._optional_text(data, "location")
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_devices")
             self._device_or_error(conn, context["family"]["id"], device_id)
             device = self.repository.update_device(
                 conn,
@@ -63,6 +71,7 @@ class DeviceService:
         name = self._required_text(data, "name", "请输入设备名称")
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_devices")
             self._device_or_error(conn, context["family"]["id"], device_id)
             device = self.repository.update_device(
                 conn,
@@ -77,6 +86,7 @@ class DeviceService:
         context = self._auth_context(access_token)
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_devices")
             device = self._device_or_error(conn, context["family"]["id"], device_id)
             if device["status"] == "unbound":
                 return {"ok": True, "device": device_payload(device)}
@@ -110,6 +120,59 @@ class DeviceService:
         if device is None:
             raise ApiError("device_not_found", "设备不存在", 404)
         return device
+
+    def _assert_current_admin(self, conn, context: dict):
+        member = self.repository.get_family_member_by_user(
+            conn,
+            family_id=context["family"]["id"],
+            user_id=context["user"]["id"],
+        )
+        if member is None:
+            user = context["user"]
+            member = self.repository.ensure_owner_member(
+                conn,
+                family_id=context["family"]["id"],
+                user_id=user["id"],
+                name=user.get("displayName") or "家长",
+                phone=user.get("phone") or "",
+                now=now_ms(),
+            )
+        if member is None:
+            raise ApiError("member_not_found", "家庭成员不存在", 404)
+        if member["role"] != "admin":
+            raise ApiError("admin_required", "只有家庭管理员可以进行此操作", 403)
+        return member
+
+    def _assert_capability(self, conn, context: dict, capability: str):
+        member = self.repository.get_family_member_by_user(
+            conn,
+            family_id=context["family"]["id"],
+            user_id=context["user"]["id"],
+        )
+        if member is None:
+            user = context["user"]
+            member = self.repository.ensure_owner_member(
+                conn,
+                family_id=context["family"]["id"],
+                user_id=user["id"],
+                name=user.get("displayName") or "家长",
+                phone=user.get("phone") or "",
+                now=now_ms(),
+            )
+        if member is None:
+            raise ApiError("member_not_found", "家庭成员不存在", 404)
+        row = self.repository.get_app_option_item(
+            conn,
+            catalog_key="family_role",
+            item_key=member["role"],
+        )
+        capabilities = role_capabilities_from_option(row) or FALLBACK_ROLE_CAPABILITIES.get(
+            member["role"],
+            [],
+        )
+        if capability not in capabilities:
+            raise ApiError("permission_denied", "当前身份不能进行此操作", 403)
+        return member
 
     def _merge_status(self, hardware_status: dict, camera_status: dict) -> dict:
         if not camera_status:

@@ -11,6 +11,24 @@ import 'package:guardian_parent_app/src/core/storage/setup_store.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const _adminCapabilities = [
+  'manage_family_members',
+  'manage_family_code',
+  'manage_devices',
+  'manage_privacy',
+  'manage_subscription',
+  'manage_child_profile',
+  'manage_child_settings',
+  'manage_emergency_contacts',
+  'manage_rewards',
+  'manage_tasks',
+  'confirm_tasks',
+  'view_live_care',
+  'view_reports',
+  'view_points_rewards',
+  'manage_account_security',
+];
+
 void main() {
   testWidgets('renders the welcome onboarding slides', (tester) async {
     await _pumpApp(tester, preferences: const {});
@@ -77,6 +95,41 @@ void main() {
 
     expect(find.text('登录家庭看护空间'), findsNothing);
     expect(find.textContaining('需要你处理'), findsOneWidget);
+    expect(
+      tester.getSize(find.byKey(const ValueKey('bottomNavAddAction'))),
+      const Size(44, 44),
+    );
+  });
+
+  testWidgets('login after logout refreshes profile for the new account', (
+    tester,
+  ) async {
+    await _pumpApp(
+      tester,
+      preferences: const {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+      },
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await _loginSuccessfully(tester, phone: '13500008291');
+    await _openProfileTab(tester);
+    expect(find.text('妈妈 · 135 **** 8291'), findsOneWidget);
+
+    await tester.scrollUntilVisible(find.text('退出登录'), 420);
+    await tester.tap(find.text('退出登录'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('退出'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('登录家庭看护空间'), findsOneWidget);
+
+    await _loginSuccessfully(tester, phone: '13860439696');
+    await _openProfileTab(tester);
+
+    expect(find.text('爸爸 · 138 **** 9696'), findsOneWidget);
+    expect(find.text('妈妈 · 135 **** 8291'), findsNothing);
   });
 
   testWidgets('runs login then first setup flow into home', (tester) async {
@@ -140,7 +193,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 250));
 
     expect(find.text('请填写手机号'), findsOneWidget);
-    expect(find.text('请输入验证码'), findsOneWidget);
+    expect(find.text('请输入验证码'), findsWidgets);
     expect(find.text('请先同意用户协议和隐私政策'), findsOneWidget);
 
     await tester.enterText(find.byType(EditableText).at(0), '12345');
@@ -612,8 +665,11 @@ void main() {
   });
 }
 
-Future<void> _loginSuccessfully(WidgetTester tester) async {
-  await tester.enterText(find.byType(EditableText).at(0), '13800002026');
+Future<void> _loginSuccessfully(
+  WidgetTester tester, {
+  String phone = '13800002026',
+}) async {
+  await tester.enterText(find.byType(EditableText).at(0), phone);
   await tester.tap(find.text('获取验证码'));
   await tester.pump(const Duration(milliseconds: 250));
 
@@ -631,6 +687,11 @@ Future<void> _loginSuccessfully(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 120));
 
   await tester.pump(const Duration(seconds: 2));
+  await tester.pumpAndSettle();
+}
+
+Future<void> _openProfileTab(WidgetTester tester) async {
+  await tester.tap(find.text('我的').last);
   await tester.pumpAndSettle();
 }
 
@@ -819,8 +880,7 @@ Future<void> _pumpStateView(
 }
 
 class _FakeApiServer {
-  _FakeApiServer({required bool completedSetup})
-    : _completedSetup = completedSetup {
+  _FakeApiServer({required this._completedSetup}) {
     _tasks.addAll([
       _task(
         id: 'task_math_homework',
@@ -1355,6 +1415,7 @@ class _FakeApiServer {
   }
 
   Map<String, dynamic> _sessionPayload(String phone) {
+    _applyAccountPersona(phone);
     return {
       'ok': true,
       'tokens': {
@@ -1372,12 +1433,14 @@ class _FakeApiServer {
       'spaceTitle': '家庭看护空间',
       'familyId': 'family_test',
       'familyName': '林家的家庭空间',
-      'displayName': '林女士',
-      'phone': '13800002026',
+      'displayName': _relationshipKey == 'dad' ? '林先生' : '林女士',
+      'phone': _phone,
+      'role': 'admin',
       'roleLabel': '管理员',
       'relationship': _relationship,
       'relationshipKey': _relationshipKey,
       'avatarPersona': _relationshipKey == 'dad' ? 'father' : 'mother',
+      'capabilities': _adminCapabilities,
       'memberCount': 2,
       'deviceCount': 1,
       'pendingItemCount': _tasks
@@ -1404,21 +1467,25 @@ class _FakeApiServer {
   }
 
   Map<String, dynamic> _familyMember([Map<String, dynamic>? body]) {
+    final relationshipKey = _text(body?['relationshipKey'], _relationshipKey);
     return {
       'id': 'member_admin',
-      'name': _text(body?['name'], '家长'),
+      'name': _text(body?['name'], _identityLabelForKey(relationshipKey)),
+      'relationshipKey': relationshipKey,
       'phone': _text(body?['phone'], _phone),
       'role': _text(body?['role'], 'admin'),
       'status': _text(body?['status'], 'active'),
       'notifyEnabled': body?['notifyEnabled'] ?? true,
-      'userId': 'test_parent_13800002026',
+      'userId': 'test_parent_$_phone',
     };
   }
 
   Map<String, dynamic> _familyInvitation(Map<String, dynamic> body) {
+    final relationshipKey = _text(body['relationshipKey'], 'mom');
     return {
       'id': 'invite_test',
-      'name': _text(body['name'], '家庭成员'),
+      'name': _text(body['name'], _identityLabelForKey(relationshipKey)),
+      'relationshipKey': relationshipKey,
       'phone': _text(body['phone'], '13900002026'),
       'role': _text(body['role'], 'guardian'),
       'status': 'pending',
@@ -1514,9 +1581,17 @@ class _FakeApiServer {
         },
       ],
       'familyRoles': [
-        {'key': 'admin', 'label': '管理员', 'description': '可管理成员、设备和全部设置。'},
-        {'key': 'guardian', 'label': '监护人', 'description': '可查看看护状态并处理任务确认。'},
-        {'key': 'viewer', 'label': '临时查看者', 'description': '可接收必要提醒，不管理设置。'},
+        {'key': 'admin', 'label': '管理员', 'description': '可管理成员、设备和全部家庭设置。'},
+        {
+          'key': 'guardian',
+          'label': '监护人',
+          'description': '可维护孩子资料、任务、奖励和紧急联系人，不管理成员和设备。',
+        },
+        {
+          'key': 'viewer',
+          'label': '临时查看者',
+          'description': '可接收必要提醒和查看基础状态，不管理设置。',
+        },
       ],
     };
   }
@@ -1543,12 +1618,29 @@ class _FakeApiServer {
 
   Map<String, dynamic> _accountProfile() {
     return {
-      'displayName': '林女士',
+      'userId': 'test_parent_$_phone',
+      'displayName': _relationshipKey == 'dad' ? '林先生' : '林女士',
       'phone': _phone,
       'familyName': '林家的家庭空间',
       'relationship': _relationship,
       'relationshipKey': _relationshipKey,
+      'role': 'admin',
+      'roleLabel': '管理员',
+      'capabilities': _adminCapabilities,
     };
+  }
+
+  void _applyAccountPersona(String phone) {
+    _phone = phone;
+    if (phone == '13860439696') {
+      _relationship = '爸爸';
+      _relationshipKey = 'dad';
+      return;
+    }
+    if (phone.endsWith('8291')) {
+      _relationship = '妈妈';
+      _relationshipKey = 'mom';
+    }
   }
 
   Map<String, dynamic> _accountSecurity() {
@@ -1571,6 +1663,34 @@ class _FakeApiServer {
         },
       ],
     };
+  }
+
+  String _identityLabelForKey(String key) {
+    switch (key) {
+      case 'mom':
+        return '妈妈';
+      case 'dad':
+        return '爸爸';
+      case 'maternal_grandpa':
+        return '外公';
+      case 'maternal_grandma':
+        return '外婆';
+      case 'grandpa':
+        return '爷爷';
+      case 'grandma':
+        return '奶奶';
+      case 'aunt':
+        return '阿姨';
+      case 'uncle':
+        return '叔叔';
+      case 'paternal_aunt':
+        return '姑姑';
+      case 'maternal_uncle':
+        return '舅舅';
+      case 'family_default':
+        return '其他家人';
+    }
+    return '家庭成员';
   }
 
   Map<String, dynamic> _setting(String key, [Map<String, dynamic>? body]) {

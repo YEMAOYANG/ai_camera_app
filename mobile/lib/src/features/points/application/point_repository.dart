@@ -4,9 +4,7 @@ import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/features/points/domain/point_models.dart';
 
 final pointRepositoryProvider = Provider<PointRepository>((ref) {
-  return PointRepository(
-    apiClient: ref.watch(apiClientProvider),
-  );
+  return PointRepository(apiClient: ref.watch(apiClientProvider));
 });
 
 final pointsSummaryProvider = FutureProvider<PointsSummary>((ref) async {
@@ -24,9 +22,7 @@ class PointException implements Exception {
 }
 
 class PointRepository {
-  PointRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  PointRepository({required this._apiClient});
 
   final ApiClient _apiClient;
 

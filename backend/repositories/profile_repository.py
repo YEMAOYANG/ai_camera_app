@@ -26,6 +26,26 @@ class ProfileRepository:
     def get_family(self, conn: DatabaseConnection, family_id: str) -> DatabaseRow | None:
         return conn.execute("SELECT * FROM families WHERE id = ?", (family_id,)).fetchone()
 
+    def get_family_by_code(self, conn: DatabaseConnection, family_code: str) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT * FROM families WHERE family_code = ?",
+            (family_code,),
+        ).fetchone()
+
+    def update_family_code(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        family_code: str,
+        now: int,
+    ) -> DatabaseRow | None:
+        conn.execute(
+            "UPDATE families SET family_code = ?, family_code_updated_at = ? WHERE id = ?",
+            (family_code, now, family_id),
+        )
+        return self.get_family(conn, family_id)
+
     def list_app_option_items(
         self,
         conn: DatabaseConnection,
@@ -43,6 +63,23 @@ class ProfileRepository:
                 (catalog_key,),
             ).fetchall()
         )
+
+    def get_app_option_item(
+        self,
+        conn: DatabaseConnection,
+        *,
+        catalog_key: str,
+        item_key: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT *
+            FROM app_option_items
+            WHERE catalog_key = ? AND item_key = ? AND enabled = 1
+            LIMIT 1
+            """,
+            (catalog_key, item_key),
+        ).fetchone()
 
     def get_parent_identity(
         self,
@@ -64,6 +101,16 @@ class ProfileRepository:
     ) -> DatabaseRow:
         if display_name is not None:
             conn.execute("UPDATE users SET display_name = ? WHERE id = ?", (display_name, user_id))
+        return self.get_user(conn, user_id)
+
+    def update_user_family(
+        self,
+        conn: DatabaseConnection,
+        *,
+        user_id: str,
+        family_id: str,
+    ) -> DatabaseRow:
+        conn.execute("UPDATE users SET family_id = ? WHERE id = ?", (family_id, user_id))
         return self.get_user(conn, user_id)
 
     def update_user_phone(
@@ -233,6 +280,7 @@ class ProfileRepository:
         family_id: str,
         user_id: str,
         name: str,
+        relationship_key: str | None = None,
         phone: str,
         now: int,
     ) -> DatabaseRow:
@@ -248,22 +296,32 @@ class ProfileRepository:
             conn.execute(
                 """
                 UPDATE family_members
-                SET name = ?, phone = ?, updated_at = ?
+                SET name = ?, relationship_key = COALESCE(?, relationship_key),
+                    phone = ?, updated_at = ?
                 WHERE id = ?
                 """,
-                (name or row["name"], phone, now, row["id"]),
+                (name or row["name"], relationship_key, phone, now, row["id"]),
             )
             return self.get_family_member(conn, family_id=family_id, member_id=row["id"])
         member_id = f"member_{uuid.uuid4().hex}"
         conn.execute(
             """
             INSERT INTO family_members(
-              id, family_id, user_id, name, phone, role, status,
+              id, family_id, user_id, name, relationship_key, phone, role, status,
               notify_enabled, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, 'admin', 'active', 1, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, 'admin', 'active', 1, ?, ?)
             """,
-            (member_id, family_id, user_id, name or "家长", phone, now, now),
+            (
+                member_id,
+                family_id,
+                user_id,
+                name or "家长",
+                relationship_key,
+                phone,
+                now,
+                now,
+            ),
         )
         return self.get_family_member(conn, family_id=family_id, member_id=member_id)
 
@@ -303,12 +361,102 @@ class ProfileRepository:
             (family_id, member_id),
         ).fetchone()
 
+    def get_family_member_by_user(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        user_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT * FROM family_members
+            WHERE family_id = ? AND user_id = ?
+            LIMIT 1
+            """,
+            (family_id, user_id),
+        ).fetchone()
+
+    def get_family_member_by_phone(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        phone: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT * FROM family_members
+            WHERE family_id = ? AND phone = ?
+            LIMIT 1
+            """,
+            (family_id, phone),
+        ).fetchone()
+
+    def upsert_joined_family_member(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        user_id: str,
+        name: str,
+        relationship_key: str | None,
+        phone: str,
+        role: str,
+        now: int,
+    ) -> DatabaseRow:
+        member = self.get_family_member_by_user(conn, family_id=family_id, user_id=user_id)
+        if member is None and phone:
+            member = self.get_family_member_by_phone(conn, family_id=family_id, phone=phone)
+        if member:
+            conn.execute(
+                """
+                UPDATE family_members
+                SET user_id = ?, name = ?, relationship_key = ?, phone = ?, role = ?, status = 'active',
+                    notify_enabled = 1, updated_at = ?
+                WHERE id = ?
+                """,
+                (
+                    user_id,
+                    name or member["name"],
+                    relationship_key or member.get("relationship_key"),
+                    phone,
+                    role,
+                    now,
+                    member["id"],
+                ),
+            )
+            return self.get_family_member(conn, family_id=family_id, member_id=member["id"])
+        member_id = f"member_{uuid.uuid4().hex}"
+        conn.execute(
+            """
+            INSERT INTO family_members(
+              id, family_id, user_id, name, relationship_key, phone, role, status,
+              notify_enabled, created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'active', 1, ?, ?)
+            """,
+            (
+                member_id,
+                family_id,
+                user_id,
+                name or "家庭成员",
+                relationship_key,
+                phone,
+                role,
+                now,
+                now,
+            ),
+        )
+        return self.get_family_member(conn, family_id=family_id, member_id=member_id)
+
     def create_family_member(
         self,
         conn: DatabaseConnection,
         *,
         family_id: str,
         name: str,
+        relationship_key: str | None,
         phone: str | None,
         role: str,
         status: str,
@@ -319,12 +467,23 @@ class ProfileRepository:
         conn.execute(
             """
             INSERT INTO family_members(
-              id, family_id, user_id, name, phone, role, status,
+              id, family_id, user_id, name, relationship_key, phone, role, status,
               notify_enabled, created_at, updated_at
             )
-            VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (member_id, family_id, name, phone, role, status, int(notify_enabled), now, now),
+            (
+                member_id,
+                family_id,
+                name,
+                relationship_key,
+                phone,
+                role,
+                status,
+                int(notify_enabled),
+                now,
+                now,
+            ),
         )
         return self.get_family_member(conn, family_id=family_id, member_id=member_id)
 
@@ -373,6 +532,14 @@ class ProfileRepository:
                 """
                 SELECT * FROM family_invitations
                 WHERE family_id = ? AND status = 'pending'
+                  AND NOT EXISTS (
+                    SELECT 1
+                    FROM family_members fm
+                    WHERE fm.family_id = family_invitations.family_id
+                      AND fm.phone = family_invitations.phone
+                      AND fm.status = 'active'
+                      AND fm.user_id IS NOT NULL
+                  )
                 ORDER BY created_at DESC
                 """,
                 (family_id,),
@@ -391,12 +558,55 @@ class ProfileRepository:
             (family_id, invitation_id),
         ).fetchone()
 
+    def get_family_invitation_for_phone(
+        self,
+        conn: DatabaseConnection,
+        *,
+        invitation_id: str,
+        phone: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT fi.*, f.name AS family_name, role_item.label AS role_label
+            FROM family_invitations fi
+            JOIN families f ON f.id = fi.family_id
+            LEFT JOIN app_option_items role_item
+              ON role_item.catalog_key = 'family_role'
+             AND role_item.item_key = fi.role
+             AND role_item.enabled = 1
+            WHERE fi.id = ? AND fi.phone = ?
+            LIMIT 1
+            """,
+            (invitation_id, phone),
+        ).fetchone()
+
+    def get_accepted_family_invitation_by_user(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        user_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT *
+            FROM family_invitations
+            WHERE family_id = ?
+              AND accepted_by = ?
+              AND status = 'accepted'
+            ORDER BY COALESCE(accepted_at, updated_at, created_at) DESC
+            LIMIT 1
+            """,
+            (family_id, user_id),
+        ).fetchone()
+
     def create_family_invitation(
         self,
         conn: DatabaseConnection,
         *,
         family_id: str,
         name: str,
+        relationship_key: str | None,
         phone: str,
         role: str,
         created_by: str,
@@ -407,12 +617,25 @@ class ProfileRepository:
         conn.execute(
             """
             INSERT INTO family_invitations(
-              id, family_id, name, phone, role, status, created_by,
-              created_at, updated_at, expires_at
+              id, family_id, name, relationship_key, phone, role, status, created_by,
+              created_at, updated_at, expires_at, delivery_status, delivery_message
             )
-            VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)
             """,
-            (invitation_id, family_id, name, phone, role, created_by, now, now, expires_at),
+            (
+                invitation_id,
+                family_id,
+                name,
+                relationship_key,
+                phone,
+                role,
+                created_by,
+                now,
+                now,
+                expires_at,
+                "not_configured",
+                "邀请已保存。短信邀请暂未接入，请让对方使用该手机号登录后接受邀请。",
+            ),
         )
         return self.get_family_invitation(
             conn,
@@ -445,6 +668,68 @@ class ProfileRepository:
             family_id=family_id,
             invitation_id=invitation_id,
         )
+
+    def update_family_invitation_by_id(
+        self,
+        conn: DatabaseConnection,
+        *,
+        invitation_id: str,
+        fields: dict,
+        now: int,
+    ) -> DatabaseRow | None:
+        if fields:
+            assignments = [f"{column} = ?" for column in fields]
+            values = list(fields.values()) + [now, invitation_id]
+            conn.execute(
+                f"""
+                UPDATE family_invitations
+                SET {', '.join(assignments)}, updated_at = ?
+                WHERE id = ?
+                """,
+                values,
+            )
+        return conn.execute(
+            "SELECT * FROM family_invitations WHERE id = ?",
+            (invitation_id,),
+        ).fetchone()
+
+    def setup_completed(self, conn: DatabaseConnection, *, family_id: str) -> bool:
+        row = conn.execute(
+            "SELECT completed FROM setup_progress WHERE family_id = ?",
+            (family_id,),
+        ).fetchone()
+        return bool(row and row["completed"])
+
+    def cleanup_orphan_family(self, conn: DatabaseConnection, *, family_id: str) -> None:
+        user_count = conn.execute(
+            "SELECT COUNT(*) AS count FROM users WHERE family_id = ?",
+            (family_id,),
+        ).fetchone()
+        if int(user_count["count"] or 0) > 0:
+            return
+        for table in (
+            "setup_progress",
+            "parent_identities",
+            "family_members",
+            "family_invitations",
+            "emergency_contacts",
+            "wifi_configs",
+            "devices",
+            "children",
+            "app_settings",
+            "feedback_items",
+            "tasks",
+            "task_events",
+            "point_accounts",
+            "point_ledger",
+            "reward_items",
+            "reward_redemptions",
+            "camera_commands",
+            "firmware_jobs",
+            "account_deletion_requests",
+        ):
+            conn.execute(f"DELETE FROM {table} WHERE family_id = ?", (family_id,))
+        conn.execute("DELETE FROM families WHERE id = ?", (family_id,))
 
     def list_children(self, conn: DatabaseConnection, *, family_id: str) -> list[DatabaseRow]:
         return list(

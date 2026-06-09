@@ -26,6 +26,10 @@ final familyInvitationsProvider = FutureProvider<List<FamilyInvitation>>((ref) {
   return ref.watch(profileRepositoryProvider).familyInvitations();
 });
 
+final familyCodeProvider = FutureProvider<FamilyCodeInfo>((ref) {
+  return ref.watch(profileRepositoryProvider).familyCode();
+});
+
 final currentChildProvider = FutureProvider<ChildProfile?>((ref) {
   return ref.watch(profileRepositoryProvider).currentChild();
 });
@@ -86,8 +90,7 @@ final legalDocumentProvider = FutureProvider.family<LegalDocumentData, String>((
 });
 
 class ProfileRepository {
-  const ProfileRepository({required ApiClient apiClient})
-    : _apiClient = apiClient;
+  const ProfileRepository({required this._apiClient});
 
   final ApiClient _apiClient;
 
@@ -119,10 +122,16 @@ class ProfileRepository {
 
   Future<FamilyInvitation> sendFamilyInvitation({
     required String name,
+    required String relationshipKey,
     required String phone,
     required String role,
   }) async {
-    final body = {'name': name, 'phone': phone, 'role': role};
+    final body = {
+      'name': name,
+      'relationshipKey': relationshipKey,
+      'phone': phone,
+      'role': role,
+    };
     final response = await _post('/family/invitations', data: body);
     return FamilyInvitation.fromJson(
       _asMap(_asMap(response.data)['invitation']),
@@ -140,9 +149,40 @@ class ProfileRepository {
     await _post('/family/invitations/$id/cancel');
   }
 
+  Future<void> acceptFamilyInvitation(String id) async {
+    await _post('/family/invitations/$id/accept');
+  }
+
+  Future<void> declineFamilyInvitation(String id) async {
+    await _post('/family/invitations/$id/decline');
+  }
+
+  Future<FamilyCodeInfo> familyCode() async {
+    final response = await _get('/family/code');
+    return FamilyCodeInfo.fromJson(_asMap(_asMap(response.data)['familyCode']));
+  }
+
+  Future<FamilyCodeInfo> resetFamilyCode() async {
+    final response = await _post('/family/code/reset');
+    return FamilyCodeInfo.fromJson(_asMap(_asMap(response.data)['familyCode']));
+  }
+
+  Future<FamilyCodePreview> previewJoinCode(String familyCode) async {
+    final response = await _post(
+      '/family/join-code/preview',
+      data: {'familyCode': familyCode},
+    );
+    return FamilyCodePreview.fromJson(_asMap(_asMap(response.data)['preview']));
+  }
+
+  Future<void> acceptJoinCode(String familyCode) async {
+    await _post('/family/join-code/accept', data: {'familyCode': familyCode});
+  }
+
   Future<FamilyMember> saveFamilyMember({
     String? id,
     required String name,
+    required String relationshipKey,
     required String phone,
     required String role,
     String status = 'active',
@@ -150,6 +190,7 @@ class ProfileRepository {
   }) async {
     final body = {
       'name': name,
+      'relationshipKey': relationshipKey,
       'phone': phone,
       'role': role,
       'status': status,
@@ -163,6 +204,13 @@ class ProfileRepository {
 
   Future<void> deleteFamilyMember(String id) async {
     await _delete('/family/members/$id');
+  }
+
+  Future<List<FamilyMember>> transferFamilyAdmin(String memberId) async {
+    final response = await _post('/family/members/$memberId/transfer-admin');
+    final raw = _asMap(response.data)['members'];
+    if (raw is! List) return const [];
+    return raw.map((item) => FamilyMember.fromJson(_asMap(item))).toList();
   }
 
   Future<ChildProfile?> currentChild() async {

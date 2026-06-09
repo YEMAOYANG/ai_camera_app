@@ -48,6 +48,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
   Widget build(BuildContext context) {
     final points = ref.watch(pointsSummaryProvider);
     final profileSummary = ref.watch(profileSummaryProvider);
+    final canManageTasks =
+        profileSummary.asData?.value.can('manage_tasks') ?? false;
     final child = profileSummary.asData?.value.child;
     final childAgeGroup = taskAgeGroupForChild(
       stage: child == null
@@ -94,14 +96,20 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               return _TaskEmptyState(
                 selectedDate: _selectedDate,
                 weekIsEmpty: tasks.isEmpty,
-                onCreate: () =>
-                    _openCreateSheet(childId, childAgeGroup: childAgeGroup),
-                onTemplate: () => _openCreateSheet(
-                  childId,
-                  childAgeGroup: childAgeGroup,
-                  initialMode: TaskEntryMode.day,
-                  showTemplatePicker: true,
-                ),
+                onCreate: canManageTasks
+                    ? () => _openCreateSheet(
+                        childId,
+                        childAgeGroup: childAgeGroup,
+                      )
+                    : null,
+                onTemplate: canManageTasks
+                    ? () => _openCreateSheet(
+                        childId,
+                        childAgeGroup: childAgeGroup,
+                        initialMode: TaskEntryMode.day,
+                        showTemplatePicker: true,
+                      )
+                    : null,
               );
             }
             return _GroupedTaskList(
@@ -159,6 +167,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     TaskEntryMode initialMode = TaskEntryMode.single,
     bool showTemplatePicker = false,
   }) async {
+    final canManageTasks =
+        ref.read(profileSummaryProvider).asData?.value.can('manage_tasks') ??
+        false;
+    if (!canManageTasks) {
+      _showToast(context, '当前身份不能新增任务');
+      return;
+    }
     final fallbackChildId = childId ?? _firstKnownChildId();
     if (fallbackChildId == null || fallbackChildId.isEmpty) {
       _showToast(context, '请先完成孩子资料，再添加孩子的新任务。');
@@ -813,8 +828,8 @@ class _TaskEmptyState extends StatelessWidget {
 
   final DateTime selectedDate;
   final bool weekIsEmpty;
-  final VoidCallback onCreate;
-  final VoidCallback onTemplate;
+  final VoidCallback? onCreate;
+  final VoidCallback? onTemplate;
 
   @override
   Widget build(BuildContext context) {
@@ -825,15 +840,20 @@ class _TaskEmptyState extends StatelessWidget {
         : isToday
         ? '今天没有任务'
         : '${_dateShort(selectedDate)}没有任务';
-    final message = isPast ? '这一天没有安排记录。' : '添加一个任务，帮孩子把安排记清楚。';
+    final canCreate = onCreate != null;
+    final message = isPast
+        ? '这一天没有安排记录。'
+        : canCreate
+        ? '添加一个任务，帮孩子把安排记清楚。'
+        : '当前身份可以查看任务安排，新增和编辑由管理员处理。';
 
     return AppStateView(
       variant: AppStateVariant.emptyTasks,
       title: title,
       message: message,
-      primaryActionLabel: isPast ? null : '添加孩子的新任务',
+      primaryActionLabel: isPast || !canCreate ? null : '添加孩子的新任务',
       onPrimaryAction: isPast ? null : onCreate,
-      secondaryActionLabel: isPast ? null : '从模板添加',
+      secondaryActionLabel: isPast || onTemplate == null ? null : '从模板添加',
       onSecondaryAction: isPast ? null : onTemplate,
     );
   }

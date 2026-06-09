@@ -3,7 +3,7 @@ from __future__ import annotations
 from flask import Blueprint, current_app, jsonify, request
 
 from core.errors import ApiError, error_response
-from schemas.auth import bearer_token, json_body
+from schemas.auth import bearer_token, client_device_payload, json_body
 from services.service_factory import auth_service
 
 
@@ -47,7 +47,7 @@ def login_with_sms():
             auth_service().login_with_sms(
                 data.get("phone", ""),
                 data.get("code", ""),
-                data.get("clientDevice"),
+                client_device_payload(request, data),
             )
         )
     except ApiError as exc:
@@ -58,7 +58,12 @@ def login_with_sms():
 def refresh_token():
     data = json_body(request)
     try:
-        return jsonify(auth_service().refresh(data.get("refreshToken", ""), data.get("clientDevice")))
+        return jsonify(
+            auth_service().refresh(
+                data.get("refreshToken", ""),
+                client_device_payload(request, data),
+            )
+        )
     except ApiError as exc:
         return error_response(exc)
 

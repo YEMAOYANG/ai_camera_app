@@ -47,11 +47,7 @@ final liveCareStatusProvider = FutureProvider<LiveCareStatus>((ref) async {
 });
 
 class CameraRepository {
-  const CameraRepository({
-    required ApiClient apiClient,
-    required Dio dio,
-  }) : _apiClient = apiClient,
-       _dio = dio;
+  const CameraRepository({required this._apiClient, required this._dio});
 
   final ApiClient _apiClient;
   final Dio _dio;

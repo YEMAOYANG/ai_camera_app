@@ -1,16 +1,27 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/platform/client_device_info.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
 
 final rawDioProvider = Provider<Dio>((ref) {
-  return _buildDio(ref.watch(appEnvironmentProvider));
+  final dio = _buildDio(ref.watch(appEnvironmentProvider));
+  dio.interceptors.add(
+    ClientDeviceHeaderInterceptor(
+      loadDeviceInfo: () => ref.read(clientDeviceInfoProvider.future),
+    ),
+  );
+  return dio;
 });
 
 final dioProvider = Provider<Dio>((ref) {
   final environment = ref.watch(appEnvironmentProvider);
   final dio = _buildDio(environment);
+  dio.interceptors.add(
+    ClientDeviceHeaderInterceptor(
+      loadDeviceInfo: () => ref.read(clientDeviceInfoProvider.future),
+    ),
+  );
   dio.interceptors.add(
     AuthTokenInterceptor(
       sessionStore: ref.watch(authSessionStoreProvider),
@@ -62,14 +73,32 @@ class ApiClient {
   }
 }
 
+class ClientDeviceHeaderInterceptor extends Interceptor {
+  ClientDeviceHeaderInterceptor({required this._loadDeviceInfo});
+
+  final Future<ClientDeviceInfo> Function() _loadDeviceInfo;
+
+  @override
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    try {
+      final info = await _loadDeviceInfo();
+      options.headers.addAll(info.headers);
+    } catch (_) {
+      // Device headers are useful for account security, but should not block API calls.
+    }
+    handler.next(options);
+  }
+}
+
 class AuthTokenInterceptor extends Interceptor {
   AuthTokenInterceptor({
-    required AuthSessionStore sessionStore,
-    required Dio refreshDio,
-    required Dio dio,
-  }) : _sessionStore = sessionStore,
-       _refreshDio = refreshDio,
-       _dio = dio;
+    required this._sessionStore,
+    required this._refreshDio,
+    required this._dio,
+  });
 
   final AuthSessionStore _sessionStore;
   final Dio _refreshDio;
@@ -88,14 +117,22 @@ class AuthTokenInterceptor extends Interceptor {
         handler.next(options);
         return;
       }
+      if (_isPublicPath(options.path)) {
+        handler.next(options);
+        return;
+      }
 
       final session = await _sessionForRequest();
-      if (session?.accessToken.isNotEmpty ?? false) {
-        options.headers['Authorization'] = 'Bearer ${session!.accessToken}';
+      if (session == null) {
+        _rejectMissingSession(options, handler);
+        return;
+      }
+      if (session.accessToken.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer ${session.accessToken}';
       }
       handler.next(options);
     } catch (_) {
-      handler.next(options);
+      _rejectMissingSession(options, handler);
     }
   }
 
@@ -158,10 +195,7 @@ class AuthTokenInterceptor extends Interceptor {
     try {
       final response = await _refreshDio.post<dynamic>(
         '/auth/token/refresh',
-        data: {
-          'refreshToken': session.refreshToken,
-          'clientDevice': _clientDevicePayload(),
-        },
+        data: {'refreshToken': session.refreshToken},
       );
       final refreshed = _parseRemoteSession(response.data);
       await _sessionStore.save(refreshed);
@@ -191,26 +225,27 @@ class AuthTokenInterceptor extends Interceptor {
         path.startsWith('/auth/token/refresh') ||
         path.startsWith('/auth/logout');
   }
-}
 
-Map<String, String> _clientDevicePayload() {
-  final platform = defaultTargetPlatform.name.toLowerCase();
-  final isPhone =
-      defaultTargetPlatform == TargetPlatform.iOS ||
-      defaultTargetPlatform == TargetPlatform.android;
-  final label = switch (defaultTargetPlatform) {
-    TargetPlatform.iOS => '本机 iPhone',
-    TargetPlatform.android => 'Android 手机',
-    TargetPlatform.macOS => 'Mac 设备',
-    TargetPlatform.windows => 'Windows 设备',
-    TargetPlatform.linux => 'Linux 设备',
-    TargetPlatform.fuchsia => '已登录设备',
-  };
-  return {
-    'label': label,
-    'type': isPhone ? 'phone' : 'desktop',
-    'platform': platform,
-  };
+  bool _isPublicPath(String path) {
+    return path.startsWith('/legal/') || path.startsWith('/app/about');
+  }
+
+  void _rejectMissingSession(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) {
+    handler.reject(
+      DioException(
+        requestOptions: options,
+        response: Response<dynamic>(
+          requestOptions: options,
+          statusCode: 401,
+          data: const {'error': 'auth_session_missing', 'message': '请先登录'},
+        ),
+        type: DioExceptionType.badResponse,
+      ),
+    );
+  }
 }
 
 Map<String, dynamic> _asMap(dynamic value) {

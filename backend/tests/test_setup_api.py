@@ -154,7 +154,7 @@ class SetupApiTest(unittest.TestCase):
         self.assertTrue(status.json["setup"]["completed"])
         self.assertEqual(status.json["setup"]["nextStep"], "home")
 
-    def test_setup_contacts_reject_duplicate_unique_guardian_identity(self):
+    def test_setup_contacts_allow_parent_identity_and_reject_contact_duplicates(self):
         access_token = self._login("13800003026")
 
         parent = self.client.post(
@@ -177,8 +177,7 @@ class SetupApiTest(unittest.TestCase):
             },
             headers=self._auth_headers(access_token),
         )
-        self.assertEqual(duplicate_parent.status_code, 400)
-        self.assertEqual(duplicate_parent.json["error"], "duplicate_guardian_identity")
+        self.assertEqual(duplicate_parent.status_code, 200)
 
         duplicate_contacts = self.client.post(
             "/api/setup/contacts",

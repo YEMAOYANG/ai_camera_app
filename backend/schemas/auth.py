@@ -28,6 +28,27 @@ def bearer_token(request: Request) -> str:
     return value[len(prefix) :].strip() if value.startswith(prefix) else ""
 
 
+def client_device_payload(request: Request, data: dict | None = None) -> dict:
+    body_device = (data or {}).get("clientDevice") if isinstance(data, dict) else None
+    body = body_device if isinstance(body_device, dict) else {}
+    mapping = {
+        "label": "X-Mira-Device-Label",
+        "type": "X-Mira-Device-Type",
+        "platform": "X-Mira-Device-Platform",
+        "model": "X-Mira-Device-Model",
+        "hardware": "X-Mira-Device-Hardware",
+        "osVersion": "X-Mira-OS-Version",
+        "appVersion": "X-Mira-App-Version",
+    }
+    payload: dict[str, str] = {}
+    for key, header in mapping.items():
+        value = request.headers.get(header) or body.get(key)
+        value = str(value or "").strip()
+        if value:
+            payload[key] = value
+    return payload
+
+
 def user_payload(row: DatabaseRow) -> dict:
     return {
         "id": row["id"],
@@ -38,7 +59,11 @@ def user_payload(row: DatabaseRow) -> dict:
 
 
 def family_payload(row: DatabaseRow) -> dict:
-    return {"id": row["id"], "name": row["name"]}
+    return {
+        "id": row["id"],
+        "name": row["name"],
+        "familyCode": row.get("family_code") or "",
+    }
 
 
 def session_payload(
@@ -47,8 +72,9 @@ def session_payload(
     family: dict,
     session: AuthSession,
     access_token_seconds: int,
+    pending_joins: list[dict] | None = None,
 ) -> dict:
-    return {
+    payload = {
         "ok": True,
         "user": user,
         "family": family,
@@ -60,3 +86,6 @@ def session_payload(
             "expiresInSeconds": access_token_seconds,
         },
     }
+    if pending_joins:
+        payload["pendingJoins"] = pending_joins
+    return payload

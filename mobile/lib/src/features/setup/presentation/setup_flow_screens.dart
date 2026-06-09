@@ -4,14 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/platform/contact_picker.dart';
 import 'package:guardian_parent_app/src/core/platform/native_date_picker.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
+import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
+import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
 import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
 import 'package:guardian_parent_app/src/features/setup/application/wifi_network_repository.dart';
 import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
 import 'package:guardian_parent_app/src/shared/widgets/adaptive_select_field.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/guardian_identity_card_selector.dart';
 
 final setupDraftProvider = StateProvider<SetupDraft>((ref) {
@@ -47,6 +54,18 @@ void syncSetupDraftFromStatus(WidgetRef ref, SetupStatus status) {
 String? _nonEmptyOrNull(String value) {
   final trimmed = value.trim();
   return trimmed.isEmpty ? null : trimmed;
+}
+
+String _setupCollaborationDetail(SetupDraft draft, String roleLabel) {
+  final identityParts = [
+    draft.parentName.trim(),
+    roleLabel.trim(),
+  ].where((part) => part.isNotEmpty).toList();
+  final identity = identityParts.isEmpty ? '家庭成员' : identityParts.join(' · ');
+  final childPrefix = draft.childName.trim().isEmpty
+      ? ''
+      : '${draft.childName.trim()} 的';
+  return '$identity，$childPrefix任务确认会进入家长端。';
 }
 
 class SetupDraft {
@@ -235,6 +254,10 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
               );
             },
           ),
+          const SizedBox(height: 14),
+          _JoinFamilyCodeBanner(
+            onTap: () => _showJoinFamilyCodeSheet(context, ref),
+          ),
         ],
       ),
       primaryLabel: '继续绑定设备',
@@ -256,6 +279,276 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
                 context.go(setupDevicePath);
               }
             },
+    );
+  }
+}
+
+Future<void> _showJoinFamilyCodeSheet(
+  BuildContext context,
+  WidgetRef ref,
+) async {
+  final accepted = await showAppBottomSheet<bool>(
+    context: context,
+    maxHeightFactor: 0.58,
+    child: _JoinFamilyCodeSheet(
+      onPreview: (code) =>
+          ref.read(profileRepositoryProvider).previewJoinCode(code),
+      onAccept: (code) =>
+          ref.read(profileRepositoryProvider).acceptJoinCode(code),
+    ),
+  );
+  if (accepted != true || !context.mounted) return;
+
+  try {
+    final status = await ref.read(setupRepositoryProvider).status();
+    if (!context.mounted) return;
+    syncSetupDraftFromStatus(ref, status);
+    ref.invalidate(profileSummaryProvider);
+    ref.invalidate(accountProfileProvider);
+    ref.invalidate(familyMembersProvider);
+    context.go(status.routePath);
+  } on SetupException catch (error) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(error.message)));
+  }
+}
+
+class _JoinFamilyCodeBanner extends StatelessWidget {
+  const _JoinFamilyCodeBanner({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.brandWash.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(AppRadii.card),
+          border: Border.all(color: AppColors.brand.withValues(alpha: 0.12)),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              Icon(Icons.tag_outlined, color: AppColors.brand, size: 18),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '已有家庭号？输入后可直接加入家庭',
+                  style: TextStyle(
+                    color: AppColors.ink,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    height: 1.35,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right, color: AppColors.brand, size: 18),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _JoinFamilyCodeSheet extends StatefulWidget {
+  const _JoinFamilyCodeSheet({required this.onPreview, required this.onAccept});
+
+  final Future<FamilyCodePreview> Function(String code) onPreview;
+  final Future<void> Function(String code) onAccept;
+
+  @override
+  State<_JoinFamilyCodeSheet> createState() => _JoinFamilyCodeSheetState();
+}
+
+class _JoinFamilyCodeSheetState extends State<_JoinFamilyCodeSheet> {
+  var _code = '';
+  var _loading = false;
+  String? _error;
+  FamilyCodePreview? _preview;
+
+  String get _normalizedCode {
+    return _code.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+  }
+
+  Future<void> _previewCode() async {
+    if (_loading) return;
+    final code = _normalizedCode;
+    if (code.length < 6) {
+      setState(() => _error = '请输入完整家庭号');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _error = null;
+      _preview = null;
+    });
+    try {
+      final preview = await widget.onPreview(code);
+      if (!mounted) return;
+      setState(() {
+        _preview = preview;
+        _loading = false;
+      });
+    } on ProfileException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = error.message;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = '家庭号暂时无法验证，请稍后再试。';
+      });
+    }
+  }
+
+  Future<void> _acceptCode() async {
+    if (_loading) return;
+    final code = _normalizedCode;
+    if (_preview == null) {
+      await _previewCode();
+      if (!mounted || _preview == null) return;
+    }
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await widget.onAccept(code);
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } on ProfileException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = error.message;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = '暂时无法加入家庭，请稍后再试。';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final preview = _preview;
+    return AppBottomSheetBody(
+      title: '输入家庭号',
+      subtitle: '加入后默认是临时查看者，管理员可在家庭成员中调整权限。',
+      footer: AppSheetFooterActions(
+        children: [
+          AppSheetSecondaryButton(
+            label: preview == null ? '预览家庭' : '重新预览',
+            onTap: _loading
+                ? null
+                : () {
+                    _previewCode();
+                  },
+          ),
+          AppSheetPrimaryButton(
+            label: '加入家庭',
+            loading: _loading,
+            onTap: _loading
+                ? null
+                : () {
+                    _acceptCode();
+                  },
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _SetupTextField(
+            label: '家庭号',
+            value: _code,
+            icon: Icons.tag_outlined,
+            hintText: '例如 MIRA2026',
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 -]')),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _code = value;
+                _preview = null;
+                _error = null;
+              });
+            },
+          ),
+          if (preview != null) ...[
+            const SizedBox(height: 14),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceElevated,
+                borderRadius: BorderRadius.circular(AppRadii.card),
+                border: Border.all(color: AppColors.borderSoft),
+              ),
+              child: AppListRow(
+                icon: Icons.home_work_outlined,
+                title: preview.familyName,
+                subtitle: '${preview.roleLabel} · ${preview.message}',
+                tone: AppListRowTone.green,
+              ),
+            ),
+          ],
+          if (_error != null) ...[
+            const SizedBox(height: 12),
+            _SetupInlineError(_error!),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SetupInlineError extends StatelessWidget {
+  const _SetupInlineError(this.message);
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.dangerWash,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.danger.withValues(alpha: 0.14)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            const Icon(Icons.error_outline, color: AppColors.danger, size: 17),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: AppColors.danger,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  height: 1.35,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1666,6 +1959,12 @@ class _EmergencyContactsSetupScreenState
       leadingIcon: Icons.contact_phone_outlined,
       body: Column(
         children: [
+          AppSecondaryButton(
+            label: '从通讯录选择',
+            trailing: const Icon(Icons.contacts_outlined, size: 17),
+            onTap: () => _pickFromContacts(draft),
+          ),
+          const SizedBox(height: 14),
           _SetupTextField(
             label: '联系人姓名',
             value: draft.emergencyName,
@@ -1698,8 +1997,7 @@ class _EmergencyContactsSetupScreenState
           _SetupStatusPanel(
             icon: Icons.family_restroom_outlined,
             title: '家庭协作已准备',
-            detail:
-                '${draft.parentName} · $roleLabel，${draft.childName} 的任务确认会进入家长端。',
+            detail: _setupCollaborationDetail(draft, roleLabel),
             tone: _SetupTone.green,
           ),
         ],
@@ -1736,9 +2034,30 @@ class _EmergencyContactsSetupScreenState
       _showSetupToast(context, error.message);
     }
   }
+
+  Future<void> _pickFromContacts(SetupDraft draft) async {
+    try {
+      final picked = await pickPhoneContact();
+      if (!mounted || picked == null) return;
+      final nextName = picked.name.isEmpty ? draft.emergencyName : picked.name;
+      final nextPhone = picked.phone.isEmpty
+          ? draft.emergencyPhone
+          : picked.phone;
+      ref.read(setupDraftProvider.notifier).state = draft.copyWith(
+        emergencyName: nextName,
+        emergencyPhone: nextPhone,
+      );
+      setState(() => _phoneError = null);
+      if (picked.phone.isEmpty) {
+        _showSetupToast(context, '这个联系人没有可用手机号，请手动填写');
+      }
+    } on ContactPickerException catch (error) {
+      if (mounted) _showSetupToast(context, error.message);
+    }
+  }
 }
 
-class _SetupScreenShell extends StatelessWidget {
+class _SetupScreenShell extends ConsumerWidget {
   const _SetupScreenShell({
     required this.step,
     required this.title,
@@ -1764,7 +2083,7 @@ class _SetupScreenShell extends StatelessWidget {
   final bool loading;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -1782,7 +2101,10 @@ class _SetupScreenShell extends StatelessWidget {
               bottom: false,
               child: Column(
                 children: [
-                  _SetupTopBar(step: step),
+                  _SetupTopBar(
+                    step: step,
+                    onLogout: () => _confirmSetupLogout(context, ref),
+                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       keyboardDismissBehavior:
@@ -1904,14 +2226,15 @@ class _SetupBackground extends StatelessWidget {
 }
 
 class _SetupTopBar extends StatelessWidget {
-  const _SetupTopBar({required this.step});
+  const _SetupTopBar({required this.step, required this.onLogout});
 
   final int step;
+  final VoidCallback onLogout;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 6),
       child: Row(
         children: [
           Text(
@@ -1924,21 +2247,51 @@ class _SetupTopBar extends StatelessWidget {
               letterSpacing: 0,
             ),
           ),
-          const Spacer(),
-          Text(
-            '$step / $_setupTotalSteps',
-            style: const TextStyle(
-              color: AppColors.muted,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0,
+          const SizedBox(width: 10),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSoft.withValues(alpha: 0.78),
+              borderRadius: BorderRadius.circular(AppRadii.full),
+              border: Border.all(color: AppColors.borderSoft),
             ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+              child: Text(
+                '$step / $_setupTotalSteps',
+                style: const TextStyle(
+                  color: AppColors.muted,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+          ),
+          const Spacer(),
+          AppIconButton(
+            icon: Icons.logout_outlined,
+            label: '退出登录',
+            onTap: onLogout,
           ),
         ],
       ),
     );
   }
+}
+
+Future<void> _confirmSetupLogout(BuildContext context, WidgetRef ref) async {
+  final confirmed = await showAppConfirmSheet(
+    context: context,
+    title: '退出登录',
+    message: '退出后可以使用其他手机号登录。当前首次设置进度会保留在这个账号和家庭空间里。',
+    confirmLabel: '退出登录',
+    danger: true,
+  );
+  if (!confirmed) return;
+  await ref.read(authRepositoryProvider).logout();
+  invalidateAuthenticatedSessionData(ref);
+  if (context.mounted) context.go(loginPath);
 }
 
 class _SetupHero extends StatelessWidget {

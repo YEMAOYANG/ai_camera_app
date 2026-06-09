@@ -139,11 +139,7 @@ class SetupBroadcastResult {
 }
 
 class SetupRepository {
-  const SetupRepository({
-    required ApiClient apiClient,
-    required SetupStore setupStore,
-  }) : _apiClient = apiClient,
-       _setupStore = setupStore;
+  const SetupRepository({required this._apiClient, required this._setupStore});
 
   final ApiClient _apiClient;
   final SetupStore _setupStore;

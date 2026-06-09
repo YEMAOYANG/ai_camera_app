@@ -11,6 +11,7 @@ def family_member_payload(row: DatabaseRow) -> dict:
         "familyId": row["family_id"],
         "userId": row["user_id"],
         "name": row["name"],
+        "relationshipKey": row.get("relationship_key") or "",
         "phone": row["phone"] or "",
         "role": row["role"],
         "status": row["status"],
@@ -25,6 +26,7 @@ def family_invitation_payload(row: DatabaseRow) -> dict:
         "id": row["id"],
         "familyId": row["family_id"],
         "name": row["name"],
+        "relationshipKey": row.get("relationship_key") or "",
         "phone": row["phone"] or "",
         "role": row["role"],
         "status": row["status"],
@@ -32,6 +34,28 @@ def family_invitation_payload(row: DatabaseRow) -> dict:
         "createdAt": row["created_at"],
         "updatedAt": row["updated_at"],
         "expiresAt": row.get("expires_at"),
+        "acceptedBy": row.get("accepted_by") or "",
+        "acceptedAt": row.get("accepted_at"),
+        "declinedAt": row.get("declined_at"),
+        "deliveryStatus": row.get("delivery_status") or "",
+        "deliveryNotice": row.get("delivery_message") or "",
+    }
+
+
+def pending_join_payload(row: DatabaseRow) -> dict:
+    return {
+        "id": row["id"],
+        "familyId": row["family_id"],
+        "familyName": row.get("family_name") or "家庭空间",
+        "name": row["name"],
+        "relationshipKey": row.get("relationship_key") or "",
+        "phone": row["phone"] or "",
+        "role": row["role"],
+        "roleLabel": row.get("role_label") or row["role"],
+        "status": row["status"],
+        "expiresAt": row.get("expires_at"),
+        "deliveryStatus": row.get("delivery_status") or "",
+        "deliveryNotice": row.get("delivery_message") or "",
     }
 
 
@@ -73,10 +97,21 @@ def guardian_identity_options_payload(
             "key": row["item_key"],
             "label": row["label"],
             "description": row.get("description") or "",
+            "capabilities": role_capabilities_from_option(row),
         }
         for row in roles
     ]
     return {"identityGroups": identity_groups, "familyRoles": family_roles}
+
+
+def role_capabilities_from_option(row: DatabaseRow | None) -> list[str]:
+    if row is None:
+        return []
+    metadata = _json_dict(row.get("metadata_json"))
+    raw = metadata.get("capabilities")
+    if not isinstance(raw, list):
+        return []
+    return [str(item) for item in raw if str(item).strip()]
 
 
 def child_profile_payload(row: DatabaseRow | None) -> dict | None:
@@ -134,25 +169,34 @@ def account_profile_payload(
     parent_identity: DatabaseRow | None,
     *,
     role: str,
+    role_label: str = "",
+    capabilities: list[str] | None = None,
+    display_name: str | None = None,
+    relationship: str | None = None,
     relationship_key: str = "",
 ) -> dict:
-    display_name = (
+    resolved_display_name = display_name or (
         parent_identity["display_name"]
         if parent_identity and parent_identity["display_name"]
         else user["display_name"]
     )
+    resolved_relationship = relationship if relationship is not None else (
+        parent_identity["relationship"] if parent_identity else ""
+    )
     return {
         "userId": user["id"],
         "phone": user["phone"],
-        "displayName": display_name,
+        "displayName": resolved_display_name,
         "familyId": family["id"],
         "familyName": family["name"],
-        "relationship": parent_identity["relationship"] if parent_identity else "",
+        "relationship": resolved_relationship,
         "relationshipKey": relationship_key or (
             parent_identity.get("relationship_key") if parent_identity else ""
         )
         or "",
         "role": role,
+        "roleLabel": role_label or role,
+        "capabilities": capabilities or [],
     }
 
 
@@ -171,7 +215,10 @@ def account_security_payload(
                 "id": row["id"],
                 "label": row.get("device_label") or _session_label(row),
                 "deviceType": row.get("device_type") or "unknown",
+                "model": row.get("device_model") or "",
+                "hardware": row.get("device_hardware") or "",
                 "platform": row.get("platform") or "unknown",
+                "osVersion": row.get("os_version") or "",
                 "appVersion": row.get("app_version") or "",
                 "active": row.get("revoked_at") is None,
                 "current": bool(current_access_hash and row.get("access_hash") == current_access_hash),

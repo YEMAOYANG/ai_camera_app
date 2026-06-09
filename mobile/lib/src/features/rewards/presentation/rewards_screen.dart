@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
 import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
@@ -20,6 +21,9 @@ class RewardsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final summary = ref.watch(rewardsSummaryProvider);
     final points = ref.watch(pointsSummaryProvider);
+    final canManageRewards =
+        ref.watch(profileSummaryProvider).asData?.value.can('manage_rewards') ??
+        false;
 
     return AppScreen(
       title: '奖励',
@@ -30,12 +34,14 @@ class RewardsScreen extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppIconButton(
-            icon: Icons.add,
-            label: '新增奖励',
-            onTap: () => context.push(rewardEditPath),
-          ),
-          const SizedBox(width: 8),
+          if (canManageRewards) ...[
+            AppIconButton(
+              icon: Icons.add,
+              label: '新增奖励',
+              onTap: () => context.push(rewardEditPath),
+            ),
+            const SizedBox(width: 8),
+          ],
           AppIconButton(
             icon: Icons.stars_outlined,
             label: '积分',
@@ -48,9 +54,12 @@ class RewardsScreen extends ConsumerWidget {
         const SizedBox(height: 14),
         ...summary.when(
           data: (data) => [
-            _RewardItemsPanel(items: data.items),
+            _RewardItemsPanel(items: data.items, canManage: canManageRewards),
             const SizedBox(height: 14),
-            _RedemptionsPanel(redemptions: data.redemptions),
+            _RedemptionsPanel(
+              redemptions: data.redemptions,
+              canManage: canManageRewards,
+            ),
           ],
           loading: () => const [_RewardsLoading()],
           error: (error, _) => [
@@ -167,9 +176,10 @@ class _RewardBalancePanel extends StatelessWidget {
 }
 
 class _RewardItemsPanel extends StatelessWidget {
-  const _RewardItemsPanel({required this.items});
+  const _RewardItemsPanel({required this.items, required this.canManage});
 
   final List<RewardItem> items;
+  final bool canManage;
 
   @override
   Widget build(BuildContext context) {
@@ -202,14 +212,16 @@ class _RewardItemsPanel extends StatelessWidget {
               trailing: StatusChip(label: item.statusLabel),
               onTap: () => context.go('$rewardDetailPath/${item.id}'),
             ),
-          const SizedBox(height: 10),
-          AppListRow(
-            icon: Icons.add_circle_outline,
-            title: '添加奖励',
-            subtitle: '家长可以创建新的兑换目标',
-            tone: AppListRowTone.green,
-            onTap: () => context.push(rewardEditPath),
-          ),
+          if (canManage) ...[
+            const SizedBox(height: 10),
+            AppListRow(
+              icon: Icons.add_circle_outline,
+              title: '添加奖励',
+              subtitle: '家长可以创建新的兑换目标',
+              tone: AppListRowTone.green,
+              onTap: () => context.push(rewardEditPath),
+            ),
+          ],
         ],
       ),
     );
@@ -226,9 +238,10 @@ class _RewardItemsPanel extends StatelessWidget {
 }
 
 class _RedemptionsPanel extends ConsumerWidget {
-  const _RedemptionsPanel({required this.redemptions});
+  const _RedemptionsPanel({required this.redemptions, required this.canManage});
 
   final List<RewardRedemption> redemptions;
+  final bool canManage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -258,7 +271,7 @@ class _RedemptionsPanel extends ConsumerWidget {
                   : redemption.status == RedemptionStatus.cancelled
                   ? AppListRowTone.neutral
                   : AppListRowTone.amber,
-              trailing: redemption.canFulfill
+              trailing: redemption.canFulfill && canManage
                   ? Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

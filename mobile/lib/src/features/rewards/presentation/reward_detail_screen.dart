@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
 import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
@@ -23,11 +24,15 @@ class RewardDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final itemValue = ref.watch(rewardDetailProvider(itemId));
     final points = ref.watch(pointsSummaryProvider);
+    final canManageRewards =
+        ref.watch(profileSummaryProvider).asData?.value.can('manage_rewards') ??
+        false;
 
     return itemValue.when(
       data: (item) {
         final balance = points.asData?.value.account.balance ?? 0;
         final canRedeem =
+            canManageRewards &&
             item.available &&
             points.asData?.value != null &&
             balance >= item.pointsCost;
@@ -38,11 +43,13 @@ class RewardDetailScreen extends ConsumerWidget {
           fixedHeader: true,
           backLabel: '返回奖励',
           onBack: () => context.go(rewardsPath),
-          trailing: AppIconButton(
-            icon: Icons.edit_outlined,
-            label: '编辑奖励',
-            onTap: () => context.push('$rewardEditPath/${item.id}'),
-          ),
+          trailing: canManageRewards
+              ? AppIconButton(
+                  icon: Icons.edit_outlined,
+                  label: '编辑奖励',
+                  onTap: () => context.push('$rewardEditPath/${item.id}'),
+                )
+              : null,
           children: [
             _RewardHero(item: item, balance: balance),
             const SizedBox(height: 14),
@@ -85,14 +92,16 @@ class RewardDetailScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 18),
-            AppPrimaryButton(
-              label: canRedeem ? '兑换奖励' : '积分不足',
-              trailing: const AppButtonGlyph(icon: Icons.redeem_outlined),
-              onTap: canRedeem
-                  ? () => _showRedeemDialog(context, ref, item)
-                  : null,
-            ),
-            const SizedBox(height: 10),
+            if (canManageRewards) ...[
+              AppPrimaryButton(
+                label: canRedeem ? '兑换奖励' : '积分不足',
+                trailing: const AppButtonGlyph(icon: Icons.redeem_outlined),
+                onTap: canRedeem
+                    ? () => _showRedeemDialog(context, ref, item)
+                    : null,
+              ),
+              const SizedBox(height: 10),
+            ],
             AppSecondaryButton(
               label: '查看兑换记录',
               trailing: const Icon(Icons.history_outlined, size: 18),

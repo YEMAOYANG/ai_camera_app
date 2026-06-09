@@ -34,6 +34,14 @@ def update_member(member_id: str):
         return error_response(exc)
 
 
+@family_bp.post("/members/<member_id>/transfer-admin")
+def transfer_admin(member_id: str):
+    try:
+        return jsonify(profile_service().transfer_family_admin(bearer_token(request), member_id))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @family_bp.delete("/members/<member_id>")
 def delete_member(member_id: str):
     try:
@@ -83,6 +91,74 @@ def cancel_invitation(invitation_id: str):
             profile_service().cancel_family_invitation(
                 bearer_token(request),
                 invitation_id,
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@family_bp.post("/invitations/<invitation_id>/accept")
+def accept_invitation(invitation_id: str):
+    try:
+        return jsonify(
+            profile_service().accept_family_invitation(
+                bearer_token(request),
+                invitation_id,
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@family_bp.post("/invitations/<invitation_id>/decline")
+def decline_invitation(invitation_id: str):
+    try:
+        return jsonify(
+            profile_service().decline_family_invitation(
+                bearer_token(request),
+                invitation_id,
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@family_bp.get("/code")
+def family_code():
+    try:
+        return jsonify(profile_service().family_code(bearer_token(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@family_bp.post("/code/reset")
+def reset_family_code():
+    try:
+        return jsonify(profile_service().reset_family_code(bearer_token(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@family_bp.post("/join-code/preview")
+def preview_join_code():
+    try:
+        return jsonify(
+            profile_service().preview_join_code(
+                bearer_token(request),
+                json_body(request),
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@family_bp.post("/join-code/accept")
+def accept_join_code():
+    try:
+        return jsonify(
+            profile_service().accept_join_code(
+                bearer_token(request),
+                json_body(request),
             )
         )
     except ApiError as exc:

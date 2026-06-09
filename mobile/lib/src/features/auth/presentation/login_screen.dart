@@ -7,8 +7,12 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
+import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
+import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
+import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
 import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
 import 'package:guardian_parent_app/src/features/setup/presentation/setup_flow_screens.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -229,10 +233,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       _statusMessage = null;
     });
 
+    late final AuthLoginResult loginResult;
     try {
-      await ref
+      loginResult = await ref
           .read(authRepositoryProvider)
           .loginWithSms(phone: phoneDigits, code: code);
+      invalidateAuthenticatedSessionData(ref);
     } on AuthException catch (error) {
       if (!mounted) return;
       setState(() {
@@ -266,6 +272,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     await Future<void>.delayed(const Duration(milliseconds: 420));
     if (!mounted) return;
 
+    if (loginResult.pendingJoins.isNotEmpty) {
+      final joinAction = await _showPendingJoins(loginResult.pendingJoins);
+      if (!mounted) return;
+      if (joinAction == _PendingJoinAction.deferred) {
+        await ref.read(authRepositoryProvider).logout();
+        invalidateAuthenticatedSessionData(ref);
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _success = false;
+          _statusMessage = '家庭邀请已保留。下次用这个手机号登录时，还可以继续处理。';
+        });
+        return;
+      }
+    }
+
+    await _routeAfterLogin();
+  }
+
+  Future<void> _routeAfterLogin() async {
     try {
       final setupStatus = await ref.read(setupRepositoryProvider).status();
       if (!mounted) return;
@@ -279,6 +305,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         _statusMessage = error.message;
       });
     }
+  }
+
+  Future<_PendingJoinAction> _showPendingJoins(
+    List<PendingFamilyJoin> joins,
+  ) async {
+    return await showAppBottomSheet<_PendingJoinAction>(
+          context: context,
+          maxHeightFactor: joins.length > 1 ? 0.72 : 0.62,
+          child: _PendingJoinSheet(
+            joins: joins,
+            onAccept: (join) async {
+              await ref
+                  .read(profileRepositoryProvider)
+                  .acceptFamilyInvitation(join.id);
+              invalidateAuthenticatedSessionData(ref);
+            },
+            onDecline: (join) async {
+              await ref
+                  .read(profileRepositoryProvider)
+                  .declineFamilyInvitation(join.id);
+            },
+          ),
+        ) ??
+        _PendingJoinAction.deferred;
   }
 
   void _focusCodeField() {
@@ -693,7 +743,7 @@ class _LoginForm extends StatelessWidget {
               focusNode: codeFocus,
               label: '验证码',
               helper: codeSent ? '已发送' : '短信确认',
-              placeholder: '4 位验证码',
+              placeholder: '请输入验证码',
               icon: Icons.password_outlined,
               errorText: codeError,
               keyboardType: TextInputType.number,
@@ -1167,6 +1217,504 @@ class _StatusPanel extends StatelessWidget {
                 ),
               ),
             ),
+    );
+  }
+}
+
+class _PendingJoinSheet extends StatefulWidget {
+  const _PendingJoinSheet({
+    required this.joins,
+    required this.onAccept,
+    required this.onDecline,
+  });
+
+  final List<PendingFamilyJoin> joins;
+  final Future<void> Function(PendingFamilyJoin join) onAccept;
+  final Future<void> Function(PendingFamilyJoin join) onDecline;
+
+  @override
+  State<_PendingJoinSheet> createState() => _PendingJoinSheetState();
+}
+
+enum _PendingJoinAction { accepted, declined, deferred }
+
+class _PendingJoinSheetState extends State<_PendingJoinSheet> {
+  var _selectedIndex = 0;
+  var _loading = false;
+  String? _error;
+
+  PendingFamilyJoin get _selected => widget.joins[_selectedIndex];
+
+  Future<void> _run(
+    Future<void> Function(PendingFamilyJoin join) action,
+    _PendingJoinAction result,
+  ) async {
+    if (_loading) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await action(_selected);
+      if (!mounted) return;
+      Navigator.of(context).pop(result);
+    } on ProfileException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = error.message;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = '家庭邀请暂时无法处理，请稍后再试。';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = _selected;
+    return AppBottomSheetBody(
+      title: '家庭邀请',
+      subtitle: '这个手机号收到了家庭空间邀请。确认后会加入对方家庭，管理员之后可以调整你的权限。',
+      footer: Column(
+        children: [
+          AppPrimaryButton(
+            label: '接受并加入家庭',
+            loading: _loading,
+            trailing: const AppButtonGlyph(icon: Icons.arrow_forward),
+            onTap: _loading
+                ? null
+                : () => unawaited(
+                    _run(widget.onAccept, _PendingJoinAction.accepted),
+                  ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: AppSecondaryButton(
+                  label: '稍后再决定',
+                  onTap: _loading
+                      ? null
+                      : () => Navigator.of(
+                          context,
+                        ).pop(_PendingJoinAction.deferred),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: AppDangerButton(
+                  label: '拒绝邀请',
+                  onTap: _loading
+                      ? null
+                      : () => unawaited(
+                          _run(widget.onDecline, _PendingJoinAction.declined),
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _PendingJoinHero(join: selected),
+          const SizedBox(height: 14),
+          const _PendingJoinEffectRow(
+            icon: Icons.home_work_outlined,
+            title: '接受后',
+            message: '你会加入这个家庭空间，并按邀请里的身份参与看护协作。',
+          ),
+          const SizedBox(height: 10),
+          const _PendingJoinEffectRow(
+            icon: Icons.schedule_outlined,
+            title: '稍后再决定',
+            message: '不改变邀请状态，也不会进入创建家庭流程。你会回到登录页，下次登录仍可处理。',
+          ),
+          const SizedBox(height: 10),
+          const _PendingJoinEffectRow(
+            icon: Icons.block_outlined,
+            title: '拒绝邀请',
+            message: '邀请会被标记为已拒绝，不会加入对方家庭；需要对方重新邀请才会再次出现。',
+            danger: true,
+          ),
+          if (widget.joins.length > 1) ...[
+            const SizedBox(height: 16),
+            const Text(
+              '选择要处理的邀请',
+              style: TextStyle(
+                color: AppColors.ink,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 13.5,
+                fontWeight: FontWeight.w900,
+                height: 1.2,
+                letterSpacing: 0,
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+          for (var index = 0; index < widget.joins.length; index++) ...[
+            if (widget.joins.length > 1) ...[
+              _PendingJoinOption(
+                join: widget.joins[index],
+                selected: index == _selectedIndex,
+                onTap: _loading
+                    ? null
+                    : () => setState(() {
+                        _selectedIndex = index;
+                        _error = null;
+                      }),
+              ),
+              if (index < widget.joins.length - 1) const SizedBox(height: 10),
+            ],
+          ],
+          if (_error != null) ...[
+            const SizedBox(height: 12),
+            _SheetErrorText(_error!),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PendingJoinHero extends StatelessWidget {
+  const _PendingJoinHero({required this.join});
+
+  final PendingFamilyJoin join;
+
+  @override
+  Widget build(BuildContext context) {
+    final familyName = join.familyName.isEmpty ? '家庭空间邀请' : join.familyName;
+    final inviter = join.name.isEmpty ? '家庭成员' : join.name;
+    final roleLabel = join.roleLabel.isEmpty ? join.role : join.roleLabel;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.brandSageWash.withValues(alpha: 0.96),
+            Colors.white.withValues(alpha: 0.96),
+          ],
+        ),
+        border: Border.all(color: AppColors.brandSage.withValues(alpha: 0.14)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF4B7568).withValues(alpha: 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.82),
+                    borderRadius: BorderRadius.circular(17),
+                    border: Border.all(
+                      color: AppColors.brandSage.withValues(alpha: 0.10),
+                    ),
+                  ),
+                  child: const SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Center(
+                      child: Icon(
+                        Icons.family_restroom_outlined,
+                        color: AppColors.brandSage,
+                        size: 23,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        familyName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.ink,
+                          fontFamily: AppTypography.systemFont,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                          height: 1.15,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                      const SizedBox(height: 7),
+                      Wrap(
+                        spacing: 7,
+                        runSpacing: 6,
+                        children: [
+                          _PendingJoinBadge(
+                            label: inviter,
+                            tone: AppColors.ink,
+                            fill: Colors.white.withValues(alpha: 0.74),
+                          ),
+                          _PendingJoinBadge(
+                            label: roleLabel,
+                            tone: AppColors.brandSage,
+                            fill: AppColors.brandSage.withValues(alpha: 0.10),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Text(
+              '这是一个家庭空间协作邀请。接受后，这个手机号会绑定到对方家庭。',
+              style: TextStyle(
+                color: AppColors.ink.withValues(alpha: 0.70),
+                fontFamily: AppTypography.systemFont,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                height: 1.42,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PendingJoinEffectRow extends StatelessWidget {
+  const _PendingJoinEffectRow({
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.danger = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+  final bool danger;
+
+  @override
+  Widget build(BuildContext context) {
+    final tone = danger ? AppColors.danger : AppColors.brand;
+    final fill = danger ? AppColors.dangerWash : AppColors.brandWash;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSoft.withValues(alpha: 0.76),
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: AppColors.borderSoft),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(13, 12, 13, 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: fill,
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: SizedBox(
+                width: 38,
+                height: 38,
+                child: Center(child: Icon(icon, color: tone, size: 18)),
+              ),
+            ),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: AppColors.ink,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w900,
+                      height: 1.2,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    message,
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.42,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PendingJoinOption extends StatelessWidget {
+  const _PendingJoinOption({
+    required this.join,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final PendingFamilyJoin join;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: AppMotion.duration(context, 180),
+      decoration: BoxDecoration(
+        color: selected
+            ? AppColors.brandWash.withValues(alpha: 0.72)
+            : AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(
+          color: selected
+              ? AppColors.brand.withValues(alpha: 0.32)
+              : AppColors.borderSoft,
+        ),
+      ),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
+          child: Row(
+            children: [
+              Icon(
+                selected ? Icons.check_circle : Icons.circle_outlined,
+                color: selected ? AppColors.brand : AppColors.muted,
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  join.familyName.isEmpty ? '家庭空间邀请' : join.familyName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.ink,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w900,
+                    height: 1.2,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              _PendingJoinBadge(
+                label: join.roleLabel.isEmpty ? join.role : join.roleLabel,
+                tone: AppColors.brand,
+                fill: Colors.white.withValues(alpha: 0.74),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PendingJoinBadge extends StatelessWidget {
+  const _PendingJoinBadge({
+    required this.label,
+    required this.tone,
+    required this.fill,
+  });
+
+  final String label;
+  final Color tone;
+  final Color fill;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: tone,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w800,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SheetErrorText extends StatelessWidget {
+  const _SheetErrorText(this.message);
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.dangerWash,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.danger.withValues(alpha: 0.14)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            const Icon(Icons.error_outline, color: AppColors.danger, size: 17),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: AppColors.danger,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  height: 1.35,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

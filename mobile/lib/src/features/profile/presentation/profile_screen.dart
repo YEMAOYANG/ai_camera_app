@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
+import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_avatar_persona.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
@@ -154,6 +155,7 @@ Future<void> _confirmProfileLogout(BuildContext context, WidgetRef ref) async {
   );
   if (!confirmed) return;
   await ref.read(authRepositoryProvider).logout();
+  invalidateAuthenticatedSessionData(ref);
   if (context.mounted) context.go(loginPath);
 }
 
@@ -176,23 +178,18 @@ class _FamilySpaceHero extends StatelessWidget {
     final childText = child == null
         ? '孩子资料待完善'
         : '${child.name} · ${child.displayStage}';
-    final displayName = account?.displayName.isNotEmpty == true
-        ? account!.displayName
-        : summary.displayName.isEmpty
-        ? '家长'
-        : summary.displayName;
-    final relationship = _relationshipLabel(
-      account: account,
-      summary: summary,
-      displayName: displayName,
-    );
+    final relationship = _relationshipLabel(account: account, summary: summary);
     final relationshipKey = _relationshipKey(
       account: account,
       summary: summary,
       identityOptions: identityOptions,
       relationship: relationship,
-      displayName: displayName,
     );
+    final identityLabel =
+        identityOptions?.labelForStoredValue(relationshipKey).trim() ?? '';
+    final relationshipLabel = identityLabel.isNotEmpty
+        ? identityLabel
+        : relationship;
     final planLabel = subscription?.planLabel.isNotEmpty == true
         ? subscription!.planLabel
         : '基础版';
@@ -305,7 +302,7 @@ class _FamilySpaceHero extends StatelessWidget {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                '$displayName · ${_phoneMask(summary.phone)}',
+                                '$relationshipLabel · ${_phoneMask(summary.phone)}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -322,10 +319,6 @@ class _FamilySpaceHero extends StatelessWidget {
                                 spacing: 7,
                                 runSpacing: 7,
                                 children: [
-                                  StatusChip(
-                                    label: relationship,
-                                    tone: StatusTone.success,
-                                  ),
                                   StatusChip(
                                     label: planLabel,
                                     tone: StatusTone.neutral,
@@ -903,15 +896,11 @@ _ToneData _toneData(AppListRowTone tone) {
 String _relationshipLabel({
   required AccountProfile? account,
   required ProfileSummary summary,
-  required String displayName,
 }) {
   final relationship = account?.relationship.trim() ?? '';
   if (relationship.isNotEmpty) return relationship;
   final summaryRelationship = summary.relationship.trim();
   if (summaryRelationship.isNotEmpty) return summaryRelationship;
-  final roleLabel = summary.roleLabel.trim();
-  if (roleLabel.isNotEmpty) return roleLabel;
-  if (displayName.trim().isNotEmpty) return displayName.trim();
   return '监护人';
 }
 
@@ -920,7 +909,6 @@ String _relationshipKey({
   required ProfileSummary summary,
   required GuardianIdentityOptions? identityOptions,
   required String relationship,
-  required String displayName,
 }) {
   final accountKey = account?.relationshipKey.trim() ?? '';
   if (accountKey.isNotEmpty) return accountKey;
@@ -929,7 +917,7 @@ String _relationshipKey({
   if (identityOptions == null) return '';
   final relationshipKey = identityOptions.keyForValue(relationship);
   if (relationshipKey.isNotEmpty) return relationshipKey;
-  return identityOptions.keyForValue(displayName);
+  return '';
 }
 
 String _phoneMask(String phone) {
