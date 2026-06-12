@@ -126,7 +126,7 @@ class ClientDeviceInfo {
       TargetPlatform.macOS => 'Mac 设备',
       TargetPlatform.windows => 'Windows 设备',
       TargetPlatform.linux => 'Linux 设备',
-      TargetPlatform.fuchsia => '已登录设备',
+      TargetPlatform.fuchsia => '其他登录设备',
     };
     return ClientDeviceInfo(
       label: label,

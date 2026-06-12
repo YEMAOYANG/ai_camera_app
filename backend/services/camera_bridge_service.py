@@ -127,12 +127,10 @@ class CameraBridgeService:
                 "monitorRuntime": {
                     "reachable": False,
                     "adapter": self.adapter.adapter_name,
-                    "error": str(exc),
                     "data": {
                         "monitor_runtime": {
                             "running": False,
                             "status": "unavailable",
-                            "last_error": str(exc),
                         }
                     },
                 },
@@ -151,8 +149,13 @@ class CameraBridgeService:
                 "confidence": float(payload.get("confidence") or 0.0),
                 "evidence": payload.get("evidence") if isinstance(payload.get("evidence"), dict) else {},
             }
-        except Exception as exc:
-            return {"verdict": "unavailable", "reason": str(exc), "confidence": 0.0, "evidence": {}}
+        except Exception:
+            return {
+                "verdict": "unavailable",
+                "reason": "observation_unavailable",
+                "confidence": 0.0,
+                "evidence": {},
+            }
 
     def _runtime_json(self, getter) -> dict:
         try:
@@ -174,13 +177,13 @@ class CameraBridgeService:
                     "data": self._public_runtime_payload(payload),
                 },
             }
-        except Exception as exc:
+        except Exception:
             return {
                 "ok": False,
                 "cameraRuntime": {
                     "reachable": False,
                     "adapter": self.adapter.adapter_name,
-                    "error": str(exc),
+                    "data": {"status": "unavailable"},
                 },
             }
 

@@ -68,6 +68,13 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(confirm.json["task"]["status"], "confirmed")
         self.assertEqual(confirm.json["ledgerEntry"]["delta"], 20)
 
+        confirm_again = self.client.post(
+            f"/api/tasks/{task['id']}/parent-confirm",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(confirm_again.status_code, 200)
+        self.assertNotIn("ledgerEntry", confirm_again.json)
+
         account = self.client.get(
             "/api/points/account",
             query_string={"childId": self.child_id},
@@ -82,8 +89,13 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
             headers=self._auth_headers(),
         )
         self.assertEqual(ledger.status_code, 200)
-        self.assertEqual(ledger.json["ledger"][0]["type"], "task_completed")
-        self.assertEqual(ledger.json["ledger"][0]["delta"], 20)
+        task_entries = [
+            entry
+            for entry in ledger.json["ledger"]
+            if entry["sourceId"] == task["id"] and entry["type"] == "task_completed"
+        ]
+        self.assertEqual(len(task_entries), 1)
+        self.assertEqual(task_entries[0]["delta"], 20)
 
     def test_parent_reject_is_terminal_and_skips_points(self):
         task = self._create_task(reward_points=12)
@@ -155,6 +167,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(complete.status_code, 200)
         self.assertEqual(complete.json["task"]["status"], "completed")
         self.assertIsNotNone(complete.json["ledgerEntry"])
+        self.assertIsNotNone(complete.json["task"]["pointsGrantedAt"])
 
         reject = self.client.post(
             f"/api/tasks/{task['id']}/reject",
@@ -237,6 +250,21 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
             complete.json["task"]["aiObservationSummary"],
             "AI 判断材料已准备，建议家长确认。",
         )
+
+    def test_single_task_requires_explicit_date_or_time(self):
+        response = self.client.post(
+            "/api/tasks",
+            json={
+                "childId": self.child_id,
+                "title": "没有日期的任务",
+                "taskType": "learning",
+                "rewardPoints": 1,
+            },
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json["error"], "missing_scheduled_date")
 
     def test_task_batch_creation_supports_day_schedule_rows(self):
         response = self.client.post(
@@ -416,6 +444,15 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(cancelled.json["account"]["balance"], 30)
         self.assertEqual(cancelled.json["ledgerEntry"]["type"], "redemption_cancelled")
 
+        cancelled_again = self.client.post(
+            f"/api/rewards/redemptions/{redemption.json['redemption']['id']}/cancel",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(cancelled_again.status_code, 200)
+        self.assertEqual(cancelled_again.json["redemption"]["status"], "cancelled")
+        self.assertEqual(cancelled_again.json["account"]["balance"], 30)
+        self.assertNotIn("ledgerEntry", cancelled_again.json)
+
         second = self.client.post(
             "/api/rewards/redemptions",
             json={"rewardItemId": item["id"]},
@@ -569,7 +606,10 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         due_at = now + timedelta(minutes=2)
         task = self._create_task_at(start_at=start_at, due_at=due_at, reward_points=6)
 
-        tick = self.client.post("/api/dev/tasks/scheduler/tick")
+        unauthenticated = self.client.post("/api/dev/tasks/scheduler/tick")
+        self.assertEqual(unauthenticated.status_code, 401)
+
+        tick = self._scheduler_tick()
         self.assertEqual(tick.status_code, 200)
         self.assertEqual(tick.json["changedTasks"][0]["id"], task["id"])
         self.assertEqual(tick.json["changedTasks"][0]["status"], "in_progress")
@@ -610,7 +650,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         task = response.json["task"]
 
-        tick = offline_client.post("/api/dev/tasks/scheduler/tick")
+        tick = self._scheduler_tick(client=offline_client, access_token=offline_token)
         self.assertEqual(tick.status_code, 200)
         self.assertEqual(tick.json["changedTasks"][0]["status"], "in_progress")
         event_types = {event["eventType"] for event in tick.json["events"]}
@@ -634,8 +674,8 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
             reminder_minutes_before=2,
         )
 
-        first = self.client.post("/api/dev/tasks/scheduler/tick")
-        second = self.client.post("/api/dev/tasks/scheduler/tick")
+        first = self._scheduler_tick()
+        second = self._scheduler_tick()
 
         self.assertEqual(first.status_code, 200)
         self.assertEqual(second.status_code, 200)
@@ -923,7 +963,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
                 due_at=now + timedelta(minutes=10),
                 reward_points=2,
             )
-            tick = self.client.post("/api/dev/tasks/scheduler/tick")
+            tick = self._scheduler_tick()
         finally:
             MockCameraRuntimeAdapter.task_observation = original
 
@@ -959,7 +999,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
                 due_at=now + timedelta(minutes=10),
                 reward_points=2,
             )
-            delayed_tick = self.client.post("/api/dev/tasks/scheduler/tick")
+            delayed_tick = self._scheduler_tick()
             self.assertEqual(delayed_tick.status_code, 200)
             delayed_event_types = {
                 event["eventType"] for event in delayed_tick.json["events"]
@@ -988,7 +1028,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
                 due_at=now + timedelta(minutes=8),
                 reward_points=2,
             )
-            auto_tick = self.client.post("/api/dev/tasks/scheduler/tick")
+            auto_tick = self._scheduler_tick()
             self.assertEqual(auto_tick.status_code, 200)
             auto_event_types = {event["eventType"] for event in auto_tick.json["events"]}
             self.assertIn("auto_started", auto_event_types)
@@ -1023,7 +1063,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
                 reward_points=1,
                 requires_parent_confirmation=False,
             )
-            tick = self.client.post("/api/dev/tasks/scheduler/tick")
+            tick = self._scheduler_tick()
         finally:
             MockCameraRuntimeAdapter.task_observation = original
 
@@ -1049,7 +1089,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
             requires_parent_confirmation=False,
         )
 
-        start_tick = self.client.post("/api/dev/tasks/scheduler/tick")
+        start_tick = self._scheduler_tick()
 
         self.assertEqual(start_tick.status_code, 200)
         start_event_types = {event["eventType"] for event in start_tick.json["events"]}
@@ -1067,7 +1107,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
             json={"dueAt": (now - timedelta(seconds=5)).isoformat()},
             headers=self._auth_headers(),
         )
-        finish_tick = self.client.post("/api/dev/tasks/scheduler/tick")
+        finish_tick = self._scheduler_tick()
 
         self.assertEqual(finish_tick.status_code, 200)
         finish_event = next(
@@ -1085,7 +1125,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
             reward_points=2,
         )
 
-        tick = self.client.post("/api/dev/tasks/scheduler/tick")
+        tick = self._scheduler_tick()
 
         self.assertEqual(tick.status_code, 200)
         self.assertEqual(tick.json["changedTasks"][0]["status"], "missed")
@@ -1107,8 +1147,8 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         start = self.client.post(f"/api/tasks/{task['id']}/start", headers=self._auth_headers())
         self.assertEqual(start.status_code, 200)
 
-        first = self.client.post("/api/dev/tasks/scheduler/tick")
-        second = self.client.post("/api/dev/tasks/scheduler/tick")
+        first = self._scheduler_tick()
+        second = self._scheduler_tick()
 
         self.assertEqual(first.status_code, 200)
         self.assertEqual(second.status_code, 200)
@@ -1137,6 +1177,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
                 "title": "数学作业",
                 "type": "learning",
                 "rewardPoints": reward_points,
+                "scheduledDate": datetime.now().date().isoformat(),
                 "scheduledStart": "19:00",
                 "scheduledEnd": "19:30",
             },
@@ -1177,6 +1218,14 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         return response.json["task"]
 
+    def _scheduler_tick(self, *, client=None, access_token: str | None = None):
+        target_client = client or self.client
+        token = access_token or self.access_token
+        return target_client.post(
+            "/api/dev/tasks/scheduler/tick",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
     def _login(self, phone: str) -> str:
         return self._login_with_client(self.client, phone)
 
@@ -1190,6 +1239,7 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         return self._create_child_with_client(self.client, self.access_token, name)
 
     def _create_child_with_client(self, client, access_token: str, name: str) -> str:
+        self._prepare_setup_prerequisites(client, access_token)
         response = client.post(
             "/api/setup/child",
             json={"name": name, "nickname": name, "ageStage": "primary"},
@@ -1197,6 +1247,27 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         return response.json["child"]["id"]
+
+    def _prepare_setup_prerequisites(self, client, access_token: str) -> None:
+        headers = {"Authorization": f"Bearer {access_token}"}
+        parent = client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "爸爸", "relationship": "爸爸", "relationshipKey": "dad"},
+            headers=headers,
+        )
+        self.assertEqual(parent.status_code, 200)
+        device = client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-TASK", "deviceName": "客厅设备", "location": "客厅"},
+            headers=headers,
+        )
+        self.assertEqual(device.status_code, 200)
+        wifi = client.post(
+            "/api/setup/wifi",
+            json={"ssid": "Home-5G", "password": "not-stored", "authType": "wpa2"},
+            headers=headers,
+        )
+        self.assertEqual(wifi.status_code, 200)
 
     def _auth_headers(self) -> dict:
         return {"Authorization": f"Bearer {self.access_token}"}

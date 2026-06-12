@@ -140,7 +140,10 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(status.json["status"]["adapter"], "mock_hardware_device")
 
     def test_camera_health_adapter_reachable_and_unreachable(self):
-        reachable = self.client.get("/api/camera/health")
+        unauthenticated = self.client.get("/api/camera/health")
+        self.assertEqual(unauthenticated.status_code, 401)
+
+        reachable = self.client.get("/api/camera/health", headers=self._auth_headers())
         self.assertEqual(reachable.status_code, 200)
         self.assertTrue(reachable.json["cameraRuntime"]["reachable"])
         self.assertEqual(reachable.json["cameraRuntime"]["adapter"], "ai_camera_test_bridge")
@@ -155,9 +158,21 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
                 CAMERA_BACKEND_URL="http://127.0.0.1:1",
             )
         )
-        unreachable = unreachable_app.test_client().get("/api/camera/health")
+        unreachable_client = unreachable_app.test_client()
+        code = request_debug_code(unreachable_client, "13800003025")
+        login = unreachable_client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13800003025", "code": code},
+        )
+        self.assertEqual(login.status_code, 200)
+        unreachable = unreachable_client.get(
+            "/api/camera/health",
+            headers={"Authorization": f"Bearer {login.json['tokens']['accessToken']}"},
+        )
         self.assertEqual(unreachable.status_code, 502)
         self.assertFalse(unreachable.json["cameraRuntime"]["reachable"])
+        self.assertNotIn("error", unreachable.json["cameraRuntime"])
+        self.assertEqual(unreachable.json["cameraRuntime"]["data"]["status"], "unavailable")
 
         disabled_app = create_app(fresh_test_config(CAMERA_RUNTIME_PROVIDER="disabled"))
         disabled_client = disabled_app.test_client()
@@ -272,15 +287,18 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(command.json["command"]["status"], "succeeded")
 
     def test_ai_config_models_and_prompt_registry(self):
-        config = self.client.get("/api/ai/config")
+        unauthenticated = self.client.get("/api/ai/config")
+        self.assertEqual(unauthenticated.status_code, 401)
+
+        config = self.client.get("/api/ai/config", headers=self._auth_headers())
         self.assertEqual(config.status_code, 200)
         self.assertEqual(config.json["promptRegistry"], "file")
 
-        models = self.client.get("/api/ai/models")
+        models = self.client.get("/api/ai/models", headers=self._auth_headers())
         self.assertEqual(models.status_code, 200)
         self.assertEqual(models.json["models"][0]["provider"], "development")
 
-        prompts = self.client.get("/api/ai/prompts")
+        prompts = self.client.get("/api/ai/prompts", headers=self._auth_headers())
         self.assertEqual(prompts.status_code, 200)
         ids = {(item["id"], item["version"]) for item in prompts.json["prompts"]}
         self.assertIn(("task.observation.summary", "v1"), ids)
@@ -331,6 +349,12 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         return login.json["tokens"]["accessToken"]
 
     def _create_device(self) -> str:
+        parent = self.client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "爸爸", "relationship": "爸爸", "relationshipKey": "dad"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(parent.status_code, 200)
         response = self.client.post(
             "/api/setup/device",
             json={"bindingCode": "BIND-BOUNDARY", "deviceName": "客厅设备", "location": "客厅"},

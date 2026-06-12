@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +11,9 @@ const authUserIdKey = 'auth.userId';
 const authPhoneKey = 'auth.phone';
 
 final authSessionStoreProvider = Provider<AuthSessionStore>((ref) {
-  return AuthSessionStore(ref.watch(sharedPreferencesProvider));
+  final store = AuthSessionStore(ref.watch(sharedPreferencesProvider));
+  ref.onDispose(store.dispose);
+  return store;
 });
 
 class AuthSession {
@@ -64,8 +67,8 @@ class AuthSession {
   }
 }
 
-class AuthSessionStore {
-  const AuthSessionStore(this._preferences);
+class AuthSessionStore extends ChangeNotifier {
+  AuthSessionStore(this._preferences);
 
   final SharedPreferences _preferences;
 
@@ -115,6 +118,7 @@ class AuthSessionStore {
     );
     await _preferences.setString(authUserIdKey, session.userId);
     await _preferences.setString(authPhoneKey, session.phone);
+    notifyListeners();
   }
 
   Future<void> clear() async {
@@ -124,6 +128,7 @@ class AuthSessionStore {
     await _preferences.remove(authRefreshTokenExpiresAtKey);
     await _preferences.remove(authUserIdKey);
     await _preferences.remove(authPhoneKey);
+    notifyListeners();
   }
 
   // Development reset if needed:

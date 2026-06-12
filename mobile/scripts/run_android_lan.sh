@@ -3,6 +3,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+env_file="${ENV_FILE:-.env.development}"
+if [[ ! -f "$env_file" ]]; then
+  echo "Missing environment file: ${env_file}"
+  exit 1
+fi
+
 host_ip="${MIRA_HOST_IP:-}"
 if [[ -z "$host_ip" ]]; then
   host_ip="$(ipconfig getifaddr en0 2>/dev/null || true)"
@@ -29,6 +35,7 @@ echo "Using API_BASE_URL=${api_base_url}"
 echo "Using TASK_WS_BASE_URL=${task_ws_base_url}"
 
 exec flutter run \
+  --dart-define-from-file="${env_file}" \
   --dart-define="API_BASE_URL=${api_base_url}" \
   --dart-define="TASK_WS_BASE_URL=${task_ws_base_url}" \
   "$@"

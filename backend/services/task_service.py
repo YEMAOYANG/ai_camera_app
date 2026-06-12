@@ -188,8 +188,9 @@ class TaskService:
             self._optional_text(data, "scheduledDate")
             or self._date_part(start_at)
             or self._date_part(due_at)
-            or date.today().isoformat()
         )
+        if not scheduled_date:
+            raise ApiError("missing_scheduled_date", "请选择任务日期")
         scheduled_start = self._optional_text(data, "scheduledStart") or self._time_part(start_at)
         scheduled_end = self._optional_text(data, "scheduledEnd") or self._time_part(due_at)
         reward_points = self._non_negative_int(data.get("rewardPoints", 0), "rewardPoints")
@@ -424,6 +425,7 @@ class TaskService:
                     self._add_event(conn, task, "points_awarded", "奖励积分已发放", ledger_payload, now)
                 else:
                     self._add_event(conn, task, "points_award_skipped", "没有重复发放积分", {}, now)
+                task = self._task_or_error(conn, context["family"]["id"], task_id)
             payload = {"ok": True, "task": task_payload(task)}
             if ledger_payload:
                 payload["ledgerEntry"] = ledger_payload
@@ -494,6 +496,13 @@ class TaskService:
     ) -> dict | None:
         if task["points_granted_at"] or task["reward_points"] <= 0:
             return None
+        if not self.repository.mark_points_granted_once(
+            conn,
+            family_id=context["family"]["id"],
+            task_id=task["id"],
+            now=now,
+        ):
+            return None
         ledger = self.point_service.apply_delta(
             conn,
             family_id=context["family"]["id"],
@@ -503,12 +512,6 @@ class TaskService:
             source_type="task",
             source_id=task["id"],
             note=f"任务完成奖励：{task['title']}",
-            now=now,
-        )
-        self.repository.mark_points_granted(
-            conn,
-            family_id=context["family"]["id"],
-            task_id=task["id"],
             now=now,
         )
         return {

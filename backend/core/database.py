@@ -16,6 +16,10 @@ class DatabaseCursor:
     def __init__(self, cursor):
         self._cursor = cursor
 
+    @property
+    def rowcount(self) -> int:
+        return self._cursor.rowcount
+
     def fetchone(self):
         return self._cursor.fetchone()
 

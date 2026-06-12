@@ -429,7 +429,7 @@ class LoginDevice {
   static LoginDevice fromJson(Map<String, dynamic> json) {
     return LoginDevice(
       id: _asString(json['id']),
-      label: _asString(json['label'], fallback: '已登录设备'),
+      label: _asString(json['label'], fallback: '其他登录设备'),
       deviceType: _asString(json['deviceType'], fallback: 'unknown'),
       model: _asString(json['model']),
       hardware: _asString(json['hardware']),
@@ -755,27 +755,169 @@ class ReportData {
   const ReportData({
     required this.title,
     required this.summary,
+    required this.headline,
+    required this.body,
+    required this.periodLabel,
+    required this.date,
+    required this.startDate,
+    required this.endDate,
     required this.taskTotal,
     required this.taskCompleted,
     required this.pointsEarned,
     required this.pendingItems,
+    required this.completionRate,
+    required this.skills,
+    required this.highlights,
+    required this.improvements,
+    required this.observations,
+    required this.tasks,
+    required this.nextActions,
   });
 
   final String title;
   final String summary;
+  final String headline;
+  final String body;
+  final String periodLabel;
+  final String date;
+  final String startDate;
+  final String endDate;
   final int taskTotal;
   final int taskCompleted;
   final int pointsEarned;
   final int pendingItems;
+  final int completionRate;
+  final List<ReportSkill> skills;
+  final List<ReportSectionItem> highlights;
+  final List<ReportSectionItem> improvements;
+  final List<ReportSectionItem> observations;
+  final List<ReportTaskItem> tasks;
+  final List<ReportSectionItem> nextActions;
 
   static ReportData fromJson(Map<String, dynamic> json) {
     return ReportData(
       title: _asString(json['title']),
       summary: _asString(json['summary']),
+      headline: _asString(
+        json['headline'],
+        fallback: _asString(json['summary']),
+      ),
+      body: _asString(json['body']),
+      periodLabel: _asString(json['periodLabel']),
+      date: _asString(json['date']),
+      startDate: _asString(json['startDate']),
+      endDate: _asString(json['endDate']),
       taskTotal: _asInt(json['taskTotal']),
       taskCompleted: _asInt(json['taskCompleted']),
       pointsEarned: _asInt(json['pointsEarned']),
       pendingItems: _asInt(json['pendingItems']),
+      completionRate: _asInt(json['completionRate']),
+      skills: _asList(json['skills']).map(ReportSkill.fromJson).toList(),
+      highlights: _asList(
+        json['highlights'],
+      ).map(ReportSectionItem.fromJson).toList(),
+      improvements: _asList(
+        json['improvements'],
+      ).map(ReportSectionItem.fromJson).toList(),
+      observations: _asList(
+        json['observations'],
+      ).map(ReportSectionItem.fromJson).toList(),
+      tasks: _asList(json['tasks']).map(ReportTaskItem.fromJson).toList(),
+      nextActions: _asList(
+        json['nextActions'],
+      ).map(ReportSectionItem.fromJson).toList(),
+    );
+  }
+}
+
+class ReportSkill {
+  const ReportSkill({
+    required this.key,
+    required this.label,
+    required this.score,
+    required this.maxScore,
+    required this.level,
+    required this.detail,
+  });
+
+  final String key;
+  final String label;
+  final int score;
+  final int maxScore;
+  final String level;
+  final String detail;
+
+  double get ratio {
+    if (maxScore <= 0) return 0;
+    return (score / maxScore).clamp(0, 1).toDouble();
+  }
+
+  static ReportSkill fromJson(Map<String, dynamic> json) {
+    return ReportSkill(
+      key: _asString(json['key']),
+      label: _asString(json['label']),
+      score: _asInt(json['score']),
+      maxScore: _asInt(json['maxScore']) == 0 ? 100 : _asInt(json['maxScore']),
+      level: _asString(json['level']),
+      detail: _asString(json['detail']),
+    );
+  }
+}
+
+class ReportSectionItem {
+  const ReportSectionItem({
+    required this.title,
+    required this.detail,
+    required this.tone,
+    required this.source,
+  });
+
+  final String title;
+  final String detail;
+  final String tone;
+  final String source;
+
+  static ReportSectionItem fromJson(Map<String, dynamic> json) {
+    return ReportSectionItem(
+      title: _localizedReportSectionTitle(_asString(json['title'])),
+      detail: _asString(json['detail']),
+      tone: _asString(json['tone'], fallback: 'neutral'),
+      source: _asString(json['source']),
+    );
+  }
+}
+
+class ReportTaskItem {
+  const ReportTaskItem({
+    required this.id,
+    required this.title,
+    required this.typeLabel,
+    required this.statusLabel,
+    required this.detail,
+    required this.time,
+    required this.points,
+    required this.tone,
+  });
+
+  final String id;
+  final String title;
+  final String typeLabel;
+  final String statusLabel;
+  final String detail;
+  final String time;
+  final int points;
+  final String tone;
+
+  static ReportTaskItem fromJson(Map<String, dynamic> json) {
+    return ReportTaskItem(
+      id: _asString(json['id']),
+      title: _asString(json['title']),
+      typeLabel: _asString(json['typeLabel']),
+      statusLabel: _asString(json['statusLabel']),
+      detail: _asString(json['detail']),
+      time: _asString(json['time']),
+      points: _asInt(json['points']),
+      tone: _asString(json['tone'], fallback: 'neutral'),
     );
   }
 }
@@ -805,6 +947,26 @@ String _asString(dynamic value, {String fallback = ''}) {
   return value is String && value.isNotEmpty ? value : fallback;
 }
 
+String _localizedReportSectionTitle(String value) {
+  final title = value.trim();
+  if (title.isEmpty) return title;
+  const labels = {
+    'monitor_started': '开始观察任务',
+    'monitor_stopped': '结束观察任务',
+    'monitor_completed': '观察任务完成',
+    'camera_observation': '摄像头观察',
+    'camera_snapshot': '摄像头快照',
+    'vision_observation': '视觉观察',
+    'ai_observation': 'AI 观察记录',
+  };
+  final label = labels[title];
+  if (label != null) return label;
+  final looksTechnical = RegExp(
+    r'^[a-z][a-z0-9]*(?:_[a-z0-9]+)+$',
+  ).hasMatch(title);
+  return looksTechnical ? '看护事件' : title;
+}
+
 int _asInt(dynamic value) {
   if (value is int) return value;
   if (value is num) return value.toInt();
@@ -832,4 +994,9 @@ Map<String, dynamic> _asMap(dynamic value) {
   if (value is Map<String, dynamic>) return value;
   if (value is Map) return Map<String, dynamic>.from(value);
   return <String, dynamic>{};
+}
+
+List<Map<String, dynamic>> _asList(dynamic value) {
+  if (value is! List) return const [];
+  return value.map(_asMap).where((item) => item.isNotEmpty).toList();
 }

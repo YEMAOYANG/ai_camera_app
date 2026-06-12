@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
@@ -145,7 +146,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       return;
     }
 
-    final debugCode = result.debugCode.trim();
+    final environment = ref.read(appEnvironmentProvider);
+    final debugCode =
+        environment.flavor == AppFlavor.development ||
+            environment.flavor == AppFlavor.test
+        ? result.debugCode.trim()
+        : '';
     if (debugCode.isNotEmpty) {
       _codeController.value = TextEditingValue(
         text: debugCode,

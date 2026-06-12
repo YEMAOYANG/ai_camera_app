@@ -3,8 +3,8 @@ from __future__ import annotations
 from flask import Blueprint, current_app, jsonify, request
 
 from core.errors import ApiError, error_response
-from schemas.auth import json_body
-from services.service_factory import camera_bridge_service, camera_command_service, task_runtime_service
+from schemas.auth import bearer_token, json_body
+from services.service_factory import auth_service, camera_bridge_service, camera_command_service, task_runtime_service
 from services.task_event_stream import publish_task_runtime_result, task_event_stream_status
 from services.task_scheduler_runner import task_scheduler_status
 
@@ -69,5 +69,6 @@ def _ensure_dev_enabled() -> None:
     if current_app.config.get("APP_ENV") in {"development", "test"} and current_app.config.get(
         "DEV_ADAPTERS_ENABLED"
     ):
+        auth_service().authenticate(bearer_token(request))
         return
     raise ApiError("dev_endpoint_not_available", "这个本地调试入口当前不可用。", 404)

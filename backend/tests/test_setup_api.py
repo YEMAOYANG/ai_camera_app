@@ -173,6 +173,20 @@ class SetupApiTest(unittest.TestCase):
         )
         self.assertEqual(parent.status_code, 200)
 
+        early_contacts = self.client.post(
+            "/api/setup/contacts",
+            json={
+                "contacts": [
+                    {"name": "妈妈", "phone": "13900003025", "relationship": "mother"},
+                ]
+            },
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(early_contacts.status_code, 409)
+        self.assertEqual(early_contacts.json["error"], "setup_step_out_of_order")
+
+        self._complete_setup_before_contacts(access_token)
+
         duplicate_parent = self.client.post(
             "/api/setup/contacts",
             json={
@@ -216,6 +230,32 @@ class SetupApiTest(unittest.TestCase):
         )
         self.assertEqual(login.status_code, 200)
         return login.json["tokens"]["accessToken"]
+
+    def _complete_setup_before_contacts(self, access_token: str) -> None:
+        device = self.client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-ORDER", "deviceName": "客厅设备", "location": "客厅"},
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(device.status_code, 200)
+        wifi = self.client.post(
+            "/api/setup/wifi",
+            json={"ssid": "Home-5G", "password": "not-stored", "authType": "wpa2"},
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(wifi.status_code, 200)
+        child = self.client.post(
+            "/api/setup/child",
+            json={"name": "小宇", "nickname": "小宇", "ageStage": "primary"},
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(child.status_code, 200)
+        camera_name = self.client.post(
+            "/api/setup/camera-name",
+            json={"wakeName": "小豆"},
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(camera_name.status_code, 200)
 
     def _auth_headers(self, access_token: str) -> dict:
         return {"Authorization": f"Bearer {access_token}"}

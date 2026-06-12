@@ -699,7 +699,7 @@ class _MonitorPtzPanel extends StatelessWidget {
         ? '正在同步设备能力。'
         : supported
         ? '可以在实时画面中轻微调整摄像头方向。'
-        : '当前接入的是测试摄像头，暂不支持云台；自研设备接入后会在这里开放控制。';
+        : '当前设备暂不支持远程调整方向，仍可正常查看画面和接收看护提醒。';
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),

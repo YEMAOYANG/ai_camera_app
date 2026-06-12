@@ -635,6 +635,13 @@ class TaskRuntimeService:
     def _grant_points_if_needed(self, conn, task, now: int) -> dict | None:
         if task["points_granted_at"] or int(task["reward_points"] or 0) <= 0:
             return None
+        if not self.repository.mark_points_granted_once(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            now=now,
+        ):
+            return None
         ledger = self.point_repository.adjust_points(
             conn,
             family_id=task["family_id"],
@@ -644,12 +651,6 @@ class TaskRuntimeService:
             source_type="task",
             source_id=task["id"],
             note=f"任务完成奖励：{task['title']}",
-            now=now,
-        )
-        self.repository.mark_points_granted(
-            conn,
-            family_id=task["family_id"],
-            task_id=task["id"],
             now=now,
         )
         return {

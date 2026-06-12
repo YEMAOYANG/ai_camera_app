@@ -985,7 +985,7 @@ class _WifiDetectionPanel extends StatelessWidget {
         ? '已识别当前 Wi-Fi'
         : '未自动识别 Wi-Fi';
     final detail = detecting
-        ? '真机会尝试读取当前连接的家庭网络；模拟器通常无法返回真实 Wi-Fi。'
+        ? '正在读取当前连接的家庭网络，也可以稍后手动输入。'
         : current?.hasSsid == true
         ? '${current!.ssid} · 请确认这是设备要加入的家庭网络'
         : current?.message ?? '你可以直接手动输入 Wi-Fi 名称。';

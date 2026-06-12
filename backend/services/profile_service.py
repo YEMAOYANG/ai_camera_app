@@ -78,6 +78,59 @@ UNIQUE_GUARDIAN_IDENTITY_KEYS = {
     "grandma",
 }
 
+REPORT_DONE_STATUSES = {"completed", "confirmed"}
+REPORT_PENDING_STATUSES = {
+    "awaiting_parent_confirmation",
+    "delayed",
+    "missed",
+    "rejected",
+}
+REPORT_ACTIVE_STATUSES = {"scheduled", "pending", "reminder_sent", "in_progress"}
+REPORT_STATUS_LABELS = {
+    "scheduled": "待开始",
+    "pending": "待提醒",
+    "reminder_sent": "已提醒",
+    "in_progress": "进行中",
+    "delayed": "已延迟",
+    "completed": "已完成",
+    "awaiting_parent_confirmation": "待确认",
+    "confirmed": "已确认",
+    "rejected": "未通过",
+    "missed": "未完成",
+    "expired": "已过期",
+    "cancelled": "已取消",
+}
+REPORT_TYPE_LABELS = {
+    "learning": "学习任务",
+    "life": "生活习惯",
+    "housework": "家务整理",
+    "sleep": "睡眠作息",
+    "schoolbag": "书包整理",
+    "reading_interest": "阅读兴趣",
+    "sports_outdoor": "户外活动",
+    "custom": "自定义任务",
+    "checkin": "打卡任务",
+    "parent_confirmation": "家长确认",
+    "ai_observed": "AI 观察",
+}
+REPORT_EVENT_LABELS = {
+    "monitor_started": "开始观察任务",
+    "monitor_stopped": "结束观察任务",
+    "monitor_completed": "观察任务完成",
+    "camera_observation": "摄像头观察",
+    "camera_snapshot": "摄像头快照",
+    "vision_observation": "视觉观察",
+    "ai_observation": "AI 观察记录",
+}
+REPORT_HIDDEN_EVENT_TYPES = {"monitor_started"}
+REPORT_SKILL_DEFS = (
+    ("self_care", "自理力"),
+    ("focus", "专注力"),
+    ("order", "秩序感"),
+    ("initiative", "主动性"),
+    ("movement", "运动力"),
+)
+
 LEGACY_GUARDIAN_IDENTITY_KEYS = {
     "母亲": "mom",
     "妈妈": "mom",
@@ -962,7 +1015,7 @@ class ProfileService:
                 revoked_at=now,
             )
             sessions = self.repository.list_sessions(conn, user_id=user["id"])
-            return {
+            response = {
                 "ok": True,
                 "message": "设备已移除",
                 "security": account_security_payload(
@@ -971,6 +1024,10 @@ class ProfileService:
                     current_access_hash=current_access_hash,
                 ),
             }
+        from services.task_event_stream import publish_account_session_revoked
+
+        publish_account_session_revoked(session_id=session_id)
+        return response
 
     def request_account_deletion(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
@@ -1173,63 +1230,77 @@ class ProfileService:
         context = self._auth_context(access_token)
         target_date = self._optional_text(query, "date") or date.today().isoformat()
         with self.repository.transaction() as conn:
-            rows = conn.execute(
-                """
-                SELECT status, reward_points FROM tasks
-                WHERE family_id = ? AND scheduled_date = ?
-                """,
-                (context["family"]["id"], target_date),
-            ).fetchall()
-            total = len(rows)
-            completed = sum(1 for row in rows if row["status"] in {"completed", "confirmed"})
-            pending = sum(
-                1
-                for row in rows
-                if row["status"] in {"awaiting_parent_confirmation", "delayed", "missed"}
+            rows = list(
+                conn.execute(
+                    """
+                    SELECT * FROM tasks
+                    WHERE family_id = ? AND scheduled_date = ?
+                    ORDER BY scheduled_start IS NULL, scheduled_start, created_at
+                    """,
+                    (context["family"]["id"], target_date),
+                ).fetchall()
             )
-            points = sum(int(row["reward_points"] or 0) for row in rows if row["status"] in {"completed", "confirmed"})
+            events = _report_events(
+                conn,
+                family_id=context["family"]["id"],
+                start_date=target_date,
+                end_date=target_date,
+            )
+            summary = _report_summary(rows, events)
             return {
                 "ok": True,
-                "report": {
-                    "date": target_date,
-                    "title": "今日报告",
-                    "summary": _daily_summary(total, completed, pending),
-                    "taskTotal": total,
-                    "taskCompleted": completed,
-                    "pendingItems": pending,
-                    "pointsEarned": points,
-                    "suggestion": _daily_suggestion(total, completed, pending),
-                },
+                "report": _build_report_payload(
+                    title="今日报告",
+                    period_label=target_date,
+                    rows=rows,
+                    events=events,
+                    summary=summary,
+                    date_value=target_date,
+                ),
             }
 
     def weekly_report(self, access_token: str, query: dict) -> dict:
         context = self._auth_context(access_token)
-        end_date = date.fromisoformat(self._optional_text(query, "endDate") or date.today().isoformat())
-        start_date = date.fromisoformat(self._optional_text(query, "startDate") or (end_date - timedelta(days=6)).isoformat())
+        end_date = date.fromisoformat(
+            self._optional_text(query, "endDate") or date.today().isoformat()
+        )
+        start_date = date.fromisoformat(
+            self._optional_text(query, "startDate")
+            or (end_date - timedelta(days=6)).isoformat()
+        )
         with self.repository.transaction() as conn:
-            rows = conn.execute(
-                """
-                SELECT scheduled_date, status, reward_points FROM tasks
-                WHERE family_id = ? AND scheduled_date >= ? AND scheduled_date <= ?
-                ORDER BY scheduled_date
-                """,
-                (context["family"]["id"], start_date.isoformat(), end_date.isoformat()),
-            ).fetchall()
-            total = len(rows)
-            completed = sum(1 for row in rows if row["status"] in {"completed", "confirmed"})
-            points = sum(int(row["reward_points"] or 0) for row in rows if row["status"] in {"completed", "confirmed"})
+            rows = list(
+                conn.execute(
+                    """
+                    SELECT * FROM tasks
+                    WHERE family_id = ? AND scheduled_date >= ? AND scheduled_date <= ?
+                    ORDER BY scheduled_date, scheduled_start IS NULL, scheduled_start, created_at
+                    """,
+                    (
+                        context["family"]["id"],
+                        start_date.isoformat(),
+                        end_date.isoformat(),
+                    ),
+                ).fetchall()
+            )
+            events = _report_events(
+                conn,
+                family_id=context["family"]["id"],
+                start_date=start_date.isoformat(),
+                end_date=end_date.isoformat(),
+            )
+            summary = _report_summary(rows, events)
             return {
                 "ok": True,
-                "report": {
-                    "startDate": start_date.isoformat(),
-                    "endDate": end_date.isoformat(),
-                    "title": "周报",
-                    "taskTotal": total,
-                    "taskCompleted": completed,
-                    "completionRate": round(completed / total, 2) if total else 0,
-                    "pointsEarned": points,
-                    "summary": _weekly_summary(total, completed),
-                },
+                "report": _build_report_payload(
+                    title="周报",
+                    period_label=f"{start_date.isoformat()} 至 {end_date.isoformat()}",
+                    rows=rows,
+                    events=events,
+                    summary=summary,
+                    start_date_value=start_date.isoformat(),
+                    end_date_value=end_date.isoformat(),
+                ),
             }
 
     def growth_moments(self, access_token: str) -> dict:
@@ -1882,6 +1953,439 @@ def _weekly_summary(total: int, completed: int) -> str:
     if completed == total:
         return "本周任务都已完成。"
     return f"本周完成 {completed} / {total} 项任务。"
+
+
+def _report_events(conn, *, family_id: str, start_date: str, end_date: str) -> list[dict]:
+    return list(
+        conn.execute(
+            """
+            SELECT e.*
+            FROM task_events e
+            JOIN tasks t ON t.id = e.task_id
+            WHERE t.family_id = ?
+              AND t.scheduled_date >= ?
+              AND t.scheduled_date <= ?
+            ORDER BY e.created_at DESC
+            LIMIT 48
+            """,
+            (family_id, start_date, end_date),
+        ).fetchall()
+    )
+
+
+def _report_summary(rows: list[dict], events: list[dict]) -> dict:
+    total = len(rows)
+    completed = sum(1 for row in rows if row.get("status") in REPORT_DONE_STATUSES)
+    pending = sum(1 for row in rows if row.get("status") in REPORT_PENDING_STATUSES)
+    points = sum(
+        int(row.get("reward_points") or 0)
+        for row in rows
+        if row.get("status") in REPORT_DONE_STATUSES
+    )
+    observed = sum(1 for row in rows if _row_has_observation(row))
+    observed += sum(1 for event in events if _event_has_observation(event))
+    return {
+        "total": total,
+        "completed": completed,
+        "pending": pending,
+        "points": points,
+        "completion_rate": round((completed / total) * 100) if total else 0,
+        "observed": observed,
+        "delayed": sum(1 for row in rows if row.get("status") == "delayed"),
+        "missed": sum(
+            1 for row in rows if row.get("status") in {"missed", "rejected"}
+        ),
+    }
+
+
+def _build_report_payload(
+    *,
+    title: str,
+    period_label: str,
+    rows: list[dict],
+    events: list[dict],
+    summary: dict,
+    date_value: str | None = None,
+    start_date_value: str | None = None,
+    end_date_value: str | None = None,
+) -> dict:
+    task_total = int(summary["total"])
+    task_completed = int(summary["completed"])
+    pending_items = int(summary["pending"])
+    is_weekly = start_date_value is not None and end_date_value is not None
+    headline = _report_headline(is_weekly=is_weekly, summary=summary)
+    body = _report_body(is_weekly=is_weekly, summary=summary)
+    return {
+        "title": title,
+        "periodLabel": period_label,
+        "date": date_value or "",
+        "startDate": start_date_value or "",
+        "endDate": end_date_value or "",
+        "summary": headline,
+        "headline": headline,
+        "body": body,
+        "taskTotal": task_total,
+        "taskCompleted": task_completed,
+        "pointsEarned": int(summary["points"]),
+        "pendingItems": pending_items,
+        "completionRate": int(summary["completion_rate"]),
+        "skills": _report_skills(rows),
+        "highlights": _report_highlights(
+            rows,
+            events,
+            summary,
+            is_weekly=is_weekly,
+        ),
+        "improvements": _report_improvements(
+            rows,
+            summary,
+            is_weekly=is_weekly,
+        ),
+        "observations": _report_observations(rows, events),
+        "tasks": [_report_task_item(row) for row in rows[:12]],
+        "nextActions": _report_next_actions(rows, summary, is_weekly=is_weekly),
+    }
+
+
+def _report_headline(*, is_weekly: bool, summary: dict) -> str:
+    total = int(summary["total"])
+    completed = int(summary["completed"])
+    pending = int(summary["pending"])
+    period = "本周" if is_weekly else "今天"
+    if total == 0:
+        return f"{period}还没有形成可分析的任务记录。"
+    if completed == total and pending == 0:
+        return f"{period}的任务节奏很完整。"
+    if pending:
+        return f"{period}有 {pending} 项需要家长继续处理。"
+    return f"{period}完成 {completed}/{total} 项任务。"
+
+
+def _report_body(*, is_weekly: bool, summary: dict) -> str:
+    period = "这一周" if is_weekly else "今天"
+    total = int(summary["total"])
+    if total == 0:
+        return f"{period}还没有足够数据。添加任务并保留看护观察后，报告会展示能力变化、亮点和待加强点。"
+    observed = int(summary["observed"])
+    if observed:
+        return f"{period}结合任务完成和 {observed} 条看护观察生成，可用于回顾稳定表现和需要关注的地方。"
+    return f"{period}主要根据任务完成情况生成。当前没有可用摄像头观察，建议为需要看护的任务保留证据或 AI 观察摘要。"
+
+
+def _report_skills(rows: list[dict]) -> list[dict]:
+    scores = {key: 42 for key, _ in REPORT_SKILL_DEFS}
+    touched = {key: 0 for key, _ in REPORT_SKILL_DEFS}
+    for row in rows:
+        key = _skill_key_for_task(row)
+        touched[key] += 1
+        status = row.get("status")
+        if status in REPORT_DONE_STATUSES:
+            scores[key] += 16
+            scores["initiative"] += 5
+        elif status in {"delayed", "missed", "rejected"}:
+            scores[key] -= 8
+        elif status in {"in_progress", "reminder_sent"}:
+            scores[key] += 4
+    if not rows:
+        scores = {key: 36 for key, _ in REPORT_SKILL_DEFS}
+    result = []
+    for key, label in REPORT_SKILL_DEFS:
+        score = max(20, min(96, int(scores[key])))
+        result.append({
+            "key": key,
+            "label": label,
+            "score": score,
+            "maxScore": 100,
+            "level": _skill_level(score),
+            "detail": _skill_detail(label, score, touched[key]),
+        })
+    return result
+
+
+def _skill_key_for_task(row: dict) -> str:
+    title = str(row.get("title") or "")
+    task_type = str(row.get("type") or "")
+    if task_type in {"life", "sleep"} or any(
+        word in title for word in ("喝水", "洗漱", "睡", "穿衣", "吃饭")
+    ):
+        return "self_care"
+    if task_type in {"housework", "schoolbag"} or any(
+        word in title for word in ("收纳", "整理", "书包", "玩具")
+    ):
+        return "order"
+    if task_type in {"learning", "reading_interest"} or any(
+        word in title for word in ("阅读", "绘本", "数学", "作业", "学习")
+    ):
+        return "focus"
+    if task_type == "sports_outdoor" or any(
+        word in title for word in ("户外", "运动", "遛娃", "散步", "跑步")
+    ):
+        return "movement"
+    return "initiative"
+
+
+def _skill_level(score: int) -> str:
+    if score >= 85:
+        return "稳定掌握"
+    if score >= 70:
+        return "正在成型"
+    if score >= 55:
+        return "需要关注"
+    return "刚开始建立"
+
+
+def _skill_detail(label: str, score: int, touched: int) -> str:
+    if touched == 0:
+        return f"{label}今天没有直接任务样本。"
+    if score >= 70:
+        return f"{label}有稳定完成记录，可以逐步减少提醒。"
+    return f"{label}还需要更清晰的步骤和更稳定的提醒节奏。"
+
+
+def _report_highlights(rows: list[dict], events: list[dict], summary: dict, *, is_weekly: bool) -> list[dict]:
+    completed_rows = [row for row in rows if row.get("status") in REPORT_DONE_STATUSES]
+    items = []
+    if completed_rows:
+        for row in completed_rows[:3]:
+            items.append({
+                "title": f"完成了{row.get('title')}",
+                "detail": _positive_task_sentence(row),
+                "tone": "green",
+                "source": _source_label(row),
+            })
+    elif rows:
+        items.append({
+            "title": "已经开始形成任务记录",
+            "detail": "虽然还没有完成项，但系统已经记录到当天节奏，适合先看哪一步需要家长协助。",
+            "tone": "blue",
+            "source": "任务记录",
+        })
+    else:
+        items.append({
+            "title": "等待第一条成长样本",
+            "detail": "添加生活、学习或收纳任务后，报告会呈现当天的具体表现。",
+            "tone": "blue",
+            "source": "报告生成",
+        })
+    if int(summary["completed"]) == int(summary["total"]) and rows:
+        items.insert(0, {
+            "title": "完成节奏完整",
+            "detail": "本周期任务都已闭环，可以把奖励重点放在具体行为上，而不是只奖励结果。",
+            "tone": "green",
+            "source": "任务统计",
+        })
+    if events and _event_has_observation(events[0]):
+        items.append({
+            "title": "有可追溯的看护记录",
+            "detail": str(events[0].get("message") or "摄像头观察已写入任务事件。"),
+            "tone": "blue",
+            "source": "看护事件",
+        })
+    return items[:4]
+
+
+def _positive_task_sentence(row: dict) -> str:
+    detail = _task_detail(row)
+    if detail:
+        return detail
+    title = str(row.get("title") or "任务")
+    if any(word in title for word in ("玩具", "收纳", "整理")):
+        return "整理类任务完成后，可以继续鼓励孩子说出“放回哪里、为什么”。"
+    if any(word in title for word in ("喝水", "洗漱", "睡")):
+        return "生活习惯任务完成，说明孩子对日常节奏有了更清晰的感知。"
+    if any(word in title for word in ("阅读", "学习", "作业")):
+        return "学习类任务完成，适合记录专注时长和是否需要家长提醒。"
+    return "这条任务已经完成，可以作为今天的正向反馈素材。"
+
+
+def _report_improvements(rows: list[dict], summary: dict, *, is_weekly: bool) -> list[dict]:
+    trouble_rows = [
+        row
+        for row in rows
+        if row.get("status") in {"delayed", "missed", "rejected", "awaiting_parent_confirmation"}
+    ]
+    items = []
+    for row in trouble_rows[:3]:
+        title = str(row.get("title") or "任务")
+        items.append({
+            "title": f"{title}需要继续跟进",
+            "detail": _improvement_sentence(row),
+            "tone": "amber" if row.get("status") != "rejected" else "red",
+            "source": REPORT_STATUS_LABELS.get(str(row.get("status")), "待处理"),
+        })
+    if not items:
+        period = "本周" if is_weekly else "今天"
+        items.append({
+            "title": "下一步关注自主开始",
+            "detail": f"{period}没有明显卡点。后续可以观察孩子是否能在较少提醒下主动开始任务。",
+            "tone": "blue",
+            "source": "复盘建议",
+        })
+    return items
+
+
+def _improvement_sentence(row: dict) -> str:
+    status = row.get("status")
+    if status == "awaiting_parent_confirmation":
+        return "这条记录还需要家长确认，确认时建议补一句具体表扬或纠正。"
+    if status == "delayed":
+        return "任务出现延迟，可以把提醒语改得更具体，减少孩子理解成本。"
+    if status == "rejected":
+        return "任务没有通过确认，建议说明差在哪里，避免孩子只记住“没完成”。"
+    if status == "missed":
+        return "任务错过后不建议直接惩罚，先判断是时间不合适还是步骤太大。"
+    return "建议继续观察这条任务的开始时间和完成过程。"
+
+
+def _report_observations(rows: list[dict], events: list[dict]) -> list[dict]:
+    items = []
+    for row in rows:
+        if not _row_has_observation(row):
+            continue
+        detail = _task_detail(row) or "这条任务有摄像头或 AI 观察记录。"
+        items.append({
+            "title": str(row.get("title") or "看护观察"),
+            "detail": detail,
+            "tone": _task_tone(row),
+            "source": "摄像头观察" if row.get("camera_observation_status") not in (None, "", "unknown", "not_required") else "任务证据",
+        })
+    for event in events:
+        if not _event_has_observation(event):
+            continue
+        items.append({
+            "title": _report_event_title(event),
+            "detail": str(event.get("message") or "看护事件已记录。"),
+            "tone": "blue",
+            "source": "事件记录",
+        })
+    if not items:
+        items.append({
+            "title": "暂无可用看护观察",
+            "detail": "当前报告主要来自任务状态。后续玩具收纳、书包整理等可观察任务完成后，会自动进入这里。",
+            "tone": "neutral",
+            "source": "系统",
+        })
+    return items[:5]
+
+
+def _report_task_item(row: dict) -> dict:
+    return {
+        "id": str(row.get("id") or ""),
+        "title": str(row.get("title") or "任务"),
+        "type": str(row.get("type") or ""),
+        "typeLabel": REPORT_TYPE_LABELS.get(str(row.get("type") or ""), "任务"),
+        "status": str(row.get("status") or ""),
+        "statusLabel": REPORT_STATUS_LABELS.get(str(row.get("status") or ""), "记录中"),
+        "points": int(row.get("reward_points") or 0),
+        "time": _task_time(row),
+        "detail": _task_detail(row) or _status_sentence(row),
+        "tone": _task_tone(row),
+    }
+
+
+def _report_next_actions(rows: list[dict], summary: dict, *, is_weekly: bool) -> list[dict]:
+    if not rows:
+        return [{
+            "title": "先设置 2 个可观察任务",
+            "detail": "建议从玩具收纳、喝水、阅读这类容易复盘的任务开始，不要一次排太满。",
+            "tone": "blue",
+            "source": "建议",
+        }]
+    actions = []
+    if int(summary["pending"]):
+        actions.append({
+            "title": "先处理待确认记录",
+            "detail": "把需要家长判断的任务处理掉，再决定是否兑换奖励或继续累积。",
+            "tone": "amber",
+            "source": "待处理",
+        })
+    weakest = min(_report_skills(rows), key=lambda item: item["score"])
+    actions.append({
+        "title": f"下次重点关注{weakest['label']}",
+        "detail": f"{weakest['label']}是当前技能图里最低的一项，可以把任务拆成更明确的第一步。",
+        "tone": "blue",
+        "source": "能力图谱",
+    })
+    if any("玩具" in str(row.get("title") or "") or "收纳" in str(row.get("title") or "") for row in rows):
+        actions.append({
+            "title": "把收纳标准说具体",
+            "detail": "比如“积木进盒子，绘本回书架”，这样摄像头观察和家长复盘都会更清楚。",
+            "tone": "green",
+            "source": "看护建议",
+        })
+    return actions[:3]
+
+
+def _row_has_observation(row: dict) -> bool:
+    if row.get("evidence_summary") or row.get("ai_observation_summary"):
+        return True
+    return row.get("camera_observation_status") not in (None, "", "unknown", "not_required")
+
+
+def _event_has_observation(event: dict) -> bool:
+    event_type = str(event.get("event_type") or "")
+    if event_type in REPORT_HIDDEN_EVENT_TYPES:
+        return False
+    return any(word in event_type for word in ("camera", "observe", "observation", "monitor", "vision"))
+
+
+def _report_event_title(event: dict) -> str:
+    event_type = str(event.get("event_type") or "")
+    if event_type in REPORT_EVENT_LABELS:
+        return REPORT_EVENT_LABELS[event_type]
+    if _event_has_observation(event):
+        return "看护事件"
+    return event_type or "事件记录"
+
+
+def _source_label(row: dict) -> str:
+    if row.get("ai_observation_summary"):
+        return "AI 观察"
+    if row.get("evidence_summary"):
+        return "家长证据"
+    return REPORT_TYPE_LABELS.get(str(row.get("type") or ""), "任务记录")
+
+
+def _task_detail(row: dict) -> str:
+    return str(row.get("ai_observation_summary") or row.get("evidence_summary") or "").strip()
+
+
+def _task_time(row: dict) -> str:
+    start = str(row.get("scheduled_start") or "").strip()
+    end = str(row.get("scheduled_end") or "").strip()
+    if start and end:
+        return f"{start}-{end}"
+    if start:
+        return start
+    return str(row.get("scheduled_date") or "")
+
+
+def _status_sentence(row: dict) -> str:
+    status = row.get("status")
+    if status in REPORT_DONE_STATUSES:
+        return "任务已完成，适合做具体表扬。"
+    if status == "awaiting_parent_confirmation":
+        return "等待家长确认后再写入最终结果。"
+    if status in REPORT_ACTIVE_STATUSES:
+        return "任务还在计划或执行中，继续观察开始和完成情况。"
+    if status == "delayed":
+        return "任务出现延迟，可能需要更明确的提醒。"
+    if status == "missed":
+        return "任务未完成，建议复盘原因。"
+    if status == "rejected":
+        return "记录没有通过确认，建议给出明确改进方向。"
+    return "任务已有记录。"
+
+
+def _task_tone(row: dict) -> str:
+    status = row.get("status")
+    if status in REPORT_DONE_STATUSES:
+        return "green"
+    if status in {"delayed", "awaiting_parent_confirmation"}:
+        return "amber"
+    if status in {"missed", "rejected"}:
+        return "red"
+    return "blue"
 
 
 def _legal_document(key: str) -> dict | None:

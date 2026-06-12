@@ -258,6 +258,32 @@ class RewardRepository:
         )
         return self.get_redemption(conn, family_id=family_id, redemption_id=redemption_id)
 
+    def mark_fulfilled_if_redeemed(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        redemption_id: str,
+        fulfilled_by: str,
+        now: int,
+    ) -> bool:
+        cursor = conn.execute(
+            """
+            UPDATE reward_redemptions
+            SET status = ?, fulfilled_by = ?, fulfilled_at = ?
+            WHERE family_id = ? AND id = ? AND status = ?
+            """,
+            (
+                REDEMPTION_FULFILLED,
+                fulfilled_by,
+                now,
+                family_id,
+                redemption_id,
+                REDEMPTION_REDEEMED,
+            ),
+        )
+        return cursor.rowcount == 1
+
     def cancel_redemption(
         self,
         conn: DatabaseConnection,
@@ -276,3 +302,29 @@ class RewardRepository:
             (REDEMPTION_CANCELLED, cancelled_by, now, family_id, redemption_id),
         )
         return self.get_redemption(conn, family_id=family_id, redemption_id=redemption_id)
+
+    def mark_cancelled_if_redeemed(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        redemption_id: str,
+        cancelled_by: str,
+        now: int,
+    ) -> bool:
+        cursor = conn.execute(
+            """
+            UPDATE reward_redemptions
+            SET status = ?, cancelled_by = ?, cancelled_at = ?
+            WHERE family_id = ? AND id = ? AND status = ?
+            """,
+            (
+                REDEMPTION_CANCELLED,
+                cancelled_by,
+                now,
+                family_id,
+                redemption_id,
+                REDEMPTION_REDEEMED,
+            ),
+        )
+        return cursor.rowcount == 1

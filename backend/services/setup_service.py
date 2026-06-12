@@ -124,7 +124,8 @@ class SetupService:
         location = self._optional_text(data, "location")
         now = now_ms()
         with self.repository.transaction() as conn:
-            self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            self._require_setup_steps(progress, "parent_identity")
             device_id = self.repository.save_device(
                 conn,
                 family_id=context["family"]["id"],
@@ -153,7 +154,8 @@ class SetupService:
         password_set = bool((data.get("password") or "").strip())
         now = now_ms()
         with self.repository.transaction() as conn:
-            self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            self._require_setup_steps(progress, "parent_identity", "device_binding")
             self.repository.save_wifi(
                 conn,
                 family_id=context["family"]["id"],
@@ -187,7 +189,8 @@ class SetupService:
         sleep_time = self._time_of_day(self._optional_text(data, "sleepTime"))
         now = now_ms()
         with self.repository.transaction() as conn:
-            self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            self._require_setup_steps(progress, "parent_identity", "device_binding", "wifi")
             child_id = self.repository.save_child(
                 conn,
                 family_id=context["family"]["id"],
@@ -237,7 +240,14 @@ class SetupService:
                 data.get("wakeName"),
                 family_names=self._guardian_identity_labels(conn),
             )
-            self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            self._require_setup_steps(
+                progress,
+                "parent_identity",
+                "device_binding",
+                "wifi",
+                "child_profile",
+            )
             device_id = self.repository.save_camera_name(
                 conn,
                 family_id=context["family"]["id"],
@@ -266,6 +276,13 @@ class SetupService:
         now = now_ms()
         with self.repository.transaction() as conn:
             progress = self.repository.get_or_create_progress(conn, family_id=family_id, now=now)
+            self._require_setup_steps(
+                progress,
+                "parent_identity",
+                "device_binding",
+                "wifi",
+                "child_profile",
+            )
             if progress.camera_name_intro == "done":
                 return self._response(
                     progress,
@@ -311,6 +328,18 @@ class SetupService:
     def camera_name_preview(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
+            progress = self.repository.get_or_create_progress(
+                conn,
+                family_id=context["family"]["id"],
+                now=now_ms(),
+            )
+            self._require_setup_steps(
+                progress,
+                "parent_identity",
+                "device_binding",
+                "wifi",
+                "child_profile",
+            )
             wake_name = self._wake_name(
                 data.get("wakeName"),
                 family_names=self._guardian_identity_labels(conn),
@@ -351,6 +380,15 @@ class SetupService:
 
         now = now_ms()
         with self.repository.transaction() as conn:
+            progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            self._require_setup_steps(
+                progress,
+                "parent_identity",
+                "device_binding",
+                "wifi",
+                "child_profile",
+                "camera_name",
+            )
             resolved_contacts = []
             for contact in contacts:
                 relationship_source = contact["relationship"]
@@ -374,7 +412,6 @@ class SetupService:
                 family_id=context["family"]["id"],
                 contacts=resolved_contacts,
             )
-            self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
             contact_ids = self.repository.replace_contacts(
                 conn,
                 family_id=context["family"]["id"],
@@ -432,6 +469,15 @@ class SetupService:
         if extra:
             payload.update(extra)
         return payload
+
+    def _require_setup_steps(self, progress, *steps: str) -> None:
+        for step in steps:
+            if getattr(progress, step) != "done":
+                raise ApiError(
+                    "setup_step_out_of_order",
+                    "请按当前设置步骤继续完成。",
+                    409,
+                )
 
     def _saved_setup_details(self, conn, family_id: str) -> dict:
         parent = self.repository.get_parent_identity(conn, family_id=family_id)

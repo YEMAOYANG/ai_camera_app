@@ -500,23 +500,23 @@ class TaskRepository:
         )
         return self.get_task(conn, family_id=family_id, task_id=task_id)
 
-    def mark_points_granted(
+    def mark_points_granted_once(
         self,
         conn: DatabaseConnection,
         *,
         family_id: str,
         task_id: str,
         now: int,
-    ) -> DatabaseRow | None:
-        conn.execute(
+    ) -> bool:
+        cursor = conn.execute(
             """
             UPDATE tasks
             SET points_granted_at = ?, updated_at = ?
-            WHERE family_id = ? AND id = ?
+            WHERE family_id = ? AND id = ? AND points_granted_at IS NULL
             """,
             (now, now, family_id, task_id),
         )
-        return self.get_task(conn, family_id=family_id, task_id=task_id)
+        return cursor.rowcount == 1
 
     def mark_rejected(
         self,

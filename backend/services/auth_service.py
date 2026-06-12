@@ -175,6 +175,28 @@ class AuthService:
             user = self._user_payload(conn, row["user_id"])
             return {"user": user, "family": self._family_payload(conn, user["familyId"])}
 
+    def authenticate_session(self, access_token: str) -> dict:
+        access_token = (access_token or "").strip()
+        if not access_token:
+            raise AuthError("missing_access_token", "缺少 access token", 401)
+
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            row = self.repository.find_session_by_access_hash(conn, hash_value(access_token))
+            if row is None or row["access_expires_at"] < now:
+                raise AuthError("access_expired", "登录状态需要刷新", 401)
+            self.repository.touch_session(conn, session_id=row["id"], last_active_at=now)
+            user = self._user_payload(conn, row["user_id"])
+            return {
+                "user": user,
+                "family": self._family_payload(conn, user["familyId"]),
+                "session": {
+                    "id": row["id"],
+                    "accessHash": row["access_hash"],
+                    "refreshHash": row["refresh_hash"],
+                },
+            }
+
     def logout(self, access_token: str | None = None, refresh_token: str | None = None) -> None:
         self.repository.revoke_sessions(
             access_hash=hash_value(access_token) if access_token else None,
@@ -273,4 +295,4 @@ def _default_device_label(platform: str, device_type: str) -> str:
         return "Android 手机"
     if "mac" in normalized:
         return "Mac 设备"
-    return "已登录设备"
+    return "其他登录设备"

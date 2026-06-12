@@ -30,6 +30,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: initialLocation,
+    refreshListenable: sessionStore,
+    redirect: (_, state) {
+      return _authRedirect(
+        onboardingStore: onboardingStore,
+        sessionStore: sessionStore,
+        location: state.uri.path,
+      );
+    },
     routes: [
       GoRoute(path: '/', builder: (_, _) => const StartupGate()),
       GoRoute(
@@ -320,6 +328,25 @@ String _initialLocation({
   if (!onboardingStore.hasSeenOnboarding) return welcomePath;
   if (!sessionStore.hasUsableSession) return loginPath;
   return '/';
+}
+
+String? _authRedirect({
+  required OnboardingStore onboardingStore,
+  required AuthSessionStore sessionStore,
+  required String location,
+}) {
+  if (_isPublicRoute(location)) return null;
+  if (!onboardingStore.hasSeenOnboarding) return welcomePath;
+  if (!sessionStore.hasUsableSession) return loginPath;
+  return null;
+}
+
+bool _isPublicRoute(String location) {
+  return location == welcomePath ||
+      location == loginPath ||
+      location == userAgreementPath ||
+      location == privacyPolicyPath ||
+      location == profileChildPrivacyPath;
 }
 
 AppRoute routeFromLocation(String location) {

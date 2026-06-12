@@ -214,7 +214,7 @@ def account_security_payload(
         "loginDevices": [
             {
                 "id": row["id"],
-                "label": row.get("device_label") or _session_label(row),
+                "label": _session_display_label(row),
                 "deviceType": row.get("device_type") or "unknown",
                 "model": row.get("device_model") or "",
                 "hardware": row.get("device_hardware") or "",
@@ -291,6 +291,13 @@ def _json_dict(value: object) -> dict:
     return parsed if isinstance(parsed, dict) else {}
 
 
+def _session_display_label(row: DatabaseRow) -> str:
+    label = str(row.get("device_label") or "").strip()
+    if label and label not in {"已登录设备", "unknown", "unknown device"}:
+        return label
+    return _session_label(row)
+
+
 def _session_label(row: DatabaseRow) -> str:
     platform = str(row.get("platform") or "").lower()
     device_type = str(row.get("device_type") or "").lower()
@@ -301,4 +308,4 @@ def _session_label(row: DatabaseRow) -> str:
         return "Android 手机"
     if "mac" in combined:
         return "Mac 设备"
-    return "已登录设备"
+    return "其他登录设备"

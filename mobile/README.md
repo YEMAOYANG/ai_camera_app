@@ -27,10 +27,25 @@ lib/
 ```sh
 cd mobile
 flutter pub get
-flutter run
+flutter run --dart-define-from-file=.env.development
 ```
 
-安卓真机连同一 Wi-Fi 调试时，用脚本自动把电脑局域网 IP 写入 App：
+环境配置在 `mobile/.env.development` 和 `mobile/.env.product`。开发环境默认使用当前
+局域网后端地址，生产构建时替换 `.env.product` 里的真实 API 域名：
+
+```sh
+flutter build apk --dart-define-from-file=.env.product
+```
+
+安卓 USB 真机调试时，优先使用脚本自动建立 `adb reverse`。这样 App 仍然访问
+`127.0.0.1`，但实际会转发到电脑上的后端，不受 Wi-Fi IP 变化影响：
+
+```sh
+cd mobile
+scripts/run_android_usb.sh -d <device-id>
+```
+
+安卓真机连同一 Wi-Fi、但不走 USB 转发时，用脚本自动把电脑局域网 IP 写入 App：
 
 ```sh
 cd mobile

@@ -197,13 +197,16 @@ class RewardService:
             if redemption["status"] == REDEMPTION_CANCELLED:
                 raise ApiError("redemption_cancelled", "已取消的兑换不能兑现")
             if redemption["status"] != REDEMPTION_FULFILLED:
-                redemption = self.repository.fulfill_redemption(
+                updated = self.repository.mark_fulfilled_if_redeemed(
                     conn,
                     family_id=context["family"]["id"],
                     redemption_id=redemption_id,
                     fulfilled_by=context["user"]["id"],
                     now=now,
                 )
+                redemption = self._redemption_or_error(conn, context["family"]["id"], redemption_id)
+                if not updated and redemption["status"] == REDEMPTION_CANCELLED:
+                    raise ApiError("redemption_cancelled", "已取消的兑换不能兑现")
             return {"ok": True, "redemption": redemption_payload(redemption)}
 
     def cancel_redemption(self, access_token: str, redemption_id: str) -> dict:
@@ -216,6 +219,29 @@ class RewardService:
                 raise ApiError("redemption_fulfilled", "已兑现的兑换不能取消")
             ledger_payload = None
             if redemption["status"] != REDEMPTION_CANCELLED:
+                updated = self.repository.mark_cancelled_if_redeemed(
+                    conn,
+                    family_id=context["family"]["id"],
+                    redemption_id=redemption_id,
+                    cancelled_by=context["user"]["id"],
+                    now=now,
+                )
+                redemption = self._redemption_or_error(conn, context["family"]["id"], redemption_id)
+                if not updated:
+                    if redemption["status"] == REDEMPTION_FULFILLED:
+                        raise ApiError("redemption_fulfilled", "已兑现的兑换不能取消")
+                    if redemption["status"] == REDEMPTION_CANCELLED:
+                        account = self.point_repository.get_or_create_account(
+                            conn,
+                            family_id=context["family"]["id"],
+                            child_id=redemption["child_id"],
+                            now=now,
+                        )
+                        return {
+                            "ok": True,
+                            "redemption": redemption_payload(redemption),
+                            "account": point_account_payload(account),
+                        }
                 ledger = self.point_service.apply_delta(
                     conn,
                     family_id=context["family"]["id"],
@@ -228,13 +254,6 @@ class RewardService:
                     now=now,
                 )
                 ledger_payload = point_ledger_payload(ledger)
-                redemption = self.repository.cancel_redemption(
-                    conn,
-                    family_id=context["family"]["id"],
-                    redemption_id=redemption_id,
-                    cancelled_by=context["user"]["id"],
-                    now=now,
-                )
             account = self.point_repository.get_or_create_account(
                 conn,
                 family_id=context["family"]["id"],

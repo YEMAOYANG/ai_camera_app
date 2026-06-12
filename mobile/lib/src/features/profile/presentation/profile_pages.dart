@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -644,10 +646,11 @@ class _AccountSecurityPageState extends ConsumerState<AccountSecurityPage> {
 
   Future<void> _confirmRevokeDevice(LoginDevice device) async {
     if (device.current || _revokingSessionId != null) return;
+    final deviceLabel = _displayDeviceLabel(context, device);
     final confirmed = await showAppConfirmSheet(
       context: context,
       title: '移除登录设备',
-      message: '移除后，${device.label} 需要重新通过手机号验证码登录。当前设备不会受到影响。',
+      message: '移除后，$deviceLabel 会退出登录，需要重新通过手机号验证码登录。当前设备不会受到影响。',
       confirmLabel: '移除',
       danger: true,
     );
@@ -656,6 +659,7 @@ class _AccountSecurityPageState extends ConsumerState<AccountSecurityPage> {
     try {
       await ref.read(profileRepositoryProvider).revokeLoginDevice(device.id);
       ref.invalidate(accountSecurityProvider);
+      await ref.read(accountSecurityProvider.future);
       if (mounted) {
         showAppToast(context, '登录设备已移除', tone: AppToastTone.success);
       }
@@ -882,40 +886,46 @@ class _DeviceRemoveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final visualButton = DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadii.full),
+        border: Border.all(color: AppColors.borderSoft),
+      ),
+      child: SizedBox(
+        height: 34,
+        width: 52,
+        child: Center(
+          child: loading
+              ? const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text(
+                  '移除',
+                  style: TextStyle(
+                    color: AppColors.ink,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0,
+                  ),
+                ),
+        ),
+      ),
+    );
+
     return Semantics(
       button: true,
       label: loading ? '正在移除设备' : '移除设备',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppRadii.full),
-            border: Border.all(color: AppColors.borderSoft),
-          ),
-          child: SizedBox(
-            height: 44,
-            width: 66,
-            child: Center(
-              child: loading
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text(
-                      '移除',
-                      style: TextStyle(
-                        color: AppColors.ink,
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0,
-                      ),
-                    ),
-            ),
-          ),
+        child: SizedBox(
+          height: 44,
+          width: 54,
+          child: Center(child: visualButton),
         ),
       ),
     );
@@ -1132,20 +1142,23 @@ IconData _deviceIcon(LoginDevice device) {
 }
 
 String _displayDeviceLabel(BuildContext context, LoginDevice device) {
-  if (device.label.isNotEmpty && device.label != '已登录设备') return device.label;
+  final label = device.label.trim();
+  if (_hasSpecificDeviceLabel(label)) return label;
   if (device.model.isNotEmpty &&
       !device.model.toLowerCase().contains('iphone')) {
     return device.model;
   }
   if (device.hardware.isNotEmpty) return device.hardware;
-  if (device.label != '已登录设备' || !device.current) return device.label;
+  final platformLabel = _devicePlatformLabel(device.platform);
+  if (platformLabel.isNotEmpty) return platformLabel;
+  if (!device.current) return '其他登录设备';
   return switch (Theme.of(context).platform) {
     TargetPlatform.iOS => '本机 iPhone',
     TargetPlatform.android => 'Android 手机',
     TargetPlatform.macOS => 'Mac 设备',
     TargetPlatform.windows => 'Windows 设备',
     TargetPlatform.linux => 'Linux 设备',
-    TargetPlatform.fuchsia => device.label,
+    TargetPlatform.fuchsia => '其他登录设备',
   };
 }
 
@@ -1156,7 +1169,38 @@ String _loginDeviceSubtitle(LoginDevice device) {
   ];
   if (device.osVersion.isNotEmpty) parts.add(device.osVersion);
   if (device.appVersion.isNotEmpty) parts.add('App ${device.appVersion}');
+  if (_hasIncompleteDeviceInfo(device)) {
+    parts.add('设备信息不完整');
+  }
   return parts.join(' · ');
+}
+
+bool _hasSpecificDeviceLabel(String label) {
+  final normalized = label.trim().toLowerCase();
+  return normalized.isNotEmpty &&
+      normalized != '已登录设备' &&
+      normalized != '其他登录设备' &&
+      normalized != 'unknown' &&
+      normalized != 'unknown device';
+}
+
+String _devicePlatformLabel(String platform) {
+  final normalized = platform.toLowerCase();
+  if (normalized.contains('ios') || normalized.contains('iphone')) {
+    return 'iPhone 设备';
+  }
+  if (normalized.contains('android')) return 'Android 手机';
+  if (normalized.contains('mac')) return 'Mac 设备';
+  if (normalized.contains('windows')) return 'Windows 设备';
+  if (normalized.contains('linux')) return 'Linux 设备';
+  return '';
+}
+
+bool _hasIncompleteDeviceInfo(LoginDevice device) {
+  return !_hasSpecificDeviceLabel(device.label) &&
+      device.model.trim().isEmpty &&
+      device.hardware.trim().isEmpty &&
+      _devicePlatformLabel(device.platform).isEmpty;
 }
 
 String _formatSessionTime(int epochMillis) {
@@ -4559,36 +4603,741 @@ class _ReportPage extends ConsumerWidget {
     return _Page(
       title: title,
       children: report.when(
-        data: (data) => [
-          AppSurface(
-            color: AppColors.ink,
-            borderColor: AppColors.ink,
-            radius: 24,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(data.summary, style: _darkTitle),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    _Metric(
-                      label: '任务',
-                      value: '${data.taskCompleted}/${data.taskTotal}',
-                    ),
-                    const SizedBox(width: 8),
-                    _Metric(label: '积分', value: '+${data.pointsEarned}'),
-                    const SizedBox(width: 8),
-                    _Metric(label: '待处理', value: '${data.pendingItems}'),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
+        data: _reportSections,
         loading: () => const [_Loading(title: '正在生成报告')],
         error: (error, _) => [
           _ErrorState(error: error, onRetry: () => ref.invalidate(provider)),
         ],
+      ),
+    );
+  }
+}
+
+List<Widget> _reportSections(ReportData data) {
+  final sections = <Widget>[
+    _ReportHero(data: data),
+    if (data.skills.isNotEmpty) _ReportSkillMap(skills: data.skills),
+    _ReportSectionBlock(
+      title: '成长亮点',
+      items: data.highlights,
+      fallback: '还没有足够亮点记录，完成任务后这里会自动生成。',
+    ),
+    _ReportSectionBlock(
+      title: '待加强',
+      items: data.improvements,
+      fallback: '暂时没有明显待加强项。',
+    ),
+    if (data.tasks.isNotEmpty) _ReportTaskReview(tasks: data.tasks),
+    _ReportSectionBlock(
+      title: '看护观察',
+      items: data.observations,
+      fallback: '暂无摄像头或 AI 观察记录。',
+    ),
+    _ReportSectionBlock(
+      title: '下次建议',
+      items: data.nextActions,
+      fallback: '继续保持当前任务节奏。',
+    ),
+  ];
+  return [
+    for (var index = 0; index < sections.length; index++) ...[
+      if (index > 0) const SizedBox(height: 12),
+      sections[index],
+    ],
+  ];
+}
+
+class _ReportHero extends StatelessWidget {
+  const _ReportHero({required this.data});
+
+  final ReportData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurface(
+      color: AppColors.ink,
+      borderColor: AppColors.ink,
+      radius: 24,
+      padding: const EdgeInsets.fromLTRB(16, 17, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  data.headline.isEmpty ? data.summary : data.headline,
+                  style: _darkTitle,
+                ),
+              ),
+              if (data.periodLabel.isNotEmpty) ...[
+                const SizedBox(width: 10),
+                _ReportDarkPill(label: data.periodLabel),
+              ],
+            ],
+          ),
+          if (data.body.isNotEmpty) ...[
+            const SizedBox(height: 9),
+            Text(data.body, style: _darkSub),
+          ],
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _Metric(
+                label: '任务完成',
+                value: '${data.taskCompleted}/${data.taskTotal}',
+              ),
+              const SizedBox(width: 8),
+              _Metric(label: '积分', value: '+${data.pointsEarned}'),
+              const SizedBox(width: 8),
+              _Metric(label: '完成率', value: '${data.completionRate}%'),
+            ],
+          ),
+          if (data.pendingItems > 0) ...[
+            const SizedBox(height: 10),
+            _ReportAttentionBar(count: data.pendingItems),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportDarkPill extends StatelessWidget {
+  const _ReportDarkPill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 184),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(AppRadii.full),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.78),
+              fontFamily: AppTypography.systemFont,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              height: 1.1,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReportAttentionBar extends StatelessWidget {
+  const _ReportAttentionBar({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.warning.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.flag_outlined,
+              color: AppColors.brandWarm,
+              size: 17,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '还有 $count 项需要家长处理',
+                style: const TextStyle(
+                  color: Color(0xFFFFD08A),
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  height: 1.2,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReportSkillMap extends StatelessWidget {
+  const _ReportSkillMap({required this.skills});
+
+  final List<ReportSkill> skills;
+
+  @override
+  Widget build(BuildContext context) {
+    final ranked = [...skills]..sort((a, b) => b.score.compareTo(a.score));
+    final strongest = ranked.isEmpty ? null : ranked.first;
+    final focus = ranked.isEmpty ? null : ranked.last;
+    return AppSurface(
+      radius: 22,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _ReportIconBadge(
+                icon: Icons.radar_outlined,
+                color: AppColors.brand,
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('成长能力图谱', style: _reportTitleStyle),
+                    SizedBox(height: 4),
+                    Text('根据任务完成和看护记录生成', style: _reportBodyStyle),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 188,
+            child: CustomPaint(
+              painter: _ReportSkillRadarPainter(skills: skills),
+              child: const SizedBox.expand(),
+            ),
+          ),
+          if (strongest != null && focus != null) ...[
+            const SizedBox(height: 14),
+            _ReportSkillSummary(strongest: strongest, focus: focus),
+            const SizedBox(height: 14),
+            _ReportSkillMeterList(skills: skills, topKey: strongest.key),
+            const SizedBox(height: 12),
+            Text(
+              '${strongest.label}: ${strongest.detail}',
+              style: _reportBodyStyle,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportSkillSummary extends StatelessWidget {
+  const _ReportSkillSummary({required this.strongest, required this.focus});
+
+  final ReportSkill strongest;
+  final ReportSkill focus;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Row(
+        children: [
+          Expanded(
+            child: _ReportSkillSpotlight(
+              eyebrow: '优势能力',
+              skill: strongest,
+              color: AppColors.brand,
+            ),
+          ),
+          const VerticalDivider(
+            width: 22,
+            thickness: 1,
+            color: AppColors.borderSoft,
+          ),
+          Expanded(
+            child: _ReportSkillSpotlight(
+              eyebrow: '重点关注',
+              skill: focus,
+              color: AppColors.brandWarm,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportSkillSpotlight extends StatelessWidget {
+  const _ReportSkillSpotlight({
+    required this.eyebrow,
+    required this.skill,
+    required this.color,
+  });
+
+  final String eyebrow;
+  final ReportSkill skill;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          eyebrow,
+          style: const TextStyle(
+            color: AppColors.subtle,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            height: 1.2,
+            letterSpacing: 0,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(child: Text(skill.label, style: _reportRowTitle)),
+            Text(
+              '${skill.score}',
+              style: TextStyle(
+                color: color,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                height: 1,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+        Text(skill.level, style: _reportMetaStyle),
+      ],
+    );
+  }
+}
+
+class _ReportSkillMeterList extends StatelessWidget {
+  const _ReportSkillMeterList({required this.skills, required this.topKey});
+
+  final List<ReportSkill> skills;
+  final String topKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var index = 0; index < skills.length; index++) ...[
+          _ReportSkillMeterRow(
+            skill: skills[index],
+            active: skills[index].key == topKey,
+          ),
+          if (index != skills.length - 1) const SizedBox(height: 9),
+        ],
+      ],
+    );
+  }
+}
+
+class _ReportSkillMeterRow extends StatelessWidget {
+  const _ReportSkillMeterRow({required this.skill, required this.active});
+
+  final ReportSkill skill;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = active ? AppColors.brandDeep : AppColors.brandSoft;
+    return Row(
+      children: [
+        SizedBox(
+          width: 48,
+          child: Text(
+            skill.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: active ? AppColors.brandDeep : AppColors.muted,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              height: 1.1,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadii.full),
+            child: SizedBox(
+              height: 7,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  const ColoredBox(color: AppColors.surfaceStrong),
+                  FractionallySizedBox(
+                    widthFactor: skill.ratio,
+                    alignment: Alignment.centerLeft,
+                    child: ColoredBox(color: color),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        SizedBox(
+          width: 28,
+          child: Text(
+            '${skill.score}',
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              color: active ? AppColors.brandDeep : AppColors.subtle,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              height: 1.1,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ReportSkillRadarPainter extends CustomPainter {
+  const _ReportSkillRadarPainter({required this.skills});
+
+  final List<ReportSkill> skills;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (skills.length < 3) return;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = math.min(size.width, size.height) * 0.35;
+    final gridPaint = Paint()
+      ..color = AppColors.border.withValues(alpha: 0.82)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final axisPaint = Paint()
+      ..color = AppColors.border.withValues(alpha: 0.72)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final fillPaint = Paint()
+      ..color = AppColors.brand.withValues(alpha: 0.16)
+      ..style = PaintingStyle.fill;
+    final linePaint = Paint()
+      ..color = AppColors.brand
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeJoin = StrokeJoin.round;
+    final pointPaint = Paint()
+      ..color = AppColors.ink
+      ..style = PaintingStyle.fill;
+
+    for (var level = 1; level <= 4; level++) {
+      final path = Path();
+      for (var index = 0; index < skills.length; index++) {
+        final point = _radarPoint(
+          center,
+          radius * level / 4,
+          index,
+          skills.length,
+        );
+        if (index == 0) {
+          path.moveTo(point.dx, point.dy);
+        } else {
+          path.lineTo(point.dx, point.dy);
+        }
+      }
+      path.close();
+      canvas.drawPath(path, gridPaint);
+    }
+
+    final valuePath = Path();
+    for (var index = 0; index < skills.length; index++) {
+      final axis = _radarPoint(center, radius, index, skills.length);
+      canvas.drawLine(center, axis, axisPaint);
+      final point = _radarPoint(
+        center,
+        radius * skills[index].ratio,
+        index,
+        skills.length,
+      );
+      if (index == 0) {
+        valuePath.moveTo(point.dx, point.dy);
+      } else {
+        valuePath.lineTo(point.dx, point.dy);
+      }
+    }
+    valuePath.close();
+    canvas.drawPath(valuePath, fillPaint);
+    canvas.drawPath(valuePath, linePaint);
+
+    for (var index = 0; index < skills.length; index++) {
+      final point = _radarPoint(
+        center,
+        radius * skills[index].ratio,
+        index,
+        skills.length,
+      );
+      canvas.drawCircle(point, 4, pointPaint);
+      final labelPoint = _radarPoint(center, radius + 24, index, skills.length);
+      final painter = TextPainter(
+        text: TextSpan(
+          text: skills[index].label,
+          style: const TextStyle(
+            color: AppColors.muted,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: 64);
+      painter.paint(
+        canvas,
+        labelPoint - Offset(painter.width / 2, painter.height / 2),
+      );
+    }
+  }
+
+  Offset _radarPoint(Offset center, double radius, int index, int count) {
+    final angle = -math.pi / 2 + (math.pi * 2 * index / count);
+    return Offset(
+      center.dx + math.cos(angle) * radius,
+      center.dy + math.sin(angle) * radius,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _ReportSkillRadarPainter oldDelegate) {
+    return oldDelegate.skills != skills;
+  }
+}
+
+class _ReportSectionBlock extends StatelessWidget {
+  const _ReportSectionBlock({
+    required this.title,
+    required this.items,
+    required this.fallback,
+  });
+
+  final String title;
+  final List<ReportSectionItem> items;
+  final String fallback;
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleItems = items.isEmpty
+        ? [
+            ReportSectionItem(
+              title: '暂无记录',
+              detail: fallback,
+              tone: 'neutral',
+              source: '系统',
+            ),
+          ]
+        : items;
+    return AppSurface(
+      radius: 22,
+      padding: const EdgeInsets.fromLTRB(16, 15, 16, 7),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: _reportTitleStyle),
+          const SizedBox(height: 10),
+          for (var index = 0; index < visibleItems.length; index++) ...[
+            _ReportInsightRow(item: visibleItems[index]),
+            if (index != visibleItems.length - 1)
+              const Divider(height: 1, color: AppColors.borderSoft),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportInsightRow extends StatelessWidget {
+  const _ReportInsightRow({required this.item});
+
+  final ReportSectionItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _reportToneColor(item.tone);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _ReportIconBadge(icon: _reportToneIcon(item.tone), color: color),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: Text(item.title, style: _reportRowTitle)),
+                    if (item.source.isNotEmpty) ...[
+                      const SizedBox(width: 8),
+                      _ReportSourcePill(label: item.source, color: color),
+                    ],
+                  ],
+                ),
+                if (item.detail.isNotEmpty) ...[
+                  const SizedBox(height: 5),
+                  Text(item.detail, style: _reportBodyStyle),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportTaskReview extends StatelessWidget {
+  const _ReportTaskReview({required this.tasks});
+
+  final List<ReportTaskItem> tasks;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurface(
+      radius: 22,
+      padding: const EdgeInsets.fromLTRB(16, 15, 16, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('任务回顾', style: _reportTitleStyle),
+          const SizedBox(height: 11),
+          for (var index = 0; index < tasks.length; index++) ...[
+            _ReportTaskRow(task: tasks[index]),
+            if (index != tasks.length - 1)
+              const Divider(height: 1, color: AppColors.borderSoft),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportTaskRow extends StatelessWidget {
+  const _ReportTaskRow({required this.task});
+
+  final ReportTaskItem task;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _reportToneColor(task.tone);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _ReportIconBadge(icon: Icons.checklist_rtl_outlined, color: color),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: Text(task.title, style: _reportRowTitle)),
+                    _ReportSourcePill(label: task.statusLabel, color: color),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  [
+                    if (task.typeLabel.isNotEmpty) task.typeLabel,
+                    if (task.time.isNotEmpty) task.time,
+                    if (task.points > 0) '+${task.points} 积分',
+                  ].join(' · '),
+                  style: _reportMetaStyle,
+                ),
+                if (task.detail.isNotEmpty) ...[
+                  const SizedBox(height: 5),
+                  Text(task.detail, style: _reportBodyStyle),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportIconBadge extends StatelessWidget {
+  const _ReportIconBadge({required this.icon, required this.color});
+
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.11),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Center(child: Icon(icon, color: color, size: 20)),
+      ),
+    );
+  }
+}
+
+class _ReportSourcePill extends StatelessWidget {
+  const _ReportSourcePill({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppRadii.full),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: color,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
       ),
     );
   }
@@ -6935,6 +7684,62 @@ Color _toneColor(AppListRowTone tone) {
     AppListRowTone.neutral => AppColors.ink,
   };
 }
+
+Color _reportToneColor(String tone) {
+  return switch (tone) {
+    'blue' => AppColors.brand,
+    'green' => AppColors.success,
+    'amber' => AppColors.warning,
+    'red' => AppColors.danger,
+    _ => AppColors.ink,
+  };
+}
+
+IconData _reportToneIcon(String tone) {
+  return switch (tone) {
+    'green' => Icons.check_circle_outline,
+    'amber' => Icons.flag_outlined,
+    'red' => Icons.error_outline,
+    'blue' => Icons.auto_awesome_outlined,
+    _ => Icons.notes_outlined,
+  };
+}
+
+const _reportTitleStyle = TextStyle(
+  color: AppColors.ink,
+  fontFamily: AppTypography.systemFont,
+  fontSize: 16,
+  fontWeight: FontWeight.w900,
+  height: 1.18,
+  letterSpacing: 0,
+);
+
+const _reportRowTitle = TextStyle(
+  color: AppColors.ink,
+  fontFamily: AppTypography.systemFont,
+  fontSize: 14,
+  fontWeight: FontWeight.w800,
+  height: 1.24,
+  letterSpacing: 0,
+);
+
+const _reportBodyStyle = TextStyle(
+  color: AppColors.muted,
+  fontFamily: AppTypography.systemFont,
+  fontSize: 12,
+  fontWeight: FontWeight.w600,
+  height: 1.45,
+  letterSpacing: 0,
+);
+
+const _reportMetaStyle = TextStyle(
+  color: AppColors.subtle,
+  fontFamily: AppTypography.systemFont,
+  fontSize: 11,
+  fontWeight: FontWeight.w700,
+  height: 1.25,
+  letterSpacing: 0,
+);
 
 const _hubSectionTitleStyle = TextStyle(
   color: AppColors.ink,

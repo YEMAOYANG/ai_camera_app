@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify, request
 
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token, client_device_payload, json_body
@@ -25,15 +25,6 @@ def request_sms_code():
         }
         if result["debugCode"] is not None:
             payload["debugCode"] = result["debugCode"]
-            print(
-                f"[development-sms] phone={result['phone']} code={result['debugCode']}",
-                flush=True,
-            )
-            current_app.logger.info(
-                "Development SMS verification code phone=%s code=%s",
-                result["phone"],
-                result["debugCode"],
-            )
         return jsonify(payload)
     except ApiError as exc:
         return error_response(exc)

@@ -2,6 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AppFlavor { development, staging, production, test }
 
+const _defaultDevelopmentApiBaseUrl = 'http://192.168.228.95:8000/api';
+const _defaultLocalApiBaseUrl = 'http://127.0.0.1:8000/api';
+const _defaultLocalTaskWebSocketBaseUrl = 'ws://127.0.0.1:8001/api';
+
 class AppEnvironment {
   const AppEnvironment({
     required this.flavor,
@@ -12,16 +16,16 @@ class AppEnvironment {
   factory AppEnvironment.development() {
     return const AppEnvironment(
       flavor: AppFlavor.development,
-      apiBaseUrl: 'http://127.0.0.1:8000/api',
-      taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',
+      apiBaseUrl: _defaultDevelopmentApiBaseUrl,
+      taskWebSocketBaseUrl: 'ws://192.168.228.95:8001/api',
     );
   }
 
   factory AppEnvironment.localBackend() {
     return const AppEnvironment(
       flavor: AppFlavor.development,
-      apiBaseUrl: 'http://127.0.0.1:8000/api',
-      taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',
+      apiBaseUrl: _defaultLocalApiBaseUrl,
+      taskWebSocketBaseUrl: _defaultLocalTaskWebSocketBaseUrl,
     );
   }
 
@@ -54,10 +58,7 @@ class AppEnvironment {
       'APP_FLAVOR',
       defaultValue: 'development',
     );
-    const apiBaseUrl = String.fromEnvironment(
-      'API_BASE_URL',
-      defaultValue: 'http://127.0.0.1:8000/api',
-    );
+    const definedApiBaseUrl = String.fromEnvironment('API_BASE_URL');
     const taskWsBaseUrl = String.fromEnvironment('TASK_WS_BASE_URL');
     final flavor = switch (flavorName) {
       'production' => AppFlavor.production,
@@ -65,6 +66,9 @@ class AppEnvironment {
       'test' => AppFlavor.test,
       _ => AppFlavor.development,
     };
+    final apiBaseUrl = definedApiBaseUrl.trim().isEmpty
+        ? _defaultApiBaseUrlFor(flavor)
+        : definedApiBaseUrl.trim();
     if (flavor == AppFlavor.production && apiBaseUrl.trim().isEmpty) {
       throw UnsupportedError('API_BASE_URL is required in production.');
     }
@@ -80,6 +84,14 @@ class AppEnvironment {
   final AppFlavor flavor;
   final String apiBaseUrl;
   final String taskWebSocketBaseUrl;
+}
+
+String _defaultApiBaseUrlFor(AppFlavor flavor) {
+  return switch (flavor) {
+    AppFlavor.development => _defaultDevelopmentApiBaseUrl,
+    AppFlavor.test => _defaultLocalApiBaseUrl,
+    AppFlavor.staging || AppFlavor.production => '',
+  };
 }
 
 String _requiredApiBaseUrl(AppFlavor flavor) {

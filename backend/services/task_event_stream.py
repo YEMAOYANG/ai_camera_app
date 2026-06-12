@@ -16,6 +16,8 @@ from websockets.sync.server import ServerConnection, serve
 
 TASK_STREAM_UPDATE = "task.updated"
 TASK_STREAM_CONNECTED = "task.connected"
+ACCOUNT_SECURITY_STREAM_CONNECTED = "account.security.connected"
+ACCOUNT_SECURITY_SESSION_REVOKED = "session_revoked"
 
 
 @dataclass
@@ -37,9 +39,11 @@ class TaskEventStreamServer:
         self._thread: threading.Thread | None = None
         self._lock = threading.Lock()
         self._connections: dict[str, set[ServerConnection]] = {}
+        self._session_connections: dict[str, set[ServerConnection]] = {}
         self._server = None
         self._auth_service: AuthService | None = None
         self._path = "/api/tasks/stream"
+        self._account_security_path = "/api/account/security/stream"
         self._state = TaskEventStreamState()
 
     def start(self, app) -> None:
@@ -55,14 +59,20 @@ class TaskEventStreamServer:
         if self._thread and self._thread.is_alive():
             return
 
-        host = str(app.config.get("TASK_WEBSOCKET_HOST") or app.config.get("HOST") or "127.0.0.1")
+        host = str(
+            app.config.get("TASK_WEBSOCKET_HOST")
+            or app.config.get("HOST")
+            or "127.0.0.1"
+        )
         port = int(app.config.get("TASK_WEBSOCKET_PORT") or 8001)
         path = str(app.config.get("TASK_WEBSOCKET_PATH") or "/api/tasks/stream")
         self._path = path
         self._auth_service = AuthService(
             app.config["DATABASE_URL"],
             access_token_seconds=int(app.config.get("AUTH_ACCESS_TOKEN_SECONDS", 900)),
-            refresh_token_seconds=int(app.config.get("AUTH_REFRESH_TOKEN_SECONDS", 60 * 60 * 24 * 30)),
+            refresh_token_seconds=int(
+                app.config.get("AUTH_REFRESH_TOKEN_SECONDS", 60 * 60 * 24 * 30)
+            ),
         )
 
         with self._lock:
@@ -105,32 +115,31 @@ class TaskEventStreamServer:
     def broadcast(self, family_id: str, payload: dict[str, Any]) -> None:
         if not family_id:
             return
-        text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
         with self._lock:
             targets = list(self._connections.get(family_id, set()))
-        if not targets:
-            return
-
-        failed: list[ServerConnection] = []
-        for connection in targets:
-            try:
-                connection.send(text)
-            except Exception:
-                failed.append(connection)
-
+        failed = _send_to_connections(targets, payload)
         if failed:
-            with self._lock:
-                active = self._connections.get(family_id)
-                if active is not None:
-                    for connection in failed:
-                        active.discard(connection)
-                    if not active:
-                        self._connections.pop(family_id, None)
-                self._state.connection_count = sum(len(items) for items in self._connections.values())
+            self._drop_failed(self._connections, family_id, failed)
 
         with self._lock:
             self._state.last_broadcast_at = _now_ms()
             self._state.last_broadcast_task_ids = list(payload.get("taskIds") or [])
+
+    def broadcast_session_revoked(
+        self,
+        session_id: str,
+        payload: dict[str, Any],
+    ) -> None:
+        if not session_id:
+            return
+        with self._lock:
+            targets = list(self._session_connections.get(session_id, set()))
+        failed = _send_to_connections(targets, payload)
+        if failed:
+            self._drop_failed(self._session_connections, session_id, failed)
+
+        with self._lock:
+            self._state.last_broadcast_at = _now_ms()
 
     def _run(self, host: str, port: int) -> None:
         try:
@@ -150,17 +159,14 @@ class TaskEventStreamServer:
                 self._state.running = False
 
     def _handle(self, connection: ServerConnection) -> None:
-        family_id = ""
+        stream_kind = ""
+        identity_id = ""
         try:
-            family_id = self._authenticate_connection(connection)
-            self._register(family_id, connection)
+            stream_kind, identity_id = self._authenticate_connection(connection)
+            self._register(stream_kind, identity_id, connection)
             connection.send(
                 json.dumps(
-                    {
-                        "type": TASK_STREAM_CONNECTED,
-                        "familyId": family_id,
-                        "sentAt": _now_ms(),
-                    },
+                    _connected_message(stream_kind, identity_id),
                     ensure_ascii=False,
                     separators=(",", ":"),
                 )
@@ -183,34 +189,76 @@ class TaskEventStreamServer:
         except ConnectionClosed:
             pass
         finally:
-            if family_id:
-                self._unregister(family_id, connection)
+            if stream_kind and identity_id:
+                self._unregister(stream_kind, identity_id, connection)
 
-    def _authenticate_connection(self, connection: ServerConnection) -> str:
+    def _authenticate_connection(self, connection: ServerConnection) -> tuple[str, str]:
         request = getattr(connection, "request", None)
         request_path = getattr(request, "path", "") if request is not None else ""
         parsed = urlparse(request_path)
-        if parsed.path != self._path:
-            raise ValueError("unexpected websocket path")
         token = (parse_qs(parsed.query).get("token") or [""])[0]
         if self._auth_service is None:
-            raise ValueError("task websocket auth is not configured")
-        context = self._auth_service.authenticate(token)
-        return str(context["family"]["id"])
+            raise ValueError("websocket auth is not configured")
+        if parsed.path == self._path:
+            context = self._auth_service.authenticate(token)
+            return "task", str(context["family"]["id"])
+        if parsed.path == self._account_security_path:
+            context = self._auth_service.authenticate_session(token)
+            return "account_security", str(context["session"]["id"])
+        raise ValueError("unexpected websocket path")
 
-    def _register(self, family_id: str, connection: ServerConnection) -> None:
+    def _register(
+        self,
+        stream_kind: str,
+        identity_id: str,
+        connection: ServerConnection,
+    ) -> None:
+        bucket = self._bucket(stream_kind)
         with self._lock:
-            self._connections.setdefault(family_id, set()).add(connection)
-            self._state.connection_count = sum(len(items) for items in self._connections.values())
+            bucket.setdefault(identity_id, set()).add(connection)
+            self._state.connection_count = self._connection_count()
 
-    def _unregister(self, family_id: str, connection: ServerConnection) -> None:
+    def _unregister(
+        self,
+        stream_kind: str,
+        identity_id: str,
+        connection: ServerConnection,
+    ) -> None:
+        bucket = self._bucket(stream_kind)
         with self._lock:
-            active = self._connections.get(family_id)
+            active = bucket.get(identity_id)
             if active is not None:
                 active.discard(connection)
                 if not active:
-                    self._connections.pop(family_id, None)
-            self._state.connection_count = sum(len(items) for items in self._connections.values())
+                    bucket.pop(identity_id, None)
+            self._state.connection_count = self._connection_count()
+
+    def _drop_failed(
+        self,
+        bucket: dict[str, set[ServerConnection]],
+        identity_id: str,
+        failed: list[ServerConnection],
+    ) -> None:
+        with self._lock:
+            active = bucket.get(identity_id)
+            if active is not None:
+                for connection in failed:
+                    active.discard(connection)
+                if not active:
+                    bucket.pop(identity_id, None)
+            self._state.connection_count = self._connection_count()
+
+    def _bucket(self, stream_kind: str) -> dict[str, set[ServerConnection]]:
+        if stream_kind == "task":
+            return self._connections
+        if stream_kind == "account_security":
+            return self._session_connections
+        raise ValueError("unknown websocket stream")
+
+    def _connection_count(self) -> int:
+        return sum(len(items) for items in self._connections.values()) + sum(
+            len(items) for items in self._session_connections.values()
+        )
 
 
 task_event_stream_server = TaskEventStreamServer()
@@ -245,7 +293,26 @@ def publish_task_runtime_result(result: dict[str, Any]) -> None:
         task_event_stream_server.broadcast(family_id, payload)
 
 
-def task_runtime_messages_by_family(result: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def publish_account_session_revoked(
+    *,
+    session_id: str,
+    reason: str = "device_removed",
+    message: str = "当前登录已在其他设备上移除。",
+) -> None:
+    task_event_stream_server.broadcast_session_revoked(
+        session_id,
+        {
+            "type": ACCOUNT_SECURITY_SESSION_REVOKED,
+            "reason": reason,
+            "message": message,
+            "sentAt": _now_ms(),
+        },
+    )
+
+
+def task_runtime_messages_by_family(
+    result: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
     grouped: dict[str, dict[str, list[dict]]] = {}
     for task in result.get("changedTasks") or []:
         family_id = str(task.get("familyId") or "")
@@ -294,6 +361,36 @@ def task_update_message(
         "checkedAt": checked_at,
         "sentAt": _now_ms(),
     }
+
+
+def _connected_message(stream_kind: str, identity_id: str) -> dict[str, Any]:
+    if stream_kind == "account_security":
+        return {
+            "type": ACCOUNT_SECURITY_STREAM_CONNECTED,
+            "sessionId": identity_id,
+            "sentAt": _now_ms(),
+        }
+    return {
+        "type": TASK_STREAM_CONNECTED,
+        "familyId": identity_id,
+        "sentAt": _now_ms(),
+    }
+
+
+def _send_to_connections(
+    targets: list[ServerConnection],
+    payload: dict[str, Any],
+) -> list[ServerConnection]:
+    if not targets:
+        return []
+    text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    failed: list[ServerConnection] = []
+    for connection in targets:
+        try:
+            connection.send(text)
+        except Exception:
+            failed.append(connection)
+    return failed
 
 
 def _now_ms() -> int:

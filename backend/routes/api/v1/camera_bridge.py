@@ -20,6 +20,7 @@ def _json_response(payload: dict):
 @camera_bp.get("/health")
 def camera_health():
     try:
+        auth_service().authenticate(bearer_token(request))
         return _json_response(camera_bridge_service().health())
     except ApiError as exc:
         return error_response(exc)
@@ -38,6 +39,7 @@ def camera_status():
 @camera_bp.get("/runtime")
 def camera_runtime():
     try:
+        auth_service().authenticate(bearer_token(request))
         return _json_response(camera_bridge_service().runtime())
     except ApiError as exc:
         return error_response(exc)
@@ -46,6 +48,7 @@ def camera_runtime():
 @camera_bp.get("/speaker/status")
 def speaker_status():
     try:
+        auth_service().authenticate(bearer_token(request))
         return _json_response(camera_bridge_service().speaker_status())
     except ApiError as exc:
         return error_response(exc)

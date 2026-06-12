@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import unittest
+from datetime import date
 
 from app import create_app
 from core.database import Database
+from core.security import hash_value
 from tests.support import fresh_test_config, request_debug_code
 
 
@@ -12,8 +14,10 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.app = create_app(fresh_test_config(CAMERA_RUNTIME_PROVIDER="disabled"))
         self.client = self.app.test_client()
         self.access_token = self._login("13800002026")
-        self.child_id = self._create_child("小宇")
+        self._save_parent_identity()
         self.device_id = self._create_device()
+        self._save_wifi()
+        self.child_id = self._create_child("小宇")
 
     def test_profile_summary_and_account_contract(self):
         summary = self.client.get("/api/profile/summary", headers=self._auth_headers())
@@ -53,6 +57,30 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         security = self.client.get("/api/account/security", headers=self._auth_headers())
         self.assertEqual(security.status_code, 200)
         self.assertEqual(security.json["security"]["loginMethod"], "sms")
+        self.assertEqual(
+            security.json["security"]["loginDevices"][0]["label"],
+            "其他登录设备",
+        )
+        database = Database(self.app.config["DATABASE_URL"])
+        with database.transaction() as conn:
+            conn.execute(
+                """
+                UPDATE sessions
+                SET device_label = '已登录设备',
+                    device_type = 'unknown',
+                    device_model = '',
+                    device_hardware = '',
+                    platform = 'unknown'
+                WHERE access_hash = ?
+                """,
+                (hash_value(self.access_token),),
+            )
+        legacy_security = self.client.get("/api/account/security", headers=self._auth_headers())
+        self.assertEqual(legacy_security.status_code, 200)
+        self.assertEqual(
+            legacy_security.json["security"]["loginDevices"][0]["label"],
+            "其他登录设备",
+        )
 
         phone_code = self.client.post(
             "/api/account/phone/code",
@@ -180,6 +208,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
             },
         )
         self.assertEqual(browser_login.status_code, 200)
+        browser_access = browser_login.json["tokens"]["accessToken"]
 
         security = self.client.get(
             "/api/account/security",
@@ -203,15 +232,32 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(current_revoke.status_code, 400)
         self.assertEqual(current_revoke.json["error"], "cannot_revoke_current_session")
 
-        removed = self.client.post(
-            f"/api/account/sessions/{removable['id']}/revoke",
-            headers={"Authorization": f"Bearer {mobile_access}"},
+        published_revocations = []
+        from services import task_event_stream
+
+        original_publish_revocation = task_event_stream.publish_account_session_revoked
+        task_event_stream.publish_account_session_revoked = (
+            lambda *, session_id, **_: published_revocations.append(session_id)
         )
+        try:
+            removed = self.client.post(
+                f"/api/account/sessions/{removable['id']}/revoke",
+                headers={"Authorization": f"Bearer {mobile_access}"},
+            )
+        finally:
+            task_event_stream.publish_account_session_revoked = original_publish_revocation
         self.assertEqual(removed.status_code, 200)
+        self.assertEqual(published_revocations, [removable["id"]])
         remaining_labels = [
             item["label"] for item in removed.json["security"]["loginDevices"]
         ]
         self.assertEqual(remaining_labels, ["iPhone 17 Pro Max"])
+
+        revoked_session = self.client.get(
+            "/api/auth/session",
+            headers={"Authorization": f"Bearer {browser_access}"},
+        )
+        self.assertEqual(revoked_session.status_code, 401)
 
         deletion = self.client.post(
             "/api/account/deletion",
@@ -548,6 +594,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
                 "title": "整理书包",
                 "type": "learning",
                 "rewardPoints": 2,
+                "scheduledDate": "2026-06-05",
                 "scheduledStart": "19:00",
                 "scheduledEnd": "19:20",
             },
@@ -1015,6 +1062,86 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(feedback.status_code, 200)
         self.assertEqual(feedback.json["feedback"]["status"], "received")
 
+    def test_reports_include_growth_sections_and_camera_observations(self):
+        today = date.today().isoformat()
+        toy_task = self._create_task(
+            title="玩具收纳",
+            task_type="housework",
+            scheduled_date=today,
+            reward_points=3,
+            requires_parent_confirmation=False,
+        )
+        water_task = self._create_task(
+            title="喝水",
+            task_type="life",
+            scheduled_date=today,
+            reward_points=1,
+            requires_parent_confirmation=True,
+        )
+
+        completed = self.client.post(
+            f"/api/tasks/{toy_task}/complete",
+            json={
+                "completionSource": "camera_ai",
+                "evidenceSummary": "摄像头看到玩具已经放回收纳盒。",
+                "aiObservationSummary": "小宇主动把积木放回盒子，收纳目标完成。",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(completed.status_code, 200)
+        awaiting = self.client.post(
+            f"/api/tasks/{water_task}/complete",
+            json={
+                "completionSource": "parent",
+                "evidenceSummary": "孩子说已经喝水，等待家长确认。",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(awaiting.status_code, 200)
+        database = Database(self.app.config["DATABASE_URL"])
+        with database.transaction() as conn:
+            task_row = conn.execute(
+                "SELECT family_id FROM tasks WHERE id = ?",
+                (toy_task,),
+            ).fetchone()
+            conn.execute(
+                """
+                INSERT INTO task_events(
+                  id, family_id, task_id, event_type, message, payload, created_at
+                )
+                VALUES (?, ?, ?, 'monitor_started', '摄像头已开始观察任务', '{}', 1)
+                """,
+                (f"event_{toy_task}", task_row["family_id"], toy_task),
+            )
+
+        daily = self.client.get(
+            f"/api/reports/daily?date={today}",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(daily.status_code, 200)
+        report = daily.json["report"]
+        self.assertEqual(report["taskTotal"], 2)
+        self.assertEqual(report["taskCompleted"], 1)
+        self.assertEqual(report["pendingItems"], 1)
+        self.assertGreaterEqual(len(report["skills"]), 5)
+        self.assertTrue(report["highlights"])
+        self.assertTrue(report["improvements"])
+        self.assertTrue(report["observations"])
+        self.assertTrue(report["tasks"])
+        self.assertTrue(report["nextActions"])
+        combined_report_text = str(report["highlights"]) + str(report["observations"]) + str(report["tasks"])
+        self.assertIn("玩具", combined_report_text)
+        self.assertIn("收纳", combined_report_text)
+        self.assertNotIn("monitor_started", combined_report_text)
+        self.assertNotIn("开始观察任务", combined_report_text)
+
+        weekly = self.client.get(
+            f"/api/reports/weekly?startDate={today}&endDate={today}",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(weekly.status_code, 200)
+        self.assertGreaterEqual(len(weekly.json["report"]["skills"]), 5)
+
     def test_reward_item_delete_archives_item(self):
         item = self.client.post(
             "/api/rewards/items",
@@ -1074,6 +1201,18 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         return response.json["child"]["id"]
 
+    def _save_parent_identity(self) -> None:
+        response = self.client.post(
+            "/api/setup/parent-identity",
+            json={
+                "displayName": "其他家人",
+                "relationship": "其他家人",
+                "relationshipKey": "family_default",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200)
+
     def _create_device(self) -> str:
         response = self.client.post(
             "/api/setup/device",
@@ -1086,6 +1225,40 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         return response.json["device"]["id"]
+
+    def _create_task(
+        self,
+        *,
+        title: str,
+        task_type: str,
+        scheduled_date: str,
+        reward_points: int,
+        requires_parent_confirmation: bool,
+    ) -> str:
+        response = self.client.post(
+            "/api/tasks",
+            json={
+                "childId": self.child_id,
+                "title": title,
+                "taskType": task_type,
+                "rewardPoints": reward_points,
+                "scheduledDate": scheduled_date,
+                "scheduledStart": "18:00",
+                "scheduledEnd": "18:20",
+                "requiresParentConfirmation": requires_parent_confirmation,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200)
+        return response.json["task"]["id"]
+
+    def _save_wifi(self) -> None:
+        response = self.client.post(
+            "/api/setup/wifi",
+            json={"ssid": "Home-5G", "password": "not-stored", "authType": "wpa2"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200)
 
     def _mark_setup_completed(self, access_token: str | None = None) -> None:
         token = access_token or self.access_token

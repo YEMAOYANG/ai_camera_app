@@ -34,10 +34,8 @@ class WifiNetworkRepository {
       final rawName = await _networkInfo.getWifiName();
       final ssid = _normalizeSsid(rawName);
       if (ssid == null) {
-        return WifiNetworkResult.unavailable(
-          message: Platform.isIOS
-              ? '未能读取当前 Wi-Fi。iOS 模拟器不会返回真实 Wi-Fi，真机需开启定位权限和 Wi-Fi 信息能力。'
-              : '未能读取当前 Wi-Fi，请确认已连接家庭网络并允许定位权限。',
+        return const WifiNetworkResult.unavailable(
+          message: '未能读取当前 Wi-Fi，请确认已连接家庭网络并允许定位权限。',
         );
       }
       return WifiNetworkResult.detected(ssid: ssid);

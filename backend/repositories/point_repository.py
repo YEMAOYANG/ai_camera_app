@@ -5,6 +5,8 @@ import uuid
 from contextlib import contextmanager
 from typing import Iterator
 
+from pymysql.err import IntegrityError
+
 from core.database import Database, DatabaseConnection, DatabaseRow
 from core.errors import ApiError
 
@@ -90,21 +92,27 @@ class PointRepository:
         family_id: str,
         child_id: str,
         now: int,
+        for_update: bool = False,
     ) -> DatabaseRow:
         row = conn.execute(
-            "SELECT * FROM point_accounts WHERE family_id = ? AND child_id = ?",
+            "SELECT * FROM point_accounts WHERE family_id = ? AND child_id = ?"
+            + (" FOR UPDATE" if for_update else ""),
             (family_id, child_id),
         ).fetchone()
         if row is None:
-            conn.execute(
-                """
-                INSERT INTO point_accounts(family_id, child_id, balance, created_at, updated_at)
-                VALUES (?, ?, 0, ?, ?)
-                """,
-                (family_id, child_id, now, now),
-            )
+            try:
+                conn.execute(
+                    """
+                    INSERT INTO point_accounts(family_id, child_id, balance, created_at, updated_at)
+                    VALUES (?, ?, 0, ?, ?)
+                    """,
+                    (family_id, child_id, now, now),
+                )
+            except IntegrityError:
+                pass
             row = conn.execute(
-                "SELECT * FROM point_accounts WHERE family_id = ? AND child_id = ?",
+                "SELECT * FROM point_accounts WHERE family_id = ? AND child_id = ?"
+                + (" FOR UPDATE" if for_update else ""),
                 (family_id, child_id),
             ).fetchone()
         return row
@@ -130,7 +138,13 @@ class PointRepository:
         note: str | None,
         now: int,
     ) -> DatabaseRow:
-        account = self.get_or_create_account(conn, family_id=family_id, child_id=child_id, now=now)
+        account = self.get_or_create_account(
+            conn,
+            family_id=family_id,
+            child_id=child_id,
+            now=now,
+            for_update=True,
+        )
         balance_after = account["balance"] + delta
         if balance_after < 0:
             raise ApiError("insufficient_points", "积分不足，无法完成操作", 400)
@@ -173,7 +187,13 @@ class PointRepository:
         child_id: str,
         now: int,
     ) -> DatabaseRow:
-        account = self.get_or_create_account(conn, family_id=family_id, child_id=child_id, now=now)
+        account = self.get_or_create_account(
+            conn,
+            family_id=family_id,
+            child_id=child_id,
+            now=now,
+            for_update=True,
+        )
         conn.execute(
             """
             UPDATE point_accounts
