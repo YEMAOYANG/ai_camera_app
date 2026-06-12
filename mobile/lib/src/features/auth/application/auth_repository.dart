@@ -23,9 +23,13 @@ class AuthRepository {
   final Dio _dio;
   final AuthSessionStore _sessionStore;
 
-  Future<void> requestSmsCode(String phone) async {
+  Future<SmsCodeRequestResult> requestSmsCode(String phone) async {
     try {
-      await _dio.post<dynamic>('/auth/sms/request', data: {'phone': phone});
+      final response = await _dio.post<dynamic>(
+        '/auth/sms/request',
+        data: {'phone': phone},
+      );
+      return SmsCodeRequestResult.fromJson(_asMap(response.data));
     } on DioException catch (error) {
       throw _fromDio(error);
     }
@@ -126,6 +130,26 @@ class AuthRepository {
   }
 }
 
+class SmsCodeRequestResult {
+  const SmsCodeRequestResult({
+    required this.codeSent,
+    required this.message,
+    this.debugCode = '',
+  });
+
+  final bool codeSent;
+  final String message;
+  final String debugCode;
+
+  static SmsCodeRequestResult fromJson(Map<String, dynamic> json) {
+    return SmsCodeRequestResult(
+      codeSent: json['codeSent'] != false,
+      message: _asString(json['message'], fallback: '验证码已发送'),
+      debugCode: _asString(json['debugCode']),
+    );
+  }
+}
+
 class AuthLoginResult {
   const AuthLoginResult({required this.session, required this.pendingJoins});
 
@@ -177,8 +201,8 @@ Map<String, dynamic> _asMap(dynamic value) {
   return <String, dynamic>{};
 }
 
-String _asString(dynamic value) {
-  return value is String ? value : '';
+String _asString(dynamic value, {String fallback = ''}) {
+  return value is String && value.isNotEmpty ? value : fallback;
 }
 
 DateTime _asDateTime(dynamic value) {

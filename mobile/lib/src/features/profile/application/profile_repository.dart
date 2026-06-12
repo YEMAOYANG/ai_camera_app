@@ -225,6 +225,7 @@ class ProfileRepository {
       'nickname': child.nickname,
       'gender': child.gender,
       'birthday': child.birthday,
+      'sleepTime': child.sleepTime,
       'ageStage': child.ageStage,
       'educationStage': child.educationStage,
       'grade': child.grade,

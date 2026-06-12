@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
@@ -78,9 +79,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             18;
 
         return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light.copyWith(
-            statusBarColor: Colors.transparent,
-            systemNavigationBarColor: AppColors.appBackgroundWarm,
+          value: AppSystemUi.dark().copyWith(
             systemNavigationBarIconBrightness: Brightness.dark,
           ),
           child: Scaffold(
@@ -1086,6 +1085,7 @@ class _TodayTaskRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final statusStyle = _HomeTaskStatusStyle.fromStatus(task.status);
     return _HomePressable(
       onTap: () => context.go('$taskDetailPath/${task.id}'),
       child: Semantics(
@@ -1094,10 +1094,7 @@ class _TodayTaskRow extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _TodayTaskTimeToken(
-              label: _taskTimeText(task),
-              tone: task.status.tone,
-            ),
+            _TodayTaskTimeToken(label: _taskTimeText(task), style: statusStyle),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -1122,9 +1119,9 @@ class _TodayTaskRow extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      StatusChip(
+                      _HomeTaskStatusChip(
                         label: task.status.label,
-                        tone: task.status.tone,
+                        style: statusStyle,
                       ),
                     ],
                   ),
@@ -1153,28 +1150,22 @@ class _TodayTaskRow extends StatelessWidget {
 }
 
 class _TodayTaskTimeToken extends StatelessWidget {
-  const _TodayTaskTimeToken({required this.label, required this.tone});
+  const _TodayTaskTimeToken({required this.label, required this.style});
 
   final String label;
-  final StatusTone tone;
+  final _HomeTaskStatusStyle style;
 
   @override
   Widget build(BuildContext context) {
-    final color = _toneColor(tone);
-    final foreground = tone == StatusTone.neutral ? AppColors.muted : color;
-    final background = tone == StatusTone.neutral
-        ? AppColors.surfaceStrong.withValues(alpha: 0.68)
-        : _toneWash(tone).withValues(alpha: 0.74);
-
     return SizedBox(
       width: 54,
       child: Align(
         alignment: Alignment.topLeft,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: background,
+            color: style.background,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: foreground.withValues(alpha: 0.11)),
+            border: Border.all(color: style.border),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
@@ -1184,7 +1175,7 @@ class _TodayTaskTimeToken extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: foreground,
+                color: style.foreground,
                 fontFamily: AppTypography.systemFont,
                 fontSize: 11.5,
                 fontWeight: FontWeight.w800,
@@ -1195,6 +1186,86 @@ class _TodayTaskTimeToken extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _HomeTaskStatusChip extends StatelessWidget {
+  const _HomeTaskStatusChip({required this.label, required this.style});
+
+  final String label;
+  final _HomeTaskStatusStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: style.background,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: style.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: style.foreground,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+            height: 1.1,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeTaskStatusStyle {
+  const _HomeTaskStatusStyle({
+    required this.foreground,
+    required this.background,
+    required this.border,
+  });
+
+  final Color foreground;
+  final Color background;
+  final Color border;
+
+  factory _HomeTaskStatusStyle.fromStatus(GuardianTaskStatus status) {
+    if (status == GuardianTaskStatus.inProgress) {
+      return _HomeTaskStatusStyle(
+        foreground: AppColors.brandDeep,
+        background: AppColors.brandWash.withValues(alpha: 0.92),
+        border: AppColors.brand.withValues(alpha: 0.14),
+      );
+    }
+    if (status == GuardianTaskStatus.completed ||
+        status == GuardianTaskStatus.confirmed) {
+      return _HomeTaskStatusStyle(
+        foreground: AppColors.success,
+        background: AppColors.successWash.withValues(alpha: 0.86),
+        border: AppColors.success.withValues(alpha: 0.12),
+      );
+    }
+    return _HomeTaskStatusStyle.fromTone(status.tone);
+  }
+
+  factory _HomeTaskStatusStyle.fromTone(StatusTone tone) {
+    final foreground = tone == StatusTone.neutral
+        ? AppColors.muted
+        : _toneColor(tone);
+    final background = tone == StatusTone.neutral
+        ? AppColors.surfaceStrong.withValues(alpha: 0.68)
+        : _toneWash(tone).withValues(alpha: 0.74);
+    final border = foreground.withValues(
+      alpha: tone == StatusTone.neutral ? 0.10 : 0.12,
+    );
+    return _HomeTaskStatusStyle(
+      foreground: foreground,
+      background: background,
+      border: border,
     );
   }
 }

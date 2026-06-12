@@ -68,6 +68,21 @@ class AppTheme {
           side: const BorderSide(color: AppColors.border),
         ),
       ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.ink,
+        elevation: 0,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        contentTextStyle: const TextStyle(
+          color: Colors.white,
+          fontFamily: AppTypography.systemFont,
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          height: 1.35,
+          letterSpacing: 0,
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceSoft,

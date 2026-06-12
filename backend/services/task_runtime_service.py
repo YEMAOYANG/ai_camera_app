@@ -16,13 +16,26 @@ from repositories.point_repository import PointRepository
 from repositories.profile_repository import ProfileRepository
 from repositories.task_repository import TaskRepository
 from schemas.tasks import task_event_payload, task_payload
+from services.ai_text_provider import AiTextProvider, UnavailableAiTextProvider
 from services.camera_command_service import CameraCommandService
+from services.prompt_registry import PromptRegistry
+from services.setting_policy import setting_value
 from services.task_reminder_policy import build_task_reminder
 
 
 TASK_TYPES_REQUIRING_START_OBSERVATION = {
     "learning",
     "reading_interest",
+}
+
+TASK_TYPES_WITHOUT_CAMERA_MONITOR = {
+    "sports_outdoor",
+}
+
+BOUNDARY_DELAY_POLICY = {
+    "loose": {"interval_seconds": 300, "max_count": 2},
+    "balanced": {"interval_seconds": 180, "max_count": 3},
+    "strict": {"interval_seconds": 120, "max_count": 4},
 }
 
 
@@ -32,6 +45,8 @@ class TaskRuntimeService:
         database_url: str | Path,
         *,
         camera_command_service: CameraCommandService,
+        ai_text_provider: AiTextProvider | None = None,
+        prompt_registry: PromptRegistry | None = None,
         reminder_lead_seconds: int = 300,
         delay_reminder_interval_seconds: int = 180,
         max_delay_reminders: int = 3,
@@ -43,6 +58,9 @@ class TaskRuntimeService:
         self.point_repository = PointRepository(database)
         self.profile_repository = ProfileRepository(database)
         self.camera_command_service = camera_command_service
+        self.ai_text_provider = ai_text_provider or UnavailableAiTextProvider()
+        self.prompt_registry = prompt_registry
+        self._task_reminder_prompt_cache: str | None = None
         self.reminder_lead_seconds = max(0, int(reminder_lead_seconds))
         self.delay_reminder_interval_seconds = max(30, int(delay_reminder_interval_seconds))
         self.max_delay_reminders = max(0, int(max_delay_reminders))
@@ -99,10 +117,10 @@ class TaskRuntimeService:
         return task, []
 
     def _send_reminder(self, conn, task, *, now: datetime):
-        if self.repository.has_event(conn, task_id=task["id"], event_type="reminder_sent") or self.repository.has_event(
-            conn,
-            task_id=task["id"],
-            event_type="reminder_failed",
+        if (
+            self.repository.has_event(conn, task_id=task["id"], event_type="reminder_sent")
+            or self.repository.has_event(conn, task_id=task["id"], event_type="reminder_failed")
+            or self.repository.has_event(conn, task_id=task["id"], event_type="reminder_skipped")
         ):
             return None, None
         current_ms = self._now_ms(now)
@@ -117,6 +135,17 @@ class TaskRuntimeService:
         )
         reminder = self._task_reminder(conn, task, phase="prepare")
         text = reminder["text"]
+        if not self._voice_reminder_enabled(conn, task["family_id"]):
+            event = self.repository.add_event(
+                conn,
+                family_id=task["family_id"],
+                task_id=task["id"],
+                event_type="reminder_skipped",
+                message="语音提醒已关闭，未向摄像头播报",
+                payload={"command": self._skipped_command("voice_reminder_disabled"), **reminder},
+                now=current_ms,
+            )
+            return task, event
         command = None
         sent = False
         if self.speaker_enabled:
@@ -148,7 +177,7 @@ class TaskRuntimeService:
     def _auto_start_or_delay(self, conn, task, *, now: datetime):
         if self.repository.has_event(conn, task_id=task["id"], event_type="auto_started"):
             return task, []
-        if not self._requires_start_observation(task):
+        if not self._requires_start_observation(conn, task):
             return self._mark_in_progress_without_start_observation(conn, task, now=now)
 
         observation = self.camera_command_service.camera_service.task_observation(dict(task))
@@ -240,7 +269,12 @@ class TaskRuntimeService:
 
     def _mark_delayed(self, conn, task, *, observation: dict, now: datetime):
         current_ms = self._now_ms(now)
-        next_reminder = self._plus_seconds_ms(now, self.delay_reminder_interval_seconds)
+        max_delay_reminders = self._max_delay_reminders(conn, task["family_id"])
+        next_reminder = (
+            self._plus_seconds_ms(now, self._delay_reminder_interval_seconds(conn, task["family_id"]))
+            if max_delay_reminders > 0
+            else None
+        )
         updated = self.repository.mark_delayed(
             conn,
             family_id=task["family_id"],
@@ -270,9 +304,10 @@ class TaskRuntimeService:
             ),
         ]
         events.extend(self._start_monitor(conn, task, now_ms_value=current_ms))
-        delay_event = self._send_delay_reminder(conn, updated, now=now)
-        if delay_event:
-            events.append(delay_event)
+        if max_delay_reminders > 0:
+            delay_event = self._send_delay_reminder(conn, updated, now=now)
+            if delay_event:
+                events.append(delay_event)
         return updated, events
 
     def _process_delayed(self, conn, task, *, now: datetime):
@@ -312,16 +347,21 @@ class TaskRuntimeService:
 
         next_reminder_at = int(task.get("next_reminder_at") or 0)
         delay_count = int(task.get("delay_reminder_count") or 0)
-        if next_reminder_at and self._now_ms(now) >= next_reminder_at and delay_count < self.max_delay_reminders:
+        max_delay_reminders = self._max_delay_reminders(conn, task["family_id"])
+        if next_reminder_at and self._now_ms(now) >= next_reminder_at and delay_count < max_delay_reminders:
             event = self._send_delay_reminder(conn, task, now=now)
             return task, [event] if event else []
         return task, []
 
     def _send_delay_reminder(self, conn, task, *, now: datetime):
-        if int(task.get("delay_reminder_count") or 0) >= self.max_delay_reminders:
+        max_delay_reminders = self._max_delay_reminders(conn, task["family_id"])
+        if int(task.get("delay_reminder_count") or 0) >= max_delay_reminders:
             return None
         current_ms = self._now_ms(now)
-        next_reminder = self._plus_seconds_ms(now, self.delay_reminder_interval_seconds)
+        next_reminder = self._plus_seconds_ms(
+            now,
+            self._delay_reminder_interval_seconds(conn, task["family_id"]),
+        )
         reminder_count = int(task.get("delay_reminder_count") or 0) + 1
         reminder = self._task_reminder(
             conn,
@@ -330,6 +370,24 @@ class TaskRuntimeService:
             count=reminder_count,
         )
         text = reminder["text"]
+        if not self._voice_reminder_enabled(conn, task["family_id"]):
+            self.repository.mark_delay_reminder_result(
+                conn,
+                family_id=task["family_id"],
+                task_id=task["id"],
+                sent=False,
+                next_reminder_at=next_reminder,
+                now=current_ms,
+            )
+            return self.repository.add_event(
+                conn,
+                family_id=task["family_id"],
+                task_id=task["id"],
+                event_type="delay_reminder_skipped",
+                message="语音提醒已关闭，未向摄像头播报",
+                payload={"command": self._skipped_command("voice_reminder_disabled"), **reminder},
+                now=current_ms,
+            )
         command = None
         sent = False
         if self.speaker_enabled:
@@ -470,6 +528,18 @@ class TaskRuntimeService:
     def _start_monitor(self, conn, task, *, now_ms_value: int):
         if not self.monitor_enabled:
             return []
+        if self._task_type(task) in TASK_TYPES_WITHOUT_CAMERA_MONITOR:
+            return [
+                self.repository.add_event(
+                    conn,
+                    family_id=task["family_id"],
+                    task_id=task["id"],
+                    event_type="monitor_not_required",
+                    message="户外任务不需要摄像头观察，按时间记录并等待后续确认。",
+                    payload={"reason": "out_of_camera_scope"},
+                    now=now_ms_value,
+                )
+            ]
         command = self.camera_command_service.internal_start_monitor(
             family_id=task["family_id"],
             task_id=task["id"],
@@ -504,6 +574,19 @@ class TaskRuntimeService:
         if task is None:
             return None
         reminder = self._task_reminder(conn, task, phase=phase)
+        if not self._voice_reminder_enabled(conn, task["family_id"]):
+            return self.repository.add_event(
+                conn,
+                family_id=task["family_id"],
+                task_id=task["id"],
+                event_type=success_event_type.replace("_sent", "_skipped"),
+                message="语音提醒已关闭，未向摄像头播报",
+                payload={
+                    "command": self._skipped_command("voice_reminder_disabled"),
+                    **reminder,
+                },
+                now=now_ms_value,
+            )
         command = None
         sent = False
         if self.speaker_enabled:
@@ -530,7 +613,24 @@ class TaskRuntimeService:
             family_id=task["family_id"],
             child_id=task["child_id"],
         )
-        return build_task_reminder(task, phase=phase, child=child, count=count)
+        return build_task_reminder(
+            task,
+            phase=phase,
+            child=child,
+            count=count,
+            ai_text_provider=self.ai_text_provider,
+            prompt=self._task_reminder_prompt(),
+        )
+
+    def _task_reminder_prompt(self) -> str:
+        if self._task_reminder_prompt_cache is not None:
+            return self._task_reminder_prompt_cache
+        if self.prompt_registry is None:
+            self._task_reminder_prompt_cache = ""
+            return ""
+        prompt = self.prompt_registry.get_prompt("task.reminder.voice", "v1")
+        self._task_reminder_prompt_cache = prompt.body if prompt else ""
+        return self._task_reminder_prompt_cache
 
     def _grant_points_if_needed(self, conn, task, now: int) -> dict | None:
         if task["points_granted_at"] or int(task["reward_points"] or 0) <= 0:
@@ -599,9 +699,58 @@ class TaskRuntimeService:
         scheduled_date = str(task.get("scheduled_date") or "")
         return bool(scheduled_date and scheduled_date < now.date().isoformat())
 
-    def _requires_start_observation(self, task) -> bool:
-        task_type = str(task.get("type") or task.get("task_type") or "").strip()
-        return task_type in TASK_TYPES_REQUIRING_START_OBSERVATION
+    def _requires_start_observation(self, conn, task) -> bool:
+        if self._ai_rules(conn, task["family_id"]).get("taskObservationEnabled") is not True:
+            return False
+        return self._task_type(task) in TASK_TYPES_REQUIRING_START_OBSERVATION
+
+    def _task_type(self, task) -> str:
+        return str(task.get("type") or task.get("task_type") or "").strip()
+
+    def _ai_rules(self, conn, family_id: str) -> dict:
+        row = self.profile_repository.get_setting(conn, family_id=family_id, key="ai-care-rules")
+        return setting_value(row, "ai-care-rules")
+
+    def _conversation_rules(self, conn, family_id: str) -> dict:
+        row = self.profile_repository.get_setting(conn, family_id=family_id, key="conversation")
+        return setting_value(row, "conversation")
+
+    def _voice_reminder_enabled(self, conn, family_id: str) -> bool:
+        return self.speaker_enabled and self._ai_rules(conn, family_id).get("voiceReminderEnabled") is True
+
+    def _delay_reminder_enabled(self, conn, family_id: str) -> bool:
+        return self._ai_rules(conn, family_id).get("delayReminderEnabled") is True
+
+    def _delay_reminder_interval_seconds(self, conn, family_id: str) -> int:
+        rules = self._ai_rules(conn, family_id)
+        configured = self._positive_int(
+            rules.get("delayReminderIntervalMinutes"),
+            fallback=0,
+        )
+        if configured:
+            return max(60, configured * 60)
+        boundary = str(self._conversation_rules(conn, family_id).get("boundaryLevel") or "balanced")
+        return BOUNDARY_DELAY_POLICY.get(boundary, BOUNDARY_DELAY_POLICY["balanced"])["interval_seconds"]
+
+    def _max_delay_reminders(self, conn, family_id: str) -> int:
+        if not self._delay_reminder_enabled(conn, family_id):
+            return 0
+        rules = self._ai_rules(conn, family_id)
+        configured = self._positive_int(rules.get("maxDelayReminderCount"), fallback=-1)
+        if configured >= 0:
+            return configured
+        boundary = str(self._conversation_rules(conn, family_id).get("boundaryLevel") or "balanced")
+        return BOUNDARY_DELAY_POLICY.get(boundary, BOUNDARY_DELAY_POLICY["balanced"])["max_count"]
+
+    def _positive_int(self, value, *, fallback: int) -> int:
+        try:
+            parsed = int(value)
+        except (TypeError, ValueError):
+            return fallback
+        return max(0, parsed)
+
+    def _skipped_command(self, reason: str) -> dict:
+        return {"status": "skipped", "reason": reason}
 
     def _now_ms(self, now: datetime) -> int:
         if now.tzinfo is None:

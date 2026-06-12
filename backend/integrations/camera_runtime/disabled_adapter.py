@@ -42,6 +42,9 @@ class DisabledCameraRuntimeAdapter(CameraRuntimeAdapter):
     def speak(self, text: str) -> dict:
         raise RuntimeError("摄像头运行时尚未配置。")
 
+    def ptz_move(self, direction: str, step: int) -> dict:
+        raise RuntimeError("摄像头运行时尚未配置。")
+
     def start_monitor(self) -> dict:
         return {
             "ok": False,

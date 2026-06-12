@@ -28,6 +28,7 @@ class DeviceRepository:
                   family_id VARCHAR(255) NOT NULL,
                   binding_code VARCHAR(255),
                   name VARCHAR(255) NOT NULL,
+                  wake_name VARCHAR(255),
                   location VARCHAR(255),
                   status VARCHAR(255) NOT NULL,
                   created_at BIGINT NOT NULL,
@@ -35,6 +36,25 @@ class DeviceRepository:
                 );
                 """
             )
+            self._ensure_column(
+                conn,
+                table="devices",
+                column="wake_name",
+                definition="VARCHAR(255)",
+            )
+
+    def _ensure_column(
+        self,
+        conn: DatabaseConnection,
+        *,
+        table: str,
+        column: str,
+        definition: str,
+    ) -> None:
+        columns = conn.execute(f"PRAGMA table_info({table})").fetchall()
+        if any(row["name"] == column for row in columns):
+            return
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
     def list_devices(self, conn: DatabaseConnection, *, family_id: str) -> list[DatabaseRow]:
         return list(

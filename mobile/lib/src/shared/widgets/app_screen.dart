@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
 
@@ -71,11 +72,7 @@ class AppScreen extends StatelessWidget {
     );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: AppColors.appBackgroundWarm,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
+      value: AppSystemUi.light(),
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
         body: Stack(

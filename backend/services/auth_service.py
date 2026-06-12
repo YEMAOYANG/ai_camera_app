@@ -88,6 +88,18 @@ class AuthService:
             self.repository.delete_sms_code(conn, normalized)
             session = self._new_session(now)
             device = self._client_device(client_device)
+            self.repository.revoke_matching_device_sessions(
+                conn,
+                user_id=user["id"],
+                device_label=device["label"],
+                device_type=device["type"],
+                device_model=device["model"],
+                device_hardware=device["hardware"],
+                platform=device["platform"],
+                os_version=device["osVersion"],
+                app_version=device["appVersion"],
+                revoked_at=now,
+            )
             self.repository.create_session(
                 conn,
                 user_id=user["id"],

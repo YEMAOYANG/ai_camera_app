@@ -141,7 +141,30 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
             },
         )
         self.assertEqual(mobile_login.status_code, 200)
-        mobile_access = mobile_login.json["tokens"]["accessToken"]
+        first_mobile_access = mobile_login.json["tokens"]["accessToken"]
+
+        code = request_debug_code(self.client, phone)
+        repeated_mobile_login = self.client.post(
+            "/api/auth/sms/login",
+            json={"phone": phone, "code": code},
+            headers={
+                "X-Mira-Device-Label": "iPhone 17 Pro Max",
+                "X-Mira-Device-Type": "phone",
+                "X-Mira-Device-Platform": "ios",
+                "X-Mira-Device-Model": "iPhone",
+                "X-Mira-Device-Hardware": "iPhone18,2",
+                "X-Mira-OS-Version": "iOS 26.1",
+                "X-Mira-App-Version": "1.0.0+1",
+            },
+        )
+        self.assertEqual(repeated_mobile_login.status_code, 200)
+        mobile_access = repeated_mobile_login.json["tokens"]["accessToken"]
+
+        old_session = self.client.get(
+            "/api/auth/session",
+            headers={"Authorization": f"Bearer {first_mobile_access}"},
+        )
+        self.assertEqual(old_session.status_code, 401)
 
         code = request_debug_code(self.client, phone)
         browser_login = self.client.post(
@@ -596,6 +619,20 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(status.status_code, 200)
         self.assertTrue(status.json["setup"]["completed"])
 
+        guest_code = self.client.get(
+            "/api/family/code",
+            headers={"Authorization": f"Bearer {guest_access}"},
+        )
+        self.assertEqual(guest_code.status_code, 200)
+        self.assertEqual(guest_code.json["familyCode"]["code"], family_code)
+
+        guest_reset = self.client.post(
+            "/api/family/code/reset",
+            headers={"Authorization": f"Bearer {guest_access}"},
+        )
+        self.assertEqual(guest_reset.status_code, 403)
+        self.assertEqual(guest_reset.json["error"], "permission_denied")
+
         denied = self.client.post(
             f"/api/devices/{self.device_id}/rename",
             json={"name": "访客改名"},
@@ -745,6 +782,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
                 "nickname": "小宇",
                 "educationStage": "小学",
                 "grade": "一年级",
+                "sleepTime": "20:45",
                 "schoolName": "示例小学",
                 "interests": ["阅读", "搭积木"],
                 "taskPreferences": {"pace": "gentle"},
@@ -753,11 +791,13 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(child.status_code, 200)
         self.assertEqual(child.json["child"]["grade"], "一年级")
+        self.assertEqual(child.json["child"]["sleepTime"], "20:45")
         self.assertEqual(child.json["child"]["interests"], ["阅读", "搭积木"])
 
         current = self.client.get("/api/children/current", headers=self._auth_headers())
         self.assertEqual(current.status_code, 200)
         self.assertEqual(current.json["child"]["schoolName"], "示例小学")
+        self.assertEqual(current.json["child"]["sleepTime"], "20:45")
 
         contact = self.client.post(
             "/api/contacts/emergency",
@@ -791,11 +831,16 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
 
         updated = self.client.patch(
             f"/api/contacts/emergency/{contact_id}",
-            json={"relationshipKey": "family_default", "defaultNotify": False},
+            json={
+                "phone": "+86 136 0000 2026",
+                "relationshipKey": "family_default",
+                "defaultNotify": False,
+            },
             headers=self._auth_headers(),
         )
         self.assertEqual(updated.status_code, 200)
         self.assertFalse(updated.json["contact"]["defaultNotify"])
+        self.assertEqual(updated.json["contact"]["phone"], "13600002026")
         self.assertEqual(updated.json["contact"]["relationship"], "其他家人")
         self.assertEqual(updated.json["contact"]["relationshipKey"], "family_default")
 
@@ -855,6 +900,10 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         setting = self.client.get("/api/settings/ai-care-rules", headers=self._auth_headers())
         self.assertEqual(setting.status_code, 200)
         self.assertTrue(setting.json["setting"]["value"]["voiceReminderEnabled"])
+        self.assertNotIn(
+            "safetyEventObservationEnabled",
+            setting.json["setting"]["value"],
+        )
 
         saved = self.client.patch(
             "/api/settings/ai-care-rules",
@@ -864,10 +913,48 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(saved.status_code, 200)
         self.assertFalse(saved.json["setting"]["value"]["voiceReminderEnabled"])
 
-        for path in (
+        notifications = self.client.get(
             "/api/settings/notifications",
-            "/api/settings/privacy",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(notifications.status_code, 200)
+        self.assertNotIn("safetyAlert", notifications.json["setting"]["value"])
+
+        conversation = self.client.patch(
             "/api/settings/conversation",
+            json={
+                "value": {
+                    "boundaryLevel": "strict",
+                    "wakeName": "豆豆",
+                    "freeChatSingleMinutes": 6,
+                    "freeChatDailyMinutes": 20,
+                }
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(conversation.status_code, 200)
+        self.assertEqual(
+            conversation.json["setting"]["value"]["boundaryLevel"],
+            "strict",
+        )
+        self.assertEqual(conversation.json["setting"]["value"]["wakeName"], "豆豆")
+        self.assertEqual(
+            conversation.json["setting"]["value"]["freeChatSingleMinutes"],
+            6,
+        )
+        self.assertEqual(
+            conversation.json["setting"]["value"]["freeChatDailyMinutes"],
+            20,
+        )
+        device = self.client.get(
+            f"/api/devices/{self.device_id}",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(device.status_code, 200)
+        self.assertEqual(device.json["device"]["wakeName"], "豆豆")
+
+        for path in (
+            "/api/settings/privacy",
             "/api/settings/education",
         ):
             response = self.client.get(path, headers=self._auth_headers())

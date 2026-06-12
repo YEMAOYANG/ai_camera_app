@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/platform/contact_picker.dart';
 import 'package:guardian_parent_app/src/core/platform/native_date_picker.dart';
+import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
 import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
@@ -19,6 +20,8 @@ import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_time_picker_sheet.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 import 'package:guardian_parent_app/src/shared/widgets/guardian_identity_card_selector.dart';
 
 final setupDraftProvider = StateProvider<SetupDraft>((ref) {
@@ -44,6 +47,7 @@ void syncSetupDraftFromStatus(WidgetRef ref, SetupStatus status) {
     wifiName: _nonEmptyOrNull(status.wifiName),
     childName: _nonEmptyOrNull(status.childName),
     childBirthday: _nonEmptyOrNull(status.childBirthday),
+    childSleepTime: _nonEmptyOrNull(status.childSleepTime),
     childGender: _nonEmptyOrNull(status.childGender),
     childStage: _nonEmptyOrNull(status.childEducationStage),
     childGrade: _nonEmptyOrNull(status.childGrade),
@@ -79,6 +83,7 @@ class SetupDraft {
     this.wifiPassword = '',
     this.childName = '',
     this.childBirthday = '',
+    this.childSleepTime = '21:00',
     this.childGender = 'unspecified',
     this.childStage = '幼儿园',
     this.childGrade = '大班',
@@ -96,6 +101,7 @@ class SetupDraft {
   final String wifiPassword;
   final String childName;
   final String childBirthday;
+  final String childSleepTime;
   final String childGender;
   final String childStage;
   final String childGrade;
@@ -113,6 +119,7 @@ class SetupDraft {
     String? wifiPassword,
     String? childName,
     String? childBirthday,
+    String? childSleepTime,
     String? childGender,
     String? childStage,
     String? childGrade,
@@ -130,6 +137,7 @@ class SetupDraft {
       wifiPassword: wifiPassword ?? this.wifiPassword,
       childName: childName ?? this.childName,
       childBirthday: childBirthday ?? this.childBirthday,
+      childSleepTime: childSleepTime ?? this.childSleepTime,
       childGender: childGender ?? this.childGender,
       childStage: childStage ?? this.childStage,
       childGrade: childGrade ?? this.childGrade,
@@ -309,9 +317,7 @@ Future<void> _showJoinFamilyCodeSheet(
     context.go(status.routePath);
   } on SetupException catch (error) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(error.message)));
+    showAppToast(context, error.message, tone: AppToastTone.danger);
   }
 }
 
@@ -1008,6 +1014,7 @@ class ChildProfileEditorValue {
   const ChildProfileEditorValue({
     required this.name,
     required this.birthday,
+    required this.sleepTime,
     required this.gender,
     required this.stage,
     required this.grade,
@@ -1017,6 +1024,7 @@ class ChildProfileEditorValue {
 
   final String name;
   final String birthday;
+  final String sleepTime;
   final String gender;
   final String stage;
   final String grade;
@@ -1043,6 +1051,13 @@ class ChildProfileEditorValue {
         : 'unspecified';
   }
 
+  String get normalizedSleepTime {
+    final parsed = ChildProfileSetupScreen._parseSleepTime(sleepTime);
+    return parsed == null
+        ? '21:00'
+        : ChildProfileSetupScreen._formatSleepTime(parsed);
+  }
+
   List<String> get interests {
     return interestsText
         .split(RegExp('[、,，]'))
@@ -1054,6 +1069,7 @@ class ChildProfileEditorValue {
   ChildProfileEditorValue copyWith({
     String? name,
     String? birthday,
+    String? sleepTime,
     String? gender,
     String? stage,
     String? grade,
@@ -1063,6 +1079,7 @@ class ChildProfileEditorValue {
     return ChildProfileEditorValue(
       name: name ?? this.name,
       birthday: birthday ?? this.birthday,
+      sleepTime: sleepTime ?? this.sleepTime,
       gender: gender ?? this.gender,
       stage: stage ?? this.stage,
       grade: grade ?? this.grade,
@@ -1146,6 +1163,25 @@ class ChildProfileEditorPanel extends StatelessWidget {
           },
           onChanged: (_) {},
         ),
+        const SizedBox(height: 16),
+        _SetupTextField(
+          label: '入睡时间',
+          value: value.normalizedSleepTime,
+          icon: Icons.nights_stay_outlined,
+          hintText: '选择孩子通常入睡时间',
+          readOnly: true,
+          suffixIcon: Icons.schedule_outlined,
+          onTap: () async {
+            FocusScope.of(context).unfocus();
+            final picked = await ChildProfileSetupScreen._pickSleepTime(
+              context,
+              value.normalizedSleepTime,
+            );
+            if (picked == null || !context.mounted) return;
+            onChanged(value.copyWith(sleepTime: picked));
+          },
+          onChanged: (_) {},
+        ),
         if (recommended != null) ...[
           const SizedBox(height: 12),
           _SetupStatusPanel(
@@ -1218,6 +1254,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
     final formValue = ChildProfileEditorValue(
       name: draft.childName,
       birthday: draft.childBirthday,
+      sleepTime: draft.childSleepTime,
       gender: draft.childGender,
       stage: draft.childStage,
       grade: draft.childGrade,
@@ -1235,6 +1272,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
           ref.read(setupDraftProvider.notifier).state = latest.copyWith(
             childName: value.name,
             childBirthday: value.birthday,
+            childSleepTime: value.normalizedSleepTime,
             childGender: value.normalizedGender,
             childStage: value.normalizedStage,
             childGrade: value.normalizedGrade,
@@ -1249,6 +1287,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
               final value = ChildProfileEditorValue(
                 name: latest.childName,
                 birthday: latest.childBirthday,
+                sleepTime: latest.childSleepTime,
                 gender: latest.childGender,
                 stage: latest.childStage,
                 grade: latest.childGrade,
@@ -1267,6 +1306,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
                       educationStage: value.normalizedStage,
                       grade: value.normalizedGrade,
                       birthday: value.birthday,
+                      sleepTime: value.normalizedSleepTime,
                     ),
               );
               if (saved && context.mounted) {
@@ -1377,6 +1417,38 @@ class ChildProfileSetupScreen extends ConsumerWidget {
       return null;
     }
     return parsed;
+  }
+
+  static Future<String?> _pickSleepTime(
+    BuildContext context,
+    String currentValue,
+  ) {
+    final initialTime =
+        _parseSleepTime(currentValue) ?? const TimeOfDay(hour: 21, minute: 0);
+    return showAppTimePickerSheet(
+      context: context,
+      title: '选择入睡时间',
+      subtitle: '用于睡前聊天边界和任务提醒节奏。',
+      initialValue: _formatSleepTime(initialTime),
+      invalidMessage: '请选择有效的入睡时间',
+    );
+  }
+
+  static TimeOfDay? _parseSleepTime(String value) {
+    final parts = value.trim().split(':');
+    if (parts.length != 2) return null;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null || hour > 23 || minute > 59) {
+      return null;
+    }
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  static String _formatSleepTime(TimeOfDay value) {
+    final hour = value.hour.toString().padLeft(2, '0');
+    final minute = value.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
   }
 
   static int _ageAt(DateTime birthday, DateTime date) {
@@ -2087,11 +2159,7 @@ class _SetupScreenShell extends ConsumerWidget {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: AppColors.appBackgroundWarm,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
+      value: AppSystemUi.light(),
       child: Scaffold(
         backgroundColor: AppColors.appBackgroundWarm,
         body: Stack(
@@ -2830,19 +2898,5 @@ Future<bool> _submitSetupStep(
 }
 
 void _showSetupToast(BuildContext context, String message) {
-  final bottomInset = MediaQuery.paddingOf(context).bottom;
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.fromLTRB(20, 0, 20, bottomInset + 88),
-        duration: const Duration(milliseconds: 2200),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadii.control),
-        ),
-        backgroundColor: AppColors.ink,
-      ),
-    );
+  showAppToast(context, message);
 }

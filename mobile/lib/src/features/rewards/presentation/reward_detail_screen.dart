@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_settings.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
 import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
@@ -13,6 +14,7 @@ import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class RewardDetailScreen extends ConsumerWidget {
@@ -24,6 +26,9 @@ class RewardDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final itemValue = ref.watch(rewardDetailProvider(itemId));
     final points = ref.watch(pointsSummaryProvider);
+    final pointSettingsValue = ref.watch(pointRewardSettingsProvider);
+    final pointSettings =
+        pointSettingsValue.asData?.value ?? PointRewardSettings.fallback;
     final canManageRewards =
         ref.watch(profileSummaryProvider).asData?.value.can('manage_rewards') ??
         false;
@@ -39,7 +44,7 @@ class RewardDetailScreen extends ConsumerWidget {
 
         return AppScreen(
           title: item.title,
-          subtitle: '${item.pointsCost} 分兑换',
+          subtitle: '${pointSettings.amount(item.pointsCost)}兑换',
           fixedHeader: true,
           backLabel: '返回奖励',
           onBack: () => context.go(rewardsPath),
@@ -51,7 +56,7 @@ class RewardDetailScreen extends ConsumerWidget {
                 )
               : null,
           children: [
-            _RewardHero(item: item, balance: balance),
+            _RewardHero(item: item, balance: balance, settings: pointSettings),
             const SizedBox(height: 14),
             AppSurface(
               child: Column(
@@ -75,8 +80,8 @@ class RewardDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 10),
                   AppListRow(
                     icon: Icons.stars_outlined,
-                    title: '所需积分',
-                    subtitle: '兑换后会立即扣减积分，并留下清楚记录。',
+                    title: '所需${pointSettings.unitLabel}',
+                    subtitle: '兑换后会立即扣减${pointSettings.unitLabel}，并留下清楚记录。',
                     tone: AppListRowTone.amber,
                     trailing: Text(
                       '${item.pointsCost}',
@@ -94,10 +99,10 @@ class RewardDetailScreen extends ConsumerWidget {
             const SizedBox(height: 18),
             if (canManageRewards) ...[
               AppPrimaryButton(
-                label: canRedeem ? '兑换奖励' : '积分不足',
+                label: canRedeem ? '兑换奖励' : '${pointSettings.unitLabel}不足',
                 trailing: const AppButtonGlyph(icon: Icons.redeem_outlined),
                 onTap: canRedeem
-                    ? () => _showRedeemDialog(context, ref, item)
+                    ? () => _showRedeemDialog(context, ref, item, pointSettings)
                     : null,
               ),
               const SizedBox(height: 10),
@@ -137,10 +142,15 @@ class RewardDetailScreen extends ConsumerWidget {
 }
 
 class _RewardHero extends StatelessWidget {
-  const _RewardHero({required this.item, required this.balance});
+  const _RewardHero({
+    required this.item,
+    required this.balance,
+    required this.settings,
+  });
 
   final RewardItem item;
   final int balance;
+  final PointRewardSettings settings;
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +185,7 @@ class _RewardHero extends StatelessWidget {
                   StatusChip(label: item.statusLabel),
                   const Spacer(),
                   Text(
-                    '余额 $balance',
+                    '余额 ${settings.amount(balance)}',
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.68),
                       fontFamily: AppTypography.systemFont,
@@ -200,7 +210,7 @@ class _RewardHero extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                '${item.pointsCost} 分兑换，家长手动兑现。',
+                '${settings.amount(item.pointsCost)}兑换，家长手动兑现。',
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.72),
                   fontFamily: AppTypography.systemFont,
@@ -251,11 +261,13 @@ Future<void> _showRedeemDialog(
   BuildContext context,
   WidgetRef ref,
   RewardItem item,
+  PointRewardSettings settings,
 ) async {
   final confirmed = await showAppConfirmSheet(
     context: context,
     title: '确认兑换',
-    message: '将使用 ${item.pointsCost} 分兑换「${item.title}」。兑换后会生成待兑现记录。',
+    message:
+        '将使用 ${settings.amount(item.pointsCost)}兑换「${item.title}」。兑换后会生成待兑现记录。',
     confirmLabel: '确认兑换',
   );
   if (!confirmed || !context.mounted) return;
@@ -283,13 +295,5 @@ Future<void> _redeem(
 }
 
 void _showToast(BuildContext context, String message) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.ink,
-      ),
-    );
+  showAppToast(context, message);
 }

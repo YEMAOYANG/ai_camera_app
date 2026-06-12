@@ -230,6 +230,47 @@ class AuthRepository:
             ),
         )
 
+    def revoke_matching_device_sessions(
+        self,
+        conn: DatabaseConnection,
+        *,
+        user_id: str,
+        device_label: str,
+        device_type: str,
+        device_model: str,
+        device_hardware: str,
+        platform: str,
+        os_version: str,
+        app_version: str,
+        revoked_at: int,
+    ) -> None:
+        conn.execute(
+            """
+            UPDATE sessions
+            SET revoked_at = ?
+            WHERE user_id = ?
+              AND revoked_at IS NULL
+              AND COALESCE(device_label, '') = ?
+              AND COALESCE(device_type, '') = ?
+              AND COALESCE(device_model, '') = ?
+              AND COALESCE(device_hardware, '') = ?
+              AND COALESCE(platform, '') = ?
+              AND COALESCE(os_version, '') = ?
+              AND COALESCE(app_version, '') = ?
+            """,
+            (
+                revoked_at,
+                user_id,
+                device_label,
+                device_type,
+                device_model,
+                device_hardware,
+                platform,
+                os_version,
+                app_version,
+            ),
+        )
+
     def find_session_by_refresh_hash(
         self,
         conn: DatabaseConnection,

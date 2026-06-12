@@ -13,6 +13,7 @@ from tests.support import fresh_test_config, request_debug_code
 
 class _CameraRuntimeHandler(BaseHTTPRequestHandler):
     speak_count = 0
+    ptz_count = 0
     monitor_running = False
 
     def do_GET(self):
@@ -70,6 +71,10 @@ class _CameraRuntimeHandler(BaseHTTPRequestHandler):
             self.__class__.speak_count += 1
             self._json({"ok": True, "speaker": {"queued": True}})
             return
+        if self.path == "/api/camera/ptz/move":
+            self.__class__.ptz_count += 1
+            self._json({"ok": True, "status": "queued", "direction": "left", "step": 1})
+            return
         if self.path == "/api/monitor/start":
             self.__class__.monitor_running = True
             self._json({"ok": True, "monitor_runtime": {"running": True, "status": "running"}})
@@ -96,6 +101,7 @@ class _CameraRuntimeHandler(BaseHTTPRequestHandler):
 class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
     def setUp(self):
         _CameraRuntimeHandler.speak_count = 0
+        _CameraRuntimeHandler.ptz_count = 0
         _CameraRuntimeHandler.monitor_running = False
         self.camera_server = ThreadingHTTPServer(("127.0.0.1", 0), _CameraRuntimeHandler)
         self.camera_thread = threading.Thread(target=self.camera_server.serve_forever, daemon=True)
@@ -153,11 +159,27 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(unreachable.status_code, 502)
         self.assertFalse(unreachable.json["cameraRuntime"]["reachable"])
 
+        disabled_app = create_app(fresh_test_config(CAMERA_RUNTIME_PROVIDER="disabled"))
+        disabled_client = disabled_app.test_client()
+        code = request_debug_code(disabled_client, "13800003026")
+        login = disabled_client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13800003026", "code": code},
+        )
+        snapshot = disabled_client.get(
+            "/api/camera/snapshot",
+            headers={"Authorization": f"Bearer {login.json['tokens']['accessToken']}"},
+        )
+        self.assertEqual(snapshot.status_code, 204)
+        self.assertEqual(snapshot.headers["X-Mira-Snapshot-Status"], "unavailable")
+        self.assertEqual(snapshot.headers["X-Mira-Snapshot-Message"], "snapshot_unavailable")
+
     def test_camera_status_snapshot_commands_and_monitor(self):
         status = self.client.get("/api/camera/status", headers=self._auth_headers())
         self.assertEqual(status.status_code, 200)
         self.assertEqual(status.json["status"]["connectionStatus"], "online")
         self.assertTrue(status.json["status"]["speakerAvailable"])
+        self.assertFalse(status.json["status"]["ptzAvailable"])
         self.assertEqual(status.json["status"]["runtimeProvider"], "ai_camera_test_bridge")
 
         snapshot = self.client.get("/api/camera/snapshot", headers=self._auth_headers())
@@ -174,6 +196,16 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(speak.json["command"]["status"], "succeeded")
         self.assertEqual(_CameraRuntimeHandler.speak_count, 1)
 
+        ptz = self.client.post(
+            "/api/camera/commands/ptz",
+            json={"direction": "left", "step": 2},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(ptz.status_code, 200)
+        self.assertEqual(ptz.json["command"]["commandType"], "ptz_move")
+        self.assertEqual(ptz.json["command"]["status"], "succeeded")
+        self.assertEqual(_CameraRuntimeHandler.ptz_count, 1)
+
         start = self.client.post("/api/camera/monitor/start", headers=self._auth_headers())
         self.assertEqual(start.status_code, 200)
         self.assertEqual(start.json["command"]["commandType"], "start_monitor")
@@ -186,6 +218,14 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         stop = self.client.post("/api/camera/monitor/stop", headers=self._auth_headers())
         self.assertEqual(stop.status_code, 200)
         self.assertEqual(stop.json["command"]["status"], "succeeded")
+
+        events = self.client.get("/api/camera/events", headers=self._auth_headers())
+        self.assertEqual(events.status_code, 200)
+        event_types = [event["eventType"] for event in events.json["events"]]
+        self.assertIn("speak", event_types)
+        self.assertIn("ptz_move", event_types)
+        self.assertIn("start_monitor", event_types)
+        self.assertIn("stop_monitor", event_types)
 
     def test_camera_webrtc_session_contract(self):
         session = self.client.get("/api/camera/webrtc/session", headers=self._auth_headers())

@@ -120,3 +120,41 @@ class CameraCommandRepository:
             "SELECT * FROM camera_commands WHERE family_id = ? AND id = ?",
             (family_id, command_id),
         ).fetchone()
+
+    def list_recent_commands(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        limit: int = 30,
+    ) -> list[DatabaseRow]:
+        return list(
+            conn.execute(
+                """
+                SELECT * FROM camera_commands
+                WHERE family_id = ?
+                ORDER BY COALESCE(completed_at, updated_at, created_at) DESC, id DESC
+                LIMIT ?
+                """,
+                (family_id, limit),
+            ).fetchall()
+        )
+
+    def list_recent_task_events(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        limit: int = 30,
+    ) -> list[DatabaseRow]:
+        return list(
+            conn.execute(
+                """
+                SELECT * FROM task_events
+                WHERE family_id = ?
+                ORDER BY created_at DESC, id DESC
+                LIMIT ?
+                """,
+                (family_id, limit),
+            ).fetchall()
+        )

@@ -168,6 +168,7 @@ class ChildProfile {
     required this.nickname,
     required this.gender,
     required this.birthday,
+    required this.sleepTime,
     required this.ageStage,
     required this.educationStage,
     required this.grade,
@@ -181,6 +182,7 @@ class ChildProfile {
   final String nickname;
   final String gender;
   final String birthday;
+  final String sleepTime;
   final String ageStage;
   final String educationStage;
   final String grade;
@@ -203,6 +205,7 @@ class ChildProfile {
       nickname: _asString(json['nickname']),
       gender: _asString(json['gender'], fallback: 'unspecified'),
       birthday: _asString(json['birthday']),
+      sleepTime: _asString(json['sleepTime']),
       ageStage: _asString(json['ageStage']),
       educationStage: _asString(json['educationStage']),
       grade: _asString(json['grade']),
@@ -533,6 +536,8 @@ class AboutInfo {
     required this.appName,
     required this.displayName,
     required this.version,
+    required this.build,
+    required this.appUpdate,
     required this.description,
     required this.principles,
   });
@@ -540,6 +545,8 @@ class AboutInfo {
   final String appName;
   final String displayName;
   final String version;
+  final String build;
+  final AppUpdateInfo appUpdate;
   final String description;
   final List<String> principles;
 
@@ -548,8 +555,40 @@ class AboutInfo {
       appName: _asString(json['appName'], fallback: '家庭看护'),
       displayName: _asString(json['displayName'], fallback: '家庭看护'),
       version: _asString(json['version']),
+      build: _asString(json['build']),
+      appUpdate: AppUpdateInfo.fromJson(_asMap(json['appUpdate'])),
       description: _asString(json['description']),
       principles: _asStringList(json['principles']),
+    );
+  }
+}
+
+class AppUpdateInfo {
+  const AppUpdateInfo({
+    required this.status,
+    required this.latestVersion,
+    required this.latestBuild,
+    required this.releaseDate,
+    required this.notes,
+  });
+
+  final String status;
+  final String latestVersion;
+  final String latestBuild;
+  final String releaseDate;
+  final String notes;
+
+  bool get updateAvailable => status == 'available';
+
+  String get statusLabel => updateAvailable ? '发现新版本' : '当前已是最新';
+
+  static AppUpdateInfo fromJson(Map<String, dynamic> json) {
+    return AppUpdateInfo(
+      status: _asString(json['status'], fallback: 'latest'),
+      latestVersion: _asString(json['latestVersion']),
+      latestBuild: _asString(json['latestBuild']),
+      releaseDate: _asString(json['releaseDate']),
+      notes: _asString(json['notes']),
     );
   }
 }

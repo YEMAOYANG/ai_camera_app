@@ -32,6 +32,10 @@ final cameraSnapshotProvider = FutureProvider<CameraSnapshotFrame>((ref) {
   return ref.watch(cameraRepositoryProvider).snapshot();
 });
 
+final cameraEventsProvider = FutureProvider<List<LiveCareEvent>>((ref) {
+  return ref.watch(cameraRepositoryProvider).events();
+});
+
 final liveCareStatusProvider = FutureProvider<LiveCareStatus>((ref) async {
   final repository = ref.watch(cameraRepositoryProvider);
   final health = await repository.health();
@@ -104,11 +108,12 @@ class CameraRepository {
       );
       final bytes = response.data;
       if (bytes == null || bytes.isEmpty) {
-        return const CameraSnapshotFrame(
+        final message = response.headers.value('x-mira-snapshot-message');
+        return CameraSnapshotFrame(
           available: false,
           bytes: null,
           contentType: '',
-          message: '暂时没有可用快照',
+          message: _snapshotUnavailableMessage(message),
         );
       }
       return CameraSnapshotFrame(
@@ -142,7 +147,9 @@ class CameraRepository {
   Future<CameraWebRtcSession> createWebRtcSession() async {
     try {
       final response = await _apiClient.get('/camera/webrtc/session');
-      return CameraWebRtcSession.fromJson(_asMap(response.data));
+      return CameraWebRtcSession.fromJson(
+        _asMap(response.data),
+      ).normalizedForApiBase(_dio.options.baseUrl);
     } on DioException catch (error) {
       throw _fromDio(error, fallback: '实时画面暂时无法连接，请稍后再试。');
     }
@@ -159,6 +166,28 @@ class CameraRepository {
       );
     } on DioException catch (error) {
       throw _fromDio(error, fallback: '暂时没能发出提醒，请稍后再试。');
+    }
+  }
+
+  Future<void> movePtz(String direction, {int step = 1}) async {
+    try {
+      await _apiClient.post(
+        '/camera/commands/ptz',
+        data: {'direction': direction, 'step': step},
+      );
+    } on DioException catch (error) {
+      throw _fromDio(error, fallback: '暂时无法控制摄像头方向。');
+    }
+  }
+
+  Future<List<LiveCareEvent>> events() async {
+    try {
+      final response = await _apiClient.get('/camera/events');
+      final raw = _asMap(response.data)['events'];
+      if (raw is! List) return const [];
+      return raw.map((event) => LiveCareEvent.fromJson(_asMap(event))).toList();
+    } on DioException catch (error) {
+      throw _fromDio(error, fallback: '暂时拿不到看护事件。');
     }
   }
 
@@ -182,4 +211,11 @@ Map<String, dynamic> _asMap(dynamic value) {
   if (value is Map<String, dynamic>) return value;
   if (value is Map) return Map<String, dynamic>.from(value);
   return <String, dynamic>{};
+}
+
+String _snapshotUnavailableMessage(String? headerValue) {
+  final value = (headerValue ?? '').trim();
+  if (value == 'snapshot_unavailable') return '真实快照暂不可用';
+  if (value.isNotEmpty) return value;
+  return '暂时没有可用快照';
 }

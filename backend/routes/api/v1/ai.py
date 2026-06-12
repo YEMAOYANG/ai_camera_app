@@ -19,6 +19,7 @@ def ai_config():
         ai_config_payload(
             provider=current_app.config["AI_PROVIDER"],
             model=current_app.config["AI_MODEL"],
+            credentials_configured=bool(current_app.config.get("AI_API_KEY")),
             eval_enabled=current_app.config["AI_EVAL_ENABLED"],
             dev_adapters_enabled=current_app.config["DEV_ADAPTERS_ENABLED"],
         )

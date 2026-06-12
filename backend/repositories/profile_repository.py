@@ -173,7 +173,7 @@ class ProfileRepository:
                 SELECT * FROM sessions
                 WHERE user_id = ? AND revoked_at IS NULL
                 ORDER BY COALESCE(last_active_at, rotated_at, created_at) DESC
-                LIMIT 8
+                LIMIT 30
                 """,
                 (user_id,),
             ).fetchall()
@@ -778,6 +778,31 @@ class ProfileRepository:
                 values,
             )
         return self.get_child(conn, family_id=family_id, child_id=child_id)
+
+    def update_current_device_wake_name(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        wake_name: str,
+        now: int,
+    ) -> None:
+        row = conn.execute(
+            """
+            SELECT id
+            FROM devices
+            WHERE family_id = ? AND status <> 'unbound'
+            ORDER BY created_at
+            LIMIT 1
+            """,
+            (family_id,),
+        ).fetchone()
+        if row is None:
+            return
+        conn.execute(
+            "UPDATE devices SET wake_name = ?, updated_at = ? WHERE family_id = ? AND id = ?",
+            (wake_name, now, family_id, row["id"]),
+        )
 
     def list_contacts(self, conn: DatabaseConnection, *, family_id: str) -> list[DatabaseRow]:
         return list(

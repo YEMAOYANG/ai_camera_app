@@ -37,6 +37,9 @@ class CameraRuntimeAdapter(Protocol):
     def speak(self, text: str) -> dict:
         ...
 
+    def ptz_move(self, direction: str, step: int) -> dict:
+        ...
+
     def start_monitor(self) -> dict:
         ...
 

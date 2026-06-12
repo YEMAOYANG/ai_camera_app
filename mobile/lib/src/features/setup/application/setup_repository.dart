@@ -39,6 +39,7 @@ class SetupStatus {
     required this.childName,
     required this.childGender,
     required this.childBirthday,
+    required this.childSleepTime,
     required this.childEducationStage,
     required this.childGrade,
     required this.cameraWakeName,
@@ -63,6 +64,7 @@ class SetupStatus {
   final String childName;
   final String childGender;
   final String childBirthday;
+  final String childSleepTime;
   final String childEducationStage;
   final String childGrade;
   final String cameraWakeName;
@@ -110,6 +112,7 @@ class SetupStatus {
       childName: _asString(child['name']),
       childGender: _asString(child['gender'], fallback: 'unspecified'),
       childBirthday: _asString(child['birthday']),
+      childSleepTime: _asString(child['sleepTime']),
       childEducationStage: _asString(child['educationStage']),
       childGrade: _asString(child['grade']),
       cameraWakeName: _asString(cameraName['wakeName']),
@@ -199,6 +202,7 @@ class SetupRepository {
     String? educationStage,
     String? grade,
     String? birthday,
+    String? sleepTime,
   }) {
     return _postStep('/setup/child', {
       'name': name,
@@ -208,6 +212,7 @@ class SetupRepository {
       'educationStage': educationStage,
       'grade': grade,
       'birthday': birthday,
+      'sleepTime': sleepTime,
     });
   }
 

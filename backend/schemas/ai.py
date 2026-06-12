@@ -5,6 +5,7 @@ def ai_config_payload(
     *,
     provider: str,
     model: str,
+    credentials_configured: bool,
     eval_enabled: bool,
     dev_adapters_enabled: bool,
 ) -> dict:
@@ -14,7 +15,8 @@ def ai_config_payload(
         "ok": True,
         "providers": [provider_name],
         "providerConfigured": provider_configured,
-        "defaultModelPolicy": "configured" if provider_configured else "unconfigured",
+        "credentialsConfigured": credentials_configured,
+        "defaultModelPolicy": "configured" if provider_configured and credentials_configured else "unconfigured",
         "defaultModel": model or None,
         "promptRegistry": "file",
         "evalEnabled": eval_enabled,
@@ -28,7 +30,7 @@ def model_payloads(*, provider: str, model: str, dev_adapters_enabled: bool) -> 
             {
                 "id": model,
                 "provider": provider,
-                "capabilities": ["text", "vision-summary", "task-summary"],
+                "capabilities": ["text", "vision-summary", "task-summary", "task-reminder"],
                 "status": "configured",
             }
         ]
@@ -37,7 +39,7 @@ def model_payloads(*, provider: str, model: str, dev_adapters_enabled: bool) -> 
             {
                 "id": "development.guardian-v1",
                 "provider": "development",
-                "capabilities": ["text", "vision-summary", "task-summary"],
+                "capabilities": ["text", "vision-summary", "task-summary", "task-reminder"],
                 "status": "development",
             }
         ]

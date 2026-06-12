@@ -5,8 +5,32 @@ import unittest
 
 from app import create_app
 from integrations.camera_runtime.mock_adapter import MockCameraRuntimeAdapter
+from services.ai_text_provider import AiTextResponse
+from services.task_reminder_policy import build_task_reminder
 from services.task_event_stream import task_runtime_messages_by_family
 from tests.support import fresh_test_config, request_debug_code
+
+
+class FakeReminderAiProvider:
+    provider_name = "fake"
+    model_name = "fake-task-reminder"
+
+    def __init__(self, text: str):
+        self.text = text
+        self.last_system_prompt = ""
+        self.last_user_prompt = ""
+
+    def complete(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        max_tokens: int = 96,
+        temperature: float = 0.4,
+    ) -> AiTextResponse:
+        self.last_system_prompt = system_prompt
+        self.last_user_prompt = user_prompt
+        return AiTextResponse(text=self.text, provider=self.provider_name, model=self.model_name)
 
 
 class TasksPointsRewardsApiTest(unittest.TestCase):
@@ -434,6 +458,73 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(adjust.json["account"]["balance"], 5)
         self.assertEqual(adjust.json["ledgerEntry"]["type"], "parent_adjustment")
 
+    def test_stage_notice_acknowledge_stores_handled_balance(self):
+        adjust = self.client.post(
+            "/api/points/adjust",
+            json={"childId": self.child_id, "delta": 10, "note": "阶段满额"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(adjust.status_code, 200)
+        self.assertEqual(adjust.json["account"]["balance"], 10)
+        self.assertEqual(adjust.json["account"]["stageNoticeHandledBalance"], 0)
+
+        acknowledged = self.client.post(
+            "/api/points/stage-notice/ack",
+            json={"childId": self.child_id},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(acknowledged.status_code, 200)
+        self.assertEqual(acknowledged.json["account"]["balance"], 10)
+        self.assertEqual(acknowledged.json["account"]["stageNoticeHandledBalance"], 10)
+
+        account = self.client.get(
+            "/api/points/account",
+            query_string={"childId": self.child_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(account.status_code, 200)
+        self.assertEqual(account.json["account"]["stageNoticeHandledBalance"], 10)
+
+    def test_point_reward_settings_are_backend_backed(self):
+        settings = self.client.get("/api/points/settings", headers=self._auth_headers())
+
+        self.assertEqual(settings.status_code, 200)
+        self.assertEqual(settings.json["settings"]["stageThreshold"], 10)
+        self.assertEqual(settings.json["settings"]["unit"], "flower")
+        options = settings.json["settings"]["unitOptions"]
+        self.assertEqual([item["key"] for item in options], ["points", "flower", "star"])
+        self.assertEqual(options[1]["suffix"], "朵小红花")
+        self.assertIn("assets/images/points/unit-flower.png", options[1]["imageAsset"])
+
+        updated = self.client.patch(
+            "/api/points/settings",
+            json={"stageThreshold": 12, "unit": "star"},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(updated.status_code, 200)
+        self.assertEqual(updated.json["settings"]["stageThreshold"], 12)
+        self.assertEqual(updated.json["settings"]["unitOption"]["suffix"], "颗小星星")
+
+        reloaded = self.client.get("/api/points/settings", headers=self._auth_headers())
+        self.assertEqual(reloaded.json["settings"]["stageThreshold"], 12)
+        self.assertEqual(reloaded.json["settings"]["unit"], "star")
+
+        invalid_unit = self.client.patch(
+            "/api/points/settings",
+            json={"unit": "coin"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(invalid_unit.status_code, 400)
+
+        invalid_threshold = self.client.patch(
+            "/api/points/settings",
+            json={"stageThreshold": 0},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(invalid_threshold.status_code, 400)
+
     def test_point_account_lists_existing_child_before_any_ledger(self):
         response = self.client.get("/api/points/account", headers=self._auth_headers())
 
@@ -586,6 +677,237 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         event_types = {event["eventType"] for event in events.json["events"]}
         self.assertIn("manual_start_reminder_sent", event_types)
 
+    def test_drink_water_prepare_reminder_uses_child_name_without_generic_copy(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            title="喝水",
+            task_type="life",
+            start_at=now + timedelta(minutes=1),
+            due_at=now + timedelta(minutes=5),
+            reward_points=1,
+            requires_parent_confirmation=False,
+        )
+
+        response = self.client.post(
+            f"/api/tasks/{task['id']}/reminder",
+            json={"phase": "prepare"},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        reminder = response.json["reminder"]
+        self.assertEqual(reminder["phase"], "prepare")
+        self.assertEqual(reminder["category"], "hydration")
+        self.assertIn("小宇", reminder["text"])
+        self.assertNotIn("小朋友", reminder["text"])
+        self.assertIn("喝", reminder["text"])
+        self.assertIn("水", reminder["text"])
+        for bad_copy in ("准备东西", "准备物品", "准备材料", "要用的东西", "放到手边"):
+            self.assertNotIn(bad_copy, reminder["text"])
+
+    def test_task_reminder_can_use_ai_provider_with_task_context(self):
+        provider = FakeReminderAiProvider("小宇，喝水时间到啦，慢慢喝几口水。")
+
+        reminder = build_task_reminder(
+            {
+                "title": "喝水",
+                "description": "午休后补水",
+                "type": "life",
+                "scheduled_start": "14:30",
+                "scheduled_end": "14:35",
+            },
+            phase="start",
+            child={"nickname": "小宇", "grade": "中班"},
+            ai_text_provider=provider,
+            prompt="按任务内容生成一句自然提醒。",
+        )
+
+        self.assertEqual(reminder["textSource"], "ai")
+        self.assertEqual(reminder["text"], "小宇，喝水时间到啦，慢慢喝几口水。")
+        self.assertIn("任务标题：喝水", provider.last_user_prompt)
+        self.assertIn("任务说明：午休后补水", provider.last_user_prompt)
+        self.assertIn("语义分类：hydration", provider.last_user_prompt)
+        self.assertIn("孩子称呼：小宇", provider.last_user_prompt)
+
+    def test_hydration_ai_prepare_copy_with_generic_object_text_falls_back(self):
+        provider = FakeReminderAiProvider("小朋友，喝水快到了，先把东西放到手边。")
+
+        reminder = build_task_reminder(
+            {
+                "title": "喝水",
+                "description": "午休后补水",
+                "type": "life",
+                "scheduled_start": "14:30",
+                "scheduled_end": "14:35",
+            },
+            phase="prepare",
+            child={"nickname": "小宇", "grade": "中班"},
+            ai_text_provider=provider,
+            prompt="按任务内容生成一句自然提醒。",
+        )
+
+        self.assertEqual(reminder["textSource"], "fallback")
+        self.assertIn("小宇", reminder["text"])
+        self.assertNotIn("小朋友", reminder["text"])
+        self.assertNotIn("放到手边", reminder["text"])
+        self.assertIn("喝", reminder["text"])
+
+    def test_preschool_outdoor_walk_reminder_uses_child_friendly_copy(self):
+        reminder = build_task_reminder(
+            {
+                "title": "遛娃",
+                "description": "饭后到小区里走一走",
+                "type": "sports_outdoor",
+                "scheduled_start": "18:30",
+                "scheduled_end": "19:00",
+            },
+            phase="start",
+            child={"nickname": "小宇", "age_stage": "幼儿园"},
+            prompt="",
+        )
+
+        self.assertEqual(reminder["textSource"], "fallback")
+        self.assertEqual(reminder["category"], "outdoor_walk")
+        self.assertIn("小宇", reminder["text"])
+        self.assertIn("出门", reminder["text"])
+        self.assertIn("走", reminder["text"])
+        self.assertNotIn("遛娃", reminder["text"])
+        self.assertNotIn("运动", reminder["text"])
+
+    def test_api_prepare_reminder_for_preschool_outdoor_walk_avoids_generic_copy(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            title="遛娃",
+            task_type="sports_outdoor",
+            start_at=now + timedelta(minutes=1),
+            due_at=now + timedelta(minutes=30),
+            reward_points=1,
+            requires_parent_confirmation=False,
+        )
+
+        response = self.client.post(
+            f"/api/tasks/{task['id']}/reminder",
+            json={"phase": "prepare"},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        reminder = response.json["reminder"]
+        self.assertEqual(reminder["phase"], "prepare")
+        self.assertEqual(reminder["category"], "outdoor_walk")
+        self.assertIn("小宇", reminder["text"])
+        self.assertIn("出门", reminder["text"])
+        self.assertIn("鞋", reminder["text"])
+        self.assertNotIn("遛娃", reminder["text"])
+        self.assertNotIn("第一步", reminder["text"])
+        self.assertNotIn("怎么做", reminder["text"])
+
+    def test_custom_outdoor_walk_synonyms_avoid_generic_copy(self):
+        reminder = build_task_reminder(
+            {
+                "title": "溜娃",
+                "description": "楼下晒太阳",
+                "type": "custom",
+                "scheduled_start": "18:30",
+                "scheduled_end": "19:00",
+            },
+            phase="prepare",
+            child={"nickname": "小宇", "age_stage": "幼儿园"},
+            prompt="",
+        )
+
+        self.assertEqual(reminder["category"], "outdoor_walk")
+        self.assertIn("出门", reminder["text"])
+        self.assertNotIn("溜娃", reminder["text"])
+        self.assertNotIn("第一步", reminder["text"])
+
+    def test_outdoor_walk_ai_copy_rewrites_parent_facing_title(self):
+        provider = FakeReminderAiProvider("小朋友，遛娃开始啦，牵好大人的手。")
+
+        reminder = build_task_reminder(
+            {
+                "title": "遛娃",
+                "description": "饭后到小区里走一走",
+                "type": "sports_outdoor",
+                "scheduled_start": "18:30",
+                "scheduled_end": "19:00",
+            },
+            phase="start",
+            child={"nickname": "小宇", "age_stage": "幼儿园"},
+            ai_text_provider=provider,
+            prompt="按任务内容生成一句自然提醒。",
+        )
+
+        self.assertEqual(reminder["textSource"], "ai")
+        self.assertEqual(reminder["category"], "outdoor_walk")
+        self.assertIn("孩子可听懂说法：出门走走", provider.last_user_prompt)
+        self.assertIn("孩子称呼：小宇", provider.last_user_prompt)
+        self.assertIn("小宇", reminder["text"])
+        self.assertIn("出门走走", reminder["text"])
+        self.assertNotIn("小朋友", reminder["text"])
+        self.assertNotIn("遛娃", reminder["text"])
+
+    def test_outdoor_walk_ai_generic_prepare_copy_falls_back(self):
+        provider = FakeReminderAiProvider("小朋友，遛娃快到了，先想一想第一步要怎么做。")
+
+        reminder = build_task_reminder(
+            {
+                "title": "遛娃",
+                "description": "饭后到小区里走一走",
+                "type": "sports_outdoor",
+                "scheduled_start": "18:30",
+                "scheduled_end": "19:00",
+            },
+            phase="prepare",
+            child={"nickname": "小爱", "age_stage": "幼儿园"},
+            ai_text_provider=provider,
+            prompt="按任务内容生成一句自然提醒。",
+        )
+
+        self.assertEqual(reminder["textSource"], "fallback")
+        self.assertEqual(reminder["category"], "outdoor_walk")
+        self.assertIn("小爱", reminder["text"])
+        self.assertIn("出门", reminder["text"])
+        self.assertNotIn("小朋友", reminder["text"])
+        self.assertNotIn("遛娃", reminder["text"])
+        self.assertNotIn("第一步", reminder["text"])
+        self.assertNotIn("怎么做", reminder["text"])
+
+    def test_voice_reminder_setting_disables_manual_camera_speak(self):
+        setting = self.client.patch(
+            "/api/settings/ai-care-rules",
+            json={"value": {"voiceReminderEnabled": False}},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(setting.status_code, 200)
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            title="阅读任务",
+            task_type="reading_interest",
+            start_at=now + timedelta(minutes=1),
+            due_at=now + timedelta(minutes=20),
+            reward_points=2,
+        )
+
+        response = self.client.post(
+            f"/api/tasks/{task['id']}/reminder",
+            json={"phase": "start"},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["command"]["status"], "skipped")
+        self.assertEqual(
+            response.json["command"]["reason"],
+            "voice_reminder_disabled",
+        )
+        events = self.client.get(
+            f"/api/tasks/{task['id']}/events",
+            headers=self._auth_headers(),
+        )
+        event_types = {event["eventType"] for event in events.json["events"]}
+        self.assertIn("manual_start_reminder_skipped", event_types)
+
     def test_scheduler_marks_child_not_ready_as_delayed_and_nudges(self):
         original = MockCameraRuntimeAdapter.task_observation
         MockCameraRuntimeAdapter.task_observation = lambda self, task: {
@@ -615,6 +937,73 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
         self.assertEqual(detail.json["task"]["status"], "delayed")
         self.assertEqual(detail.json["task"]["delayReminderCount"], 1)
+
+    def test_scheduler_respects_ai_rule_settings(self):
+        original = MockCameraRuntimeAdapter.task_observation
+        MockCameraRuntimeAdapter.task_observation = lambda self, task: {
+            "verdict": "not_started",
+            "reason": "child_not_present",
+            "confidence": 0.8,
+            "evidence": {"hasPerson": False},
+        }
+        try:
+            disabled_delay = self.client.patch(
+                "/api/settings/ai-care-rules",
+                json={"value": {"delayReminderEnabled": False}},
+                headers=self._auth_headers(),
+            )
+            self.assertEqual(disabled_delay.status_code, 200)
+            now = datetime.now().astimezone()
+            delayed_task = self._create_task_at(
+                start_at=now - timedelta(minutes=1),
+                due_at=now + timedelta(minutes=10),
+                reward_points=2,
+            )
+            delayed_tick = self.client.post("/api/dev/tasks/scheduler/tick")
+            self.assertEqual(delayed_tick.status_code, 200)
+            delayed_event_types = {
+                event["eventType"] for event in delayed_tick.json["events"]
+            }
+            self.assertIn("delayed", delayed_event_types)
+            self.assertNotIn("delay_reminder_sent", delayed_event_types)
+            delayed_detail = self.client.get(
+                f"/api/tasks/{delayed_task['id']}",
+                headers=self._auth_headers(),
+            )
+            self.assertEqual(delayed_detail.json["task"]["delayReminderCount"], 0)
+
+            disabled_observation = self.client.patch(
+                "/api/settings/ai-care-rules",
+                json={
+                    "value": {
+                        "taskObservationEnabled": False,
+                        "delayReminderEnabled": True,
+                    }
+                },
+                headers=self._auth_headers(),
+            )
+            self.assertEqual(disabled_observation.status_code, 200)
+            auto_task = self._create_task_at(
+                start_at=now - timedelta(minutes=2),
+                due_at=now + timedelta(minutes=8),
+                reward_points=2,
+            )
+            auto_tick = self.client.post("/api/dev/tasks/scheduler/tick")
+            self.assertEqual(auto_tick.status_code, 200)
+            auto_event_types = {event["eventType"] for event in auto_tick.json["events"]}
+            self.assertIn("auto_started", auto_event_types)
+            self.assertNotIn("child_not_ready", auto_event_types)
+            auto_detail = self.client.get(
+                f"/api/tasks/{auto_task['id']}",
+                headers=self._auth_headers(),
+            )
+            self.assertEqual(auto_detail.json["task"]["status"], "in_progress")
+            self.assertEqual(
+                auto_detail.json["task"]["cameraObservationStatus"],
+                "not_required",
+            )
+        finally:
+            MockCameraRuntimeAdapter.task_observation = original
 
     def test_scheduler_starts_life_task_without_seat_observation(self):
         original = MockCameraRuntimeAdapter.task_observation
@@ -663,6 +1052,11 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         start_tick = self.client.post("/api/dev/tasks/scheduler/tick")
 
         self.assertEqual(start_tick.status_code, 200)
+        start_event_types = {event["eventType"] for event in start_tick.json["events"]}
+        self.assertIn("auto_started", start_event_types)
+        self.assertIn("monitor_not_required", start_event_types)
+        self.assertNotIn("monitor_started", start_event_types)
+        self.assertNotIn("monitor_failed", start_event_types)
         start_event = next(
             event for event in start_tick.json["events"] if event["eventType"] == "start_reminder_sent"
         )

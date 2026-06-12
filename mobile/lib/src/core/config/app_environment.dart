@@ -91,12 +91,14 @@ String _requiredApiBaseUrl(AppFlavor flavor) {
 }
 
 String _defaultTaskWebSocketBaseUrl(String apiBaseUrl, AppFlavor flavor) {
-  if (flavor == AppFlavor.development) {
-    return 'ws://127.0.0.1:8001/api';
-  }
   final uri = Uri.tryParse(apiBaseUrl);
   if (uri == null || uri.host.isEmpty) return '';
   final scheme = uri.scheme == 'https' ? 'wss' : 'ws';
+  if (flavor == AppFlavor.development) {
+    return uri
+        .replace(scheme: scheme, port: 8001, path: '/api', query: '')
+        .toString();
+  }
   return uri.replace(scheme: scheme).toString();
 }
 

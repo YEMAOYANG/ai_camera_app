@@ -15,6 +15,15 @@ final primaryDeviceOverviewProvider = FutureProvider<DeviceOverview?>((ref) {
   return ref.watch(deviceRepositoryProvider).primaryOverview();
 });
 
+final primaryFirmwareStatusProvider = FutureProvider<DeviceFirmwareStatus?>((
+  ref,
+) async {
+  final repository = ref.watch(deviceRepositoryProvider);
+  final devices = await repository.devices();
+  if (devices.isEmpty) return null;
+  return repository.firmwareStatus(devices.first.id);
+});
+
 final deviceOverviewProvider = FutureProvider.family<DeviceOverview, String>((
   ref,
   deviceId,
@@ -97,6 +106,17 @@ class DeviceRepository {
     try {
       final response = await _apiClient.post('/devices/$deviceId/unbind');
       return GuardianDevice.fromJson(_asMap(_asMap(response.data)['device']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<DeviceFirmwareStatus> firmwareStatus(String deviceId) async {
+    try {
+      final response = await _apiClient.get(
+        '/firmware/devices/$deviceId/status',
+      );
+      return DeviceFirmwareStatus.fromJson(_asMap(response.data));
     } on DioException catch (error) {
       throw _fromDio(error);
     }

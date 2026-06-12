@@ -61,6 +61,9 @@ class AppConfig:
     PROMPT_ROOT: str
     AI_PROVIDER: str
     AI_MODEL: str
+    AI_API_KEY: str
+    AI_BASE_URL: str
+    AI_TIMEOUT_SECONDS: float
     AI_EVAL_ENABLED: bool
     HOST: str
     PORT: int
@@ -79,11 +82,13 @@ class AppConfig:
             "AI_CAMERA_TEST_BASE_URL",
             _env("APP_CAMERA_BACKEND_URL", ""),
         ).strip()
+        ai_provider = _env("APP_AI_PROVIDER", _default_ai_provider()).strip().lower()
+        ai_model = _env("APP_AI_MODEL", _default_ai_model(ai_provider)).strip()
         return cls(
             APP_ENV=app_env,
             SERVICE_NAME=_env("APP_SERVICE_NAME", "ai-camera-app-backend"),
             DATABASE_URL=database_url,
-            CORS_ORIGINS=_csv(_env("APP_CORS_ORIGINS", "http://127.0.0.1:8000,http://localhost:8000")),
+            CORS_ORIGINS=_csv(_env("APP_CORS_ORIGINS", "*" if app_env == "development" else "http://127.0.0.1:8000,http://localhost:8000")),
             AUTH_ACCESS_TOKEN_SECONDS=int(_env("APP_AUTH_ACCESS_SECONDS", "900")),
             AUTH_REFRESH_TOKEN_SECONDS=int(
                 _env("APP_AUTH_REFRESH_SECONDS", str(60 * 60 * 24 * 30))
@@ -118,7 +123,7 @@ class AppConfig:
                     "1" if app_env in {"development", "staging", "production"} else "0",
                 )
             ),
-            TASK_WEBSOCKET_HOST=_env("TASK_WEBSOCKET_HOST", _env("APP_HOST", "127.0.0.1")),
+            TASK_WEBSOCKET_HOST=_env("TASK_WEBSOCKET_HOST", _env("APP_HOST", "0.0.0.0" if app_env == "development" else "127.0.0.1")),
             TASK_WEBSOCKET_PORT=int(_env("TASK_WEBSOCKET_PORT", "8001")),
             TASK_WEBSOCKET_PATH=_env("TASK_WEBSOCKET_PATH", "/api/tasks/stream"),
             TASK_DELAY_REMINDER_INTERVAL_SECONDS=int(
@@ -127,10 +132,13 @@ class AppConfig:
             TASK_DELAY_REMINDER_MAX_COUNT=int(_env("TASK_DELAY_REMINDER_MAX_COUNT", "3")),
             HARDWARE_ADAPTER=_env("APP_HARDWARE_ADAPTER", "disabled").strip(),
             PROMPT_ROOT=_env("APP_PROMPT_ROOT", str(BACKEND_ROOT / "prompts")),
-            AI_PROVIDER=_env("APP_AI_PROVIDER", "").strip(),
-            AI_MODEL=_env("APP_AI_MODEL", "").strip(),
+            AI_PROVIDER=ai_provider,
+            AI_MODEL=ai_model,
+            AI_API_KEY=_env("APP_AI_API_KEY", _default_ai_api_key(ai_provider)).strip(),
+            AI_BASE_URL=_env("APP_AI_BASE_URL", _default_ai_base_url(ai_provider)).strip(),
+            AI_TIMEOUT_SECONDS=float(_env("APP_AI_TIMEOUT_SECONDS", "8")),
             AI_EVAL_ENABLED=_bool(_env("APP_AI_EVAL_ENABLED", "0")),
-            HOST=_env("APP_HOST", "127.0.0.1"),
+            HOST=_env("APP_HOST", "0.0.0.0" if app_env == "development" else "127.0.0.1"),
             PORT=int(_env("APP_PORT", _env("PORT", "8000"))),
             DEBUG=_bool(_env("APP_DEBUG", _env("FLASK_DEBUG", "0"))),
         )
@@ -225,3 +233,35 @@ def _database_url_for_env(app_env: str) -> str:
         "mysql+pymysql://ai_camera_app:ai_camera_app_dev@127.0.0.1:3306/"
         "ai_camera_app_dev?charset=utf8mb4",
     )
+
+
+def _default_ai_provider() -> str:
+    if _env("KIMI_API_KEY", "") or _env("MOONSHOT_API_KEY", ""):
+        return "moonshot"
+    if _env("OPENAI_API_KEY", ""):
+        return "openai"
+    return ""
+
+
+def _default_ai_model(provider: str) -> str:
+    if provider in {"moonshot", "kimi"}:
+        return _env("KIMI_CHAT_MODEL", _env("MOONSHOT_CHAT_MODEL", "kimi-k2.6"))
+    if provider == "openai":
+        return _env("OPENAI_CHAT_MODEL", "gpt-4.1-mini")
+    return ""
+
+
+def _default_ai_api_key(provider: str) -> str:
+    if provider in {"moonshot", "kimi"}:
+        return _env("KIMI_API_KEY", _env("MOONSHOT_API_KEY", ""))
+    if provider == "openai":
+        return _env("OPENAI_API_KEY", "")
+    return ""
+
+
+def _default_ai_base_url(provider: str) -> str:
+    if provider in {"moonshot", "kimi"}:
+        return _env("KIMI_BASE_URL", _env("MOONSHOT_BASE_URL", "https://api.moonshot.cn/v1"))
+    if provider == "openai":
+        return _env("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    return ""

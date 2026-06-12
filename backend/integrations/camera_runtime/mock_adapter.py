@@ -49,6 +49,15 @@ class MockCameraRuntimeAdapter(CameraRuntimeAdapter):
     def speak(self, text: str) -> dict:
         return {"ok": True, "speaker": {"text": text, "queued": True}}
 
+    def ptz_move(self, direction: str, step: int) -> dict:
+        return {
+            "ok": True,
+            "status": "queued",
+            "direction": direction,
+            "step": step,
+            "message": "云台控制命令已进入队列",
+        }
+
     def start_monitor(self) -> dict:
         return {"ok": True, "monitor_runtime": {"running": True, "status": "running"}}
 

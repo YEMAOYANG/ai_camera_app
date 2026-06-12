@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/platform/contact_picker.dart';
+import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
 import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
@@ -24,6 +25,7 @@ import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_text_field.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 import 'package:guardian_parent_app/src/shared/widgets/guardian_identity_selector.dart';
 import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
@@ -248,11 +250,7 @@ class _PersonalProfileScaffold extends StatelessWidget {
     final bottomInset = AppControls.buttonHeight + safe.bottom + 44;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: AppColors.appBackground,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
+      value: AppSystemUi.light(),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: AppColors.appBackground,
@@ -659,15 +657,11 @@ class _AccountSecurityPageState extends ConsumerState<AccountSecurityPage> {
       await ref.read(profileRepositoryProvider).revokeLoginDevice(device.id);
       ref.invalidate(accountSecurityProvider);
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('登录设备已移除')));
+        showAppToast(context, '登录设备已移除', tone: AppToastTone.success);
       }
     } on ProfileException catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(error.message)));
+        showAppToast(context, error.message, tone: AppToastTone.danger);
       }
     } finally {
       if (mounted) setState(() => _revokingSessionId = null);
@@ -686,9 +680,7 @@ class _AccountSecurityPageState extends ConsumerState<AccountSecurityPage> {
       if (mounted) context.go(loginPath);
     } on ProfileException catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(error.message)));
+        showAppToast(context, error.message, tone: AppToastTone.danger);
       }
     } finally {
       if (mounted) setState(() => _deletingAccount = false);
@@ -1298,40 +1290,37 @@ class TaskRewardHubPage extends StatelessWidget {
   }
 }
 
-class RulesReminderHubPage extends StatelessWidget {
-  const RulesReminderHubPage({super.key});
+class ReportsHubPage extends StatelessWidget {
+  const ReportsHubPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const _HubPage(
-      title: 'AI 规则与提醒',
+      title: '看护报告',
       sections: [
         _HubSection(
-          title: '规则',
+          title: '报告',
           rows: [
             _HubRow(
-              icon: Icons.auto_awesome_outlined,
-              title: 'AI 看护规则',
-              subtitle: '任务观察、拖拉提醒和语音播报',
-              path: profileAiRulesPath,
+              icon: Icons.today_outlined,
+              title: '今日报告',
+              subtitle: '今天的任务、积分和待处理',
+              path: profileDailyReportPath,
+              tone: AppListRowTone.green,
             ),
             _HubRow(
-              icon: Icons.notifications_outlined,
-              title: '通知与提醒',
-              subtitle: '任务、设备和积分提醒',
-              path: profileNotificationsPath,
+              icon: Icons.calendar_month_outlined,
+              title: '周报',
+              subtitle: '本周完成节奏和积分',
+              path: profileWeeklyReportPath,
+              tone: AppListRowTone.blue,
             ),
             _HubRow(
-              icon: Icons.record_voice_over_outlined,
-              title: '对话与人设',
-              subtitle: '唤醒名、语音风格和对话边界',
-              path: profileConversationPath,
-            ),
-            _HubRow(
-              icon: Icons.menu_book_outlined,
-              title: '学习内容',
-              subtitle: '小书包、课程表和内容偏好',
-              path: profileEducationPath,
+              icon: Icons.bookmark_outline,
+              title: '成长时刻',
+              subtitle: '家长保存的积极片段',
+              path: profileMomentsPath,
+              tone: AppListRowTone.amber,
             ),
           ],
         ),
@@ -1340,49 +1329,59 @@ class RulesReminderHubPage extends StatelessWidget {
   }
 }
 
-class PrivacyAuthorizationHubPage extends StatelessWidget {
-  const PrivacyAuthorizationHubPage({super.key});
+class RulesReminderHubPage extends StatelessWidget {
+  const RulesReminderHubPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const _HubPage(
-      title: '隐私与授权',
-      sections: [
-        _HubSection(
-          title: '授权',
-          rows: [
-            _HubRow(
-              icon: Icons.lock_outline,
-              title: '隐私与权限',
-              subtitle: '隐私模式、语音播报和数据保留',
-              path: profilePrivacyPath,
-            ),
-            _HubRow(
-              icon: Icons.child_care_outlined,
-              title: '儿童隐私授权说明',
-              subtitle: '儿童数据处理和家长授权说明',
-              path: profileChildPrivacyPath,
-            ),
-          ],
-        ),
-        _HubSection(
-          title: '协议',
-          rows: [
-            _HubRow(
-              icon: Icons.description_outlined,
-              title: '用户协议',
-              subtitle: '使用规则和服务说明',
-              path: userAgreementPath,
-            ),
-            _HubRow(
-              icon: Icons.privacy_tip_outlined,
-              title: '隐私政策',
-              subtitle: '数据收集、使用和保护说明',
-              path: privacyPolicyPath,
-            ),
-          ],
+    return _Page(
+      title: 'AI 规则与提醒',
+      subtitle: '观察策略、语音提醒和通知节奏',
+      children: [
+        AppSurface(
+          child: Column(
+            children: [
+              AppListRow(
+                icon: Icons.record_voice_over_outlined,
+                title: '对话与人设',
+                subtitle: '唤醒名、声线、自由聊天和睡前边界',
+                tone: AppListRowTone.blue,
+                onTap: () => context.push(profileConversationPath),
+              ),
+              const _CompactDivider(),
+              AppListRow(
+                icon: Icons.auto_awesome_outlined,
+                title: '任务看护规则',
+                subtitle: '任务观察、语音播报和拖拉跟进',
+                tone: AppListRowTone.neutral,
+                onTap: () => context.push(profileAiRulesPath),
+              ),
+              const _CompactDivider(),
+              AppListRow(
+                icon: Icons.notifications_outlined,
+                title: '通知与提醒',
+                subtitle: '任务、设备、积分和日报提醒',
+                tone: AppListRowTone.amber,
+                onTap: () => context.push(profileNotificationsPath),
+              ),
+            ],
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _CompactDivider extends StatelessWidget {
+  const _CompactDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      indent: 50,
+      color: AppColors.borderSoft.withValues(alpha: 0.86),
     );
   }
 }
@@ -1397,9 +1396,7 @@ class FamilyMembersPage extends ConsumerWidget {
     final account = ref.watch(accountProfileProvider).asData?.value;
     final canManage = account?.can('manage_family_members') ?? false;
     final canManageFamilyCode = account?.can('manage_family_code') ?? false;
-    final familyCode = canManageFamilyCode
-        ? ref.watch(familyCodeProvider)
-        : null;
+    final familyCode = ref.watch(familyCodeProvider);
     final identityOptions = ref
         .watch(guardianIdentityOptionsProvider)
         .asData
@@ -1416,32 +1413,34 @@ class FamilyMembersPage extends ConsumerWidget {
           : null,
       children: members.when(
         data: (items) => [
-          if (canManageFamilyCode) ...[
-            familyCode!.when(
-              data: (code) => _FamilyCodePanel(
-                code: code,
-                onTap: () => _showFamilyCodeSheet(context, ref, code),
-              ),
-              loading: () => const _FamilyPanel(
-                title: '家庭号',
-                subtitle: '正在同步家庭号',
-                child: AppLoadingState(
-                  title: '正在同步家庭号',
-                  message: '请稍候。',
-                  compact: true,
-                ),
-              ),
-              error: (error, _) => AppStateView(
-                variant: AppStateVariant.serviceUnavailable,
-                title: '家庭号暂时无法同步',
-                message: error is ProfileException ? error.message : '请稍后重试。',
-                primaryActionLabel: '重新加载',
-                onPrimaryAction: () => ref.invalidate(familyCodeProvider),
+          familyCode.when(
+            data: (code) => _FamilyCodePanel(
+              code: code,
+              canReset: canManageFamilyCode,
+              onCopy: () => _copyFamilyCode(context, code),
+              onReset: canManageFamilyCode
+                  ? () => _resetFamilyCode(context, ref)
+                  : null,
+            ),
+            loading: () => const _FamilyPanel(
+              title: '家庭号',
+              subtitle: '正在同步家庭号',
+              child: AppLoadingState(
+                title: '正在同步家庭号',
+                message: '请稍候。',
                 compact: true,
               ),
             ),
-            const SizedBox(height: 14),
-          ],
+            error: (error, _) => AppStateView(
+              variant: AppStateVariant.serviceUnavailable,
+              title: '家庭号暂时无法同步',
+              message: error is ProfileException ? error.message : '请稍后重试。',
+              primaryActionLabel: '重新加载',
+              onPrimaryAction: () => ref.invalidate(familyCodeProvider),
+              compact: true,
+            ),
+          ),
+          const SizedBox(height: 14),
           if (items.isEmpty)
             _FamilyEmptyPanel(
               canManage: canManage,
@@ -1531,201 +1530,172 @@ class _FamilyMembersPanel extends StatelessWidget {
 }
 
 class _FamilyCodePanel extends StatelessWidget {
-  const _FamilyCodePanel({required this.code, required this.onTap});
+  const _FamilyCodePanel({
+    required this.code,
+    required this.canReset,
+    required this.onCopy,
+    required this.onReset,
+  });
 
   final FamilyCodeInfo code;
-  final VoidCallback onTap;
+  final bool canReset;
+  final VoidCallback onCopy;
+  final VoidCallback? onReset;
 
   @override
   Widget build(BuildContext context) {
     final displayCode = code.code.isEmpty ? '未生成' : code.code;
-    final familyName = code.familyName.isEmpty ? '我的家庭' : code.familyName;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.brandWash.withValues(alpha: 0.86),
-              Colors.white.withValues(alpha: 0.92),
-            ],
-          ),
-          border: Border.all(color: AppColors.brand.withValues(alpha: 0.14)),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF557A86).withValues(alpha: 0.06),
-              blurRadius: 14,
-              offset: const Offset(0, 8),
-            ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.brandWash.withValues(alpha: 0.86),
+            Colors.white.withValues(alpha: 0.92),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(15, 14, 13, 13),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const _FamilyAvatar(
-                    icon: Icons.tag_outlined,
-                    tone: AppColors.brand,
-                    fill: Colors.white,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Text('家庭号', style: _sectionTitleStyle),
-                            const SizedBox(width: 8),
-                            _SoftTextBadge(
-                              label: '新成员入口',
-                              tone: AppColors.brand,
-                              fill: Colors.white.withValues(alpha: 0.72),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '输入家庭号会以临时查看者加入。',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: _mutedText,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    Icons.chevron_right,
-                    color: AppColors.muted,
-                    size: 22,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 13),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.84),
-                  borderRadius: BorderRadius.circular(17),
-                  border: Border.all(
-                    color: AppColors.brand.withValues(alpha: 0.10),
-                  ),
+        border: Border.all(color: AppColors.brand.withValues(alpha: 0.14)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF557A86).withValues(alpha: 0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(15, 14, 13, 13),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                _FamilyAvatar(
+                  icon: Icons.tag_outlined,
+                  tone: AppColors.brand,
+                  fill: Colors.white,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 11, 12, 11),
-                  child: Row(
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          displayCode,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.ink,
-                            fontFamily: 'SF Mono',
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            height: 1,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      _SoftTextBadge(
-                        label: familyName,
-                        tone: AppColors.ink,
-                        fill: AppColors.surfaceStrong,
+                      Text('家庭号', style: _sectionTitleStyle),
+                      SizedBox(height: 5),
+                      Text(
+                        '输入家庭号会以临时查看者加入。',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: _mutedText,
                       ),
                     ],
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 13),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.84),
+                borderRadius: BorderRadius.circular(17),
+                border: Border.all(
+                  color: AppColors.brand.withValues(alpha: 0.10),
+                ),
               ),
-              const SizedBox(height: 9),
-              const Text('重置只会让旧家庭号失效，不影响已加入成员。', style: _mutedText),
-            ],
-          ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        displayCode,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.ink,
+                          fontFamily: 'SF Mono',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    _FamilyCodeActionButton(
+                      icon: Icons.content_copy_outlined,
+                      label: '复制',
+                      onTap: onCopy,
+                    ),
+                    if (canReset && onReset != null) ...[
+                      const SizedBox(width: 7),
+                      _FamilyCodeActionButton(
+                        icon: Icons.refresh_outlined,
+                        label: '重置',
+                        danger: true,
+                        onTap: onReset!,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 9),
+            Text(
+              canReset ? '重置只会让旧家庭号失效，不影响已加入成员。' : '只有家庭管理员可以重置家庭号。',
+              style: _mutedText,
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _FamilyCodeRule extends StatelessWidget {
-  const _FamilyCodeRule({
+class _FamilyCodeActionButton extends StatelessWidget {
+  const _FamilyCodeActionButton({
     required this.icon,
-    required this.title,
-    required this.message,
+    required this.label,
+    required this.onTap,
+    this.danger = false,
   });
 
   final IconData icon;
-  final String title;
-  final String message;
+  final String label;
+  final VoidCallback onTap;
+  final bool danger;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(17),
-        border: Border.all(color: AppColors.borderSoft),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(13, 12, 13, 12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.78),
-                borderRadius: BorderRadius.circular(13),
-              ),
-              child: SizedBox(
-                width: 38,
-                height: 38,
-                child: Center(
-                  child: Icon(icon, color: AppColors.brand, size: 18),
+    final tone = danger ? AppColors.danger : AppColors.brand;
+    return Material(
+      color: tone.withValues(alpha: danger ? 0.08 : 0.10),
+      borderRadius: BorderRadius.circular(AppRadii.full),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.full),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: tone, size: 15),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: tone,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                  letterSpacing: 0,
                 ),
               ),
-            ),
-            const SizedBox(width: 11),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: AppColors.ink,
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w900,
-                      height: 1.2,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    message,
-                    style: const TextStyle(
-                      color: AppColors.muted,
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      height: 1.42,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -2235,6 +2205,7 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
     _value = ChildProfileEditorValue(
       name: _draft.nickname.trim().isEmpty ? _draft.name : _draft.nickname,
       birthday: _draft.birthday,
+      sleepTime: _draft.sleepTime.isEmpty ? '21:00' : _draft.sleepTime,
       gender: _draft.gender,
       stage: _draft.educationStage.trim().isEmpty
           ? '幼儿园'
@@ -2309,6 +2280,7 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
       nickname: name,
       gender: _value.normalizedGender,
       birthday: _value.birthday.trim(),
+      sleepTime: _value.normalizedSleepTime,
       ageStage: '${_value.normalizedStage} ${_value.normalizedGrade}',
       educationStage: _value.normalizedStage,
       grade: _value.normalizedGrade,
@@ -2651,17 +2623,7 @@ class _DeviceDetailBody extends StatelessWidget {
             trailing: const Icon(Icons.power_settings_new_outlined, size: 18),
             onTap: onUnbind,
           ),
-        ] else
-          AppSurface(
-            color: AppColors.surfaceSoft,
-            borderColor: AppColors.borderSoft,
-            child: const AppListRow(
-              icon: Icons.lock_outline,
-              title: '仅管理员可修改设备',
-              subtitle: '当前账号可以查看设备状态，设备改名和解绑需要管理员处理。',
-              tone: AppListRowTone.neutral,
-            ),
-          ),
+        ],
       ],
     );
   }
@@ -2672,23 +2634,13 @@ class AiCareRulesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const _BooleanSettingsPage(
-    title: 'AI 看护规则',
+    title: '任务看护规则',
     settingKey: 'ai-care-rules',
     rows: [
       _SettingRowSpec('taskObservationEnabled', '任务观察', '观察任务开始、进行和结束状态。'),
       _SettingRowSpec('voiceReminderEnabled', '语音提醒', '到点后由设备温和提醒孩子。'),
       _SettingRowSpec('delayReminderEnabled', '拖拉提醒', '还没开始时，按规则继续温和提醒。'),
       _SettingRowSpec('evidenceReviewEnabled', '证据确认建议', 'AI 给出完成依据，最后由家长确认。'),
-      _SettingRowSpec(
-        'safetyEventObservationEnabled',
-        '安全事件观察',
-        '门口、异常声音和危险区域只做高风险提醒。',
-      ),
-      _SettingRowSpec(
-        'misjudgementFeedbackEnabled',
-        '误判纠正记录',
-        '家长驳回后记录原因，后续优化规则。',
-      ),
     ],
   );
 }
@@ -2705,10 +2657,9 @@ class NotificationSettingsPage extends StatelessWidget {
       _SettingRowSpec('parentActionReminder', '任务待确认', '作业证据、打卡素材和奖励申请确认。'),
       _SettingRowSpec('taskEndReminder', '任务结束提醒', '结束后提醒家长确认。'),
       _SettingRowSpec('deviceOfflineReminder', '设备离线提醒', '设备离线时通知家长。'),
-      _SettingRowSpec('safetyAlert', '安全告警', 'SOS、门口、危险区域和异常声音。'),
       _SettingRowSpec('pointsRewardReminder', '积分奖励提醒', '积分发放和奖励兑现时提醒。'),
       _SettingRowSpec('dailySummary', '日报摘要', '每天一次汇总，不打扰工作时间。'),
-      _SettingRowSpec('quietHoursEnabled', '夜间免打扰', '只保留安全事件、晨起闹铃和家长主动通话。'),
+      _SettingRowSpec('quietHoursEnabled', '夜间免打扰', '夜间只保留晨起闹铃和家长主动通话。'),
     ],
   );
 }
@@ -2734,31 +2685,292 @@ class PrivacyPermissionsPage extends StatelessWidget {
   );
 }
 
-class ConversationRulesPage extends StatelessWidget {
+class ConversationRulesPage extends ConsumerStatefulWidget {
   const ConversationRulesPage({super.key});
 
   @override
-  Widget build(BuildContext context) => const _BooleanSettingsPage(
-    title: '对话与人设',
-    settingKey: 'conversation',
-    rows: [
-      _SettingRowSpec('freeChatEnabled', '自由聊天', '允许短时间普通对话。'),
-      _SettingRowSpec('homeworkModeRestricted', '作业模式限制', '作业中只回答任务相关问题。'),
-      _SettingRowSpec('bedtimeQuietEnabled', '睡前安静模式', '睡前不主动开启长时间聊天。'),
-      _SettingRowSpec(
-        'storyMusicWindowEnabled',
-        '故事音乐时段',
-        '故事、音乐和音频内容只在家长允许时段可用。',
-      ),
-      _SettingRowSpec(
-        'repeatQuestionSummaryEnabled',
-        '重复求助摘要',
-        '频繁问同类题时在日报提醒家长关注。',
-      ),
-      _SettingRowSpec('detailedTranscriptEnabled', '逐字记录', '默认只保留主题摘要。'),
-    ],
-  );
+  ConsumerState<ConversationRulesPage> createState() =>
+      _ConversationRulesPageState();
 }
+
+class _ConversationRulesPageState extends ConsumerState<ConversationRulesPage> {
+  final _wakeName = TextEditingController();
+  Map<String, dynamic>? _draft;
+  var _saving = false;
+
+  @override
+  void dispose() {
+    _wakeName.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final setting = ref.watch(profileSettingProvider('conversation'));
+    final settingData = setting.asData?.value;
+    if (_draft == null && settingData != null) {
+      _initializeDraft(settingData.value);
+    }
+    final child = ref.watch(currentChildProvider).asData?.value;
+    final sleepTime = child?.sleepTime.trim().isNotEmpty == true
+        ? child!.sleepTime
+        : '21:00';
+    final canManageSetting =
+        ref
+            .watch(profileSummaryProvider)
+            .asData
+            ?.value
+            .can('manage_child_settings') ??
+        false;
+    final canSave = canManageSetting && !_saving && _draft != null;
+    return _Page(
+      title: '对话与人设',
+      footer: canManageSetting
+          ? AppPrimaryButton(
+              label: _saving ? '保存中' : '保存设置',
+              loading: _saving,
+              onTap: canSave ? _save : null,
+            )
+          : null,
+      children: setting.when(
+        data: (data) {
+          _initializeDraft(data.value);
+          final draft = _draft!;
+          final boundaryLevel = _textValue(draft['boundaryLevel'], 'balanced');
+          final boundary = _conversationBoundaryPlan(boundaryLevel);
+          final singleMinutes = _intValue(
+            draft['freeChatSingleMinutes'],
+            boundary.singleMinutes,
+            min: 3,
+            max: 30,
+          );
+          final dailyMinutes = _intValue(
+            draft['freeChatDailyMinutes'],
+            boundary.dailyMinutes,
+            min: singleMinutes,
+            max: 120,
+          );
+          return [
+            AppSurface(
+              child: Column(
+                children: [
+                  _Input(
+                    label: '摄像头唤醒名',
+                    controller: _wakeName,
+                    readOnly: !canManageSetting,
+                  ),
+                  const SizedBox(height: 12),
+                  const _FixedSettingOption(
+                    icon: Icons.record_voice_over_outlined,
+                    label: '原创声线',
+                    value: _defaultConversationVoiceStyle,
+                    badge: '默认',
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            AppSurface(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('边界方案', style: _rowTitle),
+                            SizedBox(height: 4),
+                            Text('控制自由聊天时长和拖拉跟进节奏。', style: _mutedText),
+                          ],
+                        ),
+                      ),
+                      _SoftTextBadge(
+                        label: boundary.label,
+                        tone: AppColors.brand,
+                        fill: AppColors.brandWash,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(boundary.description, style: _mutedText),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      for (final option in _conversationBoundaryPlans) ...[
+                        Expanded(
+                          child: _BoundaryChoiceButton(
+                            label: option.label,
+                            selected: option.key == boundary.key,
+                            onTap: canManageSetting
+                                ? () => setState(() {
+                                    draft['boundaryLevel'] = option.key;
+                                    draft['freeChatSingleMinutes'] =
+                                        option.singleMinutes;
+                                    draft['freeChatDailyMinutes'] =
+                                        option.dailyMinutes;
+                                  })
+                                : null,
+                          ),
+                        ),
+                        if (option != _conversationBoundaryPlans.last)
+                          const SizedBox(width: 8),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            AppSurface(
+              child: Column(
+                children: [
+                  _SwitchRow(
+                    title: '自由聊天',
+                    subtitle: '开启后按下面的单次和每日时长控制。',
+                    value: draft['freeChatEnabled'] == true,
+                    onChanged: canManageSetting
+                        ? (value) =>
+                              setState(() => draft['freeChatEnabled'] = value)
+                        : null,
+                  ),
+                  _MinuteStepperRow(
+                    title: '单次自由聊天',
+                    subtitle: '到时后设备会温和收束话题。',
+                    value: singleMinutes,
+                    min: 3,
+                    max: 30,
+                    step: 1,
+                    enabled:
+                        canManageSetting && draft['freeChatEnabled'] == true,
+                    onChanged: (value) => setState(() {
+                      draft['freeChatSingleMinutes'] = value;
+                      if (_intValue(
+                            draft['freeChatDailyMinutes'],
+                            dailyMinutes,
+                            min: 3,
+                            max: 120,
+                          ) <
+                          value) {
+                        draft['freeChatDailyMinutes'] = value;
+                      }
+                    }),
+                  ),
+                  _MinuteStepperRow(
+                    title: '每日自由聊天',
+                    subtitle: '用于控制一天内的主动陪聊总量。',
+                    value: dailyMinutes,
+                    min: singleMinutes,
+                    max: 120,
+                    step: 5,
+                    enabled:
+                        canManageSetting && draft['freeChatEnabled'] == true,
+                    onChanged: (value) =>
+                        setState(() => draft['freeChatDailyMinutes'] = value),
+                  ),
+                  _SwitchRow(
+                    title: '作业模式限制',
+                    subtitle: '作业中只允许任务相关问答和温和提示。',
+                    value: draft['homeworkModeRestricted'] == true,
+                    onChanged: canManageSetting
+                        ? (value) => setState(
+                            () => draft['homeworkModeRestricted'] = value,
+                          )
+                        : null,
+                  ),
+                  _SwitchRow(
+                    title: '睡前不主动聊天',
+                    subtitle: '$sleepTime 后不主动开启长时间自由聊天，时间在孩子资料里维护。',
+                    value: draft['bedtimeQuietEnabled'] == true,
+                    onChanged: canManageSetting
+                        ? (value) => setState(
+                            () => draft['bedtimeQuietEnabled'] = value,
+                          )
+                        : null,
+                  ),
+                ],
+              ),
+            ),
+            if (!canManageSetting) ...[
+              const SizedBox(height: 12),
+              const AppListRow(
+                icon: Icons.lock_outline,
+                title: '当前为只读',
+                subtitle: '查看者不能修改孩子看护设置。',
+                tone: AppListRowTone.neutral,
+              ),
+            ],
+          ];
+        },
+        loading: () => const [_Loading(title: '正在同步设置')],
+        error: (error, _) => [
+          _ErrorState(
+            error: error,
+            onRetry: () =>
+                ref.invalidate(profileSettingProvider('conversation')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _initializeDraft(Map<String, dynamic> value) {
+    if (_draft != null) return;
+    _draft = Map<String, dynamic>.from(value);
+    _wakeName.text = _textValue(_draft!['wakeName'], '小豆');
+    final boundary = _conversationBoundaryPlan(
+      _textValue(_draft!['boundaryLevel'], 'balanced'),
+    );
+    _draft!.putIfAbsent('freeChatSingleMinutes', () => boundary.singleMinutes);
+    _draft!.putIfAbsent('freeChatDailyMinutes', () => boundary.dailyMinutes);
+    _draft!['voiceStyle'] = _defaultConversationVoiceStyle;
+  }
+
+  Future<void> _save() async {
+    final value = _draft;
+    if (value == null) return;
+    final nextValue = Map<String, dynamic>.from(value)
+      ..['wakeName'] = _wakeName.text.trim().isEmpty
+          ? '小豆'
+          : _wakeName.text.trim()
+      ..['voiceStyle'] = _defaultConversationVoiceStyle;
+    setState(() => _saving = true);
+    try {
+      await ref
+          .read(profileRepositoryProvider)
+          .updateSetting('conversation', nextValue);
+      ref.invalidate(profileSettingProvider('conversation'));
+      if (mounted) _toast(context, '设置已保存');
+    } on ProfileException catch (error) {
+      if (mounted) _toast(context, error.message);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+}
+
+String _textValue(Object? value, String fallback) {
+  final text = value?.toString().trim() ?? '';
+  return text.isEmpty ? fallback : text;
+}
+
+int _intValue(
+  Object? value,
+  int fallback, {
+  required int min,
+  required int max,
+}) {
+  final parsed = switch (value) {
+    int number => number,
+    num number => number.toInt(),
+    String text => int.tryParse(text.trim()),
+    _ => null,
+  };
+  return (parsed ?? fallback).clamp(min, max).toInt();
+}
+
+const _defaultConversationVoiceStyle = '温柔女声，语速偏慢';
 
 class EducationContentPage extends StatelessWidget {
   const EducationContentPage({super.key});
@@ -2803,6 +3015,10 @@ class _BooleanSettingsPageState extends ConsumerState<_BooleanSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final setting = ref.watch(profileSettingProvider(widget.settingKey));
+    final settingData = setting.asData?.value;
+    _draft ??= settingData == null
+        ? null
+        : Map<String, dynamic>.from(settingData.value);
     final requiredCapability = widget.settingKey == 'privacy'
         ? 'manage_privacy'
         : 'manage_child_settings';
@@ -2813,8 +3029,16 @@ class _BooleanSettingsPageState extends ConsumerState<_BooleanSettingsPage> {
             ?.value
             .can(requiredCapability) ??
         false;
+    final canSave = canManageSetting && !_saving && _draft != null;
     return _Page(
       title: widget.title,
+      footer: canManageSetting
+          ? AppPrimaryButton(
+              label: _saving ? '保存中' : '保存设置',
+              loading: _saving,
+              onTap: canSave ? _save : null,
+            )
+          : null,
       children: setting.when(
         data: (data) {
           _draft ??= Map<String, dynamic>.from(data.value);
@@ -2851,13 +3075,6 @@ class _BooleanSettingsPageState extends ConsumerState<_BooleanSettingsPage> {
                 label: '儿童隐私授权说明',
                 trailing: const Icon(Icons.description_outlined, size: 18),
                 onTap: () => context.push(profileChildPrivacyPath),
-              ),
-            ],
-            if (canManageSetting) ...[
-              const SizedBox(height: 14),
-              AppPrimaryButton(
-                label: _saving ? '保存中' : '保存设置',
-                onTap: _saving ? null : _save,
               ),
             ],
           ];
@@ -2951,39 +3168,19 @@ class AboutPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final about = ref.watch(aboutInfoProvider);
+    final firmware = ref.watch(primaryFirmwareStatusProvider);
     return _Page(
-      title: '关于',
+      title: '关于我们',
+      subtitle: '应用版本、设备升级和产品原则。',
       children: about.when(
         data: (data) => [
-          AppSurface(
-            color: AppColors.ink,
-            borderColor: AppColors.ink,
-            radius: 24,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    _DarkIcon(Icons.apartment_outlined),
-                    const SizedBox(width: 13),
-                    Expanded(child: Text(data.displayName, style: _darkTitle)),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(data.description, style: _darkSub),
-              ],
-            ),
-          ),
+          _AboutHero(data: data),
           const SizedBox(height: 14),
+          const _SectionTitle('应用信息'),
+          const SizedBox(height: 10),
           AppSurface(
             child: Column(
               children: [
-                AppListRow(
-                  icon: Icons.info_outline,
-                  title: '当前版本',
-                  subtitle: data.version,
-                  tone: AppListRowTone.blue,
-                ),
                 AppListRow(
                   icon: Icons.feedback_outlined,
                   title: '帮助与反馈',
@@ -2992,26 +3189,55 @@ class AboutPage extends ConsumerWidget {
                   onTap: () => context.push(profileFeedbackPath),
                 ),
                 AppListRow(
-                  icon: Icons.description_outlined,
-                  title: '用户协议',
-                  subtitle: '服务条款和使用边界',
-                  onTap: () => context.push(userAgreementPath),
-                ),
-                AppListRow(
-                  icon: Icons.lock_outline,
-                  title: '隐私政策',
-                  subtitle: '数据、权限和儿童隐私',
-                  onTap: () => context.push(privacyPolicyPath),
-                ),
-                AppListRow(
-                  icon: Icons.child_care_outlined,
-                  title: '儿童隐私授权说明',
-                  subtitle: '监护人授权和最小必要原则',
-                  onTap: () => context.push(profileChildPrivacyPath),
+                  icon: Icons.system_update_alt_outlined,
+                  title: '当前版本',
+                  subtitle: _aboutVersionText(data),
+                  tone: AppListRowTone.blue,
+                  trailing: _InlineAction(label: '检查更新'),
+                  onTap: () {
+                    ref.invalidate(aboutInfoProvider);
+                    _toast(
+                      context,
+                      data.appUpdate.updateAvailable
+                          ? '发现新版本 ${data.appUpdate.latestVersion}'
+                          : '当前已是最新版本',
+                    );
+                  },
                 ),
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          const _SectionTitle('设备与升级'),
+          const SizedBox(height: 10),
+          _AboutFirmwareSection(firmware: firmware),
+          const SizedBox(height: 16),
+          const _SectionTitle('产品原则'),
+          const SizedBox(height: 10),
+          _AboutPrinciples(principles: data.principles),
+          const SizedBox(height: 16),
+          const _SectionTitle('法律与隐私'),
+          const SizedBox(height: 10),
+          AppSurface(
+            child: Column(
+              children: [
+                AppListRow(
+                  icon: Icons.lock_outline,
+                  title: '隐私政策',
+                  subtitle: '儿童数据、权限和删除说明',
+                  onTap: () => context.push(privacyPolicyPath),
+                ),
+                AppListRow(
+                  icon: Icons.description_outlined,
+                  title: '服务协议',
+                  subtitle: '服务条款和家庭使用边界',
+                  onTap: () => context.push(userAgreementPath),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          Center(child: Text('© 2026 Mira Guardian', style: _mutedText)),
         ],
         loading: () => const [_Loading(title: '正在同步应用信息')],
         error: (error, _) => [
@@ -3023,6 +3249,163 @@ class AboutPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _AboutHero extends StatelessWidget {
+  const _AboutHero({required this.data});
+
+  final AboutInfo data;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurface(
+      color: AppColors.ink,
+      borderColor: AppColors.ink,
+      radius: 24,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _DarkIcon(Icons.apartment_outlined),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Text(
+                  data.appName.isNotEmpty ? data.appName : data.displayName,
+                  style: _darkTitle,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(data.description, style: _darkSub),
+        ],
+      ),
+    );
+  }
+}
+
+class _AboutFirmwareSection extends StatelessWidget {
+  const _AboutFirmwareSection({required this.firmware});
+
+  final AsyncValue<DeviceFirmwareStatus?> firmware;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurface(
+      child: firmware.when(
+        data: (status) {
+          if (status == null) {
+            return Column(
+              children: [
+                AppListRow(
+                  icon: Icons.memory_outlined,
+                  title: '设备固件',
+                  subtitle: '绑定摄像头后，这里会显示固件版本和升级状态。',
+                  onTap: () => context.push(profileDevicesPath),
+                ),
+                const AppListRow(
+                  icon: Icons.published_with_changes_outlined,
+                  title: 'OTA 升级',
+                  subtitle: '后续用于固件包、灰度发布和设备回执追踪。',
+                  tone: AppListRowTone.amber,
+                ),
+              ],
+            );
+          }
+          return Column(
+            children: [
+              AppListRow(
+                icon: Icons.memory_outlined,
+                title: '设备固件',
+                subtitle: status.versionLine,
+                tone: status.updateAvailable
+                    ? AppListRowTone.amber
+                    : AppListRowTone.green,
+                trailing: StatusChip(
+                  label: status.statusLabel,
+                  tone: status.tone,
+                ),
+                onTap: () => context.push(
+                  '$profileDeviceDetailPath/${status.device.id}',
+                ),
+              ),
+              AppListRow(
+                icon: Icons.published_with_changes_outlined,
+                title: 'OTA 升级',
+                subtitle: _firmwareOtaSubtitle(status),
+                tone: AppListRowTone.blue,
+                onTap: () => context.push(
+                  '$profileDeviceDetailPath/${status.device.id}',
+                ),
+              ),
+            ],
+          );
+        },
+        loading: () => const _Loading(title: '正在同步设备升级状态'),
+        error: (error, _) => AppStateView(
+          variant: AppStateVariant.serviceUnavailable,
+          title: '设备升级状态暂时不可用',
+          message: error is DeviceException ? error.message : '请稍后重试。',
+          compact: true,
+        ),
+      ),
+    );
+  }
+}
+
+class _AboutPrinciples extends StatelessWidget {
+  const _AboutPrinciples({required this.principles});
+
+  final List<String> principles;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = principles.isEmpty
+        ? const ['儿童隐私优先', '温和提醒，不过度打扰']
+        : principles;
+    final icons = [
+      Icons.verified_user_outlined,
+      Icons.favorite_border,
+      Icons.family_restroom_outlined,
+    ];
+    return AppSurface(
+      child: Column(
+        children: [
+          for (var index = 0; index < items.length; index++)
+            AppListRow(
+              icon: icons[index % icons.length],
+              title: items[index],
+              subtitle: index == 0
+                  ? '最小必要采集、监护人授权、可撤回。'
+                  : index == 1
+                  ? '提醒保持克制，关键决定交给家长。'
+                  : '围绕真实家庭生活，而不是制造打扰。',
+              tone: index == 0 ? AppListRowTone.green : AppListRowTone.amber,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+String _aboutVersionText(AboutInfo data) {
+  final version = data.version.isNotEmpty ? data.version : '待同步';
+  final parts = <String>[
+    'v$version',
+    if (data.build.isNotEmpty) data.build,
+    data.appUpdate.statusLabel,
+  ];
+  return parts.join(' · ');
+}
+
+String _firmwareOtaSubtitle(DeviceFirmwareStatus status) {
+  final job = status.lastJob;
+  if (job != null) return '${status.device.displayName} · ${job.statusLabel}';
+  if (status.updateAvailable && status.latestPackage != null) {
+    return '${status.device.displayName} · ${status.latestPackage!.notes}';
+  }
+  return '${status.device.displayName} · 等待固件包和设备回执';
 }
 
 class SubscriptionPage extends ConsumerStatefulWidget {
@@ -3288,11 +3671,7 @@ class _SubscriptionPaywallScaffold extends StatelessWidget {
     final loading = loadingPlanId == selectedPlan.id;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: AppColors.ink,
-        systemNavigationBarIconBrightness: Brightness.light,
-      ),
+      value: AppSystemUi.dark(),
       child: Scaffold(
         backgroundColor: AppColors.ink,
         body: Stack(
@@ -4561,6 +4940,7 @@ class _Page extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.headerContent,
+    this.footer,
   });
 
   final String title;
@@ -4568,6 +4948,7 @@ class _Page extends StatelessWidget {
   final List<Widget> children;
   final Widget? trailing;
   final Widget? headerContent;
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
@@ -4586,6 +4967,7 @@ class _Page extends StatelessWidget {
         }
       },
       trailing: trailing,
+      footer: footer,
       children: children,
     );
   }
@@ -4627,8 +5009,9 @@ String _hubSubtitle(String title) {
     '家庭与成员' => '成员协作和紧急联系人',
     '设备管理' => '设备状态、网络和声音能力',
     '任务与奖励' => '积分、奖励和成长记录',
+    '积分与奖励' => '积分、奖励和兑换记录',
+    '看护报告' => '日报、周报和成长时刻',
     'AI 规则与提醒' => '观察策略、语音提醒和通知节奏',
-    '隐私与授权' => '采集边界、儿童隐私和协议',
     _ => '设置',
   };
 }
@@ -5273,12 +5656,267 @@ class _SwitchRow extends StatelessWidget {
   }
 }
 
+class _FixedSettingOption extends StatelessWidget {
+  const _FixedSettingOption({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.badge,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final String badge;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppRadii.input),
+        border: Border.all(color: AppColors.borderSoft),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.brandDeep, size: 18),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: _mutedText),
+                  const SizedBox(height: 4),
+                  Text(value, style: _rowTitle),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            _SoftTextBadge(
+              label: badge,
+              tone: AppColors.brandDeep,
+              fill: AppColors.brandWash,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MinuteStepperRow extends StatelessWidget {
+  const _MinuteStepperRow({
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.step,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final String title;
+  final String subtitle;
+  final int value;
+  final int min;
+  final int max;
+  final int step;
+  final bool enabled;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final canDecrease = enabled && value > min;
+    final canIncrease = enabled && value < max;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: _rowTitle),
+                const SizedBox(height: 4),
+                Text(subtitle, style: _mutedText),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          _StepperButton(
+            icon: Icons.remove,
+            label: '减少$title',
+            onTap: canDecrease
+                ? () => onChanged((value - step).clamp(min, max).toInt())
+                : null,
+          ),
+          const SizedBox(width: 6),
+          SizedBox(
+            width: 56,
+            child: Center(
+              child: Text(
+                '$value 分',
+                maxLines: 1,
+                style: TextStyle(
+                  color: enabled ? AppColors.ink : AppColors.disabledInk,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          _StepperButton(
+            icon: Icons.add,
+            label: '增加$title',
+            onTap: canIncrease
+                ? () => onChanged((value + step).clamp(min, max).toInt())
+                : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  const _StepperButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Semantics(
+        button: true,
+        enabled: enabled,
+        label: label,
+        child: Opacity(
+          opacity: enabled ? 1 : 0.45,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(AppRadii.control),
+              border: Border.all(color: AppColors.borderSoft),
+            ),
+            child: SizedBox(
+              width: AppControls.minTouchTarget,
+              height: AppControls.minTouchTarget,
+              child: Center(child: Icon(icon, color: AppColors.ink, size: 17)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _SettingRowSpec {
   const _SettingRowSpec(this.key, this.title, this.subtitle);
 
   final String key;
   final String title;
   final String subtitle;
+}
+
+const _conversationBoundaryPlans = [
+  _ConversationBoundaryPlan(
+    key: 'loose',
+    label: '宽松',
+    singleMinutes: 12,
+    dailyMinutes: 35,
+    description: '适合周末或家长在旁边时使用，自由聊天更长，拖拉跟进更少。',
+  ),
+  _ConversationBoundaryPlan(
+    key: 'balanced',
+    label: '平衡',
+    singleMinutes: 8,
+    dailyMinutes: 25,
+    description: '默认方案，兼顾陪伴感和防沉迷，不打断正常任务节奏。',
+  ),
+  _ConversationBoundaryPlan(
+    key: 'strict',
+    label: '严格',
+    singleMinutes: 5,
+    dailyMinutes: 15,
+    description: '适合作业日或睡前更容易兴奋的孩子，提醒更克制。',
+  ),
+];
+
+class _ConversationBoundaryPlan {
+  const _ConversationBoundaryPlan({
+    required this.key,
+    required this.label,
+    required this.singleMinutes,
+    required this.dailyMinutes,
+    required this.description,
+  });
+
+  final String key;
+  final String label;
+  final int singleMinutes;
+  final int dailyMinutes;
+  final String description;
+}
+
+_ConversationBoundaryPlan _conversationBoundaryPlan(String key) {
+  for (final option in _conversationBoundaryPlans) {
+    if (option.key == key) return option;
+  }
+  return _conversationBoundaryPlans[1];
+}
+
+class _BoundaryChoiceButton extends StatelessWidget {
+  const _BoundaryChoiceButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? AppColors.ink : AppColors.surfaceSoft,
+      borderRadius: BorderRadius.circular(AppRadii.full),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.full),
+        onTap: onTap,
+        child: SizedBox(
+          height: 42,
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: selected ? Colors.white : AppColors.ink,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _SectionTitle extends StatelessWidget {
@@ -5320,159 +5958,13 @@ class _ErrorState extends StatelessWidget {
   }
 }
 
-Future<void> _showFamilyCodeSheet(
-  BuildContext context,
-  WidgetRef ref,
-  FamilyCodeInfo code,
-) async {
-  final displayCode = code.code.isEmpty ? '家庭号未生成' : code.code;
-  final familyName = code.familyName.isEmpty ? '我的家庭' : code.familyName;
-  final action = await showAppBottomSheet<String>(
-    context: context,
-    maxHeightFactor: 0.54,
-    child: AppBottomSheetBody(
-      title: '家庭号',
-      subtitle: '给已经信任的家人使用。新成员加入后默认是临时查看者。',
-      footer: AppSheetFooterActions(
-        children: [
-          AppSheetSecondaryButton(
-            label: '复制',
-            onTap: () => Navigator.of(context).pop('copy'),
-          ),
-          AppSheetDangerButton(
-            label: '重置',
-            onTap: () => Navigator.of(context).pop('reset'),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.ink, AppColors.ink.withValues(alpha: 0.88)],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryButtonShadow.withValues(alpha: 0.16),
-                  blurRadius: 18,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 17, 18, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.10),
-                          ),
-                        ),
-                        child: const SizedBox(
-                          width: 42,
-                          height: 42,
-                          child: Center(
-                            child: Icon(
-                              Icons.tag_outlined,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              familyName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.78),
-                                fontFamily: AppTypography.systemFont,
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w700,
-                                height: 1.2,
-                                letterSpacing: 0,
-                              ),
-                            ),
-                            const SizedBox(height: 7),
-                            Text(
-                              displayCode,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'SF Mono',
-                                fontSize: 25,
-                                fontWeight: FontWeight.w900,
-                                height: 1,
-                                letterSpacing: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    '输入家庭号加入的人不会自动获得管理权限。',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.70),
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      height: 1.4,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          const _FamilyCodeRule(
-            icon: Icons.visibility_outlined,
-            title: '默认临时查看者',
-            message: '通过家庭号加入后，只能查看基础状态。管理员可以在家庭成员里调整权限。',
-          ),
-          const SizedBox(height: 10),
-          const _FamilyCodeRule(
-            icon: Icons.refresh_outlined,
-            title: '重置不影响已加入成员',
-            message: '重置只会让旧家庭号失效。已加入成员、管理员和权限不会被改变。',
-          ),
-        ],
-      ),
-    ),
-  );
-  if (!context.mounted || action == null) return;
-  if (action == 'copy') {
-    await Clipboard.setData(ClipboardData(text: code.code));
-    if (context.mounted) _toast(context, '家庭号已复制');
-    return;
-  }
+Future<void> _copyFamilyCode(BuildContext context, FamilyCodeInfo code) async {
+  await Clipboard.setData(ClipboardData(text: code.code));
+  if (context.mounted) _toast(context, '家庭号已复制');
+}
 
-  final confirmed = await _confirm(
-    context,
-    title: '重置家庭号',
-    message: '重置后旧家庭号不能再用于新加入。已经加入家庭的成员不会被移出，权限也不会改变。',
-    danger: true,
-  );
+Future<void> _resetFamilyCode(BuildContext context, WidgetRef ref) async {
+  final confirmed = await _confirmFamilyCodeResetDialog(context);
   if (!confirmed || !context.mounted) return;
   try {
     await ref.read(profileRepositoryProvider).resetFamilyCode();
@@ -5481,6 +5973,28 @@ Future<void> _showFamilyCodeSheet(
   } on ProfileException catch (error) {
     if (context.mounted) _toast(context, error.message);
   }
+}
+
+Future<bool> _confirmFamilyCodeResetDialog(BuildContext context) async {
+  return await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('重置家庭号'),
+          content: const Text('重置后旧家庭号不能再用于新加入。已经加入家庭的成员不会被移出，权限也不会改变。'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+              child: const Text('确认重置'),
+            ),
+          ],
+        ),
+      ) ??
+      false;
 }
 
 Future<void> _showMemberActions(
@@ -6382,15 +6896,7 @@ Future<bool> _confirm(
 }
 
 void _toast(BuildContext context, String message) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.ink,
-      ),
-    );
+  showAppToast(context, message);
 }
 
 String _phoneMask(String phone) {

@@ -42,7 +42,6 @@ class CameraHealth {
           : '摄像头运行服务暂时不可用',
     );
   }
-
 }
 
 class CameraRuntime {
@@ -98,7 +97,6 @@ class CameraRuntime {
           : '摄像头运行状态暂时不可用',
     );
   }
-
 }
 
 class CameraSnapshotFrame {
@@ -138,6 +136,33 @@ class CameraWebRtcSession {
       message: _asString(session['message'], fallback: '实时画面连接已准备好。'),
     );
   }
+
+  CameraWebRtcSession normalizedForApiBase(String apiBaseUrl) {
+    final signalingUri = Uri.tryParse(signalingUrl);
+    final apiUri = Uri.tryParse(apiBaseUrl);
+    if (signalingUri == null ||
+        apiUri == null ||
+        signalingUri.host.isEmpty ||
+        apiUri.host.isEmpty ||
+        !_isLoopbackHost(signalingUri.host) ||
+        _isLoopbackHost(apiUri.host)) {
+      return this;
+    }
+    final scheme = apiUri.scheme == 'https' ? 'wss' : 'ws';
+    return CameraWebRtcSession(
+      signalingUrl: signalingUri
+          .replace(scheme: scheme, host: apiUri.host)
+          .toString(),
+      message: message,
+    );
+  }
+}
+
+bool _isLoopbackHost(String host) {
+  final normalized = host.toLowerCase();
+  return normalized == '127.0.0.1' ||
+      normalized == 'localhost' ||
+      normalized == '::1';
 }
 
 class CameraStatus {
@@ -147,6 +172,7 @@ class CameraStatus {
     required this.snapshotAvailable,
     required this.speakerAvailable,
     required this.monitorAvailable,
+    required this.ptzAvailable,
     required this.lastSeenAt,
     required this.runtimeProvider,
     required this.message,
@@ -158,6 +184,7 @@ class CameraStatus {
   final bool snapshotAvailable;
   final bool speakerAvailable;
   final bool monitorAvailable;
+  final bool ptzAvailable;
   final int? lastSeenAt;
   final String runtimeProvider;
   final String message;
@@ -201,13 +228,13 @@ class CameraStatus {
       snapshotAvailable: status['snapshotAvailable'] == true,
       speakerAvailable: status['speakerAvailable'] == true,
       monitorAvailable: status['monitorAvailable'] == true,
+      ptzAvailable: status['ptzAvailable'] == true,
       lastSeenAt: _asNullableInt(status['lastSeenAt']),
       runtimeProvider: _asString(status['runtimeProvider']),
       message: _asString(status['message']),
       currentTask: task.isEmpty ? null : GuardianTask.fromJson(task),
     );
   }
-
 }
 
 class CameraMonitorStatus {
@@ -239,7 +266,6 @@ class CameraMonitorStatus {
       lastReminder: _asString(monitor['lastReminder']),
     );
   }
-
 }
 
 class LiveCareStatus {
@@ -267,6 +293,8 @@ class LiveCareStatus {
 
   GuardianTask? get currentTask => cameraStatus?.currentTask;
 
+  bool get ptzAvailable => cameraStatus?.ptzAvailable ?? false;
+
   String get title {
     return isAvailable ? '实时看护状态正常。' : '实时画面暂时不可用。';
   }
@@ -274,6 +302,66 @@ class LiveCareStatus {
   String get detail {
     if (cameraStatus != null) return cameraStatus!.summary;
     return isAvailable ? runtime.summary : '我们暂时拿不到实时画面。请确认设备电源和家庭网络后再刷新。';
+  }
+}
+
+class LiveCareEvent {
+  const LiveCareEvent({
+    required this.id,
+    required this.source,
+    required this.eventType,
+    required this.title,
+    required this.message,
+    required this.status,
+    required this.toneKey,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String source;
+  final String eventType;
+  final String title;
+  final String message;
+  final String status;
+  final String toneKey;
+  final int createdAt;
+
+  StatusTone get tone {
+    return switch (toneKey) {
+      'success' => StatusTone.success,
+      'warning' => StatusTone.warning,
+      'danger' => StatusTone.danger,
+      'info' => StatusTone.neutral,
+      _ => StatusTone.neutral,
+    };
+  }
+
+  String get timeLabel {
+    if (createdAt <= 0) return '刚刚';
+    final time = DateTime.fromMillisecondsSinceEpoch(createdAt);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final day = DateTime(time.year, time.month, time.day);
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    if (day == today) return '今天 $hour:$minute';
+    if (day == today.subtract(const Duration(days: 1))) {
+      return '昨天 $hour:$minute';
+    }
+    return '${time.month}月${time.day}日 $hour:$minute';
+  }
+
+  static LiveCareEvent fromJson(Map<String, dynamic> json) {
+    return LiveCareEvent(
+      id: _asString(json['id']),
+      source: _asString(json['source']),
+      eventType: _asString(json['eventType']),
+      title: _asString(json['title'], fallback: '看护事件'),
+      message: _asString(json['message']),
+      status: _asString(json['status']),
+      toneKey: _asString(json['tone']),
+      createdAt: _asNullableInt(json['createdAt']) ?? 0,
+    );
   }
 }
 

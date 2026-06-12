@@ -25,6 +25,11 @@ from schemas.profile import (
     setting_payload,
 )
 from services.auth_service import AuthService
+from services.setting_policy import (
+    SETTING_DEFAULTS,
+    SETTING_MANAGE_CAPABILITIES,
+    setting_value,
+)
 
 
 MEMBER_STATUSES = {"active", "invited", "disabled"}
@@ -64,13 +69,6 @@ FALLBACK_ROLE_CAPABILITIES = {
     ],
     "viewer": ["view_basic_home", "view_alerts", "manage_account_security"],
 }
-SETTING_MANAGE_CAPABILITIES = {
-    "ai-care-rules": "manage_child_settings",
-    "notifications": "manage_child_settings",
-    "conversation": "manage_child_settings",
-    "education": "manage_child_settings",
-    "privacy": "manage_privacy",
-}
 UNIQUE_GUARDIAN_IDENTITY_KEYS = {
     "mom",
     "dad",
@@ -100,54 +98,6 @@ LEGACY_GUARDIAN_IDENTITY_KEYS = {
     "other": "family_default",
     "unknown": "family_default",
     "grandparent": "family_default",
-}
-
-SETTING_DEFAULTS = {
-    "ai-care-rules": {
-        "taskObservationEnabled": True,
-        "voiceReminderEnabled": True,
-        "delayReminderEnabled": True,
-        "delayReminderIntervalMinutes": 3,
-        "maxDelayReminderCount": 3,
-        "cameraObservationStrategy": "balanced",
-    },
-    "notifications": {
-        "taskReminder": True,
-        "taskEndReminder": True,
-        "deviceOfflineReminder": True,
-        "pointsRewardReminder": True,
-        "safetyAlert": True,
-        "dailySummary": False,
-        "quietHoursEnabled": False,
-        "quietHoursStart": "21:30",
-        "quietHoursEnd": "07:00",
-    },
-    "privacy": {
-        "cameraCollectionAuthorized": False,
-        "voiceBroadcastAuthorized": False,
-        "childPrivacyAuthorized": False,
-        "remoteViewingNoticeEnabled": True,
-        "storeEventSnapshotsOnly": True,
-        "detailedConversationLogEnabled": False,
-        "dataRetentionDays": 30,
-    },
-    "conversation": {
-        "wakeName": "看护助手",
-        "voiceStyle": "温和女声",
-        "boundaryLevel": "balanced",
-        "freeChatEnabled": True,
-        "homeworkModeRestricted": True,
-        "bedtimeQuietEnabled": True,
-        "detailedTranscriptEnabled": False,
-    },
-    "education": {
-        "schoolbagEnabled": True,
-        "schoolStage": "primary",
-        "courseScheduleEnabled": False,
-        "partnerContentEnabled": False,
-        "learningDiagnosisEnabled": False,
-        "notes": "",
-    },
 }
 
 
@@ -589,7 +539,6 @@ class ProfileService:
     def family_code(self, access_token: str) -> dict:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
-            self._assert_capability(conn, context, "manage_family_code")
             family = self._family_or_error(conn, context["family"]["id"])
             return {
                 "ok": True,
@@ -707,6 +656,7 @@ class ProfileService:
             "nickname": "nickname",
             "gender": "gender",
             "birthday": "birthday",
+            "sleepTime": "sleep_time",
             "ageStage": "age_stage",
             "educationStage": "education_stage",
             "grade": "grade",
@@ -718,6 +668,8 @@ class ProfileService:
                     fields[column] = self._required_text(data, key, "请输入孩子姓名")
                 elif key == "gender":
                     fields[column] = self._gender(self._optional_text(data, key))
+                elif key == "sleepTime":
+                    fields[column] = self._time_of_day(self._optional_text(data, key))
                 else:
                     fields[column] = self._optional_text(data, key)
         if "interests" in data:
@@ -837,7 +789,7 @@ class ProfileService:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
             row = self.repository.get_setting(conn, family_id=context["family"]["id"], key=key)
-            value = _setting_value(row, key)
+            value = setting_value(row, key)
             return {"ok": True, "setting": setting_payload(key, value, row["updated_at"] if row else None)}
 
     def update_setting(self, access_token: str, key: str, data: dict) -> dict:
@@ -862,6 +814,15 @@ class ProfileService:
                 value=value,
                 now=now,
             )
+            if key == "conversation":
+                wake_name = str(value.get("wakeName") or "").strip()
+                if wake_name:
+                    self.repository.update_current_device_wake_name(
+                        conn,
+                        family_id=context["family"]["id"],
+                        wake_name=wake_name,
+                        now=now,
+                    )
             return {"ok": True, "setting": setting_payload(key, value, row["updated_at"])}
 
     def account_profile(self, access_token: str) -> dict:
@@ -970,6 +931,7 @@ class ProfileService:
 
     def account_security(self, access_token: str) -> dict:
         context = self._auth_context(access_token)
+        current_access_hash = hash_value(access_token)
         with self.repository.transaction() as conn:
             user = self._user_or_error(conn, context["user"]["id"])
             sessions = self.repository.list_sessions(conn, user_id=user["id"])
@@ -977,8 +939,8 @@ class ProfileService:
                 "ok": True,
                 "security": account_security_payload(
                     user,
-                    sessions,
-                    current_access_hash=hash_value(access_token),
+                    _collapse_login_device_sessions(sessions, current_access_hash),
+                    current_access_hash=current_access_hash,
                 ),
             }
 
@@ -1005,7 +967,7 @@ class ProfileService:
                 "message": "设备已移除",
                 "security": account_security_payload(
                     user,
-                    sessions,
+                    _collapse_login_device_sessions(sessions, current_access_hash),
                     current_access_hash=current_access_hash,
                 ),
             }
@@ -1867,6 +1829,18 @@ class ProfileService:
             raise ApiError("invalid_gender", "请选择有效的孩子资料选项")
         return normalized
 
+    def _time_of_day(self, value: str | None) -> str | None:
+        if value is None:
+            return None
+        parts = value.split(":")
+        if len(parts) != 2:
+            raise ApiError("invalid_time", "请输入有效时间，例如 21:00")
+        hour = int(parts[0]) if parts[0].isdigit() else None
+        minute = int(parts[1]) if parts[1].isdigit() else None
+        if hour is None or minute is None or hour > 23 or minute > 59:
+            raise ApiError("invalid_time", "请输入有效时间，例如 21:00")
+        return f"{hour:02d}:{minute:02d}"
+
     def _json_list(self, value: object) -> str:
         if not isinstance(value, list):
             raise ApiError("invalid_interests", "兴趣信息格式不正确")
@@ -1880,19 +1854,6 @@ class ProfileService:
     def _validate_setting_key(self, key: str) -> None:
         if key not in SETTING_DEFAULTS:
             raise ApiError("setting_not_found", "设置不存在", 404)
-
-
-def _setting_value(row, key: str) -> dict:
-    if row is None:
-        return dict(SETTING_DEFAULTS[key])
-    try:
-        value = json.loads(row["value"])
-    except (TypeError, ValueError, json.JSONDecodeError):
-        value = {}
-    merged = dict(SETTING_DEFAULTS[key])
-    if isinstance(value, dict):
-        merged.update(value)
-    return merged
 
 
 def _daily_summary(total: int, completed: int, pending: int) -> str:
@@ -1936,6 +1897,50 @@ def _subscription_entitlements() -> list[dict]:
     return _content_json("subscription_entitlements.json", [])
 
 
+def _collapse_login_device_sessions(sessions: list, current_access_hash: str) -> list:
+    by_device: dict[str, object] = {}
+    for row in sessions:
+        key = _login_device_key(row)
+        existing = by_device.get(key)
+        if existing is None:
+            by_device[key] = row
+            continue
+        if row.get("access_hash") == current_access_hash:
+            by_device[key] = row
+            continue
+        if existing.get("access_hash") == current_access_hash:
+            continue
+        if _session_last_active_at(row) > _session_last_active_at(existing):
+            by_device[key] = row
+    return sorted(
+        by_device.values(),
+        key=lambda row: (
+            0 if row.get("access_hash") == current_access_hash else 1,
+            -_session_last_active_at(row),
+        ),
+    )
+
+
+def _login_device_key(row) -> str:
+    values = [
+        row.get("device_label"),
+        row.get("device_type"),
+        row.get("device_model"),
+        row.get("device_hardware"),
+        row.get("platform"),
+        row.get("os_version"),
+        row.get("app_version"),
+    ]
+    normalized = [str(value or "").strip().lower() for value in values]
+    if not any(normalized):
+        return f"session:{row.get('id')}"
+    return "|".join(normalized)
+
+
+def _session_last_active_at(row) -> int:
+    return int(row.get("last_active_at") or row.get("rotated_at") or row.get("created_at") or 0)
+
+
 def _app_about() -> dict:
     return _content_json(
         "app_about.json",
@@ -1944,6 +1949,7 @@ def _app_about() -> dict:
             "displayName": "",
             "version": "",
             "build": "",
+            "appUpdate": {},
             "description": "",
             "principles": [],
         },

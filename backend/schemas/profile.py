@@ -124,6 +124,7 @@ def child_profile_payload(row: DatabaseRow | None) -> dict | None:
         "nickname": row["nickname"] or "",
         "gender": row.get("gender") or "unspecified",
         "birthday": row["birthday"] or "",
+        "sleepTime": row.get("sleep_time") or "",
         "ageStage": row["age_stage"] or "",
         "educationStage": row.get("education_stage") or row["age_stage"] or "",
         "grade": row.get("grade") or "",

@@ -12,3 +12,8 @@ Required metadata header:
 # scenario: task
 # status: active
 ```
+
+Current task prompts:
+
+- `task.observation.summary:v1` summarizes camera task observations for parents.
+- `task.reminder.voice:v1` generates short child-facing voice reminders from task context.

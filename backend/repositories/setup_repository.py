@@ -79,6 +79,7 @@ class SetupRepository:
                   education_stage VARCHAR(255),
                   grade VARCHAR(255),
                   birthday VARCHAR(255),
+                  sleep_time VARCHAR(255),
                   created_at BIGINT NOT NULL,
                   updated_at BIGINT NOT NULL
                 );
@@ -95,6 +96,31 @@ class SetupRepository:
                 );
                 """
             )
+            self._ensure_column(
+                conn,
+                table="children",
+                column="sleep_time",
+                definition="VARCHAR(255)",
+            )
+            self._ensure_column(
+                conn,
+                table="devices",
+                column="wake_name",
+                definition="VARCHAR(255)",
+            )
+
+    def _ensure_column(
+        self,
+        conn: DatabaseConnection,
+        *,
+        table: str,
+        column: str,
+        definition: str,
+    ) -> None:
+        columns = conn.execute(f"PRAGMA table_info({table})").fetchall()
+        if any(row["name"] == column for row in columns):
+            return
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
     def get_or_create_progress(
         self,
@@ -315,6 +341,7 @@ class SetupRepository:
         education_stage: str | None,
         grade: str | None,
         birthday: str | None,
+        sleep_time: str | None,
         now: int,
     ) -> str:
         row = conn.execute(
@@ -327,7 +354,7 @@ class SetupRepository:
                 """
                 UPDATE children SET name = ?, nickname = ?, gender = ?,
                   age_stage = ?, education_stage = ?, grade = ?,
-                  birthday = ?, updated_at = ? WHERE id = ?
+                  birthday = ?, sleep_time = ?, updated_at = ? WHERE id = ?
                 """,
                 (
                     name,
@@ -337,6 +364,7 @@ class SetupRepository:
                     education_stage,
                     grade,
                     birthday,
+                    sleep_time,
                     now,
                     child_id,
                 ),
@@ -346,9 +374,9 @@ class SetupRepository:
                 """
                 INSERT INTO children(
                   id, family_id, name, nickname, gender, age_stage, education_stage,
-                  grade, birthday, created_at, updated_at
+                  grade, birthday, sleep_time, created_at, updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     child_id,
@@ -360,6 +388,7 @@ class SetupRepository:
                     education_stage,
                     grade,
                     birthday,
+                    sleep_time,
                     now,
                     now,
                 ),

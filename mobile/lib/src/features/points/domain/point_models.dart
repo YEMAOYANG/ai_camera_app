@@ -3,18 +3,21 @@ class PointAccount {
     required this.familyId,
     required this.childId,
     required this.balance,
+    required this.stageNoticeHandledBalance,
     required this.updatedAt,
   });
 
   final String familyId;
   final String childId;
   final int balance;
+  final int stageNoticeHandledBalance;
   final int updatedAt;
 
   static const empty = PointAccount(
     familyId: '',
     childId: '',
     balance: 0,
+    stageNoticeHandledBalance: 0,
     updatedAt: 0,
   );
 
@@ -23,6 +26,7 @@ class PointAccount {
       familyId: _asString(json['familyId']),
       childId: _asString(json['childId']),
       balance: _asInt(json['balance']),
+      stageNoticeHandledBalance: _asInt(json['stageNoticeHandledBalance']),
       updatedAt: _asInt(json['updatedAt']),
     );
   }

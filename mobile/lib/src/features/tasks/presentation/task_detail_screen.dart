@@ -13,6 +13,7 @@ import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class TaskDetailScreen extends ConsumerStatefulWidget {
@@ -195,6 +196,7 @@ class _TaskEventsPanel extends StatelessWidget {
       'manual_finish_reminder_failed' => Icons.volume_up_outlined,
       'auto_started' || 'manual_started' => Icons.play_circle_outline,
       'camera_monitor_started' => Icons.center_focus_strong_outlined,
+      'monitor_not_required' => Icons.visibility_off_outlined,
       'camera_command_failed' => Icons.videocam_off_outlined,
       'parent_confirmed' => Icons.verified_outlined,
       'confirmation_rejected' || 'parent_rejected' => Icons.rule_outlined,
@@ -878,13 +880,5 @@ String _formatEventTime(int milliseconds) {
 String _twoDigits(int value) => value.toString().padLeft(2, '0');
 
 void _showToast(BuildContext context, String message) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.ink,
-      ),
-    );
+  showAppToast(context, message);
 }

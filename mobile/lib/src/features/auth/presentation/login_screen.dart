@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
 import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
@@ -128,8 +129,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     if (_loading || _countdown > 0) return;
     if (!_validatePhone()) return;
 
+    late final SmsCodeRequestResult result;
     try {
-      await ref.read(authRepositoryProvider).requestSmsCode(_phoneDigits);
+      result = await ref
+          .read(authRepositoryProvider)
+          .requestSmsCode(_phoneDigits);
     } on AuthException catch (error) {
       setState(() {
         _phoneError = error.code == 'invalid_phone' ? error.message : null;
@@ -141,10 +145,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       return;
     }
 
+    final debugCode = result.debugCode.trim();
+    if (debugCode.isNotEmpty) {
+      _codeController.value = TextEditingValue(
+        text: debugCode,
+        selection: TextSelection.collapsed(offset: debugCode.length),
+      );
+      _lastCodeText = debugCode;
+    }
+
     setState(() {
-      _codeSent = true;
+      _codeSent = result.codeSent;
       _countdown = 59;
-      _statusMessage = '验证码已发送，未注册手机号验证后会自动创建家庭账户。';
+      _statusMessage = debugCode.isEmpty
+          ? '验证码已发送，未注册手机号验证后会自动创建家庭账户。'
+          : '验证码已自动填入，未注册手机号验证后会自动创建家庭账户。';
       _codeError = null;
     });
     _focusCodeField();
@@ -343,11 +358,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     final motionDisabled = MediaQuery.of(context).disableAnimations;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: AppColors.appBackgroundWarm,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
+      value: AppSystemUi.light(),
       child: Scaffold(
         backgroundColor: AppColors.appBackgroundWarm,
         body: Stack(

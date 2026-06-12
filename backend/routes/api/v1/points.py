@@ -36,9 +36,38 @@ def ledger():
         return error_response(exc)
 
 
+@points_bp.get("/settings")
+def settings():
+    try:
+        return jsonify(point_service().settings(bearer_token(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@points_bp.patch("/settings")
+def update_settings():
+    try:
+        return jsonify(point_service().update_settings(bearer_token(request), json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @points_bp.post("/adjust")
 def adjust():
     try:
         return jsonify(point_service().adjust(bearer_token(request), json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@points_bp.post("/stage-notice/ack")
+def acknowledge_stage_notice():
+    try:
+        return jsonify(
+            point_service().acknowledge_stage_notice(
+                bearer_token(request),
+                json_body(request),
+            )
+        )
     except ApiError as exc:
         return error_response(exc)

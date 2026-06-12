@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 
 class AppBackground extends StatelessWidget {
@@ -55,11 +56,7 @@ class AppBackgroundScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: AppColors.appBackgroundWarm,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
+      value: AppSystemUi.light(),
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
         extendBody: extendBody,

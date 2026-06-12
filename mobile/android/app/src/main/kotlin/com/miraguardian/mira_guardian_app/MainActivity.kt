@@ -1,10 +1,10 @@
 package com.miraguardian.mira_guardian_app
 
 import android.app.DatePickerDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.view.ContextThemeWrapper
+import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -48,10 +48,7 @@ class MainActivity : FlutterActivity() {
         }
 
         val dialog = DatePickerDialog(
-            ContextThemeWrapper(
-                localizedContext(locale),
-                android.R.style.Theme_Material_Light_Dialog_Alert
-            ),
+            themedActivityContext(locale),
             { _, year, month, dayOfMonth ->
                 finish(formatDate(year, month, dayOfMonth))
             },
@@ -66,13 +63,26 @@ class MainActivity : FlutterActivity() {
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "确定", dialog)
         dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消") { _, _ -> finish(null) }
         dialog.setOnCancelListener { finish(null) }
-        dialog.show()
+        try {
+            if (isFinishing || isDestroyed) {
+                result.error("activity_unavailable", "当前页面暂时无法打开日期选择", null)
+                return
+            }
+            dialog.show()
+        } catch (_: WindowManager.BadTokenException) {
+            result.error("activity_unavailable", "当前页面暂时无法打开日期选择", null)
+        }
     }
 
-    private fun localizedContext(locale: Locale): Context {
+    private fun themedActivityContext(locale: Locale): ContextThemeWrapper {
+        val context = ContextThemeWrapper(
+            this,
+            R.style.MiraDatePickerDialogTheme
+        )
         val configuration = Configuration(resources.configuration)
         configuration.setLocale(locale)
-        return createConfigurationContext(configuration)
+        context.applyOverrideConfiguration(configuration)
+        return context
     }
 
     private fun parseLocale(value: String?): Locale {

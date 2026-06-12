@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +16,8 @@ import 'package:guardian_parent_app/src/shared/widgets/app_compact_toggle.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_time_picker_sheet.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 final taskSelectedDateProvider = StateProvider<DateTime>((ref) {
@@ -72,10 +73,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
     return AppScreen(
       title: '任务',
-      pinnedHeaderHeight: 154,
+      pinnedHeaderHeight: 148,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.pageHorizontal,
-        6,
+        2,
         AppSpacing.pageHorizontal,
         AppSpacing.pageBottom,
       ),
@@ -303,7 +304,7 @@ class _WeekHeader extends StatelessWidget {
     });
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(0, compact ? 4 : 6, 0, compact ? 6 : 8),
+      padding: EdgeInsets.fromLTRB(0, compact ? 4 : 6, 0, 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -851,6 +852,7 @@ class _TaskEmptyState extends StatelessWidget {
       variant: AppStateVariant.emptyTasks,
       title: title,
       message: message,
+      padding: const EdgeInsets.fromLTRB(4, 6, 4, 20),
       primaryActionLabel: isPast || !canCreate ? null : '添加孩子的新任务',
       onPrimaryAction: isPast ? null : onCreate,
       secondaryActionLabel: isPast || onTemplate == null ? null : '从模板添加',
@@ -1488,15 +1490,12 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     String? maxTime,
     String invalidMessage = '结束时间要晚于开始时间',
   }) {
-    return showAppBottomSheet<String>(
+    return showAppTimePickerSheet(
       context: context,
-      maxHeightFactor: 0.58,
-      child: _AppTimePickerSheet(
-        initialValue: initial,
-        minMinutes: minTime == null ? 0 : _minutesOfDay(minTime),
-        maxMinutes: maxTime == null ? 23 * 60 + 59 : _minutesOfDay(maxTime),
-        invalidMessage: invalidMessage,
-      ),
+      initialValue: initial,
+      minMinutes: minTime == null ? 0 : _minutesOfDay(minTime),
+      maxMinutes: maxTime == null ? 23 * 60 + 59 : _minutesOfDay(maxTime),
+      invalidMessage: invalidMessage,
     );
   }
 
@@ -1899,189 +1898,6 @@ class _PickerSheetScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBottomSheetBody(title: title, subtitle: subtitle, child: child);
-  }
-}
-
-class _AppTimePickerSheet extends StatefulWidget {
-  const _AppTimePickerSheet({
-    required this.initialValue,
-    required this.minMinutes,
-    required this.maxMinutes,
-    required this.invalidMessage,
-  });
-
-  final String initialValue;
-  final int minMinutes;
-  final int maxMinutes;
-  final String invalidMessage;
-
-  @override
-  State<_AppTimePickerSheet> createState() => _AppTimePickerSheetState();
-}
-
-class _AppTimePickerSheetState extends State<_AppTimePickerSheet> {
-  late final FixedExtentScrollController _hourController;
-  late final FixedExtentScrollController _minuteController;
-  late int _hour;
-  late int _minute;
-  late final int _minMinutes;
-  late final int _maxMinutes;
-
-  @override
-  void initState() {
-    super.initState();
-    _minMinutes = widget.minMinutes.clamp(0, 23 * 60 + 59).toInt();
-    _maxMinutes = widget.maxMinutes.clamp(_minMinutes, 23 * 60 + 59).toInt();
-    final initial = _timeOfDay(
-      _minuteText(
-        _minutesOfDay(
-          widget.initialValue,
-        ).clamp(_minMinutes, _maxMinutes).toInt(),
-      ),
-    );
-    _hour = initial.hour;
-    _minute = initial.minute;
-    _hourController = FixedExtentScrollController(initialItem: _hour);
-    _minuteController = FixedExtentScrollController(initialItem: _minute);
-  }
-
-  @override
-  void dispose() {
-    _hourController.dispose();
-    _minuteController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final selectedMinutes = _hour * 60 + _minute;
-    final valid =
-        selectedMinutes >= _minMinutes && selectedMinutes <= _maxMinutes;
-    final rangeLabel = _minMinutes == 0 && _maxMinutes == 23 * 60 + 59
-        ? null
-        : '可选择 ${_minuteText(_minMinutes)} - ${_minuteText(_maxMinutes)}';
-    return AppBottomSheetBody(
-      title: '选择时间',
-      subtitle: rangeLabel,
-      scrollable: false,
-      footer: AppSheetFooterActions(
-        children: [
-          AppSheetSecondaryButton(
-            label: '取消',
-            onTap: () => Navigator.of(context).pop(),
-          ),
-          AppSheetPrimaryButton(
-            label: '确定',
-            trailing: const AppButtonGlyph(icon: Icons.check),
-            onTap: valid
-                ? () {
-                    Navigator.of(
-                      context,
-                    ).pop(_timeText(TimeOfDay(hour: _hour, minute: _minute)));
-                  }
-                : null,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AppSurface(
-            radius: 20,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            color: AppColors.surfaceSoft,
-            borderColor: AppColors.borderSoft,
-            child: SizedBox(
-              height: 174,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _TimeWheel(
-                      controller: _hourController,
-                      values: List.generate(24, (index) => index),
-                      suffix: '时',
-                      onChanged: (value) => setState(() => _hour = value),
-                    ),
-                  ),
-                  Container(
-                    width: 1,
-                    height: 116,
-                    color: AppColors.muted.withValues(alpha: 0.12),
-                  ),
-                  Expanded(
-                    child: _TimeWheel(
-                      controller: _minuteController,
-                      values: List.generate(60, (index) => index),
-                      suffix: '分',
-                      onChanged: (value) => setState(() => _minute = value),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (!valid) ...[
-            const SizedBox(height: 9),
-            Text(
-              widget.invalidMessage,
-              style: const TextStyle(
-                color: AppColors.danger,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _TimeWheel extends StatelessWidget {
-  const _TimeWheel({
-    required this.controller,
-    required this.values,
-    required this.suffix,
-    required this.onChanged,
-  });
-
-  final FixedExtentScrollController controller;
-  final List<int> values;
-  final String suffix;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPicker(
-      scrollController: controller,
-      itemExtent: 42,
-      diameterRatio: 1.12,
-      squeeze: 1.04,
-      selectionOverlay: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(14),
-        ),
-      ),
-      onSelectedItemChanged: (index) => onChanged(values[index]),
-      children: [
-        for (final value in values)
-          Center(
-            child: Text(
-              '${value.toString().padLeft(2, '0')} $suffix',
-              style: const TextStyle(
-                color: AppColors.ink,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 19,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0,
-              ),
-            ),
-          ),
-      ],
-    );
   }
 }
 
@@ -3003,8 +2819,8 @@ const _taskTypeConfigs = [
     defaultRequiresConfirmation: false,
     titleLabel: '习惯名称',
     titleHint: '例如：喝水休息',
-    detailLabel: '提醒',
-    detailHint: '例如：温和提醒一次即可',
+    detailLabel: '看护要点',
+    detailHint: '例如：午休后补水，不需要家长确认',
   ),
   _TaskTypeConfig(
     value: 'sleep',
@@ -3547,20 +3363,6 @@ int _currentSelectableMinute(DateTime now) {
       .toInt();
 }
 
-TimeOfDay _timeOfDay(String time) {
-  final parts = time.split(':');
-  return TimeOfDay(
-    hour: parts.isNotEmpty ? int.tryParse(parts[0]) ?? 19 : 19,
-    minute: parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0,
-  );
-}
-
-String _timeText(TimeOfDay time) {
-  final hour = time.hour.toString().padLeft(2, '0');
-  final minute = time.minute.toString().padLeft(2, '0');
-  return '$hour:$minute';
-}
-
 String _minuteText(int minutes) {
   final safeMinutes = minutes.clamp(0, 23 * 60 + 59).toInt();
   final hour = (safeMinutes ~/ 60).toString().padLeft(2, '0');
@@ -3647,13 +3449,5 @@ String _dateChoiceLabel(DateTime date) {
 }
 
 void _showToast(BuildContext context, String message) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.ink,
-      ),
-    );
+  showAppToast(context, message);
 }

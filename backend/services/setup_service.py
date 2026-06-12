@@ -184,6 +184,7 @@ class SetupService:
         education_stage = self._optional_text(data, "educationStage")
         grade = self._optional_text(data, "grade")
         birthday = self._optional_text(data, "birthday")
+        sleep_time = self._time_of_day(self._optional_text(data, "sleepTime"))
         now = now_ms()
         with self.repository.transaction() as conn:
             self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
@@ -197,6 +198,7 @@ class SetupService:
                 education_stage=education_stage,
                 grade=grade,
                 birthday=birthday,
+                sleep_time=sleep_time,
                 now=now,
             )
             self.repository.mark_step_done(
@@ -218,6 +220,8 @@ class SetupService:
                         "name": name,
                         "nickname": nickname,
                         "gender": gender,
+                        "birthday": birthday,
+                        "sleepTime": sleep_time,
                         "ageStage": age_stage,
                         "educationStage": education_stage,
                         "grade": grade,
@@ -472,6 +476,7 @@ class SetupService:
                 "educationStage": child.get("education_stage") or "",
                 "grade": child.get("grade") or "",
                 "birthday": child["birthday"] or "",
+                "sleepTime": child.get("sleep_time") or "",
             },
             "cameraName": None
             if device is None
@@ -496,6 +501,18 @@ class SetupService:
         if normalized not in {"male", "female", "unspecified"}:
             raise ApiError("invalid_gender", "请选择有效的孩子资料选项")
         return normalized
+
+    def _time_of_day(self, value: str | None) -> str | None:
+        if value is None:
+            return None
+        parts = value.split(":")
+        if len(parts) != 2:
+            raise ApiError("invalid_time", "请输入有效时间，例如 21:00")
+        hour = int(parts[0]) if parts[0].isdigit() else None
+        minute = int(parts[1]) if parts[1].isdigit() else None
+        if hour is None or minute is None or hour > 23 or minute > 59:
+            raise ApiError("invalid_time", "请输入有效时间，例如 21:00")
+        return f"{hour:02d}:{minute:02d}"
 
     def _guardian_identity_labels(self, conn) -> set[str]:
         return {

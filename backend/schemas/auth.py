@@ -13,6 +13,10 @@ PHONE_REPR_ERROR = "请输入正确的 11 位手机号"
 
 def normalize_phone(phone: str) -> str:
     digits = "".join(ch for ch in (phone or "") if ch.isdigit())
+    if len(digits) == 13 and digits.startswith("86"):
+        digits = digits[2:]
+    elif len(digits) == 15 and digits.startswith("0086"):
+        digits = digits[4:]
     if len(digits) != 11 or digits[0] != "1" or digits[1] not in "3456789":
         raise AuthError("invalid_phone", PHONE_REPR_ERROR)
     return digits

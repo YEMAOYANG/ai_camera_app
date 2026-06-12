@@ -81,6 +81,8 @@ class SetupApiTest(unittest.TestCase):
                 "ageStage": "primary",
                 "educationStage": "小学",
                 "grade": "一年级",
+                "birthday": "2019-05-20",
+                "sleepTime": "21:15",
             },
             headers=self._auth_headers(access_token),
         )
@@ -88,6 +90,8 @@ class SetupApiTest(unittest.TestCase):
         self.assertEqual(child.json["setup"]["childProfile"], "done")
         self.assertEqual(child.json["child"]["name"], "小宇")
         self.assertEqual(child.json["child"]["gender"], "unspecified")
+        self.assertEqual(child.json["child"]["birthday"], "2019-05-20")
+        self.assertEqual(child.json["child"]["sleepTime"], "21:15")
         self.assertEqual(child.json["setup"]["nextStep"], "cameraName")
 
         intro = self.client.post(
@@ -153,6 +157,7 @@ class SetupApiTest(unittest.TestCase):
         self.assertEqual(status.status_code, 200)
         self.assertTrue(status.json["setup"]["completed"])
         self.assertEqual(status.json["setup"]["nextStep"], "home")
+        self.assertEqual(status.json["child"]["sleepTime"], "21:15")
 
     def test_setup_contacts_allow_parent_identity_and_reject_contact_duplicates(self):
         access_token = self._login("13800003026")

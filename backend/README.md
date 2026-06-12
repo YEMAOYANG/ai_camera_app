@@ -12,6 +12,7 @@ Local default port:
 
 ```text
 App backend: http://127.0.0.1:8000
+LAN access for real devices: http://<your-computer-lan-ip>:8000
 ```
 
 Install and run:
@@ -23,6 +24,11 @@ cp .env.example .env
 python3 scripts/migrate.py
 python3 app.py
 ```
+
+Development defaults bind to `0.0.0.0` so an Android/iOS device on the same
+network can reach the backend through the computer LAN IP. If an older local
+`.env` still has `APP_HOST=127.0.0.1`, change it to `APP_HOST=0.0.0.0` and
+restart the backend.
 
 Production runtime expects a MySQL-compatible database. Create the database and
 grant an application user before starting the service:
@@ -75,6 +81,9 @@ APP_HARDWARE_ADAPTER=disabled
 APP_CAMERA_RUNTIME_ADAPTER=disabled
 APP_AI_PROVIDER=
 APP_AI_MODEL=
+APP_AI_API_KEY=
+APP_AI_BASE_URL=
+APP_AI_TIMEOUT_SECONDS=8
 ```
 
 Auth uses an `SmsProvider` abstraction. `DevelopmentSmsProvider` is allowed only
@@ -134,6 +143,7 @@ Points
   GET  /api/points/account
   GET  /api/points/ledger
   POST /api/points/adjust
+  POST /api/points/stage-notice/ack
 
 Rewards
   GET   /api/rewards/items
@@ -194,6 +204,14 @@ firmware on a real device.
 Prompt files live under `backend/prompts/` and are referenced by
 `prompt_id + version`. Routes and business code should load prompts through the
 prompt registry instead of embedding prompt strings directly.
+
+Task voice reminders use `task.reminder.voice:v1`. When `APP_AI_PROVIDER`,
+`APP_AI_MODEL`, and `APP_AI_API_KEY` are configured, the backend asks the model
+to generate a short child-facing reminder from task title, description, type,
+phase, and age context. `kimi`/`moonshot` use the Moonshot-compatible chat API
+(`APP_AI_BASE_URL` defaults to `https://api.moonshot.cn/v1` through the config
+layer). If the model is unconfigured or unavailable, the backend falls back to a
+local semantic reminder policy.
 
 ## V1 Structure
 

@@ -9,6 +9,7 @@ from integrations.camera_runtime.mock_adapter import MockCameraRuntimeAdapter
 from integrations.hardware.disabled_adapter import DisabledHardwareDeviceAdapter
 from integrations.hardware.mock_adapter import MockHardwareDeviceAdapter
 from services.auth_service import AuthService
+from services.ai_text_provider import OpenAICompatibleTextProvider, UnavailableAiTextProvider
 from services.camera_bridge_service import CameraBridgeService
 from services.camera_command_service import CameraCommandService
 from services.device_service import DeviceService
@@ -18,6 +19,7 @@ from services.profile_service import ProfileService
 from services.reward_service import RewardService
 from services.setup_service import SetupService
 from services.sms_provider import DevelopmentSmsProvider, SmsProvider, UnavailableSmsProvider
+from services.prompt_registry import PromptRegistry
 from services.task_service import TaskService
 from services.task_runtime_service import TaskRuntimeService
 
@@ -47,6 +49,8 @@ def task_service() -> TaskService:
         current_app.config["DATABASE_URL"],
         auth_service=auth_service(),
         camera_command_service_factory=camera_command_service,
+        ai_text_provider=ai_text_provider(),
+        prompt_registry=prompt_registry(),
     )
 
 
@@ -111,6 +115,8 @@ def task_runtime_service() -> TaskRuntimeService:
     return TaskRuntimeService(
         current_app.config["DATABASE_URL"],
         camera_command_service=camera_command_service(),
+        ai_text_provider=ai_text_provider(),
+        prompt_registry=prompt_registry(),
         reminder_lead_seconds=int(current_app.config.get("TASK_REMINDER_LEAD_SECONDS", 300)),
         delay_reminder_interval_seconds=int(
             current_app.config.get("TASK_DELAY_REMINDER_INTERVAL_SECONDS", 180)
@@ -131,6 +137,28 @@ def sms_provider() -> SmsProvider:
     if provider in {"aliyun", "tencent", "twilio"}:
         return UnavailableSmsProvider(provider)
     return UnavailableSmsProvider(provider or "unconfigured")
+
+
+def prompt_registry() -> PromptRegistry:
+    return PromptRegistry(current_app.config["PROMPT_ROOT"])
+
+
+def ai_text_provider():
+    provider = str(current_app.config.get("AI_PROVIDER", "")).strip().lower()
+    api_key = str(current_app.config.get("AI_API_KEY", "")).strip()
+    model = str(current_app.config.get("AI_MODEL", "")).strip()
+    base_url = str(current_app.config.get("AI_BASE_URL", "")).strip()
+    timeout = float(current_app.config.get("AI_TIMEOUT_SECONDS", 8))
+    if provider in {"moonshot", "kimi", "openai", "openai_compatible"}:
+        return OpenAICompatibleTextProvider(
+            provider_name="moonshot" if provider == "kimi" else provider,
+            api_key=api_key,
+            base_url=base_url,
+            model_name=model,
+            timeout_seconds=timeout,
+            disable_thinking=provider in {"moonshot", "kimi"},
+        )
+    return UnavailableAiTextProvider()
 
 
 def hardware_adapter():

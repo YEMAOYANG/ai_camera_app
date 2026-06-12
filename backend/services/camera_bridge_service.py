@@ -41,10 +41,13 @@ class CameraBridgeService:
         monitor_reachable = bool(monitor_runtime.get("reachable"))
         monitor_data = monitor_runtime.get("data") or {}
         monitor_payload = monitor_data.get("monitor_runtime") or monitor_data
+        health_data = health.get("cameraRuntime", {}).get("data") or {}
+        camera_data = health_data.get("camera") if isinstance(health_data, dict) else {}
         monitor_available = monitor_reachable and (
             bool(monitor_payload.get("running"))
             or str(monitor_payload.get("status", "")).lower() not in {"", "unconfigured", "unavailable"}
         )
+        ptz_available = reachable and _camera_supports_ptz(camera_data)
         status_value = "online" if reachable else "offline"
         if reachable and not runtime_reachable:
             status_value = "connecting"
@@ -63,6 +66,7 @@ class CameraBridgeService:
                 snapshot_available=reachable,
                 speaker_available=speaker_reachable,
                 monitor_available=monitor_available,
+                ptz_available=ptz_available,
                 last_seen_at=now_ms() if reachable else None,
                 runtime_provider=self.adapter.adapter_name,
                 current_task=current_task,
@@ -78,6 +82,15 @@ class CameraBridgeService:
             raise CameraBridgeError("camera_speak_failed", body, exc.code) from exc
         except Exception as exc:
             raise CameraBridgeError("camera_speak_failed", str(exc), 502) from exc
+
+    def ptz_move(self, direction: str, step: int) -> dict:
+        try:
+            return self._require_ok(self.adapter.ptz_move(direction, step), "camera_ptz_failed")
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", "ignore")
+            raise CameraBridgeError("camera_ptz_failed", body, exc.code) from exc
+        except Exception as exc:
+            raise CameraBridgeError("camera_ptz_failed", str(exc), 502) from exc
 
     def start_monitor(self) -> dict:
         try:
@@ -260,9 +273,18 @@ class CameraBridgeService:
 
         camera = payload.get("camera")
         if isinstance(camera, dict):
+            capabilities = camera.get("capabilities") if isinstance(camera.get("capabilities"), dict) else {}
+            ptz = camera.get("ptz") if isinstance(camera.get("ptz"), dict) else {}
             public["camera"] = {
                 "configured": bool(camera.get("configured")),
                 "connected": bool(camera.get("connected")),
+                "capabilities": {
+                    "ptz": bool(capabilities.get("ptz") or ptz.get("enabled")),
+                },
+                "ptz": {
+                    "enabled": bool(ptz.get("enabled") or capabilities.get("ptz")),
+                    "protocol": str(ptz.get("protocol") or ""),
+                },
                 "webrtc": {
                     "enabled": bool((camera.get("webrtc") or {}).get("enabled"))
                     if isinstance(camera.get("webrtc"), dict)
@@ -325,3 +347,13 @@ def json_text(value: object) -> str | None:
     if value is None:
         return None
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+
+def _camera_supports_ptz(camera_data: object) -> bool:
+    if not isinstance(camera_data, dict):
+        return False
+    capabilities = camera_data.get("capabilities")
+    if isinstance(capabilities, dict) and capabilities.get("ptz") is True:
+        return True
+    ptz = camera_data.get("ptz")
+    return isinstance(ptz, dict) and ptz.get("enabled") is True

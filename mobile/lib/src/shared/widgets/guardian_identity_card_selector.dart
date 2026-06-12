@@ -39,8 +39,9 @@ class GuardianIdentityCardSelector extends StatelessWidget {
         LayoutBuilder(
           builder: (context, constraints) {
             if (options.isEmpty) return const _EmptyIdentityOptions();
-            const gap = 10.0;
-            final columns = constraints.maxWidth < 300 ? 1 : 2;
+            final compact = constraints.maxWidth < 300;
+            final gap = compact ? 8.0 : 10.0;
+            final columns = options.length > 1 ? 2 : 1;
             final width =
                 (constraints.maxWidth - gap * (columns - 1)) / columns;
             return Wrap(
@@ -53,6 +54,7 @@ class GuardianIdentityCardSelector extends StatelessWidget {
                     child: _GuardianIdentityCard(
                       key: ValueKey('${keyPrefix}_${option.label}'),
                       option: option,
+                      width: width,
                       disabled: disabledKeys.contains(option.key),
                       selected:
                           value.trim() == option.key ||
@@ -72,6 +74,7 @@ class GuardianIdentityCardSelector extends StatelessWidget {
 class _GuardianIdentityCard extends StatelessWidget {
   const _GuardianIdentityCard({
     required this.option,
+    required this.width,
     required this.selected,
     required this.disabled,
     required this.onTap,
@@ -79,6 +82,7 @@ class _GuardianIdentityCard extends StatelessWidget {
   });
 
   final GuardianIdentityLabelOption option;
+  final double width;
   final bool selected;
   final bool disabled;
   final VoidCallback onTap;
@@ -86,6 +90,13 @@ class _GuardianIdentityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = selected ? AppColors.brandSoft : AppColors.borderSoft;
+    final scale = (width / 142).clamp(0.74, 1.0);
+    final cardRadius = 18.0 * scale;
+    final imageRadius = 14.0 * scale;
+    final imageHeight = 74.0 * scale;
+    final labelFontSize = 14.0 * scale;
+    final selectedMarkSize = 24.0 * scale;
+    final selectedIconSize = 16.0 * scale;
 
     return Semantics(
       button: true,
@@ -95,7 +106,7 @@ class _GuardianIdentityCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(cardRadius),
           onTap: disabled ? null : onTap,
           child: AnimatedContainer(
             duration: AppMotion.duration(context, 180),
@@ -106,14 +117,19 @@ class _GuardianIdentityCard extends StatelessWidget {
                   : selected
                   ? AppColors.brandWash.withValues(alpha: 0.34)
                   : AppColors.surfaceElevated,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(cardRadius),
               border: Border.all(
                 color: disabled ? AppColors.borderSoft : borderColor,
                 width: selected ? 1.4 : 1,
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+              padding: EdgeInsets.fromLTRB(
+                8 * scale,
+                8 * scale,
+                8 * scale,
+                10 * scale,
+              ),
               child: Stack(
                 children: [
                   Column(
@@ -124,13 +140,13 @@ class _GuardianIdentityCard extends StatelessWidget {
                           color: selected
                               ? AppColors.brandWash.withValues(alpha: 0.72)
                               : AppColors.surfaceTinted,
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(imageRadius),
                         ),
                         child: SizedBox(
-                          height: 74,
+                          height: imageHeight,
                           width: double.infinity,
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(imageRadius),
                             child: Image.asset(
                               option.imageAsset,
                               fit: BoxFit.contain,
@@ -143,15 +159,15 @@ class _GuardianIdentityCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 9),
+                      SizedBox(height: 9 * scale),
                       Text(
                         option.label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.ink,
                           fontFamily: AppTypography.systemFont,
-                          fontSize: 14,
+                          fontSize: labelFontSize,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0,
                         ),
@@ -168,17 +184,17 @@ class _GuardianIdentityCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(AppRadii.full),
                           border: Border.all(color: AppColors.borderSoft),
                         ),
-                        child: const Padding(
+                        child: Padding(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                            horizontal: 8 * scale,
+                            vertical: 4 * scale,
                           ),
                           child: Text(
                             '已存在',
                             style: TextStyle(
                               color: AppColors.muted,
                               fontFamily: AppTypography.systemFont,
-                              fontSize: 10,
+                              fontSize: 10 * scale,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0,
                             ),
@@ -188,21 +204,21 @@ class _GuardianIdentityCard extends StatelessWidget {
                     )
                   else if (selected)
                     Positioned(
-                      right: 2,
-                      top: 2,
+                      right: 2 * scale,
+                      top: 2 * scale,
                       child: DecoratedBox(
                         decoration: const BoxDecoration(
                           color: AppColors.brand,
                           shape: BoxShape.circle,
                         ),
-                        child: const SizedBox(
-                          width: 24,
-                          height: 24,
+                        child: SizedBox(
+                          width: selectedMarkSize,
+                          height: selectedMarkSize,
                           child: Center(
                             child: Icon(
                               Icons.check_rounded,
                               color: Colors.white,
-                              size: 16,
+                              size: selectedIconSize,
                             ),
                           ),
                         ),

@@ -34,6 +34,7 @@ void invalidateAuthenticatedSessionData(WidgetRef ref) {
 
   ref.invalidate(devicesProvider);
   ref.invalidate(primaryDeviceOverviewProvider);
+  ref.invalidate(primaryFirmwareStatusProvider);
   ref.invalidate(deviceOverviewProvider);
 
   ref.invalidate(cameraHealthProvider);
@@ -41,5 +42,6 @@ void invalidateAuthenticatedSessionData(WidgetRef ref) {
   ref.invalidate(cameraStatusProvider);
   ref.invalidate(cameraMonitorStatusProvider);
   ref.invalidate(cameraSnapshotProvider);
+  ref.invalidate(cameraEventsProvider);
   ref.invalidate(liveCareStatusProvider);
 }

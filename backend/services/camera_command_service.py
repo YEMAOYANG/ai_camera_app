@@ -59,6 +59,22 @@ class CameraCommandService:
             ),
         }
 
+    def ptz_move(self, access_token: str, data: dict) -> dict:
+        context = self.auth_service.authenticate(access_token)
+        direction = self._ptz_direction(data.get("direction"))
+        step = self._ptz_step(data.get("step"))
+        return {
+            "ok": True,
+            "command": self._execute_command(
+                family_id=context["family"]["id"],
+                command_type="ptz_move",
+                request_payload={"direction": direction, "step": step},
+                runner=lambda: self.camera_service.ptz_move(direction, step),
+                device_id=self._optional_text(data, "deviceId"),
+                task_id=self._optional_text(data, "taskId"),
+            ),
+        }
+
     def monitor_start(self, access_token: str, data: dict) -> dict:
         context = self.auth_service.authenticate(access_token)
         return {
@@ -102,6 +118,10 @@ class CameraCommandService:
             next_data = dict(data)
             next_data["deviceId"] = device_id
             return self.snapshot(access_token, next_data)
+        if command_type == "ptz_move":
+            next_data = dict(data)
+            next_data["deviceId"] = device_id
+            return self.ptz_move(access_token, next_data)
         if command_type == "start_monitor":
             next_data = dict(data)
             next_data["deviceId"] = device_id
@@ -111,6 +131,27 @@ class CameraCommandService:
             next_data["deviceId"] = device_id
             return self.monitor_stop(access_token, next_data)
         raise ApiError("unsupported_device_command", "暂不支持这个设备操作")
+
+    def recent_events(self, access_token: str, args) -> dict:
+        context = self.auth_service.authenticate(access_token)
+        limit = self._limit_arg(args.get("limit") if args else None)
+        with self.repository.transaction() as conn:
+            commands = self.repository.list_recent_commands(
+                conn,
+                family_id=context["family"]["id"],
+                limit=limit,
+            )
+            task_events = self.repository.list_recent_task_events(
+                conn,
+                family_id=context["family"]["id"],
+                limit=limit,
+            )
+        events = [
+            *(_camera_command_event_payload(row) for row in commands),
+            *(_task_event_payload(row) for row in task_events),
+        ]
+        events.sort(key=lambda item: (item["createdAt"], item["id"]), reverse=True)
+        return {"ok": True, "events": events[:limit]}
 
     def internal_speak(
         self,
@@ -202,7 +243,29 @@ class CameraCommandService:
             return "摄像头暂时离线，提醒没有播出。"
         if command_type == "snapshot":
             return "暂时没有拿到最新画面。"
+        if command_type == "ptz_move":
+            return "摄像头暂时不支持云台控制。"
         return "摄像头暂时离线，操作没有完成。"
+
+    def _ptz_direction(self, value: object) -> str:
+        direction = str(value or "").strip().lower()
+        if direction not in {"up", "down", "left", "right", "home"}:
+            raise ApiError("invalid_ptz_direction", "请选择正确的云台方向")
+        return direction
+
+    def _ptz_step(self, value: object) -> int:
+        try:
+            step = int(value or 1)
+        except (TypeError, ValueError):
+            step = 1
+        return max(1, min(step, 5))
+
+    def _limit_arg(self, value: object) -> int:
+        try:
+            limit = int(value or 30)
+        except (TypeError, ValueError):
+            limit = 30
+        return max(1, min(limit, 100))
 
     def _required_text(self, data: dict, key: str, message: str) -> str:
         value = self._optional_text(data, key)
@@ -226,7 +289,7 @@ class CameraCommandService:
         if not isinstance(value, dict):
             return {"ok": True}
         response = {"ok": value.get("ok", True) is not False}
-        for key in ("contentType", "status", "message"):
+        for key in ("contentType", "status", "message", "direction", "step"):
             current = value.get(key)
             if isinstance(current, (str, bool, int, float)):
                 response[key] = current
@@ -240,3 +303,98 @@ class CameraCommandService:
         if isinstance(speaker, dict):
             response["speaker"] = {"queued": bool(speaker.get("queued", True))}
         return response
+
+
+def _camera_command_event_payload(row) -> dict:
+    command_type = str(row.get("command_type") or "")
+    request = _json_dict(row.get("request_payload"))
+    response = _json_dict(row.get("response_payload"))
+    status = str(row.get("status") or "")
+    message = str(row.get("message") or _command_title(command_type))
+    if command_type == "ptz_move":
+        direction = str(request.get("direction") or response.get("direction") or "")
+        message = f"{_ptz_direction_label(direction)} · {message}"
+    return {
+        "id": row["id"],
+        "source": "camera_command",
+        "eventType": command_type,
+        "title": _command_title(command_type),
+        "message": message,
+        "status": status,
+        "tone": _event_tone(status),
+        "createdAt": row.get("completed_at") or row.get("updated_at") or row["created_at"],
+        "payload": {"request": request, "response": response},
+    }
+
+
+def _task_event_payload(row) -> dict:
+    event_type = str(row.get("event_type") or "")
+    return {
+        "id": row["id"],
+        "source": "task_event",
+        "eventType": event_type,
+        "title": _task_event_title(event_type),
+        "message": row.get("message") or _task_event_title(event_type),
+        "status": "recorded",
+        "tone": "info",
+        "createdAt": row["created_at"],
+        "payload": _json_dict(row.get("payload")),
+    }
+
+
+def _json_dict(value: object) -> dict:
+    if not value:
+        return {}
+    if isinstance(value, dict):
+        return value
+    try:
+        parsed = json.loads(str(value))
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def _command_title(command_type: str) -> str:
+    return {
+        "speak": "语音提醒",
+        "snapshot": "看护快照",
+        "start_monitor": "开始观察",
+        "stop_monitor": "停止观察",
+        "ptz_move": "云台控制",
+    }.get(command_type, "摄像头操作")
+
+
+def _task_event_title(event_type: str) -> str:
+    return {
+        "created": "任务创建",
+        "updated": "任务调整",
+        "started": "任务开始",
+        "auto_started": "任务开始",
+        "reminder_sent": "提醒已发送",
+        "start_reminder_sent": "开始提醒",
+        "end_reminder_sent": "结束提醒",
+        "camera_observation": "看护观察",
+        "completed": "任务完成",
+        "confirmed": "家长确认",
+        "rejected": "家长退回",
+    }.get(event_type, "任务事件")
+
+
+def _event_tone(status: str) -> str:
+    if status == "succeeded":
+        return "success"
+    if status == "failed":
+        return "warning"
+    if status == "running":
+        return "info"
+    return "neutral"
+
+
+def _ptz_direction_label(direction: str) -> str:
+    return {
+        "up": "上移",
+        "down": "下移",
+        "left": "左移",
+        "right": "右移",
+        "home": "回到中位",
+    }.get(direction, "移动")

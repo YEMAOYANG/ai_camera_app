@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/points/domain/point_models.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
 import 'package:guardian_parent_app/src/features/profile/presentation/profile_screen.dart';
@@ -25,6 +28,7 @@ void main() {
               entitlements: [],
             ),
           ),
+          pointsSummaryProvider.overrideWith((ref) async => _points()),
         ],
         child: const MaterialApp(home: ProfileScreen()),
       ),
@@ -39,14 +43,18 @@ void main() {
       find.byKey(const ValueKey('guardianPersona:guardian_default')),
       findsOneWidget,
     );
-    expect(find.text('家庭成员'), findsWidgets);
+    expect(find.text('家庭成员'), findsOneWidget);
     expect(find.text('紧急联系人'), findsOneWidget);
     expect(find.text('家庭与成员'), findsNothing);
-    expect(find.text('设备管理'), findsOneWidget);
+    expect(find.text('设备管理'), findsNothing);
     expect(find.text('AI 规则与提醒'), findsOneWidget);
-    expect(find.text('订阅与套餐'), findsOneWidget);
-    expect(find.text('积分与奖励'), findsOneWidget);
-    expect(find.text('隐私与授权'), findsOneWidget);
+    expect(find.text('基础版'), findsOneWidget);
+    expect(find.text('18'), findsOneWidget);
+    expect(find.text('积分'), findsOneWidget);
+    expect(find.text('订阅与套餐'), findsNothing);
+    expect(find.text('积分与奖励'), findsNothing);
+    expect(find.text('看护报告'), findsOneWidget);
+    expect(find.text('隐私与权限'), findsOneWidget);
     expect(find.text('账号安全'), findsOneWidget);
     expect(find.text('关于'), findsOneWidget);
     expect(find.text('账号设置'), findsNothing);
@@ -78,6 +86,7 @@ void main() {
                 entitlements: [],
               ),
             ),
+            pointsSummaryProvider.overrideWith((ref) async => _points()),
           ],
           child: const MaterialApp(home: ProfileScreen()),
         ),
@@ -116,6 +125,7 @@ void main() {
                 entitlements: [],
               ),
             ),
+            pointsSummaryProvider.overrideWith((ref) async => _points()),
           ],
           child: const MaterialApp(home: ProfileScreen()),
         ),
@@ -132,6 +142,45 @@ void main() {
       );
     },
   );
+
+  testWidgets('profile hero keeps guardian art inside compact Android width', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(360, 800));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          profileSummaryProvider.overrideWith((ref) async => _summary()),
+          accountProfileProvider.overrideWith(
+            (ref) async => _account('爸爸', displayName: '阿米爸爸'),
+          ),
+          subscriptionStatusProvider.overrideWith(
+            (ref) async => const SubscriptionStatus(
+              planId: 'basic',
+              planLabel: '基础版',
+              status: 'active',
+              statusLabel: '已启用',
+              renewalText: '基础看护保持可用',
+              entitlements: [],
+            ),
+          ),
+          pointsSummaryProvider.overrideWith((ref) async => _points()),
+        ],
+        child: const MaterialApp(home: ProfileScreen()),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final artRect = tester.getRect(
+      find.byKey(const ValueKey('guardianPersonaAnimated:guardian_dad')),
+    );
+    expect(
+      artRect.right,
+      lessThanOrEqualTo(360 - AppSpacing.pageHorizontalCompact),
+    );
+  });
 }
 
 ProfileSummary _summary() {
@@ -173,6 +222,19 @@ AccountProfile _account(String relationship, {String displayName = '家长'}) {
     avatarPersona: '',
     gender: '',
     ageGroup: '',
+  );
+}
+
+PointsSummary _points() {
+  return const PointsSummary(
+    account: PointAccount(
+      familyId: 'family_test',
+      childId: 'child_test',
+      balance: 18,
+      stageNoticeHandledBalance: 0,
+      updatedAt: 0,
+    ),
+    ledger: [],
   );
 }
 

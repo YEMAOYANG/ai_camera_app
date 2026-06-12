@@ -5,6 +5,8 @@ import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
 import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
+import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:guardian_parent_app/src/features/points/domain/point_models.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_avatar_persona.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
@@ -14,7 +16,6 @@ import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -25,6 +26,7 @@ class ProfileScreen extends ConsumerWidget {
     final subscription = ref.watch(subscriptionStatusProvider);
     final account = ref.watch(accountProfileProvider);
     final identityOptions = ref.watch(guardianIdentityOptionsProvider);
+    final points = ref.watch(pointsSummaryProvider);
 
     return AppScreen(
       title: '我的',
@@ -43,6 +45,7 @@ class ProfileScreen extends ConsumerWidget {
             subscription: subscription.asData?.value,
             account: account.asData?.value,
             identityOptions: identityOptions.asData?.value,
+            points: points,
           ),
           loading: () => const _FamilySpaceLoading(),
           error: (error, _) => AppStateView(
@@ -61,24 +64,10 @@ class ProfileScreen extends ConsumerWidget {
               title: '看护空间',
               rows: [
                 _ProfileCategory(
-                  icon: Icons.groups_outlined,
-                  title: '家庭成员',
-                  subtitle: '成员邀请、权限和通知范围',
-                  path: profileFamilyMembersPath,
-                  tone: AppListRowTone.green,
-                ),
-                _ProfileCategory(
                   icon: Icons.contact_phone_outlined,
                   title: '紧急联系人',
                   subtitle: '重要情况的通知对象',
                   path: profileContactsPath,
-                ),
-                _ProfileCategory(
-                  icon: Icons.videocam_outlined,
-                  title: '设备管理',
-                  subtitle: '在线状态、网络、固件和解绑状态',
-                  path: profileDevicesPath,
-                  tone: AppListRowTone.blue,
                 ),
                 _ProfileCategory(
                   icon: Icons.auto_awesome_outlined,
@@ -92,24 +81,17 @@ class ProfileScreen extends ConsumerWidget {
               title: '权益与安全',
               rows: [
                 _ProfileCategory(
-                  icon: Icons.workspace_premium_outlined,
-                  title: '订阅与套餐',
-                  subtitle: '基础看护可用，会员增强长期报告',
-                  path: profileSubscriptionPath,
-                  tone: AppListRowTone.blue,
-                ),
-                _ProfileCategory(
-                  icon: Icons.stars_outlined,
-                  title: '积分与奖励',
-                  subtitle: '积分账户、奖励中心和兑换记录',
-                  path: profileTaskRewardHubPath,
+                  icon: Icons.insights_outlined,
+                  title: '看护报告',
+                  subtitle: '日报、周报和成长时刻',
+                  path: profileReportsHubPath,
                   tone: AppListRowTone.amber,
                 ),
                 _ProfileCategory(
                   icon: Icons.lock_outline,
-                  title: '隐私与授权',
-                  subtitle: '隐私模式、儿童数据和协议政策',
-                  path: profilePrivacyHubPath,
+                  title: '隐私与权限',
+                  subtitle: '隐私模式、语音播报和数据保留',
+                  path: profilePrivacyPath,
                 ),
                 _ProfileCategory(
                   icon: Icons.admin_panel_settings_outlined,
@@ -165,12 +147,14 @@ class _FamilySpaceHero extends StatelessWidget {
     required this.subscription,
     required this.account,
     required this.identityOptions,
+    required this.points,
   });
 
   final ProfileSummary summary;
   final SubscriptionStatus? subscription;
   final AccountProfile? account;
   final GuardianIdentityOptions? identityOptions;
+  final AsyncValue<PointsSummary> points;
 
   @override
   Widget build(BuildContext context) {
@@ -210,9 +194,10 @@ class _FamilySpaceHero extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final compact = constraints.maxWidth < 350;
-          final artWidth = compact ? 124.0 : 148.0;
-          final artHeight = compact ? 192.0 : 204.0;
-          final rightReserve = compact ? 88.0 : 118.0;
+          final artWidth = compact ? 116.0 : 136.0;
+          final artHeight = compact ? 186.0 : 200.0;
+          final artRight = compact ? 6.0 : 8.0;
+          final rightReserve = compact ? 92.0 : 112.0;
 
           return ClipRRect(
             borderRadius: BorderRadius.circular(AppRadii.hero),
@@ -256,7 +241,7 @@ class _FamilySpaceHero extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    right: compact ? -22 : -10,
+                    right: artRight,
                     bottom: compact ? -2 : -1,
                     child: _GuardianCharacterArt(
                       persona: persona,
@@ -319,9 +304,12 @@ class _FamilySpaceHero extends StatelessWidget {
                                 spacing: 7,
                                 runSpacing: 7,
                                 children: [
-                                  StatusChip(
+                                  _HeroStatusAction(
+                                    key: const ValueKey('profileHeroPlanEntry'),
                                     label: planLabel,
-                                    tone: StatusTone.neutral,
+                                    semanticLabel: '查看订阅套餐',
+                                    onTap: () =>
+                                        context.push(profileSubscriptionPath),
                                   ),
                                 ],
                               ),
@@ -340,16 +328,24 @@ class _FamilySpaceHero extends StatelessWidget {
                               icon: Icons.group_outlined,
                               label: '家庭成员',
                               value: '${summary.memberCount}',
+                              path: profileFamilyMembersPath,
+                              semanticLabel: '查看家庭成员',
                             ),
                             _FamilySignal(
                               icon: Icons.sensors_outlined,
                               label: '已绑定设备',
                               value: '${summary.deviceCount}',
+                              path: profileDevicesPath,
+                              semanticLabel: '查看设备管理',
                             ),
                             _FamilySignal(
-                              icon: Icons.pending_actions_outlined,
-                              label: '待处理',
-                              value: '${summary.pendingItemCount}',
+                              icon: Icons.stars_outlined,
+                              label: '积分',
+                              value: _pointsSignalValue(points),
+                              tone: AppListRowTone.amber,
+                              path: pointsPath,
+                              semanticLabel: '查看积分账户',
+                              key: const ValueKey('profileHeroPointsEntry'),
                             ),
                           ],
                         ),
@@ -399,6 +395,82 @@ class _HeroPressableState extends State<_HeroPressable> {
           duration: AppMotion.duration(context, 150),
           curve: Curves.easeOutCubic,
           child: widget.child,
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroStatusAction extends StatefulWidget {
+  const _HeroStatusAction({
+    required this.label,
+    required this.semanticLabel,
+    required this.onTap,
+    super.key,
+  });
+
+  final String label;
+  final String semanticLabel;
+  final VoidCallback onTap;
+
+  @override
+  State<_HeroStatusAction> createState() => _HeroStatusActionState();
+}
+
+class _HeroStatusActionState extends State<_HeroStatusAction> {
+  var _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = MediaQuery.of(context).disableAnimations
+        ? 1.0
+        : (_pressed ? AppMotion.buttonPressScale : 1.0);
+
+    return Semantics(
+      button: true,
+      label: widget.semanticLabel,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapCancel: () => setState(() => _pressed = false),
+        onTapUp: (_) => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: scale,
+          duration: AppMotion.duration(context, 120),
+          curve: Curves.easeOutCubic,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.74),
+              borderRadius: BorderRadius.circular(9),
+              border: Border.all(color: AppColors.ink.withValues(alpha: 0.055)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(9, 4, 6, 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.label,
+                    style: const TextStyle(
+                      color: AppColors.ink,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                      height: 1.12,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  const Icon(
+                    Icons.chevron_right,
+                    color: AppColors.muted,
+                    size: 14,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -780,14 +852,20 @@ class _FamilySignalStrip extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final signal in signals) _FamilySignalItem(signal: signal),
+              for (final signal in signals)
+                _FamilySignalItem(key: signal.key, signal: signal),
             ],
           );
         }
         return Row(
           children: [
             for (var index = 0; index < signals.length; index++) ...[
-              Expanded(child: _FamilySignalItem(signal: signals[index])),
+              Expanded(
+                child: _FamilySignalItem(
+                  key: signals[index].key,
+                  signal: signals[index],
+                ),
+              ),
               if (index != signals.length - 1) const SizedBox(width: 8),
             ],
           ],
@@ -802,32 +880,52 @@ class _FamilySignal {
     required this.icon,
     required this.label,
     required this.value,
+    this.tone = AppListRowTone.green,
+    this.path,
+    this.semanticLabel,
+    this.key,
   });
 
   final IconData icon;
   final String label;
   final String value;
+  final AppListRowTone tone;
+  final String? path;
+  final String? semanticLabel;
+  final Key? key;
 }
 
-class _FamilySignalItem extends StatelessWidget {
-  const _FamilySignalItem({required this.signal});
+class _FamilySignalItem extends StatefulWidget {
+  const _FamilySignalItem({required this.signal, super.key});
 
   final _FamilySignal signal;
 
   @override
+  State<_FamilySignalItem> createState() => _FamilySignalItemState();
+}
+
+class _FamilySignalItemState extends State<_FamilySignalItem> {
+  var _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
+    final signal = widget.signal;
+    final tone = _toneData(signal.tone);
+    final scale = MediaQuery.of(context).disableAnimations
+        ? 1.0
+        : (_pressed ? AppMotion.buttonPressScale : 1.0);
+    final content = DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.045)),
+        border: Border.all(color: tone.foreground.withValues(alpha: 0.08)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(signal.icon, color: AppColors.brandSage, size: 15),
+            Icon(signal.icon, color: tone.foreground, size: 15),
             const SizedBox(width: 5),
             Text(
               signal.value,
@@ -855,6 +953,26 @@ class _FamilySignalItem extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+
+    if (signal.path == null) return content;
+
+    return Semantics(
+      button: true,
+      label: signal.semanticLabel ?? '${signal.value}${signal.label}',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => context.push(signal.path!),
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapCancel: () => setState(() => _pressed = false),
+        onTapUp: (_) => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: scale,
+          duration: AppMotion.duration(context, 120),
+          curve: Curves.easeOutCubic,
+          child: content,
         ),
       ),
     );
@@ -923,4 +1041,11 @@ String _relationshipKey({
 String _phoneMask(String phone) {
   if (phone.length < 7) return phone.isEmpty ? '手机号待同步' : phone;
   return '${phone.substring(0, 3)} **** ${phone.substring(phone.length - 4)}';
+}
+
+String _pointsSignalValue(AsyncValue<PointsSummary> points) {
+  final summary = points.asData?.value;
+  if (summary != null) return '${summary.account.balance}';
+  if (points.isLoading) return '同步中';
+  return '待同步';
 }

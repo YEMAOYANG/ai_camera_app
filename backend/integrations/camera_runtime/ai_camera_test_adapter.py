@@ -79,6 +79,13 @@ class AiCameraTestRuntimeAdapter(CameraRuntimeAdapter):
     def speak(self, text: str) -> dict:
         return self._post_json("/api/camera/speaker/speak", {"text": text}, timeout=12.0)
 
+    def ptz_move(self, direction: str, step: int) -> dict:
+        return self._post_json(
+            "/api/camera/ptz/move",
+            {"direction": direction, "step": step},
+            timeout=8.0,
+        )
+
     def start_monitor(self) -> dict:
         return self._post_json("/api/monitor/start", {}, timeout=8.0)
 

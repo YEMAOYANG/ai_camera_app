@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS children (
   nickname VARCHAR(255),
   age_stage VARCHAR(255),
   birthday VARCHAR(255),
+  sleep_time VARCHAR(255),
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL
 );
@@ -127,6 +128,7 @@ CREATE TABLE IF NOT EXISTS point_accounts (
   family_id VARCHAR(255) NOT NULL,
   child_id VARCHAR(255) NOT NULL,
   balance INTEGER NOT NULL DEFAULT 0,
+  stage_notice_handled_balance INTEGER NOT NULL DEFAULT 0,
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL,
   PRIMARY KEY (family_id, child_id)

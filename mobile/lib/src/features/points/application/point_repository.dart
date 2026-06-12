@@ -47,6 +47,10 @@ class PointRepository {
           familyId: parsed.first.familyId,
           childId: parsed.first.childId,
           balance: total,
+          stageNoticeHandledBalance: parsed.fold<int>(
+            0,
+            (sum, item) => sum + item.stageNoticeHandledBalance,
+          ),
           updatedAt: parsed.first.updatedAt,
         );
       }
@@ -81,6 +85,18 @@ class PointRepository {
       final response = await _apiClient.post(
         '/points/adjust',
         data: {'childId': childId, 'delta': delta, 'note': note},
+      );
+      return PointAccount.fromJson(_asMap(_asMap(response.data)['account']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<PointAccount> acknowledgeStageNotice({required String childId}) async {
+    try {
+      final response = await _apiClient.post(
+        '/points/stage-notice/ack',
+        data: {'childId': childId},
       );
       return PointAccount.fromJson(_asMap(_asMap(response.data)['account']));
     } on DioException catch (error) {

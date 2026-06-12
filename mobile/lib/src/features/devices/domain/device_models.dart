@@ -175,6 +175,139 @@ class DeviceOverview {
   }
 }
 
+class DeviceFirmwareStatus {
+  const DeviceFirmwareStatus({
+    required this.device,
+    required this.currentVersion,
+    required this.updateAvailable,
+    required this.execution,
+    this.latestPackage,
+    this.lastJob,
+  });
+
+  final GuardianDevice device;
+  final String currentVersion;
+  final bool updateAvailable;
+  final String execution;
+  final FirmwarePackage? latestPackage;
+  final FirmwareJob? lastJob;
+
+  String get statusLabel {
+    if (lastJob != null) return lastJob!.statusLabel;
+    if (updateAvailable) return '有可用固件';
+    if (execution == 'not_configured') return '暂无升级任务';
+    return '已是最新';
+  }
+
+  StatusTone get tone {
+    if (lastJob != null) return lastJob!.tone;
+    return updateAvailable ? StatusTone.warning : StatusTone.success;
+  }
+
+  String get versionLine {
+    final current = currentVersion.isNotEmpty ? currentVersion : '待同步';
+    if (latestPackage != null && updateAvailable) {
+      return '当前 $current · 可升级到 ${latestPackage!.version}';
+    }
+    return '当前 $current';
+  }
+
+  static DeviceFirmwareStatus fromJson(Map<String, dynamic> json) {
+    final firmware = _asMap(json['firmware']);
+    final latestPackage = _asMap(firmware['latestPackage']);
+    final lastJob = _asMap(firmware['lastJob']);
+    return DeviceFirmwareStatus(
+      device: GuardianDevice.fromJson(_asMap(json['device'])),
+      currentVersion: _asString(firmware['currentVersion']),
+      updateAvailable: firmware['updateAvailable'] == true,
+      execution: _asString(firmware['execution']).isNotEmpty
+          ? _asString(firmware['execution'])
+          : 'not_configured',
+      latestPackage: latestPackage.isEmpty
+          ? null
+          : FirmwarePackage.fromJson(latestPackage),
+      lastJob: lastJob.isEmpty ? null : FirmwareJob.fromJson(lastJob),
+    );
+  }
+}
+
+class FirmwarePackage {
+  const FirmwarePackage({
+    required this.id,
+    required this.version,
+    required this.channel,
+    required this.status,
+    required this.notes,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String version;
+  final String channel;
+  final String status;
+  final String notes;
+  final int createdAt;
+
+  static FirmwarePackage fromJson(Map<String, dynamic> json) {
+    return FirmwarePackage(
+      id: _asString(json['id']),
+      version: _asString(json['version']),
+      channel: _asString(json['channel']),
+      status: _asString(json['status']),
+      notes: _asString(json['notes']),
+      createdAt: _asInt(json['createdAt']),
+    );
+  }
+}
+
+class FirmwareJob {
+  const FirmwareJob({
+    required this.id,
+    required this.deviceId,
+    required this.packageId,
+    required this.status,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  final String id;
+  final String deviceId;
+  final String packageId;
+  final String status;
+  final int createdAt;
+  final int updatedAt;
+
+  String get statusLabel {
+    return switch (status) {
+      'scheduled' => '等待设备升级',
+      'running' => '升级中',
+      'succeeded' => '升级完成',
+      'failed' => '升级失败',
+      _ => status.isNotEmpty ? status : '升级任务',
+    };
+  }
+
+  StatusTone get tone {
+    return switch (status) {
+      'succeeded' => StatusTone.success,
+      'failed' => StatusTone.danger,
+      'running' || 'scheduled' => StatusTone.warning,
+      _ => StatusTone.neutral,
+    };
+  }
+
+  static FirmwareJob fromJson(Map<String, dynamic> json) {
+    return FirmwareJob(
+      id: _asString(json['id']),
+      deviceId: _asString(json['deviceId']),
+      packageId: _asString(json['packageId']),
+      status: _asString(json['status']),
+      createdAt: _asInt(json['createdAt']),
+      updatedAt: _asInt(json['updatedAt']),
+    );
+  }
+}
+
 class DeviceException implements Exception {
   const DeviceException(this.message, {this.code = 'device_error'});
 

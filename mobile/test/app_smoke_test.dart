@@ -62,6 +62,24 @@ void main() {
     expect(find.text('手机号'), findsOneWidget);
   });
 
+  testWidgets('welcome onboarding fits compact Android phones', (tester) async {
+    await _pumpApp(
+      tester,
+      preferences: const {},
+      logicalSize: const Size(360, 720),
+      devicePixelRatio: 3,
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('继续'), findsOneWidget);
+    expect(find.text('登录或创建家庭'), findsOneWidget);
+    expect(tester.getTopLeft(find.text('继续')).dy, greaterThan(580));
+    expect(
+      tester.getBottomLeft(find.text('登录或创建家庭')).dy,
+      inInclusiveRange(680, 720),
+    );
+  });
+
   testWidgets('skips onboarding after it has been seen', (tester) async {
     await _pumpApp(tester, preferences: const {hasSeenOnboardingKey: true});
     await tester.pump(const Duration(milliseconds: 500));
@@ -118,6 +136,8 @@ void main() {
     expect(find.text('妈妈 · 135 **** 8291'), findsOneWidget);
 
     await tester.scrollUntilVisible(find.text('退出登录'), 420);
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -120));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('退出登录'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('退出'));
@@ -336,33 +356,14 @@ void main() {
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('积分与奖励'));
+    await _scrollProfileToTop(tester);
+    await tester.tap(find.byKey(const ValueKey('profileHeroPointsEntry')));
     await tester.pumpAndSettle();
-
-    final pointsEntry = find.text('积分账户');
-    await tester.scrollUntilVisible(pointsEntry, 400);
-    await Scrollable.ensureVisible(
-      tester.element(pointsEntry),
-      alignment: 0.35,
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(pointsEntry);
-    await tester.pumpAndSettle();
-    expect(find.text('积分流水'), findsOneWidget);
     expect(find.text('补发或更正积分'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('积分流水'), 420);
+    expect(find.text('积分流水'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('积分与奖励'));
-    await tester.pumpAndSettle();
-    final rewardsEntry = find.text('奖励中心');
-    await tester.scrollUntilVisible(rewardsEntry, 400);
-    await Scrollable.ensureVisible(
-      tester.element(rewardsEntry),
-      alignment: 0.35,
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(rewardsEntry);
+    await tester.tap(find.byIcon(Icons.card_giftcard_outlined));
     await tester.pumpAndSettle();
     expect(find.text('奖励商店'), findsOneWidget);
     expect(find.text('兑换记录'), findsOneWidget);
@@ -485,24 +486,24 @@ void main() {
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
     await tester.pumpAndSettle();
 
-    for (final category in const [
-      '设备管理',
-      'AI 规则与提醒',
-      '订阅与套餐',
-      '积分与奖励',
-      '隐私与授权',
-      '账号安全',
-      '关于',
-    ]) {
+    for (final category in const ['AI 规则与提醒', '看护报告', '隐私与权限', '账号安全']) {
       await _openProfileEntry(tester, category, expectedTitle: category);
     }
+    await _openProfileEntry(tester, '关于', expectedTitle: '关于我们');
 
     await _openProfileSubscription(tester);
+    await _openProfileNestedEntry(tester, '看护报告', '周报', expectedTitle: '周报');
     await _openProfileNestedEntry(
       tester,
-      '积分与奖励',
-      '奖励中心',
-      expectedTitle: '奖励商店',
+      'AI 规则与提醒',
+      '对话与人设',
+      expectedTitle: '对话与人设',
+    );
+    await _openProfileNestedEntry(
+      tester,
+      'AI 规则与提醒',
+      '任务看护规则',
+      expectedTitle: '任务看护规则',
     );
     await _openProfileNestedEntry(
       tester,
@@ -510,13 +511,6 @@ void main() {
       '通知与提醒',
       expectedTitle: '通知与提醒',
     );
-    await _openProfileNestedEntry(
-      tester,
-      '隐私与授权',
-      '隐私与权限',
-      expectedTitle: '隐私与权限',
-    );
-
     expect(find.text('安全区域'), findsNothing);
     expect(find.text('打卡审核'), findsNothing);
   });
@@ -678,11 +672,11 @@ Future<void> _loginSuccessfully(
   final codeField = tester.widget<EditableText>(
     find.byType(EditableText).at(1),
   );
+  expect(codeField.controller.text, '123456');
   expect(codeField.focusNode.hasFocus, isTrue);
 
   await tester.tap(find.textContaining('我已阅读并同意'));
   await tester.pump(const Duration(milliseconds: 250));
-  await tester.enterText(find.byType(EditableText).at(1), '123456');
   await tester.tap(find.text('继续'));
   await tester.pump(const Duration(milliseconds: 120));
 
@@ -721,10 +715,19 @@ Future<void> _openProfileEntry(
   await tester.pumpAndSettle();
 }
 
+Future<void> _scrollProfileToTop(WidgetTester tester) async {
+  await tester.fling(
+    find.byType(Scrollable).first,
+    const Offset(0, 1200),
+    3000,
+  );
+  await tester.pumpAndSettle();
+}
+
 Future<void> _openProfileSubscription(WidgetTester tester) async {
-  final entry = find.text('订阅与套餐').last;
-  await tester.scrollUntilVisible(entry, 420);
-  await tester.ensureVisible(entry);
+  await _scrollProfileToTop(tester);
+  final entry = find.byKey(const ValueKey('profileHeroPlanEntry'));
+  expect(entry, findsOneWidget);
   await tester.pumpAndSettle();
   await tester.tap(entry);
   await tester.pumpAndSettle();
@@ -945,7 +948,12 @@ class _FakeApiServer {
     final segments = path.split('/').where((item) => item.isNotEmpty).toList();
 
     if (method == 'POST' && path == '/auth/sms/request') {
-      return _ok(options, {'ok': true});
+      return _ok(options, {
+        'ok': true,
+        'codeSent': true,
+        'debugCode': '123456',
+        'message': '验证码已发送',
+      });
     }
     if (method == 'POST' && path == '/auth/sms/login') {
       return _ok(options, _sessionPayload(_text(body['phone'], '13800002026')));
@@ -1155,6 +1163,12 @@ class _FakeApiServer {
     if (method == 'GET' && path == '/points/account') {
       return _ok(options, {'ok': true, 'account': _pointAccount()});
     }
+    if (method == 'GET' && path == '/points/settings') {
+      return _ok(options, {'ok': true, 'settings': _pointSettings()});
+    }
+    if (method == 'PATCH' && path == '/points/settings') {
+      return _ok(options, {'ok': true, 'settings': _pointSettings(body)});
+    }
     if (method == 'GET' && path == '/points/ledger') {
       return _ok(options, {'ok': true, 'ledger': _pointLedger()});
     }
@@ -1232,6 +1246,9 @@ class _FakeApiServer {
     if (method == 'GET' && path == '/camera/monitor/status') {
       return _ok(options, {'ok': true, 'monitor': _monitorStatus()});
     }
+    if (method == 'GET' && path == '/camera/events') {
+      return _ok(options, {'ok': true, 'events': _cameraEvents()});
+    }
     if (method == 'GET' && path == '/camera/snapshot') {
       return _ok(options, <int>[0xff, 0xd8, 0xff, 0xd9]);
     }
@@ -1243,6 +1260,22 @@ class _FakeApiServer {
     }
     if (method == 'POST' && path == '/camera/commands/speak') {
       return _ok(options, {'ok': true});
+    }
+    if (method == 'POST' && path == '/camera/commands/ptz') {
+      return _ok(options, {
+        'ok': true,
+        'command': {
+          'commandId': 'cmd_ptz',
+          'commandType': 'ptz_move',
+          'status': 'succeeded',
+          'message': '已执行',
+          'createdAt': _now,
+          'updatedAt': _now,
+        },
+      });
+    }
+    if (method == 'GET' && path.startsWith('/firmware/devices/')) {
+      return _ok(options, _firmwareStatus());
     }
 
     return _notFound(options);
@@ -1457,6 +1490,7 @@ class _FakeApiServer {
       'nickname': _text(body?['nickname'], '小宇'),
       'gender': _text(body?['gender'], 'unspecified'),
       'birthday': _text(body?['birthday'], '2020-06-01'),
+      'sleepTime': _text(body?['sleepTime'], '21:00'),
       'ageStage': _text(body?['ageStage'], 'kindergarten'),
       'educationStage': _text(body?['educationStage'], '幼儿园'),
       'grade': _text(body?['grade'], '中班'),
@@ -1724,7 +1758,10 @@ class _FakeApiServer {
         'voiceStyle': '温和女声',
         'boundaryLevel': 'balanced',
         'freeChatEnabled': true,
+        'freeChatSingleMinutes': 8,
+        'freeChatDailyMinutes': 25,
         'homeworkModeRestricted': true,
+        'bedtimeQuietEnabled': true,
       },
       'education' => {
         'schoolbagEnabled': true,
@@ -1909,6 +1946,13 @@ class _FakeApiServer {
       'displayName': '家庭看护',
       'version': '1.0.0',
       'build': '2026.06',
+      'appUpdate': {
+        'status': 'latest',
+        'latestVersion': '1.0.0',
+        'latestBuild': '2026.06',
+        'releaseDate': '2026.06.10',
+        'notes': '当前已是最新版本',
+      },
       'description': '面向家长的家庭 AI 看护与成长记录 App。',
       'principles': ['儿童隐私优先', '关键决定由家长确认', '温和提醒，不过度打扰'],
     };
@@ -2027,6 +2071,44 @@ class _FakeApiServer {
     };
   }
 
+  Map<String, dynamic> _pointSettings([Map<String, dynamic>? body]) {
+    final unit = _text(body?['unit'], 'flower');
+    final options = [
+      {
+        'key': 'points',
+        'label': '积分',
+        'description': '通用分值，适合偏任务化的家庭激励。',
+        'suffix': '分',
+        'imageAsset': 'assets/images/points/unit-points.png',
+      },
+      {
+        'key': 'flower',
+        'label': '小红花',
+        'description': '默认方案，适合低龄儿童和日常正向反馈。',
+        'suffix': '朵小红花',
+        'imageAsset': 'assets/images/points/unit-flower.png',
+      },
+      {
+        'key': 'star',
+        'label': '小星星',
+        'description': '更轻量的阶段激励，适合兴趣任务和成长记录。',
+        'suffix': '颗小星星',
+        'imageAsset': 'assets/images/points/unit-star.png',
+      },
+    ];
+    final selected = options.firstWhere(
+      (option) => option['key'] == unit,
+      orElse: () => options[1],
+    );
+    return {
+      'stageThreshold': _int(body?['stageThreshold'], 10),
+      'unit': selected['key'],
+      'unitOption': selected,
+      'unitOptions': options,
+      'updatedAt': _now,
+    };
+  }
+
   List<Map<String, dynamic>> _pointLedger() {
     return [
       {
@@ -2117,6 +2199,7 @@ class _FakeApiServer {
       'streamAvailable': true,
       'speakerAvailable': true,
       'monitorAvailable': true,
+      'ptzAvailable': false,
       'lastSeenAt': _now,
       'message': '设备在线',
     };
@@ -2132,6 +2215,47 @@ class _FakeApiServer {
         'confidence': 0.8,
       },
       'lastReminder': '',
+    };
+  }
+
+  List<Map<String, dynamic>> _cameraEvents() {
+    return [
+      {
+        'id': 'evt_camera_1',
+        'source': 'task_event',
+        'eventType': 'camera_observation',
+        'title': '看护观察',
+        'message': '画面记录到孩子在书桌前。',
+        'status': 'recorded',
+        'tone': 'info',
+        'createdAt': _now,
+        'payload': {},
+      },
+      {
+        'id': 'cmd_ptz_1',
+        'source': 'camera_command',
+        'eventType': 'ptz_move',
+        'title': '云台控制',
+        'message': '左移 · 已执行',
+        'status': 'succeeded',
+        'tone': 'success',
+        'createdAt': _now - 60000,
+        'payload': {},
+      },
+    ];
+  }
+
+  Map<String, dynamic> _firmwareStatus() {
+    return {
+      'ok': true,
+      'device': _device(),
+      'firmware': {
+        'currentVersion': '0.1.0-dev',
+        'updateAvailable': false,
+        'latestPackage': null,
+        'lastJob': null,
+        'execution': 'not_configured',
+      },
     };
   }
 

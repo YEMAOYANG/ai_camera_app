@@ -174,14 +174,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const TaskRewardHubPage(),
       ),
       GoRoute(
+        path: profileReportsHubPath,
+        name: 'profileReportsHub',
+        builder: (_, _) => const ReportsHubPage(),
+      ),
+      GoRoute(
         path: profileRulesHubPath,
         name: 'profileRulesHub',
         builder: (_, _) => const RulesReminderHubPage(),
-      ),
-      GoRoute(
-        path: profilePrivacyHubPath,
-        name: 'profilePrivacyHub',
-        builder: (_, _) => const PrivacyAuthorizationHubPage(),
       ),
       GoRoute(
         path: profileAccountPath,

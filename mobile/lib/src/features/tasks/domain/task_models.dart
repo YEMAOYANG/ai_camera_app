@@ -550,6 +550,7 @@ class GuardianTaskEvent {
       'delay_reminder_failed' => '再次提醒未送达',
       'monitor_started' => '开始观察',
       'monitor_failed' => '观察暂不可用',
+      'monitor_not_required' => '无需摄像头观察',
       'camera_monitor_started' => '摄像头开始观察',
       'camera_command_failed' => '摄像头暂时离线',
       'ended' || 'auto_finished' => '任务时间已结束',

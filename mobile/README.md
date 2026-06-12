@@ -30,6 +30,16 @@ flutter pub get
 flutter run
 ```
 
+安卓真机连同一 Wi-Fi 调试时，用脚本自动把电脑局域网 IP 写入 App：
+
+```sh
+cd mobile
+scripts/run_android_lan.sh -d <device-id>
+```
+
+脚本会生成类似 `http://192.168.x.x:8000/api` 的 `API_BASE_URL`。后端需要先用
+`backend/.env` 里的 `APP_HOST=0.0.0.0` 启动，手机才能访问电脑后端。
+
 Web 调试：
 
 ```sh

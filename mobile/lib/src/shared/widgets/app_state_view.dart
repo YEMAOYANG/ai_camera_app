@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 
 enum AppStateVariant {
   serviceUnavailable,
@@ -272,68 +273,7 @@ void showAppStateSnackBar(
   required String title,
   String? message,
 }) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.ink,
-        margin: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        content: Row(
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: variant._accent.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(4),
-                child: Image.asset(
-                  variant._asset,
-                  width: 38,
-                  height: 38,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                  if (message != null && message.isNotEmpty) ...[
-                    const SizedBox(height: 3),
-                    Text(
-                      message,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.72),
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        height: 1.35,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  showAppToast(context, title, message: message, tone: variant._toastTone);
 }
 
 class _StateIllustrationStage extends StatelessWidget {
@@ -592,6 +532,24 @@ extension on AppStateVariant {
       AppStateVariant.loading ||
       AppStateVariant.saveFailed ||
       AppStateVariant.noData => AppColors.brandSoft,
+    };
+  }
+
+  AppToastTone get _toastTone {
+    return switch (this) {
+      AppStateVariant.saved => AppToastTone.success,
+      AppStateVariant.saveFailed ||
+      AppStateVariant.serviceUnavailable ||
+      AppStateVariant.networkUnavailable ||
+      AppStateVariant.deviceOffline ||
+      AppStateVariant.cameraUnavailable => AppToastTone.danger,
+      AppStateVariant.permission => AppToastTone.warning,
+      AppStateVariant.emptyRewards ||
+      AppStateVariant.emptyLedger => AppToastTone.warning,
+      AppStateVariant.emptyTasks ||
+      AppStateVariant.searchEmpty ||
+      AppStateVariant.loading ||
+      AppStateVariant.noData => AppToastTone.neutral,
     };
   }
 

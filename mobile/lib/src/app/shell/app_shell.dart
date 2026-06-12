@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/app/router/app_router.dart';
+import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
@@ -13,6 +14,7 @@ import 'package:guardian_parent_app/src/features/tasks/application/task_realtime
 import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/presentation/tasks_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 
 class AppShell extends ConsumerWidget {
   const AppShell({required this.child, super.key});
@@ -37,13 +39,10 @@ class AppShell extends ConsumerWidget {
         false;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: AppColors.appBackgroundWarm,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
+      value: AppSystemUi.light(),
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
+        extendBody: true,
         body: Stack(
           children: [
             Positioned.fill(child: child),
@@ -536,13 +535,5 @@ DateTime _startOfWeek(DateTime date) {
 DateTime _dayOnly(DateTime date) => DateTime(date.year, date.month, date.day);
 
 void _showShellToast(BuildContext context, String message) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.ink,
-      ),
-    );
+  showAppToast(context, message, tone: AppToastTone.warning);
 }

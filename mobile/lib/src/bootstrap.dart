@@ -1,12 +1,16 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/app/app.dart';
 import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> bootstrap(AppEnvironment environment) async {
   final sharedPreferences = await SharedPreferences.getInstance();
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(AppSystemUi.light());
 
   runApp(
     ProviderScope(

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import uuid
 from contextlib import contextmanager
 from typing import Iterator
@@ -28,6 +29,7 @@ class PointRepository:
                   family_id VARCHAR(255) NOT NULL,
                   child_id VARCHAR(255) NOT NULL,
                   balance INTEGER NOT NULL DEFAULT 0,
+                  stage_notice_handled_balance INTEGER NOT NULL DEFAULT 0,
                   created_at BIGINT NOT NULL,
                   updated_at BIGINT NOT NULL,
                   PRIMARY KEY (family_id, child_id)
@@ -60,6 +62,24 @@ class PointRepository:
             conn.execute(
                 "SELECT * FROM children WHERE family_id = ? ORDER BY created_at",
                 (family_id,),
+            ).fetchall()
+        )
+
+    def list_app_option_items(
+        self,
+        conn: DatabaseConnection,
+        *,
+        catalog_key: str,
+    ) -> list[DatabaseRow]:
+        return list(
+            conn.execute(
+                """
+                SELECT *
+                FROM app_option_items
+                WHERE catalog_key = ? AND enabled = 1
+                ORDER BY sort_order, item_key
+                """,
+                (catalog_key,),
             ).fetchall()
         )
 
@@ -145,6 +165,28 @@ class PointRepository:
         )
         return conn.execute("SELECT * FROM point_ledger WHERE id = ?", (ledger_id,)).fetchone()
 
+    def acknowledge_stage_notice(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        child_id: str,
+        now: int,
+    ) -> DatabaseRow:
+        account = self.get_or_create_account(conn, family_id=family_id, child_id=child_id, now=now)
+        conn.execute(
+            """
+            UPDATE point_accounts
+            SET stage_notice_handled_balance = ?, updated_at = ?
+            WHERE family_id = ? AND child_id = ?
+            """,
+            (account["balance"], now, family_id, child_id),
+        )
+        return conn.execute(
+            "SELECT * FROM point_accounts WHERE family_id = ? AND child_id = ?",
+            (family_id, child_id),
+        ).fetchone()
+
     def list_ledger(
         self,
         conn: DatabaseConnection,
@@ -167,3 +209,45 @@ class PointRepository:
                 values,
             ).fetchall()
         )
+
+    def get_setting(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        key: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT * FROM app_settings WHERE family_id = ? AND setting_key = ?",
+            (family_id, key),
+        ).fetchone()
+
+    def upsert_setting(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        key: str,
+        value: dict,
+        now: int,
+    ) -> DatabaseRow:
+        encoded = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+        existing = self.get_setting(conn, family_id=family_id, key=key)
+        if existing:
+            conn.execute(
+                """
+                UPDATE app_settings
+                SET value = ?, updated_at = ?
+                WHERE family_id = ? AND setting_key = ?
+                """,
+                (encoded, now, family_id, key),
+            )
+        else:
+            conn.execute(
+                """
+                INSERT INTO app_settings(family_id, setting_key, value, updated_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                (family_id, key, encoded, now),
+            )
+        return self.get_setting(conn, family_id=family_id, key=key)

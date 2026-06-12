@@ -106,6 +106,41 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('parent identity cards stay in two columns on narrow screens', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 760);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          guardianIdentityOptionsProvider.overrideWith(
+            (ref) async => _identityOptions(),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const ParentIdentitySetupScreen(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final momRect = tester.getRect(
+      find.byKey(const ValueKey('guardianDisplayNameCard_妈妈')),
+    );
+    final dadRect = tester.getRect(
+      find.byKey(const ValueKey('guardianDisplayNameCard_爸爸')),
+    );
+
+    expect((momRect.top - dadRect.top).abs(), lessThan(1));
+    expect(momRect.width, lessThan(150));
+    expect(dadRect.left, greaterThan(momRect.right));
+  });
 }
 
 GuardianIdentityOptions _identityOptions() {

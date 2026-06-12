@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
@@ -115,45 +116,66 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final artHeight = math.min(size.height * 0.45, 382.0);
+    final compact = size.height < 760 || size.width < 370;
+    final artHeight = compact
+        ? (size.height * 0.45).clamp(300.0, 376.0).toDouble()
+        : (size.height * 0.41).clamp(286.0, 360.0).toDouble();
+    final pagePadding = EdgeInsets.fromLTRB(
+      18,
+      compact ? 38 : 54,
+      18,
+      bottomInset + (compact ? 14 : 24),
+    );
     final slide = _slides[_step];
     final isLast = _step == _slides.length - 1;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: AppColors.appBackgroundWarm,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
+      value: AppSystemUi.light(),
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
         body: AppBackground(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(18, 60, 18, bottomInset + 32),
-            child: SizedBox(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _WelcomeArt(
-                    slide: slide,
-                    height: artHeight,
-                    floatController: _floatController,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final viewportHeight = constraints.maxHeight.isFinite
+                  ? constraints.maxHeight
+                  : size.height;
+              final contentMinHeight = math.max<double>(
+                0,
+                viewportHeight - pagePadding.vertical,
+              );
+
+              return SingleChildScrollView(
+                padding: pagePadding,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: contentMinHeight),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _WelcomeArt(
+                        slide: slide,
+                        height: artHeight,
+                        floatController: _floatController,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: compact ? 10 : 14),
+                        child: _WelcomeCopy(
+                          slide: slide,
+                          currentStep: _step,
+                          slideCount: _slides.length,
+                          isLast: isLast,
+                          loading: _loading,
+                          onDotTap: _jumpTo,
+                          onNext: _next,
+                          onLogin: _finishOnboarding,
+                          compact: compact,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  _WelcomeCopy(
-                    slide: slide,
-                    currentStep: _step,
-                    slideCount: _slides.length,
-                    isLast: isLast,
-                    loading: _loading,
-                    onDotTap: _jumpTo,
-                    onNext: _next,
-                    onLogin: _finishOnboarding,
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -171,6 +193,7 @@ class _WelcomeCopy extends StatelessWidget {
     required this.onDotTap,
     required this.onNext,
     required this.onLogin,
+    required this.compact,
   });
 
   final _WelcomeSlide slide;
@@ -181,6 +204,7 @@ class _WelcomeCopy extends StatelessWidget {
   final ValueChanged<int> onDotTap;
   final VoidCallback onNext;
   final VoidCallback onLogin;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -213,15 +237,16 @@ class _WelcomeCopy extends StatelessWidget {
                 child: _WelcomeTextBlock(
                   key: ValueKey(slide.title),
                   slide: slide,
+                  compact: compact,
                 ),
               ),
-              const SizedBox(height: 22),
+              SizedBox(height: compact ? 14 : 22),
               _WelcomeProgress(
                 currentStep: currentStep,
                 slideCount: slideCount,
                 onDotTap: onDotTap,
               ),
-              const SizedBox(height: 22),
+              SizedBox(height: compact ? 16 : 22),
               AppPrimaryButton(
                 label: isLast ? '开始设置' : '继续',
                 loading: loading,
@@ -230,7 +255,7 @@ class _WelcomeCopy extends StatelessWidget {
                 ),
                 onTap: loading ? null : onNext,
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: compact ? 8 : 12),
               AppSecondaryButton(
                 label: '登录或创建家庭',
                 onTap: loading ? null : onLogin,
@@ -302,9 +327,14 @@ class _CopyAtmosphere extends StatelessWidget {
 }
 
 class _WelcomeTextBlock extends StatelessWidget {
-  const _WelcomeTextBlock({required this.slide, super.key});
+  const _WelcomeTextBlock({
+    required this.slide,
+    required this.compact,
+    super.key,
+  });
 
   final _WelcomeSlide slide;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -336,29 +366,30 @@ class _WelcomeTextBlock extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 18),
+        SizedBox(height: compact ? 12 : 18),
         Text(
           slide.title,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.ink,
             fontFamily: AppTypography.systemFont,
-            fontSize: 32,
+            fontSize: compact ? 28 : 32,
             fontWeight: FontWeight.w700,
-            height: 1.11,
+            height: compact ? 1.08 : 1.11,
             letterSpacing: 0,
           ),
         ),
-        const SizedBox(height: 15),
-        _DescriptionBlock(text: slide.desc),
+        SizedBox(height: compact ? 10 : 15),
+        _DescriptionBlock(text: slide.desc, compact: compact),
       ],
     );
   }
 }
 
 class _DescriptionBlock extends StatelessWidget {
-  const _DescriptionBlock({required this.text});
+  const _DescriptionBlock({required this.text, required this.compact});
 
   final String text;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -367,7 +398,7 @@ class _DescriptionBlock extends StatelessWidget {
       children: [
         Container(
           width: 2,
-          height: 44,
+          height: compact ? 34 : 44,
           margin: const EdgeInsets.only(top: 5, right: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadii.full),
@@ -385,14 +416,14 @@ class _DescriptionBlock extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            maxLines: 3,
+            maxLines: compact ? 2 : 3,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.muted,
               fontFamily: AppTypography.systemFont,
-              fontSize: 15,
+              fontSize: compact ? 14 : 15,
               fontWeight: FontWeight.w500,
-              height: 1.72,
+              height: compact ? 1.5 : 1.72,
               letterSpacing: 0,
             ),
           ),

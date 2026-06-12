@@ -22,8 +22,11 @@ from repositories.task_repository import TaskRepository
 from schemas.profile import role_capabilities_from_option
 from schemas.tasks import task_event_payload, task_payload, validate_task_status, validate_task_type
 from services.auth_service import AuthService
+from services.ai_text_provider import AiTextProvider, UnavailableAiTextProvider
 from services.camera_command_service import CameraCommandService
 from services.point_service import PointService
+from services.prompt_registry import PromptRegistry
+from services.setting_policy import setting_value
 from services.task_reminder_policy import build_task_reminder, normalize_task_reminder_phase
 
 
@@ -42,6 +45,8 @@ class TaskService:
         auth_service: AuthService,
         camera_command_service: CameraCommandService | None = None,
         camera_command_service_factory: Callable[[], CameraCommandService] | None = None,
+        ai_text_provider: AiTextProvider | None = None,
+        prompt_registry: PromptRegistry | None = None,
     ):
         self.auth_service = auth_service
         database = Database(database_url)
@@ -50,6 +55,9 @@ class TaskService:
         self.profile_repository = ProfileRepository(database)
         self._camera_command_service = camera_command_service
         self._camera_command_service_factory = camera_command_service_factory
+        self.ai_text_provider = ai_text_provider or UnavailableAiTextProvider()
+        self.prompt_registry = prompt_registry
+        self._task_reminder_prompt_cache: str | None = None
         self.point_service = PointService(database_url, auth_service=auth_service)
 
     def list_today(self, access_token: str, query: dict) -> dict:
@@ -330,20 +338,35 @@ class TaskService:
                 family_id=context["family"]["id"],
                 child_id=task["child_id"],
             )
-            reminder = build_task_reminder(task, phase=phase, child=child)
-            command = self.camera_command_service.internal_speak(
-                family_id=context["family"]["id"],
-                task_id=task["id"],
-                device_id=task.get("device_id"),
-                text=reminder["text"],
+            reminder = build_task_reminder(
+                task,
+                phase=phase,
+                child=child,
+                ai_text_provider=self.ai_text_provider,
+                prompt=self._task_reminder_prompt(),
             )
-            sent = command.get("status") != "failed"
-            event_type = self._manual_reminder_event_type(phase, sent=sent)
+            voice_enabled = self._voice_reminder_enabled(conn, context["family"]["id"])
+            command = (
+                self.camera_command_service.internal_speak(
+                    family_id=context["family"]["id"],
+                    task_id=task["id"],
+                    device_id=task.get("device_id"),
+                    text=reminder["text"],
+                )
+                if voice_enabled
+                else self._skipped_command("voice_reminder_disabled")
+            )
+            sent = command.get("status") != "failed" and command.get("status") != "skipped"
+            event_type = (
+                self._manual_reminder_event_type(phase, sent=sent)
+                if voice_enabled
+                else self._manual_reminder_event_type(phase, skipped=True)
+            )
             self._add_event(
                 conn,
                 task,
                 event_type,
-                self._manual_reminder_message(phase, sent=sent),
+                self._manual_reminder_message(phase, sent=sent, skipped=not voice_enabled),
                 {"command": command, **reminder},
                 now,
             )
@@ -516,8 +539,14 @@ class TaskService:
             now=now,
         )
 
-    def _manual_reminder_event_type(self, phase: str, *, sent: bool) -> str:
-        suffix = "sent" if sent else "failed"
+    def _manual_reminder_event_type(
+        self,
+        phase: str,
+        *,
+        sent: bool = False,
+        skipped: bool = False,
+    ) -> str:
+        suffix = "skipped" if skipped else "sent" if sent else "failed"
         return {
             "prepare": f"manual_prepare_reminder_{suffix}",
             "start": f"manual_start_reminder_{suffix}",
@@ -527,7 +556,9 @@ class TaskService:
             "finish": f"manual_finish_reminder_{suffix}",
         }.get(phase, f"manual_reminder_{suffix}")
 
-    def _manual_reminder_message(self, phase: str, *, sent: bool) -> str:
+    def _manual_reminder_message(self, phase: str, *, sent: bool, skipped: bool = False) -> str:
+        if skipped:
+            return "语音提醒已关闭，未向摄像头播报"
         if not sent:
             return "摄像头暂时离线，提醒没有播出"
         return {
@@ -538,6 +569,23 @@ class TaskService:
             "wrap_up": "已提醒孩子收尾",
             "finish": "已提醒孩子结束",
         }.get(phase, "已提醒孩子")
+
+    def _voice_reminder_enabled(self, conn, family_id: str) -> bool:
+        row = self.profile_repository.get_setting(conn, family_id=family_id, key="ai-care-rules")
+        return setting_value(row, "ai-care-rules").get("voiceReminderEnabled") is True
+
+    def _task_reminder_prompt(self) -> str:
+        if self._task_reminder_prompt_cache is not None:
+            return self._task_reminder_prompt_cache
+        if self.prompt_registry is None:
+            self._task_reminder_prompt_cache = ""
+            return ""
+        prompt = self.prompt_registry.get_prompt("task.reminder.voice", "v1")
+        self._task_reminder_prompt_cache = prompt.body if prompt else ""
+        return self._task_reminder_prompt_cache
+
+    def _skipped_command(self, reason: str) -> dict:
+        return {"status": "skipped", "reason": reason}
 
     def _auth_context(self, access_token: str) -> dict:
         return self.auth_service.authenticate(access_token)

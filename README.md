@@ -36,6 +36,11 @@ python3 -m pip install -r requirements.txt
 python3 app.py
 ```
 
+安卓真机调试时，后端需要监听局域网地址：开发配置默认使用
+`APP_HOST=0.0.0.0`。启动后在 `mobile/` 运行
+`scripts/run_android_lan.sh -d <device-id>`，脚本会自动把电脑当前 Wi-Fi IP
+传给 Flutter，避免真机继续请求手机自己的 `127.0.0.1`。
+
 接口说明见 [docs/backend_api.md](docs/backend_api.md)。Flutter 只调用 App 后端接口，不直接接触底层流媒体、RTSP/go2rtc、硬件私有协议、短信供应商或 AI provider key。旧测试运行时只能作为 development/test adapter 显式启用，不能成为 production 主路径。
 
 ## App 定位
@@ -660,6 +665,7 @@ Points
   GET  /api/points/account
   GET  /api/points/ledger
   POST /api/points/adjust
+  POST /api/points/stage-notice/ack
 
 Rewards
   GET   /api/rewards/items

@@ -28,6 +28,10 @@ def fresh_test_config(**overrides: Any) -> dict:
         "CAMERA_RUNTIME_ADAPTER": "disabled",
         "AI_CAMERA_TEST_BASE_URL": "",
         "CAMERA_BACKEND_URL": "",
+        "AI_PROVIDER": "",
+        "AI_MODEL": "",
+        "AI_API_KEY": "",
+        "AI_BASE_URL": "",
         "TASK_WEBSOCKET_ENABLED": False,
     }
     config.update(overrides)

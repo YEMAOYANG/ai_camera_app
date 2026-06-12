@@ -62,7 +62,15 @@ def snapshot():
             headers={"Cache-Control": "no-store"},
         )
     except CameraBridgeError as exc:
-        return jsonify({"ok": False, "error": exc.code, "message": exc.message}), exc.status_code
+        return Response(
+            status=204,
+            headers={
+                "Cache-Control": "no-store",
+                "X-Mira-Snapshot-Status": "unavailable",
+                "X-Mira-Snapshot-Error": exc.code,
+                "X-Mira-Snapshot-Message": "snapshot_unavailable",
+            },
+        )
     except ApiError as exc:
         return error_response(exc)
 
@@ -135,6 +143,14 @@ def snapshot_command():
         return error_response(exc)
 
 
+@camera_bp.post("/commands/ptz")
+def ptz_command():
+    try:
+        return jsonify(camera_command_service().ptz_move(bearer_token(request), json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @camera_bp.post("/monitor/start")
 def monitor_start():
     try:
@@ -173,5 +189,13 @@ def monitor_status():
                 },
             }
         )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@camera_bp.get("/events")
+def camera_events():
+    try:
+        return jsonify(camera_command_service().recent_events(bearer_token(request), request.args))
     except ApiError as exc:
         return error_response(exc)

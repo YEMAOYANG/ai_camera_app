@@ -587,6 +587,7 @@ Points
   GET  /api/points/account
   GET  /api/points/ledger
   POST /api/points/adjust
+  POST /api/points/stage-notice/ack
 ```
 
 Ledger types:
