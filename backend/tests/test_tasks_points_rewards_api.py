@@ -97,6 +97,20 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(len(task_entries), 1)
         self.assertEqual(task_entries[0]["delta"], 20)
 
+    def test_today_tasks_respects_requested_date(self):
+        self._create_task(reward_points=1)
+        other_day = (datetime.now().date() + timedelta(days=1)).isoformat()
+
+        response = self.client.get(
+            "/api/tasks/today",
+            query_string={"childId": self.child_id, "date": other_day},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["date"], other_day)
+        self.assertEqual(response.json["tasks"], [])
+
     def test_parent_reject_is_terminal_and_skips_points(self):
         task = self._create_task(reward_points=12)
 

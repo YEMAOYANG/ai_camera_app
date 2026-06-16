@@ -21,36 +21,28 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   static const _slides = [
     _WelcomeSlide(
-      image: 'assets/images/welcome/welcome-parent-phone.png',
-      alt: '家长在手机上查看孩子状态，旁边有小型 AI 摄像头',
+      image: 'assets/images/welcome/welcome-care-overview.png',
+      alt: '家长在书桌旁查看手机，桌面有小型 AI 摄像头，孩子在远处学习',
       badge: '家庭看护',
       icon: _WelcomeIcon.sparkles,
       title: '少盯一点，也能知道孩子现在怎么样。',
-      desc: '看护助手会把观察、任务、提醒和证据整理好，让家长先看到孩子状态，再处理真正需要判断的事。',
+      desc: '任务、看护状态和需要确认的事项会整理在一起，让家长少反复盯屏幕，多看真正重要的变化。',
     ),
     _WelcomeSlide(
-      image: 'assets/images/welcome/welcome-child-study.png',
-      alt: '孩子在书桌前学习，AI 摄像头以克制方式辅助观察',
-      badge: '任务陪伴',
-      icon: _WelcomeIcon.book,
-      title: 'AI 负责安静观察，孩子保留自己的节奏。',
-      desc: '作业、阅读、小书包和睡前任务都按孩子档案组织，只给温和提醒，不把 App 做成打分后台。',
-    ),
-    _WelcomeSlide(
-      image: 'assets/images/welcome/welcome-parent-confirm.png',
-      alt: '家长收到确认提醒，关键决定由家长处理',
-      badge: '家长确认',
+      image: 'assets/images/welcome/welcome-privacy.png',
+      alt: '桌面上的 AI 摄像头旁有隐私保护光层，观察轨迹逐渐消散',
+      badge: '隐私边界',
       icon: _WelcomeIcon.shield,
-      title: '关键决定由家长确认，AI 不替你承诺。',
-      desc: '奖励申请、任务证据、安全提醒会说明来源和建议，家长可以确认、改判或暂缓。',
+      title: '摄像头看到的内容，不会被长期保留。',
+      desc: '我们不会保存摄像头看到的画面和原始观察内容，只保留必要的状态、提醒结果和家长确认记录。',
     ),
     _WelcomeSlide(
-      image: 'assets/images/welcome/welcome-family-room.png',
-      alt: '温暖家庭客厅和书房中的 AI 摄像头看护场景',
+      image: 'assets/images/welcome/welcome-warm-tech.png',
+      alt: '温暖客厅和书房里，小型 AI 摄像头以克制的科技光层连接家庭看护状态',
       badge: '家庭空间',
       icon: _WelcomeIcon.home,
       title: '看护要有科技感，也要有家的温度。',
-      desc: '实时看护、隐私提示、日报和家庭协作都收在一个安静可靠的家长端 App 里。',
+      desc: '设备状态、任务提醒、隐私灯和日报都收在一个安静可靠的家长端里，帮你照看重点。',
     ),
   ];
 
@@ -350,7 +342,7 @@ class _WelcomeTextBlock extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  'AI 看护 · 家长确认',
+                  '隐私优先 · 家长确认',
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: TextStyle(
@@ -791,7 +783,6 @@ class _SmallIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = switch (icon) {
       _WelcomeIcon.sparkles => Icons.auto_awesome,
-      _WelcomeIcon.book => Icons.menu_book_outlined,
       _WelcomeIcon.shield => Icons.verified_user_outlined,
       _WelcomeIcon.home => Icons.home_outlined,
     };
@@ -817,4 +808,4 @@ class _WelcomeSlide {
   final String desc;
 }
 
-enum _WelcomeIcon { sparkles, book, shield, home }
+enum _WelcomeIcon { sparkles, shield, home }

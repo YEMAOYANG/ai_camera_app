@@ -8,7 +8,7 @@ final taskRepositoryProvider = Provider<TaskRepository>((ref) {
 });
 
 final todayTasksProvider = FutureProvider<List<GuardianTask>>((ref) {
-  return ref.watch(taskRepositoryProvider).todayTasks();
+  return ref.watch(taskRepositoryProvider).todayTasks(date: DateTime.now());
 });
 
 final taskListProvider = FutureProvider<List<GuardianTask>>((ref) {
@@ -102,7 +102,7 @@ class TaskRepository {
     String? childId,
     DateTime? date,
   }) async {
-    final targetDate = date == null ? null : _dateText(date);
+    final targetDate = _dateText(date ?? DateTime.now());
     try {
       final response = await _apiClient.get(
         '/tasks/today',
@@ -111,7 +111,9 @@ class TaskRepository {
           'date': targetDate,
         }),
       );
-      return _parseTasks(response.data);
+      return _parseTasks(
+        response.data,
+      ).where((task) => task.scheduledDate == targetDate).toList();
     } on DioException catch (error) {
       throw _fromDio(error);
     }

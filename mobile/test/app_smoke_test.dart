@@ -41,13 +41,8 @@ void main() {
 
     await tester.tap(find.text('继续'));
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text('任务陪伴'), findsOneWidget);
-    expect(find.text('AI 负责安静观察，孩子保留自己的节奏。'), findsOneWidget);
-
-    await tester.tap(find.text('继续'));
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text('家长确认'), findsOneWidget);
-    expect(find.text('关键决定由家长确认，AI 不替你承诺。'), findsOneWidget);
+    expect(find.text('隐私边界'), findsOneWidget);
+    expect(find.text('摄像头看到的内容，不会被长期保留。'), findsOneWidget);
 
     await tester.tap(find.text('继续'));
     await tester.pump(const Duration(milliseconds: 500));
@@ -1123,7 +1118,12 @@ class _FakeApiServer {
     }
 
     if (method == 'GET' && path == '/tasks/today') {
-      return _ok(options, {'ok': true, 'tasks': _tasks});
+      final date = _text(options.queryParameters['date'], _today);
+      return _ok(options, {
+        'ok': true,
+        'date': date,
+        'tasks': _tasks.where((task) => task['scheduledDate'] == date).toList(),
+      });
     }
     if (method == 'GET' && path == '/tasks') {
       return _ok(options, {'ok': true, 'tasks': _tasks});

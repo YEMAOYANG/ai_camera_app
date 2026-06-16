@@ -31,22 +31,33 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver {
   final _scrollController = ScrollController();
+  var _localTodayText = _homeDateText(DateTime.now());
   var _scrollOffset = 0.0;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _scrollController.addListener(_handleScroll);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController
       ..removeListener(_handleScroll)
       ..dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    _localTodayText = _homeDateText(DateTime.now());
+    ref.invalidate(todayTasksProvider);
   }
 
   void _handleScroll() {
@@ -57,6 +68,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final nextTodayText = _homeDateText(DateTime.now());
+    if (nextTodayText != _localTodayText) {
+      _localTodayText = nextTodayText;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ref.invalidate(todayTasksProvider);
+      });
+    }
     final profileSummary = ref.watch(profileSummaryProvider);
     final todayTasks = ref.watch(todayTasksProvider);
     final redemptions = ref.watch(rewardRedemptionsProvider);
@@ -248,8 +266,9 @@ class _HomeHeroBackdrop extends StatelessWidget {
     final camera = cameraStatus.asData?.value;
     final deviceOnline = overview?.isOnline ?? camera?.isOnline ?? false;
     final cameraOnline = camera?.isOnline ?? health?.reachable ?? false;
+    final localTodayTasks = _localTodayTasks(todayTasks.asData?.value);
     final currentTask =
-        camera?.currentTask ?? _currentTaskFromToday(todayTasks.asData?.value);
+        camera?.currentTask ?? _currentTaskFromToday(localTodayTasks);
     final reduceMotion = MediaQuery.of(context).disableAnimations;
     final progress = (scrollOffset / 260).clamp(0.0, 1.0).toDouble();
     final translateY = reduceMotion ? 0.0 : -scrollOffset * 0.16;
@@ -320,8 +339,8 @@ class _HomeHeroBackdrop extends StatelessWidget {
                   cameraHealth.isLoading ||
                   cameraStatus.isLoading,
               currentTask: currentTask,
-              pendingCount: _pendingActionCount(todayTasks, redemptions),
-              todayTaskCount: todayTasks.asData?.value.length,
+              pendingCount: _pendingActionCount(localTodayTasks, redemptions),
+              todayTaskCount: localTodayTasks?.length,
               safeTop: safeTop,
             ),
           ),
@@ -806,7 +825,7 @@ class _HomePrioritySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final taskList = tasks.asData?.value;
+    final taskList = _localTodayTasks(tasks.asData?.value);
     if (taskList == null) {
       if (tasks.isLoading) {
         return const _HomeSoftState(title: '正在整理需要处理的事', message: '一会儿就好。');
@@ -1015,7 +1034,7 @@ class _HomeTodaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final taskList = tasks.asData?.value;
+    final taskList = _localTodayTasks(tasks.asData?.value);
     if (taskList == null) {
       if (tasks.isLoading) {
         return const _HomeSoftState(title: '正在整理今天', message: '稍后显示安排。');
@@ -1284,7 +1303,9 @@ class _HomeConfirmRewardSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pendingTasks =
-        tasks.asData?.value.where((task) => task.status.awaitsParent).length ??
+        _localTodayTasks(
+          tasks.asData?.value,
+        )?.where((task) => task.status.awaitsParent).length ??
         0;
     final pendingRewards = _pendingRedemptions(redemptions).length;
     final balance = points.asData?.value.account.balance;
@@ -1371,8 +1392,9 @@ class _HomeCareInsightSection extends StatelessWidget {
     final camera = cameraStatus.asData?.value;
     final deviceOnline = overview?.isOnline ?? camera?.isOnline ?? false;
     final cameraOnline = camera?.isOnline ?? health?.reachable ?? false;
+    final localTodayTasks = _localTodayTasks(todayTasks.asData?.value);
     final currentTask =
-        camera?.currentTask ?? _currentTaskFromToday(todayTasks.asData?.value);
+        camera?.currentTask ?? _currentTaskFromToday(localTodayTasks);
     final hasIssue =
         !deviceOnline ||
         !cameraOnline ||
@@ -1389,7 +1411,7 @@ class _HomeCareInsightSection extends StatelessWidget {
         : currentTask?.nextStep ?? '任务到点后会自动提醒，隐私灯保持可见。';
     final advice = _homeAdviceFromRealData(
       currentTask: currentTask,
-      tasks: todayTasks.asData?.value,
+      tasks: localTodayTasks,
       loading: todayTasks.isLoading,
     );
 
@@ -1833,11 +1855,11 @@ List<RewardRedemption> _pendingRedemptions(
 }
 
 int _pendingActionCount(
-  AsyncValue<List<GuardianTask>> tasks,
+  List<GuardianTask>? tasks,
   AsyncValue<List<RewardRedemption>> redemptions,
 ) {
   final taskCount =
-      tasks.asData?.value.where((task) => task.status.awaitsParent).length ?? 0;
+      tasks?.where((task) => task.status.awaitsParent).length ?? 0;
   return taskCount + _pendingRedemptions(redemptions).length;
 }
 
@@ -1869,6 +1891,18 @@ GuardianTask? _currentTaskFromToday(List<GuardianTask>? tasks) {
     }
   }
   return null;
+}
+
+List<GuardianTask>? _localTodayTasks(List<GuardianTask>? tasks) {
+  if (tasks == null) return null;
+  final today = _homeDateText(DateTime.now());
+  return tasks.where((task) => task.scheduledDate == today).toList();
+}
+
+String _homeDateText(DateTime date) {
+  final month = date.month.toString().padLeft(2, '0');
+  final day = date.day.toString().padLeft(2, '0');
+  return '${date.year}-$month-$day';
 }
 
 String? _childDisplayName(ProfileSummary? profile) {
