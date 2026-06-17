@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from app import create_app
+from core.database import Database
 from tests.support import fresh_test_config, request_debug_code
 
 
@@ -222,6 +223,64 @@ class SetupApiTest(unittest.TestCase):
         self.assertEqual(complete.status_code, 400)
         self.assertEqual(complete.json["error"], "setup_incomplete")
 
+    def test_camera_name_updates_default_device_in_multi_device_family(self):
+        access_token = self._login("13800003029")
+        headers = self._auth_headers(access_token)
+        parent = self.client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "爸爸", "relationship": "爸爸", "relationshipKey": "dad"},
+            headers=headers,
+        )
+        self.assertEqual(parent.status_code, 200)
+        first = self.client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-CAMERA-NAME-1", "deviceName": "客厅设备", "location": "客厅"},
+            headers=headers,
+        )
+        self.assertEqual(first.status_code, 200)
+        second = self.client.post(
+            "/api/devices",
+            json={
+                "bindingCode": "BIND-CAMERA-NAME-2",
+                "name": "儿童房设备",
+                "location": "儿童房",
+                "setAsDefault": True,
+            },
+            headers=headers,
+        )
+        self.assertEqual(second.status_code, 200, second.json)
+        second_id = second.json["device"]["id"]
+        wifi = self.client.post(
+            "/api/setup/wifi",
+            json={"ssid": "Home-5G", "password": "not-stored", "authType": "wpa2"},
+            headers=headers,
+        )
+        self.assertEqual(wifi.status_code, 200)
+        child = self.client.post(
+            "/api/setup/child",
+            json={"name": "小宇", "nickname": "小宇", "ageStage": "kindergarten_middle"},
+            headers=headers,
+        )
+        self.assertEqual(child.status_code, 200)
+
+        camera_name = self.client.post(
+            "/api/setup/camera-name",
+            json={"wakeName": "小守"},
+            headers=headers,
+        )
+        self.assertEqual(camera_name.status_code, 200, camera_name.json)
+        self.assertEqual(camera_name.json["cameraName"]["deviceId"], second_id)
+
+        database = Database(self.app.config["DATABASE_URL"])
+        with database.transaction() as conn:
+            rows = conn.execute(
+                "SELECT id, wake_name FROM devices WHERE family_id = ? ORDER BY created_at",
+                (self.family_id,),
+            ).fetchall()
+        wake_names = {row["id"]: row.get("wake_name") for row in rows}
+        self.assertIsNone(wake_names[first.json["device"]["id"]])
+        self.assertEqual(wake_names[second_id], "小守")
+
     def _login(self, phone: str = "13800002026") -> str:
         code = request_debug_code(self.client, phone)
         login = self.client.post(
@@ -229,6 +288,7 @@ class SetupApiTest(unittest.TestCase):
             json={"phone": phone, "code": code},
         )
         self.assertEqual(login.status_code, 200)
+        self.family_id = login.json["family"]["id"]
         return login.json["tokens"]["accessToken"]
 
     def _complete_setup_before_contacts(self, access_token: str) -> None:

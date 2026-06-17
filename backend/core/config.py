@@ -65,6 +65,8 @@ class AppConfig:
     AI_BASE_URL: str
     AI_TIMEOUT_SECONDS: float
     AI_EVAL_ENABLED: bool
+    INTERNAL_API_TOKEN: str
+    INTERNAL_ALLOWED_SOURCES: list[str]
     HOST: str
     PORT: int
     DEBUG: bool
@@ -138,6 +140,8 @@ class AppConfig:
             AI_BASE_URL=_env("APP_AI_BASE_URL", _default_ai_base_url(ai_provider)).strip(),
             AI_TIMEOUT_SECONDS=float(_env("APP_AI_TIMEOUT_SECONDS", "8")),
             AI_EVAL_ENABLED=_bool(_env("APP_AI_EVAL_ENABLED", "0")),
+            INTERNAL_API_TOKEN=_env("INTERNAL_API_TOKEN", _env("APP_INTERNAL_API_TOKEN", "")).strip(),
+            INTERNAL_ALLOWED_SOURCES=_csv(_env("INTERNAL_ALLOWED_SOURCES", _env("APP_INTERNAL_ALLOWED_SOURCES", ""))),
             HOST=_env("APP_HOST", "0.0.0.0" if app_env == "development" else "127.0.0.1"),
             PORT=int(_env("APP_PORT", _env("PORT", "8000"))),
             DEBUG=_bool(_env("APP_DEBUG", _env("FLASK_DEBUG", "0"))),
@@ -166,6 +170,8 @@ class AppConfig:
                 raise ConfigError("APP_SMS_PROVIDER=development is not allowed in production.")
             if self.CAMERA_RUNTIME_PROVIDER in {"ai_camera_test", "mock"}:
                 raise ConfigError("CAMERA_RUNTIME_PROVIDER cannot use development adapters in production.")
+            if not self.INTERNAL_API_TOKEN:
+                raise ConfigError("INTERNAL_API_TOKEN is required in production.")
 
 
 def apply_test_defaults(config: dict) -> dict:
@@ -197,6 +203,8 @@ def validate_flask_config(config: dict) -> None:
             "mock",
         }:
             raise ConfigError("CAMERA_RUNTIME_PROVIDER cannot use development adapters in production.")
+        if not str(config.get("INTERNAL_API_TOKEN", "")).strip():
+            raise ConfigError("INTERNAL_API_TOKEN is required in production.")
         origins = config.get("CORS_ORIGINS") or []
         if not origins or "*" in origins:
             raise ConfigError("APP_CORS_ORIGINS must be explicit in production.")

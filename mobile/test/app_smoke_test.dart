@@ -1207,6 +1207,20 @@ class _FakeApiServer {
         'devices': [_device()],
       });
     }
+    if (method == 'POST' && path == '/devices') {
+      return _ok(options, {
+        'ok': true,
+        'duplicate': false,
+        'device': _device(body),
+        'defaultDevice': _device(),
+      });
+    }
+    if (method == 'GET' && path == '/devices/default') {
+      return _ok(options, {'ok': true, 'device': _device()});
+    }
+    if (method == 'POST' && path.endsWith('/set-default')) {
+      return _ok(options, {'ok': true, 'device': _device()});
+    }
     if (method == 'GET' &&
         segments.length == 2 &&
         segments.first == 'devices') {
@@ -2163,6 +2177,7 @@ class _FakeApiServer {
       'name': _text(body?['deviceName'] ?? body?['name'], '书桌旁设备'),
       'location': _text(body?['location'], '书桌旁'),
       'status': 'online',
+      'isDefault': true,
       'bindingCode': 'BIND-TEST',
       'boundAt': _now,
       'lastSeenAt': _now,

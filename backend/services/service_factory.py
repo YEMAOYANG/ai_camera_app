@@ -3,17 +3,19 @@ from __future__ import annotations
 from flask import current_app
 
 from core.errors import ApiError
-from integrations.camera_runtime.ai_camera_test_adapter import AiCameraTestRuntimeAdapter
-from integrations.camera_runtime.disabled_adapter import DisabledCameraRuntimeAdapter
-from integrations.camera_runtime.mock_adapter import MockCameraRuntimeAdapter
 from integrations.hardware.disabled_adapter import DisabledHardwareDeviceAdapter
 from integrations.hardware.mock_adapter import MockHardwareDeviceAdapter
 from services.auth_service import AuthService
 from services.ai_text_provider import OpenAICompatibleTextProvider, UnavailableAiTextProvider
 from services.camera_bridge_service import CameraBridgeService
+from services.camera_ai_observation_service import CameraAiObservationService
 from services.camera_command_service import CameraCommandService
+from services.care_config_service import CareConfigService
 from services.device_service import DeviceService
+from services.device_runtime_resolver import DeviceRuntimeResolver
 from services.firmware_service import FirmwareService
+from services.ai_care_reminder_service import AiCareReminderService
+from services.internal_request_guard import InternalRequestGuard
 from services.point_service import PointService
 from services.profile_service import ProfileService
 from services.reward_service import RewardService
@@ -71,7 +73,9 @@ def device_service() -> DeviceService:
         current_app.config["DATABASE_URL"],
         auth_service=auth_service(),
         hardware_adapter=hardware_adapter(),
-        camera_service=camera_bridge_service(),
+        runtime_resolver=device_runtime_resolver(),
+        app_env=str(current_app.config.get("APP_ENV", "production")),
+        dev_adapters_enabled=bool(current_app.config.get("DEV_ADAPTERS_ENABLED")),
     )
 
 
@@ -80,34 +84,56 @@ def firmware_service() -> FirmwareService:
 
 
 def camera_bridge_service() -> CameraBridgeService:
+    return device_runtime_resolver().global_bridge()
+
+
+def device_runtime_resolver() -> DeviceRuntimeResolver:
     provider = str(current_app.config.get("CAMERA_RUNTIME_PROVIDER", "disabled"))
-    legacy_provider = str(current_app.config.get("CAMERA_RUNTIME_ADAPTER", provider))
-    if provider == "disabled" and legacy_provider != provider:
-        provider = legacy_provider
-    adapter_name = provider.lower()
-    if adapter_name == "ai_camera_test":
-        _require_dev_adapter("CAMERA_RUNTIME_PROVIDER=ai_camera_test")
-        base_url = current_app.config.get("AI_CAMERA_TEST_BASE_URL") or current_app.config.get("CAMERA_BACKEND_URL")
-        if not base_url:
-            raise ApiError(
-                "camera_runtime_not_configured",
-                "开发摄像头桥接已启用，但 AI_CAMERA_TEST_BASE_URL 未配置。",
-                503,
-            )
-        return CameraBridgeService(adapter=AiCameraTestRuntimeAdapter(base_url))
-    if adapter_name == "mock":
-        _require_dev_adapter("CAMERA_RUNTIME_PROVIDER=mock")
-        return CameraBridgeService(adapter=MockCameraRuntimeAdapter())
-    if adapter_name == "disabled":
-        return CameraBridgeService(adapter=DisabledCameraRuntimeAdapter())
-    raise ApiError("camera_runtime_unknown_adapter", "未知摄像头运行时适配器。", 503)
+    return DeviceRuntimeResolver(
+        current_app.config["DATABASE_URL"],
+        provider=provider,
+        legacy_provider=str(current_app.config.get("CAMERA_RUNTIME_ADAPTER", provider)),
+        ai_camera_test_base_url=current_app.config.get("AI_CAMERA_TEST_BASE_URL"),
+        camera_backend_url=current_app.config.get("CAMERA_BACKEND_URL"),
+        dev_adapters_enabled=bool(current_app.config.get("DEV_ADAPTERS_ENABLED")),
+        app_env=str(current_app.config.get("APP_ENV", "production")),
+    )
 
 
 def camera_command_service() -> CameraCommandService:
     return CameraCommandService(
         current_app.config["DATABASE_URL"],
         auth_service=auth_service(),
-        camera_service=camera_bridge_service(),
+        runtime_resolver=device_runtime_resolver(),
+    )
+
+
+def care_config_service() -> CareConfigService:
+    return CareConfigService(
+        current_app.config["DATABASE_URL"],
+        auth_service=auth_service(),
+    )
+
+
+def ai_care_reminder_service() -> AiCareReminderService:
+    return AiCareReminderService(
+        current_app.config["DATABASE_URL"],
+        auth_service=auth_service(),
+        ai_text_provider=ai_text_provider(),
+        prompt_registry=prompt_registry(),
+        camera_command_service=camera_command_service(),
+    )
+
+
+def camera_ai_observation_service() -> CameraAiObservationService:
+    return CameraAiObservationService(current_app.config["DATABASE_URL"])
+
+
+def internal_request_guard() -> InternalRequestGuard:
+    return InternalRequestGuard(
+        current_app.config["DATABASE_URL"],
+        token=current_app.config.get("INTERNAL_API_TOKEN", ""),
+        allowed_sources=current_app.config.get("INTERNAL_ALLOWED_SOURCES", []),
     )
 
 

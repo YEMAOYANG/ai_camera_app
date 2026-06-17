@@ -17,3 +17,10 @@ Current task prompts:
 
 - `task.observation.summary:v1` summarizes camera task observations for parents.
 - `task.reminder.voice:v1` generates short child-facing voice reminders from task context.
+
+Camera care prompts are separate from task prompts:
+
+- `reminder.*:v1` generates JSON-only camera care reminder text.
+- `vision.*:v1` reserves structured scene and behavior summary prompts for future camera observation adapters.
+
+Reminder prompts must return JSON with `text`, `tone`, `scenario`, and `safety`.

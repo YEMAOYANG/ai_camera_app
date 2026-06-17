@@ -8,6 +8,7 @@ class GuardianDevice {
     required this.name,
     required this.location,
     required this.status,
+    required this.isDefault,
     required this.createdAt,
     required this.updatedAt,
     this.unboundAt,
@@ -19,6 +20,7 @@ class GuardianDevice {
   final String name;
   final String location;
   final String status;
+  final bool isDefault;
   final int createdAt;
   final int updatedAt;
   final int? unboundAt;
@@ -37,6 +39,7 @@ class GuardianDevice {
       name: _asString(json['name']),
       location: _asString(json['location']),
       status: _asString(json['status']),
+      isDefault: json['isDefault'] == true,
       createdAt: _asInt(json['createdAt']),
       updatedAt: _asInt(json['updatedAt']),
       unboundAt: _asNullableInt(json['unboundAt']),

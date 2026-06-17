@@ -180,7 +180,11 @@ class TaskRuntimeService:
         if not self._requires_start_observation(conn, task):
             return self._mark_in_progress_without_start_observation(conn, task, now=now)
 
-        observation = self.camera_command_service.camera_service.task_observation(dict(task))
+        observation = self.camera_command_service.internal_task_observation(
+            family_id=task["family_id"],
+            task=dict(task),
+            device_id=task.get("device_id"),
+        )
         verdict = observation.get("verdict")
         if verdict == "not_started":
             return self._mark_delayed(conn, task, observation=observation, now=now)
@@ -311,7 +315,11 @@ class TaskRuntimeService:
         return updated, events
 
     def _process_delayed(self, conn, task, *, now: datetime):
-        observation = self.camera_command_service.camera_service.task_observation(dict(task))
+        observation = self.camera_command_service.internal_task_observation(
+            family_id=task["family_id"],
+            task=dict(task),
+            device_id=task.get("device_id"),
+        )
         if observation.get("verdict") == "started":
             current_ms = self._now_ms(now)
             updated = self.repository.mark_in_progress(

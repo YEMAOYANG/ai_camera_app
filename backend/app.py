@@ -10,6 +10,7 @@ from routes.api.v1.ai import ai_bp
 from routes.api.v1.account import account_bp
 from routes.api.v1.auth import auth_bp
 from routes.api.v1.camera_bridge import camera_bp
+from routes.api.v1.care import care_bp
 from routes.api.v1.children import children_bp
 from routes.api.v1.contacts import contacts_bp
 from routes.api.v1.dev import dev_bp
@@ -22,11 +23,14 @@ from routes.api.v1.legal import legal_bp
 from routes.api.v1.points import points_bp
 from routes.api.v1.profile import profile_bp
 from routes.api.v1.reports import growth_bp, reports_bp
+from routes.api.v1.reminders import reminders_bp
 from routes.api.v1.rewards import rewards_bp
 from routes.api.v1.settings import settings_bp
 from routes.api.v1.setup import setup_bp
 from routes.api.v1.subscription import subscription_bp, subscriptions_bp
 from routes.api.v1.tasks import tasks_bp
+from routes.internal.camera_observations import internal_camera_observations_bp
+from routes.internal.reminders import internal_reminders_bp
 from services.task_event_stream import start_task_event_stream
 from services.task_scheduler_runner import start_task_scheduler
 
@@ -61,8 +65,12 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.register_blueprint(feedback_bp, url_prefix="/api/feedback")
     app.register_blueprint(firmware_bp, url_prefix="/api/firmware")
     app.register_blueprint(camera_bp, url_prefix="/api/camera")
+    app.register_blueprint(care_bp, url_prefix="/api/care")
+    app.register_blueprint(reminders_bp, url_prefix="/api/reminders")
     app.register_blueprint(dev_bp, url_prefix="/api/dev")
     app.register_blueprint(ai_bp, url_prefix="/api/ai")
+    app.register_blueprint(internal_camera_observations_bp, url_prefix="/internal/camera")
+    app.register_blueprint(internal_reminders_bp, url_prefix="/internal/reminders")
 
     @app.get("/api/health")
     def health():

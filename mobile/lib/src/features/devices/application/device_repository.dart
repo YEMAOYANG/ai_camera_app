@@ -19,9 +19,9 @@ final primaryFirmwareStatusProvider = FutureProvider<DeviceFirmwareStatus?>((
   ref,
 ) async {
   final repository = ref.watch(deviceRepositoryProvider);
-  final devices = await repository.devices();
-  if (devices.isEmpty) return null;
-  return repository.firmwareStatus(devices.first.id);
+  final device = await repository.defaultDevice();
+  if (device == null) return null;
+  return repository.firmwareStatus(device.id);
 });
 
 final deviceOverviewProvider = FutureProvider.family<DeviceOverview, String>((
@@ -50,9 +50,51 @@ class DeviceRepository {
   }
 
   Future<DeviceOverview?> primaryOverview() async {
-    final list = await devices();
-    if (list.isEmpty) return null;
-    return overview(list.first.id, fallback: list.first);
+    final device = await defaultDevice();
+    if (device == null) return null;
+    return overview(device.id, fallback: device);
+  }
+
+  Future<GuardianDevice?> defaultDevice() async {
+    try {
+      final response = await _apiClient.get('/devices/default');
+      final raw = _asMap(response.data)['device'];
+      if (raw == null) return null;
+      return GuardianDevice.fromJson(_asMap(raw));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<GuardianDevice> bindDevice({
+    required String bindingCode,
+    required String name,
+    String? location,
+    bool setAsDefault = false,
+  }) async {
+    try {
+      final response = await _apiClient.post(
+        '/devices',
+        data: {
+          'bindingCode': bindingCode,
+          'name': name,
+          if (location != null && location.isNotEmpty) 'location': location,
+          'setAsDefault': setAsDefault,
+        },
+      );
+      return GuardianDevice.fromJson(_asMap(_asMap(response.data)['device']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<GuardianDevice> setDefaultDevice(String deviceId) async {
+    try {
+      final response = await _apiClient.post('/devices/$deviceId/set-default');
+      return GuardianDevice.fromJson(_asMap(_asMap(response.data)['device']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
   }
 
   Future<DeviceOverview> overview(

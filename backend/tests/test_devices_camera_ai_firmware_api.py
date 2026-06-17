@@ -3,11 +3,18 @@ from __future__ import annotations
 import json
 import threading
 import unittest
+from datetime import date
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from app import create_app
 from core.database import Database
+from core.errors import ApiError
+from core.security import now_ms
 from models.firmware import FIRMWARE_PACKAGE_ACTIVE
+from repositories.device_repository import DeviceRepository
+from services.device_service import DeviceService
+from services.device_runtime_resolver import DeviceRuntimeResolver
+from services.service_factory import auth_service, camera_command_service
 from tests.support import fresh_test_config, request_debug_code
 
 
@@ -59,6 +66,14 @@ class _CameraRuntimeHandler(BaseHTTPRequestHandler):
             body = b"\xff\xd8\xff\xd9"
             self.send_response(200)
             self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if self.path == "/api/camera/stream":
+            body = b"--frame\r\nContent-Type: image/jpeg\r\n\r\n\xff\xd8\xff\xd9\r\n"
+            self.send_response(200)
+            self.send_header("Content-Type", "multipart/x-mixed-replace; boundary=frame")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -126,6 +141,11 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         devices = self.client.get("/api/devices", headers=self._auth_headers())
         self.assertEqual(devices.status_code, 200)
         self.assertEqual(len(devices.json["devices"]), 1)
+        self.assertTrue(devices.json["devices"][0]["isDefault"])
+
+        default = self.client.get("/api/devices/default", headers=self._auth_headers())
+        self.assertEqual(default.status_code, 200)
+        self.assertEqual(default.json["device"]["id"], self.device_id)
 
         detail = self.client.get(f"/api/devices/{self.device_id}", headers=self._auth_headers())
         self.assertEqual(detail.status_code, 200)
@@ -138,6 +158,92 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(status.status_code, 200)
         self.assertEqual(status.json["status"]["connectionStatus"], "online")
         self.assertEqual(status.json["status"]["adapter"], "mock_hardware_device")
+
+    def test_bind_duplicate_default_and_unbind_default_device(self):
+        second = self.client.post(
+            "/api/devices",
+            json={"bindingCode": "BIND-SECOND", "name": "儿童房设备", "location": "儿童房"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(second.status_code, 200, second.json)
+        second_id = second.json["device"]["id"]
+        self.assertFalse(second.json["duplicate"])
+        self.assertEqual(second.json["defaultDevice"]["id"], self.device_id)
+
+        duplicate = self.client.post(
+            "/api/devices",
+            json={"bindingCode": "BIND-SECOND", "name": "重复设备", "location": "卧室"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(duplicate.status_code, 200, duplicate.json)
+        self.assertTrue(duplicate.json["duplicate"])
+        self.assertEqual(duplicate.json["device"]["id"], second_id)
+
+        set_default = self.client.post(
+            f"/api/devices/{second_id}/set-default",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(set_default.status_code, 200)
+        self.assertEqual(set_default.json["device"]["id"], second_id)
+
+        default = self.client.get("/api/devices/default", headers=self._auth_headers())
+        self.assertEqual(default.status_code, 200)
+        self.assertEqual(default.json["device"]["id"], second_id)
+
+        speak = self.client.post(
+            "/api/camera/commands/speak",
+            json={"text": "默认设备提醒"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(speak.status_code, 200, speak.json)
+        self.assertEqual(speak.json["command"]["deviceId"], second_id)
+
+        unbound = self.client.post(
+            f"/api/devices/{second_id}/unbind",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(unbound.status_code, 200)
+        self.assertEqual(unbound.json["defaultDevice"]["id"], self.device_id)
+
+        default_after = self.client.get("/api/devices/default", headers=self._auth_headers())
+        self.assertEqual(default_after.status_code, 200)
+        self.assertEqual(default_after.json["device"]["id"], self.device_id)
+
+    def test_binding_code_cannot_be_active_in_two_families(self):
+        other_client = self.app.test_client()
+        other_code = request_debug_code(other_client, "13800002031")
+        other_login = other_client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13800002031", "code": other_code},
+        )
+        self.assertEqual(other_login.status_code, 200)
+        other_token = other_login.json["tokens"]["accessToken"]
+        parent = other_client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "妈妈", "relationship": "妈妈", "relationshipKey": "mom"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(parent.status_code, 200)
+
+        duplicate = other_client.post(
+            "/api/devices",
+            json={"bindingCode": "BIND-BOUNDARY", "name": "另一台设备", "location": "卧室"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(duplicate.status_code, 409)
+        self.assertEqual(duplicate.json["error"], "device_already_bound")
+
+    def test_unbind_last_default_clears_default_device(self):
+        unbound = self.client.post(
+            f"/api/devices/{self.device_id}/unbind",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(unbound.status_code, 200)
+        self.assertIsNone(unbound.json["defaultDevice"])
+
+        default = self.client.get("/api/devices/default", headers=self._auth_headers())
+        self.assertEqual(default.status_code, 200)
+        self.assertIsNone(default.json["device"])
 
     def test_camera_health_adapter_reachable_and_unreachable(self):
         unauthenticated = self.client.get("/api/camera/health")
@@ -242,12 +348,428 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertIn("start_monitor", event_types)
         self.assertIn("stop_monitor", event_types)
 
+    def test_camera_events_are_scoped_by_device(self):
+        second = self.client.post(
+            "/api/devices",
+            json={"bindingCode": "BIND-EVENTS-SECOND", "name": "儿童房设备", "location": "儿童房"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(second.status_code, 200, second.json)
+        second_id = second.json["device"]["id"]
+        first_command = self.client.post(
+            "/api/camera/commands/speak",
+            json={"deviceId": self.device_id, "text": "客厅提醒"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(first_command.status_code, 200, first_command.json)
+        second_command = self.client.post(
+            "/api/camera/commands/speak",
+            json={"deviceId": second_id, "text": "儿童房提醒"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(second_command.status_code, 200, second_command.json)
+
+        first_events = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(first_events.status_code, 200)
+        self.assertTrue(first_events.json["events"])
+        self.assertEqual({event["deviceId"] for event in first_events.json["events"]}, {self.device_id})
+
+        second_events = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": second_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(second_events.status_code, 200)
+        self.assertTrue(second_events.json["events"])
+        self.assertEqual({event["deviceId"] for event in second_events.json["events"]}, {second_id})
+
     def test_camera_webrtc_session_contract(self):
         session = self.client.get("/api/camera/webrtc/session", headers=self._auth_headers())
         self.assertEqual(session.status_code, 200)
         self.assertTrue(session.json["session"]["signalingUrl"].startswith("ws://"))
         self.assertIn("src=ipc45aw_hd", session.json["session"]["signalingUrl"])
         self.assertEqual(session.json["session"]["message"], "实时画面连接已准备好。")
+
+    def test_camera_read_apis_route_through_device_runtime_resolver(self):
+        status = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(status.status_code, 200)
+        self.assertEqual(status.json["status"]["connectionStatus"], "online")
+
+        snapshot = self.client.get(
+            "/api/camera/snapshot",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(snapshot.status_code, 200)
+        self.assertEqual(snapshot.content_type, "image/jpeg")
+
+        stream = self.client.get(
+            "/api/camera/stream",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(stream.status_code, 200)
+        self.assertTrue(stream.content_type.startswith("multipart/x-mixed-replace"))
+
+        session = self.client.get(
+            "/api/camera/webrtc/session",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(session.status_code, 200)
+        self.assertIn("signalingUrl", session.json["session"])
+
+    def test_device_runtime_config_overrides_global_provider_by_device(self):
+        second = self.client.post(
+            "/api/devices",
+            json={"bindingCode": "BIND-RUNTIME-SECOND", "name": "儿童房设备", "location": "儿童房"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(second.status_code, 200, second.json)
+        second_id = second.json["device"]["id"]
+        self._set_device_runtime_config(self.device_id, "disabled")
+        self._set_device_runtime_config(
+            second_id,
+            "ai_camera_test",
+            {"baseUrl": self.camera_url, "streamProfile": "dev"},
+        )
+
+        first_status = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(first_status.status_code, 200)
+        self.assertEqual(first_status.json["status"]["runtimeProvider"], "disabled_camera_runtime")
+        self.assertEqual(first_status.json["status"]["connectionStatus"], "offline")
+
+        second_status = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": second_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(second_status.status_code, 200)
+        self.assertEqual(second_status.json["status"]["runtimeProvider"], "ai_camera_test_bridge")
+        self.assertEqual(second_status.json["status"]["connectionStatus"], "online")
+
+        second_snapshot = self.client.get(
+            "/api/camera/snapshot",
+            query_string={"deviceId": second_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(second_snapshot.status_code, 200)
+        self.assertEqual(second_snapshot.content_type, "image/jpeg")
+
+        speak = self.client.post(
+            "/api/camera/commands/speak",
+            json={"deviceId": second_id, "text": "设备级配置提醒"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(speak.status_code, 200, speak.json)
+        self.assertEqual(speak.json["command"]["status"], "succeeded")
+        self.assertEqual(speak.json["command"]["deviceId"], second_id)
+        self.assertEqual(_CameraRuntimeHandler.speak_count, 1)
+
+    def test_device_runtime_config_missing_allows_dev_fallback_but_not_production(self):
+        dev_status = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(dev_status.status_code, 200)
+        self.assertEqual(dev_status.json["status"]["runtimeProvider"], "ai_camera_test_bridge")
+
+        resolver = DeviceRuntimeResolver(
+            self.app.config["DATABASE_URL"],
+            provider="disabled",
+            legacy_provider="disabled",
+            dev_adapters_enabled=False,
+            app_env="production",
+        )
+        with self.assertRaises(ApiError) as raised:
+            resolver.resolve(family_id=self.family_id, device_id=self.device_id)
+        self.assertEqual(raised.exception.code, "device_runtime_not_configured")
+
+    def test_other_family_and_unbound_devices_cannot_resolve_runtime_config(self):
+        self._set_device_runtime_config(self.device_id, "disabled")
+        other_client = self.app.test_client()
+        other_code = request_debug_code(other_client, "13800002033")
+        other_login = other_client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13800002033", "code": other_code},
+        )
+        self.assertEqual(other_login.status_code, 200)
+        other_token = other_login.json["tokens"]["accessToken"]
+        other_client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "妈妈", "relationship": "妈妈", "relationshipKey": "mom"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        other_device = other_client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-RUNTIME-OTHER", "deviceName": "卧室设备", "location": "卧室"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(other_device.status_code, 200)
+        other_device_id = other_device.json["device"]["id"]
+
+        rejected = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": other_device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(rejected.status_code, 404)
+        self.assertEqual(rejected.json["error"], "device_not_found")
+
+        unbind = self.client.post(
+            f"/api/devices/{self.device_id}/unbind",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(unbind.status_code, 200)
+        unbound = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(unbound.status_code, 409)
+        self.assertEqual(unbound.json["error"], "device_unbound")
+
+    def test_runtime_config_api_writes_sanitized_config_and_hides_secret_ref(self):
+        update = self.client.put(
+            f"/api/devices/{self.device_id}/runtime-config",
+            json={
+                "provider": "ai_camera_test",
+                "config": {
+                    "BaseUrl": self.camera_url,
+                    "streamProfile": "dev",
+                    "speakerCapabilities": {"enabled": True, "volume": 0.6},
+                },
+                "secretRef": "vault://camera/dev-runtime",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(update.status_code, 200, update.json)
+        runtime_config = update.json["runtimeConfig"]
+        self.assertEqual(runtime_config["provider"], "ai_camera_test")
+        self.assertTrue(runtime_config["hasSecretRef"])
+        self.assertNotIn("secretRef", runtime_config)
+        self.assertEqual(runtime_config["config"]["baseUrl"], self.camera_url)
+        self.assertEqual(runtime_config["config"]["speakerCapabilities"]["enabled"], True)
+
+        current = self.client.get(
+            f"/api/devices/{self.device_id}/runtime-config",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(current.status_code, 200, current.json)
+        self.assertTrue(current.json["runtimeConfig"]["hasSecretRef"])
+        self.assertNotIn("secretRef", current.json["runtimeConfig"])
+
+        status = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(status.status_code, 200)
+        self.assertEqual(status.json["status"]["runtimeProvider"], "ai_camera_test_bridge")
+
+    def test_runtime_config_get_requires_manage_devices_and_hides_secret_ref(self):
+        update = self.client.put(
+            f"/api/devices/{self.device_id}/runtime-config",
+            json={
+                "provider": "ai_camera_test",
+                "config": {"baseUrl": self.camera_url},
+                "secretRef": "vault://camera/admin-only-runtime",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(update.status_code, 200, update.json)
+
+        admin_get = self.client.get(
+            f"/api/devices/{self.device_id}/runtime-config",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(admin_get.status_code, 200, admin_get.json)
+        self.assertEqual(admin_get.json["runtimeConfig"]["provider"], "ai_camera_test")
+        self.assertTrue(admin_get.json["runtimeConfig"]["hasSecretRef"])
+        self.assertNotIn("secretRef", admin_get.json["runtimeConfig"])
+
+        viewer_token = self._login_family_member(role="viewer", phone="13800002035")
+        viewer_get = self.client.get(
+            f"/api/devices/{self.device_id}/runtime-config",
+            headers={"Authorization": f"Bearer {viewer_token}"},
+        )
+        self.assertEqual(viewer_get.status_code, 403)
+        self.assertEqual(viewer_get.json["error"], "permission_denied")
+
+    def test_runtime_config_rejects_sensitive_nested_config_bad_url_and_unknown_keys(self):
+        sensitive = self.client.put(
+            f"/api/devices/{self.device_id}/runtime-config",
+            json={
+                "provider": "ai_camera_test",
+                "config": {
+                    "baseUrl": self.camera_url,
+                    "speakerCapabilities": {"enabled": True, "apiKey": "should-not-store"},
+                },
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(sensitive.status_code, 400)
+        self.assertEqual(sensitive.json["error"], "sensitive_runtime_config")
+
+        bad_url = self.client.put(
+            f"/api/devices/{self.device_id}/runtime-config",
+            json={
+                "provider": "ai_camera_test",
+                "config": {"baseUrl": "http://user:pass@127.0.0.1:8767"},
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(bad_url.status_code, 400)
+        self.assertEqual(bad_url.json["error"], "invalid_runtime_config_url")
+
+        unsupported = self.client.put(
+            f"/api/devices/{self.device_id}/runtime-config",
+            json={
+                "provider": "ai_camera_test",
+                "config": {"baseUrl": self.camera_url, "rawRtspUrl": "rtsp://camera.local/stream"},
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(unsupported.status_code, 400)
+        self.assertEqual(unsupported.json["error"], "runtime_config_key_not_allowed")
+
+    def test_runtime_config_rejects_cross_family_unbound_and_dev_provider_outside_dev(self):
+        with self.app.app_context():
+            service = DeviceService(
+                self.app.config["DATABASE_URL"],
+                auth_service=auth_service(),
+                app_env="production",
+                dev_adapters_enabled=False,
+            )
+            with self.assertRaises(ApiError) as raised:
+                service.update_runtime_config(
+                    self.access_token,
+                    self.device_id,
+                    {"provider": "mock", "config": {}},
+                )
+            self.assertEqual(raised.exception.code, "development_adapter_not_allowed")
+
+        other_client = self.app.test_client()
+        other_code = request_debug_code(other_client, "13800002034")
+        other_login = other_client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13800002034", "code": other_code},
+        )
+        self.assertEqual(other_login.status_code, 200)
+        other_token = other_login.json["tokens"]["accessToken"]
+        other_client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "妈妈", "relationship": "妈妈", "relationshipKey": "mom"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        other_device = other_client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-RUNTIME-WRITE-OTHER", "deviceName": "卧室设备"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(other_device.status_code, 200)
+        cross_family = self.client.put(
+            f"/api/devices/{other_device.json['device']['id']}/runtime-config",
+            json={"provider": "disabled", "config": {}},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(cross_family.status_code, 404)
+        self.assertEqual(cross_family.json["error"], "device_not_found")
+
+        unbind = self.client.post(
+            f"/api/devices/{self.device_id}/unbind",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(unbind.status_code, 200)
+        unbound_write = self.client.put(
+            f"/api/devices/{self.device_id}/runtime-config",
+            json={"provider": "disabled", "config": {}},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(unbound_write.status_code, 409)
+        self.assertEqual(unbound_write.json["error"], "device_unbound")
+
+    def test_reserved_runtime_provider_can_be_saved_as_unimplemented_contract(self):
+        update = self.client.put(
+            f"/api/devices/{self.device_id}/runtime-config",
+            json={
+                "provider": "self_owned_camera",
+                "config": {
+                    "adapterName": "mira_self_owned_v1",
+                    "streamProfile": "default",
+                    "deviceProfile": {"model": "Mira Dev", "region": "CN"},
+                },
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(update.status_code, 200, update.json)
+        runtime_config = update.json["runtimeConfig"]
+        self.assertEqual(runtime_config["provider"], "self_owned_camera")
+        self.assertFalse(runtime_config["adapterImplemented"])
+        self.assertIn("尚未接入", runtime_config["message"])
+
+        status = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(status.status_code, 503)
+        self.assertEqual(status.json["error"], "camera_runtime_reserved_adapter")
+
+    def test_camera_read_apis_reject_other_family_and_unbound_devices(self):
+        other_client = self.app.test_client()
+        other_code = request_debug_code(other_client, "13800002029")
+        other_login = other_client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13800002029", "code": other_code},
+        )
+        self.assertEqual(other_login.status_code, 200)
+        other_token = other_login.json["tokens"]["accessToken"]
+        other_client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "妈妈", "relationship": "妈妈", "relationshipKey": "mom"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        other_device = other_client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-READ-OTHER", "deviceName": "卧室设备", "location": "卧室"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(other_device.status_code, 200)
+
+        rejected = self.client.get(
+            "/api/camera/health",
+            query_string={"deviceId": other_device.json["device"]["id"]},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(rejected.status_code, 404)
+        self.assertEqual(rejected.json["error"], "device_not_found")
+
+        unbind = self.client.post(
+            f"/api/devices/{self.device_id}/unbind",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(unbind.status_code, 200)
+        unbound = self.client.get(
+            "/api/camera/health",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(unbound.status_code, 409)
+        self.assertEqual(unbound.json["error"], "device_unbound")
 
     def test_camera_webrtc_offer_contract(self):
         app = create_app(fresh_test_config(CAMERA_RUNTIME_PROVIDER="mock"))
@@ -285,6 +807,92 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         )
         self.assertEqual(command.status_code, 200)
         self.assertEqual(command.json["command"]["status"], "succeeded")
+        self.assertEqual(command.json["command"]["deviceId"], self.device_id)
+
+        missing = self.client.post(
+            "/api/devices/dev_missing/commands",
+            json={"commandType": "speak", "text": "测试提醒"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(missing.status_code, 404)
+        self.assertEqual(missing.json["error"], "device_not_found")
+
+    def test_runtime_resolver_routes_default_device_and_rejects_other_family_device(self):
+        speak = self.client.post(
+            "/api/camera/commands/speak",
+            json={"text": "默认设备提醒"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(speak.status_code, 200, speak.json)
+        self.assertEqual(speak.json["command"]["status"], "succeeded")
+        self.assertEqual(speak.json["command"]["deviceId"], self.device_id)
+
+        with self.app.app_context():
+            internal = camera_command_service().internal_speak(
+                family_id=self.family_id,
+                text="内部提醒",
+            )
+        self.assertEqual(internal["status"], "succeeded")
+        self.assertEqual(internal["deviceId"], self.device_id)
+
+        other_client = self.app.test_client()
+        other_code = request_debug_code(other_client, "13800002028")
+        other_login = other_client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13800002028", "code": other_code},
+        )
+        self.assertEqual(other_login.status_code, 200)
+        other_token = other_login.json["tokens"]["accessToken"]
+        parent = other_client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "妈妈", "relationship": "妈妈", "relationshipKey": "mom"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(parent.status_code, 200)
+        other_device = other_client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-OTHER", "deviceName": "卧室设备", "location": "卧室"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(other_device.status_code, 200)
+
+        rejected = self.client.post(
+            f"/api/devices/{other_device.json['device']['id']}/commands",
+            json={"commandType": "speak", "text": "不该路由"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(rejected.status_code, 404)
+        self.assertEqual(rejected.json["error"], "device_not_found")
+
+    def test_camera_status_current_task_is_scoped_by_device(self):
+        child_id = self._create_child()
+        second = self.client.post(
+            "/api/devices",
+            json={"bindingCode": "BIND-TASK-SECOND", "name": "餐厅设备", "location": "餐厅"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(second.status_code, 200, second.json)
+        second_id = second.json["device"]["id"]
+        task_a = self._create_task(child_id, self.device_id, "客厅收纳")
+        task_b = self._create_task(child_id, second_id, "餐厅用餐")
+        self._start_task(task_a)
+        self._start_task(task_b)
+
+        status_a = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(status_a.status_code, 200)
+        self.assertEqual(status_a.json["status"]["currentTask"]["id"], task_a)
+
+        status_b = self.client.get(
+            "/api/camera/status",
+            query_string={"deviceId": second_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(status_b.status_code, 200)
+        self.assertEqual(status_b.json["status"]["currentTask"]["id"], task_b)
 
     def test_ai_config_models_and_prompt_registry(self):
         unauthenticated = self.client.get("/api/ai/config")
@@ -346,6 +954,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
             json={"phone": "13800002026", "code": code},
         )
         self.assertEqual(login.status_code, 200)
+        self.family_id = login.json["family"]["id"]
         return login.json["tokens"]["accessToken"]
 
     def _create_device(self) -> str:
@@ -362,6 +971,44 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         return response.json["device"]["id"]
+
+    def _create_child(self) -> str:
+        wifi = self.client.post(
+            "/api/setup/wifi",
+            json={"ssid": "Home-5G", "password": "not-stored", "authType": "wpa2"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(wifi.status_code, 200)
+        response = self.client.post(
+            "/api/setup/child",
+            json={"name": "小宇", "nickname": "小宇", "ageStage": "kindergarten_middle"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200)
+        return response.json["child"]["id"]
+
+    def _create_task(self, child_id: str, device_id: str, title: str) -> str:
+        response = self.client.post(
+            "/api/tasks",
+            json={
+                "childId": child_id,
+                "title": title,
+                "taskType": "life",
+                "scheduledDate": date.today().isoformat(),
+                "scheduledStart": "18:00",
+                "deviceId": device_id,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200, response.json)
+        return response.json["task"]["id"]
+
+    def _start_task(self, task_id: str) -> None:
+        response = self.client.post(
+            f"/api/tasks/{task_id}/start",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200, response.json)
 
     def _create_firmware_package(self, package_id: str, version: str) -> None:
         database = Database(self.app.config["DATABASE_URL"])
@@ -380,6 +1027,63 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
                     1,
                 ),
             )
+
+    def _set_device_runtime_config(
+        self,
+        device_id: str,
+        provider: str,
+        config: dict | None = None,
+    ) -> None:
+        database = Database(self.app.config["DATABASE_URL"])
+        repository = DeviceRepository(database)
+        with repository.transaction() as conn:
+            repository.upsert_device_runtime_config(
+                conn,
+                family_id=self.family_id,
+                device_id=device_id,
+                provider=provider,
+                config_json=json.dumps(config or {}, ensure_ascii=False),
+                secret_ref=None,
+                status="active",
+                now=now_ms(),
+            )
+
+    def _login_family_member(self, *, role: str, phone: str) -> str:
+        code = request_debug_code(self.client, phone)
+        login = self.client.post(
+            "/api/auth/sms/login",
+            json={"phone": phone, "code": code},
+        )
+        self.assertEqual(login.status_code, 200, login.json)
+        token = login.json["tokens"]["accessToken"]
+        user_id = login.json["user"]["id"]
+        database = Database(self.app.config["DATABASE_URL"])
+        now = now_ms()
+        with database.transaction() as conn:
+            conn.execute(
+                "UPDATE users SET family_id = ? WHERE id = ?",
+                (self.family_id, user_id),
+            )
+            conn.execute(
+                """
+                INSERT INTO family_members(
+                  id, family_id, user_id, name, phone, role, status,
+                  notify_enabled, created_at, updated_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, 'active', 1, ?, ?)
+                """,
+                (
+                    f"member_test_{role}_{user_id}",
+                    self.family_id,
+                    user_id,
+                    "只读家人",
+                    phone,
+                    role,
+                    now,
+                    now,
+                ),
+            )
+        return token
 
     def _auth_headers(self) -> dict:
         return {"Authorization": f"Bearer {self.access_token}"}

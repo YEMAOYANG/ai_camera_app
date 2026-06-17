@@ -11,6 +11,7 @@ from repositories.device_repository import DeviceRepository
 from schemas.camera import camera_command_payload
 from services.auth_service import AuthService
 from services.camera_bridge_service import CameraBridgeError, CameraBridgeService
+from services.device_runtime_resolver import DeviceRuntimeResolver
 
 
 class CameraCommandService:
@@ -19,31 +20,41 @@ class CameraCommandService:
         database_url: str | Path,
         *,
         auth_service: AuthService,
-        camera_service: CameraBridgeService,
+        camera_service: CameraBridgeService | None = None,
+        runtime_resolver: DeviceRuntimeResolver | None = None,
     ):
         database = Database(database_url)
         self.repository = CameraCommandRepository(database)
         self.device_repository = DeviceRepository(database)
         self.auth_service = auth_service
-        self.camera_service = camera_service
+        self.runtime_resolver = runtime_resolver
+        self.camera_service = camera_service or (runtime_resolver.global_bridge() if runtime_resolver else None)
 
     def speak(self, access_token: str, data: dict) -> dict:
         context = self.auth_service.authenticate(access_token)
         text = self._required_text(data, "text", "请输入要提醒孩子的话")
+        bridge, device_id = self._runtime_for_command(
+            family_id=context["family"]["id"],
+            device_id=self._optional_text(data, "deviceId"),
+        )
         return {
             "ok": True,
             "command": self._execute_command(
                 family_id=context["family"]["id"],
                 command_type="speak",
                 request_payload={"text": text},
-                runner=lambda: self.camera_service.speak(text),
-                device_id=self._optional_text(data, "deviceId"),
+                runner=lambda: bridge.speak(text),
+                device_id=device_id,
                 task_id=self._optional_text(data, "taskId"),
             ),
         }
 
     def snapshot(self, access_token: str, data: dict) -> dict:
         context = self.auth_service.authenticate(access_token)
+        bridge, device_id = self._runtime_for_command(
+            family_id=context["family"]["id"],
+            device_id=self._optional_text(data, "deviceId"),
+        )
         return {
             "ok": True,
             "command": self._execute_command(
@@ -52,9 +63,9 @@ class CameraCommandService:
                 request_payload={},
                 runner=lambda: {
                     "ok": True,
-                    "contentType": self.camera_service.fetch_snapshot().content_type,
+                    "contentType": bridge.fetch_snapshot().content_type,
                 },
-                device_id=self._optional_text(data, "deviceId"),
+                device_id=device_id,
                 task_id=self._optional_text(data, "taskId"),
             ),
         }
@@ -63,42 +74,54 @@ class CameraCommandService:
         context = self.auth_service.authenticate(access_token)
         direction = self._ptz_direction(data.get("direction"))
         step = self._ptz_step(data.get("step"))
+        bridge, device_id = self._runtime_for_command(
+            family_id=context["family"]["id"],
+            device_id=self._optional_text(data, "deviceId"),
+        )
         return {
             "ok": True,
             "command": self._execute_command(
                 family_id=context["family"]["id"],
                 command_type="ptz_move",
                 request_payload={"direction": direction, "step": step},
-                runner=lambda: self.camera_service.ptz_move(direction, step),
-                device_id=self._optional_text(data, "deviceId"),
+                runner=lambda: bridge.ptz_move(direction, step),
+                device_id=device_id,
                 task_id=self._optional_text(data, "taskId"),
             ),
         }
 
     def monitor_start(self, access_token: str, data: dict) -> dict:
         context = self.auth_service.authenticate(access_token)
+        bridge, device_id = self._runtime_for_command(
+            family_id=context["family"]["id"],
+            device_id=self._optional_text(data, "deviceId"),
+        )
         return {
             "ok": True,
             "command": self._execute_command(
                 family_id=context["family"]["id"],
                 command_type="start_monitor",
                 request_payload={},
-                runner=self.camera_service.start_monitor,
-                device_id=self._optional_text(data, "deviceId"),
+                runner=bridge.start_monitor,
+                device_id=device_id,
                 task_id=self._optional_text(data, "taskId"),
             ),
         }
 
     def monitor_stop(self, access_token: str, data: dict) -> dict:
         context = self.auth_service.authenticate(access_token)
+        bridge, device_id = self._runtime_for_command(
+            family_id=context["family"]["id"],
+            device_id=self._optional_text(data, "deviceId"),
+        )
         return {
             "ok": True,
             "command": self._execute_command(
                 family_id=context["family"]["id"],
                 command_type="stop_monitor",
                 request_payload={},
-                runner=self.camera_service.stop_monitor,
-                device_id=self._optional_text(data, "deviceId"),
+                runner=bridge.stop_monitor,
+                device_id=device_id,
                 task_id=self._optional_text(data, "taskId"),
             ),
         }
@@ -132,18 +155,28 @@ class CameraCommandService:
             return self.monitor_stop(access_token, next_data)
         raise ApiError("unsupported_device_command", "暂不支持这个设备操作")
 
-    def recent_events(self, access_token: str, args) -> dict:
+    def recent_events(
+        self,
+        access_token: str,
+        args,
+        *,
+        device_id: str | None = None,
+        include_unassigned: bool = False,
+    ) -> dict:
         context = self.auth_service.authenticate(access_token)
         limit = self._limit_arg(args.get("limit") if args else None)
         with self.repository.transaction() as conn:
             commands = self.repository.list_recent_commands(
                 conn,
                 family_id=context["family"]["id"],
+                device_id=device_id,
                 limit=limit,
             )
             task_events = self.repository.list_recent_task_events(
                 conn,
                 family_id=context["family"]["id"],
+                device_id=device_id,
+                include_unassigned=include_unassigned,
                 limit=limit,
             )
         events = [
@@ -161,13 +194,17 @@ class CameraCommandService:
         task_id: str | None = None,
         device_id: str | None = None,
     ) -> dict:
+        bridge, resolved_device_id = self._runtime_for_command(
+            family_id=family_id,
+            device_id=device_id,
+        )
         return self._execute_command(
             family_id=family_id,
             command_type="speak",
             request_payload={"text": text},
-            runner=lambda: self.camera_service.speak(text),
+            runner=lambda: bridge.speak(text),
             task_id=task_id,
-            device_id=device_id,
+            device_id=resolved_device_id,
         )
 
     def internal_start_monitor(
@@ -177,14 +214,36 @@ class CameraCommandService:
         task_id: str | None = None,
         device_id: str | None = None,
     ) -> dict:
+        bridge, resolved_device_id = self._runtime_for_command(
+            family_id=family_id,
+            device_id=device_id,
+        )
         return self._execute_command(
             family_id=family_id,
             command_type="start_monitor",
             request_payload={},
-            runner=self.camera_service.start_monitor,
+            runner=bridge.start_monitor,
             task_id=task_id,
-            device_id=device_id,
+            device_id=resolved_device_id,
         )
+
+    def internal_task_observation(
+        self,
+        *,
+        family_id: str,
+        task: dict,
+        device_id: str | None = None,
+    ) -> dict:
+        bridge, _ = self._runtime_for_command(family_id=family_id, device_id=device_id)
+        return bridge.task_observation(task)
+
+    def _runtime_for_command(self, *, family_id: str, device_id: str | None) -> tuple[CameraBridgeService, str | None]:
+        if self.runtime_resolver is None:
+            if self.camera_service is None:
+                raise ApiError("camera_runtime_not_configured", "摄像头暂时不可用。", 503)
+            return self.camera_service, device_id
+        resolved = self.runtime_resolver.resolve(family_id=family_id, device_id=device_id)
+        return resolved.bridge, resolved.device_id or device_id
 
     def _execute_command(
         self,
@@ -318,6 +377,7 @@ def _camera_command_event_payload(row) -> dict:
         "id": row["id"],
         "source": "camera_command",
         "eventType": command_type,
+        "deviceId": row.get("device_id") or "",
         "title": _command_title(command_type),
         "message": message,
         "status": status,
@@ -333,6 +393,7 @@ def _task_event_payload(row) -> dict:
         "id": row["id"],
         "source": "task_event",
         "eventType": event_type,
+        "deviceId": row.get("device_id") or "",
         "title": _task_event_title(event_type),
         "message": row.get("message") or _task_event_title(event_type),
         "status": "recorded",

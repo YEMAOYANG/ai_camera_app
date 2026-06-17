@@ -126,17 +126,24 @@ class CameraCommandRepository:
         conn: DatabaseConnection,
         *,
         family_id: str,
+        device_id: str | None = None,
         limit: int = 30,
     ) -> list[DatabaseRow]:
+        clauses = ["family_id = ?"]
+        values: list[object] = [family_id]
+        if device_id:
+            clauses.append("device_id = ?")
+            values.append(device_id)
+        values.append(limit)
         return list(
             conn.execute(
-                """
+                f"""
                 SELECT * FROM camera_commands
-                WHERE family_id = ?
+                WHERE {' AND '.join(clauses)}
                 ORDER BY COALESCE(completed_at, updated_at, created_at) DESC, id DESC
                 LIMIT ?
                 """,
-                (family_id, limit),
+                values,
             ).fetchall()
         )
 
@@ -145,16 +152,30 @@ class CameraCommandRepository:
         conn: DatabaseConnection,
         *,
         family_id: str,
+        device_id: str | None = None,
+        include_unassigned: bool = False,
         limit: int = 30,
     ) -> list[DatabaseRow]:
+        clauses = ["te.family_id = ?"]
+        values: list[object] = [family_id]
+        if device_id:
+            if include_unassigned:
+                clauses.append("(t.device_id = ? OR t.device_id IS NULL OR t.device_id = '')")
+                values.append(device_id)
+            else:
+                clauses.append("t.device_id = ?")
+                values.append(device_id)
+        values.append(limit)
         return list(
             conn.execute(
-                """
-                SELECT * FROM task_events
-                WHERE family_id = ?
-                ORDER BY created_at DESC, id DESC
+                f"""
+                SELECT te.*, t.device_id
+                FROM task_events te
+                LEFT JOIN tasks t ON t.family_id = te.family_id AND t.id = te.task_id
+                WHERE {' AND '.join(clauses)}
+                ORDER BY te.created_at DESC, te.id DESC
                 LIMIT ?
                 """,
-                (family_id, limit),
+                values,
             ).fetchall()
         )

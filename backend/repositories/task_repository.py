@@ -238,12 +238,21 @@ class TaskRepository:
         *,
         family_id: str,
         scheduled_date: str | None = None,
+        device_id: str | None = None,
+        include_unassigned: bool = False,
     ) -> list[DatabaseRow]:
         clauses = ["family_id = ?", "status IN (?, ?)"]
         values: list[str] = [family_id, TASK_IN_PROGRESS, TASK_DELAYED]
         if scheduled_date:
             clauses.append("scheduled_date = ?")
             values.append(scheduled_date)
+        if device_id:
+            if include_unassigned:
+                clauses.append("(device_id = ? OR device_id IS NULL OR device_id = '')")
+                values.append(device_id)
+            else:
+                clauses.append("device_id = ?")
+                values.append(device_id)
         return list(
             conn.execute(
                 f"""

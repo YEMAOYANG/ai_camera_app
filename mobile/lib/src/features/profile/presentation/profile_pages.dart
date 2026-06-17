@@ -11,6 +11,7 @@ import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
 import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
 import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
+import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
@@ -2444,7 +2445,11 @@ class DeviceManagementPage extends ConsumerWidget {
                           ? AppListRowTone.green
                           : AppListRowTone.neutral,
                       trailing: StatusChip(
-                        label: device.status == 'unbound' ? '已解绑' : '已绑定',
+                        label: device.isDefault
+                            ? '默认'
+                            : device.status == 'unbound'
+                            ? '已解绑'
+                            : '已绑定',
                         tone: device.status == 'unbound'
                             ? StatusTone.neutral
                             : StatusTone.success,
@@ -2513,6 +2518,7 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
               saving: _saving,
               canManage: canManage,
               onSave: _save,
+              onSetDefault: data.device.isDefault ? null : _setDefault,
               onUnbind: _unbind,
             ),
           ];
@@ -2541,11 +2547,26 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
           );
       ref.invalidate(deviceOverviewProvider(widget.deviceId));
       ref.invalidate(devicesProvider);
+      ref.invalidate(selectedDeviceProvider);
       if (mounted) _toast(context, '设备信息已保存');
     } on DeviceException catch (error) {
       if (mounted) _toast(context, error.message);
     } finally {
       if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _setDefault() async {
+    try {
+      await ref
+          .read(deviceRepositoryProvider)
+          .setDefaultDevice(widget.deviceId);
+      await selectDevice(ref, widget.deviceId);
+      ref.invalidate(deviceOverviewProvider(widget.deviceId));
+      ref.invalidate(devicesProvider);
+      if (mounted) _toast(context, '已设为默认设备');
+    } on DeviceException catch (error) {
+      if (mounted) _toast(context, error.message);
     }
   }
 
@@ -2560,6 +2581,7 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
     try {
       await ref.read(deviceRepositoryProvider).unbindDevice(widget.deviceId);
       ref.invalidate(devicesProvider);
+      ref.invalidate(selectedDeviceProvider);
       if (mounted) context.pop();
     } on DeviceException catch (error) {
       if (mounted) _toast(context, error.message);
@@ -2575,6 +2597,7 @@ class _DeviceDetailBody extends StatelessWidget {
     required this.saving,
     required this.canManage,
     required this.onSave,
+    required this.onSetDefault,
     required this.onUnbind,
   });
 
@@ -2584,6 +2607,7 @@ class _DeviceDetailBody extends StatelessWidget {
   final bool saving;
   final bool canManage;
   final VoidCallback onSave;
+  final VoidCallback? onSetDefault;
   final VoidCallback onUnbind;
 
   @override
@@ -2657,6 +2681,10 @@ class _DeviceDetailBody extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         if (canManage) ...[
+          if (onSetDefault != null) ...[
+            AppSecondaryButton(label: '设为默认设备', onTap: onSetDefault),
+            const SizedBox(height: 10),
+          ],
           AppPrimaryButton(
             label: saving ? '保存中' : '保存设备信息',
             onTap: saving ? null : onSave,

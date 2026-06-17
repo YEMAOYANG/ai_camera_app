@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
 import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
 import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
@@ -114,9 +115,10 @@ class _LiveMonitorScreenState extends ConsumerState<LiveMonitorScreen>
       _message = '正在连接实时画面';
     });
     try {
+      final selectedDevice = await ref.read(selectedDeviceProvider.future);
       final session = await ref
           .read(cameraRepositoryProvider)
-          .createWebRtcSession();
+          .createWebRtcSession(deviceId: selectedDevice?.id);
       final socket = await WebSocket.connect(session.signalingUrl);
       _signalingSocket = socket;
 
@@ -244,9 +246,10 @@ class _LiveMonitorScreenState extends ConsumerState<LiveMonitorScreen>
 
   Future<void> _movePtz(String direction) async {
     try {
+      final selectedDevice = await ref.read(selectedDeviceProvider.future);
       await ref
           .read(cameraRepositoryProvider)
-          .movePtz(direction, step: _ptzSpeed);
+          .movePtz(direction, step: _ptzSpeed, deviceId: selectedDevice?.id);
       ref
         ..invalidate(cameraEventsProvider)
         ..invalidate(liveCareStatusProvider);

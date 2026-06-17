@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
+import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
 import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
@@ -33,6 +34,8 @@ void invalidateAuthenticatedSessionData(WidgetRef ref) {
   ref.invalidate(rewardDetailProvider);
 
   ref.invalidate(devicesProvider);
+  ref.invalidate(selectedDeviceIdProvider);
+  ref.invalidate(selectedDeviceProvider);
   ref.invalidate(primaryDeviceOverviewProvider);
   ref.invalidate(primaryFirmwareStatusProvider);
   ref.invalidate(deviceOverviewProvider);

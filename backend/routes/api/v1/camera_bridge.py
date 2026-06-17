@@ -4,8 +4,8 @@ from flask import Blueprint, Response, jsonify, request, stream_with_context
 
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token, json_body
-from services.camera_bridge_service import CameraBridgeError, CameraBridgeService
-from services.service_factory import auth_service, camera_bridge_service, camera_command_service, task_service
+from services.camera_bridge_service import CameraBridgeError
+from services.service_factory import auth_service, camera_command_service, device_runtime_resolver, task_service
 
 
 camera_bp = Blueprint("camera", __name__)
@@ -17,11 +17,22 @@ def _json_response(payload: dict):
     return jsonify(payload), 502
 
 
+def _resolve_camera_runtime_for_request():
+    access_token = bearer_token(request)
+    context = auth_service().authenticate(access_token)
+    device_id = str(request.args.get("deviceId") or "").strip() or None
+    resolved = device_runtime_resolver().resolve(
+        family_id=context["family"]["id"],
+        device_id=device_id,
+    )
+    return access_token, context, resolved
+
+
 @camera_bp.get("/health")
 def camera_health():
     try:
-        auth_service().authenticate(bearer_token(request))
-        return _json_response(camera_bridge_service().health())
+        _, _, resolved = _resolve_camera_runtime_for_request()
+        return _json_response(resolved.bridge.health())
     except ApiError as exc:
         return error_response(exc)
 
@@ -29,9 +40,13 @@ def camera_health():
 @camera_bp.get("/status")
 def camera_status():
     try:
-        access_token = bearer_token(request)
-        current_task = task_service().current_in_progress(access_token)
-        return jsonify(camera_bridge_service().status(current_task=current_task))
+        access_token, _, resolved = _resolve_camera_runtime_for_request()
+        current_task = task_service().current_in_progress(
+            access_token,
+            device_id=resolved.device_id,
+            include_unassigned=bool((resolved.device or {}).get("is_default")),
+        )
+        return jsonify(resolved.bridge.status(current_task=current_task))
     except ApiError as exc:
         return error_response(exc)
 
@@ -39,8 +54,8 @@ def camera_status():
 @camera_bp.get("/runtime")
 def camera_runtime():
     try:
-        auth_service().authenticate(bearer_token(request))
-        return _json_response(camera_bridge_service().runtime())
+        _, _, resolved = _resolve_camera_runtime_for_request()
+        return _json_response(resolved.bridge.runtime())
     except ApiError as exc:
         return error_response(exc)
 
@@ -48,8 +63,8 @@ def camera_runtime():
 @camera_bp.get("/speaker/status")
 def speaker_status():
     try:
-        auth_service().authenticate(bearer_token(request))
-        return _json_response(camera_bridge_service().speaker_status())
+        _, _, resolved = _resolve_camera_runtime_for_request()
+        return _json_response(resolved.bridge.speaker_status())
     except ApiError as exc:
         return error_response(exc)
 
@@ -57,8 +72,8 @@ def speaker_status():
 @camera_bp.get("/snapshot")
 def snapshot():
     try:
-        auth_service().authenticate(bearer_token(request))
-        result = camera_bridge_service().fetch_snapshot()
+        _, _, resolved = _resolve_camera_runtime_for_request()
+        result = resolved.bridge.fetch_snapshot()
         return Response(
             result.body,
             mimetype=result.content_type,
@@ -81,8 +96,8 @@ def snapshot():
 @camera_bp.get("/stream")
 def stream():
     try:
-        auth_service().authenticate(bearer_token(request))
-        upstream = camera_bridge_service().open_stream()
+        _, _, resolved = _resolve_camera_runtime_for_request()
+        upstream = resolved.bridge.open_stream()
         content_type = upstream.headers.get("content-type", "multipart/x-mixed-replace")
 
         def generate():
@@ -107,8 +122,8 @@ def stream():
 @camera_bp.get("/webrtc/session")
 def webrtc_session():
     try:
-        auth_service().authenticate(bearer_token(request))
-        return jsonify(camera_bridge_service().webrtc_session())
+        _, _, resolved = _resolve_camera_runtime_for_request()
+        return jsonify(resolved.bridge.webrtc_session())
     except CameraBridgeError as exc:
         return jsonify({"ok": False, "error": exc.code, "message": "实时画面暂时无法连接，请稍后再试。"}), exc.status_code
     except ApiError as exc:
@@ -118,12 +133,12 @@ def webrtc_session():
 @camera_bp.post("/webrtc/offer")
 def webrtc_offer():
     try:
-        auth_service().authenticate(bearer_token(request))
+        _, _, resolved = _resolve_camera_runtime_for_request()
         data = json_body(request)
         offer_sdp = str(data.get("sdp") or "").strip()
         if not offer_sdp:
             return jsonify({"ok": False, "error": "invalid_webrtc_offer", "message": "实时画面连接信息不完整。"}), 400
-        return jsonify(camera_bridge_service().webrtc_offer(offer_sdp))
+        return jsonify(resolved.bridge.webrtc_offer(offer_sdp))
     except CameraBridgeError as exc:
         return jsonify({"ok": False, "error": exc.code, "message": "实时画面暂时无法连接，请稍后再试。"}), exc.status_code
     except ApiError as exc:
@@ -173,8 +188,8 @@ def monitor_stop():
 @camera_bp.get("/monitor/status")
 def monitor_status():
     try:
-        auth_service().authenticate(bearer_token(request))
-        payload = camera_bridge_service().monitor_status()
+        _, _, resolved = _resolve_camera_runtime_for_request()
+        payload = resolved.bridge.monitor_status()
         status = payload.get("monitorRuntime", {}).get("data", {}).get("monitor_runtime") or {}
         return jsonify(
             {
@@ -199,6 +214,14 @@ def monitor_status():
 @camera_bp.get("/events")
 def camera_events():
     try:
-        return jsonify(camera_command_service().recent_events(bearer_token(request), request.args))
+        access_token, _, resolved = _resolve_camera_runtime_for_request()
+        return jsonify(
+            camera_command_service().recent_events(
+                access_token,
+                request.args,
+                device_id=resolved.device_id,
+                include_unassigned=bool((resolved.device or {}).get("is_default")),
+            )
+        )
     except ApiError as exc:
         return error_response(exc)

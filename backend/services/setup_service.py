@@ -6,6 +6,8 @@ import re
 from core.database import Database
 from core.errors import ApiError
 from core.security import now_ms
+from models.setup import SETUP_DONE
+from repositories.device_repository import DeviceRepository
 from repositories.setup_repository import SetupRepository
 from schemas.auth import normalize_phone
 from schemas.setup import setup_payload
@@ -54,7 +56,9 @@ class SetupService:
     ):
         self.auth_service = auth_service
         self.camera_command_service_factory = camera_command_service_factory
-        self.repository = SetupRepository(Database(database_url))
+        database = Database(database_url)
+        self.repository = SetupRepository(database)
+        self.device_repository = DeviceRepository(database)
 
     def status(self, access_token: str) -> dict:
         context = self._auth_context(access_token)
@@ -126,6 +130,36 @@ class SetupService:
         with self.repository.transaction() as conn:
             progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
             self._require_setup_steps(progress, "parent_identity")
+            existing_default = self.device_repository.ensure_default_device(
+                conn,
+                family_id=context["family"]["id"],
+                now=now,
+            )
+            if binding_code:
+                global_existing = self.device_repository.find_active_device_by_binding_code_global(
+                    conn,
+                    binding_code=binding_code,
+                )
+                if global_existing and global_existing["family_id"] != context["family"]["id"]:
+                    raise ApiError("device_already_bound", "这台设备已绑定到其他家庭。", 409)
+            if progress.device_binding == SETUP_DONE and existing_default:
+                existing_code = str(existing_default.get("binding_code") or "").strip()
+                if binding_code and binding_code == existing_code:
+                    return self._response(
+                        progress,
+                        {
+                            "device": {
+                                "id": existing_default["id"],
+                                "name": existing_default["name"],
+                                "status": existing_default["status"],
+                            }
+                        },
+                    )
+                raise ApiError(
+                    "setup_device_already_bound",
+                    "已绑定摄像头，请在设备管理中添加新设备。",
+                    409,
+                )
             device_id = self.repository.save_device(
                 conn,
                 family_id=context["family"]["id"],
@@ -140,6 +174,13 @@ class SetupService:
                 column="device_binding_status",
                 now=now,
             )
+            if existing_default is None:
+                self.device_repository.set_default_device(
+                    conn,
+                    family_id=context["family"]["id"],
+                    device_id=device_id,
+                    now=now,
+                )
             progress = self.repository.get_or_create_progress(
                 conn,
                 family_id=context["family"]["id"],
@@ -248,9 +289,17 @@ class SetupService:
                 "wifi",
                 "child_profile",
             )
+            default_device = self.device_repository.ensure_default_device(
+                conn,
+                family_id=context["family"]["id"],
+                now=now,
+            )
+            if default_device is None:
+                raise ApiError("device_not_found", "请先绑定摄像头。", 404)
             device_id = self.repository.save_camera_name(
                 conn,
                 family_id=context["family"]["id"],
+                device_id=default_device["id"],
                 wake_name=wake_name,
                 now=now,
             )

@@ -108,13 +108,23 @@ class TaskService:
             task = self._task_or_error(conn, context["family"]["id"], task_id)
             return {"ok": True, "task": task_payload(task)}
 
-    def current_in_progress(self, access_token: str) -> dict | None:
+    def current_in_progress(
+        self,
+        access_token: str,
+        *,
+        device_id: str | None = None,
+        include_unassigned: bool = False,
+    ) -> dict | None:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
+            # Tasks created before multi-camera selection may not have device_id.
+            # Treat those legacy tasks as belonging to the explicit default camera only.
             rows = self.repository.list_in_progress_tasks(
                 conn,
                 family_id=context["family"]["id"],
                 scheduled_date=date.today().isoformat(),
+                device_id=device_id,
+                include_unassigned=include_unassigned,
             )
             return task_payload(rows[0]) if rows else None
 

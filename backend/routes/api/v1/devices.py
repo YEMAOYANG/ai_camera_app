@@ -18,10 +18,48 @@ def list_devices():
         return error_response(exc)
 
 
+@devices_bp.post("")
+def bind_device():
+    try:
+        return jsonify(device_service().bind_device(bearer_token(request), json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@devices_bp.get("/default")
+def default_device():
+    try:
+        return jsonify(device_service().default_device(bearer_token(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @devices_bp.get("/<device_id>")
 def get_device(device_id: str):
     try:
         return jsonify(device_service().get_device(bearer_token(request), device_id))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@devices_bp.get("/<device_id>/runtime-config")
+def get_runtime_config(device_id: str):
+    try:
+        return jsonify(device_service().get_runtime_config(bearer_token(request), device_id))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@devices_bp.put("/<device_id>/runtime-config")
+def update_runtime_config(device_id: str):
+    try:
+        return jsonify(
+            device_service().update_runtime_config(
+                bearer_token(request),
+                device_id,
+                json_body(request),
+            )
+        )
     except ApiError as exc:
         return error_response(exc)
 
@@ -38,6 +76,14 @@ def update_device(device_id: str):
 def rename_device(device_id: str):
     try:
         return jsonify(device_service().rename_device(bearer_token(request), device_id, json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@devices_bp.post("/<device_id>/set-default")
+def set_default_device(device_id: str):
+    try:
+        return jsonify(device_service().set_default_device(bearer_token(request), device_id))
     except ApiError as exc:
         return error_response(exc)
 

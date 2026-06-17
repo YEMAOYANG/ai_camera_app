@@ -422,23 +422,18 @@ class SetupRepository:
         conn: DatabaseConnection,
         *,
         family_id: str,
+        device_id: str,
         wake_name: str,
         now: int,
     ) -> str | None:
-        row = conn.execute(
-            "SELECT id FROM devices WHERE family_id = ? AND status <> 'unbound' ORDER BY created_at LIMIT 1",
-            (family_id,),
-        ).fetchone()
-        if row is None:
-            return None
         conn.execute(
             """
             UPDATE devices SET wake_name = ?, updated_at = ?
             WHERE family_id = ? AND id = ?
             """,
-            (wake_name, now, family_id, row["id"]),
+            (wake_name, now, family_id, device_id),
         )
-        return row["id"]
+        return device_id
 
     def mark_camera_name_intro_attempt(
         self,

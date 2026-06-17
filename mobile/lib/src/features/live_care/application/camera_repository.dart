@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/core/network/api_client.dart';
+import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
 import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
 
 final cameraRepositoryProvider = Provider<CameraRepository>((ref) {
@@ -12,36 +13,48 @@ final cameraRepositoryProvider = Provider<CameraRepository>((ref) {
   );
 });
 
-final cameraHealthProvider = FutureProvider<CameraHealth>((ref) {
-  return ref.watch(cameraRepositoryProvider).health();
+final cameraHealthProvider = FutureProvider<CameraHealth>((ref) async {
+  final device = await ref.watch(selectedDeviceProvider.future);
+  return ref.watch(cameraRepositoryProvider).health(deviceId: device?.id);
 });
 
-final cameraRuntimeProvider = FutureProvider<CameraRuntime>((ref) {
-  return ref.watch(cameraRepositoryProvider).runtime();
+final cameraRuntimeProvider = FutureProvider<CameraRuntime>((ref) async {
+  final device = await ref.watch(selectedDeviceProvider.future);
+  return ref.watch(cameraRepositoryProvider).runtime(deviceId: device?.id);
 });
 
-final cameraStatusProvider = FutureProvider<CameraStatus>((ref) {
-  return ref.watch(cameraRepositoryProvider).status();
+final cameraStatusProvider = FutureProvider<CameraStatus>((ref) async {
+  final device = await ref.watch(selectedDeviceProvider.future);
+  return ref.watch(cameraRepositoryProvider).status(deviceId: device?.id);
 });
 
-final cameraMonitorStatusProvider = FutureProvider<CameraMonitorStatus>((ref) {
-  return ref.watch(cameraRepositoryProvider).monitorStatus();
+final cameraMonitorStatusProvider = FutureProvider<CameraMonitorStatus>((
+  ref,
+) async {
+  final device = await ref.watch(selectedDeviceProvider.future);
+  return ref
+      .watch(cameraRepositoryProvider)
+      .monitorStatus(deviceId: device?.id);
 });
 
-final cameraSnapshotProvider = FutureProvider<CameraSnapshotFrame>((ref) {
-  return ref.watch(cameraRepositoryProvider).snapshot();
+final cameraSnapshotProvider = FutureProvider<CameraSnapshotFrame>((ref) async {
+  final device = await ref.watch(selectedDeviceProvider.future);
+  return ref.watch(cameraRepositoryProvider).snapshot(deviceId: device?.id);
 });
 
-final cameraEventsProvider = FutureProvider<List<LiveCareEvent>>((ref) {
-  return ref.watch(cameraRepositoryProvider).events();
+final cameraEventsProvider = FutureProvider<List<LiveCareEvent>>((ref) async {
+  final device = await ref.watch(selectedDeviceProvider.future);
+  return ref.watch(cameraRepositoryProvider).events(deviceId: device?.id);
 });
 
 final liveCareStatusProvider = FutureProvider<LiveCareStatus>((ref) async {
   final repository = ref.watch(cameraRepositoryProvider);
-  final health = await repository.health();
-  final runtime = await repository.runtime();
-  final status = await repository.status();
-  final monitor = await repository.monitorStatus();
+  final device = await ref.watch(selectedDeviceProvider.future);
+  final deviceId = device?.id;
+  final health = await repository.health(deviceId: deviceId);
+  final runtime = await repository.runtime(deviceId: deviceId);
+  final status = await repository.status(deviceId: deviceId);
+  final monitor = await repository.monitorStatus(deviceId: deviceId);
   return LiveCareStatus(
     health: health,
     runtime: runtime,
@@ -56,9 +69,12 @@ class CameraRepository {
   final ApiClient _apiClient;
   final Dio _dio;
 
-  Future<CameraHealth> health() async {
+  Future<CameraHealth> health({String? deviceId}) async {
     try {
-      final response = await _apiClient.get('/camera/health');
+      final response = await _apiClient.get(
+        '/camera/health',
+        queryParameters: _deviceQuery(deviceId),
+      );
       return CameraHealth.fromJson(_asMap(response.data));
     } on DioException catch (error) {
       final data = error.response?.data;
@@ -67,9 +83,12 @@ class CameraRepository {
     }
   }
 
-  Future<CameraRuntime> runtime() async {
+  Future<CameraRuntime> runtime({String? deviceId}) async {
     try {
-      final response = await _apiClient.get('/camera/runtime');
+      final response = await _apiClient.get(
+        '/camera/runtime',
+        queryParameters: _deviceQuery(deviceId),
+      );
       return CameraRuntime.fromJson(_asMap(response.data));
     } on DioException catch (error) {
       final data = error.response?.data;
@@ -78,9 +97,12 @@ class CameraRepository {
     }
   }
 
-  Future<CameraStatus> status() async {
+  Future<CameraStatus> status({String? deviceId}) async {
     try {
-      final response = await _apiClient.get('/camera/status');
+      final response = await _apiClient.get(
+        '/camera/status',
+        queryParameters: _deviceQuery(deviceId),
+      );
       return CameraStatus.fromJson(_asMap(response.data));
     } on DioException catch (error) {
       final data = error.response?.data;
@@ -89,9 +111,12 @@ class CameraRepository {
     }
   }
 
-  Future<CameraMonitorStatus> monitorStatus() async {
+  Future<CameraMonitorStatus> monitorStatus({String? deviceId}) async {
     try {
-      final response = await _apiClient.get('/camera/monitor/status');
+      final response = await _apiClient.get(
+        '/camera/monitor/status',
+        queryParameters: _deviceQuery(deviceId),
+      );
       return CameraMonitorStatus.fromJson(_asMap(response.data));
     } on DioException catch (error) {
       final data = error.response?.data;
@@ -100,10 +125,11 @@ class CameraRepository {
     }
   }
 
-  Future<CameraSnapshotFrame> snapshot() async {
+  Future<CameraSnapshotFrame> snapshot({String? deviceId}) async {
     try {
       final response = await _dio.get<List<int>>(
         '/camera/snapshot',
+        queryParameters: _deviceQuery(deviceId),
         options: Options(responseType: ResponseType.bytes),
       );
       final bytes = response.data;
@@ -144,9 +170,12 @@ class CameraRepository {
     }
   }
 
-  Future<CameraWebRtcSession> createWebRtcSession() async {
+  Future<CameraWebRtcSession> createWebRtcSession({String? deviceId}) async {
     try {
-      final response = await _apiClient.get('/camera/webrtc/session');
+      final response = await _apiClient.get(
+        '/camera/webrtc/session',
+        queryParameters: _deviceQuery(deviceId),
+      );
       return CameraWebRtcSession.fromJson(
         _asMap(response.data),
       ).normalizedForApiBase(_dio.options.baseUrl);
@@ -155,13 +184,14 @@ class CameraRepository {
     }
   }
 
-  Future<void> speak(String text, {String? taskId}) async {
+  Future<void> speak(String text, {String? taskId, String? deviceId}) async {
     try {
       await _apiClient.post(
         '/camera/commands/speak',
         data: {
           'text': text,
           if (taskId != null && taskId.isNotEmpty) 'taskId': taskId,
+          if (deviceId != null && deviceId.isNotEmpty) 'deviceId': deviceId,
         },
       );
     } on DioException catch (error) {
@@ -169,20 +199,31 @@ class CameraRepository {
     }
   }
 
-  Future<void> movePtz(String direction, {int step = 1}) async {
+  Future<void> movePtz(
+    String direction, {
+    int step = 1,
+    String? deviceId,
+  }) async {
     try {
       await _apiClient.post(
         '/camera/commands/ptz',
-        data: {'direction': direction, 'step': step},
+        data: {
+          'direction': direction,
+          'step': step,
+          if (deviceId != null && deviceId.isNotEmpty) 'deviceId': deviceId,
+        },
       );
     } on DioException catch (error) {
       throw _fromDio(error, fallback: '暂时无法控制摄像头方向。');
     }
   }
 
-  Future<List<LiveCareEvent>> events() async {
+  Future<List<LiveCareEvent>> events({String? deviceId}) async {
     try {
-      final response = await _apiClient.get('/camera/events');
+      final response = await _apiClient.get(
+        '/camera/events',
+        queryParameters: _deviceQuery(deviceId),
+      );
       final raw = _asMap(response.data)['events'];
       if (raw is! List) return const [];
       return raw.map((event) => LiveCareEvent.fromJson(_asMap(event))).toList();
@@ -205,6 +246,12 @@ class CameraRepository {
     }
     return CameraException(fallback, code: 'network_error');
   }
+}
+
+Map<String, String> _deviceQuery(String? deviceId) {
+  final value = deviceId?.trim();
+  if (value == null || value.isEmpty) return const {};
+  return {'deviceId': value};
 }
 
 Map<String, dynamic> _asMap(dynamic value) {
