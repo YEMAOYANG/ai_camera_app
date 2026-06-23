@@ -49,6 +49,37 @@ class DeviceRepository {
     }
   }
 
+  Future<List<DiscoveredCameraCandidate>>
+  discoverNearbyCameraCandidates() async {
+    await Future<void>.delayed(const Duration(milliseconds: 220));
+    return const [
+      DiscoveredCameraCandidate(
+        id: 'nearby-child-room',
+        displayName: '儿童房摄像头',
+        bindingCode: 'AI-CARE-NEARBY-KINDERGARTEN-V1-CHILD',
+        signalStrength: 92,
+        status: 'ready',
+        roomHint: '儿童房',
+      ),
+      DiscoveredCameraCandidate(
+        id: 'nearby-living-room',
+        displayName: '客厅摄像头',
+        bindingCode: 'AI-CARE-NEARBY-KINDERGARTEN-V1-LIVING',
+        signalStrength: 76,
+        status: 'ready',
+        roomHint: '客厅',
+      ),
+      DiscoveredCameraCandidate(
+        id: 'nearby-dining-room',
+        displayName: '餐厅摄像头',
+        bindingCode: 'AI-CARE-NEARBY-KINDERGARTEN-V1-DINING',
+        signalStrength: 61,
+        status: 'ready',
+        roomHint: '餐厅',
+      ),
+    ];
+  }
+
   Future<DeviceOverview?> primaryOverview() async {
     final device = await defaultDevice();
     if (device == null) return null;

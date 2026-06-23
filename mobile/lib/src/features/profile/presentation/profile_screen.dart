@@ -78,9 +78,9 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 _ProfileCategory(
                   icon: Icons.videocam_outlined,
-                  title: '设备与看护',
-                  subtitle: '摄像头、看护能力和作息时间',
-                  path: profileDeviceHubPath,
+                  title: '摄像头管理',
+                  subtitle: '摄像头、房间和默认设备',
+                  path: profileDevicesPath,
                   tone: AppListRowTone.blue,
                 ),
                 _ProfileCategory(
@@ -95,17 +95,10 @@ class ProfileScreen extends ConsumerWidget {
               title: '权益与安全',
               rows: [
                 _ProfileCategory(
-                  icon: Icons.workspace_premium_outlined,
-                  title: '订阅与权益',
-                  subtitle: '当前套餐和权益状态',
-                  path: profileSubscriptionPath,
-                  tone: AppListRowTone.amber,
-                ),
-                _ProfileCategory(
                   icon: Icons.admin_panel_settings_outlined,
-                  title: '账号与安全',
-                  subtitle: '个人信息、登录和隐私授权',
-                  path: profileAccountPath,
+                  title: '账号安全',
+                  subtitle: '登录设备和账号注销',
+                  path: profileSecurityPath,
                   tone: AppListRowTone.green,
                 ),
                 _ProfileCategory(

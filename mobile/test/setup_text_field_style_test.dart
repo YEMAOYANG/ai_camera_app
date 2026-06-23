@@ -85,6 +85,9 @@ void main() {
     expect(find.text('小班'), findsOneWidget);
     expect(find.text('中班'), findsOneWidget);
     expect(find.text('大班'), findsOneWidget);
+    expect(find.text('入睡时间'), findsNothing);
+    expect(find.text('学校'), findsNothing);
+    expect(find.text('兴趣'), findsNothing);
     expect(_choiceColor(tester, '小班'), isNot(AppColors.brandWash));
     expect(_choiceColor(tester, '中班'), isNot(AppColors.brandWash));
     expect(_choiceColor(tester, '大班'), isNot(AppColors.brandWash));

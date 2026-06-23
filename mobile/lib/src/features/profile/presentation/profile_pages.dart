@@ -2287,7 +2287,8 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
               opacity: canManageChildProfile ? 1 : 0.76,
               child: ChildProfileEditorPanel(
                 value: _value,
-                includeExtendedFields: true,
+                includeExtendedFields: false,
+                includeSleepTime: false,
                 stageOptions: const ['幼儿园'],
                 showStageSelector: false,
                 noteText: null,
@@ -2409,59 +2410,6 @@ class EmergencyContactsPage extends ConsumerWidget {
   }
 }
 
-class DeviceCareHubPage extends ConsumerWidget {
-  const DeviceCareHubPage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(selectedDeviceProvider);
-    return _Page(
-      title: '设备与看护',
-      subtitle: '管理摄像头、看护能力和作息时间。',
-      children: [
-        selected.when(
-          data: (device) => _SelectedDevicePanel(device: device),
-          loading: () => const _Loading(title: '正在同步当前摄像头'),
-          error: (error, _) => _ErrorState(
-            error: error,
-            onRetry: () => ref.invalidate(selectedDeviceProvider),
-          ),
-        ),
-        const SizedBox(height: 14),
-        AppSurface(
-          child: Column(
-            children: [
-              AppListRow(
-                icon: Icons.videocam_outlined,
-                title: '摄像头管理',
-                subtitle: '默认设备、名称和解绑',
-                tone: AppListRowTone.blue,
-                onTap: () => context.push(profileDevicesPath),
-              ),
-              const _CompactDivider(),
-              AppListRow(
-                icon: Icons.volunteer_activism_outlined,
-                title: '看护能力',
-                subtitle: '坐姿、收纳、用餐和睡眠提醒',
-                tone: AppListRowTone.green,
-                onTap: () => context.push(profileCareCapabilitiesPath),
-              ),
-              const _CompactDivider(),
-              AppListRow(
-                icon: Icons.schedule_outlined,
-                title: '作息时间',
-                subtitle: '上学日和周末的提醒时间',
-                tone: AppListRowTone.amber,
-                onTap: () => context.push(profileRoutineWindowsPath),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _SelectedDevicePanel extends StatelessWidget {
   const _SelectedDevicePanel({required this.device});
 
@@ -2516,23 +2464,19 @@ class DeviceManagementPage extends ConsumerWidget {
     final selected = ref.watch(selectedDeviceProvider);
     return _Page(
       title: '摄像头管理',
-      subtitle: '多台摄像头可按房间分开管理。',
-      trailing: IconButton(
-        tooltip: '添加摄像头',
-        onPressed: () => showAddCameraSheet(context),
-        icon: const Icon(Icons.add_circle_outline),
+      subtitle: '摄像头、房间和默认设备',
+      trailing: devices.maybeWhen<Widget?>(
+        data: (items) => items.isEmpty
+            ? null
+            : IconButton(
+                tooltip: '添加摄像头',
+                onPressed: () => showAddCameraSheet(context),
+                icon: const Icon(Icons.add_circle_outline),
+              ),
+        orElse: () => null,
       ),
       children: devices.when(
         data: (items) => [
-          selected.when(
-            data: (device) => _SelectedDevicePanel(device: device),
-            loading: () => const _Loading(title: '正在同步当前摄像头'),
-            error: (error, _) => _ErrorState(
-              error: error,
-              onRetry: () => ref.invalidate(selectedDeviceProvider),
-            ),
-          ),
-          const SizedBox(height: 14),
           if (items.isEmpty)
             AppStateView(
               variant: AppStateVariant.deviceOffline,
@@ -2543,51 +2487,49 @@ class DeviceManagementPage extends ConsumerWidget {
               compact: true,
             )
           else
-            AppSurface(
-              child: Column(
-                children: [
-                  for (var index = 0; index < items.length; index++) ...[
-                    if (index > 0) const _CompactDivider(),
-                    Builder(
-                      builder: (context) {
-                        final device = items[index];
-                        return AppListRow(
-                          icon: Icons.videocam_outlined,
-                          title: device.displayName,
-                          subtitle: _deviceListSubtitle(device),
-                          tone: device.isOnlineLike
-                              ? AppListRowTone.green
-                              : AppListRowTone.neutral,
-                          trailing: StatusChip(
-                            label: device.isDefault
-                                ? '默认'
-                                : device.status == 'unbound'
-                                ? '已解绑'
-                                : device.isOnlineLike
-                                ? '可用'
-                                : '离线',
-                            tone: device.status == 'unbound'
-                                ? StatusTone.neutral
-                                : device.isOnlineLike
-                                ? StatusTone.success
-                                : StatusTone.danger,
-                          ),
-                          onTap: () => context.push(
-                            '$profileDeviceDetailPath/${device.id}',
-                          ),
-                        );
-                      },
-                    ),
+            selected.when(
+              data: (selectedDevice) => AppSurface(
+                child: Column(
+                  children: [
+                    for (var index = 0; index < items.length; index++) ...[
+                      if (index > 0) const _CompactDivider(),
+                      Builder(
+                        builder: (context) {
+                          final device = items[index];
+                          return AppListRow(
+                            icon: Icons.videocam_outlined,
+                            title: device.displayName,
+                            subtitle: _deviceListSubtitle(device),
+                            tone: device.isOnlineLike
+                                ? AppListRowTone.green
+                                : AppListRowTone.neutral,
+                            trailing: StatusChip(
+                              label: _deviceListStatusLabel(
+                                device,
+                                selectedDevice?.id,
+                              ),
+                              tone: device.status == 'unbound'
+                                  ? StatusTone.neutral
+                                  : device.isOnlineLike
+                                  ? StatusTone.success
+                                  : StatusTone.danger,
+                            ),
+                            onTap: () => context.push(
+                              '$profileDeviceDetailPath/${device.id}',
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ],
-                ],
+                ),
+              ),
+              loading: () => const _Loading(title: '正在同步摄像头'),
+              error: (error, _) => _ErrorState(
+                error: error,
+                onRetry: () => ref.invalidate(selectedDeviceProvider),
               ),
             ),
-          const SizedBox(height: 14),
-          AppSecondaryButton(
-            label: '添加摄像头',
-            trailing: const Icon(Icons.add_outlined, size: 18),
-            onTap: () => showAddCameraSheet(context),
-          ),
         ],
         loading: () => const [_Loading(title: '正在同步摄像头')],
         error: (error, _) => [
@@ -2606,6 +2548,15 @@ String _deviceListSubtitle(GuardianDevice device) {
   if (device.isDefault) return '$location · 当前默认';
   if (device.status == 'unbound') return '$location · 已停止使用';
   return location;
+}
+
+String _deviceListStatusLabel(GuardianDevice device, String? selectedDeviceId) {
+  final isCurrent = selectedDeviceId != null && selectedDeviceId == device.id;
+  if (device.isDefault && isCurrent) return '默认 · 当前';
+  if (device.isDefault) return '默认';
+  if (isCurrent) return '当前';
+  if (device.status == 'unbound') return '已解绑';
+  return device.isOnlineLike ? '在线' : '离线';
 }
 
 class DeviceDetailPage extends ConsumerStatefulWidget {

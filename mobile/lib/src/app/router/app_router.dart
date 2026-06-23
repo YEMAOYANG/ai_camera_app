@@ -180,7 +180,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: profileDeviceHubPath,
         name: 'profileDeviceHub',
-        builder: (_, _) => const DeviceCareHubPage(),
+        builder: (_, _) => const DeviceManagementPage(),
       ),
       GoRoute(
         path: profileTaskRewardHubPath,

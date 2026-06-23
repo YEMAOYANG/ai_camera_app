@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mira Guardian</string>
+	<string>家庭 AI 看护 App</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Mira Guardian</string>
+	<string>家庭 AI 看护 App</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -31,10 +31,14 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>用于发现和连接家里的看护摄像头。</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>用于在设备配网时识别当前连接的家庭 Wi-Fi 名称，便于自动填写网络信息。</string>
 	<key>NSContactsUsageDescription</key>
 	<string>用于从通讯录中选择紧急联系人姓名和手机号，不会上传通讯录列表。</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>用于和家里的看护摄像头建立本地连接。</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

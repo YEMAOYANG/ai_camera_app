@@ -14,7 +14,7 @@ enum CameraDiscoveryVisualState {
   failed,
 }
 
-/// CustomPaint layers for the Mira dual-frequency sonar discovery effect.
+/// CustomPaint layers for the nearby-camera discovery effect.
 class DiscoverySonarPainter extends CustomPainter {
   DiscoverySonarPainter({
     required this.state,
@@ -79,8 +79,12 @@ class DiscoverySonarPainter extends CustomPainter {
       final glow = Paint()
         ..shader = RadialGradient(
           colors: [
-            AppColors.brandSageWash.withValues(alpha: alpha * (2.0 - layer * 0.4)),
-            AppColors.brandWarmWash.withValues(alpha: alpha * (1.2 - layer * 0.2)),
+            AppColors.brandSageWash.withValues(
+              alpha: alpha * (2.0 - layer * 0.4),
+            ),
+            AppColors.brandWarmWash.withValues(
+              alpha: alpha * (1.2 - layer * 0.2),
+            ),
             Colors.transparent,
           ],
           stops: const [0, 0.48, 1],
@@ -120,7 +124,8 @@ class DiscoverySonarPainter extends CustomPainter {
       ..close();
     canvas.drawPath(
       path,
-      Paint()..color = AppColors.brandSage.withValues(alpha: 0.16 * (1 - collapse)),
+      Paint()
+        ..color = AppColors.brandSage.withValues(alpha: 0.16 * (1 - collapse)),
     );
   }
 
@@ -247,7 +252,9 @@ class DiscoverySonarPainter extends CustomPainter {
         sparkOffset,
         3.2 - i * 0.55,
         Paint()
-          ..color = color.withValues(alpha: (0.65 - i * 0.14).clamp(0.15, 0.65)),
+          ..color = color.withValues(
+            alpha: (0.65 - i * 0.14).clamp(0.15, 0.65),
+          ),
       );
     }
     final glowPaint = Paint()
@@ -429,45 +436,105 @@ class CameraDevicePainter extends CustomPainter {
     required bool showLensRing,
     required double lensRingProgress,
   }) {
-    final bodyWidth = minSide * 0.72;
-    final bodyHeight = minSide * 0.62;
+    final bodyWidth = minSide * 0.66;
+    final bodyHeight = minSide * 0.58;
     final bodyRect = Rect.fromCenter(
-      center: center.translate(0, minSide * 0.02),
+      center: center.translate(0, -minSide * 0.04),
       width: bodyWidth,
       height: bodyHeight,
-    );
-    final bodyRRect = RRect.fromRectAndRadius(
-      bodyRect,
-      Radius.circular(minSide * 0.14),
     );
     final shadow = Paint()
       ..color = const Color(0x22000000)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
-    canvas.drawRRect(bodyRRect.shift(const Offset(0, 5)), shadow);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: bodyRect.bottomCenter.translate(0, minSide * 0.2),
+        width: bodyWidth * 0.92,
+        height: minSide * 0.11,
+      ),
+      shadow,
+    );
+
+    final bodyPath = Path()
+      ..moveTo(bodyRect.left + bodyWidth * 0.18, bodyRect.bottom)
+      ..quadraticBezierTo(
+        bodyRect.left,
+        bodyRect.center.dy,
+        bodyRect.left + bodyWidth * 0.18,
+        bodyRect.top + bodyHeight * 0.1,
+      )
+      ..quadraticBezierTo(
+        bodyRect.center.dx,
+        bodyRect.top - bodyHeight * 0.08,
+        bodyRect.right - bodyWidth * 0.18,
+        bodyRect.top + bodyHeight * 0.1,
+      )
+      ..quadraticBezierTo(
+        bodyRect.right,
+        bodyRect.center.dy,
+        bodyRect.right - bodyWidth * 0.18,
+        bodyRect.bottom,
+      )
+      ..quadraticBezierTo(
+        bodyRect.center.dx,
+        bodyRect.bottom + bodyHeight * 0.08,
+        bodyRect.left + bodyWidth * 0.18,
+        bodyRect.bottom,
+      )
+      ..close();
 
     final bodyPaint = Paint()
       ..shader = LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          AppColors.surfaceElevated,
-          const Color(0xFFF4F7F5),
+          Colors.white,
+          const Color(0xFFF1F5F2),
+          AppColors.brandSageWash.withValues(alpha: 0.48),
         ],
-      ).createShader(bodyRect);
-    canvas.drawRRect(bodyRRect, bodyPaint);
+        stops: const [0, 0.58, 1],
+      ).createShader(bodyRect.inflate(minSide * 0.08));
+    canvas.drawPath(bodyPath, bodyPaint);
+
+    canvas.drawPath(
+      bodyPath.shift(Offset(0, minSide * 0.008)),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8
+        ..color = Colors.white.withValues(alpha: 0.72),
+    );
 
     final border = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2
-      ..color = AppColors.border;
-    canvas.drawRRect(bodyRRect, border);
+      ..color = AppColors.brandSage.withValues(alpha: 0.22);
+    canvas.drawPath(bodyPath, border);
 
-    final lensCenter = bodyRect.center.translate(0, -minSide * 0.03);
-    final lensRadius = minSide * 0.16;
-    canvas.drawCircle(lensCenter, lensRadius, Paint()..color = AppColors.ink);
+    final lensCenter = bodyRect.center.translate(0, -minSide * 0.035);
+    final lensRadius = minSide * 0.17;
+    canvas.drawCircle(
+      lensCenter,
+      lensRadius * 1.18,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [AppColors.ink.withValues(alpha: 0.92), AppColors.ink],
+        ).createShader(Rect.fromCircle(center: lensCenter, radius: lensRadius)),
+    );
+    canvas.drawCircle(
+      lensCenter,
+      lensRadius * 0.72,
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(-0.35, -0.35),
+          colors: [
+            AppColors.brandSoft.withValues(alpha: 0.34),
+            const Color(0xFF101823),
+          ],
+        ).createShader(Rect.fromCircle(center: lensCenter, radius: lensRadius)),
+    );
     canvas.drawCircle(
       lensCenter.translate(-minSide * 0.04, -minSide * 0.04),
-      minSide * 0.04,
+      minSide * 0.035,
       Paint()..color = Colors.white.withValues(alpha: 0.82),
     );
     canvas.drawCircle(
@@ -476,7 +543,7 @@ class CameraDevicePainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.2
-        ..color = AppColors.brandSage.withValues(alpha: 0.22),
+        ..color = Colors.white.withValues(alpha: 0.34),
     );
     if (showLensRing) {
       canvas.drawArc(
@@ -491,7 +558,10 @@ class CameraDevicePainter extends CustomPainter {
       );
     }
 
-    final statusCenter = bodyRect.topRight.translate(-minSide * 0.12, minSide * 0.12);
+    final statusCenter = bodyRect.topRight.translate(
+      -minSide * 0.13,
+      minSide * 0.16,
+    );
     canvas.drawCircle(
       statusCenter,
       minSide * 0.05,
@@ -505,13 +575,26 @@ class CameraDevicePainter extends CustomPainter {
 
     final baseRect = RRect.fromRectAndRadius(
       Rect.fromCenter(
-        center: bodyRect.bottomCenter.translate(0, minSide * 0.1),
-        width: bodyWidth * 0.52,
-        height: minSide * 0.08,
+        center: bodyRect.bottomCenter.translate(0, minSide * 0.15),
+        width: bodyWidth * 0.58,
+        height: minSide * 0.09,
       ),
-      Radius.circular(minSide * 0.04),
+      Radius.circular(minSide * 0.06),
     );
-    canvas.drawRRect(baseRect, Paint()..color = AppColors.borderSoft);
+    canvas.drawRRect(
+      baseRect,
+      Paint()
+        ..shader = LinearGradient(
+          colors: [const Color(0xFFE6ECE8), AppColors.surfaceElevated],
+        ).createShader(baseRect.outerRect),
+    );
+    canvas.drawRRect(
+      baseRect,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8
+        ..color = AppColors.brandSage.withValues(alpha: 0.18),
+    );
   }
 
   @override

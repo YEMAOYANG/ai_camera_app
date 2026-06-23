@@ -164,8 +164,7 @@ class _CameraDiscoveryAnimationState extends State<CameraDiscoveryAnimation>
             final collapse = reduceMotion
                 ? (widget.state == CameraDiscoveryVisualState.found ? 1.0 : 0.0)
                 : _transitionController.value;
-            final confirmPulse =
-                reduceMotion ? 0.0 : _confirmController.value;
+            final confirmPulse = reduceMotion ? 0.0 : _confirmController.value;
             final deviceOpacity = _showsDevice
                 ? (_deviceRevealController.value.clamp(0.0, 1.0))
                 : 0.0;
@@ -207,13 +206,13 @@ class _CameraDiscoveryAnimationState extends State<CameraDiscoveryAnimation>
                   ),
                 if (widget.state == CameraDiscoveryVisualState.failed)
                   _StateAccentIcon(
-                    icon: Icons.close_rounded,
+                    icon: Icons.error_outline_rounded,
                     color: AppColors.danger,
                     size: widget.size,
                   ),
                 if (widget.state == CameraDiscoveryVisualState.notFound)
                   _StateAccentIcon(
-                    icon: Icons.search_off_rounded,
+                    icon: Icons.travel_explore_rounded,
                     color: AppColors.warning,
                     size: widget.size,
                   ),
@@ -256,35 +255,27 @@ class CameraDeviceGlyph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (compact) {
-      return Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(size * 0.26),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.brandSageWash,
-              AppColors.surfaceElevated,
-            ],
-          ),
-          border: Border.all(
-            color: AppColors.brandSage.withValues(alpha: 0.22),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.brandSage.withValues(alpha: 0.12),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+      return SizedBox.square(
+        dimension: size,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                AppColors.surfaceElevated,
+                AppColors.brandSageWash.withValues(alpha: 0.5),
+              ],
             ),
-          ],
-        ),
-        child: CustomPaint(
-          painter: CameraDevicePainter(
-            scale: 0.82,
-            statusLightColor: statusLightColor,
-            elevated: false,
+            border: Border.all(
+              color: AppColors.brandSage.withValues(alpha: 0.18),
+            ),
+          ),
+          child: CustomPaint(
+            painter: CameraDevicePainter(
+              scale: 0.86,
+              statusLightColor: statusLightColor,
+              elevated: false,
+            ),
           ),
         ),
       );

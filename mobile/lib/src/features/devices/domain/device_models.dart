@@ -1,5 +1,145 @@
 import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
+enum CameraDiscoveryPhase {
+  preparing,
+  permissionRequired,
+  bluetoothOff,
+  searching,
+  found,
+  connecting,
+  connected,
+  connectedWithoutLivePreview,
+  notFound,
+  connectionFailed,
+  alreadyBoundToAnotherFamily,
+  networkSetupFailed,
+  cancelled,
+}
+
+enum AddCameraFailureReason {
+  permissionDenied,
+  permissionPermanentlyDenied,
+  bluetoothUnavailable,
+  timeout,
+  connectionLost,
+  alreadyBound,
+  networkSetupFailed,
+  localNetworkPermissionDenied,
+  livePreviewUnavailable,
+  unsupported,
+  unknown,
+}
+
+enum CameraDiscoveryPermissionStatus {
+  unknown,
+  ready,
+  bluetoothPermissionRequired,
+  bluetoothPermissionDenied,
+  bluetoothPermissionPermanentlyDenied,
+  bluetoothOff,
+  localNetworkPermissionRequired,
+  localNetworkPermissionDenied,
+  unsupported,
+}
+
+enum CameraDiscoveryPermissionIssue {
+  bluetoothPermission,
+  bluetoothPower,
+  localNetwork,
+  nearbyDevices,
+  locationForLegacyAndroid,
+  unsupportedDevice,
+}
+
+extension CameraDiscoveryPermissionStatusX on CameraDiscoveryPermissionStatus {
+  bool get canStartDiscovery => this == CameraDiscoveryPermissionStatus.ready;
+
+  bool get requiresUserPermission {
+    return switch (this) {
+      CameraDiscoveryPermissionStatus.bluetoothPermissionRequired ||
+      CameraDiscoveryPermissionStatus.bluetoothPermissionDenied ||
+      CameraDiscoveryPermissionStatus.bluetoothPermissionPermanentlyDenied ||
+      CameraDiscoveryPermissionStatus.localNetworkPermissionRequired ||
+      CameraDiscoveryPermissionStatus.localNetworkPermissionDenied => true,
+      _ => false,
+    };
+  }
+
+  bool get isPermanentlyDenied {
+    return this ==
+        CameraDiscoveryPermissionStatus.bluetoothPermissionPermanentlyDenied;
+  }
+
+  CameraDiscoveryPermissionIssue? get issue {
+    return switch (this) {
+      CameraDiscoveryPermissionStatus.bluetoothPermissionRequired ||
+      CameraDiscoveryPermissionStatus.bluetoothPermissionDenied ||
+      CameraDiscoveryPermissionStatus.bluetoothPermissionPermanentlyDenied =>
+        CameraDiscoveryPermissionIssue.bluetoothPermission,
+      CameraDiscoveryPermissionStatus.bluetoothOff =>
+        CameraDiscoveryPermissionIssue.bluetoothPower,
+      CameraDiscoveryPermissionStatus.localNetworkPermissionRequired ||
+      CameraDiscoveryPermissionStatus.localNetworkPermissionDenied =>
+        CameraDiscoveryPermissionIssue.localNetwork,
+      CameraDiscoveryPermissionStatus.unsupported =>
+        CameraDiscoveryPermissionIssue.unsupportedDevice,
+      _ => null,
+    };
+  }
+}
+
+class CameraDiscoveryResult {
+  const CameraDiscoveryResult({
+    required this.phase,
+    required this.candidates,
+    this.failureReason,
+  });
+
+  final CameraDiscoveryPhase phase;
+  final List<DiscoveredCameraCandidate> candidates;
+  final AddCameraFailureReason? failureReason;
+}
+
+class CameraReadinessResult {
+  const CameraReadinessResult({
+    required this.livePreviewAvailable,
+    required this.message,
+  });
+
+  final bool livePreviewAvailable;
+  final String message;
+}
+
+class DiscoveredCameraCandidate {
+  const DiscoveredCameraCandidate({
+    required this.id,
+    required this.displayName,
+    required this.bindingCode,
+    required this.signalStrength,
+    required this.status,
+    this.roomHint,
+    this.isConnectable = true,
+    this.unavailableReason,
+  });
+
+  final String id;
+  final String displayName;
+  final String bindingCode;
+  final int signalStrength;
+  final String status;
+  final String? roomHint;
+  final bool isConnectable;
+  final String? unavailableReason;
+
+  int get signalBars => (signalStrength / 25).ceil().clamp(1, 4);
+
+  String get signalLabel {
+    if (signalStrength >= 80) return '信号很好';
+    if (signalStrength >= 58) return '信号良好';
+    return '信号一般';
+  }
+}
+
 class GuardianDevice {
   const GuardianDevice({
     required this.id,

@@ -266,8 +266,6 @@ class _LiveViewport extends StatelessWidget {
     final icon = available
         ? Icons.videocam_outlined
         : Icons.videocam_off_outlined;
-    final label = care.label;
-    final tone = care.tone;
     final copy = _viewportCopy(status, snapshot);
 
     return AppSurface(
@@ -306,11 +304,6 @@ class _LiveViewport extends StatelessWidget {
                 )
               else
                 Positioned.fill(child: _ViewportIcon(icon: icon)),
-              Positioned(
-                left: 16,
-                top: 16,
-                child: StatusChip(label: label, tone: tone),
-              ),
               Positioned(
                 left: 16,
                 right: 16,
