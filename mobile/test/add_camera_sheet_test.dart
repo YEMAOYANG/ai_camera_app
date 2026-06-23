@@ -12,6 +12,79 @@ import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  test('camera discovery factory uses mock adapter by default', () {
+    final mockAdapter = _FakeCameraDiscoveryAdapter();
+    final bleAdapter = _FakeCameraDiscoveryAdapter();
+    final selected =
+        CameraDiscoveryAdapterFactory(
+          mockAdapter: mockAdapter,
+          bleAdapter: bleAdapter,
+        ).create(
+          const CameraDiscoveryConfig(
+            backend: CameraDiscoveryBackend.mock,
+            allowBleFallbackToMock: false,
+          ),
+        );
+
+    expect(identical(selected, mockAdapter), isTrue);
+  });
+
+  test('camera discovery factory safely falls back for BLE in dev/test', () {
+    final mockAdapter = _FakeCameraDiscoveryAdapter();
+    final bleAdapter = _FakeCameraDiscoveryAdapter();
+    final selected =
+        CameraDiscoveryAdapterFactory(
+          mockAdapter: mockAdapter,
+          bleAdapter: bleAdapter,
+        ).create(
+          const CameraDiscoveryConfig(
+            backend: CameraDiscoveryBackend.ble,
+            allowBleFallbackToMock: true,
+          ),
+        );
+
+    expect(identical(selected, mockAdapter), isTrue);
+  });
+
+  test(
+    'camera discovery factory keeps BLE adapter when fallback is disabled',
+    () {
+      final mockAdapter = _FakeCameraDiscoveryAdapter();
+      final bleAdapter = _FakeCameraDiscoveryAdapter();
+      final selected =
+          CameraDiscoveryAdapterFactory(
+            mockAdapter: mockAdapter,
+            bleAdapter: bleAdapter,
+          ).create(
+            const CameraDiscoveryConfig(
+              backend: CameraDiscoveryBackend.ble,
+              allowBleFallbackToMock: false,
+            ),
+          );
+
+      expect(identical(selected, bleAdapter), isTrue);
+    },
+  );
+
+  test(
+    'BLE adapter reports unsupported on non-mobile test platforms',
+    () async {
+      final adapter = BleCameraDiscoveryAdapter(
+        permissionProbe: _FakePermissionProbe(
+          status: CameraDiscoveryPermissionStatus.ready,
+        ),
+      );
+
+      expect(
+        await adapter.getPermissionStatus(),
+        CameraDiscoveryPermissionStatus.unsupported,
+      );
+      final result = await adapter.startScan().first;
+      expect(result.phase, CameraDiscoveryPhase.connectionFailed);
+      expect(result.failureReason, AddCameraFailureReason.unsupported);
+    },
+  );
+
   testWidgets('add camera sheet starts discovery after permissions are ready', (
     tester,
   ) async {
@@ -270,6 +343,18 @@ void main() {
     expect(find.text('连接失败'), findsWidgets);
     expect(find.text('重新连接'), findsOneWidget);
     expect(find.textContaining('连接中断'), findsOneWidget);
+  });
+
+  testWidgets('BLE adapter unavailable state is parent-facing', (tester) async {
+    await _pumpSheet(
+      tester,
+      initialPhase: CameraDiscoveryPhase.connectionFailed,
+      initialFailureReason: AddCameraFailureReason.bleAdapterUnavailable,
+    );
+
+    expect(find.text('连接失败'), findsOneWidget);
+    expect(find.text('暂时无法连接摄像头，请稍后再试。'), findsOneWidget);
+    _expectNoEngineeringCopy();
   });
 
   testWidgets('already bound state uses family-friendly copy', (tester) async {
@@ -542,4 +627,28 @@ class _FakeCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
   Future<void> openSystemSettings() async {
     openSettingsCount += 1;
   }
+}
+
+class _FakePermissionProbe implements CameraDiscoveryPermissionProbe {
+  const _FakePermissionProbe({required this.status});
+
+  final CameraDiscoveryPermissionStatus status;
+
+  @override
+  Future<CameraDiscoveryPermissionStatus> getPermissionStatus() async {
+    return status;
+  }
+
+  @override
+  Future<CameraDiscoveryPermissionStatus> requestRequiredPermissions() async {
+    return status;
+  }
+
+  @override
+  Future<bool> isBluetoothAvailable() async {
+    return status != CameraDiscoveryPermissionStatus.bluetoothOff;
+  }
+
+  @override
+  Future<void> openSystemSettings() async {}
 }

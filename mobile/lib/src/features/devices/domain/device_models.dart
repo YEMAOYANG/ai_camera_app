@@ -16,10 +16,23 @@ enum CameraDiscoveryPhase {
   cancelled,
 }
 
+enum CameraDiscoveryBackend {
+  mock,
+  ble;
+
+  static CameraDiscoveryBackend fromName(String value) {
+    return switch (value.trim().toLowerCase()) {
+      'ble' || 'bluetooth' => CameraDiscoveryBackend.ble,
+      _ => CameraDiscoveryBackend.mock,
+    };
+  }
+}
+
 enum AddCameraFailureReason {
   permissionDenied,
   permissionPermanentlyDenied,
   bluetoothUnavailable,
+  bleAdapterUnavailable,
   timeout,
   connectionLost,
   alreadyBound,

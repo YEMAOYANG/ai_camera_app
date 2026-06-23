@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
 import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
@@ -14,13 +15,73 @@ final cameraDiscoveryPermissionProbeProvider =
       return PermissionHandlerCameraDiscoveryPermissionProbe();
     });
 
-final cameraDiscoveryAdapterProvider = Provider<CameraDiscoveryAdapter>((ref) {
-  return MockCameraDiscoveryAdapter(
-    deviceRepository: ref.watch(deviceRepositoryProvider),
-    cameraRepository: ref.watch(cameraRepositoryProvider),
-    permissionProbe: ref.watch(cameraDiscoveryPermissionProbeProvider),
+final cameraDiscoveryConfigProvider = Provider<CameraDiscoveryConfig>((ref) {
+  return CameraDiscoveryConfig.fromEnvironment(
+    ref.watch(appEnvironmentProvider),
   );
 });
+
+final cameraDiscoveryAdapterProvider = Provider<CameraDiscoveryAdapter>((ref) {
+  final permissionProbe = ref.watch(cameraDiscoveryPermissionProbeProvider);
+  final mockAdapter = MockCameraDiscoveryAdapter(
+    deviceRepository: ref.watch(deviceRepositoryProvider),
+    cameraRepository: ref.watch(cameraRepositoryProvider),
+    permissionProbe: permissionProbe,
+  );
+  final bleAdapter = BleCameraDiscoveryAdapter(
+    permissionProbe: permissionProbe,
+  );
+  return CameraDiscoveryAdapterFactory(
+    mockAdapter: mockAdapter,
+    bleAdapter: bleAdapter,
+  ).create(ref.watch(cameraDiscoveryConfigProvider));
+});
+
+class CameraDiscoveryConfig {
+  const CameraDiscoveryConfig({
+    required this.backend,
+    required this.allowBleFallbackToMock,
+  });
+
+  factory CameraDiscoveryConfig.fromEnvironment(AppEnvironment environment) {
+    const backendName = String.fromEnvironment(
+      'CAMERA_DISCOVERY_BACKEND',
+      defaultValue: 'mock',
+    );
+    final backend = CameraDiscoveryBackend.fromName(backendName);
+    return CameraDiscoveryConfig(
+      backend: backend,
+      allowBleFallbackToMock:
+          backend == CameraDiscoveryBackend.ble &&
+          environment.flavor != AppFlavor.production,
+    );
+  }
+
+  final CameraDiscoveryBackend backend;
+  final bool allowBleFallbackToMock;
+}
+
+class CameraDiscoveryAdapterFactory {
+  const CameraDiscoveryAdapterFactory({
+    required this.mockAdapter,
+    required this.bleAdapter,
+  });
+
+  final CameraDiscoveryAdapter mockAdapter;
+  final CameraDiscoveryAdapter bleAdapter;
+
+  CameraDiscoveryAdapter create(CameraDiscoveryConfig config) {
+    return switch (config.backend) {
+      CameraDiscoveryBackend.mock => mockAdapter,
+      // The real BLE adapter is intentionally a contract-only adapter for now.
+      // Development and tests keep the current nearby-device experience stable;
+      // production must not silently use development discovery when BLE is
+      // requested but not implemented.
+      CameraDiscoveryBackend.ble =>
+        config.allowBleFallbackToMock ? mockAdapter : bleAdapter,
+    };
+  }
+}
 
 abstract class CameraDiscoveryPermissionProbe {
   Future<CameraDiscoveryPermissionStatus> getPermissionStatus();
@@ -269,6 +330,99 @@ class MockCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
     } catch (_) {
       return null;
     }
+  }
+
+  @override
+  Future<void> openSystemSettings() {
+    return _permissionProbe.openSystemSettings();
+  }
+}
+
+/// Contract boundary for the future real BLE camera discovery path.
+///
+/// This adapter deliberately does not perform Bluetooth scanning yet. It keeps
+/// the production behavior explicit when CAMERA_DISCOVERY_BACKEND=ble is set
+/// before the self-owned camera advertisement and pairing protocol is ready.
+class BleCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
+  BleCameraDiscoveryAdapter({
+    required CameraDiscoveryPermissionProbe permissionProbe,
+  }) : this._(permissionProbe);
+
+  BleCameraDiscoveryAdapter._(this._permissionProbe);
+
+  final CameraDiscoveryPermissionProbe _permissionProbe;
+  StreamController<CameraDiscoveryResult>? _scanController;
+
+  bool get _isSupportedPlatform => Platform.isAndroid || Platform.isIOS;
+
+  @override
+  Future<CameraDiscoveryPermissionStatus> getPermissionStatus() async {
+    if (!_isSupportedPlatform) {
+      return CameraDiscoveryPermissionStatus.unsupported;
+    }
+    return _permissionProbe.getPermissionStatus();
+  }
+
+  @override
+  Future<CameraDiscoveryPermissionStatus> requestRequiredPermissions() async {
+    if (!_isSupportedPlatform) {
+      return CameraDiscoveryPermissionStatus.unsupported;
+    }
+    return _permissionProbe.requestRequiredPermissions();
+  }
+
+  @override
+  Future<bool> isBluetoothAvailable() async {
+    if (!_isSupportedPlatform) return false;
+    return _permissionProbe.isBluetoothAvailable();
+  }
+
+  @override
+  Stream<CameraDiscoveryResult> startScan() {
+    unawaited(stopScan());
+    final controller = StreamController<CameraDiscoveryResult>();
+    _scanController = controller;
+    scheduleMicrotask(() {
+      if (controller.isClosed) return;
+      controller.add(
+        CameraDiscoveryResult(
+          phase: CameraDiscoveryPhase.connectionFailed,
+          candidates: const [],
+          failureReason: _isSupportedPlatform
+              ? AddCameraFailureReason.bleAdapterUnavailable
+              : AddCameraFailureReason.unsupported,
+        ),
+      );
+      unawaited(controller.close());
+    });
+    return controller.stream;
+  }
+
+  @override
+  Future<void> stopScan() async {
+    final controller = _scanController;
+    _scanController = null;
+    if (controller != null && !controller.isClosed) {
+      await controller.close();
+    }
+  }
+
+  @override
+  Future<GuardianDevice> connectCandidate(
+    DiscoveredCameraCandidate candidate,
+  ) async {
+    throw const DeviceException(
+      '摄像头连接暂时不可用，请稍后再试。',
+      code: 'ble_adapter_unavailable',
+    );
+  }
+
+  @override
+  Future<CameraReadinessResult> checkReadiness(String deviceId) async {
+    return const CameraReadinessResult(
+      livePreviewAvailable: false,
+      message: '实时画面暂时不可用',
+    );
   }
 
   @override

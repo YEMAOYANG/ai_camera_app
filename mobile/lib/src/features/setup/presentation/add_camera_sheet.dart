@@ -358,6 +358,7 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
       'wifi_setup_failed' => CameraDiscoveryPhase.networkSetupFailed,
       'bluetooth_unavailable' => CameraDiscoveryPhase.bluetoothOff,
       'permission_denied' => CameraDiscoveryPhase.permissionRequired,
+      'ble_adapter_unavailable' => CameraDiscoveryPhase.connectionFailed,
       _ => CameraDiscoveryPhase.connectionFailed,
     };
   }
@@ -372,6 +373,7 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
       'wifi_setup_failed' => AddCameraFailureReason.networkSetupFailed,
       'bluetooth_unavailable' => AddCameraFailureReason.bluetoothUnavailable,
       'permission_denied' => AddCameraFailureReason.permissionDenied,
+      'ble_adapter_unavailable' => AddCameraFailureReason.bleAdapterUnavailable,
       _ => AddCameraFailureReason.connectionLost,
     };
   }
@@ -716,6 +718,7 @@ String _connectionFailureTitle(AddCameraFailureReason? reason) {
   return switch (reason) {
     AddCameraFailureReason.connectionLost => '连接中断，请靠近摄像头后再试一次。',
     AddCameraFailureReason.bluetoothUnavailable => '蓝牙暂时不可用，请打开后再试。',
+    AddCameraFailureReason.bleAdapterUnavailable => '暂时无法连接摄像头，请稍后再试。',
     AddCameraFailureReason.permissionDenied => '需要允许附近设备权限后再连接。',
     _ => '请靠近摄像头后再试一次。',
   };
