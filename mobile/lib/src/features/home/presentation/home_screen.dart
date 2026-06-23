@@ -583,57 +583,59 @@ _HeroFocusCopy _heroFocusCopy({
   final childName = _childDisplayName(profile);
   if (profileLoading || deviceStateLoading || todayTaskCount == null) {
     return _HeroFocusCopy(
-      status: '正在同步家庭状态',
-      title: childName == null ? '家庭看护' : '$childName的看护同步中',
-      detail: '正在读取今天的任务、设备和看护状态。',
+      status: '正在整理今天情况',
+      title: childName == null ? '家庭看护' : '$childName今天怎么样',
+      detail: '稍等一下，正在看看作息和看护记录。',
     );
   }
   if (profile?.child == null) {
     return const _HeroFocusCopy(
       status: '孩子资料未创建',
       title: '先添加孩子资料',
-      detail: '添加孩子资料后，可以安排任务和看护提醒。',
+      detail: '添加后可以推荐作息和看护提醒。',
     );
   }
   if (hasNoDevice) {
     return const _HeroFocusCopy(
       status: '基础设置已完成',
       title: '还没有连接摄像头',
-      detail: '连接后可以查看实时画面、看护提醒和设备观察。',
+      detail: '连接后可以查看实时画面和看护提醒。',
     );
   }
   if (!deviceOnline || !cameraOnline) {
     return const _HeroFocusCopy(
       status: '看护状态需要检查',
       title: '先检查看护设备',
-      detail: '任务安排会保留，恢复连接后再同步观察记录。',
+      detail: '生活提醒会保留，摄像头恢复后继续记录。',
     );
   }
   if (pendingCount > 0) {
     return _HeroFocusCopy(
       status: '今天有事项需要确认',
       title: '$pendingCount 件事等你处理',
-      detail: '先看证据和奖励，再决定是否写入记录。',
+      detail: '先看记录，再处理确认或奖励。',
     );
   }
   if (currentTask != null) {
     return _HeroFocusCopy(
-      status: '正在看护当前任务',
+      status: '当前节奏进行中',
       title: '${currentTask.title}进行中',
-      detail: '完成后再请你确认，不中途打断孩子。',
+      detail: '按节奏轻声提醒，不中途打断孩子。',
     );
   }
   if (todayTaskCount == 0) {
     return const _HeroFocusCopy(
-      status: '今天安排很轻',
+      status: '今天节奏很轻',
       title: '还没有需要处理的事',
-      detail: '需要时再去任务页添加提醒。',
+      detail: '需要时可以添加生活提醒。',
     );
   }
   return _HeroFocusCopy(
-    status: '看护数据正在同步',
-    title: childName == null ? '看护数据同步中' : '$childName今天有 $todayTaskCount 项安排',
-    detail: '任务到点后会自动提醒，晚些时候再请你确认。',
+    status: '今天节奏已安排',
+    title: childName == null
+        ? '今天有 $todayTaskCount 个提醒'
+        : '$childName今天有 $todayTaskCount 个提醒',
+    detail: '围绕起床、用餐、午睡和睡前轻声提醒。',
   );
 }
 
@@ -657,7 +659,7 @@ List<_HeroChipSpec> _heroChips({
     else if (deviceStateLoading)
       const _HeroChipSpec(
         icon: Icons.sensors_outlined,
-        label: '设备同步中',
+        label: '正在检查',
         tone: StatusTone.neutral,
       )
     else
@@ -671,7 +673,7 @@ List<_HeroChipSpec> _heroChips({
     chips.add(
       const _HeroChipSpec(
         icon: Icons.sync_outlined,
-        label: '资料同步中',
+        label: '正在整理',
         tone: StatusTone.neutral,
       ),
     );
@@ -710,8 +712,8 @@ List<_HeroChipSpec> _heroChips({
   } else {
     chips.add(
       const _HeroChipSpec(
-        icon: Icons.sync_outlined,
-        label: '任务同步中',
+        icon: Icons.event_available_outlined,
+        label: '节奏正常',
         tone: StatusTone.success,
       ),
     );
@@ -956,7 +958,7 @@ class _HomeNoDeviceSection extends StatelessWidget {
           const _InsightRow(
             icon: Icons.videocam_outlined,
             title: '还没有连接看护摄像头',
-            detail: '连接后可以查看实时画面、看护提醒和设备观察。',
+            detail: '连接后可以查看实时画面和看护提醒。',
             tone: StatusTone.neutral,
           ),
           const SizedBox(height: 12),
@@ -1117,7 +1119,7 @@ class _HomeTodaySection extends StatelessWidget {
       }
       return const _HomeSoftState(
         title: '今天暂时没更新',
-        message: '可以去任务页查看。',
+        message: '稍后可以去任务页查看。',
         tone: StatusTone.warning,
       );
     }
@@ -1127,17 +1129,17 @@ class _HomeTodaySection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _HomeSectionTitle(
-          title: '今天',
-          meta: taskList.isEmpty ? '未安排' : '${taskList.length} 项安排',
-          actionLabel: taskList.isEmpty ? '去安排' : '全部',
+          title: '今日节奏',
+          meta: taskList.isEmpty ? '很轻' : '${taskList.length} 个提醒',
+          actionLabel: taskList.isEmpty ? '去添加' : '去调整',
           onAction: () => context.go(AppRoute.tasks.path),
         ),
         const SizedBox(height: 10),
         if (sorted.isEmpty)
           _CalmStatusLine(
             icon: Icons.event_note_outlined,
-            title: '今天还没有安排任务',
-            detail: '需要时再添加提醒。',
+            title: '今天节奏很轻',
+            detail: '需要时再添加生活提醒。',
             tone: StatusTone.neutral,
             onTap: () => context.go(AppRoute.tasks.path),
           )
@@ -1399,7 +1401,7 @@ class _HomeConfirmRewardSection extends StatelessWidget {
               Expanded(
                 child: _SummaryMetric(
                   value: '${pendingTasks + pendingRewards}',
-                  label: '待确认',
+                  label: '待处理',
                   tone: pendingTasks + pendingRewards > 0
                       ? StatusTone.warning
                       : StatusTone.neutral,
@@ -1410,7 +1412,7 @@ class _HomeConfirmRewardSection extends StatelessWidget {
               Expanded(
                 child: _SummaryMetric(
                   value: balance == null ? '--' : '$balance',
-                  label: '积分',
+                  label: '可用积分',
                   tone: StatusTone.warning,
                   onTap: () => context.go(pointsPath),
                 ),
@@ -1432,7 +1434,7 @@ class _HomeConfirmRewardSection extends StatelessWidget {
         if (points.hasError) ...[
           const SizedBox(height: 8),
           const Text(
-            '积分稍后再更新，任务和看护可以继续使用。',
+            '积分稍后再更新，安排和看护可以继续使用。',
             style: TextStyle(
               color: AppColors.muted,
               fontFamily: AppTypography.systemFont,
@@ -1485,17 +1487,17 @@ class _HomeCareInsightSection extends StatelessWidget {
         cameraHealth.hasError ||
         cameraStatus.hasError;
     final statusTitle = hasNoDevice
-        ? '等待连接摄像头'
+        ? '还没有连接摄像头'
         : hasIssue
-        ? '看护状态需要检查'
+        ? '摄像头需要检查'
         : currentTask != null
-        ? '${currentTask.title}观察中'
-        : '看护状态稳定';
+        ? '${currentTask.title}进行中'
+        : '暂无异常记录';
     final statusDetail = hasNoDevice
-        ? '连接后可以查看实时画面和看护提醒。'
+        ? '连接后可以查看实时画面和提醒。'
         : hasIssue
-        ? '网络或摄像头暂不稳定，先保留今天的安排。'
-        : currentTask?.nextStep ?? '任务到点后会自动提醒，隐私灯保持可见。';
+        ? '摄像头暂不稳定，今天安排会保留。'
+        : currentTask?.nextStep ?? '按作息轻声提醒，隐私灯保持可见。';
     final advice = _homeAdviceFromRealData(
       currentTask: currentTask,
       tasks: localTodayTasks,
@@ -1506,7 +1508,7 @@ class _HomeCareInsightSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _HomeSectionTitle(
-          title: '看护与建议',
+          title: '今天观察到',
           meta: hasNoDevice
               ? '待连接'
               : hasIssue
@@ -1546,7 +1548,7 @@ class _HomeCareInsightSection extends StatelessWidget {
               ),
               _InsightRow(
                 icon: Icons.auto_awesome_outlined,
-                title: 'AI 观察建议',
+                title: '一句建议',
                 detail: advice,
                 tone: StatusTone.neutral,
               ),
@@ -2056,15 +2058,15 @@ String _homeAdviceFromRealData({
   required List<GuardianTask>? tasks,
   required bool loading,
 }) {
-  if (loading && tasks == null) return '正在同步观察建议。';
+  if (loading && tasks == null) return '正在整理今天记录。';
   final candidates = <GuardianTask>[?currentTask, ...?tasks];
   for (final task in candidates) {
     final text = _taskAdviceCandidate(task);
     if (text.isNotEmpty) return _compactHomeText(text);
   }
-  if (tasks == null) return '观察建议稍后更新。';
-  if (tasks.isEmpty) return '今天还没有新的观察建议。';
-  return '任务到点后会自动记录观察结果。';
+  if (tasks == null) return '看护建议稍后更新。';
+  if (tasks.isEmpty) return '今天还没有新的看护建议。';
+  return '按作息轻声提醒，有新记录会放在这里。';
 }
 
 String _taskAdviceCandidate(GuardianTask task) {

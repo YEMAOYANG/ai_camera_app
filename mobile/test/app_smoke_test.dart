@@ -466,10 +466,10 @@ void main() {
 
     await tester.tap(find.text('任务').last);
     await tester.pumpAndSettle();
-    expect(find.text('数学作业'), findsWidgets);
+    expect(find.text('户外活动'), findsWidgets);
     expect(find.text('+0 分'), findsNothing);
 
-    await tester.tap(find.text('数学作业').last);
+    await tester.tap(find.text('户外活动').last);
     await tester.pumpAndSettle();
     expect(find.text('任务进行中'), findsOneWidget);
     expect(find.text('当前观察'), findsOneWidget);
@@ -510,8 +510,8 @@ void main() {
 
     await tester.tap(find.text('任务').last);
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('英语听读').last);
-    await tester.tap(find.text('英语听读').last);
+    await tester.ensureVisible(find.text('睡前绘本').last);
+    await tester.tap(find.text('睡前绘本').last);
     await tester.pumpAndSettle();
 
     expect(find.text('等待你确认'), findsOneWidget);
@@ -779,13 +779,13 @@ void main() {
       await tester.tap(find.text('任务').last);
       await tester.pumpAndSettle();
 
-      expect(find.text('数学作业'), findsWidgets);
+      expect(find.text('户外活动'), findsWidgets);
       expect(find.text('本周'), findsOneWidget);
       expect(tester.takeException(), isNull);
 
       await tester.tap(find.byIcon(Icons.add).first);
       await tester.pumpAndSettle();
-      expect(find.text('添加孩子的新任务'), findsOneWidget);
+      expect(find.text('添加生活提醒'), findsOneWidget);
       expect(find.text('生活习惯'), findsOneWidget);
       expect(find.text('学习任务'), findsNothing);
       expect(find.text('保存并继续添加'), findsOneWidget);
@@ -793,9 +793,10 @@ void main() {
 
       await tester.tap(find.text('生活习惯').first);
       await tester.pumpAndSettle();
-      expect(find.text('选择任务类型'), findsOneWidget);
+      expect(find.text('选择提醒类型'), findsOneWidget);
       expect(tester.takeException(), isNull);
 
+      await tester.ensureVisible(find.text('运动/户外').last);
       await tester.tap(find.text('运动/户外').last);
       await tester.pumpAndSettle();
       expect(find.text('活动内容'), findsOneWidget);
@@ -839,7 +840,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('已添加，继续安排下一项'), findsOneWidget);
-    expect(find.text('添加孩子的新任务'), findsOneWidget);
+    expect(find.text('添加生活提醒'), findsOneWidget);
 
     await tester.ensureVisible(find.text('一天安排'));
     await tester.tap(find.text('一天安排'));
@@ -847,18 +848,66 @@ void main() {
 
     await tester.tap(find.text('从模板添加'));
     await tester.pumpAndSettle();
-    expect(find.text('选择一个常用安排'), findsOneWidget);
+    expect(find.text('选择一天安排'), findsOneWidget);
+    expect(find.textContaining('套可选'), findsOneWidget);
+    expect(find.text('上学日'), findsWidgets);
+    expect(find.text('周末'), findsWidgets);
 
-    await tester.tap(find.text('幼儿园放学后'));
+    expect(find.text('中班睡前准备'), findsNothing);
+    await tester.ensureVisible(find.text('睡前准备'));
+    await tester.tap(find.text('睡前准备'));
     await tester.pumpAndSettle();
     expect(find.text('保存一天安排'), findsOneWidget);
-    expect(find.text('打篮球'), findsWidgets);
+    expect(find.text('睡前阅读'), findsWidgets);
 
     await tester.ensureVisible(find.text('保存一天安排'));
     await tester.tap(find.text('保存一天安排'));
     await tester.pumpAndSettle();
 
     expect(find.text('保存一天安排'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('task template sheet shows backend error and retry', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'test_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+      logicalSize: const Size(430, 932),
+      hasDevice: true,
+      failTaskTemplates: true,
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text('任务').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.add).first);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('一天安排'));
+    await tester.tap(find.text('一天安排'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('从模板添加'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.text('常用安排暂时没取到'), findsOneWidget);
+    expect(find.text('重试'), findsOneWidget);
+    expect(find.textContaining('套可选'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -1052,6 +1101,7 @@ Future<void> _pumpApp(
   Size logicalSize = const Size(393, 852),
   double devicePixelRatio = 3,
   bool hasDevice = false,
+  bool failTaskTemplates = false,
 }) async {
   tester.view
     ..physicalSize = logicalSize * devicePixelRatio
@@ -1066,6 +1116,7 @@ Future<void> _pumpApp(
   final fakeApi = _FakeApiServer(
     completedSetup: preferences[hasCompletedInitialSetupKey] == true,
     hasDevice: hasDevice,
+    failTaskTemplates: failTaskTemplates,
   );
   final fakeDio = fakeApi.dio;
 
@@ -1211,7 +1262,11 @@ SetupStatus _setupStatusForRoute({
 }
 
 class _FakeApiServer {
-  _FakeApiServer({required this._completedSetup, required this._hasDevice}) {
+  _FakeApiServer({
+    required this._completedSetup,
+    required this._hasDevice,
+    this.failTaskTemplates = false,
+  }) {
     _lastSetupChildBody = null;
     _lastBoundDeviceBody = null;
     _cameraHealthRequestCount = 0;
@@ -1219,30 +1274,31 @@ class _FakeApiServer {
     _cameraSnapshotRequestCount = 0;
     _tasks.addAll([
       _task(
-        id: 'task_math_homework',
-        title: '数学作业',
-        description: '完成数学练习并等待观察记录。',
-        type: 'learning',
+        id: 'task_outdoor_play',
+        title: '户外活动',
+        description: '放学后户外走走，结束后喝水休息。',
+        type: 'sports_outdoor',
         status: 'in_progress',
-        scheduledStart: '14:17',
-        scheduledEnd: '15:00',
+        scheduledStart: '17:20',
+        scheduledEnd: '17:50',
         rewardPoints: 1,
       ),
       _task(
-        id: 'task_english_reading',
-        title: '英语听读',
-        description: '听读 15 分钟后由家长确认。',
-        type: 'learning',
+        id: 'task_bedtime_story',
+        title: '睡前绘本',
+        description: '睡前读一本绘本，完成后由家长确认。',
+        type: 'reading_interest',
         status: 'awaiting_parent_confirmation',
-        scheduledStart: '15:30',
-        scheduledEnd: '15:50',
+        scheduledStart: '20:30',
+        scheduledEnd: '20:50',
         rewardPoints: 2,
-        evidenceSummary: '孩子已经完成听读，等待你确认。',
+        evidenceSummary: '孩子已经完成睡前阅读，等待你确认。',
       ),
     ]);
   }
 
   final bool _completedSetup;
+  final bool failTaskTemplates;
   bool _hasDevice;
   int _taskCounter = 0;
   String _relationship = '妈妈';
@@ -1466,6 +1522,12 @@ class _FakeApiServer {
         'date': date,
         'tasks': _tasks.where((task) => task['scheduledDate'] == date).toList(),
       });
+    }
+    if (method == 'GET' && path == '/tasks/templates') {
+      if (failTaskTemplates) {
+        return _error(options, 503, 'templates_unavailable', '常用安排暂时没取到');
+      }
+      return _ok(options, _taskTemplatesResponse(options.queryParameters));
     }
     if (method == 'GET' && path == '/tasks') {
       return _ok(options, {'ok': true, 'tasks': _tasks});
@@ -2326,11 +2388,155 @@ class _FakeApiServer {
     };
   }
 
+  Map<String, dynamic> _taskTemplatesResponse(Map<String, dynamic> query) {
+    final grade = _text(query['grade'], '');
+    final dayType = _text(query['dayType'], '');
+    final tag = _text(query['tag'], '');
+    final templates = _fakeTaskTemplates().where((template) {
+      if (grade.isNotEmpty && template['grade'] != grade) return false;
+      if (dayType.isNotEmpty && template['dayType'] != dayType) return false;
+      final tags = template['tags'];
+      if (tag.isNotEmpty &&
+          tag != 'all' &&
+          (tags is! List || !tags.contains(tag))) {
+        return false;
+      }
+      return true;
+    }).toList();
+    return {
+      'ok': true,
+      'templates': templates,
+      'tags': const [
+        {'value': 'all', 'label': '全部'},
+        {'value': 'school_day', 'label': '上学日'},
+        {'value': 'weekend', 'label': '周末'},
+        {'value': 'morning', 'label': '晨间'},
+        {'value': 'after_school', 'label': '放学后'},
+        {'value': 'bedtime', 'label': '睡前'},
+        {'value': 'outdoor', 'label': '户外'},
+        {'value': 'cleanup', 'label': '收纳'},
+        {'value': 'reading', 'label': '阅读'},
+        {'value': 'meal', 'label': '用餐'},
+        {'value': 'emotion', 'label': '表达'},
+        {'value': 'self_care', 'label': '自理'},
+        {'value': 'rules', 'label': '规则'},
+        {'value': 'helper', 'label': '小帮手'},
+      ],
+      'grades': const [
+        {'value': 'small', 'label': '小班'},
+        {'value': 'middle', 'label': '中班'},
+        {'value': 'big', 'label': '大班'},
+      ],
+      'dayTypes': const [
+        {'value': 'school_day', 'label': '上学日'},
+        {'value': 'weekend', 'label': '周末'},
+      ],
+      'recommendedGrade': grade.isEmpty ? 'middle' : grade,
+      'recommendedGradeLabel': grade == 'small'
+          ? '小班'
+          : grade == 'big'
+          ? '大班'
+          : '中班',
+    };
+  }
+
+  List<Map<String, dynamic>> _fakeTaskTemplates() {
+    return [
+      for (final grade in const ['small', 'middle', 'big'])
+        for (var index = 0; index < 10; index++)
+          _fakeTaskTemplate(grade, index),
+    ];
+  }
+
+  Map<String, dynamic> _fakeTaskTemplate(String grade, int index) {
+    final gradeLabel = switch (grade) {
+      'small' => '小班',
+      'big' => '大班',
+      _ => '中班',
+    };
+    final titles = [
+      '上学日晨间',
+      '放学后表达',
+      '餐前餐后',
+      '睡前准备',
+      '周末户外',
+      '亲子阅读',
+      '家庭小帮手',
+      '整理自己的物品',
+      '情绪分享',
+      '规则与轮流',
+    ];
+    final tagSets = const [
+      ['school_day', 'morning', 'self_care', 'meal'],
+      ['school_day', 'after_school', 'emotion'],
+      ['school_day', 'meal', 'cleanup'],
+      ['school_day', 'bedtime', 'reading'],
+      ['weekend', 'outdoor', 'rules'],
+      ['weekend', 'reading', 'emotion'],
+      ['weekend', 'helper', 'cleanup'],
+      ['weekend', 'cleanup', 'self_care'],
+      ['school_day', 'emotion', 'reading'],
+      ['weekend', 'rules', 'outdoor'],
+    ];
+    final rows = index == 3
+        ? const [
+            {
+              'startTime': '20:20',
+              'endTime': '20:30',
+              'taskType': 'sleep',
+              'title': '自己洗漱',
+              'rewardPoints': 1,
+              'requiresParentConfirmation': false,
+            },
+            {
+              'startTime': '20:30',
+              'endTime': '20:50',
+              'taskType': 'reading_interest',
+              'title': '睡前阅读',
+              'rewardPoints': 1,
+              'requiresParentConfirmation': false,
+            },
+          ]
+        : const [
+            {
+              'startTime': '17:20',
+              'endTime': '17:35',
+              'taskType': 'life',
+              'title': '喝水休息',
+              'rewardPoints': 1,
+              'requiresParentConfirmation': false,
+            },
+            {
+              'startTime': '17:40',
+              'endTime': '18:00',
+              'taskType': 'sports_outdoor',
+              'title': '户外活动',
+              'rewardPoints': 2,
+              'requiresParentConfirmation': false,
+            },
+          ];
+    return {
+      'id': 'kg-$grade-$index',
+      'templateKey': 'kg-$grade-$index',
+      'title': titles[index],
+      'subtitle': '适合幼儿园孩子的一天小提醒',
+      'grade': grade,
+      'gradeLabel': gradeLabel,
+      'ageGroups': ['kindergarten_$grade'],
+      'scheduleType': index < 4 ? 'weekday' : 'weekly',
+      'dayType': index < 4 || index == 8 ? 'school_day' : 'weekend',
+      'dayTypeLabel': index < 4 || index == 8 ? '上学日' : '周末',
+      'tags': tagSets[index],
+      'tagLabels': tagSets[index],
+      'rows': rows,
+    };
+  }
+
   Map<String, dynamic> _taskFromBody(Map<String, dynamic> body) {
     _taskCounter += 1;
     return _task(
       id: 'task_created_$_taskCounter',
-      title: _text(body['title'], '新任务'),
+      title: _text(body['title'], '新提醒'),
       description: _text(body['description'], ''),
       type: _text(body['taskType'], 'life'),
       status: _text(body['status'], 'pending'),
@@ -2641,6 +2847,19 @@ class _FakeApiServer {
       requestOptions: options,
       statusCode: 404,
       data: {'ok': false, 'error': 'not_found', 'message': '路径不存在'},
+    );
+  }
+
+  Response<dynamic> _error(
+    RequestOptions options,
+    int statusCode,
+    String code,
+    String message,
+  ) {
+    return Response<dynamic>(
+      requestOptions: options,
+      statusCode: statusCode,
+      data: {'ok': false, 'error': code, 'message': message},
     );
   }
 

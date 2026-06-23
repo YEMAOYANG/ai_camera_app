@@ -9,6 +9,7 @@ import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
+import 'package:guardian_parent_app/src/features/tasks/application/task_template_schedule.dart';
 import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
@@ -120,11 +121,11 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             );
           },
           loading: () => const AppLoadingState(
-            title: '正在整理本周任务',
+            title: '正在整理本周安排',
             message: '正在同步今天和这一周的安排。',
           ),
           error: (error, _) => _TaskErrorState(
-            message: error is TaskException ? error.message : '任务同步失败，请稍后重试。',
+            message: error is TaskException ? error.message : '安排同步失败，请稍后重试。',
             onRetry: () => ref.invalidate(taskWeekProvider(query)),
           ),
         ),
@@ -172,12 +173,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         ref.read(profileSummaryProvider).asData?.value.can('manage_tasks') ??
         false;
     if (!canManageTasks) {
-      _showToast(context, '当前身份不能新增任务');
+      _showToast(context, '当前身份不能新增安排');
       return;
     }
     final fallbackChildId = childId ?? _firstKnownChildId();
     if (fallbackChildId == null || fallbackChildId.isEmpty) {
-      _showToast(context, '请先完成孩子资料，再添加孩子的新任务。');
+      _showToast(context, '请先完成孩子资料，再添加生活提醒。');
       return;
     }
     final query = TaskWeekQuery(
@@ -211,7 +212,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         context,
         variant: AppStateVariant.saved,
         title: '已保存',
-        message: '任务已加入本周安排。',
+        message: '已加入本周安排。',
       );
     }
   }
@@ -317,7 +318,7 @@ class _WeekHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      isCurrentWeek ? '本周' : '任务周',
+                      isCurrentWeek ? '本周' : '安排周',
                       style: const TextStyle(
                         color: AppColors.muted,
                         fontFamily: AppTypography.systemFont,
@@ -837,23 +838,23 @@ class _TaskEmptyState extends StatelessWidget {
     final isPast = _dayOnly(selectedDate).isBefore(_dayOnly(DateTime.now()));
     final isToday = _sameDay(selectedDate, DateTime.now());
     final title = weekIsEmpty
-        ? '本周还没有任务'
+        ? '本周还没有安排'
         : isToday
-        ? '今天没有任务'
-        : '${_dateShort(selectedDate)}没有任务';
+        ? '今天没有安排'
+        : '${_dateShort(selectedDate)}没有安排';
     final canCreate = onCreate != null;
     final message = isPast
         ? '这一天没有安排记录。'
         : canCreate
-        ? '添加一个任务，帮孩子把安排记清楚。'
-        : '当前身份可以查看任务安排，新增和编辑由管理员处理。';
+        ? '添加一个生活提醒，帮孩子稳住节奏。'
+        : '当前身份可以查看安排，新增和编辑由管理员处理。';
 
     return AppStateView(
       variant: AppStateVariant.emptyTasks,
       title: title,
       message: message,
       padding: const EdgeInsets.fromLTRB(4, 6, 4, 20),
-      primaryActionLabel: isPast || !canCreate ? null : '添加孩子的新任务',
+      primaryActionLabel: isPast || !canCreate ? null : '添加生活提醒',
       onPrimaryAction: isPast ? null : onCreate,
       secondaryActionLabel: isPast || onTemplate == null ? null : '从模板添加',
       onSecondaryAction: isPast ? null : onTemplate,
@@ -871,7 +872,7 @@ class _TaskErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppStateView(
       variant: AppStateVariant.serviceUnavailable,
-      title: '任务更新失败',
+      title: '安排更新失败',
       message: message,
       primaryActionLabel: '重新加载',
       onPrimaryAction: onRetry,
@@ -1008,8 +1009,8 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
                   const SizedBox(height: 8),
                   Text(
                     widget.task == null
-                        ? (_mode == TaskEntryMode.day ? '一天安排' : '添加孩子的新任务')
-                        : '编辑任务',
+                        ? (_mode == TaskEntryMode.day ? '一天安排' : '添加生活提醒')
+                        : '编辑安排',
                     style: const TextStyle(
                       color: AppColors.ink,
                       fontFamily: AppTypography.systemFont,
@@ -1100,7 +1101,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _FieldLabel('任务类型'),
+        _FieldLabel('提醒类型'),
         const SizedBox(height: 8),
         _PickerField(
           label: config.label,
@@ -1278,7 +1279,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     final reward = int.tryParse(_rewardController.text.trim()) ?? 0;
     if (title.isEmpty) {
       setState(() {
-        _error = '请输入任务名称。';
+        _error = '请输入提醒名称。';
         _saveFailed = false;
       });
       return;
@@ -1424,7 +1425,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     for (var index = 0; index < sorted.length; index++) {
       final row = sorted[index];
       if (row.title.trim().isEmpty) {
-        errors[row.id] = '请输入任务名称';
+        errors[row.id] = '请输入提醒名称';
         continue;
       }
       if (_startsBeforeAllowedDate(row.startTime, _date)) {
@@ -1589,7 +1590,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     return showAppBottomSheet<String>(
       context: context,
       child: _PickerSheetScaffold(
-        title: '选择任务类型',
+        title: '选择提醒类型',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1632,65 +1633,51 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
   }
 
   Future<void> _showTemplateSheet() async {
-    final recommended = _templatesForAge(widget.childAgeGroup);
-    final others = _taskTemplates
-        .where((template) => !recommended.contains(template))
-        .toList();
-    final selected = await showAppBottomSheet<_TaskTemplate>(
+    final selected = await showAppBottomSheet<TaskTemplate>(
       context: context,
-      maxHeightFactor: 0.78,
+      maxHeightFactor: 0.84,
       child: _PickerSheetScaffold(
-        title: '选择一个常用安排',
-        subtitle: '套用后可以继续修改。',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _TemplateSection(
-              title: '推荐',
-              templates: recommended,
-              onSelect: (template) => Navigator.of(context).pop(template),
-            ),
-            if (others.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              _TemplateSection(
-                title: '更多安排',
-                templates: others,
-                onSelect: (template) => Navigator.of(context).pop(template),
-              ),
-            ],
-          ],
+        title: '选择一天安排',
+        subtitle: '按孩子班级推荐，套用后还可以改。',
+        child: _TemplatePickerSheet(
+          query: TaskTemplateQuery(
+            childId: widget.childId,
+            grade: _templateGradeForAge(widget.childAgeGroup),
+          ),
+          onSelect: (template) => Navigator.of(context).pop(template),
         ),
       ),
     );
     if (selected == null || !mounted) return;
+    final resolvedDate = resolveTemplateApplyDate(
+      now: DateTime.now(),
+      selectedDate: _date,
+      dayType: selected.dayType,
+      rows: selected.rows,
+    );
     setState(() {
       _mode = TaskEntryMode.day;
+      _date = resolvedDate.date;
       _rows = _rowsFromTemplate(selected.rows);
       _scheduleType = selected.scheduleType;
       _error = null;
       _saveFailed = false;
     });
-    if (mounted) _showToast(context, '已套用，可继续修改');
+    if (mounted) {
+      _showToast(
+        context,
+        resolvedDate.message.isNotEmpty ? resolvedDate.message : '已套用，可继续修改',
+      );
+    }
   }
 
-  List<_ScheduleDraftRow> _rowsFromTemplate(List<_TaskTemplateRow> rows) {
-    if (rows.isEmpty) return const [];
-    final firstStart = rows
-        .map((row) => _minutesOfDay(row.startTime))
-        .reduce((a, b) => a < b ? a : b);
-    final targetStart = _minutesOfDay(_suggestedStartTimeForDate(_date));
-    final offset = targetStart > firstStart ? targetStart - firstStart : 0;
-    return rows
-        .map((row) => _rowFromTemplate(row, minuteOffset: offset))
-        .toList();
+  List<_ScheduleDraftRow> _rowsFromTemplate(List<TaskTemplateRow> rows) {
+    return rows.map(_rowFromTemplate).toList();
   }
 
-  _ScheduleDraftRow _rowFromTemplate(
-    _TaskTemplateRow row, {
-    int minuteOffset = 0,
-  }) {
-    final startTime = _shiftTime(row.startTime, minuteOffset);
-    final endTime = _shiftTime(row.endTime, minuteOffset);
+  _ScheduleDraftRow _rowFromTemplate(TaskTemplateRow row) {
+    final startTime = row.startTime;
+    final endTime = row.endTime;
     return _ScheduleDraftRow(
       id: 'row_${_rowSequence++}',
       startTime: startTime,
@@ -2207,7 +2194,7 @@ class _ScheduleRowCard extends StatelessWidget {
                         letterSpacing: 0,
                       ),
                       decoration: InputDecoration(
-                        hintText: '任务名称',
+                        hintText: '提醒名称',
                         hintStyle: const TextStyle(
                           color: AppColors.subtle,
                           fontWeight: FontWeight.w500,
@@ -2470,86 +2457,307 @@ class _PickerListTile extends StatelessWidget {
   }
 }
 
-class _TemplateSection extends StatelessWidget {
-  const _TemplateSection({
-    required this.title,
-    required this.templates,
-    required this.onSelect,
-  });
+class _TemplatePickerSheet extends ConsumerStatefulWidget {
+  const _TemplatePickerSheet({required this.query, required this.onSelect});
 
-  final String title;
-  final List<_TaskTemplate> templates;
-  final ValueChanged<_TaskTemplate> onSelect;
+  final TaskTemplateQuery query;
+  final ValueChanged<TaskTemplate> onSelect;
+
+  @override
+  ConsumerState<_TemplatePickerSheet> createState() =>
+      _TemplatePickerSheetState();
+}
+
+class _TemplatePickerSheetState extends ConsumerState<_TemplatePickerSheet> {
+  var _selectedTag = 'all';
 
   @override
   Widget build(BuildContext context) {
-    if (templates.isEmpty) return const SizedBox.shrink();
+    final catalogValue = ref.watch(taskTemplatesProvider(widget.query));
+    if (catalogValue.hasError) {
+      return _TemplatePickerError(
+        onRetry: () => ref.invalidate(taskTemplatesProvider(widget.query)),
+      );
+    }
+    final catalog = catalogValue.asData?.value;
+    if (catalog == null) {
+      return const _TemplatePickerLoading();
+    }
+    final tags = _availableTemplateTags(catalog);
+    final effectiveTag = tags.any((tag) => tag.value == _selectedTag)
+        ? _selectedTag
+        : 'all';
+    final filtered = effectiveTag == 'all'
+        ? catalog.templates
+        : catalog.templates
+              .where((template) => template.tags.contains(effectiveTag))
+              .toList();
+    return _TemplatePickerContent(
+      tags: tags,
+      templates: filtered,
+      selectedTag: effectiveTag,
+      onTagSelected: (tag) => setState(() => _selectedTag = tag),
+      onSelect: widget.onSelect,
+    );
+  }
+}
+
+class _TemplatePickerContent extends StatelessWidget {
+  const _TemplatePickerContent({
+    required this.tags,
+    required this.templates,
+    required this.selectedTag,
+    required this.onTagSelected,
+    required this.onSelect,
+  });
+
+  final List<TaskTemplateOption> tags;
+  final List<TaskTemplate> templates;
+  final String selectedTag;
+  final ValueChanged<String> onTagSelected;
+  final ValueChanged<TaskTemplate> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = templates;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _FieldLabel(title),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: [
+              for (final tag in tags) ...[
+                _TemplateTagChip(
+                  label: tag.label,
+                  selected: selectedTag == tag.value,
+                  onTap: () => onTagSelected(tag.value),
+                ),
+                const SizedBox(width: 8),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          '${filtered.length} 套可选',
+          style: const TextStyle(
+            color: AppColors.muted,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
+        ),
         const SizedBox(height: 8),
-        for (final template in templates)
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => onSelect(template),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 9),
-              child: AppSurface(
-                radius: 18,
-                padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
-                color: Colors.white.withValues(alpha: 0.66),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            template.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: AppColors.ink,
-                              fontFamily: AppTypography.systemFont,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '${template.rows.length} 项',
-                          style: const TextStyle(
-                            color: AppColors.muted,
-                            fontFamily: AppTypography.systemFont,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      template.subtitle,
-                      maxLines: 2,
+        if (filtered.isEmpty)
+          const _TemplatePickerEmpty()
+        else
+          for (final template in filtered)
+            _TemplateCard(template: template, onTap: () => onSelect(template)),
+      ],
+    );
+  }
+}
+
+class _TemplatePickerLoading extends StatelessWidget {
+  const _TemplatePickerLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const AppStateView(
+      variant: AppStateVariant.loading,
+      title: '正在整理常用安排',
+      message: '会按孩子班级展示适合的生活提醒。',
+    );
+  }
+}
+
+class _TemplatePickerError extends StatelessWidget {
+  const _TemplatePickerError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppStateView(
+      variant: AppStateVariant.networkUnavailable,
+      title: '常用安排暂时没取到',
+      message: '请稍后重试。',
+      primaryActionLabel: '重试',
+      onPrimaryAction: onRetry,
+    );
+  }
+}
+
+class _TemplatePickerEmpty extends StatelessWidget {
+  const _TemplatePickerEmpty();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 18),
+      child: AppStateView(
+        variant: AppStateVariant.emptyTasks,
+        title: '暂时没有适合的安排',
+        message: '可以先手动添加今天的小提醒。',
+      ),
+    );
+  }
+}
+
+class _TemplateTagChip extends StatelessWidget {
+  const _TemplateTagChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: AppMotion.duration(context, 160),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.ink : AppColors.surfaceSoft,
+          borderRadius: BorderRadius.circular(AppRadii.full),
+          border: Border.all(
+            color: selected ? AppColors.ink : AppColors.borderSoft,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? Colors.white : AppColors.muted,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TemplateCard extends StatelessWidget {
+  const _TemplateCard({required this.template, required this.onTap});
+
+  final TaskTemplate template;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tags = template.tagLabels.take(3).toList();
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 9),
+        child: AppSurface(
+          radius: 18,
+          padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+          color: Colors.white.withValues(alpha: 0.68),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      template.title,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: AppColors.muted,
+                        color: AppColors.ink,
                         fontFamily: AppTypography.systemFont,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        height: 1.4,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
                         letterSpacing: 0,
                       ),
                     ),
-                  ],
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${template.rows.length} 项',
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              Text(
+                template.subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppColors.muted,
+                  fontFamily: AppTypography.systemFont,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  height: 1.4,
+                  letterSpacing: 0,
                 ),
               ),
-            ),
+              if (tags.isNotEmpty) ...[
+                const SizedBox(height: 9),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final tag in tags) _TemplateMiniTag(label: tag),
+                  ],
+                ),
+              ],
+            ],
           ),
-      ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TemplateMiniTag extends StatelessWidget {
+  const _TemplateMiniTag({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.appBackgroundMid.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(9),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.muted,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -2701,7 +2909,7 @@ class _ConfirmSwitch extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  '确认后再发放积分，适合作业证据和奖励任务。',
+                  '确认后再发放积分，适合需要家长看一眼的安排。',
                   style: TextStyle(
                     color: AppColors.muted,
                     fontFamily: AppTypography.systemFont,
@@ -2722,7 +2930,7 @@ class _ConfirmSwitch extends StatelessWidget {
 }
 
 enum TaskEntryMode {
-  single('单个任务'),
+  single('单项提醒'),
   day('一天安排');
 
   const TaskEntryMode(this.label);
@@ -2730,7 +2938,15 @@ enum TaskEntryMode {
   final String label;
 }
 
-enum TaskAgeGroup { preschool, lowerPrimary, upperPrimary, teen }
+enum TaskAgeGroup {
+  kindergartenSmall,
+  kindergartenMiddle,
+  kindergartenBig,
+  preschool,
+  lowerPrimary,
+  upperPrimary,
+  teen,
+}
 
 class _Option {
   const _Option(this.value, this.label, this.message);
@@ -2782,6 +2998,9 @@ class _TaskTypeConfig {
 }
 
 const _allAgeGroups = [
+  TaskAgeGroup.kindergartenSmall,
+  TaskAgeGroup.kindergartenMiddle,
+  TaskAgeGroup.kindergartenBig,
   TaskAgeGroup.preschool,
   TaskAgeGroup.lowerPrimary,
   TaskAgeGroup.upperPrimary,
@@ -2812,7 +3031,7 @@ const _taskTypeConfigs = [
   _TaskTypeConfig(
     value: 'life',
     label: '生活习惯',
-    description: '喝水、整理、洗漱和日常习惯',
+    description: '喝水、洗漱和日常自理',
     icon: Icons.water_drop_outlined,
     defaultMinutes: 15,
     defaultReward: 1,
@@ -2820,21 +3039,37 @@ const _taskTypeConfigs = [
     titleLabel: '习惯名称',
     titleHint: '例如：喝水休息',
     detailLabel: '看护要点',
-    detailHint: '例如：午休后补水，不需要家长确认',
+    detailHint: '例如：午休后补水，轻声提醒即可',
+  ),
+  _TaskTypeConfig(
+    value: 'checkin',
+    label: '用餐',
+    description: '早餐、晚餐和坐好吃饭',
+    icon: Icons.restaurant_outlined,
+    defaultMinutes: 20,
+    defaultReward: 1,
+    defaultRequiresConfirmation: false,
+    titleLabel: '用餐提醒',
+    titleHint: '例如：坐好吃晚饭',
+    detailLabel: '提醒方式',
+    detailHint: '例如：慢慢吃，不评价吃得多少',
   ),
   _TaskTypeConfig(
     value: 'sleep',
-    label: '睡前流程',
-    description: '洗漱、整理、阅读和入睡节奏',
+    label: '午睡/睡眠',
+    description: '午睡、睡前准备和入睡节奏',
     icon: Icons.nights_stay_outlined,
     defaultMinutes: 20,
     defaultReward: 2,
     defaultRequiresConfirmation: false,
-    titleLabel: '流程名称',
+    titleLabel: '睡眠提醒',
     titleHint: '例如：睡前洗漱',
-    detailLabel: '步骤清单',
-    detailHint: '例如：洗漱、整理书包、上床',
+    detailLabel: '提醒方式',
+    detailHint: '例如：声音放轻，准备上床',
     ageGroups: [
+      TaskAgeGroup.kindergartenSmall,
+      TaskAgeGroup.kindergartenMiddle,
+      TaskAgeGroup.kindergartenBig,
       TaskAgeGroup.preschool,
       TaskAgeGroup.lowerPrimary,
       TaskAgeGroup.upperPrimary,
@@ -2842,72 +3077,67 @@ const _taskTypeConfigs = [
   ),
   _TaskTypeConfig(
     value: 'schoolbag',
-    label: '小书包/物品准备',
-    description: '课本、作业本、水杯和明日用品',
+    label: '物品准备',
+    description: '水杯、衣物和明日用品',
     icon: Icons.backpack_outlined,
     defaultMinutes: 10,
     defaultReward: 2,
     defaultRequiresConfirmation: true,
     titleLabel: '准备事项',
-    titleHint: '例如：检查小书包',
+    titleHint: '例如：准备水杯',
     detailLabel: '物品清单',
-    detailHint: '例如：课本、作业本、水杯',
-    ageGroups: [
-      TaskAgeGroup.preschool,
-      TaskAgeGroup.lowerPrimary,
-      TaskAgeGroup.upperPrimary,
-    ],
+    detailHint: '例如：水杯、备用衣物',
+    ageGroups: [TaskAgeGroup.lowerPrimary, TaskAgeGroup.upperPrimary],
   ),
   _TaskTypeConfig(
     value: 'housework',
-    label: '家务任务',
-    description: '整理桌面、收纳、简单家务',
+    label: '收纳整理',
+    description: '玩具、图书和餐后小整理',
     icon: Icons.cleaning_services_outlined,
-    defaultMinutes: 20,
-    defaultReward: 3,
-    defaultRequiresConfirmation: true,
-    titleLabel: '家务内容',
-    titleHint: '例如：整理书桌',
-    detailLabel: '完成标准',
-    detailHint: '例如：桌面只保留今天要用的书本',
-    ageGroups: [TaskAgeGroup.upperPrimary, TaskAgeGroup.teen],
+    defaultMinutes: 10,
+    defaultReward: 1,
+    defaultRequiresConfirmation: false,
+    titleLabel: '整理事项',
+    titleHint: '例如：玩具回到盒子',
+    detailLabel: '提醒方式',
+    detailHint: '例如：像小游戏一样一起收',
   ),
   _TaskTypeConfig(
     value: 'reading_interest',
-    label: '阅读/兴趣',
-    description: '阅读、绘画、音乐或兴趣练习',
+    label: '阅读/亲子',
+    description: '绘本、聊天和安静陪伴',
     icon: Icons.local_library_outlined,
     defaultMinutes: 20,
     defaultReward: 2,
     defaultRequiresConfirmation: false,
     titleLabel: '内容',
-    titleHint: '例如：睡前阅读',
-    detailLabel: '目标',
-    detailHint: '例如：阅读 20 分钟，读完后简单聊一聊',
+    titleHint: '例如：睡前绘本',
+    detailLabel: '陪伴方式',
+    detailHint: '例如：读完后聊一句喜欢的画面',
   ),
   _TaskTypeConfig(
     value: 'sports_outdoor',
     label: '运动/户外',
-    description: '跳绳、散步、球类和户外活动',
+    description: '散步、跑跳和户外活动',
     icon: Icons.directions_run_outlined,
     defaultMinutes: 25,
     defaultReward: 2,
     defaultRequiresConfirmation: false,
     titleLabel: '活动内容',
-    titleHint: '例如：打篮球',
+    titleHint: '例如：户外走走',
     detailLabel: '安全提醒',
-    detailHint: '例如：先看周围安全，结束后喝水',
+    detailHint: '例如：看好周围，结束后喝水',
   ),
   _TaskTypeConfig(
     value: 'custom',
-    label: '家长自定义',
-    description: '临时安排或孩子自己的计划',
+    label: '自定义',
+    description: '临时提醒或家庭小约定',
     icon: Icons.edit_note_outlined,
     defaultMinutes: 20,
     defaultReward: 2,
     defaultRequiresConfirmation: true,
     titleLabel: '名称',
-    titleHint: '例如：整理明天要带的资料',
+    titleHint: '例如：给植物浇水',
     detailLabel: '备注',
     detailHint: '写下要注意的地方',
   ),
@@ -2958,233 +3188,22 @@ class _ScheduleDraftRow {
   }
 }
 
-class _TaskTemplate {
-  const _TaskTemplate({
-    required this.title,
-    required this.subtitle,
-    required this.rows,
-    required this.ageGroups,
-    this.scheduleType = 'one_time',
-  });
-
-  final String title;
-  final String subtitle;
-  final List<_TaskTemplateRow> rows;
-  final List<TaskAgeGroup> ageGroups;
-  final String scheduleType;
+List<TaskTemplateOption> _availableTemplateTags(TaskTemplateCatalog catalog) {
+  final available = <String>{'all'};
+  for (final template in catalog.templates) {
+    available.addAll(template.tags);
+  }
+  return catalog.tags.where((tag) => available.contains(tag.value)).toList();
 }
 
-class _TaskTemplateRow {
-  const _TaskTemplateRow({
-    required this.startTime,
-    required this.endTime,
-    required this.taskType,
-    required this.title,
-    required this.rewardPoints,
-    required this.requiresParentConfirmation,
-  });
-
-  final String startTime;
-  final String endTime;
-  final String taskType;
-  final String title;
-  final int rewardPoints;
-  final bool requiresParentConfirmation;
+String? _templateGradeForAge(TaskAgeGroup ageGroup) {
+  return switch (ageGroup) {
+    TaskAgeGroup.kindergartenSmall || TaskAgeGroup.preschool => 'small',
+    TaskAgeGroup.kindergartenMiddle => 'middle',
+    TaskAgeGroup.kindergartenBig => 'big',
+    _ => null,
+  };
 }
-
-const _taskTemplates = [
-  _TaskTemplate(
-    title: '幼儿园放学后',
-    subtitle: '喝水、运动和整理，适合幼儿的短节奏安排',
-    ageGroups: [TaskAgeGroup.preschool],
-    rows: [
-      _TaskTemplateRow(
-        startTime: '17:20',
-        endTime: '17:30',
-        taskType: 'life',
-        title: '喝水休息',
-        rewardPoints: 1,
-        requiresParentConfirmation: false,
-      ),
-      _TaskTemplateRow(
-        startTime: '17:35',
-        endTime: '18:00',
-        taskType: 'sports_outdoor',
-        title: '打篮球',
-        rewardPoints: 2,
-        requiresParentConfirmation: false,
-      ),
-      _TaskTemplateRow(
-        startTime: '18:00',
-        endTime: '18:10',
-        taskType: 'life',
-        title: '整理玩具',
-        rewardPoints: 1,
-        requiresParentConfirmation: false,
-      ),
-    ],
-  ),
-  _TaskTemplate(
-    title: '放学后学习',
-    subtitle: '适合小学阶段的作业、休息和阅读节奏',
-    ageGroups: [TaskAgeGroup.lowerPrimary, TaskAgeGroup.upperPrimary],
-    rows: [
-      _TaskTemplateRow(
-        startTime: '19:00',
-        endTime: '19:40',
-        taskType: 'learning',
-        title: '作业整理',
-        rewardPoints: 3,
-        requiresParentConfirmation: true,
-      ),
-      _TaskTemplateRow(
-        startTime: '19:40',
-        endTime: '19:55',
-        taskType: 'life',
-        title: '休息',
-        rewardPoints: 1,
-        requiresParentConfirmation: false,
-      ),
-      _TaskTemplateRow(
-        startTime: '20:00',
-        endTime: '20:20',
-        taskType: 'reading_interest',
-        title: '阅读',
-        rewardPoints: 2,
-        requiresParentConfirmation: false,
-      ),
-    ],
-  ),
-  _TaskTemplate(
-    title: '睡前流程',
-    subtitle: '洗漱、整理和睡前阅读，帮助晚上收束下来',
-    scheduleType: 'daily',
-    ageGroups: [
-      TaskAgeGroup.preschool,
-      TaskAgeGroup.lowerPrimary,
-      TaskAgeGroup.upperPrimary,
-    ],
-    rows: [
-      _TaskTemplateRow(
-        startTime: '20:30',
-        endTime: '20:45',
-        taskType: 'sleep',
-        title: '洗漱',
-        rewardPoints: 1,
-        requiresParentConfirmation: false,
-      ),
-      _TaskTemplateRow(
-        startTime: '20:45',
-        endTime: '21:00',
-        taskType: 'schoolbag',
-        title: '整理书包',
-        rewardPoints: 2,
-        requiresParentConfirmation: true,
-      ),
-      _TaskTemplateRow(
-        startTime: '21:00',
-        endTime: '21:20',
-        taskType: 'reading_interest',
-        title: '睡前阅读',
-        rewardPoints: 2,
-        requiresParentConfirmation: false,
-      ),
-    ],
-  ),
-  _TaskTemplate(
-    title: '小书包检查',
-    subtitle: '把明天上学要带的物品逐项确认',
-    ageGroups: [
-      TaskAgeGroup.preschool,
-      TaskAgeGroup.lowerPrimary,
-      TaskAgeGroup.upperPrimary,
-    ],
-    rows: [
-      _TaskTemplateRow(
-        startTime: '20:00',
-        endTime: '20:10',
-        taskType: 'schoolbag',
-        title: '检查课本',
-        rewardPoints: 1,
-        requiresParentConfirmation: true,
-      ),
-      _TaskTemplateRow(
-        startTime: '20:10',
-        endTime: '20:20',
-        taskType: 'schoolbag',
-        title: '检查作业本',
-        rewardPoints: 1,
-        requiresParentConfirmation: true,
-      ),
-      _TaskTemplateRow(
-        startTime: '20:20',
-        endTime: '20:30',
-        taskType: 'schoolbag',
-        title: '检查水杯和红领巾',
-        rewardPoints: 1,
-        requiresParentConfirmation: true,
-      ),
-    ],
-  ),
-  _TaskTemplate(
-    title: '周末上午',
-    subtitle: '阅读、户外和一个轻家务任务',
-    ageGroups: [
-      TaskAgeGroup.lowerPrimary,
-      TaskAgeGroup.upperPrimary,
-      TaskAgeGroup.teen,
-    ],
-    rows: [
-      _TaskTemplateRow(
-        startTime: '09:30',
-        endTime: '10:00',
-        taskType: 'reading_interest',
-        title: '阅读',
-        rewardPoints: 2,
-        requiresParentConfirmation: false,
-      ),
-      _TaskTemplateRow(
-        startTime: '10:10',
-        endTime: '10:40',
-        taskType: 'sports_outdoor',
-        title: '户外运动',
-        rewardPoints: 3,
-        requiresParentConfirmation: false,
-      ),
-      _TaskTemplateRow(
-        startTime: '10:50',
-        endTime: '11:10',
-        taskType: 'housework',
-        title: '家务小任务',
-        rewardPoints: 3,
-        requiresParentConfirmation: true,
-      ),
-    ],
-  ),
-  _TaskTemplate(
-    title: '自主安排',
-    subtitle: '适合高年级和更大孩子自己确认晚间节奏',
-    ageGroups: [TaskAgeGroup.upperPrimary, TaskAgeGroup.teen],
-    rows: [
-      _TaskTemplateRow(
-        startTime: '19:30',
-        endTime: '20:00',
-        taskType: 'learning',
-        title: '自主学习',
-        rewardPoints: 3,
-        requiresParentConfirmation: true,
-      ),
-      _TaskTemplateRow(
-        startTime: '20:10',
-        endTime: '20:30',
-        taskType: 'custom',
-        title: '明日准备',
-        rewardPoints: 2,
-        requiresParentConfirmation: true,
-      ),
-    ],
-  ),
-];
 
 Object? _repeatRulePayload(String scheduleType) {
   return switch (scheduleType) {
@@ -3206,20 +3225,17 @@ _TaskTypeConfig _taskConfig(String value) {
 }
 
 List<_TaskTypeConfig> _taskTypeConfigsForAge(TaskAgeGroup ageGroup) {
-  if (ageGroup == TaskAgeGroup.preschool) {
+  if (_isKindergartenAgeGroup(ageGroup)) {
     const order = [
       'life',
+      'checkin',
+      'sleep',
+      'housework',
       'sports_outdoor',
       'reading_interest',
-      'schoolbag',
-      'sleep',
       'custom',
     ];
-    final ordered = [for (final value in order) _taskConfig(value)];
-    final rest = _taskTypeConfigs
-        .where((config) => !order.contains(config.value))
-        .toList();
-    return [...ordered, ...rest];
+    return [for (final value in order) _taskConfig(value)];
   }
   final recommended = _taskTypeConfigs
       .where((config) => config.ageGroups.contains(ageGroup))
@@ -3232,6 +3248,9 @@ List<_TaskTypeConfig> _taskTypeConfigsForAge(TaskAgeGroup ageGroup) {
 
 String _recommendedTaskType(TaskAgeGroup ageGroup) {
   return switch (ageGroup) {
+    TaskAgeGroup.kindergartenSmall => 'life',
+    TaskAgeGroup.kindergartenMiddle => 'life',
+    TaskAgeGroup.kindergartenBig => 'life',
     TaskAgeGroup.preschool => 'life',
     TaskAgeGroup.lowerPrimary => 'learning',
     TaskAgeGroup.upperPrimary => 'learning',
@@ -3239,12 +3258,11 @@ String _recommendedTaskType(TaskAgeGroup ageGroup) {
   };
 }
 
-List<_TaskTemplate> _templatesForAge(TaskAgeGroup ageGroup) {
-  final matches = _taskTemplates
-      .where((template) => template.ageGroups.contains(ageGroup))
-      .toList();
-  if (matches.isEmpty) return _taskTemplates.take(3).toList();
-  return matches.take(3).toList();
+bool _isKindergartenAgeGroup(TaskAgeGroup ageGroup) {
+  return ageGroup == TaskAgeGroup.kindergartenSmall ||
+      ageGroup == TaskAgeGroup.kindergartenMiddle ||
+      ageGroup == TaskAgeGroup.kindergartenBig ||
+      ageGroup == TaskAgeGroup.preschool;
 }
 
 TaskAgeGroup taskAgeGroupForChild({
@@ -3255,12 +3273,18 @@ TaskAgeGroup taskAgeGroupForChild({
   if (text.isEmpty) {
     return TaskAgeGroup.preschool;
   }
+  if (text.contains('小班')) {
+    return TaskAgeGroup.kindergartenSmall;
+  }
+  if (text.contains('中班')) {
+    return TaskAgeGroup.kindergartenMiddle;
+  }
+  if (text.contains('大班')) {
+    return TaskAgeGroup.kindergartenBig;
+  }
   if (text.contains('幼') ||
       text.contains('学前') ||
       text.contains('托班') ||
-      text.contains('小班') ||
-      text.contains('中班') ||
-      text.contains('大班') ||
       text.contains('preschool') ||
       text.contains('kindergarten')) {
     return TaskAgeGroup.preschool;
@@ -3347,12 +3371,6 @@ String _addMinutes(String time, int minutes) {
   final hour = (next ~/ 60).toString().padLeft(2, '0');
   final minute = (next % 60).toString().padLeft(2, '0');
   return '$hour:$minute';
-}
-
-String _shiftTime(String time, int minutes) {
-  return _minuteText(
-    (_minutesOfDay(time) + minutes).clamp(0, 23 * 60 + 59).toInt(),
-  );
 }
 
 int _currentSelectableMinute(DateTime now) {

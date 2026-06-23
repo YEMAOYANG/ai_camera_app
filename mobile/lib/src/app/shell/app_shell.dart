@@ -68,7 +68,7 @@ class AppShell extends ConsumerWidget {
         ref.read(profileSummaryProvider).asData?.value.can('manage_tasks') ??
         false;
     if (!canAddTask) {
-      _showShellToast(context, '当前身份不能新增任务');
+      _showShellToast(context, '当前身份不能新增安排');
       return;
     }
     String? childId;
@@ -113,7 +113,7 @@ class AppShell extends ConsumerWidget {
       }
     }
     if (childId == null || childId.isEmpty) {
-      _showShellToast(context, '请先完成孩子资料，再添加孩子的新任务。');
+      _showShellToast(context, '请先完成孩子资料，再添加生活提醒。');
       return;
     }
     final resolvedChildId = childId;

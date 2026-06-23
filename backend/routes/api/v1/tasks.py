@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token, json_body
-from services.service_factory import task_service
+from services.service_factory import task_service, task_template_service
 from services.task_event_stream import publish_task_update
 
 
@@ -23,6 +23,14 @@ def today():
 def list_tasks():
     try:
         return jsonify(task_service().list_tasks(bearer_token(request), request.args))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@tasks_bp.get("/templates")
+def list_task_templates():
+    try:
+        return jsonify(task_template_service().list_templates(bearer_token(request), request.args))
     except ApiError as exc:
         return error_response(exc)
 

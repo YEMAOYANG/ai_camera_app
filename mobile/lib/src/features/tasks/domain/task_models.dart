@@ -196,17 +196,17 @@ class GuardianTask {
   String get typeLabel {
     return switch (type) {
       'learning' => '学习',
-      'life' => '生活',
-      'housework' => '家务',
-      'sleep' => '作息',
-      'schoolbag' => '小书包',
-      'reading_interest' => '阅读/兴趣',
+      'life' => '生活习惯',
+      'housework' => '收纳整理',
+      'sleep' => '午睡/睡眠',
+      'schoolbag' => '物品准备',
+      'reading_interest' => '阅读/亲子',
       'sports_outdoor' => '运动/户外',
       'custom' => '自定义',
-      'checkin' => '记录',
+      'checkin' => '用餐',
       'parent_confirmation' => '家长确认',
-      'ai_observed' => 'AI 观察',
-      _ => '任务',
+      'ai_observed' => '看护记录',
+      _ => '安排',
     };
   }
 
@@ -618,6 +618,144 @@ class GuardianTaskEvent {
   }
 }
 
+class TaskTemplateCatalog {
+  const TaskTemplateCatalog({
+    required this.templates,
+    required this.tags,
+    required this.grades,
+    required this.dayTypes,
+    required this.recommendedGrade,
+    required this.recommendedGradeLabel,
+  });
+
+  final List<TaskTemplate> templates;
+  final List<TaskTemplateOption> tags;
+  final List<TaskTemplateOption> grades;
+  final List<TaskTemplateOption> dayTypes;
+  final String recommendedGrade;
+  final String recommendedGradeLabel;
+
+  static TaskTemplateCatalog fromJson(Map<String, dynamic> json) {
+    return TaskTemplateCatalog(
+      templates: _asList(
+        json['templates'],
+      ).map((item) => TaskTemplate.fromJson(_asMap(item))).toList(),
+      tags: _asList(
+        json['tags'],
+      ).map((item) => TaskTemplateOption.fromJson(_asMap(item))).toList(),
+      grades: _asList(
+        json['grades'],
+      ).map((item) => TaskTemplateOption.fromJson(_asMap(item))).toList(),
+      dayTypes: _asList(
+        json['dayTypes'],
+      ).map((item) => TaskTemplateOption.fromJson(_asMap(item))).toList(),
+      recommendedGrade: _asString(json['recommendedGrade'], fallback: 'small'),
+      recommendedGradeLabel: _asString(
+        json['recommendedGradeLabel'],
+        fallback: '小班',
+      ),
+    );
+  }
+}
+
+class TaskTemplate {
+  const TaskTemplate({
+    required this.id,
+    required this.templateKey,
+    required this.title,
+    required this.subtitle,
+    required this.grade,
+    required this.gradeLabel,
+    required this.ageGroups,
+    required this.scheduleType,
+    required this.dayType,
+    required this.dayTypeLabel,
+    required this.tags,
+    required this.tagLabels,
+    required this.rows,
+  });
+
+  final String id;
+  final String templateKey;
+  final String title;
+  final String subtitle;
+  final String grade;
+  final String gradeLabel;
+  final List<String> ageGroups;
+  final String scheduleType;
+  final String dayType;
+  final String dayTypeLabel;
+  final List<String> tags;
+  final List<String> tagLabels;
+  final List<TaskTemplateRow> rows;
+
+  static TaskTemplate fromJson(Map<String, dynamic> json) {
+    return TaskTemplate(
+      id: _asString(json['id']),
+      templateKey: _asString(json['templateKey']),
+      title: _asString(json['title']),
+      subtitle: _asString(json['subtitle']),
+      grade: _asString(json['grade']),
+      gradeLabel: _asString(json['gradeLabel']),
+      ageGroups: _stringList(json['ageGroups']),
+      scheduleType: _asString(json['scheduleType'], fallback: 'one_time'),
+      dayType: _asString(json['dayType']),
+      dayTypeLabel: _asString(json['dayTypeLabel']),
+      tags: _stringList(json['tags']),
+      tagLabels: _stringList(json['tagLabels']),
+      rows: _asList(
+        json['rows'],
+      ).map((item) => TaskTemplateRow.fromJson(_asMap(item))).toList(),
+    );
+  }
+}
+
+class TaskTemplateRow {
+  const TaskTemplateRow({
+    required this.startTime,
+    required this.endTime,
+    required this.taskType,
+    required this.title,
+    required this.rewardPoints,
+    required this.requiresParentConfirmation,
+  });
+
+  final String startTime;
+  final String endTime;
+  final String taskType;
+  final String title;
+  final int rewardPoints;
+  final bool requiresParentConfirmation;
+
+  static TaskTemplateRow fromJson(Map<String, dynamic> json) {
+    return TaskTemplateRow(
+      startTime: _asString(json['startTime']),
+      endTime: _asString(json['endTime']),
+      taskType: _asString(json['taskType']),
+      title: _asString(json['title']),
+      rewardPoints: _asInt(json['rewardPoints']),
+      requiresParentConfirmation:
+          json['requiresParentConfirmation'] is bool
+          ? json['requiresParentConfirmation'] as bool
+          : false,
+    );
+  }
+}
+
+class TaskTemplateOption {
+  const TaskTemplateOption({required this.value, required this.label});
+
+  final String value;
+  final String label;
+
+  static TaskTemplateOption fromJson(Map<String, dynamic> json) {
+    return TaskTemplateOption(
+      value: _asString(json['value']),
+      label: _asString(json['label']),
+    );
+  }
+}
+
 String _asString(dynamic value, {String fallback = ''}) {
   return value is String && value.isNotEmpty ? value : fallback;
 }
@@ -641,6 +779,17 @@ Map<String, dynamic> _asMap(dynamic value) {
   if (value is Map<String, dynamic>) return value;
   if (value is Map) return Map<String, dynamic>.from(value);
   return <String, dynamic>{};
+}
+
+List<dynamic> _asList(dynamic value) {
+  return value is List ? value : const [];
+}
+
+List<String> _stringList(dynamic value) {
+  return _asList(value)
+      .whereType<String>()
+      .where((item) => item.isNotEmpty)
+      .toList();
 }
 
 String _dateText(DateTime date) {

@@ -38,6 +38,40 @@ final taskEventsProvider =
       return ref.watch(taskRepositoryProvider).taskEvents(taskId);
     });
 
+final taskTemplatesProvider =
+    FutureProvider.family<TaskTemplateCatalog, TaskTemplateQuery>((ref, query) {
+      return ref.watch(taskRepositoryProvider).taskTemplates(query);
+    });
+
+class TaskTemplateQuery {
+  const TaskTemplateQuery({
+    this.childId,
+    this.grade,
+    this.dayType,
+    this.tag,
+    this.includeRows = true,
+  });
+
+  final String? childId;
+  final String? grade;
+  final String? dayType;
+  final String? tag;
+  final bool includeRows;
+
+  @override
+  bool operator ==(Object other) {
+    return other is TaskTemplateQuery &&
+        other.childId == childId &&
+        other.grade == grade &&
+        other.dayType == dayType &&
+        other.tag == tag &&
+        other.includeRows == includeRows;
+  }
+
+  @override
+  int get hashCode => Object.hash(childId, grade, dayType, tag, includeRows);
+}
+
 class TaskWeekQuery {
   const TaskWeekQuery({
     required this.startDate,
@@ -234,6 +268,24 @@ class TaskRepository {
       return raw
           .map((event) => GuardianTaskEvent.fromJson(_asMap(event)))
           .toList();
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<TaskTemplateCatalog> taskTemplates(TaskTemplateQuery query) async {
+    try {
+      final response = await _apiClient.get(
+        '/tasks/templates',
+        queryParameters: _compactQuery({
+          'childId': query.childId,
+          'grade': query.grade,
+          'dayType': query.dayType,
+          'tag': query.tag,
+          'includeRows': query.includeRows,
+        }),
+      );
+      return TaskTemplateCatalog.fromJson(_asMap(response.data));
     } on DioException catch (error) {
       throw _fromDio(error);
     }

@@ -23,6 +23,7 @@ from services.setup_service import SetupService
 from services.sms_provider import DevelopmentSmsProvider, SmsProvider, UnavailableSmsProvider
 from services.prompt_registry import PromptRegistry
 from services.task_service import TaskService
+from services.task_template_service import TaskTemplateService
 from services.task_runtime_service import TaskRuntimeService
 
 
@@ -53,6 +54,13 @@ def task_service() -> TaskService:
         camera_command_service_factory=camera_command_service,
         ai_text_provider=ai_text_provider(),
         prompt_registry=prompt_registry(),
+    )
+
+
+def task_template_service() -> TaskTemplateService:
+    return TaskTemplateService(
+        current_app.config["DATABASE_URL"],
+        auth_service=auth_service(),
     )
 
 

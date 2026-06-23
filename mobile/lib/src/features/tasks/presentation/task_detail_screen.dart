@@ -828,13 +828,13 @@ Future<void> _editTask(
     context,
     childId: task.childId,
     initialDate: initialDate,
-    childAgeGroup: TaskAgeGroup.lowerPrimary,
+    childAgeGroup: TaskAgeGroup.preschool,
     task: task,
   );
 
   if (savedDate != null) {
     _invalidateTaskData(ref, task.id);
-    if (context.mounted) _showToast(context, '任务已更新');
+    if (context.mounted) _showToast(context, '安排已更新');
   }
 }
 
