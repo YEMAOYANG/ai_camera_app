@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
@@ -20,6 +21,7 @@ import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.da
 import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
 const _homeHeroImage = 'assets/images/home/home-hero-desk-evening.png';
@@ -262,10 +264,18 @@ class _HomeHeroBackdrop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final overview = deviceOverview.asData?.value;
+    final hasNoDevice =
+        overview == null &&
+        !deviceOverview.isLoading &&
+        !deviceOverview.hasError;
     final health = cameraHealth.asData?.value;
     final camera = cameraStatus.asData?.value;
-    final deviceOnline = overview?.isOnline ?? camera?.isOnline ?? false;
-    final cameraOnline = camera?.isOnline ?? health?.reachable ?? false;
+    final deviceOnline = hasNoDevice
+        ? false
+        : overview?.isOnline ?? camera?.isOnline ?? false;
+    final cameraOnline = hasNoDevice
+        ? false
+        : camera?.isOnline ?? health?.reachable ?? false;
     final localTodayTasks = _localTodayTasks(todayTasks.asData?.value);
     final currentTask =
         camera?.currentTask ?? _currentTaskFromToday(localTodayTasks);
@@ -332,6 +342,7 @@ class _HomeHeroBackdrop extends StatelessWidget {
           Positioned.fill(
             child: _HomeHeroContent(
               profileSummary: profileSummary,
+              hasNoDevice: hasNoDevice,
               deviceOnline: deviceOnline,
               cameraOnline: cameraOnline,
               deviceStateLoading:
@@ -377,6 +388,7 @@ class _HomeHeroContent extends StatelessWidget {
     required this.deviceOnline,
     required this.cameraOnline,
     required this.deviceStateLoading,
+    required this.hasNoDevice,
     required this.currentTask,
     required this.pendingCount,
     required this.todayTaskCount,
@@ -384,6 +396,7 @@ class _HomeHeroContent extends StatelessWidget {
   });
 
   final AsyncValue<ProfileSummary> profileSummary;
+  final bool hasNoDevice;
   final bool deviceOnline;
   final bool cameraOnline;
   final bool deviceStateLoading;
@@ -401,6 +414,7 @@ class _HomeHeroContent extends StatelessWidget {
       profile: profile,
       profileLoading: profileSummary.isLoading,
       deviceStateLoading: deviceStateLoading,
+      hasNoDevice: hasNoDevice,
       currentTask: currentTask,
       deviceOnline: deviceOnline,
       cameraOnline: cameraOnline,
@@ -411,6 +425,7 @@ class _HomeHeroContent extends StatelessWidget {
       profile: profile,
       profileLoading: profileSummary.isLoading,
       deviceStateLoading: deviceStateLoading,
+      hasNoDevice: hasNoDevice,
       deviceOnline: deviceOnline,
       cameraOnline: cameraOnline,
       pendingCount: pendingCount,
@@ -558,6 +573,7 @@ _HeroFocusCopy _heroFocusCopy({
   required ProfileSummary? profile,
   required bool profileLoading,
   required bool deviceStateLoading,
+  required bool hasNoDevice,
   required GuardianTask? currentTask,
   required bool deviceOnline,
   required bool cameraOnline,
@@ -577,6 +593,13 @@ _HeroFocusCopy _heroFocusCopy({
       status: '孩子资料未创建',
       title: '先添加孩子资料',
       detail: '添加孩子资料后，可以安排任务和看护提醒。',
+    );
+  }
+  if (hasNoDevice) {
+    return const _HeroFocusCopy(
+      status: '基础设置已完成',
+      title: '还没有连接摄像头',
+      detail: '连接后可以查看实时画面、看护提醒和设备观察。',
     );
   }
   if (!deviceOnline || !cameraOnline) {
@@ -618,13 +641,20 @@ List<_HeroChipSpec> _heroChips({
   required ProfileSummary? profile,
   required bool profileLoading,
   required bool deviceStateLoading,
+  required bool hasNoDevice,
   required bool deviceOnline,
   required bool cameraOnline,
   required int pendingCount,
   required int? todayTaskCount,
 }) {
   final chips = <_HeroChipSpec>[
-    if (deviceStateLoading)
+    if (hasNoDevice)
+      const _HeroChipSpec(
+        icon: Icons.add_a_photo_outlined,
+        label: '待连接',
+        tone: StatusTone.neutral,
+      )
+    else if (deviceStateLoading)
       const _HeroChipSpec(
         icon: Icons.sensors_outlined,
         label: '设备同步中',
@@ -642,6 +672,14 @@ List<_HeroChipSpec> _heroChips({
       const _HeroChipSpec(
         icon: Icons.sync_outlined,
         label: '资料同步中',
+        tone: StatusTone.neutral,
+      ),
+    );
+  } else if (hasNoDevice) {
+    chips.add(
+      const _HeroChipSpec(
+        icon: Icons.videocam_outlined,
+        label: '可稍后连接',
         tone: StatusTone.neutral,
       ),
     );
@@ -826,6 +864,13 @@ class _HomePrioritySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskList = _localTodayTasks(tasks.asData?.value);
+    final hasNoDevice =
+        deviceOverview.asData?.value == null &&
+        !deviceOverview.isLoading &&
+        !deviceOverview.hasError;
+    if (hasNoDevice) {
+      return const _HomeNoDeviceSection();
+    }
     if (taskList == null) {
       if (tasks.isLoading) {
         return const _HomeSoftState(title: '正在整理需要处理的事', message: '一会儿就好。');
@@ -893,6 +938,37 @@ class _HomePrioritySection extends StatelessWidget {
         else
           _PriorityActionPanel(actions: actions),
       ],
+    );
+  }
+}
+
+class _HomeNoDeviceSection extends StatelessWidget {
+  const _HomeNoDeviceSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return _SoftPanel(
+      tone: StatusTone.neutral,
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const _InsightRow(
+            icon: Icons.videocam_outlined,
+            title: '还没有连接看护摄像头',
+            detail: '连接后可以查看实时画面、看护提醒和设备观察。',
+            tone: StatusTone.neutral,
+          ),
+          const SizedBox(height: 12),
+          AppPrimaryButton(
+            label: '连接第一台看护摄像头',
+            trailing: const AppButtonGlyph(icon: Icons.arrow_forward),
+            onTap: () => showAddCameraSheet(context),
+          ),
+          const SizedBox(height: 8),
+          AppSecondaryButton(label: '稍后再说', onTap: () {}),
+        ],
+      ),
     );
   }
 }
@@ -1388,25 +1464,36 @@ class _HomeCareInsightSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final overview = deviceOverview.asData?.value;
+    final hasNoDevice =
+        overview == null &&
+        !deviceOverview.isLoading &&
+        !deviceOverview.hasError;
     final health = cameraHealth.asData?.value;
     final camera = cameraStatus.asData?.value;
-    final deviceOnline = overview?.isOnline ?? camera?.isOnline ?? false;
-    final cameraOnline = camera?.isOnline ?? health?.reachable ?? false;
+    final deviceOnline = hasNoDevice
+        ? false
+        : overview?.isOnline ?? camera?.isOnline ?? false;
+    final cameraOnline = hasNoDevice
+        ? false
+        : camera?.isOnline ?? health?.reachable ?? false;
     final localTodayTasks = _localTodayTasks(todayTasks.asData?.value);
     final currentTask =
         camera?.currentTask ?? _currentTaskFromToday(localTodayTasks);
     final hasIssue =
-        !deviceOnline ||
-        !cameraOnline ||
+        (!hasNoDevice && (!deviceOnline || !cameraOnline)) ||
         deviceOverview.hasError ||
         cameraHealth.hasError ||
         cameraStatus.hasError;
-    final statusTitle = hasIssue
+    final statusTitle = hasNoDevice
+        ? '等待连接摄像头'
+        : hasIssue
         ? '看护状态需要检查'
         : currentTask != null
         ? '${currentTask.title}观察中'
         : '看护状态稳定';
-    final statusDetail = hasIssue
+    final statusDetail = hasNoDevice
+        ? '连接后可以查看实时画面和看护提醒。'
+        : hasIssue
         ? '网络或摄像头暂不稳定，先保留今天的安排。'
         : currentTask?.nextStep ?? '任务到点后会自动提醒，隐私灯保持可见。';
     final advice = _homeAdviceFromRealData(
@@ -1418,21 +1505,40 @@ class _HomeCareInsightSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _HomeSectionTitle(title: '看护与建议', meta: hasIssue ? '需留意' : '正常'),
+        _HomeSectionTitle(
+          title: '看护与建议',
+          meta: hasNoDevice
+              ? '待连接'
+              : hasIssue
+              ? '需留意'
+              : '正常',
+        ),
         const SizedBox(height: 10),
         _SoftPanel(
-          tone: hasIssue ? StatusTone.warning : StatusTone.success,
+          tone: hasNoDevice
+              ? StatusTone.neutral
+              : hasIssue
+              ? StatusTone.warning
+              : StatusTone.success,
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
           child: Column(
             children: [
               _InsightRow(
-                icon: hasIssue
+                icon: hasNoDevice
+                    ? Icons.videocam_outlined
+                    : hasIssue
                     ? Icons.sensors_off_outlined
                     : Icons.center_focus_strong_outlined,
                 title: statusTitle,
                 detail: statusDetail,
-                tone: hasIssue ? StatusTone.warning : StatusTone.success,
-                onTap: () => context.go(AppRoute.live.path),
+                tone: hasNoDevice
+                    ? StatusTone.neutral
+                    : hasIssue
+                    ? StatusTone.warning
+                    : StatusTone.success,
+                onTap: () => hasNoDevice
+                    ? showAddCameraSheet(context)
+                    : context.go(AppRoute.live.path),
               ),
               Divider(
                 height: 18,
@@ -1869,6 +1975,11 @@ bool _hasDeviceIssue(
   AsyncValue<CameraStatus> cameraStatus,
 ) {
   final overview = deviceOverview.asData?.value;
+  if (overview == null &&
+      !deviceOverview.isLoading &&
+      !deviceOverview.hasError) {
+    return false;
+  }
   final health = cameraHealth.asData?.value;
   final camera = cameraStatus.asData?.value;
   return deviceOverview.hasError ||

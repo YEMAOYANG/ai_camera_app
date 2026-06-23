@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
+import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
+import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
 import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
 import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
@@ -19,16 +21,73 @@ class LiveCareScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final deviceOverview = ref.watch(primaryDeviceOverviewProvider);
+    final selectedDevice = ref.watch(selectedDeviceProvider);
+    if (selectedDevice.isLoading) {
+      return const AppScreen(
+        title: '实时看护',
+        fixedHeader: false,
+        showHeader: false,
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.pageHorizontal,
+          8,
+          AppSpacing.pageHorizontal,
+          AppSpacing.pageBottom,
+        ),
+        children: [_LoadingLiveCareState()],
+      );
+    }
+    if (selectedDevice.hasError) {
+      return AppScreen(
+        title: '实时看护',
+        fixedHeader: false,
+        showHeader: false,
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.pageHorizontal,
+          8,
+          AppSpacing.pageHorizontal,
+          AppSpacing.pageBottom,
+        ),
+        children: [
+          AppStateView(
+            variant: AppStateVariant.serviceUnavailable,
+            title: '摄像头状态暂时无法同步',
+            message: '请稍后刷新。',
+            primaryActionLabel: '重新加载',
+            onPrimaryAction: () => ref.invalidate(selectedDeviceProvider),
+            compact: true,
+          ),
+        ],
+      );
+    }
+    final titleDevice = selectedDevice.asData?.value;
+    if (titleDevice == null) {
+      return AppScreen(
+        title: '实时看护',
+        fixedHeader: false,
+        showHeader: false,
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.pageHorizontal,
+          8,
+          AppSpacing.pageHorizontal,
+          AppSpacing.pageBottom,
+        ),
+        children: [
+          AppStateView(
+            variant: AppStateVariant.deviceOffline,
+            title: '还没有连接摄像头',
+            message: '连接后可以查看实时画面和看护提醒。',
+            primaryActionLabel: '连接看护摄像头',
+            onPrimaryAction: () => showAddCameraSheet(context),
+            compact: true,
+          ),
+        ],
+      );
+    }
     final liveStatus = ref.watch(liveCareStatusProvider);
     final snapshotFrame = ref.watch(cameraSnapshotProvider);
     final events = ref.watch(cameraEventsProvider);
-    final titleDevice = deviceOverview.asData?.value?.device;
-    final subtitle = titleDevice == null
-        ? deviceOverview.isLoading
-              ? '设备状态同步中'
-              : '尚未绑定看护设备'
-        : '${titleDevice.displayLocation} · ${titleDevice.displayName}';
+    final subtitle =
+        '${titleDevice.displayLocation} · ${titleDevice.displayName}';
 
     return AppScreen(
       title: '实时看护',
@@ -69,7 +128,22 @@ class LiveCareScreen extends ConsumerWidget {
       ..invalidate(cameraMonitorStatusProvider)
       ..invalidate(cameraSnapshotProvider)
       ..invalidate(cameraEventsProvider)
-      ..invalidate(primaryDeviceOverviewProvider);
+      ..invalidate(primaryDeviceOverviewProvider)
+      ..invalidate(selectedDeviceProvider);
+  }
+}
+
+class _LoadingLiveCareState extends StatelessWidget {
+  const _LoadingLiveCareState();
+
+  @override
+  Widget build(BuildContext context) {
+    return const AppStateView(
+      variant: AppStateVariant.loading,
+      title: '正在同步摄像头',
+      message: '请稍候。',
+      compact: true,
+    );
   }
 }
 
@@ -280,7 +354,7 @@ class _LiveViewport extends StatelessWidget {
     if (!care.isAvailable) return care.detail;
     final currentTask = care.currentTask;
     if (currentTask != null) {
-      return '正在看护“${currentTask.title}”，任务状态会随进度同步更新。';
+      return '正在看护“${currentTask.title}”，进度会同步更新。';
     }
     if (frame?.available == true) {
       return '这是最近预览画面，点击查看实时画面可进入竖屏监控。';
@@ -621,10 +695,10 @@ class _CareFocusPanel extends StatelessWidget {
             icon: currentTask == null
                 ? Icons.shield_outlined
                 : Icons.play_circle_outline,
-            title: currentTask == null ? '当前没有进行中的任务' : currentTask.title,
+            title: currentTask == null ? '当前没有进行中的看护安排' : currentTask.title,
             subtitle: currentTask == null
                 ? '需要查看时进入实时画面，普通状态不会打扰孩子。'
-                : '${currentTask.timeLabel} · 任务状态会随进度同步更新',
+                : '${currentTask.timeLabel} · 看护进度会同步更新',
             tone: care?.isAvailable == true
                 ? AppListRowTone.green
                 : AppListRowTone.amber,
@@ -633,14 +707,14 @@ class _CareFocusPanel extends StatelessWidget {
             const AppListRow(
               icon: Icons.history_toggle_off_outlined,
               title: '近期记录同步中',
-              subtitle: '正在整理最近的任务、提醒和摄像头操作。',
+              subtitle: '正在整理最近的提醒和摄像头操作。',
               tone: AppListRowTone.neutral,
             )
           else if (recentEvent == null)
             AppListRow(
               icon: Icons.history_toggle_off_outlined,
               title: '还没有近期记录',
-              subtitle: '任务提醒、看护观察和摄像头操作会持续记录在这里。',
+              subtitle: '摄像头提醒、看护记录和设备操作会持续记录在这里。',
               tone: AppListRowTone.neutral,
               onTap: () => context.go(liveEventsPath),
             )
@@ -675,7 +749,7 @@ class LiveEventsScreen extends ConsumerWidget {
     final events = ref.watch(cameraEventsProvider);
     return AppScreen(
       title: '事件回放',
-      subtitle: '任务、提醒和摄像头操作记录',
+      subtitle: '提醒、看护和摄像头操作记录',
       onBack: () => context.go(AppRoute.live.path),
       children: [
         events.when(
@@ -691,7 +765,7 @@ class LiveEventsScreen extends ConsumerWidget {
               return const AppStateView(
                 variant: AppStateVariant.noData,
                 title: '还没有可回放的片段',
-                message: '任务提醒、看护观察和摄像头操作会持续记录在这里。',
+                message: '摄像头提醒、看护记录和设备操作会持续记录在这里。',
               );
             }
             return Column(

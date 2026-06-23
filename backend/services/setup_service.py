@@ -63,11 +63,18 @@ class SetupService:
     def status(self, access_token: str) -> dict:
         context = self._auth_context(access_token)
         family_id = context["family"]["id"]
+        now = now_ms()
         with self.repository.transaction() as conn:
             progress = self.repository.get_or_create_progress(
                 conn,
                 family_id=family_id,
-                now=now_ms(),
+                now=now,
+            )
+            progress = self._complete_lightweight_setup_if_ready(
+                conn,
+                family_id=family_id,
+                progress=progress,
+                now=now,
             )
             return self._response(progress, self._saved_setup_details(conn, family_id))
 
@@ -123,9 +130,9 @@ class SetupService:
 
     def save_device(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
-        name = self._required_text(data, "deviceName", "请输入设备名称")
         binding_code = self._optional_text(data, "bindingCode")
         location = self._optional_text(data, "location")
+        name = self._device_name(self._optional_text(data, "deviceName"), location)
         now = now_ms()
         with self.repository.transaction() as conn:
             progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
@@ -168,6 +175,12 @@ class SetupService:
                 location=location,
                 now=now,
             )
+            self._ensure_default_wake_name(
+                conn,
+                family_id=context["family"]["id"],
+                device_id=device_id,
+                now=now,
+            )
             self.repository.mark_step_done(
                 conn,
                 family_id=context["family"]["id"],
@@ -196,7 +209,7 @@ class SetupService:
         now = now_ms()
         with self.repository.transaction() as conn:
             progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
-            self._require_setup_steps(progress, "parent_identity", "device_binding")
+            self._require_setup_steps(progress, "parent_identity")
             self.repository.save_wifi(
                 conn,
                 family_id=context["family"]["id"],
@@ -231,7 +244,7 @@ class SetupService:
         now = now_ms()
         with self.repository.transaction() as conn:
             progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
-            self._require_setup_steps(progress, "parent_identity", "device_binding", "wifi")
+            self._require_setup_steps(progress, "parent_identity")
             child_id = self.repository.save_child(
                 conn,
                 family_id=context["family"]["id"],
@@ -254,6 +267,12 @@ class SetupService:
             progress = self.repository.get_or_create_progress(
                 conn,
                 family_id=context["family"]["id"],
+                now=now,
+            )
+            progress = self._complete_lightweight_setup_if_ready(
+                conn,
+                family_id=context["family"]["id"],
+                progress=progress,
                 now=now,
             )
             return self._response(
@@ -285,8 +304,6 @@ class SetupService:
             self._require_setup_steps(
                 progress,
                 "parent_identity",
-                "device_binding",
-                "wifi",
                 "child_profile",
             )
             default_device = self.device_repository.ensure_default_device(
@@ -329,7 +346,6 @@ class SetupService:
                 progress,
                 "parent_identity",
                 "device_binding",
-                "wifi",
                 "child_profile",
             )
             if progress.camera_name_intro == "done":
@@ -386,7 +402,6 @@ class SetupService:
                 progress,
                 "parent_identity",
                 "device_binding",
-                "wifi",
                 "child_profile",
             )
             wake_name = self._wake_name(
@@ -433,10 +448,7 @@ class SetupService:
             self._require_setup_steps(
                 progress,
                 "parent_identity",
-                "device_binding",
-                "wifi",
                 "child_profile",
-                "camera_name",
             )
             resolved_contacts = []
             for contact in contacts:
@@ -493,14 +505,10 @@ class SetupService:
                 step != "done"
                 for step in (
                     progress.parent_identity,
-                    progress.device_binding,
-                    progress.wifi,
                     progress.child_profile,
-                    progress.camera_name,
-                    progress.contacts,
                 )
             ):
-                raise ApiError("setup_incomplete", "请先完成所有首次设置步骤")
+                raise ApiError("setup_incomplete", "请先完成家长身份和孩子资料")
 
             self.repository.complete_setup(conn, family_id=context["family"]["id"], now=now)
             progress = self.repository.get_or_create_progress(
@@ -518,6 +526,46 @@ class SetupService:
         if extra:
             payload.update(extra)
         return payload
+
+    def _complete_lightweight_setup_if_ready(self, conn, *, family_id: str, progress, now: int):
+        """V1 kindergarten setup only blocks on parent identity and child basics.
+
+        Camera connection, Wi-Fi details, camera wake name, emergency contacts,
+        and family role fine-tuning remain available after entering the app, but
+        they no longer block the first app session.
+        """
+        if progress.completed:
+            return progress
+        if (
+            progress.parent_identity == SETUP_DONE
+            and progress.child_profile == SETUP_DONE
+        ):
+            self.repository.complete_setup(conn, family_id=family_id, now=now)
+            return self.repository.get_or_create_progress(conn, family_id=family_id, now=now)
+        return progress
+
+    def _device_name(self, value: str | None, location: str | None) -> str:
+        if value:
+            return value
+        if location:
+            return f"{location}摄像头"
+        return "AI 看护摄像头"
+
+    def _ensure_default_wake_name(self, conn, *, family_id: str, device_id: str, now: int) -> None:
+        device = self.device_repository.get_device(
+            conn,
+            family_id=family_id,
+            device_id=device_id,
+        )
+        if device is not None and device.get("wake_name"):
+            return
+        self.repository.save_camera_name(
+            conn,
+            family_id=family_id,
+            device_id=device_id,
+            wake_name="小豆",
+            now=now,
+        )
 
     def _require_setup_steps(self, progress, *steps: str) -> None:
         for step in steps:

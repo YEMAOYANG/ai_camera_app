@@ -6,11 +6,24 @@ product
 
 ## Users
 
-Mira Guardian is used by parents and other caregivers who want to know what a child is doing now, whether the situation is normal, and what needs adult judgment. They often open the app quickly during dinner, work, commute, or bedtime preparation, so the interface must answer the next important decision without making them inspect device telemetry.
+家庭 AI 看护 App is used by parents and other caregivers who want to know what a child is doing now, whether the situation is normal, and what needs adult judgment. They often open the app quickly during dinner, work, commute, or bedtime preparation, so the interface must answer the next important decision without making them inspect device telemetry.
 
 ## Product Purpose
 
 The product is the parent-facing control and review app for an AI family camera. It helps caregivers set routines, review evidence, confirm rewards, handle safety events, manage privacy, and keep family members aligned. Success means parents feel calmer and more informed while the child still keeps agency: AI organizes observations and suggestions, but final decisions remain with adults.
+
+## Naming Rules
+
+The current product name is not finalized. User-visible UI, legal copy, about pages, onboarding, add-camera flows, empty states, buttons, and Toast messages must not use Mira, 米拉, or Mira Guardian.
+
+Use neutral product wording instead:
+
+- App: 家庭 AI 看护 App
+- Device: AI 看护摄像头 or 看护摄像头
+- Default camera name: AI 看护摄像头 or 儿童房摄像头
+- Default wake name: 小豆
+
+Internal headers and protocol names such as X-Mira-* may remain unchanged when they are not shown to families.
 
 ## Brand Personality
 

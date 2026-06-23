@@ -61,18 +61,32 @@ class ProfileScreen extends ConsumerWidget {
         const _ProfileCategorySections(
           sections: [
             _ProfileCategorySection(
-              title: '看护空间',
+              title: '家庭看护',
               rows: [
                 _ProfileCategory(
-                  icon: Icons.contact_phone_outlined,
-                  title: '紧急联系人',
-                  subtitle: '重要情况的通知对象',
-                  path: profileContactsPath,
+                  icon: Icons.group_outlined,
+                  title: '家庭与成员',
+                  subtitle: '成员、邀请和紧急联系人',
+                  path: profileFamilyHubPath,
+                ),
+                _ProfileCategory(
+                  icon: Icons.child_care_outlined,
+                  title: '孩子资料',
+                  subtitle: '昵称、年龄阶段和基础信息',
+                  path: profileChildPath,
+                  tone: AppListRowTone.green,
+                ),
+                _ProfileCategory(
+                  icon: Icons.videocam_outlined,
+                  title: '设备与看护',
+                  subtitle: '摄像头、看护能力和作息时间',
+                  path: profileDeviceHubPath,
+                  tone: AppListRowTone.blue,
                 ),
                 _ProfileCategory(
                   icon: Icons.auto_awesome_outlined,
                   title: 'AI 规则与提醒',
-                  subtitle: '观察规则、语音播报和通知边界',
+                  subtitle: '语音提醒、通知和隐私边界',
                   path: profileRulesHubPath,
                 ),
               ],
@@ -81,36 +95,30 @@ class ProfileScreen extends ConsumerWidget {
               title: '权益与安全',
               rows: [
                 _ProfileCategory(
-                  icon: Icons.insights_outlined,
-                  title: '看护报告',
-                  subtitle: '日报、周报和成长时刻',
-                  path: profileReportsHubPath,
+                  icon: Icons.workspace_premium_outlined,
+                  title: '订阅与权益',
+                  subtitle: '当前套餐和权益状态',
+                  path: profileSubscriptionPath,
                   tone: AppListRowTone.amber,
                 ),
                 _ProfileCategory(
-                  icon: Icons.lock_outline,
-                  title: '隐私与权限',
-                  subtitle: '隐私模式、语音播报和数据保留',
-                  path: profilePrivacyPath,
-                ),
-                _ProfileCategory(
                   icon: Icons.admin_panel_settings_outlined,
-                  title: '账号安全',
-                  subtitle: '登录设备和账号注销',
-                  path: profileSecurityPath,
+                  title: '账号与安全',
+                  subtitle: '个人信息、登录和隐私授权',
+                  path: profileAccountPath,
                   tone: AppListRowTone.green,
                 ),
-              ],
-            ),
-            _ProfileCategorySection(
-              title: '支持',
-              rows: [
+                _ProfileCategory(
+                  icon: Icons.support_agent_outlined,
+                  title: '帮助与反馈',
+                  subtitle: '问题建议和使用帮助',
+                  path: profileFeedbackPath,
+                ),
                 _ProfileCategory(
                   icon: Icons.info_outline,
                   title: '关于',
-                  subtitle: '帮助反馈、当前版本和协议政策',
+                  subtitle: '版本、协议和产品原则',
                   path: profileAboutPath,
-                  tone: AppListRowTone.green,
                 ),
               ],
             ),

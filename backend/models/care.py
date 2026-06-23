@@ -181,7 +181,7 @@ DEFAULT_CAPABILITY_CONFIGS = [
     },
     {
         "scenario": CARE_SCENARIO_TOY_CLEANUP,
-        "minObservationSeconds": 45,
+        "minObservationSeconds": 180,
         "confidenceThreshold": 0.72,
         "cooldownSeconds": 1800,
         "dailyLimit": 3,
@@ -189,7 +189,7 @@ DEFAULT_CAPABILITY_CONFIGS = [
         "allowSpeaker": True,
         "recordOnly": False,
         "promptId": "reminder.toy_cleanup",
-        "timeWindows": ["toy_cleanup", "bedtime"],
+        "timeWindows": [],
     },
     {
         "scenario": CARE_SCENARIO_MEAL_START,
@@ -298,12 +298,6 @@ DEFAULT_ROUTINE_WINDOWS = [
     },
     {
         "dayType": DAY_TYPE_SCHOOL_DAY,
-        "windowType": "toy_cleanup",
-        "startTime": "19:20",
-        "endTime": "20:00",
-    },
-    {
-        "dayType": DAY_TYPE_SCHOOL_DAY,
         "windowType": "bedtime",
         "startTime": "20:30",
         "endTime": "21:20",
@@ -337,12 +331,6 @@ DEFAULT_ROUTINE_WINDOWS = [
         "windowType": "dinner",
         "startTime": "17:40",
         "endTime": "18:50",
-    },
-    {
-        "dayType": DAY_TYPE_WEEKEND,
-        "windowType": "toy_cleanup",
-        "startTime": "18:50",
-        "endTime": "20:10",
     },
     {
         "dayType": DAY_TYPE_WEEKEND,

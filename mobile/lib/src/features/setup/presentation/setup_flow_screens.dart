@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,7 +29,7 @@ final setupDraftProvider = StateProvider<SetupDraft>((ref) {
   return const SetupDraft();
 });
 
-const _setupTotalSteps = 6;
+const _setupTotalSteps = 2;
 
 void syncSetupDraftFromStatus(WidgetRef ref, SetupStatus status) {
   final current = ref.read(setupDraftProvider);
@@ -86,7 +87,7 @@ class SetupDraft {
     this.childSleepTime = '21:00',
     this.childGender = 'unspecified',
     this.childStage = '幼儿园',
-    this.childGrade = '大班',
+    this.childGrade = '',
     this.cameraWakeName = '小豆',
     this.emergencyName = '',
     this.emergencyPhone = '',
@@ -161,26 +162,26 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
       loading: () => const _SetupScreenShell(
         step: 1,
         title: '确认家长身份',
-        subtitle: '身份用于通知分发、家庭协作记录和权限判断。',
+        subtitle: '选择家里怎么称呼你。',
         leadingIcon: Icons.supervisor_account_outlined,
         body: _SetupStatusPanel(
           icon: Icons.sync_outlined,
-          title: '正在同步身份配置',
-          detail: '家庭身份、称呼和角色由后台配置维护。',
+          title: '正在准备身份选项',
+          detail: '稍等一下，很快就好。',
           tone: _SetupTone.blue,
         ),
-        primaryLabel: '继续绑定设备',
+        primaryLabel: '继续填写孩子资料',
         onPrimary: null,
       ),
       error: (error, _) => _SetupScreenShell(
         step: 1,
         title: '确认家长身份',
-        subtitle: '身份用于通知分发、家庭协作记录和权限判断。',
+        subtitle: '选择家里怎么称呼你。',
         leadingIcon: Icons.supervisor_account_outlined,
         body: _SetupStatusPanel(
           icon: Icons.wifi_off_outlined,
-          title: '身份配置暂时无法同步',
-          detail: '请检查网络后重试，避免使用过期的本地身份选项。',
+          title: '身份选项暂时无法同步',
+          detail: '请检查网络后重试。',
           tone: _SetupTone.neutral,
         ),
         primaryLabel: '重新加载',
@@ -209,12 +210,11 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
       parentIdentityKey.isNotEmpty ? parentIdentityKey : parentIdentity,
     );
     final identityGroupKey = identityGroup?.key ?? options.defaultGroupKey;
-    final roleKey = options.roleKeyFor(draft.familyRole);
 
     return _SetupScreenShell(
       step: 1,
       title: '确认家长身份',
-      subtitle: '身份用于通知分发、家庭协作记录和权限判断。',
+      subtitle: '选择家里怎么称呼你。',
       leadingIcon: Icons.supervisor_account_outlined,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,25 +251,16 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
               );
             },
           ),
-          const SizedBox(height: 18),
-          _FamilyRoleSegmentedControl(
-            label: '家庭角色',
-            options: options.familyRoles,
-            selected: roleKey,
-            onSelect: (value) {
-              ref.read(setupDraftProvider.notifier).state = draft.copyWith(
-                familyRole: value,
-              );
-            },
-          ),
           const SizedBox(height: 14),
+          // V1 幼儿园版本暂不开放家庭权限选择，默认创建者由后端家庭成员体系保持管理员；
+          // _FamilyRoleSegmentedControl 和角色模型保留，供后续多角色家庭版本重新启用。
           _JoinFamilyCodeBanner(
             onTap: () => _showJoinFamilyCodeSheet(context, ref),
           ),
         ],
       ),
-      primaryLabel: '继续绑定设备',
-      onPrimary: parentIdentity.trim().isEmpty || roleKey.trim().isEmpty
+      primaryLabel: '继续填写孩子资料',
+      onPrimary: parentIdentity.trim().isEmpty
           ? null
           : () async {
               final saved = await _submitSetupStep(
@@ -284,7 +275,7 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
                     ),
               );
               if (saved && context.mounted) {
-                context.go(setupDevicePath);
+                context.go(setupChildProfilePath);
               }
             },
     );
@@ -454,7 +445,7 @@ class _JoinFamilyCodeSheetState extends State<_JoinFamilyCodeSheet> {
     final preview = _preview;
     return AppBottomSheetBody(
       title: '输入家庭号',
-      subtitle: '加入后默认是临时查看者，管理员可在家庭成员中调整权限。',
+      subtitle: '加入后可在家庭成员中查看你的身份。',
       footer: AppSheetFooterActions(
         children: [
           AppSheetSecondaryButton(
@@ -482,7 +473,7 @@ class _JoinFamilyCodeSheetState extends State<_JoinFamilyCodeSheet> {
             label: '家庭号',
             value: _code,
             icon: Icons.tag_outlined,
-            hintText: '例如 MIRA2026',
+            hintText: '例如 HOME2026',
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 -]')),
             ],
@@ -559,6 +550,7 @@ class _SetupInlineError extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _FamilyRoleSegmentedControl extends StatelessWidget {
   const _FamilyRoleSegmentedControl({
     required this.label,
@@ -585,7 +577,7 @@ class _FamilyRoleSegmentedControl extends StatelessWidget {
               return const _SetupStatusPanel(
                 icon: Icons.manage_accounts_outlined,
                 title: '暂未配置家庭角色',
-                detail: '请先在后台配置可选角色。',
+                detail: '请稍后再试。',
                 tone: _SetupTone.neutral,
               );
             }
@@ -745,76 +737,6 @@ class _FamilyRoleSegmentButtonState extends State<_FamilyRoleSegmentButton> {
   }
 }
 
-class DeviceEntrySetupScreen extends ConsumerWidget {
-  const DeviceEntrySetupScreen({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final draft = ref.watch(setupDraftProvider);
-
-    return _SetupScreenShell(
-      step: 2,
-      title: '绑定看护设备',
-      subtitle: '先确认设备和房间，摄像头绑定成功后再单独授权音视频采集。',
-      leadingIcon: Icons.qr_code_scanner_outlined,
-      body: Column(
-        children: [
-          _SetupStatusPanel(
-            icon: Icons.sensors_outlined,
-            title: '已发现附近设备',
-            detail: '待绑定设备 · 等待加入家庭账户',
-            tone: _SetupTone.blue,
-          ),
-          const SizedBox(height: 18),
-          _SetupTextField(
-            label: '设备名称',
-            value: draft.deviceName,
-            icon: Icons.videocam_outlined,
-            onChanged: (value) {
-              ref.read(setupDraftProvider.notifier).state = draft.copyWith(
-                deviceName: value,
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          _SetupTextField(
-            label: '房间位置',
-            value: draft.room,
-            icon: Icons.meeting_room_outlined,
-            onChanged: (value) {
-              ref.read(setupDraftProvider.notifier).state = draft.copyWith(
-                room: value,
-              );
-            },
-          ),
-          const SizedBox(height: 14),
-          const _SetupNote(text: '当前先保存设备名称和位置，后续可继续补充扫码、蓝牙发现等绑定方式。'),
-        ],
-      ),
-      primaryLabel: '配置 Wi-Fi',
-      secondaryLabel: '重新扫描',
-      onSecondary: () => _showSetupToast(context, '已重新扫描附近设备'),
-      onPrimary: draft.deviceName.trim().isEmpty || draft.room.trim().isEmpty
-          ? null
-          : () async {
-              final saved = await _submitSetupStep(
-                context,
-                ref,
-                () => ref
-                    .read(setupRepositoryProvider)
-                    .saveDevice(
-                      deviceName: draft.deviceName,
-                      location: draft.room,
-                    ),
-              );
-              if (saved && context.mounted) {
-                context.go(setupWifiPath);
-              }
-            },
-    );
-  }
-}
-
 class WifiSetupScreen extends ConsumerStatefulWidget {
   const WifiSetupScreen({super.key});
 
@@ -841,6 +763,8 @@ class _WifiSetupScreenState extends ConsumerState<WifiSetupScreen> {
 
     return _SetupScreenShell(
       step: 3,
+      // V1 幼儿园首次设置仅保留家长身份和孩子资料；旧配网页保留给后续设备设置入口复用，不显示首次设置步数。
+      showSetupProgress: false,
       title: 'Wi-Fi 配网',
       subtitle: '配网只用于让设备接入家庭网络，不会自动开始录像或录音。',
       leadingIcon: Icons.wifi_outlined,
@@ -1039,9 +963,7 @@ class ChildProfileEditorValue {
   String get normalizedGrade {
     final options = ChildProfileSetupScreen._gradesForStage(normalizedStage);
     final trimmed = grade.trim();
-    return options.contains(trimmed)
-        ? trimmed
-        : ChildProfileSetupScreen._defaultGradeForStage(normalizedStage);
+    return options.contains(trimmed) ? trimmed : '';
   }
 
   String get normalizedGender {
@@ -1095,25 +1017,36 @@ class ChildProfileEditorPanel extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.includeExtendedFields = false,
+    this.includeSleepTime = true,
+    this.stageOptions = const ['幼儿园', '小学', '初中'],
+    this.showStageSelector,
     this.noteText = '性别可以不设置，不会影响任务类型；生日和学段只用于提醒节奏与模板推荐。',
   });
 
   final ChildProfileEditorValue value;
   final ValueChanged<ChildProfileEditorValue> onChanged;
   final bool includeExtendedFields;
+  final bool includeSleepTime;
+  final List<String> stageOptions;
+  final bool? showStageSelector;
   final String? noteText;
 
   @override
   Widget build(BuildContext context) {
+    final availableStages = stageOptions.isEmpty ? const ['幼儿园'] : stageOptions;
+    final shouldShowStageSelector =
+        showStageSelector ?? availableStages.length > 1;
     final recommended =
         ChildProfileSetupScreen._educationRecommendationFromBirthday(
           value.birthday,
         );
-    final stage = value.normalizedStage;
+    final stage = availableStages.contains(value.normalizedStage)
+        ? value.normalizedStage
+        : availableStages.first;
     final gradeOptions = ChildProfileSetupScreen._gradesForStage(stage);
-    final selectedGrade = gradeOptions.contains(value.grade)
-        ? value.grade
-        : ChildProfileSetupScreen._defaultGradeForStage(stage);
+    final selectedGrade = gradeOptions.contains(value.grade.trim())
+        ? value.grade.trim()
+        : '';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1151,72 +1084,85 @@ class ChildProfileEditorPanel extends StatelessWidget {
                 ChildProfileSetupScreen._educationRecommendationFromBirthday(
                   birthday,
                 );
+            final nextStage =
+                next != null && availableStages.contains(next.stage)
+                ? next.stage
+                : stage;
             onChanged(
               next == null
                   ? value.copyWith(birthday: birthday)
                   : value.copyWith(
                       birthday: birthday,
-                      stage: next.stage,
-                      grade: next.grade,
+                      stage: nextStage,
+                      grade: nextStage == next.stage ? next.grade : '',
                     ),
             );
           },
           onChanged: (_) {},
         ),
-        const SizedBox(height: 16),
-        _SetupTextField(
-          label: '入睡时间',
-          value: value.normalizedSleepTime,
-          icon: Icons.nights_stay_outlined,
-          hintText: '选择孩子通常入睡时间',
-          readOnly: true,
-          suffixIcon: Icons.schedule_outlined,
-          onTap: () async {
-            FocusScope.of(context).unfocus();
-            final picked = await ChildProfileSetupScreen._pickSleepTime(
-              context,
-              value.normalizedSleepTime,
-            );
-            if (picked == null || !context.mounted) return;
-            onChanged(value.copyWith(sleepTime: picked));
-          },
-          onChanged: (_) {},
-        ),
-        if (recommended != null) ...[
+        if (includeSleepTime) ...[
+          const SizedBox(height: 16),
+          _SetupTextField(
+            label: '入睡时间',
+            value: value.normalizedSleepTime,
+            icon: Icons.nights_stay_outlined,
+            hintText: '选择孩子通常入睡时间',
+            readOnly: true,
+            suffixIcon: Icons.schedule_outlined,
+            onTap: () async {
+              FocusScope.of(context).unfocus();
+              final picked = await ChildProfileSetupScreen._pickSleepTime(
+                context,
+                value.normalizedSleepTime,
+              );
+              if (picked == null || !context.mounted) return;
+              onChanged(value.copyWith(sleepTime: picked));
+            },
+            onChanged: (_) {},
+          ),
+        ],
+        if (recommended != null &&
+            availableStages.contains(recommended.stage)) ...[
           const SizedBox(height: 12),
           _SetupStatusPanel(
             icon: Icons.auto_awesome_outlined,
-            title: '已根据生日推荐',
-            detail: '${recommended.stage} · ${recommended.grade}，你也可以手动调整。',
+            title: shouldShowStageSelector ? '已根据生日推荐' : '已推荐班级',
+            detail: shouldShowStageSelector
+                ? '${recommended.stage} · ${recommended.grade}，你也可以手动调整。'
+                : '推荐 ${recommended.grade}，可手动调整。',
             tone: _SetupTone.blue,
+          ),
+        ],
+        // V1 幼儿园版本隐藏学段选择，底层 stage/grade 数据结构保留给后续全年龄段版本复用。
+        if (shouldShowStageSelector) ...[
+          const SizedBox(height: 18),
+          _ChoiceGrid(
+            label: '就读阶段',
+            options: availableStages,
+            selected: stage,
+            onSelect: (stage) {
+              final recommendation =
+                  ChildProfileSetupScreen._educationRecommendationFromBirthday(
+                    value.birthday,
+                  );
+              onChanged(
+                value.copyWith(
+                  stage: stage,
+                  grade: recommendation != null && recommendation.stage == stage
+                      ? recommendation.grade
+                      : ChildProfileSetupScreen._defaultGradeForStage(stage),
+                ),
+              );
+            },
           ),
         ],
         const SizedBox(height: 18),
         _ChoiceGrid(
-          label: '就读阶段',
-          options: const ['幼儿园', '小学', '初中'],
-          selected: stage,
-          onSelect: (stage) {
-            final recommendation =
-                ChildProfileSetupScreen._educationRecommendationFromBirthday(
-                  value.birthday,
-                );
-            onChanged(
-              value.copyWith(
-                stage: stage,
-                grade: recommendation != null && recommendation.stage == stage
-                    ? recommendation.grade
-                    : ChildProfileSetupScreen._defaultGradeForStage(stage),
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 18),
-        _ChoiceGrid(
-          label: '年级',
+          label: shouldShowStageSelector ? '年级' : '幼儿园班级',
           options: gradeOptions,
           selected: selectedGrade,
-          onSelect: (grade) => onChanged(value.copyWith(grade: grade)),
+          onSelect: (grade) =>
+              onChanged(value.copyWith(stage: stage, grade: grade)),
         ),
         if (includeExtendedFields) ...[
           const SizedBox(height: 18),
@@ -1261,12 +1207,16 @@ class ChildProfileSetupScreen extends ConsumerWidget {
     );
 
     return _SetupScreenShell(
-      step: 4,
+      step: 2,
       title: '孩子资料',
-      subtitle: '用于生成更合适的提醒、任务模板和成长阶段建议。',
+      subtitle: '用于推荐幼儿园作息和看护提醒。',
       leadingIcon: Icons.child_care_outlined,
       body: ChildProfileEditorPanel(
         value: formValue,
+        includeSleepTime: false,
+        stageOptions: const ['幼儿园'],
+        showStageSelector: false,
+        noteText: null,
         onChanged: (value) {
           final latest = ref.read(setupDraftProvider);
           ref.read(setupDraftProvider.notifier).state = latest.copyWith(
@@ -1274,12 +1224,17 @@ class ChildProfileSetupScreen extends ConsumerWidget {
             childBirthday: value.birthday,
             childSleepTime: value.normalizedSleepTime,
             childGender: value.normalizedGender,
-            childStage: value.normalizedStage,
-            childGrade: value.normalizedGrade,
+            childStage: '幼儿园',
+            childGrade:
+                ChildProfileSetupScreen._gradesForStage(
+                  '幼儿园',
+                ).contains(value.grade.trim())
+                ? value.grade.trim()
+                : '',
           );
         },
       ),
-      primaryLabel: '继续给摄像头起名',
+      primaryLabel: '完成设置',
       onPrimary: draft.childName.trim().isEmpty
           ? null
           : () async {
@@ -1292,6 +1247,17 @@ class ChildProfileSetupScreen extends ConsumerWidget {
                 stage: latest.childStage,
                 grade: latest.childGrade,
               );
+              if (value.birthday.trim().isEmpty) {
+                _showSetupToast(context, '请选择孩子生日');
+                return;
+              }
+              if (value.normalizedGrade.isEmpty) {
+                _showSetupToast(context, '请选择幼儿园班级');
+                return;
+              }
+              final ageStage = value.normalizedGrade.isEmpty
+                  ? value.normalizedStage
+                  : '${value.normalizedStage} ${value.normalizedGrade}';
               final saved = await _submitSetupStep(
                 context,
                 ref,
@@ -1301,8 +1267,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
                       name: value.name,
                       nickname: value.name,
                       gender: value.normalizedGender,
-                      ageStage:
-                          '${value.normalizedStage} ${value.normalizedGrade}',
+                      ageStage: ageStage,
                       educationStage: value.normalizedStage,
                       grade: value.normalizedGrade,
                       birthday: value.birthday,
@@ -1310,7 +1275,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
                     ),
               );
               if (saved && context.mounted) {
-                context.go(setupCameraNamePath);
+                context.go(AppRoute.home.path);
               }
             },
     );
@@ -1428,7 +1393,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
     return showAppTimePickerSheet(
       context: context,
       title: '选择入睡时间',
-      subtitle: '用于睡前聊天边界和任务提醒节奏。',
+      subtitle: '用于睡前聊天边界和看护提醒节奏。',
       initialValue: _formatSleepTime(initialTime),
       invalidMessage: '请选择有效的入睡时间',
     );
@@ -1671,6 +1636,8 @@ class _CameraNameSetupScreenState extends ConsumerState<CameraNameSetupScreen> {
 
     return _SetupScreenShell(
       step: 5,
+      // V1 幼儿园首次设置不强制命名摄像头；本页保留给后续设备设置入口复用，不显示首次设置步数。
+      showSetupProgress: false,
       title: '给摄像头起名',
       subtitle: '孩子以后可以用这个名字呼唤摄像头。',
       leadingIcon: Icons.record_voice_over_outlined,
@@ -1987,7 +1954,7 @@ class _NameSuggestionRow extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final name in const ['小豆', '米拉', '小守'])
+            for (final name in const ['小豆', '小安', '小守'])
               _ChoiceChipButton(
                 label: name,
                 selected: selected == name,
@@ -2026,6 +1993,8 @@ class _EmergencyContactsSetupScreenState
 
     return _SetupScreenShell(
       step: 6,
+      // V1 幼儿园首次设置不强制紧急联系人；本页保留给设置入口复用，不显示首次设置步数。
+      showSetupProgress: false,
       title: '紧急联系人',
       subtitle: '用于重要通知兜底和家庭协作记录。',
       leadingIcon: Icons.contact_phone_outlined,
@@ -2138,9 +2107,8 @@ class _SetupScreenShell extends ConsumerWidget {
     required this.body,
     required this.primaryLabel,
     required this.onPrimary,
-    this.secondaryLabel,
-    this.onSecondary,
     this.loading = false,
+    this.showSetupProgress = true,
   });
 
   final int step;
@@ -2150,13 +2118,13 @@ class _SetupScreenShell extends ConsumerWidget {
   final Widget body;
   final String primaryLabel;
   final VoidCallback? onPrimary;
-  final String? secondaryLabel;
-  final VoidCallback? onSecondary;
   final bool loading;
+  final bool showSetupProgress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final progressStep = showSetupProgress ? step : null;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppSystemUi.light(),
@@ -2170,7 +2138,7 @@ class _SetupScreenShell extends ConsumerWidget {
               child: Column(
                 children: [
                   _SetupTopBar(
-                    step: step,
+                    step: progressStep,
                     onLogout: () => _confirmSetupLogout(context, ref),
                   ),
                   Expanded(
@@ -2185,7 +2153,7 @@ class _SetupScreenShell extends ConsumerWidget {
                             icon: leadingIcon,
                             title: title,
                             subtitle: subtitle,
-                            step: step,
+                            step: progressStep,
                           ),
                           const SizedBox(height: 16),
                           _SetupPanel(child: body),
@@ -2195,8 +2163,6 @@ class _SetupScreenShell extends ConsumerWidget {
                   ),
                   _SetupActionDock(
                     bottomInset: bottomInset,
-                    secondaryLabel: secondaryLabel,
-                    onSecondary: onSecondary,
                     primaryLabel: primaryLabel,
                     onPrimary: onPrimary,
                     loading: loading,
@@ -2217,16 +2183,12 @@ class _SetupActionDock extends StatelessWidget {
     required this.primaryLabel,
     required this.onPrimary,
     required this.loading,
-    this.secondaryLabel,
-    this.onSecondary,
   });
 
   final double bottomInset;
   final String primaryLabel;
   final VoidCallback? onPrimary;
   final bool loading;
-  final String? secondaryLabel;
-  final VoidCallback? onSecondary;
 
   @override
   Widget build(BuildContext context) {
@@ -2248,10 +2210,6 @@ class _SetupActionDock extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (secondaryLabel != null && onSecondary != null) ...[
-              AppSecondaryButton(label: secondaryLabel!, onTap: onSecondary),
-              const SizedBox(height: 10),
-            ],
             Opacity(
               opacity: onPrimary == null ? 0.5 : 1,
               child: AppPrimaryButton(
@@ -2296,7 +2254,7 @@ class _SetupBackground extends StatelessWidget {
 class _SetupTopBar extends StatelessWidget {
   const _SetupTopBar({required this.step, required this.onLogout});
 
-  final int step;
+  final int? step;
   final VoidCallback onLogout;
 
   @override
@@ -2315,27 +2273,29 @@ class _SetupTopBar extends StatelessWidget {
               letterSpacing: 0,
             ),
           ),
-          const SizedBox(width: 10),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceSoft.withValues(alpha: 0.78),
-              borderRadius: BorderRadius.circular(AppRadii.full),
-              border: Border.all(color: AppColors.borderSoft),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-              child: Text(
-                '$step / $_setupTotalSteps',
-                style: const TextStyle(
-                  color: AppColors.muted,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0,
+          if (step != null) ...[
+            const SizedBox(width: 10),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceSoft.withValues(alpha: 0.78),
+                borderRadius: BorderRadius.circular(AppRadii.full),
+                border: Border.all(color: AppColors.borderSoft),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+                child: Text(
+                  '$step / $_setupTotalSteps',
+                  style: const TextStyle(
+                    color: AppColors.muted,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
           const Spacer(),
           AppIconButton(
             icon: Icons.logout_outlined,
@@ -2373,11 +2333,13 @@ class _SetupHero extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final int step;
+  final int? step;
 
   @override
   Widget build(BuildContext context) {
-    final progress = step / _setupTotalSteps;
+    final progress = step == null
+        ? null
+        : (step! / _setupTotalSteps).clamp(0.0, 1.0).toDouble();
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -2405,21 +2367,23 @@ class _SetupHero extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Spacer(),
-                SizedBox(
-                  width: 88,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadii.full),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 6,
-                      backgroundColor: AppColors.brandWash,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.brand,
+                if (progress != null) ...[
+                  const Spacer(),
+                  SizedBox(
+                    width: 88,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadii.full),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 6,
+                        backgroundColor: AppColors.brandWash,
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.brand,
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
             const SizedBox(height: 18),
@@ -2500,6 +2464,7 @@ class _ChoiceGrid extends StatelessWidget {
           children: [
             for (final option in options)
               _ChoiceChipButton(
+                key: ValueKey('choice_${label}_$option'),
                 label: option,
                 selected: selected == option,
                 onTap: () => onSelect(option),
@@ -2513,6 +2478,7 @@ class _ChoiceGrid extends StatelessWidget {
 
 class _ChoiceChipButton extends StatelessWidget {
   const _ChoiceChipButton({
+    super.key,
     required this.label,
     required this.selected,
     required this.onTap,
@@ -2627,95 +2593,104 @@ class _SetupTextFieldState extends State<_SetupTextField> {
       listenable: Listenable.merge([_controller, _focusNode]),
       builder: (context, _) {
         final focused = _focusNode.hasFocus;
+        final fieldKey = ValueKey('setupField_${widget.label}');
+        final inputField = AnimatedContainer(
+          duration: AppMotion.duration(context, 160),
+          decoration: BoxDecoration(
+            color: _controller.text.trim().isEmpty
+                ? AppColors.surfaceSoft
+                : AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppRadii.input),
+            border: Border.all(
+              color: hasError
+                  ? AppColors.danger
+                  : focused
+                  ? AppColors.focus
+                  : AppColors.borderSoft,
+              width: focused ? 1.1 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 13),
+              Icon(
+                widget.icon,
+                color: hasError
+                    ? AppColors.danger
+                    : focused
+                    ? AppColors.brandDeep
+                    : AppColors.subtle,
+                size: 18,
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: TextField(
+                  key: ValueKey('setupInput_${widget.label}'),
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  obscureText: widget.obscureText,
+                  readOnly: widget.readOnly,
+                  showCursor: widget.readOnly ? false : null,
+                  keyboardType: widget.keyboardType,
+                  inputFormatters: widget.inputFormatters,
+                  onTap: widget.onTap,
+                  onChanged: widget.onChanged,
+                  style: const TextStyle(
+                    color: AppColors.ink,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                  ),
+                  decoration: InputDecoration(
+                    filled: false,
+                    fillColor: Colors.transparent,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    hintText: widget.hintText,
+                    hintStyle: const TextStyle(
+                      color: AppColors.subtle,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ),
+              if (widget.suffixIcon != null) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  widget.suffixIcon,
+                  color: focused ? AppColors.brandDeep : AppColors.subtle,
+                  size: 18,
+                ),
+              ],
+              const SizedBox(width: 12),
+            ],
+          ),
+        );
+        final interactiveField = widget.readOnly && widget.onTap != null
+            ? GestureDetector(
+                key: fieldKey,
+                behavior: HitTestBehavior.opaque,
+                onTap: widget.onTap,
+                child: inputField,
+              )
+            : KeyedSubtree(key: fieldKey, child: inputField);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _FieldLabel(widget.label),
             const SizedBox(height: 8),
-            AnimatedContainer(
-              duration: AppMotion.duration(context, 160),
-              decoration: BoxDecoration(
-                color: _controller.text.trim().isEmpty
-                    ? AppColors.surfaceSoft
-                    : AppColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(AppRadii.input),
-                border: Border.all(
-                  color: hasError
-                      ? AppColors.danger
-                      : focused
-                      ? AppColors.focus
-                      : AppColors.borderSoft,
-                  width: focused ? 1.1 : 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 13),
-                  Icon(
-                    widget.icon,
-                    color: hasError
-                        ? AppColors.danger
-                        : focused
-                        ? AppColors.brandDeep
-                        : AppColors.subtle,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 9),
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      focusNode: _focusNode,
-                      obscureText: widget.obscureText,
-                      readOnly: widget.readOnly,
-                      showCursor: widget.readOnly ? false : null,
-                      keyboardType: widget.keyboardType,
-                      inputFormatters: widget.inputFormatters,
-                      onTap: widget.onTap,
-                      onChanged: widget.onChanged,
-                      style: const TextStyle(
-                        color: AppColors.ink,
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                      ),
-                      decoration: InputDecoration(
-                        filled: false,
-                        fillColor: Colors.transparent,
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        focusedErrorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        hintText: widget.hintText,
-                        hintStyle: const TextStyle(
-                          color: AppColors.subtle,
-                          fontFamily: AppTypography.systemFont,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
-                        ),
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (widget.suffixIcon != null) ...[
-                    const SizedBox(width: 8),
-                    Icon(
-                      widget.suffixIcon,
-                      color: focused ? AppColors.brandDeep : AppColors.subtle,
-                      size: 18,
-                    ),
-                  ],
-                  const SizedBox(width: 12),
-                ],
-              ),
-            ),
+            interactiveField,
             AnimatedSwitcher(
               duration: AppMotion.duration(context, 160),
               child: widget.errorText == null

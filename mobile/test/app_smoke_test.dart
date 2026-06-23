@@ -1,13 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/app/app.dart';
+import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
 import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
 import 'package:guardian_parent_app/src/core/storage/setup_store.dart';
+import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
+import 'package:guardian_parent_app/src/features/live_care/presentation/live_care_screen.dart';
+import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,7 +34,44 @@ const _adminCapabilities = [
   'manage_account_security',
 ];
 
+Map<String, dynamic>? _lastSetupChildBody;
+
 void main() {
+  test('legacy setup device steps do not force legacy setup pages', () {
+    expect(
+      _setupStatusForRoute(
+        parentIdentity: 'done',
+        childProfile: 'pending',
+        nextStep: 'device',
+      ).routePath,
+      setupChildProfilePath,
+    );
+    expect(
+      _setupStatusForRoute(
+        parentIdentity: 'done',
+        childProfile: 'done',
+        nextStep: 'wifi',
+      ).routePath,
+      AppRoute.home.path,
+    );
+    expect(
+      _setupStatusForRoute(
+        parentIdentity: 'done',
+        childProfile: 'done',
+        nextStep: 'cameraName',
+      ).routePath,
+      AppRoute.home.path,
+    );
+    expect(
+      _setupStatusForRoute(
+        parentIdentity: 'done',
+        childProfile: 'done',
+        nextStep: 'emergencyContacts',
+      ).routePath,
+      AppRoute.home.path,
+    );
+  });
+
   testWidgets('renders the welcome onboarding slides', (tester) async {
     await _pumpApp(tester, preferences: const {});
     await tester.pump(const Duration(milliseconds: 500));
@@ -103,6 +145,7 @@ void main() {
         authUserIdKey: 'test_parent_13800002026',
         authPhoneKey: '13800002026',
       },
+      hasDevice: true,
     );
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -114,6 +157,48 @@ void main() {
     );
   });
 
+  testWidgets('completed setup can enter home without a camera', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'test_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+      hasDevice: false,
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('登录家庭看护空间'), findsNothing);
+    expect(find.text('还没有连接看护摄像头'), findsWidgets);
+    expect(find.text('连接第一台看护摄像头'), findsOneWidget);
+  });
+
+  testWidgets('live care shows no-camera connection state', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [selectedDeviceProvider.overrideWith((ref) async => null)],
+        child: const MaterialApp(home: LiveCareScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('还没有连接摄像头'), findsOneWidget);
+    expect(find.text('连接看护摄像头'), findsOneWidget);
+  });
+
   testWidgets('login after logout refreshes profile for the new account', (
     tester,
   ) async {
@@ -123,6 +208,7 @@ void main() {
         hasSeenOnboardingKey: true,
         hasCompletedInitialSetupKey: true,
       },
+      hasDevice: true,
     );
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -148,56 +234,90 @@ void main() {
   });
 
   testWidgets('runs login then first setup flow into home', (tester) async {
+    const datePickerChannel = MethodChannel('ai_camera_app/native_date_picker');
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      datePickerChannel,
+      (call) async => '2021-06-01',
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        datePickerChannel,
+        null,
+      ),
+    );
+
     await _pumpApp(tester, preferences: const {hasSeenOnboardingKey: true});
     await tester.pump(const Duration(milliseconds: 500));
 
     await _loginSuccessfully(tester);
 
     expect(find.text('确认家长身份'), findsOneWidget);
-    await tester.tap(find.text('继续绑定设备'));
+    expect(find.text('1 / 2'), findsOneWidget);
+    expect(find.text('3 / 2'), findsNothing);
+    expect(find.byKey(const ValueKey('familyRoleSegment_admin')), findsNothing);
+    await tester.tap(find.text('继续填写孩子资料'));
     await tester.pumpAndSettle();
 
-    expect(find.text('绑定看护设备'), findsOneWidget);
-    await tester.enterText(find.byType(EditableText).at(0), '书桌旁设备');
-    await tester.enterText(find.byType(EditableText).at(1), '书桌旁');
-    await tester.pump();
-    await tester.tap(find.text('配置 Wi-Fi'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Wi-Fi 配网'), findsOneWidget);
-    await tester.enterText(find.byType(EditableText).at(0), 'Home Wi-Fi 2.4G');
-    await tester.enterText(find.byType(EditableText).at(1), 'home2026wifi');
-    await tester.pump();
-    await tester.tap(find.text('开始绑定'));
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pumpAndSettle();
-
-    expect(find.text('设备绑定成功'), findsNothing);
     expect(find.text('孩子资料'), findsOneWidget);
-    expect(find.text('书桌旁设备已接入家庭网络'), findsOneWidget);
+    expect(find.text('2 / 2'), findsOneWidget);
+    expect(find.text('3 / 2'), findsNothing);
+    expect(find.text('就读阶段'), findsNothing);
+    expect(find.text('幼儿园'), findsNothing);
+    expect(find.text('幼儿园班级'), findsOneWidget);
+    expect(find.text('小班'), findsOneWidget);
+    expect(find.text('中班'), findsOneWidget);
+    expect(find.text('大班'), findsOneWidget);
+    expect(find.text('入睡时间'), findsNothing);
+    expect(find.text('小学'), findsNothing);
+    expect(find.text('初中'), findsNothing);
     await tester.enterText(find.byType(EditableText).at(0), '小宇');
     await tester.pump();
-    await tester.tap(find.text('继续给摄像头起名'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('给摄像头起名'), findsOneWidget);
-    expect(find.text('摄像头暂时不在线，稍后可以再试听。'), findsOneWidget);
-    await tester.tap(find.text('试听声线'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('设置紧急联系人'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('紧急联系人'), findsOneWidget);
-    await tester.enterText(find.byType(EditableText).at(0), '爸爸');
-    await tester.enterText(find.byType(EditableText).at(1), '13800002026');
+    await tester.tap(find.text('完成设置'));
     await tester.pump();
-    await tester.tap(find.text('进入首页'));
+    expect(find.text('请选择孩子生日'), findsOneWidget);
+    expect(_lastSetupChildBody, isNull);
+
+    await _tapBirthdayField(tester);
+    await tester.pumpAndSettle();
+    expect(find.text('2021-06-01'), findsOneWidget);
+    expect(find.text('已推荐班级'), findsOneWidget);
+    expect(find.text('推荐 中班，可手动调整。'), findsOneWidget);
+
+    await tester.tap(find.text('完成设置'));
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
 
     expect(find.text('家庭看护'), findsOneWidget);
-    expect(find.textContaining('需要你处理'), findsOneWidget);
+    expect(_lastSetupChildBody?['educationStage'], '幼儿园');
+    expect(_lastSetupChildBody?['ageStage'], '幼儿园 中班');
+    expect(_lastSetupChildBody?['grade'], '中班');
+    expect(find.text('还没有连接看护摄像头'), findsWidgets);
+    expect(find.text('连接第一台看护摄像头'), findsOneWidget);
+    expect(find.text('基础设置已完成'), findsOneWidget);
     expect(find.text('确认与奖励'), findsOneWidget);
+    expect(find.textContaining('bindingCode'), findsNothing);
+    expect(find.textContaining('mock'), findsNothing);
+
+    await tester.tap(find.text('连接第一台看护摄像头'));
+    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pump();
+
+    expect(find.text('添加摄像头'), findsNothing);
+    expect(find.text('正在发现附近设备'), findsOneWidget);
+    expect(find.text('连接帮助'), findsOneWidget);
+    expect(find.text('开始发现'), findsNothing);
+    expect(find.text('继续发现'), findsNothing);
+
+    await tester.pump(const Duration(milliseconds: 1500));
+    await tester.pump();
+
+    expect(find.text('AI 看护摄像头'), findsWidgets);
+    expect(find.text('连接'), findsOneWidget);
+    await tester.tap(find.text('连接'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('摄像头已连接'), findsWidgets);
+    expect(find.text('已加入家庭看护空间。'), findsOneWidget);
   });
 
   testWidgets('shows login validation errors from continue', (tester) async {
@@ -249,6 +369,7 @@ void main() {
         hasSeenOnboardingKey: true,
         hasCompletedInitialSetupKey: true,
       },
+      hasDevice: true,
     );
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -280,8 +401,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('家庭看护空间'), findsOneWidget);
     expect(find.text('家庭成员'), findsWidgets);
-    expect(find.text('紧急联系人'), findsOneWidget);
-    expect(find.text('家庭与成员'), findsNothing);
+    expect(find.text('家庭与成员'), findsOneWidget);
+    expect(find.text('设备与看护'), findsOneWidget);
+    expect(find.text('紧急联系人'), findsNothing);
   });
 
   testWidgets('rejecting a confirmation task is final in V1 copy', (
@@ -293,6 +415,7 @@ void main() {
         hasSeenOnboardingKey: true,
         hasCompletedInitialSetupKey: true,
       },
+      hasDevice: true,
     );
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -345,6 +468,7 @@ void main() {
         authUserIdKey: 'test_parent_13800002026',
         authPhoneKey: '13800002026',
       },
+      hasDevice: true,
     );
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -387,6 +511,7 @@ void main() {
         authUserIdKey: 'test_parent_13800002026',
         authPhoneKey: '13800002026',
       },
+      hasDevice: true,
     );
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -450,13 +575,13 @@ void main() {
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
     await tester.pumpAndSettle();
 
-    await _openProfileEntry(
-      tester,
-      '紧急联系人',
-      expectedTitle: '紧急联系人',
-      expectedTexts: const ['其他家人 · 139 **** 2026'],
-      absentTexts: const ['guardian'],
-    );
+    final familyHubEntry = find.text('家庭与成员').last;
+    await tester.scrollUntilVisible(familyHubEntry, 420);
+    await tester.ensureVisible(familyHubEntry);
+    await tester.pumpAndSettle();
+    await tester.tap(familyHubEntry);
+    await tester.pumpAndSettle();
+    expect(find.text('紧急联系人'), findsOneWidget);
     final emergencyEntry = find.text('紧急联系人').last;
     await tester.scrollUntilVisible(emergencyEntry, 420);
     await tester.ensureVisible(emergencyEntry);
@@ -480,25 +605,44 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
     await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+    await tester.pumpAndSettle();
 
-    for (final category in const ['AI 规则与提醒', '看护报告', '隐私与权限', '账号安全']) {
-      await _openProfileEntry(tester, category, expectedTitle: category);
-    }
+    await _openProfileEntry(tester, '设备与看护', expectedTitle: '设备与看护');
+    await _openProfileEntry(tester, 'AI 规则与提醒', expectedTitle: 'AI 规则与提醒');
+    await _openProfileEntry(tester, '账号与安全', expectedTitle: '个人信息');
     await _openProfileEntry(tester, '关于', expectedTitle: '关于我们');
 
     await _openProfileSubscription(tester);
-    await _openProfileNestedEntry(tester, '看护报告', '周报', expectedTitle: '周报');
     await _openProfileNestedEntry(
       tester,
-      'AI 规则与提醒',
-      '对话与人设',
-      expectedTitle: '对话与人设',
+      '设备与看护',
+      '摄像头管理',
+      expectedTitle: '摄像头管理',
+    );
+    await _openProfileNestedEntry(
+      tester,
+      '设备与看护',
+      '看护能力',
+      expectedTitle: '看护能力',
+    );
+    await _openProfileNestedEntry(
+      tester,
+      '设备与看护',
+      '作息时间',
+      expectedTitle: '作息节奏',
     );
     await _openProfileNestedEntry(
       tester,
       'AI 规则与提醒',
-      '任务看护规则',
-      expectedTitle: '任务看护规则',
+      '语音与称呼',
+      expectedTitle: '语音与称呼',
+    );
+    await _openProfileNestedEntry(
+      tester,
+      'AI 规则与提醒',
+      '看护能力',
+      expectedTitle: '看护能力',
     );
     await _openProfileNestedEntry(
       tester,
@@ -535,7 +679,12 @@ void main() {
     ];
 
     for (final size in sizes) {
-      await _pumpApp(tester, preferences: preferences, logicalSize: size);
+      await _pumpApp(
+        tester,
+        preferences: preferences,
+        logicalSize: size,
+        hasDevice: true,
+      );
       await tester.pump(const Duration(milliseconds: 500));
 
       await tester.tap(find.text('任务').last);
@@ -586,6 +735,7 @@ void main() {
         authPhoneKey: '13800002026',
       },
       logicalSize: const Size(430, 932),
+      hasDevice: true,
     );
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -800,11 +950,19 @@ Future<void> _openProfileNestedEntry(
   }
 }
 
+Future<void> _tapBirthdayField(WidgetTester tester) async {
+  final field = find.byKey(const ValueKey('setupInput_出生日期'));
+  await tester.ensureVisible(field);
+  final rect = tester.getRect(field);
+  await tester.tapAt(Offset(rect.left + 12, rect.center.dy));
+}
+
 Future<void> _pumpApp(
   WidgetTester tester, {
   required Map<String, Object> preferences,
   Size logicalSize = const Size(393, 852),
   double devicePixelRatio = 3,
+  bool hasDevice = false,
 }) async {
   tester.view
     ..physicalSize = logicalSize * devicePixelRatio
@@ -818,6 +976,7 @@ Future<void> _pumpApp(
   final sharedPreferences = await SharedPreferences.getInstance();
   final fakeApi = _FakeApiServer(
     completedSetup: preferences[hasCompletedInitialSetupKey] == true,
+    hasDevice: hasDevice,
   );
   final fakeDio = fakeApi.dio;
 
@@ -877,8 +1036,41 @@ Future<void> _pumpStateView(
   );
 }
 
+SetupStatus _setupStatusForRoute({
+  required String parentIdentity,
+  required String childProfile,
+  required String nextStep,
+}) {
+  return SetupStatus(
+    completed: false,
+    parentIdentity: parentIdentity,
+    deviceBinding: 'pending',
+    wifi: 'pending',
+    childProfile: childProfile,
+    cameraName: 'pending',
+    cameraNameIntro: 'pending',
+    cameraNameIntroAt: null,
+    contacts: 'pending',
+    nextStep: nextStep,
+    parentDisplayName: '',
+    parentRelationship: '',
+    parentRelationshipKey: '',
+    deviceName: '',
+    deviceLocation: '',
+    wifiName: '',
+    childName: '',
+    childGender: '',
+    childBirthday: '',
+    childSleepTime: '',
+    childEducationStage: '',
+    childGrade: '',
+    cameraWakeName: '',
+  );
+}
+
 class _FakeApiServer {
-  _FakeApiServer({required this._completedSetup}) {
+  _FakeApiServer({required this._completedSetup, required this._hasDevice}) {
+    _lastSetupChildBody = null;
     _tasks.addAll([
       _task(
         id: 'task_math_homework',
@@ -905,6 +1097,7 @@ class _FakeApiServer {
   }
 
   final bool _completedSetup;
+  bool _hasDevice;
   int _taskCounter = 0;
   String _relationship = '妈妈';
   String _relationshipKey = 'mom';
@@ -967,6 +1160,9 @@ class _FakeApiServer {
       if (path == '/setup/parent-identity') {
         _relationship = _text(body['relationship'], _relationship);
         _relationshipKey = _text(body['relationshipKey'], _relationshipKey);
+      }
+      if (path == '/setup/child') {
+        _lastSetupChildBody = Map<String, dynamic>.from(body);
       }
       return _ok(options, _setupPayloadFor(path));
     }
@@ -1204,10 +1400,11 @@ class _FakeApiServer {
     if (method == 'GET' && path == '/devices') {
       return _ok(options, {
         'ok': true,
-        'devices': [_device()],
+        'devices': _hasDevice ? [_device()] : const [],
       });
     }
     if (method == 'POST' && path == '/devices') {
+      _hasDevice = true;
       return _ok(options, {
         'ok': true,
         'duplicate': false,
@@ -1216,7 +1413,10 @@ class _FakeApiServer {
       });
     }
     if (method == 'GET' && path == '/devices/default') {
-      return _ok(options, {'ok': true, 'device': _device()});
+      return _ok(options, {
+        'ok': true,
+        'device': _hasDevice ? _device() : null,
+      });
     }
     if (method == 'POST' && path.endsWith('/set-default')) {
       return _ok(options, {'ok': true, 'device': _device()});
@@ -1339,8 +1539,12 @@ class _FakeApiServer {
 
   Map<String, dynamic> _setupPayloadFor(String path) {
     return switch (path) {
-      '/setup/parent-identity' => _setupPayload(nextStep: 'device'),
-      '/setup/device' => _setupPayload(parent: true, nextStep: 'wifi'),
+      '/setup/parent-identity' => _setupPayload(nextStep: 'child'),
+      '/setup/device' => _setupPayload(
+        parent: true,
+        device: true,
+        nextStep: 'child',
+      ),
       '/setup/wifi' => _setupPayload(
         parent: true,
         device: true,
@@ -1349,9 +1553,9 @@ class _FakeApiServer {
       '/setup/child' => _setupPayload(
         parent: true,
         device: true,
-        wifi: true,
         child: true,
-        nextStep: 'cameraName',
+        completed: true,
+        nextStep: 'home',
       ),
       '/setup/camera-name/intro' => {
         ..._setupPayload(
@@ -1444,7 +1648,7 @@ class _FakeApiServer {
             }
           : null,
       'device': device
-          ? {'id': 'device_test', 'name': '书桌旁设备', 'location': '书桌旁'}
+          ? {'id': 'device_test', 'name': 'AI 看护摄像头', 'location': '儿童房'}
           : null,
       'wifi': wifi ? {'ssid': 'Home Wi-Fi 2.4G'} : null,
       'child': child
@@ -1457,7 +1661,7 @@ class _FakeApiServer {
               'birthday': '',
             }
           : null,
-      'cameraName': cameraName ? {'wakeName': '小豆'} : null,
+      'cameraName': device || cameraName || done ? {'wakeName': '小豆'} : null,
     };
   }
 
@@ -1489,7 +1693,7 @@ class _FakeApiServer {
       'avatarPersona': _relationshipKey == 'dad' ? 'father' : 'mother',
       'capabilities': _adminCapabilities,
       'memberCount': 2,
-      'deviceCount': 1,
+      'deviceCount': _hasDevice ? 1 : 0,
       'pendingItemCount': _tasks
           .where((task) => task['status'] == 'awaiting_parent_confirmation')
           .length,
@@ -1826,7 +2030,7 @@ class _FakeApiServer {
         'billing': '无需额外订阅',
         'recommended': false,
         'ctaLabel': '当前套餐',
-        'features': ['任务提醒', '实时看护', '基础日报', '隐私控制'],
+        'features': ['看护提醒', '实时看护', '基础日报', '隐私控制'],
         'highlights': ['基础提醒', '实时查看', '基础日报', '隐私控制'],
       },
       {
@@ -1858,7 +2062,7 @@ class _FakeApiServer {
     return [
       {
         'key': 'task_reminders',
-        'name': '任务提醒',
+        'name': '看护提醒',
         'basic': true,
         'member': true,
         'family_plus': true,
@@ -1947,7 +2151,7 @@ class _FakeApiServer {
         {
           'title': isPrivacy ? '1. 开发者与适用范围' : '1. 服务说明',
           'paragraphs': [
-            isPrivacy ? '我们只在必要范围内处理家庭看护数据。' : 'Mira Guardian 为家长提供家庭看护辅助能力。',
+            isPrivacy ? '我们只在必要范围内处理家庭看护数据。' : '本应用为家长提供家庭看护辅助能力。',
           ],
         },
       ],
@@ -1956,8 +2160,8 @@ class _FakeApiServer {
 
   Map<String, dynamic> _about() {
     return {
-      'appName': 'Mira Guardian',
-      'displayName': '家庭看护',
+      'appName': '家庭 AI 看护 App',
+      'displayName': '家庭 AI 看护 App',
       'version': '1.0.0',
       'build': '2026.06',
       'appUpdate': {
@@ -2174,7 +2378,7 @@ class _FakeApiServer {
   Map<String, dynamic> _device([Map<String, dynamic>? body]) {
     return {
       'id': 'device_test',
-      'name': _text(body?['deviceName'] ?? body?['name'], '书桌旁设备'),
+      'name': _text(body?['deviceName'] ?? body?['name'], 'AI 看护摄像头'),
       'location': _text(body?['location'], '书桌旁'),
       'status': 'online',
       'isDefault': true,
@@ -2239,7 +2443,7 @@ class _FakeApiServer {
         'id': 'evt_camera_1',
         'source': 'task_event',
         'eventType': 'camera_observation',
-        'title': '看护观察',
+        'title': '看护记录',
         'message': '画面记录到孩子在书桌前。',
         'status': 'recorded',
         'tone': 'info',

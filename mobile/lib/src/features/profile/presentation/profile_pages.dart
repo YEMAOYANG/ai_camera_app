@@ -6,18 +6,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/platform/contact_picker.dart';
+import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
 import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
 import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
+import 'package:guardian_parent_app/src/features/care/application/care_repository.dart';
+import 'package:guardian_parent_app/src/features/care/domain/care_models.dart';
 import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
 import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
+import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
 import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
 import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
+import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:guardian_parent_app/src/features/setup/presentation/setup_flow_screens.dart';
 import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
@@ -28,6 +33,7 @@ import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_text_field.dart';
+import 'package:guardian_parent_app/src/shared/widgets/app_time_picker_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 import 'package:guardian_parent_app/src/shared/widgets/guardian_identity_selector.dart';
 import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
@@ -1250,31 +1256,6 @@ class FamilyHubPage extends StatelessWidget {
   }
 }
 
-class DeviceCareHubPage extends StatelessWidget {
-  const DeviceCareHubPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _HubPage(
-      title: '设备管理',
-      sections: [
-        _HubSection(
-          title: '设备',
-          rows: [
-            _HubRow(
-              icon: Icons.videocam_outlined,
-              title: '设备管理',
-              subtitle: '设备名称、房间、网络、解绑和状态',
-              path: profileDevicesPath,
-              tone: AppListRowTone.blue,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
 class TaskRewardHubPage extends StatelessWidget {
   const TaskRewardHubPage({super.key});
 
@@ -1381,32 +1362,40 @@ class RulesReminderHubPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return _Page(
       title: 'AI 规则与提醒',
-      subtitle: '观察策略、语音提醒和通知节奏',
+      subtitle: '提醒方式、语音提醒和通知节奏',
       children: [
         AppSurface(
           child: Column(
             children: [
               AppListRow(
                 icon: Icons.record_voice_over_outlined,
-                title: '对话与人设',
-                subtitle: '唤醒名、声线、自由聊天和睡前边界',
+                title: '语音与称呼',
+                subtitle: '唤醒名、声线和睡前边界',
                 tone: AppListRowTone.blue,
                 onTap: () => context.push(profileConversationPath),
               ),
               const _CompactDivider(),
               AppListRow(
-                icon: Icons.auto_awesome_outlined,
-                title: '任务看护规则',
-                subtitle: '任务观察、语音播报和拖拉跟进',
+                icon: Icons.volunteer_activism_outlined,
+                title: '看护能力',
+                subtitle: '坐姿、收纳、用餐和睡眠提醒',
                 tone: AppListRowTone.neutral,
-                onTap: () => context.push(profileAiRulesPath),
+                onTap: () => context.push(profileCareCapabilitiesPath),
+              ),
+              const _CompactDivider(),
+              AppListRow(
+                icon: Icons.schedule_outlined,
+                title: '作息时间',
+                subtitle: '上学日和周末提醒时间',
+                tone: AppListRowTone.amber,
+                onTap: () => context.push(profileRoutineWindowsPath),
               ),
               const _CompactDivider(),
               AppListRow(
                 icon: Icons.notifications_outlined,
                 title: '通知与提醒',
-                subtitle: '任务、设备、积分和日报提醒',
-                tone: AppListRowTone.amber,
+                subtitle: '家长通知、设备和日报提醒',
+                tone: AppListRowTone.neutral,
                 onTap: () => context.push(profileNotificationsPath),
               ),
             ],
@@ -2252,9 +2241,9 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
       birthday: _draft.birthday,
       sleepTime: _draft.sleepTime.isEmpty ? '21:00' : _draft.sleepTime,
       gender: _draft.gender,
-      stage: _draft.educationStage.trim().isEmpty
-          ? '幼儿园'
-          : _draft.educationStage,
+      // V1 幼儿园版本隐藏学段选择，孩子资料编辑也固定按幼儿园班级保存；
+      // educationStage/grade 字段保留给后续全年龄段版本恢复。
+      stage: '幼儿园',
       grade: _draft.grade,
       schoolName: _draft.schoolName,
       interestsText: _draft.interests.join('、'),
@@ -2299,7 +2288,9 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
               child: ChildProfileEditorPanel(
                 value: _value,
                 includeExtendedFields: true,
-                noteText: '资料用于提醒节奏、任务模板和家庭协作展示；性别可以不设置。',
+                stageOptions: const ['幼儿园'],
+                showStageSelector: false,
+                noteText: null,
                 onChanged: (value) {
                   if (canManageChildProfile) setState(() => _value = value);
                 },
@@ -2319,6 +2310,9 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
     }
 
     setState(() => _saving = true);
+    final ageStage = _value.normalizedGrade.isEmpty
+        ? _value.normalizedStage
+        : '${_value.normalizedStage} ${_value.normalizedGrade}';
     final next = ChildProfile(
       id: _draft.id,
       name: name,
@@ -2326,7 +2320,7 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
       gender: _value.normalizedGender,
       birthday: _value.birthday.trim(),
       sleepTime: _value.normalizedSleepTime,
-      ageStage: '${_value.normalizedStage} ${_value.normalizedGrade}',
+      ageStage: ageStage,
       educationStage: _value.normalizedStage,
       grade: _value.normalizedGrade,
       schoolName: _value.schoolName.trim(),
@@ -2415,53 +2409,187 @@ class EmergencyContactsPage extends ConsumerWidget {
   }
 }
 
+class DeviceCareHubPage extends ConsumerWidget {
+  const DeviceCareHubPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(selectedDeviceProvider);
+    return _Page(
+      title: '设备与看护',
+      subtitle: '管理摄像头、看护能力和作息时间。',
+      children: [
+        selected.when(
+          data: (device) => _SelectedDevicePanel(device: device),
+          loading: () => const _Loading(title: '正在同步当前摄像头'),
+          error: (error, _) => _ErrorState(
+            error: error,
+            onRetry: () => ref.invalidate(selectedDeviceProvider),
+          ),
+        ),
+        const SizedBox(height: 14),
+        AppSurface(
+          child: Column(
+            children: [
+              AppListRow(
+                icon: Icons.videocam_outlined,
+                title: '摄像头管理',
+                subtitle: '默认设备、名称和解绑',
+                tone: AppListRowTone.blue,
+                onTap: () => context.push(profileDevicesPath),
+              ),
+              const _CompactDivider(),
+              AppListRow(
+                icon: Icons.volunteer_activism_outlined,
+                title: '看护能力',
+                subtitle: '坐姿、收纳、用餐和睡眠提醒',
+                tone: AppListRowTone.green,
+                onTap: () => context.push(profileCareCapabilitiesPath),
+              ),
+              const _CompactDivider(),
+              AppListRow(
+                icon: Icons.schedule_outlined,
+                title: '作息时间',
+                subtitle: '上学日和周末的提醒时间',
+                tone: AppListRowTone.amber,
+                onTap: () => context.push(profileRoutineWindowsPath),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SelectedDevicePanel extends StatelessWidget {
+  const _SelectedDevicePanel({required this.device});
+
+  final GuardianDevice? device;
+
+  @override
+  Widget build(BuildContext context) {
+    if (device == null) {
+      return const AppStateView(
+        variant: AppStateVariant.deviceOffline,
+        title: '还没有可用摄像头',
+        message: '添加摄像头后，可以设置看护能力和作息提醒。',
+        compact: true,
+      );
+    }
+    return AppSurface(
+      color: AppColors.ink,
+      borderColor: AppColors.ink,
+      radius: 24,
+      child: Row(
+        children: [
+          _DarkIcon(Icons.videocam_outlined),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('当前看护设备', style: _darkSub),
+                const SizedBox(height: 5),
+                Text(device!.displayName, style: _darkTitle),
+                const SizedBox(height: 5),
+                Text(device!.displayLocation, style: _darkSub),
+              ],
+            ),
+          ),
+          StatusChip(
+            label: device!.isDefault ? '默认' : '已选择',
+            tone: StatusTone.success,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class DeviceManagementPage extends ConsumerWidget {
   const DeviceManagementPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final devices = ref.watch(devicesProvider);
+    final selected = ref.watch(selectedDeviceProvider);
     return _Page(
-      title: '设备管理',
+      title: '摄像头管理',
+      subtitle: '多台摄像头可按房间分开管理。',
+      trailing: IconButton(
+        tooltip: '添加摄像头',
+        onPressed: () => showAddCameraSheet(context),
+        icon: const Icon(Icons.add_circle_outline),
+      ),
       children: devices.when(
         data: (items) => [
+          selected.when(
+            data: (device) => _SelectedDevicePanel(device: device),
+            loading: () => const _Loading(title: '正在同步当前摄像头'),
+            error: (error, _) => _ErrorState(
+              error: error,
+              onRetry: () => ref.invalidate(selectedDeviceProvider),
+            ),
+          ),
+          const SizedBox(height: 14),
           if (items.isEmpty)
-            const AppStateView(
+            AppStateView(
               variant: AppStateVariant.deviceOffline,
-              title: '还没有绑定设备',
-              message: '完成设备绑定后，可以在这里查看状态和管理设备。',
+              title: '还没有可用摄像头',
+              message: '添加摄像头后，可以在这里查看状态和管理设备。',
+              primaryActionLabel: '添加摄像头',
+              onPrimaryAction: () => showAddCameraSheet(context),
               compact: true,
             )
           else
             AppSurface(
               child: Column(
                 children: [
-                  for (final device in items)
-                    AppListRow(
-                      icon: Icons.videocam_outlined,
-                      title: device.displayName,
-                      subtitle: device.displayLocation,
-                      tone: device.isOnlineLike
-                          ? AppListRowTone.green
-                          : AppListRowTone.neutral,
-                      trailing: StatusChip(
-                        label: device.isDefault
-                            ? '默认'
-                            : device.status == 'unbound'
-                            ? '已解绑'
-                            : '已绑定',
-                        tone: device.status == 'unbound'
-                            ? StatusTone.neutral
-                            : StatusTone.success,
-                      ),
-                      onTap: () =>
-                          context.push('$profileDeviceDetailPath/${device.id}'),
+                  for (var index = 0; index < items.length; index++) ...[
+                    if (index > 0) const _CompactDivider(),
+                    Builder(
+                      builder: (context) {
+                        final device = items[index];
+                        return AppListRow(
+                          icon: Icons.videocam_outlined,
+                          title: device.displayName,
+                          subtitle: _deviceListSubtitle(device),
+                          tone: device.isOnlineLike
+                              ? AppListRowTone.green
+                              : AppListRowTone.neutral,
+                          trailing: StatusChip(
+                            label: device.isDefault
+                                ? '默认'
+                                : device.status == 'unbound'
+                                ? '已解绑'
+                                : device.isOnlineLike
+                                ? '可用'
+                                : '离线',
+                            tone: device.status == 'unbound'
+                                ? StatusTone.neutral
+                                : device.isOnlineLike
+                                ? StatusTone.success
+                                : StatusTone.danger,
+                          ),
+                          onTap: () => context.push(
+                            '$profileDeviceDetailPath/${device.id}',
+                          ),
+                        );
+                      },
                     ),
+                  ],
                 ],
               ),
             ),
+          const SizedBox(height: 14),
+          AppSecondaryButton(
+            label: '添加摄像头',
+            trailing: const Icon(Icons.add_outlined, size: 18),
+            onTap: () => showAddCameraSheet(context),
+          ),
         ],
-        loading: () => const [_Loading(title: '正在同步设备')],
+        loading: () => const [_Loading(title: '正在同步摄像头')],
         error: (error, _) => [
           _ErrorState(
             error: error,
@@ -2471,6 +2599,13 @@ class DeviceManagementPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+String _deviceListSubtitle(GuardianDevice device) {
+  final location = device.displayLocation;
+  if (device.isDefault) return '$location · 当前默认';
+  if (device.status == 'unbound') return '$location · 已停止使用';
+  return location;
 }
 
 class DeviceDetailPage extends ConsumerStatefulWidget {
@@ -2545,9 +2680,7 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
             name: _name.text.trim(),
             location: _location.text.trim(),
           );
-      ref.invalidate(deviceOverviewProvider(widget.deviceId));
-      ref.invalidate(devicesProvider);
-      ref.invalidate(selectedDeviceProvider);
+      _refreshDeviceAndLiveCare(ref, deviceId: widget.deviceId);
       if (mounted) _toast(context, '设备信息已保存');
     } on DeviceException catch (error) {
       if (mounted) _toast(context, error.message);
@@ -2562,8 +2695,7 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
           .read(deviceRepositoryProvider)
           .setDefaultDevice(widget.deviceId);
       await selectDevice(ref, widget.deviceId);
-      ref.invalidate(deviceOverviewProvider(widget.deviceId));
-      ref.invalidate(devicesProvider);
+      _refreshDeviceAndLiveCare(ref, deviceId: widget.deviceId);
       if (mounted) _toast(context, '已设为默认设备');
     } on DeviceException catch (error) {
       if (mounted) _toast(context, error.message);
@@ -2574,18 +2706,40 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
     final confirmed = await _confirm(
       context,
       title: '解绑设备',
-      message: '解绑后将停止远程看护和任务提醒，确认继续吗？',
+      message: '解绑后将停止这台摄像头的远程看护和提醒，确认继续吗？',
       danger: true,
     );
     if (!confirmed) return;
     try {
       await ref.read(deviceRepositoryProvider).unbindDevice(widget.deviceId);
-      ref.invalidate(devicesProvider);
-      ref.invalidate(selectedDeviceProvider);
+      if (ref.read(selectedDeviceIdProvider) == widget.deviceId) {
+        await ref
+            .read(sharedPreferencesProvider)
+            .remove(selectedDeviceIdPreferenceKey);
+        ref.read(selectedDeviceIdProvider.notifier).state = null;
+      }
+      _refreshDeviceAndLiveCare(ref, deviceId: widget.deviceId);
       if (mounted) context.pop();
     } on DeviceException catch (error) {
       if (mounted) _toast(context, error.message);
     }
+  }
+}
+
+void _refreshDeviceAndLiveCare(WidgetRef ref, {String? deviceId}) {
+  ref
+    ..invalidate(devicesProvider)
+    ..invalidate(selectedDeviceProvider)
+    ..invalidate(primaryDeviceOverviewProvider)
+    ..invalidate(cameraHealthProvider)
+    ..invalidate(cameraRuntimeProvider)
+    ..invalidate(cameraStatusProvider)
+    ..invalidate(cameraMonitorStatusProvider)
+    ..invalidate(cameraSnapshotProvider)
+    ..invalidate(cameraEventsProvider)
+    ..invalidate(liveCareStatusProvider);
+  if (deviceId != null && deviceId.isNotEmpty) {
+    ref.invalidate(deviceOverviewProvider(deviceId));
   }
 }
 
@@ -2705,16 +2859,897 @@ class AiCareRulesPage extends StatelessWidget {
   const AiCareRulesPage({super.key});
 
   @override
-  Widget build(BuildContext context) => const _BooleanSettingsPage(
-    title: '任务看护规则',
-    settingKey: 'ai-care-rules',
-    rows: [
-      _SettingRowSpec('taskObservationEnabled', '任务观察', '观察任务开始、进行和结束状态。'),
-      _SettingRowSpec('voiceReminderEnabled', '语音提醒', '到点后由设备温和提醒孩子。'),
-      _SettingRowSpec('delayReminderEnabled', '拖拉提醒', '还没开始时，按规则继续温和提醒。'),
-      _SettingRowSpec('evidenceReviewEnabled', '证据确认建议', 'AI 给出完成依据，最后由家长确认。'),
+  Widget build(BuildContext context) => const _HubPage(
+    title: 'AI 规则与提醒',
+    sections: [
+      _HubSection(
+        title: '看护提醒',
+        rows: [
+          _HubRow(
+            icon: Icons.volunteer_activism_outlined,
+            title: '看护能力',
+            subtitle: '坐姿、收纳、用餐和睡眠提醒',
+            path: profileCareCapabilitiesPath,
+            tone: AppListRowTone.green,
+          ),
+          _HubRow(
+            icon: Icons.schedule_outlined,
+            title: '作息时间',
+            subtitle: '上学日和周末的提醒时间',
+            path: profileRoutineWindowsPath,
+            tone: AppListRowTone.amber,
+          ),
+          _HubRow(
+            icon: Icons.notifications_outlined,
+            title: '通知与提醒',
+            subtitle: '家长通知和夜间免打扰',
+            path: profileNotificationsPath,
+          ),
+        ],
+      ),
+      _HubSection(
+        title: '边界',
+        rows: [
+          _HubRow(
+            icon: Icons.record_voice_over_outlined,
+            title: '语音与称呼',
+            subtitle: '唤醒名、声线和聊天边界',
+            path: profileConversationPath,
+            tone: AppListRowTone.blue,
+          ),
+          _HubRow(
+            icon: Icons.lock_outline,
+            title: '隐私与授权',
+            subtitle: '查看、播报和数据保留',
+            path: profilePrivacyPath,
+          ),
+        ],
+      ),
     ],
   );
+}
+
+class CareCapabilitiesPage extends ConsumerStatefulWidget {
+  const CareCapabilitiesPage({super.key});
+
+  @override
+  ConsumerState<CareCapabilitiesPage> createState() =>
+      _CareCapabilitiesPageState();
+}
+
+class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
+  final Set<String> _savingKeys = <String>{};
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedDevice = ref.watch(selectedDeviceProvider);
+    final child = ref.watch(currentChildProvider);
+    final childId = child.asData?.value?.id;
+    final canManage =
+        ref
+            .watch(profileSummaryProvider)
+            .asData
+            ?.value
+            .can('manage_child_settings') ??
+        false;
+
+    return _Page(
+      title: '看护能力',
+      subtitle: '按幼儿园作息轻声提醒。',
+      children: selectedDevice.when(
+        data: (device) {
+          if (device == null) {
+            return const [
+              AppStateView(
+                variant: AppStateVariant.deviceOffline,
+                title: '还没有可用摄像头',
+                message: '添加摄像头后，可以开启看护能力。',
+                compact: true,
+              ),
+            ];
+          }
+          final query = CareCapabilitiesQuery(
+            childId: childId,
+            deviceId: device.id,
+          );
+          final capabilities = ref.watch(careCapabilitiesProvider(query));
+          return [
+            _SelectedDevicePanel(device: device),
+            const SizedBox(height: 14),
+            ...capabilities.when(
+              data: (items) => _capabilitySections(
+                items,
+                canManage: canManage,
+                query: query,
+                childId: childId,
+                deviceId: device.id,
+              ),
+              loading: () => const [_Loading(title: '正在同步看护能力')],
+              error: (error, _) => [
+                _ErrorState(
+                  error: error,
+                  onRetry: () =>
+                      ref.invalidate(careCapabilitiesProvider(query)),
+                ),
+              ],
+            ),
+          ];
+        },
+        loading: () => const [_Loading(title: '正在同步当前摄像头')],
+        error: (error, _) => [
+          _ErrorState(
+            error: error,
+            onRetry: () => ref.invalidate(selectedDeviceProvider),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _capabilitySections(
+    List<CareCapability> items, {
+    required bool canManage,
+    required CareCapabilitiesQuery query,
+    required String? childId,
+    required String deviceId,
+  }) {
+    if (items.isEmpty) {
+      return const [
+        AppStateView(
+          variant: AppStateVariant.noData,
+          title: '看护能力待同步',
+          message: '请稍后刷新，或先确认孩子资料已完善。',
+          compact: true,
+        ),
+      ];
+    }
+    final ordered = [...items]
+      ..sort(
+        (a, b) => _capabilityOrder(
+          a.scenario,
+        ).compareTo(_capabilityOrder(b.scenario)),
+      );
+    return [
+      AppSurface(
+        child: Column(
+          children: [
+            for (var index = 0; index < ordered.length; index++) ...[
+              if (index > 0) const _CompactDivider(),
+              _CareCapabilityRow(
+                capability: ordered[index],
+                savingEnabled: _savingKeys.contains(
+                  '${ordered[index].scenario}:enabled',
+                ),
+                savingVoice: _savingKeys.contains(
+                  '${ordered[index].scenario}:voice',
+                ),
+                savingRules: _savingKeys.contains(
+                  '${ordered[index].scenario}:rules',
+                ),
+                canManage: canManage,
+                onEnabledChanged: (value) => _saveCapability(
+                  query: query,
+                  childId: childId,
+                  deviceId: deviceId,
+                  capability: ordered[index],
+                  key: 'enabled',
+                  value: value,
+                ),
+                onVoiceChanged: (value) => _saveCapability(
+                  query: query,
+                  childId: childId,
+                  deviceId: deviceId,
+                  capability: ordered[index],
+                  key: 'allowSpeaker',
+                  value: value,
+                ),
+                onOpenRules: ordered[index].scenario == 'toy_cleanup'
+                    ? () => _openToyCleanupRules(
+                        query: query,
+                        childId: childId,
+                        deviceId: deviceId,
+                        capability: ordered[index],
+                      )
+                    : null,
+              ),
+            ],
+          ],
+        ),
+      ),
+      if (!canManage) ...[
+        const SizedBox(height: 12),
+        const AppListRow(
+          icon: Icons.lock_outline,
+          title: '当前为只读',
+          subtitle: '看护能力由家庭管理员维护。',
+          tone: AppListRowTone.neutral,
+        ),
+      ],
+    ];
+  }
+
+  Future<void> _saveCapability({
+    required CareCapabilitiesQuery query,
+    required String? childId,
+    required String deviceId,
+    required CareCapability capability,
+    required String key,
+    required bool value,
+  }) async {
+    await _saveCapabilityValues(
+      query: query,
+      childId: childId,
+      deviceId: deviceId,
+      capability: capability,
+      savingKey:
+          '${capability.scenario}:${key == 'allowSpeaker' ? 'voice' : key}',
+      values: {key: value},
+    );
+  }
+
+  Future<void> _saveCapabilityValues({
+    required CareCapabilitiesQuery query,
+    required String? childId,
+    required String deviceId,
+    required CareCapability capability,
+    required String savingKey,
+    required Map<String, Object?> values,
+  }) async {
+    setState(() => _savingKeys.add(savingKey));
+    try {
+      await ref
+          .read(careRepositoryProvider)
+          .updateCapabilities(
+            childId: childId,
+            deviceId: deviceId,
+            capabilities: [
+              {'scenario': capability.scenario, ...values},
+            ],
+          );
+      ref.invalidate(careCapabilitiesProvider(query));
+      ref.invalidate(careSummaryProvider(childId));
+      if (mounted) _toast(context, '已保存');
+    } on CareException catch (error) {
+      if (mounted) _toast(context, error.message);
+    } finally {
+      if (mounted) setState(() => _savingKeys.remove(savingKey));
+    }
+  }
+
+  Future<void> _openToyCleanupRules({
+    required CareCapabilitiesQuery query,
+    required String? childId,
+    required String deviceId,
+    required CareCapability capability,
+  }) async {
+    final result = await _showToyCleanupRulesSheet(context, capability);
+    if (result == null) return;
+    await _saveCapabilityValues(
+      query: query,
+      childId: childId,
+      deviceId: deviceId,
+      capability: capability,
+      savingKey: '${capability.scenario}:rules',
+      values: result,
+    );
+  }
+}
+
+class _CareCapabilityRow extends StatelessWidget {
+  const _CareCapabilityRow({
+    required this.capability,
+    required this.savingEnabled,
+    required this.savingVoice,
+    required this.savingRules,
+    required this.canManage,
+    required this.onEnabledChanged,
+    required this.onVoiceChanged,
+    this.onOpenRules,
+  });
+
+  final CareCapability capability;
+  final bool savingEnabled;
+  final bool savingVoice;
+  final bool savingRules;
+  final bool canManage;
+  final ValueChanged<bool> onEnabledChanged;
+  final ValueChanged<bool> onVoiceChanged;
+  final VoidCallback? onOpenRules;
+
+  @override
+  Widget build(BuildContext context) {
+    final disabled = !canManage || savingEnabled || savingVoice || savingRules;
+    final isToyCleanup = capability.scenario == 'toy_cleanup';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        children: [
+          _SwitchRow(
+            title: _capabilityTitle(capability.scenario),
+            subtitle: savingEnabled
+                ? '保存中'
+                : _capabilityDescription(capability.scenario),
+            value: capability.enabled,
+            onChanged: disabled ? null : onEnabledChanged,
+          ),
+          _SwitchRow(
+            title: '摄像头语音提醒',
+            subtitle: savingVoice
+                ? '保存中'
+                : capability.allowSpeaker
+                ? isToyCleanup
+                      ? '孩子离开后轻声提醒。'
+                      : '会在合适时间轻声提醒。'
+                : '只记录给家长查看。',
+            value: capability.allowSpeaker,
+            onChanged: disabled || !capability.enabled ? null : onVoiceChanged,
+          ),
+          if (isToyCleanup) ...[
+            AppListRow(
+              icon: Icons.timer_outlined,
+              title: '提醒方式',
+              subtitle: savingRules
+                  ? '保存中'
+                  : _toyCleanupRuleSummary(capability),
+              tone: AppListRowTone.amber,
+              onTap: disabled || onOpenRules == null ? null : onOpenRules,
+            ),
+          ],
+          Align(
+            alignment: Alignment.centerLeft,
+            child: StatusChip(
+              label: capability.enabled
+                  ? capability.allowSpeaker
+                        ? '已开启'
+                        : '仅记录'
+                  : '已关闭',
+              tone: capability.enabled
+                  ? StatusTone.success
+                  : StatusTone.neutral,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Future<Map<String, Object?>?> _showToyCleanupRulesSheet(
+  BuildContext context,
+  CareCapability capability,
+) {
+  var leaveMinutes = _secondsToMinutes(
+    capability.minObservationSeconds,
+    min: 1,
+  );
+  var intervalMinutes = _secondsToMinutes(capability.cooldownSeconds, min: 10);
+  var dailyLimit = capability.dailyLimit <= 0 ? 3 : capability.dailyLimit;
+
+  return showAppBottomSheet<Map<String, Object?>>(
+    context: context,
+    maxHeightFactor: 0.64,
+    child: StatefulBuilder(
+      builder: (context, setSheetState) {
+        return AppBottomSheetBody(
+          title: '玩具收纳',
+          subtitle: '孩子玩完离开后，摄像头会轻声提醒收好玩具。',
+          footer: AppPrimaryButton(
+            label: '保存提醒方式',
+            onTap: () => Navigator.of(context).pop({
+              'minObservationSeconds': leaveMinutes * 60,
+              'cooldownSeconds': intervalMinutes * 60,
+              'dailyLimit': dailyLimit,
+            }),
+          ),
+          child: Column(
+            children: [
+              _MinuteStepperRow(
+                title: '离开多久后提醒',
+                subtitle: '默认等一会儿，避免刚离开就打扰。',
+                value: leaveMinutes,
+                min: 1,
+                max: 10,
+                step: 1,
+                enabled: true,
+                onChanged: (value) => setSheetState(() => leaveMinutes = value),
+              ),
+              const _CompactDivider(),
+              _MinuteStepperRow(
+                title: '提醒间隔',
+                subtitle: '两次提醒之间留出安静时间。',
+                value: intervalMinutes,
+                min: 10,
+                max: 60,
+                step: 5,
+                enabled: true,
+                onChanged: (value) =>
+                    setSheetState(() => intervalMinutes = value),
+              ),
+              const _CompactDivider(),
+              _MinuteStepperRow(
+                title: '今日最多提醒',
+                subtitle: '提醒太多时改为通知家长。',
+                value: dailyLimit,
+                min: 1,
+                max: 6,
+                step: 1,
+                suffix: '次',
+                enabled: true,
+                onChanged: (value) => setSheetState(() => dailyLimit = value),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  );
+}
+
+String _toyCleanupRuleSummary(CareCapability capability) {
+  final leaveMinutes = _secondsToMinutes(
+    capability.minObservationSeconds,
+    min: 1,
+  );
+  final intervalMinutes = _secondsToMinutes(
+    capability.cooldownSeconds,
+    min: 10,
+  );
+  final dailyLimit = capability.dailyLimit <= 0 ? 3 : capability.dailyLimit;
+  return '离开 $leaveMinutes 分钟后提醒 · 间隔 $intervalMinutes 分钟 · 今日最多 $dailyLimit 次';
+}
+
+int _secondsToMinutes(int seconds, {required int min}) {
+  if (seconds <= 0) return min;
+  return math.max(min, (seconds / 60).ceil());
+}
+
+class RoutineWindowsPage extends ConsumerStatefulWidget {
+  const RoutineWindowsPage({super.key});
+
+  @override
+  ConsumerState<RoutineWindowsPage> createState() => _RoutineWindowsPageState();
+}
+
+class _RoutineWindowsPageState extends ConsumerState<RoutineWindowsPage> {
+  String _dayType = 'school_day';
+  List<RoutineWindow>? _draft;
+  String? _draftKey;
+  var _saving = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final child = ref.watch(currentChildProvider);
+    final childId = child.asData?.value?.id;
+    final query = RoutineWindowsQuery(childId: childId, dayType: _dayType);
+    final windows = ref.watch(routineWindowsProvider(query));
+    final canManage =
+        ref
+            .watch(profileSummaryProvider)
+            .asData
+            ?.value
+            .can('manage_child_settings') ??
+        false;
+    final canSaveRoutine = canManage && !_saving && windows.hasValue;
+
+    return _Page(
+      title: '作息节奏',
+      subtitle: '设置大概时间段，摄像头会轻声提醒。',
+      avoidFooterOverlap: true,
+      footer: canManage
+          ? AppPrimaryButton(
+              label: _saving ? '保存中' : '保存作息',
+              loading: _saving,
+              onTap: canSaveRoutine ? () => _save(query) : null,
+            )
+          : null,
+      children: [
+        _DayTypeSelector(
+          value: _dayType,
+          onChanged: _saving
+              ? null
+              : (value) => setState(() {
+                  _dayType = value;
+                  _draft = null;
+                  _draftKey = null;
+                }),
+        ),
+        const SizedBox(height: 14),
+        ...windows.when(
+          data: (items) {
+            final key = '${query.childId ?? ''}:${query.dayType}';
+            if (_draftKey != key) {
+              _draft = _routineDraft(
+                items,
+                childId: childId,
+                dayType: _dayType,
+              );
+              _draftKey = key;
+            }
+            return [
+              AppSurface(
+                child: Column(
+                  children: [
+                    for (var index = 0; index < _draft!.length; index++) ...[
+                      if (index > 0) const _CompactDivider(),
+                      _RoutineWindowRow(
+                        window: _draft![index],
+                        canManage: canManage && !_saving,
+                        onToggle: (value) => _updateWindow(
+                          index,
+                          _draft![index].copyWith(enabled: value),
+                        ),
+                        onEditStart: () => _pickTime(index, start: true),
+                        onEditEnd: () => _pickTime(index, start: false),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              const AppListRow(
+                icon: Icons.event_available_outlined,
+                title: '假期作息',
+                subtitle: '后续可按假期单独调整。',
+                tone: AppListRowTone.neutral,
+              ),
+              if (!canManage) ...[
+                const SizedBox(height: 12),
+                const AppListRow(
+                  icon: Icons.lock_outline,
+                  title: '当前为只读',
+                  subtitle: '作息时间由家庭管理员维护。',
+                  tone: AppListRowTone.neutral,
+                ),
+              ],
+            ];
+          },
+          loading: () => const [_Loading(title: '正在同步作息时间')],
+          error: (error, _) => [
+            _ErrorState(
+              error: error,
+              onRetry: () => ref.invalidate(routineWindowsProvider(query)),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _updateWindow(int index, RoutineWindow window) {
+    final next = [...?_draft];
+    next[index] = window;
+    setState(() => _draft = next);
+  }
+
+  Future<void> _pickTime(int index, {required bool start}) async {
+    final window = _draft?[index];
+    if (window == null) return;
+    final picked = await showAppTimePickerSheet(
+      context: context,
+      initialValue: start ? window.startTime : window.endTime,
+      title: start ? '开始时间' : '结束时间',
+      subtitle: _routineTitle(window.windowType),
+    );
+    if (picked == null || !mounted) return;
+    _updateWindow(
+      index,
+      start
+          ? window.copyWith(startTime: picked)
+          : window.copyWith(endTime: picked),
+    );
+  }
+
+  Future<void> _save(RoutineWindowsQuery query) async {
+    final draft = _draft;
+    if (draft == null) return;
+    setState(() => _saving = true);
+    try {
+      final visibleDraft = draft
+          .where((item) => _visibleRoutineWindowTypes.contains(item.windowType))
+          .toList();
+      await ref
+          .read(careRepositoryProvider)
+          .replaceRoutineWindows(
+            childId: query.childId,
+            dayType: query.dayType,
+            windows: visibleDraft,
+          );
+      ref.invalidate(routineWindowsProvider(query));
+      ref.invalidate(careSummaryProvider(query.childId));
+      if (mounted) _toast(context, '作息时间已保存');
+    } on CareException catch (error) {
+      if (mounted) _toast(context, error.message);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+}
+
+class _DayTypeSelector extends StatelessWidget {
+  const _DayTypeSelector({required this.value, required this.onChanged});
+
+  final String value;
+  final ValueChanged<String>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    const options = [('school_day', '上学日'), ('weekend', '周末')];
+    return AppSurface(
+      padding: const EdgeInsets.all(6),
+      child: Row(
+        children: [
+          for (final option in options) ...[
+            Expanded(
+              child: _DayTypeButton(
+                label: option.$2,
+                selected: value == option.$1,
+                onTap: onChanged == null ? null : () => onChanged!(option.$1),
+              ),
+            ),
+            if (option != options.last) const SizedBox(width: 6),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DayTypeButton extends StatelessWidget {
+  const _DayTypeButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: AppMotion.duration(context, 160),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.ink : Colors.transparent,
+          borderRadius: BorderRadius.circular(13),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: selected ? Colors.white : AppColors.muted,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RoutineWindowRow extends StatelessWidget {
+  const _RoutineWindowRow({
+    required this.window,
+    required this.canManage,
+    required this.onToggle,
+    required this.onEditStart,
+    required this.onEditEnd,
+  });
+
+  final RoutineWindow window;
+  final bool canManage;
+  final ValueChanged<bool> onToggle;
+  final VoidCallback onEditStart;
+  final VoidCallback onEditEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(_routineTitle(window.windowType), style: _rowTitle),
+                const SizedBox(height: 4),
+                Text(_routineSubtitle(window.windowType), style: _mutedText),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _TimeChip(
+                      label: window.startTime,
+                      enabled: canManage,
+                      onTap: onEditStart,
+                    ),
+                    _TimeChip(
+                      label: window.endTime,
+                      enabled: canManage,
+                      onTap: onEditEnd,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          AppCompactToggle(
+            value: window.enabled,
+            onChanged: canManage ? onToggle : null,
+            label: _routineTitle(window.windowType),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimeChip extends StatelessWidget {
+  const _TimeChip({
+    required this.label,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: enabled ? onTap : null,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceStrong,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: AppColors.borderSoft),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: enabled ? AppColors.ink : AppColors.disabledInk,
+              fontFamily: AppTypography.systemFont,
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+List<RoutineWindow> _routineDraft(
+  List<RoutineWindow> items, {
+  required String? childId,
+  required String dayType,
+}) {
+  final byType = {for (final item in items) item.windowType: item};
+  return [
+    for (final type in _routineWindowOrder)
+      byType[type] ??
+          RoutineWindow(
+            id: '',
+            childId: childId ?? '',
+            dayType: dayType,
+            windowType: type,
+            startTime: _defaultRoutineTime(type).$1,
+            endTime: _defaultRoutineTime(type).$2,
+            enabled: true,
+            timezone: 'Asia/Shanghai',
+          ),
+  ];
+}
+
+const _routineWindowOrder = [
+  'wake_up',
+  'breakfast',
+  'lunch',
+  'nap',
+  'dinner',
+  'bedtime',
+];
+
+const _visibleRoutineWindowTypes = {
+  'wake_up',
+  'breakfast',
+  'lunch',
+  'nap',
+  'dinner',
+  'bedtime',
+};
+
+(String, String) _defaultRoutineTime(String type) {
+  return switch (type) {
+    'wake_up' => ('07:00', '07:40'),
+    'breakfast' => ('07:30', '08:10'),
+    'lunch' => ('11:40', '12:30'),
+    'nap' => ('12:40', '14:20'),
+    'dinner' => ('18:00', '19:00'),
+    'bedtime' => ('20:30', '21:20'),
+    _ => ('19:00', '20:00'),
+  };
+}
+
+String _routineTitle(String type) {
+  return switch (type) {
+    'wake_up' => '起床',
+    'breakfast' => '早餐',
+    'lunch' => '午餐',
+    'nap' => '午睡',
+    'dinner' => '晚餐',
+    'bedtime' => '晚上睡觉',
+    _ => '作息时间',
+  };
+}
+
+String _routineSubtitle(String type) {
+  return switch (type) {
+    'wake_up' => '温和唤醒，不催促。',
+    'breakfast' => '准备开始一天。',
+    'lunch' => '按午餐节奏轻提醒。',
+    'nap' => '午睡前后更安静。',
+    'dinner' => '晚餐时保持坐好慢慢吃。',
+    'bedtime' => '睡前提醒会更轻。',
+    _ => '按时间段轻声提醒。',
+  };
+}
+
+int _capabilityOrder(String scenario) {
+  return switch (scenario) {
+    'posture' => 0,
+    'toy_cleanup' => 1,
+    'meal_start' => 2,
+    'meal_habit' => 3,
+    'nap_time' => 4,
+    'bedtime' => 5,
+    'wake_up' => 6,
+    'transition' => 7,
+    _ => 99,
+  };
+}
+
+String _capabilityTitle(String scenario) {
+  return switch (scenario) {
+    'posture' => '坐姿提醒',
+    'toy_cleanup' => '玩具收纳',
+    'meal_start' => '用餐开始提醒',
+    'meal_habit' => '用餐习惯提醒',
+    'nap_time' => '午睡提醒',
+    'bedtime' => '晚上入睡提醒',
+    'wake_up' => '起床提醒',
+    'transition' => '转场提醒',
+    _ => '看护提醒',
+  };
+}
+
+String _capabilityDescription(String scenario) {
+  return switch (scenario) {
+    'posture' => '久坐或靠太近时轻声提醒。',
+    'toy_cleanup' => '孩子玩完离开后，摄像头会轻声提醒收好玩具。',
+    'meal_start' => '到用餐时间，提醒坐好开始吃饭。',
+    'meal_habit' => '用餐中离座或分心时轻提醒。',
+    'nap_time' => '午睡时间更轻、更慢。',
+    'bedtime' => '睡前提醒更短，不刺激继续玩。',
+    'wake_up' => '到起床窗口温和唤醒。',
+    'transition' => '准备出门、洗漱等换场景提醒。',
+    _ => '按作息轻声提醒。',
+  };
 }
 
 class NotificationSettingsPage extends StatelessWidget {
@@ -2725,9 +3760,9 @@ class NotificationSettingsPage extends StatelessWidget {
     title: '通知与提醒',
     settingKey: 'notifications',
     rows: [
-      _SettingRowSpec('taskReminder', '任务提醒', '任务开始前提醒家长和设备。'),
-      _SettingRowSpec('parentActionReminder', '任务待确认', '作业证据、打卡素材和奖励申请确认。'),
-      _SettingRowSpec('taskEndReminder', '任务结束提醒', '结束后提醒家长确认。'),
+      _SettingRowSpec('taskReminder', '作息提醒', '到点前提醒家长和摄像头。'),
+      _SettingRowSpec('parentActionReminder', '待确认事项', '需要家长判断时集中提醒。'),
+      _SettingRowSpec('taskEndReminder', '完成提醒', '孩子完成后提醒家长查看。'),
       _SettingRowSpec('deviceOfflineReminder', '设备离线提醒', '设备离线时通知家长。'),
       _SettingRowSpec('pointsRewardReminder', '积分奖励提醒', '积分发放和奖励兑现时提醒。'),
       _SettingRowSpec('dailySummary', '日报摘要', '每天一次汇总，不打扰工作时间。'),
@@ -2744,7 +3779,7 @@ class PrivacyPermissionsPage extends StatelessWidget {
     title: '隐私与权限',
     settingKey: 'privacy',
     rows: [
-      _SettingRowSpec('voiceBroadcastAuthorized', '语音播报授权', '允许设备进行任务提醒和温和提示。'),
+      _SettingRowSpec('voiceBroadcastAuthorized', '语音播报授权', '允许设备进行看护提醒和温和提示。'),
       _SettingRowSpec('childPrivacyAuthorized', '儿童隐私授权', '确认监护人已授权儿童数据处理。'),
       _SettingRowSpec(
         'remoteViewingNoticeEnabled',
@@ -2796,7 +3831,7 @@ class _ConversationRulesPageState extends ConsumerState<ConversationRulesPage> {
         false;
     final canSave = canManageSetting && !_saving && _draft != null;
     return _Page(
-      title: '对话与人设',
+      title: '语音与称呼',
       footer: canManageSetting
           ? AppPrimaryButton(
               label: _saving ? '保存中' : '保存设置',
@@ -2854,7 +3889,7 @@ class _ConversationRulesPageState extends ConsumerState<ConversationRulesPage> {
                           children: [
                             Text('边界方案', style: _rowTitle),
                             SizedBox(height: 4),
-                            Text('控制自由聊天时长和拖拉跟进节奏。', style: _mutedText),
+                            Text('控制自由聊天时长和继续提醒节奏。', style: _mutedText),
                           ],
                         ),
                       ),
@@ -2942,8 +3977,8 @@ class _ConversationRulesPageState extends ConsumerState<ConversationRulesPage> {
                         setState(() => draft['freeChatDailyMinutes'] = value),
                   ),
                   _SwitchRow(
-                    title: '作业模式限制',
-                    subtitle: '作业中只允许任务相关问答和温和提示。',
+                    title: '专注时间限制',
+                    subtitle: '专注时间只保留当前事情相关问答和温和提示。',
                     value: draft['homeworkModeRestricted'] == true,
                     onChanged: canManageSetting
                         ? (value) => setState(
@@ -3309,7 +4344,7 @@ class AboutPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 18),
-          Center(child: Text('© 2026 Mira Guardian', style: _mutedText)),
+          Center(child: Text('© 2026 家庭 AI 看护 App', style: _mutedText)),
         ],
         loading: () => const [_Loading(title: '正在同步应用信息')],
         error: (error, _) => [
@@ -3764,7 +4799,7 @@ class _SubscriptionPaywallScaffold extends StatelessWidget {
                       const Text('让看护更完整', style: _paywallLargeTitle),
                       const SizedBox(height: 10),
                       const Text(
-                        '长期报告、趋势洞察和更细的任务提醒，帮你少盯屏幕，多看重点。',
+                        '长期报告、趋势洞察和更细的看护提醒，帮你少盯屏幕，多看重点。',
                         style: _paywallBody,
                       ),
                       const SizedBox(height: 18),
@@ -4657,7 +5692,7 @@ List<Widget> _reportSections(ReportData data) {
     ),
     if (data.tasks.isNotEmpty) _ReportTaskReview(tasks: data.tasks),
     _ReportSectionBlock(
-      title: '看护观察',
+      title: '看护记录',
       items: data.observations,
       fallback: '暂无摄像头或 AI 观察记录。',
     ),
@@ -5718,6 +6753,7 @@ class _Page extends StatelessWidget {
     this.trailing,
     this.headerContent,
     this.footer,
+    this.avoidFooterOverlap = false,
   });
 
   final String title;
@@ -5726,6 +6762,7 @@ class _Page extends StatelessWidget {
   final Widget? trailing;
   final Widget? headerContent;
   final Widget? footer;
+  final bool avoidFooterOverlap;
 
   @override
   Widget build(BuildContext context) {
@@ -5745,6 +6782,7 @@ class _Page extends StatelessWidget {
       },
       trailing: trailing,
       footer: footer,
+      avoidFooterOverlap: avoidFooterOverlap,
       children: children,
     );
   }
@@ -5788,7 +6826,7 @@ String _hubSubtitle(String title) {
     '任务与奖励' => '积分、奖励和成长记录',
     '积分与奖励' => '积分、奖励和兑换记录',
     '看护报告' => '日报、周报和成长时刻',
-    'AI 规则与提醒' => '观察策略、语音提醒和通知节奏',
+    'AI 规则与提醒' => '提醒方式、语音提醒和通知节奏',
     _ => '设置',
   };
 }
@@ -6493,6 +7531,7 @@ class _MinuteStepperRow extends StatelessWidget {
     required this.step,
     required this.enabled,
     required this.onChanged,
+    this.suffix = '分',
   });
 
   final String title;
@@ -6503,6 +7542,7 @@ class _MinuteStepperRow extends StatelessWidget {
   final int step;
   final bool enabled;
   final ValueChanged<int> onChanged;
+  final String suffix;
 
   @override
   Widget build(BuildContext context) {
@@ -6535,7 +7575,7 @@ class _MinuteStepperRow extends StatelessWidget {
             width: 56,
             child: Center(
               child: Text(
-                '$value 分',
+                '$value $suffix',
                 maxLines: 1,
                 style: TextStyle(
                   color: enabled ? AppColors.ink : AppColors.disabledInk,
@@ -6616,7 +7656,7 @@ const _conversationBoundaryPlans = [
     label: '宽松',
     singleMinutes: 12,
     dailyMinutes: 35,
-    description: '适合周末或家长在旁边时使用，自由聊天更长，拖拉跟进更少。',
+    description: '适合周末或家长在旁边时使用，自由聊天更长，继续提醒更少。',
   ),
   _ConversationBoundaryPlan(
     key: 'balanced',
@@ -6630,7 +7670,7 @@ const _conversationBoundaryPlans = [
     label: '严格',
     singleMinutes: 5,
     dailyMinutes: 15,
-    description: '适合作业日或睡前更容易兴奋的孩子，提醒更克制。',
+    description: '适合上学日或睡前更容易兴奋的孩子，提醒更克制。',
   ),
 ];
 

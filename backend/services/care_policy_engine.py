@@ -57,7 +57,6 @@ SCENARIO_ROUTINE_WINDOW_TYPES = {
     CARE_SCENARIO_MEAL_HABIT: {"breakfast", "lunch", "dinner", "meal"},
     CARE_SCENARIO_NAP_TIME: {"nap"},
     CARE_SCENARIO_BEDTIME: {"bedtime"},
-    CARE_SCENARIO_TOY_CLEANUP: {"toy_cleanup", "cleanup", "transition"},
     CARE_SCENARIO_POSTURE: {"posture", "study", "reading", "meal", "breakfast", "lunch", "dinner"},
     CARE_SCENARIO_TRANSITION: {"transition"},
 }
@@ -208,6 +207,21 @@ class CarePolicyEngine:
                 REMINDER_DECISION_RECORD_ONLY,
                 "speaker_not_allowed",
                 snapshot,
+            )
+
+        if scenario == CARE_SCENARIO_TOY_CLEANUP:
+            snapshot["routineGate"] = {
+                "allowed": True,
+                "reason": "behavior_only_scenario",
+                "dayType": day_type or "",
+                "windowTypes": [],
+                "matchedWindowId": "",
+            }
+            return _decision(
+                REMINDER_DECISION_ALLOWED,
+                "behavior_policy_allowed",
+                snapshot,
+                should_speak=True,
             )
 
         routine_gate = _routine_window_gate(

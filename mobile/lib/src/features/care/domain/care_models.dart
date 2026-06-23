@@ -81,6 +81,24 @@ class RoutineWindow {
   final bool enabled;
   final String timezone;
 
+  RoutineWindow copyWith({
+    String? startTime,
+    String? endTime,
+    bool? enabled,
+    String? timezone,
+  }) {
+    return RoutineWindow(
+      id: id,
+      childId: childId,
+      dayType: dayType,
+      windowType: windowType,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      enabled: enabled ?? this.enabled,
+      timezone: timezone ?? this.timezone,
+    );
+  }
+
   Map<String, Object?> toJson() {
     return {
       'dayType': dayType,

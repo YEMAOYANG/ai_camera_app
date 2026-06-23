@@ -44,18 +44,19 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('家庭成员'), findsOneWidget);
-    expect(find.text('紧急联系人'), findsOneWidget);
-    expect(find.text('家庭与成员'), findsNothing);
-    expect(find.text('设备管理'), findsNothing);
+    expect(find.text('紧急联系人'), findsNothing);
+    expect(find.text('家庭与成员'), findsOneWidget);
+    expect(find.text('设备与看护'), findsOneWidget);
     expect(find.text('AI 规则与提醒'), findsOneWidget);
     expect(find.text('基础版'), findsOneWidget);
     expect(find.text('18'), findsOneWidget);
     expect(find.text('积分'), findsOneWidget);
     expect(find.text('订阅与套餐'), findsNothing);
     expect(find.text('积分与奖励'), findsNothing);
-    expect(find.text('看护报告'), findsOneWidget);
-    expect(find.text('隐私与权限'), findsOneWidget);
-    expect(find.text('账号安全'), findsOneWidget);
+    expect(find.text('看护报告'), findsNothing);
+    expect(find.text('隐私与权限'), findsNothing);
+    expect(find.text('账号与安全'), findsOneWidget);
+    expect(find.text('帮助与反馈'), findsOneWidget);
     expect(find.text('关于'), findsOneWidget);
     expect(find.text('账号设置'), findsNothing);
     expect(find.text('任务与奖励'), findsNothing);

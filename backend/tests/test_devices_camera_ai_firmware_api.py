@@ -708,9 +708,9 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
             json={
                 "provider": "self_owned_camera",
                 "config": {
-                    "adapterName": "mira_self_owned_v1",
+                    "adapterName": "self_owned_camera_v1",
                     "streamProfile": "default",
-                    "deviceProfile": {"model": "Mira Dev", "region": "CN"},
+                    "deviceProfile": {"model": "AI Camera Dev", "region": "CN"},
                 },
             },
             headers=self._auth_headers(),

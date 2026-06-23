@@ -28,16 +28,8 @@ def next_setup_step(progress: SetupProgress) -> str:
         return "home"
     if progress.parent_identity != SETUP_DONE:
         return "parentIdentity"
-    if progress.device_binding != SETUP_DONE:
-        return "device"
-    if progress.wifi != SETUP_DONE:
-        return "wifi"
     if progress.child_profile != SETUP_DONE:
         return "child"
-    if progress.camera_name != SETUP_DONE:
-        return "cameraName"
-    if progress.contacts != SETUP_DONE:
-        return "contacts"
     return "complete"
 
 

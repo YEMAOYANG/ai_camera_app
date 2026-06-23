@@ -15,6 +15,7 @@ import 'package:guardian_parent_app/src/features/profile/presentation/profile_pa
 import 'package:guardian_parent_app/src/features/profile/presentation/profile_screen.dart';
 import 'package:guardian_parent_app/src/features/rewards/presentation/reward_detail_screen.dart';
 import 'package:guardian_parent_app/src/features/rewards/presentation/rewards_screen.dart';
+import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:guardian_parent_app/src/features/setup/presentation/setup_flow_screens.dart';
 import 'package:guardian_parent_app/src/features/tasks/presentation/task_detail_screen.dart';
 import 'package:guardian_parent_app/src/features/tasks/presentation/tasks_screen.dart';
@@ -90,6 +91,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: setupDevicePath,
         name: 'setupDevice',
         builder: (_, _) => const DeviceEntrySetupScreen(),
+      ),
+      GoRoute(
+        path: addCameraPath,
+        name: 'addCamera',
+        builder: (_, _) => const AddCameraRouteScreen(),
       ),
       GoRoute(
         path: setupWifiPath,
@@ -174,7 +180,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: profileDeviceHubPath,
         name: 'profileDeviceHub',
-        builder: (_, _) => const DeviceManagementPage(),
+        builder: (_, _) => const DeviceCareHubPage(),
       ),
       GoRoute(
         path: profileTaskRewardHubPath,
@@ -234,6 +240,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: profileAiRulesPath,
         name: 'profileAiRules',
         builder: (_, _) => const AiCareRulesPage(),
+      ),
+      GoRoute(
+        path: profileCareCapabilitiesPath,
+        name: 'profileCareCapabilities',
+        builder: (_, _) => const CareCapabilitiesPage(),
+      ),
+      GoRoute(
+        path: profileRoutineWindowsPath,
+        name: 'profileRoutineWindows',
+        builder: (_, _) => const RoutineWindowsPage(),
       ),
       GoRoute(
         path: profileNotificationsPath,

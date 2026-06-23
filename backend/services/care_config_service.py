@@ -335,9 +335,14 @@ def _today_day_type() -> str:
     return "weekend" if datetime.now().weekday() >= 5 else "school_day"
 
 
+VISIBLE_ROUTINE_WINDOW_TYPES = {"wake_up", "breakfast", "lunch", "nap", "dinner", "bedtime"}
+
+
 def _current_stage(windows: list[dict]) -> str:
     now = datetime.now().strftime("%H:%M")
     for row in windows:
+        if row["window_type"] not in VISIBLE_ROUTINE_WINDOW_TYPES:
+            continue
         if row["enabled"] and row["start_time"] <= now <= row["end_time"]:
             return _stage_label(row["window_type"])
     return "安静观察"
@@ -345,7 +350,11 @@ def _current_stage(windows: list[dict]) -> str:
 
 def _next_window(windows: list[dict]) -> dict | None:
     now = datetime.now().strftime("%H:%M")
-    enabled = [row for row in windows if row["enabled"]]
+    enabled = [
+        row
+        for row in windows
+        if row["enabled"] and row["window_type"] in VISIBLE_ROUTINE_WINDOW_TYPES
+    ]
     for row in enabled:
         if row["start_time"] >= now:
             return {

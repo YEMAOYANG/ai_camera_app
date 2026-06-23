@@ -6,6 +6,7 @@ class GuardianDevice {
     required this.familyId,
     required this.bindingCode,
     required this.name,
+    required this.wakeName,
     required this.location,
     required this.status,
     required this.isDefault,
@@ -18,6 +19,7 @@ class GuardianDevice {
   final String familyId;
   final String bindingCode;
   final String name;
+  final String wakeName;
   final String location;
   final String status;
   final bool isDefault;
@@ -37,6 +39,7 @@ class GuardianDevice {
       familyId: _asString(json['familyId']),
       bindingCode: _asString(json['bindingCode']),
       name: _asString(json['name']),
+      wakeName: _asString(json['wakeName']),
       location: _asString(json['location']),
       status: _asString(json['status']),
       isDefault: json['isDefault'] == true,
@@ -171,7 +174,7 @@ class DeviceOverview {
       if (current.snapshotSupported) '快照',
       if (current.streamSupported) '实时画面',
       if (current.twoWayAudioSupported) '双向语音',
-      if (current.monitorSupported) '任务观察',
+      if (current.monitorSupported) '看护记录',
     ];
     if (parts.isEmpty) return '基础状态可查看';
     return parts.join(' / ');

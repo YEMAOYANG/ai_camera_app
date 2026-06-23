@@ -34,12 +34,12 @@ class CameraHealth {
       ok: json['ok'] == true,
       reachable: reachable,
       adapter: _asString(runtime['adapter']),
-      serviceLabel: _asString(data['service'], fallback: 'camera runtime'),
+      serviceLabel: _asString(data['service'], fallback: '摄像头服务'),
       message: reachable
           ? '摄像头服务在线'
           : error.isNotEmpty
           ? error
-          : '摄像头运行服务暂时不可用',
+          : '摄像头暂时不可用',
     );
   }
 }
@@ -62,11 +62,11 @@ class CameraRuntime {
   final String message;
 
   String get stateLabel {
-    if (!reachable) return '运行状态不可用';
-    if (voiceRunning) return '语音观察运行中';
+    if (!reachable) return '摄像头状态不可用';
+    if (voiceRunning) return '语音提醒处理中';
     return switch (voiceState) {
       'idle' => '安静观察中',
-      'running' => '观察处理中',
+      'running' => '看护提醒处理中',
       'paused' => '已暂停',
       _ => voiceState.isNotEmpty ? voiceState : '基础看护在线',
     };
@@ -116,7 +116,7 @@ class CameraSnapshotFrame {
     available: false,
     bytes: null,
     contentType: '',
-    message: '真实快照暂不可用',
+    message: '实时画面暂时不可用',
   );
 }
 

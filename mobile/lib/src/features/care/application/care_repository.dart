@@ -7,16 +7,31 @@ final careRepositoryProvider = Provider<CareRepository>((ref) {
   return CareRepository(apiClient: ref.watch(apiClientProvider));
 });
 
-final careCapabilitiesProvider = FutureProvider<List<CareCapability>>((ref) {
-  return ref.watch(careRepositoryProvider).capabilities();
-});
+final careCapabilitiesProvider =
+    FutureProvider.family<List<CareCapability>, CareCapabilitiesQuery>((
+      ref,
+      query,
+    ) {
+      return ref
+          .watch(careRepositoryProvider)
+          .capabilities(childId: query.childId, deviceId: query.deviceId);
+    });
 
-final routineWindowsProvider = FutureProvider<List<RoutineWindow>>((ref) {
-  return ref.watch(careRepositoryProvider).routineWindows();
-});
+final routineWindowsProvider =
+    FutureProvider.family<List<RoutineWindow>, RoutineWindowsQuery>((
+      ref,
+      query,
+    ) {
+      return ref
+          .watch(careRepositoryProvider)
+          .routineWindows(childId: query.childId, dayType: query.dayType);
+    });
 
-final careSummaryProvider = FutureProvider<CareSummary>((ref) {
-  return ref.watch(careRepositoryProvider).summary();
+final careSummaryProvider = FutureProvider.family<CareSummary, String?>((
+  ref,
+  childId,
+) {
+  return ref.watch(careRepositoryProvider).summary(childId: childId);
 });
 
 final careReminderEventsProvider = FutureProvider<List<CareReminderEvent>>((
@@ -25,17 +40,55 @@ final careReminderEventsProvider = FutureProvider<List<CareReminderEvent>>((
   return ref.watch(careRepositoryProvider).reminderEvents();
 });
 
+class CareCapabilitiesQuery {
+  const CareCapabilitiesQuery({this.childId, this.deviceId});
+
+  final String? childId;
+  final String? deviceId;
+
+  @override
+  bool operator ==(Object other) {
+    return other is CareCapabilitiesQuery &&
+        other.childId == childId &&
+        other.deviceId == deviceId;
+  }
+
+  @override
+  int get hashCode => Object.hash(childId, deviceId);
+}
+
+class RoutineWindowsQuery {
+  const RoutineWindowsQuery({this.childId, required this.dayType});
+
+  final String? childId;
+  final String dayType;
+
+  @override
+  bool operator ==(Object other) {
+    return other is RoutineWindowsQuery &&
+        other.childId == childId &&
+        other.dayType == dayType;
+  }
+
+  @override
+  int get hashCode => Object.hash(childId, dayType);
+}
+
 class CareRepository {
   const CareRepository({required this.apiClient});
 
   final ApiClient apiClient;
 
-  Future<List<CareCapability>> capabilities({String? childId}) async {
+  Future<List<CareCapability>> capabilities({
+    String? childId,
+    String? deviceId,
+  }) async {
     try {
       final response = await apiClient.get(
         '/care/capabilities',
         queryParameters: {
           if (childId != null && childId.isNotEmpty) 'childId': childId,
+          if (deviceId != null && deviceId.isNotEmpty) 'deviceId': deviceId,
         },
       );
       final raw = _asMap(response.data)['capabilities'];
@@ -49,12 +102,14 @@ class CareRepository {
   Future<List<CareCapability>> updateCapabilities({
     required List<Map<String, Object?>> capabilities,
     String? childId,
+    String? deviceId,
   }) async {
     try {
       final response = await apiClient.patch(
         '/care/capabilities',
         data: {
           if (childId != null && childId.isNotEmpty) 'childId': childId,
+          if (deviceId != null && deviceId.isNotEmpty) 'deviceId': deviceId,
           'capabilities': capabilities,
         },
       );
@@ -89,12 +144,14 @@ class CareRepository {
   Future<List<RoutineWindow>> replaceRoutineWindows({
     required List<RoutineWindow> windows,
     String? childId,
+    required String dayType,
   }) async {
     try {
       final response = await apiClient.put(
-        '/care/routine-windows',
+        '/care/routine-windows?dayType=$dayType',
         data: {
           if (childId != null && childId.isNotEmpty) 'childId': childId,
+          'dayType': dayType,
           'windows': windows.map((item) => item.toJson()).toList(),
         },
       );

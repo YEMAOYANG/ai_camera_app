@@ -73,15 +73,9 @@ class SetupStatus {
 
   String get routePath {
     if (completed || nextStep == 'home') return AppRoute.home.path;
-    return switch (nextStep) {
-      'parentIdentity' => setupParentIdentityPath,
-      'device' => setupDevicePath,
-      'wifi' => setupWifiPath,
-      'child' => setupChildProfilePath,
-      'cameraName' => setupCameraNamePath,
-      'contacts' || 'complete' => setupEmergencyContactsPath,
-      _ => setupParentIdentityPath,
-    };
+    if (parentIdentity != 'done') return setupParentIdentityPath;
+    if (childProfile != 'done') return setupChildProfilePath;
+    return AppRoute.home.path;
   }
 
   static SetupStatus fromResponse(dynamic data) {

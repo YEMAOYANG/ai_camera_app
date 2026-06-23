@@ -26,7 +26,7 @@ class SetupApiTest(unittest.TestCase):
         self.assertEqual(response.json["setup"]["deviceBinding"], "pending")
         self.assertEqual(response.json["setup"]["nextStep"], "parentIdentity")
 
-    def test_setup_steps_save_and_complete_persists(self):
+    def test_lightweight_setup_steps_save_and_complete_persists(self):
         access_token = self._login()
 
         parent = self.client.post(
@@ -42,7 +42,7 @@ class SetupApiTest(unittest.TestCase):
         self.assertEqual(parent.json["setup"]["parentIdentity"], "done")
         self.assertEqual(parent.json["parentIdentity"]["displayName"], "爸爸")
         self.assertEqual(parent.json["parentIdentity"]["relationshipKey"], "dad")
-        self.assertEqual(parent.json["setup"]["nextStep"], "device")
+        self.assertEqual(parent.json["setup"]["nextStep"], "child")
 
         parent_status = self.client.get(
             "/api/setup/status",
@@ -52,26 +52,12 @@ class SetupApiTest(unittest.TestCase):
         self.assertEqual(parent_status.json["parentIdentity"]["displayName"], "爸爸")
         self.assertEqual(parent_status.json["parentIdentity"]["relationship"], "爸爸")
         self.assertEqual(parent_status.json["parentIdentity"]["relationshipKey"], "dad")
-
-        device = self.client.post(
-            "/api/setup/device",
-            json={"bindingCode": "BIND-2026", "deviceName": "客厅设备", "location": "客厅"},
+        summary = self.client.get(
+            "/api/profile/summary",
             headers=self._auth_headers(access_token),
         )
-        self.assertEqual(device.status_code, 200)
-        self.assertEqual(device.json["setup"]["deviceBinding"], "done")
-        self.assertEqual(device.json["device"]["status"], "bound")
-        self.assertEqual(device.json["setup"]["nextStep"], "wifi")
-
-        wifi = self.client.post(
-            "/api/setup/wifi",
-            json={"ssid": "Home-5G", "password": "not-stored", "authType": "wpa2"},
-            headers=self._auth_headers(access_token),
-        )
-        self.assertEqual(wifi.status_code, 200)
-        self.assertEqual(wifi.json["setup"]["wifi"], "done")
-        self.assertTrue(wifi.json["wifi"]["passwordSet"])
-        self.assertEqual(wifi.json["setup"]["nextStep"], "child")
+        self.assertEqual(summary.status_code, 200)
+        self.assertEqual(summary.json["summary"]["role"], "admin")
 
         child = self.client.post(
             "/api/setup/child",
@@ -79,69 +65,22 @@ class SetupApiTest(unittest.TestCase):
                 "name": "小宇",
                 "nickname": "小宇",
                 "gender": "unspecified",
-                "ageStage": "primary",
-                "educationStage": "小学",
-                "grade": "一年级",
+                "ageStage": "幼儿园 中班",
+                "educationStage": "幼儿园",
+                "grade": "中班",
                 "birthday": "2019-05-20",
                 "sleepTime": "21:15",
             },
             headers=self._auth_headers(access_token),
         )
         self.assertEqual(child.status_code, 200)
+        self.assertTrue(child.json["setup"]["completed"])
         self.assertEqual(child.json["setup"]["childProfile"], "done")
         self.assertEqual(child.json["child"]["name"], "小宇")
         self.assertEqual(child.json["child"]["gender"], "unspecified")
         self.assertEqual(child.json["child"]["birthday"], "2019-05-20")
         self.assertEqual(child.json["child"]["sleepTime"], "21:15")
-        self.assertEqual(child.json["setup"]["nextStep"], "cameraName")
-
-        intro = self.client.post(
-            "/api/setup/camera-name/intro",
-            headers=self._auth_headers(access_token),
-        )
-        self.assertEqual(intro.status_code, 200)
-        self.assertEqual(intro.json["setup"]["cameraNameIntro"], "done")
-        self.assertEqual(intro.json["broadcast"]["status"], "offline")
-
-        intro_again = self.client.post(
-            "/api/setup/camera-name/intro",
-            headers=self._auth_headers(access_token),
-        )
-        self.assertEqual(intro_again.status_code, 200)
-        self.assertEqual(intro_again.json["broadcast"]["status"], "alreadyPlayed")
-
-        preview = self.client.post(
-            "/api/setup/camera-name/preview",
-            json={"wakeName": "小豆"},
-            headers=self._auth_headers(access_token),
-        )
-        self.assertEqual(preview.status_code, 200)
-        self.assertEqual(preview.json["broadcast"]["status"], "offline")
-
-        camera_name = self.client.post(
-            "/api/setup/camera-name",
-            json={"wakeName": "小豆"},
-            headers=self._auth_headers(access_token),
-        )
-        self.assertEqual(camera_name.status_code, 200)
-        self.assertEqual(camera_name.json["setup"]["cameraName"], "done")
-        self.assertEqual(camera_name.json["cameraName"]["wakeName"], "小豆")
-        self.assertEqual(camera_name.json["setup"]["nextStep"], "contacts")
-
-        contacts = self.client.post(
-            "/api/setup/contacts",
-            json={
-                "contacts": [
-                    {"name": "妈妈", "phone": "13900002026", "relationship": "mother"},
-                    {"name": "外婆", "phone": "13800002027", "relationship": "grandparent"},
-                ]
-            },
-            headers=self._auth_headers(access_token),
-        )
-        self.assertEqual(contacts.status_code, 200)
-        self.assertEqual(contacts.json["setup"]["contacts"], "done")
-        self.assertEqual(contacts.json["contacts"]["count"], 2)
-        self.assertEqual(contacts.json["setup"]["nextStep"], "complete")
+        self.assertEqual(child.json["setup"]["nextStep"], "home")
 
         complete = self.client.post(
             "/api/setup/complete",
@@ -159,6 +98,79 @@ class SetupApiTest(unittest.TestCase):
         self.assertTrue(status.json["setup"]["completed"])
         self.assertEqual(status.json["setup"]["nextStep"], "home")
         self.assertEqual(status.json["child"]["sleepTime"], "21:15")
+        self.assertIsNone(status.json["device"])
+        self.assertIsNone(status.json["cameraName"])
+        self.assertEqual(status.json["setup"]["deviceBinding"], "pending")
+        self.assertEqual(status.json["setup"]["contacts"], "pending")
+
+        contacts = self.client.post(
+            "/api/setup/contacts",
+            json={
+                "contacts": [
+                    {"name": "妈妈", "phone": "13900002026", "relationship": "mother"},
+                    {"name": "外婆", "phone": "13800002027", "relationship": "grandparent"},
+                ]
+            },
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(contacts.status_code, 200)
+        self.assertEqual(contacts.json["contacts"]["count"], 2)
+
+    def test_setup_device_endpoint_remains_available_after_setup(self):
+        access_token = self._login("13800002027")
+        parent = self.client.post(
+            "/api/setup/parent-identity",
+            json={
+                "displayName": "妈妈",
+                "relationship": "妈妈",
+                "relationshipKey": "mom",
+            },
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(parent.status_code, 200)
+        child = self.client.post(
+            "/api/setup/child",
+            json={"name": "小星", "nickname": "小星", "ageStage": "幼儿园 小班"},
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(child.status_code, 200)
+        self.assertTrue(child.json["setup"]["completed"])
+
+        device = self.client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-2027", "location": "儿童房"},
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(device.status_code, 200, device.json)
+        self.assertEqual(device.json["device"]["status"], "bound")
+        self.assertEqual(device.json["device"]["name"], "儿童房摄像头")
+        self.assertEqual(device.json["setup"]["nextStep"], "home")
+
+        fallback = self.client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-2027-NO-ROOM"},
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(fallback.status_code, 409)
+
+        other_token = self._login("13800002028")
+        other_parent = self.client.post(
+            "/api/setup/parent-identity",
+            json={
+                "displayName": "爸爸",
+                "relationship": "爸爸",
+                "relationshipKey": "dad",
+            },
+            headers=self._auth_headers(other_token),
+        )
+        self.assertEqual(other_parent.status_code, 200)
+        default_name = self.client.post(
+            "/api/setup/device",
+            json={"bindingCode": "BIND-2028"},
+            headers=self._auth_headers(other_token),
+        )
+        self.assertEqual(default_name.status_code, 200, default_name.json)
+        self.assertEqual(default_name.json["device"]["name"], "AI 看护摄像头")
 
     def test_setup_contacts_allow_parent_identity_and_reject_contact_duplicates(self):
         access_token = self._login("13800003026")
@@ -188,16 +200,16 @@ class SetupApiTest(unittest.TestCase):
 
         self._complete_setup_before_contacts(access_token)
 
-        duplicate_parent = self.client.post(
+        contacts = self.client.post(
             "/api/setup/contacts",
             json={
                 "contacts": [
-                    {"name": "爸爸", "phone": "13900003026", "relationship": "father"},
+                    {"name": "妈妈", "phone": "13900003026", "relationship": "mother"},
                 ]
             },
             headers=self._auth_headers(access_token),
         )
-        self.assertEqual(duplicate_parent.status_code, 200)
+        self.assertEqual(contacts.status_code, 200)
 
         duplicate_contacts = self.client.post(
             "/api/setup/contacts",
@@ -278,7 +290,7 @@ class SetupApiTest(unittest.TestCase):
                 (self.family_id,),
             ).fetchall()
         wake_names = {row["id"]: row.get("wake_name") for row in rows}
-        self.assertIsNone(wake_names[first.json["device"]["id"]])
+        self.assertEqual(wake_names[first.json["device"]["id"]], "小豆")
         self.assertEqual(wake_names[second_id], "小守")
 
     def _login(self, phone: str = "13800002026") -> str:
@@ -292,30 +304,12 @@ class SetupApiTest(unittest.TestCase):
         return login.json["tokens"]["accessToken"]
 
     def _complete_setup_before_contacts(self, access_token: str) -> None:
-        device = self.client.post(
-            "/api/setup/device",
-            json={"bindingCode": "BIND-ORDER", "deviceName": "客厅设备", "location": "客厅"},
-            headers=self._auth_headers(access_token),
-        )
-        self.assertEqual(device.status_code, 200)
-        wifi = self.client.post(
-            "/api/setup/wifi",
-            json={"ssid": "Home-5G", "password": "not-stored", "authType": "wpa2"},
-            headers=self._auth_headers(access_token),
-        )
-        self.assertEqual(wifi.status_code, 200)
         child = self.client.post(
             "/api/setup/child",
-            json={"name": "小宇", "nickname": "小宇", "ageStage": "primary"},
+            json={"name": "小宇", "nickname": "小宇", "ageStage": "kindergarten_middle"},
             headers=self._auth_headers(access_token),
         )
         self.assertEqual(child.status_code, 200)
-        camera_name = self.client.post(
-            "/api/setup/camera-name",
-            json={"wakeName": "小豆"},
-            headers=self._auth_headers(access_token),
-        )
-        self.assertEqual(camera_name.status_code, 200)
 
     def _auth_headers(self, access_token: str) -> dict:
         return {"Authorization": f"Bearer {access_token}"}

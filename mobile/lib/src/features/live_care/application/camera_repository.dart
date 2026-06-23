@@ -158,14 +158,14 @@ class CameraRepository {
           contentType: '',
           message: message is String && message.isNotEmpty
               ? message
-              : '真实快照暂不可用',
+              : '实时画面暂时不可用',
         );
       }
       return const CameraSnapshotFrame(
         available: false,
         bytes: null,
         contentType: '',
-        message: '真实快照暂不可用',
+        message: '实时画面暂时不可用',
       );
     }
   }
@@ -262,7 +262,7 @@ Map<String, dynamic> _asMap(dynamic value) {
 
 String _snapshotUnavailableMessage(String? headerValue) {
   final value = (headerValue ?? '').trim();
-  if (value == 'snapshot_unavailable') return '真实快照暂不可用';
+  if (value == 'snapshot_unavailable') return '实时画面暂时不可用';
   if (value.isNotEmpty) return value;
   return '暂时没有可用快照';
 }

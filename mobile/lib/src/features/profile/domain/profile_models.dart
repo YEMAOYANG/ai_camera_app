@@ -552,8 +552,8 @@ class AboutInfo {
 
   static AboutInfo fromJson(Map<String, dynamic> json) {
     return AboutInfo(
-      appName: _asString(json['appName'], fallback: '家庭看护'),
-      displayName: _asString(json['displayName'], fallback: '家庭看护'),
+      appName: _asString(json['appName'], fallback: '家庭 AI 看护 App'),
+      displayName: _asString(json['displayName'], fallback: '家庭 AI 看护 App'),
       version: _asString(json['version']),
       build: _asString(json['build']),
       appUpdate: AppUpdateInfo.fromJson(_asMap(json['appUpdate'])),
@@ -954,10 +954,10 @@ String _localizedReportSectionTitle(String value) {
     'monitor_started': '开始观察任务',
     'monitor_stopped': '结束观察任务',
     'monitor_completed': '观察任务完成',
-    'camera_observation': '摄像头观察',
+    'camera_observation': '摄像头记录',
     'camera_snapshot': '摄像头快照',
-    'vision_observation': '视觉观察',
-    'ai_observation': 'AI 观察记录',
+    'vision_observation': '画面记录',
+    'ai_observation': '智能看护记录',
   };
   final label = labels[title];
   if (label != null) return label;

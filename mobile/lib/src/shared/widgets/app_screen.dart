@@ -19,6 +19,7 @@ class AppScreen extends StatelessWidget {
     this.fixedHeader = true,
     this.showHeader = true,
     this.reserveBottomNavigation = true,
+    this.avoidFooterOverlap = false,
     this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
     this.padding = const EdgeInsets.fromLTRB(
       AppSpacing.pageHorizontal,
@@ -39,6 +40,7 @@ class AppScreen extends StatelessWidget {
   final bool fixedHeader;
   final bool showHeader;
   final bool reserveBottomNavigation;
+  final bool avoidFooterOverlap;
   final double pinnedHeaderHeight;
   final List<Widget> children;
   final EdgeInsetsGeometry padding;
@@ -56,6 +58,10 @@ class AppScreen extends StatelessWidget {
     final footerBottomPadding = hasFooter
         ? safeArea.bottom + AppControls.buttonHeight + 46
         : 0.0;
+    final footerHeight = hasFooter
+        ? safeArea.bottom + AppControls.buttonHeight + 24
+        : 0.0;
+    final scrollBottomInset = avoidFooterOverlap ? footerHeight : 0.0;
     final bottomPadding = [
       basePadding.bottom,
       chromeBottom,
@@ -78,20 +84,24 @@ class AppScreen extends StatelessWidget {
         body: Stack(
           children: [
             const Positioned.fill(child: AppScreenBackground()),
-            ListView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: adjustedPadding,
-              children: [
-                if (!fixedHeader && showHeader) ...[
-                  _AppLargeHeader(
-                    title: title,
-                    subtitle: subtitle,
-                    trailing: trailing,
-                  ),
-                  const SizedBox(height: 18),
+            Positioned.fill(
+              bottom: scrollBottomInset,
+              child: ListView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: adjustedPadding,
+                children: [
+                  if (!fixedHeader && showHeader) ...[
+                    _AppLargeHeader(
+                      title: title,
+                      subtitle: subtitle,
+                      trailing: trailing,
+                    ),
+                    const SizedBox(height: 18),
+                  ],
+                  ...children,
                 ],
-                ...children,
-              ],
+              ),
             ),
             if (fixedHeader && showHeader)
               _AppPinnedHeader(

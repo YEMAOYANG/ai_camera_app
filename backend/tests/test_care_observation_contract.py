@@ -122,6 +122,90 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertEqual(len(replacement.json["windows"]), 2)
         self.assertEqual(replacement.json["windows"][0]["startTime"], "07:15")
 
+    def test_visible_routine_replacement_does_not_gate_toy_cleanup(self):
+        self._ensure_capabilities()
+        replacement = self.client.put(
+            "/api/care/routine-windows",
+            query_string={"dayType": "school_day"},
+            json={
+                "childId": self.child_id,
+                "windows": [
+                    {
+                        "dayType": "school_day",
+                        "windowType": "wake_up",
+                        "startTime": "07:00",
+                        "endTime": "08:00",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "breakfast",
+                        "startTime": "07:20",
+                        "endTime": "08:20",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "lunch",
+                        "startTime": "11:30",
+                        "endTime": "12:30",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "nap",
+                        "startTime": "12:40",
+                        "endTime": "14:20",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "dinner",
+                        "startTime": "17:30",
+                        "endTime": "18:40",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "bedtime",
+                        "startTime": "20:30",
+                        "endTime": "21:20",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                ],
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(replacement.status_code, 200)
+        self.assertEqual(
+            {row["windowType"] for row in replacement.json["windows"]},
+            {"wake_up", "breakfast", "lunch", "nap", "dinner", "bedtime"},
+        )
+
+        self._patch_capability(
+            "toy_cleanup",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+        )
+        allowed = self._post_observation(
+            "toy_cleanup",
+            confidence=0.9,
+            duration_seconds=5,
+            signal_type="toys_scattered",
+            observed_at=_ms("2026-06-17 10:30"),
+        )
+
+        self.assertEqual(allowed.json["decision"]["decision"], "allowed")
+        self.assertTrue(allowed.json["decision"]["shouldSpeak"])
+
     def test_internal_observation_requires_token_and_low_score_records_only(self):
         self._ensure_capabilities()
         missing = self.client.post(
@@ -218,7 +302,7 @@ class CareObservationContractTest(unittest.TestCase):
         response = self._post_observation(
             "toy_cleanup",
             confidence=0.9,
-            duration_seconds=60,
+            duration_seconds=180,
             signal_type="toys_scattered",
             observed_at=_ms("2026-06-17 19:30"),
         )
@@ -274,12 +358,28 @@ class CareObservationContractTest(unittest.TestCase):
         low = self._post_observation("toy_cleanup", confidence=0.2, duration_seconds=60)
         self.assertEqual(low.json["decision"]["decision"], "skipped_low_confidence")
 
+        self._patch_capability(
+            "toy_cleanup",
+            observationThreshold=0.72,
+            cooldownSeconds=0,
+            dailyLimit=4,
+            parentNotifyThreshold=3,
+            allowSpeaker=False,
+        )
+        toy_speaker_off = self._post_observation("toy_cleanup", confidence=0.9, duration_seconds=180)
+        self.assertEqual(toy_speaker_off.json["decision"]["decision"], "record_only")
+        self.assertFalse(toy_speaker_off.json["decision"]["shouldSpeak"])
+
         short = self._post_observation("posture", confidence=0.9, duration_seconds=1)
         self.assertEqual(short.json["decision"]["decision"], "skipped_continuity")
 
-        self._patch_capability("toy_cleanup", cooldownSeconds=1200)
+        self._patch_capability("toy_cleanup", allowSpeaker=True, cooldownSeconds=1200)
         self._create_real_reminder_event("toy_cleanup")
-        cooldown = self._post_observation("toy_cleanup", confidence=0.9, duration_seconds=60)
+        cooldown = self._post_observation(
+            "toy_cleanup",
+            confidence=0.9,
+            duration_seconds=180,
+        )
         self.assertEqual(cooldown.json["decision"]["decision"], "skipped_cooldown")
 
         self._patch_capability("meal_habit", cooldownSeconds=0, dailyLimit=1)
@@ -365,7 +465,7 @@ class CareObservationContractTest(unittest.TestCase):
     def test_routine_window_gate_controls_should_speak(self):
         self._ensure_capabilities()
         self._patch_capability(
-            "toy_cleanup",
+            "meal_start",
             minObservationSeconds=1,
             cooldownSeconds=0,
             dailyLimit=10,
@@ -373,25 +473,25 @@ class CareObservationContractTest(unittest.TestCase):
         )
 
         school_inside = self._post_observation(
-            "toy_cleanup",
+            "meal_start",
             confidence=0.9,
             duration_seconds=5,
-            signal_type="toys_scattered",
-            observed_at=_ms("2026-06-17 19:30"),
+            signal_type="meal_ready",
+            observed_at=_ms("2026-06-17 07:45"),
         )
         school_outside = self._post_observation(
-            "toy_cleanup",
+            "meal_start",
             confidence=0.9,
             duration_seconds=5,
-            signal_type="toys_scattered",
-            observed_at=_ms("2026-06-17 18:55"),
+            signal_type="meal_ready",
+            observed_at=_ms("2026-06-17 10:30"),
         )
         weekend_inside = self._post_observation(
-            "toy_cleanup",
+            "meal_start",
             confidence=0.9,
             duration_seconds=5,
-            signal_type="toys_scattered",
-            observed_at=_ms("2026-06-20 19:30"),
+            signal_type="meal_ready",
+            observed_at=_ms("2026-06-20 08:45"),
         )
 
         self.assertEqual(school_inside.json["decision"]["decision"], "allowed")
@@ -404,7 +504,7 @@ class CareObservationContractTest(unittest.TestCase):
     def test_disabled_routine_window_blocks_should_speak(self):
         self._ensure_capabilities()
         self._patch_capability(
-            "toy_cleanup",
+            "nap_time",
             minObservationSeconds=1,
             cooldownSeconds=0,
             dailyLimit=10,
@@ -418,9 +518,9 @@ class CareObservationContractTest(unittest.TestCase):
                 "windows": [
                     {
                         "dayType": "school_day",
-                        "windowType": "toy_cleanup",
-                        "startTime": "19:20",
-                        "endTime": "20:00",
+                        "windowType": "nap",
+                        "startTime": "12:40",
+                        "endTime": "14:20",
                         "enabled": False,
                         "timezone": "Asia/Shanghai",
                     }
@@ -431,11 +531,11 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         blocked = self._post_observation(
-            "toy_cleanup",
+            "nap_time",
             confidence=0.9,
             duration_seconds=5,
-            signal_type="toys_scattered",
-            observed_at=_ms("2026-06-17 19:30"),
+            signal_type="still_active",
+            observed_at=_ms("2026-06-17 13:10"),
         )
 
         self.assertEqual(blocked.json["decision"]["decision"], REMINDER_DECISION_SKIPPED_OUT_OF_ROUTINE_WINDOW)

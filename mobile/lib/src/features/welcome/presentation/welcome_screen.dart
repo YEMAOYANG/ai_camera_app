@@ -42,7 +42,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       badge: '家庭空间',
       icon: _WelcomeIcon.home,
       title: '看护要有科技感，也要有家的温度。',
-      desc: '设备状态、任务提醒、隐私灯和日报都收在一个安静可靠的家长端里，帮你照看重点。',
+      desc: '设备状态、看护提醒、隐私灯和日报都收在一个安静可靠的家长端里，帮你照看重点。',
     ),
   ];
 
