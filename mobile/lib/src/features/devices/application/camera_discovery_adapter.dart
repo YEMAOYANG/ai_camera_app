@@ -728,7 +728,7 @@ class BleCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
   ) {
     return DiscoveredCameraCandidate(
       id: 'ble_${device.id}',
-      displayName: 'AI 看护摄像头',
+      displayName: '暖瞳摄像头',
       bindingCode: 'ble:${device.id}',
       signalStrength: _signalStrengthFromRssi(device.rssi),
       status: 'ready',

@@ -193,6 +193,58 @@ class CameraCommandService:
         camera_events = [event for event in parent_events if _is_camera_care_event(event)]
         return {"ok": True, "events": camera_events[:limit]}
 
+    def record_observation_event(
+        self,
+        *,
+        family_id: str,
+        child_id: str | None,
+        device_id: str,
+        observation: dict,
+    ) -> dict:
+        display = _camera_observation_display(observation)
+        now = now_ms()
+        payload = {
+            "childId": child_id or "",
+            "observation": observation,
+            "displayTitle": display["title"],
+            "displayMessage": display["message"],
+            "category": display["category"],
+            "severity": display["severity"],
+            "evidenceSummary": display["evidence"],
+        }
+        with self.repository.transaction() as conn:
+            command = self.repository.create_command(
+                conn,
+                family_id=family_id,
+                device_id=device_id,
+                task_id=None,
+                command_type="camera_observation",
+                status="succeeded",
+                message=display["message"],
+                request_payload=self._json_text(payload),
+                now=now,
+            )
+            updated = self.repository.update_command(
+                conn,
+                family_id=family_id,
+                command_id=command["id"],
+                status="succeeded",
+                message=display["message"],
+                response_payload=self._json_text(payload),
+                now=now,
+                completed=True,
+            )
+        publish_family_event(
+            family_id=family_id,
+            event_type=CAMERA_EVENT_CREATED,
+            device_id=device_id,
+            event_ids=[command["id"]],
+            observation_id=str(observation.get("observedAt") or ""),
+            is_reliable=bool(observation.get("isReliable")),
+            source="camera_observation",
+        )
+        return camera_command_payload(updated)
+
     def internal_speak(
         self,
         *,
@@ -486,6 +538,20 @@ def _is_camera_care_event(event: dict) -> bool:
 def _parent_camera_command_event(event: dict) -> dict | None:
     event_type = str(event.get("eventType") or "")
     status = str(event.get("status") or "")
+    if event_type == "camera_observation":
+        payload = _json_dict(event.get("payload"))
+        response = _json_dict(payload.get("response"))
+        request = _json_dict(payload.get("request"))
+        data = response or request
+        observation = _json_dict(data.get("observation"))
+        display = _camera_observation_display(observation)
+        return _with_display(
+            event,
+            display_title=str(data.get("displayTitle") or display["title"]),
+            display_message=str(data.get("displayMessage") or display["message"]),
+            category=str(data.get("category") or display["category"]),
+            severity=str(data.get("severity") or display["severity"]),
+        )
     if event_type in {"start_monitor", "stop_monitor"}:
         return None
     if event_type == "speak":
@@ -729,6 +795,60 @@ def _event_tone(status: str) -> str:
     if status == "running":
         return "info"
     return "neutral"
+
+
+def _camera_observation_display(observation: dict) -> dict:
+    has_person = observation.get("hasPerson")
+    activity = str(observation.get("activity") or "").strip()
+    summary = str(observation.get("summary") or "").strip()
+    is_reliable = bool(observation.get("isReliable"))
+    if not is_reliable:
+        return {
+            "title": "画面待确认",
+            "message": "这次画面还不能判断孩子状态。",
+            "category": "camera_status",
+            "severity": "warning",
+            "evidence": "画面不可判断",
+        }
+    if has_person is False:
+        return {
+            "title": "暂未看到孩子",
+            "message": "刚才的画面里没有看到孩子。",
+            "category": "child_presence",
+            "severity": "warning",
+            "evidence": "未看到孩子",
+        }
+    if activity == "玩玩具" or "玩具" in summary:
+        return {
+            "title": "孩子正在玩玩具",
+            "message": "这条记录来自摄像头画面。",
+            "category": "camera_observation",
+            "severity": "info",
+            "evidence": "看到玩具活动",
+        }
+    if summary:
+        return {
+            "title": summary.rstrip("。"),
+            "message": "这条记录来自摄像头画面。",
+            "category": "camera_observation",
+            "severity": "info",
+            "evidence": "看到孩子",
+        }
+    if has_person is True:
+        return {
+            "title": "看到孩子在画面里",
+            "message": "这条记录来自摄像头画面。",
+            "category": "child_presence",
+            "severity": "info",
+            "evidence": "看到孩子",
+        }
+    return {
+        "title": "画面待确认",
+        "message": "这次画面还不能判断孩子状态。",
+        "category": "camera_status",
+        "severity": "warning",
+        "evidence": "画面不可判断",
+    }
 
 
 def _ptz_direction_label(direction: str) -> str:

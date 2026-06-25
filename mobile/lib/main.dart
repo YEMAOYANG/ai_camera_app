@@ -5,5 +5,5 @@ import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await bootstrap(AppEnvironment.fromDartDefines());
+  await bootstrap(await AppEnvironment.load());
 }

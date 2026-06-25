@@ -170,7 +170,7 @@ class SetupApiTest(unittest.TestCase):
             headers=self._auth_headers(other_token),
         )
         self.assertEqual(default_name.status_code, 200, default_name.json)
-        self.assertEqual(default_name.json["device"]["name"], "AI 看护摄像头")
+        self.assertEqual(default_name.json["device"]["name"], "暖瞳摄像头")
 
     def test_setup_contacts_allow_parent_identity_and_reject_contact_duplicates(self):
         access_token = self._login("13800003026")

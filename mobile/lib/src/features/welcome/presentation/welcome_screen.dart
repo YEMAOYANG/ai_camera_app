@@ -8,6 +8,8 @@ import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 
+const _brandLogoMarkAsset = 'assets/brand/nuantong-logo-mark.png';
+
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({this.onComplete, super.key});
 
@@ -338,20 +340,16 @@ class _WelcomeTextBlock extends StatelessWidget {
           children: [
             _Pill(icon: slide.icon, label: slide.badge),
             const Spacer(),
-            const Flexible(
+            Flexible(
               child: Align(
                 alignment: Alignment.centerRight,
-                child: Text(
-                  '隐私优先 · 家长确认',
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: Color(0x9A526579),
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    height: 1,
-                    letterSpacing: 0,
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Image.asset(
+                    _brandLogoMarkAsset,
+                    semanticLabel: '暖瞳',
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),

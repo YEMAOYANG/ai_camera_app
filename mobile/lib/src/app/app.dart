@@ -20,7 +20,7 @@ class GuardianApp extends ConsumerWidget {
 
     return _AccountSecurityRealtimeGate(
       child: MaterialApp.router(
-        title: '家庭看护',
+        title: '暖瞳',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         localizationsDelegates: const [

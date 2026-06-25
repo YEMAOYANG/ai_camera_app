@@ -45,15 +45,29 @@ adb -s "$device_id" get-state >/dev/null
 adb -s "$device_id" reverse tcp:8000 tcp:8000 >/dev/null
 adb -s "$device_id" reverse tcp:8001 tcp:8001 >/dev/null
 
-api_base_url="${API_BASE_URL:-http://127.0.0.1:8000/api}"
-task_ws_base_url="${TASK_WS_BASE_URL:-ws://127.0.0.1:8001/api}"
+env_value() {
+  local key="$1"
+  awk -F= -v key="$key" '
+    $0 !~ /^[[:space:]]*#/ && $1 == key {
+      sub(/^[^=]*=/, "")
+      print
+      exit
+    }
+  ' "$env_file"
+}
+
+api_base_url="$(env_value API_BASE_URL)"
+task_ws_base_url="$(env_value TASK_WS_BASE_URL)"
+
+if [[ -z "$api_base_url" || -z "$task_ws_base_url" ]]; then
+  echo "Missing API_BASE_URL or TASK_WS_BASE_URL in ${env_file}."
+  exit 1
+fi
 
 echo "Android USB reverse is ready for device ${device_id}."
-echo "Using API_BASE_URL=${api_base_url}"
-echo "Using TASK_WS_BASE_URL=${task_ws_base_url}"
+echo "Using API_BASE_URL from ${env_file}: ${api_base_url}"
+echo "Using TASK_WS_BASE_URL from ${env_file}: ${task_ws_base_url}"
 
 exec flutter run \
   --dart-define-from-file="${env_file}" \
-  --dart-define="API_BASE_URL=${api_base_url}" \
-  --dart-define="TASK_WS_BASE_URL=${task_ws_base_url}" \
   "${args[@]}"

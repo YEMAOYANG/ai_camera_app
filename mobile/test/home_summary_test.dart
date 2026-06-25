@@ -121,7 +121,7 @@ void main() {
       ),
     );
 
-    expect(summary.habitFocus.title, '今天暂时没有新的看护记录');
+    expect(summary.habitFocus.title, '画面待确认');
     expect(summary.habitFocus.title, isNot('今天按作息轻声提醒'));
     expect(summary.recentObservation.detail, isNot(contains('其他')));
     expect(summary.recentObservation.visible, isTrue);
@@ -140,34 +140,34 @@ void main() {
     expect(monitor.lastObservation, isEmpty);
   });
 
-  test(
-    'presence without concrete activity is not reliable home observation',
-    () {
-      final monitor = CameraMonitorStatus.fromJson({
-        'monitor': {
-          'running': true,
-          'status': 'observing',
-          'lastObservation': {'has_person': true},
+  test('presence without concrete activity can show child presence', () {
+    final monitor = CameraMonitorStatus.fromJson({
+      'monitor': {
+        'running': true,
+        'status': 'observing',
+        'lastObservation': {
+          'has_person': true,
+          'isReliable': true,
+          'confidence': 0.82,
+          'observedAt': DateTime.now().millisecondsSinceEpoch,
         },
-      });
+      },
+    });
 
-      final summary = buildHomeSummary(
-        HomeSummaryInput(
-          now: now,
-          profile: profile(child: child()),
-          deviceOverview: _onlineDeviceOverview(),
-          cameraMonitor: monitor,
-          tasks: const [],
-        ),
-      );
+    final summary = buildHomeSummary(
+      HomeSummaryInput(
+        now: now,
+        profile: profile(child: child()),
+        deviceOverview: _onlineDeviceOverview(),
+        cameraMonitor: monitor,
+        tasks: const [],
+      ),
+    );
 
-      expect(monitor.lastObservation, isEmpty);
-      expect(summary.habitFocus.title, '今天暂时没有新的看护记录');
-      expect(summary.habitFocus.title, isNot(contains('看到孩子')));
-      expect(summary.recentObservation.visible, isTrue);
-      expect(summary.recentObservation.headline, '暂时没有可靠画面记录');
-    },
-  );
+    expect(monitor.lastObservation, '看到孩子在画面里');
+    expect(summary.habitFocus.title, '看到孩子在画面里');
+    expect(summary.recentObservation.visible, isFalse);
+  });
 
   test(
     'no-person observation can be shown without claiming child is present',
@@ -176,11 +176,16 @@ void main() {
         'monitor': {
           'running': true,
           'status': 'observing',
-          'lastObservation': {'has_person': false},
+          'lastObservation': {
+            'has_person': false,
+            'isReliable': true,
+            'confidence': 0.88,
+            'observedAt': DateTime.now().millisecondsSinceEpoch,
+          },
         },
       });
 
-      expect(monitor.lastObservation, '暂时没在画面里看到孩子。');
+      expect(monitor.lastObservation, '暂未看到孩子');
       expect(monitor.lastObservation, isNot(contains('看到孩子在画面里')));
     },
   );
@@ -216,18 +221,29 @@ void main() {
             serviceLabel: '摄像头服务',
             message: '在线',
           ),
-          cameraMonitor: const CameraMonitorStatus(
-            running: true,
-            status: 'observing',
-            message: '观察中',
-            lastObservation: '正在看绘本。',
-            lastReminder: '已提醒坐好阅读',
-          ),
+          cameraMonitor: CameraMonitorStatus.fromJson({
+            'monitor': {
+              'running': true,
+              'status': 'observing',
+              'message': '观察中',
+              'lastObservation': {
+                'summary': '孩子正在阅读绘本',
+                'activity': '阅读绘本',
+                'hasPerson': true,
+                'isReliable': true,
+                'confidence': 0.88,
+                'observedAt': DateTime.now().millisecondsSinceEpoch,
+              },
+              'lastReminder': '已提醒坐好阅读',
+            },
+          }),
           tasks: [task(id: 't_current', status: GuardianTaskStatus.inProgress)],
         ),
       );
 
-      expect(summary.habitFocus.title, '刚刚看到：正在看绘本。');
+      expect(summary.habitFocus.title, '孩子正在阅读绘本');
+      expect(summary.habitFocus.title, isNot(contains('刚刚看到：')));
+      expect(summary.habitFocus.title, isNot(contains('最近看到：')));
       expect(summary.primaryCta.kind, HomePrimaryCtaKind.none);
       expect(summary.showLiveCareLink, isFalse);
       expect(summary.recentObservation.visible, isFalse);
@@ -235,6 +251,76 @@ void main() {
       expect(summary.recentObservation.detail, isNot('孩子已经开始翻书。'));
     },
   );
+
+  test('toy observation uses short hero copy', () {
+    final monitor = CameraMonitorStatus.fromJson({
+      'monitor': {
+        'running': true,
+        'status': 'observing',
+        'lastObservation': {
+          'summary': '孩子正在玩玩具',
+          'activity': '玩玩具',
+          'hasPerson': true,
+          'isReliable': true,
+          'confidence': 0.9,
+          'observedAt': DateTime.now().millisecondsSinceEpoch,
+        },
+      },
+    });
+    final summary = buildHomeSummary(
+      HomeSummaryInput(
+        now: now,
+        profile: profile(child: child()),
+        deviceOverview: _onlineDeviceOverview(),
+        cameraMonitor: monitor,
+        tasks: const [],
+      ),
+    );
+
+    expect(summary.habitFocus.title, '孩子正在玩玩具');
+    expect(summary.habitFocus.title, isNot(contains('刚刚看到：')));
+  });
+
+  test('stale negative observation falls back to pending frame copy', () {
+    final monitor = CameraMonitorStatus.fromJson({
+      'monitor': {
+        'running': true,
+        'status': 'observing',
+        'lastObservation': {
+          'hasPerson': false,
+          'isReliable': true,
+          'confidence': 0.9,
+          'observedAt': now
+              .subtract(const Duration(minutes: 5))
+              .millisecondsSinceEpoch,
+        },
+      },
+    });
+    final summary = buildHomeSummary(
+      HomeSummaryInput(
+        now: now,
+        profile: profile(child: child()),
+        deviceOverview: _onlineDeviceOverview(),
+        cameraStatus: CameraStatus(
+          connectionStatus: 'online',
+          streamAvailable: true,
+          snapshotAvailable: true,
+          speakerAvailable: true,
+          monitorAvailable: true,
+          ptzAvailable: false,
+          lastSeenAt: now.millisecondsSinceEpoch,
+          runtimeProvider: 'mock',
+          message: '摄像头在线',
+        ),
+        cameraMonitor: monitor,
+        tasks: const [],
+      ),
+    );
+
+    expect(monitor.lastObservation, isEmpty);
+    expect(summary.habitFocus.title, '画面待确认');
+    expect(summary.habitFocus.title, isNot(contains('暂未看到孩子')));
+  });
 
   test('buildRhythmNodes marks in-progress task as current', () {
     final nodes = buildRhythmNodes([
@@ -467,7 +553,7 @@ void main() {
       ...summary.habitFocus.chips.map((chip) => chip.label),
     ].join(' ');
 
-    expect(visibleCopy, isNot(contains('米拉')));
+    expect(visibleCopy, isNot(contains('\u7c73\u62c9')));
     expect(visibleCopy, isNot(contains('实时观察')));
     expect(visibleCopy, isNot(contains('实时同步')));
   });

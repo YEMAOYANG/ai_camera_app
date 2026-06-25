@@ -1021,8 +1021,8 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
 
         about = self.client.get("/api/app/about")
         self.assertEqual(about.status_code, 200)
-        self.assertEqual(about.json["about"]["appName"], "家庭 AI 看护 App")
-        self.assertEqual(about.json["about"]["displayName"], "家庭 AI 看护 App")
+        self.assertEqual(about.json["about"]["appName"], "暖瞳")
+        self.assertEqual(about.json["about"]["displayName"], "暖瞳")
 
         subscription = self.client.get("/api/subscription/status", headers=self._auth_headers())
         self.assertEqual(subscription.status_code, 200)

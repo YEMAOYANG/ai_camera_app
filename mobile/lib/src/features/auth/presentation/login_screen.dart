@@ -17,6 +17,8 @@ import 'package:guardian_parent_app/src/features/setup/application/setup_reposit
 import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 
+const _brandLogoMarkAsset = 'assets/brand/nuantong-logo-mark.png';
+
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -585,28 +587,16 @@ class _LoginHeader extends StatelessWidget {
           children: [
             Row(
               children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.ink,
-                    borderRadius: BorderRadius.circular(13),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryButtonShadow.withValues(
-                          alpha: 0.13,
-                        ),
-                        blurRadius: 16,
-                        offset: const Offset(0, 9),
-                      ),
-                    ],
-                  ),
-                  child: const SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Center(
-                      child: Icon(
-                        Icons.center_focus_strong_outlined,
-                        color: Colors.white,
-                        size: 18,
+                SizedBox(
+                  width: 46,
+                  height: 46,
+                  child: ClipRect(
+                    child: Transform.scale(
+                      scale: 1.22,
+                      child: Image.asset(
+                        _brandLogoMarkAsset,
+                        semanticLabel: '暖瞳',
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
@@ -616,7 +606,7 @@ class _LoginHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '家庭看护',
+                      '暖瞳',
                       style: TextStyle(
                         color: AppColors.ink,
                         fontFamily: AppTypography.systemFont,
@@ -628,7 +618,7 @@ class _LoginHeader extends StatelessWidget {
                     ),
                     SizedBox(height: 3),
                     Text(
-                      '家庭看护登录',
+                      'WarmSight',
                       style: TextStyle(
                         color: Color(0x8A526579),
                         fontFamily: AppTypography.systemFont,
@@ -644,7 +634,7 @@ class _LoginHeader extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             const Text(
-              '登录家庭看护空间',
+              '登录暖瞳',
               style: TextStyle(
                 color: AppColors.ink,
                 fontFamily: AppTypography.systemFont,

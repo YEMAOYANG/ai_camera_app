@@ -16,7 +16,7 @@ import 'package:guardian_parent_app/src/features/setup/presentation/camera_disco
 import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 
-const kSetupDefaultDeviceName = 'AI 看护摄像头';
+const kSetupDefaultDeviceName = '暖瞳摄像头';
 const kSetupDefaultBindingCode = 'AI-CARE-NEARBY-KINDERGARTEN-V1';
 
 const _fallbackNearbyCandidates = [

@@ -22,12 +22,12 @@ void main() {
     );
 
     final normalized = session.normalizedForApiBase(
-      'http://192.168.228.95:8000/api',
+      'http://backend.lan.example:8000/api',
     );
 
     expect(
       normalized.signalingUrl,
-      'ws://192.168.228.95:1984/api/ws?src=ipc45aw_hd',
+      'ws://backend.lan.example:1984/api/ws?src=ipc45aw_hd',
     );
   });
 

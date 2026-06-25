@@ -452,7 +452,11 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(observation["activity"], "阅读绘本")
         self.assertEqual(
             [payload["type"] for _, payload in captured],
-            ["camera_monitor.refreshed", "camera_observation.updated"],
+            [
+                "camera_event.created",
+                "camera_monitor.refreshed",
+                "camera_observation.updated",
+            ],
         )
         self.assertTrue(all(family_id == self.family_id for family_id, _ in captured))
         for _, payload in captured:
@@ -461,7 +465,17 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
             self.assertNotIn("snapshot", payload)
             self.assertNotIn("debug", payload)
 
-    def test_camera_monitor_refresh_marks_unknown_or_no_person_unreliable(self):
+        events = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200, events.json)
+        self.assertTrue(
+            any(event["displayTitle"] == "孩子正在阅读绘本" for event in events.json["events"])
+        )
+
+    def test_camera_monitor_refresh_marks_no_person_without_child_claim(self):
         _CameraRuntimeHandler.analyze_payload = {
             "has_person": False,
             "activity": "其他",
@@ -477,10 +491,43 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200, response.json)
         observation = response.json["monitor"]["lastObservation"]
-        self.assertFalse(observation["isReliable"])
+        self.assertTrue(observation["isReliable"])
         self.assertFalse(observation["hasPerson"])
         self.assertEqual(observation["activity"], "")
         self.assertNotIn("看到孩子在", observation["summary"])
+        self.assertEqual(observation["summary"], "暂未看到孩子")
+
+    def test_camera_monitor_refresh_records_toy_play_without_cleanup_reminder(self):
+        _CameraRuntimeHandler.analyze_payload = {
+            "has_person": True,
+            "activity": "playing with toys",
+            "confidence": 0.9,
+            "description": "孩子坐在沙发上玩玩具，周围有积木。",
+        }
+
+        response = self.client.post(
+            "/api/camera/monitor/refresh",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200, response.json)
+        observation = response.json["monitor"]["lastObservation"]
+        self.assertTrue(observation["isReliable"])
+        self.assertEqual(observation["activity"], "玩玩具")
+        self.assertEqual(observation["summary"], "孩子正在玩玩具")
+        events = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200, events.json)
+        self.assertTrue(
+            any(event["displayTitle"] == "孩子正在玩玩具" for event in events.json["events"])
+        )
+        self.assertFalse(
+            any("收纳" in event["displayTitle"] for event in events.json["events"])
+        )
 
     def test_family_realtime_camera_event_is_family_scoped(self):
         captured: list[tuple[str, dict]] = []

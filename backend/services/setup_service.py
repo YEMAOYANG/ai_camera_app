@@ -548,8 +548,8 @@ class SetupService:
         if value:
             return value
         if location:
-            return f"{location}摄像头"
-        return "AI 看护摄像头"
+            return f"{location}暖瞳摄像头"
+        return "暖瞳摄像头"
 
     def _ensure_default_wake_name(self, conn, *, family_id: str, device_id: str, now: int) -> None:
         device = self.device_repository.get_device(

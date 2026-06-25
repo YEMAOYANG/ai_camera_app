@@ -90,14 +90,14 @@ void main() {
       final enriched = await repository.discoveryStatuses(const [
         DiscoveredCameraCandidate(
           id: 'camera-a',
-          displayName: 'AI 看护摄像头',
+          displayName: '暖瞳摄像头',
           bindingCode: 'BIND-A',
           signalStrength: 80,
           status: 'ready',
         ),
         DiscoveredCameraCandidate(
           id: 'camera-b',
-          displayName: 'AI 看护摄像头',
+          displayName: '暖瞳摄像头',
           bindingCode: 'BIND-B',
           signalStrength: 70,
           status: 'ready',
@@ -147,7 +147,7 @@ Map<String, Object?> _device({
     'id': id,
     'familyId': 'family_test',
     'bindingCode': 'binding_$id',
-    'name': 'AI 看护摄像头',
+    'name': '暖瞳摄像头',
     'wakeName': '小豆',
     'location': '儿童房',
     'status': status,

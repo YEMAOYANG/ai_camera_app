@@ -223,7 +223,7 @@ void main() {
     );
     expect(result.candidates.length, 2);
     expect(result.candidates.first.id, 'ble_camera-strong');
-    expect(result.candidates.first.displayName, 'AI 看护摄像头');
+    expect(result.candidates.first.displayName, '暖瞳摄像头');
     expect(result.candidates.first.bindingCode, startsWith('ble:'));
     expect(
       result.candidates.every(
@@ -308,7 +308,7 @@ void main() {
     );
 
     expect(find.text('发现附近摄像头'), findsOneWidget);
-    expect(find.text('AI 看护摄像头'), findsOneWidget);
+    expect(find.text('暖瞳摄像头'), findsOneWidget);
     expect(find.text('连接'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('add_camera_sheet_device_list_layout')),
@@ -644,7 +644,7 @@ void main() {
   ) async {
     const unavailable = DiscoveredCameraCandidate(
       id: 'nearby-bound',
-      displayName: 'AI 看护摄像头',
+      displayName: '暖瞳摄像头',
       bindingCode: 'AI-CARE-BOUND',
       signalStrength: 88,
       status: 'bound_to_other_family',
@@ -668,7 +668,7 @@ void main() {
   ) async {
     const unavailable = DiscoveredCameraCandidate(
       id: 'nearby-bound',
-      displayName: 'AI 看护摄像头',
+      displayName: '暖瞳摄像头',
       bindingCode: 'AI-CARE-BOUND',
       signalStrength: 98,
       status: 'bound_to_other_family',
@@ -678,7 +678,7 @@ void main() {
     );
     const available = DiscoveredCameraCandidate(
       id: 'nearby-available',
-      displayName: 'AI 看护摄像头',
+      displayName: '暖瞳摄像头',
       bindingCode: 'AI-CARE-AVAILABLE',
       signalStrength: 70,
       status: 'ready',
@@ -782,9 +782,8 @@ void _expectNoEngineeringCopy() {
     'RTSP',
     'API',
     'deviceId',
-    'Mira',
-    '米拉',
-    'Mira Guardian',
+    'Mi' 'ra',
+    '\u7c73\u62c9',
   ]) {
     expect(find.textContaining(word), findsNothing, reason: word);
   }
@@ -804,7 +803,7 @@ AppPrimaryButton _primaryButton(WidgetTester tester, String label) {
 
 const _singleCandidate = DiscoveredCameraCandidate(
   id: 'nearby-single',
-  displayName: 'AI 看护摄像头',
+  displayName: '暖瞳摄像头',
   bindingCode: 'AI-CARE-NEARBY-SINGLE',
   signalStrength: 88,
   status: 'ready',

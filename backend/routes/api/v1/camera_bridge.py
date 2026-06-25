@@ -5,7 +5,13 @@ from flask import Blueprint, Response, jsonify, request, stream_with_context
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token, json_body
 from services.camera_bridge_service import CameraBridgeError
-from services.service_factory import auth_service, camera_command_service, device_runtime_resolver, task_service
+from services.service_factory import (
+    auth_service,
+    camera_command_service,
+    device_runtime_resolver,
+    profile_service,
+    task_service,
+)
 from services.task_event_stream import (
     CAMERA_MONITOR_REFRESHED,
     CAMERA_OBSERVATION_UPDATED,
@@ -203,10 +209,16 @@ def monitor_status():
 @camera_bp.post("/monitor/refresh")
 def monitor_refresh():
     try:
-        _, context, resolved = _resolve_camera_runtime_for_request()
+        access_token, context, resolved = _resolve_camera_runtime_for_request()
         payload = resolved.bridge.refresh_monitor_observation()
         response = _monitor_response(payload)
         observation = response["monitor"].get("lastObservation")
+        event_ids = _record_monitor_observation_event(
+            access_token=access_token,
+            context=context,
+            device_id=resolved.device_id,
+            observation=observation,
+        )
         is_reliable = bool(observation.get("isReliable")) if isinstance(observation, dict) else False
         publish_family_event(
             family_id=context["family"]["id"],
@@ -220,6 +232,7 @@ def monitor_refresh():
             event_type=CAMERA_OBSERVATION_UPDATED,
             device_id=resolved.device_id,
             observation_id=_observation_id(observation),
+            event_ids=event_ids,
             is_reliable=is_reliable,
             source="camera_monitor",
         )
@@ -273,7 +286,8 @@ def _normalize_monitor_observation(value: object) -> dict | None:
         return None
     has_person_value = value.get("has_person", value.get("hasPerson"))
     has_person = has_person_value is True
-    activity = _activity_label(value.get("activity") or value.get("raw_activity"))
+    raw_text = _analysis_text(value)
+    activity = _activity_label(value.get("activity") or value.get("raw_activity"), raw_text=raw_text)
     confidence = _float_or_zero(value.get("confidence"))
     observed_at = _int_or_zero(
         value.get("observedAt")
@@ -282,10 +296,10 @@ def _normalize_monitor_observation(value: object) -> dict | None:
         or value.get("time")
     )
     summary = _summary_text(value, activity=activity, has_person_value=has_person_value)
-    is_reliable = has_person and bool(activity) and confidence >= 0.65
-    if not is_reliable and has_person_value is not False:
-        if not activity or confidence < 0.65:
-            summary = summary if summary and activity else ""
+    is_reliable = has_person_value in {True, False} and confidence >= 0.65
+    has_activity = bool(activity)
+    if not is_reliable:
+        summary = ""
     return {
         "hasPerson": has_person,
         "activity": activity,
@@ -293,6 +307,7 @@ def _normalize_monitor_observation(value: object) -> dict | None:
         "observedAt": observed_at,
         "summary": summary,
         "isReliable": is_reliable,
+        "hasMeaningfulActivity": has_activity,
         "source": "camera",
     }
 
@@ -305,16 +320,23 @@ def _summary_text(value: dict, *, activity: str, has_person_value: object) -> st
         or ""
     ).strip()
     if has_person_value is False:
-        return "画面里暂时没看到孩子。"
+        return "暂未看到孩子"
+    if activity == "玩玩具":
+        return "孩子正在玩玩具"
     if activity:
-        return f"看到孩子在{activity}。"
+        return f"孩子正在{activity}"
     if raw_summary and not _is_generic_activity(raw_summary):
         return raw_summary[:80]
+    if has_person_value is True:
+        return "看到孩子在画面里"
     return ""
 
 
-def _activity_label(value: object) -> str:
+def _activity_label(value: object, *, raw_text: str = "") -> str:
     activity = str(value or "").strip()
+    combined = f"{activity} {raw_text}".strip().lower()
+    if _mentions_toy_play(combined):
+        return "玩玩具"
     if not activity or _is_generic_activity(activity):
         return ""
     return activity[:40]
@@ -323,6 +345,25 @@ def _activity_label(value: object) -> str:
 def _is_generic_activity(value: str) -> bool:
     normalized = value.strip().lower()
     return normalized in {"其他", "未知", "无明显活动", "other", "unknown", "normal"}
+
+
+def _mentions_toy_play(value: str) -> bool:
+    normalized = value.lower()
+    return any(
+        token in normalized
+        for token in ("玩具", "积木", "toy", "toys", "play", "playing")
+    )
+
+
+def _analysis_text(value: dict) -> str:
+    parts = [
+        value.get("activity"),
+        value.get("raw_activity"),
+        value.get("summary"),
+        value.get("description"),
+        value.get("child_message"),
+    ]
+    return " ".join(str(part or "") for part in parts)
 
 
 def _float_or_zero(value: object) -> float:
@@ -347,3 +388,26 @@ def _observation_id(value: object) -> str:
         if current:
             return current[:255]
     return ""
+
+
+def _record_monitor_observation_event(
+    *,
+    access_token: str,
+    context: dict,
+    device_id: str | None,
+    observation: object,
+) -> list[str]:
+    if not isinstance(observation, dict) or not device_id:
+        return []
+    try:
+        child = profile_service().current_child(access_token).get("child") or {}
+    except Exception:
+        child = {}
+    event = camera_command_service().record_observation_event(
+        family_id=context["family"]["id"],
+        child_id=str(child.get("id") or "").strip(),
+        device_id=device_id,
+        observation=observation,
+    )
+    event_id = str(event.get("id") or "").strip()
+    return [event_id] if event_id else []

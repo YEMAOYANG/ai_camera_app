@@ -87,7 +87,11 @@ HomeSummary buildHomeSummary(HomeSummaryInput input) {
       (!tasksReady && input.tasksLoading);
   final hasNoChild = !input.profileLoading && input.profile?.child == null;
   final heroObservation =
-      !isLoading && !hasNoChild && !hasNoDevice && !deviceIssue
+      !isLoading &&
+          !hasNoChild &&
+          !hasNoDevice &&
+          !deviceIssue &&
+          input.cameraMonitor?.hasCurrentReliableObservation == true
       ? meaningfulObservationText(input.cameraMonitor?.lastObservation)
       : null;
   final rhythmNodes = buildRhythmNodes(localTasks, input.now);
@@ -332,10 +336,12 @@ String observationTitle({
   required DateTime now,
 }) {
   final monitorObservation = meaningfulObservationText(
-    cameraMonitor?.lastObservation,
+    cameraMonitor?.hasCurrentReliableObservation == true
+        ? cameraMonitor?.lastObservation
+        : null,
   );
   if (monitorObservation != null) {
-    return compactHomeText('刚刚看到：$monitorObservation', maxLength: 56);
+    return compactHomeText(monitorObservation, maxLength: 24);
   }
   if (currentTask != null) {
     final aiSummary = currentTask.aiObservationSummary.trim();
@@ -361,6 +367,9 @@ String observationTitle({
   final completedCount = countCompletedRhythmTasks(localTasks);
   if (completedCount > 0) {
     return completedCount == 1 ? '今天的节奏都完成了' : '今天已完成 $completedCount 项安排';
+  }
+  if (cameraStatus?.isOnline == true || cameraMonitor != null) {
+    return '画面待确认';
   }
   if (localTasks == null || localTasks.isEmpty) {
     return '今天暂时没有新的看护记录';
@@ -629,7 +638,9 @@ RecentObservationCopy buildRecentObservationCopy({
     );
   }
   final monitorObservation = meaningfulObservationText(
-    input.cameraMonitor?.lastObservation,
+    input.cameraMonitor?.hasCurrentReliableObservation == true
+        ? input.cameraMonitor?.lastObservation
+        : null,
   );
   final repeatedInHero = sameHomeObservation(
     monitorObservation,
@@ -835,11 +846,11 @@ String? meaningfulObservationText(String? text) {
   if (trimmed.isEmpty) return null;
   final normalized = trimmed.toLowerCase();
   const genericValues = {'其他', '未知', '无明显活动', 'other', 'unknown'};
-  const weakPresenceValues = {'看到孩子在画面里。', '看到孩子在画面里', '画面里看到孩子。', '画面里看到孩子'};
+  const staleNegativeValues = {'暂时没在画面里看到孩子。', '暂时没在画面里看到孩子'};
   if (genericValues.contains(trimmed) || genericValues.contains(normalized)) {
     return null;
   }
-  if (weakPresenceValues.contains(trimmed)) return null;
+  if (staleNegativeValues.contains(trimmed)) return '暂未看到孩子';
   for (final generic in genericValues) {
     if (trimmed.endsWith('：$generic') || trimmed.endsWith(': $generic')) {
       return null;

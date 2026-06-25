@@ -552,8 +552,8 @@ class AboutInfo {
 
   static AboutInfo fromJson(Map<String, dynamic> json) {
     return AboutInfo(
-      appName: _asString(json['appName'], fallback: '家庭 AI 看护 App'),
-      displayName: _asString(json['displayName'], fallback: '家庭 AI 看护 App'),
+      appName: _asString(json['appName'], fallback: '暖瞳'),
+      displayName: _asString(json['displayName'], fallback: '暖瞳'),
       version: _asString(json['version']),
       build: _asString(json['build']),
       appUpdate: AppUpdateInfo.fromJson(_asMap(json['appUpdate'])),

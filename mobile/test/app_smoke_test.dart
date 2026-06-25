@@ -104,7 +104,7 @@ void main() {
     await tester.tap(find.text('开始设置'));
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(milliseconds: 100));
-    expect(find.text('登录家庭看护空间'), findsOneWidget);
+    expect(find.text('登录暖瞳'), findsOneWidget);
     expect(find.text('手机号'), findsOneWidget);
   });
 
@@ -130,7 +130,7 @@ void main() {
     await _pumpApp(tester, preferences: const {hasSeenOnboardingKey: true});
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('登录家庭看护空间'), findsOneWidget);
+    expect(find.text('登录暖瞳'), findsOneWidget);
     expect(find.text('少盯一点，也能知道孩子现在怎么样。'), findsNothing);
   });
 
@@ -158,7 +158,7 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('登录家庭看护空间'), findsNothing);
+    expect(find.text('登录暖瞳'), findsNothing);
     expect(find.text('今日节奏'), findsOneWidget);
     expect(find.text('当前没有需要你处理的事'), findsNothing);
     expect(
@@ -191,7 +191,7 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('登录家庭看护空间'), findsNothing);
+    expect(find.text('登录暖瞳'), findsNothing);
     expect(find.text('还没有连接摄像头'), findsWidgets);
     expect(find.text('摄像头还没连接'), findsOneWidget);
     expect(find.text('连接'), findsOneWidget);
@@ -515,7 +515,7 @@ void main() {
     await tester.tap(find.text('退出'));
     await tester.pumpAndSettle();
 
-    expect(find.text('登录家庭看护空间'), findsOneWidget);
+    expect(find.text('登录暖瞳'), findsOneWidget);
 
     await _loginSuccessfully(tester, phone: '13860439696');
     await _openProfileTab(tester);
@@ -587,7 +587,7 @@ void main() {
     expect(find.text('连接第一台看护摄像头'), findsNothing);
     expect(find.text('摄像头还没连接'), findsOneWidget);
     expect(find.text('今日节奏'), findsOneWidget);
-    expect(find.text('米拉怎么说'), findsNothing);
+    expect(find.text('\u7c73\u62c9怎么说'), findsNothing);
     expect(find.textContaining('bindingCode'), findsNothing);
     expect(find.textContaining('mock'), findsNothing);
 
@@ -661,7 +661,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
     await tester.pumpAndSettle();
 
-    expect(find.text('登录家庭看护空间'), findsOneWidget);
+    expect(find.text('登录暖瞳'), findsOneWidget);
 
     await tester.tap(find.widgetWithText(TextButton, '隐私政策'));
     await tester.pumpAndSettle();
@@ -2210,7 +2210,7 @@ class _FakeApiServer {
             }
           : null,
       'device': device
-          ? {'id': 'device_test', 'name': 'AI 看护摄像头', 'location': '儿童房'}
+          ? {'id': 'device_test', 'name': '暖瞳摄像头', 'location': '儿童房'}
           : null,
       'wifi': wifi ? {'ssid': 'Home Wi-Fi 2.4G'} : null,
       'child': child
@@ -2722,8 +2722,8 @@ class _FakeApiServer {
 
   Map<String, dynamic> _about() {
     return {
-      'appName': '家庭 AI 看护 App',
-      'displayName': '家庭 AI 看护 App',
+      'appName': '暖瞳',
+      'displayName': '暖瞳',
       'version': '1.0.0',
       'build': '2026.06',
       'appUpdate': {
@@ -3126,7 +3126,7 @@ class _FakeApiServer {
   Map<String, dynamic> _device([Map<String, dynamic>? body]) {
     return {
       'id': 'device_test',
-      'name': _text(body?['deviceName'] ?? body?['name'], 'AI 看护摄像头'),
+      'name': _text(body?['deviceName'] ?? body?['name'], '暖瞳摄像头'),
       'location': _text(body?['location'], '书桌旁'),
       'status': 'online',
       'isDefault': true,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,11 +18,29 @@ import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
-class LiveCareScreen extends ConsumerWidget {
+class LiveCareScreen extends ConsumerStatefulWidget {
   const LiveCareScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LiveCareScreen> createState() => _LiveCareScreenState();
+}
+
+class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
+  bool _requestedInitialObservation = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_requestedInitialObservation) return;
+    _requestedInitialObservation = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(_refreshLiveCare(ref, analyzeFrame: true));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final selectedDevice = ref.watch(selectedDeviceProvider);
     if (selectedDevice.isLoading) {
       return const AppScreen(
@@ -105,13 +125,13 @@ class LiveCareScreen extends ConsumerWidget {
           subtitle: subtitle,
           status: liveStatus,
           snapshot: snapshotFrame,
-          onRefresh: () => _refreshLiveCare(ref),
+          onRefresh: () => unawaited(_refreshLiveCare(ref, analyzeFrame: true)),
         ),
         const SizedBox(height: 8),
         _LiveActions(
           status: liveStatus,
           snapshot: snapshotFrame,
-          onRefresh: () => _refreshLiveCare(ref),
+          onRefresh: () => unawaited(_refreshLiveCare(ref, analyzeFrame: true)),
         ),
         const SizedBox(height: 10),
         _CareFocusPanel(status: liveStatus, events: events),
@@ -119,7 +139,20 @@ class LiveCareScreen extends ConsumerWidget {
     );
   }
 
-  void _refreshLiveCare(WidgetRef ref) {
+  Future<void> _refreshLiveCare(
+    WidgetRef ref, {
+    bool analyzeFrame = false,
+  }) async {
+    final device = ref.read(selectedDeviceProvider).asData?.value;
+    if (analyzeFrame && device != null) {
+      try {
+        await ref
+            .read(cameraRepositoryProvider)
+            .refreshMonitor(deviceId: device.id);
+      } catch (_) {
+        // 手动刷新仍应回落到普通状态刷新，避免实时页被观察服务错误卡住。
+      }
+    }
     ref
       ..invalidate(liveCareStatusProvider)
       ..invalidate(cameraHealthProvider)

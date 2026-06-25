@@ -34,7 +34,7 @@ class HomeHabitHero extends StatelessWidget {
     final compact =
         MediaQuery.sizeOf(context).width <= 340 ||
         MediaQuery.sizeOf(context).height <= 620;
-    final bottomPadding = panelOverlap + (compact ? 10 : 12);
+    final bottomPadding = panelOverlap + (compact ? 4 : 8);
     final topInset = safeTop > 0 ? safeTop : 24.0;
     final topPadding = topInset + (compact ? 12 : 14);
 
@@ -188,7 +188,7 @@ class HomeHabitHero extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: compact ? 14 : 18),
+                  SizedBox(height: compact ? 10 : 16),
                   if (isLoading)
                     _HeroSkeleton(compact: compact)
                   else ...[
@@ -212,7 +212,7 @@ class HomeHabitHero extends StatelessWidget {
                           SizedBox(height: compact ? 6 : 8),
                           Text(
                             focus.detail,
-                            maxLines: 2,
+                            maxLines: compact ? 1 : 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.74),
@@ -225,9 +225,9 @@ class HomeHabitHero extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: compact ? 6 : 8),
+                    SizedBox(height: compact ? 4 : 8),
                     SizedBox(
-                      height: 28,
+                      height: compact ? 26 : 28,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         padding: EdgeInsets.zero,

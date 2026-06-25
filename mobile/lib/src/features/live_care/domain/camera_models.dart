@@ -244,6 +244,10 @@ class CameraMonitorStatus {
     required this.message,
     required this.lastObservation,
     required this.lastReminder,
+    this.lastObservationObservedAt,
+    this.lastObservationReliable = false,
+    this.lastObservationHasPerson,
+    this.lastObservationActivity = '',
   });
 
   final bool running;
@@ -251,21 +255,62 @@ class CameraMonitorStatus {
   final String message;
   final String lastObservation;
   final String lastReminder;
+  final int? lastObservationObservedAt;
+  final bool lastObservationReliable;
+  final bool? lastObservationHasPerson;
+  final String lastObservationActivity;
 
   String get label => running ? '观察中' : '未观察';
 
   StatusTone get tone => running ? StatusTone.success : StatusTone.neutral;
 
+  bool get hasFreshObservation {
+    final observedAt = lastObservationObservedAt;
+    if (observedAt == null || observedAt <= 0) {
+      return lastObservation.isNotEmpty;
+    }
+    final age = DateTime.now().millisecondsSinceEpoch - observedAt;
+    return age >= 0 && age <= cameraObservationFreshness.inMilliseconds;
+  }
+
+  bool get hasCurrentReliableObservation =>
+      lastObservationReliable &&
+      hasFreshObservation &&
+      lastObservation.isNotEmpty;
+
   static CameraMonitorStatus fromJson(Map<String, dynamic> json) {
     final monitor = _asMap(json['monitor']);
+    final observation = _observationSnapshot(monitor['lastObservation']);
     return CameraMonitorStatus(
       running: monitor['running'] == true,
       status: _asString(monitor['status'], fallback: 'idle'),
       message: _asString(monitor['message']),
-      lastObservation: _observationSummary(monitor['lastObservation']),
+      lastObservation: observation.summary,
       lastReminder: _asString(monitor['lastReminder']),
+      lastObservationObservedAt: observation.observedAt,
+      lastObservationReliable: observation.isReliable,
+      lastObservationHasPerson: observation.hasPerson,
+      lastObservationActivity: observation.activity,
     );
   }
+}
+
+const cameraObservationFreshness = Duration(seconds: 120);
+
+class _CameraObservationSnapshot {
+  const _CameraObservationSnapshot({
+    required this.summary,
+    required this.isReliable,
+    required this.hasPerson,
+    required this.activity,
+    this.observedAt,
+  });
+
+  final String summary;
+  final bool isReliable;
+  final bool? hasPerson;
+  final String activity;
+  final int? observedAt;
 }
 
 class LiveCareStatus {
@@ -422,30 +467,98 @@ String _asString(dynamic value, {String fallback = ''}) {
   return value is String && value.isNotEmpty ? value : fallback;
 }
 
-String _observationSummary(dynamic value) {
+_CameraObservationSnapshot _observationSnapshot(dynamic value) {
   if (value is String && value.isNotEmpty) {
-    return _sanitizeObservationText(value);
+    final summary = _sanitizeObservationText(value);
+    return _CameraObservationSnapshot(
+      summary: summary,
+      isReliable: summary.isNotEmpty,
+      hasPerson: null,
+      activity: '',
+    );
   }
   final data = _asMap(value);
-  if (data.isEmpty) return '';
+  if (data.isEmpty) {
+    return const _CameraObservationSnapshot(
+      summary: '',
+      isReliable: false,
+      hasPerson: null,
+      activity: '',
+    );
+  }
   final activity = _normalizeActivityLabel(
     _asString(data['activity'] ?? data['raw_activity']),
   );
   final hasPersonValue = data['has_person'] ?? data['hasPerson'];
   final hasPerson = hasPersonValue == true;
-  final isReliable = data['isReliable'];
-  if (isReliable == false) {
-    if (hasPersonValue == false) return '暂时没在画面里看到孩子。';
-    return '';
+  final observedAt = _asNullableInt(
+    data['observedAt'] ?? data['observed_at'] ?? data['timestamp'],
+  );
+  final isFresh = _isFreshObservation(observedAt);
+  final isReliable = data['isReliable'] == true && isFresh;
+  if (!isReliable) {
+    return _CameraObservationSnapshot(
+      summary: '',
+      isReliable: false,
+      hasPerson: hasPersonValue == true
+          ? true
+          : hasPersonValue == false
+          ? false
+          : null,
+      activity: activity,
+      observedAt: observedAt,
+    );
   }
   final summary = _sanitizeObservationText(_asString(data['summary']));
-  if (isReliable == true && summary.isNotEmpty) return summary;
-  if (activity.isNotEmpty && hasPerson) {
-    return '看到孩子在$activity。';
+  if (summary.isNotEmpty) {
+    return _CameraObservationSnapshot(
+      summary: summary,
+      isReliable: true,
+      hasPerson: hasPersonValue == false ? false : hasPerson,
+      activity: activity,
+      observedAt: observedAt,
+    );
   }
-  if (activity.isNotEmpty) return '画面里看到$activity。';
-  if (hasPersonValue == false) return '暂时没在画面里看到孩子。';
-  return '';
+  if (activity.isNotEmpty && hasPerson) {
+    return _CameraObservationSnapshot(
+      summary: activity == '玩玩具' ? '孩子正在玩玩具' : '孩子正在$activity',
+      isReliable: true,
+      hasPerson: true,
+      activity: activity,
+      observedAt: observedAt,
+    );
+  }
+  if (hasPersonValue == false) {
+    return _CameraObservationSnapshot(
+      summary: '暂未看到孩子',
+      isReliable: true,
+      hasPerson: false,
+      activity: activity,
+      observedAt: observedAt,
+    );
+  }
+  if (hasPersonValue == true) {
+    return _CameraObservationSnapshot(
+      summary: '看到孩子在画面里',
+      isReliable: true,
+      hasPerson: true,
+      activity: activity,
+      observedAt: observedAt,
+    );
+  }
+  return _CameraObservationSnapshot(
+    summary: '',
+    isReliable: false,
+    hasPerson: null,
+    activity: activity,
+    observedAt: observedAt,
+  );
+}
+
+bool _isFreshObservation(int? observedAt) {
+  if (observedAt == null || observedAt <= 0) return false;
+  final age = DateTime.now().millisecondsSinceEpoch - observedAt;
+  return age >= 0 && age <= cameraObservationFreshness.inMilliseconds;
 }
 
 const _genericActivityLabels = {'其他', '未知', '无明显活动', 'other', 'unknown'};

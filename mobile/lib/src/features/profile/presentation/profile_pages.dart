@@ -38,6 +38,8 @@ import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 import 'package:guardian_parent_app/src/shared/widgets/guardian_identity_selector.dart';
 import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
 
+const _brandLogoMarkAsset = 'assets/brand/nuantong-logo-mark.png';
+
 class AccountProfilePage extends ConsumerWidget {
   const AccountProfilePage({super.key});
 
@@ -4292,7 +4294,7 @@ class AboutPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 18),
-          Center(child: Text('© 2026 家庭 AI 看护 App', style: _mutedText)),
+          Center(child: Text('© 2026 暖瞳 WarmSight', style: _mutedText)),
         ],
         loading: () => const [_Loading(title: '正在同步应用信息')],
         error: (error, _) => [
@@ -4322,12 +4324,29 @@ class _AboutHero extends StatelessWidget {
         children: [
           Row(
             children: [
-              _DarkIcon(Icons.apartment_outlined),
+              const _BrandLogoTile(),
               const SizedBox(width: 13),
               Expanded(
-                child: Text(
-                  data.appName.isNotEmpty ? data.appName : data.displayName,
-                  style: _darkTitle,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.appName.isNotEmpty ? data.appName : data.displayName,
+                      style: _darkTitle,
+                    ),
+                    const SizedBox(height: 3),
+                    const Text(
+                      'WarmSight · 陪在成长的每一天',
+                      style: TextStyle(
+                        color: Color(0xCCFFFFFF),
+                        fontFamily: AppTypography.systemFont,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -7133,6 +7152,33 @@ class _DarkIcon extends StatelessWidget {
         width: 48,
         height: 48,
         child: Center(child: Icon(icon, color: Colors.white, size: 24)),
+      ),
+    );
+  }
+}
+
+class _BrandLogoTile extends StatelessWidget {
+  const _BrandLogoTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7EA),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: SizedBox(
+        width: 48,
+        height: 48,
+        child: Center(
+          child: Image.asset(
+            _brandLogoMarkAsset,
+            semanticLabel: '暖瞳',
+            width: 36,
+            height: 36,
+            fit: BoxFit.contain,
+          ),
+        ),
       ),
     );
   }

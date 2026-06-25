@@ -2,7 +2,7 @@
 
 ## Scope
 
-This directory is the Flutter implementation of the Mira Guardian parent app. When the user asks for a new page, implement only the requested page or flow unless they explicitly expand the scope.
+This directory is the Flutter implementation of the 暖瞳 parent app. When the user asks for a new page, implement only the requested page or flow unless they explicitly expand the scope.
 
 Do not rewrite the app structure, route map, theme, welcome page, or existing flows as a side effect of adding a page.
 

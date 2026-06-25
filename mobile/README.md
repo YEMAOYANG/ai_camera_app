@@ -1,6 +1,6 @@
-# Mira Guardian Flutter App
+# 暖瞳 Flutter App
 
-米拉家长端 Flutter 工程，负责设备绑定、孩子档案、任务、实时看护、任务证据、奖励、告警、报告、隐私与家庭成员管理。
+暖瞳家长端 Flutter 工程，负责设备绑定、孩子档案、任务、实时看护、任务证据、奖励、告警、报告、隐私与家庭成员管理。
 
 ## 技术底座
 
@@ -27,33 +27,40 @@ lib/
 ```sh
 cd mobile
 flutter pub get
-flutter run --dart-define-from-file=.env.development
+flutter run
 ```
 
 环境配置在 `mobile/.env.development` 和 `mobile/.env.product`。开发环境默认使用当前
-局域网后端地址，生产构建时替换 `.env.product` 里的真实 API 域名：
+局域网后端地址，生产构建时替换 `.env.product` 里的真实 API 和 WebSocket 域名。
+移动端不会在 Dart 代码里写死 API 地址；debug 构建默认读取 `.env.development`，
+release 构建默认读取 `.env.product`。如果需要显式覆盖，也可以继续通过 dart define
+指定配置文件：
+
+```sh
+flutter run --dart-define-from-file=.env.development
+```
 
 ```sh
 flutter build apk --dart-define-from-file=.env.product
 ```
 
-安卓 USB 真机调试时，优先使用脚本自动建立 `adb reverse`。这样 App 仍然访问
-`127.0.0.1`，但实际会转发到电脑上的后端，不受 Wi-Fi IP 变化影响：
+安卓 USB 真机调试时，脚本只负责建立 `adb reverse` 并读取 `.env.development`。
+如果要走 USB 转发，请把 `.env.development` 里的地址配置为 `127.0.0.1`：
 
 ```sh
 cd mobile
 scripts/run_android_usb.sh -d <device-id>
 ```
 
-安卓真机连同一 Wi-Fi、但不走 USB 转发时，用脚本自动把电脑局域网 IP 写入 App：
+安卓真机连同一 Wi-Fi、但不走 USB 转发时，把电脑局域网地址写在 `.env.development`
+里，然后用脚本启动：
 
 ```sh
 cd mobile
 scripts/run_android_lan.sh -d <device-id>
 ```
 
-脚本会生成类似 `http://192.168.x.x:8000/api` 的 `API_BASE_URL`。后端需要先用
-`backend/.env` 里的 `APP_HOST=0.0.0.0` 启动，手机才能访问电脑后端。
+后端需要先用 `backend/.env` 里的 `APP_HOST=0.0.0.0` 启动，手机才能访问电脑后端。
 
 Web 调试：
 
