@@ -2892,6 +2892,8 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
     final selectedDevice = ref.watch(selectedDeviceProvider);
     final child = ref.watch(currentChildProvider);
     final childId = child.asData?.value?.id;
+    final device = selectedDevice.asData?.value;
+    final query = CareCapabilitiesQuery(childId: childId, deviceId: device?.id);
     final canManage =
         ref
             .watch(profileSummaryProvider)
@@ -2899,57 +2901,41 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
             ?.value
             .can('manage_child_settings') ??
         false;
+    final capabilities = ref.watch(careCapabilitiesProvider(query));
 
     return _Page(
       title: '看护能力',
       subtitle: '按幼儿园作息轻声提醒。',
-      children: selectedDevice.when(
-        data: (device) {
-          if (device == null) {
-            return const [
-              AppStateView(
-                variant: AppStateVariant.deviceOffline,
-                title: '还没有可用摄像头',
-                message: '添加摄像头后，可以开启看护能力。',
-                compact: true,
-              ),
-            ];
-          }
-          final query = CareCapabilitiesQuery(
+      children: [
+        if (selectedDevice.isLoading)
+          const _Loading(title: '正在同步当前摄像头')
+        else if (device == null)
+          const AppListRow(
+            icon: Icons.videocam_off_outlined,
+            title: '未连接摄像头',
+            subtitle: '可以先保存提醒规则，连接后按这些设置提醒。',
+            tone: AppListRowTone.neutral,
+          )
+        else
+          _SelectedDevicePanel(device: device),
+        const SizedBox(height: 14),
+        ...capabilities.when(
+          data: (items) => _capabilitySections(
+            items,
+            canManage: canManage,
+            query: query,
             childId: childId,
-            deviceId: device.id,
-          );
-          final capabilities = ref.watch(careCapabilitiesProvider(query));
-          return [
-            _SelectedDevicePanel(device: device),
-            const SizedBox(height: 14),
-            ...capabilities.when(
-              data: (items) => _capabilitySections(
-                items,
-                canManage: canManage,
-                query: query,
-                childId: childId,
-                deviceId: device.id,
-              ),
-              loading: () => const [_Loading(title: '正在同步看护能力')],
-              error: (error, _) => [
-                _ErrorState(
-                  error: error,
-                  onRetry: () =>
-                      ref.invalidate(careCapabilitiesProvider(query)),
-                ),
-              ],
-            ),
-          ];
-        },
-        loading: () => const [_Loading(title: '正在同步当前摄像头')],
-        error: (error, _) => [
-          _ErrorState(
-            error: error,
-            onRetry: () => ref.invalidate(selectedDeviceProvider),
+            deviceId: device?.id,
           ),
-        ],
-      ),
+          loading: () => const [_Loading(title: '正在同步看护能力')],
+          error: (error, _) => [
+            _ErrorState(
+              error: error,
+              onRetry: () => ref.invalidate(careCapabilitiesProvider(query)),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -2958,7 +2944,7 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
     required bool canManage,
     required CareCapabilitiesQuery query,
     required String? childId,
-    required String deviceId,
+    required String? deviceId,
   }) {
     if (items.isEmpty) {
       return const [
@@ -2976,29 +2962,34 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
           a.scenario,
         ).compareTo(_capabilityOrder(b.scenario)),
       );
+    // V1 hides transition as a future composite scene, while keeping backend config
+    // available for the later recognition phase.
+    final visible = ordered
+        .where((item) => _v1VisibleCareScenarios.contains(item.scenario))
+        .toList();
     return [
       AppSurface(
         child: Column(
           children: [
-            for (var index = 0; index < ordered.length; index++) ...[
+            for (var index = 0; index < visible.length; index++) ...[
               if (index > 0) const _CompactDivider(),
               _CareCapabilityRow(
-                capability: ordered[index],
+                capability: visible[index],
                 savingEnabled: _savingKeys.contains(
-                  '${ordered[index].scenario}:enabled',
+                  '${visible[index].scenario}:enabled',
                 ),
                 savingVoice: _savingKeys.contains(
-                  '${ordered[index].scenario}:voice',
+                  '${visible[index].scenario}:voice',
                 ),
                 savingRules: _savingKeys.contains(
-                  '${ordered[index].scenario}:rules',
+                  '${visible[index].scenario}:rules',
                 ),
                 canManage: canManage,
                 onEnabledChanged: (value) => _saveCapability(
                   query: query,
                   childId: childId,
                   deviceId: deviceId,
-                  capability: ordered[index],
+                  capability: visible[index],
                   key: 'enabled',
                   value: value,
                 ),
@@ -3006,16 +2997,16 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
                   query: query,
                   childId: childId,
                   deviceId: deviceId,
-                  capability: ordered[index],
+                  capability: visible[index],
                   key: 'allowSpeaker',
                   value: value,
                 ),
-                onOpenRules: ordered[index].scenario == 'toy_cleanup'
+                onOpenRules: visible[index].scenario == 'toy_cleanup'
                     ? () => _openToyCleanupRules(
                         query: query,
                         childId: childId,
                         deviceId: deviceId,
-                        capability: ordered[index],
+                        capability: visible[index],
                       )
                     : null,
               ),
@@ -3038,7 +3029,7 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
   Future<void> _saveCapability({
     required CareCapabilitiesQuery query,
     required String? childId,
-    required String deviceId,
+    required String? deviceId,
     required CareCapability capability,
     required String key,
     required bool value,
@@ -3057,7 +3048,7 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
   Future<void> _saveCapabilityValues({
     required CareCapabilitiesQuery query,
     required String? childId,
-    required String deviceId,
+    required String? deviceId,
     required CareCapability capability,
     required String savingKey,
     required Map<String, Object?> values,
@@ -3086,7 +3077,7 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
   Future<void> _openToyCleanupRules({
     required CareCapabilitiesQuery query,
     required String? childId,
-    required String deviceId,
+    required String? deviceId,
     required CareCapability capability,
   }) async {
     final result = await _showToyCleanupRulesSheet(context, capability);
@@ -3162,19 +3153,6 @@ class _CareCapabilityRow extends StatelessWidget {
               onTap: disabled || onOpenRules == null ? null : onOpenRules,
             ),
           ],
-          Align(
-            alignment: Alignment.centerLeft,
-            child: StatusChip(
-              label: capability.enabled
-                  ? capability.allowSpeaker
-                        ? '已开启'
-                        : '仅记录'
-                  : '已关闭',
-              tone: capability.enabled
-                  ? StatusTone.success
-                  : StatusTone.neutral,
-            ),
-          ),
         ],
       ),
     );
@@ -3351,13 +3329,6 @@ class _RoutineWindowsPageState extends ConsumerState<RoutineWindowsPage> {
                     ],
                   ],
                 ),
-              ),
-              const SizedBox(height: 12),
-              const AppListRow(
-                icon: Icons.event_available_outlined,
-                title: '假期作息',
-                subtitle: '后续可按假期单独调整。',
-                tone: AppListRowTone.neutral,
               ),
               if (!canManage) ...[
                 const SizedBox(height: 12),
@@ -3677,6 +3648,16 @@ String _routineSubtitle(String type) {
   };
 }
 
+const _v1VisibleCareScenarios = {
+  'posture',
+  'toy_cleanup',
+  'meal_start',
+  'meal_habit',
+  'nap_time',
+  'bedtime',
+  'wake_up',
+};
+
 int _capabilityOrder(String scenario) {
   return switch (scenario) {
     'posture' => 0,
@@ -3711,9 +3692,9 @@ String _capabilityDescription(String scenario) {
     'toy_cleanup' => '孩子玩完离开后，摄像头会轻声提醒收好玩具。',
     'meal_start' => '到用餐时间，提醒坐好开始吃饭。',
     'meal_habit' => '用餐中离座或分心时轻提醒。',
-    'nap_time' => '午睡时间更轻、更慢。',
-    'bedtime' => '睡前提醒更短，不刺激继续玩。',
-    'wake_up' => '到起床窗口温和唤醒。',
+    'nap_time' => '到午睡时间，摄像头会按作息轻声提醒。',
+    'bedtime' => '到睡觉时间，摄像头会提醒孩子准备休息。',
+    'wake_up' => '到起床时间，摄像头会轻声提醒。',
     'transition' => '准备出门、洗漱等换场景提醒。',
     _ => '按作息轻声提醒。',
   };

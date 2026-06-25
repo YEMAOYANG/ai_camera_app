@@ -244,6 +244,18 @@ class CameraCommandService:
         bridge, _ = self._runtime_for_command(family_id=family_id, device_id=device_id)
         return bridge.task_observation(task)
 
+    def has_available_device(self, *, family_id: str, device_id: str | None = None) -> bool:
+        requested_device_id = str(device_id or "").strip()
+        with self.repository.transaction() as conn:
+            if requested_device_id:
+                device = self.device_repository.get_device(
+                    conn,
+                    family_id=family_id,
+                    device_id=requested_device_id,
+                )
+                return device is not None and str(device.get("status") or "") != "unbound"
+            return bool(self.device_repository.ensure_default_device(conn, family_id=family_id, now=now_ms()))
+
     def _runtime_for_command(self, *, family_id: str, device_id: str | None) -> tuple[CameraBridgeService, str | None]:
         if self.runtime_resolver is None:
             if self.camera_service is None:

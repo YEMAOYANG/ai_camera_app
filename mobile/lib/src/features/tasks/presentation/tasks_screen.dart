@@ -28,7 +28,9 @@ final taskSelectedDateProvider = StateProvider<DateTime>((ref) {
 const _taskStartPreparationMinutes = 5;
 
 class TasksScreen extends ConsumerStatefulWidget {
-  const TasksScreen({super.key});
+  const TasksScreen({this.openTemplatesOnEntry = false, super.key});
+
+  final bool openTemplatesOnEntry;
 
   @override
   ConsumerState<TasksScreen> createState() => _TasksScreenState();
@@ -37,6 +39,7 @@ class TasksScreen extends ConsumerStatefulWidget {
 class _TasksScreenState extends ConsumerState<TasksScreen> {
   late DateTime _selectedDate;
   late DateTime _weekStart;
+  var _handledOpenTemplatesIntent = false;
 
   @override
   void initState() {
@@ -71,6 +74,21 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       childId: childId?.isNotEmpty == true ? childId : null,
     );
     final weekTasks = ref.watch(taskWeekProvider(query));
+
+    if (widget.openTemplatesOnEntry &&
+        !_handledOpenTemplatesIntent &&
+        profileSummary.hasValue) {
+      _handledOpenTemplatesIntent = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _openCreateSheet(
+          childId,
+          childAgeGroup: childAgeGroup,
+          initialMode: TaskEntryMode.day,
+          showTemplatePicker: true,
+        );
+      });
+    }
 
     return AppScreen(
       title: '任务',

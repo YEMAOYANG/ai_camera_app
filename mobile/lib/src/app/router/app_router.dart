@@ -314,7 +314,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoute.tasks.path,
             name: AppRoute.tasks.name,
-            builder: (_, _) => const TasksScreen(),
+            builder: (_, state) => TasksScreen(
+              openTemplatesOnEntry:
+                  state.uri.queryParameters['open'] == 'templates',
+            ),
           ),
           GoRoute(
             path: AppRoute.live.path,

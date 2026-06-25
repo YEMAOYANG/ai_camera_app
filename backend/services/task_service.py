@@ -359,6 +359,14 @@ class TaskService:
                 prompt=self._task_reminder_prompt(),
             )
             voice_enabled = self._voice_reminder_enabled(conn, context["family"]["id"])
+            has_camera_device = (
+                self._has_camera_device(
+                    family_id=context["family"]["id"],
+                    device_id=task.get("device_id"),
+                )
+                if voice_enabled
+                else False
+            )
             command = (
                 self.camera_command_service.internal_speak(
                     family_id=context["family"]["id"],
@@ -366,20 +374,27 @@ class TaskService:
                     device_id=task.get("device_id"),
                     text=reminder["text"],
                 )
-                if voice_enabled
-                else self._skipped_command("voice_reminder_disabled")
+                if voice_enabled and has_camera_device
+                else self._skipped_command(
+                    "voice_reminder_disabled" if not voice_enabled else "no_camera_device"
+                )
             )
             sent = command.get("status") != "failed" and command.get("status") != "skipped"
             event_type = (
                 self._manual_reminder_event_type(phase, sent=sent)
-                if voice_enabled
+                if voice_enabled and has_camera_device
                 else self._manual_reminder_event_type(phase, skipped=True)
             )
             self._add_event(
                 conn,
                 task,
                 event_type,
-                self._manual_reminder_message(phase, sent=sent, skipped=not voice_enabled),
+                self._manual_reminder_message(
+                    phase,
+                    sent=sent,
+                    skipped=not voice_enabled or not has_camera_device,
+                    skip_reason=command.get("reason"),
+                ),
                 {"command": command, **reminder},
                 now,
             )
@@ -606,8 +621,17 @@ class TaskService:
             "finish": f"manual_finish_reminder_{suffix}",
         }.get(phase, f"manual_reminder_{suffix}")
 
-    def _manual_reminder_message(self, phase: str, *, sent: bool, skipped: bool = False) -> str:
+    def _manual_reminder_message(
+        self,
+        phase: str,
+        *,
+        sent: bool,
+        skipped: bool = False,
+        skip_reason: str | None = None,
+    ) -> str:
         if skipped:
+            if skip_reason == "no_camera_device":
+                return "未连接摄像头，本次只记录安排。"
             return "语音提醒已关闭，未向摄像头播报"
         if not sent:
             return "摄像头暂时离线，提醒没有播出"
@@ -636,6 +660,16 @@ class TaskService:
 
     def _skipped_command(self, reason: str) -> dict:
         return {"status": "skipped", "reason": reason}
+
+    def _has_camera_device(self, *, family_id: str, device_id: str | None = None) -> bool:
+        if not hasattr(self.camera_command_service, "has_available_device"):
+            return True
+        return bool(
+            self.camera_command_service.has_available_device(
+                family_id=family_id,
+                device_id=device_id,
+            )
+        )
 
     def _auth_context(self, access_token: str) -> dict:
         return self.auth_service.authenticate(access_token)

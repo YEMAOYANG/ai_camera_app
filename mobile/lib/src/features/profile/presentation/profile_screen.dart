@@ -89,6 +89,13 @@ class ProfileScreen extends ConsumerWidget {
                   subtitle: '语音提醒、通知和隐私边界',
                   path: profileRulesHubPath,
                 ),
+                _ProfileCategory(
+                  icon: Icons.insights_outlined,
+                  title: '看护报告',
+                  subtitle: '日报、周报和成长时刻',
+                  path: profileReportsHubPath,
+                  tone: AppListRowTone.amber,
+                ),
               ],
             ),
             _ProfileCategorySection(

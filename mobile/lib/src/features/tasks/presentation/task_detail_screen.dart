@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
@@ -39,6 +40,13 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
   Widget build(BuildContext context) {
     final taskValue = ref.watch(taskDetailProvider(widget.taskId));
     final eventsValue = ref.watch(taskEventsProvider(widget.taskId));
+    final hasCameraDevice = ref
+        .watch(selectedDeviceProvider)
+        .maybeWhen(
+          data: (device) => device != null,
+          loading: () => true,
+          orElse: () => false,
+        );
 
     return taskValue.when(
       data: (task) => AppScreen(
@@ -49,7 +57,20 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
         onBack: () => context.go(AppRoute.tasks.path),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 118),
         children: [
-          _EvidencePanel(task: task, ref: ref),
+          _EvidencePanel(
+            task: task,
+            ref: ref,
+            hasCameraDevice: hasCameraDevice,
+          ),
+          if (!hasCameraDevice) ...[
+            const SizedBox(height: 14),
+            const AppListRow(
+              icon: Icons.videocam_off_outlined,
+              title: '当前只记录安排',
+              subtitle: '未连接摄像头，连接后可使用语音提醒和看护记录。',
+              tone: AppListRowTone.neutral,
+            ),
+          ],
           const SizedBox(height: 14),
           AppSurface(
             child: Column(
@@ -216,10 +237,15 @@ class _TaskEventsPanel extends StatelessWidget {
 }
 
 class _TaskHeroActions extends StatelessWidget {
-  const _TaskHeroActions({required this.task, required this.ref});
+  const _TaskHeroActions({
+    required this.task,
+    required this.ref,
+    required this.hasCameraDevice,
+  });
 
   final GuardianTask task;
   final WidgetRef ref;
+  final bool hasCameraDevice;
 
   @override
   Widget build(BuildContext context) {
@@ -260,7 +286,7 @@ class _TaskHeroActions extends StatelessWidget {
           ),
         );
       }
-      if (canManageTasks && canSendWrapUpReminder) {
+      if (hasCameraDevice && canManageTasks && canSendWrapUpReminder) {
         actions.add(
           _HeroActionData(
             label: '提醒收尾',
@@ -277,7 +303,7 @@ class _TaskHeroActions extends StatelessWidget {
         );
       }
     } else if (canSendStartReminder && (canManageTasks || canConfirmTasks)) {
-      if (canManageTasks) {
+      if (hasCameraDevice && canManageTasks) {
         actions.add(
           _HeroActionData(
             label: '再提醒一次',
@@ -503,10 +529,15 @@ class _HeroActionButton extends StatelessWidget {
 }
 
 class _EvidencePanel extends StatelessWidget {
-  const _EvidencePanel({required this.task, required this.ref});
+  const _EvidencePanel({
+    required this.task,
+    required this.ref,
+    required this.hasCameraDevice,
+  });
 
   final GuardianTask task;
   final WidgetRef ref;
+  final bool hasCameraDevice;
 
   @override
   Widget build(BuildContext context) {
@@ -549,7 +580,7 @@ class _EvidencePanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            _heroDescription(task),
+            _heroDescription(task, hasCameraDevice: hasCameraDevice),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.78),
               fontFamily: AppTypography.systemFont,
@@ -561,7 +592,11 @@ class _EvidencePanel extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           _HeroInsightCard(task: task),
-          _TaskHeroActions(task: task, ref: ref),
+          _TaskHeroActions(
+            task: task,
+            ref: ref,
+            hasCameraDevice: hasCameraDevice,
+          ),
         ],
       ),
     );
@@ -714,11 +749,12 @@ String _heroTitle(GuardianTask task) {
   };
 }
 
-String _heroDescription(GuardianTask task) {
+String _heroDescription(GuardianTask task, {required bool hasCameraDevice}) {
   return switch (task.status) {
-    GuardianTaskStatus.scheduled ||
-    GuardianTaskStatus.pending => '到时间后会提醒孩子开始。',
-    GuardianTaskStatus.reminderSent => '已经提醒孩子，等待任务开始。',
+    GuardianTaskStatus.scheduled || GuardianTaskStatus.pending =>
+      !hasCameraDevice ? '未连接摄像头，当前只记录安排。' : '到时间后会提醒孩子开始。',
+    GuardianTaskStatus.reminderSent =>
+      !hasCameraDevice ? '本次只记录安排，没有摄像头语音提醒。' : '已经提醒孩子，等待任务开始。',
     GuardianTaskStatus.inProgress =>
       task.requiresParentConfirmation
           ? '正在记录任务状态，完成后会进入确认。'
@@ -775,6 +811,9 @@ String _heroInsightBody(GuardianTask task) {
     return '孩子还没有开始，必要时可以再提醒一次。';
   }
   if (task.status == GuardianTaskStatus.inProgress) {
+    if (task.cameraObservationStatus == 'no_camera_device') {
+      return '未连接摄像头，当前只记录安排。';
+    }
     if (task.cameraObservationStatus == 'unavailable' ||
         task.cameraObservationStatus == 'offline') {
       return '摄像头暂时离线，任务仍会记录，恢复后继续同步。';

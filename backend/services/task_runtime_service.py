@@ -169,6 +169,17 @@ class TaskRuntimeService:
         )
         reminder = self._task_reminder(conn, task, phase="prepare")
         text = reminder["text"]
+        if not self._has_camera_device(task):
+            event = self.repository.add_event(
+                conn,
+                family_id=task["family_id"],
+                task_id=task["id"],
+                event_type="reminder_skipped",
+                message="未连接摄像头，本次只记录安排。",
+                payload={"command": self._skipped_command("no_camera_device"), **reminder},
+                now=current_ms,
+            )
+            return task, event
         if not self._voice_reminder_enabled(conn, task["family_id"]):
             event = self.repository.add_event(
                 conn,
@@ -211,6 +222,8 @@ class TaskRuntimeService:
     def _auto_start_or_delay(self, conn, task, *, now: datetime):
         if self.repository.has_event(conn, task_id=task["id"], event_type="auto_started"):
             return task, []
+        if not self._has_camera_device(task):
+            return self._mark_in_progress_without_camera(conn, task, now=now)
         if not self._requires_start_observation(conn, task):
             return self._mark_in_progress_without_start_observation(conn, task, now=now)
 
@@ -308,6 +321,26 @@ class TaskRuntimeService:
         events.extend(self._start_monitor(conn, task, now_ms_value=current_ms))
         return updated, events
 
+    def _mark_in_progress_without_camera(self, conn, task, *, now: datetime):
+        current_ms = self._now_ms(now)
+        updated = self.repository.mark_in_progress(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            observation_status="no_camera_device",
+            now=current_ms,
+        )
+        event = self.repository.add_event(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            event_type="auto_started",
+            message="安排已按时间开始，本次只记录安排。",
+            payload={"observation": {"verdict": "unavailable", "reason": "no_camera_device"}},
+            now=current_ms,
+        )
+        return updated, [event]
+
     def _mark_delayed(self, conn, task, *, observation: dict, now: datetime):
         current_ms = self._now_ms(now)
         max_delay_reminders = self._max_delay_reminders(conn, task["family_id"])
@@ -352,6 +385,8 @@ class TaskRuntimeService:
         return updated, events
 
     def _process_delayed(self, conn, task, *, now: datetime):
+        if not self._has_camera_device(task):
+            return task, []
         observation = self.camera_command_service.internal_task_observation(
             family_id=task["family_id"],
             task=dict(task),
@@ -416,6 +451,16 @@ class TaskRuntimeService:
             count=reminder_count,
         )
         text = reminder["text"]
+        if not self._has_camera_device(task):
+            return self.repository.add_event(
+                conn,
+                family_id=task["family_id"],
+                task_id=task["id"],
+                event_type="delay_reminder_skipped",
+                message="未连接摄像头，本次只记录安排。",
+                payload={"command": self._skipped_command("no_camera_device"), **reminder},
+                now=current_ms,
+            )
         if not self._voice_reminder_enabled(conn, task["family_id"]):
             self.repository.mark_delay_reminder_result(
                 conn,
@@ -542,6 +587,13 @@ class TaskRuntimeService:
         return updated, events
 
     def _finish_or_review(self, conn, task, *, now: datetime):
+        if not self._has_camera_device(task):
+            return self._mark_missed(
+                conn,
+                task,
+                now=now,
+                reason="未连接摄像头，本次只记录安排。",
+            )
         if not self._requires_start_observation(conn, task):
             return self._auto_finish(conn, task, now=now)
         observation_status = str(task.get("camera_observation_status") or "")
@@ -675,6 +727,19 @@ class TaskRuntimeService:
         if task is None:
             return None
         reminder = self._task_reminder(conn, task, phase=phase)
+        if not self._has_camera_device(task):
+            return self.repository.add_event(
+                conn,
+                family_id=task["family_id"],
+                task_id=task["id"],
+                event_type=success_event_type.replace("_sent", "_skipped"),
+                message="未连接摄像头，本次只记录安排。",
+                payload={
+                    "command": self._skipped_command("no_camera_device"),
+                    **reminder,
+                },
+                now=now_ms_value,
+            )
         if not self._voice_reminder_enabled(conn, task["family_id"]):
             return self.repository.add_event(
                 conn,
@@ -888,6 +953,16 @@ class TaskRuntimeService:
 
     def _skipped_command(self, reason: str) -> dict:
         return {"status": "skipped", "reason": reason}
+
+    def _has_camera_device(self, task) -> bool:
+        if not hasattr(self.camera_command_service, "has_available_device"):
+            return True
+        return bool(
+            self.camera_command_service.has_available_device(
+                family_id=task["family_id"],
+                device_id=task.get("device_id"),
+            )
+        )
 
     def _now_ms(self, now: datetime) -> int:
         if now.tzinfo is None:

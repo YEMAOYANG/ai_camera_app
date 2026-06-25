@@ -236,6 +236,148 @@ void main() {
     },
   );
 
+  testWidgets('empty home template action opens day arrangement sheet', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'test_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+      hasDevice: false,
+      seedTasks: false,
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text('选个模板'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('选择一天安排'), findsOneWidget);
+    expect(find.text('上学日晨间'), findsWidgets);
+
+    await tester.tap(find.bySemanticsLabel('关闭').last);
+    await tester.pumpAndSettle();
+    expect(find.text('选择一天安排'), findsNothing);
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('选择一天安排'), findsNothing);
+  });
+
+  testWidgets('task tab opens tasks without automatically showing templates', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'test_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+      hasDevice: false,
+      seedTasks: false,
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text('任务').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('选择一天安排'), findsNothing);
+    expect(find.text('本周还没有安排'), findsOneWidget);
+  });
+
+  testWidgets('tasks can be created without a camera', (tester) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'test_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+      hasDevice: false,
+      seedTasks: false,
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text('任务').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.add).first);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(EditableText).first, '喝水休息');
+    await tester.ensureVisible(find.text('保存并继续添加'));
+    await tester.tap(find.text('保存并继续添加'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('已添加，继续安排下一项'), findsOneWidget);
+    expect(find.text('请先连接摄像头'), findsNothing);
+  });
+
+  testWidgets('task detail without camera shows record-only state', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'test_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+      hasDevice: false,
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text('任务').last);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('户外活动').first);
+    await tester.tap(find.text('户外活动').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('当前只记录安排'), findsOneWidget);
+    expect(find.text('未连接摄像头，连接后可使用语音提醒和看护记录。'), findsOneWidget);
+    expect(find.textContaining('摄像头观察中'), findsNothing);
+    expect(find.textContaining('摄像头提醒中'), findsNothing);
+  });
+
   testWidgets(
     'empty home with camera keeps plan empty state without camera CTA',
     (tester) async {
@@ -792,6 +934,12 @@ void main() {
     await _openProfileEntry(tester, 'AI 规则与提醒', expectedTitle: 'AI 规则与提醒');
     await _openProfileEntry(
       tester,
+      '看护报告',
+      expectedTitle: '看护报告',
+      expectedTexts: const ['今日报告', '周报', '成长时刻'],
+    );
+    await _openProfileEntry(
+      tester,
       '账号安全',
       expectedTitle: '账号安全',
       expectedTexts: const ['账号保护中', '登录设备', '本机 iPhone', '注销账号'],
@@ -811,12 +959,24 @@ void main() {
       'AI 规则与提醒',
       '看护能力',
       expectedTitle: '看护能力',
+      expectedTexts: const [
+        '坐姿提醒',
+        '玩具收纳',
+        '用餐开始提醒',
+        '用餐习惯提醒',
+        '午睡提醒',
+        '晚上入睡提醒',
+        '起床提醒',
+      ],
+      absentTexts: const ['更多提醒能力', '转场提醒', '已开启', '已关闭'],
     );
     await _openProfileNestedEntry(
       tester,
       'AI 规则与提醒',
       '作息时间',
       expectedTitle: '作息节奏',
+      expectedTexts: const ['上学日', '周末', '起床', '早餐', '午睡', '晚上睡觉'],
+      absentTexts: const ['假期作息', '后续可按假期单独调整。'],
     );
     await _openProfileNestedEntry(
       tester,
@@ -826,6 +986,52 @@ void main() {
     );
     expect(find.text('安全区域'), findsNothing);
     expect(find.text('打卡审核'), findsNothing);
+  });
+
+  testWidgets('care capabilities remain configurable before camera binding', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    await _pumpApp(
+      tester,
+      preferences: {
+        hasSeenOnboardingKey: true,
+        hasCompletedInitialSetupKey: true,
+        authAccessTokenKey: 'test_access_saved',
+        authRefreshTokenKey: 'test_refresh_saved',
+        authAccessTokenExpiresAtKey: now
+            .add(const Duration(minutes: 15))
+            .millisecondsSinceEpoch,
+        authRefreshTokenExpiresAtKey: now
+            .add(const Duration(days: 30))
+            .millisecondsSinceEpoch,
+        authUserIdKey: 'test_parent_13800002026',
+        authPhoneKey: '13800002026',
+      },
+      hasDevice: false,
+      seedTasks: false,
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.tap(find.text('我的').last);
+    await tester.pumpAndSettle();
+
+    await _openProfileNestedEntry(
+      tester,
+      'AI 规则与提醒',
+      '看护能力',
+      expectedTitle: '看护能力',
+      expectedTexts: const [
+        '未连接摄像头',
+        '坐姿提醒',
+        '玩具收纳',
+        '用餐开始提醒',
+        '用餐习惯提醒',
+        '午睡提醒',
+        '晚上入睡提醒',
+        '起床提醒',
+      ],
+      absentTexts: const ['还没有可用摄像头', '更多提醒能力', '后续开放'],
+    );
   });
 
   testWidgets('tasks screen adapts to common phone sizes', (tester) async {
@@ -1144,6 +1350,7 @@ Future<void> _openProfileNestedEntry(
   String label, {
   required String expectedTitle,
   List<String> expectedTexts = const [],
+  List<String> absentTexts = const [],
 }) async {
   final categoryEntry = find.text(category).last;
   await tester.scrollUntilVisible(categoryEntry, 420);
@@ -1162,6 +1369,9 @@ Future<void> _openProfileNestedEntry(
   expect(find.text(expectedTitle), findsWidgets);
   for (final text in expectedTexts) {
     expect(find.text(text), findsWidgets);
+  }
+  for (final text in absentTexts) {
+    expect(find.text(text), findsNothing);
   }
   expect(find.textContaining('backend'), findsNothing);
   expect(find.textContaining('API'), findsNothing);
@@ -1804,6 +2014,32 @@ class _FakeApiServer {
     }
     if (method == 'GET' && path.startsWith('/firmware/devices/')) {
       return _ok(options, _firmwareStatus());
+    }
+    if (method == 'GET' && path == '/care/capabilities') {
+      return _ok(options, {
+        'ok': true,
+        'childId': 'child_test',
+        'capabilities': _careCapabilities(),
+      });
+    }
+    if (method == 'GET' && path == '/care/routine-windows') {
+      final dayType = _text(options.queryParameters['dayType'], 'school_day');
+      return _ok(options, {
+        'ok': true,
+        'childId': 'child_test',
+        'dayType': dayType,
+        'windows': _routineWindows(dayType),
+      });
+    }
+    if (method == 'PUT' && path == '/care/routine-windows') {
+      final dayType = _text(options.queryParameters['dayType'], 'school_day');
+      final rawWindows = body['windows'];
+      return _ok(options, {
+        'ok': true,
+        'childId': 'child_test',
+        'dayType': dayType,
+        'windows': rawWindows is List ? rawWindows : _routineWindows(dayType),
+      });
     }
 
     return _notFound(options);
@@ -2852,6 +3088,41 @@ class _FakeApiServer {
     ];
   }
 
+  List<Map<String, dynamic>> _careCapabilities() {
+    const scenarios = [
+      ('posture', '坐姿提醒', ['posture']),
+      ('toy_cleanup', '玩具收纳', <String>[]),
+      ('meal_start', '用餐开始提醒', ['breakfast', 'lunch', 'dinner']),
+      ('meal_habit', '用餐习惯提醒', ['breakfast', 'lunch', 'dinner']),
+      ('nap_time', '午睡提醒', ['nap']),
+      ('bedtime', '晚上入睡提醒', ['bedtime']),
+      ('wake_up', '起床提醒', ['wake_up']),
+      ('transition', '转场提醒', ['transition']),
+    ];
+    return [
+      for (final item in scenarios)
+        {
+          'id': 'care_${item.$1}',
+          'childId': 'child_test',
+          'deviceId': 'device_test',
+          'scenario': item.$1,
+          'label': item.$2,
+          'enabled': true,
+          'dayTypes': ['school_day', 'weekend'],
+          'timeWindows': item.$3,
+          'minObservationSeconds': item.$1 == 'toy_cleanup' ? 180 : 30,
+          'observationThreshold': 0.72,
+          'cooldownSeconds': item.$1 == 'toy_cleanup' ? 1800 : 1200,
+          'dailyLimit': item.$1 == 'toy_cleanup' ? 3 : 4,
+          'parentNotifyThreshold': 2,
+          'allowSpeaker': true,
+          'recordOnly': false,
+          'lastRemindedAt': null,
+          'dailyReminderCount': 0,
+        },
+    ];
+  }
+
   Map<String, dynamic> _device([Map<String, dynamic>? body]) {
     return {
       'id': 'device_test',
@@ -2934,6 +3205,30 @@ class _FakeApiServer {
         'createdAt': _now,
         'payload': {},
       },
+    ];
+  }
+
+  List<Map<String, dynamic>> _routineWindows(String dayType) {
+    const rows = [
+      ('wake_up', '07:00', '07:40'),
+      ('breakfast', '07:30', '08:10'),
+      ('lunch', '11:40', '12:30'),
+      ('nap', '12:40', '14:20'),
+      ('dinner', '18:00', '19:00'),
+      ('bedtime', '20:30', '21:20'),
+    ];
+    return [
+      for (final row in rows)
+        {
+          'id': 'routine_${dayType}_${row.$1}',
+          'childId': 'child_test',
+          'dayType': dayType,
+          'windowType': row.$1,
+          'startTime': row.$2,
+          'endTime': row.$3,
+          'enabled': true,
+          'timezone': 'Asia/Shanghai',
+        },
     ];
   }
 

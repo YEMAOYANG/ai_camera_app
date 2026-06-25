@@ -156,7 +156,8 @@ class _EmptyRhythmPanel extends StatelessWidget {
                 child: _RhythmActionButton(
                   label: '选个模板',
                   icon: Icons.auto_awesome_motion_outlined,
-                  onTap: () => context.go(AppRoute.tasks.path),
+                  onTap: () =>
+                      context.go('${AppRoute.tasks.path}?open=templates'),
                 ),
               ),
             ],
