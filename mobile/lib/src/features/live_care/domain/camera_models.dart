@@ -75,7 +75,7 @@ class CameraRuntime {
   String get summary {
     if (!reachable) return message;
     if (voiceRunning) return '设备正在处理语音/看护运行状态，家长可稍后刷新查看。';
-    return '设备运行正常，基础看护状态已同步。';
+    return '设备可用，基础看护可以继续。';
   }
 
   static CameraRuntime fromJson(Map<String, dynamic> json) {
@@ -91,7 +91,7 @@ class CameraRuntime {
       voiceState: _asString(voice['state']),
       voiceRunning: voice['running'] == true,
       message: reachable
-          ? '运行状态已同步'
+          ? '运行状态可查看'
           : error.isNotEmpty
           ? error
           : '摄像头运行状态暂时不可用',
@@ -207,13 +207,13 @@ class CameraStatus {
       'connecting' => '正在连接',
       'error' => '连接异常',
       'offline' => '摄像头离线',
-      _ => '状态同步中',
+      _ => '状态检查中',
     };
   }
 
   String get summary {
     if (message.isNotEmpty) return message;
-    return isOnline ? '摄像头在线，最新状态已同步。' : '摄像头暂时离线，任务仍会按计划记录。';
+    return isOnline ? '摄像头在线，可以查看画面。' : '摄像头暂时离线，任务仍会按计划记录。';
   }
 
   static CameraStatus fromJson(Map<String, dynamic> json) {
@@ -296,7 +296,7 @@ class LiveCareStatus {
   bool get ptzAvailable => cameraStatus?.ptzAvailable ?? false;
 
   String get title {
-    return isAvailable ? '实时看护状态正常。' : '实时画面暂时不可用。';
+    return isAvailable ? '实时看护可用。' : '实时画面暂时不可用。';
   }
 
   String get detail {
@@ -312,6 +312,13 @@ class LiveCareEvent {
     required this.eventType,
     required this.title,
     required this.message,
+    required this.displayTitle,
+    required this.displayMessage,
+    required this.category,
+    required this.severity,
+    required this.taskTitle,
+    required this.evidenceSummary,
+    required this.hasReplay,
     required this.status,
     required this.toneKey,
     required this.createdAt,
@@ -322,9 +329,26 @@ class LiveCareEvent {
   final String eventType;
   final String title;
   final String message;
+  final String displayTitle;
+  final String displayMessage;
+  final String category;
+  final String severity;
+  final String taskTitle;
+  final String evidenceSummary;
+  final bool hasReplay;
   final String status;
   final String toneKey;
   final int createdAt;
+
+  bool get isCareRecord {
+    return switch (category) {
+      'camera_observation' ||
+      'child_presence' ||
+      'snapshot' ||
+      'camera_status' => true,
+      _ => false,
+    };
+  }
 
   StatusTone get tone {
     return switch (toneKey) {
@@ -358,6 +382,22 @@ class LiveCareEvent {
       eventType: _asString(json['eventType']),
       title: _asString(json['title'], fallback: '看护事件'),
       message: _asString(json['message']),
+      displayTitle: _asString(
+        json['displayTitle'],
+        fallback: _asString(json['title'], fallback: '看护记录'),
+      ),
+      displayMessage: _asString(
+        json['displayMessage'],
+        fallback: _asString(json['message']),
+      ),
+      category: _asString(json['category'], fallback: 'care_record'),
+      severity: _asString(
+        json['severity'],
+        fallback: _asString(json['tone'], fallback: 'info'),
+      ),
+      taskTitle: _asString(json['taskTitle']),
+      evidenceSummary: _asString(json['evidenceSummary']),
+      hasReplay: json['hasReplay'] == true,
       status: _asString(json['status']),
       toneKey: _asString(json['tone']),
       createdAt: _asNullableInt(json['createdAt']) ?? 0,
@@ -383,16 +423,65 @@ String _asString(dynamic value, {String fallback = ''}) {
 }
 
 String _observationSummary(dynamic value) {
-  if (value is String && value.isNotEmpty) return value;
+  if (value is String && value.isNotEmpty) {
+    return _sanitizeObservationText(value);
+  }
   final data = _asMap(value);
   if (data.isEmpty) return '';
-  final activity = _asString(data['activity']);
-  final hasPerson = data['has_person'] == true;
-  if (activity.isNotEmpty && hasPerson) return '画面记录到孩子正在进行：$activity';
-  if (activity.isNotEmpty) return '画面记录到：$activity';
-  if (hasPerson) return '画面记录到孩子在看护区域内。';
+  final activity = _normalizeActivityLabel(
+    _asString(data['activity'] ?? data['raw_activity']),
+  );
+  final hasPersonValue = data['has_person'] ?? data['hasPerson'];
+  final hasPerson = hasPersonValue == true;
+  final isReliable = data['isReliable'];
+  if (isReliable == false) {
+    if (hasPersonValue == false) return '暂时没在画面里看到孩子。';
+    return '';
+  }
+  final summary = _sanitizeObservationText(_asString(data['summary']));
+  if (isReliable == true && summary.isNotEmpty) return summary;
+  if (activity.isNotEmpty && hasPerson) {
+    return '看到孩子在$activity。';
+  }
+  if (activity.isNotEmpty) return '画面里看到$activity。';
+  if (hasPersonValue == false) return '暂时没在画面里看到孩子。';
   return '';
 }
+
+const _genericActivityLabels = {'其他', '未知', '无明显活动', 'other', 'unknown'};
+
+String _normalizeActivityLabel(String activity) {
+  final trimmed = activity.trim();
+  if (trimmed.isEmpty) return '';
+  if (_genericActivityLabels.contains(trimmed)) return '';
+  if (_genericActivityLabels.contains(trimmed.toLowerCase())) return '';
+  return trimmed;
+}
+
+String _sanitizeObservationText(String text) {
+  final trimmed = text.trim();
+  if (trimmed.isEmpty) return '';
+  if (_weakPresenceObservationTexts.contains(trimmed)) return '';
+  for (final generic in _genericActivityLabels) {
+    if (trimmed.endsWith('：$generic') || trimmed.endsWith(': $generic')) {
+      return '';
+    }
+  }
+  if (trimmed.startsWith('画面记录到孩子正在进行：')) {
+    final activity = trimmed.replaceFirst('画面记录到孩子正在进行：', '');
+    final normalized = _normalizeActivityLabel(activity);
+    if (normalized.isEmpty) return '';
+    return '看到孩子在$normalized。';
+  }
+  return trimmed;
+}
+
+const _weakPresenceObservationTexts = {
+  '看到孩子在画面里。',
+  '看到孩子在画面里',
+  '画面里看到孩子。',
+  '画面里看到孩子',
+};
 
 int? _asNullableInt(dynamic value) {
   if (value == null) return null;

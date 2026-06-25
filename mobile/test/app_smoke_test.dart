@@ -10,12 +10,14 @@ import 'package:guardian_parent_app/src/core/network/api_client.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
 import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
 import 'package:guardian_parent_app/src/core/storage/setup_store.dart';
+import 'package:guardian_parent_app/src/features/devices/application/camera_discovery_adapter.dart';
 import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
 import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
 import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
 import 'package:guardian_parent_app/src/features/live_care/presentation/live_care_screen.dart';
 import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
+import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -157,7 +159,8 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('登录家庭看护空间'), findsNothing);
-    expect(find.textContaining('需要你处理'), findsOneWidget);
+    expect(find.text('今日节奏'), findsOneWidget);
+    expect(find.text('当前没有需要你处理的事'), findsNothing);
     expect(
       tester.getSize(find.byKey(const ValueKey('bottomNavAddAction'))),
       const Size(44, 44),
@@ -189,9 +192,83 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('登录家庭看护空间'), findsNothing);
-    expect(find.text('还没有连接看护摄像头'), findsWidgets);
-    expect(find.text('连接第一台看护摄像头'), findsOneWidget);
+    expect(find.text('还没有连接摄像头'), findsWidgets);
+    expect(find.text('摄像头还没连接'), findsOneWidget);
+    expect(find.text('连接'), findsOneWidget);
+    expect(find.text('连接第一台看护摄像头'), findsNothing);
   });
+
+  testWidgets(
+    'empty home without tasks or camera has one gentle camera entry',
+    (tester) async {
+      final now = DateTime.now();
+      await _pumpApp(
+        tester,
+        preferences: {
+          hasSeenOnboardingKey: true,
+          hasCompletedInitialSetupKey: true,
+          authAccessTokenKey: 'test_access_saved',
+          authRefreshTokenKey: 'test_refresh_saved',
+          authAccessTokenExpiresAtKey: now
+              .add(const Duration(minutes: 15))
+              .millisecondsSinceEpoch,
+          authRefreshTokenExpiresAtKey: now
+              .add(const Duration(days: 30))
+              .millisecondsSinceEpoch,
+          authUserIdKey: 'test_parent_13800002026',
+          authPhoneKey: '13800002026',
+        },
+        hasDevice: false,
+        seedTasks: false,
+      );
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.text('今日安排'), findsOneWidget);
+      expect(find.text('今天还没有安排'), findsOneWidget);
+      expect(find.text('添加安排'), findsOneWidget);
+      expect(find.text('选个模板'), findsOneWidget);
+      expect(find.text('连接看护摄像头'), findsOneWidget);
+      expect(find.text('查看全部'), findsNothing);
+      expect(find.text('连接第一台看护摄像头'), findsNothing);
+      expect(find.text('还没有连接看护摄像头'), findsNothing);
+      expect(find.text('需要你处理'), findsNothing);
+      expect(find.text('当前没有需要你处理的事'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'empty home with camera keeps plan empty state without camera CTA',
+    (tester) async {
+      final now = DateTime.now();
+      await _pumpApp(
+        tester,
+        preferences: {
+          hasSeenOnboardingKey: true,
+          hasCompletedInitialSetupKey: true,
+          authAccessTokenKey: 'test_access_saved',
+          authRefreshTokenKey: 'test_refresh_saved',
+          authAccessTokenExpiresAtKey: now
+              .add(const Duration(minutes: 15))
+              .millisecondsSinceEpoch,
+          authRefreshTokenExpiresAtKey: now
+              .add(const Duration(days: 30))
+              .millisecondsSinceEpoch,
+          authUserIdKey: 'test_parent_13800002026',
+          authPhoneKey: '13800002026',
+        },
+        hasDevice: true,
+        seedTasks: false,
+      );
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.text('今日安排'), findsOneWidget);
+      expect(find.text('今天还没有安排'), findsOneWidget);
+      expect(find.text('添加安排'), findsOneWidget);
+      expect(find.text('选个模板'), findsOneWidget);
+      expect(find.text('连接看护摄像头'), findsNothing);
+      expect(find.text('查看全部'), findsNothing);
+    },
+  );
 
   testWidgets('camera management is a direct profile entry without care rows', (
     tester,
@@ -361,31 +438,34 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
 
-    expect(find.text('家庭看护'), findsOneWidget);
+    expect(find.text('还没有连接摄像头'), findsWidgets);
     expect(_lastSetupChildBody?['educationStage'], '幼儿园');
     expect(_lastSetupChildBody?['ageStage'], '幼儿园 中班');
     expect(_lastSetupChildBody?['grade'], '中班');
-    expect(find.text('还没有连接看护摄像头'), findsWidgets);
-    expect(find.text('连接第一台看护摄像头'), findsOneWidget);
-    expect(find.text('基础设置已完成'), findsOneWidget);
-    expect(find.text('确认与奖励'), findsOneWidget);
+    expect(find.text('连接第一台看护摄像头'), findsNothing);
+    expect(find.text('摄像头还没连接'), findsOneWidget);
+    expect(find.text('今日节奏'), findsOneWidget);
+    expect(find.text('米拉怎么说'), findsNothing);
     expect(find.textContaining('bindingCode'), findsNothing);
     expect(find.textContaining('mock'), findsNothing);
 
-    await tester.tap(find.text('连接第一台看护摄像头'));
-    await tester.pump(const Duration(milliseconds: 700));
+    showAddCameraSheet(tester.element(find.text('摄像头还没连接')));
+    await tester.pump(const Duration(seconds: 1));
     await tester.pump();
 
     expect(find.text('添加摄像头'), findsNothing);
-    expect(find.text('搜索附近摄像头'), findsOneWidget);
-    expect(find.text('连接帮助'), findsOneWidget);
+    final cameraSheetIsOpen =
+        find.text('正在搜索附近摄像头').evaluate().isNotEmpty ||
+        find.text('发现附近摄像头').evaluate().isNotEmpty;
+    expect(cameraSheetIsOpen, isTrue);
+    expect(find.text('查看帮助'), findsNothing);
     expect(find.text('开始发现'), findsNothing);
     expect(find.text('继续发现'), findsNothing);
 
     await tester.pump(const Duration(milliseconds: 1900));
     await tester.pump();
 
-    expect(find.text('发现 3 台附近摄像头'), findsOneWidget);
+    expect(find.text('发现附近摄像头'), findsOneWidget);
     expect(find.text('儿童房摄像头'), findsOneWidget);
     expect(find.text('客厅摄像头'), findsOneWidget);
     expect(find.text('餐厅摄像头'), findsOneWidget);
@@ -393,8 +473,8 @@ void main() {
       find.byKey(const ValueKey('discoveredCamera_nearby-living-room')),
     );
     await tester.pump();
-    expect(find.text('连接'), findsOneWidget);
-    await tester.tap(find.text('连接'));
+    expect(find.text('连接'), findsWidgets);
+    await tester.tap(find.text('连接').last);
     await tester.pumpAndSettle();
 
     expect(find.text('摄像头已连接'), findsWidgets);
@@ -461,8 +541,8 @@ void main() {
 
     await _loginSuccessfully(tester);
 
-    expect(find.text('家庭看护'), findsOneWidget);
-    expect(find.textContaining('需要你处理'), findsOneWidget);
+    expect(find.text('今日节奏'), findsOneWidget);
+    expect(find.text('当前没有需要你处理的事'), findsNothing);
 
     await tester.tap(find.text('任务').last);
     await tester.pumpAndSettle();
@@ -482,6 +562,11 @@ void main() {
     await tester.tap(find.text('看护').last);
     await tester.pumpAndSettle();
     expect(find.text('实时看护'), findsOneWidget);
+    expect(find.text('最近记录'), findsOneWidget);
+    expect(find.textContaining('还没看到孩子开始'), findsWidgets);
+    expect(find.textContaining('任务事件'), findsNothing);
+    expect(find.textContaining('已执行'), findsNothing);
+    expect(find.textContaining('开始观察'), findsNothing);
 
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
@@ -1102,6 +1187,7 @@ Future<void> _pumpApp(
   double devicePixelRatio = 3,
   bool hasDevice = false,
   bool failTaskTemplates = false,
+  bool seedTasks = true,
 }) async {
   tester.view
     ..physicalSize = logicalSize * devicePixelRatio
@@ -1117,6 +1203,7 @@ Future<void> _pumpApp(
     completedSetup: preferences[hasCompletedInitialSetupKey] == true,
     hasDevice: hasDevice,
     failTaskTemplates: failTaskTemplates,
+    seedTasks: seedTasks,
   );
   final fakeDio = fakeApi.dio;
 
@@ -1125,6 +1212,12 @@ Future<void> _pumpApp(
       overrides: [
         appEnvironmentProvider.overrideWithValue(
           const AppEnvironment(flavor: AppFlavor.test, apiBaseUrl: ''),
+        ),
+        cameraDiscoveryConfigProvider.overrideWithValue(
+          const CameraDiscoveryConfig(
+            backend: CameraDiscoveryBackend.mock,
+            allowBleFallbackToMock: false,
+          ),
         ),
         rawDioProvider.overrideWithValue(fakeDio),
         dioProvider.overrideWithValue(fakeDio),
@@ -1266,39 +1359,43 @@ class _FakeApiServer {
     required this._completedSetup,
     required this._hasDevice,
     this.failTaskTemplates = false,
+    this.seedTasks = true,
   }) {
     _lastSetupChildBody = null;
     _lastBoundDeviceBody = null;
     _cameraHealthRequestCount = 0;
     _cameraStatusRequestCount = 0;
     _cameraSnapshotRequestCount = 0;
-    _tasks.addAll([
-      _task(
-        id: 'task_outdoor_play',
-        title: '户外活动',
-        description: '放学后户外走走，结束后喝水休息。',
-        type: 'sports_outdoor',
-        status: 'in_progress',
-        scheduledStart: '17:20',
-        scheduledEnd: '17:50',
-        rewardPoints: 1,
-      ),
-      _task(
-        id: 'task_bedtime_story',
-        title: '睡前绘本',
-        description: '睡前读一本绘本，完成后由家长确认。',
-        type: 'reading_interest',
-        status: 'awaiting_parent_confirmation',
-        scheduledStart: '20:30',
-        scheduledEnd: '20:50',
-        rewardPoints: 2,
-        evidenceSummary: '孩子已经完成睡前阅读，等待你确认。',
-      ),
-    ]);
+    if (seedTasks) {
+      _tasks.addAll([
+        _task(
+          id: 'task_outdoor_play',
+          title: '户外活动',
+          description: '放学后户外走走，结束后喝水休息。',
+          type: 'sports_outdoor',
+          status: 'in_progress',
+          scheduledStart: '17:20',
+          scheduledEnd: '17:50',
+          rewardPoints: 1,
+        ),
+        _task(
+          id: 'task_bedtime_story',
+          title: '睡前绘本',
+          description: '睡前读一本绘本，完成后由家长确认。',
+          type: 'reading_interest',
+          status: 'awaiting_parent_confirmation',
+          scheduledStart: '20:30',
+          scheduledEnd: '20:50',
+          rewardPoints: 2,
+          evidenceSummary: '孩子已经完成睡前阅读，等待你确认。',
+        ),
+      ]);
+    }
   }
 
   final bool _completedSetup;
   final bool failTaskTemplates;
+  final bool seedTasks;
   bool _hasDevice;
   int _taskCounter = 0;
   String _relationship = '妈妈';
@@ -1645,9 +1742,11 @@ class _FakeApiServer {
       return _ok(options, {'ok': true, 'device': _device(body)});
     }
     if (method == 'POST' && path.endsWith('/unbind')) {
+      _hasDevice = false;
       return _ok(options, {
         'ok': true,
         'device': {..._device(), 'status': 'unbound', 'unboundAt': _now},
+        'defaultDevice': null,
       });
     }
 
@@ -1669,6 +1768,9 @@ class _FakeApiServer {
       return _ok(options, {'ok': true, 'status': _cameraStatus()});
     }
     if (method == 'GET' && path == '/camera/monitor/status') {
+      return _ok(options, {'ok': true, 'monitor': _monitorStatus()});
+    }
+    if (method == 'POST' && path == '/camera/monitor/refresh') {
       return _ok(options, {'ok': true, 'monitor': _monitorStatus()});
     }
     if (method == 'GET' && path == '/camera/events') {
@@ -1694,7 +1796,7 @@ class _FakeApiServer {
           'commandId': 'cmd_ptz',
           'commandType': 'ptz_move',
           'status': 'succeeded',
-          'message': '已执行',
+          'message': '操作已完成',
           'createdAt': _now,
           'updatedAt': _now,
         },
@@ -1726,12 +1828,24 @@ class _FakeApiServer {
       });
     }
     if (action == 'complete') {
-      task['status'] = 'awaiting_parent_confirmation';
+      final completionSource = _text(body['completionSource'], 'parent');
+      task['completionSource'] = completionSource;
+      task['status'] = completionSource == 'parent_manual'
+          ? 'completed'
+          : 'awaiting_parent_confirmation';
       task['completedAt'] = _now;
       task['evidenceSummary'] = _text(
         body['evidenceSummary'],
         '孩子已经完成任务，等待你确认。',
       );
+      if (completionSource == 'parent_manual') {
+        task['pointsGrantedAt'] = null;
+      }
+      return _ok(options, {'ok': true, 'task': task});
+    }
+    if (action == 'acknowledge-missed') {
+      task['status'] = 'missed';
+      task['parentActions'] = <Object>[];
       return _ok(options, {'ok': true, 'task': task});
     }
     if (action == 'parent-confirm') {
@@ -2604,6 +2718,13 @@ class _FakeApiServer {
       'confirmedAt': null,
       'rejectedAt': null,
       'pointsGrantedAt': null,
+      'parentActions': status == 'missed'
+          ? [
+              {'value': 'reschedule', 'label': '重新安排'},
+              {'value': 'manual_complete', 'label': '手动标记完成'},
+              {'value': 'acknowledge_missed', 'label': '不处理'},
+            ]
+          : [],
     };
   }
 
@@ -2798,23 +2919,19 @@ class _FakeApiServer {
       {
         'id': 'evt_camera_1',
         'source': 'task_event',
-        'eventType': 'camera_observation',
-        'title': '看护记录',
-        'message': '画面记录到孩子在书桌前。',
+        'eventType': 'child_not_ready',
+        'title': '还没看到孩子开始',
+        'message': '暂时还不能确认孩子已经开始。',
+        'displayTitle': '还没看到孩子开始',
+        'displayMessage': '暂时还不能确认孩子已经开始。',
+        'category': 'camera_observation',
+        'severity': 'warning',
+        'taskTitle': '睡前阅读',
+        'evidenceSummary': '未看到对应动作',
+        'hasReplay': false,
         'status': 'recorded',
-        'tone': 'info',
+        'tone': 'warning',
         'createdAt': _now,
-        'payload': {},
-      },
-      {
-        'id': 'cmd_ptz_1',
-        'source': 'camera_command',
-        'eventType': 'ptz_move',
-        'title': '云台控制',
-        'message': '左移 · 已执行',
-        'status': 'succeeded',
-        'tone': 'success',
-        'createdAt': _now - 60000,
         'payload': {},
       },
     ];

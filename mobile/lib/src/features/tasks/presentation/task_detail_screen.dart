@@ -303,6 +303,38 @@ class _TaskHeroActions extends StatelessWidget {
           ),
         );
       }
+    } else if (task.status == GuardianTaskStatus.missed ||
+        task.status == GuardianTaskStatus.expired) {
+      if (canManageTasks && task.hasParentAction('reschedule')) {
+        actions.add(
+          _HeroActionData(
+            label: '重新安排',
+            icon: Icons.event_repeat_outlined,
+            tone: _HeroActionTone.primary,
+            onTap: () => _rescheduleMissedTask(context, ref, task),
+          ),
+        );
+      }
+      if (canConfirmTasks && task.hasParentAction('manual_complete')) {
+        actions.add(
+          _HeroActionData(
+            label: '手动标记完成',
+            icon: Icons.task_alt_outlined,
+            tone: _HeroActionTone.secondary,
+            onTap: () => _completeMissedTaskManually(context, ref, task),
+          ),
+        );
+      }
+      if (canConfirmTasks && task.hasParentAction('acknowledge_missed')) {
+        actions.add(
+          _HeroActionData(
+            label: '不处理',
+            icon: Icons.visibility_off_outlined,
+            tone: _HeroActionTone.secondary,
+            onTap: () => _acknowledgeMissedTask(context, ref, task),
+          ),
+        );
+      }
     } else if (canEditSchedule && canManageTasks) {
       actions.add(
         _HeroActionData(
@@ -326,19 +358,64 @@ class _TaskHeroActions extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 14),
-        Row(
-          children: [
-            for (
-              var index = 0;
-              index < actions.length && index < 2;
-              index++
-            ) ...[
-              if (index > 0) const SizedBox(width: 10),
-              Expanded(child: _HeroActionButton(data: actions[index])),
-            ],
-          ],
-        ),
+        _HeroActionLayout(actions: actions),
       ],
+    );
+  }
+}
+
+class _HeroActionLayout extends StatelessWidget {
+  const _HeroActionLayout({required this.actions});
+
+  final List<_HeroActionData> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    if (actions.length == 1) {
+      return _HeroActionButton(data: actions.single);
+    }
+
+    if (actions.length == 2) {
+      return Row(
+        children: [
+          Expanded(child: _HeroActionButton(data: actions[0])),
+          const SizedBox(width: 10),
+          Expanded(child: _HeroActionButton(data: actions[1])),
+        ],
+      );
+    }
+
+    if (actions.length == 3) {
+      return Column(
+        children: [
+          _HeroActionButton(data: actions[0]),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(child: _HeroActionButton(data: actions[1])),
+              const SizedBox(width: 10),
+              Expanded(child: _HeroActionButton(data: actions[2])),
+            ],
+          ),
+        ],
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final itemWidth = (constraints.maxWidth - 10) / 2;
+        return Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (final action in actions)
+              SizedBox(
+                width: itemWidth,
+                child: _HeroActionButton(data: action),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -632,7 +709,7 @@ String _heroTitle(GuardianTask task) {
     GuardianTaskStatus.awaitingParentConfirmation => '等待你确认',
     GuardianTaskStatus.completed || GuardianTaskStatus.confirmed => '已完成',
     GuardianTaskStatus.rejected => '已驳回',
-    GuardianTaskStatus.missed || GuardianTaskStatus.expired => '已错过',
+    GuardianTaskStatus.missed || GuardianTaskStatus.expired => '未完成',
     GuardianTaskStatus.cancelled => '已取消',
   };
 }
@@ -647,14 +724,14 @@ String _heroDescription(GuardianTask task) {
           ? '正在记录任务状态，完成后会进入确认。'
           : '正在记录任务状态，结束后会进入记录。',
     GuardianTaskStatus.delayed => '已提醒孩子开始，可以稍后再看或手动处理。',
-    GuardianTaskStatus.awaitingParentConfirmation => '任务时间已结束，请确认孩子是否完成。',
+    GuardianTaskStatus.awaitingParentConfirmation => '请确认孩子这次是否完成。',
     GuardianTaskStatus.completed || GuardianTaskStatus.confirmed =>
       task.pointsGrantedAt != null && task.rewardPoints > 0
           ? '已确认完成并发放积分。'
           : '任务已完成并进入记录。',
     GuardianTaskStatus.rejected => '本次任务未通过确认，未发放积分。',
     GuardianTaskStatus.missed ||
-    GuardianTaskStatus.expired => '任务时间已过，本次未记录完成。',
+    GuardianTaskStatus.expired => '本次没有看到完成结果，可以重新安排、手动记录或不处理。',
     GuardianTaskStatus.cancelled => '任务已取消，记录仍会保留。',
   };
 }
@@ -675,7 +752,7 @@ IconData _heroInsightIcon(GuardianTask task) {
 
 String _heroInsightTitle(GuardianTask task) {
   return switch (task.status) {
-    GuardianTaskStatus.awaitingParentConfirmation => '观察摘要',
+    GuardianTaskStatus.awaitingParentConfirmation => '看护记录',
     GuardianTaskStatus.completed || GuardianTaskStatus.confirmed => '完成记录',
     GuardianTaskStatus.rejected => '驳回原因',
     GuardianTaskStatus.inProgress => '当前观察',
@@ -721,7 +798,7 @@ String _heroInsightBody(GuardianTask task) {
   }
   if (task.status == GuardianTaskStatus.missed ||
       task.status == GuardianTaskStatus.expired) {
-    return '任务时间已过，本次没有记录到完成结果。';
+    return '本次没有看到完成结果，可以重新安排、手动记录或不处理。';
   }
   return _timeUntilStartLabel(task);
 }
@@ -836,6 +913,91 @@ Future<void> _editTask(
     _invalidateTaskData(ref, task.id);
     if (context.mounted) _showToast(context, '安排已更新');
   }
+}
+
+Future<void> _rescheduleMissedTask(
+  BuildContext context,
+  WidgetRef ref,
+  GuardianTask task,
+) async {
+  final savedDate = await showTaskFormSheet(
+    context,
+    childId: task.childId,
+    initialDate: _nextScheduleDateForTask(task),
+    childAgeGroup: TaskAgeGroup.preschool,
+    prefillTask: task,
+  );
+
+  if (savedDate != null) {
+    _invalidateTaskData(ref, task.id);
+    if (context.mounted) _showToast(context, '已重新安排');
+  }
+}
+
+Future<void> _completeMissedTaskManually(
+  BuildContext context,
+  WidgetRef ref,
+  GuardianTask task,
+) async {
+  final confirmed = await showAppConfirmSheet(
+    context: context,
+    title: '手动标记完成',
+    message: '如果孩子实际完成了，可以手动记录。这次不会发放积分，也不会写成摄像头确认。',
+    confirmLabel: '确认记录',
+    cancelLabel: '先不记录',
+  );
+  if (!confirmed) return;
+
+  try {
+    await ref
+        .read(taskRepositoryProvider)
+        .completeTask(
+          task.id,
+          evidenceSummary: '家长手动记录完成，未发放积分。',
+          completionSource: 'parent_manual',
+        );
+    _invalidateTaskData(ref, task.id);
+    ref.invalidate(pointsSummaryProvider);
+    if (context.mounted) _showToast(context, '已手动记录完成，未发放积分');
+  } on TaskException catch (error) {
+    if (context.mounted) _showToast(context, error.message);
+  }
+}
+
+Future<void> _acknowledgeMissedTask(
+  BuildContext context,
+  WidgetRef ref,
+  GuardianTask task,
+) async {
+  final confirmed = await showAppConfirmSheet(
+    context: context,
+    title: '不处理这次安排',
+    message: '这次会保留为未完成，不发放积分，也不会再在首页提醒。',
+    confirmLabel: '不处理',
+    cancelLabel: '返回',
+  );
+  if (!confirmed) return;
+
+  try {
+    await ref.read(taskRepositoryProvider).acknowledgeMissedTask(task.id);
+    _invalidateTaskData(ref, task.id);
+    if (context.mounted) _showToast(context, '已选择不处理');
+  } on TaskException catch (error) {
+    if (context.mounted) _showToast(context, error.message);
+  }
+}
+
+DateTime _nextScheduleDateForTask(GuardianTask task) {
+  final base = DateTime.tryParse(task.scheduledDate) ?? DateTime.now();
+  final today = DateTime.now();
+  final start = DateTime.tryParse(
+    '${task.scheduledDate}T${task.scheduledStart}:00',
+  );
+  if (start != null && start.isAfter(today)) {
+    return DateTime(base.year, base.month, base.day);
+  }
+  final next = today.add(const Duration(days: 1));
+  return DateTime(next.year, next.month, next.day);
 }
 
 Future<void> _cancelTask(

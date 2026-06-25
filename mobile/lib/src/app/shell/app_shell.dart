@@ -8,8 +8,10 @@ import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/app/router/app_router.dart';
 import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
 import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
+import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/application/task_realtime_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
 import 'package:guardian_parent_app/src/features/tasks/presentation/tasks_screen.dart';
@@ -28,8 +30,8 @@ class AppShell extends ConsumerWidget {
       next,
     ) {
       final event = next.asData?.value;
-      if (event == null || !event.isTaskUpdate) return;
-      _handleTaskRealtimeEvent(ref, event);
+      if (event == null) return;
+      _handleRealtimeEvent(ref, event);
     });
 
     final location = GoRouterState.of(context).uri.path;
@@ -178,6 +180,21 @@ class AppShell extends ConsumerWidget {
       );
   }
 
+  void _handleRealtimeEvent(WidgetRef ref, TaskRealtimeEvent event) {
+    if (event.isTaskUpdate || event.isTaskStatusChanged) {
+      _handleTaskRealtimeEvent(ref, event);
+    }
+    if (event.isCameraObservationUpdated) {
+      _handleCameraObservationRealtimeEvent(ref);
+    }
+    if (event.isCameraEventCreated) {
+      _handleCameraEventRealtimeEvent(ref);
+    }
+    if (event.isCameraStatusChanged) {
+      _handleCameraStatusRealtimeEvent(ref);
+    }
+  }
+
   void _handleTaskRealtimeEvent(WidgetRef ref, TaskRealtimeEvent event) {
     ref
       ..invalidate(taskListProvider)
@@ -189,6 +206,27 @@ class AppShell extends ConsumerWidget {
         ..invalidate(taskDetailProvider(taskId))
         ..invalidate(taskEventsProvider(taskId));
     }
+  }
+
+  void _handleCameraObservationRealtimeEvent(WidgetRef ref) {
+    ref
+      ..invalidate(cameraMonitorStatusProvider)
+      ..invalidate(cameraEventsProvider)
+      ..invalidate(liveCareStatusProvider);
+  }
+
+  void _handleCameraEventRealtimeEvent(WidgetRef ref) {
+    ref
+      ..invalidate(cameraEventsProvider)
+      ..invalidate(liveCareStatusProvider);
+  }
+
+  void _handleCameraStatusRealtimeEvent(WidgetRef ref) {
+    ref
+      ..invalidate(cameraHealthProvider)
+      ..invalidate(cameraStatusProvider)
+      ..invalidate(cameraRuntimeProvider)
+      ..invalidate(primaryDeviceOverviewProvider);
   }
 }
 

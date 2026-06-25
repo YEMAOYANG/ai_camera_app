@@ -39,6 +39,7 @@ enum AddCameraFailureReason {
   networkSetupFailed,
   localNetworkPermissionDenied,
   livePreviewUnavailable,
+  hardwareProtocolUnavailable,
   unsupported,
   unknown,
 }
@@ -63,6 +64,15 @@ enum CameraDiscoveryPermissionIssue {
   locationForLegacyAndroid,
   unsupportedDevice,
 }
+
+enum CameraCandidateBindingState {
+  unknown,
+  available,
+  boundToThisFamily,
+  boundToAnotherFamily,
+}
+
+enum CameraDiscoveryCandidateSource { unknown, mock, ble, rtspDev }
 
 extension CameraDiscoveryPermissionStatusX on CameraDiscoveryPermissionStatus {
   bool get canStartDiscovery => this == CameraDiscoveryPermissionStatus.ready;
@@ -132,7 +142,10 @@ class DiscoveredCameraCandidate {
     required this.status,
     this.roomHint,
     this.isConnectable = true,
+    this.bindingState = CameraCandidateBindingState.unknown,
     this.unavailableReason,
+    this.ownerHint,
+    this.source = CameraDiscoveryCandidateSource.unknown,
   });
 
   final String id;
@@ -142,7 +155,20 @@ class DiscoveredCameraCandidate {
   final String status;
   final String? roomHint;
   final bool isConnectable;
+  final CameraCandidateBindingState bindingState;
   final String? unavailableReason;
+  final String? ownerHint;
+  final CameraDiscoveryCandidateSource source;
+
+  bool get isOwnedByAnotherFamily {
+    return bindingState == CameraCandidateBindingState.boundToAnotherFamily ||
+        status == 'bound_to_other_family' ||
+        status == 'already_bound';
+  }
+
+  bool get canSelect => isConnectable && !isOwnedByAnotherFamily;
+
+  String? get disabledReason => unavailableReason;
 
   int get signalBars => (signalStrength / 25).ceil().clamp(1, 4);
 
@@ -150,6 +176,34 @@ class DiscoveredCameraCandidate {
     if (signalStrength >= 80) return '信号很好';
     if (signalStrength >= 58) return '信号良好';
     return '信号一般';
+  }
+
+  DiscoveredCameraCandidate copyWith({
+    String? id,
+    String? displayName,
+    String? bindingCode,
+    int? signalStrength,
+    String? status,
+    String? roomHint,
+    bool? isConnectable,
+    CameraCandidateBindingState? bindingState,
+    String? unavailableReason,
+    String? ownerHint,
+    CameraDiscoveryCandidateSource? source,
+  }) {
+    return DiscoveredCameraCandidate(
+      id: id ?? this.id,
+      displayName: displayName ?? this.displayName,
+      bindingCode: bindingCode ?? this.bindingCode,
+      signalStrength: signalStrength ?? this.signalStrength,
+      status: status ?? this.status,
+      roomHint: roomHint ?? this.roomHint,
+      isConnectable: isConnectable ?? this.isConnectable,
+      bindingState: bindingState ?? this.bindingState,
+      unavailableReason: unavailableReason ?? this.unavailableReason,
+      ownerHint: ownerHint ?? this.ownerHint,
+      source: source ?? this.source,
+    );
   }
 }
 
@@ -201,6 +255,13 @@ class GuardianDevice {
       unboundAt: _asNullableInt(json['unboundAt']),
     );
   }
+}
+
+class DeviceUnbindResult {
+  const DeviceUnbindResult({required this.device, this.defaultDevice});
+
+  final GuardianDevice device;
+  final GuardianDevice? defaultDevice;
 }
 
 class GuardianDeviceStatus {

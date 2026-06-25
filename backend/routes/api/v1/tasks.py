@@ -88,6 +88,14 @@ def complete_task(task_id: str):
         return error_response(exc)
 
 
+@tasks_bp.post("/<task_id>/acknowledge-missed")
+def acknowledge_missed_task(task_id: str):
+    try:
+        return _task_response(task_service().acknowledge_missed_task(bearer_token(request), task_id))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @tasks_bp.post("/<task_id>/start")
 def start_task(task_id: str):
     try:

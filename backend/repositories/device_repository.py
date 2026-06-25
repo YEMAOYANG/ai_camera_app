@@ -83,7 +83,7 @@ class DeviceRepository:
                 FROM devices d
                 LEFT JOIN family_default_devices fdd
                   ON fdd.family_id = d.family_id AND fdd.device_id = d.id
-                WHERE d.family_id = ?
+                WHERE d.family_id = ? AND d.status <> 'unbound'
                 ORDER BY d.created_at DESC
                 """,
                 (family_id,),

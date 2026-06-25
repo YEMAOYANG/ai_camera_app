@@ -43,6 +43,7 @@ class DeviceRepository {
       if (raw is! List) return const [];
       return raw
           .map((device) => GuardianDevice.fromJson(_asMap(device)))
+          .where((device) => device.status != 'unbound')
           .toList();
     } on DioException catch (error) {
       throw _fromDio(error);
@@ -60,6 +61,7 @@ class DeviceRepository {
         signalStrength: 92,
         status: 'ready',
         roomHint: '儿童房',
+        source: CameraDiscoveryCandidateSource.mock,
       ),
       DiscoveredCameraCandidate(
         id: 'nearby-living-room',
@@ -68,6 +70,7 @@ class DeviceRepository {
         signalStrength: 76,
         status: 'ready',
         roomHint: '客厅',
+        source: CameraDiscoveryCandidateSource.mock,
       ),
       DiscoveredCameraCandidate(
         id: 'nearby-dining-room',
@@ -76,8 +79,49 @@ class DeviceRepository {
         signalStrength: 61,
         status: 'ready',
         roomHint: '餐厅',
+        source: CameraDiscoveryCandidateSource.mock,
       ),
     ];
+  }
+
+  Future<List<DiscoveredCameraCandidate>> discoveryStatuses(
+    List<DiscoveredCameraCandidate> candidates,
+  ) async {
+    if (candidates.isEmpty) return candidates;
+    final identifiable = candidates
+        .where((candidate) => !_usesEphemeralBleIdentifier(candidate))
+        .toList(growable: false);
+    if (identifiable.isEmpty) return candidates;
+    try {
+      final response = await _apiClient.post(
+        '/devices/discovery-status',
+        data: {
+          'candidates': [
+            for (final candidate in identifiable)
+              {'id': candidate.id, 'bindingCode': candidate.bindingCode},
+          ],
+        },
+      );
+      final raw = _asMap(response.data)['candidates'];
+      if (raw is! List) return candidates;
+      final statuses = <String, Map<String, dynamic>>{};
+      for (final item in raw) {
+        final map = _asMap(item);
+        final id = _string(map['id']);
+        final bindingCode = _string(map['bindingCode']);
+        if (id.isNotEmpty) statuses[id] = map;
+        if (bindingCode.isNotEmpty) statuses[bindingCode] = map;
+      }
+      return [
+        for (final candidate in candidates)
+          _mergeDiscoveryStatus(
+            candidate,
+            statuses[candidate.id] ?? statuses[candidate.bindingCode],
+          ),
+      ];
+    } on DioException {
+      return candidates;
+    }
   }
 
   Future<DeviceOverview?> primaryOverview() async {
@@ -175,10 +219,17 @@ class DeviceRepository {
     }
   }
 
-  Future<GuardianDevice> unbindDevice(String deviceId) async {
+  Future<DeviceUnbindResult> unbindDevice(String deviceId) async {
     try {
       final response = await _apiClient.post('/devices/$deviceId/unbind');
-      return GuardianDevice.fromJson(_asMap(_asMap(response.data)['device']));
+      final map = _asMap(response.data);
+      final defaultRaw = map['defaultDevice'];
+      return DeviceUnbindResult(
+        device: GuardianDevice.fromJson(_asMap(map['device'])),
+        defaultDevice: defaultRaw == null
+            ? null
+            : GuardianDevice.fromJson(_asMap(defaultRaw)),
+      );
     } on DioException catch (error) {
       throw _fromDio(error);
     }
@@ -215,4 +266,47 @@ Map<String, dynamic> _asMap(dynamic value) {
   if (value is Map<String, dynamic>) return value;
   if (value is Map) return Map<String, dynamic>.from(value);
   return <String, dynamic>{};
+}
+
+String _string(dynamic value) => value is String ? value : '';
+
+bool _usesEphemeralBleIdentifier(DiscoveredCameraCandidate candidate) {
+  return candidate.source == CameraDiscoveryCandidateSource.ble &&
+      candidate.bindingCode.startsWith('ble:');
+}
+
+DiscoveredCameraCandidate _mergeDiscoveryStatus(
+  DiscoveredCameraCandidate candidate,
+  Map<String, dynamic>? status,
+) {
+  if (status == null) return candidate;
+  final bindingState = _bindingStateFromString(_string(status['bindingState']));
+  final isConnectable = status['isConnectable'];
+  final disabledReason = _string(status['disabledReason']);
+  return candidate.copyWith(
+    status: bindingState == CameraCandidateBindingState.boundToAnotherFamily
+        ? 'bound_to_other_family'
+        : candidate.status,
+    bindingState: bindingState,
+    isConnectable: isConnectable is bool
+        ? isConnectable
+        : candidate.isConnectable,
+    unavailableReason: disabledReason.isNotEmpty
+        ? disabledReason
+        : candidate.unavailableReason,
+    ownerHint: _string(status['ownerHint']).isEmpty
+        ? candidate.ownerHint
+        : _string(status['ownerHint']),
+  );
+}
+
+CameraCandidateBindingState _bindingStateFromString(String value) {
+  return switch (value) {
+    'available' => CameraCandidateBindingState.available,
+    'boundToCurrentFamily' ||
+    'bound_to_current_family' => CameraCandidateBindingState.boundToThisFamily,
+    'boundToAnotherFamily' || 'bound_to_another_family' =>
+      CameraCandidateBindingState.boundToAnotherFamily,
+    _ => CameraCandidateBindingState.unknown,
+  };
 }

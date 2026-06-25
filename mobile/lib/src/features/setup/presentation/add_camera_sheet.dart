@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
@@ -25,6 +26,7 @@ const _fallbackNearbyCandidates = [
     bindingCode: kSetupDefaultBindingCode,
     signalStrength: 86,
     status: 'ready',
+    source: CameraDiscoveryCandidateSource.mock,
   ),
 ];
 
@@ -37,7 +39,7 @@ Future<bool?> showAddCameraSheet(
 }) {
   return showAppBottomSheet<bool>(
     context: context,
-    maxHeightFactor: 0.50,
+    maxHeightFactor: 0.74,
     child: AddCameraSheet(
       initialPhaseForTesting: initialPhaseForTesting,
       initialFailureReasonForTesting: initialFailureReasonForTesting,
@@ -66,7 +68,7 @@ class AddCameraSheet extends ConsumerStatefulWidget {
 }
 
 class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   CameraDiscoveryPhase _phase = CameraDiscoveryPhase.preparing;
   StreamSubscription<CameraDiscoveryResult>? _scanSubscription;
   var _connecting = false;
@@ -74,6 +76,7 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
   CameraDiscoveryPermissionStatus? _permissionStatus;
   List<DiscoveredCameraCandidate> _candidates = const [];
   String? _selectedCandidateId;
+  var _recheckDiscoveryOnResume = false;
   late final CameraDiscoveryRepository _discoveryRepository;
   late final AnimationController _foundEntryController;
   late final Animation<double> _foundFade;
@@ -82,6 +85,7 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _discoveryRepository = ref.read(cameraDiscoveryRepositoryProvider);
     _foundEntryController = AnimationController(
       vsync: this,
@@ -124,9 +128,19 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     unawaited(_stopScan());
     _foundEntryController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !_recheckDiscoveryOnResume) {
+      return;
+    }
+    _recheckDiscoveryOnResume = false;
+    unawaited(_prepareDiscovery());
   }
 
   void _goTo(
@@ -275,41 +289,55 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
   void _setCandidates(List<DiscoveredCameraCandidate> candidates) {
     final sorted = [...candidates]
       ..sort((a, b) {
-        if (a.isConnectable != b.isConnectable) {
-          return a.isConnectable ? -1 : 1;
+        if (a.canSelect != b.canSelect) {
+          return a.canSelect ? -1 : 1;
         }
         return b.signalStrength.compareTo(a.signalStrength);
       });
+    final previousSelection = _selectedCandidateId;
+    final previousStillAvailable = sorted.any(
+      (candidate) => candidate.id == previousSelection && candidate.canSelect,
+    );
+    final firstSelectable = _firstSelectable(sorted);
     setState(() {
       _candidates = sorted;
-      _selectedCandidateId = sorted.isEmpty ? null : sorted.first.id;
+      _selectedCandidateId = previousStillAvailable
+          ? previousSelection
+          : firstSelectable?.id;
     });
   }
 
   DiscoveredCameraCandidate? get _selectedCandidate {
     for (final candidate in _candidates) {
-      if (candidate.id == _selectedCandidateId) return candidate;
+      if (candidate.id == _selectedCandidateId && candidate.canSelect) {
+        return candidate;
+      }
     }
-    return _candidates.isEmpty ? null : _candidates.first;
+    return _firstSelectable(_candidates);
+  }
+
+  DiscoveredCameraCandidate? _firstSelectable(
+    List<DiscoveredCameraCandidate> candidates,
+  ) {
+    for (final candidate in candidates) {
+      if (candidate.canSelect) return candidate;
+    }
+    return null;
   }
 
   Future<void> _connectCamera() async {
     if (_connecting) return;
+    final candidate = _selectedCandidate;
+    if (candidate == null || !candidate.canSelect) {
+      showAppToast(context, '请选择一台可以连接的摄像头。');
+      return;
+    }
     setState(() {
       _phase = CameraDiscoveryPhase.connecting;
       _connecting = true;
     });
     await _stopScan();
     try {
-      final candidate = _selectedCandidate;
-      if (candidate == null) {
-        _goTo(
-          CameraDiscoveryPhase.notFound,
-          failureReason: AddCameraFailureReason.timeout,
-        );
-        setState(() => _connecting = false);
-        return;
-      }
       final device = await _discoveryRepository.connectDiscoveredCamera(
         candidate,
       );
@@ -331,6 +359,16 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
       );
     } on DeviceException catch (error) {
       if (!mounted) return;
+      if (_isAlreadyBoundError(error)) {
+        _markCandidateAsBoundToAnotherFamily(candidate.id);
+        setState(() {
+          _phase = CameraDiscoveryPhase.found;
+          _failureReason = AddCameraFailureReason.alreadyBound;
+          _connecting = false;
+        });
+        showAppToast(context, '这台摄像头已被其他家庭绑定。');
+        return;
+      }
       setState(() {
         _phase = _phaseForDeviceError(error);
         _failureReason = _failureReasonForDeviceError(error);
@@ -348,6 +386,32 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
     }
   }
 
+  bool _isAlreadyBoundError(DeviceException error) {
+    return switch (error.code) {
+      'already_bound' ||
+      'device_already_bound' ||
+      'binding_code_already_bound' ||
+      'binding_code_in_use' => true,
+      _ => false,
+    };
+  }
+
+  void _markCandidateAsBoundToAnotherFamily(String candidateId) {
+    _setCandidates(
+      _candidates
+          .map((candidate) {
+            if (candidate.id != candidateId) return candidate;
+            return candidate.copyWith(
+              status: 'bound_to_other_family',
+              isConnectable: false,
+              bindingState: CameraCandidateBindingState.boundToAnotherFamily,
+              unavailableReason: '已被其他家庭绑定',
+            );
+          })
+          .toList(growable: false),
+    );
+  }
+
   CameraDiscoveryPhase _phaseForDeviceError(DeviceException error) {
     return switch (error.code) {
       'already_bound' ||
@@ -358,7 +422,8 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
       'wifi_setup_failed' => CameraDiscoveryPhase.networkSetupFailed,
       'bluetooth_unavailable' => CameraDiscoveryPhase.bluetoothOff,
       'permission_denied' => CameraDiscoveryPhase.permissionRequired,
-      'ble_adapter_unavailable' => CameraDiscoveryPhase.connectionFailed,
+      'ble_adapter_unavailable' ||
+      'ble_protocol_unavailable' => CameraDiscoveryPhase.connectionFailed,
       _ => CameraDiscoveryPhase.connectionFailed,
     };
   }
@@ -374,12 +439,10 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
       'bluetooth_unavailable' => AddCameraFailureReason.bluetoothUnavailable,
       'permission_denied' => AddCameraFailureReason.permissionDenied,
       'ble_adapter_unavailable' => AddCameraFailureReason.bleAdapterUnavailable,
+      'ble_protocol_unavailable' =>
+        AddCameraFailureReason.hardwareProtocolUnavailable,
       _ => AddCameraFailureReason.connectionLost,
     };
-  }
-
-  void _showConnectionHelp() {
-    showAppToast(context, '请确认摄像头已开机，并靠近手机。');
   }
 
   void _close({bool success = false}) {
@@ -388,56 +451,156 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
   }
 
   Future<void> _openSystemSettings() async {
+    _recheckDiscoveryOnResume = true;
     await _discoveryRepository.openSystemSettings();
     if (!mounted) return;
     showAppToast(context, '请在系统设置中允许后再试。');
   }
 
+  Future<void> _openBluetoothSettings() async {
+    _recheckDiscoveryOnResume = true;
+    await _discoveryRepository.openBluetoothSettings();
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
-    final bodyHeight = (screenHeight < 740 ? 162.0 : 190.0).clamp(150.0, 220.0);
+    final isAndroid = defaultTargetPlatform == TargetPlatform.android;
+    final footer = _hasFooterForPhase(_phase)
+        ? KeyedSubtree(
+            key: const ValueKey('add_camera_sheet_footer'),
+            child: _SheetActions(
+              phase: _phase,
+              permissionStatus: _permissionStatus,
+              selectedCandidate: _selectedCandidate,
+              hasConnectableCandidate: _candidates.any(
+                (candidate) => candidate.canSelect,
+              ),
+              isAndroid: isAndroid,
+              onConnect: _connectCamera,
+              onRetry: () => unawaited(_prepareDiscovery()),
+              onRequestPermissions: () =>
+                  unawaited(_prepareDiscovery(requestPermissions: true)),
+              onOpenSettings: () => unawaited(_openSystemSettings()),
+              onOpenBluetoothSettings: () =>
+                  unawaited(_openBluetoothSettings()),
+              onFinish: () => _close(success: true),
+              onCancel: () => _close(),
+            ),
+          )
+        : null;
 
-    return AppBottomSheetBody(
-      title: _sheetTitle(_phase, _candidates, _permissionStatus),
-      subtitle: _sheetSubtitle(_phase, _permissionStatus),
-      scrollable: false,
-      footer: _SheetActions(
-        phase: _phase,
-        permissionStatus: _permissionStatus,
-        selectedCandidate: _selectedCandidate,
-        onConnect: _connectCamera,
-        onRetry: () => unawaited(_prepareDiscovery()),
-        onRequestPermissions: () =>
-            unawaited(_prepareDiscovery(requestPermissions: true)),
-        onOpenSettings: () => unawaited(_openSystemSettings()),
-        onFinish: () => _close(success: true),
-        onCancel: () => _close(),
-        onHelp: _showConnectionHelp,
-      ),
+    return AnimatedSize(
+      duration: AppMotion.duration(context, 180),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.bottomCenter,
       child: SizedBox(
-        height: bodyHeight,
-        child: AnimatedSwitcher(
-          duration: AppMotion.duration(context, 220),
-          switchInCurve: Curves.easeOutCubic,
-          switchOutCurve: Curves.easeInCubic,
-          child: _SheetBody(
-            key: ValueKey(_phase),
-            phase: _phase,
-            candidates: _candidates,
-            selectedCandidateId: _selectedCandidateId,
-            onSelectCandidate: (candidate) {
-              setState(() => _selectedCandidateId = candidate.id);
-            },
-            failureReason: _failureReason,
-            permissionStatus: _permissionStatus,
-            foundFade: _foundFade,
-            foundSlide: _foundSlide,
+        key: _layoutKeyForPhase(_phase),
+        height: _sheetHeightFor(screenHeight, _phase, _candidates.length),
+        child: AppBottomSheetBody(
+          title: _sheetTitle(_phase, _candidates, _permissionStatus),
+          subtitle: _sheetSubtitle(_phase, _permissionStatus),
+          scrollable: true,
+          wrapScrollableChild: false,
+          padding: const EdgeInsets.fromLTRB(18, 6, 18, 10),
+          handleTitleGap: 4,
+          headerBottomGap: _headerBottomGapForPhase(_phase),
+          titleFontSize: 19,
+          subtitleFontSize: 12.5,
+          subtitleLineHeight: 1.32,
+          footer: footer,
+          child: AnimatedSwitcher(
+            duration: AppMotion.duration(context, 220),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            child: _SheetBody(
+              key: ValueKey(_phase),
+              phase: _phase,
+              candidates: _candidates,
+              selectedCandidateId: _selectedCandidateId,
+              onSelectCandidate: (candidate) {
+                setState(() => _selectedCandidateId = candidate.id);
+              },
+              failureReason: _failureReason,
+              permissionStatus: _permissionStatus,
+              foundFade: _foundFade,
+              foundSlide: _foundSlide,
+              onUnavailableCandidateTap: (candidate) {
+                showAppToast(
+                  context,
+                  candidate.unavailableReason ?? '这台摄像头暂时无法连接。',
+                );
+              },
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+bool _hasFooterForPhase(CameraDiscoveryPhase phase) {
+  return switch (phase) {
+    CameraDiscoveryPhase.preparing ||
+    CameraDiscoveryPhase.searching ||
+    CameraDiscoveryPhase.cancelled => false,
+    _ => true,
+  };
+}
+
+Key _layoutKeyForPhase(CameraDiscoveryPhase phase) {
+  return switch (phase) {
+    CameraDiscoveryPhase.preparing || CameraDiscoveryPhase.searching =>
+      const ValueKey('add_camera_sheet_searching_layout'),
+    CameraDiscoveryPhase.found || CameraDiscoveryPhase.connecting =>
+      const ValueKey('add_camera_sheet_device_list_layout'),
+    _ => const ValueKey('add_camera_sheet_message_layout'),
+  };
+}
+
+double _headerBottomGapForPhase(CameraDiscoveryPhase phase) {
+  return switch (phase) {
+    CameraDiscoveryPhase.preparing || CameraDiscoveryPhase.searching => 2,
+    CameraDiscoveryPhase.found || CameraDiscoveryPhase.connecting => 8,
+    _ => 6,
+  };
+}
+
+double _sheetHeightFor(
+  double screenHeight,
+  CameraDiscoveryPhase phase,
+  int candidateCount,
+) {
+  final factor = switch (phase) {
+    CameraDiscoveryPhase.preparing || CameraDiscoveryPhase.searching => 0.48,
+    CameraDiscoveryPhase.permissionRequired ||
+    CameraDiscoveryPhase.bluetoothOff => 0.44,
+    CameraDiscoveryPhase.found ||
+    CameraDiscoveryPhase.connecting => candidateCount >= 3 ? 0.68 : 0.54,
+    CameraDiscoveryPhase.notFound ||
+    CameraDiscoveryPhase.alreadyBoundToAnotherFamily => 0.48,
+    CameraDiscoveryPhase.connected ||
+    CameraDiscoveryPhase.connectedWithoutLivePreview ||
+    CameraDiscoveryPhase.connectionFailed ||
+    CameraDiscoveryPhase.networkSetupFailed => 0.46,
+    CameraDiscoveryPhase.cancelled => 0.36,
+  };
+  final minHeight = switch (phase) {
+    CameraDiscoveryPhase.found ||
+    CameraDiscoveryPhase.connecting => candidateCount >= 3 ? 500.0 : 390.0,
+    CameraDiscoveryPhase.permissionRequired ||
+    CameraDiscoveryPhase.bluetoothOff => 318.0,
+    _ => 340.0,
+  };
+  final maxHeight = switch (phase) {
+    CameraDiscoveryPhase.found ||
+    CameraDiscoveryPhase.connecting => candidateCount >= 3 ? 620.0 : 470.0,
+    CameraDiscoveryPhase.permissionRequired ||
+    CameraDiscoveryPhase.bluetoothOff => 390.0,
+    CameraDiscoveryPhase.preparing || CameraDiscoveryPhase.searching => 430.0,
+    _ => 430.0,
+  };
+  return (screenHeight * factor).clamp(minHeight, maxHeight);
 }
 
 String _sheetTitle(
@@ -451,13 +614,12 @@ String _sheetTitle(
       permissionStatus,
     ),
     CameraDiscoveryPhase.bluetoothOff => '请打开蓝牙',
-    CameraDiscoveryPhase.searching => '搜索附近摄像头',
-    CameraDiscoveryPhase.found =>
-      candidates.length <= 1 ? '发现 1 台附近摄像头' : '发现 ${candidates.length} 台附近摄像头',
+    CameraDiscoveryPhase.searching => '正在搜索附近摄像头',
+    CameraDiscoveryPhase.found => '发现附近摄像头',
     CameraDiscoveryPhase.connecting => '正在连接',
     CameraDiscoveryPhase.connected => '摄像头已连接',
     CameraDiscoveryPhase.connectedWithoutLivePreview => '摄像头已添加',
-    CameraDiscoveryPhase.notFound => '没有找到附近摄像头',
+    CameraDiscoveryPhase.notFound => '没有发现附近摄像头',
     CameraDiscoveryPhase.connectionFailed => '连接失败',
     CameraDiscoveryPhase.alreadyBoundToAnotherFamily => '这台摄像头已被绑定',
     CameraDiscoveryPhase.networkSetupFailed => '网络连接失败',
@@ -469,10 +631,10 @@ String _permissionTitle(CameraDiscoveryPermissionStatus? status) {
   return switch (status) {
     CameraDiscoveryPermissionStatus.localNetworkPermissionRequired ||
     CameraDiscoveryPermissionStatus.localNetworkPermissionDenied => '需要本地网络权限',
-    CameraDiscoveryPermissionStatus.bluetoothPermissionRequired ||
-    CameraDiscoveryPermissionStatus.bluetoothPermissionDenied ||
     CameraDiscoveryPermissionStatus.bluetoothPermissionPermanentlyDenied =>
-      '需要允许蓝牙',
+      '需要在系统设置中开启蓝牙权限',
+    CameraDiscoveryPermissionStatus.bluetoothPermissionRequired ||
+    CameraDiscoveryPermissionStatus.bluetoothPermissionDenied => '需要允许蓝牙',
     _ => '需要附近设备权限',
   };
 }
@@ -504,8 +666,8 @@ String _permissionSubtitle(CameraDiscoveryPermissionStatus? status) {
     CameraDiscoveryPermissionStatus.localNetworkPermissionDenied =>
       '需要允许本地网络，才能和家里的摄像头建立连接。',
     CameraDiscoveryPermissionStatus.bluetoothPermissionPermanentlyDenied =>
-      '请在系统设置中允许蓝牙权限后继续。',
-    _ => '需要允许蓝牙，才能发现附近摄像头。',
+      '开启后再回来，我们会继续搜索附近摄像头。',
+    _ => '允许后，我们才能搜索附近的看护摄像头。',
   };
 }
 
@@ -597,6 +759,7 @@ class _SheetBody extends StatelessWidget {
     required this.permissionStatus,
     required this.foundFade,
     required this.foundSlide,
+    required this.onUnavailableCandidateTap,
     super.key,
   });
 
@@ -608,17 +771,34 @@ class _SheetBody extends StatelessWidget {
   final CameraDiscoveryPermissionStatus? permissionStatus;
   final Animation<double> foundFade;
   final Animation<Offset> foundSlide;
+  final ValueChanged<DiscoveredCameraCandidate> onUnavailableCandidateTap;
 
   @override
   Widget build(BuildContext context) {
-    final animSize = MediaQuery.sizeOf(context).height < 740 ? 204.0 : 216.0;
+    final compactHeight = MediaQuery.sizeOf(context).height < 740;
+    final animSize = compactHeight ? 172.0 : 188.0;
     return switch (phase) {
-      CameraDiscoveryPhase.preparing || CameraDiscoveryPhase.searching => Align(
-        alignment: Alignment.topCenter,
-        child: CameraDiscoveryAnimation(
-          state: CameraDiscoveryVisualState.searching,
-          size: animSize,
-          showDevice: false,
+      CameraDiscoveryPhase.preparing ||
+      CameraDiscoveryPhase.searching => Center(
+        child: Column(
+          key: const ValueKey('add_camera_sheet_searching_animation'),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CameraDiscoveryAnimation(
+              state: CameraDiscoveryVisualState.searching,
+              size: animSize,
+              showDevice: false,
+            ),
+            SizedBox(height: compactHeight ? 2 : 6),
+            const Text(
+              '正在查找可连接设备',
+              style: TextStyle(
+                color: AppColors.muted,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
       ),
       CameraDiscoveryPhase.permissionRequired => Align(
@@ -652,6 +832,9 @@ class _SheetBody extends StatelessWidget {
                 onSelect: phase == CameraDiscoveryPhase.connecting
                     ? null
                     : onSelectCandidate,
+                onUnavailableTap: phase == CameraDiscoveryPhase.connecting
+                    ? null
+                    : onUnavailableCandidateTap,
               ),
             ),
           ),
@@ -719,6 +902,7 @@ String _connectionFailureTitle(AddCameraFailureReason? reason) {
     AddCameraFailureReason.connectionLost => '连接中断，请靠近摄像头后再试一次。',
     AddCameraFailureReason.bluetoothUnavailable => '蓝牙暂时不可用，请打开后再试。',
     AddCameraFailureReason.bleAdapterUnavailable => '暂时无法连接摄像头，请稍后再试。',
+    AddCameraFailureReason.hardwareProtocolUnavailable => '暂时无法完成连接，设备协议还未接入。',
     AddCameraFailureReason.permissionDenied => '需要允许附近设备权限后再连接。',
     _ => '请靠近摄像头后再试一次。',
   };
@@ -730,12 +914,14 @@ class _DiscoveredDeviceList extends StatelessWidget {
     required this.selectedCandidateId,
     required this.connecting,
     required this.onSelect,
+    required this.onUnavailableTap,
   });
 
   final List<DiscoveredCameraCandidate> candidates;
   final String? selectedCandidateId;
   final bool connecting;
   final ValueChanged<DiscoveredCameraCandidate>? onSelect;
+  final ValueChanged<DiscoveredCameraCandidate>? onUnavailableTap;
 
   @override
   Widget build(BuildContext context) {
@@ -743,6 +929,7 @@ class _DiscoveredDeviceList extends StatelessWidget {
       return const SizedBox.shrink();
     }
     return ListView.separated(
+      key: const ValueKey('add_camera_sheet_device_list'),
       padding: const EdgeInsets.only(top: 2, bottom: 6),
       physics: candidates.length <= 2
           ? const NeverScrollableScrollPhysics()
@@ -751,9 +938,13 @@ class _DiscoveredDeviceList extends StatelessWidget {
         final candidate = candidates[index];
         return _DiscoveredDeviceTile(
           candidate: candidate,
-          selected: candidate.id == selectedCandidateId,
+          selected: candidate.id == selectedCandidateId && candidate.canSelect,
           connecting: connecting && candidate.id == selectedCandidateId,
-          onTap: onSelect == null ? null : () => onSelect!(candidate),
+          onTap: onSelect == null
+              ? null
+              : candidate.canSelect
+              ? () => onSelect!(candidate)
+              : () => onUnavailableTap?.call(candidate),
         );
       },
       separatorBuilder: (_, _) => const SizedBox(height: 8),
@@ -820,7 +1011,9 @@ class _DiscoveredDeviceTileState extends State<_DiscoveredDeviceTile>
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadii.cardLarge),
-            color: AppColors.surfaceElevated,
+            color: widget.candidate.canSelect
+                ? AppColors.surfaceElevated
+                : AppColors.surfaceSoft,
             border: Border.all(
               color: widget.selected
                   ? AppColors.brandSage.withValues(alpha: 0.5)
@@ -923,6 +1116,12 @@ class _DiscoveredDeviceTileState extends State<_DiscoveredDeviceTile>
                       color: AppColors.brand,
                     ),
                   )
+                else if (widget.candidate.isOwnedByAnotherFamily)
+                  const Icon(
+                    Icons.block_rounded,
+                    size: 19,
+                    color: AppColors.muted,
+                  )
                 else
                   Icon(
                     widget.selected
@@ -941,6 +1140,9 @@ class _DiscoveredDeviceTileState extends State<_DiscoveredDeviceTile>
 }
 
 String _candidateStatusText(DiscoveredCameraCandidate candidate) {
+  if (candidate.isOwnedByAnotherFamily) {
+    return '已被其他家庭绑定';
+  }
   if (!candidate.isConnectable) {
     final reason = candidate.unavailableReason;
     return reason == null || reason.isEmpty ? '暂时无法连接' : reason;
@@ -1061,34 +1263,35 @@ class _SheetActions extends StatelessWidget {
     required this.phase,
     required this.permissionStatus,
     required this.selectedCandidate,
+    required this.hasConnectableCandidate,
+    required this.isAndroid,
     required this.onConnect,
     required this.onRetry,
     required this.onRequestPermissions,
     required this.onOpenSettings,
+    required this.onOpenBluetoothSettings,
     required this.onFinish,
     required this.onCancel,
-    required this.onHelp,
   });
 
   final CameraDiscoveryPhase phase;
   final CameraDiscoveryPermissionStatus? permissionStatus;
   final DiscoveredCameraCandidate? selectedCandidate;
+  final bool hasConnectableCandidate;
+  final bool isAndroid;
   final VoidCallback onConnect;
   final VoidCallback onRetry;
   final VoidCallback onRequestPermissions;
   final VoidCallback onOpenSettings;
+  final VoidCallback onOpenBluetoothSettings;
   final VoidCallback onFinish;
   final VoidCallback onCancel;
-  final VoidCallback onHelp;
 
   @override
   Widget build(BuildContext context) {
     return switch (phase) {
       CameraDiscoveryPhase.preparing ||
-      CameraDiscoveryPhase.searching => Padding(
-        padding: const EdgeInsets.only(top: 6),
-        child: _HelpLink(onTap: onHelp),
-      ),
+      CameraDiscoveryPhase.searching => const SizedBox.shrink(),
       CameraDiscoveryPhase.permissionRequired => _PermissionActions(
         permissionStatus: permissionStatus,
         onRequestPermissions: onRequestPermissions,
@@ -1097,10 +1300,19 @@ class _SheetActions extends StatelessWidget {
       ),
       CameraDiscoveryPhase.bluetoothOff => Column(
         mainAxisSize: MainAxisSize.min,
-        children: [AppSheetPrimaryButton(label: '我已打开', onTap: onRetry)],
+        children: [
+          AppSheetPrimaryButton(
+            label: isAndroid ? '去打开蓝牙' : '我已打开',
+            onTap: isAndroid ? onOpenBluetoothSettings : onRetry,
+          ),
+          if (!isAndroid) ...[
+            const SizedBox(height: 10),
+            AppSheetSecondaryButton(label: '去系统设置', onTap: onOpenSettings),
+          ],
+        ],
       ),
       CameraDiscoveryPhase.found => AppSheetPrimaryButton(
-        label: '连接',
+        label: hasConnectableCandidate ? '连接' : '没有可连接设备',
         onTap: selectedCandidate?.isConnectable == true ? onConnect : null,
       ),
       CameraDiscoveryPhase.connecting => const AppSheetPrimaryButton(
@@ -1116,27 +1328,15 @@ class _SheetActions extends StatelessWidget {
       CameraDiscoveryPhase.notFound ||
       CameraDiscoveryPhase.alreadyBoundToAnotherFamily => Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          AppSheetPrimaryButton(label: '重新搜索', onTap: onRetry),
-          const SizedBox(height: 10),
-          _HelpLink(onTap: onHelp),
-        ],
+        children: [AppSheetPrimaryButton(label: '重新搜索', onTap: onRetry)],
       ),
       CameraDiscoveryPhase.connectionFailed => Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          AppSheetPrimaryButton(label: '重新连接', onTap: onConnect),
-          const SizedBox(height: 10),
-          _HelpLink(onTap: onHelp),
-        ],
+        children: [AppSheetPrimaryButton(label: '重新连接', onTap: onConnect)],
       ),
       CameraDiscoveryPhase.networkSetupFailed => Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          AppSheetPrimaryButton(label: '重试', onTap: onConnect),
-          const SizedBox(height: 10),
-          _HelpLink(onTap: onHelp),
-        ],
+        children: [AppSheetPrimaryButton(label: '重试', onTap: onConnect)],
       ),
       CameraDiscoveryPhase.cancelled => const SizedBox.shrink(),
     };
@@ -1172,34 +1372,6 @@ class _PermissionActions extends StatelessWidget {
         const SizedBox(height: 10),
         AppSheetSecondaryButton(label: '稍后再说', onTap: onCancel),
       ],
-    );
-  }
-}
-
-class _HelpLink extends StatelessWidget {
-  const _HelpLink({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: TextButton(
-        onPressed: onTap,
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.muted,
-          minimumSize: const Size(96, 40),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        child: Text(
-          '连接帮助',
-          style: const TextStyle(
-            fontFamily: AppTypography.systemFont,
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
     );
   }
 }

@@ -108,6 +108,13 @@ class AppBottomSheetBody extends StatelessWidget {
     required this.child,
     this.subtitle,
     this.scrollable = true,
+    this.wrapScrollableChild = true,
+    this.padding = const EdgeInsets.fromLTRB(20, 8, 20, 12),
+    this.handleTitleGap = 10,
+    this.headerBottomGap = 16,
+    this.titleFontSize = 22,
+    this.subtitleFontSize = 13,
+    this.subtitleLineHeight = 1.45,
     this.footer,
     super.key,
   });
@@ -116,6 +123,13 @@ class AppBottomSheetBody extends StatelessWidget {
   final String? subtitle;
   final Widget child;
   final bool scrollable;
+  final bool wrapScrollableChild;
+  final EdgeInsetsGeometry padding;
+  final double handleTitleGap;
+  final double headerBottomGap;
+  final double titleFontSize;
+  final double subtitleFontSize;
+  final double subtitleLineHeight;
   final Widget? footer;
 
   @override
@@ -124,13 +138,13 @@ class AppBottomSheetBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const AppSheetHandle(),
-        const SizedBox(height: 10),
+        SizedBox(height: handleTitleGap),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.ink,
             fontFamily: AppTypography.systemFont,
-            fontSize: 22,
+            fontSize: titleFontSize,
             fontWeight: FontWeight.w900,
             letterSpacing: 0,
           ),
@@ -139,34 +153,36 @@ class AppBottomSheetBody extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             subtitle!,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.muted,
               fontFamily: AppTypography.systemFont,
-              fontSize: 13,
+              fontSize: subtitleFontSize,
               fontWeight: FontWeight.w700,
-              height: 1.45,
+              height: subtitleLineHeight,
               letterSpacing: 0,
             ),
           ),
         ],
-        const SizedBox(height: 16),
+        SizedBox(height: headerBottomGap),
       ],
     );
 
     final content = Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           header,
           if (scrollable)
             Expanded(
-              child: SingleChildScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.only(bottom: 12),
-                child: child,
-              ),
+              child: wrapScrollableChild
+                  ? SingleChildScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: child,
+                    )
+                  : child,
             )
           else
             child,

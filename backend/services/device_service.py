@@ -218,6 +218,27 @@ class DeviceService:
             )
             return {"ok": True, "device": device_payload(device) if device else None}
 
+    def discovery_status(self, access_token: str, data: dict) -> dict:
+        context = self._auth_context(access_token)
+        raw_candidates = data.get("candidates")
+        if raw_candidates is None and isinstance(data.get("bindingCodes"), list):
+            raw_candidates = [
+                {"id": str(code), "bindingCode": code}
+                for code in data.get("bindingCodes", [])
+            ]
+        if not isinstance(raw_candidates, list):
+            raise ApiError("invalid_discovery_candidates", "请选择要检查的摄像头", 400)
+        candidates = raw_candidates[:20]
+        with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_devices")
+            family_id = context["family"]["id"]
+            results = [
+                self._discovery_candidate_status(conn, family_id, item)
+                for item in candidates
+                if isinstance(item, Mapping)
+            ]
+            return {"ok": True, "candidates": results}
+
     def get_runtime_config(self, access_token: str, device_id: str) -> dict:
         context = self._auth_context(access_token)
         with self.repository.transaction() as conn:
@@ -232,6 +253,44 @@ class DeviceService:
                 "ok": True,
                 "runtimeConfig": self._runtime_config_payload(row) if row else None,
             }
+
+    def _discovery_candidate_status(self, conn, family_id: str, item: Mapping[str, Any]) -> dict:
+        candidate_id = str(item.get("id") or "").strip()
+        binding_code = str(item.get("bindingCode") or "").strip()
+        if not binding_code:
+            return {
+                "id": candidate_id,
+                "bindingCode": binding_code,
+                "bindingState": "unknown",
+                "isConnectable": True,
+            }
+        existing = self.repository.find_active_device_by_binding_code_global(
+            conn,
+            binding_code=binding_code,
+        )
+        if existing is None:
+            return {
+                "id": candidate_id,
+                "bindingCode": binding_code,
+                "bindingState": "available",
+                "isConnectable": True,
+            }
+        if existing["family_id"] == family_id:
+            return {
+                "id": candidate_id,
+                "bindingCode": binding_code,
+                "bindingState": "boundToCurrentFamily",
+                "isConnectable": False,
+                "disabledReason": "已添加到当前家庭",
+            }
+        return {
+            "id": candidate_id,
+            "bindingCode": binding_code,
+            "bindingState": "boundToAnotherFamily",
+            "isConnectable": False,
+            "disabledReason": "已被其他家庭绑定",
+            "ownerHint": "another_family",
+        }
 
     def update_runtime_config(self, access_token: str, device_id: str, data: dict) -> dict:
         context = self._auth_context(access_token)

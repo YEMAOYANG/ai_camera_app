@@ -59,6 +59,7 @@ def task_payload(row: DatabaseRow) -> dict:
         "nextReminderAt": row.get("next_reminder_at"),
         "delayReminderCount": row.get("delay_reminder_count") or 0,
         "cameraObservationStatus": row.get("camera_observation_status") or "unknown",
+        "parentActions": _parent_actions(row),
         "deviceId": row.get("device_id"),
         "timezone": row.get("timezone") or "Asia/Shanghai",
         "completedAt": row["completed_at"],
@@ -78,6 +79,24 @@ def task_event_payload(row: DatabaseRow) -> dict:
         "payload": _parse_json_object(row.get("payload")),
         "createdAt": row["created_at"],
     }
+
+
+def _parent_actions(row: DatabaseRow) -> list[dict]:
+    status = str(row.get("status") or "")
+    if status == "awaiting_parent_confirmation":
+        return [
+            {"value": "confirm", "label": "确认完成"},
+            {"value": "reject", "label": "驳回"},
+        ]
+    if status in {"missed", "expired"}:
+        if bool(row.get("missed_acknowledged")):
+            return []
+        return [
+            {"value": "reschedule", "label": "重新安排"},
+            {"value": "manual_complete", "label": "手动补记完成"},
+            {"value": "acknowledge_missed", "label": "不处理"},
+        ]
+    return []
 
 
 def validate_task_type(value: str) -> str:

@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
 import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
+import 'package:guardian_parent_app/src/features/setup/application/setup_draft.dart';
 import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/setup_flow_screens.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
 

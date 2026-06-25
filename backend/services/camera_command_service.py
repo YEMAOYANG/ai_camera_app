@@ -12,6 +12,11 @@ from schemas.camera import camera_command_payload
 from services.auth_service import AuthService
 from services.camera_bridge_service import CameraBridgeError, CameraBridgeService
 from services.device_runtime_resolver import DeviceRuntimeResolver
+from services.task_event_stream import (
+    CAMERA_EVENT_CREATED,
+    CAMERA_STATUS_CHANGED,
+    publish_family_event,
+)
 
 
 class CameraCommandService:
@@ -184,7 +189,9 @@ class CameraCommandService:
             *(_task_event_payload(row) for row in task_events),
         ]
         events.sort(key=lambda item: (item["createdAt"], item["id"]), reverse=True)
-        return {"ok": True, "events": events[:limit]}
+        parent_events = _parent_facing_events(events)
+        camera_events = [event for event in parent_events if _is_camera_care_event(event)]
+        return {"ok": True, "events": camera_events[:limit]}
 
     def internal_speak(
         self,
@@ -295,6 +302,24 @@ class CameraCommandService:
                 now=now_ms(),
                 completed=True,
             )
+            if _should_publish_camera_status(command_type, status):
+                publish_family_event(
+                    family_id=family_id,
+                    event_type=CAMERA_STATUS_CHANGED,
+                    device_id=device_id,
+                    task_ids=[task_id] if task_id else [],
+                    event_ids=[command_id],
+                    source="camera_command",
+                )
+                publish_family_event(
+                    family_id=family_id,
+                    event_type=CAMERA_EVENT_CREATED,
+                    device_id=device_id,
+                    task_ids=[task_id] if task_id else [],
+                    event_ids=[command_id],
+                    is_reliable=status == "succeeded",
+                    source="camera_command",
+                )
             return camera_command_payload(updated)
 
     def _product_error_message(self, command_type: str) -> str:
@@ -378,6 +403,7 @@ def _camera_command_event_payload(row) -> dict:
         "source": "camera_command",
         "eventType": command_type,
         "deviceId": row.get("device_id") or "",
+        "taskId": row.get("task_id") or "",
         "title": _command_title(command_type),
         "message": message,
         "status": status,
@@ -387,6 +413,12 @@ def _camera_command_event_payload(row) -> dict:
     }
 
 
+def _should_publish_camera_status(command_type: str, status: str) -> bool:
+    if command_type in {"snapshot", "start_monitor", "stop_monitor"}:
+        return True
+    return status == "failed"
+
+
 def _task_event_payload(row) -> dict:
     event_type = str(row.get("event_type") or "")
     return {
@@ -394,6 +426,8 @@ def _task_event_payload(row) -> dict:
         "source": "task_event",
         "eventType": event_type,
         "deviceId": row.get("device_id") or "",
+        "taskId": row.get("task_id") or "",
+        "taskTitle": row.get("task_title") or "",
         "title": _task_event_title(event_type),
         "message": row.get("message") or _task_event_title(event_type),
         "status": "recorded",
@@ -401,6 +435,240 @@ def _task_event_payload(row) -> dict:
         "createdAt": row["created_at"],
         "payload": _json_dict(row.get("payload")),
     }
+
+
+def _parent_facing_events(events: list[dict]) -> list[dict]:
+    result: list[dict] = []
+    seen: set[str] = set()
+    for event in events:
+        display = _parent_facing_event(event)
+        if display is None:
+            continue
+        key = _parent_event_dedupe_key(display)
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(display)
+    return result
+
+
+def _parent_facing_event(event: dict) -> dict | None:
+    source = str(event.get("source") or "")
+    event_type = str(event.get("eventType") or "")
+    if source == "camera_command":
+        return _parent_camera_command_event(event)
+    if source == "task_event":
+        return _parent_task_event(event)
+    return None
+
+
+def _is_camera_care_event(event: dict) -> bool:
+    return str(event.get("category") or "") in {
+        "camera_observation",
+        "child_presence",
+        "snapshot",
+        "camera_status",
+    }
+
+
+def _parent_camera_command_event(event: dict) -> dict | None:
+    event_type = str(event.get("eventType") or "")
+    status = str(event.get("status") or "")
+    if event_type in {"start_monitor", "stop_monitor"}:
+        return None
+    if event_type == "speak":
+        return None
+    if event_type == "snapshot":
+        if status == "failed":
+            return _with_display(
+                event,
+                display_title="画面暂时不可用",
+                display_message=str(event.get("message") or "暂时没有拿到最新画面。"),
+                category="camera_status",
+                severity="warning",
+            )
+        return None
+    if event_type == "ptz_move":
+        return None
+    return None
+
+
+def _parent_task_event(event: dict) -> dict | None:
+    event_type = str(event.get("eventType") or "")
+    if event_type in {
+        "created",
+        "task_created",
+        "updated",
+        "task_updated",
+        "reminder_due",
+        "monitor_started",
+        "monitor_not_required",
+        "camera_monitor_started",
+        "manual_started",
+    }:
+        return None
+    task_title = str(event.get("taskTitle") or "").strip()
+    payload = _json_dict(event.get("payload"))
+    if event_type in {
+        "reminder_sent",
+        "start_reminder_sent",
+        "manual_start_reminder_sent",
+        "manual_prepare_reminder_sent",
+        "manual_reminder_sent",
+        "wrap_up_reminder_sent",
+        "finish_reminder_sent",
+        "manual_finish_reminder_sent",
+        "delay_reminder_sent",
+    }:
+        return None
+    if event_type in {
+        "reminder_failed",
+        "start_reminder_failed",
+        "manual_start_reminder_failed",
+        "manual_prepare_reminder_failed",
+        "manual_reminder_failed",
+        "wrap_up_reminder_failed",
+        "finish_reminder_failed",
+        "manual_finish_reminder_failed",
+        "delay_reminder_failed",
+    }:
+        return _with_display(
+            event,
+            display_title="提醒没有播出",
+            display_message=_task_message(event, fallback="摄像头暂时不可用，提醒没有播出。"),
+            category="camera_status",
+            severity="warning",
+            task_title=task_title,
+        )
+    if event_type == "child_not_ready":
+        return _with_display(
+            event,
+            display_title="还没看到孩子开始",
+            display_message=_observation_message(payload, fallback="暂时还不能确认孩子已经开始。"),
+            category="task_observation",
+            severity="warning",
+            task_title=task_title,
+        )
+    if event_type == "delayed":
+        return None
+    if event_type == "observation_unavailable" or event_type == "monitor_failed":
+        return _with_display(
+            event,
+            display_title="暂时没有可靠观察",
+            display_message=_observation_message(payload, fallback="这次画面还不能作为确认依据。"),
+            category="task_observation",
+            severity="warning",
+            task_title=task_title,
+        )
+    if event_type == "auto_started":
+        observation = _json_dict(payload.get("observation"))
+        verdict = str(observation.get("verdict") or "")
+        reason = str(observation.get("reason") or "")
+        if verdict != "started" and reason in {"task_type", "not_required"}:
+            return None
+        if verdict != "started":
+            return _with_display(
+                event,
+                display_title="暂时没有可靠观察",
+                display_message="已按时间记录，但还不能确认孩子动作。",
+                category="task_observation",
+                severity="warning",
+                task_title=task_title,
+            )
+        return _with_display(
+            event,
+            display_title="已看到孩子开始",
+            display_message=_observation_message(payload, fallback="摄像头看到孩子开始了。"),
+            category="task_observation",
+            severity="success",
+            task_title=task_title,
+        )
+    if event_type in {"awaiting_parent_confirmation", "completed"}:
+        return None
+    if event_type in {"missed", "camera_command_failed"}:
+        return None
+    return None
+
+
+def _with_display(
+    event: dict,
+    *,
+    display_title: str,
+    display_message: str,
+    category: str,
+    severity: str,
+    task_title: str = "",
+) -> dict:
+    next_event = dict(event)
+    message = display_message.strip() or display_title
+    next_event.update(
+        {
+            "displayTitle": display_title,
+            "displayMessage": message,
+            "category": category,
+            "severity": severity,
+            "taskTitle": task_title or event.get("taskTitle") or "",
+            "evidenceSummary": _evidence_summary(event),
+            "hasReplay": False,
+            "title": display_title,
+            "message": message,
+            "tone": _severity_tone(severity),
+        }
+    )
+    return next_event
+
+
+def _task_message(event: dict, *, fallback: str) -> str:
+    message = str(event.get("message") or "").strip()
+    if not message or message in {"任务已自动开始", "任务已按时间开始"}:
+        return fallback
+    return message
+
+
+def _observation_message(payload: dict, *, fallback: str) -> str:
+    observation = _json_dict(payload.get("observation"))
+    reason = str(observation.get("reason") or "")
+    evidence = _json_dict(observation.get("evidence"))
+    if evidence.get("hasPerson") is False or evidence.get("has_person") is False:
+        return "暂时没在画面里看到孩子，还不能确认开始。"
+    if reason in {"unsupported", "insufficient", "observation_unavailable", "unavailable"}:
+        return "这次画面还不能确认孩子动作。"
+    if reason == "child_not_present":
+        return "暂时没在画面里看到孩子。"
+    return fallback
+
+
+def _evidence_summary(event: dict) -> str:
+    payload = _json_dict(event.get("payload"))
+    observation = _json_dict(payload.get("observation"))
+    evidence = _json_dict(observation.get("evidence"))
+    if evidence.get("hasPerson") is False or evidence.get("has_person") is False:
+        return "未看到孩子"
+    verdict = str(observation.get("verdict") or "")
+    if verdict == "started":
+        return "看到开始"
+    if verdict in {"insufficient", "unavailable"}:
+        return "观察暂不可用"
+    return ""
+
+
+def _severity_tone(severity: str) -> str:
+    return {
+        "success": "success",
+        "warning": "warning",
+        "danger": "danger",
+        "info": "info",
+    }.get(severity, "info")
+
+
+def _parent_event_dedupe_key(event: dict) -> str:
+    task_id = str(event.get("taskId") or "")
+    category = str(event.get("category") or event.get("eventType") or "")
+    created_at = int(event.get("createdAt") or 0)
+    bucket = created_at // 120000 if created_at else 0
+    if task_id and category in {"camera_observation", "task_observation"}:
+        return f"{task_id}:{category}:{event.get('eventType')}:{bucket}"
+    return f"{event.get('source')}:{event.get('eventType')}:{event.get('id')}"
 
 
 def _json_dict(value: object) -> dict:
@@ -419,8 +687,8 @@ def _command_title(command_type: str) -> str:
     return {
         "speak": "语音提醒",
         "snapshot": "看护快照",
-        "start_monitor": "开始观察",
-        "stop_monitor": "停止观察",
+        "start_monitor": "看护观察",
+        "stop_monitor": "看护观察",
         "ptz_move": "云台控制",
     }.get(command_type, "摄像头操作")
 
@@ -438,7 +706,7 @@ def _task_event_title(event_type: str) -> str:
         "completed": "任务完成",
         "confirmed": "家长确认",
         "rejected": "家长退回",
-    }.get(event_type, "任务事件")
+    }.get(event_type, "看护记录")
 
 
 def _event_tone(status: str) -> str:

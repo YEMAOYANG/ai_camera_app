@@ -199,7 +199,15 @@ class TaskRepository:
         return list(
             conn.execute(
                 f"""
-                SELECT * FROM tasks
+                SELECT t.*,
+                  EXISTS(
+                    SELECT 1 FROM task_events e
+                    WHERE e.family_id = t.family_id
+                      AND e.task_id = t.id
+                      AND e.event_type = 'missed_acknowledged'
+                    LIMIT 1
+                  ) AS missed_acknowledged
+                FROM tasks t
                 WHERE {' AND '.join(clauses)}
                 ORDER BY scheduled_date, scheduled_start IS NULL, scheduled_start, created_at
                 """,
@@ -272,7 +280,18 @@ class TaskRepository:
         task_id: str,
     ) -> DatabaseRow | None:
         return conn.execute(
-            "SELECT * FROM tasks WHERE family_id = ? AND id = ?",
+            """
+            SELECT t.*,
+              EXISTS(
+                SELECT 1 FROM task_events e
+                WHERE e.family_id = t.family_id
+                  AND e.task_id = t.id
+                  AND e.event_type = 'missed_acknowledged'
+                LIMIT 1
+              ) AS missed_acknowledged
+            FROM tasks t
+            WHERE t.family_id = ? AND t.id = ?
+            """,
             (family_id, task_id),
         ).fetchone()
 
@@ -604,9 +623,20 @@ class TaskRepository:
         self,
         conn: DatabaseConnection,
         *,
+        family_id: str | None = None,
         task_id: str,
         event_type: str,
     ) -> bool:
+        if family_id:
+            row = conn.execute(
+                """
+                SELECT id FROM task_events
+                WHERE family_id = ? AND task_id = ? AND event_type = ?
+                LIMIT 1
+                """,
+                (family_id, task_id, event_type),
+            ).fetchone()
+            return row is not None
         row = conn.execute(
             "SELECT id FROM task_events WHERE task_id = ? AND event_type = ? LIMIT 1",
             (task_id, event_type),

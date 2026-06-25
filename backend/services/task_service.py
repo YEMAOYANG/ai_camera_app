@@ -14,7 +14,9 @@ from models.tasks import (
     TASK_AWAITING_PARENT_CONFIRMATION,
     TASK_CONFIRMED,
     TASK_DELAYED,
+    TASK_EXPIRED,
     TASK_IN_PROGRESS,
+    TASK_MISSED,
 )
 from repositories.point_repository import PointRepository
 from repositories.profile_repository import ProfileRepository
@@ -409,27 +411,37 @@ class TaskService:
             evidence_summary = self._optional_text(data, "evidenceSummary")
             evidence = self._json_text(data.get("evidence"))
             ai_summary = self._optional_text(data, "aiObservationSummary") or evidence_summary
+            completion_source = self._optional_text(data, "completionSource") or "parent"
+            if completion_source not in {"parent", "parent_manual", "camera"}:
+                completion_source = "parent"
+            manual_parent_completion = completion_source == "parent_manual"
             task = self.repository.mark_completed(
                 conn,
                 family_id=context["family"]["id"],
                 task_id=task_id,
                 evidence_summary=evidence_summary,
-                completion_source=self._optional_text(data, "completionSource") or "parent",
+                completion_source=completion_source,
                 evidence=evidence,
                 ai_observation_summary=ai_summary,
-                requires_parent_confirmation=bool(task["requires_parent_confirmation"]),
+                requires_parent_confirmation=(
+                    bool(task["requires_parent_confirmation"])
+                    and not manual_parent_completion
+                ),
                 now=now,
             )
             self._add_event(
                 conn,
                 task,
                 "task_completed",
-                "任务已完成",
-                {"completionSource": self._optional_text(data, "completionSource") or "parent"},
+                "家长手动记录完成，未发放积分" if manual_parent_completion else "任务已完成",
+                {
+                    "completionSource": completion_source,
+                    "pointsGranted": not manual_parent_completion,
+                },
                 now,
             )
             ledger_payload = None
-            if task["status"] == "completed":
+            if task["status"] == "completed" and not manual_parent_completion:
                 ledger_payload = self._grant_task_points_if_needed(conn, context, task, now)
                 if ledger_payload:
                     self._add_event(conn, task, "points_awarded", "奖励积分已发放", ledger_payload, now)
@@ -440,6 +452,31 @@ class TaskService:
             if ledger_payload:
                 payload["ledgerEntry"] = ledger_payload
             return payload
+
+    def acknowledge_missed_task(self, access_token: str, task_id: str) -> dict:
+        context = self._auth_context(access_token)
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "confirm_tasks")
+            task = self._task_or_error(conn, context["family"]["id"], task_id)
+            if task["status"] not in (TASK_MISSED, TASK_EXPIRED):
+                raise ApiError("task_not_missed", "这项安排还不能这样处理")
+            if not self.repository.has_event(
+                conn,
+                family_id=context["family"]["id"],
+                task_id=task_id,
+                event_type="missed_acknowledged",
+            ):
+                self._add_event(
+                    conn,
+                    task,
+                    "missed_acknowledged",
+                    "已选择不处理",
+                    {"source": "parent"},
+                    now,
+                )
+            refreshed = self._task_or_error(conn, context["family"]["id"], task_id)
+            return {"ok": True, "task": task_payload(refreshed)}
 
     def parent_confirm(self, access_token: str, task_id: str) -> dict:
         context = self._auth_context(access_token)

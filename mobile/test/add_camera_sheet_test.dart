@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart' as reactive;
 import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
 import 'package:guardian_parent_app/src/core/theme/app_theme.dart';
 import 'package:guardian_parent_app/src/features/devices/application/camera_discovery_adapter.dart';
+import 'package:guardian_parent_app/src/features/devices/application/camera_discovery_repository.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
 import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
@@ -29,7 +32,7 @@ void main() {
     expect(identical(selected, mockAdapter), isTrue);
   });
 
-  test('camera discovery factory safely falls back for BLE in dev/test', () {
+  test('camera discovery factory uses BLE adapter when backend is BLE', () {
     final mockAdapter = _FakeCameraDiscoveryAdapter();
     final bleAdapter = _FakeCameraDiscoveryAdapter();
     final selected =
@@ -43,7 +46,7 @@ void main() {
           ),
         );
 
-    expect(identical(selected, mockAdapter), isTrue);
+    expect(identical(selected, bleAdapter), isTrue);
   });
 
   test(
@@ -73,6 +76,13 @@ void main() {
         permissionProbe: _FakePermissionProbe(
           status: CameraDiscoveryPermissionStatus.ready,
         ),
+        bleClient: _FakeReactiveBleClient(),
+        scanConfig: const CameraBleScanConfig(
+          serviceUuids: [],
+          namePrefixes: [],
+          manufacturerId: null,
+          scanTimeout: Duration(milliseconds: 20),
+        ),
       );
 
       expect(
@@ -85,6 +95,174 @@ void main() {
     },
   );
 
+  test('BLE adapter times out when scan criteria are not configured', () async {
+    final adapter = BleCameraDiscoveryAdapter(
+      permissionProbe: _FakePermissionProbe(
+        status: CameraDiscoveryPermissionStatus.ready,
+      ),
+      bleClient: _FakeReactiveBleClient(),
+      scanConfig: const CameraBleScanConfig(
+        serviceUuids: [],
+        namePrefixes: [],
+        manufacturerId: null,
+        scanTimeout: Duration(milliseconds: 20),
+      ),
+      isSupportedPlatform: true,
+    );
+
+    final result = await adapter.startScan().first;
+    expect(result.phase, CameraDiscoveryPhase.notFound);
+    expect(result.candidates, isEmpty);
+  });
+
+  test('BLE adapter maps powered off bluetooth to bluetoothOff', () async {
+    final adapter = BleCameraDiscoveryAdapter(
+      permissionProbe: _FakePermissionProbe(
+        status: CameraDiscoveryPermissionStatus.ready,
+      ),
+      bleClient: _FakeReactiveBleClient(status: reactive.BleStatus.poweredOff),
+      scanConfig: const CameraBleScanConfig(
+        serviceUuids: [],
+        namePrefixes: ['WarmSight-'],
+        manufacturerId: null,
+        scanTimeout: Duration(milliseconds: 20),
+      ),
+      isSupportedPlatform: true,
+    );
+
+    expect(
+      await adapter.getPermissionStatus(),
+      CameraDiscoveryPermissionStatus.bluetoothOff,
+    );
+    final result = await adapter.startScan().first;
+    expect(result.phase, CameraDiscoveryPhase.bluetoothOff);
+    expect(result.failureReason, AddCameraFailureReason.bluetoothUnavailable);
+  });
+
+  test(
+    'BLE adapter maps unauthorized bluetooth to settings permission',
+    () async {
+      final adapter = BleCameraDiscoveryAdapter(
+        permissionProbe: _FakePermissionProbe(
+          status: CameraDiscoveryPermissionStatus.ready,
+        ),
+        bleClient: _FakeReactiveBleClient(
+          status: reactive.BleStatus.unauthorized,
+        ),
+        scanConfig: const CameraBleScanConfig(
+          serviceUuids: [],
+          namePrefixes: ['WarmSight-'],
+          manufacturerId: null,
+          scanTimeout: Duration(milliseconds: 20),
+        ),
+        isSupportedPlatform: true,
+      );
+
+      expect(
+        await adapter.getPermissionStatus(),
+        CameraDiscoveryPermissionStatus.bluetoothPermissionPermanentlyDenied,
+      );
+      final result = await adapter.startScan().first;
+      expect(result.phase, CameraDiscoveryPhase.permissionRequired);
+      expect(
+        result.failureReason,
+        AddCameraFailureReason.permissionPermanentlyDenied,
+      );
+    },
+  );
+
+  test('BLE adapter filters random nearby BLE devices', () async {
+    final adapter = BleCameraDiscoveryAdapter(
+      permissionProbe: _FakePermissionProbe(
+        status: CameraDiscoveryPermissionStatus.ready,
+      ),
+      bleClient: _FakeReactiveBleClient(
+        devices: [
+          _bleDevice(id: 'speaker-1', name: 'Living Room Speaker', rssi: -45),
+        ],
+      ),
+      scanConfig: const CameraBleScanConfig(
+        serviceUuids: [],
+        namePrefixes: ['WarmSight-', 'AI-Camera-'],
+        manufacturerId: null,
+        scanTimeout: Duration(milliseconds: 20),
+      ),
+      isSupportedPlatform: true,
+    );
+
+    final result = await adapter.startScan().firstWhere(
+      (item) => item.phase == CameraDiscoveryPhase.notFound,
+    );
+    expect(result.candidates, isEmpty);
+  });
+
+  test('BLE adapter discovers matching camera candidates by signal', () async {
+    final adapter = BleCameraDiscoveryAdapter(
+      permissionProbe: _FakePermissionProbe(
+        status: CameraDiscoveryPermissionStatus.ready,
+      ),
+      bleClient: _FakeReactiveBleClient(
+        devices: [
+          _bleDevice(id: 'camera-weak', name: 'WarmSight-002', rssi: -70),
+          _bleDevice(id: 'camera-strong', name: 'WarmSight-001', rssi: -42),
+        ],
+      ),
+      scanConfig: const CameraBleScanConfig(
+        serviceUuids: [],
+        namePrefixes: ['WarmSight-'],
+        manufacturerId: null,
+        scanTimeout: Duration(milliseconds: 120),
+      ),
+      isSupportedPlatform: true,
+    );
+
+    final result = await adapter.startScan().firstWhere(
+      (item) =>
+          item.phase == CameraDiscoveryPhase.found &&
+          item.candidates.length == 2,
+    );
+    expect(result.candidates.length, 2);
+    expect(result.candidates.first.id, 'ble_camera-strong');
+    expect(result.candidates.first.displayName, 'AI 看护摄像头');
+    expect(result.candidates.first.bindingCode, startsWith('ble:'));
+    expect(
+      result.candidates.every(
+        (candidate) => candidate.source == CameraDiscoveryCandidateSource.ble,
+      ),
+      isTrue,
+    );
+  });
+
+  test(
+    'BLE adapter does not create a device before hardware protocol exists',
+    () async {
+      final adapter = BleCameraDiscoveryAdapter(
+        permissionProbe: _FakePermissionProbe(
+          status: CameraDiscoveryPermissionStatus.ready,
+        ),
+        bleClient: _FakeReactiveBleClient(),
+        scanConfig: const CameraBleScanConfig(
+          serviceUuids: [],
+          namePrefixes: [],
+          manufacturerId: null,
+          scanTimeout: Duration(milliseconds: 20),
+        ),
+        isSupportedPlatform: true,
+      );
+
+      await expectLater(
+        adapter.connectCandidate(_singleCandidate),
+        throwsA(
+          isA<DeviceException>().having(
+            (error) => error.code,
+            'code',
+            'ble_protocol_unavailable',
+          ),
+        ),
+      );
+    },
+  );
+
   testWidgets('add camera sheet starts discovery after permissions are ready', (
     tester,
   ) async {
@@ -94,8 +272,28 @@ void main() {
     await _pumpSheet(tester, adapter: adapter);
 
     await tester.pump();
-    expect(find.text('搜索附近摄像头'), findsOneWidget);
-    expect(find.text('连接帮助'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 260));
+    expect(find.text('正在搜索附近摄像头'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('add_camera_sheet_searching_layout')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('add_camera_sheet_searching_animation')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('add_camera_sheet_footer')), findsNothing);
+    expect(find.text('正在查找可连接设备'), findsOneWidget);
+    expect(find.text('连接'), findsNothing);
+    expect(
+      tester
+          .getSize(
+            find.byKey(const ValueKey('add_camera_sheet_searching_layout')),
+          )
+          .height,
+      lessThanOrEqualTo(430),
+    );
+    expect(find.text('查看帮助'), findsNothing);
     expect(find.text('开始发现'), findsNothing);
     expect(find.text('继续发现'), findsNothing);
   });
@@ -109,10 +307,53 @@ void main() {
       initialCandidates: const [_singleCandidate],
     );
 
-    expect(find.text('发现 1 台附近摄像头'), findsOneWidget);
+    expect(find.text('发现附近摄像头'), findsOneWidget);
     expect(find.text('AI 看护摄像头'), findsOneWidget);
     expect(find.text('连接'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('add_camera_sheet_device_list_layout')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('add_camera_sheet_device_list')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('add_camera_sheet_footer')),
+      findsOneWidget,
+    );
     _expectNoEngineeringCopy();
+  });
+
+  testWidgets('multi-device discovery uses taller list layout with footer', (
+    tester,
+  ) async {
+    await _pumpSheet(
+      tester,
+      initialPhase: CameraDiscoveryPhase.found,
+      initialCandidates: _candidates,
+    );
+
+    expect(
+      find.byKey(const ValueKey('add_camera_sheet_device_list_layout')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('add_camera_sheet_device_list')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('add_camera_sheet_footer')),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .getSize(
+            find.byKey(const ValueKey('add_camera_sheet_device_list_layout')),
+          )
+          .height,
+      greaterThanOrEqualTo(500),
+    );
   });
 
   testWidgets('multi-camera discovery selects strongest signal by default', (
@@ -123,7 +364,7 @@ void main() {
 
     await tester.pump(const Duration(milliseconds: 1600));
     await tester.pump();
-    expect(find.text('发现 3 台附近摄像头'), findsOneWidget);
+    expect(find.text('发现附近摄像头'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 260));
     expect(_primaryButton(tester, '连接').onTap, isNotNull);
 
@@ -157,7 +398,9 @@ void main() {
     expect(adapter.connectedCandidate?.id, 'nearby-desk');
   });
 
-  testWidgets('bluetooth off state uses parent-facing copy', (tester) async {
+  testWidgets('bluetooth off state opens bluetooth settings on Android', (
+    tester,
+  ) async {
     final adapter = _FakeCameraDiscoveryAdapter(
       permissionStatus: CameraDiscoveryPermissionStatus.bluetoothOff,
       scanDelay: const Duration(seconds: 30),
@@ -167,18 +410,21 @@ void main() {
     await tester.pump();
 
     expect(find.text('请打开蓝牙'), findsOneWidget);
-    expect(find.text('我已打开'), findsOneWidget);
+    expect(find.text('去打开蓝牙'), findsOneWidget);
     expect(find.text('查看帮助'), findsNothing);
     expect(find.text('连接帮助'), findsNothing);
     _expectSingleCloseButton();
     _expectNoEngineeringCopy();
 
     adapter.permissionStatus = CameraDiscoveryPermissionStatus.ready;
-    await tester.tap(find.text('我已打开'));
+    await tester.tap(find.text('去打开蓝牙'));
+    await tester.pump();
+    expect(adapter.openBluetoothSettingsCount, 1);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pump();
     await tester.pump();
     await tester.pump();
-    expect(find.text('搜索附近摄像头'), findsOneWidget);
+    expect(find.text('正在搜索附近摄像头'), findsOneWidget);
   });
 
   testWidgets('permission required state uses parent-facing copy', (
@@ -195,7 +441,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('需要允许蓝牙'), findsOneWidget);
-    expect(find.text('需要允许蓝牙，才能发现附近摄像头。'), findsOneWidget);
+    expect(find.text('允许后，我们才能搜索附近的看护摄像头。'), findsOneWidget);
     expect(find.text('允许并继续'), findsOneWidget);
     expect(find.text('稍后再说'), findsOneWidget);
     _expectNoEngineeringCopy();
@@ -204,7 +450,7 @@ void main() {
     await tester.pump();
     await tester.pump();
     await tester.pump();
-    expect(find.text('搜索附近摄像头'), findsOneWidget);
+    expect(find.text('正在搜索附近摄像头'), findsOneWidget);
   });
 
   testWidgets('permanently denied permission offers system settings', (
@@ -218,10 +464,10 @@ void main() {
 
     await tester.pump();
 
-    expect(find.text('需要允许蓝牙'), findsOneWidget);
+    expect(find.text('需要在系统设置中开启蓝牙权限'), findsOneWidget);
     expect(find.text('去系统设置'), findsOneWidget);
     expect(find.text('稍后再说'), findsOneWidget);
-    expect(find.text('请在系统设置中允许蓝牙权限后继续。'), findsOneWidget);
+    expect(find.text('开启后再回来，我们会继续搜索附近摄像头。'), findsOneWidget);
     await tester.tap(find.text('去系统设置'));
     await tester.pump();
     expect(adapter.openSettingsCount, 1);
@@ -275,11 +521,11 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.text('没有找到附近摄像头'), findsOneWidget);
+    expect(find.text('没有发现附近摄像头'), findsOneWidget);
     expect(find.text('重新搜索'), findsOneWidget);
+    expect(find.text('查看帮助'), findsNothing);
     expect(find.text('连接'), findsNothing);
     expect(find.text('继续'), findsNothing);
-    expect(find.text('连接帮助'), findsOneWidget);
   });
 
   testWidgets('connecting state prevents duplicate connect taps', (
@@ -357,7 +603,23 @@ void main() {
     _expectNoEngineeringCopy();
   });
 
-  testWidgets('already bound state uses family-friendly copy', (tester) async {
+  testWidgets('BLE hardware protocol missing state is parent-facing', (
+    tester,
+  ) async {
+    await _pumpSheet(
+      tester,
+      initialPhase: CameraDiscoveryPhase.connectionFailed,
+      initialFailureReason: AddCameraFailureReason.hardwareProtocolUnavailable,
+    );
+
+    expect(find.text('连接失败'), findsOneWidget);
+    expect(find.text('暂时无法完成连接，设备协议还未接入。'), findsOneWidget);
+    _expectNoEngineeringCopy();
+  });
+
+  testWidgets('already bound candidate returns to disabled device card', (
+    tester,
+  ) async {
     final adapter = _FakeCameraDiscoveryAdapter(
       connectError: const DeviceException('已被绑定', code: 'already_bound'),
     );
@@ -371,9 +633,73 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('这台摄像头已被绑定'), findsOneWidget);
-    expect(find.text('请确认是否已被家人添加。'), findsOneWidget);
-    expect(find.text('重新搜索'), findsOneWidget);
+    expect(find.text('发现附近摄像头'), findsOneWidget);
+    expect(find.text('已被其他家庭绑定'), findsOneWidget);
+    expect(find.text('没有可连接设备'), findsOneWidget);
+    expect(_primaryButton(tester, '没有可连接设备').onTap, isNull);
+  });
+
+  testWidgets('disabled already-bound candidate cannot be selected', (
+    tester,
+  ) async {
+    const unavailable = DiscoveredCameraCandidate(
+      id: 'nearby-bound',
+      displayName: 'AI 看护摄像头',
+      bindingCode: 'AI-CARE-BOUND',
+      signalStrength: 88,
+      status: 'bound_to_other_family',
+      isConnectable: false,
+      bindingState: CameraCandidateBindingState.boundToAnotherFamily,
+      unavailableReason: '已被其他家庭绑定',
+    );
+    await _pumpSheet(
+      tester,
+      initialPhase: CameraDiscoveryPhase.found,
+      initialCandidates: const [unavailable],
+    );
+
+    expect(find.text('已被其他家庭绑定'), findsOneWidget);
+    expect(find.text('没有可连接设备'), findsOneWidget);
+    expect(_primaryButton(tester, '没有可连接设备').onTap, isNull);
+  });
+
+  testWidgets('already-bound candidates are skipped for default selection', (
+    tester,
+  ) async {
+    const unavailable = DiscoveredCameraCandidate(
+      id: 'nearby-bound',
+      displayName: 'AI 看护摄像头',
+      bindingCode: 'AI-CARE-BOUND',
+      signalStrength: 98,
+      status: 'bound_to_other_family',
+      isConnectable: false,
+      bindingState: CameraCandidateBindingState.boundToAnotherFamily,
+      unavailableReason: '已被其他家庭绑定',
+    );
+    const available = DiscoveredCameraCandidate(
+      id: 'nearby-available',
+      displayName: 'AI 看护摄像头',
+      bindingCode: 'AI-CARE-AVAILABLE',
+      signalStrength: 70,
+      status: 'ready',
+    );
+    final adapter = _FakeCameraDiscoveryAdapter(
+      candidates: const [unavailable, available],
+    );
+    await _pumpSheet(tester, adapter: adapter);
+
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('已被其他家庭绑定'), findsOneWidget);
+    await tester.tap(
+      find.byKey(const ValueKey('discoveredCamera_nearby-bound')),
+    );
+    await tester.pump();
+    _primaryButton(tester, '连接').onTap!();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(adapter.connectedCandidate?.id, 'nearby-available');
   });
 
   testWidgets('network setup failed state is represented', (tester) async {
@@ -421,15 +747,17 @@ Future<void> _pumpSheet(
 }) async {
   SharedPreferences.setMockInitialValues({});
   final preferences = await SharedPreferences.getInstance();
+  final adapterValue = adapter ?? _FakeCameraDiscoveryAdapter();
   await tester.pumpWidget(
     MaterialApp(
       theme: AppTheme.light,
       home: ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(preferences),
-          cameraDiscoveryAdapterProvider.overrideWithValue(
-            adapter ?? _FakeCameraDiscoveryAdapter(),
+          cameraDiscoveryRepositoryProvider.overrideWithValue(
+            CameraDiscoveryRepository(adapter: adapterValue),
           ),
+          cameraDiscoveryAdapterProvider.overrideWithValue(adapterValue),
         ],
         child: Scaffold(
           body: AddCameraSheet(
@@ -532,6 +860,7 @@ class _FakeCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
   var connectCount = 0;
   var stopScanCount = 0;
   var openSettingsCount = 0;
+  var openBluetoothSettingsCount = 0;
   StreamController<CameraDiscoveryResult>? _controller;
   Timer? _scanTimer;
 
@@ -596,6 +925,14 @@ class _FakeCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
   ) async {
     connectCount += 1;
     connectedCandidate = candidate;
+    if (!candidate.canSelect) {
+      throw DeviceException(
+        candidate.unavailableReason ?? '这台摄像头暂时无法连接。',
+        code: candidate.isOwnedByAnotherFamily
+            ? 'already_bound'
+            : 'candidate_unavailable',
+      );
+    }
     if (connectDelay > Duration.zero) {
       await Future<void>.delayed(connectDelay);
     }
@@ -627,6 +964,11 @@ class _FakeCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
   Future<void> openSystemSettings() async {
     openSettingsCount += 1;
   }
+
+  @override
+  Future<void> openBluetoothSettings() async {
+    openBluetoothSettingsCount += 1;
+  }
 }
 
 class _FakePermissionProbe implements CameraDiscoveryPermissionProbe {
@@ -651,4 +993,55 @@ class _FakePermissionProbe implements CameraDiscoveryPermissionProbe {
 
   @override
   Future<void> openSystemSettings() async {}
+
+  @override
+  Future<void> openBluetoothSettings() async {}
+}
+
+class _FakeReactiveBleClient implements ReactiveBleClient {
+  _FakeReactiveBleClient({
+    this._status = reactive.BleStatus.ready,
+    this.devices = const [],
+  });
+
+  final reactive.BleStatus _status;
+  final List<reactive.DiscoveredDevice> devices;
+  var scanCount = 0;
+
+  @override
+  reactive.BleStatus get status => _status;
+
+  @override
+  Stream<reactive.BleStatus> get statusStream => Stream.value(_status);
+
+  @override
+  Stream<reactive.DiscoveredDevice> scanForDevices({
+    required List<reactive.Uuid> withServices,
+    required reactive.ScanMode scanMode,
+    required bool requireLocationServicesEnabled,
+  }) async* {
+    scanCount += 1;
+    for (final device in devices) {
+      await Future<void>.delayed(Duration.zero);
+      yield device;
+    }
+  }
+}
+
+reactive.DiscoveredDevice _bleDevice({
+  required String id,
+  required String name,
+  required int rssi,
+  List<String> serviceUuids = const [],
+  List<int> manufacturerData = const [],
+}) {
+  return reactive.DiscoveredDevice(
+    id: id,
+    name: name,
+    serviceData: const {},
+    manufacturerData: Uint8List.fromList(manufacturerData),
+    rssi: rssi,
+    serviceUuids: serviceUuids.map(reactive.Uuid.parse).toList(growable: false),
+    connectable: reactive.Connectable.available,
+  );
 }

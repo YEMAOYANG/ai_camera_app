@@ -125,6 +125,20 @@ class CameraRepository {
     }
   }
 
+  Future<CameraMonitorStatus> refreshMonitor({String? deviceId}) async {
+    try {
+      final response = await _apiClient.post(
+        '/camera/monitor/refresh',
+        queryParameters: _deviceQuery(deviceId),
+      );
+      return CameraMonitorStatus.fromJson(_asMap(response.data));
+    } on DioException catch (error) {
+      final data = error.response?.data;
+      if (data is Map) return CameraMonitorStatus.fromJson(_asMap(data));
+      throw _fromDio(error, fallback: '观察状态暂时不可用。');
+    }
+  }
+
   Future<CameraSnapshotFrame> snapshot({String? deviceId}) async {
     try {
       final response = await _dio.get<List<int>>(
@@ -226,7 +240,10 @@ class CameraRepository {
       );
       final raw = _asMap(response.data)['events'];
       if (raw is! List) return const [];
-      return raw.map((event) => LiveCareEvent.fromJson(_asMap(event))).toList();
+      return raw
+          .map((event) => LiveCareEvent.fromJson(_asMap(event)))
+          .where((event) => event.isCareRecord)
+          .toList();
     } on DioException catch (error) {
       throw _fromDio(error, fallback: '暂时拿不到看护事件。');
     }

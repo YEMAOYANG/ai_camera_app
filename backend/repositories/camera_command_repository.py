@@ -169,7 +169,7 @@ class CameraCommandRepository:
         return list(
             conn.execute(
                 f"""
-                SELECT te.*, t.device_id
+                SELECT te.*, t.device_id, t.title AS task_title, t.type AS task_type
                 FROM task_events te
                 LEFT JOIN tasks t ON t.family_id = te.family_id AND t.id = te.task_id
                 WHERE {' AND '.join(clauses)}

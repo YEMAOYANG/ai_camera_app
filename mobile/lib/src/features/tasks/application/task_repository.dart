@@ -310,6 +310,15 @@ class TaskRepository {
     }
   }
 
+  Future<GuardianTask> acknowledgeMissedTask(String taskId) async {
+    try {
+      final response = await _apiClient.post('/tasks/$taskId/acknowledge-missed');
+      return GuardianTask.fromJson(_asMap(_asMap(response.data)['task']));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
   Future<GuardianTask> parentConfirm(String taskId) async {
     try {
       final response = await _apiClient.post('/tasks/$taskId/parent-confirm');

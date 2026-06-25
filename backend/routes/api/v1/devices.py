@@ -34,6 +34,14 @@ def default_device():
         return error_response(exc)
 
 
+@devices_bp.post("/discovery-status")
+def discovery_status():
+    try:
+        return jsonify(device_service().discovery_status(bearer_token(request), json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @devices_bp.get("/<device_id>")
 def get_device(device_id: str):
     try:

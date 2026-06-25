@@ -12,8 +12,8 @@ import 'package:guardian_parent_app/src/features/auth/application/auth_repositor
 import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
+import 'package:guardian_parent_app/src/features/setup/application/setup_draft.dart';
 import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/setup_flow_screens.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
 

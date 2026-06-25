@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import time
 import urllib.parse
@@ -94,6 +95,29 @@ class AiCameraTestRuntimeAdapter(CameraRuntimeAdapter):
 
     def monitor_status(self) -> dict:
         return self._fetch_json("/api/monitor/runtime")
+
+    def refresh_monitor_observation(self) -> dict:
+        snapshot = self.snapshot()
+        image = base64.b64encode(snapshot.body).decode("ascii")
+        content_type = snapshot.content_type or "image/jpeg"
+        analysis = self._post_json(
+            "/api/analyze_frame",
+            {"image": f"data:{content_type};base64,{image}"},
+            timeout=15.0,
+        )
+        observed_at = int(time.time() * 1000)
+        if isinstance(analysis, dict):
+            analysis.setdefault("observed_at", observed_at)
+        return {
+            "ok": True,
+            "monitor_runtime": {
+                "running": False,
+                "status": "refreshed",
+                "last_tick_at": observed_at,
+                "last_observation": analysis if isinstance(analysis, dict) else {},
+                "last_reminder": "",
+            },
+        }
 
     def task_observation(self, task: dict) -> dict:
         payload = self.monitor_status()

@@ -11,6 +11,9 @@ class AppColors {
   static const brandSageWash = Color(0xFFE9F4EF);
   static const brandWarm = Color(0xFFE0A24B);
   static const brandWarmWash = Color(0xFFFFF1DE);
+  static const ai = Color(0xFF6D5DF7);
+  static const aiWash = Color(0xFFF0EDFF);
+  static const warm = Color(0xFFFF8A4C);
   static const primary = primaryButtonStart;
   static const primaryPressed = primaryButtonEnd;
   static const primarySoft = Color(0xFFEFF3F8);
@@ -90,7 +93,7 @@ class AppHomeHero {
 
   static const minHeight = 318.0;
   static const maxHeight = 390.0;
-  static const panelOverlap = 52.0;
+  static const panelOverlap = 64.0;
   static const panelRadius = 34.0;
   static const contentTopPadding = 18.0;
 }

@@ -67,10 +67,40 @@ class MockCameraRuntimeAdapter(CameraRuntimeAdapter):
     def monitor_status(self) -> dict:
         return {"ok": True, "monitor_runtime": {"running": False, "status": "idle"}}
 
+    def refresh_monitor_observation(self) -> dict:
+        return {
+            "ok": True,
+            "monitor_runtime": {
+                "running": False,
+                "status": "refreshed",
+                "last_observation": {
+                    "has_person": False,
+                    "activity": "unknown",
+                    "confidence": 0.0,
+                    "summary": "",
+                },
+            },
+        }
+
     def task_observation(self, task: dict) -> dict:
+        task_text = f"{task.get('type') or ''} {task.get('title') or ''} {task.get('description') or ''}"
+        if any(word in task_text for word in ("喝水", "补水", "饮水")):
+            activity = "拿起水杯喝水"
+        elif any(word in task_text for word in ("绘本", "阅读", "看书", "故事书")):
+            activity = "坐下阅读绘本"
+        elif any(word in task_text for word in ("收玩具", "收纳", "整理玩具")):
+            activity = "整理玩具"
+        elif any(word in task_text for word in ("用餐", "吃饭", "早餐", "午餐", "晚餐")):
+            activity = "坐在餐桌用餐"
+        elif any(word in task_text for word in ("午睡", "入睡", "睡觉", "睡前")):
+            activity = "安静躺下"
+        elif any(word in task_text for word in ("运动", "户外", "散步", "跑", "跳")):
+            activity = "户外活动"
+        else:
+            activity = "进行当前安排"
         return {
             "verdict": "started",
             "reason": "mock_child_ready",
             "confidence": 0.9,
-            "evidence": {"activity": "学习", "hasPerson": True, "confidence": 0.9},
+            "evidence": {"activity": activity, "hasPerson": True, "confidence": 0.9},
         }

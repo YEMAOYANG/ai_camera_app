@@ -149,6 +149,7 @@ class GuardianTask {
     required this.confirmedAt,
     required this.rejectedAt,
     required this.pointsGrantedAt,
+    this.parentActions = const [],
   });
 
   final String id;
@@ -192,6 +193,9 @@ class GuardianTask {
   final int? confirmedAt;
   final int? rejectedAt;
   final int? pointsGrantedAt;
+  final List<String> parentActions;
+
+  bool hasParentAction(String value) => parentActions.contains(value);
 
   String get typeLabel {
     return switch (type) {
@@ -255,9 +259,12 @@ class GuardianTask {
     final summary = evidence['summary'];
     if (summary is String && summary.isNotEmpty) return summary;
     if (status.awaitsParent) {
-      return rewardPoints > 0 ? '任务已完成，等待你确认后写入积分流水。' : '任务已完成，等待你确认。';
+      return rewardPoints > 0 ? '请确认是否完成，再决定是否发放积分。' : '请确认这次是否完成。';
     }
-    return '完成后会在这里显示观察摘要和处理记录。';
+    if (status == GuardianTaskStatus.missed) {
+      return '这次没有看到完成结果，可以重新安排或手动记录。';
+    }
+    return '完成后会在这里显示观察记录和处理结果。';
   }
 
   String get observationText {
@@ -279,7 +286,7 @@ class GuardianTask {
       return '孩子还没有开始，系统会继续温和提醒。';
     }
     if (status == GuardianTaskStatus.missed) {
-      return '这项任务没有按时完成，可以重新安排一个时间。';
+      return '这项安排没有看到完成结果，可以重新安排、手动记录或不处理。';
     }
     if (status == GuardianTaskStatus.rejected) {
       return rejectionReason.isNotEmpty
@@ -298,7 +305,7 @@ class GuardianTask {
     if (status == GuardianTaskStatus.reminderSent) return '已经提醒，等待开始。';
     if (status == GuardianTaskStatus.inProgress) return '完成后进入家长确认。';
     if (status == GuardianTaskStatus.delayed) return '系统会继续温和提醒。';
-    if (status == GuardianTaskStatus.missed) return '任务未完成。';
+    if (status == GuardianTaskStatus.missed) return '本次未记录完成。';
     if (status == GuardianTaskStatus.rejected) {
       return '本次任务未通过确认，未发放积分。';
     }
@@ -342,6 +349,7 @@ class GuardianTask {
     int? confirmedAt,
     int? rejectedAt,
     int? pointsGrantedAt,
+    List<String>? parentActions,
   }) {
     return GuardianTask(
       id: id,
@@ -390,6 +398,7 @@ class GuardianTask {
       confirmedAt: confirmedAt ?? this.confirmedAt,
       rejectedAt: rejectedAt ?? this.rejectedAt,
       pointsGrantedAt: pointsGrantedAt ?? this.pointsGrantedAt,
+      parentActions: parentActions ?? this.parentActions,
     );
   }
 
@@ -455,6 +464,7 @@ class GuardianTask {
       confirmedAt: _asNullableInt(json['confirmedAt']),
       rejectedAt: _asNullableInt(json['rejectedAt']),
       pointsGrantedAt: _asNullableInt(json['pointsGrantedAt']),
+      parentActions: _parentActionValues(json['parentActions']),
     );
   }
 
@@ -503,6 +513,7 @@ class GuardianTask {
       'confirmedAt': confirmedAt,
       'rejectedAt': rejectedAt,
       'pointsGrantedAt': pointsGrantedAt,
+      'parentActions': parentActions,
     };
   }
 }
@@ -553,13 +564,13 @@ class GuardianTaskEvent {
       'monitor_not_required' => '无需摄像头观察',
       'camera_monitor_started' => '摄像头开始观察',
       'camera_command_failed' => '摄像头暂时离线',
-      'ended' || 'auto_finished' => '任务时间已结束',
+      'ended' || 'auto_finished' => '时间已到',
       'awaiting_parent_confirmation' => '等待确认',
-      'completed' => '任务已完成',
+      'completed' => '已完成',
       'missed' => '任务未完成',
       'points_awarded' => '积分已发放',
       'points_award_skipped' => '未发放积分',
-      'task_completed' => '任务已完成',
+      'task_completed' => '已完成',
       'parent_confirmed' => '家长已确认',
       'confirmation_rejected' || 'parent_rejected' => '家长驳回确认',
       _ => message.isNotEmpty ? message : '任务记录',
@@ -734,8 +745,7 @@ class TaskTemplateRow {
       taskType: _asString(json['taskType']),
       title: _asString(json['title']),
       rewardPoints: _asInt(json['rewardPoints']),
-      requiresParentConfirmation:
-          json['requiresParentConfirmation'] is bool
+      requiresParentConfirmation: json['requiresParentConfirmation'] is bool
           ? json['requiresParentConfirmation'] as bool
           : false,
     );
@@ -786,8 +796,18 @@ List<dynamic> _asList(dynamic value) {
 }
 
 List<String> _stringList(dynamic value) {
+  return _asList(
+    value,
+  ).whereType<String>().where((item) => item.isNotEmpty).toList();
+}
+
+List<String> _parentActionValues(dynamic value) {
   return _asList(value)
-      .whereType<String>()
+      .map((item) {
+        if (item is String) return item;
+        if (item is Map) return _asString(item['value']);
+        return '';
+      })
       .where((item) => item.isNotEmpty)
       .toList();
 }

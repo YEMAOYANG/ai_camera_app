@@ -1,8 +1,10 @@
 package com.miraguardian.mira_guardian_app
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.content.DialogInterface
 import android.content.res.Configuration
+import android.provider.Settings
 import android.view.ContextThemeWrapper
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
@@ -13,6 +15,7 @@ import java.util.Locale
 
 class MainActivity : FlutterActivity() {
     private val nativeDatePickerChannelName = "ai_camera_app/native_date_picker"
+    private val systemSettingsChannelName = "ai_camera_app/system_settings"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -24,6 +27,24 @@ class MainActivity : FlutterActivity() {
                 "pickDate" -> showNativeDatePicker(call.arguments, result)
                 else -> result.notImplemented()
             }
+        }
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            systemSettingsChannelName
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "openBluetoothSettings" -> openBluetoothSettings(result)
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    private fun openBluetoothSettings(result: MethodChannel.Result) {
+        try {
+            startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+            result.success(null)
+        } catch (error: Exception) {
+            result.error("settings_unavailable", "当前设备暂时无法打开蓝牙设置", null)
         }
     }
 

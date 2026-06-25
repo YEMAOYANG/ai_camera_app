@@ -18,6 +18,19 @@ TASK_STREAM_UPDATE = "task.updated"
 TASK_STREAM_CONNECTED = "task.connected"
 ACCOUNT_SECURITY_STREAM_CONNECTED = "account.security.connected"
 ACCOUNT_SECURITY_SESSION_REVOKED = "session_revoked"
+CAMERA_OBSERVATION_UPDATED = "camera_observation.updated"
+CAMERA_EVENT_CREATED = "camera_event.created"
+CAMERA_MONITOR_REFRESHED = "camera_monitor.refreshed"
+CAMERA_STATUS_CHANGED = "camera_status.changed"
+TASK_STATUS_CHANGED = "task_status.changed"
+
+APP_REALTIME_EVENT_TYPES = {
+    CAMERA_OBSERVATION_UPDATED,
+    CAMERA_EVENT_CREATED,
+    CAMERA_MONITOR_REFRESHED,
+    CAMERA_STATUS_CHANGED,
+    TASK_STATUS_CHANGED,
+}
 
 
 @dataclass
@@ -286,11 +299,76 @@ def publish_task_update(
     )
     if payload["taskIds"]:
         task_event_stream_server.broadcast(family_id, payload)
+        publish_family_event(
+            family_id=family_id,
+            event_type=TASK_STATUS_CHANGED,
+            task_ids=payload["taskIds"],
+            event_ids=[str(event.get("id") or "") for event in events or []],
+            source=source,
+        )
 
 
 def publish_task_runtime_result(result: dict[str, Any]) -> None:
     for family_id, payload in task_runtime_messages_by_family(result).items():
         task_event_stream_server.broadcast(family_id, payload)
+        publish_family_event(
+            family_id=family_id,
+            event_type=TASK_STATUS_CHANGED,
+            task_ids=payload.get("taskIds") or [],
+            event_ids=[str(event.get("id") or "") for event in payload.get("events") or []],
+            source=str(payload.get("source") or "scheduler"),
+        )
+
+
+def publish_family_event(
+    *,
+    family_id: str,
+    event_type: str,
+    device_id: str | None = None,
+    task_ids: list[str] | None = None,
+    event_ids: list[str] | None = None,
+    observation_id: str | None = None,
+    is_reliable: bool | None = None,
+    source: str = "app",
+) -> None:
+    if not family_id or event_type not in APP_REALTIME_EVENT_TYPES:
+        return
+    task_event_stream_server.broadcast(
+        family_id,
+        family_event_message(
+            event_type=event_type,
+            device_id=device_id,
+            task_ids=task_ids,
+            event_ids=event_ids,
+            observation_id=observation_id,
+            is_reliable=is_reliable,
+            source=source,
+        ),
+    )
+
+
+def family_event_message(
+    *,
+    event_type: str,
+    device_id: str | None = None,
+    task_ids: list[str] | None = None,
+    event_ids: list[str] | None = None,
+    observation_id: str | None = None,
+    is_reliable: bool | None = None,
+    source: str = "app",
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "type": event_type,
+        "deviceId": str(device_id or ""),
+        "taskIds": _clean_ids(task_ids),
+        "eventIds": _clean_ids(event_ids),
+        "observationId": str(observation_id or ""),
+        "sentAt": _now_ms(),
+        "source": str(source or "app")[:80],
+    }
+    if is_reliable is not None:
+        payload["isReliable"] = bool(is_reliable)
+    return payload
 
 
 def publish_account_session_revoked(
@@ -361,6 +439,15 @@ def task_update_message(
         "checkedAt": checked_at,
         "sentAt": _now_ms(),
     }
+
+
+def _clean_ids(values: list[str] | None) -> list[str]:
+    result: list[str] = []
+    for value in values or []:
+        current = str(value or "").strip()
+        if current and current not in result:
+            result.append(current)
+    return result
 
 
 def _connected_message(stream_kind: str, identity_id: str) -> dict[str, Any]:

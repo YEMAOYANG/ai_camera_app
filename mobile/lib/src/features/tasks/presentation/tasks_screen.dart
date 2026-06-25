@@ -258,6 +258,7 @@ Future<DateTime?> showTaskFormSheet(
   bool showTemplatePicker = false,
   VoidCallback? onSavedProgress,
   GuardianTask? task,
+  GuardianTask? prefillTask,
   List<GuardianTask> existingTasks = const [],
 }) {
   return showAppBottomSheet<DateTime>(
@@ -271,6 +272,7 @@ Future<DateTime?> showTaskFormSheet(
       showTemplatePicker: showTemplatePicker,
       onSavedProgress: onSavedProgress,
       task: task,
+      prefillTask: prefillTask,
       existingTasks: existingTasks,
     ),
   );
@@ -889,6 +891,7 @@ class TaskFormSheet extends ConsumerStatefulWidget {
     this.showTemplatePicker = false,
     this.onSavedProgress,
     this.task,
+    this.prefillTask,
     this.existingTasks = const [],
     super.key,
   });
@@ -900,6 +903,7 @@ class TaskFormSheet extends ConsumerStatefulWidget {
   final bool showTemplatePicker;
   final VoidCallback? onSavedProgress;
   final GuardianTask? task;
+  final GuardianTask? prefillTask;
   final List<GuardianTask> existingTasks;
 
   @override
@@ -929,7 +933,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
   @override
   void initState() {
     super.initState();
-    final task = widget.task;
+    final task = widget.task ?? widget.prefillTask;
     _taskType = task?.type ?? _recommendedTaskType(widget.childAgeGroup);
     final selectedConfig = _taskConfig(_taskType);
     final descriptionFields = _splitTaskDescription(

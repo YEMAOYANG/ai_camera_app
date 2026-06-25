@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:guardian_parent_app/src/core/theme/app_theme.dart';
 import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
+import 'package:guardian_parent_app/src/features/setup/application/setup_draft.dart';
+import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
 import 'package:guardian_parent_app/src/features/setup/presentation/setup_flow_screens.dart';
 import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
 
@@ -129,6 +131,25 @@ void main() {
     expect(_choiceColor(tester, '大班'), isNot(AppColors.brandWash));
   });
 
+  test(
+    'setup draft from empty current account status clears old child data',
+    () {
+      const previous = SetupDraft(
+        childName: '小爱',
+        childBirthday: '2021-06-03',
+        childGrade: '中班',
+        childGender: 'girl',
+      );
+      final next = setupDraftFromStatus(_emptyChildSetupStatus());
+
+      expect(previous.childName, '小爱');
+      expect(next.childName, isEmpty);
+      expect(next.childBirthday, isEmpty);
+      expect(next.childGrade, isEmpty);
+      expect(next.childGender, 'unspecified');
+    },
+  );
+
   testWidgets('legacy setup pages do not show V1 setup progress', (
     tester,
   ) async {
@@ -252,6 +273,34 @@ Color? _choiceColor(WidgetTester tester, String option) {
         .first,
   );
   return (container.decoration as BoxDecoration?)?.color;
+}
+
+SetupStatus _emptyChildSetupStatus() {
+  return const SetupStatus(
+    completed: false,
+    parentIdentity: 'done',
+    deviceBinding: 'pending',
+    wifi: 'pending',
+    childProfile: 'pending',
+    cameraName: 'pending',
+    cameraNameIntro: 'pending',
+    cameraNameIntroAt: null,
+    contacts: 'pending',
+    nextStep: 'child',
+    parentDisplayName: '爸爸',
+    parentRelationship: '爸爸',
+    parentRelationshipKey: 'dad',
+    deviceName: '',
+    deviceLocation: '',
+    wifiName: '',
+    childName: '',
+    childGender: 'unspecified',
+    childBirthday: '',
+    childSleepTime: '',
+    childEducationStage: '',
+    childGrade: '',
+    cameraWakeName: '',
+  );
 }
 
 GuardianIdentityOptions _identityOptions() {

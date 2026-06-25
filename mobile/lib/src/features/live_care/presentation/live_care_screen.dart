@@ -165,7 +165,7 @@ class _LiveCareHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final care = status.asData?.value;
-    final label = status.isLoading ? '正在连接' : care?.label ?? '状态同步中';
+    final label = status.isLoading ? '正在连接' : care?.label ?? '状态检查中';
     final tone = status.isLoading
         ? StatusTone.warning
         : care?.tone ?? StatusTone.neutral;
@@ -537,8 +537,8 @@ class _LiveActions extends StatelessWidget {
       ),
       _LiveAction(
         icon: Icons.play_circle_outline,
-        title: '事件回放',
-        subtitle: '最近片段',
+        title: '看护记录',
+        subtitle: '最近观察',
         onTap: () => context.go(liveEventsPath),
       ),
     ];
@@ -691,7 +691,7 @@ class _CareFocusPanel extends StatelessWidget {
             title: currentTask == null ? '当前没有进行中的看护安排' : currentTask.title,
             subtitle: currentTask == null
                 ? '需要查看时进入实时画面，普通状态不会打扰孩子。'
-                : '${currentTask.timeLabel} · 看护进度会同步更新',
+                : '${currentTask.timeLabel} · 看护记录会在这里更新',
             tone: care?.isAvailable == true
                 ? AppListRowTone.green
                 : AppListRowTone.amber,
@@ -699,15 +699,15 @@ class _CareFocusPanel extends StatelessWidget {
           if (events.isLoading)
             const AppListRow(
               icon: Icons.history_toggle_off_outlined,
-              title: '近期记录同步中',
-              subtitle: '正在整理最近的提醒和摄像头操作。',
+              title: '正在整理近期记录',
+              subtitle: '正在整理最近的画面观察。',
               tone: AppListRowTone.neutral,
             )
           else if (recentEvent == null)
             AppListRow(
               icon: Icons.history_toggle_off_outlined,
-              title: '还没有近期记录',
-              subtitle: '摄像头提醒、看护记录和设备操作会持续记录在这里。',
+              title: '还没有可靠的画面记录',
+              subtitle: '看到孩子、没看到孩子或画面不可判断时会显示在这里。',
               tone: AppListRowTone.neutral,
               onTap: () => context.go(liveEventsPath),
             )
@@ -715,7 +715,8 @@ class _CareFocusPanel extends StatelessWidget {
             AppListRow(
               icon: Icons.history_outlined,
               title: '最近记录',
-              subtitle: '${recentEvent.timeLabel} · ${recentEvent.message}',
+              subtitle:
+                  '${recentEvent.timeLabel} · ${recentEvent.displayTitle}：${recentEvent.displayMessage}',
               tone: _eventListTone(recentEvent),
               onTap: () => context.go(liveEventsPath),
             ),
@@ -741,8 +742,8 @@ class LiveEventsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final events = ref.watch(cameraEventsProvider);
     return AppScreen(
-      title: '事件回放',
-      subtitle: '提醒、看护和摄像头操作记录',
+      title: '看护记录',
+      subtitle: '画面观察和需要回看的情况',
       onBack: () => context.go(AppRoute.live.path),
       children: [
         events.when(
@@ -757,8 +758,8 @@ class LiveEventsScreen extends ConsumerWidget {
             if (items.isEmpty) {
               return const AppStateView(
                 variant: AppStateVariant.noData,
-                title: '还没有可回放的片段',
-                message: '摄像头提醒、看护记录和设备操作会持续记录在这里。',
+                title: '还没有可靠的画面记录',
+                message: '看到孩子、没看到孩子或画面不可判断时会显示在这里。',
               );
             }
             return Column(
@@ -766,9 +767,9 @@ class LiveEventsScreen extends ConsumerWidget {
                 for (var index = 0; index < items.length; index++) ...[
                   _PlaybackCard(
                     icon: _eventIcon(items[index]),
-                    title: items[index].title,
+                    title: items[index].displayTitle,
                     time: items[index].timeLabel,
-                    message: items[index].message,
+                    message: _eventDisplaySubtitle(items[index]),
                     tone: _eventListTone(items[index]),
                   ),
                   if (index != items.length - 1) const SizedBox(height: 12),
@@ -783,6 +784,16 @@ class LiveEventsScreen extends ConsumerWidget {
 }
 
 IconData _eventIcon(LiveCareEvent event) {
+  if (event.category == 'camera_observation' ||
+      event.category == 'child_presence') {
+    return Icons.visibility_outlined;
+  }
+  if (event.category == 'snapshot') {
+    return Icons.camera_alt_outlined;
+  }
+  if (event.category == 'camera_status') {
+    return Icons.videocam_off_outlined;
+  }
   return switch (event.eventType) {
     'ptz_move' => Icons.control_camera_outlined,
     'speak' => Icons.record_voice_over_outlined,
@@ -793,6 +804,15 @@ IconData _eventIcon(LiveCareEvent event) {
           ? Icons.task_alt_outlined
           : Icons.play_circle_outline,
   };
+}
+
+String _eventDisplaySubtitle(LiveCareEvent event) {
+  final parts = <String>[
+    event.displayMessage,
+    if (event.taskTitle.isNotEmpty) event.taskTitle,
+    if (event.evidenceSummary.isNotEmpty) event.evidenceSummary,
+  ];
+  return parts.where((part) => part.trim().isNotEmpty).join(' · ');
 }
 
 class _PlaybackCard extends StatelessWidget {

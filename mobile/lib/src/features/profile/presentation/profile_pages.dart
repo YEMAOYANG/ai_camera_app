@@ -2662,8 +2662,22 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
     );
     if (!confirmed) return;
     try {
-      await ref.read(deviceRepositoryProvider).unbindDevice(widget.deviceId);
-      if (ref.read(selectedDeviceIdProvider) == widget.deviceId) {
+      final wasSelected = ref.read(selectedDeviceIdProvider) == widget.deviceId;
+      final wasDefault =
+          ref
+              .read(deviceOverviewProvider(widget.deviceId))
+              .asData
+              ?.value
+              .device
+              .isDefault ==
+          true;
+      final result = await ref
+          .read(deviceRepositoryProvider)
+          .unbindDevice(widget.deviceId);
+      final fallback = result.defaultDevice;
+      if (fallback != null && (wasSelected || wasDefault)) {
+        await selectDevice(ref, fallback.id);
+      } else if (wasSelected || fallback == null) {
         await ref
             .read(sharedPreferencesProvider)
             .remove(selectedDeviceIdPreferenceKey);
@@ -2682,6 +2696,8 @@ void _refreshDeviceAndLiveCare(WidgetRef ref, {String? deviceId}) {
     ..invalidate(devicesProvider)
     ..invalidate(selectedDeviceProvider)
     ..invalidate(primaryDeviceOverviewProvider)
+    ..invalidate(primaryFirmwareStatusProvider)
+    ..invalidate(profileSummaryProvider)
     ..invalidate(cameraHealthProvider)
     ..invalidate(cameraRuntimeProvider)
     ..invalidate(cameraStatusProvider)

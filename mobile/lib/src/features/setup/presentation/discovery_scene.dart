@@ -140,9 +140,9 @@ class DiscoverySonarPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..shader = LinearGradient(
         colors: [
-          AppColors.brandWarm.withValues(alpha: 0.05),
-          AppColors.brandWarm.withValues(alpha: 0.55),
-          AppColors.brandSage.withValues(alpha: 0.35),
+          AppColors.brandWarm.withValues(alpha: 0.08),
+          AppColors.brandWarm.withValues(alpha: 0.68),
+          AppColors.brandSage.withValues(alpha: 0.46),
         ],
         stops: const [0, 0.72, 1],
       ).createShader(Rect.fromPoints(center, end));
@@ -151,7 +151,7 @@ class DiscoverySonarPainter extends CustomPainter {
 
   void _drawSonarGrid(Canvas canvas, Offset center, double radius) {
     final collapse = collapseProgress.clamp(0.0, 1.0);
-    final gridAlpha = (0.12 * (1 - collapse * 0.7)).clamp(0.0, 0.12);
+    final gridAlpha = (0.15 * (1 - collapse * 0.7)).clamp(0.0, 0.15);
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.8
@@ -176,8 +176,8 @@ class DiscoverySonarPainter extends CustomPainter {
       final phase = ((progress + band * 0.33) % 1);
       final expand = phase * (1 - collapse * 0.88);
       final ringRadius = radius * (minScale + expand * 0.98);
-      final opacity = ((1 - phase) * 0.58).clamp(0.0, 0.58) * (1 - collapse);
-      final stroke = 2.2 - phase * 1.2;
+      final opacity = ((1 - phase) * 0.66).clamp(0.0, 0.66) * (1 - collapse);
+      final stroke = 2.4 - phase * 1.25;
       final rect = Rect.fromCircle(center: center, radius: ringRadius);
       final ringPaint = Paint()
         ..style = PaintingStyle.stroke

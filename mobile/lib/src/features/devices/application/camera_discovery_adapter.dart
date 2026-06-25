@@ -3,6 +3,8 @@ import 'dart:io' show Platform;
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart' as reactive;
 import 'package:guardian_parent_app/src/core/config/app_environment.dart';
 import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
 import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
@@ -21,6 +23,10 @@ final cameraDiscoveryConfigProvider = Provider<CameraDiscoveryConfig>((ref) {
   );
 });
 
+final reactiveBleClientProvider = Provider<ReactiveBleClient>((ref) {
+  return FlutterReactiveBleClient(reactive.FlutterReactiveBle());
+});
+
 final cameraDiscoveryAdapterProvider = Provider<CameraDiscoveryAdapter>((ref) {
   final permissionProbe = ref.watch(cameraDiscoveryPermissionProbeProvider);
   final mockAdapter = MockCameraDiscoveryAdapter(
@@ -30,6 +36,8 @@ final cameraDiscoveryAdapterProvider = Provider<CameraDiscoveryAdapter>((ref) {
   );
   final bleAdapter = BleCameraDiscoveryAdapter(
     permissionProbe: permissionProbe,
+    bleClient: ref.watch(reactiveBleClientProvider),
+    scanConfig: CameraBleScanConfig.fromEnvironment(),
   );
   return CameraDiscoveryAdapterFactory(
     mockAdapter: mockAdapter,
@@ -46,14 +54,13 @@ class CameraDiscoveryConfig {
   factory CameraDiscoveryConfig.fromEnvironment(AppEnvironment environment) {
     const backendName = String.fromEnvironment(
       'CAMERA_DISCOVERY_BACKEND',
-      defaultValue: 'mock',
+      // defaultValue: 'mock',
+      defaultValue: 'ble',
     );
     final backend = CameraDiscoveryBackend.fromName(backendName);
     return CameraDiscoveryConfig(
       backend: backend,
-      allowBleFallbackToMock:
-          backend == CameraDiscoveryBackend.ble &&
-          environment.flavor != AppFlavor.production,
+      allowBleFallbackToMock: false,
     );
   }
 
@@ -73,13 +80,121 @@ class CameraDiscoveryAdapterFactory {
   CameraDiscoveryAdapter create(CameraDiscoveryConfig config) {
     return switch (config.backend) {
       CameraDiscoveryBackend.mock => mockAdapter,
-      // The real BLE adapter is intentionally a contract-only adapter for now.
-      // Development and tests keep the current nearby-device experience stable;
-      // production must not silently use development discovery when BLE is
-      // requested but not implemented.
-      CameraDiscoveryBackend.ble =>
-        config.allowBleFallbackToMock ? mockAdapter : bleAdapter,
+      CameraDiscoveryBackend.ble => bleAdapter,
     };
+  }
+}
+
+class CameraBleScanConfig {
+  const CameraBleScanConfig({
+    required this.serviceUuids,
+    required this.namePrefixes,
+    required this.manufacturerId,
+    required this.scanTimeout,
+  });
+
+  factory CameraBleScanConfig.fromEnvironment() {
+    const serviceUuidText = String.fromEnvironment(
+      'CAMERA_BLE_SERVICE_UUIDS',
+      defaultValue: '',
+    );
+    const namePrefixText = String.fromEnvironment(
+      'CAMERA_BLE_NAME_PREFIXES',
+      defaultValue: '',
+    );
+    const manufacturerIdText = String.fromEnvironment(
+      'CAMERA_BLE_MANUFACTURER_ID',
+      defaultValue: '',
+    );
+    const timeoutSeconds = int.fromEnvironment(
+      'CAMERA_BLE_SCAN_TIMEOUT_SECONDS',
+      defaultValue: 12,
+    );
+    return CameraBleScanConfig(
+      serviceUuids: _splitConfigList(serviceUuidText),
+      namePrefixes: _splitConfigList(namePrefixText),
+      manufacturerId: _parseManufacturerId(manufacturerIdText),
+      scanTimeout: Duration(seconds: timeoutSeconds.clamp(4, 30)),
+    );
+  }
+
+  final List<String> serviceUuids;
+  final List<String> namePrefixes;
+  final int? manufacturerId;
+  final Duration scanTimeout;
+
+  bool get hasMatchCriteria =>
+      serviceUuids.isNotEmpty ||
+      namePrefixes.isNotEmpty ||
+      manufacturerId != null;
+
+  List<reactive.Uuid> get reactiveServiceUuids {
+    final parsed = <reactive.Uuid>[];
+    for (final value in serviceUuids) {
+      try {
+        parsed.add(reactive.Uuid.parse(value));
+      } catch (_) {
+        // Invalid build-time UUIDs are ignored so discovery can fail safely
+        // with "not found" instead of crashing the connection sheet.
+      }
+    }
+    return parsed;
+  }
+}
+
+List<String> _splitConfigList(String text) {
+  return text
+      .split(RegExp(r'[,;\s]+'))
+      .map((item) => item.trim())
+      .where((item) => item.isNotEmpty)
+      .toList(growable: false);
+}
+
+int? _parseManufacturerId(String raw) {
+  final value = raw.trim();
+  if (value.isEmpty) return null;
+  final hasHexPrefix = value.toLowerCase().startsWith('0x');
+  final normalized = hasHexPrefix ? value.substring(2) : value;
+  return int.tryParse(
+    normalized,
+    radix: hasHexPrefix || RegExp(r'[a-fA-F]').hasMatch(normalized) ? 16 : 10,
+  );
+}
+
+abstract class ReactiveBleClient {
+  reactive.BleStatus get status;
+
+  Stream<reactive.BleStatus> get statusStream;
+
+  Stream<reactive.DiscoveredDevice> scanForDevices({
+    required List<reactive.Uuid> withServices,
+    required reactive.ScanMode scanMode,
+    required bool requireLocationServicesEnabled,
+  });
+}
+
+class FlutterReactiveBleClient implements ReactiveBleClient {
+  const FlutterReactiveBleClient(this._ble);
+
+  final reactive.FlutterReactiveBle _ble;
+
+  @override
+  reactive.BleStatus get status => _ble.status;
+
+  @override
+  Stream<reactive.BleStatus> get statusStream => _ble.statusStream;
+
+  @override
+  Stream<reactive.DiscoveredDevice> scanForDevices({
+    required List<reactive.Uuid> withServices,
+    required reactive.ScanMode scanMode,
+    required bool requireLocationServicesEnabled,
+  }) {
+    return _ble.scanForDevices(
+      withServices: withServices,
+      scanMode: scanMode,
+      requireLocationServicesEnabled: requireLocationServicesEnabled,
+    );
   }
 }
 
@@ -91,7 +206,11 @@ abstract class CameraDiscoveryPermissionProbe {
   Future<bool> isBluetoothAvailable();
 
   Future<void> openSystemSettings();
+
+  Future<void> openBluetoothSettings();
 }
+
+const _systemSettingsChannel = MethodChannel('ai_camera_app/system_settings');
 
 /// Permission probing boundary for the future BLE adapter.
 ///
@@ -140,6 +259,19 @@ class PermissionHandlerCameraDiscoveryPermissionProbe
   @override
   Future<void> openSystemSettings() async {
     await openAppSettings();
+  }
+
+  @override
+  Future<void> openBluetoothSettings() async {
+    if (!Platform.isAndroid) {
+      await openAppSettings();
+      return;
+    }
+    try {
+      await _systemSettingsChannel.invokeMethod<void>('openBluetoothSettings');
+    } catch (_) {
+      await openAppSettings();
+    }
   }
 
   Future<CameraDiscoveryPermissionStatus> _iosPermissionStatus({
@@ -209,6 +341,8 @@ abstract class CameraDiscoveryAdapter {
   Future<CameraReadinessResult> checkReadiness(String deviceId);
 
   Future<void> openSystemSettings();
+
+  Future<void> openBluetoothSettings();
 }
 
 class MockCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
@@ -249,7 +383,7 @@ class MockCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
 
   @override
   Stream<CameraDiscoveryResult> startScan() {
-    unawaited(stopScan());
+    _stopCurrentScan();
     final controller = StreamController<CameraDiscoveryResult>();
     _scanController = controller;
     unawaited(_emitDevelopmentDiscovery(controller));
@@ -279,6 +413,10 @@ class MockCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
 
   @override
   Future<void> stopScan() async {
+    await _stopCurrentScan();
+  }
+
+  Future<void> _stopCurrentScan() async {
     final controller = _scanController;
     _scanController = null;
     if (controller != null && !controller.isClosed) {
@@ -288,7 +426,7 @@ class MockCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
 
   @override
   Future<GuardianDevice> connectCandidate(DiscoveredCameraCandidate candidate) {
-    if (!candidate.isConnectable) {
+    if (!candidate.canSelect) {
       throw DeviceException(
         candidate.unavailableReason ?? '这台摄像头暂时无法连接，请重新搜索。',
         code: 'candidate_unavailable',
@@ -336,31 +474,53 @@ class MockCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
   Future<void> openSystemSettings() {
     return _permissionProbe.openSystemSettings();
   }
+
+  @override
+  Future<void> openBluetoothSettings() {
+    return _permissionProbe.openBluetoothSettings();
+  }
 }
 
-/// Contract boundary for the future real BLE camera discovery path.
-///
-/// This adapter deliberately does not perform Bluetooth scanning yet. It keeps
-/// the production behavior explicit when CAMERA_DISCOVERY_BACKEND=ble is set
-/// before the self-owned camera advertisement and pairing protocol is ready.
 class BleCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
   BleCameraDiscoveryAdapter({
     required CameraDiscoveryPermissionProbe permissionProbe,
-  }) : this._(permissionProbe);
+    required ReactiveBleClient bleClient,
+    required CameraBleScanConfig scanConfig,
+    bool? isSupportedPlatform,
+  }) : this._(
+         permissionProbe,
+         bleClient,
+         scanConfig,
+         isSupportedPlatform ?? (Platform.isAndroid || Platform.isIOS),
+       );
 
-  BleCameraDiscoveryAdapter._(this._permissionProbe);
+  BleCameraDiscoveryAdapter._(
+    this._permissionProbe,
+    this._bleClient,
+    this._scanConfig,
+    this._isSupportedPlatform,
+  );
 
   final CameraDiscoveryPermissionProbe _permissionProbe;
+  final ReactiveBleClient _bleClient;
+  final CameraBleScanConfig _scanConfig;
+  final bool _isSupportedPlatform;
   StreamController<CameraDiscoveryResult>? _scanController;
-
-  bool get _isSupportedPlatform => Platform.isAndroid || Platform.isIOS;
+  StreamSubscription<reactive.DiscoveredDevice>? _bleScanSubscription;
+  Timer? _scanTimeoutTimer;
+  final _discoveredCandidates = <String, DiscoveredCameraCandidate>{};
 
   @override
   Future<CameraDiscoveryPermissionStatus> getPermissionStatus() async {
     if (!_isSupportedPlatform) {
       return CameraDiscoveryPermissionStatus.unsupported;
     }
-    return _permissionProbe.getPermissionStatus();
+    final permission = await _permissionProbe.getPermissionStatus();
+    if (!permission.canStartDiscovery) return permission;
+    return _permissionStatusFromBleStatus(
+      _bleClient.status,
+      fallbackReady: true,
+    );
   }
 
   @override
@@ -368,40 +528,241 @@ class BleCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
     if (!_isSupportedPlatform) {
       return CameraDiscoveryPermissionStatus.unsupported;
     }
-    return _permissionProbe.requestRequiredPermissions();
+    final permission = await _permissionProbe.requestRequiredPermissions();
+    if (!permission.canStartDiscovery) return permission;
+    return _permissionStatusFromBleStatus(
+      _bleClient.status,
+      fallbackReady: true,
+    );
   }
 
   @override
   Future<bool> isBluetoothAvailable() async {
     if (!_isSupportedPlatform) return false;
+    final status = _permissionStatusFromBleStatus(
+      _bleClient.status,
+      fallbackReady: true,
+    );
+    if (status == CameraDiscoveryPermissionStatus.bluetoothOff ||
+        status == CameraDiscoveryPermissionStatus.unsupported) {
+      return false;
+    }
     return _permissionProbe.isBluetoothAvailable();
   }
 
   @override
   Stream<CameraDiscoveryResult> startScan() {
-    unawaited(stopScan());
+    _stopActiveScan();
     final controller = StreamController<CameraDiscoveryResult>();
     _scanController = controller;
-    scheduleMicrotask(() {
-      if (controller.isClosed) return;
-      controller.add(
-        CameraDiscoveryResult(
+    _discoveredCandidates.clear();
+    unawaited(_startBleScan(controller));
+    return controller.stream;
+  }
+
+  Future<void> _startBleScan(
+    StreamController<CameraDiscoveryResult> controller,
+  ) async {
+    if (!_isSupportedPlatform) {
+      await _emitAndClose(
+        controller,
+        const CameraDiscoveryResult(
           phase: CameraDiscoveryPhase.connectionFailed,
-          candidates: const [],
-          failureReason: _isSupportedPlatform
-              ? AddCameraFailureReason.bleAdapterUnavailable
-              : AddCameraFailureReason.unsupported,
+          candidates: [],
+          failureReason: AddCameraFailureReason.unsupported,
         ),
       );
-      unawaited(controller.close());
+      return;
+    }
+    final status = _permissionStatusFromBleStatus(
+      _bleClient.status,
+      fallbackReady: true,
+    );
+    if (!status.canStartDiscovery) {
+      await _emitAndClose(
+        controller,
+        CameraDiscoveryResult(
+          phase: status == CameraDiscoveryPermissionStatus.bluetoothOff
+              ? CameraDiscoveryPhase.bluetoothOff
+              : CameraDiscoveryPhase.permissionRequired,
+          candidates: const [],
+          failureReason: _failureReasonForStatus(status),
+        ),
+      );
+      return;
+    }
+
+    _scanTimeoutTimer = Timer(_scanConfig.scanTimeout, () {
+      if (controller.isClosed) return;
+      controller.add(
+        const CameraDiscoveryResult(
+          phase: CameraDiscoveryPhase.notFound,
+          candidates: [],
+          failureReason: AddCameraFailureReason.timeout,
+        ),
+      );
+      unawaited(stopScan());
     });
-    return controller.stream;
+
+    if (!_scanConfig.hasMatchCriteria) {
+      return;
+    }
+
+    _bleScanSubscription = _bleClient
+        .scanForDevices(
+          withServices: _scanConfig.reactiveServiceUuids,
+          scanMode: reactive.ScanMode.lowLatency,
+          requireLocationServicesEnabled: false,
+        )
+        .listen(
+          (device) {
+            if (controller.isClosed || !_matchesCameraDevice(device)) return;
+            final candidate = _candidateFromBleDevice(device);
+            _discoveredCandidates[candidate.id] = candidate;
+            controller.add(
+              CameraDiscoveryResult(
+                phase: CameraDiscoveryPhase.found,
+                candidates: _sortedBleCandidates(),
+              ),
+            );
+          },
+          onError: (_) {
+            if (controller.isClosed) return;
+            controller.add(
+              const CameraDiscoveryResult(
+                phase: CameraDiscoveryPhase.notFound,
+                candidates: [],
+                failureReason: AddCameraFailureReason.timeout,
+              ),
+            );
+            unawaited(stopScan());
+          },
+        );
+  }
+
+  Future<void> _emitAndClose(
+    StreamController<CameraDiscoveryResult> controller,
+    CameraDiscoveryResult result,
+  ) async {
+    if (!controller.isClosed) controller.add(result);
+    if (!controller.isClosed) await controller.close();
+  }
+
+  CameraDiscoveryPermissionStatus _permissionStatusFromBleStatus(
+    reactive.BleStatus status, {
+    required bool fallbackReady,
+  }) {
+    return switch (status) {
+      reactive.BleStatus.ready => CameraDiscoveryPermissionStatus.ready,
+      reactive.BleStatus.poweredOff =>
+        CameraDiscoveryPermissionStatus.bluetoothOff,
+      reactive.BleStatus.unauthorized =>
+        CameraDiscoveryPermissionStatus.bluetoothPermissionPermanentlyDenied,
+      reactive.BleStatus.unsupported =>
+        CameraDiscoveryPermissionStatus.unsupported,
+      reactive.BleStatus.locationServicesDisabled =>
+        CameraDiscoveryPermissionStatus.bluetoothPermissionRequired,
+      reactive.BleStatus.unknown =>
+        fallbackReady
+            ? CameraDiscoveryPermissionStatus.ready
+            : CameraDiscoveryPermissionStatus.unknown,
+    };
+  }
+
+  AddCameraFailureReason _failureReasonForStatus(
+    CameraDiscoveryPermissionStatus status,
+  ) {
+    return switch (status) {
+      CameraDiscoveryPermissionStatus.bluetoothOff =>
+        AddCameraFailureReason.bluetoothUnavailable,
+      CameraDiscoveryPermissionStatus.bluetoothPermissionPermanentlyDenied =>
+        AddCameraFailureReason.permissionPermanentlyDenied,
+      CameraDiscoveryPermissionStatus.unsupported =>
+        AddCameraFailureReason.unsupported,
+      _ => AddCameraFailureReason.permissionDenied,
+    };
+  }
+
+  bool _matchesCameraDevice(reactive.DiscoveredDevice device) {
+    if (!_scanConfig.hasMatchCriteria) return false;
+    final serviceMatch =
+        _scanConfig.serviceUuids.isNotEmpty &&
+        device.serviceUuids.any(
+          (uuid) => _scanConfig.serviceUuids.any(
+            (expected) => _uuidEquals(uuid.toString(), expected),
+          ),
+        );
+    final normalizedName = device.name.trim().toLowerCase();
+    final nameMatch =
+        _scanConfig.namePrefixes.isNotEmpty &&
+        normalizedName.isNotEmpty &&
+        _scanConfig.namePrefixes.any(
+          (prefix) => normalizedName.startsWith(prefix.toLowerCase()),
+        );
+    final manufacturerMatch =
+        _scanConfig.manufacturerId != null &&
+        _manufacturerIdMatches(
+          device.manufacturerData,
+          _scanConfig.manufacturerId!,
+        );
+    return serviceMatch || nameMatch || manufacturerMatch;
+  }
+
+  bool _uuidEquals(String actual, String expected) {
+    try {
+      return reactive.Uuid.parse(actual) == reactive.Uuid.parse(expected);
+    } catch (_) {
+      return actual.toLowerCase() == expected.toLowerCase();
+    }
+  }
+
+  bool _manufacturerIdMatches(Uint8List data, int expected) {
+    if (data.length < 2) return false;
+    final littleEndian = data[0] | (data[1] << 8);
+    final bigEndian = (data[0] << 8) | data[1];
+    return littleEndian == expected || bigEndian == expected;
+  }
+
+  DiscoveredCameraCandidate _candidateFromBleDevice(
+    reactive.DiscoveredDevice device,
+  ) {
+    return DiscoveredCameraCandidate(
+      id: 'ble_${device.id}',
+      displayName: 'AI 看护摄像头',
+      bindingCode: 'ble:${device.id}',
+      signalStrength: _signalStrengthFromRssi(device.rssi),
+      status: 'ready',
+      source: CameraDiscoveryCandidateSource.ble,
+      isConnectable: device.connectable != reactive.Connectable.unavailable,
+      unavailableReason: device.connectable == reactive.Connectable.unavailable
+          ? '这台摄像头暂时无法连接，请重新搜索。'
+          : null,
+    );
+  }
+
+  int _signalStrengthFromRssi(int rssi) {
+    return (((rssi + 95) / 55) * 100).round().clamp(1, 100);
+  }
+
+  List<DiscoveredCameraCandidate> _sortedBleCandidates() {
+    final candidates = _discoveredCandidates.values.toList()
+      ..sort((a, b) => b.signalStrength.compareTo(a.signalStrength));
+    return candidates;
   }
 
   @override
   Future<void> stopScan() async {
+    await _stopActiveScan();
+  }
+
+  Future<void> _stopActiveScan() async {
+    _scanTimeoutTimer?.cancel();
+    _scanTimeoutTimer = null;
+    final subscription = _bleScanSubscription;
+    _bleScanSubscription = null;
     final controller = _scanController;
     _scanController = null;
+    await subscription?.cancel();
     if (controller != null && !controller.isClosed) {
       await controller.close();
     }
@@ -412,8 +773,8 @@ class BleCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
     DiscoveredCameraCandidate candidate,
   ) async {
     throw const DeviceException(
-      '摄像头连接暂时不可用，请稍后再试。',
-      code: 'ble_adapter_unavailable',
+      '暂时无法完成连接，设备协议还未接入。',
+      code: 'ble_protocol_unavailable',
     );
   }
 
@@ -428,5 +789,10 @@ class BleCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
   @override
   Future<void> openSystemSettings() {
     return _permissionProbe.openSystemSettings();
+  }
+
+  @override
+  Future<void> openBluetoothSettings() {
+    return _permissionProbe.openBluetoothSettings();
   }
 }

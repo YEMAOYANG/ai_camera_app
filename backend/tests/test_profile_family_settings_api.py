@@ -943,6 +943,14 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(unbound.json["device"]["status"], "unbound")
         self.assertIsNotNone(unbound.json["device"]["unboundAt"])
 
+        devices = self.client.get("/api/devices", headers=self._auth_headers())
+        self.assertEqual(devices.status_code, 200)
+        self.assertEqual(devices.json["devices"], [])
+
+        summary = self.client.get("/api/profile/summary", headers=self._auth_headers())
+        self.assertEqual(summary.status_code, 200)
+        self.assertEqual(summary.json["summary"]["deviceCount"], 0)
+
     def test_settings_legal_about_subscription_reports_and_feedback(self):
         setting = self.client.get("/api/settings/ai-care-rules", headers=self._auth_headers())
         self.assertEqual(setting.status_code, 200)

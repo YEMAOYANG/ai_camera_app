@@ -190,6 +190,49 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         )
         self.assertEqual(reject.status_code, 400)
 
+    def test_parent_manual_completion_records_source_without_granting_points(self):
+        task = self._create_task_at(
+            start_at=datetime.now().astimezone() - timedelta(minutes=30),
+            due_at=datetime.now().astimezone() - timedelta(minutes=5),
+            reward_points=6,
+            requires_parent_confirmation=True,
+        )
+
+        complete = self.client.post(
+            f"/api/tasks/{task['id']}/complete",
+            json={
+                "completionSource": "parent_manual",
+                "evidenceSummary": "家长手动补记完成。",
+            },
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(complete.status_code, 200)
+        self.assertEqual(complete.json["task"]["status"], "completed")
+        self.assertEqual(complete.json["task"]["completionSource"], "parent_manual")
+        self.assertNotIn("ledgerEntry", complete.json)
+        self.assertIsNone(complete.json["task"]["pointsGrantedAt"])
+
+        ledger = self.client.get(
+            "/api/points/ledger",
+            query_string={"childId": self.child_id},
+            headers=self._auth_headers(),
+        )
+        task_entries = [
+            entry
+            for entry in ledger.json["ledger"]
+            if entry["sourceId"] == task["id"] and entry["type"] == "task_completed"
+        ]
+        self.assertEqual(task_entries, [])
+
+        events = self.client.get(
+            f"/api/tasks/{task['id']}/events",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200)
+        event_messages = [event["message"] for event in events.json["events"]]
+        self.assertIn("家长手动记录完成，未发放积分", event_messages)
+
     def test_task_contract_supports_week_fields_and_updates(self):
         response = self.client.post(
             "/api/tasks",
@@ -392,6 +435,43 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(message["source"], "scheduler")
         self.assertEqual(message["taskIds"], ["task_1"])
         self.assertEqual(message["checkedAt"], 1780000000000)
+
+    def test_task_runtime_result_keeps_families_separate(self):
+        messages = task_runtime_messages_by_family(
+            {
+                "checkedAt": 1780000000000,
+                "changedTasks": [
+                    {
+                        "taskId": "task_a",
+                        "familyId": "family_a",
+                        "status": "in_progress",
+                    },
+                    {
+                        "taskId": "task_b",
+                        "familyId": "family_b",
+                        "status": "missed",
+                    },
+                ],
+                "events": [
+                    {
+                        "id": "event_a",
+                        "familyId": "family_a",
+                        "taskId": "task_a",
+                        "eventType": "auto_started",
+                    },
+                    {
+                        "id": "event_b",
+                        "familyId": "family_b",
+                        "taskId": "task_b",
+                        "eventType": "missed",
+                    },
+                ],
+            }
+        )
+
+        self.assertEqual(set(messages), {"family_a", "family_b"})
+        self.assertEqual(messages["family_a"]["taskIds"], ["task_a"])
+        self.assertEqual(messages["family_b"]["taskIds"], ["task_b"])
 
         week = self.client.get(
             "/api/tasks",
@@ -769,6 +849,8 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
                 "type": "life",
                 "scheduled_start": "14:30",
                 "scheduled_end": "14:35",
+                "recentReminderTexts": ["小宇，先喝几口水吧。"],
+                "evidence": {"hasPerson": False},
             },
             phase="start",
             child={"nickname": "小宇", "grade": "中班"},
@@ -782,6 +864,9 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertIn("任务说明：午休后补水", provider.last_user_prompt)
         self.assertIn("语义分类：hydration", provider.last_user_prompt)
         self.assertIn("孩子称呼：小宇", provider.last_user_prompt)
+        self.assertIn("提醒阶段说明：到点开始", provider.last_user_prompt)
+        self.assertIn("最近提醒：小宇，先喝几口水吧。", provider.last_user_prompt)
+        self.assertIn("摄像头观察：no_person", provider.last_user_prompt)
 
     def test_hydration_ai_prepare_copy_with_generic_object_text_falls_back(self):
         provider = FakeReminderAiProvider("小朋友，喝水快到了，先把东西放到手边。")
@@ -805,6 +890,28 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertNotIn("小朋友", reminder["text"])
         self.assertNotIn("放到手边", reminder["text"])
         self.assertIn("喝", reminder["text"])
+
+    def test_task_reminder_repeated_ai_text_falls_back(self):
+        provider = FakeReminderAiProvider("小宇，喝水时间到啦，慢慢喝几口水。")
+
+        reminder = build_task_reminder(
+            {
+                "title": "喝水",
+                "description": "午休后补水",
+                "type": "life",
+                "scheduled_start": "14:30",
+                "scheduled_end": "14:35",
+                "recentReminderTexts": ["小宇，喝水时间到啦，慢慢喝几口水。"],
+            },
+            phase="start",
+            child={"nickname": "小宇", "grade": "中班"},
+            ai_text_provider=provider,
+            prompt="按任务内容生成一句自然提醒。",
+        )
+
+        self.assertEqual(reminder["textSource"], "fallback")
+        self.assertIn("喝", reminder["text"])
+        self.assertNotEqual(reminder["text"], "小宇，喝水时间到啦，慢慢喝几口水。")
 
     def test_preschool_outdoor_walk_reminder_uses_child_friendly_copy(self):
         reminder = build_task_reminder(
@@ -992,6 +1099,25 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         self.assertEqual(detail.json["task"]["status"], "delayed")
         self.assertEqual(detail.json["task"]["delayReminderCount"], 1)
 
+        events = self.client.get("/api/camera/events", headers=self._auth_headers())
+        self.assertEqual(events.status_code, 200)
+        visible_text = " ".join(
+            f"{event.get('displayTitle', '')} {event.get('displayMessage', '')} {event.get('title', '')} {event.get('message', '')}"
+            for event in events.json["events"]
+        )
+        event_types = {event["eventType"] for event in events.json["events"]}
+        self.assertNotIn("还没看到孩子开始", visible_text)
+        self.assertNotIn("已继续提醒", visible_text)
+        self.assertFalse(
+            any(event.get("category") == "task_observation" for event in events.json["events"])
+        )
+        self.assertFalse(any(event.get("category") == "care_reminder" for event in events.json["events"]))
+        self.assertNotIn("任务事件", visible_text)
+        self.assertNotIn("已执行", visible_text)
+        self.assertNotIn("开始观察", visible_text)
+        self.assertNotIn("reminder_due", event_types)
+        self.assertNotIn("monitor_started", event_types)
+
     def test_scheduler_respects_ai_rule_settings(self):
         original = MockCameraRuntimeAdapter.task_observation
         MockCameraRuntimeAdapter.task_observation = lambda self, task: {
@@ -1059,13 +1185,13 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         finally:
             MockCameraRuntimeAdapter.task_observation = original
 
-    def test_scheduler_starts_life_task_without_seat_observation(self):
+    def test_scheduler_does_not_mark_hydration_normal_without_matching_observation(self):
         original = MockCameraRuntimeAdapter.task_observation
         MockCameraRuntimeAdapter.task_observation = lambda self, task: {
-            "verdict": "not_started",
-            "reason": "child_not_present",
+            "verdict": "started",
+            "reason": "mock_child_ready",
             "confidence": 0.8,
-            "evidence": {"hasPerson": False},
+            "evidence": {"hasPerson": True, "activity": "其他"},
         }
         try:
             now = datetime.now().astimezone()
@@ -1082,15 +1208,127 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
             MockCameraRuntimeAdapter.task_observation = original
 
         self.assertEqual(tick.status_code, 200)
-        self.assertEqual(tick.json["changedTasks"][0]["status"], "in_progress")
+        self.assertEqual(tick.json["changedTasks"][0]["status"], "delayed")
         event_types = {event["eventType"] for event in tick.json["events"]}
-        self.assertIn("auto_started", event_types)
-        self.assertNotIn("child_not_ready", event_types)
-        self.assertNotIn("delayed", event_types)
+        self.assertIn("child_not_ready", event_types)
+        self.assertIn("delayed", event_types)
+        self.assertNotIn("auto_started", event_types)
+        self.assertNotIn("observation_unavailable", event_types)
 
         detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
-        self.assertEqual(detail.json["task"]["status"], "in_progress")
-        self.assertEqual(detail.json["task"]["cameraObservationStatus"], "not_required")
+        self.assertEqual(detail.json["task"]["status"], "delayed")
+        self.assertEqual(detail.json["task"]["cameraObservationStatus"], "action_not_supported")
+
+    def test_delayed_reading_task_marks_missed_at_end_without_finish_reminder(self):
+        original = MockCameraRuntimeAdapter.task_observation
+        MockCameraRuntimeAdapter.task_observation = lambda self, task: {
+            "verdict": "not_started",
+            "reason": "child_not_present",
+            "confidence": 0.8,
+            "evidence": {"hasPerson": False},
+        }
+        try:
+            now = datetime.now().astimezone()
+            task = self._create_task_at(
+                title="自己阅读一本绘本",
+                task_type="reading_interest",
+                start_at=now - timedelta(minutes=10),
+                due_at=now + timedelta(minutes=2),
+                reward_points=3,
+                requires_parent_confirmation=False,
+            )
+            delayed_tick = self._scheduler_tick()
+            self.assertEqual(delayed_tick.status_code, 200)
+            self.assertEqual(delayed_tick.json["changedTasks"][0]["status"], "delayed")
+
+            self.client.patch(
+                f"/api/tasks/{task['id']}",
+                json={"dueAt": (now - timedelta(seconds=5)).isoformat()},
+                headers=self._auth_headers(),
+            )
+            finish_tick = self._scheduler_tick()
+        finally:
+            MockCameraRuntimeAdapter.task_observation = original
+
+        self.assertEqual(finish_tick.status_code, 200)
+        self.assertEqual(finish_tick.json["changedTasks"][0]["status"], "missed")
+        event_types = {event["eventType"] for event in finish_tick.json["events"]}
+        self.assertIn("missed", event_types)
+        self.assertNotIn("finish_reminder_sent", event_types)
+        self.assertNotIn("completed", event_types)
+
+        detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
+        self.assertEqual(detail.json["task"]["status"], "missed")
+        self.assertIsNone(detail.json["task"]["pointsGrantedAt"])
+
+        events = self.client.get("/api/camera/events", headers=self._auth_headers())
+        visible_text = " ".join(
+            f"{event.get('displayTitle', '')} {event.get('displayMessage', '')}"
+            for event in events.json["events"]
+        )
+        self.assertNotIn("本次未记录完成", visible_text)
+        self.assertNotIn("任务已完成", visible_text)
+        self.assertNotIn("已提醒结束", visible_text)
+
+    def test_started_reading_without_completion_evidence_requires_parent_confirmation(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            title="自己阅读一本绘本",
+            task_type="reading_interest",
+            start_at=now - timedelta(minutes=8),
+            due_at=now + timedelta(minutes=2),
+            reward_points=4,
+            requires_parent_confirmation=True,
+        )
+        start_tick = self._scheduler_tick()
+        self.assertEqual(start_tick.status_code, 200)
+        self.assertEqual(start_tick.json["changedTasks"][0]["status"], "in_progress")
+
+        self.client.patch(
+            f"/api/tasks/{task['id']}",
+            json={"dueAt": (now - timedelta(seconds=5)).isoformat()},
+            headers=self._auth_headers(),
+        )
+        finish_tick = self._scheduler_tick()
+
+        self.assertEqual(finish_tick.status_code, 200)
+        self.assertEqual(
+            finish_tick.json["changedTasks"][0]["status"],
+            "awaiting_parent_confirmation",
+        )
+        event_types = {event["eventType"] for event in finish_tick.json["events"]}
+        self.assertIn("awaiting_parent_confirmation", event_types)
+        self.assertNotIn("finish_reminder_sent", event_types)
+        self.assertNotIn("completed", event_types)
+
+        detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
+        self.assertEqual(detail.json["task"]["status"], "awaiting_parent_confirmation")
+        self.assertEqual(detail.json["task"]["evidenceSummary"], "只看到部分过程，请确认是否完成。")
+        self.assertIsNone(detail.json["task"]["pointsGrantedAt"])
+
+    def test_history_reading_task_without_observation_does_not_auto_finish(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            title="自己阅读一本绘本",
+            task_type="reading_interest",
+            start_at=now - timedelta(days=1, hours=1),
+            due_at=now - timedelta(days=1, minutes=30),
+            reward_points=5,
+            requires_parent_confirmation=False,
+        )
+        start = self.client.post(f"/api/tasks/{task['id']}/start", headers=self._auth_headers())
+        self.assertEqual(start.status_code, 200)
+
+        tick = self._scheduler_tick()
+
+        self.assertEqual(tick.status_code, 200)
+        self.assertEqual(tick.json["changedTasks"][0]["status"], "missed")
+        event_types = {event["eventType"] for event in tick.json["events"]}
+        self.assertIn("missed", event_types)
+        self.assertNotIn("finish_reminder_sent", event_types)
+        detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
+        self.assertEqual(detail.json["task"]["status"], "missed")
+        self.assertIsNone(detail.json["task"]["pointsGrantedAt"])
 
     def test_scheduler_announces_task_start_and_finish(self):
         now = datetime.now().astimezone()
@@ -1149,10 +1387,31 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         detail = self.client.get(f"/api/tasks/{task['id']}", headers=self._auth_headers())
         self.assertEqual(detail.json["task"]["status"], "missed")
         self.assertIsNotNone(detail.json["task"]["missedAt"])
+        self.assertEqual(
+            {action["value"] for action in detail.json["task"]["parentActions"]},
+            {"reschedule", "manual_complete", "acknowledge_missed"},
+        )
+
+        acknowledged = self.client.post(
+            f"/api/tasks/{task['id']}/acknowledge-missed",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(acknowledged.status_code, 200)
+        self.assertEqual(acknowledged.json["task"]["status"], "missed")
+        self.assertEqual(acknowledged.json["task"]["parentActions"], [])
+
+        events = self.client.get(
+            f"/api/tasks/{task['id']}/events",
+            headers=self._auth_headers(),
+        )
+        event_types = {event["eventType"] for event in events.json["events"]}
+        self.assertIn("missed_acknowledged", event_types)
 
     def test_scheduler_finishes_unconfirmed_task_and_grants_points_once(self):
         now = datetime.now().astimezone()
         task = self._create_task_at(
+            title="打篮球",
+            task_type="sports_outdoor",
             start_at=now - timedelta(minutes=10),
             due_at=now - timedelta(minutes=1),
             reward_points=7,

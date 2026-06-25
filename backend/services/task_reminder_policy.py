@@ -35,6 +35,16 @@ OUTDOOR_WALK_BAD_COPY = (
     "放到手边",
 )
 
+TASK_REMINDER_FORBIDDEN_COPY = (
+    "第一步",
+    "怎么做",
+    "任务快到了",
+    "打卡",
+    "系统",
+    "AI",
+    "模型",
+)
+
 REMINDER_PHASES = {
     "prepare",
     "start",
@@ -136,7 +146,12 @@ def _ai_text_for(
     )
     if response is None:
         return None
-    return _clean_ai_text(response.text, category=category, child_name=child_name)
+    cleaned = _clean_ai_text(response.text, category=category, child_name=child_name)
+    if cleaned is None:
+        return None
+    if cleaned in _recent_reminder_values(task):
+        return None
+    return cleaned
 
 
 def _task_reminder_user_prompt(
@@ -168,13 +183,65 @@ def _task_reminder_user_prompt(
             f"任务类型：{task_type}",
             f"语义分类：{category}",
             f"提醒阶段：{phase}",
+            f"提醒阶段说明：{_phase_label(phase)}",
             f"孩子称呼：{child_name}",
             f"孩子年龄段：{age_group}",
             f"提醒次数：{count}",
             f"计划时间：{scheduled_start} - {scheduled_end}",
+            f"最近提醒：{_recent_reminders(task)}",
+            f"摄像头观察：{_camera_observation_context(task)}",
             "只输出要从摄像头播报给孩子的一句话。",
         ]
     )
+
+
+def _phase_label(phase: str) -> str:
+    return {
+        "prepare": "准备开始",
+        "start": "到点开始",
+        "follow_up": "拖拉跟进",
+        "delay": "拖拉跟进",
+        "wrap_up": "快结束",
+        "finish": "结束后",
+    }.get(phase, phase)
+
+
+def _recent_reminders(task: Mapping) -> str:
+    items = _recent_reminder_values(task)
+    return "；".join(items[:3]) if items else "无"
+
+
+def _recent_reminder_values(task: Mapping) -> list[str]:
+    values = task.get("recent_reminder_texts") or task.get("recentReminderTexts")
+    if isinstance(values, (list, tuple)):
+        return [str(item).strip() for item in values if str(item or "").strip()]
+    value = str(values or "").strip()
+    return [value] if value else []
+
+
+def _camera_observation_context(task: Mapping) -> str:
+    status = str(
+        task.get("camera_observation_status") or task.get("cameraObservationStatus") or ""
+    ).strip()
+    evidence_summary = str(
+        task.get("evidence_summary") or task.get("evidenceSummary") or ""
+    ).strip()
+    ai_summary = str(
+        task.get("ai_observation_summary") or task.get("aiObservationSummary") or ""
+    ).strip()
+    evidence = task.get("evidence")
+    if isinstance(evidence, Mapping):
+        has_person = evidence.get("hasPerson", evidence.get("has_person"))
+        if has_person is False:
+            return "no_person：暂时没在画面里看到孩子"
+        activity = str(evidence.get("activity") or evidence.get("raw_activity") or "").strip()
+        if activity:
+            return f"activity：{activity}"
+    if ai_summary:
+        return ai_summary
+    if evidence_summary:
+        return evidence_summary
+    return status or "无"
 
 
 def _clean_ai_text(text: str, *, category: str, child_name: str) -> str | None:
@@ -186,10 +253,14 @@ def _clean_ai_text(text: str, *, category: str, child_name: str) -> str | None:
     value = re.sub(r"\s+", " ", value).strip()
     if not value:
         return None
+    if any(word in value for word in TASK_REMINDER_FORBIDDEN_COPY):
+        return None
     if category == "outdoor_walk":
         if any(word in value for word in OUTDOOR_WALK_BAD_COPY):
             return None
         value = _replace_outdoor_parent_words(value)
+    if category == "hydration" and not any(word in value for word in ("水", "水杯", "喝几口", "喝一口")):
+        return None
     if category == "hydration" and any(
         word in value
         for word in (
@@ -257,12 +328,20 @@ def _preschool_text(
     if phase == "prepare":
         if category == "hydration":
             return f"{child_name}，等一下该{title}啦，慢慢喝几口水就好。"
+        if category == "reading":
+            return f"{child_name}，绘本时间快到啦，等会儿选一本喜欢的书。"
+        if category == "cleanup":
+            return f"{child_name}，等会儿把玩具送回家，房间会更舒服。"
         if category == "outdoor_walk":
             return f"{child_name}，等一下要出门走走啦，先穿好鞋子，跟着大人一起。"
-        return f"{child_name}，{title}快到了。先想一想第一步怎么做。"
+        return f"{child_name}，等一下到{title}时间啦，慢慢准备就好。"
     if phase == "start":
         if category == "hydration":
             return f"{child_name}，{title}时间到啦。慢慢喝几口，喝完把杯子放好。"
+        if category == "reading":
+            return f"{child_name}，可以挑一本绘本，找个舒服的位置看一会儿。"
+        if category == "cleanup":
+            return f"{child_name}，玩具玩好啦，我们把它们放回家吧。"
         if category == "outdoor_walk":
             return f"{child_name}，我们出门走走啦，慢慢走，牵好大人的手。"
         if category == "sports_ball":
@@ -275,15 +354,19 @@ def _preschool_text(
             return f"{child_name}，{title}开始啦。先去洗漱，再把东西放好。"
         if category == "creative":
             return f"{child_name}，{title}时间到啦。先准备材料，再开始玩和练。"
-        return f"{child_name}，现在开始{title}。先做第一小步。"
+        return f"{child_name}，现在到{title}时间啦，慢慢开始吧。"
     if phase in {"follow_up", "delay"}:
         if category == "hydration":
             return f"{child_name}，先喝几口水吧，喝完我们就继续。"
+        if category == "reading":
+            return f"{child_name}，绘本还在等你，坐下来翻几页吧。"
+        if category == "cleanup":
+            return f"{child_name}，玩具还没回家，我们一起收一收吧。"
         if category == "outdoor_walk":
             return f"{child_name}，准备好就和大人一起出门，慢慢走不着急。"
         if count > 1:
-            return f"{child_name}，还没开始也没关系，先从{title}的第一步开始。"
-        return f"{child_name}，现在轮到{title}啦。我们先做第一步。"
+            return f"{child_name}，还没开始也没关系，我们慢慢来。"
+        return f"{child_name}，现在轮到{title}啦，我们先开始吧。"
     if phase == "wrap_up":
         if category == "hydration":
             return f"{title}快结束啦。最后再喝一小口，把杯子放回原位。"
@@ -297,6 +380,8 @@ def _preschool_text(
             return f"{title}完成啦。杯子放好，嘴巴和手擦干净。"
         if category == "outdoor_walk":
             return "户外活动结束啦，回家先洗手喝水，休息一下。"
+        if category == "reading":
+            return f"{title}结束啦，把书放回原处，眼睛也休息一下。"
         if category == "sports_ball":
             return f"{title}结束啦。先把球放好，喝口水，身体放松一下。"
         if category == "sports":
@@ -322,7 +407,9 @@ def _school_age_text(
             return f"{child_name}，{title}快到时间了，等会儿慢慢喝几口水。"
         if category == "outdoor_walk":
             return f"{child_name}，等会儿要出门活动，穿好鞋子，跟家人一起走。"
-        return f"{child_name}，{title}快到时间了，等会儿从第一步开始。"
+        if category == "reading":
+            return f"{child_name}，阅读时间快到了，等会儿选一本想看的书。"
+        return f"{child_name}，{title}快到时间了，等会儿慢慢开始。"
     if phase == "start":
         if category == "hydration":
             return f"{child_name}，{title}时间到了，慢慢喝几口，喝完把杯子放好。"
@@ -331,18 +418,18 @@ def _school_age_text(
         if category == "sports_ball":
             return f"{child_name}，{title}开始了。先确认周围安全，再开始运动。"
         if category == "learning":
-            return f"{child_name}，{title}开始了。先坐好，从第一步开始。"
+            return f"{child_name}，{title}开始了。先坐好，慢慢来。"
         if category == "schoolbag":
             return f"{child_name}，{title}开始了。按清单逐项检查。"
-        return f"{child_name}，{title}开始了，先完成第一步。"
+        return f"{child_name}，{title}开始了，慢慢做就好。"
     if phase in {"follow_up", "delay"}:
         if category == "hydration":
             return f"{child_name}，{title}还没完成，先喝几口水，别着急。"
         if category == "outdoor_walk":
             return f"{child_name}，准备好就出门活动，跟家人一起慢慢走。"
         if count > 1:
-            return f"{child_name}，还没有开始也没关系，先做{title}的第一步。"
-        return f"{child_name}，{title}到时间了，我们先开始第一步。"
+            return f"{child_name}，还没有开始也没关系，我们慢慢来。"
+        return f"{child_name}，{title}到时间了，我们先开始吧。"
     if phase == "wrap_up":
         if category == "hydration":
             return f"{title}快结束了，最后喝一小口，再把杯子放回去。"
@@ -375,7 +462,11 @@ def _category(task_type: str, title: str, task: Mapping | None = None) -> str:
         return "schoolbag"
     if task_type == "sleep" or any(word in text for word in ("睡", "洗漱", "刷牙")):
         return "sleep"
-    if task_type == "reading_interest" or any(word in text for word in ("绘本", "阅读", "画画", "音乐", "积木")):
+    if any(word in text for word in ("绘本", "阅读", "故事书", "看书")):
+        return "reading"
+    if any(word in text for word in ("收玩具", "收纳", "整理玩具", "玩具回位")):
+        return "cleanup"
+    if task_type == "reading_interest" or any(word in text for word in ("画画", "音乐", "积木")):
         return "creative"
     if task_type == "learning" or any(word in text for word in ("作业", "数学", "拼音", "听读", "练习")):
         return "learning"

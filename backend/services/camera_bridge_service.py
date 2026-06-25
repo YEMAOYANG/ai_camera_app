@@ -136,6 +136,35 @@ class CameraBridgeService:
                 },
             }
 
+    def refresh_monitor_observation(self) -> dict:
+        try:
+            if not hasattr(self.adapter, "refresh_monitor_observation"):
+                return self.monitor_status()
+            payload = self.adapter.refresh_monitor_observation()
+            return {
+                "ok": True,
+                "monitorRuntime": {
+                    "reachable": True,
+                    "adapter": self.adapter.adapter_name,
+                    "data": payload,
+                },
+            }
+        except Exception as exc:
+            return {
+                "ok": False,
+                "monitorRuntime": {
+                    "reachable": False,
+                    "adapter": self.adapter.adapter_name,
+                    "data": {
+                        "monitor_runtime": {
+                            "running": False,
+                            "status": "unavailable",
+                            "last_error": str(exc),
+                        }
+                    },
+                },
+            }
+
     def task_observation(self, task: dict) -> dict:
         try:
             if not hasattr(self.adapter, "task_observation"):

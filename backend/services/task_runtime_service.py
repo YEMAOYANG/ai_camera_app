@@ -32,6 +32,33 @@ TASK_TYPES_WITHOUT_CAMERA_MONITOR = {
     "sports_outdoor",
 }
 
+TASK_OBSERVATION_POLICIES = {
+    "reading": {
+        "task_keywords": ("绘本", "阅读", "看书", "故事书"),
+        "evidence_keywords": ("绘本", "阅读", "看书", "书"),
+    },
+    "hydration": {
+        "task_keywords": ("喝水", "补水", "饮水"),
+        "evidence_keywords": ("喝水", "水杯", "饮水", "补水"),
+    },
+    "toy_cleanup": {
+        "task_keywords": ("收玩具", "收纳", "整理玩具"),
+        "evidence_keywords": ("收玩具", "收纳", "整理", "玩具"),
+    },
+    "meal": {
+        "task_keywords": ("用餐", "吃饭", "早餐", "午餐", "晚餐", "餐桌"),
+        "evidence_keywords": ("用餐", "吃饭", "餐具", "餐桌", "碗", "勺"),
+    },
+    "sleep": {
+        "task_keywords": ("午睡", "入睡", "睡觉", "睡前", "躺下"),
+        "evidence_keywords": ("午睡", "入睡", "睡觉", "睡前", "躺下", "安静"),
+    },
+    "outdoor": {
+        "task_keywords": ("运动", "户外", "散步", "跑", "跳", "公园"),
+        "evidence_keywords": ("运动", "户外", "散步", "跑", "跳", "公园"),
+    },
+}
+
 BOUNDARY_DELAY_POLICY = {
     "loose": {"interval_seconds": 300, "max_count": 2},
     "balanced": {"interval_seconds": 180, "max_count": 3},
@@ -99,8 +126,15 @@ class TaskRuntimeService:
         if due_at is not None and self._is_due(now, due_at):
             if task["status"] in TASK_ACTIVE_SCHEDULED_STATUSES:
                 return self._mark_missed(conn, task, now=now, reason="任务时间已过去，仍未开始。")
-            if task["status"] in {TASK_IN_PROGRESS, TASK_DELAYED}:
-                return self._auto_finish(conn, task, now=now)
+            if task["status"] == TASK_DELAYED:
+                return self._mark_missed(
+                    conn,
+                    task,
+                    now=now,
+                    reason="这次没有看到孩子开始，可以重新安排或手动处理。",
+                )
+            if task["status"] == TASK_IN_PROGRESS:
+                return self._finish_or_review(conn, task, now=now)
             return task, []
 
         if task["status"] in TASK_ACTIVE_SCHEDULED_STATUSES:
@@ -185,11 +219,14 @@ class TaskRuntimeService:
             task=dict(task),
             device_id=task.get("device_id"),
         )
+        observation = self._normalize_task_observation(task, observation)
         verdict = observation.get("verdict")
         if verdict == "not_started":
             return self._mark_delayed(conn, task, observation=observation, now=now)
 
-        status = "started" if verdict == "started" else "observation_unavailable"
+        if verdict != "started":
+            return self._mark_delayed(conn, task, observation=observation, now=now)
+        status = "started"
         current_ms = self._now_ms(now)
         updated = self.repository.mark_in_progress(
             conn,
@@ -320,6 +357,7 @@ class TaskRuntimeService:
             task=dict(task),
             device_id=task.get("device_id"),
         )
+        observation = self._normalize_task_observation(task, observation)
         if observation.get("verdict") == "started":
             current_ms = self._now_ms(now)
             updated = self.repository.mark_in_progress(
@@ -503,6 +541,54 @@ class TaskRuntimeService:
                 )
         return updated, events
 
+    def _finish_or_review(self, conn, task, *, now: datetime):
+        if not self._requires_start_observation(conn, task):
+            return self._auto_finish(conn, task, now=now)
+        observation_status = str(task.get("camera_observation_status") or "")
+        if observation_status not in {"started", "started_after_delay"}:
+            return self._mark_missed(
+                conn,
+                task,
+                now=now,
+                reason="这次没有看到孩子开始，可以重新安排或手动处理。",
+            )
+        if bool(task["requires_parent_confirmation"]):
+            return self._finish_with_parent_review(conn, task, now=now)
+        return self._mark_missed(
+            conn,
+            task,
+            now=now,
+            reason="只看到部分过程，没有可靠完成结果，需要家长看一下。",
+        )
+
+    def _finish_with_parent_review(self, conn, task, *, now: datetime):
+        if self.repository.has_event(conn, task_id=task["id"], event_type="awaiting_parent_confirmation"):
+            return task, []
+        current_ms = self._now_ms(now)
+        updated = self.repository.mark_completed(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            evidence_summary="只看到部分过程，请确认是否完成。",
+            completion_source="camera",
+            evidence=None,
+            ai_observation_summary=task.get("ai_observation_summary"),
+            requires_parent_confirmation=True,
+            now=current_ms,
+        )
+        events = [
+            self.repository.add_event(
+                conn,
+                family_id=task["family_id"],
+                task_id=task["id"],
+                event_type="awaiting_parent_confirmation",
+                message="只看到部分过程，请确认是否完成。",
+                payload={"reason": "partial_observation"},
+                now=current_ms,
+            )
+        ]
+        return updated, events
+
     def _mark_missed(self, conn, task, *, now: datetime, reason: str):
         if self.repository.has_event(conn, task_id=task["id"], event_type="missed"):
             return task, []
@@ -519,7 +605,7 @@ class TaskRuntimeService:
             family_id=task["family_id"],
             task_id=task["id"],
             event_type="missed",
-            message="任务已错过",
+            message="本次未记录完成",
             payload={"reason": reason},
             now=current_ms,
         )
@@ -530,7 +616,14 @@ class TaskRuntimeService:
             return self._mark_missed(conn, task, now=now, reason="过去日期的任务未按时开始。")
         if task["status"] in {TASK_IN_PROGRESS, TASK_DELAYED}:
             if due_at is None or self._is_due(now, due_at):
-                return self._auto_finish(conn, task, now=now)
+                if task["status"] == TASK_DELAYED:
+                    return self._mark_missed(
+                        conn,
+                        task,
+                        now=now,
+                        reason="这次没有看到孩子开始，可以重新安排或手动处理。",
+                    )
+                return self._finish_or_review(conn, task, now=now)
         return task, []
 
     def _start_monitor(self, conn, task, *, now_ms_value: int):
@@ -711,7 +804,42 @@ class TaskRuntimeService:
     def _requires_start_observation(self, conn, task) -> bool:
         if self._ai_rules(conn, task["family_id"]).get("taskObservationEnabled") is not True:
             return False
-        return self._task_type(task) in TASK_TYPES_REQUIRING_START_OBSERVATION
+        if self._task_type(task) in TASK_TYPES_REQUIRING_START_OBSERVATION:
+            return True
+        return self._task_observation_policy(task) is not None
+
+    def _normalize_task_observation(self, task, observation: dict) -> dict:
+        if observation.get("verdict") != "started":
+            return observation
+        if self._observation_matches_task(task, observation):
+            return observation
+        next_observation = dict(observation)
+        next_observation["verdict"] = "insufficient"
+        next_observation["reason"] = "action_not_supported"
+        evidence = dict(next_observation.get("evidence") or {})
+        evidence["taskActionMatched"] = False
+        next_observation["evidence"] = evidence
+        return next_observation
+
+    def _observation_matches_task(self, task, observation: dict) -> bool:
+        policy = self._task_observation_policy(task)
+        evidence = observation.get("evidence") or {}
+        evidence_text = " ".join(
+            str(evidence.get(key) or "")
+            for key in ("activity", "raw_activity", "summary", "action")
+        )
+        if policy is not None:
+            return any(word in evidence_text for word in policy["evidence_keywords"])
+        if self._task_type(task) in {"reading_interest", "life", "checkin"}:
+            return bool(evidence_text.strip()) and evidence_text not in {"其他", "unknown", "other"}
+        return True
+
+    def _task_observation_policy(self, task) -> dict | None:
+        task_text = f"{task.get('type') or ''} {task.get('title') or ''} {task.get('description') or ''}"
+        for policy in TASK_OBSERVATION_POLICIES.values():
+            if any(word in task_text for word in policy["task_keywords"]):
+                return policy
+        return None
 
     def _task_type(self, task) -> str:
         return str(task.get("type") or task.get("task_type") or "").strip()

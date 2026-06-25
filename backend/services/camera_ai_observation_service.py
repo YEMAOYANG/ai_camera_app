@@ -12,6 +12,11 @@ from repositories.device_repository import DeviceRepository
 from schemas.care import observation_event_payload, parent_review_event_payload, reminder_decision_payload
 from services.care_defaults import ensure_default_capability_configs, ensure_default_routine_windows
 from services.care_policy_engine import CarePolicyEngine, REVIEW_ITEM_TYPE_PARENT_NOTIFY
+from services.task_event_stream import (
+    CAMERA_EVENT_CREATED,
+    CAMERA_OBSERVATION_UPDATED,
+    publish_family_event,
+)
 
 
 class CameraAiObservationService:
@@ -236,6 +241,23 @@ class CameraAiObservationService:
                     review=policy.review_item,
                     now=now,
                 )
+        publish_family_event(
+            family_id=family_id,
+            event_type=CAMERA_OBSERVATION_UPDATED,
+            device_id=device_id,
+            observation_id=event["id"],
+            is_reliable=observation_score >= 0.65,
+            source="camera_observation",
+        )
+        publish_family_event(
+            family_id=family_id,
+            event_type=CAMERA_EVENT_CREATED,
+            device_id=device_id,
+            event_ids=[event["id"]],
+            observation_id=event["id"],
+            is_reliable=observation_score >= 0.65,
+            source="camera_observation",
+        )
         return {
             "ok": True,
             "observation": observation_event_payload(event),

@@ -15,6 +15,7 @@ from repositories.device_repository import DeviceRepository
 from services.device_service import DeviceService
 from services.device_runtime_resolver import DeviceRuntimeResolver
 from services.service_factory import auth_service, camera_command_service
+from services import task_event_stream
 from tests.support import fresh_test_config, request_debug_code
 
 
@@ -22,6 +23,12 @@ class _CameraRuntimeHandler(BaseHTTPRequestHandler):
     speak_count = 0
     ptz_count = 0
     monitor_running = False
+    analyze_payload = {
+        "has_person": True,
+        "activity": "阅读绘本",
+        "confidence": 0.88,
+        "description": "孩子正在安静看绘本。",
+    }
 
     def do_GET(self):
         if self.path == "/api/health":
@@ -98,6 +105,9 @@ class _CameraRuntimeHandler(BaseHTTPRequestHandler):
             self.__class__.monitor_running = False
             self._json({"ok": True, "monitor_runtime": {"running": False, "status": "stopped"}})
             return
+        if self.path == "/api/analyze_frame":
+            self._json(dict(self.__class__.analyze_payload))
+            return
         self.send_response(404)
         self.end_headers()
 
@@ -118,6 +128,12 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         _CameraRuntimeHandler.speak_count = 0
         _CameraRuntimeHandler.ptz_count = 0
         _CameraRuntimeHandler.monitor_running = False
+        _CameraRuntimeHandler.analyze_payload = {
+            "has_person": True,
+            "activity": "阅读绘本",
+            "confidence": 0.88,
+            "description": "孩子正在安静看绘本。",
+        }
         self.camera_server = ThreadingHTTPServer(("127.0.0.1", 0), _CameraRuntimeHandler)
         self.camera_thread = threading.Thread(target=self.camera_server.serve_forever, daemon=True)
         self.camera_thread.start()
@@ -233,6 +249,53 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(duplicate.status_code, 409)
         self.assertEqual(duplicate.json["error"], "device_already_bound")
 
+    def test_discovery_status_marks_bound_devices_before_connect(self):
+        other_client = self.app.test_client()
+        other_code = request_debug_code(other_client, "13800002032")
+        other_login = other_client.post(
+            "/api/auth/sms/login",
+            json={"phone": "13800002032", "code": other_code},
+        )
+        self.assertEqual(other_login.status_code, 200)
+        other_token = other_login.json["tokens"]["accessToken"]
+        parent = other_client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "爸爸", "relationship": "爸爸", "relationshipKey": "dad"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(parent.status_code, 200)
+        other_device = other_client.post(
+            "/api/devices",
+            json={"bindingCode": "BIND-DISCOVERY-OTHER", "name": "另一台设备", "location": "卧室"},
+            headers={"Authorization": f"Bearer {other_token}"},
+        )
+        self.assertEqual(other_device.status_code, 200, other_device.json)
+
+        status = self.client.post(
+            "/api/devices/discovery-status",
+            json={
+                "candidates": [
+                    {"id": "current", "bindingCode": "BIND-BOUNDARY"},
+                    {"id": "other", "bindingCode": "BIND-DISCOVERY-OTHER"},
+                    {"id": "new", "bindingCode": "BIND-DISCOVERY-NEW"},
+                    {"id": "unknown"},
+                ]
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(status.status_code, 200, status.json)
+        by_id = {item["id"]: item for item in status.json["candidates"]}
+        self.assertEqual(by_id["current"]["bindingState"], "boundToCurrentFamily")
+        self.assertFalse(by_id["current"]["isConnectable"])
+        self.assertEqual(by_id["other"]["bindingState"], "boundToAnotherFamily")
+        self.assertFalse(by_id["other"]["isConnectable"])
+        self.assertEqual(by_id["other"]["disabledReason"], "已被其他家庭绑定")
+        self.assertNotIn("ownerName", by_id["other"])
+        self.assertEqual(by_id["new"]["bindingState"], "available")
+        self.assertTrue(by_id["new"]["isConnectable"])
+        self.assertEqual(by_id["unknown"]["bindingState"], "unknown")
+        self.assertTrue(by_id["unknown"]["isConnectable"])
+
     def test_unbind_last_default_clears_default_device(self):
         unbound = self.client.post(
             f"/api/devices/{self.device_id}/unbind",
@@ -244,6 +307,10 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         default = self.client.get("/api/devices/default", headers=self._auth_headers())
         self.assertEqual(default.status_code, 200)
         self.assertIsNone(default.json["device"])
+
+        devices = self.client.get("/api/devices", headers=self._auth_headers())
+        self.assertEqual(devices.status_code, 200)
+        self.assertEqual(devices.json["devices"], [])
 
     def test_camera_health_adapter_reachable_and_unreachable(self):
         unauthenticated = self.client.get("/api/camera/health")
@@ -327,26 +394,115 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(ptz.json["command"]["status"], "succeeded")
         self.assertEqual(_CameraRuntimeHandler.ptz_count, 1)
 
-        start = self.client.post("/api/camera/monitor/start", headers=self._auth_headers())
-        self.assertEqual(start.status_code, 200)
-        self.assertEqual(start.json["command"]["commandType"], "start_monitor")
-        self.assertEqual(start.json["command"]["status"], "succeeded")
+        captured: list[tuple[str, dict]] = []
+        original_broadcast = task_event_stream.task_event_stream_server.broadcast
+        task_event_stream.task_event_stream_server.broadcast = (
+            lambda family_id, payload: captured.append((family_id, payload))
+        )
+        try:
+            start = self.client.post("/api/camera/monitor/start", headers=self._auth_headers())
+            self.assertEqual(start.status_code, 200)
+            self.assertEqual(start.json["command"]["commandType"], "start_monitor")
+            self.assertEqual(start.json["command"]["status"], "succeeded")
 
-        monitor = self.client.get("/api/camera/monitor/status", headers=self._auth_headers())
-        self.assertEqual(monitor.status_code, 200)
-        self.assertTrue(monitor.json["monitor"]["running"])
+            monitor = self.client.get("/api/camera/monitor/status", headers=self._auth_headers())
+            self.assertEqual(monitor.status_code, 200)
+            self.assertTrue(monitor.json["monitor"]["running"])
 
-        stop = self.client.post("/api/camera/monitor/stop", headers=self._auth_headers())
-        self.assertEqual(stop.status_code, 200)
-        self.assertEqual(stop.json["command"]["status"], "succeeded")
+            stop = self.client.post("/api/camera/monitor/stop", headers=self._auth_headers())
+            self.assertEqual(stop.status_code, 200)
+            self.assertEqual(stop.json["command"]["status"], "succeeded")
+        finally:
+            task_event_stream.task_event_stream_server.broadcast = original_broadcast
+
+        pushed_types = [payload["type"] for _, payload in captured]
+        self.assertIn("camera_status.changed", pushed_types)
+        self.assertIn("camera_event.created", pushed_types)
+        self.assertTrue(all(family_id == self.family_id for family_id, _ in captured))
 
         events = self.client.get("/api/camera/events", headers=self._auth_headers())
         self.assertEqual(events.status_code, 200)
         event_types = [event["eventType"] for event in events.json["events"]]
-        self.assertIn("speak", event_types)
-        self.assertIn("ptz_move", event_types)
-        self.assertIn("start_monitor", event_types)
-        self.assertIn("stop_monitor", event_types)
+        self.assertNotIn("speak", event_types)
+        self.assertNotIn("ptz_move", event_types)
+        self.assertNotIn("start_monitor", event_types)
+        self.assertNotIn("stop_monitor", event_types)
+        self.assertFalse(
+            any(event.get("category") == "care_reminder" for event in events.json["events"])
+        )
+
+    def test_camera_monitor_refresh_publishes_lightweight_family_event(self):
+        captured: list[tuple[str, dict]] = []
+        original_broadcast = task_event_stream.task_event_stream_server.broadcast
+        task_event_stream.task_event_stream_server.broadcast = (
+            lambda family_id, payload: captured.append((family_id, payload))
+        )
+        try:
+            response = self.client.post(
+                "/api/camera/monitor/refresh",
+                query_string={"deviceId": self.device_id},
+                headers=self._auth_headers(),
+            )
+        finally:
+            task_event_stream.task_event_stream_server.broadcast = original_broadcast
+
+        self.assertEqual(response.status_code, 200, response.json)
+        observation = response.json["monitor"]["lastObservation"]
+        self.assertTrue(observation["isReliable"])
+        self.assertEqual(observation["activity"], "阅读绘本")
+        self.assertEqual(
+            [payload["type"] for _, payload in captured],
+            ["camera_monitor.refreshed", "camera_observation.updated"],
+        )
+        self.assertTrue(all(family_id == self.family_id for family_id, _ in captured))
+        for _, payload in captured:
+            self.assertEqual(payload["deviceId"], self.device_id)
+            self.assertNotIn("image", payload)
+            self.assertNotIn("snapshot", payload)
+            self.assertNotIn("debug", payload)
+
+    def test_camera_monitor_refresh_marks_unknown_or_no_person_unreliable(self):
+        _CameraRuntimeHandler.analyze_payload = {
+            "has_person": False,
+            "activity": "其他",
+            "confidence": 0.91,
+            "description": "没有看到孩子。",
+        }
+
+        response = self.client.post(
+            "/api/camera/monitor/refresh",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200, response.json)
+        observation = response.json["monitor"]["lastObservation"]
+        self.assertFalse(observation["isReliable"])
+        self.assertFalse(observation["hasPerson"])
+        self.assertEqual(observation["activity"], "")
+        self.assertNotIn("看到孩子在", observation["summary"])
+
+    def test_family_realtime_camera_event_is_family_scoped(self):
+        captured: list[tuple[str, dict]] = []
+        original_broadcast = task_event_stream.task_event_stream_server.broadcast
+        task_event_stream.task_event_stream_server.broadcast = (
+            lambda family_id, payload: captured.append((family_id, payload))
+        )
+        try:
+            task_event_stream.publish_family_event(
+                family_id="family_a",
+                event_type=task_event_stream.CAMERA_EVENT_CREATED,
+                device_id="dev_a",
+                event_ids=["evt_a"],
+                source="camera_test",
+            )
+        finally:
+            task_event_stream.task_event_stream_server.broadcast = original_broadcast
+
+        self.assertEqual(len(captured), 1)
+        self.assertEqual(captured[0][0], "family_a")
+        self.assertEqual(captured[0][1]["type"], "camera_event.created")
+        self.assertEqual(captured[0][1]["eventIds"], ["evt_a"])
 
     def test_camera_events_are_scoped_by_device(self):
         second = self.client.post(
@@ -375,8 +531,9 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
             headers=self._auth_headers(),
         )
         self.assertEqual(first_events.status_code, 200)
-        self.assertTrue(first_events.json["events"])
-        self.assertEqual({event["deviceId"] for event in first_events.json["events"]}, {self.device_id})
+        self.assertFalse(
+            any(event["eventType"] == "speak" for event in first_events.json["events"])
+        )
 
         second_events = self.client.get(
             "/api/camera/events",
@@ -384,8 +541,9 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
             headers=self._auth_headers(),
         )
         self.assertEqual(second_events.status_code, 200)
-        self.assertTrue(second_events.json["events"])
-        self.assertEqual({event["deviceId"] for event in second_events.json["events"]}, {second_id})
+        self.assertFalse(
+            any(event["eventType"] == "speak" for event in second_events.json["events"])
+        )
 
     def test_camera_webrtc_session_contract(self):
         session = self.client.get("/api/camera/webrtc/session", headers=self._auth_headers())

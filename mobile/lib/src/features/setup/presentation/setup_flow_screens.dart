@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:guardian_parent_app/src/app/router/app_route.dart';
 import 'package:guardian_parent_app/src/core/platform/contact_picker.dart';
@@ -13,6 +12,7 @@ import 'package:guardian_parent_app/src/features/auth/application/auth_repositor
 import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
 import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
 import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
+import 'package:guardian_parent_app/src/features/setup/application/setup_draft.dart';
 import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
 import 'package:guardian_parent_app/src/features/setup/application/wifi_network_repository.dart';
 import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
@@ -25,41 +25,7 @@ import 'package:guardian_parent_app/src/shared/widgets/app_time_picker_sheet.dar
 import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
 import 'package:guardian_parent_app/src/shared/widgets/guardian_identity_card_selector.dart';
 
-final setupDraftProvider = StateProvider<SetupDraft>((ref) {
-  return const SetupDraft();
-});
-
 const _setupTotalSteps = 2;
-
-void syncSetupDraftFromStatus(WidgetRef ref, SetupStatus status) {
-  final current = ref.read(setupDraftProvider);
-  final identity = status.parentRelationshipKey.isNotEmpty
-      ? status.parentRelationshipKey
-      : status.parentRelationship.isNotEmpty
-      ? status.parentRelationship
-      : status.parentDisplayName;
-  ref.read(setupDraftProvider.notifier).state = current.copyWith(
-    parentIdentity: identity,
-    parentName: status.parentDisplayName.isNotEmpty
-        ? status.parentDisplayName
-        : status.parentRelationship,
-    deviceName: _nonEmptyOrNull(status.deviceName),
-    room: _nonEmptyOrNull(status.deviceLocation),
-    wifiName: _nonEmptyOrNull(status.wifiName),
-    childName: _nonEmptyOrNull(status.childName),
-    childBirthday: _nonEmptyOrNull(status.childBirthday),
-    childSleepTime: _nonEmptyOrNull(status.childSleepTime),
-    childGender: _nonEmptyOrNull(status.childGender),
-    childStage: _nonEmptyOrNull(status.childEducationStage),
-    childGrade: _nonEmptyOrNull(status.childGrade),
-    cameraWakeName: _nonEmptyOrNull(status.cameraWakeName),
-  );
-}
-
-String? _nonEmptyOrNull(String value) {
-  final trimmed = value.trim();
-  return trimmed.isEmpty ? null : trimmed;
-}
 
 String _setupCollaborationDetail(SetupDraft draft, String roleLabel) {
   final identityParts = [
@@ -71,82 +37,6 @@ String _setupCollaborationDetail(SetupDraft draft, String roleLabel) {
       ? ''
       : '${draft.childName.trim()} 的';
   return '$identity，$childPrefix任务确认会进入家长端。';
-}
-
-class SetupDraft {
-  const SetupDraft({
-    this.parentIdentity = '',
-    this.parentName = '',
-    this.familyRole = '',
-    this.deviceName = '',
-    this.room = '',
-    this.wifiName = '',
-    this.wifiPassword = '',
-    this.childName = '',
-    this.childBirthday = '',
-    this.childSleepTime = '21:00',
-    this.childGender = 'unspecified',
-    this.childStage = '幼儿园',
-    this.childGrade = '',
-    this.cameraWakeName = '小豆',
-    this.emergencyName = '',
-    this.emergencyPhone = '',
-  });
-
-  final String parentIdentity;
-  final String parentName;
-  final String familyRole;
-  final String deviceName;
-  final String room;
-  final String wifiName;
-  final String wifiPassword;
-  final String childName;
-  final String childBirthday;
-  final String childSleepTime;
-  final String childGender;
-  final String childStage;
-  final String childGrade;
-  final String cameraWakeName;
-  final String emergencyName;
-  final String emergencyPhone;
-
-  SetupDraft copyWith({
-    String? parentIdentity,
-    String? parentName,
-    String? familyRole,
-    String? deviceName,
-    String? room,
-    String? wifiName,
-    String? wifiPassword,
-    String? childName,
-    String? childBirthday,
-    String? childSleepTime,
-    String? childGender,
-    String? childStage,
-    String? childGrade,
-    String? cameraWakeName,
-    String? emergencyName,
-    String? emergencyPhone,
-  }) {
-    return SetupDraft(
-      parentIdentity: parentIdentity ?? this.parentIdentity,
-      parentName: parentName ?? this.parentName,
-      familyRole: familyRole ?? this.familyRole,
-      deviceName: deviceName ?? this.deviceName,
-      room: room ?? this.room,
-      wifiName: wifiName ?? this.wifiName,
-      wifiPassword: wifiPassword ?? this.wifiPassword,
-      childName: childName ?? this.childName,
-      childBirthday: childBirthday ?? this.childBirthday,
-      childSleepTime: childSleepTime ?? this.childSleepTime,
-      childGender: childGender ?? this.childGender,
-      childStage: childStage ?? this.childStage,
-      childGrade: childGrade ?? this.childGrade,
-      cameraWakeName: cameraWakeName ?? this.cameraWakeName,
-      emergencyName: emergencyName ?? this.emergencyName,
-      emergencyPhone: emergencyPhone ?? this.emergencyPhone,
-    );
-  }
 }
 
 class ParentIdentitySetupScreen extends ConsumerWidget {

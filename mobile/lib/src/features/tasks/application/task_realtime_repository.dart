@@ -59,24 +59,45 @@ class TaskRealtimeEvent {
     required this.type,
     required this.taskIds,
     required this.sentAt,
+    this.eventIds = const [],
     this.source = '',
+    this.deviceId = '',
+    this.observationId = '',
+    this.isReliable,
   });
 
   final String type;
   final String source;
+  final String deviceId;
   final List<String> taskIds;
+  final List<String> eventIds;
+  final String observationId;
+  final bool? isReliable;
   final int sentAt;
 
   bool get isTaskUpdate => type == 'task.updated' && taskIds.isNotEmpty;
+  bool get isTaskStatusChanged => type == 'task_status.changed';
+  bool get isCameraObservationUpdated =>
+      type == 'camera_observation.updated' ||
+      type == 'camera_monitor.refreshed';
+  bool get isCameraEventCreated => type == 'camera_event.created';
+  bool get isCameraStatusChanged => type == 'camera_status.changed';
 
   static TaskRealtimeEvent fromJson(Map<String, dynamic> json) {
     final rawTaskIds = json['taskIds'];
+    final rawEventIds = json['eventIds'];
     return TaskRealtimeEvent(
       type: _asString(json['type']),
       source: _asString(json['source']),
+      deviceId: _asString(json['deviceId']),
       taskIds: rawTaskIds is List
           ? rawTaskIds.map(_asString).where((id) => id.isNotEmpty).toList()
           : const [],
+      eventIds: rawEventIds is List
+          ? rawEventIds.map(_asString).where((id) => id.isNotEmpty).toList()
+          : const [],
+      observationId: _asString(json['observationId']),
+      isReliable: json['isReliable'] is bool ? json['isReliable'] as bool : null,
       sentAt: _asInt(json['sentAt']),
     );
   }
