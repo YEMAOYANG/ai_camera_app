@@ -307,7 +307,7 @@ class CameraMonitorStatus {
   }
 }
 
-const cameraObservationFreshness = Duration(seconds: 120);
+const cameraObservationFreshness = Duration(seconds: 300);
 
 class _CameraObservationSnapshot {
   const _CameraObservationSnapshot({

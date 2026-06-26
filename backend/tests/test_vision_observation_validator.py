@@ -4,6 +4,7 @@ import unittest
 
 from services.vision_observation_enrich import enrich_observation_risks, is_homework_like
 from services.vision_observation_validator import VisionObservationValidator
+from schemas.vision import observation_is_reliable, with_observation_reliability
 
 
 class VisionObservationValidatorTest(unittest.TestCase):
@@ -42,6 +43,19 @@ class VisionObservationEnrichTest(unittest.TestCase):
         self.assertTrue(is_homework_like(obs))
         enriched = enrich_observation_risks(obs)
         self.assertTrue(enriched["homework_like"])
+
+
+class VisionReliabilityTest(unittest.TestCase):
+    def test_observation_is_reliable_requires_person_and_confidence(self):
+        self.assertTrue(observation_is_reliable(has_person=True, confidence=0.72))
+        self.assertFalse(observation_is_reliable(has_person=True, confidence=0.5))
+        self.assertFalse(observation_is_reliable(has_person=None, confidence=0.9))
+
+    def test_with_observation_reliability_sets_flag(self):
+        payload = with_observation_reliability(
+            {"has_person": True, "activity": "玩手机", "confidence": 0.8}
+        )
+        self.assertTrue(payload["isReliable"])
 
 
 if __name__ == "__main__":

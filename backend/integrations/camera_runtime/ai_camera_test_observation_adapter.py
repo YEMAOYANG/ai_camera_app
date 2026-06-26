@@ -138,11 +138,14 @@ class AiCameraTestObservationAdapter:
             family_id=self.config.family_id,
             child_id=self.config.child_id,
         )
-        return self.vision_service.analyze_snapshot(
-            image_bytes=body,
-            content_type=content_type,
-            device_key=self.config.device_id or self.config.base_url,
-            context=vision_context,
+        return with_observation_reliability(
+            self.vision_service.analyze_snapshot(
+                image_bytes=body,
+                content_type=content_type,
+                device_key=self.config.device_id or self.config.base_url,
+                context=vision_context,
+                force_analyze=True,
+            )
         )
 
     def payloads_from_analysis(

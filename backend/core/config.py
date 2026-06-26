@@ -156,7 +156,12 @@ class AppConfig:
             AI_VISION_TIMEOUT_SECONDS=float(_env("APP_AI_VISION_TIMEOUT_SECONDS", "20")),
             AI_VISION_MAX_BYTES=int(_env("APP_AI_VISION_MAX_BYTES", "524288")),
             AI_VISION_MIN_INTERVAL_SECONDS=float(_env("APP_AI_VISION_MIN_INTERVAL_SECONDS", "60")),
-            AI_VISION_MAX_CALLS_PER_HOUR=int(_env("APP_AI_VISION_MAX_CALLS_PER_HOUR", "20")),
+            AI_VISION_MAX_CALLS_PER_HOUR=int(
+                _env(
+                    "APP_AI_VISION_MAX_CALLS_PER_HOUR",
+                    "72" if app_env == "development" else "20",
+                )
+            ),
             AI_VISION_BACKOFF_SECONDS=float(_env("APP_AI_VISION_BACKOFF_SECONDS", "300")),
             AI_EVAL_ENABLED=_bool(_env("APP_AI_EVAL_ENABLED", "0")),
             INTERNAL_API_TOKEN=_env("INTERNAL_API_TOKEN", _env("APP_INTERNAL_API_TOKEN", "")).strip(),

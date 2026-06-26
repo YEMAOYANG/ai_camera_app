@@ -7,6 +7,8 @@ VISION_METHOD = "guardian_kimi_k26"
 VISION_METHOD_CACHED = "guardian_kimi_cached"
 VISION_METHOD_DISABLED = "vision_not_configured"
 
+RELIABLE_CONFIDENCE_THRESHOLD = 0.65
+
 ALLOWED_ACTIVITIES = frozenset(
     {
         "写作业/看书",
@@ -93,6 +95,26 @@ def _fallback_observation(*, observed_at: int, method: str, reason: str = "") ->
 def insufficient_observation(*, reason: str = "vision_not_configured", observed_at: int | None = None) -> dict[str, Any]:
     now = observed_at if observed_at is not None else int(time.time() * 1000)
     return _fallback_observation(observed_at=now, method=VISION_METHOD_DISABLED, reason=reason)
+
+
+def observation_is_reliable(*, has_person: object, confidence: object) -> bool:
+    if has_person not in (True, False):
+        return False
+    try:
+        score = float(confidence or 0)
+    except (TypeError, ValueError):
+        return False
+    return score >= RELIABLE_CONFIDENCE_THRESHOLD
+
+
+def with_observation_reliability(observation: Mapping[str, Any]) -> dict[str, Any]:
+    payload = dict(observation)
+    has_person = payload.get("has_person", payload.get("hasPerson"))
+    payload["isReliable"] = observation_is_reliable(
+        has_person=has_person,
+        confidence=payload.get("confidence"),
+    )
+    return payload
 
 
 def _clamp_score(value: object) -> float:

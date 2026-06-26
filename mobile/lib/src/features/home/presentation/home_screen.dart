@@ -38,16 +38,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   final _scrollController = ScrollController();
   var _localTodayText = homeDateText(DateTime.now());
   var _scrollOffset = 0.0;
+  Timer? _monitorPollTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _scrollController.addListener(_handleScroll);
+    _monitorPollTimer = Timer.periodic(const Duration(seconds: 90), (_) {
+      if (!mounted) return;
+      ref.invalidate(cameraMonitorStatusProvider);
+    });
   }
 
   @override
   void dispose() {
+    _monitorPollTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _scrollController
       ..removeListener(_handleScroll)

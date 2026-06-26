@@ -9,7 +9,7 @@ import urllib.request
 import websockets
 
 from integrations.camera_runtime.base import CameraRuntimeAdapter, CameraSnapshot
-from schemas.vision import insufficient_observation
+from schemas.vision import insufficient_observation, with_observation_reliability
 
 
 class AiCameraTestRuntimeAdapter(CameraRuntimeAdapter):
@@ -123,11 +123,14 @@ class AiCameraTestRuntimeAdapter(CameraRuntimeAdapter):
     ) -> dict:
         if self.vision_service is None:
             return insufficient_observation(reason="vision_not_configured")
-        return self.vision_service.analyze_snapshot(
-            image_bytes=snapshot.body,
-            content_type=snapshot.content_type or "image/jpeg",
-            device_key=self.base_url,
-            context=vision_context,
+        return with_observation_reliability(
+            self.vision_service.analyze_snapshot(
+                image_bytes=snapshot.body,
+                content_type=snapshot.content_type or "image/jpeg",
+                device_key=self.base_url,
+                context=vision_context,
+                force_analyze=True,
+            )
         )
 
     def task_observation(self, task: dict) -> dict:

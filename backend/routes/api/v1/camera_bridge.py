@@ -8,6 +8,7 @@ from core.database import Database
 from core.errors import ApiError, error_response
 from repositories.care_repository import CareRepository
 from schemas.auth import bearer_token, json_body
+from schemas.vision import observation_is_reliable
 from services.camera_bridge_service import CameraBridgeError
 from services.parent_facing_copy import build_child_vision_context
 from services.service_factory import (
@@ -328,7 +329,10 @@ def _normalize_monitor_observation(value: object) -> dict | None:
         or value.get("time")
     )
     summary = _summary_text(value, activity=activity, has_person_value=has_person_value)
-    is_reliable = has_person_value in {True, False} and confidence >= 0.65
+    is_reliable = observation_is_reliable(
+        has_person=has_person_value,
+        confidence=confidence,
+    )
     if has_person_value is False:
         activity = ""
     has_activity = bool(activity)

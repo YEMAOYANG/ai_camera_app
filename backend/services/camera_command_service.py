@@ -10,6 +10,7 @@ from core.security import now_ms
 from repositories.camera_command_repository import CameraCommandRepository
 from repositories.device_repository import DeviceRepository
 from schemas.camera import camera_command_payload
+from schemas.vision import observation_is_reliable
 from services.auth_service import AuthService
 from services.camera_bridge_service import CameraBridgeError, CameraBridgeService
 from services.device_runtime_resolver import DeviceRuntimeResolver
@@ -1035,11 +1036,7 @@ def _observation_is_reliable(observation: dict) -> bool:
     if observation.get("isReliable") is not None:
         return bool(observation.get("isReliable"))
     has_person = observation.get("hasPerson", observation.get("has_person"))
-    try:
-        confidence = float(observation.get("confidence") or 0)
-    except (TypeError, ValueError):
-        confidence = 0.0
-    return has_person in {True, False} and confidence >= 0.65
+    return observation_is_reliable(has_person=has_person, confidence=observation.get("confidence"))
 
 
 def _parent_display_text(value: object) -> str:

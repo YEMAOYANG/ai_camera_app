@@ -4,7 +4,7 @@ import time
 from typing import Any, Mapping
 
 from integrations.ai.kimi_vision_provider import AiVisionProvider
-from schemas.vision import VISION_METHOD, VISION_METHOD_CACHED, insufficient_observation
+from schemas.vision import VISION_METHOD, VISION_METHOD_CACHED, insufficient_observation, with_observation_reliability
 from services.prompt_registry import PromptRegistry
 from services.vision_observation_cadence import VisionCadenceGate
 from services.vision_observation_enrich import enrich_observation_risks
@@ -55,7 +55,8 @@ class VisionObservationService:
             cached = self.cadence.cached_result(device_key)
             if cached is not None:
                 cached.setdefault("observed_at", now_ms)
-                return cached
+                return with_observation_reliability(cached)
+            return insufficient_observation(reason="vision_rate_limited", observed_at=now_ms)
         prompt = self.prompt_registry.get_prompt("vision.scene_observation", "v1")
         if prompt is None or not prompt.body.strip():
             return insufficient_observation(reason="vision_prompt_missing", observed_at=now_ms)
@@ -73,7 +74,7 @@ class VisionObservationService:
             cached = self.cadence.cached_result(device_key)
             if cached is not None:
                 cached.setdefault("observed_at", now_ms)
-                return cached
+                return with_observation_reliability(cached)
             return insufficient_observation(reason="vision_provider_unavailable", observed_at=now_ms)
         validation = self.validator.validate(response.text, observed_at=now_ms, method=VISION_METHOD)
         observation = dict(validation.observation)
@@ -94,7 +95,7 @@ class VisionObservationService:
             "validation_ok": validation.ok,
         }
         self.cadence.record_cloud_call(device_key, observation)
-        return observation
+        return with_observation_reliability(observation)
 
 
 def _render_user_prompt(body: str, *, context: Mapping[str, object] | None, last_activity: str) -> str:
