@@ -81,6 +81,8 @@ class HomeRecentObservationCard extends StatelessWidget {
                 else ...[
                   Text(
                     copy.headline,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppColors.ink,
                       fontFamily: AppTypography.systemFont,
@@ -92,6 +94,8 @@ class HomeRecentObservationCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     copy.detail,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppColors.muted,
                       fontFamily: AppTypography.systemFont,

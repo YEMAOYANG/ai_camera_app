@@ -9,6 +9,7 @@ class AppListRow extends StatelessWidget {
     this.trailing,
     this.tone = AppListRowTone.neutral,
     this.onTap,
+    this.subtitleMaxLines = 2,
     super.key,
   });
 
@@ -18,6 +19,7 @@ class AppListRow extends StatelessWidget {
   final Widget? trailing;
   final AppListRowTone tone;
   final VoidCallback? onTap;
+  final int subtitleMaxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +68,7 @@ class AppListRow extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  maxLines: 2,
+                  maxLines: subtitleMaxLines,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: AppColors.muted,

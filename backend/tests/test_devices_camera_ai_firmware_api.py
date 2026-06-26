@@ -597,6 +597,32 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertNotIn("[", visible)
         self.assertIn("孩子在桌前写字", event["displayMessage"])
 
+    def test_camera_event_display_does_not_turn_negated_toys_into_play(self):
+        event = _parent_camera_command_event(
+            {
+                "id": "cmd_negated_toy",
+                "source": "camera_command",
+                "eventType": "camera_observation",
+                "status": "succeeded",
+                "createdAt": now_ms(),
+                "payload": {
+                    "response": {
+                        "observation": {
+                            "hasPerson": True,
+                            "isReliable": True,
+                            "activity": "玩玩具",
+                            "summary": "孩子正在玩玩具",
+                            "description": "一个人趴在桌上，头部埋在双臂之间，没有看到书本、手机或玩具等物品。",
+                        },
+                    }
+                },
+            }
+        )
+
+        self.assertIsNotNone(event)
+        self.assertNotEqual(event["displayTitle"], "孩子正在玩玩具")
+        self.assertIn("趴在桌上", event["displayMessage"])
+
     def test_family_realtime_camera_event_is_family_scoped(self):
         captured: list[tuple[str, dict]] = []
         original_broadcast = task_event_stream.task_event_stream_server.broadcast

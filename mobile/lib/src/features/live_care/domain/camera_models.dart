@@ -442,21 +442,38 @@ class LiveCareEvent {
   }
 
   static LiveCareEvent fromJson(Map<String, dynamic> json) {
+    final category = _asString(json['category'], fallback: 'care_record');
+    final rawDisplayTitle = _asString(
+      json['displayTitle'],
+      fallback: _asString(json['title'], fallback: '看护记录'),
+    );
+    final rawDisplayMessage = _asString(
+      json['displayMessage'],
+      fallback: _asString(json['message']),
+    );
+    final shouldNormalizeObservationCopy =
+        category == 'camera_observation' ||
+        category == 'child_presence' ||
+        category == 'snapshot';
+    final displayTitle = shouldNormalizeObservationCopy
+        ? parentFacingCameraObservationText(
+            rawDisplayTitle,
+            maxLength: 28,
+            ensureSentenceEnd: false,
+          )
+        : rawDisplayTitle;
+    final displayMessage = shouldNormalizeObservationCopy
+        ? parentFacingCameraObservationText(rawDisplayMessage, maxLength: 72)
+        : rawDisplayMessage;
     return LiveCareEvent(
       id: _asString(json['id']),
       source: _asString(json['source']),
       eventType: _asString(json['eventType']),
       title: _asString(json['title'], fallback: '看护事件'),
       message: _asString(json['message']),
-      displayTitle: _asString(
-        json['displayTitle'],
-        fallback: _asString(json['title'], fallback: '看护记录'),
-      ),
-      displayMessage: _asString(
-        json['displayMessage'],
-        fallback: _asString(json['message']),
-      ),
-      category: _asString(json['category'], fallback: 'care_record'),
+      displayTitle: displayTitle.isNotEmpty ? displayTitle : '看护记录',
+      displayMessage: displayMessage,
+      category: category,
       severity: _asString(
         json['severity'],
         fallback: _asString(json['tone'], fallback: 'info'),
@@ -513,17 +530,23 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
       thumbnailUrl: '',
     );
   }
+  final rawDescription = _asString(data['description']);
+  final description = parentFacingCameraObservationText(
+    rawDescription,
+    maxLength: 72,
+  );
   final activity = _normalizeActivityLabel(
     _asString(data['activity'] ?? data['raw_activity']),
+    description: rawDescription,
   );
   final hasPersonValue = data['has_person'] ?? data['hasPerson'];
   final hasPerson = hasPersonValue == true;
   final observedAt = _asNullableInt(
     data['observedAt'] ?? data['observed_at'] ?? data['timestamp'],
   );
-  final description = _asString(data['description']);
-  final decisionReason = _asString(
-    data['decisionReason'] ?? data['decision_reason'],
+  final decisionReason = parentFacingCameraObservationText(
+    _asString(data['decisionReason'] ?? data['decision_reason']),
+    maxLength: 72,
   );
   final thumbnailUrl = _asString(
     data['thumbnailUrl'] ?? data['thumbnail_url'] ?? data['snapshotUrl'],
@@ -548,7 +571,10 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
       observedAt: observedAt,
     );
   }
-  final summary = _sanitizeObservationText(_asString(data['summary']));
+  final summary = _sanitizeObservationText(
+    _asString(data['summary']),
+    description: rawDescription,
+  );
   if (summary.isNotEmpty) {
     return _CameraObservationSnapshot(
       summary: summary,
@@ -622,17 +648,19 @@ bool _isFreshObservation(int? observedAt) {
 
 const _genericActivityLabels = {'其他', '未知', '无明显活动', 'other', 'unknown'};
 
-String _normalizeActivityLabel(String activity) {
+String _normalizeActivityLabel(String activity, {String description = ''}) {
   final trimmed = activity.trim();
   if (trimmed.isEmpty) return '';
   if (_genericActivityLabels.contains(trimmed)) return '';
   if (_genericActivityLabels.contains(trimmed.toLowerCase())) return '';
+  if (trimmed == '玩玩具' && _containsNegatedToy(description)) return '';
   return trimmed;
 }
 
-String _sanitizeObservationText(String text) {
+String _sanitizeObservationText(String text, {String description = ''}) {
   final trimmed = text.trim();
   if (trimmed.isEmpty) return '';
+  if (trimmed.contains('玩玩具') && _containsNegatedToy(description)) return '';
   if (_weakPresenceObservationTexts.contains(trimmed)) return '';
   for (final generic in _genericActivityLabels) {
     if (trimmed.endsWith('：$generic') || trimmed.endsWith(': $generic')) {
@@ -641,11 +669,88 @@ String _sanitizeObservationText(String text) {
   }
   if (trimmed.startsWith('画面记录到孩子正在进行：')) {
     final activity = trimmed.replaceFirst('画面记录到孩子正在进行：', '');
-    final normalized = _normalizeActivityLabel(activity);
+    final normalized = _normalizeActivityLabel(
+      activity,
+      description: description,
+    );
     if (normalized.isEmpty) return '';
     return '看到孩子在$normalized。';
   }
   return trimmed;
+}
+
+String parentFacingCameraObservationText(
+  String text, {
+  int maxLength = 64,
+  bool ensureSentenceEnd = true,
+}) {
+  var cleaned = text.trim();
+  if (cleaned.isEmpty) return '';
+  cleaned = cleaned
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .replaceAll(RegExp(r'[。；;]\s*'), '，')
+      .replaceAll(RegExp(r'，{2,}'), '，')
+      .trim();
+  cleaned = cleaned
+      .replaceFirst(RegExp(r'^画面中有一个人'), '孩子')
+      .replaceFirst(RegExp(r'^画面里有一个人'), '孩子')
+      .replaceFirst(RegExp(r'^镜头里有一个人'), '孩子')
+      .replaceFirst(RegExp(r'^一个人'), '孩子')
+      .replaceFirst(RegExp(r'^有人'), '孩子')
+      .replaceFirst(RegExp(r'^一名儿童'), '孩子')
+      .replaceFirst(RegExp(r'^一名孩子'), '孩子')
+      .replaceFirst(RegExp(r'^一个小孩'), '孩子')
+      .replaceFirst(RegExp(r'^一名小孩'), '孩子');
+  cleaned = cleaned
+      .replaceAll('小孩', '孩子')
+      .replaceAll('儿童', '孩子')
+      .replaceAll('似乎', '可能');
+
+  final postureRisk = RegExp(
+    r'(头部距离桌面很近|头.*桌面.*近|趴在桌|趴桌|头部埋|埋在双臂|坐姿)',
+  ).hasMatch(cleaned);
+  if (postureRisk) {
+    return '孩子低头靠近桌面，注意坐姿。';
+  }
+  final screenFocus =
+      RegExp(r'(手机|屏幕|电脑|平板)').hasMatch(cleaned) &&
+      RegExp(r'(低头|操作|观看|看|玩)').hasMatch(cleaned);
+  if (screenFocus) {
+    return '孩子在看屏幕，注意用眼距离。';
+  }
+
+  final clauses = cleaned
+      .split(RegExp(r'[，,]'))
+      .map((item) => item.trim())
+      .where((item) => item.isNotEmpty)
+      .where((item) => !_isLowValueSceneInventory(item))
+      .take(2)
+      .toList();
+  final compact = clauses.isEmpty ? cleaned : clauses.join('，');
+  if (compact.length <= maxLength) {
+    return ensureSentenceEnd ? _ensureSentenceEnd(compact) : compact;
+  }
+  return '${compact.substring(0, maxLength)}…';
+}
+
+bool _isLowValueSceneInventory(String text) {
+  return RegExp(
+    r'^(桌上有|桌面有|面前有|旁边有|周围有|左侧有|右侧有|背景有|地上有|画面中有|画面里有)',
+  ).hasMatch(text);
+}
+
+String _ensureSentenceEnd(String text) {
+  if (text.isEmpty || text.endsWith('。') || text.endsWith('…')) {
+    return text;
+  }
+  return '$text。';
+}
+
+bool _containsNegatedToy(String text) {
+  if (text.trim().isEmpty) return false;
+  return RegExp(
+    r'(没有|没|未|未见|看不到|没有看到)[^，。,.]{0,18}(玩具|积木|toy|toys)',
+  ).hasMatch(text.toLowerCase());
 }
 
 const _weakPresenceObservationTexts = {

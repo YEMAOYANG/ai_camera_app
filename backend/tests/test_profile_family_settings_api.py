@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import json
 import unittest
 from datetime import date
 
 from app import create_app
 from core.database import Database
-from core.security import hash_value
+from core.security import hash_value, now_ms
 from tests.support import fresh_test_config, request_debug_code
 
 
@@ -22,7 +23,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
     def test_profile_summary_and_account_contract(self):
         summary = self.client.get("/api/profile/summary", headers=self._auth_headers())
         self.assertEqual(summary.status_code, 200)
-        self.assertEqual(summary.json["summary"]["spaceTitle"], "家庭看护空间")
+        self.assertEqual(summary.json["summary"]["spaceTitle"], "我的家庭")
         self.assertEqual(summary.json["summary"]["memberCount"], 1)
         self.assertEqual(summary.json["summary"]["deviceCount"], 1)
         self.assertNotIn("妈妈", summary.json["summary"]["familyName"])
@@ -45,6 +46,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
 
         updated_summary = self.client.get("/api/profile/summary", headers=self._auth_headers())
         self.assertEqual(updated_summary.status_code, 200)
+        self.assertEqual(updated_summary.json["summary"]["spaceTitle"], "我的家庭空间")
         self.assertEqual(updated_summary.json["summary"]["displayName"], "爸爸")
         self.assertEqual(updated_summary.json["summary"]["relationshipKey"], "dad")
 
@@ -1121,6 +1123,59 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
                 """,
                 (f"event_{toy_task}", task_row["family_id"], toy_task),
             )
+            now = now_ms()
+            conn.execute(
+                """
+                INSERT INTO camera_commands(
+                  id, family_id, device_id, task_id, command_type, status, message,
+                  request_payload, response_payload, created_at, updated_at, completed_at
+                )
+                VALUES (?, ?, ?, NULL, 'camera_observation', 'succeeded', ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "cmd_report_observation",
+                    task_row["family_id"],
+                    self.device_id,
+                    "孩子正在整理玩具。",
+                    "{}",
+                    json.dumps(
+                        {
+                            "displayTitle": "看到孩子开始收纳",
+                            "displayMessage": "孩子把地垫上的积木放回盒子。",
+                        },
+                        ensure_ascii=False,
+                    ),
+                    now,
+                    now,
+                    now,
+                ),
+            )
+            conn.execute(
+                """
+                INSERT INTO camera_commands(
+                  id, family_id, device_id, task_id, command_type, status, message,
+                  request_payload, response_payload, created_at, updated_at, completed_at
+                )
+                VALUES (?, ?, ?, NULL, 'speak', 'succeeded', ?, ?, '{}', ?, ?, ?)
+                """,
+                (
+                    "cmd_report_care_reminder",
+                    task_row["family_id"],
+                    self.device_id,
+                    "已提醒调整坐姿。",
+                    json.dumps(
+                        {
+                            "source": "care_reminder",
+                            "scenario": "posture",
+                            "text": "坐直一点，眼睛离纸远一些。",
+                        },
+                        ensure_ascii=False,
+                    ),
+                    now,
+                    now,
+                    now,
+                ),
+            )
 
         daily = self.client.get(
             f"/api/reports/daily?date={today}",
@@ -1140,6 +1195,8 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         combined_report_text = str(report["highlights"]) + str(report["observations"]) + str(report["tasks"])
         self.assertIn("玩具", combined_report_text)
         self.assertIn("收纳", combined_report_text)
+        self.assertIn("积木放回盒子", combined_report_text)
+        self.assertIn("坐直一点", combined_report_text)
         self.assertNotIn("monitor_started", combined_report_text)
         self.assertNotIn("开始观察任务", combined_report_text)
 

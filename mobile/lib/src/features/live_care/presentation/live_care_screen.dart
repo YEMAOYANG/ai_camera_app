@@ -708,6 +708,7 @@ class _CareFocusPanel extends StatelessWidget {
             tone: care?.isAvailable == true
                 ? AppListRowTone.green
                 : AppListRowTone.amber,
+            subtitleMaxLines: 1,
           ),
           if (events.isLoading)
             const AppListRow(
@@ -732,6 +733,7 @@ class _CareFocusPanel extends StatelessWidget {
                   '${recentEvent.timeLabel} · ${recentEvent.displayTitle}：${recentEvent.displayMessage}',
               tone: _eventListTone(recentEvent),
               onTap: () => context.go(liveEventsPath),
+              subtitleMaxLines: 1,
             ),
         ],
       ),
@@ -755,7 +757,8 @@ String _monitorObservationSubtitle(CameraMonitorStatus monitor) {
       monitor.lastObservationDecisionReason,
   ];
   final text = parts.where((part) => part.trim().isNotEmpty).join(' · ');
-  return text.isEmpty ? '这条记录来自摄像头画面。' : text;
+  final display = parentFacingCameraObservationText(text, maxLength: 42);
+  return display.isEmpty ? '这条记录来自摄像头画面。' : display;
 }
 
 class LiveEventsScreen extends ConsumerWidget {

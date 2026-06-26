@@ -576,6 +576,23 @@ void main() {
     expect(find.textContaining('可信度'), findsNothing);
   });
 
+  test('live care event display copy removes generic person wording', () {
+    final event = LiveCareEvent.fromJson({
+      'id': 'evt_observation',
+      'source': 'camera_observation',
+      'eventType': 'camera_observation',
+      'displayTitle': '孩子正在写作业/看书',
+      'displayMessage': '一个人低头趴在桌前，头部距离桌面很近，似乎在书写或阅读，桌上有键盘、计算器和手机。',
+      'category': 'camera_observation',
+      'tone': 'info',
+      'createdAt': 1,
+    });
+
+    expect(event.displayTitle, '孩子正在写作业/看书');
+    expect(event.displayMessage, '孩子低头靠近桌面，注意坐姿。');
+    expect(event.displayMessage, isNot(contains('一个人')));
+  });
+
   testWidgets('login after logout refreshes profile for the new account', (
     tester,
   ) async {
@@ -801,7 +818,7 @@ void main() {
 
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
-    expect(find.text('家庭看护空间'), findsOneWidget);
+    expect(find.text('林家的家庭空间'), findsOneWidget);
     expect(find.text('家庭成员'), findsWidgets);
     expect(find.text('家庭与成员'), findsOneWidget);
     expect(find.text('摄像头管理'), findsOneWidget);
@@ -920,9 +937,9 @@ void main() {
 
     await tester.tap(find.text('我的').last);
     await tester.pumpAndSettle();
-    expect(find.text('家庭看护空间'), findsOneWidget);
+    expect(find.text('林家的家庭空间'), findsOneWidget);
 
-    await tester.tap(find.text('家庭看护空间').first);
+    await tester.tap(find.text('林家的家庭空间').first);
     await tester.pumpAndSettle();
     expect(find.text('个人信息'), findsOneWidget);
     expect(find.text('身份已确认'), findsNothing);
@@ -944,7 +961,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
     await tester.pumpAndSettle();
-    expect(find.text('家庭看护空间'), findsOneWidget);
+    expect(find.text('林家的家庭空间'), findsOneWidget);
 
     final familyMembersEntry = find.text('家庭成员').last;
     await tester.scrollUntilVisible(familyMembersEntry, 420);
@@ -2334,7 +2351,7 @@ class _FakeApiServer {
 
   Map<String, dynamic> _profileSummary() {
     return {
-      'spaceTitle': '家庭看护空间',
+      'spaceTitle': '林家的家庭空间',
       'familyId': 'family_test',
       'familyName': '林家的家庭空间',
       'displayName': _relationshipKey == 'dad' ? '林先生' : '林女士',

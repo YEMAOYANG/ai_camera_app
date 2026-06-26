@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from core.database import Database
@@ -559,13 +560,28 @@ def _summary_from_activity(*, has_person: object, activity: str, description: st
 
 
 def _activity_label(activity: str, description: str = "") -> str:
-    text = f"{activity} {description}".strip().lower()
-    if any(token in text for token in ("玩具", "积木", "toy", "toys", "play", "playing")):
-        return "玩玩具"
-    normalized = activity.strip()
-    if normalized.lower() in {"", "其他", "未知", "无明显活动", "other", "unknown", "normal"}:
+    activity_text = activity.strip()
+    normalized = activity_text.lower()
+    if normalized in {"", "其他", "未知", "无明显活动", "other", "unknown", "normal"}:
         return ""
-    return normalized[:40]
+    text = f"{activity_text} {description}".strip().lower()
+    if _positive_toy_activity(activity_text, description):
+        return "玩玩具"
+    return activity_text[:40]
+
+
+def _positive_toy_activity(activity: str, description: str) -> bool:
+    activity_text = activity.strip().lower()
+    if activity_text in {"玩玩具", "玩积木", "toy_play", "playing_toys", "playing with toys"}:
+        return True
+    text = f"{activity} {description}".strip().lower()
+    if _contains_negated_toy(text):
+        return False
+    return any(token in text for token in ("玩玩具", "玩积木", "搭积木", "摆弄玩具", "操作玩具", "playing with toys"))
+
+
+def _contains_negated_toy(text: str) -> bool:
+    return re.search(r"(没有|没|未|未见|看不到|没有看到)[^，。,.]{0,18}(玩具|积木|toy|toys)", text) is not None
 
 
 def _max_signal_duration(value: object) -> int:

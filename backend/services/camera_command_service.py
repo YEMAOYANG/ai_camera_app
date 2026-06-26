@@ -858,6 +858,8 @@ def _camera_observation_display(observation: dict) -> dict:
     activity = str(observation.get("activity") or "").strip()
     summary = _parent_display_text(observation.get("summary"))
     description = _observation_description(observation)
+    if summary and "玩具" in summary and _negated_toy_observation(description):
+        summary = ""
     decision_reason = _parent_display_text(observation.get("decisionReason"))
     is_reliable = bool(observation.get("isReliable"))
     if not is_reliable:
@@ -876,7 +878,7 @@ def _camera_observation_display(observation: dict) -> dict:
             "severity": "warning",
             "evidence": "未看到孩子",
         }
-    if activity == "玩玩具" or "玩具" in summary:
+    if (activity == "玩玩具" and not _negated_toy_observation(description)) or _positive_toy_observation(summary, description):
         return {
             "title": "孩子正在玩玩具",
             "message": description or decision_reason or "孩子正在玩玩具。",
@@ -929,6 +931,17 @@ def _observation_evidence_summary(evidence: str, observation: dict) -> str:
 def _strip_confidence_text(value: str) -> str:
     text = re.sub(r"(?:\s*·\s*)?可信度\s*\d+%", "", value or "")
     return text.strip(" ·")
+
+
+def _positive_toy_observation(summary: str, description: str) -> bool:
+    text = f"{summary} {description}".strip().lower()
+    if _negated_toy_observation(text):
+        return False
+    return any(token in text for token in ("玩玩具", "玩积木", "搭积木", "摆弄玩具", "操作玩具", "playing with toys"))
+
+
+def _negated_toy_observation(text: str) -> bool:
+    return re.search(r"(没有|没|未|未见|看不到|没有看到)[^，。,.]{0,18}(玩具|积木|toy|toys)", text.lower()) is not None
 
 
 def _parent_display_text(value: object) -> str:

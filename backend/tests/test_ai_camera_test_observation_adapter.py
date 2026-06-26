@@ -100,6 +100,24 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
         self.assertEqual(normal_payloads, [])
         self.assertEqual(unknown_payloads, [])
 
+    def test_negated_toy_description_does_not_create_toy_payload(self):
+        adapter = AiCameraTestObservationAdapter(_config(), json_request=_unused_request)
+
+        payloads = adapter.payloads_from_analysis(
+            {
+                "has_person": True,
+                "activity": "玩玩具",
+                "confidence": 0.82,
+                "description": "一个人趴在桌上，头部埋在双臂之间，没有看到书本、手机或玩具等物品。",
+                "decision_reason": "坐姿风险处在冷却期内。",
+            },
+            window_start_ms=1_000,
+            window_end_ms=6_000,
+            observed_at=6_000,
+        )
+
+        self.assertEqual(payloads, [])
+
     def test_risky_posture_still_creates_posture_payload(self):
         adapter = AiCameraTestObservationAdapter(_config(), json_request=_unused_request)
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 
 from core.database import Database
@@ -121,6 +121,7 @@ REPORT_EVENT_LABELS = {
     "camera_snapshot": "摄像头快照",
     "vision_observation": "视觉观察",
     "ai_observation": "AI 观察记录",
+    "care_reminder": "看护提醒",
 }
 REPORT_HIDDEN_EVENT_TYPES = {"monitor_started"}
 REPORT_SKILL_DEFS = (
@@ -179,7 +180,7 @@ class ProfileService:
             return {
                 "ok": True,
                 "summary": {
-                    "spaceTitle": "家庭看护空间",
+                    "spaceTitle": family["name"] or "家庭看护空间",
                     "familyId": family["id"],
                     "familyName": family["name"],
                     "displayName": display_name,
@@ -1956,8 +1957,9 @@ def _weekly_summary(total: int, completed: int) -> str:
 
 
 def _report_events(conn, *, family_id: str, start_date: str, end_date: str) -> list[dict]:
-    return list(
-        conn.execute(
+    task_events = [
+        dict(row)
+        for row in conn.execute(
             """
             SELECT e.*
             FROM task_events e
@@ -1970,7 +1972,105 @@ def _report_events(conn, *, family_id: str, start_date: str, end_date: str) -> l
             """,
             (family_id, start_date, end_date),
         ).fetchall()
+    ]
+    camera_events = _camera_report_events(
+        conn,
+        family_id=family_id,
+        start_date=start_date,
+        end_date=end_date,
     )
+    events = [*task_events, *camera_events]
+    events.sort(key=lambda item: int(item.get("created_at") or 0), reverse=True)
+    return events[:64]
+
+
+def _camera_report_events(conn, *, family_id: str, start_date: str, end_date: str) -> list[dict]:
+    start_ms, end_ms = _report_date_range_ms(start_date, end_date)
+    rows = conn.execute(
+        """
+        SELECT *
+        FROM camera_commands
+        WHERE family_id = ?
+          AND command_type IN ('camera_observation', 'speak')
+          AND COALESCE(completed_at, updated_at, created_at) >= ?
+          AND COALESCE(completed_at, updated_at, created_at) <= ?
+        ORDER BY COALESCE(completed_at, updated_at, created_at) DESC
+        LIMIT 64
+        """,
+        (family_id, start_ms, end_ms),
+    ).fetchall()
+    events = []
+    for row in rows:
+        event = _camera_command_report_event(dict(row))
+        if event is not None:
+            events.append(event)
+    return events
+
+
+def _camera_command_report_event(row: dict) -> dict | None:
+    command_type = str(row.get("command_type") or "")
+    request = _json_dict(row.get("request_payload"))
+    response = _json_dict(row.get("response_payload"))
+    data = response or request
+    created_at = int(row.get("completed_at") or row.get("updated_at") or row.get("created_at") or 0)
+    if command_type == "camera_observation":
+        title = _parent_report_text(data.get("displayTitle")) or "摄像头观察"
+        message = _parent_report_text(data.get("displayMessage")) or _parent_report_text(row.get("message"))
+        if not message:
+            observation = _json_dict(data.get("observation"))
+            message = _parent_report_text(observation.get("description")) or _parent_report_text(observation.get("summary"))
+        return {
+            "id": str(row.get("id") or ""),
+            "event_type": "camera_observation",
+            "message": message or title,
+            "payload": row.get("response_payload") or row.get("request_payload") or "{}",
+            "created_at": created_at,
+        }
+    if command_type == "speak" and str(request.get("source") or "") == "care_reminder":
+        scenario = str(request.get("scenario") or "")
+        return {
+            "id": str(row.get("id") or ""),
+            "event_type": "care_reminder",
+            "message": _parent_report_text(request.get("text")) or "摄像头已按看护规则提醒。",
+            "payload": row.get("request_payload") or "{}",
+            "created_at": created_at,
+            "scenario": scenario,
+        }
+    return None
+
+
+def _report_date_range_ms(start_date: str, end_date: str) -> tuple[int, int]:
+    start = date.fromisoformat(start_date)
+    end = date.fromisoformat(end_date)
+    start_dt = datetime.combine(start, time.min)
+    end_dt = datetime.combine(end, time.max)
+    return int(start_dt.timestamp() * 1000), int(end_dt.timestamp() * 1000)
+
+
+def _parent_report_text(value: object, *, limit: int = 180) -> str:
+    if not isinstance(value, str):
+        return ""
+    text = value.strip()
+    if not text:
+        return ""
+    compact = text.strip()
+    if compact.startswith(("{", "[")) or any(
+        token in compact for token in ("'score'", '"score"', "'skills'", '"skills"')
+    ):
+        return ""
+    return text[:limit]
+
+
+def _json_dict(value: object) -> dict:
+    if not value:
+        return {}
+    if isinstance(value, dict):
+        return value
+    try:
+        parsed = json.loads(str(value))
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
 
 
 def _report_summary(rows: list[dict], events: list[dict]) -> dict:
@@ -2326,6 +2426,8 @@ def _event_has_observation(event: dict) -> bool:
     event_type = str(event.get("event_type") or "")
     if event_type in REPORT_HIDDEN_EVENT_TYPES:
         return False
+    if event_type in {"camera_observation", "care_reminder"}:
+        return True
     return any(word in event_type for word in ("camera", "observe", "observation", "monitor", "vision"))
 
 

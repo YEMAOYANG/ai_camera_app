@@ -386,16 +386,16 @@ String observationDetail({
   required DateTime now,
 }) {
   if (cameraMonitor?.hasCurrentReliableObservation == true) {
-    final description = compactHomeText(
+    final description = parentFacingCameraObservationText(
       cameraMonitor!.lastObservationDescription,
-      maxLength: 44,
+      maxLength: 30,
     );
     if (meaningfulObservationText(description) != null) {
       return description;
     }
-    final reason = compactHomeText(
+    final reason = parentFacingCameraObservationText(
       cameraMonitor.lastObservationDecisionReason,
-      maxLength: 44,
+      maxLength: 30,
     );
     if (meaningfulObservationText(reason) != null) {
       return reason;

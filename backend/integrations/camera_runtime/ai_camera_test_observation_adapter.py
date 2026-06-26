@@ -16,7 +16,8 @@ MEAL_RE = re.compile(r"(吃饭|用餐|餐桌|饭菜|餐具|碗|筷子|勺子|餐
 TOY_CLEANUP_RE = re.compile(r"(收玩具|整理玩具|收拾玩具|玩具盒|放回|归位)")
 TOY_CLEANUP_DONE_RE = re.compile(r"(玩具已收好|已经收好|收纳完成|玩具归位|整理好了|整齐)")
 TOY_LEFT_RE = re.compile(r"(离开[^，。,.]{0,12}(玩具|玩具区)|玩具[^，。,.]{0,18}(还在|散落|没收|未收))")
-PLAYING_TOYS_RE = re.compile(r"(玩玩具|玩积木|搭积木|摆弄玩具|操作玩具|playing with toys|playing|play)")
+PLAYING_TOYS_RE = re.compile(r"(玩玩具|玩积木|搭积木|摆弄玩具|操作玩具|playing with toys)")
+TOY_NEGATION_RE = re.compile(r"(没有|没|未|未见|看不到|没有看到)[^，。,.]{0,18}(玩具|积木|toy|toys)")
 POSTURE_RE = re.compile(r"(低头|头低|趴桌|身体前倾|弯腰|离[^，。,.]{0,8}(桌|书|纸)[^，。,.]{0,8}(近|太近|过近))")
 
 
@@ -203,7 +204,9 @@ def _scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, st
     has_person = analysis.get("has_person")
     toys_scattered = bool(analysis.get("toys_scattered"))
     toys_visible = bool(analysis.get("toys_visible"))
-    playing_toys = activity == "玩玩具" or PLAYING_TOYS_RE.search(text)
+    playing_toys = (
+        activity == "玩玩具" or PLAYING_TOYS_RE.search(text)
+    ) and not TOY_NEGATION_RE.search(text)
 
     posture_signal = ""
     if posture_status in POSTURE_RISK_VALUES:

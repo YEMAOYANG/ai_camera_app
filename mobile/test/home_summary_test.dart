@@ -290,6 +290,70 @@ void main() {
     expect(monitor.lastObservationConfidence, 0.9);
   });
 
+  test('negated toy description does not show toy play in hero', () {
+    final monitor = CameraMonitorStatus.fromJson({
+      'monitor': {
+        'running': true,
+        'status': 'observing',
+        'lastObservation': {
+          'summary': '孩子正在玩玩具',
+          'activity': '玩玩具',
+          'hasPerson': true,
+          'isReliable': true,
+          'confidence': 0.82,
+          'description': '一个人趴在桌上，头部埋在双臂之间，没有看到书本、手机或玩具等物品。',
+          'observedAt': DateTime.now().millisecondsSinceEpoch,
+        },
+      },
+    });
+    final summary = buildHomeSummary(
+      HomeSummaryInput(
+        now: now,
+        profile: profile(child: child()),
+        deviceOverview: _onlineDeviceOverview(),
+        cameraMonitor: monitor,
+        tasks: const [],
+      ),
+    );
+
+    expect(summary.habitFocus.title, isNot('孩子正在玩玩具'));
+    expect(summary.habitFocus.title, '画面暂时无法判断');
+    expect(summary.habitFocus.detail, contains('孩子低头靠近桌面'));
+    expect(summary.habitFocus.detail, isNot(contains('一个人')));
+  });
+
+  test('parent-facing observation copy removes generic person wording', () {
+    final monitor = CameraMonitorStatus.fromJson({
+      'monitor': {
+        'running': true,
+        'status': 'observing',
+        'lastObservation': {
+          'summary': '孩子正在写作业/看书',
+          'activity': '写作业/看书',
+          'hasPerson': true,
+          'isReliable': true,
+          'confidence': 0.88,
+          'description': '一个人低头趴在桌前，头部距离桌面很近，似乎在书写或阅读，桌上有键盘、计算器和手机。',
+          'observedAt': DateTime.now().millisecondsSinceEpoch,
+        },
+      },
+    });
+    final summary = buildHomeSummary(
+      HomeSummaryInput(
+        now: now,
+        profile: profile(child: child()),
+        deviceOverview: _onlineDeviceOverview(),
+        cameraMonitor: monitor,
+        tasks: const [],
+      ),
+    );
+
+    expect(summary.habitFocus.title, '孩子正在写作业/看书');
+    expect(summary.habitFocus.detail, '孩子低头靠近桌面，注意坐姿。');
+    expect(summary.habitFocus.detail, isNot(contains('一个人')));
+    expect(monitor.lastObservationDescription, '孩子低头靠近桌面，注意坐姿。');
+  });
+
   test('stale negative observation falls back to pending frame copy', () {
     final monitor = CameraMonitorStatus.fromJson({
       'monitor': {

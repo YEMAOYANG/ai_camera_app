@@ -37,7 +37,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('家庭看护空间'), findsOneWidget);
+    expect(find.text('我的家庭空间'), findsOneWidget);
     expect(find.text('监护人A · 138 **** 9696'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('guardianPersona:guardian_default')),
@@ -245,7 +245,7 @@ void main() {
 
 ProfileSummary _summary() {
   return ProfileSummary(
-    spaceTitle: '家庭看护空间',
+    spaceTitle: '我的家庭空间',
     familyId: 'family_test',
     familyName: '我的家庭空间',
     displayName: '家长',

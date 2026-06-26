@@ -113,134 +113,198 @@ class HomeHabitHero extends StatelessWidget {
             ),
           ),
           Positioned.fill(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.pageHorizontal,
-                topPadding,
-                AppSpacing.pageHorizontal,
-                bottomPadding,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              focus.headerTime,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.72),
-                                fontFamily: AppTypography.systemFont,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                height: 1.1,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              focus.headerTitle,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontFamily: AppTypography.systemFont,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                                height: 1.1,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      HomePressable(
-                        onTap: () => context.go(AppRoute.alerts.path),
-                        child: Semantics(
-                          button: true,
-                          label: '未处理提醒',
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.20),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.18),
-                              ),
-                            ),
-                            child: SizedBox(
-                              width: AppControls.minTouchTarget,
-                              height: AppControls.minTouchTarget,
-                              child: Center(
-                                child: Icon(
-                                  Icons.notifications_outlined,
-                                  color: Colors.white,
-                                  size: 19,
+            child: LayoutBuilder(
+              builder: (context, heroConstraints) {
+                final rawContentHeight =
+                    heroConstraints.maxHeight - topPadding - bottomPadding;
+                final tightHero = rawContentHeight < 132;
+                final effectiveTopPadding = tightHero
+                    ? topInset + (compact ? 6 : 8)
+                    : topPadding;
+                final effectiveBottomPadding = tightHero
+                    ? (panelOverlap * 0.52 + 6)
+                          .clamp(28.0, bottomPadding)
+                          .toDouble()
+                    : bottomPadding;
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.pageHorizontal,
+                    effectiveTopPadding,
+                    AppSpacing.pageHorizontal,
+                    effectiveBottomPadding,
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, contentConstraints) {
+                      final showChips =
+                          focus.chips.isNotEmpty &&
+                          contentConstraints.maxHeight >= 122;
+                      final statusGap = tightHero
+                          ? 6.0
+                          : (compact ? 10.0 : 16.0);
+                      final chipGap = tightHero ? 3.0 : (compact ? 4.0 : 8.0);
+                      final chipHeight = tightHero
+                          ? 24.0
+                          : (compact ? 26.0 : 28.0);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      focus.headerTime,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.72,
+                                        ),
+                                        fontFamily: AppTypography.systemFont,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1.1,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      focus.headerTitle,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: AppTypography.systemFont,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1.1,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
+                              const SizedBox(width: 10),
+                              HomePressable(
+                                onTap: () => context.go(AppRoute.alerts.path),
+                                child: Semantics(
+                                  button: true,
+                                  label: '未处理提醒',
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.20,
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.18,
+                                        ),
+                                      ),
+                                    ),
+                                    child: SizedBox(
+                                      width: AppControls.minTouchTarget,
+                                      height: AppControls.minTouchTarget,
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.notifications_outlined,
+                                          color: Colors.white,
+                                          size: 19,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: compact ? 10 : 16),
-                  if (isLoading)
-                    _HeroSkeleton(compact: compact)
-                  else ...[
-                    Flexible(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            focus.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: AppTypography.systemFont,
-                              fontSize: compact ? 22 : 26,
-                              fontWeight: FontWeight.w900,
-                              height: compact ? 1.12 : 1.16,
+                          SizedBox(height: statusGap),
+                          if (isLoading)
+                            _HeroSkeleton(compact: compact || tightHero)
+                          else ...[
+                            Flexible(
+                              fit: FlexFit.tight,
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  if (constraints.maxHeight <= 0 ||
+                                      constraints.maxWidth <= 0) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  final tight =
+                                      tightHero ||
+                                      compact ||
+                                      constraints.maxHeight < 74;
+                                  final titleStyle = TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: AppTypography.systemFont,
+                                    fontSize: tight ? 21 : 26,
+                                    fontWeight: FontWeight.w900,
+                                    height: tight ? 1.08 : 1.16,
+                                  );
+                                  final detailStyle = TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.74),
+                                    fontFamily: AppTypography.systemFont,
+                                    fontSize: tight ? 12 : 13,
+                                    fontWeight: FontWeight.w600,
+                                    height: tight ? 1.24 : 1.45,
+                                  );
+                                  final content = SizedBox(
+                                    width: constraints.maxWidth,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          focus.title,
+                                          maxLines: tight ? 1 : 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: titleStyle,
+                                        ),
+                                        SizedBox(height: tight ? 4 : 8),
+                                        Text(
+                                          focus.detail,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: detailStyle,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  return Align(
+                                    alignment: Alignment.topLeft,
+                                    child: FittedBox(
+                                      alignment: Alignment.topLeft,
+                                      fit: BoxFit.scaleDown,
+                                      child: content,
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                          SizedBox(height: compact ? 6 : 8),
-                          Text(
-                            focus.detail,
-                            maxLines: compact ? 1 : 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.74),
-                              fontFamily: AppTypography.systemFont,
-                              fontSize: compact ? 12.5 : 13,
-                              fontWeight: FontWeight.w600,
-                              height: compact ? 1.36 : 1.45,
-                            ),
-                          ),
+                            if (showChips) ...[
+                              SizedBox(height: chipGap),
+                              SizedBox(
+                                height: chipHeight,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: EdgeInsets.zero,
+                                  itemCount: focus.chips.length,
+                                  separatorBuilder: (_, _) =>
+                                      SizedBox(width: compact ? 6 : 8),
+                                  itemBuilder: (context, index) =>
+                                      _HeroStatusPill(chip: focus.chips[index]),
+                                ),
+                              ),
+                            ],
+                          ],
                         ],
-                      ),
-                    ),
-                    SizedBox(height: compact ? 4 : 8),
-                    SizedBox(
-                      height: compact ? 26 : 28,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.zero,
-                        itemCount: focus.chips.length,
-                        separatorBuilder: (_, _) =>
-                            SizedBox(width: compact ? 6 : 8),
-                        itemBuilder: (context, index) =>
-                            _HeroStatusPill(chip: focus.chips[index]),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
           ),
         ],
