@@ -9,6 +9,8 @@ import 'package:warm_sight/src/app/router/app_route.dart';
 import 'package:warm_sight/src/app/router/app_router.dart';
 import 'package:warm_sight/src/core/theme/app_system_ui.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/core/storage/auth_session_store.dart';
+import 'package:warm_sight/src/features/auth/application/session_data_invalidation.dart';
 import 'package:warm_sight/src/features/devices/application/device_repository.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
@@ -205,6 +207,10 @@ class _RealtimeInvalidationCoordinator {
 
   void handle(TaskRealtimeEvent event) {
     if (_disposed) return;
+    if (event.isSessionRevoked) {
+      unawaited(_handleSessionRevoked());
+      return;
+    }
     if (event.isTaskUpdate || event.isTaskStatusChanged) {
       _taskIds.addAll(event.taskIds);
       _scheduleTaskRefresh();
@@ -216,11 +222,21 @@ class _RealtimeInvalidationCoordinator {
         event.isReminderEventCreated ||
         event.isCameraCommandCreated) {
       _careTaskIds.addAll(event.taskIds);
+      if (event.isCameraEventCreated) {
+        _ref.read(cameraEventsProvider.notifier).handleRealtimeEvent(event);
+      }
       _scheduleCameraEventsRefresh();
     }
     if (event.isCameraStatusChanged) {
       _scheduleCameraStatusRefresh();
     }
+  }
+
+  Future<void> _handleSessionRevoked() async {
+    if (_disposed) return;
+    await _ref.read(authSessionStoreProvider).clear();
+    if (_disposed) return;
+    invalidateAuthenticatedSessionDataFromRef(_ref);
   }
 
   void _scheduleTaskRefresh() {
@@ -267,11 +283,11 @@ class _RealtimeInvalidationCoordinator {
       final ids = List<String>.from(_careTaskIds);
       _careTaskIds.clear();
       _ref
-        ..invalidate(cameraEventsProvider)
         ..invalidate(liveCareStatusProvider)
         ..invalidate(cameraMonitorStatusProvider)
         ..invalidate(dailyReportProvider)
         ..invalidate(weeklyReportProvider);
+      unawaited(_ref.read(cameraEventsProvider.notifier).refresh());
       for (final taskId in ids) {
         _ref.invalidate(taskEventsProvider(taskId));
       }

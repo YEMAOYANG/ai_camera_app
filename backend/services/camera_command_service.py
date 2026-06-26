@@ -243,6 +243,21 @@ class CameraCommandService:
             observation_id=str(observation.get("observedAt") or ""),
             is_reliable=bool(observation.get("isReliable")),
             source="camera_observation",
+            event={
+                "id": command["id"],
+                "deviceId": device_id,
+                "displayTitle": display["title"],
+                "displayMessage": display["message"],
+                "category": display["category"],
+                "severity": display["severity"],
+                "eventType": "camera_observation",
+                "createdAt": now,
+                "observedAt": observation.get("observedAt") or now,
+                "isReliable": bool(observation.get("isReliable")),
+                "source": "camera_observation",
+                "tone": "info",
+                "status": "succeeded",
+            },
         )
         return camera_command_payload(updated)
 

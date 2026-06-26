@@ -180,9 +180,10 @@ class TaskEventStreamServer:
     def _handle(self, connection: ServerConnection) -> None:
         stream_kind = ""
         identity_id = ""
+        session_id = ""
         try:
-            stream_kind, identity_id = self._authenticate_connection(connection)
-            self._register(stream_kind, identity_id, connection)
+            stream_kind, identity_id, session_id = self._authenticate_connection(connection)
+            self._register(stream_kind, identity_id, connection, session_id=session_id)
             connection.send(
                 json.dumps(
                     _connected_message(stream_kind, identity_id),
@@ -209,9 +210,9 @@ class TaskEventStreamServer:
             pass
         finally:
             if stream_kind and identity_id:
-                self._unregister(stream_kind, identity_id, connection)
+                self._unregister(stream_kind, identity_id, connection, session_id=session_id)
 
-    def _authenticate_connection(self, connection: ServerConnection) -> tuple[str, str]:
+    def _authenticate_connection(self, connection: ServerConnection) -> tuple[str, str, str]:
         request = getattr(connection, "request", None)
         request_path = getattr(request, "path", "") if request is not None else ""
         parsed = urlparse(request_path)
@@ -219,11 +220,11 @@ class TaskEventStreamServer:
         if self._auth_service is None:
             raise ValueError("websocket auth is not configured")
         if parsed.path == self._path:
-            context = self._auth_service.authenticate(token)
-            return "task", str(context["family"]["id"])
+            context = self._auth_service.authenticate_session(token)
+            return "task", str(context["family"]["id"]), str(context["session"]["id"])
         if parsed.path == self._account_security_path:
             context = self._auth_service.authenticate_session(token)
-            return "account_security", str(context["session"]["id"])
+            return "account_security", str(context["session"]["id"]), str(context["session"]["id"])
         raise ValueError("unexpected websocket path")
 
     def _register(
@@ -231,10 +232,14 @@ class TaskEventStreamServer:
         stream_kind: str,
         identity_id: str,
         connection: ServerConnection,
+        *,
+        session_id: str = "",
     ) -> None:
         bucket = self._bucket(stream_kind)
         with self._lock:
             bucket.setdefault(identity_id, set()).add(connection)
+            if stream_kind == "task" and session_id:
+                self._session_connections.setdefault(session_id, set()).add(connection)
             self._state.connection_count = self._connection_count()
 
     def _unregister(
@@ -242,6 +247,8 @@ class TaskEventStreamServer:
         stream_kind: str,
         identity_id: str,
         connection: ServerConnection,
+        *,
+        session_id: str = "",
     ) -> None:
         bucket = self._bucket(stream_kind)
         with self._lock:
@@ -250,6 +257,12 @@ class TaskEventStreamServer:
                 active.discard(connection)
                 if not active:
                     bucket.pop(identity_id, None)
+            if stream_kind == "task" and session_id:
+                session_active = self._session_connections.get(session_id)
+                if session_active is not None:
+                    session_active.discard(connection)
+                    if not session_active:
+                        self._session_connections.pop(session_id, None)
             self._state.connection_count = self._connection_count()
 
     def _drop_failed(
@@ -336,6 +349,7 @@ def publish_family_event(
     observation_id: str | None = None,
     is_reliable: bool | None = None,
     source: str = "app",
+    event: dict[str, Any] | None = None,
 ) -> None:
     if not family_id or event_type not in APP_REALTIME_EVENT_TYPES:
         return
@@ -349,6 +363,7 @@ def publish_family_event(
             observation_id=observation_id,
             is_reliable=is_reliable,
             source=source,
+            event=event,
         ),
     )
 
@@ -362,6 +377,7 @@ def family_event_message(
     observation_id: str | None = None,
     is_reliable: bool | None = None,
     source: str = "app",
+    event: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "type": event_type,
@@ -374,7 +390,35 @@ def family_event_message(
     }
     if is_reliable is not None:
         payload["isReliable"] = bool(is_reliable)
+    lightweight_event = _lightweight_realtime_event(event)
+    if lightweight_event:
+        payload["event"] = lightweight_event
     return payload
+
+
+def _lightweight_realtime_event(event: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(event, dict):
+        return {}
+    allowed = {
+        "id",
+        "deviceId",
+        "taskId",
+        "displayTitle",
+        "displayMessage",
+        "category",
+        "severity",
+        "eventType",
+        "createdAt",
+        "observedAt",
+        "isReliable",
+        "source",
+        "tone",
+        "status",
+    }
+    result = {key: event[key] for key in allowed if key in event}
+    for blocked in ("image", "base64", "snapshot", "thumbnail", "debug", "rawDetail"):
+        result.pop(blocked, None)
+    return result
 
 
 def publish_account_session_revoked(

@@ -417,6 +417,48 @@ class CareRepository:
             (family_id, source, source_event_id),
         ).fetchone()
 
+    def find_recent_duplicate_observation(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        child_id: str,
+        device_id: str | None,
+        scenario: str,
+        signal_type: str,
+        parent_summary: str | None,
+        raw_detail_json: str | None,
+        since: int,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT coe.*
+            FROM camera_observation_events coe
+            LEFT JOIN behavior_signals bs
+              ON bs.observation_event_id = coe.id
+            WHERE coe.family_id = ?
+              AND coe.child_id = ?
+              AND coe.device_id = ?
+              AND coe.scenario = ?
+              AND COALESCE(bs.signal_type, '') = ?
+              AND COALESCE(coe.parent_summary, '') = ?
+              AND COALESCE(coe.raw_detail_json, '') = ?
+              AND coe.created_at >= ?
+            ORDER BY coe.created_at DESC
+            LIMIT 1
+            """,
+            (
+                family_id,
+                child_id,
+                device_id or "",
+                scenario,
+                signal_type,
+                parent_summary or "",
+                raw_detail_json or "",
+                since,
+            ),
+        ).fetchone()
+
     def latest_camera_observation_for_device(
         self,
         conn: DatabaseConnection,

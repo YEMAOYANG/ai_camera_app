@@ -935,6 +935,59 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertIsNotNone(state)
         self.assertEqual(int(state["consecutive_seconds"]), 10)
 
+    def test_recent_duplicate_observation_does_not_create_second_care_event_or_reminder(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "toy_cleanup",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        captured: list[tuple[str, dict]] = []
+        original_broadcast = task_event_stream.task_event_stream_server.broadcast
+        task_event_stream.task_event_stream_server.broadcast = (
+            lambda family_id, payload: captured.append((family_id, payload))
+        )
+        raw_detail = {
+            "has_person": True,
+            "activity": "看屏幕",
+            "description": "孩子在看屏幕，注意用眼距离。",
+        }
+        try:
+            first = self._post_observation(
+                "posture",
+                confidence=0.9,
+                duration_seconds=3,
+                signal_type="posture_risk",
+                parent_summary="孩子低头靠近桌面，注意坐姿。",
+                raw_detail=raw_detail,
+                observed_at=_ms("2026-06-17 19:30"),
+            )
+            second = self._post_observation(
+                "posture",
+                confidence=0.9,
+                duration_seconds=3,
+                signal_type="posture_risk",
+                parent_summary="孩子低头靠近桌面，注意坐姿。",
+                raw_detail=raw_detail,
+                observed_at=_ms("2026-06-17 19:30") + 5_000,
+            )
+        finally:
+            task_event_stream.task_event_stream_server.broadcast = original_broadcast
+
+        self.assertEqual(first.status_code, 200, first.json)
+        self.assertEqual(second.status_code, 200, second.json)
+        self.assertTrue(second.json["duplicate"])
+        self.assertTrue(second.json["duplicateCareEvent"])
+        self.assertIsNone(second.json["careEvent"])
+        self.assertIsNone(second.json["reminder"])
+        camera_events = [
+            payload for _, payload in captured if payload["type"] == "camera_event.created"
+        ]
+        self.assertEqual(len(camera_events), 1)
+
     def test_current_behavior_state_is_upserted(self):
         self._ensure_capabilities()
         self._patch_capability("toy_cleanup", cooldownSeconds=0)

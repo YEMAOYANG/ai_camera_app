@@ -85,6 +85,21 @@ class CameraAiObservationService:
                         "observation": observation_event_payload(existing),
                         "decision": reminder_decision_payload(decision) if decision else None,
                     }
+            parsed_signals = _signals(data.get("signals"))
+            parent_summary = _optional_text(data.get("parentSummary"))
+            raw_detail_json = _json_or_none(data.get("rawDetail"))
+            primary_signal_type = parsed_signals[0]["signalType"] if parsed_signals else ""
+            duplicate_care_event = self.repository.find_recent_duplicate_observation(
+                conn,
+                family_id=family_id,
+                child_id=child_id,
+                device_id=device_id,
+                scenario=scenario,
+                signal_type=primary_signal_type,
+                parent_summary=parent_summary,
+                raw_detail_json=raw_detail_json,
+                since=now - 120_000,
+            )
             event = self.repository.create_observation_event(
                 conn,
                 family_id=family_id,
@@ -94,8 +109,8 @@ class CameraAiObservationService:
                 observed_at=observed_at,
                 confidence=observation_score,
                 evidence_type=str(data.get("evidenceType") or "none")[:128],
-                parent_summary=_optional_text(data.get("parentSummary")),
-                raw_detail_json=_json_or_none(data.get("rawDetail")),
+                parent_summary=parent_summary,
+                raw_detail_json=raw_detail_json,
                 source=source,
                 source_event_id=source_event_id,
                 source_type=_optional_text(data.get("sourceType")),
@@ -120,7 +135,7 @@ class CameraAiObservationService:
             signal_rows = []
             state_rows = []
             policy_signal_rows = []
-            for signal in _signals(data.get("signals")):
+            for signal in parsed_signals:
                 signal_row = self.repository.create_behavior_signal(
                     conn,
                     observation_event_id=event["id"],
@@ -248,7 +263,8 @@ class CameraAiObservationService:
                     now=now,
                 )
         care_event = None
-        if data.get("recordCareEvent") is not False:
+        duplicate_care_event = bool(duplicate_care_event)
+        if data.get("recordCareEvent") is not False and not duplicate_care_event:
             care_event = self._record_parent_care_event(
                 family_id=family_id,
                 child_id=child_id,
@@ -257,15 +273,17 @@ class CameraAiObservationService:
                 data=data,
                 observation_score=observation_score,
             )
-        reminder_result = self._trigger_allowed_reminder(
-            family_id=family_id,
-            child_id=child_id,
-            device_id=device_id,
-            scenario=scenario,
-            decision=decision_row,
-            event=event,
-            data=data,
-        )
+        reminder_result = None
+        if not duplicate_care_event:
+            reminder_result = self._trigger_allowed_reminder(
+                family_id=family_id,
+                child_id=child_id,
+                device_id=device_id,
+                scenario=scenario,
+                decision=decision_row,
+                event=event,
+                data=data,
+            )
         publish_family_event(
             family_id=family_id,
             event_type=CAMERA_OBSERVATION_UPDATED,
@@ -290,6 +308,8 @@ class CameraAiObservationService:
             "careEvent": care_event,
             "reminder": reminder_result,
             "reviewItem": parent_review_event_payload(review_item) if review_item else None,
+            "duplicate": duplicate_care_event,
+            "duplicateCareEvent": duplicate_care_event,
         }
 
     def _record_parent_care_event(

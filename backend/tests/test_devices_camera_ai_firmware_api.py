@@ -465,6 +465,15 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
             self.assertNotIn("image", payload)
             self.assertNotIn("snapshot", payload)
             self.assertNotIn("debug", payload)
+            if payload["type"] == "camera_event.created":
+                self.assertIn("event", payload)
+                event = payload["event"]
+                self.assertIn("id", event)
+                self.assertIn("displayTitle", event)
+                self.assertIn("displayMessage", event)
+                self.assertIn("category", event)
+                self.assertNotIn("image", event)
+                self.assertNotIn("base64", event)
 
         events = self.client.get(
             "/api/camera/events",

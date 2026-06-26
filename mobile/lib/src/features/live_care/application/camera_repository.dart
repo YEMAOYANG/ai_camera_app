@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/core/network/api_client.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/features/tasks/application/task_realtime_repository.dart';
 
 final cameraRepositoryProvider = Provider<CameraRepository>((ref) {
   return CameraRepository(
@@ -42,10 +44,54 @@ final cameraSnapshotProvider = FutureProvider<CameraSnapshotFrame>((ref) async {
   return ref.watch(cameraRepositoryProvider).snapshot(deviceId: device?.id);
 });
 
-final cameraEventsProvider = FutureProvider<List<LiveCareEvent>>((ref) async {
-  final device = await ref.watch(selectedDeviceProvider.future);
-  return ref.watch(cameraRepositoryProvider).events(deviceId: device?.id);
-});
+final cameraEventsProvider =
+    AsyncNotifierProvider<CameraEventsController, List<LiveCareEvent>>(
+      CameraEventsController.new,
+    );
+
+class CameraEventsController extends AsyncNotifier<List<LiveCareEvent>> {
+  String? _deviceId;
+
+  @override
+  Future<List<LiveCareEvent>> build() async {
+    final device = await ref.watch(selectedDeviceProvider.future);
+    _deviceId = device?.id;
+    return _fetch();
+  }
+
+  Future<void> refresh({bool keepPrevious = true}) async {
+    final previous = state.asData?.value;
+    if (!keepPrevious || previous == null) {
+      state = const AsyncLoading();
+    }
+    try {
+      final events = await _fetch();
+      state = AsyncData(events);
+    } catch (error, stackTrace) {
+      if (previous != null && keepPrevious) {
+        state = AsyncData(previous);
+        return;
+      }
+      state = AsyncError(error, stackTrace);
+    }
+  }
+
+  void handleRealtimeEvent(TaskRealtimeEvent event) {
+    if (event.isCameraEventCreated && event.event != null) {
+      final item = LiveCareEvent.fromJson(event.event!);
+      if (!item.isCareRecord) return;
+      final current = state.asData?.value ?? const <LiveCareEvent>[];
+      if (current.any((existing) => existing.id == item.id)) return;
+      state = AsyncData([item, ...current]);
+      return;
+    }
+    unawaited(refresh());
+  }
+
+  Future<List<LiveCareEvent>> _fetch() {
+    return ref.read(cameraRepositoryProvider).events(deviceId: _deviceId);
+  }
+}
 
 final liveCareStatusProvider = FutureProvider<LiveCareStatus>((ref) async {
   final health = await ref.watch(cameraHealthProvider.future);

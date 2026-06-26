@@ -480,7 +480,9 @@ void main() {
           cameraSnapshotProvider.overrideWith(
             (ref) async => CameraSnapshotFrame.unavailable,
           ),
-          cameraEventsProvider.overrideWith((ref) async => const []),
+          cameraEventsProvider.overrideWith(
+            () => _FakeCameraEventsController(const []),
+          ),
         ],
         child: const MaterialApp(home: LiveCareScreen()),
       ),
@@ -507,7 +509,7 @@ void main() {
             (ref) async => CameraSnapshotFrame.unavailable,
           ),
           cameraEventsProvider.overrideWith(
-            (ref) async => const [
+            () => _FakeCameraEventsController(const [
               LiveCareEvent(
                 id: 'evt_care_reminder',
                 source: 'camera_command',
@@ -525,7 +527,7 @@ void main() {
                 toneKey: 'info',
                 createdAt: 1,
               ),
-            ],
+            ]),
           ),
         ],
         child: const MaterialApp(home: LiveCareScreen()),
@@ -546,7 +548,7 @@ void main() {
       ProviderScope(
         overrides: [
           cameraEventsProvider.overrideWith(
-            (ref) async => const [
+            () => _FakeCameraEventsController(const [
               LiveCareEvent(
                 id: 'evt_observation',
                 source: 'camera_command',
@@ -564,7 +566,7 @@ void main() {
                 toneKey: 'info',
                 createdAt: 1,
               ),
-            ],
+            ]),
           ),
         ],
         child: const MaterialApp(home: LiveEventsScreen()),
@@ -1637,6 +1639,15 @@ LiveCareStatus _onlineLiveCareStatus() {
       lastReminder: '',
     ),
   );
+}
+
+class _FakeCameraEventsController extends CameraEventsController {
+  _FakeCameraEventsController(this._events);
+
+  final List<LiveCareEvent> _events;
+
+  @override
+  Future<List<LiveCareEvent>> build() async => _events;
 }
 
 SetupStatus _setupStatusForRoute({

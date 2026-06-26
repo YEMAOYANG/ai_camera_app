@@ -10,6 +10,14 @@ import 'package:warm_sight/src/features/setup/application/setup_draft.dart';
 import 'package:warm_sight/src/features/tasks/application/task_repository.dart';
 
 void invalidateAuthenticatedSessionData(WidgetRef ref) {
+  _invalidateAuthenticatedSessionData(ref);
+}
+
+void invalidateAuthenticatedSessionDataFromRef(Ref ref) {
+  _invalidateAuthenticatedSessionData(ref);
+}
+
+void _invalidateAuthenticatedSessionData(dynamic ref) {
   ref.invalidate(setupDraftProvider);
 
   ref.invalidate(profileSummaryProvider);
