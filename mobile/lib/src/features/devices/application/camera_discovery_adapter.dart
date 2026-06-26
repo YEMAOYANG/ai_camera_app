@@ -5,11 +5,11 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart' as reactive;
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
-import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
-import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
-import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
-import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/core/config/app_environment.dart';
+import 'package:warm_sight/src/features/devices/application/device_repository.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
+import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 final cameraDiscoveryPermissionProbeProvider =

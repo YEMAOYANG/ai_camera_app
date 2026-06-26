@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/core/network/api_client.dart';
-import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
+import 'package:warm_sight/src/core/network/api_client.dart';
+import 'package:warm_sight/src/features/tasks/domain/task_models.dart';
 
 final taskRepositoryProvider = Provider<TaskRepository>((ref) {
   return TaskRepository(apiClient: ref.watch(apiClientProvider));
@@ -312,7 +312,9 @@ class TaskRepository {
 
   Future<GuardianTask> acknowledgeMissedTask(String taskId) async {
     try {
-      final response = await _apiClient.post('/tasks/$taskId/acknowledge-missed');
+      final response = await _apiClient.post(
+        '/tasks/$taskId/acknowledge-missed',
+      );
       return GuardianTask.fromJson(_asMap(_asMap(response.data)['task']));
     } on DioException catch (error) {
       throw _fromDio(error);

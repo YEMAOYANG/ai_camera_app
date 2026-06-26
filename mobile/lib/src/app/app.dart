@@ -4,12 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/app/router/app_router.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
-import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
-import 'package:guardian_parent_app/src/core/theme/app_theme.dart';
-import 'package:guardian_parent_app/src/features/auth/application/account_security_realtime_repository.dart';
-import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
+import 'package:warm_sight/src/app/router/app_router.dart';
+import 'package:warm_sight/src/core/config/app_environment.dart';
+import 'package:warm_sight/src/core/storage/auth_session_store.dart';
+import 'package:warm_sight/src/core/theme/app_theme.dart';
+import 'package:warm_sight/src/features/auth/application/account_security_realtime_repository.dart';
+import 'package:warm_sight/src/features/auth/application/session_data_invalidation.dart';
 
 class GuardianApp extends ConsumerWidget {
   const GuardianApp({super.key});

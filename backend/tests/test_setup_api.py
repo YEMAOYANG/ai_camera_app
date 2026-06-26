@@ -116,6 +116,37 @@ class SetupApiTest(unittest.TestCase):
         self.assertEqual(contacts.status_code, 200)
         self.assertEqual(contacts.json["contacts"]["count"], 2)
 
+    def test_parent_identity_can_save_family_role(self):
+        access_token = self._login("13800002029")
+
+        parent = self.client.post(
+            "/api/setup/parent-identity",
+            json={
+                "displayName": "妈妈",
+                "relationship": "妈妈",
+                "relationshipKey": "mom",
+                "role": "guardian",
+            },
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(parent.status_code, 200)
+        self.assertEqual(parent.json["parentIdentity"]["role"], "guardian")
+        self.assertEqual(parent.json["parentIdentity"]["roleLabel"], "监护人")
+
+        status = self.client.get(
+            "/api/setup/status",
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(status.status_code, 200)
+        self.assertEqual(status.json["parentIdentity"]["role"], "guardian")
+
+        summary = self.client.get(
+            "/api/profile/summary",
+            headers=self._auth_headers(access_token),
+        )
+        self.assertEqual(summary.status_code, 200)
+        self.assertEqual(summary.json["summary"]["role"], "guardian")
+
     def test_setup_device_endpoint_remains_available_after_setup(self):
         access_token = self._login("13800002027")
         parent = self.client.post(
@@ -143,7 +174,7 @@ class SetupApiTest(unittest.TestCase):
         )
         self.assertEqual(device.status_code, 200, device.json)
         self.assertEqual(device.json["device"]["status"], "bound")
-        self.assertEqual(device.json["device"]["name"], "儿童房摄像头")
+        self.assertEqual(device.json["device"]["name"], "儿童房暖瞳摄像头")
         self.assertEqual(device.json["setup"]["nextStep"], "home")
 
         fallback = self.client.post(

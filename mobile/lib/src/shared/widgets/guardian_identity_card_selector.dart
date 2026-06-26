@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/shared/domain/guardian_identity.dart';
 
 class GuardianIdentityCardSelector extends StatelessWidget {
   const GuardianIdentityCardSelector({

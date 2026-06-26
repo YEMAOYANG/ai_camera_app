@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/features/tasks/application/task_template_schedule.dart';
-import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
+import 'package:warm_sight/src/features/tasks/application/task_template_schedule.dart';
+import 'package:warm_sight/src/features/tasks/domain/task_models.dart';
 
 void main() {
   group('resolveTemplateApplyDate', () {

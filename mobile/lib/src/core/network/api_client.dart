@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
-import 'package:guardian_parent_app/src/core/platform/client_device_info.dart';
-import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
+import 'package:warm_sight/src/core/config/app_environment.dart';
+import 'package:warm_sight/src/core/platform/client_device_info.dart';
+import 'package:warm_sight/src/core/storage/auth_session_store.dart';
 
 final rawDioProvider = Provider<Dio>((ref) {
   final dio = _buildDio(ref.watch(appEnvironmentProvider));

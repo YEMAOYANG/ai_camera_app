@@ -1,4 +1,4 @@
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 enum GuardianTaskStatus {
   scheduled('scheduled', '待开始', StatusTone.neutral),

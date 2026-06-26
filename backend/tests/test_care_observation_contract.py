@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+import json
 import unittest
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
@@ -26,6 +27,8 @@ from repositories.care_repository import CareRepository
 from services.ai_care_reminder_service import AiCareReminderService
 from services.ai_text_provider import AiTextResponse
 from services.prompt_registry import PromptRegistry
+from services import task_event_stream
+from services.routine_reminder_service import RoutineReminderService
 from tests.support import fresh_test_config, request_debug_code
 
 
@@ -205,6 +208,82 @@ class CareObservationContractTest(unittest.TestCase):
 
         self.assertEqual(allowed.json["decision"]["decision"], "allowed")
         self.assertTrue(allowed.json["decision"]["shouldSpeak"])
+
+    def test_posture_risk_is_behavior_driven_not_blocked_by_routine_window(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "posture",
+            minObservationSeconds=1,
+            observationThreshold=0.74,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        response = self._post_observation(
+            "posture",
+            confidence=0.70,
+            duration_seconds=5,
+            signal_type="leaning_too_close",
+            parent_summary="观察到坐姿需要留意。",
+            observed_at=_ms("2026-06-17 10:30"),
+            raw_detail={
+                "has_person": True,
+                "activity": "写作业/看书",
+                "posture_status": "leaning_too_close",
+                "description": "孩子头离纸面太近。",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["decision"]["decision"], "allowed")
+        self.assertTrue(response.json["decision"]["shouldSpeak"])
+        repository = CareRepository(Database(self.app.config["DATABASE_URL"]))
+        with repository.transaction() as conn:
+            decision = repository.get_reminder_decision(
+                conn,
+                decision_id=response.json["decision"]["id"],
+            )
+        snapshot = json.loads(decision["policy_snapshot_json"])
+        self.assertEqual(snapshot["confidenceThreshold"], 0.68)
+        self.assertEqual(snapshot["routineGate"]["reason"], "behavior_only_scenario")
+
+    def test_posture_risk_uses_short_effective_observation_window(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "posture",
+            minObservationSeconds=30,
+            observationThreshold=0.74,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        response = self._post_observation(
+            "posture",
+            confidence=0.70,
+            duration_seconds=3,
+            signal_type="low_head",
+            parent_summary="观察到坐姿需要留意。",
+            observed_at=_ms("2026-06-17 10:30"),
+            raw_detail={
+                "has_person": True,
+                "activity": "写作业/看书",
+                "posture_status": "low_head",
+                "description": "孩子头离纸面太近。",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["decision"]["decision"], "allowed")
+        repository = CareRepository(Database(self.app.config["DATABASE_URL"]))
+        with repository.transaction() as conn:
+            decision = repository.get_reminder_decision(
+                conn,
+                decision_id=response.json["decision"]["id"],
+            )
+        snapshot = json.loads(decision["policy_snapshot_json"])
+        self.assertEqual(snapshot["minObservationSeconds"], 3)
 
     def test_internal_observation_requires_token_and_low_score_records_only(self):
         self._ensure_capabilities()
@@ -571,6 +650,247 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertFalse(cleanup_started.json["decision"]["shouldSpeak"])
         self.assertEqual(recovered.json["decision"]["decision"], REMINDER_DECISION_RECORD_ONLY)
         self.assertFalse(recovered.json["decision"]["shouldSpeak"])
+
+    def test_ai_description_is_recorded_as_parent_facing_camera_event(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "toy_cleanup",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+        )
+
+        response = self._post_observation(
+            "toy_cleanup",
+            confidence=0.92,
+            duration_seconds=8,
+            signal_type="toy_playing_observed",
+            observed_at=_ms("2026-06-17 19:30"),
+            parent_summary="孩子正在玩玩具",
+            raw_detail={
+                "has_person": True,
+                "activity": "玩玩具",
+                "description": "孩子坐在沙发上玩玩具，周围有积木和小车。",
+                "decision_reason": "孩子仍在玩玩具，暂不催收纳。",
+                "toys_visible": True,
+                "toys_scattered": True,
+                "method": "vision-test",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200, response.json)
+        self.assertEqual(response.json["decision"]["decision"], REMINDER_DECISION_RECORD_ONLY)
+        self.assertIsNone(response.json.get("reminder"))
+        events = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200, events.json)
+        event = events.json["events"][0]
+        self.assertEqual(event["displayTitle"], "孩子正在玩玩具")
+        self.assertIn("孩子坐在沙发上玩玩具", event["displayMessage"])
+        self.assertNotIn("可信度", event["evidenceSummary"])
+        self.assertNotIn("已继续提醒", event["displayTitle"])
+
+    def test_structured_ai_summary_never_leaks_to_camera_event_copy(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "toy_cleanup",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+        )
+
+        response = self._post_observation(
+            "toy_cleanup",
+            confidence=0.92,
+            duration_seconds=8,
+            signal_type="toy_playing_observed",
+            observed_at=_ms("2026-06-17 19:31"),
+            parent_summary="",
+            raw_detail={
+                "has_person": True,
+                "activity": "",
+                "summary": {
+                    "score": 80,
+                    "skills": [
+                        {"name": "专注", "score": 62},
+                        {"name": "坐姿", "score": 92},
+                    ],
+                },
+            },
+        )
+
+        self.assertEqual(response.status_code, 200, response.json)
+        events = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200, events.json)
+        event = events.json["events"][0]
+        visible = f"{event['displayTitle']} {event['displayMessage']} {event['evidenceSummary']}"
+        self.assertNotIn("score", visible)
+        self.assertNotIn("skills", visible)
+        self.assertNotIn("{", visible)
+        self.assertNotIn("[", visible)
+
+    def test_toy_left_uncollected_triggers_internal_reminder_and_realtime_events(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "toy_cleanup",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        captured: list[tuple[str, dict]] = []
+        original_broadcast = task_event_stream.task_event_stream_server.broadcast
+        task_event_stream.task_event_stream_server.broadcast = (
+            lambda family_id, payload: captured.append((family_id, payload))
+        )
+        try:
+            response = self._post_observation(
+                "toy_cleanup",
+                confidence=0.9,
+                duration_seconds=6,
+                signal_type="child_left_toys_uncollected",
+                observed_at=_ms("2026-06-17 19:30"),
+                parent_summary="孩子离开后，玩具还没有收好。",
+                raw_detail={
+                    "has_person": False,
+                    "activity": "玩具未收纳",
+                    "description": "孩子离开了画面，地上还有散落玩具。",
+                    "decision_reason": "玩具散落且孩子已离开，需要轻声提醒。",
+                    "toys_scattered": True,
+                    "method": "vision-test",
+                },
+            )
+        finally:
+            task_event_stream.task_event_stream_server.broadcast = original_broadcast
+
+        self.assertEqual(response.status_code, 200, response.json)
+        self.assertEqual(response.json["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+        self.assertTrue(response.json["decision"]["shouldSpeak"])
+        self.assertIsNotNone(response.json.get("reminder"))
+        self.assertEqual(response.json["reminder"]["reminder"]["scenario"], "toy_cleanup")
+        self.assertEqual(response.json["reminder"]["reminder"]["eventSource"], "internal")
+        pushed_types = [payload["type"] for _, payload in captured]
+        self.assertIn("camera_observation.updated", pushed_types)
+        self.assertIn("camera_event.created", pushed_types)
+        self.assertIn("reminder_decision.created", pushed_types)
+        self.assertIn("reminder_event.created", pushed_types)
+        self.assertIn("camera_command.created", pushed_types)
+        self.assertTrue(all(family_id == self.family_id for family_id, _ in captured))
+        for _, payload in captured:
+            self.assertNotIn("image", payload)
+            self.assertNotIn("base64", payload)
+        events = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200, events.json)
+        care_reminders = [
+            event for event in events.json["events"] if event["category"] == "care_reminder"
+        ]
+        self.assertTrue(care_reminders, events.json["events"])
+        self.assertEqual(care_reminders[0]["displayTitle"], "已提醒收纳玩具")
+
+    def test_routine_reminder_tick_is_idempotent_and_uses_policy(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "wake_up",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        service = RoutineReminderService(self.app.config["DATABASE_URL"])
+        now = _ms("2026-06-17 07:30")
+
+        first = service.tick(now=now)
+        second = service.tick(now=now)
+
+        self.assertGreaterEqual(first["triggeredCount"], 1)
+        self.assertGreaterEqual(second["triggeredCount"], 1)
+        wake_responses = [
+            item for item in first["responses"] if item["observation"]["scenario"] == "wake_up"
+        ]
+        self.assertTrue(wake_responses)
+        self.assertEqual(wake_responses[0]["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+        self.assertIsNotNone(wake_responses[0].get("reminder"))
+        duplicate_wake = [
+            item for item in second["responses"] if item["observation"]["scenario"] == "wake_up"
+        ]
+        self.assertTrue(duplicate_wake)
+        self.assertTrue(duplicate_wake[0]["duplicate"])
+
+    def test_dev_routine_reminder_tick_endpoint_requires_auth_and_accepts_now(self):
+        unauthenticated = self.client.post("/api/dev/care/routine-reminder/tick")
+        self.assertEqual(unauthenticated.status_code, 401)
+
+        invalid = self.client.post(
+            "/api/dev/care/routine-reminder/tick",
+            json={"now": "not-a-timestamp"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(invalid.status_code, 400)
+        self.assertEqual(invalid.json["error"], "invalid_now")
+
+        response = self.client.post(
+            "/api/dev/care/routine-reminder/tick",
+            json={"now": _ms("2026-06-17 07:30")},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200, response.json)
+        self.assertTrue(response.json["ok"])
+        self.assertGreaterEqual(response.json["triggeredCount"], 1)
+        self.assertTrue(
+            any(item["observation"]["scenario"] == "wake_up" for item in response.json["responses"])
+        )
+
+    def test_routine_reminder_respects_disabled_speaker_off_and_window_gate(self):
+        self._ensure_capabilities()
+        service = RoutineReminderService(self.app.config["DATABASE_URL"])
+
+        self._patch_capability("wake_up", enabled=False)
+        disabled = service.tick(now=_ms("2026-06-18 07:30"))
+        disabled_wake = [
+            item for item in disabled["responses"] if item["observation"]["scenario"] == "wake_up"
+        ]
+        self.assertTrue(disabled_wake)
+        self.assertEqual(disabled_wake[0]["decision"]["decision"], "skipped_disabled")
+        self.assertIsNone(disabled_wake[0].get("reminder"))
+
+        self._patch_capability(
+            "wake_up",
+            enabled=True,
+            allowSpeaker=False,
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+        )
+        speaker_off = service.tick(now=_ms("2026-06-19 07:30"))
+        speaker_off_wake = [
+            item for item in speaker_off["responses"] if item["observation"]["scenario"] == "wake_up"
+        ]
+        self.assertTrue(speaker_off_wake)
+        self.assertEqual(speaker_off_wake[0]["decision"]["decision"], REMINDER_DECISION_RECORD_ONLY)
+        self.assertFalse(speaker_off_wake[0]["decision"]["shouldSpeak"])
+        self.assertIsNone(speaker_off_wake[0].get("reminder"))
+
+        outside = service.tick(now=_ms("2026-06-19 10:30"))
+        self.assertFalse(
+            any(item["observation"]["scenario"] == "wake_up" for item in outside["responses"])
+        )
 
     def test_duplicate_source_event_id_does_not_accumulate_duration_twice(self):
         self._ensure_capabilities()
@@ -1107,6 +1427,8 @@ class CareObservationContractTest(unittest.TestCase):
         signal_value: str = "active",
         source_event_id: str | None = None,
         observed_at: int | None = None,
+        parent_summary: str = "观察到一项日常看护情况。",
+        raw_detail: dict | None = None,
     ):
         self._source_seq += 1
         source_event_id = source_event_id or f"{scenario}_{now_ms()}_{self._source_seq}"
@@ -1121,7 +1443,8 @@ class CareObservationContractTest(unittest.TestCase):
                 **({"observedAt": observed_at} if observed_at is not None else {}),
                 "confidence": confidence,
                 "evidenceType": "snapshot",
-                "parentSummary": "观察到一项日常看护情况。",
+                "parentSummary": parent_summary,
+                **({"rawDetail": raw_detail} if raw_detail is not None else {}),
                 "signals": [
                     {
                         "signalType": signal_type or f"{scenario}_observed",
@@ -1254,6 +1577,8 @@ class _FakeCameraCommandService:
         text: str,
         task_id: str | None = None,
         device_id: str | None = None,
+        source: str | None = None,
+        scenario: str | None = None,
     ) -> dict:
         self.calls.append(
             {
@@ -1261,6 +1586,8 @@ class _FakeCameraCommandService:
                 "text": text,
                 "taskId": task_id,
                 "deviceId": device_id,
+                "source": source,
+                "scenario": scenario,
             }
         )
         command_id = f"cmd_fake_{len(self.calls)}"

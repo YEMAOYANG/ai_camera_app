@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
-import 'package:guardian_parent_app/src/features/home/application/home_summary.dart';
-import 'package:guardian_parent_app/src/features/home/domain/home_models.dart';
-import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
-import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
+import 'package:warm_sight/src/features/home/application/home_summary.dart';
+import 'package:warm_sight/src/features/home/domain/home_models.dart';
+import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/features/tasks/domain/task_models.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 void main() {
   final now = DateTime(2026, 6, 23, 19, 42);
@@ -121,7 +122,7 @@ void main() {
       ),
     );
 
-    expect(summary.habitFocus.title, '画面待确认');
+    expect(summary.habitFocus.title, '还没有最近画面');
     expect(summary.habitFocus.title, isNot('今天按作息轻声提醒'));
     expect(summary.recentObservation.detail, isNot(contains('其他')));
     expect(summary.recentObservation.visible, isTrue);
@@ -140,7 +141,7 @@ void main() {
     expect(monitor.lastObservation, isEmpty);
   });
 
-  test('presence without concrete activity can show child presence', () {
+  test('presence without concrete activity does not fake child status', () {
     final monitor = CameraMonitorStatus.fromJson({
       'monitor': {
         'running': true,
@@ -164,8 +165,8 @@ void main() {
       ),
     );
 
-    expect(monitor.lastObservation, '看到孩子在画面里');
-    expect(summary.habitFocus.title, '看到孩子在画面里');
+    expect(monitor.lastObservation, '画面暂时无法判断');
+    expect(summary.habitFocus.title, '画面暂时无法判断');
     expect(summary.recentObservation.visible, isFalse);
   });
 
@@ -232,6 +233,7 @@ void main() {
                 'hasPerson': true,
                 'isReliable': true,
                 'confidence': 0.88,
+                'description': '孩子坐在地垫上，手里拿着绘本，正在低头翻页。',
                 'observedAt': DateTime.now().millisecondsSinceEpoch,
               },
               'lastReminder': '已提醒坐好阅读',
@@ -242,6 +244,7 @@ void main() {
       );
 
       expect(summary.habitFocus.title, '孩子正在阅读绘本');
+      expect(summary.habitFocus.detail, contains('手里拿着绘本'));
       expect(summary.habitFocus.title, isNot(contains('刚刚看到：')));
       expect(summary.habitFocus.title, isNot(contains('最近看到：')));
       expect(summary.primaryCta.kind, HomePrimaryCtaKind.none);
@@ -263,6 +266,8 @@ void main() {
           'hasPerson': true,
           'isReliable': true,
           'confidence': 0.9,
+          'description': '孩子坐在沙发上玩玩具，周围有积木。',
+          'decisionReason': '孩子仍在玩玩具，暂不催收纳。',
           'observedAt': DateTime.now().millisecondsSinceEpoch,
         },
       },
@@ -278,7 +283,11 @@ void main() {
     );
 
     expect(summary.habitFocus.title, '孩子正在玩玩具');
+    expect(summary.habitFocus.detail, contains('沙发上玩玩具'));
     expect(summary.habitFocus.title, isNot(contains('刚刚看到：')));
+    expect(monitor.lastObservationDescription, contains('沙发上玩玩具'));
+    expect(monitor.lastObservationDecisionReason, contains('暂不催收纳'));
+    expect(monitor.lastObservationConfidence, 0.9);
   });
 
   test('stale negative observation falls back to pending frame copy', () {
@@ -318,7 +327,7 @@ void main() {
     );
 
     expect(monitor.lastObservation, isEmpty);
-    expect(summary.habitFocus.title, '画面待确认');
+    expect(summary.habitFocus.title, '还没有最近画面');
     expect(summary.habitFocus.title, isNot(contains('暂未看到孩子')));
   });
 
@@ -405,8 +414,13 @@ void main() {
     },
   );
 
-  test('buildRhythmNodes shows nearest three tasks instead of first three', () {
+  test('buildRhythmNodes shows latest five tasks as a timeline', () {
     final nodes = buildRhythmNodes([
+      task(
+        id: 'early_cleanup',
+        status: GuardianTaskStatus.completed,
+        scheduledStart: '08:30',
+      ).copyWith(title: '整理小书桌', scheduledEnd: '08:45'),
       task(
         id: 'morning_drink',
         status: GuardianTaskStatus.completed,
@@ -434,11 +448,18 @@ void main() {
       ).copyWith(title: '户外活动', scheduledEnd: '16:50'),
     ], DateTime(2026, 6, 23, 15, 53));
 
-    expect(nodes.map((node) => node.taskId), ['current', 'next', 'recent_toy']);
-    expect(nodes.first.title, '整理玩具');
+    expect(nodes.map((node) => node.taskId), [
+      'morning_drink',
+      'morning_read',
+      'recent_toy',
+      'current',
+      'next',
+    ]);
+    expect(nodes[3].title, '整理玩具');
+    expect(nodes[3].statusLabel, '需要提醒');
   });
 
-  test('buildRhythmNodes excludes missed and awaiting confirmation tasks', () {
+  test('buildRhythmNodes includes missed awaiting and cancelled tasks', () {
     final nodes = buildRhythmNodes([
       task(
         id: 'missed',
@@ -455,9 +476,25 @@ void main() {
         status: GuardianTaskStatus.scheduled,
         scheduledStart: '16:10',
       ).copyWith(title: '亲子阅读', scheduledEnd: '16:30'),
+      task(
+        id: 'cancelled',
+        status: GuardianTaskStatus.cancelled,
+        scheduledStart: '16:40',
+      ).copyWith(title: '取消的安排', scheduledEnd: '16:50'),
     ], DateTime(2026, 6, 23, 15, 53));
 
-    expect(nodes.map((node) => node.taskId), ['nearest']);
+    expect(nodes.map((node) => node.taskId), [
+      'missed',
+      'awaiting',
+      'nearest',
+      'cancelled',
+    ]);
+    expect(nodes.first.statusLabel, '未完成');
+    expect(nodes.first.tone, StatusTone.danger);
+    expect(nodes[1].statusLabel, '待确认');
+    expect(nodes[1].tone, StatusTone.warning);
+    expect(nodes.last.statusLabel, '已取消');
+    expect(nodes.last.tone, StatusTone.neutral);
   });
 
   test('buildPrimaryCta does not duplicate no-device camera entry', () {

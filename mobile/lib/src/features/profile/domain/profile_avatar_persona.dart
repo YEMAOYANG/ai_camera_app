@@ -1,4 +1,4 @@
-import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
 
 class GuardianAvatarPersona {
   const GuardianAvatarPersona({

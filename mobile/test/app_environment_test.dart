@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:warm_sight/src/core/config/app_environment.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

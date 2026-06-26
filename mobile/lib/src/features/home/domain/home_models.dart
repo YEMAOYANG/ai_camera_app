@@ -1,4 +1,4 @@
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 enum HomePrimaryCtaKind { pendingActions, connectCamera, checkDevice, none }
 
@@ -53,6 +53,7 @@ class RhythmNode {
     required this.timeLabel,
     required this.title,
     required this.subtitle,
+    required this.statusLabel,
     required this.state,
     required this.tone,
   });
@@ -61,6 +62,7 @@ class RhythmNode {
   final String timeLabel;
   final String title;
   final String subtitle;
+  final String statusLabel;
   final RhythmNodeState state;
   final StatusTone tone;
 }

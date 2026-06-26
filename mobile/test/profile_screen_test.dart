@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
-import 'package:guardian_parent_app/src/features/points/domain/point_models.dart';
-import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
-import 'package:guardian_parent_app/src/features/profile/presentation/profile_screen.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/points/application/point_repository.dart';
+import 'package:warm_sight/src/features/points/domain/point_models.dart';
+import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/features/profile/presentation/profile_screen.dart';
 
 void main() {
   testWidgets('profile screen shows fallback persona and top-level groups', (
@@ -50,7 +50,8 @@ void main() {
     expect(find.text('设备与看护'), findsNothing);
     expect(find.text('AI 规则与提醒'), findsOneWidget);
     expect(find.text('看护报告'), findsOneWidget);
-    expect(find.text('日报、周报和成长时刻'), findsOneWidget);
+    expect(find.text('日报和周报'), findsOneWidget);
+    expect(find.text('成长时刻'), findsNothing);
     expect(find.text('基础版'), findsOneWidget);
     expect(find.text('订阅与权益'), findsNothing);
     expect(find.text('18'), findsOneWidget);
@@ -184,6 +185,61 @@ void main() {
       artRect.right,
       lessThanOrEqualTo(360 - AppSpacing.pageHorizontalCompact),
     );
+  });
+
+  testWidgets('profile hero signal chips stay in one row on compact Android', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(320, 800));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          profileSummaryProvider.overrideWith((ref) async => _summary()),
+          accountProfileProvider.overrideWith(
+            (ref) async => _account('爸爸', displayName: '阿米爸爸'),
+          ),
+          subscriptionStatusProvider.overrideWith(
+            (ref) async => const SubscriptionStatus(
+              planId: 'basic',
+              planLabel: '基础版',
+              status: 'active',
+              statusLabel: '已启用',
+              renewalText: '基础看护保持可用',
+              entitlements: [],
+            ),
+          ),
+          pointsSummaryProvider.overrideWith((ref) async => _points()),
+        ],
+        child: const MaterialApp(home: ProfileScreen()),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final membersSize = tester.getSize(
+      find.byKey(const ValueKey('profileHeroMembersEntry')),
+    );
+    final devicesSize = tester.getSize(
+      find.byKey(const ValueKey('profileHeroDevicesEntry')),
+    );
+    final pointsSize = tester.getSize(
+      find.byKey(const ValueKey('profileHeroPointsEntry')),
+    );
+    final membersTop = tester
+        .getTopLeft(find.byKey(const ValueKey('profileHeroMembersEntry')))
+        .dy;
+    final devicesTop = tester
+        .getTopLeft(find.byKey(const ValueKey('profileHeroDevicesEntry')))
+        .dy;
+    final pointsTop = tester
+        .getTopLeft(find.byKey(const ValueKey('profileHeroPointsEntry')))
+        .dy;
+
+    expect(membersSize.height, devicesSize.height);
+    expect(pointsSize.height, membersSize.height);
+    expect(devicesTop, membersTop);
+    expect(pointsTop, membersTop);
   });
 }
 

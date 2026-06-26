@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from core.database import Database
@@ -210,7 +211,7 @@ class CameraCommandService:
             "displayMessage": display["message"],
             "category": display["category"],
             "severity": display["severity"],
-            "evidenceSummary": display["evidence"],
+            "evidenceSummary": _observation_evidence_summary(display["evidence"], observation),
         }
         with self.repository.transaction() as conn:
             command = self.repository.create_command(
@@ -252,15 +253,22 @@ class CameraCommandService:
         text: str,
         task_id: str | None = None,
         device_id: str | None = None,
+        source: str | None = None,
+        scenario: str | None = None,
     ) -> dict:
         bridge, resolved_device_id = self._runtime_for_command(
             family_id=family_id,
             device_id=device_id,
         )
+        request_payload = {"text": text}
+        if source:
+            request_payload["source"] = source
+        if scenario:
+            request_payload["scenario"] = scenario
         return self._execute_command(
             family_id=family_id,
             command_type="speak",
-            request_payload={"text": text},
+            request_payload=request_payload,
             runner=lambda: bridge.speak(text),
             task_id=task_id,
             device_id=resolved_device_id,
@@ -530,6 +538,7 @@ def _is_camera_care_event(event: dict) -> bool:
     return str(event.get("category") or "") in {
         "camera_observation",
         "child_presence",
+        "care_reminder",
         "snapshot",
         "camera_status",
     }
@@ -547,14 +556,26 @@ def _parent_camera_command_event(event: dict) -> dict | None:
         display = _camera_observation_display(observation)
         return _with_display(
             event,
-            display_title=str(data.get("displayTitle") or display["title"]),
-            display_message=str(data.get("displayMessage") or display["message"]),
+            display_title=_parent_display_text(data.get("displayTitle")) or display["title"],
+            display_message=display["message"]
+            or _parent_display_text(data.get("displayMessage")),
             category=str(data.get("category") or display["category"]),
             severity=str(data.get("severity") or display["severity"]),
         )
     if event_type in {"start_monitor", "stop_monitor"}:
         return None
     if event_type == "speak":
+        payload = _json_dict(event.get("payload"))
+        request = _json_dict(payload.get("request"))
+        if str(request.get("source") or "") == "care_reminder":
+            text = str(request.get("text") or event.get("message") or "").strip()
+            return _with_display(
+                event,
+                display_title=_care_reminder_title(str(request.get("scenario") or "")),
+                display_message=text or "摄像头已按看护规则轻声提醒。",
+                category="care_reminder",
+                severity="info" if status == "succeeded" else "warning",
+            )
         return None
     if event_type == "snapshot":
         if status == "failed":
@@ -678,17 +699,18 @@ def _with_display(
     task_title: str = "",
 ) -> dict:
     next_event = dict(event)
-    message = display_message.strip() or display_title
+    title = _parent_display_text(display_title) or "看护记录"
+    message = _parent_display_text(display_message) or title
     next_event.update(
         {
-            "displayTitle": display_title,
+            "displayTitle": title,
             "displayMessage": message,
             "category": category,
             "severity": severity,
             "taskTitle": task_title or event.get("taskTitle") or "",
             "evidenceSummary": _evidence_summary(event),
             "hasReplay": False,
-            "title": display_title,
+            "title": title,
             "message": message,
             "tone": _severity_tone(severity),
         }
@@ -718,6 +740,11 @@ def _observation_message(payload: dict, *, fallback: str) -> str:
 
 def _evidence_summary(event: dict) -> str:
     payload = _json_dict(event.get("payload"))
+    response = _json_dict(payload.get("response"))
+    request = _json_dict(payload.get("request"))
+    explicit = str((response or request).get("evidenceSummary") or "").strip()
+    if explicit:
+        return _strip_confidence_text(explicit)
     observation = _json_dict(payload.get("observation"))
     evidence = _json_dict(observation.get("evidence"))
     if evidence.get("hasPerson") is False or evidence.get("has_person") is False:
@@ -746,7 +773,36 @@ def _parent_event_dedupe_key(event: dict) -> str:
     bucket = created_at // 120000 if created_at else 0
     if task_id and category in {"camera_observation", "task_observation"}:
         return f"{task_id}:{category}:{event.get('eventType')}:{bucket}"
+    if category in {
+        "camera_observation",
+        "child_presence",
+        "care_reminder",
+        "snapshot",
+        "camera_status",
+    }:
+        title = _dedupe_text(event.get("displayTitle") or event.get("title"))
+        if category in {"camera_observation", "child_presence"}:
+            bucket = created_at // 600000 if created_at else 0
+            return f"{event.get('deviceId')}:{category}:{title}:{bucket}"
+        message = _dedupe_text(event.get("displayMessage") or event.get("message"))[:48]
+        return f"{event.get('source')}:{event.get('eventType')}:{category}:{title}:{message}:{bucket}"
     return f"{event.get('source')}:{event.get('eventType')}:{event.get('id')}"
+
+
+def _care_reminder_title(scenario: str) -> str:
+    return {
+        "toy_cleanup": "已提醒收纳玩具",
+        "posture": "已提醒调整坐姿",
+        "meal_start": "已提醒开始用餐",
+        "meal_habit": "已提醒用餐习惯",
+        "nap_time": "已提醒午睡",
+        "bedtime": "已提醒准备睡觉",
+        "wake_up": "已提醒起床",
+    }.get(scenario, "已轻声提醒")
+
+
+def _dedupe_text(value: object) -> str:
+    return " ".join(str(value or "").strip().split())
 
 
 def _json_dict(value: object) -> dict:
@@ -800,12 +856,14 @@ def _event_tone(status: str) -> str:
 def _camera_observation_display(observation: dict) -> dict:
     has_person = observation.get("hasPerson")
     activity = str(observation.get("activity") or "").strip()
-    summary = str(observation.get("summary") or "").strip()
+    summary = _parent_display_text(observation.get("summary"))
+    description = _observation_description(observation)
+    decision_reason = _parent_display_text(observation.get("decisionReason"))
     is_reliable = bool(observation.get("isReliable"))
     if not is_reliable:
         return {
-            "title": "画面待确认",
-            "message": "这次画面还不能判断孩子状态。",
+            "title": "画面暂时看不清",
+            "message": description or decision_reason or "这次画面还不能判断孩子状态。",
             "category": "camera_status",
             "severity": "warning",
             "evidence": "画面不可判断",
@@ -813,7 +871,7 @@ def _camera_observation_display(observation: dict) -> dict:
     if has_person is False:
         return {
             "title": "暂未看到孩子",
-            "message": "刚才的画面里没有看到孩子。",
+            "message": description or decision_reason or "刚才的画面里没有看到孩子。",
             "category": "child_presence",
             "severity": "warning",
             "evidence": "未看到孩子",
@@ -821,7 +879,7 @@ def _camera_observation_display(observation: dict) -> dict:
     if activity == "玩玩具" or "玩具" in summary:
         return {
             "title": "孩子正在玩玩具",
-            "message": "这条记录来自摄像头画面。",
+            "message": description or decision_reason or "孩子正在玩玩具。",
             "category": "camera_observation",
             "severity": "info",
             "evidence": "看到玩具活动",
@@ -829,26 +887,72 @@ def _camera_observation_display(observation: dict) -> dict:
     if summary:
         return {
             "title": summary.rstrip("。"),
-            "message": "这条记录来自摄像头画面。",
+            "message": description or decision_reason or summary,
             "category": "camera_observation",
             "severity": "info",
             "evidence": "看到孩子",
         }
     if has_person is True:
         return {
-            "title": "看到孩子在画面里",
-            "message": "这条记录来自摄像头画面。",
-            "category": "child_presence",
+            "title": "画面暂时无法判断",
+            "message": description or decision_reason or "这次画面还不能判断孩子状态。",
+            "category": "camera_observation",
             "severity": "info",
-            "evidence": "看到孩子",
+            "evidence": "画面不可判断",
         }
     return {
-        "title": "画面待确认",
+        "title": "画面暂时看不清",
         "message": "这次画面还不能判断孩子状态。",
         "category": "camera_status",
         "severity": "warning",
         "evidence": "画面不可判断",
     }
+
+
+def _observation_description(observation: dict) -> str:
+    for key in ("description", "displayMessage", "aiDescription"):
+        value = _parent_display_text(observation.get(key))
+        if value:
+            return value[:180]
+    raw_detail = _json_dict(observation.get("rawDetail"))
+    for key in ("description", "child_message", "decision_reason"):
+        value = _parent_display_text(raw_detail.get(key))
+        if value:
+            return value[:180]
+    return ""
+
+
+def _observation_evidence_summary(evidence: str, observation: dict) -> str:
+    return _strip_confidence_text(evidence.strip())
+
+
+def _strip_confidence_text(value: str) -> str:
+    text = re.sub(r"(?:\s*·\s*)?可信度\s*\d+%", "", value or "")
+    return text.strip(" ·")
+
+
+def _parent_display_text(value: object) -> str:
+    if not isinstance(value, str):
+        return ""
+    text = value.strip()
+    if not text:
+        return ""
+    if _looks_like_structured_payload(text):
+        return ""
+    return text
+
+
+def _looks_like_structured_payload(text: str) -> bool:
+    compact = text.strip()
+    if not compact:
+        return False
+    starts_structured = compact.startswith(("{", "["))
+    ends_structured = compact.endswith(("}", "]"))
+    has_structured_keys = any(
+        token in compact
+        for token in ("'score'", '"score"', "'skills'", '"skills"', "{'name'", '"name"')
+    )
+    return has_structured_keys or (starts_structured and ends_structured)
 
 
 def _ptz_direction_label(direction: str) -> str:

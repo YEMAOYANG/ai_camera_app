@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/core/theme/app_theme.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
-import 'package:guardian_parent_app/src/features/setup/application/setup_draft.dart';
-import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/setup_flow_screens.dart';
-import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
+import 'package:warm_sight/src/core/theme/app_theme.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/setup/application/setup_draft.dart';
+import 'package:warm_sight/src/features/setup/application/setup_repository.dart';
+import 'package:warm_sight/src/features/setup/presentation/setup_flow_screens.dart';
+import 'package:warm_sight/src/shared/domain/guardian_identity.dart';
 
 void main() {
-  testWidgets('parent identity setup hides V1 family role selector', (
+  testWidgets('parent identity setup shows family role selector', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -52,14 +52,18 @@ void main() {
     expect(find.text('妈妈'), findsOneWidget);
     expect(find.text('保姆'), findsNothing);
     expect(find.text('其他照护人'), findsNothing);
-    expect(find.byKey(const ValueKey('familyRoleSegment_admin')), findsNothing);
+    expect(find.text('权限角色'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('familyRoleSegment_admin')),
+      findsOneWidget,
+    );
     expect(
       find.byKey(const ValueKey('familyRoleSegment_guardian')),
-      findsNothing,
+      findsOneWidget,
     );
     expect(
       find.byKey(const ValueKey('familyRoleSegment_viewer')),
-      findsNothing,
+      findsOneWidget,
     );
     expect(find.text('1 / 2'), findsOneWidget);
     expect(find.text('3 / 2'), findsNothing);
@@ -191,9 +195,9 @@ void main() {
     );
     await tester.pump();
 
-    await tester.tap(find.byKey(const ValueKey('guardianIdentityGroupSelect')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('祖辈').last);
+    await tester.tap(
+      find.byKey(const ValueKey('guardianIdentityGroupOption_grandparent')),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('祖辈'), findsOneWidget);
@@ -290,6 +294,7 @@ SetupStatus _emptyChildSetupStatus() {
     parentDisplayName: '爸爸',
     parentRelationship: '爸爸',
     parentRelationshipKey: 'dad',
+    parentRole: 'admin',
     deviceName: '',
     deviceLocation: '',
     wifiName: '',

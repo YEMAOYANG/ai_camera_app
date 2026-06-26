@@ -1,22 +1,23 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/app/router/app_router.dart';
-import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
-import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
-import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
-import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
-import 'package:guardian_parent_app/src/features/tasks/application/task_realtime_repository.dart';
-import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
-import 'package:guardian_parent_app/src/features/tasks/presentation/tasks_screen.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/app/router/app_router.dart';
+import 'package:warm_sight/src/core/theme/app_system_ui.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/devices/application/device_repository.dart';
+import 'package:warm_sight/src/features/points/application/point_repository.dart';
+import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/tasks/application/task_realtime_repository.dart';
+import 'package:warm_sight/src/features/tasks/application/task_repository.dart';
+import 'package:warm_sight/src/features/tasks/presentation/tasks_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
+import 'package:warm_sight/src/shared/widgets/app_toast.dart';
 
 class AppShell extends ConsumerWidget {
   const AppShell({required this.child, super.key});
@@ -31,7 +32,7 @@ class AppShell extends ConsumerWidget {
     ) {
       final event = next.asData?.value;
       if (event == null) return;
-      _handleRealtimeEvent(ref, event);
+      ref.read(_realtimeInvalidationCoordinatorProvider).handle(event);
     });
 
     final location = GoRouterState.of(context).uri.path;
@@ -179,54 +180,123 @@ class AppShell extends ConsumerWidget {
         ),
       );
   }
+}
 
-  void _handleRealtimeEvent(WidgetRef ref, TaskRealtimeEvent event) {
+final _realtimeInvalidationCoordinatorProvider =
+    Provider.autoDispose<_RealtimeInvalidationCoordinator>((ref) {
+      final coordinator = _RealtimeInvalidationCoordinator(ref);
+      ref.onDispose(coordinator.dispose);
+      return coordinator;
+    });
+
+class _RealtimeInvalidationCoordinator {
+  _RealtimeInvalidationCoordinator(this._ref);
+
+  final Ref _ref;
+  Timer? _taskTimer;
+  Timer? _cameraMonitorTimer;
+  Timer? _cameraEventsTimer;
+  Timer? _cameraStatusTimer;
+  final Set<String> _taskIds = <String>{};
+  final Set<String> _careTaskIds = <String>{};
+  var _disposed = false;
+
+  static const _debounce = Duration(milliseconds: 900);
+
+  void handle(TaskRealtimeEvent event) {
+    if (_disposed) return;
     if (event.isTaskUpdate || event.isTaskStatusChanged) {
-      _handleTaskRealtimeEvent(ref, event);
+      _taskIds.addAll(event.taskIds);
+      _scheduleTaskRefresh();
     }
     if (event.isCameraObservationUpdated) {
-      _handleCameraObservationRealtimeEvent(ref);
+      _scheduleCameraMonitorRefresh();
     }
-    if (event.isCameraEventCreated) {
-      _handleCameraEventRealtimeEvent(ref);
+    if (event.isCameraEventCreated ||
+        event.isReminderEventCreated ||
+        event.isCameraCommandCreated) {
+      _careTaskIds.addAll(event.taskIds);
+      _scheduleCameraEventsRefresh();
     }
     if (event.isCameraStatusChanged) {
-      _handleCameraStatusRealtimeEvent(ref);
+      _scheduleCameraStatusRefresh();
     }
   }
 
-  void _handleTaskRealtimeEvent(WidgetRef ref, TaskRealtimeEvent event) {
-    ref
-      ..invalidate(taskListProvider)
-      ..invalidate(todayTasksProvider)
-      ..invalidate(taskWeekProvider)
-      ..invalidate(pointsSummaryProvider);
-    for (final taskId in event.taskIds) {
-      ref
-        ..invalidate(taskDetailProvider(taskId))
-        ..invalidate(taskEventsProvider(taskId));
-    }
+  void _scheduleTaskRefresh() {
+    if (_disposed) return;
+    _taskTimer?.cancel();
+    _taskTimer = Timer(_debounce, () {
+      if (_disposed) return;
+      final ids = List<String>.from(_taskIds);
+      _taskIds.clear();
+      _ref
+        ..invalidate(taskListProvider)
+        ..invalidate(todayTasksProvider)
+        ..invalidate(taskWeekProvider)
+        ..invalidate(pointsSummaryProvider)
+        ..invalidate(dailyReportProvider)
+        ..invalidate(weeklyReportProvider);
+      for (final taskId in ids) {
+        _ref
+          ..invalidate(taskDetailProvider(taskId))
+          ..invalidate(taskEventsProvider(taskId));
+      }
+    });
   }
 
-  void _handleCameraObservationRealtimeEvent(WidgetRef ref) {
-    ref
-      ..invalidate(cameraMonitorStatusProvider)
-      ..invalidate(cameraEventsProvider)
-      ..invalidate(liveCareStatusProvider);
+  void _scheduleCameraMonitorRefresh() {
+    if (_disposed) return;
+    _cameraMonitorTimer?.cancel();
+    _cameraMonitorTimer = Timer(_debounce, () {
+      if (_disposed) return;
+      _ref
+        ..invalidate(cameraMonitorStatusProvider)
+        ..invalidate(cameraEventsProvider)
+        ..invalidate(liveCareStatusProvider)
+        ..invalidate(dailyReportProvider)
+        ..invalidate(weeklyReportProvider);
+    });
   }
 
-  void _handleCameraEventRealtimeEvent(WidgetRef ref) {
-    ref
-      ..invalidate(cameraEventsProvider)
-      ..invalidate(liveCareStatusProvider);
+  void _scheduleCameraEventsRefresh() {
+    if (_disposed) return;
+    _cameraEventsTimer?.cancel();
+    _cameraEventsTimer = Timer(_debounce, () {
+      if (_disposed) return;
+      final ids = List<String>.from(_careTaskIds);
+      _careTaskIds.clear();
+      _ref
+        ..invalidate(cameraEventsProvider)
+        ..invalidate(liveCareStatusProvider)
+        ..invalidate(cameraMonitorStatusProvider)
+        ..invalidate(dailyReportProvider)
+        ..invalidate(weeklyReportProvider);
+      for (final taskId in ids) {
+        _ref.invalidate(taskEventsProvider(taskId));
+      }
+    });
   }
 
-  void _handleCameraStatusRealtimeEvent(WidgetRef ref) {
-    ref
-      ..invalidate(cameraHealthProvider)
-      ..invalidate(cameraStatusProvider)
-      ..invalidate(cameraRuntimeProvider)
-      ..invalidate(primaryDeviceOverviewProvider);
+  void _scheduleCameraStatusRefresh() {
+    if (_disposed) return;
+    _cameraStatusTimer?.cancel();
+    _cameraStatusTimer = Timer(_debounce, () {
+      if (_disposed) return;
+      _ref
+        ..invalidate(cameraHealthProvider)
+        ..invalidate(cameraStatusProvider)
+        ..invalidate(cameraRuntimeProvider)
+        ..invalidate(primaryDeviceOverviewProvider);
+    });
+  }
+
+  void dispose() {
+    _disposed = true;
+    _taskTimer?.cancel();
+    _cameraMonitorTimer?.cancel();
+    _cameraEventsTimer?.cancel();
+    _cameraStatusTimer?.cancel();
   }
 }
 

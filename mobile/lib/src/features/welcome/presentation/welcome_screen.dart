@@ -3,10 +3,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
+import 'package:warm_sight/src/core/theme/app_system_ui.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/shared/widgets/app_background.dart';
+import 'package:warm_sight/src/shared/widgets/app_button.dart';
 
 const _brandLogoMarkAsset = 'assets/brand/nuantong-logo-mark.png';
 

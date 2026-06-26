@@ -19,6 +19,7 @@ from services.internal_request_guard import InternalRequestGuard
 from services.point_service import PointService
 from services.profile_service import ProfileService
 from services.reward_service import RewardService
+from services.routine_reminder_service import RoutineReminderService
 from services.setup_service import SetupService
 from services.sms_provider import DevelopmentSmsProvider, SmsProvider, UnavailableSmsProvider
 from services.prompt_registry import PromptRegistry
@@ -135,6 +136,10 @@ def ai_care_reminder_service() -> AiCareReminderService:
 
 def camera_ai_observation_service() -> CameraAiObservationService:
     return CameraAiObservationService(current_app.config["DATABASE_URL"])
+
+
+def routine_reminder_service() -> RoutineReminderService:
+    return RoutineReminderService(current_app.config["DATABASE_URL"])
 
 
 def internal_request_guard() -> InternalRequestGuard:

@@ -37,11 +37,14 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
         payload = payloads[0]
         self.assertEqual(payload["scenario"], "toy_cleanup")
         self.assertEqual(payload["source"], "ai_camera_test")
-        self.assertEqual(payload["sourceEventId"], "ai_camera_test:dev_1:toy_cleanup:1000:6000:toys_scattered")
+        self.assertEqual(
+            payload["sourceEventId"],
+            "ai_camera_test:dev_1:toy_cleanup:1000:6000:child_left_toys_uncollected",
+        )
         self.assertEqual(payload["signals"][0]["durationSeconds"], 5)
-        self.assertEqual(payload["signals"][0]["signalType"], "toys_scattered")
+        self.assertEqual(payload["signals"][0]["signalType"], "child_left_toys_uncollected")
         self.assertNotIn("reminder", payload["rawDetail"])
-        self.assertNotIn("child_message", payload["rawDetail"])
+        self.assertEqual(payload["rawDetail"]["child_message"], "旧项目里的播报文案不能迁移。")
 
     def test_source_event_id_is_stable(self):
         first = build_source_event_id(
@@ -61,6 +64,63 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
 
         self.assertEqual(first, second)
         self.assertEqual(first, "ai_camera_test:dev_1:posture:10:20:leaning_too_close")
+
+    def test_normal_or_unknown_posture_does_not_create_posture_payload(self):
+        adapter = AiCameraTestObservationAdapter(_config(), json_request=_unused_request)
+
+        normal_payloads = adapter.payloads_from_analysis(
+            {
+                "has_person": True,
+                "activity": "写作业/看书",
+                "posture_status": "ok",
+                "bad_posture": False,
+                "confidence": 0.78,
+                "description": "一个人坐在桌前，纸上有手写文字和一支笔。",
+                "summary": {"skills": [{"name": "坐姿", "score": 88}]},
+            },
+            window_start_ms=1_000,
+            window_end_ms=4_000,
+            observed_at=4_000,
+        )
+        unknown_payloads = adapter.payloads_from_analysis(
+            {
+                "has_person": False,
+                "activity": "离开",
+                "posture_status": "unknown",
+                "bad_posture": False,
+                "confidence": 0.9,
+                "description": "画面中没有清晰的人出现。",
+                "summary": {"skills": [{"name": "坐姿", "score": 60}]},
+            },
+            window_start_ms=4_000,
+            window_end_ms=7_000,
+            observed_at=7_000,
+        )
+
+        self.assertEqual(normal_payloads, [])
+        self.assertEqual(unknown_payloads, [])
+
+    def test_risky_posture_still_creates_posture_payload(self):
+        adapter = AiCameraTestObservationAdapter(_config(), json_request=_unused_request)
+
+        payloads = adapter.payloads_from_analysis(
+            {
+                "has_person": True,
+                "activity": "写作业/看书",
+                "posture_status": "leaning_too_close",
+                "bad_posture": True,
+                "confidence": 0.72,
+                "description": "孩子头离纸面太近。",
+            },
+            window_start_ms=10_000,
+            window_end_ms=40_000,
+            observed_at=40_000,
+        )
+
+        self.assertEqual(len(payloads), 1)
+        self.assertEqual(payloads[0]["scenario"], "posture")
+        self.assertEqual(payloads[0]["signals"][0]["signalType"], "leaning_too_close")
+        self.assertEqual(payloads[0]["signals"][0]["durationSeconds"], 30)
 
     def test_worker_posts_only_observation_endpoint(self):
         calls = []

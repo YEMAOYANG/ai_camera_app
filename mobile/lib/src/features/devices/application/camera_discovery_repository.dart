@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/features/devices/application/camera_discovery_adapter.dart';
-import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
-import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
+import 'package:warm_sight/src/features/devices/application/camera_discovery_adapter.dart';
+import 'package:warm_sight/src/features/devices/application/device_repository.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 
 final cameraDiscoveryRepositoryProvider = Provider<CameraDiscoveryRepository>((
   ref,

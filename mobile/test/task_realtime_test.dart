@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
-import 'package:guardian_parent_app/src/features/auth/application/account_security_realtime_repository.dart';
-import 'package:guardian_parent_app/src/features/tasks/application/task_realtime_repository.dart';
+import 'package:warm_sight/src/core/config/app_environment.dart';
+import 'package:warm_sight/src/features/auth/application/account_security_realtime_repository.dart';
+import 'package:warm_sight/src/features/tasks/application/task_realtime_repository.dart';
 
 void main() {
   test('task realtime uri uses configured websocket base url', () {

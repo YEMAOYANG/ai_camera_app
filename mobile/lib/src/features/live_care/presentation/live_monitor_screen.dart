@@ -7,15 +7,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
-import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
-import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/theme/app_system_ui.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
+import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/shared/widgets/app_surface.dart';
+import 'package:warm_sight/src/shared/widgets/app_toast.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 class LiveMonitorScreen extends ConsumerStatefulWidget {
   const LiveMonitorScreen({super.key});

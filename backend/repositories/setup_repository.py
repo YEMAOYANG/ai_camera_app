@@ -250,6 +250,88 @@ class SetupRepository:
             (family_id,),
         ).fetchone()
 
+    def get_family_member_by_user(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        user_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT * FROM family_members
+            WHERE family_id = ? AND user_id = ? AND status = 'active'
+            LIMIT 1
+            """,
+            (family_id, user_id),
+        ).fetchone()
+
+    def upsert_family_member_role(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        user_id: str,
+        name: str,
+        relationship_key: str,
+        phone: str,
+        role: str,
+        now: int,
+    ) -> DatabaseRow:
+        existing = self.get_family_member_by_user(
+            conn,
+            family_id=family_id,
+            user_id=user_id,
+        )
+        if existing:
+            conn.execute(
+                """
+                UPDATE family_members
+                SET name = ?, relationship_key = ?, phone = ?, role = ?, updated_at = ?
+                WHERE id = ?
+                """,
+                (
+                    name or existing["name"],
+                    relationship_key,
+                    phone or existing["phone"],
+                    role,
+                    now,
+                    existing["id"],
+                ),
+            )
+            return self.get_family_member_by_user(
+                conn,
+                family_id=family_id,
+                user_id=user_id,
+            )
+
+        member_id = f"member_{uuid.uuid4().hex}"
+        conn.execute(
+            """
+            INSERT INTO family_members(
+              id, family_id, user_id, name, relationship_key, phone, role, status,
+              notify_enabled, created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'active', 1, ?, ?)
+            """,
+            (
+                member_id,
+                family_id,
+                user_id,
+                name or "家长",
+                relationship_key,
+                phone,
+                role,
+                now,
+                now,
+            ),
+        )
+        return self.get_family_member_by_user(
+            conn,
+            family_id=family_id,
+            user_id=user_id,
+        )
+
     def save_device(
         self,
         conn: DatabaseConnection,

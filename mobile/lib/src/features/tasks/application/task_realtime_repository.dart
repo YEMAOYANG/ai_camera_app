@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
-import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
+import 'package:warm_sight/src/core/config/app_environment.dart';
+import 'package:warm_sight/src/core/storage/auth_session_store.dart';
 
 final taskRealtimeProvider = StreamProvider.autoDispose<TaskRealtimeEvent>((
   ref,
@@ -82,6 +82,8 @@ class TaskRealtimeEvent {
       type == 'camera_monitor.refreshed';
   bool get isCameraEventCreated => type == 'camera_event.created';
   bool get isCameraStatusChanged => type == 'camera_status.changed';
+  bool get isReminderEventCreated => type == 'reminder_event.created';
+  bool get isCameraCommandCreated => type == 'camera_command.created';
 
   static TaskRealtimeEvent fromJson(Map<String, dynamic> json) {
     final rawTaskIds = json['taskIds'];
@@ -97,7 +99,9 @@ class TaskRealtimeEvent {
           ? rawEventIds.map(_asString).where((id) => id.isNotEmpty).toList()
           : const [],
       observationId: _asString(json['observationId']),
-      isReliable: json['isReliable'] is bool ? json['isReliable'] as bool : null,
+      isReliable: json['isReliable'] is bool
+          ? json['isReliable'] as bool
+          : null,
       sentAt: _asInt(json['sentAt']),
     );
   }

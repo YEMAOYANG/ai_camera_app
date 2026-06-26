@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/home/domain/home_models.dart';
-import 'package:guardian_parent_app/src/features/home/presentation/widgets/home_shared.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/home/domain/home_models.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
+import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 class HomeRhythmRail extends StatelessWidget {
   const HomeRhythmRail({
@@ -31,10 +31,8 @@ class HomeRhythmRail extends StatelessWidget {
         HomeSectionTitle(
           title: _title,
           subtitle: _subtitle,
-          actionLabel: nodes.isEmpty ? null : '查看全部',
-          onAction: nodes.isEmpty
-              ? null
-              : () => context.go(AppRoute.tasks.path),
+          actionLabel: null,
+          onAction: null,
         ),
         const SizedBox(height: 10),
         if (isLoading)
@@ -65,32 +63,25 @@ class HomeRhythmRail extends StatelessWidget {
         else if (nodes.isEmpty)
           _EmptyRhythmPanel(hasNoDevice: hasNoDevice)
         else
-          Column(
-            children: [
-              for (var index = 0; index < nodes.length; index++) ...[
-                _RhythmNodeRow(node: nodes[index]),
-                if (index != nodes.length - 1) const SizedBox(height: 8),
-              ],
-            ],
-          ),
+          _RhythmTimeline(nodes: nodes),
       ],
     );
   }
 
   String get _title {
     return switch (mode) {
-      HomeRhythmMode.review => '今日回顾',
+      HomeRhythmMode.review => '今日安排',
       HomeRhythmMode.empty => '今日安排',
-      HomeRhythmMode.rhythm => '今日节奏',
+      HomeRhythmMode.rhythm => '今日安排',
     };
   }
 
   String? get _subtitle {
     if (nodes.isEmpty) return null;
     return switch (mode) {
-      HomeRhythmMode.review => '今天完成了这些安排',
+      HomeRhythmMode.review => '按时间看看今天的小节奏',
       HomeRhythmMode.empty => null,
-      HomeRhythmMode.rhythm => '最近几个重要节点',
+      HomeRhythmMode.rhythm => '按时间看看今天的小节奏',
     };
   }
 }
@@ -281,78 +272,178 @@ class _RhythmCameraLink extends StatelessWidget {
   }
 }
 
-class _RhythmNodeRow extends StatelessWidget {
-  const _RhythmNodeRow({required this.node});
+class _RhythmTimeline extends StatelessWidget {
+  const _RhythmTimeline({required this.nodes});
 
-  final RhythmNode node;
+  final List<RhythmNode> nodes;
 
   @override
   Widget build(BuildContext context) {
-    final isCurrent = node.state == RhythmNodeState.current;
+    return HomeSoftPanel(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      child: Column(
+        children: [
+          for (var index = 0; index < nodes.length; index++)
+            _RhythmNodeRow(
+              node: nodes[index],
+              isFirst: index == 0,
+              isLast: index == nodes.length - 1,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RhythmNodeRow extends StatelessWidget {
+  const _RhythmNodeRow({
+    required this.node,
+    required this.isFirst,
+    required this.isLast,
+  });
+
+  final RhythmNode node;
+  final bool isFirst;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
     final isCompleted = node.state == RhythmNodeState.completed;
-    final tone = isCurrent ? StatusTone.success : node.tone;
+    final tone = node.state == RhythmNodeState.current
+        ? StatusTone.success
+        : node.tone;
+    final dotColor = homeToneColor(tone);
 
     return HomePressable(
       onTap: () => context.go('$taskDetailPath/${node.taskId}'),
       child: Semantics(
         button: true,
         label: '${node.title}，${node.timeLabel}',
-        child: HomeSoftPanel(
-          tone: tone,
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 52,
-                child: Text(
-                  node.timeLabel,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: homeToneColor(tone),
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      node.title,
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: isFirst ? 4 : 0,
+            bottom: isLast ? 4 : 0,
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  width: 47,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      node.timeLabel,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: AppColors.ink.withValues(
-                          alpha: isCompleted ? 0.62 : 1,
-                        ),
+                        color: dotColor,
                         fontFamily: AppTypography.systemFont,
-                        fontSize: 15,
+                        fontSize: 12,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      node.subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppColors.muted.withValues(
-                          alpha: isCompleted ? 0.72 : 1,
-                        ),
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w600,
-                        height: 1.25,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(
+                  width: 20,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          width: 1,
+                          color: isFirst
+                              ? Colors.transparent
+                              : AppColors.borderSoft,
+                        ),
+                      ),
+                      Container(
+                        width: 9,
+                        height: 9,
+                        decoration: BoxDecoration(
+                          color: dotColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: dotColor.withValues(alpha: 0.18),
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          width: 1,
+                          color: isLast
+                              ? Colors.transparent
+                              : AppColors.borderSoft,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                node.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.ink.withValues(
+                                    alpha: isCompleted ? 0.64 : 1,
+                                  ),
+                                  fontFamily: AppTypography.systemFont,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              node.statusLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: homeToneColor(tone),
+                                fontFamily: AppTypography.systemFont,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (node.subtitle.trim().isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            node.subtitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.muted.withValues(
+                                alpha: isCompleted ? 0.72 : 1,
+                              ),
+                              fontFamily: AppTypography.systemFont,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

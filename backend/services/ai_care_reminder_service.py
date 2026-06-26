@@ -28,6 +28,11 @@ from services.auth_service import AuthService
 from services.camera_command_service import CameraCommandService
 from services.prompt_registry import PromptRegistry
 from services.reminder_text_validator import ReminderTextValidator
+from services.task_event_stream import (
+    CAMERA_COMMAND_CREATED,
+    REMINDER_EVENT_CREATED,
+    publish_family_event,
+)
 
 
 REMINDER_DECISION_TRIGGER_TTL_MS = 2 * 60 * 1000
@@ -171,6 +176,11 @@ class AiCareReminderService:
                 family_id=family_id,
                 event_id=str(existing_event["id"]),
             )
+            self._publish_internal_trigger_events(
+                family_id=family_id,
+                event=command_result["event"],
+                command=command_result["command"],
+            )
             return {
                 "ok": True,
                 "idempotent": True,
@@ -194,6 +204,11 @@ class AiCareReminderService:
         command_result = self._ensure_speaker_command_for_event(
             family_id=family_id,
             event_id=result["event"]["id"],
+        )
+        self._publish_internal_trigger_events(
+            family_id=family_id,
+            event=command_result["event"],
+            command=command_result["command"],
         )
         return {
             "ok": True,
@@ -295,6 +310,8 @@ class AiCareReminderService:
                 text=str(event.get("text") or ""),
                 task_id=_optional_text(event.get("task_id")),
                 device_id=_optional_text(event.get("device_id")),
+                source="care_reminder",
+                scenario=str(event.get("scenario") or ""),
             )
             command_id = _optional_text(command.get("commandId"))
             if str(command.get("status") or "") == "failed":
@@ -409,6 +426,36 @@ class AiCareReminderService:
             "created_at": now,
         }
         return {"event": reminder_event_payload(event), "validation": generated["validation"]}
+
+    def _publish_internal_trigger_events(
+        self,
+        *,
+        family_id: str,
+        event: dict,
+        command: dict,
+    ) -> None:
+        event_id = str(event.get("id") or "").strip()
+        command_id = str(command.get("commandId") or "").strip()
+        device_id = _optional_text(event.get("deviceId"))
+        task_id = _optional_text(event.get("taskId"))
+        publish_family_event(
+            family_id=family_id,
+            event_type=REMINDER_EVENT_CREATED,
+            device_id=device_id,
+            task_ids=[task_id] if task_id else [],
+            event_ids=[event_id] if event_id else [],
+            source="care_reminder",
+        )
+        if command_id:
+            publish_family_event(
+                family_id=family_id,
+                event_type=CAMERA_COMMAND_CREATED,
+                device_id=device_id,
+                task_ids=[task_id] if task_id else [],
+                event_ids=[command_id],
+                is_reliable=command.get("ok") is not False,
+                source="care_reminder",
+            )
 
     def _generate_text_payload(
         self,

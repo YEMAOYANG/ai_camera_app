@@ -63,6 +63,7 @@ class SetupService:
     def status(self, access_token: str) -> dict:
         context = self._auth_context(access_token)
         family_id = context["family"]["id"]
+        user_id = context["user"]["id"]
         now = now_ms()
         with self.repository.transaction() as conn:
             progress = self.repository.get_or_create_progress(
@@ -76,13 +77,17 @@ class SetupService:
                 progress=progress,
                 now=now,
             )
-            return self._response(progress, self._saved_setup_details(conn, family_id))
+            return self._response(
+                progress,
+                self._saved_setup_details(conn, family_id, user_id=user_id),
+            )
 
     def save_parent_identity(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
         raw_display_name = self._optional_text(data, "displayName")
         raw_relationship = self._optional_text(data, "relationship")
         raw_relationship_key = self._optional_text(data, "relationshipKey")
+        raw_role = self._optional_text(data, "role")
         now = now_ms()
         with self.repository.transaction() as conn:
             relationship, relationship_key = self._guardian_identity_value(
@@ -90,6 +95,7 @@ class SetupService:
                 relationship_key=raw_relationship_key,
                 relationship=raw_relationship or raw_display_name,
             )
+            role, role_label = self._family_role_value(conn, raw_role)
             self._assert_guardian_identity_available(
                 conn,
                 family_id=context["family"]["id"],
@@ -104,6 +110,16 @@ class SetupService:
                 display_name=display_name,
                 relationship=relationship,
                 relationship_key=relationship_key,
+                now=now,
+            )
+            self.repository.upsert_family_member_role(
+                conn,
+                family_id=context["family"]["id"],
+                user_id=context["user"]["id"],
+                name=display_name,
+                relationship_key=relationship_key,
+                phone=context["user"].get("phone") or "",
+                role=role,
                 now=now,
             )
             self.repository.mark_step_done(
@@ -124,6 +140,8 @@ class SetupService:
                         "displayName": display_name,
                         "relationship": relationship,
                         "relationshipKey": relationship_key,
+                        "role": role,
+                        "roleLabel": role_label,
                     },
                 },
             )
@@ -576,8 +594,17 @@ class SetupService:
                     409,
                 )
 
-    def _saved_setup_details(self, conn, family_id: str) -> dict:
+    def _saved_setup_details(self, conn, family_id: str, *, user_id: str | None = None) -> dict:
         parent = self.repository.get_parent_identity(conn, family_id=family_id)
+        member = (
+            self.repository.get_family_member_by_user(
+                conn,
+                family_id=family_id,
+                user_id=user_id,
+            )
+            if user_id
+            else None
+        )
         device = self.repository.current_device(conn, family_id=family_id)
         wifi = self.repository.current_wifi(conn, family_id=family_id)
         child = self.repository.current_child(conn, family_id=family_id)
@@ -591,6 +618,8 @@ class SetupService:
                     conn,
                     parent,
                 ),
+                "role": member["role"] if member else "",
+                "roleLabel": self._family_role_label(conn, member["role"]) if member else "",
             },
             "device": None
             if device is None
@@ -666,6 +695,26 @@ class SetupService:
             )
             if row["label"]
         }
+
+    def _family_role_value(self, conn, value: str | None) -> tuple[str, str]:
+        rows = self.repository.list_app_option_items(
+            conn,
+            catalog_key="family_role",
+        )
+        requested = (value or "admin").strip() or "admin"
+        for row in rows:
+            if row["item_key"] == requested or row["label"] == requested:
+                return row["item_key"], row["label"]
+        raise ApiError("invalid_family_role", "请选择有效的家庭权限")
+
+    def _family_role_label(self, conn, role: str) -> str:
+        for row in self.repository.list_app_option_items(
+            conn,
+            catalog_key="family_role",
+        ):
+            if row["item_key"] == role:
+                return row["label"]
+        return role
 
     def _guardian_identity_value(
         self,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
-import 'package:guardian_parent_app/src/features/profile/presentation/profile_pages.dart';
-import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
+import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/features/profile/presentation/profile_pages.dart';
+import 'package:warm_sight/src/shared/domain/guardian_identity.dart';
 
 void main() {
   testWidgets('viewer can see family code but cannot reset it', (tester) async {

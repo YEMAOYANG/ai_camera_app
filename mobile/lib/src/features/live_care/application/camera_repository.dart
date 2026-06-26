@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/core/network/api_client.dart';
-import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
-import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/core/network/api_client.dart';
+import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
+import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
 
 final cameraRepositoryProvider = Provider<CameraRepository>((ref) {
   return CameraRepository(
@@ -48,13 +48,10 @@ final cameraEventsProvider = FutureProvider<List<LiveCareEvent>>((ref) async {
 });
 
 final liveCareStatusProvider = FutureProvider<LiveCareStatus>((ref) async {
-  final repository = ref.watch(cameraRepositoryProvider);
-  final device = await ref.watch(selectedDeviceProvider.future);
-  final deviceId = device?.id;
-  final health = await repository.health(deviceId: deviceId);
-  final runtime = await repository.runtime(deviceId: deviceId);
-  final status = await repository.status(deviceId: deviceId);
-  final monitor = await repository.monitorStatus(deviceId: deviceId);
+  final health = await ref.watch(cameraHealthProvider.future);
+  final runtime = await ref.watch(cameraRuntimeProvider.future);
+  final status = await ref.watch(cameraStatusProvider.future);
+  final monitor = await ref.watch(cameraMonitorStatusProvider.future);
   return LiveCareStatus(
     health: health,
     runtime: runtime,

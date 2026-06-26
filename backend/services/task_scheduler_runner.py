@@ -61,11 +61,13 @@ class TaskSchedulerRunner:
                 tick_start = int(time.time() * 1000)
                 try:
                     with app.app_context():
-                        from services.service_factory import task_runtime_service
+                        from services.service_factory import routine_reminder_service, task_runtime_service
                         from services.task_event_stream import publish_task_runtime_result
 
                         result = task_runtime_service().tick()
                         publish_task_runtime_result(result)
+                        if app.config.get("CARE_ROUTINE_REMINDER_ENABLED"):
+                            result["routineReminder"] = routine_reminder_service().tick(now=tick_start)
                     with self._lock:
                         self._state.tick_count += 1
                         self._state.last_tick_at = tick_start

@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
-import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
-import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
+import 'package:warm_sight/src/core/storage/onboarding_store.dart';
+import 'package:warm_sight/src/features/devices/application/device_repository.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 
 const selectedDeviceIdPreferenceKey = 'selectedDeviceId';
 

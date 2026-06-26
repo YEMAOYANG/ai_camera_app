@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/core/network/api_client.dart';
-import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
-import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
+import 'package:warm_sight/src/core/network/api_client.dart';
+import 'package:warm_sight/src/features/devices/application/device_repository.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 
 void main() {
   test('devices filters out unbound cameras from management lists', () async {

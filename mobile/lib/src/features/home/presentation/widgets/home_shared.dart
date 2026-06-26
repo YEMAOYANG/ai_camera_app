@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/home/domain/home_models.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/home/domain/home_models.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 IconData homeChipIcon(HomeChipKind kind) {
   return switch (kind) {

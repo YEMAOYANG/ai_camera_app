@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
 
 class AlertsScreen extends StatelessWidget {
   const AlertsScreen({super.key});

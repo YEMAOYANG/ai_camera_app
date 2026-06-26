@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
-import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
-import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
-import 'package:guardian_parent_app/src/features/points/domain/point_models.dart';
-import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_avatar_persona.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
-import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/auth/application/auth_repository.dart';
+import 'package:warm_sight/src/features/auth/application/session_data_invalidation.dart';
+import 'package:warm_sight/src/features/points/application/point_repository.dart';
+import 'package:warm_sight/src/features/points/domain/point_models.dart';
+import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_avatar_persona.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/shared/domain/guardian_identity.dart';
+import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/app_button.dart';
+import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
+import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -92,7 +92,7 @@ class ProfileScreen extends ConsumerWidget {
                 _ProfileCategory(
                   icon: Icons.insights_outlined,
                   title: '看护报告',
-                  subtitle: '日报、周报和成长时刻',
+                  subtitle: '日报和周报',
                   path: profileReportsHubPath,
                   tone: AppListRowTone.amber,
                 ),
@@ -338,6 +338,7 @@ class _FamilySpaceHero extends StatelessWidget {
                               value: '${summary.memberCount}',
                               path: profileFamilyMembersPath,
                               semanticLabel: '查看家庭成员',
+                              key: const ValueKey('profileHeroMembersEntry'),
                             ),
                             _FamilySignal(
                               icon: Icons.sensors_outlined,
@@ -345,6 +346,7 @@ class _FamilySpaceHero extends StatelessWidget {
                               value: '${summary.deviceCount}',
                               path: profileDevicesPath,
                               semanticLabel: '查看设备管理',
+                              key: const ValueKey('profileHeroDevicesEntry'),
                             ),
                             _FamilySignal(
                               icon: Icons.stars_outlined,
@@ -854,17 +856,7 @@ class _FamilySignalStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < 350;
-        if (compact) {
-          return Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final signal in signals)
-                _FamilySignalItem(key: signal.key, signal: signal),
-            ],
-          );
-        }
+        final dense = constraints.maxWidth < 360;
         return Row(
           children: [
             for (var index = 0; index < signals.length; index++) ...[
@@ -872,9 +864,10 @@ class _FamilySignalStrip extends StatelessWidget {
                 child: _FamilySignalItem(
                   key: signals[index].key,
                   signal: signals[index],
+                  dense: dense,
                 ),
               ),
-              if (index != signals.length - 1) const SizedBox(width: 8),
+              if (index != signals.length - 1) SizedBox(width: dense ? 6 : 8),
             ],
           ],
         );
@@ -904,9 +897,14 @@ class _FamilySignal {
 }
 
 class _FamilySignalItem extends StatefulWidget {
-  const _FamilySignalItem({required this.signal, super.key});
+  const _FamilySignalItem({
+    required this.signal,
+    this.dense = false,
+    super.key,
+  });
 
   final _FamilySignal signal;
+  final bool dense;
 
   @override
   State<_FamilySignalItem> createState() => _FamilySignalItemState();
@@ -919,48 +917,70 @@ class _FamilySignalItemState extends State<_FamilySignalItem> {
   Widget build(BuildContext context) {
     final signal = widget.signal;
     final tone = _toneData(signal.tone);
+    final dense = widget.dense;
+    final height = dense ? 30.0 : 32.0;
+    final horizontalPadding = dense ? 7.0 : 9.0;
+    final iconSize = dense ? 13.5 : 15.0;
+    final valueFontSize = dense ? 12.5 : 13.5;
+    final labelFontSize = dense ? 10.5 : 11.0;
     final scale = MediaQuery.of(context).disableAnimations
         ? 1.0
         : (_pressed ? AppMotion.buttonPressScale : 1.0);
-    final content = DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: tone.foreground.withValues(alpha: 0.08)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(signal.icon, color: tone.foreground, size: 15),
-            const SizedBox(width: 5),
-            Text(
-              signal.value,
-              style: const TextStyle(
-                color: AppColors.ink,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 13.5,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                signal.label,
+    final content = SizedBox(
+      height: height,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: tone.foreground.withValues(alpha: 0.08)),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(signal.icon, color: tone.foreground, size: iconSize),
+              SizedBox(width: dense ? 4 : 5),
+              Text(
+                signal.value,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppColors.muted,
+                textHeightBehavior: const TextHeightBehavior(
+                  applyHeightToFirstAscent: false,
+                  applyHeightToLastDescent: false,
+                ),
+                style: TextStyle(
+                  color: AppColors.ink,
                   fontFamily: AppTypography.systemFont,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  fontSize: valueFontSize,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
                   letterSpacing: 0,
                 ),
               ),
-            ),
-          ],
+              SizedBox(width: dense ? 3 : 4),
+              Flexible(
+                child: Text(
+                  signal.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textHeightBehavior: const TextHeightBehavior(
+                    applyHeightToFirstAscent: false,
+                    applyHeightToLastDescent: false,
+                  ),
+                  style: TextStyle(
+                    color: AppColors.muted,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: labelFontSize,
+                    fontWeight: FontWeight.w700,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

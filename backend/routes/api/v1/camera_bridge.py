@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from flask import Blueprint, Response, jsonify, request, stream_with_context
+import json
 
+from flask import Blueprint, Response, current_app, jsonify, request, stream_with_context
+
+from core.database import Database
 from core.errors import ApiError, error_response
+from repositories.care_repository import CareRepository
 from schemas.auth import bearer_token, json_body
 from services.camera_bridge_service import CameraBridgeError
 from services.service_factory import (
@@ -199,9 +203,19 @@ def monitor_stop():
 @camera_bp.get("/monitor/status")
 def monitor_status():
     try:
-        _, _, resolved = _resolve_camera_runtime_for_request()
+        _, context, resolved = _resolve_camera_runtime_for_request()
         payload = resolved.bridge.monitor_status()
-        return jsonify(_monitor_response(payload))
+        response = _monitor_response(payload)
+        stored = _latest_stored_observation(
+            family_id=context["family"]["id"],
+            device_id=resolved.device_id,
+        )
+        if stored is not None and _stored_observation_is_newer(
+            stored,
+            response["monitor"].get("lastObservation"),
+        ):
+            response["monitor"]["lastObservation"] = stored
+        return jsonify(response)
     except ApiError as exc:
         return error_response(exc)
 
@@ -328,7 +342,7 @@ def _summary_text(value: dict, *, activity: str, has_person_value: object) -> st
     if raw_summary and not _is_generic_activity(raw_summary):
         return raw_summary[:80]
     if has_person_value is True:
-        return "看到孩子在画面里"
+        return "画面暂时无法判断"
     return ""
 
 
@@ -411,3 +425,57 @@ def _record_monitor_observation_event(
     )
     event_id = str(event.get("id") or "").strip()
     return [event_id] if event_id else []
+
+
+def _latest_stored_observation(*, family_id: str, device_id: str | None) -> dict | None:
+    if not device_id:
+        return None
+    repository = CareRepository(Database(current_app.config["DATABASE_URL"]))
+    with repository.transaction() as conn:
+        row = repository.latest_camera_observation_for_device(
+            conn,
+            family_id=family_id,
+            device_id=device_id,
+        )
+    if row is None:
+        return None
+    raw = _json_dict(row.get("raw_detail_json"))
+    normalized = _normalize_monitor_observation(
+        {
+            "id": row["id"],
+            "has_person": raw.get("has_person"),
+            "activity": raw.get("activity") or raw.get("raw_activity"),
+            "raw_activity": raw.get("raw_activity"),
+            "confidence": row.get("confidence"),
+            "observedAt": row.get("observed_at"),
+            "summary": row.get("parent_summary"),
+            "description": raw.get("description"),
+            "child_message": raw.get("child_message"),
+            "decision_reason": raw.get("decision_reason"),
+            "sourceEventId": row.get("source_event_id") or "",
+        }
+    )
+    if normalized is None:
+        return None
+    normalized["id"] = row["id"]
+    normalized["description"] = str(raw.get("description") or "")[:180]
+    normalized["decisionReason"] = str(raw.get("decision_reason") or "")[:180]
+    return normalized
+
+
+def _stored_observation_is_newer(stored: dict, current: object) -> bool:
+    if not isinstance(current, dict):
+        return True
+    return _int_or_zero(stored.get("observedAt")) >= _int_or_zero(current.get("observedAt"))
+
+
+def _json_dict(value: object) -> dict:
+    if not value:
+        return {}
+    if isinstance(value, dict):
+        return value
+    try:
+        parsed = json.loads(str(value))
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}

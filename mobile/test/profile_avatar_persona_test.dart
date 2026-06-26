@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_avatar_persona.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_avatar_persona.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
 
 void main() {
   group('resolveGuardianAvatarPersona', () {

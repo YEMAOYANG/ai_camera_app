@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
 
 class AdaptiveSelectOption<T> {
   const AdaptiveSelectOption({required this.value, required this.label});

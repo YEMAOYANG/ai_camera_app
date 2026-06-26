@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
-import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
-import 'package:guardian_parent_app/src/features/setup/application/setup_draft.dart';
-import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_background.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/storage/auth_session_store.dart';
+import 'package:warm_sight/src/core/storage/onboarding_store.dart';
+import 'package:warm_sight/src/features/setup/application/setup_draft.dart';
+import 'package:warm_sight/src/features/setup/application/setup_repository.dart';
+import 'package:warm_sight/src/shared/widgets/app_background.dart';
+import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
 
 class StartupGate extends ConsumerStatefulWidget {
   const StartupGate({super.key});

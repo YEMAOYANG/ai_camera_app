@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
+import 'package:warm_sight/src/core/storage/onboarding_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const authAccessTokenKey = 'auth.accessToken';

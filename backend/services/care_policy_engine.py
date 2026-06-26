@@ -40,11 +40,15 @@ REVIEW_ITEM_TYPE_PARENT_NOTIFY = "care_parent_notify"
 
 RESET_SIGNAL_VALUES = {"recovered", "cleared", "inactive"}
 NON_ACTIONABLE_SIGNAL_TYPES = {
+    "toy_playing_observed",
     "cleanup_started",
+    "cleanup_done",
     "toys_put_away",
     "meal_started",
     "child_at_table",
     "meal_finished",
+    "ok",
+    "unknown",
     "seated",
     "posture_recovered",
     "in_bed",
@@ -128,9 +132,17 @@ class CarePolicyEngine:
             capability_config.get("confidence_threshold"),
             0.72,
         )
+        confidence_threshold = _effective_confidence_threshold(
+            scenario=scenario,
+            configured_threshold=confidence_threshold,
+        )
         min_observation_seconds = _int_value(
             capability_config.get("min_observation_seconds"),
             20,
+        )
+        min_observation_seconds = _effective_min_observation_seconds(
+            scenario=scenario,
+            configured_seconds=min_observation_seconds,
         )
         snapshot.update(
             {
@@ -209,7 +221,7 @@ class CarePolicyEngine:
                 snapshot,
             )
 
-        if scenario == CARE_SCENARIO_TOY_CLEANUP:
+        if scenario in {CARE_SCENARIO_TOY_CLEANUP, CARE_SCENARIO_POSTURE}:
             snapshot["routineGate"] = {
                 "allowed": True,
                 "reason": "behavior_only_scenario",
@@ -245,6 +257,26 @@ class CarePolicyEngine:
             snapshot,
             should_speak=True,
         )
+
+
+def _effective_confidence_threshold(
+    *,
+    scenario: str,
+    configured_threshold: float,
+) -> float:
+    if scenario == CARE_SCENARIO_POSTURE:
+        return min(configured_threshold, 0.68)
+    return configured_threshold
+
+
+def _effective_min_observation_seconds(
+    *,
+    scenario: str,
+    configured_seconds: int,
+) -> int:
+    if scenario == CARE_SCENARIO_POSTURE:
+        return min(configured_seconds, 3)
+    return configured_seconds
 
 
 def _decision(

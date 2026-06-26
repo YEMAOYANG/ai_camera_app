@@ -14,6 +14,7 @@ from models.firmware import FIRMWARE_PACKAGE_ACTIVE
 from repositories.device_repository import DeviceRepository
 from services.device_service import DeviceService
 from services.device_runtime_resolver import DeviceRuntimeResolver
+from services.camera_command_service import _parent_camera_command_event
 from services.service_factory import auth_service, camera_command_service
 from services import task_event_stream
 from tests.support import fresh_test_config, request_debug_code
@@ -528,6 +529,73 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertFalse(
             any("收纳" in event["displayTitle"] for event in events.json["events"])
         )
+
+    def test_camera_events_dedupe_repeated_observations_in_short_window(self):
+        _CameraRuntimeHandler.analyze_payload = {
+            "has_person": False,
+            "activity": "其他",
+            "confidence": 0.9,
+            "description": "客厅场景，沙发上摆放着毛绒玩具，地垫上有玩具车。",
+        }
+
+        first = self.client.post(
+            "/api/camera/monitor/refresh",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        second = self.client.post(
+            "/api/camera/monitor/refresh",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(first.status_code, 200, first.json)
+        self.assertEqual(second.status_code, 200, second.json)
+
+        events = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200, events.json)
+        self.assertEqual(len(events.json["events"]), 1, events.json["events"])
+        self.assertEqual(events.json["events"][0]["eventType"], "camera_observation")
+
+    def test_camera_event_display_sanitizes_legacy_structured_summary(self):
+        event = _parent_camera_command_event(
+            {
+                "id": "cmd_dirty",
+                "source": "camera_command",
+                "eventType": "camera_observation",
+                "status": "succeeded",
+                "createdAt": now_ms(),
+                "payload": {
+                    "response": {
+                        "displayTitle": "{'score': 80, 'skills': [{'name': '坐姿'}]}",
+                        "displayMessage": "{'score': 80, 'skills': [{'name': '专注'}]}",
+                        "observation": {
+                            "hasPerson": True,
+                            "isReliable": True,
+                            "summary": "{'score': 80, 'skills': [{'name': '坐姿'}]}",
+                            "description": "孩子在桌前写字，右手拿着笔，头离纸面比较近。",
+                            "rawDetail": {
+                                "summary": {
+                                    "score": 80,
+                                    "skills": [{"name": "坐姿", "score": 92}],
+                                }
+                            },
+                        },
+                    }
+                },
+            }
+        )
+
+        self.assertIsNotNone(event)
+        visible = f"{event['displayTitle']} {event['displayMessage']} {event['evidenceSummary']}"
+        self.assertNotIn("score", visible)
+        self.assertNotIn("skills", visible)
+        self.assertNotIn("{", visible)
+        self.assertNotIn("[", visible)
+        self.assertIn("孩子在桌前写字", event["displayMessage"])
 
     def test_family_realtime_camera_event_is_family_scoped(self):
         captured: list[tuple[str, dict]] = []

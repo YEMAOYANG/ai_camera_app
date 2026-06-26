@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/discovery_scene.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/setup/presentation/discovery_scene.dart';
 
 export 'discovery_scene.dart' show CameraDiscoveryVisualState;
 

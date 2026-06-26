@@ -1,10 +1,10 @@
-import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
-import 'package:guardian_parent_app/src/features/home/domain/home_models.dart';
-import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
-import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
-import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
+import 'package:warm_sight/src/features/home/domain/home_models.dart';
+import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/features/rewards/domain/reward_models.dart';
+import 'package:warm_sight/src/features/tasks/domain/task_models.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 const taskDetailRoutePrefix = '/tasks/detail';
 const rewardsRoutePath = '/rewards';
@@ -213,6 +213,7 @@ HabitFocusCopy buildHabitFocus({
     now: input.now,
   );
   final detail = observationDetail(
+    cameraMonitor: input.cameraMonitor,
     currentTask: currentTask,
     localTasks: localTasks,
     pendingCount: pendingCount,
@@ -369,7 +370,7 @@ String observationTitle({
     return completedCount == 1 ? '今天的节奏都完成了' : '今天已完成 $completedCount 项安排';
   }
   if (cameraStatus?.isOnline == true || cameraMonitor != null) {
-    return '画面待确认';
+    return '还没有最近画面';
   }
   if (localTasks == null || localTasks.isEmpty) {
     return '今天暂时没有新的看护记录';
@@ -378,11 +379,29 @@ String observationTitle({
 }
 
 String observationDetail({
+  required CameraMonitorStatus? cameraMonitor,
   required GuardianTask? currentTask,
   required List<GuardianTask>? localTasks,
   required int pendingCount,
   required DateTime now,
 }) {
+  if (cameraMonitor?.hasCurrentReliableObservation == true) {
+    final description = compactHomeText(
+      cameraMonitor!.lastObservationDescription,
+      maxLength: 44,
+    );
+    if (meaningfulObservationText(description) != null) {
+      return description;
+    }
+    final reason = compactHomeText(
+      cameraMonitor.lastObservationDecisionReason,
+      maxLength: 44,
+    );
+    if (meaningfulObservationText(reason) != null) {
+      return reason;
+    }
+    return '这条记录来自摄像头画面。';
+  }
   if (pendingCount > 0) {
     return '$pendingCount 件事等你处理，先看记录再决定。';
   }
@@ -474,6 +493,7 @@ List<RhythmNode> buildRhythmNodes(List<GuardianTask>? tasks, [DateTime? now]) {
         timeLabel: taskTimeText(task),
         title: task.title,
         subtitle: task.nextStep,
+        statusLabel: task.status.label,
         state: rhythmNodeState(task),
         tone: rhythmNodeTone(task),
       ),
@@ -497,17 +517,16 @@ HomeRhythmMode resolveRhythmMode(
 
 List<GuardianTask> selectRhythmTasks(List<GuardianTask> tasks, DateTime now) {
   if (tasks.isEmpty) return const [];
-  final candidates = tasks.where(_isRhythmCandidate).toList()
+  final latest = tasks.where(_isRhythmCandidate).toList()
     ..sort((a, b) {
-      final aActive = _activeRhythmPriority(a);
-      final bActive = _activeRhythmPriority(b);
-      if (aActive != bActive) return aActive.compareTo(bActive);
-      final aDistance = _taskDistanceFromNow(a, now);
-      final bDistance = _taskDistanceFromNow(b, now);
-      if (aDistance != bDistance) return aDistance.compareTo(bDistance);
-      return sortTasksByTime(a, b);
+      final timeCompare = _taskTimelineValue(
+        b,
+        now,
+      ).compareTo(_taskTimelineValue(a, now));
+      if (timeCompare != 0) return timeCompare;
+      return b.id.compareTo(a.id);
     });
-  return candidates.take(3).toList();
+  return latest.take(5).toList()..sort(sortTasksByTime);
 }
 
 RhythmNodeState rhythmNodeState(GuardianTask task) {
@@ -528,12 +547,7 @@ RhythmNodeState rhythmNodeState(GuardianTask task) {
 }
 
 StatusTone rhythmNodeTone(GuardianTask task) {
-  return switch (rhythmNodeState(task)) {
-    RhythmNodeState.current => StatusTone.success,
-    RhythmNodeState.completed => StatusTone.neutral,
-    RhythmNodeState.upcoming => StatusTone.warning,
-    RhythmNodeState.muted => StatusTone.neutral,
-  };
+  return task.status.tone;
 }
 
 List<PendingItem> buildPendingItems({
@@ -701,11 +715,14 @@ HomePrimaryCta buildPrimaryCta({
 }
 
 bool _isRhythmCandidate(GuardianTask task) {
-  return task.status != GuardianTaskStatus.missed &&
-      task.status != GuardianTaskStatus.expired &&
-      task.status != GuardianTaskStatus.awaitingParentConfirmation &&
-      task.status != GuardianTaskStatus.cancelled &&
-      task.status != GuardianTaskStatus.rejected;
+  return true;
+}
+
+int _taskTimelineValue(GuardianTask task, DateTime now) {
+  final end = _taskEndDateTime(task, now);
+  final start = _taskStartDateTime(task, now);
+  return (end ?? start ?? DateTime(now.year, now.month, now.day))
+      .millisecondsSinceEpoch;
 }
 
 int _activeRhythmPriority(GuardianTask task) {

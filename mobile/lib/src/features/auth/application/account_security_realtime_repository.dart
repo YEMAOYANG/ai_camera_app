@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:warm_sight/src/core/config/app_environment.dart';
 
 class AccountSecurityRealtimeEvent {
   const AccountSecurityRealtimeEvent({

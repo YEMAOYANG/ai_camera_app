@@ -3,20 +3,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
-import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
-import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
-import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_page_header.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/devices/application/device_repository.dart';
+import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
+import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
+import 'package:warm_sight/src/shared/widgets/app_page_header.dart';
+import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
+import 'package:warm_sight/src/shared/widgets/app_surface.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 class LiveCareScreen extends ConsumerStatefulWidget {
   const LiveCareScreen({super.key});
@@ -130,7 +129,6 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
         const SizedBox(height: 8),
         _LiveActions(
           status: liveStatus,
-          snapshot: snapshotFrame,
           onRefresh: () => unawaited(_refreshLiveCare(ref, analyzeFrame: true)),
         ),
         const SizedBox(height: 10),
@@ -143,6 +141,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
     WidgetRef ref, {
     bool analyzeFrame = false,
   }) async {
+    if (!mounted) return;
     final device = ref.read(selectedDeviceProvider).asData?.value;
     if (analyzeFrame && device != null) {
       try {
@@ -153,6 +152,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
         // 手动刷新仍应回落到普通状态刷新，避免实时页被观察服务错误卡住。
       }
     }
+    if (!mounted) return;
     ref
       ..invalidate(liveCareStatusProvider)
       ..invalidate(cameraHealthProvider)
@@ -530,14 +530,9 @@ class _ViewportIcon extends StatelessWidget {
 }
 
 class _LiveActions extends StatelessWidget {
-  const _LiveActions({
-    required this.status,
-    required this.snapshot,
-    required this.onRefresh,
-  });
+  const _LiveActions({required this.status, required this.onRefresh});
 
   final AsyncValue<LiveCareStatus> status;
-  final AsyncValue<CameraSnapshotFrame> snapshot;
   final VoidCallback onRefresh;
 
   @override
@@ -545,7 +540,6 @@ class _LiveActions extends StatelessWidget {
     final available = status.asData?.value.isAvailable ?? false;
     final streamAvailable =
         status.asData?.value.cameraStatus?.streamAvailable ?? available;
-    final frameAvailable = snapshot.asData?.value.available ?? false;
     final actions = [
       _LiveAction(
         icon: Icons.play_arrow_rounded,
@@ -562,45 +556,21 @@ class _LiveActions extends StatelessWidget {
         subtitle: '同步状态',
         onTap: onRefresh,
       ),
-      _LiveAction(
-        icon: Icons.camera_alt_outlined,
-        title: '快照',
-        subtitle: frameAvailable ? '保存当前' : '等待画面',
-        onTap: frameAvailable ? () => _showToast(context, '已保存当前画面') : null,
-      ),
-      _LiveAction(
-        icon: Icons.play_circle_outline,
-        title: '看护记录',
-        subtitle: '最近观察',
-        onTap: () => context.go(liveEventsPath),
-      ),
     ];
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < 350;
-        if (compact) {
-          final width = (constraints.maxWidth - 8) / 2;
-          return Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final action in actions)
-                SizedBox(
-                  width: width,
-                  height: 82,
-                  child: _LiveActionCard(action: action, compact: true),
-                ),
-            ],
-          );
-        }
+        final compact = constraints.maxWidth < 360;
         return Row(
           children: [
             for (var index = 0; index < actions.length; index++) ...[
               Expanded(
                 child: SizedBox(
-                  height: 80,
-                  child: _LiveActionCard(action: actions[index]),
+                  height: compact ? 74 : 80,
+                  child: _LiveActionCard(
+                    action: actions[index],
+                    compact: compact,
+                  ),
                 ),
               ),
               if (index != actions.length - 1) const SizedBox(width: 8),
@@ -702,6 +672,8 @@ class _CareFocusPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final care = status.asData?.value;
     final currentTask = care?.currentTask;
+    final monitor = care?.monitorStatus;
+    final hasObservation = monitor?.hasCurrentReliableObservation == true;
     final eventItems = events.asData?.value ?? const <LiveCareEvent>[];
     final summaryEvents = eventItems
         .where(
@@ -718,11 +690,19 @@ class _CareFocusPanel extends StatelessWidget {
           const _SectionTitle('当前看护'),
           const SizedBox(height: 8),
           AppListRow(
-            icon: currentTask == null
+            icon: hasObservation
+                ? Icons.visibility_outlined
+                : currentTask == null
                 ? Icons.shield_outlined
                 : Icons.play_circle_outline,
-            title: currentTask == null ? '当前没有进行中的看护安排' : currentTask.title,
-            subtitle: currentTask == null
+            title: hasObservation
+                ? monitor!.lastObservation
+                : currentTask == null
+                ? '当前没有进行中的看护安排'
+                : currentTask.title,
+            subtitle: hasObservation
+                ? _monitorObservationSubtitle(monitor!)
+                : currentTask == null
                 ? '需要查看时进入实时画面，普通状态不会打扰孩子。'
                 : '${currentTask.timeLabel} · 看护记录会在这里更新',
             tone: care?.isAvailable == true
@@ -766,6 +746,16 @@ AppListRowTone _eventListTone(LiveCareEvent event) {
     'danger' => AppListRowTone.red,
     _ => AppListRowTone.blue,
   };
+}
+
+String _monitorObservationSubtitle(CameraMonitorStatus monitor) {
+  final parts = <String>[
+    monitor.lastObservationDescription,
+    if (monitor.lastObservationDecisionReason.isNotEmpty)
+      monitor.lastObservationDecisionReason,
+  ];
+  final text = parts.where((part) => part.trim().isNotEmpty).join(' · ');
+  return text.isEmpty ? '这条记录来自摄像头画面。' : text;
 }
 
 class LiveEventsScreen extends ConsumerWidget {
@@ -824,6 +814,9 @@ IconData _eventIcon(LiveCareEvent event) {
   if (event.category == 'snapshot') {
     return Icons.camera_alt_outlined;
   }
+  if (event.category == 'care_reminder') {
+    return Icons.record_voice_over_outlined;
+  }
   if (event.category == 'camera_status') {
     return Icons.videocam_off_outlined;
   }
@@ -845,7 +838,18 @@ String _eventDisplaySubtitle(LiveCareEvent event) {
     if (event.taskTitle.isNotEmpty) event.taskTitle,
     if (event.evidenceSummary.isNotEmpty) event.evidenceSummary,
   ];
-  return parts.where((part) => part.trim().isNotEmpty).join(' · ');
+  return parts
+      .map(_stripConfidenceText)
+      .where((part) => part.trim().isNotEmpty)
+      .join(' · ');
+}
+
+String _stripConfidenceText(String value) {
+  return value
+      .replaceAll(RegExp(r'(?:\s*·\s*)?可信度\s*\d+%'), '')
+      .trim()
+      .replaceAll(RegExp(r'(^·\s*|\s*·$)'), '')
+      .trim();
 }
 
 class _PlaybackCard extends StatelessWidget {
@@ -865,15 +869,86 @@ class _PlaybackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = _playbackToneColor(tone);
     return AppSurface(
-      child: AppListRow(
-        icon: icon,
-        title: title,
-        subtitle: '$time · $message',
-        tone: tone,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: SizedBox(
+                width: 42,
+                height: 42,
+                child: Center(child: Icon(icon, color: color, size: 21)),
+              ),
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.ink,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      height: 1.25,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    time,
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.25,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  if (message.trim().isNotEmpty) ...[
+                    const SizedBox(height: 7),
+                    Text(
+                      message,
+                      style: const TextStyle(
+                        color: AppColors.muted,
+                        fontFamily: AppTypography.systemFont,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        height: 1.42,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+Color _playbackToneColor(AppListRowTone tone) {
+  return switch (tone) {
+    AppListRowTone.blue => AppColors.brand,
+    AppListRowTone.green => AppColors.success,
+    AppListRowTone.amber => AppColors.warning,
+    AppListRowTone.red => AppColors.danger,
+    AppListRowTone.neutral => AppColors.ink,
+  };
 }
 
 class _SectionTitle extends StatelessWidget {
@@ -894,8 +969,4 @@ class _SectionTitle extends StatelessWidget {
       ),
     );
   }
-}
-
-void _showToast(BuildContext context, String message) {
-  showAppToast(context, message);
 }

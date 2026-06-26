@@ -1,4 +1,4 @@
-import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
+import 'package:warm_sight/src/features/tasks/domain/task_models.dart';
 
 class TaskTemplateApplyDateResolution {
   const TaskTemplateApplyDateResolution({

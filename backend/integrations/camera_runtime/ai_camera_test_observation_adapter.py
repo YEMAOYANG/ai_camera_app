@@ -14,8 +14,10 @@ JsonRequest = Callable[[str, Optional[dict], Optional[Mapping[str, str]], float]
 POSTURE_RISK_VALUES = {"bad_posture", "leaning_too_close", "low_head", "slouching"}
 MEAL_RE = re.compile(r"(吃饭|用餐|餐桌|饭菜|餐具|碗|筷子|勺子|餐盘)")
 TOY_CLEANUP_RE = re.compile(r"(收玩具|整理玩具|收拾玩具|玩具盒|放回|归位)")
-PLAYING_TOYS_RE = re.compile(r"(玩玩具|积木|玩偶|玩具)")
-POSTURE_RE = re.compile(r"(坐姿|低头|头低|趴|身体前倾|弯腰|离[^，。,.]{0,8}(桌|书|纸)[^，。,.]{0,8}(近|太近|过近))")
+TOY_CLEANUP_DONE_RE = re.compile(r"(玩具已收好|已经收好|收纳完成|玩具归位|整理好了|整齐)")
+TOY_LEFT_RE = re.compile(r"(离开[^，。,.]{0,12}(玩具|玩具区)|玩具[^，。,.]{0,18}(还在|散落|没收|未收))")
+PLAYING_TOYS_RE = re.compile(r"(玩玩具|玩积木|搭积木|摆弄玩具|操作玩具|playing with toys|playing|play)")
+POSTURE_RE = re.compile(r"(低头|头低|趴桌|身体前倾|弯腰|离[^，。,.]{0,8}(桌|书|纸)[^，。,.]{0,8}(近|太近|过近))")
 
 
 class ObservationAdapterConfigError(RuntimeError):
@@ -198,29 +200,37 @@ def _scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, st
     text = _analysis_text(analysis)
     activity = str(analysis.get("activity") or analysis.get("raw_activity") or "")
     posture_status = str(analysis.get("posture_status") or "").strip()
+    has_person = analysis.get("has_person")
+    toys_scattered = bool(analysis.get("toys_scattered"))
+    toys_visible = bool(analysis.get("toys_visible"))
+    playing_toys = activity == "玩玩具" or PLAYING_TOYS_RE.search(text)
 
     posture_signal = ""
     if posture_status in POSTURE_RISK_VALUES:
         posture_signal = posture_status
     elif bool(analysis.get("bad_posture")):
         posture_signal = "bad_posture"
-    elif POSTURE_RE.search(text):
+    elif has_person is True and POSTURE_RE.search(text):
         posture_signal = "posture_risk"
-    if posture_signal:
+    if has_person is True and posture_signal:
         result.append(("posture", posture_signal, "active", "观察到坐姿需要留意。"))
 
-    if bool(analysis.get("toys_scattered")) and activity != "玩玩具":
-        result.append(("toy_cleanup", "toys_scattered", "active", "观察到玩具还没有收好。"))
+    if TOY_CLEANUP_DONE_RE.search(text):
+        result.append(("toy_cleanup", "cleanup_done", "recovered", "观察到玩具已经收好。"))
     elif TOY_CLEANUP_RE.search(text):
         result.append(("toy_cleanup", "cleanup_started", "active", "观察到孩子正在收纳玩具。"))
+    elif TOY_LEFT_RE.search(text) or (has_person is False and toys_scattered):
+        result.append(("toy_cleanup", "child_left_toys_uncollected", "active", "孩子离开后，玩具还没有收好。"))
+    elif has_person is True and playing_toys:
+        result.append(("toy_cleanup", "toy_playing_observed", "active", "观察到孩子正在玩玩具。"))
+    elif toys_scattered and not playing_toys:
+        result.append(("toy_cleanup", "child_left_toys_uncollected", "active", "观察到玩具还没有收好。"))
 
     if activity == "吃饭" or MEAL_RE.search(text):
         result.append(("meal_start", "meal_started", "active", "观察到孩子进入用餐状态。"))
         if any(word in text for word in ("走动", "离开餐桌", "玩", "分心")):
             result.append(("meal_habit", "meal_attention_shifted", "active", "观察到用餐时注意力离开餐桌。"))
 
-    if not result and bool(analysis.get("toys_visible")) and PLAYING_TOYS_RE.search(text):
-        return []
     return result
 
 
@@ -256,6 +266,11 @@ def _raw_detail(analysis: Mapping[str, object]) -> dict:
         "toys_scattered",
         "confidence",
         "description",
+        "child_message",
+        "decision_reason",
+        "activity_history",
+        "events",
+        "summary",
         "method",
         "activity_stability",
         "vision_cadence",

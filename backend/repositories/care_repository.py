@@ -417,6 +417,25 @@ class CareRepository:
             (family_id, source, source_event_id),
         ).fetchone()
 
+    def latest_camera_observation_for_device(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        device_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT *
+            FROM camera_observation_events
+            WHERE family_id = ? AND device_id = ?
+              AND evidence_type <> 'routine_window'
+            ORDER BY observed_at DESC, created_at DESC
+            LIMIT 1
+            """,
+            (family_id, device_id),
+        ).fetchone()
+
     def create_behavior_signal(
         self,
         conn: DatabaseConnection,

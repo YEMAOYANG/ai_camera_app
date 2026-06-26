@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/features/tasks/application/task_realtime_repository.dart';
+import 'package:warm_sight/src/features/tasks/application/task_realtime_repository.dart';
 
 void main() {
   test('parses camera observation realtime event as lightweight payload', () {

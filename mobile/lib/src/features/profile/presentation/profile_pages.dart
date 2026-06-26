@@ -4,39 +4,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/platform/contact_picker.dart';
-import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
-import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
-import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
-import 'package:guardian_parent_app/src/features/care/application/care_repository.dart';
-import 'package:guardian_parent_app/src/features/care/domain/care_models.dart';
-import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
-import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
-import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
-import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
-import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
-import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
-import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
-import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/setup_flow_screens.dart';
-import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_compact_toggle.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_text_field.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_time_picker_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
-import 'package:guardian_parent_app/src/shared/widgets/guardian_identity_selector.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/platform/contact_picker.dart';
+import 'package:warm_sight/src/core/storage/onboarding_store.dart';
+import 'package:warm_sight/src/core/theme/app_system_ui.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/auth/application/auth_repository.dart';
+import 'package:warm_sight/src/features/auth/application/session_data_invalidation.dart';
+import 'package:warm_sight/src/features/care/application/care_repository.dart';
+import 'package:warm_sight/src/features/care/domain/care_models.dart';
+import 'package:warm_sight/src/features/devices/application/device_repository.dart';
+import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
+import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/points/application/point_repository.dart';
+import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/features/rewards/application/reward_repository.dart';
+import 'package:warm_sight/src/features/rewards/domain/reward_models.dart';
+import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
+import 'package:warm_sight/src/features/setup/presentation/setup_flow_screens.dart';
+import 'package:warm_sight/src/shared/domain/guardian_identity.dart';
+import 'package:warm_sight/src/shared/widgets/app_button.dart';
+import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/app_compact_toggle.dart';
+import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
+import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
+import 'package:warm_sight/src/shared/widgets/app_surface.dart';
+import 'package:warm_sight/src/shared/widgets/app_text_field.dart';
+import 'package:warm_sight/src/shared/widgets/app_time_picker_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/app_toast.dart';
+import 'package:warm_sight/src/shared/widgets/guardian_identity_selector.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 const _brandLogoMarkAsset = 'assets/brand/nuantong-logo-mark.png';
 
@@ -1305,12 +1305,6 @@ class TaskRewardHubPage extends StatelessWidget {
               subtitle: '本周完成节奏和积分',
               path: profileWeeklyReportPath,
             ),
-            _HubRow(
-              icon: Icons.bookmark_outline,
-              title: '成长时刻',
-              subtitle: '家长保存的积极片段',
-              path: profileMomentsPath,
-            ),
           ],
         ),
       ],
@@ -1318,41 +1312,117 @@ class TaskRewardHubPage extends StatelessWidget {
   }
 }
 
-class ReportsHubPage extends StatelessWidget {
-  const ReportsHubPage({super.key});
+class ReportsHubPage extends ConsumerStatefulWidget {
+  const ReportsHubPage({this.initialIndex = 0, super.key});
+
+  final int initialIndex;
+
+  @override
+  ConsumerState<ReportsHubPage> createState() => _ReportsHubPageState();
+}
+
+class _ReportsHubPageState extends ConsumerState<ReportsHubPage> {
+  late int _index = widget.initialIndex.clamp(0, 1).toInt();
 
   @override
   Widget build(BuildContext context) {
-    return const _HubPage(
+    return _Page(
       title: '看护报告',
-      sections: [
-        _HubSection(
-          title: '报告',
-          rows: [
-            _HubRow(
-              icon: Icons.today_outlined,
-              title: '今日报告',
-              subtitle: '今天的任务、积分和待处理',
-              path: profileDailyReportPath,
-              tone: AppListRowTone.green,
-            ),
-            _HubRow(
-              icon: Icons.calendar_month_outlined,
-              title: '周报',
-              subtitle: '本周完成节奏和积分',
-              path: profileWeeklyReportPath,
-              tone: AppListRowTone.blue,
-            ),
-            _HubRow(
-              icon: Icons.bookmark_outline,
-              title: '成长时刻',
-              subtitle: '家长保存的积极片段',
-              path: profileMomentsPath,
-              tone: AppListRowTone.amber,
-            ),
-          ],
+      subtitle: '日报和周报',
+      children: [
+        _ReportSegmentBar(
+          index: _index,
+          onChanged: (value) => setState(() => _index = value),
         ),
+        const SizedBox(height: 12),
+        switch (_index) {
+          0 => _ReportPane(provider: dailyReportProvider),
+          _ => _ReportPane(provider: weeklyReportProvider),
+        },
       ],
+    );
+  }
+}
+
+class _ReportSegmentBar extends StatelessWidget {
+  const _ReportSegmentBar({required this.index, required this.onChanged});
+
+  final int index;
+  final ValueChanged<int> onChanged;
+
+  static const _labels = ['今日报告', '周报'];
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurface(
+      padding: const EdgeInsets.all(5),
+      color: AppColors.surfaceSoft,
+      borderColor: AppColors.borderSoft,
+      radius: AppRadii.full,
+      child: Row(
+        children: [
+          for (var i = 0; i < _labels.length; i++)
+            Expanded(
+              child: _ReportSegmentButton(
+                label: _labels[i],
+                selected: index == i,
+                onTap: () => onChanged(i),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportSegmentButton extends StatelessWidget {
+  const _ReportSegmentButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: AppMotion.duration(context, 160),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.surfaceElevated : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppRadii.full),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppColors.ink.withValues(alpha: 0.06),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: selected ? AppColors.ink : AppColors.muted,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w900,
+            height: 1.1,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -5605,33 +5675,30 @@ const _paywallLegalText = TextStyle(
   letterSpacing: 0,
 );
 
-class DailyReportPage extends ConsumerWidget {
+class DailyReportPage extends StatelessWidget {
   const DailyReportPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      _ReportPage(title: '今日报告', provider: dailyReportProvider);
+  Widget build(BuildContext context) => const ReportsHubPage(initialIndex: 0);
 }
 
-class WeeklyReportPage extends ConsumerWidget {
+class WeeklyReportPage extends StatelessWidget {
   const WeeklyReportPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      _ReportPage(title: '周报', provider: weeklyReportProvider);
+  Widget build(BuildContext context) => const ReportsHubPage(initialIndex: 1);
 }
 
-class _ReportPage extends ConsumerWidget {
-  const _ReportPage({required this.title, required this.provider});
+class _ReportPane extends ConsumerWidget {
+  const _ReportPane({required this.provider});
 
-  final String title;
   final FutureProvider<ReportData> provider;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final report = ref.watch(provider);
-    return _Page(
-      title: title,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: report.when(
         data: _reportSections,
         loading: () => const [_Loading(title: '正在生成报告')],
@@ -6373,48 +6440,11 @@ class _ReportSourcePill extends StatelessWidget {
   }
 }
 
-class GrowthMomentsPage extends ConsumerWidget {
+class GrowthMomentsPage extends StatelessWidget {
   const GrowthMomentsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final moments = ref.watch(growthMomentsProvider);
-    return _Page(
-      title: '成长时刻',
-      children: moments.when(
-        data: (items) => [
-          if (items.isEmpty)
-            const AppStateView(
-              variant: AppStateVariant.noData,
-              title: '还没有成长时刻',
-              message: '家长保存后的积极片段会显示在这里。',
-              compact: true,
-            )
-          else
-            AppSurface(
-              child: Column(
-                children: [
-                  for (final item in items)
-                    AppListRow(
-                      icon: Icons.auto_awesome_outlined,
-                      title: item.title,
-                      subtitle: '已保存',
-                      tone: AppListRowTone.green,
-                    ),
-                ],
-              ),
-            ),
-        ],
-        loading: () => const [_Loading(title: '正在同步成长时刻')],
-        error: (error, _) => [
-          _ErrorState(
-            error: error,
-            onRetry: () => ref.invalidate(growthMomentsProvider),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const ReportsHubPage(initialIndex: 0);
 }
 
 class FeedbackPage extends ConsumerStatefulWidget {
@@ -6792,7 +6822,7 @@ String _hubSubtitle(String title) {
     '设备管理' => '设备状态、网络和声音能力',
     '任务与奖励' => '积分、奖励和成长记录',
     '积分与奖励' => '积分、奖励和兑换记录',
-    '看护报告' => '日报、周报和成长时刻',
+    '看护报告' => '日报和周报',
     'AI 规则与提醒' => '提醒方式、语音提醒和通知节奏',
     _ => '设置',
   };
@@ -7903,7 +7933,7 @@ Future<void> _editMember(
   );
   final result = await showAppBottomSheet<_MemberEditResult>(
     context: context,
-    maxHeightFactor: 0.76,
+    maxHeightFactor: 0.72,
     child: _MemberEditSheet(
       member: member,
       options: identityOptions,
@@ -8200,6 +8230,10 @@ class _MemberEditSheetState extends State<_MemberEditSheet> {
       subtitle: widget.member == null
           ? '填写手机号后发送邀请，对方接受后加入家庭空间。'
           : '调整称呼和权限范围。',
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
+      handleTitleGap: 8,
+      headerBottomGap: 12,
+      titleFontSize: 21,
       footer: AppSheetFooterActions(
         children: [
           AppSheetSecondaryButton(
@@ -8239,32 +8273,176 @@ class _MemberEditSheetState extends State<_MemberEditSheet> {
             keyboardType: TextInputType.phone,
           ),
           const SizedBox(height: 12),
-          _PickerField(
-            label: '权限角色',
-            value: widget.options.roleLabelFor(_role),
-            onTap: _pickRole,
+          _MemberRoleSelector(
+            roles: widget.options.familyRoles,
+            selected: _role,
+            disabledKeys: widget.reservedRoleKeys,
+            onChanged: (role) => setState(() => _role = role),
           ),
         ],
       ),
     );
   }
+}
 
-  Future<void> _pickRole() async {
-    final selected = await showAppPickerSheet<String>(
-      context: context,
-      title: '选择权限角色',
-      selected: _role,
-      options: [
-        for (final role in widget.options.familyRoles)
-          if (!widget.reservedRoleKeys.contains(role.key) || role.key == _role)
-            AppPickerOption(
-              value: role.key,
-              label: role.label,
-              description: role.description,
-            ),
+class _MemberRoleSelector extends StatelessWidget {
+  const _MemberRoleSelector({
+    required this.roles,
+    required this.selected,
+    required this.disabledKeys,
+    required this.onChanged,
+  });
+
+  final List<FamilyRoleOption> roles;
+  final String selected;
+  final Set<String> disabledKeys;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    FamilyRoleOption? selectedRole;
+    for (final role in roles) {
+      if (role.key == selected) {
+        selectedRole = role;
+        break;
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '权限角色',
+          style: TextStyle(
+            color: AppColors.ink,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0,
+            height: 1.1,
+          ),
+        ),
+        const SizedBox(height: 7),
+        AppSurface(
+          padding: const EdgeInsets.all(4),
+          color: AppColors.surfaceStrong.withValues(alpha: 0.62),
+          borderColor: AppColors.borderSoft,
+          radius: AppRadii.full,
+          child: Row(
+            children: [
+              for (final role in roles)
+                Expanded(
+                  child: _MemberRoleButton(
+                    key: ValueKey('memberRoleSegment_${role.key}'),
+                    label: role.label,
+                    selected: role.key == selected,
+                    disabled:
+                        disabledKeys.contains(role.key) && role.key != selected,
+                    onTap: () => onChanged(role.key),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        AnimatedSwitcher(
+          duration: AppMotion.duration(context, 160),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeOutCubic,
+          child: selectedRole == null || selectedRole.description.isEmpty
+              ? const SizedBox(height: 8)
+              : Padding(
+                  key: ValueKey('memberRoleDescription_${selectedRole.key}'),
+                  padding: const EdgeInsets.fromLTRB(2, 7, 2, 0),
+                  child: Text(
+                    selectedRole.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontFamily: AppTypography.systemFont,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.35,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+        ),
       ],
     );
-    if (selected != null && mounted) setState(() => _role = selected);
+  }
+}
+
+class _MemberRoleButton extends StatelessWidget {
+  const _MemberRoleButton({
+    required this.label,
+    required this.selected,
+    required this.disabled,
+    required this.onTap,
+    super.key,
+  });
+
+  final String label;
+  final bool selected;
+  final bool disabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final foreground = disabled
+        ? AppColors.disabledInk
+        : selected
+        ? Colors.white
+        : AppColors.muted;
+    return Semantics(
+      button: true,
+      selected: selected,
+      enabled: !disabled,
+      label: '权限角色，$label',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: disabled ? null : onTap,
+        child: AnimatedContainer(
+          duration: AppMotion.duration(context, 170),
+          curve: Curves.easeOutCubic,
+          height: 34,
+          decoration: BoxDecoration(
+            color: selected ? AppColors.primaryButtonStart : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppRadii.full),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primaryButtonShadow.withValues(
+                        alpha: 0.12,
+                      ),
+                      blurRadius: 7,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Center(
+            child: AnimatedDefaultTextStyle(
+              duration: AppMotion.duration(context, 150),
+              curve: Curves.easeOutCubic,
+              style: TextStyle(
+                color: foreground,
+                fontFamily: AppTypography.systemFont,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0,
+                height: 1,
+              ),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -8454,43 +8632,6 @@ class _ContactEditSheetState extends State<_ContactEditSheet> {
     } on ContactPickerException catch (error) {
       if (mounted) _toast(context, error.message);
     }
-  }
-}
-
-class _PickerField extends StatelessWidget {
-  const _PickerField({
-    required this.label,
-    required this.value,
-    required this.onTap,
-  });
-
-  final String label;
-  final String value;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppSurface(
-      color: AppColors.surfaceSoft,
-      borderColor: AppColors.borderSoft,
-      padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
-      onTap: onTap,
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label, style: _mutedText),
-                const SizedBox(height: 4),
-                Text(value, style: _rowTitle),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right, color: AppColors.muted, size: 18),
-        ],
-      ),
-    );
   }
 }
 

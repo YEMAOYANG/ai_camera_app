@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
 
 void main() {
   test('keeps loopback signaling url when api base is loopback', () {

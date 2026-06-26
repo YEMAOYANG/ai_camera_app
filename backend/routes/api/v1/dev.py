@@ -4,7 +4,13 @@ from flask import Blueprint, current_app, jsonify, request
 
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token, json_body
-from services.service_factory import auth_service, camera_bridge_service, camera_command_service, task_runtime_service
+from services.service_factory import (
+    auth_service,
+    camera_bridge_service,
+    camera_command_service,
+    routine_reminder_service,
+    task_runtime_service,
+)
 from services.task_event_stream import publish_task_runtime_result, task_event_stream_status
 from services.task_scheduler_runner import task_scheduler_status
 
@@ -19,6 +25,23 @@ def scheduler_tick():
         result = task_runtime_service().tick()
         publish_task_runtime_result(result)
         return jsonify(result)
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@dev_bp.post("/care/routine-reminder/tick")
+def routine_reminder_tick():
+    try:
+        _ensure_dev_enabled()
+        data = json_body(request)
+        now_value = data.get("now")
+        now = None
+        if now_value is not None:
+            try:
+                now = int(now_value)
+            except (TypeError, ValueError):
+                raise ApiError("invalid_now", "now 必须是毫秒时间戳。", 400)
+        return jsonify(routine_reminder_service().tick(now=now))
     except ApiError as exc:
         return error_response(exc)
 

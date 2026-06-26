@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
-import 'package:guardian_parent_app/src/features/points/application/point_settings.dart';
-import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
-import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
-import 'package:guardian_parent_app/src/features/rewards/domain/reward_models.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_surface.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/points/application/point_repository.dart';
+import 'package:warm_sight/src/features/points/application/point_settings.dart';
+import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/rewards/application/reward_repository.dart';
+import 'package:warm_sight/src/features/rewards/domain/reward_models.dart';
+import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/app_button.dart';
+import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
+import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
+import 'package:warm_sight/src/shared/widgets/app_surface.dart';
+import 'package:warm_sight/src/shared/widgets/app_toast.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 class RewardDetailScreen extends ConsumerWidget {
   const RewardDetailScreen({required this.itemId, super.key});

@@ -51,6 +51,7 @@ class AppConfig:
     TASK_REMINDER_LEAD_SECONDS: int
     TASK_SCHEDULER_ENABLED: bool
     TASK_SCHEDULER_INTERVAL_SECONDS: int
+    CARE_ROUTINE_REMINDER_ENABLED: bool
     TASK_WEBSOCKET_ENABLED: bool
     TASK_WEBSOCKET_HOST: str
     TASK_WEBSOCKET_PORT: int
@@ -119,6 +120,7 @@ class AppConfig:
                 )
             ),
             TASK_SCHEDULER_INTERVAL_SECONDS=int(_env("TASK_SCHEDULER_INTERVAL_SECONDS", "15")),
+            CARE_ROUTINE_REMINDER_ENABLED=_bool(_env("CARE_ROUTINE_REMINDER_ENABLED", "1")),
             TASK_WEBSOCKET_ENABLED=_bool(
                 _env(
                     "TASK_WEBSOCKET_ENABLED",

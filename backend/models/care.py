@@ -170,7 +170,7 @@ DEFAULT_CAPABILITY_CONFIGS = [
     {
         "scenario": CARE_SCENARIO_POSTURE,
         "minObservationSeconds": 30,
-        "confidenceThreshold": 0.74,
+        "confidenceThreshold": 0.68,
         "cooldownSeconds": 1200,
         "dailyLimit": 4,
         "parentNotifyThreshold": 3,

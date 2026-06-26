@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
+import 'package:warm_sight/src/features/setup/application/setup_repository.dart';
 
 final setupDraftProvider = StateProvider<SetupDraft>((ref) {
   return const SetupDraft();
@@ -24,6 +24,7 @@ SetupDraft setupDraftFromStatus(SetupStatus status) {
     parentName: status.parentDisplayName.isNotEmpty
         ? status.parentDisplayName
         : status.parentRelationship,
+    familyRole: status.parentRole.trim(),
     deviceName: status.deviceName.trim(),
     room: status.deviceLocation.trim(),
     wifiName: status.wifiName.trim(),

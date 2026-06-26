@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart' as reactive;
-import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
-import 'package:guardian_parent_app/src/core/theme/app_theme.dart';
-import 'package:guardian_parent_app/src/features/devices/application/camera_discovery_adapter.dart';
-import 'package:guardian_parent_app/src/features/devices/application/camera_discovery_repository.dart';
-import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
+import 'package:warm_sight/src/core/storage/onboarding_store.dart';
+import 'package:warm_sight/src/core/theme/app_theme.dart';
+import 'package:warm_sight/src/features/devices/application/camera_discovery_adapter.dart';
+import 'package:warm_sight/src/features/devices/application/camera_discovery_repository.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
+import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/app_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -782,7 +782,8 @@ void _expectNoEngineeringCopy() {
     'RTSP',
     'API',
     'deviceId',
-    'Mi' 'ra',
+    'Mi'
+        'ra',
     '\u7c73\u62c9',
   ]) {
     expect(find.textContaining(word), findsNothing, reason: word);

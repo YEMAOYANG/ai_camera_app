@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:guardian_parent_app/src/features/tasks/domain/task_models.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/features/tasks/domain/task_models.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 class CameraHealth {
   const CameraHealth({
@@ -248,6 +248,10 @@ class CameraMonitorStatus {
     this.lastObservationReliable = false,
     this.lastObservationHasPerson,
     this.lastObservationActivity = '',
+    this.lastObservationDescription = '',
+    this.lastObservationDecisionReason = '',
+    this.lastObservationConfidence,
+    this.lastObservationThumbnailUrl = '',
   });
 
   final bool running;
@@ -259,6 +263,10 @@ class CameraMonitorStatus {
   final bool lastObservationReliable;
   final bool? lastObservationHasPerson;
   final String lastObservationActivity;
+  final String lastObservationDescription;
+  final String lastObservationDecisionReason;
+  final double? lastObservationConfidence;
+  final String lastObservationThumbnailUrl;
 
   String get label => running ? '观察中' : '未观察';
 
@@ -291,6 +299,10 @@ class CameraMonitorStatus {
       lastObservationReliable: observation.isReliable,
       lastObservationHasPerson: observation.hasPerson,
       lastObservationActivity: observation.activity,
+      lastObservationDescription: observation.description,
+      lastObservationDecisionReason: observation.decisionReason,
+      lastObservationConfidence: observation.confidence,
+      lastObservationThumbnailUrl: observation.thumbnailUrl,
     );
   }
 }
@@ -303,6 +315,10 @@ class _CameraObservationSnapshot {
     required this.isReliable,
     required this.hasPerson,
     required this.activity,
+    required this.description,
+    required this.decisionReason,
+    required this.thumbnailUrl,
+    this.confidence,
     this.observedAt,
   });
 
@@ -310,6 +326,10 @@ class _CameraObservationSnapshot {
   final bool isReliable;
   final bool? hasPerson;
   final String activity;
+  final String description;
+  final String decisionReason;
+  final String thumbnailUrl;
+  final double? confidence;
   final int? observedAt;
 }
 
@@ -389,6 +409,7 @@ class LiveCareEvent {
     return switch (category) {
       'camera_observation' ||
       'child_presence' ||
+      'care_reminder' ||
       'snapshot' ||
       'camera_status' => true,
       _ => false,
@@ -475,6 +496,9 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
       isReliable: summary.isNotEmpty,
       hasPerson: null,
       activity: '',
+      description: '',
+      decisionReason: '',
+      thumbnailUrl: '',
     );
   }
   final data = _asMap(value);
@@ -484,6 +508,9 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
       isReliable: false,
       hasPerson: null,
       activity: '',
+      description: '',
+      decisionReason: '',
+      thumbnailUrl: '',
     );
   }
   final activity = _normalizeActivityLabel(
@@ -494,6 +521,14 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
   final observedAt = _asNullableInt(
     data['observedAt'] ?? data['observed_at'] ?? data['timestamp'],
   );
+  final description = _asString(data['description']);
+  final decisionReason = _asString(
+    data['decisionReason'] ?? data['decision_reason'],
+  );
+  final thumbnailUrl = _asString(
+    data['thumbnailUrl'] ?? data['thumbnail_url'] ?? data['snapshotUrl'],
+  );
+  final confidence = _asNullableDouble(data['confidence']);
   final isFresh = _isFreshObservation(observedAt);
   final isReliable = data['isReliable'] == true && isFresh;
   if (!isReliable) {
@@ -506,6 +541,10 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
           ? false
           : null,
       activity: activity,
+      description: description,
+      decisionReason: decisionReason,
+      thumbnailUrl: thumbnailUrl,
+      confidence: confidence,
       observedAt: observedAt,
     );
   }
@@ -516,6 +555,10 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
       isReliable: true,
       hasPerson: hasPersonValue == false ? false : hasPerson,
       activity: activity,
+      description: description,
+      decisionReason: decisionReason,
+      thumbnailUrl: thumbnailUrl,
+      confidence: confidence,
       observedAt: observedAt,
     );
   }
@@ -525,6 +568,10 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
       isReliable: true,
       hasPerson: true,
       activity: activity,
+      description: description,
+      decisionReason: decisionReason,
+      thumbnailUrl: thumbnailUrl,
+      confidence: confidence,
       observedAt: observedAt,
     );
   }
@@ -534,15 +581,23 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
       isReliable: true,
       hasPerson: false,
       activity: activity,
+      description: description,
+      decisionReason: decisionReason,
+      thumbnailUrl: thumbnailUrl,
+      confidence: confidence,
       observedAt: observedAt,
     );
   }
   if (hasPersonValue == true) {
     return _CameraObservationSnapshot(
-      summary: '看到孩子在画面里',
+      summary: '画面暂时无法判断',
       isReliable: true,
       hasPerson: true,
       activity: activity,
+      description: description,
+      decisionReason: decisionReason,
+      thumbnailUrl: thumbnailUrl,
+      confidence: confidence,
       observedAt: observedAt,
     );
   }
@@ -551,6 +606,10 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
     isReliable: false,
     hasPerson: null,
     activity: activity,
+    description: description,
+    decisionReason: decisionReason,
+    thumbnailUrl: thumbnailUrl,
+    confidence: confidence,
     observedAt: observedAt,
   );
 }
@@ -601,5 +660,12 @@ int? _asNullableInt(dynamic value) {
   if (value is int) return value;
   if (value is num) return value.toInt();
   if (value is String) return int.tryParse(value);
+  return null;
+}
+
+double? _asNullableDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value);
   return null;
 }

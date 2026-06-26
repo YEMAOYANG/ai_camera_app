@@ -3,27 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/platform/contact_picker.dart';
-import 'package:guardian_parent_app/src/core/platform/native_date_picker.dart';
-import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/auth/application/auth_repository.dart';
-import 'package:guardian_parent_app/src/features/auth/application/session_data_invalidation.dart';
-import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
-import 'package:guardian_parent_app/src/features/profile/domain/profile_models.dart';
-import 'package:guardian_parent_app/src/features/setup/application/setup_draft.dart';
-import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
-import 'package:guardian_parent_app/src/features/setup/application/wifi_network_repository.dart';
-import 'package:guardian_parent_app/src/shared/domain/guardian_identity.dart';
-import 'package:guardian_parent_app/src/shared/widgets/adaptive_select_field.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_bottom_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_button.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_list_row.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_screen.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_time_picker_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_toast.dart';
-import 'package:guardian_parent_app/src/shared/widgets/guardian_identity_card_selector.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/platform/contact_picker.dart';
+import 'package:warm_sight/src/core/platform/native_date_picker.dart';
+import 'package:warm_sight/src/core/theme/app_system_ui.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/auth/application/auth_repository.dart';
+import 'package:warm_sight/src/features/auth/application/session_data_invalidation.dart';
+import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/features/setup/application/setup_draft.dart';
+import 'package:warm_sight/src/features/setup/application/setup_repository.dart';
+import 'package:warm_sight/src/features/setup/application/wifi_network_repository.dart';
+import 'package:warm_sight/src/shared/domain/guardian_identity.dart';
+import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/app_button.dart';
+import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
+import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_time_picker_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/app_toast.dart';
+import 'package:warm_sight/src/shared/widgets/guardian_identity_card_selector.dart';
+import 'package:warm_sight/src/shared/widgets/guardian_identity_selector.dart';
 
 const _setupTotalSteps = 2;
 
@@ -100,6 +100,7 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
       parentIdentityKey.isNotEmpty ? parentIdentityKey : parentIdentity,
     );
     final identityGroupKey = identityGroup?.key ?? options.defaultGroupKey;
+    final familyRoleKey = options.roleKeyFor(draft.familyRole);
 
     return _SetupScreenShell(
       step: 1,
@@ -109,15 +110,10 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AdaptiveSelectField<String>(
+          GuardianIdentityGroupSegmentedControl(
             key: const ValueKey('guardianIdentityGroupSelect'),
-            icon: Icons.family_restroom_outlined,
-            label: '家庭身份',
-            value: identityGroupKey,
-            options: [
-              for (final option in options.identityGroups)
-                AdaptiveSelectOption(value: option.key, label: option.label),
-            ],
+            groups: options.identityGroups,
+            selectedKey: identityGroupKey,
             onChanged: (groupKey) {
               final nextKey = options.defaultKeyForGroupKey(groupKey);
               final nextLabel = options.labelForStoredValue(nextKey);
@@ -142,8 +138,17 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 14),
-          // V1 幼儿园版本暂不开放家庭权限选择，默认创建者由后端家庭成员体系保持管理员；
-          // _FamilyRoleSegmentedControl 和角色模型保留，供后续多角色家庭版本重新启用。
+          _FamilyRoleSegmentedControl(
+            label: '权限角色',
+            options: options.familyRoles,
+            selected: familyRoleKey,
+            onSelect: (role) {
+              ref.read(setupDraftProvider.notifier).state = draft.copyWith(
+                familyRole: role,
+              );
+            },
+          ),
+          const SizedBox(height: 14),
           _JoinFamilyCodeBanner(
             onTap: () => _showJoinFamilyCodeSheet(context, ref),
           ),
@@ -162,6 +167,7 @@ class ParentIdentitySetupScreen extends ConsumerWidget {
                       displayName: parentIdentity,
                       relationship: parentIdentity,
                       relationshipKey: parentIdentityKey,
+                      role: familyRoleKey,
                     ),
               );
               if (saved && context.mounted) {
@@ -440,7 +446,6 @@ class _SetupInlineError extends StatelessWidget {
   }
 }
 
-// ignore: unused_element
 class _FamilyRoleSegmentedControl extends StatelessWidget {
   const _FamilyRoleSegmentedControl({
     required this.label,

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/home/application/home_summary.dart';
-import 'package:guardian_parent_app/src/features/home/domain/home_models.dart';
-import 'package:guardian_parent_app/src/features/home/presentation/widgets/home_shared.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/home/application/home_summary.dart';
+import 'package:warm_sight/src/features/home/domain/home_models.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
+import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 class HomePendingQueue extends StatelessWidget {
   const HomePendingQueue({

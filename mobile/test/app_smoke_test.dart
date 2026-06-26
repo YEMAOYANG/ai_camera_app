@@ -3,22 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/app/app.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
-import 'package:guardian_parent_app/src/core/network/api_client.dart';
-import 'package:guardian_parent_app/src/core/storage/auth_session_store.dart';
-import 'package:guardian_parent_app/src/core/storage/onboarding_store.dart';
-import 'package:guardian_parent_app/src/core/storage/setup_store.dart';
-import 'package:guardian_parent_app/src/features/devices/application/camera_discovery_adapter.dart';
-import 'package:guardian_parent_app/src/features/devices/application/selected_device_controller.dart';
-import 'package:guardian_parent_app/src/features/devices/domain/device_models.dart';
-import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
-import 'package:guardian_parent_app/src/features/live_care/domain/camera_models.dart';
-import 'package:guardian_parent_app/src/features/live_care/presentation/live_care_screen.dart';
-import 'package:guardian_parent_app/src/features/setup/application/setup_repository.dart';
-import 'package:guardian_parent_app/src/features/setup/presentation/add_camera_sheet.dart';
-import 'package:guardian_parent_app/src/shared/widgets/app_state_view.dart';
+import 'package:warm_sight/src/app/app.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/config/app_environment.dart';
+import 'package:warm_sight/src/core/network/api_client.dart';
+import 'package:warm_sight/src/core/storage/auth_session_store.dart';
+import 'package:warm_sight/src/core/storage/onboarding_store.dart';
+import 'package:warm_sight/src/core/storage/setup_store.dart';
+import 'package:warm_sight/src/features/devices/application/camera_discovery_adapter.dart';
+import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
+import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/features/live_care/presentation/live_care_screen.dart';
+import 'package:warm_sight/src/features/setup/application/setup_repository.dart';
+import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _adminCapabilities = [
@@ -159,7 +159,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('登录暖瞳'), findsNothing);
-    expect(find.text('今日节奏'), findsOneWidget);
+    expect(find.text('今日安排'), findsOneWidget);
     expect(find.text('当前没有需要你处理的事'), findsNothing);
     expect(
       tester.getSize(find.byKey(const ValueKey('bottomNavAddAction'))),
@@ -488,6 +488,92 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('摄像头在线'), findsOneWidget);
+    expect(find.text('看护记录'), findsNothing);
+    expect(find.text('快照'), findsNothing);
+    expect(find.text('保存当前'), findsNothing);
+  });
+
+  testWidgets('live care shows care reminder in recent records', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          selectedDeviceProvider.overrideWith((ref) async => _liveCareDevice()),
+          liveCareStatusProvider.overrideWith(
+            (ref) async => _onlineLiveCareStatus(),
+          ),
+          cameraSnapshotProvider.overrideWith(
+            (ref) async => CameraSnapshotFrame.unavailable,
+          ),
+          cameraEventsProvider.overrideWith(
+            (ref) async => const [
+              LiveCareEvent(
+                id: 'evt_care_reminder',
+                source: 'camera_command',
+                eventType: 'speak',
+                title: '已提醒收纳玩具',
+                message: '小爱，玩具玩好了，我们一起把小车送回家吧。',
+                displayTitle: '已提醒收纳玩具',
+                displayMessage: '小爱，玩具玩好了，我们一起把小车送回家吧。',
+                category: 'care_reminder',
+                severity: 'info',
+                taskTitle: '',
+                evidenceSummary: '',
+                hasReplay: false,
+                status: 'succeeded',
+                toneKey: 'info',
+                createdAt: 1,
+              ),
+            ],
+          ),
+        ],
+        child: const MaterialApp(home: LiveCareScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -360));
+    await tester.pumpAndSettle();
+
+    expect(find.text('最近记录'), findsOneWidget);
+    expect(find.textContaining('已提醒收纳玩具'), findsOneWidget);
+  });
+
+  testWidgets('live care records do not show confidence copy', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          cameraEventsProvider.overrideWith(
+            (ref) async => const [
+              LiveCareEvent(
+                id: 'evt_observation',
+                source: 'camera_command',
+                eventType: 'camera_observation',
+                title: '孩子正在玩手机',
+                message: '孩子正在玩手机',
+                displayTitle: '孩子正在玩手机',
+                displayMessage: '桌面上有纸张和电脑显示器。',
+                category: 'camera_observation',
+                severity: 'info',
+                taskTitle: '',
+                evidenceSummary: '看到孩子 · 可信度 85%',
+                hasReplay: false,
+                status: 'succeeded',
+                toneKey: 'info',
+                createdAt: 1,
+              ),
+            ],
+          ),
+        ],
+        child: const MaterialApp(home: LiveEventsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('孩子正在玩手机'), findsOneWidget);
+    expect(find.textContaining('可信度'), findsNothing);
   });
 
   testWidgets('login after logout refreshes profile for the new account', (
@@ -545,7 +631,10 @@ void main() {
     expect(find.text('确认家长身份'), findsOneWidget);
     expect(find.text('1 / 2'), findsOneWidget);
     expect(find.text('3 / 2'), findsNothing);
-    expect(find.byKey(const ValueKey('familyRoleSegment_admin')), findsNothing);
+    expect(
+      find.byKey(const ValueKey('familyRoleSegment_admin')),
+      findsOneWidget,
+    );
     await tester.tap(find.text('继续填写孩子资料'));
     await tester.pumpAndSettle();
 
@@ -586,7 +675,7 @@ void main() {
     expect(_lastSetupChildBody?['grade'], '中班');
     expect(find.text('连接第一台看护摄像头'), findsNothing);
     expect(find.text('摄像头还没连接'), findsOneWidget);
-    expect(find.text('今日节奏'), findsOneWidget);
+    expect(find.text('今日安排'), findsOneWidget);
     expect(find.text('\u7c73\u62c9怎么说'), findsNothing);
     expect(find.textContaining('bindingCode'), findsNothing);
     expect(find.textContaining('mock'), findsNothing);
@@ -683,7 +772,7 @@ void main() {
 
     await _loginSuccessfully(tester);
 
-    expect(find.text('今日节奏'), findsOneWidget);
+    expect(find.text('今日安排'), findsOneWidget);
     expect(find.text('当前没有需要你处理的事'), findsNothing);
 
     await tester.tap(find.text('任务').last);
@@ -936,7 +1025,8 @@ void main() {
       tester,
       '看护报告',
       expectedTitle: '看护报告',
-      expectedTexts: const ['今日报告', '周报', '成长时刻'],
+      expectedTexts: const ['今日报告', '周报'],
+      absentTexts: const ['成长时刻'],
     );
     await _openProfileEntry(
       tester,
@@ -1551,6 +1641,7 @@ SetupStatus _setupStatusForRoute({
     parentDisplayName: '',
     parentRelationship: '',
     parentRelationshipKey: '',
+    parentRole: '',
     deviceName: '',
     deviceLocation: '',
     wifiName: '',
@@ -2668,32 +2759,41 @@ class _FakeApiServer {
   }
 
   Map<String, dynamic> _dailyReport() {
+    final taskCompleted = _tasks
+        .where((task) => task['status'] == 'confirmed')
+        .length;
+    final pendingItems = _tasks
+        .where((task) => task['status'] == 'awaiting_parent_confirmation')
+        .length;
     return {
       'date': _today,
       'title': '今日报告',
-      'summary': '今天还有需要家长处理的记录。',
+      'summary': _tasks.isEmpty ? '' : '今天还有需要家长处理的记录。',
       'taskTotal': _tasks.length,
-      'taskCompleted': _tasks
-          .where((task) => task['status'] == 'confirmed')
-          .length,
-      'pendingItems': _tasks
-          .where((task) => task['status'] == 'awaiting_parent_confirmation')
-          .length,
-      'pointsEarned': 1,
-      'suggestion': '先确认需要处理的记录，再决定是否写入成长记录。',
+      'taskCompleted': taskCompleted,
+      'pendingItems': pendingItems,
+      'pointsEarned': taskCompleted,
+      'suggestion': _tasks.isEmpty ? '' : '先确认需要处理的记录，再决定是否写入成长记录。',
     };
   }
 
   Map<String, dynamic> _weeklyReport() {
+    final taskCompleted = _tasks
+        .where((task) => task['status'] == 'confirmed')
+        .length;
     return {
       'startDate': _today,
       'endDate': _today,
       'title': '周报',
       'taskTotal': _tasks.length,
-      'taskCompleted': 1,
-      'completionRate': 0.5,
-      'pointsEarned': 1,
-      'summary': '本周完成 1 / ${_tasks.length} 项任务。',
+      'taskCompleted': taskCompleted,
+      'completionRate': _tasks.isEmpty
+          ? 0
+          : ((taskCompleted / _tasks.length) * 100).round(),
+      'pointsEarned': taskCompleted,
+      'summary': _tasks.isEmpty
+          ? ''
+          : '本周完成 $taskCompleted / ${_tasks.length} 项任务。',
     };
   }
 

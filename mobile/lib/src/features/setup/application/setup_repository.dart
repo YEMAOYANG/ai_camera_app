@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/network/api_client.dart';
-import 'package:guardian_parent_app/src/core/storage/setup_store.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/network/api_client.dart';
+import 'package:warm_sight/src/core/storage/setup_store.dart';
 
 final setupRepositoryProvider = Provider<SetupRepository>((ref) {
   return SetupRepository(
@@ -33,6 +33,7 @@ class SetupStatus {
     required this.parentDisplayName,
     required this.parentRelationship,
     required this.parentRelationshipKey,
+    required this.parentRole,
     required this.deviceName,
     required this.deviceLocation,
     required this.wifiName,
@@ -58,6 +59,7 @@ class SetupStatus {
   final String parentDisplayName;
   final String parentRelationship;
   final String parentRelationshipKey;
+  final String parentRole;
   final String deviceName;
   final String deviceLocation;
   final String wifiName;
@@ -100,6 +102,7 @@ class SetupStatus {
       parentDisplayName: _asString(parent['displayName']),
       parentRelationship: _asString(parent['relationship']),
       parentRelationshipKey: _asString(parent['relationshipKey']),
+      parentRole: _asString(parent['role']),
       deviceName: _asString(device['name']),
       deviceLocation: _asString(device['location']),
       wifiName: _asString(wifi['ssid']),
@@ -156,11 +159,13 @@ class SetupRepository {
     required String displayName,
     required String relationship,
     required String relationshipKey,
+    required String role,
   }) {
     return _postStep('/setup/parent-identity', {
       'displayName': displayName,
       'relationship': relationship,
       'relationshipKey': relationshipKey,
+      'role': role,
     });
   }
 

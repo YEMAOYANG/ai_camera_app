@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:guardian_parent_app/src/bootstrap.dart';
-import 'package:guardian_parent_app/src/core/config/app_environment.dart';
+import 'package:warm_sight/src/bootstrap.dart';
+import 'package:warm_sight/src/core/config/app_environment.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

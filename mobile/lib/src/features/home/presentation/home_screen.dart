@@ -5,20 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:guardian_parent_app/src/app/router/app_route.dart';
-import 'package:guardian_parent_app/src/core/theme/app_system_ui.dart';
-import 'package:guardian_parent_app/src/core/theme/app_tokens.dart';
-import 'package:guardian_parent_app/src/features/devices/application/device_repository.dart';
-import 'package:guardian_parent_app/src/features/home/application/home_summary.dart';
-import 'package:guardian_parent_app/src/features/home/presentation/widgets/home_ai_companion_card.dart';
-import 'package:guardian_parent_app/src/features/home/presentation/widgets/home_habit_hero.dart';
-import 'package:guardian_parent_app/src/features/home/presentation/widgets/home_pending_queue.dart';
-import 'package:guardian_parent_app/src/features/home/presentation/widgets/home_primary_cta.dart';
-import 'package:guardian_parent_app/src/features/home/presentation/widgets/home_rhythm_rail.dart';
-import 'package:guardian_parent_app/src/features/live_care/application/camera_repository.dart';
-import 'package:guardian_parent_app/src/features/profile/application/profile_repository.dart';
-import 'package:guardian_parent_app/src/features/rewards/application/reward_repository.dart';
-import 'package:guardian_parent_app/src/features/tasks/application/task_repository.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/theme/app_system_ui.dart';
+import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/devices/application/device_repository.dart';
+import 'package:warm_sight/src/features/home/application/home_summary.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_ai_companion_card.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_habit_hero.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_pending_queue.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_primary_cta.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_rhythm_rail.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
+import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
+import 'package:warm_sight/src/features/rewards/application/reward_repository.dart';
+import 'package:warm_sight/src/features/tasks/application/task_repository.dart';
+import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 const _homePanelSurface = AppColors.surfaceElevated;
 const _homeScaffoldBackground = AppColors.surfaceElevated;
@@ -153,6 +156,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     final input = _buildInput();
     final summary = buildHomeSummary(input);
+    final dailyReport = ref.watch(dailyReportProvider);
+    final weeklyReport = ref.watch(weeklyReportProvider);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -243,6 +248,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     hasNoDevice: summary.hasNoDevice,
                                   ),
                                   const SizedBox(height: 14),
+                                  _HomeReportSummaryCard(
+                                    daily: dailyReport,
+                                    weekly: weeklyReport,
+                                    onOpen: () =>
+                                        context.go(profileReportsHubPath),
+                                  ),
+                                  const SizedBox(height: 14),
                                   HomePendingQueue(
                                     items: summary.pendingItems,
                                     hasNoDevice: summary.hasNoDevice,
@@ -303,4 +315,236 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (size.height > 880) return AppHomeHero.panelOverlap + 78;
     return AppHomeHero.panelOverlap + 58;
   }
+}
+
+class _HomeReportSummaryCard extends StatelessWidget {
+  const _HomeReportSummaryCard({
+    required this.daily,
+    required this.weekly,
+    required this.onOpen,
+  });
+
+  final AsyncValue<ReportData> daily;
+  final AsyncValue<ReportData> weekly;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final data = _resolveHomeReport(daily: daily, weekly: weekly);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        HomeSectionTitle(
+          title: '看护报告',
+          subtitle: data.subtitle,
+          actionLabel: '查看',
+          onAction: onOpen,
+        ),
+        const SizedBox(height: 10),
+        HomePressable(
+          onTap: onOpen,
+          child: Semantics(
+            button: true,
+            label: data.title,
+            child: HomeSoftPanel(
+              tone: data.tone,
+              padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  HomeToneIcon(icon: data.icon, tone: data.tone),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.ink,
+                            fontFamily: AppTypography.systemFont,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            height: 1.18,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          data.detail,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.muted,
+                            fontFamily: AppTypography.systemFont,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            height: 1.35,
+                          ),
+                        ),
+                        if (data.metrics.isNotEmpty) ...[
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              for (final metric in data.metrics)
+                                _HomeReportMetric(label: metric),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColors.subtle,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HomeReportMetric extends StatelessWidget {
+  const _HomeReportMetric({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(AppRadii.full),
+        border: Border.all(color: AppColors.borderSoft),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.ink,
+            fontFamily: AppTypography.systemFont,
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            height: 1.1,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeReportCopy {
+  const _HomeReportCopy({
+    required this.title,
+    required this.subtitle,
+    required this.detail,
+    required this.icon,
+    required this.tone,
+    this.metrics = const [],
+  });
+
+  final String title;
+  final String subtitle;
+  final String detail;
+  final IconData icon;
+  final StatusTone tone;
+  final List<String> metrics;
+}
+
+_HomeReportCopy _resolveHomeReport({
+  required AsyncValue<ReportData> daily,
+  required AsyncValue<ReportData> weekly,
+}) {
+  final dailyData = daily.asData?.value;
+  if (dailyData != null && _hasReportContent(dailyData)) {
+    return _reportCopy(
+      title: '今日报告',
+      subtitle: '今天的安排和看护记录',
+      data: dailyData,
+      icon: Icons.today_outlined,
+      tone: StatusTone.success,
+    );
+  }
+  final weeklyData = weekly.asData?.value;
+  if (weeklyData != null && _hasReportContent(weeklyData)) {
+    return _reportCopy(
+      title: '本周报告',
+      subtitle: '今天还少，先看本周变化',
+      data: weeklyData,
+      icon: Icons.calendar_month_outlined,
+      tone: StatusTone.neutral,
+    );
+  }
+  if (daily.isLoading || weekly.isLoading) {
+    return const _HomeReportCopy(
+      title: '正在整理报告',
+      subtitle: '今天优先，没有就看本周',
+      detail: '稍等一下，正在整理安排和看护记录。',
+      icon: Icons.auto_graph_outlined,
+      tone: StatusTone.neutral,
+    );
+  }
+  if (daily.hasError && weekly.hasError) {
+    return const _HomeReportCopy(
+      title: '报告暂时没取到',
+      subtitle: '今天优先，没有就看本周',
+      detail: '稍后可以再查看。',
+      icon: Icons.auto_graph_outlined,
+      tone: StatusTone.warning,
+    );
+  }
+  return const _HomeReportCopy(
+    title: '还没有可整理的报告',
+    subtitle: '今天优先，没有就看本周',
+    detail: '完成安排或产生看护记录后，这里会整理今天和本周情况。',
+    icon: Icons.auto_graph_outlined,
+    tone: StatusTone.neutral,
+  );
+}
+
+_HomeReportCopy _reportCopy({
+  required String title,
+  required String subtitle,
+  required ReportData data,
+  required IconData icon,
+  required StatusTone tone,
+}) {
+  final detail = [data.headline, data.body, data.summary]
+      .map((item) => item.trim())
+      .firstWhere((item) => item.isNotEmpty, orElse: () => '看看最近安排、积分和看护记录。');
+  return _HomeReportCopy(
+    title: title,
+    subtitle: subtitle,
+    detail: detail,
+    icon: icon,
+    tone: tone,
+    metrics: [
+      if (data.taskTotal > 0) '完成 ${data.taskCompleted}/${data.taskTotal}',
+      if (data.pointsEarned > 0) '+${data.pointsEarned} 分',
+      if (data.pendingItems > 0) '${data.pendingItems} 项待处理',
+    ],
+  );
+}
+
+bool _hasReportContent(ReportData data) {
+  return data.taskTotal > 0 ||
+      data.taskCompleted > 0 ||
+      data.pointsEarned > 0 ||
+      data.pendingItems > 0 ||
+      data.skills.isNotEmpty ||
+      data.highlights.isNotEmpty ||
+      data.improvements.isNotEmpty ||
+      data.observations.isNotEmpty ||
+      data.tasks.isNotEmpty ||
+      data.nextActions.isNotEmpty;
 }

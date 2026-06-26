@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guardian_parent_app/src/core/network/api_client.dart';
-import 'package:guardian_parent_app/src/features/points/application/point_repository.dart';
+import 'package:warm_sight/src/core/network/api_client.dart';
+import 'package:warm_sight/src/features/points/application/point_repository.dart';
 
 final pointRewardSettingsRepositoryProvider =
     Provider<PointRewardSettingsRepository>((ref) {
