@@ -9,6 +9,7 @@ from core.errors import ApiError, error_response
 from repositories.care_repository import CareRepository
 from schemas.auth import bearer_token, json_body
 from services.camera_bridge_service import CameraBridgeError
+from services.parent_facing_copy import build_child_vision_context
 from services.service_factory import (
     auth_service,
     camera_command_service,
@@ -224,7 +225,14 @@ def monitor_status():
 def monitor_refresh():
     try:
         access_token, context, resolved = _resolve_camera_runtime_for_request()
-        payload = resolved.bridge.refresh_monitor_observation()
+        try:
+            child = profile_service().current_child(access_token).get("child") or {}
+        except Exception:
+            child = {}
+        vision_context = build_child_vision_context(child)
+        payload = resolved.bridge.refresh_monitor_observation(
+            vision_context=vision_context,
+        )
         response = _monitor_response(payload)
         observation = response["monitor"].get("lastObservation")
         event_ids = _record_monitor_observation_event(
@@ -234,6 +242,15 @@ def monitor_refresh():
             observation=observation,
         )
         is_reliable = bool(observation.get("isReliable")) if isinstance(observation, dict) else False
+        realtime_event = None
+        if event_ids and isinstance(observation, dict):
+            from services.camera_command_service import lightweight_camera_event_from_observation
+
+            realtime_event = lightweight_camera_event_from_observation(
+                event_id=event_ids[0],
+                device_id=resolved.device_id or "",
+                observation=observation,
+            )
         publish_family_event(
             family_id=context["family"]["id"],
             event_type=CAMERA_MONITOR_REFRESHED,
@@ -249,6 +266,7 @@ def monitor_refresh():
             event_ids=event_ids,
             is_reliable=is_reliable,
             source="camera_monitor",
+            event=realtime_event,
         )
         return jsonify(response)
     except ApiError as exc:
@@ -311,6 +329,8 @@ def _normalize_monitor_observation(value: object) -> dict | None:
     )
     summary = _summary_text(value, activity=activity, has_person_value=has_person_value)
     is_reliable = has_person_value in {True, False} and confidence >= 0.65
+    if has_person_value is False:
+        activity = ""
     has_activity = bool(activity)
     if not is_reliable:
         summary = ""
@@ -413,6 +433,8 @@ def _record_monitor_observation_event(
 ) -> list[str]:
     if not isinstance(observation, dict) or not device_id:
         return []
+    if not observation.get("isReliable"):
+        return []
     try:
         child = profile_service().current_child(access_token).get("child") or {}
     except Exception:
@@ -423,6 +445,8 @@ def _record_monitor_observation_event(
         device_id=device_id,
         observation=observation,
     )
+    if not event:
+        return []
     event_id = str(event.get("id") or "").strip()
     return [event_id] if event_id else []
 

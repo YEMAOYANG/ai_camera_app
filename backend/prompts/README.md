@@ -21,6 +21,7 @@ Current task prompts:
 Camera care prompts are separate from task prompts:
 
 - `reminder.*:v1` generates JSON-only camera care reminder text.
-- `vision.*:v1` reserves structured scene and behavior summary prompts for future camera observation adapters.
+- `vision.scene_observation:v1` — **active** Kimi K2.6 scene JSON contract for Guardian vision analysis.
+- `vision.behavior_summary:v1` — reserved for future summaries.
 
 Reminder prompts must return JSON with `text`, `tone`, `scenario`, and `safety`.

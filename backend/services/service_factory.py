@@ -6,7 +6,10 @@ from core.errors import ApiError
 from integrations.hardware.disabled_adapter import DisabledHardwareDeviceAdapter
 from integrations.hardware.mock_adapter import MockHardwareDeviceAdapter
 from services.auth_service import AuthService
+from integrations.ai.kimi_vision_provider import OpenAICompatibleVisionProvider
+from integrations.ai.unavailable_vision_provider import UnavailableVisionProvider
 from services.ai_text_provider import OpenAICompatibleTextProvider, UnavailableAiTextProvider
+from services.vision_observation_service import VisionObservationService
 from services.camera_bridge_service import CameraBridgeService
 from services.camera_ai_observation_service import CameraAiObservationService
 from services.camera_command_service import CameraCommandService
@@ -106,6 +109,7 @@ def device_runtime_resolver() -> DeviceRuntimeResolver:
         camera_backend_url=current_app.config.get("CAMERA_BACKEND_URL"),
         dev_adapters_enabled=bool(current_app.config.get("DEV_ADAPTERS_ENABLED")),
         app_env=str(current_app.config.get("APP_ENV", "production")),
+        vision_service_factory=lambda: build_vision_observation_service_from_config(current_app.config),
     )
 
 
@@ -198,6 +202,48 @@ def ai_text_provider():
             disable_thinking=provider in {"moonshot", "kimi"},
         )
     return UnavailableAiTextProvider()
+
+
+def ai_vision_provider():
+    return build_ai_vision_provider_from_config(current_app.config)
+
+
+def vision_observation_service() -> VisionObservationService:
+    return build_vision_observation_service_from_config(current_app.config)
+
+
+def build_ai_vision_provider_from_config(config: dict):
+    if not bool(config.get("AI_VISION_ENABLED", True)):
+        return UnavailableVisionProvider()
+    provider = str(config.get("AI_PROVIDER", "")).strip().lower()
+    api_key = str(config.get("AI_API_KEY", "")).strip()
+    model = str(config.get("AI_VISION_MODEL") or config.get("AI_MODEL") or "").strip()
+    base_url = str(config.get("AI_BASE_URL", "")).strip()
+    timeout = float(config.get("AI_VISION_TIMEOUT_SECONDS", 20))
+    max_bytes = int(config.get("AI_VISION_MAX_BYTES", 524288))
+    if provider in {"moonshot", "kimi", "openai", "openai_compatible"} and api_key and base_url and model:
+        return OpenAICompatibleVisionProvider(
+            provider_name="moonshot" if provider == "kimi" else provider,
+            api_key=api_key,
+            base_url=base_url,
+            model_name=model,
+            timeout_seconds=timeout,
+            max_bytes=max_bytes,
+            disable_thinking=provider in {"moonshot", "kimi"},
+        )
+    return UnavailableVisionProvider()
+
+
+def build_vision_observation_service_from_config(config: dict) -> VisionObservationService:
+    prompt_root = str(config.get("PROMPT_ROOT") or "")
+    return VisionObservationService(
+        vision_provider=build_ai_vision_provider_from_config(config),
+        prompt_registry=PromptRegistry(prompt_root),
+        enabled=bool(config.get("AI_VISION_ENABLED", True)),
+        min_interval_seconds=float(config.get("AI_VISION_MIN_INTERVAL_SECONDS", 60)),
+        max_calls_per_hour=int(config.get("AI_VISION_MAX_CALLS_PER_HOUR", 20)),
+        backoff_seconds=float(config.get("AI_VISION_BACKOFF_SECONDS", 300)),
+    )
 
 
 def hardware_adapter():

@@ -77,7 +77,7 @@ class CameraEventsController extends AsyncNotifier<List<LiveCareEvent>> {
   }
 
   void handleRealtimeEvent(TaskRealtimeEvent event) {
-    if (event.isCameraEventCreated && event.event != null) {
+    if (event.event != null) {
       final item = LiveCareEvent.fromJson(event.event!);
       if (!item.isCareRecord) return;
       final current = state.asData?.value ?? const <LiveCareEvent>[];
@@ -85,7 +85,9 @@ class CameraEventsController extends AsyncNotifier<List<LiveCareEvent>> {
       state = AsyncData([item, ...current]);
       return;
     }
-    unawaited(refresh());
+    if (event.isCameraObservationUpdated || event.isCameraEventCreated) {
+      unawaited(refresh());
+    }
   }
 
   Future<List<LiveCareEvent>> _fetch() {

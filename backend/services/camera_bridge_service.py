@@ -136,11 +136,15 @@ class CameraBridgeService:
                 },
             }
 
-    def refresh_monitor_observation(self) -> dict:
+    def refresh_monitor_observation(self, *, vision_context: dict | None = None) -> dict:
         try:
             if not hasattr(self.adapter, "refresh_monitor_observation"):
                 return self.monitor_status()
-            payload = self.adapter.refresh_monitor_observation()
+            refresh = self.adapter.refresh_monitor_observation
+            if vision_context is not None:
+                payload = refresh(vision_context=vision_context)
+            else:
+                payload = refresh()
             return {
                 "ok": True,
                 "monitorRuntime": {

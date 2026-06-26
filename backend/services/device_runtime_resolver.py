@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from core.database import Database, DatabaseRow
 from core.errors import ApiError
@@ -37,6 +37,7 @@ class DeviceRuntimeResolver:
         camera_backend_url: str | None = None,
         dev_adapters_enabled: bool = False,
         app_env: str = "production",
+        vision_service_factory: Callable[[], Any] | None = None,
     ):
         self.repository = DeviceRepository(Database(database_url))
         self.provider = str(provider or "disabled").strip().lower()
@@ -45,6 +46,7 @@ class DeviceRuntimeResolver:
         self.camera_backend_url = str(camera_backend_url or "").strip()
         self.dev_adapters_enabled = bool(dev_adapters_enabled)
         self.app_env = str(app_env or "production").strip().lower()
+        self.vision_service_factory = vision_service_factory
 
     def global_bridge(self) -> CameraBridgeService:
         return self._bridge_for_provider(self._global_provider())
@@ -167,10 +169,17 @@ class DeviceRuntimeResolver:
                     "开发摄像头桥接已启用，但 AI_CAMERA_TEST_BASE_URL 未配置。",
                     503,
                 )
-            return CameraBridgeService(adapter=AiCameraTestRuntimeAdapter(base_url))
+            return CameraBridgeService(
+                adapter=AiCameraTestRuntimeAdapter(
+                    base_url,
+                    vision_service=self._vision_service(),
+                )
+            )
         if adapter_name == "mock":
             self._require_dev_adapter("CAMERA_RUNTIME_PROVIDER=mock")
-            return CameraBridgeService(adapter=MockCameraRuntimeAdapter())
+            return CameraBridgeService(
+                adapter=MockCameraRuntimeAdapter(vision_service=self._vision_service()),
+            )
         if adapter_name == "disabled":
             return CameraBridgeService(adapter=DisabledCameraRuntimeAdapter())
         if adapter_name in {"future_hardware", "self_owned_camera"}:
@@ -197,3 +206,11 @@ class DeviceRuntimeResolver:
             "mock",
             "ai_camera_test",
         }
+
+    def _vision_service(self):
+        if self.vision_service_factory is None:
+            return None
+        try:
+            return self.vision_service_factory()
+        except Exception:
+            return None

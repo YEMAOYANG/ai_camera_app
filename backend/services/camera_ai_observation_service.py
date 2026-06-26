@@ -284,6 +284,21 @@ class CameraAiObservationService:
                 event=event,
                 data=data,
             )
+        realtime_event = None
+        if care_event and device_id:
+            command_id = str(care_event.get("id") or care_event.get("commandId") or "").strip()
+            if command_id:
+                from services.camera_command_service import lightweight_camera_event_from_observation
+
+                realtime_event = lightweight_camera_event_from_observation(
+                    event_id=command_id,
+                    device_id=device_id,
+                    observation=_camera_event_observation(
+                        event=event,
+                        data=data,
+                        observation_score=observation_score,
+                    ),
+                )
         publish_family_event(
             family_id=family_id,
             event_type=CAMERA_OBSERVATION_UPDATED,
@@ -291,6 +306,7 @@ class CameraAiObservationService:
             observation_id=event["id"],
             is_reliable=observation_score >= 0.65,
             source="camera_observation",
+            event=realtime_event,
         )
         publish_family_event(
             family_id=family_id,
@@ -322,7 +338,7 @@ class CameraAiObservationService:
         data: dict,
         observation_score: float,
     ) -> dict | None:
-        if not device_id:
+        if not device_id or observation_score < 0.65:
             return None
         try:
             from services.service_factory import camera_command_service

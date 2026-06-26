@@ -65,6 +65,13 @@ class AppConfig:
     AI_API_KEY: str
     AI_BASE_URL: str
     AI_TIMEOUT_SECONDS: float
+    AI_VISION_ENABLED: bool
+    AI_VISION_MODEL: str
+    AI_VISION_TIMEOUT_SECONDS: float
+    AI_VISION_MAX_BYTES: int
+    AI_VISION_MIN_INTERVAL_SECONDS: float
+    AI_VISION_MAX_CALLS_PER_HOUR: int
+    AI_VISION_BACKOFF_SECONDS: float
     AI_EVAL_ENABLED: bool
     INTERNAL_API_TOKEN: str
     INTERNAL_ALLOWED_SOURCES: list[str]
@@ -141,6 +148,16 @@ class AppConfig:
             AI_API_KEY=_env("APP_AI_API_KEY", _default_ai_api_key(ai_provider)).strip(),
             AI_BASE_URL=_env("APP_AI_BASE_URL", _default_ai_base_url(ai_provider)).strip(),
             AI_TIMEOUT_SECONDS=float(_env("APP_AI_TIMEOUT_SECONDS", "8")),
+            AI_VISION_ENABLED=_bool(_env("APP_AI_VISION_ENABLED", "1")),
+            AI_VISION_MODEL=_env(
+                "APP_AI_VISION_MODEL",
+                _env("KIMI_VISION_MODEL", ai_model),
+            ).strip(),
+            AI_VISION_TIMEOUT_SECONDS=float(_env("APP_AI_VISION_TIMEOUT_SECONDS", "20")),
+            AI_VISION_MAX_BYTES=int(_env("APP_AI_VISION_MAX_BYTES", "524288")),
+            AI_VISION_MIN_INTERVAL_SECONDS=float(_env("APP_AI_VISION_MIN_INTERVAL_SECONDS", "60")),
+            AI_VISION_MAX_CALLS_PER_HOUR=int(_env("APP_AI_VISION_MAX_CALLS_PER_HOUR", "20")),
+            AI_VISION_BACKOFF_SECONDS=float(_env("APP_AI_VISION_BACKOFF_SECONDS", "300")),
             AI_EVAL_ENABLED=_bool(_env("APP_AI_EVAL_ENABLED", "0")),
             INTERNAL_API_TOKEN=_env("INTERNAL_API_TOKEN", _env("APP_INTERNAL_API_TOKEN", "")).strip(),
             INTERNAL_ALLOWED_SOURCES=_csv(_env("INTERNAL_ALLOWED_SOURCES", _env("APP_INTERNAL_ALLOWED_SOURCES", ""))),

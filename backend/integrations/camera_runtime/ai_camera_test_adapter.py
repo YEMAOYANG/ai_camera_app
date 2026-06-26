@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import base64
 import json
 import time
 import urllib.parse
@@ -10,13 +9,16 @@ import urllib.request
 import websockets
 
 from integrations.camera_runtime.base import CameraRuntimeAdapter, CameraSnapshot
+from schemas.vision import insufficient_observation
 
 
 class AiCameraTestRuntimeAdapter(CameraRuntimeAdapter):
     adapter_name = "ai_camera_test_bridge"
+    _STALE_OBSERVATION_MS = 90_000
 
-    def __init__(self, base_url: str):
+    def __init__(self, base_url: str, *, vision_service=None):
         self.base_url = base_url.rstrip("/")
+        self.vision_service = vision_service
 
     def health(self) -> dict:
         return self._fetch_json("/api/health")
@@ -96,15 +98,9 @@ class AiCameraTestRuntimeAdapter(CameraRuntimeAdapter):
     def monitor_status(self) -> dict:
         return self._fetch_json("/api/monitor/runtime")
 
-    def refresh_monitor_observation(self) -> dict:
+    def refresh_monitor_observation(self, *, vision_context: dict | None = None) -> dict:
         snapshot = self.snapshot()
-        image = base64.b64encode(snapshot.body).decode("ascii")
-        content_type = snapshot.content_type or "image/jpeg"
-        analysis = self._post_json(
-            "/api/analyze_frame",
-            {"image": f"data:{content_type};base64,{image}"},
-            timeout=15.0,
-        )
+        analysis = self._analyze_snapshot(snapshot, vision_context=vision_context)
         observed_at = int(time.time() * 1000)
         if isinstance(analysis, dict):
             analysis.setdefault("observed_at", observed_at)
@@ -119,6 +115,21 @@ class AiCameraTestRuntimeAdapter(CameraRuntimeAdapter):
             },
         }
 
+    def _analyze_snapshot(
+        self,
+        snapshot: CameraSnapshot,
+        *,
+        vision_context: dict | None = None,
+    ) -> dict:
+        if self.vision_service is None:
+            return insufficient_observation(reason="vision_not_configured")
+        return self.vision_service.analyze_snapshot(
+            image_bytes=snapshot.body,
+            content_type=snapshot.content_type or "image/jpeg",
+            device_key=self.base_url,
+            context=vision_context,
+        )
+
     def task_observation(self, task: dict) -> dict:
         payload = self.monitor_status()
         runtime = payload.get("monitor_runtime") if isinstance(payload, dict) else {}
@@ -129,9 +140,24 @@ class AiCameraTestRuntimeAdapter(CameraRuntimeAdapter):
             snapshot = runtime.get("snapshot")
             if isinstance(snapshot, dict):
                 observation = snapshot.get("last_observation")
+        if not isinstance(observation, dict) or self._observation_is_stale(observation):
+            try:
+                observation = self._analyze_snapshot(self.snapshot())
+            except Exception:
+                if not isinstance(observation, dict):
+                    return {"verdict": "insufficient", "reason": "no_recent_observation", "evidence": {}}
         if not isinstance(observation, dict):
             return {"verdict": "insufficient", "reason": "no_recent_observation", "evidence": {}}
         return self._decide_task_observation(task, observation)
+
+    def _observation_is_stale(self, observation: dict) -> bool:
+        try:
+            observed_at = int(observation.get("observed_at") or 0)
+        except (TypeError, ValueError):
+            return True
+        if observed_at <= 0:
+            return True
+        return (int(time.time() * 1000) - observed_at) > self._STALE_OBSERVATION_MS
 
     def _decide_task_observation(self, task: dict, observation: dict) -> dict:
         activity = str(observation.get("activity") or observation.get("raw_activity") or "")

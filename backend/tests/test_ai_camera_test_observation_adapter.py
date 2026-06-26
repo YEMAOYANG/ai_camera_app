@@ -143,25 +143,31 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
     def test_worker_posts_only_observation_endpoint(self):
         calls = []
 
-        def fake_request(url, payload, headers, timeout):
-            calls.append((url, payload, headers, timeout))
-            if url.endswith("/api/camera/snapshot?format=data_url"):
-                return {"image": "data:image/jpeg;base64,abc"}
-            if url.endswith("/api/analyze_frame"):
-                self.assertEqual(payload["image"], "data:image/jpeg;base64,abc")
+        class _FakeVision:
+            def analyze_snapshot(self, **kwargs):
                 return {
                     "has_person": True,
                     "activity": "吃饭",
                     "confidence": 0.9,
                     "description": "孩子坐在餐桌前吃饭。",
-                    "method": "vision-test",
+                    "method": "guardian_test",
+                    "observed_at": 15_000,
                 }
+
+        def fake_request(url, payload, headers, timeout):
+            calls.append((url, payload, headers, timeout))
+            if url.endswith("/api/camera/snapshot?format=data_url"):
+                return {"image": "data:image/jpeg;base64,YWJj"}
             self.assertEqual(url, "http://current.local/internal/camera/observations")
             self.assertEqual(headers["X-Mira-Internal-Token"], "token")
             self.assertEqual(headers["X-Mira-Internal-Source"], "ai_camera_test")
             return {"ok": True}
 
-        adapter = AiCameraTestObservationAdapter(_config(), json_request=fake_request)
+        adapter = AiCameraTestObservationAdapter(
+            _config(),
+            json_request=fake_request,
+            vision_service=_FakeVision(),
+        )
         result = CameraObservationWorker(adapter).run_once(
             window_start_ms=10_000,
             window_end_ms=15_000,
@@ -171,6 +177,7 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
         called_urls = [item[0] for item in calls]
         self.assertTrue(all("/internal/reminders/trigger" not in url for url in called_urls))
         self.assertTrue(all("speaker" not in url for url in called_urls))
+        self.assertTrue(all("/api/analyze_frame" not in url for url in called_urls))
         self.assertIn("http://current.local/internal/camera/observations", called_urls)
 
     def test_missing_required_worker_config_fails_fast(self):

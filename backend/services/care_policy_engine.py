@@ -17,8 +17,6 @@ from models.care import (
     CARE_SCENARIO_TOY_CLEANUP,
     CARE_SCENARIO_TRANSITION,
     CARE_SCENARIO_WAKE_UP,
-    DAY_TYPE_SCHOOL_DAY,
-    DAY_TYPE_WEEKEND,
     DAY_TYPES,
     REMINDER_DECISION_ALLOWED,
     REMINDER_DECISION_PARENT_NOTIFY,
@@ -31,8 +29,12 @@ from models.care import (
     REMINDER_DECISION_SKIPPED_OUT_OF_ROUTINE_WINDOW,
     REMINDER_EVENT_SOURCE_DRY_RUN,
     REMINDER_EVENT_SOURCE_TEST,
+    REMINDER_STATUS_COMMAND_SENT,
+    REMINDER_STATUS_DELIVERED,
+    REMINDER_STATUS_FAILED,
     REVIEW_DOMAIN_CARE,
 )
+from services.care_day_type import effective_day_type
 
 
 DEFAULT_TIMEZONE = "Asia/Shanghai"
@@ -103,7 +105,9 @@ class CarePolicyEngine:
         real_reminder_events = _real_reminder_events(recent_reminder_events)
         day_start = _start_of_local_day_ms(now)
         daily_real_count = sum(
-            1 for row in real_reminder_events if _event_time(row) >= day_start
+            1
+            for row in real_reminder_events
+            if _event_time(row) >= day_start and _reminder_counts_toward_limits(row)
         )
 
         snapshot: dict[str, Any] = {
@@ -182,10 +186,13 @@ class CarePolicyEngine:
                 snapshot,
             )
 
+        delivered_reminder_events = [
+            row for row in real_reminder_events if _reminder_counts_toward_limits(row)
+        ]
         cooldown_until = _cooldown_until(
             now=now,
             cooldown_seconds=cooldown_seconds,
-            recent_reminder_events=real_reminder_events,
+            recent_reminder_events=delivered_reminder_events,
             recent_allowed_decisions=recent_allowed_decisions,
         )
         if cooldown_until is not None and cooldown_until > now:
@@ -197,7 +204,12 @@ class CarePolicyEngine:
                 cooldown_until=cooldown_until,
             )
 
-        if parent_notify_threshold > 0 and daily_real_count >= parent_notify_threshold:
+        is_routine = str(observation_event.get("evidence_type") or "") == "routine_window"
+        if (
+            not is_routine
+            and parent_notify_threshold > 0
+            and daily_real_count >= parent_notify_threshold
+        ):
             review = _review_item(scenario=scenario, observation_event=observation_event)
             return _decision(
                 REMINDER_DECISION_PARENT_NOTIFY,
@@ -207,7 +219,10 @@ class CarePolicyEngine:
                 review_item=review,
             )
 
-        if daily_limit <= 0 or daily_real_count >= daily_limit:
+        if (
+            not is_routine
+            and (daily_limit <= 0 or daily_real_count >= daily_limit)
+        ):
             return _decision(
                 REMINDER_DECISION_SKIPPED_DAILY_LIMIT,
                 "daily_limit_reached",
@@ -409,18 +424,18 @@ def _routine_window_gate(
 
     matched_day_rows: list[DatabaseRow] = []
     disabled_rows = 0
-    effective_day_type = ""
+    resolved_day_type = ""
     for row in routine_windows:
         timezone = str(row.get("timezone") or DEFAULT_TIMEZONE)
         row_day_type = str(row.get("day_type") or "")
         if str(row.get("window_type") or "") not in window_types:
             continue
-        current_day_type = _effective_day_type(
+        current_day_type = effective_day_type(
             observed_at,
             timezone=timezone,
             explicit_day_type=explicit_day_type,
         )
-        effective_day_type = effective_day_type or current_day_type
+        resolved_day_type = resolved_day_type or current_day_type
         if row_day_type != current_day_type:
             continue
         matched_day_rows.append(row)
@@ -439,7 +454,7 @@ def _routine_window_gate(
             )
             return gate
 
-    gate["dayType"] = explicit_day_type if explicit_day_type in DAY_TYPES else effective_day_type
+    gate["dayType"] = explicit_day_type if explicit_day_type in DAY_TYPES else resolved_day_type
     if matched_day_rows and disabled_rows == len(matched_day_rows):
         gate["reason"] = "routine_window_disabled"
     elif not matched_day_rows:
@@ -455,17 +470,11 @@ def _window_types_for_scenario(scenario: str, capability_config: DatabaseRow) ->
     return allowed
 
 
-def _effective_day_type(
-    observed_at: int,
-    *,
-    timezone: str,
-    explicit_day_type: str | None,
-) -> str:
-    if explicit_day_type in DAY_TYPES:
-        return str(explicit_day_type)
-    zone = _zone(timezone)
-    dt = datetime.fromtimestamp(observed_at / 1000, tz=zone)
-    return DAY_TYPE_WEEKEND if dt.weekday() >= 5 else DAY_TYPE_SCHOOL_DAY
+def _reminder_counts_toward_limits(row: DatabaseRow) -> bool:
+    status = str(row.get("delivery_status") or "")
+    if status == REMINDER_STATUS_FAILED:
+        return False
+    return status in {REMINDER_STATUS_COMMAND_SENT, REMINDER_STATUS_DELIVERED}
 
 
 def _time_in_window(observed_at: int, row: DatabaseRow) -> bool:

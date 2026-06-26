@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import base64
 import json
 import os
 import re
 import urllib.request
 from dataclasses import dataclass
+
+from services.vision_child_context import load_child_vision_context
 from typing import Any, Callable, Mapping, Optional
 
 
@@ -96,6 +99,9 @@ class AiCameraTestObservationConfig:
         return f"{value}/internal/camera/observations"
 
 
+DATA_URL_RE = re.compile(r"^data:(?P<mime>[^;]+);base64,(?P<data>.+)$", re.DOTALL)
+
+
 class AiCameraTestObservationAdapter:
     source = "ai_camera_test"
 
@@ -104,10 +110,15 @@ class AiCameraTestObservationAdapter:
         config: AiCameraTestObservationConfig,
         *,
         json_request: JsonRequest | None = None,
+        vision_service=None,
     ):
         config.validate()
         self.config = config
         self._json_request = json_request or _json_request
+        self.vision_service = vision_service
+
+    def _database_url(self) -> str:
+        return str(os.environ.get("DATABASE_URL") or os.environ.get("APP_DATABASE_URL") or "").strip()
 
     def fetch_analysis(self) -> dict:
         snapshot = self._json_request(
@@ -119,11 +130,19 @@ class AiCameraTestObservationAdapter:
         image = str(snapshot.get("image") or "")
         if not image:
             raise RuntimeError("旧摄像头运行时没有返回可用画面。")
-        return self._json_request(
-            self.config.analyze_url,
-            {"image": image},
-            {"Content-Type": "application/json"},
-            max(30.0, self.config.timeout_seconds),
+        body, content_type = _decode_data_url(image)
+        if self.vision_service is None:
+            raise RuntimeError("Vision 服务未配置，无法分析画面。")
+        vision_context = load_child_vision_context(
+            self._database_url(),
+            family_id=self.config.family_id,
+            child_id=self.config.child_id,
+        )
+        return self.vision_service.analyze_snapshot(
+            image_bytes=body,
+            content_type=content_type,
+            device_key=self.config.device_id or self.config.base_url,
+            context=vision_context,
         )
 
     def payloads_from_analysis(
@@ -183,6 +202,18 @@ class AiCameraTestObservationAdapter:
             },
             self.config.timeout_seconds,
         )
+
+
+def _decode_data_url(value: str) -> tuple[bytes, str]:
+    match = DATA_URL_RE.match(str(value or "").strip())
+    if not match:
+        raise RuntimeError("snapshot 返回的图片格式无效。")
+    mime = str(match.group("mime") or "image/jpeg").strip() or "image/jpeg"
+    data = match.group("data")
+    try:
+        return base64.b64decode(data), mime
+    except Exception as exc:
+        raise RuntimeError("snapshot 图片解码失败。") from exc
 
 
 def build_source_event_id(

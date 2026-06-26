@@ -595,6 +595,23 @@ void main() {
     expect(event.displayMessage, isNot(contains('一个人')));
   });
 
+  test('live care event display copy keeps phone activity distinct from screen', () {
+    final event = LiveCareEvent.fromJson({
+      'id': 'evt_phone',
+      'source': 'camera_observation',
+      'eventType': 'camera_observation',
+      'displayTitle': '孩子正在玩手机',
+      'displayMessage': '孩子坐在沙发上低头操作手机。',
+      'category': 'camera_observation',
+      'tone': 'info',
+      'createdAt': 1,
+    });
+
+    expect(event.displayTitle, '孩子正在玩手机');
+    expect(event.displayMessage, '孩子在玩手机，注意休息。');
+    expect(event.displayMessage, isNot(contains('看屏幕')));
+  });
+
   testWidgets('login after logout refreshes profile for the new account', (
     tester,
   ) async {

@@ -387,6 +387,7 @@ class LiveCareEvent {
     required this.status,
     required this.toneKey,
     required this.createdAt,
+    this.recordKind = '',
   });
 
   final String id;
@@ -404,6 +405,13 @@ class LiveCareEvent {
   final String status;
   final String toneKey;
   final int createdAt;
+  final String recordKind;
+
+  bool get isRoutineRecord => recordKind == 'routine';
+
+  bool get isVisionRecord => recordKind == 'vision';
+
+  bool get isReminderRecord => recordKind == 'reminder';
 
   bool get isCareRecord {
     return switch (category) {
@@ -456,11 +464,7 @@ class LiveCareEvent {
         category == 'child_presence' ||
         category == 'snapshot';
     final displayTitle = shouldNormalizeObservationCopy
-        ? parentFacingCameraObservationText(
-            rawDisplayTitle,
-            maxLength: 28,
-            ensureSentenceEnd: false,
-          )
+        ? _parentFacingObservationTitle(rawDisplayTitle)
         : rawDisplayTitle;
     final displayMessage = shouldNormalizeObservationCopy
         ? parentFacingCameraObservationText(rawDisplayMessage, maxLength: 72)
@@ -484,6 +488,7 @@ class LiveCareEvent {
       status: _asString(json['status']),
       toneKey: _asString(json['tone']),
       createdAt: _asNullableInt(json['createdAt']) ?? 0,
+      recordKind: _asString(json['recordKind']),
     );
   }
 }
@@ -679,6 +684,21 @@ String _sanitizeObservationText(String text, {String description = ''}) {
   return trimmed;
 }
 
+String _parentFacingObservationTitle(String text) {
+  final cleaned = text.trim();
+  if (cleaned.isEmpty) return '';
+  if (cleaned.startsWith('孩子正在') ||
+      cleaned.startsWith('暂未看到') ||
+      cleaned.startsWith('画面暂时')) {
+    return cleaned.length <= 28 ? cleaned : '${cleaned.substring(0, 28)}…';
+  }
+  return parentFacingCameraObservationText(
+    cleaned,
+    maxLength: 28,
+    ensureSentenceEnd: false,
+  );
+}
+
 String parentFacingCameraObservationText(
   String text, {
   int maxLength = 64,
@@ -702,6 +722,9 @@ String parentFacingCameraObservationText(
       .replaceFirst(RegExp(r'^一个小孩'), '孩子')
       .replaceFirst(RegExp(r'^一名小孩'), '孩子');
   cleaned = cleaned
+      .replaceAll(RegExp(r'画面[中里]?可见一个人的'), '画面中可见孩子的')
+      .replaceAll(RegExp(r'可见一个人的'), '可见孩子的')
+      .replaceAll(RegExp(r'一个人的'), '孩子的')
       .replaceAll('小孩', '孩子')
       .replaceAll('儿童', '孩子')
       .replaceAll('似乎', '可能');
@@ -712,8 +735,11 @@ String parentFacingCameraObservationText(
   if (postureRisk) {
     return '孩子低头靠近桌面，注意坐姿。';
   }
+  if (RegExp(r'(玩手机|看手机|操作手机)').hasMatch(cleaned)) {
+    return '孩子在玩手机，注意休息。';
+  }
   final screenFocus =
-      RegExp(r'(手机|屏幕|电脑|平板)').hasMatch(cleaned) &&
+      RegExp(r'(电视|电脑|平板|屏幕|看屏幕)').hasMatch(cleaned) &&
       RegExp(r'(低头|操作|观看|看|玩)').hasMatch(cleaned);
   if (screenFocus) {
     return '孩子在看屏幕，注意用眼距离。';

@@ -5,6 +5,7 @@ import threading
 import unittest
 from datetime import date
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from unittest.mock import patch
 
 from app import create_app
 from core.database import Database
@@ -18,6 +19,7 @@ from services.camera_command_service import _parent_camera_command_event
 from services.service_factory import auth_service, camera_command_service
 from services import task_event_stream
 from tests.support import fresh_test_config, request_debug_code
+from tests.fake_vision_service import FakeVisionObservationService
 
 
 class _CameraRuntimeHandler(BaseHTTPRequestHandler):
@@ -139,6 +141,12 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.camera_thread = threading.Thread(target=self.camera_server.serve_forever, daemon=True)
         self.camera_thread.start()
         self.camera_url = f"http://127.0.0.1:{self.camera_server.server_port}"
+        self._fake_vision = FakeVisionObservationService(_CameraRuntimeHandler.analyze_payload)
+        self._vision_patch = patch(
+            "services.service_factory.build_vision_observation_service_from_config",
+            lambda _config: self._fake_vision,
+        )
+        self._vision_patch.start()
         self.app = create_app(
             fresh_test_config(
                 HARDWARE_ADAPTER="mock",
@@ -151,6 +159,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.device_id = self._create_device()
 
     def tearDown(self):
+        self._vision_patch.stop()
         self.camera_server.shutdown()
         self.camera_server.server_close()
 
@@ -450,7 +459,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.json)
         observation = response.json["monitor"]["lastObservation"]
         self.assertTrue(observation["isReliable"])
-        self.assertEqual(observation["activity"], "阅读绘本")
+        self.assertEqual(observation["activity"], "看书")
         self.assertEqual(
             [payload["type"] for _, payload in captured],
             [
@@ -482,13 +491,59 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         )
         self.assertEqual(events.status_code, 200, events.json)
         self.assertTrue(
-            any(event["displayTitle"] == "孩子正在阅读绘本" for event in events.json["events"])
+            any(event["displayTitle"] == "孩子正在看书" for event in events.json["events"])
         )
 
+
+    def test_camera_monitor_refresh_skips_unreliable_observation_record(self):
+        self._fake_vision.payload = {
+            "has_person": True,
+            "activity": "未知",
+            "confidence": 0.42,
+            "description": "画面暂时看不清。",
+        }
+        before = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(before.status_code, 200, before.json)
+        before_count = len(before.json["events"])
+
+        captured: list[tuple[str, dict]] = []
+        original_broadcast = task_event_stream.task_event_stream_server.broadcast
+        task_event_stream.task_event_stream_server.broadcast = (
+            lambda family_id, payload: captured.append((family_id, payload))
+        )
+        try:
+            response = self.client.post(
+                "/api/camera/monitor/refresh",
+                query_string={"deviceId": self.device_id},
+                headers=self._auth_headers(),
+            )
+        finally:
+            task_event_stream.task_event_stream_server.broadcast = original_broadcast
+
+        self.assertEqual(response.status_code, 200, response.json)
+        observation = response.json["monitor"]["lastObservation"]
+        self.assertFalse(observation["isReliable"])
+        self.assertNotIn(
+            "camera_event.created",
+            [payload["type"] for _, payload in captured],
+        )
+
+        after = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(after.status_code, 200, after.json)
+        self.assertEqual(len(after.json["events"]), before_count)
+
     def test_camera_monitor_refresh_marks_no_person_without_child_claim(self):
-        _CameraRuntimeHandler.analyze_payload = {
+        self._fake_vision.payload = {
             "has_person": False,
-            "activity": "其他",
+            "activity": "离开",
             "confidence": 0.91,
             "description": "没有看到孩子。",
         }
@@ -508,9 +563,9 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(observation["summary"], "暂未看到孩子")
 
     def test_camera_monitor_refresh_records_toy_play_without_cleanup_reminder(self):
-        _CameraRuntimeHandler.analyze_payload = {
+        self._fake_vision.payload = {
             "has_person": True,
-            "activity": "playing with toys",
+            "activity": "玩玩具",
             "confidence": 0.9,
             "description": "孩子坐在沙发上玩玩具，周围有积木。",
         }
@@ -540,9 +595,9 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         )
 
     def test_camera_events_dedupe_repeated_observations_in_short_window(self):
-        _CameraRuntimeHandler.analyze_payload = {
+        self._fake_vision.payload = {
             "has_person": False,
-            "activity": "其他",
+            "activity": "离开",
             "confidence": 0.9,
             "description": "客厅场景，沙发上摆放着毛绒玩具，地垫上有玩具车。",
         }

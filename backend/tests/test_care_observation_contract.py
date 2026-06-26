@@ -814,8 +814,9 @@ class CareObservationContractTest(unittest.TestCase):
         service = RoutineReminderService(self.app.config["DATABASE_URL"])
         now = _ms("2026-06-17 07:30")
 
-        first = service.tick(now=now)
-        second = service.tick(now=now)
+        with self.app.app_context():
+            first = service.tick(now=now)
+            second = service.tick(now=now)
 
         self.assertGreaterEqual(first["triggeredCount"], 1)
         self.assertGreaterEqual(second["triggeredCount"], 1)
@@ -825,6 +826,7 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertTrue(wake_responses)
         self.assertEqual(wake_responses[0]["decision"]["decision"], REMINDER_DECISION_ALLOWED)
         self.assertIsNotNone(wake_responses[0].get("reminder"))
+        self.assertIsNotNone(wake_responses[0].get("careEvent"))
         duplicate_wake = [
             item for item in second["responses"] if item["observation"]["scenario"] == "wake_up"
         ]
@@ -855,6 +857,155 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertTrue(
             any(item["observation"]["scenario"] == "wake_up" for item in response.json["responses"])
         )
+
+    def test_routine_reminder_day_type_filter_excludes_mismatched_windows(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "meal_start",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        service = RoutineReminderService(self.app.config["DATABASE_URL"])
+
+        friday_breakfast = service.tick(now=_ms("2026-06-26 09:00"))
+        weekend_breakfast = [
+            item
+            for item in friday_breakfast["responses"]
+            if ":weekend:" in str(item["observation"].get("sourceEventId") or "")
+            and "breakfast" in str(item["observation"].get("sourceEventId") or "")
+        ]
+        self.assertFalse(weekend_breakfast)
+
+        friday_dinner = service.tick(now=_ms("2026-06-26 17:30"))
+        school_dinners = [
+            item
+            for item in friday_dinner["responses"]
+            if item["observation"]["scenario"] == "meal_start"
+            and ":school_day:" in str(item["observation"].get("sourceEventId") or "")
+            and "dinner" in str(item["observation"].get("sourceEventId") or "")
+        ]
+        self.assertTrue(school_dinners)
+        self.assertEqual(school_dinners[0]["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+
+        saturday_wake = service.tick(now=_ms("2026-06-27 08:30"))
+        weekend_wake = [
+            item
+            for item in saturday_wake["responses"]
+            if item["observation"]["scenario"] == "wake_up"
+            and ":weekend:" in str(item["observation"].get("sourceEventId") or "")
+        ]
+        school_wake = [
+            item
+            for item in saturday_wake["responses"]
+            if item["observation"]["scenario"] == "wake_up"
+            and ":school_day:" in str(item["observation"].get("sourceEventId") or "")
+        ]
+        self.assertTrue(weekend_wake)
+        self.assertFalse(school_wake)
+
+    def test_routine_window_exempt_from_parent_notify_threshold(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "meal_start",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=2,
+            allowSpeaker=True,
+        )
+        self._create_real_reminder_event("meal_start")
+        self._create_real_reminder_event("meal_start")
+
+        service = RoutineReminderService(self.app.config["DATABASE_URL"])
+        with self.app.app_context():
+            result = service.tick(now=_ms("2026-06-26 17:30"))
+
+        dinners = [
+            item
+            for item in result["responses"]
+            if item["observation"]["scenario"] == "meal_start"
+            and "dinner" in str(item["observation"].get("sourceEventId") or "")
+        ]
+        self.assertTrue(dinners)
+        self.assertEqual(dinners[0]["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+        self.assertTrue(dinners[0]["decision"]["shouldSpeak"])
+
+    def test_routine_window_exempt_from_daily_limit(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "meal_start",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=1,
+            parentNotifyThreshold=10,
+            allowSpeaker=True,
+        )
+        self._create_real_reminder_event("meal_start")
+
+        service = RoutineReminderService(self.app.config["DATABASE_URL"])
+        with self.app.app_context():
+            result = service.tick(now=_ms("2026-06-26 17:30"))
+
+        dinners = [
+            item
+            for item in result["responses"]
+            if item["observation"]["scenario"] == "meal_start"
+            and "dinner" in str(item["observation"].get("sourceEventId") or "")
+        ]
+        self.assertTrue(dinners)
+        self.assertEqual(dinners[0]["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+        self.assertTrue(dinners[0]["decision"]["shouldSpeak"])
+
+    def test_failed_reminder_does_not_count_toward_parent_notify_threshold(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "meal_start",
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=2,
+            allowSpeaker=True,
+            minObservationSeconds=1,
+        )
+        self._create_real_reminder_event("meal_start")
+        self._create_real_reminder_event("meal_start", delivery_status=REMINDER_STATUS_FAILED)
+
+        allowed = self._post_observation(
+            "meal_start",
+            confidence=0.9,
+            duration_seconds=60,
+            observed_at=_ms("2026-06-26 12:00"),
+        )
+        self.assertEqual(allowed.json["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+        self.assertTrue(allowed.json["decision"]["shouldSpeak"])
+
+    def test_camera_events_include_record_kind_for_routine_observation(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "meal_start",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        service = RoutineReminderService(self.app.config["DATABASE_URL"])
+        with self.app.app_context():
+            service.tick(now=_ms("2026-06-26 17:30"))
+
+        events = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(events.status_code, 200, events.json)
+        routine_events = [
+            event for event in events.json["events"] if event.get("recordKind") == "routine"
+        ]
+        self.assertTrue(routine_events)
+        self.assertIn("晚餐", routine_events[0]["displayTitle"])
 
     def test_routine_reminder_respects_disabled_speaker_off_and_window_gate(self):
         self._ensure_capabilities()
@@ -984,7 +1135,10 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertIsNone(second.json["careEvent"])
         self.assertIsNone(second.json["reminder"])
         camera_events = [
-            payload for _, payload in captured if payload["type"] == "camera_event.created"
+            payload
+            for _, payload in captured
+            if payload["type"] == "camera_event.created"
+            and payload.get("source") == "camera_observation"
         ]
         self.assertEqual(len(camera_events), 1)
 
@@ -1516,6 +1670,7 @@ class CareObservationContractTest(unittest.TestCase):
         *,
         event_source: str = REMINDER_EVENT_SOURCE_INTERNAL,
         is_test: bool = False,
+        delivery_status: str = REMINDER_STATUS_COMMAND_SENT,
     ) -> str:
         repository = CareRepository(Database(self.app.config["DATABASE_URL"]))
         now = now_ms()
@@ -1537,7 +1692,7 @@ class CareObservationContractTest(unittest.TestCase):
                 text="轻声提醒一下。",
                 tone="warm",
                 text_source="fallback",
-                delivery_status=REMINDER_STATUS_GENERATED,
+                delivery_status=delivery_status,
                 command_id=None,
                 fallback_used=True,
                 generated_at=now,

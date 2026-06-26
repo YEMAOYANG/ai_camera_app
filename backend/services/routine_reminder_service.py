@@ -14,6 +14,7 @@ from models.care import (
 )
 from repositories.care_repository import CareRepository
 from repositories.device_repository import DeviceRepository
+from services.care_day_type import effective_day_type
 from services.care_defaults import ensure_default_capability_configs, ensure_default_routine_windows
 from services.camera_ai_observation_service import CameraAiObservationService
 
@@ -126,6 +127,10 @@ class RoutineReminderService:
         scenario = WINDOW_SCENARIOS.get(window_type)
         if scenario is None or not _time_in_window(now, window):
             return None
+        timezone = str(window.get("timezone") or DEFAULT_TIMEZONE)
+        effective = effective_day_type(now, timezone=timezone)
+        if str(window.get("day_type") or "") != effective:
+            return None
         label = WINDOW_LABELS.get(window_type, "作息")
         day_type = str(window.get("day_type") or "")
         local_date = _local_datetime(now, str(window.get("timezone") or DEFAULT_TIMEZONE)).date().isoformat()
@@ -150,7 +155,7 @@ class RoutineReminderService:
             "source": "routine_reminder",
             "sourceEventId": source_event_id,
             "dayType": day_type,
-            "recordCareEvent": False,
+            "recordCareEvent": True,
             "signals": [
                 {
                     "signalType": "routine_due",

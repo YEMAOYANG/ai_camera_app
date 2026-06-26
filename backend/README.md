@@ -25,6 +25,20 @@ python3 scripts/migrate.py
 python3 app.py
 ```
 
+**本地联调（Guardian + ai_camera_test 媒体层 + 观察 worker，一条命令）：**
+
+```sh
+cd backend
+chmod +x scripts/start-dev.sh   # 首次
+./scripts/start-dev.sh
+```
+
+脚本会启动 ai_camera_test（go2rtc + gunicorn + speaker/voice/task，不含 monitor_worker）、
+Guardian `app.py`（API :8000 + WS :8001）与 `camera_observation_worker`。
+**默认会在终端实时输出 API 请求日志**（Flask/Werkzeug access log）；worker 日志在
+`/tmp/guardian-dev/guardian-worker.log`。加 `--quiet` 可关闭终端日志跟屏。
+按 Ctrl+C 停止 Guardian 进程。
+
 Development defaults bind to `0.0.0.0` so an Android/iOS device on the same
 network can reach the backend through the computer LAN IP. If an older local
 `.env` still has `APP_HOST=127.0.0.1`, change it to `APP_HOST=0.0.0.0` and
@@ -212,6 +226,21 @@ phase, and age context. `kimi`/`moonshot` use the Moonshot-compatible chat API
 (`APP_AI_BASE_URL` defaults to `https://api.moonshot.cn/v1` through the config
 layer). If the model is unconfigured or unavailable, the backend falls back to a
 local semantic reminder policy.
+
+Camera vision analysis uses `vision.scene_observation:v1` via
+`VisionObservationService` (`services/vision_observation_service.py`) and Kimi
+K2.6 multimodal API. Configure:
+
+```env
+APP_AI_VISION_ENABLED=1
+APP_AI_VISION_MODEL=          # optional, defaults to APP_AI_MODEL
+APP_AI_VISION_TIMEOUT_SECONDS=20
+APP_AI_VISION_MIN_INTERVAL_SECONDS=60
+APP_AI_VISION_MAX_CALLS_PER_HOUR=20
+```
+
+The runtime adapter only fetches JPEG snapshots from `ai_camera_test`; analysis
+no longer calls `/api/analyze_frame` on the legacy runtime.
 
 ## V1 Structure
 

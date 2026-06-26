@@ -498,7 +498,8 @@ Flutter 可调用：
 
 - Adapter：`backend/integrations/camera_runtime/ai_camera_test_observation_adapter.py`。
 - Worker：`backend/workers/camera_observation_worker.py`。
-- Worker 只调用旧项目 `/api/camera/snapshot?format=data_url` 和 `/api/analyze_frame`，再 POST 当前项目 `/internal/camera/observations`。
+- Worker 只调用旧项目 `/api/camera/snapshot?format=data_url` 获取 JPEG；**视觉分析在 Guardian `VisionObservationService`（Kimi K2.6 + Prompt Registry）完成**，再 POST 当前项目 `/internal/camera/observations`。
+- Guardian **不再**调用旧项目 `/api/analyze_frame`。
 - Worker 不调用 `/internal/reminders/trigger`，不写 `reminder_events`，不调用 speaker，不改 task 状态。
 - 旧 `/api/analyze_frame` 返回里的 `reminder`、`child_message` 不作为播报文本迁移。
 
@@ -668,3 +669,24 @@ ai_camera_test:{deviceId}:{scenario}:{windowStartMs}:{windowEndMs}:{signalType}
 阶段 6：
 
 - 视觉模型接入、eval case、灰度策略和家长解释记录优化。
+
+## 12. 看护能力 × 作息 × Vision 分工
+
+三条链路不要混用：
+
+1. **看护记录**：`POST /api/camera/monitor/refresh` → `VisionObservationService` → `record_observation_event`（**无**作息窗口 gate）
+2. **语音提醒**：`camera_observation_worker` 或 internal observation → `CarePolicyEngine`（时间型能力 **必须**在作息窗口内才 `shouldSpeak`）
+3. **到点提醒**：`RoutineReminderService.tick` → internal observation（`evidenceType=routine_window`，`recordCareEvent=true` 写入看护记录）
+
+| 能力 | 作息 gate | Vision worker emit | 到点来源 |
+|------|-----------|-------------------|----------|
+| posture / toy_cleanup | 无 | 是 | 纯视觉 |
+| meal_start / meal_habit | 有 | 是 | 视觉 + 到点 |
+| nap_time / bedtime / wake_up | 有 | 否（Phase 1） | RoutineReminderService |
+
+## 13. WebSocket 与测试闭环
+
+- 后端：`camera_event.created` / `camera_observation.updated` 可附带 lightweight `event` payload。
+- Flutter：`AppRealtimeScope` 在 App 根级常驻监听；Shell 外页面（看护记录、作息设置）同样收到刷新。
+- 保存看护能力/作息后客户端主动 invalidate `cameraEventsProvider`、`liveCareStatusProvider`。
+- Dev 联调：`POST /api/dev/care/routine-reminder/tick` + `now` 毫秒时间戳，无需真等到点。

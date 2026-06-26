@@ -14,6 +14,9 @@ class MockCameraRuntimeAdapter(CameraRuntimeAdapter):
         "0000ffda0008010100003f00ffd9"
     )
 
+    def __init__(self, *, vision_service=None):
+        self.vision_service = vision_service
+
     def health(self) -> dict:
         return {"ok": True, "service": "mock-camera-runtime", "camera": {"connected": True}}
 
@@ -67,7 +70,25 @@ class MockCameraRuntimeAdapter(CameraRuntimeAdapter):
     def monitor_status(self) -> dict:
         return {"ok": True, "monitor_runtime": {"running": False, "status": "idle"}}
 
-    def refresh_monitor_observation(self) -> dict:
+    def refresh_monitor_observation(self, *, vision_context: dict | None = None) -> dict:
+        if self.vision_service is not None:
+            try:
+                analysis = self.vision_service.analyze_snapshot(
+                    image_bytes=self._tiny_jpeg,
+                    content_type="image/jpeg",
+                    device_key="mock",
+                    context=vision_context,
+                )
+                return {
+                    "ok": True,
+                    "monitor_runtime": {
+                        "running": False,
+                        "status": "refreshed",
+                        "last_observation": analysis,
+                    },
+                }
+            except Exception:
+                pass
         return {
             "ok": True,
             "monitor_runtime": {

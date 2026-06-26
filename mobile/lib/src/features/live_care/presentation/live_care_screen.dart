@@ -682,6 +682,7 @@ class _CareFocusPanel extends StatelessWidget {
         )
         .toList();
     final recentEvent = summaryEvents.isEmpty ? null : summaryEvents.first;
+    final recentHasRoutine = recentEvent?.isRoutineRecord == true;
 
     return AppSurface(
       child: Column(
@@ -703,7 +704,9 @@ class _CareFocusPanel extends StatelessWidget {
             subtitle: hasObservation
                 ? _monitorObservationSubtitle(monitor!)
                 : currentTask == null
-                ? '需要查看时进入实时画面，普通状态不会打扰孩子。'
+                ? recentHasRoutine
+                      ? '最近有作息提醒，进入实时画面可查看当前状态。'
+                      : '需要查看时进入实时画面，普通状态不会打扰孩子。'
                 : '${currentTask.timeLabel} · 看护记录会在这里更新',
             tone: care?.isAvailable == true
                 ? AppListRowTone.green
@@ -729,8 +732,7 @@ class _CareFocusPanel extends StatelessWidget {
             AppListRow(
               icon: Icons.history_outlined,
               title: '最近记录',
-              subtitle:
-                  '${recentEvent.timeLabel} · ${recentEvent.displayTitle}：${recentEvent.displayMessage}',
+              subtitle: _recentEventSubtitle(recentEvent),
               tone: _eventListTone(recentEvent),
               onTap: () => context.go(liveEventsPath),
               subtitleMaxLines: 1,
@@ -748,6 +750,16 @@ AppListRowTone _eventListTone(LiveCareEvent event) {
     'danger' => AppListRowTone.red,
     _ => AppListRowTone.blue,
   };
+}
+
+String _recentEventSubtitle(LiveCareEvent event) {
+  final prefix = switch (event.recordKind) {
+    'routine' => '作息提醒',
+    'reminder' => '语音提醒',
+    'vision' => '画面观察',
+    _ => '看护记录',
+  };
+  return '$prefix · ${event.timeLabel} · ${event.displayTitle}：${event.displayMessage}';
 }
 
 String _monitorObservationSubtitle(CameraMonitorStatus monitor) {
@@ -771,6 +783,7 @@ class LiveEventsScreen extends ConsumerWidget {
       title: '看护记录',
       subtitle: '画面观察和需要回看的情况',
       onBack: () => context.go(AppRoute.live.path),
+      onRefresh: () => ref.read(cameraEventsProvider.notifier).refresh(),
       children: [
         events.when(
           loading: () =>
@@ -795,7 +808,7 @@ class LiveEventsScreen extends ConsumerWidget {
                     icon: _eventIcon(items[index]),
                     title: items[index].displayTitle,
                     time: items[index].timeLabel,
-                    message: _eventDisplaySubtitle(items[index]),
+                    message: _recentEventSubtitle(items[index]),
                     tone: _eventListTone(items[index]),
                   ),
                   if (index != items.length - 1) const SizedBox(height: 12),
@@ -833,26 +846,6 @@ IconData _eventIcon(LiveCareEvent event) {
           ? Icons.task_alt_outlined
           : Icons.play_circle_outline,
   };
-}
-
-String _eventDisplaySubtitle(LiveCareEvent event) {
-  final parts = <String>[
-    event.displayMessage,
-    if (event.taskTitle.isNotEmpty) event.taskTitle,
-    if (event.evidenceSummary.isNotEmpty) event.evidenceSummary,
-  ];
-  return parts
-      .map(_stripConfidenceText)
-      .where((part) => part.trim().isNotEmpty)
-      .join(' · ');
-}
-
-String _stripConfidenceText(String value) {
-  return value
-      .replaceAll(RegExp(r'(?:\s*·\s*)?可信度\s*\d+%'), '')
-      .trim()
-      .replaceAll(RegExp(r'(^·\s*|\s*·$)'), '')
-      .trim();
 }
 
 class _PlaybackCard extends StatelessWidget {

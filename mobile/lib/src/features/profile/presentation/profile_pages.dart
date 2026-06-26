@@ -3073,8 +3073,8 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
                   key: 'allowSpeaker',
                   value: value,
                 ),
-                onOpenRules: visible[index].scenario == 'toy_cleanup'
-                    ? () => _openToyCleanupRules(
+                onOpenRules: _careReminderRuleScenarios.contains(visible[index].scenario)
+                    ? () => _openCareReminderRules(
                         query: query,
                         childId: childId,
                         deviceId: deviceId,
@@ -3138,6 +3138,10 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
           );
       ref.invalidate(careCapabilitiesProvider(query));
       ref.invalidate(careSummaryProvider(childId));
+      ref
+        ..invalidate(cameraEventsProvider)
+        ..invalidate(cameraMonitorStatusProvider)
+        ..invalidate(liveCareStatusProvider);
       if (mounted) _toast(context, '已保存');
     } on CareException catch (error) {
       if (mounted) _toast(context, error.message);
@@ -3146,13 +3150,13 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
     }
   }
 
-  Future<void> _openToyCleanupRules({
+  Future<void> _openCareReminderRules({
     required CareCapabilitiesQuery query,
     required String? childId,
     required String? deviceId,
     required CareCapability capability,
   }) async {
-    final result = await _showToyCleanupRulesSheet(context, capability);
+    final result = await _showCareReminderRulesSheet(context, capability);
     if (result == null) return;
     await _saveCapabilityValues(
       query: query,
@@ -3189,7 +3193,7 @@ class _CareCapabilityRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final disabled = !canManage || savingEnabled || savingVoice || savingRules;
-    final isToyCleanup = capability.scenario == 'toy_cleanup';
+    final hasReminderRules = _careReminderRuleScenarios.contains(capability.scenario);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -3207,20 +3211,20 @@ class _CareCapabilityRow extends StatelessWidget {
             subtitle: savingVoice
                 ? '保存中'
                 : capability.allowSpeaker
-                ? isToyCleanup
+                ? capability.scenario == 'toy_cleanup'
                       ? '孩子离开后轻声提醒。'
                       : '会在合适时间轻声提醒。'
                 : '只记录给家长查看。',
             value: capability.allowSpeaker,
             onChanged: disabled || !capability.enabled ? null : onVoiceChanged,
           ),
-          if (isToyCleanup) ...[
+          if (hasReminderRules) ...[
             AppListRow(
               icon: Icons.timer_outlined,
               title: '提醒方式',
               subtitle: savingRules
                   ? '保存中'
-                  : _toyCleanupRuleSummary(capability),
+                  : _careReminderRuleSummary(capability),
               tone: AppListRowTone.amber,
               onTap: disabled || onOpenRules == null ? null : onOpenRules,
             ),
@@ -3231,10 +3235,11 @@ class _CareCapabilityRow extends StatelessWidget {
   }
 }
 
-Future<Map<String, Object?>?> _showToyCleanupRulesSheet(
+Future<Map<String, Object?>?> _showCareReminderRulesSheet(
   BuildContext context,
   CareCapability capability,
 ) {
+  final isToyCleanup = capability.scenario == 'toy_cleanup';
   var leaveMinutes = _secondsToMinutes(
     capability.minObservationSeconds,
     min: 1,
@@ -3244,33 +3249,38 @@ Future<Map<String, Object?>?> _showToyCleanupRulesSheet(
 
   return showAppBottomSheet<Map<String, Object?>>(
     context: context,
-    maxHeightFactor: 0.64,
+    maxHeightFactor: isToyCleanup ? 0.64 : 0.56,
     child: StatefulBuilder(
       builder: (context, setSheetState) {
         return AppBottomSheetBody(
-          title: '玩具收纳',
-          subtitle: '孩子玩完离开后，摄像头会轻声提醒收好玩具。',
+          title: _capabilityTitle(capability.scenario),
+          subtitle: isToyCleanup
+              ? '孩子玩完离开后，摄像头会轻声提醒收好玩具。'
+              : '设置提醒间隔和今日最多次数，超过后改为通知家长。',
           footer: AppPrimaryButton(
             label: '保存提醒方式',
             onTap: () => Navigator.of(context).pop({
-              'minObservationSeconds': leaveMinutes * 60,
+              if (isToyCleanup) 'minObservationSeconds': leaveMinutes * 60,
               'cooldownSeconds': intervalMinutes * 60,
               'dailyLimit': dailyLimit,
+              'parentNotifyThreshold': dailyLimit,
             }),
           ),
           child: Column(
             children: [
-              _MinuteStepperRow(
-                title: '离开多久后提醒',
-                subtitle: '默认等一会儿，避免刚离开就打扰。',
-                value: leaveMinutes,
-                min: 1,
-                max: 10,
-                step: 1,
-                enabled: true,
-                onChanged: (value) => setSheetState(() => leaveMinutes = value),
-              ),
-              const _CompactDivider(),
+              if (isToyCleanup) ...[
+                _MinuteStepperRow(
+                  title: '离开多久后提醒',
+                  subtitle: '默认等一会儿，避免刚离开就打扰。',
+                  value: leaveMinutes,
+                  min: 1,
+                  max: 10,
+                  step: 1,
+                  enabled: true,
+                  onChanged: (value) => setSheetState(() => leaveMinutes = value),
+                ),
+                const _CompactDivider(),
+              ],
               _MinuteStepperRow(
                 title: '提醒间隔',
                 subtitle: '两次提醒之间留出安静时间。',
@@ -3285,7 +3295,7 @@ Future<Map<String, Object?>?> _showToyCleanupRulesSheet(
               const _CompactDivider(),
               _MinuteStepperRow(
                 title: '今日最多提醒',
-                subtitle: '提醒太多时改为通知家长。',
+                subtitle: '超过 $dailyLimit 次后改为通知家长。',
                 value: dailyLimit,
                 min: 1,
                 max: 6,
@@ -3302,6 +3312,21 @@ Future<Map<String, Object?>?> _showToyCleanupRulesSheet(
   );
 }
 
+String _careReminderRuleSummary(CareCapability capability) {
+  if (capability.scenario == 'toy_cleanup') {
+    return _toyCleanupRuleSummary(capability);
+  }
+  final intervalMinutes = _secondsToMinutes(
+    capability.cooldownSeconds,
+    min: 10,
+  );
+  final dailyLimit = capability.dailyLimit <= 0 ? 3 : capability.dailyLimit;
+  final threshold = capability.parentNotifyThreshold <= 0
+      ? dailyLimit
+      : capability.parentNotifyThreshold;
+  return '间隔 $intervalMinutes 分钟 · 今日最多 $dailyLimit 次 · 超过后通知家长（$threshold 次）';
+}
+
 String _toyCleanupRuleSummary(CareCapability capability) {
   final leaveMinutes = _secondsToMinutes(
     capability.minObservationSeconds,
@@ -3312,7 +3337,10 @@ String _toyCleanupRuleSummary(CareCapability capability) {
     min: 10,
   );
   final dailyLimit = capability.dailyLimit <= 0 ? 3 : capability.dailyLimit;
-  return '离开 $leaveMinutes 分钟后提醒 · 间隔 $intervalMinutes 分钟 · 今日最多 $dailyLimit 次';
+  final threshold = capability.parentNotifyThreshold <= 0
+      ? dailyLimit
+      : capability.parentNotifyThreshold;
+  return '离开 $leaveMinutes 分钟后提醒 · 间隔 $intervalMinutes 分钟 · 今日最多 $dailyLimit 次 · 超过后通知家长（$threshold 次）';
 }
 
 int _secondsToMinutes(int seconds, {required int min}) {
@@ -3466,6 +3494,10 @@ class _RoutineWindowsPageState extends ConsumerState<RoutineWindowsPage> {
           );
       ref.invalidate(routineWindowsProvider(query));
       ref.invalidate(careSummaryProvider(query.childId));
+      ref
+        ..invalidate(cameraEventsProvider)
+        ..invalidate(cameraMonitorStatusProvider)
+        ..invalidate(liveCareStatusProvider);
       if (mounted) _toast(context, '作息时间已保存');
     } on CareException catch (error) {
       if (mounted) _toast(context, error.message);
@@ -3728,6 +3760,14 @@ const _v1VisibleCareScenarios = {
   'nap_time',
   'bedtime',
   'wake_up',
+};
+
+const _careReminderRuleScenarios = {
+  'toy_cleanup',
+  'meal_start',
+  'wake_up',
+  'nap_time',
+  'bedtime',
 };
 
 int _capabilityOrder(String scenario) {

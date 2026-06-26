@@ -13,6 +13,7 @@ from schemas.camera import camera_command_payload
 from services.auth_service import AuthService
 from services.camera_bridge_service import CameraBridgeError, CameraBridgeService
 from services.device_runtime_resolver import DeviceRuntimeResolver
+from services.parent_facing_copy import sanitize_parent_facing_observation
 from services.task_event_stream import (
     CAMERA_EVENT_CREATED,
     CAMERA_STATUS_CHANGED,
@@ -201,7 +202,9 @@ class CameraCommandService:
         child_id: str | None,
         device_id: str,
         observation: dict,
-    ) -> dict:
+    ) -> dict | None:
+        if not _observation_is_reliable(observation):
+            return None
         display = _camera_observation_display(observation)
         now = now_ms()
         payload = {
@@ -243,21 +246,12 @@ class CameraCommandService:
             observation_id=str(observation.get("observedAt") or ""),
             is_reliable=bool(observation.get("isReliable")),
             source="camera_observation",
-            event={
-                "id": command["id"],
-                "deviceId": device_id,
-                "displayTitle": display["title"],
-                "displayMessage": display["message"],
-                "category": display["category"],
-                "severity": display["severity"],
-                "eventType": "camera_observation",
-                "createdAt": now,
-                "observedAt": observation.get("observedAt") or now,
-                "isReliable": bool(observation.get("isReliable")),
-                "source": "camera_observation",
-                "tone": "info",
-                "status": "succeeded",
-            },
+            event=lightweight_camera_event_from_observation(
+                event_id=command["id"],
+                device_id=device_id,
+                observation=observation,
+                now=now,
+            ),
         )
         return camera_command_payload(updated)
 
@@ -389,7 +383,11 @@ class CameraCommandService:
                 now=now_ms(),
                 completed=True,
             )
-            if _should_publish_camera_status(command_type, status):
+            if _should_publish_camera_status(command_type, status) or _should_publish_care_reminder_event(
+                command_type,
+                status,
+                request_payload,
+            ):
                 publish_family_event(
                     family_id=family_id,
                     event_type=CAMERA_STATUS_CHANGED,
@@ -398,6 +396,26 @@ class CameraCommandService:
                     event_ids=[command_id],
                     source="camera_command",
                 )
+                realtime_event = None
+                if command_type == "speak" and str(request_payload.get("source") or "") == "care_reminder":
+                    scenario = str(request_payload.get("scenario") or "")
+                    text = str(request_payload.get("text") or message or "").strip()
+                    realtime_event = {
+                        "id": command_id,
+                        "deviceId": device_id or "",
+                        "taskId": task_id or "",
+                        "displayTitle": _care_reminder_title(scenario),
+                        "displayMessage": text or "摄像头已按看护规则轻声提醒。",
+                        "category": "care_reminder",
+                        "severity": "info" if status == "succeeded" else "warning",
+                        "eventType": "speak",
+                        "createdAt": now_ms(),
+                        "observedAt": now_ms(),
+                        "isReliable": status == "succeeded",
+                        "source": "care_reminder",
+                        "tone": "info" if status == "succeeded" else "warning",
+                        "status": status,
+                    }
                 publish_family_event(
                     family_id=family_id,
                     event_type=CAMERA_EVENT_CREATED,
@@ -406,6 +424,7 @@ class CameraCommandService:
                     event_ids=[command_id],
                     is_reliable=status == "succeeded",
                     source="camera_command",
+                    event=realtime_event,
                 )
             return camera_command_payload(updated)
 
@@ -476,6 +495,38 @@ class CameraCommandService:
         return response
 
 
+def lightweight_camera_event_from_observation(
+    *,
+    event_id: str,
+    device_id: str,
+    observation: dict,
+    now: int | None = None,
+    event_type: str = "camera_observation",
+    source: str = "camera_observation",
+) -> dict:
+    display = _camera_observation_display(observation)
+    created_at = now if now is not None else now_ms()
+    record_kind = _observation_record_kind(observation)
+    payload = {
+        "id": event_id,
+        "deviceId": device_id,
+        "displayTitle": display["title"],
+        "displayMessage": display["message"],
+        "category": display["category"],
+        "severity": display["severity"],
+        "eventType": event_type,
+        "createdAt": created_at,
+        "observedAt": observation.get("observedAt") or created_at,
+        "isReliable": bool(observation.get("isReliable")),
+        "source": source,
+        "tone": "info",
+        "status": "succeeded",
+    }
+    if record_kind:
+        payload["recordKind"] = record_kind
+    return payload
+
+
 def _camera_command_event_payload(row) -> dict:
     command_type = str(row.get("command_type") or "")
     request = _json_dict(row.get("request_payload"))
@@ -504,6 +555,14 @@ def _should_publish_camera_status(command_type: str, status: str) -> bool:
     if command_type in {"snapshot", "start_monitor", "stop_monitor"}:
         return True
     return status == "failed"
+
+
+def _should_publish_care_reminder_event(command_type: str, status: str, request_payload: dict) -> bool:
+    return (
+        command_type == "speak"
+        and status == "succeeded"
+        and str(request_payload.get("source") or "") == "care_reminder"
+    )
 
 
 def _task_event_payload(row) -> dict:
@@ -576,6 +635,7 @@ def _parent_camera_command_event(event: dict) -> dict | None:
             or _parent_display_text(data.get("displayMessage")),
             category=str(data.get("category") or display["category"]),
             severity=str(data.get("severity") or display["severity"]),
+            record_kind=_observation_record_kind(observation),
         )
     if event_type in {"start_monitor", "stop_monitor"}:
         return None
@@ -590,6 +650,7 @@ def _parent_camera_command_event(event: dict) -> dict | None:
                 display_message=text or "摄像头已按看护规则轻声提醒。",
                 category="care_reminder",
                 severity="info" if status == "succeeded" else "warning",
+                record_kind="reminder",
             )
         return None
     if event_type == "snapshot":
@@ -712,6 +773,7 @@ def _with_display(
     category: str,
     severity: str,
     task_title: str = "",
+    record_kind: str = "",
 ) -> dict:
     next_event = dict(event)
     title = _parent_display_text(display_title) or "看护记录"
@@ -730,7 +792,17 @@ def _with_display(
             "tone": _severity_tone(severity),
         }
     )
+    if record_kind:
+        next_event["recordKind"] = record_kind
     return next_event
+
+
+def _observation_record_kind(observation: dict) -> str:
+    if str(observation.get("evidenceType") or "") == "routine_window":
+        return "routine"
+    if str(observation.get("source") or "") == "routine_reminder":
+        return "routine"
+    return "vision"
 
 
 def _task_message(event: dict, *, fallback: str) -> str:
@@ -959,6 +1031,17 @@ def _negated_toy_observation(text: str) -> bool:
     return re.search(r"(没有|没|未|未见|看不到|没有看到)[^，。,.]{0,18}(玩具|积木|toy|toys)", text.lower()) is not None
 
 
+def _observation_is_reliable(observation: dict) -> bool:
+    if observation.get("isReliable") is not None:
+        return bool(observation.get("isReliable"))
+    has_person = observation.get("hasPerson", observation.get("has_person"))
+    try:
+        confidence = float(observation.get("confidence") or 0)
+    except (TypeError, ValueError):
+        confidence = 0.0
+    return has_person in {True, False} and confidence >= 0.65
+
+
 def _parent_display_text(value: object) -> str:
     if not isinstance(value, str):
         return ""
@@ -967,7 +1050,7 @@ def _parent_display_text(value: object) -> str:
         return ""
     if _looks_like_structured_payload(text):
         return ""
-    return text
+    return sanitize_parent_facing_observation(text)
 
 
 def _looks_like_structured_payload(text: str) -> bool:

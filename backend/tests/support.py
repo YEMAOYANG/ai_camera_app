@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Any
 
 from core.database import Database
 from scripts.migrate import run_migrations
+
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_PROMPT_ROOT = str(BACKEND_ROOT / "prompts")
 
 
 TEST_DATABASE_URL = os.getenv(
@@ -33,6 +37,7 @@ def fresh_test_config(**overrides: Any) -> dict:
         "AI_API_KEY": "",
         "AI_BASE_URL": "",
         "TASK_WEBSOCKET_ENABLED": False,
+        "PROMPT_ROOT": DEFAULT_PROMPT_ROOT,
     }
     config.update(overrides)
     return config

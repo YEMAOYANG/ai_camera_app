@@ -21,6 +21,7 @@ class AppScreen extends StatelessWidget {
     this.reserveBottomNavigation = true,
     this.avoidFooterOverlap = false,
     this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
+    this.onRefresh,
     this.padding = const EdgeInsets.fromLTRB(
       AppSpacing.pageHorizontal,
       10,
@@ -44,6 +45,7 @@ class AppScreen extends StatelessWidget {
   final double pinnedHeaderHeight;
   final List<Widget> children;
   final EdgeInsetsGeometry padding;
+  final Future<void> Function()? onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -86,22 +88,7 @@ class AppScreen extends StatelessWidget {
             const Positioned.fill(child: AppScreenBackground()),
             Positioned.fill(
               bottom: scrollBottomInset,
-              child: ListView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: adjustedPadding,
-                children: [
-                  if (!fixedHeader && showHeader) ...[
-                    _AppLargeHeader(
-                      title: title,
-                      subtitle: subtitle,
-                      trailing: trailing,
-                    ),
-                    const SizedBox(height: 18),
-                  ],
-                  ...children,
-                ],
-              ),
+              child: _buildScrollBody(adjustedPadding),
             ),
             if (fixedHeader && showHeader)
               _AppPinnedHeader(
@@ -121,6 +108,37 @@ class AppScreen extends StatelessWidget {
       ),
     );
   }
+  Widget _buildScrollBody(EdgeInsetsGeometry adjustedPadding) {
+    final listView = ListView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      physics: onRefresh == null
+          ? null
+          : const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+      padding: adjustedPadding,
+      children: [
+        if (!fixedHeader && showHeader) ...[
+          _AppLargeHeader(
+            title: title,
+            subtitle: subtitle,
+            trailing: trailing,
+          ),
+          const SizedBox(height: 18),
+        ],
+        ...children,
+      ],
+    );
+    if (onRefresh == null) {
+      return listView;
+    }
+    return RefreshIndicator(
+      color: AppColors.brandDeep,
+      onRefresh: onRefresh!,
+      child: listView,
+    );
+  }
+
 }
 
 class _AppScreenFooter extends StatelessWidget {
