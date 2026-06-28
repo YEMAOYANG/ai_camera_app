@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:warm_sight/src/core/network/api_client.dart';
+import 'package:warm_sight/src/core/state/async_value_ui.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
 import 'package:warm_sight/src/features/tasks/application/task_realtime_repository.dart';
@@ -48,12 +49,30 @@ final cameraMonitorOverrideProvider = StateProvider<CameraMonitorStatus?>(
 final cameraMonitorDisplayProvider = Provider<AsyncValue<CameraMonitorStatus>>((
   ref,
 ) {
+  final remote = ref.watch(cameraMonitorStatusProvider);
   final override = ref.watch(cameraMonitorOverrideProvider);
-  if (override != null) {
-    return AsyncValue.data(override);
-  }
-  return ref.watch(cameraMonitorStatusProvider);
+  if (override == null) return remote;
+
+  return remote.when(
+    data: (server) => AsyncValue.data(_newerMonitorStatus(server, override)),
+    loading: () => AsyncValue.data(override),
+    error: (_, _) => AsyncValue.data(override),
+  );
 });
+
+CameraMonitorStatus _newerMonitorStatus(
+  CameraMonitorStatus server,
+  CameraMonitorStatus override,
+) {
+  final serverAt = server.lastObservationObservedAt ?? 0;
+  final overrideAt = override.lastObservationObservedAt ?? 0;
+  if (overrideAt > serverAt) return override;
+  if (overrideAt < serverAt) return server;
+  if (override.lastObservationReliable && !server.lastObservationReliable) {
+    return override;
+  }
+  return server;
+}
 
 final cameraSnapshotProvider = FutureProvider<CameraSnapshotFrame>((ref) async {
   final device = await ref.watch(selectedDeviceProvider.future);
@@ -61,18 +80,20 @@ final cameraSnapshotProvider = FutureProvider<CameraSnapshotFrame>((ref) async {
 });
 
 final cameraEventsProvider =
-    AsyncNotifierProvider<CameraEventsController, List<LiveCareEvent>>(
+    AsyncNotifierProvider<CameraEventsController, CameraEventsState>(
       CameraEventsController.new,
     );
 
-class CameraEventsController extends AsyncNotifier<List<LiveCareEvent>> {
+class CameraEventsController extends AsyncNotifier<CameraEventsState> {
   String? _deviceId;
+  static const _pageSize = 10;
 
   @override
-  Future<List<LiveCareEvent>> build() async {
+  Future<CameraEventsState> build() async {
     final device = await ref.watch(selectedDeviceProvider.future);
     _deviceId = device?.id;
-    return _fetch();
+    final page = await _fetchPage(offset: 0);
+    return CameraEventsState(items: page.events, hasMore: page.hasMore);
   }
 
   Future<void> refresh({bool keepPrevious = true}) async {
@@ -81,8 +102,10 @@ class CameraEventsController extends AsyncNotifier<List<LiveCareEvent>> {
       state = const AsyncLoading();
     }
     try {
-      final events = await _fetch();
-      state = AsyncData(events);
+      final page = await _fetchPage(offset: 0);
+      state = AsyncData(
+        CameraEventsState(items: page.events, hasMore: page.hasMore),
+      );
     } catch (error, stackTrace) {
       if (previous != null && keepPrevious) {
         state = AsyncData(previous);
@@ -92,17 +115,40 @@ class CameraEventsController extends AsyncNotifier<List<LiveCareEvent>> {
     }
   }
 
+  Future<void> loadMore() async {
+    final current = state.asData?.value;
+    if (current == null || !current.hasMore || current.isLoadingMore) return;
+    state = AsyncData(current.copyWith(isLoadingMore: true));
+    try {
+      final page = await _fetchPage(offset: current.items.length);
+      final merged = [...current.items, ...page.events];
+      state = AsyncData(
+        CameraEventsState(
+          items: merged,
+          hasMore: page.hasMore,
+          isLoadingMore: false,
+        ),
+      );
+    } catch (_) {
+      state = AsyncData(current.copyWith(isLoadingMore: false));
+    }
+  }
+
   void handleRealtimeEvent(TaskRealtimeEvent event) {
     if (event.event != null) {
       final item = LiveCareEvent.fromJson(event.event!);
       if (!item.isCareRecord) return;
-      final current = state.asData?.value ?? const <LiveCareEvent>[];
-      if (current.any((existing) => existing.id == item.id)) return;
+      final current = state.asData?.value ?? const CameraEventsState();
+      if (current.items.any((existing) => existing.id == item.id)) return;
       final dedupeKey = _realtimeDedupeKey(item);
-      if (current.any((existing) => _realtimeDedupeKey(existing) == dedupeKey)) {
+      if (current.items.any(
+        (existing) => _realtimeDedupeKey(existing) == dedupeKey,
+      )) {
         return;
       }
-      state = AsyncData([item, ...current]);
+      state = AsyncData(
+        current.copyWith(items: [item, ...current.items]),
+      );
       return;
     }
     if (event.isCameraObservationUpdated || event.isCameraEventCreated) {
@@ -110,22 +156,42 @@ class CameraEventsController extends AsyncNotifier<List<LiveCareEvent>> {
     }
   }
 
-  Future<List<LiveCareEvent>> _fetch() {
-    return ref.read(cameraRepositoryProvider).events(deviceId: _deviceId);
+  Future<CameraEventsPage> _fetchPage({required int offset}) {
+    return ref
+        .read(cameraRepositoryProvider)
+        .eventsPage(deviceId: _deviceId, limit: _pageSize, offset: offset);
   }
 }
 
-final liveCareStatusProvider = FutureProvider<LiveCareStatus>((ref) async {
-  final health = await ref.watch(cameraHealthProvider.future);
-  final runtime = await ref.watch(cameraRuntimeProvider.future);
-  final status = await ref.watch(cameraStatusProvider.future);
-  final monitor = await ref.watch(cameraMonitorStatusProvider.future);
-  return LiveCareStatus(
-    health: health,
-    runtime: runtime,
-    cameraStatus: status,
-    monitorStatus: monitor,
-  );
+final liveCareStatusProvider = Provider<AsyncValue<LiveCareStatus>>((ref) {
+  final health = ref.watch(cameraHealthProvider);
+  final runtime = ref.watch(cameraRuntimeProvider);
+  final status = ref.watch(cameraStatusProvider);
+  final monitor = ref.watch(cameraMonitorDisplayProvider);
+  final parts = [health, runtime, status, monitor];
+
+  if (parts.every((part) => part.hasValue)) {
+    return AsyncValue.data(
+      LiveCareStatus(
+        health: health.requireValue,
+        runtime: runtime.requireValue,
+        cameraStatus: status.requireValue,
+        monitorStatus: monitor.requireValue,
+      ),
+    );
+  }
+
+  if (parts.any((part) => isInitialAsyncLoad(part))) {
+    return const AsyncValue.loading();
+  }
+
+  for (final part in parts) {
+    if (part.hasError) {
+      return AsyncValue.error(part.error!, part.stackTrace!);
+    }
+  }
+
+  return const AsyncValue.loading();
 });
 
 class CameraRepository {
@@ -311,21 +377,39 @@ class CameraRepository {
     }
   }
 
-  Future<List<LiveCareEvent>> events({String? deviceId}) async {
+  Future<CameraEventsPage> eventsPage({
+    String? deviceId,
+    int limit = 10,
+    int offset = 0,
+  }) async {
     try {
       final response = await _apiClient.get(
         '/camera/events',
-        queryParameters: _deviceQuery(deviceId),
+        queryParameters: {
+          ..._deviceQuery(deviceId),
+          'limit': limit,
+          'offset': offset,
+        },
       );
-      final raw = _asMap(response.data)['events'];
-      if (raw is! List) return const [];
-      return raw
+      final body = _asMap(response.data);
+      final raw = body['events'];
+      if (raw is! List) {
+        return const CameraEventsPage(events: [], hasMore: false);
+      }
+      final events = raw
           .map((event) => LiveCareEvent.fromJson(_asMap(event)))
           .where((event) => event.isCareRecord)
           .toList();
+      final hasMore = body['hasMore'] == true;
+      return CameraEventsPage(events: events, hasMore: hasMore);
     } on DioException catch (error) {
       throw _fromDio(error, fallback: '暂时拿不到看护事件。');
     }
+  }
+
+  Future<List<LiveCareEvent>> events({String? deviceId}) async {
+    final page = await eventsPage(deviceId: deviceId, limit: 30, offset: 0);
+    return page.events;
   }
 
   CameraException _fromDio(DioException error, {required String fallback}) {

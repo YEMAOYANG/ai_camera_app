@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/features/care/application/care_repository.dart';
+import 'package:warm_sight/src/features/care/application/parent_review_realtime.dart';
+import 'package:warm_sight/src/features/care/domain/care_models.dart';
 import 'package:warm_sight/src/features/devices/application/device_repository.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
@@ -57,6 +59,7 @@ void _invalidateAuthenticatedSessionData(dynamic ref) {
   ref.invalidate(cameraRuntimeProvider);
   ref.invalidate(cameraStatusProvider);
   ref.invalidate(cameraMonitorStatusProvider);
+  ref.read(cameraMonitorOverrideProvider.notifier).state = null;
   ref.invalidate(cameraSnapshotProvider);
   ref.invalidate(cameraEventsProvider);
   ref.invalidate(liveCareStatusProvider);
@@ -65,4 +68,6 @@ void _invalidateAuthenticatedSessionData(dynamic ref) {
   ref.invalidate(routineWindowsProvider);
   ref.invalidate(careSummaryProvider);
   ref.invalidate(careReminderEventsProvider);
+  ref.read(pendingParentReviewsOverrideProvider.notifier).state =
+      const <ParentReviewItem>[];
 }

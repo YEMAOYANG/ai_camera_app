@@ -1065,6 +1065,44 @@ class CareRepository:
         )
         return conn.execute("SELECT * FROM review_items WHERE id = ?", (event_id,)).fetchone()
 
+    def get_review_item(
+        self,
+        conn: DatabaseConnection,
+        *,
+        review_id: str,
+        family_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT *
+            FROM review_items
+            WHERE id = ? AND family_id = ?
+            """,
+            (review_id, family_id),
+        ).fetchone()
+
+    def resolve_parent_review_item(
+        self,
+        conn: DatabaseConnection,
+        *,
+        review_id: str,
+        family_id: str,
+        resolved_by: str,
+        now: int,
+    ) -> DatabaseRow | None:
+        conn.execute(
+            """
+            UPDATE review_items
+            SET status = 'acknowledged', resolved_at = ?, resolved_by = ?
+            WHERE id = ? AND family_id = ? AND status = 'pending'
+            """,
+            (now, resolved_by, review_id, family_id),
+        )
+        return conn.execute(
+            "SELECT * FROM review_items WHERE id = ? AND family_id = ?",
+            (review_id, family_id),
+        ).fetchone()
+
     def find_recent_pending_review_item(
         self,
         conn: DatabaseConnection,

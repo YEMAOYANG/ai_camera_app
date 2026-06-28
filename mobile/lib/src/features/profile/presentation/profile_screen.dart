@@ -40,6 +40,7 @@ class ProfileScreen extends ConsumerWidget {
       ),
       children: [
         summary.when(
+          skipLoadingOnRefresh: true,
           data: (data) => _FamilySpaceHero(
             summary: data,
             subscription: subscription.asData?.value,

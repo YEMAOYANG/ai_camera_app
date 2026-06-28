@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:warm_sight/src/app/router/app_route.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/home/domain/home_models.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
@@ -13,7 +11,9 @@ class HomeHabitHero extends StatelessWidget {
     required this.safeTop,
     required this.scrollOffset,
     required this.isLoading,
-    required this.panelOverlap,
+    required     this.panelOverlap,
+    this.onOpenPending,
+    this.pendingCount = 0,
   });
 
   final HabitFocusCopy focus;
@@ -21,6 +21,8 @@ class HomeHabitHero extends StatelessWidget {
   final double scrollOffset;
   final bool isLoading;
   final double panelOverlap;
+  final VoidCallback? onOpenPending;
+  final int pendingCount;
 
   static const _heroImage = 'assets/images/home/home-hero-desk-evening.png';
 
@@ -185,38 +187,56 @@ class HomeHabitHero extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              HomePressable(
-                                onTap: () => context.go(AppRoute.alerts.path),
-                                child: Semantics(
-                                  button: true,
-                                  label: '未处理提醒',
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.20,
-                                      ),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.18,
-                                        ),
-                                      ),
-                                    ),
-                                    child: SizedBox(
-                                      width: AppControls.minTouchTarget,
-                                      height: AppControls.minTouchTarget,
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.notifications_outlined,
-                                          color: Colors.white,
-                                          size: 19,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              // V1: notification entry has no destination page yet.
+                              // if (onOpenPending != null) ...[
+                              // const SizedBox(width: 10),
+                              // HomePressable(
+                              //   onTap: onOpenPending!,
+                              //   child: Semantics(
+                              //     button: true,
+                              //     label: pendingCount > 0
+                              //         ? '待处理 $pendingCount 项'
+                              //         : '未处理提醒',
+                              //     child: DecoratedBox(
+                              //       decoration: BoxDecoration(
+                              //         color: Colors.black.withValues(
+                              //           alpha: 0.20,
+                              //         ),
+                              //         borderRadius: BorderRadius.circular(16),
+                              //         border: Border.all(
+                              //           color: Colors.white.withValues(
+                              //             alpha: 0.18,
+                              //           ),
+                              //         ),
+                              //       ),
+                              //       child: SizedBox(
+                              //         width: AppControls.minTouchTarget,
+                              //         height: AppControls.minTouchTarget,
+                              //         child: Center(
+                              //           child: Stack(
+                              //             clipBehavior: Clip.none,
+                              //             children: [
+                              //               Icon(
+                              //                 Icons.notifications_outlined,
+                              //                 color: Colors.white,
+                              //                 size: 19,
+                              //               ),
+                              //               if (pendingCount > 0)
+                              //                 Positioned(
+                              //                   right: -2,
+                              //                   top: -2,
+                              //                   child: _HeroPendingBadge(
+                              //                     count: pendingCount,
+                              //                   ),
+                              //                 ),
+                              //             ],
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
+                              // ],
                             ],
                           ),
                           SizedBox(height: statusGap),
@@ -345,6 +365,38 @@ class _HeroSkeleton extends StatelessWidget {
     );
   }
 }
+
+// V1: kept for when notification entry returns.
+// class _HeroPendingBadge extends StatelessWidget {
+//   const _HeroPendingBadge({required this.count});
+//
+//   final int count;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final label = count > 9 ? '9+' : '$count';
+//     return DecoratedBox(
+//       decoration: BoxDecoration(
+//         color: AppColors.warning,
+//         borderRadius: BorderRadius.circular(AppRadii.full),
+//         border: Border.all(color: Colors.white.withValues(alpha: 0.85)),
+//       ),
+//       child: Padding(
+//         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+//         child: Text(
+//           label,
+//           style: const TextStyle(
+//             color: Colors.white,
+//             fontFamily: AppTypography.systemFont,
+//             fontSize: 10,
+//             fontWeight: FontWeight.w900,
+//             height: 1.1,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class _HeroStatusPill extends StatelessWidget {
   const _HeroStatusPill({required this.chip});

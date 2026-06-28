@@ -37,7 +37,7 @@ class AiVisionProvider(Protocol):
         image_bytes: bytes,
         content_type: str,
         max_tokens: int = 360,
-        temperature: float = 0.6,
+        temperature: float = 1.0,
     ) -> AiVisionResponse | None:
         ...
 
@@ -52,6 +52,8 @@ class OpenAICompatibleVisionProvider:
         model_name: str,
         timeout_seconds: float = 20.0,
         max_bytes: int = 524288,
+        max_image_dimension: int = 1280,
+        jpeg_quality: int = 85,
         disable_thinking: bool = False,
     ):
         self.provider_name = provider_name.strip().lower() or "openai_compatible"
@@ -60,6 +62,8 @@ class OpenAICompatibleVisionProvider:
         self.model_name = model_name.strip()
         self.timeout_seconds = max(1.0, float(timeout_seconds))
         self.max_bytes = max(8192, int(max_bytes))
+        self.max_image_dimension = max(256, int(max_image_dimension))
+        self.jpeg_quality = max(40, min(95, int(jpeg_quality)))
         self.disable_thinking = disable_thinking
 
     def analyze_image(
@@ -70,13 +74,19 @@ class OpenAICompatibleVisionProvider:
         image_bytes: bytes,
         content_type: str,
         max_tokens: int = 360,
-        temperature: float = 0.6,
+        temperature: float = 1.0,
     ) -> AiVisionResponse | None:
         if not self.api_key or not self.base_url or not self.model_name:
             return None
         if not image_bytes:
             return None
-        encoded = _encode_image(image_bytes, content_type, self.max_bytes)
+        encoded = _encode_image(
+            image_bytes,
+            content_type,
+            self.max_bytes,
+            max_dimension=self.max_image_dimension,
+            jpeg_quality=self.jpeg_quality,
+        )
         if encoded is None:
             return None
         payload: dict = {
@@ -128,16 +138,23 @@ class OpenAICompatibleVisionProvider:
         return AiVisionResponse(text=text, provider=self.provider_name, model=self.model_name)
 
 
-def _encode_image(image_bytes: bytes, content_type: str, max_bytes: int) -> str | None:
+def _encode_image(
+    image_bytes: bytes,
+    content_type: str,
+    max_bytes: int,
+    *,
+    max_dimension: int = 1280,
+    jpeg_quality: int = 85,
+) -> str | None:
     body = image_bytes[:max_bytes]
     mime = str(content_type or "image/jpeg").split(";", 1)[0].strip() or "image/jpeg"
     if Image is not None:
         try:
             with Image.open(io.BytesIO(body)) as image:
                 image = image.convert("RGB")
-                image.thumbnail((512, 512))
+                image.thumbnail((max_dimension, max_dimension))
                 buffer = io.BytesIO()
-                image.save(buffer, format="JPEG", quality=45, optimize=True)
+                image.save(buffer, format="JPEG", quality=jpeg_quality, optimize=True)
                 body = buffer.getvalue()
                 mime = "image/jpeg"
         except Exception:

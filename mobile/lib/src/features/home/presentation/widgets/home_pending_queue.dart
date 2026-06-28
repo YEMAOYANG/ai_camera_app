@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/home/application/home_summary.dart';
 import 'package:warm_sight/src/features/home/domain/home_models.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_pending_actions.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
 import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
-class HomePendingQueue extends StatelessWidget {
+class HomePendingQueue extends ConsumerWidget {
   const HomePendingQueue({
     super.key,
     required this.items,
@@ -23,7 +23,7 @@ class HomePendingQueue extends StatelessWidget {
   final bool showNoDevicePrompt;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (hasNoDevice && showNoDevicePrompt) {
       return HomeSoftPanel(
         tone: StatusTone.neutral,
@@ -118,7 +118,7 @@ class HomePendingQueue extends StatelessWidget {
           title: '需要你处理',
           subtitle: '只放需要家长确认的事',
           actionLabel: '全部',
-          onAction: () => context.go(AppRoute.alerts.path),
+          onAction: () => showHomePendingSheet(context, ref, items),
         ),
         const SizedBox(height: 10),
         _PendingPanel(items: items),
@@ -127,13 +127,13 @@ class HomePendingQueue extends StatelessWidget {
   }
 }
 
-class _PendingPanel extends StatelessWidget {
+class _PendingPanel extends ConsumerWidget {
   const _PendingPanel({required this.items});
 
   final List<PendingItem> items;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final visible = items.take(2).toList();
     final tone = visible.any((item) => item.routePath == liveRoutePath)
         ? StatusTone.danger
@@ -145,7 +145,7 @@ class _PendingPanel extends StatelessWidget {
       child: Column(
         children: [
           for (var index = 0; index < visible.length; index++) ...[
-            _PendingRow(item: visible[index]),
+            _PendingRow(item: visible[index], ref: ref),
             if (index != visible.length - 1)
               Divider(height: 14, color: AppColors.ink.withValues(alpha: 0.06)),
           ],
@@ -153,14 +153,17 @@ class _PendingPanel extends StatelessWidget {
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                '还有 ${items.length - visible.length} 项，进入对应页面处理。',
-                style: const TextStyle(
-                  color: AppColors.muted,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1.35,
+              child: HomePressable(
+                onTap: () => showHomePendingSheet(context, ref, items),
+                child: Text(
+                  '还有 ${items.length - visible.length} 项，点击查看全部待办。',
+                  style: const TextStyle(
+                    color: AppColors.muted,
+                    fontFamily: AppTypography.systemFont,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    height: 1.35,
+                  ),
                 ),
               ),
             ),
@@ -172,9 +175,10 @@ class _PendingPanel extends StatelessWidget {
 }
 
 class _PendingRow extends StatelessWidget {
-  const _PendingRow({required this.item});
+  const _PendingRow({required this.item, required this.ref});
 
   final PendingItem item;
+  final WidgetRef ref;
 
   @override
   Widget build(BuildContext context) {
@@ -187,12 +191,13 @@ class _PendingRow extends StatelessWidget {
         : StatusTone.warning;
     final actionLabel = switch (item.action) {
       PendingItemAction.reviewMissedTask => '查看',
+      PendingItemAction.reviewCareNotify => '查看',
       PendingItemAction.checkDevice => '查看',
       _ => '处理',
     };
 
     return HomePressable(
-      onTap: () => context.go(item.routePath),
+      onTap: () => openHomePendingItem(context, ref, item),
       child: Semantics(
         button: true,
         label: '${item.title}，$actionLabel',

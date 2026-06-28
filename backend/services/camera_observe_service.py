@@ -101,6 +101,7 @@ class CameraObserveService:
                     current_hash=frame_hash,
                     now_ms=now,
                 )
+                runtime["display"] = _absent_runtime_display(now_ms=now)
                 self.runtime_store.save(
                     conn,
                     family_id=family_id,
@@ -363,6 +364,20 @@ class CameraObserveService:
                 since=since,
             )
         return row is not None
+
+
+def _absent_runtime_display(now_ms: int) -> dict[str, object]:
+    return {
+        "observed_at": now_ms,
+        "has_person": False,
+        "activity": "离开",
+        "raw_activity": "离开",
+        "confidence": 0.0,
+        "description": "刚才的画面里没有看到孩子。",
+        "decision_reason": "",
+        "isReliable": True,
+        "is_meal_scene": False,
+    }
 
 
 def _runtime_display_from_analysis(analysis: Mapping[str, object], *, now_ms: int) -> dict[str, object]:

@@ -5,14 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:warm_sight/src/app/realtime/app_realtime_helpers.dart';
 import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/state/async_value_ui.dart';
+import 'package:warm_sight/src/core/state/refresh_guard.dart';
 import 'package:warm_sight/src/core/theme/app_system_ui.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/care/application/care_repository.dart';
+import 'package:warm_sight/src/features/care/application/parent_review_realtime.dart';
+import 'package:warm_sight/src/features/care/domain/care_models.dart';
 import 'package:warm_sight/src/features/devices/application/device_repository.dart';
 import 'package:warm_sight/src/features/home/application/home_summary.dart';
-import 'package:warm_sight/src/features/home/presentation/widgets/home_ai_companion_card.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_habit_hero.dart';
-import 'package:warm_sight/src/features/home/presentation/widgets/home_pending_queue.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_primary_cta.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_rhythm_rail.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
@@ -36,24 +40,21 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with WidgetsBindingObserver {
   final _scrollController = ScrollController();
+  final _refreshGuard = RefreshGuard();
   var _localTodayText = homeDateText(DateTime.now());
   var _scrollOffset = 0.0;
-  Timer? _monitorPollTimer;
+  var _refreshGeneration = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _scrollController.addListener(_handleScroll);
-    _monitorPollTimer = Timer.periodic(const Duration(seconds: 90), (_) {
-      if (!mounted) return;
-      ref.invalidate(cameraMonitorStatusProvider);
-    });
   }
 
   @override
   void dispose() {
-    _monitorPollTimer?.cancel();
+    _refreshGeneration++;
     WidgetsBinding.instance.removeObserver(this);
     _scrollController
       ..removeListener(_handleScroll)
@@ -65,52 +66,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state != AppLifecycleState.resumed) return;
     _localTodayText = homeDateText(DateTime.now());
-    unawaited(_refreshMonitorOnce());
-    _invalidateHomeProviders();
+    unawaited(_refreshHomeSilently());
   }
 
-  void _invalidateHomeProviders() {
-    ref.read(cameraMonitorOverrideProvider.notifier).state = null;
-    ref
-      ..invalidate(profileSummaryProvider)
-      ..invalidate(primaryDeviceOverviewProvider)
-      ..invalidate(todayTasksProvider)
-      ..invalidate(rewardRedemptionsProvider)
-      ..invalidate(cameraStatusProvider)
-      ..invalidate(cameraHealthProvider)
-      ..invalidate(cameraMonitorStatusProvider);
+  Future<void> _refreshHomeSilently() async {
+    final generation = ++_refreshGeneration;
+    _localTodayText = homeDateText(DateTime.now());
+    await _refreshGuard.runLight(() async {
+      if (!mounted || generation != _refreshGeneration) return;
+      await refreshHomeDataSilently(ref);
+    });
   }
 
   Future<void> _refreshHome() async {
+    final generation = ++_refreshGeneration;
     _localTodayText = homeDateText(DateTime.now());
-    await _refreshMonitorOnce();
-    _invalidateHomeProviders();
-    await Future.wait<Object?>(
-      [
-        ref.read(profileSummaryProvider.future).then<Object?>((value) => value),
-        ref
-            .read(primaryDeviceOverviewProvider.future)
-            .then<Object?>((value) => value),
-        ref.read(todayTasksProvider.future).then<Object?>((value) => value),
-        ref
-            .read(rewardRedemptionsProvider.future)
-            .then<Object?>((value) => value),
-        ref.read(cameraHealthProvider.future).then<Object?>((value) => value),
-        ref.read(cameraStatusProvider.future).then<Object?>((value) => value),
-        ref
-            .read(cameraMonitorStatusProvider.future)
-            .then<Object?>((value) => value),
-      ].map((future) => future.catchError((_) => null)),
-    );
+    await _refreshGuard.runLight(() async {
+      if (!mounted || generation != _refreshGeneration) return;
+      await refreshHomeDataSilently(ref);
+    });
   }
 
-  Future<void> _refreshMonitorOnce() async {
-    try {
-      final monitor = await ref.read(cameraRepositoryProvider).refreshMonitor();
-      ref.read(cameraMonitorOverrideProvider.notifier).state = monitor;
-    } catch (_) {
-      // 页面仍可通过普通状态接口和下拉刷新兜底，不因为一次观察刷新失败进入错误态。
-    }
+  void _invalidateHomeProviders() {
+    unawaited(_refreshHomeSilently());
   }
 
   void _handleScroll() {
@@ -128,27 +106,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final cameraHealth = ref.watch(cameraHealthProvider);
     final cameraStatus = ref.watch(cameraStatusProvider);
     final cameraMonitor = ref.watch(cameraMonitorDisplayProvider);
+    final childId = profileSummary.asData?.value.child?.id;
+    final overrideReviews = ref.watch(pendingParentReviewsOverrideProvider);
+    final serverReviews = childId != null && childId.isNotEmpty
+        ? ref.watch(careSummaryProvider(childId)).asData?.value.needsParentReview
+        : null;
+    final parentReviews = mergeParentReviews(
+      overrideItems: overrideReviews,
+      serverItems: serverReviews,
+    );
 
     return HomeSummaryInput(
       now: now,
       profile: profileSummary.asData?.value,
-      profileLoading: profileSummary.isLoading,
+      profileLoading: isInitialAsyncLoad(profileSummary),
       deviceOverview: deviceOverview.asData?.value,
-      deviceLoading: deviceOverview.isLoading,
+      deviceLoading: isInitialAsyncLoad(deviceOverview),
       deviceError: deviceOverview.hasError,
       cameraHealth: cameraHealth.asData?.value,
-      cameraHealthLoading: cameraHealth.isLoading,
+      cameraHealthLoading: isInitialAsyncLoad(cameraHealth),
       cameraHealthError: cameraHealth.hasError,
       cameraStatus: cameraStatus.asData?.value,
-      cameraStatusLoading: cameraStatus.isLoading,
+      cameraStatusLoading: isInitialAsyncLoad(cameraStatus),
       cameraStatusError: cameraStatus.hasError,
       cameraMonitor: cameraMonitor.asData?.value,
-      cameraMonitorLoading: cameraMonitor.isLoading,
+      cameraMonitorLoading: isInitialAsyncLoad(cameraMonitor),
       tasks: todayTasks.asData?.value,
-      tasksLoading: todayTasks.isLoading,
+      tasksLoading: isInitialAsyncLoad(todayTasks),
       tasksError: todayTasks.hasError,
       redemptions: redemptions.asData?.value,
       redemptionsLoading: redemptions.isLoading,
+      parentReviews: parentReviews.isEmpty ? null : parentReviews,
     );
   }
 
@@ -166,6 +154,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final summary = buildHomeSummary(input);
     final dailyReport = ref.watch(dailyReportProvider);
     final weeklyReport = ref.watch(weeklyReportProvider);
+    final childId = input.profile?.child?.id;
+    if (childId != null && childId.isNotEmpty) {
+      ref.listen(careSummaryProvider(childId), (previous, next) {
+        if (next.hasValue) {
+          ref.read(pendingParentReviewsOverrideProvider.notifier).state =
+              const <ParentReviewItem>[];
+        }
+      });
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -201,8 +198,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     focus: summary.habitFocus,
                     safeTop: safeArea.top,
                     scrollOffset: _scrollOffset,
-                    isLoading: summary.isLoading,
+                    isLoading: summary.isInitialLoading,
                     panelOverlap: panelOverlap,
+                    // pendingCount: summary.pendingCount,
+                    // onOpenPending: summary.pendingItems.isEmpty
+                    //     ? null
+                    //     : () => showHomePendingSheet(
+                    //         context,
+                    //         ref,
+                    //         summary.pendingItems,
+                    //       ),
                   ),
                 ),
                 RefreshIndicator(
@@ -250,7 +255,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     mode: summary.rhythmMode,
                                     nodes: summary.rhythmNodes,
                                     isLoading:
-                                        summary.isLoading &&
+                                        summary.isInitialLoading &&
                                         summary.rhythmNodes.isEmpty,
                                     hasTaskError: input.tasksError,
                                     hasNoDevice: summary.hasNoDevice,
@@ -261,22 +266,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     weekly: weeklyReport,
                                     onOpen: () =>
                                         context.go(profileReportsHubPath),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  HomePendingQueue(
-                                    items: summary.pendingItems,
-                                    hasNoDevice: summary.hasNoDevice,
-                                    isLoading: summary.isLoading,
-                                    showNoDevicePrompt:
-                                        summary.rhythmNodes.isNotEmpty,
-                                  ),
-                                  const SizedBox(height: 14),
-                                  HomeRecentObservationCard(
-                                    copy: summary.recentObservation,
-                                    isLoading: summary.isLoading,
-                                    onRefresh: () => unawaited(_refreshHome()),
-                                    onOpenLive: () =>
-                                        context.go(AppRoute.live.path),
                                   ),
                                   const SizedBox(height: 14),
                                   HomePrimaryCtaBar(
@@ -493,7 +482,7 @@ _HomeReportCopy _resolveHomeReport({
       tone: StatusTone.neutral,
     );
   }
-  if (daily.isLoading || weekly.isLoading) {
+  if (isInitialAsyncLoad(daily) || isInitialAsyncLoad(weekly)) {
     return const _HomeReportCopy(
       title: '正在整理报告',
       subtitle: '今天优先，没有就看本周',

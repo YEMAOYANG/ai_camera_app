@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:warm_sight/src/features/care/domain/care_models.dart';
 import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 import 'package:warm_sight/src/features/home/application/home_summary.dart';
 import 'package:warm_sight/src/features/home/domain/home_models.dart';
@@ -126,7 +127,7 @@ void main() {
     expect(summary.habitFocus.title, isNot('今天按作息轻声提醒'));
     expect(summary.recentObservation.detail, isNot(contains('其他')));
     expect(summary.recentObservation.visible, isTrue);
-    expect(summary.recentObservation.headline, '暂时没有可靠画面记录');
+    expect(summary.recentObservation.headline, '暂时没有新的画面记录');
   });
 
   test('monitor status does not turn generic activity into normal state', () {
@@ -414,6 +415,31 @@ void main() {
     expect(nodes[1].state, RhythmNodeState.upcoming);
   });
 
+
+  test('buildPendingItems includes pending parent review from camera', () {
+    final pending = buildPendingItems(
+      tasks: const [],
+      redemptions: const [],
+      deviceIssue: false,
+      parentReviews: [
+        ParentReviewItem(
+          id: 'rev_1',
+          childId: 'child_1',
+          scenario: 'parent_notify',
+          reviewType: 'parent_notify',
+          status: 'pending',
+          summary: '孩子玩手机时间较长',
+          createdAt: 1,
+        ),
+      ],
+    );
+
+    expect(pending.length, 1);
+    expect(pending.first.action, PendingItemAction.reviewCareNotify);
+    expect(pending.first.routePath, liveRoutePath);
+    expect(pending.first.title, contains('玩手机'));
+  });
+
   test('buildPrimaryCta does not create a global pending action button', () {
     final pending = buildPendingItems(
       tasks: [
@@ -601,8 +627,50 @@ void main() {
 
     expect(copy.visible, isTrue);
     expect(copy.showActions, isTrue);
-    expect(copy.headline, '暂时没有可靠画面记录');
+    expect(copy.headline, '暂时没有新的画面记录');
     expect(copy.detail, contains('刷新观察'));
+  });
+
+  test('buildRecentObservationCopy falls back to recent event record', () {
+    final copy = buildRecentObservationCopy(
+      input: HomeSummaryInput(
+        now: now,
+        cameraMonitor: const CameraMonitorStatus(
+          running: true,
+          status: 'observing',
+          message: '观察中',
+          lastObservation: '旧观察',
+          lastReminder: '',
+        ),
+      ),
+      hasNoDevice: false,
+      deviceIssue: false,
+      heroObservation: null,
+      currentTask: null,
+      localTasks: const [],
+      pendingCount: 0,
+      isLoading: false,
+      recentEvent: LiveCareEvent(
+        id: 'evt_1',
+        source: 'camera_observation',
+        eventType: 'camera_observation',
+        title: '玩玩具',
+        message: '孩子在玩玩具。',
+        displayTitle: '玩玩具',
+        displayMessage: '孩子在玩玩具。',
+        category: 'camera_observation',
+        severity: 'info',
+        taskTitle: '',
+        evidenceSummary: '',
+        hasReplay: false,
+        status: 'ok',
+        toneKey: 'info',
+        createdAt: 1,
+      ),
+    );
+
+    expect(copy.headline, '最近记录');
+    expect(copy.detail, contains('玩玩具'));
   });
 
   test(
@@ -673,60 +741,61 @@ void main() {
     () {
       final afternoon = DateTime(2026, 6, 24, 16, 28);
       final today = homeDateText(afternoon);
-      final summary = buildHomeSummary(
-        HomeSummaryInput(
-          now: afternoon,
-          profile: profile(child: child()),
-          deviceOverview: _onlineDeviceOverview(),
-          cameraHealth: const CameraHealth(
-            ok: true,
-            reachable: true,
-            adapter: 'mock',
-            serviceLabel: '摄像头服务',
-            message: '在线',
-          ),
-          cameraStatus: const CameraStatus(
-            connectionStatus: 'online',
-            streamAvailable: true,
-            snapshotAvailable: true,
-            speakerAvailable: true,
-            monitorAvailable: true,
-            ptzAvailable: false,
-            lastSeenAt: 0,
-            runtimeProvider: 'mock',
-            message: '摄像头在线',
-          ),
-          tasks: [
-            task(
-              id: 'toy',
-              status: GuardianTaskStatus.completed,
-              scheduledStart: '14:50',
-            ).copyWith(
-              title: '玩会儿玩具',
-              scheduledDate: today,
-              scheduledEnd: '15:10',
-            ),
-            task(
-              id: 'read',
-              status: GuardianTaskStatus.missed,
-              scheduledStart: '10:14',
-              parentActions: const [
-                'reschedule',
-                'manual_complete',
-                'acknowledge_missed',
-              ],
-            ).copyWith(
-              title: '自己阅读一本绘本',
-              scheduledDate: today,
-              scheduledEnd: '10:30',
-            ),
-          ],
+      final tasks = [
+        task(
+          id: 'toy',
+          status: GuardianTaskStatus.completed,
+          scheduledStart: '14:50',
+        ).copyWith(
+          title: '玩会儿玩具',
+          scheduledDate: today,
+          scheduledEnd: '15:10',
         ),
+        task(
+          id: 'read',
+          status: GuardianTaskStatus.missed,
+          scheduledStart: '10:14',
+          parentActions: const [
+            'reschedule',
+            'manual_complete',
+            'acknowledge_missed',
+          ],
+        ).copyWith(
+          title: '自己阅读一本绘本',
+          scheduledDate: today,
+          scheduledEnd: '10:30',
+        ),
+      ];
+      final pendingItems = buildPendingItems(
+        tasks: tasks,
+        redemptions: const [],
+        deviceIssue: false,
+        canManageTasks: true,
+        canConfirmTasks: true,
       );
 
-      expect(summary.habitFocus.title, '有一项安排没有看到完成');
-      expect(summary.habitFocus.title, isNot(contains('玩会儿玩具')));
-      expect(summary.habitFocus.detail, '1 件事等你处理，先看记录再决定。');
+      expect(
+        observationTitle(
+          cameraStatus: null,
+          cameraMonitor: null,
+          currentTask: null,
+          localTasks: tasks,
+          pendingItems: pendingItems,
+          childName: '小爱',
+          now: afternoon,
+        ),
+        '有一项安排没有看到完成',
+      );
+      expect(
+        observationDetail(
+          cameraMonitor: null,
+          currentTask: null,
+          localTasks: tasks,
+          pendingCount: pendingItems.length,
+          now: afternoon,
+        ),
+        '1 件事等你处理，先看记录再决定。',
+      );
     },
   );
 

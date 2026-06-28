@@ -1,12 +1,15 @@
 import 'dart:async';
 
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:warm_sight/src/app/realtime/app_realtime_helpers.dart';
 import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/core/state/async_value_ui.dart';
+import 'package:warm_sight/src/core/state/refresh_guard.dart';
 import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
-import 'package:warm_sight/src/features/devices/application/device_repository.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
@@ -25,19 +28,29 @@ class LiveCareScreen extends ConsumerStatefulWidget {
 }
 
 class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
+  final _refreshGuard = RefreshGuard();
+  var _previewRefreshing = false;
+  var _refreshGeneration = 0;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(_refreshLiveCare(analyzeFrame: true));
+      unawaited(_refreshLiveCare(analyzeFrame: false));
     });
+  }
+
+  @override
+  void dispose() {
+    _refreshGeneration++;
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final selectedDevice = ref.watch(selectedDeviceProvider);
-    if (selectedDevice.isLoading) {
+    if (isInitialAsyncLoad(selectedDevice)) {
       return const AppScreen(
         title: '实时看护',
         fixedHeader: false,
@@ -68,7 +81,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
             title: '摄像头状态暂时无法同步',
             message: '请稍后刷新。',
             primaryActionLabel: '重新加载',
-            onPrimaryAction: () => ref.invalidate(selectedDeviceProvider),
+            onPrimaryAction: () => silentRefreshProvider(ref, selectedDeviceProvider),
             compact: true,
           ),
         ],
@@ -121,10 +134,12 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
           status: liveStatus,
           snapshot: snapshotFrame,
           onRefresh: () => unawaited(_refreshLiveCare(analyzeFrame: true)),
+          previewRefreshing: _previewRefreshing,
         ),
         const SizedBox(height: 8),
         _LiveActions(
           status: liveStatus,
+          previewRefreshing: _previewRefreshing,
           onRefresh: () => unawaited(_refreshLiveCare(analyzeFrame: true)),
         ),
         const SizedBox(height: 10),
@@ -137,26 +152,40 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
     bool analyzeFrame = false,
   }) async {
     if (!mounted) return;
+    final generation = ++_refreshGeneration;
     final device = ref.read(selectedDeviceProvider).asData?.value;
-    if (analyzeFrame && device != null) {
-      try {
-        await ref
-            .read(cameraRepositoryProvider)
-            .refreshMonitor(deviceId: device.id);
-      } on CameraException {
-        // 手动刷新仍应回落到普通状态刷新，避免实时页被观察服务错误卡住。
+
+    Future<void> runRefresh() async {
+      if (!mounted || generation != _refreshGeneration) return;
+      if (analyzeFrame && device != null) {
+        try {
+          await triggerMonitorAnalysis(ref, deviceId: device.id);
+        } on CameraException {
+          // 手动刷新仍应回落到普通状态刷新，避免实时页被观察服务错误卡住。
+        }
       }
+      if (!mounted || generation != _refreshGeneration) return;
+      await refreshLiveCareDataSilently(ref);
     }
-    if (!mounted) return;
-    ref
-      ..invalidate(liveCareStatusProvider)
-      ..invalidate(cameraHealthProvider)
-      ..invalidate(cameraRuntimeProvider)
-      ..invalidate(cameraStatusProvider)
-      ..invalidate(cameraMonitorStatusProvider)
-      ..invalidate(cameraSnapshotProvider)
-      ..invalidate(cameraEventsProvider)
-      ..invalidate(primaryDeviceOverviewProvider);
+
+    if (analyzeFrame) {
+      if (mounted) setState(() => _previewRefreshing = true);
+      try {
+        final ran = await ref.read(monitorAnalysisGuardProvider).runHeavy(
+          runRefresh,
+        );
+        if (!ran && mounted && generation == _refreshGeneration) {
+          await _refreshGuard.runLight(runRefresh);
+        }
+      } finally {
+        if (mounted && generation == _refreshGeneration) {
+          setState(() => _previewRefreshing = false);
+        }
+      }
+      return;
+    }
+
+    await _refreshGuard.runLight(runRefresh);
   }
 }
 
@@ -181,6 +210,7 @@ class _LiveCareHero extends StatelessWidget {
     required this.status,
     required this.snapshot,
     required this.onRefresh,
+    this.previewRefreshing = false,
   });
 
   final String title;
@@ -188,12 +218,14 @@ class _LiveCareHero extends StatelessWidget {
   final AsyncValue<LiveCareStatus> status;
   final AsyncValue<CameraSnapshotFrame> snapshot;
   final VoidCallback onRefresh;
+  final bool previewRefreshing;
 
   @override
   Widget build(BuildContext context) {
     final care = status.asData?.value;
-    final label = status.isLoading ? '正在连接' : care?.label ?? '状态检查中';
-    final tone = status.isLoading
+    final statusInitialLoad = isInitialAsyncLoad(status);
+    final label = statusInitialLoad ? '正在连接' : care?.label ?? '状态检查中';
+    final tone = statusInitialLoad
         ? StatusTone.warning
         : care?.tone ?? StatusTone.neutral;
 
@@ -244,6 +276,7 @@ class _LiveCareHero extends StatelessWidget {
           _LiveViewport(
             status: status,
             snapshot: snapshot,
+            previewRefreshing: previewRefreshing,
             onRefresh: onRefresh,
           ),
         ],
@@ -257,19 +290,22 @@ class _LiveViewport extends StatelessWidget {
     required this.status,
     required this.snapshot,
     required this.onRefresh,
+    this.previewRefreshing = false,
   });
 
   final AsyncValue<LiveCareStatus> status;
   final AsyncValue<CameraSnapshotFrame> snapshot;
   final VoidCallback onRefresh;
+  final bool previewRefreshing;
 
   @override
   Widget build(BuildContext context) {
     final care = status.asData?.value;
     final frame = snapshot.asData?.value;
     final available = care?.isAvailable ?? false;
+    final statusInitialLoad = isInitialAsyncLoad(status);
 
-    if (status.isLoading) {
+    if (statusInitialLoad) {
       return const _ViewportPlaceholder(
         icon: Icons.sync_outlined,
         label: '连接中',
@@ -524,16 +560,22 @@ class _ViewportIcon extends StatelessWidget {
 }
 
 class _LiveActions extends StatelessWidget {
-  const _LiveActions({required this.status, required this.onRefresh});
+  const _LiveActions({
+    required this.status,
+    required this.onRefresh,
+    this.previewRefreshing = false,
+  });
 
   final AsyncValue<LiveCareStatus> status;
   final VoidCallback onRefresh;
+  final bool previewRefreshing;
 
   @override
   Widget build(BuildContext context) {
     final available = status.asData?.value.isAvailable ?? false;
     final streamAvailable =
         status.asData?.value.cameraStatus?.streamAvailable ?? available;
+    final refreshSubtitle = previewRefreshing ? '同步中…' : '同步状态';
     final actions = [
       _LiveAction(
         icon: Icons.play_arrow_rounded,
@@ -547,8 +589,9 @@ class _LiveActions extends StatelessWidget {
       _LiveAction(
         icon: Icons.refresh_outlined,
         title: available ? '刷新预览' : '重新连接',
-        subtitle: '同步状态',
-        onTap: onRefresh,
+        subtitle: refreshSubtitle,
+        loading: previewRefreshing,
+        onTap: previewRefreshing ? null : onRefresh,
       ),
     ];
 
@@ -582,6 +625,7 @@ class _LiveAction {
     required this.title,
     required this.subtitle,
     this.highlighted = false,
+    this.loading = false,
     this.onTap,
   });
 
@@ -589,6 +633,7 @@ class _LiveAction {
   final String title;
   final String subtitle;
   final bool highlighted;
+  final bool loading;
   final VoidCallback? onTap;
 }
 
@@ -616,7 +661,11 @@ class _LiveActionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(action.icon, color: fg, size: compact ? 20 : 21),
+            Icon(
+              action.loading ? Icons.sync_outlined : action.icon,
+              color: fg,
+              size: compact ? 20 : 21,
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -660,7 +709,7 @@ class _CareFocusPanel extends StatelessWidget {
   const _CareFocusPanel({required this.status, required this.events});
 
   final AsyncValue<LiveCareStatus> status;
-  final AsyncValue<List<LiveCareEvent>> events;
+  final AsyncValue<CameraEventsState> events;
 
   @override
   Widget build(BuildContext context) {
@@ -668,7 +717,7 @@ class _CareFocusPanel extends StatelessWidget {
     final currentTask = care?.currentTask;
     final monitor = care?.monitorStatus;
     final hasObservation = monitor?.hasCurrentReliableObservation == true;
-    final eventItems = events.asData?.value ?? const <LiveCareEvent>[];
+    final eventItems = events.asData?.value.items ?? const <LiveCareEvent>[];
     final summaryEvents = eventItems
         .where(
           (event) =>
@@ -767,19 +816,53 @@ String _monitorObservationSubtitle(CameraMonitorStatus monitor) {
   return display.isEmpty ? '这条记录来自摄像头画面。' : display;
 }
 
-class LiveEventsScreen extends ConsumerWidget {
+class LiveEventsScreen extends ConsumerStatefulWidget {
   const LiveEventsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LiveEventsScreen> createState() => _LiveEventsScreenState();
+}
+
+class _LiveEventsScreenState extends ConsumerState<LiveEventsScreen> {
+  final _scrollController = ScrollController();
+  final _refreshController = EasyRefreshController(
+    controlFinishRefresh: true,
+    controlFinishLoad: true,
+  );
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _refreshController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleRefresh() {
+    return ref.read(cameraEventsProvider.notifier).refresh();
+  }
+
+  Future<void> _handleLoadMore() {
+    return ref.read(cameraEventsProvider.notifier).loadMore();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final events = ref.watch(cameraEventsProvider);
+    final eventsState = events.asData?.value;
     return AppScreen(
       title: '看护记录',
       subtitle: '画面观察和需要回看的情况',
       onBack: () => context.go(AppRoute.live.path),
-      onRefresh: () => ref.read(cameraEventsProvider.notifier).refresh(),
+      scrollController: _scrollController,
+      reserveBottomNavigation: false,
+      refreshDisplacement: 52,
+      easyRefreshController: _refreshController,
+      onRefresh: _handleRefresh,
+      onLoadMore: eventsState?.hasMore == true ? _handleLoadMore : null,
+      canLoadMore: eventsState?.hasMore ?? false,
       children: [
         events.when(
+          skipLoadingOnRefresh: true,
           loading: () =>
               const AppLoadingState(title: '正在整理最近片段', message: '请稍等一下。'),
           error: (_, _) => const AppStateView(
@@ -787,7 +870,8 @@ class LiveEventsScreen extends ConsumerWidget {
             title: '暂时拿不到回放',
             message: '稍后再试，任务记录不会受到影响。',
           ),
-          data: (items) {
+          data: (state) {
+            final items = state.items;
             if (items.isEmpty) {
               return const AppStateView(
                 variant: AppStateVariant.noData,
@@ -796,6 +880,7 @@ class LiveEventsScreen extends ConsumerWidget {
               );
             }
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (var index = 0; index < items.length; index++) ...[
                   _PlaybackCard(
@@ -806,6 +891,16 @@ class LiveEventsScreen extends ConsumerWidget {
                     tone: _eventListTone(items[index]),
                   ),
                   if (index != items.length - 1) const SizedBox(height: 12),
+                ],
+                if (state.isLoadingMore) ...[
+                  const SizedBox(height: 16),
+                  const Center(
+                    child: SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
                 ],
               ],
             );

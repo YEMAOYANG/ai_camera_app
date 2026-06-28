@@ -259,7 +259,9 @@ class ParentReviewItem {
       id: _asString(json['id']),
       childId: _asString(json['childId']),
       scenario: _asString(json['scenario']),
-      reviewType: _asString(json['reviewType']),
+      reviewType: _asString(json['reviewType']).isNotEmpty
+          ? _asString(json['reviewType'])
+          : _asString(json['itemType']),
       status: _asString(json['status']),
       summary: _asString(json['summary']),
       createdAt: _asInt(json['createdAt']),

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from pathlib import Path
 from typing import Mapping
 
@@ -55,6 +56,8 @@ class AiCareReminderService:
         self.prompt_registry = prompt_registry
         self.validator = validator or ReminderTextValidator()
         self.camera_command_service = camera_command_service
+        self._speaker_locks: dict[str, threading.Lock] = {}
+        self._speaker_locks_guard = threading.Lock()
 
     def next_reminder(self, access_token: str, args) -> dict:
         context = self.auth_service.authenticate(access_token)
@@ -304,15 +307,18 @@ class AiCareReminderService:
             )
 
         command_id = None
+        device_id = _optional_text(event.get("device_id")) or ""
         try:
-            command = self.camera_command_service.internal_speak(
-                family_id=family_id,
-                text=str(event.get("text") or ""),
-                task_id=_optional_text(event.get("task_id")),
-                device_id=_optional_text(event.get("device_id")),
-                source="care_reminder",
-                scenario=str(event.get("scenario") or ""),
-            )
+            with self._speaker_lock(device_id):
+                command = self.camera_command_service.internal_speak(
+                    family_id=family_id,
+                    text=str(event.get("text") or ""),
+                    task_id=_optional_text(event.get("task_id")),
+                    device_id=device_id or None,
+                    source="care_reminder",
+                    scenario=str(event.get("scenario") or ""),
+                    prompt_id=str(event.get("prompt_id") or ""),
+                )
             command_id = _optional_text(command.get("commandId"))
             if str(command.get("status") or "") == "failed":
                 return self._mark_command_failed(
@@ -385,6 +391,15 @@ class AiCareReminderService:
                 "reusedExistingCommand": False,
             },
         }
+
+    def _speaker_lock(self, device_id: str) -> threading.Lock:
+        key = device_id or "__default__"
+        with self._speaker_locks_guard:
+            lock = self._speaker_locks.get(key)
+            if lock is None:
+                lock = threading.Lock()
+                self._speaker_locks[key] = lock
+            return lock
 
     def generate_preview(
         self,

@@ -47,6 +47,7 @@ class PointsScreen extends ConsumerWidget {
         onTap: () => context.go(rewardsPath),
       ),
       children: points.when(
+        skipLoadingOnRefresh: true,
         data: (data) {
           final rewardData = rewards.asData?.value;
           final activeItems = _activeRewardItems(rewardData?.items ?? const []);

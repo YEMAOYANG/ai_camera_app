@@ -6,6 +6,7 @@ from services.observation_payload_builder import build_primary_payload
 from services.observation_absence_mode import should_skip_vision_before_analyze, update_absence_after_analysis
 from services.observation_session_state import session_snapshot_from_observation, should_post_observation
 from services.vision_frame_gate import compute_dhash, frame_is_stable, hamming_distance
+from services.camera_command_service import lightweight_camera_event_from_observation
 from services.vision_observation_enrich import enrich_observation, sanitize_absent_observation
 
 
@@ -117,6 +118,49 @@ class ObservationGateTest(unittest.TestCase):
         assert payload is not None
         self.assertEqual(payload["signals"][0]["signalType"], "toy_play_unsafe_climbing")
 
+    def test_toy_play_near_dining_table_not_meal(self):
+        payload = build_primary_payload(
+            {
+                "has_person": True,
+                "activity": "吃饭",
+                "description": "小爱坐在餐桌旁玩玩具车，手中拿着玩具。",
+                "confidence": 0.84,
+            },
+            family_id="fam_1",
+            child_id="child_1",
+            device_id="dev_1",
+            source="test",
+            window_start_ms=1_000,
+            window_end_ms=4_000,
+            observed_at=4_000,
+        )
+        self.assertIsNotNone(payload)
+        assert payload is not None
+        self.assertEqual(payload["scenario"], "toy_cleanup")
+        self.assertEqual(payload["signals"][0]["signalType"], "toy_playing_observed")
+
+    def test_cleanup_started_payload(self):
+        payload = build_primary_payload(
+            {
+                "has_person": True,
+                "activity": "收玩具",
+                "description": "小爱正在把玩具车放进收纳盒。",
+                "confidence": 0.9,
+            },
+            family_id="fam_1",
+            child_id="child_1",
+            device_id="dev_1",
+            source="test",
+            window_start_ms=1_000,
+            window_end_ms=4_000,
+            observed_at=4_000,
+        )
+        self.assertIsNotNone(payload)
+        assert payload is not None
+        self.assertEqual(payload["scenario"], "toy_cleanup")
+        self.assertEqual(payload["signals"][0]["signalType"], "cleanup_started")
+        self.assertFalse(payload["recordCareEvent"])
+
     def test_meal_eating_observed_payload(self):
         payload = build_primary_payload(
             {
@@ -149,6 +193,23 @@ class ObservationGateTest(unittest.TestCase):
         )
         self.assertFalse(should_post)
         self.assertEqual(reason, "absent_already_recorded")
+
+    def test_lightweight_event_absent_no_screen_message(self):
+        obs = enrich_observation(
+            {
+                "has_person": False,
+                "description": "孩子在看屏幕，注意用眼距离。",
+                "activity": "其他",
+            }
+        )
+        event = lightweight_camera_event_from_observation(
+            event_id="evt_absent",
+            device_id="dev_1",
+            observation=obs,
+            now=1_000,
+        )
+        self.assertNotIn("看屏幕", event["displayMessage"])
+        self.assertNotIn("看屏幕", event.get("displayTitle", ""))
 
     def test_enrich_meal_scene_normalizes_toy_activity(self):
         obs = enrich_observation(

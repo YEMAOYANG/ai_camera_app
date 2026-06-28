@@ -229,6 +229,8 @@ def build_ai_vision_provider_from_config(config: dict):
     base_url = str(config.get("AI_BASE_URL", "")).strip()
     timeout = float(config.get("AI_VISION_TIMEOUT_SECONDS", 20))
     max_bytes = int(config.get("AI_VISION_MAX_BYTES", 524288))
+    max_dimension = int(config.get("AI_VISION_MAX_DIMENSION", 1280))
+    jpeg_quality = int(config.get("AI_VISION_JPEG_QUALITY", 85))
     if provider in {"moonshot", "kimi", "openai", "openai_compatible"} and api_key and base_url and model:
         return OpenAICompatibleVisionProvider(
             provider_name="moonshot" if provider == "kimi" else provider,
@@ -237,7 +239,9 @@ def build_ai_vision_provider_from_config(config: dict):
             model_name=model,
             timeout_seconds=timeout,
             max_bytes=max_bytes,
-            disable_thinking=provider in {"moonshot", "kimi"},
+            max_image_dimension=max_dimension,
+            jpeg_quality=jpeg_quality,
+            disable_thinking=False,
         )
     return UnavailableVisionProvider()
 

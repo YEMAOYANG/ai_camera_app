@@ -9,6 +9,7 @@ import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/tasks/application/task_repository.dart';
+import 'package:warm_sight/src/features/tasks/application/task_week_scope.dart';
 import 'package:warm_sight/src/features/tasks/application/task_template_schedule.dart';
 import 'package:warm_sight/src/features/tasks/domain/task_models.dart';
 import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
@@ -73,6 +74,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       endDate: _weekStart.add(const Duration(days: 6)),
       childId: childId?.isNotEmpty == true ? childId : null,
     );
+    ref.read(activeTaskWeekQueryProvider.notifier).state = query;
     final weekTasks = ref.watch(taskWeekProvider(query));
 
     if (widget.openTemplatesOnEntry &&
@@ -110,6 +112,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       ),
       children: [
         weekTasks.when(
+          skipLoadingOnRefresh: true,
           data: (tasks) {
             final dayTasks = _tasksForSelectedDay(tasks);
             if (dayTasks.isEmpty) {

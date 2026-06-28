@@ -8,6 +8,7 @@ from services.observation_session_state import session_snapshot_from_observation
 from services.vision_observation_enrich import (
     enrich_observation,
     has_toys_on_table,
+    is_cleanup_activity,
     is_homework_like,
     is_meal_scene,
     is_toy_play_scene,
@@ -140,15 +141,8 @@ def scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, str
         result.append(("transition", "child_not_visible", "active", "暂未看到孩子。"))
         return result
 
-    if is_meal_scene(analysis):
-        if has_toys_on_table(analysis):
-            result.append(("meal_habit", "meal_toys_on_table", "active", "餐桌上有玩具，需要先收好。"))
-        elif meal_standing_detected(analysis):
-            result.append(("meal_habit", "meal_standing_on_chair", "active", "用餐时未坐好。"))
-        elif MEAL_DISTRACTION_RE.search(text):
-            result.append(("meal_habit", "meal_attention_shifted", "active", "观察到用餐时注意力离开餐桌。"))
-        else:
-            result.append(("meal_habit", "meal_eating_observed", "active", "观察到孩子正在用餐。"))
+    if is_cleanup_activity(analysis):
+        result.append(("toy_cleanup", "cleanup_started", "active", "观察到孩子正在收纳玩具。"))
         return result
 
     if is_toy_play_scene(analysis):
@@ -163,6 +157,17 @@ def scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, str
             result.append(("toy_cleanup", "toy_play_unsafe_mouth", "active", "玩玩具时有不安全动作。"))
         elif playing_toys:
             result.append(("toy_cleanup", "toy_playing_observed", "active", "观察到孩子正在玩玩具。"))
+        return result
+
+    if is_meal_scene(analysis):
+        if has_toys_on_table(analysis):
+            result.append(("meal_habit", "meal_toys_on_table", "active", "餐桌上有玩具，需要先收好。"))
+        elif meal_standing_detected(analysis):
+            result.append(("meal_habit", "meal_standing_on_chair", "active", "用餐时未坐好。"))
+        elif MEAL_DISTRACTION_RE.search(text):
+            result.append(("meal_habit", "meal_attention_shifted", "active", "观察到用餐时注意力离开餐桌。"))
+        else:
+            result.append(("meal_habit", "meal_eating_observed", "active", "观察到孩子正在用餐。"))
         return result
 
     posture_status = str(analysis.get("posture_status") or "").strip()
@@ -189,6 +194,10 @@ def scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, str
         activity = str(analysis.get("activity") or analysis.get("raw_activity") or "看书").strip()
         label = activity if activity in {"看书", "写作业", "写作业/看书"} else "看书"
         result.append(("posture", "homework_like_observed", "active", f"观察到孩子正在{label}。"))
+
+    activity = str(analysis.get("activity") or analysis.get("raw_activity") or "").strip()
+    if has_person is True and activity in {"看电视", "玩手机"} and not result:
+        result.append(("transition", "screen_activity_observed", "active", f"观察到孩子正在{activity}。"))
 
     return result
 

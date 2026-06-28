@@ -259,6 +259,7 @@ class TaskRealtimeEvent {
   bool get isCameraEventCreated => type == 'camera_event.created';
   bool get isCameraStatusChanged => type == 'camera_status.changed';
   bool get isReminderEventCreated => type == 'reminder_event.created';
+  bool get isReminderDecisionCreated => type == 'reminder_decision.created';
   bool get isCameraCommandCreated => type == 'camera_command.created';
   bool get isSessionRevoked => type == 'session_revoked';
 

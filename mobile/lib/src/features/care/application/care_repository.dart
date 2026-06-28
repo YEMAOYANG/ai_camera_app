@@ -194,6 +194,14 @@ class CareRepository {
       throw _fromDio(error, fallback: '提醒记录暂时不可用。');
     }
   }
+
+  Future<void> acknowledgeParentReview({required String reviewId}) async {
+    try {
+      await apiClient.post('/care/parent-reviews/$reviewId/acknowledge');
+    } on DioException catch (error) {
+      throw _fromDio(error, fallback: '暂时无法确认这条待办。');
+    }
+  }
 }
 
 CareException _fromDio(DioException error, {required String fallback}) {

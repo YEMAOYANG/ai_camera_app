@@ -1,3 +1,4 @@
+import 'package:warm_sight/src/features/care/domain/care_models.dart';
 import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 import 'package:warm_sight/src/features/home/domain/home_models.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
@@ -7,8 +8,11 @@ import 'package:warm_sight/src/features/tasks/domain/task_models.dart';
 import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 const taskDetailRoutePrefix = '/tasks/detail';
-const rewardsRoutePath = '/rewards';
+const rewardsRoutePath = '/rewards/redemptions';
 const liveRoutePath = '/live';
+
+/// Home hero hides pending confirmation queue until dedicated pages ship.
+const hideHomePendingQueue = true;
 
 class HomeSummaryInput {
   const HomeSummaryInput({
@@ -31,6 +35,8 @@ class HomeSummaryInput {
     this.tasksError = false,
     this.redemptions,
     this.redemptionsLoading = false,
+    this.parentReviews,
+    this.recentCameraEvent,
   });
 
   final DateTime now;
@@ -52,6 +58,8 @@ class HomeSummaryInput {
   final bool tasksError;
   final List<RewardRedemption>? redemptions;
   final bool redemptionsLoading;
+  final List<ParentReviewItem>? parentReviews;
+  final LiveCareEvent? recentCameraEvent;
 }
 
 HomeSummary buildHomeSummary(HomeSummaryInput input) {
@@ -70,21 +78,25 @@ HomeSummary buildHomeSummary(HomeSummaryInput input) {
   final tasksReady = localTasks != null;
   final currentTask =
       input.cameraStatus?.currentTask ?? currentTaskFromToday(localTasks);
-  final pendingItems = buildPendingItems(
-    tasks: localTasks,
-    redemptions: input.redemptions,
-    deviceIssue: deviceIssue,
-    canManageTasks: input.profile?.can('manage_tasks') ?? false,
-    canConfirmTasks: input.profile?.can('confirm_tasks') ?? false,
-  );
+  final pendingItems = hideHomePendingQueue
+      ? const <PendingItem>[]
+      : buildPendingItems(
+          tasks: localTasks,
+          redemptions: input.redemptions,
+          deviceIssue: deviceIssue,
+          canManageTasks: input.profile?.can('manage_tasks') ?? false,
+          canConfirmTasks: input.profile?.can('confirm_tasks') ?? false,
+          parentReviews: input.parentReviews,
+        );
   final pendingCount = pendingItems.length;
-  final isLoading =
-      input.profileLoading ||
-      input.deviceLoading ||
-      input.cameraHealthLoading ||
-      input.cameraStatusLoading ||
-      input.cameraMonitorLoading ||
+  final isInitialLoading =
+      (input.profile == null && input.profileLoading) ||
+      (input.deviceOverview == null && input.deviceLoading) ||
+      (input.cameraHealth == null && input.cameraHealthLoading) ||
+      (input.cameraStatus == null && input.cameraStatusLoading) ||
+      (input.cameraMonitor == null && input.cameraMonitorLoading) ||
       (!tasksReady && input.tasksLoading);
+  final isLoading = isInitialLoading;
   final hasNoChild = !input.profileLoading && input.profile?.child == null;
   final heroObservation =
       !isLoading &&
@@ -98,6 +110,7 @@ HomeSummary buildHomeSummary(HomeSummaryInput input) {
 
   return HomeSummary(
     isLoading: isLoading,
+    isInitialLoading: isInitialLoading,
     hasNoDevice: hasNoDevice,
     hasNoChild: hasNoChild,
     deviceIssue: deviceIssue,
@@ -129,6 +142,7 @@ HomeSummary buildHomeSummary(HomeSummaryInput input) {
       localTasks: localTasks,
       pendingCount: pendingCount,
       isLoading: isLoading,
+      recentEvent: input.recentCameraEvent,
     ),
     primaryCta: buildPrimaryCta(
       hasNoDevice: hasNoDevice,
@@ -161,7 +175,6 @@ HabitFocusCopy buildHabitFocus({
     profileLoading: input.profileLoading,
     hasNoDevice: hasNoDevice,
     deviceOnline: deviceOnline,
-    pendingCount: pendingCount,
     localTasks: localTasks,
     isLoading: isLoading,
   );
@@ -234,7 +247,6 @@ List<HomeChipSpec> buildHabitChips({
   required bool profileLoading,
   required bool hasNoDevice,
   required bool deviceOnline,
-  required int pendingCount,
   required List<GuardianTask>? localTasks,
   required bool isLoading,
 }) {
@@ -273,15 +285,7 @@ List<HomeChipSpec> buildHabitChips({
     }
   }
 
-  if (!isLoading && pendingCount > 0) {
-    chips.add(
-      HomeChipSpec(
-        kind: HomeChipKind.pending,
-        label: '待处理 $pendingCount',
-        tone: StatusTone.warning,
-      ),
-    );
-  } else if (!isLoading && !hasNoDevice && localTasks?.isEmpty == true) {
+  if (!isLoading && !hasNoDevice && localTasks?.isEmpty == true) {
     chips.add(
       const HomeChipSpec(
         kind: HomeChipKind.rhythm,
@@ -556,8 +560,23 @@ List<PendingItem> buildPendingItems({
   required bool deviceIssue,
   bool canManageTasks = false,
   bool canConfirmTasks = false,
+  List<ParentReviewItem>? parentReviews,
 }) {
   final items = <PendingItem>[];
+  for (final review in parentReviews ?? const <ParentReviewItem>[]) {
+    if (review.status != 'pending') continue;
+    final detail = review.summary.trim();
+    items.add(
+      PendingItem(
+        kind: PendingItemKind.task,
+        action: PendingItemAction.reviewCareNotify,
+        id: review.id,
+        title: detail.isNotEmpty ? detail : '有一项看护情况需要家长查看',
+        detail: '摄像头提醒多次后，需要你确认一下。',
+        routePath: liveRoutePath,
+      ),
+    );
+  }
   if (tasks != null) {
     for (final task in tasks.where(
       (item) => item.status.awaitsParent && canConfirmTasks,
@@ -631,6 +650,7 @@ RecentObservationCopy buildRecentObservationCopy({
   required List<GuardianTask>? localTasks,
   required int pendingCount,
   required bool isLoading,
+  LiveCareEvent? recentEvent,
 }) {
   if (isLoading) {
     return const RecentObservationCopy(
@@ -660,7 +680,7 @@ RecentObservationCopy buildRecentObservationCopy({
     monitorObservation,
     heroObservation,
   );
-  if (repeatedInHero) {
+  if (monitorObservation != null && repeatedInHero) {
     return const RecentObservationCopy(
       headline: '最近观察已显示在顶部',
       detail: '',
@@ -669,34 +689,46 @@ RecentObservationCopy buildRecentObservationCopy({
   }
   final observation = monitorObservation;
 
-  if (currentTask != null &&
-      (currentTask.status == GuardianTaskStatus.inProgress ||
-          currentTask.status == GuardianTaskStatus.reminderSent)) {
-    if (observation == null) {
-      return const RecentObservationCopy(
-        headline: '暂时没有可靠画面记录',
-        detail: '可以刷新观察，或进入实时画面看看。',
-        showActions: true,
-      );
-    }
+  if (observation != null) {
     return RecentObservationCopy(
       headline: '最近观察',
       detail: compactHomeText(observation, maxLength: 72),
     );
   }
 
-  if (observation == null) {
+  final recentRecord = _recentEventHeadline(recentEvent);
+  if (recentRecord != null) {
+    final repeatedRecord = sameHomeObservation(recentRecord, heroObservation);
+    if (!repeatedRecord) {
+      return RecentObservationCopy(
+        headline: '最近记录',
+        detail: compactHomeText(recentRecord, maxLength: 72),
+      );
+    }
+  }
+
+  if (currentTask != null &&
+      (currentTask.status == GuardianTaskStatus.inProgress ||
+          currentTask.status == GuardianTaskStatus.reminderSent)) {
     return const RecentObservationCopy(
-      headline: '暂时没有可靠画面记录',
+      headline: '暂时没有新的画面记录',
       detail: '可以刷新观察，或进入实时画面看看。',
       showActions: true,
     );
   }
 
-  return RecentObservationCopy(
-    headline: '最近观察',
-    detail: compactHomeText(observation, maxLength: 72),
+  return const RecentObservationCopy(
+    headline: '暂时没有新的画面记录',
+    detail: '可以刷新观察，或进入实时画面看看。',
+    showActions: true,
   );
+}
+
+String? _recentEventHeadline(LiveCareEvent? event) {
+  if (event == null) return null;
+  final title = event.displayTitle.trim();
+  if (title.isEmpty) return null;
+  return title;
 }
 
 HomePrimaryCta buildPrimaryCta({

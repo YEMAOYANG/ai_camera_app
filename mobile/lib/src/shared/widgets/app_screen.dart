@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:warm_sight/src/core/theme/app_system_ui.dart';
@@ -22,12 +23,17 @@ class AppScreen extends StatelessWidget {
     this.avoidFooterOverlap = false,
     this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
     this.onRefresh,
+    this.onLoadMore,
+    this.canLoadMore = false,
+    this.easyRefreshController,
+    this.refreshDisplacement = 40,
     this.padding = const EdgeInsets.fromLTRB(
       AppSpacing.pageHorizontal,
       10,
       AppSpacing.pageHorizontal,
       AppSpacing.pageBottom,
     ),
+    this.scrollController,
     super.key,
   });
 
@@ -46,6 +52,11 @@ class AppScreen extends StatelessWidget {
   final List<Widget> children;
   final EdgeInsetsGeometry padding;
   final Future<void> Function()? onRefresh;
+  final Future<void> Function()? onLoadMore;
+  final bool canLoadMore;
+  final EasyRefreshController? easyRefreshController;
+  final double refreshDisplacement;
+  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -110,12 +121,13 @@ class AppScreen extends StatelessWidget {
   }
   Widget _buildScrollBody(EdgeInsetsGeometry adjustedPadding) {
     final listView = ListView(
+      controller: scrollController,
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      physics: onRefresh == null
-          ? null
-          : const AlwaysScrollableScrollPhysics(
+      physics: onRefresh != null || onLoadMore != null
+          ? const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),
-            ),
+            )
+          : null,
       padding: adjustedPadding,
       children: [
         if (!fixedHeader && showHeader) ...[
@@ -129,12 +141,50 @@ class AppScreen extends StatelessWidget {
         ...children,
       ],
     );
-    if (onRefresh == null) {
+    if (onRefresh == null && onLoadMore == null) {
       return listView;
     }
-    return RefreshIndicator(
-      color: AppColors.brandDeep,
-      onRefresh: onRefresh!,
+    return EasyRefresh(
+      controller: easyRefreshController,
+      header: ClassicHeader(
+        triggerOffset: refreshDisplacement,
+        clamping: false,
+        position: IndicatorPosition.above,
+        dragText: '下拉刷新',
+        armedText: '释放刷新',
+        readyText: '刷新中…',
+        processingText: '刷新中…',
+        processedText: '已更新',
+        showMessage: false,
+      ),
+      footer: onLoadMore == null
+          ? null
+          : ClassicFooter(
+              triggerOffset: 56,
+              clamping: false,
+              position: IndicatorPosition.behind,
+              dragText: '上拉加载更多',
+              armedText: '释放加载',
+              readyText: '加载中…',
+              processingText: '加载中…',
+              processedText: '加载完成',
+              noMoreText: '没有更多了',
+              showMessage: false,
+            ),
+      onRefresh: onRefresh == null
+          ? null
+          : () async {
+              await onRefresh!();
+              easyRefreshController?.finishRefresh();
+            },
+      onLoad: onLoadMore == null
+          ? null
+          : () async {
+              await onLoadMore!();
+              easyRefreshController?.finishLoad(
+                canLoadMore ? IndicatorResult.success : IndicatorResult.noMore,
+              );
+            },
       child: listView,
     );
   }

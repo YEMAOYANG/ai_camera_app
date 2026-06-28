@@ -179,6 +179,35 @@ class CareConfigService:
             )
         return {"ok": True, "childId": resolved_child_id, "windows": [routine_window_payload(row) for row in rows]}
 
+    def acknowledge_parent_review(self, access_token: str, review_id: str) -> dict:
+        context = self.auth_service.authenticate(access_token)
+        family_id = context["family"]["id"]
+        review_id = str(review_id or "").strip()
+        if not review_id:
+            raise ApiError("review_item_id_required", "待办 id 不能为空。", 400)
+        resolved_by = str(context.get("user", {}).get("id") or "")
+        now = now_ms()
+        with self.repository.transaction() as conn:
+            row = self.repository.get_review_item(
+                conn,
+                review_id=review_id,
+                family_id=family_id,
+            )
+            if row is None:
+                raise ApiError("review_item_not_found", "待办不存在。", 404)
+            if str(row.get("status") or "") != "pending":
+                raise ApiError("review_item_already_resolved", "这条已经处理过了。", 409)
+            updated = self.repository.resolve_parent_review_item(
+                conn,
+                review_id=review_id,
+                family_id=family_id,
+                resolved_by=resolved_by,
+                now=now,
+            )
+        if updated is None:
+            raise ApiError("review_item_not_found", "待办不存在。", 404)
+        return {"ok": True, "reviewItem": parent_review_event_payload(updated)}
+
     def summary(self, access_token: str, args) -> dict:
         context = self.auth_service.authenticate(access_token)
         family_id = context["family"]["id"]

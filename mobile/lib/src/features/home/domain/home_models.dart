@@ -13,6 +13,7 @@ enum PendingItemKind { task, redemption }
 enum PendingItemAction {
   confirmTask,
   reviewMissedTask,
+  reviewCareNotify,
   fulfillReward,
   checkDevice,
 }
@@ -114,6 +115,7 @@ class HomePrimaryCta {
 class HomeSummary {
   const HomeSummary({
     required this.isLoading,
+    required this.isInitialLoading,
     required this.hasNoDevice,
     required this.hasNoChild,
     required this.deviceIssue,
@@ -130,6 +132,7 @@ class HomeSummary {
   });
 
   final bool isLoading;
+  final bool isInitialLoading;
   final bool hasNoDevice;
   final bool hasNoChild;
   final bool deviceIssue;

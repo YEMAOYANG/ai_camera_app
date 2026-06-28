@@ -370,6 +370,37 @@ class LiveCareStatus {
   }
 }
 
+class CameraEventsPage {
+  const CameraEventsPage({required this.events, required this.hasMore});
+
+  final List<LiveCareEvent> events;
+  final bool hasMore;
+}
+
+class CameraEventsState {
+  const CameraEventsState({
+    this.items = const [],
+    this.hasMore = false,
+    this.isLoadingMore = false,
+  });
+
+  final List<LiveCareEvent> items;
+  final bool hasMore;
+  final bool isLoadingMore;
+
+  CameraEventsState copyWith({
+    List<LiveCareEvent>? items,
+    bool? hasMore,
+    bool? isLoadingMore,
+  }) {
+    return CameraEventsState(
+      items: items ?? this.items,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
+}
+
 class LiveCareEvent {
   const LiveCareEvent({
     required this.id,

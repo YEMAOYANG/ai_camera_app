@@ -155,11 +155,13 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
             lambda _config: self._fake_vision,
         )
         self._vision_patch.start()
+        self.internal_token = "test-internal-token"
         self.app = create_app(
             fresh_test_config(
                 HARDWARE_ADAPTER="mock",
                 CAMERA_RUNTIME_ADAPTER="ai_camera_test",
                 CAMERA_BACKEND_URL=self.camera_url,
+                INTERNAL_API_TOKEN=self.internal_token,
             )
         )
         self.client = self.app.test_client()
@@ -773,6 +775,39 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertFalse(
             any(event["eventType"] == "speak" for event in second_events.json["events"])
         )
+
+
+    def test_camera_events_supports_offset_and_has_more(self):
+        self._fake_vision.payload = {
+            "has_person": True,
+            "activity": "玩玩具",
+            "confidence": 0.9,
+            "description": "分页契约测试记录",
+        }
+        refresh = self.client.post(
+            "/api/camera/monitor/refresh",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(refresh.status_code, 200, refresh.json)
+
+        first = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id, "limit": 1, "offset": 0},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(first.status_code, 200)
+        self.assertIn("hasMore", first.json)
+        self.assertLessEqual(len(first.json["events"]), 1)
+
+        offset = self.client.get(
+            "/api/camera/events",
+            query_string={"deviceId": self.device_id, "limit": 10, "offset": 1},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(offset.status_code, 200)
+        self.assertIn("hasMore", offset.json)
+        self.assertLessEqual(len(offset.json["events"]), 10)
 
     def test_camera_webrtc_session_contract(self):
         session = self.client.get("/api/camera/webrtc/session", headers=self._auth_headers())

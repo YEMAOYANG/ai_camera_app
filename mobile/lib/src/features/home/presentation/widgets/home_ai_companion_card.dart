@@ -23,7 +23,7 @@ class HomeRecentObservationCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const HomeSectionTitle(title: '看护概览', subtitle: '只显示可靠的画面记录'),
+        const HomeSectionTitle(title: '看护概览', subtitle: '最近可靠的画面观察与记录'),
         const SizedBox(height: 10),
         DecoratedBox(
           decoration: BoxDecoration(

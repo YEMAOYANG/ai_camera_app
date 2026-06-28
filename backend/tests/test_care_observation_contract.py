@@ -468,12 +468,27 @@ class CareObservationContractTest(unittest.TestCase):
 
         self._patch_capability("bedtime", cooldownSeconds=0, dailyLimit=4, parentNotifyThreshold=1)
         self._create_real_reminder_event("bedtime")
-        notify = self._post_observation("bedtime", confidence=0.9, duration_seconds=80)
+        captured: list[tuple[str, dict]] = []
+        original_broadcast = task_event_stream.task_event_stream_server.broadcast
+        task_event_stream.task_event_stream_server.broadcast = (
+            lambda family_id, payload: captured.append((family_id, payload))
+        )
+        try:
+            notify = self._post_observation("bedtime", confidence=0.9, duration_seconds=80)
+        finally:
+            task_event_stream.task_event_stream_server.broadcast = original_broadcast
         self.assertEqual(notify.json["decision"]["decision"], "parent_notify")
         self.assertTrue(notify.json["decision"]["shouldNotifyParent"])
         self.assertIsNotNone(notify.json["reviewItem"])
         self.assertEqual(notify.json["reviewItem"]["domain"], "care")
         self.assertNotIn("backend", notify.json["reviewItem"]["summary"])
+        reminder_ws = [
+            payload for _, payload in captured if payload["type"] == "reminder_decision.created"
+        ]
+        self.assertTrue(reminder_ws)
+        review_event = reminder_ws[0].get("event") or {}
+        self.assertEqual(review_event.get("id"), notify.json["reviewItem"]["id"])
+        self.assertEqual(review_event.get("summary"), notify.json["reviewItem"]["summary"])
 
         notify_again = self._post_observation("bedtime", confidence=0.9, duration_seconds=80)
         self.assertEqual(notify_again.json["reviewItem"]["id"], notify.json["reviewItem"]["id"])
@@ -1549,6 +1564,41 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertEqual(response.json["reminder"]["eventSource"], "dry_run")
         self.assertEqual(len(command_service.calls), 0)
         self.assertEqual(self._count_internal_reminder_events_for_decision(expired_decision_id), 0)
+
+
+    def test_parent_review_acknowledge(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "bedtime",
+            cooldownSeconds=0,
+            dailyLimit=4,
+            parentNotifyThreshold=1,
+        )
+        self._create_real_reminder_event("bedtime")
+        notify = self._post_observation("bedtime", confidence=0.9, duration_seconds=80)
+        review_id = notify.json["reviewItem"]["id"]
+
+        ack = self.client.post(
+            f"/api/care/parent-reviews/{review_id}/acknowledge",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(ack.status_code, 200, ack.json)
+        self.assertEqual(ack.json["reviewItem"]["status"], "acknowledged")
+        self.assertIsNotNone(ack.json["reviewItem"]["resolvedAt"])
+
+        again = self.client.post(
+            f"/api/care/parent-reviews/{review_id}/acknowledge",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(again.status_code, 409)
+
+        summary = self.client.get(
+            "/api/care/summary",
+            query_string={"childId": self.child_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(summary.status_code, 200)
+        self.assertFalse(summary.json["summary"]["needsParentReview"])
 
     def test_care_summary_contract(self):
         response = self.client.get(

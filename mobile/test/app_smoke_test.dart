@@ -10,6 +10,8 @@ import 'package:warm_sight/src/core/network/api_client.dart';
 import 'package:warm_sight/src/core/storage/auth_session_store.dart';
 import 'package:warm_sight/src/core/storage/onboarding_store.dart';
 import 'package:warm_sight/src/core/storage/setup_store.dart';
+import 'package:warm_sight/src/features/care/application/care_repository.dart';
+import 'package:warm_sight/src/features/care/domain/care_models.dart';
 import 'package:warm_sight/src/features/devices/application/camera_discovery_adapter.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/devices/domain/device_models.dart';
@@ -475,7 +477,7 @@ void main() {
         overrides: [
           selectedDeviceProvider.overrideWith((ref) async => _liveCareDevice()),
           liveCareStatusProvider.overrideWith(
-            (ref) async => _onlineLiveCareStatus(),
+            (ref) => AsyncValue.data(_onlineLiveCareStatus()),
           ),
           cameraSnapshotProvider.overrideWith(
             (ref) async => CameraSnapshotFrame.unavailable,
@@ -503,7 +505,7 @@ void main() {
         overrides: [
           selectedDeviceProvider.overrideWith((ref) async => _liveCareDevice()),
           liveCareStatusProvider.overrideWith(
-            (ref) async => _onlineLiveCareStatus(),
+            (ref) => AsyncValue.data(_onlineLiveCareStatus()),
           ),
           cameraSnapshotProvider.overrideWith(
             (ref) async => CameraSnapshotFrame.unavailable,
@@ -1557,6 +1559,17 @@ Future<void> _pumpApp(
         ),
         rawDioProvider.overrideWithValue(fakeDio),
         dioProvider.overrideWithValue(fakeDio),
+        careSummaryProvider.overrideWith((ref, childId) async {
+          return CareSummary(
+            childId: childId ?? 'child_test',
+            dayType: 'school_day',
+            currentStage: '安静观察',
+            todayReminderCount: 0,
+            capabilities: const [],
+            needsParentReview: const [],
+            observationSuggestion: '',
+          );
+        }),
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
       child: const GuardianApp(),
@@ -1664,7 +1677,8 @@ class _FakeCameraEventsController extends CameraEventsController {
   final List<LiveCareEvent> _events;
 
   @override
-  Future<List<LiveCareEvent>> build() async => _events;
+  Future<CameraEventsState> build() async =>
+      CameraEventsState(items: _events, hasMore: false);
 }
 
 SetupStatus _setupStatusForRoute({
@@ -2156,6 +2170,20 @@ class _FakeApiServer {
         'ok': true,
         'childId': 'child_test',
         'capabilities': _careCapabilities(),
+      });
+    }
+    if (method == 'GET' && path == '/care/summary') {
+      return _ok(options, {
+        'ok': true,
+        'summary': {
+          'childId': _text(options.queryParameters['childId'], 'child_test'),
+          'dayType': 'school_day',
+          'currentStage': '安静观察',
+          'todayReminderCount': 0,
+          'capabilities': _careCapabilities(),
+          'needsParentReview': const [],
+          'observationSuggestion': '',
+        },
       });
     }
     if (method == 'GET' && path == '/care/routine-windows') {

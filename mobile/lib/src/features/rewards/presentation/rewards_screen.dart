@@ -60,6 +60,7 @@ class RewardsScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 14),
         ...summary.when(
+          skipLoadingOnRefresh: true,
           data: (data) {
             final activeItems = _activeRewardItems(data.items);
             final pending = _pendingRedemptions(data.redemptions);

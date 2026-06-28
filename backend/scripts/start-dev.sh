@@ -10,6 +10,14 @@
 #   ./scripts/start-dev.sh --logs all   # 同时跟 app + worker 日志
 #
 # Ctrl+C 会停止本脚本拉起的所有进程。
+#
+# 语音提醒完整播放：在 ai_camera_test 的 .env 中建议设置
+#   CAMERA_SPEAKER_GO2RTC_PACED_HTTP=1
+#   CAMERA_SPEAKER_STREAM_CHUNK_MS=40
+#   CAMERA_SPEAKER_TRANSPORT_TAIL_SECONDS=0.8
+#   CAMERA_SPEAKER_PLAYBACK_BUFFER_SECONDS=1.2
+#   CAMERA_SPEAKER_TAIL_SECONDS=0.5
+# 详见 backend/.env.example
 
 set -euo pipefail
 
@@ -181,6 +189,28 @@ verify_guardian_import() {
   return 0
 }
 
+verify_worker_import() {
+  if ! env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -c "
+from workers.camera_observation_worker import build_worker_from_env
+" >/dev/null 2>&1; then
+    err "camera_observation_worker 无法加载（常见原因：缺少 pymysql 等依赖）"
+    env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -c "
+from workers.camera_observation_worker import build_worker_from_env
+" 2>&1 | tail -12 || true
+    return 1
+  fi
+  return 0
+}
+
+begin_worker_log_session() {
+  local ts
+  ts="$(date '+%Y-%m-%d %H:%M:%S %z')"
+  {
+    echo "===== Guardian worker session started ${ts} ====="
+    echo "python=${GUARDIAN_PYTHON}"
+  } > "$LOG_DIR/guardian-worker.log"
+}
+
 cleanup() {
   [ "$CLEANED" -eq 1 ] && return 0
   CLEANED=1
@@ -212,8 +242,21 @@ fi
 
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 GUARDIAN_PYTHON="$PYTHON_BIN"
+if [ -x "$BACKEND_DIR/.venv/bin/python" ]; then
+  GUARDIAN_PYTHON="$BACKEND_DIR/.venv/bin/python"
+elif [ -x "$BACKEND_DIR/venv/bin/python" ]; then
+  GUARDIAN_PYTHON="$BACKEND_DIR/venv/bin/python"
+fi
 if ! command -v "$GUARDIAN_PYTHON" >/dev/null 2>&1; then
   err "未找到 python3"
+  exit 1
+fi
+if ! "$GUARDIAN_PYTHON" -c "import pymysql" >/dev/null 2>&1; then
+  warn "Guardian Python 缺少依赖，正在安装 requirements.txt …"
+  "$GUARDIAN_PYTHON" -m pip install -r "$BACKEND_DIR/requirements.txt"
+fi
+if ! "$GUARDIAN_PYTHON" -c "import pymysql" >/dev/null 2>&1; then
+  err "依赖安装后仍无法 import pymysql，请手动执行: $GUARDIAN_PYTHON -m pip install -r $BACKEND_DIR/requirements.txt"
   exit 1
 fi
 
@@ -257,9 +300,13 @@ if [ -x "$CAMERA_PY" ]; then
   # 禁止 monitor_worker 双写；只保留 speaker / voice / task
   "$CAMERA_PY" -m runtime.supervisor stop monitor >/dev/null 2>&1 || true
   for worker in speaker voice task; do
+    "$CAMERA_PY" -m runtime.supervisor stop "$worker" >/dev/null 2>&1 || true
+  done
+  sleep 1
+  for worker in speaker voice task; do
     "$CAMERA_PY" -m runtime.supervisor start "$worker" >/dev/null 2>&1 || true
   done
-  ok "ai_camera_test workers: speaker / voice / task（monitor 已关闭）"
+  ok "ai_camera_test workers: speaker / voice / task（monitor 已关闭，speaker 已重启）"
 else
   warn "未找到 ai_camera_test venv，跳过 runtime workers"
 fi
@@ -320,11 +367,21 @@ for pid in $(pgrep -f "workers\.camera_observation_worker" 2>/dev/null || true);
   kill "$pid" 2>/dev/null || true
 done
 sleep 1
+if ! verify_worker_import; then
+  exit 1
+fi
+begin_worker_log_session
 nohup env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -m workers.camera_observation_worker \
   >> "$LOG_DIR/guardian-worker.log" 2>&1 &
-record_pid guardian-worker $!
-sleep 1
-ok "camera_observation_worker 已启动（间隔 ${CAMERA_OBSERVATION_INTERVAL_SECONDS:-60}s）"
+WORKER_PID=$!
+record_pid guardian-worker "$WORKER_PID"
+sleep 2
+if ! kill -0 "$WORKER_PID" 2>/dev/null; then
+  err "camera_observation_worker 启动后立即退出，日志: $LOG_DIR/guardian-worker.log"
+  show_startup_errors "$LOG_DIR/guardian-worker.log"
+  exit 1
+fi
+ok "camera_observation_worker 已启动（PID ${WORKER_PID}，间隔 ${CAMERA_OBSERVATION_INTERVAL_SECONDS:-60}s）"
 ok "日志: $LOG_DIR/guardian-worker.log"
 
 # ── 汇总 ────────────────────────────────────────────────

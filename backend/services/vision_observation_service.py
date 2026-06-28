@@ -54,6 +54,7 @@ class VisionObservationService:
         if not self.cadence.should_call_cloud(device_key, force=force_analyze):
             cached = self.cadence.cached_result(device_key)
             if cached is not None:
+                cached = enrich_observation(dict(cached))
                 cached.setdefault("observed_at", now_ms)
                 return with_observation_reliability(cached)
             return insufficient_observation(reason="vision_rate_limited", observed_at=now_ms)
@@ -67,12 +68,14 @@ class VisionObservationService:
             user_prompt=user_prompt,
             image_bytes=image_bytes,
             content_type=content_type,
-            max_tokens=360,
-            temperature=0.6,
+            max_tokens=640,
+            # kimi-k2.6 等视觉模型当前仅允许 temperature=1，其他值会 400
+            temperature=1.0,
         )
         if response is None:
             cached = self.cadence.cached_result(device_key)
             if cached is not None:
+                cached = enrich_observation(dict(cached))
                 cached.setdefault("observed_at", now_ms)
                 return with_observation_reliability(cached)
             return insufficient_observation(reason="vision_provider_unavailable", observed_at=now_ms)

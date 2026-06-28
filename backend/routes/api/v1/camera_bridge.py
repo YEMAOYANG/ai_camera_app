@@ -567,6 +567,8 @@ def _summary_text(value: dict, *, activity: str, has_person_value: object) -> st
     if activity:
         return f"孩子正在{activity}"
     if raw_summary and not _is_generic_activity(raw_summary):
+        if _summary_contains_screen_claim(raw_summary) and activity not in {"看电视", "玩手机"}:
+            return "画面暂时无法判断" if has_person_value is True else "暂未看到孩子"
         return raw_summary[:80]
     if has_person_value is True:
         return "画面暂时无法判断"
@@ -599,6 +601,11 @@ def _activity_label(value: object, *, raw_text: str = "") -> str:
     if not activity or _is_generic_activity(activity):
         return ""
     return activity[:40]
+
+
+def _summary_contains_screen_claim(text: str) -> bool:
+    blocked = ("看屏幕", "看电视", "玩手机", "注视", "用眼距离")
+    return any(token in text for token in blocked)
 
 
 def _is_generic_activity(value: str) -> bool:

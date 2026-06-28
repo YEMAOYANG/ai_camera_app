@@ -319,6 +319,9 @@ class CameraAiObservationService:
                 source="camera_observation",
                 event=realtime_event,
             )
+        reminder_review_event = None
+        if review_item and bool(decision_row.get("should_notify_parent")):
+            reminder_review_event = parent_review_event_payload(review_item)
         publish_family_event(
             family_id=family_id,
             event_type=REMINDER_DECISION_CREATED,
@@ -327,6 +330,7 @@ class CameraAiObservationService:
             event_ids=[decision_row["id"]],
             is_reliable=observation_score >= 0.65,
             source="care_policy",
+            event=reminder_review_event,
         )
         return {
             "ok": True,

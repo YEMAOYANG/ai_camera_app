@@ -172,20 +172,22 @@ class CameraCommandService:
         include_unassigned: bool = False,
     ) -> dict:
         context = self.auth_service.authenticate(access_token)
-        limit = self._limit_arg(args.get("limit") if args else None)
+        limit = self._limit_arg(args.get("limit") if args else 10)
+        offset = self._offset_arg(args.get("offset") if args else None)
+        fetch_limit = min(100, limit + offset)
         with self.repository.transaction() as conn:
             commands = self.repository.list_recent_commands(
                 conn,
                 family_id=context["family"]["id"],
                 device_id=device_id,
-                limit=limit,
+                limit=fetch_limit,
             )
             task_events = self.repository.list_recent_task_events(
                 conn,
                 family_id=context["family"]["id"],
                 device_id=device_id,
                 include_unassigned=include_unassigned,
-                limit=limit,
+                limit=fetch_limit,
             )
         events = [
             *(_camera_command_event_payload(row) for row in commands),
@@ -194,7 +196,9 @@ class CameraCommandService:
         events.sort(key=lambda item: (item["createdAt"], item["id"]), reverse=True)
         parent_events = _parent_facing_events(events)
         camera_events = [event for event in parent_events if _is_camera_care_event(event)]
-        return {"ok": True, "events": camera_events[:limit]}
+        page = camera_events[offset:offset + limit]
+        has_more = len(camera_events) > offset + len(page)
+        return {"ok": True, "events": page, "hasMore": has_more}
 
     def record_observation_event(
         self,
@@ -293,6 +297,8 @@ class CameraCommandService:
         device_id: str | None = None,
         source: str | None = None,
         scenario: str | None = None,
+        prompt_id: str | None = None,
+        signal_type: str | None = None,
     ) -> dict:
         bridge, resolved_device_id = self._runtime_for_command(
             family_id=family_id,
@@ -303,6 +309,10 @@ class CameraCommandService:
             request_payload["source"] = source
         if scenario:
             request_payload["scenario"] = scenario
+        if prompt_id:
+            request_payload["promptId"] = prompt_id
+        if signal_type:
+            request_payload["signalType"] = signal_type
         return self._execute_command(
             family_id=family_id,
             command_type="speak",
@@ -433,7 +443,11 @@ class CameraCommandService:
                         "id": command_id,
                         "deviceId": device_id or "",
                         "taskId": task_id or "",
-                        "displayTitle": _care_reminder_title(scenario),
+                        "displayTitle": _care_reminder_title(
+                            scenario,
+                            prompt_id=str(request_payload.get("promptId") or ""),
+                            signal_type=str(request_payload.get("signalType") or ""),
+                        ),
                         "displayMessage": text or "摄像头已按看护规则轻声提醒。",
                         "category": "care_reminder",
                         "severity": "info" if status == "succeeded" else "warning",
@@ -481,10 +495,17 @@ class CameraCommandService:
 
     def _limit_arg(self, value: object) -> int:
         try:
-            limit = int(value or 30)
+            limit = int(value if value is not None else 10)
         except (TypeError, ValueError):
-            limit = 30
+            limit = 10
         return max(1, min(limit, 100))
+
+    def _offset_arg(self, value: object) -> int:
+        try:
+            offset = int(value or 0)
+        except (TypeError, ValueError):
+            offset = 0
+        return max(0, min(offset, 500))
 
     def _required_text(self, data: dict, key: str, message: str) -> str:
         value = self._optional_text(data, key)
@@ -675,7 +696,11 @@ def _parent_camera_command_event(event: dict) -> dict | None:
             text = str(request.get("text") or event.get("message") or "").strip()
             return _with_display(
                 event,
-                display_title=_care_reminder_title(str(request.get("scenario") or "")),
+                display_title=_care_reminder_title(
+                    str(request.get("scenario") or ""),
+                    prompt_id=str(request.get("promptId") or ""),
+                    signal_type=str(request.get("signalType") or ""),
+                ),
                 display_message=text or "摄像头已按看护规则轻声提醒。",
                 category="care_reminder",
                 severity="info" if status == "succeeded" else "warning",
@@ -905,7 +930,20 @@ def _parent_event_dedupe_key(event: dict) -> str:
     return f"{event.get('source')}:{event.get('eventType')}:{event.get('id')}"
 
 
-def _care_reminder_title(scenario: str) -> str:
+def _care_reminder_title(
+    scenario: str,
+    *,
+    prompt_id: str = "",
+    signal_type: str = "",
+) -> str:
+    signal = signal_type.strip().lower()
+    prompt = prompt_id.strip().lower()
+    if prompt == "reminder.toy_play_safety" or signal.startswith("toy_play_unsafe_"):
+        return "已提醒玩玩具注意安全"
+    if signal == "cleanup_done":
+        return "玩具已收好"
+    if signal == "cleanup_started":
+        return "正在收纳玩具"
     return {
         "toy_cleanup": "已提醒收纳玩具",
         "posture": "已提醒调整坐姿",
@@ -979,9 +1017,10 @@ def _camera_observation_display(observation: dict) -> dict:
     decision_reason = _parent_display_text(observation.get("decisionReason"))
     is_reliable = bool(observation.get("isReliable"))
     if not is_reliable:
+        safe_message = _sanitize_unreliable_message(description, decision_reason)
         return {
             "title": "画面暂时看不清",
-            "message": description or decision_reason or "这次画面还不能判断孩子状态。",
+            "message": safe_message,
             "category": "camera_status",
             "severity": "warning",
             "evidence": "画面不可判断",
@@ -1005,6 +1044,14 @@ def _camera_observation_display(observation: dict) -> dict:
                 "severity": "info",
                 "evidence": "看到用餐情况",
             }
+    if activity == "收玩具" or re.search(r"(收玩具|整理玩具|收拾玩具|收纳玩具)", description):
+        return {
+            "title": "孩子正在收纳玩具",
+            "message": description or decision_reason or summary or "孩子正在收纳玩具。",
+            "category": "camera_observation",
+            "severity": "info",
+            "evidence": "看到收纳动作",
+        }
     if activity == "吃饭":
         return {
             "title": "孩子正在吃饭",
@@ -1021,10 +1068,16 @@ def _camera_observation_display(observation: dict) -> dict:
             "severity": "info",
             "evidence": "看到玩具活动",
         }
-    if summary:
+    if summary and not _summary_contradicts_presence(summary, has_person, activity):
         return {
             "title": summary.rstrip("。"),
-            "message": description or decision_reason or summary,
+            "message": _safe_person_message(
+                description,
+                decision_reason,
+                summary,
+                has_person=has_person,
+                activity=activity,
+            ),
             "category": "camera_observation",
             "severity": "info",
             "evidence": "看到孩子",
@@ -1072,10 +1125,56 @@ def _absent_display_message(description: str, decision_reason: str) -> str:
     combined = f"{description} {decision_reason}".strip()
     if not combined:
         return "刚才的画面里没有看到孩子。"
-    blocked = ("看屏幕", "玩手机", "玩玩具", "孩子在", "宝宝", "小朋友")
+    blocked = (
+        "看屏幕",
+        "看电视",
+        "玩手机",
+        "注视",
+        "用眼距离",
+        "玩玩具",
+        "弹跳",
+        "蹦床上",
+        "孩子在",
+        "宝宝在",
+        "小朋友",
+    )
     if any(token in combined for token in blocked):
         return "刚才的画面里没有看到孩子。"
     return combined[:180]
+
+
+def _sanitize_unreliable_message(description: str, decision_reason: str) -> str:
+    combined = f"{description} {decision_reason}".strip()
+    if not combined:
+        return "这次画面还不能判断孩子状态。"
+    blocked = ("看屏幕", "看电视", "玩手机", "注视", "用眼距离")
+    if any(token in combined for token in blocked):
+        return "这次画面还不能判断孩子状态。"
+    return combined[:180]
+
+
+def _summary_contradicts_presence(summary: str, has_person: object, activity: str) -> bool:
+    if has_person is False or activity == "离开":
+        blocked = ("看屏幕", "看电视", "玩手机", "孩子在", "注视", "用眼距离", "弹跳", "蹦床上")
+        return any(token in summary for token in blocked)
+    return False
+
+
+def _safe_person_message(
+    description: str,
+    decision_reason: str,
+    summary: str,
+    *,
+    has_person: object,
+    activity: str,
+) -> str:
+    if has_person is False or activity == "离开":
+        return _absent_display_message(description, decision_reason)
+    combined = f"{description} {decision_reason} {summary}".strip()
+    blocked = ("看屏幕", "看电视", "用眼距离")
+    if any(token in combined for token in blocked) and "暂未看到" in summary:
+        return "这次画面还不能判断孩子状态。"
+    return (description or decision_reason or summary or "这次画面还不能判断孩子状态。")[:180]
 
 
 def _meal_habit_display_title(observation: dict, summary: str) -> str:
@@ -1094,7 +1193,11 @@ def _meal_habit_display_title(observation: dict, summary: str) -> str:
     text = f"{summary} {observation.get('parentSummary') or ''} {raw_detail.get('description') or ''}"
     if "未坐" in text or "站" in text or "餐椅" in text:
         return "用餐时未坐好"
-    if activity == "吃饭" or "用餐" in text or "吃饭" in text or "餐桌" in text:
+    if activity == "吃饭" or re.search(r"(进食|吃东西|拿食物|正在吃|用餐|吃饭)", text):
+        if re.search(r"(玩玩具|玩积木|搭积木|玩具车|摆弄玩具)", text) and not re.search(
+            r"(进食|吃东西|拿食物|正在吃|用餐|吃饭)", text
+        ):
+            return ""
         return "孩子正在吃饭"
     return ""
 

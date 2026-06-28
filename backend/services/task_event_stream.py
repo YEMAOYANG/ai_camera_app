@@ -403,6 +403,7 @@ def _lightweight_realtime_event(event: dict[str, Any] | None) -> dict[str, Any]:
         "id",
         "deviceId",
         "taskId",
+        "childId",
         "displayTitle",
         "displayMessage",
         "category",
@@ -414,6 +415,11 @@ def _lightweight_realtime_event(event: dict[str, Any] | None) -> dict[str, Any]:
         "source",
         "tone",
         "status",
+        "summary",
+        "reviewType",
+        "itemType",
+        "scenario",
+        "domain",
     }
     result = {key: event[key] for key in allowed if key in event}
     for blocked in ("image", "base64", "snapshot", "thumbnail", "debug", "rawDetail"):
