@@ -25,16 +25,12 @@ class LiveCareScreen extends ConsumerStatefulWidget {
 }
 
 class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
-  bool _requestedInitialObservation = false;
-
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_requestedInitialObservation) return;
-    _requestedInitialObservation = true;
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(_refreshLiveCare(ref, analyzeFrame: true));
+      unawaited(_refreshLiveCare(analyzeFrame: true));
     });
   }
 
@@ -124,12 +120,12 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
           subtitle: subtitle,
           status: liveStatus,
           snapshot: snapshotFrame,
-          onRefresh: () => unawaited(_refreshLiveCare(ref, analyzeFrame: true)),
+          onRefresh: () => unawaited(_refreshLiveCare(analyzeFrame: true)),
         ),
         const SizedBox(height: 8),
         _LiveActions(
           status: liveStatus,
-          onRefresh: () => unawaited(_refreshLiveCare(ref, analyzeFrame: true)),
+          onRefresh: () => unawaited(_refreshLiveCare(analyzeFrame: true)),
         ),
         const SizedBox(height: 10),
         _CareFocusPanel(status: liveStatus, events: events),
@@ -137,8 +133,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
     );
   }
 
-  Future<void> _refreshLiveCare(
-    WidgetRef ref, {
+  Future<void> _refreshLiveCare({
     bool analyzeFrame = false,
   }) async {
     if (!mounted) return;
@@ -148,7 +143,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
         await ref
             .read(cameraRepositoryProvider)
             .refreshMonitor(deviceId: device.id);
-      } catch (_) {
+      } on CameraException {
         // 手动刷新仍应回落到普通状态刷新，避免实时页被观察服务错误卡住。
       }
     }
@@ -161,8 +156,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
       ..invalidate(cameraMonitorStatusProvider)
       ..invalidate(cameraSnapshotProvider)
       ..invalidate(cameraEventsProvider)
-      ..invalidate(primaryDeviceOverviewProvider)
-      ..invalidate(selectedDeviceProvider);
+      ..invalidate(primaryDeviceOverviewProvider);
   }
 }
 

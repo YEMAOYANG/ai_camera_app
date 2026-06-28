@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 
 from integrations.camera_runtime.ai_camera_test_observation_adapter import (
@@ -44,7 +45,7 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
         self.assertEqual(payload["signals"][0]["durationSeconds"], 5)
         self.assertEqual(payload["signals"][0]["signalType"], "child_left_toys_uncollected")
         self.assertNotIn("reminder", payload["rawDetail"])
-        self.assertEqual(payload["rawDetail"]["child_message"], "旧项目里的播报文案不能迁移。")
+        self.assertEqual(payload["rawDetail"].get("child_message"), "")
 
     def test_source_event_id_is_stable(self):
         first = build_source_event_id(
@@ -98,7 +99,9 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
         )
 
         self.assertEqual(normal_payloads, [])
-        self.assertEqual(unknown_payloads, [])
+        self.assertEqual(len(unknown_payloads), 1)
+        self.assertEqual(unknown_payloads[0]["scenario"], "transition")
+        self.assertEqual(unknown_payloads[0]["signals"][0]["signalType"], "child_not_visible")
 
     def test_negated_toy_description_does_not_create_toy_payload(self):
         adapter = AiCameraTestObservationAdapter(_config(), json_request=_unused_request)
@@ -140,6 +143,28 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
         self.assertEqual(payloads[0]["signals"][0]["signalType"], "leaning_too_close")
         self.assertEqual(payloads[0]["signals"][0]["durationSeconds"], 30)
 
+    def test_playing_toys_does_not_create_posture_payload(self):
+        adapter = AiCameraTestObservationAdapter(_config(), json_request=_unused_request)
+
+        payloads = adapter.payloads_from_analysis(
+            {
+                "has_person": True,
+                "activity": "玩玩具",
+                "posture_status": "leaning_too_close",
+                "bad_posture": True,
+                "confidence": 0.82,
+                "description": "孩子坐在客厅地垫上，周围散落着多个机器人玩具和一个大包装盒。",
+                "child_message": "眼睛离桌面远一点，坐舒服些。",
+            },
+            window_start_ms=1_000,
+            window_end_ms=6_000,
+            observed_at=6_000,
+        )
+
+        self.assertEqual(len(payloads), 1)
+        self.assertEqual(payloads[0]["scenario"], "toy_cleanup")
+        self.assertEqual(payloads[0]["signals"][0]["signalType"], "toy_playing_observed")
+
     def test_worker_posts_only_observation_endpoint(self):
         calls = []
 
@@ -147,9 +172,11 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
             def analyze_snapshot(self, **kwargs):
                 return {
                     "has_person": True,
-                    "activity": "吃饭",
+                    "activity": "写作业/看书",
+                    "posture_status": "leaning_too_close",
+                    "bad_posture": True,
                     "confidence": 0.9,
-                    "description": "孩子坐在餐桌前吃饭。",
+                    "description": "孩子低头靠近桌面写字。",
                     "method": "guardian_test",
                     "observed_at": 15_000,
                 }
@@ -163,10 +190,57 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
             self.assertEqual(headers["X-Mira-Internal-Source"], "ai_camera_test")
             return {"ok": True}
 
+        class _FakeObserveService:
+            vision_service = _FakeVision()
+
+            def run_tick(self, **kwargs):
+                from dataclasses import dataclass
+                from services.observation_payload_builder import build_primary_payload
+                from services.vision_observation_enrich import enrich_observation
+                from schemas.vision import with_observation_reliability
+
+                analysis = with_observation_reliability(
+                    enrich_observation(
+                        self.vision_service.analyze_snapshot(
+                            image_bytes=kwargs["image_bytes"],
+                            content_type=kwargs.get("content_type") or "image/jpeg",
+                            device_key="dev_1",
+                            context={},
+                            force_analyze=False,
+                        )
+                    )
+                )
+                payload = build_primary_payload(
+                    analysis,
+                    family_id=kwargs["family_id"],
+                    child_id=kwargs["child_id"],
+                    device_id=kwargs["device_id"],
+                    source=kwargs.get("source") or "ai_camera_test",
+                    window_start_ms=kwargs.get("window_start_ms") or 10_000,
+                    window_end_ms=kwargs.get("window_end_ms") or 15_000,
+                    observed_at=kwargs.get("window_end_ms") or 15_000,
+                )
+                response = None
+                posted = False
+                if payload is not None:
+                    response = kwargs["post_observation"](payload)
+                    posted = bool(response.get("ok"))
+                from services.camera_observe_service import ObserveTickResult
+
+                return ObserveTickResult(
+                    skipped=False,
+                    skip_reason="",
+                    analysis=analysis,
+                    posted=posted,
+                    observation_count=1 if payload else 0,
+                    response=response,
+                )
+
         adapter = AiCameraTestObservationAdapter(
             _config(),
             json_request=fake_request,
             vision_service=_FakeVision(),
+            observe_service=_FakeObserveService(),
         )
         result = CameraObservationWorker(adapter).run_once(
             window_start_ms=10_000,
@@ -200,6 +274,19 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
             with self.subTest(key=key):
                 with self.assertRaises(ObservationAdapterConfigError):
                     build_worker_from_env(env)
+
+    def test_run_observe_tick_skips_when_snapshot_unavailable(self):
+        from integrations.camera_runtime.ai_camera_test_observation_adapter import SnapshotUnavailableError
+
+        def failing_snapshot(url, payload, headers, timeout):
+            raise SnapshotUnavailableError("摄像头 RTSP 不可达，请检查摄像头是否在线、IP 是否正确。")
+
+        adapter = AiCameraTestObservationAdapter(_config(), json_request=failing_snapshot)
+        result = adapter.run_observe_tick(window_start_ms=1_000, window_end_ms=6_000)
+        self.assertTrue(result["skipped"])
+        self.assertEqual(result["skip_reason"], "snapshot_unavailable")
+        self.assertFalse(result["posted"])
+        self.assertIn("RTSP", result["message"])
 
 
 def _config() -> AiCameraTestObservationConfig:

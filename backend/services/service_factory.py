@@ -12,6 +12,7 @@ from services.ai_text_provider import OpenAICompatibleTextProvider, UnavailableA
 from services.vision_observation_service import VisionObservationService
 from services.camera_bridge_service import CameraBridgeService
 from services.camera_ai_observation_service import CameraAiObservationService
+from services.camera_observe_service import CameraObserveService
 from services.camera_command_service import CameraCommandService
 from services.care_config_service import CareConfigService
 from services.device_service import DeviceService
@@ -140,6 +141,13 @@ def ai_care_reminder_service() -> AiCareReminderService:
 
 def camera_ai_observation_service() -> CameraAiObservationService:
     return CameraAiObservationService(current_app.config["DATABASE_URL"])
+
+
+def camera_observe_service() -> CameraObserveService:
+    return CameraObserveService(
+        current_app.config["DATABASE_URL"],
+        vision_service=vision_observation_service(),
+    )
 
 
 def routine_reminder_service() -> RoutineReminderService:

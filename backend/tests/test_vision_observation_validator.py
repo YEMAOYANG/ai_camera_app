@@ -44,6 +44,23 @@ class VisionObservationEnrichTest(unittest.TestCase):
         enriched = enrich_observation_risks(obs)
         self.assertTrue(enriched["homework_like"])
 
+    def test_playing_toys_clears_posture_risk(self):
+        obs = enrich_observation_risks(
+            {
+                "has_person": True,
+                "activity": "玩玩具",
+                "posture_status": "leaning_too_close",
+                "bad_posture": True,
+                "description": "孩子坐在客厅地垫上，周围散落着多个机器人玩具。",
+                "child_message": "眼睛离桌面远一点，坐舒服些。",
+            }
+        )
+        self.assertFalse(obs["homework_like"])
+        self.assertFalse(obs["bad_posture"])
+        self.assertEqual(obs["posture_status"], "ok")
+        self.assertEqual(obs["posture_risk_reason"], "")
+        self.assertEqual(obs["child_message"], "")
+
 
 class VisionReliabilityTest(unittest.TestCase):
     def test_observation_is_reliable_requires_person_and_confidence(self):

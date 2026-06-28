@@ -11,9 +11,11 @@ from schemas.auth import bearer_token, json_body
 from schemas.vision import observation_is_reliable
 from services.camera_bridge_service import CameraBridgeError
 from services.parent_facing_copy import build_child_vision_context
+from core.security import now_ms
 from services.service_factory import (
     auth_service,
     camera_command_service,
+    camera_observe_service,
     device_runtime_resolver,
     profile_service,
     task_service,
@@ -43,6 +45,22 @@ def _resolve_camera_runtime_for_request():
         device_id=device_id,
     )
     return access_token, context, resolved
+
+
+def _observe_child_id(access_token: str, *, family_id: str) -> str:
+    try:
+        child = profile_service().current_child(access_token).get("child") or {}
+    except Exception:
+        child = {}
+    child_id = str(child.get("id") or "").strip()
+    if child_id:
+        return child_id
+    repository = CareRepository(Database(current_app.config["DATABASE_URL"]))
+    with repository.transaction() as conn:
+        children = repository.list_children(conn, family_id=family_id)
+    if children:
+        return str(children[0].get("id") or "").strip()
+    return ""
 
 
 @camera_bp.get("/health")
@@ -205,18 +223,21 @@ def monitor_stop():
 @camera_bp.get("/monitor/status")
 def monitor_status():
     try:
-        _, context, resolved = _resolve_camera_runtime_for_request()
+        access_token, context, resolved = _resolve_camera_runtime_for_request()
         payload = resolved.bridge.monitor_status()
         response = _monitor_response(payload)
-        stored = _latest_stored_observation(
+        child_id = _observe_child_id(access_token, family_id=context["family"]["id"])
+        _merge_stored_observation_into_response(
+            response,
             family_id=context["family"]["id"],
             device_id=resolved.device_id,
         )
-        if stored is not None and _stored_observation_is_newer(
-            stored,
-            response["monitor"].get("lastObservation"),
-        ):
-            response["monitor"]["lastObservation"] = stored
+        _merge_runtime_display_into_response(
+            response,
+            family_id=context["family"]["id"],
+            child_id=child_id,
+            device_id=resolved.device_id,
+        )
         return jsonify(response)
     except ApiError as exc:
         return error_response(exc)
@@ -226,22 +247,38 @@ def monitor_status():
 def monitor_refresh():
     try:
         access_token, context, resolved = _resolve_camera_runtime_for_request()
-        try:
-            child = profile_service().current_child(access_token).get("child") or {}
-        except Exception:
-            child = {}
-        vision_context = build_child_vision_context(child)
-        payload = resolved.bridge.refresh_monitor_observation(
-            vision_context=vision_context,
+        child_id = _observe_child_id(access_token, family_id=context["family"]["id"])
+        device_id = resolved.device_id or ""
+        snapshot = resolved.bridge.fetch_snapshot()
+        observe_result = camera_observe_service().run_tick(
+            family_id=context["family"]["id"],
+            child_id=child_id,
+            device_id=device_id,
+            image_bytes=snapshot.body,
+            content_type=snapshot.content_type or "image/jpeg",
+            source="camera_monitor",
+            force_analyze=True,
+            force_post=True,
         )
+        observation = observe_result.analysis if isinstance(observe_result.analysis, dict) else {}
+        if isinstance(observation, dict):
+            observation = dict(observation)
+            observation.setdefault("observedAt", now_ms())
+        payload = _monitor_refresh_payload(observation)
         response = _monitor_response(payload)
-        observation = response["monitor"].get("lastObservation")
-        event_ids = _record_monitor_observation_event(
-            access_token=access_token,
-            context=context,
-            device_id=resolved.device_id,
-            observation=observation,
+        _merge_stored_observation_into_response(
+            response,
+            family_id=context["family"]["id"],
+            device_id=device_id,
+            trust_current=True,
         )
+        event_ids: list[str] = []
+        response_payload = observe_result.response or {}
+        care_event = response_payload.get("careEvent") if isinstance(response_payload, dict) else None
+        if isinstance(care_event, dict):
+            event_id = str(care_event.get("id") or care_event.get("commandId") or "").strip()
+            if event_id:
+                event_ids = [event_id]
         is_reliable = bool(observation.get("isReliable")) if isinstance(observation, dict) else False
         realtime_event = None
         if event_ids and isinstance(observation, dict):
@@ -249,20 +286,20 @@ def monitor_refresh():
 
             realtime_event = lightweight_camera_event_from_observation(
                 event_id=event_ids[0],
-                device_id=resolved.device_id or "",
+                device_id=device_id,
                 observation=observation,
             )
         publish_family_event(
             family_id=context["family"]["id"],
             event_type=CAMERA_MONITOR_REFRESHED,
-            device_id=resolved.device_id,
+            device_id=device_id,
             is_reliable=is_reliable,
             source="camera_monitor",
         )
         publish_family_event(
             family_id=context["family"]["id"],
             event_type=CAMERA_OBSERVATION_UPDATED,
-            device_id=resolved.device_id,
+            device_id=device_id,
             observation_id=_observation_id(observation),
             event_ids=event_ids,
             is_reliable=is_reliable,
@@ -270,6 +307,14 @@ def monitor_refresh():
             event=realtime_event,
         )
         return jsonify(response)
+    except CameraBridgeError as exc:
+        return jsonify(
+            {
+                "ok": False,
+                "error": exc.code,
+                "message": "摄像头画面暂不可用，请稍后再试。",
+            }
+        ), exc.status_code
     except ApiError as exc:
         return error_response(exc)
 
@@ -290,45 +335,201 @@ def camera_events():
         return error_response(exc)
 
 
+def _monitor_refresh_payload(observation: dict) -> dict:
+    return {
+        "ok": True,
+        "monitorRuntime": {
+            "data": {
+                "monitor_runtime": {
+                    "running": False,
+                    "status": "refreshed",
+                    "last_tick_at": now_ms(),
+                    "last_observation": observation,
+                    "last_reminder": "",
+                }
+            }
+        },
+    }
+
+
+def _extract_monitor_status(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        return {}
+    runtime = payload.get("monitorRuntime")
+    if isinstance(runtime, dict):
+        data = runtime.get("data")
+        if isinstance(data, dict):
+            nested = data.get("monitor_runtime")
+            if isinstance(nested, dict):
+                return nested
+            if "last_observation" in data or "status" in data or "state" in data:
+                return data
+    direct = payload.get("monitor_runtime")
+    if isinstance(direct, dict):
+        return direct
+    return {}
+
+
 def _monitor_response(payload: dict) -> dict:
-    runtime = payload.get("monitorRuntime") if isinstance(payload, dict) else {}
-    data = runtime.get("data") if isinstance(runtime, dict) else {}
-    status = data.get("monitor_runtime") if isinstance(data, dict) else {}
-    if not isinstance(status, dict):
-        status = data if isinstance(data, dict) else {}
+    status = _extract_monitor_status(payload)
     running = bool(status.get("running"))
     normalized = _normalize_monitor_observation(status.get("last_observation"))
+    monitor_status = status.get("status") or status.get("state") or "unavailable"
     return {
         "ok": True,
         "monitor": {
             "running": running,
-            "status": status.get("status") or status.get("state") or "unavailable",
+            "status": monitor_status,
             "lastObservation": normalized,
             "lastReminder": status.get("last_reminder") or "",
-            "message": (
-                "摄像头正在观察当前任务"
-                if running
-                else "当前没有进行中的观察"
+            "message": _monitor_message(
+                running=running,
+                status=str(monitor_status),
+                has_observation=normalized is not None,
             ),
         },
     }
 
 
+def _monitor_message(*, running: bool, status: str, has_observation: bool) -> str:
+    if running:
+        return "摄像头正在观察当前任务"
+    if status == "refreshed":
+        if has_observation:
+            return "观察已刷新"
+        return "观察已刷新，沿用最近一次记录"
+    if has_observation:
+        return "最近一次观察"
+    return "当前没有进行中的观察"
+
+
+def _merge_stored_observation_into_response(
+    response: dict,
+    *,
+    family_id: str,
+    device_id: str | None,
+    trust_current: bool = False,
+) -> None:
+    monitor = response.get("monitor")
+    if not isinstance(monitor, dict):
+        return
+    current = monitor.get("lastObservation")
+    if trust_current and isinstance(current, dict) and str(current.get("summary") or "").strip():
+        return
+    stored = _latest_stored_observation(family_id=family_id, device_id=device_id)
+    if stored is None:
+        return
+    current = monitor.get("lastObservation")
+    current_summary = str((current or {}).get("summary") or "").strip() if isinstance(current, dict) else ""
+    stored_summary = str(stored.get("summary") or "").strip()
+    should_merge = (
+        not isinstance(current, dict)
+        or not current_summary
+        or (stored_summary and _stored_observation_is_newer(stored, current))
+    )
+    if not should_merge:
+        return
+    monitor["lastObservation"] = stored
+    if str(monitor.get("status") or "") == "refreshed":
+        monitor["message"] = "观察已刷新"
+    elif not monitor.get("message") or monitor.get("message") == "当前没有进行中的观察":
+        monitor["message"] = "最近一次观察"
+
+
+def _merge_runtime_display_into_response(
+    response: dict,
+    *,
+    family_id: str,
+    child_id: str,
+    device_id: str | None,
+) -> None:
+    if not child_id or not device_id:
+        return
+    display = _latest_runtime_display_observation(
+        family_id=family_id,
+        child_id=child_id,
+        device_id=device_id,
+    )
+    if display is None:
+        return
+    monitor = response.get("monitor")
+    if not isinstance(monitor, dict):
+        return
+    current = monitor.get("lastObservation")
+    if not isinstance(current, dict) or _stored_observation_is_newer(display, current):
+        monitor["lastObservation"] = display
+
+
+def _latest_runtime_display_observation(
+    *,
+    family_id: str,
+    child_id: str,
+    device_id: str,
+) -> dict | None:
+    from services.observation_runtime_state import ObservationRuntimeStateStore
+
+    repository = CareRepository(Database(current_app.config["DATABASE_URL"]))
+    store = ObservationRuntimeStateStore(repository)
+    with repository.transaction() as conn:
+        runtime = store.load(
+            conn,
+            family_id=family_id,
+            child_id=child_id,
+            device_id=device_id,
+        )
+    display = runtime.get("display")
+    if not isinstance(display, dict) or not int(display.get("observed_at") or 0):
+        return None
+    normalized = _normalize_monitor_observation(
+        {
+            "has_person": display.get("has_person"),
+            "activity": display.get("activity"),
+            "raw_activity": display.get("raw_activity"),
+            "confidence": display.get("confidence"),
+            "observedAt": display.get("observed_at"),
+            "description": display.get("description"),
+            "decision_reason": display.get("decision_reason"),
+            "isReliable": display.get("isReliable"),
+        }
+    )
+    if normalized is None:
+        return None
+    description = str(display.get("description") or "").strip()
+    if description:
+        normalized["description"] = description[:180]
+    return normalized
+
+
 def _normalize_monitor_observation(value: object) -> dict | None:
     if not isinstance(value, dict):
         return None
-    has_person_value = value.get("has_person", value.get("hasPerson"))
+    from services.vision_observation_enrich import enrich_observation
+
+    enriched = enrich_observation(_monitor_observation_source(value))
+    has_person_value = enriched.get("has_person")
     has_person = has_person_value is True
-    raw_text = _analysis_text(value)
-    activity = _activity_label(value.get("activity") or value.get("raw_activity"), raw_text=raw_text)
-    confidence = _float_or_zero(value.get("confidence"))
+    activity = str(enriched.get("activity") or "").strip()
+    if has_person_value is False:
+        activity = ""
+    elif _is_generic_activity(activity):
+        activity = ""
+    confidence = _float_or_zero(enriched.get("confidence") or value.get("confidence"))
     observed_at = _int_or_zero(
         value.get("observedAt")
         or value.get("observed_at")
         or value.get("timestamp")
         or value.get("time")
+        or enriched.get("observed_at")
     )
-    summary = _summary_text(value, activity=activity, has_person_value=has_person_value)
+    summary = _summary_text(
+        {
+            **value,
+            **enriched,
+            "description": enriched.get("description") or value.get("description"),
+        },
+        activity=activity,
+        has_person_value=has_person_value,
+    )
     is_reliable = observation_is_reliable(
         has_person=has_person_value,
         confidence=confidence,
@@ -361,6 +562,8 @@ def _summary_text(value: dict, *, activity: str, has_person_value: object) -> st
         return "暂未看到孩子"
     if activity == "玩玩具":
         return "孩子正在玩玩具"
+    if activity == "吃饭":
+        return "孩子正在吃饭"
     if activity:
         return f"孩子正在{activity}"
     if raw_summary and not _is_generic_activity(raw_summary):
@@ -368,6 +571,24 @@ def _summary_text(value: dict, *, activity: str, has_person_value: object) -> st
     if has_person_value is True:
         return "画面暂时无法判断"
     return ""
+
+
+def _monitor_observation_source(value: dict) -> dict:
+    return {
+        "has_person": value.get("has_person", value.get("hasPerson")),
+        "activity": value.get("activity") or value.get("raw_activity"),
+        "raw_activity": value.get("raw_activity") or value.get("activity"),
+        "confidence": value.get("confidence"),
+        "description": value.get("description"),
+        "child_message": value.get("child_message"),
+        "decision_reason": value.get("decision_reason") or value.get("decisionReason"),
+        "posture_status": value.get("posture_status"),
+        "bad_posture": value.get("bad_posture"),
+        "is_meal_scene": value.get("is_meal_scene"),
+        "meal_standing": value.get("meal_standing"),
+        "toys_on_table": value.get("toys_on_table"),
+        "toys_scattered": value.get("toys_scattered"),
+    }
 
 
 def _activity_label(value: object, *, raw_text: str = "") -> str:

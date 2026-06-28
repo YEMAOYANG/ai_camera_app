@@ -480,7 +480,7 @@ class AiCareReminderService:
                 scenario=scenario,
                 device_id=device_id,
             )
-        prompt_id = str((config or {}).get("prompt_id") or f"reminder.{scenario}")
+        prompt_id = str(context.get("promptId") or (config or {}).get("prompt_id") or f"reminder.{scenario}")
         prompt_version = str((config or {}).get("prompt_version") or "v1")
         fallback_templates = _json_list(config.get("fallback_templates") if config else None)
         if not fallback_templates:

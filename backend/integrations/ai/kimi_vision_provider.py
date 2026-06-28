@@ -109,7 +109,15 @@ class OpenAICompatibleVisionProvider:
             with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
                 body = json.loads(response.read().decode("utf-8", "ignore") or "{}")
         except urllib.error.HTTPError as exc:
-            log.warning("vision provider HTTP error: %s", exc)
+            detail = ""
+            try:
+                detail = exc.read().decode("utf-8", "ignore")
+            except Exception:
+                detail = ""
+            if detail:
+                log.warning("vision provider HTTP error: %s body=%s", exc, detail[:500])
+            else:
+                log.warning("vision provider HTTP error: %s", exc)
             return None
         except Exception as exc:
             log.warning("vision provider request failed: %s", exc)

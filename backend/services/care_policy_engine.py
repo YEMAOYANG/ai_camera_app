@@ -49,6 +49,7 @@ NON_ACTIONABLE_SIGNAL_TYPES = {
     "meal_started",
     "child_at_table",
     "meal_finished",
+    "child_not_visible",
     "ok",
     "unknown",
     "seated",
@@ -144,9 +145,16 @@ class CarePolicyEngine:
             capability_config.get("min_observation_seconds"),
             20,
         )
+        primary_signal_type = _primary_signal_type(behavior_signals)
         min_observation_seconds = _effective_min_observation_seconds(
             scenario=scenario,
+            signal_type=primary_signal_type,
             configured_seconds=min_observation_seconds,
+        )
+        cooldown_seconds = _effective_cooldown_seconds(
+            scenario=scenario,
+            signal_type=primary_signal_type,
+            configured_seconds=cooldown_seconds,
         )
         snapshot.update(
             {
@@ -155,6 +163,7 @@ class CarePolicyEngine:
                 "parentNotifyThreshold": parent_notify_threshold,
                 "confidenceThreshold": confidence_threshold,
                 "minObservationSeconds": min_observation_seconds,
+                "primarySignalType": primary_signal_type,
                 "allowSpeaker": bool(capability_config.get("allow_speaker")),
                 "recordOnly": bool(capability_config.get("record_only")),
             }
@@ -236,7 +245,7 @@ class CarePolicyEngine:
                 snapshot,
             )
 
-        if scenario in {CARE_SCENARIO_TOY_CLEANUP, CARE_SCENARIO_POSTURE}:
+        if scenario in {CARE_SCENARIO_TOY_CLEANUP, CARE_SCENARIO_POSTURE, CARE_SCENARIO_MEAL_HABIT}:
             snapshot["routineGate"] = {
                 "allowed": True,
                 "reason": "behavior_only_scenario",
@@ -248,7 +257,7 @@ class CarePolicyEngine:
                 REMINDER_DECISION_ALLOWED,
                 "behavior_policy_allowed",
                 snapshot,
-                should_speak=True,
+                should_speak=_should_speak_for_behavior_signal(primary_signal_type),
             )
 
         routine_gate = _routine_window_gate(
@@ -287,11 +296,50 @@ def _effective_confidence_threshold(
 def _effective_min_observation_seconds(
     *,
     scenario: str,
+    signal_type: str,
     configured_seconds: int,
 ) -> int:
+    signal = signal_type.strip().lower()
+    if signal == "meal_standing_on_chair":
+        return min(configured_seconds, 5)
+    if signal == "meal_toys_on_table":
+        return min(configured_seconds, 10)
+    if signal.startswith("toy_play_unsafe_"):
+        return min(configured_seconds, 15)
     if scenario == CARE_SCENARIO_POSTURE:
         return min(configured_seconds, 3)
+    if signal == "meal_attention_shifted":
+        return min(configured_seconds, 20)
     return configured_seconds
+
+
+def _effective_cooldown_seconds(
+    *,
+    scenario: str,
+    signal_type: str,
+    configured_seconds: int,
+) -> int:
+    signal = signal_type.strip().lower()
+    if signal == "meal_standing_on_chair":
+        return min(configured_seconds, 180)
+    if signal == "meal_toys_on_table":
+        return min(configured_seconds, 600)
+    if signal.startswith("toy_play_unsafe_"):
+        return min(configured_seconds, 600)
+    return configured_seconds
+
+
+def _primary_signal_type(behavior_signals: list[DatabaseRow]) -> str:
+    if not behavior_signals:
+        return ""
+    return str(behavior_signals[0].get("signal_type") or "").strip()
+
+
+def _should_speak_for_behavior_signal(signal_type: str) -> bool:
+    signal = signal_type.strip().lower()
+    if signal in NON_ACTIONABLE_SIGNAL_TYPES:
+        return False
+    return True
 
 
 def _decision(

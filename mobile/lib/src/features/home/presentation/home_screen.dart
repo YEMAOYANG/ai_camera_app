@@ -70,6 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   void _invalidateHomeProviders() {
+    ref.read(cameraMonitorOverrideProvider.notifier).state = null;
     ref
       ..invalidate(profileSummaryProvider)
       ..invalidate(primaryDeviceOverviewProvider)
@@ -105,7 +106,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Future<void> _refreshMonitorOnce() async {
     try {
-      await ref.read(cameraRepositoryProvider).refreshMonitor();
+      final monitor = await ref.read(cameraRepositoryProvider).refreshMonitor();
+      ref.read(cameraMonitorOverrideProvider.notifier).state = monitor;
     } catch (_) {
       // 页面仍可通过普通状态接口和下拉刷新兜底，不因为一次观察刷新失败进入错误态。
     }
@@ -125,7 +127,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final deviceOverview = ref.watch(primaryDeviceOverviewProvider);
     final cameraHealth = ref.watch(cameraHealthProvider);
     final cameraStatus = ref.watch(cameraStatusProvider);
-    final cameraMonitor = ref.watch(cameraMonitorStatusProvider);
+    final cameraMonitor = ref.watch(cameraMonitorDisplayProvider);
 
     return HomeSummaryInput(
       now: now,

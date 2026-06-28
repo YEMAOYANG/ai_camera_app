@@ -21,6 +21,14 @@ from services import task_event_stream
 from tests.support import fresh_test_config, request_debug_code
 from tests.fake_vision_service import FakeVisionObservationService
 
+def _fake_snapshot_bytes() -> bytes:
+    from io import BytesIO
+    from PIL import Image
+    image = Image.new("RGB", (32, 32), color=(120, 140, 160))
+    buffer = BytesIO()
+    image.save(buffer, format="JPEG")
+    return buffer.getvalue()
+
 
 class _CameraRuntimeHandler(BaseHTTPRequestHandler):
     speak_count = 0
@@ -73,7 +81,7 @@ class _CameraRuntimeHandler(BaseHTTPRequestHandler):
             )
             return
         if self.path == "/api/camera/snapshot":
-            body = b"\xff\xd8\xff\xd9"
+            body = _fake_snapshot_bytes()
             self.send_response(200)
             self.send_header("Content-Type", "image/jpeg")
             self.send_header("Content-Length", str(len(body)))
@@ -157,6 +165,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.client = self.app.test_client()
         self.access_token = self._login()
         self.device_id = self._create_device()
+        self.child_id = self._create_child()
 
     def tearDown(self):
         self._vision_patch.stop()
@@ -460,14 +469,18 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         observation = response.json["monitor"]["lastObservation"]
         self.assertTrue(observation["isReliable"])
         self.assertEqual(observation["activity"], "看书")
-        self.assertEqual(
-            [payload["type"] for _, payload in captured],
-            [
-                "camera_event.created",
-                "camera_monitor.refreshed",
-                "camera_observation.updated",
-            ],
-        )
+        types = [payload["type"] for _, payload in captured]
+        required = [
+            "camera_event.created",
+            "camera_monitor.refreshed",
+            "camera_observation.updated",
+        ]
+        start = 0
+        indexes = []
+        for name in required:
+            indexes.append(types.index(name, start))
+            start = indexes[-1] + 1
+        self.assertEqual(indexes, sorted(indexes), types)
         self.assertTrue(all(family_id == self.family_id for family_id, _ in captured))
         for _, payload in captured:
             self.assertEqual(payload["deviceId"], self.device_id)
@@ -491,9 +504,20 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         )
         self.assertEqual(events.status_code, 200, events.json)
         self.assertTrue(
-            any(event["displayTitle"] == "孩子正在看书" for event in events.json["events"])
+            any(event["displayTitle"] == "观察到孩子正在看书" for event in events.json["events"])
         )
 
+    def test_camera_monitor_refresh_returns_refreshed_status_and_message(self):
+        response = self.client.post(
+            "/api/camera/monitor/refresh",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200, response.json)
+        monitor = response.json["monitor"]
+        self.assertEqual(monitor["status"], "refreshed")
+        self.assertIsNotNone(monitor["lastObservation"])
+        self.assertIn("刷新", monitor["message"])
 
     def test_camera_monitor_refresh_skips_unreliable_observation_record(self):
         self._fake_vision.payload = {

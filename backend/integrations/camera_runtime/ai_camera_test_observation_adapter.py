@@ -4,29 +4,26 @@ import base64
 import json
 import os
 import re
+import urllib.error
 import urllib.request
 from dataclasses import dataclass
 
 from schemas.vision import with_observation_reliability
+from services.observation_payload_builder import build_primary_payload, build_source_event_id
 from services.vision_child_context import load_child_vision_context
+from services.vision_observation_enrich import enrich_observation
 from typing import Any, Callable, Mapping, Optional
 
 
 JsonRequest = Callable[[str, Optional[dict], Optional[Mapping[str, str]], float], dict[str, Any]]
 
 
-POSTURE_RISK_VALUES = {"bad_posture", "leaning_too_close", "low_head", "slouching"}
-MEAL_RE = re.compile(r"(吃饭|用餐|餐桌|饭菜|餐具|碗|筷子|勺子|餐盘)")
-TOY_CLEANUP_RE = re.compile(r"(收玩具|整理玩具|收拾玩具|玩具盒|放回|归位)")
-TOY_CLEANUP_DONE_RE = re.compile(r"(玩具已收好|已经收好|收纳完成|玩具归位|整理好了|整齐)")
-TOY_LEFT_RE = re.compile(r"(离开[^，。,.]{0,12}(玩具|玩具区)|玩具[^，。,.]{0,18}(还在|散落|没收|未收))")
-PLAYING_TOYS_RE = re.compile(r"(玩玩具|玩积木|搭积木|摆弄玩具|操作玩具|playing with toys)")
-TOY_NEGATION_RE = re.compile(r"(没有|没|未|未见|看不到|没有看到)[^，。,.]{0,18}(玩具|积木|toy|toys)")
-POSTURE_RE = re.compile(r"(低头|头低|趴桌|身体前倾|弯腰|离[^，。,.]{0,8}(桌|书|纸)[^，。,.]{0,8}(近|太近|过近))")
-
-
 class ObservationAdapterConfigError(RuntimeError):
     pass
+
+
+class SnapshotUnavailableError(RuntimeError):
+    """Raised when ai_camera_test cannot produce a snapshot (e.g. RTSP offline)."""
 
 
 @dataclass(frozen=True)
@@ -89,10 +86,6 @@ class AiCameraTestObservationConfig:
         return f"{self.base_url.rstrip('/')}/api/camera/snapshot?format=data_url"
 
     @property
-    def analyze_url(self) -> str:
-        return f"{self.base_url.rstrip('/')}/api/analyze_frame"
-
-    @property
     def observation_url(self) -> str:
         value = self.internal_url.rstrip("/")
         if value.endswith("/internal/camera/observations"):
@@ -112,16 +105,15 @@ class AiCameraTestObservationAdapter:
         *,
         json_request: JsonRequest | None = None,
         vision_service=None,
+        observe_service=None,
     ):
         config.validate()
         self.config = config
         self._json_request = json_request or _json_request
         self.vision_service = vision_service
+        self.observe_service = observe_service
 
-    def _database_url(self) -> str:
-        return str(os.environ.get("DATABASE_URL") or os.environ.get("APP_DATABASE_URL") or "").strip()
-
-    def fetch_analysis(self) -> dict:
+    def fetch_snapshot_bytes(self) -> tuple[bytes, str]:
         snapshot = self._json_request(
             self.config.snapshot_url,
             None,
@@ -131,7 +123,24 @@ class AiCameraTestObservationAdapter:
         image = str(snapshot.get("image") or "")
         if not image:
             raise RuntimeError("旧摄像头运行时没有返回可用画面。")
-        body, content_type = _decode_data_url(image)
+        return _decode_data_url(image)
+
+    def fetch_analysis(self) -> dict:
+        body, content_type = self.fetch_snapshot_bytes()
+        if self.observe_service is not None:
+            result = self.observe_service.run_tick(
+                family_id=self.config.family_id,
+                child_id=self.config.child_id,
+                device_id=self.config.device_id,
+                image_bytes=body,
+                content_type=content_type,
+                source=self.source,
+                force_analyze=False,
+                post_observation=self.post_observation,
+            )
+            if result.analysis is not None:
+                return result.analysis
+            return {"has_person": None, "activity": "", "confidence": 0.0, "description": result.skip_reason}
         if self.vision_service is None:
             raise RuntimeError("Vision 服务未配置，无法分析画面。")
         vision_context = load_child_vision_context(
@@ -140,12 +149,14 @@ class AiCameraTestObservationAdapter:
             child_id=self.config.child_id,
         )
         return with_observation_reliability(
-            self.vision_service.analyze_snapshot(
-                image_bytes=body,
-                content_type=content_type,
-                device_key=self.config.device_id or self.config.base_url,
-                context=vision_context,
-                force_analyze=True,
+            enrich_observation(
+                self.vision_service.analyze_snapshot(
+                    image_bytes=body,
+                    content_type=content_type,
+                    device_key=self.config.device_id or self.config.base_url,
+                    context=vision_context,
+                    force_analyze=False,
+                )
             )
         )
 
@@ -157,43 +168,18 @@ class AiCameraTestObservationAdapter:
         window_end_ms: int,
         observed_at: int | None = None,
     ) -> list[dict]:
-        duration_seconds = max(1, int((window_end_ms - window_start_ms) / 1000))
         observed_at = observed_at if observed_at is not None else window_end_ms
-        confidence = _score(analysis.get("confidence"))
-        payloads = []
-        for scenario, signal_type, signal_value, summary in _scenario_signals(analysis):
-            source_event_id = build_source_event_id(
-                device_id=self.config.device_id,
-                scenario=scenario,
-                window_start_ms=window_start_ms,
-                window_end_ms=window_end_ms,
-                signal_type=signal_type,
-            )
-            payloads.append(
-                {
-                    "familyId": self.config.family_id,
-                    "childId": self.config.child_id,
-                    "deviceId": self.config.device_id,
-                    "scenario": scenario,
-                    "observedAt": observed_at,
-                    "confidence": confidence,
-                    "evidenceType": "snapshot",
-                    "parentSummary": summary,
-                    "source": self.source,
-                    "sourceEventId": source_event_id,
-                    "signals": [
-                        {
-                            "signalType": signal_type,
-                            "signalValue": signal_value,
-                            "confidence": confidence,
-                            "durationSeconds": duration_seconds,
-                            "metadata": _signal_metadata(analysis),
-                        }
-                    ],
-                    "rawDetail": _raw_detail(analysis),
-                }
-            )
-        return payloads
+        payload = build_primary_payload(
+            analysis,
+            family_id=self.config.family_id,
+            child_id=self.config.child_id,
+            device_id=self.config.device_id,
+            source=self.source,
+            window_start_ms=window_start_ms,
+            window_end_ms=window_end_ms,
+            observed_at=observed_at,
+        )
+        return [payload] if payload else []
 
     def post_observation(self, payload: dict) -> dict:
         return self._json_request(
@@ -207,6 +193,48 @@ class AiCameraTestObservationAdapter:
             self.config.timeout_seconds,
         )
 
+    def run_observe_tick(self, *, window_start_ms: int, window_end_ms: int) -> dict:
+        try:
+            body, content_type = self.fetch_snapshot_bytes()
+        except SnapshotUnavailableError as exc:
+            return {
+                "skipped": True,
+                "skip_reason": "snapshot_unavailable",
+                "posted": False,
+                "observation_count": 0,
+                "analysis": None,
+                "response": None,
+                "message": str(exc),
+            }
+        service = self.observe_service
+        if service is None:
+            from services.camera_observe_service import build_observe_service_from_env
+
+            service = build_observe_service_from_env()
+        result = service.run_tick(
+            family_id=self.config.family_id,
+            child_id=self.config.child_id,
+            device_id=self.config.device_id,
+            image_bytes=body,
+            content_type=content_type,
+            source=self.source,
+            force_analyze=False,
+            window_start_ms=window_start_ms,
+            window_end_ms=window_end_ms,
+            post_observation=self.post_observation,
+        )
+        return {
+            "skipped": result.skipped,
+            "skip_reason": result.skip_reason,
+            "posted": result.posted,
+            "observation_count": result.observation_count,
+            "analysis": result.analysis,
+            "response": result.response,
+        }
+
+    def _database_url(self) -> str:
+        return str(os.environ.get("DATABASE_URL") or os.environ.get("APP_DATABASE_URL") or "").strip()
+
 
 def _decode_data_url(value: str) -> tuple[bytes, str]:
     match = DATA_URL_RE.match(str(value or "").strip())
@@ -218,107 +246,6 @@ def _decode_data_url(value: str) -> tuple[bytes, str]:
         return base64.b64decode(data), mime
     except Exception as exc:
         raise RuntimeError("snapshot 图片解码失败。") from exc
-
-
-def build_source_event_id(
-    *,
-    device_id: str,
-    scenario: str,
-    window_start_ms: int,
-    window_end_ms: int,
-    signal_type: str,
-) -> str:
-    return f"ai_camera_test:{device_id}:{scenario}:{window_start_ms}:{window_end_ms}:{signal_type}"
-
-
-def _scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, str, str]]:
-    result: list[tuple[str, str, str, str]] = []
-    text = _analysis_text(analysis)
-    activity = str(analysis.get("activity") or analysis.get("raw_activity") or "")
-    posture_status = str(analysis.get("posture_status") or "").strip()
-    has_person = analysis.get("has_person")
-    toys_scattered = bool(analysis.get("toys_scattered"))
-    toys_visible = bool(analysis.get("toys_visible"))
-    playing_toys = (
-        activity == "玩玩具" or PLAYING_TOYS_RE.search(text)
-    ) and not TOY_NEGATION_RE.search(text)
-
-    posture_signal = ""
-    if posture_status in POSTURE_RISK_VALUES:
-        posture_signal = posture_status
-    elif bool(analysis.get("bad_posture")):
-        posture_signal = "bad_posture"
-    elif has_person is True and POSTURE_RE.search(text):
-        posture_signal = "posture_risk"
-    if has_person is True and posture_signal:
-        result.append(("posture", posture_signal, "active", "观察到坐姿需要留意。"))
-
-    if TOY_CLEANUP_DONE_RE.search(text):
-        result.append(("toy_cleanup", "cleanup_done", "recovered", "观察到玩具已经收好。"))
-    elif TOY_CLEANUP_RE.search(text):
-        result.append(("toy_cleanup", "cleanup_started", "active", "观察到孩子正在收纳玩具。"))
-    elif TOY_LEFT_RE.search(text) or (has_person is False and toys_scattered):
-        result.append(("toy_cleanup", "child_left_toys_uncollected", "active", "孩子离开后，玩具还没有收好。"))
-    elif has_person is True and playing_toys:
-        result.append(("toy_cleanup", "toy_playing_observed", "active", "观察到孩子正在玩玩具。"))
-    elif toys_scattered and not playing_toys:
-        result.append(("toy_cleanup", "child_left_toys_uncollected", "active", "观察到玩具还没有收好。"))
-
-    if activity == "吃饭" or MEAL_RE.search(text):
-        result.append(("meal_start", "meal_started", "active", "观察到孩子进入用餐状态。"))
-        if any(word in text for word in ("走动", "离开餐桌", "玩", "分心")):
-            result.append(("meal_habit", "meal_attention_shifted", "active", "观察到用餐时注意力离开餐桌。"))
-
-    return result
-
-
-def _analysis_text(analysis: Mapping[str, object]) -> str:
-    return "".join(
-        str(analysis.get(key) or "")
-        for key in (
-            "activity",
-            "raw_activity",
-            "posture_status",
-            "description",
-            "decision_reason",
-        )
-    )
-
-
-def _signal_metadata(analysis: Mapping[str, object]) -> dict:
-    return {
-        "activity": str(analysis.get("activity") or analysis.get("raw_activity") or "")[:80],
-        "method": str(analysis.get("method") or "")[:80],
-        "activityStability": _score(analysis.get("activity_stability")),
-    }
-
-
-def _raw_detail(analysis: Mapping[str, object]) -> dict:
-    allowed_keys = {
-        "has_person",
-        "activity",
-        "raw_activity",
-        "bad_posture",
-        "posture_status",
-        "toys_visible",
-        "toys_scattered",
-        "confidence",
-        "description",
-        "child_message",
-        "decision_reason",
-        "activity_history",
-        "events",
-        "summary",
-        "method",
-        "activity_stability",
-        "vision_cadence",
-        "vision_backoff",
-    }
-    return {
-        key: analysis.get(key)
-        for key in allowed_keys
-        if key in analysis
-    }
 
 
 def _json_request(
@@ -335,16 +262,31 @@ def _json_request(
         request_headers.setdefault("Content-Type", "application/json")
         method = "POST"
     request = urllib.request.Request(url, data=data, headers=request_headers, method=method)
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        return json.loads(response.read().decode("utf-8", "ignore") or "{}")
-
-
-def _score(value: object) -> float:
     try:
-        parsed = float(value)
-    except (TypeError, ValueError):
-        return 0.0
-    return max(0.0, min(1.0, parsed))
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return json.loads(response.read().decode("utf-8", "ignore") or "{}")
+    except urllib.error.HTTPError as exc:
+        if exc.code in {502, 503, 504}:
+            body = exc.read().decode("utf-8", "ignore")
+            message = _snapshot_error_message(body, exc)
+            raise SnapshotUnavailableError(message) from exc
+        raise
+
+
+def _snapshot_error_message(body: str, exc: urllib.error.HTTPError) -> str:
+    try:
+        payload = json.loads(body)
+    except json.JSONDecodeError:
+        return str(exc.reason or f"HTTP {exc.code}")
+    message = str(payload.get("message") or payload.get("error") or "").strip()
+    if not message:
+        return str(exc.reason or f"HTTP {exc.code}")
+    if "No route to host" in message:
+        return "摄像头 RTSP 不可达，请检查摄像头是否在线、IP 是否正确。"
+    if "Connection refused" in message or "Connection timed out" in message:
+        return "摄像头 RTSP 连接失败，请检查网络与 RTSP 地址。"
+    first_line = message.splitlines()[0].strip()
+    return first_line or str(exc.reason or f"HTTP {exc.code}")
 
 
 def _float_env(value: object, default: float) -> float:

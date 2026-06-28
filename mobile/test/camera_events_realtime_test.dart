@@ -187,6 +187,40 @@ void main() {
     expect(event.isRoutineRecord, isTrue);
     expect(event.isVisionRecord, isFalse);
   });
+
+  test('refreshMonitor returns unavailable status when snapshot fails', () async {
+    final dio = Dio(BaseOptions(baseUrl: 'http://test/api'));
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          handler.reject(
+            DioException(
+              requestOptions: options,
+              response: Response<dynamic>(
+                requestOptions: options,
+                statusCode: 502,
+                data: {
+                  'ok': false,
+                  'error': 'camera_snapshot_failed',
+                  'message': '摄像头画面暂不可用，请稍后再试。',
+                },
+              ),
+              type: DioExceptionType.badResponse,
+            ),
+          );
+        },
+      ),
+    );
+    final repository = CameraRepository(
+      apiClient: ApiClient(dio),
+      dio: dio,
+    );
+
+    final status = await repository.refreshMonitor(deviceId: 'dev_1');
+
+    expect(status.status, 'unavailable');
+    expect(status.message, contains('摄像头画面暂不可用'));
+  });
 }
 
 class _FakeCameraRepository extends CameraRepository {

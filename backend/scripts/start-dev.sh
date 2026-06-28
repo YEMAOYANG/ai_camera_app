@@ -48,6 +48,7 @@ PID_DIR="$LOG_DIR/pids"
 CAMERA_PORT=8767
 GO2RTC_PORT=1984
 GUARDIAN_PORT=8000
+GUARDIAN_WS_PORT=8001
 
 PIDS=()
 CLEANED=0
@@ -115,9 +116,9 @@ wait_for_guardian() {
 show_startup_errors() {
   local log_file="$1"
   [ -f "$log_file" ] || return 0
-  if grep -qE 'Traceback|Error:|OSError|Address already in use|Exception' "$log_file" 2>/dev/null; then
+  if grep -qE 'Traceback|Error:|OSError|Address already in use|Exception|SyntaxError' "$log_file" 2>/dev/null; then
     warn "最近错误片段:"
-    grep -E 'Traceback|Error:|OSError|Address already in use|Exception|File "' "$log_file" | tail -15 || true
+    grep -E 'Traceback|Error:|OSError|Address already in use|Exception|SyntaxError|File "' "$log_file" | tail -15 || true
   else
     tail -15 "$log_file" || true
   fi
@@ -142,6 +143,42 @@ stop_pid_file() {
     fi
     rm -f "$file"
   fi
+}
+
+stop_listeners_on_port() {
+  local port="$1"
+  local pids
+  pids="$(lsof -tiTCP:"$port" -sTCP:LISTEN 2>/dev/null || true)"
+  [ -n "$pids" ] || return 0
+  warn "停止占用端口 ${port} 的进程: $(echo "$pids" | tr '\n' ' ' | sed 's/ $//')"
+  for pid in $pids; do
+    kill "$pid" 2>/dev/null || true
+  done
+  sleep 1
+  for pid in $pids; do
+    if kill -0 "$pid" 2>/dev/null; then
+      kill -9 "$pid" 2>/dev/null || true
+    fi
+  done
+  for pid in $pids; do
+    wait "$pid" 2>/dev/null || true
+  done
+}
+
+stop_guardian_processes() {
+  stop_pid_file guardian-app
+  stop_pid_file guardian-worker
+  stop_listeners_on_port "$GUARDIAN_PORT"
+  stop_listeners_on_port "$GUARDIAN_WS_PORT"
+}
+
+verify_guardian_import() {
+  if ! env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -c "from app import create_app" >/dev/null 2>&1; then
+    err "Guardian 代码无法加载（请检查 app.py 语法/导入错误）"
+    env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -c "from app import create_app" 2>&1 | tail -8 || true
+    return 1
+  fi
+  return 0
 }
 
 cleanup() {
@@ -234,20 +271,23 @@ log "── 2/3 Guardian 后端 (app.py) ──"
 GUARDIAN_HEALTH="http://127.0.0.1:${GUARDIAN_PORT}/api/health"
 GUARDIAN_STARTED_BY_US=0
 
-if port_listening "$GUARDIAN_PORT" && url_ok "$GUARDIAN_HEALTH"; then
-  ok "Guardian 后端已在运行 (${GUARDIAN_PORT})，跳过重启"
-elif port_listening "$GUARDIAN_PORT"; then
-  warn "端口 ${GUARDIAN_PORT} 已被占用但未通过健康检查，尝试停止旧进程…"
-  for pid in $(lsof -tiTCP:"$GUARDIAN_PORT" -sTCP:LISTEN 2>/dev/null || true); do
-    kill "$pid" 2>/dev/null || true
-  done
-  sleep 2
+if port_listening "$GUARDIAN_PORT" || port_listening "$GUARDIAN_WS_PORT"; then
+  warn "检测到 Guardian 端口 ${GUARDIAN_PORT}/${GUARDIAN_WS_PORT} 已占用，先停止旧进程…"
+  stop_guardian_processes
+  sleep 1
+else
+  stop_pid_file guardian-app
+  stop_pid_file guardian-worker
 fi
 
 cd "$BACKEND_DIR"
 set -a
 load_env_file "$ENV_FILE"
 set +a
+
+if ! verify_guardian_import; then
+  exit 1
+fi
 
 if ! port_listening "$GUARDIAN_PORT"; then
   nohup env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" app.py \
@@ -264,7 +304,7 @@ if ! port_listening "$GUARDIAN_PORT"; then
   fi
 fi
 
-ok "Guardian API + WS + 调度  →  http://127.0.0.1:${GUARDIAN_PORT}  (WS :8001)"
+ok "Guardian API + WS + 调度  →  http://127.0.0.1:${GUARDIAN_PORT}  (WS :${GUARDIAN_WS_PORT})"
 if [ "$GUARDIAN_STARTED_BY_US" -eq 1 ]; then
   ok "日志: $LOG_DIR/guardian-app.log"
 else
@@ -276,6 +316,10 @@ log ""
 log "── 3/3 Guardian 观察 worker ──"
 
 stop_pid_file guardian-worker
+for pid in $(pgrep -f "workers\.camera_observation_worker" 2>/dev/null || true); do
+  kill "$pid" 2>/dev/null || true
+done
+sleep 1
 nohup env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -m workers.camera_observation_worker \
   >> "$LOG_DIR/guardian-worker.log" 2>&1 &
 record_pid guardian-worker $!
@@ -291,10 +335,10 @@ echo "╔═══════════════════════�
 echo "║  全部就绪 — 按 Ctrl+C 停止 Guardian 进程              ║"
 echo "╠══════════════════════════════════════════════════════╣"
 echo "║  Guardian API    http://127.0.0.1:${GUARDIAN_PORT}/api"
-echo "║  Guardian WS     ws://127.0.0.1:8001/api/tasks/stream"
+echo "║  Guardian WS     ws://127.0.0.1:${GUARDIAN_WS_PORT}/api/tasks/stream"
 if [ -n "$LAN_IP" ]; then
 echo "║  手机调试 API    http://${LAN_IP}:${GUARDIAN_PORT}/api"
-echo "║  手机调试 WS     ws://${LAN_IP}:8001/api/tasks/stream"
+echo "║  手机调试 WS     ws://${LAN_IP}:${GUARDIAN_WS_PORT}/api/tasks/stream"
 fi
 echo "║  摄像头媒体      http://127.0.0.1:${CAMERA_PORT}/"
 echo "╚══════════════════════════════════════════════════════╝"

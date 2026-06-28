@@ -87,6 +87,7 @@ class OpenAICompatibleTextProvider:
         }
         if self.disable_thinking:
             payload["thinking"] = {"type": "disabled"}
+            payload["temperature"] = 0.6
         request = urllib.request.Request(
             self._chat_completions_url(),
             data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),

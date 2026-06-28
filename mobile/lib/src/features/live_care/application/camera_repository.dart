@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:warm_sight/src/core/network/api_client.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
@@ -37,6 +38,21 @@ final cameraMonitorStatusProvider = FutureProvider<CameraMonitorStatus>((
   return ref
       .watch(cameraRepositoryProvider)
       .monitorStatus(deviceId: device?.id);
+});
+
+/// 下拉 refresh 后优先展示的最新观察（避免 status 仍读 DB 旧时间戳）。
+final cameraMonitorOverrideProvider = StateProvider<CameraMonitorStatus?>(
+  (ref) => null,
+);
+
+final cameraMonitorDisplayProvider = Provider<AsyncValue<CameraMonitorStatus>>((
+  ref,
+) {
+  final override = ref.watch(cameraMonitorOverrideProvider);
+  if (override != null) {
+    return AsyncValue.data(override);
+  }
+  return ref.watch(cameraMonitorStatusProvider);
 });
 
 final cameraSnapshotProvider = FutureProvider<CameraSnapshotFrame>((ref) async {
@@ -82,6 +98,10 @@ class CameraEventsController extends AsyncNotifier<List<LiveCareEvent>> {
       if (!item.isCareRecord) return;
       final current = state.asData?.value ?? const <LiveCareEvent>[];
       if (current.any((existing) => existing.id == item.id)) return;
+      final dedupeKey = _realtimeDedupeKey(item);
+      if (current.any((existing) => _realtimeDedupeKey(existing) == dedupeKey)) {
+        return;
+      }
       state = AsyncData([item, ...current]);
       return;
     }
@@ -179,7 +199,21 @@ class CameraRepository {
       return CameraMonitorStatus.fromJson(_asMap(response.data));
     } on DioException catch (error) {
       final data = error.response?.data;
-      if (data is Map) return CameraMonitorStatus.fromJson(_asMap(data));
+      if (data is Map) {
+        if (data['monitor'] != null) {
+          return CameraMonitorStatus.fromJson(_asMap(data));
+        }
+        final message = data['message'];
+        if (message is String && message.isNotEmpty) {
+          return CameraMonitorStatus(
+            running: false,
+            status: 'unavailable',
+            message: message,
+            lastObservation: '',
+            lastReminder: '',
+          );
+        }
+      }
       throw _fromDio(error, fallback: '观察状态暂时不可用。');
     }
   }
@@ -327,4 +361,10 @@ String _snapshotUnavailableMessage(String? headerValue) {
   if (value == 'snapshot_unavailable') return '实时画面暂时不可用';
   if (value.isNotEmpty) return value;
   return '暂时没有可用快照';
+}
+
+String _realtimeDedupeKey(LiveCareEvent event) {
+  final bucket = event.createdAt ~/ 600000;
+  final title = event.displayTitle.trim();
+  return '${event.category}:$title:$bucket';
 }

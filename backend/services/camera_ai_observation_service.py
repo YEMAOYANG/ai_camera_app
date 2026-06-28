@@ -19,6 +19,7 @@ from repositories.device_repository import DeviceRepository
 from schemas.care import observation_event_payload, parent_review_event_payload, reminder_decision_payload
 from services.care_defaults import ensure_default_capability_configs, ensure_default_routine_windows
 from services.care_policy_engine import CarePolicyEngine, REVIEW_ITEM_TYPE_PARENT_NOTIFY
+from services.observation_semantic_dedupe import semantic_dedupe_key
 from services.task_event_stream import CAMERA_OBSERVATION_UPDATED, REMINDER_DECISION_CREATED, publish_family_event
 
 
@@ -87,8 +88,17 @@ class CameraAiObservationService:
                     }
             parsed_signals = _signals(data.get("signals"))
             parent_summary = _optional_text(data.get("parentSummary"))
-            raw_detail_json = _json_or_none(data.get("rawDetail"))
+            raw_detail_dict = _dict_or_empty(data.get("rawDetail"))
             primary_signal_type = parsed_signals[0]["signalType"] if parsed_signals else ""
+            dedupe_key = semantic_dedupe_key(
+                {
+                    "scenario": scenario,
+                    "signals": parsed_signals,
+                    "rawDetail": raw_detail_dict,
+                }
+            )
+            raw_detail_dict["semantic_dedupe_key"] = dedupe_key
+            raw_detail_json = json.dumps(raw_detail_dict, ensure_ascii=False, separators=(",", ":"))
             duplicate_care_event = self.repository.find_recent_duplicate_observation(
                 conn,
                 family_id=family_id,
@@ -97,7 +107,7 @@ class CameraAiObservationService:
                 scenario=scenario,
                 signal_type=primary_signal_type,
                 parent_summary=parent_summary,
-                raw_detail_json=raw_detail_json,
+                raw_detail_json=dedupe_key,
                 since=now - 120_000,
             )
             event = self.repository.create_observation_event(
@@ -299,15 +309,16 @@ class CameraAiObservationService:
                         observation_score=observation_score,
                     ),
                 )
-        publish_family_event(
-            family_id=family_id,
-            event_type=CAMERA_OBSERVATION_UPDATED,
-            device_id=device_id,
-            observation_id=event["id"],
-            is_reliable=observation_score >= 0.65,
-            source="camera_observation",
-            event=realtime_event,
-        )
+        if source != "camera_monitor":
+            publish_family_event(
+                family_id=family_id,
+                event_type=CAMERA_OBSERVATION_UPDATED,
+                device_id=device_id,
+                observation_id=event["id"],
+                is_reliable=observation_score >= 0.65,
+                source="camera_observation",
+                event=realtime_event,
+            )
         publish_family_event(
             family_id=family_id,
             event_type=REMINDER_DECISION_CREATED,
@@ -528,9 +539,20 @@ def _camera_event_observation(*, event, data: dict, observation_score: float) ->
 
 def _reminder_context_from_observation(*, event, data: dict, decision) -> dict:
     raw_detail = _dict_or_empty(data.get("rawDetail"))
+    signals = _signals(data.get("signals"))
+    signal_type = signals[0]["signalType"] if signals else ""
+    prompt_id = _prompt_id_for_signal(
+        scenario=str(event.get("scenario") or data.get("scenario") or ""),
+        signal_type=signal_type,
+    )
+    target_behavior = _target_behavior_for_signal(signal_type)
     return {
         "reminderLevel": decision.get("reminder_level") or "gentle",
         "scenario": event.get("scenario") or data.get("scenario") or "",
+        "signalType": signal_type,
+        "promptId": prompt_id,
+        "targetBehavior": target_behavior,
+        "urgency": "high" if signal_type in {"meal_standing_on_chair", "meal_toys_on_table"} else "normal",
         "activity": raw_detail.get("activity") or raw_detail.get("raw_activity") or data.get("activity") or "",
         "description": raw_detail.get("description") or data.get("description") or "",
         "decisionReason": raw_detail.get("decision_reason") or data.get("decisionReason") or "",
@@ -541,6 +563,27 @@ def _reminder_context_from_observation(*, event, data: dict, decision) -> dict:
             "summary": data.get("parentSummary") or event.get("parent_summary") or "",
         },
     }
+
+
+def _prompt_id_for_signal(*, scenario: str, signal_type: str) -> str:
+    if signal_type.startswith("toy_play_unsafe_"):
+        return "reminder.toy_play_safety"
+    if scenario == "meal_habit":
+        return "reminder.meal_habit"
+    return f"reminder.{scenario}"
+
+
+def _target_behavior_for_signal(signal_type: str) -> str:
+    mapping = {
+        "meal_standing_on_chair": "standing_on_chair",
+        "meal_toys_on_table": "toys_on_table",
+        "meal_attention_shifted": "attention_shifted",
+        "toy_play_unsafe_climbing": "climbing",
+        "toy_play_unsafe_elevated": "elevated",
+        "toy_play_unsafe_throwing": "throwing",
+        "toy_play_unsafe_mouth": "small_parts_mouth",
+    }
+    return mapping.get(signal_type, signal_type)
 
 
 def _dict_or_empty(value: object) -> dict:

@@ -208,6 +208,34 @@ class CameraCommandService:
             return None
         display = _camera_observation_display(observation)
         now = now_ms()
+        candidate_event = lightweight_camera_event_from_observation(
+            event_id="pending",
+            device_id=device_id,
+            observation=observation,
+            now=now,
+        )
+        dedupe_key = _parent_event_dedupe_key(candidate_event)
+        with self.repository.transaction() as conn:
+            recent = self.repository.list_recent_commands(
+                conn,
+                family_id=family_id,
+                device_id=device_id,
+                limit=30,
+            )
+            for row in recent:
+                if int(row.get("created_at") or 0) < now - 600_000:
+                    continue
+                if str(row.get("command_type") or "") != "camera_observation":
+                    continue
+                payload = _json_dict(row.get("request_payload"))
+                existing = lightweight_camera_event_from_observation(
+                    event_id=str(row.get("id") or ""),
+                    device_id=device_id,
+                    observation=payload.get("observation") if isinstance(payload.get("observation"), dict) else observation,
+                    now=int(row.get("created_at") or now),
+                )
+                if _parent_event_dedupe_key(existing) == dedupe_key:
+                    return camera_command_payload(row)
         payload = {
             "childId": child_id or "",
             "observation": observation,
@@ -959,12 +987,31 @@ def _camera_observation_display(observation: dict) -> dict:
             "evidence": "画面不可判断",
         }
     if has_person is False:
+        message = _absent_display_message(description, decision_reason)
         return {
             "title": "暂未看到孩子",
-            "message": description or decision_reason or "刚才的画面里没有看到孩子。",
+            "message": message,
             "category": "child_presence",
             "severity": "warning",
             "evidence": "未看到孩子",
+        }
+    if str(observation.get("scenario") or "").strip() == "meal_habit":
+        meal_title = _meal_habit_display_title(observation, summary)
+        if meal_title:
+            return {
+                "title": meal_title,
+                "message": description or decision_reason or summary or meal_title,
+                "category": "camera_observation",
+                "severity": "info",
+                "evidence": "看到用餐情况",
+            }
+    if activity == "吃饭":
+        return {
+            "title": "孩子正在吃饭",
+            "message": description or decision_reason or summary or "孩子正在吃饭。",
+            "category": "camera_observation",
+            "severity": "info",
+            "evidence": "看到用餐情况",
         }
     if (activity == "玩玩具" and not _negated_toy_observation(description)) or _positive_toy_observation(summary, description):
         return {
@@ -1021,9 +1068,44 @@ def _strip_confidence_text(value: str) -> str:
     return text.strip(" ·")
 
 
+def _absent_display_message(description: str, decision_reason: str) -> str:
+    combined = f"{description} {decision_reason}".strip()
+    if not combined:
+        return "刚才的画面里没有看到孩子。"
+    blocked = ("看屏幕", "玩手机", "玩玩具", "孩子在", "宝宝", "小朋友")
+    if any(token in combined for token in blocked):
+        return "刚才的画面里没有看到孩子。"
+    return combined[:180]
+
+
+def _meal_habit_display_title(observation: dict, summary: str) -> str:
+    raw_detail = _json_dict(observation.get("rawDetail"))
+    issue = str(raw_detail.get("meal_etiquette_issue") or "").strip()
+    activity = str(observation.get("activity") or raw_detail.get("activity") or "").strip()
+    mapping = {
+        "toys_on_table": "餐桌上有玩具",
+        "standing": "用餐时未坐好",
+        "distracted": "用餐时注意力离开",
+    }
+    if issue in mapping:
+        return mapping[issue]
+    if raw_detail.get("toys_on_table") is True:
+        return "餐桌上有玩具"
+    text = f"{summary} {observation.get('parentSummary') or ''} {raw_detail.get('description') or ''}"
+    if "未坐" in text or "站" in text or "餐椅" in text:
+        return "用餐时未坐好"
+    if activity == "吃饭" or "用餐" in text or "吃饭" in text or "餐桌" in text:
+        return "孩子正在吃饭"
+    return ""
+
+
 def _positive_toy_observation(summary: str, description: str) -> bool:
     text = f"{summary} {description}".strip().lower()
     if _negated_toy_observation(text):
+        return False
+    if re.search(r"(用餐|吃饭|餐桌|餐椅|进食|吃东西)", text) and not re.search(
+        r"(玩玩具|玩积木|搭积木|摆弄玩具|操作玩具|playing with toys)", text
+    ):
         return False
     return any(token in text for token in ("玩玩具", "玩积木", "搭积木", "摆弄玩具", "操作玩具", "playing with toys"))
 

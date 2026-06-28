@@ -7,7 +7,7 @@ from integrations.ai.kimi_vision_provider import AiVisionProvider
 from schemas.vision import VISION_METHOD, VISION_METHOD_CACHED, insufficient_observation, with_observation_reliability
 from services.prompt_registry import PromptRegistry
 from services.vision_observation_cadence import VisionCadenceGate
-from services.vision_observation_enrich import enrich_observation_risks
+from services.vision_observation_enrich import enrich_observation
 from services.parent_facing_copy import sanitize_parent_facing_observation
 from services.vision_observation_validator import VisionObservationValidator
 
@@ -85,7 +85,7 @@ class VisionObservationService:
                 description,
                 child_reference=child_reference,
             )
-        observation = enrich_observation_risks(observation)
+        observation = enrich_observation(observation)
         activity = str(observation.get("activity") or observation.get("raw_activity") or "").strip()
         if activity:
             _DEVICE_LAST_ACTIVITY[device_key] = activity

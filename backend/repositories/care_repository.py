@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import uuid
 from contextlib import contextmanager
 from typing import Iterator
@@ -430,6 +431,8 @@ class CareRepository:
         raw_detail_json: str | None,
         since: int,
     ) -> DatabaseRow | None:
+        dedupe_value = raw_detail_json or ""
+        like_pattern = f'%"semantic_dedupe_key":{json.dumps(dedupe_value, ensure_ascii=False)}%'
         return conn.execute(
             """
             SELECT coe.*
@@ -441,9 +444,12 @@ class CareRepository:
               AND coe.device_id = ?
               AND coe.scenario = ?
               AND COALESCE(bs.signal_type, '') = ?
-              AND COALESCE(coe.parent_summary, '') = ?
-              AND COALESCE(coe.raw_detail_json, '') = ?
               AND coe.created_at >= ?
+              AND (
+                COALESCE(coe.raw_detail_json, '') = ?
+                OR COALESCE(coe.raw_detail_json, '') LIKE ?
+                OR JSON_UNQUOTE(JSON_EXTRACT(coe.raw_detail_json, '$.semantic_dedupe_key')) = ?
+              )
             ORDER BY coe.created_at DESC
             LIMIT 1
             """,
@@ -453,9 +459,10 @@ class CareRepository:
                 device_id or "",
                 scenario,
                 signal_type,
-                parent_summary or "",
-                raw_detail_json or "",
                 since,
+                dedupe_value,
+                like_pattern,
+                dedupe_value,
             ),
         ).fetchone()
 

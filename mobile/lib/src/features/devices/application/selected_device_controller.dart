@@ -20,7 +20,6 @@ final selectedDeviceProvider = FutureProvider<GuardianDevice?>((ref) async {
   final devices = await repository.devices();
   if (devices.isEmpty) {
     await preferences.remove(selectedDeviceIdPreferenceKey);
-    ref.read(selectedDeviceIdProvider.notifier).state = null;
     return null;
   }
 
@@ -34,11 +33,9 @@ final selectedDeviceProvider = FutureProvider<GuardianDevice?>((ref) async {
       _firstActiveDevice(devices);
   if (fallback == null) {
     await preferences.remove(selectedDeviceIdPreferenceKey);
-    ref.read(selectedDeviceIdProvider.notifier).state = null;
     return null;
   }
   await preferences.setString(selectedDeviceIdPreferenceKey, fallback.id);
-  ref.read(selectedDeviceIdProvider.notifier).state = fallback.id;
   return fallback;
 });
 
