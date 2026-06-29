@@ -35,9 +35,11 @@ from models.care import (
     REVIEW_DOMAIN_CARE,
 )
 from services.care_day_type import effective_day_type
-
-
-DEFAULT_TIMEZONE = "Asia/Shanghai"
+from services.care_routine_window_resolver import (
+    DEFAULT_TIMEZONE,
+    routine_window_gate,
+    window_types_for_scenario,
+)
 REVIEW_ITEM_TYPE_PARENT_NOTIFY = "care_parent_notify"
 
 RESET_SIGNAL_VALUES = {"recovered", "cleared", "inactive"}
@@ -57,15 +59,6 @@ NON_ACTIONABLE_SIGNAL_TYPES = {
     "in_bed",
     "lights_out_or_quiet",
     "wake_up_detected",
-}
-SCENARIO_ROUTINE_WINDOW_TYPES = {
-    CARE_SCENARIO_WAKE_UP: {"wake_up"},
-    CARE_SCENARIO_MEAL_START: {"breakfast", "lunch", "dinner", "meal"},
-    CARE_SCENARIO_MEAL_HABIT: {"breakfast", "lunch", "dinner", "meal"},
-    CARE_SCENARIO_NAP_TIME: {"nap"},
-    CARE_SCENARIO_BEDTIME: {"bedtime"},
-    CARE_SCENARIO_POSTURE: {"posture", "study", "reading", "meal", "breakfast", "lunch", "dinner"},
-    CARE_SCENARIO_TRANSITION: {"transition"},
 }
 
 
@@ -245,7 +238,7 @@ class CarePolicyEngine:
                 snapshot,
             )
 
-        if scenario in {CARE_SCENARIO_TOY_CLEANUP, CARE_SCENARIO_POSTURE, CARE_SCENARIO_MEAL_HABIT}:
+        if scenario in {CARE_SCENARIO_TOY_CLEANUP, CARE_SCENARIO_POSTURE}:
             snapshot["routineGate"] = {
                 "allowed": True,
                 "reason": "behavior_only_scenario",
@@ -260,7 +253,29 @@ class CarePolicyEngine:
                 should_speak=_should_speak_for_behavior_signal(primary_signal_type),
             )
 
-        routine_gate = _routine_window_gate(
+        if scenario == CARE_SCENARIO_MEAL_HABIT:
+            routine_gate = routine_window_gate(
+                scenario=scenario,
+                capability_config=capability_config,
+                routine_windows=routine_windows or [],
+                explicit_day_type=day_type,
+                observed_at=_int_value(observation_event.get("observed_at"), now),
+            )
+            snapshot["routineGate"] = routine_gate
+            if not routine_gate["allowed"]:
+                return _decision(
+                    REMINDER_DECISION_SKIPPED_OUT_OF_ROUTINE_WINDOW,
+                    str(routine_gate["reason"]),
+                    snapshot,
+                )
+            return _decision(
+                REMINDER_DECISION_ALLOWED,
+                "behavior_policy_allowed",
+                snapshot,
+                should_speak=_should_speak_for_behavior_signal(primary_signal_type),
+            )
+
+        routine_gate = routine_window_gate(
             scenario=scenario,
             capability_config=capability_config,
             routine_windows=routine_windows or [],
@@ -450,106 +465,11 @@ def _signal_semantic_reason(
     return ""
 
 
-def _routine_window_gate(
-    *,
-    scenario: str,
-    capability_config: DatabaseRow,
-    routine_windows: list[DatabaseRow],
-    explicit_day_type: str | None,
-    observed_at: int,
-) -> dict[str, Any]:
-    window_types = _window_types_for_scenario(scenario, capability_config)
-    gate = {
-        "allowed": False,
-        "reason": "out_of_routine_window",
-        "dayType": "",
-        "windowTypes": sorted(window_types),
-        "matchedWindowId": "",
-    }
-    if not window_types:
-        gate["reason"] = "routine_window_not_configured"
-        return gate
-
-    matched_day_rows: list[DatabaseRow] = []
-    disabled_rows = 0
-    resolved_day_type = ""
-    for row in routine_windows:
-        timezone = str(row.get("timezone") or DEFAULT_TIMEZONE)
-        row_day_type = str(row.get("day_type") or "")
-        if str(row.get("window_type") or "") not in window_types:
-            continue
-        current_day_type = effective_day_type(
-            observed_at,
-            timezone=timezone,
-            explicit_day_type=explicit_day_type,
-        )
-        resolved_day_type = resolved_day_type or current_day_type
-        if row_day_type != current_day_type:
-            continue
-        matched_day_rows.append(row)
-        if not bool(row.get("enabled")):
-            disabled_rows += 1
-            continue
-        if _time_in_window(observed_at, row):
-            gate.update(
-                {
-                    "allowed": True,
-                    "reason": "within_routine_window",
-                    "dayType": current_day_type,
-                    "matchedWindowId": str(row.get("id") or ""),
-                    "matchedWindowType": str(row.get("window_type") or ""),
-                }
-            )
-            return gate
-
-    gate["dayType"] = explicit_day_type if explicit_day_type in DAY_TYPES else resolved_day_type
-    if matched_day_rows and disabled_rows == len(matched_day_rows):
-        gate["reason"] = "routine_window_disabled"
-    elif not matched_day_rows:
-        gate["reason"] = "routine_window_missing"
-    return gate
-
-
-def _window_types_for_scenario(scenario: str, capability_config: DatabaseRow) -> set[str]:
-    allowed = set(SCENARIO_ROUTINE_WINDOW_TYPES.get(scenario, set()))
-    configured = set(_json_list(capability_config.get("time_windows")))
-    if configured:
-        return allowed & configured
-    return allowed
-
-
 def _reminder_counts_toward_limits(row: DatabaseRow) -> bool:
     status = str(row.get("delivery_status") or "")
     if status == REMINDER_STATUS_FAILED:
         return False
     return status in {REMINDER_STATUS_COMMAND_SENT, REMINDER_STATUS_DELIVERED}
-
-
-def _time_in_window(observed_at: int, row: DatabaseRow) -> bool:
-    zone = _zone(str(row.get("timezone") or DEFAULT_TIMEZONE))
-    local_time = datetime.fromtimestamp(observed_at / 1000, tz=zone).time()
-    start_time = _parse_clock(str(row.get("start_time") or ""))
-    end_time = _parse_clock(str(row.get("end_time") or ""))
-    if start_time is None or end_time is None:
-        return False
-    if start_time <= end_time:
-        return start_time <= local_time <= end_time
-    return local_time >= start_time or local_time <= end_time
-
-
-def _parse_clock(value: str) -> time | None:
-    try:
-        hour_text, minute_text = value.split(":", 1)
-        return time(int(hour_text), int(minute_text))
-    except (TypeError, ValueError):
-        return None
-
-
-def _zone(timezone: str) -> ZoneInfo:
-    try:
-        return ZoneInfo(timezone or DEFAULT_TIMEZONE)
-    except Exception:
-        return ZoneInfo(DEFAULT_TIMEZONE)
 
 
 def _json_list(value: object) -> list[str]:

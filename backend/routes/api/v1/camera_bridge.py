@@ -480,6 +480,10 @@ def _latest_runtime_display_observation(
     display = runtime.get("display")
     if not isinstance(display, dict) or not int(display.get("observed_at") or 0):
         return None
+    cloud_gate = runtime.get("cloud_gate")
+    last_kimi_at_ms = 0
+    if isinstance(cloud_gate, dict):
+        last_kimi_at_ms = int(cloud_gate.get("last_kimi_at_ms") or 0)
     normalized = _normalize_monitor_observation(
         {
             "has_person": display.get("has_person"),
@@ -490,6 +494,8 @@ def _latest_runtime_display_observation(
             "description": display.get("description"),
             "decision_reason": display.get("decision_reason"),
             "isReliable": display.get("isReliable"),
+            "freshness": display.get("freshness"),
+            "last_kimi_at_ms": last_kimi_at_ms,
         }
     )
     if normalized is None:
@@ -537,7 +543,23 @@ def _normalize_monitor_observation(value: object) -> dict | None:
     if has_person_value is False:
         activity = ""
     has_activity = bool(activity)
-    if not is_reliable:
+    from services.observation_runtime_state import display_freshness_from_runtime
+
+    explicit_freshness = str(value.get("freshness") or "").strip().lower()
+    last_kimi_at_ms = _int_or_zero(value.get("last_kimi_at_ms") or value.get("lastKimiAtMs"))
+    if explicit_freshness in {"fresh", "stale", "prefilter_only"}:
+        freshness = explicit_freshness
+    else:
+        freshness = display_freshness_from_runtime(
+            now_ms=now_ms(),
+            display={"observed_at": observed_at, "freshness": explicit_freshness},
+            last_kimi_at_ms=last_kimi_at_ms or (observed_at if is_reliable else 0),
+        )
+    if freshness != "fresh":
+        is_reliable = False
+        if freshness == "prefilter_only":
+            summary = ""
+    elif not is_reliable:
         summary = ""
     return {
         "hasPerson": has_person,
@@ -547,6 +569,7 @@ def _normalize_monitor_observation(value: object) -> dict | None:
         "summary": summary,
         "isReliable": is_reliable,
         "hasMeaningfulActivity": has_activity,
+        "freshness": freshness,
         "source": "camera",
     }
 

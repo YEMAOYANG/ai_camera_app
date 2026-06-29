@@ -12,6 +12,7 @@ from services.ai_text_provider import OpenAICompatibleTextProvider, UnavailableA
 from services.vision_observation_service import VisionObservationService
 from services.camera_bridge_service import CameraBridgeService
 from services.camera_ai_observation_service import CameraAiObservationService
+from integrations.camera_runtime.python_open_cv_yolo_prefilter import default_local_vision_prefilter
 from services.camera_observe_service import CameraObserveService
 from services.camera_command_service import CameraCommandService
 from services.care_config_service import CareConfigService
@@ -151,6 +152,7 @@ def camera_observe_service() -> CameraObserveService:
     return CameraObserveService(
         current_app.config["DATABASE_URL"],
         vision_service=vision_observation_service(),
+        vision_prefilter=default_local_vision_prefilter(),
     )
 
 

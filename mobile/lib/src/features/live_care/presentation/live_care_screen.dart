@@ -715,7 +715,13 @@ class _CareFocusPanel extends StatelessWidget {
     final care = status.asData?.value;
     final currentTask = care?.currentTask;
     final monitor = care?.monitorStatus;
-    final hasObservation = monitor?.hasCurrentReliableObservation == true;
+    final hasFreshObservation = monitor?.hasCurrentReliableObservation == true;
+    final hasStaleObservation = monitor?.hasStaleObservation == true;
+    final isPrefilterOnly =
+        monitor?.lastObservationFreshness ==
+        CameraObservationFreshness.prefilterOnly;
+    final hasObservationDisplay =
+        hasFreshObservation || hasStaleObservation || isPrefilterOnly;
     final eventItems = events.asData?.value.items ?? const <LiveCareEvent>[];
     final summaryEvents = eventItems
         .where(
@@ -733,18 +739,26 @@ class _CareFocusPanel extends StatelessWidget {
           const _SectionTitle('当前看护'),
           const SizedBox(height: 8),
           AppListRow(
-            icon: hasObservation
+            icon: hasObservationDisplay
                 ? Icons.visibility_outlined
                 : currentTask == null
                 ? Icons.shield_outlined
                 : Icons.play_circle_outline,
-            title: hasObservation
+            title: hasFreshObservation
                 ? monitor!.lastObservation
+                : hasStaleObservation
+                ? monitor!.displayObservationTitle()
+                : isPrefilterOnly
+                ? '画面已更新，正在整理观察结果'
                 : currentTask == null
                 ? '当前没有进行中的看护安排'
                 : currentTask.title,
-            subtitle: hasObservation
+            subtitle: hasFreshObservation
                 ? _monitorObservationSubtitle(monitor!)
+                : hasStaleObservation
+                ? '较早的画面结论，不作为当前状态。'
+                : isPrefilterOnly
+                ? '预检已更新，稍后会整理新的观察结果。'
                 : currentTask == null
                 ? recentHasRoutine
                       ? '最近有作息提醒，进入实时画面可查看当前状态。'

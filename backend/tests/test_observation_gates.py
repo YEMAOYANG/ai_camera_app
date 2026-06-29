@@ -29,28 +29,45 @@ class ObservationGateTest(unittest.TestCase):
         absence = {
             "mode": "absence",
             "consecutive_no_person": 3,
+            "recorded_absent": True,
             "next_check_at": 999_999,
         }
         skip, reason = should_skip_vision_before_analyze(
             absence,
             now_ms=100_000,
-            frame_stable=True,
             force_analyze=False,
         )
         self.assertTrue(skip)
-        self.assertEqual(reason, "absence_stable_skip")
+        self.assertEqual(reason, "absence_prefilter_skip")
 
-    def test_absence_mode_analyzes_when_frame_changed(self):
+    def test_absence_mode_analyzes_when_prefilter_activity(self):
         absence = {
             "mode": "absence",
             "consecutive_no_person": 3,
+            "recorded_absent": True,
             "next_check_at": 999_999,
         }
         skip, reason = should_skip_vision_before_analyze(
             absence,
             now_ms=100_000,
-            frame_stable=False,
             force_analyze=False,
+            prefilter_activity=True,
+        )
+        self.assertFalse(skip)
+        self.assertEqual(reason, "")
+
+    def test_absence_mode_analyzes_when_person_detected(self):
+        absence = {
+            "mode": "absence",
+            "consecutive_no_person": 3,
+            "recorded_absent": True,
+            "next_check_at": 999_999,
+        }
+        skip, reason = should_skip_vision_before_analyze(
+            absence,
+            now_ms=100_000,
+            force_analyze=False,
+            prefilter_person=True,
         )
         self.assertFalse(skip)
         self.assertEqual(reason, "")

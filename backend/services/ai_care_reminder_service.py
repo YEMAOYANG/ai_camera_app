@@ -26,6 +26,7 @@ from repositories.care_repository import CareRepository
 from schemas.care import reminder_event_payload
 from services.ai_text_provider import AiTextProvider
 from services.auth_service import AuthService
+from services.camera_bridge_service import CameraBridgeError
 from services.camera_command_service import CameraCommandService
 from services.prompt_registry import PromptRegistry
 from services.reminder_text_validator import ReminderTextValidator
@@ -333,12 +334,19 @@ class AiCareReminderService:
                 command_id=command_id,
                 command=command,
             )
-        except Exception:
+        except ApiError as exc:
             return self._mark_command_failed(
                 family_id=family_id,
                 event_id=event_id,
                 command_id=command_id,
-                failure_reason="摄像头暂时离线，提醒没有播出。",
+                failure_reason=str(exc.message or "摄像头暂时离线，提醒没有播出。"),
+            )
+        except CameraBridgeError as exc:
+            return self._mark_command_failed(
+                family_id=family_id,
+                event_id=event_id,
+                command_id=command_id,
+                failure_reason=str(exc.message or "摄像头暂时离线，提醒没有播出。"),
             )
 
     def _mark_command_sent(self, *, family_id: str, event_id: str, command_id: str | None, command: dict) -> dict:

@@ -252,6 +252,7 @@ class CameraMonitorStatus {
     this.lastObservationDecisionReason = '',
     this.lastObservationConfidence,
     this.lastObservationThumbnailUrl = '',
+    this.lastObservationFreshness = CameraObservationFreshness.unknown,
   });
 
   final bool running;
@@ -267,24 +268,32 @@ class CameraMonitorStatus {
   final String lastObservationDecisionReason;
   final double? lastObservationConfidence;
   final String lastObservationThumbnailUrl;
+  final CameraObservationFreshness lastObservationFreshness;
 
   String get label => running ? '观察中' : '未观察';
 
   StatusTone get tone => running ? StatusTone.success : StatusTone.neutral;
 
-  bool get hasFreshObservation {
-    final observedAt = lastObservationObservedAt;
-    if (observedAt == null || observedAt <= 0) {
-      return lastObservation.isNotEmpty;
-    }
-    final age = DateTime.now().millisecondsSinceEpoch - observedAt;
-    return age >= 0 && age <= cameraObservationFreshness.inMilliseconds;
-  }
+  bool get hasFreshObservation =>
+      lastObservationFreshness == CameraObservationFreshness.fresh;
+
+  bool get hasStaleObservation =>
+      lastObservationFreshness == CameraObservationFreshness.stale &&
+      lastObservation.isNotEmpty;
 
   bool get hasCurrentReliableObservation =>
+      lastObservationFreshness == CameraObservationFreshness.fresh &&
       lastObservationReliable &&
-      hasFreshObservation &&
       lastObservation.isNotEmpty;
+
+  String displayObservationTitle({DateTime? now}) {
+    return parentFacingObservationWithFreshness(
+      freshness: lastObservationFreshness,
+      summary: lastObservation,
+      observedAt: lastObservationObservedAt,
+      now: now ?? DateTime.now(),
+    );
+  }
 
   static CameraMonitorStatus fromJson(Map<String, dynamic> json) {
     final monitor = _asMap(json['monitor']);
@@ -303,11 +312,71 @@ class CameraMonitorStatus {
       lastObservationDecisionReason: observation.decisionReason,
       lastObservationConfidence: observation.confidence,
       lastObservationThumbnailUrl: observation.thumbnailUrl,
+      lastObservationFreshness: observation.freshness,
     );
   }
 }
 
 const cameraObservationFreshness = Duration(seconds: 300);
+
+enum CameraObservationFreshness {
+  fresh,
+  stale,
+  prefilterOnly,
+  unknown;
+
+  static CameraObservationFreshness fromApi(String? value) {
+    switch (value?.trim().toLowerCase()) {
+      case 'fresh':
+        return CameraObservationFreshness.fresh;
+      case 'stale':
+        return CameraObservationFreshness.stale;
+      case 'prefilter_only':
+        return CameraObservationFreshness.prefilterOnly;
+      default:
+        return CameraObservationFreshness.unknown;
+    }
+  }
+}
+
+int? staleObservationAgeMinutes(int? observedAt, {required DateTime now}) {
+  if (observedAt == null || observedAt <= 0) return null;
+  final ageMs = now.millisecondsSinceEpoch - observedAt;
+  if (ageMs < 0) return null;
+  return (ageMs / 60000).ceil().clamp(1, 9999);
+}
+
+String parentFacingObservationWithFreshness({
+  required CameraObservationFreshness freshness,
+  required String summary,
+  required int? observedAt,
+  required DateTime now,
+}) {
+  if (freshness == CameraObservationFreshness.prefilterOnly) {
+    return '画面已更新，正在整理观察结果';
+  }
+  final cleaned = summary.trim();
+  if (cleaned.isEmpty) return '';
+  if (freshness != CameraObservationFreshness.stale) {
+    return cleaned;
+  }
+  final minutes = staleObservationAgeMinutes(observedAt, now: now);
+  final detail = _staleObservationDetail(cleaned);
+  if (minutes != null) {
+    return '约 $minutes 分钟前观察到$detail';
+  }
+  return '较早观察到$detail';
+}
+
+String _staleObservationDetail(String summary) {
+  if (summary.startsWith('孩子正在')) {
+    return summary.replaceFirst('孩子正在', '');
+  }
+  if (summary.startsWith('看到孩子在')) {
+    return summary.replaceFirst('看到孩子在', '');
+  }
+  return summary;
+}
 
 class _CameraObservationSnapshot {
   const _CameraObservationSnapshot({
@@ -318,6 +387,7 @@ class _CameraObservationSnapshot {
     required this.description,
     required this.decisionReason,
     required this.thumbnailUrl,
+    required this.freshness,
     this.confidence,
     this.observedAt,
   });
@@ -331,6 +401,7 @@ class _CameraObservationSnapshot {
   final String thumbnailUrl;
   final double? confidence;
   final int? observedAt;
+  final CameraObservationFreshness freshness;
 }
 
 class LiveCareStatus {
@@ -556,6 +627,7 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
       description: '',
       decisionReason: '',
       thumbnailUrl: '',
+      freshness: CameraObservationFreshness.unknown,
     );
   }
   final data = _asMap(value);
@@ -568,6 +640,7 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
       description: '',
       decisionReason: '',
       thumbnailUrl: '',
+      freshness: CameraObservationFreshness.unknown,
     );
   }
   final rawDescription = _asString(data['description']);
@@ -592,92 +665,119 @@ _CameraObservationSnapshot _observationSnapshot(dynamic value) {
     data['thumbnailUrl'] ?? data['thumbnail_url'] ?? data['snapshotUrl'],
   );
   final confidence = _asNullableDouble(data['confidence']);
-  final isFresh = _isFreshObservation(observedAt);
-  final isReliable = data['isReliable'] == true && isFresh;
-  if (!isReliable) {
+  final freshness = _resolveObservationFreshness(data, observedAt: observedAt);
+  final isReliable =
+      data['isReliable'] == true &&
+      freshness == CameraObservationFreshness.fresh;
+  final hasPersonResolved = hasPersonValue == true
+      ? true
+      : hasPersonValue == false
+      ? false
+      : null;
+
+  if (freshness == CameraObservationFreshness.prefilterOnly) {
     return _CameraObservationSnapshot(
       summary: '',
       isReliable: false,
-      hasPerson: hasPersonValue == true
-          ? true
-          : hasPersonValue == false
-          ? false
-          : null,
+      hasPerson: hasPersonResolved,
       activity: activity,
       description: description,
       decisionReason: decisionReason,
       thumbnailUrl: thumbnailUrl,
       confidence: confidence,
       observedAt: observedAt,
+      freshness: freshness,
     );
   }
-  final summary = _sanitizeObservationText(
-    _asString(data['summary']),
-    description: rawDescription,
+
+  final summary = _buildObservationSummary(
+    data: data,
+    rawDescription: rawDescription,
+    activity: activity,
+    hasPerson: hasPerson,
+    hasPersonValue: hasPersonValue,
   );
-  if (summary.isNotEmpty) {
+  final displaySummary =
+      freshness == CameraObservationFreshness.stale &&
+          !_staleObservationIsMeaningful(summary)
+      ? ''
+      : summary;
+
+  if (!isReliable && freshness != CameraObservationFreshness.stale) {
     return _CameraObservationSnapshot(
-      summary: summary,
-      isReliable: true,
-      hasPerson: hasPersonValue == false ? false : hasPerson,
+      summary: '',
+      isReliable: false,
+      hasPerson: hasPersonResolved,
       activity: activity,
       description: description,
       decisionReason: decisionReason,
       thumbnailUrl: thumbnailUrl,
       confidence: confidence,
       observedAt: observedAt,
+      freshness: freshness,
     );
   }
-  if (activity.isNotEmpty && hasPerson) {
-    return _CameraObservationSnapshot(
-      summary: activity == '玩玩具' ? '孩子正在玩玩具' : '孩子正在$activity',
-      isReliable: true,
-      hasPerson: true,
-      activity: activity,
-      description: description,
-      decisionReason: decisionReason,
-      thumbnailUrl: thumbnailUrl,
-      confidence: confidence,
-      observedAt: observedAt,
-    );
-  }
-  if (hasPersonValue == false) {
-    return _CameraObservationSnapshot(
-      summary: '暂未看到孩子',
-      isReliable: true,
-      hasPerson: false,
-      activity: activity,
-      description: description,
-      decisionReason: decisionReason,
-      thumbnailUrl: thumbnailUrl,
-      confidence: confidence,
-      observedAt: observedAt,
-    );
-  }
-  if (hasPersonValue == true) {
-    return _CameraObservationSnapshot(
-      summary: '画面暂时无法判断',
-      isReliable: true,
-      hasPerson: true,
-      activity: activity,
-      description: description,
-      decisionReason: decisionReason,
-      thumbnailUrl: thumbnailUrl,
-      confidence: confidence,
-      observedAt: observedAt,
-    );
-  }
+
   return _CameraObservationSnapshot(
-    summary: '',
-    isReliable: false,
-    hasPerson: null,
+    summary: displaySummary,
+    isReliable: isReliable,
+    hasPerson: hasPersonValue == false ? false : hasPerson,
     activity: activity,
     description: description,
     decisionReason: decisionReason,
     thumbnailUrl: thumbnailUrl,
     confidence: confidence,
     observedAt: observedAt,
+    freshness: freshness,
   );
+}
+
+CameraObservationFreshness _resolveObservationFreshness(
+  Map<String, dynamic> data, {
+  required int? observedAt,
+}) {
+  final explicit = CameraObservationFreshness.fromApi(_asString(data['freshness']));
+  if (explicit != CameraObservationFreshness.unknown) {
+    return explicit;
+  }
+  if (observedAt != null && observedAt > 0) {
+    return _isFreshObservation(observedAt)
+        ? CameraObservationFreshness.fresh
+        : CameraObservationFreshness.stale;
+  }
+  if (data['isReliable'] != true) {
+    return CameraObservationFreshness.prefilterOnly;
+  }
+  return CameraObservationFreshness.unknown;
+}
+
+String _buildObservationSummary({
+  required Map<String, dynamic> data,
+  required String rawDescription,
+  required String activity,
+  required bool hasPerson,
+  required Object? hasPersonValue,
+}) {
+  final summary = _sanitizeObservationText(
+    _asString(data['summary']),
+    description: rawDescription,
+  );
+  if (summary.isNotEmpty) return summary;
+  if (activity.isNotEmpty && hasPerson) {
+    return activity == '玩玩具' ? '孩子正在玩玩具' : '孩子正在$activity';
+  }
+  if (hasPersonValue == false) {
+    return '暂未看到孩子';
+  }
+  if (hasPersonValue == true) {
+    return '画面暂时无法判断';
+  }
+  return '';
+}
+
+bool _staleObservationIsMeaningful(String summary) {
+  const ignored = {'暂未看到孩子', '画面暂时无法判断'};
+  return summary.isNotEmpty && !ignored.contains(summary);
 }
 
 bool _isFreshObservation(int? observedAt) {

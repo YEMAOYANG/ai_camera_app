@@ -216,6 +216,23 @@ from workers.camera_voice_worker import build_worker_from_env
   return 0
 }
 
+ensure_prefilter_model() {
+  if [ -f "$BACKEND_DIR/assets/vision/yolov8n.onnx" ]; then
+    ok "YOLO prefilter model present"
+    return 0
+  fi
+  warn "YOLO prefilter model missing; exporting once (needs ultralytics: pip install ultralytics)"
+  if ! env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -c "
+from services.vision_prefilter_service import ensure_prefilter_model
+ensure_prefilter_model()
+"; then
+    err "无法准备 YOLO 模型。请执行: cd backend && pip install ultralytics && python scripts/export_yolov8n_onnx.py"
+    return 1
+  fi
+  ok "YOLO prefilter model ready"
+  return 0
+}
+
 begin_worker_log_session() {
   local ts
   ts="$(date '+%Y-%m-%d %H:%M:%S %z')"
@@ -404,6 +421,9 @@ for pid in $(pgrep -f "workers\.camera_observation_worker" 2>/dev/null || true);
   kill "$pid" 2>/dev/null || true
 done
 sleep 1
+if ! ensure_prefilter_model; then
+  exit 1
+fi
 if ! verify_worker_import; then
   exit 1
 fi

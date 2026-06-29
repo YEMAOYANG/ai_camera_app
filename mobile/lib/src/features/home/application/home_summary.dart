@@ -340,13 +340,23 @@ String observationTitle({
   required String? childName,
   required DateTime now,
 }) {
-  final monitorObservation = meaningfulObservationText(
-    cameraMonitor?.hasCurrentReliableObservation == true
-        ? cameraMonitor?.lastObservation
-        : null,
-  );
-  if (monitorObservation != null) {
-    return compactHomeText(monitorObservation, maxLength: 24);
+  if (cameraMonitor?.hasCurrentReliableObservation == true) {
+    final monitorObservation = meaningfulObservationText(
+      cameraMonitor?.lastObservation,
+    );
+    if (monitorObservation != null) {
+      return compactHomeText(monitorObservation, maxLength: 24);
+    }
+  }
+  if (cameraMonitor?.hasStaleObservation == true) {
+    return compactHomeText(
+      cameraMonitor!.displayObservationTitle(now: now),
+      maxLength: 24,
+    );
+  }
+  if (cameraMonitor?.lastObservationFreshness ==
+      CameraObservationFreshness.prefilterOnly) {
+    return '画面已更新';
   }
   if (currentTask != null) {
     final aiSummary = currentTask.aiObservationSummary.trim();
@@ -405,6 +415,16 @@ String observationDetail({
       return reason;
     }
     return '这条记录来自摄像头画面。';
+  }
+  if (cameraMonitor?.hasStaleObservation == true) {
+    return compactHomeText(
+      cameraMonitor!.displayObservationTitle(now: now),
+      maxLength: 30,
+    );
+  }
+  if (cameraMonitor?.lastObservationFreshness ==
+      CameraObservationFreshness.prefilterOnly) {
+    return '预检已更新，稍后会整理新的观察结果。';
   }
   if (pendingCount > 0) {
     return '$pendingCount 件事等你处理，先看记录再决定。';
@@ -674,6 +694,8 @@ RecentObservationCopy buildRecentObservationCopy({
   final monitorObservation = meaningfulObservationText(
     input.cameraMonitor?.hasCurrentReliableObservation == true
         ? input.cameraMonitor?.lastObservation
+        : input.cameraMonitor?.hasStaleObservation == true
+        ? input.cameraMonitor?.displayObservationTitle(now: input.now)
         : null,
   );
   final repeatedInHero = sameHomeObservation(

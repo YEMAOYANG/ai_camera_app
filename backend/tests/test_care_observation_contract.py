@@ -209,6 +209,114 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertEqual(allowed.json["decision"]["decision"], "allowed")
         self.assertTrue(allowed.json["decision"]["shouldSpeak"])
 
+    def test_meal_habit_policy_respects_meal_routine_window(self):
+        self._ensure_capabilities()
+        self._replace_school_day_routine_windows()
+        self._patch_capability(
+            "meal_habit",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+
+        outside = self._post_observation(
+            "meal_habit",
+            confidence=0.9,
+            duration_seconds=10,
+            signal_type="meal_standing_on_chair",
+            observed_at=_ms("2026-06-17 10:30"),
+        )
+        self.assertEqual(
+            outside.json["decision"]["decision"],
+            REMINDER_DECISION_SKIPPED_OUT_OF_ROUTINE_WINDOW,
+        )
+        repository = CareRepository(Database(self.app.config["DATABASE_URL"]))
+        with repository.transaction() as conn:
+            outside_decision = repository.get_reminder_decision(
+                conn,
+                decision_id=outside.json["decision"]["id"],
+            )
+        outside_snapshot = json.loads(outside_decision["policy_snapshot_json"])
+        self.assertFalse(outside_snapshot["routineGate"]["allowed"])
+        self.assertNotEqual(outside_snapshot["routineGate"]["reason"], "behavior_only_scenario")
+
+        inside = self._post_observation(
+            "meal_habit",
+            confidence=0.9,
+            duration_seconds=10,
+            signal_type="meal_standing_on_chair",
+            observed_at=_ms("2026-06-17 12:00"),
+        )
+        self.assertEqual(inside.json["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+        self.assertTrue(inside.json["decision"]["shouldSpeak"])
+        with repository.transaction() as conn:
+            inside_decision = repository.get_reminder_decision(
+                conn,
+                decision_id=inside.json["decision"]["id"],
+            )
+        inside_snapshot = json.loads(inside_decision["policy_snapshot_json"])
+        self.assertTrue(inside_snapshot["routineGate"]["allowed"])
+        self.assertEqual(inside_snapshot["routineGate"]["reason"], "within_routine_window")
+
+    def test_posture_and_toy_cleanup_ignore_meal_routine_window(self):
+        self._ensure_capabilities()
+        self._replace_school_day_routine_windows()
+        self._patch_capability(
+            "posture",
+            minObservationSeconds=1,
+            observationThreshold=0.74,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        self._patch_capability(
+            "toy_cleanup",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+        )
+
+        posture = self._post_observation(
+            "posture",
+            confidence=0.70,
+            duration_seconds=5,
+            signal_type="leaning_too_close",
+            observed_at=_ms("2026-06-17 10:30"),
+            raw_detail={
+                "has_person": True,
+                "activity": "写作业/看书",
+                "posture_status": "leaning_too_close",
+            },
+        )
+        toy = self._post_observation(
+            "toy_cleanup",
+            confidence=0.9,
+            duration_seconds=5,
+            signal_type="toys_scattered",
+            observed_at=_ms("2026-06-17 10:30"),
+        )
+
+        self.assertEqual(posture.json["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+        self.assertEqual(toy.json["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+        repository = CareRepository(Database(self.app.config["DATABASE_URL"]))
+        with repository.transaction() as conn:
+            posture_decision = repository.get_reminder_decision(
+                conn,
+                decision_id=posture.json["decision"]["id"],
+            )
+            toy_decision = repository.get_reminder_decision(
+                conn,
+                decision_id=toy.json["decision"]["id"],
+            )
+        posture_snapshot = json.loads(posture_decision["policy_snapshot_json"])
+        toy_snapshot = json.loads(toy_decision["policy_snapshot_json"])
+        self.assertEqual(posture_snapshot["routineGate"]["reason"], "behavior_only_scenario")
+        self.assertEqual(toy_snapshot["routineGate"]["reason"], "behavior_only_scenario")
+
     def test_posture_risk_is_behavior_driven_not_blocked_by_routine_window(self):
         self._ensure_capabilities()
         self._patch_capability(
@@ -463,7 +571,12 @@ class CareObservationContractTest(unittest.TestCase):
 
         self._patch_capability("meal_habit", cooldownSeconds=0, dailyLimit=1)
         self._create_real_reminder_event("meal_habit")
-        limited = self._post_observation("meal_habit", confidence=0.9, duration_seconds=60)
+        limited = self._post_observation(
+            "meal_habit",
+            confidence=0.9,
+            duration_seconds=60,
+            observed_at=_ms("2026-06-17 12:00"),
+        )
         self.assertEqual(limited.json["decision"]["decision"], "skipped_daily_limit")
 
         self._patch_capability("bedtime", cooldownSeconds=0, dailyLimit=4, parentNotifyThreshold=1)
@@ -1653,6 +1766,67 @@ class CareObservationContractTest(unittest.TestCase):
     def _auth_headers(self) -> dict:
         return {"Authorization": f"Bearer {self.access_token}"}
 
+    def _replace_school_day_routine_windows(self):
+        response = self.client.put(
+            "/api/care/routine-windows",
+            query_string={"dayType": "school_day"},
+            json={
+                "childId": self.child_id,
+                "windows": [
+                    {
+                        "dayType": "school_day",
+                        "windowType": "wake_up",
+                        "startTime": "07:00",
+                        "endTime": "08:00",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "breakfast",
+                        "startTime": "07:20",
+                        "endTime": "08:20",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "lunch",
+                        "startTime": "11:30",
+                        "endTime": "12:30",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "nap",
+                        "startTime": "12:40",
+                        "endTime": "14:20",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "dinner",
+                        "startTime": "17:30",
+                        "endTime": "18:40",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                    {
+                        "dayType": "school_day",
+                        "windowType": "bedtime",
+                        "startTime": "20:30",
+                        "endTime": "21:20",
+                        "enabled": True,
+                        "timezone": "Asia/Shanghai",
+                    },
+                ],
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200)
+
     def _ensure_capabilities(self):
         response = self.client.get(
             "/api/care/capabilities",
@@ -1837,6 +2011,8 @@ class _FakeCameraCommandService:
         device_id: str | None = None,
         source: str | None = None,
         scenario: str | None = None,
+        prompt_id: str | None = None,
+        signal_type: str | None = None,
     ) -> dict:
         self.calls.append(
             {
@@ -1846,6 +2022,8 @@ class _FakeCameraCommandService:
                 "deviceId": device_id,
                 "source": source,
                 "scenario": scenario,
+                "promptId": prompt_id,
+                "signalType": signal_type,
             }
         )
         command_id = f"cmd_fake_{len(self.calls)}"

@@ -2,12 +2,18 @@
 set -euo pipefail
 BASE="${GUARDIAN_API_BASE:-http://127.0.0.1:8000}"
 WS_BASE="${GUARDIAN_WS_BASE:-ws://127.0.0.1:8001/api/tasks/stream}"
-PHONE="${QA_PHONE:-13860439696}"
-DEVICE_ID="${CAMERA_OBSERVATION_DEVICE_ID:-dev_407a85ebde8f4441a3c98d876f973ff9}"
+PHONE="${QA_PHONE:-}"
+DEVICE_ID="${CAMERA_OBSERVATION_DEVICE_ID:-}"
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
 pass() { echo -e "${GREEN}✓${NC} $1"; }
 fail() { echo -e "${RED}✗${NC} $1"; exit 1; }
 info() { echo -e "${YELLOW}→${NC} $1"; }
+if [ -z "$PHONE" ]; then
+  fail "请设置 QA_PHONE（dev SMS 联调手机号）"
+fi
+if [ -z "$DEVICE_ID" ]; then
+  fail "请设置 CAMERA_OBSERVATION_DEVICE_ID（App 绑定设备 id）"
+fi
 echo "══ Guardian 联调 QA ══"
 info "1. SMS 登录"
 REQ=$(curl -s -X POST "$BASE/api/auth/sms/request" -H 'Content-Type: application/json' -d "{\"phone\":\"$PHONE\"}")

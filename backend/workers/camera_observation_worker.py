@@ -14,6 +14,7 @@ from integrations.camera_runtime.ai_camera_test_observation_adapter import (
     AiCameraTestObservationConfig,
 )
 from services.camera_observe_service import build_observe_service_from_env
+from services.vision_prefilter_service import validate_prefilter_runtime
 from services.vision_worker_config import vision_worker_config
 
 
@@ -86,6 +87,7 @@ def build_worker_from_env(environ: dict[str, str] | None = None) -> CameraObserv
     env = environ or os.environ
     config = AiCameraTestObservationConfig.from_env(env)
     config.validate()
+    validate_prefilter_runtime()
     observe_service = build_observe_service_from_env(env)
     return CameraObservationWorker(
         AiCameraTestObservationAdapter(

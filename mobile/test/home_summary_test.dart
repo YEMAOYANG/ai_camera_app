@@ -861,6 +861,8 @@ void main() {
     expect(summary.habitFocus.title, isNot(contains('最近安排')));
     expect(summary.habitFocus.detail, '可以看看今天的记录，或安排下一步。');
   });
+
+  _registerFreshnessTests(now);
 }
 
 DeviceOverview _onlineDeviceOverview() {
@@ -895,4 +897,115 @@ DeviceOverview _onlineDeviceOverview() {
       message: '在线',
     ),
   );
+}
+
+void _registerFreshnessTests(DateTime now) {
+  test('stale observation does not read as current reliable state', () {
+    final observedAt = now.subtract(const Duration(minutes: 12)).millisecondsSinceEpoch;
+    final monitor = CameraMonitorStatus.fromJson({
+      'monitor': {
+        'running': true,
+        'status': 'observing',
+        'lastObservation': {
+          'has_person': true,
+          'activity': '写字',
+          'isReliable': false,
+          'freshness': 'stale',
+          'summary': '孩子正在写字',
+          'observedAt': observedAt,
+          'confidence': 0.9,
+        },
+      },
+    });
+
+    expect(monitor.hasCurrentReliableObservation, isFalse);
+    expect(monitor.hasStaleObservation, isTrue);
+    expect(
+      monitor.displayObservationTitle(now: now),
+      contains('分钟前观察到'),
+    );
+    expect(
+      observationTitle(
+        cameraStatus: null,
+        cameraMonitor: monitor,
+        currentTask: null,
+        localTasks: const [],
+        pendingItems: const [],
+        childName: '小明',
+        now: now,
+      ),
+      contains('分钟前观察到'),
+    );
+  });
+
+  test('prefilter_only observation shows prefilter copy instead of kimi summary', () {
+    final monitor = CameraMonitorStatus.fromJson({
+      'monitor': {
+        'running': true,
+        'status': 'observing',
+        'lastObservation': {
+          'has_person': true,
+          'freshness': 'prefilter_only',
+          'observedAt': now.millisecondsSinceEpoch,
+        },
+      },
+    });
+
+    expect(monitor.hasCurrentReliableObservation, isFalse);
+    expect(monitor.lastObservationFreshness, CameraObservationFreshness.prefilterOnly);
+    expect(
+      observationTitle(
+        cameraStatus: null,
+        cameraMonitor: monitor,
+        currentTask: null,
+        localTasks: const [],
+        pendingItems: const [],
+        childName: '小明',
+        now: now,
+      ),
+      '画面已更新',
+    );
+    expect(
+      observationDetail(
+        cameraMonitor: monitor,
+        currentTask: null,
+        localTasks: const [],
+        pendingCount: 0,
+        now: now,
+      ),
+      contains('预检已更新'),
+    );
+  });
+
+  test('fresh observation with explicit freshness stays current', () {
+    final monitor = CameraMonitorStatus.fromJson({
+      'monitor': {
+        'running': true,
+        'status': 'observing',
+        'lastObservation': {
+          'has_person': true,
+          'activity': '写字',
+          'isReliable': true,
+          'freshness': 'fresh',
+          'summary': '孩子正在写字',
+          'observedAt': now.millisecondsSinceEpoch,
+          'confidence': 0.9,
+        },
+      },
+    });
+
+    expect(monitor.hasCurrentReliableObservation, isTrue);
+    expect(
+      observationTitle(
+        cameraStatus: null,
+        cameraMonitor: monitor,
+        currentTask: null,
+        localTasks: const [],
+        pendingItems: const [],
+        childName: '小明',
+        now: now,
+      ),
+      '孩子正在写字',
+    );
+  });
 }

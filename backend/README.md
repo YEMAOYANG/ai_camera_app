@@ -73,7 +73,7 @@ Run tests:
 
 ```sh
 cd backend
-python3 -m unittest discover -s tests -v
+python3 -m unittest discover -s tests -t . -v
 ```
 
 Tests use the isolated MySQL database configured by `APP_TEST_DATABASE_URL`

@@ -8,7 +8,24 @@ from core.database import Database
 from repositories.care_repository import CareRepository
 from services.camera_observe_service import CameraObserveService
 from services.observation_runtime_state import ObservationRuntimeStateStore
+from services.vision_prefilter_service import PrefilterResult
 from tests.support import TEST_DATABASE_URL, reset_mysql_test_database
+
+
+class _NoPersonPrefilter:
+    def analyze_frame(self, image_bytes: bytes, *, previous: dict | None, now_ms: int) -> PrefilterResult:
+        del image_bytes, previous, now_ms
+        return PrefilterResult(
+            motion_score=0.0,
+            motion_pixels=0,
+            person_detected=False,
+            person_confidence=0.0,
+            person_count=0,
+            person_available=True,
+            motion_available=True,
+            checked_at=0,
+            frame_thumb_b64="",
+        )
 
 
 class _AbsentVision:
@@ -31,6 +48,7 @@ class CameraObserveRuntimePersistenceTest(unittest.TestCase):
         self.service = CameraObserveService(
             self.database_url,
             vision_service=_AbsentVision(),
+            vision_prefilter=_NoPersonPrefilter(),
         )
         self.family_id = "fam_runtime_test"
         self.child_id = "child_runtime_test"
@@ -78,7 +96,7 @@ class CameraObserveRuntimePersistenceTest(unittest.TestCase):
         self.assertFalse(second.posted)
         self.assertIn(
             second.skip_reason,
-            {"absent_already_recorded", "absence_stable_skip"},
+            {"absent_already_recorded", "absence_prefilter_skip"},
         )
         self.assertEqual(len(posts), 1)
 
@@ -114,7 +132,7 @@ class CameraObserveRuntimePersistenceTest(unittest.TestCase):
             )
 
         self.assertTrue(skipped.skipped)
-        self.assertIn(skipped.skip_reason, {"absent_already_recorded", "absence_stable_skip"})
+        self.assertIn(skipped.skip_reason, {"absent_already_recorded", "absence_prefilter_skip"})
         self.assertEqual(len(posts), 1)
 
 
