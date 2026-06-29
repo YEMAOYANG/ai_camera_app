@@ -148,7 +148,7 @@ Map<String, Object?> _device({
     'familyId': 'family_test',
     'bindingCode': 'binding_$id',
     'name': '暖瞳摄像头',
-    'wakeName': '小豆',
+    'wakeName': '小暖',
     'location': '儿童房',
     'status': status,
     'isDefault': id == 'fallback' || id == 'active',

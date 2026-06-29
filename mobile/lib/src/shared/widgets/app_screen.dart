@@ -24,7 +24,6 @@ class AppScreen extends StatelessWidget {
     this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
     this.onRefresh,
     this.onLoadMore,
-    this.canLoadMore = false,
     this.easyRefreshController,
     this.refreshDisplacement = 40,
     this.padding = const EdgeInsets.fromLTRB(
@@ -52,8 +51,7 @@ class AppScreen extends StatelessWidget {
   final List<Widget> children;
   final EdgeInsetsGeometry padding;
   final Future<void> Function()? onRefresh;
-  final Future<void> Function()? onLoadMore;
-  final bool canLoadMore;
+  final Future<bool> Function()? onLoadMore;
   final EasyRefreshController? easyRefreshController;
   final double refreshDisplacement;
   final ScrollController? scrollController;
@@ -119,23 +117,18 @@ class AppScreen extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildScrollBody(EdgeInsetsGeometry adjustedPadding) {
     final listView = ListView(
       controller: scrollController,
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       physics: onRefresh != null || onLoadMore != null
-          ? const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            )
+          ? const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics())
           : null,
       padding: adjustedPadding,
       children: [
         if (!fixedHeader && showHeader) ...[
-          _AppLargeHeader(
-            title: title,
-            subtitle: subtitle,
-            trailing: trailing,
-          ),
+          _AppLargeHeader(title: title, subtitle: subtitle, trailing: trailing),
           const SizedBox(height: 18),
         ],
         ...children,
@@ -146,6 +139,7 @@ class AppScreen extends StatelessWidget {
     }
     return EasyRefresh(
       controller: easyRefreshController,
+      scrollController: scrollController,
       header: ClassicHeader(
         triggerOffset: refreshDisplacement,
         clamping: false,
@@ -175,20 +169,20 @@ class AppScreen extends StatelessWidget {
           ? null
           : () async {
               await onRefresh!();
-              easyRefreshController?.finishRefresh();
+              easyRefreshController?.finishRefresh(IndicatorResult.success);
+              easyRefreshController?.resetFooter();
             },
       onLoad: onLoadMore == null
           ? null
           : () async {
-              await onLoadMore!();
+              final hasMore = await onLoadMore!();
               easyRefreshController?.finishLoad(
-                canLoadMore ? IndicatorResult.success : IndicatorResult.noMore,
+                hasMore ? IndicatorResult.success : IndicatorResult.noMore,
               );
             },
       child: listView,
     );
   }
-
 }
 
 class _AppScreenFooter extends StatelessWidget {

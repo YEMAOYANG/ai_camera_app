@@ -23,8 +23,8 @@ FALLBACK_ROLE_CAPABILITIES = {
     "viewer": [],
 }
 
-RUNTIME_PROVIDERS = {"disabled", "mock", "ai_camera_test", "future_hardware", "self_owned_camera"}
-DEVELOPMENT_RUNTIME_PROVIDERS = {"mock", "ai_camera_test"}
+RUNTIME_PROVIDERS = {"disabled", "mock", "ai_camera_test", "guardian_local", "future_hardware", "self_owned_camera"}
+DEVELOPMENT_RUNTIME_PROVIDERS = {"mock", "ai_camera_test", "guardian_local"}
 RESERVED_RUNTIME_PROVIDERS = {"future_hardware", "self_owned_camera"}
 SENSITIVE_KEY_PARTS = (
     "token",
@@ -54,6 +54,20 @@ SENSITIVE_VALUE_MARKERS = (
     "set-cookie:",
     "private key",
 )
+INTERACTION_PROFILE_SCHEMA = {
+    "wakeName": "text",
+    "fallbackWakeName": "text",
+    "voiceStyle": "text",
+    "boundaryLevel": "text",
+    "freeChatEnabled": "bool",
+    "freeChatSingleMinutes": "number",
+    "freeChatDailyMinutes": "number",
+    "homeworkModeRestricted": "bool",
+    "bedtimeQuietEnabled": "bool",
+    "bedtimeQuietAfter": "text",
+    "childNickname": "text",
+}
+
 SPEAKER_CAPABILITIES_SCHEMA = {
     "enabled": "bool",
     "duplex": "bool",
@@ -65,12 +79,20 @@ RUNTIME_CONFIG_SCHEMAS = {
         "adapterName": "text",
         "streamProfile": "text",
         "speakerCapabilities": SPEAKER_CAPABILITIES_SCHEMA,
+        "interactionProfile": INTERACTION_PROFILE_SCHEMA,
+    },
+    "guardian_local": {
+        "adapterName": "text",
+        "streamProfile": "text",
+        "speakerCapabilities": SPEAKER_CAPABILITIES_SCHEMA,
+        "interactionProfile": INTERACTION_PROFILE_SCHEMA,
     },
     "ai_camera_test": {
         "baseUrl": "url",
         "adapterName": "text",
         "streamProfile": "text",
         "speakerCapabilities": SPEAKER_CAPABILITIES_SCHEMA,
+        "interactionProfile": INTERACTION_PROFILE_SCHEMA,
     },
     "future_hardware": {
         "adapterName": "text",

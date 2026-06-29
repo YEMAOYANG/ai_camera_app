@@ -24,7 +24,7 @@ Use the following product wording:
 - Slogan: 陪在成长的每一天
 - Device: 暖瞳摄像头 or 暖瞳 AI 看护摄像头
 - Default camera name: 暖瞳摄像头 or 儿童房暖瞳摄像头
-- Default wake name: 小豆
+- Default wake name: 小暖
 
 Internal headers and protocol names such as X-Mira-* may remain unchanged when they are not shown to families.
 

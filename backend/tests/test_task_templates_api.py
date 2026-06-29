@@ -34,7 +34,7 @@ class TaskTemplatesApiTest(unittest.TestCase):
             self.assertTrue(template["rows"])
         self.assertGreaterEqual(counts["small"], 10)
         self.assertGreaterEqual(counts["middle"], 10)
-        self.assertGreaterEqual(counts["big"], 10)
+        self.assertGreaterEqual(counts["big"], 13)
 
     def test_filters_by_grade_day_type_and_tag(self):
         grade_response = self.client.get(
@@ -67,6 +67,17 @@ class TaskTemplatesApiTest(unittest.TestCase):
         self.assertTrue(reading_response.json["templates"])
         for template in reading_response.json["templates"]:
             self.assertIn("reading", template["tags"])
+
+        school_ready_response = self.client.get(
+            "/api/tasks/templates",
+            query_string={"grade": "big", "tag": "school_ready"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(school_ready_response.status_code, 200)
+        self.assertGreaterEqual(len(school_ready_response.json["templates"]), 3)
+        for template in school_ready_response.json["templates"]:
+            self.assertIn("school_ready", template["tags"])
+            self.assertEqual(template["grade"], "big")
 
     def test_child_id_recommends_grade_and_is_family_scoped(self):
         response = self.client.get(

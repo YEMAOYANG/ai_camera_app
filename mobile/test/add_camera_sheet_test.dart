@@ -943,7 +943,7 @@ class _FakeCameraDiscoveryAdapter implements CameraDiscoveryAdapter {
       familyId: 'family_test',
       bindingCode: candidate.bindingCode,
       name: candidate.displayName,
-      wakeName: '小豆',
+      wakeName: '小暖',
       location: candidate.roomHint ?? '家庭空间',
       status: 'online',
       isDefault: true,

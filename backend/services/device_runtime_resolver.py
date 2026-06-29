@@ -10,6 +10,7 @@ from core.errors import ApiError
 from core.security import now_ms
 from integrations.camera_runtime.ai_camera_test_adapter import AiCameraTestRuntimeAdapter
 from integrations.camera_runtime.disabled_adapter import DisabledCameraRuntimeAdapter
+from integrations.camera_runtime.guardian_local_adapter import GuardianLocalRuntimeAdapter
 from integrations.camera_runtime.mock_adapter import MockCameraRuntimeAdapter
 from repositories.device_repository import DeviceRepository
 from services.camera_bridge_service import CameraBridgeService
@@ -102,7 +103,12 @@ class DeviceRuntimeResolver:
         provider = self._provider_for_runtime_config(runtime_config) or self._provider_for_device(device)
         config = self._runtime_config_json(runtime_config)
         return ResolvedCameraRuntime(
-            bridge=self._bridge_for_provider(provider, config=config),
+            bridge=self._bridge_for_provider(
+                provider,
+                config=config,
+                family_id=family_id,
+                device_id=str(device.get("id") or "") if device else requested_device_id,
+            ),
             provider=provider,
             family_id=family_id,
             device_id=str(device.get("id") or "") if device else requested_device_id,
@@ -151,7 +157,14 @@ class DeviceRuntimeResolver:
             return self.legacy_provider
         return self.provider or "disabled"
 
-    def _bridge_for_provider(self, provider: str, *, config: Mapping[str, Any] | None = None) -> CameraBridgeService:
+    def _bridge_for_provider(
+        self,
+        provider: str,
+        *,
+        config: Mapping[str, Any] | None = None,
+        family_id: str | None = None,
+        device_id: str | None = None,
+    ) -> CameraBridgeService:
         adapter_name = str(provider or "disabled").strip().lower()
         config = config or {}
         if adapter_name == "ai_camera_test":
@@ -175,6 +188,25 @@ class DeviceRuntimeResolver:
                     vision_service=self._vision_service(),
                 )
             )
+        if adapter_name == "guardian_local":
+            self._require_dev_adapter("CAMERA_RUNTIME_PROVIDER=guardian_local")
+            media_base_url = str(
+                config.get("baseUrl")
+                or config.get("base_url")
+                or self.ai_camera_test_base_url
+                or self.camera_backend_url
+                or ""
+            ).strip()
+            adapter = GuardianLocalRuntimeAdapter(
+                family_id=family_id,
+                device_id=device_id,
+                vision_service=self._vision_service(),
+                media_base_url=media_base_url or None,
+            )
+            profile = config.get("interactionProfile") if isinstance(config.get("interactionProfile"), dict) else {}
+            if profile:
+                adapter.sync_interaction_profile(profile)
+            return CameraBridgeService(adapter=adapter)
         if adapter_name == "mock":
             self._require_dev_adapter("CAMERA_RUNTIME_PROVIDER=mock")
             return CameraBridgeService(
@@ -198,13 +230,14 @@ class DeviceRuntimeResolver:
     def _allow_device_less_fallback(self) -> bool:
         if self.app_env not in {"development", "test"}:
             return False
-        return self._global_provider() in {"disabled", "mock", "ai_camera_test"}
+        return self._global_provider() in {"disabled", "mock", "ai_camera_test", "guardian_local"}
 
     def _allow_device_runtime_global_fallback(self) -> bool:
         return self.app_env in {"development", "test"} and self._global_provider() in {
             "disabled",
             "mock",
             "ai_camera_test",
+            "guardian_local",
         }
 
     def _vision_service(self):

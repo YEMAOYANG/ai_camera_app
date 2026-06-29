@@ -25,6 +25,8 @@ from schemas.profile import (
     setting_payload,
 )
 from services.auth_service import AuthService
+from services.conversation_sync_service import ConversationSyncService
+from services.wake_name_validator import validate_wake_name
 from services.setting_policy import (
     SETTING_DEFAULTS,
     SETTING_MANAGE_CAPABILITIES,
@@ -158,6 +160,7 @@ LEGACY_GUARDIAN_IDENTITY_KEYS = {
 class ProfileService:
     def __init__(self, database_url: str | Path, *, auth_service: AuthService):
         self.auth_service = auth_service
+        self.database_url = str(database_url)
         self.repository = ProfileRepository(Database(database_url))
 
     def summary(self, access_token: str) -> dict:
@@ -861,6 +864,13 @@ class ProfileService:
                 context,
                 SETTING_MANAGE_CAPABILITIES[key],
             )
+            if key == "conversation":
+                wake_name = validate_wake_name(
+                    value.get("wakeName"),
+                    family_names=self._guardian_identity_labels(conn),
+                    allow_fallback=True,
+                )
+                value["wakeName"] = wake_name
             row = self.repository.upsert_setting(
                 conn,
                 family_id=context["family"]["id"],
@@ -869,14 +879,9 @@ class ProfileService:
                 now=now,
             )
             if key == "conversation":
-                wake_name = str(value.get("wakeName") or "").strip()
-                if wake_name:
-                    self.repository.update_current_device_wake_name(
-                        conn,
-                        family_id=context["family"]["id"],
-                        wake_name=wake_name,
-                        now=now,
-                    )
+                ConversationSyncService(self.database_url).sync_family_conversation(
+                    family_id=context["family"]["id"],
+                )
             return {"ok": True, "setting": setting_payload(key, value, row["updated_at"])}
 
     def account_profile(self, access_token: str) -> dict:
@@ -1922,6 +1927,16 @@ class ProfileService:
         if not isinstance(value, dict):
             raise ApiError("invalid_task_preferences", "任务偏好格式不正确")
         return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+    def _guardian_identity_labels(self, conn) -> set[str]:
+        return {
+            row["label"]
+            for row in self.repository.list_app_option_items(
+                conn,
+                catalog_key="guardian_identity_label",
+            )
+            if row["label"]
+        }
 
     def _validate_setting_key(self, key: str) -> None:
         if key not in SETTING_DEFAULTS:

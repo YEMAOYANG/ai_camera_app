@@ -41,7 +41,7 @@ SetupDraft setupDraftFromStatus(SetupStatus status) {
         : status.childEducationStage.trim(),
     childGrade: status.childGrade.trim(),
     cameraWakeName: status.cameraWakeName.trim().isEmpty
-        ? '小豆'
+        ? '小暖'
         : status.cameraWakeName.trim(),
   );
 }
@@ -61,7 +61,7 @@ class SetupDraft {
     this.childGender = 'unspecified',
     this.childStage = '幼儿园',
     this.childGrade = '',
-    this.cameraWakeName = '小豆',
+    this.cameraWakeName = '小暖',
     this.emergencyName = '',
     this.emergencyPhone = '',
   });

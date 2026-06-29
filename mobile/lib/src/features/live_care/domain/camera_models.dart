@@ -382,21 +382,25 @@ class CameraEventsState {
     this.items = const [],
     this.hasMore = false,
     this.isLoadingMore = false,
+    this.loadedCount = 0,
   });
 
   final List<LiveCareEvent> items;
   final bool hasMore;
   final bool isLoadingMore;
+  final int loadedCount;
 
   CameraEventsState copyWith({
     List<LiveCareEvent>? items,
     bool? hasMore,
     bool? isLoadingMore,
+    int? loadedCount,
   }) {
     return CameraEventsState(
       items: items ?? this.items,
       hasMore: hasMore ?? this.hasMore,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      loadedCount: loadedCount ?? this.loadedCount,
     );
   }
 }

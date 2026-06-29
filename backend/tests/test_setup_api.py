@@ -321,7 +321,7 @@ class SetupApiTest(unittest.TestCase):
                 (self.family_id,),
             ).fetchall()
         wake_names = {row["id"]: row.get("wake_name") for row in rows}
-        self.assertEqual(wake_names[first.json["device"]["id"]], "小豆")
+        self.assertEqual(wake_names[first.json["device"]["id"]], "小暖")
         self.assertEqual(wake_names[second_id], "小守")
 
     def _login(self, phone: str = "13800002026") -> str:

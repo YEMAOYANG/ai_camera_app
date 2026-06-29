@@ -75,6 +75,10 @@ final aboutInfoProvider = FutureProvider<AboutInfo>((ref) {
   return ref.watch(profileRepositoryProvider).aboutInfo();
 });
 
+final voiceRuntimeProvider = FutureProvider<Map<String, dynamic>>((ref) {
+  return ref.watch(profileRepositoryProvider).voiceRuntime();
+});
+
 final profileSettingProvider = FutureProvider.family<ProfileSetting, String>((
   ref,
   key,
@@ -333,6 +337,17 @@ class ProfileRepository {
   ) async {
     final response = await _patch('/settings/$key', data: {'value': value});
     return ProfileSetting.fromJson(_asMap(_asMap(response.data)['setting']));
+  }
+
+
+  Future<Map<String, dynamic>> conversationPolicy() async {
+    final response = await _get('/conversation/policy');
+    return _asMap(_asMap(response.data)['policy']);
+  }
+
+  Future<Map<String, dynamic>> voiceRuntime() async {
+    final response = await _get('/voice/runtime');
+    return _asMap(response.data);
   }
 
   Future<SubscriptionStatus> subscriptionStatus() async {

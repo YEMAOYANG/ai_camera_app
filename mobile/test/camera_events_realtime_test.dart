@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:warm_sight/src/app/realtime/app_realtime_helpers.dart';
@@ -8,45 +9,49 @@ import 'package:warm_sight/src/features/care/application/parent_review_realtime.
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
+import 'package:warm_sight/src/features/live_care/presentation/live_care_screen.dart';
 import 'package:warm_sight/src/features/tasks/application/task_realtime_repository.dart';
 
 void main() {
-  test('camera events provider inserts observation.updated event immediately', () async {
-    final container = ProviderContainer(
-      overrides: [
-        selectedDeviceProvider.overrideWith((ref) async => null),
-        cameraRepositoryProvider.overrideWithValue(
-          _FakeCameraRepository(const []),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
+  test(
+    'camera events provider inserts observation.updated event immediately',
+    () async {
+      final container = ProviderContainer(
+        overrides: [
+          selectedDeviceProvider.overrideWith((ref) async => null),
+          cameraRepositoryProvider.overrideWithValue(
+            _FakeCameraRepository(const []),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
 
-    final event = TaskRealtimeEvent.fromJson({
-      'type': 'camera_observation.updated',
-      'observationId': 'obs_1',
-      'event': {
-        'id': 'evt_phone',
-        'source': 'camera_observation',
-        'eventType': 'camera_observation',
-        'displayTitle': '孩子正在玩手机',
-        'displayMessage': '孩子在玩手机，注意休息。',
-        'category': 'camera_observation',
-        'severity': 'info',
-        'tone': 'info',
-        'createdAt': 1,
-      },
-      'sentAt': 2,
-    });
+      final event = TaskRealtimeEvent.fromJson({
+        'type': 'camera_observation.updated',
+        'observationId': 'obs_1',
+        'event': {
+          'id': 'evt_phone',
+          'source': 'camera_observation',
+          'eventType': 'camera_observation',
+          'displayTitle': '孩子正在玩手机',
+          'displayMessage': '孩子在玩手机，注意休息。',
+          'category': 'camera_observation',
+          'severity': 'info',
+          'tone': 'info',
+          'createdAt': 1,
+        },
+        'sentAt': 2,
+      });
 
-    final notifier = container.read(cameraEventsProvider.notifier);
-    notifier.handleRealtimeEvent(event);
+      final notifier = container.read(cameraEventsProvider.notifier);
+      notifier.handleRealtimeEvent(event);
 
-    final state = container.read(cameraEventsProvider).value;
-    expect(state?.items.length, 1);
-    expect(state!.items.first.displayTitle, '孩子正在玩手机');
-    expect(state.items.first.displayMessage, '孩子在玩手机，注意休息。');
-  });
+      final state = container.read(cameraEventsProvider).value;
+      expect(state?.items.length, 1);
+      expect(state!.items.first.displayTitle, '孩子正在玩手机');
+      expect(state.items.first.displayMessage, '孩子在玩手机，注意休息。');
+    },
+  );
 
   test(
     'camera events provider inserts realtime event without duplicates',
@@ -104,10 +109,7 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    expect(
-      (await container.read(cameraEventsProvider.future)).items,
-      isEmpty,
-    );
+    expect((await container.read(cameraEventsProvider.future)).items, isEmpty);
     final notifier = container.read(cameraEventsProvider.notifier);
     notifier.handleRealtimeEvent(
       TaskRealtimeEvent.fromJson({
@@ -174,106 +176,219 @@ void main() {
     expect(merged.hasMore, isFalse);
   });
 
-  test('coordinator observation update does not invalidate camera events list', () async {
-    final container = ProviderContainer(
-      overrides: [
-        selectedDeviceProvider.overrideWith((ref) async => null),
-        cameraRepositoryProvider.overrideWithValue(
-          _FakeCameraRepository(const []),
+  test(
+    'camera events loadMore merges duplicate ids from realtime inserts',
+    () async {
+      final events = List<LiveCareEvent>.generate(
+        12,
+        (index) => LiveCareEvent(
+          id: 'evt_$index',
+          source: 'camera_observation',
+          eventType: 'camera_observation',
+          title: '记录 $index',
+          message: '记录 $index',
+          displayTitle: '记录 $index',
+          displayMessage: '记录 $index',
+          category: 'camera_observation',
+          severity: 'info',
+          taskTitle: '',
+          evidenceSummary: '',
+          hasReplay: false,
+          status: 'ok',
+          toneKey: 'info',
+          createdAt: 1000 - index,
         ),
-      ],
-    );
-    addTearDown(container.dispose);
+      );
+      final repository = _FakeCameraRepository(events);
+      final container = ProviderContainer(
+        overrides: [
+          selectedDeviceProvider.overrideWith((ref) async => null),
+          cameraRepositoryProvider.overrideWithValue(repository),
+        ],
+      );
+      addTearDown(container.dispose);
 
-    expect(
-      (await container.read(cameraEventsProvider.future)).items,
-      isEmpty,
-    );
-    final coordinator = container.read(appRealtimeInvalidationCoordinatorProvider);
-    coordinator.handle(
-      TaskRealtimeEvent.fromJson({
-        'type': 'camera_observation.updated',
-        'observationId': 'obs_2',
-        'event': {
-          'id': 'evt_live',
-          'source': 'camera_observation',
-          'eventType': 'camera_observation',
-          'displayTitle': '孩子正在看书',
-          'displayMessage': '孩子正在安静看书。',
-          'category': 'camera_observation',
-          'severity': 'info',
-          'tone': 'info',
-          'createdAt': 3,
-        },
-        'sentAt': 4,
-      }),
-    );
+      final firstPage = await container.read(cameraEventsProvider.future);
+      expect(firstPage.items.length, 10);
+      container
+          .read(cameraEventsProvider.notifier)
+          .handleRealtimeEvent(
+            TaskRealtimeEvent.fromJson({
+              'type': 'camera_event.created',
+              'event': {
+                'id': 'evt_10',
+                'source': 'camera_observation',
+                'eventType': 'camera_observation',
+                'displayTitle': '记录 10',
+                'displayMessage': '记录 10',
+                'category': 'camera_observation',
+                'severity': 'info',
+                'tone': 'info',
+                'createdAt': 990,
+              },
+              'sentAt': 1,
+            }),
+          );
 
-    final state = container.read(cameraEventsProvider).value;
-    expect(state?.items.length, 1);
-    expect(state!.items.first.id, 'evt_live');
+      await container.read(cameraEventsProvider.notifier).loadMore();
+      final merged = container.read(cameraEventsProvider).value!;
 
-    await Future<void>.delayed(const Duration(milliseconds: 300));
+      expect(
+        merged.items.map((item) => item.id).toSet().length,
+        merged.items.length,
+      );
+      expect(merged.items.where((item) => item.id == 'evt_10'), hasLength(1));
+      expect(merged.items.map((item) => item.id), contains('evt_11'));
+    },
+  );
 
-    final after = container.read(cameraEventsProvider);
-    expect(after.hasValue, isTrue);
-    expect(after.value?.items.length, 1);
-    expect(after.value?.items.first.id, 'evt_live');
-  });
+  test(
+    'camera events refresh can restore hasMore after a no-more state',
+    () async {
+      final repository = _FakeCameraRepository([
+        _event('evt_0', 30),
+        _event('evt_1', 20),
+      ]);
+      final container = ProviderContainer(
+        overrides: [
+          selectedDeviceProvider.overrideWith((ref) async => null),
+          cameraRepositoryProvider.overrideWithValue(repository),
+        ],
+      );
+      addTearDown(container.dispose);
 
-  test('reminder_decision with reviewItem inserts optimistic parent review', () {
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
+      final firstPage = await container.read(cameraEventsProvider.future);
+      expect(firstPage.hasMore, isFalse);
 
-    applyReminderDecisionRealtimeEvent(
-      container,
-      TaskRealtimeEvent.fromJson({
-        'type': 'reminder_decision.created',
-        'event': {
-          'id': 'rev_1',
-          'status': 'pending',
-          'summary': '需要家长确认',
-          'reviewType': 'bedtime',
-          'createdAt': 1,
-        },
-        'sentAt': 1,
-      }),
-    );
+      repository.eventItems = List<LiveCareEvent>.generate(
+        12,
+        (index) => _event('evt_$index', 100 - index),
+      );
+      await container.read(cameraEventsProvider.notifier).refresh();
+      final refreshed = container.read(cameraEventsProvider).value!;
+      expect(refreshed.hasMore, isTrue);
 
-    final items = container.read(pendingParentReviewsOverrideProvider);
-    expect(items.length, 1);
-    expect(items.first.id, 'rev_1');
-  });
+      final hasMoreAfterLoad = await container
+          .read(cameraEventsProvider.notifier)
+          .loadMore();
+      expect(hasMoreAfterLoad, isFalse);
+      expect(container.read(cameraEventsProvider).value?.items.length, 12);
+    },
+  );
 
-  test('coordinator reminder_decision.created schedules care refresh without clearing events', () async {
-    final container = ProviderContainer(
-      overrides: [
-        selectedDeviceProvider.overrideWith((ref) async => null),
-        cameraRepositoryProvider.overrideWithValue(
-          _FakeCameraRepository(const []),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
+  test(
+    'coordinator observation update does not invalidate camera events list',
+    () async {
+      final container = ProviderContainer(
+        overrides: [
+          selectedDeviceProvider.overrideWith((ref) async => null),
+          cameraRepositoryProvider.overrideWithValue(
+            _FakeCameraRepository(const []),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
 
-    expect(
-      (await container.read(cameraEventsProvider.future)).items,
-      isEmpty,
-    );
-    final coordinator = container.read(appRealtimeInvalidationCoordinatorProvider);
-    coordinator.handle(
-      TaskRealtimeEvent.fromJson({
-        'type': 'reminder_decision.created',
-        'sentAt': 1,
-      }),
-    );
+      expect(
+        (await container.read(cameraEventsProvider.future)).items,
+        isEmpty,
+      );
+      final coordinator = container.read(
+        appRealtimeInvalidationCoordinatorProvider,
+      );
+      coordinator.handle(
+        TaskRealtimeEvent.fromJson({
+          'type': 'camera_observation.updated',
+          'observationId': 'obs_2',
+          'event': {
+            'id': 'evt_live',
+            'source': 'camera_observation',
+            'eventType': 'camera_observation',
+            'displayTitle': '孩子正在看书',
+            'displayMessage': '孩子正在安静看书。',
+            'category': 'camera_observation',
+            'severity': 'info',
+            'tone': 'info',
+            'createdAt': 3,
+          },
+          'sentAt': 4,
+        }),
+      );
 
-    await Future<void>.delayed(const Duration(milliseconds: 300));
+      final state = container.read(cameraEventsProvider).value;
+      expect(state?.items.length, 1);
+      expect(state!.items.first.id, 'evt_live');
 
-    final after = container.read(cameraEventsProvider);
-    expect(after.hasValue, isTrue);
-    expect(after.value?.items, isEmpty);
-  });
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+
+      final after = container.read(cameraEventsProvider);
+      expect(after.hasValue, isTrue);
+      expect(after.value?.items.length, 1);
+      expect(after.value?.items.first.id, 'evt_live');
+    },
+  );
+
+  test(
+    'reminder_decision with reviewItem inserts optimistic parent review',
+    () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      applyReminderDecisionRealtimeEvent(
+        container,
+        TaskRealtimeEvent.fromJson({
+          'type': 'reminder_decision.created',
+          'event': {
+            'id': 'rev_1',
+            'status': 'pending',
+            'summary': '需要家长确认',
+            'reviewType': 'bedtime',
+            'createdAt': 1,
+          },
+          'sentAt': 1,
+        }),
+      );
+
+      final items = container.read(pendingParentReviewsOverrideProvider);
+      expect(items.length, 1);
+      expect(items.first.id, 'rev_1');
+    },
+  );
+
+  test(
+    'coordinator reminder_decision.created schedules care refresh without clearing events',
+    () async {
+      final container = ProviderContainer(
+        overrides: [
+          selectedDeviceProvider.overrideWith((ref) async => null),
+          cameraRepositoryProvider.overrideWithValue(
+            _FakeCameraRepository(const []),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      expect(
+        (await container.read(cameraEventsProvider.future)).items,
+        isEmpty,
+      );
+      final coordinator = container.read(
+        appRealtimeInvalidationCoordinatorProvider,
+      );
+      coordinator.handle(
+        TaskRealtimeEvent.fromJson({
+          'type': 'reminder_decision.created',
+          'sentAt': 1,
+        }),
+      );
+
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+
+      final after = container.read(cameraEventsProvider);
+      expect(after.hasValue, isTrue);
+      expect(after.value?.items, isEmpty);
+    },
+  );
 
   test('LiveCareEvent parses recordKind for routine observations', () {
     final event = LiveCareEvent.fromJson({
@@ -293,47 +408,76 @@ void main() {
     expect(event.isVisionRecord, isFalse);
   });
 
-  test('refreshMonitor returns unavailable status when snapshot fails', () async {
-    final dio = Dio(BaseOptions(baseUrl: 'http://test/api'));
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          handler.reject(
-            DioException(
-              requestOptions: options,
-              response: Response<dynamic>(
+  test(
+    'refreshMonitor returns unavailable status when snapshot fails',
+    () async {
+      final dio = Dio(BaseOptions(baseUrl: 'http://test/api'));
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.reject(
+              DioException(
                 requestOptions: options,
-                statusCode: 502,
-                data: {
-                  'ok': false,
-                  'error': 'camera_snapshot_failed',
-                  'message': '摄像头画面暂不可用，请稍后再试。',
-                },
+                response: Response<dynamic>(
+                  requestOptions: options,
+                  statusCode: 502,
+                  data: {
+                    'ok': false,
+                    'error': 'camera_snapshot_failed',
+                    'message': '摄像头画面暂不可用，请稍后再试。',
+                  },
+                ),
+                type: DioExceptionType.badResponse,
               ),
-              type: DioExceptionType.badResponse,
-            ),
-          );
-        },
+            );
+          },
+        ),
+      );
+      final repository = CameraRepository(apiClient: ApiClient(dio), dio: dio);
+
+      final status = await repository.refreshMonitor(deviceId: 'dev_1');
+
+      expect(status.status, 'unavailable');
+      expect(status.message, contains('摄像头画面暂不可用'));
+    },
+  );
+
+  testWidgets('LiveEventsScreen empty state keeps refresh provider active', (
+    tester,
+  ) async {
+    final repository = _FakeCameraRepository(const []);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          selectedDeviceProvider.overrideWith((ref) async => null),
+          cameraRepositoryProvider.overrideWithValue(repository),
+        ],
+        child: const MaterialApp(home: LiveEventsScreen()),
       ),
     );
-    final repository = CameraRepository(
-      apiClient: ApiClient(dio),
-      dio: dio,
+    await tester.pumpAndSettle();
+
+    expect(find.text('还没有可靠的画面记录'), findsOneWidget);
+    final callsBefore = repository.eventsPageCallCount;
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(LiveEventsScreen)),
     );
 
-    final status = await repository.refreshMonitor(deviceId: 'dev_1');
+    await container.read(cameraEventsProvider.notifier).refresh();
+    await tester.pumpAndSettle();
 
-    expect(status.status, 'unavailable');
-    expect(status.message, contains('摄像头画面暂不可用'));
+    expect(repository.eventsPageCallCount, greaterThan(callsBefore));
+    expect(find.text('还没有可靠的画面记录'), findsOneWidget);
   });
 }
 
 class _FakeCameraRepository extends CameraRepository {
-  _FakeCameraRepository(this._events)
+  _FakeCameraRepository(this.eventItems)
     : super(apiClient: ApiClient(Dio()), dio: Dio());
 
-  final List<LiveCareEvent> _events;
+  List<LiveCareEvent> eventItems;
   bool failEvents = false;
+  int eventsPageCallCount = 0;
 
   @override
   Future<CameraEventsPage> eventsPage({
@@ -344,8 +488,29 @@ class _FakeCameraRepository extends CameraRepository {
     if (failEvents) {
       throw const CameraException('暂时拿不到看护事件。');
     }
-    final slice = _events.skip(offset).take(limit).toList();
-    final hasMore = offset + slice.length < _events.length;
+    eventsPageCallCount += 1;
+    final slice = eventItems.skip(offset).take(limit).toList();
+    final hasMore = offset + slice.length < eventItems.length;
     return CameraEventsPage(events: slice, hasMore: hasMore);
   }
+}
+
+LiveCareEvent _event(String id, int createdAt) {
+  return LiveCareEvent(
+    id: id,
+    source: 'camera_observation',
+    eventType: 'camera_observation',
+    title: id,
+    message: id,
+    displayTitle: id,
+    displayMessage: id,
+    category: 'camera_observation',
+    severity: 'info',
+    taskTitle: '',
+    evidenceSummary: '',
+    hasReplay: false,
+    status: 'ok',
+    toneKey: 'info',
+    createdAt: createdAt,
+  );
 }

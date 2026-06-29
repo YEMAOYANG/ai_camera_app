@@ -32,6 +32,7 @@ TEMPLATE_TAG_OPTIONS = [
     {"value": "self_care", "label": "自理"},
     {"value": "rules", "label": "规则"},
     {"value": "helper", "label": "小帮手"},
+    {"value": "school_ready", "label": "入学准备"},
 ]
 
 GRADE_ALIASES = {

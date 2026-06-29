@@ -195,8 +195,6 @@ void main() {
 
     expect(find.text('登录暖瞳'), findsNothing);
     expect(find.text('还没有连接摄像头'), findsWidgets);
-    expect(find.text('摄像头还没连接'), findsOneWidget);
-    expect(find.text('连接'), findsOneWidget);
     expect(find.text('连接第一台看护摄像头'), findsNothing);
   });
 
@@ -597,22 +595,25 @@ void main() {
     expect(event.displayMessage, isNot(contains('一个人')));
   });
 
-  test('live care event display copy keeps phone activity distinct from screen', () {
-    final event = LiveCareEvent.fromJson({
-      'id': 'evt_phone',
-      'source': 'camera_observation',
-      'eventType': 'camera_observation',
-      'displayTitle': '孩子正在玩手机',
-      'displayMessage': '孩子坐在沙发上低头操作手机。',
-      'category': 'camera_observation',
-      'tone': 'info',
-      'createdAt': 1,
-    });
+  test(
+    'live care event display copy keeps phone activity distinct from screen',
+    () {
+      final event = LiveCareEvent.fromJson({
+        'id': 'evt_phone',
+        'source': 'camera_observation',
+        'eventType': 'camera_observation',
+        'displayTitle': '孩子正在玩手机',
+        'displayMessage': '孩子坐在沙发上低头操作手机。',
+        'category': 'camera_observation',
+        'tone': 'info',
+        'createdAt': 1,
+      });
 
-    expect(event.displayTitle, '孩子正在玩手机');
-    expect(event.displayMessage, '孩子在玩手机，注意休息。');
-    expect(event.displayMessage, isNot(contains('看屏幕')));
-  });
+      expect(event.displayTitle, '孩子正在玩手机');
+      expect(event.displayMessage, '孩子在玩手机，注意休息。');
+      expect(event.displayMessage, isNot(contains('看屏幕')));
+    },
+  );
 
   testWidgets('login after logout refreshes profile for the new account', (
     tester,
@@ -712,13 +713,12 @@ void main() {
     expect(_lastSetupChildBody?['ageStage'], '幼儿园 中班');
     expect(_lastSetupChildBody?['grade'], '中班');
     expect(find.text('连接第一台看护摄像头'), findsNothing);
-    expect(find.text('摄像头还没连接'), findsOneWidget);
     expect(find.text('今日安排'), findsOneWidget);
     expect(find.text('\u7c73\u62c9怎么说'), findsNothing);
     expect(find.textContaining('bindingCode'), findsNothing);
     expect(find.textContaining('mock'), findsNothing);
 
-    showAddCameraSheet(tester.element(find.text('摄像头还没连接')));
+    showAddCameraSheet(tester.element(find.text('还没有连接摄像头').first));
     await tester.pump(const Duration(seconds: 1));
     await tester.pump();
 
@@ -1624,7 +1624,7 @@ GuardianDevice _liveCareDevice() {
     familyId: 'family_test',
     bindingCode: 'BIND-LIVE-CARE',
     name: '儿童房摄像头',
-    wakeName: '小豆',
+    wakeName: '小暖',
     location: '儿童房',
     status: 'online',
     isDefault: true,
@@ -2387,7 +2387,7 @@ class _FakeApiServer {
               'birthday': '',
             }
           : null,
-      'cameraName': device || cameraName || done ? {'wakeName': '小豆'} : null,
+      'cameraName': device || cameraName || done ? {'wakeName': '小暖'} : null,
     };
   }
 

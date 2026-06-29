@@ -16,6 +16,7 @@ import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:warm_sight/src/shared/widgets/app_button.dart';
 import 'package:warm_sight/src/shared/widgets/app_compact_toggle.dart';
 import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_segmented_control.dart';
 import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
 import 'package:warm_sight/src/shared/widgets/app_surface.dart';
 import 'package:warm_sight/src/shared/widgets/app_time_picker_sheet.dart';
@@ -74,7 +75,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       endDate: _weekStart.add(const Duration(days: 6)),
       childId: childId?.isNotEmpty == true ? childId : null,
     );
-    ref.read(activeTaskWeekQueryProvider.notifier).state = query;
+    _scheduleActiveTaskWeekQuerySync(query);
     final weekTasks = ref.watch(taskWeekProvider(query));
 
     if (widget.openTemplatesOnEntry &&
@@ -152,6 +153,14 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         ),
       ],
     );
+  }
+
+  void _scheduleActiveTaskWeekQuerySync(TaskWeekQuery query) {
+    if (ref.read(activeTaskWeekQueryProvider) == query) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(activeTaskWeekQueryProvider.notifier).state = query;
+    });
   }
 
   List<GuardianTask> _tasksForSelectedDay(List<GuardianTask> tasks) {
@@ -1046,12 +1055,20 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
                   ),
                   if (widget.task == null) ...[
                     const SizedBox(height: 12),
-                    _TaskModeSwitch(
+                    AppSegmentedControl<TaskEntryMode>(
                       value: _mode,
+                      semanticLabel: '添加方式',
                       onChanged: (mode) => setState(() {
                         _mode = mode;
                         _error = null;
                       }),
+                      options: [
+                        for (final mode in TaskEntryMode.values)
+                          AppSegmentOption(
+                            value: mode,
+                            label: mode.label,
+                          ),
+                      ],
                     ),
                   ],
                   const SizedBox(height: 14),
@@ -1913,62 +1930,6 @@ class _PickerSheetScaffold extends StatelessWidget {
   }
 }
 
-class _TaskModeSwitch extends StatelessWidget {
-  const _TaskModeSwitch({required this.value, required this.onChanged});
-
-  final TaskEntryMode value;
-  final ValueChanged<TaskEntryMode> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
-        borderRadius: BorderRadius.circular(AppRadii.button),
-        border: Border.all(color: AppColors.borderSoft),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Row(
-          children: [
-            for (final mode in TaskEntryMode.values)
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onChanged(mode),
-                  child: AnimatedContainer(
-                    duration: AppMotion.duration(context, 160),
-                    curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(vertical: 9),
-                    decoration: BoxDecoration(
-                      color: value == mode
-                          ? AppColors.selectedBg
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(AppRadii.control),
-                    ),
-                    child: Text(
-                      mode.label,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: value == mode
-                            ? AppColors.primary
-                            : AppColors.muted,
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _PickerField extends StatelessWidget {
   const _PickerField({
     required this.label,
@@ -2549,21 +2510,16 @@ class _TemplatePickerContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Row(
-            children: [
-              for (final tag in tags) ...[
-                _TemplateTagChip(
-                  label: tag.label,
-                  selected: selectedTag == tag.value,
-                  onTap: () => onTagSelected(tag.value),
-                ),
-                const SizedBox(width: 8),
-              ],
-            ],
-          ),
+        AppSegmentedControl<String>(
+          value: selectedTag,
+          semanticLabel: '模板分类',
+          scrollable: true,
+          compact: true,
+          onChanged: onTagSelected,
+          options: [
+            for (final tag in tags)
+              AppSegmentOption(value: tag.value, label: tag.label),
+          ],
         ),
         const SizedBox(height: 12),
         Text(
@@ -2628,48 +2584,6 @@ class _TemplatePickerEmpty extends StatelessWidget {
         variant: AppStateVariant.emptyTasks,
         title: '暂时没有适合的安排',
         message: '可以先手动添加今天的小提醒。',
-      ),
-    );
-  }
-}
-
-class _TemplateTagChip extends StatelessWidget {
-  const _TemplateTagChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: AppMotion.duration(context, 160),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.ink : AppColors.surfaceSoft,
-          borderRadius: BorderRadius.circular(AppRadii.full),
-          border: Border.all(
-            color: selected ? AppColors.ink : AppColors.borderSoft,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: selected ? Colors.white : AppColors.muted,
-            fontFamily: AppTypography.systemFont,
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0,
-          ),
-        ),
       ),
     );
   }

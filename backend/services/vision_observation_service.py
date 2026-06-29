@@ -63,14 +63,15 @@ class VisionObservationService:
             return insufficient_observation(reason="vision_prompt_missing", observed_at=now_ms)
         last_activity = _DEVICE_LAST_ACTIVITY.get(device_key, "未知")
         user_prompt = _render_user_prompt(prompt.body, context=context, last_activity=last_activity)
+        disable_thinking = bool(getattr(self.vision_provider, "disable_thinking", False))
         response = self.vision_provider.analyze_image(
             system_prompt="你是儿童摄像头视觉观察模块，只输出 JSON。",
             user_prompt=user_prompt,
             image_bytes=image_bytes,
             content_type=content_type,
             max_tokens=640,
-            # kimi-k2.6 等视觉模型当前仅允许 temperature=1，其他值会 400
-            temperature=1.0,
+            # kimi-k2.6 关闭 thinking 时仅允许 0.6；开启 thinking 时需更高 max_tokens 且用 1.0。
+            temperature=0.6 if disable_thinking else 1.0,
         )
         if response is None:
             cached = self.cadence.cached_result(device_key)

@@ -30,6 +30,7 @@ import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:warm_sight/src/shared/widgets/app_compact_toggle.dart';
 import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
 import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_segmented_control.dart';
 import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
 import 'package:warm_sight/src/shared/widgets/app_surface.dart';
 import 'package:warm_sight/src/shared/widgets/app_text_field.dart';
@@ -1330,9 +1331,14 @@ class _ReportsHubPageState extends ConsumerState<ReportsHubPage> {
       title: '看护报告',
       subtitle: '日报和周报',
       children: [
-        _ReportSegmentBar(
-          index: _index,
+        AppSegmentedControl<int>(
+          value: _index,
+          semanticLabel: '报告类型',
           onChanged: (value) => setState(() => _index = value),
+          options: const [
+            AppSegmentOption(value: 0, label: '今日报告'),
+            AppSegmentOption(value: 1, label: '周报'),
+          ],
         ),
         const SizedBox(height: 12),
         switch (_index) {
@@ -1340,89 +1346,6 @@ class _ReportsHubPageState extends ConsumerState<ReportsHubPage> {
           _ => _ReportPane(provider: weeklyReportProvider),
         },
       ],
-    );
-  }
-}
-
-class _ReportSegmentBar extends StatelessWidget {
-  const _ReportSegmentBar({required this.index, required this.onChanged});
-
-  final int index;
-  final ValueChanged<int> onChanged;
-
-  static const _labels = ['今日报告', '周报'];
-
-  @override
-  Widget build(BuildContext context) {
-    return AppSurface(
-      padding: const EdgeInsets.all(5),
-      color: AppColors.surfaceSoft,
-      borderColor: AppColors.borderSoft,
-      radius: AppRadii.full,
-      child: Row(
-        children: [
-          for (var i = 0; i < _labels.length; i++)
-            Expanded(
-              child: _ReportSegmentButton(
-                label: _labels[i],
-                selected: index == i,
-                onTap: () => onChanged(i),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ReportSegmentButton extends StatelessWidget {
-  const _ReportSegmentButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: AppMotion.duration(context, 160),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.surfaceElevated : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppRadii.full),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.ink.withValues(alpha: 0.06),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: selected ? AppColors.ink : AppColors.muted,
-            fontFamily: AppTypography.systemFont,
-            fontSize: 12.5,
-            fontWeight: FontWeight.w900,
-            height: 1.1,
-            letterSpacing: 0,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -3073,7 +2996,8 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
                   key: 'allowSpeaker',
                   value: value,
                 ),
-                onOpenRules: _careReminderRuleScenarios.contains(visible[index].scenario)
+                onOpenRules:
+                    _careReminderRuleScenarios.contains(visible[index].scenario)
                     ? () => _openCareReminderRules(
                         query: query,
                         childId: childId,
@@ -3193,7 +3117,9 @@ class _CareCapabilityRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final disabled = !canManage || savingEnabled || savingVoice || savingRules;
-    final hasReminderRules = _careReminderRuleScenarios.contains(capability.scenario);
+    final hasReminderRules = _careReminderRuleScenarios.contains(
+      capability.scenario,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -3277,7 +3203,8 @@ Future<Map<String, Object?>?> _showCareReminderRulesSheet(
                   max: 10,
                   step: 1,
                   enabled: true,
-                  onChanged: (value) => setSheetState(() => leaveMinutes = value),
+                  onChanged: (value) =>
+                      setSheetState(() => leaveMinutes = value),
                 ),
                 const _CompactDivider(),
               ],
@@ -3515,63 +3442,14 @@ class _DayTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const options = [('school_day', '上学日'), ('weekend', '周末')];
-    return AppSurface(
-      padding: const EdgeInsets.all(6),
-      child: Row(
-        children: [
-          for (final option in options) ...[
-            Expanded(
-              child: _DayTypeButton(
-                label: option.$2,
-                selected: value == option.$1,
-                onTap: onChanged == null ? null : () => onChanged!(option.$1),
-              ),
-            ),
-            if (option != options.last) const SizedBox(width: 6),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _DayTypeButton extends StatelessWidget {
-  const _DayTypeButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: AppMotion.duration(context, 160),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.ink : Colors.transparent,
-          borderRadius: BorderRadius.circular(13),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: selected ? Colors.white : AppColors.muted,
-            fontFamily: AppTypography.systemFont,
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0,
-          ),
-        ),
-      ),
+    return AppSegmentedControl<String>(
+      value: value,
+      semanticLabel: '作息类型',
+      onChanged: onChanged,
+      options: const [
+        AppSegmentOption(value: 'school_day', label: '上学日'),
+        AppSegmentOption(value: 'weekend', label: '周末'),
+      ],
     );
   }
 }
@@ -3926,6 +3804,33 @@ class _ConversationRulesPageState extends ConsumerState<ConversationRulesPage> {
                     controller: _wakeName,
                     readOnly: !canManageSetting,
                   ),
+                  const SizedBox(height: 8),
+                  const Text('请让孩子说：小暖小暖，或小暖你好。', style: _mutedText),
+                  const SizedBox(height: 12),
+                  ref
+                      .watch(voiceRuntimeProvider)
+                      .when(
+                        data: (runtime) => AppListRow(
+                          icon: Icons.mic_none_outlined,
+                          title: '语音服务状态',
+                          subtitle: _voiceRuntimeStatusText(runtime),
+                          tone: _profileMap(runtime['voice'])['running'] == true
+                              ? AppListRowTone.green
+                              : AppListRowTone.neutral,
+                        ),
+                        loading: () => const AppListRow(
+                          icon: Icons.mic_none_outlined,
+                          title: '语音服务状态',
+                          subtitle: '正在查询…',
+                          tone: AppListRowTone.neutral,
+                        ),
+                        error: (_, _) => const AppListRow(
+                          icon: Icons.mic_none_outlined,
+                          title: '语音服务状态',
+                          subtitle: '暂时无法连接语音服务',
+                          tone: AppListRowTone.neutral,
+                        ),
+                      ),
                   const SizedBox(height: 12),
                   const _FixedSettingOption(
                     icon: Icons.record_voice_over_outlined,
@@ -4085,7 +3990,7 @@ class _ConversationRulesPageState extends ConsumerState<ConversationRulesPage> {
   void _initializeDraft(Map<String, dynamic> value) {
     if (_draft != null) return;
     _draft = Map<String, dynamic>.from(value);
-    _wakeName.text = _textValue(_draft!['wakeName'], '小豆');
+    _wakeName.text = _textValue(_draft!['wakeName'], '小暖');
     final boundary = _conversationBoundaryPlan(
       _textValue(_draft!['boundaryLevel'], 'balanced'),
     );
@@ -4099,7 +4004,7 @@ class _ConversationRulesPageState extends ConsumerState<ConversationRulesPage> {
     if (value == null) return;
     final nextValue = Map<String, dynamic>.from(value)
       ..['wakeName'] = _wakeName.text.trim().isEmpty
-          ? '小豆'
+          ? '小暖'
           : _wakeName.text.trim()
       ..['voiceStyle'] = _defaultConversationVoiceStyle;
     setState(() => _saving = true);
@@ -4108,12 +4013,48 @@ class _ConversationRulesPageState extends ConsumerState<ConversationRulesPage> {
           .read(profileRepositoryProvider)
           .updateSetting('conversation', nextValue);
       ref.invalidate(profileSettingProvider('conversation'));
-      if (mounted) _toast(context, '设置已保存');
+      ref.invalidate(voiceRuntimeProvider);
+      if (!mounted) return;
+      try {
+        final policy = await ref
+            .read(profileRepositoryProvider)
+            .conversationPolicy();
+        if (!mounted) return;
+        final wakeName = _profileMap(policy['interactionProfile'])['wakeName'];
+        _toast(
+          context,
+          wakeName == null || '$wakeName'.isEmpty
+              ? '设置已保存'
+              : '设置已保存，唤醒名已同步：$wakeName',
+        );
+      } on ProfileException {
+        if (mounted) _toast(context, '设置已保存');
+      }
     } on ProfileException catch (error) {
       if (mounted) _toast(context, error.message);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
+  }
+
+  String _voiceRuntimeStatusText(Map<String, dynamic> runtime) {
+    final voice = _profileMap(runtime['voice']);
+    final wakeName = '${voice['wakeName'] ?? _wakeName.text.trim()}'.trim();
+    final running = voice['running'] == true;
+    final state = '${voice['state'] ?? 'idle'}';
+    if (!running) {
+      return wakeName.isEmpty ? '语音服务未启动' : '已保存：$wakeName · 语音服务未启动';
+    }
+    if (state == 'listening') {
+      return '已同步：$wakeName · 正在监听';
+    }
+    if (state == 'wake_detected') {
+      return '已同步：$wakeName · 刚刚被唤醒';
+    }
+    if (state == 'speaking') {
+      return '已同步：$wakeName · 正在回复';
+    }
+    return wakeName.isEmpty ? '语音服务已连接' : '已同步：$wakeName';
   }
 }
 
@@ -8362,26 +8303,21 @@ class _MemberRoleSelector extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 7),
-        AppSurface(
-          padding: const EdgeInsets.all(4),
-          color: AppColors.surfaceStrong.withValues(alpha: 0.62),
-          borderColor: AppColors.borderSoft,
-          radius: AppRadii.full,
-          child: Row(
-            children: [
-              for (final role in roles)
-                Expanded(
-                  child: _MemberRoleButton(
-                    key: ValueKey('memberRoleSegment_${role.key}'),
-                    label: role.label,
-                    selected: role.key == selected,
-                    disabled:
-                        disabledKeys.contains(role.key) && role.key != selected,
-                    onTap: () => onChanged(role.key),
-                  ),
-                ),
-            ],
-          ),
+        AppSegmentedControl<String>(
+          value: selected,
+          semanticLabel: '权限角色',
+          compact: true,
+          onChanged: onChanged,
+          options: [
+            for (final role in roles)
+              AppSegmentOption<String>(
+                value: role.key,
+                label: role.label,
+                key: ValueKey('memberRoleSegment_${role.key}'),
+                enabled:
+                    !disabledKeys.contains(role.key) || role.key == selected,
+              ),
+          ],
         ),
         AnimatedSwitcher(
           duration: AppMotion.duration(context, 160),
@@ -8408,80 +8344,6 @@ class _MemberRoleSelector extends StatelessWidget {
                 ),
         ),
       ],
-    );
-  }
-}
-
-class _MemberRoleButton extends StatelessWidget {
-  const _MemberRoleButton({
-    required this.label,
-    required this.selected,
-    required this.disabled,
-    required this.onTap,
-    super.key,
-  });
-
-  final String label;
-  final bool selected;
-  final bool disabled;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final foreground = disabled
-        ? AppColors.disabledInk
-        : selected
-        ? Colors.white
-        : AppColors.muted;
-    return Semantics(
-      button: true,
-      selected: selected,
-      enabled: !disabled,
-      label: '权限角色，$label',
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: disabled ? null : onTap,
-        child: AnimatedContainer(
-          duration: AppMotion.duration(context, 170),
-          curve: Curves.easeOutCubic,
-          height: 34,
-          decoration: BoxDecoration(
-            color: selected ? AppColors.primaryButtonStart : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppRadii.full),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: AppColors.primaryButtonShadow.withValues(
-                        alpha: 0.12,
-                      ),
-                      blurRadius: 7,
-                      offset: const Offset(0, 3),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Center(
-            child: AnimatedDefaultTextStyle(
-              duration: AppMotion.duration(context, 150),
-              curve: Curves.easeOutCubic,
-              style: TextStyle(
-                color: foreground,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 12.5,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0,
-                height: 1,
-              ),
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -9070,3 +8932,11 @@ const _mutedText = TextStyle(
   height: 1.45,
   letterSpacing: 0,
 );
+
+Map<String, dynamic> _profileMap(dynamic value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) {
+    return value.map((key, item) => MapEntry('$key', item));
+  }
+  return const {};
+}

@@ -93,7 +93,11 @@ class CameraEventsController extends AsyncNotifier<CameraEventsState> {
     final device = await ref.watch(selectedDeviceProvider.future);
     _deviceId = device?.id;
     final page = await _fetchPage(offset: 0);
-    return CameraEventsState(items: page.events, hasMore: page.hasMore);
+    return CameraEventsState(
+      items: _mergeCameraEvents(page.events),
+      hasMore: page.hasMore,
+      loadedCount: page.events.length,
+    );
   }
 
   Future<void> refresh({bool keepPrevious = true}) async {
@@ -103,8 +107,15 @@ class CameraEventsController extends AsyncNotifier<CameraEventsState> {
     }
     try {
       final page = await _fetchPage(offset: 0);
+      final items = previous == null
+          ? page.events
+          : [...page.events, ...previous.items];
       state = AsyncData(
-        CameraEventsState(items: page.events, hasMore: page.hasMore),
+        CameraEventsState(
+          items: _mergeCameraEvents(items),
+          hasMore: page.hasMore,
+          loadedCount: page.events.length,
+        ),
       );
     } catch (error, stackTrace) {
       if (previous != null && keepPrevious) {
@@ -115,22 +126,27 @@ class CameraEventsController extends AsyncNotifier<CameraEventsState> {
     }
   }
 
-  Future<void> loadMore() async {
+  Future<bool> loadMore() async {
     final current = state.asData?.value;
-    if (current == null || !current.hasMore || current.isLoadingMore) return;
+    if (current == null || !current.hasMore || current.isLoadingMore) {
+      return current?.hasMore ?? false;
+    }
     state = AsyncData(current.copyWith(isLoadingMore: true));
     try {
-      final page = await _fetchPage(offset: current.items.length);
-      final merged = [...current.items, ...page.events];
+      final page = await _fetchPage(offset: current.loadedCount);
+      final merged = _mergeCameraEvents([...current.items, ...page.events]);
       state = AsyncData(
         CameraEventsState(
           items: merged,
           hasMore: page.hasMore,
           isLoadingMore: false,
+          loadedCount: current.loadedCount + page.events.length,
         ),
       );
+      return page.hasMore;
     } catch (_) {
       state = AsyncData(current.copyWith(isLoadingMore: false));
+      return current.hasMore;
     }
   }
 
@@ -147,7 +163,7 @@ class CameraEventsController extends AsyncNotifier<CameraEventsState> {
         return;
       }
       state = AsyncData(
-        current.copyWith(items: [item, ...current.items]),
+        current.copyWith(items: _mergeCameraEvents([item, ...current.items])),
       );
       return;
     }
@@ -289,10 +305,30 @@ class CameraRepository {
       final response = await _dio.get<List<int>>(
         '/camera/snapshot',
         queryParameters: _deviceQuery(deviceId),
-        options: Options(responseType: ResponseType.bytes),
+        options: Options(
+          responseType: ResponseType.bytes,
+          headers: const {'Accept': 'image/jpeg,*/*'},
+          validateStatus: (status) =>
+              status != null && status >= 200 && status < 300,
+        ),
       );
-      final bytes = response.data;
-      if (bytes == null || bytes.isEmpty) {
+      final statusCode = response.statusCode ?? 200;
+      if (statusCode == 204) {
+        final message = response.headers.value('x-mira-snapshot-message');
+        return CameraSnapshotFrame(
+          available: false,
+          bytes: null,
+          contentType: '',
+          message: _snapshotUnavailableMessage(message),
+        );
+      }
+      final rawBytes = response.data;
+      final bytes = rawBytes is Uint8List
+          ? rawBytes
+          : rawBytes == null
+          ? null
+          : Uint8List.fromList(rawBytes);
+      if (bytes == null || bytes.isEmpty || !_looksLikeJpeg(bytes)) {
         final message = response.headers.value('x-mira-snapshot-message');
         return CameraSnapshotFrame(
           available: false,
@@ -303,11 +339,20 @@ class CameraRepository {
       }
       return CameraSnapshotFrame(
         available: true,
-        bytes: Uint8List.fromList(bytes),
+        bytes: bytes,
         contentType: response.headers.value('content-type') ?? 'image/jpeg',
         message: '快照已更新',
       );
     } on DioException catch (error) {
+      if (error.response?.statusCode == 204) {
+        final message = error.response?.headers.value('x-mira-snapshot-message');
+        return CameraSnapshotFrame(
+          available: false,
+          bytes: null,
+          contentType: '',
+          message: _snapshotUnavailableMessage(message),
+        );
+      }
       final data = error.response?.data;
       if (data is Map) {
         final message = data['message'];
@@ -440,6 +485,13 @@ Map<String, dynamic> _asMap(dynamic value) {
   return <String, dynamic>{};
 }
 
+bool _looksLikeJpeg(Uint8List bytes) {
+  return bytes.length >= 3 &&
+      bytes[0] == 0xFF &&
+      bytes[1] == 0xD8 &&
+      bytes[2] == 0xFF;
+}
+
 String _snapshotUnavailableMessage(String? headerValue) {
   final value = (headerValue ?? '').trim();
   if (value == 'snapshot_unavailable') return '实时画面暂时不可用';
@@ -451,4 +503,19 @@ String _realtimeDedupeKey(LiveCareEvent event) {
   final bucket = event.createdAt ~/ 600000;
   final title = event.displayTitle.trim();
   return '${event.category}:$title:$bucket';
+}
+
+List<LiveCareEvent> _mergeCameraEvents(Iterable<LiveCareEvent> events) {
+  final byId = <String, LiveCareEvent>{};
+  for (final event in events) {
+    if (event.id.isEmpty) continue;
+    byId[event.id] = event;
+  }
+  final merged = byId.values.toList()
+    ..sort((a, b) {
+      final time = b.createdAt.compareTo(a.createdAt);
+      if (time != 0) return time;
+      return b.id.compareTo(a.id);
+    });
+  return merged;
 }

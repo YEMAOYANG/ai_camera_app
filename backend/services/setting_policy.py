@@ -40,7 +40,7 @@ SETTING_DEFAULTS = {
         "dataRetentionDays": 30,
     },
     "conversation": {
-        "wakeName": "小豆",
+        "wakeName": "小暖",
         "voiceStyle": "温柔女声，语速偏慢",
         "boundaryLevel": "balanced",
         "freeChatEnabled": True,

@@ -870,7 +870,7 @@ DeviceOverview _onlineDeviceOverview() {
       familyId: 'family_1',
       bindingCode: 'code',
       name: '客厅摄像头',
-      wakeName: '小豆',
+      wakeName: '小暖',
       location: '客厅',
       status: 'online',
       isDefault: true,

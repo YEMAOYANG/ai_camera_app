@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # 一键启动本地联调栈：
-#   ai_camera_test 媒体层（go2rtc + gunicorn + speaker/voice/task，不含 monitor_worker）
+#   ai_camera_test 媒体层（可选：go2rtc + speaker/task，不含 voice worker）
 #   Guardian 后端（app.py：API + WS + 作息调度）
-#   Guardian 观察 worker（Kimi Vision → internal observations）
+#   Guardian 观察 worker + 本地 voice worker（mock/ASR）
 #
 # 用法（在 backend 目录）：
 #   ./scripts/start-dev.sh              # 启动后在终端实时输出 API 日志
@@ -176,6 +176,7 @@ stop_listeners_on_port() {
 stop_guardian_processes() {
   stop_pid_file guardian-app
   stop_pid_file guardian-worker
+  stop_pid_file guardian-voice-worker
   stop_listeners_on_port "$GUARDIAN_PORT"
   stop_listeners_on_port "$GUARDIAN_WS_PORT"
 }
@@ -202,6 +203,19 @@ from workers.camera_observation_worker import build_worker_from_env
   return 0
 }
 
+verify_voice_worker_import() {
+  if ! env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -c "
+from workers.camera_voice_worker import build_worker_from_env
+" >/dev/null 2>&1; then
+    err "camera_voice_worker 无法加载"
+    env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -c "
+from workers.camera_voice_worker import build_worker_from_env
+" 2>&1 | tail -12 || true
+    return 1
+  fi
+  return 0
+}
+
 begin_worker_log_session() {
   local ts
   ts="$(date '+%Y-%m-%d %H:%M:%S %z')"
@@ -219,7 +233,7 @@ cleanup() {
   for pid in "${PIDS[@]:-}"; do
     kill "$pid" 2>/dev/null || true
   done
-  for name in guardian-app guardian-worker; do
+  for name in guardian-app guardian-worker guardian-voice-worker; do
     stop_pid_file "$name"
   done
   ok "已停止（ai_camera_test 媒体层仍保持运行；如需停止请在其目录运行 supervisor stop-all）"
@@ -235,9 +249,11 @@ fi
 load_env_file "$ENV_FILE"
 
 AI_CAMERA_TEST_DIR="${AI_CAMERA_TEST_WORKSPACE:-}"
-if [ -z "$AI_CAMERA_TEST_DIR" ] || [ ! -d "$AI_CAMERA_TEST_DIR" ]; then
-  err "请在 backend/.env 中设置 AI_CAMERA_TEST_WORKSPACE 为 ai_camera_test 目录"
-  exit 1
+AI_CAMERA_TEST_AVAILABLE=0
+if [ -n "$AI_CAMERA_TEST_DIR" ] && [ -d "$AI_CAMERA_TEST_DIR" ]; then
+  AI_CAMERA_TEST_AVAILABLE=1
+else
+  warn "未配置 AI_CAMERA_TEST_WORKSPACE，跳过 ai_camera_test 媒体层（语音仍可用 Guardian voice worker）"
 fi
 
 PYTHON_BIN="${PYTHON_BIN:-python3}"
@@ -265,8 +281,9 @@ echo "║  Mira Guardian 本地联调 — 一键启动                    ║"
 echo "╚══════════════════════════════════════════════════════╝"
 echo ""
 
-# ── 1. ai_camera_test 媒体层 ─────────────────────────────
-log "── 1/3 ai_camera_test 媒体层 ──"
+# ── 1. ai_camera_test 媒体层（可选）─────────────────────────
+if [ "$AI_CAMERA_TEST_AVAILABLE" -eq 1 ]; then
+log "── 1/4 ai_camera_test 媒体层 ──"
 
 CAMERA_HEALTH="http://127.0.0.1:${CAMERA_PORT}/api/health"
 GO2RTC_HEALTH="http://127.0.0.1:${GO2RTC_PORT}/api/streams"
@@ -297,23 +314,43 @@ fi
 
 CAMERA_PY="$AI_CAMERA_TEST_DIR/venv/bin/python"
 if [ -x "$CAMERA_PY" ]; then
-  # 禁止 monitor_worker 双写；只保留 speaker / voice / task
-  "$CAMERA_PY" -m runtime.supervisor stop monitor >/dev/null 2>&1 || true
-  for worker in speaker voice task; do
-    "$CAMERA_PY" -m runtime.supervisor stop "$worker" >/dev/null 2>&1 || true
-  done
-  sleep 1
-  for worker in speaker voice task; do
-    "$CAMERA_PY" -m runtime.supervisor start "$worker" >/dev/null 2>&1 || true
-  done
-  ok "ai_camera_test workers: speaker / voice / task（monitor 已关闭，speaker 已重启）"
+  # 禁止 monitor_worker 双写；speaker/task 仍用于播报；voice 唤醒可单独关闭
+  AI_CAMERA_TEST_VOICE_ENABLED="${AI_CAMERA_TEST_VOICE_ENABLED:-1}"
+  (
+    cd "$AI_CAMERA_TEST_DIR"
+    "$CAMERA_PY" -m runtime.supervisor stop monitor >/dev/null 2>&1 || true
+    for worker in speaker voice task; do
+      "$CAMERA_PY" -m runtime.supervisor stop "$worker" >/dev/null 2>&1 || true
+    done
+    sleep 1
+    for worker in speaker task; do
+      if ! "$CAMERA_PY" -m runtime.supervisor start "$worker" >/dev/null 2>&1; then
+        warn "ai_camera_test worker 启动失败: $worker（请在 $AI_CAMERA_TEST_DIR 查看日志）"
+      fi
+    done
+    if [ "$AI_CAMERA_TEST_VOICE_ENABLED" = "0" ] || [ "$AI_CAMERA_TEST_VOICE_ENABLED" = "false" ]; then
+      "$CAMERA_PY" -m runtime.supervisor stop voice >/dev/null 2>&1 || true
+      ok "ai_camera_test workers: speaker / task（AI_CAMERA_TEST_VOICE_ENABLED=0，已关闭语音唤醒）"
+    elif "$CAMERA_PY" -m runtime.supervisor start voice >/dev/null 2>&1; then
+      if "$CAMERA_PY" -m runtime.supervisor status voice 2>/dev/null | grep -q "'running': True"; then
+        ok "ai_camera_test workers: speaker / voice / task（voice 已桥接 Guardian）"
+      else
+        warn "ai_camera_test voice worker 未在监听，语音唤醒不可用（请在其目录运行: venv/bin/python -m runtime.supervisor start voice）"
+      fi
+    else
+      warn "ai_camera_test voice worker 启动失败（请在 $AI_CAMERA_TEST_DIR 查看日志）"
+    fi
+  )
 else
   warn "未找到 ai_camera_test venv，跳过 runtime workers"
+fi
+else
+  warn "跳过 ai_camera_test 媒体层"
 fi
 
 # ── 2. Guardian 后端 ─────────────────────────────────────
 log ""
-log "── 2/3 Guardian 后端 (app.py) ──"
+log "── 2/4 Guardian 后端 (app.py) ──"
 
 GUARDIAN_HEALTH="http://127.0.0.1:${GUARDIAN_PORT}/api/health"
 GUARDIAN_STARTED_BY_US=0
@@ -360,7 +397,7 @@ fi
 
 # ── 3. Guardian 观察 worker ──────────────────────────────
 log ""
-log "── 3/3 Guardian 观察 worker ──"
+log "── 3/4 Guardian 观察 worker ──"
 
 stop_pid_file guardian-worker
 for pid in $(pgrep -f "workers\.camera_observation_worker" 2>/dev/null || true); do
@@ -383,6 +420,38 @@ if ! kill -0 "$WORKER_PID" 2>/dev/null; then
 fi
 ok "camera_observation_worker 已启动（PID ${WORKER_PID}，间隔 ${CAMERA_OBSERVATION_INTERVAL_SECONDS:-60}s）"
 ok "日志: $LOG_DIR/guardian-worker.log"
+
+# ── 4. Guardian voice worker ─────────────────────────────
+log ""
+log "── 4/4 Guardian voice worker ──"
+
+VOICE_WORKER_ENABLED="${VOICE_WORKER_ENABLED:-0}"
+if [ "$VOICE_WORKER_ENABLED" = "0" ] || [ "$VOICE_WORKER_ENABLED" = "false" ]; then
+  warn "VOICE_WORKER_ENABLED=0，跳过 Guardian mock camera_voice_worker（测试摄像头请用 ai_camera_test voice worker）"
+else
+  stop_pid_file guardian-voice-worker
+  for pid in $(pgrep -f "workers\.camera_voice_worker" 2>/dev/null || true); do
+    kill "$pid" 2>/dev/null || true
+  done
+  sleep 1
+  if [ -z "${VOICE_WORKER_FAMILY_ID:-}" ]; then
+    warn "未设置 VOICE_WORKER_FAMILY_ID，跳过 camera_voice_worker（可在 backend/.env 配置）"
+  elif ! verify_voice_worker_import; then
+    exit 1
+  else
+    nohup env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -m workers.camera_voice_worker       >> "$LOG_DIR/guardian-voice-worker.log" 2>&1 &
+    VOICE_PID=$!
+    record_pid guardian-voice-worker "$VOICE_PID"
+    sleep 2
+    if ! kill -0 "$VOICE_PID" 2>/dev/null; then
+      err "camera_voice_worker 启动后立即退出，日志: $LOG_DIR/guardian-voice-worker.log"
+      show_startup_errors "$LOG_DIR/guardian-voice-worker.log"
+      exit 1
+    fi
+    ok "camera_voice_worker 已启动（PID ${VOICE_PID}，mock 模式）"
+    ok "日志: $LOG_DIR/guardian-voice-worker.log"
+  fi
+fi
 
 # ── 汇总 ────────────────────────────────────────────────
 LAN_IP="$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || true)"
@@ -413,8 +482,8 @@ case "$FOLLOW_LOGS" in
     tail -f "$LOG_DIR/guardian-worker.log"
     ;;
   all)
-    warn "实时日志: app + worker（Ctrl+C 停止全部）"
-    tail -f "$LOG_DIR/guardian-app.log" "$LOG_DIR/guardian-worker.log"
+    warn "实时日志: app + worker + voice（Ctrl+C 停止全部）"
+    tail -f "$LOG_DIR/guardian-app.log" "$LOG_DIR/guardian-worker.log" "$LOG_DIR/guardian-voice-worker.log"
     ;;
   app|*)
     warn "实时日志: API 请求（Ctrl+C 停止全部）"

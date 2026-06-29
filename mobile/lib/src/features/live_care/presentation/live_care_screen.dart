@@ -81,7 +81,8 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
             title: '摄像头状态暂时无法同步',
             message: '请稍后刷新。',
             primaryActionLabel: '重新加载',
-            onPrimaryAction: () => silentRefreshProvider(ref, selectedDeviceProvider),
+            onPrimaryAction: () =>
+                silentRefreshProvider(ref, selectedDeviceProvider),
             compact: true,
           ),
         ],
@@ -148,9 +149,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
     );
   }
 
-  Future<void> _refreshLiveCare({
-    bool analyzeFrame = false,
-  }) async {
+  Future<void> _refreshLiveCare({bool analyzeFrame = false}) async {
     if (!mounted) return;
     final generation = ++_refreshGeneration;
     final device = ref.read(selectedDeviceProvider).asData?.value;
@@ -171,9 +170,9 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
     if (analyzeFrame) {
       if (mounted) setState(() => _previewRefreshing = true);
       try {
-        final ran = await ref.read(monitorAnalysisGuardProvider).runHeavy(
-          runRefresh,
-        );
+        final ran = await ref
+            .read(monitorAnalysisGuardProvider)
+            .runHeavy(runRefresh);
         if (!ran && mounted && generation == _refreshGeneration) {
           await _refreshGuard.runLight(runRefresh);
         }
@@ -841,7 +840,7 @@ class _LiveEventsScreenState extends ConsumerState<LiveEventsScreen> {
     return ref.read(cameraEventsProvider.notifier).refresh();
   }
 
-  Future<void> _handleLoadMore() {
+  Future<bool> _handleLoadMore() {
     return ref.read(cameraEventsProvider.notifier).loadMore();
   }
 
@@ -859,7 +858,6 @@ class _LiveEventsScreenState extends ConsumerState<LiveEventsScreen> {
       easyRefreshController: _refreshController,
       onRefresh: _handleRefresh,
       onLoadMore: eventsState?.hasMore == true ? _handleLoadMore : null,
-      canLoadMore: eventsState?.hasMore ?? false,
       children: [
         events.when(
           skipLoadingOnRefresh: true,

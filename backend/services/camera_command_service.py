@@ -12,6 +12,7 @@ from repositories.device_repository import DeviceRepository
 from schemas.camera import camera_command_payload
 from schemas.vision import observation_is_reliable
 from services.auth_service import AuthService
+from services.conversation_policy_service import ConversationPolicyService
 from services.camera_bridge_service import CameraBridgeError, CameraBridgeService
 from services.device_runtime_resolver import DeviceRuntimeResolver
 from services.parent_facing_copy import sanitize_parent_facing_observation
@@ -32,6 +33,7 @@ class CameraCommandService:
         runtime_resolver: DeviceRuntimeResolver | None = None,
     ):
         database = Database(database_url)
+        self.database_url = database.database_url
         self.repository = CameraCommandRepository(database)
         self.device_repository = DeviceRepository(database)
         self.auth_service = auth_service
@@ -41,6 +43,19 @@ class CameraCommandService:
     def speak(self, access_token: str, data: dict) -> dict:
         context = self.auth_service.authenticate(access_token)
         text = self._required_text(data, "text", "请输入要提醒孩子的话")
+        task_id = self._optional_text(data, "taskId")
+        if not task_id:
+            with self.device_repository.transaction() as conn:
+                decision = ConversationPolicyService(self.database_url).evaluate_speak_context(
+                    conn,
+                    family_id=context["family"]["id"],
+                )
+            if not decision.get("allowed"):
+                raise ApiError(
+                    "conversation_speak_blocked",
+                    str(decision.get("message") or "当前不允许自由聊天播报。"),
+                    409,
+                )
         bridge, device_id = self._runtime_for_command(
             family_id=context["family"]["id"],
             device_id=self._optional_text(data, "deviceId"),

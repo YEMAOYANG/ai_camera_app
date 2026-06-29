@@ -30,6 +30,10 @@ from services.prompt_registry import PromptRegistry
 from services.task_service import TaskService
 from services.task_template_service import TaskTemplateService
 from services.task_runtime_service import TaskRuntimeService
+from services.conversation_app_service import ConversationAppService
+from services.conversation_sync_service import ConversationSyncService
+from services.voice_conversation_service import VoiceConversationService
+from services.voice_runtime_app_service import VoiceRuntimeAppService
 
 
 def auth_service() -> AuthService:
@@ -232,6 +236,8 @@ def build_ai_vision_provider_from_config(config: dict):
     max_dimension = int(config.get("AI_VISION_MAX_DIMENSION", 1280))
     jpeg_quality = int(config.get("AI_VISION_JPEG_QUALITY", 85))
     if provider in {"moonshot", "kimi", "openai", "openai_compatible"} and api_key and base_url and model:
+        # kimi-k2.6 thinking 会吃掉 max_tokens，导致 content 为空；视觉观察只需 JSON 输出。
+        disable_thinking = provider in {"moonshot", "kimi"} or str(model).startswith("kimi-k")
         return OpenAICompatibleVisionProvider(
             provider_name="moonshot" if provider == "kimi" else provider,
             api_key=api_key,
@@ -241,7 +247,7 @@ def build_ai_vision_provider_from_config(config: dict):
             max_bytes=max_bytes,
             max_image_dimension=max_dimension,
             jpeg_quality=jpeg_quality,
-            disable_thinking=False,
+            disable_thinking=disable_thinking,
         )
     return UnavailableVisionProvider()
 
@@ -279,3 +285,28 @@ def _require_dev_adapter(label: str) -> None:
         f"{label} 只能在 development/test profile 下启用。",
         503,
     )
+
+def conversation_service() -> ConversationAppService:
+    database_url = current_app.config["DATABASE_URL"]
+    return ConversationAppService(
+        database_url,
+        auth_service=auth_service(),
+        conversation_service=VoiceConversationService(
+            database_url,
+            ai_text_provider=ai_text_provider(),
+            prompt_registry=prompt_registry(),
+        ),
+    )
+
+
+def conversation_sync_service() -> ConversationSyncService:
+    return ConversationSyncService(current_app.config["DATABASE_URL"])
+
+
+def voice_runtime_service() -> VoiceRuntimeAppService:
+    return VoiceRuntimeAppService(
+        current_app.config["DATABASE_URL"],
+        auth_service=auth_service(),
+        sync_service=conversation_sync_service(),
+    )
+

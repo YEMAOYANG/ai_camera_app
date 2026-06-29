@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/shared/domain/guardian_identity.dart';
+import 'package:warm_sight/src/shared/widgets/app_segmented_control.dart';
 import 'package:warm_sight/src/shared/widgets/guardian_identity_card_selector.dart';
 
 class GuardianIdentitySelector extends StatelessWidget {
@@ -105,118 +106,21 @@ class GuardianIdentityGroupSegmentedControl extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 7),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            final segmentWidth = width / groups.length;
-            return SizedBox(
-              height: AppControls.minTouchTarget,
-              child: Center(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceStrong.withValues(alpha: 0.62),
-                    borderRadius: BorderRadius.circular(AppRadii.full),
-                    border: Border.all(color: AppColors.borderSoft),
-                  ),
-                  child: SizedBox(
-                    height: 36,
-                    child: Stack(
-                      children: [
-                        AnimatedPositioned(
-                          duration: AppMotion.duration(context, 190),
-                          curve: Curves.easeOutCubic,
-                          left: selectedIndex * segmentWidth + 3,
-                          top: 3,
-                          width: segmentWidth - 6,
-                          height: 30,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: AppColors.brandDeep,
-                              borderRadius: BorderRadius.circular(
-                                AppRadii.full,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.brandDeep.withValues(
-                                    alpha: 0.16,
-                                  ),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            for (final group in groups)
-                              Expanded(
-                                child: _GuardianIdentityGroupSegmentButton(
-                                  key: ValueKey(
-                                    'guardianIdentityGroupOption_${group.key}',
-                                  ),
-                                  label: group.label,
-                                  selected: group.key == selectedKey,
-                                  onTap: () => onChanged(group.key),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+        AppSegmentedControl<String>(
+          value: groups[selectedIndex].key,
+          semanticLabel: label,
+          compact: true,
+          onChanged: onChanged,
+          options: [
+            for (final group in groups)
+              AppSegmentOption<String>(
+                value: group.key,
+                label: group.label,
+                key: ValueKey('guardianIdentityGroupOption_${group.key}'),
               ),
-            );
-          },
+          ],
         ),
       ],
-    );
-  }
-}
-
-class _GuardianIdentityGroupSegmentButton extends StatelessWidget {
-  const _GuardianIdentityGroupSegmentButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    super.key,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: '家庭身份，$label',
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Center(
-          child: AnimatedDefaultTextStyle(
-            duration: AppMotion.duration(context, 160),
-            curve: Curves.easeOutCubic,
-            style: TextStyle(
-              color: selected ? Colors.white : AppColors.muted,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0,
-              height: 1,
-            ),
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

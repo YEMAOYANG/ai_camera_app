@@ -12,6 +12,8 @@ from repositories.setup_repository import SetupRepository
 from schemas.auth import normalize_phone
 from schemas.setup import setup_payload
 from services.auth_service import AuthService
+from services.conversation_sync_service import ConversationSyncService
+from services.wake_name_validator import validate_wake_name
 
 
 LEGACY_GUARDIAN_IDENTITY_KEYS = {
@@ -57,6 +59,7 @@ class SetupService:
         self.auth_service = auth_service
         self.camera_command_service_factory = camera_command_service_factory
         database = Database(database_url)
+        self.database_url = database.database_url
         self.repository = SetupRepository(database)
         self.device_repository = DeviceRepository(database)
 
@@ -338,6 +341,9 @@ class SetupService:
                 wake_name=wake_name,
                 now=now,
             )
+            ConversationSyncService(self.database_url).sync_family_conversation(
+                family_id=context["family"]["id"],
+            )
             self.repository.mark_step_done(
                 conn,
                 family_id=context["family"]["id"],
@@ -581,7 +587,7 @@ class SetupService:
             conn,
             family_id=family_id,
             device_id=device_id,
-            wake_name="小豆",
+            wake_name="小暖",
             now=now,
         )
 
@@ -841,21 +847,11 @@ class SetupService:
         family_names: set[str],
         allow_fallback: bool = False,
     ) -> str:
-        raw = str(value or "").strip()
-        if not raw and allow_fallback:
-            return "小豆"
-        if not raw:
-            raise ApiError("missing_wakeName", "请输入摄像头名字")
-        if raw in family_names:
-            raise ApiError("confusing_wakeName", "这个名字容易和家人称呼混淆，请换一个")
-        blocked = {"笨蛋", "傻瓜", "坏蛋", "讨厌", "滚"}
-        if any(word in raw for word in blocked):
-            raise ApiError("blocked_wakeName", "这个名字不太适合孩子使用，请换一个")
-        chinese_only = re.fullmatch(r"[\u4e00-\u9fff]{2,6}", raw)
-        short_name = re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9]{2,12}", raw)
-        if not chinese_only and not short_name:
-            raise ApiError("invalid_wakeName", "名字建议 2 到 6 个中文，或简短好读的名称")
-        return raw
+        return validate_wake_name(
+            value,
+            family_names=family_names,
+            allow_fallback=allow_fallback,
+        )
 
     def _speak_for_setup(self, *, family_id: str, text: str) -> dict:
         if self.camera_command_service_factory is None:

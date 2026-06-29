@@ -20,6 +20,7 @@ import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:warm_sight/src/shared/widgets/app_button.dart';
 import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
 import 'package:warm_sight/src/shared/widgets/app_screen.dart';
+import 'package:warm_sight/src/shared/widgets/app_segmented_control.dart';
 import 'package:warm_sight/src/shared/widgets/app_time_picker_sheet.dart';
 import 'package:warm_sight/src/shared/widgets/app_toast.dart';
 import 'package:warm_sight/src/shared/widgets/guardian_identity_card_selector.dart';
@@ -467,7 +468,7 @@ class _FamilyRoleSegmentedControl extends StatelessWidget {
         _FieldLabel(label),
         const SizedBox(height: 8),
         LayoutBuilder(
-          builder: (context, constraints) {
+          builder: (context, _) {
             if (options.isEmpty) {
               return const _SetupStatusPanel(
                 icon: Icons.manage_accounts_outlined,
@@ -476,158 +477,23 @@ class _FamilyRoleSegmentedControl extends StatelessWidget {
                 tone: _SetupTone.neutral,
               );
             }
-            final selectedIndex = options
-                .indexWhere((option) => option.key == selected)
-                .clamp(0, options.length - 1);
-            final segmentWidth = constraints.maxWidth / options.length;
-            final indicatorWidth = segmentWidth * 0.46;
 
-            return DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.surfaceElevated.withValues(alpha: 0.72),
-                borderRadius: BorderRadius.circular(AppRadii.control - 1),
-                border: Border.all(color: AppColors.borderSoft),
-              ),
-              child: SizedBox(
-                height: AppControls.minTouchTarget,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: Row(
-                        children: [
-                          for (
-                            var index = 0;
-                            index < options.length;
-                            index++
-                          ) ...[
-                            if (index > 0)
-                              Container(
-                                width: 1,
-                                height: 18,
-                                color: AppColors.borderSoft.withValues(
-                                  alpha: 0.78,
-                                ),
-                              ),
-                            Expanded(
-                              child: _FamilyRoleSegmentButton(
-                                key: ValueKey(
-                                  'familyRoleSegment_${options[index].key}',
-                                ),
-                                label: options[index].label,
-                                selected: selected == options[index].key,
-                                onTap: () => onSelect(options[index].key),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    AnimatedPositioned(
-                      key: const ValueKey('familyRoleIndicator'),
-                      left:
-                          selectedIndex * segmentWidth +
-                          (segmentWidth - indicatorWidth) / 2,
-                      bottom: 5,
-                      width: indicatorWidth,
-                      height: 3,
-                      duration: AppMotion.duration(context, 180),
-                      curve: Curves.easeOutCubic,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: AppColors.brandDeep,
-                          borderRadius: BorderRadius.circular(AppRadii.full),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.brandDeep.withValues(
-                                alpha: 0.12,
-                              ),
-                              blurRadius: 5,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            return AppSegmentedControl<String>(
+              value: selected,
+              semanticLabel: label,
+              onChanged: onSelect,
+              options: [
+                for (final option in options)
+                  AppSegmentOption<String>(
+                    value: option.key,
+                    label: option.label,
+                    key: ValueKey('familyRoleSegment_${option.key}'),
+                  ),
+              ],
             );
           },
         ),
       ],
-    );
-  }
-}
-
-class _FamilyRoleSegmentButton extends StatefulWidget {
-  const _FamilyRoleSegmentButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    super.key,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  State<_FamilyRoleSegmentButton> createState() =>
-      _FamilyRoleSegmentButtonState();
-}
-
-class _FamilyRoleSegmentButtonState extends State<_FamilyRoleSegmentButton> {
-  bool _pressed = false;
-
-  void _setPressed(bool value) {
-    if (_pressed == value) return;
-    setState(() => _pressed = value);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final selected = widget.selected;
-    final duration = AppMotion.duration(context, 150);
-
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: '选择家庭角色，${widget.label}',
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onTap,
-        onTapDown: (_) => _setPressed(true),
-        onTapUp: (_) => _setPressed(false),
-        onTapCancel: () => _setPressed(false),
-        child: AnimatedContainer(
-          duration: duration,
-          curve: Curves.easeOutCubic,
-          height: AppControls.minTouchTarget,
-          color: _pressed
-              ? AppColors.brandWash.withValues(alpha: 0.34)
-              : Colors.transparent,
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(6, 0, 6, 4),
-              child: Text(
-                widget.label,
-                key: ValueKey('familyRoleLabel_${widget.label}'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: selected ? AppColors.brandDeep : AppColors.muted,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0,
-                  height: 1.1,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -1849,7 +1715,7 @@ class _NameSuggestionRow extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final name in const ['小豆', '小安', '小守'])
+            for (final name in const ['小暖', '小安', '小守'])
               _ChoiceChipButton(
                 label: name,
                 selected: selected == name,
