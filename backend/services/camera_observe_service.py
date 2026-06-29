@@ -131,6 +131,7 @@ class CameraObserveService:
         current_session = session_snapshot_from_observation(analysis)
         has_person = analysis.get("has_person")
 
+        pending_runtime: dict[str, Any] | None = None
         with self.repository.transaction() as conn:
             runtime = self.runtime_store.load(
                 conn,
@@ -154,6 +155,7 @@ class CameraObserveService:
             runtime["session"]["bucket"] = current_session["bucket"]
             runtime["session"]["risk"] = current_session["risk"]
             runtime["display"] = _runtime_display_from_analysis(analysis, now_ms=now)
+            pending_runtime = runtime
 
             post_force = force_post or risk_escalated(previous_session, current_session)
             should_post, post_reason = should_post_observation(
@@ -164,7 +166,7 @@ class CameraObserveService:
                 recorded_absent=bool(absence.get("recorded_absent")),
             )
             if not should_post and not post_force:
-                self.runtime_store.save(
+                self._save_runtime_state(
                     conn,
                     family_id=family_id,
                     child_id=child_id,
@@ -192,20 +194,13 @@ class CameraObserveService:
             observed_at=end,
         )
         if payload is None:
-            with self.repository.transaction() as conn:
-                runtime = self.runtime_store.load(
-                    conn,
+            if pending_runtime is not None:
+                pending_runtime["display"] = _runtime_display_from_analysis(analysis, now_ms=now)
+                self._save_runtime(
                     family_id=family_id,
                     child_id=child_id,
                     device_id=device_id,
-                )
-                runtime["display"] = _runtime_display_from_analysis(analysis, now_ms=now)
-                self.runtime_store.save(
-                    conn,
-                    family_id=family_id,
-                    child_id=child_id,
-                    device_id=device_id,
-                    payload=runtime,
+                    payload=pending_runtime,
                     now=now,
                 )
             return ObserveTickResult(
@@ -218,19 +213,12 @@ class CameraObserveService:
             )
 
         if not str(child_id or "").strip():
-            with self.repository.transaction() as conn:
-                runtime = self.runtime_store.load(
-                    conn,
+            if pending_runtime is not None:
+                self._save_runtime(
                     family_id=family_id,
                     child_id=child_id,
                     device_id=device_id,
-                )
-                self.runtime_store.save(
-                    conn,
-                    family_id=family_id,
-                    child_id=child_id,
-                    device_id=device_id,
-                    payload=runtime,
+                    payload=pending_runtime,
                     now=now,
                 )
             return ObserveTickResult(
@@ -248,19 +236,12 @@ class CameraObserveService:
             device_id=device_id,
             payload=payload,
         ):
-            with self.repository.transaction() as conn:
-                runtime = self.runtime_store.load(
-                    conn,
+            if pending_runtime is not None:
+                self._save_runtime(
                     family_id=family_id,
                     child_id=child_id,
                     device_id=device_id,
-                )
-                self.runtime_store.save(
-                    conn,
-                    family_id=family_id,
-                    child_id=child_id,
-                    device_id=device_id,
-                    payload=runtime,
+                    payload=pending_runtime,
                     now=now,
                 )
             return ObserveTickResult(
@@ -277,29 +258,22 @@ class CameraObserveService:
         duplicate = bool(response.get("duplicate") or response.get("duplicateCareEvent"))
         posted = not duplicate and bool(response.get("ok"))
 
-        with self.repository.transaction() as conn:
-            runtime = self.runtime_store.load(
-                conn,
-                family_id=family_id,
-                child_id=child_id,
-                device_id=device_id,
+        runtime = dict(pending_runtime or {})
+        if should_write_absent_record(runtime.get("absence") or {}, has_person=has_person) and posted:
+            runtime["absence"] = mark_absent_recorded(dict(runtime.get("absence") or {}))
+        if posted:
+            runtime["session"] = update_session_after_post(
+                dict(runtime.get("session") or {}),
+                current_session,
+                now_ms=now,
             )
-            if should_write_absent_record(runtime.get("absence") or {}, has_person=has_person) and posted:
-                runtime["absence"] = mark_absent_recorded(dict(runtime.get("absence") or {}))
-            if posted:
-                runtime["session"] = update_session_after_post(
-                    dict(runtime.get("session") or {}),
-                    current_session,
-                    now_ms=now,
-                )
-            self.runtime_store.save(
-                conn,
-                family_id=family_id,
-                child_id=child_id,
-                device_id=device_id,
-                payload=runtime,
-                now=now,
-            )
+        self._save_runtime(
+            family_id=family_id,
+            child_id=child_id,
+            device_id=device_id,
+            payload=runtime,
+            now=now,
+        )
 
         return ObserveTickResult(
             skipped=False,
@@ -309,6 +283,44 @@ class CameraObserveService:
             observation_count=1,
             response=response,
         )
+
+    def _save_runtime_state(
+        self,
+        conn,
+        *,
+        family_id: str,
+        child_id: str,
+        device_id: str,
+        payload: Mapping[str, Any],
+        now: int,
+    ) -> None:
+        self.runtime_store.save(
+            conn,
+            family_id=family_id,
+            child_id=child_id,
+            device_id=device_id,
+            payload=payload,
+            now=now,
+        )
+
+    def _save_runtime(
+        self,
+        *,
+        family_id: str,
+        child_id: str,
+        device_id: str,
+        payload: Mapping[str, Any],
+        now: int,
+    ) -> None:
+        with self.repository.transaction() as conn:
+            self._save_runtime_state(
+                conn,
+                family_id=family_id,
+                child_id=child_id,
+                device_id=device_id,
+                payload=payload,
+                now=now,
+            )
 
     def _analyze_image(
         self,
