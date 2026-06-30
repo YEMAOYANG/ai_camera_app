@@ -196,6 +196,8 @@ class CameraObserveService:
         analysis = enrich_observation(dict(analysis))
         current_session = session_snapshot_from_observation(analysis)
         has_person = analysis.get("has_person")
+        previous_bucket = str(context.previous_session.get("bucket") or "other")
+        absent_to_present = previous_bucket == "absent" and has_person is True
 
         care_behavior = sync_care_behavior_from_analysis(
             dict(gate_decision.next_care_behavior or context.runtime.get("care_behavior") or {}),
@@ -228,7 +230,11 @@ class CameraObserveService:
             runtime["session"]["last_cloud_at"] = now
             runtime["session"]["bucket"] = current_session["bucket"]
             runtime["session"]["risk"] = current_session["risk"]
-            runtime["display"] = _runtime_display_from_analysis(analysis, now_ms=now)
+            runtime["display"] = _runtime_display_from_analysis(
+                analysis,
+                now_ms=now,
+                absent_recovery=absent_to_present,
+            )
             pending_runtime = runtime
 
             should_post, post_reason = should_post_observation(
@@ -277,10 +283,21 @@ class CameraObserveService:
             window_start_ms=start,
             window_end_ms=end,
             observed_at=end,
+            absent_to_present=absent_to_present,
         )
         if payload is None:
             if pending_runtime is not None:
-                pending_runtime["display"] = _runtime_display_from_analysis(analysis, now_ms=now)
+                if absent_to_present:
+                    pending_runtime["display"] = _pending_absence_recovery_display(
+                        analysis,
+                        now_ms=now,
+                    )
+                else:
+                    pending_runtime["display"] = _runtime_display_from_analysis(
+                        analysis,
+                        now_ms=now,
+                        absent_recovery=absent_to_present,
+                    )
                 self._save_runtime(
                     family_id=family_id,
                     child_id=child_id,
@@ -291,6 +308,37 @@ class CameraObserveService:
             return ObserveTickResult(
                 skipped=True,
                 skip_reason="no_actionable_signal",
+                analysis=analysis,
+                posted=False,
+                observation_count=0,
+                response=None,
+            )
+
+        signal_type = ""
+        signals = payload.get("signals")
+        if isinstance(signals, list) and signals:
+            signal_type = str(signals[0].get("signalType") or "")
+        payload_confidence = float(payload.get("confidence") or 0)
+        if (
+            signal_type == "child_visible"
+            and payload_confidence < 0.5
+            and payload.get("recordCareEvent") is False
+        ):
+            if pending_runtime is not None:
+                pending_runtime["display"] = _pending_absence_recovery_display(
+                    analysis,
+                    now_ms=now,
+                )
+                self._save_runtime(
+                    family_id=family_id,
+                    child_id=child_id,
+                    device_id=device_id,
+                    payload=pending_runtime,
+                    now=now,
+                )
+            return ObserveTickResult(
+                skipped=True,
+                skip_reason="transition_pending_confirmation",
                 analysis=analysis,
                 posted=False,
                 observation_count=0,
@@ -595,8 +643,19 @@ def _absent_runtime_display(now_ms: int) -> dict[str, object]:
     }
 
 
-def _runtime_display_from_analysis(analysis: Mapping[str, object], *, now_ms: int) -> dict[str, object]:
+def _runtime_display_from_analysis(
+    analysis: Mapping[str, object],
+    *,
+    now_ms: int,
+    absent_recovery: bool = False,
+) -> dict[str, object]:
     enriched = enrich_observation(dict(analysis))
+    try:
+        confidence = float(enriched.get("confidence") or 0)
+    except (TypeError, ValueError):
+        confidence = 0.0
+    if absent_recovery and confidence < 0.5:
+        return _pending_absence_recovery_display(enriched, now_ms=now_ms)
     display = {
         "observed_at": now_ms,
         "has_person": enriched.get("has_person"),
@@ -614,6 +673,29 @@ def _runtime_display_from_analysis(analysis: Mapping[str, object], *, now_ms: in
         last_kimi_at_ms=now_ms,
     )
     return display
+
+
+def _pending_absence_recovery_display(
+    analysis: Mapping[str, object],
+    *,
+    now_ms: int,
+) -> dict[str, object]:
+    try:
+        confidence = float(analysis.get("confidence") or 0)
+    except (TypeError, ValueError):
+        confidence = 0.0
+    return {
+        "observed_at": now_ms,
+        "freshness": "fresh",
+        "has_person": analysis.get("has_person"),
+        "activity": analysis.get("activity") or analysis.get("raw_activity") or "",
+        "raw_activity": analysis.get("raw_activity") or "",
+        "confidence": confidence,
+        "description": "画面已更新，仍待确认",
+        "decision_reason": "画面恢复，但还不能可靠判断",
+        "isReliable": False,
+        "is_meal_scene": False,
+    }
 
 
 def build_observe_service_from_env(environ: Mapping[str, str] | None = None) -> CameraObserveService:

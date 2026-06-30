@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import unittest
 
-from services.observation_payload_builder import build_primary_payload
+from services.care_policy_engine import NON_ACTIONABLE_SIGNAL_TYPES
+from services.observation_payload_builder import build_primary_payload, transition_child_visible_summary
 from services.observation_absence_mode import should_skip_vision_before_analyze, update_absence_after_analysis
 from services.observation_session_state import risk_escalated, session_snapshot_from_observation, should_force_screen_use_resample, should_post_observation
 from services.vision_frame_gate import compute_dhash, frame_is_stable, hamming_distance
@@ -341,6 +342,115 @@ class ObservationGateTest(unittest.TestCase):
         self.assertTrue(post_force)
         self.assertTrue(should_post)
         self.assertEqual(resolved_reason, "session_changed")
+
+    def test_absence_recovery_forces_post(self):
+        should_post, reason = should_post_observation(
+            previous_session={"bucket": "absent", "risk": "absent"},
+            current_session={"bucket": "other", "risk": "none"},
+            has_person=True,
+            absence_mode="active",
+            recorded_absent=False,
+        )
+        self.assertTrue(should_post)
+        self.assertEqual(reason, "absence_recovery")
+
+    def test_child_visible_only_when_absent_to_present(self):
+        payload = build_primary_payload(
+            {
+                "has_person": True,
+                "activity": "未知",
+                "confidence": 0.55,
+            },
+            family_id="fam_1",
+            child_id="child_1",
+            device_id="dev_1",
+            source="test",
+            window_start_ms=1_000,
+            window_end_ms=4_000,
+            observed_at=4_000,
+            absent_to_present=True,
+        )
+        self.assertIsNotNone(payload)
+        assert payload is not None
+        self.assertEqual(payload["signals"][0]["signalType"], "child_visible")
+        self.assertTrue(payload["recordCareEvent"])
+
+    def test_child_visible_not_added_without_absent_transition(self):
+        payload = build_primary_payload(
+            {
+                "has_person": True,
+                "activity": "未知",
+                "confidence": 0.55,
+            },
+            family_id="fam_1",
+            child_id="child_1",
+            device_id="dev_1",
+            source="test",
+            window_start_ms=1_000,
+            window_end_ms=4_000,
+            observed_at=4_000,
+            absent_to_present=False,
+        )
+        self.assertIsNone(payload)
+
+    def test_child_visible_low_confidence_skips_care_event(self):
+        payload = build_primary_payload(
+            {
+                "has_person": True,
+                "activity": "未知",
+                "confidence": 0.30,
+            },
+            family_id="fam_1",
+            child_id="child_1",
+            device_id="dev_1",
+            source="test",
+            window_start_ms=1_000,
+            window_end_ms=4_000,
+            observed_at=4_000,
+            absent_to_present=True,
+        )
+        self.assertIsNotNone(payload)
+        assert payload is not None
+        self.assertEqual(payload["signals"][0]["signalType"], "child_visible")
+        self.assertFalse(payload["recordCareEvent"])
+
+    def test_screen_use_priority_over_child_visible(self):
+        payload = build_primary_payload(
+            {
+                "has_person": True,
+                "activity": "玩手机",
+                "screen_device_visible": True,
+                "screen_use_active": True,
+                "screen_device_type": "phone",
+                "screen_use_duration_hint": "sustained",
+                "confidence": 0.84,
+            },
+            family_id="fam_1",
+            child_id="child_1",
+            device_id="dev_1",
+            source="test",
+            window_start_ms=1_000,
+            window_end_ms=4_000,
+            observed_at=4_000,
+            absent_to_present=True,
+        )
+        self.assertIsNotNone(payload)
+        assert payload is not None
+        self.assertEqual(payload["scenario"], "screen_use")
+        self.assertNotEqual(payload["signals"][0]["signalType"], "child_visible")
+
+    def test_child_visible_is_non_actionable(self):
+        self.assertIn("child_visible", NON_ACTIONABLE_SIGNAL_TYPES)
+
+    def test_transition_summary_conservative_copy(self):
+        self.assertEqual(
+            transition_child_visible_summary({"has_person": True, "confidence": 0.55}),
+            "画面里有人活动。",
+        )
+        self.assertEqual(
+            transition_child_visible_summary({"has_person": True, "confidence": 0.70, "activity": "玩玩具"}),
+            "画面里看到孩子活动。",
+        )
 
 
 def _tiny_png() -> bytes:

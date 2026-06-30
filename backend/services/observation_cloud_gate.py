@@ -16,6 +16,15 @@ from services.vision_prefilter_service import PrefilterResult
 
 TOY_SESSION_ACTIVE = {"playing", "toys_visible", "scattered", "play"}
 
+BEHAVIOR_CARE_CAPABILITIES = frozenset(
+    {
+        CARE_SCENARIO_POSTURE,
+        CARE_SCENARIO_TOY_CLEANUP,
+        CARE_SCENARIO_MEAL_HABIT,
+        CARE_SCENARIO_SCREEN_USE,
+    }
+)
+
 POSTURE_MONITOR_CONTEXTS = frozenset(
     {"desk", "homework", "reading", "study", "screen", "writing", "homework_study"}
 )
@@ -49,6 +58,7 @@ class CloudGateConfig:
     meal_habit_interval_seconds: int = 120
     screen_use_interval_seconds: int = 90
     motion_active_sample_seconds: int = 60
+    capability_discovery_seconds: int = 180
     enable_unsafe_toy_critical: bool = True
 
 
@@ -81,6 +91,7 @@ def cloud_gate_config() -> CloudGateConfig:
         meal_habit_interval_seconds=int(os.getenv("APP_CLOUD_MEAL_HABIT_INTERVAL_SECONDS", "120")),
         screen_use_interval_seconds=int(os.getenv("APP_CLOUD_SCREEN_USE_INTERVAL_SECONDS", "90")),
         motion_active_sample_seconds=int(os.getenv("APP_CLOUD_MOTION_ACTIVE_SAMPLE_SECONDS", "60")),
+        capability_discovery_seconds=int(os.getenv("APP_CLOUD_CAPABILITY_DISCOVERY_SECONDS", "180")),
         enable_unsafe_toy_critical=str(os.getenv("APP_CLOUD_ENABLE_UNSAFE_TOY_CRITICAL", "1")).strip().lower()
         in {"1", "true", "yes", "on"},
     )
@@ -121,6 +132,8 @@ def default_care_behavior_state() -> dict[str, Any]:
         "last_screen_use_kimi_at_ms": 0,
         "last_screen_use_signature": "",
         "screen_context_changed": False,
+        "last_meal_window_active": False,
+        "last_capability_discovery_at_ms": 0,
     }
 
 
@@ -196,10 +209,20 @@ def evaluate_cloud_gate(
         config=config,
         enabled_capabilities=enabled_capabilities,
         meal_window_active=meal_window_active,
+        child_id=child_id,
     )
     if critical is not None:
-        return critical
+        next_behavior = dict(critical.next_care_behavior or behavior)
+        next_behavior["last_meal_window_active"] = meal_window_active
+        return CloudGateDecision(
+            call_kimi=critical.call_kimi,
+            reason=critical.reason,
+            lane=critical.lane,
+            next_cloud_gate=critical.next_cloud_gate,
+            next_care_behavior=next_behavior,
+        )
 
+    behavior["last_meal_window_active"] = meal_window_active
     return CloudGateDecision(
         call_kimi=general.call_kimi,
         reason=general.reason,
@@ -220,6 +243,7 @@ def evaluate_care_critical_lane(
     config: CloudGateConfig,
     enabled_capabilities: Sequence[Mapping[str, Any]] | None,
     meal_window_active: bool,
+    child_id: str = "",
 ) -> CloudGateDecision | None:
     if not prefilter.prefilter_ready:
         return None
@@ -230,6 +254,20 @@ def evaluate_care_critical_lane(
     motion_before = _previous_motion_active(previous, config)
     motion_started = motion_now and not motion_before
     gate = dict(cloud_gate)
+    previous_meal_window = bool(care_behavior.get("last_meal_window_active"))
+
+    if (
+        general_decision.reason == "cloud_gate_person_return"
+        and str(child_id or "").strip()
+        and _any_behavior_capability_enabled(enabled_capabilities)
+        and person_present
+    ):
+        return _critical_decision(
+            gate=gate,
+            behavior=care_behavior,
+            now_ms=now_ms,
+            reason="person_return",
+        )
 
     if _capability_enabled(enabled_capabilities, CARE_SCENARIO_TOY_CLEANUP):
         if general_decision.reason == "cloud_gate_person_leave_lightweight" and has_structured_toy_context(
@@ -273,6 +311,20 @@ def evaluate_care_critical_lane(
     if (
         _capability_enabled(enabled_capabilities, CARE_SCENARIO_MEAL_HABIT)
         and meal_window_active
+        and not previous_meal_window
+        and person_present
+    ):
+        return _critical_decision(
+            gate=gate,
+            behavior=care_behavior,
+            now_ms=now_ms,
+            reason="meal_window_entered",
+            meal_habit=True,
+        )
+
+    if (
+        _capability_enabled(enabled_capabilities, CARE_SCENARIO_MEAL_HABIT)
+        and meal_window_active
         and person_present
     ):
         last_meal = int(care_behavior.get("last_meal_habit_kimi_at_ms") or 0)
@@ -306,7 +358,65 @@ def evaluate_care_critical_lane(
                     screen_use=True,
                 )
 
+    if (
+        general_decision.reason == "cloud_gate_person_stable"
+        and str(gate.get("gate_state") or "") == GATE_PERSON_STABLE
+        and person_present
+        and _any_behavior_capability_enabled(enabled_capabilities)
+        and not has_any_active_monitor_context(
+            care_behavior,
+            enabled_capabilities=enabled_capabilities,
+            meal_window_active=meal_window_active,
+        )
+    ):
+        last_discovery = int(care_behavior.get("last_capability_discovery_at_ms") or 0)
+        interval_ms = max(30, config.capability_discovery_seconds) * 1000
+        if last_discovery <= 0 or (now_ms - last_discovery) >= interval_ms:
+            return _critical_decision(
+                gate=gate,
+                behavior=care_behavior,
+                now_ms=now_ms,
+                reason="capability_discovery",
+                capability_discovery=True,
+            )
+
     return None
+
+
+def _any_behavior_capability_enabled(
+    enabled_capabilities: Sequence[Mapping[str, Any]] | None,
+) -> bool:
+    return any(
+        _capability_enabled(enabled_capabilities, scenario)
+        for scenario in BEHAVIOR_CARE_CAPABILITIES
+    )
+
+
+def has_any_active_monitor_context(
+    behavior: Mapping[str, Any],
+    *,
+    enabled_capabilities: Sequence[Mapping[str, Any]] | None,
+    meal_window_active: bool,
+) -> bool:
+    if _capability_enabled(enabled_capabilities, CARE_SCENARIO_POSTURE) and has_posture_monitor_context(
+        behavior
+    ):
+        return True
+    if _capability_enabled(enabled_capabilities, CARE_SCENARIO_SCREEN_USE) and has_screen_use_monitor_context(
+        behavior
+    ):
+        return True
+    if (
+        _capability_enabled(enabled_capabilities, CARE_SCENARIO_MEAL_HABIT)
+        and meal_window_active
+        and int(behavior.get("last_meal_habit_kimi_at_ms") or 0) > 0
+    ):
+        return True
+    if _capability_enabled(enabled_capabilities, CARE_SCENARIO_TOY_CLEANUP) and has_structured_toy_context(
+        behavior
+    ):
+        return True
+    return False
 
 
 def has_structured_toy_context(behavior: Mapping[str, Any]) -> bool:
@@ -420,6 +530,7 @@ def _critical_decision(
     meal_habit: bool = False,
     screen_use: bool = False,
     clear_screen_context_change: bool = False,
+    capability_discovery: bool = False,
 ) -> CloudGateDecision:
     behavior["last_critical_kimi_at_ms"] = now_ms
     behavior["last_critical_reason"] = reason
@@ -429,6 +540,8 @@ def _critical_decision(
         behavior["last_meal_habit_kimi_at_ms"] = now_ms
     if screen_use:
         behavior["last_screen_use_kimi_at_ms"] = now_ms
+    if capability_discovery:
+        behavior["last_capability_discovery_at_ms"] = now_ms
     if clear_screen_context_change:
         behavior["screen_context_changed"] = False
     gate["last_kimi_at_ms"] = now_ms

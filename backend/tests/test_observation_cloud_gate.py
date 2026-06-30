@@ -331,7 +331,9 @@ class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):
             enabled_capabilities=self._caps("posture"),
             meal_window_active=False,
         )
-        self.assertIsNone(critical)
+        self.assertIsNotNone(critical)
+        assert critical is not None
+        self.assertEqual(critical.reason, "capability_discovery")
 
     def test_s2_toy_cleanup_leave_forces_kimi(self):
         config = CloudGateConfig()
@@ -387,7 +389,9 @@ class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):
             enabled_capabilities=self._caps("meal_habit"),
             meal_window_active=False,
         )
-        self.assertIsNone(outside)
+        self.assertIsNotNone(outside)
+        assert outside is not None
+        self.assertEqual(outside.reason, "capability_discovery")
         inside = evaluate_care_critical_lane(
             prefilter=pf,
             prefilter_previous=prefilter_runtime_from_result(
@@ -403,7 +407,25 @@ class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):
         )
         self.assertIsNotNone(inside)
         assert inside is not None
-        self.assertEqual(inside.reason, "meal_habit_interval")
+        self.assertEqual(inside.reason, "meal_window_entered")
+        interval_behavior = default_care_behavior_state()
+        interval_behavior["last_meal_window_active"] = True
+        interval = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(
+                _prefilter(person=True, now_ms=290_000)
+            ),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=interval_behavior,
+            general_decision=general,
+            now_ms=300_000,
+            config=config,
+            enabled_capabilities=self._caps("meal_habit"),
+            meal_window_active=True,
+        )
+        self.assertIsNotNone(interval)
+        assert interval is not None
+        self.assertEqual(interval.reason, "meal_habit_interval")
 
     def test_c12_meal_window_via_cloud_gate_routine_windows(self):
         from datetime import datetime
@@ -436,12 +458,13 @@ class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):
             explicit_day_type="school_day",
         )
         self.assertTrue(decision.call_kimi)
-        self.assertEqual(decision.reason, "meal_habit_interval")
+        self.assertEqual(decision.reason, "meal_window_entered")
 
     def test_c13_toy_unsafe_requires_structured_toy_context(self):
         config = CloudGateConfig(motion_cooldown_seconds=300)
         gate = {"gate_state": GATE_PERSON_STABLE, "last_motion_kimi_at_ms": 0}
         behavior = default_care_behavior_state()
+        behavior["last_capability_discovery_at_ms"] = 400_000
         pf = _prefilter(person=True, motion=0.05, now_ms=400_000)
         previous = prefilter_runtime_from_result(_prefilter(person=True, motion=0.0, now_ms=390_000))
         general = CloudGateDecision(
@@ -535,7 +558,9 @@ class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):
             enabled_capabilities=self._caps("screen_use"),
             meal_window_active=False,
         )
-        self.assertIsNone(critical)
+        self.assertIsNotNone(critical)
+        assert critical is not None
+        self.assertEqual(critical.reason, "capability_discovery")
 
     def test_s4_screen_use_stable_respects_interval(self):
         config = CloudGateConfig(screen_use_interval_seconds=90)
@@ -659,6 +684,188 @@ class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):
         self.assertFalse(has_screen_use_monitor_context(behavior))
         behavior["last_screen_use_signature"] = "phone:active"
         self.assertTrue(has_screen_use_monitor_context(behavior))
+
+
+class ObservationCloudGateP0Test(unittest.TestCase):
+    def _caps(self, *scenarios: str) -> list[dict]:
+        return [{"scenario": scenario, "enabled": True} for scenario in scenarios]
+
+    def test_person_return_with_capabilities_calls_kimi(self):
+        config = CloudGateConfig()
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=120_000)
+        general = CloudGateDecision(
+            call_kimi=False,
+            reason="cloud_gate_person_return",
+            lane="general",
+            next_cloud_gate=gate,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=gate,
+            care_behavior=default_care_behavior_state(),
+            general_decision=general,
+            now_ms=120_000,
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            meal_window_active=False,
+            child_id="child_1",
+        )
+        self.assertIsNotNone(critical)
+        assert critical is not None
+        self.assertTrue(critical.call_kimi)
+        self.assertEqual(critical.reason, "person_return")
+
+    def test_person_return_without_capabilities_skips(self):
+        config = CloudGateConfig()
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=120_000)
+        general = CloudGateDecision(
+            call_kimi=False,
+            reason="cloud_gate_person_return",
+            lane="general",
+            next_cloud_gate=gate,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=gate,
+            care_behavior=default_care_behavior_state(),
+            general_decision=general,
+            now_ms=120_000,
+            config=config,
+            enabled_capabilities=[],
+            meal_window_active=False,
+            child_id="child_1",
+        )
+        self.assertIsNone(critical)
+
+    def test_missing_child_id_blocks_discovery(self):
+        pf = _prefilter(person=True, motion=0.0, now_ms=200_000)
+        decision = evaluate_cloud_gate(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate={"gate_state": GATE_PERSON_STABLE, "person_stable_since_ms": 0},
+            care_behavior=default_care_behavior_state(),
+            now_ms=200_000,
+            child_id="",
+            enabled_capabilities=self._caps("posture"),
+        )
+        self.assertFalse(decision.call_kimi)
+        self.assertEqual(decision.reason, "missing_child_id")
+
+    def test_capability_discovery_triggers_after_interval(self):
+        config = CloudGateConfig(capability_discovery_seconds=180)
+        behavior = default_care_behavior_state()
+        gate = {"gate_state": GATE_PERSON_STABLE, "person_stable_since_ms": 0}
+        pf = _prefilter(person=True, motion=0.0, now_ms=200_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=gate,
+            now_ms=200_000,
+            config=config,
+        )
+        self.assertFalse(general.call_kimi)
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=200_000,
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            meal_window_active=False,
+            child_id="child_1",
+        )
+        self.assertIsNotNone(critical)
+        assert critical is not None
+        self.assertEqual(critical.reason, "capability_discovery")
+
+    def test_meal_window_entered_only_for_meal_habit(self):
+        config = CloudGateConfig()
+        behavior = default_care_behavior_state()
+        behavior["last_meal_window_active"] = False
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=300_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=290_000)),
+            cloud_gate=gate,
+            now_ms=300_000,
+            config=config,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=290_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=300_000,
+            config=config,
+            enabled_capabilities=self._caps("meal_habit"),
+            meal_window_active=True,
+            child_id="child_1",
+        )
+        self.assertIsNotNone(critical)
+        assert critical is not None
+        self.assertEqual(critical.reason, "meal_window_entered")
+
+    def test_capability_discovery_blocked_when_posture_context_active(self):
+        config = CloudGateConfig(capability_discovery_seconds=180, posture_interval_seconds=60)
+        behavior = default_care_behavior_state()
+        behavior["last_posture_context"] = "homework"
+        behavior["last_posture_kimi_at_ms"] = 200_000
+        gate = {"gate_state": GATE_PERSON_STABLE, "person_stable_since_ms": 0}
+        pf = _prefilter(person=True, motion=0.0, now_ms=200_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=gate,
+            now_ms=200_000,
+            config=config,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=200_000,
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            meal_window_active=False,
+            child_id="child_1",
+        )
+        self.assertIsNone(critical)
+
+    def test_routine_capabilities_do_not_enable_discovery(self):
+        config = CloudGateConfig(capability_discovery_seconds=180)
+        behavior = default_care_behavior_state()
+        gate = {"gate_state": GATE_PERSON_STABLE, "person_stable_since_ms": 0}
+        pf = _prefilter(person=True, motion=0.0, now_ms=200_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=gate,
+            now_ms=200_000,
+            config=config,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=200_000,
+            config=config,
+            enabled_capabilities=self._caps("wake_up", "meal_start", "transition"),
+            meal_window_active=False,
+            child_id="child_1",
+        )
+        self.assertIsNone(critical)
 
 
 if __name__ == "__main__":

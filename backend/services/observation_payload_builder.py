@@ -28,6 +28,8 @@ PLAYING_TOYS_RE = re.compile(r"(玩玩具|玩积木|搭积木|摆弄玩具|操�
 TOY_NEGATION_RE = re.compile(r"(没有|没|未|未见|看不到|没有看到)[^，。,.]{0,18}(玩具|积木|toy|toys)")
 POSTURE_RE = re.compile(r"(低头|头低|趴桌|身体前倾|弯腰|离[^，。,.]{0,8}(桌|书|纸)[^，。,.]{0,8}(近|太近|过近))")
 MEAL_DISTRACTION_RE = re.compile(r"(玩玩具|玩耍|玩食物|分心|离开餐桌|走开|跑开)")
+NON_CHILD_RE = re.compile(r"(成年|非绑定|非儿童|不是孩子|未见.*(?:小爱|孩子))")
+TRANSITION_CARE_EVENT_MIN_CONFIDENCE = 0.5
 
 SIGNAL_PRIORITY = {
     "meal_toys_on_table": 1,
@@ -51,6 +53,7 @@ SIGNAL_PRIORITY = {
     "screen_use_sustained": 8,
     "screen_distance_risk": 7,
     "child_not_visible": 13,
+    "child_visible": 13,
 }
 
 
@@ -76,9 +79,19 @@ def build_primary_payload(
     window_start_ms: int,
     window_end_ms: int,
     observed_at: int,
+    absent_to_present: bool = False,
 ) -> dict | None:
     enriched = enrich_observation(dict(analysis))
     candidates = scenario_signals(enriched)
+    if not candidates and absent_to_present and enriched.get("has_person") is True:
+        candidates = [
+            (
+                "transition",
+                "child_visible",
+                "active",
+                transition_child_visible_summary(enriched),
+            )
+        ]
     if not candidates:
         return None
     scenario, signal_type, signal_value, summary = min(
@@ -97,11 +110,14 @@ def build_primary_payload(
         "rawDetail": raw_detail,
     }
     raw_detail["semantic_dedupe_key"] = semantic_dedupe_key(payload_without_key)
+    raw_detail["absent_to_present"] = bool(absent_to_present)
     record_care_event = signal_type not in {
         "meal_started",
         "cleanup_started",
         "cleanup_done",
     }
+    if signal_type == "child_visible" and confidence < TRANSITION_CARE_EVENT_MIN_CONFIDENCE:
+        record_care_event = False
     return {
         "familyId": family_id,
         "childId": child_id,
@@ -132,6 +148,26 @@ def build_primary_payload(
         ],
         "rawDetail": raw_detail,
     }
+
+
+def transition_child_visible_summary(analysis: Mapping[str, object]) -> str:
+    if _analysis_recognizes_child(analysis):
+        return "画面里看到孩子活动。"
+    return "画面里有人活动。"
+
+
+def _analysis_recognizes_child(analysis: Mapping[str, object]) -> bool:
+    text = analysis_text(analysis)
+    if NON_CHILD_RE.search(text):
+        return False
+    activity = str(analysis.get("activity") or analysis.get("raw_activity") or "").strip()
+    if activity in {"画面非儿童", "离开"}:
+        return False
+    try:
+        confidence = float(analysis.get("confidence") or 0)
+    except (TypeError, ValueError):
+        confidence = 0.0
+    return confidence >= 0.65
 
 
 def scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, str, str]]:

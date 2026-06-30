@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 
@@ -366,7 +367,8 @@ class CameraAiObservationService:
         data: dict,
         observation_score: float,
     ) -> dict | None:
-        if not device_id or observation_score < 0.65:
+        min_confidence = _care_event_min_confidence(data)
+        if not device_id or observation_score < min_confidence:
             return None
         try:
             from services.service_factory import camera_command_service
@@ -685,6 +687,18 @@ def _contains_negated_toy(text: str) -> bool:
 def _max_signal_duration(value: object) -> int:
     durations = [item["durationSeconds"] for item in _signals(value)]
     return max(durations) if durations else 0
+
+
+def _care_event_min_confidence(data: dict) -> float:
+    scenario = str(data.get("scenario") or "").strip()
+    signals = _signals(data.get("signals"))
+    signal_type = str(signals[0]["signalType"] if signals else "").strip()
+    if scenario == "transition" and signal_type == "child_visible":
+        try:
+            return float(os.getenv("APP_TRANSITION_CARE_EVENT_MIN_CONFIDENCE", "0.5"))
+        except ValueError:
+            return 0.5
+    return 0.65
 
 
 def _continuous_window_seconds(*, scenario: str, min_observation_seconds: int) -> int:

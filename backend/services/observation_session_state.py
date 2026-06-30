@@ -106,6 +106,9 @@ def should_post_observation(
         return False, "absent_not_confirmed"
 
     previous_bucket = str(previous_session.get("bucket") or "other")
+    if has_person is True and previous_bucket == "absent":
+        return True, "absence_recovery"
+
     previous_risk = str(previous_session.get("risk") or "none")
     current_bucket = str(current_session.get("bucket") or "other")
     current_risk = str(current_session.get("risk") or "none")

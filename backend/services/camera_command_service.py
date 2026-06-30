@@ -1087,6 +1087,23 @@ def _camera_observation_display(observation: dict) -> dict:
         summary = ""
     decision_reason = _parent_display_text(observation.get("decisionReason"))
     is_reliable = bool(observation.get("isReliable"))
+    scenario = str(observation.get("scenario") or "").strip()
+    try:
+        confidence = float(observation.get("confidence") or 0)
+    except (TypeError, ValueError):
+        confidence = 0.0
+    if scenario == "transition" and has_person is not False and confidence >= 0.5:
+        if summary and "看到孩子" in summary:
+            title = "画面里看到孩子活动"
+        else:
+            title = "画面里有人活动"
+        return {
+            "title": title,
+            "message": description or decision_reason or summary or title,
+            "category": "child_presence",
+            "severity": "info",
+            "evidence": "画面恢复可见",
+        }
     if not is_reliable:
         safe_message = _sanitize_unreliable_message(description, decision_reason)
         return {

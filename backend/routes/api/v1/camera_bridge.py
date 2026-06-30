@@ -560,13 +560,23 @@ def _normalize_monitor_observation(value: object) -> dict | None:
         if freshness == "prefilter_only":
             summary = ""
     elif not is_reliable:
-        summary = ""
+        pending_description = str(
+            enriched.get("description") or value.get("description") or ""
+        ).strip()
+        if pending_description:
+            summary = pending_description
+        else:
+            summary = ""
     return {
         "hasPerson": has_person,
         "activity": activity,
         "confidence": confidence,
         "observedAt": observed_at,
         "summary": summary,
+        "description": str(enriched.get("description") or value.get("description") or "").strip(),
+        "decisionReason": str(
+            enriched.get("decision_reason") or value.get("decision_reason") or ""
+        ).strip(),
         "isReliable": is_reliable,
         "hasMeaningfulActivity": has_activity,
         "freshness": freshness,

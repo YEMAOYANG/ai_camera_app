@@ -53,6 +53,7 @@ NON_ACTIONABLE_SIGNAL_TYPES = {
     "child_at_table",
     "meal_finished",
     "child_not_visible",
+    "child_visible",
     "meal_eating_observed",
     "screen_use_observed",
     "ok",

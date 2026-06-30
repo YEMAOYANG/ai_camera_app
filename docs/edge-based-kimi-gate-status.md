@@ -101,6 +101,20 @@
 | **C15 命名单测** | 低 | mock Kimi 阻塞时 assert transaction 未重入 |
 | **计划 frontmatter 同步** | 低 | 将 slice 2–4、track-ui-ia 标为 completed |
 | **screen_use critical lane** | — | V1 screen_use 能力；已合入 `c9b5c61` + `1ba2852` |
+| **P0 ability-aware gate v2.1** | ✅ | person_return critical、`capability_discovery` 180s、`meal_window_entered`、transition 保守记录、`child_visible` NON_ACTIONABLE；见 `test_observation_cloud_gate.ObservationCloudGateP0Test` |
+
+---
+
+## P0 v2.1（ability-aware gate 收口）
+
+| 项 | 状态 | 说明 |
+|----|------|------|
+| `person_return` critical lane | ✅ | general 仍 `cloud_gate_person_return`；有 childId + 行为看护能力时 critical 升级 |
+| `capability_discovery` 180s | ✅ | person_stable + 有能力 + 无 active monitor |
+| `meal_window_entered` | ✅ | 仅 meal_habit 餐窗边沿 |
+| transition 保守记录 | ✅ | ≥0.5 写 care event；<0.5 仅 monitor/display |
+| `child_visible` NON_ACTIONABLE | ✅ | 不 speak；不抢 screen/posture 等 primary payload |
+| P1（idle backoff / ability heartbeat / interval 对齐） | ⏸ 未做 | 见 v2.1 计划 |
 
 ---
 
