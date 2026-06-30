@@ -487,6 +487,7 @@ const _capabilityReminderScenarios = {
   'posture',
   'toy_cleanup',
   'meal_habit',
+  'screen_use',
 };
 
 class LiveCareEvent {

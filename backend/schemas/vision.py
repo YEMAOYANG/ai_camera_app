@@ -31,6 +31,11 @@ POSTURE_STATUSES = frozenset(
     {"ok", "low_head", "leaning_too_close", "slouching", "unknown", "posture_risk", "bad_posture"}
 )
 
+SCREEN_DEVICE_TYPES = frozenset({"phone", "tablet", "tv", "computer", "unknown"})
+SCREEN_DISTANCE_RISKS = frozenset({"ok", "too_close", "unknown"})
+SCREEN_USE_CONTEXTS = frozenset({"homework", "meal", "leisure", "unknown"})
+SCREEN_USE_DURATION_HINTS = frozenset({"brief", "sustained", "unknown"})
+
 
 def normalize_vision_observation(
     raw: Mapping[str, Any] | None,
@@ -73,6 +78,27 @@ def normalize_vision_observation(
         "homework_like": bool(raw.get("homework_like")),
         "child_message": str(raw.get("child_message") or "")[:120],
         "activity_stability": _clamp_score(raw.get("activity_stability") or 1.0),
+        "screen_device_visible": _optional_bool(raw.get("screen_device_visible")),
+        "screen_device_type": _normalize_screen_enum(
+            raw.get("screen_device_type"),
+            allowed=SCREEN_DEVICE_TYPES,
+        ),
+        "screen_use_active": _optional_bool(raw.get("screen_use_active")),
+        "screen_distance_risk": _normalize_screen_enum(
+            raw.get("screen_distance_risk"),
+            allowed=SCREEN_DISTANCE_RISKS,
+            default="unknown",
+        ),
+        "screen_use_context": _normalize_screen_enum(
+            raw.get("screen_use_context"),
+            allowed=SCREEN_USE_CONTEXTS,
+            default="unknown",
+        ),
+        "screen_use_duration_hint": _normalize_screen_enum(
+            raw.get("screen_use_duration_hint"),
+            allowed=SCREEN_USE_DURATION_HINTS,
+            default="unknown",
+        ),
     }
 
 
@@ -129,3 +155,23 @@ def _clamp_score(value: object) -> float:
     except (TypeError, ValueError):
         return 0.0
     return max(0.0, min(1.0, parsed))
+
+
+def _optional_bool(value: object) -> bool | None:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return value
+    return None
+
+
+def _normalize_screen_enum(
+    value: object,
+    *,
+    allowed: frozenset[str],
+    default: str = "",
+) -> str:
+    normalized = str(value or default).strip().lower()
+    if normalized in allowed:
+        return normalized
+    return default if default else ""

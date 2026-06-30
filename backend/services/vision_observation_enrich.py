@@ -5,6 +5,7 @@ from typing import Mapping
 
 
 HOMEWORK_ACTIVITIES = {"写作业", "看书", "写作业/看书"}
+REMINDABLE_SCREEN_DEVICES = frozenset({"phone", "tablet"})
 HOMEWORK_TEXT_RE = re.compile(
     r"(写作业|看书|书写|纸张|纸面|纸上|书本|练习册|作业本|笔记本(?!电脑)|纸笔|铅笔|钢笔|文具|写字)"
 )
@@ -372,6 +373,8 @@ def normalize_activity(obs: dict) -> dict:
             obs["meal_etiquette_issue"] = "toys_on_table"
         elif meal_standing_detected(obs):
             obs["meal_etiquette_issue"] = "standing"
+        elif structured_screen_active(obs):
+            obs["meal_etiquette_issue"] = "distracted"
         elif MEAL_DISTRACTION_RE.search(observation_text(obs)):
             obs["meal_etiquette_issue"] = "distracted"
     elif str(obs.get("activity") or "") in {"玩玩具", "收玩具"}:
@@ -413,6 +416,56 @@ def posture_risk_reason(obs: Mapping[str, object]) -> str:
     return ""
 
 
+def has_structured_screen_fields(obs: Mapping[str, object]) -> bool:
+    return isinstance(obs.get("screen_device_visible"), bool) and isinstance(
+        obs.get("screen_use_active"), bool
+    )
+
+
+def structured_screen_active(obs: Mapping[str, object]) -> bool:
+    return (
+        has_structured_screen_fields(obs)
+        and bool(obs.get("screen_device_visible"))
+        and bool(obs.get("screen_use_active"))
+    )
+
+
+def is_remindable_screen_device(obs: Mapping[str, object]) -> bool:
+    device_type = str(obs.get("screen_device_type") or "").strip().lower()
+    return device_type in REMINDABLE_SCREEN_DEVICES
+
+
+def screen_use_sustained(obs: Mapping[str, object]) -> bool:
+    hint = str(obs.get("screen_use_duration_hint") or "").strip().lower()
+    return hint == "sustained"
+
+
+def enrich_screen_observation(obs: dict) -> dict:
+    visible = obs.get("screen_device_visible")
+    active = obs.get("screen_use_active")
+    if visible is None and active is None:
+        return obs
+    obs["screen_device_type"] = str(obs.get("screen_device_type") or "unknown").strip().lower() or "unknown"
+    obs["screen_distance_risk"] = str(obs.get("screen_distance_risk") or "unknown").strip().lower() or "unknown"
+    obs["screen_use_context"] = str(obs.get("screen_use_context") or "unknown").strip().lower() or "unknown"
+    obs["screen_use_duration_hint"] = (
+        str(obs.get("screen_use_duration_hint") or "unknown").strip().lower() or "unknown"
+    )
+    return obs
+
+
+def clear_posture_for_structured_screen(obs: dict) -> dict:
+    if not structured_screen_active(obs) or not is_remindable_screen_device(obs):
+        return obs
+    obs["homework_like"] = False
+    obs["posture_risk_reason"] = ""
+    obs["bad_posture"] = False
+    obs["posture_status"] = "ok"
+    if str(obs.get("child_message") or "").strip():
+        obs["child_message"] = ""
+    return obs
+
+
 def enrich_observation_risks(obs: dict) -> dict:
     reason = posture_risk_reason(obs)
     obs["homework_like"] = is_homework_like(obs)
@@ -433,7 +486,9 @@ def enrich_observation_risks(obs: dict) -> dict:
 
 
 def enrich_observation(obs: dict) -> dict:
-    obs = enrich_observation_risks(dict(obs))
+    obs = enrich_screen_observation(dict(obs))
+    obs = enrich_observation_risks(obs)
+    obs = clear_posture_for_structured_screen(obs)
     obs = normalize_activity(obs)
     obs = enrich_play_safety(obs)
     obs = enforce_observation_consistency(obs)

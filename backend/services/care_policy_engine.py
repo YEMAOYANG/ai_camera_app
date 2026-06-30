@@ -14,6 +14,7 @@ from models.care import (
     CARE_SCENARIO_MEAL_START,
     CARE_SCENARIO_NAP_TIME,
     CARE_SCENARIO_POSTURE,
+    CARE_SCENARIO_SCREEN_USE,
     CARE_SCENARIO_TOY_CLEANUP,
     CARE_SCENARIO_TRANSITION,
     CARE_SCENARIO_WAKE_UP,
@@ -52,6 +53,8 @@ NON_ACTIONABLE_SIGNAL_TYPES = {
     "child_at_table",
     "meal_finished",
     "child_not_visible",
+    "meal_eating_observed",
+    "screen_use_observed",
     "ok",
     "unknown",
     "seated",
@@ -238,7 +241,7 @@ class CarePolicyEngine:
                 snapshot,
             )
 
-        if scenario in {CARE_SCENARIO_TOY_CLEANUP, CARE_SCENARIO_POSTURE}:
+        if scenario in {CARE_SCENARIO_TOY_CLEANUP, CARE_SCENARIO_POSTURE, CARE_SCENARIO_SCREEN_USE}:
             snapshot["routineGate"] = {
                 "allowed": True,
                 "reason": "behavior_only_scenario",

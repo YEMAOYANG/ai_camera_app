@@ -11,9 +11,12 @@ from services.vision_observation_enrich import (
     is_cleanup_activity,
     is_homework_like,
     is_meal_scene,
+    is_remindable_screen_device,
     is_toy_play_scene,
     meal_standing_detected,
     play_safety_reason,
+    screen_use_sustained,
+    structured_screen_active,
 )
 
 
@@ -44,6 +47,9 @@ SIGNAL_PRIORITY = {
     "cleanup_started": 10,
     "cleanup_done": 11,
     "toy_playing_observed": 12,
+    "screen_use_observed": 12,
+    "screen_use_sustained": 8,
+    "screen_distance_risk": 7,
     "child_not_visible": 13,
 }
 
@@ -164,10 +170,18 @@ def scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, str
             result.append(("meal_habit", "meal_toys_on_table", "active", "餐桌上有玩具，需要先收好。"))
         elif meal_standing_detected(analysis):
             result.append(("meal_habit", "meal_standing_on_chair", "active", "用餐时未坐好。"))
+        elif structured_screen_active(analysis):
+            result.append(("meal_habit", "meal_attention_shifted", "active", "观察到用餐时分心看屏幕。"))
         elif MEAL_DISTRACTION_RE.search(text):
             result.append(("meal_habit", "meal_attention_shifted", "active", "观察到用餐时注意力离开餐桌。"))
         else:
             result.append(("meal_habit", "meal_eating_observed", "active", "观察到孩子正在用餐。"))
+        return result
+
+    structured_phone_active = structured_screen_active(analysis) and is_remindable_screen_device(analysis)
+    screen_candidates = _screen_use_candidates(analysis)
+    if screen_candidates:
+        result.extend(screen_candidates)
         return result
 
     posture_status = str(analysis.get("posture_status") or "").strip()
@@ -178,7 +192,7 @@ def scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, str
         posture_signal = "bad_posture"
     elif has_person is True and POSTURE_RE.search(text):
         posture_signal = "posture_risk"
-    if has_person is True and posture_signal and is_homework_like(analysis) and not playing_toys:
+    if has_person is True and posture_signal and is_homework_like(analysis) and not playing_toys and not structured_phone_active:
         result.append(("posture", posture_signal, "active", "观察到坐姿需要留意。"))
 
     if TOY_CLEANUP_DONE_RE.search(text):
@@ -191,6 +205,47 @@ def scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, str
         result.append(("toy_cleanup", "child_left_toys_uncollected", "active", "观察到玩具还没有收好。"))
 
     return result
+
+
+def _screen_use_candidates(analysis: Mapping[str, object]) -> list[tuple[str, str, str, str]]:
+    if not structured_screen_active(analysis):
+        return []
+    if is_remindable_screen_device(analysis):
+        if screen_use_sustained(analysis):
+            distance_risk = str(analysis.get("screen_distance_risk") or "").strip().lower()
+            if distance_risk == "too_close":
+                return [
+                    (
+                        "screen_use",
+                        "screen_distance_risk",
+                        "active",
+                        "观察到孩子长时间近距离看屏幕。",
+                    )
+                ]
+            return [
+                (
+                    "screen_use",
+                    "screen_use_sustained",
+                    "active",
+                    "观察到孩子持续使用手机或平板。",
+                )
+            ]
+        return [
+            (
+                "screen_use",
+                "screen_use_observed",
+                "active",
+                "观察到孩子正在看手机或平板。",
+            )
+        ]
+    return [
+        (
+            "screen_use",
+            "screen_use_observed",
+            "active",
+            "观察到孩子正在看屏幕。",
+        )
+    ]
 
 
 def analysis_text(analysis: Mapping[str, object]) -> str:
@@ -242,6 +297,12 @@ def raw_detail_from_analysis(analysis: Mapping[str, object]) -> dict:
         "vision_backoff",
         "session_bucket",
         "session_risk",
+        "screen_device_visible",
+        "screen_device_type",
+        "screen_use_active",
+        "screen_distance_risk",
+        "screen_use_context",
+        "screen_use_duration_hint",
     }
     return {
         key: analysis.get(key)

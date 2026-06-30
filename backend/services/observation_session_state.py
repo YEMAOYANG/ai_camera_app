@@ -5,10 +5,13 @@ from typing import Any, Mapping
 from services.vision_observation_enrich import (
     is_cleanup_activity,
     is_meal_scene,
+    is_remindable_screen_device,
     is_toy_play_scene,
     meal_standing_detected,
     has_toys_on_table,
     play_safety_reason,
+    screen_use_sustained,
+    structured_screen_active,
 )
 
 
@@ -34,6 +37,17 @@ def session_snapshot_from_observation(obs: Mapping[str, object]) -> dict[str, st
         if unsafe:
             return {"bucket": "toy_play", "risk": f"toy_unsafe_{unsafe}"}
         return {"bucket": "toy_play", "risk": "toy_playing_safe"}
+
+    if structured_screen_active(obs):
+        device_type = str(obs.get("screen_device_type") or "unknown").strip().lower()
+        if is_remindable_screen_device(obs):
+            if screen_use_sustained(obs):
+                distance_risk = str(obs.get("screen_distance_risk") or "").strip().lower()
+                if distance_risk == "too_close":
+                    return {"bucket": "screen_use", "risk": "screen_distance_risk"}
+                return {"bucket": "screen_use", "risk": "screen_use_sustained"}
+            return {"bucket": "screen_use", "risk": "screen_use_brief"}
+        return {"bucket": "screen_use", "risk": f"screen_{device_type}"}
 
     activity = str(obs.get("activity") or obs.get("raw_activity") or "").strip()
     if activity in {"写作业/看书", "看书", "写作业"}:

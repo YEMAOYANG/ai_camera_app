@@ -155,11 +155,16 @@ class CameraObserveCloudGateTickTest(unittest.TestCase):
             "person_stable_since_ms": now,
             "last_person_heartbeat_at_ms": now,
         }
-        behavior = {"last_posture_kimi_at_ms": 9_999_999_999, "last_meal_habit_kimi_at_ms": 9_999_999_999}
+        behavior = {
+            "last_posture_kimi_at_ms": 9_999_999_999,
+            "last_meal_habit_kimi_at_ms": 9_999_999_999,
+            "last_screen_use_kimi_at_ms": 9_999_999_999,
+        }
         enabled = [
             {"scenario": "posture", "enabled": False},
             {"scenario": "toy_cleanup", "enabled": False},
             {"scenario": "meal_habit", "enabled": False},
+            {"scenario": "screen_use", "enabled": False},
         ]
 
         def load_context(**kwargs):
@@ -192,6 +197,7 @@ class CameraObserveCloudGateTickTest(unittest.TestCase):
             {"scenario": "posture", "enabled": False},
             {"scenario": "toy_cleanup", "enabled": False},
             {"scenario": "meal_habit", "enabled": False},
+            {"scenario": "screen_use", "enabled": False},
         ]
 
         def load_context(**kwargs):

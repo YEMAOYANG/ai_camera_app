@@ -3634,6 +3634,7 @@ const _v1VisibleCareScenarios = {
   'posture',
   'toy_cleanup',
   'meal_habit',
+  'screen_use',
 };
 
 const _careReminderRuleScenarios = {'toy_cleanup'};
@@ -3643,7 +3644,8 @@ int _capabilityOrder(String scenario) {
     'posture' => 0,
     'toy_cleanup' => 1,
     'meal_habit' => 2,
-    'transition' => 3,
+    'screen_use' => 3,
+    'transition' => 4,
     _ => 99,
   };
 }
@@ -3653,6 +3655,7 @@ String _capabilityTitle(String scenario) {
     'posture' => '坐姿提醒',
     'toy_cleanup' => '玩具收纳与安全',
     'meal_habit' => '用餐习惯提醒',
+    'screen_use' => '屏幕使用提醒',
     'meal_start' => '用餐开始提醒',
     'nap_time' => '午睡提醒',
     'bedtime' => '晚上入睡提醒',
@@ -3667,6 +3670,7 @@ String _capabilityDescription(String scenario) {
     'posture' => '低头、趴桌或靠太近时，轻声提醒孩子调整。',
     'toy_cleanup' => '玩完离开、玩具散落或玩法需要留意时提醒。',
     'meal_habit' => '只在早餐、午餐、晚餐时间内，看到离座、分心或边吃边玩时提醒。',
+    'screen_use' => '长时间玩手机、看屏幕太近或用眼距离需要留意时提醒。',
     'meal_start' => '到用餐时间，提醒坐好开始吃饭。',
     'nap_time' => '到午睡时间，摄像头会按作息轻声提醒。',
     'bedtime' => '到睡觉时间，摄像头会提醒孩子准备休息。',

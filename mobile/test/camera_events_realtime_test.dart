@@ -435,6 +435,20 @@ void main() {
     });
     expect(capabilityReminder.recordCategoryLabel, '能力提醒');
 
+    final screenUseReminder = LiveCareEvent.fromJson({
+      'id': 'evt_screen_use',
+      'eventType': 'speak',
+      'displayTitle': '屏幕使用提醒',
+      'displayMessage': '眼睛离屏幕远一点，休息一下吧。',
+      'category': 'care_reminder',
+      'recordKind': 'reminder',
+      'payload': {
+        'request': {'scenario': 'screen_use', 'source': 'care_reminder'},
+      },
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    });
+    expect(screenUseReminder.recordCategoryLabel, '能力提醒');
+
     final routineReminder = LiveCareEvent.fromJson({
       'id': 'evt_wake',
       'eventType': 'speak',

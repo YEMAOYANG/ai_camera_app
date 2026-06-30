@@ -21,6 +21,7 @@ CARE_SCENARIO_NAP_TIME = "nap_time"
 CARE_SCENARIO_BEDTIME = "bedtime"
 CARE_SCENARIO_WAKE_UP = "wake_up"
 CARE_SCENARIO_TRANSITION = "transition"
+CARE_SCENARIO_SCREEN_USE = "screen_use"
 
 CARE_SCENARIOS = {
     CARE_SCENARIO_POSTURE,
@@ -31,6 +32,7 @@ CARE_SCENARIOS = {
     CARE_SCENARIO_BEDTIME,
     CARE_SCENARIO_WAKE_UP,
     CARE_SCENARIO_TRANSITION,
+    CARE_SCENARIO_SCREEN_USE,
 }
 
 REMINDER_DECISION_PENDING = "pending"
@@ -121,6 +123,7 @@ CARE_SCENARIO_LABELS = {
     CARE_SCENARIO_BEDTIME: "晚间入睡",
     CARE_SCENARIO_WAKE_UP: "起床",
     CARE_SCENARIO_TRANSITION: "转场提醒",
+    CARE_SCENARIO_SCREEN_USE: "屏幕使用",
 }
 
 DEFAULT_FALLBACK_TEMPLATES = {
@@ -163,6 +166,11 @@ DEFAULT_FALLBACK_TEMPLATES = {
         "我们准备换到下一件事啦。",
         "收好当前的小事情，准备下一步。",
         "现在慢慢准备出发。",
+    ],
+    CARE_SCENARIO_SCREEN_USE: [
+        "眼睛离屏幕远一点，我们休息一下吧。",
+        "看屏幕久了，眼睛需要歇一歇哦。",
+        "我们把手机放下，活动一下小身体吧。",
     ],
 }
 
@@ -262,6 +270,18 @@ DEFAULT_CAPABILITY_CONFIGS = [
         "recordOnly": False,
         "promptId": "reminder.transition",
         "timeWindows": ["transition", "bedtime"],
+    },
+    {
+        "scenario": CARE_SCENARIO_SCREEN_USE,
+        "minObservationSeconds": 90,
+        "confidenceThreshold": 0.72,
+        "cooldownSeconds": 1800,
+        "dailyLimit": 3,
+        "parentNotifyThreshold": 2,
+        "allowSpeaker": True,
+        "recordOnly": False,
+        "promptId": "reminder.screen_use",
+        "timeWindows": [],
     },
 ]
 

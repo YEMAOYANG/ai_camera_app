@@ -7,9 +7,11 @@ from typing import Any, Mapping, Sequence
 from models.care import (
     CARE_SCENARIO_MEAL_HABIT,
     CARE_SCENARIO_POSTURE,
+    CARE_SCENARIO_SCREEN_USE,
     CARE_SCENARIO_TOY_CLEANUP,
 )
 from services.care_routine_window_resolver import resolve_meal_window_active
+from services.vision_observation_enrich import has_structured_screen_fields, structured_screen_active
 from services.vision_prefilter_service import PrefilterResult
 
 TOY_SESSION_ACTIVE = {"playing", "toys_visible", "scattered", "play"}
@@ -45,6 +47,7 @@ class CloudGateConfig:
     posture_interval_seconds: int = 60
     toy_cleanup_interval_seconds: int = 60
     meal_habit_interval_seconds: int = 120
+    screen_use_interval_seconds: int = 90
     enable_unsafe_toy_critical: bool = True
 
 
@@ -75,6 +78,7 @@ def cloud_gate_config() -> CloudGateConfig:
         posture_interval_seconds=int(os.getenv("APP_CLOUD_POSTURE_INTERVAL_SECONDS", "60")),
         toy_cleanup_interval_seconds=int(os.getenv("APP_CLOUD_TOY_CLEANUP_INTERVAL_SECONDS", "60")),
         meal_habit_interval_seconds=int(os.getenv("APP_CLOUD_MEAL_HABIT_INTERVAL_SECONDS", "120")),
+        screen_use_interval_seconds=int(os.getenv("APP_CLOUD_SCREEN_USE_INTERVAL_SECONDS", "90")),
         enable_unsafe_toy_critical=str(os.getenv("APP_CLOUD_ENABLE_UNSAFE_TOY_CRITICAL", "1")).strip().lower()
         in {"1", "true", "yes", "on"},
     )
@@ -112,6 +116,9 @@ def default_care_behavior_state() -> dict[str, Any]:
         "last_critical_reason": "",
         "last_posture_kimi_at_ms": 0,
         "last_meal_habit_kimi_at_ms": 0,
+        "last_screen_use_kimi_at_ms": 0,
+        "last_screen_use_signature": "",
+        "screen_context_changed": False,
     }
 
 
@@ -248,7 +255,9 @@ def evaluate_care_critical_lane(
             )
 
     if _capability_enabled(enabled_capabilities, CARE_SCENARIO_POSTURE) and person_present:
-        if has_posture_monitor_context(care_behavior):
+        screen_use_enabled = _capability_enabled(enabled_capabilities, CARE_SCENARIO_SCREEN_USE)
+        screen_monitor_active = screen_use_enabled and has_screen_use_monitor_context(care_behavior)
+        if not screen_monitor_active and has_posture_monitor_context(care_behavior):
             last_posture = int(care_behavior.get("last_posture_kimi_at_ms") or 0)
             if (now_ms - last_posture) >= config.posture_interval_seconds * 1000:
                 return _critical_decision(
@@ -273,6 +282,27 @@ def evaluate_care_critical_lane(
                 reason="meal_habit_interval",
                 meal_habit=True,
             )
+
+    if _capability_enabled(enabled_capabilities, CARE_SCENARIO_SCREEN_USE) and person_present:
+        if bool(care_behavior.get("screen_context_changed")):
+            return _critical_decision(
+                gate=gate,
+                behavior=care_behavior,
+                now_ms=now_ms,
+                reason="screen_use_context_change",
+                screen_use=True,
+                clear_screen_context_change=True,
+            )
+        if has_screen_use_monitor_context(care_behavior):
+            last_screen = int(care_behavior.get("last_screen_use_kimi_at_ms") or 0)
+            if (now_ms - last_screen) >= config.screen_use_interval_seconds * 1000:
+                return _critical_decision(
+                    gate=gate,
+                    behavior=care_behavior,
+                    now_ms=now_ms,
+                    reason="screen_use_interval",
+                    screen_use=True,
+                )
 
     return None
 
@@ -299,7 +329,23 @@ def has_posture_monitor_context(behavior: Mapping[str, Any]) -> bool:
     return raw_activity in POSTURE_MONITOR_RAW_ACTIVITIES
 
 
+def has_screen_use_monitor_context(behavior: Mapping[str, Any]) -> bool:
+    signature = str(behavior.get("last_screen_use_signature") or "").strip().lower()
+    return signature.endswith(":active")
+
+
+def screen_use_signature(analysis: Mapping[str, Any]) -> str:
+    if not has_structured_screen_fields(analysis):
+        return ""
+    device_type = str(analysis.get("screen_device_type") or "unknown").strip().lower() or "unknown"
+    if not bool(analysis.get("screen_device_visible")) or not bool(analysis.get("screen_use_active")):
+        return f"{device_type}:inactive"
+    return f"{device_type}:active"
+
+
 def posture_context_from_analysis(analysis: Mapping[str, Any]) -> str:
+    if structured_screen_active(analysis):
+        return ""
     activity = str(analysis.get("activity") or "").strip()
     raw_activity = str(analysis.get("raw_activity") or "").strip()
     if activity in {"写作业", "写作业/看书"} or raw_activity in {"写字", "写作业"}:
@@ -315,7 +361,7 @@ def sync_care_behavior_from_analysis(
     behavior: Mapping[str, Any],
     analysis: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Update structured toy context from Kimi analysis; never infer from description."""
+    """Update structured toy/screen context from Kimi analysis; never infer from description."""
     next_behavior = dict(behavior)
     toys_visible = bool(analysis.get("toys_visible"))
     toys_scattered = bool(analysis.get("toys_scattered"))
@@ -326,6 +372,20 @@ def sync_care_behavior_from_analysis(
     posture_context = posture_context_from_analysis(analysis)
     if posture_context:
         next_behavior["last_posture_context"] = posture_context
+    elif structured_screen_active(analysis):
+        next_behavior["last_posture_context"] = ""
+    signature = screen_use_signature(analysis)
+    previous_signature = str(next_behavior.get("last_screen_use_signature") or "")
+    if signature:
+        if signature != previous_signature and previous_signature and (
+            signature.endswith(":active") or previous_signature.endswith(":active")
+        ):
+            next_behavior["screen_context_changed"] = True
+        next_behavior["last_screen_use_signature"] = signature
+    elif previous_signature:
+        next_behavior["last_screen_use_signature"] = ""
+        if previous_signature.endswith(":active"):
+            next_behavior["screen_context_changed"] = True
     next_behavior["toys_visible_last"] = toys_visible
     next_behavior["toys_scattered_last"] = toys_scattered
     if activity == "玩玩具":
@@ -356,6 +416,8 @@ def _critical_decision(
     reason: str,
     posture: bool = False,
     meal_habit: bool = False,
+    screen_use: bool = False,
+    clear_screen_context_change: bool = False,
 ) -> CloudGateDecision:
     behavior["last_critical_kimi_at_ms"] = now_ms
     behavior["last_critical_reason"] = reason
@@ -363,6 +425,10 @@ def _critical_decision(
         behavior["last_posture_kimi_at_ms"] = now_ms
     if meal_habit:
         behavior["last_meal_habit_kimi_at_ms"] = now_ms
+    if screen_use:
+        behavior["last_screen_use_kimi_at_ms"] = now_ms
+    if clear_screen_context_change:
+        behavior["screen_context_changed"] = False
     gate["last_kimi_at_ms"] = now_ms
     gate["last_kimi_reason"] = reason
     if reason == "toy_unsafe_motion":

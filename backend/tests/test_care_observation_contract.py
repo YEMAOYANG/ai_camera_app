@@ -65,6 +65,7 @@ class CareObservationContractTest(unittest.TestCase):
                 "toy_cleanup",
                 "meal_start",
                 "meal_habit",
+                "screen_use",
                 "nap_time",
                 "bedtime",
                 "wake_up",

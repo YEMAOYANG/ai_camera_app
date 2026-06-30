@@ -12,7 +12,9 @@ from services.observation_cloud_gate import (
     evaluate_care_critical_lane,
     evaluate_cloud_gate,
     evaluate_general_lane,
+    has_screen_use_monitor_context,
     has_structured_toy_context,
+    sync_care_behavior_from_analysis,
 )
 from services.vision_prefilter_service import PrefilterResult, prefilter_runtime_from_result
 
@@ -447,6 +449,183 @@ class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):
         behavior = default_care_behavior_state()
         behavior["last_critical_reason"] = "unsafe climbing on sofa"
         self.assertFalse(has_structured_toy_context(behavior))
+
+    def test_s4_screen_use_interval_triggers_with_structured_context(self):
+        config = CloudGateConfig(screen_use_interval_seconds=90)
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        behavior = default_care_behavior_state()
+        behavior["last_screen_use_signature"] = "phone:active"
+        pf = _prefilter(person=True, motion=0.0, now_ms=120_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=gate,
+            now_ms=120_000,
+            config=config,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=120_000,
+            config=config,
+            enabled_capabilities=self._caps("screen_use"),
+            meal_window_active=False,
+        )
+        self.assertIsNotNone(critical)
+        assert critical is not None
+        self.assertTrue(critical.call_kimi)
+        self.assertEqual(critical.reason, "screen_use_interval")
+
+    def test_s4_screen_use_interval_skips_without_structured_context(self):
+        config = CloudGateConfig(screen_use_interval_seconds=90)
+        behavior = default_care_behavior_state()
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=120_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=gate,
+            now_ms=120_000,
+            config=config,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=120_000,
+            config=config,
+            enabled_capabilities=self._caps("screen_use"),
+            meal_window_active=False,
+        )
+        self.assertIsNone(critical)
+
+    def test_s4_screen_use_stable_respects_interval(self):
+        config = CloudGateConfig(screen_use_interval_seconds=90)
+        behavior = default_care_behavior_state()
+        behavior["last_screen_use_signature"] = "phone:active"
+        behavior["last_screen_use_kimi_at_ms"] = 50_000
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=120_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=gate,
+            now_ms=120_000,
+            config=config,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=120_000,
+            config=config,
+            enabled_capabilities=self._caps("screen_use"),
+            meal_window_active=False,
+        )
+        self.assertIsNone(critical)
+
+    def test_s4_screen_use_context_change_triggers_critical(self):
+        config = CloudGateConfig(screen_use_interval_seconds=90)
+        behavior = default_care_behavior_state()
+        behavior["last_screen_use_signature"] = "phone:active"
+        behavior["screen_context_changed"] = True
+        behavior["last_screen_use_kimi_at_ms"] = 119_000
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=120_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=gate,
+            now_ms=120_000,
+            config=config,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=120_000,
+            config=config,
+            enabled_capabilities=self._caps("screen_use"),
+            meal_window_active=False,
+        )
+        self.assertIsNotNone(critical)
+        assert critical is not None
+        self.assertEqual(critical.reason, "screen_use_context_change")
+        assert critical.next_care_behavior is not None
+        self.assertFalse(critical.next_care_behavior.get("screen_context_changed"))
+
+    def test_s4_screen_use_skips_posture_interval_when_screen_monitor_active(self):
+        config = CloudGateConfig(posture_interval_seconds=60, screen_use_interval_seconds=90)
+        behavior = default_care_behavior_state()
+        behavior["last_posture_context"] = "screen"
+        behavior["last_screen_use_signature"] = "phone:active"
+        behavior["last_posture_kimi_at_ms"] = 0
+        behavior["last_screen_use_kimi_at_ms"] = 50_000
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=120_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=gate,
+            now_ms=120_000,
+            config=config,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=110_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=120_000,
+            config=config,
+            enabled_capabilities=self._caps("posture", "screen_use"),
+            meal_window_active=False,
+        )
+        self.assertIsNone(critical)
+
+    def test_sync_screen_signature_marks_context_change(self):
+        behavior = default_care_behavior_state()
+        updated = sync_care_behavior_from_analysis(
+            behavior,
+            {
+                "activity": "玩手机",
+                "raw_activity": "看手机",
+                "screen_device_visible": True,
+                "screen_device_type": "phone",
+                "screen_use_active": True,
+            },
+        )
+        self.assertEqual(updated["last_screen_use_signature"], "phone:active")
+        self.assertFalse(updated.get("screen_context_changed"))
+        changed = sync_care_behavior_from_analysis(
+            updated,
+            {
+                "activity": "看电视",
+                "raw_activity": "看电视",
+                "screen_device_visible": True,
+                "screen_device_type": "tv",
+                "screen_use_active": True,
+            },
+        )
+        self.assertTrue(changed.get("screen_context_changed"))
+        self.assertEqual(changed["last_screen_use_signature"], "tv:active")
+
+    def test_has_screen_use_monitor_context_requires_active_signature(self):
+        behavior = default_care_behavior_state()
+        self.assertFalse(has_screen_use_monitor_context(behavior))
+        behavior["last_screen_use_signature"] = "tv:inactive"
+        self.assertFalse(has_screen_use_monitor_context(behavior))
+        behavior["last_screen_use_signature"] = "phone:active"
+        self.assertTrue(has_screen_use_monitor_context(behavior))
 
 
 if __name__ == "__main__":

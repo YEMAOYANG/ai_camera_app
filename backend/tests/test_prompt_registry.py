@@ -22,6 +22,7 @@ class PromptRegistryTest(unittest.TestCase):
         self.assertIn(("reminder.bedtime", "v1"), ids)
         self.assertIn(("reminder.wake_up", "v1"), ids)
         self.assertIn(("reminder.transition", "v1"), ids)
+        self.assertIn(("reminder.screen_use", "v1"), ids)
         self.assertIn(("reminder.fallback", "v1"), ids)
         self.assertIn(("vision.scene_observation", "v1"), ids)
         self.assertIn(("vision.behavior_summary", "v1"), ids)

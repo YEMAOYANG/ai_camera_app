@@ -89,6 +89,12 @@
   "meal_standing": true/false,
   "play_safety_status": "safe/unsafe/unknown",
   "play_safety_reason": "climbing_furniture/standing_on_furniture/throwing/small_parts_mouth/none",
+  "screen_device_visible": true/false,
+  "screen_device_type": "phone/tablet/tv/computer/unknown",
+  "screen_use_active": true/false,
+  "screen_distance_risk": "ok/too_close/unknown",
+  "screen_use_context": "homework/meal/leisure/unknown",
+  "screen_use_duration_hint": "brief/sustained/unknown",
   "confidence": 0.0-1.0,
   "description": "一句话：{child_reference} + 当前动作 + 必要环境（≤40字）",
   "child_message": "如果现在真的需要提醒孩子，就用温柔短句；否则空字符串"
@@ -139,6 +145,19 @@
 
 - 只有写作业/看书且明显低头、趴桌、离书本太近时，bad_posture=true，child_message 才给坐姿提醒。
 - 玩手机、平板、电视、用餐 → 不要给「离书本远一点」类提醒。
+
+---
+
+## 屏幕使用结构化字段（V1）
+
+- 仅当孩子**正在**使用手机/平板/电视/电脑屏幕时填写；看不清或只是背景里有屏幕 → screen_device_visible=false。
+- screen_device_visible=true 时，必须填写 screen_device_type 与 screen_use_active。
+- screen_use_active=true 表示孩子当前正在看/玩屏幕，不是短暂路过或刚拿起。
+- screen_distance_risk=too_close：仅 phone/tablet 且脸或眼明显贴近屏幕时填写。
+- screen_use_context：meal=用餐中，homework=写作业旁有屏，leisure=休闲，unknown=不确定。
+- screen_use_duration_hint：brief=刚拿起或短暂一瞥，sustained=持续观看/操作。
+- 电视关、黑屏、无画面 → screen_device_visible=false，activity 不要标看电视。
+- 用餐中看手机 → activity 仍标「吃饭」，screen_use_context=meal，screen_device_type=phone/tablet。
 
 ---
 
