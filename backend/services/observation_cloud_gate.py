@@ -11,7 +11,12 @@ from models.care import (
     CARE_SCENARIO_TOY_CLEANUP,
 )
 from services.care_routine_window_resolver import resolve_meal_window_active
-from services.vision_observation_enrich import has_structured_screen_fields, structured_screen_active
+from services.observation_session_state import should_post_observation
+from services.vision_observation_enrich import (
+    enrich_observation,
+    has_structured_screen_fields,
+    structured_screen_active,
+)
 from services.vision_prefilter_service import PrefilterResult
 
 TOY_SESSION_ACTIVE = {"playing", "toys_visible", "scattered", "play"}
@@ -59,6 +64,8 @@ class CloudGateConfig:
     screen_use_interval_seconds: int = 90
     motion_active_sample_seconds: int = 60
     capability_discovery_seconds: int = 180
+    idle_backoff_after_ticks: int = 3
+    idle_backoff_seconds: int = 600
     enable_unsafe_toy_critical: bool = True
 
 
@@ -92,6 +99,8 @@ def cloud_gate_config() -> CloudGateConfig:
         screen_use_interval_seconds=int(os.getenv("APP_CLOUD_SCREEN_USE_INTERVAL_SECONDS", "90")),
         motion_active_sample_seconds=int(os.getenv("APP_CLOUD_MOTION_ACTIVE_SAMPLE_SECONDS", "60")),
         capability_discovery_seconds=int(os.getenv("APP_CLOUD_CAPABILITY_DISCOVERY_SECONDS", "180")),
+        idle_backoff_after_ticks=int(os.getenv("APP_CLOUD_IDLE_BACKOFF_AFTER_TICKS", "3")),
+        idle_backoff_seconds=int(os.getenv("APP_CLOUD_IDLE_BACKOFF_SECONDS", "600")),
         enable_unsafe_toy_critical=str(os.getenv("APP_CLOUD_ENABLE_UNSAFE_TOY_CRITICAL", "1")).strip().lower()
         in {"1", "true", "yes", "on"},
     )
@@ -134,6 +143,7 @@ def default_care_behavior_state() -> dict[str, Any]:
         "screen_context_changed": False,
         "last_meal_window_active": False,
         "last_capability_discovery_at_ms": 0,
+        "consecutive_idle_kimi_ticks": 0,
     }
 
 
@@ -370,7 +380,8 @@ def evaluate_care_critical_lane(
         )
     ):
         last_discovery = int(care_behavior.get("last_capability_discovery_at_ms") or 0)
-        interval_ms = max(30, config.capability_discovery_seconds) * 1000
+        discovery_seconds = effective_capability_discovery_seconds(care_behavior, config)
+        interval_ms = max(30, discovery_seconds) * 1000
         if last_discovery <= 0 or (now_ms - last_discovery) >= interval_ms:
             return _critical_decision(
                 gate=gate,
@@ -390,6 +401,83 @@ def _any_behavior_capability_enabled(
         _capability_enabled(enabled_capabilities, scenario)
         for scenario in BEHAVIOR_CARE_CAPABILITIES
     )
+
+
+IDLE_KIMI_MIN_CONFIDENCE = 0.5
+
+
+def effective_capability_discovery_seconds(
+    behavior: Mapping[str, Any],
+    config: CloudGateConfig,
+) -> int:
+    ticks = int(behavior.get("consecutive_idle_kimi_ticks") or 0)
+    if ticks >= config.idle_backoff_after_ticks:
+        return max(config.capability_discovery_seconds, config.idle_backoff_seconds)
+    return config.capability_discovery_seconds
+
+
+def update_idle_kimi_ticks_after_analysis(
+    behavior: Mapping[str, Any],
+    *,
+    analysis: Mapping[str, object],
+    gate_reason: str,
+    previous_session: Mapping[str, Any],
+    current_session: Mapping[str, Any],
+    has_person: object,
+    absent_to_present: bool,
+    absence_mode: str,
+    recorded_absent: bool,
+    enabled_capabilities: Sequence[Mapping[str, Any]] | None,
+    meal_window_active: bool,
+    config: CloudGateConfig | None = None,
+) -> dict[str, Any]:
+    config = config or cloud_gate_config()
+    next_behavior = dict(behavior)
+
+    if not _any_behavior_capability_enabled(enabled_capabilities):
+        next_behavior["consecutive_idle_kimi_ticks"] = 0
+        return next_behavior
+
+    if gate_reason in {"person_return", "meal_window_entered"}:
+        next_behavior["consecutive_idle_kimi_ticks"] = 0
+        return next_behavior
+
+    if has_any_active_monitor_context(
+        next_behavior,
+        enabled_capabilities=enabled_capabilities,
+        meal_window_active=meal_window_active,
+    ):
+        next_behavior["consecutive_idle_kimi_ticks"] = 0
+        return next_behavior
+
+    should_post, post_reason = should_post_observation(
+        previous_session=previous_session,
+        current_session=current_session,
+        has_person=has_person,
+        absence_mode=absence_mode,
+        recorded_absent=recorded_absent,
+    )
+    if should_post and post_reason in {"session_changed", "absence_recovery"}:
+        next_behavior["consecutive_idle_kimi_ticks"] = 0
+        return next_behavior
+
+    enriched = enrich_observation(dict(analysis))
+    confidence = float(enriched.get("confidence") or 0)
+    if confidence < IDLE_KIMI_MIN_CONFIDENCE:
+        return next_behavior
+
+    from services.observation_payload_builder import scenario_signals
+
+    if scenario_signals(enriched):
+        next_behavior["consecutive_idle_kimi_ticks"] = 0
+        return next_behavior
+
+    if absent_to_present and enriched.get("has_person") is True:
+        next_behavior["consecutive_idle_kimi_ticks"] = 0
+        return next_behavior
+
+    next_behavior["consecutive_idle_kimi_ticks"] = int(next_behavior.get("consecutive_idle_kimi_ticks") or 0) + 1
+    return next_behavior
 
 
 def has_any_active_monitor_context(

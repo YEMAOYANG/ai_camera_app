@@ -79,6 +79,21 @@ class _AbsentVision:
         }
 
 
+class _IdleVision:
+    calls = 0
+
+    def analyze_snapshot(self, **kwargs):
+        _IdleVision.calls += 1
+        return {
+            "has_person": True,
+            "activity": "发呆",
+            "confidence": 0.9,
+            "description": "孩子在客厅。",
+            "toys_visible": False,
+            "toys_scattered": False,
+        }
+
+
 def _default_context(**runtime_overrides) -> Any:
     runtime = default_runtime_payload()
     for key, value in runtime_overrides.items():
@@ -277,6 +292,85 @@ class CameraObserveCloudGateTickTest(unittest.TestCase):
             force_analyze=True,
         )
         self.assertEqual(order, ["read", "kimi", "write"])
+
+    def test_gate_skip_does_not_increment_idle_ticks(self):
+        from core.security import now_ms
+
+        now = now_ms()
+        stable_gate = {
+            **default_cloud_gate_state(),
+            "gate_state": "person_stable",
+            "person_stable_since_ms": now,
+            "last_person_heartbeat_at_ms": now,
+        }
+        behavior = {
+            **default_runtime_payload()["care_behavior"],
+            "consecutive_idle_kimi_ticks": 2,
+            "last_posture_kimi_at_ms": 9_999_999_999,
+            "last_meal_habit_kimi_at_ms": 9_999_999_999,
+            "last_screen_use_kimi_at_ms": 9_999_999_999,
+        }
+        enabled = [
+            {"scenario": "posture", "enabled": False},
+            {"scenario": "toy_cleanup", "enabled": False},
+            {"scenario": "meal_habit", "enabled": False},
+            {"scenario": "screen_use", "enabled": False},
+        ]
+
+        def load_context(**kwargs):
+            ctx = _default_context(cloud_gate=stable_gate, care_behavior=behavior)
+            return type(ctx)(**{**ctx.__dict__, "enabled_capabilities": enabled})
+
+        self.service._load_observe_context = load_context  # type: ignore[method-assign]
+        self.service.vision_prefilter = _SequencePrefilter([_prefilter(person=True, motion=0.0, now_ms=now)])
+        env = {"APP_CLOUD_PERSON_HEARTBEAT_SECONDS": "900", "APP_CLOUD_CAPABILITY_DISCOVERY_SECONDS": "180"}
+        with patch.dict(os.environ, env, clear=False):
+            result = self.service.run_tick(
+                family_id="fam",
+                child_id="child",
+                device_id="dev",
+                image_bytes=self.image_bytes,
+            )
+        self.assertTrue(result.skipped)
+        self.assertEqual(_CountingVision.calls, 0)
+        self.assertTrue(self.saved_payloads)
+        self.assertEqual(self.saved_payloads[-1]["care_behavior"].get("consecutive_idle_kimi_ticks"), 2)
+
+    def test_idle_kimi_success_increments_idle_ticks(self):
+        _IdleVision.calls = 0
+        self.saved_payloads.clear()
+
+        def load_context(**kwargs):
+            return _default_context(
+                session={
+                    "bucket": "other",
+                    "risk": "发呆",
+                    "last_record_at": 1_000,
+                    "last_cloud_at": 0,
+                }
+            )
+
+        self.service._load_observe_context = load_context  # type: ignore[method-assign]
+        self.service.vision_service = _IdleVision()
+        self.service.vision_prefilter = _SequencePrefilter([_prefilter(person=True, motion=0.0)])
+
+        def save_state(conn, **kwargs):
+            self.saved_payloads.append(dict(kwargs["payload"]))
+
+        self.service._save_runtime_state = save_state  # type: ignore[method-assign]
+        self.service.runtime_store.load = lambda conn, **kwargs: default_runtime_payload()  # type: ignore[method-assign]
+
+        result = self.service.run_tick(
+            family_id="fam",
+            child_id="child",
+            device_id="dev",
+            image_bytes=self.image_bytes,
+            force_analyze=True,
+        )
+        self.assertEqual(_IdleVision.calls, 1)
+        self.assertTrue(self.saved_payloads)
+        self.assertEqual(self.saved_payloads[-1]["care_behavior"].get("consecutive_idle_kimi_ticks"), 1)
+        self.assertIsNotNone(result.analysis)
 
 
 if __name__ == "__main__":

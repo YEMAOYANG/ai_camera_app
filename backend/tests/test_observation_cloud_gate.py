@@ -10,12 +10,14 @@ from services.observation_cloud_gate import (
     GATE_PERSON_STABLE,
     default_cloud_gate_state,
     default_care_behavior_state,
+    effective_capability_discovery_seconds,
     evaluate_care_critical_lane,
     evaluate_cloud_gate,
     evaluate_general_lane,
     has_screen_use_monitor_context,
     has_structured_toy_context,
     sync_care_behavior_from_analysis,
+    update_idle_kimi_ticks_after_analysis,
 )
 from services.vision_prefilter_service import PrefilterResult, prefilter_runtime_from_result
 
@@ -866,6 +868,186 @@ class ObservationCloudGateP0Test(unittest.TestCase):
             child_id="child_1",
         )
         self.assertIsNone(critical)
+
+
+class ObservationCloudGateIdleBackoffTest(unittest.TestCase):
+    def _caps(self, *scenarios: str) -> list[dict]:
+        return [{"scenario": scenario, "enabled": True} for scenario in scenarios]
+
+    def _discovery_critical(
+        self,
+        *,
+        behavior: dict,
+        now_ms: int,
+        config: CloudGateConfig | None = None,
+    ):
+        config = config or CloudGateConfig(capability_discovery_seconds=180, idle_backoff_seconds=600)
+        gate = {"gate_state": GATE_PERSON_STABLE, "person_stable_since_ms": 0}
+        pf = _prefilter(person=True, motion=0.0, now_ms=now_ms)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=now_ms - 10_000)),
+            cloud_gate=gate,
+            now_ms=now_ms,
+            config=config,
+        )
+        return evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=now_ms - 10_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=now_ms,
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            meal_window_active=False,
+            child_id="child_1",
+        )
+
+    def test_effective_discovery_interval_backoffs_after_idle_ticks(self):
+        config = CloudGateConfig(
+            capability_discovery_seconds=180,
+            idle_backoff_after_ticks=3,
+            idle_backoff_seconds=600,
+        )
+        behavior = default_care_behavior_state()
+        self.assertEqual(effective_capability_discovery_seconds(behavior, config), 180)
+        behavior["consecutive_idle_kimi_ticks"] = 3
+        self.assertEqual(effective_capability_discovery_seconds(behavior, config), 600)
+
+    def test_discovery_waits_for_backoff_interval(self):
+        config = CloudGateConfig(
+            capability_discovery_seconds=180,
+            idle_backoff_after_ticks=3,
+            idle_backoff_seconds=600,
+        )
+        behavior = default_care_behavior_state()
+        behavior["consecutive_idle_kimi_ticks"] = 3
+        behavior["last_capability_discovery_at_ms"] = 100_000
+        at_200s = self._discovery_critical(behavior=behavior, now_ms=200_000, config=config)
+        self.assertIsNone(at_200s)
+        at_700s = self._discovery_critical(behavior=behavior, now_ms=700_000, config=config)
+        self.assertIsNotNone(at_700s)
+        assert at_700s is not None
+        self.assertEqual(at_700s.reason, "capability_discovery")
+
+    def test_idle_ticks_increment_only_on_idle_kimi_success(self):
+        behavior = default_care_behavior_state()
+        updated = update_idle_kimi_ticks_after_analysis(
+            behavior,
+            analysis={
+                "has_person": True,
+                "activity": "发呆",
+                "confidence": 0.9,
+                "description": "孩子在客厅。",
+            },
+            gate_reason="capability_discovery",
+            previous_session={"bucket": "other", "risk": "none"},
+            current_session={"bucket": "other", "risk": "none"},
+            has_person=True,
+            absent_to_present=False,
+            absence_mode="active",
+            recorded_absent=False,
+            enabled_capabilities=[{"scenario": "posture", "enabled": True}],
+            meal_window_active=False,
+        )
+        self.assertEqual(updated["consecutive_idle_kimi_ticks"], 1)
+
+    def test_idle_ticks_not_incremented_on_low_confidence(self):
+        behavior = default_care_behavior_state()
+        updated = update_idle_kimi_ticks_after_analysis(
+            behavior,
+            analysis={"has_person": True, "activity": "发呆", "confidence": 0.3},
+            gate_reason="capability_discovery",
+            previous_session={"bucket": "other", "risk": "none"},
+            current_session={"bucket": "other", "risk": "none"},
+            has_person=True,
+            absent_to_present=False,
+            absence_mode="active",
+            recorded_absent=False,
+            enabled_capabilities=[{"scenario": "posture", "enabled": True}],
+            meal_window_active=False,
+        )
+        self.assertEqual(updated["consecutive_idle_kimi_ticks"], 0)
+
+    def test_idle_ticks_reset_on_scenario_signal(self):
+        behavior = default_care_behavior_state()
+        behavior["consecutive_idle_kimi_ticks"] = 2
+        updated = update_idle_kimi_ticks_after_analysis(
+            behavior,
+            analysis={
+                "has_person": True,
+                "activity": "玩手机",
+                "screen_device_visible": True,
+                "screen_use_active": True,
+                "screen_device_type": "phone",
+                "confidence": 0.9,
+            },
+            gate_reason="capability_discovery",
+            previous_session={"bucket": "other", "risk": "none"},
+            current_session={"bucket": "screen", "risk": "screen_use_sustained"},
+            has_person=True,
+            absent_to_present=False,
+            absence_mode="active",
+            recorded_absent=False,
+            enabled_capabilities=[{"scenario": "screen_use", "enabled": True}],
+            meal_window_active=False,
+        )
+        self.assertEqual(updated["consecutive_idle_kimi_ticks"], 0)
+
+    def test_idle_ticks_reset_on_person_return(self):
+        behavior = default_care_behavior_state()
+        behavior["consecutive_idle_kimi_ticks"] = 2
+        updated = update_idle_kimi_ticks_after_analysis(
+            behavior,
+            analysis={"has_person": True, "activity": "发呆", "confidence": 0.9},
+            gate_reason="person_return",
+            previous_session={"bucket": "absent", "risk": "absent"},
+            current_session={"bucket": "other", "risk": "none"},
+            has_person=True,
+            absent_to_present=True,
+            absence_mode="active",
+            recorded_absent=False,
+            enabled_capabilities=[{"scenario": "posture", "enabled": True}],
+            meal_window_active=False,
+        )
+        self.assertEqual(updated["consecutive_idle_kimi_ticks"], 0)
+
+    def test_idle_ticks_reset_on_session_changed(self):
+        behavior = default_care_behavior_state()
+        behavior["consecutive_idle_kimi_ticks"] = 2
+        updated = update_idle_kimi_ticks_after_analysis(
+            behavior,
+            analysis={"has_person": True, "activity": "发呆", "confidence": 0.9},
+            gate_reason="capability_discovery",
+            previous_session={"bucket": "meal", "risk": "meal_seated"},
+            current_session={"bucket": "meal", "risk": "meal_standing"},
+            has_person=True,
+            absent_to_present=False,
+            absence_mode="active",
+            recorded_absent=False,
+            enabled_capabilities=[{"scenario": "meal_habit", "enabled": True}],
+            meal_window_active=True,
+        )
+        self.assertEqual(updated["consecutive_idle_kimi_ticks"], 0)
+
+    def test_idle_ticks_cleared_without_behavior_capabilities(self):
+        behavior = default_care_behavior_state()
+        behavior["consecutive_idle_kimi_ticks"] = 2
+        updated = update_idle_kimi_ticks_after_analysis(
+            behavior,
+            analysis={"has_person": True, "activity": "发呆", "confidence": 0.9},
+            gate_reason="person_heartbeat",
+            previous_session={"bucket": "other", "risk": "none"},
+            current_session={"bucket": "other", "risk": "none"},
+            has_person=True,
+            absent_to_present=False,
+            absence_mode="active",
+            recorded_absent=False,
+            enabled_capabilities=[{"scenario": "wake_up", "enabled": True}],
+            meal_window_active=False,
+        )
+        self.assertEqual(updated["consecutive_idle_kimi_ticks"], 0)
 
 
 if __name__ == "__main__":

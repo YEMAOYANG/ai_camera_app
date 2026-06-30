@@ -24,7 +24,12 @@ from services.observation_absence_mode import (
     update_absence_after_analysis,
     update_absence_after_prefilter,
 )
-from services.observation_cloud_gate import evaluate_cloud_gate, sync_care_behavior_from_analysis
+from services.observation_cloud_gate import (
+    evaluate_cloud_gate,
+    sync_care_behavior_from_analysis,
+    update_idle_kimi_ticks_after_analysis,
+)
+from services.care_routine_window_resolver import resolve_meal_window_active
 from services.observation_runtime_state import (
     ObservationRuntimeStateStore,
     display_freshness_from_runtime,
@@ -203,6 +208,11 @@ class CameraObserveService:
             dict(gate_decision.next_care_behavior or context.runtime.get("care_behavior") or {}),
             analysis,
         )
+        meal_window_active = resolve_meal_window_active(
+            routine_windows=context.routine_windows,
+            capability_config=context.meal_capability_config,
+            observed_at=now,
+        )
         pending_runtime: dict[str, Any] | None = None
         post_reason = ""
         with self.repository.transaction() as conn:
@@ -217,6 +227,19 @@ class CameraObserveService:
                 has_person=has_person,
                 now_ms=now,
                 frame_stable=context.frame_stable,
+            )
+            care_behavior = update_idle_kimi_ticks_after_analysis(
+                care_behavior,
+                analysis=analysis,
+                gate_reason=gate_decision.reason,
+                previous_session=context.previous_session,
+                current_session=current_session,
+                has_person=has_person,
+                absent_to_present=absent_to_present,
+                absence_mode=str(absence.get("mode") or "active"),
+                recorded_absent=bool(absence.get("recorded_absent")),
+                enabled_capabilities=context.enabled_capabilities,
+                meal_window_active=meal_window_active,
             )
             runtime["absence"] = absence
             runtime["frame"] = next_frame_state(
