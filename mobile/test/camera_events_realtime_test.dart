@@ -406,6 +406,59 @@ void main() {
 
     expect(event.isRoutineRecord, isTrue);
     expect(event.isVisionRecord, isFalse);
+    expect(event.recordCategoryLabel, '作息提醒');
+  });
+
+  test('LiveCareEvent classifies care record labels by recordKind and scenario', () {
+    final vision = LiveCareEvent.fromJson({
+      'id': 'evt_vision',
+      'eventType': 'camera_observation',
+      'displayTitle': '看到孩子在书桌前',
+      'displayMessage': '画面里看到孩子。',
+      'category': 'camera_observation',
+      'recordKind': 'vision',
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    });
+    expect(vision.recordCategoryLabel, '画面观察');
+
+    final capabilityReminder = LiveCareEvent.fromJson({
+      'id': 'evt_posture',
+      'eventType': 'speak',
+      'displayTitle': '坐姿提醒',
+      'displayMessage': '请坐直一点。',
+      'category': 'care_reminder',
+      'recordKind': 'reminder',
+      'payload': {
+        'request': {'scenario': 'posture', 'source': 'care_reminder'},
+      },
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    });
+    expect(capabilityReminder.recordCategoryLabel, '能力提醒');
+
+    final routineReminder = LiveCareEvent.fromJson({
+      'id': 'evt_wake',
+      'eventType': 'speak',
+      'displayTitle': '起床提醒',
+      'displayMessage': '该起床啦。',
+      'category': 'care_reminder',
+      'recordKind': 'reminder',
+      'payload': {
+        'request': {'scenario': 'wake_up', 'source': 'care_reminder'},
+      },
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    });
+    expect(routineReminder.recordCategoryLabel, '作息提醒');
+
+    final unknownReminder = LiveCareEvent.fromJson({
+      'id': 'evt_unknown',
+      'eventType': 'speak',
+      'displayTitle': '看护提醒',
+      'displayMessage': '已轻声提醒。',
+      'category': 'care_reminder',
+      'recordKind': 'reminder',
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    });
+    expect(unknownReminder.recordCategoryLabel, '看护提醒');
   });
 
   test(

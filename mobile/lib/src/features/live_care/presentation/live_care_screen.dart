@@ -809,12 +809,7 @@ AppListRowTone _eventListTone(LiveCareEvent event) {
 }
 
 String _recentEventSubtitle(LiveCareEvent event) {
-  final prefix = switch (event.recordKind) {
-    'routine' => '作息提醒',
-    'reminder' => '语音提醒',
-    'vision' => '画面观察',
-    _ => '看护记录',
-  };
+  final prefix = event.recordCategoryLabel;
   return '$prefix · ${event.timeLabel} · ${event.displayTitle}：${event.displayMessage}';
 }
 
@@ -864,7 +859,7 @@ class _LiveEventsScreenState extends ConsumerState<LiveEventsScreen> {
     final eventsState = events.asData?.value;
     return AppScreen(
       title: '看护记录',
-      subtitle: '画面观察和需要回看的情况',
+      subtitle: '记录画面变化和提醒情况。',
       onBack: () => context.go(AppRoute.live.path),
       scrollController: _scrollController,
       reserveBottomNavigation: false,

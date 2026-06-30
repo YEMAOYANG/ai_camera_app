@@ -476,6 +476,19 @@ class CameraEventsState {
   }
 }
 
+const _routineReminderScenarios = {
+  'meal_start',
+  'wake_up',
+  'nap_time',
+  'bedtime',
+};
+
+const _capabilityReminderScenarios = {
+  'posture',
+  'toy_cleanup',
+  'meal_habit',
+};
+
 class LiveCareEvent {
   const LiveCareEvent({
     required this.id,
@@ -494,6 +507,7 @@ class LiveCareEvent {
     required this.toneKey,
     required this.createdAt,
     this.recordKind = '',
+    this.scenario = '',
   });
 
   final String id;
@@ -512,12 +526,24 @@ class LiveCareEvent {
   final String toneKey;
   final int createdAt;
   final String recordKind;
+  final String scenario;
 
   bool get isRoutineRecord => recordKind == 'routine';
 
   bool get isVisionRecord => recordKind == 'vision';
 
   bool get isReminderRecord => recordKind == 'reminder';
+
+  String get recordCategoryLabel {
+    if (recordKind == 'routine') return '作息提醒';
+    if (recordKind == 'vision') return '画面观察';
+    if (recordKind == 'reminder') {
+      if (_routineReminderScenarios.contains(scenario)) return '作息提醒';
+      if (_capabilityReminderScenarios.contains(scenario)) return '能力提醒';
+      return '看护提醒';
+    }
+    return '看护记录';
+  }
 
   bool get isCareRecord {
     return switch (category) {
@@ -595,7 +621,29 @@ class LiveCareEvent {
       toneKey: _asString(json['tone']),
       createdAt: _asNullableInt(json['createdAt']) ?? 0,
       recordKind: _asString(json['recordKind']),
+      scenario: _parseScenario(json),
     );
+  }
+
+  static String _parseScenario(Map<String, dynamic> json) {
+    final direct = _asString(json['scenario']);
+    if (direct.isNotEmpty) return direct;
+
+    final payload = _asMap(json['payload']);
+    if (payload.isEmpty) return '';
+
+    final request = _asMap(payload['request']);
+    final response = _asMap(payload['response']);
+    for (final source in [request, response, payload]) {
+      final fromSource = _asString(source['scenario']);
+      if (fromSource.isNotEmpty) return fromSource;
+    }
+    for (final parent in [response, request, payload]) {
+      final observation = _asMap(parent['observation']);
+      final fromObservation = _asString(observation['scenario']);
+      if (fromObservation.isNotEmpty) return fromObservation;
+    }
+    return '';
   }
 }
 

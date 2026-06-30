@@ -2900,7 +2900,7 @@ class _CareCapabilitiesPageState extends ConsumerState<CareCapabilitiesPage> {
 
     return _Page(
       title: '看护能力',
-      subtitle: '按幼儿园作息轻声提醒。',
+      subtitle: '根据画面状态，在需要时轻声提醒。',
       children: [
         if (selectedDevice.isLoading)
           const _Loading(title: '正在同步当前摄像头')
@@ -3633,31 +3633,17 @@ String _routineSubtitle(String type) {
 const _v1VisibleCareScenarios = {
   'posture',
   'toy_cleanup',
-  'meal_start',
   'meal_habit',
-  'nap_time',
-  'bedtime',
-  'wake_up',
 };
 
-const _careReminderRuleScenarios = {
-  'toy_cleanup',
-  'meal_start',
-  'wake_up',
-  'nap_time',
-  'bedtime',
-};
+const _careReminderRuleScenarios = {'toy_cleanup'};
 
 int _capabilityOrder(String scenario) {
   return switch (scenario) {
     'posture' => 0,
     'toy_cleanup' => 1,
-    'meal_start' => 2,
-    'meal_habit' => 3,
-    'nap_time' => 4,
-    'bedtime' => 5,
-    'wake_up' => 6,
-    'transition' => 7,
+    'meal_habit' => 2,
+    'transition' => 3,
     _ => 99,
   };
 }
@@ -3665,9 +3651,9 @@ int _capabilityOrder(String scenario) {
 String _capabilityTitle(String scenario) {
   return switch (scenario) {
     'posture' => '坐姿提醒',
-    'toy_cleanup' => '玩具收纳',
-    'meal_start' => '用餐开始提醒',
+    'toy_cleanup' => '玩具收纳与安全',
     'meal_habit' => '用餐习惯提醒',
+    'meal_start' => '用餐开始提醒',
     'nap_time' => '午睡提醒',
     'bedtime' => '晚上入睡提醒',
     'wake_up' => '起床提醒',
@@ -3678,15 +3664,15 @@ String _capabilityTitle(String scenario) {
 
 String _capabilityDescription(String scenario) {
   return switch (scenario) {
-    'posture' => '久坐或靠太近时轻声提醒。',
-    'toy_cleanup' => '孩子玩完离开后，摄像头会轻声提醒收好玩具。',
+    'posture' => '低头、趴桌或靠太近时，轻声提醒孩子调整。',
+    'toy_cleanup' => '玩完离开、玩具散落或玩法需要留意时提醒。',
+    'meal_habit' => '只在早餐、午餐、晚餐时间内，看到离座、分心或边吃边玩时提醒。',
     'meal_start' => '到用餐时间，提醒坐好开始吃饭。',
-    'meal_habit' => '用餐中离座或分心时轻提醒。',
     'nap_time' => '到午睡时间，摄像头会按作息轻声提醒。',
     'bedtime' => '到睡觉时间，摄像头会提醒孩子准备休息。',
     'wake_up' => '到起床时间，摄像头会轻声提醒。',
     'transition' => '准备出门、洗漱等换场景提醒。',
-    _ => '按作息轻声提醒。',
+    _ => '按时间段轻声提醒。',
   };
 }
 

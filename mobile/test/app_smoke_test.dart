@@ -1089,21 +1089,26 @@ void main() {
       expectedTitle: '看护能力',
       expectedTexts: const [
         '坐姿提醒',
-        '玩具收纳',
-        '用餐开始提醒',
+        '玩具收纳与安全',
         '用餐习惯提醒',
+      ],
+      absentTexts: const [
+        '更多提醒能力',
+        '转场提醒',
+        '已开启',
+        '已关闭',
+        '用餐开始提醒',
         '午睡提醒',
         '晚上入睡提醒',
         '起床提醒',
       ],
-      absentTexts: const ['更多提醒能力', '转场提醒', '已开启', '已关闭'],
     );
     await _openProfileNestedEntry(
       tester,
       'AI 规则与提醒',
       '作息时间',
       expectedTitle: '作息节奏',
-      expectedTexts: const ['上学日', '周末', '起床', '早餐', '午睡', '晚上睡觉'],
+      expectedTexts: const ['上学日', '周末', '起床', '早餐', '午餐', '午睡', '晚餐', '晚上睡觉'],
       absentTexts: const ['假期作息', '后续可按假期单独调整。'],
     );
     await _openProfileNestedEntry(
@@ -1151,14 +1156,18 @@ void main() {
       expectedTexts: const [
         '未连接摄像头',
         '坐姿提醒',
-        '玩具收纳',
-        '用餐开始提醒',
+        '玩具收纳与安全',
         '用餐习惯提醒',
+      ],
+      absentTexts: const [
+        '还没有可用摄像头',
+        '更多提醒能力',
+        '后续开放',
+        '用餐开始提醒',
         '午睡提醒',
         '晚上入睡提醒',
         '起床提醒',
       ],
-      absentTexts: const ['还没有可用摄像头', '更多提醒能力', '后续开放'],
     );
   });
 
@@ -3264,7 +3273,7 @@ class _FakeApiServer {
   List<Map<String, dynamic>> _careCapabilities() {
     const scenarios = [
       ('posture', '坐姿提醒', ['posture']),
-      ('toy_cleanup', '玩具收纳', <String>[]),
+      ('toy_cleanup', '玩具收纳与安全', <String>[]),
       ('meal_start', '用餐开始提醒', ['breakfast', 'lunch', 'dinner']),
       ('meal_habit', '用餐习惯提醒', ['breakfast', 'lunch', 'dinner']),
       ('nap_time', '午睡提醒', ['nap']),
