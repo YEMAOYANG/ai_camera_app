@@ -189,30 +189,16 @@ class CameraCommandService:
         context = self.auth_service.authenticate(access_token)
         limit = self._limit_arg(args.get("limit") if args else 10)
         offset = self._offset_arg(args.get("offset") if args else None)
-        fetch_limit = min(100, limit + offset)
         with self.repository.transaction() as conn:
-            commands = self.repository.list_recent_commands(
+            page, has_more = _paginate_camera_care_events(
                 conn,
-                family_id=context["family"]["id"],
-                device_id=device_id,
-                limit=fetch_limit,
-            )
-            task_events = self.repository.list_recent_task_events(
-                conn,
+                self.repository,
                 family_id=context["family"]["id"],
                 device_id=device_id,
                 include_unassigned=include_unassigned,
-                limit=fetch_limit,
+                offset=offset,
+                limit=limit,
             )
-        events = [
-            *(_camera_command_event_payload(row) for row in commands),
-            *(_task_event_payload(row) for row in task_events),
-        ]
-        events.sort(key=lambda item: (item["createdAt"], item["id"]), reverse=True)
-        parent_events = _parent_facing_events(events)
-        camera_events = [event for event in parent_events if _is_camera_care_event(event)]
-        page = camera_events[offset:offset + limit]
-        has_more = len(camera_events) > offset + len(page)
         return {"ok": True, "events": page, "hasMore": has_more}
 
     def record_observation_event(
@@ -646,6 +632,76 @@ def _task_event_payload(row) -> dict:
         "createdAt": row["created_at"],
         "payload": _json_dict(row.get("payload")),
     }
+
+
+def _merged_recent_events(
+    conn,
+    repository,
+    *,
+    family_id: str,
+    device_id: str | None,
+    include_unassigned: bool,
+    scan_limit: int,
+) -> list[dict]:
+    commands = repository.list_recent_commands(
+        conn,
+        family_id=family_id,
+        device_id=device_id,
+        limit=scan_limit,
+    )
+    task_events = repository.list_recent_task_events(
+        conn,
+        family_id=family_id,
+        device_id=device_id,
+        include_unassigned=include_unassigned,
+        limit=scan_limit,
+    )
+    events = [
+        *(_camera_command_event_payload(row) for row in commands),
+        *(_task_event_payload(row) for row in task_events),
+    ]
+    events.sort(key=lambda item: (item["createdAt"], item["id"]), reverse=True)
+    return events
+
+
+def _camera_care_events_from_rows(events: list[dict]) -> list[dict]:
+    parent_events = _parent_facing_events(events)
+    return [event for event in parent_events if _is_camera_care_event(event)]
+
+
+def _paginate_camera_care_events(
+    conn,
+    repository,
+    *,
+    family_id: str,
+    device_id: str | None,
+    include_unassigned: bool,
+    offset: int,
+    limit: int,
+    max_scan: int = 500,
+) -> tuple[list[dict], bool]:
+    scan = max(40, (offset + limit + 1) * 4)
+    camera_events: list[dict] = []
+    while scan <= max_scan:
+        camera_events = _camera_care_events_from_rows(
+            _merged_recent_events(
+                conn,
+                repository,
+                family_id=family_id,
+                device_id=device_id,
+                include_unassigned=include_unassigned,
+                scan_limit=scan,
+            )
+        )
+        if len(camera_events) >= offset + limit + 1:
+            page = camera_events[offset : offset + limit]
+            return page, True
+        if scan >= max_scan:
+            break
+        scan = min(scan * 2, max_scan)
+    page = camera_events[offset : offset + limit]
+    has_more = len(camera_events) > offset + len(page)
+    return page, has_more
 
 
 def _parent_facing_events(events: list[dict]) -> list[dict]:

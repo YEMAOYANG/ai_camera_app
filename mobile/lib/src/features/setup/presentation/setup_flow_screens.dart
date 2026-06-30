@@ -995,6 +995,7 @@ class ChildProfileSetupScreen extends ConsumerWidget {
           );
         },
       ),
+      onBack: () => context.go(setupParentIdentityPath),
       primaryLabel: '完成设置',
       onPrimary: draft.childName.trim().isEmpty
           ? null
@@ -1868,6 +1869,7 @@ class _SetupScreenShell extends ConsumerWidget {
     required this.body,
     required this.primaryLabel,
     required this.onPrimary,
+    this.onBack,
     this.loading = false,
     this.showSetupProgress = true,
   });
@@ -1879,6 +1881,7 @@ class _SetupScreenShell extends ConsumerWidget {
   final Widget body;
   final String primaryLabel;
   final VoidCallback? onPrimary;
+  final VoidCallback? onBack;
   final bool loading;
   final bool showSetupProgress;
 
@@ -1900,6 +1903,7 @@ class _SetupScreenShell extends ConsumerWidget {
                 children: [
                   _SetupTopBar(
                     step: progressStep,
+                    onBack: loading ? null : onBack,
                     onLogout: () => _confirmSetupLogout(context, ref),
                   ),
                   Expanded(
@@ -2013,9 +2017,14 @@ class _SetupBackground extends StatelessWidget {
 }
 
 class _SetupTopBar extends StatelessWidget {
-  const _SetupTopBar({required this.step, required this.onLogout});
+  const _SetupTopBar({
+    required this.step,
+    required this.onLogout,
+    this.onBack,
+  });
 
   final int? step;
+  final VoidCallback? onBack;
   final VoidCallback onLogout;
 
   @override
@@ -2024,6 +2033,14 @@ class _SetupTopBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 6),
       child: Row(
         children: [
+          if (onBack != null) ...[
+            AppIconButton(
+              icon: Icons.arrow_back,
+              label: '返回上一步',
+              onTap: onBack!,
+            ),
+            const SizedBox(width: 10),
+          ],
           Text(
             '首次设置',
             style: TextStyle(

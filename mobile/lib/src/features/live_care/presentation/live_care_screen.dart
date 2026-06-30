@@ -788,7 +788,7 @@ class _CareFocusPanel extends StatelessWidget {
             AppListRow(
               icon: Icons.history_outlined,
               title: '最近记录',
-              subtitle: _recentEventSubtitle(recentEvent),
+              subtitle: _recentEventPreviewSubtitle(recentEvent),
               tone: _eventListTone(recentEvent),
               onTap: () => context.go(liveEventsPath),
               subtitleMaxLines: 1,
@@ -808,9 +808,16 @@ AppListRowTone _eventListTone(LiveCareEvent event) {
   };
 }
 
-String _recentEventSubtitle(LiveCareEvent event) {
+String _recentEventPreviewSubtitle(LiveCareEvent event) {
   final prefix = event.recordCategoryLabel;
   return '$prefix · ${event.timeLabel} · ${event.displayTitle}：${event.displayMessage}';
+}
+
+String _playbackCardMessage(LiveCareEvent event) {
+  final prefix = event.recordCategoryLabel;
+  final message = event.displayMessage.trim();
+  if (message.isEmpty) return prefix;
+  return '$prefix · $message';
 }
 
 String _monitorObservationSubtitle(CameraMonitorStatus monitor) {
@@ -856,17 +863,16 @@ class _LiveEventsScreenState extends ConsumerState<LiveEventsScreen> {
   @override
   Widget build(BuildContext context) {
     final events = ref.watch(cameraEventsProvider);
-    final eventsState = events.asData?.value;
     return AppScreen(
       title: '看护记录',
       subtitle: '记录画面变化和提醒情况。',
       onBack: () => context.go(AppRoute.live.path),
       scrollController: _scrollController,
       reserveBottomNavigation: false,
-      refreshDisplacement: 52,
+      refreshDisplacement: 56,
       easyRefreshController: _refreshController,
       onRefresh: _handleRefresh,
-      onLoadMore: eventsState?.hasMore == true ? _handleLoadMore : null,
+      onLoadMore: _handleLoadMore,
       children: [
         events.when(
           skipLoadingOnRefresh: true,
@@ -894,13 +900,13 @@ class _LiveEventsScreenState extends ConsumerState<LiveEventsScreen> {
                     icon: _eventIcon(items[index]),
                     title: items[index].displayTitle,
                     time: items[index].timeLabel,
-                    message: _recentEventSubtitle(items[index]),
+                    message: _playbackCardMessage(items[index]),
                     tone: _eventListTone(items[index]),
                   ),
-                  if (index != items.length - 1) const SizedBox(height: 12),
+                  if (index != items.length - 1) const SizedBox(height: 8),
                 ],
                 if (state.isLoadingMore) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   const Center(
                     child: SizedBox(
                       width: 22,
@@ -964,22 +970,22 @@ class _PlaybackCard extends StatelessWidget {
     final color = _playbackToneColor(tone);
     return AppSurface(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.10),
+                color: color.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: SizedBox(
-                width: 42,
-                height: 42,
-                child: Center(child: Icon(icon, color: color, size: 21)),
+                width: 40,
+                height: 40,
+                child: Center(child: Icon(icon, color: color, size: 20)),
               ),
             ),
-            const SizedBox(width: 13),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -997,7 +1003,7 @@ class _PlaybackCard extends StatelessWidget {
                       letterSpacing: 0,
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 3),
                   Text(
                     time,
                     style: const TextStyle(
@@ -1010,7 +1016,7 @@ class _PlaybackCard extends StatelessWidget {
                     ),
                   ),
                   if (message.trim().isNotEmpty) ...[
-                    const SizedBox(height: 7),
+                    const SizedBox(height: 5),
                     Text(
                       message,
                       style: const TextStyle(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/core/config/app_environment.dart';
@@ -86,22 +88,33 @@ class ApiClient {
 }
 
 class ClientDeviceHeaderInterceptor extends Interceptor {
-  ClientDeviceHeaderInterceptor({required this._loadDeviceInfo});
+  ClientDeviceHeaderInterceptor({required Future<ClientDeviceInfo> Function() loadDeviceInfo})
+      : _loadDeviceInfo = loadDeviceInfo;
 
   final Future<ClientDeviceInfo> Function() _loadDeviceInfo;
+  ClientDeviceInfo? _cachedInfo;
+  Future<void>? _warmUp;
 
   @override
   void onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
-  ) async {
-    try {
-      final info = await _loadDeviceInfo();
-      options.headers.addAll(info.headers);
-    } catch (_) {
-      // Device headers are useful for account security, but should not block API calls.
+  ) {
+    final cached = _cachedInfo;
+    if (cached != null) {
+      options.headers.addAll(cached.headers);
+      handler.next(options);
+      return;
     }
+
+    // Never block API calls while device metadata loads on first launch.
     handler.next(options);
+    _warmUp ??= _loadDeviceInfo()
+        .timeout(const Duration(seconds: 2))
+        .then((info) {
+          _cachedInfo = info;
+        })
+        .catchError((_) {});
   }
 }
 

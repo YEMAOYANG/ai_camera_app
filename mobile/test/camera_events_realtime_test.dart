@@ -243,6 +243,32 @@ void main() {
   );
 
   test(
+    'camera events refresh replaces previous page instead of merging',
+    () async {
+      final repository = _FakeCameraRepository([_event('evt_old', 10)]);
+      final container = ProviderContainer(
+        overrides: [
+          selectedDeviceProvider.overrideWith((ref) async => null),
+          cameraRepositoryProvider.overrideWithValue(repository),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      expect(
+        (await container.read(cameraEventsProvider.future)).items.single.id,
+        'evt_old',
+      );
+
+      repository.eventItems = [_event('evt_new', 100)];
+      await container.read(cameraEventsProvider.notifier).refresh();
+      final refreshed = container.read(cameraEventsProvider).value!;
+
+      expect(refreshed.items.length, 1);
+      expect(refreshed.items.single.id, 'evt_new');
+    },
+  );
+
+  test(
     'camera events refresh can restore hasMore after a no-more state',
     () async {
       final repository = _FakeCameraRepository([

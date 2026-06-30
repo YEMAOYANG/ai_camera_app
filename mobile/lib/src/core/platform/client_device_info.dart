@@ -27,14 +27,26 @@ class ClientDeviceInfo {
   final String appVersion;
 
   Map<String, String> get headers {
+    final headerLabel = _httpHeaderValue(
+      label,
+      fallback: hardware.isNotEmpty
+          ? hardware
+          : model.isNotEmpty
+          ? model
+          : platform,
+    );
     return {
-      'X-Mira-Device-Label': label,
-      'X-Mira-Device-Type': type,
-      'X-Mira-Device-Platform': platform,
-      if (model.isNotEmpty) 'X-Mira-Device-Model': model,
-      if (hardware.isNotEmpty) 'X-Mira-Device-Hardware': hardware,
-      if (osVersion.isNotEmpty) 'X-Mira-OS-Version': osVersion,
-      if (appVersion.isNotEmpty) 'X-Mira-App-Version': appVersion,
+      'X-Mira-Device-Label': headerLabel,
+      'X-Mira-Device-Type': _httpHeaderValue(type, fallback: 'phone'),
+      'X-Mira-Device-Platform': _httpHeaderValue(platform, fallback: 'ios'),
+      if (model.isNotEmpty)
+        'X-Mira-Device-Model': _httpHeaderValue(model, fallback: hardware),
+      if (hardware.isNotEmpty)
+        'X-Mira-Device-Hardware': _httpHeaderValue(hardware, fallback: model),
+      if (osVersion.isNotEmpty)
+        'X-Mira-OS-Version': _httpHeaderValue(osVersion, fallback: 'unknown'),
+      if (appVersion.isNotEmpty)
+        'X-Mira-App-Version': _httpHeaderValue(appVersion, fallback: 'unknown'),
     };
   }
 
@@ -188,4 +200,20 @@ String _titleCase(String value) {
         return word[0].toUpperCase() + word.substring(1).toLowerCase();
       })
       .join(' ');
+}
+
+String _httpHeaderValue(String value, {required String fallback}) {
+  final trimmed = value.trim();
+  if (trimmed.isEmpty) {
+    return _httpHeaderValue(fallback, fallback: 'unknown');
+  }
+  if (trimmed.runes.every((codePoint) => codePoint <= 0x7F)) {
+    return trimmed;
+  }
+  final asciiFallback = fallback.trim();
+  if (asciiFallback.isNotEmpty &&
+      asciiFallback.runes.every((codePoint) => codePoint <= 0x7F)) {
+    return asciiFallback;
+  }
+  return 'unknown';
 }

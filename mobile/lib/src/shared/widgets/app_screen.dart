@@ -7,6 +7,15 @@ import 'package:warm_sight/src/core/theme/app_system_ui.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/shared/widgets/app_background.dart';
 
+const _refreshIndicatorTextStyle = TextStyle(
+  color: Color(0xFF9AA6B6),
+  fontFamily: AppTypography.systemFont,
+  fontSize: 12,
+  fontWeight: FontWeight.w600,
+  height: 1.2,
+  letterSpacing: 0,
+);
+
 class AppScreen extends StatelessWidget {
   const AppScreen({
     required this.title,
@@ -61,6 +70,12 @@ class AppScreen extends StatelessWidget {
     final safeArea = MediaQuery.paddingOf(context);
     final basePadding = padding.resolve(Directionality.of(context));
     final hasFooter = footer != null;
+    final useEasyRefresh = onRefresh != null || onLoadMore != null;
+    final pinnedHeaderVisible = fixedHeader && showHeader;
+    final scrollBelowPinnedHeader = pinnedHeaderVisible && useEasyRefresh;
+    final scrollTopInset = scrollBelowPinnedHeader
+        ? safeArea.top + pinnedHeaderHeight
+        : 0.0;
     final chromeBottom = reserveBottomNavigation
         ? AppChrome.tabBarBottomGap(safeArea.bottom) +
               AppChrome.tabBarHeight +
@@ -78,8 +93,10 @@ class AppScreen extends StatelessWidget {
       chromeBottom,
       footerBottomPadding,
     ].reduce((value, item) => value > item ? value : item);
-    final topPadding = fixedHeader
-        ? safeArea.top + pinnedHeaderHeight + basePadding.top
+    final topPadding = pinnedHeaderVisible
+        ? (scrollBelowPinnedHeader
+              ? basePadding.top
+              : safeArea.top + pinnedHeaderHeight + basePadding.top)
         : basePadding.top + safeArea.top + 2;
     final adjustedPadding = EdgeInsets.fromLTRB(
       basePadding.left,
@@ -95,11 +112,17 @@ class AppScreen extends StatelessWidget {
         body: Stack(
           children: [
             const Positioned.fill(child: AppScreenBackground()),
-            Positioned.fill(
+            Positioned(
+              top: scrollTopInset,
+              left: 0,
+              right: 0,
               bottom: scrollBottomInset,
-              child: _buildScrollBody(adjustedPadding),
+              child: _buildScrollBody(
+                adjustedPadding,
+                scrollBelowPinnedHeader: scrollBelowPinnedHeader,
+              ),
             ),
-            if (fixedHeader && showHeader)
+            if (pinnedHeaderVisible)
               _AppPinnedHeader(
                 title: title,
                 subtitle: subtitle,
@@ -118,45 +141,52 @@ class AppScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScrollBody(EdgeInsetsGeometry adjustedPadding) {
-    final listView = ListView(
-      controller: scrollController,
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      physics: onRefresh != null || onLoadMore != null
-          ? const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics())
-          : null,
-      padding: adjustedPadding,
-      children: [
-        if (!fixedHeader && showHeader) ...[
-          _AppLargeHeader(title: title, subtitle: subtitle, trailing: trailing),
-          const SizedBox(height: 18),
+  Widget _buildScrollBody(
+    EdgeInsetsGeometry adjustedPadding, {
+    required bool scrollBelowPinnedHeader,
+  }) {
+    final useEasyRefresh = onRefresh != null || onLoadMore != null;
+    if (!useEasyRefresh) {
+      return ListView(
+        controller: scrollController,
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: adjustedPadding,
+        children: [
+          if (!fixedHeader && showHeader) ...[
+            _AppLargeHeader(
+              title: title,
+              subtitle: subtitle,
+              trailing: trailing,
+            ),
+            const SizedBox(height: 18),
+          ],
+          ...children,
         ],
-        ...children,
-      ],
-    );
-    if (onRefresh == null && onLoadMore == null) {
-      return listView;
+      );
     }
-    return EasyRefresh(
+    return EasyRefresh.builder(
       controller: easyRefreshController,
       scrollController: scrollController,
       header: ClassicHeader(
         triggerOffset: refreshDisplacement,
         clamping: false,
         position: IndicatorPosition.above,
+        safeArea: !scrollBelowPinnedHeader,
         dragText: '下拉刷新',
         armedText: '释放刷新',
         readyText: '刷新中…',
         processingText: '刷新中…',
         processedText: '已更新',
         showMessage: false,
+        textStyle: _refreshIndicatorTextStyle,
       ),
       footer: onLoadMore == null
           ? null
           : ClassicFooter(
               triggerOffset: 56,
               clamping: false,
-              position: IndicatorPosition.behind,
+              position: IndicatorPosition.above,
+              safeArea: false,
               dragText: '上拉加载更多',
               armedText: '释放加载',
               readyText: '加载中…',
@@ -164,23 +194,50 @@ class AppScreen extends StatelessWidget {
               processedText: '加载完成',
               noMoreText: '没有更多了',
               showMessage: false,
+              textStyle: _refreshIndicatorTextStyle,
             ),
       onRefresh: onRefresh == null
           ? null
           : () async {
-              await onRefresh!();
-              easyRefreshController?.finishRefresh(IndicatorResult.success);
+              try {
+                await onRefresh!();
+                easyRefreshController?.finishRefresh(IndicatorResult.success);
+              } catch (_) {
+                easyRefreshController?.finishRefresh(IndicatorResult.fail);
+              }
               easyRefreshController?.resetFooter();
             },
       onLoad: onLoadMore == null
           ? null
           : () async {
-              final hasMore = await onLoadMore!();
-              easyRefreshController?.finishLoad(
-                hasMore ? IndicatorResult.success : IndicatorResult.noMore,
-              );
+              try {
+                final hasMore = await onLoadMore!();
+                easyRefreshController?.finishLoad(
+                  hasMore ? IndicatorResult.success : IndicatorResult.noMore,
+                );
+              } catch (_) {
+                easyRefreshController?.finishLoad(IndicatorResult.fail);
+              }
             },
-      child: listView,
+      childBuilder: (context, physics) {
+        return ListView(
+          controller: scrollController,
+          physics: physics,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: adjustedPadding,
+          children: [
+            if (!fixedHeader && showHeader) ...[
+              _AppLargeHeader(
+                title: title,
+                subtitle: subtitle,
+                trailing: trailing,
+              ),
+              const SizedBox(height: 18),
+            ],
+            ...children,
+          ],
+        );
+      },
     );
   }
 }

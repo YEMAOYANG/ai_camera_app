@@ -107,12 +107,9 @@ class CameraEventsController extends AsyncNotifier<CameraEventsState> {
     }
     try {
       final page = await _fetchPage(offset: 0);
-      final items = previous == null
-          ? page.events
-          : [...page.events, ...previous.items];
       state = AsyncData(
         CameraEventsState(
-          items: _mergeCameraEvents(items),
+          items: _mergeCameraEvents(page.events),
           hasMore: page.hasMore,
           loadedCount: page.events.length,
         ),

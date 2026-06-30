@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/core/network/api_client.dart';
 import 'package:warm_sight/src/core/storage/auth_session_store.dart';
@@ -124,6 +125,12 @@ class AuthRepository {
           message,
           code: code is String ? code : 'auth_error',
         );
+      }
+    }
+    if (!kReleaseMode) {
+      final detail = error.message?.trim();
+      if (detail != null && detail.isNotEmpty) {
+        return AuthException('网络异常：$detail', code: 'network_error');
       }
     }
     return const AuthException('网络异常，请稍后重试', code: 'network_error');

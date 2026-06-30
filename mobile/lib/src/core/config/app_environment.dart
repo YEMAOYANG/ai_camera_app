@@ -12,10 +12,20 @@ class AppEnvironment {
   });
 
   static Future<AppEnvironment> load() async {
+    // Debug/Profile builds should read the bundled env file. Xcode runs do not
+    // pass --dart-define-from-file, but ios/Flutter/Generated.xcconfig can keep
+    // stale release DART_DEFINES and point the app at production URLs.
+    if (!kReleaseMode) {
+      return _loadFromBundledAsset(_flavorFromDartDefineOrBuildMode());
+    }
+
     final fromDefines = _fromOptionalDartDefines();
     if (fromDefines != null) return fromDefines;
 
-    final fileFlavor = _flavorFromDartDefineOrBuildMode();
+    return _loadFromBundledAsset(AppFlavor.production);
+  }
+
+  static Future<AppEnvironment> _loadFromBundledAsset(AppFlavor fileFlavor) async {
     final assetPath = _envAssetPathFor(fileFlavor);
     final values = _parseEnvFile(await rootBundle.loadString(assetPath));
     final flavor = _flavorFromName(values['APP_FLAVOR']) ?? fileFlavor;
