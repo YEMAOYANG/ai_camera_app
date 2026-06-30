@@ -143,8 +143,15 @@ ws://127.0.0.1:8001/api/tasks/stream?token=<ACCESS_TOKEN>
 curl -s -X POST http://127.0.0.1:8000/api/dev/care/routine-reminder/tick \
   -H 'Authorization: Bearer <ACCESS_TOKEN>' \
   -H 'Content-Type: application/json' \
-  -d '{"now": <unix_ms_in_routine_window>}'
+  -d '{
+    "now": <unix_ms_in_routine_window>,
+    "familyId": "<FAMILY_ID>",
+    "childId": "<CHILD_ID>",
+    "deviceId": "<DEVICE_ID>"
+  }'
 ```
+
+`familyId` / `childId` / `deviceId` 均为可选；传入后可限制 dev tick 扫描范围，避免污染其他家庭测试数据。响应 `filters` 字段回显实际使用的过滤条件。
 
 `now` 可选；省略则使用服务器当前时间。响应中查看 `responses[]`：
 
@@ -153,11 +160,25 @@ curl -s -X POST http://127.0.0.1:8000/api/dev/care/routine-reminder/tick \
 - `decision.shouldSpeak` — 是否允许播报
 - `reminderDecisionId` — 供 internal trigger 使用
 
-**注意：** dev tick 可能扫描多个家庭候选，会在 dev 环境产生多条记录；生产用户路径不同。
+**注意：** 未传过滤条件时，dev tick 可能扫描多个家庭候选，会在 dev 环境产生多条记录；生产用户路径不同。
 
 ### 3.2 Internal trigger（speaker）
 
-仅当 decision 为 **`allowed` 且 `shouldSpeak=true`** 且未过期时调用：
+仅当 decision 为 **`allowed` 且 `shouldSpeak=true`** 且未过期时调用。
+
+正式提醒最小请求体（`childId` / `scenario` / `deviceId` 可从 decision 反查，可不传）：
+
+```sh
+curl -s -X POST http://127.0.0.1:8000/internal/reminders/trigger \
+  -H 'Authorization: Bearer <INTERNAL_API_TOKEN>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "familyId": "<FAMILY_ID>",
+    "reminderDecisionId": "<DECISION_ID>"
+  }'
+```
+
+兼容旧调用：仍可显式传 `childId`、`scenario`、`deviceId`；若与 decision 不一致会返回 `reminder_decision_not_found` 或 `reminder_decision_device_mismatch`。
 
 ```sh
 curl -s -X POST http://127.0.0.1:8000/internal/reminders/trigger \

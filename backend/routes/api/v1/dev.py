@@ -41,7 +41,17 @@ def routine_reminder_tick():
                 now = int(now_value)
             except (TypeError, ValueError):
                 raise ApiError("invalid_now", "now 必须是毫秒时间戳。", 400)
-        return jsonify(routine_reminder_service().tick(now=now))
+        family_id = _optional_dev_id(data.get("familyId"))
+        child_id = _optional_dev_id(data.get("childId"))
+        device_id = _optional_dev_id(data.get("deviceId"))
+        return jsonify(
+            routine_reminder_service().tick(
+                now=now,
+                family_id=family_id,
+                child_id=child_id,
+                device_id=device_id,
+            )
+        )
     except ApiError as exc:
         return error_response(exc)
 
@@ -95,3 +105,8 @@ def _ensure_dev_enabled() -> None:
         auth_service().authenticate(bearer_token(request))
         return
     raise ApiError("dev_endpoint_not_available", "这个本地调试入口当前不可用。", 404)
+
+
+def _optional_dev_id(value: object) -> str | None:
+    text = str(value or "").strip()
+    return text or None

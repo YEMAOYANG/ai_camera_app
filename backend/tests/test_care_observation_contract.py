@@ -986,6 +986,81 @@ class CareObservationContractTest(unittest.TestCase):
             any(item["observation"]["scenario"] == "wake_up" for item in response.json["responses"])
         )
 
+    def test_dev_routine_reminder_tick_accepts_scope_filters(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "wake_up",
+            minObservationSeconds=1,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        foreign_family_id, foreign_child_id = self._bootstrap_foreign_family("13800004998")
+        now = _ms("2026-06-17 07:30")
+        service = RoutineReminderService(self.app.config["DATABASE_URL"])
+
+        unscoped = service.tick(now=now)
+        scoped = service.tick(
+            now=now,
+            family_id=self.family_id,
+            child_id=self.child_id,
+            device_id=self.device_id,
+        )
+
+        response = self.client.post(
+            "/api/dev/care/routine-reminder/tick",
+            json={
+                "now": now,
+                "familyId": self.family_id,
+                "childId": self.child_id,
+                "deviceId": self.device_id,
+            },
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 200, response.json)
+        self.assertEqual(response.json["filters"]["familyId"], self.family_id)
+        self.assertEqual(response.json["filters"]["childId"], self.child_id)
+        self.assertEqual(response.json["filters"]["deviceId"], self.device_id)
+
+        unscoped_families = {
+            item["observation"]["familyId"] for item in unscoped["responses"]
+        }
+        self.assertIn(self.family_id, unscoped_families)
+        self.assertIn(foreign_family_id, unscoped_families)
+
+        for item in scoped["responses"]:
+            observation = item["observation"]
+            decision = item.get("decision") or {}
+            self.assertEqual(observation["familyId"], self.family_id)
+            self.assertEqual(observation["childId"], self.child_id)
+            self.assertEqual(observation["deviceId"], self.device_id)
+            if decision:
+                self.assertEqual(decision["familyId"], self.family_id)
+                self.assertEqual(decision["childId"], self.child_id)
+                self.assertEqual(decision["deviceId"], self.device_id)
+
+        scoped_families = {item["observation"]["familyId"] for item in scoped["responses"]}
+        self.assertNotIn(foreign_family_id, scoped_families)
+        self.assertTrue(all(family_id == self.family_id for family_id in scoped_families))
+
+        for entry in scoped["skipped"]:
+            self.assertEqual(entry.get("familyId"), self.family_id)
+            self.assertEqual(entry.get("childId"), self.child_id)
+
+        wrong_device = service.tick(
+            now=now,
+            family_id=self.family_id,
+            child_id=self.child_id,
+            device_id="dev_missing_scope_filter",
+        )
+        self.assertEqual(wrong_device["responses"], [])
+        self.assertTrue(wrong_device["skipped"])
+        self.assertEqual(wrong_device["skipped"][0]["reason"], "device_not_found")
+        self.assertEqual(wrong_device["skipped"][0]["familyId"], self.family_id)
+        self.assertEqual(wrong_device["skipped"][0]["childId"], self.child_id)
+
     def test_routine_reminder_day_type_filter_excludes_mismatched_windows(self):
         self._ensure_capabilities()
         self._patch_capability(
@@ -1457,6 +1532,37 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertEqual(event["delivery"]["commandStatus"], "succeeded")
         self.assertEqual(event["delivery"]["message"], "已执行")
 
+    def test_internal_trigger_accepts_family_and_decision_only(self):
+        allowed_decision_id = self._create_decision(
+            REMINDER_DECISION_ALLOWED,
+            should_speak=True,
+            device_id=self.device_id,
+        )
+        provider = _CountingAiTextProvider()
+        command_service = _FakeCameraCommandService()
+        service = AiCareReminderService(
+            self.app.config["DATABASE_URL"],
+            auth_service=None,
+            ai_text_provider=provider,
+            prompt_registry=PromptRegistry(self.app.config["PROMPT_ROOT"]),
+            camera_command_service=command_service,
+        )
+
+        with patch("routes.internal.reminders.ai_care_reminder_service", return_value=service):
+            response = self.client.post(
+                "/internal/reminders/trigger",
+                json={
+                    "familyId": self.family_id,
+                    "reminderDecisionId": allowed_decision_id,
+                },
+                headers={"Authorization": f"Bearer {self.internal_token}"},
+            )
+
+        self.assertEqual(response.status_code, 200, response.json)
+        self.assertEqual(response.json["reminder"]["scenario"], "bedtime")
+        self.assertEqual(len(command_service.calls), 1)
+        self.assertEqual(command_service.calls[0]["deviceId"], self.device_id)
+
     def test_internal_trigger_is_idempotent_for_same_decision(self):
         allowed_decision_id = self._create_decision(REMINDER_DECISION_ALLOWED, should_speak=True)
         provider = _CountingAiTextProvider()
@@ -1726,6 +1832,39 @@ class CareObservationContractTest(unittest.TestCase):
         self.assertIn("currentStage", summary)
         self.assertIn("capabilities", summary)
         self.assertIn("needsParentReview", summary)
+
+    def _bootstrap_foreign_family(self, phone: str) -> tuple[str, str]:
+        code = request_debug_code(self.client, phone)
+        login = self.client.post("/api/auth/sms/login", json={"phone": phone, "code": code})
+        self.assertEqual(login.status_code, 200, login.json)
+        token = login.json["tokens"]["accessToken"]
+        family_id = login.json["family"]["id"]
+        headers = {"Authorization": f"Bearer {token}"}
+        parent = self.client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "妈妈", "relationship": "妈妈", "relationshipKey": "mom"},
+            headers=headers,
+        )
+        self.assertEqual(parent.status_code, 200)
+        device = self.client.post(
+            "/api/setup/device",
+            json={"bindingCode": f"BIND-{phone[-4:]}", "deviceName": "次卧设备", "location": "次卧"},
+            headers=headers,
+        )
+        self.assertEqual(device.status_code, 200)
+        wifi = self.client.post(
+            "/api/setup/wifi",
+            json={"ssid": "Home-5G", "password": "not-stored", "authType": "wpa2"},
+            headers=headers,
+        )
+        self.assertEqual(wifi.status_code, 200)
+        child = self.client.post(
+            "/api/setup/child",
+            json={"name": "其它孩子", "nickname": "其它", "ageStage": "kindergarten_middle"},
+            headers=headers,
+        )
+        self.assertEqual(child.status_code, 200)
+        return family_id, child.json["child"]["id"]
 
     def _login(self, phone: str) -> str:
         code = request_debug_code(self.client, phone)

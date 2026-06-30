@@ -48,51 +48,92 @@ class RoutineReminderService:
         self.device_repository = DeviceRepository(database)
         self.observation_service = CameraAiObservationService(database_url)
 
-    def tick(self, *, now: int | None = None) -> dict:
+    def tick(
+        self,
+        *,
+        now: int | None = None,
+        family_id: str | None = None,
+        child_id: str | None = None,
+        device_id: str | None = None,
+    ) -> dict:
         current = now if now is not None else now_ms()
+        family_filter = str(family_id or "").strip() or None
+        child_filter = str(child_id or "").strip() or None
+        device_filter = str(device_id or "").strip() or None
         payloads = []
         skipped = []
         with self.repository.transaction() as conn:
-            children = conn.execute(
-                """
+            query = """
                 SELECT id, family_id
                 FROM children
-                ORDER BY family_id, created_at, id
-                """
-            ).fetchall()
+            """
+            params: list[str] = []
+            clauses: list[str] = []
+            if family_filter:
+                clauses.append("family_id = ?")
+                params.append(family_filter)
+            if child_filter:
+                clauses.append("id = ?")
+                params.append(child_filter)
+            if clauses:
+                query += " WHERE " + " AND ".join(clauses)
+            query += " ORDER BY family_id, created_at, id"
+            children = conn.execute(query, tuple(params)).fetchall()
             for child in children:
-                family_id = str(child["family_id"])
-                child_id = str(child["id"])
+                row_family_id = str(child["family_id"])
+                row_child_id = str(child["id"])
                 ensure_default_capability_configs(
                     self.repository,
                     conn,
-                    family_id=family_id,
-                    child_id=child_id,
+                    family_id=row_family_id,
+                    child_id=row_child_id,
                     device_id=None,
                 )
                 ensure_default_routine_windows(
                     self.repository,
                     conn,
-                    family_id=family_id,
-                    child_id=child_id,
+                    family_id=row_family_id,
+                    child_id=row_child_id,
                 )
-                device = self.device_repository.ensure_default_device(
-                    conn,
-                    family_id=family_id,
-                    now=current,
-                )
+                if device_filter:
+                    device = self.device_repository.get_device(
+                        conn,
+                        family_id=row_family_id,
+                        device_id=device_filter,
+                    )
+                    if device is None:
+                        skipped.append(
+                            {
+                                "familyId": row_family_id,
+                                "childId": row_child_id,
+                                "reason": "device_not_found",
+                            }
+                        )
+                        continue
+                else:
+                    device = self.device_repository.ensure_default_device(
+                        conn,
+                        family_id=row_family_id,
+                        now=current,
+                    )
                 if device is None:
-                    skipped.append({"childId": child_id, "reason": "no_device"})
+                    skipped.append(
+                        {
+                            "familyId": row_family_id,
+                            "childId": row_child_id,
+                            "reason": "no_device",
+                        }
+                    )
                     continue
                 windows = self.repository.list_routine_windows(
                     conn,
-                    family_id=family_id,
-                    child_id=child_id,
+                    family_id=row_family_id,
+                    child_id=row_child_id,
                 )
                 for window in windows:
                     payload = self._payload_for_due_window(
-                        family_id=family_id,
-                        child_id=child_id,
+                        family_id=row_family_id,
+                        child_id=row_child_id,
                         device_id=str(device["id"]),
                         window=window,
                         now=current,
@@ -110,6 +151,11 @@ class RoutineReminderService:
             "triggeredCount": len(responses),
             "responses": responses,
             "skipped": skipped,
+            "filters": {
+                "familyId": family_filter,
+                "childId": child_filter,
+                "deviceId": device_filter,
+            },
         }
 
     def _payload_for_due_window(

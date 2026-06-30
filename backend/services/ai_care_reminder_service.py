@@ -128,26 +128,39 @@ class AiCareReminderService:
 
     def trigger_internal(self, data: dict) -> dict:
         family_id = _required_text(data, "familyId", "familyId is required")
-        child_id = _required_text(data, "childId", "childId is required")
-        scenario = _scenario(data.get("scenario"))
         dry_run = _bool_flag(data.get("dryRun"))
         reminder_decision_id = _optional_text(data.get("reminderDecisionId"))
+        decision = None
         existing_event = None
+
+        if reminder_decision_id:
+            with self.repository.transaction() as conn:
+                decision = self.repository.get_reminder_decision(
+                    conn,
+                    decision_id=reminder_decision_id,
+                )
+            if decision is None or str(decision["family_id"]) != family_id:
+                raise ApiError("reminder_decision_not_found", "提醒决策不存在。", 404)
+            child_id = str(decision["child_id"])
+            scenario = _scenario(decision["scenario"])
+            request_child_id = _optional_text(data.get("childId"))
+            request_scenario = _optional_text(data.get("scenario"))
+            if request_child_id and request_child_id != child_id:
+                raise ApiError("reminder_decision_not_found", "提醒决策不存在。", 404)
+            if request_scenario and request_scenario != scenario:
+                raise ApiError("reminder_decision_not_found", "提醒决策不存在。", 404)
+        elif dry_run:
+            with self.repository.transaction() as conn:
+                child_id = self._resolve_child_id(conn, family_id, _optional_text(data.get("childId")))
+            if not child_id:
+                raise ApiError("child_not_found", "孩子资料不存在。", 404)
+            scenario = _scenario(data.get("scenario"))
+        else:
+            raise ApiError("reminder_decision_required", "正式提醒需要先生成提醒决策。")
+
         with self.repository.transaction() as conn:
             if not self.repository.child_exists(conn, family_id=family_id, child_id=child_id):
                 raise ApiError("child_not_found", "孩子资料不存在。", 404)
-            decision = None
-            if reminder_decision_id:
-                decision = self.repository.get_reminder_decision(conn, decision_id=reminder_decision_id)
-                if (
-                    decision is None
-                    or decision["family_id"] != family_id
-                    or decision["child_id"] != child_id
-                    or decision["scenario"] != scenario
-                ):
-                    raise ApiError("reminder_decision_not_found", "提醒决策不存在。", 404)
-            elif not dry_run:
-                raise ApiError("reminder_decision_required", "正式提醒需要先生成提醒决策。")
             if not dry_run and (
                 decision["decision"] != REMINDER_DECISION_ALLOWED or not bool(decision.get("should_speak"))
             ):
