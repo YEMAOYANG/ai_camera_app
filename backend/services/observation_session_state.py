@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from services.vision_observation_enrich import (
+    is_cleanup_activity,
     is_meal_scene,
     is_toy_play_scene,
     meal_standing_detected,
@@ -15,6 +16,9 @@ def session_snapshot_from_observation(obs: Mapping[str, object]) -> dict[str, st
     has_person = obs.get("has_person")
     if has_person is False:
         return {"bucket": "absent", "risk": "absent"}
+
+    if is_cleanup_activity(obs):
+        return {"bucket": "toy_play", "risk": "cleanup_started"}
 
     if is_meal_scene(obs):
         if has_toys_on_table(obs):

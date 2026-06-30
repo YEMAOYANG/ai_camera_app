@@ -100,6 +100,10 @@ def has_meal_action_evidence(obs: Mapping[str, object]) -> bool:
         return False
     activity = str(obs.get("activity") or obs.get("raw_activity") or "")
     text = behavior_text(obs)
+    description = str(obs.get("description") or "")
+    if TOY_PLAY_ACTION_RE.search(text) and TOY_PLAY_ACTION_RE.search(description):
+        if not MEAL_ACTION_RE.search(description):
+            return False
     if TOY_PLAY_ACTION_RE.search(text) and not MEAL_ACTION_RE.search(text):
         return False
     if MEAL_ACTION_RE.search(text):
@@ -231,6 +235,12 @@ def _normalize_false_toy_play(obs: dict) -> dict:
     if activity != "玩玩具":
         return obs
     text = behavior_text(obs)
+    if (
+        obs.get("toys_scattered")
+        or obs.get("toys_visible")
+        or re.search(r"玩具", text)
+    ):
+        return obs
     if ACTIVE_TOY_INTERACTION_RE.search(text) or TOY_PLAY_ACTION_RE.search(text):
         return obs
     if not SEDENTARY_RE.search(text) and not FORWARD_GAZE_RE.search(text):

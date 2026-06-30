@@ -473,16 +473,12 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(observation["activity"], "看书")
         types = [payload["type"] for _, payload in captured]
         required = [
-            "camera_event.created",
             "camera_monitor.refreshed",
             "camera_observation.updated",
         ]
-        start = 0
-        indexes = []
         for name in required:
-            indexes.append(types.index(name, start))
-            start = indexes[-1] + 1
-        self.assertEqual(indexes, sorted(indexes), types)
+            self.assertIn(name, types)
+        self.assertNotIn("camera_event.created", types)
         self.assertTrue(all(family_id == self.family_id for family_id, _ in captured))
         for _, payload in captured:
             self.assertEqual(payload["deviceId"], self.device_id)
@@ -505,7 +501,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
             headers=self._auth_headers(),
         )
         self.assertEqual(events.status_code, 200, events.json)
-        self.assertTrue(
+        self.assertFalse(
             any(event["displayTitle"] == "观察到孩子正在看书" for event in events.json["events"])
         )
 

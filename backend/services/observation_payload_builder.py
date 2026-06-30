@@ -190,15 +190,6 @@ def scenario_signals(analysis: Mapping[str, object]) -> list[tuple[str, str, str
     elif toys_scattered and not playing_toys:
         result.append(("toy_cleanup", "child_left_toys_uncollected", "active", "观察到玩具还没有收好。"))
 
-    if has_person is True and not result and is_homework_like(analysis):
-        activity = str(analysis.get("activity") or analysis.get("raw_activity") or "看书").strip()
-        label = activity if activity in {"看书", "写作业", "写作业/看书"} else "看书"
-        result.append(("posture", "homework_like_observed", "active", f"观察到孩子正在{label}。"))
-
-    activity = str(analysis.get("activity") or analysis.get("raw_activity") or "").strip()
-    if has_person is True and activity in {"看电视", "玩手机"} and not result:
-        result.append(("transition", "screen_activity_observed", "active", f"观察到孩子正在{activity}。"))
-
     return result
 
 
