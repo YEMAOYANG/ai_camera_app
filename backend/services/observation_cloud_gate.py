@@ -48,6 +48,7 @@ class CloudGateConfig:
     toy_cleanup_interval_seconds: int = 60
     meal_habit_interval_seconds: int = 120
     screen_use_interval_seconds: int = 90
+    motion_active_sample_seconds: int = 60
     enable_unsafe_toy_critical: bool = True
 
 
@@ -79,6 +80,7 @@ def cloud_gate_config() -> CloudGateConfig:
         toy_cleanup_interval_seconds=int(os.getenv("APP_CLOUD_TOY_CLEANUP_INTERVAL_SECONDS", "60")),
         meal_habit_interval_seconds=int(os.getenv("APP_CLOUD_MEAL_HABIT_INTERVAL_SECONDS", "120")),
         screen_use_interval_seconds=int(os.getenv("APP_CLOUD_SCREEN_USE_INTERVAL_SECONDS", "90")),
+        motion_active_sample_seconds=int(os.getenv("APP_CLOUD_MOTION_ACTIVE_SAMPLE_SECONDS", "60")),
         enable_unsafe_toy_critical=str(os.getenv("APP_CLOUD_ENABLE_UNSAFE_TOY_CRITICAL", "1")).strip().lower()
         in {"1", "true", "yes", "on"},
     )
@@ -674,6 +676,9 @@ def _from_motion_active(
         return gate, False, "cloud_gate_person_leave_pending"
     if motion_now:
         gate["motion_exit_debounce"] = 0
+        last_kimi = int(gate.get("last_kimi_at_ms") or 0)
+        if (now_ms - last_kimi) >= config.motion_active_sample_seconds * 1000:
+            return gate, True, "motion_active_sample"
         return gate, False, "cloud_gate_motion_active"
     if motion_stopped:
         debounce = int(gate.get("motion_exit_debounce") or 0) + 1

@@ -8,7 +8,9 @@ from core.database import Database
 from core.errors import ApiError
 from core.security import now_ms
 from models.care import (
+    CARE_SCENARIO_SCREEN_USE,
     CARE_SCENARIOS,
+    SCREEN_USE_COOLDOWN_SECONDS_MIN,
     DEFAULT_DAY_TYPES,
     DEFAULT_FALLBACK_TEMPLATES,
     DAY_TYPES,
@@ -94,7 +96,10 @@ class CareConfigService:
                     time_windows=_json_text(_valid_time_windows(merged.get("timeWindows"))),
                     min_observation_seconds=_positive_int(merged.get("minObservationSeconds"), 20),
                     confidence_threshold=_threshold(merged.get("observationThreshold")),
-                    cooldown_seconds=_positive_int(merged.get("cooldownSeconds"), 900),
+                    cooldown_seconds=_capability_cooldown_seconds(
+                        scenario,
+                        _positive_int(merged.get("cooldownSeconds"), 900),
+                    ),
                     daily_limit=_positive_int(merged.get("dailyLimit"), 4),
                     parent_notify_threshold=_positive_int(merged.get("parentNotifyThreshold"), 3),
                     allow_speaker=_bool(merged.get("allowSpeaker")),
@@ -407,3 +412,9 @@ def _stage_label(window_type: str) -> str:
         "posture": "坐姿",
         "transition": "转场",
     }.get(window_type, "日常作息")
+
+
+def _capability_cooldown_seconds(scenario: str, seconds: int) -> int:
+    if scenario == CARE_SCENARIO_SCREEN_USE:
+        return max(seconds, SCREEN_USE_COOLDOWN_SECONDS_MIN)
+    return seconds

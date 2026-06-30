@@ -4,7 +4,7 @@ import unittest
 
 from services.observation_payload_builder import build_primary_payload
 from services.observation_absence_mode import should_skip_vision_before_analyze, update_absence_after_analysis
-from services.observation_session_state import session_snapshot_from_observation, should_post_observation
+from services.observation_session_state import risk_escalated, session_snapshot_from_observation, should_force_screen_use_resample, should_post_observation
 from services.vision_frame_gate import compute_dhash, frame_is_stable, hamming_distance
 from services.camera_command_service import lightweight_camera_event_from_observation
 from services.vision_observation_enrich import enrich_observation, sanitize_absent_observation
@@ -240,6 +240,107 @@ class ObservationGateTest(unittest.TestCase):
         snapshot = session_snapshot_from_observation(obs)
         self.assertEqual(obs["activity"], "吃饭")
         self.assertEqual(snapshot["risk"], "meal_standing")
+
+    def test_screen_use_resample_after_interval(self):
+        previous = {
+            "bucket": "screen_use",
+            "risk": "screen_use_sustained",
+            "last_record_at": 1_000,
+        }
+        current = {"bucket": "screen_use", "risk": "screen_use_sustained"}
+        self.assertFalse(
+            should_force_screen_use_resample(
+                previous_session=previous,
+                current_session=current,
+                now_ms=90_000,
+                interval_seconds=90,
+            )
+        )
+        self.assertTrue(
+            should_force_screen_use_resample(
+                previous_session=previous,
+                current_session=current,
+                now_ms=91_000,
+                interval_seconds=90,
+            )
+        )
+
+    def test_screen_use_resample_not_for_other_buckets(self):
+        self.assertFalse(
+            should_force_screen_use_resample(
+                previous_session={"bucket": "homework", "risk": "low_head", "last_record_at": 1_000},
+                current_session={"bucket": "homework", "risk": "low_head"},
+                now_ms=200_000,
+            )
+        )
+
+    def _resolve_post_reason(
+        self,
+        *,
+        force_post: bool,
+        previous_session: dict,
+        current_session: dict,
+        should_post: bool,
+        post_reason: str,
+        now_ms: int,
+    ) -> tuple[bool, str]:
+        screen_use_resample = should_force_screen_use_resample(
+            previous_session=previous_session,
+            current_session=current_session,
+            now_ms=now_ms,
+        )
+        post_force = (
+            force_post
+            or risk_escalated(previous_session, current_session)
+            or screen_use_resample
+        )
+        if screen_use_resample and not should_post:
+            post_reason = "screen_use_resample"
+        return post_force, post_reason
+
+    def test_force_post_does_not_mark_screen_use_resample(self):
+        previous = {"bucket": "homework", "risk": "low_head", "last_record_at": 1_000}
+        current = {"bucket": "homework", "risk": "low_head"}
+        should_post, post_reason = should_post_observation(
+            previous_session=previous,
+            current_session=current,
+            has_person=True,
+            absence_mode="active",
+            recorded_absent=False,
+        )
+        post_force, resolved_reason = self._resolve_post_reason(
+            force_post=True,
+            previous_session=previous,
+            current_session=current,
+            should_post=should_post,
+            post_reason=post_reason,
+            now_ms=200_000,
+        )
+        self.assertTrue(post_force)
+        self.assertFalse(should_post)
+        self.assertEqual(resolved_reason, "session_stable")
+
+    def test_meal_risk_escalation_does_not_mark_screen_use_resample(self):
+        previous = {"bucket": "meal", "risk": "meal_seated", "last_record_at": 1_000}
+        current = {"bucket": "meal", "risk": "meal_standing"}
+        should_post, post_reason = should_post_observation(
+            previous_session=previous,
+            current_session=current,
+            has_person=True,
+            absence_mode="active",
+            recorded_absent=False,
+        )
+        post_force, resolved_reason = self._resolve_post_reason(
+            force_post=False,
+            previous_session=previous,
+            current_session=current,
+            should_post=should_post,
+            post_reason=post_reason,
+            now_ms=200_000,
+        )
+        self.assertTrue(post_force)
+        self.assertTrue(should_post)
+        self.assertEqual(resolved_reason, "session_changed")
 
 
 def _tiny_png() -> bytes:

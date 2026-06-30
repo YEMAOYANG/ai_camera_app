@@ -22,6 +22,7 @@ CARE_SCENARIO_BEDTIME = "bedtime"
 CARE_SCENARIO_WAKE_UP = "wake_up"
 CARE_SCENARIO_TRANSITION = "transition"
 CARE_SCENARIO_SCREEN_USE = "screen_use"
+SCREEN_USE_COOLDOWN_SECONDS_MIN = 60
 
 CARE_SCENARIOS = {
     CARE_SCENARIO_POSTURE,
@@ -168,9 +169,9 @@ DEFAULT_FALLBACK_TEMPLATES = {
         "现在慢慢准备出发。",
     ],
     CARE_SCENARIO_SCREEN_USE: [
-        "眼睛离屏幕远一点，我们休息一下吧。",
-        "看屏幕久了，眼睛需要歇一歇哦。",
-        "我们把手机放下，活动一下小身体吧。",
+        "手机先放下，我们让眼睛休息一下。",
+        "屏幕先停一停，起来活动一下吧。",
+        "屏幕离远一点，我们看看远处。",
     ],
 }
 

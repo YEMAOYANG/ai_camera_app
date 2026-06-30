@@ -114,6 +114,21 @@ def should_post_observation(
     return False, "session_stable"
 
 
+def should_force_screen_use_resample(
+    *,
+    previous_session: Mapping[str, Any],
+    current_session: Mapping[str, str],
+    now_ms: int,
+    interval_seconds: int = 90,
+) -> bool:
+    if str(current_session.get("bucket") or "") != "screen_use":
+        return False
+    last_record = int(previous_session.get("last_record_at") or 0)
+    if last_record <= 0:
+        return False
+    return (now_ms - last_record) >= max(30, interval_seconds) * 1000
+
+
 def update_session_after_post(session: dict[str, Any], current: Mapping[str, str], *, now_ms: int) -> dict[str, Any]:
     next_session = dict(session)
     next_session.update(current)

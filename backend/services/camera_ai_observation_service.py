@@ -9,6 +9,7 @@ from core.errors import ApiError
 from core.security import now_ms
 from models.care import (
     CARE_SCENARIO_POSTURE,
+    CARE_SCENARIO_SCREEN_USE,
     CARE_SCENARIOS,
     DAY_TYPES,
     REVIEW_DOMAIN_CARE,
@@ -99,17 +100,22 @@ class CameraAiObservationService:
             )
             raw_detail_dict["semantic_dedupe_key"] = dedupe_key
             raw_detail_json = json.dumps(raw_detail_dict, ensure_ascii=False, separators=(",", ":"))
-            duplicate_care_event = self.repository.find_recent_duplicate_observation(
-                conn,
-                family_id=family_id,
-                child_id=child_id,
-                device_id=device_id,
-                scenario=scenario,
-                signal_type=primary_signal_type,
-                parent_summary=parent_summary,
-                raw_detail_json=dedupe_key,
-                since=now - 120_000,
-            )
+            duplicate_care_event = False
+            if not (
+                scenario == CARE_SCENARIO_SCREEN_USE
+                and bool(raw_detail_dict.get("observation_resample"))
+            ):
+                duplicate_care_event = self.repository.find_recent_duplicate_observation(
+                    conn,
+                    family_id=family_id,
+                    child_id=child_id,
+                    device_id=device_id,
+                    scenario=scenario,
+                    signal_type=primary_signal_type,
+                    parent_summary=parent_summary,
+                    raw_detail_json=dedupe_key,
+                    since=now - 120_000,
+                )
             event = self.repository.create_observation_event(
                 conn,
                 family_id=family_id,
@@ -140,7 +146,10 @@ class CameraAiObservationService:
                 scenario=scenario,
                 configured_threshold=float(capability.get("confidence_threshold") or 0.72) if capability else 0.72,
             )
-            continuous_window_seconds = max(30, min_observation_seconds)
+            continuous_window_seconds = _continuous_window_seconds(
+                scenario=scenario,
+                min_observation_seconds=min_observation_seconds,
+            )
             capability_enabled = capability is not None and bool(capability.get("enabled"))
             signal_rows = []
             state_rows = []
@@ -165,13 +174,17 @@ class CameraAiObservationService:
                     continue
                 if float(signal_row.get("confidence") or 0) < confidence_threshold:
                     continue
+                state_key = _behavior_state_key(
+                    scenario=scenario,
+                    signal_type=signal_row["signal_type"],
+                )
                 existing_state = self.repository.get_current_behavior_state(
                     conn,
                     family_id=family_id,
                     child_id=child_id,
                     device_id=device_id,
                     scenario=scenario,
-                    state=signal_row["signal_type"],
+                    state=state_key,
                 )
                 state_values = _next_state_values(
                     existing_state,
@@ -187,7 +200,7 @@ class CameraAiObservationService:
                         child_id=child_id,
                         device_id=device_id,
                         scenario=scenario,
-                        state=signal_row["signal_type"],
+                        state=state_key,
                         status=state_values["status"],
                         started_at=state_values["started_at"],
                         last_observed_at=observed_at,
@@ -586,6 +599,8 @@ def _target_behavior_for_signal(signal_type: str) -> str:
         "toy_play_unsafe_elevated": "elevated",
         "toy_play_unsafe_throwing": "throwing",
         "toy_play_unsafe_mouth": "small_parts_mouth",
+        "screen_use_sustained": "pause_screen_use",
+        "screen_distance_risk": "move_screen_farther",
     }
     return mapping.get(signal_type, signal_type)
 
@@ -670,6 +685,25 @@ def _contains_negated_toy(text: str) -> bool:
 def _max_signal_duration(value: object) -> int:
     durations = [item["durationSeconds"] for item in _signals(value)]
     return max(durations) if durations else 0
+
+
+def _continuous_window_seconds(*, scenario: str, min_observation_seconds: int) -> int:
+    base = max(30, min_observation_seconds)
+    if scenario == CARE_SCENARIO_SCREEN_USE:
+        # Screen-use Kimi calls are intentionally gated around the same cadence
+        # as the reminder threshold. Allow a little slack so consecutive
+        # screen observations do not reset purely because of worker/gate delay.
+        return max(base, min_observation_seconds * 2)
+    return base
+
+
+def _behavior_state_key(*, scenario: str, signal_type: str) -> str:
+    if scenario == CARE_SCENARIO_SCREEN_USE and signal_type in {
+        "screen_use_sustained",
+        "screen_distance_risk",
+    }:
+        return "screen_use_active"
+    return signal_type
 
 
 def _state_status(value: object) -> str:

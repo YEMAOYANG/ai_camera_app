@@ -3166,27 +3166,38 @@ Future<Map<String, Object?>?> _showCareReminderRulesSheet(
   CareCapability capability,
 ) {
   final isToyCleanup = capability.scenario == 'toy_cleanup';
-  var leaveMinutes = _secondsToMinutes(
+  final isScreenUse = capability.scenario == 'screen_use';
+  final hasObservationDelay = isToyCleanup || isScreenUse;
+  var observationMinutes = _secondsToMinutes(
     capability.minObservationSeconds,
     min: 1,
   );
-  var intervalMinutes = _secondsToMinutes(capability.cooldownSeconds, min: 10);
+  final intervalMinutesFloor = isScreenUse
+      ? _screenUseReminderIntervalMinutesMin
+      : _defaultCareReminderIntervalMinutesMin;
+  var intervalMinutes = _secondsToMinutes(
+    capability.cooldownSeconds,
+    min: intervalMinutesFloor,
+  );
   var dailyLimit = capability.dailyLimit <= 0 ? 3 : capability.dailyLimit;
 
   return showAppBottomSheet<Map<String, Object?>>(
     context: context,
-    maxHeightFactor: isToyCleanup ? 0.64 : 0.56,
+    maxHeightFactor: hasObservationDelay ? 0.64 : 0.56,
     child: StatefulBuilder(
       builder: (context, setSheetState) {
         return AppBottomSheetBody(
           title: _capabilityTitle(capability.scenario),
-          subtitle: isToyCleanup
-              ? '孩子玩完离开后，摄像头会轻声提醒收好玩具。'
-              : '设置提醒间隔和今日最多次数，超过后改为通知家长。',
+          subtitle: switch (capability.scenario) {
+            'toy_cleanup' => '孩子玩完离开后，摄像头会轻声提醒收好玩具。',
+            'screen_use' => '持续看屏达到设定时间后，摄像头会轻声提醒休息或拉开距离。',
+            _ => '设置提醒间隔和今日最多次数，超过后改为通知家长。',
+          },
           footer: AppPrimaryButton(
             label: '保存提醒方式',
             onTap: () => Navigator.of(context).pop({
-              if (isToyCleanup) 'minObservationSeconds': leaveMinutes * 60,
+              if (hasObservationDelay)
+                'minObservationSeconds': observationMinutes * 60,
               'cooldownSeconds': intervalMinutes * 60,
               'dailyLimit': dailyLimit,
               'parentNotifyThreshold': dailyLimit,
@@ -3198,23 +3209,41 @@ Future<Map<String, Object?>?> _showCareReminderRulesSheet(
                 _MinuteStepperRow(
                   title: '离开多久后提醒',
                   subtitle: '默认等一会儿，避免刚离开就打扰。',
-                  value: leaveMinutes,
+                  value: observationMinutes,
                   min: 1,
                   max: 10,
                   step: 1,
                   enabled: true,
                   onChanged: (value) =>
-                      setSheetState(() => leaveMinutes = value),
+                      setSheetState(() => observationMinutes = value),
+                ),
+                const _CompactDivider(),
+              ],
+              if (isScreenUse) ...[
+                _MinuteStepperRow(
+                  title: '持续观看多久后提醒',
+                  subtitle: '默认稍等一会儿，避免刚拿起手机就打扰。',
+                  value: observationMinutes,
+                  min: 1,
+                  max: 5,
+                  step: 1,
+                  enabled: true,
+                  onChanged: (value) =>
+                      setSheetState(() => observationMinutes = value),
                 ),
                 const _CompactDivider(),
               ],
               _MinuteStepperRow(
                 title: '提醒间隔',
-                subtitle: '两次提醒之间留出安静时间。',
+                subtitle: isScreenUse
+                    ? '看屏较敏感，可按需设较短间隔。'
+                    : '两次提醒之间留出安静时间。',
                 value: intervalMinutes,
-                min: 10,
+                min: intervalMinutesFloor,
                 max: 60,
-                step: 5,
+                step: isScreenUse
+                    ? _screenUseReminderIntervalMinutesMin
+                    : 5,
                 enabled: true,
                 onChanged: (value) =>
                     setSheetState(() => intervalMinutes = value),
@@ -3240,9 +3269,14 @@ Future<Map<String, Object?>?> _showCareReminderRulesSheet(
 }
 
 String _careReminderRuleSummary(CareCapability capability) {
-  if (capability.scenario == 'toy_cleanup') {
-    return _toyCleanupRuleSummary(capability);
-  }
+  return switch (capability.scenario) {
+    'toy_cleanup' => _toyCleanupRuleSummary(capability),
+    'screen_use' => _screenUseRuleSummary(capability),
+    _ => _genericCareReminderRuleSummary(capability),
+  };
+}
+
+String _genericCareReminderRuleSummary(CareCapability capability) {
   final intervalMinutes = _secondsToMinutes(
     capability.cooldownSeconds,
     min: 10,
@@ -3252,6 +3286,22 @@ String _careReminderRuleSummary(CareCapability capability) {
       ? dailyLimit
       : capability.parentNotifyThreshold;
   return '间隔 $intervalMinutes 分钟 · 今日最多 $dailyLimit 次 · 超过后通知家长（$threshold 次）';
+}
+
+String _screenUseRuleSummary(CareCapability capability) {
+  final sustainedMinutes = _secondsToMinutes(
+    capability.minObservationSeconds,
+    min: 1,
+  );
+  final intervalMinutes = _secondsToMinutes(
+    capability.cooldownSeconds,
+    min: _screenUseReminderIntervalMinutesMin,
+  );
+  final dailyLimit = capability.dailyLimit <= 0 ? 3 : capability.dailyLimit;
+  final threshold = capability.parentNotifyThreshold <= 0
+      ? dailyLimit
+      : capability.parentNotifyThreshold;
+  return '持续 $sustainedMinutes 分钟后提醒 · 间隔 $intervalMinutes 分钟 · 今日最多 $dailyLimit 次 · 超过后通知家长（$threshold 次）';
 }
 
 String _toyCleanupRuleSummary(CareCapability capability) {
@@ -3637,7 +3687,11 @@ const _v1VisibleCareScenarios = {
   'screen_use',
 };
 
-const _careReminderRuleScenarios = {'toy_cleanup'};
+const _careReminderRuleScenarios = {'toy_cleanup', 'screen_use'};
+
+/// 屏幕使用提醒允许更短间隔，便于家长对看屏行为密集提醒。
+const _screenUseReminderIntervalMinutesMin = 1;
+const _defaultCareReminderIntervalMinutesMin = 10;
 
 int _capabilityOrder(String scenario) {
   return switch (scenario) {

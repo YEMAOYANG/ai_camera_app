@@ -6,6 +6,7 @@ from services.observation_cloud_gate import (
     CloudGateConfig,
     CloudGateDecision,
     GATE_EMPTY_STABLE,
+    GATE_MOTION_ACTIVE,
     GATE_PERSON_STABLE,
     default_cloud_gate_state,
     default_care_behavior_state,
@@ -149,7 +150,11 @@ class ObservationCloudGateGeneralLaneTest(unittest.TestCase):
         self.assertEqual(kimi_calls, 0)
 
     def test_g3_sustained_motion_respects_cooldown(self):
-        config = _fast_config(motion_cooldown_seconds=300, person_heartbeat_seconds=3600)
+        config = _fast_config(
+            motion_cooldown_seconds=300,
+            person_heartbeat_seconds=3600,
+            motion_active_sample_seconds=3600,
+        )
         gate, previous = self._advance_to_person_stable(config)
         kimi_calls = 0
         t = 100_000
@@ -235,6 +240,34 @@ class ObservationCloudGateGeneralLaneTest(unittest.TestCase):
             gate = decision.next_cloud_gate
             previous = prefilter_runtime_from_result(pf)
         self.assertEqual(sum(1 for c in calls if c), 1)
+
+    def test_g5_motion_active_periodic_sample_while_motion_continues(self):
+        config = _fast_config(motion_active_sample_seconds=90, person_heartbeat_seconds=3600)
+        gate = {"gate_state": GATE_MOTION_ACTIVE, "last_kimi_at_ms": 0}
+        previous = prefilter_runtime_from_result(
+            _prefilter(person=True, motion=0.05, now_ms=100_000, thumb="m0")
+        )
+        t = 100_000
+        kimi_calls = 0
+        for i in range(12):
+            t += 10_000
+            pf = _prefilter(person=True, motion=0.05, now_ms=t, thumb=f"m{i}")
+            decision = evaluate_general_lane(
+                prefilter=pf,
+                prefilter_previous=previous,
+                cloud_gate=gate,
+                now_ms=t,
+                config=config,
+            )
+            if decision.call_kimi:
+                kimi_calls += 1
+                if decision.reason == "motion_active_sample":
+                    gate = decision.next_cloud_gate
+            else:
+                gate = decision.next_cloud_gate
+            previous = prefilter_runtime_from_result(pf)
+        self.assertGreaterEqual(kimi_calls, 1)
+        self.assertLess(kimi_calls, 12)
 
 
 class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):

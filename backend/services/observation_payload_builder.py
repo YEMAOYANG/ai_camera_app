@@ -303,6 +303,7 @@ def raw_detail_from_analysis(analysis: Mapping[str, object]) -> dict:
         "screen_distance_risk",
         "screen_use_context",
         "screen_use_duration_hint",
+        "observation_resample",
     }
     return {
         key: analysis.get(key)

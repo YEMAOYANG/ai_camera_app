@@ -32,6 +32,7 @@ from services.observation_runtime_state import (
 from services.observation_session_state import (
     risk_escalated,
     session_snapshot_from_observation,
+    should_force_screen_use_resample,
     should_post_observation,
     update_session_after_post,
 )
@@ -201,6 +202,7 @@ class CameraObserveService:
             analysis,
         )
         pending_runtime: dict[str, Any] | None = None
+        post_reason = ""
         with self.repository.transaction() as conn:
             runtime = self.runtime_store.load(
                 conn,
@@ -229,7 +231,6 @@ class CameraObserveService:
             runtime["display"] = _runtime_display_from_analysis(analysis, now_ms=now)
             pending_runtime = runtime
 
-            post_force = force_post or risk_escalated(context.previous_session, current_session)
             should_post, post_reason = should_post_observation(
                 previous_session=context.previous_session,
                 current_session=current_session,
@@ -237,6 +238,18 @@ class CameraObserveService:
                 absence_mode=str(absence.get("mode") or "active"),
                 recorded_absent=bool(absence.get("recorded_absent")),
             )
+            screen_use_resample = should_force_screen_use_resample(
+                previous_session=context.previous_session,
+                current_session=current_session,
+                now_ms=now,
+            )
+            post_force = (
+                force_post
+                or risk_escalated(context.previous_session, current_session)
+                or screen_use_resample
+            )
+            if screen_use_resample and not should_post:
+                post_reason = "screen_use_resample"
             if not should_post and not post_force:
                 self._save_runtime_state(
                     conn,
@@ -284,11 +297,19 @@ class CameraObserveService:
                 response=None,
             )
 
-        if self._semantic_duplicate(
-            family_id=family_id,
-            child_id=child_id,
-            device_id=device_id,
-            payload=payload,
+        if post_reason == "screen_use_resample":
+            raw_detail = dict(payload.get("rawDetail") or {})
+            raw_detail["observation_resample"] = True
+            payload["rawDetail"] = raw_detail
+
+        if (
+            post_reason != "screen_use_resample"
+            and self._semantic_duplicate(
+                family_id=family_id,
+                child_id=child_id,
+                device_id=device_id,
+                payload=payload,
+            )
         ):
             if pending_runtime is not None:
                 self._save_runtime(

@@ -394,6 +394,72 @@ class CareObservationContractTest(unittest.TestCase):
         snapshot = json.loads(decision["policy_snapshot_json"])
         self.assertEqual(snapshot["minObservationSeconds"], 3)
 
+    def test_screen_use_sustained_and_distance_risk_share_continuity(self):
+        self._ensure_capabilities()
+        self._patch_capability(
+            "screen_use",
+            minObservationSeconds=90,
+            observationThreshold=0.72,
+            cooldownSeconds=0,
+            dailyLimit=10,
+            parentNotifyThreshold=9,
+            allowSpeaker=True,
+        )
+        first = self._post_observation(
+            "screen_use",
+            confidence=0.95,
+            duration_seconds=60,
+            signal_type="screen_distance_risk",
+            parent_summary="观察到孩子长时间近距离看屏幕。",
+            observed_at=_ms("2026-06-17 09:53"),
+            raw_detail={
+                "has_person": True,
+                "activity": "玩手机",
+                "screen_device_visible": True,
+                "screen_device_type": "phone",
+                "screen_use_active": True,
+                "screen_distance_risk": "too_close",
+                "screen_use_duration_hint": "sustained",
+            },
+        )
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(first.json["decision"]["decision"], "skipped_continuity")
+
+        second = self._post_observation(
+            "screen_use",
+            confidence=0.95,
+            duration_seconds=60,
+            signal_type="screen_use_sustained",
+            parent_summary="观察到孩子持续使用手机或平板。",
+            observed_at=_ms("2026-06-17 09:55"),
+            raw_detail={
+                "has_person": True,
+                "activity": "玩手机",
+                "screen_device_visible": True,
+                "screen_device_type": "phone",
+                "screen_use_active": True,
+                "screen_distance_risk": "ok",
+                "screen_use_duration_hint": "sustained",
+            },
+        )
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(second.json["decision"]["decision"], REMINDER_DECISION_ALLOWED)
+        self.assertTrue(second.json["decision"]["shouldSpeak"])
+
+        repository = CareRepository(Database(self.app.config["DATABASE_URL"]))
+        with repository.transaction() as conn:
+            state = repository.get_current_behavior_state(
+                conn,
+                family_id=self.family_id,
+                child_id=self.child_id,
+                device_id=self.device_id,
+                scenario="screen_use",
+                state="screen_use_active",
+            )
+        self.assertIsNotNone(state)
+        assert state is not None
+        self.assertGreaterEqual(int(state["consecutive_seconds"]), 120)
+
     def test_internal_observation_requires_token_and_low_score_records_only(self):
         self._ensure_capabilities()
         missing = self.client.post(
