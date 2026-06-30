@@ -316,12 +316,13 @@ class SetupService:
     def save_camera_name(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
         now = now_ms()
+        family_id = context["family"]["id"]
         with self.repository.transaction() as conn:
             wake_name = self._wake_name(
                 data.get("wakeName"),
                 family_names=self._guardian_identity_labels(conn),
             )
-            progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            progress = self.repository.get_or_create_progress(conn, family_id=family_id, now=now)
             self._require_setup_steps(
                 progress,
                 "parent_identity",
@@ -329,36 +330,38 @@ class SetupService:
             )
             default_device = self.device_repository.ensure_default_device(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 now=now,
             )
             if default_device is None:
                 raise ApiError("device_not_found", "请先绑定摄像头。", 404)
             device_id = self.repository.save_camera_name(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 device_id=default_device["id"],
                 wake_name=wake_name,
                 now=now,
             )
-            ConversationSyncService(self.database_url).sync_family_conversation(
-                family_id=context["family"]["id"],
-            )
             self.repository.mark_step_done(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 column="camera_name_status",
                 now=now,
             )
             progress = self.repository.get_or_create_progress(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 now=now,
             )
-            return self._response(
+            response = self._response(
                 progress,
                 {"cameraName": {"wakeName": wake_name, "deviceId": device_id}},
             )
+        ConversationSyncService(self.database_url).sync_family_conversation(
+            family_id=family_id,
+            wake_name=wake_name,
+        )
+        return response
 
     def camera_name_intro(self, access_token: str) -> dict:
         context = self._auth_context(access_token)

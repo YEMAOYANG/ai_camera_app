@@ -858,6 +858,7 @@ class ProfileService:
             if item_key in value:
                 value[item_key] = item_value
         now = now_ms()
+        family_id = context["family"]["id"]
         with self.repository.transaction() as conn:
             self._assert_capability(
                 conn,
@@ -873,16 +874,16 @@ class ProfileService:
                 value["wakeName"] = wake_name
             row = self.repository.upsert_setting(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 key=key,
                 value=value,
                 now=now,
             )
-            if key == "conversation":
-                ConversationSyncService(self.database_url).sync_family_conversation(
-                    family_id=context["family"]["id"],
-                )
-            return {"ok": True, "setting": setting_payload(key, value, row["updated_at"])}
+        if key == "conversation":
+            ConversationSyncService(self.database_url).sync_family_conversation(
+                family_id=family_id,
+            )
+        return {"ok": True, "setting": setting_payload(key, value, row["updated_at"])}
 
     def account_profile(self, access_token: str) -> dict:
         context = self._auth_context(access_token)

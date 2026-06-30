@@ -38,7 +38,12 @@ class ConversationSyncService:
         self.device_repository = DeviceRepository(database)
         self.policy_service = ConversationPolicyService(database_url)
 
-    def sync_family_conversation(self, *, family_id: str) -> dict | None:
+    def sync_family_conversation(
+        self,
+        *,
+        family_id: str,
+        wake_name: str | None = None,
+    ) -> dict | None:
         now = now_ms()
         with self.device_repository.transaction() as conn:
             device = self.device_repository.ensure_default_device(
@@ -50,11 +55,13 @@ class ConversationSyncService:
                 return None
             rules = self.policy_service.get_rules(conn, family_id=family_id)
             profile = self.policy_service.build_interaction_profile(rules)
-            wake_name = str(profile.get("wakeName") or "").strip()
+            effective_wake_name = str(wake_name or profile.get("wakeName") or "").strip()
             if wake_name:
+                profile = {**profile, "wakeName": effective_wake_name}
+            if effective_wake_name:
                 conn.execute(
                     "UPDATE devices SET wake_name = ?, updated_at = ? WHERE family_id = ? AND id = ?",
-                    (wake_name, now, family_id, device["id"]),
+                    (effective_wake_name, now, family_id, device["id"]),
                 )
             runtime_row = self.device_repository.get_device_runtime_config(
                 conn,
@@ -88,7 +95,7 @@ class ConversationSyncService:
             push_result = self._push_profile_to_ai_camera_test(profile, base_url=base_url)
             payload = {
                 "deviceId": device["id"],
-                "wakeName": wake_name,
+                "wakeName": effective_wake_name,
                 "interactionProfile": profile,
             }
             if push_result is not None:
