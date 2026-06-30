@@ -18,6 +18,7 @@ from services.observation_cloud_gate import (
     has_structured_toy_context,
     sync_care_behavior_from_analysis,
     update_idle_kimi_ticks_after_analysis,
+    resolve_person_heartbeat_seconds,
 )
 from services.vision_prefilter_service import PrefilterResult, prefilter_runtime_from_result
 
@@ -441,7 +442,12 @@ class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):
             prefilter_previous=prefilter_runtime_from_result(
                 _prefilter(person=True, now_ms=now - 10_000)
             ),
-            cloud_gate={"gate_state": GATE_PERSON_STABLE, "person_stable_since_ms": now - 600_000},
+            cloud_gate={
+                **default_cloud_gate_state(),
+                "gate_state": GATE_PERSON_STABLE,
+                "person_stable_since_ms": now - 600_000,
+                "last_person_heartbeat_at_ms": now,
+            },
             care_behavior=default_care_behavior_state(),
             now_ms=now,
             child_id="child_1",
@@ -1048,6 +1054,146 @@ class ObservationCloudGateIdleBackoffTest(unittest.TestCase):
             meal_window_active=False,
         )
         self.assertEqual(updated["consecutive_idle_kimi_ticks"], 0)
+
+
+class ObservationCloudGateAbilityAwareHeartbeatTest(unittest.TestCase):
+    def _caps(self, *scenarios: str) -> list[dict]:
+        return [{"scenario": scenario, "enabled": True} for scenario in scenarios]
+
+    def _stable_gate(self, *, since_ms: int = 0) -> dict:
+        return {
+            **default_cloud_gate_state(),
+            "gate_state": GATE_PERSON_STABLE,
+            "person_stable_since_ms": since_ms,
+            "last_person_heartbeat_at_ms": since_ms,
+        }
+
+    def test_resolve_person_heartbeat_without_behavior_capabilities(self):
+        config = CloudGateConfig(person_heartbeat_seconds=900, person_heartbeat_capable_seconds=300)
+        seconds = resolve_person_heartbeat_seconds(
+            config=config,
+            enabled_capabilities=[{"scenario": "wake_up", "enabled": True}],
+            care_behavior=default_care_behavior_state(),
+            meal_window_active=False,
+        )
+        self.assertEqual(seconds, 900)
+
+    def test_resolve_person_heartbeat_capable_without_monitor(self):
+        config = CloudGateConfig(person_heartbeat_seconds=900, person_heartbeat_capable_seconds=300)
+        seconds = resolve_person_heartbeat_seconds(
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            care_behavior=default_care_behavior_state(),
+            meal_window_active=False,
+        )
+        self.assertEqual(seconds, 300)
+
+    def test_resolve_person_heartbeat_disabled_with_active_monitor(self):
+        config = CloudGateConfig(person_heartbeat_seconds=900, person_heartbeat_capable_seconds=300)
+        behavior = default_care_behavior_state()
+        behavior["last_posture_context"] = "homework"
+        seconds = resolve_person_heartbeat_seconds(
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            care_behavior=behavior,
+            meal_window_active=False,
+        )
+        self.assertIsNone(seconds)
+
+    def test_no_behavior_capabilities_still_wait_900s_for_heartbeat(self):
+        gate = self._stable_gate()
+        pf = _prefilter(person=True, motion=0.0, now_ms=400_000)
+        decision = evaluate_cloud_gate(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=390_000)),
+            cloud_gate=gate,
+            care_behavior=default_care_behavior_state(),
+            now_ms=400_000,
+            child_id="child_1",
+            enabled_capabilities=[{"scenario": "wake_up", "enabled": True}],
+        )
+        self.assertFalse(decision.call_kimi)
+        decision = evaluate_cloud_gate(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=900_000)),
+            cloud_gate=gate,
+            care_behavior=default_care_behavior_state(),
+            now_ms=910_000,
+            child_id="child_1",
+            enabled_capabilities=[{"scenario": "wake_up", "enabled": True}],
+        )
+        self.assertTrue(decision.call_kimi)
+        self.assertEqual(decision.reason, "person_heartbeat")
+
+    def test_capable_family_uses_300s_heartbeat_without_monitor(self):
+        gate = self._stable_gate()
+        pf = _prefilter(person=True, motion=0.0, now_ms=310_000)
+        decision = evaluate_cloud_gate(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=300_000)),
+            cloud_gate=gate,
+            care_behavior=default_care_behavior_state(),
+            now_ms=310_000,
+            child_id="child_1",
+            enabled_capabilities=self._caps("posture"),
+        )
+        self.assertTrue(decision.call_kimi)
+        self.assertEqual(decision.reason, "person_heartbeat")
+
+    def test_active_monitor_skips_general_heartbeat(self):
+        gate = self._stable_gate()
+        behavior = default_care_behavior_state()
+        behavior["last_posture_context"] = "homework"
+        behavior["last_posture_kimi_at_ms"] = 280_000
+        behavior["last_capability_discovery_at_ms"] = 310_000
+        pf = _prefilter(person=True, motion=0.0, now_ms=310_000)
+        decision = evaluate_cloud_gate(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=300_000)),
+            cloud_gate=gate,
+            care_behavior=behavior,
+            now_ms=310_000,
+            child_id="child_1",
+            enabled_capabilities=self._caps("posture"),
+        )
+        self.assertFalse(decision.call_kimi)
+        self.assertEqual(decision.reason, "cloud_gate_person_stable")
+
+    def test_idle_backoff_discovery_still_uses_600s_with_capable_heartbeat(self):
+        config = CloudGateConfig(
+            capability_discovery_seconds=180,
+            idle_backoff_after_ticks=3,
+            idle_backoff_seconds=600,
+            person_heartbeat_capable_seconds=300,
+        )
+        behavior = default_care_behavior_state()
+        behavior["consecutive_idle_kimi_ticks"] = 3
+        behavior["last_capability_discovery_at_ms"] = 100_000
+        gate = {"gate_state": GATE_PERSON_STABLE, "person_stable_since_ms": 0}
+        pf = _prefilter(person=True, motion=0.0, now_ms=200_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=gate,
+            now_ms=200_000,
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            meal_window_active=False,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=200_000,
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            meal_window_active=False,
+            child_id="child_1",
+        )
+        self.assertIsNone(critical)
+        self.assertEqual(effective_capability_discovery_seconds(behavior, config), 600)
 
 
 if __name__ == "__main__":

@@ -50,6 +50,7 @@ class CloudGateConfig:
     tick_interval_seconds: float = 10.0
     empty_heartbeat_seconds: int = 1800
     person_heartbeat_seconds: int = 900
+    person_heartbeat_capable_seconds: int = 300
     motion_cooldown_seconds: int = 300
     motion_threshold: float = 0.02
     person_enter_debounce_ticks: int = 2
@@ -84,6 +85,9 @@ def cloud_gate_config() -> CloudGateConfig:
         tick_interval_seconds=float(os.getenv("CAMERA_OBSERVATION_INTERVAL_SECONDS", "10")),
         empty_heartbeat_seconds=int(os.getenv("APP_CLOUD_EMPTY_HEARTBEAT_SECONDS", "1800")),
         person_heartbeat_seconds=int(os.getenv("APP_CLOUD_PERSON_HEARTBEAT_SECONDS", "900")),
+        person_heartbeat_capable_seconds=int(
+            os.getenv("APP_CLOUD_PERSON_HEARTBEAT_CAPABLE_SECONDS", "300")
+        ),
         motion_cooldown_seconds=int(os.getenv("APP_CLOUD_MOTION_COOLDOWN_SECONDS", "300")),
         motion_threshold=float(os.getenv("APP_CLOUD_MOTION_THRESHOLD", "0.02")),
         person_enter_debounce_ticks=int(os.getenv("APP_CLOUD_PERSON_ENTER_DEBOUNCE_TICKS", "2")),
@@ -187,12 +191,21 @@ def evaluate_cloud_gate(
         )
 
     config = cloud_gate_config()
+    meal_window_active = resolve_meal_window_active(
+        routine_windows=routine_windows or [],
+        capability_config=meal_capability_config,
+        observed_at=now_ms,
+        explicit_day_type=explicit_day_type,
+    )
     general = evaluate_general_lane(
         prefilter=prefilter,
         prefilter_previous=prefilter_previous,
         cloud_gate=cloud_gate,
         now_ms=now_ms,
         config=config,
+        care_behavior=behavior,
+        enabled_capabilities=enabled_capabilities,
+        meal_window_active=meal_window_active,
     )
     if general.call_kimi:
         return CloudGateDecision(
@@ -203,12 +216,6 @@ def evaluate_cloud_gate(
             next_care_behavior=behavior,
         )
 
-    meal_window_active = resolve_meal_window_active(
-        routine_windows=routine_windows or [],
-        capability_config=meal_capability_config,
-        observed_at=now_ms,
-        explicit_day_type=explicit_day_type,
-    )
     critical = evaluate_care_critical_lane(
         prefilter=prefilter,
         prefilter_previous=prefilter_previous,
@@ -507,6 +514,24 @@ def has_any_active_monitor_context(
     return False
 
 
+def resolve_person_heartbeat_seconds(
+    *,
+    config: CloudGateConfig,
+    enabled_capabilities: Sequence[Mapping[str, Any]] | None,
+    care_behavior: Mapping[str, Any],
+    meal_window_active: bool,
+) -> int | None:
+    if not _any_behavior_capability_enabled(enabled_capabilities):
+        return config.person_heartbeat_seconds
+    if has_any_active_monitor_context(
+        care_behavior,
+        enabled_capabilities=enabled_capabilities,
+        meal_window_active=meal_window_active,
+    ):
+        return None
+    return config.person_heartbeat_capable_seconds
+
+
 def has_structured_toy_context(behavior: Mapping[str, Any]) -> bool:
     session = str(behavior.get("last_toy_session") or "").strip().lower()
     if session in TOY_SESSION_ACTIVE:
@@ -652,10 +677,19 @@ def evaluate_general_lane(
     cloud_gate: Mapping[str, Any] | None,
     now_ms: int,
     config: CloudGateConfig | None = None,
+    care_behavior: Mapping[str, Any] | None = None,
+    enabled_capabilities: Sequence[Mapping[str, Any]] | None = None,
+    meal_window_active: bool = False,
 ) -> CloudGateDecision:
     config = config or cloud_gate_config()
     gate = dict(cloud_gate or default_cloud_gate_state())
     previous = prefilter_previous or {}
+    person_heartbeat_seconds = resolve_person_heartbeat_seconds(
+        config=config,
+        enabled_capabilities=enabled_capabilities,
+        care_behavior=care_behavior or default_care_behavior_state(),
+        meal_window_active=meal_window_active,
+    )
 
     if not prefilter.prefilter_ready:
         gate["gate_state"] = GATE_UNKNOWN
@@ -697,6 +731,7 @@ def evaluate_general_lane(
             motion_started,
             now_ms,
             config,
+            person_heartbeat_seconds=person_heartbeat_seconds,
         )
     elif state == GATE_MOTION_ACTIVE:
         gate, call_kimi, reason = _from_motion_active(
@@ -798,6 +833,12 @@ def _from_empty_candidate(
     return gate, False, "cloud_gate_empty_candidate"
 
 
+def _gate_timestamp_ms(gate: Mapping[str, Any], key: str, *, default: int) -> int:
+    if key not in gate or gate.get(key) is None:
+        return default
+    return int(gate[key])
+
+
 def _from_empty_stable(
     gate: dict[str, Any],
     person_present: bool,
@@ -812,8 +853,8 @@ def _from_empty_stable(
         return gate, False, "cloud_gate_person_enter_pending"
     if motion_started and _motion_cooldown_elapsed(gate, now_ms, config):
         return gate, True, "empty_motion_edge"
-    last_hb = int(gate.get("last_empty_heartbeat_at_ms") or 0)
-    stable_since = int(gate.get("empty_stable_since_ms") or now_ms)
+    last_hb = _gate_timestamp_ms(gate, "last_empty_heartbeat_at_ms", default=0)
+    stable_since = _gate_timestamp_ms(gate, "empty_stable_since_ms", default=now_ms)
     hb_due = (now_ms - max(last_hb, stable_since)) >= config.empty_heartbeat_seconds * 1000
     if hb_due:
         return gate, True, "empty_heartbeat"
@@ -846,6 +887,8 @@ def _from_person_stable(
     motion_started: bool,
     now_ms: int,
     config: CloudGateConfig,
+    *,
+    person_heartbeat_seconds: int | None = None,
 ) -> tuple[dict[str, Any], bool, str]:
     if not person_present:
         gate["gate_state"] = GATE_PERSON_LEFT_CANDIDATE
@@ -855,11 +898,12 @@ def _from_person_stable(
         gate["gate_state"] = GATE_MOTION_ACTIVE
         gate["motion_exit_debounce"] = 0
         return gate, True, "person_motion_started"
-    last_hb = int(gate.get("last_person_heartbeat_at_ms") or 0)
-    stable_since = int(gate.get("person_stable_since_ms") or now_ms)
-    hb_due = (now_ms - max(last_hb, stable_since)) >= config.person_heartbeat_seconds * 1000
-    if hb_due:
-        return gate, True, "person_heartbeat"
+    if person_heartbeat_seconds is not None:
+        last_hb = _gate_timestamp_ms(gate, "last_person_heartbeat_at_ms", default=0)
+        stable_since = _gate_timestamp_ms(gate, "person_stable_since_ms", default=now_ms)
+        hb_due = (now_ms - max(last_hb, stable_since)) >= person_heartbeat_seconds * 1000
+        if hb_due:
+            return gate, True, "person_heartbeat"
     return gate, False, "cloud_gate_person_stable"
 
 
