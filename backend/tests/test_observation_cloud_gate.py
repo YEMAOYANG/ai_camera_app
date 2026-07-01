@@ -19,6 +19,7 @@ from services.observation_cloud_gate import (
     sync_care_behavior_from_analysis,
     update_idle_kimi_ticks_after_analysis,
     resolve_person_heartbeat_seconds,
+    resolve_critical_sample_interval_seconds,
 )
 from services.vision_prefilter_service import PrefilterResult, prefilter_runtime_from_result
 
@@ -1194,6 +1195,231 @@ class ObservationCloudGateAbilityAwareHeartbeatTest(unittest.TestCase):
         )
         self.assertIsNone(critical)
         self.assertEqual(effective_capability_discovery_seconds(behavior, config), 600)
+
+
+class ObservationCloudGateCriticalIntervalTest(unittest.TestCase):
+    def _caps(self, *scenarios: str) -> list[dict]:
+        return [{"scenario": scenario, "enabled": True} for scenario in scenarios]
+
+    def _config(self) -> CloudGateConfig:
+        return CloudGateConfig(
+            posture_interval_seconds=60,
+            screen_use_interval_seconds=90,
+            meal_habit_interval_seconds=120,
+        )
+
+    def _capability_configs(self, **rows: dict) -> dict[str, dict]:
+        return {scenario: dict(row) for scenario, row in rows.items()}
+
+    def test_default_capability_values_match_current_gate_intervals(self):
+        config = self._config()
+        defaults = self._capability_configs(
+            posture={"min_observation_seconds": 30},
+            screen_use={"min_observation_seconds": 90},
+            meal_habit={"min_observation_seconds": 45},
+        )
+        self.assertEqual(
+            resolve_critical_sample_interval_seconds(
+                "posture",
+                capability_config=defaults["posture"],
+                config=config,
+            ),
+            60,
+        )
+        self.assertEqual(
+            resolve_critical_sample_interval_seconds(
+                "screen_use",
+                capability_config=defaults["screen_use"],
+                config=config,
+            ),
+            90,
+        )
+        self.assertEqual(
+            resolve_critical_sample_interval_seconds(
+                "meal_habit",
+                capability_config=defaults["meal_habit"],
+                config=config,
+            ),
+            120,
+        )
+
+    def test_resolver_clamps_posture_and_meal(self):
+        config = self._config()
+        self.assertEqual(
+            resolve_critical_sample_interval_seconds(
+                "posture",
+                capability_config={"min_observation_seconds": 5},
+                config=config,
+            ),
+            60,
+        )
+        self.assertEqual(
+            resolve_critical_sample_interval_seconds(
+                "posture",
+                capability_config={"min_observation_seconds": 90},
+                config=config,
+            ),
+            90,
+        )
+        self.assertEqual(
+            resolve_critical_sample_interval_seconds(
+                "meal_habit",
+                capability_config={"min_observation_seconds": 45},
+                config=config,
+            ),
+            120,
+        )
+        self.assertEqual(
+            resolve_critical_sample_interval_seconds(
+                "meal_habit",
+                capability_config={"min_observation_seconds": 180},
+                config=config,
+            ),
+            180,
+        )
+
+    def test_posture_interval_uses_configured_capability_seconds(self):
+        config = self._config()
+        behavior = default_care_behavior_state()
+        behavior["last_posture_context"] = "homework"
+        behavior["last_posture_kimi_at_ms"] = 0
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=95_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=85_000)),
+            cloud_gate=gate,
+            now_ms=95_000,
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            care_behavior=behavior,
+        )
+        capability_configs = self._capability_configs(
+            posture={"min_observation_seconds": 90},
+        )
+        before = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=85_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=85_000,
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            meal_window_active=False,
+            capability_configs=capability_configs,
+        )
+        self.assertIsNone(before)
+        after = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=95_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=95_000,
+            config=config,
+            enabled_capabilities=self._caps("posture"),
+            meal_window_active=False,
+            capability_configs=capability_configs,
+        )
+        self.assertIsNotNone(after)
+        assert after is not None
+        self.assertEqual(after.reason, "posture_interval")
+
+    def test_screen_use_interval_respects_capability_config(self):
+        config = self._config()
+        behavior = default_care_behavior_state()
+        behavior["last_screen_use_signature"] = "phone:active"
+        behavior["last_screen_use_kimi_at_ms"] = 0
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=65_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=55_000)),
+            cloud_gate=gate,
+            now_ms=65_000,
+            config=config,
+            enabled_capabilities=self._caps("screen_use"),
+            care_behavior=behavior,
+        )
+        capability_configs = self._capability_configs(
+            screen_use={"min_observation_seconds": 60},
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=55_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=65_000,
+            config=config,
+            enabled_capabilities=self._caps("screen_use"),
+            meal_window_active=False,
+            capability_configs=capability_configs,
+        )
+        self.assertIsNotNone(critical)
+        assert critical is not None
+        self.assertEqual(critical.reason, "screen_use_interval")
+
+    def test_meal_habit_interval_keeps_120_floor_with_default_capability(self):
+        config = self._config()
+        behavior = default_care_behavior_state()
+        behavior["last_meal_window_active"] = True
+        behavior["last_meal_habit_kimi_at_ms"] = 1
+        gate = {"gate_state": GATE_PERSON_STABLE}
+        pf = _prefilter(person=True, motion=0.0, now_ms=130_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=120_000)),
+            cloud_gate=gate,
+            now_ms=130_000,
+            config=config,
+            enabled_capabilities=self._caps("meal_habit"),
+            care_behavior=behavior,
+            meal_window_active=True,
+        )
+        capability_configs = self._capability_configs(
+            meal_habit={"min_observation_seconds": 45},
+        )
+        at_60s = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=60_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=60_000,
+            config=config,
+            enabled_capabilities=self._caps("meal_habit"),
+            meal_window_active=True,
+            capability_configs=capability_configs,
+        )
+        self.assertIsNone(at_60s)
+        at_130s = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=120_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=130_000,
+            config=config,
+            enabled_capabilities=self._caps("meal_habit"),
+            meal_window_active=True,
+            capability_configs=capability_configs,
+        )
+        self.assertIsNotNone(at_130s)
+        assert at_130s is not None
+        self.assertEqual(at_130s.reason, "meal_habit_interval")
+
+    def test_missing_capability_config_falls_back_to_env_interval(self):
+        config = self._config()
+        self.assertEqual(
+            resolve_critical_sample_interval_seconds(
+                "posture",
+                capability_config=None,
+                config=config,
+            ),
+            60,
+        )
 
 
 if __name__ == "__main__":

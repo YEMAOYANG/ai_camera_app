@@ -165,6 +165,7 @@ def evaluate_cloud_gate(
     enabled_capabilities: Sequence[Mapping[str, Any]] | None = None,
     routine_windows: Sequence[Mapping[str, Any]] | None = None,
     meal_capability_config: Mapping[str, Any] | None = None,
+    capability_configs: Mapping[str, Mapping[str, Any]] | None = None,
     explicit_day_type: str | None = None,
 ) -> CloudGateDecision:
     del family_id, device_id
@@ -227,6 +228,7 @@ def evaluate_cloud_gate(
         enabled_capabilities=enabled_capabilities,
         meal_window_active=meal_window_active,
         child_id=child_id,
+        capability_configs=capability_configs,
     )
     if critical is not None:
         next_behavior = dict(critical.next_care_behavior or behavior)
@@ -261,6 +263,7 @@ def evaluate_care_critical_lane(
     enabled_capabilities: Sequence[Mapping[str, Any]] | None,
     meal_window_active: bool,
     child_id: str = "",
+    capability_configs: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> CloudGateDecision | None:
     if not prefilter.prefilter_ready:
         return None
@@ -316,7 +319,12 @@ def evaluate_care_critical_lane(
         screen_monitor_active = screen_use_enabled and has_screen_use_monitor_context(care_behavior)
         if not screen_monitor_active and has_posture_monitor_context(care_behavior):
             last_posture = int(care_behavior.get("last_posture_kimi_at_ms") or 0)
-            if (now_ms - last_posture) >= config.posture_interval_seconds * 1000:
+            posture_interval = resolve_critical_sample_interval_seconds(
+                CARE_SCENARIO_POSTURE,
+                capability_config=_capability_config_row(capability_configs, CARE_SCENARIO_POSTURE),
+                config=config,
+            )
+            if (now_ms - last_posture) >= posture_interval * 1000:
                 return _critical_decision(
                     gate=gate,
                     behavior=care_behavior,
@@ -345,7 +353,12 @@ def evaluate_care_critical_lane(
         and person_present
     ):
         last_meal = int(care_behavior.get("last_meal_habit_kimi_at_ms") or 0)
-        if (now_ms - last_meal) >= config.meal_habit_interval_seconds * 1000:
+        meal_interval = resolve_critical_sample_interval_seconds(
+            CARE_SCENARIO_MEAL_HABIT,
+            capability_config=_capability_config_row(capability_configs, CARE_SCENARIO_MEAL_HABIT),
+            config=config,
+        )
+        if (now_ms - last_meal) >= meal_interval * 1000:
             return _critical_decision(
                 gate=gate,
                 behavior=care_behavior,
@@ -366,7 +379,12 @@ def evaluate_care_critical_lane(
             )
         if has_screen_use_monitor_context(care_behavior):
             last_screen = int(care_behavior.get("last_screen_use_kimi_at_ms") or 0)
-            if (now_ms - last_screen) >= config.screen_use_interval_seconds * 1000:
+            screen_interval = resolve_critical_sample_interval_seconds(
+                CARE_SCENARIO_SCREEN_USE,
+                capability_config=_capability_config_row(capability_configs, CARE_SCENARIO_SCREEN_USE),
+                config=config,
+            )
+            if (now_ms - last_screen) >= screen_interval * 1000:
                 return _critical_decision(
                     gate=gate,
                     behavior=care_behavior,
@@ -530,6 +548,47 @@ def resolve_person_heartbeat_seconds(
     ):
         return None
     return config.person_heartbeat_capable_seconds
+
+
+CRITICAL_SAMPLE_INTERVAL_BOUNDS: dict[str, tuple[int, int]] = {
+    CARE_SCENARIO_POSTURE: (60, 300),
+    CARE_SCENARIO_SCREEN_USE: (60, 180),
+    CARE_SCENARIO_MEAL_HABIT: (120, 300),
+}
+
+
+def _capability_config_row(
+    capability_configs: Mapping[str, Mapping[str, Any]] | None,
+    scenario: str,
+) -> Mapping[str, Any] | None:
+    if not capability_configs:
+        return None
+    row = capability_configs.get(scenario)
+    return row if isinstance(row, Mapping) else None
+
+
+def resolve_critical_sample_interval_seconds(
+    scenario: str,
+    *,
+    capability_config: Mapping[str, Any] | None,
+    config: CloudGateConfig,
+) -> int:
+    fallback_by_scenario = {
+        CARE_SCENARIO_POSTURE: config.posture_interval_seconds,
+        CARE_SCENARIO_SCREEN_USE: config.screen_use_interval_seconds,
+        CARE_SCENARIO_MEAL_HABIT: config.meal_habit_interval_seconds,
+    }
+    lo, hi = CRITICAL_SAMPLE_INTERVAL_BOUNDS.get(scenario, (60, 300))
+    fallback = fallback_by_scenario.get(scenario, 60)
+    if capability_config is None:
+        raw = fallback
+    else:
+        try:
+            configured = int(capability_config.get("min_observation_seconds") or 0)
+        except (TypeError, ValueError):
+            configured = 0
+        raw = configured if configured > 0 else fallback
+    return max(lo, min(hi, raw))
 
 
 def has_structured_toy_context(behavior: Mapping[str, Any]) -> bool:

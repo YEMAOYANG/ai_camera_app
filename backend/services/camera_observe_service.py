@@ -124,6 +124,7 @@ class CameraObserveService:
             enabled_capabilities=context.enabled_capabilities,
             routine_windows=context.routine_windows,
             meal_capability_config=context.meal_capability_config,
+            capability_configs=context.capability_configs,
         )
 
         if gate_decision.observation_context_invalid:
@@ -490,6 +491,11 @@ class CameraObserveService:
             }
             for row in capability_rows
         ]
+        capability_configs = {
+            str(row.get("scenario") or ""): dict(row)
+            for row in capability_rows
+            if str(row.get("scenario") or "")
+        }
         return _ObserveContext(
             runtime=runtime,
             previous_session=dict(runtime.get("session") or {}),
@@ -503,6 +509,7 @@ class CameraObserveService:
             enabled_capabilities=enabled_capabilities,
             routine_windows=[dict(row) for row in routine_rows],
             meal_capability_config=meal_capability_config,
+            capability_configs=capability_configs,
         )
 
     def _apply_gate_runtime(
@@ -635,6 +642,7 @@ class _ObserveContext:
     enabled_capabilities: list[dict[str, Any]]
     routine_windows: list[dict[str, Any]]
     meal_capability_config: dict[str, Any] | None
+    capability_configs: dict[str, dict[str, Any]]
 
 
 def _prefilter_skip_display(*, now_ms: int, gate_reason: str) -> dict[str, object]:

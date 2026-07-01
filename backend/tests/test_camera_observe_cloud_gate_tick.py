@@ -126,6 +126,7 @@ def _default_context(**runtime_overrides) -> Any:
             }
         ],
         meal_capability_config={"scenario": "meal_habit", "enabled": True, "time_windows": "[]"},
+        capability_configs={},
     )
 
 

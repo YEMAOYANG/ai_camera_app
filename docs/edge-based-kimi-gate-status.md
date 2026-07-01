@@ -115,6 +115,17 @@
 | transition 保守记录 | ✅ | ≥0.5 写 care event；<0.5 仅 monitor/display |
 | `child_visible` NON_ACTIONABLE | ✅ | 不 speak；不抢 screen/posture 等 primary payload |
 | P1（idle backoff / ability heartbeat / interval 对齐） | ⏸ 未做 | 见 v2.1 计划 |
+| **P1-A idle backoff** | ✅ | `102c59c` |
+| **P1-B1 ability-aware heartbeat** | ✅ | `8644455` |
+| **P1-B2 active monitor interval 对齐** | 🚧 实现中 | 仅 posture/screen/meal critical interval；不含 screen resample 90s |
+
+---
+
+## P1-B2 说明（active monitor interval）
+
+- Gate critical interval 从 capability `minObservationSeconds` 解析，经 per-scenario clamp，**不等于** policy 连续秒数门槛。
+- **不含**：`should_force_screen_use_resample`（仍独立 90s）、toy_cleanup periodic interval。
+- 默认 capability 下有效 interval：posture 60、screen 90、meal 120（与 P1-B2 前一致）。
 
 ---
 
