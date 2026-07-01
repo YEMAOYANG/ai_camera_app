@@ -286,12 +286,30 @@ command 返回 `status=failed` 时：
 
 模拟 `sourceEventId` 前缀：`sim_posture_*` / `sim_meal_*`。联调结束后应清理对应 DB 行，避免 App「最近记录」长期展示模拟文案。
 
-### 待验证（真实 Vision）
+### Vision live fixture（已通过）
+
+`KIMI_VISION_LIVE=1 python3 -m unittest tests.test_vision_live_regression -v`（合成 fixture 图，见 [vision_images](../backend/tests/fixtures/vision_images/)）：
 
 | 能力 | 状态 | 说明 |
 |------|------|------|
-| **posture** | ⏳ 待测 | 现场 Kimi 曾返回「未知 / 画面人物非绑定儿童」，未进入 homework/reading monitor → 无 `posture_interval` → 无坐姿提醒 |
-| **meal_habit** | ⏳ 待测 | 餐窗外不触发为正确行为；需在餐窗内用真实用餐画面验证 |
+| **posture** | ✅ live fixture 通过 | Kimi 输出 `posture_status` / `bad_posture` → `payload.scenario=posture` → 等价 `signalType`（如 `low_head`、`leaning_too_close`）；正常坐姿无 reminder payload。**真实摄像头现场**（绑定儿童识别、光照/角度）仍需继续观察 |
+| **meal_habit** | ✅ live fixture 通过 | `meal_standing_on_chair`、`meal_distracted_phone` live fixture 已通过：`meal_standing` / `meal_etiquette_issue=distracted` → `payload.scenario=meal_habit` → 对应 `signalType`。**真实餐窗现场**（餐窗 timing、RTSP 帧质量）仍需继续观察 |
+
+离线 raw_model 回归：`python3 -m unittest tests.test_vision_regression -v`（见 [vision_regression_cases.py](../backend/tests/fixtures/vision_regression_cases.py)）。
+
+| 场景 | 期望结构化输出 |
+|------|----------------|
+| 学习低头 / 趴桌 | `activity=写作业/看书`，`posture_status=low_head`（或等价风险标签），session `homework` |
+| 正常坐姿 | `posture_status=ok`，无 posture risk payload |
+| 用餐站椅子 | `meal_standing=true`，`signal_type=meal_standing_on_chair` |
+| 用餐看手机 | `meal_etiquette_issue=distracted`，`signal_type=meal_attention_shifted` |
+
+### 现场继续观察（非阻塞）
+
+| 能力 | 说明 |
+|------|------|
+| **posture** | 早期现场 Kimi 曾返回「未知 / 画面人物非绑定儿童」，未进入 homework monitor → 无 `posture_interval`；fixture 通过不代表所有现场帧稳定 |
+| **meal_habit** | 餐窗外不触发为正确行为；真实餐窗内需继续观察 gate + 餐窗 resolver 与 Vision 的配合 |
 
 ### 已知边界（本轮不改）
 
@@ -310,19 +328,6 @@ camera_observation_events  (source_event_id IN (...))
   → camera_commands        (reminder_events.command_id)
   → current_behavior_states (reminder_decisions.behavior_state_id，若 parent_summary 含「模拟」)
 ```
-
-### 下一步：Vision fixture 回归
-
-见 [backend/tests/fixtures/vision_regression_cases.py](../backend/tests/fixtures/vision_regression_cases.py) 与 `python3 -m unittest tests.test_vision_regression -v`。
-
-优先补/跑真实图片或帧样例，断言 **结构化字段**（`activity` / `posture_status` / `meal_standing` / `screen_use_active` 等），而非仅 `description` 自然语言：
-
-| 场景 | 期望结构化输出 |
-|------|----------------|
-| 学习低头 / 趴桌 | `activity=写作业/看书`，`posture_status=low_head`，session `homework` |
-| 正常坐姿 | `posture_status=ok`，无 posture risk payload |
-| 用餐站椅子 | `meal_standing=true`，`signal_type=meal_standing_on_chair` |
-| 用餐看手机 | `meal_etiquette_issue=distracted` 或 activity 偏离用餐 |
 
 ---
 
@@ -381,3 +386,4 @@ git diff --check
 | 2026-06-29 | 首次 E2E 联调通过：bedtime allowed → speak succeeded；cooldown 拒绝路径验证 |
 | 2026-06-30 | Ability-aware gate 联调收口：screen_use 真实通过；posture/meal 模拟通过；Vision fixture 待补 |
 | 2026-07-01 | 模拟联调数据清理；Vision fixture 离线回归 + live 测试骨架 |
+| 2026-07-01 | Vision live fixture 通过：posture / meal_habit Kimi 结构化输出与 payload 验证 |
