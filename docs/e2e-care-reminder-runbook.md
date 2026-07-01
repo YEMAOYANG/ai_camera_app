@@ -263,6 +263,69 @@ command 返回 `status=failed` 时：
 
 ---
 
+## 4.1 Ability-aware gate 联调收口（2026-06-30）
+
+> **范围说明：** 本节记录 P0–P1-B2 + toy monitor 死区修复（`e676630`）后的现场联调结论。
+> **模拟验证** 覆盖 policy / reminder / speaker 链路；**不等于** Kimi Vision 识别质量已验收。
+
+### 已验证（真实链路）
+
+| 能力 | 结论 | 证据要点 |
+|------|------|----------|
+| **screen_use** | ✅ 真实联调通过 | worker → `capability_discovery` → Kimi → observation → policy → `reminder_event` → `camera_command succeeded`；`minObservationSeconds=300` 时 decision 为 `skipped_continuity` 属配置预期 |
+| **gate 死区修复** | ✅ |  stale `last_toy_session=toys_visible` 曾阻塞 discovery；`e676630` 后 discovery 恢复 |
+
+### 已验证（internal observation 模拟）
+
+通过 `POST /internal/camera/observations` 注入结构化 payload（**非**现场 Kimi 输出）：
+
+| 能力 | 结论 | 说明 |
+|------|------|------|
+| **posture** | ✅ policy / speaker 链路正常 | 模拟 `low_head` → decision `allowed` → speak succeeded |
+| **meal_habit** | ✅ 餐窗内 policy / speaker 正常 | 模拟 `meal_standing_on_chair` → speak succeeded |
+
+模拟 `sourceEventId` 前缀：`sim_posture_*` / `sim_meal_*`。联调结束后应清理对应 DB 行，避免 App「最近记录」长期展示模拟文案。
+
+### 待验证（真实 Vision）
+
+| 能力 | 状态 | 说明 |
+|------|------|------|
+| **posture** | ⏳ 待测 | 现场 Kimi 曾返回「未知 / 画面人物非绑定儿童」，未进入 homework/reading monitor → 无 `posture_interval` → 无坐姿提醒 |
+| **meal_habit** | ⏳ 待测 | 餐窗外不触发为正确行为；需在餐窗内用真实用餐画面验证 |
+
+### 已知边界（本轮不改）
+
+- **screen resample 90s**：`should_force_screen_use_resample` 仍为固定 90s，与 gate `screen_use_interval`（可配置 clamp 60–180）**未全链路对齐**。仅记录，不阻塞 gate 联调收口。
+- **不做：** screen_use V2、新 gate 逻辑、UI 改动。
+
+### 模拟数据清理清单（示例）
+
+仅按 `source_event_id` 精确删除，**不要**批量删真实 observation：
+
+```text
+camera_observation_events  (source_event_id IN (...))
+  → behavior_signals       (observation_event_id)
+  → reminder_decisions     (observation_event_id)
+  → reminder_events        (reminder_decision_id)
+  → camera_commands        (reminder_events.command_id)
+  → current_behavior_states (reminder_decisions.behavior_state_id，若 parent_summary 含「模拟」)
+```
+
+### 下一步：Vision fixture 回归
+
+见 [backend/tests/fixtures/vision_regression_cases.py](../backend/tests/fixtures/vision_regression_cases.py) 与 `python3 -m unittest tests.test_vision_regression -v`。
+
+优先补/跑真实图片或帧样例，断言 **结构化字段**（`activity` / `posture_status` / `meal_standing` / `screen_use_active` 等），而非仅 `description` 自然语言：
+
+| 场景 | 期望结构化输出 |
+|------|----------------|
+| 学习低头 / 趴桌 | `activity=写作业/看书`，`posture_status=low_head`，session `homework` |
+| 正常坐姿 | `posture_status=ok`，无 posture risk payload |
+| 用餐站椅子 | `meal_standing=true`，`signal_type=meal_standing_on_chair` |
+| 用餐看手机 | `meal_etiquette_issue=distracted` 或 activity 偏离用餐 |
+
+---
+
 ## 5. Freshness（App 展示）
 
 Monitor API 的 `lastObservation.freshness`：
@@ -316,3 +379,5 @@ git diff --check
 | 日期 | 说明 |
 |------|------|
 | 2026-06-29 | 首次 E2E 联调通过：bedtime allowed → speak succeeded；cooldown 拒绝路径验证 |
+| 2026-06-30 | Ability-aware gate 联调收口：screen_use 真实通过；posture/meal 模拟通过；Vision fixture 待补 |
+| 2026-07-01 | 模拟联调数据清理；Vision fixture 离线回归 + live 测试骨架 |
