@@ -1,12 +1,11 @@
 # Vision live regression images
 
-This directory holds **optional** fixture images for live Kimi Vision regression.
+This directory holds **synthetic** fixture images for live Kimi Vision regression.
 
 ## Privacy
 
-- Do **not** commit photos of real children unless they are fully anonymized/synthetic.
-- Default repo state: **no images** — only this README and `.gitkeep` placeholders.
-- Add local files under `posture/` or `meal/` for manual runs.
+- Committed images are **synthetic / staged** scenes, not photos of real children.
+- Do not replace them with identifiable child photos without review.
 
 ## Layout
 
@@ -36,6 +35,8 @@ python3 -m unittest tests.test_vision_live_regression -v
 ```
 
 Cases without a local image file are **skipped** (not failed).
+
+Live posture cases allow equivalent risk labels (`low_head`, `leaning_too_close`, etc.) and do not pin exact `raw_activity` wording from Kimi.
 
 ## What is asserted
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 from services.prompt_registry import PromptRegistry
@@ -57,15 +58,47 @@ def _image_path(case: VisionLiveCase) -> Path:
 
 
 def _live_case_as_regression_case(case: VisionLiveCase) -> VisionRegressionCase:
+    expect = case.expect
+    if case.case_id == "homework_bad_posture":
+        expect = replace(
+            expect,
+            raw_activity=None,
+            posture_status=None,
+            signal_type=None,
+            session_risk=None,
+        )
+    elif case.case_id == "homework_good_posture":
+        expect = replace(expect, raw_activity=None)
     return VisionRegressionCase(
         case_id=case.case_id,
         title=case.title,
         raw_model={},
-        expect=case.expect,
+        expect=expect,
         notes=case.notes,
         use_validator=False,
         tags=case.tags,
     )
+
+
+def _assert_live_case_specifics(
+    case: VisionLiveCase,
+    result,
+    test_case: unittest.TestCase,
+) -> None:
+    if case.case_id != "homework_bad_posture":
+        return
+
+    allowed_posture_risks = {"low_head", "leaning_too_close", "bad_posture", "posture_risk"}
+    posture_status = str(result.enriched.get("posture_status") or "")
+    test_case.assertIn(posture_status, allowed_posture_risks)
+    test_case.assertTrue(bool(result.enriched.get("bad_posture")))
+    test_case.assertIsNotNone(result.payload)
+    assert result.payload is not None
+    signals = result.payload.get("signals") or []
+    test_case.assertTrue(signals)
+    test_case.assertIn(str(signals[0].get("signalType") or ""), allowed_posture_risks)
+    test_case.assertEqual(result.session.get("bucket"), "homework")
+    test_case.assertIn(result.session.get("risk"), allowed_posture_risks)
 
 
 @unittest.skipUnless(_live_regression_enabled(), "set KIMI_VISION_LIVE=1 to run live Kimi vision regression")
@@ -123,6 +156,7 @@ class VisionLiveRegressionTest(unittest.TestCase):
                         result,
                         test_case=self,
                     )
+                    _assert_live_case_specifics(case, result, self)
                 except AssertionError as exc:
                     failures.append(f"{case.case_id}: {exc}")
 
