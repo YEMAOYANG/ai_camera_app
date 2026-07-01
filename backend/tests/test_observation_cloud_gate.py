@@ -515,6 +515,31 @@ class ObservationCloudGateCareCriticalLaneTest(unittest.TestCase):
         behavior["last_critical_reason"] = "unsafe climbing on sofa"
         self.assertFalse(has_structured_toy_context(behavior))
 
+    def test_has_structured_toy_context_rejects_stale_visible_session(self):
+        behavior = default_care_behavior_state()
+        behavior["last_toy_session"] = "toys_visible"
+        behavior["toys_visible_last"] = False
+        behavior["toys_scattered_last"] = False
+        self.assertFalse(has_structured_toy_context(behavior))
+
+    def test_sync_clears_stale_toy_session_without_toy_evidence(self):
+        behavior = default_care_behavior_state()
+        behavior["last_toy_session"] = "toys_visible"
+        behavior["toys_visible_last"] = True
+        updated = sync_care_behavior_from_analysis(
+            behavior,
+            {
+                "has_person": True,
+                "activity": "其他",
+                "raw_activity": "其他",
+                "toys_visible": False,
+                "toys_scattered": False,
+            },
+        )
+        self.assertEqual(updated["last_toy_session"], "none")
+        self.assertFalse(updated["toys_visible_last"])
+        self.assertFalse(has_structured_toy_context(updated))
+
     def test_s4_screen_use_interval_triggers_with_structured_context(self):
         config = CloudGateConfig(screen_use_interval_seconds=90)
         gate = {"gate_state": GATE_PERSON_STABLE}
@@ -786,6 +811,46 @@ class ObservationCloudGateP0Test(unittest.TestCase):
             now_ms=200_000,
             config=config,
             enabled_capabilities=self._caps("posture"),
+            meal_window_active=False,
+            child_id="child_1",
+        )
+        self.assertIsNotNone(critical)
+        assert critical is not None
+        self.assertEqual(critical.reason, "capability_discovery")
+
+    def test_capability_discovery_recovers_after_stale_toy_context_clears(self):
+        config = CloudGateConfig(capability_discovery_seconds=180)
+        behavior = default_care_behavior_state()
+        behavior["last_toy_session"] = "toys_visible"
+        behavior["toys_visible_last"] = True
+        behavior = sync_care_behavior_from_analysis(
+            behavior,
+            {
+                "has_person": True,
+                "activity": "其他",
+                "raw_activity": "其他",
+                "toys_visible": False,
+                "toys_scattered": False,
+            },
+        )
+        gate = {"gate_state": GATE_PERSON_STABLE, "person_stable_since_ms": 0}
+        pf = _prefilter(person=True, motion=0.0, now_ms=200_000)
+        general = evaluate_general_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=gate,
+            now_ms=200_000,
+            config=config,
+        )
+        critical = evaluate_care_critical_lane(
+            prefilter=pf,
+            prefilter_previous=prefilter_runtime_from_result(_prefilter(person=True, now_ms=190_000)),
+            cloud_gate=general.next_cloud_gate,
+            care_behavior=behavior,
+            general_decision=general,
+            now_ms=200_000,
+            config=config,
+            enabled_capabilities=self._caps("posture", "toy_cleanup"),
             meal_window_active=False,
             child_id="child_1",
         )

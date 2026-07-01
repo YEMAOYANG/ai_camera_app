@@ -593,8 +593,12 @@ def resolve_critical_sample_interval_seconds(
 
 def has_structured_toy_context(behavior: Mapping[str, Any]) -> bool:
     session = str(behavior.get("last_toy_session") or "").strip().lower()
-    if session in TOY_SESSION_ACTIVE:
+    if session == "playing":
         return True
+    if session == "scattered":
+        return bool(behavior.get("toys_scattered_last"))
+    if session in {"toys_visible", "play"}:
+        return bool(behavior.get("toys_visible_last")) or bool(behavior.get("toys_scattered_last"))
     if bool(behavior.get("toys_scattered_last")):
         return True
     if bool(behavior.get("toys_visible_last")):
@@ -678,6 +682,8 @@ def sync_care_behavior_from_analysis(
         next_behavior["last_toy_session"] = "scattered"
     elif toys_visible:
         next_behavior["last_toy_session"] = "toys_visible"
+    else:
+        next_behavior["last_toy_session"] = "none"
     return next_behavior
 
 
