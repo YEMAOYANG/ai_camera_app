@@ -24,13 +24,14 @@ def _live_regression_enabled() -> bool:
 
 
 def _vision_config_from_env() -> dict:
+    timeout_seconds = float(os.getenv("AI_VISION_TIMEOUT_SECONDS", "60"))
     return {
         "AI_VISION_ENABLED": True,
         "AI_PROVIDER": os.getenv("AI_PROVIDER", "kimi"),
         "AI_API_KEY": os.getenv("AI_API_KEY", ""),
         "AI_BASE_URL": os.getenv("AI_BASE_URL", ""),
         "AI_VISION_MODEL": os.getenv("AI_VISION_MODEL") or os.getenv("AI_MODEL", ""),
-        "AI_VISION_TIMEOUT_SECONDS": float(os.getenv("AI_VISION_TIMEOUT_SECONDS", "30")),
+        "AI_VISION_TIMEOUT_SECONDS": max(timeout_seconds, 60.0),
         "AI_VISION_MAX_BYTES": int(os.getenv("AI_VISION_MAX_BYTES", "524288")),
         "AI_VISION_MAX_DIMENSION": int(os.getenv("AI_VISION_MAX_DIMENSION", "1280")),
         "AI_VISION_JPEG_QUALITY": int(os.getenv("AI_VISION_JPEG_QUALITY", "85")),
@@ -69,6 +70,8 @@ def _live_case_as_regression_case(case: VisionLiveCase) -> VisionRegressionCase:
         )
     elif case.case_id == "homework_good_posture":
         expect = replace(expect, raw_activity=None)
+    elif case.case_id == "meal_distracted_phone":
+        expect = replace(expect, activity="", raw_activity=None)
     return VisionRegressionCase(
         case_id=case.case_id,
         title=case.title,

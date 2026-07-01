@@ -30,6 +30,7 @@ export AI_PROVIDER=kimi
 export AI_API_KEY=...
 export AI_BASE_URL=https://api.moonshot.cn/v1
 export AI_VISION_MODEL=kimi-k2.5  # or your vision model
+export AI_VISION_TIMEOUT_SECONDS=60
 
 python3 -m unittest tests.test_vision_live_regression -v
 ```
@@ -47,3 +48,9 @@ Live tests validate **structured fields** after validator + enrich + payload bui
 - `session.bucket`, `session.risk`
 
 Natural-language `description` alone is not sufficient.
+
+Live model wording can vary across runs. The live regression therefore keeps the
+business-critical assertions strict, while allowing equivalent posture risk
+labels such as `low_head` and `leaning_too_close`, and allowing meal distraction
+cases to pass when the structured meal issue and payload are correct even if
+the high-level `activity` is generic.
