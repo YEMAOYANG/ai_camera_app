@@ -1,9 +1,9 @@
 # Edge-based Kimi Gate 计划完成度对照表
 
 > **计划源文件：** [edge-based_kimi_gate_f76b6b18.plan.md](/Users/sqcopenclaw/.cursor/plans/edge-based_kimi_gate_f76b6b18.plan.md)（v4.2 实施基线）  
-> **对照日期：** 2026-06-30  
-> **仓库 checkpoint：** `1ba2852`（`origin/kindergarten-v1` 已同步）  
-> **说明：** 计划 frontmatter 中 slice 2–4 仍标 `pending`，但代码与测试显示**大部分已落地**；本表以仓库实际状态为准。
+> **对照日期：** 2026-07-01
+> **仓库 checkpoint：** `1377f4c`（`origin/kindergarten-v1` 已同步）
+> **说明：** 计划 frontmatter 可能仍标 `pending`，但代码与测试以本表为准。Ability-aware gate v2.1 见 [ability-aware_kimi_gate 计划](/Users/sqcopenclaw/.cursor/plans/ability-aware_kimi_gate_cabd9ca7.plan.md)。
 
 ---
 
@@ -20,6 +20,8 @@
 | **4∥** | 作息 R1–R7 不可回归 | ✅ 完成 | `test_care_observation_contract.py` routine 系列；全量 discover 249+ OK |
 | **track-ui-ia** | 看护/作息 UI 收口 F1–F4 | ✅ 基本完成 | commit `7b58fb6`；`app_smoke_test.dart` F1/F3/F4 |
 | **5** | lightweight absent + events 过滤 | ⏸ 未做 | 计划标注可选；events API 未默认过滤 `local_prefilter` |
+| — | screen resample 90s 全链路对齐 | ⏸ 未做 | `should_force_screen_use_resample` 仍独立 90s；现场观察后再定 |
+| — | toy_cleanup periodic interval | ⏸ 未做 | 玩具收纳主要靠离开/安全风险边沿 |
 
 ---
 
@@ -97,11 +99,10 @@
 | 项 | 优先级 | 说明 |
 |----|--------|------|
 | **切片 5** lightweight absent + events 默认过滤 | 低（计划可选） | `empty_stable` 首条 lightweight 记录；events 仍展示 prefilter 事件 |
-| **ability-aware heartbeat** | 中（V2） | v3 讨论预留；当前固定 `APP_CLOUD_PERSON_HEARTBEAT_SECONDS=900` |
 | **C15 命名单测** | 低 | mock Kimi 阻塞时 assert transaction 未重入 |
-| **计划 frontmatter 同步** | 低 | 将 slice 2–4、track-ui-ia 标为 completed |
-| **screen_use critical lane** | — | V1 screen_use 能力；已合入 `c9b5c61` + `1ba2852` |
-| **P0 ability-aware gate v2.1** | ✅ | person_return critical、`capability_discovery` 180s、`meal_window_entered`、transition 保守记录、`child_visible` NON_ACTIONABLE；见 `test_observation_cloud_gate.ObservationCloudGateP0Test` |
+| **真实 RTSP 坐姿/用餐现场稳定性** | 中（验证） | live fixture 已通过；fixture ≠ 所有现场帧稳定 |
+| **screen resample 90s 配置化/全链路对齐** | 低（待现场证据） | 仅当联调证明 90s resample 造成明显延迟时再开 |
+| **计划 frontmatter 同步** | 低 | ability-aware / edge 计划 todo 状态与代码对齐 |
 
 ---
 
@@ -114,10 +115,9 @@
 | `meal_window_entered` | ✅ | 仅 meal_habit 餐窗边沿 |
 | transition 保守记录 | ✅ | ≥0.5 写 care event；<0.5 仅 monitor/display |
 | `child_visible` NON_ACTIONABLE | ✅ | 不 speak；不抢 screen/posture 等 primary payload |
-| P1（idle backoff / ability heartbeat / interval 对齐） | ⏸ 未做 | 见 v2.1 计划 |
-| **P1-A idle backoff** | ✅ | `102c59c` |
-| **P1-B1 ability-aware heartbeat** | ✅ | `8644455` |
-| **P1-B2 active monitor interval 对齐** | 🚧 实现中 | 仅 posture/screen/meal critical interval；不含 screen resample 90s |
+| **P1-A idle backoff** | ✅ | `102c59c`；3 次 idle Kimi → discovery 600s |
+| **P1-B1 ability-aware heartbeat** | ✅ | `8644455`；无能力 900s / 有能力无 monitor 300s / 有 active monitor 关闭 general heartbeat |
+| **P1-B2 active monitor interval 对齐** | ✅ | `dc2cde5`；**仅** posture / screen_use / meal_habit gate critical interval；**不含** screen resample 90s、toy_cleanup periodic |
 
 ---
 
@@ -139,7 +139,7 @@
 | 硬约束 D1–D4 | 4/4 实现，C15 测试待补 |
 | 验收清单 | **7/7** 功能达成 |
 
-**结论：** Edge-based Kimi Gate **v4.2 主体已完成**，可视为生产可用基线。剩余工作：可选 slice 5、ability-aware heartbeat（见 [screen-use-v2-plan.md](./screen-use-v2-plan.md) SU2-6）、C15 单测、计划 frontmatter 同步。
+**结论：** Edge-based Kimi Gate **v4.2 + ability-aware v2.1（P0/P1）主体已完成**，可视为生产可用基线。剩余工作：可选 slice 5、C15 单测、screen resample 全链路对齐（待现场证据）、真实 RTSP 现场观察。
 
 ---
 
