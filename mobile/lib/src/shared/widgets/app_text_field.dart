@@ -14,6 +14,8 @@ class AppTextField extends StatefulWidget {
     this.errorText,
     this.hintText,
     this.obscureText = false,
+    this.enableSuggestions = true,
+    this.autocorrect = true,
     this.readOnly = false,
     this.onTap,
     this.suffixIcon,
@@ -34,6 +36,8 @@ class AppTextField extends StatefulWidget {
   final String? errorText;
   final String? hintText;
   final bool obscureText;
+  final bool enableSuggestions;
+  final bool autocorrect;
   final bool readOnly;
   final VoidCallback? onTap;
   final IconData? suffixIcon;
@@ -143,6 +147,8 @@ class _AppTextFieldState extends State<AppTextField> {
                       controller: _controller,
                       focusNode: _focusNode,
                       obscureText: widget.obscureText,
+                      enableSuggestions: widget.enableSuggestions,
+                      autocorrect: widget.autocorrect,
                       readOnly: widget.readOnly,
                       showCursor: widget.readOnly ? false : null,
                       keyboardType: widget.keyboardType,

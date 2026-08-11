@@ -13,6 +13,7 @@ import 'package:warm_sight/src/core/storage/setup_store.dart';
 import 'package:warm_sight/src/features/care/application/care_repository.dart';
 import 'package:warm_sight/src/features/care/domain/care_models.dart';
 import 'package:warm_sight/src/features/devices/application/camera_discovery_adapter.dart';
+import 'package:warm_sight/src/features/devices/application/onvif_auto_discovery_coordinator.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
@@ -718,7 +719,7 @@ void main() {
     expect(find.textContaining('bindingCode'), findsNothing);
     expect(find.textContaining('mock'), findsNothing);
 
-    showAddCameraSheet(tester.element(find.text('还没有连接摄像头').first));
+    showBluetoothAddCameraSheet(tester.element(find.text('还没有连接摄像头').first));
     await tester.pump(const Duration(seconds: 1));
     await tester.pump();
 
@@ -1567,6 +1568,9 @@ Future<void> _pumpApp(
             backend: CameraDiscoveryBackend.mock,
             allowBleFallbackToMock: false,
           ),
+        ),
+        onvifAutoDiscoveryCoordinatorProvider.overrideWithValue(
+          OnvifAutoDiscoveryCoordinator(loadCandidates: () async => const []),
         ),
         rawDioProvider.overrideWithValue(fakeDio),
         dioProvider.overrideWithValue(fakeDio),

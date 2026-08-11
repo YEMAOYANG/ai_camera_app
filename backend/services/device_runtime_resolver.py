@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -11,9 +12,14 @@ from core.security import now_ms
 from integrations.camera_runtime.ai_camera_test_adapter import AiCameraTestRuntimeAdapter
 from integrations.camera_runtime.disabled_adapter import DisabledCameraRuntimeAdapter
 from integrations.camera_runtime.guardian_local_adapter import GuardianLocalRuntimeAdapter
+from integrations.camera_runtime.go2rtc_client import Go2RtcClient
 from integrations.camera_runtime.mock_adapter import MockCameraRuntimeAdapter
+from integrations.camera_runtime.onvif_rtsp_adapter import OnvifRtspRuntimeAdapter
+from integrations.onvif.client import OnvifClient
 from repositories.device_repository import DeviceRepository
 from services.camera_bridge_service import CameraBridgeService
+from services.device_credential_store import EncryptedFileCredentialStore
+from services.onvif_runtime_recovery import OnvifRuntimeRecoveryService
 
 
 @dataclass(frozen=True)
@@ -39,6 +45,9 @@ class DeviceRuntimeResolver:
         dev_adapters_enabled: bool = False,
         app_env: str = "production",
         vision_service_factory: Callable[[], Any] | None = None,
+        onvif_client: OnvifClient | None = None,
+        credential_store: EncryptedFileCredentialStore | None = None,
+        media_gateway: Go2RtcClient | None = None,
     ):
         self.repository = DeviceRepository(Database(database_url))
         self.provider = str(provider or "disabled").strip().lower()
@@ -48,6 +57,18 @@ class DeviceRuntimeResolver:
         self.dev_adapters_enabled = bool(dev_adapters_enabled)
         self.app_env = str(app_env or "production").strip().lower()
         self.vision_service_factory = vision_service_factory
+        self.onvif_client = onvif_client
+        self.credential_store = credential_store
+        self.media_gateway = media_gateway
+        self.onvif_runtime_recovery = (
+            OnvifRuntimeRecoveryService(
+                repository=self.repository,
+                client=onvif_client,
+                credential_store=credential_store,
+            )
+            if onvif_client is not None and credential_store is not None
+            else None
+        )
 
     def global_bridge(self) -> CameraBridgeService:
         return self._bridge_for_provider(self._global_provider())
@@ -106,6 +127,11 @@ class DeviceRuntimeResolver:
             bridge=self._bridge_for_provider(
                 provider,
                 config=config,
+                secret_ref=(
+                    str(runtime_config.get("secret_ref") or "")
+                    if runtime_config
+                    else None
+                ),
                 family_id=family_id,
                 device_id=str(device.get("id") or "") if device else requested_device_id,
             ),
@@ -162,6 +188,7 @@ class DeviceRuntimeResolver:
         provider: str,
         *,
         config: Mapping[str, Any] | None = None,
+        secret_ref: str | None = None,
         family_id: str | None = None,
         device_id: str | None = None,
     ) -> CameraBridgeService:
@@ -214,6 +241,50 @@ class DeviceRuntimeResolver:
             )
         if adapter_name == "disabled":
             return CameraBridgeService(adapter=DisabledCameraRuntimeAdapter())
+        if adapter_name == "onvif_rtsp":
+            if self.onvif_client is None or self.credential_store is None:
+                raise ApiError(
+                    "camera_runtime_not_configured",
+                    "ONVIF 摄像头运行时尚未配置。",
+                    503,
+                )
+            if not secret_ref:
+                raise ApiError(
+                    "camera_runtime_not_configured",
+                    "ONVIF 摄像头凭证尚未配置。",
+                    503,
+                )
+            if not family_id or not device_id:
+                raise ApiError(
+                    "camera_runtime_not_configured",
+                    "ONVIF 摄像头设备标识尚未配置。",
+                    503,
+                )
+            return CameraBridgeService(
+                adapter=OnvifRtspRuntimeAdapter(
+                    config=config,
+                    secret_ref=secret_ref,
+                    client=self.onvif_client,
+                    credential_store=self.credential_store,
+                    media_gateway=self.media_gateway,
+                    stream_name=onvif_preview_stream_name(
+                        device_id,
+                        secret_ref,
+                    ),
+                    recover_runtime=(
+                        (
+                            lambda current_config: self.onvif_runtime_recovery.recover(
+                                family_id=family_id,
+                                device_id=device_id,
+                                secret_ref=secret_ref,
+                                current_config=current_config,
+                            )
+                        )
+                        if self.onvif_runtime_recovery is not None
+                        else None
+                    ),
+                )
+            )
         if adapter_name in {"future_hardware", "self_owned_camera"}:
             raise ApiError("camera_runtime_reserved_adapter", "自研摄像头运行时尚未接入。", 503)
         raise ApiError("camera_runtime_unknown_adapter", "未知摄像头运行时适配器。", 503)
@@ -247,3 +318,21 @@ class DeviceRuntimeResolver:
             return self.vision_service_factory()
         except Exception:
             return None
+
+
+def onvif_preview_stream_name(
+    device_id: str | None,
+    secret_ref: str | None,
+) -> str:
+    value = str(device_id or "").strip()
+    if not value:
+        raise ApiError(
+            "camera_runtime_not_configured",
+            "摄像头设备标识尚未配置。",
+            503,
+        )
+    secret_identity = str(secret_ref or "").strip()
+    digest = hashlib.sha256(
+        f"{value}:{secret_identity}".encode("utf-8")
+    ).hexdigest()[:24]
+    return f"mira_{digest}_preview"

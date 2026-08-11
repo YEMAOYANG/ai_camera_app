@@ -202,6 +202,69 @@ class CameraObserveCloudGateTickTest(unittest.TestCase):
         self.assertTrue(self.saved_payloads)
         self.assertEqual(self.saved_payloads[-1]["display"].get("freshness"), "prefilter_only")
 
+    def test_gate_skip_preserves_last_reliable_kimi_display(self):
+        _CountingVision.calls = 0
+        from core.security import now_ms
+
+        now = now_ms()
+        observed_at = now - 60_000
+        stable_gate = {
+            **default_cloud_gate_state(),
+            "gate_state": "person_stable",
+            "person_stable_since_ms": observed_at,
+            "last_person_heartbeat_at_ms": now,
+            "last_kimi_at_ms": observed_at,
+        }
+        behavior = {
+            "last_posture_kimi_at_ms": 9_999_999_999,
+            "last_meal_habit_kimi_at_ms": 9_999_999_999,
+            "last_screen_use_kimi_at_ms": 9_999_999_999,
+        }
+        display = {
+            "observed_at": observed_at,
+            "freshness": "fresh",
+            "has_person": False,
+            "activity": "",
+            "raw_activity": "",
+            "confidence": 0.91,
+            "description": "客厅暂时没有看到孩子。",
+            "decision_reason": "",
+            "isReliable": True,
+            "is_meal_scene": False,
+        }
+        enabled = [
+            {"scenario": "posture", "enabled": False},
+            {"scenario": "toy_cleanup", "enabled": False},
+            {"scenario": "meal_habit", "enabled": False},
+            {"scenario": "screen_use", "enabled": False},
+        ]
+
+        def load_context(**kwargs):
+            ctx = _default_context(
+                cloud_gate=stable_gate,
+                care_behavior=behavior,
+                display=display,
+            )
+            return type(ctx)(**{**ctx.__dict__, "enabled_capabilities": enabled})
+
+        self.service._load_observe_context = load_context  # type: ignore[method-assign]
+        self.service.vision_prefilter = _SequencePrefilter(
+            [_prefilter(person=True, motion=0.0)]
+        )
+        env = {"APP_CLOUD_PERSON_HEARTBEAT_SECONDS": "900"}
+        with patch.dict(os.environ, env, clear=False):
+            result = self.service.run_tick(
+                family_id="fam",
+                child_id="child",
+                device_id="dev",
+                image_bytes=self.image_bytes,
+            )
+
+        self.assertTrue(result.skipped)
+        self.assertEqual(_CountingVision.calls, 0)
+        self.assertTrue(self.saved_payloads)
+        self.assertEqual(self.saved_payloads[-1]["display"], display)
+
     def test_empty_room_stable_limits_kimi_calls_with_runtime_roundtrip(self):
         env = {
             "APP_CLOUD_EMPTY_HEARTBEAT_SECONDS": "1800",

@@ -58,7 +58,7 @@ void main() {
     expect(find.text('积分'), findsOneWidget);
     expect(find.text('订阅与套餐'), findsNothing);
     expect(find.text('积分与奖励'), findsNothing);
-    expect(find.text('隐私与权限'), findsNothing);
+    expect(find.text('隐私与数据'), findsOneWidget);
     expect(find.text('账号安全'), findsOneWidget);
     expect(find.text('帮助与反馈'), findsOneWidget);
     expect(find.text('关于'), findsOneWidget);

@@ -6,16 +6,19 @@ import unittest
 from datetime import date
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlsplit
 
 from app import create_app
 from core.database import Database
 from core.errors import ApiError
 from core.security import now_ms
 from models.firmware import FIRMWARE_PACKAGE_ACTIVE
+from repositories.care_repository import CareRepository
 from repositories.device_repository import DeviceRepository
 from services.device_service import DeviceService
 from services.device_runtime_resolver import DeviceRuntimeResolver
 from services.camera_command_service import _parent_camera_command_event
+from services.observation_runtime_state import ObservationRuntimeStateStore
 from services.service_factory import auth_service, camera_command_service
 from services import task_event_stream
 from tests.support import fresh_test_config, request_debug_code
@@ -33,6 +36,7 @@ def _fake_snapshot_bytes() -> bytes:
 class _CameraRuntimeHandler(BaseHTTPRequestHandler):
     speak_count = 0
     ptz_count = 0
+    snapshot_count = 0
     monitor_running = False
     analyze_payload = {
         "has_person": True,
@@ -81,6 +85,7 @@ class _CameraRuntimeHandler(BaseHTTPRequestHandler):
             )
             return
         if self.path == "/api/camera/snapshot":
+            self.__class__.snapshot_count += 1
             body = _fake_snapshot_bytes()
             self.send_response(200)
             self.send_header("Content-Type", "image/jpeg")
@@ -138,6 +143,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
     def setUp(self):
         _CameraRuntimeHandler.speak_count = 0
         _CameraRuntimeHandler.ptz_count = 0
+        _CameraRuntimeHandler.snapshot_count = 0
         _CameraRuntimeHandler.monitor_running = False
         _CameraRuntimeHandler.analyze_payload = {
             "has_person": True,
@@ -168,6 +174,7 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.access_token = self._login()
         self.device_id = self._create_device()
         self.child_id = self._create_child()
+        self._set_camera_analysis_authorized(True)
 
     def tearDown(self):
         self._vision_patch.stop()
@@ -505,6 +512,48 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
             any(event["displayTitle"] == "观察到孩子正在看书" for event in events.json["events"])
         )
 
+    def test_camera_monitor_refresh_requires_privacy_authorization_before_snapshot(self):
+        self._set_camera_analysis_authorized(False)
+        snapshot_count = _CameraRuntimeHandler.snapshot_count
+
+        response = self.client.post(
+            "/api/camera/monitor/refresh",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(response.status_code, 403, response.json)
+        self.assertEqual(
+            response.json["error"],
+            "camera_privacy_authorization_required",
+        )
+        self.assertEqual(_CameraRuntimeHandler.snapshot_count, snapshot_count)
+
+    def test_privacy_partial_update_preserves_existing_family_choices(self):
+        first = self.client.patch(
+            "/api/settings/privacy",
+            json={
+                "value": {
+                    "cameraCollectionAuthorized": True,
+                    "childPrivacyAuthorized": True,
+                    "remoteViewingNoticeEnabled": False,
+                }
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(first.status_code, 200, first.json)
+
+        second = self.client.patch(
+            "/api/settings/privacy",
+            json={"value": {"cameraCollectionAuthorized": False}},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(second.status_code, 200, second.json)
+        value = second.json["setting"]["value"]
+        self.assertFalse(value["cameraCollectionAuthorized"])
+        self.assertTrue(value["childPrivacyAuthorized"])
+        self.assertFalse(value["remoteViewingNoticeEnabled"])
+
     def test_camera_monitor_refresh_returns_refreshed_status_and_message(self):
         response = self.client.post(
             "/api/camera/monitor/refresh",
@@ -516,6 +565,61 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
         self.assertEqual(monitor["status"], "refreshed")
         self.assertIsNotNone(monitor["lastObservation"])
         self.assertIn("刷新", monitor["message"])
+
+    def test_monitor_status_keeps_stored_kimi_result_after_prefilter_skip(self):
+        self._fake_vision.payload = {
+            "has_person": False,
+            "activity": "离开",
+            "confidence": 0.91,
+            "description": "客厅暂时没有看到孩子。",
+        }
+        refreshed = self.client.post(
+            "/api/camera/monitor/refresh",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(refreshed.status_code, 200, refreshed.json)
+        kimi_observation = refreshed.json["monitor"]["lastObservation"]
+        self.assertTrue(kimi_observation["summary"])
+
+        repository = CareRepository(Database(self.app.config["DATABASE_URL"]))
+        runtime_store = ObservationRuntimeStateStore(repository)
+        prefilter_at = int(kimi_observation["observedAt"]) + 60_000
+        with repository.transaction() as conn:
+            runtime = runtime_store.load(
+                conn,
+                family_id=self.family_id,
+                child_id=self.child_id,
+                device_id=self.device_id,
+            )
+            runtime["display"] = {
+                "observed_at": prefilter_at,
+                "freshness": "prefilter_only",
+                "has_person": None,
+                "activity": "",
+                "confidence": 0.0,
+                "description": "",
+                "isReliable": False,
+            }
+            runtime_store.save(
+                conn,
+                family_id=self.family_id,
+                child_id=self.child_id,
+                device_id=self.device_id,
+                payload=runtime,
+                now=prefilter_at,
+            )
+
+        status = self.client.get(
+            "/api/camera/monitor/status",
+            query_string={"deviceId": self.device_id},
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(status.status_code, 200, status.json)
+        observation = status.json["monitor"]["lastObservation"]
+        self.assertEqual(observation["summary"], kimi_observation["summary"])
+        self.assertNotEqual(observation["freshness"], "prefilter_only")
 
     def test_camera_monitor_refresh_skips_unreliable_observation_record(self):
         self._fake_vision.payload = {
@@ -808,8 +912,15 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
     def test_camera_webrtc_session_contract(self):
         session = self.client.get("/api/camera/webrtc/session", headers=self._auth_headers())
         self.assertEqual(session.status_code, 200)
-        self.assertTrue(session.json["session"]["signalingUrl"].startswith("ws://"))
-        self.assertIn("src=ipc45aw_hd", session.json["session"]["signalingUrl"])
+        signaling_url = session.json["session"]["signalingUrl"]
+        parsed = urlsplit(signaling_url)
+        query = parse_qs(parsed.query)
+        self.assertEqual(parsed.scheme, "ws")
+        self.assertEqual(parsed.path, "/api/camera/webrtc/ws")
+        self.assertTrue((query.get("ticket") or [""])[0].startswith("camera_ws_"))
+        self.assertNotIn("token", query)
+        self.assertNotIn("src", query)
+        self.assertNotIn(":1984", signaling_url)
         self.assertEqual(session.json["session"]["message"], "实时画面连接已准备好。")
 
     def test_camera_read_apis_route_through_device_runtime_resolver(self):
@@ -1505,6 +1616,19 @@ class DevicesCameraAiFirmwareApiTest(unittest.TestCase):
 
     def _auth_headers(self) -> dict:
         return {"Authorization": f"Bearer {self.access_token}"}
+
+    def _set_camera_analysis_authorized(self, enabled: bool) -> None:
+        response = self.client.patch(
+            "/api/settings/privacy",
+            json={
+                "value": {
+                    "cameraCollectionAuthorized": enabled,
+                    "childPrivacyAuthorized": enabled,
+                }
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(response.status_code, 200, response.json)
 
 
 if __name__ == "__main__":

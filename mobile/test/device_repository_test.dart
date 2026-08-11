@@ -110,6 +110,100 @@ void main() {
       expect(enriched.last.canSelect, isTrue);
     },
   );
+
+  test('discoverOnvifDevices parses backend discovery contract', () async {
+    Map<String, dynamic>? requestBody;
+    final repository = DeviceRepository(
+      apiClient: ApiClient(
+        _dioWithHandler((options) {
+          requestBody = Map<String, dynamic>.from(options.data as Map);
+          return {
+            'ok': true,
+            'candidates': [
+              {
+                'id': 'onvif-t62',
+                'discoveryToken': 'temporary-token',
+                'deviceUniqueId': 'uuid:t62',
+                'serialNumber': 'SERIAL-T62',
+                'manufacturer': 'OEM',
+                'model': 'T62',
+                'displayName': '智能摄像机',
+                'requiresCredentials': true,
+                'supported': true,
+                'bindingState': 'available',
+                'capabilities': {
+                  'onvif': true,
+                  'rtsp': true,
+                  'ptz': false,
+                  'audio': true,
+                },
+                'expiresAt': DateTime.now()
+                    .add(const Duration(minutes: 2))
+                    .toIso8601String(),
+              },
+            ],
+          };
+        }),
+      ),
+    );
+
+    final candidates = await repository.discoverOnvifDevices(
+      targetIp: ' 192.168.10.20 ',
+    );
+
+    expect(requestBody, {'timeoutMs': 2500, 'targetIp': '192.168.10.20'});
+    expect(candidates, hasLength(1));
+    expect(candidates.single.deviceUniqueId, 'uuid:t62');
+    expect(candidates.single.displayModel, 'T62');
+    expect(candidates.single.isAvailable, isTrue);
+    expect(candidates.single.capabilities.audio, isTrue);
+  });
+
+  test(
+    'pairOnvifDevice omits engineering credentials from app request',
+    () async {
+      Map<String, dynamic>? requestBody;
+      final repository = DeviceRepository(
+        apiClient: ApiClient(
+          _dioWithHandler((options) {
+            requestBody = Map<String, dynamic>.from(options.data as Map);
+            return {
+              'ok': true,
+              'device': _device(id: 'paired', status: 'online'),
+              'defaultDevice': _device(id: 'paired', status: 'online'),
+              'connection': {
+                'verified': true,
+                'capabilities': {
+                  'onvif': true,
+                  'rtsp': true,
+                  'ptz': false,
+                  'audio': true,
+                },
+              },
+            };
+          }),
+        ),
+      );
+
+      final result = await repository.pairOnvifDevice(
+        discoveryToken: 'temporary-token',
+        name: ' 儿童房摄像头 ',
+        location: ' 儿童房 ',
+      );
+
+      expect(requestBody, {
+        'discoveryToken': 'temporary-token',
+        'name': '儿童房摄像头',
+        'location': '儿童房',
+        'setAsDefault': false,
+      });
+      expect(requestBody, isNot(contains('username')));
+      expect(requestBody, isNot(contains('password')));
+      expect(result.device.id, 'paired');
+      expect(result.connection.verified, isTrue);
+      expect(result.connection.capabilities.rtsp, isTrue);
+    },
+  );
 }
 
 Dio _dioFor(Map<String, Object?> responses) {
@@ -132,6 +226,20 @@ Dio _dioFor(Map<String, Object?> responses) {
           return;
         }
         handler.resolve(Response(requestOptions: options, data: data));
+      },
+    ),
+  );
+  return dio;
+}
+
+Dio _dioWithHandler(Object? Function(RequestOptions options) handler) {
+  final dio = Dio(BaseOptions(baseUrl: 'https://example.test'));
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, requestHandler) {
+        requestHandler.resolve(
+          Response(requestOptions: options, data: handler(options)),
+        );
       },
     ),
   );

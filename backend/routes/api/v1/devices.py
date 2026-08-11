@@ -42,6 +42,32 @@ def discovery_status():
         return error_response(exc)
 
 
+@devices_bp.post("/discovery/onvif")
+def discover_onvif():
+    try:
+        return jsonify(
+            device_service().discover_onvif(
+                bearer_token(request),
+                json_body(request),
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@devices_bp.post("/pair/onvif")
+def pair_onvif():
+    try:
+        return jsonify(
+            device_service().pair_onvif(
+                bearer_token(request),
+                json_body(request),
+            )
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @devices_bp.get("/<device_id>")
 def get_device(device_id: str):
     try:

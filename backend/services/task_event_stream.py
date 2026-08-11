@@ -10,7 +10,9 @@ from urllib.parse import parse_qs, urlparse
 
 from core.errors import AuthError
 from services.auth_service import AuthService
+from services.camera_signaling_ticket import camera_signaling_ticket_store
 from websockets.exceptions import ConnectionClosed
+from websockets.sync.client import connect as websocket_connect
 from websockets.sync.server import ServerConnection, serve
 
 
@@ -26,6 +28,7 @@ TASK_STATUS_CHANGED = "task_status.changed"
 REMINDER_DECISION_CREATED = "reminder_decision.created"
 REMINDER_EVENT_CREATED = "reminder_event.created"
 CAMERA_COMMAND_CREATED = "camera_command.created"
+CAMERA_SIGNALING_PATH = "/api/camera/webrtc/ws"
 
 APP_REALTIME_EVENT_TYPES = {
     CAMERA_OBSERVATION_UPDATED,
@@ -60,6 +63,7 @@ class TaskEventStreamServer:
         self._connections: dict[str, set[ServerConnection]] = {}
         self._session_connections: dict[str, set[ServerConnection]] = {}
         self._server = None
+        self._app = None
         self._auth_service: AuthService | None = None
         self._path = "/api/tasks/stream"
         self._account_security_path = "/api/account/security/stream"
@@ -78,6 +82,7 @@ class TaskEventStreamServer:
         if self._thread and self._thread.is_alive():
             return
 
+        self._app = app
         host = str(
             app.config.get("TASK_WEBSOCKET_HOST")
             or app.config.get("HOST")
@@ -182,6 +187,9 @@ class TaskEventStreamServer:
         identity_id = ""
         session_id = ""
         try:
+            if self._connection_path(connection) == CAMERA_SIGNALING_PATH:
+                self._handle_camera_signaling(connection)
+                return
             stream_kind, identity_id, session_id = self._authenticate_connection(connection)
             self._register(stream_kind, identity_id, connection, session_id=session_id)
             connection.send(
@@ -212,10 +220,59 @@ class TaskEventStreamServer:
             if stream_kind and identity_id:
                 self._unregister(stream_kind, identity_id, connection, session_id=session_id)
 
+    def _handle_camera_signaling(self, connection: ServerConnection) -> None:
+        parsed = self._parsed_connection_url(connection)
+        query = parse_qs(parsed.query)
+        ticket = camera_signaling_ticket_store.consume(
+            (query.get("ticket") or [""])[0]
+        )
+        if self._app is None:
+            raise ValueError("websocket app is not configured")
+
+        try:
+            with self._app.app_context():
+                from services.service_factory import device_runtime_resolver
+
+                resolved = device_runtime_resolver().resolve(
+                    family_id=ticket.family_id,
+                    device_id=ticket.device_id,
+                    require_device=True,
+                )
+                payload = resolved.bridge.webrtc_session()
+                session = (
+                    payload.get("session")
+                    if isinstance(payload, dict)
+                    else None
+                )
+                upstream_url = (
+                    str(session.get("signalingUrl") or "").strip()
+                    if isinstance(session, dict)
+                    else ""
+                )
+                if not upstream_url:
+                    raise RuntimeError("camera signaling is unavailable")
+                upstream_stream = str(
+                    (
+                        parse_qs(urlparse(upstream_url).query).get("src")
+                        or [""]
+                    )[0]
+                ).strip()
+                if upstream_stream != ticket.stream_name:
+                    raise RuntimeError("camera signaling stream changed")
+            upstream = websocket_connect(
+                upstream_url,
+                open_timeout=5,
+                close_timeout=1,
+                max_size=8 * 1024 * 1024,
+            )
+        except Exception:
+            _send_camera_signaling_error(connection)
+            return
+
+        _relay_camera_signaling(connection, upstream)
+
     def _authenticate_connection(self, connection: ServerConnection) -> tuple[str, str, str]:
-        request = getattr(connection, "request", None)
-        request_path = getattr(request, "path", "") if request is not None else ""
-        parsed = urlparse(request_path)
+        parsed = self._parsed_connection_url(connection)
         token = (parse_qs(parsed.query).get("token") or [""])[0]
         if self._auth_service is None:
             raise ValueError("websocket auth is not configured")
@@ -226,6 +283,14 @@ class TaskEventStreamServer:
             context = self._auth_service.authenticate_session(token)
             return "account_security", str(context["session"]["id"]), str(context["session"]["id"])
         raise ValueError("unexpected websocket path")
+
+    def _parsed_connection_url(self, connection: ServerConnection):
+        request = getattr(connection, "request", None)
+        request_path = getattr(request, "path", "") if request is not None else ""
+        return urlparse(request_path)
+
+    def _connection_path(self, connection: ServerConnection) -> str:
+        return self._parsed_connection_url(connection).path
 
     def _register(
         self,
@@ -534,6 +599,72 @@ def _send_to_connections(
         except Exception:
             failed.append(connection)
     return failed
+
+
+def _relay_camera_signaling(
+    downstream: ServerConnection,
+    upstream,
+) -> None:
+    stopped = threading.Event()
+
+    def forward_upstream() -> None:
+        try:
+            while not stopped.is_set():
+                downstream.send(upstream.recv())
+        except (ConnectionClosed, OSError):
+            pass
+        except Exception:
+            pass
+        finally:
+            stopped.set()
+            _close_websocket(downstream)
+
+    receiver = threading.Thread(
+        target=forward_upstream,
+        name="camera-signaling-upstream",
+        daemon=True,
+    )
+    receiver.start()
+    try:
+        while not stopped.is_set():
+            upstream.send(downstream.recv())
+    except (ConnectionClosed, OSError):
+        pass
+    except Exception:
+        pass
+    finally:
+        stopped.set()
+        _close_websocket(upstream)
+        _close_websocket(downstream)
+        receiver.join(timeout=1)
+
+
+def _send_camera_signaling_error(connection: ServerConnection) -> None:
+    try:
+        connection.send(
+            json.dumps(
+                {
+                    "type": "error",
+                    "value": "camera_signaling_unavailable",
+                },
+                separators=(",", ":"),
+            )
+        )
+    except Exception:
+        pass
+    _close_websocket(connection, code=1011, reason="camera unavailable")
+
+
+def _close_websocket(
+    connection,
+    *,
+    code: int = 1000,
+    reason: str = "",
+) -> None:
+    try:
+        connection.close(code=code, reason=reason)
+    except Exception:
+        pass
 
 
 def _now_ms() -> int:

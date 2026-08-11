@@ -25,7 +25,7 @@ python3 scripts/migrate.py
 python3 app.py
 ```
 
-**本地联调（Guardian + ai_camera_test 媒体层 + 观察 worker，一条命令）：**
+**本地联调（默认只启动 Guardian）：**
 
 ```sh
 cd backend
@@ -33,11 +33,43 @@ chmod +x scripts/start-dev.sh   # 首次
 ./scripts/start-dev.sh
 ```
 
-脚本会启动 ai_camera_test（go2rtc + gunicorn + speaker/voice/task，不含 monitor_worker）、
-Guardian `app.py`（API :8000 + WS :8001）与 `camera_observation_worker`。
+脚本默认只启动 Guardian `app.py`（API :8000 + WS :8001）。旧
+`ai_camera_test` 媒体层默认关闭；只有在 `.env` 显式设置
+`AI_CAMERA_TEST_ENABLED=1` 时才会启动。`camera_observation_worker` 已改为从
+Guardian 数据库枚举已绑定的 ONVIF 摄像头，不再依赖旧测试项目或固定
+IP/RTSP；设置 `CAMERA_OBSERVATION_WORKER_ENABLED=1` 后独立启动。
+实时预览使用独立的 go2rtc v1.9.14 媒体网关，不再依赖
+`ai_camera_test`。首次本地安装并启用：
+
+```sh
+cd backend
+./scripts/install-go2rtc.sh
+
+# backend/.env
+APP_MEDIA_GATEWAY_ENABLED=1
+APP_MEDIA_GATEWAY_AUTO_START=1
+APP_MEDIA_GATEWAY_BINARY=/tmp/guardian-dev/bin/go2rtc-v1.9.14
+APP_MEDIA_GATEWAY_CONFIG_FILE=config/go2rtc.yaml.example
+APP_MEDIA_GATEWAY_API_BASE_URL=http://127.0.0.1:1984
+AI_CAMERA_TEST_ENABLED=0
+
+./scripts/start-dev.sh
+```
+
+安装脚本固定下载并校验
+[go2rtc v1.9.14](https://github.com/AlexxIT/go2rtc/releases/tag/v1.9.14)，
+二进制写到 `/tmp/guardian-dev/bin/`，不会提交到仓库。媒体网关管理 API
+默认只监听 `127.0.0.1:1984`；摄像头 URL、账号和密码不会写入
+`backend/.env` 或 go2rtc YAML，后端会从加密凭据存储中解析，并仅在
+go2rtc 内存中注册设备流。手机通过 Guardian `:8001` 上的受控
+`/api/camera/webrtc/ws` 信令代理访问，不能直接调用 go2rtc 管理 API。
+`APP_MEDIA_GATEWAY_PUBLIC_BASE_URL` 只作为兼容/调试配置，不应为了手机访问
+而把未认证的 go2rtc API 暴露到家庭局域网。
+
 **默认会在终端实时输出 API 请求日志**（Flask/Werkzeug access log）；worker 日志在
 `/tmp/guardian-dev/guardian-worker.log`。加 `--quiet` 可关闭终端日志跟屏。
-按 Ctrl+C 停止 Guardian 进程。
+按 Ctrl+C 停止 Guardian 进程；脚本启动或复用的媒体网关会继续运行，方便下次
+联调直接复用。
 
 Development defaults bind to `0.0.0.0` so an Android/iOS device on the same
 network can reach the backend through the computer LAN IP. If an older local
@@ -93,6 +125,15 @@ APP_ENABLE_DEV_ADAPTERS=1
 APP_SMS_PROVIDER=development
 APP_HARDWARE_ADAPTER=disabled
 APP_CAMERA_RUNTIME_ADAPTER=disabled
+APP_MEDIA_GATEWAY_ENABLED=0
+APP_MEDIA_GATEWAY_API_BASE_URL=http://127.0.0.1:1984
+APP_MEDIA_GATEWAY_PUBLIC_BASE_URL=
+APP_MEDIA_GATEWAY_TIMEOUT_SECONDS=5
+CAMERA_SIGNALING_PUBLIC_BASE_URL=
+APP_MEDIA_GATEWAY_AUTO_START=0
+APP_MEDIA_GATEWAY_BINARY=/tmp/guardian-dev/bin/go2rtc-v1.9.14
+APP_MEDIA_GATEWAY_CONFIG_FILE=config/go2rtc.yaml.example
+APP_MEDIA_GATEWAY_VERSION=1.9.14
 APP_AI_PROVIDER=
 APP_AI_MODEL=
 APP_AI_API_KEY=
@@ -180,9 +221,11 @@ Device, camera runtime, AI, SMS, and firmware boundaries:
 
 ```text
 Device
-  GET /api/devices
-  GET /api/devices/{deviceId}
-  GET /api/devices/{deviceId}/status
+  GET  /api/devices
+  POST /api/devices/discovery/onvif
+  POST /api/devices/pair/onvif
+  GET  /api/devices/{deviceId}
+  GET  /api/devices/{deviceId}/status
 
 Camera
   GET /api/camera/health
@@ -208,6 +251,31 @@ may opt in to `APP_CAMERA_RUNTIME_ADAPTER=ai_camera_test` with
 defaults to `disabled` until a real camera runtime adapter is configured. Public
 App contracts never return RTSP URLs, go2rtc URLs, old project paths, provider
 keys, or raw prompt files.
+
+ONVIF discovery uses WS-Discovery and accepts an optional private-LAN
+`targetIp` fallback plus a clamped `timeoutMs` (500–5000 ms). Discovery returns
+only compatible, unbound devices with a short-lived opaque token. Pairing
+revalidates the ONVIF identity, media profile, and RTSP authentication before it
+creates the device/runtime records. Camera credentials are encrypted behind
+`secret_ref`; API responses never include the password, device service URL, or
+RTSP URI. For the current T62 engineering sample, development/test may explicitly
+enable `ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED=1` and provide
+`ONVIF_BOOTSTRAP_USERNAME` / `ONVIF_BOOTSTRAP_PASSWORD` in the ignored local
+`.env`; the Flutter App never receives or submits those values. Startup rejects
+this fixed-credential mode outside development/test or when development adapters
+are disabled. The current ONVIF runtime supports health and snapshot access.
+When `APP_MEDIA_GATEWAY_ENABLED=1`, the backend registers the verified H.264
+RTSP profile with the independent media gateway and exposes an authenticated,
+short-lived WebRTC signaling session through Guardian WebSocket port `8001`.
+`APP_MEDIA_GATEWAY_API_BASE_URL` is backend-internal and defaults to loopback.
+`CAMERA_SIGNALING_PUBLIC_BASE_URL` may override the App-facing signaling proxy
+base in deployments with a reverse proxy; local development normally leaves it
+empty so the backend derives the phone-accessible host from the request.
+`APP_MEDIA_GATEWAY_PUBLIC_BASE_URL` is only an upstream compatibility override
+and must not be used to expose the unauthenticated management API to a phone.
+If the gateway is disabled or unhealthy, snapshot access remains available and
+the API reports live preview as unavailable instead of returning a raw
+RTSP/go2rtc URL.
 
 Device status is wrapped by `HardwareDeviceAdapter`. Production defaults to
 `disabled_hardware_device` until a real hardware adapter is configured. The

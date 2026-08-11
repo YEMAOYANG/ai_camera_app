@@ -467,15 +467,23 @@ class AccountDeletionResult {
 }
 
 class ProfileSetting {
-  const ProfileSetting({required this.key, required this.value});
+  const ProfileSetting({
+    required this.key,
+    required this.value,
+    this.updatedAt,
+  });
 
   final String key;
   final Map<String, dynamic> value;
+  final int? updatedAt;
+
+  bool get isConfigured => updatedAt != null;
 
   static ProfileSetting fromJson(Map<String, dynamic> json) {
     return ProfileSetting(
       key: _asString(json['key']),
       value: _asMap(json['value']),
+      updatedAt: _asNullableInt(json['updatedAt']),
     );
   }
 }

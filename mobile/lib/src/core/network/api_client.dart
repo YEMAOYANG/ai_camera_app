@@ -88,18 +88,14 @@ class ApiClient {
 }
 
 class ClientDeviceHeaderInterceptor extends Interceptor {
-  ClientDeviceHeaderInterceptor({required Future<ClientDeviceInfo> Function() loadDeviceInfo})
-      : _loadDeviceInfo = loadDeviceInfo;
+  ClientDeviceHeaderInterceptor({required this._loadDeviceInfo});
 
   final Future<ClientDeviceInfo> Function() _loadDeviceInfo;
   ClientDeviceInfo? _cachedInfo;
   Future<void>? _warmUp;
 
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final cached = _cachedInfo;
     if (cached != null) {
       options.headers.addAll(cached.headers);

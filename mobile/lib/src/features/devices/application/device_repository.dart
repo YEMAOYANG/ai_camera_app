@@ -124,6 +124,60 @@ class DeviceRepository {
     }
   }
 
+  Future<List<OnvifDiscoveryCandidate>> discoverOnvifDevices({
+    String? targetIp,
+  }) async {
+    final normalizedTarget = targetIp?.trim() ?? '';
+    try {
+      final response = await _apiClient.post(
+        '/devices/discovery/onvif',
+        data: {
+          'timeoutMs': 2500,
+          if (normalizedTarget.isNotEmpty) 'targetIp': normalizedTarget,
+        },
+      );
+      final raw = _asMap(response.data)['candidates'];
+      if (raw is! List) return const [];
+      return raw
+          .map(
+            (candidate) => OnvifDiscoveryCandidate.fromJson(_asMap(candidate)),
+          )
+          .where(
+            (candidate) =>
+                candidate.id.isNotEmpty &&
+                candidate.discoveryToken.isNotEmpty &&
+                !candidate.isExpired,
+          )
+          .toList(growable: false);
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
+  Future<OnvifPairResult> pairOnvifDevice({
+    required String discoveryToken,
+    String? name,
+    String? location,
+    bool setAsDefault = false,
+  }) async {
+    final normalizedName = name?.trim() ?? '';
+    final normalizedLocation = location?.trim() ?? '';
+    try {
+      final response = await _apiClient.post(
+        '/devices/pair/onvif',
+        data: {
+          'discoveryToken': discoveryToken,
+          if (normalizedName.isNotEmpty) 'name': normalizedName,
+          if (normalizedLocation.isNotEmpty) 'location': normalizedLocation,
+          'setAsDefault': setAsDefault,
+        },
+      );
+      return OnvifPairResult.fromJson(_asMap(response.data));
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
   Future<DeviceOverview?> primaryOverview() async {
     final device = await defaultDevice();
     if (device == null) return null;

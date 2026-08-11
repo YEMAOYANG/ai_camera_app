@@ -207,6 +207,120 @@ class DiscoveredCameraCandidate {
   }
 }
 
+class OnvifDeviceCapabilities {
+  const OnvifDeviceCapabilities({
+    required this.onvif,
+    required this.rtsp,
+    required this.ptz,
+    required this.audio,
+  });
+
+  final bool onvif;
+  final bool rtsp;
+  final bool ptz;
+  final bool audio;
+
+  static OnvifDeviceCapabilities fromJson(Map<String, dynamic> json) {
+    return OnvifDeviceCapabilities(
+      onvif: json['onvif'] == true,
+      rtsp: json['rtsp'] == true,
+      ptz: json['ptz'] == true,
+      audio: json['audio'] == true,
+    );
+  }
+}
+
+class OnvifDiscoveryCandidate {
+  const OnvifDiscoveryCandidate({
+    required this.id,
+    required this.discoveryToken,
+    required this.deviceUniqueId,
+    required this.displayName,
+    required this.requiresCredentials,
+    required this.supported,
+    required this.bindingState,
+    required this.capabilities,
+    required this.expiresAt,
+    this.serialNumber,
+    this.manufacturer,
+    this.model,
+  });
+
+  final String id;
+  final String discoveryToken;
+  final String deviceUniqueId;
+  final String displayName;
+  final bool requiresCredentials;
+  final bool supported;
+  final String bindingState;
+  final OnvifDeviceCapabilities capabilities;
+  final DateTime? expiresAt;
+  final String? serialNumber;
+  final String? manufacturer;
+  final String? model;
+
+  String get dedupeKey {
+    if (deviceUniqueId.isNotEmpty) return deviceUniqueId;
+    if (serialNumber?.isNotEmpty == true) return serialNumber!;
+    return id;
+  }
+
+  String get displayModel {
+    final value = model?.trim() ?? '';
+    if (value.isEmpty || _containsCameraProtocolName(value)) {
+      return '智能摄像机';
+    }
+    return value;
+  }
+
+  bool get isAvailable => supported && bindingState == 'available';
+
+  bool get isExpired {
+    final expiry = expiresAt;
+    return expiry != null && !expiry.isAfter(DateTime.now());
+  }
+
+  static OnvifDiscoveryCandidate fromJson(Map<String, dynamic> json) {
+    return OnvifDiscoveryCandidate(
+      id: _asString(json['id']),
+      discoveryToken: _asString(json['discoveryToken']),
+      deviceUniqueId: _asString(json['deviceUniqueId']),
+      serialNumber: _asNullableString(json['serialNumber']),
+      manufacturer: _asNullableString(json['manufacturer']),
+      model: _asNullableString(json['model']),
+      displayName: _asString(json['displayName']),
+      requiresCredentials: json['requiresCredentials'] != false,
+      supported: json['supported'] != false,
+      bindingState: _asString(json['bindingState']).isEmpty
+          ? 'available'
+          : _asString(json['bindingState']),
+      capabilities: OnvifDeviceCapabilities.fromJson(
+        _asMap(json['capabilities']),
+      ),
+      expiresAt: _asNullableDateTime(json['expiresAt']),
+    );
+  }
+}
+
+class OnvifConnectionVerification {
+  const OnvifConnectionVerification({
+    required this.verified,
+    required this.capabilities,
+  });
+
+  final bool verified;
+  final OnvifDeviceCapabilities capabilities;
+
+  static OnvifConnectionVerification fromJson(Map<String, dynamic> json) {
+    return OnvifConnectionVerification(
+      verified: json['verified'] == true,
+      capabilities: OnvifDeviceCapabilities.fromJson(
+        _asMap(json['capabilities']),
+      ),
+    );
+  }
+}
+
 class GuardianDevice {
   const GuardianDevice({
     required this.id,
@@ -253,6 +367,31 @@ class GuardianDevice {
       createdAt: _asInt(json['createdAt']),
       updatedAt: _asInt(json['updatedAt']),
       unboundAt: _asNullableInt(json['unboundAt']),
+    );
+  }
+}
+
+class OnvifPairResult {
+  const OnvifPairResult({
+    required this.device,
+    required this.connection,
+    this.defaultDevice,
+  });
+
+  final GuardianDevice device;
+  final GuardianDevice? defaultDevice;
+  final OnvifConnectionVerification connection;
+
+  static OnvifPairResult fromJson(Map<String, dynamic> json) {
+    final defaultDevice = json['defaultDevice'];
+    return OnvifPairResult(
+      device: GuardianDevice.fromJson(_asMap(json['device'])),
+      defaultDevice: defaultDevice == null
+          ? null
+          : GuardianDevice.fromJson(_asMap(defaultDevice)),
+      connection: OnvifConnectionVerification.fromJson(
+        _asMap(json['connection']),
+      ),
     );
   }
 }
@@ -551,6 +690,30 @@ int? _asNullableInt(dynamic value) {
   if (value is int) return value;
   if (value is num) return value.toInt();
   if (value is String) return int.tryParse(value);
+  return null;
+}
+
+String? _asNullableString(dynamic value) {
+  if (value is! String) return null;
+  final trimmed = value.trim();
+  return trimmed.isEmpty ? null : trimmed;
+}
+
+bool _containsCameraProtocolName(String value) {
+  final normalized = value.toLowerCase();
+  return normalized.contains('onvif') || normalized.contains('rtsp');
+}
+
+DateTime? _asNullableDateTime(dynamic value) {
+  if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+  if (value is num) {
+    return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+  }
+  if (value is String) {
+    final epoch = int.tryParse(value);
+    if (epoch != null) return DateTime.fromMillisecondsSinceEpoch(epoch);
+    return DateTime.tryParse(value);
+  }
   return null;
 }
 

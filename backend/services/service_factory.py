@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from flask import current_app
 
+from core.config import BACKEND_ROOT
 from core.errors import ApiError
 from integrations.hardware.disabled_adapter import DisabledHardwareDeviceAdapter
 from integrations.hardware.mock_adapter import MockHardwareDeviceAdapter
@@ -13,10 +16,13 @@ from services.vision_observation_service import VisionObservationService
 from services.camera_bridge_service import CameraBridgeService
 from services.camera_ai_observation_service import CameraAiObservationService
 from integrations.camera_runtime.python_open_cv_yolo_prefilter import default_local_vision_prefilter
+from integrations.camera_runtime.go2rtc_client import Go2RtcClient
+from integrations.onvif.client import OnvifClient
 from services.camera_observe_service import CameraObserveService
 from services.camera_command_service import CameraCommandService
 from services.care_config_service import CareConfigService
 from services.device_service import DeviceService
+from services.device_credential_store import EncryptedFileCredentialStore
 from services.device_runtime_resolver import DeviceRuntimeResolver
 from services.firmware_service import FirmwareService
 from services.ai_care_reminder_service import AiCareReminderService
@@ -92,9 +98,62 @@ def device_service() -> DeviceService:
         auth_service=auth_service(),
         hardware_adapter=hardware_adapter(),
         runtime_resolver=device_runtime_resolver(),
+        onvif_client=onvif_client(),
+        credential_store=device_credential_store(),
+        onvif_discovery_ttl_seconds=int(
+            current_app.config.get("ONVIF_DISCOVERY_TOKEN_TTL_SECONDS", 90)
+        ),
+        onvif_supported_manufacturers=tuple(
+            current_app.config.get("ONVIF_SUPPORTED_MANUFACTURERS") or ("Vatilon",)
+        ),
+        onvif_supported_models=tuple(
+            current_app.config.get("ONVIF_SUPPORTED_MODELS") or ("T62",)
+        ),
+        onvif_bootstrap_credentials_enabled=bool(
+            current_app.config.get("ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED")
+        ),
+        onvif_bootstrap_username=str(
+            current_app.config.get("ONVIF_BOOTSTRAP_USERNAME") or ""
+        ),
+        onvif_bootstrap_password=str(
+            current_app.config.get("ONVIF_BOOTSTRAP_PASSWORD") or ""
+        ),
         app_env=str(current_app.config.get("APP_ENV", "production")),
         dev_adapters_enabled=bool(current_app.config.get("DEV_ADAPTERS_ENABLED")),
     )
+
+
+def onvif_client() -> OnvifClient:
+    return OnvifClient(
+        discovery_timeout_seconds=float(
+            current_app.config.get("ONVIF_DISCOVERY_TIMEOUT_SECONDS", 1.5)
+        ),
+        http_timeout_seconds=float(
+            current_app.config.get("ONVIF_HTTP_TIMEOUT_SECONDS", 4)
+        ),
+        rtsp_timeout_seconds=float(
+            current_app.config.get("ONVIF_RTSP_TIMEOUT_SECONDS", 4)
+        ),
+    )
+
+
+def device_credential_store() -> EncryptedFileCredentialStore:
+    app_env = str(current_app.config.get("APP_ENV", "production")).strip().lower()
+    root = _backend_relative_path(
+        str(current_app.config.get("DEVICE_SECRET_STORE_DIR") or "")
+    )
+    key_file_value = str(current_app.config.get("DEVICE_SECRET_KEY_FILE") or "")
+    return EncryptedFileCredentialStore(
+        root=root,
+        key=str(current_app.config.get("DEVICE_SECRET_KEY") or ""),
+        key_file=_backend_relative_path(key_file_value) if key_file_value else None,
+        allow_key_generation=app_env in {"development", "test"},
+    )
+
+
+def _backend_relative_path(value: str) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else BACKEND_ROOT / path
 
 
 def firmware_service() -> FirmwareService:
@@ -116,6 +175,29 @@ def device_runtime_resolver() -> DeviceRuntimeResolver:
         dev_adapters_enabled=bool(current_app.config.get("DEV_ADAPTERS_ENABLED")),
         app_env=str(current_app.config.get("APP_ENV", "production")),
         vision_service_factory=lambda: build_vision_observation_service_from_config(current_app.config),
+        onvif_client=onvif_client(),
+        credential_store=device_credential_store(),
+        media_gateway=media_gateway_client(),
+    )
+
+
+def media_gateway_client() -> Go2RtcClient | None:
+    if not bool(current_app.config.get("MEDIA_GATEWAY_ENABLED")) or not bool(
+        current_app.config.get("TASK_WEBSOCKET_ENABLED")
+    ):
+        return None
+    return Go2RtcClient(
+        str(
+            current_app.config.get("MEDIA_GATEWAY_API_BASE_URL")
+            or "http://127.0.0.1:1984"
+        ),
+        public_base_url=(
+            str(current_app.config.get("MEDIA_GATEWAY_PUBLIC_BASE_URL") or "")
+            or None
+        ),
+        timeout_seconds=float(
+            current_app.config.get("MEDIA_GATEWAY_TIMEOUT_SECONDS", 5)
+        ),
     )
 
 
@@ -311,4 +393,3 @@ def voice_runtime_service() -> VoiceRuntimeAppService:
         auth_service=auth_service(),
         sync_service=conversation_sync_service(),
     )
-

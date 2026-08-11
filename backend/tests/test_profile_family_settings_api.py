@@ -154,6 +154,43 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         self.assertEqual(roles["guardian"], "监护人")
         self.assertEqual(roles["viewer"], "临时查看者")
 
+    def test_privacy_setting_marks_the_first_explicit_family_decision(self):
+        initial = self.client.get(
+            "/api/settings/privacy",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(initial.status_code, 200, initial.json)
+        self.assertIsNone(initial.json["setting"]["updatedAt"])
+        self.assertFalse(
+            initial.json["setting"]["value"]["cameraCollectionAuthorized"],
+        )
+        self.assertFalse(
+            initial.json["setting"]["value"]["childPrivacyAuthorized"],
+        )
+
+        saved = self.client.patch(
+            "/api/settings/privacy",
+            json={
+                "value": {
+                    "cameraCollectionAuthorized": False,
+                    "childPrivacyAuthorized": False,
+                }
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(saved.status_code, 200, saved.json)
+        self.assertIsInstance(saved.json["setting"]["updatedAt"], int)
+
+        reloaded = self.client.get(
+            "/api/settings/privacy",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(reloaded.status_code, 200, reloaded.json)
+        self.assertEqual(
+            reloaded.json["setting"]["updatedAt"],
+            saved.json["setting"]["updatedAt"],
+        )
+
     def test_account_security_devices_revoke_and_deletion_request(self):
         phone = "13800002126"
         code = request_debug_code(self.client, phone)

@@ -75,6 +75,7 @@ class CameraObserveService:
         self.vision_service = vision_service
         self.observation_service = observation_service or CameraAiObservationService(database_url)
         self.vision_prefilter = vision_prefilter or default_local_vision_prefilter()
+        self._prefilter_frame_cache: dict[tuple[str, str, str], str] = {}
 
     def run_tick(
         self,
@@ -106,10 +107,19 @@ class CameraObserveService:
             now=now,
         )
 
+        prefilter_previous = dict(context.prefilter_previous or {})
+        frame_cache_key = (family_id, child_id, device_id)
+        prefilter_previous["last_frame_thumb_b64"] = (
+            self._prefilter_frame_cache.get(frame_cache_key) or ""
+        )
         prefilter = self.vision_prefilter.analyze_frame(
             image_bytes,
-            previous=context.prefilter_previous,
+            previous=prefilter_previous,
             now_ms=now,
+        )
+        self._remember_prefilter_frame(
+            frame_cache_key,
+            str(getattr(prefilter, "frame_thumb_b64", "") or ""),
         )
         gate_decision = evaluate_cloud_gate(
             prefilter=prefilter,
@@ -172,7 +182,11 @@ class CameraObserveService:
                 gate_decision=gate_decision,
                 frame_hash=frame_hash,
                 now=now,
-                display=_prefilter_skip_display(now_ms=now, gate_reason=skip_reason),
+                display=_display_after_prefilter_skip(
+                    context.runtime,
+                    now_ms=now,
+                    gate_reason=skip_reason,
+                ),
                 absence=absence,
             )
             self._save_runtime(
@@ -512,6 +526,21 @@ class CameraObserveService:
             capability_configs=capability_configs,
         )
 
+    def _remember_prefilter_frame(
+        self,
+        key: tuple[str, str, str],
+        value: str,
+    ) -> None:
+        if not value:
+            return
+        if key not in self._prefilter_frame_cache and len(
+            self._prefilter_frame_cache
+        ) >= 128:
+            self._prefilter_frame_cache.pop(
+                next(iter(self._prefilter_frame_cache))
+            )
+        self._prefilter_frame_cache[key] = value
+
     def _apply_gate_runtime(
         self,
         runtime: Mapping[str, Any],
@@ -658,6 +687,24 @@ def _prefilter_skip_display(*, now_ms: int, gate_reason: str) -> dict[str, objec
         "isReliable": False,
         "is_meal_scene": False,
     }
+
+
+def _display_after_prefilter_skip(
+    runtime: Mapping[str, Any],
+    *,
+    now_ms: int,
+    gate_reason: str,
+) -> dict[str, object]:
+    previous = runtime.get("display")
+    if isinstance(previous, Mapping):
+        freshness = str(previous.get("freshness") or "").strip().lower()
+        if (
+            int(previous.get("observed_at") or 0) > 0
+            and previous.get("isReliable") is True
+            and freshness != "prefilter_only"
+        ):
+            return dict(previous)
+    return _prefilter_skip_display(now_ms=now_ms, gate_reason=gate_reason)
 
 
 def _absent_runtime_display(now_ms: int) -> dict[str, object]:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from flask import Blueprint, Response, current_app, jsonify, request, stream_with_context
 
@@ -10,6 +11,10 @@ from repositories.care_repository import CareRepository
 from schemas.auth import bearer_token, json_body
 from schemas.vision import observation_is_reliable
 from services.camera_bridge_service import CameraBridgeError
+from services.camera_observation_authorization import (
+    camera_image_analysis_authorized,
+)
+from services.camera_signaling_ticket import camera_signaling_ticket_store
 from services.parent_facing_copy import build_child_vision_context
 from core.security import now_ms
 from services.service_factory import (
@@ -28,6 +33,7 @@ from services.task_event_stream import (
 
 
 camera_bp = Blueprint("camera", __name__)
+CAMERA_SIGNALING_PATH = "/api/camera/webrtc/ws"
 
 
 def _json_response(payload: dict):
@@ -38,7 +44,7 @@ def _json_response(payload: dict):
 
 def _resolve_camera_runtime_for_request():
     access_token = bearer_token(request)
-    context = auth_service().authenticate(access_token)
+    context = auth_service().authenticate_session(access_token)
     device_id = str(request.args.get("deviceId") or "").strip() or None
     resolved = device_runtime_resolver().resolve(
         family_id=context["family"]["id"],
@@ -61,6 +67,25 @@ def _observe_child_id(access_token: str, *, family_id: str) -> str:
     if children:
         return str(children[0].get("id") or "").strip()
     return ""
+
+
+def _assert_camera_analysis_authorized(access_token: str) -> None:
+    summary = profile_service().summary(access_token).get("summary") or {}
+    capabilities = summary.get("capabilities") or []
+    if "view_live_care" not in capabilities:
+        raise ApiError(
+            "permission_denied",
+            "当前身份不能查看看护画面。",
+            403,
+        )
+    setting = profile_service().get_setting(access_token, "privacy").get("setting") or {}
+    privacy = setting.get("value") if isinstance(setting, dict) else {}
+    if not camera_image_analysis_authorized(privacy):
+        raise ApiError(
+            "camera_privacy_authorization_required",
+            "请先由家庭管理员开启画面看护授权。",
+            403,
+        )
 
 
 @camera_bp.get("/health")
@@ -157,12 +182,83 @@ def stream():
 @camera_bp.get("/webrtc/session")
 def webrtc_session():
     try:
-        _, _, resolved = _resolve_camera_runtime_for_request()
-        return jsonify(resolved.bridge.webrtc_session())
+        _, context, resolved = _resolve_camera_runtime_for_request()
+        payload = resolved.bridge.webrtc_session()
+        session = payload.get("session") if isinstance(payload, dict) else None
+        if not isinstance(session, dict):
+            raise CameraBridgeError(
+                "camera_webrtc_session_failed",
+                "实时画面暂时无法建立连接。",
+                502,
+            )
+        upstream_url = str(session.get("signalingUrl") or "").strip()
+        upstream_query = parse_qs(urlsplit(upstream_url).query)
+        stream_name = str(
+            (upstream_query.get("src") or [""])[0]
+        ).strip()
+        ticket = camera_signaling_ticket_store.issue(
+            family_id=context["family"]["id"],
+            user_id=context["user"]["id"],
+            session_id=context["session"]["id"],
+            device_id=resolved.device_id,
+            stream_name=stream_name,
+        )
+        return jsonify(
+            {
+                **payload,
+                "session": {
+                    **session,
+                    "signalingUrl": _camera_signaling_url(
+                        ticket=ticket,
+                    ),
+                },
+            }
+        )
     except CameraBridgeError as exc:
         return jsonify({"ok": False, "error": exc.code, "message": "实时画面暂时无法连接，请稍后再试。"}), exc.status_code
     except ApiError as exc:
         return error_response(exc)
+
+
+def _camera_signaling_url(
+    *,
+    ticket: str,
+) -> str:
+    configured = str(
+        current_app.config.get("CAMERA_SIGNALING_PUBLIC_BASE_URL") or ""
+    ).strip()
+    if configured:
+        parsed = urlsplit(configured)
+        scheme = (
+            "wss"
+            if parsed.scheme.lower() in {"https", "wss"}
+            else "ws"
+        )
+        base_path = parsed.path.rstrip("/")
+        netloc = parsed.netloc
+    else:
+        request_host = urlsplit(f"//{request.host}")
+        hostname = str(request_host.hostname or "").strip()
+        if not hostname:
+            raise CameraBridgeError(
+                "camera_webrtc_session_failed",
+                "实时画面服务地址配置不正确。",
+                503,
+            )
+        rendered_host = f"[{hostname}]" if ":" in hostname else hostname
+        port = int(current_app.config.get("TASK_WEBSOCKET_PORT") or 8001)
+        netloc = f"{rendered_host}:{port}"
+        scheme = "wss" if request.is_secure else "ws"
+        base_path = ""
+    return urlunsplit(
+        (
+            scheme,
+            netloc,
+            f"{base_path}{CAMERA_SIGNALING_PATH}",
+            urlencode({"ticket": ticket}),
+            "",
+        )
+    )
 
 
 @camera_bp.post("/webrtc/offer")
@@ -247,6 +343,7 @@ def monitor_status():
 def monitor_refresh():
     try:
         access_token, context, resolved = _resolve_camera_runtime_for_request()
+        _assert_camera_analysis_authorized(access_token)
         child_id = _observe_child_id(access_token, family_id=context["family"]["id"])
         device_id = resolved.device_id or ""
         snapshot = resolved.bridge.fetch_snapshot()
@@ -414,18 +511,15 @@ def _merge_stored_observation_into_response(
     if not isinstance(monitor, dict):
         return
     current = monitor.get("lastObservation")
-    if trust_current and isinstance(current, dict) and str(current.get("summary") or "").strip():
+    if trust_current and _has_formal_observation(current):
         return
     stored = _latest_stored_observation(family_id=family_id, device_id=device_id)
-    if stored is None:
+    if stored is None or not _has_formal_observation(stored):
         return
     current = monitor.get("lastObservation")
-    current_summary = str((current or {}).get("summary") or "").strip() if isinstance(current, dict) else ""
-    stored_summary = str(stored.get("summary") or "").strip()
     should_merge = (
-        not isinstance(current, dict)
-        or not current_summary
-        or (stored_summary and _stored_observation_is_newer(stored, current))
+        not _has_formal_observation(current)
+        or _stored_observation_is_newer(stored, current)
     )
     if not should_merge:
         return
@@ -456,8 +550,28 @@ def _merge_runtime_display_into_response(
     if not isinstance(monitor, dict):
         return
     current = monitor.get("lastObservation")
+    if not _has_formal_observation(display) and _has_formal_observation(current):
+        return
     if not isinstance(current, dict) or _stored_observation_is_newer(display, current):
         monitor["lastObservation"] = display
+
+
+def _prefilter_only_observation(value: object) -> bool:
+    return (
+        isinstance(value, dict)
+        and str(value.get("freshness") or "").strip().lower() == "prefilter_only"
+    )
+
+
+def _has_formal_observation(value: object) -> bool:
+    if not isinstance(value, dict) or _prefilter_only_observation(value):
+        return False
+    if not str(value.get("summary") or "").strip():
+        return False
+    freshness = str(value.get("freshness") or "").strip().lower()
+    if freshness == "stale":
+        return True
+    return value.get("isReliable") is True
 
 
 def _latest_runtime_display_observation(
@@ -484,6 +598,10 @@ def _latest_runtime_display_observation(
     last_kimi_at_ms = 0
     if isinstance(cloud_gate, dict):
         last_kimi_at_ms = int(cloud_gate.get("last_kimi_at_ms") or 0)
+    freshness = _runtime_display_freshness(
+        display,
+        last_kimi_at_ms=last_kimi_at_ms,
+    )
     normalized = _normalize_monitor_observation(
         {
             "has_person": display.get("has_person"),
@@ -494,7 +612,7 @@ def _latest_runtime_display_observation(
             "description": display.get("description"),
             "decision_reason": display.get("decision_reason"),
             "isReliable": display.get("isReliable"),
-            "freshness": display.get("freshness"),
+            "freshness": freshness,
             "last_kimi_at_ms": last_kimi_at_ms,
         }
     )
@@ -504,6 +622,25 @@ def _latest_runtime_display_observation(
     if description:
         normalized["description"] = description[:180]
     return normalized
+
+
+def _runtime_display_freshness(
+    display: dict,
+    *,
+    last_kimi_at_ms: int,
+) -> str:
+    explicit = str(display.get("freshness") or "").strip().lower()
+    if explicit == "prefilter_only":
+        return explicit
+    from services.observation_runtime_state import display_freshness_from_runtime
+
+    age_aware_display = dict(display)
+    age_aware_display.pop("freshness", None)
+    return display_freshness_from_runtime(
+        now_ms=now_ms(),
+        display=age_aware_display,
+        last_kimi_at_ms=last_kimi_at_ms,
+    )
 
 
 def _normalize_monitor_observation(value: object) -> dict | None:

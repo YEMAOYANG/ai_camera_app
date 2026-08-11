@@ -852,11 +852,7 @@ class ProfileService:
     def update_setting(self, access_token: str, key: str, data: dict) -> dict:
         self._validate_setting_key(key)
         context = self._auth_context(access_token)
-        value = dict(SETTING_DEFAULTS[key])
         incoming = data.get("value") if isinstance(data.get("value"), dict) else data
-        for item_key, item_value in incoming.items():
-            if item_key in value:
-                value[item_key] = item_value
         now = now_ms()
         family_id = context["family"]["id"]
         with self.repository.transaction() as conn:
@@ -865,6 +861,15 @@ class ProfileService:
                 context,
                 SETTING_MANAGE_CAPABILITIES[key],
             )
+            current = self.repository.get_setting(
+                conn,
+                family_id=family_id,
+                key=key,
+            )
+            value = setting_value(current, key)
+            for item_key, item_value in incoming.items():
+                if item_key in value:
+                    value[item_key] = item_value
             if key == "conversation":
                 wake_name = validate_wake_name(
                     value.get("wakeName"),

@@ -103,6 +103,13 @@ class ProfileScreen extends ConsumerWidget {
               title: '权益与安全',
               rows: [
                 _ProfileCategory(
+                  icon: Icons.lock_outline,
+                  title: '隐私与数据',
+                  subtitle: '画面授权、记录策略和儿童数据',
+                  path: profilePrivacyPath,
+                  tone: AppListRowTone.blue,
+                ),
+                _ProfileCategory(
                   icon: Icons.admin_panel_settings_outlined,
                   title: '账号安全',
                   subtitle: '登录设备和账号注销',

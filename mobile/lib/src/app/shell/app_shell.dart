@@ -9,8 +9,10 @@ import 'package:warm_sight/src/app/router/app_route.dart';
 import 'package:warm_sight/src/app/router/app_router.dart';
 import 'package:warm_sight/src/core/theme/app_system_ui.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/features/devices/presentation/onvif_auto_discovery_gate.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/profile/presentation/privacy_authorization_gate.dart';
 import 'package:warm_sight/src/features/tasks/application/task_repository.dart';
 import 'package:warm_sight/src/features/tasks/presentation/tasks_screen.dart';
 import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
@@ -36,7 +38,13 @@ class AppShell extends ConsumerWidget {
         extendBody: true,
         body: Stack(
           children: [
-            Positioned.fill(child: child),
+            Positioned.fill(
+              child: PrivacyAuthorizationGate(
+                secondaryOverlayBuilder: (content) =>
+                    OnvifAutoDiscoveryGate(child: content),
+                child: child,
+              ),
+            ),
             Positioned(
               left: 0,
               right: 0,

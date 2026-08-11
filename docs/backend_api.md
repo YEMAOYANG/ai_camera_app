@@ -1,6 +1,6 @@
 # Mira Guardian App Backend API v1
 
-更新日期：2026-06-04
+更新日期：2026-07-29
 
 本文档描述当前家长端 App 第一版已经实现或明确预留的后端接口。后端当前保留 Flask 服务，负责 App 登录态、首次设置、任务、积分、奖励、设备状态，以及 AI / Prompt / Camera / Firmware 的轻量边界。
 
@@ -224,7 +224,7 @@ Response:
 
 ### GET `/api/camera/webrtc/session`
 
-Flutter 全屏实时监控页使用。Flutter 先向当前后端申请实时画面连接信息，再用 WebRTC 建立真实流播放。
+Flutter 全屏实时监控页使用。Flutter 先向当前后端申请实时画面连接信息，再用 WebRTC 建立真实流播放。后端返回的是 Guardian `:8001` 信令代理地址和 60 秒、单次使用的票据，不返回 RTSP、摄像头凭据或 go2rtc 管理地址。
 
 Headers:
 
@@ -238,11 +238,21 @@ Response:
 {
   "ok": true,
   "session": {
-    "signalingUrl": "ws://127.0.0.1:1984/api/ws?src=ipc45aw_hd",
+    "signalingUrl": "ws://192.168.1.10:8001/api/camera/webrtc/ws?ticket=camera_ws_xxx",
     "message": "实时画面连接已准备好。"
   }
 }
 ```
+
+WebSocket 建立后沿用 go2rtc 的 JSON 信令消息合同：
+
+```json
+{"type":"webrtc/offer","value":"v=0\r\n..."}
+{"type":"webrtc/answer","value":"v=0\r\n..."}
+{"type":"webrtc/candidate","value":"candidate:..."}
+```
+
+票据会绑定当前用户、家庭、登录会话、设备和匿名媒体流；过期、重复使用或与设备不匹配时拒绝连接。
 
 ### POST `/api/camera/webrtc/offer`
 
@@ -375,6 +385,8 @@ Device
   GET    /api/devices
   GET    /api/devices/{deviceId}
   GET    /api/devices/{deviceId}/status
+  POST   /api/devices/discovery/onvif
+  POST   /api/devices/pair/onvif
   POST   /api/devices/{deviceId}/commands
 ```
 
@@ -382,6 +394,84 @@ Device
 `connectionStatus`、`lastSeenAt`、`message` 以及 `capabilities.snapshot /
 stream / twoWayAudio / monitor`。Flutter 仍然只消费 App 后端字段，不接触底层
 runtime 地址或流媒体配置。
+
+`POST /api/devices/discovery/onvif` 在后端所在局域网执行 ONVIF
+WS-Discovery。自动搜索只返回兼容名单内、尚未绑定的设备；响应不会返回摄像头
+IP、ONVIF 服务地址或 RTSP 地址。`discoveryToken` 是与当前家庭和账号绑定的
+短期一次性令牌。
+
+```json
+{
+  "timeoutMs": 2500
+}
+```
+
+定向排查时可以额外传入局域网 IPv4 地址：
+
+```json
+{
+  "timeoutMs": 2500,
+  "targetIp": "192.168.10.20"
+}
+```
+
+发现响应：
+
+```json
+{
+  "ok": true,
+  "candidates": [
+    {
+      "id": "ONVIF-...",
+      "discoveryToken": "onvif_discovery_...",
+      "deviceUniqueId": "ONVIF-...",
+      "displayName": "T62",
+      "manufacturer": "Vatilon",
+      "model": "T62",
+      "requiresCredentials": false,
+      "supported": true,
+      "bindingState": "available",
+      "capabilities": {
+        "onvif": true,
+        "rtsp": true,
+        "ptz": false,
+        "audio": true
+      },
+      "expiresAt": 1780390000000
+    }
+  ]
+}
+```
+
+`POST /api/devices/pair/onvif` 使用短期令牌完成 ONVIF 鉴权、主码流 Profile
+选择及 RTSP 可达性验证。当前 T62 工程样机在 development/test 环境由后端从
+本地 `.env` 读取固定凭据，Flutter 不展示、接收或提交账号密码。后端验证成功
+后仍把凭据加密保存为 `secret_ref`；Flutter 的持久化状态、设备响应和运行时
+配置读取接口都不会收到原始密码、IP 或 RTSP 地址。
+
+```json
+{
+  "discoveryToken": "onvif_discovery_...",
+  "name": "儿童房摄像头",
+  "location": "儿童房",
+  "setAsDefault": true
+}
+```
+
+本地工程模式必须同时设置
+`ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED=1`、
+`ONVIF_BOOTSTRAP_USERNAME` 和 `ONVIF_BOOTSTRAP_PASSWORD`，且只允许在
+development/test + development adapters 下启动。接口仍兼容工程调试工具在
+请求中同时显式传入 `username` 与 `password`；只传一项不会与固定配置混用。
+生产环境固定凭据模式会在启动校验阶段被拒绝。
+
+当前 `onvif_rtsp` adapter 已支持在线验证和 JPEG 快照；在 RTSP-to-WebRTC
+媒体网关接入前，`streamAvailable`、`monitorAvailable`、`ptzAvailable` 和
+`speakerAvailable` 必须保持 `false`，不能把 ONVIF 宣告能力误报为 App 已可用。
+
+本地联调时，运行后端的电脑必须和摄像头位于同一局域网。生产后端若部署在
+公网，家庭组播无法直接到达云端；届时应将发现阶段迁移到手机原生局域网能力或
+家庭网关，再继续复用这里的短期配对令牌、鉴权和运行时适配边界。
 
 ### Tasks
 

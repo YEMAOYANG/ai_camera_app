@@ -90,6 +90,45 @@ class DeviceRepository:
             ).fetchall()
         )
 
+    def list_active_observation_devices(
+        self,
+        conn: DatabaseConnection,
+        *,
+        after_family_id: str | None = None,
+        after_device_id: str | None = None,
+        limit: int = 8,
+    ) -> list[DatabaseRow]:
+        """List bound ONVIF devices without exposing runtime config or secrets."""
+
+        clauses = [
+            "d.status <> 'unbound'",
+            "drc.status = 'active'",
+            "drc.provider = 'onvif_rtsp'",
+        ]
+        values: list[object] = []
+        if after_family_id and after_device_id:
+            clauses.append(
+                "(d.family_id > ? OR (d.family_id = ? AND d.id > ?))"
+            )
+            values.extend(
+                [after_family_id, after_family_id, after_device_id]
+            )
+        values.append(max(1, min(int(limit), 100)))
+        return list(
+            conn.execute(
+                f"""
+                SELECT d.family_id, d.id AS device_id
+                FROM devices d
+                JOIN device_runtime_configs drc
+                  ON drc.family_id = d.family_id AND drc.device_id = d.id
+                WHERE {' AND '.join(clauses)}
+                ORDER BY d.family_id, d.id
+                LIMIT ?
+                """,
+                values,
+            ).fetchall()
+        )
+
     def get_device(
         self,
         conn: DatabaseConnection,
@@ -331,6 +370,53 @@ class DeviceRepository:
             (family_id, device_id),
         ).fetchone()
 
+    def get_onvif_runtime_recovery_state(
+        self,
+        conn: DatabaseConnection,
+        *,
+        family_id: str,
+        device_id: str,
+        for_update: bool = False,
+    ) -> DatabaseRow | None:
+        lock_clause = " FOR UPDATE" if for_update else ""
+        return conn.execute(
+            f"""
+            SELECT
+              d.binding_code,
+              d.status AS device_status,
+              drc.id AS runtime_config_id,
+              drc.provider,
+              drc.config_json,
+              drc.secret_ref,
+              drc.status AS runtime_status,
+              drc.updated_at
+            FROM devices d
+            JOIN device_runtime_configs drc
+              ON drc.family_id = d.family_id AND drc.device_id = d.id
+            WHERE d.family_id = ? AND d.id = ?
+            LIMIT 1{lock_clause}
+            """,
+            (family_id, device_id),
+        ).fetchone()
+
+    def update_onvif_runtime_config_json(
+        self,
+        conn: DatabaseConnection,
+        *,
+        runtime_config_id: str,
+        config_json: str,
+        now: int,
+    ) -> bool:
+        updated = conn.execute(
+            """
+            UPDATE device_runtime_configs
+            SET config_json = ?, updated_at = ?
+            WHERE id = ? AND provider = 'onvif_rtsp' AND status = 'active'
+            """,
+            (config_json, now, runtime_config_id),
+        )
+        return updated.rowcount == 1
+
     def upsert_device_runtime_config(
         self,
         conn: DatabaseConnection,
@@ -384,6 +470,94 @@ class DeviceRepository:
                 ),
             )
         return self.get_device_runtime_config(conn, family_id=family_id, device_id=device_id)
+
+    def create_onvif_discovery_session(
+        self,
+        conn: DatabaseConnection,
+        *,
+        token_hash: str,
+        family_id: str,
+        user_id: str,
+        binding_code: str,
+        metadata_json: str,
+        expires_at: int,
+        now: int,
+    ) -> DatabaseRow:
+        session_id = f"ods_{uuid.uuid4().hex}"
+        conn.execute(
+            """
+            INSERT INTO onvif_discovery_sessions(
+              id, token_hash, family_id, user_id, binding_code, metadata_json,
+              expires_at, consumed_at, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?)
+            """,
+            (
+                session_id,
+                token_hash,
+                family_id,
+                user_id,
+                binding_code,
+                metadata_json,
+                expires_at,
+                now,
+            ),
+        )
+        return self.get_onvif_discovery_session(
+            conn,
+            token_hash=token_hash,
+            family_id=family_id,
+            user_id=user_id,
+        )
+
+    def get_onvif_discovery_session(
+        self,
+        conn: DatabaseConnection,
+        *,
+        token_hash: str,
+        family_id: str,
+        user_id: str,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            """
+            SELECT *
+            FROM onvif_discovery_sessions
+            WHERE token_hash = ? AND family_id = ? AND user_id = ?
+            LIMIT 1
+            """,
+            (token_hash, family_id, user_id),
+        ).fetchone()
+
+    def consume_onvif_discovery_session(
+        self,
+        conn: DatabaseConnection,
+        *,
+        session_id: str,
+        consumed_at: int,
+    ) -> bool:
+        result = conn.execute(
+            """
+            UPDATE onvif_discovery_sessions
+            SET consumed_at = ?
+            WHERE id = ? AND consumed_at IS NULL AND expires_at >= ?
+            """,
+            (consumed_at, session_id, consumed_at),
+        )
+        return result.rowcount == 1
+
+    def delete_expired_onvif_discovery_sessions(
+        self,
+        conn: DatabaseConnection,
+        *,
+        before: int,
+    ) -> None:
+        conn.execute(
+            """
+            DELETE FROM onvif_discovery_sessions
+            WHERE expires_at < ? OR consumed_at IS NOT NULL
+            """,
+            (before,),
+        )
 
     def get_family_member_by_user(
         self,

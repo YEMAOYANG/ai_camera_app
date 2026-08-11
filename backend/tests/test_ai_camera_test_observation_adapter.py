@@ -6,10 +6,10 @@ import unittest
 from integrations.camera_runtime.ai_camera_test_observation_adapter import (
     AiCameraTestObservationAdapter,
     AiCameraTestObservationConfig,
-    ObservationAdapterConfigError,
     build_source_event_id,
 )
-from workers.camera_observation_worker import CameraObservationWorker, build_worker_from_env
+from services.bound_camera_observation_service import BoundCameraObservationConfig
+from workers.camera_observation_worker import CameraObservationWorker
 
 
 class AiCameraTestObservationAdapterTest(unittest.TestCase):
@@ -254,14 +254,10 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
         self.assertTrue(all("/api/analyze_frame" not in url for url in called_urls))
         self.assertIn("http://current.local/internal/camera/observations", called_urls)
 
-    def test_missing_required_worker_config_fails_fast(self):
+    def test_bound_worker_no_longer_requires_single_test_device_config(self):
         base_env = {
-            "AI_CAMERA_TEST_BASE_URL": "http://old.local",
-            "CAMERA_OBSERVATION_INTERNAL_URL": "http://current.local/internal/camera/observations",
-            "INTERNAL_API_TOKEN": "token",
-            "CAMERA_OBSERVATION_FAMILY_ID": "fam_1",
-            "CAMERA_OBSERVATION_CHILD_ID": "child_1",
-            "CAMERA_OBSERVATION_DEVICE_ID": "dev_1",
+            "CAMERA_OBSERVATION_INTERVAL_SECONDS": "15",
+            "CAMERA_OBSERVATION_MAX_DEVICES_PER_TICK": "4",
         }
         for key in (
             "INTERNAL_API_TOKEN",
@@ -272,8 +268,9 @@ class AiCameraTestObservationAdapterTest(unittest.TestCase):
             env = dict(base_env)
             env[key] = ""
             with self.subTest(key=key):
-                with self.assertRaises(ObservationAdapterConfigError):
-                    build_worker_from_env(env)
+                config = BoundCameraObservationConfig.from_env(env)
+                self.assertEqual(config.interval_seconds, 15)
+                self.assertEqual(config.max_devices_per_tick, 4)
 
     def test_run_observe_tick_skips_when_snapshot_unavailable(self):
         from integrations.camera_runtime.ai_camera_test_observation_adapter import SnapshotUnavailableError

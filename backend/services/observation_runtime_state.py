@@ -120,6 +120,7 @@ class ObservationRuntimeStateStore:
             section = parsed.get(key)
             if isinstance(section, dict):
                 merged[key].update(section)
+        merged["prefilter"]["last_frame_thumb_b64"] = ""
         return merged
 
     def save(
@@ -141,6 +142,11 @@ class ObservationRuntimeStateStore:
             state=RUNTIME_STATE,
         )
         started_at = int(existing.get("started_at") or now) if existing else now
+        stored_payload = dict(payload)
+        stored_payload["prefilter"] = dict(
+            stored_payload.get("prefilter") or {}
+        )
+        stored_payload["prefilter"]["last_frame_thumb_b64"] = ""
         self.repository.upsert_behavior_state(
             conn,
             family_id=family_id,
@@ -154,6 +160,10 @@ class ObservationRuntimeStateStore:
             confidence=1.0,
             consecutive_seconds=0,
             parent_summary=None,
-            raw_detail_json=json.dumps(dict(payload), ensure_ascii=False, separators=(",", ":")),
+            raw_detail_json=json.dumps(
+                stored_payload,
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ),
             now=now,
         )

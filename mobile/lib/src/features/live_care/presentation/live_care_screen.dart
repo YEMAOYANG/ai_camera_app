@@ -154,15 +154,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
     final generation = ++_refreshGeneration;
     final device = ref.read(selectedDeviceProvider).asData?.value;
 
-    Future<void> runRefresh() async {
-      if (!mounted || generation != _refreshGeneration) return;
-      if (analyzeFrame && device != null) {
-        try {
-          await triggerMonitorAnalysis(ref, deviceId: device.id);
-        } on CameraException {
-          // 手动刷新仍应回落到普通状态刷新，避免实时页被观察服务错误卡住。
-        }
-      }
+    Future<void> refreshSilently() async {
       if (!mounted || generation != _refreshGeneration) return;
       await refreshLiveCareDataSilently(ref);
     }
@@ -170,11 +162,16 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
     if (analyzeFrame) {
       if (mounted) setState(() => _previewRefreshing = true);
       try {
-        final ran = await ref
-            .read(monitorAnalysisGuardProvider)
-            .runHeavy(runRefresh);
-        if (!ran && mounted && generation == _refreshGeneration) {
-          await _refreshGuard.runLight(runRefresh);
+        if (device != null) {
+          try {
+            // 全 App 的重分析限流只在 triggerMonitorAnalysis 内执行一次。
+            await triggerMonitorAnalysis(ref, deviceId: device.id);
+          } on CameraException catch (error) {
+            applyMonitorAnalysisRefreshFailure(ref, error);
+          }
+        }
+        if (mounted && generation == _refreshGeneration) {
+          await _refreshGuard.runLight(refreshSilently);
         }
       } finally {
         if (mounted && generation == _refreshGeneration) {
@@ -184,7 +181,7 @@ class _LiveCareScreenState extends ConsumerState<LiveCareScreen> {
       return;
     }
 
-    await _refreshGuard.runLight(runRefresh);
+    await _refreshGuard.runLight(refreshSilently);
   }
 }
 
@@ -715,13 +712,17 @@ class _CareFocusPanel extends StatelessWidget {
     final care = status.asData?.value;
     final currentTask = care?.currentTask;
     final monitor = care?.monitorStatus;
+    final hasRefreshError = monitor?.hasRefreshError == true;
     final hasFreshObservation = monitor?.hasCurrentReliableObservation == true;
     final hasStaleObservation = monitor?.hasStaleObservation == true;
     final isPrefilterOnly =
         monitor?.lastObservationFreshness ==
         CameraObservationFreshness.prefilterOnly;
     final hasObservationDisplay =
-        hasFreshObservation || hasStaleObservation || isPrefilterOnly;
+        hasRefreshError ||
+        hasFreshObservation ||
+        hasStaleObservation ||
+        isPrefilterOnly;
     final eventItems = events.asData?.value.items ?? const <LiveCareEvent>[];
     final summaryEvents = eventItems
         .where(
@@ -740,11 +741,15 @@ class _CareFocusPanel extends StatelessWidget {
           const SizedBox(height: 8),
           AppListRow(
             icon: hasObservationDisplay
-                ? Icons.visibility_outlined
+                ? hasRefreshError
+                      ? Icons.sync_problem_outlined
+                      : Icons.visibility_outlined
                 : currentTask == null
                 ? Icons.shield_outlined
                 : Icons.play_circle_outline,
-            title: hasFreshObservation
+            title: hasRefreshError
+                ? '画面暂时无法更新'
+                : hasFreshObservation
                 ? monitor!.lastObservation
                 : hasStaleObservation
                 ? monitor!.displayObservationTitle()
@@ -753,7 +758,11 @@ class _CareFocusPanel extends StatelessWidget {
                 : currentTask == null
                 ? '当前没有进行中的看护安排'
                 : currentTask.title,
-            subtitle: hasFreshObservation
+            subtitle: hasRefreshError
+                ? monitor!.message.isNotEmpty
+                      ? monitor.message
+                      : '请稍后重新刷新。'
+                : hasFreshObservation
                 ? _monitorObservationSubtitle(monitor!)
                 : hasStaleObservation
                 ? '较早的画面结论，不作为当前状态。'
@@ -764,7 +773,9 @@ class _CareFocusPanel extends StatelessWidget {
                       ? '最近有作息提醒，进入实时画面可查看当前状态。'
                       : '需要查看时进入实时画面，普通状态不会打扰孩子。'
                 : '${currentTask.timeLabel} · 看护记录会在这里更新',
-            tone: care?.isAvailable == true
+            tone: hasRefreshError
+                ? AppListRowTone.amber
+                : care?.isAvailable == true
                 ? AppListRowTone.green
                 : AppListRowTone.amber,
             subtitleMaxLines: 1,

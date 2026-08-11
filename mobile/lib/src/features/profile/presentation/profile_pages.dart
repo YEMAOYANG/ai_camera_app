@@ -2677,6 +2677,7 @@ class _DeviceDetailPageState extends ConsumerState<DeviceDetailPage> {
             .read(sharedPreferencesProvider)
             .remove(selectedDeviceIdPreferenceKey);
         ref.read(selectedDeviceIdProvider.notifier).state = null;
+        ref.read(selectedDeviceChangeEpochProvider.notifier).state++;
       }
       _refreshDeviceAndLiveCare(ref, deviceId: widget.deviceId);
       if (mounted) context.pop();
@@ -3758,9 +3759,14 @@ class PrivacyPermissionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const _BooleanSettingsPage(
-    title: '隐私与权限',
+    title: '隐私与数据',
     settingKey: 'privacy',
     rows: [
+      _SettingRowSpec(
+        'cameraCollectionAuthorized',
+        '画面看护授权',
+        '允许设备在看护开启时分析必要画面。',
+      ),
       _SettingRowSpec('voiceBroadcastAuthorized', '语音播报授权', '允许设备进行看护提醒和温和提示。'),
       _SettingRowSpec('childPrivacyAuthorized', '儿童隐私授权', '确认监护人已授权儿童数据处理。'),
       _SettingRowSpec(

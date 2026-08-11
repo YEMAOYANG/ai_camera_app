@@ -8,6 +8,7 @@ import 'package:warm_sight/src/features/care/application/parent_review_realtime.
 import 'package:warm_sight/src/features/care/domain/care_models.dart';
 import 'package:warm_sight/src/features/devices/application/device_repository.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
+import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
@@ -20,6 +21,7 @@ import 'package:warm_sight/src/features/tasks/application/task_week_scope.dart';
 
 /// WS 观察事件携带 lightweight payload 时，立即更新首页 Hero 观察文案。
 void applyCameraObservationRealtimeEvent(dynamic ref, TaskRealtimeEvent event) {
+  if (!_isCurrentCameraEvent(ref, event)) return;
   final payload = event.event;
   if (payload == null || payload.isEmpty) return;
 
@@ -28,8 +30,7 @@ void applyCameraObservationRealtimeEvent(dynamic ref, TaskRealtimeEvent event) {
   final summary = message.isNotEmpty ? message : title;
   if (summary.isEmpty) return;
 
-  final reliable =
-      event.isReliable == true || payload['isReliable'] == true;
+  final reliable = event.isReliable == true || payload['isReliable'] == true;
   final observedAt = _int(payload['observedAt']) > 0
       ? _int(payload['observedAt'])
       : event.sentAt;
@@ -43,6 +44,9 @@ void applyCameraObservationRealtimeEvent(dynamic ref, TaskRealtimeEvent event) {
     lastObservationObservedAt: observedAt,
     lastObservationReliable: reliable,
     lastObservationDescription: message.isNotEmpty ? message : summary,
+    lastObservationFreshness: reliable
+        ? CameraObservationFreshness.fresh
+        : CameraObservationFreshness.unknown,
   );
 }
 
@@ -76,19 +80,48 @@ String? _profileChildId(dynamic ref) {
   return profile?.child?.id;
 }
 
-Future<void> triggerMonitorAnalysis(
-  dynamic ref, {
-  String? deviceId,
-}) async {
+Future<bool> triggerMonitorAnalysis(dynamic ref, {String? deviceId}) async {
   final guard = ref.read(monitorAnalysisGuardProvider);
-  await guard.runHeavy(() async {
+  return guard.runHeavy(() async {
     final resolvedDeviceId =
         deviceId ?? ref.read(selectedDeviceProvider).asData?.value?.id;
     final monitor = await ref
         .read(cameraRepositoryProvider)
         .refreshMonitor(deviceId: resolvedDeviceId);
-    ref.read(cameraMonitorOverrideProvider.notifier).state = monitor;
+    final currentState =
+        ref.read(cameraMonitorDisplayProvider)
+            as AsyncValue<CameraMonitorStatus>;
+    final current = currentState.asData?.value;
+    ref.read(cameraMonitorOverrideProvider.notifier).state = current == null
+        ? monitor
+        : preferredCameraMonitorStatus(current, monitor);
   });
+}
+
+void applyMonitorAnalysisRefreshFailure(dynamic ref, CameraException error) {
+  final currentState =
+      ref.read(cameraMonitorDisplayProvider) as AsyncValue<CameraMonitorStatus>;
+  final current = currentState.asData?.value;
+  final currentFreshness = current?.lastObservationFreshness;
+  ref.read(cameraMonitorOverrideProvider.notifier).state = CameraMonitorStatus(
+    running: false,
+    status: 'refresh_failed',
+    message: error.message,
+    lastObservation: current?.lastObservation ?? '',
+    lastReminder: current?.lastReminder ?? '',
+    lastObservationObservedAt: current?.lastObservationObservedAt,
+    lastObservationReliable: current?.lastObservationReliable ?? false,
+    lastObservationHasPerson: current?.lastObservationHasPerson,
+    lastObservationActivity: current?.lastObservationActivity ?? '',
+    lastObservationDescription: current?.lastObservationDescription ?? '',
+    lastObservationDecisionReason: current?.lastObservationDecisionReason ?? '',
+    lastObservationConfidence: current?.lastObservationConfidence,
+    lastObservationThumbnailUrl: current?.lastObservationThumbnailUrl ?? '',
+    lastObservationFreshness:
+        currentFreshness == CameraObservationFreshness.prefilterOnly
+        ? CameraObservationFreshness.unknown
+        : currentFreshness ?? CameraObservationFreshness.unknown,
+  );
 }
 
 Future<void> refreshHomeDataSilently(dynamic ref) async {
@@ -150,12 +183,12 @@ Future<void> refreshCameraMonitorSilently(dynamic ref) async {
   final override = ref.read(cameraMonitorOverrideProvider);
   if (override != null && server is AsyncValue<CameraMonitorStatus>) {
     final serverStatus = server.asData?.value;
-    if (serverStatus != null) {
-      final serverAt = serverStatus.lastObservationObservedAt ?? 0;
-      final overrideAt = override.lastObservationObservedAt ?? 0;
-      if (overrideAt <= serverAt) {
-        ref.read(cameraMonitorOverrideProvider.notifier).state = null;
-      }
+    if (serverStatus != null &&
+        identical(
+          preferredCameraMonitorStatus(serverStatus, override),
+          serverStatus,
+        )) {
+      ref.read(cameraMonitorOverrideProvider.notifier).state = null;
     }
   }
   await Future.wait([
@@ -198,4 +231,13 @@ int _int(Object? value) {
   if (value is num) return value.toInt();
   if (value is String) return int.tryParse(value) ?? 0;
   return 0;
+}
+
+bool _isCurrentCameraEvent(dynamic ref, TaskRealtimeEvent event) {
+  final eventDeviceId = event.deviceId.trim();
+  if (eventDeviceId.isEmpty) return true;
+
+  final selectedState =
+      ref.read(selectedDeviceProvider) as AsyncValue<GuardianDevice?>;
+  return selectedState.asData?.value?.id == eventDeviceId;
 }

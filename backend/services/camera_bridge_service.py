@@ -42,12 +42,30 @@ class CameraBridgeService:
         monitor_data = monitor_runtime.get("data") or {}
         monitor_payload = monitor_data.get("monitor_runtime") or monitor_data
         health_data = health.get("cameraRuntime", {}).get("data") or {}
-        camera_data = health_data.get("camera") if isinstance(health_data, dict) else {}
+        raw_camera_data = health_data.get("camera") if isinstance(health_data, dict) else {}
+        camera_data = raw_camera_data if isinstance(raw_camera_data, dict) else {}
         monitor_available = monitor_reachable and (
             bool(monitor_payload.get("running"))
-            or str(monitor_payload.get("status", "")).lower() not in {"", "unconfigured", "unavailable"}
+            or str(monitor_payload.get("status", "")).lower()
+            not in {
+                "",
+                "unconfigured",
+                "unavailable",
+                "media_gateway_required",
+                "unsupported",
+            }
         )
         ptz_available = reachable and _camera_supports_ptz(camera_data)
+        stream_available = (
+            bool(camera_data.get("streamAvailable"))
+            if "streamAvailable" in camera_data
+            else reachable
+        )
+        snapshot_available = (
+            bool(camera_data.get("snapshotAvailable"))
+            if "snapshotAvailable" in camera_data
+            else reachable
+        )
         status_value = "online" if reachable else "offline"
         if reachable and not runtime_reachable:
             status_value = "connecting"
@@ -62,8 +80,8 @@ class CameraBridgeService:
             "ok": True,
             "status": camera_status_payload(
                 connection_status=status_value,
-                stream_available=reachable,
-                snapshot_available=reachable,
+                stream_available=stream_available,
+                snapshot_available=snapshot_available,
                 speaker_available=speaker_reachable,
                 monitor_available=monitor_available,
                 ptz_available=ptz_available,
@@ -113,10 +131,14 @@ class CameraBridgeService:
     def monitor_status(self) -> dict:
         try:
             payload = self.adapter.monitor_status()
+            reachable = not (
+                isinstance(payload, dict)
+                and payload.get("ok") is False
+            )
             return {
-                "ok": True,
+                "ok": reachable,
                 "monitorRuntime": {
-                    "reachable": True,
+                    "reachable": reachable,
                     "adapter": self.adapter.adapter_name,
                     "data": payload,
                 },
@@ -330,6 +352,10 @@ class CameraBridgeService:
                     else "",
                 },
             }
+            if "streamAvailable" in camera:
+                public["camera"]["streamAvailable"] = bool(camera.get("streamAvailable"))
+            if "snapshotAvailable" in camera:
+                public["camera"]["snapshotAvailable"] = bool(camera.get("snapshotAvailable"))
 
         voice = payload.get("voice")
         if isinstance(voice, dict):

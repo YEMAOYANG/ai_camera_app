@@ -13,6 +13,9 @@ final selectedDeviceIdProvider = StateProvider<String?>((ref) {
   return value == null || value.isEmpty ? null : value;
 });
 
+/// 仅用于让设备相关的瞬时 UI 状态在用户切换摄像头时重置。
+final selectedDeviceChangeEpochProvider = StateProvider<int>((ref) => 0);
+
 final selectedDeviceProvider = FutureProvider<GuardianDevice?>((ref) async {
   final repository = ref.watch(deviceRepositoryProvider);
   final preferences = ref.watch(sharedPreferencesProvider);
@@ -46,6 +49,7 @@ Future<void> selectDevice(WidgetRef ref, String deviceId) async {
       .read(sharedPreferencesProvider)
       .setString(selectedDeviceIdPreferenceKey, value);
   ref.read(selectedDeviceIdProvider.notifier).state = value;
+  ref.read(selectedDeviceChangeEpochProvider.notifier).state++;
   ref.invalidate(selectedDeviceProvider);
 }
 

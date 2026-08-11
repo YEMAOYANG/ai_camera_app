@@ -6,13 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/devices/application/camera_discovery_repository.dart';
-import 'package:warm_sight/src/features/devices/application/device_repository.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/devices/domain/device_models.dart';
-import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
-import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
+import 'package:warm_sight/src/features/setup/application/camera_add_refresh.dart';
 import 'package:warm_sight/src/features/setup/presentation/discovery_scene.dart';
 import 'package:warm_sight/src/features/setup/presentation/camera_discovery_animation.dart';
+import 'package:warm_sight/src/features/setup/presentation/onvif_add_camera_flow.dart';
 import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:warm_sight/src/shared/widgets/app_toast.dart';
 
@@ -32,6 +31,27 @@ const _fallbackNearbyCandidates = [
 
 /// Opens the add-camera flow as a modal bottom sheet over the current page.
 Future<bool?> showAddCameraSheet(
+  BuildContext context, {
+  CameraDiscoveryPhase? initialPhaseForTesting,
+  AddCameraFailureReason? initialFailureReasonForTesting,
+  List<DiscoveredCameraCandidate>? initialCandidatesForTesting,
+}) {
+  if (initialPhaseForTesting != null ||
+      initialFailureReasonForTesting != null ||
+      initialCandidatesForTesting != null) {
+    return showBluetoothAddCameraSheet(
+      context,
+      initialPhaseForTesting: initialPhaseForTesting,
+      initialFailureReasonForTesting: initialFailureReasonForTesting,
+      initialCandidatesForTesting: initialCandidatesForTesting,
+    );
+  }
+  // 蓝牙配网实现暂时保留，但不在当前客户添加摄像头流程中展示。
+  return showOnvifFirstAddCameraFlow(context);
+}
+
+/// Legacy BLE provisioning for camera models that explicitly require it.
+Future<bool?> showBluetoothAddCameraSheet(
   BuildContext context, {
   CameraDiscoveryPhase? initialPhaseForTesting,
   AddCameraFailureReason? initialFailureReasonForTesting,
@@ -345,7 +365,7 @@ class _AddCameraSheetState extends ConsumerState<AddCameraSheet>
       final readiness = await _discoveryRepository.checkCameraReadiness(
         device.id,
       );
-      _refreshCameraAfterAdd(ref);
+      refreshCameraAfterAdd(ref);
       if (!mounted) return;
       setState(() {
         _phase = readiness.livePreviewAvailable
@@ -1374,22 +1394,6 @@ class _PermissionActions extends StatelessWidget {
       ],
     );
   }
-}
-
-void _refreshCameraAfterAdd(WidgetRef ref) {
-  ref
-    ..invalidate(devicesProvider)
-    ..invalidate(primaryDeviceOverviewProvider)
-    ..invalidate(selectedDeviceProvider)
-    ..invalidate(cameraHealthProvider)
-    ..invalidate(cameraRuntimeProvider)
-    ..invalidate(cameraStatusProvider)
-    ..invalidate(cameraMonitorStatusProvider)
-    ..invalidate(cameraSnapshotProvider)
-    ..invalidate(cameraEventsProvider)
-    ..invalidate(liveCareStatusProvider)
-    ..invalidate(profileSummaryProvider)
-    ..invalidate(accountProfileProvider);
 }
 
 /// Deep-link fallback: transparent page that presents the sheet immediately.

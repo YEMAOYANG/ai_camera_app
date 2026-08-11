@@ -286,6 +286,9 @@ class CameraMonitorStatus {
       lastObservationReliable &&
       lastObservation.isNotEmpty;
 
+  bool get hasRefreshError =>
+      status == 'refresh_failed' || status == 'unavailable';
+
   String displayObservationTitle({DateTime? now}) {
     return parentFacingObservationWithFreshness(
       freshness: lastObservationFreshness,

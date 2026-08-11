@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ipaddress
 import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -18,6 +19,7 @@ if load_dotenv is not None:
 
 
 VALID_APP_ENVS = {"development", "test", "staging", "production"}
+MEDIA_GATEWAY_REQUIRED_VERSION = "1.9.14"
 
 
 class ConfigError(RuntimeError):
@@ -48,6 +50,27 @@ class AppConfig:
     CAMERA_SPEAKER_ENABLED: bool
     CAMERA_STREAM_URL: str
     CAMERA_SNAPSHOT_URL: str
+    MEDIA_GATEWAY_ENABLED: bool
+    MEDIA_GATEWAY_API_BASE_URL: str
+    MEDIA_GATEWAY_PUBLIC_BASE_URL: str
+    MEDIA_GATEWAY_TIMEOUT_SECONDS: float
+    MEDIA_GATEWAY_AUTO_START: bool
+    MEDIA_GATEWAY_BINARY: str
+    MEDIA_GATEWAY_CONFIG_FILE: str
+    MEDIA_GATEWAY_VERSION: str
+    CAMERA_SIGNALING_PUBLIC_BASE_URL: str
+    ONVIF_DISCOVERY_TIMEOUT_SECONDS: float
+    ONVIF_HTTP_TIMEOUT_SECONDS: float
+    ONVIF_RTSP_TIMEOUT_SECONDS: float
+    ONVIF_DISCOVERY_TOKEN_TTL_SECONDS: int
+    ONVIF_SUPPORTED_MANUFACTURERS: list[str]
+    ONVIF_SUPPORTED_MODELS: list[str]
+    ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED: bool
+    ONVIF_BOOTSTRAP_USERNAME: str
+    ONVIF_BOOTSTRAP_PASSWORD: str
+    DEVICE_SECRET_STORE_DIR: str
+    DEVICE_SECRET_KEY: str
+    DEVICE_SECRET_KEY_FILE: str
     TASK_REMINDER_LEAD_SECONDS: int
     TASK_SCHEDULER_ENABLED: bool
     TASK_SCHEDULER_INTERVAL_SECONDS: int
@@ -119,6 +142,65 @@ class AppConfig:
             CAMERA_SPEAKER_ENABLED=_bool(_env("CAMERA_SPEAKER_ENABLED", "1")),
             CAMERA_STREAM_URL=_env("CAMERA_STREAM_URL", ""),
             CAMERA_SNAPSHOT_URL=_env("CAMERA_SNAPSHOT_URL", ""),
+            MEDIA_GATEWAY_ENABLED=_bool(
+                _env("APP_MEDIA_GATEWAY_ENABLED", "0")
+            ),
+            MEDIA_GATEWAY_API_BASE_URL=_env(
+                "APP_MEDIA_GATEWAY_API_BASE_URL",
+                "http://127.0.0.1:1984",
+            ).strip(),
+            MEDIA_GATEWAY_PUBLIC_BASE_URL=_env(
+                "APP_MEDIA_GATEWAY_PUBLIC_BASE_URL",
+                "",
+            ).strip(),
+            MEDIA_GATEWAY_TIMEOUT_SECONDS=float(
+                _env("APP_MEDIA_GATEWAY_TIMEOUT_SECONDS", "5")
+            ),
+            MEDIA_GATEWAY_AUTO_START=_bool(
+                _env("APP_MEDIA_GATEWAY_AUTO_START", "0")
+            ),
+            MEDIA_GATEWAY_BINARY=_env(
+                "APP_MEDIA_GATEWAY_BINARY",
+                "",
+            ).strip(),
+            MEDIA_GATEWAY_CONFIG_FILE=_env(
+                "APP_MEDIA_GATEWAY_CONFIG_FILE",
+                "",
+            ).strip(),
+            MEDIA_GATEWAY_VERSION=_env(
+                "APP_MEDIA_GATEWAY_VERSION",
+                MEDIA_GATEWAY_REQUIRED_VERSION,
+            ).strip(),
+            CAMERA_SIGNALING_PUBLIC_BASE_URL=_env(
+                "CAMERA_SIGNALING_PUBLIC_BASE_URL",
+                _env("APP_CAMERA_SIGNALING_PUBLIC_BASE_URL", ""),
+            ).strip(),
+            ONVIF_DISCOVERY_TIMEOUT_SECONDS=float(
+                _env("ONVIF_DISCOVERY_TIMEOUT_SECONDS", "1.5")
+            ),
+            ONVIF_HTTP_TIMEOUT_SECONDS=float(_env("ONVIF_HTTP_TIMEOUT_SECONDS", "4")),
+            ONVIF_RTSP_TIMEOUT_SECONDS=float(_env("ONVIF_RTSP_TIMEOUT_SECONDS", "4")),
+            ONVIF_DISCOVERY_TOKEN_TTL_SECONDS=int(
+                _env("ONVIF_DISCOVERY_TOKEN_TTL_SECONDS", "90")
+            ),
+            ONVIF_SUPPORTED_MANUFACTURERS=_csv(
+                _env("ONVIF_SUPPORTED_MANUFACTURERS", "Vatilon")
+            ),
+            ONVIF_SUPPORTED_MODELS=_csv(_env("ONVIF_SUPPORTED_MODELS", "T62")),
+            ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED=_bool(
+                _env("ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED", "0")
+            ),
+            ONVIF_BOOTSTRAP_USERNAME=_env("ONVIF_BOOTSTRAP_USERNAME", "").strip(),
+            ONVIF_BOOTSTRAP_PASSWORD=_env("ONVIF_BOOTSTRAP_PASSWORD", ""),
+            DEVICE_SECRET_STORE_DIR=_env(
+                "APP_DEVICE_SECRET_STORE_DIR",
+                str(BACKEND_ROOT / "data" / "device-secrets"),
+            ),
+            DEVICE_SECRET_KEY=_env("APP_DEVICE_SECRET_KEY", "").strip(),
+            DEVICE_SECRET_KEY_FILE=_env(
+                "APP_DEVICE_SECRET_KEY_FILE",
+                str(BACKEND_ROOT / "data" / ".device-secret.key"),
+            ),
             TASK_REMINDER_LEAD_SECONDS=int(_env("TASK_REMINDER_LEAD_SECONDS", "300")),
             TASK_SCHEDULER_ENABLED=_bool(
                 _env(
@@ -178,6 +260,24 @@ class AppConfig:
         if self.APP_ENV not in VALID_APP_ENVS:
             raise ConfigError(f"Unsupported APP_ENV: {self.APP_ENV}")
 
+        _validate_media_gateway_config(
+            app_env=self.APP_ENV,
+            enabled=self.MEDIA_GATEWAY_ENABLED,
+            api_base_url=self.MEDIA_GATEWAY_API_BASE_URL,
+            public_base_url=self.MEDIA_GATEWAY_PUBLIC_BASE_URL,
+            signaling_public_base_url=self.CAMERA_SIGNALING_PUBLIC_BASE_URL,
+            timeout_seconds=self.MEDIA_GATEWAY_TIMEOUT_SECONDS,
+            version=self.MEDIA_GATEWAY_VERSION,
+        )
+
+        _validate_onvif_bootstrap_credentials(
+            app_env=self.APP_ENV,
+            dev_adapters_enabled=self.DEV_ADAPTERS_ENABLED,
+            enabled=self.ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED,
+            username=self.ONVIF_BOOTSTRAP_USERNAME,
+            password=self.ONVIF_BOOTSTRAP_PASSWORD,
+        )
+
         if self.APP_ENV in {"staging", "production"} and not self.DATABASE_URL:
             raise ConfigError("APP_DATABASE_URL is required in staging/production.")
 
@@ -212,6 +312,26 @@ def validate_flask_config(config: dict) -> None:
     app_env = str(config.get("APP_ENV", "development")).strip().lower()
     if app_env not in VALID_APP_ENVS:
         raise ConfigError(f"Unsupported APP_ENV: {app_env}")
+    _validate_media_gateway_config(
+        app_env=app_env,
+        enabled=bool(config.get("MEDIA_GATEWAY_ENABLED", False)),
+        api_base_url=str(config.get("MEDIA_GATEWAY_API_BASE_URL") or ""),
+        public_base_url=str(config.get("MEDIA_GATEWAY_PUBLIC_BASE_URL") or ""),
+        signaling_public_base_url=str(
+            config.get("CAMERA_SIGNALING_PUBLIC_BASE_URL") or ""
+        ),
+        timeout_seconds=float(config.get("MEDIA_GATEWAY_TIMEOUT_SECONDS", 5)),
+        version=str(
+            config.get("MEDIA_GATEWAY_VERSION") or MEDIA_GATEWAY_REQUIRED_VERSION
+        ),
+    )
+    _validate_onvif_bootstrap_credentials(
+        app_env=app_env,
+        dev_adapters_enabled=bool(config.get("DEV_ADAPTERS_ENABLED")),
+        enabled=bool(config.get("ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED")),
+        username=str(config.get("ONVIF_BOOTSTRAP_USERNAME") or ""),
+        password=str(config.get("ONVIF_BOOTSTRAP_PASSWORD") or ""),
+    )
     database_url = str(config.get("DATABASE_URL", ""))
     if app_env in {"staging", "production"} and not database_url:
         raise ConfigError("APP_DATABASE_URL is required in staging/production.")
@@ -232,6 +352,127 @@ def validate_flask_config(config: dict) -> None:
         origins = config.get("CORS_ORIGINS") or []
         if not origins or "*" in origins:
             raise ConfigError("APP_CORS_ORIGINS must be explicit in production.")
+
+
+def _validate_media_gateway_config(
+    *,
+    app_env: str,
+    enabled: bool,
+    api_base_url: str,
+    public_base_url: str,
+    signaling_public_base_url: str,
+    timeout_seconds: float,
+    version: str,
+) -> None:
+    if timeout_seconds <= 0:
+        raise ConfigError("APP_MEDIA_GATEWAY_TIMEOUT_SECONDS must be greater than zero.")
+    if version != MEDIA_GATEWAY_REQUIRED_VERSION:
+        raise ConfigError(
+            "APP_MEDIA_GATEWAY_VERSION must be "
+            f"{MEDIA_GATEWAY_REQUIRED_VERSION}."
+        )
+    if enabled and not api_base_url:
+        raise ConfigError(
+            "APP_MEDIA_GATEWAY_API_BASE_URL is required when the media gateway is enabled."
+        )
+
+    _validate_http_base_url(
+        "APP_MEDIA_GATEWAY_API_BASE_URL",
+        api_base_url,
+        required=enabled,
+        allowed_schemes={"http", "https"},
+    )
+    _validate_http_base_url(
+        "APP_MEDIA_GATEWAY_PUBLIC_BASE_URL",
+        public_base_url,
+        required=False,
+        allowed_schemes={"http", "https"},
+    )
+    _validate_http_base_url(
+        "CAMERA_SIGNALING_PUBLIC_BASE_URL",
+        signaling_public_base_url,
+        required=False,
+        allowed_schemes={"http", "https", "ws", "wss"},
+    )
+
+    if app_env == "production":
+        for key, value in (
+            ("APP_MEDIA_GATEWAY_PUBLIC_BASE_URL", public_base_url),
+            ("CAMERA_SIGNALING_PUBLIC_BASE_URL", signaling_public_base_url),
+        ):
+            if value and _is_loopback_url(value):
+                raise ConfigError(f"{key} cannot use a loopback host in production.")
+
+
+def _validate_http_base_url(
+    key: str,
+    value: str,
+    *,
+    required: bool,
+    allowed_schemes: set[str],
+) -> None:
+    if not value:
+        if required:
+            raise ConfigError(f"{key} is required.")
+        return
+    parsed = urlparse(value)
+    try:
+        parsed_port = parsed.port
+    except ValueError as exc:
+        raise ConfigError(f"{key} has an invalid port.") from exc
+    if (
+        parsed.scheme not in allowed_schemes
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.query
+        or parsed.fragment
+        or parsed_port == 0
+    ):
+        schemes = "/".join(sorted(allowed_schemes))
+        raise ConfigError(
+            f"{key} must be a {schemes} base URL without credentials, query, or fragment."
+        )
+
+
+def _is_loopback_url(value: str) -> bool:
+    hostname = (urlparse(value).hostname or "").strip().lower()
+    if hostname in {"localhost", "localhost.localdomain"}:
+        return True
+    try:
+        return ipaddress.ip_address(hostname).is_loopback
+    except ValueError:
+        return False
+
+
+def _validate_onvif_bootstrap_credentials(
+    *,
+    app_env: str,
+    dev_adapters_enabled: bool,
+    enabled: bool,
+    username: str,
+    password: str,
+) -> None:
+    has_username = bool(username.strip())
+    has_password = bool(password)
+    if has_username != has_password:
+        raise ConfigError(
+            "ONVIF_BOOTSTRAP_USERNAME and ONVIF_BOOTSTRAP_PASSWORD must be set together."
+        )
+    if enabled and not has_username:
+        raise ConfigError(
+            "ONVIF bootstrap credentials must be set when the engineering fallback is enabled."
+        )
+    if has_username and not enabled:
+        raise ConfigError(
+            "ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED must be true when fixed credentials are configured."
+        )
+    if enabled and (
+        app_env not in {"development", "test"} or not dev_adapters_enabled
+    ):
+        raise ConfigError(
+            "Fixed ONVIF bootstrap credentials are development/test only."
+        )
 
 
 def _env(key: str, default: str) -> str:

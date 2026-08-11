@@ -1,0 +1,21 @@
+# Mira Guardian local media gateway.
+#
+# Keep this file free of RTSP URLs, usernames, and passwords. The backend
+# registers device-scoped streams in go2rtc memory after resolving encrypted
+# credentials. The unauthenticated management API is intentionally loopback
+# only; Flutter reaches it through the backend signaling proxy.
+
+api:
+  listen: "127.0.0.1:1984"
+
+rtsp:
+  listen: "127.0.0.1:8554"
+
+webrtc:
+  listen: ":8555"
+
+streams: {}
+
+log:
+  level: info
+  format: text

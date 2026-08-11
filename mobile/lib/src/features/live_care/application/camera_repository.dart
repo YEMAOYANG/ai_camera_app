@@ -42,9 +42,13 @@ final cameraMonitorStatusProvider = FutureProvider<CameraMonitorStatus>((
 });
 
 /// 下拉 refresh 后优先展示的最新观察（避免 status 仍读 DB 旧时间戳）。
-final cameraMonitorOverrideProvider = StateProvider<CameraMonitorStatus?>(
-  (ref) => null,
-);
+final cameraMonitorOverrideProvider = StateProvider<CameraMonitorStatus?>((
+  ref,
+) {
+  // 切换摄像头后不能继续展示上一台设备的即时观察结果。
+  ref.watch(selectedDeviceChangeEpochProvider);
+  return null;
+});
 
 final cameraMonitorDisplayProvider = Provider<AsyncValue<CameraMonitorStatus>>((
   ref,
@@ -54,16 +58,33 @@ final cameraMonitorDisplayProvider = Provider<AsyncValue<CameraMonitorStatus>>((
   if (override == null) return remote;
 
   return remote.when(
-    data: (server) => AsyncValue.data(_newerMonitorStatus(server, override)),
+    data: (server) =>
+        AsyncValue.data(preferredCameraMonitorStatus(server, override)),
     loading: () => AsyncValue.data(override),
     error: (_, _) => AsyncValue.data(override),
   );
 });
 
-CameraMonitorStatus _newerMonitorStatus(
+CameraMonitorStatus preferredCameraMonitorStatus(
   CameraMonitorStatus server,
   CameraMonitorStatus override,
 ) {
+  if (override.hasRefreshError) {
+    final serverAt = server.lastObservationObservedAt ?? 0;
+    final overrideAt = override.lastObservationObservedAt ?? 0;
+    if (server.hasCurrentReliableObservation && serverAt > overrideAt) {
+      return server;
+    }
+    return override;
+  }
+  final serverHasFormalObservation = _hasFormalObservation(server);
+  final overrideHasFormalObservation = _hasFormalObservation(override);
+  if (!overrideHasFormalObservation && serverHasFormalObservation) {
+    return server;
+  }
+  if (overrideHasFormalObservation && !serverHasFormalObservation) {
+    return override;
+  }
   final serverAt = server.lastObservationObservedAt ?? 0;
   final overrideAt = override.lastObservationObservedAt ?? 0;
   if (overrideAt > serverAt) return override;
@@ -72,6 +93,12 @@ CameraMonitorStatus _newerMonitorStatus(
     return override;
   }
   return server;
+}
+
+bool _hasFormalObservation(CameraMonitorStatus status) {
+  if (status.lastObservation.trim().isEmpty) return false;
+  return status.lastObservationFreshness == CameraObservationFreshness.fresh ||
+      status.lastObservationFreshness == CameraObservationFreshness.stale;
 }
 
 final cameraSnapshotProvider = FutureProvider<CameraSnapshotFrame>((ref) async {
@@ -342,7 +369,9 @@ class CameraRepository {
       );
     } on DioException catch (error) {
       if (error.response?.statusCode == 204) {
-        final message = error.response?.headers.value('x-mira-snapshot-message');
+        final message = error.response?.headers.value(
+          'x-mira-snapshot-message',
+        );
         return CameraSnapshotFrame(
           available: false,
           bytes: null,

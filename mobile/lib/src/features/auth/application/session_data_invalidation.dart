@@ -31,6 +31,15 @@ void _invalidateAuthenticatedSessionData(dynamic ref) {
   ref.invalidate(accountProfileProvider);
   ref.invalidate(accountSecurityProvider);
   ref.invalidate(subscriptionStatusProvider);
+  for (final key in const [
+    'ai-care-rules',
+    'notifications',
+    'privacy',
+    'conversation',
+    'education',
+  ]) {
+    ref.invalidate(profileSettingProvider(key));
+  }
   ref.invalidate(dailyReportProvider);
   ref.invalidate(weeklyReportProvider);
   ref.invalidate(growthMomentsProvider);

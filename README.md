@@ -681,6 +681,8 @@ Device
   GET /api/devices
   GET /api/devices/{deviceId}
   GET /api/devices/{deviceId}/status
+  POST /api/devices/discovery/onvif
+  POST /api/devices/pair/onvif
 
 Camera Bridge
   GET /api/camera/health
