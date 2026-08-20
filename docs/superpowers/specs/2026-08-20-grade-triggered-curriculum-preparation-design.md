@@ -82,7 +82,10 @@
 - `grade_selection_revision`
 - `curriculum_version`
 - `preparation_contract_version`
+- `target_spec_json`
 - `target_fingerprint`
+- `request_id`
+- `shared_build_request_id`
 - `status`
 - `stage`
 - `catalog_build_id`
@@ -91,6 +94,7 @@
 - `ready_course_count`
 - `failed_course_count`
 - `progress_percent`
+- `resume_stage`
 - `retry_of_plan_id`
 - `retry_ordinal`
 - `lease_token`
@@ -109,7 +113,7 @@
 
 孩子表增加 `grade_selection_revision`。只有规范化后的年级或学年发生变化时才递增；普通资料保存和重复提交同一年级不递增。计划唯一键固定为 `child_id + grade_selection_revision + target_fingerprint + retry_ordinal`。
 
-`target_fingerprint` 由规范化 JSON 计算，至少包含年级、语数英、curriculumVersion、全部 boundaryVersion、LessonPackage compiler 版本、教师与 voice 合同、完整 Runtime 合同和变体数。它不使用每次保存都会变化的 `grade_confirmed_at`。因此：
+`target_spec_json` 保存规范化目标；`target_fingerprint` 是该 JSON 的 SHA-256。目标至少包含年级、语数英、每科 boundary 数和课程数、每个 skillId 与 boundaryVersion、curriculumVersion、LessonPackage compiler 版本、教师与 voice 合同、完整 Runtime 合同和变体数。它不使用每次保存都会变化的 `grade_confirmed_at`。`request_id` 唯一绑定一次孩子计划或重试；`shared_build_request_id` 只由 target fingerprint 派生，因此不同孩子可以安全共享同一 catalog build。结果是：
 
 - 同一年级重复保存返回原计划；
 - `一年级 -> 二年级 -> 一年级` 会创建新的选择版本，不会把旧 superseded 计划重新变成当前计划；
@@ -162,6 +166,8 @@ queued
 超时按阶段分别判断，不使用一个笼统的 15 分钟误杀长任务：planning 与 publishing 最长 2 分钟，单个内容或课件项目最长 10 分钟，完整 Runtime 最长 45 分钟，单条语音最长 3 分钟且单门课语音最长 30 分钟，validating 最长 10 分钟。下游状态有新进展时刷新阶段进度时间；超过硬截止才进入明确失败，不会无限保持 `running`。
 
 每个课程项目最多一次初始生成和一次自动修复尝试。两次都失败后计划明确失败。家长点击重试时创建一条 successor plan，通过 `retry_of_plan_id` 关联原计划；旧 failed 计划保持不变。相同幂等键并发重试只创建一个 successor，不覆盖旧错误或事件。
+
+家长手动重试预算固定为 1 次。客户端 `requestId` 只作为该家庭、该失败计划下的幂等输入；服务端保存的全局唯一 request key 必须由 `family_id + failed_plan_id + client requestId` 派生，不能直接把不同家庭都可能提交的字符串设为全局唯一键。已被新年级 revision 或新 target fingerprint 取代的失败计划不可重试。
 
 ## 6. 自动发布合同
 
@@ -219,10 +225,33 @@ queued
   "learningPreparation": {
     "id": "lcp_...",
     "gradeCode": "primary_1",
+    "gradeLabel": "一年级",
     "schemaVersion": "mira.learning.preparation.v1",
     "status": "queued",
     "stage": "queued",
-    "subjects": ["chinese", "math", "english"],
+    "subjects": [
+      {
+        "code": "chinese",
+        "label": "语文",
+        "readyCourseCount": 0,
+        "failedCourseCount": 0,
+        "totalCourseCount": 12
+      },
+      {
+        "code": "math",
+        "label": "数学",
+        "readyCourseCount": 0,
+        "failedCourseCount": 0,
+        "totalCourseCount": 9
+      },
+      {
+        "code": "english",
+        "label": "英语",
+        "readyCourseCount": 0,
+        "failedCourseCount": 0,
+        "totalCourseCount": 9
+      }
+    ],
     "progressPercent": 0,
     "totalCourseCount": 30,
     "readyCourseCount": 0,
@@ -262,11 +291,13 @@ queued
 - 失败时显示安全、可执行原因和“重新准备”；
 - ready 后切换为“课程已就绪”，进入现有学习入口。
 
-资料页修改年级后使用同一状态组件。旧年级已完成的历史报告仍可查看，但首页和新任务只使用新年级计划。
+资料页修改年级后使用 learning feature 中的同一状态组件。旧年级已完成的历史报告仍可查看，但首页和新任务只使用新年级计划。
 
 App 轮询采用退避策略，进入后台时停止；恢复前台立即刷新。后端实时事件可作为后续优化，不是第一检查点依赖。
 
 在计划到达 `ready` 前，首页不调用 `/learning/today` 自动分配课程。网络状态刷新失败只显示“重新获取状态”，不会误触发生成重试。
+
+小学孩子的当前计划为 `null` 时必须 fail closed，显示“课程还没有开始准备”，不能当作历史兼容的 ready。首页前台恢复、下拉刷新及任何实时刷新 helper 都先成功获取当前计划，只有明确 `ready` 才能请求 `/learning/today`。today provider 的缓存键必须同时包含 `childId + preparationId`；无论经过 queued 中间态还是直接从 ready 计划 A 切到 ready 计划 B，都不得按相同 childId 复用旧年级结果。
 
 ## 9. 第一检查点
 
@@ -277,7 +308,10 @@ App 轮询采用退避策略，进入后台时停止；恢复前台立即刷新�
 3. 家长首页显示真实阶段、课程计数、失败和重试；
 4. runner 只实现安全领取、心跳、分阶段 deadline、崩溃恢复和共享构建绑定，不启动真实批量模型生成；
 5. 使用 fake generation adapter 的后端与 Flutter 测试证明完整状态流；
-6. 不写开发库测试学生、不修改历史任务/会话/报告。
+6. 生成首页 queued 与资料页 failed 两张固定尺寸 widget 截图，供用户在不写开发库的情况下验收；
+7. 不写开发库测试学生、不修改历史任务/会话/报告。
+
+第一检查点只把已验证的 `Serena` 记为“一年级数学样板健康基线”，不把它伪装成语数英共同的正式 voice。语文、数学、英语的 teacher profile/version 都进入 target fingerprint；语文和英语的正式 Qwen3 voice ID 在版本化 subject-voice registry 建立前保持 fail closed，后续 registry/voice 合同升级必须生成新 target fingerprint。
 
 第二检查点才把现有 catalog 生成器接入计划 runner，并先用一年级三科小批量运行；第三检查点接完整 Runtime、Qwen3-TTS、自动发布和真实学生 E2E。
 
