@@ -58,19 +58,26 @@ class ApiClient {
   Future<Response<dynamic>> get(
     String path, {
     Map<String, Object?>? queryParameters,
+    Options? options,
   }) {
-    return _dio.get<dynamic>(path, queryParameters: queryParameters);
+    return _dio.get<dynamic>(
+      path,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   Future<Response<dynamic>> post(
     String path, {
     Object? data,
     Map<String, Object?>? queryParameters,
+    Options? options,
   }) {
     return _dio.post<dynamic>(
       path,
       data: data,
       queryParameters: queryParameters,
+      options: options,
     );
   }
 

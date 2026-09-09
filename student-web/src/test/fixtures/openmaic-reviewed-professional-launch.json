@@ -1,0 +1,2562 @@
+{
+  "assessmentAuthority": "mira_backend",
+  "expiresAt": 1787000000000,
+  "features": {
+    "actionTypes": [
+      "discussion",
+      "laser",
+      "speech",
+      "spotlight",
+      "widget_annotation",
+      "widget_highlight"
+    ],
+    "classroomContentSha256": "a7f5eaaf063dc634b88df628524c995aef124fde43a4cbfadb429b059c0827ce",
+    "enabled": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "html_game",
+      "simulation"
+    ],
+    "evidence": {
+      "3d_visualization": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "code": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "diagram": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "html_game": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:html_game"
+        ],
+        "verified": true
+      },
+      "mp4_export": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "multi_agent_roundtable": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:multi_agent_roundtable"
+        ],
+        "verified": true
+      },
+      "pbl": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "quiz": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:quiz"
+        ],
+        "verified": true
+      },
+      "realtime_whiteboard": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "simulation": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:simulation"
+        ],
+        "verified": true
+      },
+      "slides": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:slides"
+        ],
+        "verified": true
+      },
+      "teacher_actions": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:teacher_actions"
+        ],
+        "verified": true
+      },
+      "video": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      }
+    },
+    "formalEvidence": {
+      "assessmentQuestionIds": [
+        "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q2",
+        "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q3",
+        "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q4",
+        "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q5"
+      ],
+      "discussionActionCount": 2,
+      "distinctDiscussionPeerCount": 2,
+      "media": {
+        "imageCount": 1,
+        "modelId": "qwen-image-max",
+        "policyId": "mira-formal-qwen-image.v1",
+        "providerId": "qwen-image",
+        "receiptSha256": "59cc28fca4bd1701c37d4fcc0bcde819ed05a32b29afa901e8d8684b83e88eb5",
+        "schemaVersion": "mira.openmaic.formal-media-receipt.v1",
+        "verified": true,
+        "verifiedAssetCount": 1
+      },
+      "peerCount": 4,
+      "professionalCreation": {
+        "imageGenerationEnabled": true,
+        "imagePolicyId": "mira-formal-qwen-image.v1",
+        "receiptSha256": "171ea7947a1e6d908cca8e7da898fad83c57a85a732e17913c915c060e21e9d0",
+        "schemaVersion": "mira.openmaic.professional-creation-receipt.v1",
+        "sessionId": "miraformal_2525b880d6ad1ee0a1af5718c5feb3a8b3cc0afe2a83b2ddb5c70c44168fb2a9",
+        "skillId": "mira-primary-courseware",
+        "skillOrchestration": {
+          "profileId": "mira-primary-adaptive.v2",
+          "receiptSha256": "1249aa0ef97be538f9a0fbf2c15cf3046c3dde5dcfd4cb064c752475a1c987e7",
+          "referenceReads": [
+            {
+              "resourcePath": "k12-core-literacy-planning/references/core-literacy.md",
+              "sourceHash": "47635d06a4a598b28c22a408f5f218e96dd2eca664ca74c1774bb95c848a47ee"
+            },
+            {
+              "resourcePath": "k12-core-literacy-planning/references/subjects/languages.md",
+              "sourceHash": "b88c8350e51ffcaf502ef891e0e69f8351295b550c4fe7202efa595de7327b89"
+            }
+          ],
+          "sceneContexts": [
+            {
+              "actionsContextSha256": "b4ebb660e93566d77a494a190e360f59dba83884f6ff8c93f475452ed1e07ccb",
+              "contentContextSha256": "2ceeaebd8260c9756b1956527ad9b7aa497ad6e8f6ed1217413d04c12aa810af",
+              "sceneId": "scene-p1",
+              "sceneType": "slide"
+            },
+            {
+              "actionsContextSha256": "12660cd6ab9752369aeda6e682cf0581747f5991c029ec81a2f192c923c7eef3",
+              "contentContextSha256": "783a84d1c5793a5f5548ba3e8d778519dca647bf84c9c2b29fe45fa3dbb03afb",
+              "sceneId": "scene-p2",
+              "sceneType": "interactive"
+            },
+            {
+              "actionsContextSha256": "b4ebb660e93566d77a494a190e360f59dba83884f6ff8c93f475452ed1e07ccb",
+              "contentContextSha256": "2ceeaebd8260c9756b1956527ad9b7aa497ad6e8f6ed1217413d04c12aa810af",
+              "sceneId": "scene-p3",
+              "sceneType": "slide"
+            },
+            {
+              "actionsContextSha256": "1f00959f402ee299a8ecdbb2a0086515b2f2ce7a1f0fe1030952a454f84b1b78",
+              "contentContextSha256": "ce119ff9be714cc20b62374e4ee6b8612043b97c894133e485a3fa624b462629",
+              "sceneId": "scene-p4",
+              "sceneType": "quiz"
+            },
+            {
+              "actionsContextSha256": "12660cd6ab9752369aeda6e682cf0581747f5991c029ec81a2f192c923c7eef3",
+              "contentContextSha256": "783a84d1c5793a5f5548ba3e8d778519dca647bf84c9c2b29fe45fa3dbb03afb",
+              "sceneId": "scene-p5",
+              "sceneType": "interactive"
+            },
+            {
+              "actionsContextSha256": "1f00959f402ee299a8ecdbb2a0086515b2f2ce7a1f0fe1030952a454f84b1b78",
+              "contentContextSha256": "ce119ff9be714cc20b62374e4ee6b8612043b97c894133e485a3fa624b462629",
+              "sceneId": "scene-p6",
+              "sceneType": "quiz"
+            },
+            {
+              "actionsContextSha256": "b4ebb660e93566d77a494a190e360f59dba83884f6ff8c93f475452ed1e07ccb",
+              "contentContextSha256": "2ceeaebd8260c9756b1956527ad9b7aa497ad6e8f6ed1217413d04c12aa810af",
+              "sceneId": "scene-p7",
+              "sceneType": "slide"
+            }
+          ],
+          "schemaVersion": "mira.openmaic.skill-orchestration-receipt.v2",
+          "selectionPlan": {
+            "decisions": [
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "mira-primary-courseware",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "stage-design",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "k12-core-literacy-planning",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "deep-interactive",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "slide-craft",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "learning-to-learn",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/teachingBrief/course/objective",
+                  "/teachingBrief/lesson/questions"
+                ],
+                "reasonCode": "bounded_goal_and_assessment_backward_design",
+                "skillId": "understanding-by-design",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_supported_explanation_cycle",
+                "skillId": "feynman-learning",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [
+                  "/teachingBrief/course/objective",
+                  "/gradeBoundary/learningObjectives/0",
+                  "/teachingBrief/lesson/teachingFlow/teach/sayText",
+                  "/teachingBrief/lesson/teachingFlow/teach/keyPoints/0",
+                  "/teachingBrief/lesson/teachingFlow/teach/keyPoints/1",
+                  "/teachingBrief/lesson/teachingFlow/teach/keyPoints/2",
+                  "/teachingBrief/lesson/questions/0/prompt",
+                  "/teachingBrief/lesson/questions/4/prompt"
+                ],
+                "reasonCode": "practice_goal_and_repeated_tasks",
+                "skillId": "workshop-style",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_explicit_social_learning_situation",
+                "skillId": "social-emotional-learning",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "stable_subject_formal_source_gate_suffices",
+                "skillId": "deep-research",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode"
+                ],
+                "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
+                "skillId": "lecture-style",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "only_after_persisted_page_requires_repair",
+                "skillId": "pro-editing",
+                "status": "deferred"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "only_after_persisted_page_requires_repair",
+                "skillId": "stage-dsl",
+                "status": "deferred"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "only_after_persisted_page_requires_repair",
+                "skillId": "slide-dsl",
+                "status": "deferred"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+                "skillId": "pptx-import",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+                "skillId": "style-clone",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+                "skillId": "page-clone",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_teacher_material",
+                "skillId": "teacher-style-clone",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "single_course_not_series_or_cross_course_memory",
+                "skillId": "curriculum-planner",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "single_course_not_series_or_cross_course_memory",
+                "skillId": "spiral-curriculum",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_personal_history_or_skill_creation_request",
+                "skillId": "build-personal-skill",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "primary_subject_not_occupational_procedure",
+                "skillId": "vocational",
+                "status": "not_applicable"
+              }
+            ],
+            "gradeBand": "lower_primary",
+            "gradeBoundarySha256": "a133e1e6a050daafff28b87981c69909f6f375b88443c2a813c3e5aaa1ee19f8",
+            "inputSha256": "d59bca0464a1cbd32b1e46bffbf7d7a7c9d09c19fbc7818726538a11059fe555",
+            "planSha256": "6b9deaa601054bcc72bfa93137a79fbbae330d92eea33ce1c62dddc68a0c9134",
+            "primaryMethod": "workshop-style",
+            "registryId": "openmaic-builtin-skills.v1-23",
+            "schemaVersion": "mira.openmaic.skill-selection.v1",
+            "selectedSkillIds": [
+              "mira-primary-courseware",
+              "stage-design",
+              "k12-core-literacy-planning",
+              "deep-interactive",
+              "slide-craft",
+              "learning-to-learn",
+              "understanding-by-design",
+              "workshop-style"
+            ]
+          },
+          "skillReads": [
+            {
+              "skillId": "mira-primary-courseware",
+              "sourceHash": "2bb9434f452705182dbb6b71a912f8e24c8bed0c07561ce08fb493f6bd74e678"
+            },
+            {
+              "skillId": "stage-design",
+              "sourceHash": "6031161607914bb7ac37eb380b93b83c15ae9af7f25376b5b0749ce6cd06d76d"
+            },
+            {
+              "skillId": "k12-core-literacy-planning",
+              "sourceHash": "fbc03e9245406bac2d5b312f1a5711de311d17dc98eeb30d8eab298ee397c08f"
+            },
+            {
+              "skillId": "deep-interactive",
+              "sourceHash": "bb26d6b34f34bad37a76fef7f9863e1e67a2d4a5fbdf89d4ef08734c74db97bb"
+            },
+            {
+              "skillId": "slide-craft",
+              "sourceHash": "cf35eea56909b1427f171c6798ba55392761edb081603138892368d1bd727081"
+            },
+            {
+              "skillId": "learning-to-learn",
+              "sourceHash": "fe8be28613d01efe49a858bb89bf97f84273bd20311c805c36e2bfd28519c2ce"
+            },
+            {
+              "skillId": "understanding-by-design",
+              "sourceHash": "75af8be3ec7772b6ae97ac70ceedbb00fcfbb16a6d4addceb5f62ec0b3614808"
+            },
+            {
+              "skillId": "workshop-style",
+              "sourceHash": "002a4c9842069fb6f24da4b2d3ed0b6a65b0cef08298f5ae05d5905e661d884a"
+            }
+          ],
+          "status": "succeeded"
+        },
+        "studentToolsEnabled": false,
+        "supportingSkillIds": [
+          "k12-core-literacy-planning",
+          "deep-interactive"
+        ],
+        "teachingQuality": {
+          "gradeBoundarySha256": "a133e1e6a050daafff28b87981c69909f6f375b88443c2a813c3e5aaa1ee19f8",
+          "policyId": "mira-primary-quality.v1",
+          "receiptSha256": "a1c4a824e29272e54f96c53abceba4569a800f19a610a3da92e20bc494985cdd",
+          "renderChecks": [
+            {
+              "domSha256": "2b391f6f1874cacb9e10f465fcaf2713a91584db67c878540ac795e6c21bb970",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p1",
+              "sceneSha256": "880b88974df312e9cfd5147fb932e299a83884d9c6eb149c4400be9a39733ce2",
+              "screenshotSha256": "2cc772fb90c76ee0046f493fc542dde4388681345e0e6f72df9fc1ed785547fa",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "4ea6d276a42670d789135ba0e7d8da7d544aa4da1faa8814a135ce7abb433c4f",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p1",
+              "sceneSha256": "880b88974df312e9cfd5147fb932e299a83884d9c6eb149c4400be9a39733ce2",
+              "screenshotSha256": "a904736a33501c433da6529481533a3c4495c52a287f847e1e6d3dbbd1a4b88b",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "45fab9676806b76bda882a3865a62f52b498fb3bd4e5f4e2ccb28355f3907154",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p2",
+              "sceneSha256": "73bb8bc3931e39ed1bbdcb2f2f90ea1b445c5d5c57a0fc47e988bb8c980cfdaf",
+              "screenshotSha256": "866a089003b253cb067e7f3e96daf4cc99b4024bfec495b55f78b14379edf0a8",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "45fab9676806b76bda882a3865a62f52b498fb3bd4e5f4e2ccb28355f3907154",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p2",
+              "sceneSha256": "73bb8bc3931e39ed1bbdcb2f2f90ea1b445c5d5c57a0fc47e988bb8c980cfdaf",
+              "screenshotSha256": "6b1acc10f5ef4d39909552d66d26443e3cea65a10f555973eefdca2178da368c",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "f3c2fbad9f1de063f93a2e16dc3f4a8ce9f61efc2de67ec3d3a4029da4f4b5f0",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p3",
+              "sceneSha256": "8e920277be327e090319195567cce0fa9548ed0a407c764c69c2eda19b5b2a00",
+              "screenshotSha256": "83d8c30ac05dee0658ee5d2f08f9d3fd022059245630ef6846c91c94e372d038",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "618eaaeec3df5d075dc850e89bb22f527b05cea4575b2da4d061d6178aa77552",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p3",
+              "sceneSha256": "8e920277be327e090319195567cce0fa9548ed0a407c764c69c2eda19b5b2a00",
+              "screenshotSha256": "fa0d667e0a3c46b166d6851501b90854f83e19bb9bcaa017c220f61bf2b4ea98",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "a04f76af281f7374f4f8ef42b286b9ea2e239e847c8068d889da084f3cb29edc",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p4",
+              "sceneSha256": "aa34279d853724b8068a14112c01b1093123b807f2829b9c01a6782a82466ffd",
+              "screenshotSha256": "54757870b3048962d8670020a1e77a4dd197e47618b6c80b2b953aef6b5631ac",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "29fa1efcee1967b87b63681be08bb7b37027fa1895f47cdb00bde89f7485fd47",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p4",
+              "sceneSha256": "aa34279d853724b8068a14112c01b1093123b807f2829b9c01a6782a82466ffd",
+              "screenshotSha256": "a2e65946cbeae519a0b206d84a4ddb89538ff901a229e453ed23bb0e84ed6ec2",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "12164836668bf6bb7c59af19a3269ca03e32c319ee9d0ba45a5eac9e2974f8ee",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p5",
+              "sceneSha256": "2714d9ba8974da4a8f923127a55b25e8a84f10365f6c458dca1f80784bfaf1d4",
+              "screenshotSha256": "1540046678690797f36b20b6f3484a1c6a7f158f7dd21b5e8095eb3a210911f3",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "b881142db8f392a5212ba9d256a27f6a18afac70858ce75a7eefe63b5249f6cf",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p5",
+              "sceneSha256": "2714d9ba8974da4a8f923127a55b25e8a84f10365f6c458dca1f80784bfaf1d4",
+              "screenshotSha256": "d17ecdda363ae6adeb9061dbd1f71c53a56c7f0e4dd0a44d10ed37d4c5ae6738",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "b1ed2ab6625ffcb0591861dcb4e52bca36ee4875c7941dcf7c1e8a29d935c825",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p6",
+              "sceneSha256": "ff6a19bebffdbfab8566c153016fdf5cd25f6896186c01aad99418fd350a323f",
+              "screenshotSha256": "91f0756b937da913c21261e01c886ca34b325616b7125438a606d1b8529d9535",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "b1ed2ab6625ffcb0591861dcb4e52bca36ee4875c7941dcf7c1e8a29d935c825",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p6",
+              "sceneSha256": "ff6a19bebffdbfab8566c153016fdf5cd25f6896186c01aad99418fd350a323f",
+              "screenshotSha256": "b18041e89358daaed9ad5ef08e927de49cab2de8c03ac16c81e8bbe84d62074e",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "420431fa56439d6a16fa2ab1c6b84e2e98c00f6771dde07bb123bbb6abc77e5d",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p7",
+              "sceneSha256": "b795ad009ef0f8fe4b8bd13261d7dc5e880492f2e7d3fe21c6e6bd21de0f3a5d",
+              "screenshotSha256": "cc8c009ac1fe5c1b8f5fd69b8dbd01a2a892cfc060a44cf240dad2b8ede9d8b6",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "58fadf829b9e06adba7c97ba9bfaacfb26065ac2132c7272742b833ca606b31e",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p7",
+              "sceneSha256": "b795ad009ef0f8fe4b8bd13261d7dc5e880492f2e7d3fe21c6e6bd21de0f3a5d",
+              "screenshotSha256": "4c269158bb1d4601a7a7170f969358c25670aa46ef691a09c5fa248b2e6e7993",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            }
+          ],
+          "review": {
+            "dimensions": [
+              {
+                "evidence": [
+                  {
+                    "quote": "张大→a，拢圆→o，扁平→e",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "它读作“啊”。再来一次，张大嘴巴，a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "啊 —— 张大嘴巴",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "喔 —— 拢圆嘴巴",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "鹅 —— 扁平嘴巴",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "张大嘴巴",
+                    "sceneId": "scene-p7"
+                  },
+                  {
+                    "quote": "a a a",
+                    "sceneId": "scene-p7"
+                  },
+                  {
+                    "quote": "拢圆嘴巴",
+                    "sceneId": "scene-p7"
+                  },
+                  {
+                    "quote": "o o o",
+                    "sceneId": "scene-p7"
+                  }
+                ],
+                "id": "grade_fit",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "最后点一下「扁平嘴巴」。现在你发现了什么？是不是张大嘴巴就读a，拢圆嘴巴就读o，扁平嘴巴就读e？",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "它读作“啊”。再来一次，张大嘴巴，a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "✅ 对啦！",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "❌ 再看口形，再试一次",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "小浣熊在小小博物馆找到一张车票。挑战甲题:观察口形:嘴巴扁平,听到“鹅”。这是哪个单韵母?",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "小浣熊在小小博物馆找到一支画笔。挑战乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "张大嘴巴 a a a，拢圆嘴巴 o o o，扁扁嘴巴 e e e。读的时候，嘴巴要跟着动起来，不是只背字儿。",
+                    "sceneId": "scene-p7"
+                  }
+                ],
+                "id": "goal_coverage",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "先猜一猜:这些名片上的声音,嘴巴分别是怎么动的?",
+                    "sceneId": "scene-p1"
+                  },
+                  {
+                    "quote": "现在，请你点一下这个「张大嘴巴」的按钮，看看上面会出现什么。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "再试试这个「拢圆嘴巴」的按钮。看到嘴巴的形状变化了吗？旁边的字母也跟着变了吧？",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "最后点一下「扁平嘴巴」。现在你发现了什么？是不是张大嘴巴就读a，拢圆嘴巴就读o，扁平嘴巴就读e？",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "先看左边的口形图。嘴巴要张大，像医生看嗓子那样。跟着老师做一次：张大嘴巴。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "小浣熊看到果篮和贝壳,请你帮它看口形选一选。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "先点“开始游戏”，看看第一个嘴巴是什么样子。不要着急选，先看清楚嘴巴是张大、拢圆还是扁扁的。",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "小浣熊又找到车票和画笔,这次请你独立看口形选一选。",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "以后遇到拿不准的字母，就记住这三步：先看口形，再听读音，最后对字母。别急着猜，先看嘴巴怎么动。",
+                    "sceneId": "scene-p7"
+                  }
+                ],
+                "id": "teaching_sequence",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "果果有时候会猜得太快，你可要比她更细心。选完一个字母，注意看下面的提示：对啦，还是再看口形。",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "选对会显示读音提示，选错会提醒你再看看嘴巴的样子。",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "❌ 再看口形，再试一次",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "配对游戏页（一年级语文，单韵母 a、o、e，widgetType=game）。学习者把“口形”和“单韵母字母”配对：游戏随机（或依次）显示一张嘴巴口形图（张大/拢圆/扁平），下方三个字母按钮 a、o、e，学习者点一个；选对得 1 分并显示“对啦”和读音提示（啊/喔/鹅），选错显示“再看口形”并允许重试；共 3 轮，结束后显示得分。学习者动作：看口形图，选出对应字母。常见误区：把扁平嘴巴 e 误选成 a，或把拢圆 o 误选成 e。纠正线索：每次答完都同时回显口形图和对应读音词。证据：学习者能在新口形图下连续选对 3 题。过渡：游戏练完，进入挑战关的车票和画笔两题。",
+                    "sceneId": "scene-p5"
+                  }
+                ],
+                "id": "misconception_repair",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "学习者点击三个不同开口形状的按钮，观察嘴巴口形示意图、拼音字母和读音提示词同步变化，自主发现张大嘴巴读a、拢圆嘴巴读o、扁平嘴巴读e的对应规则。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "mouthShape",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "配对游戏页（一年级语文，单韵母 a、o、e，widgetType=game）。学习者把“口形”和“单韵母字母”配对：游戏随机（或依次）显示一张嘴巴口形图（张大/拢圆/扁平），下方三个字母按钮 a、o、e，学习者点一个；选对得 1 分并显示“对啦”和读音提示（啊/喔/鹅），选错显示“再看口形”并允许重试；共 3 轮，结束后显示得分。学习者动作：看口形图，选出对应字母。常见误区：把扁平嘴巴 e 误选成 a，或把拢圆 o 误选成 e。纠正线索：每次答完都同时回显口形图和对应读音词。证据：学习者能在新口形图下连续选对 3 题。过渡：游戏练完，进入挑战关的车票和画笔两题。",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "interactive",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "game",
+                    "sceneId": "scene-p5"
+                  }
+                ],
+                "id": "meaningful_interaction",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "小浣熊在小小博物馆看到一个果篮。引导甲题:观察口形:嘴巴张大,听到“啊”。这是哪个单韵母?",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "小浣熊在小小博物馆看到一颗贝壳。引导乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "小浣熊在小小博物馆找到一张车票。挑战甲题:观察口形:嘴巴扁平,听到“鹅”。这是哪个单韵母?",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "小浣熊在小小博物馆找到一支画笔。挑战乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                    "sceneId": "scene-p6"
+                  }
+                ],
+                "id": "assessment_alignment",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "小朋友们,今天我们和小浣熊一起,走进小小博物馆。",
+                    "sceneId": "scene-p1"
+                  },
+                  {
+                    "quote": "看,这里有三张口形名片,还有三件展品。先别急着贴哦。",
+                    "sceneId": "scene-p1"
+                  },
+                  {
+                    "quote": "小朋友们，看看这三个按钮，上面写着不同的嘴巴动作。我们先不点，先猜一猜：张大嘴巴，会读出哪个字母呢？",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "先看左边的口形图。嘴巴要张大，像医生看嗓子那样。跟着老师做一次：张大嘴巴。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "先点“开始游戏”，看看第一个嘴巴是什么样子。不要着急选，先看清楚嘴巴是张大、拢圆还是扁扁的。",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "张大嘴巴 a a a，拢圆嘴巴 o o o，扁扁嘴巴 e e e。读的时候，嘴巴要跟着动起来，不是只背字儿。",
+                    "sceneId": "scene-p7"
+                  }
+                ],
+                "id": "language_load",
+                "passed": true
+              }
+            ],
+            "inputSha256": "e69899e76b84044f9c66282db62a0d1a1fcb9637a39f64a2f426b84ae5fe10cd",
+            "modelId": "deepseek-v4-flash",
+            "objectives": [
+              {
+                "evidence": [
+                  {
+                    "quote": "最后点一下「扁平嘴巴」。现在你发现了什么？是不是张大嘴巴就读a，拢圆嘴巴就读o，扁平嘴巴就读e？",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "它读作“啊”。再来一次，张大嘴巴，a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "✅ 对啦！",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "❌ 再看口形，再试一次",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "小浣熊在小小博物馆找到一张车票。挑战甲题:观察口形:嘴巴扁平,听到“鹅”。这是哪个单韵母?",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "小浣熊在小小博物馆找到一支画笔。挑战乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "张大嘴巴 a a a，拢圆嘴巴 o o o，扁扁嘴巴 e e e。读的时候，嘴巴要跟着动起来，不是只背字儿。",
+                    "sceneId": "scene-p7"
+                  }
+                ],
+                "objectiveIndex": 0
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "最后点一下「扁平嘴巴」。现在你发现了什么？是不是张大嘴巴就读a，拢圆嘴巴就读o，扁平嘴巴就读e？",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "它读作“啊”。再来一次，张大嘴巴，a——",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "啊 —— 张大嘴巴",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "喔 —— 拢圆嘴巴",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "鹅 —— 扁平嘴巴",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "小浣熊在小小博物馆找到一张车票。挑战甲题:观察口形:嘴巴扁平,听到“鹅”。这是哪个单韵母?",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "小浣熊在小小博物馆找到一支画笔。挑战乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                    "sceneId": "scene-p6"
+                  }
+                ],
+                "objectiveIndex": 1
+              }
+            ],
+            "providerId": "deepseek",
+            "requestIdHash": "2739e1b72b5e71d830395308bd47b70bc4a0d1589b1e355520518f13f77aed1b"
+          },
+          "sceneHashes": [
+            {
+              "sceneId": "scene-p1",
+              "sceneSha256": "880b88974df312e9cfd5147fb932e299a83884d9c6eb149c4400be9a39733ce2"
+            },
+            {
+              "sceneId": "scene-p2",
+              "sceneSha256": "73bb8bc3931e39ed1bbdcb2f2f90ea1b445c5d5c57a0fc47e988bb8c980cfdaf"
+            },
+            {
+              "sceneId": "scene-p3",
+              "sceneSha256": "8e920277be327e090319195567cce0fa9548ed0a407c764c69c2eda19b5b2a00"
+            },
+            {
+              "sceneId": "scene-p4",
+              "sceneSha256": "aa34279d853724b8068a14112c01b1093123b807f2829b9c01a6782a82466ffd"
+            },
+            {
+              "sceneId": "scene-p5",
+              "sceneSha256": "2714d9ba8974da4a8f923127a55b25e8a84f10365f6c458dca1f80784bfaf1d4"
+            },
+            {
+              "sceneId": "scene-p6",
+              "sceneSha256": "ff6a19bebffdbfab8566c153016fdf5cd25f6896186c01aad99418fd350a323f"
+            },
+            {
+              "sceneId": "scene-p7",
+              "sceneSha256": "b795ad009ef0f8fe4b8bd13261d7dc5e880492f2e7d3fe21c6e6bd21de0f3a5d"
+            }
+          ],
+          "schemaVersion": "mira.openmaic.teaching-quality-receipt.v1",
+          "selectionPlanSha256": "6b9deaa601054bcc72bfa93137a79fbbae330d92eea33ce1c62dddc68a0c9134",
+          "sessionId": "miraformal_2525b880d6ad1ee0a1af5718c5feb3a8b3cc0afe2a83b2ddb5c70c44168fb2a9",
+          "snapshotSha256": "1e82ef0d83611f015e5bd89c7c41f2c256a300e1c894b3b43d646844334456a0",
+          "stageId": "stage--qvT2QU0Lj",
+          "status": "passed",
+          "teachingBriefSha256": "6eddb509d798cc0675a3996dd40caa2244343528283eb775e228d9ad3d886439"
+        },
+        "userPromptRequired": false,
+        "verified": true,
+        "videoGenerationEnabled": true,
+        "videoPolicyId": "mira-formal-happyhorse-video.v1",
+        "webSearchEnabled": true,
+        "workflowVersion": "openmaic-pro-agent.v1"
+      },
+      "research": {
+        "citationCount": 1,
+        "citedSceneCount": 2,
+        "fetchedSourceCount": 1,
+        "providerId": "brave",
+        "receiptSha256": "2e7811cd94550fe131850d66c79d43a886ad3aee3fab73ced5b96832bac2cabe",
+        "resultCount": 10,
+        "schemaVersion": "mira.openmaic.professional-research-receipt.v1",
+        "searchCount": 2,
+        "sessionId": "miraformal_2525b880d6ad1ee0a1af5718c5feb3a8b3cc0afe2a83b2ddb5c70c44168fb2a9",
+        "verified": true
+      },
+      "runtimeEventAuthority": {
+        "scenes": [
+          {
+            "completionActionId": "action_4dCTAF6b",
+            "questionIds": [],
+            "sceneId": "scene-p1",
+            "sceneIndex": 0
+          },
+          {
+            "completionActionId": "action_dcP69LxK",
+            "questionIds": [],
+            "sceneId": "scene-p2",
+            "sceneIndex": 1
+          },
+          {
+            "completionActionId": "action_uZxCr5wc",
+            "questionIds": [],
+            "sceneId": "scene-p3",
+            "sceneIndex": 2
+          },
+          {
+            "completionActionId": "disc-p4-duoduo",
+            "questionIds": [
+              "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q2",
+              "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q3"
+            ],
+            "sceneId": "scene-p4",
+            "sceneIndex": 3
+          },
+          {
+            "completionActionId": "action_KKKfz8JR",
+            "questionIds": [],
+            "sceneId": "scene-p5",
+            "sceneIndex": 4
+          },
+          {
+            "completionActionId": "action_AFLYr9Ji",
+            "questionIds": [
+              "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q4",
+              "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q5"
+            ],
+            "sceneId": "scene-p6",
+            "sceneIndex": 5
+          },
+          {
+            "completionActionId": "action_Eae1Sb3G",
+            "questionIds": [],
+            "sceneId": "scene-p7",
+            "sceneIndex": 6
+          }
+        ],
+        "schemaVersion": "mira.openmaic.runtime-event-authority.v1"
+      },
+      "sceneDistribution": {
+        "interactive": 2,
+        "pbl": 0,
+        "quiz": 2,
+        "slide": 3
+      },
+      "speechActionCount": 23,
+      "speechSceneCount": 7,
+      "spotlightVerified": true,
+      "teacher": {
+        "agentId": "mira-formal-teacher",
+        "avatar": "/avatars/teacher-2.png",
+        "name": "小语老师",
+        "teacherGender": "female",
+        "voiceGender": "female",
+        "voiceId": "Serena"
+      },
+      "teacherActionCount": 20,
+      "teachingQuality": {
+        "receiptSha256": "a1c4a824e29272e54f96c53abceba4569a800f19a610a3da92e20bc494985cdd",
+        "sceneHashes": [
+          {
+            "sceneId": "scene-p1",
+            "sceneSha256": "880b88974df312e9cfd5147fb932e299a83884d9c6eb149c4400be9a39733ce2"
+          },
+          {
+            "sceneId": "scene-p2",
+            "sceneSha256": "73bb8bc3931e39ed1bbdcb2f2f90ea1b445c5d5c57a0fc47e988bb8c980cfdaf"
+          },
+          {
+            "sceneId": "scene-p3",
+            "sceneSha256": "8e920277be327e090319195567cce0fa9548ed0a407c764c69c2eda19b5b2a00"
+          },
+          {
+            "sceneId": "scene-p4",
+            "sceneSha256": "aa34279d853724b8068a14112c01b1093123b807f2829b9c01a6782a82466ffd"
+          },
+          {
+            "sceneId": "scene-p5",
+            "sceneSha256": "2714d9ba8974da4a8f923127a55b25e8a84f10365f6c458dca1f80784bfaf1d4"
+          },
+          {
+            "sceneId": "scene-p6",
+            "sceneSha256": "ff6a19bebffdbfab8566c153016fdf5cd25f6896186c01aad99418fd350a323f"
+          },
+          {
+            "sceneId": "scene-p7",
+            "sceneSha256": "b795ad009ef0f8fe4b8bd13261d7dc5e880492f2e7d3fe21c6e6bd21de0f3a5d"
+          }
+        ],
+        "snapshotSha256": "1e82ef0d83611f015e5bd89c7c41f2c256a300e1c894b3b43d646844334456a0",
+        "verified": true
+      },
+      "video": {
+        "modelId": "happyhorse-1.0-t2v",
+        "policyId": "mira-formal-happyhorse-video.v1",
+        "providerId": "happyhorse",
+        "receiptSha256": "786157072baa7754f4fd8f7f4a8405ad72fe7685a2350d0e883cb305802df74d",
+        "schemaVersion": "mira.openmaic.formal-video-receipt.v1",
+        "verified": true,
+        "verifiedAssetCount": 0,
+        "videoCount": 0
+      },
+      "widgetHighlightVerified": true,
+      "widgetTypes": [
+        "game",
+        "simulation"
+      ]
+    },
+    "formalRuntimeContract": {
+      "distinctPeerDiscussions": 2,
+      "interactive": {
+        "allowedWidgetTypes": [
+          "simulation",
+          "diagram",
+          "code",
+          "game",
+          "visualization3d"
+        ],
+        "fake3dRejected": true,
+        "noopRejected": true,
+        "productiveScriptRequired": true,
+        "widgetConfigRequired": true
+      },
+      "roster": {
+        "peerCount": 4,
+        "teacherCount": 1
+      },
+      "scenePlanning": {
+        "allowedSceneTypes": [
+          "slide",
+          "quiz",
+          "interactive",
+          "pbl"
+        ],
+        "authority": "openmaic_professional_agent",
+        "defaultDurationMinutes": {
+          "max": 30,
+          "min": 15
+        },
+        "exactCountRequired": false,
+        "maxSceneCount": 60,
+        "mode": "adaptive",
+        "requiredSceneTypes": [
+          "slide",
+          "quiz",
+          "interactive"
+        ],
+        "scenesPerMinute": {
+          "max": 2,
+          "min": 1
+        }
+      },
+      "schemaVersion": "mira.openmaic.formal-runtime.v4-deepseek-professional",
+      "slideSpotlight": {
+        "consecutiveSpotlightsAllowed": true,
+        "focusExplanationSequenceRequired": true,
+        "minimumPerSlide": 1,
+        "targetMustBeRenderable": true
+      },
+      "speechActions": {
+        "interactiveSpotlightRequired": false,
+        "perScene": {
+          "max": 20,
+          "min": 1
+        },
+        "total": {
+          "max": 240,
+          "min": 1
+        }
+      },
+      "speechRequiredForEveryScene": true,
+      "teacherEvidence": [
+        "spotlight",
+        "widget_highlight"
+      ],
+      "whiteboardRequired": false
+    },
+    "generationContract": {
+      "authority": "mira_backend_formal_candidate",
+      "buildItemId": "catalog_build_item_449064b5b188b2000021bbab",
+      "course": {
+        "id": "candidate_primary_1_chinese_59522fbe6bd3_catalog_gen_449064b5b188b2000021bbabb5d90e6a394f",
+        "packageId": "formal_runtime_package_6d1d396771dee531e57a1bea395284a81aa82f4af680ab86",
+        "packageVersion": 1,
+        "version": "0.0.0-candidate"
+      },
+      "coursewareAuthority": {
+        "backendProviderCredentialsAccepted": false,
+        "classroomCompilation": "professional_skill_workflow",
+        "generationOwner": "openmaic",
+        "providerInvocation": "professional_agent",
+        "schemaVersion": "mira.openmaic.courseware-authority.v2-professional"
+      },
+      "generation": {
+        "agentMode": "generate",
+        "automaticRetries": 0,
+        "enableImageGeneration": true,
+        "enableTTS": false,
+        "enableVideoGeneration": true,
+        "enableWebSearch": true,
+        "maximumAttempts": 1,
+        "mode": "professional_skill",
+        "providerInvocation": "openmaic_agent_managed",
+        "skillId": "mira-primary-courseware",
+        "supportingSkillIds": [
+          "k12-core-literacy-planning",
+          "deep-interactive"
+        ],
+        "userPromptRequired": false,
+        "webSearchRequired": true,
+        "workflowVersion": "openmaic-pro-agent.v1"
+      },
+      "gradeBoundary": {
+        "allowedContent": [
+          "单韵母 a、o、e",
+          "a、o、e 的口形提示",
+          "a、o、e 的听辨与跟读"
+        ],
+        "boundaryVersion": "mira.primary.2026-fall.v1:pinyin_syllables:87da45a0697d5d7d",
+        "curriculumVersion": "mira.primary.2026-fall.v1",
+        "estimatedMinutes": 10,
+        "excludedContent": [
+          "声母",
+          "整体认读音节",
+          "偏旁部首",
+          "生字认读",
+          "多音字",
+          "方言知识"
+        ],
+        "gradeCode": "primary_1",
+        "language": "zh-CN",
+        "learningObjectives": [
+          "能看口形认读单韵母 a、o、e",
+          "能听辨 a、o、e 的基本读音"
+        ],
+        "prerequisiteSkills": [],
+        "skillId": "pinyin_syllables",
+        "skillTitle": "单韵母 a、o、e",
+        "subject": "chinese"
+      },
+      "gradeBoundarySha256": "a133e1e6a050daafff28b87981c69909f6f375b88443c2a813c3e5aaa1ee19f8",
+      "professionalCreationPolicy": {
+        "image": {
+          "assetValidationRequired": true,
+          "enabled": true,
+          "modelId": "qwen-image-max",
+          "policyId": "mira-formal-qwen-image.v1",
+          "providerId": "qwen-image",
+          "providerManaged": true,
+          "schemaVersion": "mira.openmaic.formal-image-policy.v1",
+          "usage": "teaching_need"
+        },
+        "mode": "professional_skill",
+        "schemaVersion": "mira.openmaic.professional-creation.v1",
+        "skillId": "mira-primary-courseware",
+        "skillOrchestration": {
+          "baseSkillIds": [
+            "mira-primary-courseware",
+            "stage-design",
+            "k12-core-literacy-planning",
+            "deep-interactive",
+            "slide-craft",
+            "learning-to-learn"
+          ],
+          "decisionCoverageRequired": true,
+          "gradeBoundaryRequired": true,
+          "mainMethodMax": 1,
+          "profileId": "mira-primary-adaptive.v2",
+          "registryId": "openmaic-builtin-skills.v1-23",
+          "sceneContextRequired": true,
+          "schemaVersion": "mira.openmaic.skill-orchestration.v2",
+          "selectionMode": "server_rules"
+        },
+        "studentToolsEnabled": false,
+        "supportingSkillIds": [
+          "k12-core-literacy-planning",
+          "deep-interactive"
+        ],
+        "teachingQuality": {
+          "finalSnapshotRequired": true,
+          "gradeBoundaryRequired": true,
+          "independentReviewRequired": true,
+          "maxReviewAttempts": 3,
+          "policyId": "mira-primary-quality.v1",
+          "renderedScenesRequired": true,
+          "schemaVersion": "mira.openmaic.teaching-quality-policy.v1"
+        },
+        "userPromptRequired": false,
+        "video": {
+          "aspectRatio": "16:9",
+          "assetValidationRequired": true,
+          "durationSec": 5,
+          "enabled": true,
+          "maxCalls": 1,
+          "maxVideos": 1,
+          "modelId": "happyhorse-1.0-t2v",
+          "policyId": "mira-formal-happyhorse-video.v1",
+          "providerId": "happyhorse",
+          "providerManaged": true,
+          "resolution": "720p",
+          "schemaVersion": "mira.openmaic.formal-video-policy.v1",
+          "usage": "teaching_need"
+        },
+        "webSearch": {
+          "citationsRequired": true,
+          "enabled": true,
+          "maxCalls": 4,
+          "minimumFetchedSources": 1,
+          "primarySourcesPreferred": true,
+          "providerManaged": true
+        },
+        "workflowVersion": "openmaic-pro-agent.v1"
+      },
+      "requiredClassroom": {
+        "distinctPeerDiscussions": 2,
+        "interactive": {
+          "allowedWidgetTypes": [
+            "simulation",
+            "diagram",
+            "code",
+            "game",
+            "visualization3d"
+          ],
+          "fake3dRejected": true,
+          "noopRejected": true,
+          "productiveScriptRequired": true,
+          "widgetConfigRequired": true
+        },
+        "roster": {
+          "peerCount": 4,
+          "teacherCount": 1
+        },
+        "scenePlanning": {
+          "allowedSceneTypes": [
+            "slide",
+            "quiz",
+            "interactive",
+            "pbl"
+          ],
+          "authority": "openmaic_professional_agent",
+          "defaultDurationMinutes": {
+            "max": 30,
+            "min": 15
+          },
+          "exactCountRequired": false,
+          "maxSceneCount": 60,
+          "mode": "adaptive",
+          "requiredSceneTypes": [
+            "slide",
+            "quiz",
+            "interactive"
+          ],
+          "scenesPerMinute": {
+            "max": 2,
+            "min": 1
+          }
+        },
+        "schemaVersion": "mira.openmaic.formal-runtime.v4-deepseek-professional",
+        "slideSpotlight": {
+          "consecutiveSpotlightsAllowed": true,
+          "focusExplanationSequenceRequired": true,
+          "minimumPerSlide": 1,
+          "targetMustBeRenderable": true
+        },
+        "speechActions": {
+          "interactiveSpotlightRequired": false,
+          "perScene": {
+            "max": 20,
+            "min": 1
+          },
+          "total": {
+            "max": 240,
+            "min": 1
+          }
+        },
+        "speechRequiredForEveryScene": true,
+        "teacherEvidence": [
+          "spotlight",
+          "widget_highlight"
+        ],
+        "whiteboardRequired": false
+      },
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_449064b5b188b2000021bbab-attempt-2",
+      "schemaVersion": "mira.openmaic.formal-runtime.v4-deepseek-professional",
+      "sourceCourseContentSha256": "b863e118676b059005bffa02ae02fbf96a671eb8efbec4dcee762594e933b14b",
+      "targetFingerprint": "e7f3d4be11e40d516d68b793682c67afe6e515b9e18bab1cd12d6649435cc0cc",
+      "teacher": {
+        "runtime": {
+          "avatar": "/avatars/teacher-2.png",
+          "name": "小语老师",
+          "role": "teacher",
+          "teacherGender": "female",
+          "voiceConfig": {
+            "modelId": "qwen3-tts-flash",
+            "providerId": "qwen-tts",
+            "voiceId": "Serena"
+          },
+          "voiceGender": "female"
+        },
+        "teacherProfile": {
+          "avatarPath": "/teachers/mi-chinese-v1.png",
+          "contentHash": "a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8",
+          "displayName": "小语老师",
+          "id": "mira_chinese_gentle",
+          "version": 2
+        }
+      },
+      "teachingBrief": {
+        "authority": {
+          "answerContractProvided": false,
+          "providerSecretsProvided": false,
+          "scoringRulesProvided": false,
+          "source": "locked_learning_course"
+        },
+        "course": {
+          "gradeCode": "primary_1",
+          "id": "candidate_primary_1_chinese_59522fbe6bd3_catalog_gen_449064b5b188b2000021bbabb5d90e6a394f",
+          "objective": "能看口形认读单韵母 a、o、e;能听辨 a、o、e 的基本读音",
+          "skillId": "pinyin_syllables",
+          "subject": "chinese",
+          "title": "小浣熊博物馆里的单韵母",
+          "version": "0.0.0-candidate"
+        },
+        "lesson": {
+          "estimatedMinutes": 10,
+          "intro": "本节课学习单韵母 a、o、e 的口形和基本读音。先看一个示范,再独立练习。",
+          "questions": [
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "a"
+                },
+                {
+                  "id": "B",
+                  "label": "o"
+                },
+                {
+                  "id": "C",
+                  "label": "e"
+                }
+              ],
+              "explanation": "嘴巴张大并发出“啊”时,对应单韵母a。",
+              "hint": "把标准口形和发音线索对应起来。",
+              "id": "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q1",
+              "prompt": "小熊在晨光画室找到一张画板。示范题:观察口形:嘴巴张大,听到“啊”。这是哪个单韵母?",
+              "skill": "单韵母 a、o、e",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "a"
+                },
+                {
+                  "id": "B",
+                  "label": "o"
+                },
+                {
+                  "id": "C",
+                  "label": "e"
+                }
+              ],
+              "explanation": "嘴巴张大并发出“啊”时,对应单韵母a。",
+              "hint": "把标准口形和发音线索对应起来。",
+              "id": "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q2",
+              "prompt": "小浣熊在小小博物馆看到一个果篮。引导甲题:观察口形:嘴巴张大,听到“啊”。这是哪个单韵母?",
+              "skill": "单韵母 a、o、e",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "a"
+                },
+                {
+                  "id": "B",
+                  "label": "o"
+                },
+                {
+                  "id": "C",
+                  "label": "e"
+                }
+              ],
+              "explanation": "嘴巴拢圆并发出“喔”时,对应单韵母o。",
+              "hint": "把标准口形和发音线索对应起来。",
+              "id": "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q3",
+              "prompt": "小浣熊在小小博物馆看到一颗贝壳。引导乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+              "skill": "单韵母 a、o、e",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "a"
+                },
+                {
+                  "id": "B",
+                  "label": "o"
+                },
+                {
+                  "id": "C",
+                  "label": "e"
+                }
+              ],
+              "explanation": "嘴巴扁平并发出“鹅”时,对应单韵母e。",
+              "hint": "把标准口形和发音线索对应起来。",
+              "id": "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q4",
+              "prompt": "小浣熊在小小博物馆找到一张车票。挑战甲题:观察口形:嘴巴扁平,听到“鹅”。这是哪个单韵母?",
+              "skill": "单韵母 a、o、e",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "a"
+                },
+                {
+                  "id": "B",
+                  "label": "o"
+                },
+                {
+                  "id": "C",
+                  "label": "e"
+                }
+              ],
+              "explanation": "嘴巴拢圆并发出“喔”时,对应单韵母o。",
+              "hint": "把标准口形和发音线索对应起来。",
+              "id": "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q5",
+              "prompt": "小浣熊在小小博物馆找到一支画笔。挑战乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+              "skill": "单韵母 a、o、e",
+              "type": "single_choice"
+            }
+          ],
+          "teachingFlow": {
+            "demoQuestionId": "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q1",
+            "guidedQuestionIds": [
+              "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q2",
+              "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q3"
+            ],
+            "independentQuestionIds": [
+              "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q4",
+              "catalog_gen_449064b5b188b2000021bbabb5d90e6a394f9905c3604ff9_q5"
+            ],
+            "recap": {
+              "sayText": "回顾一下:看清嘴巴张大、拢圆或扁平,再对应 a、o、e 的基本读音。"
+            },
+            "schemaVersion": "mira.learning.teaching-flow.v1",
+            "teach": {
+              "keyPoints": [
+                "嘴巴张大读 a",
+                "嘴巴拢圆读 o",
+                "嘴巴扁平读 e"
+              ],
+              "sayText": "读 a 时嘴巴张大,基本读音像“啊”;读 o 时嘴巴拢圆,基本读音像“喔”;读 e 时嘴巴扁平,基本读音像“鹅”。 示范题:小熊在晨光画室找到一张画板。示范题:观察口形:嘴巴张大,听到“啊”。这是哪个单韵母? 嘴巴张大并发出“啊”时,对应单韵母a。",
+              "title": "看口形,听读音"
+            }
+          }
+        },
+        "schemaVersion": "mira.learning.formal-runtime-teaching-brief.v1",
+        "sourceCourseContentSha256": "b863e118676b059005bffa02ae02fbf96a671eb8efbec4dcee762594e933b14b"
+      },
+      "teachingBriefSha256": "6eddb509d798cc0675a3996dd40caa2244343528283eb775e228d9ad3d886439"
+    },
+    "media": {
+      "assets": [
+        {
+          "byteSize": 721075,
+          "height": 576,
+          "mimeType": "image/png",
+          "sceneIds": [
+            "scene-p1"
+          ],
+          "sha256": "f5540f40edee5c5f27652f5b9426cadc39057a50019fec5b99801eed8b9fff3b",
+          "src": "/api/classroom-media/stage--qvT2QU0Lj/media/generated-f5540f40edee5c5f27652f5b9426cadc39057a50019fec5b99801eed8b9fff3b.png",
+          "width": 1024
+        }
+      ],
+      "buildItemId": "catalog_build_item_449064b5b188b2000021bbab",
+      "classroomId": "stage--qvT2QU0Lj",
+      "imageCount": 1,
+      "modelId": "qwen-image-max",
+      "policyId": "mira-formal-qwen-image.v1",
+      "providerId": "qwen-image",
+      "receiptSha256": "59cc28fca4bd1701c37d4fcc0bcde819ed05a32b29afa901e8d8684b83e88eb5",
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_449064b5b188b2000021bbab-attempt-2",
+      "schemaVersion": "mira.openmaic.formal-media-receipt.v1",
+      "sessionId": "miraformal_2525b880d6ad1ee0a1af5718c5feb3a8b3cc0afe2a83b2ddb5c70c44168fb2a9",
+      "status": "succeeded"
+    },
+    "missing": [],
+    "platform": {
+      "assessmentAuthority": "mira_backend",
+      "mp4Export": false,
+      "mp4ExportCapabilityProbed": false,
+      "mp4ExportClassroomDryRun": false,
+      "mp4ExportConfigured": false
+    },
+    "present": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "html_game",
+      "simulation"
+    ],
+    "professionalCreation": {
+      "buildItemId": "catalog_build_item_449064b5b188b2000021bbab",
+      "classroomId": "stage--qvT2QU0Lj",
+      "imageGenerationEnabled": true,
+      "imagePolicyId": "mira-formal-qwen-image.v1",
+      "receiptSha256": "171ea7947a1e6d908cca8e7da898fad83c57a85a732e17913c915c060e21e9d0",
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_449064b5b188b2000021bbab-attempt-2",
+      "schemaVersion": "mira.openmaic.professional-creation-receipt.v1",
+      "sessionId": "miraformal_2525b880d6ad1ee0a1af5718c5feb3a8b3cc0afe2a83b2ddb5c70c44168fb2a9",
+      "skillId": "mira-primary-courseware",
+      "skillOrchestration": {
+        "profileId": "mira-primary-adaptive.v2",
+        "receiptSha256": "1249aa0ef97be538f9a0fbf2c15cf3046c3dde5dcfd4cb064c752475a1c987e7",
+        "referenceReads": [
+          {
+            "resourcePath": "k12-core-literacy-planning/references/core-literacy.md",
+            "sourceHash": "47635d06a4a598b28c22a408f5f218e96dd2eca664ca74c1774bb95c848a47ee"
+          },
+          {
+            "resourcePath": "k12-core-literacy-planning/references/subjects/languages.md",
+            "sourceHash": "b88c8350e51ffcaf502ef891e0e69f8351295b550c4fe7202efa595de7327b89"
+          }
+        ],
+        "sceneContexts": [
+          {
+            "actionsContextSha256": "b4ebb660e93566d77a494a190e360f59dba83884f6ff8c93f475452ed1e07ccb",
+            "contentContextSha256": "2ceeaebd8260c9756b1956527ad9b7aa497ad6e8f6ed1217413d04c12aa810af",
+            "sceneId": "scene-p1",
+            "sceneType": "slide"
+          },
+          {
+            "actionsContextSha256": "12660cd6ab9752369aeda6e682cf0581747f5991c029ec81a2f192c923c7eef3",
+            "contentContextSha256": "783a84d1c5793a5f5548ba3e8d778519dca647bf84c9c2b29fe45fa3dbb03afb",
+            "sceneId": "scene-p2",
+            "sceneType": "interactive"
+          },
+          {
+            "actionsContextSha256": "b4ebb660e93566d77a494a190e360f59dba83884f6ff8c93f475452ed1e07ccb",
+            "contentContextSha256": "2ceeaebd8260c9756b1956527ad9b7aa497ad6e8f6ed1217413d04c12aa810af",
+            "sceneId": "scene-p3",
+            "sceneType": "slide"
+          },
+          {
+            "actionsContextSha256": "1f00959f402ee299a8ecdbb2a0086515b2f2ce7a1f0fe1030952a454f84b1b78",
+            "contentContextSha256": "ce119ff9be714cc20b62374e4ee6b8612043b97c894133e485a3fa624b462629",
+            "sceneId": "scene-p4",
+            "sceneType": "quiz"
+          },
+          {
+            "actionsContextSha256": "12660cd6ab9752369aeda6e682cf0581747f5991c029ec81a2f192c923c7eef3",
+            "contentContextSha256": "783a84d1c5793a5f5548ba3e8d778519dca647bf84c9c2b29fe45fa3dbb03afb",
+            "sceneId": "scene-p5",
+            "sceneType": "interactive"
+          },
+          {
+            "actionsContextSha256": "1f00959f402ee299a8ecdbb2a0086515b2f2ce7a1f0fe1030952a454f84b1b78",
+            "contentContextSha256": "ce119ff9be714cc20b62374e4ee6b8612043b97c894133e485a3fa624b462629",
+            "sceneId": "scene-p6",
+            "sceneType": "quiz"
+          },
+          {
+            "actionsContextSha256": "b4ebb660e93566d77a494a190e360f59dba83884f6ff8c93f475452ed1e07ccb",
+            "contentContextSha256": "2ceeaebd8260c9756b1956527ad9b7aa497ad6e8f6ed1217413d04c12aa810af",
+            "sceneId": "scene-p7",
+            "sceneType": "slide"
+          }
+        ],
+        "schemaVersion": "mira.openmaic.skill-orchestration-receipt.v2",
+        "selectionPlan": {
+          "decisions": [
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "mira-primary-courseware",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "stage-design",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "k12-core-literacy-planning",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "deep-interactive",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "slide-craft",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "learning-to-learn",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/teachingBrief/course/objective",
+                "/teachingBrief/lesson/questions"
+              ],
+              "reasonCode": "bounded_goal_and_assessment_backward_design",
+              "skillId": "understanding-by-design",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_supported_explanation_cycle",
+              "skillId": "feynman-learning",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [
+                "/teachingBrief/course/objective",
+                "/gradeBoundary/learningObjectives/0",
+                "/teachingBrief/lesson/teachingFlow/teach/sayText",
+                "/teachingBrief/lesson/teachingFlow/teach/keyPoints/0",
+                "/teachingBrief/lesson/teachingFlow/teach/keyPoints/1",
+                "/teachingBrief/lesson/teachingFlow/teach/keyPoints/2",
+                "/teachingBrief/lesson/questions/0/prompt",
+                "/teachingBrief/lesson/questions/4/prompt"
+              ],
+              "reasonCode": "practice_goal_and_repeated_tasks",
+              "skillId": "workshop-style",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_explicit_social_learning_situation",
+              "skillId": "social-emotional-learning",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "stable_subject_formal_source_gate_suffices",
+              "skillId": "deep-research",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode"
+              ],
+              "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
+              "skillId": "lecture-style",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "only_after_persisted_page_requires_repair",
+              "skillId": "pro-editing",
+              "status": "deferred"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "only_after_persisted_page_requires_repair",
+              "skillId": "stage-dsl",
+              "status": "deferred"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "only_after_persisted_page_requires_repair",
+              "skillId": "slide-dsl",
+              "status": "deferred"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+              "skillId": "pptx-import",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+              "skillId": "style-clone",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+              "skillId": "page-clone",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_teacher_material",
+              "skillId": "teacher-style-clone",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "single_course_not_series_or_cross_course_memory",
+              "skillId": "curriculum-planner",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "single_course_not_series_or_cross_course_memory",
+              "skillId": "spiral-curriculum",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_personal_history_or_skill_creation_request",
+              "skillId": "build-personal-skill",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "primary_subject_not_occupational_procedure",
+              "skillId": "vocational",
+              "status": "not_applicable"
+            }
+          ],
+          "gradeBand": "lower_primary",
+          "gradeBoundarySha256": "a133e1e6a050daafff28b87981c69909f6f375b88443c2a813c3e5aaa1ee19f8",
+          "inputSha256": "d59bca0464a1cbd32b1e46bffbf7d7a7c9d09c19fbc7818726538a11059fe555",
+          "planSha256": "6b9deaa601054bcc72bfa93137a79fbbae330d92eea33ce1c62dddc68a0c9134",
+          "primaryMethod": "workshop-style",
+          "registryId": "openmaic-builtin-skills.v1-23",
+          "schemaVersion": "mira.openmaic.skill-selection.v1",
+          "selectedSkillIds": [
+            "mira-primary-courseware",
+            "stage-design",
+            "k12-core-literacy-planning",
+            "deep-interactive",
+            "slide-craft",
+            "learning-to-learn",
+            "understanding-by-design",
+            "workshop-style"
+          ]
+        },
+        "skillReads": [
+          {
+            "skillId": "mira-primary-courseware",
+            "sourceHash": "2bb9434f452705182dbb6b71a912f8e24c8bed0c07561ce08fb493f6bd74e678"
+          },
+          {
+            "skillId": "stage-design",
+            "sourceHash": "6031161607914bb7ac37eb380b93b83c15ae9af7f25376b5b0749ce6cd06d76d"
+          },
+          {
+            "skillId": "k12-core-literacy-planning",
+            "sourceHash": "fbc03e9245406bac2d5b312f1a5711de311d17dc98eeb30d8eab298ee397c08f"
+          },
+          {
+            "skillId": "deep-interactive",
+            "sourceHash": "bb26d6b34f34bad37a76fef7f9863e1e67a2d4a5fbdf89d4ef08734c74db97bb"
+          },
+          {
+            "skillId": "slide-craft",
+            "sourceHash": "cf35eea56909b1427f171c6798ba55392761edb081603138892368d1bd727081"
+          },
+          {
+            "skillId": "learning-to-learn",
+            "sourceHash": "fe8be28613d01efe49a858bb89bf97f84273bd20311c805c36e2bfd28519c2ce"
+          },
+          {
+            "skillId": "understanding-by-design",
+            "sourceHash": "75af8be3ec7772b6ae97ac70ceedbb00fcfbb16a6d4addceb5f62ec0b3614808"
+          },
+          {
+            "skillId": "workshop-style",
+            "sourceHash": "002a4c9842069fb6f24da4b2d3ed0b6a65b0cef08298f5ae05d5905e661d884a"
+          }
+        ],
+        "status": "succeeded"
+      },
+      "status": "succeeded",
+      "studentToolsEnabled": false,
+      "supportingSkillIds": [
+        "k12-core-literacy-planning",
+        "deep-interactive"
+      ],
+      "teachingBriefSha256": "6eddb509d798cc0675a3996dd40caa2244343528283eb775e228d9ad3d886439",
+      "teachingQuality": {
+        "gradeBoundarySha256": "a133e1e6a050daafff28b87981c69909f6f375b88443c2a813c3e5aaa1ee19f8",
+        "policyId": "mira-primary-quality.v1",
+        "receiptSha256": "a1c4a824e29272e54f96c53abceba4569a800f19a610a3da92e20bc494985cdd",
+        "renderChecks": [
+          {
+            "domSha256": "2b391f6f1874cacb9e10f465fcaf2713a91584db67c878540ac795e6c21bb970",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p1",
+            "sceneSha256": "880b88974df312e9cfd5147fb932e299a83884d9c6eb149c4400be9a39733ce2",
+            "screenshotSha256": "2cc772fb90c76ee0046f493fc542dde4388681345e0e6f72df9fc1ed785547fa",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "4ea6d276a42670d789135ba0e7d8da7d544aa4da1faa8814a135ce7abb433c4f",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p1",
+            "sceneSha256": "880b88974df312e9cfd5147fb932e299a83884d9c6eb149c4400be9a39733ce2",
+            "screenshotSha256": "a904736a33501c433da6529481533a3c4495c52a287f847e1e6d3dbbd1a4b88b",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "45fab9676806b76bda882a3865a62f52b498fb3bd4e5f4e2ccb28355f3907154",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p2",
+            "sceneSha256": "73bb8bc3931e39ed1bbdcb2f2f90ea1b445c5d5c57a0fc47e988bb8c980cfdaf",
+            "screenshotSha256": "866a089003b253cb067e7f3e96daf4cc99b4024bfec495b55f78b14379edf0a8",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "45fab9676806b76bda882a3865a62f52b498fb3bd4e5f4e2ccb28355f3907154",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p2",
+            "sceneSha256": "73bb8bc3931e39ed1bbdcb2f2f90ea1b445c5d5c57a0fc47e988bb8c980cfdaf",
+            "screenshotSha256": "6b1acc10f5ef4d39909552d66d26443e3cea65a10f555973eefdca2178da368c",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "f3c2fbad9f1de063f93a2e16dc3f4a8ce9f61efc2de67ec3d3a4029da4f4b5f0",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p3",
+            "sceneSha256": "8e920277be327e090319195567cce0fa9548ed0a407c764c69c2eda19b5b2a00",
+            "screenshotSha256": "83d8c30ac05dee0658ee5d2f08f9d3fd022059245630ef6846c91c94e372d038",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "618eaaeec3df5d075dc850e89bb22f527b05cea4575b2da4d061d6178aa77552",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p3",
+            "sceneSha256": "8e920277be327e090319195567cce0fa9548ed0a407c764c69c2eda19b5b2a00",
+            "screenshotSha256": "fa0d667e0a3c46b166d6851501b90854f83e19bb9bcaa017c220f61bf2b4ea98",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "a04f76af281f7374f4f8ef42b286b9ea2e239e847c8068d889da084f3cb29edc",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p4",
+            "sceneSha256": "aa34279d853724b8068a14112c01b1093123b807f2829b9c01a6782a82466ffd",
+            "screenshotSha256": "54757870b3048962d8670020a1e77a4dd197e47618b6c80b2b953aef6b5631ac",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "29fa1efcee1967b87b63681be08bb7b37027fa1895f47cdb00bde89f7485fd47",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p4",
+            "sceneSha256": "aa34279d853724b8068a14112c01b1093123b807f2829b9c01a6782a82466ffd",
+            "screenshotSha256": "a2e65946cbeae519a0b206d84a4ddb89538ff901a229e453ed23bb0e84ed6ec2",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "12164836668bf6bb7c59af19a3269ca03e32c319ee9d0ba45a5eac9e2974f8ee",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p5",
+            "sceneSha256": "2714d9ba8974da4a8f923127a55b25e8a84f10365f6c458dca1f80784bfaf1d4",
+            "screenshotSha256": "1540046678690797f36b20b6f3484a1c6a7f158f7dd21b5e8095eb3a210911f3",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "b881142db8f392a5212ba9d256a27f6a18afac70858ce75a7eefe63b5249f6cf",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p5",
+            "sceneSha256": "2714d9ba8974da4a8f923127a55b25e8a84f10365f6c458dca1f80784bfaf1d4",
+            "screenshotSha256": "d17ecdda363ae6adeb9061dbd1f71c53a56c7f0e4dd0a44d10ed37d4c5ae6738",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "b1ed2ab6625ffcb0591861dcb4e52bca36ee4875c7941dcf7c1e8a29d935c825",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p6",
+            "sceneSha256": "ff6a19bebffdbfab8566c153016fdf5cd25f6896186c01aad99418fd350a323f",
+            "screenshotSha256": "91f0756b937da913c21261e01c886ca34b325616b7125438a606d1b8529d9535",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "b1ed2ab6625ffcb0591861dcb4e52bca36ee4875c7941dcf7c1e8a29d935c825",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p6",
+            "sceneSha256": "ff6a19bebffdbfab8566c153016fdf5cd25f6896186c01aad99418fd350a323f",
+            "screenshotSha256": "b18041e89358daaed9ad5ef08e927de49cab2de8c03ac16c81e8bbe84d62074e",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "420431fa56439d6a16fa2ab1c6b84e2e98c00f6771dde07bb123bbb6abc77e5d",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p7",
+            "sceneSha256": "b795ad009ef0f8fe4b8bd13261d7dc5e880492f2e7d3fe21c6e6bd21de0f3a5d",
+            "screenshotSha256": "cc8c009ac1fe5c1b8f5fd69b8dbd01a2a892cfc060a44cf240dad2b8ede9d8b6",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "58fadf829b9e06adba7c97ba9bfaacfb26065ac2132c7272742b833ca606b31e",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p7",
+            "sceneSha256": "b795ad009ef0f8fe4b8bd13261d7dc5e880492f2e7d3fe21c6e6bd21de0f3a5d",
+            "screenshotSha256": "4c269158bb1d4601a7a7170f969358c25670aa46ef691a09c5fa248b2e6e7993",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          }
+        ],
+        "review": {
+          "dimensions": [
+            {
+              "evidence": [
+                {
+                  "quote": "张大→a，拢圆→o，扁平→e",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "它读作“啊”。再来一次，张大嘴巴，a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "啊 —— 张大嘴巴",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "喔 —— 拢圆嘴巴",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "鹅 —— 扁平嘴巴",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "张大嘴巴",
+                  "sceneId": "scene-p7"
+                },
+                {
+                  "quote": "a a a",
+                  "sceneId": "scene-p7"
+                },
+                {
+                  "quote": "拢圆嘴巴",
+                  "sceneId": "scene-p7"
+                },
+                {
+                  "quote": "o o o",
+                  "sceneId": "scene-p7"
+                }
+              ],
+              "id": "grade_fit",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "最后点一下「扁平嘴巴」。现在你发现了什么？是不是张大嘴巴就读a，拢圆嘴巴就读o，扁平嘴巴就读e？",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "它读作“啊”。再来一次，张大嘴巴，a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "✅ 对啦！",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "❌ 再看口形，再试一次",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "小浣熊在小小博物馆找到一张车票。挑战甲题:观察口形:嘴巴扁平,听到“鹅”。这是哪个单韵母?",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "小浣熊在小小博物馆找到一支画笔。挑战乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "张大嘴巴 a a a，拢圆嘴巴 o o o，扁扁嘴巴 e e e。读的时候，嘴巴要跟着动起来，不是只背字儿。",
+                  "sceneId": "scene-p7"
+                }
+              ],
+              "id": "goal_coverage",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "先猜一猜:这些名片上的声音,嘴巴分别是怎么动的?",
+                  "sceneId": "scene-p1"
+                },
+                {
+                  "quote": "现在，请你点一下这个「张大嘴巴」的按钮，看看上面会出现什么。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "再试试这个「拢圆嘴巴」的按钮。看到嘴巴的形状变化了吗？旁边的字母也跟着变了吧？",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "最后点一下「扁平嘴巴」。现在你发现了什么？是不是张大嘴巴就读a，拢圆嘴巴就读o，扁平嘴巴就读e？",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "先看左边的口形图。嘴巴要张大，像医生看嗓子那样。跟着老师做一次：张大嘴巴。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "小浣熊看到果篮和贝壳,请你帮它看口形选一选。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "先点“开始游戏”，看看第一个嘴巴是什么样子。不要着急选，先看清楚嘴巴是张大、拢圆还是扁扁的。",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "小浣熊又找到车票和画笔,这次请你独立看口形选一选。",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "以后遇到拿不准的字母，就记住这三步：先看口形，再听读音，最后对字母。别急着猜，先看嘴巴怎么动。",
+                  "sceneId": "scene-p7"
+                }
+              ],
+              "id": "teaching_sequence",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "果果有时候会猜得太快，你可要比她更细心。选完一个字母，注意看下面的提示：对啦，还是再看口形。",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "选对会显示读音提示，选错会提醒你再看看嘴巴的样子。",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "❌ 再看口形，再试一次",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "配对游戏页（一年级语文，单韵母 a、o、e，widgetType=game）。学习者把“口形”和“单韵母字母”配对：游戏随机（或依次）显示一张嘴巴口形图（张大/拢圆/扁平），下方三个字母按钮 a、o、e，学习者点一个；选对得 1 分并显示“对啦”和读音提示（啊/喔/鹅），选错显示“再看口形”并允许重试；共 3 轮，结束后显示得分。学习者动作：看口形图，选出对应字母。常见误区：把扁平嘴巴 e 误选成 a，或把拢圆 o 误选成 e。纠正线索：每次答完都同时回显口形图和对应读音词。证据：学习者能在新口形图下连续选对 3 题。过渡：游戏练完，进入挑战关的车票和画笔两题。",
+                  "sceneId": "scene-p5"
+                }
+              ],
+              "id": "misconception_repair",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "学习者点击三个不同开口形状的按钮，观察嘴巴口形示意图、拼音字母和读音提示词同步变化，自主发现张大嘴巴读a、拢圆嘴巴读o、扁平嘴巴读e的对应规则。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "mouthShape",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "配对游戏页（一年级语文，单韵母 a、o、e，widgetType=game）。学习者把“口形”和“单韵母字母”配对：游戏随机（或依次）显示一张嘴巴口形图（张大/拢圆/扁平），下方三个字母按钮 a、o、e，学习者点一个；选对得 1 分并显示“对啦”和读音提示（啊/喔/鹅），选错显示“再看口形”并允许重试；共 3 轮，结束后显示得分。学习者动作：看口形图，选出对应字母。常见误区：把扁平嘴巴 e 误选成 a，或把拢圆 o 误选成 e。纠正线索：每次答完都同时回显口形图和对应读音词。证据：学习者能在新口形图下连续选对 3 题。过渡：游戏练完，进入挑战关的车票和画笔两题。",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "interactive",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "game",
+                  "sceneId": "scene-p5"
+                }
+              ],
+              "id": "meaningful_interaction",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "小浣熊在小小博物馆看到一个果篮。引导甲题:观察口形:嘴巴张大,听到“啊”。这是哪个单韵母?",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "小浣熊在小小博物馆看到一颗贝壳。引导乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "小浣熊在小小博物馆找到一张车票。挑战甲题:观察口形:嘴巴扁平,听到“鹅”。这是哪个单韵母?",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "小浣熊在小小博物馆找到一支画笔。挑战乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                  "sceneId": "scene-p6"
+                }
+              ],
+              "id": "assessment_alignment",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "小朋友们,今天我们和小浣熊一起,走进小小博物馆。",
+                  "sceneId": "scene-p1"
+                },
+                {
+                  "quote": "看,这里有三张口形名片,还有三件展品。先别急着贴哦。",
+                  "sceneId": "scene-p1"
+                },
+                {
+                  "quote": "小朋友们，看看这三个按钮，上面写着不同的嘴巴动作。我们先不点，先猜一猜：张大嘴巴，会读出哪个字母呢？",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "先看左边的口形图。嘴巴要张大，像医生看嗓子那样。跟着老师做一次：张大嘴巴。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "先点“开始游戏”，看看第一个嘴巴是什么样子。不要着急选，先看清楚嘴巴是张大、拢圆还是扁扁的。",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "张大嘴巴 a a a，拢圆嘴巴 o o o，扁扁嘴巴 e e e。读的时候，嘴巴要跟着动起来，不是只背字儿。",
+                  "sceneId": "scene-p7"
+                }
+              ],
+              "id": "language_load",
+              "passed": true
+            }
+          ],
+          "inputSha256": "e69899e76b84044f9c66282db62a0d1a1fcb9637a39f64a2f426b84ae5fe10cd",
+          "modelId": "deepseek-v4-flash",
+          "objectives": [
+            {
+              "evidence": [
+                {
+                  "quote": "最后点一下「扁平嘴巴」。现在你发现了什么？是不是张大嘴巴就读a，拢圆嘴巴就读o，扁平嘴巴就读e？",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "它读作“啊”。再来一次，张大嘴巴，a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "✅ 对啦！",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "❌ 再看口形，再试一次",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "小浣熊在小小博物馆找到一张车票。挑战甲题:观察口形:嘴巴扁平,听到“鹅”。这是哪个单韵母?",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "小浣熊在小小博物馆找到一支画笔。挑战乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "张大嘴巴 a a a，拢圆嘴巴 o o o，扁扁嘴巴 e e e。读的时候，嘴巴要跟着动起来，不是只背字儿。",
+                  "sceneId": "scene-p7"
+                }
+              ],
+              "objectiveIndex": 0
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "最后点一下「扁平嘴巴」。现在你发现了什么？是不是张大嘴巴就读a，拢圆嘴巴就读o，扁平嘴巴就读e？",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "嘴巴张大了，发出的声音就是 a。看右边的字母卡片，跟着老师读：a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "它读作“啊”。再来一次，张大嘴巴，a——",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "啊 —— 张大嘴巴",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "喔 —— 拢圆嘴巴",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "鹅 —— 扁平嘴巴",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "小浣熊在小小博物馆找到一张车票。挑战甲题:观察口形:嘴巴扁平,听到“鹅”。这是哪个单韵母?",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "小浣熊在小小博物馆找到一支画笔。挑战乙题:观察口形:嘴巴拢圆,听到“喔”。这是哪个单韵母?",
+                  "sceneId": "scene-p6"
+                }
+              ],
+              "objectiveIndex": 1
+            }
+          ],
+          "providerId": "deepseek",
+          "requestIdHash": "2739e1b72b5e71d830395308bd47b70bc4a0d1589b1e355520518f13f77aed1b"
+        },
+        "sceneHashes": [
+          {
+            "sceneId": "scene-p1",
+            "sceneSha256": "880b88974df312e9cfd5147fb932e299a83884d9c6eb149c4400be9a39733ce2"
+          },
+          {
+            "sceneId": "scene-p2",
+            "sceneSha256": "73bb8bc3931e39ed1bbdcb2f2f90ea1b445c5d5c57a0fc47e988bb8c980cfdaf"
+          },
+          {
+            "sceneId": "scene-p3",
+            "sceneSha256": "8e920277be327e090319195567cce0fa9548ed0a407c764c69c2eda19b5b2a00"
+          },
+          {
+            "sceneId": "scene-p4",
+            "sceneSha256": "aa34279d853724b8068a14112c01b1093123b807f2829b9c01a6782a82466ffd"
+          },
+          {
+            "sceneId": "scene-p5",
+            "sceneSha256": "2714d9ba8974da4a8f923127a55b25e8a84f10365f6c458dca1f80784bfaf1d4"
+          },
+          {
+            "sceneId": "scene-p6",
+            "sceneSha256": "ff6a19bebffdbfab8566c153016fdf5cd25f6896186c01aad99418fd350a323f"
+          },
+          {
+            "sceneId": "scene-p7",
+            "sceneSha256": "b795ad009ef0f8fe4b8bd13261d7dc5e880492f2e7d3fe21c6e6bd21de0f3a5d"
+          }
+        ],
+        "schemaVersion": "mira.openmaic.teaching-quality-receipt.v1",
+        "selectionPlanSha256": "6b9deaa601054bcc72bfa93137a79fbbae330d92eea33ce1c62dddc68a0c9134",
+        "sessionId": "miraformal_2525b880d6ad1ee0a1af5718c5feb3a8b3cc0afe2a83b2ddb5c70c44168fb2a9",
+        "snapshotSha256": "1e82ef0d83611f015e5bd89c7c41f2c256a300e1c894b3b43d646844334456a0",
+        "stageId": "stage--qvT2QU0Lj",
+        "status": "passed",
+        "teachingBriefSha256": "6eddb509d798cc0675a3996dd40caa2244343528283eb775e228d9ad3d886439"
+      },
+      "userPromptRequired": false,
+      "videoGenerationEnabled": true,
+      "videoPolicyId": "mira-formal-happyhorse-video.v1",
+      "webSearchEnabled": true,
+      "workflowVersion": "openmaic-pro-agent.v1"
+    },
+    "requested": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "html_game",
+      "simulation"
+    ],
+    "required": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "html_game",
+      "simulation"
+    ],
+    "research": {
+      "buildItemId": "catalog_build_item_449064b5b188b2000021bbab",
+      "citationCount": 1,
+      "citations": [
+        {
+          "sceneIds": [
+            "scene-p3",
+            "scene-p7"
+          ],
+          "url": "http://www.zhihuishan.com/weixinview-view-6922.html"
+        }
+      ],
+      "classroomId": "stage--qvT2QU0Lj",
+      "fetchedSourceCount": 1,
+      "providerId": "brave",
+      "receiptSha256": "2e7811cd94550fe131850d66c79d43a886ad3aee3fab73ced5b96832bac2cabe",
+      "resultCount": 10,
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_449064b5b188b2000021bbab-attempt-2",
+      "schemaVersion": "mira.openmaic.professional-research-receipt.v1",
+      "searchCount": 2,
+      "searches": [
+        {
+          "query": "小学语文 一年级 单韵母 a o e 口形 发音 教学方法",
+          "resultCount": 5,
+          "searchedAt": "2026-09-09T05:33:21.313Z"
+        },
+        {
+          "query": "单韵母 a o e 发音要领 嘴张大 拢圆 扁平 人教版 一年级上册",
+          "resultCount": 5,
+          "searchedAt": "2026-09-09T05:33:59.931Z"
+        }
+      ],
+      "sessionId": "miraformal_2525b880d6ad1ee0a1af5718c5feb3a8b3cc0afe2a83b2ddb5c70c44168fb2a9",
+      "sources": [
+        {
+          "textSha256": "66693c5eac9886c3fa61771d9c4768c0ceada2e910c0fbdda960de3ae6b14e73",
+          "title": "【知识点归纳--汉语拼音】 - 智慧山",
+          "url": "http://www.zhihuishan.com/weixinview-view-6922.html"
+        }
+      ],
+      "status": "succeeded"
+    },
+    "sceneCount": 7,
+    "sceneTypes": [
+      "interactive",
+      "quiz",
+      "slide"
+    ],
+    "schemaVersion": "mira.openmaic.runtime-features.v2",
+    "sourceCommit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+    "sourceCourseContentSha256": "b863e118676b059005bffa02ae02fbf96a671eb8efbec4dcee762594e933b14b",
+    "sourceVersion": "openmaic@1.0.0",
+    "teacherIdentity": {
+      "agentId": "mira-formal-teacher",
+      "asr": {
+        "fallbackAllowed": false,
+        "modelId": "qwen3-asr-flash",
+        "providerId": "qwen-asr"
+      },
+      "avatarPath": "/teachers/mi-chinese-v1.png",
+      "languageCode": "zh-CN",
+      "runtimeAvatar": "/avatars/teacher-2.png",
+      "schemaVersion": "mira.openmaic.formal-subject-qwen3-voice.v1",
+      "subject": "chinese",
+      "teacherGender": "female",
+      "teacherName": "小语老师",
+      "teacherProfile": {
+        "contentHash": "a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8",
+        "id": "mira_chinese_gentle",
+        "version": 2
+      },
+      "tts": {
+        "fallbackAllowed": false,
+        "modelId": "qwen3-tts-flash",
+        "providerId": "qwen-tts"
+      },
+      "verified": true,
+      "voiceGender": "female",
+      "voiceId": "Serena"
+    },
+    "teachingBriefSha256": "6eddb509d798cc0675a3996dd40caa2244343528283eb775e228d9ad3d886439",
+    "video": {
+      "assets": [],
+      "buildItemId": "catalog_build_item_449064b5b188b2000021bbab",
+      "classroomId": "stage--qvT2QU0Lj",
+      "modelId": "happyhorse-1.0-t2v",
+      "policyId": "mira-formal-happyhorse-video.v1",
+      "providerId": "happyhorse",
+      "receiptSha256": "786157072baa7754f4fd8f7f4a8405ad72fe7685a2350d0e883cb305802df74d",
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_449064b5b188b2000021bbab-attempt-2",
+      "schemaVersion": "mira.openmaic.formal-video-receipt.v1",
+      "sessionId": "miraformal_2525b880d6ad1ee0a1af5718c5feb3a8b3cc0afe2a83b2ddb5c70c44168fb2a9",
+      "status": "succeeded",
+      "videoCount": 0
+    }
+  },
+  "launchUrl": "https://classroom.mira.test/mira/launch?ticket=omt_fixture",
+  "mode": "openmaic_full_runtime",
+  "ok": true
+}

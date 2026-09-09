@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:warm_sight/src/app/router/app_route.dart';
 import 'package:warm_sight/src/core/storage/auth_session_store.dart';
 import 'package:warm_sight/src/core/storage/onboarding_store.dart';
+import 'package:warm_sight/src/core/storage/setup_store.dart';
 import 'package:warm_sight/src/features/setup/application/setup_draft.dart';
 import 'package:warm_sight/src/features/setup/application/setup_repository.dart';
 import 'package:warm_sight/src/shared/widgets/app_background.dart';
@@ -39,12 +40,16 @@ class _StartupGateState extends ConsumerState<StartupGate> {
     }
 
     final sessionStore = ref.read(authSessionStoreProvider);
-    if (!sessionStore.hasUsableSession) {
+    final session = sessionStore.currentSession;
+    if (session == null || !session.canRefresh) {
       if (mounted) context.go(loginPath);
       return;
     }
 
     try {
+      // Existing sessions bypass login, so claim their pending draft before
+      // setup status can route to the child-profile screen.
+      await ref.read(setupStoreProvider).claimPendingOwner(session.userId);
       final setupStatus = await ref.read(setupRepositoryProvider).status();
       if (!mounted) return;
       syncSetupDraftFromStatus(ref, setupStatus);

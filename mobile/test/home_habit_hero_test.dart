@@ -52,4 +52,33 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('孩子正在玩手机'), findsOneWidget);
   });
+
+  testWidgets('home hero keeps a 48px student QR entry discoverable', (
+    tester,
+  ) async {
+    var tapped = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MediaQuery(
+          data: const MediaQueryData(size: Size(390, 844)),
+          child: Scaffold(
+            body: SizedBox(
+              width: 390,
+              height: 360,
+              child: Align(
+                alignment: Alignment.topRight,
+                child: HomeStudentQrButton(onTap: () => tapped = true),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final entry = find.byKey(const ValueKey('homeStudentQrScanButton'));
+    expect(entry, findsOneWidget);
+    expect(tester.getSize(entry), const Size(48, 48));
+    await tester.tap(entry);
+    expect(tapped, isTrue);
+  });
 }

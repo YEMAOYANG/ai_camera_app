@@ -1,0 +1,185 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: openmaic
+      POSTGRES_PASSWORD: ${OPENMAIC_POSTGRES_PASSWORD:?OPENMAIC_POSTGRES_PASSWORD is required}
+      POSTGRES_DB: openmaic
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openmaic -d openmaic"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - openmaic-postgres-data:/var/lib/postgresql/data
+    networks:
+      - runtime
+    restart: unless-stopped
+
+  openmaic:
+    build:
+      context: ${OPENMAIC_SOURCE_DIR:-./.runtime/OpenMAIC}
+      args:
+        ALLOWED_FRAME_ANCESTORS: ${MIRA_STUDENT_WEB_ORIGIN:?MIRA_STUDENT_WEB_ORIGIN must be an HTTPS origin}
+        NEXT_PUBLIC_PRO_WORKBENCH_ENABLED: "true"
+        NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED: "true"
+        NEXT_PUBLIC_MAIC_EDITOR_ENABLED: "true"
+        NEXT_PUBLIC_MAIC_EDITOR_RENDERER_ENABLED: "true"
+        NEXT_PUBLIC_MAIC_PLAYBACK_RENDERER_ENABLED: ${NEXT_PUBLIC_MAIC_PLAYBACK_RENDERER_ENABLED:-true}
+        NEXT_PUBLIC_PI_CHAT_ENABLED: ${NEXT_PUBLIC_PI_CHAT_ENABLED:-true}
+        NEXT_PUBLIC_ENABLE_VIDEO_EXPORT: ${NEXT_PUBLIC_ENABLE_VIDEO_EXPORT:-true}
+        NEXT_PUBLIC_ENABLE_PPTX_IMPORT: "true"
+    environment:
+      DEFAULT_MODEL: deepseek:deepseek-v4-pro
+      OPENMAIC_AGENT_RUNTIME_ENABLED: "true"
+      PERSISTENCE_DEV_TOKEN: ${MIRA_OPENMAIC_PERSISTENCE_DEV_TOKEN:?MIRA_OPENMAIC_PERSISTENCE_DEV_TOKEN is required for private authoring}
+      DATABASE_URL: "postgresql://openmaic:${OPENMAIC_POSTGRES_PASSWORD:?OPENMAIC_POSTGRES_PASSWORD is required}@postgres:5432/openmaic"
+      MODEL_ROUTES: '{"maic-agent-driver":{"model":"deepseek:deepseek-v4-pro","api":"openai-completions","thinking":{"mode":"enabled","enabled":true}},"generate-classroom":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-creator":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-verifier":{"model":"deepseek:deepseek-v4-flash","thinking":{"mode":"disabled","enabled":false}},"web-search-query-rewrite":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}}}'
+      MIRA_OPENMAIC_ENABLE_WEB_SEARCH: "1"
+      MIRA_OPENMAIC_WEB_SEARCH_PROVIDER: brave
+      BRAVE_BASE_URL: https://search.brave.com
+      BRAVE_ENABLED: "true"
+      MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY: deepseek-v4-pro-flash-v1
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com/v1}
+      DEEPSEEK_MODELS: ${DEEPSEEK_MODELS:-deepseek-v4-pro,deepseek-v4-flash}
+      TTS_QWEN_API_KEY: ${TTS_QWEN_API_KEY:-}
+      TTS_QWEN_BASE_URL: ${TTS_QWEN_BASE_URL:-}
+      TTS_QWEN_MODELS: qwen3-tts-flash
+      # The public opt-in and the patched runtime's strict policy are one
+      # switch. When enabled, missing Qwen credentials make /api/health fail.
+      MIRA_OPENMAIC_REQUIRE_QWEN_TTS: ${MIRA_OPENMAIC_ENABLE_QWEN_TTS:-0}
+      MIRA_OPENMAIC_QWEN_TTS_MODEL: qwen3-tts-flash
+      MIRA_OPENMAIC_QWEN_TTS_VOICE: Serena
+      ASR_QWEN_API_KEY: ${ASR_QWEN_API_KEY:-}
+      ASR_QWEN_BASE_URL: ${ASR_QWEN_BASE_URL:-}
+      ASR_QWEN_MODELS: ${ASR_QWEN_MODELS:-qwen3-asr-flash}
+      MIRA_OPENMAIC_REQUIRE_QWEN_ASR: ${MIRA_OPENMAIC_ENABLE_QWEN_ASR:-0}
+      MIRA_OPENMAIC_QWEN_ASR_MODEL: qwen3-asr-flash
+      MIRA_INTERNAL_API_TOKEN: ${MIRA_INTERNAL_API_TOKEN:?MIRA_INTERNAL_API_TOKEN is required}
+      TTS_VOXCPM_BASE_URL: ${TTS_VOXCPM_BASE_URL:-}
+      MIRA_VOXCPM_VOICE_PROMPT: ${MIRA_VOXCPM_VOICE_PROMPT:-warm patient primary school teacher, clear standard pronunciation, medium pace}
+      ALLOW_LOCAL_NETWORKS: ${ALLOW_LOCAL_NETWORKS:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      RENDER_SERVICE_URL: http://render-service:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "3000"
+    ports:
+      - "127.0.0.1:${OPENMAIC_ADMIN_PORT:-3100}:3000"
+    volumes:
+      - openmaic-data:/app/data
+    networks:
+      - runtime
+      - render
+      - egress
+    restart: unless-stopped
+
+  backend:
+    image: mira-backend:local
+    build:
+      context: ../backend
+    depends_on:
+      - openmaic
+    env_file:
+      - ${MIRA_BACKEND_ENV_FILE:?MIRA_BACKEND_ENV_FILE must point to a production env file}
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "0"
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      MIRA_PROCESS_ROLE: api
+      MIRA_BACKEND_BIND: 0.0.0.0:8000
+      OPENMAIC_FULL_RUNTIME_INTERNAL_URL: http://openmaic:3000
+      OPENMAIC_FULL_RUNTIME_PUBLIC_URL: ${MIRA_RUNTIME_PUBLIC_ORIGIN:?MIRA_RUNTIME_PUBLIC_ORIGIN must be an HTTPS origin}
+      INTERNAL_API_TOKEN: ${MIRA_INTERNAL_API_TOKEN:?MIRA_INTERNAL_API_TOKEN is required}
+    expose:
+      - "8000"
+    ports:
+      - "127.0.0.1:${MIRA_BACKEND_PORT:-8000}:8000"
+    volumes:
+      - backend-learning-media:/app/data/learning-media
+    networks:
+      - runtime
+      - egress
+    restart: unless-stopped
+
+  curriculum-worker:
+    image: mira-backend:local
+    build:
+      context: ../backend
+    command: ["python", "-m", "workers.learning_curriculum_preparation_worker"]
+    depends_on:
+      - openmaic
+    env_file:
+      - ${MIRA_BACKEND_ENV_FILE:?MIRA_BACKEND_ENV_FILE must point to a production env file}
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "0"
+      MIRA_PROCESS_ROLE: curriculum-worker
+      OPENMAIC_FULL_RUNTIME_INTERNAL_URL: http://openmaic:3000
+      OPENMAIC_FULL_RUNTIME_PUBLIC_URL: ${MIRA_RUNTIME_PUBLIC_ORIGIN:?MIRA_RUNTIME_PUBLIC_ORIGIN must be an HTTPS origin}
+      INTERNAL_API_TOKEN: ${MIRA_INTERNAL_API_TOKEN:?MIRA_INTERNAL_API_TOKEN is required}
+    volumes:
+      - backend-learning-media:/app/data/learning-media
+    networks:
+      - runtime
+      - egress
+    restart: unless-stopped
+    stop_grace_period: 240s
+
+  gateway:
+    build: ./gateway
+    depends_on:
+      - openmaic
+      - backend
+    environment:
+      PORT: 3101
+      OPENMAIC_UPSTREAM_URL: http://openmaic:3000
+      MIRA_BACKEND_INTERNAL_URL: http://backend:8000
+      MIRA_RUNTIME_PUBLIC_ORIGIN: ${MIRA_RUNTIME_PUBLIC_ORIGIN:?MIRA_RUNTIME_PUBLIC_ORIGIN must be an HTTPS origin}
+      MIRA_STUDENT_WEB_ORIGIN: ${MIRA_STUDENT_WEB_ORIGIN:?MIRA_STUDENT_WEB_ORIGIN must be an HTTPS origin}
+      MIRA_INTERNAL_API_TOKEN: ${MIRA_INTERNAL_API_TOKEN:?MIRA_INTERNAL_API_TOKEN is required}
+    ports:
+      - "127.0.0.1:${MIRA_RUNTIME_PORT:-3101}:3101"
+    networks:
+      - runtime
+    restart: unless-stopped
+
+  render-service:
+    build: ${OPENMAIC_SOURCE_DIR:-./.runtime/OpenMAIC}/render-service
+    profiles:
+      - video-export
+    cap_add:
+      - NET_ADMIN
+    environment:
+      PORT: 9000
+      RENDER_RESOURCE_PROFILE: ${RENDER_RESOURCE_PROFILE:-standard}
+      PRODUCER_HEADLESS_SHELL_PATH: /usr/bin/chromium-headless-shell
+      RENDER_MAX_CONCURRENCY: 1
+      RENDER_MAX_CONCURRENT_EXTRACTIONS: 1
+      PRODUCER_PUPPETEER_PROTOCOL_TIMEOUT_MS: 900000
+      HF_STATIC_DEDUP: "false"
+      RENDER_MAX_JOBS_PER_USER: 0
+    expose:
+      - "9000"
+    mem_limit: ${RENDER_SERVICE_MEMORY_LIMIT:-10g}
+    shm_size: 2gb
+    networks:
+      - render
+    restart: unless-stopped
+
+networks:
+  runtime:
+    internal: true
+  render:
+    internal: true
+  egress:
+    driver: bridge
+
+volumes:
+  openmaic-data:
+  openmaic-postgres-data:
+  backend-learning-media:

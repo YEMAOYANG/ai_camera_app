@@ -1,0 +1,1770 @@
+diff --git a/app/api/generate-classroom/[jobId]/formal-citation-recovery/route.ts b/app/api/generate-classroom/[jobId]/formal-citation-recovery/route.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d684fec8fccc28f299fabe2857f4d95599a7145d
+--- /dev/null
++++ b/app/api/generate-classroom/[jobId]/formal-citation-recovery/route.ts
+@@ -0,0 +1,144 @@
++import { after, type NextRequest, NextResponse } from 'next/server';
++
++import { createLogger } from '@/lib/logger';
++import { buildRequestOrigin } from '@/lib/server/classroom-storage';
++import {
++  claimMiraFormalCitationRecovery,
++  getMiraFormalCitationRecoveryRuntimePolicy,
++  MIRA_FORMAL_CITATION_RECOVERY_FIXED_SOURCE_JOB_ID,
++  MIRA_FORMAL_CITATION_RECOVERY_SOURCE_ERROR,
++  MiraFormalCitationRecoveryError,
++  publicMiraFormalCitationRecoveryPayload,
++  readMiraFormalCitationRecovery,
++  runMiraFormalCitationRecovery,
++  type MiraFormalCitationRecoveryExpectedSource,
++  type MiraFormalCitationRecoveryRecord,
++} from '@/lib/server/mira-formal-citation-recovery';
++import {
++  authorizeMiraInternalLoopbackRequest,
++  MiraInternalLoopbackAuthError,
++} from '@/lib/server/mira-internal-loopback-auth';
++
++export const dynamic = 'force-dynamic';
++export const maxDuration = 3600;
++
++const log = createLogger('FormalCitationRecovery API');
++
++function json(payload: unknown, status = 200): NextResponse {
++  return NextResponse.json(payload, { status });
++}
++
++function error(code: string, message: string, status: number): NextResponse {
++  return json({ code, message }, status);
++}
++
++function authorize(req: NextRequest, sourceJobId: string): NextResponse | null {
++  try {
++    const policy = getMiraFormalCitationRecoveryRuntimePolicy();
++    if (
++      !policy.enabled ||
++      sourceJobId !== MIRA_FORMAL_CITATION_RECOVERY_FIXED_SOURCE_JOB_ID ||
++      sourceJobId !== policy.sourceJobId
++    ) {
++      return error('NOT_FOUND', 'Formal citation recovery source not found', 404);
++    }
++    authorizeMiraInternalLoopbackRequest(req);
++    return null;
++  } catch (caught) {
++    if (caught instanceof MiraInternalLoopbackAuthError) {
++      return error('INVALID_CREDENTIALS', 'Invalid formal citation recovery credentials', 403);
++    }
++    log.error('Formal citation recovery policy is unavailable:', caught);
++    return error('PROVIDER_DISABLED', 'Formal citation recovery policy is unavailable', 503);
++  }
++}
++
++function responseStatus(record: MiraFormalCitationRecoveryRecord): number {
++  return record.status === 'queued' || record.status === 'running' ? 202 : 200;
++}
++
++function scheduleRecovery(req: NextRequest, record: MiraFormalCitationRecoveryRecord): void {
++  if (
++    record.status === 'queued' ||
++    (record.status === 'running' && record.step === 'publishing' && record.pendingTerminalSuccess)
++  ) {
++    const baseUrl = buildRequestOrigin(req);
++    after(() => runMiraFormalCitationRecovery(record.source.jobId, baseUrl));
++  }
++}
++
++function parseRequestBody(value: unknown): {
++  recoveryRequestId: string;
++  expectedSource: MiraFormalCitationRecoveryExpectedSource;
++} | null {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
++  const body = value as Record<string, unknown>;
++  if (Object.keys(body).sort().join(',') !== 'expectedSource,recoveryRequestId') return null;
++  const rawExpected = body.expectedSource;
++  if (!rawExpected || typeof rawExpected !== 'object' || Array.isArray(rawExpected)) return null;
++  if (
++    Object.keys(rawExpected).sort().join(',') !== 'error,formalInputSha256,runtimeRequestId,status'
++  ) {
++    return null;
++  }
++  const expected = rawExpected as Record<string, unknown>;
++  if (
++    typeof body.recoveryRequestId !== 'string' ||
++    typeof expected.runtimeRequestId !== 'string' ||
++    typeof expected.formalInputSha256 !== 'string' ||
++    expected.status !== 'failed' ||
++    expected.error !== MIRA_FORMAL_CITATION_RECOVERY_SOURCE_ERROR
++  ) {
++    return null;
++  }
++  return {
++    recoveryRequestId: body.recoveryRequestId,
++    expectedSource: {
++      status: 'failed',
++      error: MIRA_FORMAL_CITATION_RECOVERY_SOURCE_ERROR,
++      runtimeRequestId: expected.runtimeRequestId,
++      formalInputSha256: expected.formalInputSha256,
++    },
++  };
++}
++
++export async function POST(req: NextRequest, context: { params: Promise<{ jobId: string }> }) {
++  const { jobId } = await context.params;
++  const denied = authorize(req, jobId);
++  if (denied) return denied;
++  try {
++    const parsed = parseRequestBody(await req.json());
++    if (!parsed) {
++      return error('INVALID_REQUEST', 'Invalid formal citation recovery request contract', 400);
++    }
++    const { record } = await claimMiraFormalCitationRecovery({
++      sourceJobId: jobId,
++      recoveryRequestId: parsed.recoveryRequestId,
++      expectedSource: parsed.expectedSource,
++    });
++    scheduleRecovery(req, record);
++    return json(publicMiraFormalCitationRecoveryPayload(record), responseStatus(record));
++  } catch (caught) {
++    if (caught instanceof MiraFormalCitationRecoveryError) {
++      const status = caught.code === 'recovery_already_claimed' ? 409 : 400;
++      return error('INVALID_REQUEST', caught.message, status);
++    }
++    log.error('Failed to claim formal citation recovery:', caught);
++    return error('INTERNAL_ERROR', 'Failed to claim formal citation recovery', 500);
++  }
++}
++
++export async function GET(req: NextRequest, context: { params: Promise<{ jobId: string }> }) {
++  const { jobId } = await context.params;
++  const denied = authorize(req, jobId);
++  if (denied) return denied;
++  try {
++    const record = await readMiraFormalCitationRecovery(jobId);
++    if (!record) return error('NOT_FOUND', 'Formal citation recovery not found', 404);
++    scheduleRecovery(req, record);
++    return json(publicMiraFormalCitationRecoveryPayload(record), responseStatus(record));
++  } catch (caught) {
++    log.error('Failed to read formal citation recovery:', caught);
++    return error('INTERNAL_ERROR', 'Failed to read formal citation recovery', 500);
++  }
++}
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index ad0a4f7acd42aed5383efd370beb90112cbd36f7..088c469a483d20095e33448aeeb22842f265171e 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -15,6 +15,7 @@ import {
+ } from '@/lib/server/model-routes';
+ import { getMiraSampleDeterministicRecoveryRuntimePolicy } from '@/lib/server/mira-sample-deterministic-recovery';
+ import { getMiraSampleTtsCredentialRecoveryRuntimePolicy } from '@/lib/server/mira-sample-tts-credential-recovery';
++import { getMiraFormalCitationRecoveryRuntimePolicy } from '@/lib/server/mira-formal-citation-recovery';
+ import { getMiraStudentChromeRuntimePolicy } from '@/lib/mira/student-runtime';
+ import { getMiraFormalGenerationRuntimePolicy } from '@/lib/server/mira-formal-generation-policy';
+ import { getMiraInstrumentationBoundaryPolicy } from '@/lib/server/mira-instrumentation-policy';
+@@ -124,6 +125,7 @@ export async function GET(req: NextRequest) {
+   let structuredScenePolicy;
+   let deterministicRecoveryPolicy;
+   let ttsCredentialRecoveryPolicy;
++  let formalCitationRecoveryPolicy;
+   let studentChromePolicy;
+   let formalGenerationPolicy;
+   let instrumentationBoundaryPolicy;
+@@ -136,6 +138,7 @@ export async function GET(req: NextRequest) {
+     structuredScenePolicy = getMiraStructuredSceneRuntimePolicy();
+     deterministicRecoveryPolicy = getMiraSampleDeterministicRecoveryRuntimePolicy();
+     ttsCredentialRecoveryPolicy = getMiraSampleTtsCredentialRecoveryRuntimePolicy();
++    formalCitationRecoveryPolicy = getMiraFormalCitationRecoveryRuntimePolicy();
+     studentChromePolicy = getMiraStudentChromeRuntimePolicy();
+     formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
+     instrumentationBoundaryPolicy = getMiraInstrumentationBoundaryPolicy();
+@@ -165,6 +168,7 @@ export async function GET(req: NextRequest) {
+       structuredScene: structuredScenePolicy,
+       deterministicRecovery: deterministicRecoveryPolicy,
+       ttsCredentialRecovery: ttsCredentialRecoveryPolicy,
++      formalCitationRecovery: formalCitationRecoveryPolicy,
+       studentChrome: studentChromePolicy,
+       formalGeneration: formalGenerationPolicy,
+       instrumentationBoundary: instrumentationBoundaryPolicy,
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+index 676c436cbeab0f02df0d6cc2d7597960e07606e4..71d8825df4170b423898131604dbe9fe547c98a3 100644
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -54,6 +54,14 @@ export interface ClassroomGenerationJob {
+     professionalCreation?: MiraFormalProfessionalCreationReceipt;
+     research?: MiraFormalResearchReceipt;
+   };
++  formalCitationRecovery?: {
++    originalStatus: 'failed';
++    originalError: 'FORMAL_PROFESSIONAL_RESEARCH_CITATION_MISSING';
++    originalCompletedAt: string;
++    jobSnapshotSha256: string;
++    recoveryId: string;
++    receiptSha256: string;
++  };
+   error?: string;
+ }
+ 
+@@ -87,7 +95,11 @@ function canonical(value: unknown): unknown {
+   return value;
+ }
+ 
+-function sha256(value: string): string {
++function canonicalJson(value: unknown): string {
++  return JSON.stringify(canonical(value));
++}
++
++function sha256(value: string | Uint8Array): string {
+   return createHash('sha256').update(value).digest('hex');
+ }
+ 
+@@ -404,3 +416,89 @@ export async function markClassroomGenerationJobFailed(
+     error,
+   });
+ }
++
++/**
++ * Atomically promote the one exact citation-recovery source job. The original
++ * terminal bytes are the compare token; no ordinary generation transition is
++ * reused, and a repeated call is accepted only when the same recovery receipt
++ * is already present.
++ */
++export async function promoteFailedFormalClassroomGenerationJobFromCitationRecovery(input: {
++  jobId: string;
++  expected: {
++    error: 'FORMAL_PROFESSIONAL_RESEARCH_CITATION_MISSING';
++    formalInputSha256: string;
++    completedAt: string;
++    jobSnapshotSha256: string;
++  };
++  recovery: {
++    recoveryId: string;
++    receiptSha256: string;
++  };
++  result: NonNullable<ClassroomGenerationJob['result']>;
++}): Promise<{ job: ClassroomGenerationJob; applied: boolean }> {
++  if (
++    !isValidClassroomJobId(input.jobId) ||
++    input.expected.error !== 'FORMAL_PROFESSIONAL_RESEARCH_CITATION_MISSING' ||
++    !/^[a-f0-9]{64}$/u.test(input.expected.formalInputSha256) ||
++    !/^[a-f0-9]{64}$/u.test(input.expected.jobSnapshotSha256) ||
++    !/^[a-f0-9]{64}$/u.test(input.recovery.receiptSha256) ||
++    !/^[A-Za-z0-9_-]+$/u.test(input.recovery.recoveryId)
++  ) {
++    throw new Error('FORMAL_CITATION_RECOVERY_PROMOTION_INVALID');
++  }
++  return withJobLock(input.jobId, async () => {
++    const raw = await fs.readFile(jobFilePath(input.jobId));
++    const existing = JSON.parse(raw.toString('utf8')) as ClassroomGenerationJob;
++    const audit = existing.formalCitationRecovery;
++    if (existing.status === 'succeeded') {
++      if (
++        existing.formalInputSha256 === input.expected.formalInputSha256 &&
++        audit?.originalStatus === 'failed' &&
++        audit.originalError === input.expected.error &&
++        audit.originalCompletedAt === input.expected.completedAt &&
++        audit.jobSnapshotSha256 === input.expected.jobSnapshotSha256 &&
++        audit.recoveryId === input.recovery.recoveryId &&
++        audit.receiptSha256 === input.recovery.receiptSha256 &&
++        canonicalJson(existing.result) === canonicalJson(input.result)
++      ) {
++        return { job: existing, applied: false };
++      }
++      throw new Error('FORMAL_CITATION_RECOVERY_PROMOTION_CONFLICT');
++    }
++    if (
++      existing.status !== 'failed' ||
++      existing.error !== input.expected.error ||
++      existing.formalInputSha256 !== input.expected.formalInputSha256 ||
++      existing.completedAt !== input.expected.completedAt ||
++      sha256(raw) !== input.expected.jobSnapshotSha256 ||
++      existing.formalCitationRecovery !== undefined
++    ) {
++      throw new Error('FORMAL_CITATION_RECOVERY_SOURCE_MISMATCH');
++    }
++    const completedAt = new Date().toISOString();
++    const updated: ClassroomGenerationJob = {
++      ...existing,
++      status: 'succeeded',
++      step: 'completed',
++      progress: 100,
++      message: 'Classroom generation completed through formal citation recovery',
++      updatedAt: completedAt,
++      completedAt,
++      scenesGenerated: input.result.scenesCount,
++      totalScenes: input.result.scenesCount,
++      result: input.result,
++      formalCitationRecovery: {
++        originalStatus: 'failed',
++        originalError: input.expected.error,
++        originalCompletedAt: input.expected.completedAt,
++        jobSnapshotSha256: input.expected.jobSnapshotSha256,
++        recoveryId: input.recovery.recoveryId,
++        receiptSha256: input.recovery.receiptSha256,
++      },
++      error: undefined,
++    };
++    await writeJsonFileAtomic(jobFilePath(input.jobId), updated);
++    return { job: updated, applied: true };
++  });
++}
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+index 5a80809add9d95baa5a0a0d9ae8dcd2af291212c..1c09682c9da7d312ffcff0d076278a7df076d553 100644
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -1,9 +1,14 @@
+-import { createHash, timingSafeEqual } from 'crypto';
++import { createHash } from 'crypto';
+ import { lookup } from 'dns/promises';
+ import { promises as fs } from 'fs';
+ import { isIP } from 'net';
+ import path from 'path';
+ import type { NextRequest } from 'next/server';
++
++import {
++  authorizeMiraInternalLoopbackRequest,
++  MiraInternalLoopbackAuthError,
++} from '@/lib/server/mira-internal-loopback-auth';
+ import {
+   getServerASRProviders,
+   getServerTTSProviders,
+@@ -1095,71 +1100,13 @@ export function assertMiraFormalAudioProviderReady(): void {
+   providerEndpoint(resolveASRBaseUrl('qwen-asr'));
+ }
+ 
+-function secureEqual(left: string, right: string): boolean {
+-  const leftDigest = createHash('sha256').update(left).digest();
+-  const rightDigest = createHash('sha256').update(right).digest();
+-  return timingSafeEqual(leftDigest, rightDigest);
+-}
+-
+-const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
+-
+-function normalizedLoopbackHostname(value: string): string | null {
+-  const hostname = value.replace(/^\[|\]$/gu, '').toLowerCase();
+-  return LOOPBACK_HOSTNAMES.has(hostname) ? 'loopback' : null;
+-}
+-
+-function singleHeader(req: NextRequest, name: string): string | null {
+-  const value = req.headers.get(name);
+-  if (
+-    value === null ||
+-    value.length === 0 ||
+-    value !== value.trim() ||
+-    value.includes(',') ||
+-    /[%\s]/u.test(value)
+-  ) {
+-    return null;
+-  }
+-  return value;
+-}
+-
+-function isExactLoopbackAuthority(value: string | null, expectedPort: string): boolean {
+-  if (!value) return false;
+-  try {
+-    const parsed = new URL(`http://${value}`);
+-    return Boolean(
+-      !parsed.username &&
+-      !parsed.password &&
+-      parsed.pathname === '/' &&
+-      !parsed.search &&
+-      !parsed.hash &&
+-      parsed.port === expectedPort &&
+-      normalizedLoopbackHostname(parsed.hostname),
+-    );
+-  } catch {
+-    return false;
+-  }
+-}
+-
+ export function authorizeMiraFormalAudioRequest(req: NextRequest): void {
+-  const expectedPort = process.env.MIRA_OPENMAIC_PRIVATE_PORT || '3100';
+-  if (
+-    req.headers.has('forwarded') ||
+-    req.headers.has('x-real-ip') ||
+-    req.headers.has('via') ||
+-    req.nextUrl.protocol !== 'http:' ||
+-    req.nextUrl.port !== expectedPort ||
+-    !normalizedLoopbackHostname(req.nextUrl.hostname) ||
+-    !isExactLoopbackAuthority(singleHeader(req, 'host'), expectedPort) ||
+-    !isExactLoopbackAuthority(singleHeader(req, 'x-forwarded-host'), expectedPort) ||
+-    !normalizedLoopbackHostname(singleHeader(req, 'x-forwarded-for') || '') ||
+-    singleHeader(req, 'x-forwarded-proto') !== 'http' ||
+-    singleHeader(req, 'x-forwarded-port') !== expectedPort
+-  ) {
+-    throw new MiraFormalAudioError('unauthorized', 'Formal audio requires direct loopback access');
+-  }
+-  const expectedToken = process.env.MIRA_INTERNAL_API_TOKEN || '';
+-  const suppliedToken = req.headers.get('x-mira-internal-token') || '';
+-  if (!expectedToken || !suppliedToken || !secureEqual(expectedToken, suppliedToken)) {
+-    throw new MiraFormalAudioError('unauthorized', 'Invalid formal audio credentials');
++  try {
++    authorizeMiraInternalLoopbackRequest(req);
++  } catch (error) {
++    if (error instanceof MiraInternalLoopbackAuthError) {
++      throw new MiraFormalAudioError('unauthorized', error.message);
++    }
++    throw error;
+   }
+ }
+diff --git a/lib/server/mira-formal-citation-recovery.ts b/lib/server/mira-formal-citation-recovery.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..c40d35609b7fb2dc1040f9755cfa9fd6662fb654
+--- /dev/null
++++ b/lib/server/mira-formal-citation-recovery.ts
+@@ -0,0 +1,766 @@
++import { createHash } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++
++import { createLogger } from '@/lib/logger';
++import type { GenerateClassroomInput } from '@/lib/server/classroom-generation';
++import { CLASSROOM_JOBS_DIR, writeJsonFileAtomic } from '@/lib/server/classroom-storage';
++import {
++  promoteFailedFormalClassroomGenerationJobFromCitationRecovery,
++  type ClassroomGenerationJob,
++} from '@/lib/server/classroom-job-store';
++import {
++  recoverMiraFormalProfessionalClassroomFromSucceededSession,
++  resolveMiraFormalProfessionalSucceededSession,
++} from '@/lib/server/mira-formal-professional-classroom';
++
++export const MIRA_FORMAL_CITATION_RECOVERY_SCHEMA =
++  'mira.openmaic.formal-citation-recovery.v1' as const;
++export const MIRA_FORMAL_CITATION_RECOVERY_KIND = 'formal_citation_recovery' as const;
++export const MIRA_FORMAL_CITATION_RECOVERY_POLICY_VERSION =
++  'mira-formal-citation-recovery.v1' as const;
++export const MIRA_FORMAL_CITATION_REPAIR_POLICY_VERSION =
++  'mira-formal-citation-footer-canonicalize.v1' as const;
++export const MIRA_FORMAL_CITATION_RECOVERY_SOURCE_ERROR =
++  'FORMAL_PROFESSIONAL_RESEARCH_CITATION_MISSING' as const;
++export const MIRA_FORMAL_CITATION_RECOVERY_FIXED_SOURCE_JOB_ID =
++  'omformal_e6b6986c631a548c9756037e' as const;
++
++const FORMAL_CITATION_RECOVERIES_DIR = path.join(
++  process.cwd(),
++  'data',
++  'formal-citation-recoveries',
++);
++const FILE_LOCK_RETRY_MS = 10;
++const FILE_LOCK_MAX_ATTEMPTS = 500;
++const FILE_LOCK_STALE_MS = 60_000;
++const log = createLogger('MiraFormalCitationRecovery');
++
++export type MiraFormalCitationRecoveryStatus = 'queued' | 'running' | 'succeeded' | 'failed';
++
++export interface MiraFormalCitationRecoveryExpectedSource {
++  status: 'failed';
++  error: typeof MIRA_FORMAL_CITATION_RECOVERY_SOURCE_ERROR;
++  runtimeRequestId: string;
++  formalInputSha256: string;
++}
++
++export interface MiraFormalCitationRecoverySource {
++  jobId: string;
++  runtimeRequestId: string;
++  status: 'failed';
++  error: typeof MIRA_FORMAL_CITATION_RECOVERY_SOURCE_ERROR;
++  formalInputSha256: string;
++  completedAt: string;
++  jobSnapshotSha256: string;
++}
++
++export interface MiraFormalCitationRecoveryRepair {
++  policyVersion: typeof MIRA_FORMAL_CITATION_REPAIR_POLICY_VERSION;
++  sourceUrls: string[];
++  repairedSceneIds: string[];
++  beforeScenesSha256: string;
++  afterScenesSha256: string;
++  repairSha256: string;
++}
++
++export interface MiraFormalCitationRecoveryResult {
++  classroomId: string;
++  url: string;
++  scenesCount: number;
++  speechActionCount: number;
++  formalAudio: NonNullable<NonNullable<ClassroomGenerationJob['result']>['formalAudio']>;
++  professionalCreation: NonNullable<
++    NonNullable<ClassroomGenerationJob['result']>['professionalCreation']
++  >;
++  research: NonNullable<NonNullable<ClassroomGenerationJob['result']>['research']>;
++  createdAt: string;
++}
++
++interface PendingTerminalSuccess {
++  completedAt: string;
++  updatedAt: string;
++  repair: MiraFormalCitationRecoveryRepair;
++  result: MiraFormalCitationRecoveryResult;
++  receiptSha256: string;
++}
++
++export interface MiraFormalCitationRecoveryRecord {
++  schemaVersion: typeof MIRA_FORMAL_CITATION_RECOVERY_SCHEMA;
++  kind: typeof MIRA_FORMAL_CITATION_RECOVERY_KIND;
++  recoveryId: string;
++  recoveryRequestId: string;
++  source: MiraFormalCitationRecoverySource;
++  calls: {
++    llm: 0;
++    webSearch: 0;
++    fetchUrl: 0;
++    imageGeneration: 0;
++    videoGeneration: 0;
++  };
++  policy: {
++    version: typeof MIRA_FORMAL_CITATION_RECOVERY_POLICY_VERSION;
++    patchSha256: string;
++  };
++  sessionId: string;
++  stageId: string;
++  status: MiraFormalCitationRecoveryStatus;
++  step: string;
++  progress: number;
++  message: string;
++  repair: MiraFormalCitationRecoveryRepair | null;
++  result: MiraFormalCitationRecoveryResult | null;
++  createdAt: string;
++  updatedAt: string;
++  startedAt?: string;
++  completedAt?: string;
++  error?: { code: string; message: string };
++  receiptSha256?: string;
++  pendingTerminalSuccess?: PendingTerminalSuccess;
++}
++
++export interface MiraFormalCitationRecoveryPublicPayload {
++  schemaVersion: typeof MIRA_FORMAL_CITATION_RECOVERY_SCHEMA;
++  kind: typeof MIRA_FORMAL_CITATION_RECOVERY_KIND;
++  recoveryId: string;
++  source: MiraFormalCitationRecoverySource;
++  status: MiraFormalCitationRecoveryStatus;
++  step: string;
++  progress: number;
++  message: string;
++  calls: MiraFormalCitationRecoveryRecord['calls'];
++  repair: MiraFormalCitationRecoveryRepair | null;
++  result: MiraFormalCitationRecoveryResult | null;
++  createdAt: string;
++  updatedAt: string;
++  startedAt?: string;
++  completedAt?: string;
++  error?: { code: string; message: string };
++  receiptSha256?: string;
++  pollUrl: string;
++  done: boolean;
++}
++
++export class MiraFormalCitationRecoveryError extends Error {
++  constructor(
++    public readonly code:
++      | 'invalid_recovery_request'
++      | 'recovery_source_mismatch'
++      | 'recovery_already_claimed'
++      | 'recovery_not_found',
++    message: string,
++  ) {
++    super(message);
++    this.name = 'MiraFormalCitationRecoveryError';
++  }
++}
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value as Record<string, unknown>)
++        .filter(([, item]) => item !== undefined)
++        .sort(([left], [right]) => left.localeCompare(right))
++        .map(([key, item]) => [key, canonical(item)]),
++    );
++  }
++  return value;
++}
++
++function canonicalJson(value: unknown): string {
++  return JSON.stringify(canonical(value));
++}
++
++function sha256(value: string | Uint8Array): string {
++  return createHash('sha256').update(value).digest('hex');
++}
++
++function canonicalSha256(value: unknown): string {
++  return sha256(canonicalJson(value));
++}
++
++function validIdentifier(value: string): boolean {
++  return /^[A-Za-z0-9._:-]{8,128}$/u.test(value);
++}
++
++function validSha256(value: string): boolean {
++  return /^[0-9a-f]{64}$/u.test(value);
++}
++
++function recoveryPath(sourceJobId: string): string {
++  return path.join(FORMAL_CITATION_RECOVERIES_DIR, `${sourceJobId}.json`);
++}
++
++function lockPath(sourceJobId: string): string {
++  return path.join(FORMAL_CITATION_RECOVERIES_DIR, `.${sourceJobId}.lock`);
++}
++
++function sourceJobPath(sourceJobId: string): string {
++  return path.join(CLASSROOM_JOBS_DIR, `${sourceJobId}.json`);
++}
++
++function pollPath(sourceJobId: string): string {
++  return `/api/generate-classroom/${sourceJobId}/formal-citation-recovery`;
++}
++
++const inProcessLocks = new Map<string, Promise<void>>();
++
++async function waitForLock(): Promise<void> {
++  await new Promise<void>((resolve) => setTimeout(resolve, FILE_LOCK_RETRY_MS));
++}
++
++async function withFileLock<T>(sourceJobId: string, fn: () => Promise<T>): Promise<T> {
++  await fs.mkdir(FORMAL_CITATION_RECOVERIES_DIR, { recursive: true });
++  const filePath = lockPath(sourceJobId);
++  let handle: Awaited<ReturnType<typeof fs.open>> | null = null;
++  for (let attempt = 0; attempt < FILE_LOCK_MAX_ATTEMPTS; attempt += 1) {
++    try {
++      handle = await fs.open(filePath, 'wx');
++      break;
++    } catch (error) {
++      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
++      try {
++        const stat = await fs.stat(filePath);
++        if (Date.now() - stat.mtimeMs > FILE_LOCK_STALE_MS) {
++          await fs.unlink(filePath);
++          continue;
++        }
++      } catch (statError) {
++        if ((statError as NodeJS.ErrnoException).code === 'ENOENT') continue;
++        throw statError;
++      }
++      await waitForLock();
++    }
++  }
++  if (!handle) throw new Error('FORMAL_CITATION_RECOVERY_LOCK_TIMEOUT');
++  try {
++    return await fn();
++  } finally {
++    await handle.close();
++    await fs.unlink(filePath).catch((error: NodeJS.ErrnoException) => {
++      if (error.code !== 'ENOENT') throw error;
++    });
++  }
++}
++
++async function withRecoveryLock<T>(sourceJobId: string, fn: () => Promise<T>): Promise<T> {
++  const previous = inProcessLocks.get(sourceJobId) ?? Promise.resolve();
++  let release: () => void;
++  const next = new Promise<void>((resolve) => {
++    release = resolve;
++  });
++  inProcessLocks.set(sourceJobId, next);
++  try {
++    await previous;
++    return await withFileLock(sourceJobId, fn);
++  } finally {
++    release!();
++    if (inProcessLocks.get(sourceJobId) === next) inProcessLocks.delete(sourceJobId);
++  }
++}
++
++async function readExisting(sourceJobId: string): Promise<MiraFormalCitationRecoveryRecord | null> {
++  try {
++    return JSON.parse(
++      await fs.readFile(recoveryPath(sourceJobId), 'utf8'),
++    ) as MiraFormalCitationRecoveryRecord;
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
++    throw error;
++  }
++}
++
++async function writeRecord(record: MiraFormalCitationRecoveryRecord): Promise<void> {
++  await writeJsonFileAtomic(recoveryPath(record.source.jobId), record);
++}
++
++function exactFailedSource(
++  value: unknown,
++  sourceJobId: string,
++  expected: MiraFormalCitationRecoveryExpectedSource,
++): value is ClassroomGenerationJob & {
++  runtimeRequestId: string;
++  formalInputSha256: string;
++  formalInput: GenerateClassroomInput;
++  completedAt: string;
++} {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
++  const job = value as ClassroomGenerationJob;
++  return Boolean(
++    job.id === sourceJobId &&
++    job.status === expected.status &&
++    job.error === expected.error &&
++    job.runtimeRequestId === expected.runtimeRequestId &&
++    job.formalInputSha256 === expected.formalInputSha256 &&
++    job.formalInput &&
++    canonicalSha256(job.formalInput) === expected.formalInputSha256 &&
++    typeof job.completedAt === 'string' &&
++    job.completedAt.length > 0 &&
++    job.formalCitationRecovery === undefined,
++  );
++}
++
++export function getMiraFormalCitationRecoveryRuntimePolicy(): {
++  enabled: boolean;
++  sourceJobId: string;
++  policyVersion: typeof MIRA_FORMAL_CITATION_RECOVERY_POLICY_VERSION;
++  patchSha256: string;
++} {
++  const enabled = process.env.MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_ENABLED === '1';
++  const sourceJobId = process.env.MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID || '';
++  const patchSha256 = process.env.MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256 || '';
++  if (
++    enabled &&
++    (sourceJobId !== MIRA_FORMAL_CITATION_RECOVERY_FIXED_SOURCE_JOB_ID || !validSha256(patchSha256))
++  ) {
++    throw new Error('Mira formal citation recovery policy is invalid');
++  }
++  return {
++    enabled,
++    sourceJobId,
++    policyVersion: MIRA_FORMAL_CITATION_RECOVERY_POLICY_VERSION,
++    patchSha256,
++  };
++}
++
++function assertExpectedSource(value: MiraFormalCitationRecoveryExpectedSource): void {
++  if (
++    value.status !== 'failed' ||
++    value.error !== MIRA_FORMAL_CITATION_RECOVERY_SOURCE_ERROR ||
++    !validIdentifier(value.runtimeRequestId) ||
++    !validSha256(value.formalInputSha256)
++  ) {
++    throw new MiraFormalCitationRecoveryError(
++      'invalid_recovery_request',
++      'Invalid formal citation recovery source contract',
++    );
++  }
++}
++
++export async function claimMiraFormalCitationRecovery(input: {
++  sourceJobId: string;
++  recoveryRequestId: string;
++  expectedSource: MiraFormalCitationRecoveryExpectedSource;
++}): Promise<{ record: MiraFormalCitationRecoveryRecord; created: boolean }> {
++  const policy = getMiraFormalCitationRecoveryRuntimePolicy();
++  assertExpectedSource(input.expectedSource);
++  if (
++    !policy.enabled ||
++    input.sourceJobId !== MIRA_FORMAL_CITATION_RECOVERY_FIXED_SOURCE_JOB_ID ||
++    input.sourceJobId !== policy.sourceJobId ||
++    !validIdentifier(input.recoveryRequestId)
++  ) {
++    throw new MiraFormalCitationRecoveryError(
++      'invalid_recovery_request',
++      'Formal citation recovery is unavailable for this request',
++    );
++  }
++  return withRecoveryLock(input.sourceJobId, async () => {
++    const existing = await readExisting(input.sourceJobId);
++    if (existing) {
++      if (
++        existing.recoveryRequestId !== input.recoveryRequestId ||
++        existing.source.runtimeRequestId !== input.expectedSource.runtimeRequestId ||
++        existing.source.formalInputSha256 !== input.expectedSource.formalInputSha256 ||
++        existing.policy.patchSha256 !== policy.patchSha256
++      ) {
++        throw new MiraFormalCitationRecoveryError(
++          'recovery_already_claimed',
++          'Formal citation recovery was already claimed by a different request',
++        );
++      }
++      return { record: existing, created: false };
++    }
++    let raw: Uint8Array;
++    try {
++      raw = await fs.readFile(sourceJobPath(input.sourceJobId));
++    } catch (error) {
++      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
++        throw new MiraFormalCitationRecoveryError(
++          'recovery_source_mismatch',
++          'Formal citation recovery source job was not found',
++        );
++      }
++      throw error;
++    }
++    const job = JSON.parse(Buffer.from(raw).toString('utf8')) as unknown;
++    if (!exactFailedSource(job, input.sourceJobId, input.expectedSource)) {
++      throw new MiraFormalCitationRecoveryError(
++        'recovery_source_mismatch',
++        'Formal citation recovery source no longer matches the fixed failed job',
++      );
++    }
++    const identity = await resolveMiraFormalProfessionalSucceededSession(job.formalInput);
++    const now = new Date().toISOString();
++    const snapshotSha256 = sha256(raw);
++    const record: MiraFormalCitationRecoveryRecord = {
++      schemaVersion: MIRA_FORMAL_CITATION_RECOVERY_SCHEMA,
++      kind: MIRA_FORMAL_CITATION_RECOVERY_KIND,
++      recoveryId: `omcitation_${sha256(
++        `${input.sourceJobId}\n${input.recoveryRequestId}\n${snapshotSha256}`,
++      ).slice(0, 32)}`,
++      recoveryRequestId: input.recoveryRequestId,
++      source: {
++        jobId: input.sourceJobId,
++        runtimeRequestId: job.runtimeRequestId,
++        status: 'failed',
++        error: MIRA_FORMAL_CITATION_RECOVERY_SOURCE_ERROR,
++        formalInputSha256: job.formalInputSha256,
++        completedAt: job.completedAt,
++        jobSnapshotSha256: snapshotSha256,
++      },
++      calls: {
++        llm: 0,
++        webSearch: 0,
++        fetchUrl: 0,
++        imageGeneration: 0,
++        videoGeneration: 0,
++      },
++      policy: {
++        version: MIRA_FORMAL_CITATION_RECOVERY_POLICY_VERSION,
++        patchSha256: policy.patchSha256,
++      },
++      sessionId: identity.sessionId,
++      stageId: identity.stageId,
++      status: 'queued',
++      step: 'queued',
++      progress: 0,
++      message: 'Formal citation recovery queued for the existing professional classroom',
++      repair: null,
++      result: null,
++      createdAt: now,
++      updatedAt: now,
++    };
++    await writeRecord(record);
++    return { record, created: true };
++  });
++}
++
++function publicPayloadFromRecord(
++  record: MiraFormalCitationRecoveryRecord,
++): MiraFormalCitationRecoveryPublicPayload {
++  return {
++    schemaVersion: record.schemaVersion,
++    kind: record.kind,
++    recoveryId: record.recoveryId,
++    source: record.source,
++    status: record.status,
++    step: record.step,
++    progress: record.progress,
++    message: record.message,
++    calls: record.calls,
++    repair: record.repair,
++    result: record.result,
++    createdAt: record.createdAt,
++    updatedAt: record.updatedAt,
++    ...(record.startedAt ? { startedAt: record.startedAt } : {}),
++    ...(record.completedAt ? { completedAt: record.completedAt } : {}),
++    ...(record.error ? { error: record.error } : {}),
++    ...(record.receiptSha256 ? { receiptSha256: record.receiptSha256 } : {}),
++    pollUrl: pollPath(record.source.jobId),
++    done: record.status === 'succeeded' || record.status === 'failed',
++  };
++}
++
++export function publicMiraFormalCitationRecoveryPayload(
++  record: MiraFormalCitationRecoveryRecord,
++): MiraFormalCitationRecoveryPublicPayload {
++  return publicPayloadFromRecord(record);
++}
++
++function withTerminalReceipt(
++  record: MiraFormalCitationRecoveryRecord,
++): MiraFormalCitationRecoveryRecord {
++  const unsigned = publicPayloadFromRecord({ ...record, receiptSha256: undefined });
++  return { ...record, receiptSha256: canonicalSha256(unsigned) };
++}
++
++async function updateRunningProgress(
++  sourceJobId: string,
++  progress: { step: string; progress: number; message: string },
++): Promise<void> {
++  await withRecoveryLock(sourceJobId, async () => {
++    const record = await readExisting(sourceJobId);
++    if (!record || record.status !== 'running' || record.pendingTerminalSuccess) return;
++    await writeRecord({
++      ...record,
++      step: progress.step,
++      progress: Math.max(record.progress, Math.min(98, progress.progress)),
++      message: progress.message,
++      updatedAt: new Date().toISOString(),
++    });
++  });
++}
++
++function buildRepair(input: {
++  sourceUrls: string[];
++  repairedSceneIds: string[];
++  beforeScenesSha256: string;
++  afterScenesSha256: string;
++}): MiraFormalCitationRecoveryRepair {
++  const withoutHash = {
++    policyVersion: MIRA_FORMAL_CITATION_REPAIR_POLICY_VERSION,
++    sourceUrls: [...input.sourceUrls],
++    repairedSceneIds: [...input.repairedSceneIds],
++    beforeScenesSha256: input.beforeScenesSha256,
++    afterScenesSha256: input.afterScenesSha256,
++  };
++  if (
++    withoutHash.sourceUrls.length === 0 ||
++    withoutHash.repairedSceneIds.length === 0 ||
++    withoutHash.beforeScenesSha256 === withoutHash.afterScenesSha256 ||
++    !validSha256(withoutHash.beforeScenesSha256) ||
++    !validSha256(withoutHash.afterScenesSha256)
++  ) {
++    throw new Error('FORMAL_CITATION_RECOVERY_REPAIR_INVALID');
++  }
++  return { ...withoutHash, repairSha256: canonicalSha256(withoutHash) };
++}
++
++function buildResult(
++  completion: Awaited<
++    ReturnType<typeof recoverMiraFormalProfessionalClassroomFromSucceededSession>
++  >,
++): MiraFormalCitationRecoveryResult {
++  const result = completion.result;
++  if (
++    !result.formalAudio ||
++    !result.professionalCreation ||
++    !result.research ||
++    !result.speechActionCount
++  ) {
++    throw new Error('FORMAL_CITATION_RECOVERY_RESULT_INVALID');
++  }
++  return {
++    classroomId: result.id,
++    url: result.url,
++    scenesCount: result.scenesCount,
++    speechActionCount: result.speechActionCount,
++    formalAudio: result.formalAudio,
++    professionalCreation: result.professionalCreation,
++    research: result.research,
++    createdAt: result.createdAt,
++  };
++}
++
++function assertRepairResultBinding(
++  completion: Awaited<ReturnType<typeof recoverMiraFormalProfessionalClassroomFromSucceededSession>>,
++  repair: MiraFormalCitationRecoveryRepair,
++  result: MiraFormalCitationRecoveryResult,
++): void {
++  if (
++    completion.repair.sessionId !== result.professionalCreation.sessionId ||
++    completion.repair.sessionId !== result.research.sessionId ||
++    completion.repair.stageId !== result.classroomId
++  ) {
++    throw new Error('FORMAL_CITATION_RECOVERY_IDENTITY_BINDING_INVALID');
++  }
++  const sourceUrls = new Set(repair.sourceUrls);
++  const researchSourceUrls = new Set(result.research.sources.map((source) => source.url));
++  const citedUrls = new Set<string>();
++  const citedSceneIds = new Set<string>();
++  for (const citation of result.research.citations) {
++    if (!sourceUrls.has(citation.url)) continue;
++    citedUrls.add(citation.url);
++    citation.sceneIds.forEach((sceneId) => citedSceneIds.add(sceneId));
++  }
++  if (
++    [...sourceUrls].some((url) => !researchSourceUrls.has(url) || !citedUrls.has(url)) ||
++    repair.repairedSceneIds.some((sceneId) => !citedSceneIds.has(sceneId))
++  ) {
++    throw new Error('FORMAL_CITATION_RECOVERY_RESEARCH_BINDING_INVALID');
++  }
++}
++
++async function promoteAndFinalize(record: MiraFormalCitationRecoveryRecord): Promise<void> {
++  const candidate = record.pendingTerminalSuccess;
++  if (!candidate) throw new Error('FORMAL_CITATION_RECOVERY_TERMINAL_CANDIDATE_MISSING');
++  await promoteFailedFormalClassroomGenerationJobFromCitationRecovery({
++    jobId: record.source.jobId,
++    expected: {
++      error: record.source.error,
++      formalInputSha256: record.source.formalInputSha256,
++      completedAt: record.source.completedAt,
++      jobSnapshotSha256: record.source.jobSnapshotSha256,
++    },
++    recovery: {
++      recoveryId: record.recoveryId,
++      receiptSha256: candidate.receiptSha256,
++    },
++    result: {
++      classroomId: candidate.result.classroomId,
++      url: candidate.result.url,
++      scenesCount: candidate.result.scenesCount,
++      speechActionCount: candidate.result.speechActionCount,
++      formalAudio: candidate.result.formalAudio,
++      professionalCreation: candidate.result.professionalCreation,
++      research: candidate.result.research,
++    },
++  });
++  await withRecoveryLock(record.source.jobId, async () => {
++    const current = await readExisting(record.source.jobId);
++    if (!current) throw new Error('FORMAL_CITATION_RECOVERY_RECORD_MISSING');
++    if (current.status === 'succeeded') {
++      if (current.receiptSha256 !== candidate.receiptSha256) {
++        throw new Error('FORMAL_CITATION_RECOVERY_TERMINAL_CONFLICT');
++      }
++      return;
++    }
++    if (
++      current.recoveryId !== record.recoveryId ||
++      current.pendingTerminalSuccess?.receiptSha256 !== candidate.receiptSha256
++    ) {
++      throw new Error('FORMAL_CITATION_RECOVERY_TERMINAL_CONFLICT');
++    }
++    await writeRecord({
++      ...current,
++      status: 'succeeded',
++      step: 'completed',
++      progress: 100,
++      message: 'Existing OpenMAIC Pro classroom recovered and published with exact citations',
++      repair: candidate.repair,
++      result: candidate.result,
++      updatedAt: candidate.updatedAt,
++      completedAt: candidate.completedAt,
++      receiptSha256: candidate.receiptSha256,
++      pendingTerminalSuccess: undefined,
++    });
++  });
++}
++
++async function markFailed(sourceJobId: string): Promise<void> {
++  await withRecoveryLock(sourceJobId, async () => {
++    const current = await readExisting(sourceJobId);
++    if (!current || current.status === 'succeeded' || current.pendingTerminalSuccess) return;
++    const now = new Date().toISOString();
++    const failed = withTerminalReceipt({
++      ...current,
++      status: 'failed',
++      step: 'failed',
++      message: 'Formal citation recovery failed before source-job promotion',
++      repair: null,
++      result: null,
++      updatedAt: now,
++      completedAt: now,
++      error: {
++        code: 'formal_citation_recovery_failed',
++        message: 'The existing professional classroom could not be safely recovered',
++      },
++    });
++    await writeRecord(failed);
++  });
++}
++
++export async function runMiraFormalCitationRecovery(
++  sourceJobId: string,
++  baseUrl: string,
++): Promise<void> {
++  const claimed = await withRecoveryLock(sourceJobId, async () => {
++    const current = await readExisting(sourceJobId);
++    if (!current) {
++      throw new MiraFormalCitationRecoveryError(
++        'recovery_not_found',
++        'Formal citation recovery was not found',
++      );
++    }
++    if (current.status !== 'queued') return { record: current, claimed: false };
++    const now = new Date().toISOString();
++    const running: MiraFormalCitationRecoveryRecord = {
++      ...current,
++      status: 'running',
++      step: 'validating_existing_classroom',
++      progress: 5,
++      message: 'Validating the existing professional classroom and research evidence',
++      startedAt: now,
++      updatedAt: now,
++    };
++    await writeRecord(running);
++    return { record: running, claimed: true };
++  });
++  let record = claimed.record;
++  if (record.status === 'succeeded' || record.status === 'failed') return;
++  if (record.pendingTerminalSuccess) {
++    await promoteAndFinalize(record);
++    return;
++  }
++  if (!claimed.claimed) return;
++
++  try {
++    const rawJob = await fs.readFile(sourceJobPath(sourceJobId));
++    if (sha256(rawJob) !== record.source.jobSnapshotSha256) {
++      throw new Error('FORMAL_CITATION_RECOVERY_SOURCE_SNAPSHOT_CHANGED');
++    }
++    const sourceJob = JSON.parse(rawJob.toString('utf8')) as ClassroomGenerationJob;
++    if (!sourceJob.formalInput) throw new Error('FORMAL_CITATION_RECOVERY_INPUT_MISSING');
++    const completion = await recoverMiraFormalProfessionalClassroomFromSucceededSession(
++      sourceJob.formalInput,
++      {
++        baseUrl,
++        expectedSessionId: record.sessionId,
++        expectedStageId: record.stageId,
++        onProgress: async (progress) => {
++          await updateRunningProgress(sourceJobId, {
++            step: progress.step,
++            progress: progress.progress,
++            message: progress.message,
++          });
++        },
++      },
++    );
++    const repair = buildRepair(completion.repair);
++    const result = buildResult(completion);
++    assertRepairResultBinding(completion, repair, result);
++    const terminalAt = new Date().toISOString();
++    const hypothetical = withTerminalReceipt({
++      ...record,
++      status: 'succeeded',
++      step: 'completed',
++      progress: 100,
++      message: 'Existing OpenMAIC Pro classroom recovered and published with exact citations',
++      repair,
++      result,
++      updatedAt: terminalAt,
++      completedAt: terminalAt,
++      pendingTerminalSuccess: undefined,
++    });
++    const receiptSha256 = hypothetical.receiptSha256!;
++    record = await withRecoveryLock(sourceJobId, async () => {
++      const current = await readExisting(sourceJobId);
++      if (!current || current.status !== 'running' || current.recoveryId !== record.recoveryId) {
++        throw new Error('FORMAL_CITATION_RECOVERY_STATE_CHANGED');
++      }
++      const publishing: MiraFormalCitationRecoveryRecord = {
++        ...current,
++        step: 'publishing',
++        progress: 99,
++        message: 'Promoting the recovered classroom without a new provider attempt',
++        updatedAt: terminalAt,
++        pendingTerminalSuccess: {
++          completedAt: terminalAt,
++          updatedAt: terminalAt,
++          repair,
++          result,
++          receiptSha256,
++        },
++      };
++      await writeRecord(publishing);
++      return publishing;
++    });
++    await promoteAndFinalize(record);
++  } catch (error) {
++    const current = await readExisting(sourceJobId);
++    if (current?.pendingTerminalSuccess) {
++      log.error('Formal citation recovery promotion/finalization remains replayable:', error);
++      return;
++    }
++    log.error('Formal citation recovery failed:', error);
++    await markFailed(sourceJobId);
++  }
++}
++
++export async function readMiraFormalCitationRecovery(
++  sourceJobId: string,
++): Promise<MiraFormalCitationRecoveryRecord | null> {
++  return readExisting(sourceJobId);
++}
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+index dcaf55cb01dcaf269038a0cf7507b9e347309890..9dfb338b14dad8e8bb60267cbcdbc45efe93bf0f 100644
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -55,12 +55,32 @@ interface FormalIdentity {
+   ownerId: string;
+ }
+ 
+-interface FetchedResearchSource {
++export interface MiraFormalFetchedResearchSource {
+   title: string;
+   url: string;
+   textSha256: string;
+ }
+ 
++interface ResearchEvidence {
++  traces: MiraFormalResearchSearchTrace[];
++  providerId: string;
++  fetched: MiraFormalFetchedResearchSource[];
++}
++
++export interface MiraFormalCitationRepairAudit {
++  sessionId: string;
++  stageId: string;
++  sourceUrls: string[];
++  beforeScenesSha256: string;
++  afterScenesSha256: string;
++  repairedSceneIds: string[];
++}
++
++export interface MiraFormalProfessionalRecoveryCompletion {
++  result: GenerateClassroomResult;
++  repair: MiraFormalCitationRepairAudit;
++}
++
+ export interface MiraFormalProfessionalCreationReceipt {
+   schemaVersion: typeof PROFESSIONAL_CREATION_RECEIPT_VERSION;
+   status: 'succeeded';
+@@ -91,7 +111,7 @@ export interface MiraFormalResearchReceipt {
+   fetchedSourceCount: number;
+   citationCount: number;
+   searches: Array<{ query: string; searchedAt: string; resultCount: number }>;
+-  sources: FetchedResearchSource[];
++  sources: MiraFormalFetchedResearchSource[];
+   citations: Array<{ url: string; sceneIds: string[] }>;
+   receiptSha256: string;
+ }
+@@ -127,6 +147,142 @@ function plainObject(value: unknown): Record<string, unknown> | null {
+     : null;
+ }
+ 
++const SOURCE_FOOTER_SEMANTICS = /(?:来源|参考|出处)\s*[:：]/u;
++const DOMAIN_TOKEN_PATTERN = /(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}/giu;
++const TITLE_TOKEN_SEPARATOR = /[\s_|·•:：\-–—－/\\()[\]（）【】《》,，。;；]+/u;
++
++function normalizedCitationText(value: string): string {
++  return value.normalize('NFKC').toLowerCase();
++}
++
++function sourceMatchTokens(source: MiraFormalFetchedResearchSource): {
++  domains: string[];
++  titles: string[];
++} {
++  const normalizedTitle = normalizedCitationText(source.title);
++  const domains = new Set<string>([new URL(source.url).hostname.toLowerCase()]);
++  for (const match of normalizedTitle.matchAll(DOMAIN_TOKEN_PATTERN)) {
++    domains.add(match[0].toLowerCase());
++  }
++  const titles = new Set(
++    normalizedTitle
++      .replace(/<[^>]+>/gu, ' ')
++      .split(TITLE_TOKEN_SEPARATOR)
++      .map((token) => token.trim())
++      .filter((token) => {
++        if (!token || domains.has(token)) return false;
++        const length = Array.from(token).length;
++        return /[\u3400-\u9fff]/u.test(token) ? length >= 4 : length >= 8;
++      }),
++  );
++  return {
++    domains: [...domains].sort((left, right) => right.length - left.length),
++    titles: [...titles].sort((left, right) => right.length - left.length),
++  };
++}
++
++function matchesFetchedSource(content: string, source: MiraFormalFetchedResearchSource): boolean {
++  const normalized = normalizedCitationText(content);
++  const exactUrl = normalizedCitationText(source.url);
++  if (normalized.includes(exactUrl)) return true;
++  const tokens = sourceMatchTokens(source);
++  return (
++    tokens.domains.some((token) => normalized.includes(token)) ||
++    tokens.titles.some((token) => normalized.includes(token))
++  );
++}
++
++function escapeRegExp(value: string): string {
++  return value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
++}
++
++function appendExactSourceUrl(content: string, sourceUrl: string): string {
++  const closingTag = /(<\/(?:p|div|span)>\s*)$/iu;
++  if (closingTag.test(content)) {
++    return content.replace(closingTag, ` · ${sourceUrl}$1`);
++  }
++  return `${content} · ${sourceUrl}`;
++}
++
++/**
++ * Canonicalize only a source note that the Agent already rendered. This is
++ * intentionally not a citation synthesizer: a slide without an existing text
++ * footer, a generic footer, or a footer that matches more than one fetched
++ * material remains untouched and will still fail the downstream citation gate.
++ */
++export function canonicalizeMiraFormalResearchFooters(
++  scenes: Scene[],
++  fetched: MiraFormalFetchedResearchSource[],
++): {
++  scenes: Scene[];
++  sourceUrls: string[];
++  beforeScenesSha256: string;
++  afterScenesSha256: string;
++  repairedSceneIds: string[];
++} {
++  const beforeScenesSha256 = canonicalSha256(scenes);
++  const repairedSceneIds = new Set<string>();
++  const repairedSourceUrls = new Set<string>();
++  const canonicalized = scenes.map((scene) => {
++    if (scene.type !== 'slide' || scene.content.type !== 'slide') return scene;
++    const canvas = plainObject(scene.content.canvas);
++    const elements = Array.isArray(canvas?.elements) ? canvas.elements : null;
++    if (!canvas || !elements) return scene;
++    let sceneChanged = false;
++    const nextElements = elements.map((element) => {
++      const candidate = plainObject(element);
++      if (
++        candidate?.type !== 'text' ||
++        typeof candidate.content !== 'string' ||
++        !SOURCE_FOOTER_SEMANTICS.test(candidate.content)
++      ) {
++        return element;
++      }
++      const matches = fetched.filter((source) =>
++        matchesFetchedSource(candidate.content as string, source),
++      );
++      if (matches.length !== 1) return element;
++      const source = matches[0]!;
++      const normalizedContent = normalizedCitationText(candidate.content);
++      if (normalizedContent.includes(normalizedCitationText(source.url))) return element;
++
++      const tokens = sourceMatchTokens(source);
++      const matchingDomains = tokens.domains.filter((token) => normalizedContent.includes(token));
++      let content: string;
++      if (matchingDomains.length === 1) {
++        content = candidate.content.replace(
++          new RegExp(escapeRegExp(matchingDomains[0]!), 'giu'),
++          source.url,
++        );
++      } else {
++        content = appendExactSourceUrl(candidate.content, source.url);
++      }
++      if (content === candidate.content) return element;
++      sceneChanged = true;
++      repairedSourceUrls.add(source.url);
++      return { ...candidate, content };
++    });
++    if (!sceneChanged) return scene;
++    repairedSceneIds.add(scene.id);
++    return {
++      ...scene,
++      content: {
++        ...scene.content,
++        canvas: { ...canvas, elements: nextElements },
++      },
++    } as Scene;
++  });
++  return {
++    scenes: canonicalized,
++    sourceUrls: [...repairedSourceUrls].sort(),
++    beforeScenesSha256,
++    afterScenesSha256: canonicalSha256(canonicalized),
++    repairedSceneIds: scenes
++      .filter((scene) => repairedSceneIds.has(scene.id))
++      .map((scene) => scene.id),
++  };
++}
++
+ function professionalIdentity(input: GenerateClassroomInput): FormalIdentity {
+   const digest = sha256(`${input.runtimeRequestId}\n${canonicalJson(input)}`);
+   return {
+@@ -639,12 +795,10 @@ function normalizedUrl(value: string): string | null {
+   }
+ }
+ 
+-async function buildResearchReceipt(
++async function loadResearchEvidence(
+   events: PersistedAgentSessionEvent[],
+-  scenes: Scene[],
+-  spec: FormalCoursewareSpec,
+   sessionId: string,
+-): Promise<MiraFormalResearchReceipt> {
++): Promise<ResearchEvidence> {
+   const traces = events
+     .filter((event) => event.type === MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE)
+     .map((event) => event.data)
+@@ -664,7 +818,7 @@ async function buildResearchReceipt(
+   const materials = (await listSessionMaterials(sessionId, { limit: 200 })).filter(
+     (material) => material.kind === 'web' && material.sourceUrl && material.textAssetId,
+   );
+-  const fetched: FetchedResearchSource[] = [];
++  const fetched: MiraFormalFetchedResearchSource[] = [];
+   for (const material of materials) {
+     const url = normalizedUrl(material.sourceUrl!);
+     if (!url || !observedUrls.has(url)) continue;
+@@ -679,7 +833,16 @@ async function buildResearchReceipt(
+   if (fetched.length < MIRA_PROFESSIONAL_CREATION_POLICY.webSearch.minimumFetchedSources) {
+     throw new Error('FORMAL_PROFESSIONAL_RESEARCH_FETCH_MISSING');
+   }
+-  const citations = fetched.flatMap((source) => {
++  return { traces, providerId: [...providers][0]!, fetched };
++}
++
++function buildResearchReceipt(
++  evidence: ResearchEvidence,
++  scenes: Scene[],
++  spec: FormalCoursewareSpec,
++  sessionId: string,
++): MiraFormalResearchReceipt {
++  const citations = evidence.fetched.flatMap((source) => {
+     const hostname = new URL(source.url).hostname.toLowerCase();
+     const title = source.title.toLowerCase();
+     const sceneIds = scenes
+@@ -702,17 +865,17 @@ async function buildResearchReceipt(
+     buildItemId: spec.buildItemId,
+     classroomId: scenes[0]!.stageId,
+     sessionId,
+-    providerId: [...providers][0]!,
+-    searchCount: traces.length,
+-    resultCount: traces.reduce((total, trace) => total + trace.resultCount, 0),
+-    fetchedSourceCount: fetched.length,
++    providerId: evidence.providerId,
++    searchCount: evidence.traces.length,
++    resultCount: evidence.traces.reduce((total, trace) => total + trace.resultCount, 0),
++    fetchedSourceCount: evidence.fetched.length,
+     citationCount: citations.length,
+-    searches: traces.map((trace) => ({
++    searches: evidence.traces.map((trace) => ({
+       query: trace.query,
+       searchedAt: trace.searchedAt,
+       resultCount: trace.resultCount,
+     })),
+-    sources: fetched,
++    sources: evidence.fetched,
+     citations,
+   };
+   return { ...withoutHash, receiptSha256: canonicalSha256(withoutHash) };
+@@ -751,25 +914,62 @@ function buildProfessionalCreationReceipt(
+   return { ...withoutHash, receiptSha256: canonicalSha256(withoutHash) };
+ }
+ 
+-export async function generateMiraFormalProfessionalClassroom(
++async function requireSucceededProfessionalSession(
++  input: GenerateClassroomInput,
++  spec: FormalCoursewareSpec,
++): Promise<FormalIdentity> {
++  const identity = professionalIdentity(input);
++  const expectedPrompt = professionalPrompt(input, spec);
++  const store = await getAgentSessionStore();
++  const session = await store.getSession(identity.sessionId);
++  if (!session) throw new Error('FORMAL_PROFESSIONAL_SESSION_MISSING');
++  if (
++    session.status !== 'succeeded' ||
++    !isMiraFormalProfessionalSessionIdentity({
++      ownerId: session.ownerId,
++      sessionId: session.id,
++      skillId: session.skillId,
++    }) ||
++    session.ownerId !== identity.ownerId ||
++    session.prompt !== expectedPrompt ||
++    session.origin !== PROFESSIONAL_SESSION_ORIGIN ||
++    session.existingCourse
++  ) {
++    throw new Error('FORMAL_PROFESSIONAL_SUCCEEDED_SESSION_INVALID');
++  }
++  return identity;
++}
++
++export async function resolveMiraFormalProfessionalSucceededSession(
+   input: GenerateClassroomInput,
++): Promise<{ sessionId: string; stageId: string }> {
++  const spec = parseFormalCoursewareSpec(input);
++  const identity = await requireSucceededProfessionalSession(input, spec);
++  const events = await readAllSessionEvents(identity.sessionId);
++  const stageId = stageIdFromEvents(events);
++  const ownerStore = await getOwnerScopedDocumentStore(identity.ownerId);
++  if (!(await ownerStore.loadDocument(stageId))) {
++    throw new Error('FORMAL_PROFESSIONAL_DOCUMENT_MISSING');
++  }
++  return { sessionId: identity.sessionId, stageId };
++}
++
++async function completeMiraFormalProfessionalClassroom(
++  input: GenerateClassroomInput,
++  spec: FormalCoursewareSpec,
++  identity: FormalIdentity,
+   options: {
+     baseUrl: string;
+     onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void;
++    expectedStageId?: string;
++    requireCitationRepair?: boolean;
+   },
+-): Promise<GenerateClassroomResult> {
+-  const spec = parseFormalCoursewareSpec(input);
+-  await options.onProgress?.({
+-    step: 'researching',
+-    progress: 10,
+-    message: 'Starting the unattended OpenMAIC Pro courseware workflow with required web research',
+-    scenesGenerated: 0,
+-    totalScenes: 0,
+-  });
+-  const { identity } = await createOrReuseProfessionalSession(input, spec);
+-  await waitForProfessionalSession(identity.sessionId, options.onProgress);
++): Promise<MiraFormalProfessionalRecoveryCompletion> {
+   const events = await readAllSessionEvents(identity.sessionId);
+   const stageId = stageIdFromEvents(events);
++  if (options.expectedStageId && options.expectedStageId !== stageId) {
++    throw new Error('FORMAL_PROFESSIONAL_RECOVERY_STAGE_MISMATCH');
++  }
+   const ownerStore = await getOwnerScopedDocumentStore(identity.ownerId);
+   const document = await ownerStore.loadDocument(stageId);
+   if (!document) throw new Error('FORMAL_PROFESSIONAL_DOCUMENT_MISSING');
+@@ -778,8 +978,20 @@ export async function generateMiraFormalProfessionalClassroom(
+     document.scenes as Scene[],
+     spec,
+   );
++  const sourceSpeechActionCount = assertProfessionalClassroom(
++    promoted.stage,
++    promoted.scenes,
++    spec,
++    identity.sessionId,
++    document.outline,
++  );
++  const evidence = await loadResearchEvidence(events, identity.sessionId);
++  const canonicalized = canonicalizeMiraFormalResearchFooters(promoted.scenes, evidence.fetched);
++  if (options.requireCitationRepair && canonicalized.repairedSceneIds.length === 0) {
++    throw new Error('FORMAL_PROFESSIONAL_CITATION_RECOVERY_NO_REPAIR');
++  }
+   const stage = promoted.stage;
+-  const scenes = promoted.scenes;
++  const scenes = canonicalized.scenes;
+   const speechActionCount = assertProfessionalClassroom(
+     stage,
+     scenes,
+@@ -787,7 +999,10 @@ export async function generateMiraFormalProfessionalClassroom(
+     identity.sessionId,
+     document.outline,
+   );
+-  const research = await buildResearchReceipt(events, scenes, spec, identity.sessionId);
++  if (speechActionCount !== sourceSpeechActionCount) {
++    throw new Error('FORMAL_PROFESSIONAL_CITATION_REPAIR_STRUCTURE_DRIFT');
++  }
++  const research = buildResearchReceipt(evidence, scenes, spec, identity.sessionId);
+   const professionalCreation = buildProfessionalCreationReceipt(
+     input,
+     spec,
+@@ -844,15 +1059,72 @@ export async function generateMiraFormalProfessionalClassroom(
+     totalScenes: scenes.length,
+   });
+   return {
+-    id: persisted.id,
+-    url: persisted.url,
+-    stage,
+-    scenes,
+-    scenesCount: scenes.length,
+-    speechActionCount,
+-    createdAt: persisted.createdAt,
+-    formalAudio,
+-    professionalCreation,
+-    research,
++    result: {
++      id: persisted.id,
++      url: persisted.url,
++      stage,
++      scenes,
++      scenesCount: scenes.length,
++      speechActionCount,
++      createdAt: persisted.createdAt,
++      formalAudio,
++      professionalCreation,
++      research,
++    },
++    repair: {
++      sessionId: identity.sessionId,
++      stageId,
++      sourceUrls: canonicalized.sourceUrls,
++      beforeScenesSha256: canonicalized.beforeScenesSha256,
++      afterScenesSha256: canonicalized.afterScenesSha256,
++      repairedSceneIds: canonicalized.repairedSceneIds,
++    },
+   };
+ }
++
++/**
++ * Resume only the deterministic post-Agent half of formal generation. The
++ * succeeded session, its events, fetched material, and persisted document are
++ * read in place; this path never creates/runs an Agent session and never calls
++ * web_search, fetch_url, an LLM, or a media-generation model.
++ */
++export async function recoverMiraFormalProfessionalClassroomFromSucceededSession(
++  input: GenerateClassroomInput,
++  options: {
++    baseUrl: string;
++    expectedSessionId: string;
++    expectedStageId: string;
++    onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void;
++  },
++): Promise<MiraFormalProfessionalRecoveryCompletion> {
++  const spec = parseFormalCoursewareSpec(input);
++  const identity = await requireSucceededProfessionalSession(input, spec);
++  if (identity.sessionId !== options.expectedSessionId) {
++    throw new Error('FORMAL_PROFESSIONAL_RECOVERY_SESSION_MISMATCH');
++  }
++  return completeMiraFormalProfessionalClassroom(input, spec, identity, {
++    ...options,
++    requireCitationRepair: true,
++  });
++}
++
++export async function generateMiraFormalProfessionalClassroom(
++  input: GenerateClassroomInput,
++  options: {
++    baseUrl: string;
++    onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void;
++  },
++): Promise<GenerateClassroomResult> {
++  const spec = parseFormalCoursewareSpec(input);
++  await options.onProgress?.({
++    step: 'researching',
++    progress: 10,
++    message: 'Starting the unattended OpenMAIC Pro courseware workflow with required web research',
++    scenesGenerated: 0,
++    totalScenes: 0,
++  });
++  const { identity } = await createOrReuseProfessionalSession(input, spec);
++  await waitForProfessionalSession(identity.sessionId, options.onProgress);
++  const completed = await completeMiraFormalProfessionalClassroom(input, spec, identity, options);
++  return completed.result;
++}
+diff --git a/lib/server/mira-internal-loopback-auth.ts b/lib/server/mira-internal-loopback-auth.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..528883a2ad52973e0355af879786eceb3cd1999a
+--- /dev/null
++++ b/lib/server/mira-internal-loopback-auth.ts
+@@ -0,0 +1,92 @@
++import { createHash, timingSafeEqual } from 'node:crypto';
++
++import type { NextRequest } from 'next/server';
++
++const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
++
++export class MiraInternalLoopbackAuthError extends Error {
++  constructor(message: string) {
++    super(message);
++    this.name = 'MiraInternalLoopbackAuthError';
++  }
++}
++
++function secureEqual(left: string, right: string): boolean {
++  const leftDigest = createHash('sha256').update(left).digest();
++  const rightDigest = createHash('sha256').update(right).digest();
++  return timingSafeEqual(leftDigest, rightDigest);
++}
++
++function normalizedLoopbackHostname(value: string): string | null {
++  const hostname = value.replace(/^\[|\]$/gu, '').toLowerCase();
++  return LOOPBACK_HOSTNAMES.has(hostname) ? 'loopback' : null;
++}
++
++function singleHeader(req: NextRequest, name: string): string | null {
++  const value = req.headers.get(name);
++  if (
++    value === null ||
++    value.length === 0 ||
++    value !== value.trim() ||
++    value.includes(',') ||
++    /[%\s]/u.test(value)
++  ) {
++    return null;
++  }
++  return value;
++}
++
++function expectedPrivatePort(): string {
++  const value = process.env.MIRA_OPENMAIC_PRIVATE_PORT || '3100';
++  if (!/^[1-9][0-9]{0,4}$/u.test(value) || Number(value) > 65_535) {
++    throw new MiraInternalLoopbackAuthError('The OpenMAIC private port is invalid');
++  }
++  return value;
++}
++
++function isExactLoopbackAuthority(value: string | null, expectedPort: string): boolean {
++  if (!value) return false;
++  try {
++    const parsed = new URL(`http://${value}`);
++    return Boolean(
++      !parsed.username &&
++      !parsed.password &&
++      parsed.pathname === '/' &&
++      !parsed.search &&
++      !parsed.hash &&
++      parsed.port === expectedPort &&
++      normalizedLoopbackHostname(parsed.hostname),
++    );
++  } catch {
++    return false;
++  }
++}
++
++/**
++ * Accept only the exact header topology that Next emits for a direct request
++ * to the private loopback listener. A public/LAN authority, proxy chain, RFC
++ * Forwarded header, or a missing server-managed token is rejected.
++ */
++export function authorizeMiraInternalLoopbackRequest(req: NextRequest): void {
++  const expectedPort = expectedPrivatePort();
++  if (
++    req.headers.has('forwarded') ||
++    req.headers.has('x-real-ip') ||
++    req.headers.has('via') ||
++    req.nextUrl.protocol !== 'http:' ||
++    req.nextUrl.port !== expectedPort ||
++    !normalizedLoopbackHostname(req.nextUrl.hostname) ||
++    !isExactLoopbackAuthority(singleHeader(req, 'host'), expectedPort) ||
++    !isExactLoopbackAuthority(singleHeader(req, 'x-forwarded-host'), expectedPort) ||
++    !normalizedLoopbackHostname(singleHeader(req, 'x-forwarded-for') || '') ||
++    singleHeader(req, 'x-forwarded-proto') !== 'http' ||
++    singleHeader(req, 'x-forwarded-port') !== expectedPort
++  ) {
++    throw new MiraInternalLoopbackAuthError('Internal OpenMAIC access requires direct loopback');
++  }
++  const expectedToken = process.env.MIRA_INTERNAL_API_TOKEN || '';
++  const suppliedToken = req.headers.get('x-mira-internal-token') || '';
++  if (!expectedToken || !suppliedToken || !secureEqual(expectedToken, suppliedToken)) {
++    throw new MiraInternalLoopbackAuthError('Invalid internal OpenMAIC credentials');
++  }
++}
+diff --git a/tests/server/mira-formal-professional-classroom.test.ts b/tests/server/mira-formal-professional-classroom.test.ts
+index c2f0d21f143dd9f094e464375550d26eb1d75ef2..a0fecb5086d6851fa51ce280b71819c21182bdea 100644
+--- a/tests/server/mira-formal-professional-classroom.test.ts
++++ b/tests/server/mira-formal-professional-classroom.test.ts
+@@ -1,6 +1,9 @@
+ import { describe, expect, it } from 'vitest';
+ 
+-import { hasMiraFormalSlideSpotlightSequence } from '@/lib/server/mira-formal-professional-classroom';
++import {
++  canonicalizeMiraFormalResearchFooters,
++  hasMiraFormalSlideSpotlightSequence,
++} from '@/lib/server/mira-formal-professional-classroom';
+ import type { Scene } from '@/lib/types/stage';
+ 
+ function slide(actions: Scene['actions'], elementId = 'focus-target'): Scene {
+@@ -96,4 +99,29 @@ describe('Mira formal slide spotlight sequence', () => {
+       ),
+     ).toBe(false);
+   });
++
++  it('canonicalizes only an existing unambiguous source footer', () => {
++    const source = {
++      title: '汉语拼音韵母表_韵母_韵母表_韵母表图-www.hanyupinyin.cn',
++      url: 'http://yunmu.hanyupinyin.cn/yunmubiao/',
++      textSha256: 'a'.repeat(64),
++    };
++    const cited = slide([]);
++    cited.id = 'p3';
++    if (cited.content.type !== 'slide') throw new Error('invalid fixture');
++    cited.content.canvas.elements[0]!.content =
++      '<p>口形参考:汉语拼音韵母表 · www.hanyupinyin.cn</p>';
++    const uncited = slide([]);
++    uncited.id = 'p4';
++    if (uncited.content.type !== 'slide') throw new Error('invalid fixture');
++    uncited.content.canvas.elements[0]!.content = '<p>今天学习单韵母</p>';
++
++    const repaired = canonicalizeMiraFormalResearchFooters([cited, uncited], [source]);
++
++    expect(repaired.sourceUrls).toEqual([source.url]);
++    expect(repaired.repairedSceneIds).toEqual(['p3']);
++    expect(repaired.beforeScenesSha256).not.toBe(repaired.afterScenesSha256);
++    expect(JSON.stringify(repaired.scenes[0])).toContain(source.url);
++    expect(repaired.scenes[1]).toEqual(uncited);
++  });
+ });

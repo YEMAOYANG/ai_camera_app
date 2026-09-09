@@ -1,0 +1,484 @@
+From 97f0b21fd217b15c45405d25fcfa1a910e01a3ff Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 17/37] 0017-mira-student-asr-learning-events
+
+---
+ lib/hooks/use-audio-recorder.ts               | 81 +++++++++++++++--
+ lib/mira/student-runtime-events.ts            | 89 +++++++++++++------
+ tests/audio/mira-asr-client.test.ts           | 45 ++++++++++
+ .../mira-student-runtime-events.test.ts       | 74 ++++++++++++---
+ 4 files changed, 247 insertions(+), 42 deletions(-)
+
+diff --git a/lib/hooks/use-audio-recorder.ts b/lib/hooks/use-audio-recorder.ts
+index cc6185e..7dae43a 100644
+--- a/lib/hooks/use-audio-recorder.ts
++++ b/lib/hooks/use-audio-recorder.ts
+@@ -3,7 +3,10 @@ import { ASR_PROVIDERS } from '@/lib/audio/constants';
+ import { getASRServerDisabledError } from '@/lib/audio/asr-enablement';
+ import { normalizeASRUploadAudio } from '@/lib/audio/wav-utils';
+ import { createLogger } from '@/lib/logger';
++import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import { isMiraStudentRuntimeSearch } from '@/lib/mira/student-runtime';
++import type { MiraStudentRuntimeEventClient } from '@/lib/mira/student-runtime-events';
++import { useStageStore } from '@/lib/store/stage';
+ 
+ const log = createLogger('AudioRecorder');
+ const MIRA_QWEN_ASR_PROVIDER_ID = 'qwen-asr' as const;
+@@ -18,8 +21,43 @@ export function shouldUseBrowserNativeAsr(search: string, configuredProviderId:
+   return !isMiraRuntimeSearch(search) && configuredProviderId === 'browser-native';
+ }
+ 
+-// Window.SpeechRecognition / webkitSpeechRecognition have minimal constructor
+-// declarations in types/web-speech.d.ts; this hook casts the richer instance.
++export interface MiraAsrTurn {
++  readonly sceneIndex: number;
++  readonly sceneId: string;
++  readonly turnId: string;
++}
++
++export function captureMiraAsrTurn(args: {
++  readonly scenes: readonly { readonly id: string; readonly order: number }[];
++  readonly currentSceneId: string | null;
++  readonly turnId: string;
++}): MiraAsrTurn | null {
++  const orderedScenes = [...args.scenes].sort((left, right) => left.order - right.order);
++  const sceneIndex = orderedScenes.findIndex((scene) => scene.id === args.currentSceneId);
++  if (sceneIndex < 0) return null;
++  return {
++    sceneIndex,
++    sceneId: orderedScenes[sceneIndex].id,
++    turnId: args.turnId,
++  };
++}
++
++export async function forwardPersistedMiraTranscription(args: {
++  readonly runtimeEvents: Pick<MiraStudentRuntimeEventClient, 'asrTranscribed'>;
++  readonly turn: MiraAsrTurn;
++  readonly transcript: string;
++  readonly onTranscription?: (text: string) => void;
++}): Promise<void> {
++  await args.runtimeEvents.asrTranscribed({
++    ...args.turn,
++    transcript: args.transcript,
++  });
++  args.onTranscription?.(args.transcript);
++}
++
++// Window.SpeechRecognition / webkitSpeechRecognition are declared globally by
++// @assistant-ui/core's speech adapter; re-augmenting them here as `any` conflicts
++// with that typing, so we rely on the global declaration and cast the instance.
+ 
+ export interface UseAudioRecorderOptions {
+   onTranscription?: (text: string) => void;
+@@ -30,6 +68,7 @@ export interface UseAudioRecorderOptions {
+ 
+ export function useAudioRecorder(options: UseAudioRecorderOptions = {}) {
+   const { onTranscription, onError, continuous = false } = options;
++  const runtimeEvents = useMiraStudentRuntimeEvents();
+ 
+   const [isRecording, setIsRecording] = useState(false);
+   const [isProcessing, setIsProcessing] = useState(false);
+@@ -42,6 +81,7 @@ export function useAudioRecorder(options: UseAudioRecorderOptions = {}) {
+   const speechRecognitionRef = useRef<any>(null);
+   // Synchronous lock to prevent rapid re-entry (React state updates are async)
+   const busyRef = useRef(false);
++  const miraAsrTurnRef = useRef<MiraAsrTurn | null>(null);
+ 
+   // Send audio to server for transcription
+   const transcribeAudio = useCallback(
+@@ -100,16 +140,33 @@ export function useAudioRecorder(options: UseAudioRecorderOptions = {}) {
+         }
+ 
+         const result = await response.json();
+-        onTranscription?.(result.text);
++        const transcript = typeof result.text === 'string' ? result.text.trim() : '';
++        const miraRuntime =
++          typeof window !== 'undefined' && isMiraRuntimeSearch(window.location.search);
++        if (miraRuntime && transcript) {
++          const turn = miraAsrTurnRef.current;
++          if (!runtimeEvents || !turn) {
++            throw new Error('课堂语音学习记录暂时不可用');
++          }
++          await forwardPersistedMiraTranscription({
++            runtimeEvents,
++            turn,
++            transcript,
++            onTranscription,
++          });
++        } else {
++          onTranscription?.(transcript);
++        }
+       } catch (error) {
+         log.error('Transcription error:', error);
+         onError?.(error instanceof Error ? error.message : '语音识别失败，请重试');
+       } finally {
++        miraAsrTurnRef.current = null;
+         setIsProcessing(false);
+         setRecordingTime(0);
+       }
+     },
+-    [onTranscription, onError],
++    [onTranscription, onError, runtimeEvents],
+   );
+ 
+   // Start recording
+@@ -247,6 +304,20 @@ export function useAudioRecorder(options: UseAudioRecorderOptions = {}) {
+         mimeType: 'audio/webm',
+       });
+ 
++      if (typeof window !== 'undefined' && isMiraRuntimeSearch(window.location.search)) {
++        const stageState = useStageStore.getState();
++        const turn = captureMiraAsrTurn({
++          scenes: stageState.scenes,
++          currentSceneId: stageState.currentSceneId,
++          turnId: `asr-${window.crypto.randomUUID()}`,
++        });
++        if (!runtimeEvents || !turn) {
++          stream.getTracks().forEach((track) => track.stop());
++          throw new Error('课堂语音学习记录暂时不可用');
++        }
++        miraAsrTurnRef.current = turn;
++      }
++
+       mediaRecorderRef.current = mediaRecorder;
+       audioChunksRef.current = [];
+ 
+@@ -284,7 +355,7 @@ export function useAudioRecorder(options: UseAudioRecorderOptions = {}) {
+       log.error('Failed to start recording:', error);
+       onError?.('无法访问麦克风，请检查权限设置');
+     }
+-  }, [onTranscription, onError, transcribeAudio, continuous]);
++  }, [onTranscription, onError, transcribeAudio, continuous, runtimeEvents]);
+ 
+   // Stop recording
+   const stopRecording = useCallback(() => {
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+index bb487e1..c19765c 100644
+--- a/lib/mira/student-runtime-events.ts
++++ b/lib/mira/student-runtime-events.ts
+@@ -31,6 +31,15 @@ export type MiraStudentRuntimeEvent =
+         readonly attemptNumber: 1;
+       };
+     }
++  | {
++      readonly schemaVersion: typeof EVENT_SCHEMA;
++      readonly sequence: number;
++      readonly type: 'asr_transcribed';
++      readonly payload: SceneIdentity & {
++        readonly turnId: string;
++        readonly transcript: string;
++      };
++    }
+   | {
+       readonly schemaVersion: typeof EVENT_SCHEMA;
+       readonly sequence: number;
+@@ -83,6 +92,12 @@ export interface MiraStudentRuntimeEventClient {
+       readonly response: string | readonly string[];
+     },
+   ): Promise<void>;
++  asrTranscribed(
++    payload: SceneIdentity & {
++      readonly turnId: string;
++      readonly transcript: string;
++    },
++  ): Promise<void>;
+   completeWhenReady(payload: SceneIdentity): Promise<boolean>;
+   classroomCompleted(payload: SceneIdentity): Promise<void>;
+ }
+@@ -192,19 +207,23 @@ export function createMiraStudentRuntimeEventClient(
+   };
+ 
+   const record = <T extends EventType>(type: T, payload: EventPayload<T>): Promise<void> => {
+-    const operation = tail.catch(() => undefined).then(async () => {
+-      await synchronize();
+-      await commit(type, payload);
+-    });
++    const operation = tail
++      .catch(() => undefined)
++      .then(async () => {
++        await synchronize();
++        await commit(type, payload);
++      });
+     tail = operation;
+     return operation;
+   };
+ 
+   return {
+     resume: () => {
+-      const operation = tail.catch(() => undefined).then(async () => {
+-        await synchronize();
+-      });
++      const operation = tail
++        .catch(() => undefined)
++        .then(async () => {
++          await synchronize();
++        });
+       tail = operation;
+       return operation;
+     },
+@@ -222,17 +241,25 @@ export function createMiraStudentRuntimeEventClient(
+         response: answerResponse(payload.response),
+         attemptNumber: 1,
+       }),
++    asrTranscribed: (payload) =>
++      record('asr_transcribed', {
++        ...scenePayload(payload),
++        turnId: identifier(payload.turnId, 'turnId'),
++        transcript: asrTranscript(payload.transcript),
++      }),
+     completeWhenReady: (payload) => {
+       const completionPayload = scenePayload(payload) as EventPayload<'classroom_completed'>;
+-      const operation = tail.catch(() => undefined).then(async () => {
+-        await synchronize();
+-        await flushPending();
+-        const status = await synchronize(true);
+-        if (status.completed) return true;
+-        if (!status.completionReady) return false;
+-        await commit('classroom_completed', completionPayload);
+-        return true;
+-      });
++      const operation = tail
++        .catch(() => undefined)
++        .then(async () => {
++          await synchronize();
++          await flushPending();
++          const status = await synchronize(true);
++          if (status.completed) return true;
++          if (!status.completionReady) return false;
++          await commit('classroom_completed', completionPayload);
++          return true;
++        });
+       tail = operation.then(() => undefined);
+       return operation;
+     },
+@@ -300,9 +327,13 @@ function isStoredEvent(value: unknown): value is MiraStudentRuntimeEvent {
+     event.schemaVersion === EVENT_SCHEMA &&
+     Number.isInteger(event.sequence) &&
+     Number(event.sequence) >= 1 &&
+-    ['scene_entered', 'action_completed', 'answer_submitted', 'classroom_completed'].includes(
+-      String(event.type),
+-    ) &&
++    [
++      'scene_entered',
++      'action_completed',
++      'answer_submitted',
++      'asr_transcribed',
++      'classroom_completed',
++    ].includes(String(event.type)) &&
+     !!event.payload &&
+     typeof event.payload === 'object' &&
+     !Array.isArray(event.payload)
+@@ -325,12 +356,17 @@ function answerResponse(value: string | readonly string[]): string | readonly st
+   throw new Error('Mira Runtime answer response is invalid');
+ }
+ 
++function asrTranscript(value: string): string {
++  const normalized = String(value ?? '').trim();
++  if (!normalized || new TextEncoder().encode(normalized).byteLength > 4096) {
++    throw new Error('Mira Runtime transcript is invalid');
++  }
++  return normalized;
++}
++
+ function identifier(value: string, field: string, maximum = 128): string {
+   const normalized = String(value ?? '');
+-  if (
+-    normalized.length > maximum ||
+-    !/^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(normalized)
+-  ) {
++  if (normalized.length > maximum || !/^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(normalized)) {
+     throw new Error(`Mira Runtime ${field} is invalid`);
+   }
+   return normalized;
+@@ -352,8 +388,7 @@ function runtimeStatus(value: unknown): RuntimeStatus {
+     !Array.isArray(body.answeredQuestionIds) ||
+     !body.answeredQuestionIds.every(
+       (questionId) =>
+-        typeof questionId === 'string' &&
+-        /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(questionId),
++        typeof questionId === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(questionId),
+     ) ||
+     new Set(body.answeredQuestionIds).size !== body.answeredQuestionIds.length
+   ) {
+@@ -386,7 +421,9 @@ async function jsonBody(response: Response): Promise<unknown> {
+ function runtimeRequestError(status: number, body: unknown): Error {
+   const payload = body as { error?: unknown; message?: unknown } | null;
+   const error = new Error(
+-    typeof payload?.message === 'string' ? payload.message : `Mira Runtime event failed (${status})`,
++    typeof payload?.message === 'string'
++      ? payload.message
++      : `Mira Runtime event failed (${status})`,
+   );
+   error.name = typeof payload?.error === 'string' ? payload.error : 'MiraRuntimeEventError';
+   return error;
+diff --git a/tests/audio/mira-asr-client.test.ts b/tests/audio/mira-asr-client.test.ts
+index 0be7786..69abae9 100644
+--- a/tests/audio/mira-asr-client.test.ts
++++ b/tests/audio/mira-asr-client.test.ts
+@@ -1,5 +1,7 @@
+ import { describe, expect, it } from 'vitest';
+ import {
++  captureMiraAsrTurn,
++  forwardPersistedMiraTranscription,
+   isMiraRuntimeSearch,
+   resolveClientAsrProvider,
+   shouldUseBrowserNativeAsr,
+@@ -19,4 +21,47 @@ describe('Mira runtime ASR client selection', () => {
+     expect(resolveClientAsrProvider('', 'browser-native')).toBe('browser-native');
+     expect(shouldUseBrowserNativeAsr('', 'browser-native')).toBe(true);
+   });
++
++  it('captures the current scene when recording starts instead of when transcription finishes', () => {
++    expect(
++      captureMiraAsrTurn({
++        scenes: [
++          { id: 'scene-later', order: 3 },
++          { id: 'scene-at-start', order: 2 },
++        ],
++        currentSceneId: 'scene-at-start',
++        turnId: 'asr-turn-1',
++      }),
++    ).toEqual({ sceneIndex: 0, sceneId: 'scene-at-start', turnId: 'asr-turn-1' });
++  });
++
++  it('persists a Mira ASR turn before continuing and fails closed when persistence fails', async () => {
++    const order: string[] = [];
++    await forwardPersistedMiraTranscription({
++      runtimeEvents: {
++        asrTranscribed: async () => {
++          order.push('persisted');
++        },
++      },
++      turn: { sceneIndex: 1, sceneId: 'scene-1', turnId: 'asr-turn-1' },
++      transcript: '十二',
++      onTranscription: () => order.push('continued'),
++    });
++    expect(order).toEqual(['persisted', 'continued']);
++
++    const downstream: string[] = [];
++    await expect(
++      forwardPersistedMiraTranscription({
++        runtimeEvents: {
++          asrTranscribed: async () => {
++            throw new Error('ledger unavailable');
++          },
++        },
++        turn: { sceneIndex: 1, sceneId: 'scene-1', turnId: 'asr-turn-2' },
++        transcript: '十三',
++        onTranscription: () => downstream.push('must-not-run'),
++      }),
++    ).rejects.toThrow('ledger unavailable');
++    expect(downstream).toEqual([]);
++  });
+ });
+diff --git a/tests/runtime/mira-student-runtime-events.test.ts b/tests/runtime/mira-student-runtime-events.test.ts
+index 2baa0a8..6cb1996 100644
+--- a/tests/runtime/mira-student-runtime-events.test.ts
++++ b/tests/runtime/mira-student-runtime-events.test.ts
+@@ -109,7 +109,64 @@ describe('Mira authoritative student Runtime events', () => {
+         },
+       },
+     ]);
+-    expect(JSON.stringify(requests)).not.toMatch(/childId|familyId|learningSessionId|score|correct/);
++    expect(JSON.stringify(requests)).not.toMatch(
++      /childId|familyId|learningSessionId|score|correct/,
++    );
++  });
++
++  it('records repeated ASR text as distinct turns and preserves the transcript in the event payload', async () => {
++    const posts: Array<Record<string, unknown>> = [];
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage: memoryStorage(),
++      fetcher: vi.fn(async (_input, init) => {
++        if ((init?.method ?? 'GET') === 'GET') return response(status(0));
++        const event = JSON.parse(String(init?.body));
++        posts.push(event);
++        return response({
++          ok: true,
++          sequence: event.sequence,
++          receiptSha256: '9'.repeat(64),
++        });
++      }),
++    });
++    await client.asrTranscribed({
++      sceneIndex: 2,
++      sceneId: 'scene-2',
++      turnId: 'asr-turn-1',
++      transcript: '我觉得答案是十二。',
++    });
++    await client.asrTranscribed({
++      sceneIndex: 2,
++      sceneId: 'scene-2',
++      turnId: 'asr-turn-2',
++      transcript: '我觉得答案是十二。',
++    });
++
++    expect(posts).toEqual([
++      {
++        schemaVersion: 'mira.openmaic.student-runtime-event.v1',
++        sequence: 1,
++        type: 'asr_transcribed',
++        payload: {
++          sceneIndex: 2,
++          sceneId: 'scene-2',
++          turnId: 'asr-turn-1',
++          transcript: '我觉得答案是十二。',
++        },
++      },
++      {
++        schemaVersion: 'mira.openmaic.student-runtime-event.v1',
++        sequence: 2,
++        type: 'asr_transcribed',
++        payload: {
++          sceneIndex: 2,
++          sceneId: 'scene-2',
++          turnId: 'asr-turn-2',
++          transcript: '我觉得答案是十二。',
++        },
++      },
++    ]);
+   });
+ 
+   it('replays the exact pending event after a lost response before sending later evidence', async () => {
+@@ -184,9 +241,7 @@ describe('Mira authoritative student Runtime events', () => {
+     const posts: Array<{ sequence: number; payload: { questionId?: string } }> = [];
+     const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+       if ((init?.method ?? 'GET') === 'GET') {
+-        return response(
+-          status(lastSequence, 'runtime-session-a', false, [...answeredQuestionIds]),
+-        );
++        return response(status(lastSequence, 'runtime-session-a', false, [...answeredQuestionIds]));
+       }
+       const event = JSON.parse(String(init?.body));
+       posts.push(event);
+@@ -289,7 +344,8 @@ describe('Mira authoritative student Runtime events', () => {
+       classroomId: 'classroom-a',
+       storage: memoryStorage(),
+       fetcher: vi.fn(async (_input, init) => {
+-        if ((init?.method ?? 'GET') === 'GET') return response(status(8, 'runtime-session-a', ready));
++        if ((init?.method ?? 'GET') === 'GET')
++          return response(status(8, 'runtime-session-a', ready));
+         const event = JSON.parse(String(init?.body));
+         posts.push(event);
+         return response({
+@@ -301,13 +357,9 @@ describe('Mira authoritative student Runtime events', () => {
+       }),
+     });
+ 
+-    expect(
+-      await client.completeWhenReady({ sceneIndex: 9, sceneId: 'scene-9' }),
+-    ).toBe(false);
++    expect(await client.completeWhenReady({ sceneIndex: 9, sceneId: 'scene-9' })).toBe(false);
+     ready = true;
+-    expect(
+-      await client.completeWhenReady({ sceneIndex: 9, sceneId: 'scene-9' }),
+-    ).toBe(true);
++    expect(await client.completeWhenReady({ sceneIndex: 9, sceneId: 'scene-9' })).toBe(true);
+     expect(posts).toEqual([
+       {
+         schemaVersion: 'mira.openmaic.student-runtime-event.v1',
+-- 
+2.50.1 (Apple Git-155)
+

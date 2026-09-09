@@ -1,0 +1,503 @@
+From 594c5f51020cf8e943b8ea225ddb72086b82d2fe Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 21/37] 0021-mira-formal-generation-stability
+
+---
+ lib/server/classroom-generation.ts            |  89 +++++++++++-
+ lib/server/structured-output-guard.ts         |   5 +-
+ .../generation/src/outline-generator.ts       |  66 ++++++---
+ .../generation/test/outline-generator.test.ts |  17 +++
+ .../server/classroom-generation-retry.test.ts | 137 ++++++++++++++----
+ 5 files changed, 257 insertions(+), 57 deletions(-)
+
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index 36b8d28..f46f992 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -54,8 +54,40 @@ import {
+   ensureMiraSampleSceneActions,
+   resolveMiraSampleStructuralPlan,
+ } from '@/lib/server/mira-sample-structural-policy';
++import {
++  isExactMiraFormalRuntimeContract,
++  MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++} from '@/lib/server/mira-formal-generation-policy';
+ 
+ const log = createLogger('Classroom');
++const MIRA_FORMAL_LLM_TIMEOUT_MS = 5 * 60 * 1000;
++const MIRA_FORMAL_THINKING_DISABLED = { mode: 'disabled', enabled: false } as const;
++const MIRA_FORMAL_OUTLINE_DIRECTIVE = `
++MIRA FORMAL OUTLINE CONTRACT (server enforced):
++- Return exactly 10 outlines in this exact type order: slide, slide, slide, slide, slide, quiz, quiz, interactive, interactive, interactive.
++- Interactive outlines 8-10 must use widgetType simulation, game, visualization3d respectively and include a non-empty widgetOutline.
++- Do not return PBL scenes. Do not omit, merge, or add scenes.
++- Return only the JSON envelope requested by the outline prompt.`.trim();
++
++function formalLlmAbortSignal(enabled: boolean): AbortSignal | undefined {
++  return enabled ? AbortSignal.timeout(MIRA_FORMAL_LLM_TIMEOUT_MS) : undefined;
++}
++
++function matchesMiraFormalOutlineContract(outlines: SceneOutline[]): boolean {
++  const expectedTypes = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.orderedSceneTypes;
++  if (
++    outlines.length !== MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.exactSceneCount ||
++    outlines.some((outline, index) => outline.type !== expectedTypes[index])
++  ) {
++    return false;
++  }
++  const interactiveWidgets = outlines
++    .filter((outline) => outline.type === 'interactive')
++    .map((outline) => outline.widgetType);
++  return MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.interactive.requiredWidgetTypes.every(
++    (widgetType) => interactiveWidgets.includes(widgetType),
++  );
++}
+ 
+ export function containPBLGenerationError(error: unknown, sceneTitle: string): null {
+   if (!(error instanceof PBLGenerationError)) throw error;
+@@ -201,6 +233,7 @@ export async function generateClassroom(
+   },
+ ): Promise<GenerateClassroomResult> {
+   const { requirement, pdfContent } = input;
++  const miraFormalRuntime = isExactMiraFormalRuntimeContract(input.formalRuntimeContract);
+ 
+   await options.onProgress?.({
+     step: 'initializing',
+@@ -217,6 +250,9 @@ export async function generateClassroom(
+     apiKey,
+     thinkingConfig: classroomThinking,
+   } = await resolveModel({ stage: 'generate-classroom' });
++  const effectiveClassroomThinking = miraFormalRuntime
++    ? MIRA_FORMAL_THINKING_DISABLED
++    : classroomThinking;
+   log.info(`Using server-configured model: ${modelString}`);
+ 
+   // Fail fast if the resolved provider has no API key configured
+@@ -244,10 +280,13 @@ export async function generateClassroom(
+           { role: 'user', content: userPrompt },
+         ],
+         maxOutputTokens: modelInfo?.outputWindow,
++        ...(miraFormalRuntime
++          ? { abortSignal: formalLlmAbortSignal(true) }
++          : {}),
+       },
+       'generate-classroom',
+       undefined,
+-      classroomThinking,
++      effectiveClassroomThinking,
+     );
+     return result.text;
+   };
+@@ -294,7 +333,7 @@ export async function generateClassroom(
+         model: languageModel,
+         modelString,
+         outputWindow: modelInfo?.outputWindow,
+-        thinking: classroomThinking,
++        thinking: effectiveClassroomThinking,
+       };
+       stageModelCache.set(stage, fallback);
+       return fallback;
+@@ -329,7 +368,7 @@ export async function generateClassroom(
+         model: languageModel,
+         modelString,
+         outputWindow: modelInfo?.outputWindow,
+-        thinking: classroomThinking,
++        thinking: effectiveClassroomThinking,
+       };
+       stageModelCache.set(stage, fallback);
+       return fallback;
+@@ -363,6 +402,7 @@ export async function generateClassroom(
+           ],
+           maxOutputTokens: outputWindow,
+           maxRetries: 0,
++          ...(miraFormalRuntime ? { abortSignal: formalLlmAbortSignal(true) } : {}),
+         },
+         'generate-classroom-scene',
+         undefined,
+@@ -403,6 +443,7 @@ export async function generateClassroom(
+             { role: 'user', content: userPrompt },
+           ],
+           maxOutputTokens: outputWindow,
++          ...(miraFormalRuntime ? { abortSignal: formalLlmAbortSignal(true) } : {}),
+         },
+         'generate-classroom',
+         undefined,
+@@ -428,6 +469,7 @@ export async function generateClassroom(
+           ],
+           maxOutputTokens: outputWindow,
+           maxRetries: 0,
++          ...(miraFormalRuntime ? { abortSignal: formalLlmAbortSignal(true) } : {}),
+         },
+         'generate-classroom-scene',
+         undefined,
+@@ -536,8 +578,14 @@ export async function generateClassroom(
+     ({ languageDirective, courseTitle, outlines } = miraSampleStructuralPlan);
+     log.info('Using server-owned Mira sample classroom structure');
+   } else {
+-    const outlinesResult = await generateSceneOutlinesFromRequirements(
+-      requirements,
++    const formalOutlineRequirements = miraFormalRuntime
++      ? {
++          ...requirements,
++          requirement: `${requirements.requirement}\n\n${MIRA_FORMAL_OUTLINE_DIRECTIVE}`,
++        }
++      : requirements;
++    let outlinesResult = await generateSceneOutlinesFromRequirements(
++      formalOutlineRequirements,
+       pdfText,
+       undefined,
+       aiCall,
+@@ -549,11 +597,37 @@ export async function generateClassroom(
+       },
+     );
+ 
++    if (
++      miraFormalRuntime &&
++      (!outlinesResult.success ||
++        !outlinesResult.data ||
++        !matchesMiraFormalOutlineContract(outlinesResult.data.outlines))
++    ) {
++      log.warn('Mira formal outline contract rejected the first result; repairing once');
++      outlinesResult = await generateSceneOutlinesFromRequirements(
++        {
++          ...formalOutlineRequirements,
++          requirement: `${formalOutlineRequirements.requirement}\n\nThe previous response was rejected. Repair it now and satisfy every contract line exactly.`,
++        },
++        pdfText,
++        undefined,
++        aiCall,
++        {
++          imageGenerationEnabled: input.enableImageGeneration,
++          videoGenerationEnabled: input.enableVideoGeneration,
++          researchContext,
++        },
++      );
++    }
++
+     if (!outlinesResult.success || !outlinesResult.data) {
+       log.error('Failed to generate outlines:', outlinesResult.error);
+       throw new Error(outlinesResult.error || 'Failed to generate scene outlines');
+     }
+     ({ languageDirective, courseTitle, outlines } = outlinesResult.data);
++    if (miraFormalRuntime && !matchesMiraFormalOutlineContract(outlines)) {
++      throw new Error('FORMAL_RUNTIME_OUTLINE_CONTRACT_INVALID');
++    }
+   }
+   log.info(
+     `Generated ${outlines.length} scene outlines (languageDirective: ${languageDirective}, courseTitle: ${courseTitle ?? 'n/a'})`,
+@@ -688,7 +762,10 @@ export async function generateClassroom(
+             const metadata = contentCall.getLastAttemptMetadata();
+             if (!isStructuredOutputExhaustedAfterParseFailure(metadata)) return result;
+ 
+-            const error = new StructuredOutputExhaustedError(metadata);
++            // A conclusively exhausted call may be retried once at the current
++            // scene.  The second exhaustion is terminal, so this never turns
++            // into an unbounded provider loop or a whole-classroom redispatch.
++            const error = new StructuredOutputExhaustedError(metadata, attempt === 1);
+             log.warn(STRUCTURED_OUTPUT_EXHAUSTED_CODE, {
+               ...error.diagnostic,
+               sceneIndex: index + 1,
+diff --git a/lib/server/structured-output-guard.ts b/lib/server/structured-output-guard.ts
+index e749990..6492984 100644
+--- a/lib/server/structured-output-guard.ts
++++ b/lib/server/structured-output-guard.ts
+@@ -128,12 +128,13 @@ export function isStructuredOutputExhaustedAfterParseFailure(
+ 
+ export class StructuredOutputExhaustedError extends Error {
+   readonly code = STRUCTURED_OUTPUT_EXHAUSTED_CODE;
+-  readonly isRetryable = false;
++  readonly isRetryable: boolean;
+   readonly diagnostic: StructuredOutputExhaustedDiagnostic;
+ 
+-  constructor(metadata: StructuredOutputAttemptMetadata) {
++  constructor(metadata: StructuredOutputAttemptMetadata, retryable = false) {
+     super(STRUCTURED_OUTPUT_EXHAUSTED_CODE);
+     this.name = 'StructuredOutputExhaustedError';
++    this.isRetryable = retryable;
+     this.diagnostic = Object.freeze({
+       code: STRUCTURED_OUTPUT_EXHAUSTED_CODE,
+       failureKind: 'parse_failed',
+diff --git a/packages/@openmaic/generation/src/outline-generator.ts b/packages/@openmaic/generation/src/outline-generator.ts
+index a3e3bb8..4f46c59 100644
+--- a/packages/@openmaic/generation/src/outline-generator.ts
++++ b/packages/@openmaic/generation/src/outline-generator.ts
+@@ -43,6 +43,40 @@ export interface OutlineFallbackOptions {
+   logger?: GenerationLogger;
+ }
+ 
++interface OutlineEnvelope {
++  languageDirective?: unknown;
++  courseTitle?: unknown;
++  outlines: SceneOutline[];
++}
++
++function isRecord(value: unknown): value is Record<string, unknown> {
++  return typeof value === 'object' && value !== null && !Array.isArray(value);
++}
++
++/** Accept common provider envelopes while keeping the scene array authoritative. */
++function normalizeOutlineEnvelope(parsed: unknown): OutlineEnvelope | null {
++  if (Array.isArray(parsed)) return { outlines: parsed as SceneOutline[] };
++  if (!isRecord(parsed)) return null;
++
++  const candidates: Record<string, unknown>[] = [parsed];
++  for (const key of ['data', 'result']) {
++    if (isRecord(parsed[key])) candidates.push(parsed[key]);
++  }
++
++  for (const candidate of candidates) {
++    const outlines = [candidate.outlines, candidate.sceneOutlines, candidate.scenes].find(
++      Array.isArray,
++    );
++    if (!outlines) continue;
++    return {
++      languageDirective: candidate.languageDirective ?? parsed.languageDirective,
++      courseTitle: candidate.courseTitle ?? parsed.courseTitle,
++      outlines: outlines as SceneOutline[],
++    };
++  }
++  return null;
++}
++
+ function buildAvailableImages(
+   pdfImages: PdfImage[] | undefined,
+   context: OutlinePromptContext,
+@@ -143,30 +177,20 @@ export async function generateSceneOutlinesFromRequirements(
+ 
+   try {
+     const response = await aiCall(prompts.system, prompts.user, visionImages);
+-    const parsed = parseJsonResponse<
+-      { languageDirective: string; courseTitle?: string; outlines: SceneOutline[] } | SceneOutline[]
+-    >(response, { logger });
+-
+-    let languageDirective: string;
+-    let courseTitle: string | undefined;
+-    let rawOutlines: SceneOutline[];
+-
+-    if (Array.isArray(parsed)) {
+-      languageDirective = DEFAULT_LANGUAGE_DIRECTIVE;
+-      rawOutlines = parsed;
+-    } else if (parsed && parsed.outlines) {
+-      languageDirective = parsed.languageDirective || DEFAULT_LANGUAGE_DIRECTIVE;
+-      const rawTitle = parsed.courseTitle;
+-      courseTitle =
+-        typeof rawTitle === 'string' && rawTitle.trim() ? rawTitle.trim().slice(0, 120) : undefined;
+-      rawOutlines = parsed.outlines;
+-    } else {
++    const parsed = parseJsonResponse<unknown>(response, { logger });
++    const envelope = normalizeOutlineEnvelope(parsed);
++    if (!envelope) {
+       return { success: false, error: 'Failed to parse scene outlines response' };
+     }
+ 
+-    if (!Array.isArray(rawOutlines)) {
+-      return { success: false, error: 'Failed to parse scene outlines response' };
+-    }
++    const languageDirective =
++      typeof envelope.languageDirective === 'string' && envelope.languageDirective.trim()
++        ? envelope.languageDirective
++        : DEFAULT_LANGUAGE_DIRECTIVE;
++    const rawTitle = envelope.courseTitle;
++    const courseTitle =
++      typeof rawTitle === 'string' && rawTitle.trim() ? rawTitle.trim().slice(0, 120) : undefined;
++    const rawOutlines = envelope.outlines;
+ 
+     const enriched = rawOutlines.map((outline, index) => ({
+       ...outline,
+diff --git a/packages/@openmaic/generation/test/outline-generator.test.ts b/packages/@openmaic/generation/test/outline-generator.test.ts
+index 77ca2f8..dde7a31 100644
+--- a/packages/@openmaic/generation/test/outline-generator.test.ts
++++ b/packages/@openmaic/generation/test/outline-generator.test.ts
+@@ -81,6 +81,23 @@ describe('generateSceneOutlinesFromRequirements', () => {
+     expect(result.data?.languageDirective).toBe(DEFAULT_LANGUAGE_DIRECTIVE);
+   });
+ 
++  test('normalizes a nested sceneOutlines provider envelope', async () => {
++    const result = await generateSceneOutlinesFromRequirements(
++      { requirement: 'Teach photosynthesis' },
++      undefined,
++      undefined,
++      async () =>
++        JSON.stringify({
++          languageDirective: 'Teach in English.',
++          result: { sceneOutlines: [{ ...baseOutline, order: 42 }] },
++        }),
++    );
++
++    expect(result.success).toBe(true);
++    expect(result.data?.languageDirective).toBe('Teach in English.');
++    expect(result.data?.outlines).toMatchObject([{ title: 'Photosynthesis', order: 1 }]);
++  });
++
+   test('passes media enable flags into prompt conditionals', async () => {
+     let capturedPrompt = '';
+     const aiCall: AICallFn = async (system, user) => {
+diff --git a/tests/server/classroom-generation-retry.test.ts b/tests/server/classroom-generation-retry.test.ts
+index d7bf5a8..bc769ab 100644
+--- a/tests/server/classroom-generation-retry.test.ts
++++ b/tests/server/classroom-generation-retry.test.ts
+@@ -227,7 +227,7 @@ describe('classroom scene generation retries', () => {
+     );
+   });
+ 
+-  it('fails once with structured_output_exhausted after parse-null at the output window', async () => {
++  it('retries one exhausted structured scene call and keeps completed work', async () => {
+     process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
+     const defaultResolved = {
+       model: { id: 'kimi-k2.6' },
+@@ -238,6 +238,64 @@ describe('classroom scene generation retries', () => {
+       thinkingConfig: { mode: 'disabled', enabled: false },
+     };
+     mocks.resolveModel.mockResolvedValue(defaultResolved);
++    mocks.callLLM
++      .mockResolvedValueOnce({
++        text: 'PRIVATE_MODEL_RESPONSE',
++        finishReason: 'length',
++        rawFinishReason: 'length',
++        usage: {
++          outputTokens: 8192,
++          outputTokenDetails: { textTokens: 1, reasoningTokens: 8191 },
++        },
++      })
++      .mockResolvedValueOnce({
++        text: '{"elements":[]}',
++        finishReason: 'stop',
++        usage: {
++          outputTokens: 32,
++          outputTokenDetails: { textTokens: 32, reasoningTokens: 0 },
++        },
++      });
++    mocks.generateSceneContent.mockImplementation(async (_sceneOutline, aiCall) => {
++      await aiCall('PRIVATE_SYSTEM_PROMPT', 'PRIVATE_USER_PROMPT');
++      return mocks.generateSceneContent.mock.calls.length === 1 ? null : slideContent;
++    });
++
++    const { result, progress } = await generateWithProgress();
++
++    expect(result.scenesCount).toBe(1);
++    expect(mocks.generateSceneContent).toHaveBeenCalledTimes(2);
++    expect(mocks.callLLM).toHaveBeenCalledTimes(2);
++    expect(mocks.logWarn).toHaveBeenCalledWith(
++      'structured_output_exhausted',
++      expect.objectContaining({
++        sceneIndex: 1,
++        attempt: 1,
++        outputTokens: 8192,
++        reasoningTokens: 8191,
++        textTokens: 1,
++      }),
++    );
++    const progressText = JSON.stringify(mocks.logWarn.mock.calls.concat(mocks.logError.mock.calls));
++    expect(progressText).not.toContain('PRIVATE_MODEL_RESPONSE');
++    expect(progressText).not.toContain('PRIVATE_SYSTEM_PROMPT');
++    expect(progressText).not.toContain('PRIVATE_USER_PROMPT');
++    expect(progressText).not.toContain('server-owned');
++    expect(progress.some((event) => event.message.includes('Retrying scene 1/1 content'))).toBe(
++      true,
++    );
++  });
++
++  it('caps structured output exhaustion at one retry', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    mocks.resolveModel.mockResolvedValue({
++      model: { id: 'kimi-k2.6' },
++      modelInfo: { outputWindow: 8192 },
++      modelString: 'kimi:kimi-k2.6',
++      providerId: 'kimi',
++      apiKey: 'server-owned',
++      thinkingConfig: { mode: 'disabled', enabled: false },
++    });
+     mocks.callLLM.mockResolvedValue({
+       text: 'PRIVATE_MODEL_RESPONSE',
+       finishReason: 'length',
+@@ -255,36 +313,59 @@ describe('classroom scene generation retries', () => {
+     await expect(generateWithProgress()).rejects.toMatchObject({
+       code: 'structured_output_exhausted',
+       isRetryable: false,
+-      diagnostic: {
+-        attempt: 1,
+-        stage: 'scene-content:slide',
+-        modelString: 'kimi:kimi-k2.6',
+-        outputWindow: 8192,
+-        outputTokens: 8192,
+-        reasoningTokens: 8191,
+-        textTokens: 1,
+-        reachedOutputWindow: true,
+-        nearEmpty: true,
+-      },
++      diagnostic: { attempt: 2, reachedOutputWindow: true },
+     });
+-    expect(mocks.generateSceneContent).toHaveBeenCalledTimes(1);
+-    expect(mocks.callLLM).toHaveBeenCalledTimes(1);
+-    expect(mocks.logWarn).toHaveBeenCalledWith(
+-      'structured_output_exhausted',
+-      expect.objectContaining({
+-        sceneIndex: 1,
+-        attempt: 1,
+-        outputTokens: 8192,
+-        reasoningTokens: 8191,
+-        textTokens: 1,
++    expect(mocks.generateSceneContent).toHaveBeenCalledTimes(2);
++    expect(mocks.callLLM).toHaveBeenCalledTimes(2);
++  });
++
++  it('repairs a non-conforming formal outline once before scene generation', async () => {
++    const { MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT } = await import(
++      '@/lib/server/mira-formal-generation-policy'
++    );
++    const formalOutlines = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.orderedSceneTypes.map(
++      (type, index) => ({
++        ...outline,
++        id: `formal-outline-${index + 1}`,
++        type,
++        order: index + 1,
++        ...(type === 'interactive'
++          ? {
++              widgetType: ['simulation', 'game', 'visualization3d'][index - 7],
++              widgetOutline: { concept: `formal concept ${index + 1}` },
++            }
++          : {}),
+       }),
+     );
+-    const progressText = JSON.stringify(mocks.logWarn.mock.calls.concat(mocks.logError.mock.calls));
+-    expect(progressText).not.toContain('PRIVATE_MODEL_RESPONSE');
+-    expect(progressText).not.toContain('PRIVATE_SYSTEM_PROMPT');
+-    expect(progressText).not.toContain('PRIVATE_USER_PROMPT');
+-    expect(progressText).not.toContain('server-owned');
+-    expect(progressText).not.toContain('Retrying scene');
++    mocks.generateSceneOutlinesFromRequirements
++      .mockResolvedValueOnce({
++        success: true,
++        data: { languageDirective: 'Use Chinese.', outlines: [outline] },
++      })
++      .mockResolvedValueOnce({
++        success: true,
++        data: { languageDirective: 'Use Chinese.', outlines: formalOutlines },
++      });
++    mocks.generateSceneContent.mockResolvedValue(slideContent);
++
++    const { generateClassroom } = await import('@/lib/server/classroom-generation');
++    const result = await generateClassroom(
++      {
++        requirement: '一年级正式课程',
++        runtimeRequestId: 'formal-outline-repair-1',
++        formalRuntimeContract: MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++        enableWebSearch: false,
++        enableImageGeneration: false,
++        enableVideoGeneration: false,
++        enableTTS: false,
++        agentMode: 'generate',
++      },
++      { baseUrl: 'http://localhost' },
++    );
++
++    expect(mocks.generateSceneOutlinesFromRequirements).toHaveBeenCalledTimes(2);
++    expect(mocks.generateSceneContent).toHaveBeenCalledTimes(10);
++    expect(result.scenesCount).toBeGreaterThan(0);
+   });
+ 
+   it('does not reject a successfully parsed scene merely because the call reached length', async () => {
+-- 
+2.50.1 (Apple Git-155)
+

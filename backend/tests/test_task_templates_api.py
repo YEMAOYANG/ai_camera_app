@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from datetime import datetime
 
 from app import create_app
 from tests.support import fresh_test_config, request_debug_code
@@ -99,6 +100,48 @@ class TaskTemplatesApiTest(unittest.TestCase):
         self.assertEqual(forbidden.status_code, 404)
         self.assertEqual(forbidden.json["error"], "child_not_found")
 
+    def test_primary_child_returns_explicit_unavailable_without_kindergarten_fallback(self):
+        primary_access = self._login("13800003128")
+        primary_child_id = self._create_grade_code_child_with_token(
+            primary_access,
+            grade_code="primary_3",
+        )
+
+        response = self.client.get(
+            "/api/tasks/templates",
+            query_string={"childId": primary_child_id},
+            headers={"Authorization": f"Bearer {primary_access}"},
+        )
+
+        self.assertEqual(response.status_code, 200, response.json)
+        self.assertEqual(response.json["templates"], [])
+        self.assertTrue(response.json["contentUnavailable"])
+        self.assertEqual(response.json["contentMode"], "primary_learning")
+        self.assertEqual(response.json["requestedGradeCode"], "primary_3")
+        self.assertEqual(response.json["recommendedGrade"], "")
+        self.assertEqual(response.json["recommendedGradeLabel"], "三年级")
+        self.assertIn("不会套用幼儿园任务", response.json["contentMessage"])
+
+    def test_child_without_specific_grade_never_falls_back_to_small(self):
+        legacy_access = self._login("13800003129")
+        legacy_child_id = self._create_child_with_token(
+            legacy_access,
+            "小远",
+            grade="",
+            age_stage="primary",
+            education_stage="小学",
+        )
+
+        response = self.client.get(
+            "/api/tasks/templates",
+            query_string={"childId": legacy_child_id},
+            headers={"Authorization": f"Bearer {legacy_access}"},
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.json["error"], "grade_selection_required")
+        self.assertNotEqual(response.json.get("recommendedGrade"), "small")
+
     def test_templates_do_not_include_school_task_words(self):
         response = self.client.get("/api/tasks/templates", headers=self._auth_headers())
         self.assertEqual(response.status_code, 200)
@@ -125,7 +168,15 @@ class TaskTemplatesApiTest(unittest.TestCase):
     def _create_child(self, name: str, *, grade: str) -> str:
         return self._create_child_with_token(self.access_token, name, grade=grade)
 
-    def _create_child_with_token(self, access_token: str, name: str, *, grade: str) -> str:
+    def _create_child_with_token(
+        self,
+        access_token: str,
+        name: str,
+        *,
+        grade: str,
+        age_stage: str | None = None,
+        education_stage: str = "幼儿园",
+    ) -> str:
         headers = {"Authorization": f"Bearer {access_token}"}
         parent = self.client.post(
             "/api/setup/parent-identity",
@@ -138,14 +189,40 @@ class TaskTemplatesApiTest(unittest.TestCase):
             json={
                 "name": name,
                 "nickname": name,
-                "educationStage": "幼儿园",
-                "ageStage": f"幼儿园{grade}",
+                "educationStage": education_stage,
+                "ageStage": age_stage or f"幼儿园{grade}",
                 "grade": grade,
                 "birthday": "2021-09-01",
             },
             headers=headers,
         )
         self.assertEqual(child.status_code, 200)
+        return child.json["child"]["id"]
+
+    def _create_grade_code_child_with_token(
+        self,
+        access_token: str,
+        *,
+        grade_code: str,
+    ) -> str:
+        headers = {"Authorization": f"Bearer {access_token}"}
+        parent = self.client.post(
+            "/api/setup/parent-identity",
+            json={"displayName": "妈妈", "relationship": "妈妈", "relationshipKey": "mom"},
+            headers=headers,
+        )
+        self.assertEqual(parent.status_code, 200)
+        child = self.client.post(
+            "/api/setup/child",
+            json={
+                "name": "乐乐",
+                "nickname": "乐乐",
+                "gradeCode": grade_code,
+                "schoolYearStartYear": datetime.now().year,
+            },
+            headers=headers,
+        )
+        self.assertEqual(child.status_code, 200, child.json)
         return child.json["child"]["id"]
 
     def _auth_headers(self) -> dict:

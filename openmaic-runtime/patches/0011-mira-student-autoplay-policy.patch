@@ -1,0 +1,424 @@
+From ced81415e74f623b496bc7513491b09a88e98c61 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 11/37] 0011-mira-student-autoplay-policy
+
+---
+ components/canvas/canvas-toolbar.tsx          |  1 +
+ components/edit/PlaybackChromeRoot.tsx        | 37 ++++++++--
+ components/roundtable/index.tsx               |  8 ++-
+ e2e/tests/classroom-interaction.spec.ts       | 26 ++++++-
+ lib/contexts/mira-student-runtime-context.tsx | 69 ++++++++++++++++---
+ lib/mira/student-runtime.ts                   | 18 ++++-
+ tests/runtime/mira-student-runtime.test.ts    | 37 +++++++++-
+ tests/server/health-route.test.ts             |  5 +-
+ 8 files changed, 182 insertions(+), 19 deletions(-)
+
+diff --git a/components/canvas/canvas-toolbar.tsx b/components/canvas/canvas-toolbar.tsx
+index 30db3cf..70313cf 100644
+--- a/components/canvas/canvas-toolbar.tsx
++++ b/components/canvas/canvas-toolbar.tsx
+@@ -386,6 +386,7 @@ export function CanvasToolbar({
+                         : 'text-gray-500 dark:text-gray-400',
+                     )}
+                     aria-label="Auto-play"
++                    aria-pressed={autoPlayLecture === true}
+                   >
+                     <Repeat className="w-3.5 h-3.5" />
+                   </button>
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 07a6c37..e096637 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -55,7 +55,11 @@ import {
+ } from '@/components/ui/alert-dialog';
+ import { AlertTriangle } from 'lucide-react';
+ import { VisuallyHidden } from 'radix-ui';
+-import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
++import {
++  useMiraStudentAutoPlayRuntime,
++  useMiraStudentRuntime,
++} from '@/lib/contexts/mira-student-runtime-context';
++import { getMiraEffectiveAutoPlayLecture } from '@/lib/mira/student-runtime';
+ 
+ /**
+  * Imperative handle exposed via `ref` so the parent (`Stage`) can tear
+@@ -107,6 +111,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+   ) {
+     const { t } = useI18n();
+     const studentMode = useMiraStudentRuntime();
++    const studentAutoPlayRuntime = useMiraStudentAutoPlayRuntime();
+     const {
+       mode: storedMode,
+       stage,
+@@ -132,6 +137,16 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     const setChatAreaCollapsed = useSettingsStore((s) => s.setChatAreaCollapsed);
+     const setTTSMuted = useSettingsStore((s) => s.setTTSMuted);
+     const setTTSVolume = useSettingsStore((s) => s.setTTSVolume);
++    const operatorAutoPlayLecture = useSettingsStore((s) => s.autoPlayLecture);
++    const setOperatorAutoPlayLecture = useSettingsStore((s) => s.setAutoPlayLecture);
++    const autoPlayLecture = getMiraEffectiveAutoPlayLecture({
++      studentMode,
++      studentAutoPlayLecture: studentAutoPlayRuntime?.autoPlayLecture ?? false,
++      operatorAutoPlayLecture,
++    });
++    const setAutoPlayLecture = studentMode
++      ? (studentAutoPlayRuntime?.setAutoPlayLecture ?? (() => {}))
++      : setOperatorAutoPlayLecture;
+ 
+     // PlaybackEngine state
+     const [engineMode, setEngineMode] = useState<EngineMode>('idle');
+@@ -820,11 +835,23 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+               lectureSessionIdRef.current = null;
+             }
+             // Auto-play: advance to next scene after a short pause
+-            const { autoPlayLecture } = useSettingsStore.getState();
+-            if (autoPlayLecture) {
++            const autoPlayEnabled = getMiraEffectiveAutoPlayLecture({
++              studentMode,
++              studentAutoPlayLecture: studentAutoPlayRuntime?.autoPlayLectureRef.current ?? false,
++              operatorAutoPlayLecture: useSettingsStore.getState().autoPlayLecture,
++            });
++            if (autoPlayEnabled) {
+               setTimeout(() => {
+                 const stageState = useStageStore.getState();
+-                if (!useSettingsStore.getState().autoPlayLecture) return;
++                if (
++                  !getMiraEffectiveAutoPlayLecture({
++                    studentMode,
++                    studentAutoPlayLecture:
++                      studentAutoPlayRuntime?.autoPlayLectureRef.current ?? false,
++                    operatorAutoPlayLecture: useSettingsStore.getState().autoPlayLecture,
++                  })
++                )
++                  return;
+                 const allScenes = stageState.scenes;
+                 const curId = stageState.currentSceneId;
+                 const idx = allScenes.findIndex((s) => s.id === curId);
+@@ -1546,6 +1573,8 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+                 }}
+                 onResumeTopic={doResumeTopic}
+                 onPlayPause={handlePlayPause}
++                autoPlayLecture={autoPlayLecture}
++                onAutoPlayLectureChange={setAutoPlayLecture}
+                 isDiscussionPaused={isDiscussionPaused}
+                 onDiscussionPause={() => {
+                   const paused = chatAreaRef.current?.pauseActiveLiveBuffer();
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+index 0860093..7b53193 100644
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -75,6 +75,8 @@ interface RoundtableProps {
+ 
+   readonly onResumeTopic?: () => void;
+   readonly onPlayPause?: () => void;
++  readonly autoPlayLecture: boolean;
++  readonly onAutoPlayLectureChange: (enabled: boolean) => void;
+   readonly isDiscussionPaused?: boolean;
+   readonly onDiscussionPause?: () => void;
+   readonly onDiscussionResume?: () => void;
+@@ -170,6 +172,8 @@ export function Roundtable({
+ 
+   onResumeTopic,
+   onPlayPause,
++  autoPlayLecture,
++  onAutoPlayLectureChange,
+   isDiscussionPaused,
+   onDiscussionPause,
+   onDiscussionResume,
+@@ -197,8 +201,6 @@ export function Roundtable({
+   const chatAreaWidth = useSettingsStore((s) => s.chatAreaWidth);
+   const ttsVolume = useSettingsStore((s) => s.ttsVolume);
+   const setTTSVolume = useSettingsStore((s) => s.setTTSVolume);
+-  const autoPlayLecture = useSettingsStore((s) => s.autoPlayLecture);
+-  const setAutoPlayLecture = useSettingsStore((s) => s.setAutoPlayLecture);
+   const playbackSpeed = useSettingsStore((s) => s.playbackSpeed);
+   const setPlaybackSpeed = useSettingsStore((s) => s.setPlaybackSpeed);
+   const [isInputOpen, setIsInputOpen] = useState(false);
+@@ -682,7 +684,7 @@ export function Roundtable({
+       onToggleMute={() => ttsEnabled && setTTSMuted(!ttsMuted)}
+       onVolumeChange={(v) => setTTSVolume(v)}
+       autoPlayLecture={autoPlayLecture}
+-      onToggleAutoPlay={() => setAutoPlayLecture(!autoPlayLecture)}
++      onToggleAutoPlay={() => onAutoPlayLectureChange(!autoPlayLecture)}
+       playbackSpeed={playbackSpeed}
+       onCycleSpeed={handleCycleSpeed}
+     />
+diff --git a/e2e/tests/classroom-interaction.spec.ts b/e2e/tests/classroom-interaction.spec.ts
+index f2bc74f..1c2e68b 100644
+--- a/e2e/tests/classroom-interaction.spec.ts
++++ b/e2e/tests/classroom-interaction.spec.ts
+@@ -5,7 +5,10 @@ import { defaultTheme } from '../fixtures/test-data/scene-content';
+ 
+ const TEST_STAGE_ID = 'e2e-test-stage';
+ 
+-const SETTINGS_STORAGE = createSettingsStorage({ sidebarCollapsed: false });
++const SETTINGS_STORAGE = createSettingsStorage({
++  sidebarCollapsed: false,
++  autoPlayLecture: true,
++});
+ 
+ /** Seed IndexedDB with stage + 3 scenes using raw IndexedDB API */
+ async function seedDatabase(page: import('@playwright/test').Page) {
+@@ -331,6 +334,21 @@ test.describe('Classroom Interaction', () => {
+     await expect(page.locator('[data-testid="header-controls"]')).toHaveCount(0);
+     await expect(page.locator('img[alt="OpenMAIC"]')).toHaveCount(0);
+ 
++    const autoPlayButton = page.getByRole('button', { name: 'Auto-play', exact: true });
++    await expect(autoPlayButton).toHaveAttribute('aria-pressed', 'false');
++    await autoPlayButton.click();
++    await expect(autoPlayButton).toHaveAttribute('aria-pressed', 'true');
++    await autoPlayButton.click();
++    await expect(autoPlayButton).toHaveAttribute('aria-pressed', 'false');
++    await expect
++      .poll(() =>
++        page.evaluate(() => {
++          const raw = localStorage.getItem('maic:account:settings-storage');
++          return raw ? JSON.parse(raw).state?.autoPlayLecture : undefined;
++        }),
++      )
++      .toBe(true);
++
+     const iconHrefs = await page
+       .locator('link[rel~="icon"]')
+       .evaluateAll((links) =>
+@@ -346,5 +364,11 @@ test.describe('Classroom Interaction', () => {
+         })),
+       )
+       .toEqual({ locale: 'en-US', theme: 'dark' });
++
++    await page.goto(`/classroom/${TEST_STAGE_ID}`);
++    await expect(page.getByRole('button', { name: 'Auto-play', exact: true })).toHaveAttribute(
++      'aria-pressed',
++      'true',
++    );
+   });
+ });
+diff --git a/lib/contexts/mira-student-runtime-context.tsx b/lib/contexts/mira-student-runtime-context.tsx
+index 1e4f1f8..82dbad4 100644
+--- a/lib/contexts/mira-student-runtime-context.tsx
++++ b/lib/contexts/mira-student-runtime-context.tsx
+@@ -5,15 +5,59 @@ import {
+   useCallback,
+   useContext,
+   useLayoutEffect,
++  useMemo,
++  useRef,
+   useState,
++  type MutableRefObject,
+   type ReactNode,
+ } from 'react';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { useTheme } from '@/lib/hooks/use-theme';
+ import { supportedLocales, type Locale } from '@/lib/i18n';
++import { MIRA_STUDENT_AUTO_PLAY_DEFAULT } from '@/lib/mira/student-runtime';
+ 
+ const MiraStudentRuntimeContext = createContext(false);
+ 
++export interface MiraStudentAutoPlayRuntime {
++  readonly autoPlayLecture: boolean;
++  readonly autoPlayLectureRef: MutableRefObject<boolean>;
++  readonly setAutoPlayLecture: (enabled: boolean) => void;
++}
++
++const MiraStudentAutoPlayRuntimeContext = createContext<MiraStudentAutoPlayRuntime | null>(null);
++
++function MiraStudentAutoPlaySession({
++  studentMode,
++  children,
++}: {
++  readonly studentMode: boolean;
++  readonly children: ReactNode;
++}) {
++  const [autoPlayLecture, setAutoPlayLectureState] = useState(MIRA_STUDENT_AUTO_PLAY_DEFAULT);
++  const autoPlayLectureRef = useRef(MIRA_STUDENT_AUTO_PLAY_DEFAULT);
++  const setAutoPlayLecture = useCallback((enabled: boolean) => {
++    autoPlayLectureRef.current = enabled;
++    setAutoPlayLectureState(enabled);
++  }, []);
++  const autoPlayRuntime = useMemo<MiraStudentAutoPlayRuntime | null>(
++    () =>
++      studentMode
++        ? {
++            autoPlayLecture,
++            autoPlayLectureRef,
++            setAutoPlayLecture,
++          }
++        : null,
++    [autoPlayLecture, setAutoPlayLecture, studentMode],
++  );
++
++  return (
++    <MiraStudentAutoPlayRuntimeContext.Provider value={autoPlayRuntime}>
++      {children}
++    </MiraStudentAutoPlayRuntimeContext.Provider>
++  );
++}
++
+ type StoredTheme = 'light' | 'dark' | 'system';
+ 
+ function applyStudentDocumentPreferences() {
+@@ -90,14 +134,19 @@ export function MiraStudentRuntimeProvider({
+ 
+   return (
+     <MiraStudentRuntimeContext.Provider value={studentMode}>
+-      {studentMode && <MiraStudentPreferences onReady={markPreferencesReady} />}
+-      {studentMode && !preferencesReady ? (
+-        <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-600">
+-          课程加载中…
+-        </div>
+-      ) : (
+-        children
+-      )}
++      <MiraStudentAutoPlaySession
++        key={studentMode ? 'student' : 'operator'}
++        studentMode={studentMode}
++      >
++        {studentMode && <MiraStudentPreferences onReady={markPreferencesReady} />}
++        {studentMode && !preferencesReady ? (
++          <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-600">
++            课程加载中…
++          </div>
++        ) : (
++          children
++        )}
++      </MiraStudentAutoPlaySession>
+     </MiraStudentRuntimeContext.Provider>
+   );
+ }
+@@ -105,3 +154,7 @@ export function MiraStudentRuntimeProvider({
+ export function useMiraStudentRuntime(): boolean {
+   return useContext(MiraStudentRuntimeContext);
+ }
++
++export function useMiraStudentAutoPlayRuntime(): MiraStudentAutoPlayRuntime | null {
++  return useContext(MiraStudentAutoPlayRuntimeContext);
++}
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+index 183a0dc..4bcf5b4 100644
+--- a/lib/mira/student-runtime.ts
++++ b/lib/mira/student-runtime.ts
+@@ -5,13 +5,17 @@ import {
+ 
+ export const MIRA_STUDENT_RUNTIME_QUERY_KEY = 'mira';
+ export const MIRA_STUDENT_RUNTIME_QUERY_VALUE = '1';
++export const MIRA_STUDENT_AUTO_PLAY_DEFAULT = false;
+ 
+ export const MIRA_STUDENT_CHROME_POLICY = Object.freeze({
+   enforced: true,
+-  policyVersion: 'mira-student-chrome.v2',
++  policyVersion: 'mira-student-chrome.v3',
+   marker: 'mira=1',
+   locale: 'zh-CN',
+   theme: 'light',
++  autoPlayDefault: MIRA_STUDENT_AUTO_PLAY_DEFAULT,
++  autoPlayPersistence: 'student-session',
++  manualAutoPlayToggleEnabled: true,
+   operatorChromePreserved: true,
+   headerControlsHidden: true,
+   exportsHidden: true,
+@@ -34,6 +38,18 @@ export const MIRA_STUDENT_CLASSROOM_METADATA = Object.freeze({
+ 
+ export type MiraStudentChromePolicy = typeof MIRA_STUDENT_CHROME_POLICY;
+ 
++export function getMiraEffectiveAutoPlayLecture({
++  studentMode,
++  studentAutoPlayLecture,
++  operatorAutoPlayLecture,
++}: {
++  readonly studentMode: boolean;
++  readonly studentAutoPlayLecture: boolean;
++  readonly operatorAutoPlayLecture: boolean;
++}): boolean {
++  return studentMode ? studentAutoPlayLecture : operatorAutoPlayLecture;
++}
++
+ /** Student chrome is enabled only for the exact `mira=1` marker. */
+ export function isMiraStudentRuntimeSearch(search: string): boolean {
+   const values = new URLSearchParams(search).getAll(MIRA_STUDENT_RUNTIME_QUERY_KEY);
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+index 3505963..be9fcfe 100644
+--- a/tests/runtime/mira-student-runtime.test.ts
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -1,5 +1,6 @@
+ import { describe, expect, it } from 'vitest';
+ import {
++  getMiraEffectiveAutoPlayLecture,
+   getMiraStudentChromeRuntimePolicy,
+   isMiraStudentRuntimeParam,
+   isMiraStudentRuntimeSearch,
+@@ -24,10 +25,13 @@ describe('Mira student runtime marker', () => {
+   it('publishes the exact student chrome health attestation', () => {
+     expect(getMiraStudentChromeRuntimePolicy()).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v2',
++      policyVersion: 'mira-student-chrome.v3',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
++      autoPlayDefault: false,
++      autoPlayPersistence: 'student-session',
++      manualAutoPlayToggleEnabled: true,
+       operatorChromePreserved: true,
+       headerControlsHidden: true,
+       exportsHidden: true,
+@@ -38,6 +42,37 @@ describe('Mira student runtime marker', () => {
+     });
+   });
+ 
++  it('isolates student auto-play from the persisted operator preference', () => {
++    expect(
++      getMiraEffectiveAutoPlayLecture({
++        studentMode: true,
++        studentAutoPlayLecture: false,
++        operatorAutoPlayLecture: true,
++      }),
++    ).toBe(false);
++    expect(
++      getMiraEffectiveAutoPlayLecture({
++        studentMode: true,
++        studentAutoPlayLecture: true,
++        operatorAutoPlayLecture: false,
++      }),
++    ).toBe(true);
++    expect(
++      getMiraEffectiveAutoPlayLecture({
++        studentMode: false,
++        studentAutoPlayLecture: false,
++        operatorAutoPlayLecture: true,
++      }),
++    ).toBe(true);
++    expect(
++      getMiraEffectiveAutoPlayLecture({
++        studentMode: false,
++        studentAutoPlayLecture: true,
++        operatorAutoPlayLecture: false,
++      }),
++    ).toBe(false);
++  });
++
+   it('uses neutral classroom metadata and icons in student mode', () => {
+     expect(MIRA_STUDENT_CLASSROOM_METADATA).toEqual({
+       title: 'Mira 学习课堂',
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 258cc5a..2552f90 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -105,10 +105,13 @@ describe('GET /api/health structured scene runtime policy', () => {
+     });
+     expect(body.runtimePolicy.studentChrome).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v2',
++      policyVersion: 'mira-student-chrome.v3',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
++      autoPlayDefault: false,
++      autoPlayPersistence: 'student-session',
++      manualAutoPlayToggleEnabled: true,
+       operatorChromePreserved: true,
+       headerControlsHidden: true,
+       exportsHidden: true,
+-- 
+2.50.1 (Apple Git-155)
+

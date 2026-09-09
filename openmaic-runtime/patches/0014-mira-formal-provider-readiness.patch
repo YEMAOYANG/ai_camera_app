@@ -1,0 +1,1456 @@
+From 0001533466f6a079c36040f20ff49d5f01a0f2c9 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 14/37] 0014-mira-formal-provider-readiness
+
+---
+ app/api/health/route.ts                       |  28 +
+ .../mira/formal-provider-readiness/route.ts   |  62 ++
+ lib/server/mira-formal-provider-readiness.ts  | 951 ++++++++++++++++++
+ .../mira-formal-provider-readiness.test.ts    | 364 +++++++
+ 4 files changed, 1405 insertions(+)
+ create mode 100644 app/api/mira/formal-provider-readiness/route.ts
+ create mode 100644 lib/server/mira-formal-provider-readiness.ts
+ create mode 100644 tests/server/mira-formal-provider-readiness.test.ts
+
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index 0f770d6..d18f0ce 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -21,10 +21,38 @@ import {
+   getMiraFormalAudioRuntimePolicy,
+   MiraFormalAudioError,
+ } from '@/lib/server/mira-formal-audio';
++import {
++  assertMiraFormalProviderReadinessProviderReady,
++  authorizeMiraFormalProviderReadinessRequest,
++  getMiraFormalProviderReadinessPolicy,
++  MiraFormalProviderReadinessError,
++} from '@/lib/server/mira-formal-provider-readiness';
+ 
+ const version = process.env.npm_package_version || '0.3.2';
+ 
+ export async function GET(req?: NextRequest) {
++  if (req?.nextUrl.searchParams.get('scope') === 'formal-provider-readiness') {
++    try {
++      authorizeMiraFormalProviderReadinessRequest(req);
++      assertMiraFormalProviderReadinessProviderReady();
++      return apiSuccess({
++        status: 'ok',
++        version,
++        capabilities: { formalProviderReadiness: true },
++        runtimePolicy: {
++          formalProviderReadiness: getMiraFormalProviderReadinessPolicy(),
++        },
++      });
++    } catch (error) {
++      if (
++        error instanceof MiraFormalProviderReadinessError &&
++        error.code === 'unauthorized'
++      ) {
++        return apiError('INVALID_CREDENTIALS', 403, 'Invalid formal readiness credentials');
++      }
++      return apiError('PROVIDER_DISABLED', 503, 'Formal readiness providers are unavailable.');
++    }
++  }
+   if (req?.nextUrl.searchParams.get('scope') === 'formal-audio') {
+     try {
+       authorizeMiraFormalAudioRequest(req);
+diff --git a/app/api/mira/formal-provider-readiness/route.ts b/app/api/mira/formal-provider-readiness/route.ts
+new file mode 100644
+index 0000000..c9ed500
+--- /dev/null
++++ b/app/api/mira/formal-provider-readiness/route.ts
+@@ -0,0 +1,62 @@
++import type { NextRequest } from 'next/server';
++import { apiError, apiSuccess } from '@/lib/server/api-response';
++import {
++  authorizeMiraFormalProviderReadinessRequest,
++  executeMiraFormalProviderReadiness,
++  MiraFormalProviderReadinessError,
++  readMiraFormalProviderReadinessJob,
++} from '@/lib/server/mira-formal-provider-readiness';
++
++export const dynamic = 'force-dynamic';
++export const maxDuration = 600;
++
++function errorResponse(error: unknown) {
++  if (error instanceof MiraFormalProviderReadinessError) {
++    if (error.code === 'unauthorized') {
++      return apiError('INVALID_CREDENTIALS', 403, 'Invalid formal readiness credentials');
++    }
++    if (error.code === 'request_conflict') {
++      return apiError('INVALID_REQUEST', 409, 'Formal readiness request conflict');
++    }
++    if (error.code === 'not_found' || error.code === 'asset_unavailable') {
++      return apiError('INVALID_REQUEST', 404, 'Formal readiness evidence is unavailable');
++    }
++    if (error.code === 'provider_unavailable') {
++      return apiError('PROVIDER_DISABLED', 503, 'Formal readiness providers are unavailable');
++    }
++    return apiError('INVALID_REQUEST', 400, 'Invalid formal readiness request');
++  }
++  return apiError('INTERNAL_ERROR', 500, 'Formal readiness request failed');
++}
++
++export async function POST(req: NextRequest) {
++  try {
++    authorizeMiraFormalProviderReadinessRequest(req);
++    const result = await executeMiraFormalProviderReadiness(await req.json());
++    return apiSuccess(
++      { ...result.record, done: result.record.state !== 'running' },
++      result.record.state === 'running' ? 202 : 200,
++    );
++  } catch (error) {
++    return errorResponse(error);
++  }
++}
++
++export async function GET(req: NextRequest) {
++  try {
++    authorizeMiraFormalProviderReadinessRequest(req);
++    if ([...req.nextUrl.searchParams.keys()].join(',') !== 'requestId') {
++      return apiError('INVALID_REQUEST', 400, 'Invalid formal readiness query');
++    }
++    const record = await readMiraFormalProviderReadinessJob(
++      req.nextUrl.searchParams.get('requestId') || '',
++    );
++    if (!record) return apiError('INVALID_REQUEST', 404, 'Formal readiness job not found');
++    return apiSuccess(
++      { ...record, done: record.state !== 'running' },
++      record.state === 'running' ? 202 : 200,
++    );
++  } catch (error) {
++    return errorResponse(error);
++  }
++}
+diff --git a/lib/server/mira-formal-provider-readiness.ts b/lib/server/mira-formal-provider-readiness.ts
+new file mode 100644
+index 0000000..069568d
+--- /dev/null
++++ b/lib/server/mira-formal-provider-readiness.ts
+@@ -0,0 +1,951 @@
++import { createHash } from 'crypto';
++import { promises as fs } from 'fs';
++import path from 'path';
++import type { NextRequest } from 'next/server';
++import {
++  authorizeMiraFormalAudioRequest,
++  MiraFormalAudioError,
++  readMiraFormalTtsAsset,
++} from '@/lib/server/mira-formal-audio';
++import {
++  getServerASRProviders,
++  getServerProviders,
++  getServerTTSProviders,
++  resolveApiKey,
++  resolveASRApiKey,
++  resolveASRBaseUrl,
++  resolveBaseUrl,
++  resolveTTSApiKey,
++  resolveTTSBaseUrl,
++} from '@/lib/server/provider-config';
++
++export const MIRA_FORMAL_PROVIDER_READINESS_VERSION =
++  'mira.openmaic.formal-provider-readiness.v1' as const;
++export const MIRA_FORMAL_PROVIDER_READINESS_JOB_VERSION =
++  'mira.openmaic.formal-provider-readiness-job.v1' as const;
++export const MIRA_FORMAL_PROVIDER_TIMEOUT_MS = 120_000;
++
++const SUBJECT_TTS = {
++  chinese: {
++    providerId: 'qwen-tts',
++    modelId: 'qwen3-tts-flash',
++    voiceId: 'Serena',
++    languageCode: 'zh-CN',
++    qwenLanguageType: 'Chinese',
++    validationText: '你好，这是语音就绪验证。',
++  },
++  math: {
++    providerId: 'qwen-tts',
++    modelId: 'qwen3-tts-flash',
++    voiceId: 'Ethan',
++    languageCode: 'zh-CN',
++    qwenLanguageType: 'Chinese',
++    validationText: '十可以分成一个十和零个一。',
++  },
++  english: {
++    providerId: 'qwen-tts',
++    modelId: 'qwen3-tts-flash',
++    voiceId: 'Jennifer',
++    languageCode: 'en-US',
++    qwenLanguageType: 'English',
++    validationText: 'Hello, this is the voice readiness check.',
++  },
++} as const;
++
++type Subject = keyof typeof SUBJECT_TTS;
++type JobState = 'running' | 'auto_validated' | 'failed' | 'ambiguous';
++type CallState = 'attempted' | 'passed' | 'failed' | 'ambiguous';
++
++export const MIRA_FORMAL_PROVIDER_READINESS_POLICY = {
++  enforced: true,
++  schemaVersion: MIRA_FORMAL_PROVIDER_READINESS_VERSION,
++  requestIdempotency: 'requestId+canonicalBodySha256',
++  providerAttemptRecordedBeforeFetch: true,
++  expectedProviderCallCount: 5,
++  retryAllowed: false,
++  staleRunningOutcome: 'ambiguous',
++  providerTimeoutMs: MIRA_FORMAL_PROVIDER_TIMEOUT_MS,
++  routeSessionProof: {
++    schemaVersion: 'mira.openmaic.conversation-proof.v1',
++    providerCall: false,
++    publicationAuthority: false,
++  },
++  providerProof: {
++    schemaVersion: MIRA_FORMAL_PROVIDER_READINESS_VERSION,
++    providerCall: true,
++    publicationAuthority: true,
++    rawResponsePersisted: false,
++    transcriptPersisted: false,
++    audioPersisted: false,
++  },
++  providers: {
++    kimi: { providerId: 'kimi', modelId: 'kimi-k2.6', callCount: 1 },
++    asr: {
++      providerId: 'qwen-asr',
++      modelId: 'qwen3-asr-flash',
++      callCount: 1,
++      inputAuthority: 'task14-local-validation-wav',
++    },
++    tts: {
++      chinese: {
++        providerId: 'qwen-tts',
++        modelId: 'qwen3-tts-flash',
++        voiceId: 'Serena',
++        languageCode: 'zh-CN',
++      },
++      math: {
++        providerId: 'qwen-tts',
++        modelId: 'qwen3-tts-flash',
++        voiceId: 'Ethan',
++        languageCode: 'zh-CN',
++      },
++      english: {
++        providerId: 'qwen-tts',
++        modelId: 'qwen3-tts-flash',
++        voiceId: 'Jennifer',
++        languageCode: 'en-US',
++      },
++    },
++  },
++} as const;
++
++export interface MiraFormalProviderReadinessRequest {
++  schemaVersion: typeof MIRA_FORMAL_PROVIDER_READINESS_VERSION;
++  requestId: string;
++  buildItemId: string;
++  releaseId: string;
++  gradeCode: string;
++  targetFingerprint: string;
++  runtimeClassroomId: string;
++  runtimeRequestId: string;
++  upstreamClassroomId: string;
++  classroomContentSha256: string;
++  audioJobTerminalReceiptSha256: string;
++  validation: {
++    subject: Subject;
++    sceneOrder: number;
++    ttsRequestId: string;
++    audioSha256: string;
++    machineReceiptSha256: string;
++  };
++  routeSession: {
++    schemaVersion: 'mira.openmaic.conversation-proof.v1';
++    conversationProbeId: string;
++    receiptSha256: string;
++    providerCall: false;
++  };
++}
++
++export interface MiraFormalProviderCallReceipt {
++  callOrdinal: number;
++  kind: 'kimi_text' | 'qwen_asr' | 'qwen_tts';
++  subject?: Subject;
++  providerId: 'kimi' | 'qwen-asr' | 'qwen-tts';
++  modelId: 'kimi-k2.6' | 'qwen3-asr-flash' | 'qwen3-tts-flash';
++  voiceId?: 'Serena' | 'Ethan' | 'Jennifer';
++  languageCode?: 'zh-CN' | 'en-US';
++  fallbackUsed: false;
++  providerCall: true;
++  requestSha256: string;
++  state: CallState;
++  attemptedAt: string;
++  completedAt?: string;
++  responseSha256?: string;
++  safeErrorCode?: string;
++}
++
++export interface MiraFormalProviderProof {
++  schemaVersion: typeof MIRA_FORMAL_PROVIDER_READINESS_VERSION;
++  providerCall: boolean;
++  expectedCallCount: 5;
++  attemptedCallCount: number;
++  passedCallCount: number;
++  calls: MiraFormalProviderCallReceipt[];
++  receiptSha256: string;
++}
++
++export interface MiraFormalProviderReadinessJob {
++  schemaVersion: typeof MIRA_FORMAL_PROVIDER_READINESS_JOB_VERSION;
++  requestId: string;
++  requestSha256: string;
++  buildItemId: string;
++  releaseId: string;
++  gradeCode: string;
++  targetFingerprint: string;
++  runtimeClassroomId: string;
++  runtimeRequestId: string;
++  upstreamClassroomId: string;
++  classroomContentSha256: string;
++  audioJobTerminalReceiptSha256: string;
++  validation: {
++    subject: Subject;
++    sceneOrder: number;
++    ttsRequestId: string;
++    audioSha256: string;
++    machineReceiptSha256: string;
++  };
++  routeSessionProof: {
++    schemaVersion: 'mira.openmaic.conversation-proof.v1';
++    conversationProbeId: string;
++    receiptSha256: string;
++    providerCall: false;
++  };
++  state: JobState;
++  providerAttemptedCount: number;
++  providerPassedCount: number;
++  calls: MiraFormalProviderCallReceipt[];
++  providerProof?: MiraFormalProviderProof;
++  safeErrorCode?: string;
++  createdAt: string;
++  updatedAt: string;
++  completedAt?: string;
++}
++
++export type MiraFormalProviderReadinessErrorCode =
++  | 'invalid_request'
++  | 'request_conflict'
++  | 'not_found'
++  | 'unauthorized'
++  | 'provider_unavailable'
++  | 'asset_unavailable';
++
++export class MiraFormalProviderReadinessError extends Error {
++  constructor(
++    public readonly code: MiraFormalProviderReadinessErrorCode,
++    message: string,
++  ) {
++    super(message);
++    this.name = 'MiraFormalProviderReadinessError';
++  }
++}
++
++interface RuntimeDependencies {
++  fetchImpl?: typeof fetch;
++  now?: () => Date;
++}
++
++class OperationalFailure extends Error {
++  constructor(
++    public readonly outcome: 'failed' | 'ambiguous',
++    public readonly safeCode: string,
++  ) {
++    super(safeCode);
++  }
++}
++
++const IDENTIFIER = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,254}$/;
++const GRADE_CODE = /^[a-z][a-z0-9_]{0,63}$/;
++const SHA256 = /^[a-f0-9]{64}$/;
++const REQUEST_KEYS = [
++  'audioJobTerminalReceiptSha256',
++  'buildItemId',
++  'classroomContentSha256',
++  'gradeCode',
++  'releaseId',
++  'requestId',
++  'routeSession',
++  'runtimeClassroomId',
++  'runtimeRequestId',
++  'schemaVersion',
++  'targetFingerprint',
++  'upstreamClassroomId',
++  'validation',
++] as const;
++const VALIDATION_KEYS = [
++  'audioSha256',
++  'machineReceiptSha256',
++  'sceneOrder',
++  'subject',
++  'ttsRequestId',
++] as const;
++const ROUTE_KEYS = [
++  'conversationProbeId',
++  'providerCall',
++  'receiptSha256',
++  'schemaVersion',
++] as const;
++const FORBIDDEN_KEYS = new Set([
++  'provider',
++  'model',
++  'voice',
++  'apikey',
++  'key',
++  'baseurl',
++  'fallback',
++  'audiourl',
++  'base64',
++  'providerproof',
++]);
++const MAX_PROVIDER_JSON_BYTES = 1024 * 1024;
++const STALE_RUNNING_MS = 5 * 60 * 1000;
++
++function sha256(value: string | Uint8Array): string {
++  return createHash('sha256').update(value).digest('hex');
++}
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value as Record<string, unknown>)
++        .sort(([left], [right]) => left.localeCompare(right))
++        .map(([key, item]) => [key, canonical(item)]),
++    );
++  }
++  return value;
++}
++
++function digest(value: unknown): string {
++  return sha256(JSON.stringify(canonical(value)));
++}
++
++function assertNoForbiddenKeys(value: unknown): void {
++  if (!value || typeof value !== 'object') return;
++  if (Array.isArray(value)) {
++    for (const item of value) assertNoForbiddenKeys(item);
++    return;
++  }
++  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
++    if (FORBIDDEN_KEYS.has(key.toLowerCase())) {
++      throw new MiraFormalProviderReadinessError('invalid_request', 'Invalid readiness request');
++    }
++    assertNoForbiddenKeys(item);
++  }
++}
++
++function exactObject(value: unknown, keys: readonly string[]): Record<string, unknown> {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) {
++    throw new MiraFormalProviderReadinessError('invalid_request', 'Invalid readiness request');
++  }
++  if (Object.keys(value).sort().join(',') !== [...keys].sort().join(',')) {
++    throw new MiraFormalProviderReadinessError('invalid_request', 'Invalid readiness request');
++  }
++  return value as Record<string, unknown>;
++}
++
++export function assertMiraFormalProviderReadinessRequest(
++  value: unknown,
++): MiraFormalProviderReadinessRequest {
++  assertNoForbiddenKeys(value);
++  const input = exactObject(value, REQUEST_KEYS);
++  const validation = exactObject(input.validation, VALIDATION_KEYS);
++  const routeSession = exactObject(input.routeSession, ROUTE_KEYS);
++  if (
++    input.schemaVersion !== MIRA_FORMAL_PROVIDER_READINESS_VERSION ||
++    !IDENTIFIER.test(String(input.requestId || '')) ||
++    !IDENTIFIER.test(String(input.buildItemId || '')) ||
++    !IDENTIFIER.test(String(input.releaseId || '')) ||
++    !GRADE_CODE.test(String(input.gradeCode || '')) ||
++    !SHA256.test(String(input.targetFingerprint || '')) ||
++    !IDENTIFIER.test(String(input.runtimeClassroomId || '')) ||
++    !IDENTIFIER.test(String(input.runtimeRequestId || '')) ||
++    !IDENTIFIER.test(String(input.upstreamClassroomId || '')) ||
++    !SHA256.test(String(input.classroomContentSha256 || '')) ||
++    !SHA256.test(String(input.audioJobTerminalReceiptSha256 || '')) ||
++    typeof validation.subject !== 'string' ||
++    !(validation.subject in SUBJECT_TTS) ||
++    !Number.isInteger(validation.sceneOrder) ||
++    Number(validation.sceneOrder) < 0 ||
++    Number(validation.sceneOrder) > 9 ||
++    !IDENTIFIER.test(String(validation.ttsRequestId || '')) ||
++    !SHA256.test(String(validation.audioSha256 || '')) ||
++    !SHA256.test(String(validation.machineReceiptSha256 || '')) ||
++    routeSession.schemaVersion !== 'mira.openmaic.conversation-proof.v1' ||
++    !IDENTIFIER.test(String(routeSession.conversationProbeId || '')) ||
++    !SHA256.test(String(routeSession.receiptSha256 || '')) ||
++    routeSession.providerCall !== false
++  ) {
++    throw new MiraFormalProviderReadinessError('invalid_request', 'Invalid readiness request');
++  }
++  return input as unknown as MiraFormalProviderReadinessRequest;
++}
++
++function dataRoot(): string {
++  return (
++    process.env.MIRA_FORMAL_PROVIDER_READINESS_DATA_DIR ||
++    path.join(process.cwd(), 'data', 'formal-provider-readiness')
++  );
++}
++
++function jobPath(requestId: string): string {
++  return path.join(dataRoot(), 'jobs', `${sha256(requestId)}.json`);
++}
++
++async function writeExclusiveAtomic(filePath: string, value: unknown): Promise<boolean> {
++  await fs.mkdir(path.dirname(filePath), { recursive: true });
++  const temp = `${filePath}.${process.pid}.${Date.now()}.${Math.random().toString(16).slice(2)}.tmp`;
++  const handle = await fs.open(temp, 'wx', 0o600);
++  try {
++    await handle.writeFile(JSON.stringify(value, null, 2), 'utf8');
++    await handle.sync();
++  } finally {
++    await handle.close();
++  }
++  try {
++    await fs.link(temp, filePath);
++    return true;
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false;
++    throw error;
++  } finally {
++    await fs.unlink(temp).catch(() => undefined);
++  }
++}
++
++async function writeAtomic(filePath: string, value: unknown): Promise<void> {
++  await fs.mkdir(path.dirname(filePath), { recursive: true });
++  const temp = `${filePath}.${process.pid}.${Date.now()}.${Math.random().toString(16).slice(2)}.tmp`;
++  const handle = await fs.open(temp, 'wx', 0o600);
++  try {
++    await handle.writeFile(JSON.stringify(value, null, 2), 'utf8');
++    await handle.sync();
++  } finally {
++    await handle.close();
++  }
++  await fs.rename(temp, filePath);
++}
++
++function proofFor(record: MiraFormalProviderReadinessJob): MiraFormalProviderProof {
++  const safe = {
++    schemaVersion: MIRA_FORMAL_PROVIDER_READINESS_VERSION,
++    providerCall: record.calls.length > 0,
++    expectedCallCount: 5 as const,
++    attemptedCallCount: record.providerAttemptedCount,
++    passedCallCount: record.providerPassedCount,
++    calls: record.calls,
++  };
++  return { ...safe, receiptSha256: digest(safe) };
++}
++
++async function observeStale(
++  record: MiraFormalProviderReadinessJob,
++  now: Date,
++): Promise<MiraFormalProviderReadinessJob> {
++  if (
++    record.state !== 'running' ||
++    now.getTime() - new Date(record.updatedAt).getTime() <= STALE_RUNNING_MS
++  ) {
++    return record;
++  }
++  const timestamp = now.toISOString();
++  const stale: MiraFormalProviderReadinessJob = {
++    ...record,
++    state: 'ambiguous',
++    safeErrorCode: 'stale_provider_outcome_unknown',
++    providerProof: proofFor(record),
++    updatedAt: timestamp,
++    completedAt: timestamp,
++  };
++  await writeAtomic(jobPath(record.requestId), stale);
++  return stale;
++}
++
++export async function readMiraFormalProviderReadinessJob(
++  requestId: string,
++  now = new Date(),
++): Promise<MiraFormalProviderReadinessJob | null> {
++  if (!IDENTIFIER.test(requestId)) {
++    throw new MiraFormalProviderReadinessError('invalid_request', 'Invalid readiness request id');
++  }
++  try {
++    const record = JSON.parse(
++      await fs.readFile(jobPath(requestId), 'utf8'),
++    ) as MiraFormalProviderReadinessJob;
++    return observeStale(record, now);
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
++    throw error;
++  }
++}
++
++function identityFrom(input: MiraFormalProviderReadinessRequest) {
++  return {
++    buildItemId: input.buildItemId,
++    releaseId: input.releaseId,
++    gradeCode: input.gradeCode,
++    targetFingerprint: input.targetFingerprint,
++    runtimeClassroomId: input.runtimeClassroomId,
++    runtimeRequestId: input.runtimeRequestId,
++    upstreamClassroomId: input.upstreamClassroomId,
++    classroomContentSha256: input.classroomContentSha256,
++    audioJobTerminalReceiptSha256: input.audioJobTerminalReceiptSha256,
++    validation: { ...input.validation },
++    routeSessionProof: { ...input.routeSession },
++  };
++}
++
++async function claim(
++  input: MiraFormalProviderReadinessRequest,
++  now: Date,
++): Promise<{ record: MiraFormalProviderReadinessJob; created: boolean }> {
++  const requestSha256 = digest(input);
++  const existing = await readMiraFormalProviderReadinessJob(input.requestId, now);
++  if (existing) {
++    if (existing.requestSha256 !== requestSha256) {
++      throw new MiraFormalProviderReadinessError('request_conflict', 'Readiness request conflict');
++    }
++    return { record: existing, created: false };
++  }
++  const timestamp = now.toISOString();
++  const record: MiraFormalProviderReadinessJob = {
++    schemaVersion: MIRA_FORMAL_PROVIDER_READINESS_JOB_VERSION,
++    requestId: input.requestId,
++    requestSha256,
++    ...identityFrom(input),
++    state: 'running',
++    providerAttemptedCount: 0,
++    providerPassedCount: 0,
++    calls: [],
++    createdAt: timestamp,
++    updatedAt: timestamp,
++  };
++  if (await writeExclusiveAtomic(jobPath(input.requestId), record)) {
++    return { record, created: true };
++  }
++  const winner = await readMiraFormalProviderReadinessJob(input.requestId, now);
++  if (!winner || winner.requestSha256 !== requestSha256) {
++    throw new MiraFormalProviderReadinessError('request_conflict', 'Readiness request conflict');
++  }
++  return { record: winner, created: false };
++}
++
++function qwenEndpoint(baseUrl: string | undefined): string {
++  const parsed = safeHttpsBase(baseUrl || 'https://dashscope.aliyuncs.com/api/v1');
++  return `${parsed}/services/aigc/multimodal-generation/generation`;
++}
++
++function kimiEndpoint(baseUrl: string | undefined): string {
++  return `${safeHttpsBase(baseUrl || 'https://api.moonshot.cn/v1')}/chat/completions`;
++}
++
++function safeHttpsBase(value: string): string {
++  let parsed: URL;
++  try {
++    parsed = new URL(value);
++  } catch {
++    throw new MiraFormalProviderReadinessError(
++      'provider_unavailable',
++      'Formal readiness provider is unavailable',
++    );
++  }
++  if (
++    parsed.protocol !== 'https:' ||
++    parsed.username ||
++    parsed.password ||
++    parsed.search ||
++    parsed.hash ||
++    (parsed.port && parsed.port !== '443')
++  ) {
++    throw new MiraFormalProviderReadinessError(
++      'provider_unavailable',
++      'Formal readiness provider is unavailable',
++    );
++  }
++  return parsed.toString().replace(/\/$/u, '');
++}
++
++export function assertMiraFormalProviderReadinessProviderReady(): void {
++  const kimi = getServerProviders().kimi;
++  const tts = getServerTTSProviders()['qwen-tts'];
++  const asr = getServerASRProviders()['qwen-asr'];
++  if (
++    !kimi ||
++    (kimi.models !== undefined && !kimi.models.includes('kimi-k2.6')) ||
++    !resolveApiKey('kimi') ||
++    !tts ||
++    tts.disabled === true ||
++    !resolveTTSApiKey('qwen-tts') ||
++    !asr ||
++    !resolveASRApiKey('qwen-asr')
++  ) {
++    throw new MiraFormalProviderReadinessError(
++      'provider_unavailable',
++      'Formal readiness providers are unavailable',
++    );
++  }
++  kimiEndpoint(resolveBaseUrl('kimi'));
++  qwenEndpoint(resolveTTSBaseUrl('qwen-tts'));
++  qwenEndpoint(resolveASRBaseUrl('qwen-asr'));
++}
++
++function callSpecs(subject: Subject) {
++  return [
++    {
++      callOrdinal: 1,
++      kind: 'kimi_text' as const,
++      providerId: 'kimi' as const,
++      modelId: 'kimi-k2.6' as const,
++    },
++    {
++      callOrdinal: 2,
++      kind: 'qwen_asr' as const,
++      subject,
++      providerId: 'qwen-asr' as const,
++      modelId: 'qwen3-asr-flash' as const,
++      languageCode: SUBJECT_TTS[subject].languageCode,
++    },
++    ...(['chinese', 'math', 'english'] as const).map((ttsSubject, index) => ({
++      callOrdinal: index + 3,
++      kind: 'qwen_tts' as const,
++      subject: ttsSubject,
++      providerId: 'qwen-tts' as const,
++      modelId: 'qwen3-tts-flash' as const,
++      voiceId: SUBJECT_TTS[ttsSubject].voiceId,
++      languageCode: SUBJECT_TTS[ttsSubject].languageCode,
++    })),
++  ];
++}
++
++type CallSpec = ReturnType<typeof callSpecs>[number];
++
++function requestForCall(
++  spec: CallSpec,
++  input: MiraFormalProviderReadinessRequest,
++  audio: Uint8Array,
++): { endpoint: string; apiKey: string; body: Record<string, unknown> } {
++  if (spec.kind === 'kimi_text') {
++    return {
++      endpoint: kimiEndpoint(resolveBaseUrl('kimi')),
++      apiKey: resolveApiKey('kimi'),
++      body: {
++        model: 'kimi-k2.6',
++        messages: [
++          {
++            role: 'user',
++            content: `Mira formal readiness ${digest(input)}. Reply READY.`,
++          },
++        ],
++        temperature: 0.6,
++        max_completion_tokens: 16,
++        thinking: { type: 'disabled' },
++      },
++    };
++  }
++  if (spec.kind === 'qwen_asr') {
++    return {
++      endpoint: qwenEndpoint(resolveASRBaseUrl('qwen-asr')),
++      apiKey: resolveASRApiKey('qwen-asr'),
++      body: {
++        model: 'qwen3-asr-flash',
++        input: {
++          messages: [
++            {
++              role: 'user',
++              content: [{ audio: `data:audio/wav;base64,${Buffer.from(audio).toString('base64')}` }],
++            },
++          ],
++        },
++        parameters: {
++          asr_options: { language: spec.languageCode === 'en-US' ? 'en' : 'zh' },
++        },
++      },
++    };
++  }
++  const ttsPolicy = SUBJECT_TTS[spec.subject];
++  return {
++    endpoint: qwenEndpoint(resolveTTSBaseUrl('qwen-tts')),
++    apiKey: resolveTTSApiKey('qwen-tts'),
++    body: {
++      model: 'qwen3-tts-flash',
++      input: {
++        text: ttsPolicy.validationText,
++        voice: ttsPolicy.voiceId,
++        language_type: ttsPolicy.qwenLanguageType,
++      },
++      parameters: { rate: 0 },
++    },
++  };
++}
++
++async function fetchJson(
++  fetchImpl: typeof fetch,
++  endpoint: string,
++  apiKey: string,
++  body: Record<string, unknown>,
++): Promise<Record<string, unknown>> {
++  let response: Response;
++  try {
++    response = await fetchImpl(endpoint, {
++      method: 'POST',
++      headers: {
++        Authorization: `Bearer ${apiKey}`,
++        'Content-Type': 'application/json; charset=utf-8',
++      },
++      body: JSON.stringify(body),
++      signal: AbortSignal.timeout(MIRA_FORMAL_PROVIDER_TIMEOUT_MS),
++    });
++  } catch {
++    throw new OperationalFailure('ambiguous', 'provider_outcome_unknown');
++  }
++  if (!response.ok) throw new OperationalFailure('failed', 'provider_rejected');
++  const mime = response.headers.get('content-type')?.split(';', 1)[0].trim().toLowerCase();
++  if (mime !== 'application/json') {
++    throw new OperationalFailure('failed', 'provider_content_type_invalid');
++  }
++  let bytes: Uint8Array;
++  try {
++    bytes = new Uint8Array(await response.arrayBuffer());
++  } catch {
++    throw new OperationalFailure('ambiguous', 'provider_response_lost');
++  }
++  if (bytes.byteLength > MAX_PROVIDER_JSON_BYTES) {
++    throw new OperationalFailure('failed', 'provider_response_too_large');
++  }
++  try {
++    const parsed = JSON.parse(Buffer.from(bytes).toString('utf8'));
++    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('invalid');
++    return parsed as Record<string, unknown>;
++  } catch {
++    throw new OperationalFailure('failed', 'provider_response_invalid');
++  }
++}
++
++function providerResultSha256(spec: CallSpec, payload: Record<string, unknown>): string {
++  if (spec.kind === 'kimi_text') {
++    const choices = payload.choices;
++    const first = Array.isArray(choices) ? choices[0] : undefined;
++    const message =
++      first && typeof first === 'object' ? (first as Record<string, unknown>).message : undefined;
++    const content =
++      message && typeof message === 'object'
++        ? (message as Record<string, unknown>).content
++        : undefined;
++    if (typeof content !== 'string' || !content.trim() || content.length > 64_000) {
++      throw new OperationalFailure('failed', 'provider_response_invalid');
++    }
++    return sha256(content);
++  }
++  if (spec.kind === 'qwen_asr') {
++    const output = payload.output as Record<string, unknown> | undefined;
++    const choices = output?.choices;
++    const first = Array.isArray(choices) ? choices[0] : undefined;
++    const message =
++      first && typeof first === 'object' ? (first as Record<string, unknown>).message : undefined;
++    const content =
++      message && typeof message === 'object'
++        ? (message as Record<string, unknown>).content
++        : undefined;
++    const item = Array.isArray(content) ? content[0] : undefined;
++    const transcript =
++      item && typeof item === 'object' ? (item as Record<string, unknown>).text : undefined;
++    if (typeof transcript !== 'string' || !transcript.trim() || transcript.length > 64_000) {
++      throw new OperationalFailure('failed', 'provider_response_invalid');
++    }
++    return sha256(transcript);
++  }
++  const output = payload.output as Record<string, unknown> | undefined;
++  const audio = output?.audio as Record<string, unknown> | undefined;
++  if (!audio || typeof audio.url !== 'string') {
++    throw new OperationalFailure('failed', 'provider_response_invalid');
++  }
++  let url: URL;
++  try {
++    url = new URL(audio.url);
++  } catch {
++    throw new OperationalFailure('failed', 'provider_response_invalid');
++  }
++  if (url.protocol !== 'https:' || url.username || url.password) {
++    throw new OperationalFailure('failed', 'provider_response_invalid');
++  }
++  return sha256(audio.url);
++}
++
++async function recordAttempt(
++  record: MiraFormalProviderReadinessJob,
++  spec: CallSpec,
++  requestSha256: string,
++  now: Date,
++): Promise<MiraFormalProviderReadinessJob> {
++  const attemptedAt = now.toISOString();
++  const call: MiraFormalProviderCallReceipt = {
++    callOrdinal: spec.callOrdinal,
++    kind: spec.kind,
++    ...(spec.subject ? { subject: spec.subject } : {}),
++    providerId: spec.providerId,
++    modelId: spec.modelId,
++    ...('voiceId' in spec && spec.voiceId ? { voiceId: spec.voiceId } : {}),
++    ...(spec.languageCode ? { languageCode: spec.languageCode } : {}),
++    fallbackUsed: false,
++    providerCall: true,
++    requestSha256,
++    state: 'attempted',
++    attemptedAt,
++  };
++  const updated: MiraFormalProviderReadinessJob = {
++    ...record,
++    calls: [...record.calls, call],
++    providerAttemptedCount: record.providerAttemptedCount + 1,
++    updatedAt: attemptedAt,
++  };
++  await writeAtomic(jobPath(record.requestId), updated);
++  return updated;
++}
++
++async function completeCall(
++  record: MiraFormalProviderReadinessJob,
++  state: 'passed' | 'failed' | 'ambiguous',
++  responseSha256: string,
++  now: Date,
++  safeErrorCode?: string,
++): Promise<MiraFormalProviderReadinessJob> {
++  const completedAt = now.toISOString();
++  const calls = [...record.calls];
++  calls[calls.length - 1] = {
++    ...calls[calls.length - 1],
++    state,
++    responseSha256,
++    completedAt,
++    ...(safeErrorCode ? { safeErrorCode } : {}),
++  };
++  const updated: MiraFormalProviderReadinessJob = {
++    ...record,
++    calls,
++    providerPassedCount: record.providerPassedCount + (state === 'passed' ? 1 : 0),
++    updatedAt: completedAt,
++  };
++  await writeAtomic(jobPath(record.requestId), updated);
++  return updated;
++}
++
++async function terminalizeFailure(
++  record: MiraFormalProviderReadinessJob,
++  failure: OperationalFailure,
++  now: Date,
++): Promise<MiraFormalProviderReadinessJob> {
++  const responseSha256 = digest({ outcome: failure.outcome, safeCode: failure.safeCode });
++  const withCall = await completeCall(
++    record,
++    failure.outcome,
++    responseSha256,
++    now,
++    failure.safeCode,
++  );
++  const completedAt = now.toISOString();
++  const proof = proofFor(withCall);
++  const terminal: MiraFormalProviderReadinessJob = {
++    ...withCall,
++    state: failure.outcome,
++    providerProof: proof,
++    safeErrorCode: failure.safeCode,
++    updatedAt: completedAt,
++    completedAt,
++  };
++  await writeAtomic(jobPath(record.requestId), terminal);
++  return terminal;
++}
++
++export async function executeMiraFormalProviderReadiness(
++  value: unknown,
++  dependencies: RuntimeDependencies = {},
++): Promise<{ record: MiraFormalProviderReadinessJob; created: boolean }> {
++  const input = assertMiraFormalProviderReadinessRequest(value);
++  assertMiraFormalProviderReadinessProviderReady();
++  let asset;
++  try {
++    asset = await readMiraFormalTtsAsset(input.validation.ttsRequestId);
++  } catch (error) {
++    if (error instanceof MiraFormalAudioError) {
++      throw new MiraFormalProviderReadinessError(
++        'asset_unavailable',
++        'Formal validation WAV is unavailable',
++      );
++    }
++    throw error;
++  }
++  if (
++    asset.record.state !== 'succeeded' ||
++    asset.record.classroomId !== input.upstreamClassroomId ||
++    asset.record.classroomContentSha256 !== input.classroomContentSha256 ||
++    asset.record.subject !== input.validation.subject ||
++    asset.record.sceneOrder !== input.validation.sceneOrder ||
++    asset.record.audioSha256 !== input.validation.audioSha256 ||
++    sha256(asset.bytes) !== input.validation.audioSha256
++  ) {
++    throw new MiraFormalProviderReadinessError(
++      'asset_unavailable',
++      'Formal validation WAV binding is invalid',
++    );
++  }
++
++  const now = dependencies.now?.() || new Date();
++  const claimed = await claim(input, now);
++  if (!claimed.created) return claimed;
++  let record = claimed.record;
++  const fetchImpl = dependencies.fetchImpl || fetch;
++  for (const spec of callSpecs(input.validation.subject)) {
++    const providerRequest = requestForCall(spec, input, asset.bytes);
++    record = await recordAttempt(
++      record,
++      spec,
++      digest(providerRequest.body),
++      dependencies.now?.() || new Date(),
++    );
++    let responseSha256: string;
++    try {
++      const response = await fetchJson(
++        fetchImpl,
++        providerRequest.endpoint,
++        providerRequest.apiKey,
++        providerRequest.body,
++      );
++      responseSha256 = providerResultSha256(spec, response);
++    } catch (error) {
++      const failure =
++        error instanceof OperationalFailure
++          ? error
++          : new OperationalFailure('failed', 'provider_readiness_internal_failure');
++      return {
++        record: await terminalizeFailure(record, failure, dependencies.now?.() || new Date()),
++        created: true,
++      };
++    }
++    try {
++      record = await completeCall(
++        record,
++        'passed',
++        responseSha256,
++        dependencies.now?.() || new Date(),
++      );
++    } catch {
++      // The Provider has already returned successfully. A local completion
++      // write failure makes the durable outcome unknown and can never be
++      // represented as a safe failure or redispatched automatically.
++      const failure = new OperationalFailure(
++        'ambiguous',
++        'provider_completion_persist_unknown',
++      );
++      return {
++        record: await terminalizeFailure(record, failure, dependencies.now?.() || new Date()),
++        created: true,
++      };
++    }
++  }
++  const completedAt = (dependencies.now?.() || new Date()).toISOString();
++  const proof = proofFor(record);
++  const completed: MiraFormalProviderReadinessJob = {
++    ...record,
++    state: 'auto_validated',
++    providerProof: proof,
++    updatedAt: completedAt,
++    completedAt,
++  };
++  await writeAtomic(jobPath(input.requestId), completed);
++  return { record: completed, created: true };
++}
++
++export function getMiraFormalProviderReadinessPolicy() {
++  return MIRA_FORMAL_PROVIDER_READINESS_POLICY;
++}
++
++export function authorizeMiraFormalProviderReadinessRequest(req: NextRequest): void {
++  try {
++    authorizeMiraFormalAudioRequest(req);
++  } catch (error) {
++    if (error instanceof MiraFormalAudioError) {
++      throw new MiraFormalProviderReadinessError(
++        'unauthorized',
++        'Invalid formal readiness credentials',
++      );
++    }
++    throw error;
++  }
+diff --git a/tests/server/mira-formal-provider-readiness.test.ts b/tests/server/mira-formal-provider-readiness.test.ts
+new file mode 100644
+index 0000000..28fa0ca
+--- /dev/null
++++ b/tests/server/mira-formal-provider-readiness.test.ts
+@@ -0,0 +1,364 @@
++import { promises as fs } from 'fs';
++import os from 'os';
++import path from 'path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { executeMiraFormalTts, type MiraFormalTtsRequest } from '@/lib/server/mira-formal-audio';
++import {
++  executeMiraFormalProviderReadiness,
++  getMiraFormalProviderReadinessPolicy,
++  readMiraFormalProviderReadinessJob,
++  type MiraFormalProviderReadinessRequest,
++} from '@/lib/server/mira-formal-provider-readiness';
++
++const kimiKey = 'kimi-secret-never-persist';
++const ttsKey = 'tts-secret-never-persist';
++const asrKey = 'asr-secret-never-persist';
++
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerProviders: () => ({ kimi: { models: ['kimi-k2.6'] } }),
++  getServerWebSearchProviders: () => ({}),
++  getServerImageProviders: () => ({}),
++  getServerVideoProviders: () => ({}),
++  getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
++  getServerASRProviders: () => ({ 'qwen-asr': {} }),
++  resolveApiKey: () => kimiKey,
++  resolveBaseUrl: () => 'https://api.moonshot.cn/v1',
++  resolveTTSApiKey: () => ttsKey,
++  resolveTTSBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++  resolveASRApiKey: () => asrKey,
++  resolveASRBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++}));
++
++vi.mock('dns/promises', () => ({
++  lookup: async () => [{ address: '8.8.8.8', family: 4 }],
++}));
++
++function sha256(value: string | Uint8Array): string {
++  return require('crypto').createHash('sha256').update(value).digest('hex');
++}
++
++function wavBytes(): Buffer {
++  const bytes = Buffer.alloc(48);
++  bytes.write('RIFF', 0, 'ascii');
++  bytes.writeUInt32LE(40, 4);
++  bytes.write('WAVE', 8, 'ascii');
++  bytes.write('fmt ', 12, 'ascii');
++  bytes.writeUInt32LE(16, 16);
++  bytes.writeUInt16LE(1, 20);
++  bytes.writeUInt16LE(1, 22);
++  bytes.writeUInt32LE(16_000, 24);
++  bytes.writeUInt32LE(32_000, 28);
++  bytes.writeUInt16LE(2, 32);
++  bytes.writeUInt16LE(16, 34);
++  bytes.write('data', 36, 'ascii');
++  bytes.writeUInt32LE(4, 40);
++  bytes.writeInt16LE(1_000, 44);
++  bytes.writeInt16LE(-1_000, 46);
++  return bytes;
++}
++
++function responseBody(bytes: Buffer): ArrayBuffer {
++  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
++}
++
++const narration = '十可以分成一个十和零个一。';
++const validationTts: MiraFormalTtsRequest = {
++  requestId: 'formal-readiness-source-001',
++  classroomId: 'upstream-classroom-001',
++  classroomContentSha256: '1'.repeat(64),
++  subject: 'math',
++  teacherProfileId: 'mira_math_clear',
++  teacherProfileVersion: 2,
++  teacherProfileSha256: '4f5a986a765f69798c8546d7f9091fe297f2a98c5353fdd01cd1aa06884c98fb',
++  teacherGender: 'male',
++  sceneId: 'scene-math-00',
++  sceneOrder: 0,
++  actionId: 'action-math-00-speech',
++  narrationSegmentId: 'segment-math-00',
++  text: narration,
++  textSha256: sha256(narration),
++};
++
++const requestBase: Omit<MiraFormalProviderReadinessRequest, 'validation'> = {
++  schemaVersion: 'mira.openmaic.formal-provider-readiness.v1',
++  requestId: 'formal-provider-readiness-001',
++  buildItemId: 'build-item-001',
++  releaseId: 'release-001',
++  gradeCode: 'primary_1',
++  targetFingerprint: '2'.repeat(64),
++  runtimeClassroomId: 'runtime-classroom-001',
++  runtimeRequestId: 'runtime-request-001',
++  upstreamClassroomId: validationTts.classroomId,
++  classroomContentSha256: validationTts.classroomContentSha256,
++  audioJobTerminalReceiptSha256: '3'.repeat(64),
++  routeSession: {
++    schemaVersion: 'mira.openmaic.conversation-proof.v1',
++    conversationProbeId: 'conversation-probe-001',
++    receiptSha256: '4'.repeat(64),
++    providerCall: false,
++  },
++};
++
++describe('Mira formal Provider readiness runtime', () => {
++  let tempRoot: string;
++  let audioSha256: string;
++
++  beforeEach(async () => {
++    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-provider-readiness-'));
++    process.env.MIRA_FORMAL_AUDIO_DATA_DIR = path.join(tempRoot, 'formal-audio');
++    process.env.MIRA_FORMAL_PROVIDER_READINESS_DATA_DIR = path.join(tempRoot, 'readiness');
++    process.env.MIRA_INTERNAL_API_TOKEN = 'internal-secret-never-persist';
++    const audio = wavBytes();
++    const prepared = await executeMiraFormalTts(validationTts, {
++      resolveAddresses: async () => ['8.8.8.8'],
++      fetchImpl: vi.fn(async (input: string | URL | Request) =>
++        String(input).includes('/multimodal-generation/generation')
++          ? new Response(
++              JSON.stringify({
++                output: {
++                  audio: { url: 'https://mira-test.oss-cn-beijing.aliyuncs.com/result.wav' },
++                },
++              }),
++              { status: 200, headers: { 'content-type': 'application/json' } },
++            )
++          : new Response(responseBody(audio), {
++              status: 200,
++              headers: { 'content-type': 'audio/wav' },
++            }),
++      ) as typeof fetch,
++    });
++    audioSha256 = prepared.record.audioSha256!;
++  });
++
++  afterEach(async () => {
++    delete process.env.MIRA_FORMAL_AUDIO_DATA_DIR;
++    delete process.env.MIRA_FORMAL_PROVIDER_READINESS_DATA_DIR;
++    delete process.env.MIRA_INTERNAL_API_TOKEN;
++    await fs.rm(tempRoot, { recursive: true, force: true });
++    vi.restoreAllMocks();
++  });
++
++  function request(
++    overrides: Partial<MiraFormalProviderReadinessRequest> = {},
++  ): MiraFormalProviderReadinessRequest {
++    return {
++      ...requestBase,
++      validation: {
++        subject: 'math',
++        sceneOrder: 0,
++        ttsRequestId: validationTts.requestId,
++        audioSha256,
++        machineReceiptSha256: '5'.repeat(64),
++      },
++      ...overrides,
++    };
++  }
++
++  function successfulFetch(observedAttempts: number[]) {
++    return vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
++      const current = await readMiraFormalProviderReadinessJob(requestBase.requestId);
++      observedAttempts.push(current?.providerAttemptedCount || 0);
++      const body = JSON.parse(String(init?.body));
++      if (String(input).includes('moonshot')) {
++        expect(body).toMatchObject({
++          model: 'kimi-k2.6',
++          temperature: 0.6,
++          max_completion_tokens: 16,
++          thinking: { type: 'disabled' },
++        });
++        expect(body).not.toHaveProperty('max_tokens');
++        return new Response(
++          JSON.stringify({ choices: [{ message: { content: 'READY' } }] }),
++          { status: 200, headers: { 'content-type': 'application/json' } },
++        );
++      }
++      if (body.model === 'qwen3-asr-flash') {
++        expect(body.input.messages[0].content[0].audio).toMatch(/^data:audio\/wav;base64,/);
++        return new Response(
++          JSON.stringify({
++            output: { choices: [{ message: { content: [{ text: narration }] } }] },
++          }),
++          { status: 200, headers: { 'content-type': 'application/json' } },
++        );
++      }
++      expect(body.model).toBe('qwen3-tts-flash');
++      return new Response(
++        JSON.stringify({
++          output: {
++            audio: { url: 'https://mira-test.oss-cn-beijing.aliyuncs.com/readiness.wav' },
++          },
++        }),
++        { status: 200, headers: { 'content-type': 'application/json' } },
++      );
++    });
++  }
++
++  it('keeps providerCall=false as route proof and requires five real Provider calls', async () => {
++    expect(getMiraFormalProviderReadinessPolicy()).toMatchObject({
++      expectedProviderCallCount: 5,
++      routeSessionProof: { providerCall: false },
++      providerProof: { providerCall: true },
++      providers: {
++        kimi: { providerId: 'kimi', modelId: 'kimi-k2.6' },
++        asr: { providerId: 'qwen-asr', modelId: 'qwen3-asr-flash' },
++        tts: {
++          chinese: { voiceId: 'Serena' },
++          math: { voiceId: 'Ethan' },
++          english: { voiceId: 'Jennifer' },
++        },
++      },
++    });
++    const attempts: number[] = [];
++    const fetchMock = successfulFetch(attempts);
++    const result = await executeMiraFormalProviderReadiness(request(), {
++      fetchImpl: fetchMock as typeof fetch,
++    });
++    expect(result.record.state).toBe('auto_validated');
++    expect(result.record.routeSessionProof.providerCall).toBe(false);
++    expect(result.record.providerProof).toMatchObject({
++      providerCall: true,
++      expectedCallCount: 5,
++      attemptedCallCount: 5,
++      passedCallCount: 5,
++    });
++    expect(fetchMock).toHaveBeenCalledTimes(5);
++    expect(attempts).toEqual([1, 2, 3, 4, 5]);
++    const replay = await executeMiraFormalProviderReadiness(request(), {
++      fetchImpl: vi.fn() as never,
++    });
++    expect(replay.created).toBe(false);
++    expect(replay.record).toEqual(result.record);
++  });
++
++  it('rejects caller proof/Provider overrides and changed idempotent bodies', async () => {
++    for (const key of [
++      'provider',
++      'model',
++      'voice',
++      'apiKey',
++      'baseUrl',
++      'fallback',
++      'audioUrl',
++      'base64',
++      'providerProof',
++    ]) {
++      const fetchMock = vi.fn();
++      await expect(
++        executeMiraFormalProviderReadiness({ ...request(), [key]: 'attacker' } as never, {
++          fetchImpl: fetchMock as never,
++        }),
++      ).rejects.toMatchObject({ code: 'invalid_request' });
++      expect(fetchMock).not.toHaveBeenCalled();
++    }
++
++    const fetchMock = successfulFetch([]);
++    await executeMiraFormalProviderReadiness(request(), { fetchImpl: fetchMock as typeof fetch });
++    await expect(
++      executeMiraFormalProviderReadiness(request({ releaseId: 'release-changed' }), {
++        fetchImpl: vi.fn() as never,
++      }),
++    ).rejects.toMatchObject({ code: 'request_conflict' });
++  });
++
++  it('terminalizes a lost Provider response as ambiguous and never retries', async () => {
++    const timeout = vi.fn(async () => {
++      throw new DOMException('secret timeout detail', 'TimeoutError');
++    });
++    const input = request({ requestId: 'formal-provider-readiness-timeout' });
++    const first = await executeMiraFormalProviderReadiness(input, {
++      fetchImpl: timeout as typeof fetch,
++    });
++    expect(first.record).toMatchObject({
++      state: 'ambiguous',
++      safeErrorCode: 'provider_outcome_unknown',
++      providerAttemptedCount: 1,
++      providerPassedCount: 0,
++    });
++    const replay = await executeMiraFormalProviderReadiness(input, {
++      fetchImpl: timeout as typeof fetch,
++    });
++    expect(replay.created).toBe(false);
++    expect(timeout).toHaveBeenCalledTimes(1);
++    const serialized = JSON.stringify(await readMiraFormalProviderReadinessJob(input.requestId));
++    for (const forbidden of [kimiKey, ttsKey, asrKey, 'secret timeout detail', 'base64', narration]) {
++      expect(serialized).not.toContain(forbidden);
++    }
++  });
++
++  it('marks a post-Provider completion write failure ambiguous and never redispatches', async () => {
++    const actualRename = fs.rename.bind(fs);
++    vi.spyOn(fs, 'rename')
++      .mockImplementationOnce(actualRename)
++      .mockRejectedValueOnce(new Error('secret local persistence detail'))
++      .mockImplementation(actualRename);
++    const fetchMock = successfulFetch([]);
++    const input = request({ requestId: 'formal-provider-readiness-persist-unknown' });
++    const first = await executeMiraFormalProviderReadiness(input, {
++      fetchImpl: fetchMock as typeof fetch,
++    });
++    expect(first.record).toMatchObject({
++      state: 'ambiguous',
++      safeErrorCode: 'provider_completion_persist_unknown',
++      providerAttemptedCount: 1,
++      providerPassedCount: 0,
++    });
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++
++    const replayFetch = vi.fn();
++    const replay = await executeMiraFormalProviderReadiness(input, {
++      fetchImpl: replayFetch as typeof fetch,
++    });
++    expect(replay.created).toBe(false);
++    expect(replay.record.state).toBe('ambiguous');
++    expect(replayFetch).not.toHaveBeenCalled();
++    expect(JSON.stringify(replay.record)).not.toContain('secret local persistence detail');
++  });
++
++  it('protects POST/GET/health with exact loopback authority and sanitized receipts', async () => {
++    const { NextRequest } = await import('next/server');
++    const headers = {
++      host: '127.0.0.1:3100',
++      'x-forwarded-host': '127.0.0.1:3100',
++      'x-forwarded-for': '127.0.0.1',
++      'x-forwarded-proto': 'http',
++      'x-forwarded-port': '3100',
++      'x-mira-internal-token': 'internal-secret-never-persist',
++      'content-type': 'application/json',
++    };
++    vi.stubGlobal('fetch', successfulFetch([]));
++    const route = await import('@/app/api/mira/formal-provider-readiness/route');
++    const denied = await route.POST(
++      new NextRequest('http://127.0.0.1:3100/api/mira/formal-provider-readiness', {
++        method: 'POST',
++        headers: { ...headers, 'x-mira-internal-token': 'wrong' },
++        body: JSON.stringify(request({ requestId: 'route-readiness-denied' })),
++      }),
++    );
++    expect(denied.status).toBe(403);
++
++    const created = await route.POST(
++      new NextRequest('http://127.0.0.1:3100/api/mira/formal-provider-readiness', {
++        method: 'POST',
++        headers,
++        body: JSON.stringify(request({ requestId: 'route-readiness-001' })),
++      }),
++    );
++    const body = await created.json();
++    expect(created.status).toBe(200);
++    expect(body).toMatchObject({
++      success: true,
++      state: 'auto_validated',
++      routeSessionProof: { providerCall: false },
++      providerProof: { providerCall: true, passedCallCount: 5 },
++    });
++    const serialized = JSON.stringify(body);
++    for (const forbidden of [kimiKey, ttsKey, asrKey, 'baseUrl', 'audioUrl', 'base64', narration]) {
++      expect(serialized).not.toContain(forbidden);
++    }
++
++    const health = await import('@/app/api/health/route');
++    const healthy = await health.GET(
++      new NextRequest('http://127.0.0.1:3100/api/health?scope=formal-provider-readiness', {
++        headers,
++      }),
++    );
+-- 
+2.50.1 (Apple Git-155)
+

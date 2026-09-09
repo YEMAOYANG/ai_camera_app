@@ -1,0 +1,1404 @@
+From b1899cf42f2e56cba0d1b01fba2978de24deef76 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:35 +0800
+Subject: [PATCH] 0037-mira-student-completion-resume
+
+---
+ app/api/agent/owner-events/constants.ts       |   5 +
+ app/api/agent/owner-events/route.ts           |  10 +-
+ .../agent/sessions/[id]/events/constants.ts   |   3 +
+ app/api/agent/sessions/[id]/events/route.ts   |   3 +-
+ app/api/health/route.ts                       |   4 +-
+ app/api/materials/constants.ts                |   2 +
+ app/api/materials/route.ts                    |   4 +-
+ app/api/stages/[id]/freshness/constants.ts    |   4 +
+ app/api/stages/[id]/freshness/route.ts        |  12 +-
+ app/api/stages/[id]/scenes/constants.ts       |   2 +
+ app/api/stages/[id]/scenes/route.ts           |   4 +-
+ components/edit/PlaybackChromeRoot.tsx        |  19 +-
+ lib/mira/student-runtime.ts                   |  14 +
+ lib/playback/audio-availability.ts            |   9 +-
+ lib/server/classroom-media-generation.ts      |   7 +-
+ lib/server/mira-asr-policy.ts                 |   5 +-
+ lib/server/mira-formal-compiled-classroom.ts  | 427 ++++++++++++++++--
+ .../mira-professional-research-policy.ts      |  22 +
+ .../mira-sample-deterministic-classroom.ts    |   8 +-
+ next.config.ts                                |  18 +-
+ packages/@openmaic/storage/package.json       |   4 +
+ packages/@openmaic/storage/src/browser.ts     |  90 ++++
+ .../mira-primary-courseware/SKILL.md          |  78 ++++
+ .../agent-runtime/owner-events-route.test.ts  |   4 +-
+ .../session-events-route.test.ts              |   4 +-
+ .../stage-freshness-route.test.ts             |   3 +-
+ .../agent-runtime/stage-scenes-route.test.ts  |   3 +-
+ tests/runtime/mira-student-runtime.test.ts    |  29 ++
+ tests/server/health-route.test.ts             |  20 +-
+ tests/server/mira-asr-policy.test.ts          |   5 +
+ 30 files changed, 725 insertions(+), 97 deletions(-)
+ create mode 100644 app/api/agent/owner-events/constants.ts
+ create mode 100644 app/api/agent/sessions/[id]/events/constants.ts
+ create mode 100644 app/api/materials/constants.ts
+ create mode 100644 app/api/stages/[id]/freshness/constants.ts
+ create mode 100644 app/api/stages/[id]/scenes/constants.ts
+ create mode 100644 lib/server/mira-professional-research-policy.ts
+ create mode 100644 packages/@openmaic/storage/src/browser.ts
+ create mode 100644 skills/agent-runtime/mira-primary-courseware/SKILL.md
+
+diff --git a/app/api/agent/owner-events/constants.ts b/app/api/agent/owner-events/constants.ts
+new file mode 100644
+index 0000000..aa67e85
+--- /dev/null
++++ b/app/api/agent/owner-events/constants.ts
+@@ -0,0 +1,5 @@
++// Kept outside route.ts because Next.js route modules may export only route
++// handlers and documented route configuration fields.
++export const OWNER_EVENT_POLL_INTERVAL_MS = 30_000;
++export const SSE_HEARTBEAT_INTERVAL_MS = 25_000;
++export const OWNER_EVENT_REPLAY_LIMIT = 1_000;
+diff --git a/app/api/agent/owner-events/route.ts b/app/api/agent/owner-events/route.ts
+index 10ac2f7..86e7f5d 100644
+--- a/app/api/agent/owner-events/route.ts
++++ b/app/api/agent/owner-events/route.ts
+@@ -14,17 +14,17 @@ import { isAgentRuntimeConfigured } from '@/lib/config/feature-flags';
+ import { subscribeAgentEventWakeup } from '@/lib/server/agent-runtime/event-notify-bus';
+ import { resolveRequestOwnerId } from '@/lib/server/agent-runtime/owner';
+ import { getAgentSessionStore } from '@/lib/server/agent-runtime/store';
++import {
++  OWNER_EVENT_POLL_INTERVAL_MS,
++  OWNER_EVENT_REPLAY_LIMIT,
++  SSE_HEARTBEAT_INTERVAL_MS,
++} from './constants';
+ 
+ export const runtime = 'nodejs';
+ // Self-hosted `next start` ignores maxDuration; Vercel's adapter can still use
+ // it. The 25s heartbeat keeps this sparse stream active through idle periods.
+ export const maxDuration = 300;
+ 
+-// LISTEN/NOTIFY supplies low latency. This is deliberately retained as a
+-// correctness fallback because NOTIFY is lossy across listener disconnects.
+-export const OWNER_EVENT_POLL_INTERVAL_MS = 30_000;
+-export const SSE_HEARTBEAT_INTERVAL_MS = 25_000;
+-export const OWNER_EVENT_REPLAY_LIMIT = 1_000;
+ const BACKLOG_PAGE = 500;
+ 
+ function parseLastEventId(value: string | null): bigint {
+diff --git a/app/api/agent/sessions/[id]/events/constants.ts b/app/api/agent/sessions/[id]/events/constants.ts
+new file mode 100644
+index 0000000..e4d810b
+--- /dev/null
++++ b/app/api/agent/sessions/[id]/events/constants.ts
+@@ -0,0 +1,3 @@
++// Next.js route modules may export only handlers and documented route config.
++export const POLL_INTERVAL_MS = 5_000;
++export const TERMINAL_POLL_INTERVAL_MS = 10_000;
+diff --git a/app/api/agent/sessions/[id]/events/route.ts b/app/api/agent/sessions/[id]/events/route.ts
+index fb3fc68..75b92da 100644
+--- a/app/api/agent/sessions/[id]/events/route.ts
++++ b/app/api/agent/sessions/[id]/events/route.ts
+@@ -39,6 +39,7 @@ import { isAgentRuntimeConfigured } from '@/lib/config/feature-flags';
+ import { subscribeAgentEventWakeup } from '@/lib/server/agent-runtime/event-notify-bus';
+ import { resolveRequestOwnerId } from '@/lib/server/agent-runtime/owner';
+ import { getAgentSessionStore } from '@/lib/server/agent-runtime/store';
++import { POLL_INTERVAL_MS, TERMINAL_POLL_INTERVAL_MS } from './constants';
+ 
+ export const runtime = 'nodejs';
+ // Self-hosted `next start` does not enforce maxDuration; it remains useful to
+@@ -49,12 +50,10 @@ export const maxDuration = 300;
+ // LISTEN/NOTIFY supplies low latency. Polling remains an explicit correctness
+ // fallback for notifications lost during disconnects; terminal streams retain
+ // their longer backoff.
+-export const POLL_INTERVAL_MS = 5_000;
+ // Terminal streams poll less often than active ones, but 10s is the ceiling.
+ // The worst case is "session already terminal -> user steers": this is exactly
+ // the moment the user is waiting for the result. Terminal streams exist only
+ // while the user actually has that session open, so the extra cost is small.
+-export const TERMINAL_POLL_INTERVAL_MS = 10_000;
+ const HEARTBEAT_INTERVAL_MS = 25_000;
+ /** Same default as `readEventsAfter`. A full page means more backlog remains. */
+ const BACKLOG_PAGE = 500;
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index b562bc3..8695df4 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -27,8 +27,9 @@ import {
+   getMiraFormalProviderReadinessPolicy,
+   MiraFormalProviderReadinessError,
+ } from '@/lib/server/mira-formal-provider-readiness';
++import { getMiraProfessionalResearchPolicy } from '@/lib/server/mira-professional-research-policy';
+ 
+-const version = process.env.npm_package_version || '0.3.2';
++const version = process.env.npm_package_version || '1.0.0';
+ 
+ export async function GET(req: NextRequest) {
+   if (req.nextUrl.searchParams.get('scope') === 'formal-provider-readiness') {
+@@ -140,6 +141,7 @@ export async function GET(req: NextRequest) {
+       studentChrome: studentChromePolicy,
+       formalGeneration: formalGenerationPolicy,
+       instrumentationBoundary: instrumentationBoundaryPolicy,
++      professionalResearch: getMiraProfessionalResearchPolicy(),
+     },
+   });
+ }
+diff --git a/app/api/materials/constants.ts b/app/api/materials/constants.ts
+new file mode 100644
+index 0000000..ea6e196
+--- /dev/null
++++ b/app/api/materials/constants.ts
+@@ -0,0 +1,2 @@
++// Next.js route modules may export only handlers and documented route config.
++export const MAX_MATERIAL_LIST_LIMIT = 200;
+diff --git a/app/api/materials/route.ts b/app/api/materials/route.ts
+index 00b416c..ccaec5c 100644
+--- a/app/api/materials/route.ts
++++ b/app/api/materials/route.ts
+@@ -64,6 +64,7 @@ import {
+   MEDIA_MIME_TYPES,
+   normalizeWorkbenchMaterialMime,
+ } from '@/lib/workbench/material-upload-policy';
++import { MAX_MATERIAL_LIST_LIMIT } from './constants';
+ 
+ export const runtime = 'nodejs';
+ 
+@@ -73,9 +74,6 @@ const DOCUMENT_UPLOAD_LIMIT = Math.min(
+ );
+ const MEDIA_MIME_SET = new Set<string>(MEDIA_MIME_TYPES);
+ 
+-/** The store's keyset-paging ceiling (default 50, capped at 200). */
+-export const MAX_MATERIAL_LIST_LIMIT = 200;
+-
+ class MaterialPayloadTooLarge extends Error {}
+ 
+ /** The `x-material-filename` header, sanitized to a bare file name. */
+diff --git a/app/api/stages/[id]/freshness/constants.ts b/app/api/stages/[id]/freshness/constants.ts
+new file mode 100644
+index 0000000..8df458d
+--- /dev/null
++++ b/app/api/stages/[id]/freshness/constants.ts
+@@ -0,0 +1,4 @@
++// Next.js route modules may export only handlers and documented route config.
++export const STAGE_FRESHNESS_POLL_INTERVAL_MS = 5_000;
++export const STAGE_FRESHNESS_HEARTBEAT_MS = 25_000;
++export const STAGE_FRESHNESS_RETRY_MS = 3_000;
+diff --git a/app/api/stages/[id]/freshness/route.ts b/app/api/stages/[id]/freshness/route.ts
+index 242aca6..b79f94a 100644
+--- a/app/api/stages/[id]/freshness/route.ts
++++ b/app/api/stages/[id]/freshness/route.ts
+@@ -28,19 +28,17 @@ import { isAgentRuntimeConfigured } from '@/lib/config/feature-flags';
+ import { resolveRequestOwnerId } from '@/lib/server/agent-runtime/owner';
+ import { getOwnerScopedDocumentStore } from '@/lib/server/agent-runtime/owner-scoped-documents';
+ import { ownerNotFound } from '@/lib/server/agent-runtime/route-response';
++import {
++  STAGE_FRESHNESS_HEARTBEAT_MS,
++  STAGE_FRESHNESS_POLL_INTERVAL_MS,
++  STAGE_FRESHNESS_RETRY_MS,
++} from './constants';
+ 
+ export const runtime = 'nodejs';
+ // Self-hosted `next start` ignores maxDuration; Vercel's adapter can still use
+ // it. The 25s heartbeat keeps this sparse stream active through idle periods.
+ export const maxDuration = 300;
+ 
+-/** How often the stream re-checks the stage's revision. */
+-export const STAGE_FRESHNESS_POLL_INTERVAL_MS = 5_000;
+-/** Same ceiling as the sibling SSE streams. */
+-export const STAGE_FRESHNESS_HEARTBEAT_MS = 25_000;
+-/** Browser reconnect delay, sent as the SSE `retry:` field. */
+-export const STAGE_FRESHNESS_RETRY_MS = 3_000;
+-
+ type Params = { params: Promise<{ id: string }> };
+ 
+ export async function GET(req: NextRequest, { params }: Params) {
+diff --git a/app/api/stages/[id]/scenes/constants.ts b/app/api/stages/[id]/scenes/constants.ts
+new file mode 100644
+index 0000000..9794915
+--- /dev/null
++++ b/app/api/stages/[id]/scenes/constants.ts
+@@ -0,0 +1,2 @@
++// Next.js route modules may export only handlers and documented route config.
++export const MAX_BATCH_SCENE_IDS = 200;
+diff --git a/app/api/stages/[id]/scenes/route.ts b/app/api/stages/[id]/scenes/route.ts
+index 524438e..29c9bbc 100644
+--- a/app/api/stages/[id]/scenes/route.ts
++++ b/app/api/stages/[id]/scenes/route.ts
+@@ -26,12 +26,10 @@ import { apiError } from '@/lib/server/api-response';
+ import { getOwnerScopedDocumentStore } from '@/lib/server/agent-runtime/owner-scoped-documents';
+ import { ownerJson, ownerNotFound } from '@/lib/server/agent-runtime/route-response';
+ import { withRequestOwnerId } from '@/lib/server/agent-runtime/with-owner';
++import { MAX_BATCH_SCENE_IDS } from './constants';
+ 
+ export const runtime = 'nodejs';
+ 
+-/** Upper bound on `ids` — see the file header. */
+-export const MAX_BATCH_SCENE_IDS = 200;
+-
+ /**
+  * Scene ids travel the same wire as stage ids, so they face the same driver
+  * hazard: a `\0` or a lone surrogate in the query parameter would make an id
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index f55885c..3bef306 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -67,6 +67,7 @@ import {
+ } from '@/lib/contexts/mira-student-runtime-context';
+ import {
+   getMiraEffectiveAutoPlayLecture,
++  shouldAutoStartMiraStudentSelectedScene,
+   shouldShowMiraStudentStartGate,
+ } from '@/lib/mira/student-runtime';
+ import { toast } from 'sonner';
+@@ -1163,6 +1164,18 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+ 
+     const isTopicActive = playbackView.isTopicActive;
+ 
++    const armSelectedSceneAutoStart = useCallback(
++      (targetSceneId: string) => {
++        autoStartRef.current = shouldAutoStartMiraStudentSelectedScene({
++          studentMode,
++          autoPlayLecture: studentAutoPlayRuntime?.autoPlayLectureRef.current ?? false,
++          audioStartAccepted: studentAutoPlayRuntime?.audioStartAccepted ?? false,
++          targetIsPlayableScene: targetSceneId !== PENDING_SCENE_ID,
++        });
++      },
++      [studentAutoPlayRuntime, studentMode],
++    );
++
+     /**
+      * Gated scene switch — if a topic is active, show AlertDialog before switching.
+      * Returns true if the switch was immediate, false if gated (dialog shown).
+@@ -1180,10 +1193,11 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+         }
+         await chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
+         if (requestId !== sceneSwitchRequestRef.current) return false;
++        armSelectedSceneAutoStart(targetSceneId);
+         setCurrentSceneId(targetSceneId);
+         return true;
+       },
+-      [currentSceneId, isTopicActive, setCurrentSceneId],
++      [armSelectedSceneAutoStart, currentSceneId, isTopicActive, setCurrentSceneId],
+     );
+ 
+     /** User confirmed scene switch via AlertDialog */
+@@ -1197,11 +1211,12 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+         await chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
+         if (requestId !== sceneSwitchRequestRef.current) return;
+         doSessionCleanup();
++        armSelectedSceneAutoStart(targetSceneId);
+         setCurrentSceneId(targetSceneId);
+       } finally {
+         sceneSwitchConfirmingRef.current = false;
+       }
+-    }, [pendingSceneId, setCurrentSceneId, doSessionCleanup]);
++    }, [armSelectedSceneAutoStart, pendingSceneId, setCurrentSceneId, doSessionCleanup]);
+ 
+     /** User cancelled scene switch via AlertDialog */
+     const cancelSceneSwitch = useCallback(() => {
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+index cf1a85e..cd09f39 100644
+--- a/lib/mira/student-runtime.ts
++++ b/lib/mira/student-runtime.ts
+@@ -86,6 +86,20 @@ export function getMiraEffectiveAutoPlayLecture({
+   return studentMode ? studentAutoPlayLecture : operatorAutoPlayLecture;
+ }
+ 
++export function shouldAutoStartMiraStudentSelectedScene({
++  studentMode,
++  autoPlayLecture,
++  audioStartAccepted,
++  targetIsPlayableScene,
++}: {
++  readonly studentMode: boolean;
++  readonly autoPlayLecture: boolean;
++  readonly audioStartAccepted: boolean;
++  readonly targetIsPlayableScene: boolean;
++}): boolean {
++  return studentMode && autoPlayLecture && audioStartAccepted && targetIsPlayableScene;
++}
++
+ /** Browsers require a direct user gesture before a classroom can reliably play audio. */
+ export function shouldShowMiraStudentStartGate({
+   studentMode,
+diff --git a/lib/playback/audio-availability.ts b/lib/playback/audio-availability.ts
+index 76e92e2..e26310b 100644
+--- a/lib/playback/audio-availability.ts
++++ b/lib/playback/audio-availability.ts
+@@ -1,10 +1,9 @@
+-import type { Action, SpeechAction } from '@/lib/types/action';
++import type { Action, LegacySpeechAction, SpeechAction } from '@/lib/types/action';
+ 
+ /** Whether a speech action points at already-generated narration audio. */
+-export function hasSpeechAudioReference(
+-  action: Pick<SpeechAction, 'audioId' | 'audioUrl'>,
+-): boolean {
+-  return Boolean(action.audioId?.trim() || action.audioUrl?.trim());
++export function hasSpeechAudioReference(action: SpeechAction): boolean {
++  const legacyAction = action as LegacySpeechAction;
++  return Boolean(action.audioId?.trim() || legacyAction.audioUrl?.trim());
+ }
+ 
+ /** Whether a playback timeline contains any already-generated narration audio. */
+diff --git a/lib/server/classroom-media-generation.ts b/lib/server/classroom-media-generation.ts
+index d06784e..e2d1b12 100644
+--- a/lib/server/classroom-media-generation.ts
++++ b/lib/server/classroom-media-generation.ts
+@@ -30,7 +30,7 @@ import {
+ } from '@/lib/server/provider-config';
+ import type { SceneOutline } from '@/lib/types/generation';
+ import type { Scene } from '@/lib/types/stage';
+-import type { SpeechAction } from '@/lib/types/action';
++import type { LegacySpeechAction, SpeechAction } from '@/lib/types/action';
+ import type { ImageProviderId } from '@/lib/media/types';
+ import type { VideoProviderId } from '@/lib/media/types';
+ import type { TTSProviderId } from '@/lib/audio/types';
+@@ -47,7 +47,7 @@ interface MiraSpeechAudioMetadata {
+   fallbackUsed: false;
+ }
+ 
+-type MiraSpeechAction = SpeechAction & { audioMetadata?: MiraSpeechAudioMetadata };
++type MiraSpeechAction = LegacySpeechAction & { audioMetadata?: MiraSpeechAudioMetadata };
+ 
+ const log = createLogger('ClassroomMedia');
+ 
+@@ -303,8 +303,7 @@ export async function generateTTSForClassroom(
+     expectedSpeechCount?: number;
+   } = {},
+ ): Promise<ClassroomTTSGenerationResult> {
+-  const classroomDirectory =
+-    options.storageDirectory || path.join(CLASSROOMS_DIR, classroomId);
++  const classroomDirectory = options.storageDirectory || path.join(CLASSROOMS_DIR, classroomId);
+   const audioDir = path.join(classroomDirectory, 'audio');
+   await ensureDir(audioDir);
+ 
+diff --git a/lib/server/mira-asr-policy.ts b/lib/server/mira-asr-policy.ts
+index 4511661..5b9ce75 100644
+--- a/lib/server/mira-asr-policy.ts
++++ b/lib/server/mira-asr-policy.ts
+@@ -33,9 +33,10 @@ export function getMiraAsrPolicy(
+ 
+ export function assertMiraAsrProviderReady(
+   policy: MiraAsrPolicy,
+-  providers: Record<string, Record<string, never>>,
++  providers: Readonly<Record<string, { disabled?: boolean }>>,
+ ): void {
+-  if (!providers[policy.providerId]) {
++  const provider = providers[policy.providerId];
++  if (!provider || provider.disabled) {
+     throw new Error('Deterministic Qwen3-ASR is required but qwen-asr is not server-configured');
+   }
+ }
+diff --git a/lib/server/mira-formal-compiled-classroom.ts b/lib/server/mira-formal-compiled-classroom.ts
+index 8c50bb5..1ce90a3 100644
+--- a/lib/server/mira-formal-compiled-classroom.ts
++++ b/lib/server/mira-formal-compiled-classroom.ts
+@@ -5,7 +5,7 @@ import {
+   type GeneratedSceneContent,
+   type SceneOutline,
+ } from '@openmaic/generation';
+-import type { PPTElement, QuizQuestion, WidgetConfigBase } from '@openmaic/dsl';
++import type { PPTElement, PPTShapeElement, QuizQuestion, WidgetConfigBase } from '@openmaic/dsl';
+ import type {
+   ClassroomGenerationProgress,
+   GenerateClassroomInput,
+@@ -279,53 +279,364 @@ function textElement(
+   height: number,
+   fontSize: number,
+   fill?: string,
++  options: {
++    align?: 'left' | 'center' | 'right';
++    color?: string;
++    fontWeight?: number;
++    lineHeight?: number;
++    textType?: 'title' | 'subtitle' | 'content' | 'item' | 'itemTitle' | 'itemNumber';
++  } = {},
+ ): PPTElement {
++  const lineHeight = options.lineHeight ?? 1.35;
++  const align = options.align ?? 'left';
+   return {
+     id,
+     type: 'text',
+-    content: `<p style="font-size:${fontSize}px;line-height:1.35;margin:0">${escapeHtml(content)}</p>`,
++    content: `<p style="font-size:${fontSize}px;line-height:${lineHeight};margin:0;font-weight:${options.fontWeight ?? 700};text-align:${align}">${escapeHtml(content)}</p>`,
+     left,
+     top,
+     width,
+     height,
+     rotate: 0,
+     defaultFontName: 'Microsoft YaHei',
+-    defaultColor: '#18324a',
++    defaultColor: options.color ?? '#18324a',
+     fill,
+-    lineHeight: 1.35,
++    lineHeight,
+     paragraphSpace: 0,
+-    textType: top < 120 ? 'title' : 'content',
++    textType: options.textType ?? (top < 120 ? 'title' : 'content'),
+     vAlign: 'middle',
+   };
+ }
+ 
+-function slideContent(
+-  title: string,
+-  lead: string,
+-  points: readonly string[],
+-): GeneratedSceneContent {
+-  const safePoints = points.slice(0, 4);
++function roundedShape(
++  id: string,
++  left: number,
++  top: number,
++  width: number,
++  height: number,
++  fill: string,
++  radius = 16,
++): PPTShapeElement {
++  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
++  return {
++    id,
++    type: 'shape',
++    left,
++    top,
++    width,
++    height,
++    rotate: 0,
++    viewBox: [width, height],
++    path: `M ${r} 0 H ${width - r} Q ${width} 0 ${width} ${r} V ${height - r} Q ${width} ${height} ${width - r} ${height} H ${r} Q 0 ${height} 0 ${height - r} V ${r} Q 0 0 ${r} 0 Z`,
++    fixedRatio: false,
++    fill,
++  };
++}
++
++function subjectLabel(subject: MiraFormalAudioSubject): string {
++  return { chinese: '语文', math: '数学', english: '英语' }[subject];
++}
++
++function openingSlideContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
+   return {
+     elements: [
+-      textElement('slide-title', title, 64, 42, 872, 72, 38),
+-      textElement('slide-lead', lead, 64, 132, 872, 90, 25, '#eef8f6'),
+-      ...safePoints.map((point, index) =>
+-        textElement(
+-          `slide-point-${index + 1}`,
+-          `${index + 1}. ${point}`,
+-          86,
+-          250 + index * 72,
+-          828,
+-          58,
+-          23,
+-          index % 2 === 0 ? '#f4f0ff' : '#fff4e6',
+-        ),
++      roundedShape('opening-accent', 54, 48, 10, 430, '#2d6cdf', 5),
++      textElement(
++        'slide-kicker',
++        `小学一年级 · ${subjectLabel(spec.course.subject)}`,
++        86,
++        58,
++        430,
++        38,
++        18,
++        undefined,
++        { color: '#2d5ba8', fontWeight: 800, textType: 'subtitle' },
+       ),
++      textElement('slide-title', spec.course.title, 84, 108, 510, 126, 48, undefined, {
++        fontWeight: 900,
++        lineHeight: 1.15,
++      }),
++      textElement('slide-lead', spec.course.objective, 86, 246, 500, 94, 24, undefined, {
++        color: '#36516b',
++        fontWeight: 700,
++        lineHeight: 1.5,
++      }),
++      roundedShape('opening-question-bg', 632, 86, 302, 296, '#ffffff', 18),
++      textElement('opening-question-label', '今天先想一想', 668, 112, 232, 42, 18, undefined, {
++        color: '#9a5b12',
++        fontWeight: 800,
++        align: 'center',
++        textType: 'subtitle',
++      }),
++      textElement('opening-question', spec.intro, 664, 164, 238, 160, 27, undefined, {
++        align: 'center',
++        fontWeight: 850,
++        lineHeight: 1.45,
++      }),
++      textElement(
++        'opening-path',
++        '看一看   →   想一想   →   试一试',
++        120,
++        414,
++        760,
++        52,
++        22,
++        '#dfeafd',
++        {
++          align: 'center',
++          color: '#244f98',
++          fontWeight: 850,
++        },
++      ),
++    ],
++    background: { type: 'solid', color: '#f4f8ff' },
++  };
++}
++
++function teachingSlideContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
++  const points = spec.teach.keyPoints.slice(0, 3);
++  return {
++    elements: [
++      textElement('slide-kicker', '发现方法', 68, 42, 200, 36, 17, undefined, {
++        color: '#276b63',
++        fontWeight: 850,
++        textType: 'subtitle',
++      }),
++      textElement('slide-title', spec.teach.title, 66, 78, 868, 76, 40, undefined, {
++        fontWeight: 900,
++      }),
++      roundedShape('teach-lead-bg', 66, 170, 868, 118, '#e6f5f2', 16),
++      textElement('slide-lead', spec.teach.sayText, 96, 184, 808, 90, 24, undefined, {
++        color: '#1d514b',
++        fontWeight: 760,
++        lineHeight: 1.45,
++      }),
++      ...points.flatMap((point, index) => {
++        const left = 66 + index * 294;
++        return [
++          roundedShape(
++            `slide-point-bg-${index + 1}`,
++            left,
++            324,
++            272,
++            148,
++            index === 1 ? '#fff2d8' : '#edf2ff',
++            16,
++          ),
++          roundedShape(
++            `slide-point-number-${index + 1}`,
++            left + 18,
++            344,
++            42,
++            42,
++            index === 1 ? '#d89020' : '#376fcb',
++            21,
++          ),
++          textElement(
++            `slide-point-index-${index + 1}`,
++            String(index + 1),
++            left + 18,
++            344,
++            42,
++            42,
++            20,
++            undefined,
++            {
++              align: 'center',
++              color: '#ffffff',
++              fontWeight: 900,
++              textType: 'itemNumber',
++            },
++          ),
++          textElement(`slide-point-${index + 1}`, point, left + 72, 338, 180, 112, 21, undefined, {
++            fontWeight: 820,
++            lineHeight: 1.4,
++            textType: 'item',
++          }),
++        ];
++      }),
+     ],
+     background: { type: 'solid', color: '#fbfdfc' },
+   };
+ }
+ 
++function workedExampleSlideContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
++  return {
++    elements: [
++      textElement('slide-kicker', '老师示范', 68, 42, 200, 36, 17, undefined, {
++        color: '#765019',
++        fontWeight: 850,
++        textType: 'subtitle',
++      }),
++      textElement('slide-title', '把方法用在一道题里', 66, 78, 868, 76, 40, undefined, {
++        fontWeight: 900,
++      }),
++      roundedShape('demo-question-bg', 66, 176, 372, 286, '#fff3db', 16),
++      textElement('demo-question-label', '先读题', 96, 198, 130, 38, 18, undefined, {
++        color: '#8a570b',
++        fontWeight: 850,
++        textType: 'subtitle',
++      }),
++      textElement('demo-question', spec.demo.prompt, 96, 244, 312, 176, 27, undefined, {
++        fontWeight: 850,
++        lineHeight: 1.45,
++      }),
++      textElement('demo-arrow', '→', 454, 280, 70, 64, 42, undefined, {
++        align: 'center',
++        color: '#39736c',
++        fontWeight: 900,
++      }),
++      roundedShape('demo-thinking-bg', 540, 176, 394, 286, '#e7f5f2', 16),
++      textElement('demo-thinking-label', '这样想', 570, 198, 140, 38, 18, undefined, {
++        color: '#276b63',
++        fontWeight: 850,
++        textType: 'subtitle',
++      }),
++      textElement('demo-hint', spec.demo.hint, 570, 242, 334, 74, 22, undefined, {
++        color: '#24554f',
++        fontWeight: 850,
++        lineHeight: 1.4,
++      }),
++      textElement('demo-explanation', spec.demo.explanation, 570, 320, 334, 116, 20, undefined, {
++        color: '#36516b',
++        fontWeight: 700,
++        lineHeight: 1.45,
++      }),
++    ],
++    background: { type: 'solid', color: '#fffdf8' },
++  };
++}
++
++function guidedSlideContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
++  return {
++    elements: [
++      textElement('slide-kicker', '一起试一试', 68, 42, 200, 36, 17, undefined, {
++        color: '#315d9d',
++        fontWeight: 850,
++        textType: 'subtitle',
++      }),
++      textElement('slide-title', '先找方法，再动手', 66, 78, 868, 76, 40, undefined, {
++        fontWeight: 900,
++      }),
++      textElement(
++        'slide-lead',
++        '两道练习都先读清题目，再选择刚才学到的方法。',
++        68,
++        154,
++        864,
++        58,
++        22,
++        undefined,
++        {
++          color: '#45617f',
++          fontWeight: 730,
++        },
++      ),
++      ...spec.guided.flatMap((question, index) => {
++        const left = 66 + index * 444;
++        return [
++          roundedShape(
++            `guided-hint-bg-${index + 1}`,
++            left,
++            232,
++            420,
++            194,
++            index === 0 ? '#eaf1ff' : '#e8f6f1',
++            16,
++          ),
++          textElement(
++            `guided-hint-label-${index + 1}`,
++            `线索 ${index + 1}`,
++            left + 28,
++            252,
++            110,
++            36,
++            17,
++            undefined,
++            {
++              color: index === 0 ? '#315d9d' : '#276b63',
++              fontWeight: 850,
++              textType: 'subtitle',
++            },
++          ),
++          textElement(
++            `guided-hint-${index + 1}`,
++            question.hint,
++            left + 28,
++            294,
++            364,
++            106,
++            24,
++            undefined,
++            {
++              fontWeight: 830,
++              lineHeight: 1.45,
++              textType: 'item',
++            },
++          ),
++        ];
++      }),
++      textElement(
++        'guided-path',
++        '读题   →   找方法   →   说理由',
++        166,
++        458,
++        668,
++        50,
++        21,
++        '#dfeafd',
++        {
++          align: 'center',
++          color: '#244f98',
++          fontWeight: 850,
++        },
++      ),
++    ],
++    background: { type: 'solid', color: '#f8fbff' },
++  };
++}
++
++function independentSlideContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
++  const checks = ['读清题目', '自己作答', '完成后检查'];
++  return {
++    elements: [
++      textElement('slide-kicker', '独立练习前', 68, 42, 200, 36, 17, undefined, {
++        color: '#6b4d8f',
++        fontWeight: 850,
++        textType: 'subtitle',
++      }),
++      textElement('slide-title', '把方法装进自己的工具箱', 66, 78, 868, 76, 40, undefined, {
++        fontWeight: 900,
++      }),
++      roundedShape('recap-bg', 66, 178, 482, 286, '#f1edfa', 16),
++      textElement('recap-label', '先说一遍方法', 98, 204, 190, 38, 18, undefined, {
++        color: '#6b4d8f',
++        fontWeight: 850,
++        textType: 'subtitle',
++      }),
++      textElement('slide-lead', spec.recap, 98, 252, 418, 170, 26, undefined, {
++        color: '#493663',
++        fontWeight: 820,
++        lineHeight: 1.5,
++      }),
++      ...checks.flatMap((check, index) => [
++        roundedShape(`check-dot-${index + 1}`, 594, 194 + index * 88, 48, 48, '#2d6cdf', 24),
++        textElement(`check-index-${index + 1}`, '✓', 594, 194 + index * 88, 48, 48, 24, undefined, {
++          align: 'center',
++          color: '#ffffff',
++          fontWeight: 900,
++          textType: 'itemNumber',
++        }),
++        textElement(`check-${index + 1}`, check, 662, 190 + index * 88, 250, 56, 24, undefined, {
++          fontWeight: 850,
++          textType: 'item',
++        }),
++      ]),
++    ],
++    background: { type: 'solid', color: '#fcfbff' },
++  };
++}
++
+ function runtimeQuestion(question: FormalQuestion): QuizQuestion {
+   const runtimeType =
+     question.type === 'single_choice'
+@@ -375,7 +686,9 @@ function simulationContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
+     ],
+   };
+   const phaseJson = scriptJson(phases);
+-  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#f5fbfa;color:#17324a}.app{max-width:880px;margin:auto;padding:28px}.panel{padding:24px;background:#fff;border:2px solid #cce9e4;border-radius:20px}input{width:100%;accent-color:#2e9187}output{font-size:34px;font-weight:800}.result{margin-top:22px;padding:22px;border-radius:16px;background:#eef8f6;font-size:24px}.mira-highlight{outline:5px solid #f2a85b;transition:outline .25s ease}</style></head><body><main class="app"><h1>${escapeHtml(spec.course.title)} · 方法模拟</h1><section class="panel"><label for="step-control">拖动选择学习步骤</label><input id="step-control" data-var="step" type="range" min="1" max="3" step="1" value="1"><output id="step-output">1</output><div id="step-result" class="result" aria-live="polite"></div></section></main>${widgetConfigScript(config)}<script>const phases=${phaseJson};const stepControl=document.getElementById('step-control');const stepOutput=document.getElementById('step-output');const stepResult=document.getElementById('step-result');function renderStep(){const index=Number(stepControl.value)-1;stepOutput.textContent=String(index+1);stepResult.textContent=phases[index];}stepControl.addEventListener('input',function(){stepOutput.textContent=stepControl.value;renderStep();});renderStep();</script>${highlightScript()}</body></html>`;
++  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
++*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",system-ui,sans-serif;background:#f4faf8;color:#17324a}.app{max-width:920px;margin:auto;padding:26px 30px}header{display:flex;align-items:end;justify-content:space-between;gap:24px}h1{margin:0;font-size:34px;line-height:1.2}header p{max-width:360px;margin:0;color:#49657b;font-size:17px;line-height:1.5}.stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0 16px;padding:0;list-style:none}.stepper li{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:12px;color:#587184;background:#e4eeeb;font-weight:800}.stepper b{display:grid;width:30px;height:30px;place-items:center;border-radius:50%;background:#fff}.stepper li.is-current{color:#1d514b;background:#cceae4}.studio{display:grid;grid-template-columns:180px 1fr;gap:22px;align-items:stretch;padding:24px;border-radius:16px;background:#fff}.control{display:flex;flex-direction:column;justify-content:center}.control label{font-size:17px;font-weight:800}.control input{width:100%;margin:18px 0;accent-color:#2e9187}.step-number{display:flex;align-items:baseline;gap:6px;color:#2e9187}.step-number output{font-size:58px;font-weight:900;line-height:1}.step-number span{font-size:16px;font-weight:800}.result{display:flex;min-height:210px;flex-direction:column;justify-content:center;padding:28px;border-radius:14px;background:#eaf6f3}.result small{color:#2a6a62;font-size:15px;font-weight:850}.result p{margin:12px 0 0;font-size:28px;font-weight:850;line-height:1.5}.mira-highlight{outline:5px solid #f2a85b;outline-offset:5px;transition:outline .22s ease}@media(max-width:680px){.app{padding:18px}header{align-items:start;flex-direction:column}.stepper{grid-template-columns:1fr}.studio{grid-template-columns:1fr}.result{min-height:150px}}@media(prefers-reduced-motion:reduce){.mira-highlight{transition:none}}
++</style></head><body><main class="app"><header><h1>${escapeHtml(spec.course.title)} · 方法实验室</h1><p>拖动学习步骤，观察同一个方法怎样从理解走向独立使用。</p></header><ol class="stepper" aria-label="学习步骤"><li data-step="1"><b>1</b>先观察</li><li data-step="2"><b>2</b>再练习</li><li data-step="3"><b>3</b>会检查</li></ol><section class="studio"><div class="control"><label for="step-control">选择学习步骤</label><input id="step-control" data-var="step" type="range" min="1" max="3" step="1" value="1"><div class="step-number"><output id="step-output">1</output><span>/ 3</span></div></div><article class="result" aria-live="polite"><small id="step-label">先观察</small><p id="step-result"></p></article></section></main>${widgetConfigScript(config)}<script>const phases=${phaseJson};const labels=['先观察','再练习','会检查'];const stepControl=document.getElementById('step-control');const stepOutput=document.getElementById('step-output');const stepLabel=document.getElementById('step-label');const stepResult=document.getElementById('step-result');const markers=Array.from(document.querySelectorAll('[data-step]'));function renderStep(){const index=Number(stepControl.value)-1;stepOutput.textContent=String(index+1);stepLabel.textContent=labels[index];stepResult.textContent=phases[index];markers.forEach(function(marker,markerIndex){marker.classList.toggle('is-current',markerIndex===index);});}stepControl.addEventListener('input',renderStep);renderStep();</script>${highlightScript()}</body></html>`;
+   return { html, widgetType: 'simulation', widgetConfig: config };
+ }
+ 
+@@ -410,7 +723,9 @@ function gameContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
+     ],
+   };
+   const levelsJson = scriptJson(levels);
+-  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#fff8ed;color:#29364a}.app{max-width:860px;margin:auto;padding:28px}.hud{display:flex;gap:12px;flex-wrap:wrap}.pill{padding:9px 14px;border-radius:999px;background:#fff}.target{margin:24px 0;padding:26px;border-radius:20px;background:#fff;font-size:24px}.actions{display:flex;gap:12px}.actions button{border:0;border-radius:13px;padding:13px 20px;font-size:17px;cursor:pointer}.challenge{background:#2e9187;color:#fff}.retry{background:#e9e6f7;color:#443b72}.mira-highlight{outline:5px solid #f2a85b;transition:outline .25s ease}</style></head><body><main class="app"><h1>${escapeHtml(spec.course.title)} · 方法闯关</h1><div class="hud"><span class="pill">关卡 <strong id="level-status">1</strong></span><span class="pill">得分 <strong id="score-status">0</strong></span><span class="pill">进度 <strong id="progress-status">0</strong>%</span></div><div id="mastery-target" class="target" aria-live="polite"></div><div class="actions"><button id="challenge-button" class="challenge" type="button">我能说出这个方法</button><button id="retry-button" class="retry" type="button">重新练习</button></div><canvas id="game-canvas" width="420" height="90"></canvas></main>${widgetConfigScript(config)}<script>const levels=${levelsJson};let score=0;let level=1;let progress=0;const levelStatus=document.getElementById('level-status');const scoreStatus=document.getElementById('score-status');const progressStatus=document.getElementById('progress-status');const masteryTarget=document.getElementById('mastery-target');const gameCanvas=document.getElementById('game-canvas');const gameContext=gameCanvas.getContext('2d');function renderGame(){levelStatus.textContent=String(level);scoreStatus.textContent=String(score);progressStatus.textContent=String(progress);masteryTarget.textContent=levels[Math.min(level-1,levels.length-1)];gameContext.clearRect(0,0,420,90);gameContext.fillStyle='#2e9187';gameContext.fillRect(0,28,Math.round(progress*4.2),24);}document.getElementById('challenge-button').addEventListener('click',function(){score += 10;level += 1;progress = Math.min(100,Math.round(score/Math.max(10,levels.length*10)*100));renderGame();requestAnimationFrame(renderGame);});document.getElementById('retry-button').addEventListener('click',function(){score = Math.max(0,score-10);level = Math.max(1,level-1);progress = Math.max(0,progress-25);renderGame();requestAnimationFrame(renderGame);});renderGame();</script>${highlightScript()}</body></html>`;
++  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
++*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",system-ui,sans-serif;background:#fff8ed;color:#29364a}.app{max-width:900px;margin:auto;padding:26px 30px}header{display:flex;align-items:start;justify-content:space-between;gap:24px}h1{margin:0;font-size:34px;line-height:1.2}header p{max-width:330px;margin:0;color:#6f604a;font-size:17px;line-height:1.5}.progress-shell{height:18px;margin:24px 0 10px;overflow:hidden;border-radius:999px;background:#eadfcd}.progress-fill{height:100%;width:0;border-radius:inherit;background:#2e9187;transition:width .22s ease}.hud{display:flex;justify-content:space-between;color:#6f604a;font-size:15px;font-weight:800}.challenge-stage{display:grid;grid-template-columns:140px 1fr;gap:22px;align-items:center;min-height:248px;margin:18px 0;padding:28px;border-radius:16px;background:#fff}.level-orb{display:grid;width:118px;height:118px;place-items:center;border-radius:50%;color:#fff;background:#d88d25}.level-orb span{display:block;font-size:15px;font-weight:800;text-align:center}.level-orb strong{display:block;font-size:44px;line-height:1}.target small{color:#8a5b17;font-size:15px;font-weight:850}.target p{margin:10px 0 0;font-size:29px;font-weight:880;line-height:1.45}.feedback{min-height:28px;margin-top:12px;color:#277167;font-size:16px;font-weight:800}.actions{display:flex;gap:12px}.actions button{min-height:52px;border:0;border-radius:12px;padding:13px 20px;font-size:17px;font-weight:850;cursor:pointer}.challenge{color:#fff;background:#2e9187}.retry{color:#443b72;background:#e9e6f7}.actions button:focus-visible{outline:4px solid #f2a85b;outline-offset:3px}.actions button:disabled{cursor:default;opacity:.52}canvas{display:block;width:100%;height:18px;margin-top:18px;border-radius:9px;background:#eadfcd}.mira-highlight{outline:5px solid #f2a85b;outline-offset:5px;transition:outline .22s ease}@media(max-width:650px){.app{padding:18px}header{flex-direction:column}.challenge-stage{grid-template-columns:1fr}.level-orb{width:92px;height:92px}.actions{flex-direction:column}}@media(prefers-reduced-motion:reduce){.progress-fill,.mira-highlight{transition:none}}
++</style></head><body><main class="app"><header><h1>${escapeHtml(spec.course.title)} · 方法闯关</h1><p>先把当前方法说给自己听，再进入下一关。这里练的是表达，不替代正式答题。</p></header><div class="progress-shell" aria-hidden="true"><div id="progress-fill" class="progress-fill"></div></div><div class="hud"><span>方法关卡 <strong id="level-status">1</strong> / ${levels.length}</span><span>完成 <strong id="progress-status">0</strong>%</span></div><section class="challenge-stage"><div class="level-orb"><span>第 <strong id="level-orb-number">1</strong> 关</span></div><div id="mastery-target" class="target" aria-live="polite"><small>请说出这条方法</small><p id="target-copy"></p><div id="feedback" class="feedback"></div></div></section><div class="actions"><button id="challenge-button" class="challenge" type="button">我已经说清楚了</button><button id="retry-button" class="retry" type="button">再看一遍这条方法</button></div><canvas id="game-canvas" width="840" height="36" aria-label="闯关完成进度"></canvas></main>${widgetConfigScript(config)}<script>const levels=${levelsJson};let levelIndex=0;const levelStatus=document.getElementById('level-status');const levelOrbNumber=document.getElementById('level-orb-number');const progressStatus=document.getElementById('progress-status');const progressFill=document.getElementById('progress-fill');const targetCopy=document.getElementById('target-copy');const feedback=document.getElementById('feedback');const challengeButton=document.getElementById('challenge-button');const gameCanvas=document.getElementById('game-canvas');const gameContext=gameCanvas.getContext('2d');function renderGame(){const completed=Math.min(levelIndex,levels.length);const progress=Math.round(completed/levels.length*100);const shownIndex=Math.min(levelIndex,levels.length-1);levelStatus.textContent=String(shownIndex+1);levelOrbNumber.textContent=String(shownIndex+1);progressStatus.textContent=String(progress);progressFill.style.width=progress+'%';targetCopy.textContent=levels[shownIndex];gameContext.clearRect(0,0,gameCanvas.width,gameCanvas.height);gameContext.fillStyle='#2e9187';gameContext.fillRect(0,0,Math.round(gameCanvas.width*progress/100),gameCanvas.height);if(levelIndex>=levels.length){feedback.textContent='全部方法都说过一遍了，现在去完成正式练习。';challengeButton.textContent='闯关完成';challengeButton.disabled=true;}}challengeButton.addEventListener('click',function(){levelIndex+=1;feedback.textContent=levelIndex<levels.length?'很好，换下一条方法。':'';requestAnimationFrame(renderGame);});document.getElementById('retry-button').addEventListener('click',function(){feedback.textContent='慢一点，用自己的话再说一次。';});renderGame();</script>${highlightScript()}</body></html>`;
+   return { html, widgetType: 'game', widgetConfig: config };
+ }
+ 
+@@ -451,7 +766,9 @@ function visualizationContent(spec: FormalCoursewareSpec): GeneratedSceneContent
+     ],
+   };
+   const labelsJson = scriptJson(labels);
+-  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#eef4fb;color:#172b43}.app{display:grid;grid-template-columns:1fr 260px;gap:18px;max-width:940px;margin:auto;padding:22px}canvas{width:100%;height:430px;border-radius:20px;background:#dceafb}.panel{padding:20px;background:#fff;border-radius:20px}.panel button{width:100%;padding:12px;border:0;border-radius:12px;background:#2e9187;color:#fff}.panel input{width:100%}.mira-highlight{outline:5px solid #f2a85b;transition:outline .25s ease}@media(max-width:700px){.app{grid-template-columns:1fr}}</style></head><body><main class="app"><canvas id="concept-canvas" width="680" height="430" aria-label="可旋转的知识积木三维模型"></canvas><aside class="panel"><h1>${escapeHtml(spec.course.title)}</h1><ol id="concept-list"><li>${labels.map(escapeHtml).join('</li><li>')}</li></ol><button id="rotate-button" type="button">旋转观察</button><label for="zoom-control">积木大小</label><input id="zoom-control" type="range" min="1" max="2" step="0.1" value="1"><p id="model-status" aria-live="polite">拖动控件观察方法关系。</p></aside></main>${widgetConfigScript(config)}<script>const labels=${labelsJson};const canvas=document.getElementById('concept-canvas');const gl=canvas.getContext('webgl');const vertexShader=gl.createShader(gl.VERTEX_SHADER);gl.shaderSource(vertexShader,'attribute vec3 position;uniform float angle;uniform float zoom;void main(){float c=cos(angle);float s=sin(angle);vec3 p=vec3(position.x*c-position.z*s,position.y,position.x*s+position.z*c);gl_Position=vec4(p*zoom,1.0);}');gl.compileShader(vertexShader);const fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);gl.shaderSource(fragmentShader,'precision mediump float;void main(){gl_FragColor=vec4(0.18,0.57,0.53,1.0);}');gl.compileShader(fragmentShader);const program=gl.createProgram();gl.attachShader(program,vertexShader);gl.attachShader(program,fragmentShader);gl.linkProgram(program);gl.useProgram(program);const vertices=new Float32Array([-.5,-.5,0,.5,-.5,0,0,.5,0]);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);const position=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,3,gl.FLOAT,false,0,0);const angleLocation=gl.getUniformLocation(program,'angle');const zoomLocation=gl.getUniformLocation(program,'zoom');const modelStatus=document.getElementById('model-status');const zoomControl=document.getElementById('zoom-control');let rotation=0;let zoom=1;function renderModel(){gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.86,.92,.98,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform1f(angleLocation,rotation);gl.uniform1f(zoomLocation,zoom);gl.drawArrays(gl.TRIANGLES,0,3);modelStatus.textContent='正在观察：'+labels[Math.round(rotation/.25)%labels.length];}document.getElementById('rotate-button').addEventListener('click',function(){rotation += .25;renderModel();});zoomControl.addEventListener('input',function(){zoom = Number(zoomControl.value);renderModel();});renderModel();</script>${highlightScript()}</body></html>`;
++  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
++*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",system-ui,sans-serif;background:#eef4fb;color:#172b43}.app{display:grid;grid-template-columns:minmax(0,1fr) 286px;gap:18px;max-width:960px;margin:auto;padding:22px}.viewport{position:relative;min-height:470px;overflow:hidden;border-radius:16px;background:#dceafb}.viewport header{position:absolute;z-index:2;top:22px;left:26px;max-width:520px}.viewport h1{margin:0;font-size:32px;line-height:1.25}.viewport p{margin:8px 0 0;color:#405d78;font-size:16px}canvas{display:block;width:100%;height:470px}.panel{padding:22px;border-radius:16px;background:#fff}.panel h2{margin:0 0 14px;font-size:20px}.panel ol{display:grid;gap:10px;margin:0;padding:0;list-style:none}.panel li{padding:11px 12px;border-radius:10px;color:#45617a;background:#edf3f8;font-size:15px;font-weight:800}.panel li.is-active{color:#1e5f58;background:#d9eee9}.panel button{width:100%;min-height:50px;margin-top:20px;border:0;border-radius:12px;color:#fff;background:#2e9187;font-size:17px;font-weight:850;cursor:pointer}.panel button:focus-visible,.panel input:focus-visible{outline:4px solid #f2a85b;outline-offset:3px}.panel label{display:block;margin-top:20px;font-size:15px;font-weight:850}.panel input{width:100%;margin-top:10px;accent-color:#2e9187}.panel p{min-height:46px;margin:18px 0 0;color:#405d78;font-size:15px;line-height:1.5}.mira-highlight{outline:5px solid #f2a85b;outline-offset:5px;transition:outline .22s ease}@media(max-width:720px){.app{grid-template-columns:1fr;padding:14px}.viewport{min-height:360px}canvas{height:360px}.viewport header{right:20px}.panel{display:grid;grid-template-columns:1fr 1fr;gap:10px}.panel h2,.panel ol,.panel p{grid-column:1/-1}.panel button,.panel label{margin-top:4px}}@media(prefers-reduced-motion:reduce){.mira-highlight{transition:none}}
++</style></head><body><main class="app"><section class="viewport"><header><h1>${escapeHtml(spec.course.title)} · 知识积木</h1><p>转动三个知识块，看本课方法怎样连在一起。</p></header><canvas id="concept-canvas" width="680" height="470" aria-label="可旋转的三组知识积木三维模型"></canvas></section><aside class="panel"><h2>三个方法块</h2><ol id="concept-list"><li>${labels.map(escapeHtml).join('</li><li>')}</li></ol><button id="rotate-button" type="button">旋转到下一块</button><label for="zoom-control">积木大小</label><input id="zoom-control" type="range" min="0.8" max="1.35" step="0.05" value="1"><p id="model-status" aria-live="polite">正在观察：${escapeHtml(labels[0])}</p></aside></main>${widgetConfigScript(config)}<script>const labels=${labelsJson};const canvas=document.getElementById('concept-canvas');const gl=canvas.getContext('webgl');const vertexShader=gl.createShader(gl.VERTEX_SHADER);gl.shaderSource(vertexShader,'attribute vec3 position;uniform float angle;uniform float zoom;uniform vec3 offset;void main(){float cy=cos(angle),sy=sin(angle),cx=cos(.45),sx=sin(.45);vec3 y=vec3(position.x*cy-position.z*sy,position.y,position.x*sy+position.z*cy);vec3 p=vec3(y.x,y.y*cx-y.z*sx,y.y*sx+y.z*cx)+offset;gl_Position=vec4(p.x*.26*zoom,p.y*.34*zoom,p.z*.08,1.0);}');gl.compileShader(vertexShader);const fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);gl.shaderSource(fragmentShader,'precision mediump float;uniform vec3 color;void main(){gl_FragColor=vec4(color,1.0);}');gl.compileShader(fragmentShader);const program=gl.createProgram();gl.attachShader(program,vertexShader);gl.attachShader(program,fragmentShader);gl.linkProgram(program);gl.useProgram(program);const vertices=new Float32Array([-.5,-.5,.5,.5,-.5,.5,.5,.5,.5,-.5,-.5,.5,.5,.5,.5,-.5,.5,.5,-.5,-.5,-.5,-.5,.5,-.5,.5,.5,-.5,-.5,-.5,-.5,.5,.5,-.5,.5,-.5,-.5,-.5,-.5,-.5,.5,-.5,.5,.5,-.5,-.5,-.5,.5,.5,.5,-.5,-.5,-.5,-.5,-.5,.5,-.5,-.5,.5,.5,-.5,-.5,-.5,.5,.5,-.5,.5,.5,.5,.5,-.5,.5,-.5,-.5,-.5,-.5,-.5,.5,-.5,.5,.5,-.5,-.5,-.5,.5,.5,-.5,.5,-.5,-.5,-.5,.5,-.5,.5,.5,.5,.5,-.5,.5,-.5,-.5,-.5,-.5,.5,-.5,-.5,.5,.5,-.5,.5,.5,-.5,-.5,-.5,-.5,.5,.5,-.5,.5,.5,-.5,.5,-.5]);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);const position=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,3,gl.FLOAT,false,0,0);const angleLocation=gl.getUniformLocation(program,'angle');const zoomLocation=gl.getUniformLocation(program,'zoom');const offsetLocation=gl.getUniformLocation(program,'offset');const colorLocation=gl.getUniformLocation(program,'color');const modelStatus=document.getElementById('model-status');const zoomControl=document.getElementById('zoom-control');const listItems=Array.from(document.querySelectorAll('#concept-list li'));const offsets=[-1.9,0,1.9];const colors=[[.18,.57,.53],[.95,.58,.22],[.42,.34,.66]];let rotation=0;let zoom=1;let active=0;gl.enable(gl.DEPTH_TEST);function renderModel(){gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.86,.92,.98,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniform1f(zoomLocation,zoom);offsets.forEach(function(x,index){gl.uniform1f(angleLocation,rotation+index*.22);gl.uniform3f(offsetLocation,x,0,0);gl.uniform3fv(colorLocation,colors[index]);gl.drawArrays(gl.TRIANGLES,0,36);});listItems.forEach(function(item,index){item.classList.toggle('is-active',index===active);});modelStatus.textContent='正在观察：'+labels[active];}document.getElementById('rotate-button').addEventListener('click',function(){active=(active+1)%labels.length;rotation+=.42;requestAnimationFrame(renderModel);});zoomControl.addEventListener('input',function(){zoom=Number(zoomControl.value);requestAnimationFrame(renderModel);});renderModel();</script>${highlightScript()}</body></html>`;
+   return { html, widgetType: 'visualization3d', widgetConfig: config };
+ }
+ 
+@@ -489,6 +806,14 @@ function speech(order: number, text: string): Action {
+   };
+ }
+ 
++function spotlight(order: number, elementId: string): Action {
++  return {
++    id: `mira-formal-spotlight-${String(order + 1).padStart(2, '0')}`,
++    type: 'spotlight',
++    elementId,
++  };
++}
++
+ export function buildMiraFormalCompiledDraft(
+   input: GenerateClassroomInput,
+   classroomId = nanoid(10),
+@@ -542,16 +867,14 @@ export function buildMiraFormalCompiledDraft(
+   }> = [
+     {
+       outline: outline(0, 'slide', spec.course.title, spec.course.objective, [spec.intro]),
+-      content: slideContent(spec.course.title, spec.course.objective, [spec.intro]),
+-      actions: [
+-        speech(0, spec.intro),
+-        { id: 'mira-formal-spotlight-01', type: 'spotlight', elementId: 'slide-title' },
+-      ],
++      content: openingSlideContent(spec),
++      actions: [spotlight(0, 'opening-question'), speech(0, spec.intro)],
+     },
+     {
+       outline: outline(1, 'slide', spec.teach.title, spec.course.objective, spec.teach.keyPoints),
+-      content: slideContent(spec.teach.title, spec.teach.sayText, spec.teach.keyPoints),
++      content: teachingSlideContent(spec),
+       actions: [
++        spotlight(1, spec.teach.keyPoints.length ? 'slide-point-1' : 'slide-lead'),
+         speech(1, spec.teach.sayText),
+         {
+           id: 'mira-formal-discussion-01',
+@@ -563,8 +886,9 @@ export function buildMiraFormalCompiledDraft(
+     },
+     {
+       outline: outline(2, 'slide', '老师示范', spec.demo.prompt, [spec.demo.hint]),
+-      content: slideContent('老师示范', spec.demo.prompt, [spec.demo.hint, spec.demo.explanation]),
++      content: workedExampleSlideContent(spec),
+       actions: [
++        spotlight(2, 'demo-question'),
+         speech(2, `${spec.demo.prompt} ${spec.demo.hint} ${spec.demo.explanation}`),
+         {
+           id: 'mira-formal-discussion-02',
+@@ -582,12 +906,11 @@ export function buildMiraFormalCompiledDraft(
+         '先读题，再选择合适的方法。',
+         spec.guided.map((item) => item.hint),
+       ),
+-      content: slideContent(
+-        '跟着方法练',
+-        '先读题，再选择合适的方法。',
+-        spec.guided.map((item) => item.hint),
+-      ),
+-      actions: [speech(3, '接下来跟着方法练习。先认真读题，再根据提示想一想。')],
++      content: guidedSlideContent(spec),
++      actions: [
++        spotlight(3, 'guided-hint-1'),
++        speech(3, '接下来跟着方法练习。先认真读题，再根据提示想一想。'),
++      ],
+     },
+     {
+       outline: outline(4, 'slide', '独立练习前检查', spec.recap, [
+@@ -595,8 +918,8 @@ export function buildMiraFormalCompiledDraft(
+         '自己作答',
+         '完成后检查',
+       ]),
+-      content: slideContent('独立练习前检查', spec.recap, ['读清题目', '自己作答', '完成后检查']),
+-      actions: [speech(4, `${spec.recap} 下面请独立完成练习。`)],
++      content: independentSlideContent(spec),
++      actions: [spotlight(4, 'slide-lead'), speech(4, `${spec.recap} 下面请独立完成练习。`)],
+     },
+     {
+       outline: outline(
+@@ -631,12 +954,12 @@ export function buildMiraFormalCompiledDraft(
+       ),
+       content: simulationContent(spec),
+       actions: [
+-        speech(7, '拖动学习步骤控件，依次观察、练习和检查。'),
+         {
+           id: 'mira-formal-widget-highlight-01',
+           type: 'widget_highlight',
+           target: 'step-control',
+         },
++        speech(7, '拖动学习步骤控件，依次观察、练习和检查。'),
+       ],
+     },
+     {
+@@ -649,7 +972,14 @@ export function buildMiraFormalCompiledDraft(
+         'game',
+       ),
+       content: gameContent(spec),
+-      actions: [speech(8, '点击闯关按钮，每过一关就说出一种本课方法。')],
++      actions: [
++        {
++          id: 'mira-formal-widget-highlight-02',
++          type: 'widget_highlight',
++          target: 'mastery-target',
++        },
++        speech(8, '点击闯关按钮，每过一关就说出一种本课方法。'),
++      ],
+     },
+     {
+       outline: outline(
+@@ -661,7 +991,14 @@ export function buildMiraFormalCompiledDraft(
+         'visualization3d',
+       ),
+       content: visualizationContent(spec),
+-      actions: [speech(9, `${spec.recap} 请旋转知识积木，再说出你已经学会的方法。`)],
++      actions: [
++        {
++          id: 'mira-formal-widget-highlight-03',
++          type: 'widget_highlight',
++          target: 'concept-canvas',
++        },
++        speech(9, `${spec.recap} 请旋转知识积木，再说出你已经学会的方法。`),
++      ],
+     },
+   ];
+ 
+diff --git a/lib/server/mira-professional-research-policy.ts b/lib/server/mira-professional-research-policy.ts
+new file mode 100644
+index 0000000..a588e48
+--- /dev/null
++++ b/lib/server/mira-professional-research-policy.ts
+@@ -0,0 +1,22 @@
++export const MIRA_PROFESSIONAL_RESEARCH_POLICY = {
++  schemaVersion: 'mira.openmaic.professional-research.v1',
++  professionalWorkbench: {
++    upstreamVersion: '1.0.0',
++    primarySkillId: 'mira-primary-courseware',
++    proModeAvailableToOperators: true,
++    availableToStudentRuntime: false,
++  },
++  webSearch: {
++    defaultEnabled: false,
++    operatorOnly: true,
++    formalGenerationEnabled: false,
++    studentRuntimeEnabled: false,
++    maxCallsPerCourse: 4,
++    citationsRequired: true,
++    primarySourcesPreferred: true,
++  },
++} as const;
++
++export function getMiraProfessionalResearchPolicy() {
++  return MIRA_PROFESSIONAL_RESEARCH_POLICY;
++}
+diff --git a/lib/server/mira-sample-deterministic-classroom.ts b/lib/server/mira-sample-deterministic-classroom.ts
+index c71e6fb..d6cefde 100644
+--- a/lib/server/mira-sample-deterministic-classroom.ts
++++ b/lib/server/mira-sample-deterministic-classroom.ts
+@@ -23,7 +23,7 @@ import {
+   getMiraTeacherVoiceConfig,
+   getMiraTtsPolicy,
+ } from '@/lib/server/mira-tts-policy';
+-import type { Action } from '@/lib/types/action';
++import type { Action, LegacySpeechAction } from '@/lib/types/action';
+ import type { Scene, Stage } from '@/lib/types/stage';
+ 
+ export const MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION =
+@@ -688,8 +688,10 @@ async function audioManifest(stageId: string, storageDirectory: string, scenes:
+   }> = [];
+   for (const scene of scenes) {
+     for (const action of scene.actions || []) {
+-      if (action.type !== 'speech' || !action.audioUrl) continue;
+-      const pathname = new URL(action.audioUrl, 'http://runtime.invalid').pathname;
++      if (action.type !== 'speech') continue;
++      const speech = action as LegacySpeechAction;
++      if (!speech.audioUrl) continue;
++      const pathname = new URL(speech.audioUrl, 'http://runtime.invalid').pathname;
+       const expectedPrefix = `/api/classroom-media/${stageId}/audio/`;
+       if (!pathname.startsWith(expectedPrefix)) {
+         throw new Error(`mira_sample_deterministic_audio_path:${action.id}`);
+diff --git a/next.config.ts b/next.config.ts
+index 40fd885..925c95a 100644
+--- a/next.config.ts
++++ b/next.config.ts
+@@ -3,9 +3,7 @@ import { resolve } from 'node:path';
+ 
+ const nextConfig: NextConfig = {
+   output:
+-    process.env.VERCEL || process.env.MIRA_OPENMAIC_NATIVE_BUILD === '1'
+-      ? undefined
+-      : 'standalone',
++    process.env.VERCEL || process.env.MIRA_OPENMAIC_NATIVE_BUILD === '1' ? undefined : 'standalone',
+   outputFileTracingIncludes: {
+     '/*': [
+       'lib/server/agent-runtime/import-pptx-worker.mjs',
+@@ -38,18 +36,22 @@ const nextConfig: NextConfig = {
+     '@openmaic/storage',
+     'pg',
+   ],
+-  webpack(config, { nextRuntime, dev }) {
++  webpack(config, { nextRuntime, dev, isServer }) {
+     if (dev && process.env.MIRA_OPENMAIC_LOW_DISK_DEV === '1') {
+       config.cache = false;
+     }
+ 
++    if (!isServer) {
++      config.resolve.alias = {
++        ...(config.resolve.alias ?? {}),
++        '@openmaic/storage$': resolve(process.cwd(), 'packages/@openmaic/storage/dist/browser.js'),
++      };
++    }
++
+     if (nextRuntime === 'edge') {
+       config.resolve.alias = {
+         ...(config.resolve.alias ?? {}),
+-        './instrumentation.node$': resolve(
+-          process.cwd(),
+-          'instrumentation.edge.ts',
+-        ),
++        './instrumentation.node$': resolve(process.cwd(), 'instrumentation.edge.ts'),
+       };
+     }
+     return config;
+diff --git a/packages/@openmaic/storage/package.json b/packages/@openmaic/storage/package.json
+index 3a3fabf..4e5e8af 100644
+--- a/packages/@openmaic/storage/package.json
++++ b/packages/@openmaic/storage/package.json
+@@ -11,6 +11,10 @@
+       "types": "./dist/index.d.ts",
+       "import": "./dist/index.js"
+     },
++    "./browser": {
++      "types": "./dist/browser.d.ts",
++      "import": "./dist/browser.js"
++    },
+     "./runtime/http": {
+       "types": "./dist/runtime/http.d.ts",
+       "import": "./dist/runtime/http.js"
+diff --git a/packages/@openmaic/storage/src/browser.ts b/packages/@openmaic/storage/src/browser.ts
+new file mode 100644
+index 0000000..5aaf868
+--- /dev/null
++++ b/packages/@openmaic/storage/src/browser.ts
+@@ -0,0 +1,90 @@
++/**
++ * Browser-safe entry point for client bundles.
++ *
++ * The package root also exports PostgreSQL and object-storage adapters. Those
++ * adapters correctly depend on Node built-ins, but webpack resolves every
++ * static re-export before tree-shaking and would otherwise pull `node:crypto`
++ * into a browser compilation. Keep the browser surface explicit and free of
++ * server adapters.
++ */
++export type { DeviceSafeKVStore, KVScope, KVStore, LocalKVStore } from './kv/types.js';
++export { assertKVScope, DEFAULT_KV_SCOPE, KVScopeViolationError } from './kv/types.js';
++export { BrowserKVStore, type BrowserKVStoreOptions } from './kv/browser.js';
++export {
++  HttpAccountKV,
++  HttpKVStore,
++  HttpKVStoreError,
++  type AccountScope,
++  type HttpAccountKVOptions,
++  type HttpKVHeadersContext,
++  type HttpKVHeadersHook,
++  type HttpKVStoreOptions,
++} from './kv/http.js';
++
++export { BrowserAssetStore, type BrowserAssetStoreOptions } from './asset/browser-store.js';
++export {
++  HttpAssetStore,
++  HttpAssetStoreError,
++  type HttpAssetHeadersContext,
++  type HttpAssetHeadersHook,
++  type HttpAssetStoreOptions,
++} from './asset/http.js';
++export { newAssetId, toAssetId, type AssetId } from './asset/id.js';
++export {
++  ASSET_DESCRIPTOR_MEDIA_TYPE,
++  AssetNotFoundError,
++  AssetQuotaExceededError,
++  DEFAULT_RENDERABLE_TYPES,
++  EXCLUDED_RENDERABLE_TYPES,
++  type AssetBytes,
++  type AssetIdentity,
++  type AssetIndirectRead,
++  type AssetIndirectReadRequest,
++  type AssetPrincipal,
++  type AssetStore,
++} from './asset/types.js';
++
++export {
++  kvPersistStorage,
++  type PersistedValue,
++  type PersistStorageLike,
++} from './zustand/persist.js';
++
++export type {
++  DocumentStore,
++  MaicDocument,
++  DocumentSummary,
++  DocumentFolder,
++  DocumentFolderStore,
++  SceneLike,
++  SceneValidator,
++  StageValidator,
++  StageSceneManifest,
++  StageFreshnessManifest,
++  StageFreshnessManifestStore,
++} from './document/types.js';
++export {
++  DocumentFolderLimitError,
++  DocumentNotFoundError,
++  DocumentVersionError,
++} from './document/types.js';
++export { BrowserDocumentStore, type BrowserDocumentStoreOptions } from './document/browser.js';
++export {
++  HttpDocumentStore,
++  HttpDocumentStoreError,
++  type HttpDocumentHeadersContext,
++  type HttpDocumentHeadersHook,
++  type HttpDocumentStoreOptions,
++} from './document/http.js';
++
++export type {
++  RuntimeStore,
++  RuntimeSessionInit,
++  RuntimePayloadValidator,
++  RuntimeAppendOptions,
++  RuntimeTailOptions,
++} from './runtime/types.js';
++export { RuntimeAppendConflictError } from './runtime/types.js';
++export { BrowserRuntimeStore, type BrowserRuntimeStoreOptions } from './runtime/browser.js';
++
++export type { AssetRef, AssetMeta, BinaryBlob, StorageProvider } from '@openmaic/dsl';
+diff --git a/skills/agent-runtime/mira-primary-courseware/SKILL.md b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+new file mode 100644
+index 0000000..164d448
+--- /dev/null
++++ b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+@@ -0,0 +1,78 @@
++---
++name: mira-primary-courseware
++title: "Mira 小学精品课"
++description: "Mira 小学一二年级精品课件设计。用于生成或重做低年级语文、数学、英语课堂，强调具体操作、单页单目标、逐步聚焦、可观察练习和短句旁白；联网只用于确有时效性的外部事实，不用于基础课本知识。"
++---
++
++# Mira primary courseware
++
++Build one calm, concrete and genuinely teachable early-primary classroom. Load
++stage-design first. Also load k12-core-literacy-planning when the request names
++curriculum standards, core literacy or a subject performance task. For an
++existing stage, follow pro-editing and repair only the weak pages.
++
++## Learning arc
++
++Set one bounded skill and one visible success condition. Prefer 6–8 pages:
++
++1. a familiar situation and one question;
++2. concrete objects, sound, movement or visual grouping;
++3. the rule or pattern discovered from that evidence;
++4. one worked example with the reason shown step by step;
++5. guided manipulation or choice with immediate explanatory feedback;
++6. one diagnostic check aimed at the most likely misconception;
++7. transfer to a small new situation;
++8. optional recap that names the method in the learner's own words.
++
++The learner must do something on at least every second page. Do not produce a
++sequence of static definition slides.
++
++## Page craft
++
++- One page, one teaching move. Use a short action title, not “知识讲解”,
++  “案例分析” or “课堂总结”.
++- Design for a six-to-eight-year-old viewing from a distance: large type, short
++  phrases, strong figure-ground contrast and no dense card grids.
++- Prefer concrete objects, number lines, sound blocks, letter tiles, position
++  maps and before/after states over decorative illustration.
++- Every visual must teach, scaffold or receive an action. Decoration never
++  substitutes for an explanation.
++- A worked example reveals one step at a time and explains why. A quiz uses
++  plausible misconceptions and feedback that teaches the correction.
++- Interactive pages must change a meaningful state and make the consequence
++  visible. Never label a static picture as a game, simulation or 3D.
++
++## Narration and focus
++
++Write short conversational narration with one instruction per sentence. On
++each explanatory slide, bind the relevant speech line to an existing element
++with set_spotlight; the spotlight target must be the exact object, word, step
++or answer being discussed. Do not dim a page without a valid target.
++
++Read every generated page back. If the layout is dense, the target is missing
++or narration talks about something not visible, repair it before moving on.
++Generate TTS after the final narration and spotlight sequence is settled.
++
++## Controlled research
++
++Foundational primary-school knowledge does not need web research. Use
++web_search only when the lesson depends on current, named or externally
++checkable facts. In that case:
++
++- make at most four precise searches for the whole course;
++- prefer primary and authoritative sources;
++- fetch and read the source before using a claim;
++- include source name and date in the page brief;
++- never invent a citation or turn an unverified result into learner-facing
++  fact.
++
++Student playback never receives search tools. Formal Mira catalog generation
++also keeps web search off; this research branch is for an operator deliberately
++building a sourced course in the professional workbench.
++
++## Completion gate
++
++Do not call the classroom complete until every approved page is persisted,
++every speech action has audio, each explanation page has a valid spotlight
++target, at least one misconception is diagnosed, and the final task checks the
++same skill in a new context.
+diff --git a/tests/agent-runtime/owner-events-route.test.ts b/tests/agent-runtime/owner-events-route.test.ts
+index 9f2d7c8..4bf3671 100644
+--- a/tests/agent-runtime/owner-events-route.test.ts
++++ b/tests/agent-runtime/owner-events-route.test.ts
+@@ -31,12 +31,12 @@ vi.mock('@/lib/server/agent-runtime/event-notify-bus', () => ({
+   }),
+ }));
+ 
++import { GET } from '@/app/api/agent/owner-events/route';
+ import {
+-  GET,
+   OWNER_EVENT_POLL_INTERVAL_MS,
+   OWNER_EVENT_REPLAY_LIMIT,
+   SSE_HEARTBEAT_INTERVAL_MS,
+-} from '@/app/api/agent/owner-events/route';
++} from '@/app/api/agent/owner-events/constants';
+ 
+ function call(lastEventId?: { header?: string; query?: string }) {
+   const query = lastEventId?.query ? `?lastEventId=${lastEventId.query}` : '';
+diff --git a/tests/agent-runtime/session-events-route.test.ts b/tests/agent-runtime/session-events-route.test.ts
+index 146e2fd..eedba7a 100644
+--- a/tests/agent-runtime/session-events-route.test.ts
++++ b/tests/agent-runtime/session-events-route.test.ts
+@@ -29,11 +29,11 @@ vi.mock('@/lib/server/agent-runtime/event-notify-bus', () => ({
+   }),
+ }));
+ 
++import { GET } from '@/app/api/agent/sessions/[id]/events/route';
+ import {
+-  GET,
+   POLL_INTERVAL_MS,
+   TERMINAL_POLL_INTERVAL_MS,
+-} from '@/app/api/agent/sessions/[id]/events/route';
++} from '@/app/api/agent/sessions/[id]/events/constants';
+ 
+ const terminalEvent = {
+   id: 4,
+diff --git a/tests/agent-runtime/stage-freshness-route.test.ts b/tests/agent-runtime/stage-freshness-route.test.ts
+index 6226b97..52e4459 100644
+--- a/tests/agent-runtime/stage-freshness-route.test.ts
++++ b/tests/agent-runtime/stage-freshness-route.test.ts
+@@ -20,7 +20,8 @@ vi.mock('@/lib/server/agent-runtime/owner-scoped-documents', () => ({
+   getOwnerScopedDocumentStore: async () => mocks.fakeStore!.store,
+ }));
+ 
+-import { GET, STAGE_FRESHNESS_POLL_INTERVAL_MS } from '@/app/api/stages/[id]/freshness/route';
++import { STAGE_FRESHNESS_POLL_INTERVAL_MS } from '@/app/api/stages/[id]/freshness/constants';
++import { GET } from '@/app/api/stages/[id]/freshness/route';
+ 
+ const STAGE_ID = 'stage-1';
+ 
+diff --git a/tests/agent-runtime/stage-scenes-route.test.ts b/tests/agent-runtime/stage-scenes-route.test.ts
+index a29bd67..97e7ef0 100644
+--- a/tests/agent-runtime/stage-scenes-route.test.ts
++++ b/tests/agent-runtime/stage-scenes-route.test.ts
+@@ -20,7 +20,8 @@ vi.mock('@/lib/server/agent-runtime/owner-scoped-documents', () => ({
+   getOwnerScopedDocumentStore: async () => mocks.fakeStore!.store,
+ }));
+ 
+-import { GET, MAX_BATCH_SCENE_IDS } from '@/app/api/stages/[id]/scenes/route';
++import { MAX_BATCH_SCENE_IDS } from '@/app/api/stages/[id]/scenes/constants';
++import { GET } from '@/app/api/stages/[id]/scenes/route';
+ 
+ const STAGE_ID = 'stage-1';
+ 
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+index 8691294..6be65e6 100644
+--- a/tests/runtime/mira-student-runtime.test.ts
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -9,6 +9,7 @@ import {
+   MIRA_STUDENT_CLASSROOM_METADATA,
+   readMiraStudentAudioStartAccepted,
+   rememberMiraStudentAudioStartAccepted,
++  shouldAutoStartMiraStudentSelectedScene,
+   shouldShowMiraStudentStartGate,
+ } from '@/lib/mira/student-runtime';
+ 
+@@ -99,6 +100,34 @@ describe('Mira student runtime marker', () => {
+     ).toBe(false);
+   });
+ 
++  it('auto-starts a manually selected lesson scene only after the student audio gate', () => {
++    expect(
++      shouldAutoStartMiraStudentSelectedScene({
++        studentMode: true,
++        autoPlayLecture: true,
++        audioStartAccepted: true,
++        targetIsPlayableScene: true,
++      }),
++    ).toBe(true);
++
++    for (const disabled of [
++      { studentMode: false },
++      { autoPlayLecture: false },
++      { audioStartAccepted: false },
++      { targetIsPlayableScene: false },
++    ]) {
++      expect(
++        shouldAutoStartMiraStudentSelectedScene({
++          studentMode: true,
++          autoPlayLecture: true,
++          audioStartAccepted: true,
++          targetIsPlayableScene: true,
++          ...disabled,
++        }),
++      ).toBe(false);
++    }
++  });
++
+   it('requires one explicit audio-start gesture only for an unstarted student classroom', () => {
+     expect(
+       shouldShowMiraStudentStartGate({
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index e619256..75d446c 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -193,6 +193,24 @@ describe('GET /api/health structured scene runtime policy', () => {
+       collector: 'asset-collector-schedule',
+       serverExternalPackages: ['@openmaic/storage', 'pg'],
+     });
++    expect(body.runtimePolicy.professionalResearch).toEqual({
++      schemaVersion: 'mira.openmaic.professional-research.v1',
++      professionalWorkbench: {
++        upstreamVersion: '1.0.0',
++        primarySkillId: 'mira-primary-courseware',
++        proModeAvailableToOperators: true,
++        availableToStudentRuntime: false,
++      },
++      webSearch: {
++        defaultEnabled: false,
++        operatorOnly: true,
++        formalGenerationEnabled: false,
++        studentRuntimeEnabled: false,
++        maxCallsPerCourse: 4,
++        citationsRequired: true,
++        primarySourcesPreferred: true,
++      },
++    });
+     const serialized = JSON.stringify(body);
+     expect(serialized).not.toContain('fake-secret-must-not-leak');
+     expect(serialized).not.toContain('fake-base-url-must-not-leak');
+@@ -216,7 +234,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+     const body = await response.json();
+ 
+     expect(response.status).toBe(200);
+-    expect(body.version).toBe('0.3.2');
++    expect(body.version).toBe('1.0.0');
+     expect(body.capabilities).toEqual({
+       formalGeneration: true,
+       speechAudioGeneration: true,
+diff --git a/tests/server/mira-asr-policy.test.ts b/tests/server/mira-asr-policy.test.ts
+index eea68b3..04cb485 100644
+--- a/tests/server/mira-asr-policy.test.ts
++++ b/tests/server/mira-asr-policy.test.ts
+@@ -36,6 +36,11 @@ describe('Mira deterministic Qwen ASR policy', () => {
+     expect(() =>
+       assertMiraAsrProviderReady(getMiraAsrPolicy({ MIRA_OPENMAIC_REQUIRE_QWEN_ASR: '1' }), {}),
+     ).toThrow('qwen-asr is not server-configured');
++    expect(() =>
++      assertMiraAsrProviderReady(getMiraAsrPolicy({ MIRA_OPENMAIC_REQUIRE_QWEN_ASR: '1' }), {
++        'qwen-asr': { disabled: true },
++      }),
++    ).toThrow('qwen-asr is not server-configured');
+   });
+ 
+   it('recognizes only gateway-attested runtime requests', () => {
+-- 
+2.50.1 (Apple Git-155)
+

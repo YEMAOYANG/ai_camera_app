@@ -1,0 +1,301 @@
+From 2f3e19b4910a0277a5d019dc099fecbf0eb8eeb8 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 18/37] 0018-mira-student-runtime-hardening
+
+---
+ app/layout.tsx                                |  11 +-
+ lib/mira/student-runtime-events.ts            |  12 +-
+ .../mira-student-runtime-events.test.ts       | 202 +++++++++++++++++-
+ 3 files changed, 213 insertions(+), 12 deletions(-)
+
+diff --git a/app/layout.tsx b/app/layout.tsx
+index e77a1b5..4aa25c2 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -29,13 +29,12 @@ import { ProSwapWatcher } from '@/components/workbench/ProSwapWatcher';
+ import '@fontsource-variable/inter';
+ 
+ export const metadata: Metadata = {
+-  title: 'OpenMAIC',
+-  description:
+-    'The open-source AI interactive classroom. Upload a PDF to instantly generate an immersive, multi-agent learning experience.',
++  title: 'Mira 互动课堂',
++  description: '面向学生的 Mira 完整互动课堂。',
+   icons: {
+-    icon: '/openmaic-favicon.ico',
+-    shortcut: '/openmaic-favicon.ico',
+-    apple: '/openmaic-apple-icon.png',
++    icon: '/mira-classroom-icon.svg',
++    shortcut: '/mira-classroom-icon.svg',
++    apple: '/mira-classroom-icon.svg',
+   },
+ };
+ 
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+index c19765c..0a7c8e9 100644
+--- a/lib/mira/student-runtime-events.ts
++++ b/lib/mira/student-runtime-events.ts
+@@ -140,10 +140,10 @@ export function createMiraStudentRuntimeEventClient(
+       state = freshState(status.runtimeSessionId, status.nextSequence, status.completed);
+     } else {
+       if (state.pending) {
+-        if (status.lastSequence >= state.pending.event.sequence) {
+-          rememberEmitted(state, state.pending.eventKey);
+-          state.pending = null;
+-        } else if (status.nextSequence !== state.pending.event.sequence) {
++        if (
++          status.lastSequence < state.pending.event.sequence &&
++          status.nextSequence !== state.pending.event.sequence
++        ) {
+           throw new Error('Mira Runtime event sequence cannot be reconciled safely');
+         }
+       }
+@@ -222,7 +222,9 @@ export function createMiraStudentRuntimeEventClient(
+       const operation = tail
+         .catch(() => undefined)
+         .then(async () => {
+-          await synchronize();
++          await synchronize(true);
++          await flushPending();
++          await synchronize(true);
+         });
+       tail = operation;
+       return operation;
+diff --git a/tests/runtime/mira-student-runtime-events.test.ts b/tests/runtime/mira-student-runtime-events.test.ts
+index 6cb1996..5629ab3 100644
+--- a/tests/runtime/mira-student-runtime-events.test.ts
++++ b/tests/runtime/mira-student-runtime-events.test.ts
+@@ -22,6 +22,16 @@ function response(body: object, status = 200): Response {
+   });
+ }
+ 
++function deferred<T>() {
++  let resolve!: (value: T) => void;
++  let reject!: (reason?: unknown) => void;
++  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
++    resolve = resolvePromise;
++    reject = rejectPromise;
++  });
++  return { promise, resolve, reject };
++}
++
+ const status = (
+   lastSequence: number,
+   runtimeSessionId = 'runtime-session-a',
+@@ -199,7 +209,7 @@ describe('Mira authoritative student Runtime events', () => {
+     expect(posted[2]).toMatchObject({ sequence: 2, type: 'action_completed' });
+   });
+ 
+-  it('recovers an accepted lost-response event from authoritative status after reload', async () => {
++  it('replays a pending event idempotently before sending later evidence after reload', async () => {
+     const storage = memoryStorage();
+     const first = createMiraStudentRuntimeEventClient({
+       classroomId: 'classroom-a',
+@@ -226,6 +236,12 @@ describe('Mira authoritative student Runtime events', () => {
+     await resumed.actionCompleted({ sceneIndex: 0, sceneId: 'scene-0', actionId: 'speech-0' });
+ 
+     expect(posted).toEqual([
++      {
++        schemaVersion: 'mira.openmaic.student-runtime-event.v1',
++        sequence: 1,
++        type: 'scene_entered',
++        payload: { sceneIndex: 0, sceneId: 'scene-0' },
++      },
+       {
+         schemaVersion: 'mira.openmaic.student-runtime-event.v1',
+         sequence: 2,
+@@ -235,6 +251,190 @@ describe('Mira authoritative student Runtime events', () => {
+     ]);
+   });
+ 
++  it('flushes a local pending event during resume and resynchronizes authoritative state', async () => {
++    const storage = memoryStorage();
++    let lastSequence = 0;
++    let loseFirstResponse = true;
++    const requests: string[] = [];
++    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
++      const method = init?.method ?? 'GET';
++      requests.push(method);
++      if (method === 'GET') return response(status(lastSequence));
++      const event = JSON.parse(String(init?.body));
++      if (loseFirstResponse) {
++        loseFirstResponse = false;
++        throw new TypeError('response connection lost');
++      }
++      lastSequence = event.sequence;
++      return response({ ok: true, sequence: event.sequence, receiptSha256: '7'.repeat(64) });
++    });
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage,
++      fetcher,
++    });
++
++    await expect(client.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' })).rejects.toThrow(
++      'response connection lost',
++    );
++    await client.resume();
++
++    expect(requests).toEqual(['GET', 'POST', 'GET', 'POST', 'GET']);
++  });
++
++  it('keeps a pending event after a resume POST failure and retries the exact event', async () => {
++    const storage = memoryStorage();
++    let lastSequence = 0;
++    let postCount = 0;
++    const posted: unknown[] = [];
++    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
++      if ((init?.method ?? 'GET') === 'GET') return response(status(lastSequence));
++      const event = JSON.parse(String(init?.body));
++      posted.push(event);
++      postCount += 1;
++      if (postCount <= 2) throw new TypeError('resume POST connection lost');
++      lastSequence = event.sequence;
++      return response({ ok: true, sequence: event.sequence, receiptSha256: '8'.repeat(64) });
++    });
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage,
++      fetcher,
++    });
++
++    await expect(client.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' })).rejects.toThrow(
++      'resume POST connection lost',
++    );
++    await expect(client.resume()).rejects.toThrow('resume POST connection lost');
++    await client.resume();
++
++    expect(posted).toHaveLength(3);
++    expect(posted[1]).toEqual(posted[0]);
++    expect(posted[2]).toEqual(posted[0]);
++  });
++
++  it('does not repeat a confirmed receipt when the final resume sync fails', async () => {
++    const storage = memoryStorage();
++    let lastSequence = 0;
++    let initialResponseLost = true;
++    let retryReceiptConfirmed = false;
++    let finalSyncFailed = false;
++    const posted: unknown[] = [];
++    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
++      if ((init?.method ?? 'GET') === 'GET') {
++        if (retryReceiptConfirmed && !finalSyncFailed) {
++          finalSyncFailed = true;
++          throw new TypeError('final resume sync connection lost');
++        }
++        return response(status(lastSequence));
++      }
++      const event = JSON.parse(String(init?.body));
++      posted.push(event);
++      if (initialResponseLost) {
++        initialResponseLost = false;
++        lastSequence = event.sequence;
++        throw new TypeError('accepted response connection lost');
++      }
++      retryReceiptConfirmed = true;
++      return response({ ok: true, sequence: event.sequence, receiptSha256: '9'.repeat(64) });
++    });
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage,
++      fetcher,
++    });
++
++    await expect(client.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' })).rejects.toThrow(
++      'accepted response connection lost',
++    );
++    await expect(client.resume()).rejects.toThrow('final resume sync connection lost');
++    await client.resume();
++
++    expect(posted).toHaveLength(2);
++    expect(posted[1]).toEqual(posted[0]);
++  });
++
++  it('keeps a pending event and surfaces a same-sequence conflict during resume', async () => {
++    const storage = memoryStorage();
++    let lastSequence = 0;
++    let initialResponseLost = true;
++    let conflictResolved = false;
++    const posted: unknown[] = [];
++    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
++      if ((init?.method ?? 'GET') === 'GET') return response(status(lastSequence));
++      const event = JSON.parse(String(init?.body));
++      posted.push(event);
++      if (initialResponseLost) {
++        initialResponseLost = false;
++        lastSequence = event.sequence;
++        throw new TypeError('accepted conflicting response lost');
++      }
++      if (!conflictResolved) {
++        return response(
++          {
++            ok: false,
++            error: 'runtime_event_sequence_conflict',
++            message: '课堂事件序号已用于另一条事件',
++          },
++          409,
++        );
++      }
++      return response({ ok: true, sequence: event.sequence, receiptSha256: 'a'.repeat(64) });
++    });
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage,
++      fetcher,
++    });
++
++    await expect(client.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' })).rejects.toThrow(
++      'accepted conflicting response lost',
++    );
++    await expect(client.resume()).rejects.toThrow('课堂事件序号已用于另一条事件');
++    conflictResolved = true;
++    await client.resume();
++
++    expect(posted).toHaveLength(3);
++    expect(posted[1]).toEqual(posted[0]);
++    expect(posted[2]).toEqual(posted[0]);
++  });
++
++  it('serializes an append behind an in-flight resume recovery', async () => {
++    const firstStatus = deferred<Response>();
++    const finalStatus = deferred<Response>();
++    const requests: string[] = [];
++    let getCount = 0;
++    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
++      const method = init?.method ?? 'GET';
++      requests.push(method);
++      if (method === 'GET') {
++        getCount += 1;
++        return getCount === 1 ? firstStatus.promise : finalStatus.promise;
++      }
++      const event = JSON.parse(String(init?.body));
++      return response({ ok: true, sequence: event.sequence, receiptSha256: 'b'.repeat(64) });
++    });
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage: memoryStorage(),
++      fetcher,
++    });
++
++    const resume = client.resume();
++    const append = client.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' });
++    await vi.waitFor(() => expect(requests).toEqual(['GET']));
++
++    firstStatus.resolve(response(status(0)));
++    await vi.waitFor(() => expect(requests).toEqual(['GET', 'GET']));
++    expect(requests).not.toContain('POST');
++
++    finalStatus.resolve(response(status(0)));
++    await resume;
++    await append;
++
++    expect(requests).toEqual(['GET', 'GET', 'POST']);
++  });
++
+   it('uses server answered question identity after storage loss without consuming a sequence', async () => {
+     let lastSequence = 0;
+     const answeredQuestionIds: string[] = [];
+-- 
+2.50.1 (Apple Git-155)
+

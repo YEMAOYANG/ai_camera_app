@@ -1,0 +1,1475 @@
+From ee8c5989f6a677cf858033681b55f835a0e4aec6 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 22/37] 0022-mira-openmaic-single-courseware-authority
+
+---
+ app/api/generate-classroom/route.ts           |   4 +
+ app/api/health/route.ts                       |  11 -
+ .../mira/courseware-provider-call/route.ts    |  34 +
+ lib/server/classroom-generation.ts            |  10 +
+ lib/server/mira-courseware-provider.ts        | 244 +++++++
+ lib/server/mira-formal-compiled-classroom.ts  | 623 ++++++++++++++++++
+ lib/server/mira-formal-generation-policy.ts   |  23 +
+ .../server/classroom-generation-retry.test.ts | 142 +++-
+ tests/server/mira-courseware-provider.test.ts | 169 +++++
+ ...mira-formal-generation-idempotency.test.ts |   4 +
+ 10 files changed, 1223 insertions(+), 41 deletions(-)
+ create mode 100644 app/api/mira/courseware-provider-call/route.ts
+ create mode 100644 lib/server/mira-courseware-provider.ts
+ create mode 100644 lib/server/mira-formal-compiled-classroom.ts
+ create mode 100644 tests/server/mira-courseware-provider.test.ts
+
+diff --git a/app/api/generate-classroom/route.ts b/app/api/generate-classroom/route.ts
+index 264b3ed..0259a31 100644
+--- a/app/api/generate-classroom/route.ts
++++ b/app/api/generate-classroom/route.ts
+@@ -104,6 +104,9 @@ export async function POST(req: NextRequest) {
+       ...(rawBody.formalRuntimeContract
+         ? { formalRuntimeContract: rawBody.formalRuntimeContract }
+         : {}),
++      ...(rawBody.coursewareAuthority
++        ? { coursewareAuthority: rawBody.coursewareAuthority }
++        : {}),
+     };
+     const { requirement } = body;
+ 
+@@ -126,6 +129,7 @@ export async function POST(req: NextRequest) {
+         if (
+           code === 'FORMAL_RUNTIME_REQUEST_ID_INVALID' ||
+           code === 'FORMAL_RUNTIME_CONTRACT_INVALID' ||
++          code === 'FORMAL_COURSEWARE_AUTHORITY_INVALID' ||
+           code === 'FORMAL_RUNTIME_INPUT_POLICY_INVALID'
+         ) {
+           return apiError('INVALID_REQUEST', 400, 'Invalid formal Runtime request');
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index 5ef4d9b..a9b3042 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -73,23 +73,12 @@ export async function GET(req: NextRequest) {
+   }
+   if (req.nextUrl.searchParams.get('scope') === 'formal-generation') {
+     try {
+-      const structuredScenePolicy = getMiraStructuredSceneRuntimePolicy();
+       const formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
+-      const providers = getServerProviders();
+-      const formalProvider = providers[structuredScenePolicy.providerId];
+-      if (
+-        !formalProvider ||
+-        (formalProvider.models !== undefined &&
+-          !formalProvider.models.includes(structuredScenePolicy.modelId))
+-      ) {
+-        throw new Error('Formal generation Kimi provider is not ready.');
+-      }
+       return apiSuccess({
+         status: 'ok',
+         version,
+         capabilities: { formalGeneration: true, speechAudioGeneration: false },
+         runtimePolicy: {
+-          structuredScene: structuredScenePolicy,
+           formalGeneration: formalGenerationPolicy,
+         },
+       });
+diff --git a/app/api/mira/courseware-provider-call/route.ts b/app/api/mira/courseware-provider-call/route.ts
+new file mode 100644
+index 0000000..3bdb6bc
+--- /dev/null
++++ b/app/api/mira/courseware-provider-call/route.ts
+@@ -0,0 +1,34 @@
++import type { NextRequest } from 'next/server';
++import { apiError, apiSuccess } from '@/lib/server/api-response';
++import {
++  authorizeMiraCoursewareProviderRequest,
++  executeMiraCoursewareProvider,
++  MiraCoursewareProviderError,
++} from '@/lib/server/mira-courseware-provider';
++
++export const dynamic = 'force-dynamic';
++export const maxDuration = 360;
++
++export async function POST(req: NextRequest) {
++  try {
++    authorizeMiraCoursewareProviderRequest(req);
++    return apiSuccess({ ...(await executeMiraCoursewareProvider(await req.json())) });
++  } catch (error) {
++    if (error instanceof MiraCoursewareProviderError) {
++      if (error.code === 'unauthorized') {
++        return apiError('INVALID_CREDENTIALS', 403, 'Invalid courseware credentials');
++      }
++      if (error.code === 'provider_unavailable') {
++        return apiError('PROVIDER_DISABLED', 424, 'Courseware Provider is unavailable');
++      }
++      if (error.code === 'provider_rejected') {
++        return apiError('UPSTREAM_ERROR', 422, 'Courseware Provider rejected the request');
++      }
++      if (error.code === 'provider_failed') {
++        return apiError('GENERATION_FAILED', 502, 'Courseware Provider call failed');
++      }
++      return apiError('INVALID_REQUEST', 400, 'Invalid courseware request');
++    }
++    return apiError('INTERNAL_ERROR', 500, 'Courseware Provider call failed');
++  }
++}
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index f46f992..60df52c 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -55,9 +55,11 @@ import {
+   resolveMiraSampleStructuralPlan,
+ } from '@/lib/server/mira-sample-structural-policy';
+ import {
++  isExactMiraCoursewareAuthority,
+   isExactMiraFormalRuntimeContract,
+   MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+ } from '@/lib/server/mira-formal-generation-policy';
++import { generateMiraFormalCompiledClassroom } from '@/lib/server/mira-formal-compiled-classroom';
+ 
+ const log = createLogger('Classroom');
+ const MIRA_FORMAL_LLM_TIMEOUT_MS = 5 * 60 * 1000;
+@@ -99,6 +101,7 @@ export interface GenerateClassroomInput {
+   requirement: string;
+   runtimeRequestId?: string;
+   formalRuntimeContract?: unknown;
++  coursewareAuthority?: unknown;
+   pdfContent?: { text: string; images: string[] };
+   enableWebSearch?: boolean;
+   webSearchProviderId?: WebSearchProviderId;
+@@ -242,6 +245,13 @@ export async function generateClassroom(
+     scenesGenerated: 0,
+   });
+ 
++  if (miraFormalRuntime) {
++    if (!isExactMiraCoursewareAuthority(input.coursewareAuthority)) {
++      throw new Error('FORMAL_COURSEWARE_AUTHORITY_INVALID');
++    }
++    return generateMiraFormalCompiledClassroom(input, options);
++  }
++
+   const {
+     model: languageModel,
+     modelInfo,
+diff --git a/lib/server/mira-courseware-provider.ts b/lib/server/mira-courseware-provider.ts
+new file mode 100644
+index 0000000..caf7599
+--- /dev/null
++++ b/lib/server/mira-courseware-provider.ts
+@@ -0,0 +1,244 @@
++import { createHash, timingSafeEqual } from 'node:crypto';
++import type { NextRequest } from 'next/server';
++import { defaultSettingsMiddleware, wrapLanguageModel } from 'ai';
++import { callLLM } from '@/lib/ai/llm';
++import { isProviderKeyRequired } from '@/lib/ai/providers';
++import { resolveModel } from '@/lib/server/resolve-model';
++
++export const MIRA_COURSEWARE_PROVIDER_SCHEMA =
++  'mira.openmaic.courseware-provider-call.v1' as const;
++
++const REQUEST_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$/;
++const PHASES = new Set([
++  'outline',
++  'raw_candidate',
++  'candidate_repair',
++  'candidate_repair_retry',
++  'lesson_text',
++  'reconciliation',
++  'reconciliation_retry',
++  'practice_leak_repair_1',
++  'practice_leak_repair_2',
++  'choice_prompt_repair',
++  'independent_verification',
++  'consistency_repair',
++  'consistency_repair_retry',
++  'verification_after_repair',
++]);
++
++const MAX_PROMPT_CHARS = 200_000;
++const MAX_SCHEMA_BYTES = 128_000;
++const COURSEWARE_THINKING_DISABLED = { mode: 'disabled', enabled: false } as const;
++
++export class MiraCoursewareProviderError extends Error {
++  constructor(
++    public readonly code:
++      | 'unauthorized'
++      | 'invalid_request'
++      | 'provider_unavailable'
++      | 'provider_rejected'
++      | 'provider_failed',
++    message: string,
++  ) {
++    super(message);
++    this.name = 'MiraCoursewareProviderError';
++  }
++}
++
++function providerStatus(error: unknown, seen = new Set<unknown>()): number | null {
++  if (!error || seen.has(error)) return null;
++  seen.add(error);
++  if (typeof error !== 'object') return null;
++  const record = error as Record<string, unknown>;
++  const raw = record.statusCode ?? record.status ?? record.status_code;
++  const parsed = typeof raw === 'number' ? raw : Number.parseInt(String(raw ?? ''), 10);
++  if (Number.isInteger(parsed) && parsed >= 400 && parsed <= 599) return parsed;
++  const nested = [record.cause, record.lastError];
++  if (Array.isArray(record.errors)) nested.push(...record.errors);
++  for (const candidate of nested) {
++    const status = providerStatus(candidate, seen);
++    if (status !== null) return status;
++  }
++  return null;
++}
++
++function isDefinitiveProviderRejection(error: unknown): boolean {
++  const status = providerStatus(error);
++  if (status === null) return false;
++  // A provider 4xx means it rejected the request before producing courseware.
++  // Request/connection timeouts remain ambiguous because work may continue
++  // upstream after the local process stops waiting.
++  return status >= 400 && status < 500 && status !== 408;
++}
++
++export interface MiraCoursewareProviderResult {
++  schemaVersion: typeof MIRA_COURSEWARE_PROVIDER_SCHEMA;
++  requestId: string;
++  phase: string;
++  content: string;
++  providerRequestIdHash: string;
++  inputTokens: number | null;
++  outputTokens: number | null;
++  billingEvidence: 'reported' | 'unknown';
++}
++
++function secureEqual(left: string, right: string): boolean {
++  const leftBytes = Buffer.from(left);
++  const rightBytes = Buffer.from(right);
++  return leftBytes.length === rightBytes.length && timingSafeEqual(leftBytes, rightBytes);
++}
++
++/**
++ * This endpoint is the only learning-courseware boundary allowed to invoke the
++ * configured model.  It is private and token-authenticated; students and the
++ * parent app never reach it directly.
++ */
++export function authorizeMiraCoursewareProviderRequest(req: NextRequest): void {
++  const expected = process.env.MIRA_INTERNAL_API_TOKEN || '';
++  const supplied = req.headers.get('x-mira-internal-token') || '';
++  if (
++    !expected ||
++    !supplied ||
++    !secureEqual(expected, supplied) ||
++    req.headers.has('forwarded') ||
++    req.headers.has('via')
++  ) {
++    throw new MiraCoursewareProviderError(
++      'unauthorized',
++      'Courseware Provider access is private',
++    );
++  }
++}
++
++function plainObject(value: unknown): Record<string, unknown> {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) {
++    throw new MiraCoursewareProviderError('invalid_request', 'Request must be an object');
++  }
++  return value as Record<string, unknown>;
++}
++
++function boundedPrompt(value: unknown, field: string): string {
++  if (typeof value !== 'string') {
++    throw new MiraCoursewareProviderError('invalid_request', `${field} must be text`);
++  }
++  const text = value.trim();
++  if (!text || text.length > MAX_PROMPT_CHARS) {
++    throw new MiraCoursewareProviderError('invalid_request', `${field} is invalid`);
++  }
++  return text;
++}
++
++function tokenCount(value: unknown): number | null {
++  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
++    ? value
++    : null;
++}
++
++export async function executeMiraCoursewareProvider(
++  raw: unknown,
++): Promise<MiraCoursewareProviderResult> {
++  const body = plainObject(raw);
++  const expectedKeys = [
++    'phase',
++    'requestId',
++    'responseJsonSchema',
++    'schemaVersion',
++    'systemPrompt',
++    'userPrompt',
++  ];
++  if (Object.keys(body).sort().join(',') !== expectedKeys.sort().join(',')) {
++    throw new MiraCoursewareProviderError('invalid_request', 'Request fields are invalid');
++  }
++  if (body.schemaVersion !== MIRA_COURSEWARE_PROVIDER_SCHEMA) {
++    throw new MiraCoursewareProviderError('invalid_request', 'Schema version is invalid');
++  }
++  const requestId = typeof body.requestId === 'string' ? body.requestId : '';
++  const phase = typeof body.phase === 'string' ? body.phase : '';
++  if (!REQUEST_ID.test(requestId) || !PHASES.has(phase)) {
++    throw new MiraCoursewareProviderError('invalid_request', 'Courseware identity is invalid');
++  }
++  const responseJsonSchema = body.responseJsonSchema;
++  if (
++    responseJsonSchema !== null &&
++    (!responseJsonSchema ||
++      typeof responseJsonSchema !== 'object' ||
++      Array.isArray(responseJsonSchema) ||
++      Buffer.byteLength(JSON.stringify(responseJsonSchema), 'utf8') > MAX_SCHEMA_BYTES)
++  ) {
++    throw new MiraCoursewareProviderError('invalid_request', 'Response schema is invalid');
++  }
++
++  const systemPrompt = boundedPrompt(body.systemPrompt, 'systemPrompt');
++  const userPrompt = boundedPrompt(body.userPrompt, 'userPrompt');
++  const resolved = await resolveModel({ stage: 'generate-classroom' });
++  if (
++    resolved.providerId !== 'kimi' ||
++    resolved.modelId !== 'kimi-k2.6' ||
++    (isProviderKeyRequired(resolved.providerId) && !resolved.apiKey)
++  ) {
++    throw new MiraCoursewareProviderError(
++      'provider_unavailable',
++      'OpenMAIC courseware model is not configured',
++    );
++  }
++
++  try {
++    const responseFormat = responseJsonSchema
++      ? {
++          type: 'json' as const,
++          schema: responseJsonSchema as never,
++          name: `mira_courseware_${phase}`,
++        }
++      : { type: 'json' as const };
++    const coursewareModel = wrapLanguageModel({
++      model: resolved.model as Parameters<typeof wrapLanguageModel>[0]['model'],
++      middleware: defaultSettingsMiddleware({ settings: { responseFormat } }),
++    });
++    const result = await callLLM(
++      {
++        model: coursewareModel,
++        messages: [
++          { role: 'system', content: systemPrompt },
++          { role: 'user', content: userPrompt },
++        ],
++        temperature: 0.6,
++        maxOutputTokens: Math.min(resolved.modelInfo?.outputWindow || 8_000, 8_000),
++        maxRetries: 0,
++        abortSignal: AbortSignal.timeout(300_000),
++      },
++      'mira-courseware-provider',
++      undefined,
++      COURSEWARE_THINKING_DISABLED,
++    );
++    const content = result.text.trim();
++    if (!content) {
++      throw new MiraCoursewareProviderError('provider_failed', 'Provider returned no content');
++    }
++    const usage = result.totalUsage ?? result.usage;
++    const inputTokens = tokenCount(usage?.inputTokens);
++    const outputTokens = tokenCount(usage?.outputTokens);
++    const responseId = String(result.response?.id || '');
++    const providerRequestIdHash = createHash('sha256')
++      .update(`${requestId}:${phase}:${responseId || content.length}`)
++      .digest('hex');
++    return {
++      schemaVersion: MIRA_COURSEWARE_PROVIDER_SCHEMA,
++      requestId,
++      phase,
++      content,
++      providerRequestIdHash,
++      inputTokens,
++      outputTokens,
++      billingEvidence: inputTokens !== null || outputTokens !== null ? 'reported' : 'unknown',
++    };
++  } catch (error) {
++    if (error instanceof MiraCoursewareProviderError) throw error;
++    if (isDefinitiveProviderRejection(error)) {
++      throw new MiraCoursewareProviderError(
++        'provider_rejected',
++        'Courseware Provider rejected the request',
++      );
++    }
++    throw new MiraCoursewareProviderError('provider_failed', 'Courseware Provider call failed');
++  }
++}
+diff --git a/lib/server/mira-formal-compiled-classroom.ts b/lib/server/mira-formal-compiled-classroom.ts
+new file mode 100644
+index 0000000..8a0f34f
+--- /dev/null
++++ b/lib/server/mira-formal-compiled-classroom.ts
+@@ -0,0 +1,623 @@
++import { nanoid } from 'nanoid';
++import { buildCompleteScene, type GeneratedSceneContent, type SceneOutline } from '@openmaic/generation';
++import type { PPTElement, QuizQuestion, WidgetConfigBase } from '@openmaic/dsl';
++import type {
++  ClassroomGenerationProgress,
++  GenerateClassroomInput,
++  GenerateClassroomResult,
++} from '@/lib/server/classroom-generation';
++import { AGENT_COLOR_PALETTE, AGENT_DEFAULT_AVATARS } from '@/lib/constants/agent-defaults';
++import { persistClassroom } from '@/lib/server/classroom-storage';
++import {
++  isExactMiraCoursewareAuthority,
++  isExactMiraFormalRuntimeContract,
++} from '@/lib/server/mira-formal-generation-policy';
++import type { Action } from '@/lib/types/action';
++import type { Scene, Stage } from '@/lib/types/stage';
++
++type JsonObject = Record<string, unknown>;
++
++interface FormalQuestion {
++  id: string;
++  type: 'numeric' | 'single_choice' | 'exact_text' | 'accepted_text' | 'sequence';
++  prompt: string;
++  skill: string;
++  hint: string;
++  explanation: string;
++  choices?: Array<{ id: string; label: string }>;
++}
++
++interface FormalCoursewareSpec {
++  course: {
++    id: string;
++    version: string;
++    gradeCode: string;
++    subject: string;
++    skillId: string;
++    title: string;
++    objective: string;
++  };
++  intro: string;
++  estimatedMinutes: number;
++  teach: { title: string; sayText: string; keyPoints: string[] };
++  recap: string;
++  demo: FormalQuestion;
++  guided: [FormalQuestion, FormalQuestion];
++  independent: [FormalQuestion, FormalQuestion];
++  teacher: {
++    name: string;
++    avatar: string;
++    voiceConfig: { providerId: string; modelId: string; voiceId: string };
++  };
++}
++
++function record(value: unknown, label: string): JsonObject {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) {
++    throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}`);
++  }
++  return value as JsonObject;
++}
++
++function textValue(value: unknown, label: string, maximum = 2_400): string {
++  if (typeof value !== 'string') throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}`);
++  const valueText = value.trim();
++  if (!valueText || valueText.length > maximum) {
++    throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}`);
++  }
++  return valueText;
++}
++
++function stringList(value: unknown, label: string, expected?: number): string[] {
++  if (!Array.isArray(value) || (expected !== undefined && value.length !== expected)) {
++    throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}`);
++  }
++  const items = value.map((item, index) => textValue(item, `${label}.${index}`, 400));
++  if (new Set(items).size !== items.length) {
++    throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}`);
++  }
++  return items;
++}
++
++function exactObject(value: unknown, expected: JsonObject): boolean {
++  const canonical = (item: unknown): unknown => {
++    if (Array.isArray(item)) return item.map(canonical);
++    if (item && typeof item === 'object') {
++      return Object.fromEntries(
++        Object.entries(item as JsonObject)
++          .sort(([left], [right]) => left.localeCompare(right))
++          .map(([key, nested]) => [key, canonical(nested)]),
++      );
++    }
++    return item;
++  };
++  return JSON.stringify(canonical(value)) === JSON.stringify(canonical(expected));
++}
++
++function parseQuestion(value: unknown, label: string): FormalQuestion {
++  const question = record(value, label);
++  const type = textValue(question.type, `${label}.type`, 32);
++  if (!['numeric', 'single_choice', 'exact_text', 'accepted_text', 'sequence'].includes(type)) {
++    throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}.type`);
++  }
++  const result: FormalQuestion = {
++    id: textValue(question.id, `${label}.id`, 160),
++    type: type as FormalQuestion['type'],
++    prompt: textValue(question.prompt, `${label}.prompt`, 1_200),
++    skill: textValue(question.skill, `${label}.skill`, 240),
++    hint: textValue(question.hint, `${label}.hint`, 800),
++    explanation: textValue(question.explanation, `${label}.explanation`, 1_600),
++  };
++  if (result.type === 'single_choice' || result.type === 'sequence') {
++    if (!Array.isArray(question.choices) || question.choices.length < 2) {
++      throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}.choices`);
++    }
++    result.choices = question.choices.map((rawChoice, index) => {
++      const choice = record(rawChoice, `${label}.choices.${index}`);
++      return {
++        id: textValue(choice.id, `${label}.choices.${index}.id`, 80),
++        label: textValue(choice.label, `${label}.choices.${index}.label`, 480),
++      };
++    });
++  }
++  return result;
++}
++
++function parseFormalCoursewareSpec(input: GenerateClassroomInput): FormalCoursewareSpec {
++  if (
++    !isExactMiraFormalRuntimeContract(input.formalRuntimeContract) ||
++    !isExactMiraCoursewareAuthority(input.coursewareAuthority)
++  ) {
++    throw new Error('FORMAL_COURSEWARE_AUTHORITY_INVALID');
++  }
++  let rawContract: unknown;
++  try {
++    rawContract = JSON.parse(input.requirement);
++  } catch {
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:requirement');
++  }
++  const contract = record(rawContract, 'contract');
++  if (
++    contract.schemaVersion !== 'mira.openmaic.formal-runtime.v1' ||
++    contract.authority !== 'mira_backend_formal_candidate' ||
++    !isExactMiraCoursewareAuthority(contract.coursewareAuthority)
++  ) {
++    throw new Error('FORMAL_COURSEWARE_AUTHORITY_INVALID');
++  }
++  const brief = record(contract.teachingBrief, 'teachingBrief');
++  const briefAuthority = record(brief.authority, 'teachingBrief.authority');
++  if (
++    brief.schemaVersion !== 'mira.learning.formal-runtime-teaching-brief.v1' ||
++    !exactObject(briefAuthority, {
++      source: 'locked_learning_course',
++      answerContractProvided: false,
++      scoringRulesProvided: false,
++      providerSecretsProvided: false,
++    })
++  ) {
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:teachingBrief');
++  }
++  const course = record(brief.course, 'course');
++  const lesson = record(brief.lesson, 'lesson');
++  const flow = record(lesson.teachingFlow, 'teachingFlow');
++  const teach = record(flow.teach, 'teachingFlow.teach');
++  const recap = record(flow.recap, 'teachingFlow.recap');
++  if (!Array.isArray(lesson.questions) || lesson.questions.length !== 5) {
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:questions');
++  }
++  const questions = lesson.questions.map((item, index) => parseQuestion(item, `questions.${index}`));
++  const questionById = new Map(questions.map((question) => [question.id, question]));
++  if (questionById.size !== 5) throw new Error('FORMAL_COMPILED_INPUT_INVALID:questionIds');
++  const demoId = textValue(flow.demoQuestionId, 'teachingFlow.demoQuestionId', 160);
++  const guidedIds = stringList(flow.guidedQuestionIds, 'teachingFlow.guidedQuestionIds', 2);
++  const independentIds = stringList(
++    flow.independentQuestionIds,
++    'teachingFlow.independentQuestionIds',
++    2,
++  );
++  const orderedIds = [demoId, ...guidedIds, ...independentIds];
++  if (
++    new Set(orderedIds).size !== 5 ||
++    orderedIds.some((id, index) => questions[index]?.id !== id || !questionById.has(id))
++  ) {
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:teachingRoles');
++  }
++  const teacherContract = record(contract.teacher, 'teacher');
++  const runtimeTeacher = record(teacherContract.runtime, 'teacher.runtime');
++  const voiceConfig = record(runtimeTeacher.voiceConfig, 'teacher.runtime.voiceConfig');
++  if (runtimeTeacher.role !== 'teacher') {
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:teacher.role');
++  }
++  const minutes = lesson.estimatedMinutes;
++  if (typeof minutes !== 'number' || !Number.isSafeInteger(minutes) || minutes < 5 || minutes > 30) {
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:estimatedMinutes');
++  }
++  return {
++    course: {
++      id: textValue(course.id, 'course.id', 255),
++      version: textValue(course.version, 'course.version', 64),
++      gradeCode: textValue(course.gradeCode, 'course.gradeCode', 64),
++      subject: textValue(course.subject, 'course.subject', 64),
++      skillId: textValue(course.skillId, 'course.skillId', 120),
++      title: textValue(course.title, 'course.title', 160),
++      objective: textValue(course.objective, 'course.objective', 600),
++    },
++    intro: textValue(lesson.intro, 'lesson.intro', 1_200),
++    estimatedMinutes: minutes,
++    teach: {
++      title: textValue(teach.title, 'teachingFlow.teach.title', 320),
++      sayText: textValue(teach.sayText, 'teachingFlow.teach.sayText', 2_400),
++      keyPoints: stringList(teach.keyPoints, 'teachingFlow.teach.keyPoints'),
++    },
++    recap: textValue(recap.sayText, 'teachingFlow.recap.sayText', 1_200),
++    demo: questionById.get(demoId)!,
++    guided: [questionById.get(guidedIds[0])!, questionById.get(guidedIds[1])!],
++    independent: [
++      questionById.get(independentIds[0])!,
++      questionById.get(independentIds[1])!,
++    ],
++    teacher: {
++      name: textValue(runtimeTeacher.name, 'teacher.runtime.name', 160),
++      avatar: textValue(runtimeTeacher.avatar, 'teacher.runtime.avatar', 500),
++      voiceConfig: {
++        providerId: textValue(voiceConfig.providerId, 'voiceConfig.providerId', 80),
++        modelId: textValue(voiceConfig.modelId, 'voiceConfig.modelId', 160),
++        voiceId: textValue(voiceConfig.voiceId, 'voiceConfig.voiceId', 160),
++      },
++    },
++  };
++}
++
++function escapeHtml(value: string): string {
++  return value
++    .replaceAll('&', '&amp;')
++    .replaceAll('<', '&lt;')
++    .replaceAll('>', '&gt;')
++    .replaceAll('"', '&quot;')
++    .replaceAll("'", '&#39;');
++}
++
++function scriptJson(value: unknown): string {
++  return JSON.stringify(value).replaceAll('<', '\\u003c').replaceAll('>', '\\u003e');
++}
++
++function textElement(
++  id: string,
++  content: string,
++  left: number,
++  top: number,
++  width: number,
++  height: number,
++  fontSize: number,
++  fill?: string,
++): PPTElement {
++  return {
++    id,
++    type: 'text',
++    content: `<p style="font-size:${fontSize}px;line-height:1.35;margin:0">${escapeHtml(content)}</p>`,
++    left,
++    top,
++    width,
++    height,
++    rotate: 0,
++    defaultFontName: 'Microsoft YaHei',
++    defaultColor: '#18324a',
++    fill,
++    lineHeight: 1.35,
++    paragraphSpace: 0,
++    textType: top < 120 ? 'title' : 'content',
++    vAlign: 'middle',
++  };
++}
++
++function slideContent(title: string, lead: string, points: readonly string[]): GeneratedSceneContent {
++  const safePoints = points.slice(0, 4);
++  return {
++    elements: [
++      textElement('slide-title', title, 64, 42, 872, 72, 38),
++      textElement('slide-lead', lead, 64, 132, 872, 90, 25, '#eef8f6'),
++      ...safePoints.map((point, index) =>
++        textElement(
++          `slide-point-${index + 1}`,
++          `${index + 1}. ${point}`,
++          86,
++          250 + index * 72,
++          828,
++          58,
++          23,
++          index % 2 === 0 ? '#f4f0ff' : '#fff4e6',
++        ),
++      ),
++    ],
++    background: { type: 'solid', color: '#fbfdfc' },
++  };
++}
++
++function runtimeQuestion(question: FormalQuestion): QuizQuestion {
++  const runtimeType =
++    question.type === 'single_choice'
++      ? 'single'
++      : question.type === 'sequence'
++        ? 'multiple'
++        : 'short_answer';
++  return {
++    id: question.id,
++    type: runtimeType,
++    question: question.prompt,
++    ...(question.choices
++      ? {
++          options: question.choices.map((choice) => ({
++            value: choice.id,
++            label: choice.label,
++          })),
++        }
++      : {}),
++    answer: [],
++    hasAnswer: false,
++    points: 1,
++  };
++}
++
++function widgetConfigScript(config: WidgetConfigBase): string {
++  return `<script type="application/json" id="widget-config">${scriptJson(config)}</script>`;
++}
++
++function highlightScript(): string {
++  return `<script>window.addEventListener('message',function(event){const data=event.data;if(data&&data.type==='HIGHLIGHT_ELEMENT'){const target=document.getElementById(data.target);if(target){target.classList.add('mira-highlight');}}});</script>`;
++}
++
++function simulationContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
++  const phases = [spec.teach.keyPoints[0] || spec.teach.title, spec.demo.hint, spec.recap];
++  const config: WidgetConfigBase = {
++    type: 'simulation',
++    concept: spec.course.skillId,
++    description: `按步骤观察、练习并检查《${spec.course.title}》的方法。`,
++    variables: [
++      { name: 'step', label: '学习步骤', min: 1, max: 3, default: 1, step: 1, unit: '步' },
++    ],
++    presets: [
++      { name: '先观察', variables: { step: 1 } },
++      { name: '再练习', variables: { step: 2 } },
++      { name: '会检查', variables: { step: 3 } },
++    ],
++  };
++  const phaseJson = scriptJson(phases);
++  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#f5fbfa;color:#17324a}.app{max-width:880px;margin:auto;padding:28px}.panel{padding:24px;background:#fff;border:2px solid #cce9e4;border-radius:20px}input{width:100%;accent-color:#2e9187}output{font-size:34px;font-weight:800}.result{margin-top:22px;padding:22px;border-radius:16px;background:#eef8f6;font-size:24px}.mira-highlight{outline:5px solid #f2a85b;transition:outline .25s ease}</style></head><body><main class="app"><h1>${escapeHtml(spec.course.title)} · 方法模拟</h1><section class="panel"><label for="step-control">拖动选择学习步骤</label><input id="step-control" data-var="step" type="range" min="1" max="3" step="1" value="1"><output id="step-output">1</output><div id="step-result" class="result" aria-live="polite"></div></section></main>${widgetConfigScript(config)}<script>const phases=${phaseJson};const stepControl=document.getElementById('step-control');const stepOutput=document.getElementById('step-output');const stepResult=document.getElementById('step-result');function renderStep(){const index=Number(stepControl.value)-1;stepOutput.textContent=String(index+1);stepResult.textContent=phases[index];}stepControl.addEventListener('input',function(){stepOutput.textContent=stepControl.value;renderStep();});renderStep();</script>${highlightScript()}</body></html>`;
++  return { html, widgetType: 'simulation', widgetConfig: config };
++}
++
++function gameContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
++  const levels = spec.teach.keyPoints.length ? spec.teach.keyPoints : [spec.teach.title];
++  const config: WidgetConfigBase = {
++    type: 'game',
++    gameType: 'mastery_steps',
++    description: `逐关说出《${spec.course.title}》的方法并完成自查。`,
++    gameConfig: {
++      controls: ['challenge-button', 'retry-button'],
++      targets: [{ id: 'mastery-target', type: 'learning-checkpoint', label: '本课方法' }],
++      initialConditions: { score: 0, level: 1, progress: 0 },
++      successCondition: '完成全部方法关卡',
++      levels: levels.map((point, index) => ({
++        id: `level-${index + 1}`,
++        targetId: 'mastery-target',
++        label: `第${index + 1}关`,
++        description: point,
++        requiredScore: (index + 1) * 10,
++      })),
++    },
++    scoring: { completionPoints: 10, levelPoints: 10 },
++    achievements: [
++      {
++        id: 'method-mastered',
++        name: '方法小老师',
++        description: '完成全部方法关卡。',
++        points: 10,
++        targetId: 'mastery-target',
++      },
++    ],
++  };
++  const levelsJson = scriptJson(levels);
++  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#fff8ed;color:#29364a}.app{max-width:860px;margin:auto;padding:28px}.hud{display:flex;gap:12px;flex-wrap:wrap}.pill{padding:9px 14px;border-radius:999px;background:#fff}.target{margin:24px 0;padding:26px;border-radius:20px;background:#fff;font-size:24px}.actions{display:flex;gap:12px}.actions button{border:0;border-radius:13px;padding:13px 20px;font-size:17px;cursor:pointer}.challenge{background:#2e9187;color:#fff}.retry{background:#e9e6f7;color:#443b72}.mira-highlight{outline:5px solid #f2a85b;transition:outline .25s ease}</style></head><body><main class="app"><h1>${escapeHtml(spec.course.title)} · 方法闯关</h1><div class="hud"><span class="pill">关卡 <strong id="level-status">1</strong></span><span class="pill">得分 <strong id="score-status">0</strong></span><span class="pill">进度 <strong id="progress-status">0</strong>%</span></div><div id="mastery-target" class="target" aria-live="polite"></div><div class="actions"><button id="challenge-button" class="challenge" type="button">我能说出这个方法</button><button id="retry-button" class="retry" type="button">重新练习</button></div><canvas id="game-canvas" width="420" height="90"></canvas></main>${widgetConfigScript(config)}<script>const levels=${levelsJson};let score=0;let level=1;let progress=0;const levelStatus=document.getElementById('level-status');const scoreStatus=document.getElementById('score-status');const progressStatus=document.getElementById('progress-status');const masteryTarget=document.getElementById('mastery-target');const gameCanvas=document.getElementById('game-canvas');const gameContext=gameCanvas.getContext('2d');function renderGame(){levelStatus.textContent=String(level);scoreStatus.textContent=String(score);progressStatus.textContent=String(progress);masteryTarget.textContent=levels[Math.min(level-1,levels.length-1)];gameContext.clearRect(0,0,420,90);gameContext.fillStyle='#2e9187';gameContext.fillRect(0,28,Math.round(progress*4.2),24);}document.getElementById('challenge-button').addEventListener('click',function(){score += 10;level += 1;progress = Math.min(100,Math.round(score/Math.max(10,levels.length*10)*100));renderGame();requestAnimationFrame(renderGame);});document.getElementById('retry-button').addEventListener('click',function(){score = Math.max(0,score-10);level = Math.max(1,level-1);progress = Math.max(0,progress-25);renderGame();requestAnimationFrame(renderGame);});renderGame();</script>${highlightScript()}</body></html>`;
++  return { html, widgetType: 'game', widgetConfig: config };
++}
++
++function visualizationContent(spec: FormalCoursewareSpec): GeneratedSceneContent {
++  const labels = [spec.teach.title, ...spec.teach.keyPoints].slice(0, 3);
++  while (labels.length < 3) labels.push(spec.course.objective);
++  const config: WidgetConfigBase = {
++    type: 'visualization3d',
++    visualizationType: 'knowledge_blocks',
++    description: `旋转知识积木，观察《${spec.course.title}》的方法关系。`,
++    objects: labels.map((label, index) => ({
++      id: ['concept-core', 'practice-block', 'mastery-block'][index],
++      type: 'box',
++      label,
++      position: { x: index - 1, y: 0, z: 0 },
++      rotation: { x: 0, y: 0, z: 0 },
++      scale: { x: 1, y: 1, z: 1 },
++      color: ['#2e9187', '#f2a85b', '#6956a8'][index],
++    })),
++    interactions: [
++      { id: 'rotate-concepts', type: 'button', target: 'concept-core', action: 'rotate', label: '旋转观察' },
++      { id: 'zoom-concepts', type: 'range', target: 'practice-block', param: 'zoom', label: '调整大小', min: 1, max: 2, step: 0.1 },
++    ],
++  };
++  const labelsJson = scriptJson(labels);
++  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#eef4fb;color:#172b43}.app{display:grid;grid-template-columns:1fr 260px;gap:18px;max-width:940px;margin:auto;padding:22px}canvas{width:100%;height:430px;border-radius:20px;background:#dceafb}.panel{padding:20px;background:#fff;border-radius:20px}.panel button{width:100%;padding:12px;border:0;border-radius:12px;background:#2e9187;color:#fff}.panel input{width:100%}.mira-highlight{outline:5px solid #f2a85b;transition:outline .25s ease}@media(max-width:700px){.app{grid-template-columns:1fr}}</style></head><body><main class="app"><canvas id="concept-canvas" width="680" height="430" aria-label="可旋转的知识积木三维模型"></canvas><aside class="panel"><h1>${escapeHtml(spec.course.title)}</h1><ol id="concept-list"><li>${labels.map(escapeHtml).join('</li><li>')}</li></ol><button id="rotate-button" type="button">旋转观察</button><label for="zoom-control">积木大小</label><input id="zoom-control" type="range" min="1" max="2" step="0.1" value="1"><p id="model-status" aria-live="polite">拖动控件观察方法关系。</p></aside></main>${widgetConfigScript(config)}<script>const labels=${labelsJson};const canvas=document.getElementById('concept-canvas');const gl=canvas.getContext('webgl');const vertexShader=gl.createShader(gl.VERTEX_SHADER);gl.shaderSource(vertexShader,'attribute vec3 position;uniform float angle;uniform float zoom;void main(){float c=cos(angle);float s=sin(angle);vec3 p=vec3(position.x*c-position.z*s,position.y,position.x*s+position.z*c);gl_Position=vec4(p*zoom,1.0);}');gl.compileShader(vertexShader);const fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);gl.shaderSource(fragmentShader,'precision mediump float;void main(){gl_FragColor=vec4(0.18,0.57,0.53,1.0);}');gl.compileShader(fragmentShader);const program=gl.createProgram();gl.attachShader(program,vertexShader);gl.attachShader(program,fragmentShader);gl.linkProgram(program);gl.useProgram(program);const vertices=new Float32Array([-.5,-.5,0,.5,-.5,0,0,.5,0]);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);const position=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,3,gl.FLOAT,false,0,0);const angleLocation=gl.getUniformLocation(program,'angle');const zoomLocation=gl.getUniformLocation(program,'zoom');const modelStatus=document.getElementById('model-status');const zoomControl=document.getElementById('zoom-control');let rotation=0;let zoom=1;function renderModel(){gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.86,.92,.98,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform1f(angleLocation,rotation);gl.uniform1f(zoomLocation,zoom);gl.drawArrays(gl.TRIANGLES,0,3);modelStatus.textContent='正在观察：'+labels[Math.round(rotation/.25)%labels.length];}document.getElementById('rotate-button').addEventListener('click',function(){rotation += .25;renderModel();});zoomControl.addEventListener('input',function(){zoom = Number(zoomControl.value);renderModel();});renderModel();</script>${highlightScript()}</body></html>`;
++  return { html, widgetType: 'visualization3d', widgetConfig: config };
++}
++
++function outline(
++  order: number,
++  type: SceneOutline['type'],
++  title: string,
++  description: string,
++  keyPoints: string[],
++  widgetType?: 'simulation' | 'game' | 'visualization3d',
++): SceneOutline {
++  return {
++    id: `mira-formal-scene-${String(order + 1).padStart(2, '0')}`,
++    type,
++    title,
++    description,
++    keyPoints,
++    teachingObjective: description,
++    estimatedDuration: 60,
++    order,
++    languageNote: '使用适合小学生的简短表达，不泄露正式练习答案。',
++    ...(widgetType
++      ? { widgetType, widgetOutline: { concept: description } }
++      : {}),
++    ...(type === 'quiz'
++      ? { quizConfig: { questionCount: 2, difficulty: 'easy', questionTypes: ['single', 'text'] } }
++      : {}),
++  };
++}
++
++function speech(order: number, text: string): Action {
++  return {
++    id: `mira-formal-speech-${String(order + 1).padStart(2, '0')}`,
++    type: 'speech',
++    title: '课堂讲解',
++    text,
++  };
++}
++
++export function buildMiraFormalCompiledDraft(
++  input: GenerateClassroomInput,
++  classroomId = nanoid(10),
++): { stage: Stage; scenes: Scene[] } {
++  const spec = parseFormalCoursewareSpec(input);
++  const stage: Stage = {
++    id: classroomId,
++    name: spec.course.title,
++    description: spec.course.objective,
++    languageDirective:
++      spec.course.subject === 'english'
++        ? '使用简体中文讲解，英语目标内容使用英语。'
++        : '全程使用简体中文，句子简短，一次只要求一个学习动作。',
++    style: 'interactive',
++    interactiveMode: true,
++    createdAt: Date.now(),
++    updatedAt: Date.now(),
++    generatedAgentConfigs: [
++      {
++        id: 'mira-formal-teacher',
++        name: spec.teacher.name,
++        role: 'teacher',
++        persona: '耐心讲解、先教后练，并引导学生说出思考过程。',
++        avatar: spec.teacher.avatar,
++        color: AGENT_COLOR_PALETTE[0],
++        priority: 10,
++        voiceConfig: spec.teacher.voiceConfig,
++      },
++      ...['小问号', '会观察', '爱表达', '能检查'].map((name, index) => ({
++        id: `mira-formal-peer-${index + 1}`,
++        name,
++        role: 'student',
++        persona: '和学生一起观察、练习，并用短句交流学习方法。',
++        avatar: AGENT_DEFAULT_AVATARS[(index + 1) % AGENT_DEFAULT_AVATARS.length],
++        color: AGENT_COLOR_PALETTE[(index + 1) % AGENT_COLOR_PALETTE.length],
++        priority: 5,
++      })),
++    ],
++  };
++
++  const sceneSpecs: Array<{
++    outline: SceneOutline;
++    content: GeneratedSceneContent;
++    actions: Action[];
++  }> = [
++    {
++      outline: outline(0, 'slide', spec.course.title, spec.course.objective, [spec.intro]),
++      content: slideContent(spec.course.title, spec.course.objective, [spec.intro]),
++      actions: [
++        speech(0, spec.intro),
++        { id: 'mira-formal-spotlight-01', type: 'spotlight', elementId: 'slide-title' },
++      ],
++    },
++    {
++      outline: outline(1, 'slide', spec.teach.title, spec.course.objective, spec.teach.keyPoints),
++      content: slideContent(spec.teach.title, spec.teach.sayText, spec.teach.keyPoints),
++      actions: [
++        speech(1, spec.teach.sayText),
++        {
++          id: 'mira-formal-discussion-01',
++          type: 'discussion',
++          topic: `说一说《${spec.teach.title}》最重要的方法`,
++          agentId: 'mira-formal-peer-1',
++        },
++      ],
++    },
++    {
++      outline: outline(2, 'slide', '老师示范', spec.demo.prompt, [spec.demo.hint]),
++      content: slideContent('老师示范', spec.demo.prompt, [spec.demo.hint, spec.demo.explanation]),
++      actions: [
++        speech(2, `${spec.demo.prompt} ${spec.demo.hint} ${spec.demo.explanation}`),
++        {
++          id: 'mira-formal-discussion-02',
++          type: 'discussion',
++          topic: '说一说示范题使用了什么方法',
++          agentId: 'mira-formal-peer-2',
++        },
++      ],
++    },
++    {
++      outline: outline(3, 'slide', '跟着方法练', '先读题，再选择合适的方法。', spec.guided.map((item) => item.hint)),
++      content: slideContent('跟着方法练', '先读题，再选择合适的方法。', spec.guided.map((item) => item.hint)),
++      actions: [speech(3, '接下来跟着方法练习。先认真读题，再根据提示想一想。')],
++    },
++    {
++      outline: outline(4, 'slide', '独立练习前检查', spec.recap, ['读清题目', '自己作答', '完成后检查']),
++      content: slideContent('独立练习前检查', spec.recap, ['读清题目', '自己作答', '完成后检查']),
++      actions: [speech(4, `${spec.recap} 下面请独立完成练习。`)],
++    },
++    {
++      outline: outline(5, 'quiz', '引导练习', '在提示支持下完成两道练习。', spec.guided.map((item) => item.skill)),
++      content: { questions: spec.guided.map(runtimeQuestion) },
++      actions: [speech(5, '现在完成两道引导练习。可以使用刚才学到的方法，不着急。')],
++    },
++    {
++      outline: outline(6, 'quiz', '独立检测', '独立完成两道检测题。', spec.independent.map((item) => item.skill)),
++      content: { questions: spec.independent.map(runtimeQuestion) },
++      actions: [speech(6, '现在请独立完成两道检测题。这里不会提前显示答案。')],
++    },
++    {
++      outline: outline(7, 'interactive', '方法模拟', '按步骤观察方法怎样使用。', spec.teach.keyPoints, 'simulation'),
++      content: simulationContent(spec),
++      actions: [
++        speech(7, '拖动学习步骤控件，依次观察、练习和检查。'),
++        {
++          id: 'mira-formal-widget-highlight-01',
++          type: 'widget_highlight',
++          target: 'step-control',
++        },
++      ],
++    },
++    {
++      outline: outline(8, 'interactive', '方法闯关', '逐关说出本课方法。', spec.teach.keyPoints, 'game'),
++      content: gameContent(spec),
++      actions: [speech(8, '点击闯关按钮，每过一关就说出一种本课方法。')],
++    },
++    {
++      outline: outline(9, 'interactive', '知识积木', '旋转和缩放知识积木，回顾方法关系。', spec.teach.keyPoints, 'visualization3d'),
++      content: visualizationContent(spec),
++      actions: [speech(9, `${spec.recap} 请旋转知识积木，再说出你已经学会的方法。`)],
++    },
++  ];
++
++  const scenes = sceneSpecs.map((item) => {
++    const scene = buildCompleteScene(item.outline, item.content, item.actions, classroomId, {
++      sceneId: `${classroomId}-${item.outline.id}`,
++    });
++    if (!scene) throw new Error(`FORMAL_COMPILED_SCENE_INVALID:${item.outline.id}`);
++    return scene as Scene;
++  });
++  return { stage, scenes };
++}
++
++export async function generateMiraFormalCompiledClassroom(
++  input: GenerateClassroomInput,
++  options: {
++    baseUrl: string;
++    onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void;
++  },
++): Promise<GenerateClassroomResult> {
++  await options.onProgress?.({
++    step: 'generating_outlines',
++    progress: 25,
++    message: 'Compiling the locked OpenMAIC courseware artifact',
++    scenesGenerated: 0,
++    totalScenes: 10,
++  });
++  const { stage, scenes } = buildMiraFormalCompiledDraft(input);
++  await options.onProgress?.({
++    step: 'generating_scenes',
++    progress: 90,
++    message: 'Compiled 10 classroom scenes with zero model calls',
++    scenesGenerated: scenes.length,
++    totalScenes: 10,
++  });
++  await options.onProgress?.({
++    step: 'persisting',
++    progress: 98,
++    message: 'Persisting the compiled classroom',
++    scenesGenerated: scenes.length,
++    totalScenes: 10,
++  });
++  const persisted = await persistClassroom({ id: stage.id, stage, scenes }, options.baseUrl);
++  await options.onProgress?.({
++    step: 'completed',
++    progress: 100,
++    message: 'OpenMAIC classroom compilation completed without another model generation',
++    scenesGenerated: scenes.length,
++    totalScenes: 10,
++  });
++  return {
++    id: persisted.id,
++    url: persisted.url,
++    stage,
++    scenes,
++    scenesCount: scenes.length,
++    createdAt: persisted.createdAt,
++  };
++}
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+index a633283..6f869f3 100644
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -3,6 +3,17 @@ import type { GenerateClassroomInput } from '@/lib/server/classroom-generation';
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+   'mira.openmaic.formal-runtime.v1' as const;
+ 
++export const MIRA_COURSEWARE_AUTHORITY_SCHEMA =
++  'mira.openmaic.courseware-authority.v1' as const;
++
++export const MIRA_COURSEWARE_AUTHORITY = {
++  schemaVersion: MIRA_COURSEWARE_AUTHORITY_SCHEMA,
++  generationOwner: 'openmaic',
++  providerInvocation: 'courseware_generation_only',
++  classroomCompilation: 'deterministic_no_llm',
++  backendProviderCredentialsAccepted: false,
++} as const;
++
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+   exactSceneCount: 10,
+@@ -39,6 +50,7 @@ export const MIRA_FORMAL_GENERATION_POLICY = {
+   idempotencyKey: 'runtimeRequestId',
+   queryByRuntimeRequestId: true,
+   speechAudioGenerated: false,
++  coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
+   studentRuntimeEvents: {
+     enforced: true,
+     schemaVersion: 'mira.openmaic.student-runtime-events.v1',
+@@ -72,11 +84,19 @@ export function isExactMiraFormalRuntimeContract(value: unknown): boolean {
+   );
+ }
+ 
++export function isExactMiraCoursewareAuthority(value: unknown): boolean {
++  return (
++    JSON.stringify(canonical(value)) ===
++    JSON.stringify(canonical(MIRA_COURSEWARE_AUTHORITY))
++  );
++}
++
+ export function assertMiraFormalGenerationInput(
+   input: GenerateClassroomInput,
+ ): asserts input is GenerateClassroomInput & {
+   runtimeRequestId: string;
+   formalRuntimeContract: typeof MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT;
++  coursewareAuthority: typeof MIRA_COURSEWARE_AUTHORITY;
+ } {
+   if (!REQUEST_ID.test(input.runtimeRequestId || '')) {
+     throw new Error('FORMAL_RUNTIME_REQUEST_ID_INVALID');
+@@ -84,6 +104,9 @@ export function assertMiraFormalGenerationInput(
+   if (!isExactMiraFormalRuntimeContract(input.formalRuntimeContract)) {
+     throw new Error('FORMAL_RUNTIME_CONTRACT_INVALID');
+   }
++  if (!isExactMiraCoursewareAuthority(input.coursewareAuthority)) {
++    throw new Error('FORMAL_COURSEWARE_AUTHORITY_INVALID');
++  }
+   if (
+     !input.requirement.trim() ||
+     input.pdfContent !== undefined ||
+diff --git a/tests/server/classroom-generation-retry.test.ts b/tests/server/classroom-generation-retry.test.ts
+index bc769ab..3d02870 100644
+--- a/tests/server/classroom-generation-retry.test.ts
++++ b/tests/server/classroom-generation-retry.test.ts
+@@ -1,3 +1,5 @@
++import { spawnSync } from 'node:child_process';
++import path from 'node:path';
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ 
+ const mocks = vi.hoisted(() => ({
+@@ -319,41 +321,85 @@ describe('classroom scene generation retries', () => {
+     expect(mocks.callLLM).toHaveBeenCalledTimes(2);
+   });
+ 
+-  it('repairs a non-conforming formal outline once before scene generation', async () => {
+-    const { MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT } = await import(
++  it('compiles the locked OpenMAIC courseware into a formal classroom with zero model calls', async () => {
++    const {
++      MIRA_COURSEWARE_AUTHORITY,
++      MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++    } = await import(
+       '@/lib/server/mira-formal-generation-policy'
+     );
+-    const formalOutlines = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.orderedSceneTypes.map(
+-      (type, index) => ({
+-        ...outline,
+-        id: `formal-outline-${index + 1}`,
+-        type,
+-        order: index + 1,
+-        ...(type === 'interactive'
+-          ? {
+-              widgetType: ['simulation', 'game', 'visualization3d'][index - 7],
+-              widgetOutline: { concept: `formal concept ${index + 1}` },
+-            }
+-          : {}),
+-      }),
+-    );
+-    mocks.generateSceneOutlinesFromRequirements
+-      .mockResolvedValueOnce({
+-        success: true,
+-        data: { languageDirective: 'Use Chinese.', outlines: [outline] },
+-      })
+-      .mockResolvedValueOnce({
+-        success: true,
+-        data: { languageDirective: 'Use Chinese.', outlines: formalOutlines },
+-      });
+-    mocks.generateSceneContent.mockResolvedValue(slideContent);
++    const questions = Array.from({ length: 5 }, (_, index) => ({
++      id: `q${index + 1}`,
++      type: 'numeric',
++      prompt: `练习题 ${index + 1}`,
++      skill: 'number_sense_20',
++      hint: '先观察，再使用今天学到的方法。',
++      explanation: '老师按步骤完成示范。',
++    }));
++    const teacher = {
++      runtime: {
++        name: '米拉数学老师',
++        role: 'teacher',
++        avatar: '/avatars/mira-math.png',
++        teacherGender: 'female',
++        voiceGender: 'female',
++        voiceConfig: {
++          providerId: 'qwen-tts',
++          modelId: 'qwen3-tts-flash',
++          voiceId: 'Cherry',
++        },
++      },
++    };
++    const requirement = JSON.stringify({
++      schemaVersion: 'mira.openmaic.formal-runtime.v1',
++      authority: 'mira_backend_formal_candidate',
++      coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
++      teachingBrief: {
++        schemaVersion: 'mira.learning.formal-runtime-teaching-brief.v1',
++        sourceCourseContentSha256: 'a'.repeat(64),
++        course: {
++          id: 'course-1',
++          version: '1',
++          gradeCode: 'primary_1',
++          subject: 'math',
++          skillId: 'number_sense_20',
++          title: '20以内数感',
++          objective: '从不会数到会观察、会练习、会检查。',
++        },
++        lesson: {
++          intro: '今天学习20以内数感。',
++          estimatedMinutes: 10,
++          teachingFlow: {
++            schemaVersion: 'mira.learning.teaching-flow.v1',
++            teach: {
++              title: '先观察数量',
++              sayText: '先一个一个数，再检查有没有遗漏。',
++              keyPoints: ['按顺序数', '最后检查'],
++            },
++            demoQuestionId: 'q1',
++            guidedQuestionIds: ['q2', 'q3'],
++            independentQuestionIds: ['q4', 'q5'],
++            recap: { sayText: '先观察，再作答，最后检查。' },
++          },
++          questions,
++        },
++        authority: {
++          source: 'locked_learning_course',
++          answerContractProvided: false,
++          scoringRulesProvided: false,
++          providerSecretsProvided: false,
++        },
++      },
++      teacher,
++    });
+ 
+     const { generateClassroom } = await import('@/lib/server/classroom-generation');
+     const result = await generateClassroom(
+       {
+-        requirement: '一年级正式课程',
++        requirement,
+         runtimeRequestId: 'formal-outline-repair-1',
+         formalRuntimeContract: MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++        coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
+         enableWebSearch: false,
+         enableImageGeneration: false,
+         enableVideoGeneration: false,
+@@ -363,9 +409,45 @@ describe('classroom scene generation retries', () => {
+       { baseUrl: 'http://localhost' },
+     );
+ 
+-    expect(mocks.generateSceneOutlinesFromRequirements).toHaveBeenCalledTimes(2);
+-    expect(mocks.generateSceneContent).toHaveBeenCalledTimes(10);
+-    expect(result.scenesCount).toBeGreaterThan(0);
++    expect(mocks.resolveModel).not.toHaveBeenCalled();
++    expect(mocks.callLLM).not.toHaveBeenCalled();
++    expect(mocks.generateSceneOutlinesFromRequirements).not.toHaveBeenCalled();
++    expect(mocks.generateSceneContent).not.toHaveBeenCalled();
++    expect(result.scenesCount).toBe(10);
++    expect(result.scenes.map((scene) => scene.type)).toEqual(
++      MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.orderedSceneTypes,
++    );
++    const strictValidation = spawnSync(
++      'python3',
++      [
++        '-c',
++        `import json,sys
++from tests.test_formal_runtime_candidate_generation import _candidate_service
++payload=json.load(sys.stdin)
++receipt=_candidate_service()._validate_formal_classroom(payload["classroom"], teacher_contract=payload["teacher"], assessment_questions=payload["assessments"])
++print(json.dumps({"ok":True,"sceneCount":len(payload["classroom"]["scenes"]),"receiptKeys":sorted(receipt.keys())}))`,
++      ],
++      {
++        cwd: path.resolve(process.cwd(), '../../../backend'),
++        input: JSON.stringify({
++          classroom: { stage: result.stage, scenes: result.scenes },
++          teacher,
++          assessments: questions.slice(1).map((question) => ({
++            id: question.id,
++            question: question.prompt,
++            runtimeType: 'short_answer',
++            options: [],
++          })),
++        }),
++        encoding: 'utf8',
++        env: {
++          ...process.env,
++          PYTHONPYCACHEPREFIX: '/tmp/mira-single-authority-pycache',
++        },
++      },
++    );
++    expect(strictValidation.status, strictValidation.stderr || strictValidation.stdout).toBe(0);
++    expect(JSON.parse(strictValidation.stdout)).toMatchObject({ ok: true, sceneCount: 10 });
+   });
+ 
+   it('does not reject a successfully parsed scene merely because the call reached length', async () => {
+diff --git a/tests/server/mira-courseware-provider.test.ts b/tests/server/mira-courseware-provider.test.ts
+new file mode 100644
+index 0000000..3274690
+--- /dev/null
++++ b/tests/server/mira-courseware-provider.test.ts
+@@ -0,0 +1,169 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++const mocks = vi.hoisted(() => ({
++  resolveModel: vi.fn(),
++  callLLM: vi.fn(),
++  defaultSettingsMiddleware: vi.fn((options) => options),
++  wrapLanguageModel: vi.fn(({ model, middleware }) => ({ model, middleware, wrapped: true })),
++}));
++
++vi.mock('@/lib/server/resolve-model', () => ({
++  resolveModel: mocks.resolveModel,
++}));
++
++vi.mock('@/lib/ai/llm', () => ({
++  callLLM: mocks.callLLM,
++}));
++
++vi.mock('@/lib/ai/providers', () => ({
++  isProviderKeyRequired: () => true,
++}));
++
++vi.mock('ai', () => ({
++  defaultSettingsMiddleware: mocks.defaultSettingsMiddleware,
++  wrapLanguageModel: mocks.wrapLanguageModel,
++}));
++
++function request() {
++  return {
++    schemaVersion: 'mira.openmaic.courseware-provider-call.v1',
++    requestId: 'primary_1-math-course-1-outline-attempt-1',
++    phase: 'outline',
++    systemPrompt: '只生成课程结构。',
++    userPrompt: '为一年级数学生成课件。',
++    responseJsonSchema: {
++      type: 'object',
++      additionalProperties: false,
++      required: ['phaseStatus'],
++      properties: { phaseStatus: { type: 'string' } },
++    },
++  };
++}
++
++describe('Mira OpenMAIC courseware Provider boundary', () => {
++  beforeEach(() => {
++    mocks.resolveModel.mockReset();
++    mocks.callLLM.mockReset();
++    mocks.defaultSettingsMiddleware.mockClear();
++    mocks.wrapLanguageModel.mockClear();
++    mocks.resolveModel.mockResolvedValue({
++      providerId: 'kimi',
++      modelId: 'kimi-k2.6',
++      model: { provider: 'kimi', modelId: 'kimi-k2.6' },
++      modelInfo: { outputWindow: 16_000 },
++      apiKey: 'runtime-owned-key',
++    });
++    mocks.callLLM.mockResolvedValue({
++      text: '{"phaseStatus":"accepted"}',
++      totalUsage: { inputTokens: 10, outputTokens: 5 },
++      response: { id: 'provider-response-1' },
++    });
++  });
++
++  afterEach(() => {
++    delete process.env.MIRA_INTERNAL_API_TOKEN;
++  });
++
++  it('owns the one Kimi courseware call and applies the Sidecar JSON schema', async () => {
++    const { executeMiraCoursewareProvider } = await import(
++      '@/lib/server/mira-courseware-provider'
++    );
++    const result = await executeMiraCoursewareProvider(request());
++
++    expect(mocks.resolveModel).toHaveBeenCalledTimes(1);
++    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'generate-classroom' });
++    expect(mocks.wrapLanguageModel).toHaveBeenCalledTimes(1);
++    expect(mocks.defaultSettingsMiddleware).toHaveBeenCalledWith({
++      settings: {
++        responseFormat: {
++          type: 'json',
++          schema: request().responseJsonSchema,
++          name: 'mira_courseware_outline',
++        },
++      },
++    });
++    expect(mocks.callLLM).toHaveBeenCalledTimes(1);
++    expect(mocks.callLLM).toHaveBeenCalledWith(
++      expect.objectContaining({
++        temperature: 0.6,
++        maxOutputTokens: 8_000,
++        maxRetries: 0,
++      }),
++      'mira-courseware-provider',
++      undefined,
++      { mode: 'disabled', enabled: false },
++    );
++    expect(result).toMatchObject({
++      requestId: request().requestId,
++      phase: 'outline',
++      content: '{"phaseStatus":"accepted"}',
++      inputTokens: 10,
++      outputTokens: 5,
++      billingEvidence: 'reported',
++    });
++    expect(result.providerRequestIdHash).toMatch(/^[a-f0-9]{64}$/);
++  });
++
++  it('rejects any non-pinned Provider before a paid call', async () => {
++    mocks.resolveModel.mockResolvedValue({
++      providerId: 'openai',
++      modelId: 'gpt-5',
++      model: { provider: 'openai', modelId: 'gpt-5' },
++      modelInfo: { outputWindow: 8_000 },
++      apiKey: 'other-key',
++    });
++    const { executeMiraCoursewareProvider } = await import(
++      '@/lib/server/mira-courseware-provider'
++    );
++    await expect(executeMiraCoursewareProvider(request())).rejects.toMatchObject({
++      code: 'provider_unavailable',
++    });
++    expect(mocks.callLLM).not.toHaveBeenCalled();
++  });
++
++  it('classifies a provider 4xx as a definitive rejection without retrying', async () => {
++    mocks.callLLM.mockRejectedValueOnce(
++      Object.assign(new Error('provider rejected request'), { statusCode: 429 }),
++    );
++    const { executeMiraCoursewareProvider } = await import(
++      '@/lib/server/mira-courseware-provider'
++    );
++
++    await expect(executeMiraCoursewareProvider(request())).rejects.toMatchObject({
++      code: 'provider_rejected',
++    });
++    expect(mocks.callLLM).toHaveBeenCalledTimes(1);
++  });
++
++  it('keeps timeouts and provider 5xx failures ambiguous', async () => {
++    const { executeMiraCoursewareProvider } = await import(
++      '@/lib/server/mira-courseware-provider'
++    );
++    for (const failure of [
++      Object.assign(new Error('request timeout'), { statusCode: 408 }),
++      Object.assign(new Error('provider unavailable'), { statusCode: 503 }),
++    ]) {
++      mocks.callLLM.mockRejectedValueOnce(failure);
++      await expect(executeMiraCoursewareProvider(request())).rejects.toMatchObject({
++        code: 'provider_failed',
++      });
++    }
++    expect(mocks.callLLM).toHaveBeenCalledTimes(2);
++  });
++
++  it('requires the private OpenMAIC token', async () => {
++    process.env.MIRA_INTERNAL_API_TOKEN = 'private-token';
++    const { NextRequest } = await import('next/server');
++    const { authorizeMiraCoursewareProviderRequest } = await import(
++      '@/lib/server/mira-courseware-provider'
++    );
++    const allowed = new NextRequest('http://127.0.0.1/api/mira/courseware-provider-call', {
++      headers: { 'x-mira-internal-token': 'private-token' },
++    });
++    expect(() => authorizeMiraCoursewareProviderRequest(allowed)).not.toThrow();
++    const rejected = new NextRequest('http://127.0.0.1/api/mira/courseware-provider-call');
++    expect(() => authorizeMiraCoursewareProviderRequest(rejected)).toThrow(
++      'Courseware Provider access is private',
++    );
++  });
++});
+diff --git a/tests/server/mira-formal-generation-idempotency.test.ts b/tests/server/mira-formal-generation-idempotency.test.ts
+index cd874ce..ce82adf 100644
+--- a/tests/server/mira-formal-generation-idempotency.test.ts
++++ b/tests/server/mira-formal-generation-idempotency.test.ts
+@@ -72,6 +72,7 @@ describe('Mira formal generation request idempotency', () => {
+       requirement: 'formal requirement',
+       runtimeRequestId: 'mira-formal-request-1',
+       formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
+       enableWebSearch: false,
+       enableImageGeneration: false,
+       enableVideoGeneration: false,
+@@ -117,6 +118,7 @@ describe('Mira formal generation request idempotency', () => {
+       requirement: 'formal cross-process requirement',
+       runtimeRequestId: 'mira-formal-cross-process-request-1',
+       formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
+       enableWebSearch: false,
+       enableImageGeneration: false,
+       enableVideoGeneration: false,
+@@ -146,6 +148,7 @@ describe('Mira formal generation request idempotency', () => {
+       requirement: 'formal requirement',
+       runtimeRequestId: 'mira-formal-route-request-1',
+       formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
+       enableWebSearch: false,
+       enableImageGeneration: false,
+       enableVideoGeneration: false,
+@@ -194,6 +197,7 @@ describe('Mira formal generation request idempotency', () => {
+       requirement: 'formal stale requirement',
+       runtimeRequestId: 'mira-formal-stale-request-1',
+       formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
+       enableWebSearch: false,
+       enableImageGeneration: false,
+       enableVideoGeneration: false,
+-- 
+2.50.1 (Apple Git-155)
+

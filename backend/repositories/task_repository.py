@@ -224,10 +224,20 @@ class TaskRepository:
         return list(
             conn.execute(
                 """
-                SELECT * FROM tasks
-                WHERE scheduled_date <= ?
-                  AND status IN (?, ?, ?, ?, ?)
-                ORDER BY scheduled_start IS NULL, scheduled_start, created_at
+                SELECT task.*,
+                  carryover.target_date AS runtime_scheduled_date
+                FROM tasks AS task
+                LEFT JOIN learning_task_carryovers AS carryover
+                  ON carryover.source_task_id = task.id
+                 AND carryover.target_date = (
+                   SELECT MAX(latest.target_date)
+                   FROM learning_task_carryovers AS latest
+                   WHERE latest.source_task_id = task.id
+                 )
+                WHERE COALESCE(carryover.target_date, task.scheduled_date) <= ?
+                  AND task.status IN (?, ?, ?, ?, ?)
+                ORDER BY task.scheduled_start IS NULL, task.scheduled_start,
+                  task.created_at
                 """,
                 (
                     end_date,

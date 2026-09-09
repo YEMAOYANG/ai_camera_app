@@ -90,15 +90,29 @@ def template_catalog_payload(
     templates: list[tuple[DatabaseRow, list[DatabaseRow]]],
     *,
     recommended_grade: str | None,
+    requested_grade_code: str = "",
+    requested_grade_label: str = "",
+    content_mode: str = "kindergarten_growth",
+    content_unavailable: bool = False,
+    content_message: str = "",
 ) -> dict:
+    resolved_recommended_grade = recommended_grade or ("" if content_unavailable else "small")
     return {
         "ok": True,
         "templates": [template_payload(row, items) for row, items in templates],
         "tags": TEMPLATE_TAG_OPTIONS,
         "grades": GRADE_OPTIONS,
         "dayTypes": DAY_TYPE_OPTIONS,
-        "recommendedGrade": recommended_grade or "small",
-        "recommendedGradeLabel": _label_for(GRADE_OPTIONS, recommended_grade or "small"),
+        "recommendedGrade": resolved_recommended_grade,
+        "recommendedGradeLabel": (
+            requested_grade_label
+            if content_unavailable
+            else _label_for(GRADE_OPTIONS, resolved_recommended_grade)
+        ),
+        "requestedGradeCode": requested_grade_code,
+        "contentMode": content_mode,
+        "contentUnavailable": content_unavailable,
+        "contentMessage": content_message,
     }
 
 

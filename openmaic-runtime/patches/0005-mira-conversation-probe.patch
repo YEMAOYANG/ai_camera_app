@@ -1,0 +1,292 @@
+From ad751892f67f7e9bffc396b25cefc471e53e9837 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 05/37] 0005-mira-conversation-probe
+
+---
+ app/api/chat/route.ts                         |  19 +++
+ app/api/transcription/route.ts                |  16 ++-
+ lib/server/mira-conversation-probe.ts         |  46 ++++++
+ .../server/conversation-probe-routes.test.ts  | 132 ++++++++++++++++++
+ 4 files changed, 212 insertions(+), 1 deletion(-)
+ create mode 100644 lib/server/mira-conversation-probe.ts
+ create mode 100644 tests/server/conversation-probe-routes.test.ts
+
+diff --git a/app/api/chat/route.ts b/app/api/chat/route.ts
+index a148684..8f88cf3 100644
+--- a/app/api/chat/route.ts
++++ b/app/api/chat/route.ts
+@@ -20,6 +20,10 @@ import { apiError } from '@/lib/server/api-response';
+ import { createLogger } from '@/lib/logger';
+ import { resolveModel } from '@/lib/server/resolve-model';
+ import type { ThinkingConfig } from '@/lib/types/provider';
++import {
++  conversationProbeReceipt,
++  readMiraConversationProbe,
++} from '@/lib/server/mira-conversation-probe';
+ const log = createLogger('Chat API');
+ 
+ // Allow streaming responses up to 60 seconds
+@@ -51,6 +55,21 @@ export async function POST(req: NextRequest) {
+     chatModel = body.model;
+     chatMessageCount = body.messages?.length;
+ 
++    const probe = readMiraConversationProbe(req.headers);
++    if (probe) {
++      const stageId = String((body as StatelessChatRequest & { stageId?: string }).stageId || '');
++      if (stageId !== probe.classroomId) {
++        return apiError('INVALID_REQUEST', 403, 'Mira conversation probe classroom mismatch');
++      }
++      const receipt = conversationProbeReceipt(probe, 'text-chat');
++      return new Response(`event: mira-verification\ndata: ${JSON.stringify(receipt)}\n\n`, {
++        headers: {
++          'Content-Type': 'text/event-stream',
++          'Cache-Control': 'no-store',
++        },
++      });
++    }
++
+     // Validate required fields
+     if (!body.messages || !Array.isArray(body.messages)) {
+       return apiError('MISSING_REQUIRED_FIELD', 400, 'Missing required field: messages');
+diff --git a/app/api/transcription/route.ts b/app/api/transcription/route.ts
+index 400470c..c9a2964 100644
+--- a/app/api/transcription/route.ts
++++ b/app/api/transcription/route.ts
+@@ -18,6 +18,10 @@ import {
+   getMiraAsrPolicy,
+   isMiraRuntimeRequest,
+ } from '@/lib/server/mira-asr-policy';
++import {
++  conversationProbeReceipt,
++  readMiraConversationProbe,
++} from '@/lib/server/mira-conversation-probe';
+ const log = createLogger('Transcription');
+ 
+ export const maxDuration = 60;
+@@ -27,6 +31,7 @@ export async function POST(req: NextRequest) {
+   let resolvedModelId: string | undefined;
+   const miraRuntime = isMiraRuntimeRequest(req.headers);
+   try {
++    const probe = readMiraConversationProbe(req.headers);
+     const formData = await req.formData();
+     const audioFile = formData.get('audio') as File;
+     const providerId = formData.get('providerId') as ASRProviderId | null;
+@@ -38,7 +43,7 @@ export async function POST(req: NextRequest) {
+     const apiKey = formData.get('apiKey') as string | null;
+     const baseUrl = formData.get('baseUrl') as string | null;
+ 
+-    if (!audioFile) {
++    if (!(audioFile instanceof File) || audioFile.size <= 0) {
+       return apiError('MISSING_REQUIRED_FIELD', 400, 'Audio file is required');
+     }
+ 
+@@ -59,6 +64,15 @@ export async function POST(req: NextRequest) {
+       }
+       resolvedProviderId = policy.providerId;
+       resolvedModelId = policy.modelId;
++      if (probe) {
++        return apiSuccess({
++          proof: {
++            ...conversationProbeReceipt(probe, 'transcription'),
++            credentialSource: 'server',
++            asrPolicy: policy,
++          },
++        });
++      }
+       const result = await transcribeAudio(
+         {
+           providerId: policy.providerId,
+diff --git a/lib/server/mira-conversation-probe.ts b/lib/server/mira-conversation-probe.ts
+new file mode 100644
+index 0000000..2f6b05a
+--- /dev/null
++++ b/lib/server/mira-conversation-probe.ts
+@@ -0,0 +1,46 @@
++export const MIRA_CONVERSATION_PROOF_SCHEMA = 'mira.openmaic.conversation-proof.v1' as const;
++
++export interface MiraConversationProbe {
++  purpose: 'conversation_probe';
++  runtimeSessionId: string;
++  classroomId: string;
++  challenge: string;
++}
++
++const SAFE_ID = /^[A-Za-z0-9_-]{1,255}$/;
++const SAFE_CHALLENGE = /^[A-Za-z0-9_-]{20,128}$/;
++
++export function readMiraConversationProbe(headers: Headers): MiraConversationProbe | null {
++  if (headers.get('x-mira-runtime-purpose') !== 'conversation_probe') return null;
++  const runtimeSessionId = headers.get('x-mira-runtime-session') || '';
++  const classroomId = headers.get('x-mira-runtime-classroom-id') || '';
++  const challenge = headers.get('x-mira-verification-challenge') || '';
++  if (
++    !SAFE_ID.test(runtimeSessionId) ||
++    !SAFE_ID.test(classroomId) ||
++    !SAFE_CHALLENGE.test(challenge)
++  ) {
++    throw new Error('Invalid Mira conversation probe attestation');
++  }
++  return {
++    purpose: 'conversation_probe',
++    runtimeSessionId,
++    classroomId,
++    challenge,
++  };
++}
++
++export function conversationProbeReceipt(
++  probe: MiraConversationProbe,
++  route: 'text-chat' | 'transcription',
++) {
++  return {
++    schemaVersion: MIRA_CONVERSATION_PROOF_SCHEMA,
++    challenge: probe.challenge,
++    runtimeSessionId: probe.runtimeSessionId,
++    classroomId: probe.classroomId,
++    route,
++    authenticated: true,
++    providerCall: false,
++  } as const;
++}
+diff --git a/tests/server/conversation-probe-routes.test.ts b/tests/server/conversation-probe-routes.test.ts
+new file mode 100644
+index 0000000..61eae75
+--- /dev/null
++++ b/tests/server/conversation-probe-routes.test.ts
+@@ -0,0 +1,132 @@
++import { NextRequest } from 'next/server';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++const mocks = vi.hoisted(() => ({
++  resolveModel: vi.fn(),
++  statelessGenerate: vi.fn(),
++  transcribeAudio: vi.fn(),
++  resolveASRApiKey: vi.fn(),
++  resolveASRBaseUrl: vi.fn(),
++}));
++
++vi.mock('@/lib/server/resolve-model', () => ({ resolveModel: mocks.resolveModel }));
++vi.mock('@/lib/orchestration/stateless-generate', () => ({
++  statelessGenerate: mocks.statelessGenerate,
++}));
++vi.mock('@/lib/audio/asr-providers', () => ({ transcribeAudio: mocks.transcribeAudio }));
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerASRProviders: () => ({ 'qwen-asr': {} }),
++  isServerConfiguredProvider: () => true,
++  resolveASRApiKey: mocks.resolveASRApiKey,
++  resolveASRBaseUrl: mocks.resolveASRBaseUrl,
++}));
++
++const challenge = 'ompc_abcdefghijklmnopqrstuvwxyz012345';
++const probeHeaders = {
++  'x-mira-runtime-purpose': 'conversation_probe',
++  'x-mira-runtime-session': 'probe-session-a',
++  'x-mira-runtime-classroom-id': 'classroom-a',
++  'x-mira-verification-challenge': challenge,
++};
++
++describe('authenticated conversation probe fast paths', () => {
++  beforeEach(() => {
++    process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR = '1';
++    process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL = 'qwen3-asr-flash';
++    for (const mock of Object.values(mocks)) mock.mockReset();
++  });
++
++  afterEach(() => {
++    delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR;
++    delete process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL;
++  });
++
++  it('returns a session/classroom-bound chat SSE receipt without resolving or calling a model', async () => {
++    const { POST } = await import('@/app/api/chat/route');
++    const response = await POST(
++      new NextRequest('http://localhost/api/chat', {
++        method: 'POST',
++        headers: { ...probeHeaders, 'content-type': 'application/json' },
++        body: JSON.stringify({ stageId: 'classroom-a' }),
++      }),
++    );
++    const stream = await response.text();
++
++    expect(response.status).toBe(200);
++    expect(response.headers.get('content-type')).toContain('text/event-stream');
++    expect(stream).toContain('event: mira-verification');
++    const data = JSON.parse(stream.match(/^data: (.+)$/m)?.[1] || '{}');
++    expect(data).toEqual({
++      schemaVersion: 'mira.openmaic.conversation-proof.v1',
++      challenge,
++      runtimeSessionId: 'probe-session-a',
++      classroomId: 'classroom-a',
++      route: 'text-chat',
++      authenticated: true,
++      providerCall: false,
++    });
++    expect(mocks.resolveModel).not.toHaveBeenCalled();
++    expect(mocks.statelessGenerate).not.toHaveBeenCalled();
++  });
++
++  it('attests the server-owned Qwen policy from multipart without credentials or ASR calls', async () => {
++    const form = new FormData();
++    form.set('audio', new File(['silent-audio'], 'probe.webm', { type: 'audio/webm' }));
++    form.set('language', 'zh');
++    const { POST } = await import('@/app/api/transcription/route');
++    const response = await POST(
++      new NextRequest('http://localhost/api/transcription', {
++        method: 'POST',
++        headers: probeHeaders,
++        body: form,
++      }),
++    );
++    const body = await response.json();
++
++    expect(response.status).toBe(200);
++    expect(body.proof).toEqual({
++      schemaVersion: 'mira.openmaic.conversation-proof.v1',
++      challenge,
++      runtimeSessionId: 'probe-session-a',
++      classroomId: 'classroom-a',
++      route: 'transcription',
++      authenticated: true,
++      providerCall: false,
++      credentialSource: 'server',
++      asrPolicy: {
++        enforced: true,
++        providerId: 'qwen-asr',
++        modelId: 'qwen3-asr-flash',
++        fallbackAllowed: false,
++      },
++    });
++    expect(mocks.resolveASRApiKey).not.toHaveBeenCalled();
++    expect(mocks.resolveASRBaseUrl).not.toHaveBeenCalled();
++    expect(mocks.transcribeAudio).not.toHaveBeenCalled();
++  });
++
++  it.each([
++    ['providerId', 'browser-native'],
++    ['modelId', 'attacker-model'],
++    ['apiKey', 'attacker-key'],
++    ['baseUrl', 'https://attacker.invalid'],
++  ])('rejects probe client override %s without touching ASR', async (field, value) => {
++    const form = new FormData();
++    form.set('audio', new File(['silent-audio'], 'probe.webm', { type: 'audio/webm' }));
++    form.set(field, value);
++    const { POST } = await import('@/app/api/transcription/route');
++    const response = await POST(
++      new NextRequest('http://localhost/api/transcription', {
++        method: 'POST',
++        headers: probeHeaders,
++        body: form,
++      }),
++    );
++    const body = await response.json();
++
++    expect(response.status).toBe(400);
++    expect(body.errorCode).toBe('INVALID_REQUEST');
++    expect(body.error).toBe('Mira runtime ASR provider configuration is server-owned');
++    expect(mocks.transcribeAudio).not.toHaveBeenCalled();
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

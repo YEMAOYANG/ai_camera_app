@@ -1,0 +1,276 @@
+diff --git a/lib/server/mira-courseware-provider.ts b/lib/server/mira-courseware-provider.ts
+--- a/lib/server/mira-courseware-provider.ts
++++ b/lib/server/mira-courseware-provider.ts
+@@ -29,6 +29,10 @@ const PHASES = new Set([
+ const MAX_PROMPT_CHARS = 200_000;
+ const MAX_SCHEMA_BYTES = 128_000;
+ const COURSEWARE_THINKING_DISABLED = { mode: 'disabled', enabled: false } as const;
++const COURSEWARE_CALL_TIMEOUT_MS = 300_000;
++const RATE_LIMIT_RETRY_COUNT = 1;
++const DEFAULT_RATE_LIMIT_RETRY_AFTER_SECONDS = 30;
++const MAX_RATE_LIMIT_RETRY_AFTER_SECONDS = 30;
+ 
+ export class MiraCoursewareProviderError extends Error {
+   constructor(
+@@ -45,6 +49,63 @@ export class MiraCoursewareProviderError extends Error {
+   }
+ }
+ 
++function headerValue(source: unknown, name: string): string | null {
++  if (!source || typeof source !== 'object') return null;
++  const getter = (source as { get?: unknown }).get;
++  if (typeof getter === 'function') {
++    try {
++      const value = getter.call(source, name);
++      return typeof value === 'string' && value.trim() ? value.trim() : null;
++    } catch {
++      return null;
++    }
++  }
++  const record = source as Record<string, unknown>;
++  const value = record[name]
++    ?? record[name.toLowerCase()]
++    ?? record[name.toUpperCase()]
++    ?? record['Retry-After'];
++  return typeof value === 'string' && value.trim() ? value.trim() : null;
++}
++
++function providerRetryAfterSeconds(error: unknown, seen = new Set<unknown>()): number | null {
++  if (!error || seen.has(error) || typeof error !== 'object') return null;
++  seen.add(error);
++  const record = error as Record<string, unknown>;
++  const response = record.response && typeof record.response === 'object'
++    ? record.response as Record<string, unknown>
++    : null;
++  const raw = headerValue(record.responseHeaders, 'retry-after')
++    ?? headerValue(record.headers, 'retry-after')
++    ?? headerValue(response?.headers, 'retry-after');
++  if (raw !== null && /^[0-9]{1,6}$/.test(raw)) {
++    return Math.min(Number.parseInt(raw, 10), MAX_RATE_LIMIT_RETRY_AFTER_SECONDS);
++  }
++  const nested = [record.cause, record.lastError];
++  if (Array.isArray(record.errors)) nested.push(...record.errors);
++  for (const candidate of nested) {
++    const retryAfter = providerRetryAfterSeconds(candidate, seen);
++    if (retryAfter !== null) return retryAfter;
++  }
++  return null;
++}
++
++async function waitForRateLimitRetry(milliseconds: number, signal: AbortSignal): Promise<void> {
++  if (milliseconds <= 0) return;
++  if (signal.aborted) throw signal.reason;
++  await new Promise<void>((resolve, reject) => {
++    const timer = setTimeout(() => {
++      signal.removeEventListener('abort', onAbort);
++      resolve();
++    }, milliseconds);
++    const onAbort = () => {
++      clearTimeout(timer);
++      reject(signal.reason);
++    };
++    signal.addEventListener('abort', onAbort, { once: true });
++  });
++}
++
+ function providerStatus(error: unknown, seen = new Set<unknown>()): number | null {
+   if (!error || seen.has(error)) return null;
+   seen.add(error);
+@@ -182,63 +243,86 @@ export async function executeMiraCoursewareProvider(
+     );
+   }
+ 
+-  try {
+-    const responseFormat = responseJsonSchema
+-      ? {
+-          type: 'json' as const,
+-          schema: responseJsonSchema as never,
+-          name: `mira_courseware_${phase}`,
+-        }
+-      : { type: 'json' as const };
+-    const coursewareModel = wrapLanguageModel({
+-      model: resolved.model as Parameters<typeof wrapLanguageModel>[0]['model'],
+-      middleware: defaultSettingsMiddleware({ settings: { responseFormat } }),
+-    });
+-    const result = await callLLM(
+-      {
+-        model: coursewareModel,
+-        messages: [
+-          { role: 'system', content: systemPrompt },
+-          { role: 'user', content: userPrompt },
+-        ],
+-        temperature: 0.6,
+-        maxOutputTokens: Math.min(resolved.modelInfo?.outputWindow || 8_000, 8_000),
+-        maxRetries: 0,
+-        abortSignal: AbortSignal.timeout(300_000),
+-      },
+-      'mira-courseware-provider',
+-      undefined,
+-      COURSEWARE_THINKING_DISABLED,
+-    );
+-    const content = result.text.trim();
+-    if (!content) {
+-      throw new MiraCoursewareProviderError('provider_failed', 'Provider returned no content');
+-    }
+-    const usage = result.totalUsage ?? result.usage;
+-    const inputTokens = tokenCount(usage?.inputTokens);
+-    const outputTokens = tokenCount(usage?.outputTokens);
+-    const responseId = String(result.response?.id || '');
+-    const providerRequestIdHash = createHash('sha256')
+-      .update(`${requestId}:${phase}:${responseId || content.length}`)
+-      .digest('hex');
+-    return {
+-      schemaVersion: MIRA_COURSEWARE_PROVIDER_SCHEMA,
+-      requestId,
+-      phase,
+-      content,
+-      providerRequestIdHash,
+-      inputTokens,
+-      outputTokens,
+-      billingEvidence: inputTokens !== null || outputTokens !== null ? 'reported' : 'unknown',
+-    };
+-  } catch (error) {
+-    if (error instanceof MiraCoursewareProviderError) throw error;
+-    if (isDefinitiveProviderRejection(error)) {
+-      throw new MiraCoursewareProviderError(
+-        'provider_rejected',
+-        'Courseware Provider rejected the request',
++  const responseFormat = responseJsonSchema
++    ? {
++        type: 'json' as const,
++        schema: responseJsonSchema as never,
++        name: `mira_courseware_${phase}`,
++      }
++    : { type: 'json' as const };
++  const coursewareModel = wrapLanguageModel({
++    model: resolved.model as Parameters<typeof wrapLanguageModel>[0]['model'],
++    middleware: defaultSettingsMiddleware({ settings: { responseFormat } }),
++  });
++  const abortSignal = AbortSignal.timeout(COURSEWARE_CALL_TIMEOUT_MS);
++  for (let attempt = 0; attempt <= RATE_LIMIT_RETRY_COUNT; attempt += 1) {
++    try {
++      const result = await callLLM(
++        {
++          model: coursewareModel,
++          messages: [
++            { role: 'system', content: systemPrompt },
++            { role: 'user', content: userPrompt },
++          ],
++          temperature: 0.6,
++          maxOutputTokens: Math.min(resolved.modelInfo?.outputWindow || 8_000, 8_000),
++          maxRetries: 0,
++          abortSignal,
++        },
++        'mira-courseware-provider',
++        undefined,
++        COURSEWARE_THINKING_DISABLED,
+       );
++      const content = result.text.trim();
++      if (!content) {
++        throw new MiraCoursewareProviderError('provider_failed', 'Provider returned no content');
++      }
++      const usage = result.totalUsage ?? result.usage;
++      const inputTokens = tokenCount(usage?.inputTokens);
++      const outputTokens = tokenCount(usage?.outputTokens);
++      const responseId = String(result.response?.id || '');
++      const providerRequestIdHash = createHash('sha256')
++        .update(`${requestId}:${phase}:${responseId || content.length}`)
++        .digest('hex');
++      return {
++        schemaVersion: MIRA_COURSEWARE_PROVIDER_SCHEMA,
++        requestId,
++        phase,
++        content,
++        providerRequestIdHash,
++        inputTokens,
++        outputTokens,
++        billingEvidence: inputTokens !== null || outputTokens !== null ? 'reported' : 'unknown',
++      };
++    } catch (error) {
++      if (error instanceof MiraCoursewareProviderError) throw error;
++      if (providerStatus(error) === 429) {
++        const retryAfterSeconds = providerRetryAfterSeconds(error)
++          ?? DEFAULT_RATE_LIMIT_RETRY_AFTER_SECONDS;
++        if (attempt < RATE_LIMIT_RETRY_COUNT) {
++          try {
++            await waitForRateLimitRetry(retryAfterSeconds * 1_000, abortSignal);
++          } catch {
++            throw new MiraCoursewareProviderError(
++              'provider_failed',
++              'Courseware Provider call failed',
++            );
++          }
++          continue;
++        }
++        throw new MiraCoursewareProviderError(
++          'provider_rejected',
++          'Courseware Provider rejected the request',
++        );
++      }
++      if (isDefinitiveProviderRejection(error)) {
++        throw new MiraCoursewareProviderError(
++          'provider_rejected',
++          'Courseware Provider rejected the request',
++        );
++      }
++      throw new MiraCoursewareProviderError('provider_failed', 'Courseware Provider call failed');
+     }
+-    throw new MiraCoursewareProviderError('provider_failed', 'Courseware Provider call failed');
+   }
++  throw new MiraCoursewareProviderError('provider_failed', 'Courseware Provider call failed');
+ }
+diff --git a/tests/server/mira-courseware-provider.test.ts b/tests/server/mira-courseware-provider.test.ts
+--- a/tests/server/mira-courseware-provider.test.ts
++++ b/tests/server/mira-courseware-provider.test.ts
+@@ -121,9 +121,49 @@ describe('Mira OpenMAIC courseware Provider boundary', () => {
+     expect(mocks.callLLM).not.toHaveBeenCalled();
+   });
+ 
+-  it('classifies a provider 4xx as a definitive rejection without retrying', async () => {
++  it('retries one explicit provider 429 under the same timeout authority', async () => {
++    mocks.callLLM
++      .mockRejectedValueOnce(Object.assign(new Error('rate limited'), {
++        statusCode: 429,
++        responseHeaders: { 'retry-after': '0' },
++      }))
++      .mockResolvedValueOnce({
++        text: '{"phaseStatus":"accepted"}',
++        totalUsage: { inputTokens: 10, outputTokens: 5 },
++        response: { id: 'provider-response-after-429' },
++      });
++    const { executeMiraCoursewareProvider } = await import(
++      '@/lib/server/mira-courseware-provider'
++    );
++
++    await expect(executeMiraCoursewareProvider(request())).resolves.toMatchObject({
++      content: '{"phaseStatus":"accepted"}',
++    });
++    expect(mocks.callLLM).toHaveBeenCalledTimes(2);
++    const firstSignal = mocks.callLLM.mock.calls[0][0].abortSignal;
++    expect(mocks.callLLM.mock.calls[1][0].abortSignal).toBe(firstSignal);
++  });
++
++  it('keeps a repeated provider 429 terminal after the single safe retry', async () => {
++    mocks.callLLM.mockRejectedValue(
++      Object.assign(new Error('rate limited'), {
++        statusCode: 429,
++        responseHeaders: { 'retry-after': '0' },
++      }),
++    );
++    const { executeMiraCoursewareProvider } = await import(
++      '@/lib/server/mira-courseware-provider'
++    );
++
++    await expect(executeMiraCoursewareProvider(request())).rejects.toMatchObject({
++      code: 'provider_rejected',
++    });
++    expect(mocks.callLLM).toHaveBeenCalledTimes(2);
++  });
++
++  it('keeps non-rate-limit provider 4xx definitive and does not retry', async () => {
+     mocks.callLLM.mockRejectedValueOnce(
+-      Object.assign(new Error('provider rejected request'), { statusCode: 429 }),
++      Object.assign(new Error('provider rejected request'), { statusCode: 422 }),
+     );
+     const { executeMiraCoursewareProvider } = await import(
+       '@/lib/server/mira-courseware-provider'

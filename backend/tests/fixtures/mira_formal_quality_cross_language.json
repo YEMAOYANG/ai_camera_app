@@ -1,0 +1,825 @@
+{
+  "classroom": {
+    "stage": {
+      "id": "classroom-1",
+      "name": "两位数学习"
+    },
+    "scenes": [
+      {
+        "id": "formal-scene-1",
+        "type": "slide",
+        "title": "第1页",
+        "order": 0,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。",
+          "style": {
+            "fraction": 0.3333333333333333,
+            "width": 120.0,
+            "scale": 1e-07,
+            "offset": -0.0,
+            "large": 1e+21,
+            "decimal": 1e-06,
+            "😀": "astral",
+            "": "bmp",
+            "中文": "字体",
+            "10": "ten",
+            "2": "two",
+            "01": "leading",
+            "_key": "underscore",
+            "A": "upper",
+            "a": "lower"
+          }
+        },
+        "actions": [
+          {
+            "id": "speech-1",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。",
+            "audioUrl": "/audio.wav",
+            "audioDuration": 3.25,
+            "duration": 3250,
+            "ttsProvider": "qwen"
+          }
+        ]
+      },
+      {
+        "id": "formal-scene-2",
+        "type": "slide",
+        "title": "第2页",
+        "order": 1,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。"
+        },
+        "actions": [
+          {
+            "id": "speech-2",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。"
+          }
+        ]
+      },
+      {
+        "id": "formal-scene-3",
+        "type": "slide",
+        "title": "第3页",
+        "order": 2,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。"
+        },
+        "actions": [
+          {
+            "id": "speech-3",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。"
+          }
+        ]
+      },
+      {
+        "id": "formal-scene-4",
+        "type": "slide",
+        "title": "第4页",
+        "order": 3,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。"
+        },
+        "actions": [
+          {
+            "id": "speech-4",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。"
+          }
+        ]
+      },
+      {
+        "id": "formal-scene-5",
+        "type": "slide",
+        "title": "第5页",
+        "order": 4,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。"
+        },
+        "actions": [
+          {
+            "id": "speech-5",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。"
+          }
+        ]
+      },
+      {
+        "id": "formal-scene-6",
+        "type": "quiz",
+        "title": "第6页",
+        "order": 5,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。",
+          "questions": [
+            {
+              "id": "q2",
+              "question": "题目2",
+              "type": "single",
+              "hasAnswer": false,
+              "options": [
+                {
+                  "value": "a",
+                  "label": "11"
+                },
+                {
+                  "value": "b",
+                  "label": "12"
+                }
+              ]
+            },
+            {
+              "id": "q3",
+              "question": "题目3",
+              "type": "single",
+              "hasAnswer": false,
+              "options": [
+                {
+                  "value": "a",
+                  "label": "11"
+                },
+                {
+                  "value": "b",
+                  "label": "12"
+                }
+              ]
+            }
+          ]
+        },
+        "actions": [
+          {
+            "id": "speech-6",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。"
+          }
+        ]
+      },
+      {
+        "id": "formal-scene-7",
+        "type": "quiz",
+        "title": "第7页",
+        "order": 6,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。",
+          "questions": [
+            {
+              "id": "q4",
+              "question": "题目4",
+              "type": "single",
+              "hasAnswer": false,
+              "options": [
+                {
+                  "value": "a",
+                  "label": "11"
+                },
+                {
+                  "value": "b",
+                  "label": "12"
+                }
+              ]
+            },
+            {
+              "id": "q5",
+              "question": "题目5",
+              "type": "single",
+              "hasAnswer": false,
+              "options": [
+                {
+                  "value": "a",
+                  "label": "11"
+                },
+                {
+                  "value": "b",
+                  "label": "12"
+                }
+              ]
+            }
+          ]
+        },
+        "actions": [
+          {
+            "id": "speech-7",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。"
+          }
+        ]
+      },
+      {
+        "id": "formal-scene-8",
+        "type": "interactive",
+        "title": "第8页",
+        "order": 7,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。",
+          "html": "<div style=\"width:1000px\">十个一是一个十</div>"
+        },
+        "actions": [
+          {
+            "id": "speech-8",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。"
+          }
+        ]
+      },
+      {
+        "id": "formal-scene-9",
+        "type": "interactive",
+        "title": "第9页",
+        "order": 8,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。",
+          "html": "<div style=\"width:1000px\">十个一是一个十</div>"
+        },
+        "actions": [
+          {
+            "id": "speech-9",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。"
+          }
+        ]
+      },
+      {
+        "id": "formal-scene-10",
+        "type": "interactive",
+        "title": "第10页",
+        "order": 9,
+        "content": {
+          "text": "十个一是一个十。请比较不同数量。",
+          "html": "<div style=\"width:1000px\">十个一是一个十</div>"
+        },
+        "actions": [
+          {
+            "id": "speech-10",
+            "type": "speech",
+            "text": "十个一是一个十。请比较不同数量。"
+          }
+        ]
+      }
+    ]
+  },
+  "reviewIdentity": {
+    "snapshotSha256": "5beeb353f2398cf51ff62b36447803e8c804d1e4591c6fccc68df7c7afee4287",
+    "gradeBoundarySha256": "9c51d98e3db632bf8e39d7a8825ab1faf10dad289a8d5b7a57ccc959b4f7ba13",
+    "selectionPlanSha256": "15ee7e140737152eb3c6918c42b64d693f71c44b6bed079da7f33803f9fab0c7",
+    "teachingBriefSha256": "d405738d031032d9e655d21c521971b79a6c76f87032482b02df98bceb06ac66",
+    "renderChecks": [
+      {
+        "sceneId": "formal-scene-1",
+        "sceneSha256": "a8323b2ec9b845f1d916289e79a7af7b06ed00d00a98aeb44835706f516b6da5",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-1",
+        "sceneSha256": "a8323b2ec9b845f1d916289e79a7af7b06ed00d00a98aeb44835706f516b6da5",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-2",
+        "sceneSha256": "af56e341ad1636ae4321d3f9895a5e31121bad5df3697a4dd29a621d00b3bdf4",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-2",
+        "sceneSha256": "af56e341ad1636ae4321d3f9895a5e31121bad5df3697a4dd29a621d00b3bdf4",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-3",
+        "sceneSha256": "cc6c6a90a27e92b0cabe79d5ce19eaa22d1b7435b96a1b45b86dd2762edf0910",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-3",
+        "sceneSha256": "cc6c6a90a27e92b0cabe79d5ce19eaa22d1b7435b96a1b45b86dd2762edf0910",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-4",
+        "sceneSha256": "ab733de5c1f59f18538ce939e1ecb6af0edd27b5728f3ca7c0037089c9e052c3",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-4",
+        "sceneSha256": "ab733de5c1f59f18538ce939e1ecb6af0edd27b5728f3ca7c0037089c9e052c3",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-5",
+        "sceneSha256": "00612591a636910a853f8a716b29fb4087adf5de906c3c25725b1d20e0eec6ca",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-5",
+        "sceneSha256": "00612591a636910a853f8a716b29fb4087adf5de906c3c25725b1d20e0eec6ca",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-6",
+        "sceneSha256": "47b6b2b312e19ef9ac4dbdc8555064f42415986bf00d46b9f3036efa4033225b",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-6",
+        "sceneSha256": "47b6b2b312e19ef9ac4dbdc8555064f42415986bf00d46b9f3036efa4033225b",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-7",
+        "sceneSha256": "2fe53279aece8cd483f2ee4faa15aafa5f94b4d85692c9ac35d242581b12f674",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-7",
+        "sceneSha256": "2fe53279aece8cd483f2ee4faa15aafa5f94b4d85692c9ac35d242581b12f674",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 0
+      },
+      {
+        "sceneId": "formal-scene-8",
+        "sceneSha256": "2b0228222d411d750d6debcc879c30981cf131de6179106f78099dfb19c41b96",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 1
+      },
+      {
+        "sceneId": "formal-scene-8",
+        "sceneSha256": "2b0228222d411d750d6debcc879c30981cf131de6179106f78099dfb19c41b96",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 1
+      },
+      {
+        "sceneId": "formal-scene-9",
+        "sceneSha256": "86c8a18ff7c65692e6c0d45960caa0a6bf22acfab59ae6c9d30ee34160fdef02",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 1
+      },
+      {
+        "sceneId": "formal-scene-9",
+        "sceneSha256": "86c8a18ff7c65692e6c0d45960caa0a6bf22acfab59ae6c9d30ee34160fdef02",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 1
+      },
+      {
+        "sceneId": "formal-scene-10",
+        "sceneSha256": "baf2f7f412de56ef9bd82bc19f4bc2dc053146db2aa03b6646900246d19699da",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 1
+      },
+      {
+        "sceneId": "formal-scene-10",
+        "sceneSha256": "baf2f7f412de56ef9bd82bc19f4bc2dc053146db2aa03b6646900246d19699da",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "screenshotSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "domSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "passed": true,
+        "probeCount": 1
+      }
+    ]
+  },
+  "expected": {
+    "snapshot": {
+      "stage": {
+        "id": "classroom-1",
+        "name": "两位数学习"
+      },
+      "scenes": [
+        {
+          "id": "formal-scene-1",
+          "type": "slide",
+          "title": "第1页",
+          "order": 0,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。",
+            "style": {
+              "fraction": 0.3333333333333333,
+              "width": 120.0,
+              "scale": 1e-07,
+              "offset": -0.0,
+              "large": 1e+21,
+              "decimal": 1e-06,
+              "😀": "astral",
+              "": "bmp",
+              "中文": "字体",
+              "10": "ten",
+              "2": "two",
+              "01": "leading",
+              "_key": "underscore",
+              "A": "upper",
+              "a": "lower"
+            }
+          },
+          "actions": [
+            {
+              "id": "speech-1",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        },
+        {
+          "id": "formal-scene-2",
+          "type": "slide",
+          "title": "第2页",
+          "order": 1,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。"
+          },
+          "actions": [
+            {
+              "id": "speech-2",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        },
+        {
+          "id": "formal-scene-3",
+          "type": "slide",
+          "title": "第3页",
+          "order": 2,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。"
+          },
+          "actions": [
+            {
+              "id": "speech-3",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        },
+        {
+          "id": "formal-scene-4",
+          "type": "slide",
+          "title": "第4页",
+          "order": 3,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。"
+          },
+          "actions": [
+            {
+              "id": "speech-4",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        },
+        {
+          "id": "formal-scene-5",
+          "type": "slide",
+          "title": "第5页",
+          "order": 4,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。"
+          },
+          "actions": [
+            {
+              "id": "speech-5",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        },
+        {
+          "id": "formal-scene-6",
+          "type": "quiz",
+          "title": "第6页",
+          "order": 5,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。",
+            "questions": [
+              {
+                "id": "q2",
+                "question": "题目2",
+                "type": "single",
+                "hasAnswer": false,
+                "options": [
+                  {
+                    "value": "a",
+                    "label": "11"
+                  },
+                  {
+                    "value": "b",
+                    "label": "12"
+                  }
+                ]
+              },
+              {
+                "id": "q3",
+                "question": "题目3",
+                "type": "single",
+                "hasAnswer": false,
+                "options": [
+                  {
+                    "value": "a",
+                    "label": "11"
+                  },
+                  {
+                    "value": "b",
+                    "label": "12"
+                  }
+                ]
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "speech-6",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        },
+        {
+          "id": "formal-scene-7",
+          "type": "quiz",
+          "title": "第7页",
+          "order": 6,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。",
+            "questions": [
+              {
+                "id": "q4",
+                "question": "题目4",
+                "type": "single",
+                "hasAnswer": false,
+                "options": [
+                  {
+                    "value": "a",
+                    "label": "11"
+                  },
+                  {
+                    "value": "b",
+                    "label": "12"
+                  }
+                ]
+              },
+              {
+                "id": "q5",
+                "question": "题目5",
+                "type": "single",
+                "hasAnswer": false,
+                "options": [
+                  {
+                    "value": "a",
+                    "label": "11"
+                  },
+                  {
+                    "value": "b",
+                    "label": "12"
+                  }
+                ]
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "speech-7",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        },
+        {
+          "id": "formal-scene-8",
+          "type": "interactive",
+          "title": "第8页",
+          "order": 7,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。",
+            "html": "<div style=\"width:1000px\">十个一是一个十</div>"
+          },
+          "actions": [
+            {
+              "id": "speech-8",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        },
+        {
+          "id": "formal-scene-9",
+          "type": "interactive",
+          "title": "第9页",
+          "order": 8,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。",
+            "html": "<div style=\"width:1000px\">十个一是一个十</div>"
+          },
+          "actions": [
+            {
+              "id": "speech-9",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        },
+        {
+          "id": "formal-scene-10",
+          "type": "interactive",
+          "title": "第10页",
+          "order": 9,
+          "content": {
+            "text": "十个一是一个十。请比较不同数量。",
+            "html": "<div style=\"width:1000px\">十个一是一个十</div>"
+          },
+          "actions": [
+            {
+              "id": "speech-10",
+              "type": "speech",
+              "text": "十个一是一个十。请比较不同数量。"
+            }
+          ]
+        }
+      ]
+    },
+    "snapshotSha256": "5beeb353f2398cf51ff62b36447803e8c804d1e4591c6fccc68df7c7afee4287",
+    "sceneHashes": [
+      {
+        "sceneId": "formal-scene-1",
+        "sceneSha256": "a8323b2ec9b845f1d916289e79a7af7b06ed00d00a98aeb44835706f516b6da5"
+      },
+      {
+        "sceneId": "formal-scene-2",
+        "sceneSha256": "af56e341ad1636ae4321d3f9895a5e31121bad5df3697a4dd29a621d00b3bdf4"
+      },
+      {
+        "sceneId": "formal-scene-3",
+        "sceneSha256": "cc6c6a90a27e92b0cabe79d5ce19eaa22d1b7435b96a1b45b86dd2762edf0910"
+      },
+      {
+        "sceneId": "formal-scene-4",
+        "sceneSha256": "ab733de5c1f59f18538ce939e1ecb6af0edd27b5728f3ca7c0037089c9e052c3"
+      },
+      {
+        "sceneId": "formal-scene-5",
+        "sceneSha256": "00612591a636910a853f8a716b29fb4087adf5de906c3c25725b1d20e0eec6ca"
+      },
+      {
+        "sceneId": "formal-scene-6",
+        "sceneSha256": "47b6b2b312e19ef9ac4dbdc8555064f42415986bf00d46b9f3036efa4033225b"
+      },
+      {
+        "sceneId": "formal-scene-7",
+        "sceneSha256": "2fe53279aece8cd483f2ee4faa15aafa5f94b4d85692c9ac35d242581b12f674"
+      },
+      {
+        "sceneId": "formal-scene-8",
+        "sceneSha256": "2b0228222d411d750d6debcc879c30981cf131de6179106f78099dfb19c41b96"
+      },
+      {
+        "sceneId": "formal-scene-9",
+        "sceneSha256": "86c8a18ff7c65692e6c0d45960caa0a6bf22acfab59ae6c9d30ee34160fdef02"
+      },
+      {
+        "sceneId": "formal-scene-10",
+        "sceneSha256": "baf2f7f412de56ef9bd82bc19f4bc2dc053146db2aa03b6646900246d19699da"
+      }
+    ],
+    "sceneTexts": {
+      "formal-scene-1": "leading\nten\ntwo\nupper\nunderscore\nlower\n字体\nastral\nbmp\n十个一是一个十。请比较不同数量。\nspeech-1\n十个一是一个十。请比较不同数量。\nspeech",
+      "formal-scene-2": "十个一是一个十。请比较不同数量。\nspeech-2\n十个一是一个十。请比较不同数量。\nspeech",
+      "formal-scene-3": "十个一是一个十。请比较不同数量。\nspeech-3\n十个一是一个十。请比较不同数量。\nspeech",
+      "formal-scene-4": "十个一是一个十。请比较不同数量。\nspeech-4\n十个一是一个十。请比较不同数量。\nspeech",
+      "formal-scene-5": "十个一是一个十。请比较不同数量。\nspeech-5\n十个一是一个十。请比较不同数量。\nspeech",
+      "formal-scene-6": "q2\n11\na\n12\nb\n题目2\nsingle\nq3\n11\na\n12\nb\n题目3\nsingle\n十个一是一个十。请比较不同数量。\nspeech-6\n十个一是一个十。请比较不同数量。\nspeech",
+      "formal-scene-7": "q4\n11\na\n12\nb\n题目4\nsingle\nq5\n11\na\n12\nb\n题目5\nsingle\n十个一是一个十。请比较不同数量。\nspeech-7\n十个一是一个十。请比较不同数量。\nspeech",
+      "formal-scene-8": "<div style=\"width:1000px\">十个一是一个十</div>\n十个一是一个十。请比较不同数量。\nspeech-8\n十个一是一个十。请比较不同数量。\nspeech",
+      "formal-scene-9": "<div style=\"width:1000px\">十个一是一个十</div>\n十个一是一个十。请比较不同数量。\nspeech-9\n十个一是一个十。请比较不同数量。\nspeech",
+      "formal-scene-10": "<div style=\"width:1000px\">十个一是一个十</div>\n十个一是一个十。请比较不同数量。\nspeech-10\n十个一是一个十。请比较不同数量。\nspeech"
+    },
+    "reviewInputSha256": "ae3989c871edbced9924c465a5b13c6b3701cac967061d61f724fde39ca312b3",
+    "canonicalSnapshot": "{\"scenes\":[{\"actions\":[{\"id\":\"speech-1\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"style\":{\"2\":\"two\",\"10\":\"ten\",\"01\":\"leading\",\"A\":\"upper\",\"_key\":\"underscore\",\"a\":\"lower\",\"decimal\":0.000001,\"fraction\":0.3333333333333333,\"large\":1e+21,\"offset\":0,\"scale\":1e-7,\"width\":120,\"中文\":\"字体\",\"😀\":\"astral\",\"\":\"bmp\"},\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-1\",\"order\":0,\"title\":\"第1页\",\"type\":\"slide\"},{\"actions\":[{\"id\":\"speech-2\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-2\",\"order\":1,\"title\":\"第2页\",\"type\":\"slide\"},{\"actions\":[{\"id\":\"speech-3\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-3\",\"order\":2,\"title\":\"第3页\",\"type\":\"slide\"},{\"actions\":[{\"id\":\"speech-4\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-4\",\"order\":3,\"title\":\"第4页\",\"type\":\"slide\"},{\"actions\":[{\"id\":\"speech-5\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-5\",\"order\":4,\"title\":\"第5页\",\"type\":\"slide\"},{\"actions\":[{\"id\":\"speech-6\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"questions\":[{\"hasAnswer\":false,\"id\":\"q2\",\"options\":[{\"label\":\"11\",\"value\":\"a\"},{\"label\":\"12\",\"value\":\"b\"}],\"question\":\"题目2\",\"type\":\"single\"},{\"hasAnswer\":false,\"id\":\"q3\",\"options\":[{\"label\":\"11\",\"value\":\"a\"},{\"label\":\"12\",\"value\":\"b\"}],\"question\":\"题目3\",\"type\":\"single\"}],\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-6\",\"order\":5,\"title\":\"第6页\",\"type\":\"quiz\"},{\"actions\":[{\"id\":\"speech-7\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"questions\":[{\"hasAnswer\":false,\"id\":\"q4\",\"options\":[{\"label\":\"11\",\"value\":\"a\"},{\"label\":\"12\",\"value\":\"b\"}],\"question\":\"题目4\",\"type\":\"single\"},{\"hasAnswer\":false,\"id\":\"q5\",\"options\":[{\"label\":\"11\",\"value\":\"a\"},{\"label\":\"12\",\"value\":\"b\"}],\"question\":\"题目5\",\"type\":\"single\"}],\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-7\",\"order\":6,\"title\":\"第7页\",\"type\":\"quiz\"},{\"actions\":[{\"id\":\"speech-8\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"html\":\"<div style=\\\"width:1000px\\\">十个一是一个十</div>\",\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-8\",\"order\":7,\"title\":\"第8页\",\"type\":\"interactive\"},{\"actions\":[{\"id\":\"speech-9\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"html\":\"<div style=\\\"width:1000px\\\">十个一是一个十</div>\",\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-9\",\"order\":8,\"title\":\"第9页\",\"type\":\"interactive\"},{\"actions\":[{\"id\":\"speech-10\",\"text\":\"十个一是一个十。请比较不同数量。\",\"type\":\"speech\"}],\"content\":{\"html\":\"<div style=\\\"width:1000px\\\">十个一是一个十</div>\",\"text\":\"十个一是一个十。请比较不同数量。\"},\"id\":\"formal-scene-10\",\"order\":9,\"title\":\"第10页\",\"type\":\"interactive\"}],\"stage\":{\"id\":\"classroom-1\",\"name\":\"两位数学习\"}}"
+  }
+}

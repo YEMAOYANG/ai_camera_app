@@ -1,0 +1,58 @@
+From 5072ef7cb838c45caeeba1098b6db19bbdc9bd5a Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:35 +0800
+Subject: [PATCH 30/37] 0030-mira-provider-readiness-type-safety
+
+---
+ lib/server/mira-formal-provider-readiness.ts        | 5 +++--
+ tests/server/mira-formal-provider-readiness.test.ts | 3 ++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/lib/server/mira-formal-provider-readiness.ts b/lib/server/mira-formal-provider-readiness.ts
+index 43625dc..e9e8776 100644
+--- a/lib/server/mira-formal-provider-readiness.ts
++++ b/lib/server/mira-formal-provider-readiness.ts
+@@ -1135,10 +1135,11 @@ export async function recoverMiraFormalProviderReadinessQwenUrl(
+     );
+   }
+   const completedAt = (dependencies.now?.() || new Date()).toISOString();
++  const providerProof = proofFor(record);
+   const completed: MiraFormalProviderReadinessJob = {
+     ...record,
+     state: 'auto_validated',
+-    providerProof: proofFor(record),
++    providerProof,
+     updatedAt: completedAt,
+     completedAt,
+   };
+@@ -1146,7 +1147,7 @@ export async function recoverMiraFormalProviderReadinessQwenUrl(
+   await writeAtomic(recoveryAuditPath(requestId), {
+     ...recoveryAudit,
+     state: 'auto_validated',
+-    resultProviderReceiptSha256: completed.providerProof.receiptSha256,
++    resultProviderReceiptSha256: providerProof.receiptSha256,
+     updatedAt: completedAt,
+     completedAt,
+   });
+diff --git a/tests/server/mira-formal-provider-readiness.test.ts b/tests/server/mira-formal-provider-readiness.test.ts
+index be8a4a4..02f5858 100644
+--- a/tests/server/mira-formal-provider-readiness.test.ts
++++ b/tests/server/mira-formal-provider-readiness.test.ts
+@@ -1,4 +1,5 @@
+ import { promises as fs } from 'fs';
++import { createHash } from 'node:crypto';
+ import os from 'os';
+ import path from 'path';
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+@@ -35,7 +36,7 @@ vi.mock('dns/promises', () => ({
+ }));
+ 
+ function sha256(value: string | Uint8Array): string {
+-  return require('crypto').createHash('sha256').update(value).digest('hex');
++  return createHash('sha256').update(value).digest('hex');
+ }
+ 
+ function wavBytes(): Buffer {
+-- 
+2.50.1 (Apple Git-155)
+

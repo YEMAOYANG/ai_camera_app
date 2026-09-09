@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:warm_sight/src/core/network/api_client.dart';
 import 'package:warm_sight/src/core/storage/auth_session_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'support/fake_auth_token_storage.dart';
 
 void main() {
   test(
@@ -10,7 +11,10 @@ void main() {
     () async {
       SharedPreferences.setMockInitialValues(const {});
       final preferences = await SharedPreferences.getInstance();
-      final sessionStore = AuthSessionStore(preferences);
+      final sessionStore = AuthSessionStore(
+        preferences,
+        secureStorage: FakeAuthSecureSessionStorage(),
+      );
       final dio = Dio(BaseOptions(baseUrl: 'http://test.local/api'));
       final refreshDio = Dio(BaseOptions(baseUrl: 'http://test.local/api'));
       var downstreamRequests = 0;
@@ -50,7 +54,10 @@ void main() {
   test('public documents can load without a session', () async {
     SharedPreferences.setMockInitialValues(const {});
     final preferences = await SharedPreferences.getInstance();
-    final sessionStore = AuthSessionStore(preferences);
+    final sessionStore = AuthSessionStore(
+      preferences,
+      secureStorage: FakeAuthSecureSessionStorage(),
+    );
     final dio = Dio(BaseOptions(baseUrl: 'http://test.local/api'));
     var downstreamRequests = 0;
 

@@ -1,0 +1,1768 @@
+diff --git a/components/chat/chat-area.tsx b/components/chat/chat-area.tsx
+index 644c3ba..fb8ac16 100644
+--- a/components/chat/chat-area.tsx
++++ b/components/chat/chat-area.tsx
+@@ -66,7 +66,10 @@ export interface ChatAreaRef {
+   softPauseActiveSession: () => Promise<void>;
+   resumeActiveSession: () => Promise<void>;
+   sendMessage: (content: string) => Promise<void>;
+-  startDiscussion: (request: DiscussionRequest) => Promise<void>;
++  startDiscussion: (
++    request: DiscussionRequest,
++    onStarted?: (sessionId: string) => void,
++  ) => Promise<void>;
+   startLecture: (sceneId: string) => string;
+   addLectureMessage: (sessionId: string, action: Action, actionIndex: number) => void;
+   getIsStreaming: () => boolean;
+diff --git a/components/chat/use-chat-sessions.ts b/components/chat/use-chat-sessions.ts
+index 1871277..7c7579f 100644
+--- a/components/chat/use-chat-sessions.ts
++++ b/components/chat/use-chat-sessions.ts
+@@ -1962,7 +1962,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+    * Start a discussion with agent speaking first
+    */
+   const startDiscussion = useCallback(
+-    async (request: DiscussionRequest): Promise<void> => {
++    async (request: DiscussionRequest, onStarted?: (sessionId: string) => void): Promise<void> => {
+       log.info(`[ChatArea] Starting discussion: "${request.topic}"`);
+       // Explicitly clear buffer-pause intent (also cleared transitively via endSession,
+       // but being explicit guards against future refactors)
+@@ -1990,6 +1990,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+       const sessionId = `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+       const now = Date.now();
+       const agentId = request.agentId || 'default-1';
++      onStarted?.(sessionId);
+       registerFirstPiRequest(sessionId);
+ 
+       // Read all selected agent IDs from settings store
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 3bef306..c0d19d5 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -71,6 +71,10 @@ import {
+   shouldShowMiraStudentStartGate,
+ } from '@/lib/mira/student-runtime';
+ import { toast } from 'sonner';
++import {
++  finishGuidedDiscussionPlayback,
++  type GuidedDiscussionPlayback,
++} from '@/lib/playback/discussion-completion';
+ 
+ const ignoreStudentAutoPlayChange = (_enabled: boolean) => {};
+ 
+@@ -388,6 +392,8 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     );
+     // Monotonic counter incremented on each scene switch — used to discard stale SSE callbacks
+     const sceneEpochRef = useRef(0);
++    const guidedDiscussionsRef = useRef(new Map<string, GuidedDiscussionPlayback>());
++    const activeGuidedDiscussionRef = useRef<GuidedDiscussionPlayback | null>(null);
+     // When true, the next engine init will auto-start playback (for auto-play scene advance)
+     const autoStartRef = useRef(false);
+     // Discussion buffer-level pause state (distinct from soft-pause which aborts SSE)
+@@ -485,9 +491,8 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     }, []);
+ 
+     /**
+-     * Session-stop callback from the chat layer. Runs the normal cleanup, then —
+-     * only when a confirmed or timed-out soft close ended a Q&A that had
+-     * interrupted an active lecture — auto-resumes from the saved position.
++     * Scripted student discussions resume their bound lecture only after a
++     * successful end. Ordinary Q&A retains its narrower soft-close resume rule.
+      *
+      * hadLectureInterruption MUST be read before doSessionCleanup(), because
+      * handleEndDiscussion() restores and clears the saved lecture position.
+@@ -495,6 +500,29 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     const handleSessionStop = useCallback(
+       async (payload: SessionCleanupPayload) => {
+         const engine = engineRef.current;
++        if (
++          studentMode &&
++          finishGuidedDiscussionPlayback({
++            binding: guidedDiscussionsRef.current.get(payload.sessionId),
++            source: payload.source,
++            isCurrent: (binding) =>
++              binding === activeGuidedDiscussionRef.current &&
++              engineRef.current === binding.engine &&
++              useStageStore.getState().currentSceneId === binding.sceneId,
++            cleanup: doSessionCleanup,
++            prepareLecture: () => {
++              const sceneId = engine?.getCurrentSceneId();
++              if (sceneId && chatAreaRef.current) {
++                const sessionId = chatAreaRef.current.startLecture(sceneId);
++                if (lectureSessionIdRef.current !== sessionId) {
++                  lectureActionCounterRef.current = 0;
++                }
++                lectureSessionIdRef.current = sessionId;
++              }
++            },
++          })
++        )
++          return;
+         const hadLectureInterruption = engine?.hasLectureInterruption() ?? false;
+ 
+         doSessionCleanup();
+@@ -528,7 +556,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+         lectureSessionIdRef.current = sessionId;
+         engine.continuePlayback();
+       },
+-      [doSessionCleanup, playbackCompleted],
++      [doSessionCleanup, playbackCompleted, studentMode],
+     );
+ 
+     // Imperative teardown so the parent can `await` SSE / engine / TTS
+@@ -870,7 +898,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+           },
+           onDiscussionConfirmed: (topic, prompt, agentId) => {
+             // Start SSE discussion via ChatArea
+-            handleDiscussionSSE(topic, prompt, agentId);
++            handleDiscussionSSE(topic, prompt, agentId, engine, currentScene.id);
+           },
+           onDiscussionEnd: () => {
+             // Abort any active SSE
+@@ -891,7 +919,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+             }
+             // If all actions are exhausted (discussion was the last action), mark
+             // playback as completed so the bubble shows reset instead of play.
+-            if (engineRef.current?.isExhausted()) {
++            if (!studentMode && engineRef.current?.isExhausted()) {
+               setPlaybackCompleted(true);
+             }
+           },
+@@ -905,6 +933,11 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+           },
+           getPlaybackSpeed: () => useSettingsStore.getState().playbackSpeed || 1,
+           onComplete: () => {
++            if (
++              engineRef.current !== engine ||
++              useStageStore.getState().currentSceneId !== currentScene.id
++            )
++              return;
+             // lectureSpeech intentionally NOT cleared — last sentence stays visible
+             // until scene transition (auto-play) or user restarts. Scene change
+             // effect handles the reset.
+@@ -1095,13 +1128,33 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+      * Handle discussion SSE — POST /api/chat and push events to engine
+      */
+     const handleDiscussionSSE = useCallback(
+-      async (topic: string, prompt?: string, agentId?: string) => {
++      async (
++        topic: string,
++        prompt: string | undefined,
++        agentId: string | undefined,
++        engine: PlaybackEngine,
++        sceneId: string,
++      ) => {
++        if (engineRef.current !== engine || useStageStore.getState().currentSceneId !== sceneId)
++          return;
+         // Start discussion display in ChatArea (lecture speech is preserved independently)
+-        chatAreaRef.current?.startDiscussion({
+-          topic,
+-          prompt,
+-          agentId: agentId || 'default-1',
+-        });
++        chatAreaRef.current?.startDiscussion(
++          {
++            topic,
++            prompt,
++            agentId: agentId || 'default-1',
++          },
++          (sessionId) => {
++            const binding = { engine, sceneId, settled: false };
++            guidedDiscussionsRef.current.set(sessionId, binding);
++            if (
++              engineRef.current === engine &&
++              useStageStore.getState().currentSceneId === sceneId
++            ) {
++              activeGuidedDiscussionRef.current = binding;
++            }
++          },
++        );
+         // Auto-switch to chat tab when discussion starts
+         chatAreaRef.current?.switchToTab('chat');
+         // Immediately mark streaming for synchronized stop button
+diff --git a/lib/playback/discussion-completion.ts b/lib/playback/discussion-completion.ts
+new file mode 100644
+index 0000000..a95209d
+--- /dev/null
++++ b/lib/playback/discussion-completion.ts
+@@ -0,0 +1,47 @@
++import type { CleanupSource } from './auto-resume';
++import type { PlaybackEngine } from './engine';
++
++export interface GuidedDiscussionPlayback {
++  readonly engine: PlaybackEngine;
++  readonly sceneId: string;
++  settled: boolean;
++}
++
++/**
++ * Only a successful, current scripted discussion may resume the lecture.
++ * Continuing an exhausted cursor deliberately reaches the engine's ordinary
++ * onComplete callback, keeping formal scene evidence on its single exit path.
++ */
++export function finishGuidedDiscussionPlayback(input: {
++  binding: GuidedDiscussionPlayback | undefined;
++  source: CleanupSource;
++  isCurrent: (binding: GuidedDiscussionPlayback) => boolean;
++  cleanup: () => void;
++  prepareLecture: () => void;
++}): boolean {
++  const { binding } = input;
++  if (!binding) return false; // An ordinary Q&A keeps its existing cleanup path.
++  if (binding.settled || !input.isCurrent(binding)) return true;
++  if (input.source === 'soft_close_enter') return true;
++
++  const engine = binding.engine;
++  const normalEnd =
++    input.source === 'turn_complete' ||
++    input.source === 'soft_close_confirmed' ||
++    input.source === 'soft_close_timeout';
++  const canContinue =
++    normalEnd &&
++    (engine.getMode() === 'live' || engine.getMode() === 'paused') &&
++    engine.hasLectureInterruption();
++
++  // An interrupted session is terminal too: a late callback must not resume
++  // a newer live session that happens to reuse this engine and scene.
++  binding.settled = true;
++  // Clear the live session and restore its saved cursor before any continuation.
++  input.cleanup();
++  if (!canContinue) return true;
++  if (!input.isCurrent(binding) || engine.getMode() !== 'idle') return true;
++  if (!engine.isExhausted()) input.prepareLecture();
++  if (input.isCurrent(binding) && engine.getMode() === 'idle') engine.continuePlayback();
++  return true;
++}
+diff --git a/lib/server/agent-runtime/course-tools.ts b/lib/server/agent-runtime/course-tools.ts
+index f0bf7cb..d490eb5 100644
+--- a/lib/server/agent-runtime/course-tools.ts
++++ b/lib/server/agent-runtime/course-tools.ts
+@@ -53,6 +53,10 @@ import {
+ } from './generate-video';
+ import type { SceneTtsInput, SceneTtsSummary } from './scene-tts';
+ import type { LoadedSkill } from './skills';
++import type {
++  MiraFormalSceneSkillInput,
++  MiraFormalSceneSkillContext,
++} from '../mira-formal-skill-policy';
+ 
+ export type CourseDocument = MaicDocument<Scene, Stage>;
+ export type CourseStore = DocumentStore<Scene, Stage> & DocumentFolderStore;
+@@ -95,6 +99,13 @@ export interface CourseToolDeps {
+   synthesizeTts?: (input: SceneTtsInput) => Promise<SceneTtsSummary>;
+   /** Resolve the skill that owns structural diagnostics for the current turn. */
+   getActiveSkill?: () => LoadedSkill | null;
++  /** Server-selected formal profile only; never a model-controlled tool argument. */
++  getGenerationSkillContext?: (input: MiraFormalSceneSkillInput) => MiraFormalSceneSkillContext;
++  /** Required durable evidence after the generated page/action has persisted. */
++  onGenerationSkillContext?: (
++    input: MiraFormalSceneSkillInput,
++    context: MiraFormalSceneSkillContext,
++  ) => Promise<void>;
+ }
+ 
+ /**
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+index 339dcf1..ff41263 100644
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -26,6 +26,7 @@ import { synthesizeSceneNarration } from './scene-tts';
+ import { toGenerationContent } from './generation-content';
+ import { checkScenesAgainstSkill } from './skills';
+ import { isMediaPlaceholder } from '@/lib/store/media-generation';
++import type { MiraFormalSceneSkillInput } from '../mira-formal-skill-policy';
+ 
+ const MAX_GENERATE_SCENE_MEDIA = 8;
+ const SUPPORTED_SCENE_TYPES = new Set(['slide', 'quiz', 'interactive', 'pbl']);
+@@ -208,6 +209,31 @@ export function buildGenerationTools(deps: GenerationToolDeps): AgentTool<never,
+   const routed = createGenerationAiCallFactory({ abortSignal: deps.abortSignal });
+   const aiCallFor = (stage: Parameters<typeof routed>[0]) => deps.aiCall ?? routed(stage);
+   const actionGenerator = deps.generateActions ?? generateSceneActions;
++  const contextualCall = (
++    stage: Parameters<typeof routed>[0],
++    input: MiraFormalSceneSkillInput,
++  ) => {
++    const base = aiCallFor(stage);
++    const context = deps.getGenerationSkillContext?.(input);
++    if (context && !deps.onGenerationSkillContext)
++      throw new Error('FORMAL_SKILL_CONTEXT_RECORDER_MISSING');
++    let succeeded = false;
++    const call: AICallFn = context
++      ? async (system, user, images) => {
++          const result = await base(`${system}\n\n${context.text}`, user, images);
++          succeeded = true;
++          return result;
++        }
++      : base;
++    return {
++      call,
++      record: async () => {
++        if (!context) return;
++        if (!succeeded) throw new Error('FORMAL_SKILL_CONTEXT_CALL_MISSING');
++        await deps.onGenerationSkillContext!(input, context);
++      },
++    };
++  };
+ 
+   const generateScene: AgentTool<typeof SceneParams> = {
+     name: 'generate_scene',
+@@ -343,9 +369,19 @@ export function buildGenerationTools(deps: GenerationToolDeps): AgentTool<never,
+         imageMapping[id] = src;
+       }
+       const agents = doc.stage.generatedAgentConfigs;
++      const plannedSceneId = existing?.id ?? sceneIdFor(doc.scenes, params.order);
++      const pageInput = {
++        stageId: params.stageId,
++        sceneId: plannedSceneId,
++        sceneType: params.type,
++      };
++      const contentCall = contextualCall(sceneContentStage(params.type), {
++        ...pageInput,
++        phase: 'content',
++      });
+       let content: Awaited<ReturnType<typeof generateSceneContent>>;
+       try {
+-        content = await generateSceneContent(outline, aiCallFor(sceneContentStage(params.type)), {
++        content = await generateSceneContent(outline, contentCall.call, {
+           agents,
+           languageDirective: doc.stage.languageDirective ?? '',
+           allowProceduralSkill: true,
+@@ -372,18 +408,21 @@ export function buildGenerationTools(deps: GenerationToolDeps): AgentTool<never,
+       }
+       if (signal?.aborted) throw new Error('aborted');
+       if (!content) return result('Page content generation failed; nothing was written.', {}, true);
++      const actionsCall = contextualCall('scene-actions', { ...pageInput, phase: 'actions' });
+       const actions = filterKnownActions(
+-        await actionGenerator(outline, content, aiCallFor('scene-actions'), {
++        await actionGenerator(outline, content, actionsCall.call, {
+           agents,
+           languageDirective: doc.stage.languageDirective ?? '',
+         }),
+       );
+       const built = buildCompleteScene(outline, content, actions, params.stageId, {
+-        sceneId: existing?.id ?? sceneIdFor(doc.scenes, params.order),
++        sceneId: plannedSceneId,
+       });
+       if (!built) return result('Page assembly failed; nothing was written.', {}, true);
+       const scene = built as Scene;
+       await runStageMutation(signal, () => deps.store.putScene(params.stageId, scene));
++      await contentCall.record();
++      await actionsCall.record();
+       const skill = deps.getActiveSkill?.() ?? null;
+       const afterWrite = await deps.store.loadDocument(params.stageId);
+       const skillViolations =
+@@ -451,23 +490,25 @@ export function buildGenerationTools(deps: GenerationToolDeps): AgentTool<never,
+         : doc?.scenes.find((item) => item.order === params.order);
+       if (!doc || !scene) return result('Page not found. Call list_scenes.', {}, true);
+       const outline = outlineFromScene(scene, doc.outline);
++      const actionsCall = contextualCall('scene-actions', {
++        stageId: params.stageId,
++        sceneId: scene.id,
++        sceneType: scene.type,
++        phase: 'actions',
++      });
+       const actions = filterKnownActions(
+-        await actionGenerator(
+-          outline,
+-          toGenerationContent(scene.content),
+-          aiCallFor('scene-actions'),
+-          {
+-            ctx: actionContext(doc.scenes, scene),
+-            agents: doc.stage.generatedAgentConfigs,
+-            languageDirective: doc.stage.languageDirective ?? '',
+-            userProfile: params.styleDirective,
+-          },
+-        ),
++        await actionGenerator(outline, toGenerationContent(scene.content), actionsCall.call, {
++          ctx: actionContext(doc.scenes, scene),
++          agents: doc.stage.generatedAgentConfigs,
++          languageDirective: doc.stage.languageDirective ?? '',
++          userProfile: params.styleDirective,
++        }),
+       );
+       if (!actions.length)
+         return result('No known actions were generated; the page was unchanged.', {}, true);
+       const next = { ...scene, actions } as Scene;
+       await runStageMutation(signal, () => deps.store.putScene(params.stageId, next));
++      await actionsCall.record();
+       deps.onCheckpoint({
+         tool: 'generate_actions',
+         stageId: params.stageId,
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+index 74a6bc5..0773cde 100644
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -25,6 +25,7 @@ import type { Scene, SlideContent } from '@/lib/types/stage';
+ import {
+   isMiraFormalProfessionalSessionIdentity,
+   isMiraFormalImageSession,
++  isMiraFormalIntegratedSkillSession,
+   filterMiraFormalMediaTools,
+   MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
+   MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION,
+@@ -32,6 +33,15 @@ import {
+   type MiraFormalResearchSearchTrace,
+ } from '@/lib/server/mira-professional-research-policy';
+ import { MIRA_FORMAL_IMAGE_EVENT, withMiraFormalImageTrace } from '@/lib/server/mira-formal-media';
++import {
++  prepareMiraFormalSkillBundle,
++  formalSkillSubjectFromPrompt,
++  buildMiraFormalSkillPreload,
++  collectMiraFormalSkillReads,
++  composeMiraFormalSceneSkillContext,
++  formalSkillContextTrace,
++  MIRA_FORMAL_SKILL_CONTEXT_EVENT,
++} from '@/lib/server/mira-formal-skill-policy';
+ 
+ import { resolveAgentDriverModel } from './agent-driver-model';
+ import { buildAskUserTool } from './ask-user';
+@@ -1255,6 +1265,26 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+     // `read` of SKILL.md. An explicit selection stays authoritative for this
+     // session rather than being silently replaced by a later model read.
+     const installedSkills = await listSkills(meta.ownerId);
++    const formalSkillBundle = isMiraFormalIntegratedSkillSession({
++      ownerId: meta.ownerId,
++      sessionId: id,
++      skillId: meta.skillId,
++      origin: meta.origin,
++    })
++      ? await prepareMiraFormalSkillBundle(
++          installedSkills,
++          formalSkillSubjectFromPrompt(meta.prompt),
++        )
++      : null;
++    // Keep successful read frames across context compaction; the terminal receipt
++    // independently verifies their durable branch before any formal promotion.
++    const formalSkillReadMessages = [...recovery.cursorMessages];
++    const buildRunSkillPreload = async (input: Parameters<typeof buildSkillPreload>[0]) => {
++      if (!formalSkillBundle) return buildSkillPreload(input);
++      const result = await buildMiraFormalSkillPreload(input, formalSkillBundle);
++      formalSkillReadMessages.push(...result.messages);
++      return result;
++    };
+     const requestedSkill = await findSkill(meta.skillId, meta.ownerId);
+     if (meta.skillId && !requestedSkill) {
+       throw new Error(`session skill "${meta.skillId}" is unavailable for its owner`);
+@@ -1462,19 +1492,48 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+     // sequential by the shared STAGE_WRITER_TOOL_NAMES registry
+     // (course-tools.ts).
+     const formalMediaSession = {
+-      ownerId: meta.ownerId, sessionId: id, skillId: meta.skillId, origin: meta.origin,
+-    };
+-    const dslTools = filterMiraFormalMediaTools(buildDslCourseToolset({
+-      store: ownerScopedStore,
+-      stageAccess,
+-      onCheckpoint: (info) => emit(LIFECYCLE.checkpoint, info),
++      ownerId: meta.ownerId,
+       sessionId: id,
+-      abortSignal: abort.signal,
+-      getActiveSkill: () => activeSkill,
+-    }), formalMediaSession).map((tool) => isMiraFormalImageSession(formalMediaSession)
+-      ? withMiraFormalImageTrace(tool, id, (trace) =>
+-          appendRequiredRunEvent(MIRA_FORMAL_IMAGE_EVENT, trace, Date.now()))
+-      : tool);
++      skillId: meta.skillId,
++      origin: meta.origin,
++    };
++    const dslTools = filterMiraFormalMediaTools(
++      buildDslCourseToolset({
++        store: ownerScopedStore,
++        stageAccess,
++        onCheckpoint: (info) => emit(LIFECYCLE.checkpoint, info),
++        sessionId: id,
++        abortSignal: abort.signal,
++        getActiveSkill: () => activeSkill,
++        ...(formalSkillBundle
++          ? {
++              getGenerationSkillContext: (
++                input: import('../mira-formal-skill-policy').MiraFormalSceneSkillInput,
++              ) => {
++                collectMiraFormalSkillReads(formalSkillReadMessages, formalSkillBundle);
++                return composeMiraFormalSceneSkillContext(formalSkillBundle, input);
++              },
++              onGenerationSkillContext: async (
++                input: import('../mira-formal-skill-policy').MiraFormalSceneSkillInput,
++                context: import('../mira-formal-skill-policy').MiraFormalSceneSkillContext,
++              ) => {
++                await appendRequiredRunEvent(
++                  MIRA_FORMAL_SKILL_CONTEXT_EVENT,
++                  formalSkillContextTrace(id, input, context),
++                  Date.now(),
++                );
++              },
++            }
++          : {}),
++      }),
++      formalMediaSession,
++    ).map((tool) =>
++      isMiraFormalImageSession(formalMediaSession)
++        ? withMiraFormalImageTrace(tool, id, (trace) =>
++            appendRequiredRunEvent(MIRA_FORMAL_IMAGE_EVENT, trace, Date.now()),
++          )
++        : tool,
++    );
+     const curriculumTools = buildCurriculumTools({
+       store: ownerScopedStore,
+       ownerId: meta.ownerId,
+@@ -1760,7 +1819,7 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+         // `skillId` from the URL, and its prompt text contains no handle at
+         // all. On later runs the skill is already in the transcript, so the
+         // transcript dedupe (not a special case) keeps it to one load.
+-        const preload = await buildSkillPreload({
++        const preload = await buildRunSkillPreload({
+           text: plannedStart.text,
+           skills: installedSkills,
+           transcript: modelMessages,
+@@ -1816,7 +1875,7 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+         const resumedTurnText =
+           loggedMessages.findLast((message) => message.seq <= deliveredThrough)?.text ??
+           meta.prompt;
+-        const repair = await buildSkillPreload({
++        const repair = await buildRunSkillPreload({
+           text: resumedTurnText,
+           skills: installedSkills,
+           transcript: modelMessages,
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+index 28bbd64..624710f 100644
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -1,6 +1,7 @@
+ import { timingSafeEqual } from 'node:crypto';
+ import type { NextRequest } from 'next/server';
+ import type { GenerateClassroomInput } from '@/lib/server/classroom-generation';
++import { MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY } from './mira-formal-skill-policy';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+   'mira.openmaic.formal-runtime.v4-deepseek-professional' as const;
+@@ -46,13 +47,19 @@ export const MIRA_FORMAL_IMAGE_POLICY = {
+   assetValidationRequired: true,
+ } as const;
+ 
+-export const MIRA_PROFESSIONAL_CREATION_POLICY = {
++export const MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY = {
+   ...MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
+   image: MIRA_FORMAL_IMAGE_POLICY,
+ } as const;
+ 
++export const MIRA_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
++  skillOrchestration: MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY,
++} as const;
++
+ export type MiraProfessionalCreationPolicy =
+   | typeof MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_PROFESSIONAL_CREATION_POLICY;
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+@@ -138,13 +145,22 @@ export function isExactMiraCoursewareAuthority(value: unknown): boolean {
+ }
+ 
+ export function isExactMiraProfessionalCreationPolicy(value: unknown): boolean {
+-  return isMiraImageCreationPolicy(value) || (
++  return (
++    isMiraImageCreationPolicy(value) ||
+     JSON.stringify(canonical(value)) ===
+-    JSON.stringify(canonical(MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY))
++      JSON.stringify(canonical(MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY))
+   );
+ }
+ 
+ export function isMiraImageCreationPolicy(value: unknown): boolean {
++  return (
++    isMiraIntegratedSkillCreationPolicy(value) ||
++    JSON.stringify(canonical(value)) ===
++      JSON.stringify(canonical(MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY))
++  );
++}
++
++export function isMiraIntegratedSkillCreationPolicy(value: unknown): boolean {
+   return (
+     JSON.stringify(canonical(value)) ===
+     JSON.stringify(canonical(MIRA_PROFESSIONAL_CREATION_POLICY))
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+index 20a103f..0e550fc 100644
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -24,7 +24,17 @@ import {
+   MIRA_PROFESSIONAL_CREATION_POLICY,
+   MIRA_FORMAL_IMAGE_POLICY,
+   isMiraImageCreationPolicy,
++  isMiraIntegratedSkillCreationPolicy,
+ } from '@/lib/server/mira-formal-generation-policy';
++import {
++  buildMiraFormalSkillReceipt,
++  formalSkillPromptSuffix,
++  MIRA_FORMAL_SKILL_SESSION_ORIGIN,
++  prepareMiraFormalSkillBundle,
++  type MiraFormalSkillReceipt,
++} from './mira-formal-skill-policy';
++import { listSkills } from './agent-runtime/skills';
++import type { AgentMessage } from '@earendil-works/pi-agent-core';
+ import {
+   isMiraFormalProfessionalSessionIdentity,
+   MIRA_FORMAL_PROFESSIONAL_OWNER_ID_PREFIX,
+@@ -105,6 +115,7 @@ export interface MiraFormalProfessionalCreationReceipt {
+   webSearchEnabled: true;
+   imageGenerationEnabled?: true;
+   imagePolicyId?: typeof MIRA_FORMAL_IMAGE_POLICY.policyId;
++  skillOrchestration?: MiraFormalSkillReceipt;
+   receiptSha256: string;
+ }
+ 
+@@ -392,13 +403,35 @@ function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewar
+     '',
+     'Before finishing, read the created stage back and repair it until every locked requirement is true.',
+   ].join('\n');
+-  return withMiraFormalImageInstructions(originalPrompt, input.professionalCreationPolicy);
++  const withImages = withMiraFormalImageInstructions(
++    originalPrompt,
++    input.professionalCreationPolicy,
++  );
++  return withMiraFormalSkillInstructions(
++    withImages,
++    input.professionalCreationPolicy,
++    spec.course.subject,
++  );
++}
++
++export function withMiraFormalSkillInstructions(
++  originalPrompt: string,
++  creationPolicy: unknown,
++  subject: FormalCoursewareSpec['course']['subject'],
++): string {
++  return isMiraIntegratedSkillCreationPolicy(creationPolicy)
++    ? originalPrompt + formalSkillPromptSuffix(subject)
++    : originalPrompt;
+ }
+ 
+-export function withMiraFormalImageInstructions(originalPrompt: string, creationPolicy: unknown): string {
++export function withMiraFormalImageInstructions(
++  originalPrompt: string,
++  creationPolicy: unknown,
++): string {
+   // Never rewrite an old job's prompt: its exact bytes are durable authority.
+   if (!isMiraImageCreationPolicy(creationPolicy)) return originalPrompt;
+-  return `${originalPrompt}\n\nFormal image policy (${MIRA_FORMAL_IMAGE_POLICY.policyId}):\n` +
++  return (
++    `${originalPrompt}\n\nFormal image policy (${MIRA_FORMAL_IMAGE_POLICY.policyId}):\n` +
+     'Qwen image generation is available when a concrete picture improves the teaching. ' +
+     'Do not generate decorative images or force an image into every lesson. ' +
+     'Use generate_image for the current stage only, obtain the real src first, then place it ' +
+@@ -409,12 +442,16 @@ export function withMiraFormalImageInstructions(originalPrompt: string, creation
+     'text, formulas, geometric relationships, and answer evidence with verifiable slide elements ' +
+     'or HTML. Never use a generated image as the only basis for answering an assessment. ' +
+     'If an image you need fails to generate, ' +
+-    'do not substitute a broken placeholder. Video generation is unavailable for this job.';
++    'do not substitute a broken placeholder. Video generation is unavailable for this job.'
++  );
+ }
+ 
+ function professionalSessionOrigin(input: GenerateClassroomInput): string {
++  if (isMiraIntegratedSkillCreationPolicy(input.professionalCreationPolicy))
++    return MIRA_FORMAL_SKILL_SESSION_ORIGIN;
+   return isMiraImageCreationPolicy(input.professionalCreationPolicy)
+-    ? MIRA_FORMAL_IMAGE_SESSION_ORIGIN : PROFESSIONAL_SESSION_ORIGIN;
++    ? MIRA_FORMAL_IMAGE_SESSION_ORIGIN
++    : PROFESSIONAL_SESSION_ORIGIN;
+ }
+ 
+ async function createOrReuseProfessionalSession(
+@@ -924,6 +961,7 @@ function buildProfessionalCreationReceipt(
+   spec: FormalCoursewareSpec,
+   classroomId: string,
+   sessionId: string,
++  skillOrchestration?: MiraFormalSkillReceipt,
+ ): MiraFormalProfessionalCreationReceipt {
+   const contract = formalContractPayload(input);
+   const teachingBrief = contract.teachingBrief;
+@@ -948,10 +986,13 @@ function buildProfessionalCreationReceipt(
+     userPromptRequired: false as const,
+     studentToolsEnabled: false as const,
+     webSearchEnabled: true as const,
+-    ...(isMiraImageCreationPolicy(input.professionalCreationPolicy) ? {
+-      imageGenerationEnabled: true as const,
+-      imagePolicyId: MIRA_FORMAL_IMAGE_POLICY.policyId,
+-    } : {}),
++    ...(isMiraImageCreationPolicy(input.professionalCreationPolicy)
++      ? {
++          imageGenerationEnabled: true as const,
++          imagePolicyId: MIRA_FORMAL_IMAGE_POLICY.policyId,
++        }
++      : {}),
++    ...(skillOrchestration ? { skillOrchestration } : {}),
+   };
+   return { ...withoutHash, receiptSha256: canonicalSha256(withoutHash) };
+ }
+@@ -1045,11 +1086,34 @@ async function completeMiraFormalProfessionalClassroom(
+     throw new Error('FORMAL_PROFESSIONAL_CITATION_REPAIR_STRUCTURE_DRIFT');
+   }
+   const research = buildResearchReceipt(evidence, scenes, spec, identity.sessionId);
++  let skillOrchestration: MiraFormalSkillReceipt | undefined;
++  if (isMiraIntegratedSkillCreationPolicy(input.professionalCreationPolicy)) {
++    const bundle = await prepareMiraFormalSkillBundle(
++      await listSkills(identity.ownerId),
++      spec.course.subject,
++    );
++    const sessionStore = await getAgentSessionStore();
++    // Opening/reading the terminal branch is read-only; this handle never appends.
++    const tree = await sessionStore.openEntryTree(identity.sessionId, 'formal-skill-receipt', 0);
++    const branch = await tree.getPathToRoot(await tree.getLeafId());
++    const messages = branch.flatMap((entry) =>
++      entry.type === 'message' ? [entry.message as AgentMessage] : [],
++    );
++    skillOrchestration = buildMiraFormalSkillReceipt({
++      sessionId: identity.sessionId,
++      stageId: stage.id,
++      bundle,
++      messages,
++      scenes,
++      events,
++    });
++  }
+   const professionalCreation = buildProfessionalCreationReceipt(
+     input,
+     spec,
+     stage.id,
+     identity.sessionId,
++    skillOrchestration,
+   );
+   const media = isMiraImageCreationPolicy(input.professionalCreationPolicy)
+     ? await buildMiraFormalMediaReceipt({
+@@ -1058,7 +1122,8 @@ async function completeMiraFormalProfessionalClassroom(
+         classroomId: stage.id,
+         sessionId: identity.sessionId,
+         scenes,
+-        traces: events.filter((event) => event.type === MIRA_FORMAL_IMAGE_EVENT)
++        traces: events
++          .filter((event) => event.type === MIRA_FORMAL_IMAGE_EVENT)
+           .map((event) => event.data),
+       })
+     : undefined;
+diff --git a/lib/server/mira-formal-skill-policy.ts b/lib/server/mira-formal-skill-policy.ts
+new file mode 100644
+index 0000000..8155c77
+--- /dev/null
++++ b/lib/server/mira-formal-skill-policy.ts
+@@ -0,0 +1,402 @@
++import { createHash, randomBytes } from 'node:crypto';
++import { readFile } from 'node:fs/promises';
++import { dirname, join, resolve } from 'node:path';
++import type { AgentMessage } from '@earendil-works/pi-agent-core';
++import type { Scene } from '@/lib/types/stage';
++import {
++  createNativeSkillReadTool,
++  readSkillFileText,
++  type LoadedSkill,
++} from './agent-runtime/skills';
++import { buildSkillPreload, type SkillPreload } from './agent-runtime/skill-preload';
++
++export const MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY = {
++  schemaVersion: 'mira.openmaic.skill-orchestration.v1',
++  profileId: 'mira-primary-integrated.v1',
++  skillIds: [
++    'mira-primary-courseware',
++    'stage-design',
++    'k12-core-literacy-planning',
++    'deep-interactive',
++    'slide-craft',
++    'learning-to-learn',
++  ],
++  sceneContextRequired: true,
++} as const;
++
++export const MIRA_FORMAL_SKILL_SESSION_ORIGIN = 'mira-formal-professional-integrated-skills-v1';
++export const MIRA_FORMAL_SKILL_CONTEXT_EVENT = 'mira_formal_skill_scene_context';
++const CONTEXT_SCHEMA = 'mira.openmaic.skill-scene-context.v1';
++const PROMPT_MARKER = 'MIRA_FORMAL_SKILL_PROFILE: ';
++type Subject = 'math' | 'chinese' | 'english';
++type SceneType = 'slide' | 'quiz' | 'interactive' | 'pbl';
++type Phase = 'content' | 'actions';
++
++function sha256(text: string): string {
++  return createHash('sha256').update(text, 'utf8').digest('hex');
++}
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value)
++        .sort(([a], [b]) => a.localeCompare(b))
++        .map(([key, item]) => [key, canonical(item)]),
++    );
++  }
++  return value;
++}
++
++function digest(value: unknown): string {
++  return sha256(JSON.stringify(canonical(value)));
++}
++
++export function formalSkillReferencePaths(subject: Subject): string[] {
++  return [
++    'k12-core-literacy-planning/references/core-literacy.md',
++    `k12-core-literacy-planning/references/subjects/${subject === 'math' ? 'mathematics' : 'languages'}.md`,
++  ];
++}
++
++export function formalSkillPromptSuffix(subject: Subject): string {
++  return (
++    '\n\n' +
++    PROMPT_MARKER +
++    JSON.stringify({
++      profileId: MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.profileId,
++      subject,
++    }) +
++    '\n' +
++    [
++      'The server preloads all six approved Skills and the subject references. Apply them together.',
++      'Formal authority wins over generic Skill defaults: the approved brief needs no ask_user or sign-off;',
++      'locked assessments, age boundary, roster, adaptive page count and server-managed audio stay unchanged.',
++      'Deep-interactive supplies meaningful controls and feedback, not a 60% page ratio, forced widget alternation, or extra pages.',
++      'Integrate only 1-2 learning-to-learn actions (prediction, recall, self-explanation or checking) into the subject task.',
++      'Page briefs must state the learner action, observable evidence, likely misconception and correction, source attribution,',
++      'and transition to the next page. Static text must not expose planning labels or spoken role dialogue.',
++      'Use slide-craft for visual quality and read back each page. Generate every page with generate_scene so its',
++      'content and narration receive the approved context; no duplicate_scene shortcut. Do not activate personal Skills,',
++      'series planners, lecture/workshop styles, or a separate research course. Research remains the existing 1-4-call gate.',
++    ].join('\n')
++  );
++}
++
++export function formalSkillSubjectFromPrompt(prompt: string): Subject {
++  const lines = prompt.split('\n').filter((line) => line.startsWith(PROMPT_MARKER));
++  if (lines.length !== 1) throw new Error('FORMAL_SKILL_PROFILE_PROMPT_INVALID');
++  const value = JSON.parse(lines[0]!.slice(PROMPT_MARKER.length));
++  if (
++    value.profileId !== MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.profileId ||
++    !['math', 'chinese', 'english'].includes(value.subject)
++  ) {
++    throw new Error('FORMAL_SKILL_PROFILE_PROMPT_INVALID');
++  }
++  return value.subject;
++}
++
++interface SkillResource {
++  resourcePath: string;
++  filePath: string;
++  skillId?: string;
++  text: string;
++  sourceHash: string;
++}
++
++export interface MiraFormalSkillBundle {
++  subject: Subject;
++  skills: LoadedSkill[];
++  resources: SkillResource[];
++}
++
++/** Read the exact registered builtins. User skills never define a formal profile. */
++export async function prepareMiraFormalSkillBundle(
++  installed: readonly LoadedSkill[],
++  subject: Subject,
++): Promise<MiraFormalSkillBundle> {
++  const skills = MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.skillIds.map((id) => {
++    const skill = installed.find((entry) => entry.id === id && entry.source === 'builtin');
++    if (!skill) throw new Error(`FORMAL_SKILL_MISSING:${id}`);
++    return skill;
++  });
++  const resources: SkillResource[] = [];
++  for (const skill of skills) {
++    const text = await readSkillFileText(skill);
++    resources.push({
++      skillId: skill.id,
++      resourcePath: `${skill.id}/SKILL.md`,
++      filePath: resolve(skill.filePath),
++      text,
++      sourceHash: sha256(text),
++    });
++  }
++  const skillRoot = dirname(
++    dirname(skills.find((entry) => entry.id === 'k12-core-literacy-planning')!.filePath),
++  );
++  for (const resourcePath of formalSkillReferencePaths(subject)) {
++    const filePath = resolve(join(skillRoot, resourcePath));
++    const text = await readFile(filePath, 'utf8');
++    resources.push({ resourcePath, filePath, text, sourceHash: sha256(text) });
++  }
++  return { subject, skills, resources };
++}
++
++function provesResourceRead(message: AgentMessage, resource: SkillResource): boolean {
++  if (message.role !== 'toolResult') return false;
++  const value = message as unknown as {
++    toolName?: string;
++    isError?: boolean;
++    details?: Record<string, unknown>;
++    content?: Array<{ type: string; text?: string }>;
++  };
++  const details = value.details;
++  if (
++    value.toolName !== 'read' ||
++    value.isError ||
++    !details ||
++    details.path !== resource.filePath ||
++    details.offset !== 1 ||
++    typeof details.lines !== 'number' ||
++    typeof details.totalLines !== 'number' ||
++    details.lines < details.totalLines ||
++    details.sourceHash !== resource.sourceHash.slice(0, 16)
++  )
++    return false;
++  const body = value.content
++    ?.filter((part) => part.type === 'text')
++    .map((part) => part.text ?? '')
++    .join('\n');
++  return (
++    body !== undefined &&
++    sha256(body) === resource.sourceHash &&
++    details.totalLines === body.split(/\r?\n/).length
++  );
++}
++
++export function collectMiraFormalSkillReads(
++  messages: readonly AgentMessage[],
++  bundle: MiraFormalSkillBundle,
++) {
++  for (const resource of bundle.resources) {
++    if (!messages.some((message) => provesResourceRead(message, resource))) {
++      throw new Error(`FORMAL_SKILL_READ_MISSING:${resource.resourcePath}`);
++    }
++  }
++  return {
++    skillReads: bundle.resources
++      .filter((resource) => resource.skillId)
++      .map((resource) => ({
++        skillId: resource.skillId!,
++        sourceHash: resource.sourceHash,
++      })),
++    referenceReads: bundle.resources
++      .filter((resource) => !resource.skillId)
++      .map((resource) => ({
++        resourcePath: resource.resourcePath,
++        sourceHash: resource.sourceHash,
++      })),
++  };
++}
++
++/** Same native read transcript protocol, with a formal-only six-Skill limit. */
++export async function buildMiraFormalSkillPreload(
++  input: Parameters<typeof buildSkillPreload>[0],
++  bundle: MiraFormalSkillBundle,
++): Promise<SkillPreload> {
++  const preload = await buildSkillPreload({ ...input, forced: bundle.skills, maxCount: 6 });
++  const read = createNativeSkillReadTool(bundle.skills, () => undefined);
++  for (const resource of bundle.resources.filter((entry) => !entry.skillId)) {
++    if (
++      [...input.transcript, ...preload.messages].some((message) =>
++        provesResourceRead(message, resource),
++      )
++    )
++      continue;
++    const id = `call_mira_skill_${randomBytes(12).toString('hex')}`;
++    const args = { path: resource.filePath, limit: resource.text.split(/\r?\n/).length };
++    const result = await read.execute(id, args);
++    const timestamp = Date.now();
++    preload.messages.push(
++      {
++        role: 'assistant',
++        content: [{ type: 'toolCall', id, name: 'read', arguments: args }],
++        api: input.model.api,
++        provider: input.model.provider,
++        usage: {
++          input: 0,
++          output: 0,
++          cacheRead: 0,
++          cacheWrite: 0,
++          totalTokens: 0,
++          cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
++        },
++        model: input.model.id,
++        stopReason: 'toolUse',
++        timestamp,
++      } as unknown as AgentMessage,
++      {
++        role: 'toolResult',
++        toolName: 'read',
++        toolCallId: id,
++        content: result.content,
++        details: result.details,
++        isError: false,
++        timestamp,
++      } as AgentMessage,
++    );
++  }
++  collectMiraFormalSkillReads([...input.transcript, ...preload.messages], bundle);
++  return preload;
++}
++
++function section(text: string, heading: string): string {
++  const start = text.indexOf(`\n## ${heading}\n`);
++  if (start < 0) throw new Error(`FORMAL_SKILL_SECTION_MISSING:${heading}`);
++  const end = text.indexOf('\n## ', start + 1);
++  return text.slice(start + 1, end < 0 ? undefined : end).trim();
++}
++
++export interface MiraFormalSceneSkillInput {
++  stageId: string;
++  sceneId: string;
++  sceneType: string;
++  phase: Phase;
++}
++
++export interface MiraFormalSceneSkillContext {
++  text: string;
++  contextSha256: string;
++}
++
++/** The page model gets applicable source sections, not the Agent's hidden memory. */
++export function composeMiraFormalSceneSkillContext(
++  bundle: MiraFormalSkillBundle,
++  input: Pick<MiraFormalSceneSkillInput, 'sceneType' | 'phase'>,
++): MiraFormalSceneSkillContext {
++  const source = (id: string) => bundle.resources.find((entry) => entry.skillId === id)!.text;
++  const blocks = [
++    'MIRA SERVER-OWNED INTEGRATED PAGE RULES v1',
++    `Profile: ${MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.profileId}; subject: ${bundle.subject}; phase: ${input.phase}; page: ${input.sceneType}.`,
++    'Produce only this requested page/output. The formal brief is approved. Keep its grade, locked questions, roster, source facts and answer-blind boundary.',
++    'Stage-design applies as one durable page per call and a complete learning sequence. Do not emit planning or tool instructions into learner content.',
++    ...bundle.resources.map(
++      (entry) => `Read source: ${entry.resourcePath} sha256=${entry.sourceHash}`,
++    ),
++    section(
++      source('mira-primary-courseware'),
++      input.phase === 'actions' ? 'Narration and focus' : 'Page craft',
++    ),
++    section(source('k12-core-literacy-planning'), 'Settle the learning contract'),
++    section(source('k12-core-literacy-planning'), 'Universal non-negotiables'),
++    ...bundle.resources.filter((entry) => !entry.skillId).map((entry) => entry.text),
++    section(source('learning-to-learn'), '两条内容红线'),
++    section(source('learning-to-learn'), '四个嵌入点'),
++    'Choose only 1-2 suitable learning actions across the lesson; weave them into the existing concept task, never add a separate learning-strategy course or mandatory extra pages.',
++  ];
++  if (input.sceneType === 'slide' && input.phase === 'content') {
++    blocks.push(source('slide-craft').replace(/^---[\s\S]*?---\s*/, ''));
++  }
++  if (input.sceneType === 'interactive') {
++    blocks.push(
++      section(source('deep-interactive'), 'Choosing a widget type'),
++      section(source('deep-interactive'), 'keyPoints'),
++    );
++  }
++  blocks.push(
++    input.phase === 'actions'
++      ? 'Narration uses short age-appropriate instructions tied to visible content. Preserve valid spotlight/speech sequences, exact element IDs and real widget selectors. Spoken role dialogue belongs only in actions.'
++      : 'Keep learner-facing text concise and visually legible. Use meaningful manipulation/feedback when interactive, concrete evidence and misconceptions when assessing. Internal planning labels and role speeches never belong in static text.',
++  );
++  blocks.push(
++    'FORMAL PRIORITY: no ask_user, no extra scene plan, no fixed page count, no 60% interactive quota or forced widget rotation. Do not change locked assessment wording/options or invent answers. Server promotion owns audio; output this page and its requested data only.',
++  );
++  const text = blocks.join('\n\n');
++  return { text, contextSha256: sha256(text) };
++}
++
++export interface MiraFormalSkillContextTrace extends MiraFormalSceneSkillInput {
++  schemaVersion: typeof CONTEXT_SCHEMA;
++  profileId: typeof MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.profileId;
++  sessionId: string;
++  contextSha256: string;
++}
++
++export function formalSkillContextTrace(
++  sessionId: string,
++  input: MiraFormalSceneSkillInput,
++  context: MiraFormalSceneSkillContext,
++): MiraFormalSkillContextTrace {
++  return {
++    schemaVersion: CONTEXT_SCHEMA,
++    profileId: MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.profileId,
++    sessionId,
++    ...input,
++    contextSha256: context.contextSha256,
++  };
++}
++
++export interface MiraFormalSkillReceipt {
++  schemaVersion: 'mira.openmaic.skill-orchestration-receipt.v1';
++  profileId: typeof MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.profileId;
++  status: 'succeeded';
++  skillReads: Array<{ skillId: string; sourceHash: string }>;
++  referenceReads: Array<{ resourcePath: string; sourceHash: string }>;
++  sceneContexts: Array<{
++    sceneId: string;
++    sceneType: SceneType;
++    contentContextSha256: string;
++    actionsContextSha256: string;
++  }>;
++  receiptSha256: string;
++}
++
++export function buildMiraFormalSkillReceipt(input: {
++  sessionId: string;
++  stageId: string;
++  bundle: MiraFormalSkillBundle;
++  messages: readonly AgentMessage[];
++  scenes: readonly Scene[];
++  events: ReadonlyArray<{ type: string; data: unknown }>;
++}): MiraFormalSkillReceipt {
++  const reads = collectMiraFormalSkillReads(input.messages, input.bundle);
++  const sceneContexts = input.scenes.map((scene) => {
++    if (scene.stageId !== input.stageId) throw new Error('FORMAL_SKILL_SCENE_STAGE_MISMATCH');
++    const hashes = (['content', 'actions'] as const).map((phase) => {
++      const expected = composeMiraFormalSceneSkillContext(input.bundle, {
++        phase,
++        sceneType: scene.type,
++      });
++      const match = input.events.some((event) => {
++        if (event.type !== MIRA_FORMAL_SKILL_CONTEXT_EVENT) return false;
++        const trace = event.data as MiraFormalSkillContextTrace | null;
++        return (
++          trace?.schemaVersion === CONTEXT_SCHEMA &&
++          trace.profileId === MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.profileId &&
++          trace.sessionId === input.sessionId &&
++          trace.stageId === input.stageId &&
++          trace.sceneId === scene.id &&
++          trace.sceneType === scene.type &&
++          trace.phase === phase &&
++          trace.contextSha256 === expected.contextSha256
++        );
++      });
++      if (!match) throw new Error(`FORMAL_SKILL_SCENE_CONTEXT_MISSING:${scene.id}:${phase}`);
++      return expected.contextSha256;
++    });
++    return {
++      sceneId: scene.id,
++      sceneType: scene.type as SceneType,
++      contentContextSha256: hashes[0]!,
++      actionsContextSha256: hashes[1]!,
++    };
++  });
++  const unsigned = {
++    schemaVersion: 'mira.openmaic.skill-orchestration-receipt.v1' as const,
++    profileId: MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.profileId,
++    status: 'succeeded' as const,
++    ...reads,
++    sceneContexts,
++  };
++  return { ...unsigned, receiptSha256: digest(unsigned) };
++}
+diff --git a/lib/server/mira-professional-research-policy.ts b/lib/server/mira-professional-research-policy.ts
+index c86617d..15531d2 100644
+--- a/lib/server/mira-professional-research-policy.ts
++++ b/lib/server/mira-professional-research-policy.ts
+@@ -1,3 +1,5 @@
++import { MIRA_FORMAL_SKILL_SESSION_ORIGIN } from './mira-formal-skill-policy';
++
+ export const MIRA_PROFESSIONAL_RESEARCH_POLICY = {
+   schemaVersion: 'mira.openmaic.professional-research.v1',
+   professionalWorkbench: {
+@@ -67,8 +69,23 @@ export function isMiraFormalImageSession(input: {
+   skillId?: string | null;
+   origin?: string | null;
+ }): boolean {
+-  return isMiraFormalProfessionalSessionIdentity(input) &&
+-    input.origin === MIRA_FORMAL_IMAGE_SESSION_ORIGIN;
++  return (
++    isMiraFormalProfessionalSessionIdentity(input) &&
++    (input.origin === MIRA_FORMAL_IMAGE_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_SKILL_SESSION_ORIGIN)
++  );
++}
++
++export function isMiraFormalIntegratedSkillSession(input: {
++  ownerId: string;
++  sessionId: string;
++  skillId?: string | null;
++  origin?: string | null;
++}): boolean {
++  return (
++    isMiraFormalProfessionalSessionIdentity(input) &&
++    input.origin === MIRA_FORMAL_SKILL_SESSION_ORIGIN
++  );
+ }
+ 
+ export function filterMiraFormalMediaTools<T extends { name: string }>(
+@@ -77,8 +94,9 @@ export function filterMiraFormalMediaTools<T extends { name: string }>(
+ ): T[] {
+   if (!isMiraFormalProfessionalSessionIdentity(input)) return tools;
+   const imagesEnabled = isMiraFormalImageSession(input);
+-  return tools.filter((tool) =>
+-    tool.name !== 'generate_video' && (tool.name !== 'generate_image' || imagesEnabled));
++  return tools.filter(
++    (tool) => tool.name !== 'generate_video' && (tool.name !== 'generate_image' || imagesEnabled),
++  );
+ }
+ 
+ export interface MiraFormalResearchSearchTrace {
+diff --git a/tests/agent-runtime/generation-tools.test.ts b/tests/agent-runtime/generation-tools.test.ts
+index 58c0da9..6b0cbd7 100644
+--- a/tests/agent-runtime/generation-tools.test.ts
++++ b/tests/agent-runtime/generation-tools.test.ts
+@@ -98,6 +98,117 @@ function deps(store: CourseStore, extra: Record<string, unknown> = {}) {
+ }
+ 
+ describe('generation and deck tools', () => {
++  it('injects the formal page context into real content/actions calls and records only after persistence', async () => {
++    const params = {
++      stageId: 'stage-test',
++      order: 1,
++      title: 'Practice',
++      type: 'quiz',
++      brief: 'Try the idea',
++    };
++    const output = (count: number) =>
++      count === 1
++        ? JSON.stringify([{ id: 'q1', type: 'short_answer', question: 'Try it?' }])
++        : JSON.stringify([{ type: 'text', content: 'Narration' }]);
++    const oldState = state(document([]));
++    const baselineCall = vi.fn(async (_system: string, _user: string) =>
++      output(baselineCall.mock.calls.length),
++    );
++    await find(
++      buildGenerationTools(deps(oldState.store, { aiCall: baselineCall })),
++      'generate_scene',
++    ).execute('baseline', params as never);
++
++    const current = state(document([]));
++    const aiCall = vi.fn(async (_system: string, _user: string) =>
++      output(aiCall.mock.calls.length),
++    );
++    const getGenerationSkillContext = vi.fn((input: { phase: string }) => ({
++      text: `approved ${input.phase} page rules`,
++      contextSha256: 'a'.repeat(64),
++    }));
++    const onGenerationSkillContext = vi.fn(async () => {
++      expect(current.store.putScene).toHaveBeenCalled();
++      expect(current.get()?.scenes).toHaveLength(1);
++    });
++    const tools = buildGenerationTools(
++      deps(current.store, { aiCall, getGenerationSkillContext, onGenerationSkillContext }),
++    );
++    await find(tools, 'generate_scene').execute('formal', params as never);
++    expect(aiCall).toHaveBeenCalledTimes(2);
++    expect(aiCall.mock.calls[0]![0]).toBe(
++      `${baselineCall.mock.calls[0]![0]}\n\napproved content page rules`,
++    );
++    expect(aiCall.mock.calls[1]![0]).toBe(
++      `${baselineCall.mock.calls[1]![0]}\n\napproved actions page rules`,
++    );
++    expect(aiCall.mock.calls.map((call) => call[1])).toEqual(
++      baselineCall.mock.calls.map((call) => call[1]),
++    );
++    expect(getGenerationSkillContext.mock.calls.map(([input]) => input.phase)).toEqual([
++      'content',
++      'actions',
++    ]);
++    expect(onGenerationSkillContext).toHaveBeenNthCalledWith(
++      1,
++      expect.objectContaining({
++        stageId: 'stage-test',
++        sceneId: 'scene-p1',
++        sceneType: 'quiz',
++        phase: 'content',
++      }),
++      expect.objectContaining({ text: 'approved content page rules' }),
++    );
++    expect(onGenerationSkillContext).toHaveBeenNthCalledWith(
++      2,
++      expect.objectContaining({ stageId: 'stage-test', sceneId: 'scene-p1', phase: 'actions' }),
++      expect.objectContaining({ text: 'approved actions page rules' }),
++    );
++    await find(tools, 'generate_actions').execute('rebuild-actions', {
++      stageId: 'stage-test',
++      sceneId: 'scene-p1',
++      synthesizeAudio: false,
++    } as never);
++    expect(aiCall.mock.calls[2]![0]).toContain('approved actions page rules');
++    expect(onGenerationSkillContext).toHaveBeenCalledTimes(3);
++  });
++
++  it('does not issue a Skill-context receipt for failed AI calls or failed scene writes', async () => {
++    for (const failsAt of ['ai', 'persistence']) {
++      const current = state(document([]));
++      const onGenerationSkillContext = vi.fn(async () => undefined);
++      if (failsAt === 'persistence')
++        vi.mocked(current.store.putScene).mockRejectedValue(new Error('write failed'));
++      let calls = 0;
++      const aiCall = vi.fn(async () => {
++        if (failsAt === 'ai') throw new Error('ai failed');
++        return ++calls === 1
++          ? JSON.stringify([{ id: 'q1', type: 'short_answer', question: 'Try it?' }])
++          : JSON.stringify([{ type: 'text', content: 'Narration' }]);
++      });
++      const tools = buildGenerationTools(
++        deps(current.store, {
++          aiCall,
++          onGenerationSkillContext,
++          getGenerationSkillContext: () => ({
++            text: 'Approved rules',
++            contextSha256: 'a'.repeat(64),
++          }),
++        }),
++      );
++      await expect(
++        find(tools, 'generate_scene').execute('failed', {
++          stageId: 'stage-test',
++          order: 1,
++          title: 'Practice',
++          type: 'quiz',
++          brief: 'Try the idea',
++        } as never),
++      ).rejects.toThrow(/failed/);
++      expect(onGenerationSkillContext).not.toHaveBeenCalled();
++    }
++  });
++
+   it('reports active-skill diagnostics against the persisted stage after generation', async () => {
+     const current = state(document([]));
+     const onCheckpoint = vi.fn();
+diff --git a/tests/playback/discussion-completion.test.ts b/tests/playback/discussion-completion.test.ts
+new file mode 100644
+index 0000000..3cfeb9e
+--- /dev/null
++++ b/tests/playback/discussion-completion.test.ts
+@@ -0,0 +1,163 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { PlaybackEngine } from '@/lib/playback/engine';
++import { finishGuidedDiscussionPlayback } from '@/lib/playback/discussion-completion';
++import type { CleanupSource } from '@/lib/playback/auto-resume';
++import type { ActionEngine } from '@/lib/action/engine';
++import type { AudioPlayer } from '@/lib/utils/audio-player';
++import type { Action } from '@/lib/types/action';
++import type { Scene } from '@/lib/types/stage';
++
++async function joinedDiscussion(followedBySpeech = false) {
++  vi.useFakeTimers();
++  const onComplete = vi.fn();
++  const onSpeechStart = vi.fn();
++  let audioEnded = () => {};
++  const audio = {
++    play: vi.fn(async () => true),
++    onEnded: vi.fn((callback: () => void) => {
++      audioEnded = callback;
++    }),
++    stop: vi.fn(),
++    pause: vi.fn(),
++    resume: vi.fn(),
++    isPlaying: vi.fn(() => false),
++    hasActiveAudio: vi.fn(() => false),
++  } as unknown as AudioPlayer;
++  const actions: Action[] = [
++    { id: 'final-discussion', type: 'discussion', topic: 'Compare numbers' },
++  ];
++  if (followedBySpeech)
++    actions.push({
++      id: 'after-discussion',
++      type: 'speech',
++      text: 'Now try the next example.',
++      audioId: 'saved-audio',
++    });
++  const scene = {
++    id: 'scene-p5',
++    stageId: 'stage-math',
++    type: 'interactive',
++    title: 'Compare',
++    order: 5,
++    content: { type: 'interactive', html: '<p>Compare</p>' },
++    actions,
++  } as Scene;
++  const engine = new PlaybackEngine(
++    [scene],
++    {
++      execute: vi.fn(async () => {}),
++      clearEffects: vi.fn(),
++      resetPlaybackVisualState: vi.fn(),
++    } as unknown as ActionEngine,
++    audio,
++    { onComplete, onSpeechStart },
++  );
++  engine.start();
++  await vi.advanceTimersByTimeAsync(4000);
++  engine.confirmDiscussion();
++  expect(engine.getMode()).toBe('live');
++  const binding = { engine, sceneId: scene.id, settled: false };
++  const cleanup = vi.fn(() => engine.handleEndDiscussion());
++  const prepareLecture = vi.fn();
++  const finish = (source: CleanupSource, isCurrent = () => true) =>
++    finishGuidedDiscussionPlayback({ binding, source, isCurrent, cleanup, prepareLecture });
++  return {
++    engine,
++    binding,
++    cleanup,
++    prepareLecture,
++    onComplete,
++    onSpeechStart,
++    finish,
++    endAudio: () => audioEnded(),
++  };
++}
++
++describe('scripted discussion completion uses the ordinary playback exit', () => {
++  afterEach(() => vi.useRealTimers());
++
++  it.each(['turn_complete', 'soft_close_confirmed', 'soft_close_timeout'] as const)(
++    'finishes a final discussion exactly once after %s',
++    async (source) => {
++      const test = await joinedDiscussion();
++      expect(test.onComplete).not.toHaveBeenCalled();
++      test.finish(source);
++      expect(test.cleanup).toHaveBeenCalledTimes(1);
++      expect(test.onComplete).toHaveBeenCalledTimes(1);
++      expect(test.prepareLecture).not.toHaveBeenCalled();
++      test.finish(source);
++      expect(test.cleanup).toHaveBeenCalledTimes(1);
++      expect(test.onComplete).toHaveBeenCalledTimes(1);
++    },
++  );
++
++  it('continues remaining actions and reports completion only after their real audio end', async () => {
++    const test = await joinedDiscussion(true);
++    test.finish('turn_complete');
++    await Promise.resolve();
++    expect(test.prepareLecture).toHaveBeenCalledTimes(1);
++    expect(test.onSpeechStart).toHaveBeenCalledWith('Now try the next example.');
++    expect(test.onComplete).not.toHaveBeenCalled();
++    test.endAudio();
++    expect(test.onComplete).toHaveBeenCalledTimes(1);
++  });
++
++  it.each(['manual_stop', 'error', 'scene_switch', 'soft_close_enter'] as const)(
++    'never resumes or completes on %s',
++    async (source) => {
++      const test = await joinedDiscussion();
++      test.finish(source);
++      expect(test.onComplete).not.toHaveBeenCalled();
++      expect(test.prepareLecture).not.toHaveBeenCalled();
++      expect(test.binding.settled).toBe(source !== 'soft_close_enter');
++    },
++  );
++
++  it('ignores an old engine, scene or superseded chat session before cleanup', async () => {
++    const test = await joinedDiscussion();
++    test.finish('turn_complete', () => false);
++    expect(test.cleanup).not.toHaveBeenCalled();
++    expect(test.onComplete).not.toHaveBeenCalled();
++  });
++
++  it('rechecks ownership after cleanup and does not complete a replacement scene', async () => {
++    const test = await joinedDiscussion();
++    let current = true;
++    finishGuidedDiscussionPlayback({
++      binding: test.binding,
++      source: 'turn_complete',
++      isCurrent: () => current,
++      cleanup: () => {
++        test.engine.handleEndDiscussion();
++        current = false;
++      },
++      prepareLecture: test.prepareLecture,
++    });
++    expect(test.onComplete).not.toHaveBeenCalled();
++  });
++
++  it('does not treat a late successful callback after an interruption as completion', async () => {
++    const test = await joinedDiscussion();
++    test.finish('manual_stop');
++    test.engine.handleUserInterrupt('A different question');
++    expect(test.engine.getMode()).toBe('live');
++    test.finish('turn_complete');
++    expect(test.cleanup).toHaveBeenCalledTimes(1);
++    expect(test.engine.getMode()).toBe('live');
++    expect(test.onComplete).not.toHaveBeenCalled();
++  });
++
++  it('leaves ordinary unbound Q&A on its existing cleanup path', () => {
++    const cleanup = vi.fn();
++    expect(
++      finishGuidedDiscussionPlayback({
++        binding: undefined,
++        source: 'turn_complete',
++        isCurrent: () => true,
++        cleanup,
++        prepareLecture: vi.fn(),
++      }),
++    ).toBe(false);
++    expect(cleanup).not.toHaveBeenCalled();
++  });
++});
+diff --git a/tests/server/classroom-generation-retry.test.ts b/tests/server/classroom-generation-retry.test.ts
+index 76f3c26..3d4bdc8 100644
+--- a/tests/server/classroom-generation-retry.test.ts
++++ b/tests/server/classroom-generation-retry.test.ts
+@@ -336,14 +336,12 @@ describe('classroom scene generation retries', () => {
+     expect(mocks.callLLM).toHaveBeenCalledTimes(2);
+   });
+ 
+-  it('compiles the locked OpenMAIC courseware into a formal classroom with zero model calls', async () => {
++  it('routes a historical image-free formal job to Pro without invoking the generic generator', async () => {
+     const {
+       MIRA_COURSEWARE_AUTHORITY,
+       MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+-      MIRA_PROFESSIONAL_CREATION_POLICY,
+-    } = await import(
+-      '@/lib/server/mira-formal-generation-policy'
+-    );
++      MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY: MIRA_PROFESSIONAL_CREATION_POLICY,
++    } = await import('@/lib/server/mira-formal-generation-policy');
+     const questions = Array.from({ length: 5 }, (_, index) => ({
+       id: `q${index + 1}`,
+       type: 'numeric',
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index b9c012f..f326fa1 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -9,8 +9,8 @@ vi.mock('@/lib/server/provider-config', () => ({
+       ? { deepseek: { models: ['deepseek-v4-pro', 'deepseek-v4-flash'] } }
+       : {},
+   getServerWebSearchProviders: () => ({}),
+-  getServerImageProviders: () => process.env.MIRA_TEST_QWEN_IMAGE_KEY
+-    ? { 'qwen-image': { models: ['qwen-image-max'] } } : {},
++  getServerImageProviders: () =>
++    process.env.MIRA_TEST_QWEN_IMAGE_KEY ? { 'qwen-image': { models: ['qwen-image-max'] } } : {},
+   isServerProviderDisabled: () => false,
+   resolveImageApiKey: () => process.env.MIRA_TEST_QWEN_IMAGE_KEY || '',
+   resolveImageModel: () => 'qwen-image-max',
+@@ -256,6 +256,19 @@ describe('GET /api/health structured scene runtime policy', () => {
+           usage: 'teaching_need',
+           assetValidationRequired: true,
+         },
++        skillOrchestration: {
++          schemaVersion: 'mira.openmaic.skill-orchestration.v1',
++          profileId: 'mira-primary-integrated.v1',
++          skillIds: [
++            'mira-primary-courseware',
++            'stage-design',
++            'k12-core-literacy-planning',
++            'deep-interactive',
++            'slide-craft',
++            'learning-to-learn',
++          ],
++          sceneContextRequired: true,
++        },
+       },
+       studentRuntimeEvents: {
+         enforced: true,
+@@ -462,7 +475,9 @@ describe('GET /api/health structured scene runtime policy', () => {
+     process.env.DEEPSEEK_API_KEY = 'formal-generation-test-key';
+     delete process.env.MIRA_TEST_QWEN_IMAGE_KEY;
+     const { GET } = await import('@/app/api/health/route');
+-    const response = await GET(new NextRequest('http://runtime.test/api/health?scope=formal-generation'));
++    const response = await GET(
++      new NextRequest('http://runtime.test/api/health?scope=formal-generation'),
++    );
+     expect(response.status).toBe(503);
+     expect(await response.json()).toMatchObject({ success: false, errorCode: 'PROVIDER_DISABLED' });
+   });
+diff --git a/tests/server/mira-formal-skill-policy.test.ts b/tests/server/mira-formal-skill-policy.test.ts
+new file mode 100644
+index 0000000..d767bdd
+--- /dev/null
++++ b/tests/server/mira-formal-skill-policy.test.ts
+@@ -0,0 +1,206 @@
++import { createHash } from 'node:crypto';
++import { beforeAll, describe, expect, it } from 'vitest';
++import type { AgentMessage } from '@earendil-works/pi-agent-core';
++import {
++  MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY,
++  MIRA_FORMAL_SKILL_SESSION_ORIGIN,
++  MIRA_FORMAL_SKILL_CONTEXT_EVENT,
++  prepareMiraFormalSkillBundle,
++  buildMiraFormalSkillPreload,
++  collectMiraFormalSkillReads,
++  composeMiraFormalSceneSkillContext,
++  buildMiraFormalSkillReceipt,
++  formalSkillContextTrace,
++  formalSkillReferencePaths,
++  formalSkillPromptSuffix,
++  formalSkillSubjectFromPrompt,
++  type MiraFormalSkillBundle,
++} from '@/lib/server/mira-formal-skill-policy';
++import { listSkills } from '@/lib/server/agent-runtime/skills';
++import { buildSkillPreload } from '@/lib/server/agent-runtime/skill-preload';
++import {
++  MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++  MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
++  MIRA_PROFESSIONAL_CREATION_POLICY,
++  isExactMiraProfessionalCreationPolicy,
++  isMiraIntegratedSkillCreationPolicy,
++  isMiraImageCreationPolicy,
++} from '@/lib/server/mira-formal-generation-policy';
++import {
++  withMiraFormalImageInstructions,
++  withMiraFormalSkillInstructions,
++} from '@/lib/server/mira-formal-professional-classroom';
++import {
++  isMiraFormalIntegratedSkillSession,
++  isMiraFormalImageSession,
++} from '@/lib/server/mira-professional-research-policy';
++import type { Scene } from '@/lib/types/stage';
++
++const model = { api: 'openai-completions', provider: 'test', id: 'test' } as const;
++let bundle: MiraFormalSkillBundle;
++let messages: AgentMessage[];
++beforeAll(async () => {
++  bundle = await prepareMiraFormalSkillBundle(await listSkills(), 'math');
++  const preload = await buildMiraFormalSkillPreload(
++    { text: 'Build the approved course.', skills: bundle.skills, transcript: [], model },
++    bundle,
++  );
++  messages = preload.messages;
++});
++
++describe('formal integrated Skills', () => {
++  it('uses exact versioned policies and preserves both historical prompt byte streams', () => {
++    const original = 'historical prompt\nwith whitespace  \n';
++    for (const policy of [
++      MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++      MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
++    ]) {
++      expect(isExactMiraProfessionalCreationPolicy(policy)).toBe(true);
++      expect(isMiraIntegratedSkillCreationPolicy(policy)).toBe(false);
++      const historical = withMiraFormalImageInstructions(original, policy);
++      expect(withMiraFormalSkillInstructions(historical, policy, 'math')).toBe(historical);
++    }
++    expect(isMiraImageCreationPolicy(MIRA_PROFESSIONAL_CREATION_POLICY)).toBe(true);
++    expect(isMiraIntegratedSkillCreationPolicy(MIRA_PROFESSIONAL_CREATION_POLICY)).toBe(true);
++    expect(
++      isExactMiraProfessionalCreationPolicy({
++        ...MIRA_PROFESSIONAL_CREATION_POLICY,
++        skillOrchestration: {
++          ...MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY,
++          sceneContextRequired: false,
++        },
++      }),
++    ).toBe(false);
++    expect(formalSkillSubjectFromPrompt(original + formalSkillPromptSuffix('math'))).toBe('math');
++    expect(formalSkillReferencePaths('english')).toEqual(formalSkillReferencePaths('chinese'));
++    expect(formalSkillReferencePaths('math')[1]).toMatch(/mathematics\.md$/);
++  });
++
++  it('requires the internal formal identity and new origin, without changing public Pro', () => {
++    const formal = {
++      ownerId: `mira-formal-professional:${'a'.repeat(64)}`,
++      sessionId: `miraformal_${'a'.repeat(64)}`,
++      skillId: 'mira-primary-courseware',
++      origin: MIRA_FORMAL_SKILL_SESSION_ORIGIN,
++    };
++    expect(isMiraFormalIntegratedSkillSession(formal)).toBe(true);
++    expect(isMiraFormalImageSession(formal)).toBe(true);
++    expect(isMiraFormalIntegratedSkillSession({ ...formal, ownerId: 'anonymous-operator' })).toBe(
++      false,
++    );
++    expect(
++      isMiraFormalIntegratedSkillSession({ ...formal, origin: 'mira-formal-professional' }),
++    ).toBe(false);
++  });
++
++  it('actually reads six builtin Skills plus the two subject references and deduplicates on resume', async () => {
++    const reads = collectMiraFormalSkillReads(messages, bundle);
++    expect(reads.skillReads.map((read) => read.skillId)).toEqual(
++      MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY.skillIds,
++    );
++    expect(reads.referenceReads.map((read) => read.resourcePath)).toEqual(
++      formalSkillReferencePaths('math'),
++    );
++    expect(
++      [...reads.skillReads, ...reads.referenceReads].every((read) =>
++        /^[a-f0-9]{64}$/.test(read.sourceHash),
++      ),
++    ).toBe(true);
++    expect(messages.filter((message) => message.role === 'toolResult')).toHaveLength(8);
++    const resumed = await buildMiraFormalSkillPreload(
++      { text: 'Continue.', skills: bundle.skills, transcript: messages, model },
++      bundle,
++    );
++    expect(resumed.messages).toEqual([]);
++    const publicPreload = await buildSkillPreload({
++      text: 'Public Pro',
++      forced: bundle.skills,
++      skills: bundle.skills,
++      transcript: [],
++      model,
++    });
++    expect(publicPreload.injected).toHaveLength(3);
++    expect(publicPreload.deferred).toHaveLength(3);
++  });
++
++  it('rejects missing, partial, mismatched or merely claimed read evidence', () => {
++    expect(() => collectMiraFormalSkillReads(messages.slice(2), bundle)).toThrow(
++      'FORMAL_SKILL_READ_MISSING',
++    );
++    const partial = structuredClone(messages) as Array<
++      AgentMessage & { details?: Record<string, unknown> }
++    >;
++    partial[1]!.details!.lines = 1;
++    expect(() => collectMiraFormalSkillReads(partial, bundle)).toThrow('FORMAL_SKILL_READ_MISSING');
++    const forged = structuredClone(messages) as Array<AgentMessage & { content?: unknown }>;
++    forged[1]!.content = [{ type: 'text', text: 'Skill was applied.' }];
++    expect(() => collectMiraFormalSkillReads(forged, bundle)).toThrow('FORMAL_SKILL_READ_MISSING');
++  });
++
++  it('carries source-derived page rules into content and actions with explicit formal precedence', () => {
++    const slide = composeMiraFormalSceneSkillContext(bundle, {
++      sceneType: 'slide',
++      phase: 'content',
++    });
++    expect(slide.text).toContain('The canvas you are editing inside');
++    expect(slide.text).toContain('50px');
++    expect(slide.text).toContain('两条内容红线');
++    expect(slide.text).toContain('先预测');
++    expect(slide.text).toContain('mathematics.md');
++    expect(slide.text).toContain('no 60% interactive quota');
++    expect(slide.contextSha256).toBe(createHash('sha256').update(slide.text).digest('hex'));
++    const interactive = composeMiraFormalSceneSkillContext(bundle, {
++      sceneType: 'interactive',
++      phase: 'content',
++    });
++    expect(interactive.text).toContain('what the learner changes');
++    expect(interactive.text).not.toContain('The body is `interactive`');
++    const actions = composeMiraFormalSceneSkillContext(bundle, {
++      sceneType: 'slide',
++      phase: 'actions',
++    });
++    expect(actions.text).toContain('Narration and focus');
++    expect(actions.text).toContain('spotlight/speech sequences');
++    expect(actions.text).not.toContain('The canvas you are editing inside');
++    expect(actions.contextSha256).not.toBe(slide.contextSha256);
++  });
++
++  it('requires durable content and action context for every final page and the same session/stage', () => {
++    const scenes = [
++      { id: 'page-1', stageId: 'stage-1', type: 'slide', order: 0 },
++      { id: 'page-2', stageId: 'stage-1', type: 'interactive', order: 1 },
++    ] as Scene[];
++    const events = scenes.flatMap((scene) =>
++      (['content', 'actions'] as const).map((phase) => {
++        const input = { stageId: scene.stageId, sceneId: scene.id, sceneType: scene.type, phase };
++        return {
++          type: MIRA_FORMAL_SKILL_CONTEXT_EVENT,
++          data: formalSkillContextTrace(
++            'session-1',
++            input,
++            composeMiraFormalSceneSkillContext(bundle, input),
++          ),
++        };
++      }),
++    );
++    const input = { bundle, messages, scenes, events, sessionId: 'session-1', stageId: 'stage-1' };
++    const receipt = buildMiraFormalSkillReceipt(input);
++    expect(receipt.skillReads).toHaveLength(6);
++    expect(receipt.sceneContexts.map((row) => row.sceneId)).toEqual(['page-1', 'page-2']);
++    expect(() => buildMiraFormalSkillReceipt({ ...input, events: events.slice(1) })).toThrow(
++      'FORMAL_SKILL_SCENE_CONTEXT_MISSING',
++    );
++    expect(() =>
++      buildMiraFormalSkillReceipt({ ...input, sessionId: 'public-pro-session' }),
++    ).toThrow('FORMAL_SKILL_SCENE_CONTEXT_MISSING');
++    expect(() =>
++      buildMiraFormalSkillReceipt({
++        ...input,
++        scenes: [{ ...scenes[0]!, stageId: 'foreign-stage' }],
++      }),
++    ).toThrow('FORMAL_SKILL_SCENE_STAGE_MISMATCH');
++    expect(() => buildMiraFormalSkillReceipt({ ...input, messages: [] })).toThrow(
++      'FORMAL_SKILL_READ_MISSING',
++    );
++  });
++});

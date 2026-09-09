@@ -1,0 +1,17 @@
+# Publicly trusted production TLS edge. Each value must be a credential-free
+# HTTPS origin, for example https://learn.example.com.
+
+{$MIRA_STUDENT_ORIGIN} {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3000
+}
+
+{$MIRA_CLASSROOM_ORIGIN} {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3101
+}
+
+{$MIRA_API_ORIGIN} {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8000
+}

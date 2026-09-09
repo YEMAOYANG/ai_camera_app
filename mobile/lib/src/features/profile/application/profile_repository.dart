@@ -233,6 +233,8 @@ class ProfileRepository {
       'ageStage': child.ageStage,
       'educationStage': child.educationStage,
       'grade': child.grade,
+      'gradeCode': child.gradeCode,
+      'schoolYearStartYear': child.schoolYearStartYear,
       'schoolName': child.schoolName,
       'interests': child.interests,
       'taskPreferences': child.taskPreferences,
@@ -338,7 +340,6 @@ class ProfileRepository {
     final response = await _patch('/settings/$key', data: {'value': value});
     return ProfileSetting.fromJson(_asMap(_asMap(response.data)['setting']));
   }
-
 
   Future<Map<String, dynamic>> conversationPolicy() async {
     final response = await _get('/conversation/policy');

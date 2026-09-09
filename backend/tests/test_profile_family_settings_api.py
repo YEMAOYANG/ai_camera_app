@@ -2,12 +2,49 @@ from __future__ import annotations
 
 import json
 import unittest
-from datetime import date
+from concurrent.futures import ThreadPoolExecutor
+from datetime import date, datetime
+from threading import Barrier, Event, Lock, local
+from unittest.mock import patch
 
 from app import create_app
-from core.database import Database
+from core.database import Database, DatabaseConnection
 from core.security import hash_value, now_ms
+from repositories.profile_repository import ProfileRepository
 from tests.support import fresh_test_config, request_debug_code
+
+
+PREPARATION_SCHEMA_HEADER = "X-Mira-Preparation-Schema"
+PREPARATION_SCHEMA_V2 = "mira.learning.preparation.v2"
+V1_PREPARATION_KEYS = {
+    "schemaVersion",
+    "id",
+    "childId",
+    "gradeCode",
+    "gradeLabel",
+    "subjects",
+    "status",
+    "stage",
+    "progressPercent",
+    "totalCourseCount",
+    "readyCourseCount",
+    "failedCourseCount",
+    "attempt",
+    "canRetry",
+    "retryAfterMs",
+    "message",
+    "lastProgressAt",
+    "updatedAt",
+    "completedAt",
+    "error",
+}
+V1_SUBJECT_KEYS = {
+    "code",
+    "label",
+    "readyCourseCount",
+    "failedCourseCount",
+    "totalCourseCount",
+}
 
 
 class ProfileFamilySettingsApiTest(unittest.TestCase):
@@ -877,8 +914,33 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(child.status_code, 200)
         self.assertEqual(child.json["child"]["grade"], "一年级")
+        self.assertEqual(child.json["child"]["gradeCode"], "primary_1")
+        self.assertEqual(child.json["child"]["gradeLabel"], "一年级")
+        self.assertEqual(child.json["child"]["educationStageCode"], "primary")
+        self.assertEqual(child.json["child"]["contentMode"], "primary_learning")
+        self.assertEqual(
+            child.json["child"]["schoolYearStartYear"],
+            datetime.now().year,
+        )
+        self.assertIsInstance(child.json["child"]["gradeConfirmedAt"], int)
         self.assertEqual(child.json["child"]["sleepTime"], "20:45")
         self.assertEqual(child.json["child"]["interests"], ["阅读", "搭积木"])
+
+        reselected = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={
+                "gradeCode": "primary_4",
+                "schoolYearStartYear": datetime.now().year,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(reselected.status_code, 200, reselected.json)
+        self.assertEqual(reselected.json["child"]["gradeCode"], "primary_4")
+        self.assertEqual(reselected.json["child"]["grade"], "四年级")
+        self.assertEqual(reselected.json["child"]["name"], "小宇")
+        self.assertEqual(reselected.json["child"]["sleepTime"], "20:45")
+        self.assertEqual(reselected.json["child"]["schoolName"], "示例小学")
+        self.assertEqual(reselected.json["child"]["interests"], ["阅读", "搭积木"])
 
         current = self.client.get("/api/children/current", headers=self._auth_headers())
         self.assertEqual(current.status_code, 200)
@@ -949,6 +1011,571 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
             headers=self._auth_headers(),
         )
         self.assertEqual(deleted.status_code, 200)
+
+    def test_child_grade_selection_reserves_preparation_plan(self):
+        current_year = datetime.now().year
+        selected = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={
+                "gradeCode": "primary_1",
+                "schoolYearStartYear": current_year,
+            },
+            headers={
+                **self._auth_headers(),
+                PREPARATION_SCHEMA_HEADER: PREPARATION_SCHEMA_V2,
+            },
+        )
+        self.assertEqual(selected.status_code, 200, selected.json)
+        self.assertEqual(selected.json["child"]["gradeCode"], "primary_1")
+        preparation = selected.json["learningPreparation"]
+        self.assertEqual(set(preparation), V1_PREPARATION_KEYS)
+        self.assertEqual(
+            preparation["schemaVersion"],
+            "mira.learning.preparation.v1",
+        )
+        self.assertNotIn("contentProgress", preparation)
+        for subject in preparation["subjects"]:
+            self.assertEqual(set(subject), V1_SUBJECT_KEYS)
+        self.assertEqual(preparation["status"], "queued")
+        self.assertEqual(preparation["totalCourseCount"], 30)
+        self.assertEqual(preparation["gradeLabel"], "一年级")
+        self.assertEqual(
+            selected.json["learningPreparationAvailability"],
+            {
+                "status": "preparing",
+                "gradeCode": "primary_1",
+                "message": "已开始准备",
+            },
+        )
+        self.assertEqual(
+            [item["label"] for item in preparation["subjects"]],
+            ["语文", "数学", "英语"],
+        )
+
+        repeated = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={
+                "gradeCode": "primary_1",
+                "schoolYearStartYear": current_year,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(repeated.status_code, 200, repeated.json)
+        self.assertEqual(repeated.json["learningPreparation"]["id"], preparation["id"])
+
+        nickname_only = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={"nickname": "小宇仔"},
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(nickname_only.status_code, 200, nickname_only.json)
+        self.assertNotIn("learningPreparation", nickname_only.json)
+
+        changed_away = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={
+                "educationStage": "幼儿园",
+                "grade": "中班",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(changed_away.status_code, 200, changed_away.json)
+        self.assertNotIn("learningPreparation", changed_away.json)
+
+        database = Database(self.app.config["DATABASE_URL"])
+        with database.transaction() as conn:
+            child = conn.execute(
+                "SELECT * FROM children WHERE id = ?",
+                (self.child_id,),
+            ).fetchone()
+            plans = conn.execute(
+                """
+                SELECT grade_selection_revision, status
+                FROM learning_curriculum_preparation_plans
+                WHERE child_id = ?
+                ORDER BY grade_selection_revision
+                """,
+                (self.child_id,),
+            ).fetchall()
+        self.assertEqual(child["grade_selection_revision"], 2)
+        self.assertEqual(
+            [(row["grade_selection_revision"], row["status"]) for row in plans],
+            [(1, "superseded")],
+        )
+
+    def test_primary_two_grade_is_saved_without_reserving_a_formal_plan(self):
+        current_year = datetime.now().year
+
+        selected = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={
+                "gradeCode": "primary_2",
+                "schoolYearStartYear": current_year,
+            },
+            headers=self._auth_headers(),
+        )
+
+        self.assertEqual(selected.status_code, 200, selected.json)
+        self.assertEqual(selected.json["child"]["gradeCode"], "primary_2")
+        self.assertNotIn("learningPreparation", selected.json)
+        self.assertEqual(
+            selected.json["learningPreparationAvailability"],
+            {
+                "status": "unavailable",
+                "gradeCode": "primary_2",
+                "message": "该年级正式课程尚未开放",
+            },
+        )
+        with Database(self.app.config["DATABASE_URL"]).transaction() as conn:
+            count = conn.execute(
+                """
+                SELECT COUNT(*) AS count
+                FROM learning_curriculum_preparation_plans
+                WHERE child_id = ?
+                """,
+                (self.child_id,),
+            ).fetchone()["count"]
+        self.assertEqual(int(count), 0)
+
+    def test_concurrent_profile_grade_changes_serialize_to_one_current_plan(self):
+        barrier = Barrier(3)
+        current_year = datetime.now().year
+        connection_ids: list[int] = []
+        connection_ids_lock = Lock()
+        original_get_child = ProfileRepository.get_child
+
+        def record_locked_child_connection(
+            repository,
+            conn,
+            *,
+            family_id: str,
+            child_id: str,
+            for_update: bool = False,
+        ):
+            if for_update:
+                connection_id = conn.execute(
+                    "SELECT CONNECTION_ID() AS id"
+                ).fetchone()["id"]
+                with connection_ids_lock:
+                    connection_ids.append(connection_id)
+            return original_get_child(
+                repository,
+                conn,
+                family_id=family_id,
+                child_id=child_id,
+                for_update=for_update,
+            )
+
+        def save_grade_from_independent_client(grade_code: str):
+            client = self.app.test_client()
+            barrier.wait(timeout=5)
+            return client.patch(
+                f"/api/children/{self.child_id}",
+                json={
+                    "gradeCode": grade_code,
+                    "schoolYearStartYear": current_year,
+                },
+                headers=self._auth_headers(),
+            )
+
+        with patch.object(
+            ProfileRepository,
+            "get_child",
+            record_locked_child_connection,
+        ):
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                futures = [
+                    executor.submit(save_grade_from_independent_client, "primary_1"),
+                    executor.submit(save_grade_from_independent_client, "primary_2"),
+                ]
+                barrier.wait(timeout=5)
+                responses = [future.result(timeout=15) for future in futures]
+        self.assertEqual([response.status_code for response in responses], [200, 200])
+        self.assertEqual(len(connection_ids), 2)
+        self.assertEqual(len(set(connection_ids)), 2)
+
+        database = Database(self.app.config["DATABASE_URL"])
+        with database.transaction() as conn:
+            child = conn.execute(
+                "SELECT * FROM children WHERE id = ?",
+                (self.child_id,),
+            ).fetchone()
+            plans = conn.execute(
+                """
+                SELECT grade_code, grade_selection_revision, status
+                FROM learning_curriculum_preparation_plans
+                WHERE child_id = ?
+                ORDER BY grade_selection_revision
+                """,
+                (self.child_id,),
+            ).fetchall()
+            event_count = conn.execute(
+                """
+                SELECT COUNT(*) AS count
+                FROM learning_curriculum_preparation_events events
+                JOIN learning_curriculum_preparation_plans plans
+                  ON plans.id = events.plan_id
+                WHERE plans.child_id = ?
+                """,
+                (self.child_id,),
+            ).fetchone()["count"]
+        self.assertEqual(child["grade_selection_revision"], 2)
+        self.assertEqual(len(plans), 1)
+        self.assertEqual(plans[0]["grade_code"], "primary_1")
+        if child["grade_code"] == "primary_1":
+            self.assertEqual(plans[0]["grade_selection_revision"], 2)
+            self.assertEqual(plans[0]["status"], "queued")
+        else:
+            self.assertEqual(child["grade_code"], "primary_2")
+            self.assertEqual(plans[0]["grade_selection_revision"], 1)
+            self.assertEqual(plans[0]["status"], "superseded")
+        # Task 3's reservation contract records supersession on the plan row;
+        # append-only worker events begin only when a stated transition API uses them.
+        self.assertEqual(event_count, 0)
+
+    def test_mixed_setup_and_profile_grade_saves_lock_family_before_child(self):
+        start = Barrier(3)
+        setup_family_locked = Event()
+        profile_first_lock_seen = Event()
+        thread_state = local()
+        orders = {"setup": [], "profile": []}
+        orders_lock = Lock()
+        original_execute = DatabaseConnection.execute
+
+        def record_lock_order(connection, sql: str, params=()):
+            flow = getattr(thread_state, "flow", "")
+            normalized = " ".join(sql.split())
+            is_family_lock = (
+                normalized == "SELECT id FROM families WHERE id = ? FOR UPDATE"
+            )
+            is_setup_child_lock = (
+                "SELECT * FROM children WHERE family_id = ? ORDER BY created_at LIMIT 1 FOR UPDATE"
+                in normalized
+            )
+            is_profile_child_lock = (
+                "SELECT * FROM children WHERE family_id = ? AND id = ? FOR UPDATE"
+                in normalized
+            )
+            is_plan_lock = (
+                "learning_curriculum_preparation_plans" in normalized
+                and (
+                    normalized.startswith("INSERT INTO")
+                    or normalized.endswith("FOR UPDATE")
+                )
+            )
+
+            if flow == "profile" and is_family_lock:
+                profile_first_lock_seen.set()
+            result = original_execute(connection, sql, params)
+            lock_name = None
+            if is_family_lock:
+                lock_name = "family"
+            elif is_setup_child_lock or is_profile_child_lock:
+                lock_name = "child"
+            elif is_plan_lock:
+                lock_name = "plan"
+            if flow and lock_name:
+                with orders_lock:
+                    orders[flow].append(lock_name)
+
+            if flow == "setup" and is_family_lock:
+                setup_family_locked.set()
+                if not profile_first_lock_seen.wait(timeout=5):
+                    raise AssertionError("profile did not reach its first contested lock")
+            elif flow == "profile" and is_profile_child_lock:
+                if "family" not in orders[flow]:
+                    profile_first_lock_seen.set()
+                    if not setup_family_locked.wait(timeout=5):
+                        raise AssertionError("setup did not acquire the family lock")
+            return result
+
+        def setup_save():
+            thread_state.flow = "setup"
+            client = self.app.test_client()
+            start.wait(timeout=5)
+            try:
+                return client.post(
+                    "/api/setup/child",
+                    json={
+                        "name": "小宇",
+                        "nickname": "小宇",
+                        "gradeCode": "primary_1",
+                        "schoolYearStartYear": datetime.now().year,
+                    },
+                    headers=self._auth_headers(),
+                )
+            except Exception as exc:  # pragma: no cover - exercised by RED
+                return exc
+
+        def profile_save():
+            thread_state.flow = "profile"
+            client = self.app.test_client()
+            start.wait(timeout=5)
+            try:
+                return client.patch(
+                    f"/api/children/{self.child_id}",
+                    json={
+                        "gradeCode": "primary_2",
+                        "schoolYearStartYear": datetime.now().year,
+                    },
+                    headers=self._auth_headers(),
+                )
+            except Exception as exc:  # pragma: no cover - exercised by RED
+                return exc
+
+        with patch.object(DatabaseConnection, "execute", record_lock_order):
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                futures = [executor.submit(setup_save), executor.submit(profile_save)]
+                start.wait(timeout=5)
+                results = [future.result(timeout=15) for future in futures]
+
+        for result in results:
+            self.assertFalse(isinstance(result, Exception), repr(result))
+            self.assertEqual(result.status_code, 200, result.json)
+        for flow in ("setup", "profile"):
+            self.assertIn("family", orders[flow], orders)
+            self.assertIn("child", orders[flow], orders)
+            self.assertIn("plan", orders[flow], orders)
+            self.assertLess(orders[flow].index("family"), orders[flow].index("child"))
+            self.assertLess(orders[flow].index("child"), orders[flow].index("plan"))
+
+    def test_same_grade_save_and_retry_share_family_child_plan_lock_order(self):
+        current_year = datetime.now().year
+        selected = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={
+                "gradeCode": "primary_1",
+                "schoolYearStartYear": current_year,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(selected.status_code, 200, selected.json)
+        plan_id = selected.json["learningPreparation"]["id"]
+        failed_at = now_ms()
+        database = Database(self.app.config["DATABASE_URL"])
+        with database.transaction() as conn:
+            source = conn.execute(
+                """
+                SELECT * FROM learning_curriculum_preparation_plans
+                WHERE id = ?
+                """,
+                (plan_id,),
+            ).fetchone()
+        from services.learning_catalog_release_service import (
+            LearningCatalogReleaseService,
+        )
+
+        catalog = LearningCatalogReleaseService(
+            self.app.config["DATABASE_URL"],
+            dynamic_generation_service=None,
+            lesson_package_service=None,
+        )
+        catalog_payload = catalog.create_preparation_content_build(
+            request_id=str(source["shared_build_request_id"]),
+            title="Task 9 profile retry lock authority",
+            preparation_target=json.loads(str(source["target_spec_json"])),
+            target_fingerprint=str(source["target_fingerprint"]),
+        )
+        with database.transaction() as conn:
+            conn.execute(
+                """
+                UPDATE learning_curriculum_preparation_plans
+                SET status = 'failed', stage = 'completed', next_run_at = NULL,
+                  catalog_build_id = ?, catalog_release_id = ?,
+                  completed_at = ?,
+                  error_code = 'preparation_dependency_unavailable',
+                  error_message_safe = '课程服务暂时不可用，请稍后重试',
+                  lease_token = NULL, lease_expires_at = NULL,
+                  heartbeat_at = NULL, hard_deadline_at = NULL,
+                  resume_stage = NULL, work_unit_kind = NULL,
+                  bound_catalog_item_id = NULL,
+                  bound_content_attempt_ordinal = NULL,
+                  bound_content_phase = NULL, retry_reason_code = NULL,
+                  retry_message_safe = NULL, updated_at = ?
+                WHERE id = ?
+                """,
+                (
+                    catalog_payload["build"]["id"],
+                    catalog_payload["release"]["id"],
+                    failed_at,
+                    failed_at,
+                    plan_id,
+                ),
+            )
+
+        from services.service_factory import learning_curriculum_preparation_service
+
+        start = Barrier(3)
+        save_first_lock_acquired = Event()
+        retry_family_attempted = Event()
+        retry_plan_locked = Event()
+        thread_state = local()
+        orders = {"save": [], "retry": []}
+        orders_lock = Lock()
+        original_execute = DatabaseConnection.execute
+
+        def record_lock_order(connection, sql: str, params=()):
+            flow = getattr(thread_state, "flow", "")
+            normalized = " ".join(sql.split())
+            is_family_lock = normalized in (
+                "SELECT id FROM families WHERE id = ? FOR UPDATE",
+                "SELECT * FROM families WHERE id = ? LIMIT 1 FOR UPDATE",
+            )
+            is_child_lock = (
+                "SELECT * FROM children WHERE family_id = ? AND id = ? FOR UPDATE"
+                in normalized
+                or "SELECT * FROM children WHERE id = ? AND family_id = ? LIMIT 1 FOR UPDATE"
+                in normalized
+            )
+            is_plan_lock = (
+                "learning_curriculum_preparation_plans" in normalized
+                and normalized.endswith("FOR UPDATE")
+            )
+
+            if flow == "retry" and is_family_lock:
+                retry_family_attempted.set()
+            result = original_execute(connection, sql, params)
+            lock_name = None
+            if is_family_lock:
+                lock_name = "family"
+            elif is_child_lock:
+                lock_name = "child"
+            elif is_plan_lock:
+                lock_name = "plan"
+            if flow and lock_name:
+                with orders_lock:
+                    orders[flow].append(lock_name)
+
+            if flow == "save" and is_family_lock:
+                save_first_lock_acquired.set()
+                if not retry_family_attempted.wait(timeout=5):
+                    raise AssertionError("retry did not attempt the family lock")
+            elif flow == "save" and is_child_lock and "family" not in orders[flow]:
+                save_first_lock_acquired.set()
+                if not retry_plan_locked.wait(timeout=5):
+                    raise AssertionError("retry did not acquire the plan lock")
+            elif flow == "retry" and is_plan_lock and "family" not in orders[flow]:
+                retry_plan_locked.set()
+            return result
+
+        def same_grade_save():
+            thread_state.flow = "save"
+            client = self.app.test_client()
+            start.wait(timeout=5)
+            try:
+                return client.patch(
+                    f"/api/children/{self.child_id}",
+                    json={
+                        "gradeCode": "primary_1",
+                        "schoolYearStartYear": current_year,
+                    },
+                    headers=self._auth_headers(),
+                )
+            except Exception as exc:  # pragma: no cover - exercised by RED
+                return exc
+
+        def retry_failed_plan():
+            thread_state.flow = "retry"
+            start.wait(timeout=5)
+            if not save_first_lock_acquired.wait(timeout=5):
+                return AssertionError("save did not acquire its first lock")
+            try:
+                with self.app.app_context():
+                    return learning_curriculum_preparation_service().retry(
+                        self.access_token,
+                        plan_id,
+                        lambda: {"requestId": "concurrent-parent-retry"},
+                    )
+            except Exception as exc:  # pragma: no cover - exercised by RED
+                return exc
+
+        with patch.object(DatabaseConnection, "execute", record_lock_order):
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                futures = [
+                    executor.submit(same_grade_save),
+                    executor.submit(retry_failed_plan),
+                ]
+                start.wait(timeout=5)
+                results = [future.result(timeout=15) for future in futures]
+
+        for result in results:
+            self.assertFalse(isinstance(result, Exception), repr(result))
+        self.assertEqual(results[0].status_code, 200, results[0].json)
+        retry_payload, created = results[1]
+        self.assertTrue(created)
+        self.assertEqual(retry_payload["preparation"]["status"], "queued")
+        for flow in ("save", "retry"):
+            self.assertIn("family", orders[flow], orders)
+            self.assertIn("child", orders[flow], orders)
+            self.assertIn("plan", orders[flow], orders)
+            self.assertLess(orders[flow].index("family"), orders[flow].index("child"))
+            self.assertLess(orders[flow].index("child"), orders[flow].index("plan"))
+
+    def test_preparation_service_is_shared_by_setup_and_profile_factories(self):
+        from services.service_factory import (
+            learning_curriculum_preparation_service,
+            profile_service,
+            setup_service,
+        )
+
+        with self.app.app_context():
+            preparation = learning_curriculum_preparation_service()
+            self.assertIs(learning_curriculum_preparation_service(), preparation)
+            self.assertIs(setup_service().preparation_service, preparation)
+            self.assertIs(profile_service().preparation_service, preparation)
+            self.assertEqual(
+                preparation.next_grade_selection_revision(
+                    None,
+                    grade_code=None,
+                    school_year_start_year=None,
+                ),
+                0,
+            )
+            self.assertEqual(
+                preparation.next_grade_selection_revision(
+                    None,
+                    grade_code="primary_1",
+                    school_year_start_year=2026,
+                ),
+                1,
+            )
+            self.assertEqual(
+                preparation.next_grade_selection_revision(
+                    {
+                        "grade_code": "primary_1",
+                        "grade_school_year_start": 2026,
+                        "grade_selection_revision": 0,
+                    },
+                    grade_code="primary_1",
+                    school_year_start_year=2026,
+                ),
+                0,
+            )
+
+    def test_child_profile_rejects_invalid_grade_and_stage_conflict(self):
+        current_year = datetime.now().year
+        invalid = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={
+                "gradeCode": "primary_7",
+                "schoolYearStartYear": current_year,
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(invalid.status_code, 400)
+        self.assertEqual(invalid.json["error"], "invalid_grade_code")
+
+        conflict = self.client.patch(
+            f"/api/children/{self.child_id}",
+            json={
+                "gradeCode": "primary_3",
+                "schoolYearStartYear": current_year,
+                "educationStage": "幼儿园",
+            },
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(conflict.status_code, 400)
+        self.assertEqual(conflict.json["error"], "grade_stage_conflict")
 
     def test_device_management_and_status(self):
         renamed = self.client.post(

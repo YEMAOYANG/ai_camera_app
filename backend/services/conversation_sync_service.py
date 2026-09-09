@@ -68,31 +68,41 @@ class ConversationSyncService:
                 family_id=family_id,
                 device_id=device["id"],
             )
-            config = self._runtime_config_json(runtime_row)
-            config["interactionProfile"] = profile
-            base_url = str(config.get("baseUrl") or os.getenv("AI_CAMERA_TEST_BASE_URL") or "").strip()
-            if base_url:
-                config["baseUrl"] = base_url
-            provider = str(runtime_row["provider"] if runtime_row else "guardian_local").strip().lower()
-            if provider in {"", "disabled"}:
-                provider = "guardian_local"
-            self.device_repository.upsert_device_runtime_config(
-                conn,
-                family_id=family_id,
-                device_id=device["id"],
-                provider=provider,
-                config_json=json.dumps(config, ensure_ascii=False),
-                secret_ref=str(runtime_row["secret_ref"] if runtime_row and runtime_row.get("secret_ref") else "") or None,
-                status="active",
-                now=now,
-            )
+            provider = ""
+            base_url = ""
+            if runtime_row is not None:
+                provider = str(runtime_row.get("provider") or "").strip().lower()
+                config = self._runtime_config_json(runtime_row)
+                config["interactionProfile"] = profile
+                if provider in {"guardian_local", "ai_camera_test"}:
+                    base_url = str(
+                        config.get("baseUrl")
+                        or os.getenv("AI_CAMERA_TEST_BASE_URL")
+                        or ""
+                    ).strip()
+                    if base_url:
+                        config["baseUrl"] = base_url
+                self.device_repository.upsert_device_runtime_config(
+                    conn,
+                    family_id=family_id,
+                    device_id=device["id"],
+                    provider=provider,
+                    config_json=json.dumps(config, ensure_ascii=False),
+                    secret_ref=str(runtime_row.get("secret_ref") or "") or None,
+                    status=str(runtime_row.get("status") or "active"),
+                    now=now,
+                )
             VoiceRuntimeStore.set_profile(
                 family_id=family_id,
                 device_id=device["id"],
                 profile=profile,
             )
-            base_url = str(config.get("baseUrl") or os.getenv("AI_CAMERA_TEST_BASE_URL") or "").strip()
-            push_result = self._push_profile_to_ai_camera_test(profile, base_url=base_url)
+            push_result = None
+            if provider in {"guardian_local", "ai_camera_test"}:
+                push_result = self._push_profile_to_ai_camera_test(
+                    profile,
+                    base_url=base_url,
+                )
             payload = {
                 "deviceId": device["id"],
                 "wakeName": effective_wake_name,
@@ -168,4 +178,3 @@ class ConversationSyncService:
         except Exception as exc:
             log.warning("ai_camera_test voice profile push failed: %s", exc)
             return {"ok": False, "baseUrl": url_base, "error": str(exc)[:240]}
-

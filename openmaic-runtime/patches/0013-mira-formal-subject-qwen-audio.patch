@@ -1,0 +1,1957 @@
+From 41b6838c30a8733a20acc3bbb1362e902bf58b02 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 13/37] 0013-mira-formal-subject-qwen-audio
+
+---
+ app/api/health/route.ts                |   27 +-
+ app/api/mira/formal-audio/asr/route.ts |   66 ++
+ app/api/mira/formal-audio/tts/route.ts |   92 ++
+ lib/server/mira-formal-audio.ts        | 1099 ++++++++++++++++++++++++
+ tests/server/mira-formal-audio.test.ts |  607 +++++++++++++
+ 5 files changed, 1888 insertions(+), 3 deletions(-)
+ create mode 100644 app/api/mira/formal-audio/asr/route.ts
+ create mode 100644 app/api/mira/formal-audio/tts/route.ts
+ create mode 100644 lib/server/mira-formal-audio.ts
+ create mode 100644 tests/server/mira-formal-audio.test.ts
+
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index 242f434..0f770d6 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -15,10 +15,33 @@ import { getMiraSampleDeterministicRecoveryRuntimePolicy } from '@/lib/server/mi
+ import { getMiraSampleTtsCredentialRecoveryRuntimePolicy } from '@/lib/server/mira-sample-tts-credential-recovery';
+ import { getMiraStudentChromeRuntimePolicy } from '@/lib/mira/student-runtime';
+ import { getMiraFormalGenerationRuntimePolicy } from '@/lib/server/mira-formal-generation-policy';
++import {
++  assertMiraFormalAudioProviderReady,
++  authorizeMiraFormalAudioRequest,
++  getMiraFormalAudioRuntimePolicy,
++  MiraFormalAudioError,
++} from '@/lib/server/mira-formal-audio';
+ 
+ const version = process.env.npm_package_version || '0.3.2';
+ 
+ export async function GET(req?: NextRequest) {
++  if (req?.nextUrl.searchParams.get('scope') === 'formal-audio') {
++    try {
++      authorizeMiraFormalAudioRequest(req);
++      assertMiraFormalAudioProviderReady();
++      return apiSuccess({
++        status: 'ok',
++        version,
++        capabilities: { formalAudio: true, tts: true, asr: true },
++        runtimePolicy: { formalAudio: getMiraFormalAudioRuntimePolicy() },
++      });
++    } catch (error) {
++      if (error instanceof MiraFormalAudioError && error.code === 'unauthorized') {
++        return apiError('INVALID_CREDENTIALS', 403, 'Invalid formal audio credentials');
++      }
++      return apiError('PROVIDER_DISABLED', 503, 'Formal Qwen audio providers are not ready.');
++    }
++  }
+   if (req?.nextUrl.searchParams.get('scope') === 'formal-generation') {
+     try {
+       const structuredScenePolicy = getMiraStructuredSceneRuntimePolicy();
+@@ -45,9 +68,7 @@ export async function GET(req?: NextRequest) {
+       return apiError(
+         'PROVIDER_DISABLED',
+         503,
+-        error instanceof Error
+-          ? error.message
+-          : 'Formal generation policy is not ready',
++        error instanceof Error ? error.message : 'Formal generation policy is not ready',
+       );
+     }
+   }
+diff --git a/app/api/mira/formal-audio/asr/route.ts b/app/api/mira/formal-audio/asr/route.ts
+new file mode 100644
+index 0000000..0227877
+--- /dev/null
++++ b/app/api/mira/formal-audio/asr/route.ts
+@@ -0,0 +1,66 @@
++import type { NextRequest } from 'next/server';
++import { apiError, apiSuccess } from '@/lib/server/api-response';
++import {
++  authorizeMiraFormalAudioRequest,
++  executeMiraFormalAsr,
++  MiraFormalAudioError,
++  readMiraFormalAsrJob,
++  type MiraFormalAsrJob,
++} from '@/lib/server/mira-formal-audio';
++
++export const dynamic = 'force-dynamic';
++export const maxDuration = 180;
++
++function safeRecord(record: MiraFormalAsrJob) {
++  return { ...record, done: record.state !== 'running' };
++}
++
++function errorResponse(error: unknown) {
++  if (error instanceof MiraFormalAudioError) {
++    if (error.code === 'unauthorized') {
++      return apiError('INVALID_CREDENTIALS', 403, 'Invalid formal audio credentials');
++    }
++    if (error.code === 'request_conflict') {
++      return apiError('INVALID_REQUEST', 409, 'Formal ASR request conflict');
++    }
++    if (error.code === 'not_found' || error.code === 'asset_unavailable') {
++      return apiError('INVALID_REQUEST', 404, 'Matching formal TTS WAV is unavailable');
++    }
++    if (error.code === 'provider_unavailable') {
++      return apiError('PROVIDER_DISABLED', 503, 'Formal ASR provider is unavailable');
++    }
++    return apiError('INVALID_REQUEST', 400, 'Invalid formal ASR request');
++  }
++  return apiError('INTERNAL_ERROR', 500, 'Formal ASR request failed');
++}
++
++export async function POST(req: NextRequest) {
++  try {
++    authorizeMiraFormalAudioRequest(req);
++    const result = await executeMiraFormalAsr(await req.json());
++    return apiSuccess(
++      {
++        ...safeRecord(result.record),
++        ...(result.transcript !== undefined ? { transcript: result.transcript } : {}),
++      },
++      result.record.state === 'running' ? 202 : 200,
++    );
++  } catch (error) {
++    return errorResponse(error);
++  }
++}
++
++export async function GET(req: NextRequest) {
++  try {
++    authorizeMiraFormalAudioRequest(req);
++    if ([...req.nextUrl.searchParams.keys()].join(',') !== 'requestId') {
++      return apiError('INVALID_REQUEST', 400, 'Invalid formal ASR query');
++    }
++    const requestId = req.nextUrl.searchParams.get('requestId') || '';
++    const record = await readMiraFormalAsrJob(requestId);
++    if (!record) return apiError('INVALID_REQUEST', 404, 'Formal ASR job not found');
++    return apiSuccess(safeRecord(record), record.state === 'running' ? 202 : 200);
++  } catch (error) {
++    return errorResponse(error);
++  }
++}
+diff --git a/app/api/mira/formal-audio/tts/route.ts b/app/api/mira/formal-audio/tts/route.ts
+new file mode 100644
+index 0000000..27980e6
+--- /dev/null
++++ b/app/api/mira/formal-audio/tts/route.ts
+@@ -0,0 +1,92 @@
++import type { NextRequest } from 'next/server';
++import { apiError, apiSuccess } from '@/lib/server/api-response';
++import {
++  authorizeMiraFormalAudioRequest,
++  executeMiraFormalTts,
++  MiraFormalAudioError,
++  readMiraFormalTtsAsset,
++  readMiraFormalTtsJob,
++  type MiraFormalTtsJob,
++} from '@/lib/server/mira-formal-audio';
++
++export const dynamic = 'force-dynamic';
++export const maxDuration = 360;
++
++function safeRecord(record: MiraFormalTtsJob, requestPath: string) {
++  const { assetFileName: _privateAssetFileName, ...safe } = record;
++  return {
++    ...safe,
++    ...(record.state === 'succeeded'
++      ? {
++          downloadUrl: `${requestPath}?requestId=${encodeURIComponent(record.requestId)}&download=1`,
++        }
++      : {}),
++    done: record.state !== 'running',
++  };
++}
++
++function errorResponse(error: unknown) {
++  if (error instanceof MiraFormalAudioError) {
++    if (error.code === 'unauthorized') {
++      return apiError('INVALID_CREDENTIALS', 403, 'Invalid formal audio credentials');
++    }
++    if (error.code === 'request_conflict') {
++      return apiError('INVALID_REQUEST', 409, 'Formal TTS request conflict');
++    }
++    if (error.code === 'not_found' || error.code === 'asset_unavailable') {
++      return apiError('INVALID_REQUEST', 404, 'Formal TTS job not found');
++    }
++    if (error.code === 'provider_unavailable') {
++      return apiError('PROVIDER_DISABLED', 503, 'Formal TTS provider is unavailable');
++    }
++    return apiError('INVALID_REQUEST', 400, 'Invalid formal TTS request');
++  }
++  return apiError('INTERNAL_ERROR', 500, 'Formal TTS request failed');
++}
++
++export async function POST(req: NextRequest) {
++  try {
++    authorizeMiraFormalAudioRequest(req);
++    const result = await executeMiraFormalTts(await req.json());
++    return apiSuccess(
++      safeRecord(result.record, req.nextUrl.pathname),
++      result.record.state === 'running' ? 202 : 200,
++    );
++  } catch (error) {
++    return errorResponse(error);
++  }
++}
++
++export async function GET(req: NextRequest) {
++  try {
++    authorizeMiraFormalAudioRequest(req);
++    const keys = [...req.nextUrl.searchParams.keys()].sort();
++    const download = req.nextUrl.searchParams.get('download');
++    const expectedKeys = download === null ? ['requestId'] : ['download', 'requestId'];
++    if (keys.join(',') !== expectedKeys.join(',') || (download !== null && download !== '1')) {
++      return apiError('INVALID_REQUEST', 400, 'Invalid formal TTS query');
++    }
++    const requestId = req.nextUrl.searchParams.get('requestId') || '';
++    if (download === '1') {
++      const { record, bytes } = await readMiraFormalTtsAsset(requestId);
++      return new Response(Buffer.from(bytes), {
++        status: 200,
++        headers: {
++          'content-type': 'audio/wav',
++          'content-length': String(bytes.byteLength),
++          'cache-control': 'private, no-store',
++          'x-content-type-options': 'nosniff',
++          'x-mira-audio-sha256': record.audioSha256 || '',
++        },
++      });
++    }
++    const record = await readMiraFormalTtsJob(requestId);
++    if (!record) return apiError('INVALID_REQUEST', 404, 'Formal TTS job not found');
++    return apiSuccess(
++      safeRecord(record, req.nextUrl.pathname),
++      record.state === 'running' ? 202 : 200,
++    );
++  } catch (error) {
++    return errorResponse(error);
++  }
++}
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+new file mode 100644
+index 0000000..35c11b1
+--- /dev/null
++++ b/lib/server/mira-formal-audio.ts
+@@ -0,0 +1,1099 @@
++import { createHash, timingSafeEqual } from 'crypto';
++import { lookup } from 'dns/promises';
++import { promises as fs } from 'fs';
++import { isIP } from 'net';
++import path from 'path';
++import type { NextRequest } from 'next/server';
++import {
++  getServerASRProviders,
++  getServerTTSProviders,
++  resolveASRApiKey,
++  resolveASRBaseUrl,
++  resolveTTSApiKey,
++  resolveTTSBaseUrl,
++} from '@/lib/server/provider-config';
++
++export const MIRA_FORMAL_AUDIO_CONTRACT_VERSION = 'mira.openmaic.formal-audio.v1' as const;
++export const MIRA_FORMAL_AUDIO_JOB_VERSION = 'mira.openmaic.formal-audio-job.v1' as const;
++export const MIRA_FORMAL_AUDIO_PROVIDER_TIMEOUT_MS = 120_000;
++export const MIRA_FORMAL_AUDIO_MAX_BYTES = 16 * 1024 * 1024;
++
++const SUBJECT_POLICIES = {
++  chinese: {
++    teacherProfileId: 'mira_chinese_gentle',
++    teacherProfileVersion: 2,
++    teacherProfileSha256: 'a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8',
++    teacherName: '小语老师',
++    teacherGender: 'female',
++    voiceGender: 'female',
++    voiceId: 'Serena',
++    languageCode: 'zh-CN',
++    qwenLanguageType: 'Chinese',
++  },
++  math: {
++    teacherProfileId: 'mira_math_clear',
++    teacherProfileVersion: 2,
++    teacherProfileSha256: '4f5a986a765f69798c8546d7f9091fe297f2a98c5353fdd01cd1aa06884c98fb',
++    teacherName: '小数老师',
++    teacherGender: 'male',
++    voiceGender: 'male',
++    voiceId: 'Ethan',
++    languageCode: 'zh-CN',
++    qwenLanguageType: 'Chinese',
++  },
++  english: {
++    teacherProfileId: 'mira_english_standard',
++    teacherProfileVersion: 2,
++    teacherProfileSha256: '4725f27c5438c0f68fe8923ac977fa1dd01452b990ac58912b880320750ee040',
++    teacherName: 'Mia 老师',
++    teacherGender: 'female',
++    voiceGender: 'female',
++    voiceId: 'Jennifer',
++    languageCode: 'en-US',
++    qwenLanguageType: 'English',
++  },
++} as const;
++
++export const MIRA_FORMAL_AUDIO_POLICY = {
++  enforced: true,
++  schemaVersion: MIRA_FORMAL_AUDIO_CONTRACT_VERSION,
++  expectedSegmentCount: 10,
++  requestIdempotency: 'requestId+canonicalBodySha256',
++  providerAttemptRecordedBeforeFetch: true,
++  staleRunningOutcome: 'ambiguous',
++  retryAllowed: false,
++  providerTimeoutMs: MIRA_FORMAL_AUDIO_PROVIDER_TIMEOUT_MS,
++  maxAudioBytes: MIRA_FORMAL_AUDIO_MAX_BYTES,
++  audioMimeType: 'audio/wav',
++  tts: {
++    providerId: 'qwen-tts',
++    modelId: 'qwen3-tts-flash',
++    fallbackAllowed: false,
++  },
++  asr: {
++    providerId: 'qwen-asr',
++    modelId: 'qwen3-asr-flash',
++    fallbackAllowed: false,
++    inputAuthority: 'matching-local-tts-wav',
++    transcriptPersisted: false,
++  },
++  subjects: SUBJECT_POLICIES,
++} as const;
++
++type Subject = keyof typeof SUBJECT_POLICIES;
++type Gender = 'female' | 'male';
++type JobState = 'running' | 'succeeded' | 'failed' | 'ambiguous';
++
++export interface MiraFormalTtsRequest {
++  requestId: string;
++  classroomId: string;
++  classroomContentSha256: string;
++  subject: Subject;
++  teacherProfileId: string;
++  teacherProfileVersion: number;
++  teacherProfileSha256: string;
++  teacherGender: Gender;
++  sceneId: string;
++  sceneOrder: number;
++  actionId: string;
++  narrationSegmentId: string;
++  text: string;
++  textSha256: string;
++}
++
++export interface MiraFormalAsrRequest {
++  requestId: string;
++  ttsRequestId: string;
++  classroomId: string;
++  classroomContentSha256: string;
++  subject: Subject;
++  teacherProfileId: string;
++  teacherProfileVersion: number;
++  teacherProfileSha256: string;
++  teacherGender: Gender;
++  sceneId: string;
++  sceneOrder: number;
++  actionId: string;
++  narrationSegmentId: string;
++  audioSha256: string;
++}
++
++interface FormalAudioIdentity {
++  classroomId: string;
++  classroomContentSha256: string;
++  subject: Subject;
++  teacherProfileId: string;
++  teacherProfileVersion: number;
++  teacherProfileSha256: string;
++  teacherGender: Gender;
++  sceneId: string;
++  sceneOrder: number;
++  actionId: string;
++  narrationSegmentId: string;
++}
++
++interface BaseJobRecord extends FormalAudioIdentity {
++  schemaVersion: typeof MIRA_FORMAL_AUDIO_JOB_VERSION;
++  requestId: string;
++  requestSha256: string;
++  state: JobState;
++  providerId: 'qwen-tts' | 'qwen-asr';
++  modelId: 'qwen3-tts-flash' | 'qwen3-asr-flash';
++  fallbackUsed: false;
++  providerAttemptedAt: string;
++  providerCompletedAt?: string;
++  safeErrorCode?: string;
++  createdAt: string;
++  updatedAt: string;
++  completedAt?: string;
++}
++
++export interface MiraFormalTtsJob extends BaseJobRecord {
++  kind: 'tts';
++  textSha256: string;
++  voiceId: 'Serena' | 'Ethan' | 'Jennifer';
++  voiceGender: Gender;
++  languageCode: 'zh-CN' | 'en-US';
++  downloadAttemptedAt?: string;
++  assetId?: string;
++  assetFileName?: string;
++  mimeType?: 'audio/wav';
++  sizeBytes?: number;
++  audioSha256?: string;
++}
++
++export interface MiraFormalAsrJob extends BaseJobRecord {
++  kind: 'asr';
++  ttsRequestId: string;
++  audioSha256: string;
++  languageCode: 'zh-CN' | 'en-US';
++  transcriptSha256?: string;
++}
++
++export type MiraFormalAudioErrorCode =
++  | 'invalid_request'
++  | 'request_conflict'
++  | 'not_found'
++  | 'unauthorized'
++  | 'provider_unavailable'
++  | 'asset_unavailable';
++
++export class MiraFormalAudioError extends Error {
++  constructor(
++    public readonly code: MiraFormalAudioErrorCode,
++    message: string,
++  ) {
++    super(message);
++    this.name = 'MiraFormalAudioError';
++  }
++}
++
++interface RuntimeDependencies {
++  fetchImpl?: typeof fetch;
++  resolveAddresses?: (hostname: string) => Promise<string[]>;
++  now?: () => Date;
++}
++
++class OperationalFailure extends Error {
++  constructor(
++    public readonly outcome: 'failed' | 'ambiguous',
++    public readonly safeCode: string,
++  ) {
++    super(safeCode);
++  }
++}
++
++const IDENTIFIER = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
++const SHA256 = /^[a-f0-9]{64}$/;
++const TTS_KEYS = [
++  'actionId',
++  'classroomContentSha256',
++  'classroomId',
++  'narrationSegmentId',
++  'requestId',
++  'sceneId',
++  'sceneOrder',
++  'subject',
++  'teacherGender',
++  'teacherProfileId',
++  'teacherProfileSha256',
++  'teacherProfileVersion',
++  'text',
++  'textSha256',
++] as const;
++const ASR_KEYS = [
++  'actionId',
++  'audioSha256',
++  'classroomContentSha256',
++  'classroomId',
++  'narrationSegmentId',
++  'requestId',
++  'sceneId',
++  'sceneOrder',
++  'subject',
++  'teacherGender',
++  'teacherProfileId',
++  'teacherProfileSha256',
++  'teacherProfileVersion',
++  'ttsRequestId',
++] as const;
++const STALE_RUNNING_MS = 5 * 60 * 1000;
++const MAX_PROVIDER_JSON_BYTES = 1024 * 1024;
++const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
++
++function sha256(value: string | Uint8Array): string {
++  return createHash('sha256').update(value).digest('hex');
++}
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value as Record<string, unknown>)
++        .sort(([left], [right]) => left.localeCompare(right))
++        .map(([key, item]) => [key, canonical(item)]),
++    );
++  }
++  return value;
++}
++
++function requestDigest(value: object): string {
++  return sha256(JSON.stringify(canonical(value)));
++}
++
++function assertExactObject(value: unknown, keys: readonly string[]): Record<string, unknown> {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) {
++    throw new MiraFormalAudioError('invalid_request', 'Invalid formal audio request');
++  }
++  if (Object.keys(value).sort().join(',') !== [...keys].sort().join(',')) {
++    throw new MiraFormalAudioError('invalid_request', 'Invalid formal audio request');
++  }
++  return value as Record<string, unknown>;
++}
++
++function assertIdentity(
++  input: Record<string, unknown>,
++): asserts input is Record<keyof FormalAudioIdentity, unknown> {
++  if (
++    !IDENTIFIER.test(String(input.classroomId || '')) ||
++    !SHA256.test(String(input.classroomContentSha256 || '')) ||
++    !IDENTIFIER.test(String(input.sceneId || '')) ||
++    !Number.isInteger(input.sceneOrder) ||
++    Number(input.sceneOrder) < 0 ||
++    Number(input.sceneOrder) > 9 ||
++    !IDENTIFIER.test(String(input.actionId || '')) ||
++    !IDENTIFIER.test(String(input.narrationSegmentId || ''))
++  ) {
++    throw new MiraFormalAudioError('invalid_request', 'Invalid formal audio identity');
++  }
++  const subject = input.subject as Subject;
++  const policy = SUBJECT_POLICIES[subject];
++  if (
++    !policy ||
++    input.teacherProfileId !== policy.teacherProfileId ||
++    input.teacherProfileVersion !== policy.teacherProfileVersion ||
++    input.teacherProfileSha256 !== policy.teacherProfileSha256 ||
++    input.teacherGender !== policy.teacherGender
++  ) {
++    throw new MiraFormalAudioError('invalid_request', 'Invalid formal teacher identity');
++  }
++}
++
++export function assertMiraFormalTtsRequest(value: unknown): MiraFormalTtsRequest {
++  const input = assertExactObject(value, TTS_KEYS);
++  assertIdentity(input);
++  const text = input.text;
++  if (
++    !IDENTIFIER.test(String(input.requestId || '')) ||
++    typeof text !== 'string' ||
++    text.length < 1 ||
++    text.length > 8_000 ||
++    text !== text.trim() ||
++    /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(text) ||
++    !SHA256.test(String(input.textSha256 || '')) ||
++    sha256(text) !== input.textSha256
++  ) {
++    throw new MiraFormalAudioError('invalid_request', 'Invalid formal TTS request');
++  }
++  return input as unknown as MiraFormalTtsRequest;
++}
++
++export function assertMiraFormalAsrRequest(value: unknown): MiraFormalAsrRequest {
++  const input = assertExactObject(value, ASR_KEYS);
++  assertIdentity(input);
++  if (
++    !IDENTIFIER.test(String(input.requestId || '')) ||
++    !IDENTIFIER.test(String(input.ttsRequestId || '')) ||
++    !SHA256.test(String(input.audioSha256 || ''))
++  ) {
++    throw new MiraFormalAudioError('invalid_request', 'Invalid formal ASR request');
++  }
++  return input as unknown as MiraFormalAsrRequest;
++}
++
++function dataRoot(): string {
++  return process.env.MIRA_FORMAL_AUDIO_DATA_DIR || path.join(process.cwd(), 'data', 'formal-audio');
++}
++
++function jobsDir(kind: 'tts' | 'asr'): string {
++  return path.join(dataRoot(), 'jobs', kind);
++}
++
++function jobPath(kind: 'tts' | 'asr', requestId: string): string {
++  return path.join(jobsDir(kind), `${sha256(requestId)}.json`);
++}
++
++function assetsDir(): string {
++  return path.join(dataRoot(), 'assets');
++}
++
++async function writeExclusiveAtomic(filePath: string, value: unknown): Promise<boolean> {
++  await fs.mkdir(path.dirname(filePath), { recursive: true });
++  const tempPath = `${filePath}.${process.pid}.${Date.now()}.${Math.random()
++    .toString(16)
++    .slice(2)}.tmp`;
++  const handle = await fs.open(tempPath, 'wx', 0o600);
++  try {
++    await handle.writeFile(JSON.stringify(value, null, 2), 'utf8');
++    await handle.sync();
++  } finally {
++    await handle.close();
++  }
++  try {
++    await fs.link(tempPath, filePath);
++    return true;
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false;
++    throw error;
++  } finally {
++    await fs.unlink(tempPath).catch(() => undefined);
++  }
++}
++
++async function writeAtomic(filePath: string, value: unknown): Promise<void> {
++  await fs.mkdir(path.dirname(filePath), { recursive: true });
++  const tempPath = `${filePath}.${process.pid}.${Date.now()}.${Math.random()
++    .toString(16)
++    .slice(2)}.tmp`;
++  const handle = await fs.open(tempPath, 'wx', 0o600);
++  try {
++    await handle.writeFile(JSON.stringify(value, null, 2), 'utf8');
++    await handle.sync();
++  } finally {
++    await handle.close();
++  }
++  await fs.rename(tempPath, filePath);
++}
++
++async function readJob<T>(kind: 'tts' | 'asr', requestId: string): Promise<T | null> {
++  if (!IDENTIFIER.test(requestId)) {
++    throw new MiraFormalAudioError('invalid_request', 'Invalid formal audio request id');
++  }
++  try {
++    return JSON.parse(await fs.readFile(jobPath(kind, requestId), 'utf8')) as T;
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
++    throw error;
++  }
++}
++
++function isStale(record: BaseJobRecord, now: Date): boolean {
++  return (
++    record.state === 'running' &&
++    now.getTime() - new Date(record.providerAttemptedAt).getTime() > STALE_RUNNING_MS
++  );
++}
++
++async function observeJob<T extends BaseJobRecord>(
++  kind: 'tts' | 'asr',
++  record: T,
++  now: Date,
++): Promise<T> {
++  if (!isStale(record, now)) return record;
++  const observed = {
++    ...record,
++    state: 'ambiguous' as const,
++    safeErrorCode: 'stale_provider_outcome_unknown',
++    updatedAt: now.toISOString(),
++    completedAt: now.toISOString(),
++  };
++  await writeAtomic(jobPath(kind, record.requestId), observed);
++  return observed;
++}
++
++export async function readMiraFormalTtsJob(
++  requestId: string,
++  now = new Date(),
++): Promise<MiraFormalTtsJob | null> {
++  const record = await readJob<MiraFormalTtsJob>('tts', requestId);
++  return record ? observeJob('tts', record, now) : null;
++}
++
++export async function readMiraFormalAsrJob(
++  requestId: string,
++  now = new Date(),
++): Promise<MiraFormalAsrJob | null> {
++  const record = await readJob<MiraFormalAsrJob>('asr', requestId);
++  return record ? observeJob('asr', record, now) : null;
++}
++
++function identityOf(input: FormalAudioIdentity): FormalAudioIdentity {
++  return {
++    classroomId: input.classroomId,
++    classroomContentSha256: input.classroomContentSha256,
++    subject: input.subject,
++    teacherProfileId: input.teacherProfileId,
++    teacherProfileVersion: input.teacherProfileVersion,
++    teacherProfileSha256: input.teacherProfileSha256,
++    teacherGender: input.teacherGender,
++    sceneId: input.sceneId,
++    sceneOrder: input.sceneOrder,
++    actionId: input.actionId,
++    narrationSegmentId: input.narrationSegmentId,
++  };
++}
++
++async function claimTts(
++  input: MiraFormalTtsRequest,
++  now: Date,
++): Promise<{ record: MiraFormalTtsJob; created: boolean }> {
++  const digest = requestDigest(input);
++  const existing = await readMiraFormalTtsJob(input.requestId, now);
++  if (existing) {
++    if (existing.requestSha256 !== digest) {
++      throw new MiraFormalAudioError('request_conflict', 'Formal TTS request conflict');
++    }
++    return { record: existing, created: false };
++  }
++  const policy = SUBJECT_POLICIES[input.subject];
++  const timestamp = now.toISOString();
++  const record: MiraFormalTtsJob = {
++    schemaVersion: MIRA_FORMAL_AUDIO_JOB_VERSION,
++    kind: 'tts',
++    requestId: input.requestId,
++    requestSha256: digest,
++    ...identityOf(input),
++    textSha256: input.textSha256,
++    state: 'running',
++    providerId: 'qwen-tts',
++    modelId: 'qwen3-tts-flash',
++    voiceId: policy.voiceId,
++    voiceGender: policy.voiceGender,
++    languageCode: policy.languageCode,
++    fallbackUsed: false,
++    providerAttemptedAt: timestamp,
++    createdAt: timestamp,
++    updatedAt: timestamp,
++  };
++  if (await writeExclusiveAtomic(jobPath('tts', input.requestId), record)) {
++    return { record, created: true };
++  }
++  const winner = await readMiraFormalTtsJob(input.requestId, now);
++  if (!winner || winner.requestSha256 !== digest) {
++    throw new MiraFormalAudioError('request_conflict', 'Formal TTS request conflict');
++  }
++  return { record: winner, created: false };
++}
++
++function sameIdentity(left: FormalAudioIdentity, right: FormalAudioIdentity): boolean {
++  return requestDigest(identityOf(left)) === requestDigest(identityOf(right));
++}
++
++async function claimAsr(
++  input: MiraFormalAsrRequest,
++  tts: MiraFormalTtsJob,
++  now: Date,
++): Promise<{ record: MiraFormalAsrJob; created: boolean }> {
++  if (
++    tts.state !== 'succeeded' ||
++    tts.requestId !== input.ttsRequestId ||
++    tts.audioSha256 !== input.audioSha256 ||
++    !sameIdentity(tts, input)
++  ) {
++    throw new MiraFormalAudioError('asset_unavailable', 'Matching formal TTS WAV is unavailable');
++  }
++  const digest = requestDigest(input);
++  const existing = await readMiraFormalAsrJob(input.requestId, now);
++  if (existing) {
++    if (existing.requestSha256 !== digest) {
++      throw new MiraFormalAudioError('request_conflict', 'Formal ASR request conflict');
++    }
++    return { record: existing, created: false };
++  }
++  const policy = SUBJECT_POLICIES[input.subject];
++  const timestamp = now.toISOString();
++  const record: MiraFormalAsrJob = {
++    schemaVersion: MIRA_FORMAL_AUDIO_JOB_VERSION,
++    kind: 'asr',
++    requestId: input.requestId,
++    requestSha256: digest,
++    ...identityOf(input),
++    ttsRequestId: input.ttsRequestId,
++    audioSha256: input.audioSha256,
++    languageCode: policy.languageCode,
++    state: 'running',
++    providerId: 'qwen-asr',
++    modelId: 'qwen3-asr-flash',
++    fallbackUsed: false,
++    providerAttemptedAt: timestamp,
++    createdAt: timestamp,
++    updatedAt: timestamp,
++  };
++  if (await writeExclusiveAtomic(jobPath('asr', input.requestId), record)) {
++    return { record, created: true };
++  }
++  const winner = await readMiraFormalAsrJob(input.requestId, now);
++  if (!winner || winner.requestSha256 !== digest) {
++    throw new MiraFormalAudioError('request_conflict', 'Formal ASR request conflict');
++  }
++  return { record: winner, created: false };
++}
++
++function providerEndpoint(baseUrl: string | undefined): string {
++  const effectiveBaseUrl = baseUrl || 'https://dashscope.aliyuncs.com/api/v1';
++  let parsed: URL;
++  try {
++    parsed = new URL(effectiveBaseUrl);
++  } catch {
++    throw new MiraFormalAudioError('provider_unavailable', 'Formal audio provider is unavailable');
++  }
++  if (
++    parsed.protocol !== 'https:' ||
++    parsed.username ||
++    parsed.password ||
++    parsed.search ||
++    parsed.hash ||
++    (parsed.port && parsed.port !== '443')
++  ) {
++    throw new MiraFormalAudioError('provider_unavailable', 'Formal audio provider is unavailable');
++  }
++  return `${parsed.toString().replace(/\/$/u, '')}/services/aigc/multimodal-generation/generation`;
++}
++
++function timeoutSignal(): AbortSignal {
++  return AbortSignal.timeout(MIRA_FORMAL_AUDIO_PROVIDER_TIMEOUT_MS);
++}
++
++async function fetchProvider(
++  fetchImpl: typeof fetch,
++  url: string,
++  init: RequestInit,
++): Promise<Response> {
++  try {
++    return await fetchImpl(url, { ...init, signal: timeoutSignal() });
++  } catch {
++    throw new OperationalFailure('ambiguous', 'provider_outcome_unknown');
++  }
++}
++
++async function readBoundedBytes(response: Response, maximum: number): Promise<Uint8Array> {
++  const declared = response.headers.get('content-length');
++  if (declared !== null) {
++    const length = Number(declared);
++    if (!Number.isSafeInteger(length) || length < 0 || length > maximum) {
++      throw new OperationalFailure('failed', 'response_size_invalid');
++    }
++  }
++  if (!response.body) {
++    const bytes = new Uint8Array(await response.arrayBuffer());
++    if (bytes.byteLength > maximum) throw new OperationalFailure('failed', 'response_too_large');
++    return bytes;
++  }
++  const reader = response.body.getReader();
++  const chunks: Uint8Array[] = [];
++  let total = 0;
++  while (true) {
++    let next: ReadableStreamReadResult<Uint8Array>;
++    try {
++      next = await reader.read();
++    } catch {
++      throw new OperationalFailure('ambiguous', 'response_stream_outcome_unknown');
++    }
++    if (next.done) break;
++    total += next.value.byteLength;
++    if (total > maximum) {
++      await reader.cancel().catch(() => undefined);
++      throw new OperationalFailure('failed', 'response_too_large');
++    }
++    chunks.push(next.value);
++  }
++  const combined = new Uint8Array(total);
++  let offset = 0;
++  for (const chunk of chunks) {
++    combined.set(chunk, offset);
++    offset += chunk.byteLength;
++  }
++  return combined;
++}
++
++async function readProviderJson(response: Response): Promise<Record<string, unknown>> {
++  const mimeType = response.headers.get('content-type')?.split(';', 1)[0].trim().toLowerCase();
++  if (mimeType !== 'application/json') {
++    throw new OperationalFailure('failed', 'provider_content_type_invalid');
++  }
++  const bytes = await readBoundedBytes(response, MAX_PROVIDER_JSON_BYTES);
++  try {
++    const value = JSON.parse(Buffer.from(bytes).toString('utf8'));
++    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid');
++    return value as Record<string, unknown>;
++  } catch {
++    throw new OperationalFailure('failed', 'provider_response_invalid');
++  }
++}
++
++function isAllowedMediaHostname(hostname: string): boolean {
++  const normalized = hostname.toLowerCase().replace(/\.$/u, '');
++  return (
++    normalized === 'dashscope.aliyuncs.com' ||
++    /^[a-z0-9-]+\.oss(?:-[a-z0-9-]+)?\.aliyuncs\.com$/u.test(normalized)
++  );
++}
++
++function isPrivateAddress(address: string): boolean {
++  if (isIP(address) === 4) {
++    const parts = address.split('.').map(Number);
++    return (
++      parts[0] === 0 ||
++      parts[0] === 10 ||
++      parts[0] === 127 ||
++      (parts[0] === 169 && parts[1] === 254) ||
++      (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
++      (parts[0] === 192 && parts[1] === 168) ||
++      parts[0] >= 224
++    );
++  }
++  if (isIP(address) === 6) {
++    const normalized = address.toLowerCase();
++    return (
++      normalized === '::' ||
++      normalized === '::1' ||
++      normalized.startsWith('fc') ||
++      normalized.startsWith('fd') ||
++      /^fe[89ab]/u.test(normalized) ||
++      normalized.startsWith('ff') ||
++      normalized.startsWith('::ffff:')
++    );
++  }
++  return true;
++}
++
++async function defaultResolveAddresses(hostname: string): Promise<string[]> {
++  return (await lookup(hostname, { all: true, verbatim: true })).map((item) => item.address);
++}
++
++async function validateMediaUrl(
++  rawUrl: string,
++  resolveAddresses: (hostname: string) => Promise<string[]>,
++): Promise<URL> {
++  let url: URL;
++  try {
++    url = new URL(rawUrl);
++  } catch {
++    throw new OperationalFailure('failed', 'media_url_invalid');
++  }
++  if (
++    url.protocol !== 'https:' ||
++    url.username ||
++    url.password ||
++    url.hash ||
++    (url.port && url.port !== '443') ||
++    !isAllowedMediaHostname(url.hostname)
++  ) {
++    throw new OperationalFailure('failed', 'media_url_rejected');
++  }
++  let addresses: string[];
++  try {
++    addresses = await resolveAddresses(url.hostname);
++  } catch {
++    throw new OperationalFailure('failed', 'media_host_unresolved');
++  }
++  if (!addresses.length || addresses.some(isPrivateAddress)) {
++    throw new OperationalFailure('failed', 'media_host_rejected');
++  }
++  return url;
++}
++
++async function downloadWav(
++  initialUrl: string,
++  fetchImpl: typeof fetch,
++  resolveAddresses: (hostname: string) => Promise<string[]>,
++): Promise<Uint8Array> {
++  const signal = timeoutSignal();
++  let current = await validateMediaUrl(initialUrl, resolveAddresses);
++  for (let redirectCount = 0; redirectCount <= 2; redirectCount += 1) {
++    let response: Response;
++    try {
++      response = await fetchImpl(current, { method: 'GET', redirect: 'manual', signal });
++    } catch {
++      throw new OperationalFailure('ambiguous', 'media_download_outcome_unknown');
++    }
++    if (REDIRECT_STATUSES.has(response.status)) {
++      const location = response.headers.get('location');
++      if (!location || redirectCount === 2) {
++        throw new OperationalFailure('failed', 'media_redirect_rejected');
++      }
++      current = await validateMediaUrl(new URL(location, current).toString(), resolveAddresses);
++      continue;
++    }
++    if (!response.ok) throw new OperationalFailure('failed', 'media_download_failed');
++    if (response.headers.get('content-type')?.trim().toLowerCase() !== 'audio/wav') {
++      throw new OperationalFailure('failed', 'media_mime_invalid');
++    }
++    const bytes = await readBoundedBytes(response, MIRA_FORMAL_AUDIO_MAX_BYTES);
++    if (
++      bytes.byteLength < 44 ||
++      Buffer.from(bytes.subarray(0, 4)).toString('ascii') !== 'RIFF' ||
++      Buffer.from(bytes.subarray(8, 12)).toString('ascii') !== 'WAVE'
++    ) {
++      throw new OperationalFailure('failed', 'media_wav_invalid');
++    }
++    return bytes;
++  }
++  throw new OperationalFailure('failed', 'media_redirect_rejected');
++}
++
++async function writeAssetExclusive(assetId: string, bytes: Uint8Array): Promise<string> {
++  const fileName = `${assetId}.wav`;
++  const filePath = path.join(assetsDir(), fileName);
++  await fs.mkdir(path.dirname(filePath), { recursive: true });
++  const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
++  const handle = await fs.open(tempPath, 'wx', 0o600);
++  try {
++    await handle.writeFile(bytes);
++    await handle.sync();
++  } finally {
++    await handle.close();
++  }
++  try {
++    await fs.link(tempPath, filePath);
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'EEXIST') {
++      throw new OperationalFailure('ambiguous', 'local_asset_already_exists');
++    }
++    throw new OperationalFailure('failed', 'local_asset_write_failed');
++  } finally {
++    await fs.unlink(tempPath).catch(() => undefined);
++  }
++  return fileName;
++}
++
++async function updateTts(record: MiraFormalTtsJob): Promise<void> {
++  await writeAtomic(jobPath('tts', record.requestId), record);
++}
++
++async function updateAsr(record: MiraFormalAsrJob): Promise<void> {
++  await writeAtomic(jobPath('asr', record.requestId), record);
++}
++
++async function terminalizeTts(
++  record: MiraFormalTtsJob,
++  failure: OperationalFailure | MiraFormalAudioError,
++  now: Date,
++): Promise<MiraFormalTtsJob> {
++  const terminal: MiraFormalTtsJob = {
++    ...record,
++    state: failure instanceof OperationalFailure ? failure.outcome : 'failed',
++    safeErrorCode: failure instanceof OperationalFailure ? failure.safeCode : failure.code,
++    updatedAt: now.toISOString(),
++    completedAt: now.toISOString(),
++  };
++  await updateTts(terminal);
++  return terminal;
++}
++
++async function terminalizeAsr(
++  record: MiraFormalAsrJob,
++  failure: OperationalFailure | MiraFormalAudioError,
++  now: Date,
++): Promise<MiraFormalAsrJob> {
++  const terminal: MiraFormalAsrJob = {
++    ...record,
++    state: failure instanceof OperationalFailure ? failure.outcome : 'failed',
++    safeErrorCode: failure instanceof OperationalFailure ? failure.safeCode : failure.code,
++    updatedAt: now.toISOString(),
++    completedAt: now.toISOString(),
++  };
++  await updateAsr(terminal);
++  return terminal;
++}
++
++export async function executeMiraFormalTts(
++  value: unknown,
++  dependencies: RuntimeDependencies = {},
++): Promise<{ record: MiraFormalTtsJob; created: boolean }> {
++  const input = assertMiraFormalTtsRequest(value);
++  const now = dependencies.now?.() || new Date();
++  const claim = await claimTts(input, now);
++  if (!claim.created) return claim;
++  let record = claim.record;
++  const fetchImpl = dependencies.fetchImpl || fetch;
++  const resolveAddresses = dependencies.resolveAddresses || defaultResolveAddresses;
++  try {
++    const apiKey = resolveTTSApiKey('qwen-tts');
++    if (!apiKey)
++      throw new MiraFormalAudioError('provider_unavailable', 'Formal TTS is unavailable');
++    const endpoint = providerEndpoint(resolveTTSBaseUrl('qwen-tts'));
++    const policy = SUBJECT_POLICIES[input.subject];
++    const response = await fetchProvider(fetchImpl, endpoint, {
++      method: 'POST',
++      headers: {
++        Authorization: `Bearer ${apiKey}`,
++        'Content-Type': 'application/json; charset=utf-8',
++      },
++      body: JSON.stringify({
++        model: 'qwen3-tts-flash',
++        input: {
++          text: input.text,
++          voice: policy.voiceId,
++          language_type: policy.qwenLanguageType,
++        },
++        parameters: { rate: 0 },
++      }),
++    });
++    if (!response.ok) throw new OperationalFailure('failed', 'provider_rejected');
++    const providerBody = await readProviderJson(response);
++    const output = providerBody.output as Record<string, unknown> | undefined;
++    const audio = output?.audio as Record<string, unknown> | undefined;
++    if (!audio || typeof audio.url !== 'string') {
++      throw new OperationalFailure('failed', 'provider_response_invalid');
++    }
++    const providerCompletedAt = (dependencies.now?.() || new Date()).toISOString();
++    record = {
++      ...record,
++      providerCompletedAt,
++      downloadAttemptedAt: providerCompletedAt,
++      updatedAt: providerCompletedAt,
++    };
++    await updateTts(record);
++    const bytes = await downloadWav(audio.url, fetchImpl, resolveAddresses);
++    const audioSha256 = sha256(bytes);
++    const assetId = `mirawav_${sha256(input.requestId).slice(0, 24)}`;
++    const assetFileName = await writeAssetExclusive(assetId, bytes);
++    const readback = new Uint8Array(await fs.readFile(path.join(assetsDir(), assetFileName)));
++    if (readback.byteLength !== bytes.byteLength || sha256(readback) !== audioSha256) {
++      throw new OperationalFailure('failed', 'local_asset_readback_mismatch');
++    }
++    const completedAt = (dependencies.now?.() || new Date()).toISOString();
++    record = {
++      ...record,
++      state: 'succeeded',
++      assetId,
++      assetFileName,
++      mimeType: 'audio/wav',
++      sizeBytes: bytes.byteLength,
++      audioSha256,
++      updatedAt: completedAt,
++      completedAt,
++    };
++    await updateTts(record);
++    return { record, created: true };
++  } catch (error) {
++    const failure =
++      error instanceof OperationalFailure || error instanceof MiraFormalAudioError
++        ? error
++        : new OperationalFailure('failed', 'formal_tts_internal_failure');
++    return {
++      record: await terminalizeTts(record, failure, dependencies.now?.() || new Date()),
++      created: true,
++    };
++  }
++}
++
++export async function readMiraFormalTtsAsset(
++  requestId: string,
++): Promise<{ record: MiraFormalTtsJob; bytes: Uint8Array }> {
++  const record = await readMiraFormalTtsJob(requestId);
++  if (
++    !record ||
++    record.state !== 'succeeded' ||
++    !record.assetFileName ||
++    !record.audioSha256 ||
++    !record.sizeBytes
++  ) {
++    throw new MiraFormalAudioError('asset_unavailable', 'Formal TTS WAV is unavailable');
++  }
++  let bytes: Uint8Array;
++  try {
++    bytes = new Uint8Array(await fs.readFile(path.join(assetsDir(), record.assetFileName)));
++  } catch {
++    throw new MiraFormalAudioError('asset_unavailable', 'Formal TTS WAV is unavailable');
++  }
++  if (
++    bytes.byteLength !== record.sizeBytes ||
++    bytes.byteLength > MIRA_FORMAL_AUDIO_MAX_BYTES ||
++    sha256(bytes) !== record.audioSha256
++  ) {
++    throw new MiraFormalAudioError('asset_unavailable', 'Formal TTS WAV is unavailable');
++  }
++  return { record, bytes };
++}
++
++export async function executeMiraFormalAsr(
++  value: unknown,
++  dependencies: RuntimeDependencies = {},
++): Promise<{ record: MiraFormalAsrJob; created: boolean; transcript?: string }> {
++  const input = assertMiraFormalAsrRequest(value);
++  const tts = await readMiraFormalTtsJob(input.ttsRequestId);
++  if (!tts)
++    throw new MiraFormalAudioError('asset_unavailable', 'Matching formal TTS WAV is unavailable');
++  const now = dependencies.now?.() || new Date();
++  const claim = await claimAsr(input, tts, now);
++  if (!claim.created) return claim;
++  let record = claim.record;
++  const fetchImpl = dependencies.fetchImpl || fetch;
++  try {
++    const { bytes } = await readMiraFormalTtsAsset(input.ttsRequestId);
++    const apiKey = resolveASRApiKey('qwen-asr');
++    if (!apiKey)
++      throw new MiraFormalAudioError('provider_unavailable', 'Formal ASR is unavailable');
++    const endpoint = providerEndpoint(resolveASRBaseUrl('qwen-asr'));
++    const policy = SUBJECT_POLICIES[input.subject];
++    const response = await fetchProvider(fetchImpl, endpoint, {
++      method: 'POST',
++      headers: {
++        Authorization: `Bearer ${apiKey}`,
++        'Content-Type': 'application/json; charset=utf-8',
++        'X-DashScope-Audio-Format': 'wav',
++      },
++      body: JSON.stringify({
++        model: 'qwen3-asr-flash',
++        input: {
++          messages: [
++            {
++              role: 'user',
++              content: [
++                { audio: `data:audio/wav;base64,${Buffer.from(bytes).toString('base64')}` },
++              ],
++            },
++          ],
++        },
++        parameters: {
++          asr_options: { language: policy.languageCode === 'en-US' ? 'en' : 'zh' },
++        },
++      }),
++    });
++    if (!response.ok) throw new OperationalFailure('failed', 'provider_rejected');
++    const providerBody = await readProviderJson(response);
++    const output = providerBody.output as Record<string, unknown> | undefined;
++    const choices = output?.choices;
++    const first = Array.isArray(choices) ? choices[0] : undefined;
++    const message =
++      first && typeof first === 'object' ? (first as Record<string, unknown>).message : undefined;
++    const content =
++      message && typeof message === 'object'
++        ? (message as Record<string, unknown>).content
++        : undefined;
++    const item = Array.isArray(content) ? content[0] : undefined;
++    const transcript =
++      item && typeof item === 'object' ? (item as Record<string, unknown>).text : undefined;
++    if (typeof transcript !== 'string' || transcript.length > 64_000) {
++      throw new OperationalFailure('failed', 'provider_response_invalid');
++    }
++    const completedAt = (dependencies.now?.() || new Date()).toISOString();
++    record = {
++      ...record,
++      state: 'succeeded',
++      providerCompletedAt: completedAt,
++      transcriptSha256: sha256(transcript),
++      updatedAt: completedAt,
++      completedAt,
++    };
++    await updateAsr(record);
++    return { record, created: true, transcript };
++  } catch (error) {
++    const failure =
++      error instanceof OperationalFailure || error instanceof MiraFormalAudioError
++        ? error
++        : new OperationalFailure('failed', 'formal_asr_internal_failure');
++    return {
++      record: await terminalizeAsr(record, failure, dependencies.now?.() || new Date()),
++      created: true,
++    };
++  }
++}
++
++export function getMiraFormalAudioRuntimePolicy() {
++  return MIRA_FORMAL_AUDIO_POLICY;
++}
++
++export function assertMiraFormalAudioProviderReady(): void {
++  const tts = getServerTTSProviders()['qwen-tts'];
++  const asr = getServerASRProviders()['qwen-asr'];
++  if (tts?.disabled !== false && tts?.disabled !== undefined) {
++    throw new Error('Formal Qwen TTS provider is not ready.');
++  }
++  if (!tts || !asr || !resolveTTSApiKey('qwen-tts') || !resolveASRApiKey('qwen-asr')) {
++    throw new Error('Formal Qwen audio providers are not ready.');
++  }
++  providerEndpoint(resolveTTSBaseUrl('qwen-tts'));
++  providerEndpoint(resolveASRBaseUrl('qwen-asr'));
++}
++
++function secureEqual(left: string, right: string): boolean {
++  const leftDigest = createHash('sha256').update(left).digest();
++  const rightDigest = createHash('sha256').update(right).digest();
++  return timingSafeEqual(leftDigest, rightDigest);
++}
++
++const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
++
++function normalizedLoopbackHostname(value: string): string | null {
++  const hostname = value.replace(/^\[|\]$/gu, '').toLowerCase();
++  return LOOPBACK_HOSTNAMES.has(hostname) ? 'loopback' : null;
++}
++
++function singleHeader(req: NextRequest, name: string): string | null {
++  const value = req.headers.get(name);
++  if (
++    value === null ||
++    value.length === 0 ||
++    value !== value.trim() ||
++    value.includes(',') ||
++    /[%\s]/u.test(value)
++  ) {
++    return null;
++  }
++  return value;
++}
++
++function isExactLoopbackAuthority(value: string | null, expectedPort: string): boolean {
++  if (!value) return false;
++  try {
++    const parsed = new URL(`http://${value}`);
++    return Boolean(
++      !parsed.username &&
++      !parsed.password &&
++      parsed.pathname === '/' &&
++      !parsed.search &&
++      !parsed.hash &&
++      parsed.port === expectedPort &&
++      normalizedLoopbackHostname(parsed.hostname),
++    );
++  } catch {
++    return false;
++  }
++}
++
++export function authorizeMiraFormalAudioRequest(req: NextRequest): void {
++  const expectedPort = process.env.MIRA_OPENMAIC_PRIVATE_PORT || '3100';
++  if (
++    req.headers.has('forwarded') ||
++    req.headers.has('x-real-ip') ||
++    req.headers.has('via') ||
++    req.nextUrl.protocol !== 'http:' ||
++    req.nextUrl.port !== expectedPort ||
++    !normalizedLoopbackHostname(req.nextUrl.hostname) ||
++    !isExactLoopbackAuthority(singleHeader(req, 'host'), expectedPort) ||
++    !isExactLoopbackAuthority(singleHeader(req, 'x-forwarded-host'), expectedPort) ||
++    !normalizedLoopbackHostname(singleHeader(req, 'x-forwarded-for') || '') ||
++    singleHeader(req, 'x-forwarded-proto') !== 'http' ||
++    singleHeader(req, 'x-forwarded-port') !== expectedPort
++  ) {
++    throw new MiraFormalAudioError('unauthorized', 'Formal audio requires direct loopback access');
++  }
++  const expectedToken = process.env.MIRA_INTERNAL_API_TOKEN || '';
++  const suppliedToken = req.headers.get('x-mira-internal-token') || '';
++  if (!expectedToken || !suppliedToken || !secureEqual(expectedToken, suppliedToken)) {
++    throw new MiraFormalAudioError('unauthorized', 'Invalid formal audio credentials');
++  }
++}
+diff --git a/tests/server/mira-formal-audio.test.ts b/tests/server/mira-formal-audio.test.ts
+new file mode 100644
+index 0000000..308e03f
+--- /dev/null
++++ b/tests/server/mira-formal-audio.test.ts
+@@ -0,0 +1,607 @@
++import { promises as fs } from 'fs';
++import os from 'os';
++import path from 'path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import {
++  MIRA_FORMAL_AUDIO_POLICY,
++  MiraFormalAudioError,
++  executeMiraFormalAsr,
++  executeMiraFormalTts,
++  getMiraFormalAudioRuntimePolicy,
++  readMiraFormalAsrJob,
++  readMiraFormalTtsJob,
++  type MiraFormalTtsRequest,
++} from '@/lib/server/mira-formal-audio';
++
++const ttsKey = 'tts-secret-never-persist';
++const asrKey = 'asr-secret-never-persist';
++
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerProviders: () => ({}),
++  getServerWebSearchProviders: () => ({}),
++  getServerImageProviders: () => ({}),
++  getServerVideoProviders: () => ({}),
++  getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
++  getServerASRProviders: () => ({ 'qwen-asr': {} }),
++  resolveTTSApiKey: () => ttsKey,
++  resolveTTSBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++  resolveASRApiKey: () => asrKey,
++  resolveASRBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++}));
++
++vi.mock('dns/promises', () => ({
++  lookup: async () => [{ address: '8.8.8.8', family: 4 }],
++}));
++
++function sha256Text(value: string): string {
++  return require('crypto').createHash('sha256').update(value).digest('hex');
++}
++
++function wavBytes(): Buffer {
++  const bytes = Buffer.alloc(48);
++  bytes.write('RIFF', 0, 'ascii');
++  bytes.writeUInt32LE(40, 4);
++  bytes.write('WAVE', 8, 'ascii');
++  bytes.write('fmt ', 12, 'ascii');
++  bytes.writeUInt32LE(16, 16);
++  bytes.writeUInt16LE(1, 20);
++  bytes.writeUInt16LE(1, 22);
++  bytes.writeUInt32LE(16_000, 24);
++  bytes.writeUInt32LE(32_000, 28);
++  bytes.writeUInt16LE(2, 32);
++  bytes.writeUInt16LE(16, 34);
++  bytes.write('data', 36, 'ascii');
++  bytes.writeUInt32LE(4, 40);
++  bytes.writeInt16LE(1_000, 44);
++  bytes.writeInt16LE(-1_000, 46);
++  return bytes;
++}
++
++function responseBody(bytes: Buffer): ArrayBuffer {
++  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
++}
++
++const narration = '十可以分成一个十和零个一。';
++const mathTtsRequest: MiraFormalTtsRequest = {
++  requestId: 'formal-tts-math-001',
++  classroomId: 'omclass_math_001',
++  classroomContentSha256: '1'.repeat(64),
++  subject: 'math',
++  teacherProfileId: 'mira_math_clear',
++  teacherProfileVersion: 2,
++  teacherProfileSha256: '4f5a986a765f69798c8546d7f9091fe297f2a98c5353fdd01cd1aa06884c98fb',
++  teacherGender: 'male',
++  sceneId: 'scene_math_00',
++  sceneOrder: 0,
++  actionId: 'action_math_00_speech',
++  narrationSegmentId: 'segment_math_00',
++  text: narration,
++  textSha256: sha256Text(narration),
++};
++
++describe('Mira formal subject Qwen audio runtime', () => {
++  let tempRoot: string;
++
++  beforeEach(async () => {
++    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-formal-audio-'));
++    process.env.MIRA_FORMAL_AUDIO_DATA_DIR = tempRoot;
++    process.env.MIRA_INTERNAL_API_TOKEN = 'internal-secret-never-persist';
++  });
++
++  afterEach(async () => {
++    delete process.env.MIRA_FORMAL_AUDIO_DATA_DIR;
++    delete process.env.MIRA_INTERNAL_API_TOKEN;
++    await fs.rm(tempRoot, { recursive: true, force: true });
++    vi.restoreAllMocks();
++  });
++
++  it('freezes the three subject teachers and never mutates the sample Serena policy', () => {
++    expect(getMiraFormalAudioRuntimePolicy()).toEqual(MIRA_FORMAL_AUDIO_POLICY);
++    expect(MIRA_FORMAL_AUDIO_POLICY).toMatchObject({
++      schemaVersion: 'mira.openmaic.formal-audio.v1',
++      tts: { providerId: 'qwen-tts', modelId: 'qwen3-tts-flash', fallbackAllowed: false },
++      asr: { providerId: 'qwen-asr', modelId: 'qwen3-asr-flash', fallbackAllowed: false },
++      subjects: {
++        chinese: {
++          teacherName: '小语老师',
++          teacherGender: 'female',
++          voiceGender: 'female',
++          voiceId: 'Serena',
++          languageCode: 'zh-CN',
++        },
++        math: {
++          teacherName: '小数老师',
++          teacherGender: 'male',
++          voiceGender: 'male',
++          voiceId: 'Ethan',
++          languageCode: 'zh-CN',
++        },
++        english: {
++          teacherName: 'Mia 老师',
++          teacherGender: 'female',
++          voiceGender: 'female',
++          voiceId: 'Jennifer',
++          languageCode: 'en-US',
++        },
++      },
++    });
++  });
++
++  it('persists the TTS attempt before fetch and replays without a second provider call', async () => {
++    const audio = wavBytes();
++    let observedAttempt = false;
++    const fetchMock = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
++      const url = String(input);
++      if (url.includes('/multimodal-generation/generation')) {
++        const persisted = await readMiraFormalTtsJob(mathTtsRequest.requestId);
++        observedAttempt = Boolean(persisted?.providerAttemptedAt && persisted.state === 'running');
++        const requestBody = JSON.parse(String(init?.body));
++        expect(requestBody).toMatchObject({
++          model: 'qwen3-tts-flash',
++          input: { text: narration, voice: 'Ethan', language_type: 'Chinese' },
++        });
++        return new Response(
++          JSON.stringify({
++            output: { audio: { url: 'https://mira-test.oss-cn-beijing.aliyuncs.com/result.wav' } },
++          }),
++          {
++            status: 200,
++            headers: { 'content-type': 'application/json' },
++          },
++        );
++      }
++      return new Response(responseBody(audio), {
++        status: 200,
++        headers: { 'content-type': 'audio/wav', 'content-length': String(audio.byteLength) },
++      });
++    });
++
++    const first = await executeMiraFormalTts(mathTtsRequest, {
++      fetchImpl: fetchMock as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++    });
++    const replay = await executeMiraFormalTts(mathTtsRequest, {
++      fetchImpl: fetchMock as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++    });
++
++    expect(observedAttempt).toBe(true);
++    expect(first.created).toBe(true);
++    expect(first.record.state).toBe('succeeded');
++    expect(first.record.voiceId).toBe('Ethan');
++    expect(replay.created).toBe(false);
++    expect(replay.record).toEqual(first.record);
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++    const serialized = JSON.stringify(await readMiraFormalTtsJob(mathTtsRequest.requestId));
++    expect(serialized).not.toContain(ttsKey);
++    expect(serialized).not.toContain('oss-cn-beijing');
++  });
++
++  it('rejects caller provider overrides and changed idempotent bodies', async () => {
++    const forbidden = [
++      'provider',
++      'model',
++      'voice',
++      'apiKey',
++      'baseUrl',
++      'fallback',
++      'audioUrl',
++      'base64',
++    ];
++    for (const key of forbidden) {
++      await expect(
++        executeMiraFormalTts({ ...mathTtsRequest, [key]: 'attacker' } as never, {
++          fetchImpl: vi.fn() as never,
++          resolveAddresses: async () => ['8.8.8.8'],
++        }),
++      ).rejects.toMatchObject({ code: 'invalid_request' });
++    }
++
++    const never = vi.fn();
++    const hanging = new Promise<Response>(() => undefined);
++    void executeMiraFormalTts(mathTtsRequest, {
++      fetchImpl: never.mockReturnValue(hanging) as never,
++      resolveAddresses: async () => ['8.8.8.8'],
++    });
++    await vi.waitFor(async () => {
++      expect(
++        (await readMiraFormalTtsJob(mathTtsRequest.requestId))?.providerAttemptedAt,
++      ).toBeTruthy();
++    });
++    await expect(
++      executeMiraFormalTts(
++        { ...mathTtsRequest, text: 'changed', textSha256: sha256Text('changed') },
++        {
++          fetchImpl: vi.fn() as never,
++          resolveAddresses: async () => ['8.8.8.8'],
++        },
++      ),
++    ).rejects.toBeInstanceOf(MiraFormalAudioError);
++    await expect(
++      executeMiraFormalTts(
++        { ...mathTtsRequest, text: 'changed', textSha256: sha256Text('changed') },
++        {
++          fetchImpl: vi.fn() as never,
++          resolveAddresses: async () => ['8.8.8.8'],
++        },
++      ),
++    ).rejects.toMatchObject({ code: 'request_conflict' });
++  });
++
++  it('terminalizes explicit failures and ambiguous outcomes without retrying', async () => {
++    const providerRejected = vi.fn(
++      async () =>
++        new Response('{}', {
++          status: 500,
++          headers: { 'content-type': 'application/json' },
++        }),
++    );
++    const rejectedRequest = { ...mathTtsRequest, requestId: 'formal-tts-rejected-001' };
++    const rejected = await executeMiraFormalTts(rejectedRequest, {
++      fetchImpl: providerRejected as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++    });
++    expect(rejected.record).toMatchObject({
++      state: 'failed',
++      safeErrorCode: 'provider_rejected',
++    });
++    await executeMiraFormalTts(rejectedRequest, {
++      fetchImpl: providerRejected as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++    });
++    expect(providerRejected).toHaveBeenCalledTimes(1);
++
++    const timeout = vi.fn(async () => {
++      throw new DOMException('secret timeout detail', 'TimeoutError');
++    });
++    const timeoutRequest = { ...mathTtsRequest, requestId: 'formal-tts-timeout-001' };
++    const ambiguous = await executeMiraFormalTts(timeoutRequest, {
++      fetchImpl: timeout as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++    });
++    expect(ambiguous.record).toMatchObject({
++      state: 'ambiguous',
++      safeErrorCode: 'provider_outcome_unknown',
++    });
++    await executeMiraFormalTts(timeoutRequest, {
++      fetchImpl: timeout as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++    });
++    expect(timeout).toHaveBeenCalledTimes(1);
++    expect(JSON.stringify(ambiguous.record)).not.toContain('secret timeout detail');
++  });
++
++  it('turns a stale attempted job ambiguous and never dispatches it again', async () => {
++    const hanging = vi.fn(() => new Promise<Response>(() => undefined));
++    const request = { ...mathTtsRequest, requestId: 'formal-tts-stale-001' };
++    void executeMiraFormalTts(request, {
++      fetchImpl: hanging as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++      now: () => new Date('2026-08-25T00:00:00.000Z'),
++    });
++    await vi.waitFor(async () => {
++      expect(
++        (await readMiraFormalTtsJob(request.requestId, new Date('2026-08-25T00:00:01.000Z')))
++          ?.providerAttemptedAt,
++      ).toBeTruthy();
++    });
++    const future = new Date('2026-08-25T00:06:00.000Z');
++    const stale = await readMiraFormalTtsJob(request.requestId, future);
++    expect(stale).toMatchObject({
++      state: 'ambiguous',
++      safeErrorCode: 'stale_provider_outcome_unknown',
++    });
++    const replayFetch = vi.fn();
++    const replay = await executeMiraFormalTts(request, {
++      fetchImpl: replayFetch as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++      now: () => future,
++    });
++    expect(replay.created).toBe(false);
++    expect(replay.record.state).toBe('ambiguous');
++    expect(replayFetch).not.toHaveBeenCalled();
++    expect(hanging).toHaveBeenCalledTimes(1);
++  });
++
++  it('rejects a mismatched formal teacher gender and profile hash before fetch', async () => {
++    for (const mutation of [
++      { teacherGender: 'female' },
++      { teacherProfileSha256: 'f'.repeat(64) },
++      { teacherProfileId: 'mira_chinese_gentle' },
++    ]) {
++      const fetchMock = vi.fn();
++      await expect(
++        executeMiraFormalTts({ ...mathTtsRequest, ...mutation } as never, {
++          fetchImpl: fetchMock as never,
++          resolveAddresses: async () => ['8.8.8.8'],
++        }),
++      ).rejects.toMatchObject({ code: 'invalid_request' });
++      expect(fetchMock).not.toHaveBeenCalled();
++    }
++  });
++
++  it('rejects redirect escape, private resolution, wrong MIME, and oversize media', async () => {
++    const synthesis = () =>
++      new Response(
++        JSON.stringify({
++          output: {
++            audio: {
++              url: 'https://mira-test.oss-cn-beijing.aliyuncs.com/result.wav',
++            },
++          },
++        }),
++        { status: 200, headers: { 'content-type': 'application/json' } },
++      );
++
++    const redirectFetch = vi
++      .fn()
++      .mockResolvedValueOnce(synthesis())
++      .mockResolvedValueOnce(
++        new Response(null, {
++          status: 302,
++          headers: { location: 'https://127.0.0.1/private.wav' },
++        }),
++      );
++    const redirect = await executeMiraFormalTts(
++      { ...mathTtsRequest, requestId: 'formal-tts-redirect-001' },
++      {
++        fetchImpl: redirectFetch as typeof fetch,
++        resolveAddresses: async () => ['8.8.8.8'],
++      },
++    );
++    expect(redirect.record).toMatchObject({ state: 'failed', safeErrorCode: 'media_url_rejected' });
++
++    const privateFetch = vi.fn().mockResolvedValueOnce(synthesis());
++    const privateMedia = await executeMiraFormalTts(
++      { ...mathTtsRequest, requestId: 'formal-tts-private-001' },
++      {
++        fetchImpl: privateFetch as typeof fetch,
++        resolveAddresses: async () => ['127.0.0.1'],
++      },
++    );
++    expect(privateMedia.record).toMatchObject({
++      state: 'failed',
++      safeErrorCode: 'media_host_rejected',
++    });
++    expect(privateFetch).toHaveBeenCalledTimes(1);
++
++    const mimeFetch = vi
++      .fn()
++      .mockResolvedValueOnce(synthesis())
++      .mockResolvedValueOnce(
++        new Response(responseBody(wavBytes()), {
++          status: 200,
++          headers: { 'content-type': 'audio/mpeg' },
++        }),
++      );
++    const wrongMime = await executeMiraFormalTts(
++      { ...mathTtsRequest, requestId: 'formal-tts-mime-001' },
++      { fetchImpl: mimeFetch as typeof fetch, resolveAddresses: async () => ['8.8.8.8'] },
++    );
++    expect(wrongMime.record).toMatchObject({
++      state: 'failed',
++      safeErrorCode: 'media_mime_invalid',
++    });
++
++    const oversizeFetch = vi
++      .fn()
++      .mockResolvedValueOnce(synthesis())
++      .mockResolvedValueOnce(
++        new Response(responseBody(wavBytes()), {
++          status: 200,
++          headers: { 'content-type': 'audio/wav', 'content-length': String(16 * 1024 * 1024 + 1) },
++        }),
++      );
++    const oversize = await executeMiraFormalTts(
++      { ...mathTtsRequest, requestId: 'formal-tts-oversize-001' },
++      { fetchImpl: oversizeFetch as typeof fetch, resolveAddresses: async () => ['8.8.8.8'] },
++    );
++    expect(oversize.record).toMatchObject({
++      state: 'failed',
++      safeErrorCode: 'response_size_invalid',
++    });
++  });
++
++  it('uses only the matching local TTS WAV for ASR and never persists the transcript', async () => {
++    const audio = wavBytes();
++    const ttsFetch = vi.fn(async (input: string | URL | Request) =>
++      String(input).includes('/multimodal-generation/generation')
++        ? new Response(
++            JSON.stringify({
++              output: {
++                audio: { url: 'https://mira-test.oss-cn-beijing.aliyuncs.com/result.wav' },
++              },
++            }),
++            { status: 200, headers: { 'content-type': 'application/json' } },
++          )
++        : new Response(responseBody(audio), {
++            status: 200,
++            headers: { 'content-type': 'audio/wav' },
++          }),
++    );
++    const tts = await executeMiraFormalTts(mathTtsRequest, {
++      fetchImpl: ttsFetch as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++    });
++    const asrRequest = {
++      requestId: 'formal-asr-math-001',
++      ttsRequestId: mathTtsRequest.requestId,
++      classroomId: mathTtsRequest.classroomId,
++      classroomContentSha256: mathTtsRequest.classroomContentSha256,
++      subject: mathTtsRequest.subject,
++      teacherProfileId: mathTtsRequest.teacherProfileId,
++      teacherProfileVersion: mathTtsRequest.teacherProfileVersion,
++      teacherProfileSha256: mathTtsRequest.teacherProfileSha256,
++      teacherGender: mathTtsRequest.teacherGender,
++      sceneId: mathTtsRequest.sceneId,
++      sceneOrder: mathTtsRequest.sceneOrder,
++      actionId: mathTtsRequest.actionId,
++      narrationSegmentId: mathTtsRequest.narrationSegmentId,
++      audioSha256: tts.record.audioSha256!,
++    } as const;
++    const transcript = '十可以分成一个十和零个一。';
++    const asrFetch = vi.fn(async (_input: string | URL | Request, init?: RequestInit) => {
++      const body = JSON.parse(String(init?.body));
++      expect(body.model).toBe('qwen3-asr-flash');
++      expect(body.input.messages[0].content[0].audio).toMatch(/^data:audio\/wav;base64,/);
++      const persisted = await readMiraFormalAsrJob(asrRequest.requestId);
++      expect(persisted?.providerAttemptedAt).toBeTruthy();
++      return new Response(
++        JSON.stringify({ output: { choices: [{ message: { content: [{ text: transcript }] } }] } }),
++        { status: 200, headers: { 'content-type': 'application/json' } },
++      );
++    });
++
++    const result = await executeMiraFormalAsr(asrRequest, { fetchImpl: asrFetch as typeof fetch });
++    expect(result.transcript).toBe(transcript);
++    expect(result.record.transcriptSha256).toBe(sha256Text(transcript));
++    const serialized = JSON.stringify(await readMiraFormalAsrJob(asrRequest.requestId));
++    expect(serialized).not.toContain(transcript);
++    expect(serialized).not.toContain(asrKey);
++    expect(serialized).not.toContain('base64');
++  });
++
++  it('protects the private routes and exposes a scoped credential-free health policy', async () => {
++    const { NextRequest } = await import('next/server');
++    const headers = {
++      host: '127.0.0.1:3100',
++      'x-forwarded-host': '127.0.0.1:3100',
++      'x-forwarded-for': '127.0.0.1',
++      'x-forwarded-proto': 'http',
++      'x-forwarded-port': '3100',
++      'x-mira-internal-token': 'internal-secret-never-persist',
++      'content-type': 'application/json',
++    };
++    const audio = wavBytes();
++    vi.stubGlobal(
++      'fetch',
++      vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
++        if (String(input).includes('/multimodal-generation/generation')) {
++          const providerBody = JSON.parse(String(init?.body));
++          if (providerBody.model === 'qwen3-asr-flash') {
++            return new Response(
++              JSON.stringify({
++                output: {
++                  choices: [{ message: { content: [{ text: narration }] } }],
++                },
++              }),
++              { status: 200, headers: { 'content-type': 'application/json' } },
++            );
++          }
++          return new Response(
++            JSON.stringify({
++              output: {
++                audio: {
++                  url: 'https://mira-test.oss-cn-beijing.aliyuncs.com/result.wav',
++                },
++              },
++            }),
++            { status: 200, headers: { 'content-type': 'application/json' } },
++          );
++        }
++        return new Response(responseBody(audio), {
++          status: 200,
++          headers: { 'content-type': 'audio/wav' },
++        });
++      }),
++    );
++    const ttsRoute = await import('@/app/api/mira/formal-audio/tts/route');
++    const denied = await ttsRoute.POST(
++      new NextRequest('http://127.0.0.1:3100/api/mira/formal-audio/tts', {
++        method: 'POST',
++        headers: { ...headers, 'x-mira-internal-token': 'wrong' },
++        body: JSON.stringify(mathTtsRequest),
++      }),
++    );
++    expect(denied.status).toBe(403);
++    expect(JSON.stringify(await denied.json())).not.toContain('wrong');
++
++    const created = await ttsRoute.POST(
++      new NextRequest('http://127.0.0.1:3100/api/mira/formal-audio/tts', {
++        method: 'POST',
++        headers,
++        body: JSON.stringify(mathTtsRequest),
++      }),
++    );
++    const createdBody = await created.json();
++    expect(created.status).toBe(200);
++    expect(createdBody).toMatchObject({
++      success: true,
++      kind: 'tts',
++      requestId: mathTtsRequest.requestId,
++      state: 'succeeded',
++      voiceId: 'Ethan',
++      done: true,
++    });
++    expect(createdBody.downloadUrl).toContain('download=1');
++    expect(JSON.stringify(createdBody)).not.toContain('assetFileName');
++
++    const downloaded = await ttsRoute.GET(
++      new NextRequest(
++        `http://127.0.0.1:3100/api/mira/formal-audio/tts?requestId=${mathTtsRequest.requestId}&download=1`,
++        { headers },
++      ),
++    );
++    expect(downloaded.status).toBe(200);
++    expect(downloaded.headers.get('content-type')).toBe('audio/wav');
++    expect(new Uint8Array(await downloaded.arrayBuffer())).toEqual(new Uint8Array(audio));
++
++    const asrRoute = await import('@/app/api/mira/formal-audio/asr/route');
++    const asrPayload = {
++      requestId: 'formal-asr-route-001',
++      ttsRequestId: mathTtsRequest.requestId,
++      classroomId: mathTtsRequest.classroomId,
++      classroomContentSha256: mathTtsRequest.classroomContentSha256,
++      subject: mathTtsRequest.subject,
++      teacherProfileId: mathTtsRequest.teacherProfileId,
++      teacherProfileVersion: mathTtsRequest.teacherProfileVersion,
++      teacherProfileSha256: mathTtsRequest.teacherProfileSha256,
++      teacherGender: mathTtsRequest.teacherGender,
++      sceneId: mathTtsRequest.sceneId,
++      sceneOrder: mathTtsRequest.sceneOrder,
++      actionId: mathTtsRequest.actionId,
++      narrationSegmentId: mathTtsRequest.narrationSegmentId,
++      audioSha256: createdBody.audioSha256,
++    };
++    const asrCreated = await asrRoute.POST(
++      new NextRequest('http://127.0.0.1:3100/api/mira/formal-audio/asr', {
++        method: 'POST',
++        headers,
++        body: JSON.stringify(asrPayload),
++      }),
++    );
++    const asrBody = await asrCreated.json();
++    expect(asrCreated.status).toBe(200);
++    expect(asrBody).toMatchObject({
++      state: 'succeeded',
++      transcript: narration,
++      transcriptSha256: sha256Text(narration),
++      done: true,
++    });
++    const asrReplay = await asrRoute.POST(
++      new NextRequest('http://127.0.0.1:3100/api/mira/formal-audio/asr', {
++        method: 'POST',
++        headers,
++        body: JSON.stringify(asrPayload),
++      }),
++    );
++    const asrReplayBody = await asrReplay.json();
++    expect(asrReplayBody.state).toBe('succeeded');
++    expect(asrReplayBody.transcript).toBeUndefined();
++
++    const health = await import('@/app/api/health/route');
++    const healthy = await health.GET(
++      new NextRequest('http://127.0.0.1:3100/api/health?scope=formal-audio', {
++        headers,
++      }),
++    );
++    const healthBody = await healthy.json();
++    expect(healthy.status).toBe(200);
++    expect(healthBody.capabilities).toEqual({ formalAudio: true, tts: true, asr: true });
++    expect(healthBody.runtimePolicy.formalAudio.subjects.math.voiceId).toBe('Ethan');
++    const serialized = JSON.stringify(healthBody);
++    expect(serialized).not.toContain(ttsKey);
++    expect(serialized).not.toContain(asrKey);
++    expect(serialized).not.toContain('baseUrl');
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

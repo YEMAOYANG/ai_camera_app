@@ -10,6 +10,9 @@ import 'package:warm_sight/src/features/devices/application/device_repository.da
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
+import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
+import 'package:warm_sight/src/features/learning/application/learning_repository.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
@@ -18,6 +21,76 @@ import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
 import 'package:warm_sight/src/features/tasks/application/task_realtime_repository.dart';
 import 'package:warm_sight/src/features/tasks/application/task_repository.dart';
 import 'package:warm_sight/src/features/tasks/application/task_week_scope.dart';
+
+final homeDataRefreshCoordinatorProvider = Provider<HomeDataRefreshCoordinator>(
+  HomeDataRefreshCoordinator.new,
+);
+
+class HomeDataRefreshCoordinator {
+  HomeDataRefreshCoordinator(this._ref);
+
+  final Ref _ref;
+  Future<void>? _inFlight;
+
+  Future<void> refresh() {
+    final inFlight = _inFlight;
+    if (inFlight != null) return inFlight;
+    final operation = _refresh();
+    _inFlight = operation;
+    return operation.whenComplete(() {
+      if (identical(_inFlight, operation)) _inFlight = null;
+    });
+  }
+
+  Future<void> _refresh() async {
+    ProfileSummary? freshProfile;
+    try {
+      freshProfile = await _ref.refresh(profileSummaryProvider.future);
+    } catch (_) {
+      // Learning refreshes fail closed when the fresh profile is unavailable.
+    }
+
+    await Future.wait([
+      silentRefreshProvider(_ref, primaryDeviceOverviewProvider),
+      silentRefreshProvider(_ref, todayTasksProvider),
+      silentRefreshProvider(_ref, rewardRedemptionsProvider),
+      silentRefreshProvider(_ref, cameraHealthProvider),
+      silentRefreshProvider(_ref, cameraStatusProvider),
+      silentRefreshProvider(_ref, cameraMonitorStatusProvider),
+    ]);
+
+    final child = freshProfile?.child;
+    if (child != null &&
+        child.id.isNotEmpty &&
+        child.contentMode == 'primary_learning') {
+      try {
+        final _ = await _ref.refresh(
+          currentLearningPreparationProvider(child.id).future,
+        );
+      } catch (_) {
+        // Preparation progress is secondary and must not hide an active release.
+      }
+      try {
+        final availability = await _ref.refresh(
+          currentLearningAvailabilityProvider(child.id).future,
+        );
+        if (availability.gradeCode == child.gradeCode &&
+            availability.canLearnNow) {
+          final todayProvider = todayLearningProvider((
+            childId: child.id,
+            gradeCode: availability.gradeCode,
+          ));
+          final _ = await _ref.refresh(todayProvider.future);
+        }
+      } catch (_) {
+        // A failed fresh availability request must never unlock Today from stale
+        // preparation progress.
+      }
+    }
+
+    await refreshCareSummarySilently(_ref);
+  }
+}
 
 /// WS 观察事件携带 lightweight payload 时，立即更新首页 Hero 观察文案。
 void applyCameraObservationRealtimeEvent(dynamic ref, TaskRealtimeEvent event) {
@@ -125,16 +198,7 @@ void applyMonitorAnalysisRefreshFailure(dynamic ref, CameraException error) {
 }
 
 Future<void> refreshHomeDataSilently(dynamic ref) async {
-  await Future.wait([
-    silentRefreshProvider(ref, profileSummaryProvider),
-    silentRefreshProvider(ref, primaryDeviceOverviewProvider),
-    silentRefreshProvider(ref, todayTasksProvider),
-    silentRefreshProvider(ref, rewardRedemptionsProvider),
-    silentRefreshProvider(ref, cameraHealthProvider),
-    silentRefreshProvider(ref, cameraStatusProvider),
-    silentRefreshProvider(ref, cameraMonitorStatusProvider),
-  ]);
-  await refreshCareSummarySilently(ref);
+  await ref.read(homeDataRefreshCoordinatorProvider).refresh();
 }
 
 Future<void> refreshLiveCareDataSilently(dynamic ref) async {
@@ -164,12 +228,24 @@ Future<void> refreshTaskProvidersSilently(
   final activeQuery = ref.read(activeTaskWeekQueryProvider);
   final childId = _profileChildId(ref);
   final weekQuery = activeQuery ?? fallbackTaskWeekQuery(childId);
+  final child = ref.read(profileSummaryProvider).asData?.value.child;
+  final availability = child == null
+      ? null
+      : ref.read(currentLearningAvailabilityProvider(child.id)).asData?.value;
   await Future.wait([
     silentRefreshProvider(ref, taskListProvider),
     silentRefreshProvider(ref, todayTasksProvider),
     silentRefreshProvider(ref, pointsSummaryProvider),
     silentRefreshProvider(ref, dailyReportProvider),
     silentRefreshProvider(ref, weeklyReportProvider),
+    if (child != null &&
+        child.contentMode == 'primary_learning' &&
+        availability?.gradeCode == child.gradeCode &&
+        availability?.canLearnNow == true)
+      silentRefreshProvider(
+        ref,
+        todayLearningProvider((childId: child.id, gradeCode: child.gradeCode)),
+      ),
     if (weekQuery != null)
       silentRefreshProvider(ref, taskWeekProvider(weekQuery)),
     ...taskIds.map((id) => silentRefreshProvider(ref, taskDetailProvider(id))),

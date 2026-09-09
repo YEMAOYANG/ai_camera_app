@@ -1,0 +1,235 @@
+From 8974696121b60950ccbf8ec76573ca52b5e0d409 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 16/37] 0016-mira-student-asr-isolation
+
+---
+ components/roundtable/index.tsx            |  9 ++++++-
+ e2e/tests/classroom-interaction.spec.ts    | 30 ++++++++++++++++++++++
+ lib/hooks/use-asr-available.ts             | 13 ++++++++--
+ lib/mira/student-runtime.ts                | 16 +++++++++++-
+ tests/runtime/mira-student-runtime.test.ts | 16 +++++++++++-
+ tests/server/health-route.test.ts          |  6 ++++-
+ 6 files changed, 84 insertions(+), 6 deletions(-)
+
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+index 7b53193..183d13c 100644
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -32,6 +32,8 @@ import { DEFAULT_TEACHER_AVATAR, DEFAULT_USER_AVATAR } from '@/components/roundt
+ import type { DiscussionAction } from '@/lib/types/action';
+ import type { EngineMode, PlaybackView } from '@/lib/playback';
+ import type { Participant } from '@/lib/types/roundtable';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
++import { getMiraEffectiveAsrEnabled } from '@/lib/mira/student-runtime';
+ 
+ export interface DiscussionRequest {
+   topic: string;
+@@ -197,7 +199,9 @@ export function Roundtable({
+   const ttsMuted = useSettingsStore((s) => s.ttsMuted);
+   const setTTSMuted = useSettingsStore((s) => s.setTTSMuted);
+   const ttsEnabled = useSettingsStore((state) => state.ttsEnabled);
+-  const asrEnabled = useSettingsStore((state) => state.asrEnabled);
++  const operatorAsrEnabled = useSettingsStore((state) => state.asrEnabled);
++  const studentMode = useMiraStudentRuntime();
++  const asrEnabled = getMiraEffectiveAsrEnabled({ studentMode, operatorAsrEnabled });
+   const chatAreaWidth = useSettingsStore((s) => s.chatAreaWidth);
+   const ttsVolume = useSettingsStore((s) => s.ttsVolume);
+   const setTTSVolume = useSettingsStore((s) => s.setTTSVolume);
+@@ -2041,6 +2045,9 @@ export function Roundtable({
+               ) : (
+                 <>
+                   <button
++                    aria-label={
++                      asrEnabled ? t('roundtable.voiceInput') : t('roundtable.voiceInputDisabled')
++                    }
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       if (asrEnabled) handleToggleVoice();
+diff --git a/e2e/tests/classroom-interaction.spec.ts b/e2e/tests/classroom-interaction.spec.ts
+index 1c2e68b..f65b5e0 100644
+--- a/e2e/tests/classroom-interaction.spec.ts
++++ b/e2e/tests/classroom-interaction.spec.ts
+@@ -371,4 +371,34 @@ test.describe('Classroom Interaction', () => {
+       'true',
+     );
+   });
++
++  test('keeps Mira student voice input available without changing the operator ASR preference', async ({
++    page,
++  }) => {
++    await page.addInitScript(() => {
++      const key = 'maic:account:settings-storage';
++      const raw = localStorage.getItem(key);
++      if (!raw) throw new Error('Expected seeded settings storage');
++      const settings = JSON.parse(raw);
++      settings.state.asrEnabled = false;
++      localStorage.setItem(key, JSON.stringify(settings));
++    });
++
++    await page.goto(`/classroom/${TEST_STAGE_ID}?mira=1`);
++    await expect(page.getByText('课程加载中…')).toBeHidden({ timeout: 15_000 });
++    await expect(page.locator('[data-testid="scene-item"]')).toHaveCount(3, { timeout: 10_000 });
++
++    const studentVoiceButton = page.getByRole('button', { name: '语音输入', exact: true });
++    await expect(studentVoiceButton).toBeVisible();
++    await expect(studentVoiceButton).toBeEnabled();
++
++    await page.goto(`/classroom/${TEST_STAGE_ID}`);
++    await expect(page.locator('[data-testid="scene-item"]')).toHaveCount(3, { timeout: 10_000 });
++    const operatorVoiceButton = page.getByRole('button', {
++      name: 'Voice input disabled',
++      exact: true,
++    });
++    await expect(operatorVoiceButton).toBeVisible();
++    await expect(operatorVoiceButton).toBeDisabled();
++  });
+ });
+diff --git a/lib/hooks/use-asr-available.ts b/lib/hooks/use-asr-available.ts
+index 6d76c88..26ad1d0 100644
+--- a/lib/hooks/use-asr-available.ts
++++ b/lib/hooks/use-asr-available.ts
+@@ -4,6 +4,8 @@ import { useSyncExternalStore } from 'react';
+ import { useSettingsStore } from '@/lib/store/settings';
+ import { ASR_PROVIDERS } from '@/lib/audio/constants';
+ import type { BuiltInASRProviderId } from '@/lib/audio/types';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
++import { getMiraEffectiveAsrEnabled } from '@/lib/mira/student-runtime';
+ 
+ // Web Speech API support is constant per environment, so subscribing is a no-op.
+ const subscribe = () => () => {};
+@@ -23,7 +25,8 @@ const getBrowserSpeechSupported = () =>
+  * each one having to remember to wire the toggle through a `disabled` prop.
+  */
+ export function useASRAvailable(): boolean {
+-  const asrEnabled = useSettingsStore((s) => s.asrEnabled);
++  const operatorAsrEnabled = useSettingsStore((s) => s.asrEnabled);
++  const studentMode = useMiraStudentRuntime();
+   const asrProviderId = useSettingsStore((s) => s.asrProviderId);
+   const providerConfig = useSettingsStore((s) => s.asrProvidersConfig[s.asrProviderId]);
+ 
+@@ -47,5 +50,11 @@ export function useASRAvailable(): boolean {
+   const modelOk = !!builtIn || (providerConfig?.customModels?.length ?? 0) > 0;
+   const browserOk = asrProviderId !== 'browser-native' || browserSpeechSupported;
+ 
+-  return asrEnabled && keyOk && modelOk && browserOk;
++  return (
++    studentMode ||
++    (getMiraEffectiveAsrEnabled({ studentMode, operatorAsrEnabled }) &&
++      keyOk &&
++      modelOk &&
++      browserOk)
++  );
+ }
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+index 4bcf5b4..3c12563 100644
+--- a/lib/mira/student-runtime.ts
++++ b/lib/mira/student-runtime.ts
+@@ -9,13 +9,17 @@ export const MIRA_STUDENT_AUTO_PLAY_DEFAULT = false;
+ 
+ export const MIRA_STUDENT_CHROME_POLICY = Object.freeze({
+   enforced: true,
+-  policyVersion: 'mira-student-chrome.v3',
++  policyVersion: 'mira-student-chrome.v4',
+   marker: 'mira=1',
+   locale: 'zh-CN',
+   theme: 'light',
+   autoPlayDefault: MIRA_STUDENT_AUTO_PLAY_DEFAULT,
+   autoPlayPersistence: 'student-session',
+   manualAutoPlayToggleEnabled: true,
++  asrEnabled: true,
++  asrPersistence: 'student-session',
++  manualAsrToggleEnabled: false,
++  operatorAsrPreferencePreserved: true,
+   operatorChromePreserved: true,
+   headerControlsHidden: true,
+   exportsHidden: true,
+@@ -50,6 +54,16 @@ export function getMiraEffectiveAutoPlayLecture({
+   return studentMode ? studentAutoPlayLecture : operatorAutoPlayLecture;
+ }
+ 
++export function getMiraEffectiveAsrEnabled({
++  studentMode,
++  operatorAsrEnabled,
++}: {
++  readonly studentMode: boolean;
++  readonly operatorAsrEnabled: boolean;
++}): boolean {
++  return studentMode || operatorAsrEnabled;
++}
++
+ /** Student chrome is enabled only for the exact `mira=1` marker. */
+ export function isMiraStudentRuntimeSearch(search: string): boolean {
+   const values = new URLSearchParams(search).getAll(MIRA_STUDENT_RUNTIME_QUERY_KEY);
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+index be9fcfe..6184340 100644
+--- a/tests/runtime/mira-student-runtime.test.ts
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -1,5 +1,6 @@
+ import { describe, expect, it } from 'vitest';
+ import {
++  getMiraEffectiveAsrEnabled,
+   getMiraEffectiveAutoPlayLecture,
+   getMiraStudentChromeRuntimePolicy,
+   isMiraStudentRuntimeParam,
+@@ -25,13 +26,17 @@ describe('Mira student runtime marker', () => {
+   it('publishes the exact student chrome health attestation', () => {
+     expect(getMiraStudentChromeRuntimePolicy()).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v3',
++      policyVersion: 'mira-student-chrome.v4',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
+       autoPlayDefault: false,
+       autoPlayPersistence: 'student-session',
+       manualAutoPlayToggleEnabled: true,
++      asrEnabled: true,
++      asrPersistence: 'student-session',
++      manualAsrToggleEnabled: false,
++      operatorAsrPreferencePreserved: true,
+       operatorChromePreserved: true,
+       headerControlsHidden: true,
+       exportsHidden: true,
+@@ -73,6 +78,15 @@ describe('Mira student runtime marker', () => {
+     ).toBe(false);
+   });
+ 
++  it('keeps student ASR enabled without changing the operator preference', () => {
++    expect(getMiraEffectiveAsrEnabled({ studentMode: true, operatorAsrEnabled: false })).toBe(true);
++    expect(getMiraEffectiveAsrEnabled({ studentMode: true, operatorAsrEnabled: true })).toBe(true);
++    expect(getMiraEffectiveAsrEnabled({ studentMode: false, operatorAsrEnabled: false })).toBe(
++      false,
++    );
++    expect(getMiraEffectiveAsrEnabled({ studentMode: false, operatorAsrEnabled: true })).toBe(true);
++  });
++
+   it('uses neutral classroom metadata and icons in student mode', () => {
+     expect(MIRA_STUDENT_CLASSROOM_METADATA).toEqual({
+       title: 'Mira 学习课堂',
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 6894c8d..7daa11d 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -109,13 +109,17 @@ describe('GET /api/health structured scene runtime policy', () => {
+     });
+     expect(body.runtimePolicy.studentChrome).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v3',
++      policyVersion: 'mira-student-chrome.v4',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
+       autoPlayDefault: false,
+       autoPlayPersistence: 'student-session',
+       manualAutoPlayToggleEnabled: true,
++      asrEnabled: true,
++      asrPersistence: 'student-session',
++      manualAsrToggleEnabled: false,
++      operatorAsrPreferencePreserved: true,
+       operatorChromePreserved: true,
+       headerControlsHidden: true,
+       exportsHidden: true,
+-- 
+2.50.1 (Apple Git-155)
+

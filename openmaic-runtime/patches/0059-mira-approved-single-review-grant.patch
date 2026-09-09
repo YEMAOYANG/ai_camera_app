@@ -1,0 +1,369 @@
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -46,7 +46,7 @@
+   type MiraFormalSelectionInput,
+ } from './mira-formal-skill-selection';
+ import { listSkills } from './agent-runtime/skills';
+-import { reviewFormalCourse } from './mira-formal-teaching-quality';
++import { reviewFormalCourse, type FormalQualityReviewGrant } from './mira-formal-teaching-quality';
+ import type { MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
+ import { formalInspectionConfiguration } from './mira-formal-scene-inspector';
+ import type { AgentMessage } from '@earendil-works/pi-agent-core';
+@@ -1256,6 +1256,7 @@
+     recoveredScenes?: Scene[];
+     recheckUnsentBrowserReview?: boolean;
+     cachedQualityOnly?: boolean;
++    approvedReviewGrant?: FormalQualityReviewGrant;
+   },
+ ): Promise<MiraFormalProfessionalRecoveryCompletion> {
+   const events = await readAllSessionEvents(identity.sessionId);
+@@ -1350,6 +1351,7 @@
+       selectionPlan: { ...skillBundle.selectionPlan },
+       teachingBrief: skillBundle.teachingBrief,
+     }, undefined, { recheckUnsentBrowserReview: options.recheckUnsentBrowserReview,
++      approvedReviewGrant: options.approvedReviewGrant,
+       ...(options.cachedQualityOnly ? { provider: async () => { throw new Error('FORMAL_AUDIO_TAIL_NEW_REVIEW_FORBIDDEN'); } } : {}) });
+     if (quality.status !== 'passed' || !quality.receipt)
+       throw new Error(
+@@ -1532,7 +1534,8 @@
+ export async function recoverMiraFormalSavedStage(
+   input: GenerateClassroomInput,
+   repair: MiraSavedStageRecoveryInput,
+-  options: { baseUrl: string; cachedQualityOnly?: boolean; onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void },
++  options: { baseUrl: string; cachedQualityOnly?: boolean; approvedReviewGrant?: FormalQualityReviewGrant;
++    onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void },
+ ) {
+   const prepared = await prepareMiraFormalSavedStageRecovery(input, repair);
+   return completeMiraFormalProfessionalClassroom(input, parseFormalCoursewareSpec(input), prepared,
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -99,6 +99,33 @@
+   lockDeps?: QualityLockDeps;
+   /** Explicit operator recovery of the SAME snapshot rejected before provider dispatch. */
+   recheckUnsentBrowserReview?: boolean;
++  /** Operator-only, explicitly approved fourth review of one frozen snapshot. */
++  approvedReviewGrant?: FormalQualityReviewGrant;
++}
++
++export interface FormalQualityReviewGrant {
++  schemaVersion: 'mira.formal-quality-review-grant.v1';
++  grantId: string;
++  approvalRef: string;
++  sessionId: string;
++  stageId: string;
++  reviewIdentitySha256: string;
++  snapshotSha256: string;
++  priorAttemptsSha256: string;
++  maxAdditionalReviews: 1;
++}
++
++function assertGrantBinding(grant: FormalQualityReviewGrant, identity: JsonRecord, snapshotSha256: string) {
++  if (!object(grant) || Object.keys(grant).sort().join(',') !==
++      'approvalRef,grantId,maxAdditionalReviews,priorAttemptsSha256,reviewIdentitySha256,schemaVersion,sessionId,snapshotSha256,stageId'
++      || grant.schemaVersion !== 'mira.formal-quality-review-grant.v1'
++      || !/^[a-zA-Z0-9_-]{1,100}$/.test(grant.grantId)
++      || typeof grant.approvalRef !== 'string' || !grant.approvalRef.trim() || grant.approvalRef.length > 500
++      || grant.maxAdditionalReviews !== 1 || !SHA.test(grant.priorAttemptsSha256)
++      || grant.reviewIdentitySha256 !== qualitySha(identity)
++      || grant.sessionId !== identity.sessionId || grant.stageId !== identity.stageId
++      || grant.snapshotSha256 !== snapshotSha256)
++    throw new Error('FORMAL_QUALITY_REVIEW_GRANT_INVALID');
+ }
+ 
+ /** Three durable attempts per formal session. An unchanged snapshot reuses its
+@@ -115,11 +142,13 @@
+   if (!SHA.test(selectionPlanSha256)) throw new Error('FORMAL_QUALITY_SELECTION_INVALID');
+   const identity = { ownerId: input.ownerId, sessionId: input.sessionId, stageId: input.stage.id,
+     gradeBoundarySha256, teachingBriefSha256, selectionPlanSha256 };
++  const grant = deps.approvedReviewGrant;
++  if (grant) assertGrantBinding(grant, identity, snapshotSha256);
+   const folder = join(resolve(deps.cacheRoot ?? 'data/formal-quality-reviews'), qualitySha(identity));
+   await mkdir(folder, { recursive: true, mode: 0o700 });
+   const resultPath = join(folder, `${snapshotSha256}.json`);
+   const cached = await readJson(resultPath);
+-  const recheckUnsent = deps.recheckUnsentBrowserReview === true && object(cached)
++  const recheckUnsent = !grant && deps.recheckUnsentBrowserReview === true && object(cached)
+     && cached.status === 'needs_revision' && Array.isArray(cached.issues) && cached.issues.length > 0
+     && cached.issues.every(issue => object(issue) && typeof issue.problem === 'string'
+       && issue.problem.startsWith('Browser check '))
+@@ -127,7 +156,8 @@
+     && await readJson(join(folder, `${snapshotSha256}-provider-dispatch.json`)) === undefined;
+   if (cached !== undefined && (!object(cached) || cached.snapshotSha256 !== snapshotSha256
+       || !Array.isArray(cached.issues))) throw new Error('FORMAL_QUALITY_CACHE_CORRUPT');
+-  if (!recheckUnsent && object(cached) && cached.snapshotSha256 === snapshotSha256) {
++  if (!recheckUnsent && object(cached) && cached.snapshotSha256 === snapshotSha256
++      && (!grant || cached.status === 'passed')) {
+     if (cached.status === 'passed') {
+       if (!object(cached.receipt) || cached.receipt.snapshotSha256 !== snapshotSha256
+           || cached.receipt.gradeBoundarySha256 !== gradeBoundarySha256
+@@ -156,10 +186,23 @@
+     const previous = await readJson(ledgerPath);
+     const attempts = previous === undefined ? [] : previous;
+     if (!Array.isArray(attempts)) throw new Error('FORMAL_QUALITY_LEDGER_INVALID');
++    if (grant) {
++      // One additional operator review per session, regardless of grant ID. The
++      // original three attempts and every old provider response remain intact.
++      if (await readJson(join(folder, 'operator-review-grant.json')) !== undefined)
++        throw new Error('FORMAL_QUALITY_REVIEW_GRANT_ALREADY_CONSUMED');
++      if (attempts.length !== MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts
++          || qualitySha(attempts) !== grant.priorAttemptsSha256
++          || attempts.some(item => !object(item) || !['failed', 'needs_revision'].includes(String(item.status))))
++        throw new Error('FORMAL_QUALITY_REVIEW_GRANT_LEDGER_CHANGED');
++      const claim = await open(join(folder, 'operator-review-grant.json'), 'wx', 0o600);
++      try { await claim.writeFile(JSON.stringify({ ...grant, reservedAt: Date.now() })); await claim.sync(); }
++      finally { await claim.close(); }
++    }
+     const existingAttempt = attempts.find(item => object(item) && item.snapshotSha256 === snapshotSha256);
+-    if (existingAttempt && !recheckUnsent)
++    if (existingAttempt && !recheckUnsent && !grant)
+       throw new Error('FORMAL_QUALITY_PRIOR_ATTEMPT_UNRESOLVED');
+-    if (!recheckUnsent && attempts.length >= MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts)
++    if (!recheckUnsent && !grant && attempts.length >= MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts)
+       throw new Error('FORMAL_QUALITY_REPAIR_BUDGET_EXHAUSTED');
+     if (recheckUnsent) {
+       const priorBrowser = await readJson(join(folder, `${snapshotSha256}-browser.json`));
+@@ -173,12 +216,16 @@
+       await save(join(folder, `${snapshotSha256}-browser-rejection-${Date.now()}.json`),
+         { result: cached, browser: priorBrowser, attempt: existingAttempt });
+     }
++    const artifactPrefix = grant ? `${snapshotSha256}-grant-${qualitySha(grant)}` : snapshotSha256;
+     const attempt = (recheckUnsent ? existingAttempt :
+-      { snapshotSha256, status: 'started', startedAt: Date.now() }) as JsonRecord;
++      { snapshotSha256, status: 'started', startedAt: Date.now(),
++        ...(grant ? { grantId: grant.grantId, approvalRef: grant.approvalRef, artifactPrefix,
++          priorAttemptsSha256: grant.priorAttemptsSha256 } : {}) }) as JsonRecord;
+     if (recheckUnsent) attempt.browserRecheckedAt = Date.now();
+     else attempts.push(attempt);
+     await save(ledgerPath, attempts);
+-    await save(join(folder, `${snapshotSha256}-input.json`), { ...identity, snapshot,
++    if (grant && cached !== undefined) await save(join(folder, `${artifactPrefix}-previous-result.json`), cached);
++    await save(join(folder, `${artifactPrefix}-input.json`), { ...identity, snapshot,
+       gradeBoundary: input.gradeBoundary, selectionPlan: input.selectionPlan, teachingBrief: input.teachingBrief });
+     try {
+       const issues: FormalQualityResult['issues'] = [];
+@@ -207,7 +254,7 @@
+             passed: true, probeCount: observed.probeCount });
+         }
+       }
+-      await save(join(folder, `${snapshotSha256}-browser.json`), observations);
++      await save(join(folder, `${artifactPrefix}-browser.json`), observations);
+       let result: FormalQualityResult;
+       if (issues.length) result = { status: 'needs_revision', snapshotSha256, issues };
+       else {
+@@ -224,19 +271,20 @@
+           } : value),
+         }));
+         if (userPrompt.length > 200_000) throw new Error('FORMAL_QUALITY_REVIEW_INPUT_TOO_LARGE');
+-        const dispatch = await open(join(folder, `${snapshotSha256}-provider-dispatch.json`), 'wx', 0o600);
++        const dispatch = await open(join(folder, `${artifactPrefix}-provider-dispatch.json`), 'wx', 0o600);
+         try { await dispatch.writeFile(JSON.stringify({ snapshotSha256, startedAt: Date.now() })); await dispatch.sync(); }
+         finally { await dispatch.close(); }
+         const response = await (deps.provider ?? executeMiraCoursewareProvider)({
+           schemaVersion: MIRA_COURSEWARE_PROVIDER_SCHEMA,
+-          requestId: `quality-${qualitySha({ ...identity, snapshotSha256 })}`,
++          requestId: `quality-${qualitySha({ ...identity, snapshotSha256,
++            ...(grant ? { reviewGrantSha256: qualitySha(grant) } : {}) })}`,
+           phase: attempts.length === 1 ? 'independent_verification' : 'verification_after_repair',
+           systemPrompt: FORMAL_QUALITY_REVIEW_SYSTEM, userPrompt,
+           responseJsonSchema: formalReviewEvidenceSchema(evidenceCatalog),
+         }, signal);
+         // Preserve the actual response and usage before parsing; an invalid report
+         // is a failed attempt, never a fabricated pass or an invisible retry.
+-        await save(join(folder, `${snapshotSha256}-provider.json`), response);
++        await save(join(folder, `${artifactPrefix}-provider.json`), response);
+         if (signal?.aborted) throw new Error('FORMAL_QUALITY_ABORTED');
+         const report = parseFormalQualityReview(
+           decodeFormalReviewEvidence(JSON.parse(response.content), evidenceCatalog), input);
+@@ -259,7 +307,11 @@
+         }
+       }
+       attempt.status = result.status;
+-      await save(resultPath, { ...result, reviewPromptVersion: FORMAL_QUALITY_REVIEW_PROMPT_VERSION });
++      const stored = { ...result, reviewPromptVersion: FORMAL_QUALITY_REVIEW_PROMPT_VERSION };
++      await save(join(folder, `${artifactPrefix}.json`), stored);
++      // Only an actual valid pass can become the canonical cache used by the
++      // remaining audio/publication tail. Failed old evidence is never relabeled.
++      if (grant && result.status === 'passed') await save(resultPath, stored);
+       await save(ledgerPath, attempts);
+       return { ...result, remainingReviewAttempts: Math.max(0,
+         MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts - attempts.length) };
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -1,6 +1,7 @@
+ /** Local operator command: inspect -> complete. Never starts an Agent or search.
+  * Failed source bytes and the terminal session stay in the recovery audit.
+- * A completion consumes the original session's existing quality budget.
++ * A completion consumes the original session's existing quality budget unless
++ * its frozen snapshot has a separately recorded one-review operator grant.
+  */
+ import { createHash } from 'node:crypto';
+ import { promises as fs } from 'node:fs';
+@@ -16,6 +17,7 @@
+   normalizeMiraFormalAsrText, miraFormalAsrSimilarityBps } from '../lib/server/mira-formal-audio-lifecycle';
+ import { acquireFormalQualityLock, type QualityLockLease } from '../lib/server/mira-formal-quality-lock';
+ import { repairMiraFormalAudioSegment } from '../lib/server/mira-formal-audio-repair';
++import type { FormalQualityReviewGrant } from '../lib/server/mira-formal-teaching-quality';
+ 
+ const sha = (value: Buffer) => createHash('sha256').update(value).digest('hex');
+ let lease: QualityLockLease | undefined;
+@@ -44,6 +46,13 @@
+   const snapshotSha256 = qualitySha(qualitySnapshot(prepared.stage, prepared.scenes));
+   const identity = { sourceJobSha256: sha(source), sourceSnapshotSha256: manifest.sourceSnapshotSha256,
+     repairSnapshotSha256: snapshotSha256, sessionId: prepared.sessionId, stageId: prepared.stage.id };
++  const approvedReviewGrant: FormalQualityReviewGrant | undefined = mode === 'complete' && manifest.reviewGrantPath
++    ? JSON.parse(await fs.readFile(path.resolve(path.dirname(manifestPath), manifest.reviewGrantPath), 'utf8'))
++    : undefined;
++  if (approvedReviewGrant && (approvedReviewGrant.sessionId !== prepared.sessionId
++      || approvedReviewGrant.stageId !== prepared.stage.id || approvedReviewGrant.snapshotSha256 !== snapshotSha256
++      || approvedReviewGrant.maxAdditionalReviews !== 1)) throw new Error('SAVED_STAGE_REVIEW_GRANT_MISMATCH');
++  const reviewGrantSha256 = approvedReviewGrant ? qualitySha(approvedReviewGrant) : undefined;
+   await writeJsonFileAtomic(path.join(folder, 'prepared-snapshot.json'), qualitySnapshot(prepared.stage, prepared.scenes));
+   if (mode === 'prepare') { console.log(JSON.stringify(identity)); return; }
+   assertMiraFormalAudioProviderReady();
+@@ -135,11 +144,12 @@
+   const legacyClaim = path.join(folder, 'complete.claim');
+   try {
+     const legacy = JSON.parse(await fs.readFile(legacyClaim, 'utf8'));
+-    if (!audioTailReceipt && legacy.repairSnapshotSha256 === snapshotSha256) throw new Error('SAVED_STAGE_PRIOR_COMPLETION_CLAIM');
++    if (!audioTailReceipt && !reviewGrantSha256 && legacy.repairSnapshotSha256 === snapshotSha256)
++      throw new Error('SAVED_STAGE_PRIOR_COMPLETION_CLAIM');
+   } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+   const claim = await fs.open(path.join(folder,
+-    `complete-${snapshotSha256}${audioTailReceipt ? `-audio-${audioTailReceipt}` : ''}.claim`), 'wx', 0o600);
+-  await claim.writeFile(JSON.stringify({ ...identity, pid: process.pid, createdAt: new Date().toISOString() }));
++    `complete-${snapshotSha256}${audioTailReceipt ? `-audio-${audioTailReceipt}` : reviewGrantSha256 ? `-review-${reviewGrantSha256}` : ''}.claim`), 'wx', 0o600);
++  await claim.writeFile(JSON.stringify({ ...identity, reviewGrantSha256, pid: process.pid, createdAt: new Date().toISOString() }));
+   await claim.sync(); await claim.close();
+   try { await fs.writeFile(path.join(folder, 'source-job.json'), source, { flag: 'wx', mode: 0o600 }); }
+   catch (error) {
+@@ -149,11 +159,12 @@
+   await writeJsonFileAtomic(path.join(folder, `repair-proposal-${snapshotSha256}.json`), proposal);
+   const completion = await recoverMiraFormalSavedStage(job.formalInput, repair, {
+     baseUrl: 'http://127.0.0.1:3100', cachedQualityOnly: !!audioTailReceipt,
++    approvedReviewGrant,
+     onProgress: progress => { console.log(JSON.stringify(progress)); },
+   });
+   const receipt = { ...identity, kind: 'operator_saved_stage_repair', originalSessionStatus: prepared.originalSessionStatus,
+     recoveryId: `omsaved_${qualitySha(identity).slice(0, 24)}`, completedAt: new Date().toISOString(),
+-    newAgentSessions: 0, newSearches: 0, result: completion.result };
++    newAgentSessions: 0, newSearches: 0, ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}), result: completion.result };
+   const receiptSha256 = qualitySha(receipt);
+   await writeJsonFileAtomic(path.join(folder, 'completion.json'), { ...receipt, receiptSha256 });
+   if (sha(await fs.readFile(jobPath)) !== manifest.sourceJobSha256)
+diff --git a/tests/server/mira-formal-teaching-quality.test.ts b/tests/server/mira-formal-teaching-quality.test.ts
+--- a/tests/server/mira-formal-teaching-quality.test.ts
++++ b/tests/server/mira-formal-teaching-quality.test.ts
+@@ -16,6 +16,7 @@
+   reviewFormalCourse,
+   type FormalQualityInput,
+   type QualityReviewDeps,
++  type FormalQualityReviewGrant,
+ } from '@/lib/server/mira-formal-teaching-quality';
+ import { formalCanonicalSha256 } from '@/lib/server/mira-formal-skill-selection';
+ import { buildFormalReviewEvidence, decodeFormalReviewEvidence } from '@/lib/server/mira-formal-review-evidence';
+@@ -127,6 +128,102 @@
+   return join(cacheRoot, (await readdir(cacheRoot))[0]!);
+ }
+ 
++async function exhaustedGrantFixture() {
++  const value = input(); const deps = { ...mocks(value), cacheRoot };
++  const valid = await deps.provider();
++  deps.provider.mockClear();
++  deps.provider.mockResolvedValue({ ...valid, content: '{"invalid":true}' });
++  for (let revision = 1; revision <= 3; revision++) {
++    value.scenes[0].title = `failed revision ${revision}`;
++    await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow();
++  }
++  const directory = await folder();
++  const ledger = JSON.parse(await readFile(join(directory, 'attempts.json'), 'utf8'));
++  const grant: FormalQualityReviewGrant = {
++    schemaVersion: 'mira.formal-quality-review-grant.v1', grantId: 'approved-extra-review',
++    approvalRef: 'explicit local test approval', sessionId: value.sessionId, stageId: value.stage.id,
++    reviewIdentitySha256: directory.split('/').at(-1)!,
++    snapshotSha256: qualitySha(qualitySnapshot(value.stage, value.scenes)),
++    priorAttemptsSha256: qualitySha(ledger), maxAdditionalReviews: 1,
++  };
++  deps.provider.mockResolvedValue(valid);
++  return { value, deps, directory, ledger, grant };
++}
++
++describe('one approved operator review without resetting ordinary limits', () => {
++  it('reviews the same failed snapshot once, retaining all prior evidence and reusing only its valid pass', async () => {
++    const { value, deps, directory, ledger, grant } = await exhaustedGrantFixture();
++    const oldResponse = await readFile(join(directory, `${grant.snapshotSha256}-provider.json`), 'utf8');
++    const oldRequestId = deps.provider.mock.calls.at(-1)![0].requestId;
++    const result = await reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant });
++    expect(result.status).toBe('passed'); expect(result.remainingReviewAttempts).toBe(0);
++    expect(deps.provider).toHaveBeenCalledTimes(4);
++    expect(deps.provider.mock.calls.at(-1)![0].requestId).not.toBe(oldRequestId);
++    expect(await readFile(join(directory, `${grant.snapshotSha256}-provider.json`), 'utf8')).toBe(oldResponse);
++    const after = JSON.parse(await readFile(join(directory, 'attempts.json'), 'utf8'));
++    expect(after.slice(0, 3)).toEqual(ledger);
++    expect(after[3]).toMatchObject({ grantId: grant.grantId, status: 'passed' });
++    expect((await reviewFormalCourse(value, undefined, deps)).receipt).toEqual(result.receipt);
++    expect((await reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant })).status).toBe('passed');
++    expect(deps.provider).toHaveBeenCalledTimes(4);
++  });
++
++  it('permits the approved repaired snapshot while leaving ordinary fourth-snapshot calls blocked', async () => {
++    const { value, deps, grant } = await exhaustedGrantFixture();
++    value.scenes[0].title = 'offline repaired page';
++    await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('BUDGET_EXHAUSTED');
++    grant.snapshotSha256 = qualitySha(qualitySnapshot(value.stage, value.scenes));
++    expect((await reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant })).status).toBe('passed');
++    expect(deps.provider).toHaveBeenCalledTimes(4);
++  });
++
++  it('rejects a changed identity, snapshot, cap or ledger before reserving or calling a provider', async () => {
++    const { value, deps, grant, directory, ledger } = await exhaustedGrantFixture();
++    for (const changes of [
++      { sessionId: 'another-session' }, { stageId: 'another-stage' },
++      { reviewIdentitySha256: 'f'.repeat(64) }, { snapshotSha256: 'f'.repeat(64) },
++      { maxAdditionalReviews: 2 }, { priorAttemptsSha256: 'f'.repeat(64) },
++    ]) {
++      await expect(reviewFormalCourse(value, undefined,
++        { ...deps, approvedReviewGrant: { ...grant, ...changes } as FormalQualityReviewGrant }))
++        .rejects.toThrow(/REVIEW_GRANT_(INVALID|LEDGER_CHANGED)/);
++    }
++    expect(deps.provider).toHaveBeenCalledTimes(3);
++    expect(JSON.parse(await readFile(join(directory, 'attempts.json'), 'utf8'))).toEqual(ledger);
++    expect(await readdir(directory)).not.toContain('operator-review-grant.json');
++  });
++
++  it('cannot replay an ambiguous granted dispatch, use another grant ID or reset to an ungranted call', async () => {
++    const { value, deps, grant } = await exhaustedGrantFixture();
++    deps.provider.mockRejectedValue(new Error('ambiguous granted dispatch'));
++    await expect(reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant }))
++      .rejects.toThrow('ambiguous granted dispatch');
++    for (const nextGrant of [grant, { ...grant, grantId: 'different-name' }]) {
++      await expect(reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: nextGrant }))
++        .rejects.toThrow('GRANT_ALREADY_CONSUMED');
++    }
++    await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('PRIOR_ATTEMPT_UNRESOLVED');
++    value.scenes[0].title = 'yet another revision';
++    await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('BUDGET_EXHAUSTED');
++    expect(deps.provider).toHaveBeenCalledTimes(4);
++  });
++
++  it('records a genuine rejection and never promotes it or spends the grant again', async () => {
++    const { value, deps, grant, directory } = await exhaustedGrantFixture();
++    const evidence = evidenceReport(value);
++    evidence.dimensions[0].passed = false;
++    evidence.issues.push({ sceneId: value.scenes[0].id, problem: '教学内容有错', repair: '修正讲解' });
++    const valid = await deps.provider.getMockImplementation()!({} as never);
++    deps.provider.mockResolvedValue({ ...valid, content: JSON.stringify(evidence) });
++    const result = await reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant });
++    expect(result.status).toBe('needs_revision'); expect(result.receipt).toBeUndefined();
++    expect(await readdir(directory)).not.toContain(`${grant.snapshotSha256}.json`);
++    await expect(reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant }))
++      .rejects.toThrow('GRANT_ALREADY_CONSUMED');
++    expect(deps.provider).toHaveBeenCalledTimes(4);
++  });
++});
++
+ describe('formal teaching quality proof and durable budget', () => {
+   it('derives a consistent verdict from model judgments and only accepts real source evidence IDs', () => {
+     const value = input(); const catalog = buildFormalReviewEvidence(value); const raw = evidenceReport(value);

@@ -10,6 +10,14 @@ from core.errors import ApiError
 from core.security import hash_value, now_ms
 from repositories.profile_repository import ProfileRepository
 from schemas.auth import normalize_phone
+from schemas.education import (
+    education_stage_code,
+    education_stage_label,
+    grade_definition_from_row,
+    grade_storage_fields,
+    resolve_grade_definition,
+    validate_school_year_start_year,
+)
 from schemas.profile import (
     account_deletion_request_payload,
     account_profile_payload,
@@ -25,6 +33,9 @@ from schemas.profile import (
     setting_payload,
 )
 from services.auth_service import AuthService
+from services.learning_curriculum_preparation_service import (
+    LearningCurriculumPreparationService,
+)
 from services.conversation_sync_service import ConversationSyncService
 from services.wake_name_validator import validate_wake_name
 from services.setting_policy import (
@@ -158,8 +169,15 @@ LEGACY_GUARDIAN_IDENTITY_KEYS = {
 
 
 class ProfileService:
-    def __init__(self, database_url: str | Path, *, auth_service: AuthService):
+    def __init__(
+        self,
+        database_url: str | Path,
+        *,
+        auth_service: AuthService,
+        preparation_service: LearningCurriculumPreparationService,
+    ):
         self.auth_service = auth_service
+        self.preparation_service = preparation_service
         self.database_url = str(database_url)
         self.repository = ProfileRepository(Database(database_url))
 
@@ -707,6 +725,8 @@ class ProfileService:
 
     def update_child(self, access_token: str, child_id: str, data: dict) -> dict:
         context = self._auth_context(access_token)
+        family_id = context["family"]["id"]
+        should_sync_conversation = "name" in data or "nickname" in data
         fields: dict = {}
         mapping = {
             "name": "name",
@@ -714,9 +734,6 @@ class ProfileService:
             "gender": "gender",
             "birthday": "birthday",
             "sleepTime": "sleep_time",
-            "ageStage": "age_stage",
-            "educationStage": "education_stage",
-            "grade": "grade",
             "schoolName": "school_name",
         }
         for key, column in mapping.items():
@@ -733,18 +750,71 @@ class ProfileService:
             fields["interests"] = self._json_list(data["interests"])
         if "taskPreferences" in data:
             fields["task_preferences"] = self._json_dict(data["taskPreferences"])
-        now = now_ms()
         with self.repository.transaction() as conn:
+            self.repository.lock_family(conn, family_id=family_id)
             self._assert_capability(conn, context, "manage_child_profile")
-            self._child_or_error(conn, context["family"]["id"], child_id)
+            current = self._child_or_error(
+                conn,
+                family_id,
+                child_id,
+                for_update=True,
+            )
+            now = now_ms()
+            fields.update(
+                self._child_grade_update_fields(data, current=current, now=now)
+            )
+            grade_code = str(fields.get("grade_code", current.get("grade_code")) or "")
+            school_year_start_year = int(
+                fields.get(
+                    "grade_school_year_start",
+                    current.get("grade_school_year_start"),
+                )
+                or 0
+            )
+            fields["grade_selection_revision"] = (
+                self.preparation_service.next_grade_selection_revision(
+                    current,
+                    grade_code=grade_code,
+                    school_year_start_year=school_year_start_year,
+                )
+            )
+            previous_selection = (
+                str(current.get("grade_code") or ""),
+                int(current.get("grade_school_year_start") or 0),
+            )
+            saved_selection = (grade_code, school_year_start_year)
+            should_reserve_preparation = (
+                any(key in data for key in ("gradeCode", "grade", "schoolYearStartYear"))
+                or previous_selection != saved_selection
+            )
             child = self.repository.update_child(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 child_id=child_id,
                 fields=fields,
                 now=now,
             )
-            return {"ok": True, "child": child_profile_payload(child)}
+            response = {"ok": True, "child": child_profile_payload(child)}
+            if should_reserve_preparation:
+                preparation = self.preparation_service.reserve_for_saved_child(
+                    conn,
+                    family_id=family_id,
+                    child=child,
+                    now=now,
+                )
+                if preparation is not None:
+                    response["learningPreparation"] = preparation
+                availability = self.preparation_service.availability_payload(
+                    child.get("grade_code"),
+                    preparation,
+                )
+                if availability is not None:
+                    response["learningPreparationAvailability"] = availability
+        if should_sync_conversation:
+            ConversationSyncService(self.database_url).sync_family_conversation(
+                family_id=family_id,
+            )
+        return response
 
     def list_contacts(self, access_token: str) -> dict:
         context = self._auth_context(access_token)
@@ -1641,11 +1711,78 @@ class ProfileService:
             raise ApiError("invitation_not_found", "邀请不存在", 404)
         return invitation
 
-    def _child_or_error(self, conn, family_id: str, child_id: str):
-        child = self.repository.get_child(conn, family_id=family_id, child_id=child_id)
+    def _child_or_error(
+        self,
+        conn,
+        family_id: str,
+        child_id: str,
+        *,
+        for_update: bool = False,
+    ):
+        child = self.repository.get_child(
+            conn,
+            family_id=family_id,
+            child_id=child_id,
+            for_update=for_update,
+        )
         if child is None:
             raise ApiError("child_not_found", "孩子资料不存在", 404)
         return child
+
+    def _child_grade_update_fields(self, data: dict, *, current, now: int) -> dict:
+        if "gradeCode" in data and not self._optional_text(data, "gradeCode"):
+            raise ApiError("invalid_grade_code", "请选择有效的年级")
+
+        definition = resolve_grade_definition(
+            grade_code=data.get("gradeCode"),
+            legacy_grade=data.get("grade"),
+            education_stage=data.get("educationStage"),
+            age_stage=data.get("ageStage"),
+        )
+        current_definition = grade_definition_from_row(current)
+
+        if definition is not None:
+            school_year = validate_school_year_start_year(
+                data.get("schoolYearStartYear"),
+                required="gradeCode" in data,
+                fallback_to_current_year="gradeCode" not in data,
+            )
+            return grade_storage_fields(
+                definition,
+                school_year_start_year=school_year,
+                confirmed_at=now,
+            )
+
+        if "schoolYearStartYear" in data:
+            if current_definition is None:
+                raise ApiError("missing_grade_code", "请先选择年级")
+            school_year = validate_school_year_start_year(
+                data.get("schoolYearStartYear"),
+                required=True,
+            )
+            return grade_storage_fields(
+                current_definition,
+                school_year_start_year=school_year,
+                confirmed_at=now,
+            )
+
+        fields: dict = {}
+        stage_value = self._optional_text(data, "educationStage")
+        age_stage_value = self._optional_text(data, "ageStage")
+        if current_definition is not None:
+            if stage_value and education_stage_code(stage_value) != current_definition.education_stage_code:
+                raise ApiError("grade_stage_conflict", "年级与学段不一致，请重新选择")
+            if age_stage_value:
+                age_stage_code = education_stage_code(age_stage_value, strict=False)
+                if age_stage_code and age_stage_code != current_definition.education_stage_code:
+                    raise ApiError("grade_stage_conflict", "年级与学段不一致，请重新选择")
+            return fields
+
+        if stage_value:
+            fields["education_stage"] = education_stage_label(stage_value)
+        if age_stage_value:
+            fields["age_stage"] = age_stage_value
+        return fields
 
     def _contact_or_error(self, conn, family_id: str, contact_id: str):
         contact = self.repository.get_contact(conn, family_id=family_id, contact_id=contact_id)

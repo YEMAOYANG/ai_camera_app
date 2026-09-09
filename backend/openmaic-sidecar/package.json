@@ -1,0 +1,17 @@
+{
+  "name": "@mira/guardian-openmaic-sidecar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "availability": "node src/cli.mjs --availability",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@openmaic/dsl": "0.10.1",
+    "@openmaic/generation": "0.3.1"
+  }
+}

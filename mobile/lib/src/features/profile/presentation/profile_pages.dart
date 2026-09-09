@@ -17,6 +17,10 @@ import 'package:warm_sight/src/features/devices/application/device_repository.da
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
+import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
+import 'package:warm_sight/src/features/learning/domain/learning_preparation_models.dart';
+import 'package:warm_sight/src/features/learning/presentation/widgets/learning_preparation_card.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
@@ -25,6 +29,7 @@ import 'package:warm_sight/src/features/rewards/domain/reward_models.dart';
 import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:warm_sight/src/features/setup/presentation/setup_flow_screens.dart';
 import 'package:warm_sight/src/shared/domain/guardian_identity.dart';
+import 'package:warm_sight/src/shared/domain/child_grade.dart';
 import 'package:warm_sight/src/shared/widgets/app_button.dart';
 import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
 import 'package:warm_sight/src/shared/widgets/app_compact_toggle.dart';
@@ -2226,20 +2231,25 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
   late ChildProfile _draft;
   late ChildProfileEditorValue _value;
   var _saving = false;
+  var _retryingPreparation = false;
 
   @override
   void initState() {
     super.initState();
     _draft = widget.child;
+    final gradeOption =
+        ChildGradeOption.fromCode(_draft.gradeCode) ??
+        ChildGradeOption.fromLegacy(
+          educationStage: _draft.educationStage,
+          grade: _draft.grade,
+        );
     _value = ChildProfileEditorValue(
       name: _draft.nickname.trim().isEmpty ? _draft.name : _draft.nickname,
       birthday: _draft.birthday,
       sleepTime: _draft.sleepTime.isEmpty ? '21:00' : _draft.sleepTime,
       gender: _draft.gender,
-      // V1 幼儿园版本隐藏学段选择，孩子资料编辑也固定按幼儿园班级保存；
-      // educationStage/grade 字段保留给后续全年龄段版本恢复。
-      stage: '幼儿园',
-      grade: _draft.grade,
+      stage: gradeOption?.stageLabel ?? _draft.educationStage,
+      grade: gradeOption?.gradeLabel ?? _draft.grade,
       schoolName: _draft.schoolName,
       interestsText: _draft.interests.join('、'),
     );
@@ -2249,7 +2259,32 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
   Widget build(BuildContext context) {
     final account = ref.watch(accountProfileProvider).asData?.value;
     final canManageChildProfile = account?.can('manage_child_profile') ?? false;
-    final canSave = !_saving && _value.name.trim().isNotEmpty;
+    final gradeOption = ChildGradeOption.fromLegacy(
+      educationStage: _value.normalizedStage,
+      grade: _value.normalizedGrade,
+    );
+    final savedGradeOption =
+        ChildGradeOption.fromCode(_draft.gradeCode) ??
+        ChildGradeOption.fromLegacy(
+          educationStage: _draft.educationStage,
+          grade: _draft.grade,
+        );
+    final canSave = !_saving && gradeOption != null;
+    final isSavedPrimary = savedGradeOption?.isPrimary == true;
+    final preparation = isSavedPrimary && _draft.id.trim().isNotEmpty
+        ? ref.watch(currentLearningPreparationProvider(_draft.id))
+        : null;
+    final availability = isSavedPrimary && _draft.id.trim().isNotEmpty
+        ? ref.watch(currentLearningAvailabilityProvider(_draft.id))
+        : null;
+    final currentAvailability = availability?.asData?.value;
+    final canLearnNow =
+        currentAvailability?.gradeCode == savedGradeOption?.code &&
+        currentAvailability?.canLearnNow == true;
+    final canAccessWorkspace =
+        currentAvailability?.gradeCode == savedGradeOption?.code &&
+        currentAvailability?.canAccessWorkspace == true;
+    final canCreateStudentAccess = canManageChildProfile && canAccessWorkspace;
 
     return AppScreen(
       title: '孩子资料',
@@ -2283,15 +2318,70 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
               child: ChildProfileEditorPanel(
                 value: _value,
                 includeExtendedFields: false,
+                includeGender: false,
+                includeBirthday: false,
                 includeSleepTime: false,
-                stageOptions: const ['幼儿园'],
-                showStageSelector: false,
-                noteText: null,
+                stageOptions: const ['幼儿园', '小学'],
+                showStageSelector: true,
+                recommendEducationFromBirthday: false,
+                noteText: '称呼和就读阶段可随时修改；学习内容按你确认的年级匹配。',
                 onChanged: (value) {
                   if (canManageChildProfile) setState(() => _value = value);
                 },
               ),
             ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        if (preparation != null &&
+            availability?.hasValue == true &&
+            !canLearnNow) ...[
+          preparation.when(
+            loading: () => const LearningPreparationLoadingCard(),
+            error: (error, _) => LearningPreparationNetworkErrorCard(
+              onRetry: () => _refreshPreparation(),
+            ),
+            data: (value) {
+              if (value == null) {
+                return LearningPreparationMissingCard(
+                  onRefresh: () => _refreshPreparation(),
+                );
+              }
+              return LearningPreparationCard(
+                preparation: value,
+                awaitingPublication: value.isReady,
+                onRefresh: () => _refreshPreparation(),
+                onRetry: value.canRetry ? () => _retryPreparation(value) : null,
+                retrying: _retryingPreparation,
+              );
+            },
+          ),
+          const SizedBox(height: 14),
+        ],
+        AppSurface(
+          key: const ValueKey('studentLearningSpaceEntry'),
+          color: AppColors.brandWash.withValues(alpha: 0.62),
+          borderColor: AppColors.brand.withValues(alpha: 0.10),
+          radius: AppRadii.cardLarge,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+          child: AppListRow(
+            icon: Icons.school_outlined,
+            title: '学生学习空间',
+            subtitle: savedGradeOption?.isPrimary != true
+                ? '当前正式学习空间仅面向已开放年级'
+                : !canManageChildProfile
+                ? '仅家庭管理员可创建或更新学生登录方式'
+                : availability?.isLoading == true
+                ? '正在确认学习空间权限'
+                : availability?.hasError == true
+                ? '学习空间权限加载失败，请检查网络后重试'
+                : !canAccessWorkspace
+                ? '请确认已选择开放年级并完成设置'
+                : '设置学习 PIN，生成 10 分钟有效的网页配对码',
+            tone: AppListRowTone.blue,
+            onTap: canCreateStudentAccess
+                ? () => context.push(profileStudentAccessPath)
+                : null,
           ),
         ),
       ],
@@ -2300,8 +2390,12 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
 
   Future<void> _save() async {
     final name = _value.name.trim();
-    if (name.isEmpty) {
-      _toast(context, '请填写孩子称呼');
+    final gradeOption = ChildGradeOption.fromLegacy(
+      educationStage: _value.normalizedStage,
+      grade: _value.normalizedGrade,
+    );
+    if (gradeOption == null) {
+      _toast(context, '请选择孩子当前年级');
       return;
     }
 
@@ -2311,29 +2405,122 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
         : '${_value.normalizedStage} ${_value.normalizedGrade}';
     final next = ChildProfile(
       id: _draft.id,
-      name: name,
-      nickname: name,
-      gender: _value.normalizedGender,
-      birthday: _value.birthday.trim(),
+      name: name.isEmpty ? _draft.name : name,
+      nickname: name.isEmpty ? _draft.nickname : name,
+      gender: _draft.gender,
+      birthday: _draft.birthday,
       sleepTime: _value.normalizedSleepTime,
       ageStage: ageStage,
       educationStage: _value.normalizedStage,
       grade: _value.normalizedGrade,
+      gradeCode: gradeOption.code,
+      educationStageCode: gradeOption.stageCode,
+      contentMode: gradeOption.contentMode,
+      schoolYearStartYear: gradeSchoolYearStartYear(),
+      gradeConfirmedAt: _draft.gradeConfirmedAt,
       schoolName: _value.schoolName.trim(),
       interests: _value.interests,
       taskPreferences: _draft.taskPreferences,
     );
     try {
-      _draft = await ref.read(profileRepositoryProvider).updateChild(next);
+      final before = _normalizedPersistedGrade(_draft);
+      final saved = await ref.read(profileRepositoryProvider).updateChild(next);
+      final gradeChanged = before != _normalizedPersistedGrade(saved);
+      _draft = saved;
+      final savedGrade = ChildGradeOption.fromCode(saved.gradeCode);
       ref.invalidate(currentChildProvider);
       ref.invalidate(profileSummaryProvider);
-      if (mounted) _toast(context, '孩子资料已保存');
+      // Saving an unchanged grade can attach a newly available shared catalog.
+      // Refresh its access gate even when the grade itself did not change.
+      ref.invalidate(currentLearningAvailabilityProvider(_draft.id));
+      if (gradeChanged && savedGrade?.isPrimary == true) {
+        ref.invalidate(currentLearningPreparationProvider(_draft.id));
+      }
+      if (mounted) {
+        final message = !gradeChanged
+            ? '孩子资料已保存'
+            : savedGrade?.isPrimary == true
+            ? '年级已保存，课程将在后台准备'
+            : '年级已保存';
+        _toast(context, message);
+      }
     } on ProfileException catch (error) {
       if (mounted) _toast(context, error.message);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
   }
+
+  Future<void> _refreshPreparation() async {
+    try {
+      final _ = await ref.refresh(
+        currentLearningPreparationProvider(_draft.id).future,
+      );
+    } catch (_) {
+      // The provider remains in error and renders the explicit refresh action.
+    }
+    try {
+      final _ = await ref.refresh(
+        currentLearningAvailabilityProvider(_draft.id).future,
+      );
+    } catch (_) {
+      // Keep the availability error visible next to the student-space entry.
+    }
+  }
+
+  Future<void> _retryPreparation(LearningPreparation preparation) async {
+    if (_retryingPreparation) return;
+    setState(() => _retryingPreparation = true);
+    final requestId =
+        'parent-prep-retry:${preparation.id}:${DateTime.now().millisecondsSinceEpoch}';
+    try {
+      await ref
+          .read(learningPreparationRepositoryProvider)
+          .retry(planId: preparation.id, requestId: requestId);
+      final _ = await ref.refresh(
+        currentLearningPreparationProvider(_draft.id).future,
+      );
+      final _ = await ref.refresh(
+        currentLearningAvailabilityProvider(_draft.id).future,
+      );
+    } catch (error) {
+      var reconciled = false;
+      try {
+        final current = await ref.refresh(
+          currentLearningPreparationProvider(_draft.id).future,
+        );
+        reconciled = current != null && current.id != preparation.id;
+      } catch (_) {
+        // Keep the original failure when current status cannot reconcile it.
+      }
+      if (mounted && !reconciled) {
+        _toast(
+          context,
+          error is LearningPreparationException
+              ? error.message
+              : '课程重新准备失败，请稍后重试',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _retryingPreparation = false);
+    }
+  }
+}
+
+({String gradeCode, int? schoolYearStartYear}) _normalizedPersistedGrade(
+  ChildProfile child,
+) {
+  final normalizedCode = child.gradeCode.trim();
+  final grade =
+      ChildGradeOption.fromCode(normalizedCode) ??
+      ChildGradeOption.fromLegacy(
+        educationStage: child.educationStage.trim(),
+        grade: child.grade.trim(),
+      );
+  return (
+    gradeCode: grade?.code ?? normalizedCode,
+    schoolYearStartYear: child.schoolYearStartYear,
+  );
 }
 
 class EmergencyContactsPage extends ConsumerWidget {
@@ -3236,15 +3423,11 @@ Future<Map<String, Object?>?> _showCareReminderRulesSheet(
               ],
               _MinuteStepperRow(
                 title: '提醒间隔',
-                subtitle: isScreenUse
-                    ? '看屏较敏感，可按需设较短间隔。'
-                    : '两次提醒之间留出安静时间。',
+                subtitle: isScreenUse ? '看屏较敏感，可按需设较短间隔。' : '两次提醒之间留出安静时间。',
                 value: intervalMinutes,
                 min: intervalMinutesFloor,
                 max: 60,
-                step: isScreenUse
-                    ? _screenUseReminderIntervalMinutesMin
-                    : 5,
+                step: isScreenUse ? _screenUseReminderIntervalMinutesMin : 5,
                 enabled: true,
                 onChanged: (value) =>
                     setSheetState(() => intervalMinutes = value),

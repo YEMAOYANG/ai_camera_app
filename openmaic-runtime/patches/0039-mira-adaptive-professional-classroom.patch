@@ -1,0 +1,1714 @@
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index 1551411..e9b0745 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -58,7 +58,6 @@ import {
+   assertMiraFormalGenerationInput,
+   isExactMiraCoursewareAuthority,
+   isExactMiraFormalRuntimeContract,
+-  MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import { generateMiraFormalProfessionalClassroom } from '@/lib/server/mira-formal-professional-classroom';
+ import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
+@@ -68,34 +67,6 @@ import type {
+ } from '@/lib/server/mira-formal-professional-classroom';
+ 
+ const log = createLogger('Classroom');
+-const MIRA_FORMAL_LLM_TIMEOUT_MS = 5 * 60 * 1000;
+-const MIRA_FORMAL_THINKING_DISABLED = { mode: 'disabled', enabled: false } as const;
+-const MIRA_FORMAL_OUTLINE_DIRECTIVE = `
+-MIRA FORMAL OUTLINE CONTRACT (server enforced):
+-- Return exactly 10 outlines in this exact type order: slide, slide, slide, slide, slide, quiz, quiz, interactive, interactive, interactive.
+-- Interactive outlines 8-10 must use widgetType simulation, game, visualization3d respectively and include a non-empty widgetOutline.
+-- Do not return PBL scenes. Do not omit, merge, or add scenes.
+-- Return only the JSON envelope requested by the outline prompt.`.trim();
+-
+-function formalLlmAbortSignal(enabled: boolean): AbortSignal | undefined {
+-  return enabled ? AbortSignal.timeout(MIRA_FORMAL_LLM_TIMEOUT_MS) : undefined;
+-}
+-
+-function matchesMiraFormalOutlineContract(outlines: SceneOutline[]): boolean {
+-  const expectedTypes = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.orderedSceneTypes;
+-  if (
+-    outlines.length !== MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.exactSceneCount ||
+-    outlines.some((outline, index) => outline.type !== expectedTypes[index])
+-  ) {
+-    return false;
+-  }
+-  const interactiveWidgets = outlines
+-    .filter((outline) => outline.type === 'interactive')
+-    .map((outline) => outline.widgetType);
+-  return MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.interactive.requiredWidgetTypes.every(
+-    (widgetType) => interactiveWidgets.includes(widgetType),
+-  );
+-}
+ 
+ export function containPBLGenerationError(error: unknown, sceneTitle: string): null {
+   if (!(error instanceof PBLGenerationError)) throw error;
+@@ -145,6 +116,7 @@ export interface GenerateClassroomResult {
+   stage: Stage;
+   scenes: Scene[];
+   scenesCount: number;
++  speechActionCount?: number;
+   createdAt: string;
+   formalAudio?: MiraFormalAudioLifecycleReceipt;
+   professionalCreation?: MiraFormalProfessionalCreationReceipt;
+@@ -271,9 +243,6 @@ export async function generateClassroom(
+     apiKey,
+     thinkingConfig: classroomThinking,
+   } = await resolveModel({ stage: 'generate-classroom' });
+-  const effectiveClassroomThinking = miraFormalRuntime
+-    ? MIRA_FORMAL_THINKING_DISABLED
+-    : classroomThinking;
+   log.info(`Using server-configured model: ${modelString}`);
+ 
+   // Fail fast if the resolved provider has no API key configured
+@@ -301,13 +270,10 @@ export async function generateClassroom(
+           { role: 'user', content: userPrompt },
+         ],
+         maxOutputTokens: modelInfo?.outputWindow,
+-        ...(miraFormalRuntime
+-          ? { abortSignal: formalLlmAbortSignal(true) }
+-          : {}),
+       },
+       'generate-classroom',
+       undefined,
+-      effectiveClassroomThinking,
++      classroomThinking,
+     );
+     return result.text;
+   };
+@@ -354,7 +320,7 @@ export async function generateClassroom(
+         model: languageModel,
+         modelString,
+         outputWindow: modelInfo?.outputWindow,
+-        thinking: effectiveClassroomThinking,
++        thinking: classroomThinking,
+       };
+       stageModelCache.set(stage, fallback);
+       return fallback;
+@@ -389,7 +355,7 @@ export async function generateClassroom(
+         model: languageModel,
+         modelString,
+         outputWindow: modelInfo?.outputWindow,
+-        thinking: effectiveClassroomThinking,
++        thinking: classroomThinking,
+       };
+       stageModelCache.set(stage, fallback);
+       return fallback;
+@@ -423,7 +389,6 @@ export async function generateClassroom(
+           ],
+           maxOutputTokens: outputWindow,
+           maxRetries: 0,
+-          ...(miraFormalRuntime ? { abortSignal: formalLlmAbortSignal(true) } : {}),
+         },
+         'generate-classroom-scene',
+         undefined,
+@@ -464,7 +429,6 @@ export async function generateClassroom(
+             { role: 'user', content: userPrompt },
+           ],
+           maxOutputTokens: outputWindow,
+-          ...(miraFormalRuntime ? { abortSignal: formalLlmAbortSignal(true) } : {}),
+         },
+         'generate-classroom',
+         undefined,
+@@ -490,7 +454,6 @@ export async function generateClassroom(
+           ],
+           maxOutputTokens: outputWindow,
+           maxRetries: 0,
+-          ...(miraFormalRuntime ? { abortSignal: formalLlmAbortSignal(true) } : {}),
+         },
+         'generate-classroom-scene',
+         undefined,
+@@ -599,14 +562,8 @@ export async function generateClassroom(
+     ({ languageDirective, courseTitle, outlines } = miraSampleStructuralPlan);
+     log.info('Using server-owned Mira sample classroom structure');
+   } else {
+-    const formalOutlineRequirements = miraFormalRuntime
+-      ? {
+-          ...requirements,
+-          requirement: `${requirements.requirement}\n\n${MIRA_FORMAL_OUTLINE_DIRECTIVE}`,
+-        }
+-      : requirements;
+-    let outlinesResult = await generateSceneOutlinesFromRequirements(
+-      formalOutlineRequirements,
++    const outlinesResult = await generateSceneOutlinesFromRequirements(
++      requirements,
+       pdfText,
+       undefined,
+       aiCall,
+@@ -618,37 +575,11 @@ export async function generateClassroom(
+       },
+     );
+ 
+-    if (
+-      miraFormalRuntime &&
+-      (!outlinesResult.success ||
+-        !outlinesResult.data ||
+-        !matchesMiraFormalOutlineContract(outlinesResult.data.outlines))
+-    ) {
+-      log.warn('Mira formal outline contract rejected the first result; repairing once');
+-      outlinesResult = await generateSceneOutlinesFromRequirements(
+-        {
+-          ...formalOutlineRequirements,
+-          requirement: `${formalOutlineRequirements.requirement}\n\nThe previous response was rejected. Repair it now and satisfy every contract line exactly.`,
+-        },
+-        pdfText,
+-        undefined,
+-        aiCall,
+-        {
+-          imageGenerationEnabled: input.enableImageGeneration,
+-          videoGenerationEnabled: input.enableVideoGeneration,
+-          researchContext,
+-        },
+-      );
+-    }
+-
+     if (!outlinesResult.success || !outlinesResult.data) {
+       log.error('Failed to generate outlines:', outlinesResult.error);
+       throw new Error(outlinesResult.error || 'Failed to generate scene outlines');
+     }
+     ({ languageDirective, courseTitle, outlines } = outlinesResult.data);
+-    if (miraFormalRuntime && !matchesMiraFormalOutlineContract(outlines)) {
+-      throw new Error('FORMAL_RUNTIME_OUTLINE_CONTRACT_INVALID');
+-    }
+   }
+   log.info(
+     `Generated ${outlines.length} scene outlines (languageDirective: ${languageDirective}, courseTitle: ${courseTitle ?? 'n/a'})`,
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+index e3b0027..676c436 100644
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -49,6 +49,7 @@ export interface ClassroomGenerationJob {
+     classroomId: string;
+     url: string;
+     scenesCount: number;
++    speechActionCount?: number;
+     formalAudio?: MiraFormalAudioLifecycleReceipt;
+     professionalCreation?: MiraFormalProfessionalCreationReceipt;
+     research?: MiraFormalResearchReceipt;
+@@ -94,10 +95,7 @@ function formalJobId(runtimeRequestId: string): string {
+   return `omformal_${sha256(runtimeRequestId).slice(0, 24)}`;
+ }
+ 
+-async function writeJsonFileExclusiveAtomic(
+-  filePath: string,
+-  data: unknown,
+-): Promise<boolean> {
++async function writeJsonFileExclusiveAtomic(filePath: string, data: unknown): Promise<boolean> {
+   await ensureClassroomJobsDir();
+   const tempPath = `${filePath}.${process.pid}.${Date.now()}.${Math.random()
+     .toString(16)
+@@ -242,9 +240,7 @@ export async function createOrGetFormalClassroomGenerationJob(
+   });
+ }
+ 
+-export async function claimFormalClassroomGenerationDispatch(
+-  jobId: string,
+-): Promise<boolean> {
++export async function claimFormalClassroomGenerationDispatch(jobId: string): Promise<boolean> {
+   const job = await readStoredClassroomGenerationJob(jobId);
+   if (
+     !job ||
+@@ -386,10 +382,11 @@ export async function markClassroomGenerationJobSucceeded(
+       classroomId: result.id,
+       url: result.url,
+       scenesCount: result.scenesCount,
+-      ...(result.formalAudio ? { formalAudio: result.formalAudio } : {}),
+-      ...(result.professionalCreation
+-        ? { professionalCreation: result.professionalCreation }
++      ...(result.speechActionCount !== undefined
++        ? { speechActionCount: result.speechActionCount }
+         : {}),
++      ...(result.formalAudio ? { formalAudio: result.formalAudio } : {}),
++      ...(result.professionalCreation ? { professionalCreation: result.professionalCreation } : {}),
+       ...(result.research ? { research: result.research } : {}),
+     },
+   });
+diff --git a/lib/server/mira-formal-audio-lifecycle.ts b/lib/server/mira-formal-audio-lifecycle.ts
+index dc7121d..9305245 100644
+--- a/lib/server/mira-formal-audio-lifecycle.ts
++++ b/lib/server/mira-formal-audio-lifecycle.ts
+@@ -22,7 +22,12 @@ export const MIRA_FORMAL_AUDIO_LIFECYCLE_VERSION =
+ export const MIRA_FORMAL_SPEECH_TEXT_POLICY_VERSION =
+   'mira.learning.formal-speech-text.v2' as const;
+ 
+-const EXPECTED_SEGMENT_COUNT = 10;
++const MINIMUM_SCENE_COUNT = 1;
++const MAXIMUM_SCENE_COUNT = 60;
++const MINIMUM_SPEECH_PER_SCENE = 1;
++const MAXIMUM_SPEECH_PER_SCENE = 20;
++const MINIMUM_SEGMENT_COUNT = 1;
++const MAXIMUM_SEGMENT_COUNT = 240;
+ const MINIMUM_ASR_SIMILARITY_BPS = 8_500;
+ const IDENTIFIER = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
+ const SHA256 = /^[a-f0-9]{64}$/;
+@@ -119,9 +124,9 @@ export interface MiraFormalAudioLifecycleReceipt {
+     sha256: string;
+     gender: 'female' | 'male';
+   };
+-  expectedSegmentCount: 10;
+-  ttsSucceededCount: 10;
+-  asrPassedCount: 10;
++  expectedSegmentCount: number;
++  ttsSucceededCount: number;
++  asrPassedCount: number;
+   segments: MiraFormalAudioLifecycleSegmentReceipt[];
+   receiptSha256: string;
+ }
+@@ -154,7 +159,7 @@ export interface MiraFormalAudioLifecycleOptions {
+   onProgress?: (progress: {
+     phase: 'tts' | 'asr';
+     completed: number;
+-    total: 10;
++    total: number;
+   }) => Promise<void> | void;
+ }
+ 
+@@ -188,16 +193,21 @@ function canonicalSha256(value: unknown): string {
+   return sha256(JSON.stringify(canonical(value)));
+ }
+ 
+-function speechAction(scene: Scene): Action & { type: 'speech'; text: string } {
++function speechActions(scene: Scene): Array<Action & { type: 'speech'; text: string }> {
+   const actions = Array.isArray(scene.actions) ? scene.actions : [];
+-  const speech = actions.filter(
++  const rawSpeech = actions.filter((action) => action.type === 'speech');
++  const speech = rawSpeech.filter(
+     (action): action is Action & { type: 'speech'; text: string } =>
+-      action.type === 'speech' && typeof action.text === 'string',
++      action.type === 'speech' && typeof action.text === 'string' && !!action.text.trim(),
+   );
+-  if (speech.length !== 1) {
++  if (
++    rawSpeech.length !== speech.length ||
++    speech.length < MINIMUM_SPEECH_PER_SCENE ||
++    speech.length > MAXIMUM_SPEECH_PER_SCENE
++  ) {
+     throw new Error(`FORMAL_AUDIO_SPEECH_COUNT_INVALID:${scene.order}`);
+   }
+-  return speech[0];
++  return speech;
+ }
+ 
+ export function prepareMiraFormalSpeechText(
+@@ -310,39 +320,51 @@ function buildLifecycleSegments(input: FormalAudioLifecycleInput): {
+   if (!IDENTIFIER.test(input.buildItemId)) {
+     throw new Error('FORMAL_AUDIO_BUILD_ITEM_INVALID');
+   }
+-  if (!IDENTIFIER.test(input.stage.id) || input.scenes.length !== EXPECTED_SEGMENT_COUNT) {
++  if (
++    !IDENTIFIER.test(input.stage.id) ||
++    input.scenes.length < MINIMUM_SCENE_COUNT ||
++    input.scenes.length > MAXIMUM_SCENE_COUNT
++  ) {
+     throw new Error('FORMAL_AUDIO_CLASSROOM_INVALID');
+   }
+   const seenSceneIds = new Set<string>();
+   const seenActionIds = new Set<string>();
+-  const segments = input.scenes.map((scene, expectedOrder) => {
+-    if (scene.order !== expectedOrder || !IDENTIFIER.test(scene.id) || seenSceneIds.has(scene.id)) {
+-      throw new Error(`FORMAL_AUDIO_SCENE_INVALID:${expectedOrder}`);
+-    }
+-    const action = speechAction(scene);
+-    if (!IDENTIFIER.test(action.id) || seenActionIds.has(action.id)) {
+-      throw new Error(`FORMAL_AUDIO_ACTION_INVALID:${expectedOrder}`);
++  const segments: LifecycleSegment[] = [];
++  for (const [sceneIndex, scene] of input.scenes.entries()) {
++    if (scene.order !== sceneIndex || !IDENTIFIER.test(scene.id) || seenSceneIds.has(scene.id)) {
++      throw new Error(`FORMAL_AUDIO_SCENE_INVALID:${sceneIndex}`);
+     }
+     seenSceneIds.add(scene.id);
+-    seenActionIds.add(action.id);
+-    const sourceText = action.text.trim();
+-    const text = prepareMiraFormalSpeechText(sourceText, input.subject);
+-    if (!sourceText || !text) throw new Error(`FORMAL_AUDIO_TEXT_INVALID:${expectedOrder}`);
+-    const textSha256 = sha256(text);
+-    const identity = `${input.buildItemId}:${expectedOrder}:${scene.id}:${action.id}:${MIRA_FORMAL_SPEECH_TEXT_POLICY_VERSION}:${textSha256}`;
+-    const identityDigest = sha256(identity);
+-    return {
+-      sceneOrder: expectedOrder,
+-      sceneId: scene.id,
+-      actionId: action.id,
+-      narrationSegmentId: `formal_narration_${identityDigest.slice(0, 48)}`,
+-      sourceTextSha256: sha256(sourceText),
+-      text,
+-      textSha256,
+-      ttsRequestId: `formal_tts_${identityDigest.slice(0, 48)}`,
+-      asrRequestId: `formal_asr_${identityDigest.slice(0, 48)}`,
+-    };
+-  });
++    for (const action of speechActions(scene)) {
++      const segmentOrdinal = segments.length;
++      if (!IDENTIFIER.test(action.id) || seenActionIds.has(action.id)) {
++        throw new Error(`FORMAL_AUDIO_ACTION_INVALID:${segmentOrdinal}`);
++      }
++      seenActionIds.add(action.id);
++      const sourceText = action.text.trim();
++      const text = prepareMiraFormalSpeechText(sourceText, input.subject);
++      if (!sourceText || !text) throw new Error(`FORMAL_AUDIO_TEXT_INVALID:${segmentOrdinal}`);
++      const textSha256 = sha256(text);
++      const identity = `${input.buildItemId}:${segmentOrdinal}:${scene.id}:${action.id}:${MIRA_FORMAL_SPEECH_TEXT_POLICY_VERSION}:${textSha256}`;
++      const identityDigest = sha256(identity);
++      segments.push({
++        // In formal runtime v3 this legacy field is the global speech segment
++        // ordinal. Multiple consecutive entries may therefore share sceneId.
++        sceneOrder: segmentOrdinal,
++        sceneId: scene.id,
++        actionId: action.id,
++        narrationSegmentId: `formal_narration_${identityDigest.slice(0, 48)}`,
++        sourceTextSha256: sha256(sourceText),
++        text,
++        textSha256,
++        ttsRequestId: `formal_tts_${identityDigest.slice(0, 48)}`,
++        asrRequestId: `formal_asr_${identityDigest.slice(0, 48)}`,
++      });
++    }
++  }
++  if (segments.length < MINIMUM_SEGMENT_COUNT || segments.length > MAXIMUM_SEGMENT_COUNT) {
++    throw new Error('FORMAL_AUDIO_SEGMENT_COUNT_INVALID');
++  }
+   return {
+     classroomContentSha256: canonicalSha256({ stage: input.stage, scenes: input.scenes }),
+     segments,
+@@ -457,6 +479,7 @@ export async function completeMiraFormalAudioLifecycle(
+     throw new Error('FORMAL_AUDIO_TEACHER_CONTRACT_INVALID');
+   }
+   const { classroomContentSha256, segments } = buildLifecycleSegments(input);
++  const expectedSegmentCount = segments.length;
+   let providerReady = false;
+   const ensureProviderReady = () => {
+     if (providerReady) return;
+@@ -502,7 +525,7 @@ export async function completeMiraFormalAudioLifecycle(
+     await options.onProgress?.({
+       phase: 'tts',
+       completed: segment.sceneOrder + 1,
+-      total: EXPECTED_SEGMENT_COUNT as 10,
++      total: expectedSegmentCount,
+     });
+ 
+     const asrRequest: MiraFormalAsrRequest = {
+@@ -528,7 +551,7 @@ export async function completeMiraFormalAudioLifecycle(
+     await options.onProgress?.({
+       phase: 'asr',
+       completed: segment.sceneOrder + 1,
+-      total: EXPECTED_SEGMENT_COUNT as 10,
++      total: expectedSegmentCount,
+     });
+     completedSegments.push({
+       sceneOrder: segment.sceneOrder,
+@@ -563,7 +586,7 @@ export async function completeMiraFormalAudioLifecycle(
+     });
+   }
+ 
+-  if (completedSegments.length !== EXPECTED_SEGMENT_COUNT) {
++  if (completedSegments.length !== expectedSegmentCount) {
+     throw new Error('FORMAL_AUDIO_SEGMENT_COUNT_INVALID');
+   }
+   const receiptWithoutHash = {
+@@ -580,9 +603,9 @@ export async function completeMiraFormalAudioLifecycle(
+       sha256: subjectPolicy.teacherProfileSha256,
+       gender: subjectPolicy.teacherGender,
+     },
+-    expectedSegmentCount: EXPECTED_SEGMENT_COUNT as 10,
+-    ttsSucceededCount: EXPECTED_SEGMENT_COUNT as 10,
+-    asrPassedCount: EXPECTED_SEGMENT_COUNT as 10,
++    expectedSegmentCount,
++    ttsSucceededCount: completedSegments.length,
++    asrPassedCount: completedSegments.length,
+     segments: completedSegments,
+   };
+   return {
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+index 28bdc25..5a80809 100644
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -63,7 +63,7 @@ const SUBJECT_POLICIES = {
+ export const MIRA_FORMAL_AUDIO_POLICY = {
+   enforced: true,
+   schemaVersion: MIRA_FORMAL_AUDIO_CONTRACT_VERSION,
+-  expectedSegmentCount: 10,
++  segmentCount: { mode: 'per_speech_action', min: 1, max: 240 },
+   requestIdempotency: 'requestId+canonicalBodySha256',
+   providerAttemptRecordedBeforeFetch: true,
+   staleRunningOutcome: 'ambiguous',
+@@ -295,7 +295,7 @@ function assertIdentity(
+     !IDENTIFIER.test(String(input.sceneId || '')) ||
+     !Number.isInteger(input.sceneOrder) ||
+     Number(input.sceneOrder) < 0 ||
+-    Number(input.sceneOrder) > 9 ||
++    Number(input.sceneOrder) > 239 ||
+     !IDENTIFIER.test(String(input.actionId || '')) ||
+     !IDENTIFIER.test(String(input.narrationSegmentId || ''))
+   ) {
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+index 458ce35..aff9c47 100644
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
+ import type { GenerateClassroomInput } from '@/lib/server/classroom-generation';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+-  'mira.openmaic.formal-runtime.v2-professional' as const;
++  'mira.openmaic.formal-runtime.v3-adaptive' as const;
+ 
+ export const MIRA_COURSEWARE_AUTHORITY_SCHEMA =
+   'mira.openmaic.courseware-authority.v2-professional' as const;
+@@ -36,26 +36,33 @@ export const MIRA_PROFESSIONAL_CREATION_POLICY = {
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+-  exactSceneCount: 10,
+-  orderedSceneTypes: [
+-    'slide',
+-    'slide',
+-    'slide',
+-    'slide',
+-    'slide',
+-    'quiz',
+-    'quiz',
+-    'interactive',
+-    'interactive',
+-    'interactive',
+-  ],
+-  sceneDistribution: { slide: 5, quiz: 2, interactive: 3 },
++  scenePlanning: {
++    mode: 'adaptive',
++    authority: 'openmaic_professional_agent',
++    exactCountRequired: false,
++    allowedSceneTypes: ['slide', 'quiz', 'interactive', 'pbl'],
++    requiredSceneTypes: ['slide', 'quiz', 'interactive'],
++    defaultDurationMinutes: { min: 15, max: 30 },
++    scenesPerMinute: { min: 1, max: 2 },
++    maxSceneCount: 60,
++  },
+   roster: { teacherCount: 1, peerCount: 4 },
+   speechRequiredForEveryScene: true,
++  speechActions: {
++    perScene: { min: 1, max: 20 },
++    total: { min: 1, max: 240 },
++    interactiveSpotlightRequired: false,
++  },
+   distinctPeerDiscussions: 2,
+   teacherEvidence: ['spotlight', 'widget_highlight'],
++  slideSpotlight: {
++    minimumPerSlide: 1,
++    targetMustBeRenderable: true,
++    focusExplanationSequenceRequired: true,
++    consecutiveSpotlightsAllowed: true,
++  },
+   interactive: {
+-    requiredWidgetTypes: ['simulation', 'game', 'visualization3d'],
++    allowedWidgetTypes: ['simulation', 'diagram', 'code', 'game', 'visualization3d'],
+     widgetConfigRequired: true,
+     productiveScriptRequired: true,
+     noopRejected: true,
+@@ -106,10 +113,7 @@ export function isExactMiraFormalRuntimeContract(value: unknown): boolean {
+ }
+ 
+ export function isExactMiraCoursewareAuthority(value: unknown): boolean {
+-  return (
+-    JSON.stringify(canonical(value)) ===
+-    JSON.stringify(canonical(MIRA_COURSEWARE_AUTHORITY))
+-  );
++  return JSON.stringify(canonical(value)) === JSON.stringify(canonical(MIRA_COURSEWARE_AUTHORITY));
+ }
+ 
+ export function isExactMiraProfessionalCreationPolicy(value: unknown): boolean {
+@@ -167,7 +171,6 @@ export function authorizeMiraFormalGenerationRequest(req: NextRequest): boolean
+   const expectedBytes = Buffer.from(expected);
+   const suppliedBytes = Buffer.from(supplied);
+   return (
+-    expectedBytes.length === suppliedBytes.length &&
+-    timingSafeEqual(expectedBytes, suppliedBytes)
++    expectedBytes.length === suppliedBytes.length && timingSafeEqual(expectedBytes, suppliedBytes)
+   );
+ }
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+index 6f7d958..dcaf55c 100644
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -46,8 +46,7 @@ const FORMAL_SESSION_POLL_MS = 2_000;
+ const MAX_AGENT_EVENTS = 20_000;
+ const PROFESSIONAL_CREATION_RECEIPT_VERSION =
+   'mira.openmaic.professional-creation-receipt.v1' as const;
+-const RESEARCH_RECEIPT_VERSION =
+-  'mira.openmaic.professional-research-receipt.v1' as const;
++const RESEARCH_RECEIPT_VERSION = 'mira.openmaic.professional-research-receipt.v1' as const;
+ const PROFESSIONAL_SESSION_ORIGIN = 'mira-formal-professional';
+ 
+ interface FormalIdentity {
+@@ -191,16 +190,18 @@ function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewar
+     '  the source title or domain on every page that uses a researched fact.',
+     '- If search, fetch, or citation cannot be completed, fail the job; never silently continue offline.',
+     '',
+-    'Locked classroom contract:',
+-    '- Exactly 10 scenes in this exact order: slide, slide, slide, slide, slide, quiz, quiz, interactive, interactive, interactive.',
+-    '- The five slides are distinct teaching moves: warm-up, concept discovery, worked example, guided-practice preparation, independent-check preparation.',
+-    '- Quiz scene 6 contains the first two locked assessment questions below, in order.',
+-    '- Quiz scene 7 contains the last two locked assessment questions below, in order.',
++    'Adaptive classroom contract:',
++    '- Before create_stage, form the complete page plan internally under the official stage-design, K12 planning, and active Skill rules.',
++    '- Choose the page count from the actual teaching brief, grade, bounded skill and lesson duration; there is no fixed page count or fixed type order.',
++    '- When duration is absent, infer 15-30 minutes. Use 1-2 scenes per minute as planning guidance and never create more than 60 scenes.',
++    '- Use only slide, quiz, interactive and pbl scenes. Include at least one slide, one quiz and one interactive scene; use pbl only when the learning task genuinely warrants it.',
++    '- Use between one and four quiz scenes. Distribute the four locked assessment questions across them in original order so every locked question appears exactly once.',
+     '- Copy every locked question id, question, type, and option exactly. Keep hasAnswer=false and answer=[]; never add an answer or scoring rule.',
+-    '- When calling generate_scene for pages 8-10, pass widgetType simulation, game, visualization3d respectively.',
++    '- Choose each interactive widget type from simulation, diagram, code, game or visualization3d according to the page content; do not force a predetermined widget roster.',
+     '- Each interactive page must contain self-contained runnable HTML/JS, real learner controls, observable state change, and a matching non-empty widgetConfig.',
+-    '- Every scene has exactly one non-empty speech action.',
+-    '- At least one slide has a spotlight action targeting a real visible element.',
++    '- Every scene has 1-20 non-empty speech actions and the whole classroom has 1-240 speech actions.',
++    '- Every slide must contain at least one spotlight, and every spotlight must target a real renderable element. Include at least one focus/explanation sequence where one or more consecutive spotlights are immediately followed by a non-empty speech. Opening, transition and closing speech may appear without a spotlight; use additional focus sequences when explaining distinct visual regions.',
++    '- Interactive, quiz and PBL scenes require speech but do not require spotlight actions.',
+     '- At least one interactive page has a widget_highlight action targeting a real control.',
+     '- At least two discussion actions use two different peer agent ids.',
+     '- Create exactly five roster agents: the locked teacher plus four student/assistant peers.',
+@@ -304,7 +305,7 @@ async function waitForProfessionalSession(
+             ? 'OpenMAIC Pro Agent is researching and creating the classroom'
+             : 'OpenMAIC Pro Agent session is queued',
+         scenesGenerated: 0,
+-        totalScenes: 10,
++        totalScenes: 0,
+       });
+     }
+     await delay(FORMAL_SESSION_POLL_MS);
+@@ -379,31 +380,39 @@ function promoteProfessionalDocument(
+   spec: FormalCoursewareSpec,
+ ): { stage: Stage; scenes: Scene[] } {
+   const ordered = [...scenes].sort((left, right) => left.order - right.order);
++  const planning = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.scenePlanning;
+   if (
+-    ordered.length !== 10 ||
++    ordered.length === 0 ||
++    ordered.length > planning.maxSceneCount ||
+     ordered.some((scene, index) => scene.order !== index + 1)
+   ) {
+     throw new Error('FORMAL_PROFESSIONAL_SOURCE_SCENE_ORDER_INVALID');
+   }
+ 
+-  const roster = Array.isArray(stage.generatedAgentConfigs)
+-    ? stage.generatedAgentConfigs
+-    : [];
++  const roster = Array.isArray(stage.generatedAgentConfigs) ? stage.generatedAgentConfigs : [];
+   const promotedStage: Stage = {
+     ...stage,
+     generatedAgentConfigs: roster.map((agent) =>
+-      agent.role === 'teacher'
+-        ? { ...agent, voiceConfig: spec.teacher.voiceConfig }
+-        : agent,
++      agent.role === 'teacher' ? { ...agent, voiceConfig: spec.teacher.voiceConfig } : agent,
+     ),
+   };
+   const lockedQuestions = [...spec.guided, ...spec.independent].map(lockedRuntimeQuestion);
++  const quizSceneCount = ordered.filter((scene) => scene.type === 'quiz').length;
++  if (quizSceneCount < 1 || quizSceneCount > lockedQuestions.length) {
++    throw new Error('FORMAL_PROFESSIONAL_SOURCE_QUIZ_COUNT_INVALID');
++  }
++  const questionsByQuiz = Array.from({ length: quizSceneCount }, (_, quizIndex) => {
++    const start = Math.floor((quizIndex * lockedQuestions.length) / quizSceneCount);
++    const end = Math.floor(((quizIndex + 1) * lockedQuestions.length) / quizSceneCount);
++    return lockedQuestions.slice(start, end);
++  });
++  let quizIndex = 0;
+   const promotedScenes = ordered.map((scene, index) => {
+     const content =
+-      scene.content.type === 'quiz' && (index === 5 || index === 6)
++      scene.type === 'quiz' && scene.content.type === 'quiz'
+         ? {
+             ...scene.content,
+-            questions: index === 5 ? lockedQuestions.slice(0, 2) : lockedQuestions.slice(2, 4),
++            questions: questionsByQuiz[quizIndex++],
+           }
+         : scene.content;
+     return { ...scene, order: index, content } as Scene;
+@@ -411,32 +420,93 @@ function promoteProfessionalDocument(
+   return { stage: promotedStage, scenes: promotedScenes };
+ }
+ 
++export function hasMiraFormalSlideSpotlightSequence(scene: Scene): boolean {
++  if (scene.type !== 'slide' || scene.content.type !== 'slide') return false;
++  const canvas = plainObject(scene.content.canvas);
++  const renderableElementIds = new Set(
++    (Array.isArray(canvas?.elements) ? canvas.elements : []).flatMap((element) => {
++      const candidate = plainObject(element);
++      return candidate &&
++        typeof candidate.id === 'string' &&
++        candidate.id.trim() &&
++        typeof candidate.type === 'string' &&
++        candidate.type.trim() &&
++        candidate.visible !== false
++        ? [candidate.id]
++        : [];
++    }),
++  );
++  const actions = Array.isArray(scene.actions) ? scene.actions : [];
++  const rawSpeechIndexes = actions.flatMap((action, index) =>
++    action.type === 'speech' ? [index] : [],
++  );
++  const speechIndexes = rawSpeechIndexes.filter((index) => {
++    const action = actions[index];
++    return action?.type === 'speech' && typeof action.text === 'string' && !!action.text.trim();
++  });
++  const speechPolicy = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.speechActions.perScene;
++  if (
++    rawSpeechIndexes.length !== speechIndexes.length ||
++    speechIndexes.length < speechPolicy.min ||
++    speechIndexes.length > speechPolicy.max
++  ) {
++    return false;
++  }
++  const spotlightIndexes = actions.flatMap((action, index) =>
++    action.type === 'spotlight' ? [index] : [],
++  );
++  if (
++    spotlightIndexes.length <
++      MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.slideSpotlight.minimumPerSlide ||
++    spotlightIndexes.some((index) => {
++      const spotlight = actions[index];
++      return (
++        spotlight?.type !== 'spotlight' ||
++        typeof spotlight.elementId !== 'string' ||
++        !renderableElementIds.has(spotlight.elementId)
++      );
++    })
++  ) {
++    return false;
++  }
++  const speechIndexSet = new Set(speechIndexes);
++  return spotlightIndexes.some((index) => speechIndexSet.has(index + 1));
++}
++
+ function assertProfessionalClassroom(
+   stage: Stage,
+   scenes: Scene[],
+   spec: FormalCoursewareSpec,
+   sessionId: string,
+   outline: unknown,
+-): void {
++): number {
+   const producerRef = plainObject(outline)?.producerRef;
+-  if (producerRef !== sessionId || stage.id === '' || scenes.length !== 10) {
++  const planning = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.scenePlanning;
++  if (
++    producerRef !== sessionId ||
++    stage.id === '' ||
++    scenes.length === 0 ||
++    scenes.length > planning.maxSceneCount
++  ) {
+     throw new Error('FORMAL_PROFESSIONAL_CLASSROOM_IDENTITY_INVALID');
+   }
+-  const expectedTypes = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.orderedSceneTypes;
++  const allowedTypes = new Set<string>(planning.allowedSceneTypes);
+   if (
+     scenes.some(
+       (scene, index) =>
+         scene.stageId !== stage.id ||
+         scene.order !== index ||
+-        scene.type !== expectedTypes[index] ||
++        !allowedTypes.has(scene.type) ||
+         scene.content.type !== scene.type,
+     )
+   ) {
+     throw new Error('FORMAL_PROFESSIONAL_SCENE_CONTRACT_INVALID');
+   }
+-  const roster = Array.isArray(stage.generatedAgentConfigs)
+-    ? stage.generatedAgentConfigs
+-    : [];
++  const observedTypes = new Set(scenes.map((scene) => scene.type));
++  if (planning.requiredSceneTypes.some((sceneType) => !observedTypes.has(sceneType))) {
++    throw new Error('FORMAL_PROFESSIONAL_REQUIRED_SCENE_TYPE_MISSING');
++  }
++  const roster = Array.isArray(stage.generatedAgentConfigs) ? stage.generatedAgentConfigs : [];
+   const teachers = roster.filter((agent) => agent.role === 'teacher');
+   const peers = roster.filter((agent) => agent.role === 'student' || agent.role === 'assistant');
+   const teacher = teachers[0];
+@@ -453,14 +523,26 @@ function assertProfessionalClassroom(
+   }
+   const peerIds = new Set(peers.map((agent) => agent.id));
+   const discussionPeers = new Set<string>();
+-  let spotlight = false;
+   let widgetHighlight = false;
++  let speechActionCount = 0;
++  const speechPolicy = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.speechActions;
+   for (const scene of scenes) {
+     const actions = Array.isArray(scene.actions) ? scene.actions : [];
+-    const speech = actions.filter(
++    const rawSpeech = actions.filter((action) => action.type === 'speech');
++    const speech = rawSpeech.filter(
+       (action) => action.type === 'speech' && typeof action.text === 'string' && action.text.trim(),
+     );
+-    if (speech.length !== 1) throw new Error('FORMAL_PROFESSIONAL_SPEECH_INVALID');
++    if (
++      rawSpeech.length !== speech.length ||
++      speech.length < speechPolicy.perScene.min ||
++      speech.length > speechPolicy.perScene.max
++    ) {
++      throw new Error('FORMAL_PROFESSIONAL_SPEECH_INVALID');
++    }
++    speechActionCount += speech.length;
++    if (scene.type === 'slide' && !hasMiraFormalSlideSpotlightSequence(scene)) {
++      throw new Error('FORMAL_PROFESSIONAL_SLIDE_SPOTLIGHT_INVALID');
++    }
+     for (const action of actions) {
+       if (
+         action.type === 'discussion' &&
+@@ -469,24 +551,23 @@ function assertProfessionalClassroom(
+       ) {
+         discussionPeers.add(action.agentId);
+       }
+-      if (
+-        action.type === 'spotlight' &&
+-        scene.type === 'slide' &&
+-        typeof action.elementId === 'string' &&
+-        action.elementId.trim()
+-      ) {
+-        spotlight = true;
+-      }
+       if (action.type === 'widget_highlight' && scene.type === 'interactive') {
+         widgetHighlight = true;
+       }
+     }
+   }
+-  if (discussionPeers.size < 2 || !spotlight || !widgetHighlight) {
++  if (speechActionCount < speechPolicy.total.min || speechActionCount > speechPolicy.total.max) {
++    throw new Error('FORMAL_PROFESSIONAL_SPEECH_INVALID');
++  }
++  if (discussionPeers.size < 2 || !widgetHighlight) {
+     throw new Error('FORMAL_PROFESSIONAL_TEACHING_ACTIONS_INVALID');
+   }
+   const expectedQuestions = [...spec.guided, ...spec.independent].map(expectedRuntimeQuestion);
+-  const actualQuestions = scenes.slice(5, 7).flatMap((scene) => {
++  const quizScenes = scenes.filter((scene) => scene.type === 'quiz');
++  if (quizScenes.length < 1 || quizScenes.length > expectedQuestions.length) {
++    throw new Error('FORMAL_PROFESSIONAL_ASSESSMENT_INVALID');
++  }
++  const actualQuestions = quizScenes.flatMap((scene) => {
+     if (scene.content.type !== 'quiz') return [];
+     return Array.isArray(scene.content.questions) ? scene.content.questions : [];
+   });
+@@ -494,7 +575,8 @@ function assertProfessionalClassroom(
+     actualQuestions.length !== 4 ||
+     actualQuestions.some((question, index) => {
+       const actual = plainObject(question);
+-      if (!actual || actual.hasAnswer !== false || canonicalJson(actual.answer) !== '[]') return true;
++      if (!actual || actual.hasAnswer !== false || canonicalJson(actual.answer) !== '[]')
++        return true;
+       const comparable = {
+         id: actual.id,
+         type: actual.type,
+@@ -506,16 +588,20 @@ function assertProfessionalClassroom(
+   ) {
+     throw new Error('FORMAL_PROFESSIONAL_ASSESSMENT_INVALID');
+   }
+-  const expectedWidgets = ['simulation', 'game', 'visualization3d'];
+-  for (const [index, scene] of scenes.slice(7).entries()) {
++  const allowedWidgets = new Set<string>(
++    MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.interactive.allowedWidgetTypes,
++  );
++  for (const scene of scenes.filter((candidate) => candidate.type === 'interactive')) {
+     if (scene.content.type !== 'interactive') {
+       throw new Error('FORMAL_PROFESSIONAL_WIDGET_INVALID');
+     }
+     const config = plainObject(scene.content.widgetConfig);
+     const html = typeof scene.content.html === 'string' ? scene.content.html : '';
++    const widgetType = scene.content.widgetType;
+     if (
+-      scene.content.widgetType !== expectedWidgets[index] ||
+-      config?.type !== expectedWidgets[index] ||
++      !widgetType ||
++      !allowedWidgets.has(widgetType) ||
++      config?.type !== widgetType ||
+       html.length < 200 ||
+       !/<script[\s>]/iu.test(html) ||
+       !/<(?:button|input|select|canvas)[\s>]/iu.test(html)
+@@ -523,23 +609,24 @@ function assertProfessionalClassroom(
+       throw new Error('FORMAL_PROFESSIONAL_WIDGET_INVALID');
+     }
+   }
++  return speechActionCount;
+ }
+ 
+ function isResearchTrace(value: unknown): value is MiraFormalResearchSearchTrace {
+   const trace = plainObject(value);
+   return Boolean(
+     trace &&
+-      trace.kind === MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE &&
+-      trace.schemaVersion === MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION &&
+-      typeof trace.query === 'string' &&
+-      trace.query.trim() &&
+-      typeof trace.providerId === 'string' &&
+-      trace.providerId.trim() &&
+-      typeof trace.searchedAt === 'string' &&
+-      Number.isFinite(trace.resultCount) &&
+-      Number(trace.resultCount) > 0 &&
+-      Array.isArray(trace.sources) &&
+-      trace.sources.length === Number(trace.resultCount),
++    trace.kind === MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE &&
++    trace.schemaVersion === MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION &&
++    typeof trace.query === 'string' &&
++    trace.query.trim() &&
++    typeof trace.providerId === 'string' &&
++    trace.providerId.trim() &&
++    typeof trace.searchedAt === 'string' &&
++    Number.isFinite(trace.resultCount) &&
++    Number(trace.resultCount) > 0 &&
++    Array.isArray(trace.sources) &&
++    trace.sources.length === Number(trace.resultCount),
+   );
+ }
+ 
+@@ -569,7 +656,9 @@ async function buildResearchReceipt(
+   if (providers.size !== 1) throw new Error('FORMAL_PROFESSIONAL_RESEARCH_PROVIDER_INVALID');
+   const observedUrls = new Set(
+     traces.flatMap((trace) =>
+-      trace.sources.map((source) => normalizedUrl(source.url)).filter((url): url is string => !!url),
++      trace.sources
++        .map((source) => normalizedUrl(source.url))
++        .filter((url): url is string => !!url),
+     ),
+   );
+   const materials = (await listSessionMaterials(sessionId, { limit: 200 })).filter(
+@@ -596,8 +685,11 @@ async function buildResearchReceipt(
+     const sceneIds = scenes
+       .filter((scene) => {
+         const content = canonicalJson(scene).toLowerCase();
+-        return content.includes(source.url.toLowerCase()) || content.includes(hostname) ||
+-          (title.length >= 4 && content.includes(title));
++        return (
++          content.includes(source.url.toLowerCase()) ||
++          content.includes(hostname) ||
++          (title.length >= 4 && content.includes(title))
++        );
+       })
+       .map((scene) => scene.id);
+     return sceneIds.length ? [{ url: source.url, sceneIds }] : [];
+@@ -635,7 +727,10 @@ function buildProfessionalCreationReceipt(
+   const contract = formalContractPayload(input);
+   const teachingBrief = contract.teachingBrief;
+   const teachingBriefSha256 = String(contract.teachingBriefSha256 || '');
+-  if (!/^[0-9a-f]{64}$/u.test(teachingBriefSha256) || canonicalSha256(teachingBrief) !== teachingBriefSha256) {
++  if (
++    !/^[0-9a-f]{64}$/u.test(teachingBriefSha256) ||
++    canonicalSha256(teachingBrief) !== teachingBriefSha256
++  ) {
+     throw new Error('FORMAL_PROFESSIONAL_TEACHING_BRIEF_HASH_INVALID');
+   }
+   const withoutHash = {
+@@ -669,7 +764,7 @@ export async function generateMiraFormalProfessionalClassroom(
+     progress: 10,
+     message: 'Starting the unattended OpenMAIC Pro courseware workflow with required web research',
+     scenesGenerated: 0,
+-    totalScenes: 10,
++    totalScenes: 0,
+   });
+   const { identity } = await createOrReuseProfessionalSession(input, spec);
+   await waitForProfessionalSession(identity.sessionId, options.onProgress);
+@@ -685,7 +780,13 @@ export async function generateMiraFormalProfessionalClassroom(
+   );
+   const stage = promoted.stage;
+   const scenes = promoted.scenes;
+-  assertProfessionalClassroom(stage, scenes, spec, identity.sessionId, document.outline);
++  const speechActionCount = assertProfessionalClassroom(
++    stage,
++    scenes,
++    spec,
++    identity.sessionId,
++    document.outline,
++  );
+   const research = await buildResearchReceipt(events, scenes, spec, identity.sessionId);
+   const professionalCreation = buildProfessionalCreationReceipt(
+     input,
+@@ -698,7 +799,7 @@ export async function generateMiraFormalProfessionalClassroom(
+     progress: 50,
+     message: 'Professional classroom passed research and structure gates; validating formal audio',
+     scenesGenerated: scenes.length,
+-    totalScenes: 10,
++    totalScenes: scenes.length,
+   });
+   const formalAudio: MiraFormalAudioLifecycleReceipt = await completeMiraFormalAudioLifecycle(
+     { buildItemId: spec.buildItemId, subject: spec.course.subject, stage, scenes },
+@@ -714,17 +815,25 @@ export async function generateMiraFormalProfessionalClassroom(
+               ? `Generated and verified formal audio ${completed}/${total}`
+               : `Validated formal ASR round trip ${completed}/${total}`,
+           scenesGenerated: scenes.length,
+-          totalScenes: 10,
++          totalScenes: scenes.length,
+         });
+       },
+     },
+   );
++  if (
++    formalAudio.expectedSegmentCount !== speechActionCount ||
++    formalAudio.ttsSucceededCount !== speechActionCount ||
++    formalAudio.asrPassedCount !== speechActionCount ||
++    formalAudio.segments.length !== speechActionCount
++  ) {
++    throw new Error('FORMAL_PROFESSIONAL_AUDIO_COUNT_INVALID');
++  }
+   await options.onProgress?.({
+     step: 'persisting',
+     progress: 98,
+     message: 'Publishing the validated Pro classroom to the student runtime',
+     scenesGenerated: scenes.length,
+-    totalScenes: 10,
++    totalScenes: scenes.length,
+   });
+   const persisted = await persistClassroom({ id: stage.id, stage, scenes }, options.baseUrl);
+   await options.onProgress?.({
+@@ -732,7 +841,7 @@ export async function generateMiraFormalProfessionalClassroom(
+     progress: 100,
+     message: 'OpenMAIC Pro courseware workflow completed with web research and citations',
+     scenesGenerated: scenes.length,
+-    totalScenes: 10,
++    totalScenes: scenes.length,
+   });
+   return {
+     id: persisted.id,
+@@ -740,6 +849,7 @@ export async function generateMiraFormalProfessionalClassroom(
+     stage,
+     scenes,
+     scenesCount: scenes.length,
++    speechActionCount,
+     createdAt: persisted.createdAt,
+     formalAudio,
+     professionalCreation,
+diff --git a/lib/server/mira-formal-provider-readiness.ts b/lib/server/mira-formal-provider-readiness.ts
+index e9e8776..c76f87b 100644
+--- a/lib/server/mira-formal-provider-readiness.ts
++++ b/lib/server/mira-formal-provider-readiness.ts
+@@ -348,7 +348,7 @@ export function assertMiraFormalProviderReadinessRequest(
+     !(validation.subject in SUBJECT_TTS) ||
+     !Number.isInteger(validation.sceneOrder) ||
+     Number(validation.sceneOrder) < 0 ||
+-    Number(validation.sceneOrder) > 9 ||
++    Number(validation.sceneOrder) > 239 ||
+     !IDENTIFIER.test(String(validation.ttsRequestId || '')) ||
+     !SHA256.test(String(validation.audioSha256 || '')) ||
+     !SHA256.test(String(validation.machineReceiptSha256 || '')) ||
+diff --git a/skills/agent-runtime/mira-primary-courseware/SKILL.md b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+index d5d37fa..bd49eb7 100644
+--- a/skills/agent-runtime/mira-primary-courseware/SKILL.md
++++ b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+@@ -1,7 +1,7 @@
+ ---
+ name: mira-primary-courseware
+ title: "Mira 小学精品课"
+-description: "Mira 小学精品课件专业创作。用于根据家长已选年级和服务端教学简报自动生成低年级语文、数学、英语课堂：固定十页、默认联网核验、可追溯引用、逐步聚焦、可观察练习和短句旁白。"
++description: "Mira 小学精品课件专业创作。用于根据家长已选年级和服务端教学简报自动生成低年级语文、数学、英语课堂：自适应页面计划、默认联网核验、可追溯引用、逐步聚焦、可观察练习和短句旁白。"
+ ---
+ 
+ # Mira primary courseware
+@@ -27,18 +27,34 @@ interactive Pro-workbench request, prefer 6–8 pages:
+ 7. transfer to a small new situation;
+ 8. optional recap that names the method in the learner's own words.
+ 
+-For a server-authored Mira formal brief, the formal contract overrides that
+-preference. Generate exactly 10 pages in this exact order: five `slide`, two
+-`quiz`, then three `interactive`. Preserve the brief's locked grade, subject,
+-ability boundary, teacher identity, four-peer roster and assessment IDs/text/
+-options without paraphrasing them. Plan all ten pages internally and continue
+-straight through the build sequence without asking for approval. In the three
+-formal `generate_scene` calls, pass `widgetType` as `simulation`, `game`, then
+-`visualization3d`; do not rely on the generic interactive fallback.
++For a server-authored Mira formal brief, plan the whole deck internally under
++the official `stage-design` and K12 rules, then continue straight through the
++build sequence without asking for approval. Choose the page count from the
++brief's grade, bounded skill and estimated duration; when duration is absent,
++infer 15–30 minutes and use 1–2 scenes per minute as planning guidance. There
++is no fixed page count or fixed type order, but never exceed 60 pages. Use only
++`slide`, `quiz`, `interactive` and `pbl`, with at least one `slide`, one `quiz`
++and one `interactive`; use `pbl` only for a genuinely multi-step task.
++
++Preserve the brief's locked grade, subject, ability boundary, teacher identity,
++four-peer roster and assessment IDs/text/options without paraphrasing them.
++Use one to four quiz pages and place all four locked assessment questions once,
++in original order, across those pages. For each `interactive` page, choose the
++content-appropriate `widgetType` from `simulation`, `diagram`, `code`, `game`
++or `visualization3d`; do not manufacture a fixed widget sequence.
+ 
+ The learner must do something on at least every second page. Do not produce a
+ sequence of static definition slides.
+ 
++Every formal scene must contain 1–20 non-empty `speech` actions, with at most
++240 speech actions in the whole classroom. Every formal `slide` needs at least
++one `spotlight`, and every spotlight `elementId` must name a real renderable
++element on that slide. Include at least one focus/explanation sequence per
++slide: one or more consecutive `spotlight` actions immediately followed by a
++non-empty `speech`. Opening, transition, and closing speech may be unfocused;
++use additional focus sequences when explaining distinct visual regions.
++Interactive, quiz and PBL scenes do not need spotlight actions.
++
+ ## Page craft
+ 
+ - One page, one teaching move. Use a short action title, not “知识讲解”,
+@@ -99,6 +115,7 @@ persisted, every speech action has audio, each explanation page has a valid
+ spotlight target, at least one misconception is diagnosed, and the final task
+ checks the same skill in a new context. A server-authored formal classroom
+ instead leaves speech audio to the server promotion boundary and requires
+-exactly 10 pages in the locked type order, the intact locked assessments and
+-roster, 1–4 successful searches, at least one same-session fetched source, and
+-a persisted citation that resolves to that source.
++an adaptive deck within the formal planning bounds, all required scene types,
++the intact locked assessments and roster, 1–4 successful searches, at least
++one same-session fetched source, and a persisted citation that resolves to that
++source.
+diff --git a/tests/server/classroom-generation-retry.test.ts b/tests/server/classroom-generation-retry.test.ts
+index c112eec..e6f0dd4 100644
+--- a/tests/server/classroom-generation-retry.test.ts
++++ b/tests/server/classroom-generation-retry.test.ts
+@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
+   createSceneWithActions: vi.fn(),
+   persistClassroom: vi.fn(),
+   completeMiraFormalAudioLifecycle: vi.fn(),
++  generateMiraFormalProfessionalClassroom: vi.fn(),
+   callLLM: vi.fn(),
+   logInfo: vi.fn(),
+   logWarn: vi.fn(),
+@@ -67,6 +68,10 @@ vi.mock('@/lib/server/mira-formal-audio-lifecycle', () => ({
+   completeMiraFormalAudioLifecycle: mocks.completeMiraFormalAudioLifecycle,
+ }));
+ 
++vi.mock('@/lib/server/mira-formal-professional-classroom', () => ({
++  generateMiraFormalProfessionalClassroom: mocks.generateMiraFormalProfessionalClassroom,
++}));
++
+ vi.mock('@/lib/logger', () => ({
+   createLogger: () => ({
+     info: mocks.logInfo,
+@@ -335,6 +340,7 @@ describe('classroom scene generation retries', () => {
+     const {
+       MIRA_COURSEWARE_AUTHORITY,
+       MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      MIRA_PROFESSIONAL_CREATION_POLICY,
+     } = await import(
+       '@/lib/server/mira-formal-generation-policy'
+     );
+@@ -361,11 +367,12 @@ describe('classroom scene generation retries', () => {
+       },
+     };
+     const requirement = JSON.stringify({
+-      schemaVersion: 'mira.openmaic.formal-runtime.v1',
++      schemaVersion: MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.schemaVersion,
+       authority: 'mira_backend_formal_candidate',
+       buildItemId: 'formal-build-item-1',
+       runtimeRequestId: 'formal-outline-repair-1',
+       coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
++      professionalCreationPolicy: MIRA_PROFESSIONAL_CREATION_POLICY,
+       teachingBrief: {
+         schemaVersion: 'mira.learning.formal-runtime-teaching-brief.v1',
+         sourceCourseContentSha256: 'a'.repeat(64),
+@@ -405,6 +412,74 @@ describe('classroom scene generation retries', () => {
+       teacher,
+     });
+ 
++    const fixtureResult = spawnSync(
++      'python3',
++      [
++        '-c',
++        `import json
++from tests.test_formal_runtime_candidate_generation import _formal_classroom
++print(json.dumps(_formal_classroom()))`,
++      ],
++      {
++        cwd: path.resolve(process.cwd(), '../../../backend'),
++        encoding: 'utf8',
++        env: {
++          ...process.env,
++          PYTHONPYCACHEPREFIX: '/tmp/mira-single-authority-pycache',
++        },
++      },
++    );
++    expect(fixtureResult.status, fixtureResult.stderr || fixtureResult.stdout).toBe(0);
++    const professionalClassroom = JSON.parse(fixtureResult.stdout);
++    Object.assign(professionalClassroom.stage.generatedAgentConfigs[0], teacher.runtime);
++    for (const scene of professionalClassroom.scenes) {
++      if (scene.type !== 'slide') continue;
++      const speech = scene.actions.find((action: { type?: string }) => action.type === 'speech');
++      const spotlights = scene.actions.filter(
++        (action: { type?: string }) => action.type === 'spotlight',
++      );
++      const otherActions = scene.actions.filter(
++        (action: { type?: string }) => action.type !== 'speech' && action.type !== 'spotlight',
++      );
++      expect(speech).toBeTruthy();
++      scene.actions = [...otherActions, ...spotlights, speech];
++    }
++    const assessmentQuestions = questions.slice(1).map((question) => ({
++      id: question.id,
++      type: 'short_answer',
++      question: question.prompt,
++      hasAnswer: false,
++      answer: [],
++      points: 1,
++    }));
++    let assessmentIndex = 0;
++    for (const scene of professionalClassroom.scenes) {
++      if (scene.type !== 'quiz') continue;
++      for (const question of scene.content.questions) {
++        Object.assign(question, assessmentQuestions[assessmentIndex++]);
++      }
++    }
++    expect(assessmentIndex).toBe(assessmentQuestions.length);
++    const speechActionCount = professionalClassroom.scenes.reduce(
++      (total: number, scene: { actions?: Array<{ type?: string }> }) =>
++        total + (scene.actions || []).filter((action) => action.type === 'speech').length,
++      0,
++    );
++    mocks.generateMiraFormalProfessionalClassroom.mockResolvedValue({
++      id: professionalClassroom.stage.id,
++      url: `http://localhost/classroom/${professionalClassroom.stage.id}`,
++      stage: professionalClassroom.stage,
++      scenes: professionalClassroom.scenes,
++      scenesCount: professionalClassroom.scenes.length,
++      speechActionCount,
++      createdAt: '2026-06-22T00:00:00.000Z',
++      formalAudio: {
++        schemaVersion: 'mira.openmaic.formal-audio-lifecycle.v2',
++        status: 'succeeded',
++        receiptSha256: 'f'.repeat(64),
++      },
++    });
++
+     const { generateClassroom } = await import('@/lib/server/classroom-generation');
+     const result = await generateClassroom(
+       {
+@@ -412,7 +487,8 @@ describe('classroom scene generation retries', () => {
+         runtimeRequestId: 'formal-outline-repair-1',
+         formalRuntimeContract: MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+         coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
+-        enableWebSearch: false,
++        professionalCreationPolicy: MIRA_PROFESSIONAL_CREATION_POLICY,
++        enableWebSearch: true,
+         enableImageGeneration: false,
+         enableVideoGeneration: false,
+         enableTTS: false,
+@@ -425,14 +501,16 @@ describe('classroom scene generation retries', () => {
+     expect(mocks.callLLM).not.toHaveBeenCalled();
+     expect(mocks.generateSceneOutlinesFromRequirements).not.toHaveBeenCalled();
+     expect(mocks.generateSceneContent).not.toHaveBeenCalled();
+-    expect(result.scenesCount).toBe(10);
+-    expect(mocks.completeMiraFormalAudioLifecycle).toHaveBeenCalledTimes(1);
++    expect(result.scenesCount).toBe(professionalClassroom.scenes.length);
++    expect(result.speechActionCount).toBe(speechActionCount);
++    expect(mocks.generateMiraFormalProfessionalClassroom).toHaveBeenCalledTimes(1);
++    expect(mocks.completeMiraFormalAudioLifecycle).not.toHaveBeenCalled();
+     expect(result.formalAudio).toMatchObject({
+       schemaVersion: 'mira.openmaic.formal-audio-lifecycle.v2',
+       status: 'succeeded',
+     });
+-    expect(result.scenes.map((scene) => scene.type)).toEqual(
+-      MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.orderedSceneTypes,
++    expect(new Set(result.scenes.map((scene) => scene.type))).toEqual(
++      new Set(MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.scenePlanning.requiredSceneTypes),
+     );
+     const strictValidation = spawnSync(
+       'python3',
+@@ -449,10 +527,10 @@ print(json.dumps({"ok":True,"sceneCount":len(payload["classroom"]["scenes"]),"re
+         input: JSON.stringify({
+           classroom: { stage: result.stage, scenes: result.scenes },
+           teacher,
+-          assessments: questions.slice(1).map((question) => ({
++          assessments: assessmentQuestions.map((question) => ({
+             id: question.id,
+-            question: question.prompt,
+-            runtimeType: 'short_answer',
++            question: question.question,
++            runtimeType: question.type,
+             options: [],
+           })),
+         }),
+@@ -464,7 +542,10 @@ print(json.dumps({"ok":True,"sceneCount":len(payload["classroom"]["scenes"]),"re
+       },
+     );
+     expect(strictValidation.status, strictValidation.stderr || strictValidation.stdout).toBe(0);
+-    expect(JSON.parse(strictValidation.stdout)).toMatchObject({ ok: true, sceneCount: 10 });
++    expect(JSON.parse(strictValidation.stdout)).toMatchObject({
++      ok: true,
++      sceneCount: professionalClassroom.scenes.length,
++    });
+   });
+ 
+   it('does not reject a successfully parsed scene merely because the call reached length', async () => {
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 75d446c..1c55aad 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -16,6 +16,23 @@ vi.mock('@/lib/server/provider-config', () => ({
+   resolveASRBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
+ }));
+ 
++vi.mock('@/lib/config/feature-flags', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('@/lib/config/feature-flags')>()),
++  isAgentRuntimeConfigured: () => true,
++}));
++
++vi.mock('@/lib/server/agent-runtime/web-search', () => ({
++  resolveWebSearchCapability: () => ({ providerId: 'brave', apiKey: '' }),
++}));
++
++vi.mock('@/lib/server/agent-runtime/agent-driver-model', () => ({
++  resolveAgentDriverModel: async () => ({ model: { id: 'test-agent-model' } }),
++}));
++
++vi.mock('@/lib/server/agent-runtime/store', () => ({
++  getAgentSessionStore: async () => ({ getSession: async () => null }),
++}));
++
+ describe('GET /api/health structured scene runtime policy', () => {
+   beforeEach(() => {
+     vi.resetModules();
+@@ -137,17 +154,34 @@ describe('GET /api/health structured scene runtime policy', () => {
+     });
+     expect(body.runtimePolicy.formalGeneration).toEqual({
+       enforced: true,
+-      policyId: 'mira.openmaic.formal-runtime.v1',
++      policyId: 'mira.openmaic.formal-runtime.v3-adaptive',
+       idempotencyKey: 'runtimeRequestId',
+       queryByRuntimeRequestId: true,
+-      speechAudioGenerated: false,
++      speechAudioGenerated: true,
+       coursewareAuthority: {
+-        schemaVersion: 'mira.openmaic.courseware-authority.v1',
++        schemaVersion: 'mira.openmaic.courseware-authority.v2-professional',
+         generationOwner: 'openmaic',
+-        providerInvocation: 'courseware_generation_only',
+-        classroomCompilation: 'deterministic_no_llm',
++        providerInvocation: 'professional_agent',
++        classroomCompilation: 'professional_skill_workflow',
+         backendProviderCredentialsAccepted: false,
+       },
++      professionalCreation: {
++        schemaVersion: 'mira.openmaic.professional-creation.v1',
++        mode: 'professional_skill',
++        workflowVersion: 'openmaic-pro-agent.v1',
++        skillId: 'mira-primary-courseware',
++        supportingSkillIds: ['k12-core-literacy-planning', 'deep-interactive'],
++        userPromptRequired: false,
++        webSearch: {
++          enabled: true,
++          providerManaged: true,
++          maxCalls: 4,
++          citationsRequired: true,
++          primarySourcesPreferred: true,
++          minimumFetchedSources: 1,
++        },
++        studentToolsEnabled: false,
++      },
+       studentRuntimeEvents: {
+         enforced: true,
+         schemaVersion: 'mira.openmaic.student-runtime-events.v1',
+@@ -158,27 +192,34 @@ describe('GET /api/health structured scene runtime policy', () => {
+         clientScoreAccepted: false,
+       },
+       contract: {
+-        schemaVersion: 'mira.openmaic.formal-runtime.v1',
+-        exactSceneCount: 10,
+-        orderedSceneTypes: [
+-          'slide',
+-          'slide',
+-          'slide',
+-          'slide',
+-          'slide',
+-          'quiz',
+-          'quiz',
+-          'interactive',
+-          'interactive',
+-          'interactive',
+-        ],
+-        sceneDistribution: { slide: 5, quiz: 2, interactive: 3 },
++        schemaVersion: 'mira.openmaic.formal-runtime.v3-adaptive',
++        scenePlanning: {
++          mode: 'adaptive',
++          authority: 'openmaic_professional_agent',
++          exactCountRequired: false,
++          allowedSceneTypes: ['slide', 'quiz', 'interactive', 'pbl'],
++          requiredSceneTypes: ['slide', 'quiz', 'interactive'],
++          defaultDurationMinutes: { min: 15, max: 30 },
++          scenesPerMinute: { min: 1, max: 2 },
++          maxSceneCount: 60,
++        },
+         roster: { teacherCount: 1, peerCount: 4 },
+         speechRequiredForEveryScene: true,
++        speechActions: {
++          perScene: { min: 1, max: 20 },
++          total: { min: 1, max: 240 },
++          interactiveSpotlightRequired: false,
++        },
+         distinctPeerDiscussions: 2,
+         teacherEvidence: ['spotlight', 'widget_highlight'],
++        slideSpotlight: {
++          minimumPerSlide: 1,
++          targetMustBeRenderable: true,
++          focusExplanationSequenceRequired: true,
++          consecutiveSpotlightsAllowed: true,
++        },
+         interactive: {
+-          requiredWidgetTypes: ['simulation', 'game', 'visualization3d'],
++          allowedWidgetTypes: ['simulation', 'diagram', 'code', 'game', 'visualization3d'],
+           widgetConfigRequired: true,
+           productiveScriptRequired: true,
+           noopRejected: true,
+@@ -202,9 +243,9 @@ describe('GET /api/health structured scene runtime policy', () => {
+         availableToStudentRuntime: false,
+       },
+       webSearch: {
+-        defaultEnabled: false,
+-        operatorOnly: true,
+-        formalGenerationEnabled: false,
++        defaultEnabled: true,
++        operatorOnly: false,
++        formalGenerationEnabled: true,
+         studentRuntimeEnabled: false,
+         maxCallsPerCourse: 4,
+         citationsRequired: true,
+@@ -237,11 +278,13 @@ describe('GET /api/health structured scene runtime policy', () => {
+     expect(body.version).toBe('1.0.0');
+     expect(body.capabilities).toEqual({
+       formalGeneration: true,
++      professionalAgent: true,
++      webSearch: true,
+       speechAudioGeneration: true,
+     });
+     expect(body.runtimePolicy.formalGeneration).toMatchObject({
+-      policyId: 'mira.openmaic.formal-runtime.v1',
+-      speechAudioGenerated: false,
++      policyId: 'mira.openmaic.formal-runtime.v3-adaptive',
++      speechAudioGenerated: true,
+       studentRuntimeEvents: {
+         enforced: true,
+         schemaVersion: 'mira.openmaic.student-runtime-events.v1',
+@@ -256,6 +299,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+     expect(body.runtimePolicy.asr).toBeUndefined();
+     expect(body.runtimePolicy.formalAudio).toMatchObject({
+       schemaVersion: 'mira.openmaic.formal-audio.v1',
++      segmentCount: { mode: 'per_speech_action', min: 1, max: 240 },
+       tts: { providerId: 'qwen-tts', modelId: 'qwen3-tts-flash' },
+       asr: { providerId: 'qwen-asr', modelId: 'qwen3-asr-flash' },
+     });
+diff --git a/tests/server/mira-formal-audio-lifecycle.test.ts b/tests/server/mira-formal-audio-lifecycle.test.ts
+index a1188cc..441c21a 100644
+--- a/tests/server/mira-formal-audio-lifecycle.test.ts
++++ b/tests/server/mira-formal-audio-lifecycle.test.ts
+@@ -36,7 +36,7 @@ function requestSha256(value: object): string {
+   return sha256(JSON.stringify(canonical(value)));
+ }
+ 
+-function formalClassroom(): { stage: Stage; scenes: Scene[] } {
++function formalClassroom(sceneCount = 10, speechPerScene = 1): { stage: Stage; scenes: Scene[] } {
+   const stage = {
+     id: 'mfc_test_classroom',
+     name: '20以内数感',
+@@ -62,25 +62,29 @@ function formalClassroom(): { stage: Stage; scenes: Scene[] } {
+       },
+     ],
+   } as unknown as Stage;
+-  const scenes = Array.from({ length: 10 }, (_, sceneOrder) => ({
+-    id: `mfc_test_scene_${sceneOrder}`,
+-    outlineId: `outline_${sceneOrder}`,
+-    stageId: stage.id,
+-    type: 'quiz',
+-    title: `场景 ${sceneOrder}`,
+-    order: sceneOrder,
+-    content: { type: 'quiz', questions: [] },
+-    actions: [
+-      {
+-        id: `speech_${sceneOrder}`,
+-        type: 'speech',
++  const scenes = Array.from({ length: sceneCount }, (_, sceneOrder) => {
++    const actions = Array.from({ length: speechPerScene }, (_, actionOrder) => {
++      const speechOrdinal = sceneOrder * speechPerScene + actionOrder;
++      return {
++        id: `speech_${sceneOrder}_${actionOrder}`,
++        type: 'speech' as const,
+         title: '课堂讲解',
+-        text: `第${sceneOrder + 1}段讲解。`,
+-      },
+-    ],
+-    createdAt: Date.UTC(2026, 0, 1),
+-    updatedAt: Date.UTC(2026, 0, 1),
+-  })) as Scene[];
++        text: `第${speechOrdinal + 1}段讲解。`,
++      };
++    });
++    return {
++      id: `mfc_test_scene_${sceneOrder}`,
++      outlineId: `outline_${sceneOrder}`,
++      stageId: stage.id,
++      type: 'quiz',
++      title: `场景 ${sceneOrder}`,
++      order: sceneOrder,
++      content: { type: 'quiz', questions: [] },
++      actions,
++      createdAt: Date.UTC(2026, 0, 1),
++      updatedAt: Date.UTC(2026, 0, 1),
++    };
++  }) as Scene[];
+   return { stage, scenes };
+ }
+ 
+@@ -202,8 +206,8 @@ function fakeDependencies(transcriptFor: (request: MiraFormalAsrRequest) => stri
+ }
+ 
+ describe('Mira formal audio lifecycle v2', () => {
+-  it('completes exactly 10 TTS and ASR segments and returns a hashed receipt', async () => {
+-    const classroom = formalClassroom();
++  it('flattens speech by scene/action order for TTS, ASR, progress and the receipt', async () => {
++    const classroom = formalClassroom(3, 2);
+     const fake = fakeDependencies((request) => `第${request.sceneOrder + 1}段讲解。`);
+     const onProgress = vi.fn();
+ 
+@@ -214,23 +218,40 @@ describe('Mira formal audio lifecycle v2', () => {
+     );
+ 
+     expect(fake.assertProviderReady).toHaveBeenCalledTimes(1);
+-    expect(fake.executeTts).toHaveBeenCalledTimes(10);
+-    expect(fake.executeAsr).toHaveBeenCalledTimes(10);
+-    expect(onProgress).toHaveBeenCalledTimes(20);
++    expect(fake.executeTts).toHaveBeenCalledTimes(6);
++    expect(fake.executeAsr).toHaveBeenCalledTimes(6);
++    expect(onProgress).toHaveBeenCalledTimes(12);
++    expect(onProgress).toHaveBeenLastCalledWith({ phase: 'asr', completed: 6, total: 6 });
+     expect(receipt).toMatchObject({
+       schemaVersion: 'mira.openmaic.formal-audio-lifecycle.v2',
+       status: 'succeeded',
+       buildItemId: 'build-item-001',
+       classroomId: classroom.stage.id,
+       subject: 'math',
+-      expectedSegmentCount: 10,
+-      ttsSucceededCount: 10,
+-      asrPassedCount: 10,
++      expectedSegmentCount: 6,
++      ttsSucceededCount: 6,
++      asrPassedCount: 6,
+       teacherProfile: { id: 'mira_math_clear', version: 2, gender: 'male' },
+     });
+     expect(receipt.segments.map((segment) => segment.sceneOrder)).toEqual(
+-      Array.from({ length: 10 }, (_, index) => index),
++      Array.from({ length: 6 }, (_, index) => index),
+     );
++    expect(receipt.segments.map((segment) => segment.sceneId)).toEqual([
++      'mfc_test_scene_0',
++      'mfc_test_scene_0',
++      'mfc_test_scene_1',
++      'mfc_test_scene_1',
++      'mfc_test_scene_2',
++      'mfc_test_scene_2',
++    ]);
++    expect(receipt.segments.map((segment) => segment.actionId)).toEqual([
++      'speech_0_0',
++      'speech_0_1',
++      'speech_1_0',
++      'speech_1_1',
++      'speech_2_0',
++      'speech_2_1',
++    ]);
+     expect(receipt.segments.every((segment) => segment.asr.similarityBps === 10_000)).toBe(true);
+     const { receiptSha256, ...receiptWithoutHash } = receipt;
+     expect(receiptSha256).toBe(requestSha256(receiptWithoutHash));
+@@ -262,6 +283,30 @@ describe('Mira formal audio lifecycle v2', () => {
+     ).rejects.toThrow('FORMAL_AUDIO_ASR_INCOMPLETE:0:succeeded');
+   });
+ 
++  it('rejects zero or more than 20 speeches in a scene and more than 240 overall', async () => {
++    const fake = fakeDependencies(() => '不会调用');
++    await expect(
++      completeMiraFormalAudioLifecycle(
++        { buildItemId: 'build-item-empty', subject: 'math', ...formalClassroom(2, 0) },
++        fake.dependencies,
++      ),
++    ).rejects.toThrow('FORMAL_AUDIO_SPEECH_COUNT_INVALID:0');
++    await expect(
++      completeMiraFormalAudioLifecycle(
++        { buildItemId: 'build-item-scene-max', subject: 'math', ...formalClassroom(1, 21) },
++        fake.dependencies,
++      ),
++    ).rejects.toThrow('FORMAL_AUDIO_SPEECH_COUNT_INVALID:0');
++    await expect(
++      completeMiraFormalAudioLifecycle(
++        { buildItemId: 'build-item-total-max', subject: 'math', ...formalClassroom(13, 20) },
++        fake.dependencies,
++      ),
++    ).rejects.toThrow('FORMAL_AUDIO_SEGMENT_COUNT_INVALID');
++    expect(fake.executeTts).not.toHaveBeenCalled();
++    expect(fake.executeAsr).not.toHaveBeenCalled();
++  });
++
+   it('keeps speech and ASR canonicalization aligned with backend policy v2', () => {
+     expect(prepareMiraFormalSpeechText('声母 b 和韵母 a 拼成 ba。', 'chinese')).toBe(
+       '声母 波 和韵母 啊 拼成 八。',
+diff --git a/tests/server/mira-formal-audio.test.ts b/tests/server/mira-formal-audio.test.ts
+index 42bad68..e70bedd 100644
+--- a/tests/server/mira-formal-audio.test.ts
++++ b/tests/server/mira-formal-audio.test.ts
+@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ import {
+   MIRA_FORMAL_AUDIO_POLICY,
+   MiraFormalAudioError,
++  assertMiraFormalTtsRequest,
+   executeMiraFormalAsr,
+   executeMiraFormalTts,
+   getMiraFormalAudioRuntimePolicy,
+@@ -124,6 +125,7 @@ describe('Mira formal subject Qwen audio runtime', () => {
+     expect(getMiraFormalAudioRuntimePolicy()).toEqual(MIRA_FORMAL_AUDIO_POLICY);
+     expect(MIRA_FORMAL_AUDIO_POLICY).toMatchObject({
+       schemaVersion: 'mira.openmaic.formal-audio.v1',
++      segmentCount: { mode: 'per_speech_action', min: 1, max: 240 },
+       tts: { providerId: 'qwen-tts', modelId: 'qwen3-tts-flash', fallbackAllowed: false },
+       asr: { providerId: 'qwen-asr', modelId: 'qwen3-asr-flash', fallbackAllowed: false },
+       subjects: {
+@@ -155,6 +157,13 @@ describe('Mira formal subject Qwen audio runtime', () => {
+     });
+   });
+ 
++  it('accepts global speech ordinal 239 and rejects 240', () => {
++    expect(assertMiraFormalTtsRequest({ ...mathTtsRequest, sceneOrder: 239 }).sceneOrder).toBe(239);
++    expect(() => assertMiraFormalTtsRequest({ ...mathTtsRequest, sceneOrder: 240 })).toThrow(
++      MiraFormalAudioError,
++    );
++  });
++
+   it('persists the TTS attempt before fetch and replays without a second provider call', async () => {
+     const audio = wavBytes();
+     let observedAttempt = false;
+diff --git a/tests/server/mira-formal-professional-classroom.test.ts b/tests/server/mira-formal-professional-classroom.test.ts
+new file mode 100644
+index 0000000..c2f0d21
+--- /dev/null
++++ b/tests/server/mira-formal-professional-classroom.test.ts
+@@ -0,0 +1,99 @@
++import { describe, expect, it } from 'vitest';
++
++import { hasMiraFormalSlideSpotlightSequence } from '@/lib/server/mira-formal-professional-classroom';
++import type { Scene } from '@/lib/types/stage';
++
++function slide(actions: Scene['actions'], elementId = 'focus-target'): Scene {
++  return {
++    id: 'slide-1',
++    stageId: 'stage-1',
++    order: 0,
++    type: 'slide',
++    title: '聚光讲解',
++    content: {
++      type: 'slide',
++      canvas: {
++        id: 'canvas-1',
++        viewportSize: 1000,
++        viewportRatio: 0.5625,
++        elements: [
++          {
++            id: elementId,
++            type: 'text',
++            content: '<p>先看这里</p>',
++            left: 120,
++            top: 120,
++            width: 320,
++            height: 80,
++            rotate: 0,
++          },
++          {
++            id: 'detail-target',
++            type: 'text',
++            content: '<p>再看这里</p>',
++            left: 520,
++            top: 120,
++            width: 320,
++            height: 80,
++            rotate: 0,
++          },
++        ],
++      },
++    },
++    actions,
++    createdAt: Date.UTC(2026, 0, 1),
++    updatedAt: Date.UTC(2026, 0, 1),
++  } as Scene;
++}
++
++describe('Mira formal slide spotlight sequence', () => {
++  it('accepts official focus sequences while allowing unfocused transition speech', () => {
++    expect(
++      hasMiraFormalSlideSpotlightSequence(
++        slide([
++          { id: 'speech-opening', type: 'speech', text: '我们先看整张图。' },
++          { id: 'spotlight-1', type: 'spotlight', elementId: 'focus-target' },
++          { id: 'spotlight-2', type: 'spotlight', elementId: 'detail-target' },
++          { id: 'speech-focused', type: 'speech', text: '这两个位置共同说明了重点。' },
++          { id: 'speech-closing', type: 'speech', text: '现在把它们连起来想一想。' },
++        ]),
++      ),
++    ).toBe(true);
++
++    expect(
++      hasMiraFormalSlideSpotlightSequence(
++        slide([
++          { id: 'speech-1', type: 'speech', text: '顺序错误。' },
++          { id: 'spotlight-1', type: 'spotlight', elementId: 'focus-target' },
++        ]),
++      ),
++    ).toBe(false);
++    expect(
++      hasMiraFormalSlideSpotlightSequence(
++        slide([
++          { id: 'spotlight-1', type: 'spotlight', elementId: 'missing-target' },
++          { id: 'speech-1', type: 'speech', text: '目标不存在。' },
++        ]),
++      ),
++    ).toBe(false);
++    expect(
++      hasMiraFormalSlideSpotlightSequence(
++        slide([
++          { id: 'spotlight-1', type: 'spotlight', elementId: 'focus-target' },
++          { id: 'speech-1', type: 'speech', text: '第一段。' },
++          { id: 'speech-2', type: 'speech', text: '第二段。' },
++        ]),
++      ),
++    ).toBe(true);
++    expect(
++      hasMiraFormalSlideSpotlightSequence(
++        slide(
++          Array.from({ length: 21 }, (_, index) => [
++            { id: `spotlight-${index}`, type: 'spotlight' as const, elementId: 'focus-target' },
++            { id: `speech-${index}`, type: 'speech' as const, text: `第 ${index + 1} 段。` },
++          ]).flat(),
++        ),
++      ),
++    ).toBe(false);
++  });
++});
+diff --git a/tests/server/mira-formal-provider-readiness.test.ts b/tests/server/mira-formal-provider-readiness.test.ts
+index 02f5858..002ce8f 100644
+--- a/tests/server/mira-formal-provider-readiness.test.ts
++++ b/tests/server/mira-formal-provider-readiness.test.ts
+@@ -74,7 +74,7 @@ const validationTts: MiraFormalTtsRequest = {
+   teacherProfileSha256: '4f5a986a765f69798c8546d7f9091fe297f2a98c5353fdd01cd1aa06884c98fb',
+   teacherGender: 'male',
+   sceneId: 'scene-math-00',
+-  sceneOrder: 0,
++  sceneOrder: 239,
+   actionId: 'action-math-00-speech',
+   narrationSegmentId: 'segment-math-00',
+   text: narration,
+@@ -147,7 +147,7 @@ describe('Mira formal Provider readiness runtime', () => {
+       ...requestBase,
+       validation: {
+         subject: 'math',
+-        sceneOrder: 0,
++        sceneOrder: validationTts.sceneOrder,
+         ttsRequestId: validationTts.requestId,
+         audioSha256,
+         machineReceiptSha256: '5'.repeat(64),
+@@ -309,6 +309,12 @@ describe('Mira formal Provider readiness runtime', () => {
+       expect(fetchMock).not.toHaveBeenCalled();
+     }
+ 
++    const outOfRange = request();
++    outOfRange.validation = { ...outOfRange.validation, sceneOrder: 240 };
++    await expect(
++      executeMiraFormalProviderReadiness(outOfRange, { fetchImpl: vi.fn() as never }),
++    ).rejects.toMatchObject({ code: 'invalid_request' });
++
+     const fetchMock = successfulFetch([]);
+     await executeMiraFormalProviderReadiness(request(), { fetchImpl: fetchMock as typeof fetch });
+     await expect(

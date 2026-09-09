@@ -1,0 +1,1128 @@
+From 370a3dae2fa6e11b9dfbe2e61502503ba899fa06 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 03/37] 0003-mira-kimi-structured-output
+
+---
+ app/api/health/route.ts                       |  10 +-
+ lib/server/classroom-generation.ts            |  73 +++++++-
+ lib/server/model-routes.ts                    | 123 +++++++++++++
+ lib/server/structured-output-guard.ts         | 143 +++++++++++++++
+ tests/ai/openai-provider.test.ts              |   2 +-
+ .../server/classroom-generation-retry.test.ts | 149 ++++++++++++++-
+ tests/server/health-route.test.ts             | 118 ++++++++++++
+ tests/server/model-routes.test.ts             |  91 ++++++++++
+ tests/server/structured-output-guard.test.ts  | 169 ++++++++++++++++++
+ 9 files changed, 862 insertions(+), 16 deletions(-)
+ create mode 100644 lib/server/structured-output-guard.ts
+ create mode 100644 tests/server/health-route.test.ts
+ create mode 100644 tests/server/structured-output-guard.test.ts
+
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index 57aa653..d996318 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -6,20 +6,23 @@ import {
+   getServerTTSProviders,
+ } from '@/lib/server/provider-config';
+ import { assertMiraTtsProviderReady, getMiraTtsPolicy } from '@/lib/server/mira-tts-policy';
++import { getMiraStructuredSceneRuntimePolicy } from '@/lib/server/model-routes';
+ 
+ const version = process.env.npm_package_version || '0.1.0';
+ 
+ export async function GET() {
+   const ttsProviders = getServerTTSProviders();
+   let ttsPolicy;
++  let structuredScenePolicy;
+   try {
+     ttsPolicy = getMiraTtsPolicy();
+     assertMiraTtsProviderReady(ttsPolicy, ttsProviders);
++    structuredScenePolicy = getMiraStructuredSceneRuntimePolicy();
+   } catch (error) {
+     return apiError(
+       'PROVIDER_DISABLED',
+       503,
+-      error instanceof Error ? error.message : 'Deterministic TTS policy is not ready',
++      error instanceof Error ? error.message : 'Deterministic runtime policy is not ready',
+     );
+   }
+   return apiSuccess({
+@@ -33,6 +36,9 @@ export async function GET() {
+       videoGeneration: Object.values(getServerVideoProviders()).some((info) => !info.disabled),
+       tts: Object.values(ttsProviders).some((info) => !info.disabled),
+     },
+-    runtimePolicy: { tts: ttsPolicy },
++    runtimePolicy: {
++      tts: ttsPolicy,
++      structuredScene: structuredScenePolicy,
++    },
+   });
+ }
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index f68f58c..a96f1f2 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -19,7 +19,7 @@ import { createLogger } from '@/lib/logger';
+ import { isProviderKeyRequired } from '@/lib/ai/providers';
+ import { resolveClassroomWebSearchConfig } from '@/lib/server/web-search-config';
+ import { resolveModel } from '@/lib/server/resolve-model';
+-import { getStageModel, type LlmStage } from '@/lib/server/model-routes';
++import { getStageModel, getStageRoute, type LlmStage } from '@/lib/server/model-routes';
+ import type { LanguageModel } from 'ai';
+ import type { ThinkingConfig } from '@/lib/types/provider';
+ import { resolveVocationalActive } from '@/lib/config/feature-flags';
+@@ -41,6 +41,13 @@ import {
+   getMiraTeacherVoiceConfig,
+   getMiraTtsPolicy,
+ } from '@/lib/server/mira-tts-policy';
++import {
++  captureStructuredOutputAttempt,
++  isStructuredOutputExhaustedAfterParseFailure,
++  STRUCTURED_OUTPUT_EXHAUSTED_CODE,
++  StructuredOutputExhaustedError,
++  type StructuredOutputAttemptMetadata,
++} from '@/lib/server/structured-output-guard';
+ 
+ const log = createLogger('Classroom');
+ 
+@@ -254,6 +261,7 @@ export async function generateClassroom(
+     LlmStage,
+     {
+       model: LanguageModel;
++      modelString: string;
+       outputWindow?: number;
+       thinking: ThinkingConfig | undefined;
+     }
+@@ -263,16 +271,20 @@ export async function generateClassroom(
+     stage: LlmStage,
+   ): Promise<{
+     model: LanguageModel;
++    modelString: string;
+     outputWindow?: number;
+     thinking: ThinkingConfig | undefined;
+   }> => {
+     const cached = stageModelCache.get(stage);
+     if (cached) return cached;
+ 
++    const stageRoute = getStageRoute(stage);
++
+     // No route configured → reuse the classroom model, no extra resolution.
+-    if (!getStageModel(stage)) {
++    if (!stageRoute) {
+       const fallback = {
+         model: languageModel,
++        modelString,
+         outputWindow: modelInfo?.outputWindow,
+         thinking: classroomThinking,
+       };
+@@ -284,6 +296,7 @@ export async function generateClassroom(
+       const resolved = await resolveModel({ stage });
+       const entry = {
+         model: resolved.model,
++        modelString: resolved.modelString,
+         outputWindow: resolved.modelInfo?.outputWindow,
+         thinking: resolved.thinkingConfig,
+       };
+@@ -291,13 +304,22 @@ export async function generateClassroom(
+       stageModelCache.set(stage, entry);
+       return entry;
+     } catch (err) {
++      if (stageRoute.enforced) {
++        log.error('Enforced structured scene model route could not be resolved', {
++          stage,
++          modelString: stageRoute.model,
++          policy: 'server-controlled',
++        });
++        throw err;
++      }
+       log.warn(
+-        `Stage "${stage}" route "${getStageModel(stage)}" could not be resolved; ` +
++        `Stage "${stage}" route "${stageRoute.model}" could not be resolved; ` +
+           `falling back to the generate-classroom model.`,
+         err,
+       );
+       const fallback = {
+         model: languageModel,
++        modelString,
+         outputWindow: modelInfo?.outputWindow,
+         thinking: classroomThinking,
+       };
+@@ -315,7 +337,14 @@ export async function generateClassroom(
+   // aiCall closure, and consumes the route's thinking config separately.
+   const resolveSceneContentCall = async (outlineType?: string) => {
+     const stage = (outlineType ? `scene-content:${outlineType}` : 'scene-content') as LlmStage;
+-    const { model, outputWindow, thinking } = await resolveStageModel(stage);
++    const {
++      model,
++      modelString: stageModelString,
++      outputWindow,
++      thinking,
++    } = await resolveStageModel(stage);
++    let lastAttemptMetadata: StructuredOutputAttemptMetadata | undefined;
++    let currentAttempt = 1;
+     const aiCall: AICallFn = async (systemPrompt, userPrompt, _images) => {
+       const result = await callLLM(
+         {
+@@ -331,9 +360,24 @@ export async function generateClassroom(
+         undefined,
+         thinking,
+       );
++      lastAttemptMetadata = captureStructuredOutputAttempt(result, {
++        attempt: currentAttempt,
++        stage,
++        modelString: stageModelString,
++        outputWindow,
++      });
+       return result.text;
+     };
+-    return { aiCall, model, thinking };
++    return {
++      aiCall,
++      model,
++      thinking,
++      beginAttempt: (attempt: number) => {
++        currentAttempt = attempt;
++        lastAttemptMetadata = undefined;
++      },
++      getLastAttemptMetadata: () => lastAttemptMetadata,
++    };
+   };
+ 
+   // agent-profiles routes via the `agent-profiles` stage (matches the browser
+@@ -602,8 +646,9 @@ export async function generateClassroom(
+     const content = await (async () => {
+       try {
+         return await withGenerationRetry(
+-          () =>
+-            generateSceneContent(safeOutline, contentCall.aiCall, {
++          async (attempt) => {
++            contentCall.beginAttempt(attempt);
++            const result = await generateSceneContent(safeOutline, contentCall.aiCall, {
+               agents,
+               languageDirective,
+               allowProceduralSkill: vocationalActive,
+@@ -619,7 +664,19 @@ export async function generateClassroom(
+                       ),
+                   }
+                 : {}),
+-            }),
++            });
++            if (result !== null) return result;
++
++            const metadata = contentCall.getLastAttemptMetadata();
++            if (!isStructuredOutputExhaustedAfterParseFailure(metadata)) return result;
++
++            const error = new StructuredOutputExhaustedError(metadata);
++            log.warn(STRUCTURED_OUTPUT_EXHAUSTED_CODE, {
++              ...error.diagnostic,
++              sceneIndex: index + 1,
++            });
++            throw error;
++          },
+           {
+             label: `scene ${index + 1}/${outlines.length} content`,
+             shouldRetryResult: (result) => result === null,
+diff --git a/lib/server/model-routes.ts b/lib/server/model-routes.ts
+index ebfdf76..1596c9d 100644
+--- a/lib/server/model-routes.ts
++++ b/lib/server/model-routes.ts
+@@ -69,6 +69,127 @@ export interface StageRoute {
+    * Passed through to callLLM, which normalizes it against the model's capability.
+    */
+   thinking?: ThinkingConfig;
++  /**
++   * Server-owned policy routes fail closed instead of degrading to the
++   * generate-classroom model when their provider cannot be resolved.
++   */
++  enforced?: true;
++}
++
++export const MIRA_STRUCTURED_SCENE_POLICY_ENV = 'MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY';
++export const MIRA_STRUCTURED_SCENE_POLICY_ID = 'kimi-k2.6-thinking-disabled-v1';
++
++const MIRA_STRUCTURED_SCENE_PROVIDER_ID = 'kimi';
++const MIRA_STRUCTURED_SCENE_MODEL_ID = 'kimi-k2.6';
++const MIRA_STRUCTURED_SCENE_MODEL = `${MIRA_STRUCTURED_SCENE_PROVIDER_ID}:${MIRA_STRUCTURED_SCENE_MODEL_ID}`;
++export const MIRA_STRUCTURED_SCENE_STAGES = [
++  'scene-content',
++  'scene-content:slide',
++  'scene-content:quiz',
++  'scene-content:interactive',
++  'scene-content:pbl',
++] as const;
++const MIRA_STRUCTURED_SCENE_STAGE_SET = new Set<string>(MIRA_STRUCTURED_SCENE_STAGES);
++
++export interface MiraStructuredSceneRuntimePolicy {
++  enforced: true;
++  policyId: typeof MIRA_STRUCTURED_SCENE_POLICY_ID;
++  providerId: typeof MIRA_STRUCTURED_SCENE_PROVIDER_ID;
++  modelId: typeof MIRA_STRUCTURED_SCENE_MODEL_ID;
++  stages: readonly (typeof MIRA_STRUCTURED_SCENE_STAGES)[number][];
++  thinking: {
++    mode: 'disabled';
++    enabled: false;
++  };
++}
++
++function getMiraStructuredSceneRoute(stage: string): StageRoute | undefined {
++  const policy = process.env[MIRA_STRUCTURED_SCENE_POLICY_ENV]?.trim();
++  if (!policy) return undefined;
++  if (policy !== MIRA_STRUCTURED_SCENE_POLICY_ID) {
++    throw new Error(
++      `Unsupported ${MIRA_STRUCTURED_SCENE_POLICY_ENV}; expected ${MIRA_STRUCTURED_SCENE_POLICY_ID}.`,
++    );
++  }
++  if (!MIRA_STRUCTURED_SCENE_STAGE_SET.has(stage)) return undefined;
++
++  return {
++    model: MIRA_STRUCTURED_SCENE_MODEL,
++    thinking: { mode: 'disabled', enabled: false },
++    enforced: true,
++  };
++}
++
++type StageRouteResolver = (stage: string) => StageRoute | undefined;
++
++/**
++ * Validate every protected stage through the same route resolver used by
++ * generation. This keeps health readiness tied to the effective server-owned
++ * policy instead of a separately hard-coded success response.
++ */
++export function validateMiraStructuredSceneRoutes(
++  resolveRoute: StageRouteResolver,
++): MiraStructuredSceneRuntimePolicy {
++  let resolvedProviderId: string | undefined;
++  let resolvedModelId: string | undefined;
++
++  for (const stage of MIRA_STRUCTURED_SCENE_STAGES) {
++    const route = resolveRoute(stage);
++    if (!route || !route.thinking) {
++      throw new Error(`Structured scene route mismatch for ${stage}.`);
++    }
++    const routeKeys = Object.keys(route).sort();
++    const thinkingKeys = Object.keys(route.thinking).sort();
++    if (
++      route.enforced !== true ||
++      route.model !== MIRA_STRUCTURED_SCENE_MODEL ||
++      route.thinking.mode !== 'disabled' ||
++      route.thinking.enabled !== false ||
++      routeKeys.join(',') !== 'enforced,model,thinking' ||
++      thinkingKeys.join(',') !== 'enabled,mode'
++    ) {
++      throw new Error(`Structured scene route mismatch for ${stage}.`);
++    }
++
++    const separator = route.model.indexOf(':');
++    const providerId = separator > 0 ? route.model.slice(0, separator) : '';
++    const modelId = separator > 0 ? route.model.slice(separator + 1) : '';
++    if (
++      providerId !== MIRA_STRUCTURED_SCENE_PROVIDER_ID ||
++      modelId !== MIRA_STRUCTURED_SCENE_MODEL_ID
++    ) {
++      throw new Error(`Structured scene model mismatch for ${stage}.`);
++    }
++
++    resolvedProviderId ??= providerId;
++    resolvedModelId ??= modelId;
++    if (resolvedProviderId !== providerId || resolvedModelId !== modelId) {
++      throw new Error(`Structured scene routes do not share one model at ${stage}.`);
++    }
++  }
++
++  return {
++    enforced: true,
++    policyId: MIRA_STRUCTURED_SCENE_POLICY_ID,
++    providerId: resolvedProviderId as typeof MIRA_STRUCTURED_SCENE_PROVIDER_ID,
++    modelId: resolvedModelId as typeof MIRA_STRUCTURED_SCENE_MODEL_ID,
++    stages: [...MIRA_STRUCTURED_SCENE_STAGES],
++    thinking: { mode: 'disabled', enabled: false },
++  };
++}
++
++/** Resolve and validate the credential-free structured-scene health contract. */
++export function getMiraStructuredSceneRuntimePolicy(): MiraStructuredSceneRuntimePolicy {
++  const policy = process.env[MIRA_STRUCTURED_SCENE_POLICY_ENV]?.trim();
++  if (!policy) {
++    throw new Error(`${MIRA_STRUCTURED_SCENE_POLICY_ENV} is required.`);
++  }
++  if (policy !== MIRA_STRUCTURED_SCENE_POLICY_ID) {
++    throw new Error(
++      `Unsupported ${MIRA_STRUCTURED_SCENE_POLICY_ENV}; expected ${MIRA_STRUCTURED_SCENE_POLICY_ID}.`,
++    );
++  }
++  return validateMiraStructuredSceneRoutes(getStageRoute);
+ }
+ 
+ /** Validate/sanitize a route's `thinking` object into a ThinkingConfig (drops bad fields with a warn). */
+@@ -252,6 +373,8 @@ function loadRoutes(): Record<string, StageRoute> {
+  */
+ export function getStageRoute(stage?: string): StageRoute | undefined {
+   if (!stage) return undefined;
++  const miraRoute = getMiraStructuredSceneRoute(stage);
++  if (miraRoute) return miraRoute;
+   const routes = loadRoutes();
+   let key: string | undefined = stage;
+   while (key) {
+diff --git a/lib/server/structured-output-guard.ts b/lib/server/structured-output-guard.ts
+new file mode 100644
+index 0000000..e749990
+--- /dev/null
++++ b/lib/server/structured-output-guard.ts
+@@ -0,0 +1,143 @@
++export const STRUCTURED_OUTPUT_EXHAUSTED_CODE = 'structured_output_exhausted' as const;
++
++const NEAR_EMPTY_TEXT_TOKEN_LIMIT = 8;
++const NEAR_EMPTY_TEXT_CHARACTER_LIMIT = 32;
++
++interface UsageLike {
++  outputTokens?: number;
++  outputTokenDetails?: {
++    textTokens?: number;
++    reasoningTokens?: number;
++  };
++}
++
++export interface StructuredOutputResultLike {
++  text: string;
++  finishReason?: string;
++  rawFinishReason?: string;
++  usage?: UsageLike;
++  totalUsage?: UsageLike;
++}
++
++export interface StructuredOutputAttemptMetadata {
++  attempt: number;
++  stage: string;
++  modelString: string;
++  outputWindow?: number;
++  finishReason?: string;
++  rawFinishReason?: string;
++  outputTokens?: number;
++  reasoningTokens?: number;
++  textTokens?: number;
++  textLength: number;
++  reachedOutputWindow: boolean;
++  nearEmpty: boolean;
++}
++
++export interface StructuredOutputExhaustedDiagnostic extends StructuredOutputAttemptMetadata {
++  code: typeof STRUCTURED_OUTPUT_EXHAUSTED_CODE;
++  failureKind: 'parse_failed';
++}
++
++function finiteNonNegative(value: unknown): number | undefined {
++  return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : undefined;
++}
++
++function normalizeFinishReason(value: unknown): string | undefined {
++  if (typeof value !== 'string') return undefined;
++  switch (value.trim().toLowerCase()) {
++    case 'length':
++    case 'max_tokens':
++    case 'max_output_tokens':
++      return 'length';
++    case 'stop':
++    case 'content-filter':
++    case 'tool-calls':
++    case 'error':
++    case 'other':
++    case 'unknown':
++      return value.trim().toLowerCase();
++    default:
++      return 'other';
++  }
++}
++
++/**
++ * Reduce an LLM result to metadata that is safe to retain or log. The generated
++ * text, prompts, reasoning content, response body, headers and credentials are
++ * intentionally excluded.
++ */
++export function captureStructuredOutputAttempt(
++  result: StructuredOutputResultLike,
++  context: { attempt: number; stage: string; modelString: string; outputWindow?: number },
++): StructuredOutputAttemptMetadata {
++  // finishReason describes the last model step, so prefer the last-step usage
++  // as well. Scene generation is single-step today; totalUsage is a safe
++  // fallback for adapters that omit the per-step field.
++  const usage = result.usage ?? result.totalUsage;
++  const outputTokens = finiteNonNegative(usage?.outputTokens);
++  const reasoningTokens = finiteNonNegative(usage?.outputTokenDetails?.reasoningTokens);
++  const reportedTextTokens = finiteNonNegative(usage?.outputTokenDetails?.textTokens);
++  const textTokens =
++    reportedTextTokens ??
++    (outputTokens !== undefined && reasoningTokens !== undefined
++      ? Math.max(0, outputTokens - reasoningTokens)
++      : undefined);
++  const outputWindow = finiteNonNegative(context.outputWindow);
++  const textLength = result.text.length;
++
++  return Object.freeze({
++    attempt: Math.max(1, Math.floor(context.attempt)),
++    stage: context.stage,
++    modelString: context.modelString,
++    outputWindow,
++    finishReason: normalizeFinishReason(result.finishReason),
++    rawFinishReason: normalizeFinishReason(result.rawFinishReason),
++    outputTokens,
++    reasoningTokens,
++    textTokens,
++    textLength,
++    reachedOutputWindow:
++      outputWindow !== undefined && outputTokens !== undefined && outputTokens >= outputWindow,
++    nearEmpty:
++      (textTokens !== undefined && textTokens <= NEAR_EMPTY_TEXT_TOKEN_LIMIT) ||
++      textLength <= NEAR_EMPTY_TEXT_CHARACTER_LIMIT,
++  });
++}
++
++/**
++ * Classify a failed structured parse as deterministic exhaustion only when the
++ * provider says it ended for length, or its measured output reached the model
++ * window. Near-empty output is also retained as an explicit signal, but a
++ * successfully parsed result is never rejected merely for reaching the limit.
++ */
++export function isStructuredOutputExhaustedAfterParseFailure(
++  metadata: StructuredOutputAttemptMetadata | undefined,
++): metadata is StructuredOutputAttemptMetadata {
++  if (!metadata) return false;
++
++  const providerReportedLength =
++    metadata.finishReason === 'length' || metadata.rawFinishReason === 'length';
++
++  // The caller invokes this only after the structured parser returned null.
++  // `nearEmpty` remains an explicit diagnostic for the observed Kimi starvation
++  // signature, but a longer truncated JSON result is equally deterministic
++  // when the provider reports length or reaches the configured hard window.
++  return metadata.reachedOutputWindow || providerReportedLength;
++}
++
++export class StructuredOutputExhaustedError extends Error {
++  readonly code = STRUCTURED_OUTPUT_EXHAUSTED_CODE;
++  readonly isRetryable = false;
++  readonly diagnostic: StructuredOutputExhaustedDiagnostic;
++
++  constructor(metadata: StructuredOutputAttemptMetadata) {
++    super(STRUCTURED_OUTPUT_EXHAUSTED_CODE);
++    this.name = 'StructuredOutputExhaustedError';
++    this.diagnostic = Object.freeze({
++      code: STRUCTURED_OUTPUT_EXHAUSTED_CODE,
++      failureKind: 'parse_failed',
++      ...metadata,
++    });
++  }
++}
+diff --git a/tests/ai/openai-provider.test.ts b/tests/ai/openai-provider.test.ts
+index 3c8902a..b495917 100644
+--- a/tests/ai/openai-provider.test.ts
++++ b/tests/ai/openai-provider.test.ts
+@@ -568,7 +568,7 @@ describe('OpenAI provider defaults', () => {
+     ['grok', 'grok-4.6', { mode: 'enabled', effort: 'xhigh' }, { reasoning_effort: 'xhigh' }],
+     ['grok', 'grok-4.5', { mode: 'enabled', effort: 'medium' }, { reasoning_effort: 'medium' }],
+     ['grok', 'grok-4.3', { mode: 'disabled', effort: 'none' }, { reasoning_effort: 'none' }],
+-    ['kimi', 'kimi-k2.6', { mode: 'disabled' }, { thinking: { type: 'disabled' } }],
++    ['kimi', 'kimi-k2.6', { mode: 'disabled', enabled: false }, { thinking: { type: 'disabled' } }],
+     ['glm', 'glm-5.1', { mode: 'enabled' }, { thinking: { type: 'enabled' } }],
+     [
+       'glm',
+diff --git a/tests/server/classroom-generation-retry.test.ts b/tests/server/classroom-generation-retry.test.ts
+index 1c399d1..d7bf5a8 100644
+--- a/tests/server/classroom-generation-retry.test.ts
++++ b/tests/server/classroom-generation-retry.test.ts
+@@ -1,4 +1,4 @@
+-import { beforeEach, describe, expect, it, vi } from 'vitest';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ 
+ const mocks = vi.hoisted(() => ({
+   resolveModel: vi.fn(),
+@@ -10,6 +10,10 @@ const mocks = vi.hoisted(() => ({
+   createSceneWithActions: vi.fn(),
+   persistClassroom: vi.fn(),
+   callLLM: vi.fn(),
++  logInfo: vi.fn(),
++  logWarn: vi.fn(),
++  logError: vi.fn(),
++  logDebug: vi.fn(),
+ }));
+ const PBLGenerationErrorMock = vi.hoisted(
+   () =>
+@@ -58,10 +62,10 @@ vi.mock('@/lib/server/classroom-storage', () => ({
+ 
+ vi.mock('@/lib/logger', () => ({
+   createLogger: () => ({
+-    info: vi.fn(),
+-    warn: vi.fn(),
+-    error: vi.fn(),
+-    debug: vi.fn(),
++    info: mocks.logInfo,
++    warn: mocks.logWarn,
++    error: mocks.logError,
++    debug: mocks.logDebug,
+   }),
+ }));
+ 
+@@ -96,6 +100,7 @@ async function generateWithProgress() {
+ 
+ describe('classroom scene generation retries', () => {
+   beforeEach(() => {
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
+     for (const mock of Object.values(mocks)) {
+       mock.mockReset();
+     }
+@@ -143,6 +148,10 @@ describe('classroom scene generation retries', () => {
+     }));
+   });
+ 
++  afterEach(() => {
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++  });
++
+   it('retries an empty scene content result before skipping the scene', async () => {
+     mocks.generateSceneContent.mockResolvedValueOnce(null).mockResolvedValueOnce(slideContent);
+ 
+@@ -180,6 +189,136 @@ describe('classroom scene generation retries', () => {
+     );
+   });
+ 
++  it('uses the server-controlled Kimi thinking policy only for structured scene content', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    const defaultResolved = {
++      model: { id: 'default-language-model' },
++      modelInfo: { outputWindow: 8192 },
++      modelString: 'kimi:kimi-k2.6',
++      providerId: 'kimi',
++      apiKey: 'server-owned',
++    };
++    mocks.resolveModel.mockImplementation(async ({ stage }: { stage?: string }) =>
++      stage === 'scene-content:slide'
++        ? {
++            ...defaultResolved,
++            model: { id: 'structured-scene-model' },
++            thinkingConfig: { mode: 'disabled', enabled: false },
++          }
++        : defaultResolved,
++    );
++    mocks.generateSceneContent.mockImplementation(async (_sceneOutline, aiCall) => {
++      await aiCall('private system prompt', 'private user prompt');
++      return slideContent;
++    });
++
++    await generateWithProgress();
++
++    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'scene-content:slide' });
++    expect(mocks.callLLM).toHaveBeenCalledWith(
++      expect.objectContaining({
++        model: { id: 'structured-scene-model' },
++        maxOutputTokens: 8192,
++        maxRetries: 0,
++      }),
++      'generate-classroom-scene',
++      undefined,
++      { mode: 'disabled', enabled: false },
++    );
++  });
++
++  it('fails once with structured_output_exhausted after parse-null at the output window', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    const defaultResolved = {
++      model: { id: 'kimi-k2.6' },
++      modelInfo: { outputWindow: 8192 },
++      modelString: 'kimi:kimi-k2.6',
++      providerId: 'kimi',
++      apiKey: 'server-owned',
++      thinkingConfig: { mode: 'disabled', enabled: false },
++    };
++    mocks.resolveModel.mockResolvedValue(defaultResolved);
++    mocks.callLLM.mockResolvedValue({
++      text: 'PRIVATE_MODEL_RESPONSE',
++      finishReason: 'length',
++      rawFinishReason: 'length',
++      usage: {
++        outputTokens: 8192,
++        outputTokenDetails: { textTokens: 1, reasoningTokens: 8191 },
++      },
++    });
++    mocks.generateSceneContent.mockImplementation(async (_sceneOutline, aiCall) => {
++      await aiCall('PRIVATE_SYSTEM_PROMPT', 'PRIVATE_USER_PROMPT');
++      return null;
++    });
++
++    await expect(generateWithProgress()).rejects.toMatchObject({
++      code: 'structured_output_exhausted',
++      isRetryable: false,
++      diagnostic: {
++        attempt: 1,
++        stage: 'scene-content:slide',
++        modelString: 'kimi:kimi-k2.6',
++        outputWindow: 8192,
++        outputTokens: 8192,
++        reasoningTokens: 8191,
++        textTokens: 1,
++        reachedOutputWindow: true,
++        nearEmpty: true,
++      },
++    });
++    expect(mocks.generateSceneContent).toHaveBeenCalledTimes(1);
++    expect(mocks.callLLM).toHaveBeenCalledTimes(1);
++    expect(mocks.logWarn).toHaveBeenCalledWith(
++      'structured_output_exhausted',
++      expect.objectContaining({
++        sceneIndex: 1,
++        attempt: 1,
++        outputTokens: 8192,
++        reasoningTokens: 8191,
++        textTokens: 1,
++      }),
++    );
++    const progressText = JSON.stringify(mocks.logWarn.mock.calls.concat(mocks.logError.mock.calls));
++    expect(progressText).not.toContain('PRIVATE_MODEL_RESPONSE');
++    expect(progressText).not.toContain('PRIVATE_SYSTEM_PROMPT');
++    expect(progressText).not.toContain('PRIVATE_USER_PROMPT');
++    expect(progressText).not.toContain('server-owned');
++    expect(progressText).not.toContain('Retrying scene');
++  });
++
++  it('does not reject a successfully parsed scene merely because the call reached length', async () => {
++    mocks.resolveModel.mockResolvedValue({
++      model: { id: 'kimi-k2.6' },
++      modelInfo: { outputWindow: 8192 },
++      modelString: 'kimi:kimi-k2.6',
++      providerId: 'kimi',
++      apiKey: 'server-owned',
++    });
++    mocks.callLLM.mockResolvedValue({
++      text: '{"elements":[]}',
++      finishReason: 'length',
++      usage: {
++        outputTokens: 8192,
++        outputTokenDetails: { textTokens: 190, reasoningTokens: 8002 },
++      },
++    });
++    mocks.generateSceneContent.mockImplementation(async (_sceneOutline, aiCall) => {
++      await aiCall('system', 'user');
++      return slideContent;
++    });
++
++    const { result } = await generateWithProgress();
++
++    expect(result.scenesCount).toBe(1);
++    expect(mocks.generateSceneContent).toHaveBeenCalledTimes(1);
++    expect(mocks.callLLM).toHaveBeenCalledTimes(1);
++    expect(mocks.logWarn).not.toHaveBeenCalledWith(
++      'structured_output_exhausted',
++      expect.anything(),
++    );
++  });
++
+   it('retries retryable action generation errors', async () => {
+     mocks.generateSceneContent.mockResolvedValue(slideContent);
+     mocks.generateSceneActions
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+new file mode 100644
+index 0000000..a8db0c6
+--- /dev/null
++++ b/tests/server/health-route.test.ts
+@@ -0,0 +1,118 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerWebSearchProviders: () => ({}),
++  getServerImageProviders: () => ({}),
++  getServerVideoProviders: () => ({}),
++  getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
++}));
++
++describe('GET /api/health structured scene runtime policy', () => {
++  beforeEach(() => {
++    vi.resetModules();
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS = '1';
++    process.env.MIRA_OPENMAIC_QWEN_TTS_MODEL = 'qwen3-tts-flash';
++    process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE = 'Serena';
++    delete process.env.MODEL_ROUTES;
++    delete process.env.KIMI_API_KEY;
++    delete process.env.KIMI_BASE_URL;
++  });
++
++  afterEach(() => {
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS;
++    delete process.env.MIRA_OPENMAIC_QWEN_TTS_MODEL;
++    delete process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE;
++    delete process.env.MODEL_ROUTES;
++    delete process.env.KIMI_API_KEY;
++    delete process.env.KIMI_BASE_URL;
++  });
++
++  it('returns the exact policy resolved from the effective server-owned routes', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    process.env.MODEL_ROUTES = JSON.stringify({ 'scene-content': 'attacker:model' });
++    process.env.KIMI_API_KEY = 'fake-secret-must-not-leak';
++    process.env.KIMI_BASE_URL = 'https://fake-base-url-must-not-leak.invalid/v1';
++
++    const { GET } = await import('@/app/api/health/route');
++    const response = await GET();
++    const body = await response.json();
++
++    expect(response.status).toBe(200);
++    expect(body.capabilities.tts).toBe(true);
++    expect(body.runtimePolicy.tts).toEqual({
++      enforced: true,
++      providerId: 'qwen-tts',
++      modelId: 'qwen3-tts-flash',
++      voiceId: 'Serena',
++    });
++    expect(body.runtimePolicy.structuredScene).toEqual({
++      enforced: true,
++      policyId: 'kimi-k2.6-thinking-disabled-v1',
++      providerId: 'kimi',
++      modelId: 'kimi-k2.6',
++      stages: [
++        'scene-content',
++        'scene-content:slide',
++        'scene-content:quiz',
++        'scene-content:interactive',
++        'scene-content:pbl',
++      ],
++      thinking: { mode: 'disabled', enabled: false },
++    });
++    const serialized = JSON.stringify(body);
++    expect(serialized).not.toContain('fake-secret-must-not-leak');
++    expect(serialized).not.toContain('fake-base-url-must-not-leak');
++    expect(serialized).not.toContain('apiKey');
++    expect(serialized).not.toContain('baseUrl');
++  });
++
++  it('returns 503 when the fixed policy env is missing', async () => {
++    const { GET } = await import('@/app/api/health/route');
++    const response = await GET();
++    const body = await response.json();
++
++    expect(response.status).toBe(503);
++    expect(body).toMatchObject({
++      success: false,
++      errorCode: 'PROVIDER_DISABLED',
++      error: 'MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY is required.',
++    });
++    expect(body.runtimePolicy).toBeUndefined();
++  });
++
++  it('returns 503 without echoing a caller-controlled policy id', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'hostile-policy-secret';
++
++    const { GET } = await import('@/app/api/health/route');
++    const response = await GET();
++    const body = await response.json();
++
++    expect(response.status).toBe(503);
++    expect(body.error).toContain('expected kimi-k2.6-thinking-disabled-v1');
++    expect(JSON.stringify(body)).not.toContain('hostile-policy-secret');
++  });
++
++  it('returns 503 when effective route validation reports a mismatch', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    vi.doMock('@/lib/server/model-routes', () => ({
++      getMiraStructuredSceneRuntimePolicy: () => {
++        throw new Error('Structured scene route mismatch for scene-content:quiz.');
++      },
++    }));
++
++    const { GET } = await import('@/app/api/health/route');
++    vi.doUnmock('@/lib/server/model-routes');
++    const response = await GET();
++    const body = await response.json();
++
++    expect(response.status).toBe(503);
++    expect(body).toMatchObject({
++      success: false,
++      errorCode: 'PROVIDER_DISABLED',
++      error: 'Structured scene route mismatch for scene-content:quiz.',
++    });
++    expect(body.runtimePolicy).toBeUndefined();
++  });
++});
+diff --git a/tests/server/model-routes.test.ts b/tests/server/model-routes.test.ts
+index b5d03f3..6b0639c 100644
+--- a/tests/server/model-routes.test.ts
++++ b/tests/server/model-routes.test.ts
+@@ -8,11 +8,102 @@ describe('model-routes', () => {
+   beforeEach(() => {
+     vi.resetModules();
+     delete process.env.MODEL_ROUTES;
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
+     vi.restoreAllMocks();
+   });
+ 
+   afterEach(() => {
+     delete process.env.MODEL_ROUTES;
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++  });
++
++  it('enforces the server-owned Kimi route only for structured scene-content stages', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    process.env.MODEL_ROUTES = JSON.stringify({
++      'scene-content': { model: 'attacker:model', thinking: { mode: 'enabled' } },
++    });
++
++    const { getStageRoute } = await import('@/lib/server/model-routes');
++    const expected = {
++      model: 'kimi:kimi-k2.6',
++      thinking: { mode: 'disabled', enabled: false },
++      enforced: true,
++    };
++
++    expect(getStageRoute('scene-content')).toEqual(expected);
++    expect(getStageRoute('scene-content:slide')).toEqual(expected);
++    expect(getStageRoute('scene-content:quiz')).toEqual(expected);
++    expect(getStageRoute('scene-content:interactive')).toEqual(expected);
++    expect(getStageRoute('scene-content:pbl')).toEqual(expected);
++    expect(getStageRoute('scene-actions')).toBeUndefined();
++    expect(getStageRoute('agent-profiles')).toBeUndefined();
++    expect(getStageRoute('chat-adapter')).toBeUndefined();
++  });
++
++  it('derives the exact credential-free runtime policy from every effective stage route', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    process.env.MODEL_ROUTES = JSON.stringify({
++      'scene-content': { model: 'attacker:model', thinking: { enabled: true } },
++    });
++
++    const { getMiraStructuredSceneRuntimePolicy } = await import('@/lib/server/model-routes');
++
++    expect(getMiraStructuredSceneRuntimePolicy()).toEqual({
++      enforced: true,
++      policyId: 'kimi-k2.6-thinking-disabled-v1',
++      providerId: 'kimi',
++      modelId: 'kimi-k2.6',
++      stages: [
++        'scene-content',
++        'scene-content:slide',
++        'scene-content:quiz',
++        'scene-content:interactive',
++        'scene-content:pbl',
++      ],
++      thinking: { mode: 'disabled', enabled: false },
++    });
++  });
++
++  it('fails runtime policy readiness when the server-owned policy env is missing', async () => {
++    const { getMiraStructuredSceneRuntimePolicy } = await import('@/lib/server/model-routes');
++
++    expect(() => getMiraStructuredSceneRuntimePolicy()).toThrow(
++      'MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY is required.',
++    );
++  });
++
++  it('rejects a mismatch in any effective structured scene route', async () => {
++    const { validateMiraStructuredSceneRoutes } = await import('@/lib/server/model-routes');
++    const exactRoute = {
++      model: 'kimi:kimi-k2.6',
++      thinking: { mode: 'disabled' as const, enabled: false },
++      enforced: true as const,
++    };
++
++    expect(() =>
++      validateMiraStructuredSceneRoutes((stage) =>
++        stage === 'scene-content:quiz'
++          ? { ...exactRoute, model: 'kimi:kimi-k2.5' }
++          : { ...exactRoute },
++      ),
++    ).toThrow('Structured scene route mismatch for scene-content:quiz.');
++
++    expect(() =>
++      validateMiraStructuredSceneRoutes((stage) =>
++        stage === 'scene-content:interactive'
++          ? { ...exactRoute, thinking: { mode: 'enabled', enabled: true } }
++          : { ...exactRoute },
++      ),
++    ).toThrow('Structured scene route mismatch for scene-content:interactive.');
++  });
++
++  it('fails closed for an unsupported server-owned structured scene policy', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'caller-controlled-policy';
++    const { getStageRoute } = await import('@/lib/server/model-routes');
++
++    expect(() => getStageRoute('scene-content:slide')).toThrow(
++      /Unsupported MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY/,
++    );
+   });
+ 
+   it('returns undefined for any stage when MODEL_ROUTES is unset', async () => {
+diff --git a/tests/server/structured-output-guard.test.ts b/tests/server/structured-output-guard.test.ts
+new file mode 100644
+index 0000000..c8b9d7e
+--- /dev/null
++++ b/tests/server/structured-output-guard.test.ts
+@@ -0,0 +1,169 @@
++import { describe, expect, it, vi } from 'vitest';
++import { withGenerationRetry } from '@openmaic/generation';
++import {
++  captureStructuredOutputAttempt,
++  isStructuredOutputExhaustedAfterParseFailure,
++  STRUCTURED_OUTPUT_EXHAUSTED_CODE,
++  StructuredOutputExhaustedError,
++} from '@/lib/server/structured-output-guard';
++
++describe('structured output exhaustion guard', () => {
++  it('captures only safe metadata for the observed Kimi reasoning starvation shape', () => {
++    const metadata = captureStructuredOutputAttempt(
++      {
++        text: 'PRIVATE_RESPONSE',
++        finishReason: 'length',
++        rawFinishReason: 'length',
++        totalUsage: {
++          outputTokens: 8192,
++          outputTokenDetails: { reasoningTokens: 8191 },
++        },
++      },
++      {
++        attempt: 1,
++        stage: 'scene-content:slide',
++        modelString: 'kimi:kimi-k2.6',
++        outputWindow: 8192,
++      },
++    );
++
++    expect(metadata).toEqual({
++      attempt: 1,
++      stage: 'scene-content:slide',
++      modelString: 'kimi:kimi-k2.6',
++      outputWindow: 8192,
++      finishReason: 'length',
++      rawFinishReason: 'length',
++      outputTokens: 8192,
++      reasoningTokens: 8191,
++      textTokens: 1,
++      textLength: 16,
++      reachedOutputWindow: true,
++      nearEmpty: true,
++    });
++    expect(JSON.stringify(metadata)).not.toContain('PRIVATE_RESPONSE');
++  });
++
++  it('classifies a long truncated parse at the hard window as non-retryable exhaustion', () => {
++    const metadata = captureStructuredOutputAttempt(
++      {
++        text: 'x'.repeat(2000),
++        finishReason: 'unknown',
++        totalUsage: {
++          outputTokens: 8192,
++          outputTokenDetails: { textTokens: 190, reasoningTokens: 8002 },
++        },
++      },
++      {
++        attempt: 2,
++        stage: 'scene-content:slide',
++        modelString: 'kimi:kimi-k2.6',
++        outputWindow: 8192,
++      },
++    );
++
++    expect(metadata.nearEmpty).toBe(false);
++    expect(isStructuredOutputExhaustedAfterParseFailure(metadata)).toBe(true);
++
++    const error = new StructuredOutputExhaustedError(metadata);
++    expect(error).toMatchObject({
++      name: 'StructuredOutputExhaustedError',
++      message: STRUCTURED_OUTPUT_EXHAUSTED_CODE,
++      code: STRUCTURED_OUTPUT_EXHAUSTED_CODE,
++      isRetryable: false,
++    });
++    expect(error.diagnostic.failureKind).toBe('parse_failed');
++    expect(JSON.stringify(error.diagnostic)).not.toContain('x'.repeat(32));
++  });
++
++  it('uses provider length as a deterministic signal when token usage is unavailable', () => {
++    const metadata = captureStructuredOutputAttempt(
++      { text: '{"elements":', finishReason: 'length' },
++      {
++        attempt: 1,
++        stage: 'scene-content:quiz',
++        modelString: 'kimi:kimi-k2.6',
++      },
++    );
++
++    expect(metadata.reachedOutputWindow).toBe(false);
++    expect(isStructuredOutputExhaustedAfterParseFailure(metadata)).toBe(true);
++  });
++
++  it('does not classify an under-window stop result as output exhaustion', () => {
++    const metadata = captureStructuredOutputAttempt(
++      {
++        text: 'not-json',
++        finishReason: 'stop',
++        totalUsage: {
++          outputTokens: 40,
++          outputTokenDetails: { textTokens: 40, reasoningTokens: 0 },
++        },
++      },
++      {
++        attempt: 1,
++        stage: 'scene-content:interactive',
++        modelString: 'kimi:kimi-k2.6',
++        outputWindow: 8192,
++      },
++    );
++
++    expect(isStructuredOutputExhaustedAfterParseFailure(metadata)).toBe(false);
++  });
++
++  it('stops the generic retry loop immediately for the stable exhaustion error', async () => {
++    const metadata = captureStructuredOutputAttempt(
++      {
++        text: '{',
++        finishReason: 'length',
++        usage: {
++          outputTokens: 8192,
++          outputTokenDetails: { textTokens: 1, reasoningTokens: 8191 },
++        },
++      },
++      {
++        attempt: 1,
++        stage: 'scene-content:slide',
++        modelString: 'kimi:kimi-k2.6',
++        outputWindow: 8192,
++      },
++    );
++    const error = new StructuredOutputExhaustedError(metadata);
++    const operation = vi.fn(async () => {
++      throw error;
++    });
++    const onRetry = vi.fn();
++
++    await expect(
++      withGenerationRetry(operation, {
++        label: 'structured scene',
++        onRetry,
++        sleep: async () => undefined,
++      }),
++    ).rejects.toMatchObject({
++      code: STRUCTURED_OUTPUT_EXHAUSTED_CODE,
++      isRetryable: false,
++    });
++    expect(operation).toHaveBeenCalledTimes(1);
++    expect(onRetry).not.toHaveBeenCalled();
++  });
++
++  it('keeps retrying a transient provider failure', async () => {
++    const operation = vi
++      .fn<() => Promise<string>>()
++      .mockRejectedValueOnce(Object.assign(new Error('rate limited'), { statusCode: 429 }))
++      .mockResolvedValueOnce('ok');
++    const onRetry = vi.fn();
++
++    await expect(
++      withGenerationRetry(operation, {
++        label: 'structured scene',
++        maxRetries: 1,
++        onRetry,
++        sleep: async () => undefined,
++      }),
++    ).resolves.toBe('ok');
++    expect(operation).toHaveBeenCalledTimes(2);
++    expect(onRetry).toHaveBeenCalledTimes(1);
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

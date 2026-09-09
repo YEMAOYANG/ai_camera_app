@@ -1,0 +1,2770 @@
+From 26d14e9ecc71c00058b8f50dcaa2c398fdb90734 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 07/37] 0007-mira-sample-deterministic-recovery
+
+---
+ .../[jobId]/deterministic-recovery/route.ts   | 220 +++++
+ app/api/generate-classroom/[jobId]/route.ts   |   1 +
+ app/api/health/route.ts                       |   4 +
+ lib/server/classroom-media-generation.ts      |  16 +-
+ .../mira-sample-deterministic-classroom.ts    | 775 ++++++++++++++++++
+ .../mira-sample-deterministic-recovery.ts     | 599 ++++++++++++++
+ tests/audio/qwen-tts-timeout.test.ts          | 103 +++
+ tests/server/classroom-tts-fail-fast.test.ts  | 100 +++
+ tests/server/health-route.test.ts             |  13 +
+ ...ira-sample-deterministic-classroom.test.ts | 214 +++++
+ ...ample-deterministic-recovery-route.test.ts | 285 +++++++
+ ...mira-sample-deterministic-recovery.test.ts | 257 ++++++
+ 12 files changed, 2586 insertions(+), 1 deletion(-)
+ create mode 100644 app/api/generate-classroom/[jobId]/deterministic-recovery/route.ts
+ create mode 100644 lib/server/mira-sample-deterministic-classroom.ts
+ create mode 100644 lib/server/mira-sample-deterministic-recovery.ts
+ create mode 100644 tests/audio/qwen-tts-timeout.test.ts
+ create mode 100644 tests/server/classroom-tts-fail-fast.test.ts
+ create mode 100644 tests/server/mira-sample-deterministic-classroom.test.ts
+ create mode 100644 tests/server/mira-sample-deterministic-recovery-route.test.ts
+ create mode 100644 tests/server/mira-sample-deterministic-recovery.test.ts
+
+diff --git a/app/api/generate-classroom/[jobId]/deterministic-recovery/route.ts b/app/api/generate-classroom/[jobId]/deterministic-recovery/route.ts
+new file mode 100644
+index 0000000..e27d088
+--- /dev/null
++++ b/app/api/generate-classroom/[jobId]/deterministic-recovery/route.ts
+@@ -0,0 +1,220 @@
++import { createHash, timingSafeEqual } from 'crypto';
++import { after, type NextRequest } from 'next/server';
++import { apiError, apiSuccess } from '@/lib/server/api-response';
++import {
++  claimMiraSampleDeterministicRecovery,
++  MiraSampleDeterministicRecoveryError,
++  readMiraSampleDeterministicRecovery,
++  runMiraSampleDeterministicRecovery,
++  type MiraSampleDeterministicRecoveryRecord,
++  type MiraSampleRecoveryExpectedSource,
++} from '@/lib/server/mira-sample-deterministic-recovery';
++
++export const dynamic = 'force-dynamic';
++export const maxDuration = 3600;
++
++function secureEqual(left: string, right: string): boolean {
++  const leftDigest = createHash('sha256').update(left).digest();
++  const rightDigest = createHash('sha256').update(right).digest();
++  return timingSafeEqual(leftDigest, rightDigest);
++}
++
++const RECOVERY_RUNTIME_PORT = '3100';
++const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
++
++function singleHeader(req: NextRequest, name: string): string | null {
++  const value = req.headers.get(name);
++  if (
++    value === null ||
++    value.length === 0 ||
++    value !== value.trim() ||
++    value.includes(',') ||
++    /[%\s]/.test(value)
++  ) {
++    return null;
++  }
++  return value;
++}
++
++function normalizedLoopbackHostname(value: string): string | null {
++  const hostname = value.replace(/^\[|\]$/g, '').toLowerCase();
++  return LOOPBACK_HOSTNAMES.has(hostname) ? 'loopback' : null;
++}
++
++function isExactLoopbackAuthority(value: string | null, expectedPort: string): boolean {
++  if (!value) return false;
++  try {
++    const parsed = new URL(`http://${value}`);
++    return Boolean(
++      !parsed.username &&
++      !parsed.password &&
++      parsed.pathname === '/' &&
++      !parsed.search &&
++      !parsed.hash &&
++      parsed.port === expectedPort &&
++      normalizedLoopbackHostname(parsed.hostname),
++    );
++  } catch {
++    return false;
++  }
++}
++
++/**
++ * Next 16.1.2 injects x-forwarded-host/port/proto/for even for a direct
++ * request. On the reviewed native listener their exact non-secret shape is:
++ * Host/forwarded-host=127.0.0.1:3100, proto=http, port=3100, and one
++ * forwarded-for loopback address. These headers are consistency checks only;
++ * the 127.0.0.1 listener binding plus the internal token remain the positive
++ * security boundary.
++ */
++function isDirectRecoveryLoopbackRequest(req: NextRequest): boolean {
++  if (req.headers.has('forwarded') || req.headers.has('x-real-ip') || req.headers.has('via')) {
++    return false;
++  }
++  if (
++    req.nextUrl.protocol !== 'http:' ||
++    req.nextUrl.port !== RECOVERY_RUNTIME_PORT ||
++    !normalizedLoopbackHostname(req.nextUrl.hostname)
++  ) {
++    return false;
++  }
++
++  const host = singleHeader(req, 'host');
++  const forwardedHost = singleHeader(req, 'x-forwarded-host');
++  const forwardedFor = singleHeader(req, 'x-forwarded-for');
++  const forwardedProto = singleHeader(req, 'x-forwarded-proto');
++  const forwardedPort = singleHeader(req, 'x-forwarded-port');
++  return Boolean(
++    isExactLoopbackAuthority(host, RECOVERY_RUNTIME_PORT) &&
++    isExactLoopbackAuthority(forwardedHost, RECOVERY_RUNTIME_PORT) &&
++    forwardedFor &&
++    normalizedLoopbackHostname(forwardedFor) &&
++    forwardedProto === 'http' &&
++    forwardedPort === RECOVERY_RUNTIME_PORT,
++  );
++}
++
++function authorize(req: NextRequest, sourceJobId: string): ReturnType<typeof apiError> | null {
++  if (process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED !== '1') {
++    return apiError('PROVIDER_DISABLED', 404, 'Deterministic recovery is disabled');
++  }
++  if (process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID !== sourceJobId) {
++    return apiError('INVALID_REQUEST', 404, 'Deterministic recovery source not found');
++  }
++  if (!isDirectRecoveryLoopbackRequest(req)) {
++    return apiError(
++      'INVALID_CREDENTIALS',
++      403,
++      'Deterministic recovery requires direct loopback access',
++    );
++  }
++  const expectedToken = process.env.MIRA_INTERNAL_API_TOKEN || '';
++  const suppliedToken = req.headers.get('x-mira-internal-token') || '';
++  if (!expectedToken || !suppliedToken || !secureEqual(expectedToken, suppliedToken)) {
++    return apiError('INVALID_CREDENTIALS', 403, 'Invalid deterministic recovery credentials');
++  }
++  return null;
++}
++
++function responsePayload(record: MiraSampleDeterministicRecoveryRecord, req: NextRequest) {
++  return {
++    schemaVersion: record.schemaVersion,
++    kind: record.kind,
++    recoveryId: record.recoveryId,
++    mode: record.mode,
++    source: {
++      jobId: record.source.jobId,
++      status: record.source.status,
++      error: record.source.error,
++      scenesGenerated: record.source.scenesGenerated,
++      totalScenes: record.source.totalScenes,
++      completedAt: record.source.completedAt,
++      jobSnapshotSha256: record.source.jobSnapshotSha256,
++      jobSnapshotHashBasis: record.source.jobSnapshotHashBasis,
++    },
++    policy: record.policy,
++    calls: record.calls,
++    status: record.status,
++    step: record.step,
++    progress: record.progress,
++    message: record.message,
++    scenesGenerated: record.scenesGenerated,
++    totalScenes: record.totalScenes,
++    createdAt: record.createdAt,
++    updatedAt: record.updatedAt,
++    ...(record.startedAt ? { startedAt: record.startedAt } : {}),
++    ...(record.completedAt ? { completedAt: record.completedAt } : {}),
++    ...(record.artifact ? { artifact: record.artifact } : {}),
++    ...(record.error ? { error: record.error } : {}),
++    pollUrl: `${req.nextUrl.origin}${req.nextUrl.pathname}`,
++    done: record.status === 'succeeded' || record.status === 'failed',
++  };
++}
++
++function responseStatus(record: MiraSampleDeterministicRecoveryRecord): number {
++  return record.status === 'queued' || record.status === 'running' ? 202 : 200;
++}
++
++export async function POST(req: NextRequest, context: { params: Promise<{ jobId: string }> }) {
++  const { jobId } = await context.params;
++  const denied = authorize(req, jobId);
++  if (denied) return denied;
++
++  try {
++    const rawBody: unknown = await req.json();
++    if (!rawBody || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
++      return apiError('INVALID_REQUEST', 400, 'Invalid deterministic recovery request contract');
++    }
++    const body = rawBody as Record<string, unknown>;
++    const topKeys = Object.keys(body).sort();
++    const expectedValue = body.expectedSource;
++    if (
++      topKeys.join(',') !== 'expectedSource,recoveryRequestId' ||
++      !expectedValue ||
++      typeof expectedValue !== 'object' ||
++      Array.isArray(expectedValue) ||
++      Object.keys(expectedValue).sort().join(',') !== 'error,scenesGenerated,status,totalScenes'
++    ) {
++      return apiError('INVALID_REQUEST', 400, 'Invalid deterministic recovery request contract');
++    }
++    const expected = expectedValue as Partial<MiraSampleRecoveryExpectedSource>;
++    if (
++      typeof body.recoveryRequestId !== 'string' ||
++      expected?.status !== 'failed' ||
++      expected.error !== 'structured_output_exhausted' ||
++      expected.scenesGenerated !== 4 ||
++      expected.totalScenes !== 10
++    ) {
++      return apiError('INVALID_REQUEST', 400, 'Invalid deterministic recovery request contract');
++    }
++    const { record, created } = await claimMiraSampleDeterministicRecovery({
++      sourceJobId: jobId,
++      recoveryRequestId: body.recoveryRequestId,
++      expectedSource: expected as MiraSampleRecoveryExpectedSource,
++      patchSha256: process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_PATCH_SHA256 || '',
++    });
++    if (created) {
++      after(() => runMiraSampleDeterministicRecovery(jobId));
++    }
++    return apiSuccess(responsePayload(record, req), responseStatus(record));
++  } catch (error) {
++    if (error instanceof MiraSampleDeterministicRecoveryError) {
++      const status = error.code === 'recovery_already_claimed' ? 409 : 400;
++      return apiError('INVALID_REQUEST', status, error.message, error.code);
++    }
++    return apiError('INTERNAL_ERROR', 500, 'Failed to claim deterministic recovery');
++  }
++}
++
++export async function GET(req: NextRequest, context: { params: Promise<{ jobId: string }> }) {
++  const { jobId } = await context.params;
++  const denied = authorize(req, jobId);
++  if (denied) return denied;
++  try {
++    const record = await readMiraSampleDeterministicRecovery(jobId);
++    if (!record) return apiError('INVALID_REQUEST', 404, 'Deterministic recovery not found');
++    return apiSuccess(responsePayload(record, req), responseStatus(record));
++  } catch (error) {
++    return apiError('INTERNAL_ERROR', 500, 'Failed to read deterministic recovery');
++  }
++}
+diff --git a/app/api/generate-classroom/[jobId]/route.ts b/app/api/generate-classroom/[jobId]/route.ts
+index adf51da..b6e45f7 100644
+--- a/app/api/generate-classroom/[jobId]/route.ts
++++ b/app/api/generate-classroom/[jobId]/route.ts
+@@ -40,6 +40,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ jobId:
+       totalScenes: job.totalScenes,
+       result: job.result,
+       error: job.error,
++      completedAt: job.completedAt,
+       done: job.status === 'succeeded' || job.status === 'failed',
+     });
+   } catch (error) {
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index d33c0c1..c1b7d6f 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -9,6 +9,7 @@ import {
+ import { assertMiraTtsProviderReady, getMiraTtsPolicy } from '@/lib/server/mira-tts-policy';
+ import { assertMiraAsrProviderReady, getMiraAsrPolicy } from '@/lib/server/mira-asr-policy';
+ import { getMiraStructuredSceneRuntimePolicy } from '@/lib/server/model-routes';
++import { getMiraSampleDeterministicRecoveryRuntimePolicy } from '@/lib/server/mira-sample-deterministic-recovery';
+ 
+ const version = process.env.npm_package_version || '0.1.0';
+ 
+@@ -18,12 +19,14 @@ export async function GET() {
+   let ttsPolicy;
+   let asrPolicy;
+   let structuredScenePolicy;
++  let deterministicRecoveryPolicy;
+   try {
+     ttsPolicy = getMiraTtsPolicy();
+     assertMiraTtsProviderReady(ttsPolicy, ttsProviders);
+     asrPolicy = getMiraAsrPolicy();
+     assertMiraAsrProviderReady(asrPolicy, asrProviders);
+     structuredScenePolicy = getMiraStructuredSceneRuntimePolicy();
++    deterministicRecoveryPolicy = getMiraSampleDeterministicRecoveryRuntimePolicy();
+   } catch (error) {
+     return apiError(
+       'PROVIDER_DISABLED',
+@@ -47,6 +50,7 @@ export async function GET() {
+       tts: ttsPolicy,
+       asr: asrPolicy,
+       structuredScene: structuredScenePolicy,
++      deterministicRecovery: deterministicRecoveryPolicy,
+     },
+   });
+ }
+diff --git a/lib/server/classroom-media-generation.ts b/lib/server/classroom-media-generation.ts
+index 86eff5a..22fa072 100644
+--- a/lib/server/classroom-media-generation.ts
++++ b/lib/server/classroom-media-generation.ts
+@@ -296,6 +296,10 @@ export async function generateTTSForClassroom(
+   scenes: Scene[],
+   classroomId: string,
+   baseUrl: string,
++  options: {
++    onSpeechAttempted?: (attempted: number) => Promise<void> | void;
++    onSpeechGenerated?: (completed: number) => Promise<void> | void;
++  } = {},
+ ): Promise<ClassroomTTSGenerationResult> {
+   const audioDir = path.join(CLASSROOMS_DIR, classroomId, 'audio');
+   await ensureDir(audioDir);
+@@ -322,12 +326,16 @@ export async function generateTTSForClassroom(
+   const modelId =
+     policy?.modelId || DEFAULT_TTS_MODELS[providerId as keyof typeof DEFAULT_TTS_MODELS] || '';
+   const voice =
+-    policy?.voiceId || DEFAULT_TTS_VOICES[providerId as keyof typeof DEFAULT_TTS_VOICES] || 'default';
++    policy?.voiceId ||
++    DEFAULT_TTS_VOICES[providerId as keyof typeof DEFAULT_TTS_VOICES] ||
++    'default';
+   const format = ttsProvider?.supportedFormats?.[0] || 'mp3';
+   const serverVoxCPMVoicePrompt =
+     process.env.MIRA_VOXCPM_VOICE_PROMPT?.replace(/[()（）\p{C}]+/gu, ' ').trim() ||
+     'warm patient primary school teacher, clear standard pronunciation, medium pace';
+ 
++  let attemptedSpeechCount = 0;
++  let completedSpeechCount = 0;
+   for (const scene of scenes) {
+     if (!scene.actions) continue;
+ 
+@@ -349,6 +357,10 @@ export async function generateTTSForClassroom(
+       // first load. Browser generation allocates pool ids directly.
+       const audioId = `tts_s${sceneOrder}_${action.id}`;
+ 
++      attemptedSpeechCount += 1;
++      // Persist the attempt before the provider call. If this callback cannot
++      // commit its recovery CAS, fail closed and do not spend the Qwen request.
++      await options.onSpeechAttempted?.(attemptedSpeechCount);
+       const result = await generateTTS(
+         {
+           providerId,
+@@ -390,6 +402,8 @@ export async function generateTTSForClassroom(
+         voiceId: voice,
+         fallbackUsed: false,
+       };
++      completedSpeechCount += 1;
++      await options.onSpeechGenerated?.(completedSpeechCount);
+       log.info(`Generated TTS: ${filename} (${written.size} bytes)`);
+     }
+   }
+diff --git a/lib/server/mira-sample-deterministic-classroom.ts b/lib/server/mira-sample-deterministic-classroom.ts
+new file mode 100644
+index 0000000..027976b
+--- /dev/null
++++ b/lib/server/mira-sample-deterministic-classroom.ts
+@@ -0,0 +1,775 @@
++import { createHash } from 'crypto';
++import { promises as fs } from 'fs';
++import path from 'path';
++import { nanoid } from 'nanoid';
++import { buildCompleteScene, type GeneratedSceneContent } from '@openmaic/generation';
++import type { PPTElement, QuizQuestion, WidgetConfigBase } from '@openmaic/dsl';
++import { AGENT_COLOR_PALETTE, AGENT_DEFAULT_AVATARS } from '@/lib/constants/agent-defaults';
++import { buildVideoManifestFromOutlines } from '@/lib/media/video-manifest';
++import { CLASSROOMS_DIR, persistClassroom } from '@/lib/server/classroom-storage';
++import { generateTTSForClassroom } from '@/lib/server/classroom-media-generation';
++import {
++  assertMiraSampleClassroomStructure,
++  ensureMiraSampleSceneActions,
++  type MiraSampleStructuralPlan,
++} from '@/lib/server/mira-sample-structural-policy';
++import {
++  getMiraTeacherName,
++  getMiraTeacherVoiceConfig,
++  getMiraTtsPolicy,
++} from '@/lib/server/mira-tts-policy';
++import type { Action } from '@/lib/types/action';
++import type { Scene, Stage } from '@/lib/types/stage';
++
++export const MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION =
++  'mira-sample-deterministic-classroom.v1' as const;
++export const MIRA_SAMPLE_DETERMINISTIC_RECOVERY_KIND =
++  'mira_sample_deterministic_no_llm_v1' as const;
++export const MIRA_SAMPLE_DETERMINISTIC_RECOVERY_MODE = 'deterministic_no_llm' as const;
++
++export interface MiraSampleDeterministicProgress {
++  step:
++    | 'initializing'
++    | 'generating_outlines'
++    | 'generating_scenes'
++    | 'generating_tts'
++    | 'persisting'
++    | 'completed';
++  progress: number;
++  message: string;
++  scenesGenerated: number;
++  totalScenes?: number;
++}
++
++export interface MiraSampleDeterministicReceipt {
++  schemaVersion: 'mira.openmaic.deterministic-classroom-receipt.v1';
++  kind: typeof MIRA_SAMPLE_DETERMINISTIC_RECOVERY_KIND;
++  mode: typeof MIRA_SAMPLE_DETERMINISTIC_RECOVERY_MODE;
++  policyVersion: typeof MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION;
++  canonicalSpecSha256: string;
++  calls: {
++    llm: 0;
++    webSearch: 0;
++    imageGeneration: 0;
++    videoGeneration: 0;
++    tts: 10;
++  };
++  contentSha256: string;
++  artifactSha256: string;
++  audio: Array<{ actionId: string; bytes: number; sha256: string }>;
++  tts: {
++    providerId: string;
++    modelId: string;
++    voiceId: string;
++    speechCount: 10;
++    fallbackUsed: false;
++  };
++}
++
++export interface MiraSampleDeterministicResult {
++  id: string;
++  url: string;
++  stage: Stage;
++  scenes: Scene[];
++  scenesCount: number;
++  createdAt: string;
++  deterministicReceipt: MiraSampleDeterministicReceipt;
++}
++
++interface GenerateOptions {
++  baseUrl: string;
++  onProgress?: (progress: MiraSampleDeterministicProgress) => Promise<void> | void;
++  onTtsAttempted?: (attempted: number) => Promise<void> | void;
++  onTtsProgress?: (completed: number) => Promise<void> | void;
++}
++
++function sha256(value: string | Uint8Array): string {
++  return createHash('sha256').update(value).digest('hex');
++}
++
++function textElement(
++  id: string,
++  content: string,
++  left: number,
++  top: number,
++  width: number,
++  height: number,
++  options: {
++    color?: string;
++    fill?: string;
++    fontSize?: number;
++    textType?: 'title' | 'subtitle' | 'content';
++  } = {},
++): PPTElement {
++  const fontSize = options.fontSize || 28;
++  return {
++    id,
++    type: 'text',
++    content: `<p style="font-size:${fontSize}px;line-height:1.35;margin:0">${content}</p>`,
++    left,
++    top,
++    width,
++    height,
++    rotate: 0,
++    defaultFontName: 'Microsoft YaHei',
++    defaultColor: options.color || '#20304a',
++    fill: options.fill,
++    lineHeight: 1.35,
++    paragraphSpace: 0,
++    textType: options.textType || 'content',
++    vAlign: 'middle',
++  };
++}
++
++function numberChips(prefix: string, values: readonly number[], top: number): PPTElement[] {
++  return values.map((value, index) =>
++    textElement(`${prefix}-${value}`, `<strong>${value}</strong>`, 92 + index * 82, top, 62, 62, {
++      color: index % 2 === 0 ? '#154b5b' : '#6f3b18',
++      fill: index % 2 === 0 ? '#dff6f3' : '#fff0d9',
++      fontSize: 30,
++    }),
++  );
++}
++
++function slideContent(order: number): GeneratedSceneContent {
++  const commonTitle = (title: string, kicker: string): PPTElement[] => [
++    textElement(`slide-${order}-kicker`, kicker, 72, 44, 856, 38, {
++      color: '#2e7d75',
++      fontSize: 18,
++      textType: 'subtitle',
++    }),
++    textElement(`slide-${order}-title`, `<strong>${title}</strong>`, 72, 88, 856, 82, {
++      color: '#18324a',
++      fontSize: 42,
++      textType: 'title',
++    }),
++  ];
++
++  if (order === 1) {
++    return {
++      elements: [
++        ...commonTitle('数一数身边的物品', '20以内数感探索 · 热身观察'),
++        textElement('slide-1-task', '请按顺序点数：不漏数，也不重复。', 72, 190, 856, 64, {
++          fill: '#eef8f6',
++          fontSize: 26,
++        }),
++        ...numberChips('slide-1-chip', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 300),
++        textElement(
++          'slide-1-rule',
++          '<strong>最后数到几，总数就是几。</strong>',
++          180,
++          410,
++          640,
++          72,
++          {
++            color: '#8b4b16',
++            fill: '#fff5e8',
++            fontSize: 30,
++          },
++        ),
++      ],
++      background: { type: 'solid', color: '#fbfdfc' },
++      remark: '开场只做点数观察，不直接进入测验。',
++    };
++  }
++  if (order === 2) {
++    return {
++      elements: [
++        ...commonTitle('十和几个组成十几', '把十连方和单个方块放在一起'),
++        textElement('slide-2-ten', '<strong>1个十</strong><br/>■■■■■■■■■■', 90, 210, 400, 120, {
++          color: '#14596b',
++          fill: '#e2f5f7',
++          fontSize: 30,
++        }),
++        textElement('slide-2-ones', '<strong>2个一</strong><br/>■ ■', 530, 210, 370, 120, {
++          color: '#8a4e12',
++          fill: '#fff0da',
++          fontSize: 30,
++        }),
++        textElement('slide-2-equation', '<strong>10 + 2 = 12</strong>', 260, 390, 480, 80, {
++          color: '#4d347e',
++          fill: '#f0eafb',
++          fontSize: 38,
++        }),
++      ],
++      background: { type: 'solid', color: '#fbfdfc' },
++      remark: '用一组完整的十和若干个一解释十几。',
++    };
++  }
++  if (order === 4) {
++    return {
++      elements: [
++        ...commonTitle('数轴上的前后邻居', '从左到右，数字越来越大'),
++        textElement(
++          'slide-4-line-a',
++          '0 ─ 1 ─ 2 ─ 3 ─ 4 ─ 5 ─ 6 ─ 7 ─ 8 ─ 9 ─ 10',
++          70,
++          190,
++          860,
++          70,
++          {
++            color: '#275a70',
++            fill: '#e8f6fa',
++            fontSize: 25,
++          },
++        ),
++        textElement(
++          'slide-4-line-b',
++          '10 ─ 11 ─ 12 ─ 13 ─ 14 ─ 15 ─ 16 ─ 17 ─ 18 ─ 19 ─ 20',
++          70,
++          275,
++          860,
++          70,
++          {
++            color: '#4b4a86',
++            fill: '#f0eefa',
++            fontSize: 23,
++          },
++        ),
++        textElement(
++          'slide-4-neighbor',
++          '例如：14 的前一个数是 13，后一个数是 15。',
++          110,
++          380,
++          780,
++          68,
++          {
++            color: '#7c4519',
++            fill: '#fff2df',
++            fontSize: 26,
++          },
++        ),
++        textElement('slide-4-rule', '相邻两个数相差 1。', 260, 475, 480, 40, {
++          color: '#3c2d72',
++          fontSize: 24,
++        }),
++      ],
++      background: { type: 'solid', color: '#fbfdfc' },
++    };
++  }
++  if (order === 6) {
++    return {
++      elements: [
++        ...commonTitle('谁多谁少', '两种方法都能比较20以内的数'),
++        textElement(
++          'slide-6-match',
++          '<strong>方法一：一一对应</strong><br/>有剩余的一组更多。',
++          80,
++          210,
++          400,
++          150,
++          {
++            color: '#14596b',
++            fill: '#e2f5f7',
++            fontSize: 28,
++          },
++        ),
++        textElement(
++          'slide-6-axis',
++          '<strong>方法二：看数轴</strong><br/>右边的数更大。',
++          520,
++          210,
++          400,
++          150,
++          {
++            color: '#814812',
++            fill: '#fff0da',
++            fontSize: 28,
++          },
++        ),
++        textElement(
++          'slide-6-example',
++          '<strong>17 &gt; 14</strong>，因为17在14的右边。',
++          220,
++          410,
++          560,
++          78,
++          {
++            color: '#4d347e',
++            fill: '#f0eafb',
++            fontSize: 32,
++          },
++        ),
++      ],
++      background: { type: 'solid', color: '#fbfdfc' },
++    };
++  }
++  return {
++    elements: [
++      ...commonTitle('数感小结', '今天掌握了四种20以内数感方法'),
++      textElement('slide-10-a', '① 按顺序数数量', 100, 205, 360, 82, {
++        fill: '#e2f5f7',
++        fontSize: 27,
++      }),
++      textElement('slide-10-b', '② 看十和一的组成', 540, 205, 360, 82, {
++        fill: '#fff0da',
++        fontSize: 27,
++      }),
++      textElement('slide-10-c', '③ 在数轴上找顺序', 100, 325, 360, 82, {
++        fill: '#f0eafb',
++        fontSize: 27,
++      }),
++      textElement('slide-10-d', '④ 比较谁大谁小', 540, 325, 360, 82, {
++        fill: '#edf5df',
++        fontSize: 27,
++      }),
++      textElement('slide-10-close', '请说出一种你会用的方法。', 230, 462, 540, 55, {
++        color: '#2e6d65',
++        fontSize: 25,
++      }),
++    ],
++    background: { type: 'solid', color: '#fbfdfc' },
++  };
++}
++
++function quizContent(order: number): GeneratedSceneContent {
++  const questions: QuizQuestion[] =
++    order === 8
++      ? [
++          {
++            id: 'guided-count',
++            type: 'single',
++            question: '一个十和3个一组成哪个数？',
++            options: [
++              { label: '10', value: 'A' },
++              { label: '13', value: 'B' },
++              { label: '30', value: 'C' },
++            ],
++            answer: ['B'],
++            analysis: '一个十是10，再加3个一，就是13。',
++            hasAnswer: true,
++            points: 1,
++          },
++          {
++            id: 'guided-neighbor',
++            type: 'single',
++            question: '16后面的一个数是？',
++            options: [
++              { label: '15', value: 'A' },
++              { label: '17', value: 'B' },
++              { label: '18', value: 'C' },
++            ],
++            answer: ['B'],
++            analysis: '相邻两个数相差1，16后面是17。',
++            hasAnswer: true,
++            points: 1,
++          },
++          {
++            id: 'guided-compare',
++            type: 'single',
++            question: '14和19，哪个数更大？',
++            options: [
++              { label: '14', value: 'A' },
++              { label: '19', value: 'B' },
++              { label: '一样大', value: 'C' },
++            ],
++            answer: ['B'],
++            analysis: '19在数轴上更靠右，所以19更大。',
++            hasAnswer: true,
++            points: 1,
++          },
++        ]
++      : [
++          {
++            id: 'independent-compose',
++            type: 'single',
++            question: '1个十和8个一组成哪个数？',
++            options: [
++              { label: '8', value: 'A' },
++              { label: '18', value: 'B' },
++              { label: '20', value: 'C' },
++            ],
++            answer: ['B'],
++            analysis: '完成后检查：10和8合起来是18。',
++            hasAnswer: true,
++            points: 1,
++          },
++          {
++            id: 'independent-order',
++            type: 'single',
++            question: '下面哪组数字是从小到大排列？',
++            options: [
++              { label: '12、15、18', value: 'A' },
++              { label: '18、15、12', value: 'B' },
++              { label: '15、12、18', value: 'C' },
++            ],
++            answer: ['A'],
++            analysis: '12小于15，15小于18。',
++            hasAnswer: true,
++            points: 1,
++          },
++          {
++            id: 'independent-explain',
++            type: 'short_answer',
++            question: '用一句话说说：为什么17比14大？',
++            commentPrompt: '学生可用数轴位置或一一对应解释，意思正确即可。',
++            hasAnswer: false,
++            points: 1,
++          },
++        ];
++  return { questions };
++}
++
++const SIMULATION_CONFIG: WidgetConfigBase = {
++  type: 'simulation',
++  concept: '20以内数量与十框表示同步变化',
++  description: '拖动数量滑杆，观察数字、十框和十与一的组成同步变化。',
++  variables: [{ name: 'count', label: '数量', min: 1, max: 20, default: 12, step: 1, unit: '个' }],
++  presets: [
++    { name: '一个十', variables: { count: 10 } },
++    { name: '十二', variables: { count: 12 } },
++    { name: '二十', variables: { count: 20 } },
++  ],
++};
++
++const GAME_CONFIG: WidgetConfigBase = {
++  type: 'game',
++  gameType: 'puzzle',
++  description: '拖动数字卡片，把每一关的数字从小到大排好。',
++  gameConfig: {
++    controls: ['drag-card', 'drop-slot', 'submit', 'retry'],
++    targets: [
++      { id: 'slot-1', type: 'number-slot' },
++      { id: 'slot-2', type: 'number-slot' },
++      { id: 'slot-3', type: 'number-slot' },
++    ],
++    initialConditions: { score: 0, level: 1, progress: 0 },
++    successCondition: '三个数字从小到大排列后提交',
++    levels: [
++      { id: 'level-1', numbers: '7,3,5' },
++      { id: 'level-2', numbers: '14,11,18' },
++      { id: 'level-3', numbers: '20,16,19' },
++    ],
++  },
++  scoring: { completionPoints: 10, retryPenalty: 0 },
++  achievements: [
++    { id: 'first-win', name: '顺序小能手', description: '完成第一关数字排序。' },
++    { id: 'all-clear', name: '火车总调度', description: '完成全部三关。' },
++  ],
++};
++
++const VISUALIZATION_CONFIG: WidgetConfigBase = {
++  type: 'visualization3d',
++  visualizationType: 'geometry',
++  description: '旋转、缩放并切换11到20，观察一个十连方和若干个位方块。',
++  objects: [
++    { id: 'ten-rod', type: 'box', name: '十连方' },
++    { id: 'ones-group', type: 'box', name: '个位方块组' },
++  ],
++  interactions: [
++    { type: 'drag', target: 'model', action: 'rotate' },
++    { type: 'wheel', target: 'camera', action: 'zoom' },
++    { type: 'slider', target: 'ones-group', param: 'count' },
++    { type: 'button', target: 'model', action: 'reset' },
++  ],
++};
++
++function widgetConfigScript(config: WidgetConfigBase): string {
++  return `<script type="application/json" id="widget-config">${JSON.stringify(config)}</script>`;
++}
++
++function simulationHtml(): string {
++  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
++*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#f5fbfa;color:#17324a}.app{max-width:900px;margin:auto;padding:28px}h1{margin:0 0 8px;font-size:30px}.hint{color:#47706d}.panel{margin-top:20px;padding:22px;background:#fff;border:2px solid #cce9e4;border-radius:20px}.control{display:flex;align-items:center;gap:16px}input{flex:1;accent-color:#2e9187}output{min-width:72px;padding:10px 14px;border-radius:14px;background:#e5f7f3;font-size:28px;font-weight:700;text-align:center}.frames{display:flex;gap:18px;flex-wrap:wrap;margin:24px 0}.ten{display:grid;grid-template-columns:repeat(5,42px);gap:7px;padding:12px;border-radius:14px;background:#eaf4ff}.dot{width:42px;height:42px;border-radius:10px;background:#4ca89d;box-shadow:inset 0 -4px rgba(0,0,0,.08)}.dot.empty{background:#dfe8ea}.ones{display:flex;gap:7px;flex-wrap:wrap;align-content:flex-start;max-width:230px}.ones .dot{background:#f2a85b}.result{font-size:24px;font-weight:700;color:#5b3e82}.presets{display:flex;gap:10px;flex-wrap:wrap}.presets button{border:0;border-radius:999px;padding:10px 17px;background:#eef0fb;color:#423873;font-size:16px;cursor:pointer}.presets button:hover{background:#dfdcf7}</style></head><body><main class="app"><h1>数量变一变</h1><p class="hint">拖动滑杆，看看数字、十框和方块怎样一起变化。</p><section class="panel"><div class="control"><label for="count">数量</label><input id="count" data-var="count" type="range" min="1" max="20" step="1" value="12"><output id="value-output" for="count">12</output></div><div class="frames"><div id="ten-frame" class="ten"></div><div id="ones" class="ones"></div></div><p id="result" class="result" aria-live="polite"></p><div class="presets"><button data-count="10">一个十</button><button data-count="12">十二</button><button data-count="20">二十</button></div></section></main>${widgetConfigScript(SIMULATION_CONFIG)}<script>
++const count=document.getElementById('count');const output=document.getElementById('value-output');const frame=document.getElementById('ten-frame');const ones=document.getElementById('ones');const result=document.getElementById('result');
++function makeDot(filled){const dot=document.createElement('span');dot.className=filled?'dot':'dot empty';return dot}
++function renderCount(){const value=Number(count.value);output.textContent=String(value);frame.innerHTML='';ones.innerHTML='';for(let i=0;i<10;i+=1)frame.appendChild(makeDot(i<Math.min(value,10)));for(let i=10;i<value;i+=1)ones.appendChild(makeDot(true));const tens=Math.floor(value/10);const units=value%10;result.textContent=value===20?'20是2个十。':value>=10?value+'是'+tens+'个十和'+units+'个一。':value+'是'+units+'个一。';}
++count.addEventListener('input',function(){renderCount()});document.querySelectorAll('[data-count]').forEach(function(button){button.addEventListener('click',function(){count.value=button.dataset.count;renderCount()})});renderCount();
++</script></body></html>`;
++}
++
++function gameHtml(): string {
++  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
++*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#fff8ed;color:#29364a}.app{max-width:900px;margin:auto;padding:28px}h1{margin:0}.hud{display:flex;gap:12px;margin:16px 0}.pill{padding:8px 14px;border-radius:999px;background:#fff;border:1px solid #f1d2a5}.yard,.train{display:flex;gap:14px;min-height:108px;padding:18px;margin:16px 0;border-radius:18px}.yard{background:#fff}.train{background:#e8f5f3;border:2px dashed #68aa9f}.card,.slot{display:grid;place-items:center;width:92px;height:72px;border-radius:16px;font-size:30px;font-weight:800;border:0}.card{background:#f5ad58;color:#492d0e;cursor:pointer;box-shadow:0 7px 0 #d58632}.card.selected{outline:5px solid #5a55a5;transform:translateY(-4px)}.slot{background:#fff;border:2px dashed #8bbab4;cursor:pointer}.actions{display:flex;gap:12px}.actions button{border:0;border-radius:13px;padding:12px 20px;font-size:17px;cursor:pointer}.submit{background:#2e9187;color:#fff}.retry{background:#e9e6f7;color:#443b72}.status{min-height:34px;margin-top:18px;font-size:21px;font-weight:700}</style></head><body><main class="app"><h1>数字小火车</h1><p>可以拖动，也可以先点数字卡片、再点车厢。请按从小到大排好。</p><div class="hud"><span class="pill">关卡 <strong id="level">1</strong>/3</span><span class="pill">得分 <strong id="score">0</strong></span><span class="pill">进度 <strong id="progress">0</strong>%</span></div><div id="yard" class="yard"></div><div id="train" class="train"><button type="button" class="slot" data-slot="0" aria-label="第1节车厢">1</button><button type="button" class="slot" data-slot="1" aria-label="第2节车厢">2</button><button type="button" class="slot" data-slot="2" aria-label="第3节车厢">3</button></div><div class="actions"><button id="submit" class="submit">提交检查</button><button id="retry" class="retry">重新挑战</button></div><div id="game-status" class="status" aria-live="polite"></div></main>${widgetConfigScript(GAME_CONFIG)}<script>
++const levels=[[7,3,5],[14,11,18],[20,16,19]];let level=1;let score=0;let progress=0;let dragged=null;let selected=null;const yard=document.getElementById('yard');const slots=[...document.querySelectorAll('.slot')];const status=document.getElementById('game-status');
++function selectCard(card){document.querySelectorAll('.card').forEach(function(item){item.classList.remove('selected');item.setAttribute('aria-pressed','false')});selected=card;if(card){card.classList.add('selected');card.setAttribute('aria-pressed','true');status.textContent='已选中数字'+card.dataset.value+'，请点一个车厢。'}}
++function bindCard(card){card.addEventListener('dragstart',function(){dragged=card});card.addEventListener('click',function(){selectCard(card)});card.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();selectCard(card)}})}
++function makeCard(value){const card=document.createElement('div');card.className='card';card.draggable=true;card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-pressed','false');card.setAttribute('aria-label','数字'+value);card.textContent=String(value);card.dataset.value=String(value);bindCard(card);return card}
++function placeCard(slot,card){if(!card)return;if(slot.dataset.value)yard.appendChild(makeCard(slot.dataset.value));slot.dataset.value=card.dataset.value;slot.textContent=card.dataset.value;card.remove();dragged=null;selected=null;status.textContent='已放入车厢，可以继续排列。'}
++function renderGame(){document.getElementById('level').textContent=String(level);document.getElementById('score').textContent=String(score);document.getElementById('progress').textContent=String(progress);yard.innerHTML='';selected=null;dragged=null;slots.forEach(function(slot,index){slot.textContent=String(index+1);delete slot.dataset.value});levels[level-1].forEach(function(value){yard.appendChild(makeCard(value))});}
++slots.forEach(function(slot){slot.addEventListener('click',function(){placeCard(slot,selected)});slot.addEventListener('dragover',function(event){event.preventDefault()});slot.addEventListener('drop',function(event){event.preventDefault();placeCard(slot,dragged)})});
++document.getElementById('submit').addEventListener('click',function(){const values=slots.map(function(slot){return Number(slot.dataset.value)});if(values.some(Number.isNaN)){status.textContent='还有空车厢，请把三张卡片都放好。';return}const won=values.every(function(value,index){return index===0||values[index-1]<value});if(won){score += 10;progress = Math.round(level/levels.length*100);status.textContent=level===levels.length?'全部通关！你是顺序小能手。':'排列正确，进入下一关！';if(level<levels.length){level += 1;setTimeout(renderGame,700)}else{renderHud()}}else{status.textContent='顺序还可以调整。看一看左边是不是更小。';}});
++document.getElementById('retry').addEventListener('click',function(){progress = Math.round((level-1)/levels.length*100);status.textContent='本关已重置，再试一次吧。';renderGame()});function renderHud(){document.getElementById('score').textContent=String(score);document.getElementById('progress').textContent=String(progress)}function gameLoop(){requestAnimationFrame(gameLoop)}renderGame();requestAnimationFrame(gameLoop);
++</script></body></html>`;
++}
++
++function visualizationHtml(): string {
++  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
++*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#eef4fb;color:#172b43}.app{display:grid;grid-template-columns:1fr 250px;gap:18px;max-width:980px;margin:auto;padding:20px}canvas{width:100%;height:500px;border-radius:20px;background:linear-gradient(#dceafb,#f9fbff);touch-action:none}.panel{padding:20px;background:#fff;border-radius:20px}h1{font-size:26px;margin-top:0}input{width:100%;accent-color:#4d64b4}.value{font-size:34px;font-weight:800;color:#3d559e}.legend{margin-top:20px;line-height:1.8}.panel button{width:100%;margin-top:18px;border:0;border-radius:12px;padding:12px;background:#2e9187;color:#fff;font-size:16px}@media(max-width:700px){.app{grid-template-columns:1fr}canvas{height:360px}}</style></head><body><main class="app"><canvas id="model-canvas" width="700" height="500" aria-label="可旋转的十连方和个位方块三维模型"></canvas><aside class="panel"><h1>搭一搭十几</h1><p>拖动画面旋转，滚轮缩放。</p><label for="cube-count">数量 11—20</label><input id="cube-count" type="range" min="11" max="20" step="1" value="14"><output id="model-value" class="value">14</output><div id="model-status" class="legend">1个十和4个一</div><button id="reset-view">恢复正面</button></aside></main>${widgetConfigScript(VISUALIZATION_CONFIG)}<script>
++const canvas=document.getElementById('model-canvas');const gl=canvas.getContext('webgl');if(!gl)throw new Error('WebGL unavailable');
++const vertexSource='attribute vec3 position;uniform mat4 matrix;uniform vec3 offset;varying float depthShade;void main(){vec3 world=position+offset;depthShade=.72+(position.z+.36)*.35;gl_Position=matrix*vec4(world,1.0);}';const fragmentSource='precision mediump float;uniform vec4 color;varying float depthShade;void main(){gl_FragColor=vec4(color.rgb*depthShade,color.a);}';
++function shader(type,source){const item=gl.createShader(type);gl.shaderSource(item,source);gl.compileShader(item);return item}const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vertexSource));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fragmentSource));gl.linkProgram(program);gl.useProgram(program);
++const vertices=new Float32Array([
++-.35,-.35,.35,.35,-.35,.35,.35,.35,.35,-.35,-.35,.35,.35,.35,.35,-.35,.35,.35,
++.35,-.35,-.35,-.35,-.35,-.35,-.35,.35,-.35,.35,-.35,-.35,-.35,.35,-.35,.35,.35,-.35,
++-.35,.35,.35,.35,.35,.35,.35,.35,-.35,-.35,.35,.35,.35,.35,-.35,-.35,.35,-.35,
++-.35,-.35,-.35,.35,-.35,-.35,.35,-.35,.35,-.35,-.35,-.35,.35,-.35,.35,-.35,-.35,.35,
++.35,-.35,.35,.35,-.35,-.35,.35,.35,-.35,.35,-.35,.35,.35,.35,-.35,.35,.35,.35,
++-.35,-.35,-.35,-.35,-.35,.35,-.35,.35,.35,-.35,-.35,-.35,-.35,.35,.35,-.35,.35,-.35]);
++const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);const position=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,3,gl.FLOAT,false,0,0);gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
++const matrixLocation=gl.getUniformLocation(program,'matrix');const offsetLocation=gl.getUniformLocation(program,'offset');const colorLocation=gl.getUniformLocation(program,'color');const model={rotation:{x:-0.35,y:0.45,z:0},scale:{x:1,y:1,z:1}};let zoom=1;let dragging=false;let lastX=0;let lastY=0;let count=14;
++function multiply(a,b){const out=new Float32Array(16);for(let row=0;row<4;row+=1)for(let col=0;col<4;col+=1)for(let k=0;k<4;k+=1)out[col*4+row]+=a[k*4+row]*b[col*4+k];return out}
++function perspective(fov,aspect,near,far){const f=1/Math.tan(fov/2),nf=1/(near-far);return new Float32Array([f/aspect,0,0,0,0,f,0,0,0,0,(far+near)*nf,-1,0,0,2*far*near*nf,0])}
++function translation(x,y,z){return new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,x,y,z,1])}function rotateX(angle){const c=Math.cos(angle),s=Math.sin(angle);return new Float32Array([1,0,0,0,0,c,s,0,0,-s,c,0,0,0,0,1])}function rotateY(angle){const c=Math.cos(angle),s=Math.sin(angle);return new Float32Array([c,0,-s,0,0,1,0,0,s,0,c,0,0,0,0,1])}
++function matrix(){let value=perspective(Math.PI/3,canvas.width/canvas.height,.1,100);value=multiply(value,translation(0,0,-7/zoom));value=multiply(value,rotateX(model.rotation.x));value=multiply(value,rotateY(model.rotation.y));return value}
++function drawCube(x,y,color){gl.uniformMatrix4fv(matrixLocation,false,matrix());gl.uniform3f(offsetLocation,x,y,0);gl.uniform4fv(colorLocation,color);gl.drawArrays(gl.TRIANGLES,0,36)}
++function renderModel(){gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.88,.93,.98,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);for(let i=0;i<10;i+=1)drawCube(-3.4+i*.72,1.1,[.18,.58,.55,1]);for(let i=0;i<count-10;i+=1)drawCube(-2.7+i*.78,-1.2,[.94,.55,.25,1]);document.getElementById('model-value').textContent=String(count);document.getElementById('model-status').textContent=count===20?'2个十':'1个十和'+(count-10)+'个一';}
++canvas.addEventListener('pointerdown',function(event){dragging=true;lastX=event.clientX;lastY=event.clientY;canvas.setPointerCapture(event.pointerId)});canvas.addEventListener('pointermove',function(event){if(!dragging)return;model.rotation.y += (event.clientX-lastX)*.01;model.rotation.x += (event.clientY-lastY)*.01;lastX=event.clientX;lastY=event.clientY;renderModel()});canvas.addEventListener('pointerup',function(){dragging=false});canvas.addEventListener('wheel',function(event){event.preventDefault();zoom=Math.max(.65,Math.min(1.7,zoom-event.deltaY*.001));model.scale.x = zoom;model.scale.y = zoom;model.scale.z = zoom;renderModel()},{passive:false});document.getElementById('cube-count').addEventListener('input',function(event){count=Number(event.target.value);renderModel()});document.getElementById('reset-view').addEventListener('click',function(){model.rotation.x=-.35;model.rotation.y=.45;model.rotation.z=0;zoom=1;model.scale.x=1;model.scale.y=1;model.scale.z=1;renderModel()});renderModel();
++</script></body></html>`;
++}
++
++function interactiveContent(order: number): GeneratedSceneContent {
++  if (order === 3)
++    return { html: simulationHtml(), widgetType: 'simulation', widgetConfig: SIMULATION_CONFIG };
++  if (order === 5) return { html: gameHtml(), widgetType: 'game', widgetConfig: GAME_CONFIG };
++  return {
++    html: visualizationHtml(),
++    widgetType: 'visualization3d',
++    widgetConfig: VISUALIZATION_CONFIG,
++  };
++}
++
++function contentFor(order: number): GeneratedSceneContent {
++  if ([1, 2, 4, 6, 10].includes(order)) return slideContent(order);
++  if ([8, 9].includes(order)) return quizContent(order);
++  return interactiveContent(order);
++}
++
++function actionsFor(order: number, content: GeneratedSceneContent): Action[] {
++  const actions: Action[] = [];
++  if ('html' in content) {
++    actions.push({
++      id: `mira-sample-widget-action-${String(order).padStart(2, '0')}`,
++      type: 'widget_highlight',
++      target: order === 3 ? '#count' : order === 5 ? '#train' : '#model-canvas',
++      content: '请操作画面并观察结果。',
++    });
++  }
++  return actions;
++}
++
++function stableSpec(plan: MiraSampleStructuralPlan): object {
++  return {
++    policyVersion: MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION,
++    courseTitle: plan.courseTitle,
++    languageDirective: plan.languageDirective,
++    agents: plan.agents,
++    scenes: plan.outlines.map((outline) => {
++      const content = contentFor(outline.order);
++      return {
++        outline,
++        content,
++        actions: ensureMiraSampleSceneActions(outline, content, actionsFor(outline.order, content)),
++      };
++    }),
++  };
++}
++
++export function miraSampleCanonicalSpecSha256(plan: MiraSampleStructuralPlan): string {
++  return sha256(JSON.stringify(stableSpec(plan)));
++}
++
++export function assertMiraSampleDeterministicInteractiveContract(scenes: readonly Scene[]): void {
++  const expected = new Map<string, WidgetConfigBase>([
++    ['simulation', SIMULATION_CONFIG],
++    ['game', GAME_CONFIG],
++    ['visualization3d', VISUALIZATION_CONFIG],
++  ]);
++  for (const scene of scenes.filter((item) => item.type === 'interactive')) {
++    const content = scene.content;
++    const widgetType = content.widgetType || '';
++    const config = expected.get(widgetType);
++    if (!config || JSON.stringify(content.widgetConfig) !== JSON.stringify(config)) {
++      throw new Error(`mira_sample_deterministic_interactive_failed:config:${widgetType}`);
++    }
++    const match = content.html?.match(
++      /<script\b(?=[^>]*\btype=["']application\/json["'])(?=[^>]*\bid=["']widget-config["'])[^>]*>([\s\S]*?)<\/script\s*>/i,
++    );
++    if (!match || JSON.stringify(JSON.parse(match[1])) !== JSON.stringify(config)) {
++      throw new Error(`mira_sample_deterministic_interactive_failed:embedded_config:${widgetType}`);
++    }
++    const html = content.html || '';
++    const complete =
++      widgetType === 'simulation'
++        ? /<input\b[^>]*type=["']range["']/i.test(html) &&
++          /addEventListener\(["']input["']/.test(html) &&
++          /\.textContent\s*=/.test(html)
++        : widgetType === 'game'
++          ? /dragstart/.test(html) &&
++            /\bdrop\b/.test(html) &&
++            /slot\.addEventListener\(['"]click['"]/.test(html) &&
++            /function selectCard\(/.test(html) &&
++            /score\s*\+=/.test(html) &&
++            /level\s*\+=/.test(html) &&
++            /progress\s*=/.test(html) &&
++            /requestAnimationFrame\(/.test(html)
++          : /<canvas\b/i.test(html) &&
++            /getContext\(["']webgl["']\)/.test(html) &&
++            /createShader\(/.test(html) &&
++            /gl\.enable\(gl\.DEPTH_TEST\)/.test(html) &&
++            /function perspective\(/.test(html) &&
++            /drawArrays\(gl\.TRIANGLES,0,36\)/.test(html) &&
++            /model\.rotation\.[xyz]\s*\+=/.test(html);
++    if (!complete) {
++      throw new Error(`mira_sample_deterministic_interactive_failed:behavior:${widgetType}`);
++    }
++  }
++}
++
++/**
++ * Build and strictly validate the complete deterministic classroom draft.
++ * This boundary performs no LLM, media, persistence, or TTS calls, so backend
++ * contract validators can inspect the exact 10-scene artifact before any paid
++ * speech request is allowed.
++ */
++export function buildMiraSampleDeterministicDraft(plan: MiraSampleStructuralPlan): {
++  stage: Stage;
++  scenes: Scene[];
++} {
++  const ttsPolicy = getMiraTtsPolicy();
++  if (!ttsPolicy) {
++    throw new Error('mira_sample_deterministic_recovery_requires_qwen3_tts_policy');
++  }
++  const stageId = nanoid(10);
++  const stage: Stage = {
++    id: stageId,
++    name: plan.courseTitle,
++    languageDirective: plan.languageDirective,
++    videoManifest: buildVideoManifestFromOutlines(plan.outlines),
++    style: 'interactive',
++    createdAt: Date.now(),
++    updatedAt: Date.now(),
++    generatedAgentConfigs: plan.agents.map((agent, index) => {
++      const voiceConfig = getMiraTeacherVoiceConfig(agent.role, ttsPolicy);
++      return {
++        id: agent.id,
++        name: getMiraTeacherName(agent.role, agent.name, ttsPolicy),
++        role: agent.role,
++        persona: agent.persona || '',
++        avatar: AGENT_DEFAULT_AVATARS[index % AGENT_DEFAULT_AVATARS.length],
++        color: AGENT_COLOR_PALETTE[index % AGENT_COLOR_PALETTE.length],
++        priority: agent.role === 'teacher' ? 10 : 5,
++        ...(voiceConfig ? { voiceConfig } : {}),
++      };
++    }),
++  };
++  const scenes = plan.outlines.map((outline) => {
++    const content = contentFor(outline.order);
++    const actions = ensureMiraSampleSceneActions(
++      outline,
++      content,
++      actionsFor(outline.order, content),
++    );
++    const scene = buildCompleteScene(outline, content, actions, stageId);
++    if (!scene) throw new Error(`mira_sample_deterministic_scene_failed:${outline.id}`);
++    return scene as Scene;
++  });
++  assertMiraSampleClassroomStructure(stage, scenes);
++  assertMiraSampleDeterministicInteractiveContract(scenes);
++  return { stage, scenes };
++}
++
++async function audioManifest(stageId: string, scenes: readonly Scene[]) {
++  const manifest: Array<{ actionId: string; bytes: number; sha256: string }> = [];
++  for (const scene of scenes) {
++    for (const action of scene.actions || []) {
++      if (action.type !== 'speech' || !action.audioUrl) continue;
++      const filename = path.basename(new URL(action.audioUrl, 'http://runtime.invalid').pathname);
++      const bytes = await fs.readFile(path.join(CLASSROOMS_DIR, stageId, 'audio', filename));
++      manifest.push({ actionId: action.id, bytes: bytes.length, sha256: sha256(bytes) });
++    }
++  }
++  return manifest;
++}
++
++export async function generateMiraSampleDeterministicClassroom(
++  plan: MiraSampleStructuralPlan,
++  options: GenerateOptions,
++): Promise<MiraSampleDeterministicResult> {
++  if (options.baseUrl !== '') {
++    throw new Error('mira_sample_deterministic_recovery_requires_relative_urls');
++  }
++  await options.onProgress?.({
++    step: 'initializing',
++    progress: 5,
++    message: 'Initializing deterministic Mira sample recovery',
++    scenesGenerated: 0,
++  });
++  await options.onProgress?.({
++    step: 'generating_outlines',
++    progress: 20,
++    message: 'Loading server-owned 10-scene lesson specification',
++    scenesGenerated: 0,
++    totalScenes: 10,
++  });
++  const { stage, scenes } = buildMiraSampleDeterministicDraft(plan);
++  await options.onProgress?.({
++    step: 'generating_scenes',
++    progress: 88,
++    message: 'Built and validated 10 deterministic scenes without LLM calls',
++    scenesGenerated: 10,
++    totalScenes: 10,
++  });
++  await options.onProgress?.({
++    step: 'generating_tts',
++    progress: 94,
++    message: 'Generating required Qwen3-TTS narration',
++    scenesGenerated: 10,
++    totalScenes: 10,
++  });
++  const tts = await generateTTSForClassroom(scenes, stage.id, options.baseUrl, {
++    onSpeechAttempted: options.onTtsAttempted,
++    onSpeechGenerated: options.onTtsProgress,
++  });
++  if (tts.speechCount !== 10) {
++    throw new Error(`mira_sample_deterministic_tts_count:${tts.speechCount}`);
++  }
++  assertMiraSampleClassroomStructure(stage, scenes);
++  assertMiraSampleDeterministicInteractiveContract(scenes);
++  await options.onProgress?.({
++    step: 'persisting',
++    progress: 98,
++    message: 'Persisting deterministic recovery artifact',
++    scenesGenerated: 10,
++    totalScenes: 10,
++  });
++  const persisted = await persistClassroom({ id: stage.id, stage, scenes }, options.baseUrl);
++  const audio = await audioManifest(stage.id, scenes);
++  if (audio.length !== 10) throw new Error(`mira_sample_deterministic_audio_count:${audio.length}`);
++  const contentSha256 = sha256(JSON.stringify({ stage, scenes }));
++  const artifactSha256 = sha256(JSON.stringify({ contentSha256, audio }));
++  const deterministicReceipt: MiraSampleDeterministicReceipt = {
++    schemaVersion: 'mira.openmaic.deterministic-classroom-receipt.v1',
++    kind: MIRA_SAMPLE_DETERMINISTIC_RECOVERY_KIND,
++    mode: MIRA_SAMPLE_DETERMINISTIC_RECOVERY_MODE,
++    policyVersion: MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION,
++    canonicalSpecSha256: miraSampleCanonicalSpecSha256(plan),
++    calls: { llm: 0, webSearch: 0, imageGeneration: 0, videoGeneration: 0, tts: 10 },
++    contentSha256,
++    artifactSha256,
++    audio,
++    tts: {
++      providerId: String(tts.providerId),
++      modelId: tts.modelId,
++      voiceId: tts.voiceId,
++      speechCount: 10,
++      fallbackUsed: false,
++    },
++  };
++  await options.onProgress?.({
++    step: 'completed',
++    progress: 100,
++    message: 'Deterministic Mira sample recovery completed',
++    scenesGenerated: 10,
++    totalScenes: 10,
++  });
++  return {
++    id: persisted.id,
++    url: persisted.url,
++    stage,
++    scenes,
++    scenesCount: scenes.length,
++    createdAt: persisted.createdAt,
++    deterministicReceipt,
++  };
++}
+diff --git a/lib/server/mira-sample-deterministic-recovery.ts b/lib/server/mira-sample-deterministic-recovery.ts
+new file mode 100644
+index 0000000..f9d629d
+--- /dev/null
++++ b/lib/server/mira-sample-deterministic-recovery.ts
+@@ -0,0 +1,599 @@
++import { createHash } from 'crypto';
++import { promises as fs } from 'fs';
++import path from 'path';
++import { CLASSROOM_JOBS_DIR, writeJsonFileAtomic } from '@/lib/server/classroom-storage';
++import {
++  generateMiraSampleDeterministicClassroom,
++  MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION,
++  MIRA_SAMPLE_DETERMINISTIC_RECOVERY_KIND,
++  MIRA_SAMPLE_DETERMINISTIC_RECOVERY_MODE,
++  miraSampleCanonicalSpecSha256,
++  type MiraSampleDeterministicProgress,
++} from '@/lib/server/mira-sample-deterministic-classroom';
++import {
++  MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER,
++  resolveMiraSampleStructuralPlan,
++} from '@/lib/server/mira-sample-structural-policy';
++import { createLogger } from '@/lib/logger';
++
++export const MIRA_SAMPLE_DETERMINISTIC_RECOVERY_SCHEMA =
++  'mira.openmaic.deterministic-recovery.v1' as const;
++export const CLASSROOM_RECOVERIES_DIR = path.join(process.cwd(), 'data', 'classroom-recoveries');
++export const MIRA_SAMPLE_DETERMINISTIC_RECOVERY_STALE_TIMEOUT_MS = 15 * 60 * 1000;
++const RECOVERY_LOCK_STALE_TIMEOUT_MS = 60 * 1000;
++const RECOVERY_LOCK_RETRY_MS = 10;
++const RECOVERY_LOCK_MAX_ATTEMPTS = 500;
++const log = createLogger('MiraDeterministicRecovery');
++
++export type MiraSampleDeterministicRecoveryStatus = 'queued' | 'running' | 'succeeded' | 'failed';
++
++export interface MiraSampleDeterministicRecoveryRecord {
++  schemaVersion: typeof MIRA_SAMPLE_DETERMINISTIC_RECOVERY_SCHEMA;
++  kind: typeof MIRA_SAMPLE_DETERMINISTIC_RECOVERY_KIND;
++  recoveryId: string;
++  mode: typeof MIRA_SAMPLE_DETERMINISTIC_RECOVERY_MODE;
++  requestIdSha256: string;
++  source: {
++    jobId: string;
++    status: 'failed';
++    error: 'structured_output_exhausted';
++    scenesGenerated: 4;
++    totalScenes: 10;
++    completedAt: string;
++    jobSnapshotSha256: string;
++    jobSnapshotHashBasis: 'canonical_json_v1';
++    rawJobFileSha256: string;
++  };
++  policy: {
++    marker: typeof MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER;
++    version: typeof MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION;
++    canonicalSpecSha256: string;
++    patchSha256: string;
++  };
++  calls: {
++    llm: 0;
++    webSearch: 0;
++    imageGeneration: 0;
++    videoGeneration: 0;
++    tts: { expected: 10; attempted: number; completed: number };
++  };
++  status: MiraSampleDeterministicRecoveryStatus;
++  step: string;
++  progress: number;
++  message: string;
++  scenesGenerated: number;
++  totalScenes: 10;
++  createdAt: string;
++  updatedAt: string;
++  startedAt?: string;
++  completedAt?: string;
++  artifact?: {
++    classroomId: string;
++    url: string;
++    sceneCount: 10;
++    contentSha256: string;
++    artifactSha256: string;
++    tts: {
++      providerId: string;
++      modelId: string;
++      voiceId: string;
++      speechCount: 10;
++      fallbackUsed: false;
++    };
++  };
++  error?: { code: 'deterministic_recovery_failed'; message: string };
++}
++
++export interface MiraSampleRecoveryExpectedSource {
++  status: 'failed';
++  error: 'structured_output_exhausted';
++  scenesGenerated: 4;
++  totalScenes: 10;
++}
++
++export class MiraSampleDeterministicRecoveryError extends Error {
++  constructor(
++    public readonly code:
++      | 'invalid_recovery_request'
++      | 'recovery_source_mismatch'
++      | 'recovery_already_claimed',
++    message: string,
++  ) {
++    super(message);
++    this.name = 'MiraSampleDeterministicRecoveryError';
++  }
++}
++
++function sha256(value: string | Uint8Array): string {
++  return createHash('sha256').update(value).digest('hex');
++}
++
++function recoveryPath(sourceJobId: string): string {
++  return path.join(CLASSROOM_RECOVERIES_DIR, `${sourceJobId}.json`);
++}
++
++function recoveryLockPath(sourceJobId: string): string {
++  return path.join(CLASSROOM_RECOVERIES_DIR, `.${sourceJobId}.lock`);
++}
++
++function sourceJobPath(sourceJobId: string): string {
++  return path.join(CLASSROOM_JOBS_DIR, `${sourceJobId}.json`);
++}
++
++function validIdentifier(value: string): boolean {
++  return /^[A-Za-z0-9_-]+$/.test(value);
++}
++
++function validRecoveryRequestId(value: string): boolean {
++  return /^[A-Za-z0-9._:-]{8,128}$/.test(value);
++}
++
++function exactSource(
++  value: unknown,
++  sourceJobId: string,
++  expected: MiraSampleRecoveryExpectedSource,
++): value is {
++  id: string;
++  status: 'failed';
++  error: 'structured_output_exhausted';
++  scenesGenerated: 4;
++  totalScenes: 10;
++  completedAt: string;
++  inputSummary: { requirementPreview: string };
++} {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
++  const job = value as Record<string, unknown>;
++  const summary = job.inputSummary;
++  return Boolean(
++    job.id === sourceJobId &&
++    job.status === expected.status &&
++    job.error === expected.error &&
++    job.scenesGenerated === expected.scenesGenerated &&
++    job.totalScenes === expected.totalScenes &&
++    typeof job.completedAt === 'string' &&
++    summary &&
++    typeof summary === 'object' &&
++    !Array.isArray(summary) &&
++    (summary as Record<string, unknown>).requirementPreview?.toString().split('\n')[0] ===
++      MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER,
++  );
++}
++
++export function canonicalMiraSampleRecoverySourceSnapshot(input: {
++  id: string;
++  completedAt: string;
++}): string {
++  // Keys are deliberately emitted in lexicographic order. Cross-language
++  // callers hash these UTF-8 JSON bytes with no insignificant whitespace.
++  return JSON.stringify({
++    completedAt: input.completedAt,
++    error: 'structured_output_exhausted',
++    id: input.id,
++    requirementMarker: MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER,
++    scenesGenerated: 4,
++    status: 'failed',
++    totalScenes: 10,
++  });
++}
++
++export function getMiraSampleDeterministicRecoveryRuntimePolicy(): {
++  enabled: boolean;
++  sourceJobId: string;
++  policyVersion: typeof MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION;
++  canonicalSpecSha256: string;
++  patchSha256: string;
++} {
++  const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER);
++  if (!plan) throw new Error('Mira sample deterministic plan unavailable');
++  return {
++    enabled: process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED === '1',
++    sourceJobId: process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID || '',
++    policyVersion: MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION,
++    canonicalSpecSha256: miraSampleCanonicalSpecSha256(plan),
++    patchSha256: process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_PATCH_SHA256 || '',
++  };
++}
++
++async function readExisting(
++  sourceJobId: string,
++): Promise<MiraSampleDeterministicRecoveryRecord | null> {
++  try {
++    return JSON.parse(
++      await fs.readFile(recoveryPath(sourceJobId), 'utf8'),
++    ) as MiraSampleDeterministicRecoveryRecord;
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
++    throw error;
++  }
++}
++
++const recoveryLocks = new Map<string, Promise<void>>();
++
++async function waitForRecoveryLockRetry(): Promise<void> {
++  await new Promise<void>((resolve) => {
++    setTimeout(resolve, RECOVERY_LOCK_RETRY_MS);
++  });
++}
++
++async function withFileRecoveryLock<T>(sourceJobId: string, fn: () => Promise<T>): Promise<T> {
++  await fs.mkdir(CLASSROOM_RECOVERIES_DIR, { recursive: true });
++  const lockPath = recoveryLockPath(sourceJobId);
++  let lockHandle: Awaited<ReturnType<typeof fs.open>> | null = null;
++  for (let attempt = 0; attempt < RECOVERY_LOCK_MAX_ATTEMPTS; attempt += 1) {
++    try {
++      lockHandle = await fs.open(lockPath, 'wx');
++      break;
++    } catch (error) {
++      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
++      try {
++        const stat = await fs.stat(lockPath);
++        if (Date.now() - stat.mtimeMs > RECOVERY_LOCK_STALE_TIMEOUT_MS) {
++          await fs.unlink(lockPath);
++          continue;
++        }
++      } catch (statError) {
++        if ((statError as NodeJS.ErrnoException).code === 'ENOENT') continue;
++        throw statError;
++      }
++      await waitForRecoveryLockRetry();
++    }
++  }
++  if (!lockHandle) {
++    throw new Error(`Timed out acquiring deterministic recovery lock: ${sourceJobId}`);
++  }
++  try {
++    return await fn();
++  } finally {
++    await lockHandle.close();
++    try {
++      await fs.unlink(lockPath);
++    } catch (error) {
++      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
++    }
++  }
++}
++
++/**
++ * Serialize recovery read-modify-write operations in-process and with a short
++ * filesystem lease. The on-disk status check is the compare part of CAS; the
++ * atomic rename in writeJsonFileAtomic is the swap. This prevents a late TTS
++ * callback in another request/process from reviving a terminal record.
++ */
++async function withRecoveryLock<T>(sourceJobId: string, fn: () => Promise<T>): Promise<T> {
++  const previous = recoveryLocks.get(sourceJobId) ?? Promise.resolve();
++  let release: () => void;
++  const next = new Promise<void>((resolve) => {
++    release = resolve;
++  });
++  recoveryLocks.set(sourceJobId, next);
++  try {
++    await previous;
++    return await withFileRecoveryLock(sourceJobId, fn);
++  } finally {
++    release!();
++    if (recoveryLocks.get(sourceJobId) === next) recoveryLocks.delete(sourceJobId);
++  }
++}
++
++function staleFailureRecord(
++  record: MiraSampleDeterministicRecoveryRecord,
++  nowMs: number,
++  nowIso: string,
++): MiraSampleDeterministicRecoveryRecord | null {
++  if (record.status !== 'queued' && record.status !== 'running') return null;
++  const updatedAtMs = Date.parse(record.updatedAt);
++  if (
++    Number.isFinite(updatedAtMs) &&
++    nowMs - updatedAtMs < MIRA_SAMPLE_DETERMINISTIC_RECOVERY_STALE_TIMEOUT_MS
++  ) {
++    return null;
++  }
++  return {
++    ...record,
++    status: 'failed',
++    step: 'failed',
++    message: 'Deterministic Mira sample recovery expired without persisted progress',
++    updatedAt: nowIso,
++    completedAt: nowIso,
++    error: {
++      code: 'deterministic_recovery_failed',
++      message:
++        'Deterministic recovery expired after 15 minutes without persisted progress; it will not be replayed',
++    },
++  };
++}
++
++async function readAndExpireStaleRecovery(
++  sourceJobId: string,
++): Promise<MiraSampleDeterministicRecoveryRecord | null> {
++  return withRecoveryLock(sourceJobId, async () => {
++    const current = await readExisting(sourceJobId);
++    if (!current) return null;
++    const nowMs = Date.now();
++    const nowIso = new Date(nowMs).toISOString();
++    const expired = staleFailureRecord(current, nowMs, nowIso);
++    if (!expired) return current;
++    await writeJsonFileAtomic(recoveryPath(sourceJobId), expired);
++    return expired;
++  });
++}
++
++type RecoveryPatch = Partial<MiraSampleDeterministicRecoveryRecord>;
++
++async function compareAndSwapRecovery(
++  sourceJobId: string,
++  expectedStatuses: readonly MiraSampleDeterministicRecoveryStatus[],
++  makePatch: (current: MiraSampleDeterministicRecoveryRecord, nowIso: string) => RecoveryPatch,
++): Promise<{ record: MiraSampleDeterministicRecoveryRecord; applied: boolean }> {
++  return withRecoveryLock(sourceJobId, async () => {
++    const current = await readExisting(sourceJobId);
++    if (!current) throw new Error(`Deterministic recovery not found: ${sourceJobId}`);
++    const nowMs = Date.now();
++    const nowIso = new Date(nowMs).toISOString();
++    const expired = staleFailureRecord(current, nowMs, nowIso);
++    if (expired) {
++      await writeJsonFileAtomic(recoveryPath(sourceJobId), expired);
++      return { record: expired, applied: false };
++    }
++    if (!expectedStatuses.includes(current.status)) {
++      return { record: current, applied: false };
++    }
++    const updated: MiraSampleDeterministicRecoveryRecord = {
++      ...current,
++      ...makePatch(current, nowIso),
++      updatedAt: nowIso,
++    };
++    await writeJsonFileAtomic(recoveryPath(sourceJobId), updated);
++    return { record: updated, applied: true };
++  });
++}
++
++export async function readMiraSampleDeterministicRecovery(
++  sourceJobId: string,
++): Promise<MiraSampleDeterministicRecoveryRecord | null> {
++  if (!validIdentifier(sourceJobId)) return null;
++  return readAndExpireStaleRecovery(sourceJobId);
++}
++
++export async function claimMiraSampleDeterministicRecovery(input: {
++  sourceJobId: string;
++  recoveryRequestId: string;
++  expectedSource: MiraSampleRecoveryExpectedSource;
++  patchSha256: string;
++}): Promise<{ record: MiraSampleDeterministicRecoveryRecord; created: boolean }> {
++  if (!validIdentifier(input.sourceJobId) || !validRecoveryRequestId(input.recoveryRequestId)) {
++    throw new MiraSampleDeterministicRecoveryError(
++      'invalid_recovery_request',
++      'Invalid deterministic recovery identifier',
++    );
++  }
++  if (!/^[a-f0-9]{64}$/.test(input.patchSha256)) {
++    throw new MiraSampleDeterministicRecoveryError(
++      'invalid_recovery_request',
++      'Deterministic recovery patch SHA-256 is not configured',
++    );
++  }
++  const requestIdSha256 = sha256(input.recoveryRequestId);
++  const existing = await readAndExpireStaleRecovery(input.sourceJobId);
++  if (existing) {
++    if (existing.requestIdSha256 !== requestIdSha256) {
++      throw new MiraSampleDeterministicRecoveryError(
++        'recovery_already_claimed',
++        'The source job already has a deterministic recovery claimed with a different idempotency key',
++      );
++    }
++    return { record: existing, created: false };
++  }
++
++  const rawSource = await fs.readFile(sourceJobPath(input.sourceJobId));
++  let source: unknown;
++  try {
++    source = JSON.parse(rawSource.toString('utf8'));
++  } catch {
++    throw new MiraSampleDeterministicRecoveryError(
++      'recovery_source_mismatch',
++      'The source job snapshot is not valid JSON',
++    );
++  }
++  if (!exactSource(source, input.sourceJobId, input.expectedSource)) {
++    throw new MiraSampleDeterministicRecoveryError(
++      'recovery_source_mismatch',
++      'The source job does not match the frozen failed third-job snapshot contract',
++    );
++  }
++  const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER);
++  if (!plan) throw new Error('Mira sample deterministic plan unavailable');
++  const now = new Date().toISOString();
++  const record: MiraSampleDeterministicRecoveryRecord = {
++    schemaVersion: MIRA_SAMPLE_DETERMINISTIC_RECOVERY_SCHEMA,
++    kind: MIRA_SAMPLE_DETERMINISTIC_RECOVERY_KIND,
++    recoveryId: `omrec_${sha256(`${input.sourceJobId}:${requestIdSha256}`).slice(0, 24)}`,
++    mode: MIRA_SAMPLE_DETERMINISTIC_RECOVERY_MODE,
++    requestIdSha256,
++    source: {
++      jobId: input.sourceJobId,
++      status: 'failed',
++      error: 'structured_output_exhausted',
++      scenesGenerated: 4,
++      totalScenes: 10,
++      completedAt: source.completedAt,
++      jobSnapshotSha256: sha256(
++        canonicalMiraSampleRecoverySourceSnapshot({
++          id: input.sourceJobId,
++          completedAt: source.completedAt,
++        }),
++      ),
++      jobSnapshotHashBasis: 'canonical_json_v1',
++      rawJobFileSha256: sha256(rawSource),
++    },
++    policy: {
++      marker: MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER,
++      version: MIRA_SAMPLE_DETERMINISTIC_POLICY_VERSION,
++      canonicalSpecSha256: miraSampleCanonicalSpecSha256(plan),
++      patchSha256: input.patchSha256,
++    },
++    calls: {
++      llm: 0,
++      webSearch: 0,
++      imageGeneration: 0,
++      videoGeneration: 0,
++      tts: { expected: 10, attempted: 0, completed: 0 },
++    },
++    status: 'queued',
++    step: 'queued',
++    progress: 0,
++    message: 'Deterministic Mira sample recovery queued',
++    scenesGenerated: 0,
++    totalScenes: 10,
++    createdAt: now,
++    updatedAt: now,
++  };
++
++  await fs.mkdir(CLASSROOM_RECOVERIES_DIR, { recursive: true });
++  try {
++    await fs.writeFile(recoveryPath(input.sourceJobId), JSON.stringify(record, null, 2), {
++      encoding: 'utf8',
++      flag: 'wx',
++    });
++    return { record, created: true };
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
++    const winner = await readExisting(input.sourceJobId);
++    if (!winner) throw error;
++    if (winner.requestIdSha256 !== requestIdSha256) {
++      throw new MiraSampleDeterministicRecoveryError(
++        'recovery_already_claimed',
++        'The source job already has a deterministic recovery claimed with a different idempotency key',
++      );
++    }
++    return { record: winner, created: false };
++  }
++}
++
++const runningRecoveries = new Map<string, Promise<void>>();
++
++export function runMiraSampleDeterministicRecovery(sourceJobId: string): Promise<void> {
++  const existing = runningRecoveries.get(sourceJobId);
++  if (existing) return existing;
++  const task = (async () => {
++    try {
++      // Only a fresh append-only queued claim may transition to running. Every
++      // later update is a status-checked CAS from running, so a stale-failed or
++      // otherwise terminal record can never be revived and can never spend TTS
++      // again.
++      const started = await compareAndSwapRecovery(sourceJobId, ['queued'], (_current, nowIso) => ({
++        status: 'running',
++        step: 'initializing',
++        progress: 1,
++        message: 'Deterministic Mira sample recovery started',
++        startedAt: nowIso,
++      }));
++      if (!started.applied) return;
++      const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER);
++      if (!plan) throw new Error('Mira sample deterministic plan unavailable');
++      const result = await generateMiraSampleDeterministicClassroom(plan, {
++        // Persist same-origin references. The backend resolves them against the
++        // private 3100 origin; a student resolves them against the authenticated
++        // 3101 gateway. Never bake loopback or one machine's LAN host into data.
++        baseUrl: '',
++        onProgress: async (progress: MiraSampleDeterministicProgress) => {
++          const update = await compareAndSwapRecovery(sourceJobId, ['running'], () => ({
++            status: 'running',
++            step: progress.step,
++            progress: progress.progress,
++            message: progress.message,
++            scenesGenerated: progress.scenesGenerated,
++          }));
++          if (!update.applied) {
++            throw new Error('Deterministic recovery is no longer running');
++          }
++        },
++        onTtsAttempted: async (attempted) => {
++          const update = await compareAndSwapRecovery(sourceJobId, ['running'], (current) => {
++            if (
++              !Number.isInteger(attempted) ||
++              attempted !== current.calls.tts.attempted + 1 ||
++              attempted > current.calls.tts.expected
++            ) {
++              throw new Error('Invalid deterministic recovery TTS attempt count');
++            }
++            return {
++              calls: {
++                ...current.calls,
++                tts: { ...current.calls.tts, attempted },
++              },
++            };
++          });
++          if (!update.applied) {
++            throw new Error('Deterministic recovery is no longer running');
++          }
++        },
++        onTtsProgress: async (completed) => {
++          const update = await compareAndSwapRecovery(sourceJobId, ['running'], (current) => {
++            if (
++              !Number.isInteger(completed) ||
++              completed !== current.calls.tts.completed + 1 ||
++              completed > current.calls.tts.attempted
++            ) {
++              throw new Error('Invalid deterministic recovery TTS progress');
++            }
++            return {
++              calls: {
++                ...current.calls,
++                tts: { ...current.calls.tts, completed },
++              },
++            };
++          });
++          if (!update.applied) {
++            throw new Error('Deterministic recovery is no longer running');
++          }
++        },
++      });
++      const receipt = result.deterministicReceipt;
++      await compareAndSwapRecovery(sourceJobId, ['running'], (_current, nowIso) => ({
++        status: 'succeeded',
++        step: 'completed',
++        progress: 100,
++        message: 'Deterministic Mira sample recovery completed',
++        scenesGenerated: 10,
++        completedAt: nowIso,
++        calls: {
++          llm: 0,
++          webSearch: 0,
++          imageGeneration: 0,
++          videoGeneration: 0,
++          tts: { expected: 10, attempted: 10, completed: 10 },
++        },
++        artifact: {
++          classroomId: result.id,
++          url: result.url,
++          sceneCount: 10,
++          contentSha256: receipt.contentSha256,
++          artifactSha256: receipt.artifactSha256,
++          tts: receipt.tts,
++        },
++      }));
++    } catch (error) {
++      log.error(`Deterministic recovery ${sourceJobId} failed`, {
++        errorType: error instanceof Error ? error.name : 'unknown',
++      });
++      // If a GET/POST observation already stale-failed this record, this CAS is
++      // deliberately a no-op. A late provider rejection or completion must not
++      // rewrite terminal audit history.
++      await compareAndSwapRecovery(sourceJobId, ['running'], (_current, nowIso) => ({
++        status: 'failed',
++        step: 'failed',
++        message: 'Deterministic Mira sample recovery failed',
++        completedAt: nowIso,
++        error: {
++          code: 'deterministic_recovery_failed',
++          message: 'Deterministic recovery execution failed; inspect the server log',
++        },
++      }));
++    } finally {
++      runningRecoveries.delete(sourceJobId);
++    }
++  })();
++  runningRecoveries.set(sourceJobId, task);
++  return task;
++}
+diff --git a/tests/audio/qwen-tts-timeout.test.ts b/tests/audio/qwen-tts-timeout.test.ts
+new file mode 100644
+index 0000000..2f18573
+--- /dev/null
++++ b/tests/audio/qwen-tts-timeout.test.ts
+@@ -0,0 +1,103 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { generateTTS, QWEN_TTS_REQUEST_TIMEOUT_MS } from '@/lib/audio/tts-providers';
++
++describe('Qwen TTS bounded network contract', () => {
++  afterEach(() => {
++    vi.restoreAllMocks();
++    vi.unstubAllGlobals();
++  });
++
++  it('uses a separate fixed AbortSignal for synthesis and audio download with no retry', async () => {
++    const synthesisSignal = new AbortController().signal;
++    const downloadSignal = new AbortController().signal;
++    const timeout = vi
++      .spyOn(AbortSignal, 'timeout')
++      .mockReturnValueOnce(synthesisSignal)
++      .mockReturnValueOnce(downloadSignal);
++    const fetchMock = vi
++      .fn()
++      .mockResolvedValueOnce({
++        ok: true,
++        json: async () => ({ output: { audio: { url: 'https://audio.invalid/qwen.wav' } } }),
++      })
++      .mockResolvedValueOnce({
++        ok: true,
++        arrayBuffer: async () => Uint8Array.from([82, 73, 70, 70]).buffer,
++      });
++    vi.stubGlobal('fetch', fetchMock);
++
++    const result = await generateTTS(
++      {
++        providerId: 'qwen-tts',
++        modelId: 'qwen3-tts-flash',
++        apiKey: 'offline-test-key',
++        baseUrl: 'https://dashscope.invalid/api/v1',
++        voice: 'Serena',
++      },
++      '我们来认识二十以内的数。',
++    );
++
++    expect(result.audio).toEqual(Uint8Array.from([82, 73, 70, 70]));
++    expect(timeout.mock.calls).toEqual([
++      [QWEN_TTS_REQUEST_TIMEOUT_MS],
++      [QWEN_TTS_REQUEST_TIMEOUT_MS],
++    ]);
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++    expect(fetchMock.mock.calls[0][1]).toMatchObject({ signal: synthesisSignal });
++    expect(fetchMock.mock.calls[1][1]).toEqual({ signal: downloadSignal });
++  });
++
++  it('propagates a synthesis timeout after one attempt and never starts the download', async () => {
++    const timeout = vi.spyOn(AbortSignal, 'timeout').mockReturnValue(new AbortController().signal);
++    const timeoutError = new Error('offline timeout');
++    timeoutError.name = 'TimeoutError';
++    const fetchMock = vi.fn().mockRejectedValueOnce(timeoutError);
++    vi.stubGlobal('fetch', fetchMock);
++
++    await expect(
++      generateTTS(
++        {
++          providerId: 'qwen-tts',
++          modelId: 'qwen3-tts-flash',
++          apiKey: 'offline-test-key',
++          baseUrl: 'https://dashscope.invalid/api/v1',
++          voice: 'Serena',
++        },
++        '第一段语音',
++      ),
++    ).rejects.toMatchObject({ name: 'TimeoutError' });
++    expect(timeout).toHaveBeenCalledOnce();
++    expect(fetchMock).toHaveBeenCalledOnce();
++  });
++
++  it('propagates an audio download timeout after exactly one synthesis and one download', async () => {
++    const timeout = vi
++      .spyOn(AbortSignal, 'timeout')
++      .mockReturnValue(new AbortController().signal);
++    const timeoutError = new Error('offline audio download timeout');
++    timeoutError.name = 'TimeoutError';
++    const fetchMock = vi
++      .fn()
++      .mockResolvedValueOnce({
++        ok: true,
++        json: async () => ({ output: { audio: { url: 'https://audio.invalid/qwen.wav' } } }),
++      })
++      .mockRejectedValueOnce(timeoutError);
++    vi.stubGlobal('fetch', fetchMock);
++
++    await expect(
++      generateTTS(
++        {
++          providerId: 'qwen-tts',
++          modelId: 'qwen3-tts-flash',
++          apiKey: 'offline-test-key',
++          baseUrl: 'https://dashscope.invalid/api/v1',
++          voice: 'Serena',
++        },
++        '第四段语音',
++      ),
++    ).rejects.toMatchObject({ name: 'TimeoutError' });
++    expect(timeout).toHaveBeenCalledTimes(2);
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++  });
++});
+diff --git a/tests/server/classroom-tts-fail-fast.test.ts b/tests/server/classroom-tts-fail-fast.test.ts
+new file mode 100644
+index 0000000..b3d7912
+--- /dev/null
++++ b/tests/server/classroom-tts-fail-fast.test.ts
+@@ -0,0 +1,100 @@
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++import type { Scene } from '@/lib/types/stage';
++
++const mocks = vi.hoisted(() => ({
++  generateTTS: vi.fn(),
++  mkdir: vi.fn(),
++  writeFile: vi.fn(),
++  stat: vi.fn(),
++}));
++
++vi.mock('fs', () => ({
++  promises: {
++    mkdir: mocks.mkdir,
++    writeFile: mocks.writeFile,
++    stat: mocks.stat,
++  },
++}));
++vi.mock('@/lib/audio/tts-providers', () => ({ generateTTS: mocks.generateTTS }));
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerImageProviders: () => ({}),
++  getServerVideoProviders: () => ({}),
++  getServerTTSProviders: () => ({ 'qwen-tts': {} }),
++  resolveImageApiKey: () => '',
++  resolveImageBaseUrl: () => '',
++  resolveVideoApiKey: () => '',
++  resolveVideoBaseUrl: () => '',
++  resolveTTSApiKey: () => 'offline-test-key',
++  resolveTTSBaseUrl: () => 'https://dashscope.invalid/api/v1',
++}));
++vi.mock('@/lib/server/mira-tts-policy', () => ({
++  getMiraTtsPolicy: () => ({
++    enforced: true,
++    providerId: 'qwen-tts',
++    modelId: 'qwen3-tts-flash',
++    voiceId: 'Serena',
++  }),
++  assertMiraTtsProviderReady: () => undefined,
++}));
++
++function speechScenes(count: number): Scene[] {
++  return Array.from({ length: count }, (_, index) => ({
++    id: `scene-${index + 1}`,
++    stageId: 'stage-tts-fail-fast',
++    type: 'slide',
++    title: `第${index + 1}场`,
++    order: index + 1,
++    content: {
++      type: 'slide',
++      canvas: { id: `canvas-${index + 1}`, elements: [] },
++    },
++    actions: [
++      {
++        id: `speech-${index + 1}`,
++        type: 'speech',
++        text: `这是第${index + 1}段语音。`,
++      },
++    ],
++  })) as unknown as Scene[];
++}
++
++describe('classroom Qwen TTS fail-fast accounting', () => {
++  beforeEach(() => {
++    for (const mock of Object.values(mocks)) mock.mockReset();
++    mocks.mkdir.mockResolvedValue(undefined);
++    mocks.writeFile.mockResolvedValue(undefined);
++    mocks.stat.mockResolvedValue({ isFile: () => true, size: 4 });
++    mocks.generateTTS.mockImplementation(async () => {
++      if (mocks.generateTTS.mock.calls.length === 4) {
++        const error = new Error('offline download timeout');
++        error.name = 'TimeoutError';
++        throw error;
++      }
++      return { audio: Uint8Array.from([82, 73, 70, 70]), format: 'wav' };
++    });
++  });
++
++  it('records the fourth attempt, only three verified assets, and never starts speech five', async () => {
++    const { generateTTSForClassroom } = await import('@/lib/server/classroom-media-generation');
++    const scenes = speechScenes(5);
++    const attempted: number[] = [];
++    const completed: number[] = [];
++
++    await expect(
++      generateTTSForClassroom(scenes, 'stage-tts-fail-fast', '', {
++        onSpeechAttempted: (count) => {
++          attempted.push(count);
++        },
++        onSpeechGenerated: (count) => {
++          completed.push(count);
++        },
++      }),
++    ).rejects.toMatchObject({ name: 'TimeoutError' });
++
++    expect(attempted).toEqual([1, 2, 3, 4]);
++    expect(completed).toEqual([1, 2, 3]);
++    expect(mocks.generateTTS).toHaveBeenCalledTimes(4);
++    expect(scenes[3].actions?.[0]).not.toHaveProperty('audioMetadata');
++    expect(scenes[4].actions?.[0]).not.toHaveProperty('audioMetadata');
++  });
++});
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 49e66f0..942a5b2 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -20,6 +20,9 @@ describe('GET /api/health structured scene runtime policy', () => {
+     delete process.env.MODEL_ROUTES;
+     delete process.env.KIMI_API_KEY;
+     delete process.env.KIMI_BASE_URL;
++    process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED = '1';
++    process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID = 'uKQl3vMr4d';
++    process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_PATCH_SHA256 = 'c'.repeat(64);
+   });
+ 
+   afterEach(() => {
+@@ -32,6 +35,9 @@ describe('GET /api/health structured scene runtime policy', () => {
+     delete process.env.MODEL_ROUTES;
+     delete process.env.KIMI_API_KEY;
+     delete process.env.KIMI_BASE_URL;
++    delete process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED;
++    delete process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID;
++    delete process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_PATCH_SHA256;
+   });
+ 
+   it('returns the exact policy resolved from the effective server-owned routes', async () => {
+@@ -73,6 +79,13 @@ describe('GET /api/health structured scene runtime policy', () => {
+       ],
+       thinking: { mode: 'disabled', enabled: false },
+     });
++    expect(body.runtimePolicy.deterministicRecovery).toEqual({
++      enabled: true,
++      sourceJobId: 'uKQl3vMr4d',
++      policyVersion: 'mira-sample-deterministic-classroom.v1',
++      canonicalSpecSha256: '879040700d374f045058b09cbf6ed6e956ebf97d8c8d9008477063458c5ef7b6',
++      patchSha256: 'c'.repeat(64),
++    });
+     const serialized = JSON.stringify(body);
+     expect(serialized).not.toContain('fake-secret-must-not-leak');
+     expect(serialized).not.toContain('fake-base-url-must-not-leak');
+diff --git a/tests/server/mira-sample-deterministic-classroom.test.ts b/tests/server/mira-sample-deterministic-classroom.test.ts
+new file mode 100644
+index 0000000..3904030
+--- /dev/null
++++ b/tests/server/mira-sample-deterministic-classroom.test.ts
+@@ -0,0 +1,214 @@
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++
++const mocks = vi.hoisted(() => ({
++  resolveModel: vi.fn(),
++  callLLM: vi.fn(),
++  generateSceneContent: vi.fn(),
++  generateSceneActions: vi.fn(),
++  generateTTSForClassroom: vi.fn(),
++  persistClassroom: vi.fn(),
++  readFile: vi.fn(),
++}));
++
++vi.mock('@/lib/server/resolve-model', () => ({ resolveModel: mocks.resolveModel }));
++vi.mock('@/lib/ai/llm', () => ({ callLLM: mocks.callLLM }));
++vi.mock('@openmaic/generation', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('@openmaic/generation')>()),
++  generateSceneContent: mocks.generateSceneContent,
++  generateSceneActions: mocks.generateSceneActions,
++}));
++vi.mock('@/lib/server/classroom-media-generation', () => ({
++  generateTTSForClassroom: mocks.generateTTSForClassroom,
++}));
++vi.mock('@/lib/server/classroom-storage', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('@/lib/server/classroom-storage')>()),
++  persistClassroom: mocks.persistClassroom,
++  CLASSROOMS_DIR: '/deterministic-test/classrooms',
++}));
++vi.mock('fs', () => ({ promises: { readFile: mocks.readFile } }));
++
++describe('Mira sample deterministic classroom', () => {
++  beforeEach(() => {
++    for (const mock of Object.values(mocks)) mock.mockReset();
++    process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS = '1';
++    process.env.MIRA_OPENMAIC_QWEN_TTS_MODEL = 'qwen3-tts-flash';
++    process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE = 'Serena';
++    mocks.readFile.mockResolvedValue(Buffer.from('RIFF deterministic qwen audio bytes'));
++    mocks.persistClassroom.mockImplementation(async ({ id, stage, scenes }) => ({
++      id,
++      stage,
++      scenes,
++      createdAt: '2026-08-18T00:00:00.000Z',
++      url: `/classroom/${id}`,
++    }));
++    mocks.generateTTSForClassroom.mockImplementation(
++      async (scenes, classroomId, baseUrl, options) => {
++        expect(baseUrl).toBe('');
++        let completed = 0;
++        for (const scene of scenes) {
++          for (const action of scene.actions || []) {
++            if (action.type !== 'speech') continue;
++            completed += 1;
++            await options?.onSpeechAttempted?.(completed);
++            Object.assign(action, {
++              audioId: `tts_s${scene.order}_${action.id}`,
++              audioUrl: `/api/classroom-media/${classroomId}/audio/tts-${scene.order}.wav`,
++              audioMetadata: {
++                schemaVersion: 'mira.openmaic.speech-audio.v1',
++                providerId: 'qwen-tts',
++                modelId: 'qwen3-tts-flash',
++                voiceId: 'Serena',
++                fallbackUsed: false,
++              },
++            });
++            await options?.onSpeechGenerated?.(completed);
++          }
++        }
++        return {
++          providerId: 'qwen-tts',
++          modelId: 'qwen3-tts-flash',
++          voiceId: 'Serena',
++          speechCount: completed,
++        };
++      },
++    );
++  });
++
++  it('builds the complete production lesson with zero course-LLM calls and strict Qwen TTS', async () => {
++    const {
++      assertMiraSampleDeterministicInteractiveContract,
++      generateMiraSampleDeterministicClassroom,
++    } = await import('@/lib/server/mira-sample-deterministic-classroom');
++    const { MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER, resolveMiraSampleStructuralPlan } =
++      await import('@/lib/server/mira-sample-structural-policy');
++    const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER);
++    if (!plan) throw new Error('deterministic plan missing');
++    const ttsAttempts: number[] = [];
++    const ttsProgress: number[] = [];
++    const result = await generateMiraSampleDeterministicClassroom(plan, {
++      baseUrl: '',
++      onTtsAttempted: (attempted) => {
++        ttsAttempts.push(attempted);
++      },
++      onTtsProgress: (completed) => {
++        ttsProgress.push(completed);
++      },
++    });
++
++    expect(mocks.resolveModel).not.toHaveBeenCalled();
++    expect(mocks.callLLM).not.toHaveBeenCalled();
++    expect(mocks.generateSceneContent).not.toHaveBeenCalled();
++    expect(mocks.generateSceneActions).not.toHaveBeenCalled();
++    expect(result.scenes).toHaveLength(10);
++    expect(result.scenes.filter((scene) => scene.type === 'slide')).toHaveLength(5);
++    expect(result.scenes.filter((scene) => scene.type === 'quiz')).toHaveLength(2);
++    expect(
++      result.scenes
++        .filter((scene) => scene.type === 'slide')
++        .every((scene) => scene.type === 'slide' && scene.content.canvas.elements.length >= 5),
++    ).toBe(true);
++    expect(
++      result.scenes
++        .filter((scene) => scene.type === 'quiz')
++        .every((scene) => scene.type === 'quiz' && scene.content.questions.length === 3),
++    ).toBe(true);
++    const numberLine = result.scenes.find((scene) => scene.order === 4);
++    expect(
++      numberLine?.type === 'slide' &&
++        numberLine.content.canvas.elements.some(
++          (element) => element.type === 'text' && element.content.includes('13 ─ 14 ─ 15'),
++        ),
++    ).toBe(true);
++    assertMiraSampleDeterministicInteractiveContract(result.scenes);
++
++    const interactives = result.scenes.filter((scene) => scene.type === 'interactive');
++    expect(interactives.map((scene) => scene.content.widgetType)).toEqual([
++      'simulation',
++      'game',
++      'visualization3d',
++    ]);
++    const game = interactives.find((scene) => scene.content.widgetType === 'game');
++    expect(game?.content.html).toContain("slot.addEventListener('click'");
++    expect(game?.content.html).toContain('function placeCard(slot,card)');
++    const visualization = interactives.find(
++      (scene) => scene.content.widgetType === 'visualization3d',
++    );
++    expect(visualization?.content.html).toContain('gl.enable(gl.DEPTH_TEST)');
++    expect(visualization?.content.html).toContain('function perspective(');
++    expect(visualization?.content.html).toContain('gl.drawArrays(gl.TRIANGLES,0,36)');
++
++    const speeches = result.scenes.flatMap((scene) =>
++      (scene.actions || []).filter((action) => action.type === 'speech'),
++    );
++    expect(speeches).toHaveLength(10);
++    expect(
++      speeches.every(
++        (speech) =>
++          speech.type === 'speech' &&
++          speech.audioUrl?.startsWith('/api/classroom-media/') &&
++          !speech.audioUrl.includes('://'),
++      ),
++    ).toBe(true);
++    expect(ttsAttempts).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
++    expect(ttsProgress).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
++    expect(result.deterministicReceipt.calls).toEqual({
++      llm: 0,
++      webSearch: 0,
++      imageGeneration: 0,
++      videoGeneration: 0,
++      tts: 10,
++    });
++    expect(result.deterministicReceipt.tts).toEqual({
++      providerId: 'qwen-tts',
++      modelId: 'qwen3-tts-flash',
++      voiceId: 'Serena',
++      speechCount: 10,
++      fallbackUsed: false,
++    });
++    expect(result.stage.generatedAgentConfigs?.map((agent) => agent.role)).toEqual([
++      'teacher',
++      'student',
++      'student',
++      'student',
++      'student',
++    ]);
++    const peerIds = new Set(
++      result.scenes.flatMap((scene) =>
++        (scene.actions || [])
++          .filter((action) => action.type === 'discussion')
++          .map((action) => action.agentId),
++      ),
++    );
++    expect(peerIds).toEqual(new Set(['mira-sample-peer-duoduo', 'mira-sample-peer-lele']));
++  });
++
++  it('exports a fully validated draft boundary without any LLM, TTS, or persistence call', async () => {
++    const { buildMiraSampleDeterministicDraft } =
++      await import('@/lib/server/mira-sample-deterministic-classroom');
++    const { MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER, resolveMiraSampleStructuralPlan } =
++      await import('@/lib/server/mira-sample-structural-policy');
++    const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER)!;
++    const draft = buildMiraSampleDeterministicDraft(plan);
++
++    expect(draft.scenes).toHaveLength(10);
++    expect(draft.stage.generatedAgentConfigs).toHaveLength(5);
++    expect(mocks.resolveModel).not.toHaveBeenCalled();
++    expect(mocks.callLLM).not.toHaveBeenCalled();
++    expect(mocks.generateSceneContent).not.toHaveBeenCalled();
++    expect(mocks.generateSceneActions).not.toHaveBeenCalled();
++    expect(mocks.generateTTSForClassroom).not.toHaveBeenCalled();
++    expect(mocks.persistClassroom).not.toHaveBeenCalled();
++  });
++
++  it('rejects any absolute artifact base URL', async () => {
++    const { generateMiraSampleDeterministicClassroom } =
++      await import('@/lib/server/mira-sample-deterministic-classroom');
++    const { MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER, resolveMiraSampleStructuralPlan } =
++      await import('@/lib/server/mira-sample-structural-policy');
++    const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER)!;
++    await expect(
++      generateMiraSampleDeterministicClassroom(plan, { baseUrl: 'http://127.0.0.1:3100' }),
++    ).rejects.toThrow(/requires_relative_urls/);
++    expect(mocks.generateTTSForClassroom).not.toHaveBeenCalled();
++  });
++});
+diff --git a/tests/server/mira-sample-deterministic-recovery-route.test.ts b/tests/server/mira-sample-deterministic-recovery-route.test.ts
+new file mode 100644
+index 0000000..db5e254
+--- /dev/null
++++ b/tests/server/mira-sample-deterministic-recovery-route.test.ts
+@@ -0,0 +1,285 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { NextRequest } from 'next/server';
++
++const mocks = vi.hoisted(() => ({
++  after: vi.fn(),
++  claim: vi.fn(),
++  read: vi.fn(),
++  run: vi.fn(),
++}));
++
++vi.mock('next/server', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('next/server')>()),
++  after: mocks.after,
++}));
++vi.mock('@/lib/server/mira-sample-deterministic-recovery', () => ({
++  claimMiraSampleDeterministicRecovery: mocks.claim,
++  readMiraSampleDeterministicRecovery: mocks.read,
++  runMiraSampleDeterministicRecovery: mocks.run,
++  MiraSampleDeterministicRecoveryError: class extends Error {
++    constructor(
++      public code: string,
++      message: string,
++    ) {
++      super(message);
++    }
++  },
++}));
++
++function record(status: 'queued' | 'running' | 'succeeded' | 'failed' = 'queued') {
++  return {
++    schemaVersion: 'mira.openmaic.deterministic-recovery.v1',
++    kind: 'mira_sample_deterministic_no_llm_v1',
++    recoveryId: 'omrec_1234567890abcdefghijklmn',
++    mode: 'deterministic_no_llm',
++    requestIdSha256: 'do-not-expose',
++    source: {
++      jobId: 'uKQl3vMr4d',
++      status: 'failed',
++      error: 'structured_output_exhausted',
++      scenesGenerated: 4,
++      totalScenes: 10,
++      completedAt: '2026-08-18T10:36:50.864Z',
++      jobSnapshotSha256: 'a'.repeat(64),
++      jobSnapshotHashBasis: 'canonical_json_v1',
++      rawJobFileSha256: 'raw-do-not-expose',
++    },
++    policy: {
++      marker: 'MIRA_OPENMAIC_SAMPLE_STRUCTURAL_POLICY_V1',
++      version: 'mira-sample-deterministic-classroom.v1',
++      canonicalSpecSha256: 'b'.repeat(64),
++      patchSha256: 'c'.repeat(64),
++    },
++    calls: {
++      llm: 0,
++      webSearch: 0,
++      imageGeneration: 0,
++      videoGeneration: 0,
++      tts: {
++        expected: 10,
++        attempted: status === 'succeeded' ? 10 : 0,
++        completed: status === 'succeeded' ? 10 : 0,
++      },
++    },
++    status,
++    step: status === 'queued' ? 'queued' : status,
++    progress: status === 'succeeded' ? 100 : 0,
++    message: 'safe status',
++    scenesGenerated: status === 'succeeded' ? 10 : 0,
++    totalScenes: 10,
++    createdAt: '2026-08-18T11:00:00.000Z',
++    updatedAt: '2026-08-18T11:00:00.000Z',
++    ...(status === 'succeeded'
++      ? {
++          completedAt: '2026-08-18T11:02:00.000Z',
++          artifact: {
++            classroomId: 'classroom-1',
++            url: '/classroom/classroom-1',
++            sceneCount: 10,
++            contentSha256: 'd'.repeat(64),
++            artifactSha256: 'e'.repeat(64),
++            tts: {
++              providerId: 'qwen-tts',
++              modelId: 'qwen3-tts-flash',
++              voiceId: 'Serena',
++              speechCount: 10,
++              fallbackUsed: false,
++            },
++          },
++        }
++      : {}),
++  };
++}
++
++function request(
++  body: object,
++  url = 'http://127.0.0.1:3100/api/generate-classroom/uKQl3vMr4d/deterministic-recovery',
++) {
++  return new NextRequest(url, {
++    method: 'POST',
++    headers: {
++      'content-type': 'application/json',
++      host: '127.0.0.1:3100',
++      'x-forwarded-host': '127.0.0.1:3100',
++      'x-forwarded-for': '127.0.0.1',
++      'x-forwarded-proto': 'http',
++      'x-forwarded-port': '3100',
++      'x-mira-internal-token': 'internal-test-token',
++    },
++    body: JSON.stringify(body),
++  });
++}
++
++function directGetRequest() {
++  return new NextRequest(
++    'http://127.0.0.1:3100/api/generate-classroom/uKQl3vMr4d/deterministic-recovery',
++    {
++      headers: {
++        host: '127.0.0.1:3100',
++        'x-forwarded-host': '127.0.0.1:3100',
++        'x-forwarded-for': '127.0.0.1',
++        'x-forwarded-proto': 'http',
++        'x-forwarded-port': '3100',
++        'x-mira-internal-token': 'internal-test-token',
++      },
++    },
++  );
++}
++
++const exactBody = {
++  recoveryRequestId: 'stage2-number-sense-deterministic-recovery-v1',
++  expectedSource: {
++    status: 'failed',
++    error: 'structured_output_exhausted',
++    scenesGenerated: 4,
++    totalScenes: 10,
++  },
++};
++
++describe('deterministic recovery route', () => {
++  beforeEach(() => {
++    for (const mock of Object.values(mocks)) mock.mockReset();
++    process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED = '1';
++    process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID = 'uKQl3vMr4d';
++    process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_PATCH_SHA256 = 'c'.repeat(64);
++    process.env.MIRA_INTERNAL_API_TOKEN = 'internal-test-token';
++  });
++
++  afterEach(() => {
++    delete process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED;
++    delete process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID;
++    delete process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_PATCH_SHA256;
++    delete process.env.MIRA_INTERNAL_API_TOKEN;
++  });
++
++  it('claims before scheduling after(), returns a flattened allowlisted receipt, and schedules once', async () => {
++    mocks.claim.mockResolvedValueOnce({ record: record('queued'), created: true });
++    const { POST, maxDuration } =
++      await import('@/app/api/generate-classroom/[jobId]/deterministic-recovery/route');
++    const response = await POST(request(exactBody), {
++      params: Promise.resolve({ jobId: 'uKQl3vMr4d' }),
++    });
++    const payload = await response.json();
++
++    expect(maxDuration).toBe(3600);
++    expect(response.status).toBe(202);
++    expect(payload.success).toBe(true);
++    expect(payload.schemaVersion).toBe('mira.openmaic.deterministic-recovery.v1');
++    expect(payload.requestIdSha256).toBeUndefined();
++    expect(payload.source.rawJobFileSha256).toBeUndefined();
++    expect(mocks.after).toHaveBeenCalledTimes(1);
++    const callback = mocks.after.mock.calls[0][0];
++    await callback();
++    expect(mocks.run).toHaveBeenCalledWith('uKQl3vMr4d');
++
++    mocks.claim.mockResolvedValueOnce({ record: record('running'), created: false });
++    const repeated = await POST(request(exactBody), {
++      params: Promise.resolve({ jobId: 'uKQl3vMr4d' }),
++    });
++    expect(repeated.status).toBe(202);
++    expect(mocks.after).toHaveBeenCalledTimes(1);
++  });
++
++  it('rejects contract drift, forwarded/public requests, and invalid credentials before claim', async () => {
++    const { POST } =
++      await import('@/app/api/generate-classroom/[jobId]/deterministic-recovery/route');
++    const extra = await POST(request({ ...exactBody, extra: true }), {
++      params: Promise.resolve({ jobId: 'uKQl3vMr4d' }),
++    });
++    expect(extra.status).toBe(400);
++
++    const publicRequest = request(
++      exactBody,
++      'http://192.168.1.50:3100/api/generate-classroom/uKQl3vMr4d/deterministic-recovery',
++    );
++    const publicResponse = await POST(publicRequest, {
++      params: Promise.resolve({ jobId: 'uKQl3vMr4d' }),
++    });
++    expect(publicResponse.status).toBe(403);
++
++    const badToken = request(exactBody);
++    badToken.headers.set('x-mira-internal-token', 'wrong-token');
++    const denied = await POST(badToken, {
++      params: Promise.resolve({ jobId: 'uKQl3vMr4d' }),
++    });
++    expect(denied.status).toBe(403);
++    expect(mocks.claim).not.toHaveBeenCalled();
++  });
++
++  it('accepts only the exact Next 16 direct-loopback header topology', async () => {
++    mocks.claim.mockResolvedValue({ record: record('queued'), created: false });
++    const { POST } =
++      await import('@/app/api/generate-classroom/[jobId]/deterministic-recovery/route');
++    const exact = await POST(request(exactBody), {
++      params: Promise.resolve({ jobId: 'uKQl3vMr4d' }),
++    });
++    expect(exact.status).toBe(202);
++    expect(mocks.claim).toHaveBeenCalledOnce();
++
++    const adversarialCases: Array<[string, (req: NextRequest) => void]> = [
++      ['public forwarded-for', (req) => req.headers.set('x-forwarded-for', '203.0.113.8')],
++      [
++        'mixed forwarded-for chain',
++        (req) => req.headers.set('x-forwarded-for', '127.0.0.1, 203.0.113.8'),
++      ],
++      ['missing forwarded-for', (req) => req.headers.delete('x-forwarded-for')],
++      ['missing host', (req) => req.headers.delete('host')],
++      ['missing forwarded-host', (req) => req.headers.delete('x-forwarded-host')],
++      ['missing forwarded-proto', (req) => req.headers.delete('x-forwarded-proto')],
++      ['missing forwarded-port', (req) => req.headers.delete('x-forwarded-port')],
++      ['forwarded-for with port', (req) => req.headers.set('x-forwarded-for', '127.0.0.1:3100')],
++      [
++        'IPv4-mapped forwarded-for',
++        (req) => req.headers.set('x-forwarded-for', '::ffff:127.0.0.1'),
++      ],
++      ['zone-id forwarded-for', (req) => req.headers.set('x-forwarded-for', 'fe80::1%lo0')],
++      ['public host', (req) => req.headers.set('host', '192.168.1.50:3100')],
++      ['multi host', (req) => req.headers.set('host', '127.0.0.1:3100, localhost:3100')],
++      ['host userinfo', (req) => req.headers.set('host', 'user@127.0.0.1:3100')],
++      ['host trailing dot', (req) => req.headers.set('host', 'localhost.:3100')],
++      ['IPv4-mapped host', (req) => req.headers.set('host', '[::ffff:127.0.0.1]:3100')],
++      ['public forwarded-host', (req) => req.headers.set('x-forwarded-host', 'example.com:3100')],
++      [
++        'multi forwarded-host',
++        (req) => req.headers.set('x-forwarded-host', '127.0.0.1:3100, localhost:3100'),
++      ],
++      [
++        'IPv4-mapped forwarded-host',
++        (req) => req.headers.set('x-forwarded-host', '[::ffff:127.0.0.1]:3100'),
++      ],
++      ['wrong forwarded port', (req) => req.headers.set('x-forwarded-port', '3101')],
++      ['wrong forwarded proto', (req) => req.headers.set('x-forwarded-proto', 'https')],
++      ['RFC Forwarded', (req) => req.headers.set('forwarded', 'for=127.0.0.1;host=localhost:3100')],
++      ['x-real-ip', (req) => req.headers.set('x-real-ip', '127.0.0.1')],
++      ['via', (req) => req.headers.set('via', '1.1 localhost')],
++    ];
++    mocks.claim.mockClear();
++    for (const [label, mutate] of adversarialCases) {
++      const req = request(exactBody);
++      mutate(req);
++      const response = await POST(req, {
++        params: Promise.resolve({ jobId: 'uKQl3vMr4d' }),
++      });
++      expect(response.status, label).toBe(403);
++    }
++    expect(mocks.claim).not.toHaveBeenCalled();
++  });
++
++  it('returns a terminal receipt with explicit non-fallback Qwen TTS identity', async () => {
++    mocks.read.mockResolvedValue(record('succeeded'));
++    const { GET } =
++      await import('@/app/api/generate-classroom/[jobId]/deterministic-recovery/route');
++    const req = directGetRequest();
++    const response = await GET(req, { params: Promise.resolve({ jobId: 'uKQl3vMr4d' }) });
++    const payload = await response.json();
++    expect(response.status).toBe(200);
++    expect(payload.done).toBe(true);
++    expect(payload.artifact.tts).toEqual({
++      providerId: 'qwen-tts',
++      modelId: 'qwen3-tts-flash',
++      voiceId: 'Serena',
++      speechCount: 10,
++      fallbackUsed: false,
++    });
++  });
++});
+diff --git a/tests/server/mira-sample-deterministic-recovery.test.ts b/tests/server/mira-sample-deterministic-recovery.test.ts
+new file mode 100644
+index 0000000..c556e46
+--- /dev/null
++++ b/tests/server/mira-sample-deterministic-recovery.test.ts
+@@ -0,0 +1,257 @@
++import { promises as fs } from 'fs';
++import os from 'os';
++import path from 'path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++const generateRecoveryArtifact = vi.fn();
++
++vi.mock('@/lib/server/mira-sample-deterministic-classroom', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('@/lib/server/mira-sample-deterministic-classroom')>()),
++  generateMiraSampleDeterministicClassroom: generateRecoveryArtifact,
++}));
++
++const ORIGINAL_CWD = process.cwd();
++let testDir = '';
++
++async function sourceJobBytes(): Promise<Buffer> {
++  const payload = {
++    id: 'uKQl3vMr4d',
++    status: 'failed',
++    step: 'failed',
++    progress: 54,
++    message: 'Classroom generation failed',
++    createdAt: '2026-08-18T10:22:55.804Z',
++    updatedAt: '2026-08-18T10:36:50.864Z',
++    inputSummary: {
++      requirementPreview: 'MIRA_OPENMAIC_SAMPLE_STRUCTURAL_POLICY_V1\n固定一年级数学样板课堂合同',
++      hasPdf: false,
++      pdfTextLength: 0,
++      pdfImageCount: 0,
++    },
++    scenesGenerated: 4,
++    startedAt: '2026-08-18T10:22:55.806Z',
++    totalScenes: 10,
++    completedAt: '2026-08-18T10:36:50.864Z',
++    error: 'structured_output_exhausted',
++  };
++  return Buffer.from(JSON.stringify(payload, null, 2));
++}
++
++const expectedSource = {
++  status: 'failed' as const,
++  error: 'structured_output_exhausted' as const,
++  scenesGenerated: 4 as const,
++  totalScenes: 10 as const,
++};
++
++describe('Mira deterministic recovery append-only store', () => {
++  beforeEach(async () => {
++    generateRecoveryArtifact.mockReset();
++    testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-deterministic-recovery-'));
++    process.chdir(testDir);
++    await fs.mkdir(path.join(testDir, 'data', 'classroom-jobs'), { recursive: true });
++    await fs.writeFile(
++      path.join(testDir, 'data', 'classroom-jobs', 'uKQl3vMr4d.json'),
++      await sourceJobBytes(),
++    );
++    vi.resetModules();
++  });
++
++  afterEach(async () => {
++    vi.useRealTimers();
++    process.chdir(ORIGINAL_CWD);
++    await fs.rm(testDir, { recursive: true, force: true });
++  });
++
++  it('claims once, preserves the failed source bytes, and hashes the frozen canonical snapshot', async () => {
++    const sourcePath = path.join(testDir, 'data', 'classroom-jobs', 'uKQl3vMr4d.json');
++    const originalBytes = await fs.readFile(sourcePath);
++    const { canonicalMiraSampleRecoverySourceSnapshot, claimMiraSampleDeterministicRecovery } =
++      await import('@/lib/server/mira-sample-deterministic-recovery');
++    const first = await claimMiraSampleDeterministicRecovery({
++      sourceJobId: 'uKQl3vMr4d',
++      recoveryRequestId: 'stage2-number-sense-deterministic-recovery-v1',
++      expectedSource,
++      patchSha256: 'a'.repeat(64),
++    });
++    const same = await claimMiraSampleDeterministicRecovery({
++      sourceJobId: 'uKQl3vMr4d',
++      recoveryRequestId: 'stage2-number-sense-deterministic-recovery-v1',
++      expectedSource,
++      patchSha256: 'a'.repeat(64),
++    });
++
++    expect(first.created).toBe(true);
++    expect(same.created).toBe(false);
++    expect(same.record.recoveryId).toBe(first.record.recoveryId);
++    expect(first.record.status).toBe('queued');
++    expect(first.record.calls).toEqual({
++      llm: 0,
++      webSearch: 0,
++      imageGeneration: 0,
++      videoGeneration: 0,
++      tts: { expected: 10, attempted: 0, completed: 0 },
++    });
++    expect(first.record.source.jobSnapshotHashBasis).toBe('canonical_json_v1');
++    const canonical = canonicalMiraSampleRecoverySourceSnapshot({
++      id: 'uKQl3vMr4d',
++      completedAt: '2026-08-18T10:36:50.864Z',
++    });
++    expect(canonical).toBe(
++      '{"completedAt":"2026-08-18T10:36:50.864Z","error":"structured_output_exhausted","id":"uKQl3vMr4d","requirementMarker":"MIRA_OPENMAIC_SAMPLE_STRUCTURAL_POLICY_V1","scenesGenerated":4,"status":"failed","totalScenes":10}',
++    );
++    expect(first.record.source.jobSnapshotSha256).toMatch(/^[a-f0-9]{64}$/);
++    expect(await fs.readFile(sourcePath)).toEqual(originalBytes);
++    await expect(
++      claimMiraSampleDeterministicRecovery({
++        sourceJobId: 'uKQl3vMr4d',
++        recoveryRequestId: 'another-idempotency-key',
++        expectedSource,
++        patchSha256: 'a'.repeat(64),
++      }),
++    ).rejects.toMatchObject({ code: 'recovery_already_claimed' });
++  });
++
++  it('records the exact partial TTS count and never replays a failed recovery', async () => {
++    const {
++      claimMiraSampleDeterministicRecovery,
++      readMiraSampleDeterministicRecovery,
++      runMiraSampleDeterministicRecovery,
++    } = await import('@/lib/server/mira-sample-deterministic-recovery');
++    await claimMiraSampleDeterministicRecovery({
++      sourceJobId: 'uKQl3vMr4d',
++      recoveryRequestId: 'stage2-number-sense-deterministic-recovery-v1',
++      expectedSource,
++      patchSha256: 'b'.repeat(64),
++    });
++    generateRecoveryArtifact.mockImplementationOnce(async (_plan, options) => {
++      await options.onTtsAttempted(1);
++      await options.onTtsProgress(1);
++      await options.onTtsAttempted(2);
++      await options.onTtsProgress(2);
++      await options.onTtsAttempted(3);
++      await options.onTtsProgress(3);
++      await options.onTtsAttempted(4);
++      throw new Error('provider raw error https://secret.invalid?key=must-not-leak');
++    });
++
++    await runMiraSampleDeterministicRecovery('uKQl3vMr4d');
++    const failed = await readMiraSampleDeterministicRecovery('uKQl3vMr4d');
++    expect(failed?.status).toBe('failed');
++    expect(failed?.calls.tts).toEqual({ expected: 10, attempted: 4, completed: 3 });
++    expect(failed?.error).toEqual({
++      code: 'deterministic_recovery_failed',
++      message: 'Deterministic recovery execution failed; inspect the server log',
++    });
++    expect(JSON.stringify(failed)).not.toContain('secret.invalid');
++
++    await runMiraSampleDeterministicRecovery('uKQl3vMr4d');
++    expect(generateRecoveryArtifact).toHaveBeenCalledTimes(1);
++  });
++
++  it('terminally fails an expired queued claim and never schedules its generator', async () => {
++    vi.useFakeTimers();
++    vi.setSystemTime(new Date('2026-08-18T11:00:00.000Z'));
++    const {
++      MIRA_SAMPLE_DETERMINISTIC_RECOVERY_STALE_TIMEOUT_MS,
++      claimMiraSampleDeterministicRecovery,
++      readMiraSampleDeterministicRecovery,
++      runMiraSampleDeterministicRecovery,
++    } = await import('@/lib/server/mira-sample-deterministic-recovery');
++    await claimMiraSampleDeterministicRecovery({
++      sourceJobId: 'uKQl3vMr4d',
++      recoveryRequestId: 'stage2-number-sense-deterministic-recovery-v1',
++      expectedSource,
++      patchSha256: 'c'.repeat(64),
++    });
++
++    vi.setSystemTime(
++      new Date(Date.now() + MIRA_SAMPLE_DETERMINISTIC_RECOVERY_STALE_TIMEOUT_MS + 1),
++    );
++    const expired = await readMiraSampleDeterministicRecovery('uKQl3vMr4d');
++    expect(expired).toMatchObject({
++      status: 'failed',
++      step: 'failed',
++      calls: { tts: { expected: 10, attempted: 0, completed: 0 } },
++      error: {
++        code: 'deterministic_recovery_failed',
++        message:
++          'Deterministic recovery expired after 15 minutes without persisted progress; it will not be replayed',
++      },
++    });
++
++    const repeated = await claimMiraSampleDeterministicRecovery({
++      sourceJobId: 'uKQl3vMr4d',
++      recoveryRequestId: 'stage2-number-sense-deterministic-recovery-v1',
++      expectedSource,
++      patchSha256: 'c'.repeat(64),
++    });
++    expect(repeated.created).toBe(false);
++    expect(repeated.record.status).toBe('failed');
++    await runMiraSampleDeterministicRecovery('uKQl3vMr4d');
++    expect(generateRecoveryArtifact).not.toHaveBeenCalled();
++  });
++
++  it('stale-fails a running recovery and rejects its late success CAS', async () => {
++    vi.useFakeTimers();
++    vi.setSystemTime(new Date('2026-08-18T12:00:00.000Z'));
++    let releaseArtifact!: (value: unknown) => void;
++    let markGeneratorStarted!: () => void;
++    const generatorStarted = new Promise<void>((resolve) => {
++      markGeneratorStarted = resolve;
++    });
++    const pendingArtifact = new Promise<unknown>((resolve) => {
++      releaseArtifact = resolve;
++    });
++    generateRecoveryArtifact.mockImplementationOnce(async () => {
++      markGeneratorStarted();
++      return pendingArtifact;
++    });
++    const {
++      MIRA_SAMPLE_DETERMINISTIC_RECOVERY_STALE_TIMEOUT_MS,
++      claimMiraSampleDeterministicRecovery,
++      readMiraSampleDeterministicRecovery,
++      runMiraSampleDeterministicRecovery,
++    } = await import('@/lib/server/mira-sample-deterministic-recovery');
++    await claimMiraSampleDeterministicRecovery({
++      sourceJobId: 'uKQl3vMr4d',
++      recoveryRequestId: 'stage2-number-sense-deterministic-recovery-v1',
++      expectedSource,
++      patchSha256: 'd'.repeat(64),
++    });
++    const run = runMiraSampleDeterministicRecovery('uKQl3vMr4d');
++    await generatorStarted;
++    expect((await readMiraSampleDeterministicRecovery('uKQl3vMr4d'))?.status).toBe('running');
++
++    vi.setSystemTime(
++      new Date(Date.now() + MIRA_SAMPLE_DETERMINISTIC_RECOVERY_STALE_TIMEOUT_MS + 1),
++    );
++    const expired = await readMiraSampleDeterministicRecovery('uKQl3vMr4d');
++    expect(expired?.status).toBe('failed');
++    const expiredCompletedAt = expired?.completedAt;
++    releaseArtifact({
++      id: 'late-orphan-classroom',
++      url: '/classroom/late-orphan-classroom',
++      deterministicReceipt: {
++        contentSha256: 'e'.repeat(64),
++        artifactSha256: 'f'.repeat(64),
++        tts: {
++          providerId: 'qwen-tts',
++          modelId: 'qwen3-tts-flash',
++          voiceId: 'Serena',
++          speechCount: 10,
++          fallbackUsed: false,
++        },
++      },
++    });
++    await run;
++
++    const terminal = await readMiraSampleDeterministicRecovery('uKQl3vMr4d');
++    expect(terminal?.status).toBe('failed');
++    expect(terminal?.completedAt).toBe(expiredCompletedAt);
++    expect(terminal?.artifact).toBeUndefined();
++    expect(terminal?.calls.tts).toEqual({ expected: 10, attempted: 0, completed: 0 });
++    await runMiraSampleDeterministicRecovery('uKQl3vMr4d');
++    expect(generateRecoveryArtifact).toHaveBeenCalledTimes(1);
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

@@ -1,0 +1,46 @@
+From 2a770c3528270f758bd76c215636a88dd36dc97c Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 01/37] 0001-mira-server-voxcpm-prompt-voice
+
+---
+ lib/server/classroom-media-generation.ts | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/lib/server/classroom-media-generation.ts b/lib/server/classroom-media-generation.ts
+index 7a74293..c1bd777 100644
+--- a/lib/server/classroom-media-generation.ts
++++ b/lib/server/classroom-media-generation.ts
+@@ -272,10 +272,9 @@ export async function generateTTSForClassroom(
+   const ttsBaseUrl = resolveTTSBaseUrl(providerId) || ttsProvider?.defaultBaseUrl;
+   const voice = DEFAULT_TTS_VOICES[providerId as keyof typeof DEFAULT_TTS_VOICES] || 'default';
+   const format = ttsProvider?.supportedFormats?.[0] || 'mp3';
+-  if (providerId === VOXCPM_TTS_PROVIDER_ID && voice === VOXCPM_AUTO_VOICE_ID) {
+-    log.warn('VoxCPM Auto Voice requires agent context; skipping server-side TTS generation');
+-    return;
+-  }
++  const serverVoxCPMVoicePrompt =
++    process.env.MIRA_VOXCPM_VOICE_PROMPT?.replace(/[()（）\p{C}]+/gu, ' ').trim() ||
++    'warm patient primary school teacher, clear standard pronunciation, medium pace';
+ 
+   for (const scene of scenes) {
+     if (!scene.actions) continue;
+@@ -304,6 +303,15 @@ export async function generateTTSForClassroom(
+             baseUrl: ttsBaseUrl,
+             voice,
+             speed: speechAction.speed,
++            ...(providerId === VOXCPM_TTS_PROVIDER_ID && voice === VOXCPM_AUTO_VOICE_ID
++              ? {
++                  providerOptions: {
++                    backend: 'vllm-omni',
++                    voiceMode: 'prompt',
++                    voicePrompt: serverVoxCPMVoicePrompt,
++                  },
++                }
++              : {}),
+           },
+           speechAction.text,
+         );
+-- 
+2.50.1 (Apple Git-155)
+

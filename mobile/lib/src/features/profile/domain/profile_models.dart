@@ -1,3 +1,5 @@
+import 'package:warm_sight/src/shared/domain/child_grade.dart';
+
 class ProfileSummary {
   const ProfileSummary({
     required this.spaceTitle,
@@ -175,6 +177,11 @@ class ChildProfile {
     required this.schoolName,
     required this.interests,
     required this.taskPreferences,
+    this.gradeCode = '',
+    this.educationStageCode = '',
+    this.contentMode = '',
+    this.schoolYearStartYear,
+    this.gradeConfirmedAt,
   });
 
   final String id;
@@ -186,6 +193,11 @@ class ChildProfile {
   final String ageStage;
   final String educationStage;
   final String grade;
+  final String gradeCode;
+  final String educationStageCode;
+  final String contentMode;
+  final int? schoolYearStartYear;
+  final int? gradeConfirmedAt;
   final String schoolName;
   final List<String> interests;
   final Map<String, dynamic> taskPreferences;
@@ -199,6 +211,12 @@ class ChildProfile {
   }
 
   static ChildProfile fromJson(Map<String, dynamic> json) {
+    final gradeOption =
+        ChildGradeOption.fromCode(_asString(json['gradeCode'])) ??
+        ChildGradeOption.fromLegacy(
+          educationStage: _asString(json['educationStage']),
+          grade: _asString(json['grade']),
+        );
     return ChildProfile(
       id: _asString(json['id']),
       name: _asString(json['name'], fallback: '孩子'),
@@ -209,6 +227,19 @@ class ChildProfile {
       ageStage: _asString(json['ageStage']),
       educationStage: _asString(json['educationStage']),
       grade: _asString(json['grade']),
+      gradeCode: gradeOption?.code ?? '',
+      educationStageCode: _asString(
+        json['educationStageCode'],
+        fallback: gradeOption?.stageCode ?? '',
+      ),
+      contentMode: _asString(
+        json['contentMode'],
+        fallback: gradeOption?.contentMode ?? '',
+      ),
+      schoolYearStartYear: _asNullableInt(
+        json['schoolYearStartYear'] ?? json['gradeSchoolYearStart'],
+      ),
+      gradeConfirmedAt: _asNullableInt(json['gradeConfirmedAt']),
       schoolName: _asString(json['schoolName']),
       interests: _asStringList(json['interests']),
       taskPreferences: _asMap(json['taskPreferences']),

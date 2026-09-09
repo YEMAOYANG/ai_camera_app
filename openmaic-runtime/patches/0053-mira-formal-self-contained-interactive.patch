@@ -1,0 +1,205 @@
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -385,6 +385,9 @@
+           agents,
+           languageDirective: doc.stage.languageDirective ?? '',
+           allowProceduralSkill: true,
++          // Formal context comes only from the server-owned Skill bundle. The
++          // post-processor must not add CDN dependencies to self-contained pages.
++          ...(deps.getGenerationSkillContext ? { interactiveIncludeKatex: false } : {}),
+           ...(assignedImages.length ? { assignedImages, imageMapping } : {}),
+           ...(params.instruction ? { editDirective: params.instruction } : {}),
+           ...(baseline ? { baselineContent: baseline } : {}),
+diff --git a/packages/@openmaic/generation/src/interactive-post-processor.ts b/packages/@openmaic/generation/src/interactive-post-processor.ts
+--- a/packages/@openmaic/generation/src/interactive-post-processor.ts
++++ b/packages/@openmaic/generation/src/interactive-post-processor.ts
+@@ -13,12 +13,16 @@
+  * Main entry point: post-process generated interactive HTML
+  * Converts LaTeX delimiters and injects KaTeX rendering resources.
+  */
+-export function postProcessInteractiveHtml(html: string): string {
++export function postProcessInteractiveHtml(
++  html: string,
++  options: { includeKatex?: boolean } = {},
++): string {
+   // Convert LaTeX delimiters while protecting script tags
+   let processed = convertLatexDelimiters(html);
+ 
+-  // Inject KaTeX resources if not already present
+-  if (!processed.toLowerCase().includes('katex')) {
++  // Self-contained hosts opt out of automatic external resources. This does
++  // not strip explicitly authored math markup/scripts or skip delimiter conversion.
++  if (options.includeKatex !== false && !processed.toLowerCase().includes('katex')) {
+     processed = injectKatex(processed);
+   }
+ 
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -95,6 +95,8 @@
+   /** Original course request/profile, used by PBL v2 for explicit learner-level signals. */
+   userRequirements?: UserRequirements;
+   allowProceduralSkill?: boolean;
++  /** Interactive only: self-contained hosts disable automatic external KaTeX injection. */
++  interactiveIncludeKatex?: boolean;
+   /**
+    * Natural-language edit instruction for whole-slide regeneration (MAIC Editor
+    * agent `regenerate_scene`). When set, the slide content prompt switches to
+@@ -268,6 +270,7 @@
+     // Route to widget generation (handles all 5 types)
+     return generateWidgetContent(outline, aiCall, languageDirective, {
+       allowProceduralSkill,
++      includeKatex: options.interactiveIncludeKatex,
+       logger: log,
+     });
+   }
+@@ -1104,7 +1107,11 @@
+   outline: SceneOutline,
+   aiCall: AICallFn,
+   languageDirective?: string,
+-  options: { allowProceduralSkill?: boolean; logger?: GenerationLogger } = {},
++  options: {
++    allowProceduralSkill?: boolean;
++    includeKatex?: boolean;
++    logger?: GenerationLogger;
++  } = {},
+ ): Promise<GeneratedInteractiveContent | null> {
+   const log = options.logger ?? noopGenerationLogger;
+   const widgetType = outline.widgetType;
+@@ -1232,7 +1239,7 @@
+   const widgetConfig = extractWidgetConfig(html, widgetType);
+ 
+   return {
+-    html: postProcessInteractiveHtml(html),
++    html: postProcessInteractiveHtml(html, { includeKatex: options.includeKatex }),
+     widgetType,
+     widgetConfig,
+   };
+diff --git a/packages/@openmaic/generation/test/media-prompt-wiring.test.ts b/packages/@openmaic/generation/test/media-prompt-wiring.test.ts
+--- a/packages/@openmaic/generation/test/media-prompt-wiring.test.ts
++++ b/packages/@openmaic/generation/test/media-prompt-wiring.test.ts
+@@ -5,6 +5,28 @@
+ import type { AICallFn } from '@openmaic/generation';
+ 
+ describe('media prompt condition wiring', () => {
++  test('threads self-contained interactive options through generation without changing normal defaults', async () => {
++    const html =
++      '<html><head></head><body><button id="count">数一数</button><script>let n=0;document.querySelector("#count").onclick=()=>n++;</script></body></html>';
++    const outline: SceneOutline = {
++      id: 'counting',
++      type: 'interactive',
++      order: 1,
++      title: '点圆点',
++      description: '点一次数一次',
++      keyPoints: ['数数'],
++      widgetType: 'simulation',
++      widgetOutline: { concept: '数数' },
++    };
++    const ordinary = await generateSceneContent(outline, async () => html);
++    const formal = await generateSceneContent(outline, async () => html, {
++      interactiveIncludeKatex: false,
++    });
++    expect(ordinary && 'html' in ordinary && ordinary.html).toContain('katex.min.js');
++    expect(formal && 'html' in formal && formal.html).toBe(html);
++    expect(formal && 'html' in formal && formal.html).not.toContain('cdn.');
++  });
++
+   test('outline generation passes media enable flags into conditional snippets', async () => {
+     let capturedPrompt = '';
+     const aiCall: AICallFn = async (system, user) => {
+diff --git a/packages/@openmaic/generation/test/support-primitives.test.ts b/packages/@openmaic/generation/test/support-primitives.test.ts
+--- a/packages/@openmaic/generation/test/support-primitives.test.ts
++++ b/packages/@openmaic/generation/test/support-primitives.test.ts
+@@ -25,6 +25,28 @@
+ });
+ 
+ describe('interactive HTML post-processing', () => {
++  it('keeps a formula-free self-contained page free of injected network dependencies', () => {
++    const source =
++      '<html><head></head><body><button id="count">数一数</button><script>let count=0; document.querySelector("#count").onclick=()=>count++;</script></body></html>';
++    expect(postProcessInteractiveHtml(source, { includeKatex: false })).toBe(source);
++    expect(postProcessInteractiveHtml(source)).toContain('https://cdn.jsdelivr.net/npm/katex');
++    expect(postProcessInteractiveHtml(source, { includeKatex: true })).toBe(
++      postProcessInteractiveHtml(source),
++    );
++  });
++
++  it('preserves explicit math and authored rendering while disabling only automatic injection', () => {
++    const source =
++      '<html><head></head><body>$x+1$ $$y=2$$<span class="katex">already rendered</span><script>const literal="$5"; localMathRenderer();</script></body></html>';
++    const processed = postProcessInteractiveHtml(source, { includeKatex: false });
++    expect(processed).toContain('\\(x+1\\)');
++    expect(processed).toContain('\\[y=2\\]');
++    expect(processed).toContain('<span class="katex">already rendered</span>');
++    expect(processed).toContain('<script>const literal="$5"; localMathRenderer();</script>');
++    expect(processed).not.toContain('https://');
++    expect(postProcessInteractiveHtml(processed, { includeKatex: false })).toBe(processed);
++  });
++
+   it('converts math, protects scripts, and injects KaTeX once', () => {
+     const source =
+       '<html><head></head><body>$x+1$<script>const price = "$5";</script></body></html>';
+diff --git a/tests/agent-runtime/generation-tools.test.ts b/tests/agent-runtime/generation-tools.test.ts
+--- a/tests/agent-runtime/generation-tools.test.ts
++++ b/tests/agent-runtime/generation-tools.test.ts
+@@ -9,6 +9,10 @@
+   filterKnownActions,
+ } from '@/lib/server/agent-runtime/generation-tools';
+ import type { Scene } from '@/lib/types/stage';
++
++// Exercise current package source without rebuilding shared dist during an
++// isolated paid-run audit. Production bootstrap builds this same package.
++vi.mock('@openmaic/generation', async () => import('@/packages/@openmaic/generation/src/index'));
+ 
+ function slide(id: string, order: number, title = id): Scene {
+   return {
+@@ -98,6 +102,48 @@
+ }
+ 
+ describe('generation and deck tools', () => {
++  it('persists formal interactive HTML without adding external KaTeX while ordinary Pro keeps its default', async () => {
++    const html =
++      '<html><head></head><body><button id="count">数一数</button><script>let n=0;document.querySelector("#count").onclick=()=>n++;</script></body></html>';
++    for (const formal of [false, true]) {
++      const current = state(document([]));
++      let calls = 0;
++      const aiCall = vi.fn(async () =>
++        ++calls === 1 ? html : JSON.stringify([{ type: 'text', content: '请亲手点一点。' }]),
++      );
++      const context = {
++        getGenerationSkillContext: () => ({
++          text: 'Formal self-contained page; no external dependencies.',
++          contextSha256: 'a'.repeat(64),
++        }),
++        onGenerationSkillContext: vi.fn(async () => {}),
++      };
++      const tool = find(
++        buildGenerationTools(deps(current.store, { aiCall, ...(formal ? context : {}) })),
++        'generate_scene',
++      );
++      await tool.execute(formal ? 'formal-count' : 'ordinary-count', {
++        stageId: 'stage-test',
++        order: 1,
++        title: '数圆点',
++        type: 'interactive',
++        widgetType: 'simulation',
++        brief: '每次点一下圆点只数一次',
++      } as never);
++      expect(aiCall).toHaveBeenCalledTimes(2);
++      const scene = current.get()?.scenes[0];
++      expect(scene?.content.type).toBe('interactive');
++      if (scene?.content.type !== 'interactive') throw Error('interactive fixture');
++      if (formal) {
++        expect(scene.content.html).toBe(html);
++        expect(context.onGenerationSkillContext).toHaveBeenCalledTimes(2);
++      } else {
++        expect(scene.content.html).toContain('cdn.jsdelivr.net/npm/katex');
++      }
++      expect(scene.actions.some((action) => action.type === 'speech')).toBe(true);
++    }
++  });
++
+   it('injects the formal page context into real content/actions calls and records only after persistence', async () => {
+     const params = {
+       stageId: 'stage-test',

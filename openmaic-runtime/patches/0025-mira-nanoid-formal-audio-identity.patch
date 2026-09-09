@@ -1,0 +1,39 @@
+From c3cd1f13d8fa0778cc6c9d9154d991efe5444f65 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 25/37] 0025-mira-nanoid-formal-audio-identity
+
+---
+ lib/server/mira-formal-audio.ts        | 2 +-
+ tests/server/mira-formal-audio.test.ts | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+index 044948c..393e88f 100644
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -209,7 +209,7 @@ class OperationalFailure extends Error {
+   }
+ }
+ 
+-const IDENTIFIER = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
++const IDENTIFIER = /^[A-Za-z0-9_-][A-Za-z0-9._:-]{0,127}$/;
+ const SHA256 = /^[a-f0-9]{64}$/;
+ const TTS_KEYS = [
+   'actionId',
+diff --git a/tests/server/mira-formal-audio.test.ts b/tests/server/mira-formal-audio.test.ts
+index ff10afd..94702be 100644
+--- a/tests/server/mira-formal-audio.test.ts
++++ b/tests/server/mira-formal-audio.test.ts
+@@ -89,7 +89,7 @@ const mathTtsRequest: MiraFormalTtsRequest = {
+ const englishNarration = '大写字母 H 和小写字母 h 是同一个字母。';
+ const englishTtsRequest: MiraFormalTtsRequest = {
+   requestId: 'formal-tts-english-001',
+-  classroomId: 'omclass_english_001',
++  classroomId: '-omclass_english_001',
+   classroomContentSha256: '2'.repeat(64),
+   subject: 'english',
+   teacherProfileId: 'mira_english_standard',
+-- 
+2.50.1 (Apple Git-155)
+

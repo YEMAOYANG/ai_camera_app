@@ -1,0 +1,2071 @@
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -19,6 +19,7 @@
+ import { getMiraStudentChromeRuntimePolicy } from '@/lib/mira/student-runtime';
+ import { getMiraFormalGenerationRuntimePolicy } from '@/lib/server/mira-formal-generation-policy';
+ import { assertMiraFormalImageProviderReady } from '@/lib/server/mira-formal-media';
++import { assertMiraFormalVideoProviderReady } from '@/lib/server/mira-formal-video';
+ import { getMiraInstrumentationBoundaryPolicy } from '@/lib/server/mira-instrumentation-policy';
+ import {
+   assertMiraFormalAudioProviderReady,
+@@ -96,6 +97,7 @@
+       await sessionStore.getSession('mira-formal-health-probe');
+       assertMiraFormalAudioProviderReady();
+       assertMiraFormalImageProviderReady();
++      assertMiraFormalVideoProviderReady();
+       return apiSuccess({
+         status: 'ok',
+         version,
+@@ -105,6 +107,7 @@
+           webSearch: true,
+           speechAudioGeneration: true,
+           imageGeneration: true,
++          videoGeneration: true,
+         },
+         runtimePolicy: {
+           formalGeneration: formalGenerationPolicy,
+diff --git a/lib/media/adapters/happyhorse-adapter.ts b/lib/media/adapters/happyhorse-adapter.ts
+--- a/lib/media/adapters/happyhorse-adapter.ts
++++ b/lib/media/adapters/happyhorse-adapter.ts
+@@ -97,6 +97,7 @@
+   const baseUrl = normalizeBaseUrl(config.baseUrl);
+   const response = await fetch(`${baseUrl}/api/v1/services/aigc/video-generation/video-synthesis`, {
+     method: 'POST',
++    signal: options.signal,
+     headers: {
+       ...jsonHeaders(config.apiKey),
+       'X-DashScope-Async': 'enable',
+@@ -134,10 +135,12 @@
+ export async function pollHappyHorseTask(
+   config: VideoGenerationConfig,
+   taskId: string,
++  signal?: AbortSignal,
+ ): Promise<VideoGenerationResult | null> {
+   const baseUrl = normalizeBaseUrl(config.baseUrl);
+   const response = await fetch(`${baseUrl}/api/v1/tasks/${encodeURIComponent(taskId)}`, {
+     method: 'GET',
++    signal,
+     headers: authHeaders(config.apiKey),
+   });
+ 
+@@ -179,11 +182,12 @@
+       taskId: await submitHappyHorseTask(config, options),
+     }),
+     poll: async (taskId) => {
+-      const result = await pollHappyHorseTask(config, taskId);
++      const result = await pollHappyHorseTask(config, taskId, options.signal);
+       return result ? { status: 'done', result } : { status: 'pending' };
+     },
+     intervalMs: POLL_INTERVAL_MS,
+     maxAttempts: MAX_POLL_ATTEMPTS,
++    signal: options.signal,
+     label: 'HappyHorse video generation',
+     formatTimeout: ({ taskId, elapsedMs }) =>
+       `HappyHorse video generation timed out after ${elapsedMs / 1000}s (task: ${taskId})`,
+diff --git a/lib/media/polled-task.ts b/lib/media/polled-task.ts
+--- a/lib/media/polled-task.ts
++++ b/lib/media/polled-task.ts
+@@ -22,10 +22,22 @@
+   maxAttempts: number;
+   label: string;
+   formatTimeout?: (context: PolledTaskTimeoutContext) => string;
++  signal?: AbortSignal;
+ }
+ 
+-function delay(ms: number): Promise<void> {
+-  return new Promise((resolve) => setTimeout(resolve, ms));
++function delay(ms: number, signal?: AbortSignal): Promise<void> {
++  signal?.throwIfAborted();
++  return new Promise((resolve, reject) => {
++    const abort = () => {
++      clearTimeout(timer);
++      reject(signal?.reason ?? new Error('aborted'));
++    };
++    const timer = setTimeout(() => {
++      signal?.removeEventListener('abort', abort);
++      resolve();
++    }, ms);
++    signal?.addEventListener('abort', abort, { once: true });
++  });
+ }
+ 
+ export async function runPolledTask<T>({
+@@ -35,8 +47,11 @@
+   maxAttempts,
+   label,
+   formatTimeout,
++  signal,
+ }: RunPolledTaskOptions<T>): Promise<T> {
++  signal?.throwIfAborted();
+   const submitted = await submit();
++  signal?.throwIfAborted();
+   if (submitted.status === 'done') return submitted.result;
+   if (submitted.status === 'failed') throw new Error(submitted.message);
+ 
+@@ -44,8 +59,10 @@
+   let lastPendingDetail: string | undefined;
+ 
+   while (attempts < maxAttempts) {
+-    await delay(intervalMs);
++    await delay(intervalMs, signal);
++    signal?.throwIfAborted();
+     const result = await poll(submitted.taskId);
++    signal?.throwIfAborted();
+     attempts++;
+ 
+     if (result.status === 'done') return result.result;
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -25,6 +25,7 @@
+ import {
+   isMiraFormalProfessionalSessionIdentity,
+   isMiraFormalImageSession,
++  isMiraFormalVideoSession,
+   isMiraFormalIntegratedSkillSession,
+   isMiraFormalAdaptiveSkillSession,
+   filterMiraFormalMediaTools,
+@@ -34,6 +35,7 @@
+   type MiraFormalResearchSearchTrace,
+ } from '@/lib/server/mira-professional-research-policy';
+ import { MIRA_FORMAL_IMAGE_EVENT, withMiraFormalImageTrace } from '@/lib/server/mira-formal-media';
++import { MIRA_FORMAL_VIDEO_EVENT, withMiraFormalVideoTrace } from '@/lib/server/mira-formal-video';
+ import { buildFormalQualityTools } from '@/lib/server/mira-formal-teaching-quality';
+ import {
+   prepareMiraFormalSkillBundle,
+@@ -1276,13 +1278,16 @@
+       origin: meta.origin,
+     };
+     const formalSkillBundle = isMiraFormalAdaptiveSkillSession(formalSkillIdentity)
+-      ? await prepareMiraFormalAdaptiveSkillBundle(installedSkills, formalAdaptiveSelectionInputFromPrompt(meta.prompt))
++      ? await prepareMiraFormalAdaptiveSkillBundle(
++          installedSkills,
++          formalAdaptiveSelectionInputFromPrompt(meta.prompt),
++        )
+       : isMiraFormalIntegratedSkillSession(formalSkillIdentity)
+         ? await prepareMiraFormalSkillBundle(
+-          installedSkills,
+-          formalSkillSubjectFromPrompt(meta.prompt),
+-        )
+-      : null;
++            installedSkills,
++            formalSkillSubjectFromPrompt(meta.prompt),
++          )
++        : null;
+     // Keep successful read frames across context compaction; the terminal receipt
+     // independently verifies their durable branch before any formal promotion.
+     const formalSkillReadMessages = [...recovery.cursorMessages];
+@@ -1534,13 +1539,21 @@
+           : {}),
+       }),
+       formalMediaSession,
+-    ).map((tool) =>
+-      isMiraFormalImageSession(formalMediaSession)
++    ).map((tool) => {
++      const imageTool = isMiraFormalImageSession(formalMediaSession)
+         ? withMiraFormalImageTrace(tool, id, (trace) =>
+             appendRequiredRunEvent(MIRA_FORMAL_IMAGE_EVENT, trace, Date.now()),
+           )
+-        : tool,
+-    );
++        : tool;
++      return isMiraFormalVideoSession(formalMediaSession)
++        ? withMiraFormalVideoTrace(
++            imageTool,
++            id,
++            (trace) => appendRequiredRunEvent(MIRA_FORMAL_VIDEO_EVENT, trace, Date.now()),
++            { ownsStage: async (stageId) => (await stageAccess(stageId)).kind === 'owned' },
++          )
++        : imageTool;
++    });
+     const curriculumTools = buildCurriculumTools({
+       store: ownerScopedStore,
+       ownerId: meta.ownerId,
+@@ -1602,13 +1615,23 @@
+       }),
+       id,
+     );
+-    const formalQualityTools = formalSkillBundle?.selectionPlan && formalSkillBundle.gradeBoundary && formalSkillBundle.teachingBrief
+-      ? buildFormalQualityTools({
+-          store: ownerScopedStore, stageAccess, ownerId: meta.ownerId, sessionId: id,
+-          abortSignal: abort.signal,
+-          context: { gradeBoundary: { ...formalSkillBundle.gradeBoundary },
+-            selectionPlan: { ...formalSkillBundle.selectionPlan }, teachingBrief: formalSkillBundle.teachingBrief },
+-        }) : [];
++    const formalQualityTools =
++      formalSkillBundle?.selectionPlan &&
++      formalSkillBundle.gradeBoundary &&
++      formalSkillBundle.teachingBrief
++        ? buildFormalQualityTools({
++            store: ownerScopedStore,
++            stageAccess,
++            ownerId: meta.ownerId,
++            sessionId: id,
++            abortSignal: abort.signal,
++            context: {
++              gradeBoundary: { ...formalSkillBundle.gradeBoundary },
++              selectionPlan: { ...formalSkillBundle.selectionPlan },
++              teachingBrief: formalSkillBundle.teachingBrief,
++            },
++          })
++        : [];
+     const tools = assembleRunnerTools(
+       askUserTools,
+       webSearchTools,
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -62,6 +62,7 @@
+ import { generateMiraFormalProfessionalClassroom } from '@/lib/server/mira-formal-professional-classroom';
+ import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
+ import type { MiraFormalMediaReceipt } from '@/lib/server/mira-formal-media';
++import type { MiraFormalVideoReceipt } from '@/lib/server/mira-formal-video';
+ import type {
+   MiraFormalProfessionalCreationReceipt,
+   MiraFormalResearchReceipt,
+@@ -123,6 +124,7 @@
+   professionalCreation?: MiraFormalProfessionalCreationReceipt;
+   research?: MiraFormalResearchReceipt;
+   media?: MiraFormalMediaReceipt;
++  video?: MiraFormalVideoReceipt;
+ }
+ 
+ function createInMemoryStore(stage: Stage): StageStore {
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -65,11 +65,34 @@
+   teachingQuality: MIRA_TEACHING_QUALITY_POLICY,
+ } as const;
+ 
++// Keep the existing adaptive policy byte-for-byte for persisted v2 requests.
++export const MIRA_FORMAL_VIDEO_POLICY = {
++  schemaVersion: 'mira.openmaic.formal-video-policy.v1',
++  policyId: 'mira-formal-happyhorse-video.v1',
++  enabled: true,
++  providerManaged: true,
++  providerId: 'happyhorse',
++  modelId: 'happyhorse-1.0-t2v',
++  usage: 'teaching_need',
++  maxCalls: 1,
++  maxVideos: 1,
++  durationSec: 5,
++  resolution: '720p',
++  aspectRatio: '16:9',
++  assetValidationRequired: true,
++} as const;
++
++export const MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_PROFESSIONAL_CREATION_POLICY,
++  video: MIRA_FORMAL_VIDEO_POLICY,
++} as const;
++
+ export type MiraProfessionalCreationPolicy =
+   | typeof MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY
+-  | typeof MIRA_PROFESSIONAL_CREATION_POLICY;
++  | typeof MIRA_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY;
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+@@ -115,7 +138,7 @@
+   queryByRuntimeRequestId: true,
+   speechAudioGenerated: true,
+   coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
+-  professionalCreation: MIRA_PROFESSIONAL_CREATION_POLICY,
++  professionalCreation: MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
+   studentRuntimeEvents: {
+     enforced: true,
+     schemaVersion: 'mira.openmaic.student-runtime-events.v1',
+@@ -179,8 +202,16 @@
+ 
+ export function isMiraAdaptiveSkillCreationPolicy(value: unknown): boolean {
+   return (
+-    JSON.stringify(canonical(value)) ===
+-    JSON.stringify(canonical(MIRA_PROFESSIONAL_CREATION_POLICY))
++    isMiraVideoCreationPolicy(value) ||
++    JSON.stringify(canonical(value)) ===
++      JSON.stringify(canonical(MIRA_PROFESSIONAL_CREATION_POLICY))
++  );
++}
++
++export function isMiraVideoCreationPolicy(value: unknown): boolean {
++  return (
++    JSON.stringify(canonical(value)) ===
++    JSON.stringify(canonical(MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY))
+   );
+ }
+ 
+@@ -209,7 +240,7 @@
+     input.pdfContent !== undefined ||
+     input.enableWebSearch !== true ||
+     input.enableImageGeneration !== isMiraImageCreationPolicy(input.professionalCreationPolicy) ||
+-    input.enableVideoGeneration !== false ||
++    input.enableVideoGeneration !== isMiraVideoCreationPolicy(input.professionalCreationPolicy) ||
+     input.enableTTS !== false ||
+     input.agentMode !== 'generate' ||
+     input.webSearchProviderId !== undefined ||
+diff --git a/lib/server/mira-formal-inspection-network.ts b/lib/server/mira-formal-inspection-network.ts
+--- a/lib/server/mira-formal-inspection-network.ts
++++ b/lib/server/mira-formal-inspection-network.ts
+@@ -66,9 +66,13 @@
+     }
+     return (
+       url.pathname.startsWith(`/api/classroom-media/${input.stageId}/media/`) &&
+-      /^\/api\/classroom-media\/[A-Za-z0-9_-]+\/media\/[A-Za-z0-9_-]+\.(?:png|jpe?g|webp|gif)$/i.test(
++      (/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/media\/[A-Za-z0-9_-]+\.(?:png|jpe?g|webp|gif)$/i.test(
+         url.pathname,
+-      ) &&
++      ) ||
++        (input.resourceType === 'media' &&
++          /^\/api\/classroom-media\/[A-Za-z0-9_-]+\/media\/[A-Za-z0-9_-]+\.mp4$/i.test(
++            url.pathname,
++          ))) &&
+       !url.search
+     );
+   }
+@@ -131,6 +135,6 @@
+     `font-src data: ${base}/_next/static/ ${base}/fonts/ ${[...RENDERER_FONT_URLS].join(' ')} ${cdn}`,
+     `img-src data: blob: ${base}/api/classroom-media/${input.stageId}/media/ ${base}/images/ ${base}/avatars/ ${base}/icons/ ${base}/_next/image ${base}/mira-classroom-icon.svg ${cdn}`,
+     `frame-src 'self' data: blob:`,
+-    "media-src 'none'",
++    `media-src ${base}/api/classroom-media/${input.stageId}/media/`,
+   ].join('; ');
+ }
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -25,6 +25,8 @@
+   MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+   MIRA_PROFESSIONAL_CREATION_POLICY,
+   MIRA_FORMAL_IMAGE_POLICY,
++  MIRA_FORMAL_VIDEO_POLICY,
++  isMiraVideoCreationPolicy,
+   isMiraImageCreationPolicy,
+   isMiraIntegratedSkillCreationPolicy,
+   isMiraAdaptiveSkillCreationPolicy,
+@@ -39,7 +41,10 @@
+   type MiraFormalSkillBundle,
+   type MiraFormalSkillReceipt,
+ } from './mira-formal-skill-policy';
+-import { MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN, type MiraFormalSelectionInput } from './mira-formal-skill-selection';
++import {
++  MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN,
++  type MiraFormalSelectionInput,
++} from './mira-formal-skill-selection';
+ import { listSkills } from './agent-runtime/skills';
+ import { reviewFormalCourse } from './mira-formal-teaching-quality';
+ import type { MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
+@@ -47,10 +52,12 @@
+ import type { AgentMessage } from '@earendil-works/pi-agent-core';
+ import {
+   isMiraFormalProfessionalSessionIdentity,
++  isMiraFormalAdaptiveSkillSession,
+   MIRA_FORMAL_PROFESSIONAL_OWNER_ID_PREFIX,
+   MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID,
+   MIRA_FORMAL_PROFESSIONAL_SESSION_ID_PREFIX,
+   MIRA_FORMAL_IMAGE_SESSION_ORIGIN,
++  MIRA_FORMAL_VIDEO_SESSION_ORIGIN,
+   MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
+   MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION,
+   type MiraFormalResearchSearchTrace,
+@@ -68,6 +75,11 @@
+   buildMiraFormalMediaReceipt,
+   MIRA_FORMAL_IMAGE_EVENT,
+ } from '@/lib/server/mira-formal-media';
++import {
++  assertMiraFormalVideoProviderReady,
++  buildMiraFormalVideoReceipt,
++  MIRA_FORMAL_VIDEO_EVENT,
++} from '@/lib/server/mira-formal-video';
+ 
+ const FORMAL_SESSION_TIMEOUT_MS = 60 * 60 * 1_000;
+ const FORMAL_SESSION_POLL_MS = 2_000;
+@@ -125,6 +137,8 @@
+   webSearchEnabled: true;
+   imageGenerationEnabled?: true;
+   imagePolicyId?: typeof MIRA_FORMAL_IMAGE_POLICY.policyId;
++  videoGenerationEnabled?: true;
++  videoPolicyId?: typeof MIRA_FORMAL_VIDEO_POLICY.policyId;
+   skillOrchestration?: MiraFormalSkillReceipt;
+   teachingQuality?: MiraTeachingQualityReceipt;
+   receiptSha256: string;
+@@ -336,10 +350,15 @@
+   return contract;
+ }
+ 
+-export function formalAdaptiveSkillSelectionInput(input: GenerateClassroomInput): MiraFormalSelectionInput {
++export function formalAdaptiveSkillSelectionInput(
++  input: GenerateClassroomInput,
++): MiraFormalSelectionInput {
+   const contract = formalContractPayload(input);
+-  return { teachingBrief: contract.teachingBrief, gradeBoundary: contract.gradeBoundary,
+-    gradeBoundarySha256: String(contract.gradeBoundarySha256 ?? '') };
++  return {
++    teachingBrief: contract.teachingBrief,
++    gradeBoundary: contract.gradeBoundary,
++    gradeBoundarySha256: String(contract.gradeBoundarySha256 ?? ''),
++  };
+ }
+ 
+ function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewareSpec): string {
+@@ -425,11 +444,12 @@
+     input.professionalCreationPolicy,
+   );
+   return withMiraFormalSkillInstructions(
+-    withImages,
++    withMiraFormalVideoInstructions(withImages, input.professionalCreationPolicy),
+     input.professionalCreationPolicy,
+     spec.course.subject,
+     isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy)
+-      ? formalAdaptiveSkillSelectionInput(input) : undefined,
++      ? formalAdaptiveSkillSelectionInput(input)
++      : undefined,
+   );
+ }
+ 
+@@ -466,11 +486,36 @@
+     'text, formulas, geometric relationships, and answer evidence with verifiable slide elements ' +
+     'or HTML. Never use a generated image as the only basis for answering an assessment. ' +
+     'If an image you need fails to generate, ' +
+-    'do not substitute a broken placeholder. Video generation is unavailable for this job.'
++    'do not substitute a broken placeholder. ' +
++    (isMiraVideoCreationPolicy(creationPolicy)
++      ? 'The following formal video policy applies.'
++      : 'Video generation is unavailable for this job.')
++  );
++}
++
++export function withMiraFormalVideoInstructions(
++  originalPrompt: string,
++  creationPolicy: unknown,
++): string {
++  if (!isMiraVideoCreationPolicy(creationPolicy)) return originalPrompt;
++  return (
++    originalPrompt +
++    `\n\nFormal video policy (${MIRA_FORMAL_VIDEO_POLICY.policyId}):\n` +
++    'Use video only when motion or a concrete situation helps this lesson; zero videos is valid when it adds no teaching value. ' +
++    'At most ONE generate_video attempt is available in this entire course, including failures and restarts. ' +
++    'Use the existing current stage, a concrete visual/motion prompt, durationSec=5, resolution="720p", aspectRatio="16:9". ' +
++    'The server uses HappyHorse happyhorse-1.0-t2v. Never retry a failed or uncertain generation or create another stage for a video. ' +
++    'Obtain the persisted src before adding a video element with patch_stage or using it in self-contained interactive HTML. ' +
++    'Every generated video must be referenced in the final course. Use only the returned same-stage src; no external, inline, invented or cross-stage video URLs. ' +
++    'Provide a learner-controlled playback control and an age-appropriate observation prompt. ' +
++    'Video is context, not verified answer evidence: precise quantities, text, formulas, geometry and assessment evidence must remain in verifiable slide elements or HTML. ' +
++    'Never rely on generated video to prove how many objects there are. If video was requested but fails, report failure rather than silently dropping it.\n'
+   );
+ }
+ 
+ function professionalSessionOrigin(input: GenerateClassroomInput): string {
++  if (isMiraVideoCreationPolicy(input.professionalCreationPolicy))
++    return MIRA_FORMAL_VIDEO_SESSION_ORIGIN;
+   if (isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy))
+     return MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN;
+   if (isMiraIntegratedSkillCreationPolicy(input.professionalCreationPolicy))
+@@ -494,6 +539,8 @@
+   if (isMiraImageCreationPolicy(input.professionalCreationPolicy)) {
+     assertMiraFormalImageProviderReady();
+   }
++  if (isMiraVideoCreationPolicy(input.professionalCreationPolicy))
++    assertMiraFormalVideoProviderReady();
+   if (isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy)) {
+     await access(formalInspectionConfiguration().executablePath, fsConstants.X_OK);
+   }
+@@ -694,11 +741,16 @@
+     ),
+   };
+   const lockedQuestions = [...spec.guided, ...spec.independent].map(lockedRuntimeQuestion);
+-  return { stage: promotedStage, scenes: normalizeProfessionalScenes(ordered, lockedQuestions, preserveQuestionPlacement) };
++  return {
++    stage: promotedStage,
++    scenes: normalizeProfessionalScenes(ordered, lockedQuestions, preserveQuestionPlacement),
++  };
+ }
+ 
+ function normalizeProfessionalScenes(
+-  ordered: Scene[], lockedQuestions: QuizQuestion[], preserveQuestionPlacement: boolean,
++  ordered: Scene[],
++  lockedQuestions: QuizQuestion[],
++  preserveQuestionPlacement: boolean,
+ ): Scene[] {
+   const quizSceneCount = ordered.filter((scene) => scene.type === 'quiz').length;
+   if (quizSceneCount < 1 || quizSceneCount > lockedQuestions.length) {
+@@ -722,9 +774,16 @@
+                   // New jobs keep the teaching plan's assessment placement.
+                   // A different question is a repairable error, never silently
+                   // replaced after the semantic review has already passed.
+-                  const publicFields = (q: QuizQuestion) => ({ id: q.id, type: q.type,
+-                    question: q.question, ...(q.options ? { options: q.options } : {}) });
+-                  if (!locked || canonicalJson(publicFields(question)) !== canonicalJson(publicFields(locked)))
++                  const publicFields = (q: QuizQuestion) => ({
++                    id: q.id,
++                    type: q.type,
++                    question: q.question,
++                    ...(q.options ? { options: q.options } : {}),
++                  });
++                  if (
++                    !locked ||
++                    canonicalJson(publicFields(question)) !== canonicalJson(publicFields(locked))
++                  )
+                     throw new Error('FORMAL_QUALITY_LOCKED_QUESTION_MISMATCH');
+                   return locked;
+                 })
+@@ -741,12 +800,22 @@
+ /** The review tool and terminal promotion use identical question and citation
+  * normalization. Review stays read-only and the original editor order is kept. */
+ export async function prepareMiraFormalQualitySnapshot(input: {
+-  stage: Stage; scenes: Scene[]; ownerId: string; sessionId: string;
++  stage: Stage;
++  scenes: Scene[];
++  ownerId: string;
++  sessionId: string;
+ }): Promise<{ stage: Stage; scenes: Scene[] }> {
+   const session = await (await getAgentSessionStore()).getSession(input.sessionId);
+-  if (!session || session.ownerId !== input.ownerId || session.origin !== MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN
+-      || !isMiraFormalProfessionalSessionIdentity({ ownerId: session.ownerId,
+-        sessionId: session.id, skillId: session.skillId }))
++  if (
++    !session ||
++    session.ownerId !== input.ownerId ||
++    !isMiraFormalAdaptiveSkillSession({
++      ownerId: session.ownerId,
++      sessionId: session.id,
++      skillId: session.skillId,
++      origin: session.origin,
++    })
++  )
+     throw new Error('FORMAL_QUALITY_SESSION_MISMATCH');
+   const questionMarker = '\nLocked assessment questions:\n';
+   const briefMarker = '\n\nAnswer-blind teaching brief (authoritative):\n';
+@@ -761,8 +830,10 @@
+   if (ordered.some((scene, index) => scene.order !== index + 1))
+     throw new Error('FORMAL_PROFESSIONAL_SOURCE_SCENE_ORDER_INVALID');
+   const normalized = normalizeProfessionalScenes(ordered, questions as QuizQuestion[], true);
+-  return { stage: input.stage,
+-    scenes: canonicalizeMiraFormalResearchFooters(normalized, research.fetched).scenes };
++  return {
++    stage: input.stage,
++    scenes: canonicalizeMiraFormalResearchFooters(normalized, research.fetched).scenes,
++  };
+ }
+ 
+ export function hasMiraFormalSlideSpotlightSequence(scene: Scene): boolean {
+@@ -1108,6 +1179,9 @@
+         }
+       : {}),
+     ...(skillOrchestration ? { skillOrchestration } : {}),
++    ...(isMiraVideoCreationPolicy(input.professionalCreationPolicy)
++      ? { videoGenerationEnabled: true as const, videoPolicyId: MIRA_FORMAL_VIDEO_POLICY.policyId }
++      : {}),
+     ...(teachingQuality ? { teachingQuality } : {}),
+   };
+   return { ...withoutHash, receiptSha256: canonicalSha256(withoutHash) };
+@@ -1210,7 +1284,10 @@
+   if (isMiraIntegratedSkillCreationPolicy(input.professionalCreationPolicy)) {
+     const installed = await listSkills(identity.ownerId);
+     skillBundle = isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy)
+-      ? await prepareMiraFormalAdaptiveSkillBundle(installed, formalAdaptiveSkillSelectionInput(input))
++      ? await prepareMiraFormalAdaptiveSkillBundle(
++          installed,
++          formalAdaptiveSkillSelectionInput(input),
++        )
+       : await prepareMiraFormalSkillBundle(installed, spec.course.subject);
+     const sessionStore = await getAgentSessionStore();
+     // Opening/reading the terminal branch is read-only; this handle never appends.
+@@ -1228,17 +1305,35 @@
+       events,
+     });
+   }
++  const video = isMiraVideoCreationPolicy(input.professionalCreationPolicy)
++    ? await buildMiraFormalVideoReceipt({
++        runtimeRequestId: spec.runtimeRequestId,
++        buildItemId: spec.buildItemId,
++        classroomId: stage.id,
++        sessionId: identity.sessionId,
++        scenes,
++        traces: events
++          .filter((event) => event.type === MIRA_FORMAL_VIDEO_EVENT)
++          .map((event) => event.data),
++      })
++    : undefined;
+   let teachingQuality: MiraTeachingQualityReceipt | undefined;
+   if (isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy)) {
+     if (!skillBundle?.selectionPlan || !skillBundle.gradeBoundary || !skillBundle.teachingBrief)
+       throw new Error('FORMAL_QUALITY_CONTEXT_MISSING');
+     const quality = await reviewFormalCourse({
+-      stage, scenes, ownerId: identity.ownerId, sessionId: identity.sessionId,
++      stage,
++      scenes,
++      ownerId: identity.ownerId,
++      sessionId: identity.sessionId,
+       gradeBoundary: { ...skillBundle.gradeBoundary },
+-      selectionPlan: { ...skillBundle.selectionPlan }, teachingBrief: skillBundle.teachingBrief,
++      selectionPlan: { ...skillBundle.selectionPlan },
++      teachingBrief: skillBundle.teachingBrief,
+     });
+     if (quality.status !== 'passed' || !quality.receipt)
+-      throw new Error(`FORMAL_QUALITY_FINAL_SNAPSHOT_REJECTED: ${JSON.stringify(quality.issues).slice(0, 6000)}`);
++      throw new Error(
++        `FORMAL_QUALITY_FINAL_SNAPSHOT_REJECTED: ${JSON.stringify(quality.issues).slice(0, 6000)}`,
++      );
+     teachingQuality = quality.receipt;
+   }
+   const professionalCreation = buildProfessionalCreationReceipt(
+@@ -1323,6 +1418,7 @@
+       professionalCreation,
+       research,
+       ...(media ? { media } : {}),
++      ...(video ? { video } : {}),
+     },
+     repair: {
+       sessionId: identity.sessionId,
+diff --git a/lib/server/mira-formal-scene-inspector.ts b/lib/server/mira-formal-scene-inspector.ts
+--- a/lib/server/mira-formal-scene-inspector.ts
++++ b/lib/server/mira-formal-scene-inspector.ts
+@@ -118,6 +118,57 @@
+     await new Promise<void>((resolve) =>
+       requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+     );
++  });
++}
++
++/** Executes only in the disposable, owned preview. No narration or student events. */
++async function inspectVideoPlayback(target: Page | Frame) {
++  return target.evaluate(async () => {
++    const videos = Array.from(document.querySelectorAll('video'));
++    const results: Array<{ id: string; passed: boolean; message: string }> = [];
++    if (videos.length > 4)
++      return [{ id: 'video-playback', passed: false, message: 'Too many videos in one scene.' }];
++    for (const [index, video] of videos.entries()) {
++      const until = (condition: () => boolean) =>
++        new Promise<void>((resolve, reject) => {
++          const start = performance.now();
++          const poll = () => {
++            if (video.error) return reject(new Error(`Media decode error ${video.error.code}`));
++            if (condition()) return resolve();
++            if (performance.now() - start > 4000)
++              return reject(new Error('Media playback did not advance.'));
++            setTimeout(poll, 40);
++          };
++          poll();
++        });
++      try {
++        video.muted = true;
++        video.loop = false;
++        video.preload = 'auto';
++        await until(
++          () => video.readyState >= 2 && video.videoWidth > 0 && Number.isFinite(video.duration),
++        );
++        for (let pass = 0; pass < 2; pass++) {
++          video.pause();
++          video.currentTime = 0;
++          await Promise.all([video.play(), until(() => video.currentTime >= 0.2)]);
++        }
++        results.push({
++          id: `video-playback-${index}`,
++          passed: true,
++          message: `Decoded ${video.videoWidth}x${video.videoHeight}, ${video.duration.toFixed(2)}s; playback and replay advanced.`,
++        });
++      } catch (error) {
++        results.push({
++          id: `video-playback-${index}`,
++          passed: false,
++          message: error instanceof Error ? error.message : 'Video playback failed.',
++        });
++      } finally {
++        video.pause();
++      }
++    }
++    return results;
+   });
+ }
+ 
+@@ -412,13 +463,13 @@
+           if (
+             !file.startsWith(`${realBase}${path.sep}`) ||
+             !stat.isFile() ||
+-            stat.size > 32 * 1024 * 1024
++            stat.size > (file.endsWith('.mp4') ? 200 : 32) * 1024 * 1024
+           )
+             throw new Error('invalid media');
+           const ext = path.extname(file).slice(1).replace('jpg', 'jpeg');
+           await route.fulfill({
+             status: 200,
+-            contentType: `image/${ext}`,
++            contentType: ext === 'mp4' ? 'video/mp4' : `image/${ext}`,
+             body: await fs.readFile(file),
+             headers: { 'access-control-allow-origin': '*' },
+           });
+@@ -478,6 +529,11 @@
+       await target.waitForLoadState('domcontentloaded', { timeout: 8000 });
+     }
+     await awaitPaint(target);
++    const videoResults = await inspectVideoPlayback(target);
++    probeResults.push(...videoResults);
++    for (const result of videoResults) {
++      if (!result.passed) issues.push(`video_playback_failed:${result.message}`);
++    }
+     const initial = await target.evaluate(observeFormalSceneDom);
+     if (cloned.scene.type === 'pbl' && !unsupported) {
+       await page.locator('#formal-pbl-show-workspace').dispatchEvent('click');
+diff --git a/lib/server/mira-formal-video.ts b/lib/server/mira-formal-video.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-video.ts
+@@ -0,0 +1,401 @@
++import { createHash } from 'node:crypto';
++import { execFile } from 'node:child_process';
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import { promisify } from 'node:util';
++import { parse, type DefaultTreeAdapterTypes } from 'parse5';
++import { enumerateAssetManifest } from '@openmaic/dsl';
++import type { AgentTool } from '@earendil-works/pi-agent-core';
++import type { Scene } from '@/lib/types/stage';
++import { VIDEO_PROVIDERS } from '@/lib/media/video-providers';
++import { CLASSROOMS_DIR } from './classroom-storage';
++import { MIRA_FORMAL_VIDEO_POLICY } from './mira-formal-generation-policy';
++import {
++  getServerVideoProviders,
++  isServerProviderDisabled,
++  resolveVideoApiKey,
++  resolveVideoBaseUrl,
++  resolveVideoModel,
++} from './provider-config';
++
++export const MIRA_FORMAL_VIDEO_EVENT = 'mira_formal_video_generated';
++const MAX_BYTES = 200 * 1024 * 1024;
++const SAFE_ID = /^[A-Za-z0-9_-]{1,255}$/;
++const runFile = promisify(execFile);
++
++export interface MiraFormalVideoTrace {
++  schemaVersion: 'mira.openmaic.formal-video-trace.v1';
++  sessionId: string;
++  classroomId: string;
++  toolCallId: string;
++  src: string;
++  providerId: 'happyhorse';
++  modelId: 'happyhorse-1.0-t2v';
++}
++
++export interface MiraFormalVideoAsset {
++  src: string;
++  sha256: string;
++  mimeType: 'video/mp4';
++  byteSize: number;
++  width: number;
++  height: number;
++  durationMs: number;
++  sceneIds: string[];
++}
++
++export interface MiraFormalVideoReceipt {
++  schemaVersion: 'mira.openmaic.formal-video-receipt.v1';
++  status: 'succeeded';
++  runtimeRequestId: string;
++  buildItemId: string;
++  classroomId: string;
++  sessionId: string;
++  policyId: typeof MIRA_FORMAL_VIDEO_POLICY.policyId;
++  providerId: typeof MIRA_FORMAL_VIDEO_POLICY.providerId;
++  modelId: typeof MIRA_FORMAL_VIDEO_POLICY.modelId;
++  videoCount: number;
++  assets: MiraFormalVideoAsset[];
++  receiptSha256: string;
++}
++
++type Attempt = {
++  schemaVersion: 'mira.openmaic.formal-video-attempt.v1';
++  sessionId: string;
++  classroomId: string;
++  toolCallId: string;
++  status: 'reserved' | 'succeeded' | 'failed';
++  src?: string;
++};
++
++function fail(code: string): never {
++  throw new Error(`FORMAL_VIDEO_${code}`);
++}
++function sha(bytes: string | Buffer): string {
++  return createHash('sha256').update(bytes).digest('hex');
++}
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object')
++    return Object.fromEntries(
++      Object.entries(value)
++        .sort(([a], [b]) => a.localeCompare(b))
++        .map(([key, item]) => [key, canonical(item)]),
++    );
++  return value;
++}
++function attemptPath(sessionId: string, directory?: string): string {
++  if (!SAFE_ID.test(sessionId)) fail('SESSION_INVALID');
++  return path.resolve(
++    directory ?? path.join(CLASSROOMS_DIR, '..', 'formal-video-attempts'),
++    `${sessionId}.json`,
++  );
++}
++async function readAttempt(sessionId: string, directory?: string): Promise<Attempt | null> {
++  try {
++    return JSON.parse(await fs.readFile(attemptPath(sessionId, directory), 'utf8')) as Attempt;
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
++    throw error;
++  }
++}
++async function settleAttempt(file: string, attempt: Attempt): Promise<void> {
++  const temp = `${file}.${process.pid}.tmp`;
++  await fs.writeFile(temp, JSON.stringify(attempt), { mode: 0o600 });
++  await fs.rename(temp, file);
++}
++
++/** Configuration check only; the existing provider adapter remains authoritative. */
++export function assertMiraFormalVideoProviderReady(): void {
++  const policy = MIRA_FORMAL_VIDEO_POLICY;
++  const providers = getServerVideoProviders();
++  const configured = providers[policy.providerId];
++  // generate_video chooses the first configured, enabled, credentialed provider.
++  // DEFAULT_VIDEO_PROVIDER alone does not control that official selector.
++  const selected = Object.entries(providers).find(([id, info]) => {
++    if (info.disabled || !(id in VIDEO_PROVIDERS)) return false;
++    const provider = VIDEO_PROVIDERS[id as keyof typeof VIDEO_PROVIDERS];
++    return !provider.requiresApiKey || !!resolveVideoApiKey(id);
++  })?.[0];
++  if (
++    !configured ||
++    selected !== policy.providerId ||
++    configured.disabled ||
++    isServerProviderDisabled('video', policy.providerId) ||
++    process.env.DEFAULT_VIDEO_PROVIDER !== policy.providerId ||
++    resolveVideoModel(policy.providerId) !== policy.modelId ||
++    !resolveVideoApiKey(policy.providerId).trim()
++  )
++    fail('PROVIDER_NOT_READY');
++  const base = resolveVideoBaseUrl(policy.providerId);
++  if (base !== 'https://dashscope.aliyuncs.com' && base !== 'https://dashscope.aliyuncs.com/')
++    fail('PROVIDER_ORIGIN_INVALID');
++}
++
++/** Reserve the one paid attempt durably before provider I/O, including failures/crash resumes. */
++export function withMiraFormalVideoTrace(
++  tool: AgentTool<never, never>,
++  sessionId: string,
++  record: (trace: MiraFormalVideoTrace) => Promise<void>,
++  options: {
++    ownsStage: (stageId: string) => Promise<boolean>;
++    attemptsDir?: string;
++    assertReady?: () => void;
++  },
++): AgentTool<never, never> {
++  if (tool.name !== 'generate_video') return tool;
++  return {
++    ...tool,
++    async execute(...args: Parameters<typeof tool.execute>) {
++      const params = args[1] as unknown as {
++        stageId?: unknown;
++        prompt?: unknown;
++        durationSec?: unknown;
++        resolution?: unknown;
++        aspectRatio?: unknown;
++      };
++      if (
++        typeof params.stageId !== 'string' ||
++        !SAFE_ID.test(params.stageId) ||
++        typeof params.prompt !== 'string' ||
++        !params.prompt.trim() ||
++        (params.durationSec !== undefined && params.durationSec !== 5) ||
++        (params.resolution !== undefined && params.resolution !== '720p') ||
++        (params.aspectRatio !== undefined && params.aspectRatio !== '16:9')
++      )
++        fail('REQUEST_POLICY_INVALID');
++      if (!(await options.ownsStage(params.stageId))) fail('STAGE_NOT_OWNED');
++      if (args[2]?.aborted) fail('ABORTED');
++      (options.assertReady ?? assertMiraFormalVideoProviderReady)();
++      const file = attemptPath(sessionId, options.attemptsDir);
++      await fs.mkdir(path.dirname(file), { recursive: true });
++      const attempt: Attempt = {
++        schemaVersion: 'mira.openmaic.formal-video-attempt.v1',
++        sessionId,
++        classroomId: params.stageId,
++        toolCallId: args[0],
++        status: 'reserved',
++      };
++      let handle;
++      try {
++        handle = await fs.open(file, 'wx', 0o600);
++      } catch (error) {
++        if ((error as NodeJS.ErrnoException).code === 'EEXIST') fail('ATTEMPT_LIMIT');
++        throw error;
++      }
++      try {
++        await handle.writeFile(JSON.stringify(attempt));
++        await handle.sync();
++      } finally {
++        await handle.close();
++      }
++      try {
++        const fixed = { ...params, durationSec: 5, resolution: '720p', aspectRatio: '16:9' };
++        const result = await tool.execute(args[0], fixed as never, args[2], args[3]);
++        const value = result as unknown as {
++          isError?: boolean;
++          details?: { src?: unknown; mime?: unknown; durationSec?: unknown };
++        };
++        const src = value.details?.src;
++        if (
++          value.isError ||
++          typeof src !== 'string' ||
++          value.details?.mime !== 'video/mp4' ||
++          typeof value.details.durationSec !== 'number' ||
++          value.details.durationSec < 4.9 ||
++          value.details.durationSec > 5.1 ||
++          !sourceFilename(src, params.stageId)
++        )
++          fail('TOOL_RESULT_INVALID');
++        const trace: MiraFormalVideoTrace = {
++          schemaVersion: 'mira.openmaic.formal-video-trace.v1',
++          sessionId,
++          classroomId: params.stageId,
++          toolCallId: args[0],
++          src,
++          providerId: MIRA_FORMAL_VIDEO_POLICY.providerId,
++          modelId: MIRA_FORMAL_VIDEO_POLICY.modelId,
++        };
++        await record(trace);
++        await settleAttempt(file, { ...attempt, status: 'succeeded', src });
++        return result;
++      } catch (error) {
++        await settleAttempt(file, { ...attempt, status: 'failed' }).catch(() => {});
++        throw error;
++      }
++    },
++  };
++}
++
++function sourceFilename(src: string, classroomId: string): RegExpExecArray | null {
++  const prefix = `/api/classroom-media/${classroomId}/media/`;
++  return src.startsWith(prefix)
++    ? /^generated-([a-f0-9]{64})\.mp4$/u.exec(src.slice(prefix.length))
++    : null;
++}
++
++/** Video slots only: audio/source and image/poster references keep their own contracts. */
++export function formalSceneVideoReferences(scene: Scene): string[] {
++  const refs = new Set(
++    enumerateAssetManifest({ stage: {}, scenes: [scene] })
++      .entries.filter((entry) => entry.kind === 'video')
++      .map((entry) => entry.ref),
++  );
++  const content = scene.content as unknown as { html?: unknown };
++  if (typeof content.html === 'string') {
++    const visit = (node: DefaultTreeAdapterTypes.Node, inVideo = false): void => {
++      if ('tagName' in node) {
++        const attrs = Object.fromEntries(node.attrs.map((attr) => [attr.name, attr.value]));
++        if ((node.tagName === 'video' || (node.tagName === 'source' && inVideo)) && attrs.src)
++          refs.add(attrs.src);
++        if (node.tagName === 'audio') inVideo = false;
++        if (node.tagName === 'video') inVideo = true;
++        if (node.tagName === 'template' && 'content' in node) visit(node.content, inVideo);
++      }
++      if ('childNodes' in node) for (const child of node.childNodes) visit(child, inVideo);
++    };
++    visit(parse(content.html));
++  }
++  return [...refs];
++}
++
++export async function probeMiraFormalVideo(
++  file: string,
++): Promise<{ width: number; height: number; durationMs: number }> {
++  const { stdout } = await runFile(
++    'ffprobe',
++    [
++      '-v',
++      'error',
++      '-protocol_whitelist',
++      'file,pipe',
++      '-show_entries',
++      'stream=codec_type,width,height:format=duration,format_name',
++      '-of',
++      'json',
++      file,
++    ],
++    { timeout: 10000, maxBuffer: 1024 * 1024, windowsHide: true },
++  );
++  const result = JSON.parse(stdout) as {
++    streams?: Array<{ codec_type?: string; width?: number; height?: number }>;
++    format?: { duration?: string; format_name?: string };
++  };
++  const videos = result.streams?.filter((stream) => stream.codec_type === 'video') ?? [];
++  if (videos.length !== 1 || !result.format?.format_name?.split(',').includes('mp4'))
++    fail('BYTES_INVALID');
++  return {
++    width: videos[0]!.width ?? 0,
++    height: videos[0]!.height ?? 0,
++    durationMs: Math.round(Number(result.format.duration) * 1000),
++  };
++}
++
++export async function buildMiraFormalVideoReceipt(
++  input: {
++    runtimeRequestId: string;
++    buildItemId: string;
++    classroomId: string;
++    sessionId: string;
++    scenes: Scene[];
++    traces: unknown[];
++  },
++  options: {
++    classroomsDir?: string;
++    attemptsDir?: string;
++    probe?: typeof probeMiraFormalVideo;
++  } = {},
++): Promise<MiraFormalVideoReceipt> {
++  if (!SAFE_ID.test(input.classroomId)) fail('STAGE_INVALID');
++  const refs = new Map<string, string[]>();
++  for (const scene of input.scenes) {
++    if (scene.stageId !== input.classroomId) fail('SCENE_STAGE_MISMATCH');
++    for (const src of formalSceneVideoReferences(scene)) {
++      const ids = refs.get(src) ?? [];
++      if (!ids.includes(scene.id)) ids.push(scene.id);
++      refs.set(src, ids);
++    }
++  }
++  if (refs.size > 1 || input.traces.length > 1) fail('ASSET_LIMIT');
++  const attempt = await readAttempt(input.sessionId, options.attemptsDir);
++  if (
++    attempt &&
++    (attempt.schemaVersion !== 'mira.openmaic.formal-video-attempt.v1' ||
++      attempt.sessionId !== input.sessionId ||
++      attempt.classroomId !== input.classroomId ||
++      attempt.status !== 'succeeded')
++  )
++    fail('ATTEMPT_UNRESOLVED');
++  const traced = new Set<string>();
++  for (const raw of input.traces) {
++    const trace = raw as Partial<MiraFormalVideoTrace> | null;
++    if (
++      !trace ||
++      trace.schemaVersion !== 'mira.openmaic.formal-video-trace.v1' ||
++      trace.sessionId !== input.sessionId ||
++      trace.classroomId !== input.classroomId ||
++      trace.providerId !== MIRA_FORMAL_VIDEO_POLICY.providerId ||
++      trace.modelId !== MIRA_FORMAL_VIDEO_POLICY.modelId ||
++      typeof trace.src !== 'string' ||
++      typeof trace.toolCallId !== 'string' ||
++      !trace.toolCallId ||
++      !attempt ||
++      attempt.toolCallId !== trace.toolCallId ||
++      attempt.src !== trace.src
++    )
++      fail('TRACE_INVALID');
++    if (!refs.has(trace.src)) fail('GENERATED_ASSET_UNREFERENCED');
++    traced.add(trace.src);
++  }
++  if (attempt && !traced.has(attempt.src!)) fail('TRACE_MISSING');
++  const assets: MiraFormalVideoAsset[] = [];
++  const root = path.resolve(options.classroomsDir ?? CLASSROOMS_DIR, input.classroomId, 'media');
++  for (const [src, sceneIds] of refs) {
++    const match = sourceFilename(src, input.classroomId);
++    if (!match || !traced.has(src)) fail('SOURCE_UNATTESTED');
++    const file = path.join(root, match[0]);
++    const real = await fs.realpath(file).catch(() => fail('FILE_MISSING'));
++    if (real !== file) fail('SOURCE_NOT_OWNED');
++    const stat = await fs.stat(real);
++    if (!stat.isFile() || stat.size < 1 || stat.size > MAX_BYTES) fail('BYTES_INVALID');
++    const bytes = await fs.readFile(real);
++    const digest = sha(bytes);
++    if (digest !== match[1]) fail('HASH_MISMATCH');
++    let metadata;
++    try {
++      metadata = await (options.probe ?? probeMiraFormalVideo)(real);
++    } catch {
++      fail('BYTES_INVALID');
++    }
++    if (
++      metadata.width !== 1280 ||
++      metadata.height !== 720 ||
++      !Number.isSafeInteger(metadata.durationMs) ||
++      metadata.durationMs < 4900 ||
++      metadata.durationMs > 5100
++    )
++      fail('OUTPUT_POLICY_INVALID');
++    assets.push({
++      src,
++      sha256: digest,
++      mimeType: 'video/mp4',
++      byteSize: bytes.length,
++      ...metadata,
++      sceneIds,
++    });
++  }
++  const unsigned = {
++    schemaVersion: 'mira.openmaic.formal-video-receipt.v1' as const,
++    status: 'succeeded' as const,
++    runtimeRequestId: input.runtimeRequestId,
++    buildItemId: input.buildItemId,
++    classroomId: input.classroomId,
++    sessionId: input.sessionId,
++    policyId: MIRA_FORMAL_VIDEO_POLICY.policyId,
++    providerId: MIRA_FORMAL_VIDEO_POLICY.providerId,
++    modelId: MIRA_FORMAL_VIDEO_POLICY.modelId,
++    videoCount: assets.length,
++    assets,
++  };
++  return { ...unsigned, receiptSha256: sha(JSON.stringify(canonical(unsigned))) };
++}
+diff --git a/lib/server/mira-professional-research-policy.ts b/lib/server/mira-professional-research-policy.ts
+--- a/lib/server/mira-professional-research-policy.ts
++++ b/lib/server/mira-professional-research-policy.ts
+@@ -36,6 +36,7 @@
+ // The persisted origin, rather than a global provider toggle or editable prompt,
+ // distinguishes new image-capable jobs from historical formal jobs on resume.
+ export const MIRA_FORMAL_IMAGE_SESSION_ORIGIN = 'mira-formal-professional-qwen-image-v1';
++export const MIRA_FORMAL_VIDEO_SESSION_ORIGIN = 'mira-formal-professional-happyhorse-video-v1';
+ export const MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE = 'mira_formal_research_search';
+ export const MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION =
+   'mira.openmaic.research-search-trace.v1';
+@@ -74,7 +75,8 @@
+     isMiraFormalProfessionalSessionIdentity(input) &&
+     (input.origin === MIRA_FORMAL_IMAGE_SESSION_ORIGIN ||
+       input.origin === MIRA_FORMAL_SKILL_SESSION_ORIGIN ||
+-      input.origin === MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN)
++      input.origin === MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN)
+   );
+ }
+ 
+@@ -87,7 +89,8 @@
+   return (
+     isMiraFormalProfessionalSessionIdentity(input) &&
+     (input.origin === MIRA_FORMAL_SKILL_SESSION_ORIGIN ||
+-      input.origin === MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN)
++      input.origin === MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN)
+   );
+ }
+ 
+@@ -99,7 +102,17 @@
+ }): boolean {
+   return (
+     isMiraFormalProfessionalSessionIdentity(input) &&
+-    input.origin === MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN
++    (input.origin === MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN)
++  );
++}
++
++export function isMiraFormalVideoSession(
++  input: Parameters<typeof isMiraFormalImageSession>[0],
++): boolean {
++  return (
++    isMiraFormalProfessionalSessionIdentity(input) &&
++    input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN
+   );
+ }
+ 
+@@ -109,8 +122,11 @@
+ ): T[] {
+   if (!isMiraFormalProfessionalSessionIdentity(input)) return tools;
+   const imagesEnabled = isMiraFormalImageSession(input);
++  const videosEnabled = isMiraFormalVideoSession(input);
+   return tools.filter(
+-    (tool) => tool.name !== 'generate_video' && (tool.name !== 'generate_image' || imagesEnabled),
++    (tool) =>
++      (tool.name !== 'generate_video' || videosEnabled) &&
++      (tool.name !== 'generate_image' || imagesEnabled),
+   );
+ }
+ 
+diff --git a/tests/fixtures/formal-inspection-video.json b/tests/fixtures/formal-inspection-video.json
+new file mode 100644
+--- /dev/null
++++ b/tests/fixtures/formal-inspection-video.json
+@@ -0,0 +1,4 @@
++{
++  "description": "Locally generated 1-second H.264 green frame for real browser media decode/replay tests; no Provider calls.",
++  "base64": "AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAPEbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAu50cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAUAAAAC0AAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAIAAABAAAAAAJmbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAwAAAAMABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAACEW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAdFzdGJsAAAAwXN0c2QAAAAAAAAAAQAAALFhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAUAAtABIAAAASAAAAAAAAAABFUxhdmM2Mi4yOC4xMDAgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAN2F2Y0MBZAAM/+EAGmdkAAys2UFBn58BEAAAAwAQAAADAYDxQplgAQAGaOvjyyLA/fj4AAAAABBwYXNwAAAAAQAAAAEAAAAUYnRydAAAAAAAABzoAAAAAAAAABhzdHRzAAAAAAAAAAEAAAAMAAAEAAAAABRzdHNzAAAAAAAAAAEAAAABAAAAaGN0dHMAAAAAAAAACwAAAAEAAAgAAAAAAQAAFAAAAAABAAAIAAAAAAEAAAAAAAAAAQAABAAAAAABAAAUAAAAAAEAAAgAAAAAAQAAAAAAAAABAAAEAAAAAAEAABAAAAAAAgAABAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAwAAAABAAAARHN0c3oAAAAAAAAAAAAAAAwAAAL0AAAAEQAAAA0AAAANAAAADQAAABYAAAAPAAAADQAAAA0AAAAWAAAADwAAAA0AAAAUc3RjbwAAAAAAAAABAAAD9AAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNjIuMTIuMTAwAAAACGZyZWUAAAOlbWRhdAAAAq4GBf//qtxF6b3m2Ui3lizYINkj7u94MjY0IC0gY29yZSAxNjUgcjMyMjIgYjM1NjA1YSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMjUgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0xIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDM6MHgxMTMgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTEgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz02IGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MyBiX3B5cmFtaWQ9MiBiX2FkYXB0PTEgYl9iaWFzPTAgZGlyZWN0PTEgd2VpZ2h0Yj0xIG9wZW5fZ29wPTAgd2VpZ2h0cD0yIGtleWludD0yNTAga2V5aW50X21pbj0xMiBzY2VuZWN1dD00MCBpbnRyYV9yZWZyZXNoPTAgcmNfbG9va2FoZWFkPTQwIHJjPWNyZiBtYnRyZWU9MSBjcmY9MjMuMCBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhcT0xOjEuMDAAgAAAAD5liIQAEP/+5sD5lklwZOk+25VoDqSugXdc8hvTiAZchoeXPgAE9SnXuLiIRYrhbARYAAA6IbEBWymSzeNLgQAAAA1BmiRsQQ/+qlUAAIWAAAAACUGeQniG/wABdwAAAAkBnmF0Qz8AAccAAAAJAZ5jakM/AAHHAAAAEkGaaEmoQWiZTAh///6plgACBwAAAAtBnoZFESw3/wABdwAAAAkBnqV0Qz8AAccAAAAJAZ6nakM/AAHHAAAAEkGaq0moQWyZTAhn//6eEAAPmAAAAAtBnslFFSw3/wABdwAAAAkBnupqQz8AAcc="
++}
+diff --git a/tests/fixtures/mira-formal-video-5s.json b/tests/fixtures/mira-formal-video-5s.json
+new file mode 100644
+--- /dev/null
++++ b/tests/fixtures/mira-formal-video-5s.json
+@@ -0,0 +1,5 @@
++{
++  "description": "Locally generated 5-second 1280x720 H.264 navy frames for offline formal video file metadata and media route tests; no Provider calls.",
++  "sha256": "4dd69962b07fb2e4e403c390074cbcabb68c5a2260506f472a6f79544fc00b55",
++  "base64": "AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAN4bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAE4gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAqJ0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAE4gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAABQAAAALQAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAABOIAACAAAABAAAAAAIabWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAABAAAABQABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABxW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAYVzdGJsAAAAwXN0c2QAAAAAAAAAAQAAALFhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAABQAC0ABIAAAASAAAAAAAAAABFUxhdmM2Mi4yOC4xMDAgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAN2F2Y0MBZAAf/+EAGmdkAB+s2UBQBbsBEAAAAwAQAAADACDxgxlgAQAGaOvjyyLA/fj4AAAAABBwYXNwAAAAAQAAAAEAAAAUYnRydAAAAAAAAAasAAAAAAAAABhzdHRzAAAAAAAAAAEAAAAFAABAAAAAABRzdHNzAAAAAAAAAAEAAAABAAAAOGN0dHMAAAAAAAAABQAAAAEAAIAAAAAAAQABQAAAAAABAACAAAAAAAEAAAAAAAAAAQAAQAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAUAAAABAAAAKHN0c3oAAAAAAAAAAAAAAAUAAAORAAAAKQAAACYAAAAmAAAAJgAAABRzdGNvAAAAAAAAAAEAAAOoAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY2Mi4xMi4xMDAAAAAIZnJlZQAABDRtZGF0AAACrgYF//+q3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE2NSByMzIyMiBiMzU2MDVhIC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAyNSAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTE1IGxvb2thaGVhZF90aHJlYWRzPTIgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MyBiX3B5cmFtaWQ9MiBiX2FkYXB0PTEgYl9iaWFzPTAgZGlyZWN0PTEgd2VpZ2h0Yj0xIG9wZW5fZ29wPTAgd2VpZ2h0cD0yIGtleWludD0yNTAga2V5aW50X21pbj0xIHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAA22WIhAAX//7ugr4FN2xIX8J1SWkY9c+OqC9NDfFdX+m9QuIxhx5LcAAAAwAAAwAAAwAAAwB4TQt2xyav6DuEgAAAAwAA+wAAlwAA4wACGAAFXAAR8ABFQAE6AAWQACOAAL4ABeAAIgABEAAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwA/YQAAACVBmiRsQV/+1qVQAAADAAADAAADAAADAAADAAADAAADAAADAGXAAAAAIkGeQniC3wAAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwAALKEAAAAiAZ5hdEFfAAADAAADAAADAAADAAADAAADAAADAAADAABDwAAAACIBnmNqQV8AAAMAAAMAAAMAAAMAAAMAAAMAAAMAAAMAAEPB"
++}
+diff --git a/tests/media/happyhorse-adapter.test.ts b/tests/media/happyhorse-adapter.test.ts
+--- a/tests/media/happyhorse-adapter.test.ts
++++ b/tests/media/happyhorse-adapter.test.ts
+@@ -1,5 +1,5 @@
+-import { beforeEach, describe, expect, test, vi } from 'vitest';
+-import { pollHappyHorseTask, submitHappyHorseTask } from '@/lib/media/adapters/happyhorse-adapter';
++import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
++import { generateWithHappyHorse, pollHappyHorseTask, submitHappyHorseTask } from '@/lib/media/adapters/happyhorse-adapter';
+ import type { VideoGenerationConfig } from '@/lib/media/types';
+ 
+ const fetchMock = vi.fn();
+@@ -16,6 +16,8 @@
+   beforeEach(() => {
+     fetchMock.mockReset();
+   });
++
++  afterEach(() => { vi.useRealTimers(); });
+ 
+   test('submits an async DashScope video synthesis task', async () => {
+     fetchMock.mockResolvedValueOnce({
+@@ -41,6 +43,7 @@
+       'https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis',
+       {
+         method: 'POST',
++        signal: undefined,
+         headers: {
+           Authorization: 'Bearer test-key',
+           'Content-Type': 'application/json',
+@@ -60,6 +63,39 @@
+         }),
+       },
+     );
++  });
++
++  test('cancels the actual submission request without any replacement submission', async () => {
++    const abort = new AbortController();
++    fetchMock.mockImplementationOnce((_url, init: RequestInit) => new Promise((_resolve, reject) => {
++      expect(init.signal).toBe(abort.signal);
++      init.signal!.addEventListener('abort', () => reject(init.signal!.reason), { once: true });
++    }));
++    const result = generateWithHappyHorse(config, { prompt: 'A leaf unfolding', signal: abort.signal });
++    const rejection = expect(result).rejects.toThrow('stop submission');
++    abort.abort(new Error('stop submission'));
++    await rejection;
++    expect(fetchMock).toHaveBeenCalledOnce();
++  });
++
++  test('cancels in-flight polling and performs no further provider calls', async () => {
++    vi.useFakeTimers();
++    const abort = new AbortController();
++    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ output: { task_id: 'paid-task' } }) });
++    fetchMock.mockImplementationOnce((_url, init: RequestInit) => new Promise((_resolve, reject) => {
++      expect(init.method).toBe('GET');
++      expect(init.signal).toBe(abort.signal);
++      init.signal!.addEventListener('abort', () => reject(init.signal!.reason), { once: true });
++    }));
++    const result = generateWithHappyHorse(config, { prompt: 'A leaf unfolding', signal: abort.signal });
++    const rejection = expect(result).rejects.toThrow('stop poll');
++    await vi.advanceTimersByTimeAsync(15_000);
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++    abort.abort(new Error('stop poll'));
++    await rejection;
++    await vi.advanceTimersByTimeAsync(600_000);
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++    expect(vi.getTimerCount()).toBe(0);
+   });
+ 
+   test('returns a video result when polling succeeds', async () => {
+diff --git a/tests/media/polled-task.test.ts b/tests/media/polled-task.test.ts
+--- a/tests/media/polled-task.test.ts
++++ b/tests/media/polled-task.test.ts
+@@ -23,6 +23,51 @@
+     expect(result).toBe('video-url');
+     expect(submit).toHaveBeenCalledTimes(1);
+     expect(poll).not.toHaveBeenCalled();
++    expect(vi.getTimerCount()).toBe(0);
++  });
++
++  it('never submits an already cancelled task', async () => {
++    const abort = new AbortController();
++    const reason = new Error('cancelled before dispatch');
++    abort.abort(reason);
++    const submit = vi.fn();
++    await expect(runPolledTask({ submit, poll: vi.fn(), intervalMs: 1_000,
++      maxAttempts: 3, label: 'Test task', signal: abort.signal })).rejects.toBe(reason);
++    expect(submit).not.toHaveBeenCalled();
++  });
++
++  it('clears the waiting timer on cancellation without polling or submitting again', async () => {
++    vi.useFakeTimers();
++    const abort = new AbortController();
++    const submit = vi.fn().mockResolvedValue({ status: 'submitted', taskId: 'paid-task' });
++    const poll = vi.fn();
++    const result = runPolledTask({ submit, poll, intervalMs: 15_000,
++      maxAttempts: 40, label: 'Test task', signal: abort.signal });
++    const rejection = expect(result).rejects.toThrow('stop polling');
++    await vi.advanceTimersByTimeAsync(1_000);
++    abort.abort(new Error('stop polling'));
++    await rejection;
++    await vi.advanceTimersByTimeAsync(600_000);
++    expect(submit).toHaveBeenCalledOnce();
++    expect(poll).not.toHaveBeenCalled();
++    expect(vi.getTimerCount()).toBe(0);
++  });
++
++  it('does not accept or continue a poll result that arrives after cancellation', async () => {
++    vi.useFakeTimers();
++    const abort = new AbortController();
++    const poll = vi.fn(async () => {
++      abort.abort(new Error('cancelled during poll'));
++      return { status: 'done' as const, result: 'late-video' };
++    });
++    const result = runPolledTask({
++      submit: vi.fn().mockResolvedValue({ status: 'submitted', taskId: 'paid-task' }),
++      poll, intervalMs: 1_000, maxAttempts: 40, label: 'Test task', signal: abort.signal,
++    });
++    const rejection = expect(result).rejects.toThrow('cancelled during poll');
++    await vi.advanceTimersByTimeAsync(1_000);
++    await rejection;
++    expect(poll).toHaveBeenCalledOnce();
+     expect(vi.getTimerCount()).toBe(0);
+   });
+ 
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -15,7 +15,11 @@
+   resolveImageApiKey: () => process.env.MIRA_TEST_QWEN_IMAGE_KEY || '',
+   resolveImageModel: () => 'qwen-image-max',
+   resolveImageBaseUrl: () => 'https://dashscope.aliyuncs.com',
+-  getServerVideoProviders: () => ({}),
++  getServerVideoProviders: () =>
++    process.env.MIRA_TEST_HAPPYHORSE_KEY ? { happyhorse: { models: ['happyhorse-1.0-t2v'] } } : {},
++  resolveVideoApiKey: () => process.env.MIRA_TEST_HAPPYHORSE_KEY || '',
++  resolveVideoModel: () => 'happyhorse-1.0-t2v',
++  resolveVideoBaseUrl: () => 'https://dashscope.aliyuncs.com',
+   getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
+   getServerASRProviders: () => ({ 'qwen-asr': {} }),
+   resolveTTSApiKey: () => process.env.MIRA_TEST_QWEN_API_KEY || '',
+@@ -55,6 +59,8 @@
+     process.env.MIRA_TEST_QWEN_API_KEY = 'test-qwen-key';
+     process.env.MIRA_TEST_QWEN_IMAGE_KEY = 'test-qwen-image-key';
+     process.env.DEFAULT_IMAGE_PROVIDER = 'qwen-image';
++    process.env.MIRA_TEST_HAPPYHORSE_KEY = 'test-happyhorse-key';
++    process.env.DEFAULT_VIDEO_PROVIDER = 'happyhorse';
+     process.env.MODEL_ROUTES = JSON.stringify({
+       'maic-agent-driver': {
+         model: 'deepseek:deepseek-v4-pro',
+@@ -100,6 +106,8 @@
+     delete process.env.MIRA_TEST_QWEN_API_KEY;
+     delete process.env.MIRA_TEST_QWEN_IMAGE_KEY;
+     delete process.env.DEFAULT_IMAGE_PROVIDER;
++    delete process.env.MIRA_TEST_HAPPYHORSE_KEY;
++    delete process.env.DEFAULT_VIDEO_PROVIDER;
+     delete process.env.MODEL_ROUTES;
+     delete process.env.DEEPSEEK_API_KEY;
+     delete process.env.DEEPSEEK_BASE_URL;
+@@ -275,6 +283,21 @@
+           sceneContextRequired: true,
+           gradeBoundaryRequired: true,
+         },
++        video: {
++          schemaVersion: 'mira.openmaic.formal-video-policy.v1',
++          policyId: 'mira-formal-happyhorse-video.v1',
++          enabled: true,
++          providerManaged: true,
++          providerId: 'happyhorse',
++          modelId: 'happyhorse-1.0-t2v',
++          usage: 'teaching_need',
++          maxCalls: 1,
++          maxVideos: 1,
++          durationSec: 5,
++          resolution: '720p',
++          aspectRatio: '16:9',
++          assetValidationRequired: true,
++        },
+         teachingQuality: {
+           schemaVersion: 'mira.openmaic.teaching-quality-policy.v1',
+           policyId: 'mira-primary-quality.v1',
+@@ -385,6 +408,7 @@
+       webSearch: true,
+       speechAudioGeneration: true,
+       imageGeneration: true,
++      videoGeneration: true,
+     });
+     expect(body.runtimePolicy.formalGeneration).toMatchObject({
+       policyId: 'mira.openmaic.formal-runtime.v4-deepseek-professional',
+@@ -485,6 +509,31 @@
+     expect(body.runtimePolicy).toBeUndefined();
+   });
+ 
++  it.each(['missing-key', 'wrong-default', 'missing-default'])(
++    'does not claim new formal video readiness with %s',
++    async (mode) => {
++      process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
++      process.env.DEEPSEEK_API_KEY = 'formal-generation-test-key';
++      if (mode === 'missing-key') delete process.env.MIRA_TEST_HAPPYHORSE_KEY;
++      if (mode === 'wrong-default') process.env.DEFAULT_VIDEO_PROVIDER = 'other';
++      if (mode === 'missing-default') delete process.env.DEFAULT_VIDEO_PROVIDER;
++      const { GET } = await import('@/app/api/health/route');
++      const response = await GET(
++        new NextRequest('http://runtime.test/api/health?scope=formal-generation'),
++      );
++      expect(response.status).toBe(503);
++      const body = await response.json();
++      expect(body).toMatchObject({
++        success: false,
++        errorCode: 'PROVIDER_DISABLED',
++        error: 'FORMAL_VIDEO_PROVIDER_NOT_READY',
++      });
++      expect(JSON.stringify(body)).not.toContain('test-happyhorse-key');
++      // Ordinary runtime health remains available for existing classroom playback.
++      expect((await GET(healthRequest())).status).toBe(200);
++    },
++  );
++
+   it('does not claim new formal image readiness without a configured image provider', async () => {
+     process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     process.env.DEEPSEEK_API_KEY = 'formal-generation-test-key';
+diff --git a/tests/server/mira-formal-professional-classroom.test.ts b/tests/server/mira-formal-professional-classroom.test.ts
+--- a/tests/server/mira-formal-professional-classroom.test.ts
++++ b/tests/server/mira-formal-professional-classroom.test.ts
+@@ -4,8 +4,15 @@
+   canonicalizeMiraFormalResearchFooters,
+   hasMiraFormalSlideSpotlightSequence,
+   withMiraFormalImageInstructions,
++  withMiraFormalVideoInstructions,
+ } from '@/lib/server/mira-formal-professional-classroom';
+-import { MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY, MIRA_PROFESSIONAL_CREATION_POLICY } from '@/lib/server/mira-formal-generation-policy';
++import {
++  MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++  MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
++  MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY,
++  MIRA_PROFESSIONAL_CREATION_POLICY,
++  MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++} from '@/lib/server/mira-formal-generation-policy';
+ import type { Scene } from '@/lib/types/stage';
+ 
+ function slide(actions: Scene['actions'], elementId = 'focus-target'): Scene {
+@@ -52,10 +59,41 @@
+ }
+ 
+ describe('Mira formal slide spotlight sequence', () => {
++  it('adds bounded video teaching instructions only to the new exact policy', () => {
++    const original = 'persisted prompt\n';
++    for (const policy of [
++      MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++      MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
++      MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY,
++      MIRA_PROFESSIONAL_CREATION_POLICY,
++    ]) {
++      expect(withMiraFormalVideoInstructions(original, policy)).toBe(original);
++      if ('image' in policy)
++        expect(withMiraFormalImageInstructions(original, policy)).toContain(
++          'Video generation is unavailable for this job.',
++        );
++    }
++    const prompt = withMiraFormalVideoInstructions(
++      withMiraFormalImageInstructions(original, MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY),
++      MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++    );
++    expect(prompt).not.toContain('Video generation is unavailable for this job.');
++    for (const phrase of [
++      'zero videos is valid',
++      'ONE generate_video attempt',
++      'durationSec=5',
++      '720p',
++      '16:9',
++      'Every generated video must be referenced',
++      'Never rely on generated video to prove how many',
++    ])
++      expect(prompt).toContain(phrase);
++  });
+   it('adds image teaching limits only to new jobs and preserves the legacy prompt bytes', () => {
+     const original = 'persisted legacy prompt\nwith exact whitespace\n';
+-    expect(withMiraFormalImageInstructions(original, MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY))
+-      .toBe(original);
++    expect(
++      withMiraFormalImageInstructions(original, MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY),
++    ).toBe(original);
+     const updated = withMiraFormalImageInstructions(original, MIRA_PROFESSIONAL_CREATION_POLICY);
+     expect(updated.startsWith(original)).toBe(true);
+     expect(updated).toContain('precise quantities, text, formulas, geometric relationships');
+@@ -123,8 +161,7 @@
+     if (cited.content.type !== 'slide') throw new Error('invalid fixture');
+     const citedText = cited.content.canvas.elements[0]!;
+     if (citedText.type !== 'text') throw new Error('invalid fixture');
+-    citedText.content =
+-      '<p>口形参考:汉语拼音韵母表 · www.hanyupinyin.cn</p>';
++    citedText.content = '<p>口形参考:汉语拼音韵母表 · www.hanyupinyin.cn</p>';
+     const uncited = slide([]);
+     uncited.id = 'p4';
+     if (uncited.content.type !== 'slide') throw new Error('invalid fixture');
+diff --git a/tests/server/mira-formal-quality-normalization.test.ts b/tests/server/mira-formal-quality-normalization.test.ts
+--- a/tests/server/mira-formal-quality-normalization.test.ts
++++ b/tests/server/mira-formal-quality-normalization.test.ts
+@@ -3,6 +3,7 @@
+ import { prepareMiraFormalQualitySnapshot } from '@/lib/server/mira-formal-professional-classroom';
+ import { MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN } from '@/lib/server/mira-formal-skill-selection';
+ import {
++  MIRA_FORMAL_VIDEO_SESSION_ORIGIN,
+   MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
+   MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION,
+ } from '@/lib/server/mira-professional-research-policy';
+@@ -89,6 +90,26 @@
+   ]);
+ });
+ describe('quality review uses the final normalized question placement', () => {
++  it('accepts the new video session for the same final quality snapshot without dropping HTML video', async () => {
++    const original = await mocks.session();
++    mocks.session.mockResolvedValue({ ...original, origin: MIRA_FORMAL_VIDEO_SESSION_ORIGIN });
++    const value = input();
++    if (value.scenes[1]!.content.type !== 'interactive') throw new Error('fixture');
++    value.scenes[1]!.content.html =
++      '<video controls src="/api/classroom-media/stage/media/generated-test.mp4"></video><button>观察后说一说</button>';
++    const normalized = await prepareMiraFormalQualitySnapshot(value);
++    expect(normalized.stage.id).toBe(value.stage.id);
++    expect(normalized.scenes[1]!.content).toEqual(value.scenes[1]!.content);
++    expect(normalized.scenes.map((scene) => scene.order)).toEqual([0, 1, 2]);
++    mocks.session.mockResolvedValue({ ...original, origin: 'public-pro' });
++    await expect(prepareMiraFormalQualitySnapshot(value)).rejects.toThrow('SESSION_MISMATCH');
++    mocks.session.mockResolvedValue({
++      ...original,
++      origin: MIRA_FORMAL_VIDEO_SESSION_ORIGIN,
++      skillId: 'other',
++    });
++    await expect(prepareMiraFormalQualitySnapshot(value)).rejects.toThrow('SESSION_MISMATCH');
++  });
+   it('keeps the original 1+3 question placement, strips generated answers, and leaves the editor document unchanged', async () => {
+     const value = input();
+     if (value.scenes[0]!.content.type !== 'quiz') throw new Error('fixture');
+diff --git a/tests/server/mira-formal-scene-inspector.browser.test.ts b/tests/server/mira-formal-scene-inspector.browser.test.ts
+--- a/tests/server/mira-formal-scene-inspector.browser.test.ts
++++ b/tests/server/mira-formal-scene-inspector.browser.test.ts
+@@ -18,6 +18,7 @@
+ import { createDefaultSlide, createDefaultTextElement } from '@/lib/edit/slide-edit-elements';
+ import type { FormalSceneInspectionInput } from '@/lib/types/formal-scene-inspection';
+ import type { Scene } from '@/lib/types/stage';
++import videoFixture from '../fixtures/formal-inspection-video.json';
+ 
+ const fixture = vi.hoisted(() => ({
+   sessionId: `inspector-browser-${process.pid}`,
+@@ -81,6 +82,8 @@
+   let imageBytes: Buffer;
+   const imageName = `inspection-${process.pid}.png`;
+   const imagePath = path.join(CLASSROOMS_DIR, stage.id, 'media', imageName);
++  const videoName = `inspection-${process.pid}.mp4`;
++  const videoPath = path.join(CLASSROOMS_DIR, stage.id, 'media', videoName);
+   beforeAll(async () => {
+     imageBytes = await sharp({
+       create: { width: 64, height: 64, channels: 3, background: '#28a745' },
+@@ -89,6 +92,7 @@
+       .toBuffer();
+     await fs.mkdir(path.dirname(imagePath), { recursive: true });
+     await fs.writeFile(imagePath, imageBytes, { flag: 'wx' });
++    await fs.writeFile(videoPath, Buffer.from(videoFixture.base64, 'base64'), { flag: 'wx' });
+     const require = createRequire(import.meta.url);
+     // tsx is a pinned dev tool already used by this repo. Its esbuild is only
+     // needed to mount the real renderer in this isolated HTTP test fixture.
+@@ -118,6 +122,10 @@
+           response.setHeader('content-type', 'image/png');
+           response.setHeader('access-control-allow-origin', '*');
+           response.end(imageBytes);
++        } else if (request.url === `/api/classroom-media/${stage.id}/media/${videoName}`) {
++          response.setHeader('content-type', 'video/mp4');
++          response.setHeader('access-control-allow-origin', '*');
++          response.end(Buffer.from(videoFixture.base64, 'base64'));
+         } else {
+           response.writeHead(404);
+           response.end();
+@@ -168,6 +176,7 @@
+       force: true,
+     });
+     await fs.rm(imagePath, { force: true });
++    await fs.rm(videoPath, { force: true });
+     vi.unstubAllEnvs();
+   });
+ 
+@@ -198,6 +207,25 @@
+       expect(result.domSha256).toMatch(/^[a-f0-9]{64}$/);
+       expect(result.visibleText).toContain('把积木分成两组');
+     }
++  }, 60_000);
++
++  it('decodes and replays the owned video while detecting a missing video', async () => {
++    const html = (name: string) =>
++      `<h1>看看整理材料的过程</h1><video width="480" height="270" controls preload="auto" src="${productionBaseUrl || canaryOrigin}/api/classroom-media/${stage.id}/media/${name}"></video><button id="observe" onclick="this.textContent='我看到了'">说说你看到了什么</button>`;
++    const result = await inspectFormalScene(input(interactive(html(videoName))));
++    expect(result.issues).toEqual([]);
++    expect(result.probeResults).toContainEqual(
++      expect.objectContaining({
++        id: 'video-playback-0',
++        passed: true,
++        message: expect.stringContaining('playback and replay advanced'),
++      }),
++    );
++    const missing = await inspectFormalScene(input(interactive(html('missing.mp4'))));
++    expect(missing.passed).toBe(false);
++    expect(missing.probeResults).toContainEqual(
++      expect.objectContaining({ id: 'video-playback-0', passed: false }),
++    );
+   }, 60_000);
+ 
+   it('renders the actual SlideCanvas and detects clipping in a deliberately bad slide', async () => {
+diff --git a/tests/server/mira-formal-scene-inspector.test.ts b/tests/server/mira-formal-scene-inspector.test.ts
+--- a/tests/server/mira-formal-scene-inspector.test.ts
++++ b/tests/server/mira-formal-scene-inspector.test.ts
+@@ -285,4 +285,25 @@
+       request('http://127.0.0.1:3100/api/classroom-media/stage-one/media/../private.png', 'image'),
+     ).toBe(false);
+   });
+-});
++  it('allows owned MP4 media reads while denying foreign, remote and API requests', () => {
++    const url = 'http://127.0.0.1:3100/api/classroom-media/stage-one/media/generated-abc.mp4';
++    expect(request(url, 'media')).toBe(true);
++    expect(request(url, 'fetch')).toBe(false);
++    expect(request(url, 'script')).toBe(false);
++    expect(request(url, 'media', 'POST')).toBe(false);
++    expect(request(url + '?token=private', 'media')).toBe(false);
++    expect(request(url.replace('stage-one', 'stage-other'), 'media')).toBe(false);
++    expect(request(url.replace('http://127.0.0.1:3100', 'https://example.com'), 'media')).toBe(
++      false,
++    );
++    const policy = formalInspectionContentSecurityPolicy({
++      baseOrigin: 'http://127.0.0.1:3100',
++      stageId: stage.id,
++      scene,
++    });
++    expect(policy).toContain(
++      'media-src http://127.0.0.1:3100/api/classroom-media/stage-one/media/',
++    );
++    expect(policy).toContain("connect-src 'none'");
++  });
++});
+diff --git a/tests/server/mira-formal-video.test.ts b/tests/server/mira-formal-video.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-video.test.ts
+@@ -0,0 +1,431 @@
++import { createHash } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import type { AgentTool } from '@earendil-works/pi-agent-core';
++import type { Scene } from '@/lib/types/stage';
++
++const config = vi.hoisted(() => ({
++  disabled: false,
++  providers: null as Record<string, { disabled?: boolean }> | null,
++  model: 'happyhorse-1.0-t2v',
++  key: 'offline-key',
++  base: 'https://dashscope.aliyuncs.com',
++}));
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerVideoProviders: () => config.providers ?? { happyhorse: { models: [config.model] } },
++  isServerProviderDisabled: () => config.disabled,
++  resolveVideoModel: () => config.model,
++  resolveVideoApiKey: () => config.key,
++  resolveVideoBaseUrl: () => config.base,
++}));
++
++import {
++  assertMiraFormalVideoProviderReady,
++  withMiraFormalVideoTrace,
++  buildMiraFormalVideoReceipt,
++  formalSceneVideoReferences,
++  probeMiraFormalVideo,
++  type MiraFormalVideoTrace,
++} from '@/lib/server/mira-formal-video';
++import {
++  assertMiraFormalGenerationInput,
++  isExactMiraProfessionalCreationPolicy,
++  MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++  MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
++  MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY,
++  MIRA_PROFESSIONAL_CREATION_POLICY,
++  MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++  MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++  MIRA_COURSEWARE_AUTHORITY,
++  MIRA_FORMAL_GENERATION_POLICY,
++} from '@/lib/server/mira-formal-generation-policy';
++import {
++  filterMiraFormalMediaTools,
++  isMiraFormalAdaptiveSkillSession,
++  MIRA_FORMAL_VIDEO_SESSION_ORIGIN,
++} from '@/lib/server/mira-professional-research-policy';
++
++const identity = {
++  runtimeRequestId: 'request-video-1',
++  buildItemId: 'build-video-1',
++  classroomId: 'stage-video-1',
++  sessionId: `miraformal_${'b'.repeat(64)}`,
++};
++const session = {
++  sessionId: identity.sessionId,
++  ownerId: `mira-formal-professional:${'b'.repeat(64)}`,
++  skillId: 'mira-primary-courseware',
++  origin: MIRA_FORMAL_VIDEO_SESSION_ORIGIN,
++};
++const digest = (bytes: Buffer | string) => createHash('sha256').update(bytes).digest('hex');
++function slide(src?: string): Scene {
++  return {
++    id: 'scene-video-1',
++    stageId: identity.classroomId,
++    type: 'slide',
++    order: 0,
++    content: {
++      type: 'slide',
++      canvas: { elements: src ? [{ id: 'movie', type: 'video', src }] : [] },
++    },
++    actions: [],
++  } as unknown as Scene;
++}
++function html(value: string): Scene {
++  return {
++    ...slide(),
++    type: 'interactive',
++    content: { type: 'interactive', html: value },
++  } as unknown as Scene;
++}
++
++describe('formal video bounded request and final assets', () => {
++  let root: string;
++  let attemptsDir: string;
++  beforeEach(async () => {
++    root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'mira-video-test-')));
++    attemptsDir = path.join(root, 'attempts');
++    config.disabled = false;
++    config.providers = null;
++    config.model = 'happyhorse-1.0-t2v';
++    config.key = 'offline-key';
++    config.base = 'https://dashscope.aliyuncs.com';
++    vi.stubEnv('DEFAULT_VIDEO_PROVIDER', 'happyhorse');
++    vi.stubGlobal(
++      'fetch',
++      vi.fn(() => {
++        throw new Error('NO_NETWORK_IN_OFFLINE_TEST');
++      }),
++    );
++  });
++  afterEach(async () => {
++    await fs.rm(root, { recursive: true, force: true });
++    vi.unstubAllGlobals();
++    vi.unstubAllEnvs();
++  });
++
++  async function asset() {
++    const fixture = JSON.parse(
++      await fs.readFile(new URL('../fixtures/mira-formal-video-5s.json', import.meta.url), 'utf8'),
++    );
++    const bytes = Buffer.from(fixture.base64, 'base64');
++    expect(digest(bytes)).toBe(fixture.sha256);
++    const sha = digest(bytes);
++    const directory = path.join(root, identity.classroomId, 'media');
++    await fs.mkdir(directory, { recursive: true });
++    const file = path.join(directory, `generated-${sha}.mp4`);
++    await fs.writeFile(file, bytes);
++    return {
++      file,
++      bytes,
++      src: `/api/classroom-media/${identity.classroomId}/media/generated-${sha}.mp4`,
++      sha,
++    };
++  }
++  function tool(
++    src: string,
++    execute = vi.fn(async () => ({
++      content: [],
++      details: { src, mime: 'video/mp4', durationSec: 5 },
++    })),
++  ) {
++    const traces: MiraFormalVideoTrace[] = [];
++    const wrapped = withMiraFormalVideoTrace(
++      { name: 'generate_video', execute } as unknown as AgentTool<never, never>,
++      identity.sessionId,
++      async (trace) => {
++        traces.push(trace);
++      },
++      { attemptsDir, ownsStage: async (id) => id === identity.classroomId },
++    );
++    return { wrapped, traces, execute };
++  }
++  const invoke = (wrapped: AgentTool<never, never>, extra = {}, call = 'video-call-1') =>
++    wrapped.execute(
++      call,
++      {
++        stageId: identity.classroomId,
++        prompt: 'A five-second teaching situation',
++        ...extra,
++      } as never,
++      new AbortController().signal,
++    );
++  const receipt = (
++    scenes: Scene[],
++    traces: unknown[],
++    probe = vi.fn(async () => ({ width: 1280, height: 720, durationMs: 5000 })),
++  ) =>
++    buildMiraFormalVideoReceipt(
++      { ...identity, scenes, traces },
++      { classroomsDir: root, attemptsDir, probe },
++    );
++
++  it('fails before reservation when the actual official selector would choose another provider', () => {
++    config.providers = { seedance: {}, happyhorse: {} };
++    expect(() => assertMiraFormalVideoProviderReady()).toThrow('PROVIDER_NOT_READY');
++    config.providers = { seedance: { disabled: true }, happyhorse: {} };
++    expect(() => assertMiraFormalVideoProviderReady()).not.toThrow();
++    config.providers = { happyhorse: {}, seedance: {} };
++    expect(() => assertMiraFormalVideoProviderReady()).not.toThrow();
++  });
++
++  it('serves the exact final stage-owned MP4 bytes and MIME from the student media route', async () => {
++    const media = await asset();
++    const generated = tool(media.src);
++    await invoke(generated.wrapped);
++    const scenes = [
++      slide(media.src),
++      { ...html(`<video controls src="${media.src}"></video>`), id: 'scene-video-2' },
++    ];
++    const video = await receipt(scenes, generated.traces);
++    vi.doMock('@/lib/server/classroom-storage', () => ({
++      CLASSROOMS_DIR: root,
++      isValidClassroomId: (id: string) => /^[a-zA-Z0-9_-]+$/.test(id),
++    }));
++    try {
++      const { GET } = await import('@/app/api/classroom-media/[classroomId]/[...path]/route');
++      const { NextRequest } = await import('next/server');
++      const response = await GET(new NextRequest(`http://runtime.test${media.src}`), {
++        params: Promise.resolve({
++          classroomId: identity.classroomId,
++          path: ['media', `generated-${media.sha}.mp4`],
++        }),
++      });
++      expect(response.status).toBe(200);
++      expect(response.headers.get('Content-Type')).toBe('video/mp4');
++      expect(Buffer.from(await response.arrayBuffer())).toEqual(media.bytes);
++      expect(video.classroomId).toBe(identity.classroomId);
++      expect(video.assets[0]).toMatchObject({
++        src: media.src,
++        sha256: media.sha,
++        sceneIds: scenes.map((scene) => scene.id),
++      });
++      expect(JSON.parse(JSON.stringify(scenes))).toEqual(scenes);
++    } finally {
++      vi.doUnmock('@/lib/server/classroom-storage');
++    }
++  });
++
++  it('keeps all four old policies video-off and accepts video-on only for the new exact policy', () => {
++    const base = {
++      requirement: 'locked brief',
++      runtimeRequestId: identity.runtimeRequestId,
++      formalRuntimeContract: MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
++      enableWebSearch: true,
++      enableTTS: false,
++      agentMode: 'generate' as const,
++    };
++    for (const policy of [
++      MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++      MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
++      MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY,
++      MIRA_PROFESSIONAL_CREATION_POLICY,
++    ]) {
++      expect(policy).not.toHaveProperty('video');
++      const input = {
++        ...base,
++        professionalCreationPolicy: policy,
++        enableImageGeneration: 'image' in policy,
++        enableVideoGeneration: false,
++      };
++      expect(() => assertMiraFormalGenerationInput(input)).not.toThrow();
++      expect(() =>
++        assertMiraFormalGenerationInput({ ...input, enableVideoGeneration: true }),
++      ).toThrow('INPUT_POLICY_INVALID');
++    }
++    const input = {
++      ...base,
++      professionalCreationPolicy: MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++      enableImageGeneration: true,
++      enableVideoGeneration: true,
++    };
++    expect(() => assertMiraFormalGenerationInput(input)).not.toThrow();
++    expect(() =>
++      assertMiraFormalGenerationInput({ ...input, enableVideoGeneration: false }),
++    ).toThrow('INPUT_POLICY_INVALID');
++    expect(
++      isExactMiraProfessionalCreationPolicy({
++        ...MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++        video: { ...MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY.video, maxCalls: 2 },
++      }),
++    ).toBe(false);
++    expect(MIRA_FORMAL_GENERATION_POLICY.professionalCreation).toEqual(
++      MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++    );
++    expect(digest(JSON.stringify(MIRA_PROFESSIONAL_CREATION_POLICY))).not.toBe(
++      digest(JSON.stringify(MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY)),
++    );
++  });
++
++  it('uses persisted video origin rather than global availability to expose tools and adaptive context', () => {
++    const tools = ['generate_video', 'generate_image', 'generate_scene'].map((name) => ({ name }));
++    expect(filterMiraFormalMediaTools(tools, session)).toEqual(tools);
++    expect(isMiraFormalAdaptiveSkillSession(session)).toBe(true);
++    expect(
++      filterMiraFormalMediaTools(tools, {
++        ...session,
++        origin: 'mira-formal-professional-adaptive-skills-v2',
++      }).map((t) => t.name),
++    ).toEqual(['generate_image', 'generate_scene']);
++    expect(
++      filterMiraFormalMediaTools(tools, { ...session, origin: 'mira-formal-professional' }).map(
++        (t) => t.name,
++      ),
++    ).toEqual(['generate_scene']);
++  });
++
++  it('rejects disabled/wrong model/wrong origin/missing credentials without I/O', () => {
++    expect(() => assertMiraFormalVideoProviderReady()).not.toThrow();
++    for (const change of [
++      { disabled: true },
++      { model: 'other' },
++      { key: '' },
++      { base: 'https://other.test' },
++    ]) {
++      const before = { ...config };
++      Object.assign(config, change);
++      expect(() => assertMiraFormalVideoProviderReady()).toThrow('FORMAL_VIDEO_');
++      Object.assign(config, before);
++    }
++    expect(fetch).not.toHaveBeenCalled();
++  });
++
++  it('pins one 5s/720p/16:9 attempt and durable trace before returning a local asset', async () => {
++    const file = await asset();
++    const job = tool(file.src);
++    await invoke(job.wrapped);
++    expect(job.execute).toHaveBeenCalledWith(
++      'video-call-1',
++      expect.objectContaining({ durationSec: 5, resolution: '720p', aspectRatio: '16:9' }),
++      expect.any(AbortSignal),
++      undefined,
++    );
++    expect(job.traces).toEqual([
++      expect.objectContaining({
++        src: file.src,
++        sessionId: identity.sessionId,
++        providerId: 'happyhorse',
++        modelId: 'happyhorse-1.0-t2v',
++      }),
++    ]);
++    const result = await receipt([slide(file.src)], job.traces);
++    expect(result).toMatchObject({
++      videoCount: 1,
++      assets: [
++        {
++          width: 1280,
++          height: 720,
++          durationMs: 5000,
++          sha256: file.sha,
++          sceneIds: ['scene-video-1'],
++        },
++      ],
++    });
++    expect(result.receiptSha256).toMatch(/^[0-9a-f]{64}$/);
++  });
++
++  it('blocks concurrent attempts and fresh-wrapper reentry without another provider call', async () => {
++    const file = await asset();
++    const first = tool(file.src);
++    const second = tool(file.src);
++    const outcomes = await Promise.allSettled([
++      invoke(first.wrapped),
++      invoke(second.wrapped, {}, 'video-call-2'),
++    ]);
++    expect(outcomes.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
++    expect(first.execute.mock.calls.length + second.execute.mock.calls.length).toBe(1);
++    await expect(invoke(tool(file.src).wrapped, {}, 'video-call-3')).rejects.toThrow(
++      'ATTEMPT_LIMIT',
++    );
++  });
++
++  it('does not restore paid allowance after provider failure or hide the failure as a zero-video course', async () => {
++    const file = await asset();
++    const execute = vi.fn(async () => {
++      throw new Error('uncertain provider result');
++    });
++    const job = tool(file.src, execute);
++    await expect(invoke(job.wrapped)).rejects.toThrow('uncertain provider result');
++    await expect(invoke(tool(file.src).wrapped)).rejects.toThrow('ATTEMPT_LIMIT');
++    await expect(receipt([slide()], [])).rejects.toThrow('ATTEMPT_UNRESOLVED');
++  });
++
++  it('rejects policy overrides and foreign stage before reserving or calling the provider', async () => {
++    const file = await asset();
++    const job = tool(file.src);
++    for (const extra of [
++      { durationSec: 10 },
++      { resolution: '1080p' },
++      { aspectRatio: '1:1' },
++      { stageId: 'foreign' },
++    ])
++      await expect(invoke(job.wrapped, extra)).rejects.toThrow('FORMAL_VIDEO_');
++    expect(job.execute).not.toHaveBeenCalled();
++    await expect(fs.stat(attemptsDir)).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++
++  it('allows zero videos when unused and reads only video HTML source slots', async () => {
++    expect((await receipt([slide()], [])).videoCount).toBe(0);
++    expect(
++      formalSceneVideoReferences(
++        html(
++          '<video src="first"><source src="second"></video><audio><source src="audio"></audio><picture><source src="image"></picture>',
++        ),
++      ),
++    ).toEqual(['first', 'second']);
++  });
++
++  it('requires every generated asset to be referenced and every referenced asset to have the same-stage trace', async () => {
++    const file = await asset();
++    const job = tool(file.src);
++    await invoke(job.wrapped);
++    await expect(receipt([slide()], job.traces)).rejects.toThrow('GENERATED_ASSET_UNREFERENCED');
++    await expect(receipt([slide(file.src)], [])).rejects.toThrow('TRACE_MISSING');
++    await expect(
++      receipt([slide(file.src)], [{ ...job.traces[0], classroomId: 'foreign' }]),
++    ).rejects.toThrow('TRACE_INVALID');
++    await expect(
++      receipt(
++        [slide(file.src), { ...slide(file.src), id: 'scene-2', stageId: 'foreign' }],
++        job.traces,
++      ),
++    ).rejects.toThrow('SCENE_STAGE_MISMATCH');
++  });
++
++  it('rejects unowned/unattested paths, file mutations and oversized/incorrect video dimensions or duration', async () => {
++    await expect(receipt([slide('https://other.test/video.mp4')], [])).rejects.toThrow(
++      'SOURCE_UNATTESTED',
++    );
++    const file = await asset();
++    const job = tool(file.src);
++    await invoke(job.wrapped);
++    for (const metadata of [
++      { width: 1920, height: 1080, durationMs: 5000 },
++      { width: 1280, height: 720, durationMs: 10000 },
++    ])
++      await expect(
++        receipt(
++          [slide(file.src)],
++          job.traces,
++          vi.fn(async () => metadata),
++        ),
++      ).rejects.toThrow('OUTPUT_POLICY_INVALID');
++    await fs.appendFile(file.file, 'changed');
++    await expect(receipt([slide(file.src)], job.traces)).rejects.toThrow('HASH_MISMATCH');
++  });
++
++  it('probes real offline MP4 bytes rather than trusting provider duration metadata', async () => {
++    const file = await asset();
++    expect(await probeMiraFormalVideo(file.file)).toEqual({
++      width: 1280,
++      height: 720,
++      durationMs: 5000,
++    });
++    await fs.writeFile(file.file, 'not an MP4');
++    await expect(probeMiraFormalVideo(file.file)).rejects.toThrow();
++    expect(fetch).not.toHaveBeenCalled();
++  });
++});

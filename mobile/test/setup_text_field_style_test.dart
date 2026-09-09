@@ -1,16 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:warm_sight/src/core/storage/onboarding_store.dart';
+import 'package:warm_sight/src/core/storage/setup_store.dart';
 import 'package:warm_sight/src/core/theme/app_theme.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/setup/application/setup_draft.dart';
 import 'package:warm_sight/src/features/setup/application/setup_repository.dart';
 import 'package:warm_sight/src/features/setup/presentation/setup_flow_screens.dart';
 import 'package:warm_sight/src/shared/domain/guardian_identity.dart';
+import 'package:warm_sight/src/shared/widgets/app_button.dart';
 
 void main() {
+  test(
+    'legacy child without a confirmed school year is routed to grade selection',
+    () {
+      final status = SetupStatus.fromResponse({
+        'setup': {
+          'completed': true,
+          'parentIdentity': 'done',
+          'childProfile': 'done',
+          'nextStep': 'home',
+        },
+        'child': {
+          'grade': '三年级',
+          'educationStage': '小学',
+          'gradeCode': 'primary_3',
+          'gradeSelectionRequired': true,
+        },
+      });
+
+      expect(status.childGradeSelectionRequired, isTrue);
+      expect(status.routePath, setupChildProfilePath);
+    },
+  );
+
   testWidgets('parent identity setup shows family role selector', (
     tester,
   ) async {
@@ -69,11 +96,14 @@ void main() {
     expect(find.text('3 / 2'), findsNothing);
   });
 
-  testWidgets('child profile setup is the second V1 setup step', (
+  testWidgets('child learning identity requires both nickname and grade', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
+    final preferences = await SharedPreferences.getInstance();
     await tester.pumpWidget(
       ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(preferences)],
         child: MaterialApp(
           theme: AppTheme.light,
           home: const ChildProfileSetupScreen(),
@@ -82,41 +112,71 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('孩子资料'), findsOneWidget);
+    expect(find.text('设置孩子的学习身份'), findsOneWidget);
+    expect(find.text('用于称呼孩子并匹配适龄内容'), findsOneWidget);
     expect(find.text('2 / 2'), findsOneWidget);
     expect(find.text('3 / 2'), findsNothing);
-    expect(find.text('就读阶段'), findsNothing);
-    expect(find.text('幼儿园'), findsNothing);
-    expect(find.text('幼儿园班级'), findsOneWidget);
-    expect(find.text('小班'), findsOneWidget);
-    expect(find.text('中班'), findsOneWidget);
-    expect(find.text('大班'), findsOneWidget);
+    expect(find.text('幼儿园'), findsOneWidget);
+    expect(find.text('小学'), findsOneWidget);
+    expect(_stageChoiceColor(tester, 'primary'), AppColors.brandDeep);
+    expect(_stageChoiceColor(tester, 'kindergarten'), Colors.transparent);
+    expect(find.text('选择小学年级'), findsOneWidget);
+    expect(find.text('新一年级'), findsOneWidget);
+    expect(find.text('新六年级'), findsOneWidget);
+    expect(find.byKey(const ValueKey('gradeOption_primary_3')), findsOneWidget);
+    expect(find.byKey(const ValueKey('gradeOption_primary_6')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('gradeOption_kindergarten_small')),
+      findsNothing,
+    );
+    expect(find.text('孩子称呼'), findsOneWidget);
+    expect(find.byKey(const ValueKey('setupInput_孩子称呼')), findsOneWidget);
+    expect(find.text('摄像头老师会这样称呼孩子'), findsOneWidget);
+    expect(find.text('性别'), findsNothing);
+    expect(find.text('出生日期'), findsNothing);
+    expect(find.text('初中'), findsNothing);
+    expect(find.text('高中'), findsNothing);
     expect(find.text('入睡时间'), findsNothing);
     expect(find.text('学校'), findsNothing);
     expect(find.text('兴趣'), findsNothing);
-    expect(_choiceColor(tester, '小班'), isNot(AppColors.brandWash));
-    expect(_choiceColor(tester, '中班'), isNot(AppColors.brandWash));
-    expect(_choiceColor(tester, '大班'), isNot(AppColors.brandWash));
-    expect(find.textContaining('生日和班级只用于'), findsNothing);
+    expect(
+      tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
+      isNull,
+    );
+
+    await tester.enterText(find.byKey(const ValueKey('setupInput_孩子称呼')), '乐乐');
+    await tester.pump();
+
+    expect(
+      tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
+      isNull,
+    );
+    expect(preferences.getString(pendingSetupChildNicknameKey), '乐乐');
+
+    await tester.tap(find.byKey(const ValueKey('gradeOption_primary_3')));
+    await tester.pumpAndSettle();
+
+    expect(_gradeChoiceColor(tester, 'primary_3'), AppColors.brandDeep);
+    expect(
+      tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
+      isNotNull,
+    );
+    expect(preferences.getString('pendingSetupGradeCode'), 'primary_3');
   });
 
-  testWidgets('child profile birthday recommends kindergarten class', (
+  testWidgets('only the active school stage grade scale is rendered', (
     tester,
   ) async {
-    const datePickerChannel = MethodChannel('ai_camera_app/native_date_picker');
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      datePickerChannel,
-      (call) async => '2021-06-01',
-    );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        datePickerChannel,
-        null,
-      ),
-    );
+    tester.view.physicalSize = const Size(320, 760);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({});
+    final preferences = await SharedPreferences.getInstance();
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(preferences)],
         child: MaterialApp(
           theme: AppTheme.light,
           home: const ChildProfileSetupScreen(),
@@ -125,14 +185,142 @@ void main() {
     );
     await tester.pump();
 
-    await _tapBirthdayField(tester);
+    final first = tester.getRect(
+      find.byKey(const ValueKey('gradeOption_primary_1')),
+    );
+    final second = tester.getRect(
+      find.byKey(const ValueKey('gradeOption_primary_2')),
+    );
+    final third = tester.getRect(
+      find.byKey(const ValueKey('gradeOption_primary_3')),
+    );
+    expect((first.top - second.top).abs(), lessThan(1));
+    expect((first.top - third.top).abs(), lessThan(1));
+    expect(first.width, greaterThanOrEqualTo(44));
+    expect(first.height, greaterThanOrEqualTo(44));
+    final fourth = tester.getRect(
+      find.byKey(const ValueKey('gradeOption_primary_4')),
+    );
+    expect(fourth.top, greaterThan(first.bottom));
+    expect(
+      find.byKey(const ValueKey('gradeOption_kindergarten_big')),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.byKey(const ValueKey('gradeStage_kindergarten')));
     await tester.pumpAndSettle();
 
-    expect(find.text('2021-06-01'), findsOneWidget);
-    expect(find.text('已推荐班级'), findsOneWidget);
-    expect(find.text('推荐 中班，可手动调整。'), findsOneWidget);
-    expect(_choiceColor(tester, '中班'), AppColors.brandWash);
-    expect(_choiceColor(tester, '大班'), isNot(AppColors.brandWash));
+    expect(_stageChoiceColor(tester, 'kindergarten'), AppColors.brandDeep);
+    expect(_stageChoiceColor(tester, 'primary'), Colors.transparent);
+    expect(find.byKey(const ValueKey('gradeOption_primary_3')), findsNothing);
+    expect(
+      find.byKey(const ValueKey('gradeOption_kindergarten_small')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('gradeOption_kindergarten_big')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('gradeOption_kindergarten_big')),
+    );
+    await tester.pumpAndSettle();
+    expect(_gradeChoiceColor(tester, 'kindergarten_big'), AppColors.brandDeep);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('pending child nickname resumes an interrupted setup', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      pendingSetupChildNicknameKey: '朵朵',
+    });
+    final preferences = await SharedPreferences.getInstance();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(preferences),
+          setupDraftProvider.overrideWith(
+            (ref) => const SetupDraft(childName: '已有姓名'),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const ChildProfileSetupScreen(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final field = tester.widget<TextField>(
+      find.byKey(const ValueKey('setupInput_孩子称呼')),
+    );
+    expect(field.controller?.text, '朵朵');
+    expect(
+      tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
+      isNull,
+    );
+  });
+
+  testWidgets('clearing a legacy child name keeps nickname empty', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final preferences = await SharedPreferences.getInstance();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(preferences),
+          setupDraftProvider.overrideWith(
+            (ref) => const SetupDraft(childName: '旧名字'),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const ChildProfileSetupScreen(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final input = find.byKey(const ValueKey('setupInput_孩子称呼'));
+    expect(tester.widget<TextField>(input).controller?.text, '旧名字');
+
+    await tester.enterText(input, '');
+    await tester.pump();
+
+    expect(tester.widget<TextField>(input).controller?.text, isEmpty);
+    expect(
+      tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
+      isNull,
+    );
+  });
+
+  test('setup status maps child nickname into the setup draft', () {
+    final status = SetupStatus.fromResponse({
+      'setup': {
+        'completed': false,
+        'parentIdentity': 'done',
+        'childProfile': 'pending',
+        'nextStep': 'child',
+      },
+      'child': {
+        'name': '乐乐',
+        'nickname': '乐乐',
+        'gradeCode': 'primary_3',
+        'schoolYearStartYear': DateTime.now().year,
+      },
+    });
+
+    final draft = setupDraftFromStatus(status);
+    expect(status.childNickname, '乐乐');
+    expect(draft.childName, '乐乐');
+    expect(draft.childNickname, '乐乐');
+    expect(draft.childGradeCode, 'primary_3');
   });
 
   test(
@@ -140,6 +328,7 @@ void main() {
     () {
       const previous = SetupDraft(
         childName: '小爱',
+        childNickname: '爱爱',
         childBirthday: '2021-06-03',
         childGrade: '中班',
         childGender: 'girl',
@@ -147,7 +336,9 @@ void main() {
       final next = setupDraftFromStatus(_emptyChildSetupStatus());
 
       expect(previous.childName, '小爱');
+      expect(previous.childNickname, '爱爱');
       expect(next.childName, isEmpty);
+      expect(next.childNickname, isEmpty);
       expect(next.childBirthday, isEmpty);
       expect(next.childGrade, isEmpty);
       expect(next.childGender, 'unspecified');
@@ -260,21 +451,21 @@ void main() {
   });
 }
 
-Future<void> _tapBirthdayField(WidgetTester tester) async {
-  final field = find.byKey(const ValueKey('setupInput_出生日期'));
-  await tester.ensureVisible(field);
-  final rect = tester.getRect(field);
-  await tester.tapAt(Offset(rect.left + 12, rect.center.dy));
-}
-
-Color? _choiceColor(WidgetTester tester, String option) {
+Color? _gradeChoiceColor(WidgetTester tester, String code) {
   final container = tester.widget<AnimatedContainer>(
     find
         .descendant(
-          of: find.byKey(ValueKey('choice_幼儿园班级_$option')),
+          of: find.byKey(ValueKey('gradeOption_$code')),
           matching: find.byType(AnimatedContainer),
         )
         .first,
+  );
+  return (container.decoration as BoxDecoration?)?.color;
+}
+
+Color? _stageChoiceColor(WidgetTester tester, String code) {
+  final container = tester.widget<AnimatedContainer>(
+    find.byKey(ValueKey('gradeStage_$code')),
   );
   return (container.decoration as BoxDecoration?)?.color;
 }

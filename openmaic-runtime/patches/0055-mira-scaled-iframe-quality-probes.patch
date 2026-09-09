@@ -1,0 +1,189 @@
+diff --git a/lib/server/mira-formal-scene-inspector.ts b/lib/server/mira-formal-scene-inspector.ts
+--- a/lib/server/mira-formal-scene-inspector.ts
++++ b/lib/server/mira-formal-scene-inspector.ts
+@@ -2,7 +2,7 @@
+ import { promises as fs } from 'node:fs';
+ import path from 'node:path';
+ import os from 'node:os';
+-import { chromium, type Browser, type Frame, type Page } from 'playwright-core';
++import { chromium, type Browser, type Frame, type Locator, type Page } from 'playwright-core';
+ import type {
+   FormalInteractionProbe,
+   FormalSceneInspectionInput,
+@@ -172,6 +172,61 @@
+   });
+ }
+ 
++/** Chromium's cross-process iframe coordinates can omit the host CSS scale.
++ * Project the actual DOM point through the preview host, retaining real mouse
++ * input and hit tests in both documents. Never synthesize a DOM click. */
++async function clickLocalControl(target: Page | Frame, control: Locator) {
++  if (!('frameElement' in target)) {
++    await control.click({ timeout: 2000 });
++    return;
++  }
++  await control.waitFor({ state: 'visible', timeout: 2000 });
++  if (!(await control.isEnabled())) throw new Error('probe control is disabled');
++  await control.scrollIntoViewIfNeeded({ timeout: 2000 });
++  const local = await control.evaluate((element) => {
++    const rect = element.getBoundingClientRect();
++    const x = rect.x + rect.width / 2;
++    const y = rect.y + rect.height / 2;
++    if (
++      rect.width <= 0 ||
++      rect.height <= 0 ||
++      x < 0 ||
++      y < 0 ||
++      x >= window.innerWidth ||
++      y >= window.innerHeight ||
++      !element.contains(document.elementFromPoint(x, y))
++    )
++      throw new Error('probe control is outside the viewport or covered');
++    return { x, y };
++  });
++  const host = await target.frameElement();
++  try {
++    const point = await host.evaluate((element, local) => {
++      const iframe = element as HTMLIFrameElement;
++      const rect = iframe.getBoundingClientRect();
++      const transform = new DOMMatrix(getComputedStyle(iframe).transform);
++      if (
++        !transform.is2D ||
++        transform.b !== 0 ||
++        transform.c !== 0 ||
++        transform.a <= 0 ||
++        transform.d <= 0 ||
++        iframe.offsetWidth <= 0 ||
++        iframe.offsetHeight <= 0
++      )
++        throw new Error('probe iframe transform is unsupported');
++      const x = rect.x + ((iframe.clientLeft + local.x) * rect.width) / iframe.offsetWidth;
++      const y = rect.y + ((iframe.clientTop + local.y) * rect.height) / iframe.offsetHeight;
++      if (!Number.isFinite(x) || !Number.isFinite(y) || document.elementFromPoint(x, y) !== iframe)
++        throw new Error('probe iframe is outside the viewport or covered');
++      return { x, y };
++    }, local);
++    await target.page().mouse.click(point.x, point.y);
++  } finally {
++    await host.dispose();
++  }
++}
++
+ async function runProbe(target: Page | Frame, probe: FormalInteractionProbe) {
+   // native querySelector rejects Playwright's non-CSS selector engines. Scope
+   // is this snapshot's document, never another browser tab or a student frame.
+@@ -200,7 +255,7 @@
+   }));
+   if (tag.tag === 'a' || tag.type === 'file' || tag.type === 'submit' || tag.type === 'image')
+     throw new Error('probe action is not a local control');
+-  if (probe.action === 'click') await control.click({ timeout: 2000 });
++  if (probe.action === 'click') await clickLocalControl(target, control);
+   else if (probe.action === 'fill') await control.fill(probe.value ?? '', { timeout: 2000 });
+   else if (probe.action === 'select')
+     await control.selectOption(probe.value ?? '', { timeout: 2000 });
+diff --git a/tests/server/mira-formal-scene-inspector.browser.test.ts b/tests/server/mira-formal-scene-inspector.browser.test.ts
+--- a/tests/server/mira-formal-scene-inspector.browser.test.ts
++++ b/tests/server/mira-formal-scene-inspector.browser.test.ts
+@@ -154,7 +154,7 @@
+       const { scene, viewport } = snapshot;
+       let content = '';
+       if (scene.content.type === 'interactive')
+-        content = `<iframe id="formal-interactive-frame" sandbox="allow-scripts allow-forms allow-popups" style="border:0;width:1280px;height:720px;transform-origin:top left;transform:scale(${Math.min(viewport.width / 1280, viewport.height / 720)})" srcdoc="${escape(patchHtmlForIframe(scene.content.html ?? ''))}"></iframe>`;
++        content = `<iframe id="formal-interactive-frame" sandbox="allow-scripts allow-forms allow-popups" style="position:absolute;top:${(viewport.height - 720 * Math.min(viewport.width / 1280, viewport.height / 720)) / 2}px;border:0;width:1280px;height:720px;transform-origin:top left;transform:scale(${Math.min(viewport.width / 1280, viewport.height / 720)})" srcdoc="${escape(patchHtmlForIframe(scene.content.html ?? ''))}"></iframe>`;
+       response.setHeader('content-type', 'text/html; charset=utf-8');
+       response.end(
+         `<!doctype html><html><head><style>html,body{margin:0}#formal-scene-root{width:${viewport.width}px;height:${viewport.height}px;overflow:hidden;position:relative}</style></head><body><main id="formal-scene-root" data-qa-ready="true">${content}</main>${scene.type === 'slide' ? `<script>window.fixture=${JSON.stringify(scene).replaceAll('<', '\\u003c')}</script><script src="/_next/static/inspection-test.js"></script>` : ''}</body></html>`,
+@@ -208,6 +208,26 @@
+       expect(result.visibleText).toContain('把积木分成两组');
+     }
+   }, 60_000);
++
++  it('clicks the real control inside a scaled letterboxed iframe without bypassing occlusion', async () => {
++    const html = (covered = false) =>
++      `<html><body style="margin:0"><button id="choice" style="position:absolute;left:900px;top:200px;width:140px;height:60px" onclick="if(event.isTrusted)document.querySelector('#answer').textContent='点到了'">选择 a</button><p id="answer">等待选择</p>${covered ? '<div style="position:absolute;left:890px;top:190px;width:180px;height:90px;z-index:99;background:white">遮挡</div>' : ''}</body></html>`;
++    for (const viewport of [
++      { width: 1280, height: 720 },
++      { width: 1024, height: 768 },
++    ]) {
++      const result = await inspectFormalScene(input(interactive(html()), viewport));
++      expect(result.passed).toBe(true);
++      expect(result.probeCount).toBe(1);
++      expect(result.visibleText).toContain('点到了');
++    }
++    const covered = await inspectFormalScene(
++      input(interactive(html(true)), { width: 1024, height: 768 }),
++    );
++    expect(covered.passed).toBe(false);
++    expect(covered.issues).toContain('probe_failed:auto-click');
++    expect(covered.visibleText).not.toContain('点到了');
++  }, 60000);
+ 
+   it('decodes and replays the owned video while detecting a missing video', async () => {
+     const html = (name: string) =>
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -34,6 +34,7 @@
+   status: 'passed' | 'needs_revision'; snapshotSha256: string;
+   issues: Array<{ sceneId: string; problem: string; repair: string }>;
+   receipt?: MiraTeachingQualityReceipt;
++  remainingReviewAttempts?: number;
+ }
+ interface ReviewReport {
+   status: 'passed' | 'needs_revision'; dimensions: QualityDimension[];
+@@ -134,7 +135,10 @@
+     if (cached.reviewPromptVersion !== FORMAL_QUALITY_REVIEW_PROMPT_VERSION)
+       throw new Error('FORMAL_QUALITY_REVIEW_VERSION_CHANGED');
+     const { reviewPromptVersion: _version, ...result } = cached;
+-    return result as unknown as FormalQualityResult;
++    const ledger = await readJson(join(folder, 'attempts.json'));
++    if (!Array.isArray(ledger)) throw new Error('FORMAL_QUALITY_LEDGER_INVALID');
++    return { ...result, remainingReviewAttempts: Math.max(0,
++      MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts - ledger.length) } as unknown as FormalQualityResult;
+   }
+   const lockPath = join(folder, 'review.lock');
+   const lock = await acquireFormalQualityLock(lockPath, deps.lockDeps);
+@@ -228,7 +232,8 @@
+       attempt.status = result.status;
+       await save(resultPath, { ...result, reviewPromptVersion: FORMAL_QUALITY_REVIEW_PROMPT_VERSION });
+       await save(ledgerPath, attempts);
+-      return result;
++      return { ...result, remainingReviewAttempts: Math.max(0,
++        MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts - attempts.length) };
+     } catch (error) {
+       attempt.status = 'failed';
+       await save(ledgerPath, attempts);
+@@ -261,14 +266,18 @@
+       const latest = await deps.store.loadDocument(input.stageId);
+       if (!latest || qualitySha(qualitySnapshot(latest.stage, latest.scenes)) !== sourceSha256)
+         throw new Error('FORMAL_QUALITY_DOCUMENT_CHANGED_DURING_REVIEW');
++      const exhausted = result.status === 'needs_revision' && result.remainingReviewAttempts === 0;
+       return { content: [{ type: 'text' as const, text: JSON.stringify({ status: result.status,
+         snapshotSha256: result.snapshotSha256, issues: result.issues,
+         receiptSha256: result.receipt?.receiptSha256,
+-        ...(result.status === 'needs_revision' ? {
++        remainingReviewAttempts: result.remainingReviewAttempts,
++        ...(exhausted ? { errorCode: 'FORMAL_QUALITY_REPAIR_BUDGET_EXHAUSTED' } : {}),
++        ...(result.status === 'needs_revision' && !exhausted ? {
+           repairContext: await prepareMiraFormalRepairSkillContext(deps.ownerId, doc.scenes, result.issues),
+         } : {}),
+       }) }],
+-      details: { stageId: input.stageId, status: result.status }, isError: result.status !== 'passed' };
++      details: { stageId: input.stageId, status: result.status },
++      terminate: exhausted, isError: result.status !== 'passed' };
+     },
+   } as AgentTool<typeof params>] as unknown as AgentTool<never, never>[];
+ }
+diff --git a/tests/server/mira-formal-teaching-quality.test.ts b/tests/server/mira-formal-teaching-quality.test.ts
+--- a/tests/server/mira-formal-teaching-quality.test.ts
++++ b/tests/server/mira-formal-teaching-quality.test.ts
+@@ -277,7 +277,8 @@
+         expect(ledger.at(-1).status).toBe('started');
+         return original(...args);
+       });
+-      await reviewFormalCourse(value, undefined, deps);
++      const result = await reviewFormalCourse(value, undefined, deps);
++      expect(result.remainingReviewAttempts).toBe(3 - attempt);
+     }
+     value.scenes[0]!.title = 'revision 4';
+     await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('BUDGET_EXHAUSTED');

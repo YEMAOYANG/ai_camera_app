@@ -1,0 +1,184 @@
+From c1f5094f803254e6f29f12a48926a76e97a44c9d Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 24/37] 0024-mira-english-chinese-instruction-audio
+
+---
+ lib/server/mira-formal-audio.ts        | 10 ++-
+ tests/server/mira-formal-audio.test.ts | 95 ++++++++++++++++++++++++++
+ 2 files changed, 103 insertions(+), 2 deletions(-)
+
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+index 64db840..044948c 100644
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -28,7 +28,9 @@ const SUBJECT_POLICIES = {
+     voiceGender: 'female',
+     voiceId: 'Serena',
+     languageCode: 'zh-CN',
++    instructionLanguageCode: 'zh-CN',
+     qwenLanguageType: 'Chinese',
++    qwenAsrLanguage: 'zh',
+   },
+   math: {
+     teacherProfileId: 'mira_math_clear',
+@@ -39,7 +41,9 @@ const SUBJECT_POLICIES = {
+     voiceGender: 'male',
+     voiceId: 'Ethan',
+     languageCode: 'zh-CN',
++    instructionLanguageCode: 'zh-CN',
+     qwenLanguageType: 'Chinese',
++    qwenAsrLanguage: 'zh',
+   },
+   english: {
+     teacherProfileId: 'mira_english_standard',
+@@ -50,7 +54,9 @@ const SUBJECT_POLICIES = {
+     voiceGender: 'female',
+     voiceId: 'Jennifer',
+     languageCode: 'en-US',
+-    qwenLanguageType: 'English',
++    instructionLanguageCode: 'zh-CN',
++    qwenLanguageType: 'Chinese',
++    qwenAsrLanguage: 'zh',
+   },
+ } as const;
+ 
+@@ -1008,7 +1014,7 @@ export async function executeMiraFormalAsr(
+           ],
+         },
+         parameters: {
+-          asr_options: { language: policy.languageCode === 'en-US' ? 'en' : 'zh' },
++          asr_options: { language: policy.qwenAsrLanguage },
+         },
+       }),
+     });
+diff --git a/tests/server/mira-formal-audio.test.ts b/tests/server/mira-formal-audio.test.ts
+index 28f42b7..ff10afd 100644
+--- a/tests/server/mira-formal-audio.test.ts
++++ b/tests/server/mira-formal-audio.test.ts
+@@ -86,6 +86,24 @@ const mathTtsRequest: MiraFormalTtsRequest = {
+   textSha256: sha256Text(narration),
+ };
+ 
++const englishNarration = '大写字母 H 和小写字母 h 是同一个字母。';
++const englishTtsRequest: MiraFormalTtsRequest = {
++  requestId: 'formal-tts-english-001',
++  classroomId: 'omclass_english_001',
++  classroomContentSha256: '2'.repeat(64),
++  subject: 'english',
++  teacherProfileId: 'mira_english_standard',
++  teacherProfileVersion: 2,
++  teacherProfileSha256: '4725f27c5438c0f68fe8923ac977fa1dd01452b990ac58912b880320750ee040',
++  teacherGender: 'female',
++  sceneId: 'scene_english_00',
++  sceneOrder: 0,
++  actionId: 'action_english_00_speech',
++  narrationSegmentId: 'segment_english_00',
++  text: englishNarration,
++  textSha256: sha256Text(englishNarration),
++};
++
+ describe('Mira formal subject Qwen audio runtime', () => {
+   let tempRoot: string;
+ 
+@@ -129,6 +147,9 @@ describe('Mira formal subject Qwen audio runtime', () => {
+           voiceGender: 'female',
+           voiceId: 'Jennifer',
+           languageCode: 'en-US',
++          instructionLanguageCode: 'zh-CN',
++          qwenLanguageType: 'Chinese',
++          qwenAsrLanguage: 'zh',
+         },
+       },
+     });
+@@ -493,6 +514,7 @@ describe('Mira formal subject Qwen audio runtime', () => {
+     const asrFetch = vi.fn(async (_input: string | URL | Request, init?: RequestInit) => {
+       const body = JSON.parse(String(init?.body));
+       expect(body.model).toBe('qwen3-asr-flash');
++      expect(body.parameters.asr_options.language).toBe('zh');
+       expect(body.input.messages[0].content[0].audio).toMatch(/^data:audio\/wav;base64,/);
+       const persisted = await readMiraFormalAsrJob(asrRequest.requestId);
+       expect(persisted?.providerAttemptedAt).toBeTruthy();
+@@ -511,6 +533,79 @@ describe('Mira formal subject Qwen audio runtime', () => {
+     expect(serialized).not.toContain('base64');
+   });
+ 
++  it('keeps English as the subject language while teaching it in Chinese', async () => {
++    const audio = wavBytes();
++    const ttsFetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
++      if (String(input).includes('/multimodal-generation/generation')) {
++        const body = JSON.parse(String(init?.body));
++        expect(body).toMatchObject({
++          model: 'qwen3-tts-flash',
++          input: {
++            text: englishNarration,
++            voice: 'Jennifer',
++            language_type: 'Chinese',
++          },
++        });
++        return new Response(
++          JSON.stringify({
++            output: {
++              audio: { url: 'https://mira-test.oss-cn-beijing.aliyuncs.com/english.wav' },
++            },
++          }),
++          { status: 200, headers: { 'content-type': 'application/json' } },
++        );
++      }
++      return new Response(responseBody(audio), {
++        status: 200,
++        headers: { 'content-type': 'audio/wav' },
++      });
++    });
++    const tts = await executeMiraFormalTts(englishTtsRequest, {
++      fetchImpl: ttsFetch as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'],
++    });
++    expect(tts.record).toMatchObject({
++      state: 'succeeded',
++      subject: 'english',
++      languageCode: 'en-US',
++      voiceId: 'Jennifer',
++    });
++
++    const asrRequest = {
++      requestId: 'formal-asr-english-001',
++      ttsRequestId: englishTtsRequest.requestId,
++      classroomId: englishTtsRequest.classroomId,
++      classroomContentSha256: englishTtsRequest.classroomContentSha256,
++      subject: englishTtsRequest.subject,
++      teacherProfileId: englishTtsRequest.teacherProfileId,
++      teacherProfileVersion: englishTtsRequest.teacherProfileVersion,
++      teacherProfileSha256: englishTtsRequest.teacherProfileSha256,
++      teacherGender: englishTtsRequest.teacherGender,
++      sceneId: englishTtsRequest.sceneId,
++      sceneOrder: englishTtsRequest.sceneOrder,
++      actionId: englishTtsRequest.actionId,
++      narrationSegmentId: englishTtsRequest.narrationSegmentId,
++      audioSha256: tts.record.audioSha256!,
++    } as const;
++    const asrFetch = vi.fn(async (_input: string | URL | Request, init?: RequestInit) => {
++      const body = JSON.parse(String(init?.body));
++      expect(body.parameters.asr_options.language).toBe('zh');
++      return new Response(
++        JSON.stringify({
++          output: {
++            choices: [{ message: { content: [{ text: englishNarration }] } }],
++          },
++        }),
++        { status: 200, headers: { 'content-type': 'application/json' } },
++      );
++    });
++    const asr = await executeMiraFormalAsr(asrRequest, {
++      fetchImpl: asrFetch as typeof fetch,
++    });
++    expect(asr.transcript).toBe(englishNarration);
++    expect(asr.record.transcriptSha256).toBe(sha256Text(englishNarration));
++  });
++
+   it('protects the private routes and exposes a scoped credential-free health policy', async () => {
+     const { NextRequest } = await import('next/server');
+     const headers = {
+-- 
+2.50.1 (Apple Git-155)
+

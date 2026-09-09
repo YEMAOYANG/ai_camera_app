@@ -1,0 +1,98 @@
+--- a/lib/ai/deepseek-service.ts
++++ b/lib/ai/deepseek-service.ts
+@@ -19,6 +19,24 @@
+   'deepseek-v4-pro': 'deepseek-v4-pro-0813',
+   'deepseek-v4-flash': 'deepseek-v4-flash-0731',
+ };
++
++/** Preserve the required output contract when the endpoint uses JSON mode. */
++export function adaptDeepSeekJsonSchema(body: Record<string, unknown>): Record<string, unknown> {
++  const format = body.response_format as { type?: string; json_schema?: { schema?: unknown } } | undefined;
++  if (format?.type !== 'json_schema' || format.json_schema?.schema === undefined || !Array.isArray(body.messages)) return body;
++  const instruction = 'Return one JSON object matching this JSON Schema exactly. '
++    + 'Use the specified property names and required fields; do not add commentary or markdown. '
++    + 'The server validates this schema and the evidence in the result.\n'
++    + JSON.stringify(format.json_schema.schema);
++  const messages = [...body.messages];
++  const systemIndex = messages.findIndex((message) => message?.role === 'system' && typeof message.content === 'string');
++  if (systemIndex >= 0) {
++    messages[systemIndex] = { ...messages[systemIndex], content: `${messages[systemIndex].content}\n\n${instruction}` };
++  } else {
++    messages.unshift({ role: 'system', content: instruction });
++  }
++  return { ...body, response_format: { type: 'json_object' }, messages };
++}
+ 
+ export function adaptDeepSeekRequest(
+   endpoint: string,
+--- a/lib/ai/providers.ts
++++ b/lib/ai/providers.ts
+@@ -26,7 +26,7 @@
+  * - https://platform.xiaomimimo.com/static/docs/tokenplan/quick-access.md
+  */
+ 
+-import { adaptDeepSeekRequest } from './deepseek-service';
++import { adaptDeepSeekRequest, adaptDeepSeekJsonSchema } from './deepseek-service';
+ import { createOpenAI } from '@ai-sdk/openai';
+ import { createAzure } from '@ai-sdk/azure';
+ import { createAnthropic } from '@ai-sdk/anthropic';
+@@ -2127,8 +2127,7 @@
+             try {
+               const body = JSON.parse(init.body);
+               if (body.response_format?.type === 'json_schema') {
+-                body.response_format = { type: 'json_object' };
+-                init = { ...init, body: JSON.stringify(body) };
++                init = { ...init, body: JSON.stringify(adaptDeepSeekJsonSchema(body)) };
+               }
+             } catch {
+               /* leave body as-is */
+--- a/tests/ai/deepseek-service.test.ts
++++ b/tests/ai/deepseek-service.test.ts
+@@ -1,7 +1,24 @@
+ import { describe, expect, it } from 'vitest';
+-import { adaptDeepSeekRequest, isBailianDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
++import { adaptDeepSeekRequest, adaptDeepSeekJsonSchema, isBailianDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
+ 
+ describe('DeepSeek service wire adaptation', () => {
++  it('preserves the schema and original prompt when using JSON-object compatibility', () => {
++    const schema = { type: 'object', required: ['dimensions', 'objectives'], additionalProperties: false };
++    const original = { response_format: { type: 'json_schema', json_schema: { schema } },
++      messages: [{ role: 'system', content: 'Review actual classroom evidence.' }, { role: 'user', content: 'course' }] };
++    const result = adaptDeepSeekJsonSchema(original);
++    expect(result.response_format).toEqual({ type: 'json_object' });
++    expect((result.messages as Array<{ content: string }>)[0].content).toContain(JSON.stringify(schema));
++    expect((result.messages as Array<{ content: string }>)[0].content).toContain('Review actual classroom evidence.');
++    expect(original.messages[0].content).toBe('Review actual classroom evidence.');
++    expect(original.response_format.type).toBe('json_schema');
++    expect(adaptDeepSeekJsonSchema(result)).toBe(result);
++  });
++  it('adds the contract as a system message when there was no system prompt', () => {
++    const result = adaptDeepSeekJsonSchema({ response_format: { type: 'json_schema', json_schema: { schema: { type: 'object' } } },
++      messages: [{ role: 'user', content: 'course' }] });
++    expect(result.messages).toEqual([expect.objectContaining({ role: 'system' }), { role: 'user', content: 'course' }]);
++  });
+   const body = {
+     model: 'deepseek-v4-pro',
+     thinking: { type: 'disabled' },
+--- a/tests/ai/openai-provider.test.ts
++++ b/tests/ai/openai-provider.test.ts
+@@ -95,6 +95,19 @@
+ 
+   afterEach(() => {
+     vi.unstubAllEnvs();
++  });
++
++  it('keeps required quality-report fields in the actual DeepSeek request after JSON compatibility', async () => {
++    const schema = { type: 'object', required: ['status', 'dimensions', 'objectives', 'issues'], additionalProperties: false };
++    const body = await captureInjectedRequestBody('deepseek', 'deepseek-v4-flash', undefined,
++      'https://api.deepseek.com/v1', { model: 'deepseek-v4-flash',
++        messages: [{ role: 'system', content: 'Review the supplied classroom.' }, { role: 'user', content: 'classroom' }],
++        response_format: { type: 'json_schema', json_schema: { name: 'quality', schema } },
++      });
++    expect(body.response_format).toEqual({ type: 'json_object' });
++    expect(body.messages[0].content).toContain(JSON.stringify(schema));
++    expect(body.messages[0].content).toContain('Review the supplied classroom.');
++    expect(body.messages[1]).toEqual({ role: 'user', content: 'classroom' });
+   });
+ 
+   it.each([

@@ -31,7 +31,9 @@ flutter run
 ```
 
 环境配置在 `mobile/.env.development` 和 `mobile/.env.product`。开发环境默认使用当前
-局域网后端地址，生产构建时替换 `.env.product` 里的真实 API 和 WebSocket 域名。
+局域网后端地址。`.env.product` 里是不可发布的占位域名：生产构建前必须替换
+为真实的 API、实时服务和学生 Web 域名。production 会在启动时强制 API/学生 Web
+使用 HTTPS、WebSocket 使用 WSS；明文 `http://` 或 `ws://` 配置会被拒绝。
 移动端不会在 Dart 代码里写死 API 地址；debug 构建默认读取 `.env.development`，
 release 构建默认读取 `.env.product`。如果需要显式覆盖，也可以继续通过 dart define
 指定配置文件：

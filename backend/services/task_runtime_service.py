@@ -94,6 +94,121 @@ class TaskRuntimeService:
         self.monitor_enabled = monitor_enabled
         self.speaker_enabled = speaker_enabled
 
+    def learning_classroom_started(self, *, family_id: str, task_id: str) -> dict:
+        """Consume a trusted classroom start without granting camera authority."""
+
+        timestamp = now_ms()
+        with self.repository.transaction() as conn:
+            task = self.repository.get_task(
+                conn,
+                family_id=family_id,
+                task_id=task_id,
+            )
+            if task is None or not self._is_runtime_learning_task(task):
+                return {"ok": False, "reason": "learning_task_not_found"}
+            if self.repository.has_event(
+                conn,
+                family_id=family_id,
+                task_id=task_id,
+                event_type="learning_classroom_started",
+            ):
+                return {"ok": True, "replayed": True}
+            self.repository.update_task(
+                conn,
+                family_id=family_id,
+                task_id=task_id,
+                fields={
+                    "next_reminder_at": None,
+                    "reminder_status": "runtime_active",
+                    "camera_observation_status": "runtime_active",
+                },
+                now=timestamp,
+            )
+            self.repository.add_event(
+                conn,
+                family_id=family_id,
+                task_id=task_id,
+                event_type="learning_classroom_started",
+                message="互动课堂已开始，停止后续开课提醒",
+                payload={"authority": "openmaic_runtime_event"},
+                now=timestamp,
+            )
+            monitor = self._stop_learning_monitor(
+                conn,
+                task,
+                now_ms_value=timestamp,
+                reason="classroom_started",
+            )
+        return {"ok": True, "replayed": False, "monitor": monitor}
+
+    def learning_classroom_completed(
+        self,
+        *,
+        family_id: str,
+        task_id: str,
+    ) -> dict:
+        """Stop auxiliary observation and optionally praise after completion."""
+
+        timestamp = now_ms()
+        with self.repository.transaction() as conn:
+            task = self.repository.get_task(
+                conn,
+                family_id=family_id,
+                task_id=task_id,
+            )
+            if task is None or not self._is_runtime_learning_task(task):
+                return {"ok": False, "reason": "learning_task_not_found"}
+            if self.repository.has_event(
+                conn,
+                family_id=family_id,
+                task_id=task_id,
+                event_type="learning_classroom_completed",
+            ):
+                return {"ok": True, "replayed": True}
+            monitor = self._stop_learning_monitor(
+                conn,
+                task,
+                now_ms_value=timestamp,
+                reason="classroom_completed",
+            )
+            finish_event = self._send_phase_reminder(
+                conn,
+                task,
+                phase="finish",
+                now_ms_value=timestamp,
+                success_event_type="learning_finish_reminder_sent",
+                failed_event_type="learning_finish_reminder_failed",
+                success_message="摄像头已向孩子送出完成鼓励",
+                failed_message="课堂已完成，摄像头鼓励暂未播出",
+            )
+            self.repository.update_task(
+                conn,
+                family_id=family_id,
+                task_id=task_id,
+                fields={
+                    "next_reminder_at": None,
+                    "reminder_status": "runtime_completed",
+                    "camera_observation_status": "runtime_completed",
+                },
+                now=timestamp,
+            )
+            self.repository.add_event(
+                conn,
+                family_id=family_id,
+                task_id=task_id,
+                event_type="learning_classroom_completed",
+                message="互动课堂已完成，摄像头联动已收尾",
+                payload={
+                    "authority": "openmaic_runtime_event",
+                    "monitor": monitor,
+                    "finishReminderEventId": (
+                        finish_event.get("id") if finish_event is not None else None
+                    ),
+                },
+                now=timestamp,
+            )
+        return {"ok": True, "replayed": False, "monitor": monitor}
+
     def tick(self, *, now: datetime | None = None) -> dict:
         now = now or datetime.now().astimezone()
         date_text = now.date().isoformat()
@@ -220,6 +335,8 @@ class TaskRuntimeService:
         return updated, event
 
     def _auto_start_or_delay(self, conn, task, *, now: datetime):
+        if self._is_runtime_learning_task(task):
+            return self._wait_for_authoritative_classroom(conn, task, now=now)
         if self.repository.has_event(conn, task_id=task["id"], event_type="auto_started"):
             return task, []
         if not self._has_camera_device(task):
@@ -284,6 +401,73 @@ class TaskRuntimeService:
                 )
             )
         events.extend(self._start_monitor(conn, task, now_ms_value=current_ms))
+        return updated, events
+
+    def _wait_for_authoritative_classroom(self, conn, task, *, now: datetime):
+        """Remind and observe, but never let camera evidence start a lesson."""
+
+        current_ms = self._now_ms(now)
+        max_delay_reminders = self._max_delay_reminders(conn, task["family_id"])
+        next_reminder = (
+            self._plus_seconds_ms(
+                now,
+                self._delay_reminder_interval_seconds(conn, task["family_id"]),
+            )
+            if max_delay_reminders > 0
+            else None
+        )
+        has_camera = self._has_camera_device(task)
+        updated = self.repository.mark_delayed(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            observation_status=(
+                "awaiting_runtime_event" if has_camera else "no_camera_device"
+            ),
+            next_reminder_at=next_reminder,
+            now=current_ms,
+        )
+        events = [
+            self.repository.add_event(
+                conn,
+                family_id=task["family_id"],
+                task_id=task["id"],
+                event_type="learning_classroom_waiting",
+                message="等待孩子在互动课堂中开始学习",
+                payload={
+                    "runtimeScheduledDate": task.get("runtime_scheduled_date")
+                    or task.get("scheduled_date"),
+                    "cameraRole": "reminder_only",
+                },
+                now=current_ms,
+            )
+        ]
+        start_event = self._send_phase_reminder(
+            conn,
+            updated,
+            phase="start",
+            now_ms_value=current_ms,
+            success_event_type="learning_start_reminder_sent",
+            failed_event_type="learning_start_reminder_failed",
+            success_message="已提醒孩子打开互动课堂",
+            failed_message="摄像头暂时离线，开课提醒没有播出",
+        )
+        if start_event:
+            events.append(start_event)
+        if has_camera:
+            events.extend(self._start_monitor(conn, updated, now_ms_value=current_ms))
+        else:
+            events.append(
+                self.repository.add_event(
+                    conn,
+                    family_id=task["family_id"],
+                    task_id=task["id"],
+                    event_type="learning_monitor_skipped",
+                    message="未连接摄像头，本次只等待课堂开始事件",
+                    payload={"reason": "no_camera_device"},
+                    now=current_ms,
+                )
+            )
         return updated, events
 
     def _mark_in_progress_without_start_observation(self, conn, task, *, now: datetime):
@@ -385,6 +569,20 @@ class TaskRuntimeService:
         return updated, events
 
     def _process_delayed(self, conn, task, *, now: datetime):
+        if self._is_runtime_learning_task(task):
+            next_reminder_at = int(task.get("next_reminder_at") or 0)
+            delay_count = int(task.get("delay_reminder_count") or 0)
+            max_delay_reminders = self._max_delay_reminders(
+                conn, task["family_id"]
+            )
+            if (
+                next_reminder_at
+                and self._now_ms(now) >= next_reminder_at
+                and delay_count < max_delay_reminders
+            ):
+                event = self._send_delay_reminder(conn, task, now=now)
+                return task, [event] if event else []
+            return task, []
         if not self._has_camera_device(task):
             return task, []
         observation = self.camera_command_service.internal_task_observation(
@@ -712,6 +910,60 @@ class TaskRuntimeService:
             )
         ]
 
+    def _stop_learning_monitor(
+        self,
+        conn,
+        task,
+        *,
+        now_ms_value: int,
+        reason: str,
+    ) -> dict:
+        if not self.repository.has_event(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            event_type="monitor_started",
+        ):
+            return {"status": "not_active", "reason": "monitor_not_started"}
+        if self.repository.has_event(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            event_type="learning_monitor_stopped",
+        ):
+            return {"status": "already_stopped"}
+        if not self._has_camera_device(task):
+            command = self._skipped_command("no_camera_device")
+            event_type = "learning_monitor_stop_skipped"
+            message = "摄像头未连接，观察停止指令已跳过"
+        else:
+            command = self.camera_command_service.internal_stop_monitor(
+                family_id=task["family_id"],
+                task_id=task["id"],
+                device_id=task.get("device_id"),
+            )
+            succeeded = command.get("status") != "failed"
+            event_type = (
+                "learning_monitor_stopped"
+                if succeeded
+                else "learning_monitor_stop_failed"
+            )
+            message = (
+                "课堂状态已确认，摄像头停止任务观察"
+                if succeeded
+                else "课堂状态已确认，但摄像头停止观察失败"
+            )
+        self.repository.add_event(
+            conn,
+            family_id=task["family_id"],
+            task_id=task["id"],
+            event_type=event_type,
+            message=message,
+            payload={"reason": reason, "command": command},
+            now=now_ms_value,
+        )
+        return command
+
     def _send_phase_reminder(
         self,
         conn,
@@ -827,6 +1079,19 @@ class TaskRuntimeService:
         }
 
     def _task_datetime(self, task, kind: str) -> datetime | None:
+        runtime_date = str(task.get("runtime_scheduled_date") or "").strip()
+        if runtime_date:
+            clock = (
+                task.get("scheduled_start")
+                if kind == "start"
+                else task.get("scheduled_end")
+            )
+            if not clock:
+                return None
+            try:
+                return datetime.fromisoformat(f"{runtime_date}T{clock}:00")
+            except ValueError:
+                return None
         value = task.get("start_at") if kind == "start" else task.get("due_at")
         if not value:
             clock = task.get("scheduled_start") if kind == "start" else task.get("scheduled_end")
@@ -863,7 +1128,9 @@ class TaskRuntimeService:
         return now.astimezone(target.tzinfo)
 
     def _is_history_task(self, task, now: datetime) -> bool:
-        scheduled_date = str(task.get("scheduled_date") or "")
+        scheduled_date = str(
+            task.get("runtime_scheduled_date") or task.get("scheduled_date") or ""
+        )
         return bool(scheduled_date and scheduled_date < now.date().isoformat())
 
     def _requires_start_observation(self, conn, task) -> bool:
@@ -908,6 +1175,12 @@ class TaskRuntimeService:
 
     def _task_type(self, task) -> str:
         return str(task.get("type") or task.get("task_type") or "").strip()
+
+    def _is_runtime_learning_task(self, task) -> bool:
+        return bool(
+            self._task_type(task) == "learning"
+            and str(task.get("learning_course_id") or "").strip()
+        )
 
     def _ai_rules(self, conn, family_id: str) -> dict:
         row = self.profile_repository.get_setting(conn, family_id=family_id, key="ai-care-rules")

@@ -1,0 +1,876 @@
+[
+  {
+    "name": "real-primary-1-math-boundary",
+    "input": {
+      "teachingBrief": {
+        "schemaVersion": "mira.learning.formal-runtime-teaching-brief.v1",
+        "course": {
+          "id": "selection-fixture",
+          "version": "1",
+          "gradeCode": "primary_1",
+          "subject": "math",
+          "skillId": "number_sense_20",
+          "title": "同样数量，换种排列",
+          "objective": "理解20以内数量的组成关系，并解释排列改变后的数量"
+        },
+        "lesson": {
+          "intro": "比较两种排列。",
+          "estimatedMinutes": 10,
+          "teachingFlow": {
+            "teach": {
+              "title": "数量与排列",
+              "sayText": "因为没有增加或拿走圆点，所以数量相同。数一数，再比较。",
+              "keyPoints": [
+                "数量相同，排列不同",
+                "摆一摆，说明组成关系"
+              ]
+            },
+            "recap": {
+              "sayText": "用自己的话解释。"
+            }
+          },
+          "questions": [
+            {
+              "id": "q1",
+              "type": "single_choice",
+              "prompt": "数一数有几个圆点"
+            },
+            {
+              "id": "q2",
+              "type": "single_choice",
+              "prompt": "选出与六个相同数量的一组"
+            },
+            {
+              "id": "q3",
+              "type": "single_choice",
+              "prompt": "摆出相同数量的圆点"
+            },
+            {
+              "id": "q4",
+              "type": "single_choice",
+              "prompt": "比较两种排列"
+            },
+            {
+              "id": "q5",
+              "type": "single_choice",
+              "prompt": "说明为什么数量不变"
+            }
+          ]
+        },
+        "authority": {
+          "source": "locked_learning_course",
+          "answerContractProvided": false,
+          "scoringRulesProvided": false,
+          "providerSecretsProvided": false
+        }
+      },
+      "gradeBoundary": {
+        "gradeCode": "primary_1",
+        "subject": "math",
+        "curriculumVersion": "mira.primary.2026-fall.v1",
+        "boundaryVersion": "mira.primary.2026-fall.v1:number_sense_20:4c771187db7ced28",
+        "skillId": "number_sense_20",
+        "skillTitle": "20以内数感",
+        "learningObjectives": [
+          "比较20以内数的大小",
+          "理解数的组成与顺序"
+        ],
+        "allowedContent": [
+          "数数",
+          "数位雏形",
+          "大小比较"
+        ],
+        "excludedContent": [
+          "负数",
+          "乘除法",
+          "分数",
+          "小数"
+        ],
+        "prerequisiteSkills": [],
+        "language": "zh-CN",
+        "estimatedMinutes": 10
+      },
+      "gradeBoundarySha256": "c407811c47bbe36c641952dc3f3dbb04f1f3e43db1e29d5c6749cd4f45b31a2d"
+    },
+    "expected": {
+      "schemaVersion": "mira.openmaic.skill-selection.v1",
+      "registryId": "openmaic-builtin-skills.v1-23",
+      "inputSha256": "987207fa6d3a7d9ce6679fbf376832c5896f19dc132724c0d28831a182dc62de",
+      "gradeBoundarySha256": "c407811c47bbe36c641952dc3f3dbb04f1f3e43db1e29d5c6749cd4f45b31a2d",
+      "gradeBand": "lower_primary",
+      "primaryMethod": "feynman-learning",
+      "selectedSkillIds": [
+        "mira-primary-courseware",
+        "stage-design",
+        "k12-core-literacy-planning",
+        "deep-interactive",
+        "slide-craft",
+        "learning-to-learn",
+        "understanding-by-design",
+        "feynman-learning"
+      ],
+      "decisions": [
+        {
+          "skillId": "mira-primary-courseware",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "stage-design",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "k12-core-literacy-planning",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "deep-interactive",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "slide-craft",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "learning-to-learn",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "understanding-by-design",
+          "status": "selected",
+          "reasonCode": "bounded_goal_and_assessment_backward_design",
+          "evidencePaths": [
+            "/teachingBrief/course/objective",
+            "/teachingBrief/lesson/questions"
+          ]
+        },
+        {
+          "skillId": "feynman-learning",
+          "status": "selected",
+          "reasonCode": "explanation_goal_allowed_and_taught",
+          "evidencePaths": [
+            "/teachingBrief/course/objective",
+            "/gradeBoundary/learningObjectives/1",
+            "/gradeBoundary/allowedContent/2",
+            "/teachingBrief/lesson/teachingFlow/teach/sayText",
+            "/teachingBrief/lesson/teachingFlow/teach/keyPoints/0",
+            "/teachingBrief/lesson/teachingFlow/teach/keyPoints/1",
+            "/teachingBrief/lesson/questions/1/prompt",
+            "/teachingBrief/lesson/questions/2/prompt",
+            "/teachingBrief/lesson/questions/4/prompt"
+          ]
+        },
+        {
+          "skillId": "workshop-style",
+          "status": "not_applicable",
+          "reasonCode": "primary_method_feynman_wins",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "social-emotional-learning",
+          "status": "not_applicable",
+          "reasonCode": "no_explicit_social_learning_situation",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "deep-research",
+          "status": "not_applicable",
+          "reasonCode": "stable_subject_formal_source_gate_suffices",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "lecture-style",
+          "status": "not_applicable",
+          "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode"
+          ]
+        },
+        {
+          "skillId": "pro-editing",
+          "status": "deferred",
+          "reasonCode": "only_after_persisted_page_requires_repair",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "stage-dsl",
+          "status": "deferred",
+          "reasonCode": "only_after_persisted_page_requires_repair",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "slide-dsl",
+          "status": "deferred",
+          "reasonCode": "only_after_persisted_page_requires_repair",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "pptx-import",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "style-clone",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "page-clone",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "teacher-style-clone",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_teacher_material",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "curriculum-planner",
+          "status": "not_applicable",
+          "reasonCode": "single_course_not_series_or_cross_course_memory",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "spiral-curriculum",
+          "status": "not_applicable",
+          "reasonCode": "single_course_not_series_or_cross_course_memory",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "build-personal-skill",
+          "status": "not_applicable",
+          "reasonCode": "no_personal_history_or_skill_creation_request",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "vocational",
+          "status": "not_applicable",
+          "reasonCode": "primary_subject_not_occupational_procedure",
+          "evidencePaths": [
+            "/gradeBoundary/subject"
+          ]
+        }
+      ],
+      "planSha256": "e0cb2052c3f802986857c4a6db0694f685006f374c9b24b4b1c6e081fa789eac"
+    }
+  },
+  {
+    "name": "practice-without-explanation",
+    "input": {
+      "teachingBrief": {
+        "schemaVersion": "mira.learning.formal-runtime-teaching-brief.v1",
+        "course": {
+          "id": "selection-fixture",
+          "version": "1",
+          "gradeCode": "primary_1",
+          "subject": "math",
+          "skillId": "number_sense_20",
+          "title": "同样数量，换种排列",
+          "objective": "计算20以内的加减"
+        },
+        "lesson": {
+          "intro": "比较两种排列。",
+          "estimatedMinutes": 10,
+          "teachingFlow": {
+            "teach": {
+              "title": "数量与排列",
+              "sayText": "因为没有增加或拿走圆点，所以数量相同。数一数，再比较。",
+              "keyPoints": [
+                "数量相同，排列不同",
+                "摆一摆，说明组成关系"
+              ]
+            },
+            "recap": {
+              "sayText": "用自己的话解释。"
+            }
+          },
+          "questions": [
+            {
+              "id": "q1",
+              "type": "single_choice",
+              "prompt": "数一数有几个圆点"
+            },
+            {
+              "id": "q2",
+              "type": "single_choice",
+              "prompt": "选出与六个相同数量的一组"
+            },
+            {
+              "id": "q3",
+              "type": "single_choice",
+              "prompt": "摆出相同数量的圆点"
+            },
+            {
+              "id": "q4",
+              "type": "single_choice",
+              "prompt": "比较两种排列"
+            },
+            {
+              "id": "q5",
+              "type": "single_choice",
+              "prompt": "说明为什么数量不变"
+            }
+          ]
+        },
+        "authority": {
+          "source": "locked_learning_course",
+          "answerContractProvided": false,
+          "scoringRulesProvided": false,
+          "providerSecretsProvided": false
+        }
+      },
+      "gradeBoundary": {
+        "gradeCode": "primary_1",
+        "subject": "math",
+        "curriculumVersion": "mira.primary.2026-fall.v1",
+        "boundaryVersion": "mira.primary.2026-fall.v1:number_sense_20:4c771187db7ced28",
+        "skillId": "number_sense_20",
+        "skillTitle": "20以内数感",
+        "learningObjectives": [
+          "计算20以内的加减"
+        ],
+        "allowedContent": [
+          "20以内加减计算"
+        ],
+        "excludedContent": [
+          "负数",
+          "乘除法",
+          "分数",
+          "小数"
+        ],
+        "prerequisiteSkills": [],
+        "language": "zh-CN",
+        "estimatedMinutes": 10
+      },
+      "gradeBoundarySha256": "d3075c414d10df6c01695485884ce16d254c095a8da72091c202e41c6f1c7f3d"
+    },
+    "expected": {
+      "schemaVersion": "mira.openmaic.skill-selection.v1",
+      "registryId": "openmaic-builtin-skills.v1-23",
+      "inputSha256": "5a6a61d6fd45e4577628daa8e0f7f3dd96d548e7fa9c012dfc837ce087c4f2bd",
+      "gradeBoundarySha256": "d3075c414d10df6c01695485884ce16d254c095a8da72091c202e41c6f1c7f3d",
+      "gradeBand": "lower_primary",
+      "primaryMethod": "workshop-style",
+      "selectedSkillIds": [
+        "mira-primary-courseware",
+        "stage-design",
+        "k12-core-literacy-planning",
+        "deep-interactive",
+        "slide-craft",
+        "learning-to-learn",
+        "understanding-by-design",
+        "workshop-style"
+      ],
+      "decisions": [
+        {
+          "skillId": "mira-primary-courseware",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "stage-design",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "k12-core-literacy-planning",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "deep-interactive",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "slide-craft",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "learning-to-learn",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "understanding-by-design",
+          "status": "selected",
+          "reasonCode": "bounded_goal_and_assessment_backward_design",
+          "evidencePaths": [
+            "/teachingBrief/course/objective",
+            "/teachingBrief/lesson/questions"
+          ]
+        },
+        {
+          "skillId": "feynman-learning",
+          "status": "not_applicable",
+          "reasonCode": "no_supported_explanation_cycle",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "workshop-style",
+          "status": "selected",
+          "reasonCode": "practice_goal_and_repeated_tasks",
+          "evidencePaths": [
+            "/teachingBrief/course/objective",
+            "/gradeBoundary/learningObjectives/0",
+            "/gradeBoundary/allowedContent/0",
+            "/teachingBrief/lesson/teachingFlow/teach/sayText",
+            "/teachingBrief/lesson/teachingFlow/teach/keyPoints/1",
+            "/teachingBrief/lesson/questions/0/prompt",
+            "/teachingBrief/lesson/questions/1/prompt",
+            "/teachingBrief/lesson/questions/2/prompt",
+            "/teachingBrief/lesson/questions/3/prompt"
+          ]
+        },
+        {
+          "skillId": "social-emotional-learning",
+          "status": "not_applicable",
+          "reasonCode": "no_explicit_social_learning_situation",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "deep-research",
+          "status": "not_applicable",
+          "reasonCode": "stable_subject_formal_source_gate_suffices",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "lecture-style",
+          "status": "not_applicable",
+          "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode"
+          ]
+        },
+        {
+          "skillId": "pro-editing",
+          "status": "deferred",
+          "reasonCode": "only_after_persisted_page_requires_repair",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "stage-dsl",
+          "status": "deferred",
+          "reasonCode": "only_after_persisted_page_requires_repair",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "slide-dsl",
+          "status": "deferred",
+          "reasonCode": "only_after_persisted_page_requires_repair",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "pptx-import",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "style-clone",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "page-clone",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "teacher-style-clone",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_teacher_material",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "curriculum-planner",
+          "status": "not_applicable",
+          "reasonCode": "single_course_not_series_or_cross_course_memory",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "spiral-curriculum",
+          "status": "not_applicable",
+          "reasonCode": "single_course_not_series_or_cross_course_memory",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "build-personal-skill",
+          "status": "not_applicable",
+          "reasonCode": "no_personal_history_or_skill_creation_request",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "vocational",
+          "status": "not_applicable",
+          "reasonCode": "primary_subject_not_occupational_procedure",
+          "evidencePaths": [
+            "/gradeBoundary/subject"
+          ]
+        }
+      ],
+      "planSha256": "068647a7b2ba5b3484bd375b3f19ff589a93394b2792af986d3722b23e40ddfa"
+    }
+  },
+  {
+    "name": "explicit-social-and-current-evidence",
+    "input": {
+      "teachingBrief": {
+        "schemaVersion": "mira.learning.formal-runtime-teaching-brief.v1",
+        "course": {
+          "id": "selection-fixture",
+          "version": "1",
+          "gradeCode": "primary_1",
+          "subject": "math",
+          "skillId": "number_sense_20",
+          "title": "同样数量，换种排列",
+          "objective": "计算20以内的加减"
+        },
+        "lesson": {
+          "intro": "比较两种排列。",
+          "estimatedMinutes": 10,
+          "teachingFlow": {
+            "teach": {
+              "title": "数量与排列",
+              "sayText": "因为没有增加或拿走圆点，所以数量相同。数一数，再比较。",
+              "keyPoints": [
+                "数量相同，排列不同",
+                "摆一摆，说明组成关系",
+                "合作解释不同观点",
+                "比较现行政策的统计数据"
+              ]
+            },
+            "recap": {
+              "sayText": "用自己的话解释。"
+            }
+          },
+          "questions": [
+            {
+              "id": "q1",
+              "type": "single_choice",
+              "prompt": "数一数有几个圆点"
+            },
+            {
+              "id": "q2",
+              "type": "single_choice",
+              "prompt": "选出与六个相同数量的一组"
+            },
+            {
+              "id": "q3",
+              "type": "single_choice",
+              "prompt": "摆出相同数量的圆点"
+            },
+            {
+              "id": "q4",
+              "type": "single_choice",
+              "prompt": "比较两种排列"
+            },
+            {
+              "id": "q5",
+              "type": "single_choice",
+              "prompt": "说明为什么数量不变"
+            }
+          ]
+        },
+        "authority": {
+          "source": "locked_learning_course",
+          "answerContractProvided": false,
+          "scoringRulesProvided": false,
+          "providerSecretsProvided": false
+        }
+      },
+      "gradeBoundary": {
+        "gradeCode": "primary_1",
+        "subject": "math",
+        "curriculumVersion": "mira.primary.2026-fall.v1",
+        "boundaryVersion": "mira.primary.2026-fall.v1:number_sense_20:4c771187db7ced28",
+        "skillId": "number_sense_20",
+        "skillTitle": "20以内数感",
+        "learningObjectives": [
+          "计算20以内的加减",
+          "合作完成统计数据比较"
+        ],
+        "allowedContent": [
+          "20以内加减计算",
+          "同伴反馈与现行政策案例"
+        ],
+        "excludedContent": [
+          "负数",
+          "乘除法",
+          "分数",
+          "小数"
+        ],
+        "prerequisiteSkills": [],
+        "language": "zh-CN",
+        "estimatedMinutes": 10
+      },
+      "gradeBoundarySha256": "898ea63c8ad4ca4fcd68c9cef21709b34ac9068fb067fa32c23de833885a34e2"
+    },
+    "expected": {
+      "schemaVersion": "mira.openmaic.skill-selection.v1",
+      "registryId": "openmaic-builtin-skills.v1-23",
+      "inputSha256": "70fd49df496765297779639d8999b364b3e1abf6d38dd046d638e133ecaac566",
+      "gradeBoundarySha256": "898ea63c8ad4ca4fcd68c9cef21709b34ac9068fb067fa32c23de833885a34e2",
+      "gradeBand": "lower_primary",
+      "primaryMethod": "workshop-style",
+      "selectedSkillIds": [
+        "mira-primary-courseware",
+        "stage-design",
+        "k12-core-literacy-planning",
+        "deep-interactive",
+        "slide-craft",
+        "learning-to-learn",
+        "understanding-by-design",
+        "workshop-style",
+        "social-emotional-learning",
+        "deep-research"
+      ],
+      "decisions": [
+        {
+          "skillId": "mira-primary-courseware",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "stage-design",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "k12-core-literacy-planning",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "deep-interactive",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "slide-craft",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "learning-to-learn",
+          "status": "selected",
+          "reasonCode": "formal_primary_baseline",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode",
+            "/gradeBoundary/subject"
+          ]
+        },
+        {
+          "skillId": "understanding-by-design",
+          "status": "selected",
+          "reasonCode": "bounded_goal_and_assessment_backward_design",
+          "evidencePaths": [
+            "/teachingBrief/course/objective",
+            "/teachingBrief/lesson/questions"
+          ]
+        },
+        {
+          "skillId": "feynman-learning",
+          "status": "not_applicable",
+          "reasonCode": "no_supported_explanation_cycle",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "workshop-style",
+          "status": "selected",
+          "reasonCode": "practice_goal_and_repeated_tasks",
+          "evidencePaths": [
+            "/teachingBrief/course/objective",
+            "/gradeBoundary/learningObjectives/0",
+            "/gradeBoundary/learningObjectives/1",
+            "/gradeBoundary/allowedContent/0",
+            "/teachingBrief/lesson/teachingFlow/teach/sayText",
+            "/teachingBrief/lesson/teachingFlow/teach/keyPoints/1",
+            "/teachingBrief/lesson/teachingFlow/teach/keyPoints/3",
+            "/teachingBrief/lesson/questions/0/prompt",
+            "/teachingBrief/lesson/questions/1/prompt",
+            "/teachingBrief/lesson/questions/2/prompt",
+            "/teachingBrief/lesson/questions/3/prompt"
+          ]
+        },
+        {
+          "skillId": "social-emotional-learning",
+          "status": "selected",
+          "reasonCode": "social_goal_and_concrete_learning_situation",
+          "evidencePaths": [
+            "/gradeBoundary/learningObjectives/1",
+            "/gradeBoundary/allowedContent/1",
+            "/teachingBrief/lesson/teachingFlow/teach/keyPoints/2"
+          ]
+        },
+        {
+          "skillId": "deep-research",
+          "status": "selected",
+          "reasonCode": "external_fact_goal_and_teaching_evidence",
+          "evidencePaths": [
+            "/gradeBoundary/learningObjectives/1",
+            "/gradeBoundary/allowedContent/1",
+            "/teachingBrief/lesson/teachingFlow/teach/keyPoints/3"
+          ]
+        },
+        {
+          "skillId": "lecture-style",
+          "status": "not_applicable",
+          "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
+          "evidencePaths": [
+            "/gradeBoundary/gradeCode"
+          ]
+        },
+        {
+          "skillId": "pro-editing",
+          "status": "deferred",
+          "reasonCode": "only_after_persisted_page_requires_repair",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "stage-dsl",
+          "status": "deferred",
+          "reasonCode": "only_after_persisted_page_requires_repair",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "slide-dsl",
+          "status": "deferred",
+          "reasonCode": "only_after_persisted_page_requires_repair",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "pptx-import",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "style-clone",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "page-clone",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "teacher-style-clone",
+          "status": "not_applicable",
+          "reasonCode": "no_authorized_teacher_material",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "curriculum-planner",
+          "status": "not_applicable",
+          "reasonCode": "single_course_not_series_or_cross_course_memory",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "spiral-curriculum",
+          "status": "not_applicable",
+          "reasonCode": "single_course_not_series_or_cross_course_memory",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "build-personal-skill",
+          "status": "not_applicable",
+          "reasonCode": "no_personal_history_or_skill_creation_request",
+          "evidencePaths": []
+        },
+        {
+          "skillId": "vocational",
+          "status": "not_applicable",
+          "reasonCode": "primary_subject_not_occupational_procedure",
+          "evidencePaths": [
+            "/gradeBoundary/subject"
+          ]
+        }
+      ],
+      "planSha256": "55bf43a749aa841a8bab1e207eed78a3cb7512ec0d0d56e47cddb9acff8e7fed"
+    }
+  }
+]

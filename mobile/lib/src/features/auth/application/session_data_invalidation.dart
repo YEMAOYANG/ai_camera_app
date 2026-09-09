@@ -5,6 +5,9 @@ import 'package:warm_sight/src/features/care/domain/care_models.dart';
 import 'package:warm_sight/src/features/devices/application/device_repository.dart';
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
+import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
+import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
+import 'package:warm_sight/src/features/learning/application/learning_repository.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/rewards/application/reward_repository.dart';
@@ -43,6 +46,13 @@ void _invalidateAuthenticatedSessionData(dynamic ref) {
   ref.invalidate(dailyReportProvider);
   ref.invalidate(weeklyReportProvider);
   ref.invalidate(growthMomentsProvider);
+
+  ref.invalidate(todayLearningProvider);
+  ref.invalidate(latestLearningReportProvider);
+  ref.invalidate(learningAvailabilityRepositoryProvider);
+  ref.invalidate(currentLearningAvailabilityProvider);
+  ref.invalidate(learningPreparationRepositoryProvider);
+  ref.invalidate(currentLearningPreparationProvider);
 
   ref.invalidate(todayTasksProvider);
   ref.invalidate(taskListProvider);

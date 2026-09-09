@@ -5,7 +5,7 @@ import 'package:warm_sight/src/features/tasks/application/task_realtime_reposito
 
 void main() {
   test('task realtime uri uses configured websocket base url', () {
-    const environment = AppEnvironment(
+    final environment = AppEnvironment(
       flavor: AppFlavor.development,
       apiBaseUrl: 'http://127.0.0.1:8000/api',
       taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',
@@ -20,7 +20,7 @@ void main() {
   });
 
   test('task realtime uri can derive websocket scheme from api url', () {
-    const environment = AppEnvironment(
+    final environment = AppEnvironment(
       flavor: AppFlavor.staging,
       apiBaseUrl: 'https://app.example.com/api',
     );
@@ -34,7 +34,7 @@ void main() {
   });
 
   test('account security realtime uri uses configured websocket base url', () {
-    const environment = AppEnvironment(
+    final environment = AppEnvironment(
       flavor: AppFlavor.development,
       apiBaseUrl: 'http://127.0.0.1:8000/api',
       taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',

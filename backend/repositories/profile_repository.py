@@ -707,7 +707,23 @@ class ProfileRepository:
         ).fetchone()
         if int(user_count["count"] or 0) > 0:
             return
+        conn.execute(
+            """
+            DELETE FROM student_sessions
+            WHERE principal_id IN (
+              SELECT id FROM student_principals WHERE family_id = ?
+            )
+               OR device_id IN (
+              SELECT id FROM student_trusted_devices WHERE family_id = ?
+            )
+            """,
+            (family_id, family_id),
+        )
         for table in (
+            "student_trusted_devices",
+            "student_pairing_codes",
+            "student_pairing_challenges",
+            "student_principals",
             "setup_progress",
             "parent_identities",
             "family_members",
@@ -718,6 +734,9 @@ class ProfileRepository:
             "children",
             "app_settings",
             "feedback_items",
+            "learning_sessions",
+            "learning_reports",
+            "learning_mastery_states",
             "tasks",
             "task_events",
             "point_accounts",
@@ -745,15 +764,23 @@ class ProfileRepository:
             (family_id,),
         ).fetchone()
 
+    def lock_family(self, conn: DatabaseConnection, *, family_id: str) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT id FROM families WHERE id = ? FOR UPDATE",
+            (family_id,),
+        ).fetchone()
+
     def get_child(
         self,
         conn: DatabaseConnection,
         *,
         family_id: str,
         child_id: str,
+        for_update: bool = False,
     ) -> DatabaseRow | None:
+        lock = " FOR UPDATE" if for_update else ""
         return conn.execute(
-            "SELECT * FROM children WHERE family_id = ? AND id = ?",
+            "SELECT * FROM children WHERE family_id = ? AND id = ?" + lock,
             (family_id, child_id),
         ).fetchone()
 

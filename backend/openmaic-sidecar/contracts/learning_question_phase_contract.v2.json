@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "mira.learning.question-phase-graph.v1",
+  "questionContractVersion": "mira.learning.question-contract.v2",
+  "providerPhases": [
+    {"phase": "outline", "phaseOrdinal": 1},
+    {"phase": "raw_candidate", "phaseOrdinal": 2},
+    {"phase": "candidate_repair", "phaseOrdinal": 3},
+    {"phase": "candidate_repair_retry", "phaseOrdinal": 4},
+    {"phase": "lesson_text", "phaseOrdinal": 5},
+    {"phase": "reconciliation", "phaseOrdinal": 6},
+    {"phase": "reconciliation_retry", "phaseOrdinal": 7},
+    {"phase": "practice_leak_repair_1", "phaseOrdinal": 8},
+    {"phase": "practice_leak_repair_2", "phaseOrdinal": 9},
+    {"phase": "choice_prompt_repair", "phaseOrdinal": 10},
+    {"phase": "independent_verification", "phaseOrdinal": 11},
+    {"phase": "consistency_repair", "phaseOrdinal": 12},
+    {"phase": "consistency_repair_retry", "phaseOrdinal": 13},
+    {"phase": "verification_after_repair", "phaseOrdinal": 14}
+  ]
+}

@@ -1,0 +1,684 @@
+From 47ba5183214f5828c273b67c9111f3cd8c08cba0 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 10/37] 0010-mira-sample-teacher-identity
+
+---
+ components/agent/agent-bar.tsx                |  4 +-
+ components/chat/use-chat-sessions.ts          | 62 +++++++++++++--
+ lib/mira/sample-teacher-identity.ts           | 27 +++++++
+ lib/mira/student-runtime.ts                   | 11 ++-
+ lib/orchestration/registry/store.ts           | 21 ++++-
+ .../mira-sample-deterministic-classroom.ts    | 14 ++--
+ lib/server/mira-sample-structural-policy.ts   | 12 ++-
+ tests/lib/chat/use-chat-sessions.test.ts      | 48 +++++++++++
+ .../apply-generated-agents.test.ts            | 79 ++++++++++++++++++-
+ tests/runtime/mira-student-runtime.test.ts    |  6 +-
+ tests/server/health-route.test.ts             |  6 +-
+ ...ira-sample-deterministic-classroom.test.ts | 13 +++
+ .../mira-sample-structural-policy.test.ts     | 13 ++-
+ 13 files changed, 288 insertions(+), 28 deletions(-)
+ create mode 100644 lib/mira/sample-teacher-identity.ts
+
+diff --git a/components/agent/agent-bar.tsx b/components/agent/agent-bar.tsx
+index 4b079e6..5adad83 100644
+--- a/components/agent/agent-bar.tsx
++++ b/components/agent/agent-bar.tsx
+@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
+ import { cn } from '@/lib/utils';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { useSettingsStore } from '@/lib/store/settings';
+-import { useAgentRegistry } from '@/lib/orchestration/registry/store';
++import { selectLoadedClassroomTeacher, useAgentRegistry } from '@/lib/orchestration/registry/store';
+ import { resolveAgentVoice, getSelectableProvidersWithVoices } from '@/lib/audio/voice-resolver';
+ import { playBrowserTTSPreview } from '@/lib/audio/browser-tts-preview';
+ import { useAllVoiceProfiles } from '@/lib/audio/voxcpm-voices';
+@@ -638,7 +638,7 @@ export function AgentBar() {
+ 
+   const allAgents = listAgents();
+   const agents = allAgents.filter((a) => !a.isGenerated);
+-  const teacherAgent = agents.find((a) => a.role === 'teacher');
++  const teacherAgent = selectLoadedClassroomTeacher(allAgents, agentMode === 'auto');
+   const selectedAgents = agents.filter((a) => selectedAgentIds.includes(a.id));
+   const nonTeacherSelected = selectedAgents.filter((a) => a.role !== 'teacher');
+ 
+diff --git a/components/chat/use-chat-sessions.ts b/components/chat/use-chat-sessions.ts
+index 7b7002d..0061866 100644
+--- a/components/chat/use-chat-sessions.ts
++++ b/components/chat/use-chat-sessions.ts
+@@ -21,7 +21,8 @@ import { useStageStore } from '@/lib/store';
+ import { useCanvasStore } from '@/lib/store/canvas';
+ import { useSettingsStore, type SettingsState } from '@/lib/store/settings';
+ import { useUserProfileStore } from '@/lib/store/user-profile';
+-import { useAgentRegistry } from '@/lib/orchestration/registry/store';
++import { selectLoadedClassroomTeacher, useAgentRegistry } from '@/lib/orchestration/registry/store';
++import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { getCurrentModelConfig } from '@/lib/utils/model-config';
+ import { USER_AVATAR } from '@/lib/types/roundtable';
+@@ -44,6 +45,40 @@ import { refreshWhiteboardRuntimeProjection } from '@/lib/whiteboard/runtime/bro
+ 
+ const log = createLogger('ChatSessions');
+ const SOFT_CLOSE_TIMEOUT_MS = 15_000;
++const DEFAULT_LECTURE_AGENT_ID = 'default-1';
++
++export function selectLectureTeacherForMode(
++  agents: readonly AgentConfig[],
++  agentMode: 'preset' | 'auto',
++): AgentConfig | undefined {
++  return selectLoadedClassroomTeacher(agents, agentMode === 'auto');
++}
++
++export interface LectureAgentIdentityRegistry {
++  remember(sessionId: string, agentId: string): void;
++  resolve(sessionId: string): string;
++  clear(sessionId: string): void;
++}
++
++/**
++ * Keep the selected lecture teacher available before React state commits.
++ * Lecture actions can be emitted immediately after startLecture resolves, so
++ * their identity cannot depend on a later sessions-state render.
++ */
++export function createLectureAgentIdentityRegistry(): LectureAgentIdentityRegistry {
++  const agentIds = new Map<string, string>();
++  return {
++    remember(sessionId, agentId) {
++      agentIds.set(sessionId, agentId);
++    },
++    resolve(sessionId) {
++      return agentIds.get(sessionId) ?? DEFAULT_LECTURE_AGENT_ID;
++    },
++    clear(sessionId) {
++      agentIds.delete(sessionId);
++    },
++  };
++}
+ 
+ export interface SoftCloseRegistration {
+   token: string;
+@@ -871,6 +906,9 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+   // Tracks last action index per lecture session (avoids stale closure reads)
+   const lectureLastActionIndexRef = useRef<Map<string, number>>(new Map());
+ 
++  // Tracks the selected teacher synchronously across the lecture action lifecycle.
++  const lectureAgentIdentities = useRef(createLectureAgentIdentityRegistry());
++
+   const toggleSessionExpand = useCallback((sessionId: string) => {
+     setExpandedSessionIds((prev) => {
+       const next = new Set(prev);
+@@ -1426,6 +1464,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+       }
+       lectureMessageIds.current.delete(sessionId);
+       lectureLastActionIndexRef.current.delete(sessionId);
++      lectureAgentIdentities.current.clear(sessionId);
+ 
+       if (isLiveSession && wasStreaming) {
+         // Append "..." + interrupted marker to last assistant message
+@@ -2069,6 +2108,12 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+           (s.status === 'active' || s.status === 'completed'),
+       );
+       if (existing) {
++        const existingAgentId =
++          existing.config.agentIds[0] ||
++          existing.messages[0]?.metadata?.agentId ||
++          DEFAULT_LECTURE_AGENT_ID;
++        lectureAgentIdentities.current.remember(existing.id, existingAgentId);
++
+         // Reactivate a completed session so the chat panel shows it as active again.
+         // Actions won't be re-appended because lastActionIndex already covers them.
+         if (existing.status === 'completed') {
+@@ -2096,7 +2141,10 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+       const scene = useStageStore.getState().scenes.find((s) => s.id === sceneId);
+       const title = scene?.title || t('chat.lecture');
+ 
+-      const agentConfig = useAgentRegistry.getState().getAgent('default-1');
++      const registry = useAgentRegistry.getState();
++      const agentMode = useSettingsStore.getState().agentMode;
++      const agentConfig = selectLectureTeacherForMode(registry.listAgents(), agentMode);
++      const agentId = agentConfig?.id || DEFAULT_LECTURE_AGENT_ID;
+ 
+       // Create session with a single assistant message (all actions append parts here)
+       const lectureMessage: UIMessage<ChatMessageMetadata> = {
+@@ -2107,7 +2155,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+           senderName: agentConfig?.name || t('settings.agentNames.default-1'),
+           senderAvatar: agentConfig?.avatar,
+           originalRole: 'teacher',
+-          agentId: 'default-1',
++          agentId,
+           createdAt: now,
+         },
+       };
+@@ -2119,7 +2167,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+         status: 'active',
+         messages: [lectureMessage],
+         config: {
+-          agentIds: ['default-1'],
++          agentIds: [agentId],
+         },
+         toolCalls: [],
+         pendingToolCalls: [],
+@@ -2130,6 +2178,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+       };
+ 
+       lectureMessageIds.current.set(sessionId, messageId);
++      lectureAgentIdentities.current.remember(sessionId, agentId);
+ 
+       setSessions((prev) => [...prev, newSession]);
+       setActiveSessionId(sessionId);
+@@ -2150,6 +2199,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+     (sessionId: string, action: Action, actionIndex: number) => {
+       const messageId = lectureMessageIds.current.get(sessionId);
+       if (!messageId) return;
++      const agentId = lectureAgentIdentities.current.resolve(sessionId);
+ 
+       // Skip if this action was already appended in a previous run
+       const lastIndex = lectureLastActionIndexRef.current.get(sessionId) ?? -1;
+@@ -2172,7 +2222,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+       }
+ 
+       if (action.type === 'speech') {
+-        buffer.pushText(messageId, action.text, 'default-1');
++        buffer.pushText(messageId, action.text, agentId);
+         buffer.sealText(messageId);
+       } else if (
+         action.type === 'spotlight' ||
+@@ -2196,7 +2246,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+                     topic: (action as DiscussionAction).topic,
+                     prompt: (action as DiscussionAction).prompt,
+                   },
+-          agentId: 'default-1',
++          agentId,
+         });
+       }
+     },
+diff --git a/lib/mira/sample-teacher-identity.ts b/lib/mira/sample-teacher-identity.ts
+new file mode 100644
+index 0000000..51c92c3
+--- /dev/null
++++ b/lib/mira/sample-teacher-identity.ts
+@@ -0,0 +1,27 @@
++/** Fixed visual identity for Mira's controlled Grade-1 math sample teacher. */
++export const MIRA_SAMPLE_TEACHER_ID = 'mira-sample-teacher' as const;
++export const MIRA_SAMPLE_TEACHER_AVATAR = '/avatars/teacher-2.png' as const;
++
++type TeacherAvatarIdentity = {
++  id: string;
++  role: string;
++  avatar: string;
++};
++
++/**
++ * Repair only the exact controlled sample teacher.
++ *
++ * This keeps the already-published immutable classroom artifact auditable while
++ * ensuring its in-memory UI identity matches the server-owned classroom identity.
++ * Every other generated/default/operator agent keeps its configured avatar.
++ */
++export function normalizeMiraSampleTeacherAvatar<T extends TeacherAvatarIdentity>(agent: T): T {
++  if (
++    agent.id !== MIRA_SAMPLE_TEACHER_ID ||
++    agent.role !== 'teacher' ||
++    agent.avatar === MIRA_SAMPLE_TEACHER_AVATAR
++  ) {
++    return agent;
++  }
++  return { ...agent, avatar: MIRA_SAMPLE_TEACHER_AVATAR };
++}
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+index 7c760af..183a0dc 100644
+--- a/lib/mira/student-runtime.ts
++++ b/lib/mira/student-runtime.ts
+@@ -1,15 +1,24 @@
++import {
++  MIRA_SAMPLE_TEACHER_AVATAR,
++  MIRA_SAMPLE_TEACHER_ID,
++} from '@/lib/mira/sample-teacher-identity';
++
+ export const MIRA_STUDENT_RUNTIME_QUERY_KEY = 'mira';
+ export const MIRA_STUDENT_RUNTIME_QUERY_VALUE = '1';
+ 
+ export const MIRA_STUDENT_CHROME_POLICY = Object.freeze({
+   enforced: true,
+-  policyVersion: 'mira-student-chrome.v1',
++  policyVersion: 'mira-student-chrome.v2',
+   marker: 'mira=1',
+   locale: 'zh-CN',
+   theme: 'light',
+   operatorChromePreserved: true,
+   headerControlsHidden: true,
+   exportsHidden: true,
++  teacherIdentity: Object.freeze({
++    agentId: MIRA_SAMPLE_TEACHER_ID,
++    avatar: MIRA_SAMPLE_TEACHER_AVATAR,
++  }),
+ });
+ 
+ export const MIRA_STUDENT_CLASSROOM_METADATA = Object.freeze({
+diff --git a/lib/orchestration/registry/store.ts b/lib/orchestration/registry/store.ts
+index 0a3867c..dd64ef5 100644
+--- a/lib/orchestration/registry/store.ts
++++ b/lib/orchestration/registry/store.ts
+@@ -13,6 +13,7 @@ import { USER_AVATAR } from '@/lib/types/roundtable';
+ import type { Participant, ParticipantRole } from '@/lib/types/roundtable';
+ import { useUserProfileStore } from '@/lib/store/user-profile';
+ import type { AgentInfo } from '@openmaic/generation';
++import { normalizeMiraSampleTeacherAvatar } from '@/lib/mira/sample-teacher-identity';
+ 
+ interface AgentRegistryState {
+   agents: Record<string, AgentConfig>; // Map of agentId -> config
+@@ -337,6 +338,23 @@ export function agentsToParticipants(
+   return participants;
+ }
+ 
++/**
++ * Resolve the teacher that belongs to the currently loaded classroom roster.
++ * Generated agents are cleared on every classroom load, so a generated teacher
++ * here is stage-bound. Operator/preset screens can opt out and retain the
++ * built-in default teacher.
++ */
++export function selectLoadedClassroomTeacher(
++  agents: readonly AgentConfig[],
++  preferGenerated = true,
++): AgentConfig | undefined {
++  if (preferGenerated) {
++    const generatedTeacher = agents.find((agent) => agent.isGenerated && agent.role === 'teacher');
++    if (generatedTeacher) return generatedTeacher;
++  }
++  return agents.find((agent) => !agent.isGenerated && agent.role === 'teacher');
++}
++
+ /**
+  * Replace the registry's generated agents with the given stage roster.
+  *
+@@ -364,7 +382,8 @@ export function applyGeneratedAgentsToRegistry(
+   const now = Date.now();
+   const ids: string[] = [];
+   for (const agent of agents) {
+-    const { voiceConfig, ...rest } = agent;
++    const normalizedAgent = normalizeMiraSampleTeacherAvatar(agent);
++    const { voiceConfig, ...rest } = normalizedAgent;
+     registry.addAgent({
+       ...rest,
+       allowedActions: getActionsForRole(agent.role),
+diff --git a/lib/server/mira-sample-deterministic-classroom.ts b/lib/server/mira-sample-deterministic-classroom.ts
+index 1a31120..c71e6fb 100644
+--- a/lib/server/mira-sample-deterministic-classroom.ts
++++ b/lib/server/mira-sample-deterministic-classroom.ts
+@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid';
+ import { buildCompleteScene, type GeneratedSceneContent } from '@openmaic/generation';
+ import type { PPTElement, QuizQuestion, WidgetConfigBase } from '@openmaic/dsl';
+ import { AGENT_COLOR_PALETTE, AGENT_DEFAULT_AVATARS } from '@/lib/constants/agent-defaults';
++import { normalizeMiraSampleTeacherAvatar } from '@/lib/mira/sample-teacher-identity';
+ import { buildVideoManifestFromOutlines } from '@/lib/media/video-manifest';
+ import {
+   CLASSROOMS_DIR,
+@@ -650,7 +651,7 @@ export function buildMiraSampleDeterministicDraft(
+     updatedAt: Date.now(),
+     generatedAgentConfigs: plan.agents.map((agent, index) => {
+       const voiceConfig = getMiraTeacherVoiceConfig(agent.role, ttsPolicy);
+-      return {
++      return normalizeMiraSampleTeacherAvatar({
+         id: agent.id,
+         name: getMiraTeacherName(agent.role, agent.name, ttsPolicy),
+         role: agent.role,
+@@ -659,7 +660,7 @@ export function buildMiraSampleDeterministicDraft(
+         color: AGENT_COLOR_PALETTE[index % AGENT_COLOR_PALETTE.length],
+         priority: agent.role === 'teacher' ? 10 : 5,
+         ...(voiceConfig ? { voiceConfig } : {}),
+-      };
++      });
+     }),
+   };
+   const scenes = plan.outlines.map((outline) => {
+@@ -678,11 +679,7 @@ export function buildMiraSampleDeterministicDraft(
+   return { stage, scenes };
+ }
+ 
+-async function audioManifest(
+-  stageId: string,
+-  storageDirectory: string,
+-  scenes: readonly Scene[],
+-) {
++async function audioManifest(stageId: string, storageDirectory: string, scenes: readonly Scene[]) {
+   const manifest: Array<{
+     actionId: string;
+     relativePath: string;
+@@ -751,8 +748,7 @@ export async function generateMiraSampleDeterministicClassroom(
+     throw new Error('mira_sample_deterministic_staging_requires_classroom_id');
+   }
+   const { stage, scenes } = buildMiraSampleDeterministicDraft(plan, options.classroomId);
+-  const storageDirectory =
+-    options.storageDirectory || path.join(CLASSROOMS_DIR, stage.id);
++  const storageDirectory = options.storageDirectory || path.join(CLASSROOMS_DIR, stage.id);
+   await options.onProgress?.({
+     step: 'generating_scenes',
+     progress: 88,
+diff --git a/lib/server/mira-sample-structural-policy.ts b/lib/server/mira-sample-structural-policy.ts
+index 27f49cf..1c19a33 100644
+--- a/lib/server/mira-sample-structural-policy.ts
++++ b/lib/server/mira-sample-structural-policy.ts
+@@ -1,6 +1,10 @@
+ import type { AgentInfo, GeneratedSceneContent, SceneOutline } from '@openmaic/generation';
+ import type { Action } from '@/lib/types/action';
+ import type { Scene, Stage } from '@/lib/types/stage';
++import {
++  MIRA_SAMPLE_TEACHER_AVATAR,
++  MIRA_SAMPLE_TEACHER_ID,
++} from '@/lib/mira/sample-teacher-identity';
+ 
+ /**
+  * Exact, server-owned routing marker appended by Mira's backend requirement compiler.
+@@ -16,7 +20,6 @@ export const MIRA_SAMPLE_COURSE_TITLE = '20以内数感探索课' as const;
+ export const MIRA_SAMPLE_LANGUAGE_DIRECTIVE =
+   '全程使用简体中文。面向小学一年级学生，使用短句、口语化指令，一次只要求一个动作；只讲20以内数量、组成、顺序和大小比较。' as const;
+ 
+-const TEACHER_ID = 'mira-sample-teacher';
+ const PEER_DUODUO_ID = 'mira-sample-peer-duoduo';
+ const PEER_LELE_ID = 'mira-sample-peer-lele';
+ const PEER_CHENCHEN_ID = 'mira-sample-peer-chenchen';
+@@ -24,7 +27,7 @@ const PEER_ANAN_ID = 'mira-sample-peer-anan';
+ 
+ const SAMPLE_AGENTS: readonly AgentInfo[] = [
+   {
+-    id: TEACHER_ID,
++    id: MIRA_SAMPLE_TEACHER_ID,
+     name: '米拉数学老师',
+     role: 'teacher',
+     persona: '耐心、清楚地引导一年级学生观察数量。每次只提出一个问题，不提前说出独立检测答案。',
+@@ -420,6 +423,11 @@ export function assertMiraSampleClassroomStructure(stage: Stage, scenes: readonl
+     configs.filter((agent) => agent.role === 'teacher').length === 1,
+     'teacher_count',
+   );
++  const teacher = configs.find((agent) => agent.id === MIRA_SAMPLE_TEACHER_ID);
++  assertCondition(
++    teacher?.role === 'teacher' && teacher.avatar === MIRA_SAMPLE_TEACHER_AVATAR,
++    'teacher_avatar',
++  );
+   assertCondition(configs.filter((agent) => agent.role === 'student').length === 4, 'peer_count');
+ 
+   let slideCount = 0;
+diff --git a/tests/lib/chat/use-chat-sessions.test.ts b/tests/lib/chat/use-chat-sessions.test.ts
+index 768512c..d82f298 100644
+--- a/tests/lib/chat/use-chat-sessions.test.ts
++++ b/tests/lib/chat/use-chat-sessions.test.ts
+@@ -3,6 +3,7 @@ import type { ChatSession } from '@/lib/types/chat';
+ import {
+   consumePiSessionBoundaryContext,
+   consumePiWhiteboardEvent,
++  createLectureAgentIdentityRegistry,
+   createPreviousLiveSessionContext,
+   createPiSessionBoundaryContext,
+   getPiSessionBoundaryContext,
+@@ -13,6 +14,7 @@ import {
+   resumeSoftClosingSessionForFollowUp,
+   resumeSoftClosingSessionWithoutMessage,
+   runPiSingleRequest,
++  selectLectureTeacherForMode,
+   shouldAwaitPresentationAction,
+   withPiInclassWhiteboardTools,
+   withPiWebSearchSettings,
+@@ -24,6 +26,7 @@ import { useStageStore } from '@/lib/store/stage';
+ import type { ChatRequestTemplate } from '@/components/chat/use-chat-sessions';
+ import type { UIMessage } from 'ai';
+ import type { ChatMessageMetadata } from '@/lib/types/chat';
++import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ 
+ function makeSession(overrides: Partial<ChatSession> = {}): ChatSession {
+   return {
+@@ -41,6 +44,51 @@ function makeSession(overrides: Partial<ChatSession> = {}): ChatSession {
+   };
+ }
+ 
++function makeAgent(
++  id: string,
++  { isGenerated = false }: { isGenerated?: boolean } = {},
++): AgentConfig {
++  return {
++    id,
++    name: id,
++    role: 'teacher',
++    persona: 'Teach',
++    avatar: '/avatars/teacher.png',
++    color: '#000000',
++    allowedActions: [],
++    priority: 1,
++    createdAt: new Date(0),
++    updatedAt: new Date(0),
++    isDefault: !isGenerated,
++    isGenerated,
++  };
++}
++
++describe('lecture agent identity wiring', () => {
++  it('uses the generated classroom teacher only in auto mode', () => {
++    const defaultTeacher = makeAgent('default-1');
++    const generatedTeacher = makeAgent('mira-sample-teacher', { isGenerated: true });
++    const loadedAgents = [defaultTeacher, generatedTeacher];
++
++    expect(selectLectureTeacherForMode(loadedAgents, 'auto')?.id).toBe('mira-sample-teacher');
++    expect(selectLectureTeacherForMode(loadedAgents, 'preset')?.id).toBe('default-1');
++  });
++
++  it('keeps the exact lecture action agent id session-scoped until the session ends', () => {
++    const identities = createLectureAgentIdentityRegistry();
++
++    identities.remember('lecture-auto', 'mira-sample-teacher');
++    identities.remember('lecture-preset', 'default-1');
++
++    expect(identities.resolve('lecture-auto')).toBe('mira-sample-teacher');
++    expect(identities.resolve('lecture-preset')).toBe('default-1');
++
++    identities.clear('lecture-auto');
++    expect(identities.resolve('lecture-auto')).toBe('default-1');
++    expect(identities.resolve('lecture-preset')).toBe('default-1');
++  });
++});
++
+ describe('normalizeStoredSessionsForRestore', () => {
+   it('does not restore transient active or soft-closing statuses', () => {
+     const restored = normalizeStoredSessionsForRestore([
+diff --git a/tests/lib/orchestration/apply-generated-agents.test.ts b/tests/lib/orchestration/apply-generated-agents.test.ts
+index 7bba949..44452f7 100644
+--- a/tests/lib/orchestration/apply-generated-agents.test.ts
++++ b/tests/lib/orchestration/apply-generated-agents.test.ts
+@@ -41,13 +41,12 @@ vi.mock('@/lib/audio/agent-voice', () => ({
+   warmUpAgentVoices: vi.fn(),
+ }));
+ 
+-import {
+-  applyGeneratedAgentsToRegistry,
+-  useAgentRegistry,
+-} from '@/lib/orchestration/registry/store';
++import * as agentRegistry from '@/lib/orchestration/registry/store';
+ import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ import type { GeneratedAgentConfig } from '@/lib/types/stage';
+ 
++const { applyGeneratedAgentsToRegistry, useAgentRegistry } = agentRegistry;
++
+ function makeConfig(id: string, extra: Partial<GeneratedAgentConfig> = {}): GeneratedAgentConfig {
+   return {
+     id,
+@@ -74,6 +73,78 @@ beforeEach(() => {
+ });
+ 
+ describe('applyGeneratedAgentsToRegistry', () => {
++  it('normalizes the sample avatar without mutating the generated input object', () => {
++    const input = makeConfig('mira-sample-teacher', {
++      name: '小数老师',
++      avatar: '/avatars/teacher.png',
++      voiceConfig: {
++        providerId: 'qwen-tts',
++        modelId: 'qwen3-tts-flash',
++        voiceId: 'Serena',
++      } as GeneratedAgentConfig['voiceConfig'],
++    });
++    const original = {
++      ...input,
++      voiceConfig: input.voiceConfig && { ...input.voiceConfig },
++    };
++
++    applyGeneratedAgentsToRegistry('stage-1', [input]);
++
++    expect(input).toEqual(original);
++    expect(input.avatar).toBe('/avatars/teacher.png');
++    expect(useAgentRegistry.getState().getAgent(input.id)?.avatar).toBe('/avatars/teacher-2.png');
++  });
++
++  it('repairs the immutable sample teacher avatar without changing other generated teachers', () => {
++    applyGeneratedAgentsToRegistry('stage-1', [
++      makeConfig('mira-sample-teacher', {
++        name: '小数老师',
++        avatar: '/avatars/teacher.png',
++        voiceConfig: {
++          providerId: 'qwen-tts',
++          modelId: 'qwen3-tts-flash',
++          voiceId: 'Serena',
++        } as GeneratedAgentConfig['voiceConfig'],
++      }),
++      makeConfig('another-generated-teacher', { avatar: '/avatars/custom-teacher.png' }),
++    ]);
++
++    expect(useAgentRegistry.getState().getAgent('mira-sample-teacher')).toMatchObject({
++      avatar: '/avatars/teacher-2.png',
++      voiceConfig: {
++        providerId: 'qwen-tts',
++        modelId: 'qwen3-tts-flash',
++        voiceId: 'Serena',
++      },
++    });
++    expect(useAgentRegistry.getState().getAgent('another-generated-teacher')?.avatar).toBe(
++      '/avatars/custom-teacher.png',
++    );
++  });
++
++  it('selects the loaded generated classroom teacher before the unrelated default teacher', () => {
++    const selectLoadedClassroomTeacher = (
++      agentRegistry as typeof agentRegistry & {
++        selectLoadedClassroomTeacher?: (agents: AgentConfig[]) => AgentConfig | undefined;
++      }
++    ).selectLoadedClassroomTeacher;
++    applyGeneratedAgentsToRegistry('stage-1', [
++      makeConfig('mira-sample-teacher', {
++        name: '小数老师',
++        avatar: '/avatars/teacher-2.png',
++      }),
++    ]);
++    const loadedAgents = useAgentRegistry.getState().listAgents();
++
++    expect(selectLoadedClassroomTeacher).toBeTypeOf('function');
++    expect(selectLoadedClassroomTeacher?.(loadedAgents)?.id).toBe('mira-sample-teacher');
++
++    applyGeneratedAgentsToRegistry('stage-2', []);
++    expect(selectLoadedClassroomTeacher?.(useAgentRegistry.getState().listAgents())?.id).toBe(
++      'default-1',
++    );
++  });
++
+   it('adds the roster as stage-bound generated agents and returns the ids', () => {
+     const voiceDesign = { identity: 'warm', texture: 'low', delivery: 'calm' };
+     const ids = applyGeneratedAgentsToRegistry('stage-1', [
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+index f89dd09..3505963 100644
+--- a/tests/runtime/mira-student-runtime.test.ts
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -24,13 +24,17 @@ describe('Mira student runtime marker', () => {
+   it('publishes the exact student chrome health attestation', () => {
+     expect(getMiraStudentChromeRuntimePolicy()).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v1',
++      policyVersion: 'mira-student-chrome.v2',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
+       operatorChromePreserved: true,
+       headerControlsHidden: true,
+       exportsHidden: true,
++      teacherIdentity: {
++        agentId: 'mira-sample-teacher',
++        avatar: '/avatars/teacher-2.png',
++      },
+     });
+   });
+ 
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 703c0ec..258cc5a 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -105,13 +105,17 @@ describe('GET /api/health structured scene runtime policy', () => {
+     });
+     expect(body.runtimePolicy.studentChrome).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v1',
++      policyVersion: 'mira-student-chrome.v2',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
+       operatorChromePreserved: true,
+       headerControlsHidden: true,
+       exportsHidden: true,
++      teacherIdentity: {
++        agentId: 'mira-sample-teacher',
++        avatar: '/avatars/teacher-2.png',
++      },
+     });
+     const serialized = JSON.stringify(body);
+     expect(serialized).not.toContain('fake-secret-must-not-leak');
+diff --git a/tests/server/mira-sample-deterministic-classroom.test.ts b/tests/server/mira-sample-deterministic-classroom.test.ts
+index 5c96aaf..a81d0c5 100644
+--- a/tests/server/mira-sample-deterministic-classroom.test.ts
++++ b/tests/server/mira-sample-deterministic-classroom.test.ts
+@@ -179,6 +179,19 @@ describe('Mira sample deterministic classroom', () => {
+       'student',
+       'student',
+     ]);
++    expect(
++      result.stage.generatedAgentConfigs?.find((agent) => agent.id === 'mira-sample-teacher'),
++    ).toMatchObject({
++      id: 'mira-sample-teacher',
++      name: '小数老师',
++      role: 'teacher',
++      avatar: '/avatars/teacher-2.png',
++      voiceConfig: {
++        providerId: 'qwen-tts',
++        modelId: 'qwen3-tts-flash',
++        voiceId: 'Serena',
++      },
++    });
+     const peerIds = new Set(
+       result.scenes.flatMap((scene) =>
+         (scene.actions || [])
+diff --git a/tests/server/mira-sample-structural-policy.test.ts b/tests/server/mira-sample-structural-policy.test.ts
+index f7c3b51..0b12991 100644
+--- a/tests/server/mira-sample-structural-policy.test.ts
++++ b/tests/server/mira-sample-structural-policy.test.ts
+@@ -120,7 +120,7 @@ function completeClassroom(): { stage: Stage; scenes: Scene[] } {
+       name: agent.name,
+       role: agent.role,
+       persona: agent.persona || '',
+-      avatar: `/avatar-${index}.png`,
++      avatar: agent.role === 'teacher' ? '/avatars/teacher-2.png' : `/avatar-${index}.png`,
+       color: '#123456',
+       priority: agent.role === 'teacher' ? 10 : 5,
+     })),
+@@ -134,6 +134,17 @@ function completeClassroom(): { stage: Stage; scenes: Scene[] } {
+ }
+ 
+ describe('Mira sample structural policy', () => {
++  it('rejects a sample teacher whose visual identity does not match the fixed teacher contract', () => {
++    const { stage, scenes } = completeClassroom();
++    const teacher = stage.generatedAgentConfigs?.find((agent) => agent.role === 'teacher');
++    if (!teacher) throw new Error('sample teacher missing');
++    teacher.avatar = '/avatars/teacher.png';
++
++    expect(() => assertMiraSampleClassroomStructure(stage, scenes)).toThrow(
++      'mira_sample_structural_policy_failed:teacher_avatar',
++    );
++  });
++
+   it('matches only an exact, case-sensitive full line', () => {
+     expect(isMiraSampleStructuralRequirement(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER)).toBe(true);
+     expect(
+-- 
+2.50.1 (Apple Git-155)
+

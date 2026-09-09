@@ -1,0 +1,194 @@
+From 37c72ab83585c0260851a6b1c31708e586d8aedd Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:35 +0800
+Subject: [PATCH 32/37] 0032-mira-student-authoritative-audio-refresh
+
+---
+ components/classroom/ClassroomSurface.tsx | 14 +++++-
+ lib/classroom/load-classroom.ts           | 24 +++++++--
+ tests/classroom/load-classroom.test.ts    | 59 +++++++++++++++++++++++
+ 3 files changed, 91 insertions(+), 6 deletions(-)
+
+diff --git a/components/classroom/ClassroomSurface.tsx b/components/classroom/ClassroomSurface.tsx
+index 649a7a2..944026d 100644
+--- a/components/classroom/ClassroomSurface.tsx
++++ b/components/classroom/ClassroomSurface.tsx
+@@ -51,6 +51,7 @@ import {
+   paneAvailabilityRetryDelay,
+   shouldResumeClassroomGeneration,
+ } from '@/lib/classroom/progressive-load-policy';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
+ const log = createLogger('Classroom');
+ 
+@@ -67,6 +68,7 @@ export function ClassroomSurface({
+   readonly variant?: 'page' | 'pane';
+ }) {
+   const { loadFromStorage } = useStageStore();
++  const studentMode = useMiraStudentRuntime();
+   const loadedClassroomId = useStageStore((s) => s.stage?.id ?? null);
+   const { t } = useI18n();
+   // The retry loop below reads the message after async gaps, so it must see
+@@ -108,6 +110,7 @@ export function ClassroomSurface({
+           classroomId,
+           loadToken,
+           isCurrent,
++          requireServerClassroom: studentMode,
+           loadFromStorage,
+           getCurrentStage: () => useStageStore.getState().stage,
+           fetchClassroom: defaultClassroomLoadDeps.fetchClassroom,
+@@ -115,7 +118,14 @@ export function ClassroomSurface({
+             defaultClassroomLoadDeps.applyFallbackScenes({
+               ...args,
+               isCurrent,
+-              applyStageAndScenes: applyClassroomStageAndScenes,
++              applyStageAndScenes: (stage, scenes, options) =>
++                applyClassroomStageAndScenes(stage, scenes, {
++                  ...options,
++                  // Student documents contain session-bound gateway audio
++                  // URLs. Keep those grants in memory and refresh them from
++                  // server authority on every launch.
++                  persist: !studentMode,
++                }),
+             }),
+           loadRestoredMediaTasks: defaultClassroomLoadDeps.loadRestoredMediaTasks,
+           applyRestoredMediaTasks: defaultClassroomLoadDeps.applyRestoredMediaTasks,
+@@ -154,7 +164,7 @@ export function ClassroomSurface({
+         return isCurrent() ? 'failed' : 'cancelled';
+       }
+     },
+-    [classroomId, loadFromStorage, variant],
++    [classroomId, loadFromStorage, studentMode, variant],
+   );
+ 
+   useEffect(() => {
+diff --git a/lib/classroom/load-classroom.ts b/lib/classroom/load-classroom.ts
+index 72eabe1..9a4b149 100644
+--- a/lib/classroom/load-classroom.ts
++++ b/lib/classroom/load-classroom.ts
+@@ -52,6 +52,12 @@ export interface RunClassroomLoadArgs<TMediaTasks = unknown> {
+   classroomId: string;
+   loadToken: StageSceneLoadToken;
+   isCurrent: () => boolean;
++  /**
++   * Student launches are session-bound gateway documents. Their audio URLs and
++   * other runtime grants must be refreshed from the server on every launch and
++   * must never be shadowed by an older IndexedDB copy.
++   */
++  requireServerClassroom?: boolean;
+   loadFromStorage: (classroomId: string, loadToken: StageSceneLoadToken) => Promise<void>;
+   getCurrentStage: () => Stage | null;
+   fetchClassroom: (
+@@ -107,6 +113,7 @@ export async function runClassroomLoad<TMediaTasks = unknown>({
+   classroomId,
+   loadToken,
+   isCurrent,
++  requireServerClassroom = false,
+   loadFromStorage,
+   getCurrentStage,
+   fetchClassroom,
+@@ -125,11 +132,18 @@ export async function runClassroomLoad<TMediaTasks = unknown>({
+   log,
+ }: RunClassroomLoadArgs<TMediaTasks>): Promise<void> {
+   try {
+-    await loadFromStorage(classroomId, loadToken);
+-    if (!isCurrent()) return;
++    if (!requireServerClassroom) {
++      await loadFromStorage(classroomId, loadToken);
++      if (!isCurrent()) return;
++    }
+ 
+-    if (!getCurrentStage()) {
+-      log.info('No IndexedDB data, trying server-side storage for:', classroomId);
++    if (requireServerClassroom || !getCurrentStage()) {
++      log.info(
++        requireServerClassroom
++          ? 'Loading session-bound classroom from server authority:'
++          : 'No IndexedDB data, trying server-side storage for:',
++        classroomId,
++      );
+       // The fetch path converts and commits under the per-stage document lock.
+       // Once it returns, the document owns every allocation; a later
+       // navigation may discard only this in-memory apply, never the durable
+@@ -149,6 +163,8 @@ export async function runClassroomLoad<TMediaTasks = unknown>({
+           return;
+         }
+         log.info('Loaded from server-side storage:', classroomId);
++      } else if (requireServerClassroom) {
++        throw new Error('Session-bound classroom is unavailable from the server');
+       }
+     }
+ 
+diff --git a/tests/classroom/load-classroom.test.ts b/tests/classroom/load-classroom.test.ts
+index 828aa9d..eca66ed 100644
+--- a/tests/classroom/load-classroom.test.ts
++++ b/tests/classroom/load-classroom.test.ts
+@@ -163,6 +163,65 @@ beforeEach(() => {
+ });
+ 
+ describe('runClassroomLoad', () => {
++  it('uses the server as authority for a student launch instead of an older IndexedDB classroom', async () => {
++    const cachedStage = makeStage('stage-a');
++    const serverStage = makeStage('stage-a', [makeAgentConfig('teacher')]);
++    const serverScene = {
++      ...makeScene('scene-server', 'stage-a'),
++      actions: [
++        {
++          id: 'speech-1',
++          type: 'speech',
++          text: 'Server narration',
++          audioId: 'formal-audio-1',
++          audioUrl: '/mira/runtime-audio/formal-audio-1',
++        },
++      ],
++    } as Scene;
++    const { deps, setStage } = makeDeps({
++      requireServerClassroom: true,
++      fetchClassroom: vi.fn().mockResolvedValue({ stage: serverStage, scenes: [serverScene] }),
++      applyGeneratedAgents: vi.fn().mockReturnValue(['teacher']),
++    });
++    setStage(cachedStage);
++    deps.applyFallbackScenes = vi.fn().mockImplementation(async ({ stage }) => {
++      setStage(stage);
++      return true;
++    });
++
++    await runClassroomLoad(deps);
++
++    expect(deps.loadFromStorage).not.toHaveBeenCalled();
++    expect(deps.fetchClassroom).toHaveBeenCalledExactlyOnceWith('stage-a', deps.isCurrent);
++    expect(deps.applyFallbackScenes).toHaveBeenCalledWith({
++      loadToken: 1,
++      stage: serverStage,
++      scenes: [serverScene],
++    });
++    expect(deps.applyGeneratedAgents).toHaveBeenCalledWith(
++      'stage-a',
++      serverStage.generatedAgentConfigs,
++    );
++  });
++
++  it('fails closed when a required student classroom cannot be refreshed from the server', async () => {
++    const { deps, setStage } = makeDeps({
++      requireServerClassroom: true,
++      fetchClassroom: vi.fn().mockResolvedValue(null),
++    });
++    setStage(makeStage('stage-a'));
++
++    await runClassroomLoad(deps);
++
++    expect(deps.loadFromStorage).not.toHaveBeenCalled();
++    expect(deps.applyFallbackScenes).not.toHaveBeenCalled();
++    expect(deps.loadRestoredMediaTasks).not.toHaveBeenCalled();
++    expect(deps.setError).toHaveBeenCalledWith(
++      'Session-bound classroom is unavailable from the server',
++    );
++    expect(deps.setLoading).toHaveBeenCalledWith(false);
++  });
++
+   it('keeps the current load token valid when fallback scenes are committed', () => {
+     useStageStore.getState().clearStore();
+     const loadToken = claimStageSceneLoadToken();
+-- 
+2.50.1 (Apple Git-155)
+

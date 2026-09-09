@@ -1,0 +1,292 @@
+From 1a5ed9becdc5fbb0d2f2e8eb339ef9882885390d Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:35 +0800
+Subject: [PATCH 35/37] 0035-mira-student-playback-stability
+
+---
+ components/classroom/ClassroomSurface.tsx     | 21 +++++++++++++++++--
+ components/edit/PlaybackChromeRoot.tsx        | 16 ++++++--------
+ lib/classroom/load-classroom.ts               |  2 ++
+ lib/contexts/mira-student-runtime-context.tsx | 13 +++++++++++-
+ lib/store/stage.ts                            | 15 +++++++++++++
+ tests/classroom/load-classroom.test.ts        | 18 ++++++++++++++++
+ 6 files changed, 72 insertions(+), 13 deletions(-)
+
+diff --git a/components/classroom/ClassroomSurface.tsx b/components/classroom/ClassroomSurface.tsx
+index 944026d..c50d582 100644
+--- a/components/classroom/ClassroomSurface.tsx
++++ b/components/classroom/ClassroomSurface.tsx
+@@ -52,6 +52,10 @@ import {
+   shouldResumeClassroomGeneration,
+ } from '@/lib/classroom/progressive-load-policy';
+ import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
++import {
++  applyHydratedClassroomFallbackScenes,
++  hydrateClassroomFallbackChats,
++} from '@/lib/classroom/pbl-fallback-hydration';
+ 
+ const log = createLogger('Classroom');
+ 
+@@ -115,9 +119,18 @@ export function ClassroomSurface({
+           getCurrentStage: () => useStageStore.getState().stage,
+           fetchClassroom: defaultClassroomLoadDeps.fetchClassroom,
+           applyFallbackScenes: (args) =>
+-            defaultClassroomLoadDeps.applyFallbackScenes({
++            applyHydratedClassroomFallbackScenes({
+               ...args,
+               isCurrent,
++              // Student playback owns no editor chat history. Skipping legacy
++              // chat hydration also avoids the Web Locks-only migration path
++              // on plain-HTTP LAN development origins.
++              hydrateChats: studentMode
++                ? async () => ({
++                    chats: [],
++                    chatSnapshot: { sessions: [], restoreMarker: null },
++                  })
++                : hydrateClassroomFallbackChats,
+               applyStageAndScenes: (stage, scenes, options) =>
+                 applyClassroomStageAndScenes(stage, scenes, {
+                   ...options,
+@@ -125,6 +138,7 @@ export function ClassroomSurface({
+                   // URLs. Keep those grants in memory and refresh them from
+                   // server authority on every launch.
+                   persist: !studentMode,
++                  memoryOnly: studentMode,
+                 }),
+             }),
+           loadRestoredMediaTasks: defaultClassroomLoadDeps.loadRestoredMediaTasks,
+@@ -231,6 +245,9 @@ export function ClassroomSurface({
+   // server-owned, not client-authored, and therefore not this browser's to
+   // regenerate.
+   useEffect(() => {
++    // Students receive one released, server-authoritative classroom. Never
++    // run the editor's generation or media-recovery loop on that route.
++    if (studentMode) return;
+     if (
+       !shouldResumeClassroomGeneration({
+         loading,
+@@ -323,7 +340,7 @@ export function ClassroomSurface({
+         log.warn('[Classroom] Media generation resume error:', err);
+       });
+     }
+-  }, [loading, error, generateRemaining]);
++  }, [studentMode, loading, error, generateRemaining]);
+ 
+   return (
+     <ThemeProvider>
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 9532b92..021f0d8 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -191,7 +191,6 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+ 
+     // PlaybackEngine state
+     const [engineMode, setEngineMode] = useState<EngineMode>('idle');
+-    const [studentLectureStarted, setStudentLectureStarted] = useState(false);
+     const [playbackCompleted, setPlaybackCompleted] = useState(false); // Distinguishes "never played" idle from "finished" idle
+     const [lectureSpeech, setLectureSpeech] = useState<string | null>(null); // From PlaybackEngine (lecture)
+     const [currentPlaybackActionIndex, setCurrentPlaybackActionIndex] = useState<number | null>(0);
+@@ -805,12 +804,9 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+               const failedEngine = engineRef.current;
+               if (failedEngine && failedActionIndex !== undefined && failedActionIndex >= 0) {
+                 failedEngine.pause();
+-                void failedEngine
+-                  .jumpToAction(failedActionIndex, { autoplay: false })
+-                  .finally(() => setStudentLectureStarted(false));
++                void failedEngine.jumpToAction(failedActionIndex, { autoplay: false });
+               } else {
+                 failedEngine?.pause();
+-                setStudentLectureStarted(false);
+               }
+             }
+             const title = studentMode
+@@ -818,8 +814,8 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+               : 'Narration audio could not be played';
+             const description = studentMode
+               ? reason === 'asset_unavailable'
+-                ? '课程音频未能加载，本段将继续显示讲解文字。'
+-                : '请检查浏览器声音权限，本段将继续显示讲解文字。'
++                ? '课程音频未能加载，请点击播放按钮重试本段。'
++                : '请检查浏览器声音权限，然后点击播放按钮重试本段。'
+               : reason === 'asset_unavailable'
+                 ? 'The narration asset did not load. Lecture text will continue.'
+                 : 'Check browser audio permissions. Lecture text will continue.';
+@@ -1231,7 +1227,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     const isPendingScene = currentSceneId === PENDING_SCENE_ID;
+     const showStudentStartGate = shouldShowMiraStudentStartGate({
+       studentMode,
+-      lectureStarted: studentLectureStarted,
++      lectureStarted: studentAutoPlayRuntime?.audioStartAccepted ?? false,
+       hasScene: Boolean(currentScene && !isPendingScene),
+     });
+     const handleStudentStartLesson = useCallback(() => {
+@@ -1240,10 +1236,10 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+       // browser user activation. Student mute/volume are local session state,
+       // so stale operator preferences never leak into the classroom.
+       audioPlayerRef.current.prepareStudentPlayback();
+-      setStudentLectureStarted(true);
++      studentAutoPlayRuntime?.acceptAudioStart();
+       setAutoPlayLecture(true);
+       handlePlayPause();
+-    }, [handlePlayPause, setAutoPlayLecture]);
++    }, [handlePlayPause, setAutoPlayLecture, studentAutoPlayRuntime]);
+     const hasNextPending = generatingOutlines.length > 0;
+     // True when every outline has materialized into a scene and nothing is
+     // currently generating — signals the classroom has finished and the user
+diff --git a/lib/classroom/load-classroom.ts b/lib/classroom/load-classroom.ts
+index 9a4b149..b092da5 100644
+--- a/lib/classroom/load-classroom.ts
++++ b/lib/classroom/load-classroom.ts
+@@ -282,6 +282,7 @@ export function applyClassroomStageAndScenes(
+   scenes: readonly Scene[],
+   options: {
+     persist?: boolean;
++    memoryOnly?: boolean;
+     chats?: ChatSession[];
+     chatSnapshot?: ChatStorageSnapshot;
+   } = {},
+@@ -314,6 +315,7 @@ export function applyClassroomStageAndScenes(
+     readOnly: !access.isOwner,
+     generationEpoch: state.generationEpoch + 1,
+     mode: 'playback',
++    persistenceMode: options.memoryOnly ? 'memory-only' : 'read-write',
+   }));
+   if (options.persist !== false) {
+     void useStageStore.getState().saveToStorage();
+diff --git a/lib/contexts/mira-student-runtime-context.tsx b/lib/contexts/mira-student-runtime-context.tsx
+index bbbd78c..c1ae583 100644
+--- a/lib/contexts/mira-student-runtime-context.tsx
++++ b/lib/contexts/mira-student-runtime-context.tsx
+@@ -28,6 +28,13 @@ export interface MiraStudentAutoPlayRuntime {
+   readonly autoPlayLecture: boolean;
+   readonly autoPlayLectureRef: MutableRefObject<boolean>;
+   readonly setAutoPlayLecture: (enabled: boolean) => void;
++  /**
++   * True after the one browser-gesture audio gate has been accepted for this
++   * mounted classroom document.  It intentionally lives above the playback
++   * chrome so an engine/UI remount cannot ask the child to start again.
++   */
++  readonly audioStartAccepted: boolean;
++  readonly acceptAudioStart: () => void;
+ }
+ 
+ const MiraStudentAutoPlayRuntimeContext = createContext<MiraStudentAutoPlayRuntime | null>(null);
+@@ -41,10 +48,12 @@ function MiraStudentAutoPlaySession({
+ }) {
+   const [autoPlayLecture, setAutoPlayLectureState] = useState(MIRA_STUDENT_AUTO_PLAY_DEFAULT);
+   const autoPlayLectureRef = useRef(MIRA_STUDENT_AUTO_PLAY_DEFAULT);
++  const [audioStartAccepted, setAudioStartAccepted] = useState(false);
+   const setAutoPlayLecture = useCallback((enabled: boolean) => {
+     autoPlayLectureRef.current = enabled;
+     setAutoPlayLectureState(enabled);
+   }, []);
++  const acceptAudioStart = useCallback(() => setAudioStartAccepted(true), []);
+   const autoPlayRuntime = useMemo<MiraStudentAutoPlayRuntime | null>(
+     () =>
+       studentMode
+@@ -52,9 +61,11 @@ function MiraStudentAutoPlaySession({
+             autoPlayLecture,
+             autoPlayLectureRef,
+             setAutoPlayLecture,
++            audioStartAccepted,
++            acceptAudioStart,
+           }
+         : null,
+-    [autoPlayLecture, setAutoPlayLecture, studentMode],
++    [acceptAudioStart, audioStartAccepted, autoPlayLecture, setAutoPlayLecture, studentMode],
+   );
+ 
+   return (
+diff --git a/lib/store/stage.ts b/lib/store/stage.ts
+index 5ed9891..b8fcc0f 100644
+--- a/lib/store/stage.ts
++++ b/lib/store/stage.ts
+@@ -102,6 +102,12 @@ function schedulePendingSave(): void {
+ 
+ function markPendingChanges(stageId: string | undefined, ...changes: PendingChange[]): void {
+   if (!stageId || isStageDeleted(stageId)) return;
++  // Mira student classrooms are session-bound, server-authoritative playback
++  // documents.  Persisting their cursor/chat mutations into the editor store
++  // both leaks an expired gateway grant and requires Web Locks that are not
++  // available on a plain-HTTP LAN origin.  Their durable progress is emitted
++  // through the authenticated Runtime event stream instead.
++  if (useStageStore.getState().persistenceMode === 'memory-only') return;
+   if (pendingStageId !== stageId) resetPendingChanges(stageId);
+   for (const change of changes) {
+     pendingRevision += 1;
+@@ -221,6 +227,7 @@ function clearedStageState(state: Pick<StageState, 'generationEpoch'>) {
+     currentGeneratingOrder: -1,
+     failedOutlines: [],
+     generatingOutlines: [],
++    persistenceMode: 'read-write' as const,
+   };
+ }
+ 
+@@ -324,6 +331,9 @@ interface StageState {
+    */
+   outlineProducer: DocumentProducer | null;
+ 
++  // Session-bound student classrooms never write editor/browser persistence.
++  persistenceMode: 'read-write' | 'memory-only';
++
+   // Transient generation tracking (not persisted)
+   generationEpoch: number;
+   generationStatus: 'idle' | 'generating' | 'paused' | 'completed' | 'error';
+@@ -480,6 +490,7 @@ const useStageStoreBase = create<StageState>()((set, get) => ({
+   outlineProducer: null,
+   isOwner: true,
+   readOnly: false,
++  persistenceMode: 'read-write',
+   generationEpoch: 0,
+   generationStatus: 'idle' as const,
+   currentGeneratingOrder: -1,
+@@ -824,6 +835,7 @@ const useStageStoreBase = create<StageState>()((set, get) => ({
+   // durability (e.g. setGenerationComplete) can avoid recording state that
+   // outruns the scene data.
+   saveToStorage: async () => {
++    if (get().persistenceMode === 'memory-only') return true;
+     const { stage, scenes, currentSceneId, chats, chatSnapshot, outlines, generationComplete } =
+       get();
+     if (!stage?.id) {
+@@ -905,6 +917,9 @@ const useStageStoreBase = create<StageState>()((set, get) => ({
+ 
+   loadFromStorage: async (stageId: string, loadToken?: StageSceneLoadToken) => {
+     try {
++      // An operator navigation after a student route must restore normal
++      // editor persistence before any load-side repair marks are emitted.
++      set({ persistenceMode: 'read-write' });
+       const token = loadToken ?? claimStageSceneLoadToken();
+       // Deletion handling keys on stage IDENTITY alone, deliberately BEFORE
+       // any scene-count shortcut: a warm ghost of a deleted classroom with
+diff --git a/tests/classroom/load-classroom.test.ts b/tests/classroom/load-classroom.test.ts
+index eca66ed..a48d118 100644
+--- a/tests/classroom/load-classroom.test.ts
++++ b/tests/classroom/load-classroom.test.ts
+@@ -668,6 +668,24 @@ describe('runClassroomLoad', () => {
+     useStageStore.getState().clearStore();
+   });
+ 
++  it('keeps a session-bound student classroom entirely memory-only', async () => {
++    vi.mocked(saveStageDataIncremental).mockClear();
++    applyClassroomStageAndScenes(
++      makeStage('stage-student-memory'),
++      [makeScene('scene-student-a', 'stage-student-memory')],
++      { persist: false, memoryOnly: true },
++    );
++
++    useStageStore.getState().setCurrentSceneId('scene-student-b');
++    useStageStore.getState().setChats([]);
++    await flushStageSave();
++
++    expect(useStageStore.getState().persistenceMode).toBe('memory-only');
++    expect(saveStageDataIncremental).not.toHaveBeenCalled();
++    useStageStore.getState().clearStore();
++    expect(useStageStore.getState().persistenceMode).toBe('read-write');
++  });
++
+   it('commits runtime chats hydrated for a server fallback', () => {
+     const hydratedChat = {
+       id: 'runtime-chat',
+-- 
+2.50.1 (Apple Git-155)
+

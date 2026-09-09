@@ -4,6 +4,8 @@ import json
 
 from core.database import DatabaseRow
 
+from schemas.education import child_education_payload
+
 
 def family_member_payload(row: DatabaseRow) -> dict:
     return {
@@ -117,6 +119,7 @@ def role_capabilities_from_option(row: DatabaseRow | None) -> list[str]:
 def child_profile_payload(row: DatabaseRow | None) -> dict | None:
     if row is None:
         return None
+    education = child_education_payload(row)
     return {
         "id": row["id"],
         "familyId": row["family_id"],
@@ -125,9 +128,7 @@ def child_profile_payload(row: DatabaseRow | None) -> dict | None:
         "gender": row.get("gender") or "unspecified",
         "birthday": row["birthday"] or "",
         "sleepTime": row.get("sleep_time") or "",
-        "ageStage": row["age_stage"] or "",
-        "educationStage": row.get("education_stage") or row["age_stage"] or "",
-        "grade": row.get("grade") or "",
+        **education,
         "schoolName": row.get("school_name") or "",
         "interests": _json_list(row.get("interests")),
         "taskPreferences": _json_dict(row.get("task_preferences")),

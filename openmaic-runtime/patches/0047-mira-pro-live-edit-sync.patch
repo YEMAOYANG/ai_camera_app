@@ -1,0 +1,657 @@
+diff --git a/components/edit/surfaces/slide/slide-edit-session.ts b/components/edit/surfaces/slide/slide-edit-session.ts
+index 83aa1f1..92b5ff4 100644
+--- a/components/edit/surfaces/slide/slide-edit-session.ts
++++ b/components/edit/surfaces/slide/slide-edit-session.ts
+@@ -18,6 +18,7 @@
+  */
+ 
+ import { create } from 'zustand';
++import { isEqual } from 'lodash';
+ import {
+   applyEditorTransaction,
+   createEditorHistory,
+@@ -32,12 +33,18 @@ import { migrateSlideContent } from '@/lib/edit/slide-schema';
+ import type { SlideEditHistory } from '@/lib/edit/slide-ops';
+ import { useStageStore } from '@/lib/store/stage';
+ import type { SlideContent } from '@/lib/types/stage';
++import { adoptExternalSlideHistory, applySlideSnapshotDelta } from './slide-external-sync';
+ 
+ interface SlideEditSessionState {
+   sceneId: string | null;
+   history: EditorHistory | null;
+   /** True while the legacy canvas holds an uncommitted pointer gesture locally. */
+   gestureActive: boolean;
++  /** Last canonical snapshot observed or written by this session, not a DB revision. */
++  canonicalContent: SlideContent | null;
++  /** Remote content waits while the renderer owns an uncommitted text/pointer draft. */
++  pendingExternal: { baseline: EditorHistory; content: SlideContent } | null;
++  syncCanonical: (sceneId: string, content: SlideContent, defer: boolean) => void;
+ 
+   /** Establish a fresh in-memory baseline for a scene. */
+   seed: (sceneId: string, content: SlideContent) => void;
+@@ -77,14 +84,36 @@ export const useSlideEditSession = create<SlideEditSessionState>((set, get) => {
+    * soon as React processes the next batch.
+    */
+   const writeThrough = (next: SlideContent) => {
+-    const { sceneId } = get();
++    const { sceneId, pendingExternal } = get();
+     if (!sceneId) return;
+-    useStageStore.getState().updateScene(sceneId, { content: next });
++    const content = pendingExternal
++      ? applySlideSnapshotDelta(
++          pendingExternal.baseline.present,
++          next,
++          pendingExternal.content,
++          true,
++        )
++      : next;
++    // Mark our own echo before notifying canonical-store subscribers. A local
++    // commit must never look like an external reset of the undo timeline.
++    set({ canonicalContent: content });
++    useStageStore.getState().updateScene(sceneId, { content });
++  };
++
++  const captureLatestCanonical = () => {
++    const { sceneId } = get();
++    const scene = useStageStore.getState().scenes?.find((value) => value.id === sceneId);
++    if (scene?.content.type === 'slide' && sceneId) {
++      // Covers a remote snapshot arriving between the last React effect and a
++      // pointer/text commit. Keep the current draft, merge at write-through.
++      get().syncCanonical(sceneId, scene.content, true);
++    }
+   };
+ 
+   const replace = (history: EditorHistory) => {
+     const { history: prev } = get();
+     if (history === prev) return;
++    captureLatestCanonical();
+     writeThrough(history.present);
+     set({ history });
+   };
+@@ -93,6 +122,37 @@ export const useSlideEditSession = create<SlideEditSessionState>((set, get) => {
+     sceneId: null,
+     history: null,
+     gestureActive: false,
++    canonicalContent: null,
++    pendingExternal: null,
++
++    syncCanonical: (sceneId, incoming, defer) => {
++      const state = get();
++      if (state.sceneId !== sceneId || !state.history) return;
++      const content = migrateSlideContent(incoming);
++      let pending = state.pendingExternal;
++      if (!isEqual(content, state.canonicalContent)) {
++        // A later remote response may include our already-saved draft. Only
++        // its delta from our last canonical write is external authority.
++        const external =
++          pending && state.canonicalContent
++            ? applySlideSnapshotDelta(state.canonicalContent, content, pending.content)
++            : content;
++        pending = { baseline: pending?.baseline ?? state.history, content: external };
++        set({ canonicalContent: content, pendingExternal: pending });
++      }
++      if (!pending || defer || state.gestureActive) return;
++      const history = adoptExternalSlideHistory(state.history, pending.baseline, pending.content);
++      set({
++        history,
++        pendingExternal: null,
++      });
++      // Another remote response can arrive after an auto-saved text draft but
++      // before blur. Keep the focused draft's merge policy consistent in both
++      // stores; only that actual merge conflict needs one canonical write.
++      if (!isEqual(history.present, get().canonicalContent)) {
++        writeThrough(history.present);
++      }
++    },
+ 
+     seed: (sceneId, content) => {
+       // Adopt the live scene content as the in-memory baseline. We do NOT
+@@ -104,6 +164,8 @@ export const useSlideEditSession = create<SlideEditSessionState>((set, get) => {
+         sceneId,
+         history: createEditorHistory(migrateSlideContent(content)),
+         gestureActive: false,
++        canonicalContent: migrateSlideContent(content),
++        pendingExternal: null,
+       });
+     },
+ 
+@@ -153,6 +215,7 @@ export const useSlideEditSession = create<SlideEditSessionState>((set, get) => {
+         // the redo branch pointed at, so replaying those stale entries
+         // would discard this normalization. Leaving them would let a later
+         // redo silently revert to pre-undo content (canvas/store divergence).
++        captureLatestCanonical();
+         writeThrough(next);
+         set({ history: { ...history, present: next, future: [] } });
+         return;
+@@ -180,7 +243,13 @@ export const useSlideEditSession = create<SlideEditSessionState>((set, get) => {
+     },
+ 
+     end: () => {
+-      set({ sceneId: null, history: null, gestureActive: false });
++      set({
++        sceneId: null,
++        history: null,
++        gestureActive: false,
++        canonicalContent: null,
++        pendingExternal: null,
++      });
+     },
+   };
+ });
+diff --git a/components/edit/surfaces/slide/slide-external-sync.ts b/components/edit/surfaces/slide/slide-external-sync.ts
+new file mode 100644
+index 0000000..d8baccf
+--- /dev/null
++++ b/components/edit/surfaces/slide/slide-external-sync.ts
+@@ -0,0 +1,103 @@
++import { isEqual } from 'lodash';
++import type { EditorHistory } from '@openmaic/editor/core';
++import type { SlideContent } from '@/lib/types/stage';
++
++/** Apply only changed properties. Element identity is handled separately below. */
++function changedFields(before: unknown, after: unknown, onto: unknown): unknown {
++  if (isEqual(before, after)) return onto;
++  if (
++    !before ||
++    !after ||
++    !onto ||
++    typeof before !== 'object' ||
++    typeof after !== 'object' ||
++    typeof onto !== 'object' ||
++    Array.isArray(before) ||
++    Array.isArray(after) ||
++    Array.isArray(onto)
++  )
++    return after;
++  const previous = before as Record<string, unknown>;
++  const next = after as Record<string, unknown>;
++  const result = { ...(onto as Record<string, unknown>) };
++  for (const key of new Set([...Object.keys(previous), ...Object.keys(next)])) {
++    if (isEqual(previous[key], next[key]) && key in previous === key in next) continue;
++    if (!(key in next)) delete result[key];
++    else result[key] = changedFields(previous[key], next[key], result[key]);
++  }
++  return result;
++}
++
++/**
++ * Three-way snapshot update, keyed by element id. Only the incoming side's
++ * changed fields win; unrelated text, geometry, media and animations survive.
++ * A local draft may restore an element deleted remotely. An external update
++ * must not resurrect an element absent from a user's earlier undo snapshot.
++ */
++export function applySlideSnapshotDelta(
++  before: SlideContent,
++  after: SlideContent,
++  onto: SlideContent,
++  restoreMissing = false,
++): SlideContent {
++  if (isEqual(before, after)) return onto;
++  const previous = new Map(before.canvas.elements.map((element) => [element.id, element]));
++  const next = new Map(after.canvas.elements.map((element) => [element.id, element]));
++  const elements = new Map(onto.canvas.elements.map((element) => [element.id, element]));
++  for (const id of previous.keys()) if (!next.has(id)) elements.delete(id);
++  for (const [id, element] of next) {
++    const baseline = previous.get(id);
++    if (!baseline || baseline.type !== element.type) elements.set(id, element);
++    else if (!isEqual(baseline, element) && (elements.has(id) || restoreMissing)) {
++      const target = elements.get(id);
++      elements.set(
++        id,
++        target && target.type !== element.type && restoreMissing
++          ? element
++          : (changedFields(baseline, element, target) as typeof element),
++      );
++    }
++  }
++  const ids = (content: SlideContent) => content.canvas.elements.map((element) => element.id);
++  const order = isEqual(ids(before), ids(after)) ? ids(onto) : ids(after);
++  const orderedIds = [...new Set([...order, ...elements.keys()])];
++  const withoutElements = (content: SlideContent) => ({
++    ...content,
++    canvas: { ...content.canvas, elements: [] },
++  });
++  const result = changedFields(
++    withoutElements(before),
++    withoutElements(after),
++    withoutElements(onto),
++  ) as SlideContent;
++  return {
++    ...result,
++    canvas: {
++      ...result.canvas,
++      elements: orderedIds.flatMap((id) => (elements.has(id) ? [elements.get(id)!] : [])),
++    },
++  };
++}
++
++/**
++ * Preserve the local undo steps created while an external update was deferred.
++ * Snapshots already present when it arrived receive the remote delta. New local
++ * snapshots receive only their own delta on top of the remote baseline, so
++ * two drafts H1/H2 still undo H2 -> H1 -> remote rather than H2 -> remote.
++ */
++export function adoptExternalSlideHistory(
++  history: EditorHistory,
++  baseline: EditorHistory,
++  remote: SlideContent,
++): EditorHistory {
++  const existing = new Set([...baseline.past, baseline.present, ...baseline.future]);
++  const rebase = (snapshot: SlideContent) =>
++    existing.has(snapshot)
++      ? applySlideSnapshotDelta(baseline.present, remote, snapshot)
++      : applySlideSnapshotDelta(baseline.present, snapshot, remote, true);
++  return {
++    past: history.past.map(rebase),
++    present: rebase(history.present),
++    future: history.future.map(rebase),
++  };
++}
+diff --git a/components/edit/surfaces/slide/use-slide-surface.ts b/components/edit/surfaces/slide/use-slide-surface.ts
+index cfe149c..580acd8 100644
+--- a/components/edit/surfaces/slide/use-slide-surface.ts
++++ b/components/edit/surfaces/slide/use-slide-surface.ts
+@@ -2,7 +2,7 @@
+ 
+ import { produce } from 'immer';
+ import { Image as ImageIcon, PaintBucket, Type } from 'lucide-react';
+-import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
++import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+ import type { SceneDataController } from '@/lib/contexts/scene-context';
+ import type { InsertPaletteItem, SurfaceState } from '@/lib/edit/scene-editor-surface';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+@@ -244,6 +244,8 @@ interface SlideCanvasController {
+     readonly onPointerDownCapture: () => void;
+     readonly onPointerUpCapture: () => void;
+     readonly onPointerCancelCapture: () => void;
++    readonly onFocusCapture: (event: React.FocusEvent<HTMLDivElement>) => void;
++    readonly onBlurCapture: () => void;
+   };
+ }
+ 
+@@ -255,10 +257,14 @@ interface SlideCanvasController {
+  * "restore unsaved" UX — the stage store is the source of truth).
+  */
+ export function useSlideCanvasController(): SlideCanvasController {
+-  const sceneId = useStageStore((s) => {
+-    const scene = s.scenes.find((x) => x.id === s.currentSceneId) ?? null;
+-    return scene && scene.type === 'slide' ? scene.id : '';
+-  });
++  const scene = useStageStore((s) => s.scenes.find((x) => x.id === s.currentSceneId) ?? null);
++  const sceneId = scene?.type === 'slide' ? scene.id : '';
++  const content = scene?.content.type === 'slide' ? scene.content : null;
++  // Renderer selection survives blur. Protect actual input focus, not the
++  // retained editingElementId, or a Pro chat request would defer forever.
++  const [draftFocused, setDraftFocused] = useState(false);
++  const focusEpoch = useRef(0);
++  const gestureActive = useSlideEditSession((s) => s.gestureActive);
+   // Re-render (and thus re-feed SceneProvider's getSnapshot) on every
+   // history move (apply / commit / undo / redo).
+   useSlideEditSession((s) => s.history);
+@@ -285,6 +291,23 @@ export function useSlideCanvasController(): SlideCanvasController {
+   }, []);
+   const gestureProps = useMemo(
+     () => ({
++      onFocusCapture: (event: React.FocusEvent<HTMLDivElement>) => {
++        if (
++          !(event.target instanceof HTMLElement) ||
++          !event.target.closest('input, textarea, [contenteditable="true"]')
++        )
++          return;
++        focusEpoch.current += 1;
++        setDraftFocused(true);
++      },
++      onBlurCapture: () => {
++        const epoch = ++focusEpoch.current;
++        // The renderer flushes its text transaction in its blur handler.
++        // Release only afterwards, unless another editor took focus meanwhile.
++        queueMicrotask(() => {
++          if (focusEpoch.current === epoch) setDraftFocused(false);
++        });
++      },
+       onPointerDownCapture: () => {
+         gestureRef.current = true;
+         useSlideEditSession.getState().setGestureActive(true);
+@@ -307,11 +330,11 @@ export function useSlideCanvasController(): SlideCanvasController {
+ 
+   useEffect(() => {
+     if (!sceneId) return;
+-    const content = currentSlideContent(sceneId);
+-    if (content && useSlideEditSession.getState().sceneId !== sceneId) {
+-      useSlideEditSession.getState().seed(sceneId, content);
+-    }
+-  }, [sceneId]);
++    if (!content) return;
++    const session = useSlideEditSession.getState();
++    if (session.sceneId !== sceneId) session.seed(sceneId, content);
++    else session.syncCanonical(sceneId, content, draftFocused || gestureActive);
++  }, [sceneId, content, draftFocused, gestureActive]);
+ 
+   useEffect(() => () => useSlideEditSession.getState().end(), []);
+ 
+diff --git a/tests/edit/slide-canvas-external-sync.test.ts b/tests/edit/slide-canvas-external-sync.test.ts
+new file mode 100644
+index 0000000..de50e40
+--- /dev/null
++++ b/tests/edit/slide-canvas-external-sync.test.ts
+@@ -0,0 +1,172 @@
++// @vitest-environment jsdom
++import { act, createElement } from 'react';
++import { createRoot } from 'react-dom/client';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { createDefaultSlide, createDefaultTextElement } from '@/lib/edit/slide-edit-elements';
++import type { PPTTextElement } from '@openmaic/dsl';
++import type { Scene, SlideContent } from '@/lib/types/stage';
++
++const writes = vi.hoisted(() => vi.fn());
++vi.mock('@/lib/store/stage', async () => {
++  const { create } = await import('zustand');
++  const useStageStore = create<{
++    scenes: Scene[];
++    currentSceneId: string | null;
++    updateScene: (id: string, patch: Partial<Scene>) => void;
++  }>((set) => ({
++    scenes: [],
++    currentSceneId: null,
++    updateScene: (id, patch) => {
++      writes(id, patch);
++      set((state) => ({
++        scenes: state.scenes.map((scene) =>
++          scene.id === id ? ({ ...scene, ...patch } as Scene) : scene,
++        ),
++      }));
++    },
++  }));
++  return { useStageStore };
++});
++
++import { useStageStore } from '@/lib/store/stage';
++import { useCanvasStore } from '@/lib/store/canvas';
++import { useSlideEditSession } from '@/components/edit/surfaces/slide/slide-edit-session';
++import {
++  useResolvedSlideContent,
++  useSlideCanvasController,
++} from '@/components/edit/surfaces/slide/use-slide-surface';
++
++let root: ReturnType<typeof createRoot> | undefined;
++afterEach(async () => {
++  await act(async () => root?.unmount());
++  root = undefined;
++  document.body.replaceChildren();
++  useCanvasStore.setState({ editingElementId: '' });
++  vi.unstubAllGlobals();
++});
++
++function CanvasProbe() {
++  const { gestureProps } = useSlideCanvasController();
++  const content = useResolvedSlideContent();
++  return createElement(
++    'div',
++    gestureProps,
++    createElement(
++      'div',
++      { 'data-main-canvas': true },
++      (content.canvas.elements[0] as PPTTextElement | undefined)?.content,
++    ),
++    createElement('input', { 'data-draft-editor': true }),
++  );
++}
++
++describe('mounted slide canvas external subscription', () => {
++  it('updates the same page, protects a focused draft, and does not create a save echo', async () => {
++    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
++    useSlideEditSession.getState().end();
++    writes.mockClear();
++    const slide = createDefaultSlide('slide-1');
++    slide.elements = [{ ...createDefaultTextElement('text-1'), content: 'Original title' }];
++    const scene = {
++      id: 'scene-1',
++      stageId: 'stage-1',
++      title: 'Lesson',
++      order: 0,
++      type: 'slide',
++      content: { type: 'slide', canvas: slide },
++      actions: [],
++    } as Scene;
++    useStageStore.setState({ scenes: [scene], currentSceneId: scene.id });
++    const container = document.createElement('div');
++    document.body.append(container);
++    root = createRoot(container);
++    await act(async () => root!.render(createElement(CanvasProbe)));
++    expect(container.textContent).toBe('Original title');
++    const replaceRemote = async (title: string) => {
++      const content = structuredClone(useStageStore.getState().scenes[0].content) as SlideContent;
++      (content.canvas.elements[0] as PPTTextElement).content = title;
++      await act(async () => useStageStore.setState({ scenes: [{ ...scene, content }] }));
++    };
++    await replaceRemote('AI title');
++    expect(container.textContent).toBe('AI title');
++    expect(writes).not.toHaveBeenCalled();
++    await act(async () => {
++      useCanvasStore.getState().setEditingElementId('text-1');
++      container.querySelector('input')!.focus();
++    });
++    await replaceRemote('Later AI title');
++    expect(container.textContent).toBe('AI title');
++    await act(async () =>
++      useSlideEditSession.getState().applyTransaction({
++        origin: 'canvas',
++        history: 'record',
++        operations: [{ type: 'text.updateContent', elementId: 'text-1', content: 'Human draft' }],
++      }),
++    );
++    await act(async () => container.querySelector('input')!.blur());
++    expect(useCanvasStore.getState().editingElementId).toBe('text-1');
++    expect(container.textContent).toBe('Human draft');
++    expect(writes).toHaveBeenCalledTimes(1);
++    await act(async () => useSlideEditSession.getState().undo());
++    expect(container.textContent).toBe('Later AI title');
++    expect(writes).toHaveBeenCalledTimes(2);
++    await replaceRemote('AI after blur, selection retained');
++    expect(container.textContent).toBe('AI after blur, selection retained');
++    expect(writes).toHaveBeenCalledTimes(2);
++  });
++
++  it('saves a deferred conflict once when AI responds again after a manual auto-save', async () => {
++    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
++    useSlideEditSession.getState().end();
++    writes.mockClear();
++    const slide = createDefaultSlide('slide-1');
++    slide.elements = [{ ...createDefaultTextElement('text-1'), content: 'Original title' }];
++    const scene = {
++      id: 'scene-1',
++      stageId: 'stage-1',
++      title: 'Lesson',
++      order: 0,
++      type: 'slide',
++      content: { type: 'slide', canvas: slide },
++      actions: [],
++    } as Scene;
++    useStageStore.setState({ scenes: [scene], currentSceneId: scene.id });
++    const container = document.createElement('div');
++    document.body.append(container);
++    root = createRoot(container);
++    await act(async () => root!.render(createElement(CanvasProbe)));
++    const replaceRemote = async (title: string) => {
++      const content = structuredClone(useStageStore.getState().scenes[0].content) as SlideContent;
++      (content.canvas.elements[0] as PPTTextElement).content = title;
++      await act(async () => useStageStore.setState({ scenes: [{ ...scene, content }] }));
++    };
++    await act(async () => container.querySelector('input')!.focus());
++    await replaceRemote('First AI title');
++    await act(async () =>
++      useSlideEditSession.getState().applyTransaction({
++        origin: 'canvas',
++        history: 'record',
++        operations: [{ type: 'text.updateContent', elementId: 'text-1', content: 'Human draft' }],
++      }),
++    );
++    expect(writes).toHaveBeenCalledTimes(1);
++    await replaceRemote('Second AI title');
++    expect(container.textContent).toBe('Human draft');
++    await act(async () => container.querySelector('input')!.blur());
++    expect(container.textContent).toBe('Human draft');
++    expect(useStageStore.getState().scenes[0].content).toEqual(
++      useSlideEditSession.getState().history!.present,
++    );
++    expect(writes).toHaveBeenCalledTimes(2);
++    const history = useSlideEditSession.getState().history;
++    await replaceRemote('Human draft');
++    expect(useSlideEditSession.getState().history).toBe(history);
++    expect(writes).toHaveBeenCalledTimes(2);
++    await act(async () => useSlideEditSession.getState().undo());
++    expect(container.textContent).toBe('Second AI title');
++    expect(useStageStore.getState().scenes[0].content).toEqual(
++      useSlideEditSession.getState().history!.present,
++    );
++    expect(writes).toHaveBeenCalledTimes(3);
++  });
++});
+diff --git a/tests/edit/slide-edit-session.test.ts b/tests/edit/slide-edit-session.test.ts
+index 118c353..6bbf831 100644
+--- a/tests/edit/slide-edit-session.test.ts
++++ b/tests/edit/slide-edit-session.test.ts
+@@ -229,4 +229,143 @@ describe('useSlideEditSession (auto-save to stage store)', () => {
+     });
+     expect(updateScene).not.toHaveBeenCalled();
+   });
++
++  it('adopts same-page AI changes without writes and rebases existing undo history', () => {
++    const session = useSlideEditSession.getState();
++    session.seed('scene-1', makeContent());
++    session.applyOp({ type: 'element.update', elementId: 'text-1', patch: { left: 500 } });
++    const local = useSlideEditSession.getState().history!.present;
++    // A canonical echo must preserve the exact undo history, even after JSON transport.
++    const history = useSlideEditSession.getState().history;
++    session.syncCanonical('scene-1', structuredClone(local), false);
++    expect(useSlideEditSession.getState().history).toBe(history);
++    const remote = structuredClone(local);
++    (remote.canvas.elements[0] as PPTTextElement).content = '<p>AI title</p>';
++    updateScene.mockClear();
++    session.syncCanonical('scene-1', remote, false);
++    expect(
++      (useSlideEditSession.getState().history!.present.canvas.elements[0] as PPTTextElement)
++        .content,
++    ).toBe('<p>AI title</p>');
++    expect(updateScene).not.toHaveBeenCalled();
++    expect(useSlideEditSession.getState().history!.past).toHaveLength(1);
++    session.undo();
++    expect(useSlideEditSession.getState().history!.present.canvas.elements[0].left).toBe(
++      makeContent().canvas.elements[0].left,
++    );
++    expect(
++      (useSlideEditSession.getState().history!.present.canvas.elements[0] as PPTTextElement)
++        .content,
++    ).toBe('<p>AI title</p>');
++    session.redo();
++    expect(useSlideEditSession.getState().history!.present.canvas.elements[0].left).toBe(500);
++  });
++
++  it('defers AI updates during a text draft and merges the committed draft without reverting other AI fields', () => {
++    const session = useSlideEditSession.getState();
++    session.seed('scene-1', makeContent());
++    const baseline = useSlideEditSession.getState().history!.present;
++    const remote = structuredClone(baseline);
++    (remote.canvas.elements[0] as PPTTextElement).content = '<p>AI title</p>';
++    remote.canvas.elements[0].left = 700;
++    session.syncCanonical('scene-1', remote, true);
++    expect(useSlideEditSession.getState().history!.present).toBe(baseline);
++    expect(updateScene).not.toHaveBeenCalled();
++    session.applyTransaction({
++      origin: 'canvas',
++      history: 'record',
++      operations: [
++        {
++          type: 'text.updateContent',
++          elementId: 'text-1',
++          content: '<p>Unsubmitted human draft</p>',
++        },
++      ],
++    });
++    const written = updateScene.mock.calls[0][1].content as SlideContent;
++    expect(written.canvas.elements[0]).toMatchObject({
++      left: 700,
++      content: '<p>Unsubmitted human draft</p>',
++    });
++    // Do not replace the renderer-owned buffer while it still owns focus.
++    expect(useSlideEditSession.getState().history!.present.canvas.elements[0].left).toBe(
++      baseline.canvas.elements[0].left,
++    );
++    session.syncCanonical('scene-1', written, false);
++    expect(useSlideEditSession.getState().history!.present.canvas.elements[0]).toMatchObject({
++      left: 700,
++      content: '<p>Unsubmitted human draft</p>',
++    });
++    expect(updateScene).toHaveBeenCalledTimes(1);
++    session.undo();
++    expect(useSlideEditSession.getState().history!.present.canvas.elements[0]).toMatchObject({
++      left: 700,
++      content: '<p>AI title</p>',
++    });
++  });
++
++  it('keeps an unfinished pointer draft through remote deletion and restores only its edited element', () => {
++    const session = useSlideEditSession.getState();
++    session.seed('scene-1', makeContent());
++    const draft = structuredClone(useSlideEditSession.getState().history!.present);
++    draft.canvas.elements[0].left = 800;
++    const remote = structuredClone(useSlideEditSession.getState().history!.present);
++    remote.canvas.elements = [];
++    session.setGestureActive(true);
++    session.syncCanonical('scene-1', remote, false);
++    expect(useSlideEditSession.getState().history!.present.canvas.elements).toHaveLength(1);
++    session.commitContent(draft, true);
++    const written = updateScene.mock.calls[0][1].content as SlideContent;
++    expect(written.canvas.elements[0]).toMatchObject({ id: 'text-1', left: 800 });
++    session.setGestureActive(false);
++    session.syncCanonical('scene-1', written, false);
++    expect(useSlideEditSession.getState().history!.present.canvas.elements[0]).toMatchObject({
++      id: 'text-1',
++      left: 800,
++    });
++    expect(useSlideEditSession.getState().pendingExternal).toBeNull();
++    expect(updateScene).toHaveBeenCalledTimes(1);
++    // A different course's late response cannot replace this draft.
++    session.syncCanonical('another-scene', remote, false);
++    expect(useSlideEditSession.getState().history!.present.canvas.elements).toHaveLength(1);
++  });
++
++  it('preserves each local undo step committed while the same remote update waits', () => {
++    const session = useSlideEditSession.getState();
++    session.seed('scene-1', makeContent());
++    const remote = structuredClone(useSlideEditSession.getState().history!.present);
++    (remote.canvas.elements[0] as PPTTextElement).content = '<p>AI title</p>';
++    session.syncCanonical('scene-1', remote, true);
++    for (const content of ['<p>Human draft 1</p>', '<p>Human draft 2</p>']) {
++      session.applyTransaction({
++        origin: 'canvas',
++        history: 'record',
++        operations: [{ type: 'text.updateContent', elementId: 'text-1', content }],
++      });
++      if (content === '<p>Human draft 1</p>') {
++        // A second remote response includes our saved H1, but only its
++        // geometry change may become part of the external undo baseline.
++        const nextRemote = structuredClone(
++          updateScene.mock.calls.at(-1)![1].content,
++        ) as SlideContent;
++        nextRemote.canvas.elements[0].left = 700;
++        session.syncCanonical('scene-1', nextRemote, true);
++      }
++    }
++    const written = updateScene.mock.calls.at(-1)![1].content as SlideContent;
++    session.syncCanonical('scene-1', written, false);
++    const text = () =>
++      (useSlideEditSession.getState().history!.present.canvas.elements[0] as PPTTextElement)
++        .content;
++    expect(text()).toBe('<p>Human draft 2</p>');
++    session.undo();
++    expect(text()).toBe('<p>Human draft 1</p>');
++    session.undo();
++    expect(text()).toBe('<p>AI title</p>');
++    expect(useSlideEditSession.getState().history!.present.canvas.elements[0].left).toBe(700);
++    session.redo();
++    expect(text()).toBe('<p>Human draft 1</p>');
++    session.redo();
++    expect(text()).toBe('<p>Human draft 2</p>');
++  });
+ });

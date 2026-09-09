@@ -1,0 +1,160 @@
+From 2c0ca01ec4d20a944071367ec791faa6147be8a6 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 23/37] 0023-mira-qwen-tts-https-upgrade
+
+---
+ lib/server/mira-formal-audio.ts        | 46 ++++++++++++++++++++++--
+ tests/server/mira-formal-audio.test.ts | 50 ++++++++++++++++++++++++++
+ 2 files changed, 93 insertions(+), 3 deletions(-)
+
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+index 35c11b1..64db840 100644
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -691,13 +691,27 @@ async function validateMediaUrl(
+   } catch {
+     throw new OperationalFailure('failed', 'media_url_invalid');
+   }
++  const allowedHostname = isAllowedMediaHostname(url.hostname);
++  // DashScope currently returns a time-limited OSS URL with an http scheme.
++  // Never follow it in plaintext: upgrade only the already allowlisted OSS
++  // host to https before DNS validation and the actual download request.
++  if (
++    url.protocol === 'http:' &&
++    allowedHostname &&
++    !url.username &&
++    !url.password &&
++    !url.hash &&
++    !url.port
++  ) {
++    url.protocol = 'https:';
++  }
+   if (
+     url.protocol !== 'https:' ||
+     url.username ||
+     url.password ||
+     url.hash ||
+     (url.port && url.port !== '443') ||
+-    !isAllowedMediaHostname(url.hostname)
++    !allowedHostname
+   ) {
+     throw new OperationalFailure('failed', 'media_url_rejected');
+   }
+@@ -736,10 +750,11 @@ async function downloadWav(
+       continue;
+     }
+     if (!response.ok) throw new OperationalFailure('failed', 'media_download_failed');
+-    if (response.headers.get('content-type')?.trim().toLowerCase() !== 'audio/wav') {
++    const mimeType = response.headers.get('content-type')?.trim().toLowerCase();
++    if (mimeType !== 'audio/wav' && mimeType !== 'audio/x-wav') {
+       throw new OperationalFailure('failed', 'media_mime_invalid');
+     }
+-    const bytes = await readBoundedBytes(response, MIRA_FORMAL_AUDIO_MAX_BYTES);
++    let bytes = await readBoundedBytes(response, MIRA_FORMAL_AUDIO_MAX_BYTES);
+     if (
+       bytes.byteLength < 44 ||
+       Buffer.from(bytes.subarray(0, 4)).toString('ascii') !== 'RIFF' ||
+@@ -747,6 +762,31 @@ async function downloadWav(
+     ) {
+       throw new OperationalFailure('failed', 'media_wav_invalid');
+     }
++    const header = Buffer.from(bytes);
++    const actualRiffSize = bytes.byteLength - 8;
++    const fixedPcmHeader =
++      header.subarray(12, 16).toString('ascii') === 'fmt ' &&
++      header.readUInt32LE(16) === 16 &&
++      header.subarray(36, 40).toString('ascii') === 'data';
++    const actualDataSize = fixedPcmHeader ? bytes.byteLength - 44 : -1;
++    const declaredRiffSize = header.readUInt32LE(4);
++    const declaredDataSize = fixedPcmHeader ? header.readUInt32LE(40) : -1;
++    if (
++      fixedPcmHeader &&
++      declaredRiffSize >= 0x7fff0000 &&
++      declaredDataSize >= 0x7fff0000 &&
++      declaredRiffSize - declaredDataSize === 36
++    ) {
++      const normalized = Buffer.from(bytes);
++      normalized.writeUInt32LE(actualRiffSize, 4);
++      normalized.writeUInt32LE(actualDataSize, 40);
++      bytes = new Uint8Array(normalized);
++    } else if (
++      declaredRiffSize !== actualRiffSize ||
++      (fixedPcmHeader && declaredDataSize !== actualDataSize)
++    ) {
++      throw new OperationalFailure('failed', 'media_wav_size_invalid');
++    }
+     return bytes;
+   }
+   throw new OperationalFailure('failed', 'media_redirect_rejected');
+diff --git a/tests/server/mira-formal-audio.test.ts b/tests/server/mira-formal-audio.test.ts
+index 308e03f..28f42b7 100644
+--- a/tests/server/mira-formal-audio.test.ts
++++ b/tests/server/mira-formal-audio.test.ts
+@@ -57,6 +57,13 @@ function wavBytes(): Buffer {
+   return bytes;
+ }
+ 
++function streamingWavBytes(): Buffer {
++  const bytes = wavBytes();
++  bytes.writeUInt32LE(0x7fffffbf, 4);
++  bytes.writeUInt32LE(0x7fffff9b, 40);
++  return bytes;
++}
++
+ function responseBody(bytes: Buffer): ArrayBuffer {
+   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+ }
+@@ -177,6 +184,49 @@ describe('Mira formal subject Qwen audio runtime', () => {
+     expect(serialized).not.toContain('oss-cn-beijing');
+   });
+ 
++  it('upgrades an allowlisted DashScope OSS audio URL to HTTPS before download', async () => {
++    const audio = streamingWavBytes();
++    const fetchMock = vi.fn(async (input: string | URL | Request) => {
++      const url = String(input);
++      if (url.includes('/multimodal-generation/generation')) {
++        return new Response(
++          JSON.stringify({
++            output: {
++              audio: {
++                url: 'http://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/result.wav?Expires=1&Signature=test',
++              },
++            },
++          }),
++          { status: 200, headers: { 'content-type': 'application/json' } },
++        );
++      }
++      expect(url).toBe(
++        'https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/result.wav?Expires=1&Signature=test',
++      );
++      return new Response(responseBody(audio), {
++        status: 200,
++        headers: { 'content-type': 'audio/x-wav', 'content-length': String(audio.byteLength) },
++      });
++    });
++
++    const result = await executeMiraFormalTts(
++      { ...mathTtsRequest, requestId: 'formal-tts-http-upgrade-001' },
++      {
++        fetchImpl: fetchMock as typeof fetch,
++        resolveAddresses: async (hostname) => {
++          expect(hostname).toBe('dashscope-result-bj.oss-cn-beijing.aliyuncs.com');
++          return ['8.8.8.8'];
++        },
++      },
++    );
++
++    expect(result.record.state).toBe('succeeded');
++    expect(result.record.audioSha256).toBe(
++      require('crypto').createHash('sha256').update(wavBytes()).digest('hex'),
++    );
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++  });
++
+   it('rejects caller provider overrides and changed idempotent bodies', async () => {
+     const forbidden = [
+       'provider',
+-- 
+2.50.1 (Apple Git-155)
+

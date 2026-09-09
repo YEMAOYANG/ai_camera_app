@@ -66,6 +66,8 @@ def task_payload(row: DatabaseRow) -> dict:
         "confirmedAt": row["confirmed_at"],
         "rejectedAt": row["rejected_at"],
         "pointsGrantedAt": row["points_granted_at"],
+        "learningCourseId": row.get("learning_course_id"),
+        "learningCourseVersion": row.get("learning_course_version"),
     }
 
 

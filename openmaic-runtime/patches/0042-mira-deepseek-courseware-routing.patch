@@ -1,0 +1,1621 @@
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -9,7 +9,10 @@
+ } from '@/lib/server/provider-config';
+ import { assertMiraTtsProviderReady, getMiraTtsPolicy } from '@/lib/server/mira-tts-policy';
+ import { assertMiraAsrProviderReady, getMiraAsrPolicy } from '@/lib/server/mira-asr-policy';
+-import { getMiraStructuredSceneRuntimePolicy } from '@/lib/server/model-routes';
++import {
++  getMiraProfessionalModelRuntimePolicy,
++  getMiraStructuredSceneRuntimePolicy,
++} from '@/lib/server/model-routes';
+ import { getMiraSampleDeterministicRecoveryRuntimePolicy } from '@/lib/server/mira-sample-deterministic-recovery';
+ import { getMiraSampleTtsCredentialRecoveryRuntimePolicy } from '@/lib/server/mira-sample-tts-credential-recovery';
+ import { getMiraStudentChromeRuntimePolicy } from '@/lib/mira/student-runtime';
+@@ -40,19 +43,18 @@
+     try {
+       authorizeMiraFormalProviderReadinessRequest(req);
+       assertMiraFormalProviderReadinessProviderReady();
++      const modelPolicy = getMiraProfessionalModelRuntimePolicy();
+       return apiSuccess({
+         status: 'ok',
+         version,
+         capabilities: { formalProviderReadiness: true },
+         runtimePolicy: {
+           formalProviderReadiness: getMiraFormalProviderReadinessPolicy(),
++          modelPolicy,
+         },
+       });
+     } catch (error) {
+-      if (
+-        error instanceof MiraFormalProviderReadinessError &&
+-        error.code === 'unauthorized'
+-      ) {
++      if (error instanceof MiraFormalProviderReadinessError && error.code === 'unauthorized') {
+         return apiError('INVALID_CREDENTIALS', 403, 'Invalid formal readiness credentials');
+       }
+       return apiError('PROVIDER_DISABLED', 503, 'Formal readiness providers are unavailable.');
+@@ -78,6 +80,7 @@
+   if (req.nextUrl.searchParams.get('scope') === 'formal-generation') {
+     try {
+       const formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
++      const modelPolicy = getMiraProfessionalModelRuntimePolicy();
+       if (!isAgentRuntimeConfigured()) {
+         throw new Error('Formal generation requires the OpenMAIC Agent Runtime and PostgreSQL.');
+       }
+@@ -85,6 +88,7 @@
+       if (!search) {
+         throw new Error('Formal generation requires a server-managed web-search provider.');
+       }
++      assertMiraFormalProviderReadinessProviderReady();
+       await resolveAgentDriverModel();
+       const sessionStore = await getAgentSessionStore();
+       await sessionStore.getSession('mira-formal-health-probe');
+@@ -102,6 +106,7 @@
+           formalGeneration: formalGenerationPolicy,
+           formalAudio: getMiraFormalAudioRuntimePolicy(),
+           professionalResearch: getMiraProfessionalResearchPolicy(),
++          modelPolicy,
+         },
+       });
+     } catch (error) {
+@@ -122,6 +127,7 @@
+   let studentChromePolicy;
+   let formalGenerationPolicy;
+   let instrumentationBoundaryPolicy;
++  let modelPolicy;
+   try {
+     ttsPolicy = getMiraTtsPolicy();
+     assertMiraTtsProviderReady(ttsPolicy, ttsProviders);
+@@ -133,6 +139,7 @@
+     studentChromePolicy = getMiraStudentChromeRuntimePolicy();
+     formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
+     instrumentationBoundaryPolicy = getMiraInstrumentationBoundaryPolicy();
++    modelPolicy = getMiraProfessionalModelRuntimePolicy();
+   } catch (error) {
+     return apiError(
+       'PROVIDER_DISABLED',
+@@ -162,6 +169,7 @@
+       formalGeneration: formalGenerationPolicy,
+       instrumentationBoundary: instrumentationBoundaryPolicy,
+       professionalResearch: getMiraProfessionalResearchPolicy(),
++      modelPolicy,
+     },
+   });
+ }
+--- a/lib/agent/runtime/stream-fn.ts
++++ b/lib/agent/runtime/stream-fn.ts
+@@ -404,8 +404,9 @@
+         messages: toModelMessages(context.messages, {
+           includeReasoning:
+             typeof opts.languageModel !== 'string' &&
+-            opts.languageModel.provider === 'kimi.chat' &&
+-            opts.languageModel.modelId === 'kimi-k3',
++            (opts.languageModel.provider === 'deepseek.chat' ||
++              (opts.languageModel.provider === 'kimi.chat' &&
++                opts.languageModel.modelId === 'kimi-k3')),
+         }),
+         tools: toAiTools(context.tools ?? []),
+         toolChoice: 'auto',
+--- a/lib/ai/providers.ts
++++ b/lib/ai/providers.ts
+@@ -33,8 +33,8 @@
+ import { createGoogleGenerativeAI } from '@ai-sdk/google';
+ import { wrapLanguageModel, extractReasoningMiddleware } from 'ai';
+ import {
+-  createKimiReasoningPreservationMiddleware,
+-  restoreKimiReasoningInRequestBody,
++  createKimiReasoningPreservationMiddleware as createReasoningContentPreservationMiddleware,
++  restoreKimiReasoningInRequestBody as restoreReasoningContentInRequestBody,
+   wrapJsonResponseWithReasoning,
+   wrapResponseWithReasoning,
+ } from './reasoning-sse';
+@@ -1657,11 +1657,16 @@
+         return { thinking: { type: 'disabled' } };
+       }
+ 
+-      const effort = config.effort === 'max' || config.effort === 'xhigh' ? 'max' : 'high';
+-      return {
+-        thinking: { type: 'enabled' },
+-        reasoning_effort: effort,
+-      };
++      const effort =
++        config.effort === 'max' || config.effort === 'xhigh'
++          ? 'max'
++          : config.effort
++            ? 'high'
++            : undefined;
++      const body: Record<string, unknown> = {};
++      if (mode === 'enabled' || effort) body.thinking = { type: 'enabled' };
++      if (effort) body.reasoning_effort = effort;
++      return Object.keys(body).length > 0 ? body : undefined;
+     }
+ 
+     case 'qwen': {
+@@ -1833,6 +1838,20 @@
+   }
+ }
+ 
++function ensureDeepSeekAssistantReasoningContent(body: unknown): void {
++  if (!body || typeof body !== 'object') return;
++  const messages = (body as { messages?: unknown }).messages;
++  if (!Array.isArray(messages)) return;
++
++  for (const message of messages) {
++    if (!message || typeof message !== 'object') continue;
++    const record = message as Record<string, unknown>;
++    if (record.role === 'assistant' && typeof record.reasoning_content !== 'string') {
++      record.reasoning_content = '';
++    }
++  }
++}
++
+ function shouldUseOpenAIStreamingChatCompat(providerId: ProviderId, baseUrl?: string): boolean {
+   return (
+     providerId === 'openai' &&
+@@ -2096,7 +2115,25 @@
+         (usesCustomOpenAIBaseUrl(config.baseUrl) && !usesOpenAIResponses);
+       if (usesCompatTransport) {
+         const providerId = config.providerId;
++        const preservesReasoningContent =
++          providerId === 'deepseek' || (providerId === 'kimi' && config.modelId === 'kimi-k3');
+         const compatFetch = async (url: RequestInfo | URL, init?: RequestInit) => {
++          // DeepSeek's OpenAI-compatible Chat Completions endpoint accepts
++          // JSON mode but does not consistently accept the SDK's json_schema
++          // payload. Keep the schema in the server-side validator/prompt and
++          // downgrade only the wire-level response format.
++          if (providerId === 'deepseek' && init?.body && typeof init.body === 'string') {
++            try {
++              const body = JSON.parse(init.body);
++              if (body.response_format?.type === 'json_schema') {
++                body.response_format = { type: 'json_object' };
++                init = { ...init, body: JSON.stringify(body) };
++              }
++            } catch {
++              /* leave body as-is */
++            }
++          }
++
+           // Read thinking config from globalThis (set by thinking-context.ts)
+           const thinkingCtx = (globalThis as Record<string, unknown>).__thinkingContext as
+             | { getStore?: () => unknown }
+@@ -2123,15 +2160,11 @@
+             }
+           }
+ 
+-          if (
+-            providerId === 'kimi' &&
+-            config.modelId === 'kimi-k3' &&
+-            init?.body &&
+-            typeof init.body === 'string'
+-          ) {
++          if (preservesReasoningContent && init?.body && typeof init.body === 'string') {
+             try {
+               const body = JSON.parse(init.body);
+-              restoreKimiReasoningInRequestBody(body);
++              restoreReasoningContentInRequestBody(body);
++              if (providerId === 'deepseek') ensureDeepSeekAssistantReasoningContent(body);
+               init = { ...init, body: JSON.stringify(body) };
+             } catch {
+               /* leave body as-is */
+@@ -2208,13 +2241,15 @@
+       // Split it into first-class reasoning parts so the agent stream and UI can
+       // show a thinking panel and the answer text stays clean.
+       if (usesCompatTransport) {
+-        const middleware =
+-          config.providerId === 'kimi' && config.modelId === 'kimi-k3'
+-            ? [
+-                createKimiReasoningPreservationMiddleware(),
+-                extractReasoningMiddleware({ tagName: 'think' }),
+-              ]
+-            : extractReasoningMiddleware({ tagName: 'think' });
++        const preservesReasoningContent =
++          config.providerId === 'deepseek' ||
++          (config.providerId === 'kimi' && config.modelId === 'kimi-k3');
++        const middleware = preservesReasoningContent
++          ? [
++              createReasoningContentPreservationMiddleware(),
++              extractReasoningMiddleware({ tagName: 'think' }),
++            ]
++          : extractReasoningMiddleware({ tagName: 'think' });
+         model = wrapLanguageModel({
+           model,
+           middleware,
+--- a/lib/server/mira-courseware-provider.ts
++++ b/lib/server/mira-courseware-provider.ts
+@@ -5,8 +5,7 @@
+ import { isProviderKeyRequired } from '@/lib/ai/providers';
+ import { resolveModel } from '@/lib/server/resolve-model';
+ 
+-export const MIRA_COURSEWARE_PROVIDER_SCHEMA =
+-  'mira.openmaic.courseware-provider-call.v1' as const;
++export const MIRA_COURSEWARE_PROVIDER_SCHEMA = 'mira.openmaic.courseware-provider-call.v1' as const;
+ 
+ const REQUEST_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$/;
+ const PHASES = new Set([
+@@ -29,6 +28,19 @@
+ const MAX_PROMPT_CHARS = 200_000;
+ const MAX_SCHEMA_BYTES = 128_000;
+ const COURSEWARE_THINKING_DISABLED = { mode: 'disabled', enabled: false } as const;
++const VERIFIER_PHASES = new Set(['independent_verification', 'verification_after_repair']);
++const COURSEWARE_CREATOR = {
++  stage: 'mira-courseware-creator' as const,
++  providerId: 'deepseek',
++  modelId: 'deepseek-v4-pro',
++  temperature: 0.6,
++} as const;
++const COURSEWARE_VERIFIER = {
++  stage: 'mira-courseware-verifier' as const,
++  providerId: 'deepseek',
++  modelId: 'deepseek-v4-flash',
++  temperature: 0.1,
++} as const;
+ const COURSEWARE_CALL_TIMEOUT_MS = 300_000;
+ const RATE_LIMIT_RETRY_COUNT = 1;
+ const DEFAULT_RATE_LIMIT_RETRY_AFTER_SECONDS = 30;
+@@ -61,10 +73,11 @@
+     }
+   }
+   const record = source as Record<string, unknown>;
+-  const value = record[name]
+-    ?? record[name.toLowerCase()]
+-    ?? record[name.toUpperCase()]
+-    ?? record['Retry-After'];
++  const value =
++    record[name] ??
++    record[name.toLowerCase()] ??
++    record[name.toUpperCase()] ??
++    record['Retry-After'];
+   return typeof value === 'string' && value.trim() ? value.trim() : null;
+ }
+ 
+@@ -72,12 +85,14 @@
+   if (!error || seen.has(error) || typeof error !== 'object') return null;
+   seen.add(error);
+   const record = error as Record<string, unknown>;
+-  const response = record.response && typeof record.response === 'object'
+-    ? record.response as Record<string, unknown>
+-    : null;
+-  const raw = headerValue(record.responseHeaders, 'retry-after')
+-    ?? headerValue(record.headers, 'retry-after')
+-    ?? headerValue(response?.headers, 'retry-after');
++  const response =
++    record.response && typeof record.response === 'object'
++      ? (record.response as Record<string, unknown>)
++      : null;
++  const raw =
++    headerValue(record.responseHeaders, 'retry-after') ??
++    headerValue(record.headers, 'retry-after') ??
++    headerValue(response?.headers, 'retry-after');
+   if (raw !== null && /^[0-9]{1,6}$/.test(raw)) {
+     return Math.min(Number.parseInt(raw, 10), MAX_RATE_LIMIT_RETRY_AFTER_SECONDS);
+   }
+@@ -164,10 +179,7 @@
+     req.headers.has('forwarded') ||
+     req.headers.has('via')
+   ) {
+-    throw new MiraCoursewareProviderError(
+-      'unauthorized',
+-      'Courseware Provider access is private',
+-    );
++    throw new MiraCoursewareProviderError('unauthorized', 'Courseware Provider access is private');
+   }
+ }
+ 
+@@ -190,9 +202,7 @@
+ }
+ 
+ function tokenCount(value: unknown): number | null {
+-  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+-    ? value
+-    : null;
++  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : null;
+ }
+ 
+ export async function executeMiraCoursewareProvider(
+@@ -231,10 +241,11 @@
+ 
+   const systemPrompt = boundedPrompt(body.systemPrompt, 'systemPrompt');
+   const userPrompt = boundedPrompt(body.userPrompt, 'userPrompt');
+-  const resolved = await resolveModel({ stage: 'generate-classroom' });
++  const coursewareRole = VERIFIER_PHASES.has(phase) ? COURSEWARE_VERIFIER : COURSEWARE_CREATOR;
++  const resolved = await resolveModel({ stage: coursewareRole.stage });
+   if (
+-    resolved.providerId !== 'kimi' ||
+-    resolved.modelId !== 'kimi-k2.6' ||
++    resolved.providerId !== coursewareRole.providerId ||
++    resolved.modelId !== coursewareRole.modelId ||
+     (isProviderKeyRequired(resolved.providerId) && !resolved.apiKey)
+   ) {
+     throw new MiraCoursewareProviderError(
+@@ -264,7 +275,7 @@
+             { role: 'system', content: systemPrompt },
+             { role: 'user', content: userPrompt },
+           ],
+-          temperature: 0.6,
++          temperature: coursewareRole.temperature,
+           maxOutputTokens: Math.min(resolved.modelInfo?.outputWindow || 8_000, 8_000),
+           maxRetries: 0,
+           abortSignal,
+@@ -297,8 +308,8 @@
+     } catch (error) {
+       if (error instanceof MiraCoursewareProviderError) throw error;
+       if (providerStatus(error) === 429) {
+-        const retryAfterSeconds = providerRetryAfterSeconds(error)
+-          ?? DEFAULT_RATE_LIMIT_RETRY_AFTER_SECONDS;
++        const retryAfterSeconds =
++          providerRetryAfterSeconds(error) ?? DEFAULT_RATE_LIMIT_RETRY_AFTER_SECONDS;
+         if (attempt < RATE_LIMIT_RETRY_COUNT) {
+           try {
+             await waitForRateLimitRetry(retryAfterSeconds * 1_000, abortSignal);
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -3,7 +3,7 @@
+ import type { GenerateClassroomInput } from '@/lib/server/classroom-generation';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+-  'mira.openmaic.formal-runtime.v3-adaptive' as const;
++  'mira.openmaic.formal-runtime.v4-deepseek-professional' as const;
+ 
+ export const MIRA_COURSEWARE_AUTHORITY_SCHEMA =
+   'mira.openmaic.courseware-authority.v2-professional' as const;
+--- a/lib/server/mira-formal-provider-readiness.ts
++++ b/lib/server/mira-formal-provider-readiness.ts
+@@ -20,9 +20,9 @@
+ } from '@/lib/server/provider-config';
+ 
+ export const MIRA_FORMAL_PROVIDER_READINESS_VERSION =
+-  'mira.openmaic.formal-provider-readiness.v1' as const;
++  'mira.openmaic.formal-provider-readiness.v2' as const;
+ export const MIRA_FORMAL_PROVIDER_READINESS_JOB_VERSION =
+-  'mira.openmaic.formal-provider-readiness-job.v1' as const;
++  'mira.openmaic.formal-provider-readiness-job.v2' as const;
+ export const MIRA_FORMAL_PROVIDER_TIMEOUT_MS = 120_000;
+ export const MIRA_FORMAL_PROVIDER_QWEN_URL_RECOVERY_VERSION =
+   'mira.openmaic.formal-provider-qwen-url-recovery.v1' as const;
+@@ -81,7 +81,7 @@
+     audioPersisted: false,
+   },
+   providers: {
+-    kimi: { providerId: 'kimi', modelId: 'kimi-k2.6', callCount: 1 },
++    deepseek: { providerId: 'deepseek', modelId: 'deepseek-v4-pro', callCount: 1 },
+     asr: {
+       providerId: 'qwen-asr',
+       modelId: 'qwen3-asr-flash',
+@@ -140,10 +140,10 @@
+ 
+ export interface MiraFormalProviderCallReceipt {
+   callOrdinal: number;
+-  kind: 'kimi_text' | 'qwen_asr' | 'qwen_tts';
++  kind: 'deepseek_text' | 'qwen_asr' | 'qwen_tts';
+   subject?: Subject;
+-  providerId: 'kimi' | 'qwen-asr' | 'qwen-tts';
+-  modelId: 'kimi-k2.6' | 'qwen3-asr-flash' | 'qwen3-tts-flash';
++  providerId: 'deepseek' | 'qwen-asr' | 'qwen-tts';
++  modelId: 'deepseek-v4-pro' | 'qwen3-asr-flash' | 'qwen3-tts-flash';
+   voiceId?: 'Serena' | 'Ethan' | 'Jennifer';
+   languageCode?: 'zh-CN' | 'en-US';
+   fallbackUsed: false;
+@@ -520,8 +520,8 @@
+   return `${parsed}/services/aigc/multimodal-generation/generation`;
+ }
+ 
+-function kimiEndpoint(baseUrl: string | undefined): string {
+-  return `${safeHttpsBase(baseUrl || 'https://api.moonshot.cn/v1')}/chat/completions`;
++function deepseekEndpoint(baseUrl: string | undefined): string {
++  return `${safeHttpsBase(baseUrl || 'https://api.deepseek.com/v1')}/chat/completions`;
+ }
+ 
+ function safeHttpsBase(value: string): string {
+@@ -551,13 +551,15 @@
+ }
+ 
+ export function assertMiraFormalProviderReadinessProviderReady(): void {
+-  const kimi = getServerProviders().kimi;
++  const deepseek = getServerProviders().deepseek;
+   const tts = getServerTTSProviders()['qwen-tts'];
+   const asr = getServerASRProviders()['qwen-asr'];
+   if (
+-    !kimi ||
+-    (kimi.models !== undefined && !kimi.models.includes('kimi-k2.6')) ||
+-    !resolveApiKey('kimi') ||
++    !deepseek ||
++    (deepseek.models !== undefined &&
++      (!deepseek.models.includes('deepseek-v4-pro') ||
++        !deepseek.models.includes('deepseek-v4-flash'))) ||
++    !resolveApiKey('deepseek') ||
+     !tts ||
+     tts.disabled === true ||
+     !resolveTTSApiKey('qwen-tts') ||
+@@ -569,7 +571,7 @@
+       'Formal readiness providers are unavailable',
+     );
+   }
+-  kimiEndpoint(resolveBaseUrl('kimi'));
++  deepseekEndpoint(resolveBaseUrl('deepseek'));
+   qwenEndpoint(resolveTTSBaseUrl('qwen-tts'));
+   qwenEndpoint(resolveASRBaseUrl('qwen-asr'));
+ }
+@@ -578,9 +580,9 @@
+   return [
+     {
+       callOrdinal: 1,
+-      kind: 'kimi_text' as const,
+-      providerId: 'kimi' as const,
+-      modelId: 'kimi-k2.6' as const,
++      kind: 'deepseek_text' as const,
++      providerId: 'deepseek' as const,
++      modelId: 'deepseek-v4-pro' as const,
+     },
+     {
+       callOrdinal: 2,
+@@ -609,12 +611,12 @@
+   input: MiraFormalProviderReadinessRequest,
+   audio: Uint8Array,
+ ): { endpoint: string; apiKey: string; body: Record<string, unknown> } {
+-  if (spec.kind === 'kimi_text') {
++  if (spec.kind === 'deepseek_text') {
+     return {
+-      endpoint: kimiEndpoint(resolveBaseUrl('kimi')),
+-      apiKey: resolveApiKey('kimi'),
++      endpoint: deepseekEndpoint(resolveBaseUrl('deepseek')),
++      apiKey: resolveApiKey('deepseek'),
+       body: {
+-        model: 'kimi-k2.6',
++        model: 'deepseek-v4-pro',
+         messages: [
+           {
+             role: 'user',
+@@ -622,7 +624,7 @@
+           },
+         ],
+         temperature: 0.6,
+-        max_completion_tokens: 16,
++        max_tokens: 16,
+         thinking: { type: 'disabled' },
+       },
+     };
+@@ -637,7 +639,9 @@
+           messages: [
+             {
+               role: 'user',
+-              content: [{ audio: `data:audio/wav;base64,${Buffer.from(audio).toString('base64')}` }],
++              content: [
++                { audio: `data:audio/wav;base64,${Buffer.from(audio).toString('base64')}` },
++              ],
+             },
+           ],
+         },
+@@ -707,7 +711,7 @@
+ }
+ 
+ function providerResultSha256(spec: CallSpec, payload: Record<string, unknown>): string {
+-  if (spec.kind === 'kimi_text') {
++  if (spec.kind === 'deepseek_text') {
+     const choices = payload.choices;
+     const first = Array.isArray(choices) ? choices[0] : undefined;
+     const message =
+@@ -941,10 +945,7 @@
+       // The Provider has already returned successfully. A local completion
+       // write failure makes the durable outcome unknown and can never be
+       // represented as a safe failure or redispatched automatically.
+-      const failure = new OperationalFailure(
+-        'ambiguous',
+-        'provider_completion_persist_unknown',
+-      );
++      const failure = new OperationalFailure('ambiguous', 'provider_completion_persist_unknown');
+       return {
+         record: await terminalizeFailure(record, failure, dependencies.now?.() || new Date()),
+         created: true,
+@@ -980,7 +981,9 @@
+   );
+ }
+ 
+-function requestFromJob(record: MiraFormalProviderReadinessJob): MiraFormalProviderReadinessRequest {
++function requestFromJob(
++  record: MiraFormalProviderReadinessJob,
++): MiraFormalProviderReadinessRequest {
+   return assertMiraFormalProviderReadinessRequest({
+     schemaVersion: MIRA_FORMAL_PROVIDER_READINESS_VERSION,
+     requestId: record.requestId,
+--- a/lib/server/model-routes.ts
++++ b/lib/server/model-routes.ts
+@@ -77,11 +77,22 @@
+ }
+ 
+ export const MIRA_STRUCTURED_SCENE_POLICY_ENV = 'MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY';
+-export const MIRA_STRUCTURED_SCENE_POLICY_ID = 'kimi-k2.6-thinking-disabled-v1';
++export const MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA =
++  'mira.openmaic.professional-model-policy.v1' as const;
++export const MIRA_PROFESSIONAL_MODEL_POLICY_ID = 'deepseek-v4-pro-flash-v1' as const;
++export const MIRA_STRUCTURED_SCENE_POLICY_ID = MIRA_PROFESSIONAL_MODEL_POLICY_ID;
+ 
+-const MIRA_STRUCTURED_SCENE_PROVIDER_ID = 'kimi';
+-const MIRA_STRUCTURED_SCENE_MODEL_ID = 'kimi-k2.6';
++const MIRA_DEEPSEEK_PROVIDER_ID = 'deepseek' as const;
++const MIRA_DEEPSEEK_PRO_MODEL_ID = 'deepseek-v4-pro' as const;
++const MIRA_DEEPSEEK_FLASH_MODEL_ID = 'deepseek-v4-flash' as const;
++const MIRA_STRUCTURED_SCENE_PROVIDER_ID = MIRA_DEEPSEEK_PROVIDER_ID;
++const MIRA_STRUCTURED_SCENE_MODEL_ID = MIRA_DEEPSEEK_PRO_MODEL_ID;
+ const MIRA_STRUCTURED_SCENE_MODEL = `${MIRA_STRUCTURED_SCENE_PROVIDER_ID}:${MIRA_STRUCTURED_SCENE_MODEL_ID}`;
++const MIRA_COURSEWARE_CREATOR_STAGE = 'mira-courseware-creator';
++const MIRA_COURSEWARE_VERIFIER_STAGE = 'mira-courseware-verifier';
++const MIRA_AGENT_DRIVER_STAGE = 'maic-agent-driver';
++const MIRA_GENERATE_CLASSROOM_STAGE = 'generate-classroom';
++const MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE = 'web-search-query-rewrite';
+ export const MIRA_STRUCTURED_SCENE_STAGES = [
+   'scene-content',
+   'scene-content:slide',
+@@ -103,6 +114,33 @@
+   };
+ }
+ 
++export interface MiraProfessionalModelRuntimePolicy {
++  schemaVersion: typeof MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA;
++  policyId: typeof MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++  agentDriver: {
++    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
++    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID;
++    thinking: { mode: 'enabled'; enabled: true; effort: 'high' };
++  };
++  coursewareCreator: {
++    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
++    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID;
++    thinking: { mode: 'disabled'; enabled: false };
++  };
++  coursewareVerifier: {
++    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
++    modelId: typeof MIRA_DEEPSEEK_FLASH_MODEL_ID;
++    thinking: { mode: 'disabled'; enabled: false };
++  };
++  structuredScene: {
++    policyId: typeof MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
++    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID;
++    thinking: { mode: 'disabled'; enabled: false };
++  };
++  fallbackAllowed: false;
++}
++
+ function getMiraStructuredSceneRoute(stage: string): StageRoute | undefined {
+   const policy = process.env[MIRA_STRUCTURED_SCENE_POLICY_ENV]?.trim();
+   if (!policy) return undefined;
+@@ -190,6 +228,92 @@
+     );
+   }
+   return validateMiraStructuredSceneRoutes(getStageRoute);
++}
++
++function assertExactMiraRoute(
++  stage: string,
++  expectedModel: string,
++  expectedThinking: { mode: 'disabled'; enabled: false } | { mode: 'enabled'; enabled: true },
++  expectedApi?: string,
++): void {
++  const route = getStageRoute(stage);
++  const expectedRouteKeys = expectedApi ? 'api,model,thinking' : 'model,thinking';
++  if (
++    !route ||
++    route.model !== expectedModel ||
++    route.thinking?.mode !== expectedThinking.mode ||
++    route.thinking.enabled !== expectedThinking.enabled ||
++    Object.keys(route).sort().join(',') !== expectedRouteKeys ||
++    Object.keys(route.thinking).sort().join(',') !== 'enabled,mode' ||
++    (expectedApi !== undefined && route.api !== expectedApi)
++  ) {
++    throw new Error(`Professional model route mismatch for ${stage}.`);
++  }
++}
++
++/**
++ * Resolve the effective professional-courseware routes and fail closed on any
++ * operator override. DeepSeek Pro owns creation and the Agent, while Flash is
++ * isolated to the two verification phases selected by the private provider.
++ */
++export function getMiraProfessionalModelRuntimePolicy(): MiraProfessionalModelRuntimePolicy {
++  const structuredScene = getMiraStructuredSceneRuntimePolicy();
++  assertExactMiraRoute(
++    MIRA_AGENT_DRIVER_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_PRO_MODEL_ID}`,
++    { mode: 'enabled', enabled: true },
++    'openai-completions',
++  );
++  assertExactMiraRoute(
++    MIRA_COURSEWARE_CREATOR_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_PRO_MODEL_ID}`,
++    { mode: 'disabled', enabled: false },
++  );
++  assertExactMiraRoute(
++    MIRA_COURSEWARE_VERIFIER_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_FLASH_MODEL_ID}`,
++    { mode: 'disabled', enabled: false },
++  );
++  assertExactMiraRoute(
++    MIRA_GENERATE_CLASSROOM_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_PRO_MODEL_ID}`,
++    { mode: 'disabled', enabled: false },
++  );
++  assertExactMiraRoute(
++    MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_PRO_MODEL_ID}`,
++    { mode: 'disabled', enabled: false },
++  );
++
++  return {
++    schemaVersion: MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA,
++    policyId: MIRA_PROFESSIONAL_MODEL_POLICY_ID,
++    agentDriver: {
++      providerId: MIRA_DEEPSEEK_PROVIDER_ID,
++      modelId: MIRA_DEEPSEEK_PRO_MODEL_ID,
++      // DeepSeek maps enabled reasoning without an explicit route effort to its
++      // reviewed high setting. The pi Agent transport rejects an effort field
++      // when function tools are active, so health exposes the effective value.
++      thinking: { mode: 'enabled', enabled: true, effort: 'high' },
++    },
++    coursewareCreator: {
++      providerId: MIRA_DEEPSEEK_PROVIDER_ID,
++      modelId: MIRA_DEEPSEEK_PRO_MODEL_ID,
++      thinking: { mode: 'disabled', enabled: false },
++    },
++    coursewareVerifier: {
++      providerId: MIRA_DEEPSEEK_PROVIDER_ID,
++      modelId: MIRA_DEEPSEEK_FLASH_MODEL_ID,
++      thinking: { mode: 'disabled', enabled: false },
++    },
++    structuredScene: {
++      policyId: MIRA_PROFESSIONAL_MODEL_POLICY_ID,
++      providerId: structuredScene.providerId,
++      modelId: structuredScene.modelId,
++      thinking: { ...structuredScene.thinking },
++    },
++    fallbackAllowed: false,
++  };
+ }
+ 
+ /** Validate/sanitize a route's `thinking` object into a ThinkingConfig (drops bad fields with a warn). */
+@@ -267,6 +391,8 @@
+   'pbl-v2-runtime:simulator',
+   'chat-adapter',
+   'generate-classroom',
++  'mira-courseware-creator',
++  'mira-courseware-verifier',
+   'web-search-query-rewrite',
+   'maic-agent',
+   'maic-agent-driver',
+--- a/tests/ai/openai-provider.test.ts
++++ b/tests/ai/openai-provider.test.ts
+@@ -28,6 +28,7 @@
+   modelId: string,
+   thinkingConfig?: Record<string, unknown>,
+   baseUrl?: string,
++  requestBody?: Record<string, unknown>,
+ ) {
+   const originalFetch = globalThis.fetch;
+   const globalRecord = globalThis as Record<string, unknown>;
+@@ -57,10 +58,12 @@
+ 
+     await options?.fetch?.('https://example.test/v1/chat/completions', {
+       method: 'POST',
+-      body: JSON.stringify({
+-        model: modelId,
+-        messages: [{ role: 'user', content: 'hi' }],
+-      }),
++      body: JSON.stringify(
++        requestBody || {
++          model: modelId,
++          messages: [{ role: 'user', content: 'hi' }],
++        },
++      ),
+     });
+ 
+     const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
+@@ -652,6 +655,26 @@
+     },
+   );
+ 
++  it('downgrades DeepSeek Chat json_schema requests to supported JSON mode', async () => {
++    const body = await captureInjectedRequestBody(
++      'deepseek',
++      'deepseek-v4-pro',
++      { mode: 'disabled', enabled: false },
++      undefined,
++      {
++        model: 'deepseek-v4-pro',
++        messages: [{ role: 'user', content: 'Return JSON.' }],
++        response_format: {
++          type: 'json_schema',
++          json_schema: { name: 'courseware', schema: { type: 'object' } },
++        },
++      },
++    );
++
++    expect(body.response_format).toEqual({ type: 'json_object' });
++    expect(body.thinking).toEqual({ type: 'disabled' });
++  });
++
+   it('sends the driver route thinking toggle required by the custom OpenAI gateway', async () => {
+     const body = await captureInjectedRequestBody(
+       'openai',
+--- a/tests/lib/agent/runtime/stream-fn.test.ts
++++ b/tests/lib/agent/runtime/stream-fn.test.ts
+@@ -2,7 +2,12 @@
+  * Tests for the promoted stream-fn adapter — `toModelMessages` conversion.
+  */
+ import { describe, it, expect } from 'vitest';
+-import { toModelMessages, createPartMapper } from '@/lib/agent/runtime/stream-fn';
++import {
++  toModelMessages,
++  createPartMapper,
++  createCallLlmStreamFn,
++} from '@/lib/agent/runtime/stream-fn';
++import { getModel } from '@/lib/ai/providers';
+ import type { ToolCallProviderMetadata } from '@/lib/agent/runtime/provider-metadata';
+ import type {
+   AssistantMessage,
+@@ -266,4 +271,128 @@
+ 
+     expect(content[0].output).toEqual({ type: 'error-text', value: 'failure detail' });
+   });
++
++  it('passes DeepSeek assistant reasoning_content back verbatim after a tool call', async () => {
++    const reasoning = '先核对课程目标。\n再调用课标检索工具。';
++    let requestBody: Record<string, unknown> | undefined;
++    const originalFetch = globalThis.fetch;
++    globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
++      requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
++      const chunks = [
++        {
++          id: 'chatcmpl-deepseek-agent-2',
++          object: 'chat.completion.chunk',
++          created: 1,
++          model: 'deepseek-v4-pro',
++          choices: [{ index: 0, delta: { content: '继续创作' }, finish_reason: null }],
++        },
++        {
++          id: 'chatcmpl-deepseek-agent-2',
++          object: 'chat.completion.chunk',
++          created: 1,
++          model: 'deepseek-v4-pro',
++          choices: [{ index: 0, delta: {}, finish_reason: 'stop' }],
++          usage: { prompt_tokens: 3, completion_tokens: 2, total_tokens: 5 },
++        },
++      ];
++      return new Response(
++        `${chunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join('')}data: [DONE]\n\n`,
++        { headers: { 'content-type': 'text/event-stream' } },
++      );
++    }) as typeof globalThis.fetch;
++
++    try {
++      const { model } = getModel({
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-pro',
++        apiKey: 'sk-test',
++      });
++      const messages: PiMessage[] = [
++        { role: 'user', content: '制作一年级课程', timestamp: 0 },
++        {
++          role: 'assistant',
++          content: [{ type: 'text', text: '先明确课程主题。' }],
++          api: 'unknown' as never,
++          provider: 'unknown' as never,
++          model: 'deepseek-v4-pro',
++          usage: {
++            input: 0,
++            output: 0,
++            cacheRead: 0,
++            cacheWrite: 0,
++            totalTokens: 0,
++            cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
++          },
++          stopReason: 'stop',
++          timestamp: 1,
++        },
++        { role: 'user', content: '继续并检索课标', timestamp: 2 },
++        {
++          role: 'assistant',
++          content: [
++            { type: 'thinking', thinking: reasoning },
++            { type: 'toolCall', id: 'call-1', name: 'lookup', arguments: {} },
++          ],
++          api: 'unknown' as never,
++          provider: 'unknown' as never,
++          model: 'deepseek-v4-pro',
++          usage: {
++            input: 0,
++            output: 0,
++            cacheRead: 0,
++            cacheWrite: 0,
++            totalTokens: 0,
++            cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
++          },
++          stopReason: 'toolUse',
++          timestamp: 3,
++        },
++        {
++          role: 'toolResult',
++          toolCallId: 'call-1',
++          toolName: 'lookup',
++          content: [{ type: 'text', text: '课标结果' }],
++          isError: false,
++          timestamp: 4,
++        },
++      ];
++      const streamFn = createCallLlmStreamFn({
++        languageModel: model,
++        thinkingConfig: { mode: 'enabled', enabled: true },
++      });
++      const stream = await streamFn(
++        {} as never,
++        {
++          systemPrompt: '你是课件主创。',
++          messages,
++          tools: [
++            {
++              name: 'lookup',
++              description: '检索课标',
++              parameters: { type: 'object', properties: {}, additionalProperties: false },
++            } as never,
++          ],
++        },
++      );
++
++      await stream.result();
++
++      const wireMessages = requestBody?.messages as Array<Record<string, unknown>>;
++      const assistantMessages = wireMessages.filter((message) => message.role === 'assistant');
++      expect(assistantMessages[0]).toMatchObject({
++        content: '先明确课程主题。',
++        reasoning_content: '',
++      });
++      expect(assistantMessages[1]).toMatchObject({
++        role: 'assistant',
++        content: null,
++        reasoning_content: reasoning,
++        tool_calls: [{ id: 'call-1' }],
++      });
++      expect(requestBody).toMatchObject({ thinking: { type: 'enabled' } });
++      expect(requestBody).not.toHaveProperty('reasoning_effort');
++    } finally {
++      globalThis.fetch = originalFetch;
++    }
++  });
+ });
+--- a/tests/server/classroom-generation-retry.test.ts
++++ b/tests/server/classroom-generation-retry.test.ts
+@@ -206,13 +206,13 @@
+     );
+   });
+ 
+-  it('uses the server-controlled Kimi thinking policy only for structured scene content', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++  it('uses the server-controlled DeepSeek thinking policy only for structured scene content', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     const defaultResolved = {
+       model: { id: 'default-language-model' },
+       modelInfo: { outputWindow: 8192 },
+-      modelString: 'kimi:kimi-k2.6',
+-      providerId: 'kimi',
++      modelString: 'deepseek:deepseek-v4-pro',
++      providerId: 'deepseek',
+       apiKey: 'server-owned',
+     };
+     mocks.resolveModel.mockImplementation(async ({ stage }: { stage?: string }) =>
+@@ -245,12 +245,12 @@
+   });
+ 
+   it('retries one exhausted structured scene call and keeps completed work', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     const defaultResolved = {
+-      model: { id: 'kimi-k2.6' },
++      model: { id: 'deepseek-v4-pro' },
+       modelInfo: { outputWindow: 8192 },
+-      modelString: 'kimi:kimi-k2.6',
+-      providerId: 'kimi',
++      modelString: 'deepseek:deepseek-v4-pro',
++      providerId: 'deepseek',
+       apiKey: 'server-owned',
+       thinkingConfig: { mode: 'disabled', enabled: false },
+     };
+@@ -304,12 +304,12 @@
+   });
+ 
+   it('caps structured output exhaustion at one retry', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     mocks.resolveModel.mockResolvedValue({
+-      model: { id: 'kimi-k2.6' },
++      model: { id: 'deepseek-v4-pro' },
+       modelInfo: { outputWindow: 8192 },
+-      modelString: 'kimi:kimi-k2.6',
+-      providerId: 'kimi',
++      modelString: 'deepseek:deepseek-v4-pro',
++      providerId: 'deepseek',
+       apiKey: 'server-owned',
+       thinkingConfig: { mode: 'disabled', enabled: false },
+     });
+@@ -550,10 +550,10 @@
+ 
+   it('does not reject a successfully parsed scene merely because the call reached length', async () => {
+     mocks.resolveModel.mockResolvedValue({
+-      model: { id: 'kimi-k2.6' },
++      model: { id: 'deepseek-v4-pro' },
+       modelInfo: { outputWindow: 8192 },
+-      modelString: 'kimi:kimi-k2.6',
+-      providerId: 'kimi',
++      modelString: 'deepseek:deepseek-v4-pro',
++      providerId: 'deepseek',
+       apiKey: 'server-owned',
+     });
+     mocks.callLLM.mockResolvedValue({
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -4,7 +4,10 @@
+ const healthRequest = () => new NextRequest('http://runtime.test/api/health');
+ 
+ vi.mock('@/lib/server/provider-config', () => ({
+-  getServerProviders: () => (process.env.KIMI_API_KEY ? { kimi: { models: ['kimi-k2.6'] } } : {}),
++  getServerProviders: () =>
++    process.env.DEEPSEEK_API_KEY
++      ? { deepseek: { models: ['deepseek-v4-pro', 'deepseek-v4-flash'] } }
++      : {},
+   getServerWebSearchProviders: () => ({}),
+   getServerImageProviders: () => ({}),
+   getServerVideoProviders: () => ({}),
+@@ -14,6 +17,8 @@
+   resolveASRApiKey: () => process.env.MIRA_TEST_QWEN_API_KEY || '',
+   resolveTTSBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
+   resolveASRBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++  resolveApiKey: () => process.env.DEEPSEEK_API_KEY || '',
++  resolveBaseUrl: () => process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1',
+ }));
+ 
+ vi.mock('@/lib/config/feature-flags', async (importOriginal) => ({
+@@ -43,9 +48,31 @@
+     process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR = '1';
+     process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL = 'qwen3-asr-flash';
+     process.env.MIRA_TEST_QWEN_API_KEY = 'test-qwen-key';
+-    delete process.env.MODEL_ROUTES;
+-    delete process.env.KIMI_API_KEY;
+-    delete process.env.KIMI_BASE_URL;
++    process.env.MODEL_ROUTES = JSON.stringify({
++      'maic-agent-driver': {
++        model: 'deepseek:deepseek-v4-pro',
++        api: 'openai-completions',
++        thinking: { mode: 'enabled', enabled: true },
++      },
++      'mira-courseware-creator': {
++        model: 'deepseek:deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      'mira-courseware-verifier': {
++        model: 'deepseek:deepseek-v4-flash',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      'generate-classroom': {
++        model: 'deepseek:deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      'web-search-query-rewrite': {
++        model: 'deepseek:deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++    });
++    delete process.env.DEEPSEEK_API_KEY;
++    delete process.env.DEEPSEEK_BASE_URL;
+     process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED = '1';
+     process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID = 'uKQl3vMr4d';
+     process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_PATCH_SHA256 = 'c'.repeat(64);
+@@ -65,8 +92,8 @@
+     delete process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL;
+     delete process.env.MIRA_TEST_QWEN_API_KEY;
+     delete process.env.MODEL_ROUTES;
+-    delete process.env.KIMI_API_KEY;
+-    delete process.env.KIMI_BASE_URL;
++    delete process.env.DEEPSEEK_API_KEY;
++    delete process.env.DEEPSEEK_BASE_URL;
+     delete process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED;
+     delete process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID;
+     delete process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_PATCH_SHA256;
+@@ -77,10 +104,13 @@
+   });
+ 
+   it('returns the exact policy resolved from the effective server-owned routes', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
+-    process.env.MODEL_ROUTES = JSON.stringify({ 'scene-content': 'attacker:model' });
+-    process.env.KIMI_API_KEY = 'fake-secret-must-not-leak';
+-    process.env.KIMI_BASE_URL = 'https://fake-base-url-must-not-leak.invalid/v1';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
++    process.env.MODEL_ROUTES = JSON.stringify({
++      ...JSON.parse(process.env.MODEL_ROUTES || '{}'),
++      'scene-content': 'attacker:model',
++    });
++    process.env.DEEPSEEK_API_KEY = 'fake-secret-must-not-leak';
++    process.env.DEEPSEEK_BASE_URL = 'https://fake-base-url-must-not-leak.invalid/v1';
+ 
+     const { GET } = await import('@/app/api/health/route');
+     const response = await GET(healthRequest());
+@@ -103,9 +133,9 @@
+     });
+     expect(body.runtimePolicy.structuredScene).toEqual({
+       enforced: true,
+-      policyId: 'kimi-k2.6-thinking-disabled-v1',
+-      providerId: 'kimi',
+-      modelId: 'kimi-k2.6',
++      policyId: 'deepseek-v4-pro-flash-v1',
++      providerId: 'deepseek',
++      modelId: 'deepseek-v4-pro',
+       stages: [
+         'scene-content',
+         'scene-content:slide',
+@@ -114,6 +144,32 @@
+         'scene-content:pbl',
+       ],
+       thinking: { mode: 'disabled', enabled: false },
++    });
++    expect(body.runtimePolicy.modelPolicy).toEqual({
++      schemaVersion: 'mira.openmaic.professional-model-policy.v1',
++      policyId: 'deepseek-v4-pro-flash-v1',
++      agentDriver: {
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-pro',
++        thinking: { mode: 'enabled', enabled: true, effort: 'high' },
++      },
++      coursewareCreator: {
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      coursewareVerifier: {
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-flash',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      structuredScene: {
++        policyId: 'deepseek-v4-pro-flash-v1',
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      fallbackAllowed: false,
+     });
+     expect(body.runtimePolicy.deterministicRecovery).toEqual({
+       enabled: true,
+@@ -154,7 +210,7 @@
+     });
+     expect(body.runtimePolicy.formalGeneration).toEqual({
+       enforced: true,
+-      policyId: 'mira.openmaic.formal-runtime.v3-adaptive',
++      policyId: 'mira.openmaic.formal-runtime.v4-deepseek-professional',
+       idempotencyKey: 'runtimeRequestId',
+       queryByRuntimeRequestId: true,
+       speechAudioGenerated: true,
+@@ -192,7 +248,7 @@
+         clientScoreAccepted: false,
+       },
+       contract: {
+-        schemaVersion: 'mira.openmaic.formal-runtime.v3-adaptive',
++        schemaVersion: 'mira.openmaic.formal-runtime.v4-deepseek-professional',
+         scenePlanning: {
+           mode: 'adaptive',
+           authority: 'openmaic_professional_agent',
+@@ -260,13 +316,13 @@
+   });
+ 
+   it('reports formal generation readiness without sample TTS or ASR readiness', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS;
+     delete process.env.MIRA_OPENMAIC_QWEN_TTS_MODEL;
+     delete process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE;
+     delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR;
+     delete process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL;
+-    process.env.KIMI_API_KEY = 'formal-generation-test-key';
++    process.env.DEEPSEEK_API_KEY = 'formal-generation-test-key';
+     const { NextRequest } = await import('next/server');
+     const { GET } = await import('@/app/api/health/route');
+     const response = await GET(
+@@ -283,7 +339,7 @@
+       speechAudioGeneration: true,
+     });
+     expect(body.runtimePolicy.formalGeneration).toMatchObject({
+-      policyId: 'mira.openmaic.formal-runtime.v3-adaptive',
++      policyId: 'mira.openmaic.formal-runtime.v4-deepseek-professional',
+       speechAudioGenerated: true,
+       studentRuntimeEvents: {
+         enforced: true,
+@@ -303,10 +359,16 @@
+       tts: { providerId: 'qwen-tts', modelId: 'qwen3-tts-flash' },
+       asr: { providerId: 'qwen-asr', modelId: 'qwen3-asr-flash' },
+     });
++    expect(body.runtimePolicy.modelPolicy).toMatchObject({
++      policyId: 'deepseek-v4-pro-flash-v1',
++      coursewareCreator: { modelId: 'deepseek-v4-pro' },
++      coursewareVerifier: { modelId: 'deepseek-v4-flash' },
++      fallbackAllowed: false,
++    });
+   });
+ 
+   it('fails formal generation readiness when the OpenMAIC Qwen credential is absent', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     delete process.env.MIRA_TEST_QWEN_API_KEY;
+     const { NextRequest } = await import('next/server');
+     const { GET } = await import('@/app/api/health/route');
+@@ -319,7 +381,7 @@
+     expect(body).toMatchObject({
+       success: false,
+       errorCode: 'PROVIDER_DISABLED',
+-      error: 'Formal Qwen audio providers are not ready.',
++      error: 'Formal readiness providers are unavailable',
+     });
+     expect(JSON.stringify(body)).not.toContain('apiKey');
+   });
+@@ -346,16 +408,19 @@
+     const body = await response.json();
+ 
+     expect(response.status).toBe(503);
+-    expect(body.error).toContain('expected kimi-k2.6-thinking-disabled-v1');
++    expect(body.error).toContain('expected deepseek-v4-pro-flash-v1');
+     expect(JSON.stringify(body)).not.toContain('hostile-policy-secret');
+   });
+ 
+   it('returns 503 when effective route validation reports a mismatch', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     vi.doMock('@/lib/server/model-routes', () => ({
+       getMiraStructuredSceneRuntimePolicy: () => {
+         throw new Error('Structured scene route mismatch for scene-content:quiz.');
+       },
++      getMiraProfessionalModelRuntimePolicy: () => {
++        throw new Error('Structured scene route mismatch for scene-content:quiz.');
++      },
+     }));
+ 
+     const { GET } = await import('@/app/api/health/route');
+--- a/tests/server/mira-courseware-provider.test.ts
++++ b/tests/server/mira-courseware-provider.test.ts
+@@ -24,11 +24,11 @@
+   wrapLanguageModel: mocks.wrapLanguageModel,
+ }));
+ 
+-function request() {
++function request(phase = 'outline') {
+   return {
+     schemaVersion: 'mira.openmaic.courseware-provider-call.v1',
+     requestId: 'primary_1-math-course-1-outline-attempt-1',
+-    phase: 'outline',
++    phase,
+     systemPrompt: '只生成课程结构。',
+     userPrompt: '为一年级数学生成课件。',
+     responseJsonSchema: {
+@@ -47,9 +47,9 @@
+     mocks.defaultSettingsMiddleware.mockClear();
+     mocks.wrapLanguageModel.mockClear();
+     mocks.resolveModel.mockResolvedValue({
+-      providerId: 'kimi',
+-      modelId: 'kimi-k2.6',
+-      model: { provider: 'kimi', modelId: 'kimi-k2.6' },
++      providerId: 'deepseek',
++      modelId: 'deepseek-v4-pro',
++      model: { provider: 'deepseek', modelId: 'deepseek-v4-pro' },
+       modelInfo: { outputWindow: 16_000 },
+       apiKey: 'runtime-owned-key',
+     });
+@@ -64,14 +64,12 @@
+     delete process.env.MIRA_INTERNAL_API_TOKEN;
+   });
+ 
+-  it('owns the one Kimi courseware call and applies the Sidecar JSON schema', async () => {
+-    const { executeMiraCoursewareProvider } = await import(
+-      '@/lib/server/mira-courseware-provider'
+-    );
++  it('owns the DeepSeek Pro creator call and applies the Sidecar JSON schema', async () => {
++    const { executeMiraCoursewareProvider } = await import('@/lib/server/mira-courseware-provider');
+     const result = await executeMiraCoursewareProvider(request());
+ 
+     expect(mocks.resolveModel).toHaveBeenCalledTimes(1);
+-    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'generate-classroom' });
++    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'mira-courseware-creator' });
+     expect(mocks.wrapLanguageModel).toHaveBeenCalledTimes(1);
+     expect(mocks.defaultSettingsMiddleware).toHaveBeenCalledWith({
+       settings: {
+@@ -104,6 +102,31 @@
+     expect(result.providerRequestIdHash).toMatch(/^[a-f0-9]{64}$/);
+   });
+ 
++  it.each(['independent_verification', 'verification_after_repair'])(
++    'isolates %s on DeepSeek Flash with deterministic settings',
++    async (phase) => {
++      mocks.resolveModel.mockResolvedValue({
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-flash',
++        model: { provider: 'deepseek', modelId: 'deepseek-v4-flash' },
++        modelInfo: { outputWindow: 16_000 },
++        apiKey: 'runtime-owned-key',
++      });
++      const { executeMiraCoursewareProvider } =
++        await import('@/lib/server/mira-courseware-provider');
++
++      await executeMiraCoursewareProvider(request(phase));
++
++      expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'mira-courseware-verifier' });
++      expect(mocks.callLLM).toHaveBeenCalledWith(
++        expect.objectContaining({ temperature: 0.1, maxRetries: 0 }),
++        'mira-courseware-provider',
++        undefined,
++        { mode: 'disabled', enabled: false },
++      );
++    },
++  );
++
+   it('rejects any non-pinned Provider before a paid call', async () => {
+     mocks.resolveModel.mockResolvedValue({
+       providerId: 'openai',
+@@ -112,9 +135,7 @@
+       modelInfo: { outputWindow: 8_000 },
+       apiKey: 'other-key',
+     });
+-    const { executeMiraCoursewareProvider } = await import(
+-      '@/lib/server/mira-courseware-provider'
+-    );
++    const { executeMiraCoursewareProvider } = await import('@/lib/server/mira-courseware-provider');
+     await expect(executeMiraCoursewareProvider(request())).rejects.toMatchObject({
+       code: 'provider_unavailable',
+     });
+@@ -123,18 +144,18 @@
+ 
+   it('retries one explicit provider 429 under the same timeout authority', async () => {
+     mocks.callLLM
+-      .mockRejectedValueOnce(Object.assign(new Error('rate limited'), {
+-        statusCode: 429,
+-        responseHeaders: { 'retry-after': '0' },
+-      }))
++      .mockRejectedValueOnce(
++        Object.assign(new Error('rate limited'), {
++          statusCode: 429,
++          responseHeaders: { 'retry-after': '0' },
++        }),
++      )
+       .mockResolvedValueOnce({
+         text: '{"phaseStatus":"accepted"}',
+         totalUsage: { inputTokens: 10, outputTokens: 5 },
+         response: { id: 'provider-response-after-429' },
+       });
+-    const { executeMiraCoursewareProvider } = await import(
+-      '@/lib/server/mira-courseware-provider'
+-    );
++    const { executeMiraCoursewareProvider } = await import('@/lib/server/mira-courseware-provider');
+ 
+     await expect(executeMiraCoursewareProvider(request())).resolves.toMatchObject({
+       content: '{"phaseStatus":"accepted"}',
+@@ -151,9 +172,7 @@
+         responseHeaders: { 'retry-after': '0' },
+       }),
+     );
+-    const { executeMiraCoursewareProvider } = await import(
+-      '@/lib/server/mira-courseware-provider'
+-    );
++    const { executeMiraCoursewareProvider } = await import('@/lib/server/mira-courseware-provider');
+ 
+     await expect(executeMiraCoursewareProvider(request())).rejects.toMatchObject({
+       code: 'provider_rejected',
+@@ -165,9 +184,7 @@
+     mocks.callLLM.mockRejectedValueOnce(
+       Object.assign(new Error('provider rejected request'), { statusCode: 422 }),
+     );
+-    const { executeMiraCoursewareProvider } = await import(
+-      '@/lib/server/mira-courseware-provider'
+-    );
++    const { executeMiraCoursewareProvider } = await import('@/lib/server/mira-courseware-provider');
+ 
+     await expect(executeMiraCoursewareProvider(request())).rejects.toMatchObject({
+       code: 'provider_rejected',
+@@ -176,9 +193,7 @@
+   });
+ 
+   it('keeps timeouts and provider 5xx failures ambiguous', async () => {
+-    const { executeMiraCoursewareProvider } = await import(
+-      '@/lib/server/mira-courseware-provider'
+-    );
++    const { executeMiraCoursewareProvider } = await import('@/lib/server/mira-courseware-provider');
+     for (const failure of [
+       Object.assign(new Error('request timeout'), { statusCode: 408 }),
+       Object.assign(new Error('provider unavailable'), { statusCode: 503 }),
+@@ -194,9 +209,8 @@
+   it('requires the private OpenMAIC token', async () => {
+     process.env.MIRA_INTERNAL_API_TOKEN = 'private-token';
+     const { NextRequest } = await import('next/server');
+-    const { authorizeMiraCoursewareProviderRequest } = await import(
+-      '@/lib/server/mira-courseware-provider'
+-    );
++    const { authorizeMiraCoursewareProviderRequest } =
++      await import('@/lib/server/mira-courseware-provider');
+     const allowed = new NextRequest('http://127.0.0.1/api/mira/courseware-provider-call', {
+       headers: { 'x-mira-internal-token': 'private-token' },
+     });
+--- a/tests/server/mira-formal-provider-readiness.test.ts
++++ b/tests/server/mira-formal-provider-readiness.test.ts
+@@ -12,19 +12,19 @@
+   type MiraFormalProviderReadinessRequest,
+ } from '@/lib/server/mira-formal-provider-readiness';
+ 
+-const kimiKey = 'kimi-secret-never-persist';
++const deepseekKey = 'deepseek-secret-never-persist';
+ const ttsKey = 'tts-secret-never-persist';
+ const asrKey = 'asr-secret-never-persist';
+ 
+ vi.mock('@/lib/server/provider-config', () => ({
+-  getServerProviders: () => ({ kimi: { models: ['kimi-k2.6'] } }),
++  getServerProviders: () => ({ deepseek: { models: ['deepseek-v4-pro', 'deepseek-v4-flash'] } }),
+   getServerWebSearchProviders: () => ({}),
+   getServerImageProviders: () => ({}),
+   getServerVideoProviders: () => ({}),
+   getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
+   getServerASRProviders: () => ({ 'qwen-asr': {} }),
+-  resolveApiKey: () => kimiKey,
+-  resolveBaseUrl: () => 'https://api.moonshot.cn/v1',
++  resolveApiKey: () => deepseekKey,
++  resolveBaseUrl: () => 'https://api.deepseek.com/v1',
+   resolveTTSApiKey: () => ttsKey,
+   resolveTTSBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
+   resolveASRApiKey: () => asrKey,
+@@ -82,7 +82,7 @@
+ };
+ 
+ const requestBase: Omit<MiraFormalProviderReadinessRequest, 'validation'> = {
+-  schemaVersion: 'mira.openmaic.formal-provider-readiness.v1',
++  schemaVersion: 'mira.openmaic.formal-provider-readiness.v2',
+   requestId: 'formal-provider-readiness-001',
+   buildItemId: 'build-item-001',
+   releaseId: 'release-001',
+@@ -110,6 +110,30 @@
+     process.env.MIRA_FORMAL_AUDIO_DATA_DIR = path.join(tempRoot, 'formal-audio');
+     process.env.MIRA_FORMAL_PROVIDER_READINESS_DATA_DIR = path.join(tempRoot, 'readiness');
+     process.env.MIRA_INTERNAL_API_TOKEN = 'internal-secret-never-persist';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
++    process.env.MODEL_ROUTES = JSON.stringify({
++      'maic-agent-driver': {
++        model: 'deepseek:deepseek-v4-pro',
++        api: 'openai-completions',
++        thinking: { mode: 'enabled', enabled: true },
++      },
++      'mira-courseware-creator': {
++        model: 'deepseek:deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      'mira-courseware-verifier': {
++        model: 'deepseek:deepseek-v4-flash',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      'generate-classroom': {
++        model: 'deepseek:deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      'web-search-query-rewrite': {
++        model: 'deepseek:deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++    });
+     const audio = wavBytes();
+     const prepared = await executeMiraFormalTts(validationTts, {
+       resolveAddresses: async () => ['8.8.8.8'],
+@@ -136,6 +160,8 @@
+     delete process.env.MIRA_FORMAL_AUDIO_DATA_DIR;
+     delete process.env.MIRA_FORMAL_PROVIDER_READINESS_DATA_DIR;
+     delete process.env.MIRA_INTERNAL_API_TOKEN;
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    delete process.env.MODEL_ROUTES;
+     await fs.rm(tempRoot, { recursive: true, force: true });
+     vi.restoreAllMocks();
+   });
+@@ -161,18 +187,18 @@
+       const current = await readMiraFormalProviderReadinessJob(requestBase.requestId);
+       observedAttempts.push(current?.providerAttemptedCount || 0);
+       const body = JSON.parse(String(init?.body));
+-      if (String(input).includes('moonshot')) {
++      if (String(input).includes('deepseek')) {
+         expect(body).toMatchObject({
+-          model: 'kimi-k2.6',
++          model: 'deepseek-v4-pro',
+           temperature: 0.6,
+-          max_completion_tokens: 16,
++          max_tokens: 16,
+           thinking: { type: 'disabled' },
+         });
+-        expect(body).not.toHaveProperty('max_tokens');
+-        return new Response(
+-          JSON.stringify({ choices: [{ message: { content: 'READY' } }] }),
+-          { status: 200, headers: { 'content-type': 'application/json' } },
+-        );
++        expect(body).not.toHaveProperty('max_completion_tokens');
++        return new Response(JSON.stringify({ choices: [{ message: { content: 'READY' } }] }), {
++          status: 200,
++          headers: { 'content-type': 'application/json' },
++        });
+       }
+       if (body.model === 'qwen3-asr-flash') {
+         expect(body.input.messages[0].content[0].audio).toMatch(/^data:audio\/wav;base64,/);
+@@ -201,7 +227,7 @@
+       routeSessionProof: { providerCall: false },
+       providerProof: { providerCall: true },
+       providers: {
+-        kimi: { providerId: 'kimi', modelId: 'kimi-k2.6' },
++        deepseek: { providerId: 'deepseek', modelId: 'deepseek-v4-pro' },
+         asr: { providerId: 'qwen-asr', modelId: 'qwen3-asr-flash' },
+         tts: {
+           chinese: { voiceId: 'Serena' },
+@@ -235,11 +261,11 @@
+   it('resumes only the three Qwen TTS calls after the reviewed URL-policy fix', async () => {
+     const failingFetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+       const body = JSON.parse(String(init?.body));
+-      if (String(input).includes('moonshot')) {
+-        return new Response(
+-          JSON.stringify({ choices: [{ message: { content: 'READY' } }] }),
+-          { status: 200, headers: { 'content-type': 'application/json' } },
+-        );
++      if (String(input).includes('deepseek')) {
++        return new Response(JSON.stringify({ choices: [{ message: { content: 'READY' } }] }), {
++          status: 200,
++          headers: { 'content-type': 'application/json' },
++        });
+       }
+       if (body.model === 'qwen3-asr-flash') {
+         return new Response(
+@@ -344,7 +370,14 @@
+     expect(replay.created).toBe(false);
+     expect(timeout).toHaveBeenCalledTimes(1);
+     const serialized = JSON.stringify(await readMiraFormalProviderReadinessJob(input.requestId));
+-    for (const forbidden of [kimiKey, ttsKey, asrKey, 'secret timeout detail', 'base64', narration]) {
++    for (const forbidden of [
++      deepseekKey,
++      ttsKey,
++      asrKey,
++      'secret timeout detail',
++      'base64',
++      narration,
++    ]) {
+       expect(serialized).not.toContain(forbidden);
+     }
+   });
+@@ -416,7 +449,15 @@
+       providerProof: { providerCall: true, passedCallCount: 5 },
+     });
+     const serialized = JSON.stringify(body);
+-    for (const forbidden of [kimiKey, ttsKey, asrKey, 'baseUrl', 'audioUrl', 'base64', narration]) {
++    for (const forbidden of [
++      deepseekKey,
++      ttsKey,
++      asrKey,
++      'baseUrl',
++      'audioUrl',
++      'base64',
++      narration,
++    ]) {
+       expect(serialized).not.toContain(forbidden);
+     }
+ 
+--- a/tests/server/model-routes.test.ts
++++ b/tests/server/model-routes.test.ts
+@@ -17,15 +17,15 @@
+     delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
+   });
+ 
+-  it('enforces the server-owned Kimi route only for structured scene-content stages', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++  it('enforces the server-owned DeepSeek Pro route only for structured scene-content stages', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     process.env.MODEL_ROUTES = JSON.stringify({
+       'scene-content': { model: 'attacker:model', thinking: { mode: 'enabled' } },
+     });
+ 
+     const { getStageRoute } = await import('@/lib/server/model-routes');
+     const expected = {
+-      model: 'kimi:kimi-k2.6',
++      model: 'deepseek:deepseek-v4-pro',
+       thinking: { mode: 'disabled', enabled: false },
+       enforced: true,
+     };
+@@ -41,7 +41,7 @@
+   });
+ 
+   it('derives the exact credential-free runtime policy from every effective stage route', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     process.env.MODEL_ROUTES = JSON.stringify({
+       'scene-content': { model: 'attacker:model', thinking: { enabled: true } },
+     });
+@@ -50,9 +50,9 @@
+ 
+     expect(getMiraStructuredSceneRuntimePolicy()).toEqual({
+       enforced: true,
+-      policyId: 'kimi-k2.6-thinking-disabled-v1',
+-      providerId: 'kimi',
+-      modelId: 'kimi-k2.6',
++      policyId: 'deepseek-v4-pro-flash-v1',
++      providerId: 'deepseek',
++      modelId: 'deepseek-v4-pro',
+       stages: [
+         'scene-content',
+         'scene-content:slide',
+@@ -75,7 +75,7 @@
+   it('rejects a mismatch in any effective structured scene route', async () => {
+     const { validateMiraStructuredSceneRoutes } = await import('@/lib/server/model-routes');
+     const exactRoute = {
+-      model: 'kimi:kimi-k2.6',
++      model: 'deepseek:deepseek-v4-pro',
+       thinking: { mode: 'disabled' as const, enabled: false },
+       enforced: true as const,
+     };
+@@ -83,7 +83,7 @@
+     expect(() =>
+       validateMiraStructuredSceneRoutes((stage) =>
+         stage === 'scene-content:quiz'
+-          ? { ...exactRoute, model: 'kimi:kimi-k2.5' }
++          ? { ...exactRoute, model: 'deepseek:deepseek-v4-flash' }
+           : { ...exactRoute },
+       ),
+     ).toThrow('Structured scene route mismatch for scene-content:quiz.');
+@@ -97,6 +97,61 @@
+     ).toThrow('Structured scene route mismatch for scene-content:interactive.');
+   });
+ 
++  it('exposes the exact Pro creation and Flash verification policy without fallback', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
++    process.env.MODEL_ROUTES = JSON.stringify({
++      'maic-agent-driver': {
++        model: 'deepseek:deepseek-v4-pro',
++        api: 'openai-completions',
++        thinking: { mode: 'enabled', enabled: true },
++      },
++      'mira-courseware-creator': {
++        model: 'deepseek:deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      'mira-courseware-verifier': {
++        model: 'deepseek:deepseek-v4-flash',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      'generate-classroom': {
++        model: 'deepseek:deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      'web-search-query-rewrite': {
++        model: 'deepseek:deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++    });
++
++    const { getMiraProfessionalModelRuntimePolicy } = await import('@/lib/server/model-routes');
++    expect(getMiraProfessionalModelRuntimePolicy()).toEqual({
++      schemaVersion: 'mira.openmaic.professional-model-policy.v1',
++      policyId: 'deepseek-v4-pro-flash-v1',
++      agentDriver: {
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-pro',
++        thinking: { mode: 'enabled', enabled: true, effort: 'high' },
++      },
++      coursewareCreator: {
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      coursewareVerifier: {
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-flash',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      structuredScene: {
++        policyId: 'deepseek-v4-pro-flash-v1',
++        providerId: 'deepseek',
++        modelId: 'deepseek-v4-pro',
++        thinking: { mode: 'disabled', enabled: false },
++      },
++      fallbackAllowed: false,
++    });
++  });
++
+   it('fails closed for an unsupported server-owned structured scene policy', async () => {
+     process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'caller-controlled-policy';
+     const { getStageRoute } = await import('@/lib/server/model-routes');

@@ -78,6 +78,9 @@ class SetupRepository:
                   age_stage VARCHAR(255),
                   education_stage VARCHAR(255),
                   grade VARCHAR(255),
+                  grade_code VARCHAR(64),
+                  grade_school_year_start INTEGER,
+                  grade_confirmed_at BIGINT,
                   birthday VARCHAR(255),
                   sleep_time VARCHAR(255),
                   created_at BIGINT NOT NULL,
@@ -422,6 +425,10 @@ class SetupRepository:
         age_stage: str | None,
         education_stage: str | None,
         grade: str | None,
+        grade_code: str | None,
+        grade_school_year_start: int | None,
+        grade_confirmed_at: int | None,
+        grade_selection_revision: int,
         birthday: str | None,
         sleep_time: str | None,
         now: int,
@@ -436,7 +443,9 @@ class SetupRepository:
                 """
                 UPDATE children SET name = ?, nickname = ?, gender = ?,
                   age_stage = ?, education_stage = ?, grade = ?,
-                  birthday = ?, sleep_time = ?, updated_at = ? WHERE id = ?
+                  grade_code = ?, grade_school_year_start = ?, grade_confirmed_at = ?,
+                  grade_selection_revision = ?, birthday = ?, sleep_time = ?,
+                  updated_at = ? WHERE id = ?
                 """,
                 (
                     name,
@@ -445,6 +454,10 @@ class SetupRepository:
                     age_stage,
                     education_stage,
                     grade,
+                    grade_code,
+                    grade_school_year_start,
+                    grade_confirmed_at,
+                    grade_selection_revision,
                     birthday,
                     sleep_time,
                     now,
@@ -456,9 +469,10 @@ class SetupRepository:
                 """
                 INSERT INTO children(
                   id, family_id, name, nickname, gender, age_stage, education_stage,
-                  grade, birthday, sleep_time, created_at, updated_at
+                  grade, grade_code, grade_school_year_start, grade_confirmed_at,
+                  grade_selection_revision, birthday, sleep_time, created_at, updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     child_id,
@@ -469,6 +483,10 @@ class SetupRepository:
                     age_stage,
                     education_stage,
                     grade,
+                    grade_code,
+                    grade_school_year_start,
+                    grade_confirmed_at,
+                    grade_selection_revision,
                     birthday,
                     sleep_time,
                     now,
@@ -482,9 +500,17 @@ class SetupRepository:
         conn: DatabaseConnection,
         *,
         family_id: str,
+        for_update: bool = False,
     ) -> DatabaseRow | None:
+        lock = " FOR UPDATE" if for_update else ""
         return conn.execute(
-            "SELECT * FROM children WHERE family_id = ? ORDER BY created_at LIMIT 1",
+            "SELECT * FROM children WHERE family_id = ? ORDER BY created_at LIMIT 1" + lock,
+            (family_id,),
+        ).fetchone()
+
+    def lock_family(self, conn: DatabaseConnection, *, family_id: str) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT id FROM families WHERE id = ? FOR UPDATE",
             (family_id,),
         ).fetchone()
 

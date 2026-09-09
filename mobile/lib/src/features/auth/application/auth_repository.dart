@@ -3,11 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/core/network/api_client.dart';
 import 'package:warm_sight/src/core/storage/auth_session_store.dart';
+import 'package:warm_sight/src/core/storage/setup_store.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(
     dio: ref.watch(rawDioProvider),
     sessionStore: ref.watch(authSessionStoreProvider),
+    setupStore: ref.watch(setupStoreProvider),
   );
 });
 
@@ -19,10 +21,15 @@ class AuthException implements Exception {
 }
 
 class AuthRepository {
-  const AuthRepository({required this._dio, required this._sessionStore});
+  const AuthRepository({
+    required this._dio,
+    required this._sessionStore,
+    required this._setupStore,
+  });
 
   final Dio _dio;
   final AuthSessionStore _sessionStore;
+  final SetupStore _setupStore;
 
   Future<SmsCodeRequestResult> requestSmsCode(String phone) async {
     try {
@@ -46,6 +53,9 @@ class AuthRepository {
         data: {'phone': phone, 'code': code},
       );
       final session = _parseSession(response.data);
+      // Claim before exposing the new session to router listeners, so another
+      // account can never render the previous account's unfinished child data.
+      await _setupStore.claimPendingOwner(session.userId);
       await _sessionStore.save(session);
       return AuthLoginResult(
         session: session,
@@ -69,6 +79,7 @@ class AuthRepository {
         data: {'refreshToken': session.refreshToken},
       );
       final refreshed = _parseSession(response.data);
+      await _setupStore.claimPendingOwner(refreshed.userId);
       await _sessionStore.save(refreshed);
       return refreshed;
     } on DioException {

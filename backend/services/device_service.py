@@ -23,8 +23,9 @@ from integrations.onvif.identity import onvif_binding_code
 from repositories.device_repository import DeviceRepository
 from schemas.devices import device_payload, device_runtime_config_payload, runtime_config_json
 from schemas.profile import role_capabilities_from_option
-from services.camera_bridge_service import CameraBridgeService
 from services.auth_service import AuthService
+from services.camera_bridge_service import CameraBridgeService
+from services.conversation_sync_service import ConversationSyncService
 from services.device_credential_store import EncryptedFileCredentialStore
 from services.onvif_runtime_config import build_onvif_runtime_config
 from services.device_runtime_resolver import (
@@ -182,7 +183,9 @@ class DeviceService:
         dev_adapters_enabled: bool = False,
     ):
         self.auth_service = auth_service
-        self.repository = DeviceRepository(Database(database_url))
+        database = Database(database_url)
+        self.database_url = database.database_url
+        self.repository = DeviceRepository(database)
         self.hardware_adapter = hardware_adapter or DisabledHardwareDeviceAdapter()
         self.camera_service = camera_service
         self.runtime_resolver = runtime_resolver
@@ -289,12 +292,16 @@ class DeviceService:
                     family_id=family_id,
                     device_id=device["id"],
                 )
-            return {
+            response = {
                 "ok": True,
                 "duplicate": duplicate,
                 "device": device_payload(device),
                 "defaultDevice": device_payload(default_device) if default_device else None,
             }
+        ConversationSyncService(self.database_url).sync_family_conversation(
+            family_id=family_id,
+        )
+        return response
 
     def get_device(self, access_token: str, device_id: str) -> dict:
         context = self._auth_context(access_token)

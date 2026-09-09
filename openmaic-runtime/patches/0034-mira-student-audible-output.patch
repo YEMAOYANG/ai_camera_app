@@ -1,0 +1,773 @@
+From a93f79a4f48272eed1cf3d7c790ab8ef6fa289c5 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:35 +0800
+Subject: [PATCH 34/37] 0034-mira-student-audible-output
+
+---
+ components/edit/PlaybackChromeRoot.tsx        |  43 +++-
+ components/roundtable/index.tsx               |  30 ++-
+ lib/hooks/use-discussion-tts.ts               |  18 +-
+ lib/playback/engine.ts                        |  26 +-
+ lib/utils/audio-player.ts                     | 234 +++++++++++++++++-
+ tests/audio/mira-student-audio-output.test.ts | 149 +++++++++++
+ tests/playback/action-navigation.test.ts      |  35 +++
+ 7 files changed, 512 insertions(+), 23 deletions(-)
+ create mode 100644 tests/audio/mira-student-audio-output.test.ts
+
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 261dffe..9532b92 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -152,8 +152,28 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     const setChatAreaWidth = useSettingsStore((s) => s.setChatAreaWidth);
+     const chatAreaCollapsed = useSettingsStore((s) => s.chatAreaCollapsed);
+     const setChatAreaCollapsed = useSettingsStore((s) => s.setChatAreaCollapsed);
+-    const setTTSMuted = useSettingsStore((s) => s.setTTSMuted);
+-    const setTTSVolume = useSettingsStore((s) => s.setTTSVolume);
++    const operatorTTSMuted = useSettingsStore((s) => s.ttsMuted);
++    const operatorTTSVolume = useSettingsStore((s) => s.ttsVolume);
++    const setOperatorTTSMuted = useSettingsStore((s) => s.setTTSMuted);
++    const setOperatorTTSVolume = useSettingsStore((s) => s.setTTSVolume);
++    const [studentTTSMuted, setStudentTTSMuted] = useState(false);
++    const [studentTTSVolume, setStudentTTSVolume] = useState(1);
++    const ttsMuted = studentMode ? studentTTSMuted : operatorTTSMuted;
++    const ttsVolume = studentMode ? studentTTSVolume : operatorTTSVolume;
++    const setTTSMuted = useCallback(
++      (muted: boolean) => {
++        if (studentMode) setStudentTTSMuted(muted);
++        else setOperatorTTSMuted(muted);
++      },
++      [setOperatorTTSMuted, studentMode],
++    );
++    const setTTSVolume = useCallback(
++      (volume: number) => {
++        if (studentMode) setStudentTTSVolume(Math.max(0, Math.min(1, volume)));
++        else setOperatorTTSVolume(volume);
++      },
++      [setOperatorTTSVolume, studentMode],
++    );
+     const operatorAutoPlayLecture = useSettingsStore((s) => s.autoPlayLecture);
+     const setOperatorAutoPlayLecture = useSettingsStore((s) => s.setAutoPlayLecture);
+     const autoPlayLecture = getMiraEffectiveAutoPlayLecture({
+@@ -223,7 +243,6 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+ 
+     // Selected agents from settings store (Zustand)
+     const selectedAgentIds = useSettingsStore((s) => s.selectedAgentIds);
+-    const ttsMuted = useSettingsStore((s) => s.ttsMuted);
+     const ttsEnabled = useSettingsStore((s) => s.ttsEnabled);
+ 
+     // Generate participants from selected agents
+@@ -248,6 +267,8 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     const discussionTTS = useDiscussionTTS({
+       enabled: ttsEnabled && !ttsMuted,
+       agents: selectedAgents,
++      muted: ttsMuted,
++      volume: ttsVolume,
+       onAudioStateChange: (agentId, state) => {
+         setAudioAgentId(agentId);
+         setAudioIndicatorState(state);
+@@ -775,6 +796,9 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+           onAudioPlaybackIssue: ({ reason, actionId }) => {
+             if (studentMode) {
+               setAutoPlayLecture(false);
++              if (lectureSessionIdRef.current) {
++                chatAreaRef.current?.pauseBuffer(lectureSessionIdRef.current);
++              }
+               const failedActionIndex = currentScene.actions?.findIndex(
+                 (action) => action.id === actionId,
+               );
+@@ -1033,7 +1057,6 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     }, [ttsMuted]);
+ 
+     // Sync volume from settings store to audioPlayer
+-    const ttsVolume = useSettingsStore((s) => s.ttsVolume);
+     useEffect(() => {
+       if (!ttsMuted) {
+         audioPlayerRef.current.setVolume(ttsVolume);
+@@ -1213,6 +1236,10 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     });
+     const handleStudentStartLesson = useCallback(() => {
+       if (!engineRef.current) return;
++      // Unlock the dedicated student output graph while this click still has
++      // browser user activation. Student mute/volume are local session state,
++      // so stale operator preferences never leak into the classroom.
++      audioPlayerRef.current.prepareStudentPlayback();
+       setStudentLectureStarted(true);
+       setAutoPlayLecture(true);
+       handlePlayPause();
+@@ -1479,7 +1506,9 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+                 aria-labelledby="mira-student-start-title"
+                 className="w-full max-w-md rounded-[2rem] border border-white/70 bg-white px-8 py-9 text-center shadow-2xl"
+               >
+-                <p className="mb-2 text-sm font-semibold tracking-wide text-blue-600">老师已经准备好了</p>
++                <p className="mb-2 text-sm font-semibold tracking-wide text-blue-600">
++                  老师已经准备好了
++                </p>
+                 <h2
+                   id="mira-student-start-title"
+                   className="text-3xl font-bold tracking-tight text-slate-900"
+@@ -1721,6 +1750,10 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+                 isPresenting={isPresenting}
+                 controlsVisible={controlsVisible}
+                 preGeneratedAudioAvailable={preGeneratedAudioAvailable}
++                ttsMuted={ttsMuted}
++                ttsVolume={ttsVolume}
++                onToggleTTSMuted={() => setTTSMuted(!ttsMuted)}
++                onTTSVolumeChange={setTTSVolume}
+                 onTogglePresentation={togglePresentation}
+                 onPresentationInteractionChange={setIsPresentationInteractionActive}
+                 fullscreenContainerRef={stageRef}
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+index 47b4d2c..f9efe84 100644
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -99,6 +99,11 @@ interface RoundtableProps {
+   readonly controlsVisible?: boolean;
+   /** Enables volume controls for already-generated lecture audio independently of TTS providers. */
+   readonly preGeneratedAudioAvailable?: boolean;
++  /** Controlled student-classroom audio state; operator playback falls back to settings. */
++  readonly ttsMuted?: boolean;
++  readonly ttsVolume?: number;
++  readonly onToggleTTSMuted?: () => void;
++  readonly onTTSVolumeChange?: (volume: number) => void;
+   readonly onTogglePresentation?: () => void;
+   readonly onPresentationInteractionChange?: (active: boolean) => void;
+   /** Ref to the fullscreen container — passed to ProactiveCard so its portal
+@@ -194,21 +199,27 @@ export function Roundtable({
+   isPresenting,
+   controlsVisible,
+   preGeneratedAudioAvailable,
++  ttsMuted: controlledTTSMuted,
++  ttsVolume: controlledTTSVolume,
++  onToggleTTSMuted,
++  onTTSVolumeChange,
+   onTogglePresentation,
+   onPresentationInteractionChange,
+   fullscreenContainerRef,
+ }: RoundtableProps) {
+   const { t } = useI18n();
+-  const ttsMuted = useSettingsStore((s) => s.ttsMuted);
+-  const setTTSMuted = useSettingsStore((s) => s.setTTSMuted);
++  const operatorTTSMuted = useSettingsStore((s) => s.ttsMuted);
++  const setOperatorTTSMuted = useSettingsStore((s) => s.setTTSMuted);
+   const ttsEnabled = useSettingsStore((state) => state.ttsEnabled);
+   const audioPlaybackAvailable = ttsEnabled || !!preGeneratedAudioAvailable;
+   const operatorAsrEnabled = useSettingsStore((state) => state.asrEnabled);
+   const studentMode = useMiraStudentRuntime();
+   const asrEnabled = getMiraEffectiveAsrEnabled({ studentMode, operatorAsrEnabled });
+   const chatAreaWidth = useSettingsStore((s) => s.chatAreaWidth);
+-  const ttsVolume = useSettingsStore((s) => s.ttsVolume);
+-  const setTTSVolume = useSettingsStore((s) => s.setTTSVolume);
++  const operatorTTSVolume = useSettingsStore((s) => s.ttsVolume);
++  const setOperatorTTSVolume = useSettingsStore((s) => s.setTTSVolume);
++  const ttsMuted = controlledTTSMuted ?? operatorTTSMuted;
++  const ttsVolume = controlledTTSVolume ?? operatorTTSVolume;
+   const playbackSpeed = useSettingsStore((s) => s.playbackSpeed);
+   const setPlaybackSpeed = useSettingsStore((s) => s.setPlaybackSpeed);
+   const [isInputOpen, setIsInputOpen] = useState(false);
+@@ -689,8 +700,15 @@ export function Roundtable({
+       audioPlaybackAvailable={audioPlaybackAvailable}
+       ttsMuted={ttsMuted}
+       ttsVolume={ttsVolume}
+-      onToggleMute={() => audioPlaybackAvailable && setTTSMuted(!ttsMuted)}
+-      onVolumeChange={(v) => setTTSVolume(v)}
++      onToggleMute={() => {
++        if (!audioPlaybackAvailable) return;
++        if (onToggleTTSMuted) onToggleTTSMuted();
++        else setOperatorTTSMuted(!ttsMuted);
++      }}
++      onVolumeChange={(value) => {
++        if (onTTSVolumeChange) onTTSVolumeChange(value);
++        else setOperatorTTSVolume(value);
++      }}
+       autoPlayLecture={autoPlayLecture}
+       onToggleAutoPlay={() => onAutoPlayLectureChange(!autoPlayLecture)}
+       playbackSpeed={playbackSpeed}
+diff --git a/lib/hooks/use-discussion-tts.ts b/lib/hooks/use-discussion-tts.ts
+index 9049512..f03e0d6 100644
+--- a/lib/hooks/use-discussion-tts.ts
++++ b/lib/hooks/use-discussion-tts.ts
+@@ -29,6 +29,9 @@ import {
+ interface DiscussionTTSOptions {
+   enabled: boolean;
+   agents: AgentConfig[];
++  /** Optional classroom-local controls. Operator playback falls back to the settings store. */
++  muted?: boolean;
++  volume?: number;
+   onAudioStateChange?: (agentId: string | null, state: AudioIndicatorState) => void;
+ }
+ 
+@@ -43,12 +46,20 @@ interface QueueItem {
+   fallbackVoice?: ResolvedVoice;
+ }
+ 
+-export function useDiscussionTTS({ enabled, agents, onAudioStateChange }: DiscussionTTSOptions) {
++export function useDiscussionTTS({
++  enabled,
++  agents,
++  muted,
++  volume,
++  onAudioStateChange,
++}: DiscussionTTSOptions) {
+   const { locale, t } = useI18n();
+   const ttsProvidersConfig = useSettingsStore((s) => s.ttsProvidersConfig);
+   const ttsSpeed = useSettingsStore((s) => s.ttsSpeed);
+-  const ttsMuted = useSettingsStore((s) => s.ttsMuted);
+-  const ttsVolume = useSettingsStore((s) => s.ttsVolume);
++  const storedTtsMuted = useSettingsStore((s) => s.ttsMuted);
++  const storedTtsVolume = useSettingsStore((s) => s.ttsVolume);
++  const ttsMuted = muted ?? storedTtsMuted;
++  const ttsVolume = volume ?? storedTtsVolume;
+   const playbackSpeed = useSettingsStore((s) => s.playbackSpeed);
+   // Global lecture voice — used as fallback for teacher agent
+   const globalTtsProviderId = useSettingsStore((s) => s.ttsProviderId);
+@@ -76,6 +87,7 @@ export function useDiscussionTTS({ enabled, agents, onAudioStateChange }: Discus
+     cancel: browserCancel,
+   } = useBrowserTTS({
+     rate: ttsSpeed,
++    volume: ttsMuted ? 0 : ttsVolume,
+     onEnd: () => {
+       isPlayingRef.current = false;
+       segmentDoneCounterRef.current++;
+diff --git a/lib/playback/engine.ts b/lib/playback/engine.ts
+index d382126..a8c4c1c 100644
+--- a/lib/playback/engine.ts
++++ b/lib/playback/engine.ts
+@@ -288,6 +288,8 @@ export class PlaybackEngine {
+       } else if (this.audioPlayer.hasActiveAudio()) {
+         // Audio is paused — resume it; TTS onend will call processNext
+         const generation = this.playbackGeneration;
++        const resumedAction = this.scenes[this.sceneIndex]?.actions?.[this.actionIndex - 1];
++        const resumedSpeech = resumedAction?.type === 'speech' ? resumedAction : null;
+         this.audioPlayer.onEnded(() => {
+           if (!this.isCurrentGeneration(generation)) return;
+           this.callbacks.onSpeechEnd?.();
+@@ -295,7 +297,29 @@ export class PlaybackEngine {
+             this.processNext(generation);
+           }
+         });
+-        this.audioPlayer.resume();
++        const recoverResumeFailure = () => {
++          if (!this.isCurrentGeneration(generation)) return;
++          if (resumedSpeech && hasSpeechAudioReference(resumedSpeech)) {
++            this.callbacks.onAudioPlaybackIssue?.({
++              actionId: resumedSpeech.id,
++              reason: 'playback_failed',
++            });
++          }
++          // The student callback pauses and invalidates this generation before
++          // rewinding to the same action. Operator/legacy playback has no such
++          // recovery owner, so retain its old continue-with-text behaviour.
++          if (!this.isCurrentGeneration(generation) || this.mode !== 'playing') return;
++          this.callbacks.onSpeechEnd?.();
++          this.processNext(generation);
++        };
++        void Promise.resolve(this.audioPlayer.resume())
++          .then((resumed) => {
++            if (!resumed) recoverResumeFailure();
++          })
++          .catch((error) => {
++            log.error('Audio resume failed:', error);
++            recoverResumeFailure();
++          });
+       } else if (this.speechTimerRemaining > 0) {
+         // Reading timer was paused — reschedule with remaining time
+         const generation = this.playbackGeneration;
+diff --git a/lib/utils/audio-player.ts b/lib/utils/audio-player.ts
+index 7f95d45..eb8ec6a 100644
+--- a/lib/utils/audio-player.ts
++++ b/lib/utils/audio-player.ts
+@@ -10,6 +10,11 @@
+ import { createLogger } from '@/lib/logger';
+ 
+ const log = createLogger('AudioPlayer');
++const MIRA_STUDENT_AUDIO_GAIN = 10 ** (6 / 20);
++
++type WebkitAudioWindow = Window & {
++  webkitAudioContext?: typeof AudioContext;
++};
+ 
+ /** How long a legacy narration URL fetch may take before the media element
+  * fallback takes over. Bounded like the converter's URL probes: one stalled
+@@ -66,6 +71,137 @@ export class AudioPlayer {
+     if (this.blobUrl === blobUrl) this.blobUrl = null;
+   }
+ 
++  private studentRuntimeAudioEnabled: boolean = false;
++  private audioContext: AudioContext | null = null;
++  private audioContextReady: Promise<boolean> | null = null;
++  private mediaSource: MediaElementAudioSourceNode | null = null;
++  private gainNode: GainNode | null = null;
++  private limiterNode: DynamicsCompressorNode | null = null;
++
++  private disconnectStudentAudioGraph(): void {
++    this.mediaSource?.disconnect();
++    this.gainNode?.disconnect();
++    this.limiterNode?.disconnect();
++    this.mediaSource = null;
++    this.gainNode = null;
++    this.limiterNode = null;
++  }
++
++  private getStudentAudioContext(): AudioContext | null {
++    if (typeof window === 'undefined') return null;
++    if (this.audioContext && this.audioContext.state !== 'closed') return this.audioContext;
++
++    const AudioContextConstructor =
++      window.AudioContext || (window as WebkitAudioWindow).webkitAudioContext;
++    if (!AudioContextConstructor) return null;
++
++    try {
++      this.audioContext = new AudioContextConstructor();
++      return this.audioContext;
++    } catch (error) {
++      log.warn('Unable to initialize the student audio output graph:', error);
++      return null;
++    }
++  }
++
++  private resumeStudentAudioContext(): void {
++    const context = this.getStudentAudioContext();
++    if (!context) return;
++    if (context.state === 'running') {
++      this.audioContextReady = Promise.resolve(true);
++      return;
++    }
++    if (context.state !== 'suspended') {
++      this.audioContextReady = Promise.resolve(false);
++      return;
++    }
++
++    // Calling resume while the start-lesson click still has user activation
++    // unlocks this one context for the later automatically advanced clips.
++    this.audioContextReady = context
++      .resume()
++      .then(() => context.state === 'running')
++      .catch((error) => {
++        log.warn('Unable to resume the student audio output graph:', error);
++        return false;
++      });
++  }
++
++  private updateStudentOutputGain(): void {
++    if (!this.gainNode) return;
++    this.gainNode.gain.value = this.muted ? 0 : this.volume * MIRA_STUDENT_AUDIO_GAIN;
++  }
++
++  private connectStudentAudioGraph(audioUrl: string): boolean {
++    this.disconnectStudentAudioGraph();
++    if (!this.studentRuntimeAudioEnabled || !isMiraRuntimeAudioUrl(audioUrl)) return false;
++
++    const context = this.getStudentAudioContext();
++    // Never capture a media element into a suspended context. Native audio is
++    // the fail-safe path if browser context unlock is rejected or delayed.
++    if (!context || context.state !== 'running' || !this.audio) return false;
++
++    let source: MediaElementAudioSourceNode | null = null;
++    try {
++      // Create the processing nodes before capturing the media element. If a
++      // browser lacks either node, normal HTMLAudioElement playback remains
++      // untouched and is still a safe fallback.
++      const gain = context.createGain();
++      const limiter = context.createDynamicsCompressor();
++      source = context.createMediaElementSource(this.audio);
++
++      limiter.threshold.value = -1;
++      limiter.knee.value = 0;
++      limiter.ratio.value = 20;
++      limiter.attack.value = 0.003;
++      limiter.release.value = 0.15;
++      source.connect(gain);
++      gain.connect(limiter);
++      limiter.connect(context.destination);
++
++      this.mediaSource = source;
++      this.gainNode = gain;
++      this.limiterNode = limiter;
++      // The graph owns volume so it can boost quiet Qwen narration above the
++      // HTMLMediaElement's hard maximum of 1 while preserving mute/volume UI.
++      this.audio.muted = false;
++      this.audio.volume = 1;
++      this.updateStudentOutputGain();
++      return true;
++    } catch (error) {
++      // If capture succeeded but a connection failed, route the source
++      // directly to the destination so the lesson is still audible.
++      try {
++        source?.disconnect();
++        this.gainNode?.disconnect();
++        this.limiterNode?.disconnect();
++        source?.connect(context.destination);
++        this.mediaSource = source;
++        this.gainNode = null;
++        this.limiterNode = null;
++      } catch {
++        // The original warning below is the actionable failure.
++      }
++      log.warn('Unable to apply student narration gain; using browser audio:', error);
++      return false;
++    }
++  }
++
++  private attachStudentAudioGraphAfterUnlock(
++    audio: HTMLAudioElement,
++    audioUrl: string,
++    requestToken: number,
++  ): void {
++    const ready = this.audioContextReady;
++    if (!ready || !this.studentRuntimeAudioEnabled || !isMiraRuntimeAudioUrl(audioUrl)) return;
++    void ready.then((unlocked) => {
++      if (!unlocked || requestToken !== this.requestToken || this.audio !== audio || audio.paused) {
++        return;
++      }
++      this.connectStudentAudioGraph(audioUrl);
++    });
++  }
++
+   private stopAudioElement(): void {
+     if (this.audio) {
+       this.audio.pause();
+@@ -75,6 +211,16 @@ export class AudioPlayer {
+     // Stop or replacement before natural end must not leak the fetched
+     // narration: the element is dropped here, so its URL is released with it.
+     this.releaseBlobUrl(this.blobUrl);
++    this.disconnectStudentAudioGraph();
++  }
++
++  /**
++   * Prepare the formal student classroom while the start button still owns a
++   * browser user-activation grant. This is intentionally synchronous.
++   */
++  public prepareStudentPlayback(): void {
++    this.studentRuntimeAudioEnabled = true;
++    this.resumeStudentAudioContext();
+   }
+ 
+   /**
+@@ -101,6 +247,33 @@ export class AudioPlayer {
+     // A new play supersedes any in-flight legacy fetch of the previous one.
+     this.abortLegacyFetch();
+     try {
++      // Mira student narration URLs are short-lived server grants. Play them
++      // directly so the bounded student gain graph can recognize the source;
++      // other legacy URLs still use the fetch/blob fallback below.
++      if (legacyUrl && isMiraRuntimeAudioUrl(legacyUrl)) {
++        this.stopAudioElement();
++        if (requestToken !== this.requestToken) return false;
++        this.audio = new Audio();
++        this.audio.src = legacyUrl;
++        this.audio.muted = false;
++        if (this.muted) this.audio.volume = 0;
++        else this.audio.volume = this.volume;
++        this.audio.defaultPlaybackRate = this.playbackRate;
++        this.audio.playbackRate = this.playbackRate;
++        const audio = this.audio;
++        const graphConnected = this.connectStudentAudioGraph(legacyUrl);
++        if (!graphConnected) {
++          this.attachStudentAudioGraphAfterUnlock(audio, legacyUrl, requestToken);
++        }
++        this.audio.addEventListener('ended', () => {
++          this.onEndedCallback?.();
++        });
++        await this.audio.play();
++        if (requestToken !== this.requestToken) return false;
++        this.audio.playbackRate = this.playbackRate;
++        return true;
++      }
++
+       let blob = await resolveBytes(audioId);
+       if (requestToken !== this.requestToken) return false;
+ 
+@@ -210,12 +383,30 @@ export class AudioPlayer {
+   /**
+    * Resume playback
+    */
+-  public resume(): void {
+-    if (this.audio?.paused) {
+-      this.audio.playbackRate = this.playbackRate;
+-      this.audio.play().catch((error) => {
+-        log.error('Failed to resume audio:', error);
+-      });
++  public async resume(): Promise<boolean> {
++    const audio = this.audio;
++    if (!audio?.paused) return false;
++
++    const requestToken = this.requestToken;
++    const graphNeedsUnlock = Boolean(this.mediaSource && this.audioContext?.state !== 'running');
++    this.resumeStudentAudioContext();
++    const contextReady = this.audioContextReady;
++    audio.playbackRate = this.playbackRate;
++
++    try {
++      // Invoke play before the first await so a toolbar click keeps its browser
++      // user-activation grant. The caller decides how to recover this sentence.
++      const playAttempt = audio.play();
++      await playAttempt;
++      if (requestToken !== this.requestToken || this.audio !== audio) return false;
++      if (graphNeedsUnlock && contextReady) {
++        const unlocked = await contextReady;
++        if (!unlocked || requestToken !== this.requestToken || this.audio !== audio) return false;
++      }
++      return true;
++    } catch (error) {
++      log.error('Failed to resume audio:', error);
++      throw error;
+     }
+   }
+ 
+@@ -260,7 +451,11 @@ export class AudioPlayer {
+    */
+   public setMuted(muted: boolean): void {
+     this.muted = muted;
+-    if (this.audio) {
++    if (this.gainNode) {
++      this.audio!.muted = false;
++      this.audio!.volume = 1;
++      this.updateStudentOutputGain();
++    } else if (this.audio) {
+       this.audio.volume = muted ? 0 : this.volume;
+     }
+   }
+@@ -270,7 +465,11 @@ export class AudioPlayer {
+    */
+   public setVolume(volume: number): void {
+     this.volume = Math.max(0, Math.min(1, volume));
+-    if (this.audio && !this.muted) {
++    if (this.gainNode) {
++      this.audio!.muted = false;
++      this.audio!.volume = 1;
++      this.updateStudentOutputGain();
++    } else if (this.audio && !this.muted) {
+       this.audio.volume = this.volume;
+     }
+   }
+@@ -291,6 +490,25 @@ export class AudioPlayer {
+   public destroy(): void {
+     this.stop();
+     this.onEndedCallback = null;
++    const context = this.audioContext;
++    this.audioContext = null;
++    this.audioContextReady = null;
++    this.studentRuntimeAudioEnabled = false;
++    if (context && context.state !== 'closed') {
++      void context.close().catch((error) => {
++        log.warn('Unable to close the student audio output graph:', error);
++      });
++    }
++  }
++}
++
++function isMiraRuntimeAudioUrl(audioUrl: string): boolean {
++  try {
++    return /^\/mira\/runtime-audio\/formal_audio_asset_[0-9a-f]{48}$/.test(
++      new URL(audioUrl, 'http://mira-runtime.invalid').pathname,
++    );
++  } catch {
++    return false;
+   }
+ }
+ 
+diff --git a/tests/audio/mira-student-audio-output.test.ts b/tests/audio/mira-student-audio-output.test.ts
+new file mode 100644
+index 0000000..5f0047e
+--- /dev/null
++++ b/tests/audio/mira-student-audio-output.test.ts
+@@ -0,0 +1,149 @@
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++
++vi.mock('@/lib/utils/database', () => ({
++  db: { audioFiles: { get: vi.fn() } },
++}));
++
++import { AudioPlayer } from '@/lib/utils/audio-player';
++
++class AudioStub {
++  static latest: AudioStub | null = null;
++
++  muted = false;
++  volume = 1;
++  defaultPlaybackRate = 1;
++  playbackRate = 1;
++  src = '';
++  currentTime = 0;
++  paused = false;
++  play = vi.fn(async () => {});
++  pause = vi.fn();
++  addEventListener = vi.fn();
++
++  constructor() {
++    AudioStub.latest = this;
++  }
++}
++
++class AudioContextStub {
++  static latest: AudioContextStub | null = null;
++  static resumeHandler: ((context: AudioContextStub) => Promise<void>) | null = null;
++
++  state: AudioContextState = 'suspended';
++  destination = {} as AudioDestinationNode;
++  gain = { value: 0 };
++  limiter = {
++    threshold: { value: 0 },
++    knee: { value: 0 },
++    ratio: { value: 0 },
++    attack: { value: 0 },
++    release: { value: 0 },
++  };
++  source = { connect: vi.fn(), disconnect: vi.fn() };
++  gainNode = { gain: this.gain, connect: vi.fn(), disconnect: vi.fn() };
++  limiterNode = { ...this.limiter, connect: vi.fn(), disconnect: vi.fn() };
++  resume = vi.fn(() => {
++    if (AudioContextStub.resumeHandler) return AudioContextStub.resumeHandler(this);
++    this.state = 'running';
++    return Promise.resolve();
++  });
++  close = vi.fn(async () => {
++    this.state = 'closed';
++  });
++  createGain = vi.fn(() => this.gainNode as unknown as GainNode);
++  createDynamicsCompressor = vi.fn(() => this.limiterNode as unknown as DynamicsCompressorNode);
++  createMediaElementSource = vi.fn(() => this.source as unknown as MediaElementAudioSourceNode);
++
++  constructor() {
++    AudioContextStub.latest = this;
++  }
++}
++
++describe('Mira formal student audio output', () => {
++  beforeEach(() => {
++    vi.unstubAllGlobals();
++    vi.clearAllMocks();
++    AudioStub.latest = null;
++    AudioContextStub.latest = null;
++    AudioContextStub.resumeHandler = null;
++    vi.stubGlobal('Audio', AudioStub);
++    vi.stubGlobal('window', { AudioContext: AudioContextStub });
++  });
++
++  it('unlocks one audio context and applies bounded gain to runtime narration', async () => {
++    const player = new AudioPlayer();
++
++    player.prepareStudentPlayback();
++    expect(AudioContextStub.latest?.resume).toHaveBeenCalledTimes(1);
++
++    await expect(
++      player.play('formal-audio-1', `/mira/runtime-audio/formal_audio_asset_${'a'.repeat(48)}`),
++    ).resolves.toBe(true);
++
++    expect(AudioContextStub.latest?.createMediaElementSource).toHaveBeenCalledTimes(1);
++    expect(AudioContextStub.latest?.gain.value).toBeCloseTo(1.995262, 6);
++    expect(AudioContextStub.latest?.limiter.threshold.value).toBe(-1);
++    expect(AudioContextStub.latest?.limiter.ratio.value).toBe(20);
++    expect(AudioStub.latest).toMatchObject({ muted: false, volume: 1 });
++
++    player.setVolume(0.5);
++    expect(AudioContextStub.latest?.gain.value).toBeCloseTo(0.997631, 6);
++    player.setMuted(true);
++    expect(AudioContextStub.latest?.gain.value).toBe(0);
++    player.setMuted(false);
++    expect(AudioContextStub.latest?.gain.value).toBeCloseTo(0.997631, 6);
++
++    player.destroy();
++    expect(AudioContextStub.latest?.close).toHaveBeenCalledTimes(1);
++  });
++
++  it('does not boost unrelated operator audio URLs', async () => {
++    const player = new AudioPlayer();
++    player.prepareStudentPlayback();
++
++    await expect(player.play('operator-audio', '/api/classroom-media/audio.wav')).resolves.toBe(
++      true,
++    );
++
++    expect(AudioContextStub.latest?.createMediaElementSource).not.toHaveBeenCalled();
++    expect(AudioStub.latest).toMatchObject({ muted: false, volume: 1 });
++  });
++
++  it('keeps native audio audible until a deferred context unlock succeeds', async () => {
++    let finishUnlock = () => {};
++    AudioContextStub.resumeHandler = (context) =>
++      new Promise<void>((resolve) => {
++        finishUnlock = () => {
++          context.state = 'running';
++          resolve();
++        };
++      });
++    const player = new AudioPlayer();
++    player.prepareStudentPlayback();
++
++    await player.play('formal-audio-2', `/mira/runtime-audio/formal_audio_asset_${'b'.repeat(48)}`);
++
++    expect(AudioStub.latest?.play).toHaveBeenCalledTimes(1);
++    expect(AudioContextStub.latest?.createMediaElementSource).not.toHaveBeenCalled();
++
++    finishUnlock();
++    await vi.waitFor(() => {
++      expect(AudioContextStub.latest?.createMediaElementSource).toHaveBeenCalledTimes(1);
++    });
++  });
++
++  it('falls back to native audio when context unlock is rejected', async () => {
++    AudioContextStub.resumeHandler = async () => {
++      throw new Error('AudioContext blocked');
++    };
++    const player = new AudioPlayer();
++    player.prepareStudentPlayback();
++
++    await player.play('formal-audio-3', `/mira/runtime-audio/formal_audio_asset_${'c'.repeat(48)}`);
++    await Promise.resolve();
++
++    expect(AudioStub.latest?.play).toHaveBeenCalledTimes(1);
++    expect(AudioContextStub.latest?.createMediaElementSource).not.toHaveBeenCalled();
++    expect(AudioStub.latest).toMatchObject({ muted: false, volume: 1 });
++  });
++});
+diff --git a/tests/playback/action-navigation.test.ts b/tests/playback/action-navigation.test.ts
+index 2adb7c4..5b94716 100644
+--- a/tests/playback/action-navigation.test.ts
++++ b/tests/playback/action-navigation.test.ts
+@@ -625,6 +625,41 @@ describe('PlaybackEngine action navigation', () => {
+     }
+   });
+ 
++  it('rewinds the same referenced narration when paused audio cannot resume', async () => {
++    const { engine: actionEngine } = createActionEngine();
++    const { player } = createAudioPlayer(async () => true);
++    vi.mocked(player.isPlaying).mockReturnValue(true);
++    vi.mocked(player.hasActiveAudio).mockReturnValue(true);
++    vi.mocked(player.resume).mockRejectedValue(new Error('NotAllowedError'));
++    const action = {
++      ...speech('formal-resume', '恢复时仍要从这一句继续'),
++      audioId: 'formal-audio-resume',
++      audioUrl: '/mira/runtime-audio/formal-audio-resume',
++    } as Action;
++    const onAudioPlaybackIssue = vi.fn();
++    const playback = new PlaybackEngine([scene([action])], actionEngine, player, {
++      onAudioPlaybackIssue: (issue) => {
++        onAudioPlaybackIssue(issue);
++        playback.pause();
++        void playback.jumpToAction(issue.actionId === action.id ? 0 : -1, { autoplay: false });
++      },
++    });
++
++    playback.start();
++    await flushPromises();
++    playback.pause();
++    playback.resume();
++    await flushPromises();
++    await flushPromises();
++
++    expect(onAudioPlaybackIssue).toHaveBeenCalledWith({
++      actionId: 'formal-resume',
++      reason: 'playback_failed',
++    });
++    expect(playback.getMode()).toBe('paused');
++    expect(player.resume).toHaveBeenCalledTimes(1);
++  });
++
+   it('can pause, rewind, and retry the same referenced narration after playback fails', async () => {
+     const { engine: actionEngine } = createActionEngine();
+     let attempts = 0;
+-- 
+2.50.1 (Apple Git-155)
+

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/app/router/app_route.dart';
 import 'package:warm_sight/src/core/network/api_client.dart';
 import 'package:warm_sight/src/core/storage/setup_store.dart';
+import 'package:warm_sight/src/shared/domain/child_grade.dart';
 
 final setupRepositoryProvider = Provider<SetupRepository>((ref) {
   return SetupRepository(
@@ -38,11 +39,17 @@ class SetupStatus {
     required this.deviceLocation,
     required this.wifiName,
     required this.childName,
+    this.childNickname = '',
     required this.childGender,
     required this.childBirthday,
     required this.childSleepTime,
     required this.childEducationStage,
     required this.childGrade,
+    this.childGradeCode = '',
+    this.childContentMode = '',
+    this.childSchoolYearStartYear,
+    this.childGradeConfirmedAt,
+    this.childGradeSelectionRequired = false,
     required this.cameraWakeName,
   });
 
@@ -64,19 +71,27 @@ class SetupStatus {
   final String deviceLocation;
   final String wifiName;
   final String childName;
+  final String childNickname;
   final String childGender;
   final String childBirthday;
   final String childSleepTime;
   final String childEducationStage;
   final String childGrade;
+  final String childGradeCode;
+  final String childContentMode;
+  final int? childSchoolYearStartYear;
+  final int? childGradeConfirmedAt;
+  final bool childGradeSelectionRequired;
   final String cameraWakeName;
 
   bool get hasDeviceBinding => deviceBinding == 'done';
 
   String get routePath {
-    if (completed || nextStep == 'home') return AppRoute.home.path;
     if (parentIdentity != 'done') return setupParentIdentityPath;
-    if (childProfile != 'done') return setupChildProfilePath;
+    if (childProfile != 'done' || childGradeSelectionRequired) {
+      return setupChildProfilePath;
+    }
+    if (completed || nextStep == 'home') return AppRoute.home.path;
     return AppRoute.home.path;
   }
 
@@ -88,6 +103,12 @@ class SetupStatus {
     final wifi = _asMap(map['wifi']);
     final child = _asMap(map['child']);
     final cameraName = _asMap(map['cameraName']);
+    final gradeOption =
+        ChildGradeOption.fromCode(_asString(child['gradeCode'])) ??
+        ChildGradeOption.fromLegacy(
+          educationStage: _asString(child['educationStage']),
+          grade: _asString(child['grade']),
+        );
     return SetupStatus(
       completed: setup['completed'] == true,
       parentIdentity: _asString(setup['parentIdentity'], fallback: 'pending'),
@@ -107,11 +128,22 @@ class SetupStatus {
       deviceLocation: _asString(device['location']),
       wifiName: _asString(wifi['ssid']),
       childName: _asString(child['name']),
+      childNickname: _asString(child['nickname']),
       childGender: _asString(child['gender'], fallback: 'unspecified'),
       childBirthday: _asString(child['birthday']),
       childSleepTime: _asString(child['sleepTime']),
       childEducationStage: _asString(child['educationStage']),
       childGrade: _asString(child['grade']),
+      childGradeCode: gradeOption?.code ?? '',
+      childContentMode: _asString(
+        child['contentMode'],
+        fallback: gradeOption?.contentMode ?? '',
+      ),
+      childSchoolYearStartYear: _asNullableInt(
+        child['schoolYearStartYear'] ?? child['gradeSchoolYearStart'],
+      ),
+      childGradeConfirmedAt: _asNullableInt(child['gradeConfirmedAt']),
+      childGradeSelectionRequired: child['gradeSelectionRequired'] == true,
       cameraWakeName: _asString(cameraName['wakeName']),
     );
   }
@@ -194,25 +226,36 @@ class SetupRepository {
   }
 
   Future<SetupStatus> saveChild({
-    required String name,
+    String? name,
     String? nickname,
     String gender = 'unspecified',
     String? ageStage,
     String? educationStage,
     String? grade,
+    String? gradeCode,
+    int? schoolYearStartYear,
     String? birthday,
     String? sleepTime,
   }) {
-    return _postStep('/setup/child', {
-      'name': name,
-      'nickname': nickname,
-      'gender': gender,
-      'ageStage': ageStage,
-      'educationStage': educationStage,
-      'grade': grade,
-      'birthday': birthday,
-      'sleepTime': sleepTime,
-    });
+    final body = <String, Object?>{};
+    void addText(String key, String? value) {
+      final trimmed = value?.trim() ?? '';
+      if (trimmed.isNotEmpty) body[key] = trimmed;
+    }
+
+    addText('name', name);
+    addText('nickname', nickname);
+    if (gender != 'unspecified' || gradeCode == null) body['gender'] = gender;
+    addText('ageStage', ageStage);
+    addText('educationStage', educationStage);
+    addText('grade', grade);
+    addText('gradeCode', gradeCode);
+    if (schoolYearStartYear != null) {
+      body['schoolYearStartYear'] = schoolYearStartYear;
+    }
+    addText('birthday', birthday);
+    addText('sleepTime', sleepTime);
+    return _postStep('/setup/child', body);
   }
 
   Future<SetupStatus> saveCameraName({required String wakeName}) {
@@ -278,7 +321,10 @@ class SetupRepository {
   }
 
   Future<void> _syncLocalCompletion(SetupStatus status) async {
-    if (status.completed) {
+    if (status.childProfile == 'done' && !status.childGradeSelectionRequired) {
+      await _setupStore.clearPendingChildProfile();
+    }
+    if (status.completed && !status.childGradeSelectionRequired) {
       await _setupStore.markCompleted();
     } else {
       await _setupStore.reset();

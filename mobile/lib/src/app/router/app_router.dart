@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/app/router/app_route_observer.dart';
 import 'package:warm_sight/src/app/router/startup_gate.dart';
 import 'package:warm_sight/src/app/shell/app_shell.dart';
 import 'package:warm_sight/src/core/storage/auth_session_store.dart';
@@ -17,6 +18,8 @@ import 'package:warm_sight/src/features/rewards/presentation/reward_detail_scree
 import 'package:warm_sight/src/features/rewards/presentation/rewards_screen.dart';
 import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
 import 'package:warm_sight/src/features/setup/presentation/setup_flow_screens.dart';
+import 'package:warm_sight/src/features/student_access/presentation/student_access_pairing_page.dart';
+import 'package:warm_sight/src/features/student_access/presentation/student_access_qr_page.dart';
 import 'package:warm_sight/src/features/tasks/presentation/task_detail_screen.dart';
 import 'package:warm_sight/src/features/tasks/presentation/tasks_screen.dart';
 import 'package:warm_sight/src/features/welcome/presentation/welcome_screen.dart';
@@ -31,6 +34,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: initialLocation,
+    observers: [appRouteObserver],
     refreshListenable: sessionStore,
     redirect: (_, state) {
       return _authRedirect(
@@ -216,6 +220,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: profileChildPath,
         name: 'profileChild',
         builder: (_, _) => const ChildProfilePage(),
+      ),
+      GoRoute(
+        path: profileStudentAccessPath,
+        name: 'profileStudentAccess',
+        builder: (_, _) => const StudentAccessPairingPage(),
+      ),
+      GoRoute(
+        path: studentAccessQrPath,
+        name: 'studentAccessQr',
+        builder: (_, _) => const StudentAccessQrPage(),
       ),
       GoRoute(
         path: profileContactsPath,

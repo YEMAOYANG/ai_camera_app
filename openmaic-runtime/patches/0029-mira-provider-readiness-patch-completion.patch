@@ -1,0 +1,36 @@
+From 14c5a02a96d5ba4fd9004067f57c6d46272c05b4 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:35 +0800
+Subject: [PATCH 29/37] 0029-mira-provider-readiness-patch-completion
+
+---
+ lib/server/mira-formal-provider-readiness.ts        | 1 +
+ tests/server/mira-formal-provider-readiness.test.ts | 6 ++++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/lib/server/mira-formal-provider-readiness.ts b/lib/server/mira-formal-provider-readiness.ts
+index 6b30ee9..43625dc 100644
+--- a/lib/server/mira-formal-provider-readiness.ts
++++ b/lib/server/mira-formal-provider-readiness.ts
+@@ -1169,3 +1169,4 @@ export function authorizeMiraFormalProviderReadinessRequest(req: NextRequest): v
+     }
+     throw error;
+   }
++}
+diff --git a/tests/server/mira-formal-provider-readiness.test.ts b/tests/server/mira-formal-provider-readiness.test.ts
+index 03f1b17..be8a4a4 100644
+--- a/tests/server/mira-formal-provider-readiness.test.ts
++++ b/tests/server/mira-formal-provider-readiness.test.ts
+@@ -419,3 +419,9 @@ describe('Mira formal Provider readiness runtime', () => {
+         headers,
+       }),
+     );
++    expect(healthy.status).toBe(200);
++    const healthBody = await healthy.json();
++    expect(healthBody.capabilities).toEqual({ formalProviderReadiness: true });
++    expect(healthBody.runtimePolicy.formalProviderReadiness.expectedProviderCallCount).toBe(5);
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

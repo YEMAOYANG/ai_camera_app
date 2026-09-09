@@ -8,11 +8,15 @@ from services.service_factory import (
     auth_service,
     camera_bridge_service,
     camera_command_service,
+    learning_service,
     routine_reminder_service,
     task_runtime_service,
 )
 from services.task_event_stream import publish_task_runtime_result, task_event_stream_status
 from services.task_scheduler_runner import task_scheduler_status
+from services.learning_daily_preparation_runner import (
+    learning_daily_preparation_status,
+)
 
 
 dev_bp = Blueprint("dev", __name__)
@@ -64,8 +68,24 @@ def scheduler_status():
             {
                 "ok": True,
                 "scheduler": task_scheduler_status(),
+                "learningDailyPreparation": learning_daily_preparation_status(),
                 "taskStream": task_event_stream_status(),
             }
+        )
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@dev_bp.post("/learning/daily/prepare")
+def learning_daily_prepare():
+    try:
+        _ensure_dev_enabled()
+        data = json_body(request)
+        learning_date = str(data.get("date") or "").strip() or None
+        return jsonify(
+            learning_service().ensure_today_for_all_primary_children(
+                learning_date=learning_date
+            )
         )
     except ApiError as exc:
         return error_response(exc)

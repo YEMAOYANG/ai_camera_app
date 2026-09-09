@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 from typing import Any
+from urllib.parse import unquote, urlparse
 
 from core.database import Database
 from scripts.migrate import run_migrations
@@ -18,12 +19,30 @@ TEST_DATABASE_URL = os.getenv(
 )
 
 
+def validated_test_database_url(database_url: str | None = None) -> str:
+    resolved = str(
+        database_url
+        or os.getenv("APP_TEST_DATABASE_URL")
+        or TEST_DATABASE_URL
+    ).strip()
+    parsed = urlparse(resolved)
+    database_name = unquote(parsed.path.lstrip("/")).split("/", 1)[0]
+    if database_name != "ai_camera_app_test":
+        raise RuntimeError(
+            "APP_TEST_DATABASE_URL must name the exact ai_camera_app_test database"
+        )
+    if parsed.scheme != "mysql+pymysql":
+        raise RuntimeError("APP_TEST_DATABASE_URL must use mysql+pymysql")
+    if (parsed.hostname or "").lower() not in {"127.0.0.1", "localhost", "::1"}:
+        raise RuntimeError("APP_TEST_DATABASE_URL must use a safe local test boundary")
+    return resolved
+
+
 def fresh_test_config(**overrides: Any) -> dict:
-    reset_mysql_test_database()
     config = {
         "TESTING": True,
         "APP_ENV": "test",
-        "DATABASE_URL": TEST_DATABASE_URL,
+        "DATABASE_URL": os.getenv("APP_TEST_DATABASE_URL") or TEST_DATABASE_URL,
         "AUTH_ACCESS_TOKEN_SECONDS": 900,
         "AUTH_REFRESH_TOKEN_SECONDS": 3600,
         "SMS_PROVIDER": "development",
@@ -40,11 +59,15 @@ def fresh_test_config(**overrides: Any) -> dict:
         "PROMPT_ROOT": DEFAULT_PROMPT_ROOT,
     }
     config.update(overrides)
+    database_url = validated_test_database_url(config["DATABASE_URL"])
+    config["DATABASE_URL"] = database_url
+    reset_mysql_test_database(database_url)
     return config
 
 
-def reset_mysql_test_database() -> None:
-    database = Database(TEST_DATABASE_URL)
+def reset_mysql_test_database(database_url: str | None = None) -> None:
+    safe_database_url = validated_test_database_url(database_url)
+    database = Database(safe_database_url)
     with database.transaction() as conn:
         conn.execute("SET FOREIGN_KEY_CHECKS = 0")
         rows = conn.execute("SHOW TABLES").fetchall()
@@ -52,7 +75,7 @@ def reset_mysql_test_database() -> None:
             table_name = next(iter(row.values()))
             conn.execute(f"DROP TABLE IF EXISTS `{table_name}`")
         conn.execute("SET FOREIGN_KEY_CHECKS = 1")
-    run_migrations(TEST_DATABASE_URL, verbose=False)
+    run_migrations(safe_database_url, verbose=False)
 
 
 def request_debug_code(client, phone: str) -> str:

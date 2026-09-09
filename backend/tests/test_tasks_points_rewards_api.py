@@ -4,10 +4,12 @@ from datetime import datetime, timedelta
 import unittest
 
 from app import create_app
+from core.database import Database
 from integrations.camera_runtime.mock_adapter import MockCameraRuntimeAdapter
 from services.ai_text_provider import AiTextResponse
 from services.task_reminder_policy import build_task_reminder
 from services.task_event_stream import task_runtime_messages_by_family
+from services.service_factory import task_runtime_service
 from tests.support import fresh_test_config, request_debug_code
 
 
@@ -722,6 +724,71 @@ class TasksPointsRewardsApiTest(unittest.TestCase):
         event_types = {event["eventType"] for event in events.json["events"]}
         self.assertIn("auto_started", event_types)
         self.assertIn("monitor_started", event_types)
+
+    def test_runtime_learning_waits_for_classroom_events_and_stops_camera_monitor(self):
+        now = datetime.now().astimezone()
+        task = self._create_task_at(
+            title="20以内加法互动课",
+            task_type="learning",
+            start_at=now - timedelta(minutes=1),
+            due_at=now + timedelta(minutes=5),
+            reward_points=0,
+            requires_parent_confirmation=False,
+        )
+        with Database(self.app.config["DATABASE_URL"]).transaction() as conn:
+            conn.execute(
+                """
+                UPDATE tasks
+                SET learning_course_id = 'course-runtime-test',
+                  learning_course_version = '1'
+                WHERE id = ?
+                """,
+                (task["id"],),
+            )
+
+        tick = self._scheduler_tick()
+
+        self.assertEqual(tick.status_code, 200, tick.json)
+        self.assertEqual(tick.json["changedTasks"][0]["status"], "delayed")
+        event_types = {event["eventType"] for event in tick.json["events"]}
+        self.assertIn("learning_classroom_waiting", event_types)
+        self.assertIn("learning_start_reminder_sent", event_types)
+        self.assertIn("monitor_started", event_types)
+        self.assertNotIn("auto_started", event_types)
+
+        started = self.client.post(
+            f"/api/tasks/{task['id']}/start",
+            headers=self._auth_headers(),
+        )
+        self.assertEqual(started.status_code, 200, started.json)
+        with self.app.app_context():
+            coordinated = task_runtime_service().learning_classroom_started(
+                family_id=started.json["task"]["familyId"],
+                task_id=task["id"],
+            )
+            completed = task_runtime_service().learning_classroom_completed(
+                family_id=started.json["task"]["familyId"],
+                task_id=task["id"],
+            )
+        self.assertTrue(coordinated["ok"])
+        self.assertTrue(completed["ok"])
+
+        detail = self.client.get(
+            f"/api/tasks/{task['id']}",
+            headers=self._auth_headers(),
+        )
+        # The camera coordinator cannot declare learning complete; only the
+        # authoritative classroom/report transaction does that.
+        self.assertEqual(detail.json["task"]["status"], "in_progress")
+        events = self.client.get(
+            f"/api/tasks/{task['id']}/events",
+            headers=self._auth_headers(),
+        )
+        persisted_types = {event["eventType"] for event in events.json["events"]}
+        self.assertIn("learning_classroom_started", persisted_types)
+        self.assertIn("learning_monitor_stopped", persisted_types)
+        self.assertIn("learning_classroom_completed", persisted_types)
+        self.assertIn("learning_finish_reminder_sent", persisted_types)
 
     def test_scheduler_tick_records_offline_camera_without_blocking_task(self):
         offline_app = create_app(fresh_test_config(CAMERA_RUNTIME_PROVIDER="disabled"))

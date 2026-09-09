@@ -1,0 +1,541 @@
+From 30a16f36d9ce492aed908f9dc2ae4dc1e4fb83f1 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 04/37] 0004-mira-qwen-asr-runtime-policy
+
+---
+ app/api/health/route.ts                  |  8 +++
+ app/api/server-providers/route.ts        |  7 +-
+ app/api/transcription/route.ts           | 41 +++++++++++
+ lib/hooks/use-audio-recorder.ts          | 61 ++++++++++------
+ lib/server/mira-asr-policy.ts            | 45 ++++++++++++
+ tests/audio/mira-asr-client.test.ts      | 22 ++++++
+ tests/server/health-route.test.ts        | 12 ++++
+ tests/server/mira-asr-policy.test.ts     | 47 +++++++++++++
+ tests/server/transcription-route.test.ts | 89 ++++++++++++++++++++++++
+ 9 files changed, 311 insertions(+), 21 deletions(-)
+ create mode 100644 lib/server/mira-asr-policy.ts
+ create mode 100644 tests/audio/mira-asr-client.test.ts
+ create mode 100644 tests/server/mira-asr-policy.test.ts
+ create mode 100644 tests/server/transcription-route.test.ts
+
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index d996318..d33c0c1 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -4,19 +4,25 @@ import {
+   getServerImageProviders,
+   getServerVideoProviders,
+   getServerTTSProviders,
++  getServerASRProviders,
+ } from '@/lib/server/provider-config';
+ import { assertMiraTtsProviderReady, getMiraTtsPolicy } from '@/lib/server/mira-tts-policy';
++import { assertMiraAsrProviderReady, getMiraAsrPolicy } from '@/lib/server/mira-asr-policy';
+ import { getMiraStructuredSceneRuntimePolicy } from '@/lib/server/model-routes';
+ 
+ const version = process.env.npm_package_version || '0.1.0';
+ 
+ export async function GET() {
+   const ttsProviders = getServerTTSProviders();
++  const asrProviders = getServerASRProviders();
+   let ttsPolicy;
++  let asrPolicy;
+   let structuredScenePolicy;
+   try {
+     ttsPolicy = getMiraTtsPolicy();
+     assertMiraTtsProviderReady(ttsPolicy, ttsProviders);
++    asrPolicy = getMiraAsrPolicy();
++    assertMiraAsrProviderReady(asrPolicy, asrProviders);
+     structuredScenePolicy = getMiraStructuredSceneRuntimePolicy();
+   } catch (error) {
+     return apiError(
+@@ -35,9 +41,11 @@ export async function GET() {
+       imageGeneration: Object.values(getServerImageProviders()).some((info) => !info.disabled),
+       videoGeneration: Object.values(getServerVideoProviders()).some((info) => !info.disabled),
+       tts: Object.values(ttsProviders).some((info) => !info.disabled),
++      asr: Boolean(asrProviders[asrPolicy.providerId]),
+     },
+     runtimePolicy: {
+       tts: ttsPolicy,
++      asr: asrPolicy,
+       structuredScene: structuredScenePolicy,
+     },
+   });
+diff --git a/app/api/server-providers/route.ts b/app/api/server-providers/route.ts
+index c3cfcfd..3403fd0 100644
+--- a/app/api/server-providers/route.ts
++++ b/app/api/server-providers/route.ts
+@@ -11,6 +11,7 @@ import {
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import { createLogger } from '@/lib/logger';
+ import { assertMiraTtsProviderReady, getMiraTtsPolicy } from '@/lib/server/mira-tts-policy';
++import { assertMiraAsrProviderReady, getMiraAsrPolicy } from '@/lib/server/mira-asr-policy';
+ 
+ const log = createLogger('ServerProviders');
+ 
+@@ -19,11 +20,15 @@ export async function GET() {
+     const tts = getServerTTSProviders();
+     const ttsPolicy = getMiraTtsPolicy();
+     assertMiraTtsProviderReady(ttsPolicy, tts);
++    const asr = getServerASRProviders();
++    const asrPolicy = getMiraAsrPolicy();
++    assertMiraAsrProviderReady(asrPolicy, asr);
+     return apiSuccess({
+       providers: getServerProviders(),
+       tts,
+       ttsPolicy,
+-      asr: getServerASRProviders(),
++      asr,
++      asrPolicy,
+       pdf: getServerPDFProviders(),
+       image: getServerImageProviders(),
+       video: getServerVideoProviders(),
+diff --git a/app/api/transcription/route.ts b/app/api/transcription/route.ts
+index 92b34fd..400470c 100644
+--- a/app/api/transcription/route.ts
++++ b/app/api/transcription/route.ts
+@@ -3,6 +3,7 @@ import { transcribeAudio } from '@/lib/audio/asr-providers';
+ import {
+   isServerConfiguredProvider,
+   isServerProviderDisabled,
++  getServerASRProviders,
+   resolveASRApiKey,
+   resolveASRBaseUrl,
+   resolveASRModel,
+@@ -12,6 +13,11 @@ import type { ASRProviderId } from '@/lib/audio/types';
+ import { createLogger } from '@/lib/logger';
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import { validateUrlForSSRF } from '@/lib/server/ssrf-guard';
++import {
++  assertMiraAsrProviderReady,
++  getMiraAsrPolicy,
++  isMiraRuntimeRequest,
++} from '@/lib/server/mira-asr-policy';
+ const log = createLogger('Transcription');
+ 
+ export const maxDuration = 60;
+@@ -19,6 +25,7 @@ export const maxDuration = 60;
+ export async function POST(req: NextRequest) {
+   let resolvedProviderId: string | undefined;
+   let resolvedModelId: string | undefined;
++  const miraRuntime = isMiraRuntimeRequest(req.headers);
+   try {
+     const formData = await req.formData();
+     const audioFile = formData.get('audio') as File;
+@@ -35,6 +42,36 @@ export async function POST(req: NextRequest) {
+       return apiError('MISSING_REQUIRED_FIELD', 400, 'Audio file is required');
+     }
+ 
++    if (miraRuntime) {
++      const policy = getMiraAsrPolicy();
++      assertMiraAsrProviderReady(policy, getServerASRProviders());
++      if (
++        (providerId && providerId !== policy.providerId) ||
++        (modelId && modelId !== policy.modelId) ||
++        apiKey ||
++        baseUrl
++      ) {
++        return apiError(
++          'INVALID_REQUEST',
++          400,
++          'Mira runtime ASR provider configuration is server-owned',
++        );
++      }
++      resolvedProviderId = policy.providerId;
++      resolvedModelId = policy.modelId;
++      const result = await transcribeAudio(
++        {
++          providerId: policy.providerId,
++          modelId: policy.modelId,
++          language: language || 'auto',
++          apiKey: resolveASRApiKey(policy.providerId),
++          baseUrl: resolveASRBaseUrl(policy.providerId),
++        },
++        audioFile,
++      );
++      return apiSuccess({ text: result.text });
++    }
++
+     // Prefer an enabled operator-configured backend when the client omitted its
+     // selection. Never guess a vendor: fail loudly when no backend is enabled.
+     const effectiveProviderId =
+@@ -80,6 +117,10 @@ export async function POST(req: NextRequest) {
+ 
+     return apiSuccess({ text: result.text });
+   } catch (error) {
++    if (miraRuntime) {
++      log.error('Mira Qwen ASR transcription failed');
++      return apiError('TRANSCRIPTION_FAILED', 500, 'Transcription failed');
++    }
+     log.error(
+       `Transcription failed [provider=${resolvedProviderId ?? 'unknown'}, model=${resolvedModelId ?? 'default'}]:`,
+       error,
+diff --git a/lib/hooks/use-audio-recorder.ts b/lib/hooks/use-audio-recorder.ts
+index b742123..f30d8fd 100644
+--- a/lib/hooks/use-audio-recorder.ts
++++ b/lib/hooks/use-audio-recorder.ts
+@@ -5,6 +5,19 @@ import { normalizeASRUploadAudio } from '@/lib/audio/wav-utils';
+ import { createLogger } from '@/lib/logger';
+ 
+ const log = createLogger('AudioRecorder');
++const MIRA_QWEN_ASR_PROVIDER_ID = 'qwen-asr' as const;
++
++export function isMiraRuntimeSearch(search: string): boolean {
++  return new URLSearchParams(search).get('mira') === '1';
++}
++
++export function resolveClientAsrProvider(search: string, configuredProviderId: string): string {
++  return isMiraRuntimeSearch(search) ? MIRA_QWEN_ASR_PROVIDER_ID : configuredProviderId;
++}
++
++export function shouldUseBrowserNativeAsr(search: string, configuredProviderId: string): boolean {
++  return !isMiraRuntimeSearch(search) && configuredProviderId === 'browser-native';
++}
+ 
+ // Window.SpeechRecognition / webkitSpeechRecognition have minimal constructor
+ // declarations in types/web-speech.d.ts; this hook casts the richer instance.
+@@ -44,27 +57,34 @@ export function useAudioRecorder(options: UseAudioRecorderOptions = {}) {
+         if (typeof window !== 'undefined') {
+           const { useSettingsStore } = await import('@/lib/store/settings');
+           const { asrProviderId, asrLanguage, asrProvidersConfig } = useSettingsStore.getState();
+-          const uploadAudio = await normalizeASRUploadAudio(asrProviderId, audioBlob);
+-          formData.append('audio', uploadAudio.blob, uploadAudio.fileName);
+-
+-          formData.append('providerId', asrProviderId);
+-          formData.append(
+-            'modelId',
+-            asrProvidersConfig?.[asrProviderId]?.modelId ||
+-              ASR_PROVIDERS[asrProviderId as keyof typeof ASR_PROVIDERS]?.defaultModelId ||
+-              '',
++          const miraRuntime = isMiraRuntimeSearch(window.location.search);
++          const effectiveProviderId = resolveClientAsrProvider(
++            window.location.search,
++            asrProviderId,
+           );
++          const uploadAudio = await normalizeASRUploadAudio(effectiveProviderId, audioBlob);
++          formData.append('audio', uploadAudio.blob, uploadAudio.fileName);
+           formData.append('language', asrLanguage);
+ 
+-          // Append API key and base URL if configured
+-          const providerConfig = asrProvidersConfig?.[asrProviderId];
+-          if (providerConfig?.apiKey?.trim()) {
+-            formData.append('apiKey', providerConfig.apiKey);
+-          }
+-          const effectiveBaseUrl =
+-            providerConfig?.baseUrl?.trim() || providerConfig?.customDefaultBaseUrl || '';
+-          if (effectiveBaseUrl) {
+-            formData.append('baseUrl', effectiveBaseUrl);
++          if (!miraRuntime) {
++            formData.append('providerId', asrProviderId);
++            formData.append(
++              'modelId',
++              asrProvidersConfig?.[asrProviderId]?.modelId ||
++                ASR_PROVIDERS[asrProviderId as keyof typeof ASR_PROVIDERS]?.defaultModelId ||
++                '',
++            );
++
++            // Non-Mira operator sessions retain the upstream configurable provider flow.
++            const providerConfig = asrProvidersConfig?.[asrProviderId];
++            if (providerConfig?.apiKey?.trim()) {
++              formData.append('apiKey', providerConfig.apiKey);
++            }
++            const effectiveBaseUrl =
++              providerConfig?.baseUrl?.trim() || providerConfig?.customDefaultBaseUrl || '';
++            if (effectiveBaseUrl) {
++              formData.append('baseUrl', effectiveBaseUrl);
++            }
+           }
+         } else {
+           formData.append('audio', audioBlob, 'recording.webm');
+@@ -112,8 +132,9 @@ export function useAudioRecorder(options: UseAudioRecorderOptions = {}) {
+           return;
+         }
+ 
+-        // Use browser native ASR if configured
+-        if (asrProviderId === 'browser-native') {
++        // Mira runtime always records audio and sends it to server-owned Qwen ASR.
++        // Browser-native ASR remains available only to non-Mira operator sessions.
++        if (shouldUseBrowserNativeAsr(window.location.search, asrProviderId)) {
+           // Check if Speech Recognition is supported
+           if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+             onError?.('您的浏览器不支持语音识别功能');
+diff --git a/lib/server/mira-asr-policy.ts b/lib/server/mira-asr-policy.ts
+new file mode 100644
+index 0000000..4511661
+--- /dev/null
++++ b/lib/server/mira-asr-policy.ts
+@@ -0,0 +1,45 @@
++import { ASR_PROVIDERS } from '@/lib/audio/constants';
++
++export const MIRA_QWEN_ASR_PROVIDER_ID = 'qwen-asr' as const;
++export const MIRA_QWEN_ASR_MODEL_ID = 'qwen3-asr-flash' as const;
++
++export interface MiraAsrPolicy {
++  enforced: true;
++  providerId: typeof MIRA_QWEN_ASR_PROVIDER_ID;
++  modelId: typeof MIRA_QWEN_ASR_MODEL_ID;
++  fallbackAllowed: false;
++}
++
++export function getMiraAsrPolicy(
++  env: Readonly<Record<string, string | undefined>> = process.env,
++): MiraAsrPolicy {
++  if (env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR !== '1') {
++    throw new Error('MIRA_OPENMAIC_REQUIRE_QWEN_ASR must be exactly 1');
++  }
++  const modelId = env.MIRA_OPENMAIC_QWEN_ASR_MODEL || MIRA_QWEN_ASR_MODEL_ID;
++  const registered = ASR_PROVIDERS[MIRA_QWEN_ASR_PROVIDER_ID].models.some(
++    (model) => model.id === modelId,
++  );
++  if (modelId !== MIRA_QWEN_ASR_MODEL_ID || !registered) {
++    throw new Error('Unsupported deterministic Qwen3-ASR model');
++  }
++  return {
++    enforced: true,
++    providerId: MIRA_QWEN_ASR_PROVIDER_ID,
++    modelId: MIRA_QWEN_ASR_MODEL_ID,
++    fallbackAllowed: false,
++  };
++}
++
++export function assertMiraAsrProviderReady(
++  policy: MiraAsrPolicy,
++  providers: Record<string, Record<string, never>>,
++): void {
++  if (!providers[policy.providerId]) {
++    throw new Error('Deterministic Qwen3-ASR is required but qwen-asr is not server-configured');
++  }
++}
++
++export function isMiraRuntimeRequest(headers: Headers): boolean {
++  return Boolean(headers.get('x-mira-runtime-session'));
++}
+diff --git a/tests/audio/mira-asr-client.test.ts b/tests/audio/mira-asr-client.test.ts
+new file mode 100644
+index 0000000..0be7786
+--- /dev/null
++++ b/tests/audio/mira-asr-client.test.ts
+@@ -0,0 +1,22 @@
++import { describe, expect, it } from 'vitest';
++import {
++  isMiraRuntimeSearch,
++  resolveClientAsrProvider,
++  shouldUseBrowserNativeAsr,
++} from '@/lib/hooks/use-audio-recorder';
++
++describe('Mira runtime ASR client selection', () => {
++  it('recognizes only the explicit Mira classroom launch marker', () => {
++    expect(isMiraRuntimeSearch('?mira=1')).toBe(true);
++    expect(isMiraRuntimeSearch('?foo=bar&mira=1')).toBe(true);
++    expect(isMiraRuntimeSearch('')).toBe(false);
++    expect(isMiraRuntimeSearch('?mira=0')).toBe(false);
++  });
++
++  it('forces server Qwen and disables the browser-native path in Mira classrooms', () => {
++    expect(resolveClientAsrProvider('?mira=1', 'browser-native')).toBe('qwen-asr');
++    expect(shouldUseBrowserNativeAsr('?mira=1', 'browser-native')).toBe(false);
++    expect(resolveClientAsrProvider('', 'browser-native')).toBe('browser-native');
++    expect(shouldUseBrowserNativeAsr('', 'browser-native')).toBe(true);
++  });
++});
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index a8db0c6..49e66f0 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -5,6 +5,7 @@ vi.mock('@/lib/server/provider-config', () => ({
+   getServerImageProviders: () => ({}),
+   getServerVideoProviders: () => ({}),
+   getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
++  getServerASRProviders: () => ({ 'qwen-asr': {} }),
+ }));
+ 
+ describe('GET /api/health structured scene runtime policy', () => {
+@@ -14,6 +15,8 @@ describe('GET /api/health structured scene runtime policy', () => {
+     process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS = '1';
+     process.env.MIRA_OPENMAIC_QWEN_TTS_MODEL = 'qwen3-tts-flash';
+     process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE = 'Serena';
++    process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR = '1';
++    process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL = 'qwen3-asr-flash';
+     delete process.env.MODEL_ROUTES;
+     delete process.env.KIMI_API_KEY;
+     delete process.env.KIMI_BASE_URL;
+@@ -24,6 +27,8 @@ describe('GET /api/health structured scene runtime policy', () => {
+     delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS;
+     delete process.env.MIRA_OPENMAIC_QWEN_TTS_MODEL;
+     delete process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE;
++    delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR;
++    delete process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL;
+     delete process.env.MODEL_ROUTES;
+     delete process.env.KIMI_API_KEY;
+     delete process.env.KIMI_BASE_URL;
+@@ -41,12 +46,19 @@ describe('GET /api/health structured scene runtime policy', () => {
+ 
+     expect(response.status).toBe(200);
+     expect(body.capabilities.tts).toBe(true);
++    expect(body.capabilities.asr).toBe(true);
+     expect(body.runtimePolicy.tts).toEqual({
+       enforced: true,
+       providerId: 'qwen-tts',
+       modelId: 'qwen3-tts-flash',
+       voiceId: 'Serena',
+     });
++    expect(body.runtimePolicy.asr).toEqual({
++      enforced: true,
++      providerId: 'qwen-asr',
++      modelId: 'qwen3-asr-flash',
++      fallbackAllowed: false,
++    });
+     expect(body.runtimePolicy.structuredScene).toEqual({
+       enforced: true,
+       policyId: 'kimi-k2.6-thinking-disabled-v1',
+diff --git a/tests/server/mira-asr-policy.test.ts b/tests/server/mira-asr-policy.test.ts
+new file mode 100644
+index 0000000..eea68b3
+--- /dev/null
++++ b/tests/server/mira-asr-policy.test.ts
+@@ -0,0 +1,47 @@
++import { afterEach, describe, expect, it } from 'vitest';
++import {
++  assertMiraAsrProviderReady,
++  getMiraAsrPolicy,
++  isMiraRuntimeRequest,
++} from '@/lib/server/mira-asr-policy';
++
++describe('Mira deterministic Qwen ASR policy', () => {
++  afterEach(() => {
++    delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR;
++    delete process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL;
++  });
++
++  it('attests the only accepted server-owned provider and model', () => {
++    expect(
++      getMiraAsrPolicy({
++        MIRA_OPENMAIC_REQUIRE_QWEN_ASR: '1',
++        MIRA_OPENMAIC_QWEN_ASR_MODEL: 'qwen3-asr-flash',
++      }),
++    ).toEqual({
++      enforced: true,
++      providerId: 'qwen-asr',
++      modelId: 'qwen3-asr-flash',
++      fallbackAllowed: false,
++    });
++  });
++
++  it('fails closed for missing flags, other models, or a missing server provider', () => {
++    expect(() => getMiraAsrPolicy({})).toThrow('must be exactly 1');
++    expect(() =>
++      getMiraAsrPolicy({
++        MIRA_OPENMAIC_REQUIRE_QWEN_ASR: '1',
++        MIRA_OPENMAIC_QWEN_ASR_MODEL: 'other-model',
++      }),
++    ).toThrow('Unsupported deterministic Qwen3-ASR model');
++    expect(() =>
++      assertMiraAsrProviderReady(getMiraAsrPolicy({ MIRA_OPENMAIC_REQUIRE_QWEN_ASR: '1' }), {}),
++    ).toThrow('qwen-asr is not server-configured');
++  });
++
++  it('recognizes only gateway-attested runtime requests', () => {
++    expect(isMiraRuntimeRequest(new Headers())).toBe(false);
++    expect(
++      isMiraRuntimeRequest(new Headers({ 'x-mira-runtime-session': 'runtime-session-1' })),
++    ).toBe(true);
++  });
++});
+diff --git a/tests/server/transcription-route.test.ts b/tests/server/transcription-route.test.ts
+new file mode 100644
+index 0000000..e19ccb8
+--- /dev/null
++++ b/tests/server/transcription-route.test.ts
+@@ -0,0 +1,89 @@
++import { NextRequest } from 'next/server';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++const mocks = vi.hoisted(() => ({
++  transcribeAudio: vi.fn(),
++  resolveASRApiKey: vi.fn(() => 'server-secret-never-return'),
++  resolveASRBaseUrl: vi.fn(() => 'https://server-owned.invalid/api/v1'),
++}));
++
++vi.mock('@/lib/audio/asr-providers', () => ({ transcribeAudio: mocks.transcribeAudio }));
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerASRProviders: () => ({ 'qwen-asr': {} }),
++  isServerConfiguredProvider: () => true,
++  resolveASRApiKey: mocks.resolveASRApiKey,
++  resolveASRBaseUrl: mocks.resolveASRBaseUrl,
++}));
++
++function request(extra: Record<string, string> = {}): NextRequest {
++  const form = new FormData();
++  form.set('audio', new File(['audio'], 'student.webm', { type: 'audio/webm' }));
++  form.set('language', 'zh');
++  for (const [key, value] of Object.entries(extra)) form.set(key, value);
++  return new NextRequest('http://localhost/api/transcription', {
++    method: 'POST',
++    headers: { 'x-mira-runtime-session': 'runtime-session-1' },
++    body: form,
++  });
++}
++
++describe('Mira runtime transcription', () => {
++  beforeEach(() => {
++    process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR = '1';
++    process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL = 'qwen3-asr-flash';
++    mocks.transcribeAudio.mockReset().mockResolvedValue({ text: '我想到了二十' });
++  });
++
++  afterEach(() => {
++    delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR;
++    delete process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL;
++  });
++
++  it('uses only the fixed server-owned Qwen ASR configuration', async () => {
++    const { POST } = await import('@/app/api/transcription/route');
++    const response = await POST(request());
++    const body = await response.json();
++
++    expect(response.status).toBe(200);
++    expect(body.text).toBe('我想到了二十');
++    expect(mocks.transcribeAudio).toHaveBeenCalledOnce();
++    expect(mocks.transcribeAudio.mock.calls[0][0]).toEqual({
++      providerId: 'qwen-asr',
++      modelId: 'qwen3-asr-flash',
++      language: 'zh',
++      apiKey: 'server-secret-never-return',
++      baseUrl: 'https://server-owned.invalid/api/v1',
++    });
++    expect(JSON.stringify(body)).not.toContain('server-secret-never-return');
++    expect(JSON.stringify(body)).not.toContain('server-owned.invalid');
++  });
++
++  it.each([
++    ['providerId', 'browser-native'],
++    ['modelId', 'attacker-model'],
++    ['apiKey', 'attacker-key'],
++    ['baseUrl', 'https://attacker.invalid'],
++  ])('rejects client-owned %s before any provider call', async (field, value) => {
++    const { POST } = await import('@/app/api/transcription/route');
++    const response = await POST(request({ [field]: value }));
++    const body = await response.json();
++
++    expect(response.status).toBe(400);
++    expect(body.error).toBe('Mira runtime ASR provider configuration is server-owned');
++    expect(mocks.transcribeAudio).not.toHaveBeenCalled();
++    expect(JSON.stringify(body)).not.toContain(value);
++  });
++
++  it('does not expose provider errors or secrets to the response', async () => {
++    mocks.transcribeAudio.mockRejectedValueOnce(
++      new Error('upstream failed with server-secret-never-return'),
++    );
++    const { POST } = await import('@/app/api/transcription/route');
++    const response = await POST(request());
++    const serialized = JSON.stringify(await response.json());
++
++    expect(response.status).toBe(500);
++    expect(serialized).not.toContain('server-secret-never-return');
++    expect(serialized).not.toContain('server-owned.invalid');
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

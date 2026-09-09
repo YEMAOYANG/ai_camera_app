@@ -637,6 +637,9 @@ class TaskTemplateCatalog {
     required this.dayTypes,
     required this.recommendedGrade,
     required this.recommendedGradeLabel,
+    required this.contentUnavailable,
+    required this.contentMode,
+    required this.contentMessage,
   });
 
   final List<TaskTemplate> templates;
@@ -645,6 +648,9 @@ class TaskTemplateCatalog {
   final List<TaskTemplateOption> dayTypes;
   final String recommendedGrade;
   final String recommendedGradeLabel;
+  final bool contentUnavailable;
+  final String contentMode;
+  final String contentMessage;
 
   static TaskTemplateCatalog fromJson(Map<String, dynamic> json) {
     return TaskTemplateCatalog(
@@ -665,6 +671,9 @@ class TaskTemplateCatalog {
         json['recommendedGradeLabel'],
         fallback: '小班',
       ),
+      contentUnavailable: json['contentUnavailable'] == true,
+      contentMode: _asString(json['contentMode']),
+      contentMessage: _asString(json['contentMessage']),
     );
   }
 }

@@ -1,0 +1,318 @@
+From c5d09d0c058cd5bf3f8fab04d9db8d32959af837 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 19/37] 0019-mira-node-persistence-instrumentation-boundary
+
+---
+ app/api/health/route.ts                       |  4 +
+ instrumentation.node.ts                       | 75 +++++++++++++++++
+ instrumentation.ts                            | 84 +------------------
+ lib/server/mira-instrumentation-policy.ts     | 14 ++++
+ next.config.ts                                |  2 +
+ tests/server/health-route.test.ts             |  6 ++
+ tests/server/instrumentation-boundary.test.ts | 31 +++++++
+ 7 files changed, 135 insertions(+), 81 deletions(-)
+ create mode 100644 instrumentation.node.ts
+ create mode 100644 lib/server/mira-instrumentation-policy.ts
+ create mode 100644 tests/server/instrumentation-boundary.test.ts
+
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index d18f0ce..da56f04 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -15,6 +15,7 @@ import { getMiraSampleDeterministicRecoveryRuntimePolicy } from '@/lib/server/mi
+ import { getMiraSampleTtsCredentialRecoveryRuntimePolicy } from '@/lib/server/mira-sample-tts-credential-recovery';
+ import { getMiraStudentChromeRuntimePolicy } from '@/lib/mira/student-runtime';
+ import { getMiraFormalGenerationRuntimePolicy } from '@/lib/server/mira-formal-generation-policy';
++import { getMiraInstrumentationBoundaryPolicy } from '@/lib/server/mira-instrumentation-policy';
+ import {
+   assertMiraFormalAudioProviderReady,
+   authorizeMiraFormalAudioRequest,
+@@ -109,6 +110,7 @@ export async function GET(req?: NextRequest) {
+   let ttsCredentialRecoveryPolicy;
+   let studentChromePolicy;
+   let formalGenerationPolicy;
++  let instrumentationBoundaryPolicy;
+   try {
+     ttsPolicy = getMiraTtsPolicy();
+     assertMiraTtsProviderReady(ttsPolicy, ttsProviders);
+@@ -119,6 +121,7 @@ export async function GET(req?: NextRequest) {
+     ttsCredentialRecoveryPolicy = getMiraSampleTtsCredentialRecoveryRuntimePolicy();
+     studentChromePolicy = getMiraStudentChromeRuntimePolicy();
+     formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
++    instrumentationBoundaryPolicy = getMiraInstrumentationBoundaryPolicy();
+   } catch (error) {
+     return apiError(
+       'PROVIDER_DISABLED',
+@@ -146,6 +149,7 @@ export async function GET(req?: NextRequest) {
+       ttsCredentialRecovery: ttsCredentialRecoveryPolicy,
+       studentChrome: studentChromePolicy,
+       formalGeneration: formalGenerationPolicy,
++      instrumentationBoundary: instrumentationBoundaryPolicy,
+     },
+   });
+ }
+diff --git a/instrumentation.node.ts b/instrumentation.node.ts
+new file mode 100644
+index 0000000..0cd54e9
+--- /dev/null
++++ b/instrumentation.node.ts
+@@ -0,0 +1,75 @@
++/** Register persistence work only in the Node.js instrumentation bundle. */
++export async function registerNodeInstrumentation(): Promise<void> {
++  const { startAssetCollectorSchedule } = await import('./lib/persistence/asset-collector-schedule');
++  const assetSchedule = startAssetCollectorSchedule();
++
++  // Warn-first boot-time validation of model routing config. It is cheap and
++  // non-throwing, but remains in this Node-only graph because provider config
++  // reads the filesystem.
++  const { validateServerConfig } = await import('./lib/server/config-validation');
++  validateServerConfig();
++
++  let runner: import('./lib/server/agent-runtime/runner').AgentRunnerHandle | undefined;
++  let extractionRunner:
++    | import('./lib/server/material-extraction/runner').MaterialExtractionRunnerHandle
++    | undefined;
++  let stopAgentEventNotifyBus: (() => Promise<void>) | null = null;
++  try {
++    const { isAgentRuntimeConfigured } = await import('./lib/config/feature-flags');
++    if (isAgentRuntimeConfigured()) {
++      const { startAgentEventNotifyBus } = await import(
++        './lib/server/agent-runtime/event-notify-bus'
++      );
++      const eventNotifyBus = startAgentEventNotifyBus();
++      stopAgentEventNotifyBus = () => eventNotifyBus.stop();
++      const runtime = await import('./lib/server/agent-runtime/runner');
++      runner = runtime.startAgentRunner();
++      const extraction = await import('./lib/server/material-extraction/runner');
++      extractionRunner = extraction.startMaterialExtractionRunner();
++    }
++  } catch (error) {
++    console.error('[instrumentation] Agent runtime startup failed', error);
++  }
++
++  let shutdownPromise: Promise<void> | undefined;
++  const shutdown = (): Promise<void> => {
++    shutdownPromise ??= (async () => {
++      try {
++        await extractionRunner?.stop();
++      } catch (error) {
++        console.error('[instrumentation] Material extraction runner drain failed', error);
++      }
++      try {
++        await runner?.stop();
++      } catch (error) {
++        console.error('[instrumentation] Agent runner drain failed', error);
++      }
++      try {
++        await stopAgentEventNotifyBus?.();
++      } catch (error) {
++        console.error('[instrumentation] Agent event notify bus drain failed', error);
++      }
++      try {
++        await assetSchedule?.stop();
++      } catch (error) {
++        console.error('[instrumentation] Asset collector drain failed', error);
++      }
++      const connectionString = process.env.DATABASE_URL?.trim();
++      if (connectionString) {
++        try {
++          const { getServerPersistenceProvider } = await import(
++            './lib/persistence/server-provider'
++          );
++          const { pool } = await getServerPersistenceProvider(connectionString);
++          await pool.end();
++        } catch (error) {
++          console.error('[instrumentation] Persistence pool shutdown failed', error);
++        }
++      }
++    })();
++    return shutdownPromise;
++  };
++
++  process.once('SIGTERM', () => void shutdown());
++  process.once('SIGINT', () => void shutdown());
++}
+diff --git a/instrumentation.ts b/instrumentation.ts
+index 9310515..c4e4136 100644
+--- a/instrumentation.ts
++++ b/instrumentation.ts
+@@ -15,85 +15,7 @@ export async function register(): Promise<void> {
+   // want; the persistence stack is Node-only.
+   if (process.env.NEXT_RUNTIME !== 'nodejs') return;
+ 
+-  // Imported dynamically so the Edge bundle never pulls in `pg`.
+-  const { startAssetCollectorSchedule } =
+-    await import('@/lib/persistence/asset-collector-schedule');
+-  const assetSchedule = startAssetCollectorSchedule();
+-
+-  // Warn-first boot-time validation of model routing config (MODEL_ROUTES,
+-  // DEFAULT_MODEL, <PREFIX>_MODELS). Cheap and non-throwing: broken config
+-  // surfaces here as [config] warnings instead of failing at request time.
+-  // Imported dynamically so the Edge bundle never pulls in the fs/js-yaml
+-  // backed provider config it reads.
+-  const { validateServerConfig } = await import('@/lib/server/config-validation');
+-  validateServerConfig();
+-
+-  let runner: import('@/lib/server/agent-runtime/runner').AgentRunnerHandle | undefined;
+-  let extractionRunner:
+-    | import('@/lib/server/material-extraction/runner').MaterialExtractionRunnerHandle
+-    | undefined;
+-  let stopAgentEventNotifyBus: (() => Promise<void>) | null = null;
+-  try {
+-    const { isAgentRuntimeConfigured } = await import('@/lib/config/feature-flags');
+-    if (isAgentRuntimeConfigured()) {
+-      // One dedicated LISTEN connection per application instance. The HTTP
+-      // SSE routes and the runner share its in-process fanout registry; it is
+-      // not a pool client and never scales with the number of streams.
+-      const { startAgentEventNotifyBus } =
+-        await import('@/lib/server/agent-runtime/event-notify-bus');
+-      const eventNotifyBus = startAgentEventNotifyBus();
+-      stopAgentEventNotifyBus = () => eventNotifyBus.stop();
+-      // startAgentRunner only installs a timer. Store/schema initialization is
+-      // retained behind the store's lazy promise and never blocks register().
+-      const runtime = await import('@/lib/server/agent-runtime/runner');
+-      runner = runtime.startAgentRunner();
+-      const extraction = await import('@/lib/server/material-extraction/runner');
+-      extractionRunner = extraction.startMaterialExtractionRunner();
+-    }
+-  } catch (error) {
+-    console.error('[instrumentation] Agent runtime startup failed', error);
+-  }
+-
+-  let shutdownPromise: Promise<void> | undefined;
+-  const shutdown = (): Promise<void> => {
+-    shutdownPromise ??= (async () => {
+-      // Park sessions before any pool they use is closed. This preserves the
+-      // last durable entry-tree checkpoint for immediate takeover.
+-      try {
+-        await extractionRunner?.stop();
+-      } catch (error) {
+-        console.error('[instrumentation] Material extraction runner drain failed', error);
+-      }
+-      try {
+-        await runner?.stop();
+-      } catch (error) {
+-        console.error('[instrumentation] Agent runner drain failed', error);
+-      }
+-      try {
+-        await stopAgentEventNotifyBus?.();
+-      } catch (error) {
+-        console.error('[instrumentation] Agent event notify bus drain failed', error);
+-      }
+-      try {
+-        await assetSchedule?.stop();
+-      } catch (error) {
+-        console.error('[instrumentation] Asset collector drain failed', error);
+-      }
+-      const connectionString = process.env.DATABASE_URL?.trim();
+-      if (connectionString) {
+-        try {
+-          const { getServerPersistenceProvider } =
+-            await import('@/lib/persistence/server-provider');
+-          const { pool } = await getServerPersistenceProvider(connectionString);
+-          await pool.end();
+-        } catch (error) {
+-          console.error('[instrumentation] Persistence pool shutdown failed', error);
+-        }
+-      }
+-    })();
+-    return shutdownPromise;
+-  };
+-
+-  process.once('SIGTERM', () => void shutdown());
+-  process.once('SIGINT', () => void shutdown());
++  // Keep the Node-only persistence graph out of the Edge/general entry bundle.
++  const { registerNodeInstrumentation } = await import('./instrumentation.node');
++  await registerNodeInstrumentation();
+ }
+diff --git a/lib/server/mira-instrumentation-policy.ts b/lib/server/mira-instrumentation-policy.ts
+new file mode 100644
+index 0000000..f184a34
+--- /dev/null
++++ b/lib/server/mira-instrumentation-policy.ts
+@@ -0,0 +1,14 @@
++const instrumentationBoundary = {
++  nodeRuntimeOnly: true,
++  edgeBundle: 'excluded',
++  collector: 'asset-collector-schedule',
++  serverExternalPackages: ['@openmaic/storage', 'pg'],
++} as const;
++
++/** Safe health metadata for the Node-only persistence instrumentation boundary. */
++export function getMiraInstrumentationBoundaryPolicy() {
++  return {
++    ...instrumentationBoundary,
++    serverExternalPackages: [...instrumentationBoundary.serverExternalPackages],
++  };
++}
+diff --git a/next.config.ts b/next.config.ts
+index 1493e7b..c433afc 100644
+--- a/next.config.ts
++++ b/next.config.ts
+@@ -31,6 +31,8 @@ const nextConfig: NextConfig = {
+     // egress cannot resolve their SDK in the shipped deployment.
+     '@aws-sdk/client-s3',
+     '@aws-sdk/s3-request-presigner',
++    '@openmaic/storage',
++    'pg',
+   ],
+   experimental: {
+     proxyClientMaxBodySize: '200mb',
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 7daa11d..37d8a55 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -173,6 +173,12 @@ describe('GET /api/health structured scene runtime policy', () => {
+         whiteboardRequired: false,
+       },
+     });
++    expect(body.runtimePolicy.instrumentationBoundary).toEqual({
++      nodeRuntimeOnly: true,
++      edgeBundle: 'excluded',
++      collector: 'asset-collector-schedule',
++      serverExternalPackages: ['@openmaic/storage', 'pg'],
++    });
+     const serialized = JSON.stringify(body);
+     expect(serialized).not.toContain('fake-secret-must-not-leak');
+     expect(serialized).not.toContain('fake-base-url-must-not-leak');
+diff --git a/tests/server/instrumentation-boundary.test.ts b/tests/server/instrumentation-boundary.test.ts
+new file mode 100644
+index 0000000..edf8aa5
+--- /dev/null
++++ b/tests/server/instrumentation-boundary.test.ts
+@@ -0,0 +1,31 @@
++import { existsSync, readFileSync } from 'node:fs';
++import { resolve } from 'node:path';
++import { describe, expect, it } from 'vitest';
++
++const root = resolve(__dirname, '../..');
++const read = (relativePath: string) => readFileSync(resolve(root, relativePath), 'utf8');
++
++describe('Next instrumentation persistence boundary', () => {
++  it('keeps the Edge registration entry free of Node-only persistence imports', () => {
++    const source = read('instrumentation.ts');
++
++    expect(source).toContain("await import('./instrumentation.node')");
++    expect(source).not.toContain('asset-collector-schedule');
++    expect(source).not.toContain('@openmaic/storage');
++    expect(source).not.toContain("from 'pg'");
++  });
++
++  it('declares a dedicated Node entry and server-external persistence packages', () => {
++    const nodeEntry = resolve(root, 'instrumentation.node.ts');
++    expect(existsSync(nodeEntry)).toBe(true);
++    if (existsSync(nodeEntry)) {
++      const source = read('instrumentation.node.ts');
++      expect(source).toContain('asset-collector-schedule');
++      expect(source).toContain('startAssetCollectorSchedule');
++    }
++
++    const nextConfig = read('next.config.ts');
++    expect(nextConfig).toContain("'@openmaic/storage'");
++    expect(nextConfig).toContain("'pg'");
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

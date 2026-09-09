@@ -548,6 +548,12 @@ set -a
 load_env_file "$ENV_FILE"
 set +a
 
+if ! "$GUARDIAN_PYTHON" scripts/migrate.py; then
+  err "Guardian 数据库迁移失败，已停止启动"
+  exit 1
+fi
+ok "Guardian 数据库迁移已完成"
+
 if ! verify_guardian_import; then
   exit 1
 fi

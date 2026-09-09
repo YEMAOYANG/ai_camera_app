@@ -1,0 +1,1096 @@
+From f773ff87e8704170fe0278c310240f8208eed318 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 20/37] 0020-mira-webpack-production-boundaries
+
+---
+ app/api/health/route.ts                       |   8 +-
+ app/api/persistence/[...path]/route.ts        | 322 +-----------------
+ app/generation-preview/page.tsx               |   2 +-
+ components/generation/outlines-editor.tsx     |   2 +-
+ instrumentation.edge.ts                       |   8 +
+ lib/hooks/use-scene-generator.ts              |   2 +-
+ lib/pbl/v2/operations/kernel/engagement.ts    |   2 +-
+ lib/pbl/v2/operations/kernel/proficiency.ts   |   2 +-
+ lib/pbl/v2/operations/kernel/progress.ts      |   2 +-
+ .../v2/operations/kernel/runtime-events.ts    |   2 +-
+ .../v2/operations/kernel/task-completion.ts   |   2 +-
+ .../v2/operations/runtime/eval-tail-parser.ts |   2 +-
+ lib/persistence/route-handler.ts              | 320 +++++++++++++++++
+ next.config.ts                                |  13 +
+ packages/@openmaic/generation/package.json    |  32 ++
+ tests/persistence/route.test.ts               |  32 +-
+ tests/server/health-route.test.ts             |  11 +-
+ tests/server/instrumentation-boundary.test.ts |  16 +
+ 18 files changed, 428 insertions(+), 352 deletions(-)
+ create mode 100644 instrumentation.edge.ts
+ create mode 100644 lib/persistence/route-handler.ts
+
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index da56f04..5ef4d9b 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -31,8 +31,8 @@ import {
+ 
+ const version = process.env.npm_package_version || '0.3.2';
+ 
+-export async function GET(req?: NextRequest) {
+-  if (req?.nextUrl.searchParams.get('scope') === 'formal-provider-readiness') {
++export async function GET(req: NextRequest) {
++  if (req.nextUrl.searchParams.get('scope') === 'formal-provider-readiness') {
+     try {
+       authorizeMiraFormalProviderReadinessRequest(req);
+       assertMiraFormalProviderReadinessProviderReady();
+@@ -54,7 +54,7 @@ export async function GET(req?: NextRequest) {
+       return apiError('PROVIDER_DISABLED', 503, 'Formal readiness providers are unavailable.');
+     }
+   }
+-  if (req?.nextUrl.searchParams.get('scope') === 'formal-audio') {
++  if (req.nextUrl.searchParams.get('scope') === 'formal-audio') {
+     try {
+       authorizeMiraFormalAudioRequest(req);
+       assertMiraFormalAudioProviderReady();
+@@ -71,7 +71,7 @@ export async function GET(req?: NextRequest) {
+       return apiError('PROVIDER_DISABLED', 503, 'Formal Qwen audio providers are not ready.');
+     }
+   }
+-  if (req?.nextUrl.searchParams.get('scope') === 'formal-generation') {
++  if (req.nextUrl.searchParams.get('scope') === 'formal-generation') {
+     try {
+       const structuredScenePolicy = getMiraStructuredSceneRuntimePolicy();
+       const formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
+diff --git a/app/api/persistence/[...path]/route.ts b/app/api/persistence/[...path]/route.ts
+index 730451e..cf8c026 100644
+--- a/app/api/persistence/[...path]/route.ts
++++ b/app/api/persistence/[...path]/route.ts
+@@ -1,327 +1,7 @@
+-import type { IncomingMessage, RequestListener, ServerResponse } from 'node:http';
+-import { Readable } from 'node:stream';
+-
+-import {
+-  createStorageHttpHandler,
+-  DEFAULT_SIGNED_URL_TTL_SECONDS,
+-  type AssetIndirectByteEgress,
+-} from '@openmaic/storage/server';
+-
+-import { validateAppScene, validateAppStage } from '@/lib/document-store/validators';
+-import { resolveAssetCollectionGraceMs } from '@/lib/persistence/asset-collection-grace';
+-import {
+-  decideDocumentAccess,
+-  parseDocumentAction,
+-  type DocumentAccess,
+-} from '@/lib/persistence/document-access';
+-import { createOwnerBoundDocumentStore } from '@/lib/persistence/owner-bound-document-store';
+-import { authenticatePersistenceRequest } from '@/lib/persistence/server-auth';
+-import {
+-  getServerPersistenceProvider,
+-  type PersistencePoolFactory,
+-} from '@/lib/persistence/server-provider';
+-import { readStageMeta } from '@/lib/persistence/stage-meta';
+-import { APP_RUNTIME_PAYLOAD_VALIDATORS } from '@/lib/runtime/payload-validators';
+-import { withRequestOwnerId } from '@/lib/server/agent-runtime/with-owner';
++import { handlePersistenceRequest } from '@/lib/persistence/route-handler';
+ 
+ export const runtime = 'nodejs';
+ 
+-const ROUTE_PREFIX = '/api/persistence';
+-
+-function jsonError(status: number, code: string, message: string): Response {
+-  return Response.json({ error: { code, message } }, { status });
+-}
+-
+-/**
+- * ASSET_BYTE_EGRESS: set to `redirect` to answer asset byte GETs with a 302 to
+- * a short-lived signed URL, when the byte layer can sign (S3 can; the
+- * PostgreSQL byte column cannot, and falls back to direct bytes). Anything
+- * else, including unset and `direct`, keeps the default byte-for-byte
+- * behavior. The tradeoff this opts into -- the redirect target names the
+- * content hash -- is specified in the storage package's asset HTTP contract.
+- */
+-function configuredAssetByteEgress(value: string | undefined): 'redirect' | undefined {
+-  const raw = value?.trim().toLowerCase();
+-  if (raw === 'redirect') return 'redirect';
+-  if (raw === undefined || raw === '' || raw === 'direct') return undefined;
+-  console.warn(`ASSET_BYTE_EGRESS=${value} is not recognized; using direct byte egress`);
+-  return undefined;
+-}
+-
+-/**
+- * Redirect egress and the collection grace must agree: a signed URL that
+- * outlives its object turns a valid read into an object-store error. The
+- * handler enforces that invariant itself, on the grace passed here, and this
+- * grace is resolved by the collector's own parser so both components run on one
+- * number.
+- *
+- * A grace too short for the default lifetime degrades to direct egress with a
+- * loud warning rather than failing initialization: the asset backend is
+- * optional, and its misconfiguration must never take document and runtime
+- * traffic down with it.
+- */
+-function indirectEgressWithinGrace(
+-  egress: 'redirect' | undefined,
+-): AssetIndirectByteEgress | undefined {
+-  if (egress !== 'redirect') return undefined;
+-  const collectionGraceMs = resolveAssetCollectionGraceMs();
+-  if (collectionGraceMs < DEFAULT_SIGNED_URL_TTL_SECONDS * 1000 * 10) {
+-    console.warn(
+-      `ASSET_BYTE_EGRESS=redirect requires ASSET_COLLECTION_GRACE_MS to be at least ten times ` +
+-        `the signed URL lifetime (${DEFAULT_SIGNED_URL_TTL_SECONDS}s); got ${collectionGraceMs}ms. ` +
+-        `Falling back to direct byte egress.`,
+-    );
+-    return undefined;
+-  }
+-  return { mode: 'redirect', collectionGraceMs };
+-}
+-
+-async function createPersistenceHandler(
+-  connectionString: string,
+-  ownerId: string,
+-  access: DocumentAccess,
+-  poolFactory?: PersistencePoolFactory,
+-): Promise<RequestListener> {
+-  const { pool, runtimeStore, assetStore } = await getServerPersistenceProvider(
+-    connectionString,
+-    poolFactory,
+-  );
+-  const documentStore = createOwnerBoundDocumentStore({
+-    pool,
+-    ownerId,
+-    validateScene: validateAppScene,
+-    validateStage: validateAppStage,
+-  });
+-  // Runtime and asset requests retain the development authenticator, which
+-  // takes their partition key from a client-supplied header. Document requests
+-  // use the server-resolved anonymous owner below. Before runtime or asset
+-  // routes carry production data, their authenticator must also be replaced
+-  // with real session verification.
+-  // Reclamation is not scheduled from here, and must not be: a route module
+-  // has no once-per-process guarantee and no shutdown hook. AssetCollector
+-  // runs from instrumentation.ts instead, over the byte store this same
+-  // lib/persistence/asset-byte-store selection produces, so the collector
+-  // always deletes through the layer the request path wrote through.
+-  const byteEgress = indirectEgressWithinGrace(
+-    configuredAssetByteEgress(process.env.ASSET_BYTE_EGRESS),
+-  );
+-  return createStorageHttpHandler(runtimeStore, documentStore, {
+-    authenticate: async (request) =>
+-      request.url?.startsWith('/documents')
+-        ? { learnerKey: ownerId }
+-        : authenticatePersistenceRequest(request),
+-    authorizeMerge: async () => false,
+-    authorizeAdmin: async () => false,
+-    authorizeDocuments: async () => access === 'allow',
+-    validateScene: validateAppScene,
+-    validateStage: validateAppStage,
+-    payloadValidators: APP_RUNTIME_PAYLOAD_VALIDATORS,
+-    assetStore,
+-    ...(byteEgress === undefined ? {} : { byteEgress }),
+-  });
+-}
+-
+-function routeRelativePath(request: Request): string {
+-  const pathname = new URL(request.url).pathname;
+-  return pathname.startsWith(ROUTE_PREFIX) ? pathname.slice(ROUTE_PREFIX.length) || '/' : pathname;
+-}
+-
+-function nodeRequest(request: Request): IncomingMessage {
+-  const url = new URL(request.url);
+-  const pathname = url.pathname.startsWith(ROUTE_PREFIX)
+-    ? url.pathname.slice(ROUTE_PREFIX.length) || '/'
+-    : url.pathname;
+-  const body = request.body
+-    ? Readable.fromWeb(
+-        request.body as unknown as import('node:stream/web').ReadableStream<Uint8Array>,
+-      )
+-    : Readable.from([]);
+-  return Object.assign(body, {
+-    method: request.method,
+-    url: `${pathname}${url.search}`,
+-    headers: Object.fromEntries(request.headers.entries()),
+-  }) as IncomingMessage;
+-}
+-
+-function setHeaders(target: Headers, source: Record<string, string | number | string[]>): void {
+-  for (const [name, value] of Object.entries(source)) {
+-    if (Array.isArray(value)) {
+-      for (const item of value) target.append(name, item);
+-    } else {
+-      target.set(name, String(value));
+-    }
+-  }
+-}
+-
+-type ResponseCallback = () => void;
+-
+-function responseEncoding(encodingOrCallback?: BufferEncoding | ResponseCallback): BufferEncoding {
+-  const encoding = typeof encodingOrCallback === 'string' ? encodingOrCallback : 'utf8';
+-  if (!Buffer.isEncoding(encoding)) {
+-    // Let Buffer produce Node's ERR_UNKNOWN_ENCODING TypeError.
+-    Buffer.from('', encoding);
+-  }
+-  return encoding;
+-}
+-
+-function responseCallback(
+-  encodingOrCallback?: BufferEncoding | ResponseCallback,
+-  callback?: ResponseCallback,
+-): ResponseCallback | undefined {
+-  return typeof encodingOrCallback === 'function' ? encodingOrCallback : callback;
+-}
+-
+-function suppressesResponseBody(request: Request, status: number): boolean {
+-  return request.method === 'HEAD' || status === 204 || status === 205 || status === 304;
+-}
+-
+-function runNodeHandler(handler: RequestListener, request: Request): Promise<Response> {
+-  return new Promise<Response>((resolve, reject) => {
+-    let status = 200;
+-    const headers = new Headers();
+-    let headersSent = false;
+-    // Buffered as bytes rather than as a string. A handler may end with a
+-    // `Uint8Array`, which `ServerResponse.end` accepts and which is not
+-    // necessarily valid UTF-8; decoding it would replace every unpaired byte
+-    // with U+FFFD and silently corrupt the response.
+-    const body: Buffer[] = [];
+-
+-    const appendChunk = (chunk: string | Uint8Array, encoding: BufferEncoding) => {
+-      body.push(typeof chunk === 'string' ? Buffer.from(chunk, encoding) : Buffer.from(chunk));
+-    };
+-
+-    const response = {
+-      get headersSent() {
+-        return headersSent;
+-      },
+-      writeHead(
+-        statusCode: number,
+-        statusMessageOrHeaders?: string | Record<string, string | number | string[]>,
+-        outgoingHeaders?: Record<string, string | number | string[]>,
+-      ) {
+-        status = statusCode;
+-        headersSent = true;
+-        const values =
+-          typeof statusMessageOrHeaders === 'string' ? outgoingHeaders : statusMessageOrHeaders;
+-        if (values) setHeaders(headers, values);
+-        return this;
+-      },
+-      write(
+-        chunk: string | Uint8Array,
+-        encodingOrCallback?: BufferEncoding | ResponseCallback,
+-        callback?: ResponseCallback,
+-      ) {
+-        // `write` is part of the `ServerResponse` surface this object claims to
+-        // implement. Omitting it made any chunked handler a runtime TypeError
+-        // that the `as unknown as ServerResponse` cast hid from the compiler.
+-        headersSent = true;
+-        appendChunk(chunk, responseEncoding(encodingOrCallback));
+-        const done = responseCallback(encodingOrCallback, callback);
+-        if (done) process.nextTick(done);
+-        return true;
+-      },
+-      end(
+-        chunkOrCallback?: string | Uint8Array | ResponseCallback,
+-        encodingOrCallback?: BufferEncoding | ResponseCallback,
+-        callback?: ResponseCallback,
+-      ) {
+-        headersSent = true;
+-        const chunk = typeof chunkOrCallback === 'function' ? undefined : chunkOrCallback;
+-        const done =
+-          typeof chunkOrCallback === 'function'
+-            ? chunkOrCallback
+-            : responseCallback(encodingOrCallback, callback);
+-        if (chunk !== undefined) appendChunk(chunk, responseEncoding(encodingOrCallback));
+-        resolve(
+-          new Response(
+-            suppressesResponseBody(request, status) || body.length === 0
+-              ? undefined
+-              : Buffer.concat(body),
+-            {
+-              status,
+-              headers,
+-            },
+-          ),
+-        );
+-        if (done) process.nextTick(done);
+-        return this;
+-      },
+-      destroy(error?: Error) {
+-        reject(error ?? new Error('Persistence HTTP handler destroyed the response'));
+-        return this;
+-      },
+-    } as unknown as ServerResponse;
+-
+-    try {
+-      handler(nodeRequest(request), response);
+-    } catch (error) {
+-      reject(error);
+-    }
+-  });
+-}
+-
+-interface PersistenceRequestDeps {
+-  poolFactory?: PersistencePoolFactory;
+-}
+-
+-export async function handlePersistenceRequest(
+-  request: Request,
+-  deps: PersistenceRequestDeps = {},
+-): Promise<Response> {
+-  const connectionString = process.env.DATABASE_URL;
+-  if (!connectionString) {
+-    return jsonError(404, 'PERSISTENCE_NOT_CONFIGURED', 'server persistence not configured');
+-  }
+-  if (!process.env.PERSISTENCE_DEV_TOKEN) {
+-    return jsonError(
+-      503,
+-      'PERSISTENCE_DEV_TOKEN_MISSING',
+-      'server persistence requires PERSISTENCE_DEV_TOKEN (development auth only)',
+-    );
+-  }
+-
+-  return withRequestOwnerId(request, async (ownerId, responseHeaders) => {
+-    try {
+-      const path = routeRelativePath(request);
+-      const action = parseDocumentAction(request.method, path);
+-      let access: DocumentAccess = 'allow';
+-      if (path === '/documents' || path.startsWith('/documents/')) {
+-        const { pool } = await getServerPersistenceProvider(connectionString, deps.poolFactory);
+-        const queryable = pool;
+-        access = await decideDocumentAccess(
+-          action,
+-          ownerId,
+-          (stageId) => readStageMeta(queryable, stageId),
+-          (stageId) =>
+-            pool
+-              .query('SELECT 1 FROM document_stages WHERE id = $1', [stageId])
+-              .then((result) => result.rows.length > 0),
+-          (stageId) => readStageMeta(queryable, stageId),
+-        );
+-      }
+-
+-      const response =
+-        access === 'not-found'
+-          ? jsonError(404, 'DOCUMENT_NOT_FOUND', '@openmaic/storage: document not found')
+-          : await runNodeHandler(
+-              await createPersistenceHandler(connectionString, ownerId, access, deps.poolFactory),
+-              request,
+-            );
+-      for (const [name, value] of responseHeaders.entries()) response.headers.append(name, value);
+-      return response;
+-    } catch (error) {
+-      console.error('Embedded persistence route initialization failed', error);
+-      const response = jsonError(
+-        500,
+-        'PERSISTENCE_INIT_FAILED',
+-        'server persistence initialization failed',
+-      );
+-      for (const [name, value] of responseHeaders.entries()) response.headers.append(name, value);
+-      return response;
+-    }
+-  });
+-}
+-
+ export const GET = (request: Request) => handlePersistenceRequest(request);
+ export const POST = (request: Request) => handlePersistenceRequest(request);
+ export const PUT = (request: Request) => handlePersistenceRequest(request);
+diff --git a/app/generation-preview/page.tsx b/app/generation-preview/page.tsx
+index f2acc52..36b6d07 100644
+--- a/app/generation-preview/page.tsx
++++ b/app/generation-preview/page.tsx
+@@ -25,7 +25,7 @@ import {
+   fetchSceneContent,
+   generateTTSForScene,
+ } from '@/lib/hooks/use-scene-generator';
+-import { isAbortError } from '@openmaic/generation';
++import { isAbortError } from '@openmaic/generation/generation-retry';
+ import { FOREGROUND_SCENE_RETRY_OPTIONS } from './foreground-retry';
+ import {
+   loadImageMapping,
+diff --git a/components/generation/outlines-editor.tsx b/components/generation/outlines-editor.tsx
+index c4d4cf0..2ac0cdb 100644
+--- a/components/generation/outlines-editor.tsx
++++ b/components/generation/outlines-editor.tsx
+@@ -28,7 +28,7 @@ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { cn } from '@/lib/utils';
+ import type { SceneOutline } from '@/lib/types/generation';
+ import type { WidgetType } from '@/lib/types/widgets';
+-import { changeOutlineType } from '@openmaic/generation';
++import { changeOutlineType } from '@openmaic/generation/outline-type';
+ import { countBlockingOutlines, validateOutline } from '@/lib/edit/content-validation';
+ 
+ type SceneType = SceneOutline['type'];
+diff --git a/instrumentation.edge.ts b/instrumentation.edge.ts
+new file mode 100644
+index 0000000..24bc0c9
+--- /dev/null
++++ b/instrumentation.edge.ts
+@@ -0,0 +1,8 @@
++/**
++ * Edge compilation replacement for the Node-only instrumentation entry.
++ *
++ * `instrumentation.ts` returns before this is ever executed on Edge. Keeping
++ * an explicit no-op export also prevents webpack from tracing the Node-only
++ * persistence graph (`pg`, `fs`, streams) while compiling that entry.
++ */
++export async function registerNodeInstrumentation(): Promise<void> {}
+diff --git a/lib/hooks/use-scene-generator.ts b/lib/hooks/use-scene-generator.ts
+index 1d8035b..d8f4359 100644
+--- a/lib/hooks/use-scene-generator.ts
++++ b/lib/hooks/use-scene-generator.ts
+@@ -42,7 +42,7 @@ import {
+   isAbortError,
+   withGenerationRetry,
+   type GenerationRetryOptions,
+-} from '@openmaic/generation';
++} from '@openmaic/generation/generation-retry';
+ 
+ const log = createLogger('SceneGenerator');
+ 
+diff --git a/lib/pbl/v2/operations/kernel/engagement.ts b/lib/pbl/v2/operations/kernel/engagement.ts
+index 61022a0..4e354d4 100644
+--- a/lib/pbl/v2/operations/kernel/engagement.ts
++++ b/lib/pbl/v2/operations/kernel/engagement.ts
+@@ -1,2 +1,2 @@
+ /** Compatibility barrel for package-owned PBL engagement primitives. */
+-export * from '@openmaic/generation';
++export * from '@openmaic/generation/pbl/operations/kernel/engagement';
+diff --git a/lib/pbl/v2/operations/kernel/proficiency.ts b/lib/pbl/v2/operations/kernel/proficiency.ts
+index 2bb30c6..d2020fb 100644
+--- a/lib/pbl/v2/operations/kernel/proficiency.ts
++++ b/lib/pbl/v2/operations/kernel/proficiency.ts
+@@ -1,2 +1,2 @@
+ /** Compatibility barrel for package-owned PBL proficiency primitives. */
+-export * from '@openmaic/generation';
++export * from '@openmaic/generation/pbl/operations/kernel/proficiency';
+diff --git a/lib/pbl/v2/operations/kernel/progress.ts b/lib/pbl/v2/operations/kernel/progress.ts
+index d8c5648..1e3a78a 100644
+--- a/lib/pbl/v2/operations/kernel/progress.ts
++++ b/lib/pbl/v2/operations/kernel/progress.ts
+@@ -1,2 +1,2 @@
+ /** Compatibility barrel for package-owned PBL progress primitives. */
+-export * from '@openmaic/generation';
++export * from '@openmaic/generation/pbl/operations/kernel/progress';
+diff --git a/lib/pbl/v2/operations/kernel/runtime-events.ts b/lib/pbl/v2/operations/kernel/runtime-events.ts
+index 386a21d..8db81f3 100644
+--- a/lib/pbl/v2/operations/kernel/runtime-events.ts
++++ b/lib/pbl/v2/operations/kernel/runtime-events.ts
+@@ -1,2 +1,2 @@
+ /** Compatibility barrel for package-owned PBL runtime-event primitives. */
+-export * from '@openmaic/generation';
++export * from '@openmaic/generation/pbl/operations/kernel/runtime-events';
+diff --git a/lib/pbl/v2/operations/kernel/task-completion.ts b/lib/pbl/v2/operations/kernel/task-completion.ts
+index 69ae446..956260c 100644
+--- a/lib/pbl/v2/operations/kernel/task-completion.ts
++++ b/lib/pbl/v2/operations/kernel/task-completion.ts
+@@ -1,2 +1,2 @@
+ /** Compatibility barrel for package-owned PBL task-completion primitives. */
+-export * from '@openmaic/generation';
++export * from '@openmaic/generation/pbl/operations/kernel/task-completion';
+diff --git a/lib/pbl/v2/operations/runtime/eval-tail-parser.ts b/lib/pbl/v2/operations/runtime/eval-tail-parser.ts
+index cdbfe83..51048fa 100644
+--- a/lib/pbl/v2/operations/runtime/eval-tail-parser.ts
++++ b/lib/pbl/v2/operations/runtime/eval-tail-parser.ts
+@@ -23,7 +23,7 @@
+  * we encode them all up front here.
+  */
+ 
+-import { parseJsonResponse } from '@openmaic/generation';
++import { parseJsonResponse } from '@openmaic/generation/json-repair';
+ 
+ const FENCED_JSON_RE = /```json\s*\n([\s\S]*?)\n\s*```/g;
+ const ANY_FENCED_JSON_RE = /```(?:json)?\s*([\s\S]*?)```/g;
+diff --git a/lib/persistence/route-handler.ts b/lib/persistence/route-handler.ts
+new file mode 100644
+index 0000000..187f89c
+--- /dev/null
++++ b/lib/persistence/route-handler.ts
+@@ -0,0 +1,320 @@
++import type { IncomingMessage, RequestListener, ServerResponse } from 'node:http';
++import { Readable } from 'node:stream';
++
++import {
++  createStorageHttpHandler,
++  DEFAULT_SIGNED_URL_TTL_SECONDS,
++  type AssetIndirectByteEgress,
++} from '@openmaic/storage/server';
++
++import { validateAppScene, validateAppStage } from '@/lib/document-store/validators';
++import { resolveAssetCollectionGraceMs } from '@/lib/persistence/asset-collection-grace';
++import {
++  decideDocumentAccess,
++  parseDocumentAction,
++  type DocumentAccess,
++} from '@/lib/persistence/document-access';
++import { createOwnerBoundDocumentStore } from '@/lib/persistence/owner-bound-document-store';
++import { authenticatePersistenceRequest } from '@/lib/persistence/server-auth';
++import {
++  getServerPersistenceProvider,
++  type PersistencePoolFactory,
++} from '@/lib/persistence/server-provider';
++import { readStageMeta } from '@/lib/persistence/stage-meta';
++import { APP_RUNTIME_PAYLOAD_VALIDATORS } from '@/lib/runtime/payload-validators';
++import { withRequestOwnerId } from '@/lib/server/agent-runtime/with-owner';
++
++const ROUTE_PREFIX = '/api/persistence';
++
++function jsonError(status: number, code: string, message: string): Response {
++  return Response.json({ error: { code, message } }, { status });
++}
++
++/**
++ * ASSET_BYTE_EGRESS: set to `redirect` to answer asset byte GETs with a 302 to
++ * a short-lived signed URL, when the byte layer can sign (S3 can; the
++ * PostgreSQL byte column cannot, and falls back to direct bytes). Anything
++ * else, including unset and `direct`, keeps the default byte-for-byte
++ * behavior. The tradeoff this opts into -- the redirect target names the
++ * content hash -- is specified in the storage package's asset HTTP contract.
++ */
++function configuredAssetByteEgress(value: string | undefined): 'redirect' | undefined {
++  const raw = value?.trim().toLowerCase();
++  if (raw === 'redirect') return 'redirect';
++  if (raw === undefined || raw === '' || raw === 'direct') return undefined;
++  console.warn(`ASSET_BYTE_EGRESS=${value} is not recognized; using direct byte egress`);
++  return undefined;
++}
++
++/**
++ * Redirect egress and the collection grace must agree: a signed URL that
++ * outlives its object turns a valid read into an object-store error. The
++ * handler enforces that invariant itself, on the grace passed here, and this
++ * grace is resolved by the collector's own parser so both components run on one
++ * number.
++ *
++ * A grace too short for the default lifetime degrades to direct egress with a
++ * loud warning rather than failing initialization: the asset backend is
++ * optional, and its misconfiguration must never take document and runtime
++ * traffic down with it.
++ */
++function indirectEgressWithinGrace(
++  egress: 'redirect' | undefined,
++): AssetIndirectByteEgress | undefined {
++  if (egress !== 'redirect') return undefined;
++  const collectionGraceMs = resolveAssetCollectionGraceMs();
++  if (collectionGraceMs < DEFAULT_SIGNED_URL_TTL_SECONDS * 1000 * 10) {
++    console.warn(
++      `ASSET_BYTE_EGRESS=redirect requires ASSET_COLLECTION_GRACE_MS to be at least ten times ` +
++        `the signed URL lifetime (${DEFAULT_SIGNED_URL_TTL_SECONDS}s); got ${collectionGraceMs}ms. ` +
++        `Falling back to direct byte egress.`,
++    );
++    return undefined;
++  }
++  return { mode: 'redirect', collectionGraceMs };
++}
++
++async function createPersistenceHandler(
++  connectionString: string,
++  ownerId: string,
++  access: DocumentAccess,
++  poolFactory?: PersistencePoolFactory,
++): Promise<RequestListener> {
++  const { pool, runtimeStore, assetStore } = await getServerPersistenceProvider(
++    connectionString,
++    poolFactory,
++  );
++  const documentStore = createOwnerBoundDocumentStore({
++    pool,
++    ownerId,
++    validateScene: validateAppScene,
++    validateStage: validateAppStage,
++  });
++  // Runtime and asset requests retain the development authenticator, which
++  // takes their partition key from a client-supplied header. Document requests
++  // use the server-resolved anonymous owner below. Before runtime or asset
++  // routes carry production data, their authenticator must also be replaced
++  // with real session verification.
++  // Reclamation is not scheduled from here, and must not be: a route module
++  // has no once-per-process guarantee and no shutdown hook. AssetCollector
++  // runs from instrumentation.ts instead, over the byte store this same
++  // lib/persistence/asset-byte-store selection produces, so the collector
++  // always deletes through the layer the request path wrote through.
++  const byteEgress = indirectEgressWithinGrace(
++    configuredAssetByteEgress(process.env.ASSET_BYTE_EGRESS),
++  );
++  return createStorageHttpHandler(runtimeStore, documentStore, {
++    authenticate: async (request) =>
++      request.url?.startsWith('/documents')
++        ? { learnerKey: ownerId }
++        : authenticatePersistenceRequest(request),
++    authorizeMerge: async () => false,
++    authorizeAdmin: async () => false,
++    authorizeDocuments: async () => access === 'allow',
++    validateScene: validateAppScene,
++    validateStage: validateAppStage,
++    payloadValidators: APP_RUNTIME_PAYLOAD_VALIDATORS,
++    assetStore,
++    ...(byteEgress === undefined ? {} : { byteEgress }),
++  });
++}
++function routeRelativePath(request: Request): string {
++  const pathname = new URL(request.url).pathname;
++  return pathname.startsWith(ROUTE_PREFIX) ? pathname.slice(ROUTE_PREFIX.length) || '/' : pathname;
++}
++
++function nodeRequest(request: Request): IncomingMessage {
++  const url = new URL(request.url);
++  const pathname = url.pathname.startsWith(ROUTE_PREFIX)
++    ? url.pathname.slice(ROUTE_PREFIX.length) || '/'
++    : url.pathname;
++  const body = request.body
++    ? Readable.fromWeb(
++        request.body as unknown as import('node:stream/web').ReadableStream<Uint8Array>,
++      )
++    : Readable.from([]);
++  return Object.assign(body, {
++    method: request.method,
++    url: `${pathname}${url.search}`,
++    headers: Object.fromEntries(request.headers.entries()),
++  }) as IncomingMessage;
++}
++
++function setHeaders(target: Headers, source: Record<string, string | number | string[]>): void {
++  for (const [name, value] of Object.entries(source)) {
++    if (Array.isArray(value)) {
++      for (const item of value) target.append(name, item);
++    } else {
++      target.set(name, String(value));
++    }
++  }
++}
++
++type ResponseCallback = () => void;
++
++function responseEncoding(encodingOrCallback?: BufferEncoding | ResponseCallback): BufferEncoding {
++  const encoding = typeof encodingOrCallback === 'string' ? encodingOrCallback : 'utf8';
++  if (!Buffer.isEncoding(encoding)) {
++    // Let Buffer produce Node's ERR_UNKNOWN_ENCODING TypeError.
++    Buffer.from('', encoding);
++  }
++  return encoding;
++}
++
++function responseCallback(
++  encodingOrCallback?: BufferEncoding | ResponseCallback,
++  callback?: ResponseCallback,
++): ResponseCallback | undefined {
++  return typeof encodingOrCallback === 'function' ? encodingOrCallback : callback;
++}
++
++function suppressesResponseBody(request: Request, status: number): boolean {
++  return request.method === 'HEAD' || status === 204 || status === 205 || status === 304;
++}
++
++function runNodeHandler(handler: RequestListener, request: Request): Promise<Response> {
++  return new Promise<Response>((resolve, reject) => {
++    let status = 200;
++    const headers = new Headers();
++    let headersSent = false;
++    // Buffered as bytes rather than as a string. A handler may end with a
++    // `Uint8Array`, which `ServerResponse.end` accepts and which is not
++    // necessarily valid UTF-8; decoding it would replace every unpaired byte
++    // with U+FFFD and silently corrupt the response.
++    const body: Buffer[] = [];
++
++    const appendChunk = (chunk: string | Uint8Array, encoding: BufferEncoding) => {
++      body.push(typeof chunk === 'string' ? Buffer.from(chunk, encoding) : Buffer.from(chunk));
++    };
++
++    const response = {
++      get headersSent() {
++        return headersSent;
++      },
++      writeHead(
++        statusCode: number,
++        statusMessageOrHeaders?: string | Record<string, string | number | string[]>,
++        outgoingHeaders?: Record<string, string | number | string[]>,
++      ) {
++        status = statusCode;
++        headersSent = true;
++        const values =
++          typeof statusMessageOrHeaders === 'string' ? outgoingHeaders : statusMessageOrHeaders;
++        if (values) setHeaders(headers, values);
++        return this;
++      },
++      write(
++        chunk: string | Uint8Array,
++        encodingOrCallback?: BufferEncoding | ResponseCallback,
++        callback?: ResponseCallback,
++      ) {
++        // `write` is part of the `ServerResponse` surface this object claims to
++        // implement. Omitting it made any chunked handler a runtime TypeError
++        // that the `as unknown as ServerResponse` cast hid from the compiler.
++        headersSent = true;
++        appendChunk(chunk, responseEncoding(encodingOrCallback));
++        const done = responseCallback(encodingOrCallback, callback);
++        if (done) process.nextTick(done);
++        return true;
++      },
++      end(
++        chunkOrCallback?: string | Uint8Array | ResponseCallback,
++        encodingOrCallback?: BufferEncoding | ResponseCallback,
++        callback?: ResponseCallback,
++      ) {
++        headersSent = true;
++        const chunk = typeof chunkOrCallback === 'function' ? undefined : chunkOrCallback;
++        const done =
++          typeof chunkOrCallback === 'function'
++            ? chunkOrCallback
++            : responseCallback(encodingOrCallback, callback);
++        if (chunk !== undefined) appendChunk(chunk, responseEncoding(encodingOrCallback));
++        resolve(
++          new Response(
++            suppressesResponseBody(request, status) || body.length === 0
++              ? undefined
++              : Buffer.concat(body),
++            {
++              status,
++              headers,
++            },
++          ),
++        );
++        if (done) process.nextTick(done);
++        return this;
++      },
++      destroy(error?: Error) {
++        reject(error ?? new Error('Persistence HTTP handler destroyed the response'));
++        return this;
++      },
++    } as unknown as ServerResponse;
++
++    try {
++      handler(nodeRequest(request), response);
++    } catch (error) {
++      reject(error);
++    }
++  });
++}
++
++interface PersistenceRequestDeps {
++  poolFactory?: PersistencePoolFactory;
++}
++
++export async function handlePersistenceRequest(
++  request: Request,
++  deps: PersistenceRequestDeps = {},
++): Promise<Response> {
++  const connectionString = process.env.DATABASE_URL;
++  if (!connectionString) {
++    return jsonError(404, 'PERSISTENCE_NOT_CONFIGURED', 'server persistence not configured');
++  }
++  if (!process.env.PERSISTENCE_DEV_TOKEN) {
++    return jsonError(
++      503,
++      'PERSISTENCE_DEV_TOKEN_MISSING',
++      'server persistence requires PERSISTENCE_DEV_TOKEN (development auth only)',
++    );
++  }
++
++  return withRequestOwnerId(request, async (ownerId, responseHeaders) => {
++    try {
++      const path = routeRelativePath(request);
++      const action = parseDocumentAction(request.method, path);
++      let access: DocumentAccess = 'allow';
++      if (path === '/documents' || path.startsWith('/documents/')) {
++        const { pool } = await getServerPersistenceProvider(connectionString, deps.poolFactory);
++        const queryable = pool;
++        access = await decideDocumentAccess(
++          action,
++          ownerId,
++          (stageId) => readStageMeta(queryable, stageId),
++          (stageId) =>
++            pool
++              .query('SELECT 1 FROM document_stages WHERE id = $1', [stageId])
++              .then((result) => result.rows.length > 0),
++          (stageId) => readStageMeta(queryable, stageId),
++        );
++      }
++
++      const response =
++        access === 'not-found'
++          ? jsonError(404, 'DOCUMENT_NOT_FOUND', '@openmaic/storage: document not found')
++          : await runNodeHandler(
++              await createPersistenceHandler(connectionString, ownerId, access, deps.poolFactory),
++              request,
++            );
++      for (const [name, value] of responseHeaders.entries()) response.headers.append(name, value);
++      return response;
++    } catch (error) {
++      console.error('Embedded persistence route initialization failed', error);
++      const response = jsonError(
++        500,
++        'PERSISTENCE_INIT_FAILED',
++        'server persistence initialization failed',
++      );
++      for (const [name, value] of responseHeaders.entries()) response.headers.append(name, value);
++      return response;
++    }
++  });
++}
+diff --git a/next.config.ts b/next.config.ts
+index c433afc..f04e776 100644
+--- a/next.config.ts
++++ b/next.config.ts
+@@ -1,4 +1,5 @@
+ import type { NextConfig } from 'next';
++import { resolve } from 'node:path';
+ 
+ const nextConfig: NextConfig = {
+   output: process.env.VERCEL ? undefined : 'standalone',
+@@ -34,6 +35,18 @@ const nextConfig: NextConfig = {
+     '@openmaic/storage',
+     'pg',
+   ],
++  webpack(config, { nextRuntime }) {
++    if (nextRuntime === 'edge') {
++      config.resolve.alias = {
++        ...(config.resolve.alias ?? {}),
++        './instrumentation.node$': resolve(
++          process.cwd(),
++          'instrumentation.edge.ts',
++        ),
++      };
++    }
++    return config;
++  },
+   experimental: {
+     proxyClientMaxBodySize: '200mb',
+   },
+diff --git a/packages/@openmaic/generation/package.json b/packages/@openmaic/generation/package.json
+index ec50086..87207dc 100644
+--- a/packages/@openmaic/generation/package.json
++++ b/packages/@openmaic/generation/package.json
+@@ -10,6 +10,38 @@
+     ".": {
+       "types": "./dist/index.d.ts",
+       "import": "./dist/index.js"
++    },
++    "./generation-retry": {
++      "types": "./dist/generation-retry.d.ts",
++      "import": "./dist/generation-retry.js"
++    },
++    "./outline-type": {
++      "types": "./dist/outline-type.d.ts",
++      "import": "./dist/outline-type.js"
++    },
++    "./json-repair": {
++      "types": "./dist/json-repair.d.ts",
++      "import": "./dist/json-repair.js"
++    },
++    "./pbl/operations/kernel/engagement": {
++      "types": "./dist/pbl/operations/kernel/engagement.d.ts",
++      "import": "./dist/pbl/operations/kernel/engagement.js"
++    },
++    "./pbl/operations/kernel/proficiency": {
++      "types": "./dist/pbl/operations/kernel/proficiency.d.ts",
++      "import": "./dist/pbl/operations/kernel/proficiency.js"
++    },
++    "./pbl/operations/kernel/progress": {
++      "types": "./dist/pbl/operations/kernel/progress.d.ts",
++      "import": "./dist/pbl/operations/kernel/progress.js"
++    },
++    "./pbl/operations/kernel/runtime-events": {
++      "types": "./dist/pbl/operations/kernel/runtime-events.d.ts",
++      "import": "./dist/pbl/operations/kernel/runtime-events.js"
++    },
++    "./pbl/operations/kernel/task-completion": {
++      "types": "./dist/pbl/operations/kernel/task-completion.d.ts",
++      "import": "./dist/pbl/operations/kernel/task-completion.js"
+     }
+   },
+   "files": [
+diff --git a/tests/persistence/route.test.ts b/tests/persistence/route.test.ts
+index 9c74635..c0cbd8a 100644
+--- a/tests/persistence/route.test.ts
++++ b/tests/persistence/route.test.ts
+@@ -23,9 +23,11 @@ describe('embedded persistence route', () => {
+ 
+   it('returns a clear 404 when DATABASE_URL is unset', async () => {
+     vi.stubEnv('DATABASE_URL', '');
+-    const { GET } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+ 
+-    const response = await GET(new Request('http://localhost/api/persistence/runtime/sessions'));
++    const response = await handlePersistenceRequest(
++      new Request('http://localhost/api/persistence/runtime/sessions'),
++    );
+ 
+     expect(response.status).toBe(404);
+     await expect(response.json()).resolves.toEqual({
+@@ -39,9 +41,11 @@ describe('embedded persistence route', () => {
+   it('refuses configured persistence when the development token is missing', async () => {
+     vi.stubEnv('DATABASE_URL', 'postgres://unused-in-this-test');
+     vi.stubEnv('PERSISTENCE_DEV_TOKEN', '');
+-    const { GET } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+ 
+-    const response = await GET(new Request('http://localhost/api/persistence/documents'));
++    const response = await handlePersistenceRequest(
++      new Request('http://localhost/api/persistence/documents'),
++    );
+ 
+     expect(response.status).toBe(503);
+     await expect(response.json()).resolves.toEqual({
+@@ -93,7 +97,7 @@ describe('embedded persistence route', () => {
+     }));
+     vi.stubEnv('DATABASE_URL', 'postgres://retry-test');
+     vi.stubEnv('PERSISTENCE_DEV_TOKEN', 'test-token');
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const request = () =>
+       new Request('http://localhost/api/persistence/runtime/sessions', {
+         headers: { authorization: 'Bearer test-token' },
+@@ -115,7 +119,7 @@ describe('embedded persistence route', () => {
+     // Next dev HMR reloads module code but retains globalThis. The initialized
+     // handler must be reused rather than opening another pool.
+     vi.resetModules();
+-    const reloaded = await import('@/app/api/persistence/[...path]/route');
++    const reloaded = await import('@/lib/persistence/route-handler');
+     const hmrPoolFactory = vi.fn();
+     const afterReload = await reloaded.handlePersistenceRequest(request(), {
+       poolFactory: hmrPoolFactory,
+@@ -195,7 +199,7 @@ describe('embedded persistence route', () => {
+     });
+     vi.stubEnv('DATABASE_URL', 'postgres://asset-wiring-test');
+     vi.stubEnv('PERSISTENCE_DEV_TOKEN', 'test-token');
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const pool = { end: vi.fn().mockResolvedValue(undefined) };
+ 
+     const response = await handlePersistenceRequest(
+@@ -296,7 +300,7 @@ describe('embedded persistence route', () => {
+     vi.stubEnv('DATABASE_URL', 'postgres://asset-s3-test');
+     vi.stubEnv('PERSISTENCE_DEV_TOKEN', 'test-token');
+     vi.stubEnv('ASSET_S3_BUCKET', '  asset-bucket  ');
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+ 
+     const response = await handlePersistenceRequest(
+       new Request('http://localhost/api/persistence/assets', {
+@@ -370,7 +374,7 @@ describe('embedded persistence route', () => {
+     vi.stubEnv('DATABASE_URL', 'postgres://invalid-s3-bucket-test');
+     vi.stubEnv('PERSISTENCE_DEV_TOKEN', 'test-token');
+     vi.stubEnv('ASSET_S3_BUCKET', 'Invalid_Bucket');
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const poolFactory = vi.fn(() => ({ end: vi.fn().mockResolvedValue(undefined) }));
+ 
+     // The malformed bucket no longer gates handler initialization: document
+@@ -441,7 +445,7 @@ describe('embedded persistence route', () => {
+     vi.stubEnv('DATABASE_URL', 'postgres://asset-s3-retry-test');
+     vi.stubEnv('PERSISTENCE_DEV_TOKEN', 'test-token');
+     vi.stubEnv('ASSET_S3_BUCKET', 'asset-bucket');
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+ 
+     const response = await handlePersistenceRequest(
+       new Request('http://localhost/api/persistence/runtime/sessions', {
+@@ -505,7 +509,7 @@ describe('embedded persistence route', () => {
+     vi.stubEnv('DATABASE_URL', 'postgres://validator-wiring-test');
+     vi.stubEnv('PERSISTENCE_DEV_TOKEN', 'test-token');
+     const [{ handlePersistenceRequest }, { APP_RUNTIME_PAYLOAD_VALIDATORS }] = await Promise.all([
+-      import('@/app/api/persistence/[...path]/route'),
++      import('@/lib/persistence/route-handler'),
+       import('@/lib/runtime/payload-validators'),
+     ]);
+     const response = await handlePersistenceRequest(
+@@ -580,7 +584,7 @@ describe('embedded persistence route', () => {
+     }));
+     vi.stubEnv('DATABASE_URL', 'postgres://adapter-test');
+     vi.stubEnv('PERSISTENCE_DEV_TOKEN', 'test-token');
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const pool = { end: vi.fn().mockResolvedValue(undefined) };
+ 
+     const put = await handlePersistenceRequest(
+@@ -636,7 +640,7 @@ describe('embedded persistence route', () => {
+   };
+ 
+   const readAdapterBody = async (path: string) => {
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const pool = { end: vi.fn().mockResolvedValue(undefined) };
+     const response = await handlePersistenceRequest(
+       new Request(`http://localhost/api/persistence/${path}`, {
+@@ -785,7 +789,7 @@ describe('embedded persistence route', () => {
+       });
+       response.end('content');
+     }, 'postgres://head-test');
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const response = await handlePersistenceRequest(
+       new Request('http://localhost/api/persistence/documents/head', {
+         method: 'HEAD',
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 37d8a55..084c0a6 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -1,4 +1,7 @@
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { NextRequest } from 'next/server';
++
++const healthRequest = () => new NextRequest('http://runtime.test/api/health');
+ 
+ vi.mock('@/lib/server/provider-config', () => ({
+   getServerProviders: () =>
+@@ -60,7 +63,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+     process.env.KIMI_BASE_URL = 'https://fake-base-url-must-not-leak.invalid/v1';
+ 
+     const { GET } = await import('@/app/api/health/route');
+-    const response = await GET();
++    const response = await GET(healthRequest());
+     const body = await response.json();
+ 
+     expect(response.status).toBe(200);
+@@ -247,7 +250,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+ 
+   it('returns 503 when the fixed policy env is missing', async () => {
+     const { GET } = await import('@/app/api/health/route');
+-    const response = await GET();
++    const response = await GET(healthRequest());
+     const body = await response.json();
+ 
+     expect(response.status).toBe(503);
+@@ -263,7 +266,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+     process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'hostile-policy-secret';
+ 
+     const { GET } = await import('@/app/api/health/route');
+-    const response = await GET();
++    const response = await GET(healthRequest());
+     const body = await response.json();
+ 
+     expect(response.status).toBe(503);
+@@ -281,7 +284,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+ 
+     const { GET } = await import('@/app/api/health/route');
+     vi.doUnmock('@/lib/server/model-routes');
+-    const response = await GET();
++    const response = await GET(healthRequest());
+     const body = await response.json();
+ 
+     expect(response.status).toBe(503);
+diff --git a/tests/server/instrumentation-boundary.test.ts b/tests/server/instrumentation-boundary.test.ts
+index edf8aa5..a5f3f91 100644
+--- a/tests/server/instrumentation-boundary.test.ts
++++ b/tests/server/instrumentation-boundary.test.ts
+@@ -28,4 +28,20 @@ describe('Next instrumentation persistence boundary', () => {
+     expect(nextConfig).toContain("'@openmaic/storage'");
+     expect(nextConfig).toContain("'pg'");
+   });
++
++  it('replaces the Node instrumentation entry with an Edge no-op at bundle time', () => {
++    const edgeEntry = resolve(root, 'instrumentation.edge.ts');
++    expect(existsSync(edgeEntry)).toBe(true);
++    if (existsSync(edgeEntry)) {
++      const source = read('instrumentation.edge.ts');
++      expect(source).toContain('registerNodeInstrumentation');
++      expect(source).not.toContain('asset-collector-schedule');
++      expect(source).not.toContain("from 'pg'");
++    }
++
++    const nextConfig = read('next.config.ts');
++    expect(nextConfig).toContain("nextRuntime === 'edge'");
++    expect(nextConfig).toContain("'./instrumentation.node$'");
++    expect(nextConfig).toContain("'instrumentation.edge.ts'");
++  });
+ });
+-- 
+2.50.1 (Apple Git-155)
+

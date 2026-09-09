@@ -18,13 +18,17 @@ import 'package:warm_sight/src/features/devices/application/device_repository.da
 import 'package:warm_sight/src/features/home/application/home_summary.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_habit_hero.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_primary_cta.dart';
+import 'package:warm_sight/src/features/home/presentation/widgets/home_primary_learning_preview.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_rhythm_rail.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
+import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
 import 'package:warm_sight/src/features/rewards/application/reward_repository.dart';
 import 'package:warm_sight/src/features/tasks/application/task_repository.dart';
+import 'package:warm_sight/src/shared/domain/child_grade.dart';
+import 'package:warm_sight/src/shared/widgets/app_toast.dart';
 import 'package:warm_sight/src/shared/widgets/status_chip.dart';
 
 const _homePanelSurface = AppColors.surfaceElevated;
@@ -97,6 +101,86 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     setState(() => _scrollOffset = nextOffset);
   }
 
+  void _openStudentQrScanner(AsyncValue<ProfileSummary> profile) {
+    final summary = profile.asData?.value;
+    if (summary == null) {
+      showAppToast(
+        context,
+        profile.hasError ? '家庭资料暂时无法同步' : '正在同步家庭资料',
+        message: profile.hasError ? '请下拉刷新后再试。' : '请稍后再试。',
+        tone: profile.hasError ? AppToastTone.danger : AppToastTone.neutral,
+      );
+      return;
+    }
+    if (!summary.can('manage_child_profile')) {
+      showAppToast(
+        context,
+        '需要家庭管理员授权',
+        message: '当前账号没有管理孩子资料的权限。',
+        tone: AppToastTone.warning,
+      );
+      return;
+    }
+    final child = summary.child;
+    if (child == null) {
+      showAppToast(
+        context,
+        '请先完善孩子资料',
+        message: '完成小学年级设置后即可扫码登录学习网页。',
+        tone: AppToastTone.warning,
+      );
+      return;
+    }
+    final grade =
+        ChildGradeOption.fromCode(child.gradeCode) ??
+        ChildGradeOption.fromLegacy(
+          educationStage: child.educationStage,
+          grade: child.grade,
+        );
+    if (grade?.isPrimary != true) {
+      showAppToast(
+        context,
+        '当前年级暂不支持扫码登录',
+        message: '学生学习空间仅面向已开放年级。',
+        tone: AppToastTone.warning,
+      );
+      return;
+    }
+    final availability = child.id.trim().isEmpty
+        ? null
+        : ref.read(currentLearningAvailabilityProvider(child.id));
+    if (availability == null || availability.isLoading) {
+      showAppToast(
+        context,
+        '正在确认学习空间权限',
+        message: '确认后即可扫码登录。',
+        tone: AppToastTone.neutral,
+      );
+      return;
+    }
+    if (availability.hasError) {
+      showAppToast(
+        context,
+        '学习空间权限加载失败',
+        message: '请检查网络或下拉刷新后再试。',
+        tone: AppToastTone.danger,
+      );
+      return;
+    }
+    final current = availability.asData?.value;
+    if (current?.gradeCode != child.gradeCode ||
+        current?.canAccessWorkspace != true) {
+      showAppToast(
+        context,
+        '当前暂不能登录学习空间',
+        message: '请确认孩子已选择开放年级，并完成年级设置。',
+        tone: AppToastTone.warning,
+      );
+      return;
+    }
+    context.push(studentAccessQrPath);
+  }
+
   HomeSummaryInput _buildInput() {
     final now = DateTime.now();
     final profileSummary = ref.watch(profileSummaryProvider);
@@ -109,7 +193,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final childId = profileSummary.asData?.value.child?.id;
     final overrideReviews = ref.watch(pendingParentReviewsOverrideProvider);
     final serverReviews = childId != null && childId.isNotEmpty
-        ? ref.watch(careSummaryProvider(childId)).asData?.value.needsParentReview
+        ? ref
+              .watch(careSummaryProvider(childId))
+              .asData
+              ?.value
+              .needsParentReview
         : null;
     final parentReviews = mergeParentReviews(
       overrideItems: overrideReviews,
@@ -151,10 +239,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
 
     final input = _buildInput();
+    final profileSummary = ref.watch(profileSummaryProvider);
     final summary = buildHomeSummary(input);
     final dailyReport = ref.watch(dailyReportProvider);
     final weeklyReport = ref.watch(weeklyReportProvider);
     final childId = input.profile?.child?.id;
+    final child = input.profile?.child;
+    final childGrade = child == null
+        ? null
+        : ChildGradeOption.fromCode(child.gradeCode) ??
+              ChildGradeOption.fromLegacy(
+                educationStage: child.educationStage,
+                grade: child.grade,
+              );
+    final isPrimaryLearning =
+        child?.contentMode == 'primary_learning' &&
+        childGrade?.isPrimary == true;
     if (childId != null && childId.isNotEmpty) {
       ref.listen(careSummaryProvider(childId), (previous, next) {
         if (next.hasValue) {
@@ -251,15 +351,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  HomeRhythmRail(
-                                    mode: summary.rhythmMode,
-                                    nodes: summary.rhythmNodes,
-                                    isLoading:
-                                        summary.isInitialLoading &&
-                                        summary.rhythmNodes.isEmpty,
-                                    hasTaskError: input.tasksError,
-                                    hasNoDevice: summary.hasNoDevice,
-                                  ),
+                                  if (isPrimaryLearning && child != null)
+                                    HomePrimaryLearningPreview(
+                                      key: ValueKey(
+                                        'primaryLearningPreviewChild_${child.id}',
+                                      ),
+                                      child: child,
+                                    )
+                                  else
+                                    HomeRhythmRail(
+                                      mode: summary.rhythmMode,
+                                      nodes: summary.rhythmNodes,
+                                      isLoading:
+                                          summary.isInitialLoading &&
+                                          summary.rhythmNodes.isEmpty,
+                                      hasTaskError: input.tasksError,
+                                      hasNoDevice: summary.hasNoDevice,
+                                    ),
                                   const SizedBox(height: 14),
                                   _HomeReportSummaryCard(
                                     daily: dailyReport,
@@ -279,6 +387,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                       ),
                     ],
+                  ),
+                ),
+                Positioned(
+                  top:
+                      (safeArea.top > 0 ? safeArea.top : 24) +
+                      (size.width <= 340 || size.height <= 620 ? 12 : 14),
+                  right: AppSpacing.pageHorizontal,
+                  child: HomeStudentQrButton(
+                    onTap: () => _openStudentQrScanner(profileSummary),
                   ),
                 ),
               ],

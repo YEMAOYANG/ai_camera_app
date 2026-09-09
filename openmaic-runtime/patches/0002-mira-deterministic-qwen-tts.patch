@@ -1,0 +1,750 @@
+From 01b4fe22d39cc51b95b1f0256e0811612c4c0b56 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 02/37] 0002-mira-deterministic-qwen-tts
+
+---
+ app/api/health/route.ts                       |  18 ++-
+ app/api/server-providers/route.ts             |   7 +-
+ lib/audio/voice-resolver.ts                   |  23 +++
+ lib/hooks/use-discussion-tts.ts               |  13 +-
+ lib/server/classroom-generation.ts            |  38 +++--
+ lib/server/classroom-media-generation.ts      | 147 +++++++++++++-----
+ lib/server/mira-tts-policy.ts                 |  70 +++++++++
+ lib/store/settings.ts                         |  37 ++++-
+ tests/audio/voice-resolver-enablement.test.ts |  22 +++
+ .../server/classroom-media-generation.test.ts |  54 ++++++-
+ tests/server/mira-tts-policy.test.ts          |  55 +++++++
+ 11 files changed, 409 insertions(+), 75 deletions(-)
+ create mode 100644 lib/server/mira-tts-policy.ts
+ create mode 100644 tests/server/mira-tts-policy.test.ts
+
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index 5148247..57aa653 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -1,14 +1,27 @@
+-import { apiSuccess } from '@/lib/server/api-response';
++import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import {
+   getServerWebSearchProviders,
+   getServerImageProviders,
+   getServerVideoProviders,
+   getServerTTSProviders,
+ } from '@/lib/server/provider-config';
++import { assertMiraTtsProviderReady, getMiraTtsPolicy } from '@/lib/server/mira-tts-policy';
+ 
+ const version = process.env.npm_package_version || '0.1.0';
+ 
+ export async function GET() {
++  const ttsProviders = getServerTTSProviders();
++  let ttsPolicy;
++  try {
++    ttsPolicy = getMiraTtsPolicy();
++    assertMiraTtsProviderReady(ttsPolicy, ttsProviders);
++  } catch (error) {
++    return apiError(
++      'PROVIDER_DISABLED',
++      503,
++      error instanceof Error ? error.message : 'Deterministic TTS policy is not ready',
++    );
++  }
+   return apiSuccess({
+     status: 'ok',
+     version,
+@@ -18,7 +31,8 @@ export async function GET() {
+       webSearch: Object.values(getServerWebSearchProviders()).some((info) => !info.disabled),
+       imageGeneration: Object.values(getServerImageProviders()).some((info) => !info.disabled),
+       videoGeneration: Object.values(getServerVideoProviders()).some((info) => !info.disabled),
+-      tts: Object.values(getServerTTSProviders()).some((info) => !info.disabled),
++      tts: Object.values(ttsProviders).some((info) => !info.disabled),
+     },
++    runtimePolicy: { tts: ttsPolicy },
+   });
+ }
+diff --git a/app/api/server-providers/route.ts b/app/api/server-providers/route.ts
+index 94e6d72..c3cfcfd 100644
+--- a/app/api/server-providers/route.ts
++++ b/app/api/server-providers/route.ts
+@@ -10,14 +10,19 @@ import {
+ } from '@/lib/server/provider-config';
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import { createLogger } from '@/lib/logger';
++import { assertMiraTtsProviderReady, getMiraTtsPolicy } from '@/lib/server/mira-tts-policy';
+ 
+ const log = createLogger('ServerProviders');
+ 
+ export async function GET() {
+   try {
++    const tts = getServerTTSProviders();
++    const ttsPolicy = getMiraTtsPolicy();
++    assertMiraTtsProviderReady(ttsPolicy, tts);
+     return apiSuccess({
+       providers: getServerProviders(),
+-      tts: getServerTTSProviders(),
++      tts,
++      ttsPolicy,
+       asr: getServerASRProviders(),
+       pdf: getServerPDFProviders(),
+       image: getServerImageProviders(),
+diff --git a/lib/audio/voice-resolver.ts b/lib/audio/voice-resolver.ts
+index 17e7c85..5ae8a1c 100644
+--- a/lib/audio/voice-resolver.ts
++++ b/lib/audio/voice-resolver.ts
+@@ -67,6 +67,29 @@ export function resolveNarratorVoiceBinding(
+   };
+ }
+ 
++/**
++ * Resolve the teacher's live-discussion voice. A classroom-bound voice wins
++ * over account-scoped settings so server-generated lecture audio and live
++ * answers retain the same reviewed identity.
++ */
++export function resolveTeacherDiscussionVoice(
++  agent: AgentConfig,
++  globalVoice: ResolvedVoice,
++  providerConfig: Record<string, TTSEnablementConfig & { modelId?: string }>,
++): ResolvedVoice | null {
++  for (const voice of [agent.voiceConfig, globalVoice]) {
++    if (!voice) continue;
++    const config = providerConfig[voice.providerId];
++    if (!isTTSProviderEnabled(voice.providerId, config)) continue;
++    return {
++      providerId: voice.providerId,
++      modelId: voice.modelId || config?.modelId,
++      voiceId: voice.voiceId,
++    };
++  }
++  return null;
++}
++
+ /**
+  * Resolve the TTS provider + voice for an agent, choosing only among ENABLED
+  * providers (`enabledProviders` is the output of getEnabledProvidersWithVoices,
+diff --git a/lib/hooks/use-discussion-tts.ts b/lib/hooks/use-discussion-tts.ts
+index 87b133f..9049512 100644
+--- a/lib/hooks/use-discussion-tts.ts
++++ b/lib/hooks/use-discussion-tts.ts
+@@ -6,6 +6,7 @@ import { useBrowserTTS } from '@/lib/hooks/use-browser-tts';
+ import {
+   resolveAgentVoice,
+   resolveNarratorVoiceBinding,
++  resolveTeacherDiscussionVoice,
+   getSelectableProvidersWithVoices,
+   type ResolvedVoice,
+ } from '@/lib/audio/voice-resolver';
+@@ -151,8 +152,8 @@ export function useDiscussionTTS({ enabled, agents, onAudioStateChange }: Discus
+       // could swap the user's chosen voice. Only if the global provider is itself
+       // disabled does the teacher fall back to an enabled provider.
+       if (agent.role === 'teacher') {
+-        const resolved = resolveNarratorVoiceBinding(
+-          agent.voiceConfig,
++        const resolved = resolveTeacherDiscussionVoice(
++          agent,
+           {
+             providerId: globalTtsProviderId,
+             voiceId: globalTtsVoice,
+@@ -160,13 +161,7 @@ export function useDiscussionTTS({ enabled, agents, onAudioStateChange }: Discus
+           },
+           ttsProvidersConfig,
+         );
+-        const preferred = isTTSProviderEnabled(
+-          resolved.providerId,
+-          ttsProvidersConfig[resolved.providerId],
+-        )
+-          ? resolved
+-          : firstVoice();
+-        return applyUnavailableBindingFallback(agent.id, preferred, globalVoice, firstVoice);
++        return applyUnavailableBindingFallback(agent.id, resolved, globalVoice, firstVoice);
+       }
+ 
+       const index = agentIndexMap.current.get(agentId!) ?? 0;
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index ab1406f..f68f58c 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -36,6 +36,11 @@ import { buildVideoManifestFromOutlines } from '@/lib/media/video-manifest';
+ import type { UserRequirements } from '@/lib/types/generation';
+ import type { Scene, Stage } from '@/lib/types/stage';
+ import { AGENT_COLOR_PALETTE, AGENT_DEFAULT_AVATARS } from '@/lib/constants/agent-defaults';
++import {
++  getMiraTeacherName,
++  getMiraTeacherVoiceConfig,
++  getMiraTtsPolicy,
++} from '@/lib/server/mira-tts-policy';
+ 
+ const log = createLogger('Classroom');
+ 
+@@ -518,6 +523,7 @@ export async function generateClassroom(
+   } else {
+     agents = getDefaultAgents();
+   }
++  const miraTtsPolicy = getMiraTtsPolicy();
+ 
+   const stageId = nanoid(10);
+   const stage: Stage = {
+@@ -534,15 +540,19 @@ export async function generateClassroom(
+     // For default agents, just record IDs — the client already has them.
+     ...(agentMode === 'generate'
+       ? {
+-          generatedAgentConfigs: agents.map((a, i) => ({
+-            id: a.id,
+-            name: a.name,
+-            role: a.role,
+-            persona: a.persona || '',
+-            avatar: AGENT_DEFAULT_AVATARS[i % AGENT_DEFAULT_AVATARS.length],
+-            color: AGENT_COLOR_PALETTE[i % AGENT_COLOR_PALETTE.length],
+-            priority: a.role === 'teacher' ? 10 : a.role === 'assistant' ? 7 : 5,
+-          })),
++          generatedAgentConfigs: agents.map((a, i) => {
++            const voiceConfig = getMiraTeacherVoiceConfig(a.role, miraTtsPolicy);
++            return {
++              id: a.id,
++              name: getMiraTeacherName(a.role, a.name, miraTtsPolicy),
++              role: a.role,
++              persona: a.persona || '',
++              avatar: AGENT_DEFAULT_AVATARS[i % AGENT_DEFAULT_AVATARS.length],
++              color: AGENT_COLOR_PALETTE[i % AGENT_COLOR_PALETTE.length],
++              priority: a.role === 'teacher' ? 10 : a.role === 'assistant' ? 7 : 5,
++              ...(voiceConfig ? { voiceConfig } : {}),
++            };
++          }),
+         }
+       : {
+           agentIds: agents.map((a) => a.id),
+@@ -692,12 +702,10 @@ export async function generateClassroom(
+       totalScenes: outlines.length,
+     });
+ 
+-    try {
+-      await generateTTSForClassroom(scenes, stageId, options.baseUrl);
+-      log.info('TTS generation complete');
+-    } catch (err) {
+-      log.warn('TTS generation phase failed, continuing:', err);
+-    }
++    const tts = await generateTTSForClassroom(scenes, stageId, options.baseUrl);
++    log.info(
++      `TTS generation complete: provider=${tts.providerId}, model=${tts.modelId}, voice=${tts.voiceId}, speech=${tts.speechCount}`,
++    );
+   }
+ 
+   await options.onProgress?.({
+diff --git a/lib/server/classroom-media-generation.ts b/lib/server/classroom-media-generation.ts
+index c1bd777..86eff5a 100644
+--- a/lib/server/classroom-media-generation.ts
++++ b/lib/server/classroom-media-generation.ts
+@@ -37,6 +37,17 @@ import type { TTSProviderId } from '@/lib/audio/types';
+ import { splitLongSpeechActions } from '@/lib/audio/tts-utils';
+ import { isGeneratedMediaPlaceholder } from '@/lib/media/media-ref';
+ import { VOXCPM_AUTO_VOICE_ID, VOXCPM_TTS_PROVIDER_ID } from '@/lib/audio/voxcpm';
++import { assertMiraTtsProviderReady, getMiraTtsPolicy } from '@/lib/server/mira-tts-policy';
++
++interface MiraSpeechAudioMetadata {
++  schemaVersion: 'mira.openmaic.speech-audio.v1';
++  providerId: string;
++  modelId: string;
++  voiceId: string;
++  fallbackUsed: false;
++}
++
++type MiraSpeechAction = SpeechAction & { audioMetadata?: MiraSpeechAudioMetadata };
+ 
+ const log = createLogger('ClassroomMedia');
+ 
+@@ -244,33 +255,74 @@ export function replaceMediaPlaceholders(scenes: Scene[], mediaMap: Record<strin
+ // TTS generation
+ // ---------------------------------------------------------------------------
+ 
++export interface ClassroomTTSGenerationResult {
++  providerId: TTSProviderId;
++  modelId: string;
++  voiceId: string;
++  speechCount: number;
++}
++
++export function assertClassroomSpeechAudioComplete(scenes: Scene[]): number {
++  let speechCount = 0;
++  for (const scene of scenes) {
++    for (const action of scene.actions || []) {
++      if (action.type !== 'speech') continue;
++      speechCount += 1;
++      const speech = action as MiraSpeechAction;
++      if (!speech.text?.trim()) {
++        throw new Error(`Speech action ${action.id} has no text`);
++      }
++      if (!speech.audioId || !speech.audioUrl) {
++        throw new Error(`Speech action ${action.id} has no generated audio`);
++      }
++      if (
++        speech.audioMetadata?.schemaVersion !== 'mira.openmaic.speech-audio.v1' ||
++        !speech.audioMetadata.providerId ||
++        !speech.audioMetadata.modelId ||
++        !speech.audioMetadata.voiceId ||
++        speech.audioMetadata.fallbackUsed !== false
++      ) {
++        throw new Error(`Speech action ${action.id} has invalid audio metadata`);
++      }
++    }
++  }
++  if (speechCount === 0) {
++    throw new Error('TTS was enabled but the classroom contains no speech actions');
++  }
++  return speechCount;
++}
++
+ export async function generateTTSForClassroom(
+   scenes: Scene[],
+   classroomId: string,
+   baseUrl: string,
+-): Promise<void> {
++): Promise<ClassroomTTSGenerationResult> {
+   const audioDir = path.join(CLASSROOMS_DIR, classroomId, 'audio');
+   await ensureDir(audioDir);
+ 
+   // Resolve TTS provider (exclude browser-native-tts and operator force-disabled
+   // providers — server precedence, #665).
+-  const ttsProviderIds = Object.entries(getServerTTSProviders())
++  const serverTtsProviders = getServerTTSProviders();
++  const policy = getMiraTtsPolicy();
++  assertMiraTtsProviderReady(policy, serverTtsProviders);
++  const ttsProviderIds = Object.entries(serverTtsProviders)
+     .filter(([id, info]) => id !== 'browser-native-tts' && !info.disabled)
+     .map(([id]) => id);
+   if (ttsProviderIds.length === 0) {
+-    log.warn('No server TTS provider configured, skipping TTS generation');
+-    return;
++    throw new Error('TTS was enabled but no server TTS provider is configured');
+   }
+ 
+-  const providerId = ttsProviderIds[0] as TTSProviderId;
++  const providerId = (policy?.providerId || ttsProviderIds[0]) as TTSProviderId;
+   const apiKey = resolveTTSApiKey(providerId);
+   const ttsProvider = TTS_PROVIDERS[providerId as keyof typeof TTS_PROVIDERS];
+   if (ttsProvider?.requiresApiKey && !apiKey) {
+-    log.warn(`No API key for TTS provider "${providerId}", skipping TTS generation`);
+-    return;
++    throw new Error(`TTS provider "${providerId}" is configured without its required API key`);
+   }
+   const ttsBaseUrl = resolveTTSBaseUrl(providerId) || ttsProvider?.defaultBaseUrl;
+-  const voice = DEFAULT_TTS_VOICES[providerId as keyof typeof DEFAULT_TTS_VOICES] || 'default';
++  const modelId =
++    policy?.modelId || DEFAULT_TTS_MODELS[providerId as keyof typeof DEFAULT_TTS_MODELS] || '';
++  const voice =
++    policy?.voiceId || DEFAULT_TTS_VOICES[providerId as keyof typeof DEFAULT_TTS_VOICES] || 'default';
+   const format = ttsProvider?.supportedFormats?.[0] || 'mp3';
+   const serverVoxCPMVoicePrompt =
+     process.env.MIRA_VOXCPM_VOICE_PROMPT?.replace(/[()（）\p{C}]+/gu, ' ').trim() ||
+@@ -287,44 +339,61 @@ export async function generateTTSForClassroom(
+     const sceneOrder = scene.order;
+ 
+     for (const action of scene.actions) {
+-      if (action.type !== 'speech' || !(action as SpeechAction).text) continue;
+-      const speechAction = action as ServerTransportSpeechAction;
++      if (action.type !== 'speech') continue;
++      const speechAction = action as ServerTransportSpeechAction & MiraSpeechAction;
++      if (!speechAction.text?.trim()) {
++        throw new Error(`Speech action ${action.id} has no text`);
++      }
+       // Server transport emits the derived id plus the serving URL; the
+       // client-side converter collapses the pair into one pool asset on
+       // first load. Browser generation allocates pool ids directly.
+       const audioId = `tts_s${sceneOrder}_${action.id}`;
+ 
+-      try {
+-        const result = await generateTTS(
+-          {
+-            providerId,
+-            modelId: DEFAULT_TTS_MODELS[providerId as keyof typeof DEFAULT_TTS_MODELS] || '',
+-            apiKey,
+-            baseUrl: ttsBaseUrl,
+-            voice,
+-            speed: speechAction.speed,
+-            ...(providerId === VOXCPM_TTS_PROVIDER_ID && voice === VOXCPM_AUTO_VOICE_ID
+-              ? {
+-                  providerOptions: {
+-                    backend: 'vllm-omni',
+-                    voiceMode: 'prompt',
+-                    voicePrompt: serverVoxCPMVoicePrompt,
+-                  },
+-                }
+-              : {}),
+-          },
+-          speechAction.text,
+-        );
+-
+-        const filename = `${audioId}.${result.format || format}`;
+-        await fs.writeFile(path.join(audioDir, filename), result.audio);
++      const result = await generateTTS(
++        {
++          providerId,
++          modelId,
++          apiKey,
++          baseUrl: ttsBaseUrl,
++          voice,
++          speed: speechAction.speed,
++          ...(providerId === VOXCPM_TTS_PROVIDER_ID && voice === VOXCPM_AUTO_VOICE_ID
++            ? {
++                providerOptions: {
++                  backend: 'vllm-omni',
++                  voiceMode: 'prompt',
++                  voicePrompt: serverVoxCPMVoicePrompt,
++                },
++              }
++            : {}),
++        },
++        speechAction.text,
++      );
++      if (!result.audio?.length) {
++        throw new Error(`TTS provider returned empty audio for action ${action.id}`);
++      }
+ 
+-        speechAction.audioId = audioId;
+-        speechAction.audioUrl = mediaServingUrl(baseUrl, classroomId, `audio/${filename}`);
+-        log.info(`Generated TTS: ${filename} (${result.audio.length} bytes)`);
+-      } catch (err) {
+-        log.warn(`TTS generation failed for action ${action.id}:`, err);
++      const filename = `${audioId}.${result.format || format}`;
++      const audioPath = path.join(audioDir, filename);
++      await fs.writeFile(audioPath, result.audio);
++      const written = await fs.stat(audioPath);
++      if (!written.isFile() || written.size === 0) {
++        throw new Error(`Generated TTS file is empty for action ${action.id}`);
+       }
++
++      speechAction.audioId = audioId;
++      speechAction.audioUrl = mediaServingUrl(baseUrl, classroomId, `audio/${filename}`);
++      speechAction.audioMetadata = {
++        schemaVersion: 'mira.openmaic.speech-audio.v1',
++        providerId,
++        modelId,
++        voiceId: voice,
++        fallbackUsed: false,
++      };
++      log.info(`Generated TTS: ${filename} (${written.size} bytes)`);
+     }
+   }
++
++  const speechCount = assertClassroomSpeechAudioComplete(scenes);
++  return { providerId, modelId, voiceId: voice, speechCount };
+ }
+diff --git a/lib/server/mira-tts-policy.ts b/lib/server/mira-tts-policy.ts
+new file mode 100644
+index 0000000..dceb4ce
+--- /dev/null
++++ b/lib/server/mira-tts-policy.ts
+@@ -0,0 +1,70 @@
++import { TTS_PROVIDERS } from '@/lib/audio/constants';
++
++export const MIRA_QWEN_TTS_PROVIDER_ID = 'qwen-tts' as const;
++
++const ALLOWED_MODELS = new Set(['qwen3-tts-flash']);
++const ALLOWED_TEACHER_VOICES = new Set(['Serena']);
++
++export interface MiraTtsPolicy {
++  enforced: true;
++  providerId: typeof MIRA_QWEN_TTS_PROVIDER_ID;
++  modelId: string;
++  voiceId: string;
++}
++
++export function getMiraTtsPolicy(
++  env: Readonly<Record<string, string | undefined>> = process.env,
++): MiraTtsPolicy | null {
++  const required = env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS;
++  if (required === undefined || required === '' || required === '0') return null;
++  if (required !== '1') {
++    throw new Error('MIRA_OPENMAIC_REQUIRE_QWEN_TTS must be exactly 0 or 1');
++  }
++
++  const modelId = env.MIRA_OPENMAIC_QWEN_TTS_MODEL || 'qwen3-tts-flash';
++  if (!ALLOWED_MODELS.has(modelId)) {
++    throw new Error(`Unsupported deterministic Qwen3-TTS model: ${modelId}`);
++  }
++
++  const voiceId = env.MIRA_OPENMAIC_QWEN_TTS_VOICE || 'Serena';
++  const qwenVoices = new Set(
++    TTS_PROVIDERS[MIRA_QWEN_TTS_PROVIDER_ID].voices.map((voice) => voice.id),
++  );
++  if (!ALLOWED_TEACHER_VOICES.has(voiceId) || !qwenVoices.has(voiceId)) {
++    throw new Error(`Unsupported deterministic Qwen3-TTS teacher voice: ${voiceId}`);
++  }
++
++  return {
++    enforced: true,
++    providerId: MIRA_QWEN_TTS_PROVIDER_ID,
++    modelId,
++    voiceId,
++  };
++}
++
++export function assertMiraTtsProviderReady(
++  policy: MiraTtsPolicy | null,
++  providers: Record<string, { disabled?: boolean }>,
++): void {
++  if (!policy) return;
++  const provider = providers[policy.providerId];
++  if (!provider || provider.disabled) {
++    throw new Error('Deterministic Qwen3-TTS is required but qwen-tts is not server-configured');
++  }
++}
++
++export function getMiraTeacherVoiceConfig(
++  role: string,
++  policy: MiraTtsPolicy | null,
++): { providerId: string; modelId: string; voiceId: string } | undefined {
++  if (role !== 'teacher' || !policy) return undefined;
++  return { providerId: policy.providerId, modelId: policy.modelId, voiceId: policy.voiceId };
++}
++
++export function getMiraTeacherName(
++  role: string,
++  currentName: string,
++  policy: MiraTtsPolicy | null,
++): string {
++  return role === 'teacher' && policy ? '小数老师' : currentName;
++}
+diff --git a/lib/store/settings.ts b/lib/store/settings.ts
+index 7d87e93..77de429 100644
+--- a/lib/store/settings.ts
++++ b/lib/store/settings.ts
+@@ -1407,6 +1407,12 @@ export const useSettingsStore = create<SettingsState>()(
+             const data = (await res.json()) as {
+               providers: Record<string, { models?: string[] }>;
+               tts: Record<string, { disabled?: boolean }>;
++              ttsPolicy?: {
++                enforced: true;
++                providerId: TTSProviderId;
++                modelId: string;
++                voiceId: string;
++              } | null;
+               asr: Record<string, { disabled?: boolean }>;
+               pdf: Record<string, Record<string, never>>;
+               image: Record<string, { models?: string[]; disabled?: boolean }>;
+@@ -1491,6 +1497,13 @@ export const useSettingsStore = create<SettingsState>()(
+                   };
+                 }
+               }
++              const enforcedTtsPolicy = data.ttsPolicy?.enforced ? data.ttsPolicy : null;
++              if (enforcedTtsPolicy && newTTSConfig[enforcedTtsPolicy.providerId]) {
++                newTTSConfig[enforcedTtsPolicy.providerId] = {
++                  ...newTTSConfig[enforcedTtsPolicy.providerId],
++                  modelId: enforcedTtsPolicy.modelId,
++                };
++              }
+ 
+               // Merge ASR providers. Reset both server flags first, then apply:
+               // an entry with `disabled` is force-off (server precedence) and is
+@@ -1644,12 +1657,14 @@ export const useSettingsStore = create<SettingsState>()(
+                 newProvidersConfig,
+                 llmFallback,
+               );
+-              const validTTSProvider = validateProvider(
+-                state.ttsProviderId,
+-                newTTSConfig,
+-                ttsFallback,
+-                'browser-native-tts' as TTSProviderId,
+-              );
++              const validTTSProvider = enforcedTtsPolicy
++                ? enforcedTtsPolicy.providerId
++                : validateProvider(
++                    state.ttsProviderId,
++                    newTTSConfig,
++                    ttsFallback,
++                    'browser-native-tts' as TTSProviderId,
++                  );
+               const validASRProvider = validateProvider(
+                 state.asrProviderId,
+                 newASRConfig,
+@@ -1721,8 +1736,9 @@ export const useSettingsStore = create<SettingsState>()(
+                 ? resolveSelectedModel(state.videoModelId, videoModels)
+                 : '';
+ 
+-              const validTTSVoice =
+-                validTTSProvider !== state.ttsProviderId
++              const validTTSVoice = enforcedTtsPolicy
++                ? enforcedTtsPolicy.voiceId
++                : validTTSProvider !== state.ttsProviderId
+                   ? DEFAULT_TTS_VOICES[validTTSProvider as BuiltInTTSProviderId] || 'default'
+                   : state.ttsVoice;
+ 
+@@ -1897,6 +1913,11 @@ export const useSettingsStore = create<SettingsState>()(
+                   videoGenerationEnabled: autoVideoEnabled,
+                 }),
+                 ...(autoTtsEnabled !== undefined && { ttsEnabled: autoTtsEnabled }),
++                ...(enforcedTtsPolicy && {
++                  ttsProviderId: enforcedTtsPolicy.providerId,
++                  ttsVoice: enforcedTtsPolicy.voiceId,
++                  ttsEnabled: true,
++                }),
+               };
+             });
+           } catch (e) {
+diff --git a/tests/audio/voice-resolver-enablement.test.ts b/tests/audio/voice-resolver-enablement.test.ts
+index a4cd49d..fba6c19 100644
+--- a/tests/audio/voice-resolver-enablement.test.ts
++++ b/tests/audio/voice-resolver-enablement.test.ts
+@@ -12,6 +12,7 @@ import {
+   getEnabledProvidersWithVoices,
+   getSelectableProvidersWithVoices,
+   resolveAgentVoice,
++  resolveTeacherDiscussionVoice,
+   type ProviderWithVoices,
+ } from '@/lib/audio/voice-resolver';
+ 
+@@ -137,4 +138,25 @@ describe('getSelectableProvidersWithVoices (unified picker + discussion source)'
+     const student = {} as AgentConfig;
+     expect(resolveAgentVoice(student, 0, providers)).not.toBeNull();
+   });
++
++  it('keeps a policy-bound teacher on the lecture provider, model and voice during discussion', () => {
++    const teacher = {
++      role: 'teacher',
++      voiceConfig: { providerId: 'qwen-tts' as const, voiceId: 'Serena' },
++    } as AgentConfig;
++    expect(
++      resolveTeacherDiscussionVoice(
++        teacher,
++        { providerId: 'browser-native-tts', voiceId: 'os-zh' },
++        {
++          'qwen-tts': {
++            isServerConfigured: true,
++            enabled: true,
++            modelId: 'qwen3-tts-flash',
++          },
++          'browser-native-tts': { enabled: true },
++        },
++      ),
++    ).toEqual({ providerId: 'qwen-tts', modelId: 'qwen3-tts-flash', voiceId: 'Serena' });
++  });
+ });
+diff --git a/tests/server/classroom-media-generation.test.ts b/tests/server/classroom-media-generation.test.ts
+index 62b9d32..f8cb9a1 100644
+--- a/tests/server/classroom-media-generation.test.ts
++++ b/tests/server/classroom-media-generation.test.ts
+@@ -1,5 +1,8 @@
+ import { afterEach, describe, expect, test, vi } from 'vitest';
+-import { replaceMediaPlaceholders } from '@/lib/server/classroom-media-generation';
++import {
++  assertClassroomSpeechAudioComplete,
++  replaceMediaPlaceholders,
++} from '@/lib/server/classroom-media-generation';
+ import type { Scene } from '@/lib/types/stage';
+ import type { SceneOutline } from '@/lib/types/generation';
+ 
+@@ -330,3 +333,52 @@ describe('generateMediaForClassroom model fallback', () => {
+     expect(genBody.model).toBe('pinned-video-a');
+   });
+ });
++
++describe('classroom TTS completion contract', () => {
++  test('accepts only speech actions with complete audio metadata', () => {
++    const scene = slideScene([]);
++    scene.actions = [
++      {
++        id: 'speech_1',
++        type: 'speech',
++        text: '你好',
++        audioId: 'tts_s1_speech_1',
++        audioUrl: '/api/classroom-media/stage_1/audio/tts_s1_speech_1.wav',
++        audioMetadata: {
++          schemaVersion: 'mira.openmaic.speech-audio.v1',
++          providerId: 'qwen-tts',
++          modelId: 'qwen3-tts-flash',
++          voiceId: 'Serena',
++          fallbackUsed: false,
++        },
++      },
++    ] as unknown as Scene['actions'];
++    expect(assertClassroomSpeechAudioComplete([scene])).toBe(1);
++  });
++
++  test('fails closed when any speech action lacks generated audio', () => {
++    const scene = slideScene([]);
++    scene.actions = [{ id: 'speech_1', type: 'speech', text: '你好' }] as Scene['actions'];
++    expect(() => assertClassroomSpeechAudioComplete([scene])).toThrow(/no generated audio/);
++  });
++
++  test('fails closed when speech audio provenance is missing', () => {
++    const scene = slideScene([]);
++    scene.actions = [
++      {
++        id: 'speech_1',
++        type: 'speech',
++        text: '你好',
++        audioId: 'tts_s1_speech_1',
++        audioUrl: '/api/classroom-media/stage_1/audio/tts_s1_speech_1.wav',
++      },
++    ] as unknown as Scene['actions'];
++    expect(() => assertClassroomSpeechAudioComplete([scene])).toThrow(/invalid audio metadata/);
++  });
++
++  test('fails closed when TTS is enabled for a classroom with no speech', () => {
++    expect(() => assertClassroomSpeechAudioComplete([slideScene([])])).toThrow(
++      /contains no speech actions/,
++    );
++  });
++});
+diff --git a/tests/server/mira-tts-policy.test.ts b/tests/server/mira-tts-policy.test.ts
+new file mode 100644
+index 0000000..f4e340d
+--- /dev/null
++++ b/tests/server/mira-tts-policy.test.ts
+@@ -0,0 +1,55 @@
++import { describe, expect, test } from 'vitest';
++import {
++  assertMiraTtsProviderReady,
++  getMiraTeacherName,
++  getMiraTeacherVoiceConfig,
++  getMiraTtsPolicy,
++} from '@/lib/server/mira-tts-policy';
++
++describe('Mira deterministic Qwen3-TTS policy', () => {
++  test('is disabled unless explicitly opted in', () => {
++    expect(getMiraTtsPolicy({})).toBeNull();
++  });
++
++  test('pins the hosted-like Serena voice and Qwen3 model', () => {
++    const policy = getMiraTtsPolicy({ MIRA_OPENMAIC_REQUIRE_QWEN_TTS: '1' });
++    expect(policy).toEqual({
++      enforced: true,
++      providerId: 'qwen-tts',
++      modelId: 'qwen3-tts-flash',
++      voiceId: 'Serena',
++    });
++    expect(getMiraTeacherVoiceConfig('teacher', policy)).toEqual({
++      providerId: 'qwen-tts',
++      modelId: 'qwen3-tts-flash',
++      voiceId: 'Serena',
++    });
++    expect(getMiraTeacherVoiceConfig('student', policy)).toBeUndefined();
++    expect(getMiraTeacherName('teacher', '随机教师名', policy)).toBe('小数老师');
++    expect(getMiraTeacherName('student', '小明', policy)).toBe('小明');
++  });
++
++  test('rejects unreviewed model and voice identities', () => {
++    expect(() =>
++      getMiraTtsPolicy({
++        MIRA_OPENMAIC_REQUIRE_QWEN_TTS: '1',
++        MIRA_OPENMAIC_QWEN_TTS_MODEL: 'qwen3-tts-instruct-flash',
++      }),
++    ).toThrow(/Unsupported deterministic Qwen3-TTS model/);
++    expect(() =>
++      getMiraTtsPolicy({
++        MIRA_OPENMAIC_REQUIRE_QWEN_TTS: '1',
++        MIRA_OPENMAIC_QWEN_TTS_VOICE: 'Cherry',
++      }),
++    ).toThrow(/Unsupported deterministic Qwen3-TTS teacher voice/);
++  });
++
++  test('requires the server-managed qwen-tts provider', () => {
++    const policy = getMiraTtsPolicy({ MIRA_OPENMAIC_REQUIRE_QWEN_TTS: '1' });
++    expect(() => assertMiraTtsProviderReady(policy, {})).toThrow(/not server-configured/);
++    expect(() => assertMiraTtsProviderReady(policy, { 'qwen-tts': { disabled: true } })).toThrow(
++      /not server-configured/,
++    );
++    expect(() => assertMiraTtsProviderReady(policy, { 'qwen-tts': {} })).not.toThrow();
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

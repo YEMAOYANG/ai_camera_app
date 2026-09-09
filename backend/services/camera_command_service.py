@@ -343,6 +343,26 @@ class CameraCommandService:
             device_id=resolved_device_id,
         )
 
+    def internal_stop_monitor(
+        self,
+        *,
+        family_id: str,
+        task_id: str | None = None,
+        device_id: str | None = None,
+    ) -> dict:
+        bridge, resolved_device_id = self._runtime_for_command(
+            family_id=family_id,
+            device_id=device_id,
+        )
+        return self._execute_command(
+            family_id=family_id,
+            command_type="stop_monitor",
+            request_payload={},
+            runner=bridge.stop_monitor,
+            task_id=task_id,
+            device_id=resolved_device_id,
+        )
+
     def internal_task_observation(
         self,
         *,

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warm_sight/src/core/config/app_environment.dart';
 import 'package:warm_sight/src/core/storage/auth_session_store.dart';
 import 'package:warm_sight/src/features/tasks/application/task_realtime_repository.dart';
+import 'support/fake_auth_token_storage.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -85,10 +86,13 @@ void main() {
   test('global realtime controller follows session lifecycle once', () async {
     SharedPreferences.setMockInitialValues(const {});
     final preferences = await SharedPreferences.getInstance();
-    final sessionStore = AuthSessionStore(preferences);
+    final sessionStore = AuthSessionStore(
+      preferences,
+      secureStorage: FakeAuthSecureSessionStorage(),
+    );
     final sockets = <_FakeWebSocket>[];
     final controller = AppRealtimeController(
-      environment: const AppEnvironment(
+      environment: AppEnvironment(
         flavor: AppFlavor.development,
         apiBaseUrl: 'http://127.0.0.1:8000/api',
         taskWebSocketBaseUrl: 'ws://127.0.0.1:8001/api',

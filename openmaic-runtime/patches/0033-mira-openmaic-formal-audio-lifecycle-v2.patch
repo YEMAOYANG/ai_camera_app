@@ -1,0 +1,2008 @@
+From 1c62f509fd6c81b72ceda27e1f48584ae721fc38 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:35 +0800
+Subject: [PATCH 33/37] 0033-mira-openmaic-formal-audio-lifecycle-v2
+
+---
+ app/api/health/route.ts                       |   5 +-
+ components/chat/chat-area.tsx                 |   2 +-
+ components/chat/use-chat-sessions.ts          |   4 +-
+ components/edit/PlaybackChromeRoot.tsx        | 110 +++-
+ lib/mira/student-runtime.ts                   |  17 +-
+ lib/server/classroom-generation.ts            |   2 +
+ lib/server/classroom-job-store.ts             |   3 +
+ lib/server/mira-formal-audio-lifecycle.ts     | 592 ++++++++++++++++++
+ lib/server/mira-formal-audio.ts               |  22 +-
+ lib/server/mira-formal-compiled-classroom.ts  | 239 ++++++-
+ tests/playback/action-navigation.test.ts      |  47 ++
+ tests/runtime/mira-student-runtime.test.ts    |  20 +-
+ .../server/classroom-generation-retry.test.ts |  25 +-
+ tests/server/health-route.test.ts             |  30 +-
+ .../mira-formal-audio-lifecycle.test.ts       | 273 ++++++++
+ tests/server/mira-formal-audio.test.ts        |  11 +-
+ 16 files changed, 1324 insertions(+), 78 deletions(-)
+ create mode 100644 lib/server/mira-formal-audio-lifecycle.ts
+ create mode 100644 tests/server/mira-formal-audio-lifecycle.test.ts
+
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index a9b3042..b562bc3 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -1,7 +1,6 @@
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import type { NextRequest } from 'next/server';
+ import {
+-  getServerProviders,
+   getServerWebSearchProviders,
+   getServerImageProviders,
+   getServerVideoProviders,
+@@ -74,12 +73,14 @@ export async function GET(req: NextRequest) {
+   if (req.nextUrl.searchParams.get('scope') === 'formal-generation') {
+     try {
+       const formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
++      assertMiraFormalAudioProviderReady();
+       return apiSuccess({
+         status: 'ok',
+         version,
+-        capabilities: { formalGeneration: true, speechAudioGeneration: false },
++        capabilities: { formalGeneration: true, speechAudioGeneration: true },
+         runtimePolicy: {
+           formalGeneration: formalGenerationPolicy,
++          formalAudio: getMiraFormalAudioRuntimePolicy(),
+         },
+       });
+     } catch (error) {
+diff --git a/components/chat/chat-area.tsx b/components/chat/chat-area.tsx
+index c2050fe..644c3ba 100644
+--- a/components/chat/chat-area.tsx
++++ b/components/chat/chat-area.tsx
+@@ -67,7 +67,7 @@ export interface ChatAreaRef {
+   resumeActiveSession: () => Promise<void>;
+   sendMessage: (content: string) => Promise<void>;
+   startDiscussion: (request: DiscussionRequest) => Promise<void>;
+-  startLecture: (sceneId: string) => Promise<string>;
++  startLecture: (sceneId: string) => string;
+   addLectureMessage: (sessionId: string, action: Action, actionIndex: number) => void;
+   getIsStreaming: () => boolean;
+   getActiveSessionType: () => string | null;
+diff --git a/components/chat/use-chat-sessions.ts b/components/chat/use-chat-sessions.ts
+index 0061866..1871277 100644
+--- a/components/chat/use-chat-sessions.ts
++++ b/components/chat/use-chat-sessions.ts
+@@ -62,7 +62,7 @@ export interface LectureAgentIdentityRegistry {
+ 
+ /**
+  * Keep the selected lecture teacher available before React state commits.
+- * Lecture actions can be emitted immediately after startLecture resolves, so
++ * Lecture actions can be emitted immediately after startLecture returns, so
+  * their identity cannot depend on a later sessions-state render.
+  */
+ export function createLectureAgentIdentityRegistry(): LectureAgentIdentityRegistry {
+@@ -2099,7 +2099,7 @@ export function useChatSessions(options: UseChatSessionsOptions = {}) {
+    * Deduplicates: returns existing active lecture session for the same sceneId if found.
+    */
+   const startLecture = useCallback(
+-    async (sceneId: string): Promise<string> => {
++    (sceneId: string): string => {
+       // Check for existing lecture session with same sceneId (active or completed)
+       const existing = sessions.find(
+         (s) =>
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 878ebba..261dffe 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -65,9 +65,14 @@ import {
+   useMiraStudentRuntime,
+   useMiraStudentRuntimeEvents,
+ } from '@/lib/contexts/mira-student-runtime-context';
+-import { getMiraEffectiveAutoPlayLecture } from '@/lib/mira/student-runtime';
++import {
++  getMiraEffectiveAutoPlayLecture,
++  shouldShowMiraStudentStartGate,
++} from '@/lib/mira/student-runtime';
+ import { toast } from 'sonner';
+ 
++const ignoreStudentAutoPlayChange = (_enabled: boolean) => {};
++
+ /**
+  * Imperative handle exposed via `ref` so the parent (`Stage`) can tear
+  * down playback state synchronously before flipping mode to `'edit'`.
+@@ -156,12 +161,17 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+       studentAutoPlayLecture: studentAutoPlayRuntime?.autoPlayLecture ?? false,
+       operatorAutoPlayLecture,
+     });
+-    const setAutoPlayLecture = studentMode
+-      ? (studentAutoPlayRuntime?.setAutoPlayLecture ?? (() => {}))
+-      : setOperatorAutoPlayLecture;
++    const setAutoPlayLecture = useMemo(
++      () =>
++        studentMode
++          ? (studentAutoPlayRuntime?.setAutoPlayLecture ?? ignoreStudentAutoPlayChange)
++          : setOperatorAutoPlayLecture,
++      [setOperatorAutoPlayLecture, studentAutoPlayRuntime?.setAutoPlayLecture, studentMode],
++    );
+ 
+     // PlaybackEngine state
+     const [engineMode, setEngineMode] = useState<EngineMode>('idle');
++    const [studentLectureStarted, setStudentLectureStarted] = useState(false);
+     const [playbackCompleted, setPlaybackCompleted] = useState(false); // Distinguishes "never played" idle from "finished" idle
+     const [lectureSpeech, setLectureSpeech] = useState<string | null>(null); // From PlaybackEngine (lecture)
+     const [currentPlaybackActionIndex, setCurrentPlaybackActionIndex] = useState<number | null>(0);
+@@ -478,20 +488,14 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+         const sceneId = engine.getCurrentSceneId();
+         if (!sceneId || !chatAreaRef.current) return;
+ 
+-        // startLecture is async — re-check the engine is still idle AND still
+-        // the installed engine afterwards. A scene switch during the await
+-        // stops the captured engine (leaving it idle, so the mode check alone
+-        // passes) and installs a new one; resuming the orphan would emit
+-        // progress snapshots for the old scene over the new scene's cursor.
+-        const sessionId = await chatAreaRef.current.startLecture(sceneId);
++        const sessionId = chatAreaRef.current.startLecture(sceneId);
+         if (engineRef.current !== engine) {
+           await chatAreaRef.current.endSession(sessionId);
+           return;
+         }
+         if (engine.getMode() !== 'idle') {
+-          // The engine left idle during the async startLecture (e.g. a new live
+-          // session began) — tear down the lecture session we just
+-          // created/reactivated so it doesn't linger without playing.
++          // A competing live session already owns the engine. Tear down the
++          // lecture session we just created/reactivated so it cannot linger.
+           await chatAreaRef.current.endSession(sessionId);
+           return;
+         }
+@@ -768,7 +772,23 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+             // Clearing here causes fallback to idleText (first sentence).
+             setActiveBubbleId(null);
+           },
+-          onAudioPlaybackIssue: ({ reason }) => {
++          onAudioPlaybackIssue: ({ reason, actionId }) => {
++            if (studentMode) {
++              setAutoPlayLecture(false);
++              const failedActionIndex = currentScene.actions?.findIndex(
++                (action) => action.id === actionId,
++              );
++              const failedEngine = engineRef.current;
++              if (failedEngine && failedActionIndex !== undefined && failedActionIndex >= 0) {
++                failedEngine.pause();
++                void failedEngine
++                  .jumpToAction(failedActionIndex, { autoplay: false })
++                  .finally(() => setStudentLectureStarted(false));
++              } else {
++                failedEngine?.pause();
++                setStudentLectureStarted(false);
++              }
++            }
+             const title = studentMode
+               ? '这段课程声音暂时无法播放'
+               : 'Narration audio could not be played';
+@@ -953,14 +973,11 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+         // Auto-start if triggered by auto-play scene advance
+         if (autoStartRef.current) {
+           autoStartRef.current = false;
+-          (async () => {
+-            if (currentScene && chatAreaRef.current) {
+-              const sessionId = await chatAreaRef.current.startLecture(currentScene.id);
+-              lectureSessionIdRef.current = sessionId;
+-              lectureActionCounterRef.current = 0;
+-            }
+-            engine.start();
+-          })();
++          if (currentScene && chatAreaRef.current) {
++            lectureSessionIdRef.current = chatAreaRef.current.startLecture(currentScene.id);
++            lectureActionCounterRef.current = 0;
++          }
++          engine.start();
+         } else {
+           // Load saved playback state and restore position (but never auto-play).
+           if (savedResumeActionIndex > 0 && engine.canJumpToAction(savedResumeActionIndex)) {
+@@ -1149,7 +1166,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     }, []);
+ 
+     // play/pause toggle
+-    const handlePlayPause = useCallback(async () => {
++    const handlePlayPause = useCallback(() => {
+       const engine = engineRef.current;
+       if (!engine) return;
+ 
+@@ -1170,10 +1187,11 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+       } else {
+         const wasCompleted = playbackCompleted;
+         setPlaybackCompleted(false);
+-        // Starting playback - create/reuse lecture session
++        // startLecture is synchronous, so the first speech bubble exists before
++        // playback while HTMLAudioElement.play() still receives this click's
++        // browser user-activation grant.
+         if (currentScene && chatAreaRef.current) {
+-          const sessionId = await chatAreaRef.current.startLecture(currentScene.id);
+-          lectureSessionIdRef.current = sessionId;
++          lectureSessionIdRef.current = chatAreaRef.current.startLecture(currentScene.id);
+         }
+         if (wasCompleted) {
+           // Restart from beginning (user clicked restart after completion)
+@@ -1188,6 +1206,17 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+ 
+     // get scene information
+     const isPendingScene = currentSceneId === PENDING_SCENE_ID;
++    const showStudentStartGate = shouldShowMiraStudentStartGate({
++      studentMode,
++      lectureStarted: studentLectureStarted,
++      hasScene: Boolean(currentScene && !isPendingScene),
++    });
++    const handleStudentStartLesson = useCallback(() => {
++      if (!engineRef.current) return;
++      setStudentLectureStarted(true);
++      setAutoPlayLecture(true);
++      handlePlayPause();
++    }, [handlePlayPause, setAutoPlayLecture]);
+     const hasNextPending = generatingOutlines.length > 0;
+     // True when every outline has materialized into a scene and nothing is
+     // currently generating — signals the classroom has finished and the user
+@@ -1442,6 +1471,35 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+ 
+         {/* Main Content Area */}
+         <div className="flex-1 flex flex-col overflow-hidden min-w-0 relative">
++          {showStudentStartGate && (
++            <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-6 backdrop-blur-sm">
++              <div
++                role="dialog"
++                aria-modal="true"
++                aria-labelledby="mira-student-start-title"
++                className="w-full max-w-md rounded-[2rem] border border-white/70 bg-white px-8 py-9 text-center shadow-2xl"
++              >
++                <p className="mb-2 text-sm font-semibold tracking-wide text-blue-600">老师已经准备好了</p>
++                <h2
++                  id="mira-student-start-title"
++                  className="text-3xl font-bold tracking-tight text-slate-900"
++                >
++                  点一下，开始上课
++                </h2>
++                <p className="mt-3 text-base leading-7 text-slate-600">
++                  浏览器需要你先点一次，之后老师会自动讲解并继续下一页。
++                </p>
++                <button
++                  type="button"
++                  onClick={handleStudentStartLesson}
++                  className="mt-7 min-h-14 w-full rounded-2xl bg-blue-600 px-6 text-lg font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
++                >
++                  开始上课
++                </button>
++              </div>
++            </div>
++          )}
++
+           {/* Header — playback only. The Pro Switch fires `onEnterProMode`
+             (passed by the parent Stage) which awaits our `teardown()`
+             before the parent flips mode to 'edit'. */}
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+index 3c12563..c931a04 100644
+--- a/lib/mira/student-runtime.ts
++++ b/lib/mira/student-runtime.ts
+@@ -5,11 +5,11 @@ import {
+ 
+ export const MIRA_STUDENT_RUNTIME_QUERY_KEY = 'mira';
+ export const MIRA_STUDENT_RUNTIME_QUERY_VALUE = '1';
+-export const MIRA_STUDENT_AUTO_PLAY_DEFAULT = false;
++export const MIRA_STUDENT_AUTO_PLAY_DEFAULT = true;
+ 
+ export const MIRA_STUDENT_CHROME_POLICY = Object.freeze({
+   enforced: true,
+-  policyVersion: 'mira-student-chrome.v4',
++  policyVersion: 'mira-student-chrome.v5',
+   marker: 'mira=1',
+   locale: 'zh-CN',
+   theme: 'light',
+@@ -54,6 +54,19 @@ export function getMiraEffectiveAutoPlayLecture({
+   return studentMode ? studentAutoPlayLecture : operatorAutoPlayLecture;
+ }
+ 
++/** Browsers require a direct user gesture before a classroom can reliably play audio. */
++export function shouldShowMiraStudentStartGate({
++  studentMode,
++  lectureStarted,
++  hasScene,
++}: {
++  readonly studentMode: boolean;
++  readonly lectureStarted: boolean;
++  readonly hasScene: boolean;
++}): boolean {
++  return studentMode && hasScene && !lectureStarted;
++}
++
+ export function getMiraEffectiveAsrEnabled({
+   studentMode,
+   operatorAsrEnabled,
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index 60df52c..40afc2a 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -60,6 +60,7 @@ import {
+   MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import { generateMiraFormalCompiledClassroom } from '@/lib/server/mira-formal-compiled-classroom';
++import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
+ 
+ const log = createLogger('Classroom');
+ const MIRA_FORMAL_LLM_TIMEOUT_MS = 5 * 60 * 1000;
+@@ -139,6 +140,7 @@ export interface GenerateClassroomResult {
+   scenes: Scene[];
+   scenesCount: number;
+   createdAt: string;
++  formalAudio?: MiraFormalAudioLifecycleReceipt;
+ }
+ 
+ function createInMemoryStore(stage: Stage): StageStore {
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+index 4c4070c..505353c 100644
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -13,6 +13,7 @@ import {
+   writeJsonFileAtomic,
+ } from '@/lib/server/classroom-storage';
+ import { assertMiraFormalGenerationInput } from '@/lib/server/mira-formal-generation-policy';
++import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
+ 
+ export type ClassroomGenerationJobStatus = 'queued' | 'running' | 'succeeded' | 'failed';
+ 
+@@ -43,6 +44,7 @@ export interface ClassroomGenerationJob {
+     classroomId: string;
+     url: string;
+     scenesCount: number;
++    formalAudio?: MiraFormalAudioLifecycleReceipt;
+   };
+   error?: string;
+ }
+@@ -377,6 +379,7 @@ export async function markClassroomGenerationJobSucceeded(
+       classroomId: result.id,
+       url: result.url,
+       scenesCount: result.scenesCount,
++      ...(result.formalAudio ? { formalAudio: result.formalAudio } : {}),
+     },
+   });
+ }
+diff --git a/lib/server/mira-formal-audio-lifecycle.ts b/lib/server/mira-formal-audio-lifecycle.ts
+new file mode 100644
+index 0000000..dc7121d
+--- /dev/null
++++ b/lib/server/mira-formal-audio-lifecycle.ts
+@@ -0,0 +1,592 @@
++import { createHash } from 'node:crypto';
++import type { Action } from '@/lib/types/action';
++import type { Scene, Stage } from '@/lib/types/stage';
++import {
++  assertMiraFormalAudioProviderReady,
++  executeMiraFormalAsr,
++  executeMiraFormalTts,
++  getMiraFormalAudioRuntimePolicy,
++  readMiraFormalAsrJob,
++  readMiraFormalTtsAsset,
++  readMiraFormalTtsJob,
++  type MiraFormalAsrJob,
++  type MiraFormalAsrRequest,
++  type MiraFormalAsrTranscriptEvidence,
++  type MiraFormalAudioSubject,
++  type MiraFormalTtsJob,
++  type MiraFormalTtsRequest,
++} from '@/lib/server/mira-formal-audio';
++
++export const MIRA_FORMAL_AUDIO_LIFECYCLE_VERSION =
++  'mira.openmaic.formal-audio-lifecycle.v2' as const;
++export const MIRA_FORMAL_SPEECH_TEXT_POLICY_VERSION =
++  'mira.learning.formal-speech-text.v2' as const;
++
++const EXPECTED_SEGMENT_COUNT = 10;
++const MINIMUM_ASR_SIMILARITY_BPS = 8_500;
++const IDENTIFIER = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
++const SHA256 = /^[a-f0-9]{64}$/;
++const CHINESE_LATIN_TOKEN_PATTERN = /(?<![A-Za-z])([A-Za-z]+)(?![A-Za-z])/gu;
++const CHINESE_NUMBER_PATTERN = /\d+/gu;
++const CHINESE_DIGITS = '零一二三四五六七八九';
++const CHINESE_PINYIN_SPOKEN_TOKENS: Readonly<Record<string, string>> = {
++  a: '啊',
++  o: '喔',
++  e: '鹅',
++  i: '衣',
++  u: '乌',
++  b: '波',
++  p: '坡',
++  m: '摸',
++  f: '佛',
++  d: '得',
++  t: '特',
++  n: '讷',
++  l: '勒',
++  g: '哥',
++  k: '科',
++  h: '喝',
++  j: '鸡',
++  q: '七',
++  x: '西',
++  zh: '知',
++  ch: '吃',
++  sh: '诗',
++  r: '日',
++  z: '资',
++  c: '次',
++  s: '思',
++  y: '衣',
++  w: '乌',
++  ba: '八',
++  che: '车',
++};
++
++interface FormalAudioLifecycleInput {
++  buildItemId: string;
++  subject: MiraFormalAudioSubject;
++  stage: Stage;
++  scenes: Scene[];
++}
++
++interface FormalAudioLifecycleTtsReceipt {
++  requestId: string;
++  requestSha256: string;
++  state: 'succeeded';
++  audioSha256: string;
++  mimeType: 'audio/wav';
++  sizeBytes: number;
++  providerId: 'qwen-tts';
++  modelId: 'qwen3-tts-flash';
++  voiceId: 'Serena' | 'Ethan' | 'Jennifer';
++  fallbackUsed: false;
++}
++
++interface FormalAudioLifecycleAsrReceipt {
++  requestId: string;
++  requestSha256: string;
++  state: 'succeeded';
++  transcriptSha256: string;
++  normalizedTranscriptSha256: string;
++  similarityBps: number;
++  providerId: 'qwen-asr';
++  modelId: 'qwen3-asr-flash';
++  fallbackUsed: false;
++}
++
++export interface MiraFormalAudioLifecycleSegmentReceipt {
++  sceneOrder: number;
++  sceneId: string;
++  actionId: string;
++  narrationSegmentId: string;
++  sourceTextSha256: string;
++  textSha256: string;
++  tts: FormalAudioLifecycleTtsReceipt;
++  asr: FormalAudioLifecycleAsrReceipt;
++}
++
++export interface MiraFormalAudioLifecycleReceipt {
++  schemaVersion: typeof MIRA_FORMAL_AUDIO_LIFECYCLE_VERSION;
++  status: 'succeeded';
++  buildItemId: string;
++  classroomId: string;
++  classroomContentSha256: string;
++  subject: MiraFormalAudioSubject;
++  speechTextPolicyVersion: typeof MIRA_FORMAL_SPEECH_TEXT_POLICY_VERSION;
++  teacherProfile: {
++    id: string;
++    version: number;
++    sha256: string;
++    gender: 'female' | 'male';
++  };
++  expectedSegmentCount: 10;
++  ttsSucceededCount: 10;
++  asrPassedCount: 10;
++  segments: MiraFormalAudioLifecycleSegmentReceipt[];
++  receiptSha256: string;
++}
++
++interface LifecycleSegment {
++  sceneOrder: number;
++  sceneId: string;
++  actionId: string;
++  narrationSegmentId: string;
++  sourceTextSha256: string;
++  text: string;
++  textSha256: string;
++  ttsRequestId: string;
++  asrRequestId: string;
++}
++
++export interface MiraFormalAudioLifecycleDependencies {
++  assertProviderReady: () => void;
++  readTtsJob: typeof readMiraFormalTtsJob;
++  executeTts: (request: MiraFormalTtsRequest) => ReturnType<typeof executeMiraFormalTts>;
++  readTtsAsset: typeof readMiraFormalTtsAsset;
++  readAsrJob: typeof readMiraFormalAsrJob;
++  executeAsr: (
++    request: MiraFormalAsrRequest,
++    transcriptEvidence: (transcript: string) => MiraFormalAsrTranscriptEvidence,
++  ) => ReturnType<typeof executeMiraFormalAsr>;
++}
++
++export interface MiraFormalAudioLifecycleOptions {
++  onProgress?: (progress: {
++    phase: 'tts' | 'asr';
++    completed: number;
++    total: 10;
++  }) => Promise<void> | void;
++}
++
++const defaultDependencies: MiraFormalAudioLifecycleDependencies = {
++  assertProviderReady: assertMiraFormalAudioProviderReady,
++  readTtsJob: readMiraFormalTtsJob,
++  executeTts: (request) => executeMiraFormalTts(request),
++  readTtsAsset: readMiraFormalTtsAsset,
++  readAsrJob: readMiraFormalAsrJob,
++  executeAsr: (request, transcriptEvidence) =>
++    executeMiraFormalAsr(request, { transcriptEvidence }),
++};
++
++function sha256(value: string | Uint8Array): string {
++  return createHash('sha256').update(value).digest('hex');
++}
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value as Record<string, unknown>)
++        .sort(([left], [right]) => left.localeCompare(right))
++        .map(([key, nested]) => [key, canonical(nested)]),
++    );
++  }
++  return value;
++}
++
++function canonicalSha256(value: unknown): string {
++  return sha256(JSON.stringify(canonical(value)));
++}
++
++function speechAction(scene: Scene): Action & { type: 'speech'; text: string } {
++  const actions = Array.isArray(scene.actions) ? scene.actions : [];
++  const speech = actions.filter(
++    (action): action is Action & { type: 'speech'; text: string } =>
++      action.type === 'speech' && typeof action.text === 'string',
++  );
++  if (speech.length !== 1) {
++    throw new Error(`FORMAL_AUDIO_SPEECH_COUNT_INVALID:${scene.order}`);
++  }
++  return speech[0];
++}
++
++export function prepareMiraFormalSpeechText(
++  value: string,
++  subject: MiraFormalAudioSubject,
++): string {
++  const text = value.trim();
++  if (subject !== 'chinese' || !text) return text;
++  return text.replace(CHINESE_LATIN_TOKEN_PATTERN, (token) => {
++    return CHINESE_PINYIN_SPOKEN_TOKENS[token.toLowerCase()] || token;
++  });
++}
++
++function smallIntegerToSpokenChinese(value: string): string {
++  const normalized = value.normalize('NFKC');
++  if (normalized.length > 1 && normalized.startsWith('0')) {
++    return [...normalized].map((digit) => CHINESE_DIGITS[Number(digit)]).join('');
++  }
++  const number = Number(normalized);
++  if (number > 9_999) {
++    return [...normalized].map((digit) => CHINESE_DIGITS[Number(digit)]).join('');
++  }
++  if (number < 10) return CHINESE_DIGITS[number];
++  const units = [
++    [1_000, '千'],
++    [100, '百'],
++    [10, '十'],
++  ] as const;
++  let remaining = number;
++  const parts: string[] = [];
++  let pendingZero = false;
++  for (const [unit, label] of units) {
++    const digit = Math.floor(remaining / unit);
++    remaining %= unit;
++    if (digit) {
++      if (pendingZero) {
++        parts.push('零');
++        pendingZero = false;
++      }
++      if (!(unit === 10 && digit === 1 && parts.length === 0)) {
++        parts.push(CHINESE_DIGITS[digit]);
++      }
++      parts.push(label);
++    } else if (parts.length && remaining) {
++      pendingZero = true;
++    }
++  }
++  if (remaining) {
++    if (pendingZero) parts.push('零');
++    parts.push(CHINESE_DIGITS[remaining]);
++  }
++  return parts.join('');
++}
++
++export function prepareMiraFormalAsrComparisonText(
++  value: string,
++  subject: MiraFormalAudioSubject,
++): string {
++  let text = prepareMiraFormalSpeechText(value.normalize('NFKC'), subject);
++  if (subject !== 'chinese' && subject !== 'math') return text;
++  text = text.replace(CHINESE_NUMBER_PATTERN, (number) => smallIntegerToSpokenChinese(number));
++  text = text.replaceAll('+', '加').replaceAll('=', '等于');
++  text = text.replaceAll('×', '乘').replaceAll('*', '乘');
++  text = text.replaceAll('÷', '除以');
++  const numberCharacters = `${CHINESE_DIGITS}十百千`;
++  text = text.replace(
++    new RegExp(`(?<=[${numberCharacters}])-(?=[${numberCharacters}])`, 'gu'),
++    '减',
++  );
++  return text.replace(
++    new RegExp(`(?<=[${numberCharacters}])/(?=[${numberCharacters}])`, 'gu'),
++    '除以',
++  );
++}
++
++export function normalizeMiraFormalAsrText(value: string): string {
++  return [...value.normalize('NFKC').toLowerCase()]
++    .filter((character) => /[\p{L}\p{N}]/u.test(character))
++    .join('');
++}
++
++export function miraFormalAsrSimilarityBps(expected: string, actual: string): number {
++  let left = normalizeMiraFormalAsrText(expected);
++  let right = normalizeMiraFormalAsrText(actual);
++  if (!left || !right) return 0;
++  if (left.length < right.length) [left, right] = [right, left];
++  let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
++  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
++    const current = [leftIndex];
++    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
++      current.push(
++        Math.min(
++          current[current.length - 1] + 1,
++          previous[rightIndex] + 1,
++          previous[rightIndex - 1] + (left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1),
++        ),
++      );
++    }
++    previous = current;
++  }
++  const distance = previous[previous.length - 1];
++  const denominator = Math.max(left.length, right.length);
++  return Math.max(0, Math.floor(((denominator - distance) * 10_000) / denominator));
++}
++
++function buildLifecycleSegments(input: FormalAudioLifecycleInput): {
++  classroomContentSha256: string;
++  segments: LifecycleSegment[];
++} {
++  if (!IDENTIFIER.test(input.buildItemId)) {
++    throw new Error('FORMAL_AUDIO_BUILD_ITEM_INVALID');
++  }
++  if (!IDENTIFIER.test(input.stage.id) || input.scenes.length !== EXPECTED_SEGMENT_COUNT) {
++    throw new Error('FORMAL_AUDIO_CLASSROOM_INVALID');
++  }
++  const seenSceneIds = new Set<string>();
++  const seenActionIds = new Set<string>();
++  const segments = input.scenes.map((scene, expectedOrder) => {
++    if (scene.order !== expectedOrder || !IDENTIFIER.test(scene.id) || seenSceneIds.has(scene.id)) {
++      throw new Error(`FORMAL_AUDIO_SCENE_INVALID:${expectedOrder}`);
++    }
++    const action = speechAction(scene);
++    if (!IDENTIFIER.test(action.id) || seenActionIds.has(action.id)) {
++      throw new Error(`FORMAL_AUDIO_ACTION_INVALID:${expectedOrder}`);
++    }
++    seenSceneIds.add(scene.id);
++    seenActionIds.add(action.id);
++    const sourceText = action.text.trim();
++    const text = prepareMiraFormalSpeechText(sourceText, input.subject);
++    if (!sourceText || !text) throw new Error(`FORMAL_AUDIO_TEXT_INVALID:${expectedOrder}`);
++    const textSha256 = sha256(text);
++    const identity = `${input.buildItemId}:${expectedOrder}:${scene.id}:${action.id}:${MIRA_FORMAL_SPEECH_TEXT_POLICY_VERSION}:${textSha256}`;
++    const identityDigest = sha256(identity);
++    return {
++      sceneOrder: expectedOrder,
++      sceneId: scene.id,
++      actionId: action.id,
++      narrationSegmentId: `formal_narration_${identityDigest.slice(0, 48)}`,
++      sourceTextSha256: sha256(sourceText),
++      text,
++      textSha256,
++      ttsRequestId: `formal_tts_${identityDigest.slice(0, 48)}`,
++      asrRequestId: `formal_asr_${identityDigest.slice(0, 48)}`,
++    };
++  });
++  return {
++    classroomContentSha256: canonicalSha256({ stage: input.stage, scenes: input.scenes }),
++    segments,
++  };
++}
++
++function assertTtsRecord(
++  record: MiraFormalTtsJob,
++  request: MiraFormalTtsRequest,
++  expectedVoiceId: 'Serena' | 'Ethan' | 'Jennifer',
++): asserts record is MiraFormalTtsJob & {
++  state: 'succeeded';
++  audioSha256: string;
++  mimeType: 'audio/wav';
++  sizeBytes: number;
++} {
++  if (
++    record.requestSha256 !== canonicalSha256(request) ||
++    record.requestId !== request.requestId ||
++    record.classroomId !== request.classroomId ||
++    record.classroomContentSha256 !== request.classroomContentSha256 ||
++    record.subject !== request.subject ||
++    record.teacherProfileId !== request.teacherProfileId ||
++    record.teacherProfileVersion !== request.teacherProfileVersion ||
++    record.teacherProfileSha256 !== request.teacherProfileSha256 ||
++    record.teacherGender !== request.teacherGender ||
++    record.sceneId !== request.sceneId ||
++    record.sceneOrder !== request.sceneOrder ||
++    record.actionId !== request.actionId ||
++    record.narrationSegmentId !== request.narrationSegmentId ||
++    record.textSha256 !== request.textSha256 ||
++    record.state !== 'succeeded' ||
++    !record.audioSha256 ||
++    !SHA256.test(record.audioSha256) ||
++    record.mimeType !== 'audio/wav' ||
++    !Number.isSafeInteger(record.sizeBytes) ||
++    !record.sizeBytes ||
++    record.providerId !== 'qwen-tts' ||
++    record.modelId !== 'qwen3-tts-flash' ||
++    record.voiceId !== expectedVoiceId ||
++    record.fallbackUsed !== false
++  ) {
++    throw new Error(`FORMAL_AUDIO_TTS_INCOMPLETE:${request.sceneOrder}:${record.state}`);
++  }
++}
++
++function assertAsrRecord(
++  record: MiraFormalAsrJob,
++  request: MiraFormalAsrRequest,
++): asserts record is MiraFormalAsrJob & {
++  state: 'succeeded';
++  transcriptSha256: string;
++  normalizedTranscriptSha256: string;
++  similarityBps: number;
++} {
++  const similarityBps = record.similarityBps;
++  if (
++    record.requestSha256 !== canonicalSha256(request) ||
++    record.requestId !== request.requestId ||
++    record.ttsRequestId !== request.ttsRequestId ||
++    record.classroomId !== request.classroomId ||
++    record.classroomContentSha256 !== request.classroomContentSha256 ||
++    record.subject !== request.subject ||
++    record.teacherProfileId !== request.teacherProfileId ||
++    record.teacherProfileVersion !== request.teacherProfileVersion ||
++    record.teacherProfileSha256 !== request.teacherProfileSha256 ||
++    record.teacherGender !== request.teacherGender ||
++    record.sceneId !== request.sceneId ||
++    record.sceneOrder !== request.sceneOrder ||
++    record.actionId !== request.actionId ||
++    record.narrationSegmentId !== request.narrationSegmentId ||
++    record.audioSha256 !== request.audioSha256 ||
++    record.state !== 'succeeded' ||
++    !record.transcriptSha256 ||
++    !SHA256.test(record.transcriptSha256) ||
++    !record.normalizedTranscriptSha256 ||
++    !SHA256.test(record.normalizedTranscriptSha256) ||
++    !Number.isSafeInteger(similarityBps) ||
++    similarityBps === undefined ||
++    similarityBps < MINIMUM_ASR_SIMILARITY_BPS ||
++    similarityBps > 10_000 ||
++    record.providerId !== 'qwen-asr' ||
++    record.modelId !== 'qwen3-asr-flash' ||
++    record.fallbackUsed !== false
++  ) {
++    throw new Error(`FORMAL_AUDIO_ASR_INCOMPLETE:${request.sceneOrder}:${record.state}`);
++  }
++}
++
++export async function completeMiraFormalAudioLifecycle(
++  input: FormalAudioLifecycleInput,
++  dependencies: MiraFormalAudioLifecycleDependencies = defaultDependencies,
++  options: MiraFormalAudioLifecycleOptions = {},
++): Promise<MiraFormalAudioLifecycleReceipt> {
++  const policy = getMiraFormalAudioRuntimePolicy();
++  const subjectPolicy = policy.subjects[input.subject];
++  if (!subjectPolicy) throw new Error('FORMAL_AUDIO_SUBJECT_INVALID');
++  const teachers = (input.stage.generatedAgentConfigs || []).filter(
++    (agent) => agent.role === 'teacher',
++  );
++  const teacher = teachers[0];
++  const teacherVoiceConfig = teacher?.voiceConfig as
++    | (NonNullable<typeof teacher.voiceConfig> & { modelId?: string })
++    | undefined;
++  if (
++    teachers.length !== 1 ||
++    teacher.name !== subjectPolicy.teacherName ||
++    teacherVoiceConfig?.providerId !== policy.tts.providerId ||
++    teacherVoiceConfig?.modelId !== policy.tts.modelId ||
++    teacherVoiceConfig?.voiceId !== subjectPolicy.voiceId
++  ) {
++    throw new Error('FORMAL_AUDIO_TEACHER_CONTRACT_INVALID');
++  }
++  const { classroomContentSha256, segments } = buildLifecycleSegments(input);
++  let providerReady = false;
++  const ensureProviderReady = () => {
++    if (providerReady) return;
++    dependencies.assertProviderReady();
++    providerReady = true;
++  };
++
++  const completedSegments: MiraFormalAudioLifecycleSegmentReceipt[] = [];
++  for (const segment of segments) {
++    const identity = {
++      classroomId: input.stage.id,
++      classroomContentSha256,
++      subject: input.subject,
++      teacherProfileId: subjectPolicy.teacherProfileId,
++      teacherProfileVersion: subjectPolicy.teacherProfileVersion,
++      teacherProfileSha256: subjectPolicy.teacherProfileSha256,
++      teacherGender: subjectPolicy.teacherGender,
++      sceneId: segment.sceneId,
++      sceneOrder: segment.sceneOrder,
++      actionId: segment.actionId,
++      narrationSegmentId: segment.narrationSegmentId,
++    } as const;
++    const ttsRequest: MiraFormalTtsRequest = {
++      requestId: segment.ttsRequestId,
++      ...identity,
++      text: segment.text,
++      textSha256: segment.textSha256,
++    };
++    let ttsRecord = await dependencies.readTtsJob(ttsRequest.requestId);
++    if (!ttsRecord) {
++      ensureProviderReady();
++      ttsRecord = (await dependencies.executeTts(ttsRequest)).record;
++    }
++    assertTtsRecord(ttsRecord, ttsRequest, subjectPolicy.voiceId);
++    const asset = await dependencies.readTtsAsset(ttsRequest.requestId);
++    if (
++      asset.record.requestSha256 !== ttsRecord.requestSha256 ||
++      asset.bytes.byteLength !== ttsRecord.sizeBytes ||
++      sha256(asset.bytes) !== ttsRecord.audioSha256
++    ) {
++      throw new Error(`FORMAL_AUDIO_TTS_ASSET_INVALID:${segment.sceneOrder}`);
++    }
++    await options.onProgress?.({
++      phase: 'tts',
++      completed: segment.sceneOrder + 1,
++      total: EXPECTED_SEGMENT_COUNT as 10,
++    });
++
++    const asrRequest: MiraFormalAsrRequest = {
++      requestId: segment.asrRequestId,
++      ttsRequestId: ttsRequest.requestId,
++      ...identity,
++      audioSha256: ttsRecord.audioSha256,
++    };
++    const transcriptEvidence = (transcript: string): MiraFormalAsrTranscriptEvidence => {
++      const expected = prepareMiraFormalAsrComparisonText(segment.text, input.subject);
++      const actual = prepareMiraFormalAsrComparisonText(transcript, input.subject);
++      return {
++        normalizedTranscriptSha256: sha256(normalizeMiraFormalAsrText(actual)),
++        similarityBps: miraFormalAsrSimilarityBps(expected, actual),
++      };
++    };
++    let asrRecord = await dependencies.readAsrJob(asrRequest.requestId);
++    if (!asrRecord) {
++      ensureProviderReady();
++      asrRecord = (await dependencies.executeAsr(asrRequest, transcriptEvidence)).record;
++    }
++    assertAsrRecord(asrRecord, asrRequest);
++    await options.onProgress?.({
++      phase: 'asr',
++      completed: segment.sceneOrder + 1,
++      total: EXPECTED_SEGMENT_COUNT as 10,
++    });
++    completedSegments.push({
++      sceneOrder: segment.sceneOrder,
++      sceneId: segment.sceneId,
++      actionId: segment.actionId,
++      narrationSegmentId: segment.narrationSegmentId,
++      sourceTextSha256: segment.sourceTextSha256,
++      textSha256: segment.textSha256,
++      tts: {
++        requestId: ttsRecord.requestId,
++        requestSha256: ttsRecord.requestSha256,
++        state: 'succeeded',
++        audioSha256: ttsRecord.audioSha256,
++        mimeType: 'audio/wav',
++        sizeBytes: ttsRecord.sizeBytes,
++        providerId: 'qwen-tts',
++        modelId: 'qwen3-tts-flash',
++        voiceId: ttsRecord.voiceId,
++        fallbackUsed: false,
++      },
++      asr: {
++        requestId: asrRecord.requestId,
++        requestSha256: asrRecord.requestSha256,
++        state: 'succeeded',
++        transcriptSha256: asrRecord.transcriptSha256,
++        normalizedTranscriptSha256: asrRecord.normalizedTranscriptSha256,
++        similarityBps: asrRecord.similarityBps,
++        providerId: 'qwen-asr',
++        modelId: 'qwen3-asr-flash',
++        fallbackUsed: false,
++      },
++    });
++  }
++
++  if (completedSegments.length !== EXPECTED_SEGMENT_COUNT) {
++    throw new Error('FORMAL_AUDIO_SEGMENT_COUNT_INVALID');
++  }
++  const receiptWithoutHash = {
++    schemaVersion: MIRA_FORMAL_AUDIO_LIFECYCLE_VERSION,
++    status: 'succeeded' as const,
++    buildItemId: input.buildItemId,
++    classroomId: input.stage.id,
++    classroomContentSha256,
++    subject: input.subject,
++    speechTextPolicyVersion: MIRA_FORMAL_SPEECH_TEXT_POLICY_VERSION,
++    teacherProfile: {
++      id: subjectPolicy.teacherProfileId,
++      version: subjectPolicy.teacherProfileVersion,
++      sha256: subjectPolicy.teacherProfileSha256,
++      gender: subjectPolicy.teacherGender,
++    },
++    expectedSegmentCount: EXPECTED_SEGMENT_COUNT as 10,
++    ttsSucceededCount: EXPECTED_SEGMENT_COUNT as 10,
++    asrPassedCount: EXPECTED_SEGMENT_COUNT as 10,
++    segments: completedSegments,
++  };
++  return {
++    ...receiptWithoutHash,
++    receiptSha256: canonicalSha256(receiptWithoutHash),
++  };
++}
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+index 393e88f..28bdc25 100644
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -86,7 +86,8 @@ export const MIRA_FORMAL_AUDIO_POLICY = {
+   subjects: SUBJECT_POLICIES,
+ } as const;
+ 
+-type Subject = keyof typeof SUBJECT_POLICIES;
++export type MiraFormalAudioSubject = keyof typeof SUBJECT_POLICIES;
++type Subject = MiraFormalAudioSubject;
+ type Gender = 'female' | 'male';
+ type JobState = 'running' | 'succeeded' | 'failed' | 'ambiguous';
+ 
+@@ -174,6 +175,13 @@ export interface MiraFormalAsrJob extends BaseJobRecord {
+   audioSha256: string;
+   languageCode: 'zh-CN' | 'en-US';
+   transcriptSha256?: string;
++  normalizedTranscriptSha256?: string;
++  similarityBps?: number;
++}
++
++export interface MiraFormalAsrTranscriptEvidence {
++  normalizedTranscriptSha256: string;
++  similarityBps: number;
+ }
+ 
+ export type MiraFormalAudioErrorCode =
+@@ -198,6 +206,7 @@ interface RuntimeDependencies {
+   fetchImpl?: typeof fetch;
+   resolveAddresses?: (hostname: string) => Promise<string[]>;
+   now?: () => Date;
++  transcriptEvidence?: (transcript: string) => MiraFormalAsrTranscriptEvidence;
+ }
+ 
+ class OperationalFailure extends Error {
+@@ -1035,12 +1044,23 @@ export async function executeMiraFormalAsr(
+     if (typeof transcript !== 'string' || transcript.length > 64_000) {
+       throw new OperationalFailure('failed', 'provider_response_invalid');
+     }
++    const transcriptEvidence = dependencies.transcriptEvidence?.(transcript);
++    if (
++      transcriptEvidence &&
++      (!SHA256.test(transcriptEvidence.normalizedTranscriptSha256) ||
++        !Number.isSafeInteger(transcriptEvidence.similarityBps) ||
++        transcriptEvidence.similarityBps < 0 ||
++        transcriptEvidence.similarityBps > 10_000)
++    ) {
++      throw new OperationalFailure('failed', 'asr_evidence_invalid');
++    }
+     const completedAt = (dependencies.now?.() || new Date()).toISOString();
+     record = {
+       ...record,
+       state: 'succeeded',
+       providerCompletedAt: completedAt,
+       transcriptSha256: sha256(transcript),
++      ...(transcriptEvidence || {}),
+       updatedAt: completedAt,
+       completedAt,
+     };
+diff --git a/lib/server/mira-formal-compiled-classroom.ts b/lib/server/mira-formal-compiled-classroom.ts
+index 8a0f34f..8c50bb5 100644
+--- a/lib/server/mira-formal-compiled-classroom.ts
++++ b/lib/server/mira-formal-compiled-classroom.ts
+@@ -1,5 +1,10 @@
++import { createHash } from 'node:crypto';
+ import { nanoid } from 'nanoid';
+-import { buildCompleteScene, type GeneratedSceneContent, type SceneOutline } from '@openmaic/generation';
++import {
++  buildCompleteScene,
++  type GeneratedSceneContent,
++  type SceneOutline,
++} from '@openmaic/generation';
+ import type { PPTElement, QuizQuestion, WidgetConfigBase } from '@openmaic/dsl';
+ import type {
+   ClassroomGenerationProgress,
+@@ -8,6 +13,11 @@ import type {
+ } from '@/lib/server/classroom-generation';
+ import { AGENT_COLOR_PALETTE, AGENT_DEFAULT_AVATARS } from '@/lib/constants/agent-defaults';
+ import { persistClassroom } from '@/lib/server/classroom-storage';
++import {
++  completeMiraFormalAudioLifecycle,
++  type MiraFormalAudioLifecycleReceipt,
++} from '@/lib/server/mira-formal-audio-lifecycle';
++import type { MiraFormalAudioSubject } from '@/lib/server/mira-formal-audio';
+ import {
+   isExactMiraCoursewareAuthority,
+   isExactMiraFormalRuntimeContract,
+@@ -28,11 +38,13 @@ interface FormalQuestion {
+ }
+ 
+ interface FormalCoursewareSpec {
++  buildItemId: string;
++  runtimeRequestId: string;
+   course: {
+     id: string;
+     version: string;
+     gradeCode: string;
+-    subject: string;
++    subject: MiraFormalAudioSubject;
+     skillId: string;
+     title: string;
+     objective: string;
+@@ -143,6 +155,14 @@ function parseFormalCoursewareSpec(input: GenerateClassroomInput): FormalCoursew
+   ) {
+     throw new Error('FORMAL_COURSEWARE_AUTHORITY_INVALID');
+   }
++  const buildItemId = textValue(contract.buildItemId, 'buildItemId', 128);
++  const runtimeRequestId = textValue(contract.runtimeRequestId, 'runtimeRequestId', 128);
++  if (
++    !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(buildItemId) ||
++    runtimeRequestId !== input.runtimeRequestId
++  ) {
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:runtimeIdentity');
++  }
+   const brief = record(contract.teachingBrief, 'teachingBrief');
+   const briefAuthority = record(brief.authority, 'teachingBrief.authority');
+   if (
+@@ -157,6 +177,10 @@ function parseFormalCoursewareSpec(input: GenerateClassroomInput): FormalCoursew
+     throw new Error('FORMAL_COMPILED_INPUT_INVALID:teachingBrief');
+   }
+   const course = record(brief.course, 'course');
++  const subject = textValue(course.subject, 'course.subject', 64);
++  if (!['chinese', 'math', 'english'].includes(subject)) {
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:course.subject');
++  }
+   const lesson = record(brief.lesson, 'lesson');
+   const flow = record(lesson.teachingFlow, 'teachingFlow');
+   const teach = record(flow.teach, 'teachingFlow.teach');
+@@ -164,7 +188,9 @@ function parseFormalCoursewareSpec(input: GenerateClassroomInput): FormalCoursew
+   if (!Array.isArray(lesson.questions) || lesson.questions.length !== 5) {
+     throw new Error('FORMAL_COMPILED_INPUT_INVALID:questions');
+   }
+-  const questions = lesson.questions.map((item, index) => parseQuestion(item, `questions.${index}`));
++  const questions = lesson.questions.map((item, index) =>
++    parseQuestion(item, `questions.${index}`),
++  );
+   const questionById = new Map(questions.map((question) => [question.id, question]));
+   if (questionById.size !== 5) throw new Error('FORMAL_COMPILED_INPUT_INVALID:questionIds');
+   const demoId = textValue(flow.demoQuestionId, 'teachingFlow.demoQuestionId', 160);
+@@ -188,15 +214,22 @@ function parseFormalCoursewareSpec(input: GenerateClassroomInput): FormalCoursew
+     throw new Error('FORMAL_COMPILED_INPUT_INVALID:teacher.role');
+   }
+   const minutes = lesson.estimatedMinutes;
+-  if (typeof minutes !== 'number' || !Number.isSafeInteger(minutes) || minutes < 5 || minutes > 30) {
++  if (
++    typeof minutes !== 'number' ||
++    !Number.isSafeInteger(minutes) ||
++    minutes < 5 ||
++    minutes > 30
++  ) {
+     throw new Error('FORMAL_COMPILED_INPUT_INVALID:estimatedMinutes');
+   }
+   return {
++    buildItemId,
++    runtimeRequestId,
+     course: {
+       id: textValue(course.id, 'course.id', 255),
+       version: textValue(course.version, 'course.version', 64),
+       gradeCode: textValue(course.gradeCode, 'course.gradeCode', 64),
+-      subject: textValue(course.subject, 'course.subject', 64),
++      subject: subject as MiraFormalAudioSubject,
+       skillId: textValue(course.skillId, 'course.skillId', 120),
+       title: textValue(course.title, 'course.title', 160),
+       objective: textValue(course.objective, 'course.objective', 600),
+@@ -211,10 +244,7 @@ function parseFormalCoursewareSpec(input: GenerateClassroomInput): FormalCoursew
+     recap: textValue(recap.sayText, 'teachingFlow.recap.sayText', 1_200),
+     demo: questionById.get(demoId)!,
+     guided: [questionById.get(guidedIds[0])!, questionById.get(guidedIds[1])!],
+-    independent: [
+-      questionById.get(independentIds[0])!,
+-      questionById.get(independentIds[1])!,
+-    ],
++    independent: [questionById.get(independentIds[0])!, questionById.get(independentIds[1])!],
+     teacher: {
+       name: textValue(runtimeTeacher.name, 'teacher.runtime.name', 160),
+       avatar: textValue(runtimeTeacher.avatar, 'teacher.runtime.avatar', 500),
+@@ -269,7 +299,11 @@ function textElement(
+   };
+ }
+ 
+-function slideContent(title: string, lead: string, points: readonly string[]): GeneratedSceneContent {
++function slideContent(
++  title: string,
++  lead: string,
++  points: readonly string[],
++): GeneratedSceneContent {
+   const safePoints = points.slice(0, 4);
+   return {
+     elements: [
+@@ -397,8 +431,23 @@ function visualizationContent(spec: FormalCoursewareSpec): GeneratedSceneContent
+       color: ['#2e9187', '#f2a85b', '#6956a8'][index],
+     })),
+     interactions: [
+-      { id: 'rotate-concepts', type: 'button', target: 'concept-core', action: 'rotate', label: '旋转观察' },
+-      { id: 'zoom-concepts', type: 'range', target: 'practice-block', param: 'zoom', label: '调整大小', min: 1, max: 2, step: 0.1 },
++      {
++        id: 'rotate-concepts',
++        type: 'button',
++        target: 'concept-core',
++        action: 'rotate',
++        label: '旋转观察',
++      },
++      {
++        id: 'zoom-concepts',
++        type: 'range',
++        target: 'practice-block',
++        param: 'zoom',
++        label: '调整大小',
++        min: 1,
++        max: 2,
++        step: 0.1,
++      },
+     ],
+   };
+   const labelsJson = scriptJson(labels);
+@@ -424,9 +473,7 @@ function outline(
+     estimatedDuration: 60,
+     order,
+     languageNote: '使用适合小学生的简短表达，不泄露正式练习答案。',
+-    ...(widgetType
+-      ? { widgetType, widgetOutline: { concept: description } }
+-      : {}),
++    ...(widgetType ? { widgetType, widgetOutline: { concept: description } } : {}),
+     ...(type === 'quiz'
+       ? { quizConfig: { questionCount: 2, difficulty: 'easy', questionTypes: ['single', 'text'] } }
+       : {}),
+@@ -445,8 +492,14 @@ function speech(order: number, text: string): Action {
+ export function buildMiraFormalCompiledDraft(
+   input: GenerateClassroomInput,
+   classroomId = nanoid(10),
+-): { stage: Stage; scenes: Scene[] } {
+-  const spec = parseFormalCoursewareSpec(input);
++  artifactTimestamp = Date.now(),
++  preparedSpec?: FormalCoursewareSpec,
++): {
++  stage: Stage;
++  scenes: Scene[];
++  formalAudioContext: { buildItemId: string; subject: MiraFormalAudioSubject };
++} {
++  const spec = preparedSpec || parseFormalCoursewareSpec(input);
+   const stage: Stage = {
+     id: classroomId,
+     name: spec.course.title,
+@@ -457,8 +510,8 @@ export function buildMiraFormalCompiledDraft(
+         : '全程使用简体中文，句子简短，一次只要求一个学习动作。',
+     style: 'interactive',
+     interactiveMode: true,
+-    createdAt: Date.now(),
+-    updatedAt: Date.now(),
++    createdAt: artifactTimestamp,
++    updatedAt: artifactTimestamp,
+     generatedAgentConfigs: [
+       {
+         id: 'mira-formal-teacher',
+@@ -522,27 +575,60 @@ export function buildMiraFormalCompiledDraft(
+       ],
+     },
+     {
+-      outline: outline(3, 'slide', '跟着方法练', '先读题，再选择合适的方法。', spec.guided.map((item) => item.hint)),
+-      content: slideContent('跟着方法练', '先读题，再选择合适的方法。', spec.guided.map((item) => item.hint)),
++      outline: outline(
++        3,
++        'slide',
++        '跟着方法练',
++        '先读题，再选择合适的方法。',
++        spec.guided.map((item) => item.hint),
++      ),
++      content: slideContent(
++        '跟着方法练',
++        '先读题，再选择合适的方法。',
++        spec.guided.map((item) => item.hint),
++      ),
+       actions: [speech(3, '接下来跟着方法练习。先认真读题，再根据提示想一想。')],
+     },
+     {
+-      outline: outline(4, 'slide', '独立练习前检查', spec.recap, ['读清题目', '自己作答', '完成后检查']),
++      outline: outline(4, 'slide', '独立练习前检查', spec.recap, [
++        '读清题目',
++        '自己作答',
++        '完成后检查',
++      ]),
+       content: slideContent('独立练习前检查', spec.recap, ['读清题目', '自己作答', '完成后检查']),
+       actions: [speech(4, `${spec.recap} 下面请独立完成练习。`)],
+     },
+     {
+-      outline: outline(5, 'quiz', '引导练习', '在提示支持下完成两道练习。', spec.guided.map((item) => item.skill)),
++      outline: outline(
++        5,
++        'quiz',
++        '引导练习',
++        '在提示支持下完成两道练习。',
++        spec.guided.map((item) => item.skill),
++      ),
+       content: { questions: spec.guided.map(runtimeQuestion) },
+       actions: [speech(5, '现在完成两道引导练习。可以使用刚才学到的方法，不着急。')],
+     },
+     {
+-      outline: outline(6, 'quiz', '独立检测', '独立完成两道检测题。', spec.independent.map((item) => item.skill)),
++      outline: outline(
++        6,
++        'quiz',
++        '独立检测',
++        '独立完成两道检测题。',
++        spec.independent.map((item) => item.skill),
++      ),
+       content: { questions: spec.independent.map(runtimeQuestion) },
+       actions: [speech(6, '现在请独立完成两道检测题。这里不会提前显示答案。')],
+     },
+     {
+-      outline: outline(7, 'interactive', '方法模拟', '按步骤观察方法怎样使用。', spec.teach.keyPoints, 'simulation'),
++      outline: outline(
++        7,
++        'interactive',
++        '方法模拟',
++        '按步骤观察方法怎样使用。',
++        spec.teach.keyPoints,
++        'simulation',
++      ),
+       content: simulationContent(spec),
+       actions: [
+         speech(7, '拖动学习步骤控件，依次观察、练习和检查。'),
+@@ -554,12 +640,26 @@ export function buildMiraFormalCompiledDraft(
+       ],
+     },
+     {
+-      outline: outline(8, 'interactive', '方法闯关', '逐关说出本课方法。', spec.teach.keyPoints, 'game'),
++      outline: outline(
++        8,
++        'interactive',
++        '方法闯关',
++        '逐关说出本课方法。',
++        spec.teach.keyPoints,
++        'game',
++      ),
+       content: gameContent(spec),
+       actions: [speech(8, '点击闯关按钮，每过一关就说出一种本课方法。')],
+     },
+     {
+-      outline: outline(9, 'interactive', '知识积木', '旋转和缩放知识积木，回顾方法关系。', spec.teach.keyPoints, 'visualization3d'),
++      outline: outline(
++        9,
++        'interactive',
++        '知识积木',
++        '旋转和缩放知识积木，回顾方法关系。',
++        spec.teach.keyPoints,
++        'visualization3d',
++      ),
+       content: visualizationContent(spec),
+       actions: [speech(9, `${spec.recap} 请旋转知识积木，再说出你已经学会的方法。`)],
+     },
+@@ -570,9 +670,41 @@ export function buildMiraFormalCompiledDraft(
+       sceneId: `${classroomId}-${item.outline.id}`,
+     });
+     if (!scene) throw new Error(`FORMAL_COMPILED_SCENE_INVALID:${item.outline.id}`);
+-    return scene as Scene;
++    const stableScene = {
++      ...scene,
++      createdAt: artifactTimestamp,
++      updatedAt: artifactTimestamp,
++    } as Scene;
++    if (stableScene.type === 'slide' && stableScene.content.type === 'slide') {
++      stableScene.content = {
++        ...stableScene.content,
++        canvas: {
++          ...stableScene.content.canvas,
++          id: `${stableScene.id}-canvas`,
++        },
++      };
++    }
++    return stableScene;
+   });
+-  return { stage, scenes };
++  return {
++    stage,
++    scenes,
++    formalAudioContext: { buildItemId: spec.buildItemId, subject: spec.course.subject },
++  };
++}
++
++function deterministicFormalArtifactIdentity(runtimeRequestId: string): {
++  classroomId: string;
++  artifactTimestamp: number;
++} {
++  const digest = createHash('sha256').update(runtimeRequestId).digest('hex');
++  return {
++    classroomId: `mfc_${digest.slice(0, 24)}`,
++    // PersistedClassroomData.createdAt remains the real wall-clock time. These
++    // in-artifact timestamps are fixed so a safe replay has the same content
++    // hash and therefore reuses the same Qwen request identities.
++    artifactTimestamp: Date.UTC(2026, 0, 1),
++  };
+ }
+ 
+ export async function generateMiraFormalCompiledClassroom(
+@@ -589,14 +721,58 @@ export async function generateMiraFormalCompiledClassroom(
+     scenesGenerated: 0,
+     totalScenes: 10,
+   });
+-  const { stage, scenes } = buildMiraFormalCompiledDraft(input);
++  const spec = parseFormalCoursewareSpec(input);
++  const identity = deterministicFormalArtifactIdentity(spec.runtimeRequestId);
++  const { stage, scenes, formalAudioContext } = buildMiraFormalCompiledDraft(
++    input,
++    identity.classroomId,
++    identity.artifactTimestamp,
++    spec,
++  );
+   await options.onProgress?.({
+     step: 'generating_scenes',
+-    progress: 90,
++    progress: 45,
+     message: 'Compiled 10 classroom scenes with zero model calls',
+     scenesGenerated: scenes.length,
+     totalScenes: 10,
+   });
++  await options.onProgress?.({
++    step: 'generating_tts',
++    progress: 50,
++    message: 'Generating and validating formal classroom audio inside OpenMAIC',
++    scenesGenerated: scenes.length,
++    totalScenes: 10,
++  });
++  const formalAudio: MiraFormalAudioLifecycleReceipt = await completeMiraFormalAudioLifecycle(
++    {
++      ...formalAudioContext,
++      stage,
++      scenes,
++    },
++    undefined,
++    {
++      onProgress: async ({ phase, completed, total }) => {
++        const completedWork = (completed - 1) * 2 + (phase === 'tts' ? 1 : 2);
++        await options.onProgress?.({
++          step: 'generating_tts',
++          progress: 50 + Math.floor((completedWork / (total * 2)) * 44),
++          message:
++            phase === 'tts'
++              ? `Generated and verified formal audio ${completed}/${total}`
++              : `Validated formal ASR round trip ${completed}/${total}`,
++          scenesGenerated: scenes.length,
++          totalScenes: 10,
++        });
++      },
++    },
++  );
++  await options.onProgress?.({
++    step: 'generating_tts',
++    progress: 95,
++    message: 'Validated 10 formal TTS assets and 10 ASR round trips',
++    scenesGenerated: scenes.length,
++    totalScenes: 10,
++  });
+   await options.onProgress?.({
+     step: 'persisting',
+     progress: 98,
+@@ -619,5 +795,6 @@ export async function generateMiraFormalCompiledClassroom(
+     scenes,
+     scenesCount: scenes.length,
+     createdAt: persisted.createdAt,
++    formalAudio,
+   };
+ }
+diff --git a/tests/playback/action-navigation.test.ts b/tests/playback/action-navigation.test.ts
+index 2d2f939..2adb7c4 100644
+--- a/tests/playback/action-navigation.test.ts
++++ b/tests/playback/action-navigation.test.ts
+@@ -625,6 +625,53 @@ describe('PlaybackEngine action navigation', () => {
+     }
+   });
+ 
++  it('can pause, rewind, and retry the same referenced narration after playback fails', async () => {
++    const { engine: actionEngine } = createActionEngine();
++    let attempts = 0;
++    const { player, fireEnded } = createAudioPlayer(async () => {
++      attempts += 1;
++      return attempts > 1;
++    });
++    const onComplete = vi.fn();
++    const action = {
++      ...speech('formal-retry', '请从这一句重新开始'),
++      audioId: 'formal-audio-retry',
++      audioUrl: '/mira/runtime-audio/formal-audio-retry',
++    } as Action;
++    const playback = new PlaybackEngine([scene([action])], actionEngine, player, {
++      onAudioPlaybackIssue: ({ actionId }) => {
++        const actionIndex = actionId === action.id ? 0 : -1;
++        playback.pause();
++        void playback.jumpToAction(actionIndex, { autoplay: false });
++      },
++      onComplete,
++    });
++
++    playback.start();
++    await flushPromises();
++
++    expect(playback.getMode()).toBe('paused');
++    expect(player.play).toHaveBeenCalledTimes(1);
++    expect(player.play).toHaveBeenLastCalledWith(
++      'formal-audio-retry',
++      '/mira/runtime-audio/formal-audio-retry',
++    );
++
++    playback.resume();
++    await flushPromises();
++
++    expect(player.play).toHaveBeenCalledTimes(2);
++    expect(player.play).toHaveBeenLastCalledWith(
++      'formal-audio-retry',
++      '/mira/runtime-audio/formal-audio-retry',
++    );
++    expect(onComplete).not.toHaveBeenCalled();
++
++    fireEnded();
++    await flushPromises();
++    expect(onComplete).toHaveBeenCalledTimes(1);
++  });
++
+   it('jumping to the last line completes through normal completion flow', async () => {
+     vi.useFakeTimers();
+     const { engine: actionEngine } = createActionEngine();
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+index 6184340..be699b6 100644
+--- a/tests/runtime/mira-student-runtime.test.ts
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -6,6 +6,7 @@ import {
+   isMiraStudentRuntimeParam,
+   isMiraStudentRuntimeSearch,
+   MIRA_STUDENT_CLASSROOM_METADATA,
++  shouldShowMiraStudentStartGate,
+ } from '@/lib/mira/student-runtime';
+ 
+ describe('Mira student runtime marker', () => {
+@@ -26,11 +27,11 @@ describe('Mira student runtime marker', () => {
+   it('publishes the exact student chrome health attestation', () => {
+     expect(getMiraStudentChromeRuntimePolicy()).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v4',
++      policyVersion: 'mira-student-chrome.v5',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
+-      autoPlayDefault: false,
++      autoPlayDefault: true,
+       autoPlayPersistence: 'student-session',
+       manualAutoPlayToggleEnabled: true,
+       asrEnabled: true,
+@@ -78,6 +79,21 @@ describe('Mira student runtime marker', () => {
+     ).toBe(false);
+   });
+ 
++  it('requires one explicit audio-start gesture only for an unstarted student classroom', () => {
++    expect(
++      shouldShowMiraStudentStartGate({ studentMode: true, lectureStarted: false, hasScene: true }),
++    ).toBe(true);
++    expect(
++      shouldShowMiraStudentStartGate({ studentMode: true, lectureStarted: true, hasScene: true }),
++    ).toBe(false);
++    expect(
++      shouldShowMiraStudentStartGate({ studentMode: true, lectureStarted: false, hasScene: false }),
++    ).toBe(false);
++    expect(
++      shouldShowMiraStudentStartGate({ studentMode: false, lectureStarted: false, hasScene: true }),
++    ).toBe(false);
++  });
++
+   it('keeps student ASR enabled without changing the operator preference', () => {
+     expect(getMiraEffectiveAsrEnabled({ studentMode: true, operatorAsrEnabled: false })).toBe(true);
+     expect(getMiraEffectiveAsrEnabled({ studentMode: true, operatorAsrEnabled: true })).toBe(true);
+diff --git a/tests/server/classroom-generation-retry.test.ts b/tests/server/classroom-generation-retry.test.ts
+index 3d02870..c112eec 100644
+--- a/tests/server/classroom-generation-retry.test.ts
++++ b/tests/server/classroom-generation-retry.test.ts
+@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
+   generateSceneActions: vi.fn(),
+   createSceneWithActions: vi.fn(),
+   persistClassroom: vi.fn(),
++  completeMiraFormalAudioLifecycle: vi.fn(),
+   callLLM: vi.fn(),
+   logInfo: vi.fn(),
+   logWarn: vi.fn(),
+@@ -62,6 +63,10 @@ vi.mock('@/lib/server/classroom-storage', () => ({
+   persistClassroom: mocks.persistClassroom,
+ }));
+ 
++vi.mock('@/lib/server/mira-formal-audio-lifecycle', () => ({
++  completeMiraFormalAudioLifecycle: mocks.completeMiraFormalAudioLifecycle,
++}));
++
+ vi.mock('@/lib/logger', () => ({
+   createLogger: () => ({
+     info: mocks.logInfo,
+@@ -148,6 +153,11 @@ describe('classroom scene generation retries', () => {
+       scenesCount: scenes.length,
+       createdAt: '2026-06-22T00:00:00.000Z',
+     }));
++    mocks.completeMiraFormalAudioLifecycle.mockResolvedValue({
++      schemaVersion: 'mira.openmaic.formal-audio-lifecycle.v2',
++      status: 'succeeded',
++      receiptSha256: 'f'.repeat(64),
++    });
+   });
+ 
+   afterEach(() => {
+@@ -338,21 +348,23 @@ describe('classroom scene generation retries', () => {
+     }));
+     const teacher = {
+       runtime: {
+-        name: '米拉数学老师',
++        name: '小数老师',
+         role: 'teacher',
+         avatar: '/avatars/mira-math.png',
+-        teacherGender: 'female',
+-        voiceGender: 'female',
++        teacherGender: 'male',
++        voiceGender: 'male',
+         voiceConfig: {
+           providerId: 'qwen-tts',
+           modelId: 'qwen3-tts-flash',
+-          voiceId: 'Cherry',
++          voiceId: 'Ethan',
+         },
+       },
+     };
+     const requirement = JSON.stringify({
+       schemaVersion: 'mira.openmaic.formal-runtime.v1',
+       authority: 'mira_backend_formal_candidate',
++      buildItemId: 'formal-build-item-1',
++      runtimeRequestId: 'formal-outline-repair-1',
+       coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
+       teachingBrief: {
+         schemaVersion: 'mira.learning.formal-runtime-teaching-brief.v1',
+@@ -414,6 +426,11 @@ describe('classroom scene generation retries', () => {
+     expect(mocks.generateSceneOutlinesFromRequirements).not.toHaveBeenCalled();
+     expect(mocks.generateSceneContent).not.toHaveBeenCalled();
+     expect(result.scenesCount).toBe(10);
++    expect(mocks.completeMiraFormalAudioLifecycle).toHaveBeenCalledTimes(1);
++    expect(result.formalAudio).toMatchObject({
++      schemaVersion: 'mira.openmaic.formal-audio-lifecycle.v2',
++      status: 'succeeded',
++    });
+     expect(result.scenes.map((scene) => scene.type)).toEqual(
+       MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.orderedSceneTypes,
+     );
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 084c0a6..389043f 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -13,6 +13,10 @@ vi.mock('@/lib/server/provider-config', () => ({
+   getServerVideoProviders: () => ({}),
+   getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
+   getServerASRProviders: () => ({ 'qwen-asr': {} }),
++  resolveTTSApiKey: () => process.env.MIRA_TEST_QWEN_API_KEY || '',
++  resolveASRApiKey: () => process.env.MIRA_TEST_QWEN_API_KEY || '',
++  resolveTTSBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++  resolveASRBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
+ }));
+ 
+ describe('GET /api/health structured scene runtime policy', () => {
+@@ -24,6 +28,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+     process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE = 'Serena';
+     process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR = '1';
+     process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL = 'qwen3-asr-flash';
++    process.env.MIRA_TEST_QWEN_API_KEY = 'test-qwen-key';
+     delete process.env.MODEL_ROUTES;
+     delete process.env.KIMI_API_KEY;
+     delete process.env.KIMI_BASE_URL;
+@@ -44,6 +49,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+     delete process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE;
+     delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR;
+     delete process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL;
++    delete process.env.MIRA_TEST_QWEN_API_KEY;
+     delete process.env.MODEL_ROUTES;
+     delete process.env.KIMI_API_KEY;
+     delete process.env.KIMI_BASE_URL;
+@@ -112,11 +118,11 @@ describe('GET /api/health structured scene runtime policy', () => {
+     });
+     expect(body.runtimePolicy.studentChrome).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v4',
++      policyVersion: 'mira-student-chrome.v5',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
+-      autoPlayDefault: false,
++      autoPlayDefault: true,
+       autoPlayPersistence: 'student-session',
+       manualAutoPlayToggleEnabled: true,
+       asrEnabled: true,
+@@ -137,6 +143,13 @@ describe('GET /api/health structured scene runtime policy', () => {
+       idempotencyKey: 'runtimeRequestId',
+       queryByRuntimeRequestId: true,
+       speechAudioGenerated: false,
++      coursewareAuthority: {
++        schemaVersion: 'mira.openmaic.courseware-authority.v1',
++        generationOwner: 'openmaic',
++        providerInvocation: 'courseware_generation_only',
++        classroomCompilation: 'deterministic_no_llm',
++        backendProviderCredentialsAccepted: false,
++      },
+       studentRuntimeEvents: {
+         enforced: true,
+         schemaVersion: 'mira.openmaic.student-runtime-events.v1',
+@@ -209,7 +222,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+     expect(body.version).toBe('0.3.2');
+     expect(body.capabilities).toEqual({
+       formalGeneration: true,
+-      speechAudioGeneration: false,
++      speechAudioGeneration: true,
+     });
+     expect(body.runtimePolicy.formalGeneration).toMatchObject({
+       policyId: 'mira.openmaic.formal-runtime.v1',
+@@ -226,12 +239,17 @@ describe('GET /api/health structured scene runtime policy', () => {
+     });
+     expect(body.runtimePolicy.tts).toBeUndefined();
+     expect(body.runtimePolicy.asr).toBeUndefined();
++    expect(body.runtimePolicy.formalAudio).toMatchObject({
++      schemaVersion: 'mira.openmaic.formal-audio.v1',
++      tts: { providerId: 'qwen-tts', modelId: 'qwen3-tts-flash' },
++      asr: { providerId: 'qwen-asr', modelId: 'qwen3-asr-flash' },
++    });
+   });
+ 
+-  it('fails formal generation readiness when the Kimi server credential is absent', async () => {
++  it('fails formal generation readiness when the OpenMAIC Qwen credential is absent', async () => {
+     process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY =
+       'kimi-k2.6-thinking-disabled-v1';
+-    delete process.env.KIMI_API_KEY;
++    delete process.env.MIRA_TEST_QWEN_API_KEY;
+     const { NextRequest } = await import('next/server');
+     const { GET } = await import('@/app/api/health/route');
+     const response = await GET(
+@@ -243,7 +261,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+     expect(body).toMatchObject({
+       success: false,
+       errorCode: 'PROVIDER_DISABLED',
+-      error: 'Formal generation Kimi provider is not ready.',
++      error: 'Formal Qwen audio providers are not ready.',
+     });
+     expect(JSON.stringify(body)).not.toContain('apiKey');
+   });
+diff --git a/tests/server/mira-formal-audio-lifecycle.test.ts b/tests/server/mira-formal-audio-lifecycle.test.ts
+new file mode 100644
+index 0000000..a1188cc
+--- /dev/null
++++ b/tests/server/mira-formal-audio-lifecycle.test.ts
+@@ -0,0 +1,273 @@
++import { createHash } from 'node:crypto';
++import { describe, expect, it, vi } from 'vitest';
++import {
++  completeMiraFormalAudioLifecycle,
++  miraFormalAsrSimilarityBps,
++  normalizeMiraFormalAsrText,
++  prepareMiraFormalAsrComparisonText,
++  prepareMiraFormalSpeechText,
++  type MiraFormalAudioLifecycleDependencies,
++} from '@/lib/server/mira-formal-audio-lifecycle';
++import type {
++  MiraFormalAsrJob,
++  MiraFormalAsrRequest,
++  MiraFormalTtsJob,
++  MiraFormalTtsRequest,
++} from '@/lib/server/mira-formal-audio';
++import type { Scene, Stage } from '@/lib/types/stage';
++
++function sha256(value: string | Uint8Array): string {
++  return createHash('sha256').update(value).digest('hex');
++}
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value as Record<string, unknown>)
++        .sort(([left], [right]) => left.localeCompare(right))
++        .map(([key, nested]) => [key, canonical(nested)]),
++    );
++  }
++  return value;
++}
++
++function requestSha256(value: object): string {
++  return sha256(JSON.stringify(canonical(value)));
++}
++
++function formalClassroom(): { stage: Stage; scenes: Scene[] } {
++  const stage = {
++    id: 'mfc_test_classroom',
++    name: '20以内数感',
++    description: '学习数感',
++    style: 'interactive',
++    interactiveMode: true,
++    createdAt: Date.UTC(2026, 0, 1),
++    updatedAt: Date.UTC(2026, 0, 1),
++    generatedAgentConfigs: [
++      {
++        id: 'teacher-math',
++        name: '小数老师',
++        role: 'teacher',
++        persona: '耐心讲解',
++        avatar: '/avatars/math.png',
++        color: '#123456',
++        priority: 10,
++        voiceConfig: {
++          providerId: 'qwen-tts',
++          modelId: 'qwen3-tts-flash',
++          voiceId: 'Ethan',
++        },
++      },
++    ],
++  } as unknown as Stage;
++  const scenes = Array.from({ length: 10 }, (_, sceneOrder) => ({
++    id: `mfc_test_scene_${sceneOrder}`,
++    outlineId: `outline_${sceneOrder}`,
++    stageId: stage.id,
++    type: 'quiz',
++    title: `场景 ${sceneOrder}`,
++    order: sceneOrder,
++    content: { type: 'quiz', questions: [] },
++    actions: [
++      {
++        id: `speech_${sceneOrder}`,
++        type: 'speech',
++        title: '课堂讲解',
++        text: `第${sceneOrder + 1}段讲解。`,
++      },
++    ],
++    createdAt: Date.UTC(2026, 0, 1),
++    updatedAt: Date.UTC(2026, 0, 1),
++  })) as Scene[];
++  return { stage, scenes };
++}
++
++function fakeDependencies(transcriptFor: (request: MiraFormalAsrRequest) => string): {
++  dependencies: MiraFormalAudioLifecycleDependencies;
++  executeTts: ReturnType<typeof vi.fn>;
++  executeAsr: ReturnType<typeof vi.fn>;
++  assertProviderReady: ReturnType<typeof vi.fn>;
++} {
++  const ttsJobs = new Map<string, MiraFormalTtsJob>();
++  const asrJobs = new Map<string, MiraFormalAsrJob>();
++  const assets = new Map<string, Uint8Array>();
++  const assertProviderReady = vi.fn();
++  const executeTts = vi.fn(async (request: MiraFormalTtsRequest) => {
++    const bytes = new Uint8Array([82, 73, 70, 70, request.sceneOrder]);
++    const audioSha256 = sha256(bytes);
++    const timestamp = '2026-08-31T00:00:00.000Z';
++    const record = {
++      schemaVersion: 'mira.openmaic.formal-audio-job.v1',
++      kind: 'tts',
++      requestId: request.requestId,
++      requestSha256: requestSha256(request),
++      classroomId: request.classroomId,
++      classroomContentSha256: request.classroomContentSha256,
++      subject: request.subject,
++      teacherProfileId: request.teacherProfileId,
++      teacherProfileVersion: request.teacherProfileVersion,
++      teacherProfileSha256: request.teacherProfileSha256,
++      teacherGender: request.teacherGender,
++      sceneId: request.sceneId,
++      sceneOrder: request.sceneOrder,
++      actionId: request.actionId,
++      narrationSegmentId: request.narrationSegmentId,
++      textSha256: request.textSha256,
++      state: 'succeeded',
++      providerId: 'qwen-tts',
++      modelId: 'qwen3-tts-flash',
++      voiceId: 'Ethan',
++      voiceGender: 'male',
++      languageCode: 'zh-CN',
++      fallbackUsed: false,
++      providerAttemptedAt: timestamp,
++      providerCompletedAt: timestamp,
++      assetId: `asset_${request.sceneOrder}`,
++      assetFileName: `asset_${request.sceneOrder}.wav`,
++      mimeType: 'audio/wav',
++      sizeBytes: bytes.byteLength,
++      audioSha256,
++      createdAt: timestamp,
++      updatedAt: timestamp,
++      completedAt: timestamp,
++    } satisfies MiraFormalTtsJob;
++    ttsJobs.set(request.requestId, record);
++    assets.set(request.requestId, bytes);
++    return { record, created: true };
++  });
++  const executeAsr = vi.fn(
++    async (
++      request: MiraFormalAsrRequest,
++      transcriptEvidence: (transcript: string) => {
++        normalizedTranscriptSha256: string;
++        similarityBps: number;
++      },
++    ) => {
++      const transcript = transcriptFor(request);
++      const evidence = transcriptEvidence(transcript);
++      const timestamp = '2026-08-31T00:00:01.000Z';
++      const record = {
++        schemaVersion: 'mira.openmaic.formal-audio-job.v1',
++        kind: 'asr',
++        requestId: request.requestId,
++        requestSha256: requestSha256(request),
++        ttsRequestId: request.ttsRequestId,
++        classroomId: request.classroomId,
++        classroomContentSha256: request.classroomContentSha256,
++        subject: request.subject,
++        teacherProfileId: request.teacherProfileId,
++        teacherProfileVersion: request.teacherProfileVersion,
++        teacherProfileSha256: request.teacherProfileSha256,
++        teacherGender: request.teacherGender,
++        sceneId: request.sceneId,
++        sceneOrder: request.sceneOrder,
++        actionId: request.actionId,
++        narrationSegmentId: request.narrationSegmentId,
++        audioSha256: request.audioSha256,
++        state: 'succeeded',
++        providerId: 'qwen-asr',
++        modelId: 'qwen3-asr-flash',
++        languageCode: 'zh-CN',
++        fallbackUsed: false,
++        providerAttemptedAt: timestamp,
++        providerCompletedAt: timestamp,
++        transcriptSha256: sha256(transcript),
++        ...evidence,
++        createdAt: timestamp,
++        updatedAt: timestamp,
++        completedAt: timestamp,
++      } satisfies MiraFormalAsrJob;
++      asrJobs.set(request.requestId, record);
++      return { record, created: true, transcript };
++    },
++  );
++  return {
++    assertProviderReady,
++    executeTts,
++    executeAsr,
++    dependencies: {
++      assertProviderReady,
++      readTtsJob: async (requestId) => ttsJobs.get(requestId) || null,
++      executeTts,
++      readTtsAsset: async (requestId) => ({
++        record: ttsJobs.get(requestId)!,
++        bytes: assets.get(requestId)!,
++      }),
++      readAsrJob: async (requestId) => asrJobs.get(requestId) || null,
++      executeAsr,
++    },
++  };
++}
++
++describe('Mira formal audio lifecycle v2', () => {
++  it('completes exactly 10 TTS and ASR segments and returns a hashed receipt', async () => {
++    const classroom = formalClassroom();
++    const fake = fakeDependencies((request) => `第${request.sceneOrder + 1}段讲解。`);
++    const onProgress = vi.fn();
++
++    const receipt = await completeMiraFormalAudioLifecycle(
++      { buildItemId: 'build-item-001', subject: 'math', ...classroom },
++      fake.dependencies,
++      { onProgress },
++    );
++
++    expect(fake.assertProviderReady).toHaveBeenCalledTimes(1);
++    expect(fake.executeTts).toHaveBeenCalledTimes(10);
++    expect(fake.executeAsr).toHaveBeenCalledTimes(10);
++    expect(onProgress).toHaveBeenCalledTimes(20);
++    expect(receipt).toMatchObject({
++      schemaVersion: 'mira.openmaic.formal-audio-lifecycle.v2',
++      status: 'succeeded',
++      buildItemId: 'build-item-001',
++      classroomId: classroom.stage.id,
++      subject: 'math',
++      expectedSegmentCount: 10,
++      ttsSucceededCount: 10,
++      asrPassedCount: 10,
++      teacherProfile: { id: 'mira_math_clear', version: 2, gender: 'male' },
++    });
++    expect(receipt.segments.map((segment) => segment.sceneOrder)).toEqual(
++      Array.from({ length: 10 }, (_, index) => index),
++    );
++    expect(receipt.segments.every((segment) => segment.asr.similarityBps === 10_000)).toBe(true);
++    const { receiptSha256, ...receiptWithoutHash } = receipt;
++    expect(receiptSha256).toBe(requestSha256(receiptWithoutHash));
++  });
++
++  it('replays from durable primitive records without another provider execution', async () => {
++    const classroom = formalClassroom();
++    const fake = fakeDependencies((request) => `第${request.sceneOrder + 1}段讲解。`);
++    const input = { buildItemId: 'build-item-002', subject: 'math' as const, ...classroom };
++
++    const first = await completeMiraFormalAudioLifecycle(input, fake.dependencies);
++    const replay = await completeMiraFormalAudioLifecycle(input, fake.dependencies);
++
++    expect(replay).toEqual(first);
++    expect(fake.executeTts).toHaveBeenCalledTimes(10);
++    expect(fake.executeAsr).toHaveBeenCalledTimes(10);
++    expect(fake.assertProviderReady).toHaveBeenCalledTimes(1);
++  });
++
++  it('fails the whole lifecycle when any ASR round trip is below 8500 bps', async () => {
++    const classroom = formalClassroom();
++    const fake = fakeDependencies(() => '完全不同的内容');
++
++    await expect(
++      completeMiraFormalAudioLifecycle(
++        { buildItemId: 'build-item-003', subject: 'math', ...classroom },
++        fake.dependencies,
++      ),
++    ).rejects.toThrow('FORMAL_AUDIO_ASR_INCOMPLETE:0:succeeded');
++  });
++
++  it('keeps speech and ASR canonicalization aligned with backend policy v2', () => {
++    expect(prepareMiraFormalSpeechText('声母 b 和韵母 a 拼成 ba。', 'chinese')).toBe(
++      '声母 波 和韵母 啊 拼成 八。',
++    );
++    expect(prepareMiraFormalAsrComparisonText('14+7=21', 'math')).toBe('十四加七等于二十一');
++    expect(normalizeMiraFormalAsrText(' 十四，加七！ ')).toBe('十四加七');
++    expect(miraFormalAsrSimilarityBps('十四加七', '十四加七')).toBe(10_000);
++  });
++});
+diff --git a/tests/server/mira-formal-audio.test.ts b/tests/server/mira-formal-audio.test.ts
+index 94702be..42bad68 100644
+--- a/tests/server/mira-formal-audio.test.ts
++++ b/tests/server/mira-formal-audio.test.ts
+@@ -524,9 +524,18 @@ describe('Mira formal subject Qwen audio runtime', () => {
+       );
+     });
+ 
+-    const result = await executeMiraFormalAsr(asrRequest, { fetchImpl: asrFetch as typeof fetch });
++    const normalizedTranscriptSha256 = sha256Text('normalized-transcript');
++    const result = await executeMiraFormalAsr(asrRequest, {
++      fetchImpl: asrFetch as typeof fetch,
++      transcriptEvidence: () => ({ normalizedTranscriptSha256, similarityBps: 9_750 }),
++    });
+     expect(result.transcript).toBe(transcript);
+     expect(result.record.transcriptSha256).toBe(sha256Text(transcript));
++    expect(result.record).toMatchObject({ normalizedTranscriptSha256, similarityBps: 9_750 });
++    expect(await readMiraFormalAsrJob(asrRequest.requestId)).toMatchObject({
++      normalizedTranscriptSha256,
++      similarityBps: 9_750,
++    });
+     const serialized = JSON.stringify(await readMiraFormalAsrJob(asrRequest.requestId));
+     expect(serialized).not.toContain(transcript);
+     expect(serialized).not.toContain(asrKey);
+-- 
+2.50.1 (Apple Git-155)
+

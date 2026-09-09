@@ -1,0 +1,28 @@
+From 856b63a585e521b3e0f28781063443b964ffbee1 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 26/37] 0026-mira-native-next-build-boundary
+
+---
+ next.config.ts | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/next.config.ts b/next.config.ts
+index f04e776..3e95838 100644
+--- a/next.config.ts
++++ b/next.config.ts
+@@ -2,7 +2,10 @@ import type { NextConfig } from 'next';
+ import { resolve } from 'node:path';
+ 
+ const nextConfig: NextConfig = {
+-  output: process.env.VERCEL ? undefined : 'standalone',
++  output:
++    process.env.VERCEL || process.env.MIRA_OPENMAIC_NATIVE_BUILD === '1'
++      ? undefined
++      : 'standalone',
+   outputFileTracingIncludes: {
+     '/*': [
+       'lib/server/agent-runtime/import-pptx-worker.mjs',
+-- 
+2.50.1 (Apple Git-155)
+

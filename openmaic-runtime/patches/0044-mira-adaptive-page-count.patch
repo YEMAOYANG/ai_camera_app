@@ -1,0 +1,35 @@
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+index 9dfb338b14dad8e8bb60267cbcdbc45efe93bf0f..dd0925eaab78af03e46913a881070114d7a2c4a3 100644
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -348,8 +348,8 @@ function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewar
+     '',
+     'Adaptive classroom contract:',
+     '- Before create_stage, form the complete page plan internally under the official stage-design, K12 planning, and active Skill rules.',
+-    '- Choose the page count from the actual teaching brief, grade, bounded skill and lesson duration; there is no fixed page count or fixed type order.',
+-    '- When duration is absent, infer 15-30 minutes. Use 1-2 scenes per minute as planning guidance and never create more than 60 scenes.',
++    '- Choose the smallest complete page count from the actual teaching moves required by the brief, grade and bounded skill; there is no fixed page count or fixed type order.',
++    '- Treat lesson duration only as an upper time budget, never as a page-count formula. Do not default to one page per minute and do not default to 10 pages. Never create more than 60 scenes.',
+     '- Use only slide, quiz, interactive and pbl scenes. Include at least one slide, one quiz and one interactive scene; use pbl only when the learning task genuinely warrants it.',
+     '- Use between one and four quiz scenes. Distribute the four locked assessment questions across them in original order so every locked question appears exactly once.',
+     '- Copy every locked question id, question, type, and option exactly. Keep hasAnswer=false and answer=[]; never add an answer or scoring rule.',
+diff --git a/skills/agent-runtime/mira-primary-courseware/SKILL.md b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+index bd49eb75f3cc7911958e5e3c5c2cd20f383aaefe..8228c892a6ef55d1f9af97c9c772dfa4250f1ce4 100644
+--- a/skills/agent-runtime/mira-primary-courseware/SKILL.md
++++ b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+@@ -29,10 +29,11 @@ interactive Pro-workbench request, prefer 6–8 pages:
+ 
+ For a server-authored Mira formal brief, plan the whole deck internally under
+ the official `stage-design` and K12 rules, then continue straight through the
+-build sequence without asking for approval. Choose the page count from the
+-brief's grade, bounded skill and estimated duration; when duration is absent,
+-infer 15–30 minutes and use 1–2 scenes per minute as planning guidance. There
+-is no fixed page count or fixed type order, but never exceed 60 pages. Use only
++build sequence without asking for approval. Choose the smallest complete page
++count from the actual teaching moves needed for the brief's grade and bounded
++skill. Treat estimated duration only as an upper time budget, never as a
++page-count formula: do not default to one page per minute and do not default to
++10 pages. There is no fixed page count or fixed type order, but never exceed 60 pages. Use only
+ `slide`, `quiz`, `interactive` and `pbl`, with at least one `slide`, one `quiz`
+ and one `interactive`; use `pbl` only for a genuinely multi-step task.
+ 

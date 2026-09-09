@@ -18,7 +18,7 @@ class TaskTemplateRepository:
     def child_grade(self, conn: DatabaseConnection, *, family_id: str, child_id: str) -> str | None:
         row = conn.execute(
             """
-            SELECT grade, age_stage
+            SELECT grade_code, grade, age_stage
             FROM children
             WHERE family_id = ? AND id = ?
             """,
@@ -26,7 +26,12 @@ class TaskTemplateRepository:
         ).fetchone()
         if row is None:
             return None
-        return (row.get("grade") or row.get("age_stage") or "").strip() or None
+        return (
+            row.get("grade_code")
+            or row.get("grade")
+            or row.get("age_stage")
+            or ""
+        ).strip() or None
 
     def child_exists(self, conn: DatabaseConnection, *, family_id: str, child_id: str) -> bool:
         row = conn.execute(

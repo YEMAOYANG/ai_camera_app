@@ -1,0 +1,340 @@
+diff --git a/lib/web-search/brave.ts b/lib/web-search/brave.ts
+index 2cb2768..35b40d9 100644
+--- a/lib/web-search/brave.ts
++++ b/lib/web-search/brave.ts
+@@ -13,6 +13,12 @@ import type { WebSearchResult, WebSearchSource } from '@/lib/types/web-search';
+ import { normalizeWebSearchQuery } from './utils';
+ 
+ const BRAVE_DEFAULT_BASE_URL = 'https://search.brave.com';
++const BRAVE_SCRAPE_MIN_REQUEST_INTERVAL_MS = 1_000;
++const BRAVE_SCRAPE_DEFAULT_RETRY_AFTER_MS = 30_000;
++const BRAVE_SCRAPE_MAX_RETRY_AFTER_MS = 60_000;
++
++let braveScrapeQueue: Promise<void> = Promise.resolve();
++let lastBraveScrapeRequestStartedAt = 0;
+ 
+ const BRAVE_HEADERS: Record<string, string> = {
+   'User-Agent':
+@@ -57,6 +63,96 @@ function isBraveOwnedUrl(value: string): boolean {
+   }
+ }
+ 
++function abortReason(signal: AbortSignal): unknown {
++  return signal.reason ?? new DOMException('The operation was aborted', 'AbortError');
++}
++
++function waitForDelay(delayMs: number, signal?: AbortSignal): Promise<void> {
++  if (signal?.aborted) return Promise.reject(abortReason(signal));
++  if (delayMs <= 0) return Promise.resolve();
++
++  return new Promise((resolve, reject) => {
++    const onAbort = () => {
++      clearTimeout(timer);
++      reject(abortReason(signal!));
++    };
++    const timer = setTimeout(() => {
++      signal?.removeEventListener('abort', onAbort);
++      resolve();
++    }, delayMs);
++
++    signal?.addEventListener('abort', onAbort, { once: true });
++  });
++}
++
++function waitForPromise(promise: Promise<void>, signal?: AbortSignal): Promise<void> {
++  if (!signal) return promise;
++  if (signal.aborted) return Promise.reject(abortReason(signal));
++
++  return new Promise((resolve, reject) => {
++    const onAbort = () => reject(abortReason(signal));
++    signal.addEventListener('abort', onAbort, { once: true });
++    promise.then(
++      () => {
++        signal.removeEventListener('abort', onAbort);
++        resolve();
++      },
++      (error) => {
++        signal.removeEventListener('abort', onAbort);
++        reject(error);
++      },
++    );
++  });
++}
++
++async function runSerializedBraveScrape<T>(
++  operation: () => Promise<T>,
++  signal?: AbortSignal,
++): Promise<T> {
++  const predecessor = braveScrapeQueue;
++  let releaseSlot!: () => void;
++  const slot = new Promise<void>((resolve) => {
++    releaseSlot = resolve;
++  });
++  braveScrapeQueue = predecessor.then(() => slot);
++
++  try {
++    await waitForPromise(predecessor, signal);
++    if (signal?.aborted) throw abortReason(signal);
++    return await operation();
++  } finally {
++    releaseSlot();
++  }
++}
++
++async function waitForBraveScrapeThrottle(signal?: AbortSignal): Promise<void> {
++  const elapsedMs = Date.now() - lastBraveScrapeRequestStartedAt;
++  const delayMs = Math.min(
++    BRAVE_SCRAPE_MIN_REQUEST_INTERVAL_MS,
++    Math.max(0, BRAVE_SCRAPE_MIN_REQUEST_INTERVAL_MS - elapsedMs),
++  );
++  await waitForDelay(delayMs, signal);
++  if (signal?.aborted) throw abortReason(signal);
++  lastBraveScrapeRequestStartedAt = Date.now();
++}
++
++function braveRetryAfterMs(response: Response): number {
++  const raw = response.headers.get('retry-after')?.trim();
++  let delayMs = BRAVE_SCRAPE_DEFAULT_RETRY_AFTER_MS;
++
++  if (raw && /^\d+$/.test(raw)) {
++    delayMs = Number(raw) * 1_000;
++  } else if (raw) {
++    const retryAt = Date.parse(raw);
++    if (Number.isFinite(retryAt)) delayMs = Math.max(0, retryAt - Date.now());
++  }
++
++  if (!Number.isFinite(delayMs) || delayMs < 0) {
++    delayMs = BRAVE_SCRAPE_DEFAULT_RETRY_AFTER_MS;
++  }
++  return Math.min(delayMs, BRAVE_SCRAPE_MAX_RETRY_AFTER_MS);
++}
++
+ export function parseBraveSearchHtml(html: string, maxResults: number): WebSearchSource[] {
+   const results: WebSearchSource[] = [];
+   const snippetRegex =
+@@ -165,19 +261,35 @@ async function searchWithBraveScrape(
+   baseUrl?: string,
+   signal?: AbortSignal,
+ ): Promise<WebSearchSource[]> {
+-  const res = await proxyFetch(buildBraveSearchUrl(query, baseUrl), {
+-    method: 'GET',
+-    headers: BRAVE_HEADERS,
+-    ...(signal ? { signal } : {}),
+-  });
++  return runSerializedBraveScrape(async () => {
++    const url = buildBraveSearchUrl(query, baseUrl);
+ 
+-  if (!res.ok) {
+-    const errorText = await res.text().catch(() => '');
+-    throw new Error(`Brave Search error (${res.status}): ${errorText || res.statusText}`);
+-  }
++    for (let attempt = 0; attempt < 2; attempt += 1) {
++      await waitForBraveScrapeThrottle(signal);
++      const res = await proxyFetch(url, {
++        method: 'GET',
++        headers: BRAVE_HEADERS,
++        ...(signal ? { signal } : {}),
++      });
++
++      if (res.ok) {
++        const html = await res.text();
++        return parseBraveSearchHtml(html, maxResults);
++      }
++
++      if (res.status === 429 && attempt === 0) {
++        const retryAfterMs = braveRetryAfterMs(res);
++        await res.body?.cancel().catch(() => undefined);
++        await waitForDelay(retryAfterMs, signal);
++        continue;
++      }
++
++      const errorText = await res.text().catch(() => '');
++      throw new Error(`Brave Search error (${res.status}): ${errorText || res.statusText}`);
++    }
+ 
+-  const html = await res.text();
+-  return parseBraveSearchHtml(html, maxResults);
++    throw new Error('Brave Search retry exhausted');
++  }, signal);
+ }
+ 
+ export async function searchWithBrave(params: {
+diff --git a/tests/web-search/brave.test.ts b/tests/web-search/brave.test.ts
+index d6ca3e4..e4d9206 100644
+--- a/tests/web-search/brave.test.ts
++++ b/tests/web-search/brave.test.ts
+@@ -1,4 +1,4 @@
+-import { beforeEach, describe, expect, it, vi } from 'vitest';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ 
+ const proxyFetchMock = vi.hoisted(() => vi.fn());
+ 
+@@ -6,7 +6,23 @@ vi.mock('@/lib/server/proxy-fetch', () => ({
+   proxyFetch: proxyFetchMock,
+ }));
+ 
+-import { parseBraveSearchHtml, searchWithBrave } from '@/lib/web-search/brave';
++import { parseBraveSearchHtml } from '@/lib/web-search/brave';
++
++async function loadSearchWithBrave() {
++  vi.resetModules();
++  return (await import('@/lib/web-search/brave')).searchWithBrave;
++}
++
++function htmlResponse(title = 'Example'): Response {
++  return new Response(
++    `<div class="snippet" data-type="web">
++      <a href="https://example.com" class="l1"></a>
++      <div class="title search-snippet-title">${title}</div>
++      <div class="generic-snippet">Content</div>
++    </div>`,
++    { status: 200, headers: { 'content-type': 'text/html' } },
++  );
++}
+ 
+ describe('parseBraveSearchHtml', () => {
+   // Result 1 uses Brave's current `<div class="… search-snippet-title …">` title
+@@ -68,19 +84,13 @@ describe('searchWithBrave', () => {
+     proxyFetchMock.mockReset();
+   });
+ 
++  afterEach(() => {
++    vi.useRealTimers();
++  });
++
+   it('uses Brave public search without an API key and clamps long queries', async () => {
+-    proxyFetchMock.mockResolvedValueOnce(
+-      new Response(
+-        `
+-          <div class="snippet" data-type="web">
+-            <a href="https://example.com" class="l1"></a>
+-            <div class="title search-snippet-title">Example</div>
+-            <div class="generic-snippet">Content</div>
+-          </div>
+-        `,
+-        { status: 200, headers: { 'content-type': 'text/html' } },
+-      ),
+-    );
++    const searchWithBrave = await loadSearchWithBrave();
++    proxyFetchMock.mockResolvedValueOnce(htmlResponse());
+ 
+     const result = await searchWithBrave({
+       query: 'x'.repeat(500),
+@@ -95,4 +105,117 @@ describe('searchWithBrave', () => {
+     expect(result.sources).toHaveLength(1);
+     expect(result.query).toHaveLength(400);
+   });
++
++  it('serializes concurrent keyless scrapes and spaces their request starts', async () => {
++    vi.useFakeTimers();
++    vi.setSystemTime(new Date('2026-09-03T00:00:00Z'));
++    const searchWithBrave = await loadSearchWithBrave();
++    let finishFirst!: (response: Response) => void;
++    proxyFetchMock
++      .mockImplementationOnce(
++        () =>
++          new Promise<Response>((resolve) => {
++            finishFirst = resolve;
++          }),
++      )
++      .mockResolvedValueOnce(htmlResponse('Second'));
++
++    const first = searchWithBrave({ query: 'first' });
++    const second = searchWithBrave({ query: 'second' });
++    await vi.advanceTimersByTimeAsync(0);
++    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
++
++    finishFirst(htmlResponse('First'));
++    await expect(first).resolves.toMatchObject({ sources: [{ title: 'First' }] });
++    await vi.advanceTimersByTimeAsync(999);
++    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
++    await vi.advanceTimersByTimeAsync(1);
++    await expect(second).resolves.toMatchObject({ sources: [{ title: 'Second' }] });
++    expect(proxyFetchMock).toHaveBeenCalledTimes(2);
++  });
++
++  it('retries one 429 after Retry-After seconds with the same abort signal', async () => {
++    vi.useFakeTimers();
++    vi.setSystemTime(new Date('2026-09-03T00:00:00Z'));
++    const searchWithBrave = await loadSearchWithBrave();
++    const signal = new AbortController().signal;
++    proxyFetchMock
++      .mockResolvedValueOnce(
++        new Response('slow down', { status: 429, headers: { 'Retry-After': '2' } }),
++      )
++      .mockResolvedValueOnce(htmlResponse('Recovered'));
++
++    const result = searchWithBrave({ query: 'retry', signal });
++    await vi.advanceTimersByTimeAsync(1_999);
++    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
++    await vi.advanceTimersByTimeAsync(1);
++    await expect(result).resolves.toMatchObject({ sources: [{ title: 'Recovered' }] });
++    expect(proxyFetchMock.mock.calls.map(([, init]) => init.signal)).toEqual([signal, signal]);
++  });
++
++  it('respects Retry-After dates and caps an excessive delay at 60 seconds', async () => {
++    vi.useFakeTimers();
++    const now = new Date('2026-09-03T00:00:00Z');
++    vi.setSystemTime(now);
++    const searchWithBrave = await loadSearchWithBrave();
++    proxyFetchMock
++      .mockResolvedValueOnce(
++        new Response(null, {
++          status: 429,
++          headers: { 'Retry-After': new Date(now.getTime() + 120_000).toUTCString() },
++        }),
++      )
++      .mockResolvedValueOnce(htmlResponse('Capped'));
++
++    const result = searchWithBrave({ query: 'retry date' });
++    await vi.advanceTimersByTimeAsync(59_999);
++    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
++    await vi.advanceTimersByTimeAsync(1);
++    await expect(result).resolves.toMatchObject({ sources: [{ title: 'Capped' }] });
++  });
++
++  it('uses a 30-second fallback for an invalid Retry-After value', async () => {
++    vi.useFakeTimers();
++    vi.setSystemTime(new Date('2026-09-03T00:00:00Z'));
++    const searchWithBrave = await loadSearchWithBrave();
++    proxyFetchMock
++      .mockResolvedValueOnce(
++        new Response(null, { status: 429, headers: { 'Retry-After': 'not-a-delay' } }),
++      )
++      .mockResolvedValueOnce(htmlResponse('Fallback'));
++
++    const result = searchWithBrave({ query: 'retry fallback' });
++    await vi.advanceTimersByTimeAsync(29_999);
++    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
++    await vi.advanceTimersByTimeAsync(1);
++    await expect(result).resolves.toMatchObject({ sources: [{ title: 'Fallback' }] });
++  });
++
++  it('does not retry non-429 failures', async () => {
++    const searchWithBrave = await loadSearchWithBrave();
++    proxyFetchMock.mockResolvedValueOnce(new Response('unavailable', { status: 503 }));
++
++    await expect(searchWithBrave({ query: 'no retry' })).rejects.toThrow(
++      'Brave Search error (503): unavailable',
++    );
++    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
++  });
++
++  it('aborts during a 429 backoff without sending the retry', async () => {
++    vi.useFakeTimers();
++    vi.setSystemTime(new Date('2026-09-03T00:00:00Z'));
++    const searchWithBrave = await loadSearchWithBrave();
++    const controller = new AbortController();
++    proxyFetchMock.mockResolvedValueOnce(
++      new Response(null, { status: 429, headers: { 'Retry-After': '30' } }),
++    );
++
++    const result = searchWithBrave({ query: 'cancel retry', signal: controller.signal });
++    await vi.advanceTimersByTimeAsync(0);
++    controller.abort(new DOMException('cancelled', 'AbortError'));
++
++    await expect(result).rejects.toMatchObject({ name: 'AbortError' });
++    await vi.advanceTimersByTimeAsync(30_000);
++    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
++  });
+ });

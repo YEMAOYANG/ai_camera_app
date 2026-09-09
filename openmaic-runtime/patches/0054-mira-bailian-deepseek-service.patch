@@ -1,0 +1,235 @@
+--- /dev/null
++++ b/lib/ai/deepseek-service.ts
+@@ -0,0 +1,53 @@
++/** Wire adaptation only; contains no credentials or server-only imports. */
++export function isBailianDeepSeekEndpoint(baseUrl: string): boolean {
++  try {
++    const url = new URL(baseUrl);
++    return (
++      url.protocol === 'https:' &&
++      !url.username &&
++      !url.password &&
++      (url.hostname === 'dashscope.aliyuncs.com' ||
++        /^[a-z0-9-]+\.cn-beijing\.maas\.aliyuncs\.com$/.test(url.hostname)) &&
++      /^\/compatible-mode\/v1(?:\/chat\/completions)?\/?$/.test(url.pathname)
++    );
++  } catch {
++    return false;
++  }
++}
++
++export const BAILIAN_DEEPSEEK_MODELS: Record<string, string> = {
++  'deepseek-v4-pro': 'deepseek-v4-pro-0813',
++  'deepseek-v4-flash': 'deepseek-v4-flash-0731',
++};
++
++export function adaptDeepSeekRequest(
++  endpoint: string,
++  body: Record<string, unknown>,
++): Record<string, unknown> {
++  if (!isBailianDeepSeekEndpoint(endpoint)) return body;
++  const adapted = { ...body };
++  const model = String(body.model || '');
++  adapted.model = BAILIAN_DEEPSEEK_MODELS[model] || model;
++  const thinking = body.thinking as { type?: string } | undefined;
++  if (thinking?.type === 'enabled' || thinking?.type === 'disabled') {
++    adapted.enable_thinking = thinking.type === 'enabled';
++    delete adapted.thinking;
++  }
++  if (adapted.enable_thinking === false) delete adapted.reasoning_effort;
++  if (adapted.stream !== true) delete adapted.stream_options;
++  return adapted;
++}
++
++export function describeDeepSeekService(endpoint: string) {
++  const bailian = isBailianDeepSeekEndpoint(endpoint);
++  return {
++    service: bailian ? 'bailian' : 'official-or-custom',
++    wireModels: bailian
++      ? BAILIAN_DEEPSEEK_MODELS
++      : {
++          'deepseek-v4-pro': 'deepseek-v4-pro',
++          'deepseek-v4-flash': 'deepseek-v4-flash',
++        },
++    automaticFallback: false,
++  };
++}
+--- a/lib/ai/providers.ts
++++ b/lib/ai/providers.ts
+@@ -26,6 +26,7 @@
+  * - https://platform.xiaomimimo.com/static/docs/tokenplan/quick-access.md
+  */
+ 
++import { adaptDeepSeekRequest } from './deepseek-service';
+ import { createOpenAI } from '@ai-sdk/openai';
+ import { createAzure } from '@ai-sdk/azure';
+ import { createAnthropic } from '@ai-sdk/anthropic';
+@@ -2170,6 +2171,12 @@
+               /* leave body as-is */
+             }
+           }
++          if (providerId === 'deepseek' && typeof init?.body === 'string') {
++            init = {
++              ...init,
++              body: JSON.stringify(adaptDeepSeekRequest(String(url), JSON.parse(init.body))),
++            };
++          }
+           const response = useStreamingChatCompat
+             ? await fetchCustomOpenAIChat(url, init)
+             : await globalThis.fetch(url, init);
+--- a/lib/server/mira-formal-provider-readiness.ts
++++ b/lib/server/mira-formal-provider-readiness.ts
+@@ -1,3 +1,4 @@
++import { adaptDeepSeekRequest } from '@/lib/ai/deepseek-service';
+ import { createHash } from 'crypto';
+ import { promises as fs } from 'fs';
+ import path from 'path';
+@@ -615,7 +616,7 @@
+     return {
+       endpoint: deepseekEndpoint(resolveBaseUrl('deepseek')),
+       apiKey: resolveApiKey('deepseek'),
+-      body: {
++      body: adaptDeepSeekRequest(deepseekEndpoint(resolveBaseUrl('deepseek')), {
+         model: 'deepseek-v4-pro',
+         messages: [
+           {
+@@ -626,7 +627,7 @@
+         temperature: 0.6,
+         max_tokens: 16,
+         thinking: { type: 'disabled' },
+-      },
++      }),
+     };
+   }
+   if (spec.kind === 'qwen_asr') {
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -1,6 +1,8 @@
++import { describeDeepSeekService } from '@/lib/ai/deepseek-service';
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import type { NextRequest } from 'next/server';
+ import {
++  resolveBaseUrl,
+   getServerWebSearchProviders,
+   getServerImageProviders,
+   getServerVideoProviders,
+@@ -54,6 +56,7 @@
+         runtimePolicy: {
+           formalProviderReadiness: getMiraFormalProviderReadinessPolicy(),
+           modelPolicy,
++          modelService: describeDeepSeekService(resolveBaseUrl('deepseek') || 'https://api.deepseek.com/v1'),
+         },
+       });
+     } catch (error) {
+@@ -180,6 +183,7 @@
+       instrumentationBoundary: instrumentationBoundaryPolicy,
+       professionalResearch: getMiraProfessionalResearchPolicy(),
+       modelPolicy,
++      modelService: describeDeepSeekService(resolveBaseUrl('deepseek') || 'https://api.deepseek.com/v1'),
+     },
+   });
+ }
+--- a/tests/ai/formal-thinking-wire.test.ts
++++ b/tests/ai/formal-thinking-wire.test.ts
+@@ -1,6 +1,8 @@
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ 
+ import type { ThinkingConfig } from '@/lib/types/provider';
++
++const endpoint = vi.hoisted(() => ({ value: 'https://thinking-wire.invalid/v1' }));
+ 
+ // Keep routing, model construction, generation callbacks and the AI SDK real.
+ // Only credentials and the final HTTP transport are replaced; no local config
+@@ -8,7 +10,7 @@
+ vi.mock('@/lib/server/provider-config', () => ({
+   isServerConfiguredProvider: () => true,
+   resolveApiKey: () => 'offline-fixture-key',
+-  resolveBaseUrl: () => 'https://thinking-wire.invalid/v1',
++  resolveBaseUrl: () => endpoint.value,
+   resolveProxy: () => undefined,
+ }));
+ 
+@@ -62,6 +64,7 @@
+ 
+ describe('formal thinking policy at the actual SDK HTTP boundary', () => {
+   beforeEach(() => {
++    endpoint.value = 'https://thinking-wire.invalid/v1';
+     vi.resetModules();
+     vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY', 'deepseek-v4-pro-flash-v1');
+     vi.stubEnv('DEFAULT_MODEL', 'deepseek:deepseek-v4-pro');
+@@ -196,4 +199,40 @@
+     expect(bodies[0].thinking).toEqual({ type: 'disabled' });
+     expect(bodies[1]).not.toHaveProperty('thinking');
+   });
++  it('uses Bailian dated models and thinking flags at every real formal SDK boundary', async () => {
++    endpoint.value = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
++    const llm = await loadInstance();
++    const bodies: Array<Record<string, any>> = [];
++    vi.stubGlobal('fetch', async (url: RequestInfo | URL, init?: RequestInit) => {
++      expect(String(url)).toBe(`${endpoint.value}/chat/completions`);
++      expect(new Headers(init?.headers).get('authorization')).toBe('Bearer offline-fixture-key');
++      const body = JSON.parse(String(init?.body));
++      bodies.push(body);
++      return responseFor(body);
++    });
++    for (const stage of [
++      'scene-content:slide',
++      'scene-actions',
++      'mira-courseware-creator',
++      'mira-courseware-verifier',
++      'web-search-query-rewrite',
++    ] as const) {
++      expect(await llm.createGenerationAiCallFactory()(stage)('system', stage)).toBe('ok');
++    }
++    const driver = await llm.resolveModel({ stage: 'maic-agent-driver' });
++    expect(
++      await llm.streamLLM(
++        { model: driver.model, prompt: 'driver', maxRetries: 0 },
++        'driver',
++        driver.thinkingConfig,
++      ).text,
++    ).toBe('ok');
++    expect(bodies).toHaveLength(6);
++    for (const [index, body] of bodies.entries()) {
++      expect(body.model).toBe(index === 3 ? 'deepseek-v4-flash-0731' : 'deepseek-v4-pro-0813');
++      expect(body.enable_thinking).toBe(index === 5);
++      expect(body).not.toHaveProperty('thinking');
++      expect(body.reasoning_effort).toBe(index === 5 ? 'high' : undefined);
++    }
++  });
+ });
+--- /dev/null
++++ b/tests/ai/deepseek-service.test.ts
+@@ -0,0 +1,32 @@
++import { describe, expect, it } from 'vitest';
++import { adaptDeepSeekRequest, isBailianDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
++
++describe('DeepSeek service wire adaptation', () => {
++  const body = {
++    model: 'deepseek-v4-pro',
++    thinking: { type: 'disabled' },
++    reasoning_effort: 'high',
++    stream_options: { include_usage: true },
++  };
++  it('leaves the official request and credentials path unchanged', () => {
++    expect(adaptDeepSeekRequest('https://api.deepseek.com/v1/chat/completions', body)).toBe(body);
++  });
++  it('adapts readiness and non-streaming requests without mutating the original', () => {
++    const result = adaptDeepSeekRequest(
++      'https://ws-example.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/chat/completions',
++      body,
++    );
++    expect(result).toEqual({ model: 'deepseek-v4-pro-0813', enable_thinking: false });
++    expect(body.thinking.type).toBe('disabled');
++  });
++  it.each([
++    'https://dashscope.aliyuncs.com.attacker.test/compatible-mode/v1',
++    'https://attacker.test/compatible-mode/v1',
++    'http://dashscope.aliyuncs.com/compatible-mode/v1',
++    'https://user:pass@dashscope.aliyuncs.com/compatible-mode/v1',
++    'https://dashscope.aliyuncs.com/api/v1',
++  ])('does not apply this profile to %s', (url) => {
++    expect(isBailianDeepSeekEndpoint(url)).toBe(false);
++    expect(adaptDeepSeekRequest(url, body)).toBe(body);
++  });
++});

@@ -1,0 +1,467 @@
+From 2d97688467096215a535f9e416fb2e6212545648 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:35 +0800
+Subject: [PATCH 36/37] 0036-mira-student-refresh-resume
+
+---
+ components/edit/PlaybackChromeRoot.tsx        | 59 ++++++++++++++---
+ lib/contexts/mira-student-runtime-context.tsx | 30 +++++++--
+ lib/mira/student-runtime.ts                   | 38 ++++++++++-
+ tests/runtime/mira-student-runtime.test.ts    | 66 +++++++++++++++++--
+ tests/server/health-route.test.ts             | 14 ++--
+ 5 files changed, 176 insertions(+), 31 deletions(-)
+
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 021f0d8..f55885c 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -194,6 +194,10 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     const [playbackCompleted, setPlaybackCompleted] = useState(false); // Distinguishes "never played" idle from "finished" idle
+     const [lectureSpeech, setLectureSpeech] = useState<string | null>(null); // From PlaybackEngine (lecture)
+     const [currentPlaybackActionIndex, setCurrentPlaybackActionIndex] = useState<number | null>(0);
++    const [studentPlaybackRestore, setStudentPlaybackRestore] = useState<{
++      sceneId: string;
++      resumed: boolean;
++    } | null>(null);
+     const [liveSpeech, setLiveSpeech] = useState<string | null>(null); // From buffer (discussion/QA)
+     const [speechProgress, setSpeechProgress] = useState<number | null>(null); // StreamBuffer reveal progress (0–1)
+     const [discussionTrigger, setDiscussionTrigger] = useState<TriggerEvent | null>(null);
+@@ -302,6 +306,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     const presentationIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+     const cursorSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+     const pendingCursorRef = useRef<{ stageId: string; cursor: PlaybackCursor } | null>(null);
++    const studentResumeNoticeShownRef = useRef(false);
+     const stageRef = useRef<HTMLDivElement>(null);
+     // Guard to prevent double flash when manual stop triggers onDiscussionEnd
+     const manualStopRef = useRef(false);
+@@ -677,6 +682,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+               )
+             : { actionIndex: 0, position: null };
+         let savedResumeActionIndex = sessionResumeCursor.actionIndex;
++        let hasSavedPlaybackPosition = sessionResumeCursor.position !== null;
+         const playbackStageId = stage?.id ?? currentScene?.stageId;
+         if (currentScene && playbackStageId && !sessionResumeCursor.position) {
+           try {
+@@ -687,6 +693,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+               canJumpWithinReconstructablePrefix(currentScene.actions, 0, cursor.actionIndex)
+             ) {
+               savedResumeActionIndex = cursor.actionIndex;
++              hasSavedPlaybackPosition = true;
+             }
+           } catch (error) {
+             console.warn(`Failed to load playback cursor for stage ${playbackStageId}:`, error);
+@@ -695,6 +702,13 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+ 
+         if (cancelled) return;
+ 
++        if (currentScene) {
++          setStudentPlaybackRestore({
++            sceneId: currentScene.id,
++            resumed: hasSavedPlaybackPosition,
++          });
++        }
++
+         const savedResumeAction = currentScene?.actions?.[savedResumeActionIndex];
+ 
+         // Reset all roundtable/live state so scenes are fully isolated. Use the
+@@ -1000,6 +1014,17 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+           engine.start();
+         } else {
+           // Load saved playback state and restore position (but never auto-play).
++          if (
++            studentMode &&
++            (studentAutoPlayRuntime?.audioStartAccepted || hasSavedPlaybackPosition) &&
++            !studentResumeNoticeShownRef.current
++          ) {
++            studentResumeNoticeShownRef.current = true;
++            toast.info('课堂进度已恢复', {
++              id: `mira-student-refresh-resume-${currentScene.id}`,
++              description: '点击播放按钮继续老师讲解；刷新后浏览器可能需要再次确认声音播放。',
++            });
++          }
+           if (savedResumeActionIndex > 0 && engine.canJumpToAction(savedResumeActionIndex)) {
+             void engine
+               .jumpToAction(savedResumeActionIndex, { autoplay: false })
+@@ -1198,12 +1223,22 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+           chatAreaRef.current?.pauseBuffer(lectureSessionIdRef.current);
+         }
+       } else if (mode === 'paused') {
++        if (studentMode) {
++          audioPlayerRef.current.prepareStudentPlayback();
++          studentAutoPlayRuntime?.acceptAudioStart();
++          setAutoPlayLecture(true);
++        }
+         engine.resume();
+         // Resume lecture buffer
+         if (lectureSessionIdRef.current) {
+           chatAreaRef.current?.resumeBuffer(lectureSessionIdRef.current);
+         }
+       } else {
++        if (studentMode) {
++          audioPlayerRef.current.prepareStudentPlayback();
++          studentAutoPlayRuntime?.acceptAudioStart();
++          setAutoPlayLecture(true);
++        }
+         const wasCompleted = playbackCompleted;
+         setPlaybackCompleted(false);
+         // startLecture is synchronous, so the first speech bubble exists before
+@@ -1221,25 +1256,33 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+           engine.continuePlayback();
+         }
+       }
+-    }, [playbackCompleted, currentScene, saveSceneResumePosition]);
++    }, [
++      playbackCompleted,
++      currentScene,
++      saveSceneResumePosition,
++      setAutoPlayLecture,
++      studentAutoPlayRuntime,
++      studentMode,
++    ]);
+ 
+     // get scene information
+     const isPendingScene = currentSceneId === PENDING_SCENE_ID;
++    const studentResumeStatus =
++      studentPlaybackRestore?.sceneId !== currentScene?.id
++        ? 'checking'
++        : studentPlaybackRestore?.resumed
++          ? 'resumed'
++          : 'fresh';
+     const showStudentStartGate = shouldShowMiraStudentStartGate({
+       studentMode,
+       lectureStarted: studentAutoPlayRuntime?.audioStartAccepted ?? false,
++      resumeStatus: studentResumeStatus,
+       hasScene: Boolean(currentScene && !isPendingScene),
+     });
+     const handleStudentStartLesson = useCallback(() => {
+       if (!engineRef.current) return;
+-      // Unlock the dedicated student output graph while this click still has
+-      // browser user activation. Student mute/volume are local session state,
+-      // so stale operator preferences never leak into the classroom.
+-      audioPlayerRef.current.prepareStudentPlayback();
+-      studentAutoPlayRuntime?.acceptAudioStart();
+-      setAutoPlayLecture(true);
+       handlePlayPause();
+-    }, [handlePlayPause, setAutoPlayLecture, studentAutoPlayRuntime]);
++    }, [handlePlayPause]);
+     const hasNextPending = generatingOutlines.length > 0;
+     // True when every outline has materialized into a scene and nothing is
+     // currently generating — signals the classroom has finished and the user
+diff --git a/lib/contexts/mira-student-runtime-context.tsx b/lib/contexts/mira-student-runtime-context.tsx
+index c1ae583..5ebd4b1 100644
+--- a/lib/contexts/mira-student-runtime-context.tsx
++++ b/lib/contexts/mira-student-runtime-context.tsx
+@@ -15,7 +15,11 @@ import {
+ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { useTheme } from '@/lib/hooks/use-theme';
+ import { supportedLocales, type Locale } from '@/lib/i18n';
+-import { MIRA_STUDENT_AUTO_PLAY_DEFAULT } from '@/lib/mira/student-runtime';
++import {
++  MIRA_STUDENT_AUTO_PLAY_DEFAULT,
++  readMiraStudentAudioStartAccepted,
++  rememberMiraStudentAudioStartAccepted,
++} from '@/lib/mira/student-runtime';
+ import {
+   createMiraStudentRuntimeEventClient,
+   type MiraStudentRuntimeEventClient,
+@@ -29,9 +33,9 @@ export interface MiraStudentAutoPlayRuntime {
+   readonly autoPlayLectureRef: MutableRefObject<boolean>;
+   readonly setAutoPlayLecture: (enabled: boolean) => void;
+   /**
+-   * True after the one browser-gesture audio gate has been accepted for this
+-   * mounted classroom document.  It intentionally lives above the playback
+-   * chrome so an engine/UI remount cannot ask the child to start again.
++   * True after the browser-gesture audio gate has been accepted for this
++   * classroom in the current tab session. It lives above the playback chrome
++   * and survives a full refresh so a resumed lesson is not presented as new.
+    */
+   readonly audioStartAccepted: boolean;
+   readonly acceptAudioStart: () => void;
+@@ -41,19 +45,30 @@ const MiraStudentAutoPlayRuntimeContext = createContext<MiraStudentAutoPlayRunti
+ 
+ function MiraStudentAutoPlaySession({
+   studentMode,
++  classroomId,
+   children,
+ }: {
+   readonly studentMode: boolean;
++  readonly classroomId: string;
+   readonly children: ReactNode;
+ }) {
+   const [autoPlayLecture, setAutoPlayLectureState] = useState(MIRA_STUDENT_AUTO_PLAY_DEFAULT);
+   const autoPlayLectureRef = useRef(MIRA_STUDENT_AUTO_PLAY_DEFAULT);
+-  const [audioStartAccepted, setAudioStartAccepted] = useState(false);
++  const [audioStartAccepted, setAudioStartAccepted] = useState(() =>
++    studentMode && typeof window !== 'undefined'
++      ? readMiraStudentAudioStartAccepted(window.sessionStorage, classroomId)
++      : false,
++  );
+   const setAutoPlayLecture = useCallback((enabled: boolean) => {
+     autoPlayLectureRef.current = enabled;
+     setAutoPlayLectureState(enabled);
+   }, []);
+-  const acceptAudioStart = useCallback(() => setAudioStartAccepted(true), []);
++  const acceptAudioStart = useCallback(() => {
++    setAudioStartAccepted(true);
++    if (studentMode && typeof window !== 'undefined') {
++      rememberMiraStudentAudioStartAccepted(window.sessionStorage, classroomId);
++    }
++  }, [classroomId, studentMode]);
+   const autoPlayRuntime = useMemo<MiraStudentAutoPlayRuntime | null>(
+     () =>
+       studentMode
+@@ -169,8 +184,9 @@ export function MiraStudentRuntimeProvider({
+     <MiraStudentRuntimeContext.Provider value={studentMode}>
+       <MiraStudentRuntimeEventContext.Provider value={runtimeEvents}>
+         <MiraStudentAutoPlaySession
+-          key={studentMode ? 'student' : 'operator'}
++          key={studentMode ? `student:${classroomId}` : 'operator'}
+           studentMode={studentMode}
++          classroomId={classroomId}
+         >
+           {studentMode && <MiraStudentPreferences onReady={markPreferencesReady} />}
+           {studentMode && !preferencesReady ? (
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+index c931a04..cf1a85e 100644
+--- a/lib/mira/student-runtime.ts
++++ b/lib/mira/student-runtime.ts
+@@ -6,15 +6,19 @@ import {
+ export const MIRA_STUDENT_RUNTIME_QUERY_KEY = 'mira';
+ export const MIRA_STUDENT_RUNTIME_QUERY_VALUE = '1';
+ export const MIRA_STUDENT_AUTO_PLAY_DEFAULT = true;
++const MIRA_STUDENT_AUDIO_START_STORAGE_PREFIX = 'mira:student-audio-start:v1';
++
++type MiraStudentAudioStartStorage = Pick<Storage, 'getItem' | 'setItem'>;
+ 
+ export const MIRA_STUDENT_CHROME_POLICY = Object.freeze({
+   enforced: true,
+-  policyVersion: 'mira-student-chrome.v5',
++  policyVersion: 'mira-student-chrome.v6',
+   marker: 'mira=1',
+   locale: 'zh-CN',
+   theme: 'light',
+   autoPlayDefault: MIRA_STUDENT_AUTO_PLAY_DEFAULT,
+   autoPlayPersistence: 'student-session',
++  audioStartPersistence: 'classroom-tab-session',
+   manualAutoPlayToggleEnabled: true,
+   asrEnabled: true,
+   asrPersistence: 'student-session',
+@@ -29,6 +33,34 @@ export const MIRA_STUDENT_CHROME_POLICY = Object.freeze({
+   }),
+ });
+ 
++export function getMiraStudentAudioStartStorageKey(classroomId: string): string {
++  return `${MIRA_STUDENT_AUDIO_START_STORAGE_PREFIX}:${encodeURIComponent(classroomId.trim())}`;
++}
++
++export function readMiraStudentAudioStartAccepted(
++  storage: MiraStudentAudioStartStorage,
++  classroomId: string,
++): boolean {
++  if (!classroomId.trim()) return false;
++  try {
++    return storage.getItem(getMiraStudentAudioStartStorageKey(classroomId)) === 'accepted';
++  } catch {
++    return false;
++  }
++}
++
++export function rememberMiraStudentAudioStartAccepted(
++  storage: MiraStudentAudioStartStorage,
++  classroomId: string,
++): void {
++  if (!classroomId.trim()) return;
++  try {
++    storage.setItem(getMiraStudentAudioStartStorageKey(classroomId), 'accepted');
++  } catch {
++    // A blocked sessionStorage must not prevent the explicit play gesture.
++  }
++}
++
+ export const MIRA_STUDENT_CLASSROOM_METADATA = Object.freeze({
+   title: 'Mira 学习课堂',
+   description: 'Mira 学生互动学习课堂',
+@@ -58,13 +90,15 @@ export function getMiraEffectiveAutoPlayLecture({
+ export function shouldShowMiraStudentStartGate({
+   studentMode,
+   lectureStarted,
++  resumeStatus,
+   hasScene,
+ }: {
+   readonly studentMode: boolean;
+   readonly lectureStarted: boolean;
++  readonly resumeStatus: 'checking' | 'fresh' | 'resumed';
+   readonly hasScene: boolean;
+ }): boolean {
+-  return studentMode && hasScene && !lectureStarted;
++  return studentMode && hasScene && resumeStatus === 'fresh' && !lectureStarted;
+ }
+ 
+ export function getMiraEffectiveAsrEnabled({
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+index be699b6..8691294 100644
+--- a/tests/runtime/mira-student-runtime.test.ts
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest';
+ import {
+   getMiraEffectiveAsrEnabled,
+   getMiraEffectiveAutoPlayLecture,
++  getMiraStudentAudioStartStorageKey,
+   getMiraStudentChromeRuntimePolicy,
+   isMiraStudentRuntimeParam,
+   isMiraStudentRuntimeSearch,
+   MIRA_STUDENT_CLASSROOM_METADATA,
++  readMiraStudentAudioStartAccepted,
++  rememberMiraStudentAudioStartAccepted,
+   shouldShowMiraStudentStartGate,
+ } from '@/lib/mira/student-runtime';
+ 
+@@ -27,12 +30,13 @@ describe('Mira student runtime marker', () => {
+   it('publishes the exact student chrome health attestation', () => {
+     expect(getMiraStudentChromeRuntimePolicy()).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v5',
++      policyVersion: 'mira-student-chrome.v6',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
+       autoPlayDefault: true,
+       autoPlayPersistence: 'student-session',
++      audioStartPersistence: 'classroom-tab-session',
+       manualAutoPlayToggleEnabled: true,
+       asrEnabled: true,
+       asrPersistence: 'student-session',
+@@ -48,6 +52,22 @@ describe('Mira student runtime marker', () => {
+     });
+   });
+ 
++  it('remembers the accepted audio gate only for the same classroom tab session', () => {
++    const values = new Map<string, string>();
++    const storage = {
++      getItem: (key: string) => values.get(key) ?? null,
++      setItem: (key: string, value: string) => values.set(key, value),
++    };
++
++    expect(readMiraStudentAudioStartAccepted(storage, 'classroom-1')).toBe(false);
++    rememberMiraStudentAudioStartAccepted(storage, 'classroom-1');
++    expect(readMiraStudentAudioStartAccepted(storage, 'classroom-1')).toBe(true);
++    expect(readMiraStudentAudioStartAccepted(storage, 'classroom-2')).toBe(false);
++    expect(getMiraStudentAudioStartStorageKey('classroom-1')).not.toBe(
++      getMiraStudentAudioStartStorageKey('classroom-2'),
++    );
++  });
++
+   it('isolates student auto-play from the persisted operator preference', () => {
+     expect(
+       getMiraEffectiveAutoPlayLecture({
+@@ -81,16 +101,52 @@ describe('Mira student runtime marker', () => {
+ 
+   it('requires one explicit audio-start gesture only for an unstarted student classroom', () => {
+     expect(
+-      shouldShowMiraStudentStartGate({ studentMode: true, lectureStarted: false, hasScene: true }),
++      shouldShowMiraStudentStartGate({
++        studentMode: true,
++        lectureStarted: false,
++        resumeStatus: 'fresh',
++        hasScene: true,
++      }),
+     ).toBe(true);
+     expect(
+-      shouldShowMiraStudentStartGate({ studentMode: true, lectureStarted: true, hasScene: true }),
++      shouldShowMiraStudentStartGate({
++        studentMode: true,
++        lectureStarted: true,
++        resumeStatus: 'fresh',
++        hasScene: true,
++      }),
++    ).toBe(false);
++    expect(
++      shouldShowMiraStudentStartGate({
++        studentMode: true,
++        lectureStarted: false,
++        resumeStatus: 'fresh',
++        hasScene: false,
++      }),
++    ).toBe(false);
++    expect(
++      shouldShowMiraStudentStartGate({
++        studentMode: false,
++        lectureStarted: false,
++        resumeStatus: 'fresh',
++        hasScene: true,
++      }),
+     ).toBe(false);
+     expect(
+-      shouldShowMiraStudentStartGate({ studentMode: true, lectureStarted: false, hasScene: false }),
++      shouldShowMiraStudentStartGate({
++        studentMode: true,
++        lectureStarted: false,
++        resumeStatus: 'checking',
++        hasScene: true,
++      }),
+     ).toBe(false);
+     expect(
+-      shouldShowMiraStudentStartGate({ studentMode: false, lectureStarted: false, hasScene: true }),
++      shouldShowMiraStudentStartGate({
++        studentMode: true,
++        lectureStarted: false,
++        resumeStatus: 'resumed',
++        hasScene: true,
++      }),
+     ).toBe(false);
+   });
+ 
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 389043f..e619256 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -4,10 +4,7 @@ import { NextRequest } from 'next/server';
+ const healthRequest = () => new NextRequest('http://runtime.test/api/health');
+ 
+ vi.mock('@/lib/server/provider-config', () => ({
+-  getServerProviders: () =>
+-    process.env.KIMI_API_KEY
+-      ? { kimi: { models: ['kimi-k2.6'] } }
+-      : {},
++  getServerProviders: () => (process.env.KIMI_API_KEY ? { kimi: { models: ['kimi-k2.6'] } } : {}),
+   getServerWebSearchProviders: () => ({}),
+   getServerImageProviders: () => ({}),
+   getServerVideoProviders: () => ({}),
+@@ -118,12 +115,13 @@ describe('GET /api/health structured scene runtime policy', () => {
+     });
+     expect(body.runtimePolicy.studentChrome).toEqual({
+       enforced: true,
+-      policyVersion: 'mira-student-chrome.v5',
++      policyVersion: 'mira-student-chrome.v6',
+       marker: 'mira=1',
+       locale: 'zh-CN',
+       theme: 'light',
+       autoPlayDefault: true,
+       autoPlayPersistence: 'student-session',
++      audioStartPersistence: 'classroom-tab-session',
+       manualAutoPlayToggleEnabled: true,
+       asrEnabled: true,
+       asrPersistence: 'student-session',
+@@ -203,8 +201,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+   });
+ 
+   it('reports formal generation readiness without sample TTS or ASR readiness', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY =
+-      'kimi-k2.6-thinking-disabled-v1';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
+     delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS;
+     delete process.env.MIRA_OPENMAIC_QWEN_TTS_MODEL;
+     delete process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE;
+@@ -247,8 +244,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+   });
+ 
+   it('fails formal generation readiness when the OpenMAIC Qwen credential is absent', async () => {
+-    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY =
+-      'kimi-k2.6-thinking-disabled-v1';
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'kimi-k2.6-thinking-disabled-v1';
+     delete process.env.MIRA_TEST_QWEN_API_KEY;
+     const { NextRequest } = await import('next/server');
+     const { GET } = await import('@/app/api/health/route');
+-- 
+2.50.1 (Apple Git-155)
+

@@ -10,9 +10,22 @@ from models.setup import SETUP_DONE
 from repositories.device_repository import DeviceRepository
 from repositories.setup_repository import SetupRepository
 from schemas.auth import normalize_phone
+from schemas.education import (
+    child_education_payload,
+    education_stage_code,
+    education_stage_label,
+    grade_definition_from_row,
+    grade_storage_fields,
+    resolve_grade_definition,
+    validate_school_year_start_year,
+)
+from schemas.profile import child_profile_payload
 from schemas.setup import setup_payload
 from services.auth_service import AuthService
 from services.conversation_sync_service import ConversationSyncService
+from services.learning_curriculum_preparation_service import (
+    LearningCurriculumPreparationService,
+)
 from services.wake_name_validator import validate_wake_name
 
 
@@ -54,9 +67,11 @@ class SetupService:
         database_url: str | Path,
         *,
         auth_service: AuthService,
+        preparation_service: LearningCurriculumPreparationService,
         camera_command_service_factory=None,
     ):
         self.auth_service = auth_service
+        self.preparation_service = preparation_service
         self.camera_command_service_factory = camera_command_service_factory
         database = Database(database_url)
         self.database_url = database.database_url
@@ -254,64 +269,191 @@ class SetupService:
 
     def save_child(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
-        name = self._required_text(data, "name", "请输入孩子姓名")
-        nickname = self._optional_text(data, "nickname")
-        gender = self._gender(self._optional_text(data, "gender"))
-        age_stage = self._optional_text(data, "ageStage")
-        education_stage = self._optional_text(data, "educationStage")
-        grade = self._optional_text(data, "grade")
-        birthday = self._optional_text(data, "birthday")
-        sleep_time = self._time_of_day(self._optional_text(data, "sleepTime"))
-        now = now_ms()
+        self._validate_present_grade_values(data)
+        grade_definition = resolve_grade_definition(
+            grade_code=data.get("gradeCode"),
+            legacy_grade=data.get("grade"),
+            education_stage=data.get("educationStage"),
+            age_stage=data.get("ageStage"),
+        )
+        grade_was_submitted = any(
+            key in data and self._optional_text(data, key)
+            for key in ("gradeCode", "grade")
+        ) or (
+            "ageStage" in data
+            and resolve_grade_definition(age_stage=data.get("ageStage")) is not None
+        )
+        school_year_start_year = None
+        if grade_definition is not None and grade_was_submitted:
+            school_year_start_year = validate_school_year_start_year(
+                data.get("schoolYearStartYear"),
+                required="gradeCode" in data,
+                fallback_to_current_year="gradeCode" not in data,
+            )
+        elif "schoolYearStartYear" in data:
+            raise ApiError("missing_grade_code", "请先选择年级")
+
         with self.repository.transaction() as conn:
-            progress = self.repository.get_or_create_progress(conn, family_id=context["family"]["id"], now=now)
+            family_id = context["family"]["id"]
+            self.repository.lock_family(conn, family_id=family_id)
+            now = now_ms()
+            progress = self.repository.get_or_create_progress(conn, family_id=family_id, now=now)
             self._require_setup_steps(progress, "parent_identity")
+            current = self.repository.current_child(
+                conn,
+                family_id=family_id,
+                for_update=True,
+            )
+            current_grade = grade_definition_from_row(current)
+            if grade_definition is None and current_grade is not None:
+                self._validate_stage_against_grade(data, current_grade.education_stage_code)
+
+            if current is None and grade_definition is None and not self._optional_text(data, "name"):
+                raise ApiError("missing_grade_code", "请先选择年级")
+
+            # The lightweight grade-based setup is one atomic identity step.
+            # Do not silently publish a grade-only child as “小朋友”: camera
+            # speech and learning reports need a real parent-confirmed name.
+            if "gradeCode" in data:
+                submitted_name = self._optional_text(data, "name")
+                submitted_nickname = self._optional_text(data, "nickname")
+                if not submitted_name:
+                    raise ApiError("missing_name", "请输入孩子称呼")
+                if not submitted_nickname:
+                    raise ApiError("missing_nickname", "请输入孩子称呼")
+
+            name = (
+                self._optional_text(data, "name")
+                if "name" in data
+                else self._row_text(current, "name")
+            )
+            if not name:
+                raise ApiError("missing_name", "请输入孩子姓名")
+            nickname = (
+                self._optional_text(data, "nickname")
+                if "nickname" in data
+                else self._row_text(current, "nickname")
+            )
+            gender = (
+                self._gender(self._optional_text(data, "gender"))
+                if "gender" in data
+                else self._row_text(current, "gender") or "unspecified"
+            )
+            birthday = (
+                self._optional_text(data, "birthday")
+                if "birthday" in data
+                else self._row_text(current, "birthday")
+            )
+            sleep_time = (
+                self._time_of_day(self._optional_text(data, "sleepTime"))
+                if "sleepTime" in data
+                else self._row_text(current, "sleep_time")
+            )
+            age_stage = self._row_text(current, "age_stage")
+            education_stage = self._row_text(current, "education_stage")
+            grade = self._row_text(current, "grade")
+            grade_code = self._row_text(current, "grade_code")
+            stored_school_year = self._row_int(current, "grade_school_year_start")
+            grade_confirmed_at = self._row_int(current, "grade_confirmed_at")
+
+            if grade_definition is not None and grade_was_submitted:
+                grade_fields = grade_storage_fields(
+                    grade_definition,
+                    school_year_start_year=school_year_start_year,
+                    confirmed_at=now,
+                )
+                age_stage = grade_fields["age_stage"]
+                education_stage = grade_fields["education_stage"]
+                grade = grade_fields["grade"]
+                grade_code = grade_fields["grade_code"]
+                stored_school_year = grade_fields["grade_school_year_start"]
+                grade_confirmed_at = grade_fields["grade_confirmed_at"]
+            elif current is None:
+                age_stage = self._optional_text(data, "ageStage")
+                stage_value = self._optional_text(data, "educationStage")
+                education_stage = education_stage_label(stage_value) if stage_value else None
+
+            grade_selection_revision = (
+                self.preparation_service.next_grade_selection_revision(
+                    current,
+                    grade_code=grade_code,
+                    school_year_start_year=stored_school_year,
+                )
+            )
+            previous_selection = (
+                self._row_text(current, "grade_code") or "",
+                self._row_int(current, "grade_school_year_start") or 0,
+            )
+            saved_selection = (grade_code or "", stored_school_year or 0)
+            should_reserve_preparation = (
+                grade_was_submitted
+                or "schoolYearStartYear" in data
+                or previous_selection != saved_selection
+            )
+
             child_id = self.repository.save_child(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 name=name,
                 nickname=nickname,
                 gender=gender,
                 age_stage=age_stage,
                 education_stage=education_stage,
                 grade=grade,
+                grade_code=grade_code,
+                grade_school_year_start=stored_school_year,
+                grade_confirmed_at=grade_confirmed_at,
+                grade_selection_revision=grade_selection_revision,
                 birthday=birthday,
                 sleep_time=sleep_time,
                 now=now,
             )
             self.repository.mark_step_done(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 column="child_profile_status",
                 now=now,
             )
             progress = self.repository.get_or_create_progress(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 now=now,
             )
             progress = self._complete_lightweight_setup_if_ready(
                 conn,
-                family_id=context["family"]["id"],
+                family_id=family_id,
                 progress=progress,
                 now=now,
             )
-            return self._response(
-                progress,
-                {
-                    "child": {
-                        "id": child_id,
-                        "name": name,
-                        "nickname": nickname,
-                        "gender": gender,
-                        "birthday": birthday,
-                        "sleepTime": sleep_time,
-                        "ageStage": age_stage,
-                        "educationStage": education_stage,
-                        "grade": grade,
-                    }
-                },
+            saved_child = self.repository.current_child(
+                conn,
+                family_id=family_id,
+                for_update=True,
             )
+            preparation = (
+                self.preparation_service.reserve_for_saved_child(
+                    conn,
+                    family_id=family_id,
+                    child=saved_child,
+                    now=now,
+                )
+                if should_reserve_preparation
+                else None
+            )
+            details = {"child": child_profile_payload(saved_child)}
+            if preparation is not None:
+                details["learningPreparation"] = preparation
+            availability = self.preparation_service.availability_payload(
+                saved_child.get("grade_code"),
+                preparation,
+            )
+            if should_reserve_preparation and availability is not None:
+                details["learningPreparationAvailability"] = availability
+            response = self._response(progress, details)
+        ConversationSyncService(self.database_url).sync_family_conversation(
+            family_id=family_id,
+        )
+        return response
 
     def save_camera_name(self, access_token: str, data: dict) -> dict:
         context = self._auth_context(access_token)
@@ -555,7 +697,7 @@ class SetupService:
         return payload
 
     def _complete_lightweight_setup_if_ready(self, conn, *, family_id: str, progress, now: int):
-        """V1 kindergarten setup only blocks on parent identity and child basics.
+        """V1 setup only blocks on parent identity and the minimum child profile.
 
         Camera connection, Wi-Fi details, camera wake name, emergency contacts,
         and family role fine-tuning remain available after entering the app, but
@@ -653,11 +795,9 @@ class SetupService:
                 "name": child["name"],
                 "nickname": child["nickname"] or "",
                 "gender": child.get("gender") or "unspecified",
-                "ageStage": child["age_stage"] or "",
-                "educationStage": child.get("education_stage") or "",
-                "grade": child.get("grade") or "",
                 "birthday": child["birthday"] or "",
                 "sleepTime": child.get("sleep_time") or "",
+                **child_education_payload(child),
             },
             "cameraName": None
             if device is None
@@ -676,6 +816,40 @@ class SetupService:
             return None
         value = str(value).strip()
         return value or None
+
+    def _validate_present_grade_values(self, data: dict) -> None:
+        if "gradeCode" in data and not self._optional_text(data, "gradeCode"):
+            raise ApiError("invalid_grade_code", "请选择有效的年级")
+
+    def _validate_stage_against_grade(self, data: dict, expected_stage: str) -> None:
+        stage = self._optional_text(data, "educationStage")
+        if stage and education_stage_code(stage) != expected_stage:
+            raise ApiError("grade_stage_conflict", "年级与学段不一致，请重新选择")
+        age_stage = self._optional_text(data, "ageStage")
+        if age_stage:
+            normalized = education_stage_code(age_stage, strict=False)
+            if normalized and normalized != expected_stage:
+                raise ApiError("grade_stage_conflict", "年级与学段不一致，请重新选择")
+
+    def _row_text(self, row, key: str) -> str | None:
+        if row is None:
+            return None
+        value = row.get(key)
+        if value is None:
+            return None
+        normalized = str(value).strip()
+        return normalized or None
+
+    def _row_int(self, row, key: str) -> int | None:
+        if row is None:
+            return None
+        value = row.get(key)
+        if value is None or value == "":
+            return None
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
 
     def _gender(self, value: str | None) -> str:
         normalized = value or "unspecified"

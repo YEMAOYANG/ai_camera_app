@@ -1,0 +1,1638 @@
+diff --git a/Dockerfile b/Dockerfile
+index c326ae6..96915a7 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -51,6 +51,8 @@ FROM base AS builder
+ ARG ALLOWED_FRAME_ANCESTORS
+ ARG NEXT_PUBLIC_PERSISTENCE
+ ARG NEXT_PUBLIC_PERSISTENCE_TOKEN
++ARG NEXT_PUBLIC_PRO_WORKBENCH_ENABLED
++ARG NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED
+ ARG NEXT_PUBLIC_MAIC_EDITOR_ENABLED
+ ARG NEXT_PUBLIC_MAIC_EDITOR_RENDERER_ENABLED
+ ARG NEXT_PUBLIC_MAIC_PLAYBACK_RENDERER_ENABLED
+@@ -62,6 +64,8 @@ ARG NEXT_PUBLIC_ENABLE_PPTX_IMPORT
+ ENV ALLOWED_FRAME_ANCESTORS=$ALLOWED_FRAME_ANCESTORS
+ ENV NEXT_PUBLIC_PERSISTENCE=$NEXT_PUBLIC_PERSISTENCE
+ ENV NEXT_PUBLIC_PERSISTENCE_TOKEN=$NEXT_PUBLIC_PERSISTENCE_TOKEN
++ENV NEXT_PUBLIC_PRO_WORKBENCH_ENABLED=$NEXT_PUBLIC_PRO_WORKBENCH_ENABLED
++ENV NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED=$NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED
+ ENV NEXT_PUBLIC_MAIC_EDITOR_ENABLED=$NEXT_PUBLIC_MAIC_EDITOR_ENABLED
+ ENV NEXT_PUBLIC_MAIC_EDITOR_RENDERER_ENABLED=$NEXT_PUBLIC_MAIC_EDITOR_RENDERER_ENABLED
+ ENV NEXT_PUBLIC_MAIC_PLAYBACK_RENDERER_ENABLED=$NEXT_PUBLIC_MAIC_PLAYBACK_RENDERER_ENABLED
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index 088c469..eb37d70 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -18,6 +18,7 @@ import { getMiraSampleTtsCredentialRecoveryRuntimePolicy } from '@/lib/server/mi
+ import { getMiraFormalCitationRecoveryRuntimePolicy } from '@/lib/server/mira-formal-citation-recovery';
+ import { getMiraStudentChromeRuntimePolicy } from '@/lib/mira/student-runtime';
+ import { getMiraFormalGenerationRuntimePolicy } from '@/lib/server/mira-formal-generation-policy';
++import { assertMiraFormalImageProviderReady } from '@/lib/server/mira-formal-media';
+ import { getMiraInstrumentationBoundaryPolicy } from '@/lib/server/mira-instrumentation-policy';
+ import {
+   assertMiraFormalAudioProviderReady,
+@@ -94,6 +95,7 @@ export async function GET(req: NextRequest) {
+       const sessionStore = await getAgentSessionStore();
+       await sessionStore.getSession('mira-formal-health-probe');
+       assertMiraFormalAudioProviderReady();
++      assertMiraFormalImageProviderReady();
+       return apiSuccess({
+         status: 'ok',
+         version,
+@@ -102,6 +104,7 @@ export async function GET(req: NextRequest) {
+           professionalAgent: true,
+           webSearch: true,
+           speechAudioGeneration: true,
++          imageGeneration: true,
+         },
+         runtimePolicy: {
+           formalGeneration: formalGenerationPolicy,
+diff --git a/app/layout.tsx b/app/layout.tsx
+index 4aa25c2..a7460a5 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -1,4 +1,10 @@
+ import type { Metadata } from 'next';
++import { headers } from 'next/headers';
++import { isAgentRuntimeConfigured, isProWorkbenchEnabled } from '@/lib/config/feature-flags';
++import {
++  MIRA_DOCUMENT_SCOPE_HEADER,
++  miraDocumentStorageMode,
++} from '@/lib/persistence/mira-document-scope';
+ import { GeistSans } from 'geist/font/sans';
+ import { GeistMono } from 'geist/font/mono';
+ import './globals.css';
+@@ -38,13 +44,21 @@ export const metadata: Metadata = {
+   },
+ };
+ 
+-export default function RootLayout({
++export default async function RootLayout({
+   children,
+ }: Readonly<{
+   children: React.ReactNode;
+ }>) {
++  const requestHeaders = await headers();
++  const documentStorage = miraDocumentStorageMode({
++    scope: requestHeaders.get(MIRA_DOCUMENT_SCOPE_HEADER),
++    workbenchEnabled: isProWorkbenchEnabled(),
++    documentsEnabled: process.env.NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED === 'true',
++    runtimeConfigured: isAgentRuntimeConfigured(),
++    persistenceConfigured: Boolean(process.env.PERSISTENCE_DEV_TOKEN),
++  });
+   return (
+-    <html lang="en" suppressHydrationWarning>
++    <html lang="en" data-mira-document-storage={documentStorage} suppressHydrationWarning>
+       <body
+         className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
+         suppressHydrationWarning
+diff --git a/lib/persistence/bootstrap.ts b/lib/persistence/bootstrap.ts
+index 4e31c54..6931e64 100644
+--- a/lib/persistence/bootstrap.ts
++++ b/lib/persistence/bootstrap.ts
+@@ -16,6 +16,20 @@ export function isBrowserPersistenceEnabled(): boolean {
+   return typeof window !== 'undefined' && process.env.NEXT_PUBLIC_PERSISTENCE === '1';
+ }
+ 
++// The server-rendered root selects the document backend before any store is
++// resolved. Missing markup (including SSR) defaults to browser storage. This
++// private authoring path never enables the learner RuntimeStore or exports a
++// persistence token; document routes already resolve the workbench owner cookie.
++const miraWorkbenchDocuments =
++  typeof window !== 'undefined' &&
++  typeof document !== 'undefined' &&
++  process.env.NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED === 'true' &&
++  document.documentElement.getAttribute('data-mira-document-storage') === 'server';
++
++export function isBrowserDocumentPersistenceEnabled(): boolean {
++  return isBrowserPersistenceEnabled() || miraWorkbenchDocuments;
++}
++
+ export function getPersistenceLearnerKey(): Promise<string> {
+   if (!isBrowserPersistenceEnabled()) {
+     return Promise.reject(new Error('Browser persistence is not enabled'));
+@@ -72,4 +86,11 @@ if (isBrowserPersistenceEnabled()) {
+       error,
+     );
+   }
++} else if (miraWorkbenchDocuments) {
++  // Only the document seam changes. Mira students keep their existing local
++  // playback/quiz/whiteboard state and trusted gateway event transport.
++  configureDocumentStorage({
++    store: ({ validateScene, validateStage }) =>
++      new HttpDocumentStore({ baseUrl: '/api/persistence', validateScene, validateStage }),
++  });
+ }
+diff --git a/lib/persistence/mira-document-scope.ts b/lib/persistence/mira-document-scope.ts
+new file mode 100644
+index 0000000..7b8588b
+--- /dev/null
++++ b/lib/persistence/mira-document-scope.ts
+@@ -0,0 +1,32 @@
++/** Internal request marker; middleware overwrites caller-supplied values. */
++export const MIRA_DOCUMENT_SCOPE_HEADER = 'x-mira-document-scope';
++
++export function miraDocumentRequestScope(input: {
++  pathname: string;
++  search: string;
++  runtimeSession: string | null;
++}): 'student' | 'operator' {
++  // The student gateway supplies its verified runtime session on every request.
++  // A direct student preview also stays on the browser store. Query parameters
++  // can only narrow this choice; they never grant document mutation authority.
++  return input.runtimeSession ||
++    (input.pathname.startsWith('/classroom/') && new URLSearchParams(input.search).has('mira'))
++    ? 'student'
++    : 'operator';
++}
++
++export function miraDocumentStorageMode(input: {
++  scope: string | null;
++  workbenchEnabled: boolean;
++  documentsEnabled: boolean;
++  runtimeConfigured: boolean;
++  persistenceConfigured: boolean;
++}): 'server' | 'browser' {
++  return input.scope === 'operator' &&
++    input.workbenchEnabled &&
++    input.documentsEnabled &&
++    input.runtimeConfigured &&
++    input.persistenceConfigured
++    ? 'server'
++    : 'browser';
++}
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+index b5a1848..74a6bc5 100644
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -24,11 +24,14 @@ import { parseElementRefs, type ElementRef } from '@/lib/workbench/element-refs'
+ import type { Scene, SlideContent } from '@/lib/types/stage';
+ import {
+   isMiraFormalProfessionalSessionIdentity,
++  isMiraFormalImageSession,
++  filterMiraFormalMediaTools,
+   MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
+   MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION,
+   MIRA_PROFESSIONAL_RESEARCH_POLICY,
+   type MiraFormalResearchSearchTrace,
+ } from '@/lib/server/mira-professional-research-policy';
++import { MIRA_FORMAL_IMAGE_EVENT, withMiraFormalImageTrace } from '@/lib/server/mira-formal-media';
+ 
+ import { resolveAgentDriverModel } from './agent-driver-model';
+ import { buildAskUserTool } from './ask-user';
+@@ -1458,14 +1461,20 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+     // owner-gated by `withOwnerStageAuthorization`, and patch_stage is marked
+     // sequential by the shared STAGE_WRITER_TOOL_NAMES registry
+     // (course-tools.ts).
+-    const dslTools = buildDslCourseToolset({
++    const formalMediaSession = {
++      ownerId: meta.ownerId, sessionId: id, skillId: meta.skillId, origin: meta.origin,
++    };
++    const dslTools = filterMiraFormalMediaTools(buildDslCourseToolset({
+       store: ownerScopedStore,
+       stageAccess,
+       onCheckpoint: (info) => emit(LIFECYCLE.checkpoint, info),
+       sessionId: id,
+       abortSignal: abort.signal,
+       getActiveSkill: () => activeSkill,
+-    });
++    }), formalMediaSession).map((tool) => isMiraFormalImageSession(formalMediaSession)
++      ? withMiraFormalImageTrace(tool, id, (trace) =>
++          appendRequiredRunEvent(MIRA_FORMAL_IMAGE_EVENT, trace, Date.now()))
++      : tool);
+     const curriculumTools = buildCurriculumTools({
+       store: ownerScopedStore,
+       ownerId: meta.ownerId,
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index e9b0745..9741de2 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -61,6 +61,7 @@ import {
+ } from '@/lib/server/mira-formal-generation-policy';
+ import { generateMiraFormalProfessionalClassroom } from '@/lib/server/mira-formal-professional-classroom';
+ import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
++import type { MiraFormalMediaReceipt } from '@/lib/server/mira-formal-media';
+ import type {
+   MiraFormalProfessionalCreationReceipt,
+   MiraFormalResearchReceipt,
+@@ -121,6 +122,7 @@ export interface GenerateClassroomResult {
+   formalAudio?: MiraFormalAudioLifecycleReceipt;
+   professionalCreation?: MiraFormalProfessionalCreationReceipt;
+   research?: MiraFormalResearchReceipt;
++  media?: MiraFormalMediaReceipt;
+ }
+ 
+ function createInMemoryStore(stage: Stage): StageStore {
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+index 9e8fe1a..a03aa28 100644
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -14,6 +14,7 @@ import {
+ } from '@/lib/server/classroom-storage';
+ import { assertMiraFormalGenerationInput } from '@/lib/server/mira-formal-generation-policy';
+ import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
++import type { MiraFormalMediaReceipt } from '@/lib/server/mira-formal-media';
+ import type {
+   MiraFormalProfessionalCreationReceipt,
+   MiraFormalResearchReceipt,
+@@ -53,6 +54,7 @@ export interface ClassroomGenerationJob {
+     formalAudio?: MiraFormalAudioLifecycleReceipt;
+     professionalCreation?: MiraFormalProfessionalCreationReceipt;
+     research?: MiraFormalResearchReceipt;
++    media?: MiraFormalMediaReceipt;
+   };
+   formalCitationRecovery?: {
+     originalStatus: 'failed';
+@@ -427,6 +429,7 @@ export async function markClassroomGenerationJobSucceeded(
+       ...(result.formalAudio ? { formalAudio: result.formalAudio } : {}),
+       ...(result.professionalCreation ? { professionalCreation: result.professionalCreation } : {}),
+       ...(result.research ? { research: result.research } : {}),
++      ...(result.media ? { media: result.media } : {}),
+     },
+   });
+ }
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+index 8e95105..28bbd64 100644
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -16,7 +16,8 @@ export const MIRA_COURSEWARE_AUTHORITY = {
+   backendProviderCredentialsAccepted: false,
+ } as const;
+ 
+-export const MIRA_PROFESSIONAL_CREATION_POLICY = {
++// Persisted v4 jobs keep this exact object and their original input hash.
++export const MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY = {
+   schemaVersion: 'mira.openmaic.professional-creation.v1',
+   mode: 'professional_skill',
+   workflowVersion: 'openmaic-pro-agent.v1',
+@@ -34,6 +35,26 @@ export const MIRA_PROFESSIONAL_CREATION_POLICY = {
+   studentToolsEnabled: false,
+ } as const;
+ 
++export const MIRA_FORMAL_IMAGE_POLICY = {
++  schemaVersion: 'mira.openmaic.formal-image-policy.v1',
++  policyId: 'mira-formal-qwen-image.v1',
++  enabled: true,
++  providerManaged: true,
++  providerId: 'qwen-image',
++  modelId: 'qwen-image-max',
++  usage: 'teaching_need',
++  assetValidationRequired: true,
++} as const;
++
++export const MIRA_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++  image: MIRA_FORMAL_IMAGE_POLICY,
++} as const;
++
++export type MiraProfessionalCreationPolicy =
++  | typeof MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_PROFESSIONAL_CREATION_POLICY;
++
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+   scenePlanning: {
+@@ -117,6 +138,13 @@ export function isExactMiraCoursewareAuthority(value: unknown): boolean {
+ }
+ 
+ export function isExactMiraProfessionalCreationPolicy(value: unknown): boolean {
++  return isMiraImageCreationPolicy(value) || (
++    JSON.stringify(canonical(value)) ===
++    JSON.stringify(canonical(MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY))
++  );
++}
++
++export function isMiraImageCreationPolicy(value: unknown): boolean {
+   return (
+     JSON.stringify(canonical(value)) ===
+     JSON.stringify(canonical(MIRA_PROFESSIONAL_CREATION_POLICY))
+@@ -129,7 +157,7 @@ export function assertMiraFormalGenerationInput(
+   runtimeRequestId: string;
+   formalRuntimeContract: typeof MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT;
+   coursewareAuthority: typeof MIRA_COURSEWARE_AUTHORITY;
+-  professionalCreationPolicy: typeof MIRA_PROFESSIONAL_CREATION_POLICY;
++  professionalCreationPolicy: MiraProfessionalCreationPolicy;
+ } {
+   if (!REQUEST_ID.test(input.runtimeRequestId || '')) {
+     throw new Error('FORMAL_RUNTIME_REQUEST_ID_INVALID');
+@@ -147,7 +175,7 @@ export function assertMiraFormalGenerationInput(
+     !input.requirement.trim() ||
+     input.pdfContent !== undefined ||
+     input.enableWebSearch !== true ||
+-    input.enableImageGeneration !== false ||
++    input.enableImageGeneration !== isMiraImageCreationPolicy(input.professionalCreationPolicy) ||
+     input.enableVideoGeneration !== false ||
+     input.enableTTS !== false ||
+     input.agentMode !== 'generate' ||
+diff --git a/lib/server/mira-formal-media.ts b/lib/server/mira-formal-media.ts
+new file mode 100644
+index 0000000..525dad8
+--- /dev/null
++++ b/lib/server/mira-formal-media.ts
+@@ -0,0 +1,281 @@
++import { createHash } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import sharp from 'sharp';
++import { parse, type DefaultTreeAdapterTypes } from 'parse5';
++import parseSrcset from 'parse-srcset';
++import { enumerateAssetManifest } from '@openmaic/dsl';
++import type { AgentTool } from '@earendil-works/pi-agent-core';
++import type { Scene } from '@/lib/types/stage';
++import { CLASSROOMS_DIR } from '@/lib/server/classroom-storage';
++import { MAX_REMOTE_IMAGE_BYTES } from '@/lib/server/bounded-download';
++import { MIRA_FORMAL_IMAGE_POLICY } from '@/lib/server/mira-formal-generation-policy';
++import {
++  getServerImageProviders,
++  isServerProviderDisabled,
++  resolveImageApiKey,
++  resolveImageBaseUrl,
++  resolveImageModel,
++} from '@/lib/server/provider-config';
++
++export const MIRA_FORMAL_IMAGE_EVENT = 'mira_formal_image_generated';
++
++export interface MiraFormalImageTrace {
++  schemaVersion: 'mira.openmaic.formal-image-trace.v1';
++  sessionId: string;
++  classroomId: string;
++  toolCallId: string;
++  src: string;
++  providerId: 'qwen-image';
++  modelId: 'qwen-image-max';
++}
++
++export interface MiraFormalMediaAsset {
++  src: string;
++  sha256: string;
++  mimeType: string;
++  byteSize: number;
++  width: number;
++  height: number;
++  sceneIds: string[];
++}
++
++export interface MiraFormalMediaReceipt {
++  schemaVersion: 'mira.openmaic.formal-media-receipt.v1';
++  status: 'succeeded';
++  runtimeRequestId: string;
++  buildItemId: string;
++  classroomId: string;
++  sessionId: string;
++  policyId: typeof MIRA_FORMAL_IMAGE_POLICY.policyId;
++  providerId: typeof MIRA_FORMAL_IMAGE_POLICY.providerId;
++  modelId: typeof MIRA_FORMAL_IMAGE_POLICY.modelId;
++  imageCount: number;
++  assets: MiraFormalMediaAsset[];
++  receiptSha256: string;
++}
++
++/** Configuration-only check: never invokes a paid provider from health or resume. */
++export function assertMiraFormalImageProviderReady(): void {
++  const policy = MIRA_FORMAL_IMAGE_POLICY;
++  const configured = getServerImageProviders()[policy.providerId];
++  if (
++    !configured ||
++    configured.disabled ||
++    isServerProviderDisabled('image', policy.providerId) ||
++    process.env.DEFAULT_IMAGE_PROVIDER !== policy.providerId ||
++    resolveImageModel(policy.providerId) !== policy.modelId ||
++    !resolveImageApiKey(policy.providerId).trim()
++  ) {
++    throw new Error('FORMAL_IMAGE_PROVIDER_NOT_READY');
++  }
++  const base = resolveImageBaseUrl(policy.providerId);
++  if (base !== 'https://dashscope.aliyuncs.com' && base !== 'https://dashscope.aliyuncs.com/') {
++    throw new Error('FORMAL_IMAGE_PROVIDER_ORIGIN_INVALID');
++  }
++}
++
++/** Keep a durable, same-session source for generated bytes before the model uses them. */
++export function withMiraFormalImageTrace(
++  tool: AgentTool<never, never>,
++  sessionId: string,
++  record: (trace: MiraFormalImageTrace) => Promise<void>,
++): AgentTool<never, never> {
++  if (tool.name !== 'generate_image') return tool;
++  return {
++    ...tool,
++    async execute(...args: Parameters<typeof tool.execute>) {
++      assertMiraFormalImageProviderReady();
++      const result = await tool.execute(...args);
++      const value = result as unknown as { isError?: boolean; details?: { src?: unknown } };
++      if (!value.isError) {
++        const params = args[1] as unknown as { stageId?: unknown };
++        const src = value.details?.src;
++        if (typeof src !== 'string' || typeof params.stageId !== 'string') {
++          throw new Error('FORMAL_IMAGE_TOOL_RESULT_INVALID');
++        }
++        await record({
++          schemaVersion: 'mira.openmaic.formal-image-trace.v1',
++          sessionId,
++          classroomId: params.stageId,
++          toolCallId: args[0],
++          src,
++          providerId: MIRA_FORMAL_IMAGE_POLICY.providerId,
++          modelId: MIRA_FORMAL_IMAGE_POLICY.modelId,
++        });
++      }
++      return result;
++    },
++  };
++}
++
++/** Official slide/background/whiteboard enumeration plus actual HTML image slots. */
++export function formalSceneImageReferences(scene: Scene): string[] {
++  const refs = new Set(
++    enumerateAssetManifest({ stage: {}, scenes: [scene] })
++      .entries.filter((entry) => ['image', 'background', 'poster'].includes(entry.kind))
++      .map((entry) => entry.ref),
++  );
++  const content = scene.content as unknown as { html?: unknown };
++  if (typeof content.html === 'string') {
++    // Parse markup without constructing a browser DOM: DOM emulators can pull
++    // native canvas into the production server bundle even for attribute reads.
++    const document = parse(content.html);
++    const styles: string[] = [];
++    const inlineStyles: string[] = [];
++    const visit = (node: DefaultTreeAdapterTypes.Node): void => {
++      if ('tagName' in node) {
++        const attrs = Object.fromEntries(
++          node.attrs.map((attr) => [
++            attr.prefix ? `${attr.prefix}:${attr.name}` : attr.name,
++            attr.value,
++          ]),
++        );
++        if (node.tagName === 'img' || node.tagName === 'image') {
++          const src = attrs.src || attrs.href || attrs['xlink:href'];
++          if (src) refs.add(src);
++        }
++        if ((node.tagName === 'img' || node.tagName === 'source') && attrs.srcset) {
++          for (const candidate of parseSrcset(attrs.srcset)) refs.add(candidate.url);
++        }
++        if (node.tagName === 'style') {
++          styles.push(
++            node.childNodes.map((child) => ('value' in child ? child.value : '')).join(''),
++          );
++        }
++        if (attrs.style) inlineStyles.push(attrs.style);
++        if (node.tagName === 'template' && 'content' in node) visit(node.content);
++      }
++      if ('childNodes' in node) {
++        for (const child of node.childNodes) visit(child);
++      }
++    };
++    visit(document);
++    for (const css of [...styles, ...inlineStyles]) {
++      for (const match of css.matchAll(/url\(\s*['"]?([^'"\s)]+)['"]?\s*\)/giu)) {
++        if (!match[1]!.startsWith('#')) refs.add(match[1]!);
++      }
++    }
++  }
++  return [...refs];
++}
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value)
++        .sort(([a], [b]) => a.localeCompare(b))
++        .map(([key, item]) => [key, canonical(item)]),
++    );
++  }
++  return value;
++}
++
++function fail(code: string): never {
++  throw new Error(`FORMAL_IMAGE_${code}`);
++}
++
++export async function buildMiraFormalMediaReceipt(
++  input: {
++    runtimeRequestId: string;
++    buildItemId: string;
++    classroomId: string;
++    sessionId: string;
++    scenes: Scene[];
++    traces: unknown[];
++  },
++  options: { classroomsDir?: string } = {},
++): Promise<MiraFormalMediaReceipt> {
++  const refs = new Map<string, string[]>();
++  for (const scene of input.scenes) {
++    if (scene.stageId !== input.classroomId) fail('SCENE_STAGE_MISMATCH');
++    for (const src of formalSceneImageReferences(scene)) {
++      const ids = refs.get(src) ?? [];
++      if (!ids.includes(scene.id)) ids.push(scene.id);
++      refs.set(src, ids);
++    }
++  }
++  if (refs.size > 120 || input.traces.length > 240) fail('ASSET_LIMIT');
++  const traced = new Set<string>();
++  for (const raw of input.traces) {
++    const trace = raw as Partial<MiraFormalImageTrace> | null;
++    if (
++      !trace ||
++      trace.schemaVersion !== 'mira.openmaic.formal-image-trace.v1' ||
++      trace.sessionId !== input.sessionId ||
++      trace.classroomId !== input.classroomId ||
++      trace.providerId !== MIRA_FORMAL_IMAGE_POLICY.providerId ||
++      trace.modelId !== MIRA_FORMAL_IMAGE_POLICY.modelId ||
++      typeof trace.toolCallId !== 'string' ||
++      !trace.toolCallId ||
++      typeof trace.src !== 'string'
++    )
++      fail('TRACE_INVALID');
++    if (!refs.has(trace.src)) fail('GENERATED_ASSET_UNREFERENCED');
++    traced.add(trace.src);
++  }
++  const assets: MiraFormalMediaAsset[] = [];
++  const root = path.resolve(options.classroomsDir ?? CLASSROOMS_DIR, input.classroomId, 'media');
++  for (const [src, sceneIds] of [...refs].sort(([a], [b]) => a.localeCompare(b))) {
++    const prefix = `/api/classroom-media/${input.classroomId}/media/`;
++    if (!src.startsWith(prefix)) fail('SOURCE_NOT_OWNED');
++    const filename = src.slice(prefix.length);
++    const match = /^generated-([a-f0-9]{64})\.(png|jpg|webp|gif)$/u.exec(filename);
++    if (!match || !traced.has(src)) fail('SOURCE_UNATTESTED');
++    const file = path.join(root, filename);
++    let bytes: Buffer;
++    try {
++      const real = await fs.realpath(file);
++      if (real !== file) fail('SOURCE_NOT_OWNED');
++      const stat = await fs.stat(real);
++      if (!stat.isFile() || stat.size < 1 || stat.size > MAX_REMOTE_IMAGE_BYTES)
++        fail('BYTES_INVALID');
++      bytes = await fs.readFile(real);
++    } catch (error) {
++      if (error instanceof Error && error.message.startsWith('FORMAL_IMAGE_')) throw error;
++      fail('FILE_MISSING');
++    }
++    const sha256 = createHash('sha256').update(bytes).digest('hex');
++    if (sha256 !== match[1]) fail('HASH_MISMATCH');
++    let metadata: Awaited<ReturnType<ReturnType<typeof sharp>['metadata']>>;
++    try {
++      metadata = await sharp(bytes, { limitInputPixels: 40_000_000 }).metadata();
++    } catch {
++      fail('BYTES_INVALID');
++    }
++    const mime = { png: 'image/png', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };
++    const mimeType = mime[metadata.format as keyof typeof mime];
++    const expectedFormat = match[2] === 'jpg' ? 'jpeg' : match[2];
++    if (!mimeType || metadata.format !== expectedFormat || !metadata.width || !metadata.height)
++      fail('BYTES_INVALID');
++    assets.push({
++      src,
++      sha256,
++      mimeType,
++      byteSize: bytes.length,
++      width: metadata.width,
++      height: metadata.height,
++      sceneIds,
++    });
++  }
++  const withoutHash = {
++    schemaVersion: 'mira.openmaic.formal-media-receipt.v1' as const,
++    status: 'succeeded' as const,
++    runtimeRequestId: input.runtimeRequestId,
++    buildItemId: input.buildItemId,
++    classroomId: input.classroomId,
++    sessionId: input.sessionId,
++    policyId: MIRA_FORMAL_IMAGE_POLICY.policyId,
++    providerId: MIRA_FORMAL_IMAGE_POLICY.providerId,
++    modelId: MIRA_FORMAL_IMAGE_POLICY.modelId,
++    imageCount: assets.length,
++    assets,
++  };
++  return {
++    ...withoutHash,
++    receiptSha256: createHash('sha256')
++      .update(JSON.stringify(canonical(withoutHash)))
++      .digest('hex'),
++  };
++}
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+index c0cd3fd..20a103f 100644
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -22,12 +22,15 @@ import {
+ import {
+   MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+   MIRA_PROFESSIONAL_CREATION_POLICY,
++  MIRA_FORMAL_IMAGE_POLICY,
++  isMiraImageCreationPolicy,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import {
+   isMiraFormalProfessionalSessionIdentity,
+   MIRA_FORMAL_PROFESSIONAL_OWNER_ID_PREFIX,
+   MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID,
+   MIRA_FORMAL_PROFESSIONAL_SESSION_ID_PREFIX,
++  MIRA_FORMAL_IMAGE_SESSION_ORIGIN,
+   MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
+   MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION,
+   type MiraFormalResearchSearchTrace,
+@@ -40,6 +43,11 @@ import { getOwnerScopedDocumentStore } from '@/lib/server/agent-runtime/owner-sc
+ import { getAgentSessionStore } from '@/lib/server/agent-runtime/store';
+ import { resolveWebSearchCapability } from '@/lib/server/agent-runtime/web-search';
+ import type { QuizQuestion, Scene, Stage } from '@/lib/types/stage';
++import {
++  assertMiraFormalImageProviderReady,
++  buildMiraFormalMediaReceipt,
++  MIRA_FORMAL_IMAGE_EVENT,
++} from '@/lib/server/mira-formal-media';
+ 
+ const FORMAL_SESSION_TIMEOUT_MS = 60 * 60 * 1_000;
+ const FORMAL_SESSION_POLL_MS = 2_000;
+@@ -95,6 +103,8 @@ export interface MiraFormalProfessionalCreationReceipt {
+   userPromptRequired: false;
+   studentToolsEnabled: false;
+   webSearchEnabled: true;
++  imageGenerationEnabled?: true;
++  imagePolicyId?: typeof MIRA_FORMAL_IMAGE_POLICY.policyId;
+   receiptSha256: string;
+ }
+ 
+@@ -327,7 +337,7 @@ function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewar
+     answer: [],
+     points: 1,
+   }));
+-  return [
++  const originalPrompt = [
+     'MIRA SERVER-AUTHORED FORMAL PROFESSIONAL COURSEWARE JOB',
+     '',
+     'This is an unattended, server-approved job triggered after a parent saved the child grade.',
+@@ -382,6 +392,29 @@ function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewar
+     '',
+     'Before finishing, read the created stage back and repair it until every locked requirement is true.',
+   ].join('\n');
++  return withMiraFormalImageInstructions(originalPrompt, input.professionalCreationPolicy);
++}
++
++export function withMiraFormalImageInstructions(originalPrompt: string, creationPolicy: unknown): string {
++  // Never rewrite an old job's prompt: its exact bytes are durable authority.
++  if (!isMiraImageCreationPolicy(creationPolicy)) return originalPrompt;
++  return `${originalPrompt}\n\nFormal image policy (${MIRA_FORMAL_IMAGE_POLICY.policyId}):\n` +
++    'Qwen image generation is available when a concrete picture improves the teaching. ' +
++    'Do not generate decorative images or force an image into every lesson. ' +
++    'Use generate_image for the current stage only, obtain the real src first, then place it ' +
++    'in generate_scene.media or an image element via patch_stage. Every successfully generated ' +
++    'image must be used in the final scenes. Do not use external image URLs, inline image bytes, ' +
++    'invented src values, or images from another stage. Generated pictures support explanations ' +
++    'and contextual illustrations; they are not verified answer evidence. Render precise quantities, ' +
++    'text, formulas, geometric relationships, and answer evidence with verifiable slide elements ' +
++    'or HTML. Never use a generated image as the only basis for answering an assessment. ' +
++    'If an image you need fails to generate, ' +
++    'do not substitute a broken placeholder. Video generation is unavailable for this job.';
++}
++
++function professionalSessionOrigin(input: GenerateClassroomInput): string {
++  return isMiraImageCreationPolicy(input.professionalCreationPolicy)
++    ? MIRA_FORMAL_IMAGE_SESSION_ORIGIN : PROFESSIONAL_SESSION_ORIGIN;
+ }
+ 
+ async function createOrReuseProfessionalSession(
+@@ -395,6 +428,9 @@ async function createOrReuseProfessionalSession(
+   if (!resolveWebSearchCapability()) {
+     throw new Error('FORMAL_PROFESSIONAL_WEB_SEARCH_NOT_CONFIGURED');
+   }
++  if (isMiraImageCreationPolicy(input.professionalCreationPolicy)) {
++    assertMiraFormalImageProviderReady();
++  }
+   const identity = professionalIdentity(input);
+   const prompt = professionalPrompt(input, spec);
+   const store = await getAgentSessionStore();
+@@ -407,7 +443,7 @@ async function createOrReuseProfessionalSession(
+         ownerId: identity.ownerId,
+         prompt,
+         skillId: MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID,
+-        origin: PROFESSIONAL_SESSION_ORIGIN,
++        origin: professionalSessionOrigin(input),
+         existingCourse: false,
+         status: 'queued',
+       });
+@@ -424,7 +460,7 @@ async function createOrReuseProfessionalSession(
+     }) ||
+     session.ownerId !== identity.ownerId ||
+     session.prompt !== prompt ||
+-    session.origin !== PROFESSIONAL_SESSION_ORIGIN ||
++    session.origin !== professionalSessionOrigin(input) ||
+     session.existingCourse
+   ) {
+     throw new Error('FORMAL_PROFESSIONAL_SESSION_CONFLICT');
+@@ -912,6 +948,10 @@ function buildProfessionalCreationReceipt(
+     userPromptRequired: false as const,
+     studentToolsEnabled: false as const,
+     webSearchEnabled: true as const,
++    ...(isMiraImageCreationPolicy(input.professionalCreationPolicy) ? {
++      imageGenerationEnabled: true as const,
++      imagePolicyId: MIRA_FORMAL_IMAGE_POLICY.policyId,
++    } : {}),
+   };
+   return { ...withoutHash, receiptSha256: canonicalSha256(withoutHash) };
+ }
+@@ -934,7 +974,7 @@ async function requireSucceededProfessionalSession(
+     }) ||
+     session.ownerId !== identity.ownerId ||
+     session.prompt !== expectedPrompt ||
+-    session.origin !== PROFESSIONAL_SESSION_ORIGIN ||
++    session.origin !== professionalSessionOrigin(input) ||
+     session.existingCourse
+   ) {
+     throw new Error('FORMAL_PROFESSIONAL_SUCCEEDED_SESSION_INVALID');
+@@ -1011,6 +1051,17 @@ async function completeMiraFormalProfessionalClassroom(
+     stage.id,
+     identity.sessionId,
+   );
++  const media = isMiraImageCreationPolicy(input.professionalCreationPolicy)
++    ? await buildMiraFormalMediaReceipt({
++        runtimeRequestId: spec.runtimeRequestId,
++        buildItemId: spec.buildItemId,
++        classroomId: stage.id,
++        sessionId: identity.sessionId,
++        scenes,
++        traces: events.filter((event) => event.type === MIRA_FORMAL_IMAGE_EVENT)
++          .map((event) => event.data),
++      })
++    : undefined;
+   await options.onProgress?.({
+     step: 'generating_tts',
+     progress: 50,
+@@ -1072,6 +1123,7 @@ async function completeMiraFormalProfessionalClassroom(
+       formalAudio,
+       professionalCreation,
+       research,
++      ...(media ? { media } : {}),
+     },
+     repair: {
+       sessionId: identity.sessionId,
+diff --git a/lib/server/mira-professional-research-policy.ts b/lib/server/mira-professional-research-policy.ts
+index 628cd22..c86617d 100644
+--- a/lib/server/mira-professional-research-policy.ts
++++ b/lib/server/mira-professional-research-policy.ts
+@@ -30,6 +30,9 @@ export function getMiraProfessionalResearchPolicy() {
+ export const MIRA_FORMAL_PROFESSIONAL_OWNER_ID_PREFIX = 'mira-formal-professional:';
+ export const MIRA_FORMAL_PROFESSIONAL_SESSION_ID_PREFIX = 'miraformal_';
+ export const MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID = 'mira-primary-courseware';
++// The persisted origin, rather than a global provider toggle or editable prompt,
++// distinguishes new image-capable jobs from historical formal jobs on resume.
++export const MIRA_FORMAL_IMAGE_SESSION_ORIGIN = 'mira-formal-professional-qwen-image-v1';
+ export const MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE = 'mira_formal_research_search';
+ export const MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION =
+   'mira.openmaic.research-search-trace.v1';
+@@ -58,6 +61,26 @@ export function isMiraFormalProfessionalSessionIdentity(input: {
+   );
+ }
+ 
++export function isMiraFormalImageSession(input: {
++  ownerId: string;
++  sessionId: string;
++  skillId?: string | null;
++  origin?: string | null;
++}): boolean {
++  return isMiraFormalProfessionalSessionIdentity(input) &&
++    input.origin === MIRA_FORMAL_IMAGE_SESSION_ORIGIN;
++}
++
++export function filterMiraFormalMediaTools<T extends { name: string }>(
++  tools: T[],
++  input: { ownerId: string; sessionId: string; skillId?: string | null; origin?: string | null },
++): T[] {
++  if (!isMiraFormalProfessionalSessionIdentity(input)) return tools;
++  const imagesEnabled = isMiraFormalImageSession(input);
++  return tools.filter((tool) =>
++    tool.name !== 'generate_video' && (tool.name !== 'generate_image' || imagesEnabled));
++}
++
+ export interface MiraFormalResearchSearchTrace {
+   kind: typeof MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE;
+   schemaVersion: typeof MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION;
+diff --git a/lib/utils/stage-storage.ts b/lib/utils/stage-storage.ts
+index 0d3bb42..b3796a2 100644
+--- a/lib/utils/stage-storage.ts
++++ b/lib/utils/stage-storage.ts
+@@ -41,7 +41,7 @@ import {
+   withRuntimeStorageSharedLock,
+ } from './chat-storage-lock';
+ import { DocumentVersionError, type DocumentSummary } from '@openmaic/storage';
+-import { isBrowserPersistenceEnabled } from '@/lib/persistence/bootstrap';
++import { isBrowserDocumentPersistenceEnabled } from '@/lib/persistence/bootstrap';
+ import { preparePBLScenesForDocumentPersistence } from '@/lib/pbl/v2/runtime/document-persistence';
+ import {
+   MISSING_ASSET_LEASE,
+@@ -768,7 +768,7 @@ async function listOwnerStagesFromServer(): Promise<StageListItem[]> {
+  */
+ export async function listStages(): Promise<StageListItem[]> {
+   try {
+-    if (isBrowserPersistenceEnabled()) {
++    if (isBrowserDocumentPersistenceEnabled()) {
+       // Server persistence is on: the generic document listing answers 403 by
+       // design, so the home/workspace library lists through the owner-scoped
+       // workbench surface instead.
+@@ -1170,7 +1170,7 @@ async function listOwnerFoldersFromServer(): Promise<FolderRecord[]> {
+  * List all folders, ordered by their `order` field (ascending).
+  */
+ export async function listFolders(): Promise<FolderRecord[]> {
+-  if (isBrowserPersistenceEnabled()) {
++  if (isBrowserDocumentPersistenceEnabled()) {
+     return await listOwnerFoldersFromServer();
+   }
+   const folders = await db.folders.toArray();
+@@ -1222,7 +1222,7 @@ async function createOwnerFolderFromServer(name: string): Promise<FolderRecord>
+  * the same store the workspace rail and this module's `listFolders` read.
+  */
+ export async function createFolder(name: string): Promise<FolderRecord> {
+-  if (isBrowserPersistenceEnabled()) {
++  if (isBrowserDocumentPersistenceEnabled()) {
+     return await createOwnerFolderFromServer(name);
+   }
+   const now = Date.now();
+@@ -1265,7 +1265,7 @@ async function renameOwnerFolderFromServer(id: string, name: string): Promise<vo
+  * With server persistence on, the rename goes through `PATCH /api/folders/:id`.
+  */
+ export async function renameFolder(id: string, name: string): Promise<void> {
+-  if (isBrowserPersistenceEnabled()) {
++  if (isBrowserDocumentPersistenceEnabled()) {
+     await renameOwnerFolderFromServer(id, name);
+     return;
+   }
+@@ -1314,7 +1314,7 @@ async function deleteOwnerFolderFromServer(id: string, mode: DeleteFolderMode):
+  * and the `remove` cascade deletes the returned member ids.
+  */
+ export async function deleteFolder(id: string, mode: DeleteFolderMode = 'ungroup'): Promise<void> {
+-  if (isBrowserPersistenceEnabled()) {
++  if (isBrowserDocumentPersistenceEnabled()) {
+     await deleteOwnerFolderFromServer(id, mode);
+     return;
+   }
+@@ -1363,7 +1363,7 @@ export async function setStageFolder(stageId: string, folderId: string | undefin
+   // (folderId undefined) always succeeds — it just removes the membership.
+   if (folderId !== undefined) {
+     await db.transaction('rw', [db.folders, db.stageFolders], async () => {
+-      if (!isBrowserPersistenceEnabled()) {
++      if (!isBrowserDocumentPersistenceEnabled()) {
+         const folder = await db.folders.get(folderId);
+         if (!folder) throw new Error(`Folder not found: ${folderId}`);
+       }
+diff --git a/middleware.ts b/middleware.ts
+index 1cf3340..d6b9143 100644
+--- a/middleware.ts
++++ b/middleware.ts
+@@ -1,6 +1,10 @@
+ import { NextRequest, NextResponse } from 'next/server';
+ 
+ import { isAgentRuntimeConfigured, isProWorkbenchEnabled } from '@/lib/config/feature-flags';
++import {
++  MIRA_DOCUMENT_SCOPE_HEADER,
++  miraDocumentRequestScope,
++} from '@/lib/persistence/mira-document-scope';
+ 
+ /** Convert string to Uint8Array */
+ function encode(str: string): Uint8Array {
+@@ -45,6 +49,16 @@ async function verifyToken(token: string, accessCode: string): Promise<boolean>
+ 
+ export async function middleware(request: NextRequest) {
+   const { pathname } = request.nextUrl;
++  const requestHeaders = new Headers(request.headers);
++  requestHeaders.set(
++    MIRA_DOCUMENT_SCOPE_HEADER,
++    miraDocumentRequestScope({
++      pathname,
++      search: request.nextUrl.search,
++      runtimeSession: request.headers.get('x-mira-runtime-session'),
++    }),
++  );
++  const next = () => NextResponse.next({ request: { headers: requestHeaders } });
+ 
+   // Return an actual server-side 404 when either half of the workbench is off.
+   // Edge middleware cannot reliably inspect server-only deployment variables,
+@@ -59,18 +73,18 @@ export async function middleware(request: NextRequest) {
+ 
+   const accessCode = process.env.ACCESS_CODE;
+   if (!accessCode) {
+-    return NextResponse.next();
++    return next();
+   }
+ 
+   // Whitelist: access-code endpoints, health check
+   if (pathname.startsWith('/api/access-code/') || pathname === '/api/health') {
+-    return NextResponse.next();
++    return next();
+   }
+ 
+   // Check cookie — validate HMAC signature, not just existence
+   const cookie = request.cookies.get('openmaic_access');
+   if (cookie?.value && (await verifyToken(cookie.value, accessCode))) {
+-    return NextResponse.next();
++    return next();
+   }
+ 
+   // API requests without valid cookie → 401
+@@ -82,7 +96,7 @@ export async function middleware(request: NextRequest) {
+   }
+ 
+   // Page requests → let through, frontend shows modal
+-  return NextResponse.next();
++  return next();
+ }
+ 
+ export const config = {
+diff --git a/next.config.ts b/next.config.ts
+index 925c95a..07dff00 100644
+--- a/next.config.ts
++++ b/next.config.ts
+@@ -37,7 +37,13 @@ const nextConfig: NextConfig = {
+     'pg',
+   ],
+   webpack(config, { nextRuntime, dev, isServer }) {
+-    if (dev && process.env.MIRA_OPENMAIC_LOW_DISK_DEV === '1') {
++    // Native production builds are explicit, infrequent rebuilds. Persisting
++    // several gigabytes of webpack cache can exhaust the host disk before the
++    // deployable output is written; the runtime does not need this cache.
++    if (
++      process.env.MIRA_OPENMAIC_NATIVE_BUILD === '1' ||
++      (dev && process.env.MIRA_OPENMAIC_LOW_DISK_DEV === '1')
++    ) {
+       config.cache = false;
+     }
+ 
+diff --git a/tests/persistence/bootstrap.test.ts b/tests/persistence/bootstrap.test.ts
+index 275492b..93aab52 100644
+--- a/tests/persistence/bootstrap.test.ts
++++ b/tests/persistence/bootstrap.test.ts
+@@ -80,6 +80,7 @@ describe('persistence client bootstrap', () => {
+ 
+   it('does not run client configuration during server module evaluation', async () => {
+     vi.stubEnv('NEXT_PUBLIC_PERSISTENCE', '1');
++    vi.stubEnv('NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED', 'true');
+ 
+     const runtime = await import('@/lib/runtime/store');
+     const documents = await import('@/lib/document-store');
+@@ -90,6 +91,38 @@ describe('persistence client bootstrap', () => {
+     expect(assets.isAssetPoolStorageConfigured()).toBe(false);
+   });
+ 
++  it('uses the server-selected operator document store without learner HTTP storage or tokens', async () => {
++    vi.stubEnv('NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED', 'true');
++    vi.stubGlobal('window', {});
++    vi.stubGlobal('document', { documentElement: { getAttribute: () => 'server' } });
++    const { HttpDocumentStore } = await import('@openmaic/storage');
++    const runtime = await import('@/lib/runtime/store');
++    const documents = await import('@/lib/document-store');
++    const bootstrap = await import('@/lib/persistence/bootstrap');
++
++    expect(documents.getDocumentStore()).toBeInstanceOf(HttpDocumentStore);
++    expect(bootstrap.isBrowserDocumentPersistenceEnabled()).toBe(true);
++    expect(bootstrap.isBrowserPersistenceEnabled()).toBe(false);
++    expect(runtime.isRuntimeStorageConfigured()).toBe(false);
++    expect(await bootstrap.getPersistenceRequestHeaders()).toEqual({});
++  });
++
++  it.each(['browser', null, ''])(
++    'keeps student/default markup %s on browser storage',
++    async (mode) => {
++      vi.stubEnv('NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED', 'true');
++      // Even on a URL that looks like the workbench, the server markup wins.
++      vi.stubGlobal('window', { location: { pathname: '/workspace', search: '' } });
++      vi.stubGlobal('document', { documentElement: { getAttribute: () => mode } });
++      const runtime = await import('@/lib/runtime/store');
++      const documents = await import('@/lib/document-store');
++      const bootstrap = await import('@/lib/persistence/bootstrap');
++      expect(documents.isDocumentStorageConfigured()).toBe(false);
++      expect(runtime.isRuntimeStorageConfigured()).toBe(false);
++      expect(bootstrap.isBrowserDocumentPersistenceEnabled()).toBe(false);
++    },
++  );
++
+   it('preflights both configured seams so a failure cannot partially configure bootstrap', async () => {
+     vi.stubEnv('NEXT_PUBLIC_PERSISTENCE', '1');
+     vi.stubGlobal('window', {});
+diff --git a/tests/persistence/mira-document-scope.test.ts b/tests/persistence/mira-document-scope.test.ts
+new file mode 100644
+index 0000000..519b47a
+--- /dev/null
++++ b/tests/persistence/mira-document-scope.test.ts
+@@ -0,0 +1,61 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { NextRequest } from 'next/server';
++import { middleware } from '@/middleware';
++import {
++  miraDocumentRequestScope,
++  miraDocumentStorageMode,
++} from '@/lib/persistence/mira-document-scope';
++
++describe('Mira authoring document scope', () => {
++  it.each([
++    ['/workspace', '', null, 'operator'],
++    ['/classroom/new-course', '', null, 'operator'],
++    ['/classroom/lesson', '?mira=1', null, 'student'],
++    ['/classroom/lesson', '?mira=1&mira=0', null, 'student'],
++    ['/classroom/lesson', '', 'verified-runtime-session', 'student'],
++    ['/workspace', '', 'verified-runtime-session', 'student'],
++  ])('selects %s%s with runtime %s as %s', (pathname, search, runtimeSession, expected) => {
++    expect(miraDocumentRequestScope({ pathname, search, runtimeSession })).toBe(expected);
++  });
++
++  const ready = {
++    scope: 'operator',
++    workbenchEnabled: true,
++    documentsEnabled: true,
++    runtimeConfigured: true,
++    persistenceConfigured: true,
++  };
++
++  it('allows only an explicitly configured operator document store', () => {
++    expect(miraDocumentStorageMode(ready)).toBe('server');
++    for (const scope of ['student', null, '']) {
++      expect(miraDocumentStorageMode({ ...ready, scope })).toBe('browser');
++    }
++    for (const field of [
++      'workbenchEnabled',
++      'documentsEnabled',
++      'runtimeConfigured',
++      'persistenceConfigured',
++    ]) {
++      expect(miraDocumentStorageMode({ ...ready, [field]: false })).toBe('browser');
++    }
++  });
++});
++
++describe('Mira server request scope propagation', () => {
++  afterEach(() => vi.unstubAllEnvs());
++
++  it.each([
++    ['/workspace', {}, 'operator'],
++    ['/classroom/lesson?mira=1', { 'x-mira-document-scope': 'operator' }, 'student'],
++    [
++      '/classroom/lesson',
++      { 'x-mira-runtime-session': 'verified-runtime-session', 'x-mira-document-scope': 'operator' },
++      'student',
++    ],
++  ])('marks %s from the request before server rendering', async (path, headers, expected) => {
++    vi.stubEnv('ACCESS_CODE', '');
++    const response = await middleware(new NextRequest(`http://localhost${path}`, { headers }));
++    expect(response.headers.get('x-middleware-request-x-mira-document-scope')).toBe(expected);
++  });
++});
+diff --git a/tests/persistence/route.test.ts b/tests/persistence/route.test.ts
+index c0cbd8a..1b87822 100644
+--- a/tests/persistence/route.test.ts
++++ b/tests/persistence/route.test.ts
+@@ -843,7 +843,7 @@ describe('embedded persistence route', () => {
+   };
+ 
+   const requestThroughRoute = async () => {
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     return handlePersistenceRequest(
+       new Request('http://localhost/api/persistence/runtime/sessions', {
+         headers: { authorization: 'Bearer test-token' },
+@@ -1185,7 +1185,7 @@ describe('embedded persistence route -- real handler boundary', () => {
+       put(principal: { key: string }, data: Blob, meta?: { contentType?: string }): Promise<string>;
+     }> = [];
+     wireRealHandler(stores);
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const deps = { poolFactory: () => ({ end: vi.fn().mockResolvedValue(undefined) }) as never };
+ 
+     // First request initializes the handler and the store.
+@@ -1226,7 +1226,7 @@ describe('embedded persistence route -- real handler boundary', () => {
+     wireRealHandler(stores, signed, `postgres://boundary-${name}`);
+     vi.stubEnv('ASSET_BYTE_EGRESS', 'redirect');
+     vi.stubEnv('ASSET_COLLECTION_GRACE_MS', graceMs);
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const deps = { poolFactory: () => ({ end: vi.fn().mockResolvedValue(undefined) }) as never };
+     const first = await handlePersistenceRequest(authed('/runtime/sessions'), deps);
+     expect(first.status).not.toBe(500);
+diff --git a/tests/persistence/stage-access-fidelity.test.ts b/tests/persistence/stage-access-fidelity.test.ts
+index 58c866e..fdd46e8 100644
+--- a/tests/persistence/stage-access-fidelity.test.ts
++++ b/tests/persistence/stage-access-fidelity.test.ts
+@@ -85,7 +85,7 @@ describe('reference-fidelity stage access', () => {
+     const stageId = 'stage-agent-browser-regression';
+     await ownerStore(pool, `anon:${ownerCookie}`).saveDocument(courseDocument(stageId));
+ 
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const response = await handlePersistenceRequest(
+       new Request(`http://localhost/api/persistence/documents/${stageId}`, {
+         headers: { cookie: `anonymous_id=${ownerCookie}` },
+@@ -111,7 +111,7 @@ describe('reference-fidelity stage access', () => {
+     await expect(
+       visitor.saveDocument(courseDocument(stageId, 'Foreign edit')),
+     ).rejects.toBeInstanceOf(StageAccessError);
+-    const { handlePersistenceRequest } = await import('@/app/api/persistence/[...path]/route');
++    const { handlePersistenceRequest } = await import('@/lib/persistence/route-handler');
+     const visitorRead = await handlePersistenceRequest(
+       new Request(`http://localhost/api/persistence/documents/${stageId}`, {
+         headers: { cookie: `anonymous_id=${visitorCookie}` },
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 4c31bc3..b9c012f 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -9,7 +9,12 @@ vi.mock('@/lib/server/provider-config', () => ({
+       ? { deepseek: { models: ['deepseek-v4-pro', 'deepseek-v4-flash'] } }
+       : {},
+   getServerWebSearchProviders: () => ({}),
+-  getServerImageProviders: () => ({}),
++  getServerImageProviders: () => process.env.MIRA_TEST_QWEN_IMAGE_KEY
++    ? { 'qwen-image': { models: ['qwen-image-max'] } } : {},
++  isServerProviderDisabled: () => false,
++  resolveImageApiKey: () => process.env.MIRA_TEST_QWEN_IMAGE_KEY || '',
++  resolveImageModel: () => 'qwen-image-max',
++  resolveImageBaseUrl: () => 'https://dashscope.aliyuncs.com',
+   getServerVideoProviders: () => ({}),
+   getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
+   getServerASRProviders: () => ({ 'qwen-asr': {} }),
+@@ -48,6 +53,8 @@ describe('GET /api/health structured scene runtime policy', () => {
+     process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR = '1';
+     process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL = 'qwen3-asr-flash';
+     process.env.MIRA_TEST_QWEN_API_KEY = 'test-qwen-key';
++    process.env.MIRA_TEST_QWEN_IMAGE_KEY = 'test-qwen-image-key';
++    process.env.DEFAULT_IMAGE_PROVIDER = 'qwen-image';
+     process.env.MODEL_ROUTES = JSON.stringify({
+       'maic-agent-driver': {
+         model: 'deepseek:deepseek-v4-pro',
+@@ -91,6 +98,8 @@ describe('GET /api/health structured scene runtime policy', () => {
+     delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR;
+     delete process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL;
+     delete process.env.MIRA_TEST_QWEN_API_KEY;
++    delete process.env.MIRA_TEST_QWEN_IMAGE_KEY;
++    delete process.env.DEFAULT_IMAGE_PROVIDER;
+     delete process.env.MODEL_ROUTES;
+     delete process.env.DEEPSEEK_API_KEY;
+     delete process.env.DEEPSEEK_BASE_URL;
+@@ -237,6 +246,16 @@ describe('GET /api/health structured scene runtime policy', () => {
+           minimumFetchedSources: 1,
+         },
+         studentToolsEnabled: false,
++        image: {
++          schemaVersion: 'mira.openmaic.formal-image-policy.v1',
++          policyId: 'mira-formal-qwen-image.v1',
++          enabled: true,
++          providerManaged: true,
++          providerId: 'qwen-image',
++          modelId: 'qwen-image-max',
++          usage: 'teaching_need',
++          assetValidationRequired: true,
++        },
+       },
+       studentRuntimeEvents: {
+         enforced: true,
+@@ -337,6 +356,7 @@ describe('GET /api/health structured scene runtime policy', () => {
+       professionalAgent: true,
+       webSearch: true,
+       speechAudioGeneration: true,
++      imageGeneration: true,
+     });
+     expect(body.runtimePolicy.formalGeneration).toMatchObject({
+       policyId: 'mira.openmaic.formal-runtime.v4-deepseek-professional',
+@@ -436,4 +456,14 @@ describe('GET /api/health structured scene runtime policy', () => {
+     });
+     expect(body.runtimePolicy).toBeUndefined();
+   });
++
++  it('does not claim new formal image readiness without a configured image provider', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
++    process.env.DEEPSEEK_API_KEY = 'formal-generation-test-key';
++    delete process.env.MIRA_TEST_QWEN_IMAGE_KEY;
++    const { GET } = await import('@/app/api/health/route');
++    const response = await GET(new NextRequest('http://runtime.test/api/health?scope=formal-generation'));
++    expect(response.status).toBe(503);
++    expect(await response.json()).toMatchObject({ success: false, errorCode: 'PROVIDER_DISABLED' });
++  });
+ });
+diff --git a/tests/server/mira-formal-job-resumption.test.ts b/tests/server/mira-formal-job-resumption.test.ts
+index 234b469..2a18b82 100644
+--- a/tests/server/mira-formal-job-resumption.test.ts
++++ b/tests/server/mira-formal-job-resumption.test.ts
+@@ -23,7 +23,7 @@ describe('formal job restart authority', () => {
+       requirement: 'locked formal brief', runtimeRequestId: 'mira-restart-authority-1',
+       formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+       coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
+-      professionalCreationPolicy: policy.MIRA_PROFESSIONAL_CREATION_POLICY,
++      professionalCreationPolicy: policy.MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
+       enableWebSearch: true, enableImageGeneration: false, enableVideoGeneration: false,
+       enableTTS: false, agentMode: 'generate' as const,
+     };
+@@ -55,4 +55,32 @@ describe('formal job restart authority', () => {
+     await store.updateClassroomGenerationJob(job.id, { formalInput: input, status: 'succeeded' });
+     expect(await store.readResumableFormalClassroomGenerationJob(job.id)).toBeNull();
+   });
++  it('requires a new request identity for the image policy and persists its media receipt', async () => {
++    const { store, input, job } = await fixture();
++    const policy = await import('@/lib/server/mira-formal-generation-policy');
++    const { buildMiraFormalMediaReceipt } = await import('@/lib/server/mira-formal-media');
++    const imageInput = {
++      ...input,
++      enableImageGeneration: true,
++      professionalCreationPolicy: policy.MIRA_PROFESSIONAL_CREATION_POLICY,
++    };
++    await expect(store.createOrGetFormalClassroomGenerationJob(imageInput))
++      .rejects.toThrow('FORMAL_RUNTIME_REQUEST_CONFLICT');
++    const created = await store.createOrGetFormalClassroomGenerationJob({
++      ...imageInput, runtimeRequestId: 'new-image-policy-request',
++    });
++    expect(created.job.formalInputSha256).not.toBe(job.formalInputSha256);
++    const media = await buildMiraFormalMediaReceipt({
++      runtimeRequestId: 'new-image-policy-request', buildItemId: 'build-image-1',
++      classroomId: 'stage-image-1', sessionId: 'image-session', scenes: [], traces: [],
++    });
++    await store.markClassroomGenerationJobSucceeded(created.job.id, {
++      id: 'stage-image-1', url: 'http://runtime.test/classroom/stage-image-1',
++      stage: {} as import('@/lib/types/stage').Stage, scenes: [], scenesCount: 0,
++      createdAt: new Date().toISOString(), media,
++    });
++    expect((await store.readClassroomGenerationJob(created.job.id))?.result?.media).toEqual(media);
++    expect((await store.readClassroomGenerationJob(job.id))?.formalInput).toEqual(input);
++    expect((await store.readClassroomGenerationJob(job.id))?.result?.media).toBeUndefined();
++  });
+ });
+diff --git a/tests/server/mira-formal-media.test.ts b/tests/server/mira-formal-media.test.ts
+new file mode 100644
+index 0000000..22d277c
+--- /dev/null
++++ b/tests/server/mira-formal-media.test.ts
+@@ -0,0 +1,331 @@
++import { createHash } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import sharp from 'sharp';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import type { Scene } from '@/lib/types/stage';
++import type { AgentTool } from '@earendil-works/pi-agent-core';
++
++const provider = vi.hoisted(() => ({
++  configured: { 'qwen-image': { models: ['qwen-image-max'] } } as Record<
++    string,
++    { models?: string[]; disabled?: boolean }
++  >,
++  disabled: false,
++  model: 'qwen-image-max',
++  key: 'test-key',
++  base: 'https://dashscope.aliyuncs.com',
++}));
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerImageProviders: () => provider.configured,
++  isServerProviderDisabled: () => provider.disabled,
++  resolveImageApiKey: () => provider.key,
++  resolveImageModel: () => provider.model,
++  resolveImageBaseUrl: () => provider.base,
++}));
++
++import {
++  assertMiraFormalGenerationInput,
++  isExactMiraProfessionalCreationPolicy,
++  MIRA_COURSEWARE_AUTHORITY,
++  MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++  MIRA_PROFESSIONAL_CREATION_POLICY,
++  MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++} from '@/lib/server/mira-formal-generation-policy';
++import {
++  assertMiraFormalImageProviderReady,
++  buildMiraFormalMediaReceipt,
++  formalSceneImageReferences,
++  withMiraFormalImageTrace,
++  type MiraFormalImageTrace,
++} from '@/lib/server/mira-formal-media';
++import {
++  filterMiraFormalMediaTools,
++  MIRA_FORMAL_IMAGE_SESSION_ORIGIN,
++} from '@/lib/server/mira-professional-research-policy';
++
++const session = {
++  ownerId: `mira-formal-professional:${'a'.repeat(64)}`,
++  sessionId: `miraformal_${'a'.repeat(64)}`,
++  skillId: 'mira-primary-courseware',
++  origin: 'mira-formal-professional',
++};
++const identity = {
++  runtimeRequestId: 'request-image-1',
++  buildItemId: 'build-image-1',
++  classroomId: 'stage-image-1',
++  sessionId: session.sessionId,
++};
++
++function slide(src?: string, id = 'scene-1'): Scene {
++  return {
++    id,
++    stageId: identity.classroomId,
++    type: 'slide',
++    order: 0,
++    content: {
++      type: 'slide',
++      canvas: { elements: src ? [{ id: 'picture', type: 'image', src }] : [] },
++    },
++    actions: [],
++  } as unknown as Scene;
++}
++function trace(src: string): MiraFormalImageTrace {
++  return {
++    schemaVersion: 'mira.openmaic.formal-image-trace.v1',
++    sessionId: identity.sessionId,
++    classroomId: identity.classroomId,
++    toolCallId: 'image-call-1',
++    src,
++    providerId: 'qwen-image',
++    modelId: 'qwen-image-max',
++  };
++}
++
++describe('formal image policy and assets', () => {
++  let root: string;
++  beforeEach(async () => {
++    root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'mira-image-')));
++    provider.configured = { 'qwen-image': { models: ['qwen-image-max'] } };
++    provider.disabled = false;
++    provider.model = 'qwen-image-max';
++    provider.key = 'test-key';
++    provider.base = 'https://dashscope.aliyuncs.com';
++    vi.stubEnv('DEFAULT_IMAGE_PROVIDER', 'qwen-image');
++  });
++  afterEach(async () => {
++    await fs.rm(root, { recursive: true, force: true });
++    vi.unstubAllEnvs();
++  });
++
++  async function image(bytes?: Buffer) {
++    bytes ??= await sharp({ create: { width: 8, height: 6, channels: 3, background: '#12ab34' } })
++      .png()
++      .toBuffer();
++    const sha = createHash('sha256').update(bytes).digest('hex');
++    const filename = `generated-${sha}.png`;
++    const directory = path.join(root, identity.classroomId, 'media');
++    await fs.mkdir(directory, { recursive: true });
++    const file = path.join(directory, filename);
++    await fs.writeFile(file, bytes);
++    return {
++      file,
++      bytes,
++      sha,
++      src: `/api/classroom-media/${identity.classroomId}/media/${filename}`,
++    };
++  }
++  const receipt = (scenes: Scene[], traces: unknown[]) =>
++    buildMiraFormalMediaReceipt({ ...identity, scenes, traces }, { classroomsDir: root });
++
++  it('accepts only the exact legacy/false and image-policy/true pairs', () => {
++    const input = {
++      requirement: 'locked brief',
++      runtimeRequestId: identity.runtimeRequestId,
++      formalRuntimeContract: MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
++      enableWebSearch: true,
++      enableVideoGeneration: false,
++      enableTTS: false,
++      agentMode: 'generate' as const,
++    };
++    for (const [policy, enabled] of [
++      [MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY, false],
++      [MIRA_PROFESSIONAL_CREATION_POLICY, true],
++    ] as const) {
++      expect(() =>
++        assertMiraFormalGenerationInput({
++          ...input,
++          professionalCreationPolicy: policy,
++          enableImageGeneration: enabled,
++        }),
++      ).not.toThrow();
++      expect(() =>
++        assertMiraFormalGenerationInput({
++          ...input,
++          professionalCreationPolicy: policy,
++          enableImageGeneration: !enabled,
++        }),
++      ).toThrow('FORMAL_RUNTIME_INPUT_POLICY_INVALID');
++    }
++    expect(
++      isExactMiraProfessionalCreationPolicy({
++        ...MIRA_PROFESSIONAL_CREATION_POLICY,
++        image: { ...MIRA_PROFESSIONAL_CREATION_POLICY.image, modelId: 'other-model' },
++      }),
++    ).toBe(false);
++  });
++
++  it('keeps legacy formal tools closed when global media providers become available', () => {
++    const tools = ['generate_image', 'generate_video', 'generate_scene'].map((name) => ({ name }));
++    expect(filterMiraFormalMediaTools(tools, session).map((t) => t.name)).toEqual([
++      'generate_scene',
++    ]);
++    expect(
++      filterMiraFormalMediaTools(tools, {
++        ...session,
++        origin: MIRA_FORMAL_IMAGE_SESSION_ORIGIN,
++      }).map((t) => t.name),
++    ).toEqual(['generate_image', 'generate_scene']);
++    expect(
++      filterMiraFormalMediaTools(tools, { ...session, sessionId: 'ordinary-session' }),
++    ).toEqual(tools);
++  });
++
++  it.each(['disabled', 'key', 'model', 'base', 'default'] as const)(
++    'rejects invalid provider %s without a provider call',
++    (condition) => {
++      if (condition === 'disabled') provider.disabled = true;
++      if (condition === 'key') provider.key = '';
++      if (condition === 'model') provider.model = 'other-model';
++      if (condition === 'base') provider.base = 'https://other.example';
++      if (condition === 'default') vi.stubEnv('DEFAULT_IMAGE_PROVIDER', 'other-provider');
++      expect(() => assertMiraFormalImageProviderReady()).toThrow('FORMAL_IMAGE_PROVIDER_');
++    },
++  );
++
++  it('allows a deliberate course with no images and produces a hashed zero receipt', async () => {
++    const result = await receipt([slide()], []);
++    expect(result).toMatchObject({
++      ...identity,
++      imageCount: 0,
++      assets: [],
++      status: 'succeeded',
++      policyId: 'mira-formal-qwen-image.v1',
++    });
++    expect(result.receiptSha256).toMatch(/^[a-f0-9]{64}$/);
++  });
++
++  it('attests the bytes, dimensions, stage and actual scene references', async () => {
++    const asset = await image();
++    const result = await receipt(
++      [slide(asset.src), slide(asset.src, 'scene-2')],
++      [trace(asset.src)],
++    );
++    expect(result.imageCount).toBe(1);
++    expect(result.assets[0]).toEqual({
++      src: asset.src,
++      sha256: asset.sha,
++      mimeType: 'image/png',
++      byteSize: asset.bytes.length,
++      width: 8,
++      height: 6,
++      sceneIds: ['scene-1', 'scene-2'],
++    });
++    expect(
++      await receipt([slide(asset.src), slide(asset.src, 'scene-2')], [trace(asset.src)]),
++    ).toEqual(result);
++  });
++
++  it('enumerates real interactive HTML image and CSS background slots', () => {
++    const scene = {
++      ...slide(),
++      type: 'interactive',
++      content: {
++        type: 'interactive',
++        html: '<html><body><img src="/a.png"><div style="background-image:url(\'/b.png\')"></div></body></html>',
++      },
++    } as unknown as Scene;
++    expect(formalSceneImageReferences(scene)).toEqual(['/a.png', '/b.png']);
++  });
++
++  it('parses fragments, srcset, SVG namespaces and styles without executing markup', () => {
++    const scene = {
++      ...slide(),
++      type: 'interactive',
++      content: {
++        type: 'interactive',
++        html: `<style>.hero { background: url('/style.png') } .mask { filter: url(#mask) }</style>
++          <picture><source srcset="/small.png 400w, /large.png 800w">
++            <img src="/main.png" srcset="/retina.png 2x" style="background:url('/inline.png')">
++          </picture>
++          <svg><image href="/svg.png"/><image xlink:href="/legacy.png"/></svg>
++          <template><img src="/template.png"></template>
++          <script>const fake = '<img src="/not-an-image.png">';</script>`,
++      },
++    } as unknown as Scene;
++    expect(formalSceneImageReferences(scene)).toEqual([
++      '/small.png',
++      '/large.png',
++      '/main.png',
++      '/retina.png',
++      '/svg.png',
++      '/legacy.png',
++      '/template.png',
++      '/style.png',
++      '/inline.png',
++    ]);
++  });
++
++  it('retains decoded and data image references so ownership validation can reject them', () => {
++    const scene = {
++      ...slide(),
++      type: 'interactive',
++      content: {
++        type: 'interactive',
++        html: '<img src="/image.png?a=1&amp;b=2"><img srcset="data:image/png;base64,AAAA 1x, /large.png 2x">',
++      },
++    } as unknown as Scene;
++    expect(formalSceneImageReferences(scene)).toEqual([
++      '/image.png?a=1&b=2',
++      'data:image/png;base64,AAAA',
++      '/large.png',
++    ]);
++  });
++
++  it('rejects generated bytes omitted from the final scenes', async () => {
++    const asset = await image();
++    await expect(receipt([slide()], [trace(asset.src)])).rejects.toThrow(
++      'GENERATED_ASSET_UNREFERENCED',
++    );
++  });
++  it('rejects an image with no same-session generation trace', async () => {
++    const asset = await image();
++    await expect(receipt([slide(asset.src)], [])).rejects.toThrow('SOURCE_UNATTESTED');
++  });
++  it('rejects an image or trace from another stage', async () => {
++    const src = '/api/classroom-media/foreign/media/generated-a.png';
++    await expect(receipt([slide(src)], [trace(src)])).rejects.toThrow('SOURCE_NOT_OWNED');
++    const asset = await image();
++    await expect(
++      receipt([slide(asset.src)], [{ ...trace(asset.src), classroomId: 'foreign' }]),
++    ).rejects.toThrow('TRACE_INVALID');
++  });
++  it('rejects deleted, corrupt, or non-image bytes', async () => {
++    const asset = await image();
++    await fs.writeFile(asset.file, 'changed');
++    await expect(receipt([slide(asset.src)], [trace(asset.src)])).rejects.toThrow('HASH_MISMATCH');
++    await fs.rm(asset.file);
++    await expect(receipt([slide(asset.src)], [trace(asset.src)])).rejects.toThrow('FILE_MISSING');
++    const fake = await image(Buffer.from('not a PNG'));
++    await expect(receipt([slide(fake.src)], [trace(fake.src)])).rejects.toThrow('BYTES_INVALID');
++  });
++  it('rejects symlinked media outside the stage', async () => {
++    const asset = await image();
++    const other = path.join(root, 'outside.png');
++    await fs.rename(asset.file, other);
++    await fs.symlink(other, asset.file);
++    await expect(receipt([slide(asset.src)], [trace(asset.src)])).rejects.toThrow(
++      'SOURCE_NOT_OWNED',
++    );
++  });
++
++  it('awaits the durable image trace before returning a successful tool result', async () => {
++    const asset = await image();
++    const record = vi.fn().mockResolvedValue(undefined);
++    const execute = vi.fn().mockResolvedValue({ details: { src: asset.src }, content: [] });
++    const tool = withMiraFormalImageTrace(
++      { name: 'generate_image', execute } as unknown as AgentTool<never, never>,
++      identity.sessionId,
++      record,
++    );
++    await tool.execute('image-call-1', { stageId: identity.classroomId } as never, undefined);
++    expect(execute).toHaveBeenCalledTimes(1);
++    expect(record).toHaveBeenCalledWith(trace(asset.src));
++    record.mockRejectedValueOnce(new Error('durable store failed'));
++    await expect(
++      tool.execute('image-call-1', { stageId: identity.classroomId } as never, undefined),
++    ).rejects.toThrow('durable store failed');
++  });
++});
+diff --git a/tests/server/mira-formal-professional-classroom.test.ts b/tests/server/mira-formal-professional-classroom.test.ts
+index a0fecb5..939eef9 100644
+--- a/tests/server/mira-formal-professional-classroom.test.ts
++++ b/tests/server/mira-formal-professional-classroom.test.ts
+@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
+ import {
+   canonicalizeMiraFormalResearchFooters,
+   hasMiraFormalSlideSpotlightSequence,
++  withMiraFormalImageInstructions,
+ } from '@/lib/server/mira-formal-professional-classroom';
++import { MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY, MIRA_PROFESSIONAL_CREATION_POLICY } from '@/lib/server/mira-formal-generation-policy';
+ import type { Scene } from '@/lib/types/stage';
+ 
+ function slide(actions: Scene['actions'], elementId = 'focus-target'): Scene {
+@@ -50,6 +52,16 @@ function slide(actions: Scene['actions'], elementId = 'focus-target'): Scene {
+ }
+ 
+ describe('Mira formal slide spotlight sequence', () => {
++  it('adds image teaching limits only to new jobs and preserves the legacy prompt bytes', () => {
++    const original = 'persisted legacy prompt\nwith exact whitespace\n';
++    expect(withMiraFormalImageInstructions(original, MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY))
++      .toBe(original);
++    const updated = withMiraFormalImageInstructions(original, MIRA_PROFESSIONAL_CREATION_POLICY);
++    expect(updated.startsWith(original)).toBe(true);
++    expect(updated).toContain('precise quantities, text, formulas, geometric relationships');
++    expect(updated).toContain('with verifiable slide elements or HTML');
++    expect(updated).toContain('Never use a generated image as the only basis');
++  });
+   it('accepts official focus sequences while allowing unfocused transition speech', () => {
+     expect(
+       hasMiraFormalSlideSpotlightSequence(
+@@ -109,12 +121,16 @@ describe('Mira formal slide spotlight sequence', () => {
+     const cited = slide([]);
+     cited.id = 'p3';
+     if (cited.content.type !== 'slide') throw new Error('invalid fixture');
+-    cited.content.canvas.elements[0]!.content =
++    const citedText = cited.content.canvas.elements[0]!;
++    if (citedText.type !== 'text') throw new Error('invalid fixture');
++    citedText.content =
+       '<p>口形参考:汉语拼音韵母表 · www.hanyupinyin.cn</p>';
+     const uncited = slide([]);
+     uncited.id = 'p4';
+     if (uncited.content.type !== 'slide') throw new Error('invalid fixture');
+-    uncited.content.canvas.elements[0]!.content = '<p>今天学习单韵母</p>';
++    const uncitedText = uncited.content.canvas.elements[0]!;
++    if (uncitedText.type !== 'text') throw new Error('invalid fixture');
++    uncitedText.content = '<p>今天学习单韵母</p>';
+ 
+     const repaired = canonicalizeMiraFormalResearchFooters([cited, uncited], [source]);
+ 

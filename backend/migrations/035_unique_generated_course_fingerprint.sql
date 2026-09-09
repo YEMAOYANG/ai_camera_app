@@ -1,0 +1,2 @@
+CREATE UNIQUE INDEX uq_learning_courses_generation_content_hash
+  ON learning_courses(generation_content_hash);

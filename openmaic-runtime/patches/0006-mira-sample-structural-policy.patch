@@ -1,0 +1,1158 @@
+From 243cf385d0b6f010ea2337c6da94e9d5cede7241 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 06/37] 0006-mira-sample-structural-policy
+
+---
+ lib/server/classroom-generation.ts            |  63 ++-
+ lib/server/mira-sample-structural-policy.ts   | 500 ++++++++++++++++++
+ ...classroom-generation-sample-policy.test.ts | 219 ++++++++
+ .../mira-sample-structural-policy.test.ts     | 271 ++++++++++
+ 4 files changed, 1032 insertions(+), 21 deletions(-)
+ create mode 100644 lib/server/mira-sample-structural-policy.ts
+ create mode 100644 tests/server/classroom-generation-sample-policy.test.ts
+ create mode 100644 tests/server/mira-sample-structural-policy.test.ts
+
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index a96f1f2..a0eade2 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -11,6 +11,7 @@ import {
+   withGenerationRetry,
+   type AICallFn,
+   type AgentInfo,
++  type SceneOutline,
+ } from '@openmaic/generation';
+ import { createSceneWithActions } from '@/lib/server/scene-generation';
+ import { generatePBLV2Project } from '@/lib/pbl/v2/agents/planner';
+@@ -48,6 +49,11 @@ import {
+   StructuredOutputExhaustedError,
+   type StructuredOutputAttemptMetadata,
+ } from '@/lib/server/structured-output-guard';
++import {
++  assertMiraSampleClassroomStructure,
++  ensureMiraSampleSceneActions,
++  resolveMiraSampleStructuralPlan,
++} from '@/lib/server/mira-sample-structural-policy';
+ 
+ const log = createLogger('Classroom');
+ 
+@@ -450,6 +456,7 @@ export async function generateClassroom(
+   const requirements: UserRequirements = {
+     requirement,
+   };
++  const miraSampleStructuralPlan = resolveMiraSampleStructuralPlan(requirement);
+   const vocationalActive = resolveVocationalActive(requirements);
+   const pdfText = pdfContent?.text || undefined;
+ 
+@@ -520,25 +527,32 @@ export async function generateClassroom(
+     scenesGenerated: 0,
+   });
+ 
+-  const outlinesResult = await generateSceneOutlinesFromRequirements(
+-    requirements,
+-    pdfText,
+-    undefined,
+-    aiCall,
+-    {
+-      imageGenerationEnabled: input.enableImageGeneration,
+-      videoGenerationEnabled: input.enableVideoGeneration,
+-      researchContext,
+-      // NO teacherContext — agents haven't been generated yet
+-    },
+-  );
++  let languageDirective: string;
++  let courseTitle: string | undefined;
++  let outlines: SceneOutline[];
++  if (miraSampleStructuralPlan) {
++    ({ languageDirective, courseTitle, outlines } = miraSampleStructuralPlan);
++    log.info('Using server-owned Mira sample classroom structure');
++  } else {
++    const outlinesResult = await generateSceneOutlinesFromRequirements(
++      requirements,
++      pdfText,
++      undefined,
++      aiCall,
++      {
++        imageGenerationEnabled: input.enableImageGeneration,
++        videoGenerationEnabled: input.enableVideoGeneration,
++        researchContext,
++        // NO teacherContext — agents haven't been generated yet
++      },
++    );
+ 
+-  if (!outlinesResult.success || !outlinesResult.data) {
+-    log.error('Failed to generate outlines:', outlinesResult.error);
+-    throw new Error(outlinesResult.error || 'Failed to generate scene outlines');
++    if (!outlinesResult.success || !outlinesResult.data) {
++      log.error('Failed to generate outlines:', outlinesResult.error);
++      throw new Error(outlinesResult.error || 'Failed to generate scene outlines');
++    }
++    ({ languageDirective, courseTitle, outlines } = outlinesResult.data);
+   }
+-
+-  const { languageDirective, courseTitle, outlines } = outlinesResult.data;
+   log.info(
+     `Generated ${outlines.length} scene outlines (languageDirective: ${languageDirective}, courseTitle: ${courseTitle ?? 'n/a'})`,
+   );
+@@ -554,7 +568,9 @@ export async function generateClassroom(
+   // Resolve agents based on agentMode — now AFTER outlines so we can use languageDirective
+   let agents: AgentInfo[];
+   const agentMode = input.agentMode || 'default';
+-  if (agentMode === 'generate') {
++  if (miraSampleStructuralPlan) {
++    agents = miraSampleStructuralPlan.agents;
++  } else if (agentMode === 'generate') {
+     log.info('Generating custom agent profiles via LLM...');
+     try {
+       const agentProfilesCall = await getAgentProfilesAiCall();
+@@ -582,7 +598,7 @@ export async function generateClassroom(
+     // For LLM-generated agents, embed full configs so the client can
+     // hydrate the agent registry without prior IndexedDB data.
+     // For default agents, just record IDs — the client already has them.
+-    ...(agentMode === 'generate'
++    ...(miraSampleStructuralPlan || agentMode === 'generate'
+       ? {
+           generatedAgentConfigs: agents.map((a, i) => {
+             const voiceConfig = getMiraTeacherVoiceConfig(a.role, miraTtsPolicy);
+@@ -693,7 +709,7 @@ export async function generateClassroom(
+     }
+ 
+     const actionsAiCall = await getSceneActionsAiCall();
+-    const actions = await withGenerationRetry(
++    const generatedActions = await withGenerationRetry(
+       () =>
+         generateSceneActions(safeOutline, content, actionsAiCall, {
+           agents,
+@@ -704,6 +720,9 @@ export async function generateClassroom(
+         onRetry: (event) => reportSceneRetry('actions', event),
+       },
+     );
++    const actions = miraSampleStructuralPlan
++      ? ensureMiraSampleSceneActions(safeOutline, content, generatedActions)
++      : generatedActions;
+     log.info(`Scene "${safeOutline.title}": ${actions.length} actions`);
+ 
+     const sceneId = createSceneWithActions(safeOutline, content, actions, api);
+@@ -726,7 +745,9 @@ export async function generateClassroom(
+   const scenes = store.getState().scenes;
+   log.info(`Pipeline complete: ${scenes.length} scenes generated`);
+ 
+-  if (scenes.length === 0) {
++  if (miraSampleStructuralPlan) {
++    assertMiraSampleClassroomStructure(stage, scenes);
++  } else if (scenes.length === 0) {
+     throw new Error('No scenes were generated');
+   }
+ 
+diff --git a/lib/server/mira-sample-structural-policy.ts b/lib/server/mira-sample-structural-policy.ts
+new file mode 100644
+index 0000000..27f49cf
+--- /dev/null
++++ b/lib/server/mira-sample-structural-policy.ts
+@@ -0,0 +1,500 @@
++import type { AgentInfo, GeneratedSceneContent, SceneOutline } from '@openmaic/generation';
++import type { Action } from '@/lib/types/action';
++import type { Scene, Stage } from '@/lib/types/stage';
++
++/**
++ * Exact, server-owned routing marker appended by Mira's backend requirement compiler.
++ *
++ * This is intentionally a full-line, case-sensitive marker rather than a substring
++ * or a user-facing phrase. It selects a fixed safe lesson structure; it is not an
++ * authentication token and grants no additional route or credential access.
++ */
++export const MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER =
++  'MIRA_OPENMAIC_SAMPLE_STRUCTURAL_POLICY_V1' as const;
++
++export const MIRA_SAMPLE_COURSE_TITLE = '20以内数感探索课' as const;
++export const MIRA_SAMPLE_LANGUAGE_DIRECTIVE =
++  '全程使用简体中文。面向小学一年级学生，使用短句、口语化指令，一次只要求一个动作；只讲20以内数量、组成、顺序和大小比较。' as const;
++
++const TEACHER_ID = 'mira-sample-teacher';
++const PEER_DUODUO_ID = 'mira-sample-peer-duoduo';
++const PEER_LELE_ID = 'mira-sample-peer-lele';
++const PEER_CHENCHEN_ID = 'mira-sample-peer-chenchen';
++const PEER_ANAN_ID = 'mira-sample-peer-anan';
++
++const SAMPLE_AGENTS: readonly AgentInfo[] = [
++  {
++    id: TEACHER_ID,
++    name: '米拉数学老师',
++    role: 'teacher',
++    persona: '耐心、清楚地引导一年级学生观察数量。每次只提出一个问题，不提前说出独立检测答案。',
++  },
++  {
++    id: PEER_DUODUO_ID,
++    name: '朵朵',
++    role: 'student',
++    persona: '喜欢用十框和小方块解释自己的发现，会用短句说出思考过程。',
++  },
++  {
++    id: PEER_LELE_ID,
++    name: '乐乐',
++    role: 'student',
++    persona: '喜欢在数轴上找数字，愿意先观察再回答。',
++  },
++  {
++    id: PEER_CHENCHEN_ID,
++    name: '晨晨',
++    role: 'student',
++    persona: '做题认真，会检查数量、顺序和大小关系。',
++  },
++  {
++    id: PEER_ANAN_ID,
++    name: '安安',
++    role: 'student',
++    persona: '敢于尝试互动操作，答错后愿意根据提示再试一次。',
++  },
++];
++
++const SAMPLE_OUTLINES: readonly SceneOutline[] = [
++  {
++    id: 'mira-sample-scene-01-context',
++    type: 'slide',
++    title: '数一数身边的物品',
++    description: '从可数的生活物品进入20以内数量，建立数词、物体和数量之间的联系。',
++    keyPoints: ['按顺序点数，不漏数也不重复', '最后数到几，物品总数就是几'],
++    teachingObjective: '能按顺序数出20以内一组物品的数量。',
++    estimatedDuration: 45,
++    order: 1,
++    languageNote: '使用简体中文短句，一次只引导一个观察动作。',
++  },
++  {
++    id: 'mira-sample-scene-02-compose',
++    type: 'slide',
++    title: '十和几个组成十几',
++    description: '用一个十和若干个一解释11到20的组成。',
++    keyPoints: ['一个十和几个一合起来就是十几', '例如12由1个十和2个一组成'],
++    teachingObjective: '理解11到20各数由1个十和若干个一组成。',
++    estimatedDuration: 65,
++    order: 2,
++    languageNote: '使用十框、十连方和单个方块等低阅读负担表征。',
++  },
++  {
++    id: 'mira-sample-scene-03-simulation',
++    type: 'interactive',
++    title: '数量变一变',
++    description: '学生拨动1到20的数量控件，观察数字、十框和数量输出同步变化。',
++    keyPoints: ['数量每增加1，表示物也增加1个', '超过10后先看到一个完整的十'],
++    teachingObjective: '通过变量操作建立数字和数量表征的对应关系。',
++    estimatedDuration: 70,
++    order: 3,
++    languageNote: '控件标签和输出全部使用简体中文，反馈短而明确。',
++    widgetType: 'simulation',
++    widgetOutline: {
++      concept: '20以内数量与十框表示同步变化',
++      keyVariables: ['数量（1到20）'],
++    },
++  },
++  {
++    id: 'mira-sample-scene-04-number-line',
++    type: 'slide',
++    title: '数轴上的前后邻居',
++    description: '在0到20的数轴上示范数的顺序、前一个数和后一个数。',
++    keyPoints: ['数轴上越往右数越大', '相邻两个数相差1'],
++    teachingObjective: '能在数轴上辨认20以内数的顺序和相邻数。',
++    estimatedDuration: 55,
++    order: 4,
++    languageNote: '用位置和箭头示范，不引入超出一年级范围的术语。',
++  },
++  {
++    id: 'mira-sample-scene-05-game',
++    type: 'interactive',
++    title: '数字小火车',
++    description: '学生把20以内数字卡片拖到正确顺序，获得计分、关卡结果和可重试反馈。',
++    keyPoints: ['按从小到大的顺序排列数字', '根据前后位置检查顺序'],
++    teachingObjective: '在小游戏中巩固20以内数的顺序。',
++    estimatedDuration: 65,
++    order: 5,
++    languageNote: '不展示广告、外链或独立检测答案。',
++    widgetType: 'game',
++    widgetOutline: {
++      gameType: 'puzzle',
++      challenge: '把每关给出的20以内数字卡片拖到从小到大的正确位置，提交后显示本关得分和是否过关。',
++      playerControls: ['拖动数字卡片', '提交检查', '重新挑战'],
++    },
++  },
++  {
++    id: 'mira-sample-scene-06-compare',
++    type: 'slide',
++    title: '谁多谁少',
++    description: '用一一对应和数轴位置示范20以内两个数量的大小比较。',
++    keyPoints: ['一一对应后有剩余的一组更多', '数轴上右边的数更大'],
++    teachingObjective: '能用具体表征说明20以内两个数谁大谁小。',
++    estimatedDuration: 60,
++    order: 6,
++    languageNote: '先让学生观察，再用完整短句表达比较结果。',
++  },
++  {
++    id: 'mira-sample-scene-07-visualization3d',
++    type: 'interactive',
++    title: '搭一搭十几',
++    description: '用可旋转、缩放和分组观察的三维十连方与个位方块表示11到20。',
++    keyPoints: ['一个十连方表示1个十', '单个方块表示1个一'],
++    teachingObjective: '从三维模型中辨认十和一的组成。',
++    estimatedDuration: 70,
++    order: 7,
++    languageNote: '三维画面保持简洁，操作说明一次只给一个动作。',
++    widgetType: 'visualization3d',
++    widgetOutline: {
++      visualizationType: 'geometry',
++      objects: ['一个由10个单位方块组成的十连方', '最多10个可分组的个位方块'],
++      interactions: ['旋转模型', '缩放观察', '切换11到20的数量', '突出显示十和一的分组'],
++    },
++  },
++  {
++    id: 'mira-sample-scene-08-guided-quiz',
++    type: 'quiz',
++    title: '跟着练一练',
++    description: '用有即时形成性反馈的题目练习数量、组成和顺序，不计入正式成绩。',
++    keyPoints: ['先看清数量或位置', '作答后根据提示检查'],
++    teachingObjective: '在提示支持下练习20以内数感。',
++    estimatedDuration: 60,
++    order: 8,
++    languageNote: '题干短、选项清楚；反馈用于练习，不宣称正式成绩。',
++    quizConfig: {
++      questionCount: 3,
++      difficulty: 'easy',
++      questionTypes: ['single'],
++    },
++  },
++  {
++    id: 'mira-sample-scene-09-independent-quiz',
++    type: 'quiz',
++    title: '自己试一试',
++    description: '独立检测20以内数量、组成、顺序和大小比较，课堂讲稿不得提前泄露答案。',
++    keyPoints: ['独立读题并完成', '完成后再查看练习反馈'],
++    teachingObjective: '独立完成覆盖本课目标的简短检测。',
++    estimatedDuration: 55,
++    order: 9,
++    languageNote: '不得在引导语或讲稿中透露正确选项和答案。',
++    quizConfig: {
++      questionCount: 3,
++      difficulty: 'easy',
++      questionTypes: ['single', 'text'],
++    },
++  },
++  {
++    id: 'mira-sample-scene-10-summary',
++    type: 'slide',
++    title: '数感小结',
++    description: '回顾20以内数量、十和一的组成、数轴顺序以及大小比较方法。',
++    keyPoints: ['会数20以内的数量', '会看十和一、顺序与大小'],
++    teachingObjective: '用简短语言回顾并说出本课的四个核心方法。',
++    estimatedDuration: 55,
++    order: 10,
++    languageNote: '鼓励学生说出一种自己会用的方法，不增加新知识。',
++  },
++];
++
++const SAFE_FALLBACK_NARRATION: Readonly<Record<string, string>> = {
++  'mira-sample-scene-01-context':
++    '我们先来数一数身边的物品。按顺序一个一个点数，最后数到几，总数就是几。',
++  'mira-sample-scene-02-compose':
++    '一个十和几个一合起来就是十几。请看十连方和单个方块怎样表示一个数。',
++  'mira-sample-scene-03-simulation': '请拨动数量控件，再观察数字、十框和数量输出怎样一起变化。',
++  'mira-sample-scene-04-number-line': '请看数轴上的位置。越往右数越大，相邻两个数相差一。',
++  'mira-sample-scene-05-game':
++    '请把数字卡片按从小到大的顺序排好，提交后看看本关结果，也可以再试一次。',
++  'mira-sample-scene-06-compare': '比较两个数量时，可以一一对应，也可以看它们在数轴上的位置。',
++  'mira-sample-scene-07-visualization3d':
++    '请旋转和缩放模型，观察一个十连方和几个单块怎样组成十几。',
++  'mira-sample-scene-08-guided-quiz': '现在跟着题目练一练。先看清数量或位置，再选择自己的答案。',
++  'mira-sample-scene-09-independent-quiz':
++    '现在请自己完成检测。认真读题，独立作答，完成后再查看练习反馈。',
++  'mira-sample-scene-10-summary':
++    '今天我们学习了数数量、看十和一、找数的顺序和比较大小。请说说你会用哪一种方法。',
++};
++
++const REQUIRED_DISCUSSIONS: Readonly<
++  Record<string, { agentId: string; topic: string; prompt: string }>
++> = {
++  'mira-sample-scene-03-simulation': {
++    agentId: PEER_DUODUO_ID,
++    topic: '数量控件和十框怎样一起变化',
++    prompt: '朵朵，请用一句短话说说你发现了什么。',
++  },
++  'mira-sample-scene-07-visualization3d': {
++    agentId: PEER_LELE_ID,
++    topic: '十连方和个位方块怎样表示十几',
++    prompt: '乐乐，请说说模型里的一个十和几个一。',
++  },
++};
++
++export interface MiraSampleStructuralPlan {
++  courseTitle: string;
++  languageDirective: string;
++  outlines: SceneOutline[];
++  agents: AgentInfo[];
++}
++
++function cloneOutline(outline: SceneOutline): SceneOutline {
++  return {
++    ...outline,
++    keyPoints: [...outline.keyPoints],
++    ...(outline.quizConfig
++      ? {
++          quizConfig: {
++            ...outline.quizConfig,
++            questionTypes: [...outline.quizConfig.questionTypes],
++          },
++        }
++      : {}),
++    ...(outline.widgetOutline
++      ? {
++          widgetOutline: {
++            ...outline.widgetOutline,
++            ...(outline.widgetOutline.keyVariables
++              ? { keyVariables: [...outline.widgetOutline.keyVariables] }
++              : {}),
++            ...(outline.widgetOutline.objects
++              ? { objects: [...outline.widgetOutline.objects] }
++              : {}),
++            ...(outline.widgetOutline.interactions
++              ? { interactions: [...outline.widgetOutline.interactions] }
++              : {}),
++            ...(outline.widgetOutline.playerControls
++              ? { playerControls: [...outline.widgetOutline.playerControls] }
++              : {}),
++          },
++        }
++      : {}),
++  };
++}
++
++export function isMiraSampleStructuralRequirement(requirement: string): boolean {
++  return requirement.split('\n').some((line) => line === MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER);
++}
++
++export function resolveMiraSampleStructuralPlan(
++  requirement: string,
++): MiraSampleStructuralPlan | null {
++  if (!isMiraSampleStructuralRequirement(requirement)) return null;
++  return {
++    courseTitle: MIRA_SAMPLE_COURSE_TITLE,
++    languageDirective: MIRA_SAMPLE_LANGUAGE_DIRECTIVE,
++    outlines: SAMPLE_OUTLINES.map(cloneOutline),
++    agents: SAMPLE_AGENTS.map((agent) => ({ ...agent })),
++  };
++}
++
++function nextActionId(actions: readonly Action[], base: string): string {
++  const ids = new Set(actions.map((action) => action.id));
++  if (!ids.has(base)) return base;
++  let suffix = 2;
++  while (ids.has(`${base}-${suffix}`)) suffix += 1;
++  return `${base}-${suffix}`;
++}
++
++function isNonemptySpeech(action: Action): boolean {
++  return action.type === 'speech' && action.text.trim().length > 0;
++}
++
++function fallbackDiscussion(
++  outline: SceneOutline,
++  action: Extract<Action, { type: 'discussion' }> | undefined,
++): Extract<Action, { type: 'discussion' }> | undefined {
++  const required = REQUIRED_DISCUSSIONS[outline.id];
++  if (!action && !required) return undefined;
++
++  const peerIds = new Set(
++    SAMPLE_AGENTS.filter((agent) => agent.role === 'student').map((a) => a.id),
++  );
++  const fallbackPeer = SAMPLE_AGENTS[(outline.order % 4) + 1]?.id || PEER_DUODUO_ID;
++  const agentId =
++    required?.agentId ||
++    (action?.agentId && peerIds.has(action.agentId) ? action.agentId : fallbackPeer);
++  const topic = required?.topic || action?.topic?.trim() || `交流${outline.title}中的发现`;
++  const prompt = required?.prompt || action?.prompt?.trim() || '请用一句短话说说你的发现。';
++
++  return {
++    ...(action || {
++      id: `mira-sample-discussion-${String(outline.order).padStart(2, '0')}`,
++      type: 'discussion' as const,
++    }),
++    topic,
++    prompt,
++    agentId,
++  };
++}
++
++/**
++ * Repair only the sample policy's structural action guarantees.
++ * Meaningful model-authored speech is never rewritten. Blank speech is invalid
++ * and removed; a short, server-owned line is inserted only if none remains.
++ */
++export function ensureMiraSampleSceneActions(
++  outline: SceneOutline,
++  content: GeneratedSceneContent,
++  actions: readonly Action[],
++): Action[] {
++  const nonblankActions = actions.filter(
++    (action) => action.type !== 'speech' || action.text.trim().length > 0,
++  );
++  const existingDiscussion = nonblankActions.find(
++    (action): action is Extract<Action, { type: 'discussion' }> => action.type === 'discussion',
++  );
++  let repaired: Action[] = nonblankActions.filter((action) => action.type !== 'discussion');
++
++  if (!repaired.some(isNonemptySpeech)) {
++    const text = SAFE_FALLBACK_NARRATION[outline.id];
++    if (!text) {
++      throw new Error(`mira_sample_structural_policy_failed:unknown_outline:${outline.id}`);
++    }
++    repaired.push({
++      id: nextActionId(repaired, `mira-sample-speech-${String(outline.order).padStart(2, '0')}`),
++      type: 'speech',
++      title: '场景讲解',
++      text,
++    });
++  }
++
++  if (outline.type === 'slide' && 'elements' in content && content.elements.length > 0) {
++    const elementIds = new Set(content.elements.map((element) => element.id));
++    const firstElementId = content.elements[0].id;
++    repaired = repaired.map((action) => {
++      if (
++        (action.type === 'spotlight' || action.type === 'laser') &&
++        !elementIds.has(action.elementId)
++      ) {
++        return { ...action, elementId: firstElementId };
++      }
++      return action;
++    });
++
++    if (
++      outline.id === SAMPLE_OUTLINES[0].id &&
++      !repaired.some((action) => action.type === 'spotlight' && elementIds.has(action.elementId))
++    ) {
++      repaired.unshift({
++        id: nextActionId(repaired, 'mira-sample-spotlight-01'),
++        type: 'spotlight',
++        title: '聚焦重点',
++        elementId: firstElementId,
++      });
++    }
++  }
++
++  const discussion = fallbackDiscussion(outline, existingDiscussion);
++  if (discussion) {
++    const id = nextActionId(repaired, discussion.id);
++    repaired.push(id === discussion.id ? discussion : { ...discussion, id });
++  }
++  return repaired;
++}
++
++function structuralFailure(reason: string): never {
++  throw new Error(`mira_sample_structural_policy_failed:${reason}`);
++}
++
++function assertCondition(condition: unknown, reason: string): asserts condition {
++  if (!condition) structuralFailure(reason);
++}
++
++/** Fail closed before media/TTS spend if the fixed sample structure was not produced. */
++export function assertMiraSampleClassroomStructure(stage: Stage, scenes: readonly Scene[]): void {
++  assertCondition(scenes.length === SAMPLE_OUTLINES.length, 'scene_count');
++
++  const configs = stage.generatedAgentConfigs;
++  assertCondition(
++    Array.isArray(configs) && configs.length === SAMPLE_AGENTS.length,
++    'roster_count',
++  );
++  assertCondition(stage.agentIds === undefined, 'roster_storage_mode');
++  const expectedAgentIds = new Set(SAMPLE_AGENTS.map((agent) => agent.id));
++  const actualAgentIds = new Set(configs.map((agent) => agent.id));
++  assertCondition(
++    actualAgentIds.size === expectedAgentIds.size &&
++      configs.every((agent) => expectedAgentIds.has(agent.id)),
++    'roster_ids',
++  );
++  assertCondition(
++    configs.filter((agent) => agent.role === 'teacher').length === 1,
++    'teacher_count',
++  );
++  assertCondition(configs.filter((agent) => agent.role === 'student').length === 4, 'peer_count');
++
++  let slideCount = 0;
++  let quizCount = 0;
++  const widgetTypes = new Set<string>();
++  const discussionPeers = new Set<string>();
++  let validSpotlights = 0;
++
++  for (const [index, scene] of scenes.entries()) {
++    const expected = SAMPLE_OUTLINES[index];
++    const actions = scene.actions || [];
++    assertCondition(scene.order === index + 1, `scene_order_${index + 1}`);
++    assertCondition(scene.outlineId === expected.id, `outline_id_${index + 1}`);
++    assertCondition(scene.type === expected.type, `scene_type_${index + 1}`);
++
++    const speeches = actions.filter(
++      (action): action is Extract<Action, { type: 'speech' }> => action.type === 'speech',
++    );
++    assertCondition(speeches.length > 0, `speech_missing_${index + 1}`);
++    assertCondition(
++      speeches.every((speech) => speech.text.trim().length > 0),
++      `speech_blank_${index + 1}`,
++    );
++
++    const discussions = actions.filter(
++      (action): action is Extract<Action, { type: 'discussion' }> => action.type === 'discussion',
++    );
++    assertCondition(discussions.length <= 1, `discussion_count_${index + 1}`);
++    if (discussions.length === 1) {
++      const discussion = discussions[0];
++      assertCondition(actions.at(-1) === discussion, `discussion_terminal_${index + 1}`);
++      assertCondition(
++        !!discussion.agentId &&
++          configs.some((agent) => agent.id === discussion.agentId && agent.role === 'student'),
++        `discussion_peer_${index + 1}`,
++      );
++      assertCondition(discussion.topic.trim().length > 0, `discussion_topic_${index + 1}`);
++      discussionPeers.add(discussion.agentId);
++    }
++
++    if (scene.type === 'slide') {
++      slideCount += 1;
++      const elementIdList = scene.content.canvas.elements.map((element) => element.id);
++      const elementIds = new Set(elementIdList);
++      assertCondition(
++        elementIdList.length > 0 &&
++          elementIdList.every((id) => id.trim().length > 0) &&
++          elementIds.size === elementIdList.length,
++        `slide_elements_${index + 1}`,
++      );
++      for (const action of actions) {
++        if (action.type !== 'spotlight') continue;
++        assertCondition(elementIds.has(action.elementId), `spotlight_target_${index + 1}`);
++        validSpotlights += 1;
++      }
++    } else if (scene.type === 'quiz') {
++      quizCount += 1;
++      assertCondition(scene.content.questions.length > 0, `quiz_questions_${index + 1}`);
++    } else if (scene.type === 'interactive') {
++      assertCondition(
++        typeof scene.content.html === 'string' && scene.content.html.trim().length > 0,
++        `interactive_html_${index + 1}`,
++      );
++      assertCondition(scene.content.widgetType === expected.widgetType, `widget_type_${index + 1}`);
++      widgetTypes.add(scene.content.widgetType || '');
++    }
++  }
++
++  assertCondition(slideCount === 5, 'slide_count');
++  assertCondition(quizCount === 2, 'quiz_count');
++  assertCondition(
++    widgetTypes.size === 3 &&
++      ['simulation', 'game', 'visualization3d'].every((type) => widgetTypes.has(type)),
++    'interactive_widget_types',
++  );
++  assertCondition(discussionPeers.size >= 2, 'distinct_discussion_peers');
++  assertCondition(validSpotlights >= 1, 'valid_spotlight');
++}
+diff --git a/tests/server/classroom-generation-sample-policy.test.ts b/tests/server/classroom-generation-sample-policy.test.ts
+new file mode 100644
+index 0000000..e5c0c21
+--- /dev/null
++++ b/tests/server/classroom-generation-sample-policy.test.ts
+@@ -0,0 +1,219 @@
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++import type { SceneOutline } from '@openmaic/generation';
++
++const mocks = vi.hoisted(() => ({
++  resolveModel: vi.fn(),
++  isProviderKeyRequired: vi.fn(),
++  callLLM: vi.fn(),
++  generateSceneOutlinesFromRequirements: vi.fn(),
++  applyOutlineFallbacks: vi.fn(),
++  generateSceneContent: vi.fn(),
++  generateSceneActions: vi.fn(),
++  createSceneWithActions: vi.fn(),
++  persistClassroom: vi.fn(),
++}));
++
++vi.mock('@/lib/server/resolve-model', () => ({ resolveModel: mocks.resolveModel }));
++vi.mock('@/lib/ai/providers', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('@/lib/ai/providers')>()),
++  isProviderKeyRequired: mocks.isProviderKeyRequired,
++}));
++vi.mock('@/lib/ai/llm', () => ({ callLLM: mocks.callLLM }));
++vi.mock('@openmaic/generation', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('@openmaic/generation')>()),
++  generateSceneOutlinesFromRequirements: mocks.generateSceneOutlinesFromRequirements,
++  applyOutlineFallbacks: mocks.applyOutlineFallbacks,
++  generateSceneContent: mocks.generateSceneContent,
++  generateSceneActions: mocks.generateSceneActions,
++}));
++vi.mock('@/lib/server/scene-generation', () => ({
++  createSceneWithActions: mocks.createSceneWithActions,
++}));
++vi.mock('@/lib/server/classroom-storage', () => ({ persistClassroom: mocks.persistClassroom }));
++
++function generatedContent(outline: SceneOutline) {
++  if (outline.type === 'slide') {
++    return {
++      elements: [
++        {
++          id: `element-${outline.order}`,
++          type: 'text',
++          content: `<p>${outline.title}</p>`,
++          left: 40,
++          top: 40,
++          width: 400,
++          height: 80,
++          rotate: 0,
++        },
++      ],
++    };
++  }
++  if (outline.type === 'quiz') {
++    return {
++      questions: [
++        {
++          id: `question-${outline.order}`,
++          type: 'single',
++          question: '请选择一个答案',
++          options: [
++            { label: '选项一', value: 'a' },
++            { label: '选项二', value: 'b' },
++          ],
++          answer: 'a',
++        },
++      ],
++    };
++  }
++  return {
++    html: `<div><button id="control-${outline.order}">操作</button><script>window.value=1</script></div>`,
++    widgetType: outline.widgetType,
++    widgetConfig: { type: outline.widgetType },
++  };
++}
++
++describe('classroom generation Mira sample policy integration', () => {
++  beforeEach(() => {
++    for (const mock of Object.values(mocks)) mock.mockReset();
++    delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS;
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    mocks.resolveModel.mockResolvedValue({
++      model: { id: 'test-model' },
++      modelInfo: { outputWindow: 8192 },
++      modelString: 'test:model',
++      providerId: 'test',
++      apiKey: '',
++    });
++    mocks.isProviderKeyRequired.mockReturnValue(false);
++    mocks.callLLM.mockResolvedValue({ text: '[]' });
++    mocks.applyOutlineFallbacks.mockImplementation((outline) => outline);
++    mocks.generateSceneContent.mockImplementation(async (outline) => generatedContent(outline));
++    mocks.generateSceneActions.mockResolvedValue([]);
++    mocks.createSceneWithActions.mockImplementation((outline, content, actions, api) => {
++      const result = api.scene.create({
++        type: outline.type,
++        title: outline.title,
++        order: outline.order,
++        outlineId: outline.id,
++        content:
++          outline.type === 'slide'
++            ? {
++                type: 'slide',
++                canvas: {
++                  id: `canvas-${outline.order}`,
++                  viewportSize: 1000,
++                  viewportRatio: 0.5625,
++                  elements: content.elements,
++                },
++              }
++            : outline.type === 'quiz'
++              ? { type: 'quiz', questions: content.questions }
++              : {
++                  type: 'interactive',
++                  url: '',
++                  html: content.html,
++                  widgetType: content.widgetType,
++                  widgetConfig: content.widgetConfig,
++                },
++        actions,
++      });
++      return result.success ? (result.data ?? null) : null;
++    });
++    mocks.persistClassroom.mockImplementation(async ({ id, stage, scenes }) => ({
++      id,
++      stage,
++      scenes,
++      url: `http://localhost/classroom/${id}`,
++      scenesCount: scenes.length,
++      createdAt: '2026-08-18T00:00:00.000Z',
++    }));
++  });
++
++  it('skips outline and agent-profile models and emits the fixed complete structure', async () => {
++    const { generateClassroom } = await import('@/lib/server/classroom-generation');
++    const { MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER } =
++      await import('@/lib/server/mira-sample-structural-policy');
++    const result = await generateClassroom(
++      {
++        requirement: `服务端固定合同\n${MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER}\n合同结束`,
++        agentMode: 'generate',
++        enableTTS: false,
++        enableImageGeneration: false,
++        enableVideoGeneration: false,
++      },
++      { baseUrl: 'http://localhost' },
++    );
++
++    expect(mocks.generateSceneOutlinesFromRequirements).not.toHaveBeenCalled();
++    expect(mocks.resolveModel).not.toHaveBeenCalledWith({ stage: 'agent-profiles' });
++    expect(mocks.generateSceneContent).toHaveBeenCalledTimes(10);
++    expect(mocks.generateSceneActions).toHaveBeenCalledTimes(10);
++    expect(result.scenes).toHaveLength(10);
++    expect(result.scenes.map((scene) => scene.type)).toEqual([
++      'slide',
++      'slide',
++      'interactive',
++      'slide',
++      'interactive',
++      'slide',
++      'interactive',
++      'quiz',
++      'quiz',
++      'slide',
++    ]);
++    expect(result.stage.generatedAgentConfigs?.map(({ role }) => role)).toEqual([
++      'teacher',
++      'student',
++      'student',
++      'student',
++      'student',
++    ]);
++    expect(result.stage.agentIds).toBeUndefined();
++    expect(
++      result.scenes.every((scene) =>
++        (scene.actions || []).some(
++          (action) => action.type === 'speech' && action.text.trim().length > 0,
++        ),
++      ),
++    ).toBe(true);
++    const discussionPeers = new Set(
++      result.scenes.flatMap((scene) =>
++        (scene.actions || [])
++          .filter((action) => action.type === 'discussion')
++          .map((action) => action.agentId),
++      ),
++    );
++    expect(discussionPeers).toEqual(new Set(['mira-sample-peer-duoduo', 'mira-sample-peer-lele']));
++  });
++
++  it('leaves a lookalike marker on the ordinary OpenMAIC outline path', async () => {
++    const ordinaryOutline = {
++      id: 'ordinary-outline',
++      type: 'slide',
++      title: 'Ordinary lesson',
++      description: 'Ordinary lesson description',
++      keyPoints: ['Ordinary point'],
++      order: 1,
++    } as const;
++    mocks.generateSceneOutlinesFromRequirements.mockResolvedValue({
++      success: true,
++      data: {
++        languageDirective: 'Use English.',
++        courseTitle: 'Ordinary lesson',
++        outlines: [ordinaryOutline],
++      },
++    });
++
++    const { generateClassroom } = await import('@/lib/server/classroom-generation');
++    const { MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER } =
++      await import('@/lib/server/mira-sample-structural-policy');
++    const result = await generateClassroom(
++      { requirement: `prefix-${MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER}` },
++      { baseUrl: 'http://localhost' },
++    );
++
++    expect(mocks.generateSceneOutlinesFromRequirements).toHaveBeenCalledTimes(1);
++    expect(result.scenes).toHaveLength(1);
++    expect(result.stage.agentIds).toBeDefined();
++    expect(result.stage.generatedAgentConfigs).toBeUndefined();
++  });
++});
+diff --git a/tests/server/mira-sample-structural-policy.test.ts b/tests/server/mira-sample-structural-policy.test.ts
+new file mode 100644
+index 0000000..f7c3b51
+--- /dev/null
++++ b/tests/server/mira-sample-structural-policy.test.ts
+@@ -0,0 +1,271 @@
++import { describe, expect, it } from 'vitest';
++import type {
++  GeneratedInteractiveContent,
++  GeneratedQuizContent,
++  GeneratedSceneContent,
++  GeneratedSlideContent,
++  SceneOutline,
++} from '@openmaic/generation';
++import type { Action } from '@/lib/types/action';
++import type { Scene, Stage } from '@/lib/types/stage';
++import {
++  assertMiraSampleClassroomStructure,
++  ensureMiraSampleSceneActions,
++  isMiraSampleStructuralRequirement,
++  MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER,
++  resolveMiraSampleStructuralPlan,
++} from '@/lib/server/mira-sample-structural-policy';
++
++function generatedContent(outline: SceneOutline): GeneratedSceneContent {
++  if (outline.type === 'slide') {
++    return {
++      elements: [
++        {
++          id: `element-${outline.order}`,
++          type: 'text',
++          content: `<p>${outline.title}</p>`,
++          left: 40,
++          top: 40,
++          width: 400,
++          height: 80,
++          rotate: 0,
++        },
++      ],
++    } as GeneratedSlideContent;
++  }
++  if (outline.type === 'quiz') {
++    return {
++      questions: [
++        {
++          id: `question-${outline.order}`,
++          type: 'single',
++          question: '请选择一个答案',
++          options: [
++            { label: '选项一', value: 'a' },
++            { label: '选项二', value: 'b' },
++          ],
++          answer: ['a'],
++        },
++      ],
++    } as GeneratedQuizContent;
++  }
++  return {
++    html: `<div><button id="control-${outline.order}">操作</button></div>`,
++    widgetType: outline.widgetType,
++    widgetConfig: { type: outline.widgetType },
++  } as GeneratedInteractiveContent;
++}
++
++function toScene(outline: SceneOutline, content: GeneratedSceneContent, actions: Action[]): Scene {
++  const core = {
++    id: `scene-${outline.order}`,
++    outlineId: outline.id,
++    stageId: 'stage-sample',
++    type: outline.type,
++    title: outline.title,
++    order: outline.order,
++    actions,
++    createdAt: 1,
++    updatedAt: 1,
++  };
++  if (outline.type === 'slide' && 'elements' in content) {
++    return {
++      ...core,
++      type: 'slide',
++      content: {
++        type: 'slide',
++        canvas: {
++          id: `canvas-${outline.order}`,
++          viewportSize: 1000,
++          viewportRatio: 0.5625,
++          elements: content.elements,
++        },
++      },
++    } as Scene;
++  }
++  if (outline.type === 'quiz' && 'questions' in content) {
++    return {
++      ...core,
++      type: 'quiz',
++      content: { type: 'quiz', questions: content.questions },
++    } as Scene;
++  }
++  if (outline.type === 'interactive' && 'html' in content) {
++    return {
++      ...core,
++      type: 'interactive',
++      content: {
++        type: 'interactive',
++        url: '',
++        html: content.html,
++        widgetType: content.widgetType,
++        widgetConfig: content.widgetConfig,
++      },
++    } as Scene;
++  }
++  throw new Error(`Unexpected outline type: ${outline.type}`);
++}
++
++function completeClassroom(): { stage: Stage; scenes: Scene[] } {
++  const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER);
++  if (!plan) throw new Error('sample plan missing');
++  const stage: Stage = {
++    id: 'stage-sample',
++    name: plan.courseTitle,
++    languageDirective: plan.languageDirective,
++    createdAt: 1,
++    updatedAt: 1,
++    generatedAgentConfigs: plan.agents.map((agent, index) => ({
++      id: agent.id,
++      name: agent.name,
++      role: agent.role,
++      persona: agent.persona || '',
++      avatar: `/avatar-${index}.png`,
++      color: '#123456',
++      priority: agent.role === 'teacher' ? 10 : 5,
++    })),
++  };
++  const scenes = plan.outlines.map((outline) => {
++    const content = generatedContent(outline);
++    const actions = ensureMiraSampleSceneActions(outline, content, []);
++    return toScene(outline, content, actions);
++  });
++  return { stage, scenes };
++}
++
++describe('Mira sample structural policy', () => {
++  it('matches only an exact, case-sensitive full line', () => {
++    expect(isMiraSampleStructuralRequirement(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER)).toBe(true);
++    expect(
++      isMiraSampleStructuralRequirement(`合同\n${MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER}\n结束`),
++    ).toBe(true);
++    expect(
++      isMiraSampleStructuralRequirement(`prefix-${MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER}`),
++    ).toBe(false);
++    expect(isMiraSampleStructuralRequirement(`${MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER} `)).toBe(
++      false,
++    );
++    expect(
++      isMiraSampleStructuralRequirement(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER.toLowerCase()),
++    ).toBe(false);
++  });
++
++  it('returns an exact 10-scene, 10-minute grade-one number-sense blueprint', () => {
++    const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER);
++    expect(plan).not.toBeNull();
++    expect(plan?.outlines).toHaveLength(10);
++    expect(plan?.outlines.map((outline) => outline.order)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
++    expect(plan?.outlines.filter((outline) => outline.type === 'slide')).toHaveLength(5);
++    expect(plan?.outlines.filter((outline) => outline.type === 'quiz')).toHaveLength(2);
++    expect(
++      plan?.outlines
++        .filter((outline) => outline.type === 'interactive')
++        .map((outline) => outline.widgetType),
++    ).toEqual(['simulation', 'game', 'visualization3d']);
++    expect(plan?.outlines.reduce((sum, outline) => sum + (outline.estimatedDuration || 0), 0)).toBe(
++      600,
++    );
++
++    const simulation = plan?.outlines.find((outline) => outline.widgetType === 'simulation');
++    const game = plan?.outlines.find((outline) => outline.widgetType === 'game');
++    const visualization = plan?.outlines.find(
++      (outline) => outline.widgetType === 'visualization3d',
++    );
++    expect(simulation?.widgetOutline).toMatchObject({
++      concept: expect.any(String),
++      keyVariables: [expect.any(String)],
++    });
++    expect(game?.widgetOutline).toMatchObject({
++      gameType: 'puzzle',
++      challenge: expect.any(String),
++      playerControls: expect.arrayContaining([expect.any(String)]),
++    });
++    expect(visualization?.widgetOutline).toMatchObject({
++      visualizationType: 'geometry',
++      objects: expect.arrayContaining([expect.any(String)]),
++      interactions: expect.arrayContaining([expect.any(String)]),
++    });
++    expect(plan?.agents.filter((agent) => agent.role === 'teacher')).toHaveLength(1);
++    expect(plan?.agents.filter((agent) => agent.role === 'student')).toHaveLength(4);
++  });
++
++  it('keeps meaningful speech and adds fallback only when narration is absent', () => {
++    const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER)!;
++    const outline = plan.outlines[2];
++    const content = generatedContent(outline);
++    const authored: Action = { id: 'authored', type: 'speech', text: '这是模型写的有效讲稿。' };
++    const kept = ensureMiraSampleSceneActions(outline, content, [authored]);
++    expect(kept.find((action) => action.id === 'authored')).toBe(authored);
++    expect(kept.filter((action) => action.type === 'speech')).toHaveLength(1);
++
++    const repaired = ensureMiraSampleSceneActions(outline, content, [
++      { id: 'blank', type: 'speech', text: '   ' },
++      { id: 'discussion', type: 'discussion', topic: '', agentId: 'invalid-agent' },
++    ]);
++    const speeches = repaired.filter((action) => action.type === 'speech');
++    expect(speeches).toHaveLength(1);
++    expect((speeches[0] as Extract<Action, { type: 'speech' }>).text).toContain('数量控件');
++    expect(repaired.at(-1)).toMatchObject({
++      type: 'discussion',
++      agentId: 'mira-sample-peer-duoduo',
++      topic: expect.any(String),
++    });
++  });
++
++  it('binds a missing first-slide spotlight to a real generated element', () => {
++    const plan = resolveMiraSampleStructuralPlan(MIRA_SAMPLE_STRUCTURAL_POLICY_MARKER)!;
++    const outline = plan.outlines[0];
++    const content = generatedContent(outline);
++    const actions = ensureMiraSampleSceneActions(outline, content, []);
++    expect(actions[0]).toMatchObject({
++      type: 'spotlight',
++      elementId: 'element-1',
++    });
++  });
++
++  it('accepts the complete repaired classroom and rejects structural regressions', () => {
++    const complete = completeClassroom();
++    expect(() => assertMiraSampleClassroomStructure(complete.stage, complete.scenes)).not.toThrow();
++
++    const missingScene = completeClassroom();
++    missingScene.scenes.pop();
++    expect(() =>
++      assertMiraSampleClassroomStructure(missingScene.stage, missingScene.scenes),
++    ).toThrow(/scene_count/);
++
++    const missingSpeech = completeClassroom();
++    missingSpeech.scenes[4].actions = (missingSpeech.scenes[4].actions || []).filter(
++      (action) => action.type !== 'speech',
++    );
++    expect(() =>
++      assertMiraSampleClassroomStructure(missingSpeech.stage, missingSpeech.scenes),
++    ).toThrow(/speech_missing_5/);
++
++    const wrongWidget = completeClassroom();
++    const interactive = wrongWidget.scenes[2];
++    if (interactive.type === 'interactive') interactive.content.widgetType = 'game';
++    expect(() => assertMiraSampleClassroomStructure(wrongWidget.stage, wrongWidget.scenes)).toThrow(
++      /widget_type_3/,
++    );
++
++    const duplicateDiscussionPeer = completeClassroom();
++    const discussions = duplicateDiscussionPeer.scenes.flatMap((scene) =>
++      (scene.actions || []).filter(
++        (action): action is Extract<Action, { type: 'discussion' }> => action.type === 'discussion',
++      ),
++    );
++    discussions[1].agentId = discussions[0].agentId;
++    expect(() =>
++      assertMiraSampleClassroomStructure(
++        duplicateDiscussionPeer.stage,
++        duplicateDiscussionPeer.scenes,
++      ),
++    ).toThrow(/distinct_discussion_peers/);
++
++    const badRoster = completeClassroom();
++    badRoster.stage.generatedAgentConfigs = badRoster.stage.generatedAgentConfigs?.slice(0, 4);
++    expect(() => assertMiraSampleClassroomStructure(badRoster.stage, badRoster.scenes)).toThrow(
++      /roster_count/,
++    );
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/app/app.dart';
@@ -19,9 +18,13 @@ import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
 import 'package:warm_sight/src/features/live_care/presentation/live_care_screen.dart';
+import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
+import 'package:warm_sight/src/features/learning/domain/learning_preparation_models.dart';
 import 'package:warm_sight/src/features/setup/application/setup_repository.dart';
 import 'package:warm_sight/src/features/setup/presentation/add_camera_sheet.dart';
+import 'package:warm_sight/src/shared/widgets/app_button.dart';
 import 'package:warm_sight/src/shared/widgets/app_state_view.dart';
+import 'support/fake_auth_token_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _adminCapabilities = [
@@ -651,18 +654,6 @@ void main() {
   });
 
   testWidgets('runs login then first setup flow into home', (tester) async {
-    const datePickerChannel = MethodChannel('ai_camera_app/native_date_picker');
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      datePickerChannel,
-      (call) async => '2021-06-01',
-    );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        datePickerChannel,
-        null,
-      ),
-    );
-
     await _pumpApp(tester, preferences: const {hasSeenOnboardingKey: true});
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -675,46 +666,76 @@ void main() {
       find.byKey(const ValueKey('familyRoleSegment_admin')),
       findsOneWidget,
     );
-    await tester.tap(find.text('继续填写孩子资料'));
+    await tester.tap(find.text('继续设置孩子身份'));
     await tester.pumpAndSettle();
 
-    expect(find.text('孩子资料'), findsOneWidget);
+    expect(find.text('设置孩子的学习身份'), findsOneWidget);
+    expect(find.text('用于称呼孩子并匹配适龄内容'), findsOneWidget);
     expect(find.text('2 / 2'), findsOneWidget);
     expect(find.text('3 / 2'), findsNothing);
     expect(find.text('就读阶段'), findsNothing);
-    expect(find.text('幼儿园'), findsNothing);
-    expect(find.text('幼儿园班级'), findsOneWidget);
-    expect(find.text('小班'), findsOneWidget);
-    expect(find.text('中班'), findsOneWidget);
-    expect(find.text('大班'), findsOneWidget);
+    expect(find.text('幼儿园'), findsOneWidget);
+    expect(find.text('小学'), findsOneWidget);
+    expect(find.text('选择小学年级'), findsOneWidget);
+    expect(find.text('新六年级'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('gradeOption_kindergarten_small')),
+      findsNothing,
+    );
+    expect(find.text('孩子称呼'), findsOneWidget);
+    expect(find.text('摄像头老师会这样称呼孩子'), findsOneWidget);
+    expect(find.text('性别'), findsNothing);
+    expect(find.text('出生日期'), findsNothing);
     expect(find.text('入睡时间'), findsNothing);
     expect(find.text('学校'), findsNothing);
     expect(find.text('兴趣'), findsNothing);
-    expect(find.text('小学'), findsNothing);
     expect(find.text('初中'), findsNothing);
-    await tester.enterText(find.byType(EditableText).at(0), '小宇');
-    await tester.pump();
-    await tester.tap(find.text('完成设置'));
-    await tester.pump();
-    expect(find.text('请选择孩子生日'), findsOneWidget);
     expect(_lastSetupChildBody, isNull);
+    expect(
+      tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
+      isNull,
+    );
 
-    await _tapBirthdayField(tester);
+    await tester.enterText(find.byKey(const ValueKey('setupInput_孩子称呼')), '乐乐');
+    await tester.pump();
+    expect(
+      tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
+      isNull,
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
-    expect(find.text('2021-06-01'), findsOneWidget);
-    expect(find.text('已推荐班级'), findsOneWidget);
-    expect(find.text('推荐 中班，可手动调整。'), findsOneWidget);
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('gradeOption_primary_3')),
+    );
+    await tester.tap(find.byKey(const ValueKey('gradeOption_primary_3')));
+    await tester.pumpAndSettle();
+    expect(find.text('新三年级'), findsWidgets);
+    expect(
+      tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
+      isNotNull,
+    );
 
     await tester.tap(find.text('完成设置'));
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
 
     expect(find.text('还没有连接摄像头'), findsWidgets);
-    expect(_lastSetupChildBody?['educationStage'], '幼儿园');
-    expect(_lastSetupChildBody?['ageStage'], '幼儿园 中班');
-    expect(_lastSetupChildBody?['grade'], '中班');
+    expect(_lastSetupChildBody?['name'], '乐乐');
+    expect(_lastSetupChildBody?['nickname'], '乐乐');
+    expect(_lastSetupChildBody?['gradeCode'], 'primary_3');
+    expect(_lastSetupChildBody?['schoolYearStartYear'], DateTime.now().year);
+    expect(_lastSetupChildBody?.containsKey('birthday'), isFalse);
+    expect(_lastSetupChildBody?.containsKey('gender'), isFalse);
     expect(find.text('连接第一台看护摄像头'), findsNothing);
-    expect(find.text('今日安排'), findsOneWidget);
+    expect(find.text('今日学习'), findsOneWidget);
+    expect(find.text('正式发布校验中'), findsOneWidget);
+    expect(find.text('三位数进位加法'), findsNothing);
+    expect(find.text('课程已就绪'), findsNothing);
+    expect(find.text('扫码登录学生网页'), findsNothing);
+    expect(find.textContaining('家长端只展示准备状态与学习结果'), findsNothing);
+    expect(find.text('安排今日课程'), findsNothing);
+    expect(find.text('体验预览'), findsNothing);
     expect(find.text('\u7c73\u62c9怎么说'), findsNothing);
     expect(find.textContaining('bindingCode'), findsNothing);
     expect(find.textContaining('mock'), findsNothing);
@@ -1021,8 +1042,8 @@ void main() {
       tester,
       '孩子资料',
       expectedTitle: '孩子资料',
-      expectedTexts: const ['孩子称呼', '性别', '出生日期', '幼儿园班级'],
-      absentTexts: const ['入睡时间', '学校', '兴趣', '就读阶段'],
+      expectedTexts: const ['孩子称呼', '就读阶段', '年级'],
+      absentTexts: const ['性别', '出生日期', '入睡时间', '学校', '兴趣'],
     );
 
     final familyHubEntry = find.text('家庭与成员').last;
@@ -1088,12 +1109,7 @@ void main() {
       'AI 规则与提醒',
       '看护能力',
       expectedTitle: '看护能力',
-      expectedTexts: const [
-        '坐姿提醒',
-        '玩具收纳与安全',
-        '用餐习惯提醒',
-        '屏幕使用提醒',
-      ],
+      expectedTexts: const ['坐姿提醒', '玩具收纳与安全', '用餐习惯提醒', '屏幕使用提醒'],
       absentTexts: const [
         '更多提醒能力',
         '转场提醒',
@@ -1155,13 +1171,7 @@ void main() {
       'AI 规则与提醒',
       '看护能力',
       expectedTitle: '看护能力',
-      expectedTexts: const [
-        '未连接摄像头',
-        '坐姿提醒',
-        '玩具收纳与安全',
-        '用餐习惯提醒',
-        '屏幕使用提醒',
-      ],
+      expectedTexts: const ['未连接摄像头', '坐姿提醒', '玩具收纳与安全', '用餐习惯提醒', '屏幕使用提醒'],
       absentTexts: const [
         '还没有可用摄像头',
         '更多提醒能力',
@@ -1523,13 +1533,6 @@ Future<void> _openProfileNestedEntry(
   }
 }
 
-Future<void> _tapBirthdayField(WidgetTester tester) async {
-  final field = find.byKey(const ValueKey('setupInput_出生日期'));
-  await tester.ensureVisible(field);
-  final rect = tester.getRect(field);
-  await tester.tapAt(Offset(rect.left + 12, rect.center.dy));
-}
-
 Future<void> _pumpApp(
   WidgetTester tester, {
   required Map<String, Object> preferences,
@@ -1549,6 +1552,11 @@ Future<void> _pumpApp(
 
   SharedPreferences.setMockInitialValues(preferences);
   final sharedPreferences = await SharedPreferences.getInstance();
+  final authSessionStore = AuthSessionStore(
+    sharedPreferences,
+    secureStorage: FakeAuthSecureSessionStorage(),
+  );
+  await authSessionStore.initialize();
   final fakeApi = _FakeApiServer(
     completedSetup: preferences[hasCompletedInitialSetupKey] == true,
     hasDevice: hasDevice,
@@ -1561,7 +1569,7 @@ Future<void> _pumpApp(
     ProviderScope(
       overrides: [
         appEnvironmentProvider.overrideWithValue(
-          const AppEnvironment(flavor: AppFlavor.test, apiBaseUrl: ''),
+          AppEnvironment(flavor: AppFlavor.test, apiBaseUrl: ''),
         ),
         cameraDiscoveryConfigProvider.overrideWithValue(
           const CameraDiscoveryConfig(
@@ -1574,6 +1582,9 @@ Future<void> _pumpApp(
         ),
         rawDioProvider.overrideWithValue(fakeDio),
         dioProvider.overrideWithValue(fakeDio),
+        learningPreparationRepositoryProvider.overrideWithValue(
+          const _SmokePreparationGateway(),
+        ),
         careSummaryProvider.overrideWith((ref, childId) async {
           return CareSummary(
             childId: childId ?? 'child_test',
@@ -1586,11 +1597,72 @@ Future<void> _pumpApp(
           );
         }),
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        authSessionStoreProvider.overrideWithValue(authSessionStore),
       ],
       child: const GuardianApp(),
     ),
   );
   await tester.pump(const Duration(milliseconds: 50));
+}
+
+LearningPreparation _smokeReadyPreparation(String childId) =>
+    LearningPreparation.fromJson({
+      'schemaVersion': 'mira.learning.preparation.v1',
+      'id': 'plan-smoke-ready',
+      'childId': childId,
+      'gradeCode': 'primary_3',
+      'gradeLabel': '三年级',
+      'subjects': const [
+        {
+          'code': 'chinese',
+          'label': '语文',
+          'readyCourseCount': 12,
+          'failedCourseCount': 0,
+          'totalCourseCount': 12,
+        },
+        {
+          'code': 'math',
+          'label': '数学',
+          'readyCourseCount': 9,
+          'failedCourseCount': 0,
+          'totalCourseCount': 9,
+        },
+        {
+          'code': 'english',
+          'label': '英语',
+          'readyCourseCount': 9,
+          'failedCourseCount': 0,
+          'totalCourseCount': 9,
+        },
+      ],
+      'status': 'ready',
+      'stage': 'completed',
+      'progressPercent': 100,
+      'totalCourseCount': 30,
+      'readyCourseCount': 30,
+      'failedCourseCount': 0,
+      'attempt': 1,
+      'canRetry': false,
+      'retryAfterMs': null,
+      'message': '课程已就绪',
+      'lastProgressAt': 1787200000000,
+      'updatedAt': 1787200000000,
+      'completedAt': 1787200000000,
+      'error': null,
+    });
+
+class _SmokePreparationGateway implements LearningPreparationGateway {
+  const _SmokePreparationGateway();
+
+  @override
+  Future<LearningPreparation?> current(String childId) async =>
+      _smokeReadyPreparation(childId);
+
+  @override
+  Future<LearningPreparation> retry({
+    required String planId,
+    required String requestId,
+  }) async => _smokeReadyPreparation('child_test');
 }
 
 Future<void> _pumpStateView(
@@ -1776,6 +1848,8 @@ class _FakeApiServer {
   String _relationship = '妈妈';
   String _relationshipKey = 'mom';
   String _phone = '13800002026';
+  String _childGradeCode = 'kindergarten_middle';
+  int _childSchoolYearStartYear = DateTime.now().year;
   final List<Map<String, dynamic>> _tasks = [];
 
   late final Dio dio = _buildDio();
@@ -1837,6 +1911,10 @@ class _FakeApiServer {
       }
       if (path == '/setup/child') {
         _lastSetupChildBody = Map<String, dynamic>.from(body);
+        _childGradeCode = _text(body['gradeCode'], _childGradeCode);
+        _childSchoolYearStartYear = body['schoolYearStartYear'] is int
+            ? body['schoolYearStartYear'] as int
+            : _childSchoolYearStartYear;
       }
       return _ok(options, _setupPayloadFor(path));
     }
@@ -1873,6 +1951,10 @@ class _FakeApiServer {
       return _ok(options, {'ok': true, 'child': _child()});
     }
     if (method == 'PATCH' && path.startsWith('/children/')) {
+      _childGradeCode = _text(body['gradeCode'], _childGradeCode);
+      if (body['schoolYearStartYear'] is int) {
+        _childSchoolYearStartYear = body['schoolYearStartYear'] as int;
+      }
       return _ok(options, {'ok': true, 'child': _child(body)});
     }
     if (method == 'GET' && path == '/contacts/emergency') {
@@ -1993,6 +2075,40 @@ class _FakeApiServer {
         'ok': true,
         'date': date,
         'tasks': _tasks.where((task) => task['scheduledDate'] == date).toList(),
+      });
+    }
+    if (method == 'GET' && path == '/learning/availability') {
+      return _ok(options, {
+        'ok': true,
+        'availability': {
+          'gradeCode': _childGradeCode,
+          'hasActiveRelease': false,
+          'availableCourseCount': 0,
+          'canLearnNow': false,
+          'canAccessWorkspace': _childGradeCode == 'primary_1',
+        },
+      });
+    }
+    if (method == 'GET' && path == '/learning/overview') {
+      return _ok(options, {
+        'ok': true,
+        'date': _text(options.queryParameters['date'], _today),
+        'childId': _text(options.queryParameters['childId'], 'child_test'),
+        'recommendation': {
+          'courseId': 'primary_3_math_addition_v1',
+          'courseVersion': 1,
+          'gradeCode': 'primary_3',
+          'subject': 'math',
+          'nodeCode': 'addition.carry',
+          'title': '三位数进位加法',
+          'objective': '理解位值并正确完成连续进位',
+          'estimatedMinutes': 10,
+          'questionCount': 4,
+          'intro': '从位值理解进位。',
+        },
+        'task': null,
+        'session': null,
+        'latestReport': null,
       });
     }
     if (method == 'GET' && path == '/tasks/templates') {
@@ -2392,16 +2508,7 @@ class _FakeApiServer {
           ? {'id': 'device_test', 'name': '暖瞳摄像头', 'location': '儿童房'}
           : null,
       'wifi': wifi ? {'ssid': 'Home Wi-Fi 2.4G'} : null,
-      'child': child
-          ? {
-              'id': 'child_test',
-              'name': '小宇',
-              'gender': 'unspecified',
-              'educationStage': '幼儿园',
-              'grade': '大班',
-              'birthday': '',
-            }
-          : null,
+      'child': child ? _child() : null,
       'cameraName': device || cameraName || done ? {'wakeName': '小暖'} : null,
     };
   }
@@ -2443,6 +2550,9 @@ class _FakeApiServer {
   }
 
   Map<String, dynamic> _child([Map<String, dynamic>? body]) {
+    final gradeCode = _text(body?['gradeCode'], _childGradeCode);
+    final stageLabel = _stageLabelForGradeCode(gradeCode);
+    final gradeLabel = _gradeLabelForCode(gradeCode);
     return {
       'id': 'child_test',
       'name': _text(body?['name'], '小宇'),
@@ -2450,12 +2560,41 @@ class _FakeApiServer {
       'gender': _text(body?['gender'], 'unspecified'),
       'birthday': _text(body?['birthday'], '2020-06-01'),
       'sleepTime': _text(body?['sleepTime'], '21:00'),
-      'ageStage': _text(body?['ageStage'], 'kindergarten'),
-      'educationStage': _text(body?['educationStage'], '幼儿园'),
-      'grade': _text(body?['grade'], '中班'),
+      'ageStage': _text(body?['ageStage'], '$stageLabel $gradeLabel'),
+      'educationStage': _text(body?['educationStage'], stageLabel),
+      'educationStageCode': gradeCode.startsWith('primary_')
+          ? 'primary'
+          : 'kindergarten',
+      'grade': _text(body?['grade'], gradeLabel),
+      'gradeCode': gradeCode,
+      'contentMode': gradeCode.startsWith('primary_')
+          ? 'primary_learning'
+          : 'kindergarten_growth',
+      'schoolYearStartYear': body?['schoolYearStartYear'] is int
+          ? body!['schoolYearStartYear']
+          : _childSchoolYearStartYear,
+      'gradeConfirmedAt': _now,
       'schoolName': _text(body?['schoolName'], ''),
       'interests': body?['interests'] ?? ['绘本', '运动'],
       'taskPreferences': body?['taskPreferences'] ?? {},
+    };
+  }
+
+  String _stageLabelForGradeCode(String gradeCode) {
+    return gradeCode.startsWith('primary_') ? '小学' : '幼儿园';
+  }
+
+  String _gradeLabelForCode(String gradeCode) {
+    return switch (gradeCode) {
+      'kindergarten_small' => '小班',
+      'kindergarten_big' => '大班',
+      'primary_1' => '一年级',
+      'primary_2' => '二年级',
+      'primary_3' => '三年级',
+      'primary_4' => '四年级',
+      'primary_5' => '五年级',
+      'primary_6' => '六年级',
+      _ => '中班',
     };
   }
 

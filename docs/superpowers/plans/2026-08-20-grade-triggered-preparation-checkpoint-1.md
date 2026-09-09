@@ -1013,7 +1013,7 @@ Add:
 ```text
 LEARNING_CURRICULUM_PREPARATION_RUNNER_ENABLED=0
 LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS=15
-LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS=90
+LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS=240
 ```
 
 Plan reservation is an invariant of successful primary-grade save and has no kill switch; only the worker is disabled by default. `apply_test_defaults()` sets runner false. `validate_flask_config()` requires interval at least 5 and lease at least 30. `create_app()` calls `start_learning_curriculum_preparation(app)` after existing daily preparation startup.

@@ -1,0 +1,164 @@
+--- a/lib/server/classroom-job-runner.ts
++++ b/lib/server/classroom-job-runner.ts
+@@ -35,6 +35,11 @@
+   const onError = () => { lost = true; };
+   client.on('error', onError);
+   const assertOwner = async () => {
++    // Shutdown closes the shared pool after draining the Agent runner. This
++    // checked-out advisory-lock client can still answer SELECT 1 while the
++    // store's next pool query already rejects. Preserve the durable job for
++    // reattachment instead of recording that shutdown as a content failure.
++    if (pool.ending || pool.ended) lost = true;
+     if (!lost) {
+       try { await client.query('SELECT 1'); } catch { lost = true; }
+     }
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -668,13 +668,30 @@
+   }
+ }
+ 
+-function stageIdFromEvents(events: PersistedAgentSessionEvent[]): string {
++export function resolveMiraFormalStageId(
++  events: ReadonlyArray<Pick<PersistedAgentSessionEvent, 'type' | 'data'>>,
++): string {
+   const ids = new Set<string>();
+   for (const event of events) {
+     if (event.type !== HOST_AGENT_LIFECYCLE.stageLink && event.type !== 'course_link') continue;
+     const data = plainObject(event.data);
+     const stageId = typeof data?.stageId === 'string' ? data.stageId.trim() : '';
+     if (stageId) ids.add(stageId);
++  }
++  if (ids.size === 0) {
++    // A required search can fail before create_stage. Report that durable
++    // dependency failure rather than suggesting a broken classroom link.
++    const searchWasRateLimited = events.some((event) => {
++      const data = plainObject(event.data);
++      if (event.type !== 'tool_execution_end' || data?.toolName !== 'web_search' || data.isError !== true) return false;
++      const result = plainObject(data.result);
++      return Array.isArray(result?.content) && result.content.some((block) => {
++        const content = plainObject(block);
++        return content?.type === 'text' && typeof content.text === 'string' &&
++          /(?:\berror\s*\(429\)|\bHTTP(?:\s+status)?\s+429\b)/i.test(content.text.slice(0, 1024));
++      });
++    });
++    if (searchWasRateLimited) throw new Error('FORMAL_PROFESSIONAL_WEB_SEARCH_RATE_LIMITED');
+   }
+   if (ids.size !== 1) throw new Error('FORMAL_PROFESSIONAL_STAGE_LINK_INVALID');
+   return [...ids][0]!;
+@@ -1219,7 +1236,7 @@
+   const spec = parseFormalCoursewareSpec(input);
+   const identity = await requireSucceededProfessionalSession(input, spec);
+   const events = await readAllSessionEvents(identity.sessionId);
+-  const stageId = stageIdFromEvents(events);
++  const stageId = resolveMiraFormalStageId(events);
+   const ownerStore = await getOwnerScopedDocumentStore(identity.ownerId);
+   if (!(await ownerStore.loadDocument(stageId))) {
+     throw new Error('FORMAL_PROFESSIONAL_DOCUMENT_MISSING');
+@@ -1239,7 +1256,7 @@
+   },
+ ): Promise<MiraFormalProfessionalRecoveryCompletion> {
+   const events = await readAllSessionEvents(identity.sessionId);
+-  const stageId = stageIdFromEvents(events);
++  const stageId = resolveMiraFormalStageId(events);
+   if (options.expectedStageId && options.expectedStageId !== stageId) {
+     throw new Error('FORMAL_PROFESSIONAL_RECOVERY_STAGE_MISMATCH');
+   }
+--- a/tests/server/mira-formal-job-owner.test.ts
++++ b/tests/server/mira-formal-job-owner.test.ts
+@@ -3,9 +3,10 @@
+   query: vi.fn(), release: vi.fn(), on: vi.fn(), removeListener: vi.fn(),
+   claim: vi.fn(), saved: vi.fn(), running: vi.fn(), succeeded: vi.fn(), failed: vi.fn(),
+   progress: vi.fn(), generate: vi.fn(), resume: vi.fn(),
++  pool: { ending: false, ended: false },
+ }));
+ vi.mock('@/lib/persistence/server-provider', () => ({
+-  getServerPersistenceProvider: async () => ({ pool: { connect: async () => mocks } }),
++  getServerPersistenceProvider: async () => ({ pool: Object.assign(mocks.pool, { connect: async () => mocks }) }),
+ }));
+ vi.mock('@/lib/server/classroom-generation', () => ({ generateClassroom: mocks.generate }));
+ vi.mock('@/lib/server/mira-formal-professional-classroom', () => ({ resumeMiraFormalProfessionalClassroom: mocks.resume }));
+@@ -22,6 +23,8 @@
+ describe('formal completion owner', () => {
+   beforeEach(() => {
+     vi.resetAllMocks();
++    mocks.pool.ending = false;
++    mocks.pool.ended = false;
+     vi.stubEnv('DATABASE_URL', 'postgres://unused-test-connection');
+     mocks.query.mockResolvedValue({ rows: [{ acquired: true }] });
+     mocks.claim.mockResolvedValue(false);
+@@ -50,4 +53,21 @@
+     expect(mocks.failed).not.toHaveBeenCalled();
+     expect(mocks.running).not.toHaveBeenCalled();
+   });
++  it('preserves completion when shutdown ends the pool while its owner client still works', async () => {
++    mocks.resume.mockImplementation(async () => {
++      mocks.pool.ending = true;
++      throw new Error('Cannot use a pool after calling end on the pool');
++    });
++    await runClassroomGenerationJob('shutdown-job', input, 'http://local');
++    expect(mocks.resume).toHaveBeenCalledTimes(1);
++    expect(mocks.generate).not.toHaveBeenCalled();
++    expect(mocks.failed).not.toHaveBeenCalled();
++    expect(mocks.succeeded).not.toHaveBeenCalled();
++    expect(mocks.release).toHaveBeenCalledWith(true);
++  });
++  it('retains a real terminal quality rejection when the pool remains healthy', async () => {
++    mocks.resume.mockRejectedValue(new Error('FORMAL_QUALITY_REPAIR_BUDGET_EXHAUSTED'));
++    await runClassroomGenerationJob('quality-job', input, 'http://local');
++    expect(mocks.failed).toHaveBeenCalledWith('quality-job', 'FORMAL_QUALITY_REPAIR_BUDGET_EXHAUSTED');
++  });
+ });
+--- a/tests/server/mira-formal-professional-classroom.test.ts
++++ b/tests/server/mira-formal-professional-classroom.test.ts
+@@ -3,6 +3,7 @@
+ import {
+   canonicalizeMiraFormalResearchFooters,
+   hasMiraFormalSlideSpotlightSequence,
++  resolveMiraFormalStageId,
+   withMiraFormalImageInstructions,
+   withMiraFormalVideoInstructions,
+ } from '@/lib/server/mira-formal-professional-classroom';
+@@ -14,6 +15,28 @@
+   MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import type { Scene } from '@/lib/types/stage';
++
++describe('formal classroom dependency diagnostics', () => {
++  const limitedSearch = { type: 'tool_execution_end', data: {
++    toolName: 'web_search', isError: true,
++    result: { content: [{ type: 'text', text: 'Brave Search error (429): limited' }] },
++  } };
++  it('identifies a failed search before a classroom was created', () => {
++    expect(() => resolveMiraFormalStageId([limitedSearch])).toThrow('FORMAL_PROFESSIONAL_WEB_SEARCH_RATE_LIMITED');
++  });
++  it('does not relabel a completed stage or ambiguous multiple stages', () => {
++    const stage = { type: 'stage_link', data: { stageId: 'original-stage' } };
++    expect(resolveMiraFormalStageId([limitedSearch, stage])).toBe('original-stage');
++    expect(() => resolveMiraFormalStageId([limitedSearch, stage,
++      { type: 'stage_link', data: { stageId: 'other-stage' } },
++    ])).toThrow('FORMAL_PROFESSIONAL_STAGE_LINK_INVALID');
++  });
++  it('does not mistake a successful result mentioning 429 for a provider failure', () => {
++    expect(() => resolveMiraFormalStageId([{ ...limitedSearch,
++      data: { ...limitedSearch.data, isError: false },
++    }])).toThrow('FORMAL_PROFESSIONAL_STAGE_LINK_INVALID');
++  });
++});
+ 
+ function slide(actions: Scene['actions'], elementId = 'focus-target'): Scene {
+   return {
+--- a/tests/server/mira-formal-scene-inspector.browser.test.ts
++++ b/tests/server/mira-formal-scene-inspector.browser.test.ts
+@@ -249,9 +249,9 @@
+   }, 60_000);
+ 
+   it('renders the actual SlideCanvas and detects clipping in a deliberately bad slide', async () => {
+-    const canvas = createDefaultSlide();
++    const canvas = createDefaultSlide('inspector-canvas');
+     const text = {
+-      ...createDefaultTextElement(),
++      ...createDefaultTextElement('inspector-text'),
+       content: '<p>认识数字五</p>',
+       left: 80,
+       top: 90,

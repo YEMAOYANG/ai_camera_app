@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 from pathlib import Path
+from urllib.parse import urlparse
 
 from flask import current_app
 
-from core.config import BACKEND_ROOT
+from core.config import (
+    BACKEND_ROOT,
+    LEARNING_CURRICULUM_PREPARATION_MIN_LEASE_SECONDS,
+)
+from core.database import Database
 from core.errors import ApiError
 from integrations.hardware.disabled_adapter import DisabledHardwareDeviceAdapter
 from integrations.hardware.mock_adapter import MockHardwareDeviceAdapter
 from services.auth_service import AuthService
+from services.student_auth_service import StudentAuthService
 from integrations.ai.kimi_vision_provider import OpenAICompatibleVisionProvider
 from integrations.ai.unavailable_vision_provider import UnavailableVisionProvider
 from services.ai_text_provider import OpenAICompatibleTextProvider, UnavailableAiTextProvider
@@ -18,6 +24,28 @@ from services.camera_ai_observation_service import CameraAiObservationService
 from integrations.camera_runtime.python_open_cv_yolo_prefilter import default_local_vision_prefilter
 from integrations.camera_runtime.go2rtc_client import Go2RtcClient
 from integrations.onvif.client import OnvifClient
+from integrations.tts.macos_say import MacOsSayTtsProvider
+from integrations.tts.voxcpm2 import VoxCpm2HttpProvider
+from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
+from integrations.openmaic_formal_citation_recovery_client import (
+    OpenMaicFormalCitationRecoveryClient,
+)
+from integrations.openmaic_conversation_probe_client import (
+    OpenMaicConversationProbeClient,
+)
+from integrations.openmaic_deterministic_recovery_client import (
+    RECOVERY_CANONICAL_SPEC_SHA256,
+    RECOVERY_PATCH_SHA256,
+    OpenMaicDeterministicRecoveryClient,
+)
+from integrations.openmaic_tts_credential_recovery_client import (
+    TTS_CREDENTIAL_RECOVERY_PATCH_SHA256,
+    OpenMaicTtsCredentialRecoveryClient,
+)
+from integrations.openmaic_question_adapter import (
+    OpenMaicQuestionAdapter,
+    OpenMaicQuestionPhaseAdapter,
+)
 from services.camera_observe_service import CameraObserveService
 from services.camera_command_service import CameraCommandService
 from services.care_config_service import CareConfigService
@@ -27,6 +55,48 @@ from services.device_runtime_resolver import DeviceRuntimeResolver
 from services.firmware_service import FirmwareService
 from services.ai_care_reminder_service import AiCareReminderService
 from services.internal_request_guard import InternalRequestGuard
+from services.learning_content_generation_service import LearningContentGenerationService
+from services.learning_content_pipeline_service import LearningContentPipelineService
+from services.dynamic_learning_course_generation_service import (
+    DynamicLearningCourseGenerationService,
+    StagedContentCandidateGenerator,
+)
+from repositories.dynamic_learning_course_repository import (
+    DynamicLearningCourseRepository,
+)
+from services.learning_service import LearningService
+from services.learning_curriculum_preparation_service import (
+    LearningCurriculumPreparationService,
+)
+from services.learning_curriculum_preparation_runner import (
+    CheckpointSharedBuildAdapter,
+    FormalProductionStageAdapter,
+)
+from services.learning_catalog_release_service import LearningCatalogReleaseService
+from services.learning_catalog_validator import LearningCatalogValidator
+from services.learning_generated_course_validator import (
+    LearningGeneratedCourseValidator,
+)
+from repositories.learning_teacher_media_repository import (
+    LearningTeacherMediaRepository,
+)
+from repositories.learning_curriculum_preparation_repository import (
+    LearningCurriculumPreparationRepository,
+)
+from services.learning_media_asset_store import FilesystemLearningMediaAssetStore
+from services.learning_media_materialization_service import (
+    FormalQwenAudioService,
+    LearningMediaMaterializationService,
+)
+from services.lesson_package_service import LessonPackageService
+from services.lesson_runtime_service import LessonRuntimeService
+from services.student_learning_service import StudentLearningService
+from services.student_learning_media_service import StudentLearningMediaService
+from services.openmaic_full_runtime_service import OpenMaicFullRuntimeService
+from services.openmaic_runtime_audio_service import OpenMaicRuntimeAudioService
+from services.openmaic_conversation_probe_service import (
+    OpenMaicConversationProbeService,
+)
 from services.point_service import PointService
 from services.profile_service import ProfileService
 from services.reward_service import RewardService
@@ -43,6 +113,50 @@ from services.voice_conversation_service import VoiceConversationService
 from services.voice_runtime_app_service import VoiceRuntimeAppService
 
 
+class _ParentRetryQuestionPhaseCanonicalizer:
+    """Pure request/hash authority for retry audits; never executes a phase."""
+
+    canonicalize_phase = OpenMaicQuestionPhaseAdapter.canonicalize_phase
+
+    def __init__(self, profile: dict[str, object]):
+        self.provider_name = str(profile["name"])
+        self.model_name = str(profile["model"])
+        self.base_url = str(profile["baseUrl"])
+        self.api_key_env = str(profile["apiKeyEnv"])
+        self.provider_timeout_ms = int(profile["timeoutMs"])
+        self.max_tokens = int(profile["maxTokens"])
+        self.temperature = float(profile["temperature"])
+
+
+class _ParentRetryCatalogAuditService(LearningCatalogReleaseService):
+    """Catalog retry auditor with canonicalization but no execution adapter."""
+
+    def __init__(self, database_url: str, profile: dict[str, object] | None):
+        profiles = (
+            {"generator": dict(profile), "verifier": dict(profile)}
+            if profile is not None
+            else {}
+        )
+        super().__init__(
+            database_url,
+            dynamic_generation_service=None,
+            lesson_package_service=None,
+            primary_one_host_validator=LearningGeneratedCourseValidator(),
+            question_phase_provider_profiles=profiles,
+        )
+        self._parent_retry_canonicalizer = (
+            _ParentRetryQuestionPhaseCanonicalizer(profile)
+            if profile is not None
+            else None
+        )
+
+    def _content_provider_preflight(self, command):
+        canonicalizer = self._parent_retry_canonicalizer
+        if canonicalizer is None:
+            raise ValueError("parent retry Provider profile is unavailable")
+        return canonicalizer.canonicalize_phase(command)
+
+
 def auth_service() -> AuthService:
     return AuthService(
         current_app.config["DATABASE_URL"],
@@ -55,12 +169,311 @@ def auth_service() -> AuthService:
     )
 
 
+def student_auth_service() -> StudentAuthService:
+    return StudentAuthService(
+        current_app.config["DATABASE_URL"],
+        parent_auth_service=auth_service(),
+        pepper=current_app.config["STUDENT_AUTH_PEPPER"],
+        access_token_seconds=current_app.config["STUDENT_ACCESS_TOKEN_SECONDS"],
+        refresh_token_seconds=current_app.config["STUDENT_REFRESH_TOKEN_SECONDS"],
+        device_token_seconds=current_app.config["STUDENT_DEVICE_TOKEN_SECONDS"],
+        pairing_code_ttl_seconds=current_app.config[
+            "STUDENT_PAIRING_CODE_TTL_SECONDS"
+        ],
+        qr_challenge_ttl_seconds=current_app.config[
+            "STUDENT_QR_CHALLENGE_TTL_SECONDS"
+        ],
+        qr_approval_exchange_seconds=current_app.config[
+            "STUDENT_QR_APPROVAL_EXCHANGE_SECONDS"
+        ],
+        qr_polling_interval_ms=current_app.config[
+            "STUDENT_QR_POLLING_INTERVAL_MS"
+        ],
+        qr_active_challenge_limit=current_app.config[
+            "STUDENT_QR_ACTIVE_CHALLENGE_LIMIT"
+        ],
+        qr_ip_active_challenge_limit=current_app.config[
+            "STUDENT_QR_IP_ACTIVE_CHALLENGE_LIMIT"
+        ],
+        qr_rate_limit_window_seconds=current_app.config[
+            "STUDENT_QR_RATE_LIMIT_WINDOW_SECONDS"
+        ],
+        qr_rate_limit_max=current_app.config["STUDENT_QR_RATE_LIMIT_MAX"],
+        qr_ip_rate_limit_max=current_app.config[
+            "STUDENT_QR_IP_RATE_LIMIT_MAX"
+        ],
+        qr_retention_seconds=current_app.config["STUDENT_QR_RETENTION_SECONDS"],
+        pin_pbkdf2_iterations=current_app.config[
+            "STUDENT_PIN_PBKDF2_ITERATIONS"
+        ],
+        pin_max_attempts=current_app.config["STUDENT_PIN_MAX_ATTEMPTS"],
+        pin_lock_seconds=current_app.config["STUDENT_PIN_LOCK_SECONDS"],
+        formal_learning_access_checker=(
+            current_app.extensions.get("mira_formal_learning_access_checker")
+            if current_app.testing
+            else None
+        ),
+    )
+
+
 def setup_service() -> SetupService:
     return SetupService(
         current_app.config["DATABASE_URL"],
         auth_service=auth_service(),
+        preparation_service=learning_curriculum_preparation_service(),
         camera_command_service_factory=camera_command_service,
     )
+
+
+def learning_curriculum_preparation_service() -> LearningCurriculumPreparationService:
+    service = current_app.extensions.get(
+        "mira_learning_curriculum_preparation_service"
+    )
+    if isinstance(service, LearningCurriculumPreparationService):
+        return service
+    service = LearningCurriculumPreparationService(
+        current_app.config["DATABASE_URL"],
+        course_library_enabled=bool(current_app.config.get("LEARNING_COURSE_LIBRARY_ENABLED", False)),
+        auth_service=auth_service(),
+        repository=learning_curriculum_preparation_repository(),
+        retry_repository_factory=(
+            learning_curriculum_preparation_parent_retry_repository
+        ),
+        shared_build_repository_factory=(
+            learning_curriculum_preparation_parent_retry_repository
+        ),
+    )
+    current_app.extensions["mira_learning_curriculum_preparation_service"] = service
+    return service
+
+
+def learning_curriculum_preparation_repository() -> LearningCurriculumPreparationRepository:
+    repository = current_app.extensions.get(
+        "mira_learning_curriculum_preparation_repository"
+    )
+    if isinstance(repository, LearningCurriculumPreparationRepository):
+        return repository
+    repository = LearningCurriculumPreparationRepository(
+        Database(current_app.config["DATABASE_URL"])
+    )
+    current_app.extensions[
+        "mira_learning_curriculum_preparation_repository"
+    ] = repository
+    return repository
+
+
+def learning_curriculum_preparation_status_repository() -> LearningCurriculumPreparationRepository:
+    repository = current_app.extensions.get(
+        "mira_learning_curriculum_preparation_status_repository"
+    )
+    if isinstance(repository, LearningCurriculumPreparationRepository):
+        return repository
+    repository = LearningCurriculumPreparationRepository(
+        Database(current_app.config["DATABASE_URL"])
+    )
+    current_app.extensions[
+        "mira_learning_curriculum_preparation_status_repository"
+    ] = repository
+    return repository
+
+
+def learning_curriculum_preparation_parent_retry_repository() -> LearningCurriculumPreparationRepository:
+    repository = current_app.extensions.get(
+        "mira_learning_curriculum_preparation_parent_retry_repository"
+    )
+    if isinstance(repository, LearningCurriculumPreparationRepository):
+        return repository
+    database_url = current_app.config["DATABASE_URL"]
+    profile = _checkpoint_question_phase_profile()
+    audit_service = _ParentRetryCatalogAuditService(database_url, profile)
+    repository = LearningCurriculumPreparationRepository(
+        Database(database_url),
+        content_proof_auditor=audit_service.audit_locked_content_proofs,
+        content_parent_retry_auditor=(
+            audit_service.audit_content_parent_retry_authority
+        ),
+    )
+    current_app.extensions[
+        "mira_learning_curriculum_preparation_parent_retry_repository"
+    ] = repository
+    return repository
+
+
+def learning_curriculum_preparation_checkpoint_adapter() -> CheckpointSharedBuildAdapter:
+    adapter = current_app.extensions.get(
+        "mira_learning_curriculum_preparation_checkpoint_adapter"
+    )
+    if isinstance(adapter, FormalProductionStageAdapter):
+        return adapter
+    database_url = current_app.config["DATABASE_URL"]
+    profile = _checkpoint_question_phase_profile()
+    if profile is None:
+        restricted_catalog_service = LearningCatalogReleaseService(
+            database_url,
+            dynamic_generation_service=None,
+            lesson_package_service=None,
+        )
+    else:
+        phase_adapter = OpenMaicQuestionPhaseAdapter(
+            provider_name=str(profile["name"]),
+            model_name=str(profile["model"]),
+            base_url=str(profile["baseUrl"]),
+            api_key_env=str(profile["apiKeyEnv"]),
+            provider_timeout_ms=int(profile["timeoutMs"]),
+            max_tokens=int(profile["maxTokens"]),
+            temperature=float(profile["temperature"]),
+            process_timeout_seconds=(
+                int(profile["timeoutMs"])
+                + OpenMaicQuestionPhaseAdapter.PROCESS_SHUTDOWN_ALLOWANCE_MS
+            )
+            / 1000.0,
+        )
+        staged_generator = StagedContentCandidateGenerator(
+            repository=DynamicLearningCourseRepository(Database(database_url)),
+            adapter=phase_adapter,
+        )
+        restricted_catalog_service = LearningCatalogReleaseService(
+            database_url,
+            dynamic_generation_service=None,
+            lesson_package_service=None,
+            catalog_validator=LearningCatalogValidator(),
+            staged_content_candidate_generator=staged_generator,
+            primary_one_host_validator=LearningGeneratedCourseValidator(),
+            question_phase_provider_profiles={
+                "generator": dict(profile),
+                "verifier": dict(profile),
+            },
+        )
+    checkpoint_repository = LearningCurriculumPreparationRepository(
+        Database(database_url),
+        content_proof_auditor=(
+            restricted_catalog_service.audit_locked_content_proofs
+        ),
+        content_dispatch_graph_auditor=(
+            restricted_catalog_service.audit_content_host_retry_graph
+        ),
+        content_parent_retry_auditor=(
+            restricted_catalog_service.audit_content_parent_retry_authority
+        ),
+        content_provider_dependency_auditor=(
+            restricted_catalog_service.audit_content_provider_dependency_retry
+        ),
+        content_host_dependency_auditor=(
+            restricted_catalog_service.audit_content_host_dependency_retry
+        ),
+    )
+    formal_repository = LearningTeacherMediaRepository(Database(database_url))
+    formal_runtime_enabled = bool(
+        current_app.config.get("OPENMAIC_FULL_RUNTIME_ENABLED") is True
+        and current_app.config.get(
+            "OPENMAIC_FULL_RUNTIME_GENERATION_ENABLED"
+        ) is True
+        and str(
+            current_app.config.get("OPENMAIC_FULL_RUNTIME_INTERNAL_URL") or ""
+        ).strip()
+        and str(current_app.config.get("INTERNAL_API_TOKEN") or "").strip()
+    )
+    runtime_service = (
+        openmaic_full_runtime_service() if formal_runtime_enabled else None
+    )
+    runtime_client = getattr(runtime_service, "client", None)
+    formal_audio_service = (
+        FormalQwenAudioService(
+            formal_repository,
+            runtime_client=runtime_client,
+            asset_store=FilesystemLearningMediaAssetStore(
+                _backend_relative_path(
+                    str(
+                        current_app.config.get("LEARNING_MEDIA_STORAGE_ROOT")
+                        or "data/learning-media"
+                    )
+                )
+            ),
+        )
+        if (
+            isinstance(runtime_client, OpenMaicFullRuntimeClient)
+            and formal_runtime_enabled
+            and current_app.config.get(
+                "LEARNING_FORMAL_AUDIO_VALIDATION_ENABLED", False
+            ) is True
+        )
+        else None
+    )
+    adapter = FormalProductionStageAdapter(
+        restricted_catalog_service,
+        repository=checkpoint_repository,
+        runtime_candidate_processor=lambda: process_next_formal_runtime_candidate(),
+        formal_repository=formal_repository,
+        formal_audio_service=formal_audio_service,
+        formal_audio_validation_enabled=(
+            current_app.config.get(
+                "LEARNING_FORMAL_AUDIO_VALIDATION_ENABLED", False
+            ) is True
+        ),
+        formal_auto_publication_enabled=(
+            current_app.config.get(
+                "LEARNING_FORMAL_AUTO_PUBLICATION_ENABLED", False
+            ) is True
+        ),
+        formal_provider_readiness_client=(
+            runtime_client
+            if isinstance(runtime_client, OpenMaicFullRuntimeClient)
+            else None
+        ),
+        formal_route_probe_service=(
+            openmaic_conversation_probe_service()
+            if current_app.config.get(
+                "OPENMAIC_CONVERSATION_PROBE_ENABLED", False
+            )
+            else None
+        ),
+        formal_route_probe_client=openmaic_conversation_probe_client(),
+        max_progressive_published_courses=current_app.config.get(
+            "LEARNING_CURRICULUM_PREPARATION_PROGRESSIVE_PUBLICATION_LIMIT"
+        ),
+        plan_lease_ms=int(
+            current_app.config.get(
+                "LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS",
+                LEARNING_CURRICULUM_PREPARATION_MIN_LEASE_SECONDS,
+            )
+        )
+        * 1000,
+    )
+    current_app.extensions[
+        "mira_learning_curriculum_preparation_checkpoint_adapter"
+    ] = adapter
+    return adapter
+
+
+def _checkpoint_question_phase_profile() -> dict[str, object] | None:
+    # Learning courseware has one generation authority: OpenMAIC.  The backend
+    # intentionally does not project its camera/observation AI Provider into
+    # the learning pipeline and never gives the Sidecar a model credential.
+    base_url = str(
+        current_app.config.get("OPENMAIC_FULL_RUNTIME_INTERNAL_URL") or ""
+    ).strip()
+    internal_token = str(
+        current_app.config.get("INTERNAL_API_TOKEN") or ""
+    ).strip()
+    parsed = urlparse(base_url)
+    if (
+        not internal_token
+        or parsed.scheme not in {"http", "https"}
+        or not parsed.netloc
+    ):
+        return None
+    return {
+        "name": "openmaic_runtime",
+        "model": "courseware-v2",
+        "baseUrl": base_url.rstrip("/"),
+        "apiKeyEnv": "INTERNAL_API_TOKEN",
+        # This bounds one private OpenMAIC courseware call. OpenMAIC owns the
+        # model credential and the paid invocation; the backend only waits for
+        # the result and persists its receipt.
+        "timeoutMs": 300_000,
+        "maxTokens": 8_000,
+        "temperature": 0.6,
+    }
 
 
 def task_service() -> TaskService:
@@ -71,6 +484,405 @@ def task_service() -> TaskService:
         ai_text_provider=ai_text_provider(),
         prompt_registry=prompt_registry(),
     )
+
+
+def learning_service() -> LearningService:
+    service = current_app.extensions.get("mira_learning_service")
+    if isinstance(service, LearningService):
+        return service
+    service = LearningService(
+        current_app.config["DATABASE_URL"],
+        course_library_enabled=bool(current_app.config.get("LEARNING_COURSE_LIBRARY_ENABLED", False)),
+        auth_service=auth_service(),
+        static_catalog_enabled=bool(
+            current_app.config.get("LEARNING_STATIC_CATALOG_ENABLED", False)
+        ),
+        dynamic_generation_service=(
+            dynamic_learning_course_generation_service()
+            if current_app.config.get("LEARNING_DYNAMIC_GENERATION_ENABLED")
+            else None
+        ),
+        dynamic_pool_target=int(
+            current_app.config.get("LEARNING_DYNAMIC_POOL_TARGET", 1)
+        ),
+    )
+    current_app.extensions["mira_learning_service"] = service
+    return service
+
+
+def student_learning_service() -> StudentLearningService:
+    service = current_app.extensions.get("mira_student_learning_service")
+    if isinstance(service, StudentLearningService):
+        return service
+    service = StudentLearningService(
+        current_app.config["DATABASE_URL"],
+        course_library_enabled=bool(current_app.config.get("LEARNING_COURSE_LIBRARY_ENABLED", False)),
+        student_auth_service=student_auth_service(),
+        static_catalog_enabled=bool(
+            current_app.config.get("LEARNING_STATIC_CATALOG_ENABLED", False)
+        ),
+        dynamic_generation_service=(
+            dynamic_learning_course_generation_service()
+            if current_app.config.get("LEARNING_DYNAMIC_GENERATION_ENABLED")
+            else None
+        ),
+        dynamic_pool_target=int(
+            current_app.config.get("LEARNING_DYNAMIC_POOL_TARGET", 1)
+        ),
+        lesson_runtime_service=lesson_runtime_service(),
+        classroom_student_release_enabled=bool(
+            current_app.config.get(
+                "LEARNING_CLASSROOM_STUDENT_RELEASE_ENABLED",
+                False,
+            )
+        ),
+    )
+    current_app.extensions["mira_student_learning_service"] = service
+    return service
+
+
+def student_learning_media_service() -> StudentLearningMediaService:
+    service = current_app.extensions.get("mira_student_learning_media_service")
+    if isinstance(service, StudentLearningMediaService):
+        return service
+    service = StudentLearningMediaService(
+        current_app.config["DATABASE_URL"],
+        student_auth_service=student_auth_service(),
+        storage_root=_backend_relative_path(
+            str(
+                current_app.config.get("LEARNING_MEDIA_STORAGE_ROOT")
+                or "data/learning-media"
+            )
+        ),
+    )
+    current_app.extensions["mira_student_learning_media_service"] = service
+    return service
+
+
+def openmaic_full_runtime_service() -> OpenMaicFullRuntimeService:
+    service = current_app.extensions.get("mira_openmaic_full_runtime_service")
+    if isinstance(service, OpenMaicFullRuntimeService):
+        return service
+    enabled = bool(current_app.config.get("OPENMAIC_FULL_RUNTIME_ENABLED", False))
+    internal_url = str(
+        current_app.config.get("OPENMAIC_FULL_RUNTIME_INTERNAL_URL") or ""
+    ).strip()
+    client = (
+        OpenMaicFullRuntimeClient(
+            internal_url,
+            timeout_seconds=float(
+                current_app.config.get("OPENMAIC_FULL_RUNTIME_TIMEOUT_SECONDS", 30)
+            ),
+            formal_audio_internal_token=str(
+                current_app.config.get("INTERNAL_API_TOKEN") or ""
+            ),
+        )
+        if enabled and internal_url
+        else None
+    )
+    recovery_enabled = bool(
+        current_app.config.get(
+            "OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED", False
+        )
+    )
+    tts_credential_recovery_enabled = bool(
+        current_app.config.get(
+            "OPENMAIC_TTS_CREDENTIAL_RECOVERY_ENABLED", False
+        )
+    )
+    formal_citation_recovery_enabled = bool(
+        current_app.config.get(
+            "OPENMAIC_FORMAL_CITATION_RECOVERY_ENABLED", False
+        )
+    )
+    recovery_client = (
+        OpenMaicDeterministicRecoveryClient(
+            internal_url,
+            internal_token=str(
+                current_app.config.get("INTERNAL_API_TOKEN") or ""
+            ),
+            expected_canonical_spec_sha256=(
+                RECOVERY_CANONICAL_SPEC_SHA256
+            ),
+            expected_patch_sha256=RECOVERY_PATCH_SHA256,
+            timeout_seconds=float(
+                current_app.config.get(
+                    "OPENMAIC_FULL_RUNTIME_TIMEOUT_SECONDS", 30
+                )
+            ),
+        )
+        if enabled and recovery_enabled and internal_url
+        else None
+    )
+    tts_credential_recovery_client = (
+        OpenMaicTtsCredentialRecoveryClient(
+            internal_url,
+            internal_token=str(
+                current_app.config.get("INTERNAL_API_TOKEN") or ""
+            ),
+            expected_patch_sha256=TTS_CREDENTIAL_RECOVERY_PATCH_SHA256,
+            timeout_seconds=float(
+                current_app.config.get(
+                    "OPENMAIC_FULL_RUNTIME_TIMEOUT_SECONDS", 30
+                )
+            ),
+        )
+        if enabled and tts_credential_recovery_enabled and internal_url
+        else None
+    )
+    formal_citation_recovery_client = (
+        OpenMaicFormalCitationRecoveryClient(
+            internal_url,
+            internal_token=str(
+                current_app.config.get("INTERNAL_API_TOKEN") or ""
+            ),
+            timeout_seconds=float(
+                current_app.config.get(
+                    "OPENMAIC_FULL_RUNTIME_TIMEOUT_SECONDS", 30
+                )
+            ),
+        )
+        if enabled and formal_citation_recovery_enabled and internal_url
+        else None
+    )
+    service = OpenMaicFullRuntimeService(
+        current_app.config["DATABASE_URL"],
+        student_auth_service=student_auth_service(),
+        client=client,
+        enabled=enabled,
+        generation_enabled=bool(
+            current_app.config.get(
+                "OPENMAIC_FULL_RUNTIME_GENERATION_ENABLED", False
+            )
+        ),
+        public_url=str(
+            current_app.config.get("OPENMAIC_FULL_RUNTIME_PUBLIC_URL") or ""
+        ),
+        launch_ttl_seconds=int(
+            current_app.config.get("OPENMAIC_FULL_RUNTIME_LAUNCH_TTL_SECONDS", 60)
+        ),
+        session_ttl_seconds=int(
+            current_app.config.get(
+                "OPENMAIC_FULL_RUNTIME_SESSION_TTL_SECONDS", 14400
+            )
+        ),
+        video_export_enabled=bool(
+            current_app.config.get(
+                "OPENMAIC_FULL_RUNTIME_VIDEO_EXPORT_ENABLED", False
+            )
+        ),
+        conversation_probe_service=(
+            openmaic_conversation_probe_service()
+            if current_app.config.get("OPENMAIC_CONVERSATION_PROBE_ENABLED", False)
+            else None
+        ),
+        conversation_probe_client=openmaic_conversation_probe_client(),
+        deterministic_recovery_enabled=recovery_enabled,
+        deterministic_recovery_redispatch_enabled=bool(
+            current_app.config.get(
+                "OPENMAIC_DETERMINISTIC_RECOVERY_REDISPATCH_ENABLED", False
+            )
+        ),
+        deterministic_recovery_client=recovery_client,
+        tts_credential_recovery_enabled=tts_credential_recovery_enabled,
+        tts_credential_recovery_client=tts_credential_recovery_client,
+        formal_citation_recovery_enabled=formal_citation_recovery_enabled,
+        formal_citation_recovery_source_job_id=str(
+            current_app.config.get(
+                "OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID"
+            )
+            or ""
+        ),
+        formal_citation_recovery_client=formal_citation_recovery_client,
+    )
+    current_app.extensions["mira_openmaic_full_runtime_service"] = service
+    return service
+
+
+def openmaic_runtime_audio_service() -> OpenMaicRuntimeAudioService:
+    service = current_app.extensions.get("mira_openmaic_runtime_audio_service")
+    if isinstance(service, OpenMaicRuntimeAudioService):
+        return service
+    service = OpenMaicRuntimeAudioService(
+        current_app.config["DATABASE_URL"],
+        storage_root=_backend_relative_path(
+            str(
+                current_app.config.get("LEARNING_MEDIA_STORAGE_ROOT")
+                or "data/learning-media"
+            )
+        ),
+    )
+    current_app.extensions["mira_openmaic_runtime_audio_service"] = service
+    return service
+
+
+def openmaic_conversation_probe_service() -> OpenMaicConversationProbeService:
+    service = current_app.extensions.get("mira_openmaic_conversation_probe_service")
+    if isinstance(service, OpenMaicConversationProbeService):
+        return service
+    service = OpenMaicConversationProbeService(
+        current_app.config["DATABASE_URL"],
+        enabled=bool(
+            current_app.config.get("OPENMAIC_CONVERSATION_PROBE_ENABLED", False)
+        ),
+        ttl_seconds=int(
+            current_app.config.get("OPENMAIC_CONVERSATION_PROBE_TTL_SECONDS", 90)
+        ),
+    )
+    current_app.extensions["mira_openmaic_conversation_probe_service"] = service
+    return service
+
+
+def openmaic_conversation_probe_client() -> OpenMaicConversationProbeClient | None:
+    if not current_app.config.get("OPENMAIC_CONVERSATION_PROBE_ENABLED", False):
+        return None
+    service = current_app.extensions.get("mira_openmaic_conversation_probe_client")
+    if isinstance(service, OpenMaicConversationProbeClient):
+        return service
+    public_url = str(
+        current_app.config.get("OPENMAIC_FULL_RUNTIME_PUBLIC_URL") or ""
+    ).strip()
+    if not public_url:
+        return None
+    service = OpenMaicConversationProbeClient(
+        public_url,
+        timeout_seconds=float(
+            current_app.config.get("OPENMAIC_FULL_RUNTIME_TIMEOUT_SECONDS", 30)
+        ),
+    )
+    current_app.extensions["mira_openmaic_conversation_probe_client"] = service
+    return service
+
+
+def learning_content_generation_service() -> LearningContentGenerationService:
+    return LearningContentGenerationService()
+
+
+def learning_content_pipeline_service() -> LearningContentPipelineService:
+    return LearningContentPipelineService(
+        current_app.config["DATABASE_URL"],
+        generation_service=learning_content_generation_service(),
+    )
+
+
+def lesson_package_service() -> LessonPackageService:
+    service = current_app.extensions.get("mira_lesson_package_service")
+    if isinstance(service, LessonPackageService):
+        return service
+    service = LessonPackageService(
+        current_app.config["DATABASE_URL"],
+        media_service=learning_media_materialization_service(),
+    )
+    current_app.extensions["mira_lesson_package_service"] = service
+    return service
+
+
+def process_next_formal_runtime_candidate():
+    """Wire the candidate package boundary to the full Runtime boundary."""
+
+    runtime = openmaic_full_runtime_service()
+    readiness = runtime.ensure_initial_formal_provider_probe()
+    if readiness.get("dispatchAllowed") is not True:
+        return {"blockedReason": "provider_probe_required"}
+    return lesson_package_service().process_next_formal_candidate(
+        runtime
+    )
+
+
+def learning_media_materialization_service() -> LearningMediaMaterializationService:
+    service = current_app.extensions.get("mira_learning_media_materialization_service")
+    if isinstance(service, LearningMediaMaterializationService):
+        return service
+    provider_id = str(
+        current_app.config.get("LEARNING_TTS_PROVIDER") or "voxcpm2"
+    ).strip().lower()
+    if provider_id == "macos-say":
+        provider = MacOsSayTtsProvider(
+            app_env=str(current_app.config.get("APP_ENV") or ""),
+            timeout_seconds=float(
+                current_app.config.get("LEARNING_MACOS_SAY_TIMEOUT_SECONDS", 30)
+            ),
+        )
+    else:
+        base_url = str(
+            current_app.config.get("LEARNING_VOXCPM_BASE_URL") or ""
+        ).strip()
+        provider = (
+            VoxCpm2HttpProvider(
+                base_url=base_url,
+                backend=str(
+                    current_app.config.get("LEARNING_VOXCPM_BACKEND")
+                    or "vllm-omni"
+                ),
+                model_name=str(
+                    current_app.config.get("LEARNING_VOXCPM_MODEL")
+                    or "openbmb/VoxCPM2"
+                ),
+                timeout_seconds=float(
+                    current_app.config.get("LEARNING_VOXCPM_TIMEOUT_SECONDS", 30)
+                ),
+            )
+            if base_url
+            else None
+        )
+    storage_root = _backend_relative_path(
+        str(
+            current_app.config.get("LEARNING_MEDIA_STORAGE_ROOT")
+            or "data/learning-media"
+        )
+    )
+    service = LearningMediaMaterializationService(
+        LearningTeacherMediaRepository(
+            Database(current_app.config["DATABASE_URL"])
+        ),
+        tts_provider=provider,
+        asset_store=FilesystemLearningMediaAssetStore(storage_root),
+    )
+    current_app.extensions["mira_learning_media_materialization_service"] = service
+    return service
+
+
+def lesson_runtime_service() -> LessonRuntimeService:
+    service = current_app.extensions.get("mira_lesson_runtime_service")
+    if isinstance(service, LessonRuntimeService):
+        return service
+    service = LessonRuntimeService(current_app.config["DATABASE_URL"])
+    current_app.extensions["mira_lesson_runtime_service"] = service
+    return service
+
+
+def dynamic_learning_course_generation_service() -> DynamicLearningCourseGenerationService:
+    service = current_app.extensions.get(
+        "mira_dynamic_learning_course_generation_service"
+    )
+    if isinstance(service, DynamicLearningCourseGenerationService):
+        return service
+    service = DynamicLearningCourseGenerationService(
+        current_app.config["DATABASE_URL"],
+        adapter=OpenMaicQuestionAdapter(
+            timeout_seconds=float(
+                current_app.config.get("OPENMAIC_QUESTION_TIMEOUT_SECONDS", 420)
+            )
+        ),
+        classroom_enqueue=lesson_package_service().enqueue,
+    )
+    current_app.extensions[
+        "mira_dynamic_learning_course_generation_service"
+    ] = service
+    return service
+
+
+def learning_catalog_release_service() -> LearningCatalogReleaseService:
+    service = current_app.extensions.get("mira_learning_catalog_release_service")
+    if isinstance(service, LearningCatalogReleaseService):
+        return service
+    service = LearningCatalogReleaseService(
+        current_app.config["DATABASE_URL"],
+        dynamic_generation_service=dynamic_learning_course_generation_service(),
+        lesson_package_service=lesson_package_service(),
+    )
+    current_app.extensions["mira_learning_catalog_release_service"] = service
+    return service
 
 
 def task_template_service() -> TaskTemplateService:
@@ -89,7 +901,11 @@ def reward_service() -> RewardService:
 
 
 def profile_service() -> ProfileService:
-    return ProfileService(current_app.config["DATABASE_URL"], auth_service=auth_service())
+    return ProfileService(
+        current_app.config["DATABASE_URL"],
+        auth_service=auth_service(),
+        preparation_service=learning_curriculum_preparation_service(),
+    )
 
 
 def device_service() -> DeviceService:

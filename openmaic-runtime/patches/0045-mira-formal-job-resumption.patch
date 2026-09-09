@@ -1,0 +1,348 @@
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -273,6 +273,33 @@
+   });
+ }
+ 
++/** A restart may reattach completion, but may never claim a second dispatch. */
++export async function readResumableFormalClassroomGenerationJob(
++  jobId: string,
++): Promise<ClassroomGenerationJob | null> {
++  const job = await readStoredClassroomGenerationJob(jobId);
++  if (
++    !job || job.status !== 'running' || !job.runtimeRequestId || !job.formalInput ||
++    job.id !== formalJobId(job.runtimeRequestId) ||
++    job.formalContractVersion !== MIRA_FORMAL_RUNTIME_CONTRACT_VERSION ||
++    job.formalInput.runtimeRequestId !== job.runtimeRequestId ||
++    sha256(JSON.stringify(canonical(job.formalInput))) !== job.formalInputSha256
++  ) return null;
++  assertMiraFormalGenerationInput(job.formalInput);
++  try {
++    const marker = JSON.parse(await fs.readFile(formalDispatchMarkerPath(jobId), 'utf-8'));
++    if (
++      marker.schemaVersion !== 'mira.openmaic.formal-dispatch-start.v1' ||
++      marker.jobId !== job.id || marker.runtimeRequestId !== job.runtimeRequestId ||
++      marker.formalInputSha256 !== job.formalInputSha256
++    ) return null;
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
++    throw error;
++  }
++  return job;
++}
++
+ export async function readClassroomGenerationJobByRuntimeRequestId(
+   runtimeRequestId: string,
+ ): Promise<ClassroomGenerationJob | null> {
+diff --git a/lib/server/classroom-job-runner.ts b/lib/server/classroom-job-runner.ts
+--- a/lib/server/classroom-job-runner.ts
++++ b/lib/server/classroom-job-runner.ts
+@@ -1,15 +1,60 @@
+ import { createLogger } from '@/lib/logger';
+ import { generateClassroom, type GenerateClassroomInput } from '@/lib/server/classroom-generation';
++import { getServerPersistenceProvider } from '@/lib/persistence/server-provider';
++import { resumeMiraFormalProfessionalClassroom } from '@/lib/server/mira-formal-professional-classroom';
+ import {
+   markClassroomGenerationJobFailed,
+   markClassroomGenerationJobRunning,
+   markClassroomGenerationJobSucceeded,
+   claimFormalClassroomGenerationDispatch,
++  readResumableFormalClassroomGenerationJob,
+   updateClassroomGenerationJobProgress,
+ } from '@/lib/server/classroom-job-store';
+ 
+ const log = createLogger('ClassroomJob');
+-const runningJobs = new Map<string, Promise<void>>();
++const JOB_RUNNERS_KEY = Symbol.for('mira.formal-classroom-job.runners');
++const globalState = globalThis as typeof globalThis & {
++  [JOB_RUNNERS_KEY]?: Map<string, Promise<void>>;
++};
++const runningJobs = (globalState[JOB_RUNNERS_KEY] ??= new Map<string, Promise<void>>());
++
++// A PostgreSQL session lock survives HTTP requests and is released by the
++// server on process exit. It also excludes duplicate owners across bundles
++// and processes without creating another Agent, job, or dispatch receipt.
++async function withFormalJobOwner(
++  jobId: string,
++  body: (assertOwner: () => Promise<void>) => Promise<void>,
++): Promise<void> {
++  const connectionString = process.env.DATABASE_URL?.trim();
++  if (!connectionString) throw new Error('FORMAL_PROFESSIONAL_AGENT_RUNTIME_NOT_CONFIGURED');
++  const { pool } = await getServerPersistenceProvider(connectionString);
++  const client = await pool.connect();
++  const key = `mira.formal-classroom-completion:${jobId}`;
++  let locked = false;
++  let lost = false;
++  const onError = () => { lost = true; };
++  client.on('error', onError);
++  const assertOwner = async () => {
++    if (!lost) {
++      try { await client.query('SELECT 1'); } catch { lost = true; }
++    }
++    if (lost) throw new Error('FORMAL_CLASSROOM_OWNER_LOST');
++  };
++  try {
++    const result = await client.query<{ acquired: boolean }>(
++      'SELECT pg_try_advisory_lock(hashtextextended($1, 0)) AS acquired', [key],
++    );
++    locked = result.rows[0]?.acquired === true;
++    if (locked) await body(assertOwner);
++  } finally {
++    if (locked) {
++      await client.query('SELECT pg_advisory_unlock(hashtextextended($1, 0))', [key])
++        .catch(() => {});
++    }
++    client.removeListener('error', onError);
++    client.release(lost);
++  }
++}
+ 
+ export function runClassroomGenerationJob(
+   jobId: string,
+@@ -21,34 +66,53 @@
+     return existing;
+   }
+ 
+-  const jobPromise = (async () => {
++  const execute = async (assertOwner: () => Promise<void> = async () => {}) => {
++    let authorityVerified = !input.runtimeRequestId;
+     try {
++      let resume = false;
+       if (input.runtimeRequestId) {
+         const claimed = await claimFormalClassroomGenerationDispatch(jobId);
+-        if (!claimed) return;
++        if (!claimed) {
++          const saved = await readResumableFormalClassroomGenerationJob(jobId);
++          if (!saved || JSON.stringify(saved.formalInput) !== JSON.stringify(input)) return;
++          resume = true;
++        }
++        authorityVerified = true;
+       }
++      await assertOwner();
+       await markClassroomGenerationJobRunning(jobId);
+ 
+-      const result = await generateClassroom(input, {
++      const generate = resume ? resumeMiraFormalProfessionalClassroom : generateClassroom;
++      const result = await generate(input, {
+         baseUrl,
+         onProgress: async (progress) => {
++          await assertOwner();
+           await updateClassroomGenerationJobProgress(jobId, progress);
+         },
+       });
+ 
++      await assertOwner();
+       await markClassroomGenerationJobSucceeded(jobId, result);
+     } catch (error) {
+       const message = error instanceof Error ? error.message : String(error);
+       log.error(`Classroom generation job ${jobId} failed:`, error);
++      // A lost owner leaves durable work intact for the next authorized poll.
++      if (
++        !authorityVerified || message === 'FORMAL_CLASSROOM_OWNER_LOST' ||
++        message === 'FORMAL_PROFESSIONAL_SESSION_MISSING' ||
++        message === 'FORMAL_PROFESSIONAL_SESSION_CONFLICT'
++      ) return;
+       try {
++        await assertOwner();
+         await markClassroomGenerationJobFailed(jobId, message);
+       } catch (markFailedError) {
+         log.error(`Failed to persist failed status for job ${jobId}:`, markFailedError);
+       }
+-    } finally {
+-      runningJobs.delete(jobId);
+     }
+-  })();
++  };
++  const jobPromise = (input.runtimeRequestId ? withFormalJobOwner(jobId, execute) : execute())
++    .catch((error) => log.error(`Unable to acquire classroom job owner ${jobId}:`, error))
++    .finally(() => runningJobs.delete(jobId));
+ 
+   runningJobs.set(jobId, jobPromise);
+   return jobPromise;
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -387,6 +387,7 @@
+ async function createOrReuseProfessionalSession(
+   input: GenerateClassroomInput,
+   spec: FormalCoursewareSpec,
++  existingOnly = false,
+ ): Promise<{ identity: FormalIdentity; prompt: string }> {
+   if (!isAgentRuntimeConfigured()) {
+     throw new Error('FORMAL_PROFESSIONAL_AGENT_RUNTIME_NOT_CONFIGURED');
+@@ -399,6 +400,7 @@
+   const store = await getAgentSessionStore();
+   let session = await store.getSession(identity.sessionId);
+   if (!session) {
++    if (existingOnly) throw new Error('FORMAL_PROFESSIONAL_SESSION_MISSING');
+     try {
+       session = await store.createSession({
+         id: identity.sessionId,
+@@ -1128,3 +1130,19 @@
+   const completed = await completeMiraFormalProfessionalClassroom(input, spec, identity, options);
+   return completed.result;
+ }
++
++/** Reattach the persisted Agent; this path cannot enqueue another session. */
++export async function resumeMiraFormalProfessionalClassroom(
++  input: GenerateClassroomInput,
++  options: {
++    baseUrl: string;
++    onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void;
++  },
++): Promise<GenerateClassroomResult> {
++  const spec = parseFormalCoursewareSpec(input);
++  const { identity } = await createOrReuseProfessionalSession(input, spec, true);
++  await waitForProfessionalSession(identity.sessionId, options.onProgress);
++  await requireSucceededProfessionalSession(input, spec);
++  const completed = await completeMiraFormalProfessionalClassroom(input, spec, identity, options);
++  return completed.result;
++}
+diff --git a/app/api/generate-classroom/route.ts b/app/api/generate-classroom/route.ts
+--- a/app/api/generate-classroom/route.ts
++++ b/app/api/generate-classroom/route.ts
+@@ -50,8 +50,7 @@
+ function reconcileFormalDispatch(req: NextRequest, job: ClassroomGenerationJob) {
+   if (
+     job.runtimeRequestId &&
+-    job.status === 'queued' &&
+-    job.dispatchAmbiguous !== true &&
++    ((job.status === 'queued' && job.dispatchAmbiguous !== true) || job.status === 'running') &&
+     job.formalInput
+   ) {
+     const baseUrl = buildRequestOrigin(req);
+diff --git a/app/api/generate-classroom/[jobId]/route.ts b/app/api/generate-classroom/[jobId]/route.ts
+--- a/app/api/generate-classroom/[jobId]/route.ts
++++ b/app/api/generate-classroom/[jobId]/route.ts
+@@ -36,8 +36,7 @@
+ 
+     if (
+       job.runtimeRequestId &&
+-      job.status === 'queued' &&
+-      job.dispatchAmbiguous !== true &&
++      ((job.status === 'queued' && job.dispatchAmbiguous !== true) || job.status === 'running') &&
+       job.formalInput
+     ) {
+       const baseUrl = buildRequestOrigin(req);
+diff --git a/tests/server/mira-formal-job-resumption.test.ts b/tests/server/mira-formal-job-resumption.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-job-resumption.test.ts
+@@ -0,0 +1,58 @@
++import { promises as fs } from 'fs';
++import os from 'os';
++import path from 'path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++describe('formal job restart authority', () => {
++  let cwd: string;
++  let root: string;
++  beforeEach(async () => {
++    cwd = process.cwd();
++    root = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-job-resume-'));
++    process.chdir(root);
++    vi.resetModules();
++  });
++  afterEach(async () => {
++    process.chdir(cwd);
++    await fs.rm(root, { recursive: true, force: true });
++  });
++  async function fixture() {
++    const policy = await import('@/lib/server/mira-formal-generation-policy');
++    const store = await import('@/lib/server/classroom-job-store');
++    const input = {
++      requirement: 'locked formal brief', runtimeRequestId: 'mira-restart-authority-1',
++      formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
++      professionalCreationPolicy: policy.MIRA_PROFESSIONAL_CREATION_POLICY,
++      enableWebSearch: true, enableImageGeneration: false, enableVideoGeneration: false,
++      enableTTS: false, agentMode: 'generate' as const,
++    };
++    const { job } = await store.createOrGetFormalClassroomGenerationJob(input);
++    return { store, input, job };
++  }
++  it('reattaches only the original running dispatch and never claims it twice', async () => {
++    const { store, job } = await fixture();
++    expect(await store.readResumableFormalClassroomGenerationJob(job.id)).toBeNull();
++    expect(await store.claimFormalClassroomGenerationDispatch(job.id)).toBe(true);
++    await store.markClassroomGenerationJobRunning(job.id);
++    expect(await store.readResumableFormalClassroomGenerationJob(job.id)).toMatchObject({ id: job.id, status: 'running' });
++    expect(await store.claimFormalClassroomGenerationDispatch(job.id)).toBe(false);
++  });
++  it('rejects missing or altered durable dispatch authority', async () => {
++    const { store, job } = await fixture();
++    await store.markClassroomGenerationJobRunning(job.id);
++    expect(await store.readResumableFormalClassroomGenerationJob(job.id)).toBeNull();
++    const marker = path.join(root, 'data/classroom-jobs', `${job.id}.formal-dispatch-started.json`);
++    await fs.writeFile(marker, JSON.stringify({ schemaVersion: 'mira.openmaic.formal-dispatch-start.v1', jobId: job.id, runtimeRequestId: job.runtimeRequestId, formalInputSha256: 'wrong' }));
++    expect(await store.readResumableFormalClassroomGenerationJob(job.id)).toBeNull();
++  });
++  it('rejects changed input and terminal jobs', async () => {
++    const { store, job, input } = await fixture();
++    await store.claimFormalClassroomGenerationDispatch(job.id);
++    await store.markClassroomGenerationJobRunning(job.id);
++    await store.updateClassroomGenerationJob(job.id, { formalInput: { ...input, requirement: 'changed' } });
++    expect(await store.readResumableFormalClassroomGenerationJob(job.id)).toBeNull();
++    await store.updateClassroomGenerationJob(job.id, { formalInput: input, status: 'succeeded' });
++    expect(await store.readResumableFormalClassroomGenerationJob(job.id)).toBeNull();
++  });
++});
+diff --git a/tests/server/mira-formal-job-owner.test.ts b/tests/server/mira-formal-job-owner.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-job-owner.test.ts
+@@ -0,0 +1,53 @@
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++const mocks = vi.hoisted(() => ({
++  query: vi.fn(), release: vi.fn(), on: vi.fn(), removeListener: vi.fn(),
++  claim: vi.fn(), saved: vi.fn(), running: vi.fn(), succeeded: vi.fn(), failed: vi.fn(),
++  progress: vi.fn(), generate: vi.fn(), resume: vi.fn(),
++}));
++vi.mock('@/lib/persistence/server-provider', () => ({
++  getServerPersistenceProvider: async () => ({ pool: { connect: async () => mocks } }),
++}));
++vi.mock('@/lib/server/classroom-generation', () => ({ generateClassroom: mocks.generate }));
++vi.mock('@/lib/server/mira-formal-professional-classroom', () => ({ resumeMiraFormalProfessionalClassroom: mocks.resume }));
++vi.mock('@/lib/server/classroom-job-store', () => ({
++  claimFormalClassroomGenerationDispatch: mocks.claim,
++  readResumableFormalClassroomGenerationJob: mocks.saved,
++  markClassroomGenerationJobRunning: mocks.running,
++  markClassroomGenerationJobSucceeded: mocks.succeeded,
++  markClassroomGenerationJobFailed: mocks.failed,
++  updateClassroomGenerationJobProgress: mocks.progress,
++}));
++import { runClassroomGenerationJob } from '@/lib/server/classroom-job-runner';
++const input = { runtimeRequestId: 'mira-owner-resume', requirement: 'locked brief' };
++describe('formal completion owner', () => {
++  beforeEach(() => {
++    vi.resetAllMocks();
++    vi.stubEnv('DATABASE_URL', 'postgres://unused-test-connection');
++    mocks.query.mockResolvedValue({ rows: [{ acquired: true }] });
++    mocks.claim.mockResolvedValue(false);
++    mocks.saved.mockResolvedValue({ formalInput: input });
++    mocks.resume.mockResolvedValue({ classroomId: 'existing-stage' });
++  });
++  it('reattaches one completion to the original session across concurrent polls', async () => {
++    await Promise.all([runClassroomGenerationJob('same-job', input, 'http://local'), runClassroomGenerationJob('same-job', input, 'http://local')]);
++    expect(mocks.resume).toHaveBeenCalledTimes(1);
++    expect(mocks.generate).not.toHaveBeenCalled();
++    expect(mocks.succeeded).toHaveBeenCalledWith('same-job', { classroomId: 'existing-stage' });
++    expect(mocks.failed).not.toHaveBeenCalled();
++  });
++  it('does no work if another process owns completion', async () => {
++    mocks.query.mockResolvedValue({ rows: [{ acquired: false }] });
++    await runClassroomGenerationJob('busy-job', input, 'http://local');
++    expect(mocks.claim).not.toHaveBeenCalled();
++    expect(mocks.resume).not.toHaveBeenCalled();
++    expect(mocks.running).not.toHaveBeenCalled();
++  });
++  it('preserves a job whose durable authority cannot be verified', async () => {
++    mocks.saved.mockResolvedValue(null);
++    await runClassroomGenerationJob('unverified-job', input, 'http://local');
++    expect(mocks.generate).not.toHaveBeenCalled();
++    expect(mocks.resume).not.toHaveBeenCalled();
++    expect(mocks.failed).not.toHaveBeenCalled();
++    expect(mocks.running).not.toHaveBeenCalled();
++  });
++});

@@ -1,0 +1,1271 @@
+From 31142d315221406c6897f6d9e4b4acd53340d1f1 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 15/37] 0015-mira-student-runtime-events
+
+---
+ app/classroom/[id]/page.tsx                   |   2 +-
+ components/edit/PlaybackChromeRoot.tsx        |  34 ++
+ components/scene-renderers/quiz-view.tsx      | 136 ++++--
+ components/stage.tsx                          |  18 +-
+ lib/contexts/mira-student-runtime-context.tsx |  54 ++-
+ lib/mira/student-runtime-events.ts            | 434 ++++++++++++++++++
+ lib/server/mira-formal-generation-policy.ts   |   9 +
+ .../mira-student-runtime-events.test.ts       | 320 +++++++++++++
+ tests/server/health-route.test.ts             |  18 +
+ 9 files changed, 977 insertions(+), 48 deletions(-)
+ create mode 100644 lib/mira/student-runtime-events.ts
+ create mode 100644 tests/runtime/mira-student-runtime-events.test.ts
+
+diff --git a/app/classroom/[id]/page.tsx b/app/classroom/[id]/page.tsx
+index cba7667..f3d9c77 100644
+--- a/app/classroom/[id]/page.tsx
++++ b/app/classroom/[id]/page.tsx
+@@ -23,7 +23,7 @@ export default async function ClassroomDetailPage({ params, searchParams }: Clas
+   const studentMode = isMiraStudentRuntimeParam(query.mira);
+ 
+   return (
+-    <MiraStudentRuntimeProvider studentMode={studentMode}>
++    <MiraStudentRuntimeProvider studentMode={studentMode} classroomId={id}>
+       <ClassroomSurface classroomId={id} variant="page" />
+     </MiraStudentRuntimeProvider>
+   );
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index e096637..ecf3f7c 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -58,6 +58,7 @@ import { VisuallyHidden } from 'radix-ui';
+ import {
+   useMiraStudentAutoPlayRuntime,
+   useMiraStudentRuntime,
++  useMiraStudentRuntimeEvents,
+ } from '@/lib/contexts/mira-student-runtime-context';
+ import { getMiraEffectiveAutoPlayLecture } from '@/lib/mira/student-runtime';
+ 
+@@ -112,6 +113,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     const { t } = useI18n();
+     const studentMode = useMiraStudentRuntime();
+     const studentAutoPlayRuntime = useMiraStudentAutoPlayRuntime();
++    const runtimeEvents = useMiraStudentRuntimeEvents();
+     const {
+       mode: storedMode,
+       stage,
+@@ -829,6 +831,38 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+             clearSceneResumePosition(currentScene.id);
+             setPlaybackCompleted(true);
+ 
++            if (studentMode && runtimeEvents) {
++              const stageState = useStageStore.getState();
++              const orderedScenes = [...stageState.scenes].sort(
++                (left, right) => left.order - right.order,
++              );
++              const sceneIndex = orderedScenes.findIndex((scene) => scene.id === currentScene.id);
++              const authoritativeActionId = currentScene.actions?.at(-1)?.id;
++              if (sceneIndex >= 0 && authoritativeActionId) {
++                void runtimeEvents
++                  .actionCompleted({
++                    sceneIndex,
++                    sceneId: currentScene.id,
++                    actionId: authoritativeActionId,
++                  })
++                  .then(async () => {
++                    const finalScene = orderedScenes.at(-1);
++                    if (finalScene) {
++                      await runtimeEvents.completeWhenReady({
++                        sceneIndex: orderedScenes.length - 1,
++                        sceneId: finalScene.id,
++                      });
++                    }
++                  })
++                  .catch((error) =>
++                    console.error(
++                      '[Mira Runtime] Failed to record authoritative scene completion',
++                      error,
++                    ),
++                  );
++              }
++            }
++
+             // End lecture session on playback complete
+             if (lectureSessionIdRef.current) {
+               chatAreaRef.current?.endSession(lectureSessionIdRef.current);
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+index 9e7b582..bd282b6 100644
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -41,6 +41,8 @@ import {
+   type QuizRuntimeGate,
+   type QuizViewLifetime,
+ } from '@/lib/quiz/view-state';
++import { useStageStore } from '@/lib/store';
++import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ 
+ // ─── Types ──────────────────────────────────────────────────────────────────
+ 
+@@ -698,6 +700,7 @@ function ScoreBanner({
+ 
+ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
+   const { t, locale } = useI18n();
++  const runtimeEvents = useMiraStudentRuntimeEvents();
+ 
+   const [phase, setPhase] = useState<Phase>('not_started');
+   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+@@ -746,6 +749,35 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
+ 
+   const attemptId = isQuizRuntimeReady(runtimeGate) ? runtimeGate.attemptId : null;
+ 
++  const reportAuthoritativeAnswers = useCallback(async () => {
++    if (!runtimeEvents || !attemptId) return;
++    const stageState = useStageStore.getState();
++    const orderedScenes = [...stageState.scenes].sort(
++      (left, right) => left.order - right.order,
++    );
++    const sceneIndex = orderedScenes.findIndex((scene) => scene.id === sceneId);
++    if (sceneIndex < 0) throw new Error('Mira Runtime quiz scene is unavailable');
++    const sceneIdentity = { sceneIndex, sceneId };
++    for (const question of questions) {
++      const response = answers[question.id];
++      if (typeof response !== 'string' && !Array.isArray(response)) {
++        throw new Error(`Mira Runtime answer is missing for ${question.id}`);
++      }
++      await runtimeEvents.answerSubmitted({
++        ...sceneIdentity,
++        questionId: question.id,
++        response,
++      });
++    }
++    const finalScene = orderedScenes.at(-1);
++    if (finalScene) {
++      await runtimeEvents.completeWhenReady({
++        sceneIndex: orderedScenes.length - 1,
++        sceneId: finalScene.id,
++      });
++    }
++  }, [answers, attemptId, questions, runtimeEvents, sceneId]);
++
+   const totalPoints = useMemo(
+     () => questions.reduce((sum, q) => sum + (q.points ?? 1), 0),
+     [questions],
+@@ -793,32 +825,32 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
+     );
+   }, [attemptId, answers, runtimeWriter, sceneId, stageId, viewLifetime]);
+ 
+-  // When entering grading phase, grade choice questions locally + call API for short-answer
++  // Formal Mira student sessions never grade in the browser. The backend records
++  // the first submission and remains the sole assessment authority.
+   useEffect(() => {
+     if (phase !== 'grading') return;
+     let cancelled = false;
+ 
+     (async () => {
+-      // 1. Grade choice questions locally (instant)
+-      const choiceResults = gradeChoiceQuestions(questions, answers);
++      let ordered: QuestionResult[] = [];
++      if (!runtimeEvents) {
++        const choiceResults = gradeChoiceQuestions(questions, answers);
++        const shortAnswerQs = questions.filter(isShortAnswer);
++        const aiResults = await Promise.all(
++          shortAnswerQs.map((q) =>
++            gradeShortAnswerQuestion(q, (answers[q.id] as string) ?? '', locale),
++          ),
++        );
+ 
+-      // 2. Grade short-answer questions via AI API (parallel)
+-      const shortAnswerQs = questions.filter(isShortAnswer);
+-      const aiResults = await Promise.all(
+-        shortAnswerQs.map((q) =>
+-          gradeShortAnswerQuestion(q, (answers[q.id] as string) ?? '', locale),
+-        ),
+-      );
++        const allResultsMap = new Map<string, QuestionResult>();
++        for (const result of [...choiceResults, ...aiResults]) {
++          allResultsMap.set(result.questionId, result);
++        }
++        ordered = questions.map((question) => allResultsMap.get(question.id)!).filter(Boolean);
++      }
+ 
+       if (cancelled) return;
+ 
+-      // 3. Merge results in original question order
+-      const allResultsMap = new Map<string, QuestionResult>();
+-      for (const r of [...choiceResults, ...aiResults]) {
+-        allResultsMap.set(r.questionId, r);
+-      }
+-      const ordered = questions.map((q) => allResultsMap.get(q.id)!).filter(Boolean);
+-
+       if (!attemptId) {
+         setRuntimeGate({ status: 'error' });
+         return;
+@@ -828,6 +860,7 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
+           { stageId, sceneId, attemptId, answers, results: ordered },
+           runtimeWriter,
+         );
++        await reportAuthoritativeAnswers();
+       } catch (error) {
+         log.warn('Failed to persist quiz review:', error);
+         if (!cancelled) setRuntimeGate({ status: 'error' });
+@@ -841,7 +874,26 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
+     return () => {
+       cancelled = true;
+     };
+-  }, [phase, questions, answers, locale, sceneId, stageId, attemptId, runtimeWriter]);
++  }, [
++    phase,
++    questions,
++    answers,
++    locale,
++    sceneId,
++    stageId,
++    attemptId,
++    runtimeWriter,
++    reportAuthoritativeAnswers,
++    runtimeEvents,
++  ]);
++
++  useEffect(() => {
++    if (phase !== 'reviewing' || !runtimeEvents || !attemptId) return;
++    void reportAuthoritativeAnswers().catch((error) => {
++      log.warn('Failed to resume authoritative Mira quiz reporting:', error);
++      setRuntimeGate({ status: 'error' });
++    });
++  }, [attemptId, phase, reportAuthoritativeAnswers, runtimeEvents]);
+ 
+   const handleRetry = useCallback(async () => {
+     if (!attemptId || retrying) return;
+@@ -1016,9 +1068,11 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
+             </motion.div>
+             <div className="text-center">
+               <p className="text-base font-semibold text-gray-700 dark:text-gray-200">
+-                {t('quiz.aiGrading')}
++                {runtimeEvents ? '正在安全提交回答…' : t('quiz.aiGrading')}
++              </p>
++              <p className="text-sm text-gray-400 mt-1">
++                {runtimeEvents ? '正式结果由服务端统一判定' : t('quiz.aiGradingWait')}
+               </p>
+-              <p className="text-sm text-gray-400 mt-1">{t('quiz.aiGradingWait')}</p>
+             </div>
+             <div className="flex gap-1 mt-2">
+               {[0, 1, 2].map((i) => (
+@@ -1052,22 +1106,36 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
+                   {t('quiz.quizReport')}
+                 </span>
+               </div>
+-              <button
+-                type="button"
+-                onClick={() => void handleRetry()}
+-                disabled={retrying}
+-                className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+-              >
+-                <RotateCcw className="w-3.5 h-3.5" />
+-                {t('quiz.retry')}
+-              </button>
++              {!runtimeEvents && (
++                <button
++                  type="button"
++                  onClick={() => void handleRetry()}
++                  disabled={retrying}
++                  className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
++                >
++                  <RotateCcw className="w-3.5 h-3.5" />
++                  {t('quiz.retry')}
++                </button>
++              )}
+             </div>
+ 
+             {/* Results */}
+             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+-              <ScoreBanner score={earnedScore} total={totalPoints} results={results} />
+-
+-              {questions.map((q, i) => {
++              {runtimeEvents ? (
++                <div className="flex min-h-48 flex-col items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50/70 px-6 text-center dark:border-emerald-900/40 dark:bg-emerald-950/20">
++                  <CheckCircle2 className="mb-3 h-10 w-10 text-emerald-500" />
++                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
++                    回答已提交
++                  </h3>
++                  <p className="mt-2 max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400">
++                    本次结果由服务端统一判定，请在家长端学习报告中查看正式结果。
++                  </p>
++                </div>
++              ) : (
++                <>
++                  <ScoreBanner score={earnedScore} total={totalPoints} results={results} />
++
++                  {questions.map((q, i) => {
+                 const r = resultMap[q.id];
+                 if (q.type === 'single') {
+                   return (
+@@ -1106,7 +1174,9 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
+                     result={r}
+                   />
+                 );
+-              })}
++                  })}
++                </>
++              )}
+             </div>
+           </motion.div>
+         )}
+diff --git a/components/stage.tsx b/components/stage.tsx
+index dfade47..8362cfc 100644
+--- a/components/stage.tsx
++++ b/components/stage.tsx
+@@ -26,7 +26,10 @@ import { useWorkbenchStore } from '@/lib/workbench/session-store';
+ import { useWorkbenchPanelState } from '@/lib/workbench/panel-context';
+ import { workspaceHref } from '@/lib/workbench/workspace-panes';
+ import { exitProPlaybackToStandalone } from '@/lib/workbench/pro-playback-exit';
+-import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
++import {
++  useMiraStudentRuntime,
++  useMiraStudentRuntimeEvents,
++} from '@/lib/contexts/mira-student-runtime-context';
+ 
+ /**
+  * Stage — top-level classroom container. Standalone classrooms dispatch
+@@ -89,6 +92,7 @@ export function Stage({
+   const proWorkbenchEntry = proWorkbenchFlag && proRuntime === 'on';
+   const currentScene = useStageStore((s) => s.getCurrentScene());
+   const studentMode = useMiraStudentRuntime();
++  const runtimeEvents = useMiraStudentRuntimeEvents();
+   // The reference implementation makes editing owner-only. `isOwner` is true for the stage creator and
+   // defaults to true with browser storage (single-user IndexedDB), so this gate is
+   // a no-op upstream but hides Pro mode from visitors / bookmarked viewers in
+@@ -127,6 +131,18 @@ export function Stage({
+   const classroomBackControl = resolveClassroomBackControl(hosted, workbenchPlayback);
+   const classroomHeaderControls = resolveClassroomHeaderControls(hosted, workbenchPlayback);
+ 
++  useEffect(() => {
++    if (!studentMode || !runtimeEvents || !currentScene) return;
++    const orderedScenes = [...scenes].sort((left, right) => left.order - right.order);
++    const sceneIndex = orderedScenes.findIndex((scene) => scene.id === currentScene.id);
++    if (sceneIndex < 0) return;
++    void runtimeEvents
++      .sceneEntered({ sceneIndex, sceneId: currentScene.id })
++      .catch((error) =>
++        console.error('[Mira Runtime] Failed to record scene entry', error),
++      );
++  }, [currentScene, runtimeEvents, scenes, studentMode]);
++
+   // Predicate for "can the user enter Pro mode for the current scene?".
+   // Single source of truth feeds the Header's Pro Switch state and the
+   // auto-exit effect below; keeping them in lock-step prevents an
+diff --git a/lib/contexts/mira-student-runtime-context.tsx b/lib/contexts/mira-student-runtime-context.tsx
+index 82dbad4..bbbd78c 100644
+--- a/lib/contexts/mira-student-runtime-context.tsx
++++ b/lib/contexts/mira-student-runtime-context.tsx
+@@ -4,6 +4,7 @@ import {
+   createContext,
+   useCallback,
+   useContext,
++  useEffect,
+   useLayoutEffect,
+   useMemo,
+   useRef,
+@@ -15,8 +16,13 @@ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { useTheme } from '@/lib/hooks/use-theme';
+ import { supportedLocales, type Locale } from '@/lib/i18n';
+ import { MIRA_STUDENT_AUTO_PLAY_DEFAULT } from '@/lib/mira/student-runtime';
++import {
++  createMiraStudentRuntimeEventClient,
++  type MiraStudentRuntimeEventClient,
++} from '@/lib/mira/student-runtime-events';
+ 
+ const MiraStudentRuntimeContext = createContext(false);
++const MiraStudentRuntimeEventContext = createContext<MiraStudentRuntimeEventClient | null>(null);
+ 
+ export interface MiraStudentAutoPlayRuntime {
+   readonly autoPlayLecture: boolean;
+@@ -124,29 +130,47 @@ function MiraStudentPreferences({ onReady }: { readonly onReady: () => void }) {
+ 
+ export function MiraStudentRuntimeProvider({
+   studentMode,
++  classroomId,
+   children,
+ }: {
+   readonly studentMode: boolean;
++  readonly classroomId: string;
+   readonly children: ReactNode;
+ }) {
+   const [preferencesReady, setPreferencesReady] = useState(!studentMode);
+   const markPreferencesReady = useCallback(() => setPreferencesReady(true), []);
++  const runtimeEvents = useMemo(
++    () =>
++      studentMode && typeof window !== 'undefined'
++        ? createMiraStudentRuntimeEventClient({ classroomId })
++        : null,
++    [classroomId, studentMode],
++  );
++
++  useEffect(() => {
++    if (!runtimeEvents) return;
++    void runtimeEvents.resume().catch((error) => {
++      console.error('[Mira Runtime] Failed to resume authoritative event stream', error);
++    });
++  }, [runtimeEvents]);
+ 
+   return (
+     <MiraStudentRuntimeContext.Provider value={studentMode}>
+-      <MiraStudentAutoPlaySession
+-        key={studentMode ? 'student' : 'operator'}
+-        studentMode={studentMode}
+-      >
+-        {studentMode && <MiraStudentPreferences onReady={markPreferencesReady} />}
+-        {studentMode && !preferencesReady ? (
+-          <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-600">
+-            课程加载中…
+-          </div>
+-        ) : (
+-          children
+-        )}
+-      </MiraStudentAutoPlaySession>
++      <MiraStudentRuntimeEventContext.Provider value={runtimeEvents}>
++        <MiraStudentAutoPlaySession
++          key={studentMode ? 'student' : 'operator'}
++          studentMode={studentMode}
++        >
++          {studentMode && <MiraStudentPreferences onReady={markPreferencesReady} />}
++          {studentMode && !preferencesReady ? (
++            <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-600">
++              课程加载中…
++            </div>
++          ) : (
++            children
++          )}
++        </MiraStudentAutoPlaySession>
++      </MiraStudentRuntimeEventContext.Provider>
+     </MiraStudentRuntimeContext.Provider>
+   );
+ }
+@@ -158,3 +182,7 @@ export function useMiraStudentRuntime(): boolean {
+ export function useMiraStudentAutoPlayRuntime(): MiraStudentAutoPlayRuntime | null {
+   return useContext(MiraStudentAutoPlayRuntimeContext);
+ }
++
++export function useMiraStudentRuntimeEvents(): MiraStudentRuntimeEventClient | null {
++  return useContext(MiraStudentRuntimeEventContext);
++}
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+new file mode 100644
+index 0000000..bb487e1
+--- /dev/null
++++ b/lib/mira/student-runtime-events.ts
+@@ -0,0 +1,434 @@
++const EVENT_SCHEMA = 'mira.openmaic.student-runtime-event.v1' as const;
++const RECEIPT_SCHEMA = 'mira.openmaic.student-runtime-event-receipt.v1' as const;
++const STATE_VERSION = 1 as const;
++const STORAGE_PREFIX = 'mira:student-runtime-events:v1:';
++
++type SceneIdentity = {
++  readonly sceneIndex: number;
++  readonly sceneId: string;
++};
++
++export type MiraStudentRuntimeEvent =
++  | {
++      readonly schemaVersion: typeof EVENT_SCHEMA;
++      readonly sequence: number;
++      readonly type: 'scene_entered';
++      readonly payload: SceneIdentity;
++    }
++  | {
++      readonly schemaVersion: typeof EVENT_SCHEMA;
++      readonly sequence: number;
++      readonly type: 'action_completed';
++      readonly payload: SceneIdentity & { readonly actionId: string };
++    }
++  | {
++      readonly schemaVersion: typeof EVENT_SCHEMA;
++      readonly sequence: number;
++      readonly type: 'answer_submitted';
++      readonly payload: SceneIdentity & {
++        readonly questionId: string;
++        readonly response: string | readonly string[];
++        readonly attemptNumber: 1;
++      };
++    }
++  | {
++      readonly schemaVersion: typeof EVENT_SCHEMA;
++      readonly sequence: number;
++      readonly type: 'classroom_completed';
++      readonly payload: SceneIdentity;
++    };
++
++type EventType = MiraStudentRuntimeEvent['type'];
++type EventPayload<T extends EventType> = Extract<MiraStudentRuntimeEvent, { type: T }>['payload'];
++
++interface PendingEvent {
++  readonly eventKey: string;
++  readonly event: MiraStudentRuntimeEvent;
++}
++
++interface StoredState {
++  readonly version: typeof STATE_VERSION;
++  runtimeSessionId: string | null;
++  nextSequence: number;
++  pending: PendingEvent | null;
++  emittedKeys: string[];
++  completed: boolean;
++}
++
++interface RuntimeStatus {
++  readonly ok: true;
++  readonly schemaVersion: typeof RECEIPT_SCHEMA;
++  readonly runtimeSessionId: string;
++  readonly lastSequence: number;
++  readonly nextSequence: number;
++  readonly completed: boolean;
++  readonly completionReady: boolean;
++  readonly answeredQuestionIds: readonly string[];
++}
++
++interface RuntimeReceipt {
++  readonly ok: true;
++  readonly sequence: number;
++  readonly completed?: boolean;
++  readonly receiptSha256: string;
++}
++
++export interface MiraStudentRuntimeEventClient {
++  resume(): Promise<void>;
++  sceneEntered(payload: SceneIdentity): Promise<void>;
++  actionCompleted(payload: SceneIdentity & { readonly actionId: string }): Promise<void>;
++  answerSubmitted(
++    payload: SceneIdentity & {
++      readonly questionId: string;
++      readonly response: string | readonly string[];
++    },
++  ): Promise<void>;
++  completeWhenReady(payload: SceneIdentity): Promise<boolean>;
++  classroomCompleted(payload: SceneIdentity): Promise<void>;
++}
++
++export interface MiraStudentRuntimeEventClientOptions {
++  readonly classroomId: string;
++  readonly fetcher?: typeof fetch;
++  readonly storage?: Storage;
++  readonly endpoint?: string;
++}
++
++export function createMiraStudentRuntimeEventClient(
++  options: MiraStudentRuntimeEventClientOptions,
++): MiraStudentRuntimeEventClient {
++  const classroomId = identifier(options.classroomId, 'classroomId', 255);
++  const fetcher = options.fetcher ?? fetch;
++  const storage = options.storage ?? browserStorage();
++  const storageKey = `${STORAGE_PREFIX}${encodeURIComponent(classroomId)}`;
++  const endpoint = options.endpoint ?? '/mira/runtime-events';
++  let state = readState(storage, storageKey);
++  let synchronized = false;
++  let lastStatus: RuntimeStatus | null = null;
++  let tail: Promise<void> = Promise.resolve();
++
++  const persist = () => safeSet(storage, storageKey, JSON.stringify(state));
++
++  const synchronize = async (force = false): Promise<RuntimeStatus> => {
++    if (synchronized && !force && lastStatus) return lastStatus;
++    const result = await fetcher(endpoint, {
++      method: 'GET',
++      credentials: 'same-origin',
++      cache: 'no-store',
++      headers: { Accept: 'application/json' },
++    });
++    const body = await jsonBody(result);
++    if (!result.ok) throw runtimeRequestError(result.status, body);
++    const status = runtimeStatus(body);
++
++    if (state.runtimeSessionId !== status.runtimeSessionId) {
++      state = freshState(status.runtimeSessionId, status.nextSequence, status.completed);
++    } else {
++      if (state.pending) {
++        if (status.lastSequence >= state.pending.event.sequence) {
++          rememberEmitted(state, state.pending.eventKey);
++          state.pending = null;
++        } else if (status.nextSequence !== state.pending.event.sequence) {
++          throw new Error('Mira Runtime event sequence cannot be reconciled safely');
++        }
++      }
++      state.nextSequence = status.nextSequence;
++      state.completed = status.completed;
++    }
++    persist();
++    synchronized = true;
++    lastStatus = status;
++    return status;
++  };
++
++  const flushPending = async () => {
++    const pending = state.pending;
++    if (!pending) return;
++    const result = await fetcher(endpoint, {
++      method: 'POST',
++      credentials: 'same-origin',
++      cache: 'no-store',
++      headers: {
++        Accept: 'application/json',
++        'Content-Type': 'application/json',
++      },
++      body: JSON.stringify(pending.event),
++    });
++    const body = await jsonBody(result);
++    if (!result.ok) throw runtimeRequestError(result.status, body);
++    const receipt = runtimeReceipt(body, pending.event.sequence);
++    rememberEmitted(state, pending.eventKey);
++    state.nextSequence = receipt.sequence + 1;
++    state.completed = receipt.completed === true;
++    state.pending = null;
++    persist();
++  };
++
++  const commit = async <T extends EventType>(type: T, payload: EventPayload<T>): Promise<void> => {
++    const eventKey = stableEventKey(type, payload);
++    if (
++      type === 'answer_submitted' &&
++      lastStatus?.answeredQuestionIds.includes(
++        (payload as EventPayload<'answer_submitted'>).questionId,
++      )
++    ) {
++      rememberEmitted(state, eventKey);
++      persist();
++      return;
++    }
++    if (state.emittedKeys.includes(eventKey)) return;
++    await flushPending();
++    if (state.emittedKeys.includes(eventKey)) return;
++    if (state.completed) throw new Error('Mira Runtime event stream is already completed');
++    const event = {
++      schemaVersion: EVENT_SCHEMA,
++      sequence: state.nextSequence,
++      type,
++      payload,
++    } as MiraStudentRuntimeEvent;
++    state.pending = { eventKey, event };
++    persist();
++    await flushPending();
++  };
++
++  const record = <T extends EventType>(type: T, payload: EventPayload<T>): Promise<void> => {
++    const operation = tail.catch(() => undefined).then(async () => {
++      await synchronize();
++      await commit(type, payload);
++    });
++    tail = operation;
++    return operation;
++  };
++
++  return {
++    resume: () => {
++      const operation = tail.catch(() => undefined).then(async () => {
++        await synchronize();
++      });
++      tail = operation;
++      return operation;
++    },
++    sceneEntered: (payload) =>
++      record('scene_entered', scenePayload(payload) as EventPayload<'scene_entered'>),
++    actionCompleted: (payload) =>
++      record('action_completed', {
++        ...scenePayload(payload),
++        actionId: identifier(payload.actionId, 'actionId'),
++      }),
++    answerSubmitted: (payload) =>
++      record('answer_submitted', {
++        ...scenePayload(payload),
++        questionId: identifier(payload.questionId, 'questionId'),
++        response: answerResponse(payload.response),
++        attemptNumber: 1,
++      }),
++    completeWhenReady: (payload) => {
++      const completionPayload = scenePayload(payload) as EventPayload<'classroom_completed'>;
++      const operation = tail.catch(() => undefined).then(async () => {
++        await synchronize();
++        await flushPending();
++        const status = await synchronize(true);
++        if (status.completed) return true;
++        if (!status.completionReady) return false;
++        await commit('classroom_completed', completionPayload);
++        return true;
++      });
++      tail = operation.then(() => undefined);
++      return operation;
++    },
++    classroomCompleted: (payload) =>
++      record('classroom_completed', scenePayload(payload) as EventPayload<'classroom_completed'>),
++  };
++}
++
++function freshState(
++  runtimeSessionId: string | null = null,
++  nextSequence = 1,
++  completed = false,
++): StoredState {
++  return {
++    version: STATE_VERSION,
++    runtimeSessionId,
++    nextSequence,
++    pending: null,
++    emittedKeys: [],
++    completed,
++  };
++}
++
++function readState(storage: Storage, key: string): StoredState {
++  try {
++    const parsed = JSON.parse(storage.getItem(key) ?? 'null') as Partial<StoredState> | null;
++    if (
++      !parsed ||
++      parsed.version !== STATE_VERSION ||
++      (parsed.runtimeSessionId !== null && typeof parsed.runtimeSessionId !== 'string') ||
++      !Number.isInteger(parsed.nextSequence) ||
++      Number(parsed.nextSequence) < 1 ||
++      !Array.isArray(parsed.emittedKeys) ||
++      !parsed.emittedKeys.every((value) => typeof value === 'string') ||
++      typeof parsed.completed !== 'boolean'
++    ) {
++      return freshState();
++    }
++    const pending = pendingEvent(parsed.pending);
++    return {
++      version: STATE_VERSION,
++      runtimeSessionId: parsed.runtimeSessionId ?? null,
++      nextSequence: Number(parsed.nextSequence),
++      pending,
++      emittedKeys: parsed.emittedKeys.slice(-256),
++      completed: parsed.completed,
++    };
++  } catch {
++    return freshState();
++  }
++}
++
++function pendingEvent(value: unknown): PendingEvent | null {
++  if (value == null) return null;
++  if (typeof value !== 'object' || Array.isArray(value)) return null;
++  const pending = value as Partial<PendingEvent>;
++  if (typeof pending.eventKey !== 'string' || !isStoredEvent(pending.event)) return null;
++  return { eventKey: pending.eventKey, event: pending.event };
++}
++
++function isStoredEvent(value: unknown): value is MiraStudentRuntimeEvent {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
++  const event = value as Partial<MiraStudentRuntimeEvent>;
++  return (
++    event.schemaVersion === EVENT_SCHEMA &&
++    Number.isInteger(event.sequence) &&
++    Number(event.sequence) >= 1 &&
++    ['scene_entered', 'action_completed', 'answer_submitted', 'classroom_completed'].includes(
++      String(event.type),
++    ) &&
++    !!event.payload &&
++    typeof event.payload === 'object' &&
++    !Array.isArray(event.payload)
++  );
++}
++
++function scenePayload(value: SceneIdentity): SceneIdentity {
++  if (!Number.isInteger(value.sceneIndex) || value.sceneIndex < 0 || value.sceneIndex >= 100) {
++    throw new Error('Mira Runtime sceneIndex is invalid');
++  }
++  return {
++    sceneIndex: value.sceneIndex,
++    sceneId: identifier(value.sceneId, 'sceneId'),
++  };
++}
++
++function answerResponse(value: string | readonly string[]): string | readonly string[] {
++  if (typeof value === 'string') return value;
++  if (Array.isArray(value) && value.every((item) => typeof item === 'string')) return [...value];
++  throw new Error('Mira Runtime answer response is invalid');
++}
++
++function identifier(value: string, field: string, maximum = 128): string {
++  const normalized = String(value ?? '');
++  if (
++    normalized.length > maximum ||
++    !/^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(normalized)
++  ) {
++    throw new Error(`Mira Runtime ${field} is invalid`);
++  }
++  return normalized;
++}
++
++function runtimeStatus(value: unknown): RuntimeStatus {
++  const body = value as Partial<RuntimeStatus> | null;
++  if (
++    !body ||
++    body.ok !== true ||
++    body.schemaVersion !== RECEIPT_SCHEMA ||
++    typeof body.runtimeSessionId !== 'string' ||
++    !Number.isInteger(body.lastSequence) ||
++    !Number.isInteger(body.nextSequence) ||
++    Number(body.lastSequence) < 0 ||
++    Number(body.nextSequence) !== Number(body.lastSequence) + 1 ||
++    typeof body.completed !== 'boolean' ||
++    typeof body.completionReady !== 'boolean' ||
++    !Array.isArray(body.answeredQuestionIds) ||
++    !body.answeredQuestionIds.every(
++      (questionId) =>
++        typeof questionId === 'string' &&
++        /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(questionId),
++    ) ||
++    new Set(body.answeredQuestionIds).size !== body.answeredQuestionIds.length
++  ) {
++    throw new Error('Mira Runtime returned an invalid event status');
++  }
++  return body as RuntimeStatus;
++}
++
++function runtimeReceipt(value: unknown, expectedSequence: number): RuntimeReceipt {
++  const body = value as Partial<RuntimeReceipt> | null;
++  if (
++    !body ||
++    body.ok !== true ||
++    body.sequence !== expectedSequence ||
++    !/^[a-f0-9]{64}$/.test(String(body.receiptSha256 ?? ''))
++  ) {
++    throw new Error('Mira Runtime returned an invalid event receipt');
++  }
++  return body as RuntimeReceipt;
++}
++
++async function jsonBody(response: Response): Promise<unknown> {
++  try {
++    return await response.json();
++  } catch {
++    return null;
++  }
++}
++
++function runtimeRequestError(status: number, body: unknown): Error {
++  const payload = body as { error?: unknown; message?: unknown } | null;
++  const error = new Error(
++    typeof payload?.message === 'string' ? payload.message : `Mira Runtime event failed (${status})`,
++  );
++  error.name = typeof payload?.error === 'string' ? payload.error : 'MiraRuntimeEventError';
++  return error;
++}
++
++function stableEventKey(type: EventType, payload: object): string {
++  if (type === 'answer_submitted') {
++    const answer = payload as EventPayload<'answer_submitted'>;
++    return `${type}:${canonicalJson({
++      sceneIndex: answer.sceneIndex,
++      sceneId: answer.sceneId,
++      questionId: answer.questionId,
++    })}`;
++  }
++  return `${type}:${canonicalJson(payload)}`;
++}
++
++function canonicalJson(value: unknown): string {
++  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
++  if (value && typeof value === 'object') {
++    return `{${Object.entries(value)
++      .sort(([left], [right]) => left.localeCompare(right))
++      .map(([key, item]) => `${JSON.stringify(key)}:${canonicalJson(item)}`)
++      .join(',')}}`;
++  }
++  return JSON.stringify(value);
++}
++
++function rememberEmitted(state: StoredState, eventKey: string): void {
++  if (!state.emittedKeys.includes(eventKey)) state.emittedKeys.push(eventKey);
++  if (state.emittedKeys.length > 256) state.emittedKeys.splice(0, state.emittedKeys.length - 256);
++}
++
++function browserStorage(): Storage {
++  if (typeof window === 'undefined') throw new Error('Mira Runtime event storage is unavailable');
++  return window.localStorage;
++}
++
++function safeSet(storage: Storage, key: string, value: string): void {
++  try {
++    storage.setItem(key, value);
++  } catch {
++    throw new Error('Mira Runtime event state could not be persisted safely');
++  }
++}
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+index 8512515..a633283 100644
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -39,6 +39,15 @@ export const MIRA_FORMAL_GENERATION_POLICY = {
+   idempotencyKey: 'runtimeRequestId',
+   queryByRuntimeRequestId: true,
+   speechAudioGenerated: false,
++  studentRuntimeEvents: {
++    enforced: true,
++    schemaVersion: 'mira.openmaic.student-runtime-events.v1',
++    classroomAuthoritySchema: 'mira.openmaic.runtime-event-authority.v1',
++    endpoint: '/mira/runtime-events',
++    authority: 'mira-backend',
++    clientIdentityAccepted: false,
++    clientScoreAccepted: false,
++  },
+   contract: MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+ } as const;
+ 
+diff --git a/tests/runtime/mira-student-runtime-events.test.ts b/tests/runtime/mira-student-runtime-events.test.ts
+new file mode 100644
+index 0000000..2baa0a8
+--- /dev/null
++++ b/tests/runtime/mira-student-runtime-events.test.ts
+@@ -0,0 +1,320 @@
++import { describe, expect, it, vi } from 'vitest';
++import { createMiraStudentRuntimeEventClient } from '@/lib/mira/student-runtime-events';
++
++function memoryStorage(): Storage {
++  const values = new Map<string, string>();
++  return {
++    get length() {
++      return values.size;
++    },
++    clear: () => values.clear(),
++    getItem: (key) => values.get(key) ?? null,
++    key: (index) => [...values.keys()][index] ?? null,
++    removeItem: (key) => values.delete(key),
++    setItem: (key, value) => values.set(key, value),
++  } as Storage;
++}
++
++function response(body: object, status = 200): Response {
++  return new Response(JSON.stringify(body), {
++    status,
++    headers: { 'content-type': 'application/json' },
++  });
++}
++
++const status = (
++  lastSequence: number,
++  runtimeSessionId = 'runtime-session-a',
++  completionReady = false,
++  answeredQuestionIds: string[] = [],
++) => ({
++  ok: true,
++  schemaVersion: 'mira.openmaic.student-runtime-event-receipt.v1',
++  runtimeSessionId,
++  lastSequence,
++  nextSequence: lastSequence + 1,
++  completed: false,
++  reportId: null,
++  completionReady,
++  answeredQuestionIds,
++});
++
++describe('Mira authoritative student Runtime events', () => {
++  it('accepts the full 255-character upstream classroom identity boundary', async () => {
++    const classroomId = `c${'a'.repeat(254)}`;
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId,
++      storage: memoryStorage(),
++      fetcher: vi.fn(async () => response(status(0))),
++    });
++    await expect(client.resume()).resolves.toBeUndefined();
++    expect(() =>
++      createMiraStudentRuntimeEventClient({
++        classroomId: `${classroomId}x`,
++        storage: memoryStorage(),
++        fetcher: vi.fn(),
++      }),
++    ).toThrow('classroomId is invalid');
++  });
++
++  it('syncs the server sequence and emits only classroom evidence without identity or score', async () => {
++    const requests: Array<{ method: string; body?: unknown }> = [];
++    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
++      requests.push({
++        method: init?.method ?? 'GET',
++        ...(init?.body ? { body: JSON.parse(String(init.body)) } : {}),
++      });
++      if ((init?.method ?? 'GET') === 'GET') return response(status(4));
++      const event = JSON.parse(String(init?.body));
++      return response({ ok: true, sequence: event.sequence, receiptSha256: 'a'.repeat(64) });
++    });
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      fetcher,
++      storage: memoryStorage(),
++    });
++
++    await client.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' });
++    await client.answerSubmitted({
++      sceneIndex: 0,
++      sceneId: 'scene-0',
++      questionId: 'q-1',
++      response: '12',
++    });
++
++    expect(requests).toEqual([
++      { method: 'GET' },
++      {
++        method: 'POST',
++        body: {
++          schemaVersion: 'mira.openmaic.student-runtime-event.v1',
++          sequence: 5,
++          type: 'scene_entered',
++          payload: { sceneIndex: 0, sceneId: 'scene-0' },
++        },
++      },
++      {
++        method: 'POST',
++        body: {
++          schemaVersion: 'mira.openmaic.student-runtime-event.v1',
++          sequence: 6,
++          type: 'answer_submitted',
++          payload: {
++            sceneIndex: 0,
++            sceneId: 'scene-0',
++            questionId: 'q-1',
++            response: '12',
++            attemptNumber: 1,
++          },
++        },
++      },
++    ]);
++    expect(JSON.stringify(requests)).not.toMatch(/childId|familyId|learningSessionId|score|correct/);
++  });
++
++  it('replays the exact pending event after a lost response before sending later evidence', async () => {
++    const storage = memoryStorage();
++    const posted: unknown[] = [];
++    let loseFirstResponse = true;
++    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
++      if ((init?.method ?? 'GET') === 'GET') return response(status(0));
++      const event = JSON.parse(String(init?.body));
++      posted.push(event);
++      if (loseFirstResponse) {
++        loseFirstResponse = false;
++        throw new TypeError('response connection lost');
++      }
++      return response({ ok: true, sequence: event.sequence, receiptSha256: 'b'.repeat(64) });
++    });
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      fetcher,
++      storage,
++    });
++
++    await expect(client.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' })).rejects.toThrow(
++      'response connection lost',
++    );
++    await client.actionCompleted({ sceneIndex: 0, sceneId: 'scene-0', actionId: 'speech-0' });
++
++    expect(posted).toHaveLength(3);
++    expect(posted[0]).toEqual(posted[1]);
++    expect(posted[2]).toMatchObject({ sequence: 2, type: 'action_completed' });
++  });
++
++  it('recovers an accepted lost-response event from authoritative status after reload', async () => {
++    const storage = memoryStorage();
++    const first = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage,
++      fetcher: vi.fn(async (_input, init) => {
++        if ((init?.method ?? 'GET') === 'GET') return response(status(0));
++        throw new TypeError('response connection lost');
++      }),
++    });
++    await expect(first.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' })).rejects.toThrow();
++
++    const posted: unknown[] = [];
++    const resumed = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage,
++      fetcher: vi.fn(async (_input, init) => {
++        if ((init?.method ?? 'GET') === 'GET') return response(status(1));
++        const event = JSON.parse(String(init?.body));
++        posted.push(event);
++        return response({ ok: true, sequence: event.sequence, receiptSha256: 'c'.repeat(64) });
++      }),
++    });
++
++    await resumed.actionCompleted({ sceneIndex: 0, sceneId: 'scene-0', actionId: 'speech-0' });
++
++    expect(posted).toEqual([
++      {
++        schemaVersion: 'mira.openmaic.student-runtime-event.v1',
++        sequence: 2,
++        type: 'action_completed',
++        payload: { sceneIndex: 0, sceneId: 'scene-0', actionId: 'speech-0' },
++      },
++    ]);
++  });
++
++  it('uses server answered question identity after storage loss without consuming a sequence', async () => {
++    let lastSequence = 0;
++    const answeredQuestionIds: string[] = [];
++    const posts: Array<{ sequence: number; payload: { questionId?: string } }> = [];
++    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
++      if ((init?.method ?? 'GET') === 'GET') {
++        return response(
++          status(lastSequence, 'runtime-session-a', false, [...answeredQuestionIds]),
++        );
++      }
++      const event = JSON.parse(String(init?.body));
++      posts.push(event);
++      lastSequence = event.sequence;
++      if (event.type === 'answer_submitted') {
++        answeredQuestionIds.push(event.payload.questionId);
++      }
++      return response({
++        ok: true,
++        sequence: event.sequence,
++        receiptSha256: 'f'.repeat(64),
++      });
++    });
++    const first = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      fetcher,
++      storage: memoryStorage(),
++    });
++    await first.answerSubmitted({
++      sceneIndex: 5,
++      sceneId: 'quiz-guided',
++      questionId: 'q2',
++      response: '99',
++    });
++
++    const reloadedWithoutStorage = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      fetcher,
++      storage: memoryStorage(),
++    });
++    await reloadedWithoutStorage.answerSubmitted({
++      sceneIndex: 5,
++      sceneId: 'quiz-guided',
++      questionId: 'q2',
++      response: '12',
++    });
++    await reloadedWithoutStorage.answerSubmitted({
++      sceneIndex: 5,
++      sceneId: 'quiz-guided',
++      questionId: 'q3',
++      response: '13',
++    });
++
++    expect(posts).toHaveLength(2);
++    expect(posts.map((event) => event.sequence)).toEqual([1, 2]);
++    expect(posts.map((event) => event.payload.questionId)).toEqual(['q2', 'q3']);
++  });
++
++  it('deduplicates render retries and never resends an authoritative question on local retry', async () => {
++    let lastSequence = 0;
++    const posts: unknown[] = [];
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage: memoryStorage(),
++      fetcher: vi.fn(async (_input, init) => {
++        if ((init?.method ?? 'GET') === 'GET') return response(status(lastSequence));
++        const event = JSON.parse(String(init?.body));
++        lastSequence = event.sequence;
++        posts.push(event);
++        return response({ ok: true, sequence: event.sequence, receiptSha256: 'd'.repeat(64) });
++      }),
++    });
++
++    await client.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' });
++    await client.sceneEntered({ sceneIndex: 0, sceneId: 'scene-0' });
++    await client.answerSubmitted({
++      sceneIndex: 0,
++      sceneId: 'scene-0',
++      questionId: 'q-1',
++      response: '99',
++    });
++    await client.answerSubmitted({
++      sceneIndex: 0,
++      sceneId: 'scene-0',
++      questionId: 'q-1',
++      response: '11',
++    });
++    await client.answerSubmitted({
++      sceneIndex: 0,
++      sceneId: 'scene-0',
++      questionId: 'q-2',
++      response: '12',
++    });
++
++    expect(posts).toHaveLength(3);
++    expect(posts[1]).toMatchObject({
++      type: 'answer_submitted',
++      payload: { questionId: 'q-1', response: '99', attemptNumber: 1 },
++    });
++    expect(posts[2]).toMatchObject({
++      type: 'answer_submitted',
++      payload: { questionId: 'q-2', response: '12', attemptNumber: 1 },
++    });
++  });
++
++  it('emits completion only after the backend confirms all authoritative evidence', async () => {
++    let ready = false;
++    const posts: Array<{ type: string; sequence: number }> = [];
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a',
++      storage: memoryStorage(),
++      fetcher: vi.fn(async (_input, init) => {
++        if ((init?.method ?? 'GET') === 'GET') return response(status(8, 'runtime-session-a', ready));
++        const event = JSON.parse(String(init?.body));
++        posts.push(event);
++        return response({
++          ok: true,
++          sequence: event.sequence,
++          completed: event.type === 'classroom_completed',
++          receiptSha256: 'e'.repeat(64),
++        });
++      }),
++    });
++
++    expect(
++      await client.completeWhenReady({ sceneIndex: 9, sceneId: 'scene-9' }),
++    ).toBe(false);
++    ready = true;
++    expect(
++      await client.completeWhenReady({ sceneIndex: 9, sceneId: 'scene-9' }),
++    ).toBe(true);
++    expect(posts).toEqual([
++      {
++        schemaVersion: 'mira.openmaic.student-runtime-event.v1',
++        sequence: 9,
++        type: 'classroom_completed',
++        payload: { sceneIndex: 9, sceneId: 'scene-9' },
++      },
++    ]);
++  });
++});
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index f56a05d..6894c8d 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -130,6 +130,15 @@ describe('GET /api/health structured scene runtime policy', () => {
+       idempotencyKey: 'runtimeRequestId',
+       queryByRuntimeRequestId: true,
+       speechAudioGenerated: false,
++      studentRuntimeEvents: {
++        enforced: true,
++        schemaVersion: 'mira.openmaic.student-runtime-events.v1',
++        classroomAuthoritySchema: 'mira.openmaic.runtime-event-authority.v1',
++        endpoint: '/mira/runtime-events',
++        authority: 'mira-backend',
++        clientIdentityAccepted: false,
++        clientScoreAccepted: false,
++      },
+       contract: {
+         schemaVersion: 'mira.openmaic.formal-runtime.v1',
+         exactSceneCount: 10,
+@@ -192,6 +201,15 @@ describe('GET /api/health structured scene runtime policy', () => {
+     expect(body.runtimePolicy.formalGeneration).toMatchObject({
+       policyId: 'mira.openmaic.formal-runtime.v1',
+       speechAudioGenerated: false,
++      studentRuntimeEvents: {
++        enforced: true,
++        schemaVersion: 'mira.openmaic.student-runtime-events.v1',
++        classroomAuthoritySchema: 'mira.openmaic.runtime-event-authority.v1',
++        endpoint: '/mira/runtime-events',
++        authority: 'mira-backend',
++        clientIdentityAccepted: false,
++        clientScoreAccepted: false,
++      },
+     });
+     expect(body.runtimePolicy.tts).toBeUndefined();
+     expect(body.runtimePolicy.asr).toBeUndefined();
+-- 
+2.50.1 (Apple Git-155)
+

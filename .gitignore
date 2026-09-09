@@ -4,3 +4,15 @@ backend/.env
 backend/backend-8000.log
 backend/backend-8000.pid
 .local_backups/
+
+# Local browser sessions, dependency caches, and acceptance artifacts.
+.playwright-cli/
+/.pnpm-store/
+/output/
+/design-qa/
+/openmaic-runtime/output/
+/chinese-live-classroom.png
+
+# Generated course media and failed golden-test comparisons.
+/backend/data/learning-media/
+/mobile/test/failures/

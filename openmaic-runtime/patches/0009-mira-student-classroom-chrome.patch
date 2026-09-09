@@ -1,0 +1,1045 @@
+From 7cbc332b902c608ddd099203e111cee277f84eed Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 09/37] 0009-mira-student-classroom-chrome
+
+---
+ app/api/health/route.ts                       |   4 +
+ app/classroom/[id]/page.tsx                   | 267 ++----------------
+ app/layout.tsx                                |   5 +
+ components/access-code-modal.tsx              |   2 +-
+ components/edit/PlaybackChromeRoot.tsx        |   5 +-
+ components/header.tsx                         |  22 +-
+ .../scene-renderers/pbl/v2/workspace.tsx      |  22 +-
+ components/stage.tsx                          |  24 +-
+ components/stage/header-controls.tsx          |  11 +-
+ components/stage/scene-sidebar.tsx            |  22 +-
+ e2e/tests/classroom-interaction.spec.ts       |  33 +++
+ lib/contexts/mira-student-runtime-context.tsx | 107 +++++++
+ lib/hooks/use-audio-recorder.ts               |   5 +-
+ lib/hooks/use-i18n.tsx                        |  13 +-
+ lib/hooks/use-theme.tsx                       |  16 +-
+ lib/mira/student-runtime.ts                   |  41 +++
+ public/mira-classroom-icon.svg                |   7 +
+ .../openmaic-apple-icon.png                   | Bin
+ .../openmaic-favicon.ico                      | Bin
+ tests/runtime/mira-student-runtime.test.ts    |  50 ++++
+ tests/server/health-route.test.ts             |  10 +
+ 21 files changed, 377 insertions(+), 289 deletions(-)
+ create mode 100644 lib/contexts/mira-student-runtime-context.tsx
+ create mode 100644 lib/mira/student-runtime.ts
+ create mode 100644 public/mira-classroom-icon.svg
+ rename app/apple-icon.png => public/openmaic-apple-icon.png (100%)
+ rename app/favicon.ico => public/openmaic-favicon.ico (100%)
+ create mode 100644 tests/runtime/mira-student-runtime.test.ts
+
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index e3d4919..49810c5 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -11,6 +11,7 @@ import { assertMiraAsrProviderReady, getMiraAsrPolicy } from '@/lib/server/mira-
+ import { getMiraStructuredSceneRuntimePolicy } from '@/lib/server/model-routes';
+ import { getMiraSampleDeterministicRecoveryRuntimePolicy } from '@/lib/server/mira-sample-deterministic-recovery';
+ import { getMiraSampleTtsCredentialRecoveryRuntimePolicy } from '@/lib/server/mira-sample-tts-credential-recovery';
++import { getMiraStudentChromeRuntimePolicy } from '@/lib/mira/student-runtime';
+ 
+ const version = process.env.npm_package_version || '0.1.0';
+ 
+@@ -22,6 +23,7 @@ export async function GET() {
+   let structuredScenePolicy;
+   let deterministicRecoveryPolicy;
+   let ttsCredentialRecoveryPolicy;
++  let studentChromePolicy;
+   try {
+     ttsPolicy = getMiraTtsPolicy();
+     assertMiraTtsProviderReady(ttsPolicy, ttsProviders);
+@@ -30,6 +32,7 @@ export async function GET() {
+     structuredScenePolicy = getMiraStructuredSceneRuntimePolicy();
+     deterministicRecoveryPolicy = getMiraSampleDeterministicRecoveryRuntimePolicy();
+     ttsCredentialRecoveryPolicy = getMiraSampleTtsCredentialRecoveryRuntimePolicy();
++    studentChromePolicy = getMiraStudentChromeRuntimePolicy();
+   } catch (error) {
+     return apiError(
+       'PROVIDER_DISABLED',
+@@ -55,6 +58,7 @@ export async function GET() {
+       structuredScene: structuredScenePolicy,
+       deterministicRecovery: deterministicRecoveryPolicy,
+       ttsCredentialRecovery: ttsCredentialRecoveryPolicy,
++      studentChrome: studentChromePolicy,
+     },
+   });
+ }
+diff --git a/app/classroom/[id]/page.tsx b/app/classroom/[id]/page.tsx
+index dfbaaf4..cba7667 100644
+--- a/app/classroom/[id]/page.tsx
++++ b/app/classroom/[id]/page.tsx
+@@ -1,255 +1,30 @@
+-'use client';
+-
+-import { Stage } from '@/components/stage';
+-import { ThemeProvider } from '@/lib/hooks/use-theme';
+-import { useStageStore } from '@/lib/store';
+-import { useSettingsStore } from '@/lib/store/settings';
+-import { claimStageSceneLoadToken, isCurrentStageSceneLoadToken } from '@/lib/store/stage';
+-import { loadImageMapping } from '@/lib/utils/image-storage';
+-import { useEffect, useRef, useState, useCallback } from 'react';
+-import { useParams } from 'next/navigation';
+-import { useSceneGenerator } from '@/lib/hooks/use-scene-generator';
+-import { useMediaGenerationStore } from '@/lib/store/media-generation';
+-import { useWhiteboardHistoryStore } from '@/lib/store/whiteboard-history';
+-import { createLogger } from '@/lib/logger';
+-import { MediaStageProvider } from '@/lib/contexts/media-stage-context';
+-import { generateMediaForOutlines } from '@/lib/media/media-orchestrator';
+-import { useAgentRegistry } from '@/lib/orchestration/registry/store';
+-import { fetchStageMeta } from '@/lib/classroom/stage-meta-client';
+-import { noteStageOwnership } from '@/lib/classroom/stage-ownership-signal';
++import type { Metadata } from 'next';
++import { ClassroomSurface } from '@/components/classroom/ClassroomSurface';
++import { MiraStudentRuntimeProvider } from '@/lib/contexts/mira-student-runtime-context';
+ import {
+-  applyClassroomStageAndScenes,
+-  defaultClassroomLoadDeps,
+-  runClassroomLoad,
+-} from '@/lib/classroom/load-classroom';
+-
+-const log = createLogger('Classroom');
+-
+-export default function ClassroomDetailPage() {
+-  const params = useParams();
+-  const classroomId = params?.id as string;
+-
+-  const { loadFromStorage } = useStageStore();
+-
+-  const [loading, setLoading] = useState(true);
+-  const [error, setError] = useState<string | null>(null);
+-
+-  const generationStartedRef = useRef(false);
+-
+-  const { generateRemaining, retrySingleOutline, stop } = useSceneGenerator({
+-    onComplete: () => {
+-      log.info('[Classroom] All scenes generated');
+-    },
+-  });
+-
+-  const loadClassroom = useCallback(
+-    async (isEffectCurrent: () => boolean = () => true) => {
+-      const loadToken = claimStageSceneLoadToken();
+-      const isCurrent = () => isEffectCurrent() && isCurrentStageSceneLoadToken(loadToken);
+-
+-      await runClassroomLoad({
+-        classroomId,
+-        loadToken,
+-        isCurrent,
+-        loadFromStorage,
+-        getCurrentStage: () => useStageStore.getState().stage,
+-        fetchClassroom: defaultClassroomLoadDeps.fetchClassroom,
+-        applyFallbackScenes: (args) =>
+-          defaultClassroomLoadDeps.applyFallbackScenes({
+-            ...args,
+-            isCurrent,
+-            applyStageAndScenes: applyClassroomStageAndScenes,
+-          }),
+-        loadRestoredMediaTasks: defaultClassroomLoadDeps.loadRestoredMediaTasks,
+-        applyRestoredMediaTasks: defaultClassroomLoadDeps.applyRestoredMediaTasks,
+-        discardRestoredMediaTasks: defaultClassroomLoadDeps.discardRestoredMediaTasks,
+-        loadLegacyAgentFallbacks: defaultClassroomLoadDeps.loadLegacyAgentFallbacks,
+-        commitMigratedAgentConfigs: defaultClassroomLoadDeps.commitMigratedAgentConfigs,
+-        applyGeneratedAgents: defaultClassroomLoadDeps.applyGeneratedAgents,
+-        getSettings: () => useSettingsStore.getState(),
+-        getAgent: (id) => useAgentRegistry.getState().getAgent(id),
+-        restoreAgentSelection: defaultClassroomLoadDeps.restoreAgentSelection,
+-        setError,
+-        setLoading,
+-        log,
+-      });
+-
+-      // The stage-meta sidecar resolves the viewer-facing ownership facts the
+-      // document seam does not carry — `isOwner` decides read-only vs editable
+-      // (see `stage-meta-client.ts`). Run it strictly AFTER the load applied
+-      // its defaults so its answer wins, and fire it without blocking the
+-      // render that already happened.
+-      if (isEffectCurrent()) {
+-        void fetchStageMeta(classroomId)
+-          .then((result) => {
+-            if (!isEffectCurrent()) return;
+-            if (result.outcome === 'found') {
+-              noteStageOwnership(classroomId, true, {
+-                isOwner: result.meta.isOwner,
+-              });
+-              useStageStore.getState().setViewerAccess({
+-                isOwner: result.meta.isOwner,
+-              });
+-            } else if (result.outcome === 'unavailable') {
+-              // A silent sidecar is not "this is a stranger's course": record
+-              // the outage so nothing treats `isOwner === false` as a visitor
+-              // conclusion. The edit gate stays on the upstream defaults.
+-              noteStageOwnership(classroomId, false, null);
+-            } else {
+-              // 'absent' — no sidecar row for this id. This classroom also
+-              // serves local-only courses, so the upstream editable default
+-              // stays; the server's owner-scoped writes remain the authority.
+-              noteStageOwnership(classroomId, true, null);
+-            }
+-          })
+-          .catch(() => noteStageOwnership(classroomId, false, null));
+-      }
+-    },
+-    [classroomId, loadFromStorage],
+-  );
+-
+-  useEffect(() => {
+-    // Reset loading state on course switch to unmount Stage during transition,
+-    // preventing stale data from syncing back to the new course
+-    /* eslint-disable react-hooks/set-state-in-effect -- Course switch must hide stale Stage before async load */
+-    setLoading(true);
+-    setError(null);
+-    /* eslint-enable react-hooks/set-state-in-effect */
+-    generationStartedRef.current = false;
+-
+-    // Clear previous classroom's media tasks to prevent cross-classroom contamination.
+-    // Placeholder IDs (gen_img_1, gen_vid_1) are NOT globally unique across stages,
+-    // so stale tasks from a previous classroom would shadow the new one's.
+-    const mediaStore = useMediaGenerationStore.getState();
+-    mediaStore.revokeObjectUrls();
+-    useMediaGenerationStore.setState({ tasks: {} });
+-
+-    // Clear whiteboard history to prevent snapshots from a previous course leaking in.
+-    useWhiteboardHistoryStore.getState().clearHistory();
+-
+-    let cancelled = false;
+-    loadClassroom(() => !cancelled);
++  isMiraStudentRuntimeParam,
++  MIRA_STUDENT_CLASSROOM_METADATA,
++} from '@/lib/mira/student-runtime';
+ 
+-    // Cancel ongoing generation when classroomId changes or component unmounts
+-    return () => {
+-      cancelled = true;
+-      stop();
+-    };
+-  }, [classroomId, loadClassroom, stop]);
++type ClassroomPageProps = {
++  readonly params: Promise<{ id: string }>;
++  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
++};
+ 
+-  // Auto-resume generation for pending outlines
+-  useEffect(() => {
+-    if (loading || error || generationStartedRef.current) return;
++export async function generateMetadata({ searchParams }: ClassroomPageProps): Promise<Metadata> {
++  const query = await searchParams;
++  if (!isMiraStudentRuntimeParam(query.mira)) return {};
+ 
+-    const state = useStageStore.getState();
+-    const { outlines, scenes, stage, generationComplete } = state;
+-
+-    // Check if there are pending outlines. A finished deck is frozen for
+-    // editing: deleting a slide leaves its outline orphaned, but that must not
+-    // be treated as an interrupted generation and regenerated. Only resume
+-    // when generation has not completed.
+-    const completedOrders = new Set(scenes.map((s) => s.order));
+-    const hasPending = !generationComplete && outlines.some((o) => !completedOrders.has(o.order));
+-
+-    if (hasPending && stage) {
+-      generationStartedRef.current = true;
+-
+-      // Load generation params from sessionStorage (stored by generation-preview before navigating)
+-      const genParamsStr = sessionStorage.getItem('generationParams');
+-      const params = genParamsStr ? JSON.parse(genParamsStr) : {};
+-
+-      // Reconstruct imageMapping for the resumed generation. A server-backed
+-      // deployment stored allocated asset ids on the session's pdfImages (RFC
+-      // #1153 part 2 B): the extracted images are pool assets, so generation
+-      // is fed by id and the routes resolve the bytes server-side. Per source
+-      // (N4) the mapping may MIX allocated asset ids and IndexedDB data URLs —
+-      // a source whose cache write failed materialized its own images — so the
+-      // resume mapping merges both, instead of choosing one transport for the
+-      // whole set and silently dropping the other half.
+-      const pdfImages = (params.pdfImages || []) as Array<
+-        { id: string; assetId?: string; storageId?: string } & Record<string, unknown>
+-      >;
+-      const finishResume = (imageMapping: Record<string, string>) =>
+-        generateRemaining({
+-          pdfImages: params.pdfImages,
+-          imageMapping,
+-          stageInfo: {
+-            name: stage.name || '',
+-            description: stage.description,
+-            style: stage.style,
+-          },
+-          agents: params.agents,
+-          userProfile: params.userProfile,
+-          languageDirective: params.languageDirective || stage.languageDirective,
+-        });
++  return MIRA_STUDENT_CLASSROOM_METADATA;
++}
+ 
+-      const imageMapping: Record<string, string> = {};
+-      for (const img of pdfImages) {
+-        if (img.assetId) imageMapping[img.id] = img.assetId;
+-      }
+-      const storageIds = pdfImages
+-        .filter((img) => !img.assetId && img.storageId)
+-        .map((img) => img.storageId as string);
+-      void (async () => {
+-        if (storageIds.length > 0) {
+-          Object.assign(imageMapping, await loadImageMapping(storageIds));
+-        }
+-        finishResume(imageMapping);
+-      })();
+-    } else if (outlines.length > 0 && stage) {
+-      // All scenes are generated, but some media may not have finished.
+-      // Resume media generation for any tasks not yet in IndexedDB.
+-      // generateMediaForOutlines skips already-completed tasks automatically.
+-      generationStartedRef.current = true;
+-      // The deck reached the classroom already fully materialized (e.g. a
+-      // single-slide course, or a deck whose last slide finished in
+-      // generation-preview), so generateRemaining's completion path never
+-      // ran. Record completion now so a later edit/delete is not treated as
+-      // an interrupted generation. No-op if already complete or not all
+-      // outlines have scenes.
+-      useStageStore.getState().markGenerationCompleteIfDone();
+-      // Resume media only for outlines that still have a scene. On a finished
+-      // deck the user may have deleted a slide, leaving an orphaned outline;
+-      // generating its media would waste API calls on a slide that is gone.
+-      const materializedOrders = new Set(scenes.map((s) => s.order));
+-      const materializedOutlines = outlines.filter((o) => materializedOrders.has(o.order));
+-      generateMediaForOutlines(materializedOutlines, stage.id).catch((err) => {
+-        log.warn('[Classroom] Media generation resume error:', err);
+-      });
+-    }
+-  }, [loading, error, generateRemaining]);
++export default async function ClassroomDetailPage({ params, searchParams }: ClassroomPageProps) {
++  const [{ id }, query] = await Promise.all([params, searchParams]);
++  const studentMode = isMiraStudentRuntimeParam(query.mira);
+ 
+   return (
+-    <ThemeProvider>
+-      <MediaStageProvider value={classroomId}>
+-        <div className="h-screen flex flex-col overflow-hidden">
+-          {loading ? (
+-            <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+-              <div className="text-center text-muted-foreground">
+-                <p>Loading classroom...</p>
+-              </div>
+-            </div>
+-          ) : error ? (
+-            <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+-              <div className="text-center">
+-                <p className="text-destructive mb-4">Error: {error}</p>
+-                <button
+-                  onClick={() => {
+-                    setError(null);
+-                    setLoading(true);
+-                    loadClassroom();
+-                  }}
+-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+-                >
+-                  Retry
+-                </button>
+-              </div>
+-            </div>
+-          ) : (
+-            <Stage onRetryOutline={retrySingleOutline} />
+-          )}
+-        </div>
+-      </MediaStageProvider>
+-    </ThemeProvider>
++    <MiraStudentRuntimeProvider studentMode={studentMode}>
++      <ClassroomSurface classroomId={id} variant="page" />
++    </MiraStudentRuntimeProvider>
+   );
+ }
+diff --git a/app/layout.tsx b/app/layout.tsx
+index e66ab91..e77a1b5 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -32,6 +32,11 @@ export const metadata: Metadata = {
+   title: 'OpenMAIC',
+   description:
+     'The open-source AI interactive classroom. Upload a PDF to instantly generate an immersive, multi-agent learning experience.',
++  icons: {
++    icon: '/openmaic-favicon.ico',
++    shortcut: '/openmaic-favicon.ico',
++    apple: '/openmaic-apple-icon.png',
++  },
+ };
+ 
+ export default function RootLayout({
+diff --git a/components/access-code-modal.tsx b/components/access-code-modal.tsx
+index 66a3c9f..35af97b 100644
+--- a/components/access-code-modal.tsx
++++ b/components/access-code-modal.tsx
+@@ -118,7 +118,7 @@ export function AccessCodeModal({ open, onSuccess }: AccessCodeModalProps) {
+                 animate={{ opacity: 1 }}
+                 transition={{ delay: 0.25, duration: 0.4 }}
+               >
+-                OpenMAIC
++                互动课堂
+               </motion.p>
+ 
+               {/* Form */}
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 85ab51b..07a6c37 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -55,6 +55,7 @@ import {
+ } from '@/components/ui/alert-dialog';
+ import { AlertTriangle } from 'lucide-react';
+ import { VisuallyHidden } from 'radix-ui';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
+ /**
+  * Imperative handle exposed via `ref` so the parent (`Stage`) can tear
+@@ -105,8 +106,9 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     ref,
+   ) {
+     const { t } = useI18n();
++    const studentMode = useMiraStudentRuntime();
+     const {
+-      mode,
++      mode: storedMode,
+       stage,
+       getCurrentScene,
+       scenes,
+@@ -115,6 +117,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+       generatingOutlines,
+       outlines,
+     } = useStageStore();
++    const mode = studentMode && storedMode === 'edit' ? 'playback' : storedMode;
+     const failedOutlines = useStageStore.use.failedOutlines();
+     const generationComplete = useStageStore.use.generationComplete();
+ 
+diff --git a/components/header.tsx b/components/header.tsx
+index ca64295..bce2d42 100644
+--- a/components/header.tsx
++++ b/components/header.tsx
+@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
+ import type { StageMode } from '@/lib/types/stage';
+ import { classroomExitLabelKey, exitClassroom } from '@/lib/workbench/classroom-exit';
+ import { HeaderControls } from './stage/header-controls';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
+ interface HeaderProps {
+   readonly currentSceneTitle: string;
+@@ -46,12 +47,13 @@ export function Header({
+   const router = useRouter();
+   const searchParams = useSearchParams();
+   const exitLabel = t(classroomExitLabelKey(searchParams));
++  const studentMode = useMiraStudentRuntime();
+ 
+   return (
+     <>
+       <header className="h-20 px-8 flex items-center justify-between z-10 bg-transparent gap-4">
+         <div className="flex items-center gap-3 min-w-0 flex-1">
+-          {hideBackControl
++          {studentMode || hideBackControl
+             ? null
+             : (backControl ?? (
+                 <button
+@@ -89,14 +91,16 @@ export function Header({
+ 
+         {/* Standalone classroom keeps the full cluster. Workbench-attached
+             classrooms omit both the global capsule and course share/export. */}
+-        <HeaderControls
+-          mode={mode}
+-          proModeActive={proModeActive}
+-          canEdit={canEdit}
+-          onToggleEditMode={onToggleEditMode}
+-          showGlobalControls={!hideGlobalControls}
+-          showCourseActions={!hideCourseActions}
+-        />
++        {!studentMode ? (
++          <HeaderControls
++            mode={mode}
++            proModeActive={proModeActive}
++            canEdit={canEdit}
++            onToggleEditMode={onToggleEditMode}
++            showGlobalControls={!hideGlobalControls}
++            showCourseActions={!hideCourseActions}
++          />
++        ) : null}
+       </header>
+     </>
+   );
+diff --git a/components/scene-renderers/pbl/v2/workspace.tsx b/components/scene-renderers/pbl/v2/workspace.tsx
+index 9c02296..56ac455 100644
+--- a/components/scene-renderers/pbl/v2/workspace.tsx
++++ b/components/scene-renderers/pbl/v2/workspace.tsx
+@@ -13,7 +13,7 @@
+ 
+ import type { PBLMilestone, PBLProjectV2 } from '@/lib/pbl/v2/types';
+ import Image from 'next/image';
+-import { Maximize2, Workflow } from 'lucide-react';
++import { BookOpenCheck, Maximize2, Workflow } from 'lucide-react';
+ import {
+   useCallback,
+   useMemo,
+@@ -32,6 +32,7 @@ import { useI18n } from '@/lib/hooks/use-i18n';
+ import type { CSSProperties } from 'react';
+ import { runOneStream, type StreamDisplayState, type StreamStatus } from './use-instructor-stream';
+ import type { PBLProjectPatch } from '@/lib/pbl/v2/api/sse';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
+ interface Props {
+   readonly project: PBLProjectV2;
+@@ -431,6 +432,7 @@ function WorkspaceTopBar({
+   readonly onExpand?: () => void;
+ }) {
+   const { t } = useI18n();
++  const studentMode = useMiraStudentRuntime();
+   return (
+     <header
+       className="relative z-40 col-span-full grid min-w-0 items-center overflow-hidden border-b border-cyan-100/[0.12] bg-[#111d35]/88 px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_14px_42px_rgba(5,12,28,0.24)] backdrop-blur-xl"
+@@ -441,13 +443,17 @@ function WorkspaceTopBar({
+       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(157,140,255,0.20),transparent_30%),radial-gradient(circle_at_78%_0%,rgba(34,211,238,0.13),transparent_26%),linear-gradient(90deg,rgba(255,255,255,0.05),transparent_34%,rgba(255,255,255,0.035))]" />
+       <div className="relative flex min-w-0 flex-1 items-center gap-3">
+         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-violet-200/25 bg-violet-100/[0.08] shadow-[0_0_24px_rgba(157,140,255,0.18)]">
+-          <Image
+-            src="/openmaic-mark.png"
+-            alt="OpenMAIC"
+-            width={28}
+-            height={28}
+-            className="h-6 w-6"
+-          />
++          {studentMode ? (
++            <BookOpenCheck aria-hidden className="h-6 w-6 text-violet-100" />
++          ) : (
++            <Image
++              src="/openmaic-mark.png"
++              alt="OpenMAIC"
++              width={28}
++              height={28}
++              className="h-6 w-6"
++            />
++          )}
+         </div>
+         <div className="min-w-0">
+           <div className="flex items-center gap-2">
+diff --git a/components/stage.tsx b/components/stage.tsx
+index de792bf..dfade47 100644
+--- a/components/stage.tsx
++++ b/components/stage.tsx
+@@ -26,6 +26,7 @@ import { useWorkbenchStore } from '@/lib/workbench/session-store';
+ import { useWorkbenchPanelState } from '@/lib/workbench/panel-context';
+ import { workspaceHref } from '@/lib/workbench/workspace-panes';
+ import { exitProPlaybackToStandalone } from '@/lib/workbench/pro-playback-exit';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
+ /**
+  * Stage — top-level classroom container. Standalone classrooms dispatch
+@@ -87,13 +88,14 @@ export function Stage({
+   }, [proWorkbenchFlag]);
+   const proWorkbenchEntry = proWorkbenchFlag && proRuntime === 'on';
+   const currentScene = useStageStore((s) => s.getCurrentScene());
++  const studentMode = useMiraStudentRuntime();
+   // The reference implementation makes editing owner-only. `isOwner` is true for the stage creator and
+   // defaults to true with browser storage (single-user IndexedDB), so this gate is
+   // a no-op upstream but hides Pro mode from visitors / bookmarked viewers in
+   // server-backed mode — their saves would not pass the owner check anyway.
+   const isOwner = useStageStore((s) => s.isOwner);
+   const readOnly = useStageStore((s) => s.readOnly);
+-  const canEditOwnedStage = isOwner && !readOnly;
++  const canEditOwnedStage = !studentMode && isOwner && !readOnly;
+ 
+   // Hosted by the Pro workspace's classroom pane. Ambient rather than a prop
+   // because `Stage` is built by `ClassroomSurface`, which is mounted by both
+@@ -282,15 +284,17 @@ export function Stage({
+   // The embedded pane is already Pro-locked, so it has no switch. Full-screen
+   // learning exposes an active switch whose off transition exits the workspace
+   // and returns to the ordinary classroom route.
+-  const chromeToggleHandler = hosted
+-    ? workbenchPlayback
+-      ? handleExitWorkbench
+-      : undefined
+-    : !isOwner || proRuntime === 'pending'
+-      ? undefined
+-      : proWorkbenchEntry
+-        ? handleEnterWorkbench
+-        : toggleHandler;
++  const chromeToggleHandler = studentMode
++    ? undefined
++    : hosted
++      ? workbenchPlayback
++        ? handleExitWorkbench
++        : undefined
++      : !isOwner || proRuntime === 'pending'
++        ? undefined
++        : proWorkbenchEntry
++          ? handleEnterWorkbench
++          : toggleHandler;
+ 
+   // Mode swap choreography — a clean opacity cross-fade. Both roots layer
+   // via `absolute inset-0` so they coexist for the ~280ms window without
+diff --git a/components/stage/header-controls.tsx b/components/stage/header-controls.tsx
+index 4821683..9fcf0c1 100644
+--- a/components/stage/header-controls.tsx
++++ b/components/stage/header-controls.tsx
+@@ -39,6 +39,7 @@ import {
+ } from '@/components/ui/dropdown-menu';
+ import { cn } from '@/lib/utils';
+ import type { StageMode } from '@/lib/types/stage';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
+ interface HeaderControlsProps {
+   readonly mode?: StageMode;
+@@ -69,7 +70,13 @@ interface HeaderControlsProps {
+  * never both), so dropdown / dialog state and refs stay co-located
+  * here without cross-instance leakage.
+  */
+-export function HeaderControls({
++export function HeaderControls({ ...props }: HeaderControlsProps) {
++  const studentMode = useMiraStudentRuntime();
++  if (studentMode) return null;
++  return <OperatorHeaderControls {...props} />;
++}
++
++function OperatorHeaderControls({
+   mode,
+   proModeActive,
+   canEdit,
+@@ -141,7 +148,7 @@ export function HeaderControls({
+   // the cluster pixel-stable; both hosts pad to `px-8`, so the right edge
+   // anchors identically too.
+   return (
+-    <div className="flex items-center gap-4">
++    <div data-testid="header-controls" className="flex items-center gap-4">
+       <div
+         className={cn(
+           'shrink-0 flex items-center gap-1 backdrop-blur-md shadow-sm rounded-full',
+diff --git a/components/stage/scene-sidebar.tsx b/components/stage/scene-sidebar.tsx
+index 72f8109..4303545 100644
+--- a/components/stage/scene-sidebar.tsx
++++ b/components/stage/scene-sidebar.tsx
+@@ -20,6 +20,7 @@ import { useStageStore, useCanvasStore } from '@/lib/store';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+ import type { SceneType, SlideContent, InteractiveContent } from '@/lib/types/stage';
+ import { PENDING_SCENE_ID } from '@/lib/store/stage';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
+ interface SceneSidebarProps {
+   readonly collapsed: boolean;
+@@ -42,6 +43,7 @@ export function SceneSidebar({
+ }: SceneSidebarProps) {
+   const { t } = useI18n();
+   const router = useRouter();
++  const studentMode = useMiraStudentRuntime();
+   const { scenes, currentSceneId, setCurrentSceneId, generatingOutlines, generationStatus } =
+     useStageStore();
+   const failedOutlines = useStageStore.use.failedOutlines();
+@@ -125,13 +127,19 @@ export function SceneSidebar({
+       <div className={cn('flex flex-col w-full h-full overflow-hidden', collapsed && 'hidden')}>
+         {/* Logo Header */}
+         <div className="h-10 flex items-center justify-between shrink-0 relative mt-3 mb-1 px-3">
+-          <button
+-            onClick={() => router.push('/')}
+-            className="flex items-center gap-2 cursor-pointer rounded-lg px-1.5 -mx-1.5 py-1 -my-1 hover:bg-gray-100/80 dark:hover:bg-gray-800/60 active:scale-[0.97] transition-all duration-150"
+-            title={t('generation.backToHome')}
+-          >
+-            <img src="/logo-horizontal.png" alt="OpenMAIC" className="h-6" />
+-          </button>
++          {studentMode ? (
++            <span className="px-1.5 text-sm font-semibold tracking-wide text-slate-700">
++              课程目录
++            </span>
++          ) : (
++            <button
++              onClick={() => router.push('/')}
++              className="flex items-center gap-2 cursor-pointer rounded-lg px-1.5 -mx-1.5 py-1 -my-1 hover:bg-gray-100/80 dark:hover:bg-gray-800/60 active:scale-[0.97] transition-all duration-150"
++              title={t('generation.backToHome')}
++            >
++              <img src="/logo-horizontal.png" alt="OpenMAIC" className="h-6" />
++            </button>
++          )}
+           <button
+             onClick={() => onCollapseChange(true)}
+             className="w-7 h-7 shrink-0 rounded-lg flex items-center justify-center bg-gray-100/80 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 ring-1 ring-black/[0.04] dark:ring-white/[0.06] hover:bg-gray-200/90 dark:hover:bg-gray-700/90 hover:text-gray-700 dark:hover:text-gray-200 active:scale-90 transition-all duration-200"
+diff --git a/e2e/tests/classroom-interaction.spec.ts b/e2e/tests/classroom-interaction.spec.ts
+index cef2792..f2bc74f 100644
+--- a/e2e/tests/classroom-interaction.spec.ts
++++ b/e2e/tests/classroom-interaction.spec.ts
+@@ -314,4 +314,37 @@ test.describe('Classroom Interaction', () => {
+     await expect(page.getByRole('dialog', { name: 'Settings' })).toBeVisible();
+     await expectBodyScrollState(true);
+   });
++
++  test('isolates the Mira student classroom chrome from operator branding', async ({ page }) => {
++    await page.evaluate(() => {
++      localStorage.setItem('locale', 'en-US');
++      localStorage.setItem('theme', 'dark');
++    });
++    await page.goto(`/classroom/${TEST_STAGE_ID}?mira=1`);
++    await expect(page.getByText('课程加载中…')).toBeHidden({ timeout: 15_000 });
++    await expect(page.locator('[data-testid="scene-item"]')).toHaveCount(3, { timeout: 10_000 });
++
++    await expect(page).toHaveTitle('Mira 学习课堂');
++    await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
++    await expect(page.locator('html')).not.toHaveClass(/dark/);
++    await expect(page.getByText('课程目录', { exact: true })).toBeVisible();
++    await expect(page.locator('[data-testid="header-controls"]')).toHaveCount(0);
++    await expect(page.locator('img[alt="OpenMAIC"]')).toHaveCount(0);
++
++    const iconHrefs = await page
++      .locator('link[rel~="icon"]')
++      .evaluateAll((links) =>
++        links.map((link) => (link as HTMLLinkElement).getAttribute('href') || ''),
++      );
++    expect(iconHrefs.length).toBeGreaterThan(0);
++    expect(iconHrefs.every((href) => href.includes('mira-classroom-icon.svg'))).toBe(true);
++    await expect
++      .poll(() =>
++        page.evaluate(() => ({
++          locale: localStorage.getItem('locale'),
++          theme: localStorage.getItem('theme'),
++        })),
++      )
++      .toEqual({ locale: 'en-US', theme: 'dark' });
++  });
+ });
+diff --git a/lib/contexts/mira-student-runtime-context.tsx b/lib/contexts/mira-student-runtime-context.tsx
+new file mode 100644
+index 0000000..1e4f1f8
+--- /dev/null
++++ b/lib/contexts/mira-student-runtime-context.tsx
+@@ -0,0 +1,107 @@
++'use client';
++
++import {
++  createContext,
++  useCallback,
++  useContext,
++  useLayoutEffect,
++  useState,
++  type ReactNode,
++} from 'react';
++import { useI18n } from '@/lib/hooks/use-i18n';
++import { useTheme } from '@/lib/hooks/use-theme';
++import { supportedLocales, type Locale } from '@/lib/i18n';
++
++const MiraStudentRuntimeContext = createContext(false);
++
++type StoredTheme = 'light' | 'dark' | 'system';
++
++function applyStudentDocumentPreferences() {
++  const root = document.documentElement;
++  root.lang = 'zh-CN';
++  root.classList.remove('dark');
++  root.style.colorScheme = 'light';
++}
++
++function MiraStudentPreferences({ onReady }: { readonly onReady: () => void }) {
++  const { locale, setRuntimeLocale } = useI18n();
++  const { theme, setRuntimeTheme } = useTheme();
++
++  // Snapshot the operator preferences before applying the classroom-only
++  // override. Runtime setters leave storage untouched; cleanup restores the
++  // provider state so client-side operator navigation cannot inherit student
++  // presentation settings either.
++  useLayoutEffect(() => {
++    let rawTheme: string | null = null;
++    let rawLocale: string | null = null;
++    try {
++      rawTheme = localStorage.getItem('theme');
++      rawLocale = localStorage.getItem('locale');
++    } catch {
++      // Storage may be unavailable; the in-memory provider values still give
++      // us a safe operator fallback for cleanup.
++    }
++    const previousTheme: StoredTheme =
++      rawTheme === 'light' || rawTheme === 'dark' || rawTheme === 'system' ? rawTheme : theme;
++    const previousLocale: Locale = supportedLocales.some((item) => item.code === rawLocale)
++      ? (rawLocale as Locale)
++      : locale;
++    const root = document.documentElement;
++    const previousDocument = {
++      lang: root.lang,
++      dark: root.classList.contains('dark'),
++      colorScheme: root.style.colorScheme,
++    };
++
++    applyStudentDocumentPreferences();
++    onReady();
++
++    return () => {
++      setRuntimeLocale(previousLocale);
++      setRuntimeTheme(previousTheme);
++      root.lang = previousDocument.lang;
++      root.classList.toggle('dark', previousDocument.dark);
++      root.style.colorScheme = previousDocument.colorScheme;
++    };
++    // This is deliberately mount-only: rerunning it after the override changes
++    // theme/locale would replace the operator snapshot with student values.
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, []);
++
++  useLayoutEffect(() => {
++    if (locale !== 'zh-CN') setRuntimeLocale('zh-CN');
++    if (theme !== 'light') setRuntimeTheme('light');
++
++    applyStudentDocumentPreferences();
++  }, [locale, setRuntimeLocale, setRuntimeTheme, theme]);
++
++  return null;
++}
++
++export function MiraStudentRuntimeProvider({
++  studentMode,
++  children,
++}: {
++  readonly studentMode: boolean;
++  readonly children: ReactNode;
++}) {
++  const [preferencesReady, setPreferencesReady] = useState(!studentMode);
++  const markPreferencesReady = useCallback(() => setPreferencesReady(true), []);
++
++  return (
++    <MiraStudentRuntimeContext.Provider value={studentMode}>
++      {studentMode && <MiraStudentPreferences onReady={markPreferencesReady} />}
++      {studentMode && !preferencesReady ? (
++        <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-600">
++          课程加载中…
++        </div>
++      ) : (
++        children
++      )}
++    </MiraStudentRuntimeContext.Provider>
++  );
++}
++
++export function useMiraStudentRuntime(): boolean {
++  return useContext(MiraStudentRuntimeContext);
++}
+diff --git a/lib/hooks/use-audio-recorder.ts b/lib/hooks/use-audio-recorder.ts
+index f30d8fd..cc6185e 100644
+--- a/lib/hooks/use-audio-recorder.ts
++++ b/lib/hooks/use-audio-recorder.ts
+@@ -3,13 +3,12 @@ import { ASR_PROVIDERS } from '@/lib/audio/constants';
+ import { getASRServerDisabledError } from '@/lib/audio/asr-enablement';
+ import { normalizeASRUploadAudio } from '@/lib/audio/wav-utils';
+ import { createLogger } from '@/lib/logger';
++import { isMiraStudentRuntimeSearch } from '@/lib/mira/student-runtime';
+ 
+ const log = createLogger('AudioRecorder');
+ const MIRA_QWEN_ASR_PROVIDER_ID = 'qwen-asr' as const;
+ 
+-export function isMiraRuntimeSearch(search: string): boolean {
+-  return new URLSearchParams(search).get('mira') === '1';
+-}
++export const isMiraRuntimeSearch = isMiraStudentRuntimeSearch;
+ 
+ export function resolveClientAsrProvider(search: string, configuredProviderId: string): string {
+   return isMiraRuntimeSearch(search) ? MIRA_QWEN_ASR_PROVIDER_ID : configuredProviderId;
+diff --git a/lib/hooks/use-i18n.tsx b/lib/hooks/use-i18n.tsx
+index 18936cc..23c2ecb 100644
+--- a/lib/hooks/use-i18n.tsx
++++ b/lib/hooks/use-i18n.tsx
+@@ -21,6 +21,7 @@ function resolveLocale(lang: string): Locale {
+ type I18nContextType = {
+   locale: Locale;
+   setLocale: (locale: Locale) => void;
++  setRuntimeLocale: (locale: Locale) => void;
+   t: (key: string, options?: Record<string, unknown>) => string;
+ };
+ 
+@@ -54,7 +55,17 @@ export function I18nProvider({ children }: { children: ReactNode }) {
+     }
+   };
+ 
+-  return <I18nContext.Provider value={{ locale, setLocale, t }}>{children}</I18nContext.Provider>;
++  // Route-scoped presentation overrides must not rewrite the operator's
++  // persisted preference. The caller is responsible for restoring it.
++  const setRuntimeLocale = (newLocale: Locale) => {
++    i18n.changeLanguage(newLocale);
++  };
++
++  return (
++    <I18nContext.Provider value={{ locale, setLocale, setRuntimeLocale, t }}>
++      {children}
++    </I18nContext.Provider>
++  );
+ }
+ 
+ export function useI18n() {
+diff --git a/lib/hooks/use-theme.tsx b/lib/hooks/use-theme.tsx
+index 2f00106..913cc23 100644
+--- a/lib/hooks/use-theme.tsx
++++ b/lib/hooks/use-theme.tsx
+@@ -7,6 +7,7 @@ type Theme = 'light' | 'dark' | 'system';
+ interface ThemeContextType {
+   theme: Theme;
+   setTheme: (theme: Theme) => void;
++  setRuntimeTheme: (theme: Theme) => void;
+   resolvedTheme: 'light' | 'dark';
+ }
+ 
+@@ -55,8 +56,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
+     localStorage.setItem('theme', newTheme);
+   };
+ 
++  // Route-scoped presentation overrides must not rewrite the operator's
++  // persisted preference. The caller is responsible for restoring it.
++  const handleSetRuntimeTheme = (newTheme: Theme) => {
++    setThemeState(newTheme);
++  };
++
+   return (
+-    <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme, resolvedTheme }}>
++    <ThemeContext.Provider
++      value={{
++        theme,
++        setTheme: handleSetTheme,
++        setRuntimeTheme: handleSetRuntimeTheme,
++        resolvedTheme,
++      }}
++    >
+       {children}
+     </ThemeContext.Provider>
+   );
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+new file mode 100644
+index 0000000..7c760af
+--- /dev/null
++++ b/lib/mira/student-runtime.ts
+@@ -0,0 +1,41 @@
++export const MIRA_STUDENT_RUNTIME_QUERY_KEY = 'mira';
++export const MIRA_STUDENT_RUNTIME_QUERY_VALUE = '1';
++
++export const MIRA_STUDENT_CHROME_POLICY = Object.freeze({
++  enforced: true,
++  policyVersion: 'mira-student-chrome.v1',
++  marker: 'mira=1',
++  locale: 'zh-CN',
++  theme: 'light',
++  operatorChromePreserved: true,
++  headerControlsHidden: true,
++  exportsHidden: true,
++});
++
++export const MIRA_STUDENT_CLASSROOM_METADATA = Object.freeze({
++  title: 'Mira 学习课堂',
++  description: 'Mira 学生互动学习课堂',
++  robots: { index: false, follow: false },
++  icons: {
++    icon: '/mira-classroom-icon.svg',
++    shortcut: '/mira-classroom-icon.svg',
++    apple: '/mira-classroom-icon.svg',
++  },
++});
++
++export type MiraStudentChromePolicy = typeof MIRA_STUDENT_CHROME_POLICY;
++
++/** Student chrome is enabled only for the exact `mira=1` marker. */
++export function isMiraStudentRuntimeSearch(search: string): boolean {
++  const values = new URLSearchParams(search).getAll(MIRA_STUDENT_RUNTIME_QUERY_KEY);
++  return values.length === 1 && values[0] === MIRA_STUDENT_RUNTIME_QUERY_VALUE;
++}
++
++/** Server-component equivalent of the exact client-side query check. */
++export function isMiraStudentRuntimeParam(value: string | string[] | undefined): boolean {
++  return typeof value === 'string' && value === MIRA_STUDENT_RUNTIME_QUERY_VALUE;
++}
++
++export function getMiraStudentChromeRuntimePolicy(): MiraStudentChromePolicy {
++  return MIRA_STUDENT_CHROME_POLICY;
++}
+diff --git a/public/mira-classroom-icon.svg b/public/mira-classroom-icon.svg
+new file mode 100644
+index 0000000..62ba7bf
+--- /dev/null
++++ b/public/mira-classroom-icon.svg
+@@ -0,0 +1,7 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
++  <title id="title">Mira 学习课堂</title>
++  <rect width="64" height="64" rx="16" fill="#f4f1ff"/>
++  <path d="M15 18.5c7.2 0 12.9 2 17 6v24c-4.1-4-9.8-6-17-6z" fill="#7257d9"/>
++  <path d="M49 18.5c-7.2 0-12.9 2-17 6v24c4.1-4 9.8-6 17-6z" fill="#9b87e8"/>
++  <path d="M32 24.5v24" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2.5"/>
++</svg>
+diff --git a/app/apple-icon.png b/public/openmaic-apple-icon.png
+similarity index 100%
+rename from app/apple-icon.png
+rename to public/openmaic-apple-icon.png
+diff --git a/app/favicon.ico b/public/openmaic-favicon.ico
+similarity index 100%
+rename from app/favicon.ico
+rename to public/openmaic-favicon.ico
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+new file mode 100644
+index 0000000..f89dd09
+--- /dev/null
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -0,0 +1,50 @@
++import { describe, expect, it } from 'vitest';
++import {
++  getMiraStudentChromeRuntimePolicy,
++  isMiraStudentRuntimeParam,
++  isMiraStudentRuntimeSearch,
++  MIRA_STUDENT_CLASSROOM_METADATA,
++} from '@/lib/mira/student-runtime';
++
++describe('Mira student runtime marker', () => {
++  it('enables student chrome only for the exact mira=1 value', () => {
++    expect(isMiraStudentRuntimeSearch('?mira=1')).toBe(true);
++    expect(isMiraStudentRuntimeSearch('?course=math&mira=1')).toBe(true);
++    expect(isMiraStudentRuntimeSearch('mira=1')).toBe(true);
++
++    for (const search of ['', '?mira=0', '?mira=true', '?MIRA=1', '?mira=1%20', '?mira=1&mira=0']) {
++      expect(isMiraStudentRuntimeSearch(search)).toBe(false);
++    }
++    expect(isMiraStudentRuntimeParam('1')).toBe(true);
++    expect(isMiraStudentRuntimeParam(undefined)).toBe(false);
++    expect(isMiraStudentRuntimeParam(['1'])).toBe(false);
++    expect(isMiraStudentRuntimeParam('0')).toBe(false);
++  });
++
++  it('publishes the exact student chrome health attestation', () => {
++    expect(getMiraStudentChromeRuntimePolicy()).toEqual({
++      enforced: true,
++      policyVersion: 'mira-student-chrome.v1',
++      marker: 'mira=1',
++      locale: 'zh-CN',
++      theme: 'light',
++      operatorChromePreserved: true,
++      headerControlsHidden: true,
++      exportsHidden: true,
++    });
++  });
++
++  it('uses neutral classroom metadata and icons in student mode', () => {
++    expect(MIRA_STUDENT_CLASSROOM_METADATA).toEqual({
++      title: 'Mira 学习课堂',
++      description: 'Mira 学生互动学习课堂',
++      robots: { index: false, follow: false },
++      icons: {
++        icon: '/mira-classroom-icon.svg',
++        shortcut: '/mira-classroom-icon.svg',
++        apple: '/mira-classroom-icon.svg',
++      },
++    });
++    expect(JSON.stringify(MIRA_STUDENT_CLASSROOM_METADATA).toLowerCase()).not.toContain('openmaic');
++  });
++});
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index d14ba38..703c0ec 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -103,6 +103,16 @@ describe('GET /api/health structured scene runtime policy', () => {
+       canonicalSpecSha256: '879040700d374f045058b09cbf6ed6e956ebf97d8c8d9008477063458c5ef7b6',
+       patchSha256: 'd'.repeat(64),
+     });
++    expect(body.runtimePolicy.studentChrome).toEqual({
++      enforced: true,
++      policyVersion: 'mira-student-chrome.v1',
++      marker: 'mira=1',
++      locale: 'zh-CN',
++      theme: 'light',
++      operatorChromePreserved: true,
++      headerControlsHidden: true,
++      exportsHidden: true,
++    });
+     const serialized = JSON.stringify(body);
+     expect(serialized).not.toContain('fake-secret-must-not-leak');
+     expect(serialized).not.toContain('fake-base-url-must-not-leak');
+-- 
+2.50.1 (Apple Git-155)
+

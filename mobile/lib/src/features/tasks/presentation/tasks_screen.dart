@@ -1064,10 +1064,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
                       }),
                       options: [
                         for (final mode in TaskEntryMode.values)
-                          AppSegmentOption(
-                            value: mode,
-                            label: mode.label,
-                          ),
+                          AppSegmentOption(value: mode, label: mode.label),
                       ],
                     ),
                   ],
@@ -2469,6 +2466,12 @@ class _TemplatePickerSheetState extends ConsumerState<_TemplatePickerSheet> {
     if (catalog == null) {
       return const _TemplatePickerLoading();
     }
+    if (catalog.contentUnavailable) {
+      return _TemplatePickerUnavailable(
+        gradeLabel: catalog.recommendedGradeLabel,
+        message: catalog.contentMessage,
+      );
+    }
     final tags = _availableTemplateTags(catalog);
     final effectiveTag = tags.any((tag) => tag.value == _selectedTag)
         ? _selectedTag
@@ -2584,6 +2587,28 @@ class _TemplatePickerEmpty extends StatelessWidget {
         variant: AppStateVariant.emptyTasks,
         title: '暂时没有适合的安排',
         message: '可以先手动添加今天的小提醒。',
+      ),
+    );
+  }
+}
+
+class _TemplatePickerUnavailable extends StatelessWidget {
+  const _TemplatePickerUnavailable({
+    required this.gradeLabel,
+    required this.message,
+  });
+
+  final String gradeLabel;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      child: AppStateView(
+        variant: AppStateVariant.noData,
+        title: '$gradeLabel学习内容准备中',
+        message: message.isEmpty ? '当前不会套用幼儿园任务。课程通过质量校验后会在这里开放。' : message,
       ),
     );
   }

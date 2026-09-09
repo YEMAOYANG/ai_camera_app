@@ -1,0 +1,1749 @@
+From aa2bfb3c1d406c47100c6744d90e788abdf1f6d5 Mon Sep 17 00:00:00 2001
+Subject: [PATCH 38/38] mira formal professional agent courseware
+
+---
+diff --git a/app/api/generate-classroom/[jobId]/route.ts b/app/api/generate-classroom/[jobId]/route.ts
+index ab433b2..d842f45 100644
+--- a/app/api/generate-classroom/[jobId]/route.ts
++++ b/app/api/generate-classroom/[jobId]/route.ts
+@@ -7,10 +7,12 @@ import {
+ import { buildRequestOrigin } from '@/lib/server/classroom-storage';
+ import { runClassroomGenerationJob } from '@/lib/server/classroom-job-runner';
+ import { createLogger } from '@/lib/logger';
++import { authorizeMiraFormalGenerationRequest } from '@/lib/server/mira-formal-generation-policy';
+ 
+ const log = createLogger('ClassroomJob API');
+ 
+ export const dynamic = 'force-dynamic';
++export const maxDuration = 3600;
+ 
+ export async function GET(req: NextRequest, context: { params: Promise<{ jobId: string }> }) {
+   let resolvedJobId: string | undefined;
+@@ -26,6 +28,9 @@ export async function GET(req: NextRequest, context: { params: Promise<{ jobId:
+     if (!job) {
+       return apiError('INVALID_REQUEST', 404, 'Classroom generation job not found');
+     }
++    if (job.runtimeRequestId && !authorizeMiraFormalGenerationRequest(req)) {
++      return apiError('INVALID_CREDENTIALS', 403, 'Formal generation access is private');
++    }
+ 
+     const pollUrl = `${buildRequestOrigin(req)}/api/generate-classroom/${jobId}`;
+ 
+diff --git a/app/api/generate-classroom/route.ts b/app/api/generate-classroom/route.ts
+index 0259a31..5ed48ec 100644
+--- a/app/api/generate-classroom/route.ts
++++ b/app/api/generate-classroom/route.ts
+@@ -11,10 +11,14 @@ import {
+ } from '@/lib/server/classroom-job-store';
+ import { buildRequestOrigin } from '@/lib/server/classroom-storage';
+ import { createLogger } from '@/lib/logger';
++import { authorizeMiraFormalGenerationRequest } from '@/lib/server/mira-formal-generation-policy';
+ 
+ const log = createLogger('GenerateClassroom API');
+ 
+-export const maxDuration = 30;
++// Formal Pro generation waits for the durable Agent session plus the existing
++// ten-scene audio lifecycle. Native/self-hosted Next keeps the callback alive;
++// this value also prevents platform adapters from applying the old 30s cap.
++export const maxDuration = 3600;
+ 
+ function jobResponse(req: NextRequest, job: ClassroomGenerationJob) {
+   const baseUrl = buildRequestOrigin(req);
+@@ -56,6 +60,9 @@ function reconcileFormalDispatch(req: NextRequest, job: ClassroomGenerationJob)
+ }
+ 
+ export async function GET(req: NextRequest) {
++  if (!authorizeMiraFormalGenerationRequest(req)) {
++    return apiError('INVALID_CREDENTIALS', 403, 'Formal generation access is private');
++  }
+   const runtimeRequestId = req.nextUrl.searchParams.get('runtimeRequestId') || '';
+   if (!runtimeRequestId) {
+     return apiError('MISSING_REQUIRED_FIELD', 400, 'Missing runtimeRequestId');
+@@ -107,6 +114,9 @@ export async function POST(req: NextRequest) {
+       ...(rawBody.coursewareAuthority
+         ? { coursewareAuthority: rawBody.coursewareAuthority }
+         : {}),
++      ...(rawBody.professionalCreationPolicy
++        ? { professionalCreationPolicy: rawBody.professionalCreationPolicy }
++        : {}),
+     };
+     const { requirement } = body;
+ 
+@@ -117,6 +127,9 @@ export async function POST(req: NextRequest) {
+     const baseUrl = buildRequestOrigin(req);
+     const formal = Boolean(body.runtimeRequestId || body.formalRuntimeContract);
+     if (formal) {
++      if (!authorizeMiraFormalGenerationRequest(req)) {
++        return apiError('INVALID_CREDENTIALS', 403, 'Formal generation access is private');
++      }
+       try {
+         const { job, created } = await createOrGetFormalClassroomGenerationJob(body);
+         reconcileFormalDispatch(req, job);
+@@ -130,6 +143,7 @@ export async function POST(req: NextRequest) {
+           code === 'FORMAL_RUNTIME_REQUEST_ID_INVALID' ||
+           code === 'FORMAL_RUNTIME_CONTRACT_INVALID' ||
+           code === 'FORMAL_COURSEWARE_AUTHORITY_INVALID' ||
++          code === 'FORMAL_PROFESSIONAL_CREATION_POLICY_INVALID' ||
+           code === 'FORMAL_RUNTIME_INPUT_POLICY_INVALID'
+         ) {
+           return apiError('INVALID_REQUEST', 400, 'Invalid formal Runtime request');
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index 8695df4..d9f3d16 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -28,6 +28,10 @@ import {
+   MiraFormalProviderReadinessError,
+ } from '@/lib/server/mira-formal-provider-readiness';
+ import { getMiraProfessionalResearchPolicy } from '@/lib/server/mira-professional-research-policy';
++import { isAgentRuntimeConfigured } from '@/lib/config/feature-flags';
++import { resolveAgentDriverModel } from '@/lib/server/agent-runtime/agent-driver-model';
++import { getAgentSessionStore } from '@/lib/server/agent-runtime/store';
++import { resolveWebSearchCapability } from '@/lib/server/agent-runtime/web-search';
+ 
+ const version = process.env.npm_package_version || '1.0.0';
+ 
+@@ -74,14 +78,30 @@ export async function GET(req: NextRequest) {
+   if (req.nextUrl.searchParams.get('scope') === 'formal-generation') {
+     try {
+       const formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
++      if (!isAgentRuntimeConfigured()) {
++        throw new Error('Formal generation requires the OpenMAIC Agent Runtime and PostgreSQL.');
++      }
++      const search = resolveWebSearchCapability();
++      if (!search) {
++        throw new Error('Formal generation requires a server-managed web-search provider.');
++      }
++      await resolveAgentDriverModel();
++      const sessionStore = await getAgentSessionStore();
++      await sessionStore.getSession('mira-formal-health-probe');
+       assertMiraFormalAudioProviderReady();
+       return apiSuccess({
+         status: 'ok',
+         version,
+-        capabilities: { formalGeneration: true, speechAudioGeneration: true },
++        capabilities: {
++          formalGeneration: true,
++          professionalAgent: true,
++          webSearch: true,
++          speechAudioGeneration: true,
++        },
+         runtimePolicy: {
+           formalGeneration: formalGenerationPolicy,
+           formalAudio: getMiraFormalAudioRuntimePolicy(),
++          professionalResearch: getMiraProfessionalResearchPolicy(),
+         },
+       });
+     } catch (error) {
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+index 43c724c..339dcf1 100644
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -40,6 +40,15 @@ const SceneParams = Type.Object({
+     Type.Literal('interactive'),
+     Type.Literal('pbl'),
+   ]),
++  widgetType: Type.Optional(
++    Type.Union([
++      Type.Literal('simulation'),
++      Type.Literal('game'),
++      Type.Literal('visualization3d'),
++      Type.Literal('diagram'),
++      Type.Literal('code'),
++    ]),
++  ),
+   brief: Type.String({ minLength: 1 }),
+   instruction: Type.Optional(Type.String()),
+   materialFacts: Type.Optional(Type.Array(Type.String())),
+@@ -251,6 +260,13 @@ export function buildGenerationTools(deps: GenerationToolDeps): AgentTool<never,
+           true,
+         );
+       }
++      if (params.widgetType && params.type !== 'interactive') {
++        return result(
++          'widgetType is only valid when generate_scene type is interactive.',
++          { error: 'widget-type-on-non-interactive-page', type: params.type },
++          true,
++        );
++      }
+       const requestedMedia = params.media ?? [];
+       if (requestedMedia.length > MAX_GENERATE_SCENE_MEDIA) {
+         return result(
+@@ -266,6 +282,12 @@ export function buildGenerationTools(deps: GenerationToolDeps): AgentTool<never,
+         type: params.type,
+         description: brief,
+         keyPoints: params.materialFacts ?? [],
++        ...(params.type === 'interactive' && params.widgetType
++          ? {
++              widgetType: params.widgetType,
++              widgetOutline: { concept: brief },
++            }
++          : {}),
+         ...(params.type === 'pbl'
+           ? {
+               pblConfig: {
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+index e848bb7..b5a1848 100644
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -22,6 +22,13 @@ import { createLogger } from '@/lib/logger';
+ import { parseCourseRefs, type CourseRef } from '@/lib/workbench/course-refs';
+ import { parseElementRefs, type ElementRef } from '@/lib/workbench/element-refs';
+ import type { Scene, SlideContent } from '@/lib/types/stage';
++import {
++  isMiraFormalProfessionalSessionIdentity,
++  MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
++  MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION,
++  MIRA_PROFESSIONAL_RESEARCH_POLICY,
++  type MiraFormalResearchSearchTrace,
++} from '@/lib/server/mira-professional-research-policy';
+ 
+ import { resolveAgentDriverModel } from './agent-driver-model';
+ import { buildAskUserTool } from './ask-user';
+@@ -101,9 +108,36 @@ const WORKER_ID = `${randomUUID().slice(0, 8)}:${process.pid}`;
+ const SESSION_WAKEUP_FALLBACK_MS = 5_000;
+ const MESSAGE_UPDATE_MIN_INTERVAL_MS = 150;
+ 
+-/** The runner's always-registered tool; additional tools are capability-gated. */
++/** Regular user sessions always register this tool; internal formal jobs do not. */
+ export const MINIMAL_AGENT_TOOL_NAMES = new Set(['ask_user']);
+ 
++function miraFormalProfessionalAutomationPromptBlock(): string {
++  return [
++    '## System-authored professional courseware job',
++    '',
++    'This session was created by the Mira formal curriculum pipeline after the parent selected a grade.',
++    'All product decisions and approvals are already supplied in the task. Do not ask the user a question;',
++    '`ask_user` is intentionally unavailable. Complete the course autonomously from the locked brief.',
++    'Web research is mandatory: call `web_search` at least once and no more than four times, then use',
++    '`fetch_url` on at least one relevant result. Cite the fetched sources naturally in the course content.',
++    'If research cannot be completed, state the failure honestly; never invent a source or citation.',
++  ].join('\n');
++}
++
++async function countMiraFormalResearchSearchEvents(
++  store: Pick<Awaited<ReturnType<typeof getAgentSessionStore>>, 'readEventsAfter'>,
++  sessionId: string,
++): Promise<number> {
++  let cursor = 0;
++  let count = 0;
++  for (;;) {
++    const events = await store.readEventsAfter(sessionId, cursor, 500);
++    count += events.filter((event) => event.type === MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE).length;
++    if (events.length < 500) return count;
++    cursor = events[events.length - 1]!.id;
++  }
++}
++
+ /**
+  * System prompt for a run with the given registered toolset, assembled by
+  * `buildRunnerCoursePrompt` (runner-contract.ts): the shared base lines from
+@@ -890,6 +924,11 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+   const id = meta.id;
+   const attempt = meta.attempt;
+   const claimSeq = meta.claimSeq;
++  const formalProfessionalSession = isMiraFormalProfessionalSessionIdentity({
++    ownerId: meta.ownerId,
++    sessionId: id,
++    skillId: meta.skillId,
++  });
+   const abort = new AbortController();
+   ctx.running.set(id, { abort });
+ 
+@@ -939,6 +978,52 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+     }
+   };
+ 
++  /** A formal research receipt must be durable before web_search can succeed. */
++  const appendRequiredRunEvent = (type: string, data: unknown, ts: number): Promise<void> => {
++    const snapshot = snapshotEventDataForLog(type, data);
++    let resolveCompletion!: () => void;
++    let rejectCompletion!: (error: unknown) => void;
++    const completion = new Promise<void>((resolve, reject) => {
++      resolveCompletion = resolve;
++      rejectCompletion = reject;
++    });
++    chain = chain.then(async () => {
++      if (leaseLost) {
++        rejectCompletion(new AgentSessionLeaseLostError(id, WORKER_ID, attempt));
++        return;
++      }
++      if (!entryWritesHealthy) {
++        rejectCompletion(criticalWriteError ?? new Error('critical write chain is unhealthy'));
++        return;
++      }
++      try {
++        const seq = await store.appendRunEvent(id, WORKER_ID, {
++          ts,
++          attempt,
++          type,
++          data: snapshot,
++        });
++        if (seq === null) {
++          const error = new AgentSessionLeaseLostError(id, WORKER_ID, attempt);
++          markLeaseLost();
++          rejectCompletion(error);
++          return;
++        }
++        resolveCompletion();
++      } catch (error) {
++        if (isLeaseLostError(error)) markLeaseLost();
++        else {
++          log.error(`session ${id}: required event write failed`, error);
++          entryWritesHealthy = false;
++          criticalWriteError ??= error;
++          abort.abort();
++        }
++        rejectCompletion(error);
++      }
++    });
++    return completion;
++  };
++
+   let entrySession: Session | undefined;
+   const loadEntryHistory = async (): Promise<SessionEntryHistory> => {
+     entrySession ??= new Session(
+@@ -1259,25 +1344,61 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+       abortSignal: abort.signal,
+     });
+     let questionEmitted = false;
+-    const askUserTool = buildAskUserTool({
+-      onUserQuestion: (question) => {
+-        // Fence the live steer drain at the same instant the question enters
+-        // the durable write chain. afterToolCall commits the terminal latch a
+-        // moment later; either fact means no follow-up belongs in this run.
+-        questionEmitted = true;
+-        emit(LIFECYCLE.userQuestion, question);
+-      },
+-    });
++    const askUserTools = formalProfessionalSession
++      ? []
++      : [
++          buildAskUserTool({
++            onUserQuestion: (question) => {
++              // Fence the live steer drain at the same instant the question enters
++              // the durable write chain. afterToolCall commits the terminal latch a
++              // moment later; either fact means no follow-up belongs in this run.
++              questionEmitted = true;
++              emit(LIFECYCLE.userQuestion, question);
++            },
++          }),
++        ];
+     // web_search is capability-registered: the tool exists in the toolset
+     // exactly when this deployment has a working web-search backend. An
+     // unconfigured deployment gets no tool, so the model never sees a dead one.
+     // Every result URL is registered with this session's durable URL trust
+     // gate before the tool result is returned (reference semantics).
+     const search = resolveWebSearchCapability();
++    if (formalProfessionalSession && !search) {
++      throw new Error(
++        'Mira formal professional session requires a configured web_search capability',
++      );
++    }
++    const priorFormalSearchCalls = formalProfessionalSession
++      ? await countMiraFormalResearchSearchEvents(store, id)
++      : 0;
+     const webSearchTools = search
+       ? [
+-          buildWebSearchTool(search, (urls) =>
+-            registerSessionUrls(id, urls, 'web_search').then(() => undefined),
++          buildWebSearchTool(
++            search,
++            (urls) => registerSessionUrls(id, urls, 'web_search').then(() => undefined),
++            formalProfessionalSession
++              ? {
++                  maxCalls: MIRA_PROFESSIONAL_RESEARCH_POLICY.webSearch.maxCallsPerCourse,
++                  initialCallCount: priorFormalSearchCalls,
++                  onSearchCompleted: (trace) => {
++                    const receipt: MiraFormalResearchSearchTrace = {
++                      kind: MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
++                      schemaVersion: MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION,
++                      query: trace.query,
++                      providerId: trace.providerId,
++                      searchedAt: trace.searchedAt,
++                      responseTimeSeconds: trace.responseTimeSeconds,
++                      resultCount: trace.sources.length,
++                      sources: trace.sources,
++                    };
++                    return appendRequiredRunEvent(
++                      MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
++                      receipt,
++                      Date.now(),
++                    );
++                  },
++                }
++              : {},
+           ),
+         ]
+       : [];
+@@ -1407,7 +1528,7 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+       id,
+     );
+     const tools = assembleRunnerTools(
+-      [askUserTool],
++      askUserTools,
+       webSearchTools,
+       // ownerId is captured from the claimed durable session. It is deliberately
+       // absent from the model-visible parameters, so the model cannot forge a
+@@ -1442,7 +1563,9 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+       streamFn,
+       systemPrompt: buildRunnerCoursePrompt({
+         availableSkills: availableSkillsPromptBlock(installedSkills),
+-        curriculum: CURRICULUM_TOOLS_PROMPT,
++        curriculum: formalProfessionalSession
++          ? `${miraFormalProfessionalAutomationPromptBlock()}\n\n${CURRICULUM_TOOLS_PROMPT}`
++          : CURRICULUM_TOOLS_PROMPT,
+         ...(search ? { search: searchPromptBlock() } : {}),
+         fetch: fetchPromptBlock(),
+         untrustedContent: untrustedContentPolicyPromptBlock(),
+@@ -1453,7 +1576,7 @@ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Pr
+       model: driver.piModel,
+       tools,
+       allowedToolNames: new Set([
+-        ...MINIMAL_AGENT_TOOL_NAMES,
++        ...(formalProfessionalSession ? [] : MINIMAL_AGENT_TOOL_NAMES),
+         ...(search ? ['web_search'] : []),
+         'create_skill',
+         ...SKILL_EDIT_TOOL_NAMES,
+@@ -1878,7 +2001,8 @@ export function startAgentRunner(): AgentRunnerHandle {
+       `maxConcurrent=${config.maxConcurrent}, maxAttempts=${config.maxAttempts})`,
+   );
+   log.info(
+-    'agent runner toolset: ask_user always; web_search when a web-search backend is configured; ' +
++    'agent runner toolset: ask_user for regular sessions (omitted for isolated formal automation); ' +
++      'web_search when a web-search backend is configured; ' +
+       'create_skill/read_skill/patch_skill and the skill-scoped read when skills are installed; ' +
+       'fetch_url always (URL trust gate enforced per call); ' +
+       'read_stage/patch_stage/grep_stage and create_stage/read_stage_outline always (owner-scoped store)',
+diff --git a/lib/server/agent-runtime/web-search.ts b/lib/server/agent-runtime/web-search.ts
+index 5911de9..474c18f 100644
+--- a/lib/server/agent-runtime/web-search.ts
++++ b/lib/server/agent-runtime/web-search.ts
+@@ -20,6 +20,27 @@ export interface WebSearchCapability {
+   baseUrl?: string;
+ }
+ 
++export interface CompletedWebSearchTrace {
++  query: string;
++  providerId: WebSearchCapability['providerId'];
++  searchedAt: string;
++  responseTimeSeconds: number;
++  sources: Array<{
++    title: string;
++    url: string;
++    score: number;
++  }>;
++}
++
++export interface WebSearchToolOptions {
++  /** Maximum calls in this logical session, including `initialCallCount`. */
++  maxCalls?: number;
++  /** Calls already durably observed before this runner attempt/resume. */
++  initialCallCount?: number;
++  /** Runs after URL trust registration and before the successful tool result. */
++  onSearchCompleted?: (trace: CompletedWebSearchTrace) => Promise<void> | void;
++}
++
+ /** This deployment's web-search capability, or null when unconfigured. */
+ export function resolveWebSearchCapability(): WebSearchCapability | null {
+   // The resolver's own per-provider rules decide usability — including
+@@ -43,7 +64,21 @@ const SEARCH_SCHEMA = Type.Object({
+ export function buildWebSearchTool(
+   capability: WebSearchCapability,
+   onUrlsObserved?: (urls: string[]) => Promise<void>,
++  options: WebSearchToolOptions = {},
+ ): AgentTool<never, never> {
++  if (
++    options.maxCalls !== undefined &&
++    (!Number.isInteger(options.maxCalls) || options.maxCalls < 1)
++  ) {
++    throw new Error('web_search maxCalls must be a positive integer');
++  }
++  if (
++    options.initialCallCount !== undefined &&
++    (!Number.isInteger(options.initialCallCount) || options.initialCallCount < 0)
++  ) {
++    throw new Error('web_search initialCallCount must be a non-negative integer');
++  }
++  let callsStarted = options.initialCallCount ?? 0;
+   const tool: AgentTool<typeof SEARCH_SCHEMA, unknown> = {
+     name: 'web_search',
+     label: 'Search the web',
+@@ -57,6 +92,10 @@ export function buildWebSearchTool(
+       // agent.abort() fires); the provider fetch below carries it too, so an
+       // in-flight request is cut short rather than merely abandoned.
+       if (signal?.aborted) throw new Error('aborted');
++      if (options.maxCalls !== undefined && callsStarted >= options.maxCalls) {
++        throw new Error(`web_search call limit reached (${options.maxCalls})`);
++      }
++      callsStarted += 1;
+       const result = await searchWeb({
+         providerId: capability.providerId,
+         query: params.query,
+@@ -70,6 +109,17 @@ export function buildWebSearchTool(
+       // registration is awaited, so a store failure fails this tool call
+       // rather than silently returning results the trust gate cannot back.
+       await onUrlsObserved?.(result.sources.map((source) => source.url));
++      await options.onSearchCompleted?.({
++        query: params.query,
++        providerId: capability.providerId,
++        searchedAt: new Date().toISOString(),
++        responseTimeSeconds: result.responseTime,
++        sources: result.sources.map((source) => ({
++          title: source.title,
++          url: source.url,
++          score: source.score,
++        })),
++      });
+       const context = formatSearchResultsAsContext(result);
+       return {
+         content: [
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index 40afc2a..1551411 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -55,12 +55,17 @@ import {
+   resolveMiraSampleStructuralPlan,
+ } from '@/lib/server/mira-sample-structural-policy';
+ import {
++  assertMiraFormalGenerationInput,
+   isExactMiraCoursewareAuthority,
+   isExactMiraFormalRuntimeContract,
+   MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+ } from '@/lib/server/mira-formal-generation-policy';
+-import { generateMiraFormalCompiledClassroom } from '@/lib/server/mira-formal-compiled-classroom';
++import { generateMiraFormalProfessionalClassroom } from '@/lib/server/mira-formal-professional-classroom';
+ import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
++import type {
++  MiraFormalProfessionalCreationReceipt,
++  MiraFormalResearchReceipt,
++} from '@/lib/server/mira-formal-professional-classroom';
+ 
+ const log = createLogger('Classroom');
+ const MIRA_FORMAL_LLM_TIMEOUT_MS = 5 * 60 * 1000;
+@@ -103,6 +108,7 @@ export interface GenerateClassroomInput {
+   runtimeRequestId?: string;
+   formalRuntimeContract?: unknown;
+   coursewareAuthority?: unknown;
++  professionalCreationPolicy?: unknown;
+   pdfContent?: { text: string; images: string[] };
+   enableWebSearch?: boolean;
+   webSearchProviderId?: WebSearchProviderId;
+@@ -141,6 +147,8 @@ export interface GenerateClassroomResult {
+   scenesCount: number;
+   createdAt: string;
+   formalAudio?: MiraFormalAudioLifecycleReceipt;
++  professionalCreation?: MiraFormalProfessionalCreationReceipt;
++  research?: MiraFormalResearchReceipt;
+ }
+ 
+ function createInMemoryStore(stage: Stage): StageStore {
+@@ -251,7 +259,8 @@ export async function generateClassroom(
+     if (!isExactMiraCoursewareAuthority(input.coursewareAuthority)) {
+       throw new Error('FORMAL_COURSEWARE_AUTHORITY_INVALID');
+     }
+-    return generateMiraFormalCompiledClassroom(input, options);
++    assertMiraFormalGenerationInput(input);
++    return generateMiraFormalProfessionalClassroom(input, options);
+   }
+ 
+   const {
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+index 505353c..e3b0027 100644
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -14,6 +14,11 @@ import {
+ } from '@/lib/server/classroom-storage';
+ import { assertMiraFormalGenerationInput } from '@/lib/server/mira-formal-generation-policy';
+ import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
++import type {
++  MiraFormalProfessionalCreationReceipt,
++  MiraFormalResearchReceipt,
++} from '@/lib/server/mira-formal-professional-classroom';
++import { MIRA_FORMAL_RUNTIME_CONTRACT_VERSION } from '@/lib/server/mira-formal-generation-policy';
+ 
+ export type ClassroomGenerationJobStatus = 'queued' | 'running' | 'succeeded' | 'failed';
+ 
+@@ -45,6 +50,8 @@ export interface ClassroomGenerationJob {
+     url: string;
+     scenesCount: number;
+     formalAudio?: MiraFormalAudioLifecycleReceipt;
++    professionalCreation?: MiraFormalProfessionalCreationReceipt;
++    research?: MiraFormalResearchReceipt;
+   };
+   error?: string;
+ }
+@@ -197,7 +204,7 @@ export async function createOrGetFormalClassroomGenerationJob(
+     if (existing) {
+       if (
+         existing.runtimeRequestId !== input.runtimeRequestId ||
+-        existing.formalContractVersion !== 'mira.openmaic.formal-runtime.v1' ||
++        existing.formalContractVersion !== MIRA_FORMAL_RUNTIME_CONTRACT_VERSION ||
+         existing.formalInputSha256 !== inputSha256
+       ) {
+         throw new Error('FORMAL_RUNTIME_REQUEST_CONFLICT');
+@@ -214,7 +221,7 @@ export async function createOrGetFormalClassroomGenerationJob(
+       createdAt: now,
+       updatedAt: now,
+       runtimeRequestId: input.runtimeRequestId,
+-      formalContractVersion: 'mira.openmaic.formal-runtime.v1',
++      formalContractVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+       formalInputSha256: inputSha256,
+       formalInput,
+       inputSummary: buildInputSummary(input),
+@@ -226,7 +233,7 @@ export async function createOrGetFormalClassroomGenerationJob(
+     if (
+       !winner ||
+       winner.runtimeRequestId !== input.runtimeRequestId ||
+-      winner.formalContractVersion !== 'mira.openmaic.formal-runtime.v1' ||
++      winner.formalContractVersion !== MIRA_FORMAL_RUNTIME_CONTRACT_VERSION ||
+       winner.formalInputSha256 !== inputSha256
+     ) {
+       throw new Error('FORMAL_RUNTIME_REQUEST_CONFLICT');
+@@ -380,6 +387,10 @@ export async function markClassroomGenerationJobSucceeded(
+       url: result.url,
+       scenesCount: result.scenesCount,
+       ...(result.formalAudio ? { formalAudio: result.formalAudio } : {}),
++      ...(result.professionalCreation
++        ? { professionalCreation: result.professionalCreation }
++        : {}),
++      ...(result.research ? { research: result.research } : {}),
+     },
+   });
+ }
+diff --git a/lib/server/mira-formal-compiled-classroom.ts b/lib/server/mira-formal-compiled-classroom.ts
+index 1ce90a3..74fb531 100644
+--- a/lib/server/mira-formal-compiled-classroom.ts
++++ b/lib/server/mira-formal-compiled-classroom.ts
+@@ -21,13 +21,14 @@ import type { MiraFormalAudioSubject } from '@/lib/server/mira-formal-audio';
+ import {
+   isExactMiraCoursewareAuthority,
+   isExactMiraFormalRuntimeContract,
++  MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import type { Action } from '@/lib/types/action';
+ import type { Scene, Stage } from '@/lib/types/stage';
+ 
+ type JsonObject = Record<string, unknown>;
+ 
+-interface FormalQuestion {
++export interface FormalQuestion {
+   id: string;
+   type: 'numeric' | 'single_choice' | 'exact_text' | 'accepted_text' | 'sequence';
+   prompt: string;
+@@ -37,7 +38,7 @@ interface FormalQuestion {
+   choices?: Array<{ id: string; label: string }>;
+ }
+ 
+-interface FormalCoursewareSpec {
++export interface FormalCoursewareSpec {
+   buildItemId: string;
+   runtimeRequestId: string;
+   course: {
+@@ -134,7 +135,7 @@ function parseQuestion(value: unknown, label: string): FormalQuestion {
+   return result;
+ }
+ 
+-function parseFormalCoursewareSpec(input: GenerateClassroomInput): FormalCoursewareSpec {
++export function parseFormalCoursewareSpec(input: GenerateClassroomInput): FormalCoursewareSpec {
+   if (
+     !isExactMiraFormalRuntimeContract(input.formalRuntimeContract) ||
+     !isExactMiraCoursewareAuthority(input.coursewareAuthority)
+@@ -149,7 +150,7 @@ function parseFormalCoursewareSpec(input: GenerateClassroomInput): FormalCoursew
+   }
+   const contract = record(rawContract, 'contract');
+   if (
+-    contract.schemaVersion !== 'mira.openmaic.formal-runtime.v1' ||
++    contract.schemaVersion !== MIRA_FORMAL_RUNTIME_CONTRACT_VERSION ||
+     contract.authority !== 'mira_backend_formal_candidate' ||
+     !isExactMiraCoursewareAuthority(contract.coursewareAuthority)
+   ) {
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+index 6f869f3..458ce35 100644
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -1,19 +1,39 @@
++import { timingSafeEqual } from 'node:crypto';
++import type { NextRequest } from 'next/server';
+ import type { GenerateClassroomInput } from '@/lib/server/classroom-generation';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+-  'mira.openmaic.formal-runtime.v1' as const;
++  'mira.openmaic.formal-runtime.v2-professional' as const;
+ 
+ export const MIRA_COURSEWARE_AUTHORITY_SCHEMA =
+-  'mira.openmaic.courseware-authority.v1' as const;
++  'mira.openmaic.courseware-authority.v2-professional' as const;
+ 
+ export const MIRA_COURSEWARE_AUTHORITY = {
+   schemaVersion: MIRA_COURSEWARE_AUTHORITY_SCHEMA,
+   generationOwner: 'openmaic',
+-  providerInvocation: 'courseware_generation_only',
+-  classroomCompilation: 'deterministic_no_llm',
++  providerInvocation: 'professional_agent',
++  classroomCompilation: 'professional_skill_workflow',
+   backendProviderCredentialsAccepted: false,
+ } as const;
+ 
++export const MIRA_PROFESSIONAL_CREATION_POLICY = {
++  schemaVersion: 'mira.openmaic.professional-creation.v1',
++  mode: 'professional_skill',
++  workflowVersion: 'openmaic-pro-agent.v1',
++  skillId: 'mira-primary-courseware',
++  supportingSkillIds: ['k12-core-literacy-planning', 'deep-interactive'],
++  userPromptRequired: false,
++  webSearch: {
++    enabled: true,
++    providerManaged: true,
++    maxCalls: 4,
++    citationsRequired: true,
++    primarySourcesPreferred: true,
++    minimumFetchedSources: 1,
++  },
++  studentToolsEnabled: false,
++} as const;
++
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+   exactSceneCount: 10,
+@@ -49,8 +69,9 @@ export const MIRA_FORMAL_GENERATION_POLICY = {
+   policyId: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+   idempotencyKey: 'runtimeRequestId',
+   queryByRuntimeRequestId: true,
+-  speechAudioGenerated: false,
++  speechAudioGenerated: true,
+   coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
++  professionalCreation: MIRA_PROFESSIONAL_CREATION_POLICY,
+   studentRuntimeEvents: {
+     enforced: true,
+     schemaVersion: 'mira.openmaic.student-runtime-events.v1',
+@@ -91,12 +112,20 @@ export function isExactMiraCoursewareAuthority(value: unknown): boolean {
+   );
+ }
+ 
++export function isExactMiraProfessionalCreationPolicy(value: unknown): boolean {
++  return (
++    JSON.stringify(canonical(value)) ===
++    JSON.stringify(canonical(MIRA_PROFESSIONAL_CREATION_POLICY))
++  );
++}
++
+ export function assertMiraFormalGenerationInput(
+   input: GenerateClassroomInput,
+ ): asserts input is GenerateClassroomInput & {
+   runtimeRequestId: string;
+   formalRuntimeContract: typeof MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT;
+   coursewareAuthority: typeof MIRA_COURSEWARE_AUTHORITY;
++  professionalCreationPolicy: typeof MIRA_PROFESSIONAL_CREATION_POLICY;
+ } {
+   if (!REQUEST_ID.test(input.runtimeRequestId || '')) {
+     throw new Error('FORMAL_RUNTIME_REQUEST_ID_INVALID');
+@@ -107,10 +136,13 @@ export function assertMiraFormalGenerationInput(
+   if (!isExactMiraCoursewareAuthority(input.coursewareAuthority)) {
+     throw new Error('FORMAL_COURSEWARE_AUTHORITY_INVALID');
+   }
++  if (!isExactMiraProfessionalCreationPolicy(input.professionalCreationPolicy)) {
++    throw new Error('FORMAL_PROFESSIONAL_CREATION_POLICY_INVALID');
++  }
+   if (
+     !input.requirement.trim() ||
+     input.pdfContent !== undefined ||
+-    input.enableWebSearch !== false ||
++    input.enableWebSearch !== true ||
+     input.enableImageGeneration !== false ||
+     input.enableVideoGeneration !== false ||
+     input.enableTTS !== false ||
+@@ -127,3 +159,15 @@ export function assertMiraFormalGenerationInput(
+ export function getMiraFormalGenerationRuntimePolicy() {
+   return MIRA_FORMAL_GENERATION_POLICY;
+ }
++
++export function authorizeMiraFormalGenerationRequest(req: NextRequest): boolean {
++  const expected = process.env.MIRA_INTERNAL_API_TOKEN?.trim() || '';
++  const supplied = req.headers.get('x-mira-internal-token')?.trim() || '';
++  if (!expected || !supplied) return false;
++  const expectedBytes = Buffer.from(expected);
++  const suppliedBytes = Buffer.from(supplied);
++  return (
++    expectedBytes.length === suppliedBytes.length &&
++    timingSafeEqual(expectedBytes, suppliedBytes)
++  );
++}
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+new file mode 100644
+index 0000000..6f7d958
+--- /dev/null
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -0,0 +1,748 @@
++import { createHash } from 'node:crypto';
++
++import type { PersistedAgentSessionEvent } from '@openmaic/storage';
++
++import { HOST_AGENT_LIFECYCLE } from '@/lib/agent-runtime/lifecycle';
++import { isAgentRuntimeConfigured } from '@/lib/config/feature-flags';
++import type {
++  ClassroomGenerationProgress,
++  GenerateClassroomInput,
++  GenerateClassroomResult,
++} from '@/lib/server/classroom-generation';
++import { persistClassroom } from '@/lib/server/classroom-storage';
++import {
++  completeMiraFormalAudioLifecycle,
++  type MiraFormalAudioLifecycleReceipt,
++} from '@/lib/server/mira-formal-audio-lifecycle';
++import {
++  parseFormalCoursewareSpec,
++  type FormalCoursewareSpec,
++  type FormalQuestion,
++} from '@/lib/server/mira-formal-compiled-classroom';
++import {
++  MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++  MIRA_PROFESSIONAL_CREATION_POLICY,
++} from '@/lib/server/mira-formal-generation-policy';
++import {
++  isMiraFormalProfessionalSessionIdentity,
++  MIRA_FORMAL_PROFESSIONAL_OWNER_ID_PREFIX,
++  MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID,
++  MIRA_FORMAL_PROFESSIONAL_SESSION_ID_PREFIX,
++  MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
++  MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION,
++  type MiraFormalResearchSearchTrace,
++} from '@/lib/server/mira-professional-research-policy';
++import {
++  listSessionMaterials,
++  resolveSessionMaterialText,
++} from '@/lib/server/agent-runtime/session-materials';
++import { getOwnerScopedDocumentStore } from '@/lib/server/agent-runtime/owner-scoped-documents';
++import { getAgentSessionStore } from '@/lib/server/agent-runtime/store';
++import { resolveWebSearchCapability } from '@/lib/server/agent-runtime/web-search';
++import type { QuizQuestion, Scene, Stage } from '@/lib/types/stage';
++
++const FORMAL_SESSION_TIMEOUT_MS = 60 * 60 * 1_000;
++const FORMAL_SESSION_POLL_MS = 2_000;
++const MAX_AGENT_EVENTS = 20_000;
++const PROFESSIONAL_CREATION_RECEIPT_VERSION =
++  'mira.openmaic.professional-creation-receipt.v1' as const;
++const RESEARCH_RECEIPT_VERSION =
++  'mira.openmaic.professional-research-receipt.v1' as const;
++const PROFESSIONAL_SESSION_ORIGIN = 'mira-formal-professional';
++
++interface FormalIdentity {
++  digest: string;
++  sessionId: string;
++  ownerId: string;
++}
++
++interface FetchedResearchSource {
++  title: string;
++  url: string;
++  textSha256: string;
++}
++
++export interface MiraFormalProfessionalCreationReceipt {
++  schemaVersion: typeof PROFESSIONAL_CREATION_RECEIPT_VERSION;
++  status: 'succeeded';
++  runtimeRequestId: string;
++  buildItemId: string;
++  classroomId: string;
++  teachingBriefSha256: string;
++  sessionId: string;
++  workflowVersion: typeof MIRA_PROFESSIONAL_CREATION_POLICY.workflowVersion;
++  skillId: typeof MIRA_PROFESSIONAL_CREATION_POLICY.skillId;
++  supportingSkillIds: string[];
++  userPromptRequired: false;
++  studentToolsEnabled: false;
++  webSearchEnabled: true;
++  receiptSha256: string;
++}
++
++export interface MiraFormalResearchReceipt {
++  schemaVersion: typeof RESEARCH_RECEIPT_VERSION;
++  status: 'succeeded';
++  runtimeRequestId: string;
++  buildItemId: string;
++  classroomId: string;
++  sessionId: string;
++  providerId: string;
++  searchCount: number;
++  resultCount: number;
++  fetchedSourceCount: number;
++  citationCount: number;
++  searches: Array<{ query: string; searchedAt: string; resultCount: number }>;
++  sources: FetchedResearchSource[];
++  citations: Array<{ url: string; sceneIds: string[] }>;
++  receiptSha256: string;
++}
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value as Record<string, unknown>)
++        .filter(([, item]) => item !== undefined)
++        .sort(([left], [right]) => left.localeCompare(right))
++        .map(([key, item]) => [key, canonical(item)]),
++    );
++  }
++  return value;
++}
++
++function canonicalJson(value: unknown): string {
++  return JSON.stringify(canonical(value));
++}
++
++function sha256(value: string | Uint8Array): string {
++  return createHash('sha256').update(value).digest('hex');
++}
++
++function canonicalSha256(value: unknown): string {
++  return sha256(canonicalJson(value));
++}
++
++function plainObject(value: unknown): Record<string, unknown> | null {
++  return value && typeof value === 'object' && !Array.isArray(value)
++    ? (value as Record<string, unknown>)
++    : null;
++}
++
++function professionalIdentity(input: GenerateClassroomInput): FormalIdentity {
++  const digest = sha256(`${input.runtimeRequestId}\n${canonicalJson(input)}`);
++  return {
++    digest,
++    sessionId: `${MIRA_FORMAL_PROFESSIONAL_SESSION_ID_PREFIX}${digest}`,
++    ownerId: `${MIRA_FORMAL_PROFESSIONAL_OWNER_ID_PREFIX}${digest}`,
++  };
++}
++
++function formalContractPayload(input: GenerateClassroomInput): Record<string, unknown> {
++  let parsed: unknown;
++  try {
++    parsed = JSON.parse(input.requirement);
++  } catch {
++    throw new Error('FORMAL_PROFESSIONAL_BRIEF_INVALID');
++  }
++  const contract = plainObject(parsed);
++  if (!contract) throw new Error('FORMAL_PROFESSIONAL_BRIEF_INVALID');
++  return contract;
++}
++
++function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewareSpec): string {
++  const contract = formalContractPayload(input);
++  const lockedAssessment = [...spec.guided, ...spec.independent].map((question) => ({
++    id: question.id,
++    type:
++      question.type === 'single_choice'
++        ? 'single'
++        : question.type === 'sequence'
++          ? 'multiple'
++          : 'short_answer',
++    question: question.prompt,
++    ...(question.choices
++      ? {
++          options: question.choices.map((choice) => ({
++            value: choice.id,
++            label: choice.label,
++          })),
++        }
++      : {}),
++    hasAnswer: false,
++    answer: [],
++    points: 1,
++  }));
++  return [
++    'MIRA SERVER-AUTHORED FORMAL PROFESSIONAL COURSEWARE JOB',
++    '',
++    'This is an unattended, server-approved job triggered after a parent saved the child grade.',
++    'Do not ask the user any question. Approval of the plan is already granted. Complete the',
++    'course in this run and create exactly one stage. Do not create a folder or a second stage.',
++    '',
++    `Use the forced /${MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID} Skill together with`,
++    `/${MIRA_PROFESSIONAL_CREATION_POLICY.supportingSkillIds[0]} and`,
++    `/${MIRA_PROFESSIONAL_CREATION_POLICY.supportingSkillIds[1]}.`,
++    '',
++    'Research gate (mandatory before page generation):',
++    '- Call web_search between 1 and 4 times with precise queries appropriate to this grade and subject.',
++    '- Prefer official curriculum, government, museum, university, or other primary educational sources.',
++    '- Use fetch_url on at least one URL returned by web_search and read that fetched material.',
++    '- Use facts only when supported by the fetched source. Add a small visible source footer containing',
++    '  the source title or domain on every page that uses a researched fact.',
++    '- If search, fetch, or citation cannot be completed, fail the job; never silently continue offline.',
++    '',
++    'Locked classroom contract:',
++    '- Exactly 10 scenes in this exact order: slide, slide, slide, slide, slide, quiz, quiz, interactive, interactive, interactive.',
++    '- The five slides are distinct teaching moves: warm-up, concept discovery, worked example, guided-practice preparation, independent-check preparation.',
++    '- Quiz scene 6 contains the first two locked assessment questions below, in order.',
++    '- Quiz scene 7 contains the last two locked assessment questions below, in order.',
++    '- Copy every locked question id, question, type, and option exactly. Keep hasAnswer=false and answer=[]; never add an answer or scoring rule.',
++    '- When calling generate_scene for pages 8-10, pass widgetType simulation, game, visualization3d respectively.',
++    '- Each interactive page must contain self-contained runnable HTML/JS, real learner controls, observable state change, and a matching non-empty widgetConfig.',
++    '- Every scene has exactly one non-empty speech action.',
++    '- At least one slide has a spotlight action targeting a real visible element.',
++    '- At least one interactive page has a widget_highlight action targeting a real control.',
++    '- At least two discussion actions use two different peer agent ids.',
++    '- Create exactly five roster agents: the locked teacher plus four student/assistant peers.',
++    '- Use age-appropriate Simplified Chinese, one learning action per page, strong visual hierarchy, generous spacing, and purposeful focus/highlight actions.',
++    '- Do not expose provider keys, answer contracts, private student data, or open-ended internet tools to the student runtime.',
++    '',
++    'Locked teacher (copy id, name and avatar exactly; omit voice/voiceConfig):',
++    'The server binds the approved Qwen teacher voice after the Pro Agent has finished,',
++    'so do not call list_voices, register_voice or generate_tts for this formal job.',
++    canonicalJson({
++      id: 'mira-formal-teacher',
++      name: spec.teacher.name,
++      role: 'teacher',
++      avatar: spec.teacher.avatar,
++    }),
++    '',
++    'Locked assessment questions:',
++    canonicalJson(lockedAssessment),
++    '',
++    'Answer-blind teaching brief (authoritative):',
++    canonicalJson(contract.teachingBrief),
++    '',
++    'Before finishing, read the created stage back and repair it until every locked requirement is true.',
++  ].join('\n');
++}
++
++async function createOrReuseProfessionalSession(
++  input: GenerateClassroomInput,
++  spec: FormalCoursewareSpec,
++): Promise<{ identity: FormalIdentity; prompt: string }> {
++  if (!isAgentRuntimeConfigured()) {
++    throw new Error('FORMAL_PROFESSIONAL_AGENT_RUNTIME_NOT_CONFIGURED');
++  }
++  if (!resolveWebSearchCapability()) {
++    throw new Error('FORMAL_PROFESSIONAL_WEB_SEARCH_NOT_CONFIGURED');
++  }
++  const identity = professionalIdentity(input);
++  const prompt = professionalPrompt(input, spec);
++  const store = await getAgentSessionStore();
++  let session = await store.getSession(identity.sessionId);
++  if (!session) {
++    try {
++      session = await store.createSession({
++        id: identity.sessionId,
++        ownerId: identity.ownerId,
++        prompt,
++        skillId: MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID,
++        origin: PROFESSIONAL_SESSION_ORIGIN,
++        existingCourse: false,
++        status: 'queued',
++      });
++    } catch (error) {
++      session = await store.getSession(identity.sessionId);
++      if (!session) throw error;
++    }
++  }
++  if (
++    !isMiraFormalProfessionalSessionIdentity({
++      ownerId: session.ownerId,
++      sessionId: session.id,
++      skillId: session.skillId,
++    }) ||
++    session.ownerId !== identity.ownerId ||
++    session.prompt !== prompt ||
++    session.origin !== PROFESSIONAL_SESSION_ORIGIN ||
++    session.existingCourse
++  ) {
++    throw new Error('FORMAL_PROFESSIONAL_SESSION_CONFLICT');
++  }
++  return { identity, prompt };
++}
++
++function delay(ms: number): Promise<void> {
++  return new Promise((resolve) => setTimeout(resolve, ms));
++}
++
++async function waitForProfessionalSession(
++  sessionId: string,
++  onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void,
++): Promise<void> {
++  const store = await getAgentSessionStore();
++  const deadline = Date.now() + FORMAL_SESSION_TIMEOUT_MS;
++  let lastReportedAt = 0;
++  for (;;) {
++    const session = await store.getSession(sessionId);
++    if (!session) throw new Error('FORMAL_PROFESSIONAL_SESSION_MISSING');
++    if (session.status === 'succeeded') return;
++    if (session.status === 'failed' || session.status === 'cancelled') {
++      throw new Error(
++        `FORMAL_PROFESSIONAL_SESSION_${session.status.toUpperCase()}:${session.error || 'no error detail'}`,
++      );
++    }
++    if (Date.now() >= deadline) throw new Error('FORMAL_PROFESSIONAL_SESSION_TIMEOUT');
++    if (Date.now() - lastReportedAt >= 10_000) {
++      lastReportedAt = Date.now();
++      await onProgress?.({
++        step: 'generating_scenes',
++        progress: session.status === 'running' ? 35 : 18,
++        message:
++          session.status === 'running'
++            ? 'OpenMAIC Pro Agent is researching and creating the classroom'
++            : 'OpenMAIC Pro Agent session is queued',
++        scenesGenerated: 0,
++        totalScenes: 10,
++      });
++    }
++    await delay(FORMAL_SESSION_POLL_MS);
++  }
++}
++
++async function readAllSessionEvents(sessionId: string): Promise<PersistedAgentSessionEvent[]> {
++  const store = await getAgentSessionStore();
++  const events: PersistedAgentSessionEvent[] = [];
++  let cursor = 0;
++  for (;;) {
++    const page = await store.readEventsAfter(sessionId, cursor, 500);
++    events.push(...page);
++    if (events.length > MAX_AGENT_EVENTS) throw new Error('FORMAL_PROFESSIONAL_EVENT_LIMIT');
++    if (page.length < 500) return events;
++    cursor = page.at(-1)!.id;
++  }
++}
++
++function stageIdFromEvents(events: PersistedAgentSessionEvent[]): string {
++  const ids = new Set<string>();
++  for (const event of events) {
++    if (event.type !== HOST_AGENT_LIFECYCLE.stageLink && event.type !== 'course_link') continue;
++    const data = plainObject(event.data);
++    const stageId = typeof data?.stageId === 'string' ? data.stageId.trim() : '';
++    if (stageId) ids.add(stageId);
++  }
++  if (ids.size !== 1) throw new Error('FORMAL_PROFESSIONAL_STAGE_LINK_INVALID');
++  return [...ids][0]!;
++}
++
++function expectedRuntimeQuestion(question: FormalQuestion): Record<string, unknown> {
++  return {
++    id: question.id,
++    type:
++      question.type === 'single_choice'
++        ? 'single'
++        : question.type === 'sequence'
++          ? 'multiple'
++          : 'short_answer',
++    question: question.prompt,
++    ...(question.choices
++      ? {
++          options: question.choices.map((choice) => ({
++            value: choice.id,
++            label: choice.label,
++          })),
++        }
++      : {}),
++  };
++}
++
++function lockedRuntimeQuestion(question: FormalQuestion): QuizQuestion {
++  return {
++    ...(expectedRuntimeQuestion(question) as Omit<QuizQuestion, 'answer' | 'hasAnswer' | 'points'>),
++    answer: [],
++    hasAnswer: false,
++    points: 1,
++  } as QuizQuestion;
++}
++
++/**
++ * Pro authoring uses the workbench's 1-based page order and bindable voice
++ * catalog. The published Mira classroom intentionally uses a 0-based formal
++ * contract and a server-owned Qwen voice that is not exposed to Agent tools.
++ * Promote the durable Pro document across that boundary without trusting the
++ * model with either answer authority or provider identity.
++ */
++function promoteProfessionalDocument(
++  stage: Stage,
++  scenes: Scene[],
++  spec: FormalCoursewareSpec,
++): { stage: Stage; scenes: Scene[] } {
++  const ordered = [...scenes].sort((left, right) => left.order - right.order);
++  if (
++    ordered.length !== 10 ||
++    ordered.some((scene, index) => scene.order !== index + 1)
++  ) {
++    throw new Error('FORMAL_PROFESSIONAL_SOURCE_SCENE_ORDER_INVALID');
++  }
++
++  const roster = Array.isArray(stage.generatedAgentConfigs)
++    ? stage.generatedAgentConfigs
++    : [];
++  const promotedStage: Stage = {
++    ...stage,
++    generatedAgentConfigs: roster.map((agent) =>
++      agent.role === 'teacher'
++        ? { ...agent, voiceConfig: spec.teacher.voiceConfig }
++        : agent,
++    ),
++  };
++  const lockedQuestions = [...spec.guided, ...spec.independent].map(lockedRuntimeQuestion);
++  const promotedScenes = ordered.map((scene, index) => {
++    const content =
++      scene.content.type === 'quiz' && (index === 5 || index === 6)
++        ? {
++            ...scene.content,
++            questions: index === 5 ? lockedQuestions.slice(0, 2) : lockedQuestions.slice(2, 4),
++          }
++        : scene.content;
++    return { ...scene, order: index, content } as Scene;
++  });
++  return { stage: promotedStage, scenes: promotedScenes };
++}
++
++function assertProfessionalClassroom(
++  stage: Stage,
++  scenes: Scene[],
++  spec: FormalCoursewareSpec,
++  sessionId: string,
++  outline: unknown,
++): void {
++  const producerRef = plainObject(outline)?.producerRef;
++  if (producerRef !== sessionId || stage.id === '' || scenes.length !== 10) {
++    throw new Error('FORMAL_PROFESSIONAL_CLASSROOM_IDENTITY_INVALID');
++  }
++  const expectedTypes = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.orderedSceneTypes;
++  if (
++    scenes.some(
++      (scene, index) =>
++        scene.stageId !== stage.id ||
++        scene.order !== index ||
++        scene.type !== expectedTypes[index] ||
++        scene.content.type !== scene.type,
++    )
++  ) {
++    throw new Error('FORMAL_PROFESSIONAL_SCENE_CONTRACT_INVALID');
++  }
++  const roster = Array.isArray(stage.generatedAgentConfigs)
++    ? stage.generatedAgentConfigs
++    : [];
++  const teachers = roster.filter((agent) => agent.role === 'teacher');
++  const peers = roster.filter((agent) => agent.role === 'student' || agent.role === 'assistant');
++  const teacher = teachers[0];
++  if (
++    roster.length !== 5 ||
++    teachers.length !== 1 ||
++    peers.length !== 4 ||
++    !teacher ||
++    teacher.name !== spec.teacher.name ||
++    teacher.avatar !== spec.teacher.avatar ||
++    canonicalJson(teacher.voiceConfig) !== canonicalJson(spec.teacher.voiceConfig)
++  ) {
++    throw new Error('FORMAL_PROFESSIONAL_ROSTER_INVALID');
++  }
++  const peerIds = new Set(peers.map((agent) => agent.id));
++  const discussionPeers = new Set<string>();
++  let spotlight = false;
++  let widgetHighlight = false;
++  for (const scene of scenes) {
++    const actions = Array.isArray(scene.actions) ? scene.actions : [];
++    const speech = actions.filter(
++      (action) => action.type === 'speech' && typeof action.text === 'string' && action.text.trim(),
++    );
++    if (speech.length !== 1) throw new Error('FORMAL_PROFESSIONAL_SPEECH_INVALID');
++    for (const action of actions) {
++      if (
++        action.type === 'discussion' &&
++        typeof action.agentId === 'string' &&
++        peerIds.has(action.agentId)
++      ) {
++        discussionPeers.add(action.agentId);
++      }
++      if (
++        action.type === 'spotlight' &&
++        scene.type === 'slide' &&
++        typeof action.elementId === 'string' &&
++        action.elementId.trim()
++      ) {
++        spotlight = true;
++      }
++      if (action.type === 'widget_highlight' && scene.type === 'interactive') {
++        widgetHighlight = true;
++      }
++    }
++  }
++  if (discussionPeers.size < 2 || !spotlight || !widgetHighlight) {
++    throw new Error('FORMAL_PROFESSIONAL_TEACHING_ACTIONS_INVALID');
++  }
++  const expectedQuestions = [...spec.guided, ...spec.independent].map(expectedRuntimeQuestion);
++  const actualQuestions = scenes.slice(5, 7).flatMap((scene) => {
++    if (scene.content.type !== 'quiz') return [];
++    return Array.isArray(scene.content.questions) ? scene.content.questions : [];
++  });
++  if (
++    actualQuestions.length !== 4 ||
++    actualQuestions.some((question, index) => {
++      const actual = plainObject(question);
++      if (!actual || actual.hasAnswer !== false || canonicalJson(actual.answer) !== '[]') return true;
++      const comparable = {
++        id: actual.id,
++        type: actual.type,
++        question: actual.question,
++        ...(actual.options !== undefined ? { options: actual.options } : {}),
++      };
++      return canonicalJson(comparable) !== canonicalJson(expectedQuestions[index]);
++    })
++  ) {
++    throw new Error('FORMAL_PROFESSIONAL_ASSESSMENT_INVALID');
++  }
++  const expectedWidgets = ['simulation', 'game', 'visualization3d'];
++  for (const [index, scene] of scenes.slice(7).entries()) {
++    if (scene.content.type !== 'interactive') {
++      throw new Error('FORMAL_PROFESSIONAL_WIDGET_INVALID');
++    }
++    const config = plainObject(scene.content.widgetConfig);
++    const html = typeof scene.content.html === 'string' ? scene.content.html : '';
++    if (
++      scene.content.widgetType !== expectedWidgets[index] ||
++      config?.type !== expectedWidgets[index] ||
++      html.length < 200 ||
++      !/<script[\s>]/iu.test(html) ||
++      !/<(?:button|input|select|canvas)[\s>]/iu.test(html)
++    ) {
++      throw new Error('FORMAL_PROFESSIONAL_WIDGET_INVALID');
++    }
++  }
++}
++
++function isResearchTrace(value: unknown): value is MiraFormalResearchSearchTrace {
++  const trace = plainObject(value);
++  return Boolean(
++    trace &&
++      trace.kind === MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE &&
++      trace.schemaVersion === MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION &&
++      typeof trace.query === 'string' &&
++      trace.query.trim() &&
++      typeof trace.providerId === 'string' &&
++      trace.providerId.trim() &&
++      typeof trace.searchedAt === 'string' &&
++      Number.isFinite(trace.resultCount) &&
++      Number(trace.resultCount) > 0 &&
++      Array.isArray(trace.sources) &&
++      trace.sources.length === Number(trace.resultCount),
++  );
++}
++
++function normalizedUrl(value: string): string | null {
++  try {
++    const url = new URL(value);
++    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null;
++  } catch {
++    return null;
++  }
++}
++
++async function buildResearchReceipt(
++  events: PersistedAgentSessionEvent[],
++  scenes: Scene[],
++  spec: FormalCoursewareSpec,
++  sessionId: string,
++): Promise<MiraFormalResearchReceipt> {
++  const traces = events
++    .filter((event) => event.type === MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE)
++    .map((event) => event.data)
++    .filter(isResearchTrace);
++  if (traces.length < 1 || traces.length > MIRA_PROFESSIONAL_CREATION_POLICY.webSearch.maxCalls) {
++    throw new Error('FORMAL_PROFESSIONAL_RESEARCH_SEARCH_COUNT_INVALID');
++  }
++  const providers = new Set(traces.map((trace) => trace.providerId));
++  if (providers.size !== 1) throw new Error('FORMAL_PROFESSIONAL_RESEARCH_PROVIDER_INVALID');
++  const observedUrls = new Set(
++    traces.flatMap((trace) =>
++      trace.sources.map((source) => normalizedUrl(source.url)).filter((url): url is string => !!url),
++    ),
++  );
++  const materials = (await listSessionMaterials(sessionId, { limit: 200 })).filter(
++    (material) => material.kind === 'web' && material.sourceUrl && material.textAssetId,
++  );
++  const fetched: FetchedResearchSource[] = [];
++  for (const material of materials) {
++    const url = normalizedUrl(material.sourceUrl!);
++    if (!url || !observedUrls.has(url)) continue;
++    const text = await resolveSessionMaterialText(sessionId, material.textAssetId!);
++    if (!text || text.length === 0) continue;
++    fetched.push({
++      title: material.title?.trim() || new URL(url).hostname,
++      url,
++      textSha256: sha256(text),
++    });
++  }
++  if (fetched.length < MIRA_PROFESSIONAL_CREATION_POLICY.webSearch.minimumFetchedSources) {
++    throw new Error('FORMAL_PROFESSIONAL_RESEARCH_FETCH_MISSING');
++  }
++  const citations = fetched.flatMap((source) => {
++    const hostname = new URL(source.url).hostname.toLowerCase();
++    const title = source.title.toLowerCase();
++    const sceneIds = scenes
++      .filter((scene) => {
++        const content = canonicalJson(scene).toLowerCase();
++        return content.includes(source.url.toLowerCase()) || content.includes(hostname) ||
++          (title.length >= 4 && content.includes(title));
++      })
++      .map((scene) => scene.id);
++    return sceneIds.length ? [{ url: source.url, sceneIds }] : [];
++  });
++  if (citations.length < 1) throw new Error('FORMAL_PROFESSIONAL_RESEARCH_CITATION_MISSING');
++  const withoutHash = {
++    schemaVersion: RESEARCH_RECEIPT_VERSION,
++    status: 'succeeded' as const,
++    runtimeRequestId: spec.runtimeRequestId,
++    buildItemId: spec.buildItemId,
++    classroomId: scenes[0]!.stageId,
++    sessionId,
++    providerId: [...providers][0]!,
++    searchCount: traces.length,
++    resultCount: traces.reduce((total, trace) => total + trace.resultCount, 0),
++    fetchedSourceCount: fetched.length,
++    citationCount: citations.length,
++    searches: traces.map((trace) => ({
++      query: trace.query,
++      searchedAt: trace.searchedAt,
++      resultCount: trace.resultCount,
++    })),
++    sources: fetched,
++    citations,
++  };
++  return { ...withoutHash, receiptSha256: canonicalSha256(withoutHash) };
++}
++
++function buildProfessionalCreationReceipt(
++  input: GenerateClassroomInput,
++  spec: FormalCoursewareSpec,
++  classroomId: string,
++  sessionId: string,
++): MiraFormalProfessionalCreationReceipt {
++  const contract = formalContractPayload(input);
++  const teachingBrief = contract.teachingBrief;
++  const teachingBriefSha256 = String(contract.teachingBriefSha256 || '');
++  if (!/^[0-9a-f]{64}$/u.test(teachingBriefSha256) || canonicalSha256(teachingBrief) !== teachingBriefSha256) {
++    throw new Error('FORMAL_PROFESSIONAL_TEACHING_BRIEF_HASH_INVALID');
++  }
++  const withoutHash = {
++    schemaVersion: PROFESSIONAL_CREATION_RECEIPT_VERSION,
++    status: 'succeeded' as const,
++    runtimeRequestId: spec.runtimeRequestId,
++    buildItemId: spec.buildItemId,
++    classroomId,
++    teachingBriefSha256,
++    sessionId,
++    workflowVersion: MIRA_PROFESSIONAL_CREATION_POLICY.workflowVersion,
++    skillId: MIRA_PROFESSIONAL_CREATION_POLICY.skillId,
++    supportingSkillIds: [...MIRA_PROFESSIONAL_CREATION_POLICY.supportingSkillIds],
++    userPromptRequired: false as const,
++    studentToolsEnabled: false as const,
++    webSearchEnabled: true as const,
++  };
++  return { ...withoutHash, receiptSha256: canonicalSha256(withoutHash) };
++}
++
++export async function generateMiraFormalProfessionalClassroom(
++  input: GenerateClassroomInput,
++  options: {
++    baseUrl: string;
++    onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void;
++  },
++): Promise<GenerateClassroomResult> {
++  const spec = parseFormalCoursewareSpec(input);
++  await options.onProgress?.({
++    step: 'researching',
++    progress: 10,
++    message: 'Starting the unattended OpenMAIC Pro courseware workflow with required web research',
++    scenesGenerated: 0,
++    totalScenes: 10,
++  });
++  const { identity } = await createOrReuseProfessionalSession(input, spec);
++  await waitForProfessionalSession(identity.sessionId, options.onProgress);
++  const events = await readAllSessionEvents(identity.sessionId);
++  const stageId = stageIdFromEvents(events);
++  const ownerStore = await getOwnerScopedDocumentStore(identity.ownerId);
++  const document = await ownerStore.loadDocument(stageId);
++  if (!document) throw new Error('FORMAL_PROFESSIONAL_DOCUMENT_MISSING');
++  const promoted = promoteProfessionalDocument(
++    document.stage as Stage,
++    document.scenes as Scene[],
++    spec,
++  );
++  const stage = promoted.stage;
++  const scenes = promoted.scenes;
++  assertProfessionalClassroom(stage, scenes, spec, identity.sessionId, document.outline);
++  const research = await buildResearchReceipt(events, scenes, spec, identity.sessionId);
++  const professionalCreation = buildProfessionalCreationReceipt(
++    input,
++    spec,
++    stage.id,
++    identity.sessionId,
++  );
++  await options.onProgress?.({
++    step: 'generating_tts',
++    progress: 50,
++    message: 'Professional classroom passed research and structure gates; validating formal audio',
++    scenesGenerated: scenes.length,
++    totalScenes: 10,
++  });
++  const formalAudio: MiraFormalAudioLifecycleReceipt = await completeMiraFormalAudioLifecycle(
++    { buildItemId: spec.buildItemId, subject: spec.course.subject, stage, scenes },
++    undefined,
++    {
++      onProgress: async ({ phase, completed, total }) => {
++        const completedWork = (completed - 1) * 2 + (phase === 'tts' ? 1 : 2);
++        await options.onProgress?.({
++          step: 'generating_tts',
++          progress: 50 + Math.floor((completedWork / (total * 2)) * 44),
++          message:
++            phase === 'tts'
++              ? `Generated and verified formal audio ${completed}/${total}`
++              : `Validated formal ASR round trip ${completed}/${total}`,
++          scenesGenerated: scenes.length,
++          totalScenes: 10,
++        });
++      },
++    },
++  );
++  await options.onProgress?.({
++    step: 'persisting',
++    progress: 98,
++    message: 'Publishing the validated Pro classroom to the student runtime',
++    scenesGenerated: scenes.length,
++    totalScenes: 10,
++  });
++  const persisted = await persistClassroom({ id: stage.id, stage, scenes }, options.baseUrl);
++  await options.onProgress?.({
++    step: 'completed',
++    progress: 100,
++    message: 'OpenMAIC Pro courseware workflow completed with web research and citations',
++    scenesGenerated: scenes.length,
++    totalScenes: 10,
++  });
++  return {
++    id: persisted.id,
++    url: persisted.url,
++    stage,
++    scenes,
++    scenesCount: scenes.length,
++    createdAt: persisted.createdAt,
++    formalAudio,
++    professionalCreation,
++    research,
++  };
++}
+diff --git a/lib/server/mira-professional-research-policy.ts b/lib/server/mira-professional-research-policy.ts
+index a588e48..628cd22 100644
+--- a/lib/server/mira-professional-research-policy.ts
++++ b/lib/server/mira-professional-research-policy.ts
+@@ -7,9 +7,9 @@ export const MIRA_PROFESSIONAL_RESEARCH_POLICY = {
+     availableToStudentRuntime: false,
+   },
+   webSearch: {
+-    defaultEnabled: false,
+-    operatorOnly: true,
+-    formalGenerationEnabled: false,
++    defaultEnabled: true,
++    operatorOnly: false,
++    formalGenerationEnabled: true,
+     studentRuntimeEnabled: false,
+     maxCallsPerCourse: 4,
+     citationsRequired: true,
+@@ -20,3 +20,55 @@ export const MIRA_PROFESSIONAL_RESEARCH_POLICY = {
+ export function getMiraProfessionalResearchPolicy() {
+   return MIRA_PROFESSIONAL_RESEARCH_POLICY;
+ }
++
++/**
++ * Internal identity boundary for the parent-app-triggered formal courseware
++ * workflow. Public Pro sessions never receive these deterministic ids, so
++ * runner-only policy (no ask_user and durable research receipts) cannot be
++ * activated by selecting the same Skill in the regular workbench.
++ */
++export const MIRA_FORMAL_PROFESSIONAL_OWNER_ID_PREFIX = 'mira-formal-professional:';
++export const MIRA_FORMAL_PROFESSIONAL_SESSION_ID_PREFIX = 'miraformal_';
++export const MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID = 'mira-primary-courseware';
++export const MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE = 'mira_formal_research_search';
++export const MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION =
++  'mira.openmaic.research-search-trace.v1';
++
++const SHA256_HEX_PATTERN = '[0-9a-f]{64}';
++const MIRA_FORMAL_PROFESSIONAL_OWNER_ID_RE = new RegExp(
++  `^${MIRA_FORMAL_PROFESSIONAL_OWNER_ID_PREFIX}${SHA256_HEX_PATTERN}$`,
++);
++const MIRA_FORMAL_PROFESSIONAL_SESSION_ID_RE = new RegExp(
++  `^${MIRA_FORMAL_PROFESSIONAL_SESSION_ID_PREFIX}${SHA256_HEX_PATTERN}$`,
++);
++
++export function isMiraFormalProfessionalOwnerId(ownerId: string): boolean {
++  return MIRA_FORMAL_PROFESSIONAL_OWNER_ID_RE.test(ownerId);
++}
++
++export function isMiraFormalProfessionalSessionIdentity(input: {
++  ownerId: string;
++  sessionId: string;
++  skillId?: string | null;
++}): boolean {
++  return (
++    isMiraFormalProfessionalOwnerId(input.ownerId) &&
++    MIRA_FORMAL_PROFESSIONAL_SESSION_ID_RE.test(input.sessionId) &&
++    input.skillId === MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID
++  );
++}
++
++export interface MiraFormalResearchSearchTrace {
++  kind: typeof MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE;
++  schemaVersion: typeof MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION;
++  query: string;
++  providerId: string;
++  searchedAt: string;
++  responseTimeSeconds: number;
++  resultCount: number;
++  sources: Array<{
++    title: string;
++    url: string;
++    score: number;
++  }>;
++}
+diff --git a/skills/agent-runtime/mira-primary-courseware/SKILL.md b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+index 164d448..d5d37fa 100644
+--- a/skills/agent-runtime/mira-primary-courseware/SKILL.md
++++ b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+@@ -1,19 +1,22 @@
+ ---
+ name: mira-primary-courseware
+ title: "Mira 小学精品课"
+-description: "Mira 小学一二年级精品课件设计。用于生成或重做低年级语文、数学、英语课堂，强调具体操作、单页单目标、逐步聚焦、可观察练习和短句旁白；联网只用于确有时效性的外部事实，不用于基础课本知识。"
++description: "Mira 小学精品课件专业创作。用于根据家长已选年级和服务端教学简报自动生成低年级语文、数学、英语课堂：固定十页、默认联网核验、可追溯引用、逐步聚焦、可观察练习和短句旁白。"
+ ---
+ 
+ # Mira primary courseware
+ 
+ Build one calm, concrete and genuinely teachable early-primary classroom. Load
+-stage-design first. Also load k12-core-literacy-planning when the request names
+-curriculum standards, core literacy or a subject performance task. For an
+-existing stage, follow pro-editing and repair only the weak pages.
++stage-design first. For a server-authored Mira formal brief, always also load
++k12-core-literacy-planning and deep-interactive. The brief is already approved
++by the parent grade-selection workflow: do not call `ask_user`, do not request a
++replacement prompt, and do not invent learner requirements outside that brief.
++For an existing stage, follow pro-editing and repair only the weak pages.
+ 
+ ## Learning arc
+ 
+-Set one bounded skill and one visible success condition. Prefer 6–8 pages:
++Set one bounded skill and one visible success condition. For an ordinary
++interactive Pro-workbench request, prefer 6–8 pages:
+ 
+ 1. a familiar situation and one question;
+ 2. concrete objects, sound, movement or visual grouping;
+@@ -24,6 +27,15 @@ Set one bounded skill and one visible success condition. Prefer 6–8 pages:
+ 7. transfer to a small new situation;
+ 8. optional recap that names the method in the learner's own words.
+ 
++For a server-authored Mira formal brief, the formal contract overrides that
++preference. Generate exactly 10 pages in this exact order: five `slide`, two
++`quiz`, then three `interactive`. Preserve the brief's locked grade, subject,
++ability boundary, teacher identity, four-peer roster and assessment IDs/text/
++options without paraphrasing them. Plan all ten pages internally and continue
++straight through the build sequence without asking for approval. In the three
++formal `generate_scene` calls, pass `widgetType` as `simulation`, `game`, then
++`visualization3d`; do not rely on the generic interactive fallback.
++
+ The learner must do something on at least every second page. Do not produce a
+ sequence of static definition slides.
+ 
+@@ -51,28 +63,42 @@ or answer being discussed. Do not dim a page without a valid target.
+ 
+ Read every generated page back. If the layout is dense, the target is missing
+ or narration talks about something not visible, repair it before moving on.
+-Generate TTS after the final narration and spotlight sequence is settled.
+-
+-## Controlled research
+-
+-Foundational primary-school knowledge does not need web research. Use
+-web_search only when the lesson depends on current, named or externally
+-checkable facts. In that case:
+-
+-- make at most four precise searches for the whole course;
+-- prefer primary and authoritative sources;
+-- fetch and read the source before using a claim;
+-- include source name and date in the page brief;
+-- never invent a citation or turn an unverified result into learner-facing
+-  fact.
+-
+-Student playback never receives search tools. Formal Mira catalog generation
+-also keeps web search off; this research branch is for an operator deliberately
+-building a sourced course in the professional workbench.
++For an ordinary user-authored Pro course, generate TTS after the final
++narration and spotlight sequence is settled. For a server-authored Mira formal
++brief, do not call `list_voices`, `register_voice`, or `generate_tts`: leave the
++teacher voice unbound in `set_roster`; the formal promotion boundary binds and
++validates the approved Qwen teacher voice and audio after the Agent finishes.
++
++## Required formal research
++
++For a server-authored Mira formal brief, research is mandatory even when the
++lesson teaches foundational knowledge. Before `create_stage`:
++
++- make 1–4 precise `web_search` calls for the whole course;
++- prefer current curriculum authorities, official education resources,
++  museums, universities and other primary sources;
++- require at least one successful search with results, then `fetch_url` and
++  read at least one result from that same session before using it;
++- keep the source title, canonical URL, access date and the claim it supports;
++- cite the fetched source beside the relevant claim in the page brief and in
++  the persisted learner-visible source note; never cite a search-result snippet
++  as though it were the source;
++- use research to verify teaching framing and examples, while the locked
++  answer key and assessment wording remain authoritative.
++
++Fail closed if the search tool/provider is unavailable, a search has no usable
++result, the selected source cannot be fetched, or a learner-facing external
++claim cannot be traced to a fetched citation. Do not substitute model memory,
++silently disable research, or declare/publish the classroom complete. Student
++playback never receives search or authoring tools.
+ 
+ ## Completion gate
+ 
+-Do not call the classroom complete until every approved page is persisted,
+-every speech action has audio, each explanation page has a valid spotlight
+-target, at least one misconception is diagnosed, and the final task checks the
+-same skill in a new context.
++Do not call an ordinary Pro classroom complete until every approved page is
++persisted, every speech action has audio, each explanation page has a valid
++spotlight target, at least one misconception is diagnosed, and the final task
++checks the same skill in a new context. A server-authored formal classroom
++instead leaves speech audio to the server promotion boundary and requires
++exactly 10 pages in the locked type order, the intact locked assessments and
++roster, 1–4 successful searches, at least one same-session fetched source, and
++a persisted citation that resolves to that source.
+diff --git a/skills/agent-runtime/stage-design/SKILL.md b/skills/agent-runtime/stage-design/SKILL.md
+index aefeef0..63cf3ba 100644
+--- a/skills/agent-runtime/stage-design/SKILL.md
++++ b/skills/agent-runtime/stage-design/SKILL.md
+@@ -18,6 +18,16 @@ same under every topic skill. Read this one first, then the topic skill.
+ Nothing here applies to a stage that already has pages. A stage with persisted
+ pages is edited, not built (see `pro-editing`).
+ 
++### Server-authored formal brief
++
++There is one non-conversational planning authority. When a Mira formal request
++contains a server-authored teaching brief and marks parent grade selection as
++approval already granted, that brief is the settled plan. Do not call
++`ask_user`, do not pause for sign-off, and do not ask the learner or parent to
++rewrite it. Plan internally, satisfy any mandatory research gate from the Mira
++skill, and proceed directly to `create_stage`. This exception never applies to
++an ordinary user-authored Pro-workbench request.
++
+ ## The build sequence
+ 
+ Build a NEW stage only when there are no persisted pages yet. Then, in this
+@@ -27,11 +37,12 @@ order:
+    each page with its `title`, `type` (`slide` / `quiz` / `interactive` /
+    `pbl`) and `brief` (this page's teaching intent and content outline, the
+    same information a planned outline slot used to carry) — in page order.
+-   Settle the plan with the user through `ask_user` before creating anything:
+-   there is no outline tool to plan with, so the plan is your words and their
+-   sign-off. A topic skill's structural constraints are a diagnostic the
+-   runtime checks against the real stage after each page; you decide how to
+-   act on it.
++   Settle the plan with the user through `ask_user` before creating anything,
++   except for the server-authored formal-brief authority above. There is no
++   outline tool to plan with, so the plan is your words and their sign-off (or
++   the accepted formal brief). A topic skill's structural constraints are a
++   diagnostic the runtime checks against the real stage after each page; you
++   decide how to act on it.
+ 2. **`create_stage`** with the settled course title (pass the series folder's
+    `folderId` when the stage is part of a series, so it is filed in the same
+    call). From here on, pass the returned stageId to every stage tool.

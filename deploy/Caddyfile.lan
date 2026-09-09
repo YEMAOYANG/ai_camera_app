@@ -1,0 +1,20 @@
+# LAN-only TLS edge. Caddy issues certificates from its local CA. Every phone,
+# tablet, and computer used for testing must explicitly trust that CA.
+
+{$MIRA_STUDENT_ORIGIN} {
+	tls internal
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3000
+}
+
+{$MIRA_CLASSROOM_ORIGIN} {
+	tls internal
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3101
+}
+
+{$MIRA_API_ORIGIN} {
+	tls internal
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8000
+}

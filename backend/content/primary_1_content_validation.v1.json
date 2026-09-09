@@ -1,0 +1,333 @@
+{
+  "schemaVersion": "mira.learning.primary-1-content-validation.v1",
+  "gradeCode": "primary_1",
+  "subjectLanguagePolicyVersion": "mira.learning.subject-language-policy.v1",
+  "subjects": [
+    {
+      "subject": "chinese",
+      "subjectOrdinal": 1,
+      "instructionLanguageCode": "zh-CN",
+      "targetLanguageCode": "zh-CN",
+      "boundaries": [
+        {
+          "skillId": "pinyin_syllables",
+          "boundaryOrdinal": 1,
+          "prerequisiteSkills": [],
+          "validationInventoryKeys": ["chinese.pinyin_vowels_aoe.v1", "chinese.guidance_characters.v1"]
+        },
+        {
+          "skillId": "pinyin_initials_syllables",
+          "boundaryOrdinal": 2,
+          "prerequisiteSkills": ["pinyin_syllables"],
+          "validationInventoryKeys": ["chinese.initials.v1", "chinese.pinyin_vowels_aoe.v1", "chinese.simple_syllables.v1"]
+        },
+        {
+          "skillId": "characters_words",
+          "boundaryOrdinal": 3,
+          "prerequisiteSkills": ["pinyin_initials_syllables"],
+          "validationInventoryKeys": ["chinese.common_characters_radicals_words.v1"]
+        },
+        {
+          "skillId": "simple_sentences",
+          "boundaryOrdinal": 4,
+          "prerequisiteSkills": ["characters_words"],
+          "validationInventoryKeys": ["chinese.simple_sentence_punctuation.v1"]
+        }
+      ]
+    },
+    {
+      "subject": "math",
+      "subjectOrdinal": 2,
+      "instructionLanguageCode": "zh-CN",
+      "targetLanguageCode": "zh-CN",
+      "boundaries": [
+        {
+          "skillId": "number_sense_20",
+          "boundaryOrdinal": 1,
+          "prerequisiteSkills": [],
+          "validationInventoryKeys": ["math.number_sense_20_ranges.v1"]
+        },
+        {
+          "skillId": "addition_subtraction_20",
+          "boundaryOrdinal": 2,
+          "prerequisiteSkills": [],
+          "validationInventoryKeys": ["math.addition_subtraction_20_ast.v1"]
+        },
+        {
+          "skillId": "shapes_position",
+          "boundaryOrdinal": 3,
+          "prerequisiteSkills": [],
+          "validationInventoryKeys": ["math.shapes_position_relations.v1"]
+        }
+      ]
+    },
+    {
+      "subject": "english",
+      "subjectOrdinal": 3,
+      "instructionLanguageCode": "zh-CN",
+      "targetLanguageCode": "en-US",
+      "boundaries": [
+        {
+          "skillId": "letters_sounds",
+          "boundaryOrdinal": 1,
+          "prerequisiteSkills": [],
+          "validationInventoryKeys": ["english.letter_case_initial_sound.v1"]
+        },
+        {
+          "skillId": "greetings",
+          "boundaryOrdinal": 2,
+          "prerequisiteSkills": [],
+          "validationInventoryKeys": ["english.greeting_patterns.v1"]
+        },
+        {
+          "skillId": "numbers_colors",
+          "boundaryOrdinal": 3,
+          "prerequisiteSkills": [],
+          "validationInventoryKeys": ["english.numbers_1_20_colors.v1"]
+        }
+      ]
+    }
+  ],
+  "prerequisiteInventory": {
+    "pinyin_syllables": [],
+    "pinyin_initials_syllables": ["pinyin_syllables"],
+    "characters_words": ["pinyin_initials_syllables"],
+    "simple_sentences": ["characters_words"],
+    "number_sense_20": [],
+    "addition_subtraction_20": [],
+    "shapes_position": [],
+    "letters_sounds": [],
+    "greetings": [],
+    "numbers_colors": []
+  },
+  "inventories": {
+    "chinese.pinyin_vowels_aoe.v1": {
+      "schemaVersion": "chinese.pinyin_vowels_aoe.v1",
+      "kind": "pinyin_vowel_rules",
+      "rules": {
+        "symbols": [
+          {"symbol": "a", "mouthShape": "嘴巴张大", "soundCue": "啊"},
+          {"symbol": "o", "mouthShape": "嘴巴拢圆", "soundCue": "喔"},
+          {"symbol": "e", "mouthShape": "嘴巴扁平", "soundCue": "鹅"}
+        ],
+        "allowedAssessmentModes": ["口形辨认", "听音辨认", "跟读"],
+        "forbiddenTeachingTargets": ["声母", "汉字识读", "偏旁"]
+      }
+    },
+    "chinese.guidance_characters.v1": {
+      "schemaVersion": "chinese.guidance_characters.v1",
+      "kind": "character_allowlist",
+      "rules": {
+        "usage": "instruction_only",
+        "characters": ["看", "听", "读", "口", "形", "跟", "我", "你", "把", "选", "出", "相", "同", "不", "一", "个", "再", "来"]
+      }
+    },
+    "chinese.initials.v1": {
+      "schemaVersion": "chinese.initials.v1",
+      "kind": "pinyin_initial_rules",
+      "rules": {
+        "initials": ["b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h", "j", "q", "x", "zh", "ch", "sh", "r", "z", "c", "s", "y", "w"],
+        "learnedFinals": ["a", "o", "e"],
+        "toneOrdinals": [1, 2, 3, 4],
+        "compositionRule": "initial_plus_learned_final"
+      }
+    },
+    "chinese.simple_syllables.v1": {
+      "schemaVersion": "chinese.simple_syllables.v1",
+      "kind": "pinyin_syllable_rules",
+      "rules": {
+        "syllables": ["ba", "bo", "pa", "po", "ma", "mo", "me", "fa", "fo", "de", "te", "ne", "le", "ge", "ke", "he", "zhe", "che", "she", "re", "ze", "ce", "se", "ya", "ye", "wo"],
+        "maxComponents": 2,
+        "prerequisiteSkill": "pinyin_syllables"
+      }
+    },
+    "chinese.common_characters_radicals_words.v1": {
+      "schemaVersion": "chinese.common_characters_radicals_words.v1",
+      "kind": "character_radical_word_relation_rules",
+      "rules": {
+        "characters": [
+          {"character": "人", "reading": "rén", "words": ["大人", "人口"]},
+          {"character": "口", "reading": "kǒu", "words": ["门口", "开口"]},
+          {"character": "日", "reading": "rì", "words": ["日子", "生日"]},
+          {"character": "月", "reading": "yuè", "words": ["月亮", "月光"]},
+          {"character": "木", "reading": "mù", "words": ["木头", "树木"]},
+          {"character": "火", "reading": "huǒ", "words": ["火苗", "生火"]},
+          {"character": "山", "reading": "shān", "words": ["大山", "山水"]},
+          {"character": "水", "reading": "shuǐ", "words": ["喝水", "河水"]},
+          {"character": "大", "reading": "dà", "words": ["大小", "大人"]},
+          {"character": "小", "reading": "xiǎo", "words": ["大小", "小手"]},
+          {"character": "上", "reading": "shàng", "words": ["上下", "上学"]},
+          {"character": "下", "reading": "xià", "words": ["上下", "下雨"]},
+          {"character": "你", "reading": "nǐ", "words": ["你好", "你们"]},
+          {"character": "他", "reading": "tā", "words": ["他们", "他的"]},
+          {"character": "妈", "reading": "mā", "words": ["妈妈", "爸妈"]},
+          {"character": "河", "reading": "hé", "words": ["小河", "河水"]}
+        ],
+        "radicals": [
+          {"radical": "亻", "meaning": "人", "characters": ["你", "他"]},
+          {"radical": "氵", "meaning": "水", "characters": ["河"]},
+          {"radical": "女", "meaning": "女性或亲属", "characters": ["妈"]},
+          {"radical": "木", "meaning": "树木", "characters": ["木"]}
+        ],
+        "wordRelations": [
+          {"relation": "antonym", "left": "大", "right": "小"},
+          {"relation": "antonym", "left": "上", "right": "下"},
+          {"relation": "collocation", "left": "喝", "right": "水"},
+          {"relation": "collocation", "left": "上", "right": "学"},
+          {"relation": "classifier", "classifier": "本", "noun": "书"},
+          {"relation": "classifier", "classifier": "朵", "noun": "花"}
+        ]
+      }
+    },
+    "chinese.simple_sentence_punctuation.v1": {
+      "schemaVersion": "chinese.simple_sentence_punctuation.v1",
+      "kind": "sentence_language_rules",
+      "rules": {
+        "sentencePatterns": [
+          {"id": "subject_action", "slots": ["谁", "做什么"]},
+          {"id": "subject_identity", "slots": ["谁", "是什么"]},
+          {"id": "subject_description", "slots": ["什么", "怎么样"]}
+        ],
+        "wordOrderRules": ["主语在动作前", "时间词可放句首", "否定词放在动作前"],
+        "terminalPunctuation": ["。", "？"],
+        "punctuationRules": [
+          {"intent": "statement", "terminal": "。"},
+          {"intent": "question", "terminal": "？"}
+        ],
+        "requiredCompleteness": ["明确对象", "完整谓语", "显式句末标点"],
+        "predicateGrammarVersion": "mira.learning.primary-1-simple-sentence-predicate-grammar.v2",
+        "subjectPredicateShapes": [
+          {"patternId": "subject_action", "predicateInventory": "intransitivePredicates", "shape": ["subject", "predicate"], "aspectMarkersAllowed": true},
+          {"patternId": "subject_action", "predicateInventory": "actionPhrases", "shape": ["subject", "predicate"], "aspectMarkersAllowed": true},
+          {"patternId": "subject_description", "predicateInventory": "statePredicates", "shape": ["subject", "predicate"], "aspectMarkersAllowed": true},
+          {"patternId": "subject_identity", "predicateInventory": "identityMarkers", "shape": ["subject", "predicate", "complement"], "aspectMarkersAllowed": false},
+          {"patternId": "subject_description", "predicateInventory": "descriptionMarkers", "shape": ["subject", "predicate", "complement"], "aspectMarkersAllowed": false}
+        ],
+        "aspectMarkers": ["了", "着", "过"],
+        "intransitivePredicates": ["工作", "跑步", "走路", "跳舞", "唱歌", "说话", "学习", "睡觉", "起床", "劳动", "飞走", "叫"],
+        "actionPhrases": ["去上学", "上学", "跳绳", "读书", "写字", "画画", "看书", "听课", "喝水", "吃饭", "开门", "关门", "回家", "洗手", "玩球", "做题", "收拾书包", "帮助同学", "抱小猫", "拿书", "拍球", "扫地", "玩积木", "洗衣服", "写作业", "做家务"],
+        "statePredicates": ["下雨", "晴朗", "开心", "高兴", "难过", "安静", "干净", "漂亮", "可爱", "暖和", "凉快", "生气", "害怕"],
+        "identityMarkers": ["是"],
+        "descriptionMarkers": ["很", "真", "太"],
+        "markerBearingSubjectNouns": ["太空人", "真菌", "过山车", "太太", "老太太"],
+        "identityComplements": ["老师", "学生", "同学", "朋友", "医生", "工人", "农民", "警察", "爸爸", "妈妈", "哥哥", "姐姐", "弟弟", "妹妹", "孩子", "太空人"]
+      }
+    },
+    "math.number_sense_20_ranges.v1": {
+      "schemaVersion": "math.number_sense_20_ranges.v1",
+      "kind": "number_sense_rules",
+      "rules": {
+        "valueRange": {"minimum": 0, "maximum": 20, "integerOnly": true},
+        "placeValue": {"tensMinimum": 0, "tensMaximum": 2, "onesMinimum": 0, "onesMaximum": 9, "twentyComposition": {"tens": 2, "ones": 0}},
+        "comparisonRelations": ["greater_than", "less_than", "equal"],
+        "requiredEvidence": ["number_order", "comparison", "tens_and_ones_composition"]
+      }
+    },
+    "math.addition_subtraction_20_ast.v1": {
+      "schemaVersion": "math.addition_subtraction_20_ast.v1",
+      "kind": "arithmetic_ast_rules",
+      "rules": {
+        "allowedNodeTypes": ["integer_literal", "add", "subtract"],
+        "operandRange": {"minimum": 0, "maximum": 20, "integerOnly": true},
+        "resultRange": {"minimum": 0, "maximum": 20, "integerOnly": true},
+        "maximumOperatorDepth": 1,
+        "subtractionMustBeNonNegative": true,
+        "requiredIndependentOperations": ["add", "subtract"]
+      }
+    },
+    "math.shapes_position_relations.v1": {
+      "schemaVersion": "math.shapes_position_relations.v1",
+      "kind": "shape_position_rules",
+      "rules": {
+        "shapes": [
+          {"name": "圆形", "properties": ["封闭曲线", "没有直边", "没有角"]},
+          {"name": "三角形", "properties": ["三条直边", "三个角"]},
+          {"name": "正方形", "properties": ["四条边相等", "四个直角"]},
+          {"name": "长方形", "properties": ["四条直边", "四个直角", "对边相等"]}
+        ],
+        "positionRelations": ["上", "下", "左", "右"],
+        "rectangleSquareRule": {
+          "squareIsRectangle": true,
+          "whenBothAreChoices": "must_disambiguate_particular_rectangle",
+          "requiredDiscriminators": ["四条边不全相等", "相邻边长度不同", "长和宽不相等"]
+        },
+        "relationComposition": {"sameAxisOnly": true, "crossAxisRequiresSharedRowOrColumn": true}
+      }
+    },
+    "english.letter_case_initial_sound.v1": {
+      "schemaVersion": "english.letter_case_initial_sound.v1",
+      "kind": "letter_initial_sound_rules",
+      "rules": {
+        "letters": [
+          {"uppercase": "A", "lowercase": "a", "initialSoundWords": ["apple"]},
+          {"uppercase": "B", "lowercase": "b", "initialSoundWords": ["ball"]},
+          {"uppercase": "C", "lowercase": "c", "initialSoundWords": ["cat"]},
+          {"uppercase": "D", "lowercase": "d", "initialSoundWords": ["dog"]},
+          {"uppercase": "E", "lowercase": "e", "initialSoundWords": ["egg"]},
+          {"uppercase": "F", "lowercase": "f", "initialSoundWords": ["fish"]},
+          {"uppercase": "G", "lowercase": "g", "initialSoundWords": ["goat"]},
+          {"uppercase": "H", "lowercase": "h", "initialSoundWords": ["hat"]},
+          {"uppercase": "I", "lowercase": "i", "initialSoundWords": ["ink"]},
+          {"uppercase": "J", "lowercase": "j", "initialSoundWords": ["jam"]},
+          {"uppercase": "K", "lowercase": "k", "initialSoundWords": ["kite"]},
+          {"uppercase": "L", "lowercase": "l", "initialSoundWords": ["lion"]},
+          {"uppercase": "M", "lowercase": "m", "initialSoundWords": ["moon"]},
+          {"uppercase": "N", "lowercase": "n", "initialSoundWords": ["nose"]},
+          {"uppercase": "O", "lowercase": "o", "initialSoundWords": ["orange"]},
+          {"uppercase": "P", "lowercase": "p", "initialSoundWords": ["pig"]},
+          {"uppercase": "Q", "lowercase": "q", "initialSoundWords": ["queen"]},
+          {"uppercase": "R", "lowercase": "r", "initialSoundWords": ["red"]},
+          {"uppercase": "S", "lowercase": "s", "initialSoundWords": ["sun"]},
+          {"uppercase": "T", "lowercase": "t", "initialSoundWords": ["top"]},
+          {"uppercase": "U", "lowercase": "u", "initialSoundWords": ["umbrella"]},
+          {"uppercase": "V", "lowercase": "v", "initialSoundWords": ["van"]},
+          {"uppercase": "W", "lowercase": "w", "initialSoundWords": ["water"]},
+          {"uppercase": "X", "lowercase": "x", "initialSoundWords": ["x-ray"]},
+          {"uppercase": "Y", "lowercase": "y", "initialSoundWords": ["yellow"]},
+          {"uppercase": "Z", "lowercase": "z", "initialSoundWords": ["zoo"]}
+        ],
+        "assessmentModes": ["letter_recognition", "case_matching", "initial_sound_matching"],
+        "scoringNormalization": ["trim", "casefold", "strip_terminal_punctuation"]
+      }
+    },
+    "english.greeting_patterns.v1": {
+      "schemaVersion": "english.greeting_patterns.v1",
+      "kind": "greeting_phrase_rules",
+      "rules": {
+        "phrases": [
+          {"intent": "hello", "canonical": "Hello."},
+          {"intent": "morning_greeting", "canonical": "Good morning."},
+          {"intent": "ask_wellbeing", "canonical": "How are you?"},
+          {"intent": "positive_response", "canonical": "I'm fine, thank you."}
+        ],
+        "nameExpression": {"pattern": "My name is {name}.", "nameMustBeNonEmpty": true},
+        "scoringNormalization": ["trim", "casefold", "strip_terminal_punctuation"],
+        "targetLanguageCode": "en-US"
+      }
+    },
+    "english.numbers_1_20_colors.v1": {
+      "schemaVersion": "english.numbers_1_20_colors.v1",
+      "kind": "number_color_rules",
+      "rules": {
+        "numbers": [
+          {"value": 1, "word": "one"}, {"value": 2, "word": "two"}, {"value": 3, "word": "three"}, {"value": 4, "word": "four"}, {"value": 5, "word": "five"},
+          {"value": 6, "word": "six"}, {"value": 7, "word": "seven"}, {"value": 8, "word": "eight"}, {"value": 9, "word": "nine"}, {"value": 10, "word": "ten"},
+          {"value": 11, "word": "eleven"}, {"value": 12, "word": "twelve"}, {"value": 13, "word": "thirteen"}, {"value": 14, "word": "fourteen"}, {"value": 15, "word": "fifteen"},
+          {"value": 16, "word": "sixteen"}, {"value": 17, "word": "seventeen"}, {"value": 18, "word": "eighteen"}, {"value": 19, "word": "nineteen"}, {"value": 20, "word": "twenty"}
+        ],
+        "colors": ["red", "yellow", "blue", "green", "black", "white", "orange", "purple", "pink", "brown"],
+        "assessmentModes": ["number_word_matching", "color_word_matching"],
+        "scoringNormalization": ["trim", "casefold", "strip_terminal_punctuation"]
+      }
+    }
+  },
+  "canaryManifest": {
+    "version": "mira.learning.primary-1-canary.v1",
+    "targets": [
+      {"subject": "chinese", "subjectOrdinal": 1, "skillId": "pinyin_syllables", "boundaryOrdinal": 1, "variantOrdinal": 1},
+      {"subject": "math", "subjectOrdinal": 2, "skillId": "number_sense_20", "boundaryOrdinal": 1, "variantOrdinal": 1},
+      {"subject": "english", "subjectOrdinal": 3, "skillId": "letters_sounds", "boundaryOrdinal": 1, "variantOrdinal": 1}
+    ]
+  },
+  "datasetSha256": "1ca7707b75f9d55c775201676dfc234c496e1655b048494517ac2aea8736b63d"
+}

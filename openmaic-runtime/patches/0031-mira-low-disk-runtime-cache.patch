@@ -1,0 +1,29 @@
+From 559c5b11e908c36aa613734c51f0d0e8aac38404 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:35 +0800
+Subject: [PATCH 31/37] 0031-mira-low-disk-runtime-cache
+
+---
+ next.config.ts | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/next.config.ts b/next.config.ts
+index 3e95838..40fd885 100644
+--- a/next.config.ts
++++ b/next.config.ts
+@@ -38,7 +38,11 @@ const nextConfig: NextConfig = {
+     '@openmaic/storage',
+     'pg',
+   ],
+-  webpack(config, { nextRuntime }) {
++  webpack(config, { nextRuntime, dev }) {
++    if (dev && process.env.MIRA_OPENMAIC_LOW_DISK_DEV === '1') {
++      config.cache = false;
++    }
++
+     if (nextRuntime === 'edge') {
+       config.resolve.alias = {
+         ...(config.resolve.alias ?? {}),
+-- 
+2.50.1 (Apple Git-155)
+

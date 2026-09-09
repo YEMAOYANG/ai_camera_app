@@ -1,0 +1,431 @@
+From 92af54725133560a7ee2cfb0334f390427518246 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:34 +0800
+Subject: [PATCH 28/37] 0028-mira-student-runtime-audio-playback
+
+---
+ components/canvas/canvas-toolbar.tsx     | 16 ++--
+ components/edit/PlaybackChromeRoot.tsx   | 29 +++++++-
+ components/roundtable/index.tsx          |  8 +-
+ lib/playback/audio-availability.ts       | 15 ++++
+ lib/playback/engine.ts                   | 22 +++++-
+ lib/playback/index.ts                    |  1 +
+ lib/playback/types.ts                    |  7 ++
+ lib/utils/audio-player.ts                |  2 +-
+ tests/playback/action-navigation.test.ts | 95 ++++++++++++++++++++++++
+ 9 files changed, 184 insertions(+), 11 deletions(-)
+ create mode 100644 lib/playback/audio-availability.ts
+
+diff --git a/components/canvas/canvas-toolbar.tsx b/components/canvas/canvas-toolbar.tsx
+index 70313cf..52651ce 100644
+--- a/components/canvas/canvas-toolbar.tsx
++++ b/components/canvas/canvas-toolbar.tsx
+@@ -45,7 +45,7 @@ export interface CanvasToolbarProps {
+   readonly onTogglePresentation?: () => void;
+   readonly className?: string;
+   // Audio/playback controls
+-  readonly ttsEnabled?: boolean;
++  readonly audioPlaybackAvailable?: boolean;
+   readonly ttsMuted?: boolean;
+   readonly ttsVolume?: number;
+   readonly onToggleMute?: () => void;
+@@ -106,7 +106,7 @@ export function CanvasToolbar({
+   isPresenting,
+   onTogglePresentation,
+   className,
+-  ttsEnabled,
++  audioPlaybackAvailable,
+   ttsMuted,
+   ttsVolume = 1,
+   onToggleMute,
+@@ -195,11 +195,11 @@ export function CanvasToolbar({
+             >
+               <button
+                 onClick={onToggleMute}
+-                disabled={!ttsEnabled}
++                disabled={!audioPlaybackAvailable}
+                 className={cn(
+                   ctrlBtn,
+                   'w-6 h-6',
+-                  !ttsEnabled
++                  !audioPlaybackAvailable
+                     ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                     : ttsMuted
+                       ? 'text-red-500 dark:text-red-400'
+@@ -207,7 +207,11 @@ export function CanvasToolbar({
+                 )}
+                 aria-label={ttsMuted ? 'Unmute' : 'Mute'}
+               >
+-                <VolumeIcon muted={!!ttsMuted} volume={ttsVolume} disabled={!ttsEnabled} />
++                <VolumeIcon
++                  muted={!!ttsMuted}
++                  volume={ttsVolume}
++                  disabled={!audioPlaybackAvailable}
++                />
+               </button>
+ 
+               {/* Vertical volume slider (pops up above) */}
+@@ -215,7 +219,7 @@ export function CanvasToolbar({
+                 className={cn(
+                   'absolute bottom-full left-1/2 -translate-x-1/2 mb-2 flex flex-col items-center',
+                   'transition-all duration-200 ease-out pointer-events-none opacity-0',
+-                  volumeHover && ttsEnabled && 'pointer-events-auto opacity-100',
++                  volumeHover && audioPlaybackAvailable && 'pointer-events-auto opacity-100',
+                 )}
+               >
+                 <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg px-2 py-2.5 flex flex-col items-center gap-1.5">
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index ecf3f7c..878ebba 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -19,7 +19,12 @@ import { SceneSidebar } from '@/components/stage/scene-sidebar';
+ import { Header } from '@/components/header';
+ import { CanvasArea } from '@/components/canvas/canvas-area';
+ import { Roundtable } from '@/components/roundtable';
+-import { PlaybackEngine, computePlaybackView, shouldAutoResumeLecture } from '@/lib/playback';
++import {
++  PlaybackEngine,
++  computePlaybackView,
++  hasPreGeneratedSpeechAudio,
++  shouldAutoResumeLecture,
++} from '@/lib/playback';
+ import type { EngineMode, TriggerEvent, Effect } from '@/lib/playback';
+ import {
+   canJumpWithinReconstructablePrefix,
+@@ -61,6 +66,7 @@ import {
+   useMiraStudentRuntimeEvents,
+ } from '@/lib/contexts/mira-student-runtime-context';
+ import { getMiraEffectiveAutoPlayLecture } from '@/lib/mira/student-runtime';
++import { toast } from 'sonner';
+ 
+ /**
+  * Imperative handle exposed via `ref` so the parent (`Stage`) can tear
+@@ -129,6 +135,10 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+     const generationComplete = useStageStore.use.generationComplete();
+ 
+     const currentScene = getCurrentScene();
++    const preGeneratedAudioAvailable = useMemo(
++      () => hasPreGeneratedSpeechAudio(currentScene?.actions),
++      [currentScene?.actions],
++    );
+ 
+     // Layout state from settings store (persisted via localStorage)
+     const sidebarCollapsed = useSettingsStore((s) => s.sidebarCollapsed);
+@@ -758,6 +768,22 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+             // Clearing here causes fallback to idleText (first sentence).
+             setActiveBubbleId(null);
+           },
++          onAudioPlaybackIssue: ({ reason }) => {
++            const title = studentMode
++              ? '这段课程声音暂时无法播放'
++              : 'Narration audio could not be played';
++            const description = studentMode
++              ? reason === 'asset_unavailable'
++                ? '课程音频未能加载，本段将继续显示讲解文字。'
++                : '请检查浏览器声音权限，本段将继续显示讲解文字。'
++              : reason === 'asset_unavailable'
++                ? 'The narration asset did not load. Lecture text will continue.'
++                : 'Check browser audio permissions. Lecture text will continue.';
++            toast.warning(title, {
++              id: `playback-audio-${currentScene.id}`,
++              description,
++            });
++          },
+           onEffectFire: (effect: Effect) => {
+             // Add to lecture session with incrementing index
+             if (
+@@ -1636,6 +1662,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+                 onWhiteboardClose={handleWhiteboardToggle}
+                 isPresenting={isPresenting}
+                 controlsVisible={controlsVisible}
++                preGeneratedAudioAvailable={preGeneratedAudioAvailable}
+                 onTogglePresentation={togglePresentation}
+                 onPresentationInteractionChange={setIsPresentationInteractionActive}
+                 fullscreenContainerRef={stageRef}
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+index 183d13c..47b4d2c 100644
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -97,6 +97,8 @@ interface RoundtableProps {
+   readonly onWhiteboardClose?: () => void;
+   readonly isPresenting?: boolean;
+   readonly controlsVisible?: boolean;
++  /** Enables volume controls for already-generated lecture audio independently of TTS providers. */
++  readonly preGeneratedAudioAvailable?: boolean;
+   readonly onTogglePresentation?: () => void;
+   readonly onPresentationInteractionChange?: (active: boolean) => void;
+   /** Ref to the fullscreen container — passed to ProactiveCard so its portal
+@@ -191,6 +193,7 @@ export function Roundtable({
+   onWhiteboardClose,
+   isPresenting,
+   controlsVisible,
++  preGeneratedAudioAvailable,
+   onTogglePresentation,
+   onPresentationInteractionChange,
+   fullscreenContainerRef,
+@@ -199,6 +202,7 @@ export function Roundtable({
+   const ttsMuted = useSettingsStore((s) => s.ttsMuted);
+   const setTTSMuted = useSettingsStore((s) => s.setTTSMuted);
+   const ttsEnabled = useSettingsStore((state) => state.ttsEnabled);
++  const audioPlaybackAvailable = ttsEnabled || !!preGeneratedAudioAvailable;
+   const operatorAsrEnabled = useSettingsStore((state) => state.asrEnabled);
+   const studentMode = useMiraStudentRuntime();
+   const asrEnabled = getMiraEffectiveAsrEnabled({ studentMode, operatorAsrEnabled });
+@@ -682,10 +686,10 @@ export function Roundtable({
+       showStopDiscussion={showStopButton}
+       onStopDiscussion={onStopDiscussion}
+       onContinueDiscussion={handleContinueSoftClosing}
+-      ttsEnabled={ttsEnabled}
++      audioPlaybackAvailable={audioPlaybackAvailable}
+       ttsMuted={ttsMuted}
+       ttsVolume={ttsVolume}
+-      onToggleMute={() => ttsEnabled && setTTSMuted(!ttsMuted)}
++      onToggleMute={() => audioPlaybackAvailable && setTTSMuted(!ttsMuted)}
+       onVolumeChange={(v) => setTTSVolume(v)}
+       autoPlayLecture={autoPlayLecture}
+       onToggleAutoPlay={() => onAutoPlayLectureChange(!autoPlayLecture)}
+diff --git a/lib/playback/audio-availability.ts b/lib/playback/audio-availability.ts
+new file mode 100644
+index 0000000..76e92e2
+--- /dev/null
++++ b/lib/playback/audio-availability.ts
+@@ -0,0 +1,15 @@
++import type { Action, SpeechAction } from '@/lib/types/action';
++
++/** Whether a speech action points at already-generated narration audio. */
++export function hasSpeechAudioReference(
++  action: Pick<SpeechAction, 'audioId' | 'audioUrl'>,
++): boolean {
++  return Boolean(action.audioId?.trim() || action.audioUrl?.trim());
++}
++
++/** Whether a playback timeline contains any already-generated narration audio. */
++export function hasPreGeneratedSpeechAudio(actions: readonly Action[] | undefined): boolean {
++  return Boolean(
++    actions?.some((action) => action.type === 'speech' && hasSpeechAudioReference(action)),
++  );
++}
+diff --git a/lib/playback/engine.ts b/lib/playback/engine.ts
+index 96103b8..d382126 100644
+--- a/lib/playback/engine.ts
++++ b/lib/playback/engine.ts
+@@ -49,6 +49,7 @@ import { useCanvasStore } from '@/lib/store/canvas';
+ import { useSettingsStore } from '@/lib/store/settings';
+ import { isTTSProviderEnabled } from '@/lib/audio/provider-enablement';
+ import { createLogger } from '@/lib/logger';
++import { hasSpeechAudioReference } from './audio-availability';
+ 
+ const log = createLogger('PlaybackEngine');
+ 
+@@ -619,6 +620,7 @@ export class PlaybackEngine {
+         // empty SpeechSynthesisUtterance doesn't reliably fire onend in Chromium,
+         // which would hang playback on that slide.
+         const hasText = !!speechAction.text.trim();
++        const hasPreGeneratedAudio = hasSpeechAudioReference(speechAction);
+ 
+         this.audioPlayer
+           // The legacy URL of an unconverted pair rides along as the
+@@ -627,6 +629,18 @@ export class PlaybackEngine {
+           .then((audioStarted) => {
+             if (!this.isCurrentGeneration(generation)) return;
+             if (!audioStarted) {
++              // A referenced formal narration asset must never fall through to a
++              // provider/browser TTS replacement. Report the failure and keep the
++              // lesson moving with the same text-duration fallback used offline.
++              if (hasPreGeneratedAudio) {
++                this.callbacks.onAudioPlaybackIssue?.({
++                  actionId: speechAction.id,
++                  reason: 'asset_unavailable',
++                });
++                scheduleReadingTimer();
++                return;
++              }
++
+               // No pre-generated audio — try browser-native TTS only when it is
+               // the selected provider AND actually enabled (opt-in, #665).
+               const settings = useSettingsStore.getState();
+@@ -649,7 +663,13 @@ export class PlaybackEngine {
+           })
+           .catch((err) => {
+             if (!this.isCurrentGeneration(generation)) return;
+-            log.error('TTS error:', err);
++            log.error('Audio playback error:', err);
++            if (hasPreGeneratedAudio) {
++              this.callbacks.onAudioPlaybackIssue?.({
++                actionId: speechAction.id,
++                reason: 'playback_failed',
++              });
++            }
+             scheduleReadingTimer();
+           });
+         break;
+diff --git a/lib/playback/index.ts b/lib/playback/index.ts
+index 969c3b1..f60a466 100644
+--- a/lib/playback/index.ts
++++ b/lib/playback/index.ts
+@@ -2,3 +2,4 @@ export * from './types';
+ export * from './engine';
+ export * from './derived-state';
+ export * from './auto-resume';
++export * from './audio-availability';
+diff --git a/lib/playback/types.ts b/lib/playback/types.ts
+index 910ed9c..5927e4f 100644
+--- a/lib/playback/types.ts
++++ b/lib/playback/types.ts
+@@ -20,6 +20,12 @@ export type EngineMode = 'idle' | 'playing' | 'paused' | 'live';
+ /** Discussion topic state */
+ export type TopicState = 'active' | 'pending' | 'closed';
+ 
++/** Controlled reason reported when referenced narration audio could not start. */
++export interface AudioPlaybackIssue {
++  actionId: string;
++  reason: 'asset_unavailable' | 'playback_failed';
++}
++
+ /** Trigger event (for proactive discussion card) */
+ export interface TriggerEvent {
+   id: string;
+@@ -34,6 +40,7 @@ export interface PlaybackEngineCallbacks {
+   onSceneChange?: (sceneId: string) => void;
+   onSpeechStart?: (text: string) => void;
+   onSpeechEnd?: () => void;
++  onAudioPlaybackIssue?: (issue: AudioPlaybackIssue) => void;
+   onTextDelta?: (content: string) => void;
+   onSpeakerChange?: (role: string) => void;
+   onEffectFire?: (effect: Effect) => void;
+diff --git a/lib/utils/audio-player.ts b/lib/utils/audio-player.ts
+index c491d95..7f95d45 100644
+--- a/lib/utils/audio-player.ts
++++ b/lib/utils/audio-player.ts
+@@ -94,7 +94,7 @@ export class AudioPlayer {
+    *
+    * @param audioId Audio asset reference (allocated asset id, or a legacy TTS-derived id)
+    * @param legacyUrl The legacy `audioUrl` of an unconverted pair, if present
+-   * @returns true if audio started playing, false if no audio (TTS disabled or not generated)
++   * @returns true if audio started playing, false if the referenced audio could not be resolved
+    */
+   public async play(audioId: string, legacyUrl?: string): Promise<boolean> {
+     const requestToken = ++this.requestToken;
+diff --git a/tests/playback/action-navigation.test.ts b/tests/playback/action-navigation.test.ts
+index a719bd5..2d2f939 100644
+--- a/tests/playback/action-navigation.test.ts
++++ b/tests/playback/action-navigation.test.ts
+@@ -1,6 +1,7 @@
+ import { afterEach, describe, expect, it, vi } from 'vitest';
+ 
+ import { PlaybackEngine } from '@/lib/playback/engine';
++import { hasPreGeneratedSpeechAudio } from '@/lib/playback/audio-availability';
+ import {
+   buildActionNavigationTargets,
+   canJumpWithinReconstructablePrefix,
+@@ -138,6 +139,20 @@ describe('action navigation helpers', () => {
+   });
+ });
+ 
++describe('pre-generated speech audio availability', () => {
++  it('detects audio references without consulting provider settings', () => {
++    expect(hasPreGeneratedSpeechAudio([speech('plain')])).toBe(false);
++    expect(
++      hasPreGeneratedSpeechAudio([{ ...speech('with-id'), audioId: 'formal-audio-1' } as Action]),
++    ).toBe(true);
++    expect(
++      hasPreGeneratedSpeechAudio([
++        { ...speech('with-url'), audioUrl: '/api/mira/audio/formal-1.wav' } as Action,
++      ]),
++    ).toBe(true);
++  });
++});
++
+ describe('action resume storage', () => {
+   it('stores action-level resume positions without time or progress fields', () => {
+     const storage = createMemoryStorage();
+@@ -530,6 +545,86 @@ describe('PlaybackEngine action navigation', () => {
+     expect(onSpeechEnd).not.toHaveBeenCalled();
+   });
+ 
++  it('plays referenced narration even when provider TTS is disabled', async () => {
++    const previousTtsEnabled = useSettingsStore.getState().ttsEnabled;
++    useSettingsStore.setState({ ttsEnabled: false });
++
++    try {
++      const { engine: actionEngine } = createActionEngine();
++      const { player } = createAudioPlayer(async () => true);
++      const action = {
++        ...speech('formal', 'Formal narration'),
++        audioId: 'formal-audio-1',
++        audioUrl: '/api/mira/audio/formal-1.wav',
++      } as Action;
++      const engine = new PlaybackEngine([scene([action])], actionEngine, player);
++
++      engine.start();
++      await flushPromises();
++
++      expect(player.play).toHaveBeenCalledWith('formal-audio-1', '/api/mira/audio/formal-1.wav');
++    } finally {
++      useSettingsStore.setState({ ttsEnabled: previousTtsEnabled });
++    }
++  });
++
++  it('reports referenced narration failures without replacing them with browser TTS', async () => {
++    vi.useFakeTimers();
++    const speak = vi.fn();
++    vi.stubGlobal('window', {
++      speechSynthesis: {
++        getVoices: () => [{ voiceURI: 'v1', lang: 'en-US' }],
++        cancel: vi.fn(),
++        speak,
++      },
++    });
++    const previous = useSettingsStore.getState();
++    useSettingsStore.setState({
++      ttsEnabled: true,
++      ttsProviderId: 'browser-native-tts',
++      ttsProvidersConfig: {
++        ...previous.ttsProvidersConfig,
++        'browser-native-tts': {
++          ...previous.ttsProvidersConfig['browser-native-tts'],
++          enabled: true,
++        },
++      },
++    });
++
++    try {
++      const { engine: actionEngine } = createActionEngine();
++      const { player } = createAudioPlayer(async () => false);
++      const onAudioPlaybackIssue = vi.fn();
++      const onComplete = vi.fn();
++      const action = {
++        ...speech('formal', '正式课程讲解'),
++        audioId: 'formal-audio-1',
++      } as Action;
++      const engine = new PlaybackEngine([scene([action])], actionEngine, player, {
++        onAudioPlaybackIssue,
++        onComplete,
++      });
++
++      engine.start();
++      await flushPromises();
++
++      expect(onAudioPlaybackIssue).toHaveBeenCalledWith({
++        actionId: 'formal',
++        reason: 'asset_unavailable',
++      });
++      expect(speak).not.toHaveBeenCalled();
++
++      await vi.advanceTimersByTimeAsync(5000);
++      expect(onComplete).toHaveBeenCalledTimes(1);
++    } finally {
++      useSettingsStore.setState({
++        ttsEnabled: previous.ttsEnabled,
++        ttsProviderId: previous.ttsProviderId,
++        ttsProvidersConfig: previous.ttsProvidersConfig,
++      });
++    }
++  });
++
+   it('jumping to the last line completes through normal completion flow', async () => {
+     vi.useFakeTimers();
+     const { engine: actionEngine } = createActionEngine();
+-- 
+2.50.1 (Apple Git-155)
+

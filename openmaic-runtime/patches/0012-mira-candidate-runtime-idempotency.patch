@@ -1,0 +1,1099 @@
+From 100a20dd699039966ecffa77d5b109ce46109316 Mon Sep 17 00:00:00 2001
+From: Codex Migration <codex-migration@local.invalid>
+Date: Wed, 2 Sep 2026 10:39:33 +0800
+Subject: [PATCH 12/37] 0012-mira-candidate-runtime-idempotency
+
+---
+ app/api/generate-classroom/[jobId]/route.ts   |  22 +-
+ app/api/generate-classroom/route.ts           | 110 +++++++--
+ app/api/health/route.ts                       |  42 +++-
+ lib/server/classroom-generation.ts            |   2 +
+ lib/server/classroom-job-runner.ts            |   5 +
+ lib/server/classroom-job-store.ts             | 179 +++++++++++++-
+ lib/server/mira-formal-generation-policy.ts   |  97 ++++++++
+ tests/server/health-route.test.ts             |  90 +++++++
+ ...ra-formal-generation-idempotency-worker.ts |  36 +++
+ ...mira-formal-generation-idempotency.test.ts | 233 ++++++++++++++++++
+ 10 files changed, 792 insertions(+), 24 deletions(-)
+ create mode 100644 lib/server/mira-formal-generation-policy.ts
+ create mode 100644 tests/server/mira-formal-generation-idempotency-worker.ts
+ create mode 100644 tests/server/mira-formal-generation-idempotency.test.ts
+
+diff --git a/app/api/generate-classroom/[jobId]/route.ts b/app/api/generate-classroom/[jobId]/route.ts
+index b6e45f7..ab433b2 100644
+--- a/app/api/generate-classroom/[jobId]/route.ts
++++ b/app/api/generate-classroom/[jobId]/route.ts
+@@ -1,10 +1,11 @@
+-import { type NextRequest } from 'next/server';
++import { after, type NextRequest } from 'next/server';
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import {
+   isValidClassroomJobId,
+   readClassroomGenerationJob,
+ } from '@/lib/server/classroom-job-store';
+ import { buildRequestOrigin } from '@/lib/server/classroom-storage';
++import { runClassroomGenerationJob } from '@/lib/server/classroom-job-runner';
+ import { createLogger } from '@/lib/logger';
+ 
+ const log = createLogger('ClassroomJob API');
+@@ -28,6 +29,16 @@ export async function GET(req: NextRequest, context: { params: Promise<{ jobId:
+ 
+     const pollUrl = `${buildRequestOrigin(req)}/api/generate-classroom/${jobId}`;
+ 
++    if (
++      job.runtimeRequestId &&
++      job.status === 'queued' &&
++      job.dispatchAmbiguous !== true &&
++      job.formalInput
++    ) {
++      const baseUrl = buildRequestOrigin(req);
++      after(() => runClassroomGenerationJob(job.id, job.formalInput!, baseUrl));
++    }
++
+     return apiSuccess({
+       jobId: job.id,
+       status: job.status,
+@@ -41,6 +52,14 @@ export async function GET(req: NextRequest, context: { params: Promise<{ jobId:
+       result: job.result,
+       error: job.error,
+       completedAt: job.completedAt,
++      ...(job.runtimeRequestId
++        ? {
++            runtimeRequestId: job.runtimeRequestId,
++            formalContractVersion: job.formalContractVersion,
++            formalInputSha256: job.formalInputSha256,
++            dispatchAmbiguous: job.dispatchAmbiguous === true,
++          }
++        : {}),
+       done: job.status === 'succeeded' || job.status === 'failed',
+     });
+   } catch (error) {
+@@ -49,7 +68,6 @@ export async function GET(req: NextRequest, context: { params: Promise<{ jobId:
+       'INTERNAL_ERROR',
+       500,
+       'Failed to retrieve classroom generation job',
+-      error instanceof Error ? error.message : String(error),
+     );
+   }
+ }
+diff --git a/app/api/generate-classroom/route.ts b/app/api/generate-classroom/route.ts
+index e93dc9e..264b3ed 100644
+--- a/app/api/generate-classroom/route.ts
++++ b/app/api/generate-classroom/route.ts
+@@ -3,7 +3,12 @@ import { nanoid } from 'nanoid';
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import { type GenerateClassroomInput } from '@/lib/server/classroom-generation';
+ import { runClassroomGenerationJob } from '@/lib/server/classroom-job-runner';
+-import { createClassroomGenerationJob } from '@/lib/server/classroom-job-store';
++import {
++  createClassroomGenerationJob,
++  createOrGetFormalClassroomGenerationJob,
++  readClassroomGenerationJobByRuntimeRequestId,
++  type ClassroomGenerationJob,
++} from '@/lib/server/classroom-job-store';
+ import { buildRequestOrigin } from '@/lib/server/classroom-storage';
+ import { createLogger } from '@/lib/logger';
+ 
+@@ -11,6 +16,66 @@ const log = createLogger('GenerateClassroom API');
+ 
+ export const maxDuration = 30;
+ 
++function jobResponse(req: NextRequest, job: ClassroomGenerationJob) {
++  const baseUrl = buildRequestOrigin(req);
++  return {
++    jobId: job.id,
++    status: job.status,
++    step: job.step,
++    progress: job.progress,
++    message: job.message,
++    pollUrl: `${baseUrl}/api/generate-classroom/${job.id}`,
++    pollIntervalMs: 5000,
++    scenesGenerated: job.scenesGenerated,
++    totalScenes: job.totalScenes,
++    result: job.result,
++    error: job.error,
++    completedAt: job.completedAt,
++    ...(job.runtimeRequestId
++      ? {
++          runtimeRequestId: job.runtimeRequestId,
++          formalContractVersion: job.formalContractVersion,
++          formalInputSha256: job.formalInputSha256,
++          dispatchAmbiguous: job.dispatchAmbiguous === true,
++        }
++      : {}),
++    done: job.status === 'succeeded' || job.status === 'failed',
++  };
++}
++
++function reconcileFormalDispatch(req: NextRequest, job: ClassroomGenerationJob) {
++  if (
++    job.runtimeRequestId &&
++    job.status === 'queued' &&
++    job.dispatchAmbiguous !== true &&
++    job.formalInput
++  ) {
++    const baseUrl = buildRequestOrigin(req);
++    after(() => runClassroomGenerationJob(job.id, job.formalInput!, baseUrl));
++  }
++}
++
++export async function GET(req: NextRequest) {
++  const runtimeRequestId = req.nextUrl.searchParams.get('runtimeRequestId') || '';
++  if (!runtimeRequestId) {
++    return apiError('MISSING_REQUIRED_FIELD', 400, 'Missing runtimeRequestId');
++  }
++  try {
++    const job = await readClassroomGenerationJobByRuntimeRequestId(runtimeRequestId);
++    if (!job) {
++      return apiError('INVALID_REQUEST', 404, 'Classroom generation job not found');
++    }
++    reconcileFormalDispatch(req, job);
++    return apiSuccess(jobResponse(req, job));
++  } catch (error) {
++    if (error instanceof Error && error.message === 'FORMAL_RUNTIME_REQUEST_ID_INVALID') {
++      return apiError('INVALID_REQUEST', 400, 'Invalid runtimeRequestId');
++    }
++    log.error('Formal classroom generation query failed:', error);
++    return apiError('INTERNAL_ERROR', 500, 'Failed to query classroom generation job');
++  }
++}
++
+ export async function POST(req: NextRequest) {
+   let requirementSnippet: string | undefined;
+   try {
+@@ -33,6 +98,12 @@ export async function POST(req: NextRequest) {
+         : {}),
+       ...(rawBody.enableTTS != null ? { enableTTS: rawBody.enableTTS } : {}),
+       ...(rawBody.agentMode ? { agentMode: rawBody.agentMode } : {}),
++      ...(rawBody.runtimeRequestId
++        ? { runtimeRequestId: rawBody.runtimeRequestId }
++        : {}),
++      ...(rawBody.formalRuntimeContract
++        ? { formalRuntimeContract: rawBody.formalRuntimeContract }
++        : {}),
+     };
+     const { requirement } = body;
+ 
+@@ -41,23 +112,31 @@ export async function POST(req: NextRequest) {
+     }
+ 
+     const baseUrl = buildRequestOrigin(req);
++    const formal = Boolean(body.runtimeRequestId || body.formalRuntimeContract);
++    if (formal) {
++      try {
++        const { job, created } = await createOrGetFormalClassroomGenerationJob(body);
++        reconcileFormalDispatch(req, job);
++        return apiSuccess(jobResponse(req, job), created ? 202 : 200);
++      } catch (error) {
++        const code = error instanceof Error ? error.message : '';
++        if (code === 'FORMAL_RUNTIME_REQUEST_CONFLICT') {
++          return apiError('INVALID_REQUEST', 409, 'runtimeRequestId conflict');
++        }
++        if (
++          code === 'FORMAL_RUNTIME_REQUEST_ID_INVALID' ||
++          code === 'FORMAL_RUNTIME_CONTRACT_INVALID' ||
++          code === 'FORMAL_RUNTIME_INPUT_POLICY_INVALID'
++        ) {
++          return apiError('INVALID_REQUEST', 400, 'Invalid formal Runtime request');
++        }
++        throw error;
++      }
++    }
+     const jobId = nanoid(10);
+     const job = await createClassroomGenerationJob(jobId, body);
+-    const pollUrl = `${baseUrl}/api/generate-classroom/${jobId}`;
+-
+     after(() => runClassroomGenerationJob(jobId, body, baseUrl));
+-
+-    return apiSuccess(
+-      {
+-        jobId,
+-        status: job.status,
+-        step: job.step,
+-        message: job.message,
+-        pollUrl,
+-        pollIntervalMs: 5000,
+-      },
+-      202,
+-    );
++    return apiSuccess(jobResponse(req, job), 202);
+   } catch (error) {
+     log.error(
+       `Classroom generation job creation failed [requirement="${requirementSnippet ?? 'unknown'}..."]:`,
+@@ -67,7 +146,6 @@ export async function POST(req: NextRequest) {
+       'INTERNAL_ERROR',
+       500,
+       'Failed to create classroom generation job',
+-      error instanceof Error ? error.message : 'Unknown error',
+     );
+   }
+ }
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+index 49810c5..242f434 100644
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -1,5 +1,7 @@
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
++import type { NextRequest } from 'next/server';
+ import {
++  getServerProviders,
+   getServerWebSearchProviders,
+   getServerImageProviders,
+   getServerVideoProviders,
+@@ -12,10 +14,43 @@ import { getMiraStructuredSceneRuntimePolicy } from '@/lib/server/model-routes';
+ import { getMiraSampleDeterministicRecoveryRuntimePolicy } from '@/lib/server/mira-sample-deterministic-recovery';
+ import { getMiraSampleTtsCredentialRecoveryRuntimePolicy } from '@/lib/server/mira-sample-tts-credential-recovery';
+ import { getMiraStudentChromeRuntimePolicy } from '@/lib/mira/student-runtime';
++import { getMiraFormalGenerationRuntimePolicy } from '@/lib/server/mira-formal-generation-policy';
+ 
+-const version = process.env.npm_package_version || '0.1.0';
++const version = process.env.npm_package_version || '0.3.2';
+ 
+-export async function GET() {
++export async function GET(req?: NextRequest) {
++  if (req?.nextUrl.searchParams.get('scope') === 'formal-generation') {
++    try {
++      const structuredScenePolicy = getMiraStructuredSceneRuntimePolicy();
++      const formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
++      const providers = getServerProviders();
++      const formalProvider = providers[structuredScenePolicy.providerId];
++      if (
++        !formalProvider ||
++        (formalProvider.models !== undefined &&
++          !formalProvider.models.includes(structuredScenePolicy.modelId))
++      ) {
++        throw new Error('Formal generation Kimi provider is not ready.');
++      }
++      return apiSuccess({
++        status: 'ok',
++        version,
++        capabilities: { formalGeneration: true, speechAudioGeneration: false },
++        runtimePolicy: {
++          structuredScene: structuredScenePolicy,
++          formalGeneration: formalGenerationPolicy,
++        },
++      });
++    } catch (error) {
++      return apiError(
++        'PROVIDER_DISABLED',
++        503,
++        error instanceof Error
++          ? error.message
++          : 'Formal generation policy is not ready',
++      );
++    }
++  }
+   const ttsProviders = getServerTTSProviders();
+   const asrProviders = getServerASRProviders();
+   let ttsPolicy;
+@@ -24,6 +59,7 @@ export async function GET() {
+   let deterministicRecoveryPolicy;
+   let ttsCredentialRecoveryPolicy;
+   let studentChromePolicy;
++  let formalGenerationPolicy;
+   try {
+     ttsPolicy = getMiraTtsPolicy();
+     assertMiraTtsProviderReady(ttsPolicy, ttsProviders);
+@@ -33,6 +69,7 @@ export async function GET() {
+     deterministicRecoveryPolicy = getMiraSampleDeterministicRecoveryRuntimePolicy();
+     ttsCredentialRecoveryPolicy = getMiraSampleTtsCredentialRecoveryRuntimePolicy();
+     studentChromePolicy = getMiraStudentChromeRuntimePolicy();
++    formalGenerationPolicy = getMiraFormalGenerationRuntimePolicy();
+   } catch (error) {
+     return apiError(
+       'PROVIDER_DISABLED',
+@@ -59,6 +96,7 @@ export async function GET() {
+       deterministicRecovery: deterministicRecoveryPolicy,
+       ttsCredentialRecovery: ttsCredentialRecoveryPolicy,
+       studentChrome: studentChromePolicy,
++      formalGeneration: formalGenerationPolicy,
+     },
+   });
+ }
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+index a0eade2..36b8d28 100644
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -65,6 +65,8 @@ export function containPBLGenerationError(error: unknown, sceneTitle: string): n
+ 
+ export interface GenerateClassroomInput {
+   requirement: string;
++  runtimeRequestId?: string;
++  formalRuntimeContract?: unknown;
+   pdfContent?: { text: string; images: string[] };
+   enableWebSearch?: boolean;
+   webSearchProviderId?: WebSearchProviderId;
+diff --git a/lib/server/classroom-job-runner.ts b/lib/server/classroom-job-runner.ts
+index b098bff..41030c4 100644
+--- a/lib/server/classroom-job-runner.ts
++++ b/lib/server/classroom-job-runner.ts
+@@ -4,6 +4,7 @@ import {
+   markClassroomGenerationJobFailed,
+   markClassroomGenerationJobRunning,
+   markClassroomGenerationJobSucceeded,
++  claimFormalClassroomGenerationDispatch,
+   updateClassroomGenerationJobProgress,
+ } from '@/lib/server/classroom-job-store';
+ 
+@@ -22,6 +23,10 @@ export function runClassroomGenerationJob(
+ 
+   const jobPromise = (async () => {
+     try {
++      if (input.runtimeRequestId) {
++        const claimed = await claimFormalClassroomGenerationDispatch(jobId);
++        if (!claimed) return;
++      }
+       await markClassroomGenerationJobRunning(jobId);
+ 
+       const result = await generateClassroom(input, {
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+index bfcbb0c..4c4070c 100644
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -1,4 +1,5 @@
+ import { promises as fs } from 'fs';
++import { createHash } from 'crypto';
+ import path from 'path';
+ import type {
+   ClassroomGenerationProgress,
+@@ -11,6 +12,7 @@ import {
+   ensureClassroomJobsDir,
+   writeJsonFileAtomic,
+ } from '@/lib/server/classroom-storage';
++import { assertMiraFormalGenerationInput } from '@/lib/server/mira-formal-generation-policy';
+ 
+ export type ClassroomGenerationJobStatus = 'queued' | 'running' | 'succeeded' | 'failed';
+ 
+@@ -22,6 +24,11 @@ export interface ClassroomGenerationJob {
+   message: string;
+   createdAt: string;
+   updatedAt: string;
++  runtimeRequestId?: string;
++  formalContractVersion?: string;
++  formalInputSha256?: string;
++  formalInput?: GenerateClassroomInput;
++  dispatchAmbiguous?: boolean;
+   startedAt?: string;
+   completedAt?: string;
+   inputSummary: {
+@@ -44,6 +51,10 @@ function jobFilePath(jobId: string) {
+   return path.join(CLASSROOM_JOBS_DIR, `${jobId}.json`);
+ }
+ 
++function formalDispatchMarkerPath(jobId: string) {
++  return path.join(CLASSROOM_JOBS_DIR, `${jobId}.formal-dispatch-started.json`);
++}
++
+ function buildInputSummary(input: GenerateClassroomInput): ClassroomGenerationJob['inputSummary'] {
+   return {
+     requirementPreview:
+@@ -54,6 +65,52 @@ function buildInputSummary(input: GenerateClassroomInput): ClassroomGenerationJo
+   };
+ }
+ 
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value as Record<string, unknown>)
++        .sort(([left], [right]) => left.localeCompare(right))
++        .map(([key, item]) => [key, canonical(item)]),
++    );
++  }
++  return value;
++}
++
++function sha256(value: string): string {
++  return createHash('sha256').update(value).digest('hex');
++}
++
++function formalJobId(runtimeRequestId: string): string {
++  return `omformal_${sha256(runtimeRequestId).slice(0, 24)}`;
++}
++
++async function writeJsonFileExclusiveAtomic(
++  filePath: string,
++  data: unknown,
++): Promise<boolean> {
++  await ensureClassroomJobsDir();
++  const tempPath = `${filePath}.${process.pid}.${Date.now()}.${Math.random()
++    .toString(16)
++    .slice(2)}.tmp`;
++  const handle = await fs.open(tempPath, 'wx');
++  try {
++    await handle.writeFile(JSON.stringify(data, null, 2), 'utf8');
++    await handle.sync();
++  } finally {
++    await handle.close();
++  }
++  try {
++    await fs.link(tempPath, filePath);
++    return true;
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false;
++    throw error;
++  } finally {
++    await fs.unlink(tempPath).catch(() => undefined);
++  }
++}
++
+ /** Simple per-job mutex to serialize read-modify-write on the same job file. */
+ const jobLocks = new Map<string, Promise<void>>();
+ 
+@@ -80,6 +137,13 @@ function markStaleIfNeeded(job: ClassroomGenerationJob): ClassroomGenerationJob
+   if (job.status !== 'running') return job;
+   const updatedAt = new Date(job.updatedAt).getTime();
+   if (Date.now() - updatedAt > STALE_JOB_TIMEOUT_MS) {
++    if (job.runtimeRequestId) {
++      return {
++        ...job,
++        dispatchAmbiguous: true,
++        message: 'Formal generation is stale and its dispatch outcome is unknown',
++      };
++    }
+     return {
+       ...job,
+       status: 'failed',
+@@ -119,13 +183,120 @@ export async function createClassroomGenerationJob(
+   return job;
+ }
+ 
++export async function createOrGetFormalClassroomGenerationJob(
++  input: GenerateClassroomInput,
++): Promise<{ job: ClassroomGenerationJob; created: boolean }> {
++  assertMiraFormalGenerationInput(input);
++  const jobId = formalJobId(input.runtimeRequestId);
++  const formalInput = JSON.parse(JSON.stringify(canonical(input))) as GenerateClassroomInput;
++  const inputSha256 = sha256(JSON.stringify(formalInput));
++  return withJobLock(jobId, async () => {
++    const existing = await readClassroomGenerationJob(jobId);
++    if (existing) {
++      if (
++        existing.runtimeRequestId !== input.runtimeRequestId ||
++        existing.formalContractVersion !== 'mira.openmaic.formal-runtime.v1' ||
++        existing.formalInputSha256 !== inputSha256
++      ) {
++        throw new Error('FORMAL_RUNTIME_REQUEST_CONFLICT');
++      }
++      return { job: existing, created: false };
++    }
++    const now = new Date().toISOString();
++    const job: ClassroomGenerationJob = {
++      id: jobId,
++      status: 'queued',
++      step: 'queued',
++      progress: 0,
++      message: 'Classroom generation job queued',
++      createdAt: now,
++      updatedAt: now,
++      runtimeRequestId: input.runtimeRequestId,
++      formalContractVersion: 'mira.openmaic.formal-runtime.v1',
++      formalInputSha256: inputSha256,
++      formalInput,
++      inputSummary: buildInputSummary(input),
++      scenesGenerated: 0,
++    };
++    const created = await writeJsonFileExclusiveAtomic(jobFilePath(jobId), job);
++    if (created) return { job, created: true };
++    const winner = await readStoredClassroomGenerationJob(jobId);
++    if (
++      !winner ||
++      winner.runtimeRequestId !== input.runtimeRequestId ||
++      winner.formalContractVersion !== 'mira.openmaic.formal-runtime.v1' ||
++      winner.formalInputSha256 !== inputSha256
++    ) {
++      throw new Error('FORMAL_RUNTIME_REQUEST_CONFLICT');
++    }
++    return { job: winner, created: false };
++  });
++}
++
++export async function claimFormalClassroomGenerationDispatch(
++  jobId: string,
++): Promise<boolean> {
++  const job = await readStoredClassroomGenerationJob(jobId);
++  if (
++    !job ||
++    job.status !== 'queued' ||
++    !job.runtimeRequestId ||
++    !job.formalInput ||
++    !job.formalInputSha256 ||
++    sha256(JSON.stringify(canonical(job.formalInput))) !== job.formalInputSha256
++  ) {
++    return false;
++  }
++  return writeJsonFileExclusiveAtomic(formalDispatchMarkerPath(jobId), {
++    schemaVersion: 'mira.openmaic.formal-dispatch-start.v1',
++    jobId,
++    runtimeRequestId: job.runtimeRequestId,
++    formalInputSha256: job.formalInputSha256,
++    startedAt: new Date().toISOString(),
++  });
++}
++
++export async function readClassroomGenerationJobByRuntimeRequestId(
++  runtimeRequestId: string,
++): Promise<ClassroomGenerationJob | null> {
++  if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(runtimeRequestId)) {
++    throw new Error('FORMAL_RUNTIME_REQUEST_ID_INVALID');
++  }
++  const job = await readClassroomGenerationJob(formalJobId(runtimeRequestId));
++  if (!job) return null;
++  if (job.runtimeRequestId !== runtimeRequestId) {
++    throw new Error('FORMAL_RUNTIME_REQUEST_CONFLICT');
++  }
++  return job;
++}
++
+ export async function readClassroomGenerationJob(
+   jobId: string,
++): Promise<ClassroomGenerationJob | null> {
++  const job = await readStoredClassroomGenerationJob(jobId);
++  if (!job) return null;
++  const observed = markStaleIfNeeded(job);
++  if (observed.runtimeRequestId && observed.status === 'queued') {
++    try {
++      await fs.access(formalDispatchMarkerPath(jobId));
++      return {
++        ...observed,
++        dispatchAmbiguous: true,
++        message: 'Formal dispatch started but no durable running state is available',
++      };
++    } catch (error) {
++      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
++    }
++  }
++  return observed;
++}
++
++async function readStoredClassroomGenerationJob(
++  jobId: string,
+ ): Promise<ClassroomGenerationJob | null> {
+   try {
+     const content = await fs.readFile(jobFilePath(jobId), 'utf-8');
+-    const job = JSON.parse(content) as ClassroomGenerationJob;
+-    return markStaleIfNeeded(job);
++    return JSON.parse(content) as ClassroomGenerationJob;
+   } catch (error) {
+     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+       return null;
+@@ -139,7 +310,7 @@ export async function updateClassroomGenerationJob(
+   patch: Partial<ClassroomGenerationJob>,
+ ): Promise<ClassroomGenerationJob> {
+   return withJobLock(jobId, async () => {
+-    const existing = await readClassroomGenerationJob(jobId);
++    const existing = await readStoredClassroomGenerationJob(jobId);
+     if (!existing) {
+       throw new Error(`Classroom generation job not found: ${jobId}`);
+     }
+@@ -159,7 +330,7 @@ export async function markClassroomGenerationJobRunning(
+   jobId: string,
+ ): Promise<ClassroomGenerationJob> {
+   return withJobLock(jobId, async () => {
+-    const existing = await readClassroomGenerationJob(jobId);
++    const existing = await readStoredClassroomGenerationJob(jobId);
+     if (!existing) {
+       throw new Error(`Classroom generation job not found: ${jobId}`);
+     }
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+new file mode 100644
+index 0000000..8512515
+--- /dev/null
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -0,0 +1,97 @@
++import type { GenerateClassroomInput } from '@/lib/server/classroom-generation';
++
++export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
++  'mira.openmaic.formal-runtime.v1' as const;
++
++export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
++  schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
++  exactSceneCount: 10,
++  orderedSceneTypes: [
++    'slide',
++    'slide',
++    'slide',
++    'slide',
++    'slide',
++    'quiz',
++    'quiz',
++    'interactive',
++    'interactive',
++    'interactive',
++  ],
++  sceneDistribution: { slide: 5, quiz: 2, interactive: 3 },
++  roster: { teacherCount: 1, peerCount: 4 },
++  speechRequiredForEveryScene: true,
++  distinctPeerDiscussions: 2,
++  teacherEvidence: ['spotlight', 'widget_highlight'],
++  interactive: {
++    requiredWidgetTypes: ['simulation', 'game', 'visualization3d'],
++    widgetConfigRequired: true,
++    productiveScriptRequired: true,
++    noopRejected: true,
++    fake3dRejected: true,
++  },
++  whiteboardRequired: false,
++} as const;
++
++export const MIRA_FORMAL_GENERATION_POLICY = {
++  enforced: true,
++  policyId: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
++  idempotencyKey: 'runtimeRequestId',
++  queryByRuntimeRequestId: true,
++  speechAudioGenerated: false,
++  contract: MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++} as const;
++
++const REQUEST_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') {
++    return Object.fromEntries(
++      Object.entries(value as Record<string, unknown>)
++        .sort(([left], [right]) => left.localeCompare(right))
++        .map(([key, item]) => [key, canonical(item)]),
++    );
++  }
++  return value;
++}
++
++export function isExactMiraFormalRuntimeContract(value: unknown): boolean {
++  return (
++    JSON.stringify(canonical(value)) ===
++    JSON.stringify(canonical(MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT))
++  );
++}
++
++export function assertMiraFormalGenerationInput(
++  input: GenerateClassroomInput,
++): asserts input is GenerateClassroomInput & {
++  runtimeRequestId: string;
++  formalRuntimeContract: typeof MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT;
++} {
++  if (!REQUEST_ID.test(input.runtimeRequestId || '')) {
++    throw new Error('FORMAL_RUNTIME_REQUEST_ID_INVALID');
++  }
++  if (!isExactMiraFormalRuntimeContract(input.formalRuntimeContract)) {
++    throw new Error('FORMAL_RUNTIME_CONTRACT_INVALID');
++  }
++  if (
++    !input.requirement.trim() ||
++    input.pdfContent !== undefined ||
++    input.enableWebSearch !== false ||
++    input.enableImageGeneration !== false ||
++    input.enableVideoGeneration !== false ||
++    input.enableTTS !== false ||
++    input.agentMode !== 'generate' ||
++    input.webSearchProviderId !== undefined ||
++    input.webSearchApiKey !== undefined ||
++    input.webSearchModelId !== undefined ||
++    input.baiduSubSources !== undefined
++  ) {
++    throw new Error('FORMAL_RUNTIME_INPUT_POLICY_INVALID');
++  }
++}
++
++export function getMiraFormalGenerationRuntimePolicy() {
++  return MIRA_FORMAL_GENERATION_POLICY;
++}
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 2552f90..f56a05d 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -1,6 +1,10 @@
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ 
+ vi.mock('@/lib/server/provider-config', () => ({
++  getServerProviders: () =>
++    process.env.KIMI_API_KEY
++      ? { kimi: { models: ['kimi-k2.6'] } }
++      : {},
+   getServerWebSearchProviders: () => ({}),
+   getServerImageProviders: () => ({}),
+   getServerVideoProviders: () => ({}),
+@@ -120,6 +124,42 @@ describe('GET /api/health structured scene runtime policy', () => {
+         avatar: '/avatars/teacher-2.png',
+       },
+     });
++    expect(body.runtimePolicy.formalGeneration).toEqual({
++      enforced: true,
++      policyId: 'mira.openmaic.formal-runtime.v1',
++      idempotencyKey: 'runtimeRequestId',
++      queryByRuntimeRequestId: true,
++      speechAudioGenerated: false,
++      contract: {
++        schemaVersion: 'mira.openmaic.formal-runtime.v1',
++        exactSceneCount: 10,
++        orderedSceneTypes: [
++          'slide',
++          'slide',
++          'slide',
++          'slide',
++          'slide',
++          'quiz',
++          'quiz',
++          'interactive',
++          'interactive',
++          'interactive',
++        ],
++        sceneDistribution: { slide: 5, quiz: 2, interactive: 3 },
++        roster: { teacherCount: 1, peerCount: 4 },
++        speechRequiredForEveryScene: true,
++        distinctPeerDiscussions: 2,
++        teacherEvidence: ['spotlight', 'widget_highlight'],
++        interactive: {
++          requiredWidgetTypes: ['simulation', 'game', 'visualization3d'],
++          widgetConfigRequired: true,
++          productiveScriptRequired: true,
++          noopRejected: true,
++          fake3dRejected: true,
++        },
++        whiteboardRequired: false,
++      },
++    });
+     const serialized = JSON.stringify(body);
+     expect(serialized).not.toContain('fake-secret-must-not-leak');
+     expect(serialized).not.toContain('fake-base-url-must-not-leak');
+@@ -127,6 +167,56 @@ describe('GET /api/health structured scene runtime policy', () => {
+     expect(serialized).not.toContain('baseUrl');
+   });
+ 
++  it('reports formal generation readiness without sample TTS or ASR readiness', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY =
++      'kimi-k2.6-thinking-disabled-v1';
++    delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS;
++    delete process.env.MIRA_OPENMAIC_QWEN_TTS_MODEL;
++    delete process.env.MIRA_OPENMAIC_QWEN_TTS_VOICE;
++    delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_ASR;
++    delete process.env.MIRA_OPENMAIC_QWEN_ASR_MODEL;
++    process.env.KIMI_API_KEY = 'formal-generation-test-key';
++    const { NextRequest } = await import('next/server');
++    const { GET } = await import('@/app/api/health/route');
++    const response = await GET(
++      new NextRequest('http://runtime.test/api/health?scope=formal-generation'),
++    );
++    const body = await response.json();
++
++    expect(response.status).toBe(200);
++    expect(body.version).toBe('0.3.2');
++    expect(body.capabilities).toEqual({
++      formalGeneration: true,
++      speechAudioGeneration: false,
++    });
++    expect(body.runtimePolicy.formalGeneration).toMatchObject({
++      policyId: 'mira.openmaic.formal-runtime.v1',
++      speechAudioGenerated: false,
++    });
++    expect(body.runtimePolicy.tts).toBeUndefined();
++    expect(body.runtimePolicy.asr).toBeUndefined();
++  });
++
++  it('fails formal generation readiness when the Kimi server credential is absent', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY =
++      'kimi-k2.6-thinking-disabled-v1';
++    delete process.env.KIMI_API_KEY;
++    const { NextRequest } = await import('next/server');
++    const { GET } = await import('@/app/api/health/route');
++    const response = await GET(
++      new NextRequest('http://runtime.test/api/health?scope=formal-generation'),
++    );
++    const body = await response.json();
++
++    expect(response.status).toBe(503);
++    expect(body).toMatchObject({
++      success: false,
++      errorCode: 'PROVIDER_DISABLED',
++      error: 'Formal generation Kimi provider is not ready.',
++    });
++    expect(JSON.stringify(body)).not.toContain('apiKey');
++  });
++
+   it('returns 503 when the fixed policy env is missing', async () => {
+     const { GET } = await import('@/app/api/health/route');
+     const response = await GET();
+diff --git a/tests/server/mira-formal-generation-idempotency-worker.ts b/tests/server/mira-formal-generation-idempotency-worker.ts
+new file mode 100644
+index 0000000..01ce71b
+--- /dev/null
++++ b/tests/server/mira-formal-generation-idempotency-worker.ts
+@@ -0,0 +1,36 @@
++import process from 'process';
++
++async function main() {
++  const [, , tempRoot, action, encoded] = process.argv;
++  if (!tempRoot || !action || !encoded) process.exit(2);
++  process.chdir(tempRoot);
++
++  const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8')) as Record<
++    string,
++    unknown
++  >;
++  const store = await import('../../lib/server/classroom-job-store');
++
++  if (action === 'create') {
++    const startAt = Number(payload.startAt || 0);
++    if (startAt > Date.now()) {
++      await new Promise((resolve) => setTimeout(resolve, startAt - Date.now()));
++    }
++    const result = await store.createOrGetFormalClassroomGenerationJob(
++      payload.input as never,
++    );
++    process.stdout.write(JSON.stringify({ jobId: result.job.id, created: result.created }));
++  } else if (action === 'claim') {
++    const claimed = await store.claimFormalClassroomGenerationDispatch(
++      String(payload.jobId || ''),
++    );
++    process.stdout.write(JSON.stringify({ claimed }));
++  } else {
++    process.exit(2);
++  }
++}
++
++main().catch((error) => {
++  process.stderr.write(String(error instanceof Error ? error.stack : error));
++  process.exit(1);
++});
+diff --git a/tests/server/mira-formal-generation-idempotency.test.ts b/tests/server/mira-formal-generation-idempotency.test.ts
+new file mode 100644
+index 0000000..cd874ce
+--- /dev/null
++++ b/tests/server/mira-formal-generation-idempotency.test.ts
+@@ -0,0 +1,233 @@
++import { promises as fs } from 'fs';
++import { spawn } from 'child_process';
++import os from 'os';
++import path from 'path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++const afterSpy = vi.fn();
++const runSpy = vi.fn();
++
++vi.mock('next/server', async (importOriginal) => {
++  const actual = await importOriginal<typeof import('next/server')>();
++  return {
++    ...actual,
++    after: (callback: () => unknown) => afterSpy(callback),
++  };
++});
++
++vi.mock('@/lib/server/classroom-job-runner', () => ({
++  runClassroomGenerationJob: (...args: unknown[]) => runSpy(...args),
++}));
++
++describe('Mira formal generation request idempotency', () => {
++  let originalCwd: string;
++  let tempRoot: string;
++
++  function runWorker(action: 'create' | 'claim', payload: object): Promise<Record<string, unknown>> {
++    const worker = path.join(
++      originalCwd,
++      'tests/server/mira-formal-generation-idempotency-worker.ts',
++    );
++    const tsx = path.join(originalCwd, 'node_modules/.bin/tsx');
++    const encoded = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url');
++    return new Promise((resolve, reject) => {
++      const child = spawn(tsx, [worker, tempRoot, action, encoded], {
++        cwd: originalCwd,
++        env: { ...process.env },
++        stdio: ['ignore', 'pipe', 'pipe'],
++      });
++      let stdout = '';
++      let stderr = '';
++      child.stdout.on('data', (chunk) => { stdout += String(chunk); });
++      child.stderr.on('data', (chunk) => { stderr += String(chunk); });
++      child.on('error', reject);
++      child.on('close', (code) => {
++        if (code !== 0) {
++          reject(new Error(`worker failed (${code}): ${stderr || stdout}`));
++          return;
++        }
++        resolve(JSON.parse(stdout) as Record<string, unknown>);
++      });
++    });
++  }
++
++  beforeEach(async () => {
++    originalCwd = process.cwd();
++    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-formal-runtime-'));
++    process.chdir(tempRoot);
++    afterSpy.mockReset();
++    runSpy.mockReset();
++    vi.resetModules();
++  });
++
++  afterEach(async () => {
++    process.chdir(originalCwd);
++    await fs.rm(tempRoot, { recursive: true, force: true });
++  });
++
++  it('converges concurrent creates and rejects a changed replay', async () => {
++    const policy = await import('@/lib/server/mira-formal-generation-policy');
++    const store = await import('@/lib/server/classroom-job-store');
++    const input = {
++      requirement: 'formal requirement',
++      runtimeRequestId: 'mira-formal-request-1',
++      formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      enableWebSearch: false,
++      enableImageGeneration: false,
++      enableVideoGeneration: false,
++      enableTTS: false,
++      agentMode: 'generate' as const,
++    };
++
++    const results = await Promise.all(
++      Array.from({ length: 8 }, () =>
++        store.createOrGetFormalClassroomGenerationJob(input),
++      ),
++    );
++
++    expect(new Set(results.map((result) => result.job.id)).size).toBe(1);
++    expect(results.filter((result) => result.created)).toHaveLength(1);
++    expect(
++      await store.readClassroomGenerationJobByRuntimeRequestId(
++        input.runtimeRequestId,
++      ),
++    ).toMatchObject({
++      id: results[0].job.id,
++      runtimeRequestId: input.runtimeRequestId,
++      formalContractVersion: 'mira.openmaic.formal-runtime.v1',
++    });
++
++    await expect(
++      store.createOrGetFormalClassroomGenerationJob({
++        ...input,
++        requirement: 'changed replay',
++      }),
++    ).rejects.toThrow('FORMAL_RUNTIME_REQUEST_CONFLICT');
++    await expect(
++      store.createOrGetFormalClassroomGenerationJob({
++        ...input,
++        enableTTS: true,
++      }),
++    ).rejects.toThrow('FORMAL_RUNTIME_INPUT_POLICY_INVALID');
++  });
++
++  it('atomically creates and claims one formal dispatch across Node processes', async () => {
++    const policy = await import('@/lib/server/mira-formal-generation-policy');
++    const input = {
++      requirement: 'formal cross-process requirement',
++      runtimeRequestId: 'mira-formal-cross-process-request-1',
++      formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      enableWebSearch: false,
++      enableImageGeneration: false,
++      enableVideoGeneration: false,
++      enableTTS: false,
++      agentMode: 'generate' as const,
++    };
++    const startAt = Date.now() + 1_000;
++    const creates = await Promise.all(
++      Array.from({ length: 8 }, () => runWorker('create', { input, startAt })),
++    );
++    expect(new Set(creates.map((value) => value.jobId)).size).toBe(1);
++    expect(creates.filter((value) => value.created === true)).toHaveLength(1);
++
++    const claims = await Promise.all(
++      Array.from({ length: 8 }, () =>
++        runWorker('claim', { jobId: creates[0].jobId }),
++      ),
++    );
++    expect(claims.filter((value) => value.claimed === true)).toHaveLength(1);
++  }, 30_000);
++
++  it('POST replay and GET reconcile a queued crash window without losing identity', async () => {
++    const policy = await import('@/lib/server/mira-formal-generation-policy');
++    const { NextRequest } = await import('next/server');
++    const route = await import('@/app/api/generate-classroom/route');
++    const payload = {
++      requirement: 'formal requirement',
++      runtimeRequestId: 'mira-formal-route-request-1',
++      formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      enableWebSearch: false,
++      enableImageGeneration: false,
++      enableVideoGeneration: false,
++      enableTTS: false,
++      agentMode: 'generate',
++    };
++    const request = () =>
++      new NextRequest('http://runtime.test/api/generate-classroom', {
++        method: 'POST',
++        headers: { 'content-type': 'application/json' },
++        body: JSON.stringify(payload),
++      });
++
++    const first = await route.POST(request());
++    const replay = await route.POST(request());
++    const firstBody = await first.json();
++    const replayBody = await replay.json();
++
++    expect(first.status).toBe(202);
++    expect(replay.status).toBe(200);
++    expect(replayBody.jobId).toBe(firstBody.jobId);
++    expect(afterSpy).toHaveBeenCalledTimes(2);
++
++    const queried = await route.GET(
++      new NextRequest(
++        'http://runtime.test/api/generate-classroom?runtimeRequestId=mira-formal-route-request-1',
++      ),
++    );
++    expect(queried.status).toBe(200);
++    const queriedBody = await queried.json();
++    expect(queriedBody).toMatchObject({
++      jobId: firstBody.jobId,
++      status: 'queued',
++      done: false,
++      runtimeRequestId: payload.runtimeRequestId,
++      formalContractVersion: 'mira.openmaic.formal-runtime.v1',
++    });
++    expect(queriedBody.formalInputSha256).toMatch(/^[a-f0-9]{64}$/);
++    expect(afterSpy).toHaveBeenCalledTimes(3);
++  });
++
++  it('never converts a stale formal running job into an explicit failed result', async () => {
++    const policy = await import('@/lib/server/mira-formal-generation-policy');
++    const store = await import('@/lib/server/classroom-job-store');
++    const input = {
++      requirement: 'formal stale requirement',
++      runtimeRequestId: 'mira-formal-stale-request-1',
++      formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
++      enableWebSearch: false,
++      enableImageGeneration: false,
++      enableVideoGeneration: false,
++      enableTTS: false,
++      agentMode: 'generate' as const,
++    };
++    const { job } = await store.createOrGetFormalClassroomGenerationJob(input);
++    await store.updateClassroomGenerationJob(job.id, { status: 'running' });
++    const jobPath = path.join(tempRoot, 'data', 'classroom-jobs', `${job.id}.json`);
++    const persisted = JSON.parse(await fs.readFile(jobPath, 'utf8')) as Record<
++      string,
++      unknown
++    >;
++    persisted.updatedAt = new Date(Date.now() - 31 * 60 * 1000).toISOString();
++    await fs.writeFile(jobPath, JSON.stringify(persisted), 'utf8');
++
++    const stale = await store.readClassroomGenerationJob(job.id);
++    expect(stale?.status).toBe('running');
++    expect(stale?.dispatchAmbiguous).toBe(true);
++  });
++
++  it('does not expose raw internal errors in a formal POST 500 response', async () => {
++    const { NextRequest } = await import('next/server');
++    const route = await import('@/app/api/generate-classroom/route');
++    const response = await route.POST(
++      new NextRequest('http://runtime.test/api/generate-classroom', {
++        method: 'POST',
++        headers: { 'content-type': 'application/json' },
++        body: '{broken-json',
++      }),
++    );
++    const body = await response.json();
++    expect(response.status).toBe(500);
++    expect(JSON.stringify(body)).not.toContain('JSON');
++    expect(body.details).toBeUndefined();
++  });
++});
+-- 
+2.50.1 (Apple Git-155)
+

@@ -11,7 +11,7 @@ class HomeHabitHero extends StatelessWidget {
     required this.safeTop,
     required this.scrollOffset,
     required this.isLoading,
-    required     this.panelOverlap,
+    required this.panelOverlap,
     this.onOpenPending,
     this.pendingCount = 0,
   });
@@ -187,6 +187,11 @@ class HomeHabitHero extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              const SizedBox(width: 10),
+                              // The real button is a top Stack layer in
+                              // HomeScreen so the opaque scroll view cannot
+                              // intercept its hit test. Keep its layout space.
+                              const SizedBox(width: 48, height: 48),
                               // V1: notification entry has no destination page yet.
                               // if (onOpenPending != null) ...[
                               // const SizedBox(width: 10),
@@ -328,6 +333,45 @@ class HomeHabitHero extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class HomeStudentQrButton extends StatelessWidget {
+  const HomeStudentQrButton({required this.onTap, super.key});
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: '扫码登录学习网页',
+      child: Semantics(
+        button: true,
+        enabled: onTap != null,
+        label: '扫码登录学习网页',
+        child: Material(
+          color: Colors.black.withValues(alpha: 0.20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
+          ),
+          child: InkWell(
+            key: const ValueKey('homeStudentQrScanButton'),
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              width: 48,
+              height: 48,
+              child: Icon(
+                Icons.qr_code_scanner_rounded,
+                color: Colors.white.withValues(alpha: onTap == null ? 0.58 : 1),
+                size: 23,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

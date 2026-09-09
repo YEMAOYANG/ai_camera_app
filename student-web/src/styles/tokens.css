@@ -1,0 +1,65 @@
+:root {
+  --mira-bg: #f8fafd;
+  --mira-bg-warm: #f7f7f3;
+  --mira-surface: #ffffff;
+  --mira-surface-soft: #f3f7f8;
+  --mira-ink: #142033;
+  --mira-muted: #66758a;
+  --mira-subtle: #8a96a8;
+  --mira-brand: #2f6cf6;
+  --mira-brand-deep: #2459d6;
+  --mira-brand-wash: #eaf1ff;
+  --mira-ai: #6d5df7;
+  --mira-sky: #dff3ff;
+  --mira-mint: #daf4e7;
+  --mira-mint-deep: #397864;
+  --mira-sun: #ffd166;
+  --mira-sun-soft: #fff1c7;
+  --mira-peach: #ffdfd0;
+  --mira-lilac: #ebe5ff;
+  --mira-buddy-body: #f8fbff;
+  --mira-buddy-line: #2a4a85;
+  --mira-buddy-cheek: #ffb8ae;
+  --mira-buddy-mouth: #ff8c7a;
+  --mira-buddy-antenna: #ffd166;
+  --mira-buddy-book: #bfead4;
+  --mira-success: #2f8f68;
+  --mira-warning: #d8922b;
+  --mira-danger: #b64a4a;
+  --mira-border: #e2e8f0;
+  --mira-border-soft: #eaf0f6;
+  --mira-disabled: #e9eef4;
+  --mira-radius-control: 14px;
+  --mira-radius-button: 15px;
+  --mira-radius-card: 22px;
+  --mira-radius-playful: 30px;
+  --mira-radius-hero: 28px;
+  --mira-shadow-card: 0 18px 54px rgba(33, 54, 89, 0.09);
+  --mira-shadow-action: 0 14px 28px rgba(36, 89, 214, 0.2);
+  --mira-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --mira-duration-fast: 160ms;
+  --mira-duration-base: 260ms;
+}
+
+@theme inline {
+  --color-background: var(--mira-bg);
+  --color-surface: var(--mira-surface);
+  --color-ink: var(--mira-ink);
+  --color-muted: var(--mira-muted);
+  --color-brand: var(--mira-brand);
+  --color-brand-deep: var(--mira-brand-deep);
+  --color-brand-wash: var(--mira-brand-wash);
+  --color-border: var(--mira-border);
+  --font-sans: var(--font-mira-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
