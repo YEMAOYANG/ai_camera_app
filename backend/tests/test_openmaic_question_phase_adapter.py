@@ -3318,7 +3318,7 @@ class OpenMaicQuestionPhaseAdapterTest(unittest.TestCase):
             ),
             grade_code="primary_2",
         )
-        with self.assertRaisesRegex(ValueError, "gradeCode must be primary_1"):
+        with self.assertRaisesRegex(ValueError, "unregistered formal grade/subject/skill"):
             self._adapter().canonicalize_phase(other_grade)
 
     def test_phase3_exact_letters_round_trips_malicious_raw_without_provider_key(self):

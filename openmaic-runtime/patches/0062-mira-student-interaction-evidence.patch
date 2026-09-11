@@ -1,0 +1,581 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -71,6 +71,7 @@
+   shouldShowMiraStudentStartGate,
+ } from '@/lib/mira/student-runtime';
+ import { toast } from 'sonner';
++import { requiredInteractionsBeforeScene } from '@/lib/mira/student-interaction-bridge';
+ import {
+   finishGuidedDiscussionPlayback,
+   type GuidedDiscussionPlayback,
+@@ -896,9 +897,9 @@
+           onProactiveHide: () => {
+             setDiscussionTrigger(null);
+           },
+-          onDiscussionConfirmed: (topic, prompt, agentId) => {
++          onDiscussionConfirmed: (topic, prompt, agentId, actionId) => {
+             // Start SSE discussion via ChatArea
+-            handleDiscussionSSE(topic, prompt, agentId, engine, currentScene.id);
++            handleDiscussionSSE(topic, prompt, agentId, engine, currentScene.id, actionId);
+           },
+           onDiscussionEnd: () => {
+             // Abort any active SSE
+@@ -1134,6 +1135,7 @@
+         agentId: string | undefined,
+         engine: PlaybackEngine,
+         sceneId: string,
++        actionId?: string,
+       ) => {
+         if (engineRef.current !== engine || useStageStore.getState().currentSceneId !== sceneId)
+           return;
+@@ -1143,6 +1145,7 @@
+             topic,
+             prompt,
+             agentId: agentId || 'default-1',
++            ...(studentMode && actionId ? { miraScriptedAction: { sceneId, actionId } } : {}),
+           },
+           (sessionId) => {
+             const binding = { engine, sceneId, settled: false };
+@@ -1163,7 +1166,7 @@
+         // Optimistic thinking: show thinking dots immediately (same as onMessageSend)
+         setThinkingState({ stage: 'director' });
+       },
+-      [],
++      [studentMode],
+     );
+ 
+     // First speech text for idle display (extracted here for playbackView)
+@@ -1240,6 +1243,17 @@
+           setPendingSceneId(null);
+           return false;
+         }
++        if (studentMode && runtimeEvents) {
++          const required = requiredInteractionsBeforeScene(useStageStore.getState().scenes, targetSceneId);
++          if (!runtimeEvents.hasCompletedInteractions(required)) {
++            try { await runtimeEvents.resume(); }
++            catch { toast.info('操作进度还没保存好，请再点一次下一页。'); return false; }
++            if (!runtimeEvents.hasCompletedInteractions(required)) {
++              toast.info('先动手试一试，看看结果为什么会变，再进入下一页。');
++              return false;
++            }
++          }
++        }
+         if (isTopicActive) {
+           setPendingSceneId(targetSceneId);
+           return false;
+@@ -1250,7 +1264,7 @@
+         setCurrentSceneId(targetSceneId);
+         return true;
+       },
+-      [armSelectedSceneAutoStart, currentSceneId, isTopicActive, setCurrentSceneId],
++      [armSelectedSceneAutoStart, currentSceneId, isTopicActive, setCurrentSceneId, studentMode, runtimeEvents],
+     );
+ 
+     /** User confirmed scene switch via AlertDialog */
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -16,6 +16,9 @@
+ import { intersectClientBoxes } from '@/lib/edit/visible-client-rect';
+ import { useCanvasStore } from '@/lib/store/canvas';
+ import { useElementRefsStore } from '@/lib/store/element-refs';
++import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
++import { useStageStore } from '@/lib/store/stage';
++import { connectStudentInteractionFrame, studentInteractionObjectives } from '@/lib/mira/student-interaction-bridge';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+ import {
+   ELEMENT_REF_SELECTOR_MAX,
+@@ -155,6 +158,9 @@
+  */
+ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+   const { t } = useI18n();
++  const runtimeEvents = useMiraStudentRuntimeEvents();
++  const visibleRef = useRef(visible);
++  visibleRef.current = visible;
+   const iframeRef = useRef<HTMLIFrameElement>(null);
+   const registerIframe = useWidgetIframeStore((s) => s.registerIframe);
+   const getSendMessage = useWidgetIframeStore((s) => s.getSendMessage);
+@@ -168,6 +174,31 @@
+       ),
+     [refs, sceneId],
+   );
++
++  useEffect(() => {
++    const frame = iframeRef.current;
++    if (!frame || !runtimeEvents || !visible) return;
++    const scenes = [...useStageStore.getState().scenes].sort((a, b) => a.order - b.order);
++    const sceneIndex = scenes.findIndex(scene => scene.id === sceneId);
++    const objectives = studentInteractionObjectives(scenes).filter(item => item.operation.sceneId === sceneId);
++    if (sceneIndex < 0 || !objectives.length) return;
++    let disconnect = () => {};
++    const connect = () => {
++      disconnect();
++      disconnect = connectStudentInteractionFrame({ frame, objectives,
++        active: () => visibleRef.current && useStageStore.getState().currentSceneId === sceneId,
++        onOperation: operation => {
++          void runtimeEvents.interactionCompleted({ sceneIndex, sceneId, ...operation }).then(async () => {
++            const finalScene = scenes.at(-1);
++            if (finalScene) await runtimeEvents.completeWhenReady({ sceneIndex: scenes.length - 1, sceneId: finalScene.id });
++          }).catch(error => console.error('[Mira Runtime] Failed to save student interaction', error));
++        },
++      });
++    };
++    frame.addEventListener('load', connect);
++    connect();
++    return () => { frame.removeEventListener('load', connect); disconnect(); };
++  }, [entry.srcDoc, runtimeEvents, sceneId, visible]);
+ 
+   // Register the postMessage callback for this scene (moved here from the
+   // placeholder, since the iframe now lives in the host). Stable per scene:
+diff --git a/lib/mira/student-interaction-bridge.ts b/lib/mira/student-interaction-bridge.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/student-interaction-bridge.ts
+@@ -0,0 +1,112 @@
++import type { Scene } from '@/lib/types/stage';
++import type { InteractionObjective } from '@/lib/server/mira-formal-interaction-design';
++import { interactionPayload, type MiraInteractionOperation } from './student-runtime-events';
++
++/** The persisted plan is public teaching data. The backend independently binds
++ * every submission to the frozen professional receipt, never to this parser. */
++export function studentInteractionObjectives(scenes: readonly Scene[]): InteractionObjective[] {
++  const first = [...scenes].sort((a, b) => a.order - b.order).find(scene => scene.type === 'interactive');
++  if (first?.content.type !== 'interactive') return [];
++  const scripts = [...(first.content.html ?? '').matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)];
++  const plans = scripts.filter(match => /\bid\s*=\s*["']mira-interaction-plan["']/i.test(match[1]) &&
++    /\btype\s*=\s*["']application\/json["']/i.test(match[1]));
++  if (plans.length !== 1) return [];
++  try {
++    const value = JSON.parse(plans[0][2]);
++    return value.schemaVersion === 'mira.openmaic.interaction-design-plan.v1' && Array.isArray(value.objectives)
++      ? value.objectives.filter((item: InteractionObjective) => Number.isInteger(item?.objectiveIndex) &&
++        item.objectiveIndex >= 0 && item.objectiveIndex < 30 && item.operation?.sceneId && item.feedback?.sceneId)
++      : [];
++  } catch { return []; }
++}
++
++export function requiredInteractionsBeforeScene(scenes: readonly Scene[], targetSceneId: string): number[] {
++  const target = scenes.find(scene => scene.id === targetSceneId);
++  if (!target) return [];
++  return studentInteractionObjectives(scenes).filter(objective => {
++    const operation = scenes.find(scene => scene.id === objective.operation.sceneId);
++    return operation && operation.order < target.order;
++  }).map(objective => objective.objectiveIndex);
++}
++
++/** Only this private port is an observation channel. General iframe postMessage,
++ * teacher widget actions, another frame and closed/hidden scenes cannot submit. */
++export function connectStudentInteractionFrame(options: {
++  frame: HTMLIFrameElement;
++  objectives: readonly InteractionObjective[];
++  onOperation: (operation: MiraInteractionOperation) => void;
++  active: () => boolean;
++}): () => void {
++  const channel = new MessageChannel();
++  let connected = true;
++  channel.port1.onmessage = (event) => {
++    if (!connected || !options.active()) return;
++    try {
++      const operation = interactionPayload(event.data);
++      const objective = options.objectives.find(item => item.objectiveIndex === operation.objectiveIndex);
++      if (!objective || objective.operation.controlSelector !== operation.controlSelector ||
++          objective.operation.action !== operation.action ||
++          (objective.operation.action !== 'click' && objective.operation.value !== operation.value) ||
++          !operation.feedbackText.includes(objective.feedback.textIncludes) ||
++          !operation.feedbackText.includes(objective.feedback.reasonQuote)) return;
++      options.onOperation(operation);
++    } catch { /* Malformed iframe observations never enter the event stream. */ }
++  };
++  options.frame.contentWindow?.postMessage({ type: 'mira:observe-student-interactions', objectives: options.objectives }, '*', [channel.port2]);
++  return () => { connected = false; channel.port1.onmessage = null; channel.port1.close(); };
++}
++
++/** Inject before generated scripts. A captured native MessageChannel endpoint
++ * remains in this closure; page scripts only see the ordinary DOM controls.
++ * This records browser interaction, not a tamper-proof remote attestation. */
++export const STUDENT_INTERACTION_OBSERVER = `<script data-mira-student-interaction-observer>
++(function () {
++  var port = null, objectives = [], pending = new Map(), completed = new Set();
++  var query = document.querySelector.bind(document);
++  var schedule = window.setTimeout.bind(window);
++  var textGetter = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerText').get;
++  var send = MessagePort.prototype.postMessage;
++  function text(node) { return textGetter.call(node).trim().slice(0, 2000); }
++  function feedback(item, control) {
++    var node = query(item.feedback.selector);
++    if (!(node instanceof HTMLElement) || node === control || node.contains(control) || control.contains(node) ||
++        /^(BUTTON|INPUT|SELECT|TEXTAREA)$/.test(node.tagName)) return null;
++    var rect = node.getBoundingClientRect();
++    if (!rect.width || !rect.height || (node.checkVisibility && !node.checkVisibility({checkOpacity:true,checkVisibilityCSS:true}))) return null;
++    return node;
++  }
++  window.addEventListener('message', function (event) {
++    if (event.source !== window.parent || event.data?.type !== 'mira:observe-student-interactions' || !event.ports[0]) return;
++    event.stopImmediatePropagation();
++    if (port) port.close();
++    port = event.ports[0]; objectives = Array.isArray(event.data.objectives) ? event.data.objectives : [];
++    pending.clear(); completed.clear();
++  }, true);
++  function observed(event) {
++    if (!event.isTrusted || !port) return;
++    objectives.forEach(function (item) {
++      if (completed.has(item.objectiveIndex)) return;
++      var op = item.operation, control = query(op.controlSelector);
++      if (!control || !(event.target === control || control.contains(event.target))) return;
++      if ((op.action === 'click' ? 'click' : op.action === 'select' ? 'change' : 'input') !== event.type) return;
++      var value = op.action === 'click' ? '' : String(control.value);
++      if (op.action !== 'click' && value !== op.value) return;
++      var node = feedback(item, control);
++      if (!node) return;
++      var before = text(node), currentPort = port, ticket = {};
++      pending.set(item.objectiveIndex, ticket);
++      var started = performance.now();
++      function inspect() {
++        if (port !== currentPort || pending.get(item.objectiveIndex) !== ticket) return;
++        var result = feedback(item, control), after = result ? text(result) : '';
++        if (after && after !== before && after.includes(item.feedback.textIncludes) && after.includes(item.feedback.reasonQuote)) {
++          completed.add(item.objectiveIndex); pending.delete(item.objectiveIndex);
++          send.call(currentPort, {objectiveIndex:item.objectiveIndex, controlSelector:op.controlSelector, action:op.action, value:value, feedbackText:after});
++        } else if (performance.now() - started < 2000) schedule(inspect, 40);
++      }
++      schedule(inspect, 0);
++    });
++  }
++  ['click','input','change'].forEach(function (type) { window.addEventListener(type, observed, true); });
++})();
++</script>`;
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+--- a/lib/mira/student-runtime-events.ts
++++ b/lib/mira/student-runtime-events.ts
+@@ -2,6 +2,14 @@
+ const RECEIPT_SCHEMA = 'mira.openmaic.student-runtime-event-receipt.v1' as const;
+ const STATE_VERSION = 1 as const;
+ const STORAGE_PREFIX = 'mira:student-runtime-events:v1:';
++
++export type MiraInteractionOperation = {
++  readonly objectiveIndex: number;
++  readonly controlSelector: string;
++  readonly action: 'click' | 'fill' | 'range' | 'select';
++  readonly value: string;
++  readonly feedbackText: string;
++};
+ 
+ type SceneIdentity = {
+   readonly sceneIndex: number;
+@@ -43,6 +51,12 @@
+   | {
+       readonly schemaVersion: typeof EVENT_SCHEMA;
+       readonly sequence: number;
++      readonly type: 'interaction_completed';
++      readonly payload: SceneIdentity & MiraInteractionOperation;
++    }
++  | {
++      readonly schemaVersion: typeof EVENT_SCHEMA;
++      readonly sequence: number;
+       readonly type: 'classroom_completed';
+       readonly payload: SceneIdentity;
+     };
+@@ -73,6 +87,7 @@
+   readonly completed: boolean;
+   readonly completionReady: boolean;
+   readonly answeredQuestionIds: readonly string[];
++  readonly completedInteractionObjectiveIndexes?: readonly number[];
+ }
+ 
+ interface RuntimeReceipt {
+@@ -98,6 +113,8 @@
+       readonly transcript: string;
+     },
+   ): Promise<void>;
++  interactionCompleted(payload: SceneIdentity & MiraInteractionOperation): Promise<void>;
++  hasCompletedInteractions(objectiveIndexes: readonly number[]): boolean;
+   completeWhenReady(payload: SceneIdentity): Promise<boolean>;
+   classroomCompleted(payload: SceneIdentity): Promise<void>;
+ }
+@@ -121,6 +138,7 @@
+   let synchronized = false;
+   let lastStatus: RuntimeStatus | null = null;
+   let tail: Promise<void> = Promise.resolve();
++  let completedInteractions = new Set<number>();
+ 
+   const persist = () => safeSet(storage, storageKey, JSON.stringify(state));
+ 
+@@ -153,6 +171,7 @@
+     persist();
+     synchronized = true;
+     lastStatus = status;
++    completedInteractions = new Set(status.completedInteractionObjectiveIndexes ?? []);
+     return status;
+   };
+ 
+@@ -173,6 +192,7 @@
+     if (!result.ok) throw runtimeRequestError(result.status, body);
+     const receipt = runtimeReceipt(body, pending.event.sequence);
+     rememberEmitted(state, pending.eventKey);
++    if (pending.event.type === 'interaction_completed') completedInteractions.add(pending.event.payload.objectiveIndex);
+     state.nextSequence = receipt.sequence + 1;
+     state.completed = receipt.completed === true;
+     state.pending = null;
+@@ -191,6 +211,7 @@
+       persist();
+       return;
+     }
++    if (type === 'interaction_completed' && completedInteractions.has((payload as MiraInteractionOperation).objectiveIndex)) return;
+     if (state.emittedKeys.includes(eventKey)) return;
+     await flushPending();
+     if (state.emittedKeys.includes(eventKey)) return;
+@@ -249,6 +270,8 @@
+         turnId: identifier(payload.turnId, 'turnId'),
+         transcript: asrTranscript(payload.transcript),
+       }),
++    interactionCompleted: (payload) => record('interaction_completed', { ...scenePayload(payload), ...interactionPayload(payload) }),
++    hasCompletedInteractions: (indexes) => indexes.every(index => completedInteractions.has(index)),
+     completeWhenReady: (payload) => {
+       const completionPayload = scenePayload(payload) as EventPayload<'classroom_completed'>;
+       const operation = tail
+@@ -334,12 +357,25 @@
+       'action_completed',
+       'answer_submitted',
+       'asr_transcribed',
++      'interaction_completed',
+       'classroom_completed',
+     ].includes(String(event.type)) &&
+     !!event.payload &&
+     typeof event.payload === 'object' &&
+     !Array.isArray(event.payload)
+   );
++}
++
++export function interactionPayload(value: MiraInteractionOperation): MiraInteractionOperation {
++  if (!Number.isInteger(value.objectiveIndex) || value.objectiveIndex < 0 || value.objectiveIndex >= 30 ||
++      !/^#[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(value.controlSelector) ||
++      !['click', 'fill', 'range', 'select'].includes(value.action) ||
++      typeof value.value !== 'string' || value.value.length > 500 ||
++      (value.action === 'click' && value.value !== '') ||
++      typeof value.feedbackText !== 'string' || !value.feedbackText.trim() || value.feedbackText.length > 2000)
++    throw new Error('Mira Runtime interaction evidence is invalid');
++  return { objectiveIndex: value.objectiveIndex, controlSelector: value.controlSelector,
++    action: value.action, value: value.value, feedbackText: value.feedbackText };
+ }
+ 
+ function scenePayload(value: SceneIdentity): SceneIdentity {
+@@ -392,7 +428,10 @@
+       (questionId) =>
+         typeof questionId === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(questionId),
+     ) ||
+-    new Set(body.answeredQuestionIds).size !== body.answeredQuestionIds.length
++    new Set(body.answeredQuestionIds).size !== body.answeredQuestionIds.length ||
++    (body.completedInteractionObjectiveIndexes !== undefined &&
++      (!Array.isArray(body.completedInteractionObjectiveIndexes) || !body.completedInteractionObjectiveIndexes.every(
++        index => Number.isInteger(index) && index >= 0 && index < 30)))
+   ) {
+     throw new Error('Mira Runtime returned an invalid event status');
+   }
+@@ -432,6 +471,10 @@
+ }
+ 
+ function stableEventKey(type: EventType, payload: object): string {
++  if (type === 'interaction_completed') {
++    const operation = payload as EventPayload<'interaction_completed'>;
++    return `${type}:${canonicalJson({ sceneId: operation.sceneId, objectiveIndex: operation.objectiveIndex })}`;
++  }
+   if (type === 'answer_submitted') {
+     const answer = payload as EventPayload<'answer_submitted'>;
+     return `${type}:${canonicalJson({
+diff --git a/lib/playback/engine.ts b/lib/playback/engine.ts
+--- a/lib/playback/engine.ts
++++ b/lib/playback/engine.ts
+@@ -402,6 +402,7 @@
+       this.currentTrigger.question,
+       this.currentTrigger.prompt,
+       this.currentTrigger.agentId,
++      this.currentTrigger.id,
+     );
+     this.currentTrigger = null;
+   }
+diff --git a/lib/playback/types.ts b/lib/playback/types.ts
+--- a/lib/playback/types.ts
++++ b/lib/playback/types.ts
+@@ -50,7 +50,7 @@
+   onProactiveHide?: () => void;
+ 
+   // Discussion lifecycle
+-  onDiscussionConfirmed?: (topic: string, prompt?: string, agentId?: string) => void;
++  onDiscussionConfirmed?: (topic: string, prompt?: string, agentId?: string, actionId?: string) => void;
+   onDiscussionEnd?: () => void;
+   onUserInterrupt?: (text: string) => void;
+ 
+diff --git a/lib/utils/iframe.ts b/lib/utils/iframe.ts
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -1,3 +1,4 @@
++import { STUDENT_INTERACTION_OBSERVER } from '@/lib/mira/student-interaction-bridge';
+ import { injectIntoDocumentHead } from './html-document';
+ 
+ /**
+@@ -301,7 +302,7 @@
+ </style>`;
+ 
+   const injection =
+-    '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss;
++    '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss;
+ 
+   return injectIntoDocumentHead(html, injection);
+ }
+diff --git a/tests/playback/discussion-consumption.test.ts b/tests/playback/discussion-consumption.test.ts
+--- a/tests/playback/discussion-consumption.test.ts
++++ b/tests/playback/discussion-consumption.test.ts
+@@ -116,3 +116,18 @@
+     expect(snapshotsWith(onProgress, 'disc-join').length).toBeGreaterThan(0);
+   });
+ });
++
++
++it('passes the exact persisted scripted action identity only when the discussion is confirmed', async () => {
++  vi.useFakeTimers();
++  const onDiscussionConfirmed = vi.fn();
++  const engine = new PlaybackEngine([scene([discussion('scripted-action-1', 'teacher-1')])],
++    createActionEngine(), createAudioPlayer(), { onDiscussionConfirmed });
++  try {
++    engine.start();
++    await vi.advanceTimersByTimeAsync(3100);
++    expect(onDiscussionConfirmed).not.toHaveBeenCalled();
++    engine.confirmDiscussion();
++    expect(onDiscussionConfirmed).toHaveBeenCalledWith('topic-scripted-action-1', 'prompt-scripted-action-1', 'teacher-1', 'scripted-action-1');
++  } finally { engine.stop(); vi.useRealTimers(); }
++});
+diff --git a/tests/runtime/mira-student-interaction-bridge.browser.test.ts b/tests/runtime/mira-student-interaction-bridge.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/mira-student-interaction-bridge.browser.test.ts
+@@ -0,0 +1,74 @@
++import { describe, expect, it } from 'vitest';
++import { chromium } from 'playwright-core';
++import { createRequire } from 'node:module';
++import { patchHtmlForIframe } from '@/lib/utils/iframe';
++
++const objective = { objectiveIndex: 0, demonstration: {sceneId:'demo',quote:'先看示范'},
++  operation:{sceneId:'operate',controlSelector:'#quantity',action:'range',value:'12'},
++  feedback:{sceneId:'operate',selector:'#result',textIncludes:'一个十两个一',reasonQuote:'十个一是一个十'},
++  independentJudgment:{sceneId:'quiz',questionId:'q4'} };
++const original = `<input aria-label="数量" id="quantity" type="range" min="0" max="20" value="2"><output id="result">两个一</output>
++<script>quantity.oninput=()=>{result.textContent=Number(quantity.value)===12?'一个十两个一，因为十个一是一个十':'当前数量'+quantity.value}</script>`;
++const escape = (value: string) => value.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')('actual student operation browser bridge', () => {
++  it('accepts trusted manipulation and rejects teacher scripts, postMessage forgery and stale/hidden channels', async () => {
++    const require = createRequire(import.meta.url);
++    const { build } = createRequire(require.resolve('tsx'))('esbuild');
++    const bundle = await build({ stdin:{ resolveDir:process.cwd(), loader:'ts', contents:`
++      import {connectStudentInteractionFrame} from './lib/mira/student-interaction-bridge';
++      window.events=[]; window.active=true;
++      window.connect=()=>{ window.disconnect?.(); window.disconnect=connectStudentInteractionFrame({
++        frame:document.querySelector('iframe'), objectives:${JSON.stringify([objective])},
++        active:()=>window.active, onOperation:op=>window.events.push(op) }); };
++      window.connect();` }, bundle:true, write:false, format:'iife', platform:'browser', logLevel:'silent' });
++    const browser = await chromium.launch({ executablePath:process.env.MIRA_FORMAL_QA_BROWSER_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless:true });
++    try {
++      const page = await browser.newPage();
++      await page.route('**/*', route=>route.abort());
++      await page.setContent(`<iframe sandbox="allow-scripts" srcdoc="${escape(patchHtmlForIframe(original))}"></iframe>`);
++      await page.addScriptTag({content:bundle.outputFiles[0].text});
++      const frame = page.frames().find(frame=>frame !== page.mainFrame())!;
++      await frame.evaluate(()=>{const range=document.querySelector('input')!; range.value='12'; range.dispatchEvent(new Event('input',{bubbles:true})); window.parent.postMessage({objectiveIndex:0,passed:true},'*');});
++      await page.waitForTimeout(100);
++      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events)).toEqual([]);
++      // Reset via page script; only subsequent trusted keyboard input may complete.
++      await frame.evaluate(()=>{const range=document.querySelector('input')!; range.value='11'; document.querySelector('output')!.textContent='当前数量11';});
++      await frame.getByRole('slider').focus();
++      await frame.getByRole('slider').press('ArrowRight');
++      await page.waitForFunction(()=> (window as unknown as {events:unknown[]}).events.length===1);
++      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events[0])).toMatchObject({objectiveIndex:0,value:'12',feedbackText:'一个十两个一，因为十个一是一个十'});
++      // A kept-alive scene may still run scripts, but its closed/hidden host port is inert.
++      await page.evaluate(()=>{const w=window as unknown as {active:boolean;disconnect:()=>void};w.active=false;w.disconnect();});
++      await frame.evaluate(()=>{const range=document.querySelector('input')!;range.value='11';document.querySelector('output')!.textContent='当前数量11';});
++      await frame.getByRole('slider').press('ArrowRight');
++      await page.waitForTimeout(100);
++      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events.length)).toBe(1);
++      // Re-entry opens a fresh channel; the old document's observation cannot cross a scene swap.
++      await page.evaluate(()=>{const w=window as unknown as {active:boolean;connect:()=>void};w.active=true;w.connect();});
++      await frame.evaluate(()=>{const range=document.querySelector('input')!;range.value='11';document.querySelector('output')!.textContent='当前数量11';});
++      await frame.getByRole('slider').press('ArrowRight');
++      await page.waitForFunction(()=> (window as unknown as {events:unknown[]}).events.length===2);
++      // Hidden descendants cannot manufacture "visible" result evidence.
++      await page.evaluate(()=> (window as unknown as {connect:()=>void}).connect());
++      await frame.evaluate(()=>{
++        const range=document.querySelector('input')!, result=document.querySelector('output')!;
++        range.value='11'; result.innerHTML='<span>可见结果没有变化</span><span id="hidden-result" style="display:none">等待</span>';
++        range.oninput=()=>{document.querySelector('#hidden-result')!.textContent='一个十两个一，因为十个一是一个十';};
++      });
++      await frame.getByRole('slider').press('ArrowRight');
++      await page.waitForTimeout(100);
++      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events.length)).toBe(2);
++      await page.evaluate(()=> (window as unknown as {connect:()=>void}).connect());
++      await frame.evaluate(()=>{
++        const range=document.querySelector('input')!, result=document.querySelector('output')!;
++        range.value='11'; result.textContent='当前数量11'; result.style.opacity='0';
++        range.oninput=()=>{result.textContent='一个十两个一，因为十个一是一个十';};
++      });
++      await frame.getByRole('slider').press('ArrowRight');
++      await page.waitForTimeout(100);
++      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events.length)).toBe(2);
++
++    } finally { await browser.close(); }
++  }, 30_000);
++});
+diff --git a/tests/runtime/mira-student-interaction-bridge.test.ts b/tests/runtime/mira-student-interaction-bridge.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/mira-student-interaction-bridge.test.ts
+@@ -0,0 +1,23 @@
++import { describe, expect, it } from 'vitest';
++import type { Scene } from '@/lib/types/stage';
++import { studentInteractionObjectives, requiredInteractionsBeforeScene } from '@/lib/mira/student-interaction-bridge';
++
++const objective = { objectiveIndex: 0, demonstration: { sceneId: 'demo', quote: '把两个部分合起来' },
++  operation: { sceneId: 'operate', controlSelector: '#quantity', action: 'range', value: '12' },
++  feedback: { sceneId: 'operate', selector: '#result', textIncludes: '一个十两个一', reasonQuote: '十个一是一个十' },
++  independentJudgment: { sceneId: 'quiz', questionId: 'q4' } };
++const scenes = [
++  { id: 'demo', order: 0, type: 'slide', content: { type: 'slide' } },
++  { id: 'operate', order: 1, type: 'interactive', content: { type: 'interactive', html:
++    `<script type="application/json" id="mira-interaction-plan">${JSON.stringify({schemaVersion:'mira.openmaic.interaction-design-plan.v1',objectives:[objective]})}</script>` } },
++  { id: 'quiz', order: 2, type: 'quiz', content: { type: 'quiz', questions: [] } },
++] as Scene[];
++describe('student interaction teaching-plan navigation', () => {
++  it('leaves historical courses unaffected and requires operation before later independent pages', () => {
++    expect(studentInteractionObjectives([])).toEqual([]);
++    expect(studentInteractionObjectives(scenes)).toEqual([objective]);
++    expect(requiredInteractionsBeforeScene(scenes, 'operate')).toEqual([]);
++    expect(requiredInteractionsBeforeScene(scenes, 'quiz')).toEqual([0]);
++    expect(requiredInteractionsBeforeScene(scenes, 'demo')).toEqual([]);
++  });
++});
+diff --git a/tests/runtime/mira-student-runtime-events.test.ts b/tests/runtime/mira-student-runtime-events.test.ts
+--- a/tests/runtime/mira-student-runtime-events.test.ts
++++ b/tests/runtime/mira-student-runtime-events.test.ts
+@@ -570,3 +570,23 @@
+     ]);
+   });
+ });
++
++it('records acknowledged operations once, restores them from server status and rejects synthetic grades', async () => {
++  const submitted: unknown[] = [];
++  const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
++    if (init?.method !== 'POST') return response({ ...status(0), completedInteractionObjectiveIndexes: [1] });
++    const event = JSON.parse(String(init.body)); submitted.push(event);
++    return response({ ok: true, sequence: event.sequence, receiptSha256: 'a'.repeat(64) });
++  });
++  const client = createMiraStudentRuntimeEventClient({ classroomId: 'interaction', fetcher, storage: memoryStorage() });
++  await client.resume();
++  expect(client.hasCompletedInteractions([0, 1])).toBe(false);
++  const payload = { sceneIndex: 1, sceneId: 'operate', objectiveIndex: 0, controlSelector: '#quantity',
++    action: 'range' as const, value: '12', feedbackText: '一个十两个一，因为十个一是一个十' };
++  await client.interactionCompleted(payload);
++  await client.interactionCompleted({ ...payload, feedbackText: payload.feedbackText + '。' });
++  expect(client.hasCompletedInteractions([0, 1])).toBe(true);
++  expect(submitted).toHaveLength(1);
++  expect(submitted[0]).toMatchObject({ type: 'interaction_completed', payload });
++  expect(() => client.interactionCompleted({ ...payload, objectiveIndex: 30 })).toThrow();
++});

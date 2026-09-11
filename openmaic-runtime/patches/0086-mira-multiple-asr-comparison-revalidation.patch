@@ -1,0 +1,326 @@
+diff --git a/lib/server/mira-formal-audio-lifecycle.ts b/lib/server/mira-formal-audio-lifecycle.ts
+--- a/lib/server/mira-formal-audio-lifecycle.ts
++++ b/lib/server/mira-formal-audio-lifecycle.ts
+@@ -1,7 +1,7 @@
+ import { createHash } from 'node:crypto';
+ import type { Action } from '@/lib/types/action';
+ import type { Scene, Stage } from '@/lib/types/stage';
+-import type { AsrComparisonReference, AsrComparisonRevalidation } from './mira-formal-asr-revalidation';
++import type { AsrComparisonReferences, AsrComparisonRevalidation } from './mira-formal-asr-revalidation';
+ import { qualitySha } from './mira-formal-quality-contract';
+ import {
+   assertMiraFormalAudioProviderReady,
+@@ -161,7 +161,7 @@
+ }
+ 
+ export interface MiraFormalAudioLifecycleOptions {
+-  asrComparisonRevalidation?: AsrComparisonReference;
++  asrComparisonRevalidation?: AsrComparisonReferences;
+   onProgress?: (progress: {
+     phase: 'tts' | 'asr';
+     completed: number;
+@@ -323,16 +323,18 @@
+ }
+ 
+ export function miraFormalAsrSimilarityBps(expected: string, actual: string): number {
++  // Long otherwise identical sentences must not conceal a wrong fraction,
++  // decimal or percentage behind the edit-distance threshold. Preserve order,
++  // numerator/denominator and every significant digit; do not erase numbers.
++  // Extract before removing punctuation: "一百，五分之三" contains a
++  // fraction with denominator five, never the invented "一百五分之三".
++  const mathValues = (text: string) => text.normalize('NFKC').match(
++    /百分之[零一二两三四五六七八九十百千万亿]+(?:点[零一二三四五六七八九]+)?|[零一二两三四五六七八九十百千万亿]+分之[零一二两三四五六七八九十百千万亿]+|[零一二两三四五六七八九十百千万亿]+点[零一二三四五六七八九]+/gu,
++  )?.map(token => token.replaceAll('两', '二')) ?? [];
++  if (JSON.stringify(mathValues(expected)) !== JSON.stringify(mathValues(actual))) return 0;
+   let left = normalizeMiraFormalAsrText(expected);
+   let right = normalizeMiraFormalAsrText(actual);
+   if (!left || !right) return 0;
+-  // Long otherwise identical sentences must not conceal a wrong fraction,
+-  // decimal or percentage behind the edit-distance threshold. Preserve order,
+-  // numerator/denominator and every significant digit; do not erase numbers.
+-  const mathValues = (text: string) => text.match(
+-    /百分之[零一二两三四五六七八九十百千万亿]+(?:点[零一二三四五六七八九]+)?|[零一二两三四五六七八九十百千万亿]+分之[零一二两三四五六七八九十百千万亿]+|[零一二两三四五六七八九十百千万亿]+点[零一二三四五六七八九]+/gu,
+-  )?.map(token => token.replaceAll('两', '二')) ?? [];
+-  if (JSON.stringify(mathValues(left)) !== JSON.stringify(mathValues(right))) return 0;
+   if (left.length < right.length) [left, right] = [right, left];
+   let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+   for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+@@ -520,14 +522,15 @@
+   }
+   const { classroomContentSha256, segments } = buildLifecycleSegments(input);
+   const expectedSegmentCount = segments.length;
+-  let savedComparison: AsrComparisonRevalidation | undefined;
++  const savedComparisons = new Map<string, AsrComparisonRevalidation>();
+   if (options.asrComparisonRevalidation) {
+-    if (!segments.some(segment => segment.asrRequestId === options.asrComparisonRevalidation?.asrRequestId))
++    const { readValidatedAsrComparison, normalizeAsrComparisonReferences } = await import('./mira-formal-asr-revalidation');
++    const references = normalizeAsrComparisonReferences(options.asrComparisonRevalidation);
++    if (references.some(reference => !segments.some(segment => segment.asrRequestId === reference.asrRequestId)))
+       throw new Error('SAVED_ASR_COMPARISON_SEGMENT_MISSING');
+-    const { readValidatedAsrComparison } = await import('./mira-formal-asr-revalidation');
+-    savedComparison = await readValidatedAsrComparison({
+-      reference: options.asrComparisonRevalidation, stage: input.stage, scenes: input.scenes,
+-    });
++    // Validate the whole set before the first missing segment can call a provider.
++    for (const reference of references) savedComparisons.set(reference.asrRequestId,
++      await readValidatedAsrComparison({ reference, stage: input.stage, scenes: input.scenes }));
+   }
+   let providerReady = false;
+   const ensureProviderReady = () => {
+@@ -596,9 +599,8 @@
+       ensureProviderReady();
+       asrRecord = (await dependencies.executeAsr(asrRequest, transcriptEvidence)).record;
+     }
+-    let comparisonRevalidation: AsrComparisonRevalidation | undefined;
+-    if (savedComparison?.binding.asrRequestId === asrRecord.requestId) {
+-      comparisonRevalidation = savedComparison;
++    const comparisonRevalidation = savedComparisons.get(asrRecord.requestId);
++    if (comparisonRevalidation) {
+       if (qualitySha(asrRecord) !== comparisonRevalidation.source.asrRecordSha256)
+         throw new Error('SAVED_ASR_COMPARISON_SOURCE_CHANGED');
+       // This is a derived acceptance view only. The original ASR job and its
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -4,7 +4,7 @@
+   withPaidBudget,
+ } from './mira-paid-budget';
+ import { createHash } from 'node:crypto';
+-import type { AsrComparisonReference } from './mira-formal-asr-revalidation';
++import { normalizeAsrComparisonReferences, type AsrComparisonReferences } from './mira-formal-asr-revalidation';
+ import { access } from 'node:fs/promises';
+ import { constants as fsConstants } from 'node:fs';
+ 
+@@ -1308,7 +1308,7 @@
+     recoveredScenes?: Scene[];
+     recheckUnsentBrowserReview?: boolean;
+     cachedQualityOnly?: boolean;
+-    asrComparisonRevalidation?: AsrComparisonReference;
++    asrComparisonRevalidation?: AsrComparisonReferences;
+     approvedReviewGrant?: FormalQualityReviewGrant;
+   },
+ ): Promise<MiraFormalProfessionalRecoveryCompletion> {
+@@ -1450,7 +1450,7 @@
+     totalScenes: scenes.length,
+   });
+   if (options.asrComparisonRevalidation && (!options.cachedQualityOnly ||
+-    options.asrComparisonRevalidation.sessionId !== identity.sessionId))
++    normalizeAsrComparisonReferences(options.asrComparisonRevalidation).some(reference => reference.sessionId !== identity.sessionId)))
+     throw new Error('SAVED_ASR_COMPARISON_CONTEXT_INVALID');
+   const formalAudio: MiraFormalAudioLifecycleReceipt = await completeMiraFormalAudioLifecycle(
+     { buildItemId: spec.buildItemId, subject: spec.course.subject, stage, scenes },
+@@ -1602,7 +1602,7 @@
+   input: GenerateClassroomInput,
+   repair: MiraSavedStageRecoveryInput,
+   options: { baseUrl: string; cachedQualityOnly?: boolean; approvedReviewGrant?: FormalQualityReviewGrant;
+-    asrComparisonRevalidation?: AsrComparisonReference;
++    asrComparisonRevalidation?: AsrComparisonReferences;
+     onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void },
+ ) {
+   const prepared = await prepareMiraFormalSavedStageRecovery(input, repair);
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -21,6 +21,7 @@
+ import { claimUnsentBrowserRecheck } from '../lib/server/mira-formal-browser-recheck';
+ import { parsePaidBudget } from '../lib/server/mira-paid-budget';
+ import { revalidateSavedAsrComparison, readValidatedAsrComparison,
++  normalizeAsrComparisonReferences, asrComparisonClaimSha256,
+   type AsrComparisonReference } from '../lib/server/mira-formal-asr-revalidation';
+ 
+ const sha = (value: Buffer) => createHash('sha256').update(value).digest('hex');
+@@ -136,9 +137,8 @@
+       || Date.now() - Date.parse(preflight.checkedAt) > 24 * 60 * 60 * 1000)
+     throw new Error('SAVED_STAGE_BROWSER_PREFLIGHT_REQUIRED');
+   let audioTailReceipt: string | undefined;
+-  let asrComparisonRevalidation: AsrComparisonReference | undefined;
++  let asrComparisonRevalidation: AsrComparisonReference[] | undefined;
+   if (mode === 'complete-audio-tail' || mode === 'complete-audio-comparison-tail') {
+-    const repairedAsr = await readMiraFormalAsrJob(manifest.asrSourceRequestId);
+     const qualityFolders = await fs.readdir(path.join(process.cwd(), 'data/formal-quality-reviews'));
+     let cachedPass = false;
+     for (const directory of qualityFolders) {
+@@ -154,15 +154,18 @@
+       } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+     }
+     if (mode === 'complete-audio-comparison-tail') {
+-      const reference = manifest.asrComparisonRevalidation as AsrComparisonReference | undefined;
+-      if (!cachedPass || !reference || reference.sessionId !== prepared.sessionId ||
++      const references = normalizeAsrComparisonReferences(manifest.asrComparisonRevalidation);
++      if (!cachedPass || !references.length || references.some(reference => reference.sessionId !== prepared.sessionId ||
+         reference.stageId !== prepared.stage.id || reference.snapshotSha256 !== snapshotSha256 ||
+-        reference.sourceJobSha256 !== identity.sourceJobSha256 || reference.asrRequestId !== manifest.asrSourceRequestId)
++        reference.sourceJobSha256 !== identity.sourceJobSha256) ||
++        (manifest.asrSourceRequestId && !references.some(reference => reference.asrRequestId === manifest.asrSourceRequestId)))
+         throw new Error('SAVED_ASR_COMPARISON_CONTEXT_INVALID');
+-      const receipt = await readValidatedAsrComparison({reference,stage:prepared.stage,scenes:prepared.scenes});
+-      asrComparisonRevalidation=reference;
+-      audioTailReceipt=receipt.receiptSha256;
++      for (const reference of references)
++        await readValidatedAsrComparison({reference,stage:prepared.stage,scenes:prepared.scenes});
++      asrComparisonRevalidation=references;
++      audioTailReceipt=asrComparisonClaimSha256(references);
+     } else {
++    const repairedAsr = await readMiraFormalAsrJob(manifest.asrSourceRequestId);
+     if (!cachedPass || !repairedAsr || repairedAsr.classroomId !== prepared.stage.id
+         || repairedAsr.state !== 'succeeded' || (repairedAsr.similarityBps ?? 0) < 8500
+         || !('operatorRepair' in repairedAsr)) throw new Error('SAVED_STAGE_VERIFIED_AUDIO_REPAIR_REQUIRED');
+@@ -205,7 +208,8 @@
+     recoveryId: `omsaved_${qualitySha(identity).slice(0, 24)}`, completedAt: new Date().toISOString(),
+     newAgentSessions: 0, newSearches: 0, ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}),
+     ...(browserRecheckSha256 ? { browserRecheckSha256 } : {}),
+-    ...(asrComparisonRevalidation ? { asrComparisonRevalidationReceiptSha256: asrComparisonRevalidation.receiptSha256 } : {}),
++    ...(asrComparisonRevalidation ? { asrComparisonRevalidationReceiptSha256: audioTailReceipt,
++      asrComparisonRevalidationReceipts: asrComparisonRevalidation } : {}),
+     result: completion.result };
+   const receiptSha256 = qualitySha(receipt);
+   await writeJsonFileAtomic(path.join(folder, 'completion.json'), { ...receipt, receiptSha256 });
+diff --git a/lib/server/mira-formal-asr-revalidation.ts b/lib/server/mira-formal-asr-revalidation.ts
+--- a/lib/server/mira-formal-asr-revalidation.ts
++++ b/lib/server/mira-formal-asr-revalidation.ts
+@@ -12,6 +12,7 @@
+   sessionId: string; stageId: string; snapshotSha256: string; sourceJobSha256: string; asrRequestId: string;
+ };
+ export type AsrComparisonReference = AsrComparisonBinding & { receiptSha256: string };
++export type AsrComparisonReferences = AsrComparisonReference | AsrComparisonReference[];
+ type TranscriptArchive = { requestId: string; audioSha256: string; transcript: string; transcriptSha256: string };
+ type OriginalSources = { asrRecord: MiraFormalAsrJob; ttsRecord: MiraFormalTtsJob;
+   transcriptArchive: TranscriptArchive; spokenText: string; audio: Uint8Array };
+@@ -21,6 +22,33 @@
+   'teacherProfileVersion','teacherProfileSha256','teacherGender','sceneId','sceneOrder','actionId','narrationSegmentId'] as const;
+ function fail(): never { throw new Error('SAVED_ASR_COMPARISON_SOURCE_INVALID'); }
+ const audioRoot = () => process.env.MIRA_FORMAL_AUDIO_DATA_DIR || path.join(process.cwd(),'data/formal-audio');
++
++/** One receipt per original ASR. A set cannot mix classroom or source-job authority. */
++export function normalizeAsrComparisonReferences(value: AsrComparisonReferences | undefined): AsrComparisonReference[] {
++  if (value === undefined) return [];
++  const references = Array.isArray(value) ? [...value] : [value];
++  if (!references.length || references.length > 240) fail();
++  const identities = new Set<string>();
++  const first = references[0];
++  for (const reference of references) {
++    if (!reference || typeof reference !== 'object' || Array.isArray(reference) ||
++      Object.keys(reference).sort().join(',') !== 'asrRequestId,receiptSha256,sessionId,snapshotSha256,sourceJobSha256,stageId' ||
++      typeof reference.asrRequestId !== 'string' || !/^formal_asr_[A-Za-z0-9_-]+$/.test(reference.asrRequestId) ||
++      !/^miraformal_[a-f0-9]{64}$/.test(reference.sessionId) || !/^[A-Za-z0-9_-]+$/.test(reference.stageId) ||
++      ![reference.snapshotSha256, reference.sourceJobSha256, reference.receiptSha256].every(value => HASH.test(value)) ||
++      ['sessionId', 'stageId', 'snapshotSha256', 'sourceJobSha256'].some(key =>
++        reference[key as keyof AsrComparisonReference] !== first[key as keyof AsrComparisonReference]) ||
++      identities.has(reference.asrRequestId)) fail();
++    identities.add(reference.asrRequestId);
++  }
++  return references.sort((left, right) => left.asrRequestId < right.asrRequestId ? -1 : 1);
++}
++
++export function asrComparisonClaimSha256(references: AsrComparisonReferences): string {
++  const normalized = normalizeAsrComparisonReferences(references);
++  // Preserve the existing single-receipt claim, including an array of one.
++  return normalized.length === 1 ? normalized[0].receiptSha256 : qualitySha(normalized);
++}
+ 
+ /** Pure replay of existing evidence. It never substitutes a new transcript or audio. */
+ export function buildAsrComparisonRevalidation(binding: AsrComparisonBinding, original: OriginalSources,
+diff --git a/tests/server/mira-formal-asr-revalidation.test.ts b/tests/server/mira-formal-asr-revalidation.test.ts
+--- a/tests/server/mira-formal-asr-revalidation.test.ts
++++ b/tests/server/mira-formal-asr-revalidation.test.ts
+@@ -1,6 +1,7 @@
+ import { createHash } from 'node:crypto';
+ import { describe, expect, it, vi } from 'vitest';
+-import { buildAsrComparisonRevalidation } from '@/lib/server/mira-formal-asr-revalidation';
++import { buildAsrComparisonRevalidation, normalizeAsrComparisonReferences,
++  asrComparisonClaimSha256 } from '@/lib/server/mira-formal-asr-revalidation';
+ import { qualitySha } from '@/lib/server/mira-formal-quality-contract';
+ import { miraFormalAsrSimilarityBps, prepareMiraFormalAsrComparisonText } from '@/lib/server/mira-formal-audio-lifecycle';
+ import type { MiraFormalAsrJob, MiraFormalTtsJob } from '@/lib/server/mira-formal-audio';
+@@ -37,6 +38,17 @@
+ }
+ 
+ describe('saved ASR comparator revalidation', () => {
++  it('binds a multi-segment set independent of order and preserves the single-receipt claim', () => {
++    const first = {...fixture().binding, receiptSha256: '4'.repeat(64)};
++    const second = {...first, asrRequestId: 'formal_asr_second', receiptSha256: '5'.repeat(64)};
++    expect(normalizeAsrComparisonReferences([first, second]).length).toBe(2);
++    expect(asrComparisonClaimSha256([first, second])).toBe(asrComparisonClaimSha256([second, first]));
++    expect(asrComparisonClaimSha256(first)).toBe(first.receiptSha256);
++    expect(asrComparisonClaimSha256([first])).toBe(first.receiptSha256);
++    expect(() => normalizeAsrComparisonReferences([first, first])).toThrow('SOURCE_INVALID');
++    expect(() => normalizeAsrComparisonReferences([first, {...second, snapshotSha256: '6'.repeat(64)}])).toThrow('SOURCE_INVALID');
++    expect(() => normalizeAsrComparisonReferences([first, {...second, sourceJobSha256: '7'.repeat(64)}])).toThrow('SOURCE_INVALID');
++  });
+   it('replays original evidence without provider calls or replacing the rejected record', () => {
+     const network = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('no provider'));
+     try {
+diff --git a/tests/server/mira-formal-audio-lifecycle.test.ts b/tests/server/mira-formal-audio-lifecycle.test.ts
+--- a/tests/server/mira-formal-audio-lifecycle.test.ts
++++ b/tests/server/mira-formal-audio-lifecycle.test.ts
+@@ -15,6 +15,8 @@
+   MiraFormalTtsRequest,
+ } from '@/lib/server/mira-formal-audio';
+ import type { Scene, Stage } from '@/lib/types/stage';
++import * as comparisonAudit from '@/lib/server/mira-formal-asr-revalidation';
++import { qualitySha, qualitySnapshot } from '@/lib/server/mira-formal-quality-contract';
+ 
+ function sha256(value: string | Uint8Array): string {
+   return createHash('sha256').update(value).digest('hex');
+@@ -271,6 +273,43 @@
+     expect(fake.assertProviderReady).toHaveBeenCalledTimes(1);
+   });
+ 
++  it('reuses two separately audited ASR segments together without regenerating cached audio', async () => {
++    const classroom = formalClassroom();
++    const fake = fakeDependencies((request) => `第${request.sceneOrder + 1}段讲解。`);
++    const input = { buildItemId: 'build-item-multi-asr', subject: 'math' as const, ...classroom };
++    const first = await completeMiraFormalAudioLifecycle(input, fake.dependencies);
++    const receipts = [];
++    for (const ordinal of [2, 9]) {
++      const asrRecord = (await fake.dependencies.readAsrJob(first.segments[ordinal].asr.requestId))!;
++      const ttsRecord = (await fake.dependencies.readTtsJob(asrRecord.ttsRequestId))!;
++      asrRecord.similarityBps = ordinal === 2 ? 8000 : 0;
++      const transcript = `第${ordinal + 1}段讲解。`;
++      receipts.push(comparisonAudit.buildAsrComparisonRevalidation({
++        sessionId: `miraformal_${'a'.repeat(64)}`, stageId: classroom.stage.id,
++        snapshotSha256: qualitySha(qualitySnapshot(classroom.stage, classroom.scenes)),
++        sourceJobSha256: 'b'.repeat(64), asrRequestId: asrRecord.requestId,
++      }, {asrRecord, ttsRecord, spokenText: transcript,
++        audio: (await fake.dependencies.readTtsAsset(ttsRecord.requestId)).bytes,
++        transcriptArchive: {requestId: asrRecord.requestId, audioSha256: asrRecord.audioSha256,
++          transcript, transcriptSha256: sha256(transcript)}}, 'c'.repeat(64), '2026-09-10T09:00:00.000Z'));
++    }
++    const readAudit = vi.spyOn(comparisonAudit, 'readValidatedAsrComparison').mockImplementation(async ({reference}) =>
++      receipts.find(receipt => receipt.binding.asrRequestId === reference.asrRequestId)!);
++    fake.executeTts.mockClear(); fake.executeAsr.mockClear(); fake.assertProviderReady.mockClear();
++    try {
++      const replay = await completeMiraFormalAudioLifecycle(input, fake.dependencies, {
++        asrComparisonRevalidation: receipts.map(receipt => ({...receipt.binding, receiptSha256: receipt.receiptSha256})),
++      });
++      expect(readAudit).toHaveBeenCalledTimes(2);
++      expect(replay.segments.filter(segment => segment.asr.comparisonRevalidation).length).toBe(2);
++      expect(replay.segments[2].asr.comparisonRevalidation?.source.asrRecord.similarityBps).toBe(8000);
++      expect(replay.segments[9].asr.comparisonRevalidation?.source.asrRecord.similarityBps).toBe(0);
++      expect(replay.segments.every(segment => segment.asr.similarityBps >= 8500)).toBe(true);
++      expect(fake.executeTts).not.toHaveBeenCalled(); expect(fake.executeAsr).not.toHaveBeenCalled();
++      expect(fake.assertProviderReady).not.toHaveBeenCalled();
++    } finally { readAudit.mockRestore(); }
++  });
++
+   it('fails the whole lifecycle when any ASR round trip is below 8500 bps', async () => {
+     const classroom = formalClassroom();
+     const fake = fakeDependencies(() => '完全不同的内容');
+@@ -353,4 +392,17 @@
+       prepareMiraFormalAsrComparisonText(transcript, 'math'),
+     )).toBe(10_000);
+   });
++
++  it('keeps the actual tenth narration clause boundary when checking its fraction', () => {
++    const source = '把分母变成100，五分之三就等于一百分之六十。为什么可以这样变？因为我们把每一份又平均分成了20小份，3份就变成了60小份。';
++    const transcript = '把分母变成幺零零，五分之三就等于一百分之六十，为什么可以这样变？因为我们把每一份又平均分成了二十小份，三份就变成了六十小份。';
++    const expected = prepareMiraFormalAsrComparisonText(source, 'math');
++    expect(prepareMiraFormalSpeechText(source, 'math')).toBe(source);
++    expect(miraFormalAsrSimilarityBps(expected,
++      prepareMiraFormalAsrComparisonText(transcript, 'math'))).toBe(9464);
++    expect(miraFormalAsrSimilarityBps(expected,
++      prepareMiraFormalAsrComparisonText(transcript.replace('五分之三', '三分之五'), 'math'))).toBe(0);
++    expect(miraFormalAsrSimilarityBps(expected,
++      prepareMiraFormalAsrComparisonText(transcript.replace('一百分之六十', '一百分之六十一'), 'math'))).toBe(0);
++  });
+ });

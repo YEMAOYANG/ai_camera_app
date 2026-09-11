@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LearningLibrary } from "@/features/learning/learning-library";
@@ -147,6 +147,7 @@ describe("LearningLibrary full runtime links", () => {
     getLearningLibrary
       .mockResolvedValueOnce({
         ...library,
+        availableCourseCount: 0,
         items: [{ ...library.items[0], fullClassroomAvailable: false }],
       })
       .mockResolvedValue(library);
@@ -172,7 +173,8 @@ describe("LearningLibrary full runtime links", () => {
     expect(refresh).not.toHaveBeenCalled();
   });
 
-  it("adds each newly published course while the rest of the catalog keeps generating", async () => {
+  it("stops preparation polling once a course is playable and silently refreshes on focus", async () => {
+    vi.useFakeTimers();
     const secondCourse = {
       ...library.items[0],
       taskId: null,
@@ -199,7 +201,7 @@ describe("LearningLibrary full runtime links", () => {
         items: [...library.items, secondCourse],
       });
 
-    render(
+    await act(async () => { render(
       <LearningLibrary
         student={{
           id: "student-1",
@@ -209,10 +211,13 @@ describe("LearningLibrary full runtime links", () => {
         }}
         pollIntervalMs={10}
       />,
-    );
+    ); });
 
-    expect(await screen.findByText(/已有 1 门可用/)).toBeInTheDocument();
-    expect(await screen.findByText("第二门已完成的数学课")).toBeInTheDocument();
+    expect(screen.getByText(/已有 1 门可用/)).toBeInTheDocument();
+    await act(async () => { await vi.advanceTimersByTimeAsync(50); });
+    expect(getLearningLibrary).toHaveBeenCalledTimes(1);
+    await act(async () => { fireEvent.focus(window); });
+    expect(screen.getByText("第二门已完成的数学课")).toBeInTheDocument();
     expect(getLearningLibrary).toHaveBeenCalledTimes(2);
     expect(refresh).not.toHaveBeenCalled();
   });

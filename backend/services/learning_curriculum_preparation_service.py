@@ -412,6 +412,21 @@ class LearningCurriculumPreparationService:
                 available_course_count = int(
                     summary["availableCourseCount"]
                 )
+            learning_state = None
+            if query.get("includeLearningState") == "true":
+                from services.learning_availability_state import personal_learning_state
+                from services.course_library_service import cached_supply_summary
+                identity = {"family_id": family_id, "child_id": child_id, "grade_code": grade_code}
+                supply = (cached_supply_summary(self.repository.database.database_url, grade_code=grade_code)
+                          if self.course_library_enabled and grade_code in FORMAL_STUDENT_GRADE_CODES else None)
+                learning_state = personal_learning_state(
+                    grade_code=grade_code, grade_open=can_access_workspace,
+                    courses=self.learning_repository.personal_visible_course_inventory(conn, **identity,
+                        grade_selection_revision=int(child.get("grade_selection_revision") or 0)) if can_access_workspace else [],
+                    mastery=self.learning_repository.personal_grade_mastery(conn, **identity) if can_access_workspace else {},
+                    supply=supply,
+                )
+                available_course_count = int(learning_state["availableCourseCount"])
         return {
             "ok": True,
             "availability": {
@@ -425,8 +440,10 @@ class LearningCurriculumPreparationService:
                 "hasActiveRelease": has_active_release,
                 "availableCourseCount": available_course_count,
                 "canLearnNow": bool(
-                    has_active_release or available_course_count > 0
+                    available_course_count > 0 if learning_state is not None
+                    else has_active_release or available_course_count > 0
                 ),
+                **({"learningState": learning_state} if learning_state is not None else {}),
             },
         }
 
@@ -665,9 +682,9 @@ class LearningCurriculumPreparationService:
                 raise ValueError("target must be an object")
             if (
                 str(target.get("schemaVersion") or "") != TARGET_SCHEMA_V2
-                or str(target.get("gradeCode") or "") != "primary_1"
-                or str(row.get("grade_code") or "") != "primary_1"
-                or not compatible_preparation_target(target, build_preparation_target("primary_1"))
+                or str(row.get("grade_code") or "") not in FORMAL_STUDENT_GRADE_CODES
+                or target.get("gradeCode") != row.get("grade_code")
+                or not compatible_preparation_target(target, build_preparation_target(str(row["grade_code"])))
                 or str(row.get("target_fingerprint") or "")
                 != preparation_target_fingerprint(target)
             ):
@@ -689,7 +706,7 @@ class LearningCurriculumPreparationService:
             canary_failed = row["content_canary_failed_count"]
             canary_target = row["content_canary_target_count"]
             if not (
-                target_count == 30
+                target_count == len(target["courseTargets"])
                 and canary_target == 3
                 and candidate >= 0
                 and failed >= 0
@@ -845,7 +862,7 @@ class LearningCurriculumPreparationService:
                 receipt_hash = row.get("formal_publication_receipt_hash")
                 if not (
                     stage == "completed"
-                    and candidate == target_count == 30
+                    and candidate == target_count == len(target["courseTargets"])
                     and failed == 0
                     and row["progress_percent"] == 100
                     and row["ready_course_count"] == target_count

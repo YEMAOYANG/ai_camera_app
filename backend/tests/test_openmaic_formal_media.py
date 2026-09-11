@@ -61,10 +61,10 @@ class OpenMaicFormalMediaTest(unittest.TestCase):
     def test_new_target_changes_fingerprint_and_exact_legacy_remains_resumable(self):
         current = build_preparation_target("primary_1")
         legacy = deepcopy(current)
-        from integrations.openmaic_formal_media import VIDEO_PROFESSIONAL_POLICY, LEGACY_CONTENT_PROVIDER_PROFILE
+        from integrations.openmaic_formal_media import INTERACTIVE_PROFESSIONAL_POLICY, LEGACY_CONTENT_PROVIDER_PROFILE
         legacy["contentProviderProfileContractVersion"] = LEGACY_CONTENT_PROVIDER_PROFILE
         legacy["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(LEGACY_PROFESSIONAL_POLICY)
-        self.assertEqual(policy_from_target(current), VIDEO_PROFESSIONAL_POLICY)
+        self.assertEqual(policy_from_target(current), INTERACTIVE_PROFESSIONAL_POLICY)
         self.assertEqual(preparation_target_fingerprint(legacy), "174a787e2ddbb8dd9c50e859a829bd2fe08fec71838448a8c5e5b0d2246766f1")
         self.assertNotEqual(preparation_target_fingerprint(legacy), preparation_target_fingerprint(current))
         self.assertTrue(compatible_preparation_target(legacy, current))

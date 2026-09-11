@@ -6,7 +6,7 @@ import logging
 import os
 import re
 import threading
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Callable, Mapping, Protocol
 
 from core.config import LEARNING_CURRICULUM_PREPARATION_MIN_LEASE_SECONDS
@@ -21,6 +21,7 @@ from services.learning_catalog_release_service import (
 )
 from services.learning_curriculum_preparation_contract import (
     build_preparation_target,
+    formal_target_course_count,
     preparation_target_fingerprint,
 )
 
@@ -517,7 +518,7 @@ class FormalProductionStageAdapter(CheckpointSharedBuildAdapter):
         catalog_service,
         *,
         repository: LearningCurriculumPreparationRepository,
-        runtime_candidate_processor: Callable[[], object] | None,
+        runtime_candidate_processor: Callable[..., object] | None,
         formal_repository,
         formal_audio_service,
         formal_audio_validation_enabled: bool = False,
@@ -648,7 +649,7 @@ class FormalProductionStageAdapter(CheckpointSharedBuildAdapter):
         ready = int(result.get("ready") or 0)
         failed = int(result.get("failed") or 0)
         ambiguous = int(result.get("ambiguous") or 0)
-        if total != 30 or failed or ambiguous or not 0 <= ready <= total:
+        if total != formal_target_course_count(plan) or failed or ambiguous or not 0 <= ready <= total:
             raise PreparationDeterministicError(
                 "formal Provider readiness emitted terminal or incomplete authority"
             )
@@ -709,7 +710,7 @@ class FormalProductionStageAdapter(CheckpointSharedBuildAdapter):
         return PreparationStageResult(
             next_status="ready",
             next_stage="completed",
-            ready_course_count=30,
+            ready_course_count=formal_target_course_count(plan),
             failed_course_count=0,
             subject_progress=ready_subject_progress,
             next_run_at=int(self.clock()),
@@ -745,7 +746,7 @@ class FormalProductionStageAdapter(CheckpointSharedBuildAdapter):
             )
         if not self.formal_auto_publication_enabled:
             if self.runtime_candidate_processor is not None:
-                self.runtime_candidate_processor()
+                self.runtime_candidate_processor(preparation_plan=plan)
             return None
         result = self.catalog_service.advance_progressive_grade_validation(
             grade_code=str(plan["grade_code"]),
@@ -768,7 +769,7 @@ class FormalProductionStageAdapter(CheckpointSharedBuildAdapter):
         if (
             failed
             or ambiguous
-            or not 0 <= ready <= total <= 30
+            or not 0 <= ready <= total <= formal_target_course_count(plan)
             or not 0 <= published <= ready
         ):
             raise PreparationDeterministicError(
@@ -776,7 +777,7 @@ class FormalProductionStageAdapter(CheckpointSharedBuildAdapter):
             )
         runtime_result = None
         if self.runtime_candidate_processor is not None:
-            runtime_result = self.runtime_candidate_processor()
+            runtime_result = self.runtime_candidate_processor(preparation_plan=plan)
         return {
             "blockedReason": runtime_result.get("blockedReason") if isinstance(runtime_result, Mapping) else None,
             "total": total,
@@ -923,7 +924,7 @@ class FormalProductionStageAdapter(CheckpointSharedBuildAdapter):
                 )
 
         initial = counts()
-        if initial["total"] != 30:
+        if initial["total"] != formal_target_course_count(plan):
             raise PreparationDeterministicError(
                 "formal production requires the exact thirty build items"
             )
@@ -951,7 +952,7 @@ class FormalProductionStageAdapter(CheckpointSharedBuildAdapter):
             self._process_progressive_formal_tail(plan, stage=stage)
             observed = counts()
             if (
-                observed["total"] != 30
+                observed["total"] != formal_target_course_count(plan)
                 or observed["classroomFailed"]
                 or observed["speechFailed"]
             ):
@@ -1022,6 +1023,9 @@ class LearningCurriculumPreparationRunner:
         self._thread: threading.Thread | None = None
         self._stop = threading.Event()
         self._lock = threading.RLock()
+        self._tick_lock = threading.Lock()
+        self._grade_cursor: dict[tuple, int] = {}
+        self._library_refresh: dict[tuple, int] = {}
         self._observation: dict[str, object] = {
             "lastRunAt": None,
             "lastResultCode": None,
@@ -1035,6 +1039,16 @@ class LearningCurriculumPreparationRunner:
             return self._thread
 
     def run_once(self, app, now_ms: int) -> dict[str, object]:
+        # One fair scheduler and one in-flight tick per process, regardless of
+        # the number of configured grades. Paid calls retain their shared DB budget.
+        if not self._tick_lock.acquire(blocking=False):
+            return {"claimed": 0, "busy": True}
+        try:
+            return self._run_once(app, now_ms)
+        finally:
+            self._tick_lock.release()
+
+    def _run_once(self, app, now_ms: int) -> dict[str, object]:
         config = learning_curriculum_preparation_config_projection(app)
         if not (
             config is not None
@@ -1044,19 +1058,28 @@ class LearningCurriculumPreparationRunner:
         ):
             return {"claimed": 0, "disabled": True}
         repository, adapter = self._resolve_dependencies(app)
-        refresh_key = (app.config.get("DATABASE_URL"), app.config.get("LEARNING_COURSE_SUPPLY_SCOPE", "canary"))
-        if app.config.get("LEARNING_COURSE_LIBRARY_ENABLED") is True and (
-            getattr(self, "_library_refresh_key", None) != refresh_key
-            or int(self.clock()) >= getattr(self, "_library_refresh_at", 0)
-        ):
+        scheduling_key = (app.config.get("DATABASE_URL"), config.grade_allowlist)
+        with self._lock:
+            cursor = self._grade_cursor.get(scheduling_key, 0)
+            grade_code = config.grade_allowlist[cursor % len(config.grade_allowlist)]
+            self._grade_cursor[scheduling_key] = (cursor + 1) % len(config.grade_allowlist)
+        config = replace(config, grade_code=grade_code,
+                         target_fingerprint=preparation_target_fingerprint(build_preparation_target(grade_code)))
+        # The old scalar switch authorizes Grade 1 only. Merely adding a grade
+        # to scheduler eligibility must never create a paid production scope.
+        grade_scopes = app.config.get("LEARNING_COURSE_SUPPLY_GRADE_SCOPES", {})
+        scope = grade_scopes.get(grade_code)
+        if scope is None and grade_code == "primary_1":
+            scope = app.config.get("LEARNING_COURSE_SUPPLY_SCOPE", "canary")
+        refresh_key = (app.config.get("DATABASE_URL"), grade_code, config.target_fingerprint, scope)
+        if (app.config.get("LEARNING_COURSE_LIBRARY_ENABLED") is True and scope is not None
+            and int(self.clock()) >= self._library_refresh.get(refresh_key, 0)):
             from services.course_library_service import CourseLibraryService
-
             CourseLibraryService(
-                app.config["DATABASE_URL"], preparation_repository=repository,
-                clock=self.clock,
-            ).request_scope(app.config.get("LEARNING_COURSE_SUPPLY_SCOPE", "canary"))
-            self._library_refresh_key = refresh_key
-            self._library_refresh_at = int(self.clock()) + 60_000
+                app.config["DATABASE_URL"], grade_code=grade_code,
+                preparation_repository=repository, clock=self.clock,
+            ).request_scope(scope, preserve_existing_scope=True)
+            self._library_refresh[refresh_key] = int(self.clock()) + 60_000
         generator = getattr(getattr(adapter, "catalog_service", None),
                             "staged_content_candidate_generator", None)
         required_budget = getattr(generator, "required_phase_budget_ms", 0)
@@ -1141,6 +1164,7 @@ class LearningCurriculumPreparationRunner:
                         repository,
                         plan,
                         now_ms=failure_now,
+                        retry_backoff_ms=(self.RETRY_BACKOFF_MS if _is_runtime_readiness_transient(exc) else 1_000),
                     )
                 next_run_at = min(failure_now + self.RETRY_BACKOFF_MS, deadline)
                 with repository.transaction() as conn:
@@ -1241,6 +1265,7 @@ class LearningCurriculumPreparationRunner:
         plan: Mapping[str, object],
         *,
         now_ms: int,
+        retry_backoff_ms: int = 1_000,
     ) -> dict[str, object]:
         build_id = str(plan.get("catalog_build_id") or "")
         release_id = str(plan.get("catalog_release_id") or "")
@@ -1263,7 +1288,7 @@ class LearningCurriculumPreparationRunner:
                     owner_plan_id=str(plan["id"]),
                     owner_lease_token=str(plan["lease_token"]),
                 )
-            next_run_at = int(now_ms) + 1_000
+            next_run_at = int(now_ms) + retry_backoff_ms
             with repository.transaction() as conn:
                 released = repository.release_content_continuation(
                     conn,
@@ -1432,14 +1457,17 @@ class LearningCurriculumPreparationRunner:
         )
         if config is None:
             raise RuntimeError("preparation runner observation scope is invalid")
+        counts = {"claimablePlanCount": 0, "runningPlanCount": 0, "expiredLeaseCount": 0}
         with repository.transaction() as conn:
-            counts = repository.count_runner_scope(
-                conn,
-                now=int(now_ms),
-                supported_stages=FormalProductionStageAdapter.supported_stages,
-                grade_code=config.grade_code,
-                target_fingerprint=config.target_fingerprint,
-            )
+            for grade_code in config.grade_allowlist:
+                grade_counts = repository.count_runner_scope(
+                    conn, now=int(now_ms),
+                    supported_stages=FormalProductionStageAdapter.supported_stages,
+                    grade_code=grade_code,
+                    target_fingerprint=preparation_target_fingerprint(build_preparation_target(grade_code)),
+                )
+                for key in counts:
+                    counts[key] += int(grade_counts[key])
         return {
             "lastRunAt": observation["lastRunAt"],
             "lastResultCode": observation["lastResultCode"],
@@ -1578,11 +1606,19 @@ def _safe_observation_code(value: object, fallback: str) -> str:
 
 
 def _is_transient(exc: Exception) -> bool:
+    if _is_runtime_readiness_transient(exc):
+        return True
     if isinstance(exc, PreparationTransientError):
         return True
     if isinstance(exc, ApiError):
         return exc.status_code in LearningCurriculumPreparationRunner.TRANSIENT_API_STATUSES
     return isinstance(exc, (TimeoutError, ConnectionResetError))
+
+
+def _is_runtime_readiness_transient(exc: Exception) -> bool:
+    from services.openmaic_full_runtime_service import OpenMaicRuntimeServiceError
+    return (isinstance(exc, OpenMaicRuntimeServiceError)
+            and exc.code == 'openmaic_formal_generation_not_ready' and exc.status_code == 503)
 
 
 def _deterministic_error_code(exc: Exception) -> str:
@@ -1632,21 +1668,23 @@ def learning_curriculum_preparation_config_projection(
         type(runner_enabled) is bool
         and type(content_generation_enabled) is bool
         and type(allowlist) is list
-        and allowlist == ["primary_1"]
+        and bool(allowlist)
+        and all(type(grade) is str and grade in {f"primary_{n}" for n in range(1, 7)} for grade in allowlist)
+        and len(set(allowlist)) == len(allowlist)
         and type(max_provider_subcalls_per_tick) is int
         and max_provider_subcalls_per_tick == 1
         and type(max_inflight_per_build) is int
         and max_inflight_per_build == 1
         and canary_enabled is True
-        and canary_auto_expand is True
+        and type(canary_auto_expand) is bool
         and reconciliation_enabled is False
     ):
         return None
-    grade_code = "primary_1"
+    grade_code = allowlist[0]
     return PreparationRunnerConfigProjection(
         runner_enabled=runner_enabled,
         content_generation_enabled=content_generation_enabled,
-        grade_allowlist=(grade_code,),
+        grade_allowlist=tuple(allowlist),
         max_provider_subcalls_per_tick=max_provider_subcalls_per_tick,
         max_inflight_per_build=max_inflight_per_build,
         canary_enabled=canary_enabled,

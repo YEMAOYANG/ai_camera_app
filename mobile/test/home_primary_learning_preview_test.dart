@@ -12,6 +12,51 @@ import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
 import 'package:warm_sight/src/shared/widgets/app_button.dart';
 
 void main() {
+  testWidgets(
+    'empty grade shows no progress and stops stale preparation polling',
+    (tester) async {
+      final gateway = _FakeLearningGateway();
+      final preparation = _FailingPollPreparationGateway();
+      final availability = _EmptyAvailabilityGateway();
+      final child = ChildProfile.fromJson({
+        'id': 'child-1',
+        'name': '小雨',
+        'nickname': '小雨',
+        'educationStage': '小学',
+        'grade': '六年级',
+        'gradeCode': 'primary_6',
+        'contentMode': 'primary_learning',
+      });
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: _overrides(
+            gateway,
+            preparationGateway: preparation,
+            availabilityGateway: availability,
+          ),
+          child: MaterialApp(
+            home: Scaffold(body: HomePrimaryLearningPreview(child: child)),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('暂无课程'), findsOneWidget);
+      expect(find.textContaining('扫码进入学习空间'), findsOneWidget);
+      expect(find.textContaining('未开放'), findsNothing);
+      expect(find.textContaining('备课'), findsNothing);
+      expect(find.textContaining('准备中'), findsNothing);
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+      expect(gateway.todayCalls, 0);
+      expect(preparation.calls, 1);
+      expect(availability.calls, 1);
+      await tester.pump(const Duration(minutes: 2));
+      expect(preparation.calls, 1);
+      expect(availability.calls, 1);
+      expect(find.textContaining('%'), findsNothing);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
   testWidgets('student completion updates silently and pauses in background', (
     tester,
   ) async {
@@ -273,36 +318,37 @@ void main() {
     expect(find.byType(LinearProgressIndicator), findsNothing);
   });
 
-  testWidgets('poll failure preserves the last active course view', (
-    tester,
-  ) async {
-    final gateway = _FakeLearningGateway(startAssigned: true);
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: _overrides(
-          gateway,
-          preparationGateway: _FailingPollPreparationGateway(),
-        ),
-        child: const MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: HomePrimaryLearningPreview(child: _primaryChild),
+  testWidgets(
+    'an available course stops preparation polling without an error banner',
+    (tester) async {
+      final gateway = _FakeLearningGateway(startAssigned: true);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: _overrides(
+            gateway,
+            preparationGateway: _FailingPollPreparationGateway(),
+          ),
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: HomePrimaryLearningPreview(child: _primaryChild),
+              ),
             ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pump(const Duration(milliseconds: 2100));
-    await tester.pump();
+      await tester.pump(const Duration(milliseconds: 2100));
+      await tester.pump();
 
-    expect(find.text('真实课程：三位数加法'), findsOneWidget);
-    expect(find.text('现有课程可正常使用，进度同步稍慢，已保留上次结果'), findsOneWidget);
-    expect(find.text('课程状态暂时无法同步'), findsNothing);
-    expect(find.text('35%'), findsNothing);
-    expect(find.byType(LinearProgressIndicator), findsNothing);
-  });
+      expect(find.text('真实课程：三位数加法'), findsOneWidget);
+      expect(find.text('现有课程可正常使用，进度同步稍慢，已保留上次结果'), findsNothing);
+      expect(find.text('课程状态暂时无法同步'), findsNothing);
+      expect(find.text('35%'), findsNothing);
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+    },
+  );
 }
 
 dynamic _overrides(
@@ -327,6 +373,29 @@ class _ActiveAvailabilityGateway implements LearningAvailabilityGateway {
       hasActiveRelease: true,
       availableCourseCount: 30,
       canLearnNow: true,
+    );
+  }
+}
+
+class _EmptyAvailabilityGateway implements LearningAvailabilityGateway {
+  var calls = 0;
+
+  @override
+  Future<LearningAvailability> current(String childId) async {
+    calls += 1;
+    return const LearningAvailability(
+      gradeCode: 'primary_6',
+      hasActiveRelease: false,
+      availableCourseCount: 0,
+      canLearnNow: false,
+      canAccessWorkspace: true,
+      learningState: LearningAvailabilityState(
+        status: 'empty',
+        availableCourseCount: 0,
+        newCourseCount: 0,
+        reviewCourseCount: 0,
+        message: '可以扫码进入学习空间，当前暂无课程。',
+      ),
     );
   }
 }

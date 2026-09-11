@@ -40,6 +40,7 @@ class LearningAvailabilityRepository implements LearningAvailabilityGateway {
         queryParameters: {
           'childId': normalizedChildId,
           'includeWorkspaceAccess': 'true',
+          'includeLearningState': 'true',
         },
       );
       return LearningAvailability.fromJson(response.data);

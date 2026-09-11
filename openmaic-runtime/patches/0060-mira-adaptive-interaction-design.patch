@@ -1,0 +1,820 @@
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -4,6 +4,7 @@
+ import { MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY } from './mira-formal-skill-policy';
+ import { MIRA_ADAPTIVE_SKILL_ORCHESTRATION_POLICY } from './mira-formal-skill-selection';
+ import { MIRA_TEACHING_QUALITY_POLICY } from './mira-formal-quality-contract';
++import { MIRA_INTERACTION_DESIGN_POLICY } from './mira-formal-interaction-design';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+   'mira.openmaic.formal-runtime.v4-deepseek-professional' as const;
+@@ -87,12 +88,19 @@
+   video: MIRA_FORMAL_VIDEO_POLICY,
+ } as const;
+ 
++// New jobs opt into this policy; never mutate the persisted video policy above.
++export const MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++  interactionDesignPolicy: MIRA_INTERACTION_DESIGN_POLICY,
++} as const;
++
+ export type MiraProfessionalCreationPolicy =
+   | typeof MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_PROFESSIONAL_CREATION_POLICY
+-  | typeof MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY;
++  | typeof MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY;
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+@@ -210,9 +218,15 @@
+ 
+ export function isMiraVideoCreationPolicy(value: unknown): boolean {
+   return (
++    isMiraInteractionCreationPolicy(value) ||
+     JSON.stringify(canonical(value)) ===
+     JSON.stringify(canonical(MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY))
+   );
++}
++
++export function isMiraInteractionCreationPolicy(value: unknown): boolean {
++  return JSON.stringify(canonical(value)) ===
++    JSON.stringify(canonical(MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY));
+ }
+ 
+ export function assertMiraFormalGenerationInput(
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -30,6 +30,7 @@
+   isMiraImageCreationPolicy,
+   isMiraIntegratedSkillCreationPolicy,
+   isMiraAdaptiveSkillCreationPolicy,
++  isMiraInteractionCreationPolicy,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import {
+   buildMiraFormalSkillReceipt,
+@@ -48,6 +49,10 @@
+ import { listSkills } from './agent-runtime/skills';
+ import { reviewFormalCourse, type FormalQualityReviewGrant } from './mira-formal-teaching-quality';
+ import type { MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
++import {
++  MIRA_INTERACTION_DESIGN_POLICY, interactionDesignPrompt, interactionDesignContextFromPrompt,
++  type InteractionDesignReceipt, type InteractionDesignContext,
++} from './mira-formal-interaction-design';
+ import { formalInspectionConfiguration } from './mira-formal-scene-inspector';
+ import type { AgentMessage } from '@earendil-works/pi-agent-core';
+ import {
+@@ -141,6 +146,7 @@
+   videoPolicyId?: typeof MIRA_FORMAL_VIDEO_POLICY.policyId;
+   skillOrchestration?: MiraFormalSkillReceipt;
+   teachingQuality?: MiraTeachingQualityReceipt;
++  interactionDesign?: InteractionDesignReceipt;
+   receiptSha256: string;
+ }
+ 
+@@ -443,7 +449,7 @@
+     originalPrompt,
+     input.professionalCreationPolicy,
+   );
+-  return withMiraFormalSkillInstructions(
++  const prompt = withMiraFormalSkillInstructions(
+     withMiraFormalVideoInstructions(withImages, input.professionalCreationPolicy),
+     input.professionalCreationPolicy,
+     spec.course.subject,
+@@ -451,6 +457,10 @@
+       ? formalAdaptiveSkillSelectionInput(input)
+       : undefined,
+   );
++  return isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
++    ? prompt + interactionDesignPrompt({ policy: MIRA_INTERACTION_DESIGN_POLICY,
++        independentQuestionIds: spec.independent.map(question => question.id) })
++    : prompt;
+ }
+ 
+ export function withMiraFormalSkillInstructions(
+@@ -821,7 +831,7 @@
+   scenes: Scene[];
+   ownerId: string;
+   sessionId: string;
+-}): Promise<{ stage: Stage; scenes: Scene[] }> {
++}): Promise<{ stage: Stage; scenes: Scene[]; interactionDesign?: InteractionDesignContext }> {
+   const session = await (await getAgentSessionStore()).getSession(input.sessionId);
+   if (
+     !session ||
+@@ -850,6 +860,8 @@
+   return {
+     stage: input.stage,
+     scenes: canonicalizeMiraFormalResearchFooters(normalized, research.fetched).scenes,
++    ...(interactionDesignContextFromPrompt(session.prompt)
++      ? { interactionDesign: interactionDesignContextFromPrompt(session.prompt) } : {}),
+   };
+ }
+ 
+@@ -1165,6 +1177,7 @@
+   sessionId: string,
+   skillOrchestration?: MiraFormalSkillReceipt,
+   teachingQuality?: MiraTeachingQualityReceipt,
++  interactionDesign?: InteractionDesignReceipt,
+ ): MiraFormalProfessionalCreationReceipt {
+   const contract = formalContractPayload(input);
+   const teachingBrief = contract.teachingBrief;
+@@ -1200,6 +1213,7 @@
+       ? { videoGenerationEnabled: true as const, videoPolicyId: MIRA_FORMAL_VIDEO_POLICY.policyId }
+       : {}),
+     ...(teachingQuality ? { teachingQuality } : {}),
++    ...(interactionDesign ? { interactionDesign } : {}),
+   };
+   return { ...withoutHash, receiptSha256: canonicalSha256(withoutHash) };
+ }
+@@ -1339,6 +1353,7 @@
+       })
+     : undefined;
+   let teachingQuality: MiraTeachingQualityReceipt | undefined;
++  let interactionDesign: InteractionDesignReceipt | undefined;
+   if (isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy)) {
+     if (!skillBundle?.selectionPlan || !skillBundle.gradeBoundary || !skillBundle.teachingBrief)
+       throw new Error('FORMAL_QUALITY_CONTEXT_MISSING');
+@@ -1350,6 +1365,9 @@
+       gradeBoundary: { ...skillBundle.gradeBoundary },
+       selectionPlan: { ...skillBundle.selectionPlan },
+       teachingBrief: skillBundle.teachingBrief,
++      ...(isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
++        ? { interactionDesign: { policy: MIRA_INTERACTION_DESIGN_POLICY,
++            independentQuestionIds: spec.independent.map(question => question.id) } } : {}),
+     }, undefined, { recheckUnsentBrowserReview: options.recheckUnsentBrowserReview,
+       approvedReviewGrant: options.approvedReviewGrant,
+       ...(options.cachedQualityOnly ? { provider: async () => { throw new Error('FORMAL_AUDIO_TAIL_NEW_REVIEW_FORBIDDEN'); } } : {}) });
+@@ -1358,6 +1376,10 @@
+         `FORMAL_QUALITY_FINAL_SNAPSHOT_REJECTED: ${JSON.stringify(quality.issues).slice(0, 6000)}`,
+       );
+     teachingQuality = quality.receipt;
++    if (isMiraInteractionCreationPolicy(input.professionalCreationPolicy)) {
++      if (!quality.interactionDesign) throw new Error('FORMAL_INTERACTION_FINAL_RECEIPT_MISSING');
++      interactionDesign = quality.interactionDesign;
++    }
+   }
+   const professionalCreation = buildProfessionalCreationReceipt(
+     input,
+@@ -1366,6 +1388,7 @@
+     identity.sessionId,
+     skillOrchestration,
+     teachingQuality,
++    interactionDesign,
+   );
+   const media = isMiraImageCreationPolicy(input.professionalCreationPolicy)
+     ? await buildMiraFormalMediaReceipt({
+diff --git a/lib/server/mira-formal-scene-inspector.ts b/lib/server/mira-formal-scene-inspector.ts
+--- a/lib/server/mira-formal-scene-inspector.ts
++++ b/lib/server/mira-formal-scene-inspector.ts
+@@ -74,6 +74,9 @@
+       (probe.value?.length ?? 0) > 500 ||
+       (probe.expect.textIncludes?.length ?? 0) > 500 ||
+       (probe.expect.valueEquals?.length ?? 0) > 500 ||
++      (probe.expect.textIncludesAll !== undefined &&
++        (!Array.isArray(probe.expect.textIncludesAll) || probe.expect.textIncludesAll.length > 4 ||
++          probe.expect.textIncludesAll.some(value => typeof value !== 'string' || !value.trim() || value.length > 500))) ||
+       !Object.keys(probe.expect).some((key) => key !== 'selector')
+     )
+       throw new Error('FORMAL_QUALITY_PROBE_INVALID');
+@@ -231,11 +234,16 @@
+   // native querySelector rejects Playwright's non-CSS selector engines. Scope
+   // is this snapshot's document, never another browser tab or a student frame.
+   await target.evaluate(
+-    ({ selector, expected }) => {
+-      if (!document.querySelector(selector) || !document.querySelector(expected))
++    ({ selector, expected, distinctFeedback }) => {
++      const control = document.querySelector(selector);
++      const feedback = document.querySelector(expected);
++      if (!control || !feedback)
+         throw new Error('probe target absent');
++      if (distinctFeedback && (control === feedback || control.contains(feedback) || feedback.contains(control) ||
++          ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(feedback.tagName)))
++        throw new Error('probe feedback must be separate from the control');
+     },
+-    { selector: probe.selector, expected: probe.expect.selector },
++    { selector: probe.selector, expected: probe.expect.selector, distinctFeedback: probe.expect.distinctFeedback },
+   );
+   const before = await target
+     .locator(probe.expect.selector)
+@@ -279,6 +287,11 @@
+       });
+       return (
+         (expect.textIncludes === undefined || element.innerText.includes(expect.textIncludes)) &&
++        (expect.textIncludesAll === undefined || expect.textIncludesAll.every(value => element.innerText.includes(value))) &&
++        (!expect.distinctFeedback || (element.getBoundingClientRect().width > 0 && element.getBoundingClientRect().height > 0 &&
++          getComputedStyle(element).visibility !== 'hidden' && getComputedStyle(element).display !== 'none' &&
++          (!element.checkVisibility || element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) &&
++          element.innerText.trim() !== JSON.parse(before).text?.trim())) &&
+         (expect.valueEquals === undefined || element.value === expect.valueEquals) &&
+         (expect.checked === undefined || element.checked === expect.checked) &&
+         (!expect.changed || state !== before)
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -18,6 +18,12 @@
+ import {
+   FORMAL_QUALITY_REVIEW_SYSTEM, FORMAL_QUALITY_REVIEW_PROMPT_VERSION,
+ } from '@/lib/prompts/mira-formal-quality.v1';
++import {
++  readInteractionDesignPlan, interactionDesignProbes, buildInteractionDesignReceipt,
++  assertInteractionDesignReceipt, INTERACTION_REVIEW_PROMPT_VERSION, INTERACTION_REVIEW_SYSTEM_SUFFIX,
++  type InteractionDesignContext, type InteractionDesignReceipt,
++} from './mira-formal-interaction-design';
++import type { FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
+ 
+ type JsonRecord = Record<string, unknown>;
+ const object = (value: unknown): value is JsonRecord =>
+@@ -27,6 +33,7 @@
+   gradeBoundary: JsonRecord;
+   selectionPlan: { planSha256: string } & JsonRecord;
+   teachingBrief: JsonRecord;
++  interactionDesign?: InteractionDesignContext;
+ }
+ export interface FormalQualityInput extends FormalQualityContext {
+   stage: Stage; scenes: Scene[]; ownerId: string; sessionId: string;
+@@ -35,6 +42,7 @@
+   status: 'passed' | 'needs_revision'; snapshotSha256: string;
+   issues: Array<{ sceneId: string; problem: string; repair: string }>;
+   receipt?: MiraTeachingQualityReceipt;
++  interactionDesign?: InteractionDesignReceipt;
+   remainingReviewAttempts?: number;
+ }
+ interface ReviewReport {
+@@ -134,6 +142,10 @@
+   input: FormalQualityInput, signal?: AbortSignal, deps: QualityReviewDeps = {},
+ ): Promise<FormalQualityResult> {
+   if (signal?.aborted) throw new Error('FORMAL_QUALITY_ABORTED');
++  const interactionPlan = input.interactionDesign ? readInteractionDesignPlan({
++    ...input, interactionDesign: input.interactionDesign,
++  }) : undefined;
++  const reviewPromptVersion = interactionPlan ? INTERACTION_REVIEW_PROMPT_VERSION : FORMAL_QUALITY_REVIEW_PROMPT_VERSION;
+   const snapshot = qualitySnapshot(input.stage, input.scenes);
+   const snapshotSha256 = qualitySha(snapshot);
+   const gradeBoundarySha256 = qualitySha(input.gradeBoundary);
+@@ -141,7 +153,8 @@
+   const selectionPlanSha256 = input.selectionPlan.planSha256;
+   if (!SHA.test(selectionPlanSha256)) throw new Error('FORMAL_QUALITY_SELECTION_INVALID');
+   const identity = { ownerId: input.ownerId, sessionId: input.sessionId, stageId: input.stage.id,
+-    gradeBoundarySha256, teachingBriefSha256, selectionPlanSha256 };
++    gradeBoundarySha256, teachingBriefSha256, selectionPlanSha256,
++    ...(input.interactionDesign ? { interactionDesignContextSha256: qualitySha(input.interactionDesign) } : {}) };
+   const grant = deps.approvedReviewGrant;
+   if (grant) assertGrantBinding(grant, identity, snapshotSha256);
+   const folder = join(resolve(deps.cacheRoot ?? 'data/formal-quality-reviews'), qualitySha(identity));
+@@ -167,11 +180,13 @@
+         throw new Error('FORMAL_QUALITY_CACHE_CORRUPT');
+       const { receiptSha256, ...unsigned } = cached.receipt;
+       if (qualitySha(unsigned) !== receiptSha256) throw new Error('FORMAL_QUALITY_CACHE_CORRUPT');
++      if (interactionPlan) assertInteractionDesignReceipt(cached.interactionDesign, interactionPlan,
++        cached.receipt as unknown as MiraTeachingQualityReceipt);
+     }
+     if (!['passed', 'needs_revision'].includes(String(cached.status))) throw new Error('FORMAL_QUALITY_CACHE_CORRUPT');
+     // A changed reviewer must not silently accept an older pass or reset this
+     // session's durable paid-attempt budget by choosing a new cache directory.
+-    if (cached.reviewPromptVersion !== FORMAL_QUALITY_REVIEW_PROMPT_VERSION)
++    if (cached.reviewPromptVersion !== reviewPromptVersion)
+       throw new Error('FORMAL_QUALITY_REVIEW_VERSION_CHANGED');
+     const { reviewPromptVersion: _version, ...result } = cached;
+     const ledger = await readJson(join(folder, 'attempts.json'));
+@@ -230,7 +245,7 @@
+     try {
+       const issues: FormalQualityResult['issues'] = [];
+       const renderChecks: QualityRenderCheck[] = [];
+-      const observations: unknown[] = [];
++      const observations: FormalSceneInspectionResult[] = [];
+       const scenes = [...input.scenes].sort((a, b) => a.order - b.order);
+       for (const [sceneIndex, scene] of scenes.entries()) {
+         for (const viewport of QUALITY_VIEWPORTS) {
+@@ -238,14 +253,18 @@
+           const observed = await (deps.inspect ?? inspectFormalScene)({
+             scene, scenes, sceneIndex, stage: input.stage, ownerId: input.ownerId,
+             sessionId: input.sessionId, snapshotSha256, viewport,
++            ...(interactionPlan && interactionDesignProbes(interactionPlan, scene.id).length
++              ? { probes: interactionDesignProbes(interactionPlan, scene.id) } : {}),
+           }, signal);
+           observations.push(observed);
+           const sceneSha256 = qualitySha(snapshot.scenes[sceneIndex]);
+           if (observed.sceneId !== scene.id || observed.sceneSha256 !== sceneSha256
+               || observed.viewport.width !== viewport.width || observed.viewport.height !== viewport.height)
+             throw new Error('FORMAL_QUALITY_RENDER_IDENTITY_MISMATCH');
++          const interactionProbeMissing = interactionPlan && interactionDesignProbes(interactionPlan, scene.id)
++            .some(probe => !observed.probeResults.some(result => result.id === probe.id && result.passed));
+           if (!observed.passed || !SHA.test(observed.screenshotSha256) || !SHA.test(observed.domSha256)
+-              || (scene.type === 'interactive' && observed.probeCount < 1)) {
++              || (scene.type === 'interactive' && observed.probeCount < 1) || interactionProbeMissing) {
+             issues.push({ sceneId: scene.id,
+               problem: `Browser check ${viewport.width}x${viewport.height}: ${observed.issues.join('; ') || 'missing render or interaction evidence'}`.slice(0, 2000),
+               repair: 'Repair the actual page content/control/feedback and rerun review_course_quality; preserve the locked assessments.' });
+@@ -262,9 +281,11 @@
+         const reviewIdentity = { snapshotSha256, gradeBoundarySha256, selectionPlanSha256,
+           teachingBriefSha256, renderChecks };
+         const userPrompt = JSON.stringify(qualityCanonical({
+-          promptVersion: FORMAL_QUALITY_REVIEW_PROMPT_VERSION,
++          promptVersion: reviewPromptVersion,
+           gradeBoundary: input.gradeBoundary, teachingBrief: input.teachingBrief,
+           selectionPlan: input.selectionPlan, snapshot, evidenceCatalog, browserChecks: renderChecks,
++          ...(interactionPlan ? { interactionDesignPlan: interactionPlan,
++            independentQuestionIds: input.interactionDesign!.independentQuestionIds } : {}),
+           browserObservations: observations.map((value) => object(value) ? {
+             sceneId: value.sceneId, viewport: value.viewport, visibleText: value.visibleText,
+             probeResults: value.probeResults, metrics: value.metrics,
+@@ -279,7 +300,7 @@
+           requestId: `quality-${qualitySha({ ...identity, snapshotSha256,
+             ...(grant ? { reviewGrantSha256: qualitySha(grant) } : {}) })}`,
+           phase: attempts.length === 1 ? 'independent_verification' : 'verification_after_repair',
+-          systemPrompt: FORMAL_QUALITY_REVIEW_SYSTEM, userPrompt,
++          systemPrompt: FORMAL_QUALITY_REVIEW_SYSTEM + (interactionPlan ? INTERACTION_REVIEW_SYSTEM_SUFFIX : ''), userPrompt,
+           responseJsonSchema: formalReviewEvidenceSchema(evidenceCatalog),
+         }, signal);
+         // Preserve the actual response and usage before parsing; an invalid report
+@@ -304,10 +325,13 @@
+           if (!SHA.test(response.providerRequestIdHash)) throw new Error('FORMAL_QUALITY_PROVIDER_RECEIPT_INVALID');
+           result = { status: 'passed', snapshotSha256, issues: [],
+             receipt: { ...unsigned, receiptSha256: qualitySha(unsigned) } };
++          if (interactionPlan) result.interactionDesign = buildInteractionDesignReceipt({
++            ...input, plan: interactionPlan, quality: result.receipt!, observations,
++          });
+         }
+       }
+       attempt.status = result.status;
+-      const stored = { ...result, reviewPromptVersion: FORMAL_QUALITY_REVIEW_PROMPT_VERSION };
++      const stored = { ...result, reviewPromptVersion };
+       await save(join(folder, `${artifactPrefix}.json`), stored);
+       // Only an actual valid pass can become the canonical cache used by the
+       // remaining audio/publication tail. Failed old evidence is never relabeled.
+diff --git a/lib/types/formal-scene-inspection.ts b/lib/types/formal-scene-inspection.ts
+--- a/lib/types/formal-scene-inspection.ts
++++ b/lib/types/formal-scene-inspection.ts
+@@ -13,6 +13,8 @@
+   expect: {
+     selector: string;
+     textIncludes?: string;
++    textIncludesAll?: readonly string[];
++    distinctFeedback?: boolean;
+     valueEquals?: string;
+     checked?: boolean;
+     changed?: boolean;
+diff --git a/tests/server/mira-formal-scene-inspector.browser.test.ts b/tests/server/mira-formal-scene-inspector.browser.test.ts
+--- a/tests/server/mira-formal-scene-inspector.browser.test.ts
++++ b/tests/server/mira-formal-scene-inspector.browser.test.ts
+@@ -209,6 +209,31 @@
+     }
+   }, 60_000);
+ 
++  it('adaptive interaction verifies separate visible explanatory feedback and rejects decorative changes', async () => {
++    const markup = (effect: string, nested = false) => `<html><body><h1>合并两组积木</h1>
++      ${nested ? '<div id="result">' : ''}<button id="combine" onclick="${effect}">把两组合起来</button>
++      ${nested ? '</div>' : '<output id="result">先动手看结果</output>'}</body></html>`;
++    const probe = { id: 'objective-0', action: 'click' as const, selector: '#combine',
++      expect: { selector: '#result', textIncludes: '一共四个', textIncludesAll: ['因为两组合并'],
++        changed: true, distinctFeedback: true } };
++    const good = interactive(markup("document.querySelector('#result').textContent='一共四个，因为两组合并'"));
++    for (const viewport of [{ width: 1280, height: 720 }, { width: 1024, height: 768 }]) {
++      const observed = await inspectFormalScene({ ...input(good, viewport), probes: [probe] });
++      expect(observed.passed).toBe(true);
++      expect(observed.probeResults).toContainEqual(expect.objectContaining({ id: 'objective-0', passed: true }));
++    }
++    for (const scene of [
++      interactive(markup("this.textContent='一共四个，因为两组合并'")),
++      interactive(markup("document.querySelector('#result').style.color='red'")),
++      interactive(markup("this.textContent='一共四个，因为两组合并'", true)),
++      interactive(markup("document.querySelector('#result').textContent='一共四个，因为两组合并';document.querySelector('#result').style.display='none'")),
++    ]) {
++      const observed = await inspectFormalScene({ ...input(scene), probes: [probe] });
++      expect(observed.passed).toBe(false);
++      expect(observed.issues).toContain('probe_failed:objective-0');
++    }
++  }, 60_000);
++
+   it('clicks the real control inside a scaled letterboxed iframe without bypassing occlusion', async () => {
+     const html = (covered = false) =>
+       `<html><body style="margin:0"><button id="choice" style="position:absolute;left:900px;top:200px;width:140px;height:60px" onclick="if(event.isTrusted)document.querySelector('#answer').textContent='点到了'">选择 a</button><p id="answer">等待选择</p>${covered ? '<div style="position:absolute;left:890px;top:190px;width:180px;height:90px;z-index:99;background:white">遮挡</div>' : ''}</body></html>`;
+diff --git a/tests/server/mira-formal-teaching-quality.test.ts b/tests/server/mira-formal-teaching-quality.test.ts
+--- a/tests/server/mira-formal-teaching-quality.test.ts
++++ b/tests/server/mira-formal-teaching-quality.test.ts
+@@ -21,6 +21,7 @@
+ import { formalCanonicalSha256 } from '@/lib/server/mira-formal-skill-selection';
+ import { buildFormalReviewEvidence, decodeFormalReviewEvidence } from '@/lib/server/mira-formal-review-evidence';
+ import fixtures from '../fixtures/mira-formal-skill-selection-v2.json';
++import { MIRA_INTERACTION_DESIGN_POLICY } from '@/lib/server/mira-formal-interaction-design';
+ 
+ // This suite exercises the real receipt/cache/budget boundary without launching
+ // browsers or a model. Inspector/provider outcomes are explicit per test.
+@@ -128,6 +129,48 @@
+   return join(cacheRoot, (await readdir(cacheRoot))[0]!);
+ }
+ 
++function interactionInput(): FormalQualityInput {
++  const value = input();
++  value.gradeBoundary.learningObjectives = ['理解合并'];
++  value.interactionDesign = { policy: MIRA_INTERACTION_DESIGN_POLICY, independentQuestionIds: ['independent-1'] };
++  const plan = { schemaVersion: 'mira.openmaic.interaction-design-plan.v1', objectives: [{
++    objectiveIndex: 0, demonstration: { sceneId: 'page-1', quote },
++    operation: { sceneId: 'page-1', action: 'click', controlSelector: '#combine' },
++    feedback: { sceneId: 'page-1', selector: '#result', textIncludes: '一共四个', reasonQuote: '因为合并两组' },
++    independentJudgment: { sceneId: 'quiz', questionId: 'independent-1' },
++  }] };
++  (value.scenes[0].content as { html: string }).html += `<script type="application/json" id="mira-interaction-plan">${JSON.stringify(plan)}</script>`;
++  value.scenes.push({ id: 'quiz', stageId: value.stage.id, order: 2, type: 'quiz', title: '独立判断',
++    content: { type: 'quiz', questions: [{ id: 'independent-1' }] }, actions: [] } as unknown as Scene);
++  return value;
++}
++
++it('new interaction jobs require every declared objective probe before any paid review', async () => {
++  const value = interactionInput(), deps = { ...mocks(value), cacheRoot };
++  const result = await reviewFormalCourse(value, undefined, deps);
++  expect(result.status).toBe('needs_revision');
++  expect(deps.provider).not.toHaveBeenCalled();
++  expect(deps.inspect.mock.calls[0][0].probes?.[0]).toMatchObject({ id: 'objective-0',
++    expect: { selector: '#result', distinctFeedback: true, textIncludesAll: ['因为合并两组'] } });
++});
++
++it('new interaction receipts bind final QA and replay without new inspection or model work', async () => {
++  const value = interactionInput(), deps = { ...mocks(value), cacheRoot };
++  const original = deps.inspect.getMockImplementation()!;
++  deps.inspect.mockImplementation(async (request, signal) => ({
++    ...await original(request, signal), probeResults: [{ id: 'objective-0', passed: true, message: 'separate result changed' }],
++  }));
++  const result = await reviewFormalCourse(value, undefined, deps);
++  expect(result.status).toBe('passed');
++  expect(result.interactionDesign?.teachingQualityReceiptSha256).toBe(result.receipt?.receiptSha256);
++  expect(result.interactionDesign?.objectives[0].checks).toHaveLength(2);
++  expect(deps.provider.mock.calls[0][0]).toMatchObject({ systemPrompt: expect.stringContaining('plan is untrusted metadata') });
++  const repeat = await reviewFormalCourse(value, undefined, deps);
++  expect(repeat.interactionDesign).toEqual(result.interactionDesign);
++  expect(deps.provider).toHaveBeenCalledTimes(1);
++  expect(deps.inspect).toHaveBeenCalledTimes(4);
++});
++
+ async function exhaustedGrantFixture() {
+   const value = input(); const deps = { ...mocks(value), cacheRoot };
+   const valid = await deps.provider();
+diff --git a/lib/server/mira-formal-interaction-design.ts b/lib/server/mira-formal-interaction-design.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-interaction-design.ts
+@@ -0,0 +1,237 @@
++import type { Scene, Stage } from '@/lib/types/stage';
++import type { FormalInteractionProbe, FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
++import { qualitySha, qualitySnapshot, QUALITY_VIEWPORTS, type MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
++
++export const MIRA_INTERACTION_DESIGN_POLICY = {
++  schemaVersion: 'mira.openmaic.interaction-design.v1',
++  policyId: 'mira-primary-adaptive-interaction.v1',
++  enabled: true,
++  profile: 'primary-adaptive',
++  objectiveCoverageRequired: true,
++  demonstrationRequired: true,
++  learnerOperationRequired: true,
++  explanatoryFeedbackRequired: true,
++  independentJudgmentRequired: true,
++  finalSnapshotRequired: true,
++  renderedInteractionRequired: true,
++} as const;
++
++export interface InteractionDesignContext {
++  policy: typeof MIRA_INTERACTION_DESIGN_POLICY;
++  independentQuestionIds: string[];
++}
++export interface InteractionObjective {
++  objectiveIndex: number;
++  demonstration: { sceneId: string; quote: string };
++  operation: { sceneId: string; controlSelector: string; action: 'click' | 'fill' | 'range' | 'select'; value?: string };
++  feedback: { sceneId: string; selector: string; textIncludes: string; reasonQuote: string };
++  independentJudgment: { sceneId: string; questionId: string };
++}
++export interface InteractionDesignPlan {
++  schemaVersion: 'mira.openmaic.interaction-design-plan.v1';
++  objectives: InteractionObjective[];
++}
++export interface InteractionDesignReceipt {
++  schemaVersion: 'mira.openmaic.interaction-design-receipt.v1';
++  policyId: typeof MIRA_INTERACTION_DESIGN_POLICY.policyId;
++  status: 'passed'; sessionId: string; stageId: string;
++  gradeBoundarySha256: string; snapshotSha256: string; planSha256: string;
++  teachingQualityReceiptSha256: string;
++  objectives: Array<InteractionObjective & { checks: Array<{
++    viewport: { width: number; height: number }; sceneSha256: string;
++    screenshotSha256: string; domSha256: string; probeId: string;
++  }> }>;
++  receiptSha256: string;
++}
++type Obj = Record<string, unknown>;
++const object = (value: unknown): value is Obj => value !== null && typeof value === 'object' && !Array.isArray(value);
++const text = (value: unknown, min = 1, max = 500): value is string =>
++  typeof value === 'string' && value.trim().length >= min && value.length <= max;
++const exact = (value: unknown, keys: string) => object(value) && Object.keys(value).sort().join(',') === keys;
++const selector = (value: unknown): value is string => typeof value === 'string' && /^#[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(value);
++const fail = (suffix: string): never => { throw new Error(`FORMAL_INTERACTION_${suffix}`); };
++const START = '\nMIRA_INTERACTION_DESIGN_CONTEXT:\n';
++const END = '\nEND_MIRA_INTERACTION_DESIGN_CONTEXT\n';
++
++export function assertInteractionDesignContext(value: unknown): asserts value is InteractionDesignContext {
++  if (!exact(value, 'independentQuestionIds,policy') || !object(value) ||
++      qualitySha(value.policy) !== qualitySha(MIRA_INTERACTION_DESIGN_POLICY) ||
++      !Array.isArray(value.independentQuestionIds) || !value.independentQuestionIds.length ||
++      value.independentQuestionIds.some(id => !text(id, 1, 128)) ||
++      new Set(value.independentQuestionIds).size !== value.independentQuestionIds.length)
++    fail('CONTEXT_INVALID');
++}
++
++/** The server appends this to NEW job prompts only. Old prompt bytes stay frozen. */
++export function interactionDesignPrompt(context: InteractionDesignContext): string {
++  assertInteractionDesignContext(context);
++  return START + JSON.stringify(context) + END + `
++Required adaptive interaction design for this formal course:
++For EVERY gradeBoundary.learningObjectives entry, teach an explicit worked demonstration,
++then let the real learner operate the taught model, show its observable result AND explain why,
++then require an independent judgment using one of the locked independentQuestionIds above.
++Use a stateful teaching model: learners change a condition or arrangement and SEE the mechanism's
++corresponding quantities, spatial relations, classification, or evidence-based interpretation change.
++Offer multiple meaningful states to explore (for example composing quantities, arranging language units,
++classifying examples, or comparing source evidence); the result must be computed from the chosen state.
++An answer choice that merely reveals prewritten praise/explanation is insufficient. Prefer a clear
++condition -> visible model/result -> explanation loop appropriate to the grade, with reset/revisit controls.
++Reuse pages when appropriate; there is no 60% interactive-page quota and no mandatory widget roster.
++Do not force 3D, sliders, or physics-like simulations onto language lessons; choose the representation
++that makes THIS learning objective observable rather than repeating one reveal-button template.
++Before review_course_quality, embed exactly one non-executable application/json script with
++id="mira-interaction-plan" in the FIRST interactive scene's HTML. JSON shape:
++{"schemaVersion":"mira.openmaic.interaction-design-plan.v1","objectives":[{"objectiveIndex":0,
++"demonstration":{"sceneId":"actual-scene-id","quote":"exact teacher speech excerpt"},
++"operation":{"sceneId":"actual-interactive-scene-id","controlSelector":"#actual-control","action":"click"},
++"feedback":{"sceneId":"same-interactive-scene-id","selector":"#separate-result","textIncludes":"observed result","reasonQuote":"explanation of why"},
++"independentJudgment":{"sceneId":"later-quiz-scene-id","questionId":"locked-independent-id"}}]}
++Use actual persisted scene IDs (read the stage and patch HTML after building if necessary).
++Cover objective indices 0..N-1 exactly once. Demonstration quote must occur in actual speech.
++Operation action is click, fill, range, or select; non-click operations require a string value.
++Selectors are simple #ids. Feedback must be a separate visible result region, not the control,
++its ancestor/descendant, or another form control. Operation must change its visible text and
++reveal BOTH textIncludes and reasonQuote. A color toggle, click counter, generic praise, or an
++answer-reveal button unrelated to the taught mechanism cannot satisfy this contract.
++The independent question must follow the operation, never use a guided/example question.
++Real browser probes and independent teaching review validate the final snapshot. The plan is
++not a claim that a real student has already performed these operations.
++`;
++}
++
++export function interactionDesignContextFromPrompt(prompt: string): InteractionDesignContext | undefined {
++  const parts = prompt.split(START);
++  if (parts.length === 1) return undefined;
++  if (parts.length !== 2 || parts[1].split(END).length !== 2) return fail('CONTEXT_INVALID');
++  const value: unknown = JSON.parse(parts[1].split(END)[0]);
++  assertInteractionDesignContext(value);
++  return value;
++}
++
++const PLAN_SCRIPT = /<script\b(?=[^>]*\bid=["']mira-interaction-plan["'])(?=[^>]*\btype=["']application\/json["'])[^>]*>([\s\S]*?)<\/script\s*>/gi;
++export function readInteractionDesignPlan(input: {
++  scenes: readonly Scene[]; gradeBoundary: Obj; interactionDesign: InteractionDesignContext;
++}): InteractionDesignPlan {
++  assertInteractionDesignContext(input.interactionDesign);
++  const ordered = [...input.scenes].sort((a, b) => a.order - b.order);
++  const firstInteractive = ordered.find(scene => scene.type === 'interactive');
++  const plans = ordered.flatMap(scene => scene.content.type === 'interactive'
++    ? [...(scene.content.html ?? '').matchAll(PLAN_SCRIPT)].map(match => ({ sceneId: scene.id, value: match[1] })) : []);
++  if (plans.length !== 1 || plans[0].sceneId !== firstInteractive?.id || plans[0].value.length > 40_000)
++    return fail('PLAN_MISSING_OR_DUPLICATE');
++  let raw: unknown;
++  try { raw = JSON.parse(plans[0].value); } catch { return fail('PLAN_INVALID'); }
++  const objectives = input.gradeBoundary.learningObjectives;
++  if (!exact(raw, 'objectives,schemaVersion') || !object(raw) || raw.schemaVersion !== 'mira.openmaic.interaction-design-plan.v1' ||
++      !Array.isArray(objectives) || !objectives.length || !Array.isArray(raw.objectives) ||
++      raw.objectives.length !== objectives.length || raw.objectives.length > 30) return fail('OBJECTIVE_COVERAGE_INVALID');
++  const byId = new Map(ordered.map((scene, index) => [scene.id, { scene, index }]));
++  const seen = new Set<number>();
++  for (const item of raw.objectives) {
++    if (!exact(item, 'demonstration,feedback,independentJudgment,objectiveIndex,operation') || !object(item) ||
++        !Number.isInteger(item.objectiveIndex) || Number(item.objectiveIndex) < 0 || Number(item.objectiveIndex) >= objectives.length ||
++        seen.has(Number(item.objectiveIndex))) return fail('OBJECTIVE_COVERAGE_INVALID');
++    seen.add(Number(item.objectiveIndex));
++    const { demonstration: demo, operation: op, feedback: feedback, independentJudgment: judge } = item;
++    if (!exact(demo, 'quote,sceneId') || !object(demo) || !text(demo.sceneId, 1, 128) || !text(demo.quote, 3) ||
++        !object(op) || !['action,controlSelector,sceneId', 'action,controlSelector,sceneId,value'].includes(Object.keys(op).sort().join(',')) ||
++        !text(op.sceneId, 1, 128) || !selector(op.controlSelector) || !['click','fill','range','select'].includes(String(op.action)) ||
++        (op.action !== 'click' && !text(op.value)) || (op.value !== undefined && !text(op.value)) ||
++        !exact(feedback, 'reasonQuote,sceneId,selector,textIncludes') || !object(feedback) || feedback.sceneId !== op.sceneId ||
++        !selector(feedback.selector) || feedback.selector === op.controlSelector || !text(feedback.textIncludes, 3) || !text(feedback.reasonQuote, 3) ||
++        !exact(judge, 'questionId,sceneId') || !object(judge) || !text(judge.sceneId, 1, 128) ||
++        !text(judge.questionId, 1, 128) || !input.interactionDesign.independentQuestionIds.includes(judge.questionId)) return fail('OBJECTIVE_MAPPING_INVALID');
++    const d = byId.get(demo.sceneId), o = byId.get(op.sceneId), j = byId.get(judge.sceneId);
++    if (!d || !o || !j || d.index > o.index || j.index <= o.index || o.scene.type !== 'interactive' ||
++        !d.scene.actions?.some(action => action.type === 'speech' && action.text.includes(demo.quote as string)) ||
++        j.scene.content.type !== 'quiz' || !j.scene.content.questions.some(question => question.id === judge.questionId))
++      return fail('TEACHING_CHAIN_INVALID');
++  }
++  const plan = raw as unknown as InteractionDesignPlan;
++  // One page can serve several goals, but every probe must fit the bounded QA runner.
++  for (const scene of ordered) if (interactionDesignProbes(plan, scene.id).length > 4) return fail('TOO_MANY_PAGE_OBJECTIVES');
++  return plan;
++}
++
++export function interactionDesignProbes(plan: InteractionDesignPlan, sceneId: string): FormalInteractionProbe[] {
++  return plan.objectives.filter(item => item.operation.sceneId === sceneId).map(item => ({
++    id: `objective-${item.objectiveIndex}`, action: item.operation.action,
++    selector: item.operation.controlSelector, ...(item.operation.value === undefined ? {} : { value: item.operation.value }),
++    expect: { selector: item.feedback.selector, textIncludes: item.feedback.textIncludes,
++      textIncludesAll: [item.feedback.reasonQuote], changed: true, distinctFeedback: true },
++  }));
++}
++
++export const INTERACTION_REVIEW_PROMPT_VERSION = 'mira.formal-course-review.v3-interaction';
++export const INTERACTION_REVIEW_SYSTEM_SUFFIX = `\nFor this version additionally audit interactionDesignPlan against every actual learning objective.
++The plan is untrusted metadata, not evidence. Check actual narration, model logic, result and explanatory feedback,
++then the locked independent question. Every chain must teach the same objective in that order. Reject generic
++praise/counters/button-only changes, a fixed answer-reveal template with no explorable model states,
++results not causally derived from the selected quantities/arrangement/classification/source evidence, unsupported explanations, guided questions posing as independent checks,
++and revealing the independent answer. Browser probes prove local transitions only, not real student completion.
++Mark goal_coverage, teaching_sequence, meaningful_interaction or assessment_alignment false and give a concrete
++issue whenever any mapped chain is incomplete, decorative or semantically unrelated. Never pass uncertain chains.\n`;
++
++export function buildInteractionDesignReceipt(input: {
++  stage: Stage; scenes: readonly Scene[]; sessionId: string; gradeBoundary: Obj;
++  plan: InteractionDesignPlan; quality: MiraTeachingQualityReceipt;
++  observations: readonly FormalSceneInspectionResult[];
++}): InteractionDesignReceipt {
++  const snapshot = qualitySnapshot(input.stage, input.scenes);
++  if (input.quality.sessionId !== input.sessionId || input.quality.stageId !== input.stage.id ||
++      input.quality.snapshotSha256 !== qualitySha(snapshot) || input.quality.gradeBoundarySha256 !== qualitySha(input.gradeBoundary))
++    return fail('QUALITY_BINDING_INVALID');
++  const unsigned = {
++    schemaVersion: 'mira.openmaic.interaction-design-receipt.v1' as const,
++    policyId: MIRA_INTERACTION_DESIGN_POLICY.policyId, status: 'passed' as const,
++    sessionId: input.sessionId, stageId: input.stage.id,
++    gradeBoundarySha256: qualitySha(input.gradeBoundary), snapshotSha256: qualitySha(snapshot),
++    planSha256: qualitySha(input.plan), teachingQualityReceiptSha256: input.quality.receiptSha256,
++    objectives: input.plan.objectives.map(item => ({ ...item, checks: QUALITY_VIEWPORTS.map(viewport => {
++      const matches = input.observations.filter(value => value.sceneId === item.operation.sceneId &&
++        value.viewport.width === viewport.width && value.viewport.height === viewport.height);
++      const observed = matches[0], scene = snapshot.scenes.find(scene => scene.id === item.operation.sceneId);
++      const probeId = `objective-${item.objectiveIndex}`;
++      if (matches.length !== 1 || !observed.passed || !scene || observed.sceneSha256 !== qualitySha(scene) ||
++          !/^[0-9a-f]{64}$/.test(observed.screenshotSha256) || !/^[0-9a-f]{64}$/.test(observed.domSha256) ||
++          !observed.probeResults.some(probe => probe.id === probeId && probe.passed) ||
++          !input.quality.renderChecks.some(check => check.sceneId === item.operation.sceneId &&
++            check.viewport.width === viewport.width && check.viewport.height === viewport.height &&
++            check.sceneSha256 === observed.sceneSha256 && check.screenshotSha256 === observed.screenshotSha256 &&
++            check.domSha256 === observed.domSha256 && check.passed)) return fail('BROWSER_PROOF_MISSING');
++      return { viewport: { ...viewport }, sceneSha256: observed.sceneSha256,
++        screenshotSha256: observed.screenshotSha256, domSha256: observed.domSha256, probeId };
++    }) })),
++  };
++  return { ...unsigned, receiptSha256: qualitySha(unsigned) };
++}
++
++/** Cached passes must preserve the same plan, QA identity and two viewport proofs. */
++export function assertInteractionDesignReceipt(value: unknown, plan: InteractionDesignPlan,
++  quality: MiraTeachingQualityReceipt): asserts value is InteractionDesignReceipt {
++  if (!exact(value, 'gradeBoundarySha256,objectives,planSha256,policyId,receiptSha256,schemaVersion,sessionId,snapshotSha256,stageId,status,teachingQualityReceiptSha256') ||
++      !object(value) || value.schemaVersion !== 'mira.openmaic.interaction-design-receipt.v1' ||
++      value.policyId !== MIRA_INTERACTION_DESIGN_POLICY.policyId || value.status !== 'passed' ||
++      value.sessionId !== quality.sessionId || value.stageId !== quality.stageId ||
++      value.snapshotSha256 !== quality.snapshotSha256 || value.gradeBoundarySha256 !== quality.gradeBoundarySha256 ||
++      value.planSha256 !== qualitySha(plan) || value.teachingQualityReceiptSha256 !== quality.receiptSha256 ||
++      !Array.isArray(value.objectives) || value.objectives.length !== plan.objectives.length)
++    return fail('RECEIPT_INVALID');
++  const { receiptSha256, ...unsigned } = value;
++  if (receiptSha256 !== qualitySha(unsigned)) return fail('RECEIPT_INVALID');
++  for (const [index, raw] of value.objectives.entries()) {
++    if (!object(raw) || !Array.isArray(raw.checks) || raw.checks.length !== QUALITY_VIEWPORTS.length)
++      return fail('RECEIPT_INVALID');
++    const { checks, ...mapping } = raw;
++    if (qualitySha(mapping) !== qualitySha(plan.objectives[index])) return fail('RECEIPT_INVALID');
++    for (const [viewportIndex, check] of checks.entries()) {
++      const viewport = QUALITY_VIEWPORTS[viewportIndex];
++      if (!exact(check, 'domSha256,probeId,sceneSha256,screenshotSha256,viewport') || !object(check) ||
++          qualitySha(check.viewport) !== qualitySha(viewport) || check.probeId !== `objective-${mapping.objectiveIndex}` ||
++          !quality.renderChecks.some(render => render.sceneId === plan.objectives[index].operation.sceneId &&
++            render.viewport.width === viewport.width && render.viewport.height === viewport.height && render.passed &&
++            render.sceneSha256 === check.sceneSha256 && render.screenshotSha256 === check.screenshotSha256 &&
++            render.domSha256 === check.domSha256 && render.probeCount >= 1)) return fail('RECEIPT_INVALID');
++    }
++  }
++}
+diff --git a/tests/server/mira-formal-interaction-design.test.ts b/tests/server/mira-formal-interaction-design.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-interaction-design.test.ts
+@@ -0,0 +1,118 @@
++import { describe, expect, it } from 'vitest';
++import type { Scene, Stage } from '@/lib/types/stage';
++import {
++  MIRA_INTERACTION_DESIGN_POLICY, readInteractionDesignPlan, interactionDesignProbes,
++  interactionDesignPrompt, interactionDesignContextFromPrompt, buildInteractionDesignReceipt,
++  assertInteractionDesignReceipt, type InteractionDesignPlan,
++} from '@/lib/server/mira-formal-interaction-design';
++import {
++  MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY, MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY,
++  isExactMiraProfessionalCreationPolicy, isMiraInteractionCreationPolicy,
++} from '@/lib/server/mira-formal-generation-policy';
++import { qualitySha, qualitySnapshot, QUALITY_VIEWPORTS, MIRA_TEACHING_QUALITY_POLICY, type MiraTeachingQualityReceipt } from '@/lib/server/mira-formal-quality-contract';
++import type { FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
++
++function fixture() {
++  const plan: InteractionDesignPlan = {
++    schemaVersion: 'mira.openmaic.interaction-design-plan.v1', objectives: [{ objectiveIndex: 0,
++      demonstration: { sceneId: 'demo', quote: '两个部分合起来，数量就变多了。' },
++      operation: { sceneId: 'operate', controlSelector: '#count', action: 'range', value: '4' },
++      feedback: { sceneId: 'operate', selector: '#result', textIncludes: '一共四个', reasonQuote: '因为增加了两个' },
++      independentJudgment: { sceneId: 'judge', questionId: 'independent-1' },
++    }],
++  };
++  const scenes = [
++    { id: 'demo', type: 'slide', title: '看老师合起来', content: { type: 'slide' },
++      actions: [{ type: 'speech', text: plan.objectives[0].demonstration.quote }] },
++    { id: 'operate', type: 'interactive', title: '亲手试一次', content: { type: 'interactive',
++      html: `<input id="count" type="range"><output id="result">先动手</output><script type="application/json" id="mira-interaction-plan">${JSON.stringify(plan)}</script>` }, actions: [] },
++    { id: 'judge', type: 'quiz', title: '自己判断', content: { type: 'quiz', questions: [{ id: 'independent-1' }] }, actions: [] },
++  ].map((scene, order) => ({ ...scene, order, stageId: 'stage-1' })) as Scene[];
++  return { plan, scenes, stage: { id: 'stage-1', name: '动手合起来' } as Stage,
++    gradeBoundary: { learningObjectives: ['理解合并数量'] },
++    interactionDesign: { policy: MIRA_INTERACTION_DESIGN_POLICY, independentQuestionIds: ['independent-1'] } };
++}
++function withPlan(value: ReturnType<typeof fixture>, change: (plan: InteractionDesignPlan) => void) {
++  change(value.plan);
++  (value.scenes[1].content as { html: string }).html = `<script id="mira-interaction-plan" type="application/json">${JSON.stringify(value.plan)}</script>`;
++  return value;
++}
++function evidence(value = fixture()) {
++  const snapshot = qualitySnapshot(value.stage, value.scenes);
++  const observations = QUALITY_VIEWPORTS.map(viewport => ({ sceneId: 'operate', viewport: { ...viewport },
++    sceneSha256: qualitySha(snapshot.scenes[1]), screenshotSha256: 'a'.repeat(64), domSha256: 'b'.repeat(64),
++    passed: true, probeCount: 1, probeResults: [{ id: 'objective-0', passed: true, message: 'result and reason changed' }],
++  })) as FormalSceneInspectionResult[];
++  const quality: MiraTeachingQualityReceipt = {
++    schemaVersion: 'mira.openmaic.teaching-quality-receipt.v1', policyId: MIRA_TEACHING_QUALITY_POLICY.policyId,
++    status: 'passed', sessionId: 'session-1', stageId: value.stage.id, snapshotSha256: qualitySha(snapshot),
++    gradeBoundarySha256: qualitySha(value.gradeBoundary), receiptSha256: 'c'.repeat(64),
++    selectionPlanSha256: 'd'.repeat(64), teachingBriefSha256: 'e'.repeat(64),
++    sceneHashes: snapshot.scenes.map(scene => ({ sceneId: scene.id, sceneSha256: qualitySha(scene) })),
++    renderChecks: observations.map(check => ({ ...check, passed: true as const })),
++    review: { providerId: 'deepseek', modelId: 'deepseek-v4-flash', requestIdHash: 'f'.repeat(64),
++      inputSha256: '0'.repeat(64), dimensions: [], objectives: [] },
++  };
++  return { ...value, sessionId: 'session-1', observations, quality };
++}
++
++describe('formal adaptive interaction design', () => {
++  it('preserves the exact old video policy while registering a distinct future policy', () => {
++    expect(MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY).not.toHaveProperty('interactionDesignPolicy');
++    expect(isExactMiraProfessionalCreationPolicy(MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY)).toBe(true);
++    expect(isMiraInteractionCreationPolicy(MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY)).toBe(false);
++    expect(isExactMiraProfessionalCreationPolicy(MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY)).toBe(true);
++    expect(isExactMiraProfessionalCreationPolicy({ ...MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY,
++      interactionDesignPolicy: { ...MIRA_INTERACTION_DESIGN_POLICY, enabled: false } })).toBe(false);
++  });
++  it('keeps old prompts untouched and round trips only validated server context', () => {
++    expect(interactionDesignContextFromPrompt('old frozen job')).toBeUndefined();
++    const context = fixture().interactionDesign;
++    expect(interactionDesignContextFromPrompt('job' + interactionDesignPrompt(context))).toEqual(context);
++    expect(() => interactionDesignPrompt({ ...context, independentQuestionIds: [] })).toThrow('CONTEXT_INVALID');
++  });
++  it('requires every objective but allows a three-page teaching chain without a 60% quota', () => {
++    const value = fixture();
++    expect(readInteractionDesignPlan(value)).toEqual(value.plan);
++    expect(interactionDesignProbes(value.plan, 'operate')).toEqual([{ id: 'objective-0', action: 'range',
++      selector: '#count', value: '4', expect: { selector: '#result', textIncludes: '一共四个',
++        textIncludesAll: ['因为增加了两个'], changed: true, distinctFeedback: true } }]);
++    value.gradeBoundary.learningObjectives.push('分解数量');
++    expect(() => readInteractionDesignPlan(value)).toThrow('OBJECTIVE_COVERAGE_INVALID');
++  });
++  it('rejects missing or duplicate plan metadata rather than falling back to a badge', () => {
++    const value = fixture();
++    const html = value.scenes[1].content as { html: string };
++    html.html += html.html;
++    expect(() => readInteractionDesignPlan(value)).toThrow('PLAN_MISSING_OR_DUPLICATE');
++    html.html = '<button>我会了</button>';
++    expect(() => readInteractionDesignPlan(value)).toThrow('PLAN_MISSING_OR_DUPLICATE');
++  });
++  it.each([
++    ['guided assessment', (plan: InteractionDesignPlan) => { plan.objectives[0].independentJudgment.questionId = 'guided-1'; }],
++    ['button feedback', (plan: InteractionDesignPlan) => { plan.objectives[0].feedback.selector = '#count'; }],
++    ['arbitrary selector', (plan: InteractionDesignPlan) => { plan.objectives[0].operation.controlSelector = 'body *'; }],
++    ['unbound value', (plan: InteractionDesignPlan) => { delete plan.objectives[0].operation.value; }],
++  ])('rejects %s', (_name, change) => {
++    expect(() => readInteractionDesignPlan(withPlan(fixture(), change))).toThrow('OBJECTIVE_MAPPING_INVALID');
++  });
++  it('rejects evidence fabricated inside the plan instead of real teacher speech', () => {
++    expect(() => readInteractionDesignPlan(withPlan(fixture(), plan => {
++      plan.objectives[0].demonstration.quote = '没有实际讲过的示范';
++    }))).toThrow('TEACHING_CHAIN_INVALID');
++  });
++  it('binds two actual objective probes to the final snapshot and the independent QA receipt', () => {
++    const value = evidence(), receipt = buildInteractionDesignReceipt(value);
++    expect(receipt.objectives[0].checks.map(check => check.probeId)).toEqual(['objective-0', 'objective-0']);
++    expect(() => assertInteractionDesignReceipt(receipt, value.plan, value.quality)).not.toThrow();
++    value.observations[1].probeResults[0].id = 'decorative-button';
++    expect(() => buildInteractionDesignReceipt(value)).toThrow('BROWSER_PROOF_MISSING');
++  });
++  it('rejects tampered cached evidence and an edited post-review classroom', () => {
++    const value = evidence(), receipt = buildInteractionDesignReceipt(value);
++    receipt.objectives[0].checks[0].domSha256 = 'd'.repeat(64);
++    expect(() => assertInteractionDesignReceipt(receipt, value.plan, value.quality)).toThrow('RECEIPT_INVALID');
++    value.scenes[0].title = 'changed after review';
++    expect(() => buildInteractionDesignReceipt(value)).toThrow('QUALITY_BINDING_INVALID');
++  });
++});

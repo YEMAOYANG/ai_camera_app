@@ -1,0 +1,125 @@
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -18,7 +18,7 @@
+ 
+ import { buildAgent } from '@/lib/agent/runtime/build-agent';
+ import { createCallLlmStreamFn } from '@/lib/agent/runtime/stream-fn';
+-import { MIRA_FORMAL_AGENT_BUDGET, reserveMiraFormalAgentDispatch } from '@/lib/server/mira-formal-agent-budget';
++import { MIRA_FORMAL_AGENT_BUDGET, miraFormalAgentOutputOptions, reserveMiraFormalAgentDispatch } from '@/lib/server/mira-formal-agent-budget';
+ import { formalSearchEventCounts, projectFormalErrorContext } from '@/lib/server/mira-formal-context';
+ import { HOST_AGENT_LIFECYCLE as LIFECYCLE } from '@/lib/agent-runtime/lifecycle';
+ import { createLogger } from '@/lib/logger';
+@@ -1396,10 +1396,7 @@
+     const driver = await resolveAgentDriverModel();
+     const streamFn = createCallLlmStreamFn({
+       languageModel: driver.connection.model,
+-      maxOutputTokens: formalProfessionalSession
+-        ? Math.min(driver.wireMaxOutputTokens ?? Infinity, MIRA_FORMAL_AGENT_BUDGET.maxOutputTokensPerDispatch)
+-        : driver.wireMaxOutputTokens,
+-      omitMaxOutputTokens: !formalProfessionalSession && driver.wireMaxOutputTokens === undefined,
++      ...(await miraFormalAgentOutputOptions(formalProfessionalSession, driver.wireMaxOutputTokens)),
+       ...(formalProfessionalSession ? {
+         maxRetries: MIRA_FORMAL_AGENT_BUDGET.maxRetries,
+         beforeDispatch: ({ inputCharacters }: { inputCharacters: number }) =>
+diff --git a/lib/server/mira-formal-agent-budget.ts b/lib/server/mira-formal-agent-budget.ts
+--- a/lib/server/mira-formal-agent-budget.ts
++++ b/lib/server/mira-formal-agent-budget.ts
+@@ -13,6 +13,20 @@
+   maxOutputTokensPerDispatch: 16_384,
+   maxRetries: 0,
+ } as const;
++
++/** The legacy 16K allowance is a local quota, not the driver's model capacity. */
++export async function miraFormalAgentOutputOptions(
++  formalProfessionalSession: boolean,
++  wireMaxOutputTokens: number | undefined,
++) {
++  const limitOutput = formalProfessionalSession && !(await isPaidBudgetObservationMode());
++  return {
++    maxOutputTokens: limitOutput
++      ? Math.min(wireMaxOutputTokens ?? Infinity, MIRA_FORMAL_AGENT_BUDGET.maxOutputTokensPerDispatch)
++      : wireMaxOutputTokens,
++    omitMaxOutputTokens: !limitOutput && wireMaxOutputTokens === undefined,
++  };
++}
+ 
+ export async function reserveMiraFormalAgentDispatch(
+   input: {
+diff --git a/tests/server/mira-formal-agent-budget.test.ts b/tests/server/mira-formal-agent-budget.test.ts
+--- a/tests/server/mira-formal-agent-budget.test.ts
++++ b/tests/server/mira-formal-agent-budget.test.ts
+@@ -4,6 +4,7 @@
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ import {
+   MIRA_FORMAL_AGENT_BUDGET,
++  miraFormalAgentOutputOptions,
+   reserveMiraFormalAgentDispatch,
+ } from '@/lib/server/mira-formal-agent-budget';
+ import { withPaidBudget } from '@/lib/server/mira-paid-budget';
+@@ -22,6 +23,21 @@
+   await rm(root, { recursive: true, force: true });
+ });
+ describe('formal Agent provider dispatch allowance', () => {
++  it('retains ordinary model windows and the default formal allowance', async () => {
++    const fetch = vi.fn();
++    vi.stubGlobal('fetch', fetch);
++    for (const window of [8_192, 393_216, undefined]) {
++      expect(await miraFormalAgentOutputOptions(false, window)).toEqual({
++        maxOutputTokens: window,
++        omitMaxOutputTokens: window === undefined,
++      });
++      expect(await miraFormalAgentOutputOptions(true, window)).toEqual({
++        maxOutputTokens: Math.min(window ?? Infinity, 16_384),
++        omitMaxOutputTokens: false,
++      });
++    }
++    expect(fetch).not.toHaveBeenCalled();
++  });
+   it('includes legacy paid turns and retains a reservation across restarts', async () => {
+     await reserveMiraFormalAgentDispatch(
+       { sessionId, inputCharacters: 100 },
+@@ -116,6 +132,9 @@
+           Response.json({ ok: true, budget: { aggregateLimitsEnabled: false, prices: {} } }),
+         );
+         await expect(call()).rejects.toThrow('MIRA_PAID_BUDGET_CONTEXT_REJECTED');
++        await expect(miraFormalAgentOutputOptions(true, 393_216)).rejects.toThrow(
++          'MIRA_PAID_BUDGET_CONTEXT_REJECTED',
++        );
+       },
+     );
+     expect(context).toHaveBeenCalledOnce();
+diff --git a/tests/server/mira-paid-budget.test.ts b/tests/server/mira-paid-budget.test.ts
+--- a/tests/server/mira-paid-budget.test.ts
++++ b/tests/server/mira-paid-budget.test.ts
+@@ -1,4 +1,5 @@
+ import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
++import { miraFormalAgentOutputOptions } from '@/lib/server/mira-formal-agent-budget';
+ import {
+   budgetedModel,
+   budgetedOperation,
+@@ -189,6 +190,24 @@
+       output_tokens: 20,
+     });
+   });
++  it('reserves the observed driver model window exactly as sent to the provider', async () => {
++    aggregateLimitsEnabled = false;
++    const provider = model();
++    const send = vi.fn((_request: { maxOutputTokens?: number }) => provider.doGenerate());
++    await withPaidBudget(binding, 'observed-driver-output', async () => {
++      const output = await miraFormalAgentOutputOptions(true, 393_216);
++      expect(output.omitMaxOutputTokens).toBe(false);
++      await (budgetedModel({ ...provider, doGenerate: send } as any, 'fake', 'fake-text') as any)
++        .doGenerate({ ...params, maxOutputTokens: output.maxOutputTokens });
++    });
++    expect(send).toHaveBeenCalledOnce();
++    expect(send.mock.calls[0][0].maxOutputTokens).toBe(393_216);
++    expect(operations.map((o) => o.operation)).toEqual([
++      'context', 'reserve', 'dispatch', 'settle',
++    ]);
++    expect(operations[1].body.maxUnits.output_tokens).toBe(393_216);
++    expect(operations[3].body.actualUnits.output_tokens).toBe(20);
++  });
+   it('observation removes price-table ceilings but still validates units and one request per dispatch', async () => {
+     aggregateLimitsEnabled = false;
+     for (const measured of [

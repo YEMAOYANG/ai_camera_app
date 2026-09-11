@@ -1,0 +1,93 @@
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -1400,7 +1400,7 @@
+             independentQuestionIds: spec.independent.map(question => question.id) } } : {}),
+     }, undefined, { recheckUnsentBrowserReview: options.recheckUnsentBrowserReview,
+       approvedReviewGrant: options.approvedReviewGrant,
+-      ...(options.cachedQualityOnly ? { provider: async () => { throw new Error('FORMAL_AUDIO_TAIL_NEW_REVIEW_FORBIDDEN'); } } : {}) });
++      ...(options.cachedQualityOnly ? { cachedOnly: true } : {}) });
+     if (quality.status !== 'passed' || !quality.receipt)
+       throw new Error(
+         `FORMAL_QUALITY_FINAL_SNAPSHOT_REJECTED: ${JSON.stringify(quality.issues).slice(0, 6000)}`,
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -108,6 +108,8 @@
+   provider?: typeof executeMiraCoursewareProvider;
+   cacheRoot?: string;
+   lockDeps?: QualityLockDeps;
++  /** Audio completion may reuse a frozen pass, but must never initiate review work. */
++  cachedOnly?: boolean;
+   /** Explicit operator recovery of the SAME snapshot rejected before provider dispatch. */
+   recheckUnsentBrowserReview?: boolean;
+   /** Operator-only, explicitly approved fourth review of one frozen snapshot. */
+@@ -145,6 +147,17 @@
+   input: FormalQualityInput, signal?: AbortSignal, deps: QualityReviewDeps = {},
+ ): Promise<FormalQualityResult> {
+   if (signal?.aborted) throw new Error('FORMAL_QUALITY_ABORTED');
++  // Tool review and terminal promotion derive the same identity from the frozen brief.
++  const frozenDifficulty = input.teachingBrief.difficultyPolicy;
++  if (frozenDifficulty !== undefined) {
++    if (!object(frozenDifficulty)) throw new Error('FORMAL_QUALITY_DIFFICULTY_INVALID');
++    const { policySha256, ...unsigned } = frozenDifficulty;
++    if (frozenDifficulty.schemaVersion !== 'mira.learning.difficulty-policy.v1'
++      || policySha256 !== qualitySha(unsigned)
++      || (input.difficultyPolicy !== undefined && qualitySha(input.difficultyPolicy) !== qualitySha(frozenDifficulty)))
++      throw new Error('FORMAL_QUALITY_DIFFICULTY_INVALID');
++    input = { ...input, difficultyPolicy: frozenDifficulty };
++  } else if (input.difficultyPolicy !== undefined) throw new Error('FORMAL_QUALITY_DIFFICULTY_INVALID');
+   const interactionPlan = input.interactionDesign ? readInteractionDesignPlan({
+     ...input, interactionDesign: input.interactionDesign,
+   }) : undefined;
+@@ -199,6 +212,7 @@
+     return { ...result, remainingReviewAttempts: Math.max(0,
+       MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts - ledger.length) } as unknown as FormalQualityResult;
+   }
++  if (deps.cachedOnly) throw new Error('FORMAL_AUDIO_TAIL_NEW_REVIEW_FORBIDDEN');
+   const lockPath = join(folder, 'review.lock');
+   const lock = await acquireFormalQualityLock(lockPath, deps.lockDeps);
+   try {
+--- a/tests/server/mira-formal-teaching-quality.test.ts
++++ b/tests/server/mira-formal-teaching-quality.test.ts
+@@ -21,10 +21,12 @@
+ import { formalCanonicalSha256 } from '@/lib/server/mira-formal-skill-selection';
+ import { buildFormalReviewEvidence, decodeFormalReviewEvidence } from '@/lib/server/mira-formal-review-evidence';
+ import fixtures from '../fixtures/mira-formal-skill-selection-v2.json';
++import { reviewFormalVisualSnapshot } from '@/lib/server/mira-formal-visual-review';
+ import { MIRA_INTERACTION_DESIGN_POLICY } from '@/lib/server/mira-formal-interaction-design';
+ 
+ // This suite exercises the real receipt/cache/budget boundary without launching
+ // browsers or a model. Inspector/provider outcomes are explicit per test.
++vi.mock('@/lib/server/mira-formal-visual-review', () => ({ reviewFormalVisualSnapshot: vi.fn() }));
+ vi.mock('@/lib/server/mira-formal-scene-inspector', () => ({ inspectFormalScene: vi.fn() }));
+ vi.mock('@/lib/server/mira-courseware-provider', () => ({
+   MIRA_COURSEWARE_PROVIDER_SCHEMA: 'mira.openmaic.courseware-provider-call.v1',
+@@ -567,3 +569,29 @@
+     expect(qualitySha(value)).toBe(formalCanonicalSha256(value));
+   });
+ });
++
++
++it('cached-only completion shares frozen difficulty identity and never starts browser or paid review', async () => {
++  const value = input();
++  const unsigned = { schemaVersion: 'mira.learning.difficulty-policy.v1', difficultyCode: 'standard' };
++  const difficulty = { ...unsigned, policySha256: qualitySha(unsigned) };
++  value.teachingBrief.difficultyPolicy = difficulty;
++  const deps = { ...mocks(value), cacheRoot };
++  await expect(reviewFormalCourse(value, undefined, { ...deps, cachedOnly: true }))
++    .rejects.toThrow('FORMAL_AUDIO_TAIL_NEW_REVIEW_FORBIDDEN');
++  expect(deps.inspect).not.toHaveBeenCalled();
++  expect(deps.provider).not.toHaveBeenCalled();
++  expect(reviewFormalVisualSnapshot).not.toHaveBeenCalled();
++  const first = await reviewFormalCourse(value, undefined, deps);
++  expect(first.status).toBe('passed');
++  const browserCalls = deps.inspect.mock.calls.length;
++  const completion = await reviewFormalCourse({ ...value, difficultyPolicy: difficulty }, undefined,
++    { ...deps, cachedOnly: true });
++  expect(completion.receipt).toEqual(first.receipt);
++  expect(deps.inspect).toHaveBeenCalledTimes(browserCalls);
++  expect(deps.provider).toHaveBeenCalledTimes(1);
++  expect(reviewFormalVisualSnapshot).not.toHaveBeenCalled();
++  await expect(reviewFormalCourse({ ...value, difficultyPolicy: { ...difficulty, difficultyCode: 'basic' } }, undefined,
++    { ...deps, cachedOnly: true })).rejects.toThrow('FORMAL_QUALITY_DIFFICULTY_INVALID');
++  expect(deps.provider).toHaveBeenCalledTimes(1);
++});

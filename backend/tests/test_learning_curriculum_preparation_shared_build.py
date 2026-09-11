@@ -1568,8 +1568,8 @@ class LearningCurriculumPreparationSharedBuildTest(unittest.TestCase):
             "outer_missing": {
                 "content_provider_attempt_hard_deadline_at": None
             },
-            "outer_drift": {
-                "content_provider_attempt_hard_deadline_at": 1_800_101
+            "outer_beyond_bounded_continuation": {
+                "content_provider_attempt_hard_deadline_at": 5_400_101
             },
             "gate_status": {"content_gate_status": "pending"},
             "gate_ordinal": {"content_gate_attempt_count": 1},

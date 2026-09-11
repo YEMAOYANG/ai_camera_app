@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 
 from flask import current_app
 
+
 from core.config import (
     BACKEND_ROOT,
     LEARNING_CURRICULUM_PREPARATION_MIN_LEASE_SECONDS,
@@ -155,6 +156,32 @@ class _ParentRetryCatalogAuditService(LearningCatalogReleaseService):
         if canonicalizer is None:
             raise ValueError("parent retry Provider profile is unavailable")
         return canonicalizer.canonicalize_phase(command)
+
+
+def _catalog_paid_budget_environment(command):
+    from core.errors import ApiError
+    from os import getenv
+    result = learning_budget_service().catalog_production_dispatch_context(
+        build_item_id=command.build_item_id, expected_grade=command.grade_code,
+        expected_subject=command.subject, expected_skill=command.boundary.get("skillId"))
+    if not result["required"]:
+        return {}
+    if result["binding"] is None:
+        raise ApiError("learning_budget_unavailable", "课程生产预算尚未授权。", 503)
+    import json
+    return {"MIRA_PAID_BUDGET_BINDING": json.dumps(result["binding"], separators=(",", ":")),
+            "MIRA_PAID_BUDGET_BACKEND_URL": (current_app.config.get("LEARNING_BUDGET_INTERNAL_URL") or getenv("LEARNING_BUDGET_INTERNAL_URL", "http://127.0.0.1:8000")),
+            "MIRA_PAID_BUDGET_INTERNAL_TOKEN": current_app.config["INTERNAL_API_TOKEN"]}
+
+
+def learning_budget_service():
+    # Deliberately reload operator policy at the call boundary. Disabled by
+    # default; installing the ledger does not activate old paid requests.
+    from os import getenv
+    from content.learning_budget_policy import LearningBudgetPolicy
+    from services.learning_budget_service import LearningBudgetService
+    return LearningBudgetService(Database(current_app.config["DATABASE_URL"]),
+        policy=LearningBudgetPolicy.load(current_app.config.get("LEARNING_BUDGET_POLICY_PATH") or getenv("LEARNING_BUDGET_POLICY_PATH")))
 
 
 def auth_service() -> AuthService:
@@ -315,6 +342,7 @@ def learning_curriculum_preparation_checkpoint_adapter() -> CheckpointSharedBuil
         )
     else:
         phase_adapter = OpenMaicQuestionPhaseAdapter(
+            paid_budget_environment=_catalog_paid_budget_environment,
             provider_name=str(profile["name"]),
             model_name=str(profile["model"]),
             base_url=str(profile["baseUrl"]),
@@ -402,7 +430,7 @@ def learning_curriculum_preparation_checkpoint_adapter() -> CheckpointSharedBuil
     adapter = FormalProductionStageAdapter(
         restricted_catalog_service,
         repository=checkpoint_repository,
-        runtime_candidate_processor=lambda: process_next_formal_runtime_candidate(),
+        runtime_candidate_processor=lambda **scope: process_next_formal_runtime_candidate(**scope),
         formal_repository=formal_repository,
         formal_audio_service=formal_audio_service,
         formal_audio_validation_enabled=(
@@ -649,6 +677,7 @@ def openmaic_full_runtime_service() -> OpenMaicFullRuntimeService:
         current_app.config["DATABASE_URL"],
         student_auth_service=student_auth_service(),
         client=client,
+        paid_budget_service=learning_budget_service(),
         enabled=enabled,
         generation_enabled=bool(
             current_app.config.get(
@@ -777,7 +806,7 @@ def lesson_package_service() -> LessonPackageService:
     return service
 
 
-def process_next_formal_runtime_candidate():
+def process_next_formal_runtime_candidate(*, preparation_plan=None):
     """Wire the candidate package boundary to the full Runtime boundary."""
 
     runtime = openmaic_full_runtime_service()
@@ -785,7 +814,7 @@ def process_next_formal_runtime_candidate():
     if readiness.get("dispatchAllowed") is not True:
         return {"blockedReason": "provider_probe_required"}
     return lesson_package_service().process_next_formal_candidate(
-        runtime
+        runtime, preparation_plan=preparation_plan
     )
 
 
@@ -1209,3 +1238,10 @@ def voice_runtime_service() -> VoiceRuntimeAppService:
         auth_service=auth_service(),
         sync_service=conversation_sync_service(),
     )
+
+
+def learning_practice_service():
+    from repositories.learning_practice_repository import LearningPracticeRepository
+    from services.learning_practice_service import LearningPracticeService
+    return LearningPracticeService(repository=LearningPracticeRepository(Database(current_app.config["DATABASE_URL"])),
+                                   student_auth_service=student_auth_service())

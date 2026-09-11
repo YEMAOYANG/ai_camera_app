@@ -67,6 +67,18 @@ class OpenMaicRuntimeEventRepositoryTest(unittest.TestCase):
             Database("mysql://user:pass@127.0.0.1/test")
         )
 
+    def test_student_operations_are_scoped_to_the_full_frozen_learning_identity(self):
+        conn = _Connection()
+        self.assertEqual(self.repository.learning_session_interaction_evidence(conn,
+            family_id="family-1", child_id="child-1", learning_session_id="learning-1",
+            runtime_classroom_id="classroom-row-1", release_id="release-1", target_fingerprint="a" * 64), [])
+        sql, params = conn.calls[-1]
+        self.assertEqual(params, ("family-1", "child-1", "learning-1", "classroom-row-1", "release-1", "a" * 64))
+        for column in ("family_id", "child_id", "learning_session_id", "runtime_classroom_id", "release_id", "target_fingerprint"):
+            self.assertIn(f"stream.{column} = ?", sql)
+        self.assertIn("event.event_type = 'interaction_completed'", sql)
+        self.assertNotIn("teachingQuality", sql)
+
     def test_authority_query_binds_runtime_learning_and_upstream_classroom(self):
         conn = _Connection()
         row = self.repository.get_runtime_authority(

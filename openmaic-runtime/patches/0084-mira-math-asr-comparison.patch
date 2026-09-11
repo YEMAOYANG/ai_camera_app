@@ -1,0 +1,100 @@
+diff --git a/lib/server/mira-formal-audio-lifecycle.ts b/lib/server/mira-formal-audio-lifecycle.ts
+--- a/lib/server/mira-formal-audio-lifecycle.ts
++++ b/lib/server/mira-formal-audio-lifecycle.ts
+@@ -21,6 +21,8 @@
+   'mira.openmaic.formal-audio-lifecycle.v2' as const;
+ export const MIRA_FORMAL_SPEECH_TEXT_POLICY_VERSION =
+   'mira.learning.formal-speech-text.v2' as const;
++export const MIRA_FORMAL_ASR_COMPARISON_POLICY_VERSION =
++  'mira.learning.formal-asr-comparison.v3-math-notation' as const;
+ 
+ const MINIMUM_SCENE_COUNT = 1;
+ const MAXIMUM_SCENE_COUNT = 60;
+@@ -268,7 +270,27 @@
+ ): string {
+   let text = prepareMiraFormalSpeechText(value.normalize('NFKC'), subject);
+   if (subject !== 'chinese' && subject !== 'math') return text;
++  if (subject === 'math') {
++    // A written fraction is read denominator-first. Do this before replacing
++    // individual numbers or the slash would incorrectly become "除以".
++    text = text.replace(/(?<![\d.])(\d+)\s*\/\s*(\d+)(?![\d.])/gu,
++      (_match, numerator: string, denominator: string) => `${denominator}分之${numerator}`);
++    text = text.replace(/(\d+(?:\.\d+)?)\s*%/gu, '百分之$1');
++    // Decimal digits are read separately: .25 is 点二五, never 点二十五.
++    text = text.replace(/(\d+)\.(\d+)/gu, (_match, whole: string, fraction: string) =>
++      `${whole}点${[...fraction].map(digit => CHINESE_DIGITS[Number(digit)]).join('')}`);
++    text = text.replace(/点(\d+)/gu, (_match, fraction: string) =>
++      `点${[...fraction].map(digit => CHINESE_DIGITS[Number(digit)]).join('')}`);
++  }
+   text = text.replace(CHINESE_NUMBER_PATTERN, (number) => smallIntegerToSpokenChinese(number));
++  if (subject === 'math') {
++    // Trailing decimal zeroes change the spelling, not the stated value.
++    text = text.replace(/([零一二三四五六七八九十百千]+)点([零一二三四五六七八九]+)/gu,
++      (_match, whole: string, fraction: string) => {
++        const digits = fraction.replace(/零+$/u, '');
++        return digits ? `${whole}点${digits}` : whole;
++      });
++  }
+   text = text.replaceAll('+', '加').replaceAll('=', '等于');
+   text = text.replaceAll('×', '乘').replaceAll('*', '乘');
+   text = text.replaceAll('÷', '除以');
+@@ -293,6 +315,13 @@
+   let left = normalizeMiraFormalAsrText(expected);
+   let right = normalizeMiraFormalAsrText(actual);
+   if (!left || !right) return 0;
++  // Long otherwise identical sentences must not conceal a wrong fraction,
++  // decimal or percentage behind the edit-distance threshold. Preserve order,
++  // numerator/denominator and every significant digit; do not erase numbers.
++  const mathValues = (text: string) => text.match(
++    /百分之[零一二两三四五六七八九十百千万亿]+(?:点[零一二三四五六七八九]+)?|[零一二两三四五六七八九十百千万亿]+分之[零一二两三四五六七八九十百千万亿]+|[零一二两三四五六七八九十百千万亿]+点[零一二三四五六七八九]+/gu,
++  )?.map(token => token.replaceAll('两', '二')) ?? [];
++  if (JSON.stringify(mathValues(left)) !== JSON.stringify(mathValues(right))) return 0;
+   if (left.length < right.length) [left, right] = [right, left];
+   let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+   for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+diff --git a/tests/server/mira-formal-audio-lifecycle.test.ts b/tests/server/mira-formal-audio-lifecycle.test.ts
+--- a/tests/server/mira-formal-audio-lifecycle.test.ts
++++ b/tests/server/mira-formal-audio-lifecycle.test.ts
+@@ -315,4 +315,42 @@
+     expect(normalizeMiraFormalAsrText(' 十四，加七！ ')).toBe('十四加七');
+     expect(miraFormalAsrSimilarityBps('十四加七', '十四加七')).toBe(10_000);
+   });
++
++  it.each([
++    ['3/5', '五分之三'],
++    ['0.25', '零点二五'],
++    ['0.250', '零点二五'],
++    ['60%', '百分之六十'],
++    ['37.5%', '百分之三十七点五'],
++  ])('compares mathematical notation %s with its exact spoken form %s', (written, spoken) => {
++    const expected = prepareMiraFormalAsrComparisonText(written, 'math');
++    const actual = prepareMiraFormalAsrComparisonText(spoken, 'math');
++    expect(expected).toBe(actual);
++    expect(miraFormalAsrSimilarityBps(expected, actual)).toBe(10_000);
++    expect(prepareMiraFormalSpeechText(written, 'math')).toBe(written);
++  });
++
++  it.each([
++    ['3/5', '三分之五'],
++    ['3/5', '五分之二'],
++    ['0.25', '零点二六'],
++    ['60%', '百分之六十一'],
++  ])('rejects changed mathematical values %s versus %s even in a long sentence', (written, wrong) => {
++    const prefix = '同学们请仔细观察当前图形，想想整体和部分之间的关系，再用自己的话解释这个结果：';
++    const suffix = '。检查你的计算过程，看看分数条和显示的数字是否一致，然后继续学习。';
++    expect(miraFormalAsrSimilarityBps(
++      prepareMiraFormalAsrComparisonText(prefix + written + suffix, 'math'),
++      prepareMiraFormalAsrComparisonText(prefix + wrong + suffix, 'math'),
++    )).toBe(0);
++  });
++
++  it('replays the actual stored fraction narration without changing the speech text', () => {
++    const source = '要解决的问题就是：3/5的阅读组有多少人？';
++    const transcript = '要解决的问题就是五分之三的阅读组有多少人。';
++    expect(prepareMiraFormalSpeechText(source, 'math')).toBe(source);
++    expect(miraFormalAsrSimilarityBps(
++      prepareMiraFormalAsrComparisonText(source, 'math'),
++      prepareMiraFormalAsrComparisonText(transcript, 'math'),
++    )).toBe(10_000);
++  });
+ });

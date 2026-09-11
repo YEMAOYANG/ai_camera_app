@@ -35,6 +35,7 @@ from routes.api.v1.tasks import tasks_bp
 from routes.api.v2.parent_student_access import parent_student_access_bp
 from routes.api.v2.student_auth import student_auth_bp
 from routes.api.v2.student_learning import student_learning_bp
+from routes.api.v2.student_practice import student_practice_bp
 from routes.api.v2.student_learning_media import student_learning_media_bp
 from routes.internal.camera_observations import internal_camera_observations_bp
 from routes.internal.learning_content import internal_learning_content_bp
@@ -43,6 +44,7 @@ from routes.internal.learning_curriculum_preparations import (
     internal_learning_curriculum_preparations_bp,
 )
 from routes.internal.learning_media import internal_learning_media_bp
+from routes.internal.learning_budget import internal_learning_budget_bp
 from routes.internal.openmaic_runtime import internal_openmaic_runtime_bp
 from routes.internal.voice import internal_voice_bp
 from routes.internal.reminders import internal_reminders_bp
@@ -103,6 +105,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.register_blueprint(voice_bp, url_prefix="/api/voice")
     app.register_blueprint(parent_student_access_bp, url_prefix="/api/v2/parent")
     app.register_blueprint(student_auth_bp, url_prefix="/api/v2/student")
+    app.register_blueprint(student_practice_bp, url_prefix="/api/v2/student/practice")
     app.register_blueprint(
         student_learning_bp,
         url_prefix="/api/v2/student/learning",
@@ -127,6 +130,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         internal_learning_media_bp,
         url_prefix="/internal/learning/media",
     )
+    app.register_blueprint(internal_learning_budget_bp, url_prefix="/internal/learning/budget")
     app.register_blueprint(
         internal_openmaic_runtime_bp,
         url_prefix="/internal/learning/openmaic",

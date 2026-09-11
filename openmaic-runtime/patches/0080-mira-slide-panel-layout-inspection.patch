@@ -1,0 +1,218 @@
+diff --git a/lib/server/mira-formal-scene-dom.ts b/lib/server/mira-formal-scene-dom.ts
+--- a/lib/server/mira-formal-scene-dom.ts
++++ b/lib/server/mira-formal-scene-dom.ts
+@@ -29,6 +29,78 @@
+   };
+   const textOverflow: string[] = [];
+   const outsideCanvas: string[] = [];
++  const slideLayoutIssues: string[] = [];
++  const within = (inner: DOMRect, outer: DOMRect) =>
++    inner.left >= outer.left - 2 && inner.top >= outer.top - 2 &&
++    inner.right <= outer.right + 2 && inner.bottom <= outer.bottom + 2;
++  // Read glyph geometry from the actual renderer, not the auto-height text box.
++  // Restrict this to slide siblings: quizzes and interactive HTML have their own
++  // layout semantics and may deliberately place labels beside their controls.
++  const texts = Array.from(root.querySelectorAll<HTMLElement>(
++    '.slide-element .base-element-text, .slide-element .base-element-latex',
++  )).filter(visible).map((base) => {
++    const wrapper = base.closest<HTMLElement>('.slide-element')!;
++    const rects: DOMRect[] = [];
++    if (base.matches('.base-element-latex')) {
++      const formula = base.querySelector('.katex-html, svg g');
++      if (formula && visible(formula)) rects.push(formula.getBoundingClientRect());
++    } else {
++      const walker = document.createTreeWalker(base, NodeFilter.SHOW_TEXT);
++      let node: Node | null;
++      while ((node = walker.nextNode())) {
++        if (!node.textContent?.trim() || !node.parentElement || !visible(node.parentElement)) continue;
++        const range = document.createRange();
++        range.selectNodeContents(node);
++        rects.push(...Array.from(range.getClientRects()).filter(r => r.width > 1 && r.height > 1));
++      }
++    }
++    return { id: wrapper.id, parent: wrapper.parentElement, z: Number(getComputedStyle(wrapper).zIndex),
++      box: base.getBoundingClientRect(), rects };
++  }).filter(text => text.rects.length);
++  const panels = Array.from(root.querySelectorAll<SVGPathElement>(
++    '.slide-element .base-element-shape > .rotate-wrapper > .element-content > svg > g > path',
++  )).flatMap(shape => {
++    const wrapper = shape.closest<HTMLElement>('.slide-element')!;
++    const box = shape.getBoundingClientRect();
++    const style = getComputedStyle(shape);
++    const matrix = shape.getScreenCTM();
++    // Only substantial, axis-aligned, opaque solid fills. Thin separators,
++    // outlines, translucent highlights and non-rectangular diagrams are not panels.
++    if (!visible(shape) || box.width < 60 || box.height < 32 || !matrix ||
++      Math.abs(matrix.b) > 0.001 || Math.abs(matrix.c) > 0.001 ||
++      !/^rgb\(/.test(style.fill) || Number(style.fillOpacity) < 0.98) return [];
++    let opacity = 1;
++    for (let element: Element | null = shape; element && element !== root; element = element.parentElement)
++      opacity *= Number(getComputedStyle(element).opacity);
++    if (opacity < 0.98) return [];
++    const inverse = matrix.inverse();
++    if (![0.05, 0.5, 0.95].every(x => [0.05, 0.5, 0.95].every(y =>
++      shape.isPointInFill(new DOMPoint(box.left + box.width * x, box.top + box.height * y)
++        .matrixTransform(inverse))))) return [];
++    return [{ id: wrapper.id, parent: wrapper.parentElement,
++      z: Number(getComputedStyle(wrapper).zIndex), box }];
++  });
++  for (const panel of panels) {
++    const siblings = texts.filter(text => text.parent === panel.parent);
++    // Infer containment only when another complete text/formula already anchors
++    // this panel and the suspect box starts inside it. Unattached captions or
++    // deliberate overlapping decorative shapes are not assigned to a panel.
++    const anchored = siblings.filter(text => text.z > panel.z &&
++      text.rects.every(rect => within(rect, panel.box)));
++    for (const text of siblings) {
++      if (panel.z > text.z && text.rects.some(rect => {
++        const w = Math.min(rect.right, panel.box.right) - Math.max(rect.left, panel.box.left);
++        const h = Math.min(rect.bottom, panel.box.bottom) - Math.max(rect.top, panel.box.top);
++        return w > 4 && h > 4 && w * h > rect.width * rect.height * 0.15;
++      })) slideLayoutIssues.push(`text_occluded_by_panel:${text.id}:${panel.id}`);
++      if (text.z > panel.z && anchored.some(anchor => anchor !== text) &&
++        text.box.left >= panel.box.left - 2 && text.box.left < panel.box.right - 2 &&
++        text.box.top >= panel.box.top - 2 && text.box.top < panel.box.bottom - 2 &&
++        text.box.width <= panel.box.width + 4 &&
++        !text.rects.every(rect => within(rect, panel.box)))
++        slideLayoutIssues.push(`text_outside_panel:${text.id}:${panel.id}`);
++    }
++  }
+   for (const element of Array.from(root.querySelectorAll<HTMLElement>('.element-content'))) {
+     if (!visible(element)) continue;
+     const r = element.getBoundingClientRect();
+@@ -102,6 +174,7 @@
+       horizontalOverflow: Math.max(0, scrollRoot.scrollWidth - scrollRoot.clientWidth),
+       verticalOverflow: Math.max(0, scrollRoot.scrollHeight - scrollRoot.clientHeight),
+       textOverflow: [...new Set(textOverflow)].slice(0, 60),
++      slideLayoutIssues: [...new Set(slideLayoutIssues)].slice(0, 60),
+       outsideCanvas: [...new Set(outsideCanvas)].slice(0, 60),
+       failedImages: failedImages.slice(0, 60),
+       controls,
+diff --git a/lib/server/mira-formal-scene-inspector.ts b/lib/server/mira-formal-scene-inspector.ts
+--- a/lib/server/mira-formal-scene-inspector.ts
++++ b/lib/server/mira-formal-scene-inspector.ts
+@@ -665,6 +665,7 @@
+       if (observation.metrics.horizontalOverflow > 2) issues.push('horizontal_overflow');
+       issues.push(
+         ...observation.metrics.textOverflow.map((id) => `text_overflow:${id}`),
++        ...(observation.metrics.slideLayoutIssues ?? []),
+         ...observation.metrics.outsideCanvas.map((id) => `outside_canvas:${id}`),
+         ...observation.metrics.failedImages.map((src) => `image_unavailable:${src}`),
+       );
+diff --git a/lib/types/formal-scene-inspection.ts b/lib/types/formal-scene-inspection.ts
+--- a/lib/types/formal-scene-inspection.ts
++++ b/lib/types/formal-scene-inspection.ts
+@@ -56,6 +56,8 @@
+   horizontalOverflow: number;
+   verticalOverflow: number;
+   textOverflow: string[];
++  /** Optional for receipts saved before panel/paint-order inspection. */
++  slideLayoutIssues?: string[];
+   outsideCanvas: string[];
+   failedImages: string[];
+   controls: Array<{ selector: string; tag: string; type: string; text: string }>;
+diff --git a/tests/server/mira-formal-slide-layout.browser.test.ts b/tests/server/mira-formal-slide-layout.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-slide-layout.browser.test.ts
+@@ -0,0 +1,100 @@
++/** Actual SlideCanvas geometry in a memory-only Chrome page: no server or model. */
++import { createRequire } from 'node:module';
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { chromium, type Browser, type Page } from 'playwright-core';
++import type { Slide } from '@openmaic/dsl';
++import {
++  createDefaultShapeElement, createDefaultSlide, createDefaultTextElement,
++} from '@/lib/edit/slide-edit-elements';
++import type { observeFormalSceneDom } from '@/lib/server/mira-formal-scene-dom';
++
++type FixtureWindow = Window & {
++  renderSlide: (slide: Slide) => void;
++  observeSlide: typeof observeFormalSceneDom;
++};
++const panel = (id: string, top: number, height: number, fill = '#dbeafe') => ({
++  ...createDefaultShapeElement(id), left: 60, top, width: 880, height, fill,
++});
++const text = (id: string, top: number, content: string) => ({
++  ...createDefaultTextElement(id), left: 146, top, width: 710, height: 49,
++  content: `<p style="font-size:18px">${content}</p>`,
++});
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')('slide panel paint and containment', () => {
++  let browser: Browser;
++  let page: Page;
++  beforeAll(async () => {
++    const require = createRequire(import.meta.url);
++    const { build } = createRequire(require.resolve('tsx'))('esbuild');
++    const result = await build({
++      stdin: {
++        resolveDir: process.cwd(), loader: 'tsx',
++        contents: `import React from 'react';import {createRoot} from 'react-dom/client';
++          import {SlideCanvas} from '@openmaic/renderer';
++          import {observeFormalSceneDom} from './lib/server/mira-formal-scene-dom';
++          const root=createRoot(document.getElementById('formal-scene-root'));
++          window.renderSlide=slide=>root.render(React.createElement(SlideCanvas,{slide,chrome:false}));
++          window.observeSlide=observeFormalSceneDom;`,
++      },
++      bundle: true, write: false, format: 'iife', platform: 'browser',
++      define: { 'process.env.NODE_ENV': '"production"' },
++      loader: { '.css': 'empty' }, logLevel: 'silent',
++    });
++    browser = await chromium.launch({
++      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ??
++        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++      headless: true,
++    });
++    page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
++    await page.route('**/*', route => route.abort());
++    await page.setContent('<style>html,body{margin:0}#formal-scene-root{width:100vw;height:100vh}</style><main id="formal-scene-root"></main>');
++    await page.addScriptTag({ content: result.outputFiles[0].text });
++  }, 30_000);
++  afterAll(async () => { await browser?.close(); });
++  async function inspect(elements: Slide['elements']) {
++    await page.evaluate(slide => (window as unknown as FixtureWindow).renderSlide(slide), {
++      ...createDefaultSlide('layout-fixture'), elements,
++    });
++    await page.evaluate(async () => {
++      await document.fonts.ready;
++      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
++    });
++    return page.evaluate(() => (window as unknown as FixtureWindow).observeSlide());
++  }
++  it('rejects text escaping its panel and hidden by a later opaque panel at both viewports', async () => {
++    for (const viewport of [{ width: 1280, height: 720 }, { width: 1024, height: 768 }]) {
++      await page.setViewportSize(viewport);
++      const result = await inspect([
++        panel('method', 160, 166), text('anchor', 180, '方法要点'),
++        text('spill', 311, '分数转成百分数：先化小数'),
++        { id: 'formula', type: 'latex', left: 200, top: 315, width: 120, height: 40,
++          rotate: 0, latex: '3/5', color: '#333333', fixedRatio: true,
++          path: 'M0 0 L120 40 M120 0 L0 40', viewBox: [120, 40] },
++        text('covered', 360, '求部分量＝整体乘分数'), panel('reflection', 350, 148),
++        text('question', 410, '现在怎么想？'),
++      ]);
++      expect(result.metrics.slideLayoutIssues).toEqual(expect.arrayContaining([
++        'text_outside_panel:slide-element-spill:slide-element-method',
++        'text_outside_panel:slide-element-formula:slide-element-method',
++        'text_occluded_by_panel:slide-element-covered:slide-element-reflection',
++      ]));
++      // The former scroll/whole-canvas checks do not detect these failures.
++      expect(result.metrics.outsideCanvas).toEqual([]);
++      expect(result.metrics.textOverflow).toEqual([]);
++    }
++  });
++  it('allows contained teaching text, separate captions, thin rules and translucent decoration', async () => {
++    const result = await inspect([
++      panel('card', 160, 180), text('heading', 180, '练一练'),
++      text('body', 245, '请写出你的理由'),
++      panel('highlight', 240, 70, 'rgba(255, 230, 0, 0.15)'),
++      panel('divider', 305, 2), text('caption', 360, '图外的说明可以独立排版'),
++    ]);
++    expect(result.metrics.slideLayoutIssues).toEqual([]);
++  });
++  it('does not impose slide panel relationships on quiz or interactive controls', async () => {
++    await page.setContent('<main id="formal-scene-root"><section style="background:#eee;width:200px;height:40px"><label>答题区</label></section><label style="margin-top:30px">独立题目说明</label><input aria-label="答案"></main>');
++    // Reuse the exact browser function after replacing the React fixture.
++    expect(await page.evaluate(() => (window as unknown as FixtureWindow).observeSlide().metrics.slideLayoutIssues)).toEqual([]);
++  });
++});

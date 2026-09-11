@@ -50,7 +50,7 @@ class LearningCurriculumPreparationContractTest(unittest.TestCase):
     def test_other_primary_grades_have_twenty_seven_courses(self):
         for grade in range(2, 7):
             target = build_preparation_target(f"primary_{grade}")
-            self.assertEqual(target["schemaVersion"], TARGET_SCHEMA_V1)
+            self.assertEqual(target["schemaVersion"], TARGET_SCHEMA_V2)
             self.assertEqual(TARGET_SCHEMA_V1, "mira.learning.preparation-target.v1")
             self.assertEqual(target["boundaryCount"], 9)
             self.assertEqual(target["totalCourseCount"], 27)
@@ -242,7 +242,7 @@ class LearningCurriculumPreparationContractTest(unittest.TestCase):
         )
         self.assertEqual(
             preparation_target_fingerprint(target),
-            "e7f3d4be11e40d516d68b793682c67afe6e515b9e18bab1cd12d6649435cc0cc",
+            "d526af0146e824185c7eedf0e0b0eba3c195d0f17247c7297525205b3428d0d3",
         )
 
     def test_v95_provider_phase_budget_fits_every_formal_deadline(self):

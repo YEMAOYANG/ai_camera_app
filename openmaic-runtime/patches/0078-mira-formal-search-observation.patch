@@ -1,0 +1,207 @@
+diff --git a/lib/server/agent-runtime/web-search.ts b/lib/server/agent-runtime/web-search.ts
+--- a/lib/server/agent-runtime/web-search.ts
++++ b/lib/server/agent-runtime/web-search.ts
+@@ -14,6 +14,7 @@
+ import { formatSearchResultsAsContext, searchWeb } from '@/lib/web-search';
+ import { resolveClassroomWebSearchConfig } from '@/lib/server/web-search-config';
+ import { sanitizedWebSearchToolError } from '@/lib/web-search/provider-error';
++import { isPaidBudgetObservationMode } from '@/lib/server/mira-paid-budget';
+ 
+ export interface WebSearchCapability {
+   providerId: Parameters<typeof searchWeb>[0]['providerId'];
+@@ -93,7 +94,11 @@
+       // agent.abort() fires); the provider fetch below carries it too, so an
+       // in-flight request is cut short rather than merely abandoned.
+       if (signal?.aborted) throw new Error('aborted');
+-      if (options.maxCalls !== undefined && callsStarted >= options.maxCalls) {
++      if (
++        options.maxCalls !== undefined &&
++        callsStarted >= options.maxCalls &&
++        !(await isPaidBudgetObservationMode())
++      ) {
+         throw new Error(`web_search call limit reached (${options.maxCalls})`);
+       }
+       callsStarted += 1;
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -1,4 +1,8 @@
+-import { persistSessionPaidBudget, withPaidBudget } from './mira-paid-budget';
++import {
++  isPaidBudgetObservationMode,
++  persistSessionPaidBudget,
++  withPaidBudget,
++} from './mira-paid-budget';
+ import { createHash } from 'node:crypto';
+ import { access } from 'node:fs/promises';
+ import { constants as fsConstants } from 'node:fs';
+@@ -1106,7 +1110,7 @@
+   }
+ }
+ 
+-async function loadResearchEvidence(
++export async function loadResearchEvidence(
+   events: PersistedAgentSessionEvent[],
+   sessionId: string,
+ ): Promise<ResearchEvidence> {
+@@ -1114,7 +1118,11 @@
+     .filter((event) => event.type === MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE)
+     .map((event) => event.data)
+     .filter(isResearchTrace);
+-  if (traces.length < 1 || traces.length > MIRA_PROFESSIONAL_CREATION_POLICY.webSearch.maxCalls) {
++  if (
++    traces.length < 1 ||
++    (traces.length > MIRA_PROFESSIONAL_CREATION_POLICY.webSearch.maxCalls &&
++      !(await isPaidBudgetObservationMode()))
++  ) {
+     throw new Error('FORMAL_PROFESSIONAL_RESEARCH_SEARCH_COUNT_INVALID');
+   }
+   const providers = new Set(traces.map((trace) => trace.providerId));
+diff --git a/tests/agent-runtime/web-search.test.ts b/tests/agent-runtime/web-search.test.ts
+--- a/tests/agent-runtime/web-search.test.ts
++++ b/tests/agent-runtime/web-search.test.ts
+@@ -19,6 +19,7 @@
+ }));
+ 
+ import { resolveClassroomWebSearchConfig } from '@/lib/server/web-search-config';
++import { withPaidBudget } from '@/lib/server/mira-paid-budget';
+ import {
+   buildWebSearchTool,
+   resolveWebSearchCapability,
+@@ -30,6 +31,8 @@
+ afterEach(() => {
+   mocked.mockReset();
+   searchWebMock.mockReset();
++  vi.unstubAllGlobals();
++  vi.unstubAllEnvs();
+ });
+ 
+ describe('resolveWebSearchCapability', () => {
+@@ -164,6 +167,52 @@
+ 
+ describe('web_search bounded failure context', () => {
+   const capability: WebSearchCapability = { providerId: 'brave', apiKey: '' };
++  it('observation preserves old attempts and records new successful research beyond four calls', async () => {
++    vi.stubEnv('MIRA_BACKEND_INTERNAL_URL', 'http://fake-backend.invalid');
++    vi.stubEnv('MIRA_INTERNAL_API_TOKEN', 'fake-internal');
++    const context = vi.fn(async () =>
++      Response.json({ ok: true, budget: { aggregateLimitsEnabled: false, prices: {} } }),
++    );
++    vi.stubGlobal('fetch', context);
++    searchWebMock.mockRejectedValueOnce(new Error('old provider failed')).mockResolvedValue({
++      answer: '',
++      query: 'q',
++      responseTime: 0.2,
++      sources: [{ title: 'Source', url: 'https://example.org', content: 'snippet', score: 0.9 }],
++    });
++    const completed = vi.fn();
++    const observed = vi.fn();
++    const tool = buildWebSearchTool({ providerId: 'baidu', apiKey: 'test-only' }, observed, {
++      maxCalls: 4,
++      initialCallCount: 4,
++      onSearchCompleted: completed,
++    });
++    await withPaidBudget(
++      {
++        schemaVersion: 'mira.learning.paid-budget-binding.v1',
++        authorizationId: 'a'.repeat(64),
++        required: true,
++      },
++      'search-observation',
++      async () => {
++        await expect(tool.execute('failure', { query: 'q' } as never, undefined)).rejects.toThrow(
++          'WEB_SEARCH_PROVIDER_FAILED',
++        );
++        await tool.execute('new-1', { query: 'q' } as never, undefined);
++        await tool.execute('new-2', { query: 'q' } as never, undefined);
++      },
++    );
++    expect(context).toHaveBeenCalledOnce();
++    expect(searchWebMock).toHaveBeenCalledTimes(3);
++    expect(completed).toHaveBeenCalledTimes(2);
++    expect(observed).toHaveBeenCalledTimes(2);
++    expect(completed).toHaveBeenLastCalledWith(
++      expect.objectContaining({
++        providerId: 'baidu',
++        sources: [{ title: 'Source', url: 'https://example.org', score: 0.9 }],
++      }),
++    );
++  });
+   it('keeps Baidu agent calls web-only, registers real results, and retains the four-call limit', async () => {
+     searchWebMock.mockResolvedValue({
+       answer: '',
+diff --git a/tests/server/mira-formal-research-observation.test.ts b/tests/server/mira-formal-research-observation.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-research-observation.test.ts
+@@ -0,0 +1,70 @@
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++import type { PersistedAgentSessionEvent } from '@openmaic/storage';
++
++const mocks = vi.hoisted(() => ({ observation: vi.fn(), materials: vi.fn(), text: vi.fn() }));
++vi.mock('@/lib/server/mira-paid-budget', async (actual) => ({
++  ...(await actual<typeof import('@/lib/server/mira-paid-budget')>()),
++  isPaidBudgetObservationMode: mocks.observation,
++}));
++vi.mock('@/lib/server/agent-runtime/session-materials', async (actual) => ({
++  ...(await actual<typeof import('@/lib/server/agent-runtime/session-materials')>()),
++  listSessionMaterials: mocks.materials,
++  resolveSessionMaterialText: mocks.text,
++}));
++import { loadResearchEvidence } from '@/lib/server/mira-formal-professional-classroom';
++
++const events = Array.from({ length: 5 }, (_, index) => ({
++  type: 'mira_formal_research_search',
++  data: {
++    kind: 'mira_formal_research_search',
++    schemaVersion: 'mira.openmaic.research-search-trace.v1',
++    query: `query-${index}`,
++    providerId: 'baidu',
++    searchedAt: '2026-09-10T00:00:00.000Z',
++    resultCount: 1,
++    sources: [{ title: 'Source', url: 'https://example.org', score: 0.9 }],
++  },
++})) as PersistedAgentSessionEvent[];
++
++beforeEach(() => {
++  mocks.observation.mockReset().mockResolvedValue(true);
++  mocks.materials
++    .mockReset()
++    .mockResolvedValue([
++      {
++        kind: 'web',
++        sourceUrl: 'https://example.org',
++        title: 'Source',
++        textAssetId: 'fetched-text',
++      },
++    ]);
++  mocks.text.mockReset().mockResolvedValue('Actual fetched source text');
++});
++
++describe('formal research completion in observation mode', () => {
++  it('keeps every valid search, while retaining the default maximum and minimum evidence requirements', async () => {
++    const original = JSON.stringify(events);
++    const evidence = await loadResearchEvidence(events, 'test-session');
++    expect(evidence.traces).toHaveLength(5);
++    expect(evidence.fetched).toEqual([
++      {
++        title: 'Source',
++        url: 'https://example.org/',
++        textSha256: expect.stringMatching(/^[a-f0-9]{64}$/),
++      },
++    ]);
++    expect(JSON.stringify(events)).toBe(original);
++    mocks.observation.mockResolvedValue(false);
++    await expect(loadResearchEvidence(events, 'test-session')).rejects.toThrow(
++      'RESEARCH_SEARCH_COUNT_INVALID',
++    );
++    mocks.observation.mockResolvedValue(true);
++    await expect(loadResearchEvidence([], 'test-session')).rejects.toThrow(
++      'RESEARCH_SEARCH_COUNT_INVALID',
++    );
++    mocks.text.mockResolvedValue('');
++    await expect(loadResearchEvidence(events, 'test-session')).rejects.toThrow(
++      'RESEARCH_FETCH_MISSING',
++    );
++  });
++});

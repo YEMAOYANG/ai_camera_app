@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from content.formal_curriculum_registry import formal_content_validation_identity, formal_registered_boundary
+from services.learning_curriculum_preparation_contract import (canonical_preparation_target_for, formal_target_course_count, preparation_authority_grade)
+
 from dataclasses import dataclass
 import hashlib
+import logging
 import re
 import unicodedata
 import uuid
@@ -37,6 +41,7 @@ from services.learning_generation_failure_policy import (
 from services.learning_provider_deadline_contract import (
     provider_attempt_deadline_is_valid,
 )
+from services.learning_content_recovery import recovery_dispatches
 from integrations.openmaic_question_adapter import (
     QUESTION_CONTRACT_VERSION,
     QUESTION_PHASE_EXECUTION_AUTHORITY,
@@ -437,7 +442,7 @@ class LearningCatalogReleaseService:
                     )
             if (
                 not allow_partial
-                and total == 30
+                and total == formal_target_course_count(grade_code)
                 and failed == 0
                 and ambiguous == 0
             ):
@@ -452,7 +457,7 @@ class LearningCatalogReleaseService:
                         now=int(self._content_clock_ms()),
                     )
                 )
-                expected_stage = "publishing" if ready == 30 else "validating"
+                expected_stage = "publishing" if ready == formal_target_course_count(grade_code) else "validating"
                 if not persisted or next_stage != expected_stage:
                     raise LearningCatalogActivationError(
                         "formal validation handoff authority is stale"
@@ -507,8 +512,8 @@ class LearningCatalogReleaseService:
                 now=activated_at,
             )
             if (
-                int(authority.get("itemCount") or 0) != 30
-                or int(authority.get("readyItemCount") or 0) != 30
+                int(authority.get("itemCount") or 0) != formal_target_course_count(grade_code)
+                or int(authority.get("readyItemCount") or 0) != formal_target_course_count(grade_code)
                 or re.fullmatch(
                     r"[0-9a-f]{64}",
                     str(authority.get("publicationReceiptSha256") or ""),
@@ -852,17 +857,17 @@ class LearningCatalogReleaseService:
             not isinstance(release, Mapping)
             or not isinstance(build, Mapping)
             or not isinstance(raw_items, Sequence)
-            or len(raw_items) != 30
+            or len(raw_items) != formal_target_course_count(build)
             or str(build.get("id") or "") != build_id
             or str(build.get("release_id") or "")
             != str(release.get("id") or "")
         ):
             raise ValueError("locked content proof projection identity drift")
         items = [item for item in raw_items if isinstance(item, Mapping)]
-        if len(items) != 30:
+        if len(items) != formal_target_course_count(build):
             raise ValueError("locked content proof projection shape drift")
         item_order = tuple(str(item.get("id") or "") for item in items)
-        if any(not item_id for item_id in item_order) or len(set(item_order)) != 30:
+        if any(not item_id for item_id in item_order) or len(set(item_order)) != formal_target_course_count(build):
             raise ValueError("locked content proof projection item drift")
         item_ids = frozenset(item_order)
 
@@ -887,7 +892,7 @@ class LearningCatalogReleaseService:
         )
         if passed & terminal_failed or repairable & terminal_failed:
             raise ValueError("locked content proof projection overlaps failures")
-        if len(passed) == 30:
+        if len(passed) == formal_target_course_count(build):
             proofs = audit.get("proofs")
             if not isinstance(proofs, Sequence):
                 raise ValueError("locked content handoff proofs are missing")
@@ -1232,6 +1237,10 @@ class LearningCatalogReleaseService:
             raise ValueError("Provider dependency next phase drift")
         if logical_attempt == 1:
             self._require_empty_locked_attempt_history(evidence=evidence, attempt=2)
+        elif recovery_dispatches(item=item, evidence=evidence) is not None:
+            # This exact returned failure has no rejected course persistence;
+            # the immutable operator receipt binds its original dispatch graph.
+            pass
         else:
             attempt_one = self._locked_attempt_evidence(
                 evidence=evidence,
@@ -1365,12 +1374,8 @@ class LearningCatalogReleaseService:
                 course_id=str(candidate_course.get("id") or ""),
                 course_version=str(candidate_course.get("version") or ""),
                 curriculum_version=PRIMARY_CURRICULUM_VERSION,
-                content_validation_contract_version=(
-                    CONTENT_VALIDATION_CONTRACT_VERSION
-                ),
-                content_validation_dataset_sha256=(
-                    PRIMARY_ONE_CONTENT_DATASET_SHA256
-                ),
+                content_validation_contract_version=formal_content_validation_identity(historical_target.grade_code)["contentValidationContractVersion"],
+                content_validation_dataset_sha256=formal_content_validation_identity(historical_target.grade_code)["contentValidationDatasetSha256"],
                 subject_language_policy_version=(
                     SUBJECT_LANGUAGE_POLICY_VERSION
                 ),
@@ -1442,7 +1447,7 @@ class LearningCatalogReleaseService:
                 evidence=historical_host_evidence,
                 skill_boundary_sha256=hashlib.sha256(
                     self._canonical_content_json(
-                        self._content_boundary(str(historical_item["skill_id"]))
+                        self._content_boundary(historical_item)
                     ).encode("utf-8")
                 ).hexdigest(),
                 candidate_course_sha256=hashlib.sha256(
@@ -1480,7 +1485,7 @@ class LearningCatalogReleaseService:
                     "hostGateReceiptHash",
                 }
                 or str(envelope.get("schemaVersion") or "")
-                != "mira.learning.primary-1-host-gate-evidence.v1"
+                != formal_content_validation_identity(historical_target.grade_code)["hostGateEvidenceSchemaVersion"]
                 or not isinstance(receipt, Mapping)
                 or str(receipt.get("outcome") or "") != "rejected"
                 or not isinstance(envelope_fingerprint, str)
@@ -1660,9 +1665,12 @@ class LearningCatalogReleaseService:
         ):
             return False
         items = [item for item in raw_items if isinstance(item, Mapping)]
-        if len(items) != 30 or len(items) != len(raw_items):
+        try:
+            target = canonical_preparation_target_for(plan)
+        except (ValueError, TypeError, KeyError):
             return False
-        target = build_preparation_target("primary_1")
+        if len(items) != formal_target_course_count(target) or len(items) != len(raw_items):
+            return False
         target_json = self._canonical_content_json(target)
         target_fingerprint = preparation_target_fingerprint(target)
         expected_request_id = f"grade-build:{target_fingerprint}"
@@ -1673,10 +1681,10 @@ class LearningCatalogReleaseService:
         build_id = f"catalog_build_{request_digest}"
         release_id = f"catalog_release_{request_digest}"
         exact_int_fields = (
-            (build, "total_item_count", 30),
+            (build, "total_item_count", formal_target_course_count(plan)),
             (build, "ready_item_count", 0),
             (build, "failed_item_count", 0),
-            (release, "required_boundary_count", 10),
+            (release, "required_boundary_count", int(target["boundaryCount"])),
             (release, "ready_item_count", 0),
         )
         if any(
@@ -1691,7 +1699,7 @@ class LearningCatalogReleaseService:
             and str(plan.get("catalog_release_id") or "") == release_id
             and str(plan.get("target_fingerprint") or "")
             == target_fingerprint
-            and str(plan.get("grade_code") or "") == "primary_1"
+            and str(plan.get("grade_code") or "") == preparation_authority_grade(plan)
             and str(plan.get("curriculum_version") or "")
             == str(target["curriculumVersion"])
             and (
@@ -1730,6 +1738,7 @@ class LearningCatalogReleaseService:
             curriculum_version=str(target["curriculumVersion"]),
             content_manifest_version=str(target["schemaVersion"]),
             course_targets=target["courseTargets"],
+            grade_code=preparation_authority_grade(target),
         )
         if any(
             not self.repository._content_item_immutables_match(row, immutable)
@@ -1902,8 +1911,12 @@ class LearningCatalogReleaseService:
         self,
         proofs: Sequence[AcceptedPrimaryOneHostReceipt],
     ) -> None:
-        if len(proofs) != 30:
-            raise ValueError("content handoff requires exactly thirty proofs")
+        if not proofs or any(not isinstance(proof, AcceptedPrimaryOneHostReceipt) for proof in proofs):
+            raise ValueError("content handoff requires typed formal proofs")
+        grade_code = proofs[0].target.grade_code
+        target = build_preparation_target(grade_code)
+        if len(proofs) != formal_target_course_count(grade_code) or any(proof.target.grade_code != grade_code for proof in proofs):
+            raise ValueError("content handoff grade or cardinality drift")
         groups: dict[
             tuple[str, str, str], list[PrimaryOneValidatedVariant]
         ] = {}
@@ -1924,7 +1937,7 @@ class LearningCatalogReleaseService:
                     receipt_hash=proof.receipt_hash,
                 )
             )
-        if len(groups) != 10 or any(len(values) != 3 for values in groups.values()):
+        if len(groups) != int(target["boundaryCount"]) or any(len(values) != 3 for values in groups.values()):
             raise ValueError("content handoff variant inventory drift")
         for variants in groups.values():
             self.catalog_validator.validate_primary_one_variant_set(variants)
@@ -1951,7 +1964,7 @@ class LearningCatalogReleaseService:
         evidence_rows = [
             evidence for evidence in raw_evidence if isinstance(evidence, Mapping)
         ]
-        if len(items) != 30 or len(evidence_rows) != len(raw_evidence):
+        if len(items) != formal_target_course_count(build) or len(evidence_rows) != len(raw_evidence):
             raise ValueError("locked content proof inventory shape drift")
         if not authority_prevalidated and not self.repository._content_authority_is_exact(
             conn,
@@ -2076,6 +2089,8 @@ class LearningCatalogReleaseService:
             attempt_one = None
         elif attempt == 2:
             if (
+                recovery_dispatches(item=item, evidence=evidence) is not None
+                or
                 self._zero_call_number_sense_attempt_one_dispatches(
                     item=item,
                     evidence=evidence,
@@ -2114,7 +2129,7 @@ class LearningCatalogReleaseService:
             or str(item.get("active_generation_request_id") or "")
             != expected_request_id
             or str(item.get("content_validation_contract_version") or "")
-            != CONTENT_VALIDATION_CONTRACT_VERSION
+            != formal_content_validation_identity(preparation_authority_grade(item))["contentValidationContractVersion"]
             or not re.fullmatch(
                 r"[0-9a-f]{64}",
                 str(item.get("content_receipt_hash") or ""),
@@ -2153,7 +2168,7 @@ class LearningCatalogReleaseService:
             host_evidence,
             target=target,
             identity=identity,
-            skill_boundary=self._content_boundary(str(item["skill_id"])),
+            skill_boundary=self._content_boundary(item),
             accepted_host_receipts=priors,
         )
         proof = self._accepted_content_proofs(
@@ -2472,7 +2487,7 @@ class LearningCatalogReleaseService:
             host_evidence,
             target=target,
             identity=identity,
-            skill_boundary=self._content_boundary(str(item["skill_id"])),
+            skill_boundary=self._content_boundary(item),
             accepted_host_receipts=priors,
         )
         envelope = self._decode_content_json(candidate.get("validation_json"))
@@ -2484,7 +2499,7 @@ class LearningCatalogReleaseService:
             or self._canonical_content_json(envelope)
             != self._canonical_content_json(
                 {
-                    "schemaVersion": "mira.learning.primary-1-host-gate-evidence.v1",
+                    "schemaVersion": formal_content_validation_identity(target.grade_code)["hostGateEvidenceSchemaVersion"],
                     "contentFingerprint": str(
                         replay.receipt.get("hostContentFingerprint") or ""
                     ),
@@ -2805,17 +2820,21 @@ class LearningCatalogReleaseService:
         repairable_item_ids: set[str],
     ) -> Mapping[str, object]:
         passed_targets = [proof.target for proof in proofs]
+        if not items:
+            raise ValueError("content summary requires immutable grade inventory")
+        target = canonical_preparation_target_for(items[0])
+        if any(preparation_authority_grade(item) != target["gradeCode"] for item in items):
+            raise ValueError("content summary mixes grades")
         failed = [
             item
             for item in items
             if str(item.get("status") or "") == "failed"
             and str(item.get("id") or "") not in repairable_item_ids
         ]
-        target_counts = {"chinese": 12, "math": 9, "english": 9}
+        target_counts = {subject: values["totalCourseCount"] for subject, values in target["subjectTargets"].items()}
         canary_keys = {
-            ("chinese", "pinyin_syllables", 1),
-            ("math", "number_sense_20", 1),
-            ("english", "letters_sounds", 1),
+            (row["subject"], row["skillId"], row["variantOrdinal"])
+            for row in target["canaryManifest"]["targets"]
         }
         passed_canaries = sum(
             1
@@ -2910,7 +2929,7 @@ class LearningCatalogReleaseService:
                 evidence,
                 target=target,
                 identity=identity,
-                skill_boundary=self._content_boundary(str(item["skill_id"])),
+                skill_boundary=self._content_boundary(item),
                 accepted_host_receipts=prior,
             )
             envelope = self._decode_content_json(candidate.get("validation_json"))
@@ -2924,7 +2943,7 @@ class LearningCatalogReleaseService:
                 or self._canonical_content_json(envelope)
                 != self._canonical_content_json(
                     {
-                        "schemaVersion": "mira.learning.primary-1-host-gate-evidence.v1",
+                        "schemaVersion": formal_content_validation_identity(target.grade_code)["hostGateEvidenceSchemaVersion"],
                         "contentFingerprint": str(
                             rerun.receipt.get("hostContentFingerprint") or ""
                         ),
@@ -2999,6 +3018,19 @@ class LearningCatalogReleaseService:
             )
         except (KeyError, TypeError, ValueError):
             return self._content_contract_failure(build_id, item, summary)
+        from services.learning_formal_question_preflight import (
+            FormalQuestionPreflightError, validate_formal_phase_question_checkpoint,
+        )
+        try:
+            validate_formal_phase_question_checkpoint(command)
+        except FormalQuestionPreflightError as exc:
+            logging.getLogger("mira.staged_content").warning(
+                "formal objective preflight rejected grade=%s phase=%s difficulty=%s detail=%s",
+                command.grade_code, command.phase, command.difficulty_code, str(exc),
+            )
+            return self._content_terminal_failure(
+                build_id, item, summary, error_code="preparation_content_validation_failed",
+            )
         work = ContentPhaseWork(
             command=command,
             attempt_initial_checkpoint=initial_checkpoint,
@@ -3313,7 +3345,7 @@ class LearningCatalogReleaseService:
                 evidence,
                 target=target,
                 identity=identity,
-                skill_boundary=self._content_boundary(str(item["skill_id"])),
+                skill_boundary=self._content_boundary(item),
                 accepted_host_receipts=prior,
             )
             if result.outcome == "passed" and target.variant_ordinal == 3:
@@ -3421,9 +3453,7 @@ class LearningCatalogReleaseService:
                         locked_evidence,
                         target=locked_target,
                         identity=locked_identity,
-                        skill_boundary=self._content_boundary(
-                            str(locked_item["skill_id"])
-                        ),
+                        skill_boundary=self._content_boundary(locked_item),
                         accepted_host_receipts=locked_prior,
                     )
                     if (
@@ -3675,7 +3705,7 @@ class LearningCatalogReleaseService:
                     phase=row_phase,
                     phase_ordinal=ordinal,
                     generation_request_id=generation_request_id,
-                    grade_code="primary_1",
+                    grade_code=preparation_authority_grade(item),
                     subject=str(item["subject"]),
                     instruction_language_code="zh-CN",
                     target_language_code=(
@@ -3683,7 +3713,8 @@ class LearningCatalogReleaseService:
                         if str(item["subject"]) == "english"
                         else "zh-CN"
                     ),
-                    boundary=self._content_boundary(str(item["skill_id"])),
+                    difficulty_code=self._content_target(item).difficulty_code,
+                    boundary=self._content_boundary(item),
                     checkpoint=predecessor_checkpoint,
                 )
                 prepared = self._content_provider_preflight(
@@ -3720,7 +3751,7 @@ class LearningCatalogReleaseService:
             phase=phase,
             phase_ordinal=phase_ordinal,
             generation_request_id=generation_request_id,
-            grade_code="primary_1",
+            grade_code=preparation_authority_grade(item),
             subject=str(item["subject"]),
             instruction_language_code=(
                 "zh-CN"
@@ -3728,7 +3759,8 @@ class LearningCatalogReleaseService:
             target_language_code=(
                 "en-US" if str(item["subject"]) == "english" else "zh-CN"
             ),
-            boundary=self._content_boundary(str(item["skill_id"])),
+            difficulty_code=self._content_target(item).difficulty_code,
+            boundary=self._content_boundary(item),
             checkpoint=checkpoint,
         )
         return command, initial
@@ -3815,6 +3847,8 @@ class LearningCatalogReleaseService:
             if not isinstance(attempt_one, Mapping):
                 raise ValueError("attempt-one evidence is missing")
             candidate_less_attempt_one = (
+                recovery_dispatches(item=item, evidence=attempt_one) is not None
+                or
                 self._zero_call_number_sense_attempt_one_dispatches(
                     item=item, evidence=attempt_one
                 )
@@ -4609,17 +4643,10 @@ class LearningCatalogReleaseService:
                 return True
         return False
 
-    def _content_boundary(self, skill_id: str) -> dict[str, object]:
-        boundary = next(
-            (
-                value
-                for value in PRIMARY_SKILL_BOUNDARIES
-                if value.grade_code == "primary_1" and value.skill_id == skill_id
-            ),
-            None,
+    def _content_boundary(self, item: Mapping[str, object]) -> dict[str, object]:
+        boundary = formal_registered_boundary(
+            preparation_authority_grade(item), str(item["subject"]), str(item["skill_id"])
         )
-        if boundary is None:
-            raise ValueError("content skill boundary is missing")
         payload = dict(boundary.to_openmaic_payload())
         payload.pop("language", None)
         return payload
@@ -4650,7 +4677,7 @@ class LearningCatalogReleaseService:
 
     def _content_target(self, item: Mapping[str, object]) -> PrimaryOneCourseTarget:
         return PrimaryOneCourseTarget(
-            grade_code="primary_1",
+            grade_code=preparation_authority_grade(item),
             subject=str(item["subject"]),
             subject_ordinal=int(item["subject_ordinal"]),
             skill_id=str(item["skill_id"]),
@@ -4756,8 +4783,8 @@ class LearningCatalogReleaseService:
             course_id=str(course["id"]),
             course_version=str(course["version"]),
             curriculum_version=PRIMARY_CURRICULUM_VERSION,
-            content_validation_contract_version=CONTENT_VALIDATION_CONTRACT_VERSION,
-            content_validation_dataset_sha256=PRIMARY_ONE_CONTENT_DATASET_SHA256,
+            content_validation_contract_version=formal_content_validation_identity(target.grade_code)["contentValidationContractVersion"],
+            content_validation_dataset_sha256=formal_content_validation_identity(target.grade_code)["contentValidationDatasetSha256"],
             subject_language_policy_version=SUBJECT_LANGUAGE_POLICY_VERSION,
             generator_profile_hash=generator.profile_hash,
             verifier_profile_hash=verifier.profile_hash,
@@ -4836,16 +4863,19 @@ class LearningCatalogReleaseService:
             raise ValueError("Host retry graph persistence drift")
         attempt_one = None
         if attempt == 2:
-            attempt_one = self._locked_attempt_evidence(
-                evidence=evidence,
-                attempt=1,
-            )
-            self._validate_locked_rejected_history(
-                evidence=evidence,
-                item=item,
-                history_evidence=attempt_one,
-                prior_evidence=prior_evidence,
-            )
+            if recovery_dispatches(item=item, evidence=evidence) is not None:
+                attempt_one = evidence
+            else:
+                attempt_one = self._locked_attempt_evidence(
+                    evidence=evidence,
+                    attempt=1,
+                )
+                self._validate_locked_rejected_history(
+                    evidence=evidence,
+                    item=item,
+                    history_evidence=attempt_one,
+                    prior_evidence=prior_evidence,
+                )
         plan = {
             "candidate": candidate,
             "dispatches": dispatches,
@@ -5110,13 +5140,14 @@ class LearningCatalogReleaseService:
                 phase=phase,
                 phase_ordinal=ordinal,
                 generation_request_id=str(item["active_generation_request_id"]),
-                grade_code="primary_1",
+                grade_code=preparation_authority_grade(item),
                 subject=str(item["subject"]),
                 instruction_language_code="zh-CN",
                 target_language_code=(
                     "en-US" if str(item["subject"]) == "english" else "zh-CN"
                 ),
-                boundary=self._content_boundary(str(item["skill_id"])),
+                difficulty_code=self._content_target(item).difficulty_code,
+                boundary=self._content_boundary(item),
                 checkpoint=input_checkpoint,
             )
             prepared = self._content_provider_preflight(command)
@@ -5230,9 +5261,12 @@ class LearningCatalogReleaseService:
     ) -> dict[str, object]:
         result = self._empty_content_summary()
         rows = [row for row in items if isinstance(row, Mapping)]
-        if len(rows) not in {0, 30}:
+        if not rows:
             return result
-        target_counts = {"chinese": 12, "math": 9, "english": 9}
+        target = canonical_preparation_target_for(rows[0])
+        if len(rows) != formal_target_course_count(target) or any(preparation_authority_grade(row) != target["gradeCode"] for row in rows):
+            return result
+        target_counts = {subject: values["totalCourseCount"] for subject, values in target["subjectTargets"].items()}
         passed = [
             row
             for row in rows
@@ -5259,9 +5293,8 @@ class LearningCatalogReleaseService:
                 "targetCount": target_count,
             }
         canary_keys = {
-            ("chinese", "pinyin_syllables", 1),
-            ("math", "number_sense_20", 1),
-            ("english", "letters_sounds", 1),
+            (row["subject"], row["skillId"], row["variantOrdinal"])
+            for row in target["canaryManifest"]["targets"]
         }
         passed_canaries = sum(
             1
@@ -5616,7 +5649,7 @@ class LearningCatalogReleaseService:
         normalized_title = str(title or "").strip()[:255]
         if not normalized_title:
             raise ApiError("invalid_catalog_title", "课程目录标题不能为空")
-        canonical_target = build_preparation_target("primary_1")
+        canonical_target = canonical_preparation_target_for(preparation_target)
         canonical_json = self.repository.encode_json(canonical_target)
         provided_json = self.repository.encode_json(preparation_target)
         canonical_fingerprint = preparation_target_fingerprint(canonical_target)
@@ -5629,7 +5662,7 @@ class LearningCatalogReleaseService:
         ):
             raise ApiError(
                 "catalog_preparation_target_conflict",
-                "备课内容目标与已批准的一年级正式合同不一致",
+                "备课内容目标与已批准的对应年级正式合同不一致",
                 409,
             )
         try:

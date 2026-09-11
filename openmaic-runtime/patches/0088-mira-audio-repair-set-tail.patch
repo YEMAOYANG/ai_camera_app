@@ -1,0 +1,42 @@
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -97,6 +97,20 @@
+   return {...reference, sourceSha256: qualitySha(source)};
+ }
+ 
++async function verifiedAudioRepairs(value: unknown, prepared: Awaited<ReturnType<typeof prepareMiraFormalSavedStageRecovery>>) {
++  const references = Array.isArray(value) ? [...value] : [value];
++  if (!references.length || references.length > 240 ||
++      references.some(reference => !reference || typeof reference !== 'object' || Array.isArray(reference)) ||
++      new Set(references.map(reference => reference.asrRequestId)).size !== references.length)
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_SET_INVALID');
++  const receipts = [];
++  for (const reference of references) receipts.push(await verifiedAudioRepair(reference, prepared));
++  receipts.sort((left, right) => left.asrRequestId < right.asrRequestId ? -1 : 1);
++  // Preserve the consumed single-repair claim even if its reference is wrapped
++  // in an array. Multiple repairs bind the complete sorted set, without a nonce.
++  return receipts.length === 1 ? receipts[0] : receipts;
++}
++
+ async function main() {
+   const [mode, manifestPath] = process.argv.slice(2);
+   if (!['prepare', 'inspect', 'complete', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
+@@ -214,7 +228,7 @@
+     throw new Error('SAVED_STAGE_BROWSER_PREFLIGHT_REQUIRED');
+   let audioTailReceipt: string | undefined;
+   let asrComparisonRevalidation: AsrComparisonReference[] | undefined;
+-  let audioRepair: Awaited<ReturnType<typeof verifiedAudioRepair>> | undefined;
++  let audioRepair: Awaited<ReturnType<typeof verifiedAudioRepairs>> | undefined;
+   if (mode === 'complete-audio-tail' || mode === 'complete-audio-comparison-tail') {
+     const qualityFolders = await fs.readdir(path.join(process.cwd(), 'data/formal-quality-reviews'));
+     let cachedPass = false;
+@@ -245,7 +259,7 @@
+         const previous = JSON.parse(await fs.readFile(path.join(folder, `complete-${snapshotSha256}-audio-${audioTailReceipt}.claim`), 'utf8'));
+         if (Object.entries(identity).some(([key, value]) => previous[key] !== value))
+           throw new Error('SAVED_STAGE_AUDIO_REPAIR_PRIOR_CLAIM_CHANGED');
+-        audioRepair = await verifiedAudioRepair(manifest.audioRepair, prepared);
++        audioRepair = await verifiedAudioRepairs(manifest.audioRepair, prepared);
+         audioTailReceipt = qualitySha({comparisonReceiptSha256: audioTailReceipt, audioRepair});
+       }
+     } else {

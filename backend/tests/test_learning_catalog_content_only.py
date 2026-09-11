@@ -57,6 +57,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
     def test_provider_dependency_projection_is_exact_and_rejects_artifact_residue(self):
         service = object.__new__(LearningCatalogReleaseService)
         item = {
+            "grade_code": "primary_1",
             "id": "item-1",
             "build_job_id": "build-1",
             "release_id": "release-1",
@@ -123,6 +124,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
             if target["subject"] == "math" and target["variantOrdinal"] == 1
         )
         item = {
+            "grade_code": "primary_1",
             "id": "item-1",
             "build_job_id": "build-1",
             "release_id": "release-1",
@@ -186,7 +188,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
             evidence=host_evidence,
             skill_boundary_sha256=hashlib.sha256(
                 service._canonical_content_json(
-                    service._content_boundary(str(item["skill_id"]))
+                    service._content_boundary(item)
                 ).encode("utf-8")
             ).hexdigest(),
             candidate_course_sha256=hashlib.sha256(
@@ -461,6 +463,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
             "dispatches": [],
             "evidence": [],
             "attemptHistoriesByItem": {},
+            "historicalQuestionFingerprintsByItem": {},
             "releaseHasCatalogItems": False,
         }
 
@@ -581,6 +584,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
     def test_host_retry_graph_projection_consumes_prior_and_attempt_one_evidence(self):
         service = object.__new__(LearningCatalogReleaseService)
         item = {
+            "grade_code": "primary_1",
             "id": "item-1",
             "status": "processing",
             "content_phase": "host_gate_pending",
@@ -684,6 +688,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
     def test_attempt_one_host_retry_rejects_all_attempt_two_residue(self):
         service = object.__new__(LearningCatalogReleaseService)
         item = {
+            "grade_code": "primary_1",
             "id": "item-1",
             "status": "processing",
             "content_phase": "host_gate_pending",
@@ -1068,6 +1073,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
             ),
         }
         item = {
+            "grade_code": "primary_1",
             "id": "item-1",
             "generation_request_id": "request-1",
             "active_generation_request_id": "request-1.attempt2",
@@ -1107,7 +1113,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
             observed.append(dict(item))
             return (
                 type("Evidence", (), {"candidate_course": {}})(),
-                object(),
+                type("Target", (), {"grade_code": "primary_1"})(),
                 object(),
                 (),
             )
@@ -1177,6 +1183,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
             "Prepared", (), {"input_sha256": "a" * 64}
         )()
         item = {
+            "grade_code": "primary_1",
             "id": "item-1",
             "attempt_count": 1,
             "active_generation_request_id": "request-1",
@@ -1242,7 +1249,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
                 self.call = (conn, build_id)
                 return {
                     "release": {"id": "release-1"},
-                    "build": {"id": build_id, "release_id": "release-1"},
+                    "build": {"id": build_id, "release_id": "release-1", "target_spec_json": json.dumps(build_preparation_target("primary_1"))},
                     "items": items,
                     "evidence": [],
                 }
@@ -1349,6 +1356,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
             lambda conn, *, row: ({"id": "job-1"}, {"id": "candidate-1"})
         )
         repository.list_content_dispatches = lambda *args, **kwargs: []
+        repository._historical_question_fingerprints = lambda *args, **kwargs: []
         repository._load_content_attempt_histories_locked = (
             lambda conn, *, rows: {
                 str(value["id"]): {
@@ -1718,6 +1726,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
         rows = [
             {
                 "id": f"summary-{index}",
+                "grade_code": target["gradeCode"],
                 "subject": item["subject"],
                 "skill_id": item["skillId"],
                 "variant_ordinal": item["variantOrdinal"],

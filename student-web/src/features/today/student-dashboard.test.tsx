@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { StudentDashboard } from "@/features/today/student-dashboard";
@@ -69,7 +69,7 @@ describe("StudentDashboard", () => {
     expect(await screen.findByText("拼音声母小侦探")).toBeInTheDocument();
     expect(screen.queryByRole("progressbar", { name: "新课准备进度" })).not.toBeInTheDocument();
     expect(screen.queryByText("35%")).not.toBeInTheDocument();
-    expect(screen.getAllByText("小课堂还需要一点调整")).toHaveLength(2);
+    expect(screen.queryByText("小课堂还需要一点调整")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /开始这节课/ })).toHaveAttribute("href", "/lesson/task-1/classroom");
     expect(screen.queryByText("老师正在认真备课")).not.toBeInTheDocument();
   });
@@ -115,7 +115,7 @@ describe("StudentDashboard", () => {
     expect(screen.getByText(/先补上 1 节没学完的课/)).toBeInTheDocument();
   });
 
-  it("shows the first ready lesson immediately and fills later slots without flicker", async () => {
+  it("shows the first ready lesson without background placeholders and refreshes on return", async () => {
     getTodayLearning
       .mockResolvedValueOnce({
         ...todayFixture,
@@ -136,8 +136,23 @@ describe("StudentDashboard", () => {
     expect(await screen.findByText("拼音声母小侦探")).toBeInTheDocument();
     expect(screen.getByText(/今天已有 1 节小课可以学/)).toBeInTheDocument();
     expect(screen.queryByRole("progressbar", { name: "新课准备进度" })).not.toBeInTheDocument();
-    expect(screen.getAllByText("完成后自动出现")).toHaveLength(2);
+    expect(screen.queryByText("完成后自动出现")).not.toBeInTheDocument();
+    expect(getTodayLearning).toHaveBeenCalledTimes(1);
+    fireEvent.focus(window);
     expect(await screen.findByText("20以内加法小实验")).toBeInTheDocument();
     expect(getTodayLearning).toHaveBeenCalledTimes(2);
+  });
+
+  it("shows scope completion and review without pretending a new course is being generated", async () => {
+    getTodayLearning.mockResolvedValue({ ...todayFixture, items: [], itemCount: 0, completedCount: 0,
+      catalogStatus: "complete", availableCourseCount: 3,
+      learningState: { schemaVersion: "mira.learning.availability-state.v1", availabilityStatus: "scope_completed",
+        availableCourseCount: 3, newCourseCount: 0, reviewCourseCount: 3, publishedCourseCount: 3,
+        message: "本单元已完成，可以先复习。" } });
+    render(<StudentDashboard student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} />);
+    expect(await screen.findByText("本单元已完成")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /去复习学过的课程/ })).toHaveAttribute("href", "/learning");
+    expect(screen.queryByRole("progressbar", { name: "新课准备进度" })).not.toBeInTheDocument();
+    expect(screen.queryByText("今天还没有排好课程")).not.toBeInTheDocument();
   });
 });

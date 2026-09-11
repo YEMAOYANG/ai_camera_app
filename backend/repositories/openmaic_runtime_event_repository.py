@@ -616,6 +616,58 @@ class OpenMaicRuntimeEventRepository:
             ),
         }
 
+    def learning_session_completed_action_scene_ids(
+        self, conn: DatabaseConnection, *, family_id: str, child_id: str,
+        learning_session_id: str, runtime_classroom_id: str, release_id: str,
+        target_fingerprint: str,
+    ) -> list[str]:
+        """Accepted completion only; the complete frozen authority isolates re-entry."""
+        rows = conn.execute(
+            """
+            SELECT DISTINCT event.scene_id
+            FROM learning_openmaic_runtime_events AS event
+            JOIN learning_openmaic_runtime_event_streams AS stream
+              ON stream.runtime_session_id = event.runtime_session_id
+            WHERE stream.family_id = ? AND stream.child_id = ?
+              AND stream.learning_session_id = ? AND stream.runtime_classroom_id = ?
+              AND stream.release_id = ? AND stream.target_fingerprint = ?
+              AND event.event_type = 'action_completed'
+            ORDER BY event.scene_id
+            """,
+            (family_id, child_id, learning_session_id, runtime_classroom_id,
+             release_id, target_fingerprint),
+        ).fetchall()
+        return [str(row["scene_id"]) for row in rows]
+
+    def learning_session_interaction_evidence(
+        self, conn: DatabaseConnection, *, family_id: str, child_id: str,
+        learning_session_id: str, runtime_classroom_id: str, release_id: str,
+        target_fingerprint: str,
+    ) -> list[dict[str, Any]]:
+        # The same immutable learning-session identity as scene evidence supports
+        # genuine re-entry without mixing another child's or another release's work.
+        rows = conn.execute("""
+            SELECT event.event_type, event.payload_json
+            FROM learning_openmaic_runtime_events AS event
+            JOIN learning_openmaic_runtime_event_streams AS stream
+              ON stream.runtime_session_id = event.runtime_session_id
+            WHERE stream.family_id = ? AND stream.child_id = ?
+              AND stream.learning_session_id = ? AND stream.runtime_classroom_id = ?
+              AND stream.release_id = ? AND stream.target_fingerprint = ?
+              AND event.event_type = 'interaction_completed'
+            ORDER BY event.created_at, event.sequence
+        """, (family_id, child_id, learning_session_id, runtime_classroom_id, release_id, target_fingerprint)).fetchall()
+        result = []
+        for row in rows:
+            raw = row.get("payload_json")
+            try:
+                payload = json.loads(raw) if isinstance(raw, str) else raw
+            except (ValueError, TypeError):
+                continue
+            if isinstance(payload, Mapping):
+                result.append({"event_type": str(row["event_type"]), "payload": dict(payload)})
+        return result
+
     def answered_question_ids(
         self,
         conn: DatabaseConnection,

@@ -1,0 +1,410 @@
+--- a/lib/web-search/brave.ts
++++ b/lib/web-search/brave.ts
+@@ -12,6 +12,7 @@
+ import { proxyFetch } from '@/lib/server/proxy-fetch';
+ import type { WebSearchResult, WebSearchSource } from '@/lib/types/web-search';
+ import { normalizeWebSearchQuery } from './utils';
++import { braveResponseError, WebSearchProviderError } from './provider-error';
+ 
+ const BRAVE_DEFAULT_BASE_URL = 'https://search.brave.com';
+ const BRAVE_SCRAPE_MIN_REQUEST_INTERVAL_MS = 1_000;
+@@ -20,6 +21,28 @@
+ 
+ let braveScrapeQueue: Promise<void> = Promise.resolve();
+ let lastBraveScrapeRequestStartedAt = 0;
++const braveCooldowns = new Map<string, { until: number; failures: number }>();
++
++function assertBraveNotCooling(origin: string): void {
++  const state = braveCooldowns.get(origin);
++  if (state && state.until > Date.now()) {
++    throw new WebSearchProviderError(
++      'WEB_SEARCH_RATE_LIMIT_COOLDOWN',
++      429,
++      state.until - Date.now(),
++      'cooldown',
++    );
++  }
++}
++
++function recordBraveRateLimit(origin: string, response: Response): number {
++  const failures = (braveCooldowns.get(origin)?.failures ?? 0) + 1;
++  const delay = Math.max(1_000, braveRetryAfterMs(response), failures >= 3 ? 300_000 : 0);
++  if (!braveCooldowns.has(origin) && braveCooldowns.size >= 32)
++    braveCooldowns.delete(braveCooldowns.keys().next().value!);
++  braveCooldowns.set(origin, { until: Date.now() + delay, failures });
++  return delay;
++}
+ 
+ const BRAVE_HEADERS: Record<string, string> = {
+   'User-Agent':
+@@ -228,9 +251,10 @@
+   });
+ 
+   if (!res.ok) {
+-    const errorText = await res.text().catch(() => '');
+-    throw new Error(`Brave API error (${res.status}): ${errorText || res.statusText}`);
+-  }
++    const retryAfterMs = res.status === 429 ? recordBraveRateLimit(BRAVE_API_BASE_URL, res) : 0;
++    throw await braveResponseError(res, retryAfterMs);
++  }
++  braveCooldowns.delete(BRAVE_API_BASE_URL);
+ 
+   const data = (await res.json()) as {
+     web?: {
+@@ -264,32 +288,31 @@
+ ): Promise<WebSearchSource[]> {
+   return runSerializedBraveScrape(async () => {
+     const url = buildBraveSearchUrl(query, baseUrl);
+-
+-    for (let attempt = 0; attempt < 2; attempt += 1) {
+-      await waitForBraveScrapeThrottle(signal);
+-      const res = await meteredOperation('brave', 'brave-search', { url: String(url), attempt }, { calls: 1, search_requests: 1 }, () => proxyFetch(url, {
+-        method: 'GET',
+-        headers: BRAVE_HEADERS,
+-        ...(signal ? { signal } : {}),
+-      }));
+-
+-      if (res.ok) {
+-        const html = await res.text();
+-        return parseBraveSearchHtml(html, maxResults);
+-      }
+-
+-      if (res.status === 429 && attempt === 0) {
+-        const retryAfterMs = braveRetryAfterMs(res);
+-        await res.body?.cancel().catch(() => undefined);
+-        await waitForDelay(retryAfterMs, signal);
+-        continue;
+-      }
+-
+-      const errorText = await res.text().catch(() => '');
+-      throw new Error(`Brave Search error (${res.status}): ${errorText || res.statusText}`);
++    const origin = new URL(url).origin;
++    assertBraveNotCooling(origin);
++    await waitForBraveScrapeThrottle(signal);
++    assertBraveNotCooling(origin);
++    const res = await meteredOperation(
++      'brave',
++      'brave-search',
++      { url: String(url), attempt: 0 },
++      { calls: 1, search_requests: 1 },
++      () =>
++        proxyFetch(url, {
++          method: 'GET',
++          headers: BRAVE_HEADERS,
++          ...(signal ? { signal } : {}),
++        }),
++    );
++
++    if (res.ok) {
++      braveCooldowns.delete(origin);
++      const html = await res.text();
++      return parseBraveSearchHtml(html, maxResults);
+     }
+ 
+-    throw new Error('Brave Search retry exhausted');
++    const retryAfterMs = res.status === 429 ? recordBraveRateLimit(origin, res) : 0;
++    throw await braveResponseError(res, retryAfterMs);
+   }, signal);
+ }
+ 
+@@ -303,9 +326,18 @@
+   const { query: rawQuery, apiKey, maxResults = 5, baseUrl, signal } = params;
+   const query = normalizeWebSearchQuery(rawQuery);
+   const startedAt = Date.now();
++  assertBraveNotCooling(
++    apiKey ? BRAVE_API_BASE_URL : new URL(buildBraveSearchUrl(query, baseUrl)).origin,
++  );
+ 
+   const sources = apiKey
+-    ? await meteredOperation('brave', 'brave-search', { query, maxResults }, { calls: 1, search_requests: 1 }, () => searchWithBraveApi(query, apiKey, maxResults, signal))
++    ? await meteredOperation(
++        'brave',
++        'brave-search',
++        { query, maxResults },
++        { calls: 1, search_requests: 1 },
++        () => searchWithBraveApi(query, apiKey, maxResults, signal),
++      )
+     : await searchWithBraveScrape(query, maxResults, baseUrl, signal);
+ 
+   return {
+--- /dev/null
++++ b/lib/web-search/provider-error.ts
+@@ -0,0 +1,55 @@
++/** Only bounded failure metadata may become an agent tool result. */
++export class WebSearchProviderError extends Error {
++  constructor(
++    readonly code:
++      | 'WEB_SEARCH_HTTP_ERROR'
++      | 'WEB_SEARCH_RATE_LIMITED'
++      | 'WEB_SEARCH_RATE_LIMIT_COOLDOWN',
++    readonly status: number,
++    readonly retryAfterMs: number,
++    readonly bodySummary: 'html_omitted' | 'json_omitted' | 'body_omitted' | 'cooldown',
++  ) {
++    super(
++      `${code} provider=brave status=${status} retry_after_ms=${Math.ceil(retryAfterMs)} body=${bodySummary}`,
++    );
++    this.name = 'WebSearchProviderError';
++  }
++}
++
++export async function braveResponseError(
++  response: Response,
++  retryAfterMs: number,
++): Promise<WebSearchProviderError> {
++  const type = response.headers.get('content-type') ?? '';
++  const summary = /html/i.test(type)
++    ? 'html_omitted'
++    : /json/i.test(type)
++      ? 'json_omitted'
++      : 'body_omitted';
++  // Never read an error page: even a short prefix can contain credentials or
++  // instructions. This categorical summary retains response evidence only.
++  await response.body?.cancel().catch(() => undefined);
++  return new WebSearchProviderError(
++    response.status === 429 ? 'WEB_SEARCH_RATE_LIMITED' : 'WEB_SEARCH_HTTP_ERROR',
++    response.status,
++    retryAfterMs,
++    summary,
++  );
++}
++
++export function sanitizedWebSearchToolError(error: unknown): Error {
++  if (error instanceof WebSearchProviderError) return error;
++  if (error instanceof Error && error.name === 'AbortError') return error;
++  const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : '';
++  const message = error instanceof Error ? error.message : String(error);
++  // Preserve local budget/control codes while excluding untrusted messages,
++  // HTML, URLs, authorization headers and arbitrarily long provider bodies.
++  const localCode = /^[A-Z][A-Z0-9_]{1,95}$/.test(code)
++    ? code
++    : message.match(/^(MIRA_PAID_[A-Z0-9_]{1,80})(?=$|[:\s])/u)?.[1];
++  if (localCode) return new Error(localCode);
++  const status = message
++    .slice(0, 256)
++    .match(/(?:status[=: ]+|error\s*\(|HTTP\s+)([45]\d{2})/i)?.[1];
++  return new Error(`WEB_SEARCH_PROVIDER_FAILED${status ? ` status=${status}` : ''} detail=omitted`);
++}
+--- a/lib/server/agent-runtime/web-search.ts
++++ b/lib/server/agent-runtime/web-search.ts
+@@ -13,6 +13,7 @@
+ 
+ import { formatSearchResultsAsContext, searchWeb } from '@/lib/web-search';
+ import { resolveClassroomWebSearchConfig } from '@/lib/server/web-search-config';
++import { sanitizedWebSearchToolError } from '@/lib/web-search/provider-error';
+ 
+ export interface WebSearchCapability {
+   providerId: Parameters<typeof searchWeb>[0]['providerId'];
+@@ -102,6 +103,8 @@
+         apiKey: capability.apiKey,
+         ...(capability.baseUrl ? { baseUrl: capability.baseUrl } : {}),
+         ...(signal ? { signal } : {}),
++      }).catch((error: unknown) => {
++        throw sanitizedWebSearchToolError(error);
+       });
+       if (signal?.aborted) throw new Error('aborted');
+       // Every result URL is registered with the session's durable session-urls
+--- a/tests/web-search/brave.test.ts
++++ b/tests/web-search/brave.test.ts
+@@ -134,88 +134,93 @@
+     expect(proxyFetchMock).toHaveBeenCalledTimes(2);
+   });
+ 
+-  it('retries one 429 after Retry-After seconds with the same abort signal', async () => {
++  it('omits the complete 429 HTML page and fails repeated calls during cooldown without more requests', async () => {
+     vi.useFakeTimers();
+     vi.setSystemTime(new Date('2026-09-03T00:00:00Z'));
+     const searchWithBrave = await loadSearchWithBrave();
+-    const signal = new AbortController().signal;
+-    proxyFetchMock
+-      .mockResolvedValueOnce(
+-        new Response('slow down', { status: 429, headers: { 'Retry-After': '2' } }),
+-      )
+-      .mockResolvedValueOnce(htmlResponse('Recovered'));
+-
+-    const result = searchWithBrave({ query: 'retry', signal });
+-    await vi.advanceTimersByTimeAsync(1_999);
++    const response = new Response(
++      '<html><script>' + 'private error body '.repeat(100_000) + '</script></html>',
++      {
++        status: 429,
++        headers: { 'Retry-After': '2', 'Content-Type': 'text/html' },
++      },
++    );
++    const readBody = vi.spyOn(response, 'text');
++    proxyFetchMock.mockResolvedValueOnce(response).mockResolvedValueOnce(htmlResponse('Recovered'));
++    const error = await searchWithBrave({ query: 'first' }).catch((value) => value);
++    expect(error).toMatchObject({
++      code: 'WEB_SEARCH_RATE_LIMITED',
++      status: 429,
++      retryAfterMs: 2000,
++    });
++    expect(error.message.length).toBeLessThan(180);
++    expect(error.message).not.toMatch(/<html|private|script/);
++    expect(readBody).not.toHaveBeenCalled();
++    for (const query of ['second', 'third', 'different query']) {
++      await expect(searchWithBrave({ query })).rejects.toMatchObject({
++        code: 'WEB_SEARCH_RATE_LIMIT_COOLDOWN',
++        status: 429,
++      });
++    }
+     expect(proxyFetchMock).toHaveBeenCalledTimes(1);
+-    await vi.advanceTimersByTimeAsync(1);
+-    await expect(result).resolves.toMatchObject({ sources: [{ title: 'Recovered' }] });
+-    expect(proxyFetchMock.mock.calls.map(([, init]) => init.signal)).toEqual([signal, signal]);
+-  });
+-
+-  it('respects Retry-After dates and caps an excessive delay at 60 seconds', async () => {
++    await vi.advanceTimersByTimeAsync(2000);
++    await expect(searchWithBrave({ query: 'after cooldown' })).resolves.toMatchObject({
++      sources: [{ title: 'Recovered' }],
++    });
++    expect(proxyFetchMock).toHaveBeenCalledTimes(2);
++  });
++
++  it('caps retry-after dates, uses safe fallback, and opens a five-minute cooldown after three 429s', async () => {
+     vi.useFakeTimers();
+     const now = new Date('2026-09-03T00:00:00Z');
+     vi.setSystemTime(now);
+     const searchWithBrave = await loadSearchWithBrave();
+-    proxyFetchMock
+-      .mockResolvedValueOnce(
+-        new Response(null, {
+-          status: 429,
+-          headers: { 'Retry-After': new Date(now.getTime() + 120_000).toUTCString() },
+-        }),
+-      )
+-      .mockResolvedValueOnce(htmlResponse('Capped'));
+-
+-    const result = searchWithBrave({ query: 'retry date' });
+-    await vi.advanceTimersByTimeAsync(59_999);
+-    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
+-    await vi.advanceTimersByTimeAsync(1);
+-    await expect(result).resolves.toMatchObject({ sources: [{ title: 'Capped' }] });
+-  });
+-
+-  it('uses a 30-second fallback for an invalid Retry-After value', async () => {
+-    vi.useFakeTimers();
+-    vi.setSystemTime(new Date('2026-09-03T00:00:00Z'));
+-    const searchWithBrave = await loadSearchWithBrave();
+-    proxyFetchMock
+-      .mockResolvedValueOnce(
+-        new Response(null, { status: 429, headers: { 'Retry-After': 'not-a-delay' } }),
+-      )
+-      .mockResolvedValueOnce(htmlResponse('Fallback'));
+-
+-    const result = searchWithBrave({ query: 'retry fallback' });
+-    await vi.advanceTimersByTimeAsync(29_999);
+-    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
+-    await vi.advanceTimersByTimeAsync(1);
+-    await expect(result).resolves.toMatchObject({ sources: [{ title: 'Fallback' }] });
+-  });
+-
+-  it('does not retry non-429 failures', async () => {
+-    const searchWithBrave = await loadSearchWithBrave();
+-    proxyFetchMock.mockResolvedValueOnce(new Response('unavailable', { status: 503 }));
+-
+-    await expect(searchWithBrave({ query: 'no retry' })).rejects.toThrow(
+-      'Brave Search error (503): unavailable',
+-    );
+-    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
+-  });
+-
+-  it('aborts during a 429 backoff without sending the retry', async () => {
+-    vi.useFakeTimers();
+-    vi.setSystemTime(new Date('2026-09-03T00:00:00Z'));
+-    const searchWithBrave = await loadSearchWithBrave();
+-    const controller = new AbortController();
+-    proxyFetchMock.mockResolvedValueOnce(
+-      new Response(null, { status: 429, headers: { 'Retry-After': '30' } }),
+-    );
+-
+-    const result = searchWithBrave({ query: 'cancel retry', signal: controller.signal });
+-    await vi.advanceTimersByTimeAsync(0);
+-    controller.abort(new DOMException('cancelled', 'AbortError'));
+-
+-    await expect(result).rejects.toMatchObject({ name: 'AbortError' });
+-    await vi.advanceTimersByTimeAsync(30_000);
+-    expect(proxyFetchMock).toHaveBeenCalledTimes(1);
++    proxyFetchMock.mockResolvedValueOnce(
++      new Response(null, {
++        status: 429,
++        headers: { 'Retry-After': new Date(now.getTime() + 120_000).toUTCString() },
++      }),
++    );
++    await expect(searchWithBrave({ query: 'first' })).rejects.toMatchObject({
++      retryAfterMs: 60000,
++    });
++    await vi.advanceTimersByTimeAsync(60000);
++    proxyFetchMock.mockResolvedValueOnce(
++      new Response(null, { status: 429, headers: { 'Retry-After': 'invalid' } }),
++    );
++    await expect(searchWithBrave({ query: 'second' })).rejects.toMatchObject({
++      retryAfterMs: 30000,
++    });
++    await vi.advanceTimersByTimeAsync(30000);
++    proxyFetchMock.mockResolvedValueOnce(
++      new Response(null, { status: 429, headers: { 'Retry-After': '0' } }),
++    );
++    await expect(searchWithBrave({ query: 'third' })).rejects.toMatchObject({
++      retryAfterMs: 300000,
++    });
++    await expect(searchWithBrave({ query: 'fourth' })).rejects.toMatchObject({
++      code: 'WEB_SEARCH_RATE_LIMIT_COOLDOWN',
++    });
++    expect(proxyFetchMock).toHaveBeenCalledTimes(3);
++  });
++
++  it('also bounds API non-2xx bodies and preserves a failed status', async () => {
++    const searchWithBrave = await loadSearchWithBrave();
++    proxyFetchMock.mockResolvedValueOnce(
++      new Response(JSON.stringify({ error: 'sensitive '.repeat(100_000) }), {
++        status: 503,
++        headers: { 'Content-Type': 'application/json' },
++      }),
++    );
++    const error = await searchWithBrave({ query: 'API', apiKey: 'test-key' }).catch(
++      (value) => value,
++    );
++    expect(error).toMatchObject({
++      code: 'WEB_SEARCH_HTTP_ERROR',
++      status: 503,
++      bodySummary: 'json_omitted',
++    });
++    expect(error.message.length).toBeLessThan(180);
++    expect(error.message).not.toContain('sensitive');
+   });
+ });
+--- a/tests/agent-runtime/web-search.test.ts
++++ b/tests/agent-runtime/web-search.test.ts
+@@ -161,3 +161,30 @@
+     );
+   });
+ });
++
++describe('web_search bounded failure context', () => {
++  const capability: WebSearchCapability = { providerId: 'brave', apiKey: '' };
++
++  it('does not expose arbitrary provider HTML or record failed searches as completed', async () => {
++    searchWebMock.mockRejectedValue(
++      new Error('Brave Search error (429): <html>' + 'large private body '.repeat(100_000)),
++    );
++    const observed = vi.fn();
++    const completed = vi.fn();
++    const tool = buildWebSearchTool(capability, observed, { onSearchCompleted: completed });
++    const error = await tool
++      .execute('failed', { query: 'q' } as never, undefined)
++      .catch((value) => value);
++    expect(error.message).toBe('WEB_SEARCH_PROVIDER_FAILED status=429 detail=omitted');
++    expect(observed).not.toHaveBeenCalled();
++    expect(completed).not.toHaveBeenCalled();
++  });
++
++  it('preserves a local paid-budget denial code without its untrusted details', async () => {
++    searchWebMock.mockRejectedValue(new Error('MIRA_PAID_BUDGET_EXHAUSTED: private details'));
++    const tool = buildWebSearchTool(capability);
++    await expect(tool.execute('failed', { query: 'q' } as never, undefined)).rejects.toThrow(
++      /^MIRA_PAID_BUDGET_EXHAUSTED$/,
++    );
++  });
++});

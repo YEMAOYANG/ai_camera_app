@@ -53,7 +53,9 @@ npm ci
 npm run dev
 ```
 
-Student Web 使用 Next.js 16 App Router、React 19、TypeScript、Tailwind CSS 4，并以 Turbopack 作为日常开发和默认构建器。它复用现有 Python Backend 的学生专属 API，不在 Next.js 中重写课程、判题或掌握度业务。网页会读取真实的今日两节课，执行“老师先讲 → 看示范 → 互动引导 → 独立练习 → 总结”，提交真实答案并展示真实报告。
+Student Web 使用 Next.js 16 App Router、React 19、TypeScript、Tailwind CSS 4，并以 Turbopack 作为日常开发和默认构建器。它复用现有 Python Backend 的学生专属 API，不在 Next.js 中重写课程、判题或掌握度业务。网页会读取后端实际分配的当日课程，执行“老师先讲 → 看示范 → 互动引导 → 独立练习 → 总结”，提交真实答案并展示真实报告。
+
+一至六年级的目标方案和当前验收边界见[课程与题库实施方案](docs/architecture/2026-09-09-multigrade-learning-production-plan.md)、[需求与深度交互复核](docs/architecture/2026-09-10-requirements-deep-interaction-review.md)。现有正式备课已经使用深度交互技能并产出互动页；完整的适龄深交互默认政策与教学操作证据仍是待实施项，不能用首页开关或技能名称代替产物验收。
 
 当前生产课堂由 OpenMAIC 1.0 专业 Agent 直接创建完整 Stage/Scene：后端提供已选年级、学科、能力边界和答案盲教学简报，不再要求家长补充提示词。Agent 默认先联网检索并保存引用，再按课时和内容自适应规划 1–60 个场景，页数和页面类型顺序都不固定。讲解型 slide 可按画面元素拆成多段“聚焦 → 讲解”序列，互动页必须有真实控件和可观察状态变化。生成后由服务端绑定 Qwen 老师音色，对每段旁白执行 TTS 和 ASR 回读验证；评分题的答案仍只在 Mira 后端判定。旧的 10 场景样板/恢复合同只作为兼容路径，不再是新正式课堂的生成模板。工程说明见 [student-web/README.md](student-web/README.md)。
 

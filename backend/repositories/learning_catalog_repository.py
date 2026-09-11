@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from content.formal_curriculum_registry import formal_content_validation_identity
+
+from services.learning_curriculum_preparation_contract import (canonical_preparation_target_for, formal_target_course_count, preparation_authority_grade)
+
 from repositories.course_supply_repository import requested_supply, filter_requested_supply, record_supply_incident
 
 from integrations.openmaic_formal_media import validate_media_manifest, compatible_preparation_target
@@ -304,7 +308,9 @@ class LearningCatalogRepository:
         now: int,
     ) -> tuple[DatabaseRow, bool]:
         target_spec_json = self.encode_json(target_spec)
-        canonical_target = build_preparation_target("primary_1")
+        canonical_target = canonical_preparation_target_for(target_spec)
+        grade_code = preparation_authority_grade(target_spec)
+        target_count = formal_target_course_count(target_spec)
         canonical_target_json = self.encode_json(canonical_target)
         canonical_fingerprint = preparation_target_fingerprint(canonical_target)
         canonical_curriculum_version = str(canonical_target["curriculumVersion"])
@@ -328,17 +334,17 @@ class LearningCatalogRepository:
         if (
             str(target_spec.get("schemaVersion") or "")
             != "mira.learning.preparation-target.v2"
-            or str(target_spec.get("gradeCode") or "") != "primary_1"
+            or str(target_spec.get("gradeCode") or "") != grade_code
             or int(target_spec.get("variantsPerBoundary") or 0) != 3
-            or int(target_spec.get("totalCourseCount") or 0) != 30
+            or int(target_spec.get("totalCourseCount") or 0) != target_count
             or not isinstance(course_targets, list)
-            or len(course_targets) != 30
+            or len(course_targets) != target_count
             or not isinstance(canary_manifest, Mapping)
             or not isinstance(canary_manifest.get("targets"), list)
             or len(canary_manifest["targets"]) != 3
         ):
             raise LearningCatalogBuildConflict(
-                "content-only preparation target is not the exact primary_1 shape"
+                "content-only preparation target is not the exact registered grade shape"
             )
         content_manifest_version = str(target_spec["schemaVersion"])
         canary_manifest_json = self.encode_json(canary_manifest)
@@ -352,9 +358,9 @@ class LearningCatalogRepository:
                 for target in course_targets
             }
         )
-        if boundary_count != 10:
+        if boundary_count != int(canonical_target["boundaryCount"]):
             raise LearningCatalogBuildConflict(
-                "content-only preparation target must contain ten boundaries"
+                "content-only preparation target must match the registered boundary count"
             )
 
         digest = hashlib.sha256(request_id.encode("utf-8")).hexdigest()[:24]
@@ -403,7 +409,7 @@ class LearningCatalogRepository:
                   failed_item_count, execution_mode, content_manifest_version,
                   canary_manifest_json, stage_ceiling, created_at, updated_at
                 )
-                VALUES (?, ?, ?, ?, 'queued', ?, 30, 0, 0, 'content_only',
+                VALUES (?, ?, ?, ?, 'queued', ?, ?, 0, 0, 'content_only',
                   ?, ?, 'content_ready', ?, ?)
                 ON DUPLICATE KEY UPDATE id = id
                 """,
@@ -413,6 +419,7 @@ class LearningCatalogRepository:
                     release_id,
                     curriculum_version,
                     target_spec_json,
+                    target_count,
                     content_manifest_version,
                     canary_manifest_json,
                     now,
@@ -432,7 +439,7 @@ class LearningCatalogRepository:
             or str(locked["release_id"]) != release_id
             or str(locked["curriculum_version"]) != curriculum_version
             or str(locked["target_spec_json"]) != target_spec_json
-            or int(locked["total_item_count"]) != 30
+            or int(locked["total_item_count"]) != target_count
             or str(locked.get("execution_mode") or "") != "content_only"
             or str(locked.get("stage_ceiling") or "") != "content_ready"
             or str(locked.get("content_manifest_version") or "")
@@ -459,7 +466,7 @@ class LearningCatalogRepository:
                 skill_id = str(target["skillId"])
                 variant_ordinal = int(target["variantOrdinal"])
                 identity = (
-                    f"{build_id}:primary_1:{subject}:{skill_id}:{variant_ordinal}"
+                    f"{build_id}:{grade_code}:{subject}:{skill_id}:{variant_ordinal}"
                 )
                 item_digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()
                 conn.execute(
@@ -473,7 +480,7 @@ class LearningCatalogRepository:
                       boundary_ordinal, content_phase, content_gate_status,
                       content_gate_attempt_count, created_at, updated_at
                     )
-                    VALUES (?, ?, ?, 'primary_1', ?, ?, ?, ?, ?, 'pending', 0,
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 0,
                       ?, 'content_only', ?, ?, ?, 'not_started', 'not_started',
                       0, ?, ?)
                     """,
@@ -481,6 +488,7 @@ class LearningCatalogRepository:
                         f"catalog_build_item_{item_digest[:24]}",
                         build_id,
                         release_id,
+                        grade_code,
                         subject,
                         skill_id,
                         curriculum_version,
@@ -505,8 +513,9 @@ class LearningCatalogRepository:
             curriculum_version=canonical_curriculum_version,
             content_manifest_version=content_manifest_version,
             course_targets=course_targets,
+            grade_code=grade_code,
         )
-        if len(rows) != 30 or any(
+        if len(rows) != target_count or any(
             not self._content_item_immutables_match(row, expected)
             for row, expected in zip(rows, expected_items)
         ):
@@ -651,7 +660,7 @@ class LearningCatalogRepository:
         if release is None:
             return None
         target_spec = self.decode_json(build.get("target_spec_json"))
-        canonical_target = build_preparation_target("primary_1")
+        canonical_target = canonical_preparation_target_for(target_spec)
         canonical_curriculum_version = str(canonical_target["curriculumVersion"])
         if (
             not compatible_preparation_target(target_spec, canonical_target)
@@ -672,7 +681,7 @@ class LearningCatalogRepository:
             str(target_spec.get("schemaVersion") or "")
             != str(build.get("content_manifest_version") or "")
             or not isinstance(course_targets, list)
-            or len(course_targets) != 30
+            or len(course_targets) != formal_target_course_count(target_spec)
             or not isinstance(canary_targets, list)
             or len(canary_targets) != 3
             or self.encode_json(canary_manifest)
@@ -686,8 +695,9 @@ class LearningCatalogRepository:
             curriculum_version=canonical_curriculum_version,
             content_manifest_version=str(build["content_manifest_version"]),
             course_targets=course_targets,
+            grade_code=preparation_authority_grade(target_spec),
         )
-        if len(rows) != 30 or any(
+        if len(rows) != formal_target_course_count(target_spec) or any(
             not self._content_item_immutables_match(row, expected)
             for row, expected in zip(rows, expected_items)
         ):
@@ -1834,6 +1844,8 @@ class LearningCatalogRepository:
         expected_input_sha256: str,
         checkpoint: Mapping[str, object],
         now: int,
+        expected_grade: str = "primary_1",
+        recovery_audit_sha256: str | None = None,
     ) -> DatabaseRow | None:
         """Seal one billed retry from its immutable Host-compilable candidate."""
 
@@ -1849,8 +1861,10 @@ class LearningCatalogRepository:
             ("english", "greetings"),
             ("english", "numbers_colors"),
         }
+        audited_high_grade = expected_grade in {f"primary_{n}" for n in range(2, 7)}
         if (
-            (expected_subject, expected_skill_id) not in sealed_targets
+            ((expected_subject, expected_skill_id) not in sealed_targets and not audited_high_grade)
+            or (audited_high_grade and re.fullmatch(r"[0-9a-f]{64}", recovery_audit_sha256 or "") is None)
             or
             re.fullmatch(r"[0-9a-f]{64}", expected_input_sha256) is None
             or set(checkpoint) != {"phaseStatus", "candidate"}
@@ -1887,9 +1901,11 @@ class LearningCatalogRepository:
                 rows=rows,
                 allow_terminal=True,
             )
-            or str(build.get("status") or "") != "failed"
-            or str(build.get("error_code") or "")
-            != "preparation_content_validation_failed"
+            or not (
+                (str(build.get("status") or "") == "failed"
+                 and str(build.get("error_code") or "") == "preparation_content_validation_failed")
+                or (audited_high_grade and build.get("status") == "running" and build.get("error_code") is None)
+            )
             or sum(str(row.get("status") or "") == "failed" for row in rows)
             != 1
             or any(
@@ -1897,7 +1913,7 @@ class LearningCatalogRepository:
                 not in {"pending", "course_ready", "failed"}
                 for row in rows
             )
-            or str(item.get("grade_code") or "") != "primary_1"
+            or str(item.get("grade_code") or "") != expected_grade
             or str(item.get("subject") or "") != expected_subject
             or str(item.get("skill_id") or "") != expected_skill_id
             or int(item.get("variant_ordinal") or 0) not in {1, 2, 3}
@@ -1926,6 +1942,13 @@ class LearningCatalogRepository:
         ).get(item_id)
         if not isinstance(histories, Mapping):
             return None
+        if audited_high_grade:
+            from services.learning_content_recovery import candidate_less_evidence, require_billed_recovery_audit
+            if (logical_attempt != 2 or candidate_less_evidence(item=item, histories=histories) is None
+                    or item.get("course_id") is not None or item.get("course_version") is not None):
+                return None
+            require_billed_recovery_audit(conn, build_id=build_id, item=item, histories=histories,
+                                         audit_sha256=recovery_audit_sha256, checkpoint=checkpoint)
         if logical_attempt == 2:
             try:
                 attempt_one = self._attempt_one_evidence_for_active_retry(
@@ -2124,7 +2147,7 @@ class LearningCatalogRepository:
               AND (
                 (? = 1 AND course_id IS NULL AND course_version IS NULL)
                 OR
-                (? = 2 AND course_id = ? AND course_version = ?)
+                (? = 2 AND course_id <=> ? AND course_version <=> ?)
               )
             """,
             (
@@ -2136,8 +2159,8 @@ class LearningCatalogRepository:
                 logical_attempt,
                 logical_attempt,
                 logical_attempt,
-                str(item.get("course_id") or ""),
-                str(item.get("course_version") or ""),
+                item.get("course_id"),
+                item.get("course_version"),
             ),
         )
         build_cursor = conn.execute(
@@ -2145,11 +2168,12 @@ class LearningCatalogRepository:
             UPDATE learning_catalog_build_jobs
             SET status = 'running', error_code = NULL,
               error_message_safe = NULL, completed_at = NULL, updated_at = ?
-            WHERE id = ? AND status = 'failed'
-              AND error_code = 'preparation_content_validation_failed'
-              AND completed_at IS NOT NULL
+            WHERE id = ? AND (
+                (status = 'failed' AND error_code = 'preparation_content_validation_failed' AND completed_at IS NOT NULL)
+                OR (? = 1 AND status = 'running' AND error_code IS NULL)
+            )
             """,
-            (int(now), build_id),
+            (int(now), build_id, int(audited_high_grade)),
         )
         if any(
             cursor.rowcount != 1
@@ -2569,7 +2593,7 @@ class LearningCatalogRepository:
             or str(build.get("status") or "") != "failed"
             or str(build.get("error_code") or "")
             != "preparation_content_contract_drift"
-            or len(rows) != 30
+            or len(rows) != formal_target_course_count(build)
             or any(
                 str(row.get("status") or "") not in {"pending", "course_ready"}
                 for row in rows
@@ -2584,7 +2608,7 @@ class LearningCatalogRepository:
             or str(item.get("content_receipt_hash") or "")
             != expected_receipt_hash
             or str(item.get("content_validation_contract_version") or "")
-            != "mira.learning.primary-1-content-validation.v1"
+            != formal_content_validation_identity(preparation_authority_grade(build))["contentValidationContractVersion"]
             or not str(item.get("course_id") or "")
             or not str(item.get("course_version") or "")
             or item.get("content_lease_token") is not None
@@ -3270,6 +3294,11 @@ class LearningCatalogRepository:
                         in attempt_pairs
                     ],
                 }
+            if int(row.get('attempt_count') or 0) == 2 and row.get('grade_code') != 'primary_1':
+                from services.learning_content_recovery import load_recovery_receipt
+                receipt = load_recovery_receipt(conn, build_id=str(row['build_job_id']), item_id=item_id)
+                if receipt is not None:
+                    attempts[1]['recoveryReceipt'] = receipt
             result[item_id] = attempts
         return result
 
@@ -3493,6 +3522,10 @@ class LearningCatalogRepository:
         item: Mapping[str, object],
         histories: Mapping[int, Mapping[str, object]],
     ) -> Mapping[str, object]:
+        from services.learning_content_recovery import candidate_less_evidence
+        audited_recovery = candidate_less_evidence(item=item, histories=histories)
+        if audited_recovery is not None:
+            return audited_recovery
         zero_call = cls._zero_call_number_sense_attempt_one_evidence_from_histories(
             item=item,
             histories=histories,
@@ -3665,8 +3698,8 @@ class LearningCatalogRepository:
         if (
             not isinstance(locked_build, Mapping)
             or not isinstance(locked_items, Sequence)
-            or len(locked_items) != 30
-            or len(locked_item_ids) != 30
+            or len(locked_items) != formal_target_course_count(locked_build)
+            or len(locked_item_ids) != formal_target_course_count(locked_build)
             or str(locked_build.get("id") or "")
             != str(locked_item.get("build_job_id") or "")
             or str(locked_item.get("id") or "") not in locked_item_ids
@@ -4578,7 +4611,10 @@ class LearningCatalogRepository:
         rows: Sequence[Mapping[str, Any]],
         allow_terminal: bool = False,
     ) -> bool:
-        current_target = build_preparation_target("primary_1")
+        try:
+            current_target = canonical_preparation_target_for(build)
+        except (ValueError, TypeError, KeyError):
+            return False
         target = self.decode_json(build.get("target_spec_json"))
         if not compatible_preparation_target(target, current_target):
             return False
@@ -4608,7 +4644,7 @@ class LearningCatalogRepository:
             != str(target["schemaVersion"])
             or str(build.get("canary_manifest_json") or "")
             != self.encode_json(target["canaryManifest"])
-            or int(build.get("total_item_count") or 0) != 30
+            or int(build.get("total_item_count") or 0) != formal_target_course_count(build)
             or int(build.get("ready_item_count") or 0) != 0
             or int(build.get("failed_item_count") or 0) != 0
             or (
@@ -4631,7 +4667,7 @@ class LearningCatalogRepository:
             or str(release.get("quality_status") or "") != "building"
             or str(release.get("curriculum_version") or "")
             != str(target["curriculumVersion"])
-            or int(release.get("required_boundary_count") or 0) != 10
+            or int(release.get("required_boundary_count") or 0) != int(current_target["boundaryCount"])
             or release.get("activated_at") is not None
             or release.get("retired_at") is not None
         ):
@@ -4642,8 +4678,9 @@ class LearningCatalogRepository:
             curriculum_version=str(target["curriculumVersion"]),
             content_manifest_version=str(target["schemaVersion"]),
             course_targets=course_targets,
+            grade_code=preparation_authority_grade(build),
         )
-        if len(rows) != 30 or any(
+        if len(rows) != formal_target_course_count(build) or any(
             not self._content_item_immutables_match(row, immutable)
             for row, immutable in zip(rows, expected)
         ):
@@ -5569,7 +5606,7 @@ class LearningCatalogRepository:
             raise LearningCatalogBuildConflict("Host receipt hash drift")
         return self.encode_json(
             {
-                "schemaVersion": "mira.learning.primary-1-host-gate-evidence.v1",
+                "schemaVersion": formal_content_validation_identity(preparation_authority_grade(receipt))["hostGateEvidenceSchemaVersion"],
                 "contentFingerprint": str(receipt.get("hostContentFingerprint") or ""),
                 "hostGateReceipt": receipt,
                 "hostGateReceiptHash": receipt_hash,
@@ -7929,7 +7966,7 @@ class LearningCatalogRepository:
                 self.decode_json(build.get("target_spec_json"))
             )
             == target_fingerprint
-            and len(items) == 30
+            and len(items) == formal_target_course_count(grade_code)
             and (items_progressive if allow_partial else items_complete)
         ):
             raise LearningCatalogActivationError(
@@ -8070,11 +8107,11 @@ class LearningCatalogRepository:
             # Incomplete or rejected siblings are not publication candidates.
             rows = [row for row in rows if row.get("audio_state") == "auto_validated"
                     and row.get("runtime_status") == "ready"]
-        if not allow_partial and len(rows) != 30:
+        if not allow_partial and len(rows) != formal_target_course_count(grade_code):
             raise LearningCatalogActivationError(
                 "formal validation evidence does not cover thirty items"
             )
-        if allow_partial and len(rows) > 30:
+        if allow_partial and len(rows) > formal_target_course_count(grade_code):
             raise LearningCatalogActivationError(
                 "formal validation evidence cardinality is invalid"
             )
@@ -8849,9 +8886,9 @@ class LearningCatalogRepository:
         if not (
             isinstance(items, list)
             and (
-                len(items) == 30
+                len(items) == formal_target_course_count(authority)
                 if finalize_release
-                else 1 <= len(items) <= 30
+                else 1 <= len(items) <= formal_target_course_count(authority)
             )
             and release_id
             and publication_request_id
@@ -9078,7 +9115,7 @@ class LearningCatalogRepository:
                 (release_id,),
             ).fetchone()
             ready_item_count = int((counted or {}).get("value") or 0)
-            if not 1 <= ready_item_count <= 30:
+            if not 1 <= ready_item_count <= formal_target_course_count(authority):
                 raise LearningCatalogActivationError(
                     "progressive formal publication count is invalid"
                 )
@@ -9103,20 +9140,20 @@ class LearningCatalogRepository:
             """
             UPDATE learning_catalog_releases
             SET status = 'published', quality_status = 'ready',
-              ready_item_count = 30,
+              ready_item_count = ?,
               activated_at = COALESCE(activated_at, ?),
               retired_at = NULL, updated_at = ?
             WHERE id = ? AND status IN ('draft', 'published')
               AND quality_status IN ('building', 'ready')
             """,
-            (int(published_at), int(published_at), release_id),
+            (formal_target_course_count(authority), int(published_at), int(published_at), release_id),
         )
         release = self.get_release(conn, release_id=release_id, for_update=True)
         if not (
             release is not None
             and str(release.get("status") or "") == "published"
             and str(release.get("quality_status") or "") == "ready"
-            and int(release.get("ready_item_count") or 0) == 30
+            and int(release.get("ready_item_count") or 0) == formal_target_course_count(authority)
             and release.get("retired_at") is None
         ):
             raise LearningCatalogActivationError(
@@ -9486,6 +9523,7 @@ class LearningCatalogRepository:
         curriculum_version: str,
         content_manifest_version: str,
         course_targets: Sequence[Mapping[str, Any]],
+        grade_code: str,
     ) -> list[dict[str, object]]:
         expected: list[dict[str, object]] = []
         for target in course_targets:
@@ -9493,7 +9531,7 @@ class LearningCatalogRepository:
             skill_id = str(target["skillId"])
             variant_ordinal = int(target["variantOrdinal"])
             identity = (
-                f"{build_id}:primary_1:{subject}:{skill_id}:{variant_ordinal}"
+                f"{build_id}:{grade_code}:{subject}:{skill_id}:{variant_ordinal}"
             )
             item_digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()
             expected.append(
@@ -9502,7 +9540,7 @@ class LearningCatalogRepository:
                     "generation_request_id": f"catalog_gen_{item_digest[:48]}",
                     "build_job_id": build_id,
                     "release_id": release_id,
-                    "grade_code": "primary_1",
+                    "grade_code": grade_code,
                     "subject": subject,
                     "skill_id": skill_id,
                     "curriculum_version": curriculum_version,
@@ -9557,7 +9595,7 @@ class LearningCatalogRepository:
             not hasattr(conn, "execute")
             or not release_id
             or not build_id
-            or not 1 <= ready_item_count <= 30
+            or not 1 <= ready_item_count <= formal_target_course_count(build)
             or re.fullmatch(r"[0-9a-f]{64}", target_fingerprint) is None
         ):
             return False

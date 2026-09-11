@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from services.learning_curriculum_preparation_contract import (canonical_preparation_target_for, formal_target_course_count, preparation_authority_grade)
+from core.security import now_ms as current_time_ms
+
 import json
 import hashlib
 import uuid
@@ -103,7 +106,7 @@ class LessonPackageRepository:
         ).fetchone()
 
     def get_next_formal_candidate_authority(
-        self, conn: DatabaseConnection
+        self, conn: DatabaseConnection, *, preparation_plan: Mapping[str, Any] | None = None
     ) -> DatabaseRow | None:
         """Return one exact V2 content-ready item safe to issue.
 
@@ -119,14 +122,28 @@ class LessonPackageRepository:
             compatible_preparation_scope_sql,
         )
 
-        current_target = build_preparation_target("primary_1")
+        # The no-plan path is the existing bounded Grade-1 operator entry.
+        # Every automatic scheduler call supplies its exact leased plan.
+        current_target = (canonical_preparation_target_for(preparation_plan)
+                          if preparation_plan is not None else build_preparation_target("primary_1"))
+        grade_code = preparation_authority_grade(current_target)
+        target_count = formal_target_course_count(current_target)
         target_scope, target_params = compatible_preparation_scope_sql(
             current_target, target_column="plan.target_spec_json", fingerprint_column="plan.target_fingerprint",
             automatic_only=True,
         )
-        return conn.execute(
+        plan_scope = ""
+        plan_params = ()
+        if preparation_plan is not None:
+            if any(not preparation_plan.get(field) for field in ("id", "lease_token", "catalog_build_id", "catalog_release_id", "target_fingerprint")):
+                raise ValueError("automatic Runtime candidate scope is incomplete")
+            plan_scope = " AND plan.id = ? AND plan.lease_token = ? AND plan.lease_expires_at > ? AND plan.target_fingerprint = ? AND build.id = ? AND release_row.id = ?"
+            plan_params = (preparation_plan["id"], preparation_plan["lease_token"], current_time_ms(),
+                           preparation_plan["target_fingerprint"], preparation_plan["catalog_build_id"], preparation_plan["catalog_release_id"])
+        candidates = list(conn.execute(
             f"""
             SELECT item.id AS build_item_id, item.course_id, item.course_version,
+              item.skill_id, item.variant_ordinal,
               build.target_spec_json, release_row.id AS release_id,
               plan.id AS preparation_plan_id,
               plan.target_fingerprint,
@@ -149,7 +166,7 @@ class LessonPackageRepository:
              AND release_row.quality_status = 'building'
              AND release_row.activated_at IS NULL
              AND release_row.retired_at IS NULL
-             AND release_row.ready_item_count BETWEEN 0 AND 29
+             AND release_row.ready_item_count BETWEEN 0 AND {target_count - 1}
             JOIN learning_curriculum_preparation_plans AS plan
               ON plan.catalog_build_id = build.id
              AND plan.catalog_release_id = release_row.id
@@ -161,8 +178,8 @@ class LessonPackageRepository:
                'generating_content', 'building_classrooms',
                'generating_speech', 'validating', 'publishing'
              )
-             AND plan.content_target_count = 30
-             AND plan.content_candidate_count BETWEEN 1 AND 30
+             AND plan.content_target_count = {target_count}
+             AND plan.content_candidate_count BETWEEN 1 AND {target_count}
              AND (plan.content_failed_count = 0 OR plan.library_target_fingerprint IS NOT NULL)
              AND plan.content_canary_target_count = 3
              AND plan.content_canary_candidate_count BETWEEN 0 AND 3
@@ -191,7 +208,7 @@ class LessonPackageRepository:
               AND item.execution_mode_snapshot = 'content_only'
               AND item.content_manifest_version_snapshot = build.content_manifest_version
               AND build.status IN ('queued', 'running')
-              AND build.total_item_count = 30
+              AND build.total_item_count = {target_count}
               AND build.ready_item_count = 0
               AND build.failed_item_count = 0
               AND build.error_code IS NULL
@@ -203,8 +220,10 @@ class LessonPackageRepository:
               AND JSON_UNQUOTE(JSON_EXTRACT(
                     plan.target_spec_json, '$.gradeCode'
                   )) = item.grade_code
-              AND item.grade_code = 'primary_1'
+              AND item.grade_code = ?
+              AND course.grade_code = item.grade_code AND plan.grade_code = item.grade_code
               AND {target_scope}
+              {plan_scope}
               AND (plan.library_target_fingerprint IS NOT NULL OR NOT EXISTS (
                 SELECT 1 FROM learning_curriculum_preparation_plans AS library_owner
                 WHERE library_owner.library_target_fingerprint = plan.target_fingerprint
@@ -271,10 +290,22 @@ class LessonPackageRepository:
               END,
               item.subject_ordinal, item.boundary_ordinal,
               item.variant_ordinal, item.id
-            LIMIT 1
+            LIMIT {target_count}
             """,
-            target_params,
-        ).fetchone()
+            (grade_code, *target_params, *plan_params),
+        ).fetchall())
+        from repositories.course_supply_inventory import published_supply
+        playable = published_supply(conn, current_target)
+        for candidate in candidates:
+            key = (str(candidate["subject"]), str(candidate["skill_id"]), int(candidate["variant_ordinal"]))
+            if key in playable:
+                continue
+            if preparation_plan is not None:
+                candidate = dict(candidate)
+                candidate["scheduler_lease_token"] = preparation_plan["lease_token"]
+                candidate["scheduler_build_id"] = preparation_plan["catalog_build_id"]
+            return candidate
+        return None
 
     def reserve_formal_runtime_package(
         self,
@@ -306,7 +337,8 @@ class LessonPackageRepository:
             preparation_target_fingerprint,
         )
 
-        current_target = build_preparation_target("primary_1")
+        current_target = canonical_preparation_target_for(authority)
+        target_count = formal_target_course_count(current_target)
         try:
             persisted_target = json.loads(str(authority.get("target_spec_json") or ""))
             valid_target = (compatible_preparation_target(persisted_target, current_target)
@@ -316,8 +348,13 @@ class LessonPackageRepository:
         if not valid_target:
             raise ValueError("formal package target contract is stale")
         persisted_target_json = self.encode_json(persisted_target)
+        scheduler_scope = ""
+        scheduler_params = ()
+        if authority.get("scheduler_lease_token") is not None:
+            scheduler_scope = " AND plan.lease_token = ? AND plan.lease_expires_at > ? AND build.id = ?"
+            scheduler_params = (authority["scheduler_lease_token"], int(now), authority["scheduler_build_id"])
         locked = conn.execute(
-            """
+            f"""
             SELECT item.id AS build_item_id, item.course_id, item.course_version,
               build.execution_mode, build.stage_ceiling, build.status AS build_status,
               release_row.status AS release_status,
@@ -342,8 +379,8 @@ class LessonPackageRepository:
                'generating_content', 'building_classrooms',
                'generating_speech', 'validating', 'publishing'
              )
-             AND plan.content_target_count = 30
-             AND plan.content_candidate_count BETWEEN 1 AND 30
+             AND plan.content_target_count = {target_count}
+             AND plan.content_candidate_count BETWEEN 1 AND {target_count}
              AND plan.content_failed_count = 0
              AND plan.content_canary_target_count = 3
              AND plan.content_canary_candidate_count BETWEEN 0 AND 3
@@ -365,7 +402,7 @@ class LessonPackageRepository:
               AND item.execution_mode_snapshot = 'content_only'
               AND item.content_manifest_version_snapshot = build.content_manifest_version
               AND build.status IN ('queued', 'running')
-              AND build.total_item_count = 30
+              AND build.total_item_count = {target_count}
               AND build.ready_item_count = 0
               AND build.failed_item_count = 0
               AND build.error_code IS NULL
@@ -375,9 +412,19 @@ class LessonPackageRepository:
               AND release_row.quality_status = 'building'
               AND release_row.activated_at IS NULL
               AND release_row.retired_at IS NULL
-              AND release_row.ready_item_count BETWEEN 0 AND 29
+              AND release_row.ready_item_count BETWEEN 0 AND {target_count - 1}
+              AND item.grade_code = course.grade_code
+              AND item.grade_code = plan.grade_code
+              AND item.grade_code = ?
+              {scheduler_scope}
               AND plan.target_fingerprint = ?
               AND plan.target_spec_json = ?
+              AND (plan.library_target_fingerprint IS NULL OR EXISTS (
+                SELECT 1 FROM learning_course_supply_requests AS request
+                WHERE request.target_fingerprint = plan.target_fingerprint
+                  AND request.subject = item.subject AND request.skill_id = item.skill_id
+                  AND request.variant_ordinal = item.variant_ordinal AND request.enabled = TRUE
+              ))
               AND JSON_UNQUOTE(JSON_EXTRACT(
                     plan.target_spec_json, '$.schemaVersion'
                   )) = 'mira.learning.preparation-target.v2'
@@ -400,6 +447,8 @@ class LessonPackageRepository:
                 item_id,
                 course_id,
                 course_version,
+                preparation_authority_grade(authority),
+                *scheduler_params,
                 target_fingerprint,
                 persisted_target_json,
             ),

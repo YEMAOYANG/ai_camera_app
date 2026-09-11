@@ -119,6 +119,26 @@ export function LearningLibrary({
     };
   }, [bucket, pollIntervalMs, shouldPoll, subject]);
 
+  useEffect(() => {
+    let active = true;
+    let pending = false;
+    const refreshVisibleLibrary = () => {
+      if (document.hidden || pending) return;
+      pending = true;
+      void getLearningLibrary({ bucket, subject })
+        .then((value) => { if (active) { setData(value); setError(""); } })
+        .catch(() => undefined)
+        .finally(() => { pending = false; });
+    };
+    window.addEventListener("focus", refreshVisibleLibrary);
+    document.addEventListener("visibilitychange", refreshVisibleLibrary);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", refreshVisibleLibrary);
+      document.removeEventListener("visibilitychange", refreshVisibleLibrary);
+    };
+  }, [bucket, subject]);
+
   async function lock() {
     setLocking(true);
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
@@ -172,6 +192,7 @@ export function LearningLibrary({
             <p className="learning-eyebrow"><LibraryBig className="size-5" />{gradeLabel(student.gradeCode)}学习书架</p>
             <h1 id="learning-library-title">{student.displayName}的<br /><span>我的学习</span></h1>
             <p>今天的课、学过的课和喜欢的课，都在这里。每次回来都能接着学。</p>
+            <Link href="/learning/practice" className="focus-ring mt-4 inline-flex min-h-12 items-center gap-2 rounded-2xl bg-[var(--mira-brand-deep)] px-5 font-bold text-white">学过的内容，练一练<ArrowRight className="size-5" aria-hidden="true" /></Link>
           </div>
           <MiraBuddy mood="reading" className="learning-library-buddy" label="Mira 在整理课程书架" />
         </section>
@@ -188,7 +209,9 @@ export function LearningLibrary({
             </div>
             {data ? (
               <span>
-                {data.catalogStatus === "preparing"
+                {(data.learningState?.availabilityStatus ?? data.courseSupply?.availabilityStatus) === "empty"
+                  ? "课程准备好后就会出现在这里"
+                  : data.catalogStatus === "preparing"
                   ? `已有 ${data.availableCourseCount} 门可用，新课完成一门就会自动加入`
                   : data.catalogStatus === "failed"
                     ? `本轮更新未全部完成，现有 ${data.availableCourseCount} 门仍可学习`
@@ -219,7 +242,8 @@ export function LearningLibrary({
               ))}
             </div>
           ) : null}
-          {!loading && !error && !visibleItems.length ? <LearningEmpty bucket={bucket} catalogStatus={data?.catalogStatus} /> : null}
+          {!loading && !error && !visibleItems.length ? <LearningEmpty bucket={bucket} catalogStatus={data?.catalogStatus}
+            availability={data?.learningState?.availabilityStatus ?? data?.courseSupply?.availabilityStatus} /> : null}
         </section>
       </main>
     </div>
@@ -227,14 +251,14 @@ export function LearningLibrary({
 }
 
 function libraryHasPreparingClassroom(data: LearningLibraryResponse | null) {
-  return Boolean(data && (
-    data.catalogStatus !== "failed"
-    && (
-      data.catalogStatus === "preparing"
-      || [data.continueItem, ...data.items]
-        .some((item) => item && !item.fullClassroomAvailable)
-    )
-  ));
+  if (!data || data.catalogStatus === "failed") return false;
+  const state = data.learningState;
+  const availability = state?.availabilityStatus ?? data.courseSupply?.availabilityStatus;
+  if (availability && ["paused", "empty", "not_open", "scope_completed"].includes(availability)) return false;
+  if ((state?.availableCourseCount ?? data.availableCourseCount) > 0
+    || [data.continueItem, ...data.items].some((item) => item?.fullClassroomAvailable)) return false;
+  return state?.availabilityStatus === "preparing" || data.catalogStatus === "preparing"
+    || [data.continueItem, ...data.items].some((item) => item && !item.fullClassroomAvailable);
 }
 
 function ContinueLesson({ item, onFavorite, favoriteBusy }: { item: LearningLibraryItem; onFavorite: () => void; favoriteBusy: boolean }) {
@@ -309,11 +333,15 @@ function LearningLibraryError({ message, onRetry }: { message: string; onRetry: 
 function LearningEmpty({
   bucket,
   catalogStatus,
+  availability,
 }: {
   bucket: LearningLibraryBucket;
   catalogStatus?: LearningLibraryResponse["catalogStatus"];
+  availability?: NonNullable<LearningLibraryResponse["learningState"]>["availabilityStatus"];
 }) {
-  const copy = bucket === "all" && catalogStatus === "preparing"
+  const copy = availability === "empty"
+    ? ["这里还没有课程", "课程准备好后就会出现。"]
+    : bucket === "all" && catalogStatus === "preparing"
     ? ["第一门课程正在准备", "完成一门就会自动放到这里，不需要等全部课程生成。"]
     : bucket === "favorites"
     ? ["还没有收藏课程", "看到喜欢的课，点一下小爱心就能放到这里。"]

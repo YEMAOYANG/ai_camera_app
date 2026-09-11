@@ -1,0 +1,206 @@
+diff --git a/lib/server/agent-runtime/generation-ai-call.ts b/lib/server/agent-runtime/generation-ai-call.ts
+--- a/lib/server/agent-runtime/generation-ai-call.ts
++++ b/lib/server/agent-runtime/generation-ai-call.ts
+@@ -1,10 +1,18 @@
+ import type { AICallFn } from '@openmaic/generation';
++import { createHash } from 'node:crypto';
++import { mkdir, open } from 'node:fs/promises';
++import { join, resolve } from 'node:path';
+ 
+ import { callLLM } from '@/lib/ai/llm';
+-import type { LlmStage } from '@/lib/server/model-routes';
++import { getStageRoute, type LlmStage } from '@/lib/server/model-routes';
+ import { resolveModel } from '@/lib/server/resolve-model';
+ 
+ const CONTENT_TYPES = new Set(['slide', 'quiz', 'interactive', 'pbl']);
++
++// A model's outputWindow describes its capability, not the requested size of a
++// page or its actions. Keep the formal task ceiling at the original authorized
++// 65,536 tokens; the Agent driver's separate 16,384-token ceiling is unchanged.
++export const MIRA_STRUCTURED_SCENE_MAX_OUTPUT_TOKENS = 65_536;
+ 
+ export function sceneContentStage(type?: string): LlmStage {
+   return type && CONTENT_TYPES.has(type) ? (`scene-content:${type}` as LlmStage) : 'scene-content';
+@@ -21,12 +29,17 @@
+     let resolved: Awaited<ReturnType<typeof resolveModel>> | undefined;
+     const call: AICallFn = async (systemPrompt, userPrompt) => {
+       resolved ??= await resolveModel({ stage });
++      const modelOutputWindow = resolved.modelInfo?.outputWindow;
++      const formalTask = getStageRoute(stage)?.enforced === true;
++      const maxOutputTokens = formalTask
++        ? Math.min(modelOutputWindow ?? Infinity, MIRA_STRUCTURED_SCENE_MAX_OUTPUT_TOKENS)
++        : modelOutputWindow;
+       const result = await callLLM(
+         {
+           model: resolved.model,
+           system: systemPrompt,
+           prompt: userPrompt,
+-          maxOutputTokens: resolved.modelInfo?.outputWindow,
++          maxOutputTokens,
+           maxRetries: 0,
+           abortSignal: options?.abortSignal,
+         },
+@@ -34,6 +47,38 @@
+         undefined,
+         resolved.thinkingConfig,
+       );
++      if (formalTask && result.finishReason === 'length') {
++        // A partial page must not be parsed/persisted as a successful generation.
++        // Retain the paid reply for inspection; never delete an earlier scene or
++        // silently retry at a smaller limit to fit the remaining money.
++        const sha = (value: unknown) =>
++          createHash('sha256').update(JSON.stringify(value)).digest('hex');
++        const response = {
++          schemaVersion: 'mira.openmaic.truncated-scene-response.v1',
++          stage,
++          requestSha256: sha({ stage, systemPrompt, userPrompt, maxOutputTokens }),
++          maxOutputTokens,
++          finishReason: result.finishReason,
++          content: result.text,
++          usage: result.totalUsage ?? result.usage,
++          responseId: result.response?.id ?? null,
++          responseModelId: result.response?.modelId ?? null,
++        };
++        const folder = resolve('data/formal-scene-provider-responses', response.requestSha256);
++        await mkdir(folder, { recursive: true, mode: 0o700 });
++        try {
++          const archive = await open(join(folder, `${sha(response)}.json`), 'wx', 0o600);
++          try {
++            await archive.writeFile(JSON.stringify(response));
++            await archive.sync();
++          } finally {
++            await archive.close();
++          }
++        } catch (error) {
++          if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
++        }
++        throw new Error('FORMAL_SCENE_OUTPUT_TRUNCATED');
++      }
+       return result.text;
+     };
+     calls.set(stage, call);
+diff --git a/tests/agent-runtime/generation-ai-call.test.ts b/tests/agent-runtime/generation-ai-call.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/agent-runtime/generation-ai-call.test.ts
+@@ -0,0 +1,120 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++const mocks = vi.hoisted(() => ({
++  callLLM: vi.fn(),
++  resolveModel: vi.fn(),
++  mkdir: vi.fn(),
++  open: vi.fn(),
++  writeFile: vi.fn(),
++  sync: vi.fn(),
++  close: vi.fn(),
++}));
++vi.mock('@/lib/ai/llm', () => ({ callLLM: mocks.callLLM }));
++vi.mock('@/lib/server/resolve-model', () => ({ resolveModel: mocks.resolveModel }));
++vi.mock('node:fs/promises', () => ({ mkdir: mocks.mkdir, open: mocks.open }));
++
++import { MIRA_STRUCTURED_SCENE_STAGES } from '@/lib/server/model-routes';
++import { createGenerationAiCallFactory } from '@/lib/server/agent-runtime/generation-ai-call';
++
++const model = { provider: 'deepseek.chat', modelId: 'deepseek-v4-pro' };
++const thinkingConfig = { mode: 'disabled', enabled: false };
++
++describe('formal page and action generation output admission', () => {
++  beforeEach(() => {
++    vi.stubEnv('MODEL_ROUTES', '');
++    vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY', 'deepseek-v4-pro-flash-v1');
++    mocks.resolveModel.mockReset().mockResolvedValue({
++      model,
++      modelInfo: { outputWindow: 393_216 },
++      thinkingConfig,
++    });
++    mocks.callLLM.mockReset().mockImplementation(async (request) => {
++      // Model transport is mocked: exercise the real factory against the
++      // original paid authorization ceiling without dispatching a provider.
++      if (request.maxOutputTokens > 65_536) throw Error('MIRA_PAID_BUDGET_RESOURCE_LIMIT');
++      return { text: 'generated page or actions' };
++    });
++    mocks.mkdir.mockReset().mockResolvedValue(undefined);
++    mocks.writeFile.mockReset().mockResolvedValue(undefined);
++    mocks.sync.mockReset().mockResolvedValue(undefined);
++    mocks.close.mockReset().mockResolvedValue(undefined);
++    mocks.open.mockReset().mockResolvedValue({
++      writeFile: mocks.writeFile,
++      sync: mocks.sync,
++      close: mocks.close,
++    });
++  });
++
++  afterEach(() => vi.unstubAllEnvs());
++
++  it('admits every protected scene/action stage at the original task ceiling, not model capacity', async () => {
++    const aiCallFor = createGenerationAiCallFactory();
++    for (const stage of MIRA_STRUCTURED_SCENE_STAGES) {
++      await expect(aiCallFor(stage)('full teaching rules', 'full page brief')).resolves.toBe(
++        'generated page or actions',
++      );
++      expect(mocks.callLLM).toHaveBeenLastCalledWith(
++        {
++          model,
++          system: 'full teaching rules',
++          prompt: 'full page brief',
++          maxOutputTokens: 65_536,
++          maxRetries: 0,
++          abortSignal: undefined,
++        },
++        stage,
++        undefined,
++        thinkingConfig,
++      );
++    }
++    expect(mocks.callLLM).toHaveBeenCalledTimes(MIRA_STRUCTURED_SCENE_STAGES.length);
++    expect(mocks.open).not.toHaveBeenCalled();
++  });
++
++  it('respects smaller model capacity and still has a task limit if metadata is absent', async () => {
++    for (const [outputWindow, expected] of [
++      [32_768, 32_768],
++      [undefined, 65_536],
++    ]) {
++      mocks.resolveModel.mockResolvedValue({ model, modelInfo: { outputWindow }, thinkingConfig });
++      await createGenerationAiCallFactory()('scene-actions')('rules', 'brief');
++      expect(mocks.callLLM.mock.lastCall?.[0].maxOutputTokens).toBe(expected);
++    }
++  });
++
++  it('leaves unprotected workbench request behavior unchanged', async () => {
++    vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY', '');
++    mocks.callLLM.mockResolvedValue({ text: 'ordinary workbench' });
++    await createGenerationAiCallFactory()('scene-content:interactive')('rules', 'brief');
++    expect(mocks.callLLM.mock.lastCall?.[0].maxOutputTokens).toBe(393_216);
++  });
++
++  it('archives a real truncated reply and fails before the caller can parse it as a complete page', async () => {
++    const usage = { inputTokens: 123, outputTokens: 65_536 };
++    mocks.callLLM.mockResolvedValue({
++      text: '<html>partial teaching model',
++      finishReason: 'length',
++      usage,
++      response: { id: 'mock-response', modelId: 'deepseek-v4-pro' },
++    });
++    await expect(
++      createGenerationAiCallFactory()('scene-content:interactive')('rules', 'brief'),
++    ).rejects.toThrow('FORMAL_SCENE_OUTPUT_TRUNCATED');
++    expect(mocks.callLLM).toHaveBeenCalledTimes(1);
++    expect(mocks.open).toHaveBeenCalledWith(
++      expect.stringContaining('formal-scene-provider-responses'),
++      'wx',
++      0o600,
++    );
++    expect(JSON.parse(mocks.writeFile.mock.lastCall![0])).toMatchObject({
++      finishReason: 'length',
++      content: '<html>partial teaching model',
++      maxOutputTokens: 65_536,
++      usage,
++      responseId: 'mock-response',
++      responseModelId: 'deepseek-v4-pro',
++    });
++    expect(mocks.sync).toHaveBeenCalledOnce();
++    expect(mocks.close).toHaveBeenCalledOnce();
++  });
++});

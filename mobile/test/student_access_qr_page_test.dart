@@ -215,9 +215,38 @@ void main() {
     );
   });
 
-  testWidgets('an unopened primary grade cannot reach the QR scanner', (
-    tester,
-  ) async {
+  testWidgets(
+    'a primary grade without workspace permission cannot reach the QR scanner',
+    (tester) async {
+      await _usePhoneViewport(tester);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            profileSummaryProvider.overrideWith(
+              (ref) async => _profile(child: _primaryTwoChild),
+            ),
+            studentAccessAvailabilityProvider.overrideWith(
+              (ref, childId) async => _availability(
+                gradeCode: 'primary_2',
+                hasActiveRelease: false,
+              ),
+            ),
+            appEnvironmentProvider.overrideWithValue(_environment),
+          ],
+          child: const MaterialApp(home: StudentAccessQrPage()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('当前暂不能登录学习空间'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('studentQrScannerViewport')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets('an empty second grade can open the QR scanner', (tester) async {
     await _usePhoneViewport(tester);
     await tester.pumpWidget(
       ProviderScope(
@@ -226,21 +255,36 @@ void main() {
             (ref) async => _profile(child: _primaryTwoChild),
           ),
           studentAccessAvailabilityProvider.overrideWith(
-            (ref, childId) async =>
-                _availability(gradeCode: 'primary_2', hasActiveRelease: false),
+            (ref, childId) async => const LearningAvailability(
+              gradeCode: 'primary_2',
+              hasActiveRelease: false,
+              availableCourseCount: 0,
+              canLearnNow: false,
+              canAccessWorkspace: true,
+              learningState: LearningAvailabilityState(
+                status: 'empty',
+                availableCourseCount: 0,
+                newCourseCount: 0,
+                reviewCourseCount: 0,
+                message: '可以扫码进入学习空间，当前暂无课程。',
+              ),
+            ),
           ),
           appEnvironmentProvider.overrideWithValue(_environment),
         ],
-        child: const MaterialApp(home: StudentAccessQrPage()),
+        child: MaterialApp(
+          home: StudentAccessQrPage(
+            scannerBuilder: (_, _) =>
+                const SizedBox(key: ValueKey('emptyGradeScanner')),
+          ),
+        ),
       ),
     );
     await tester.pumpAndSettle();
-
-    expect(find.text('当前暂不能登录学习空间'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('studentQrScannerViewport')),
-      findsNothing,
-    );
+    expect(find.byKey(const ValueKey('emptyGradeScanner')), findsOneWidget);
+    expect(find.byKey(const ValueKey('studentQrScannerPage')), findsOneWidget);
+    expect(find.text('当前暂不能登录学习空间'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets(

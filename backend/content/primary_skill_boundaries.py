@@ -150,6 +150,28 @@ def _skill(
     excluded: tuple[str, ...],
     prerequisites: tuple[str, ...] = (),
 ) -> PrimarySkillBoundary:
+    # Only the new bounded pilots use these explicit, subject-local edges.
+    # Never rewrite Grade-1 boundaries: their versions are frozen authority.
+    pilot_prerequisites = {
+        (2, "chinese", "sentence_order_punctuation"): ("word_relations",),
+        (2, "chinese", "short_reading"): ("sentence_order_punctuation",),
+        (3, "chinese", "connect_sentences"): ("context_words",),
+        (3, "chinese", "reading_evidence"): ("connect_sentences",),
+        (4, "chinese", "reading_inference"): ("paragraph_structure",),
+        (5, "chinese", "narrative_logic"): ("nonfiction_reading",),
+        (6, "chinese", "integrated_reading"): ("argument_evidence",),
+        (2, "math", "multiplication_division_intro"): ("number_operations_100",),
+        (3, "math", "perimeter_measurement"): ("multi_digit_operations",),
+        (4, "math", "decimals_intro"): ("large_numbers_operations",),
+        (5, "math", "volume_statistics"): ("decimals_equations",),
+        (6, "math", "proportional_reasoning"): ("fraction_ratio_percentage",),
+        (3, "english", "short_reading"): ("self_introduction", "daily_routines"),
+        (4, "english", "descriptions"): ("questions_answers",),
+        (5, "english", "informational_reading"): ("present_tenses",),
+        (6, "english", "reading_evidence"): ("past_future", "grammar_in_context"),
+    }
+    if grade != 1 and not prerequisites:
+        prerequisites = pilot_prerequisites.get((grade, subject, skill_id), ())
     return PrimarySkillBoundary(
         grade_code=f"primary_{grade}",
         subject=subject,

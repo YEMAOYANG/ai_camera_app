@@ -20,6 +20,7 @@ from integrations.openmaic_formal_skills import (
 from integrations.openmaic_formal_pedagogy import FORMAL_TEACHING_QUALITY_POLICY, validate_generation_grade_boundary
 from integrations.openmaic_formal_quality import validate_quality_manifest
 from integrations.openmaic_formal_video import FORMAL_VIDEO_POLICY, validate_video_manifest
+from integrations.openmaic_formal_interaction import INTERACTION_DESIGN_POLICY, MULTISTATE_INTERACTION_POLICY, validate_interaction_manifest
 
 
 FORMAL_IMAGE_POLICY = {
@@ -61,6 +62,12 @@ PROFESSIONAL_POLICY = {
 }
 # Freeze the adaptive image-only policy above: old request/receipt hashes stay exact.
 VIDEO_PROFESSIONAL_POLICY = {**deepcopy(PROFESSIONAL_POLICY), "video": FORMAL_VIDEO_POLICY}
+INTERACTIVE_PROFESSIONAL_POLICY = {
+    **deepcopy(VIDEO_PROFESSIONAL_POLICY), "interactionDesignPolicy": INTERACTION_DESIGN_POLICY,
+}
+MULTISTATE_PROFESSIONAL_POLICY = {
+    **deepcopy(VIDEO_PROFESSIONAL_POLICY), "interactionDesignPolicy": MULTISTATE_INTERACTION_POLICY,
+}
 LEGACY_CONTENT_PROVIDER_PROFILE = "mira.learning.question-provider-profile.v105-deepseek-professional"
 VIDEO_CONTENT_PROVIDER_PROFILE = "mira.learning.question-provider-profile.v106-deepseek-professional-video"
 LEGACY_GENERATION_OPTIONS = {
@@ -95,7 +102,7 @@ def professional_policy(value: object) -> dict[str, Any]:
     if not isinstance(value, Mapping) or canonical_sha256(value) not in {
         canonical_sha256(LEGACY_PROFESSIONAL_POLICY), canonical_sha256(IMAGE_PROFESSIONAL_POLICY),
         canonical_sha256(INTEGRATED_PROFESSIONAL_POLICY), canonical_sha256(PROFESSIONAL_POLICY),
-        canonical_sha256(VIDEO_PROFESSIONAL_POLICY)
+        canonical_sha256(VIDEO_PROFESSIONAL_POLICY), canonical_sha256(INTERACTIVE_PROFESSIONAL_POLICY), canonical_sha256(MULTISTATE_PROFESSIONAL_POLICY)
     }:
         raise ValueError("unsupported formal professional policy")
     return deepcopy(dict(value))
@@ -121,11 +128,13 @@ def compatible_preparation_targets(current: Mapping[str, Any]) -> tuple[dict[str
     policy_from_target(current)
     targets = [deepcopy(dict(current))]
     for historical_policy in (LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY,
-                              INTEGRATED_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY):
+                              INTEGRATED_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY):
         historical = deepcopy(dict(current))
         historical["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(historical_policy)
         if "video" in policy_from_target(current):
-            historical["contentProviderProfileContractVersion"] = LEGACY_CONTENT_PROVIDER_PROFILE
+            historical["contentProviderProfileContractVersion"] = (
+                VIDEO_CONTENT_PROVIDER_PROFILE if "video" in historical_policy else LEGACY_CONTENT_PROVIDER_PROFILE
+            )
         if canonical_sha256(historical) not in {canonical_sha256(t) for t in targets}:
             targets.append(historical)
     return tuple(targets)
@@ -362,6 +371,7 @@ def validate_media_manifest(manifest: Mapping[str, Any]) -> dict[str, Any] | Non
     validate_generation_grade_boundary(generation)
     validate_skill_manifest(manifest)
     validate_quality_manifest(manifest)
+    validate_interaction_manifest(manifest)
     validate_video_manifest(manifest)
     if canonical_sha256(generation.get("generation")) != canonical_sha256(generation_options(policy)):
         raise ValueError("formal media generation options mismatch")

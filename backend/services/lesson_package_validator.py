@@ -419,6 +419,10 @@ def formal_runtime_teaching_brief(
             "providerSecretsProvided": False,
         },
     }
+    if identity["gradeCode"] != "primary_1":
+        from content.formal_difficulty_policy import formal_difficulty_policy
+        identity["difficultyCode"] = content.get("difficultyCode")
+        brief["difficultyPolicy"] = formal_difficulty_policy(identity["gradeCode"], identity["subject"], identity["skillId"], identity["difficultyCode"])
     canonical = json.dumps(
         brief, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     )

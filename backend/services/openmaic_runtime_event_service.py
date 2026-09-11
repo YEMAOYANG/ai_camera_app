@@ -9,8 +9,10 @@ from typing import Any, Callable, Mapping
 
 from core.errors import ApiError
 from core.security import now_ms
+from integrations.openmaic_formal_interaction import validate_interaction_manifest
+from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
 from services.formal_student_learning_access import (
-    FORMAL_COURSE_COUNT,
+    formal_course_count,
     FORMAL_PUBLICATION_CONTRACT_VERSION,
     assert_formal_student_grade_open,
 )
@@ -24,6 +26,7 @@ _EVENT_TYPES = frozenset(
         "action_completed",
         "answer_submitted",
         "asr_transcribed",
+        "interaction_completed",
         "classroom_completed",
     }
 )
@@ -38,6 +41,7 @@ _PAYLOAD_FIELDS = {
     "asr_transcribed": frozenset(
         {"sceneIndex", "sceneId", "turnId", "transcript"}
     ),
+    "interaction_completed": frozenset({"sceneIndex", "sceneId", "objectiveIndex", "controlSelector", "action", "value", "feedbackText"}),
     "classroom_completed": frozenset({"sceneIndex", "sceneId"}),
 }
 
@@ -59,11 +63,15 @@ class OpenMaicRuntimeEventService:
         repository: Any,
         learning_service: Any,
         task_runtime_service: Any | None = None,
+        budget_service: Any | None = None,
+        teaching_conversation_reader: Any | None = None,
         clock: Callable[[], int] = now_ms,
     ):
         self.repository = repository
         self.learning_service = learning_service
         self.task_runtime_service = task_runtime_service
+        self.budget_service = budget_service
+        self.teaching_conversation_reader = teaching_conversation_reader
         self.clock = clock
 
     def status(
@@ -137,6 +145,9 @@ class OpenMaicRuntimeEventService:
             completed = (stream or {}).get("completed_at") is not None
             scene_count = int(evidence.get("scene_count") or 0)
             action_scene_count = int(evidence.get("action_scene_count") or 0)
+            interaction_objectives = self._interaction_objectives(authority)
+            interaction_evidence = self._interaction_evidence(conn, authority=authority) if interaction_objectives else []
+            completed_interactions = self._completed_interactions(interaction_objectives, interaction_evidence)
             completion_ready = bool(
                 not completed
                 and scene_count == expected_scene_count
@@ -144,8 +155,9 @@ class OpenMaicRuntimeEventService:
                 and int(evidence.get("maximum_scene_index") or -1)
                 == expected_scene_count - 1
                 and questions_complete
+                and len(completed_interactions) == len(interaction_objectives)
             )
-            return {
+            response = {
                 "ok": True,
                 "schemaVersion": RUNTIME_EVENT_RECEIPT_SCHEMA,
                 "runtimeSessionId": trusted_runtime_id,
@@ -162,7 +174,18 @@ class OpenMaicRuntimeEventService:
                 "questionsComplete": questions_complete,
                 "answeredQuestionIds": answered_question_ids,
                 "completionReady": completion_ready,
+                "completedInteractionObjectiveIndexes": sorted(completed_interactions),
+                "completedActionSceneIds": self.repository.learning_session_completed_action_scene_ids(
+                    conn, family_id=str(authority["family_id"]), child_id=str(authority["child_id"]),
+                    learning_session_id=str(authority["learning_session_id"]),
+                    runtime_classroom_id=str(authority["runtime_classroom_id"]),
+                    release_id=str(authority["candidate_release_id"]),
+                    target_fingerprint=str(authority["candidate_target_fingerprint"]),
+                ),
             }
+        if completed:
+            self._close_completed_budget(authority)
+        return response
 
     def record(
         self,
@@ -285,9 +308,22 @@ class OpenMaicRuntimeEventService:
                 event=event,
                 expected_scenes=expected_scenes,
             )
+            objectives = self._interaction_objectives(authority)
+            if event["type"] == "interaction_completed":
+                matched = next((item for item in objectives if item["objectiveIndex"] == event["payload"]["objectiveIndex"]), None)
+                if matched is None or not self._operation_matches(matched, event["payload"]):
+                    raise ApiError("runtime_event_interaction_authority_mismatch", "操作结果与已发布课程不一致", 409)
+            elif event["type"] == "answer_submitted" and objectives:
+                required = {item["objectiveIndex"] for item in objectives if item["independentJudgment"]["questionId"] == event["payload"]["questionId"]}
+                completed_operations = self._completed_interactions(objectives, self._interaction_evidence(conn, authority=authority))
+                if not required.issubset(completed_operations):
+                    raise ApiError("runtime_event_interaction_incomplete", "请先完成动手探索，再独立作答", 409)
             authoritative: dict[str, Any] | None = None
             report_id: str | None = None
             completed = False
+            if event["type"] in {"action_completed", "classroom_completed"}:
+                self._require_teaching_completed(authority,
+                    scene_id=event["payload"]["sceneId"] if event["type"] == "action_completed" else None)
             if event["type"] == "answer_submitted":
                 authoritative = self.learning_service.record_authoritative_runtime_answer(
                     conn,
@@ -354,7 +390,59 @@ class OpenMaicRuntimeEventService:
                 )
 
         self._coordinate_task_runtime(follow_up)
+        if completed:
+            self._close_completed_budget(authority)
         return response
+
+    def _require_teaching_completed(self, authority, *, scene_id=None):
+        from services.learning_paid_authority import scope_digest, teaching_budget_scope, upgraded_manifest
+        from services.openmaic_paid_call_service import teaching_conversation_id
+        manifest = authority.get("feature_manifest_json")
+        manifest = json.loads(manifest) if isinstance(manifest, str) else manifest
+        if not isinstance(manifest, Mapping) or not upgraded_manifest(manifest):
+            return
+        actions = manifest["formalEvidence"]["requiredTeachingActions"]
+        required = [item for item in actions if scene_id is None or item["sceneId"] == scene_id]
+        if not required:
+            return
+        if getattr(self, "teaching_conversation_reader", None) is None:
+            raise ApiError("runtime_teaching_verification_unavailable", "老师指导的完成记录暂时无法确认，进度已保留。", 503)
+        row = {**authority, "course_id": authority["session_course_id"], "course_version": authority["session_course_version"]}
+        identity = scope_digest(teaching_budget_scope(row, manifest, "required_teaching"))
+        for action in required:
+            conversation_id = teaching_conversation_id(authorization_id=identity,
+                learning_session_id=authority["learning_session_id"], classroom_id=authority["upstream_classroom_id"],
+                scene_id=action["sceneId"], action_id=action["actionId"])
+            try:
+                conversation = self.teaching_conversation_reader(conversation_id=conversation_id,
+                    learning_session_id=authority["learning_session_id"], classroom_id=authority["upstream_classroom_id"])
+            except OpenMaicFullRuntimeError as exc:
+                raise ApiError("runtime_teaching_verification_unavailable", "老师指导的完成记录暂时无法确认，进度已保留。", 503) from exc
+            if (not isinstance(conversation, Mapping) or conversation.get("id") != conversation_id
+                    or conversation.get("authorizationId") != identity or conversation.get("state") != "completed"):
+                raise ApiError("runtime_teaching_incomplete", "这段老师指导尚未完成，请先继续课堂对话。", 409)
+
+    def _close_completed_budget(self, authority: Mapping[str, Any]) -> None:
+        # Budget uses its own lock order. Always run after learning commits; a
+        # budget outage must never undo the child's completed work/report.
+        if self.budget_service is None:
+            return
+        from services.learning_paid_authority import scope_digest, teaching_budget_scope, upgraded_manifest
+        manifest = authority.get("feature_manifest_json")
+        try:
+            manifest = json.loads(manifest) if isinstance(manifest, str) else manifest
+            if not isinstance(manifest, Mapping) or not upgraded_manifest(manifest):
+                return
+            row = {**authority, "course_id": authority["session_course_id"],
+                   "course_version": authority["session_course_version"]}
+            for purpose in ("required_teaching", "optional_interaction"):
+                try:
+                    self.budget_service.close_authorization(authorization_id=scope_digest(teaching_budget_scope(row, manifest, purpose)))
+                except ApiError as exc:
+                    if exc.status_code != 404:
+                        logger.warning("Budget close will retry on completed session status: %s", authority["learning_session_id"])
+        except Exception:
+            logger.exception("Could not close completed learning budget: %s", authority.get("learning_session_id"))
 
     def _coordinate_task_runtime(
         self,
@@ -448,6 +536,14 @@ class OpenMaicRuntimeEventService:
             child.get("grade_selection_revision")
         )
         if grade_revision < 1:
+            raise self._release_not_ready()
+        # A new, supported grade must still invalidate the former grade's
+        # frozen classroom. This unlocked snapshot is only an early rejection;
+        # matching identities remain subject to the locked authority checks.
+        if subject.get("binding_grade_code") and (
+            str(subject["binding_grade_code"]) != grade_code
+            or self._positive_integer(subject.get("binding_grade_revision")) != grade_revision
+        ):
             raise self._release_not_ready()
 
         principal = self.repository.get_principal_for_update(
@@ -738,7 +834,7 @@ class OpenMaicRuntimeEventService:
             and str(plan.get("stage") or "") == "completed"
             and plan.get("superseded_at") is None
             and cls._positive_integer(plan.get("progress_percent")) == 100
-            and total == FORMAL_COURSE_COUNT
+            and total == formal_course_count(grade_code)
             and cls._positive_integer(plan.get("ready_course_count")) == total
             and cls._positive_integer(plan.get("failed_course_count")) == 0
             and cls._positive_integer(plan.get("content_target_count")) == total
@@ -834,7 +930,7 @@ class OpenMaicRuntimeEventService:
             and cls._positive_integer(ownership.get("binding_pointer_revision"))
             == cls._positive_integer(pointer.get("pointer_revision"))
             and cls._positive_integer(ownership.get("release_ready_item_count"))
-            == FORMAL_COURSE_COUNT
+            == formal_course_count(grade_code)
             and cls._positive_integer(ownership.get("release_activated_at")) > 0
             and ownership.get("release_retired_at") is None
             and ownership.get("release_item_retired_at") is None
@@ -1223,8 +1319,11 @@ class OpenMaicRuntimeEventService:
             conn,
             authority=authority,
         )
+        objectives = self._interaction_objectives(authority)
+        completed_operations = self._completed_interactions(objectives, self._interaction_evidence(conn, authority=authority)) if objectives else set()
         if (
-            int(evidence.get("scene_count") or 0) != expected_scene_count
+            len(completed_operations) != len(objectives)
+            or int(evidence.get("scene_count") or 0) != expected_scene_count
             or int(evidence.get("action_scene_count") or 0) != expected_scene_count
             or int(evidence.get("maximum_scene_index") or -1)
             != expected_scene_count - 1
@@ -1254,6 +1353,58 @@ class OpenMaicRuntimeEventService:
             release_id=str(authority["candidate_release_id"]),
             target_fingerprint=str(authority["candidate_target_fingerprint"]),
         )
+
+    @staticmethod
+    def _interaction_objectives(authority: Mapping[str, Any]) -> list[dict[str, Any]]:
+        manifest = authority.get("feature_manifest_json")
+        if isinstance(manifest, str):
+            try:
+                manifest = json.loads(manifest)
+            except (ValueError, TypeError):
+                manifest = None
+        if not isinstance(manifest, Mapping):
+            raise ApiError("runtime_event_authority_invalid", "课程互动合同不可用", 409)
+        generation = manifest.get("generationContract") or {}
+        professional = manifest.get("professionalCreation") or {}
+        formal = manifest.get("formalEvidence") or {}
+        policy = generation.get("professionalCreationPolicy") if isinstance(generation, Mapping) else None
+        selected = policy.get("interactionDesignPolicy") if isinstance(policy, Mapping) else None
+        claimed = (isinstance(professional, Mapping) and "interactionDesign" in professional) or (isinstance(formal, Mapping) and "interactionDesign" in formal)
+        if selected is None and not claimed:
+            return []  # Historical frozen courses keep their original completion contract.
+        try:
+            validate_interaction_manifest(manifest)
+            receipt = professional["interactionDesign"]
+            if receipt["stageId"] != authority["upstream_classroom_id"]:
+                raise ValueError("interaction classroom mismatch")
+            return receipt["objectives"]
+        except (ValueError, TypeError, KeyError) as exc:
+            raise ApiError("runtime_event_authority_invalid", "课程互动合同与已发布版本不一致", 409) from exc
+
+    @staticmethod
+    def _operation_matches(objective: Mapping[str, Any], payload: Mapping[str, Any]) -> bool:
+        operation, feedback = objective["operation"], objective["feedback"]
+        text = payload.get("feedbackText")
+        return bool(payload.get("objectiveIndex") == objective["objectiveIndex"]
+            and payload.get("sceneId") == operation["sceneId"]
+            and payload.get("controlSelector") == operation["controlSelector"]
+            and payload.get("action") == operation["action"]
+            and payload.get("value") == ("" if operation["action"] == "click" else operation.get("value"))
+            and isinstance(text, str) and feedback["textIncludes"] in text and feedback["reasonQuote"] in text)
+
+    @classmethod
+    def _completed_interactions(cls, objectives: list[dict[str, Any]], evidence: list[dict[str, Any]]) -> set[int]:
+        return {item["objectiveIndex"] for item in objectives if any(
+            row.get("event_type") == "interaction_completed" and cls._operation_matches(item, row.get("payload") or {})
+            for row in evidence)}
+
+    def _interaction_evidence(self, conn: Any, *, authority: Mapping[str, Any]) -> list[dict[str, Any]]:
+        return self.repository.learning_session_interaction_evidence(conn,
+            family_id=str(authority["family_id"]), child_id=str(authority["child_id"]),
+            learning_session_id=str(authority["learning_session_id"]),
+            runtime_classroom_id=str(authority["runtime_classroom_id"]),
+            release_id=str(authority["candidate_release_id"]),
+            target_fingerprint=str(authority["candidate_target_fingerprint"]))
 
     @classmethod
     def _event(cls, value: Mapping[str, Any]) -> dict[str, Any]:
@@ -1310,6 +1461,15 @@ class OpenMaicRuntimeEventService:
                 raise ApiError("invalid_runtime_event_payload", "作答内容格式无效") from exc
             if len(encoded_response.encode("utf-8")) > 4096:
                 raise ApiError("invalid_runtime_event_payload", "作答内容过大")
+        if event_type == "interaction_completed":
+            index, selector = clean_payload.get("objectiveIndex"), clean_payload.get("controlSelector")
+            action, operation_value, feedback = clean_payload.get("action"), clean_payload.get("value"), clean_payload.get("feedbackText")
+            if (type(index) is not int or not 0 <= index < 30 or not isinstance(selector, str)
+                    or not re.fullmatch(r"#[A-Za-z][A-Za-z0-9_-]{0,98}", selector)
+                    or action not in ("click", "fill", "range", "select")
+                    or not isinstance(operation_value, str) or len(operation_value) > 500 or (action == "click" and operation_value != "")
+                    or not isinstance(feedback, str) or not feedback.strip() or len(feedback) > 2000):
+                raise ApiError("invalid_runtime_event_payload", "课程操作证据无效")
         if event_type == "asr_transcribed":
             turn_id = clean_payload.get("turnId")
             if (

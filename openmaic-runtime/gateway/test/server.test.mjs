@@ -1415,3 +1415,60 @@ async function jsonBody(request) {
   for await (const chunk of request) chunks.push(chunk);
   return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
 }
+
+
+test("student interaction events bind exact fields and cannot claim grades or arbitrary operations", () => {
+  const runtime = { runtimeSessionId: "runtime-1", learningSessionId: "learning-1", classroomId: "classroom-1" };
+  const payload = { sceneIndex: 1, sceneId: "scene-1", objectiveIndex: 0, controlSelector: "#quantity",
+    action: "range", value: "12", feedbackText: "一个十两个一，因为十个一是一个十" };
+  const encode = value => Buffer.from(JSON.stringify({ schemaVersion: "mira.openmaic.student-runtime-event.v1",
+    sequence: 1, type: "interaction_completed", payload: value }));
+  assert.deepEqual(prepareRuntimeEvent(encode(payload), runtime).payload, payload);
+  for (const change of [{objectiveIndex:true}, {objectiveIndex:30}, {action:"evaluate"},
+    {controlSelector:"body *"}, {value:"x".repeat(501)}, {feedbackText:""}, {passed:true},
+    {action:"click", value:"12"}]) assert.throws(() => prepareRuntimeEvent(encode({...payload,...change}), runtime));
+  assert.equal(prepareRuntimeEvent(encode({...payload, objectiveIndex:29}), runtime).payload.objectiveIndex, 29);
+});
+
+test("new paid classrooms receive only backend-authorized budget headers and canonical teaching requests", async () => {
+  let admission, nativeRequest;
+  const binding = {schemaVersion:"mira.learning.paid-budget-binding.v1",authorizationId:"a".repeat(64),required:true};
+  const backend = await listen(http.createServer(async (request,response) => {
+    if (request.url.endsWith('/paid-call')) {
+      admission = { body: await jsonBody(request), headers: request.headers };
+      return reply(response,{ok:true,paidBudget:binding,request:{messages:[],canonical:true}});
+    }
+    reply(response,{...formalRuntime(),paidBudgets:{required_teaching:binding,optional_interaction:null}});
+  }));
+  const upstream = await listen(http.createServer(async (request,response) => {
+    nativeRequest = {body:await jsonBody(request),headers:request.headers};reply(response,{ok:true});
+  }));
+  const gateway = await listenGateway({backend,upstream});
+  const result = await fetch(`${gateway}/api/chat`, {method:'POST',headers:{
+    cookie:'mira_openmaic_runtime=omr_good','content-type':'application/json',
+    'x-mira-paid-budget-authorization':'forged','x-mira-internal-token':'forged',
+  },body:JSON.stringify({paidBudget:binding,authorizationId:'forged',messages:[],miraScriptedAction:{sceneId:'scene-a',actionId:'discussion-a'}})});
+  assert.equal(result.status,200);
+  assert.equal(admission.body.path,'/api/chat');
+  assert.equal(admission.body.request.paidBudget,undefined);
+  assert.equal(admission.body.request.authorizationId,undefined);
+  assert.equal(admission.headers['x-mira-internal-token'],'test-internal-token');
+  assert.equal(nativeRequest.headers['x-mira-paid-budget-authorization'],binding.authorizationId);
+  assert.equal(nativeRequest.headers['x-mira-paid-budget-required'],'1');
+  assert.equal(nativeRequest.headers['x-mira-internal-token'],'test-internal-token');
+  assert.deepEqual(nativeRequest.body,{messages:[],canonical:true});
+});
+
+test("new classroom unpaid interaction fails before any native request while old playback remains readable", async () => {
+  let nativeCalls=0;
+  const backend = await listen(http.createServer((request,response) => {
+    if(request.url.endsWith('/paid-call'))return reply(response,{ok:true,paidBudget:null});
+    reply(response,{...formalRuntime(),paidBudgets:{required_teaching:null,optional_interaction:null}});
+  }));
+  const upstream = await listen(http.createServer((_request,response) => {nativeCalls++;reply(response,{ok:true});}));
+  const gateway = await listenGateway({backend,upstream});
+  const response = await fetch(`${gateway}/api/chat`,{method:'POST',headers:{cookie:'mira_openmaic_runtime=omr_good','content-type':'application/json'},body:'{}'});
+  assert.equal(response.status,503);assert.equal(nativeCalls,0);
+  const asset=await fetch(`${gateway}/_next/static/chunk.js`,{headers:{cookie:'mira_openmaic_runtime=omr_good'}});
+  assert.equal(asset.status,200);assert.equal(nativeCalls,1);
+});

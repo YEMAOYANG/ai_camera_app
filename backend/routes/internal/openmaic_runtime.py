@@ -481,6 +481,30 @@ def runtime_event_status():
         return error_response(exc)
 
 
+@internal_openmaic_runtime_bp.post("/runtime/paid-call")
+def admit_runtime_paid_call():
+    from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
+    from services.openmaic_paid_call_service import OpenMaicPaidCallService
+    from services.service_factory import learning_budget_service
+    try:
+        context = _authorize("/internal/learning/openmaic/runtime/paid-call")
+        _require_runtime_gateway(context)
+        service = OpenMaicPaidCallService(
+            repository=OpenMaicRuntimeEventRepository(Database(current_app.config["DATABASE_URL"])),
+            runtime_service=openmaic_full_runtime_service(), budget_service=learning_budget_service())
+        return jsonify(service.admit(
+            runtime_session_id=_required_gateway_header("X-Mira-Runtime-Session"),
+            learning_session_id=_required_gateway_header("X-Mira-Learning-Session", maximum=255),
+            upstream_classroom_id=_required_gateway_header("X-Mira-Runtime-Classroom-Id", maximum=255),
+            data=json_body(request)))
+    except OpenMaicRuntimeServiceError as exc:
+        return error_response(_api_error(exc))
+    except OpenMaicFullRuntimeError as exc:
+        return error_response(_api_error(exc))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @internal_openmaic_runtime_bp.post("/runtime/probe/issue")
 def issue_conversation_probe():
     try:
@@ -621,11 +645,14 @@ def _authorize(route: str, *, payload_ref: str = "") -> dict:
 
 
 def _runtime_event_service() -> OpenMaicRuntimeEventService:
+    from services.service_factory import learning_budget_service
     database = Database(current_app.config["DATABASE_URL"])
     return OpenMaicRuntimeEventService(
         repository=OpenMaicRuntimeEventRepository(database),
         learning_service=learning_service(),
         task_runtime_service=task_runtime_service(),
+        budget_service=learning_budget_service(),
+        teaching_conversation_reader=openmaic_full_runtime_service().client.read_teaching_conversation,
     )
 
 

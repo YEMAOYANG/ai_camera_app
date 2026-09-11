@@ -396,6 +396,8 @@ class _ProgressivePreparationRepository:
 
 class OpenMaicProgressiveRuntimeAuthorityTest(unittest.TestCase):
     def test_partial_handoff_allows_only_canary_until_canary_gate_passes(self):
+        from services.learning_curriculum_preparation_contract import build_preparation_target
+        target = build_preparation_target("primary_1")
         release = {
             "status": "draft",
             "quality_status": "building",
@@ -404,6 +406,7 @@ class OpenMaicProgressiveRuntimeAuthorityTest(unittest.TestCase):
             "ready_item_count": 0,
         }
         build = {
+            "target_spec_json": json.dumps(target),
             "execution_mode": "content_only",
             "stage_ceiling": "content_ready",
             "status": "running",
@@ -427,6 +430,7 @@ class OpenMaicProgressiveRuntimeAuthorityTest(unittest.TestCase):
             ),
         }
         item = {
+            "grade_code": "primary_1",
             "subject": "chinese",
             "skill_id": "chi-1",
             "variant_ordinal": 1,
@@ -438,6 +442,8 @@ class OpenMaicProgressiveRuntimeAuthorityTest(unittest.TestCase):
             "content_manifest_version_snapshot": "manifest-v1",
         }
         plan = {
+            "grade_code": "primary_1",
+            "target_spec_json": json.dumps(target),
             "status": "running",
             "stage": "generating_content",
             "content_target_count": 30,
@@ -491,6 +497,19 @@ class OpenMaicProgressiveRuntimeAuthorityTest(unittest.TestCase):
                 complete_item_count=3,
             )
         )
+
+        # The same handoff stays strict for the registered 27-course grades.
+        for grade in ("primary_2", "primary_6"):
+            grade_target = build_preparation_target(grade)
+            grade_build = {**build, "target_spec_json": json.dumps(grade_target), "total_item_count": 27}
+            grade_item = {**item, "grade_code": grade}
+            grade_plan = {**plan, "grade_code": grade, "target_spec_json": json.dumps(grade_target), "content_target_count": 27}
+            with self.subTest(grade=grade):
+                self.assertTrue(OpenMaicRuntimeRepository._candidate_content_handoff_is_current(
+                    release=release, build=grade_build, item=grade_item, plan=grade_plan, complete_item_count=1))
+                for invalid in ({"content_target_count": 30}, {"grade_code": "primary_1"}, {"status": "failed"}):
+                    self.assertFalse(OpenMaicRuntimeRepository._candidate_content_handoff_is_current(
+                        release=release, build=grade_build, item=grade_item, plan={**grade_plan, **invalid}, complete_item_count=1))
 
 
 class LearningGradePublicationServiceTest(unittest.TestCase):

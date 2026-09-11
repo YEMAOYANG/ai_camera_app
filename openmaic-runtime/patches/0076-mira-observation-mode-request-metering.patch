@@ -1,0 +1,220 @@
+diff --git a/lib/server/mira-paid-budget.ts b/lib/server/mira-paid-budget.ts
+--- a/lib/server/mira-paid-budget.ts
++++ b/lib/server/mira-paid-budget.ts
+@@ -21,6 +21,7 @@
+   binding: PaidBudgetBinding;
+   namespace: string;
+   prices?: Promise<Record<string, Price>>;
++  aggregateLimitsEnabled?: boolean;
+ };
+ const globals = globalThis as typeof globalThis & { __miraPaidBudget?: AsyncLocalStorage<Context> };
+ export const paidBudgetContext = (globals.__miraPaidBudget ??= new AsyncLocalStorage<Context>());
+@@ -97,8 +98,10 @@
+   if (!response.ok || !result?.ok || !result.budget) {
+     // Keep only the backend's fixed public code. Never copy a response body,
+     // message, request measurement or credential into the classroom error.
+-    const reason = typeof result?.error === 'string' && /^learning_budget_[a-z_]{1,48}$/.test(result.error)
+-      ? `_${result.error.slice('learning_budget_'.length).toUpperCase()}` : '';
++    const reason =
++      typeof result?.error === 'string' && /^learning_budget_[a-z_]{1,48}$/.test(result.error)
++        ? `_${result.error.slice('learning_budget_'.length).toUpperCase()}`
++        : '';
+     const code = `MIRA_PAID_BUDGET_${operation.toUpperCase()}_REJECTED${reason}`;
+     throw Object.assign(new Error(code), { code });
+   }
+@@ -114,7 +117,12 @@
+   const context = paidBudgetContext.getStore();
+   if (!context) throw new Error('MIRA_PAID_BUDGET_CONTEXT_REQUIRED');
+   const { authorizationId } = context.binding;
+-  context.prices ??= backend('context', { authorizationId }).then((r) => r.prices);
++  context.prices ??= backend('context', { authorizationId }).then((r) => {
++    // Only the trusted accounting service may opt this authorization into
++    // observation mode. Old responses and every value other than false enforce.
++    context.aggregateLimitsEnabled = r.aggregateLimitsEnabled !== false;
++    return r.prices;
++  });
+   const entries = Object.entries(await context.prices).filter(
+     ([, p]) => p.provider === provider && p.model === model,
+   );
+@@ -135,11 +143,17 @@
+     price.allowedUnits.map((unit) => [unit, price.perCallMax[unit]]),
+   );
+   for (const [unit, value] of Object.entries(measured)) {
+-    if (!Number.isSafeInteger(value) || value < 0 || !(unit in maxUnits) || value > maxUnits[unit])
++    if (
++      !Number.isSafeInteger(value) ||
++      value < 0 ||
++      !(unit in maxUnits) ||
++      (context.aggregateLimitsEnabled !== false && value > maxUnits[unit])
++    )
+       throw new Error('MIRA_PAID_BUDGET_RESOURCE_LIMIT');
+     maxUnits[unit] = value;
+   }
+   if (
++    maxUnits.calls !== 1 ||
+     price.allowedUnits.some((unit) => !Number.isSafeInteger(maxUnits[unit]) || maxUnits[unit] < 0)
+   )
+     throw new Error('MIRA_PAID_BUDGET_RESOURCE_LIMIT');
+diff --git a/tests/server/mira-paid-budget.test.ts b/tests/server/mira-paid-budget.test.ts
+--- a/tests/server/mira-paid-budget.test.ts
++++ b/tests/server/mira-paid-budget.test.ts
+@@ -15,6 +15,7 @@
+ let claims: Set<string>;
+ let rejected = '';
+ let providerCalls = 0;
++let aggregateLimitsEnabled: boolean | undefined;
+ const model = () => ({
+   specificationVersion: 'v3' as const,
+   provider: 'fake',
+@@ -50,6 +51,7 @@
+   claims = new Set();
+   providerCalls = 0;
+   rejected = '';
++  aggregateLimitsEnabled = undefined;
+   vi.stubEnv('MIRA_BACKEND_INTERNAL_URL', 'http://fake-backend.invalid');
+   vi.stubEnv('MIRA_INTERNAL_API_TOKEN', 'fake-internal');
+   vi.stubGlobal(
+@@ -63,12 +65,13 @@
+         return Response.json({
+           ok: true,
+           budget: {
++            ...(aggregateLimitsEnabled === undefined ? {} : { aggregateLimitsEnabled }),
+             prices: {
+               fake: {
+                 provider: 'fake',
+                 model: 'fake-text',
+                 allowedUnits: ['calls', 'input_tokens', 'output_tokens'],
+-                perCallMax: { calls: 1, input_tokens: 100000, output_tokens: 1000 },
++                perCallMax: { calls: 1, input_tokens: 500000, output_tokens: 1000 },
+               },
+               media: {
+                 provider: 'qwen-tts',
+@@ -100,9 +103,9 @@
+   vi.unstubAllGlobals();
+   vi.unstubAllEnvs();
+ });
+-function call() {
++function call(request = params) {
+   return withPaidBudget(binding, 'job-a', () =>
+-    (budgetedModel(model() as any, 'fake', 'fake-text') as any).doGenerate(params),
++    (budgetedModel(model() as any, 'fake', 'fake-text') as any).doGenerate(request),
+   );
+ }
+ describe('paid provider admission', () => {
+@@ -150,6 +153,73 @@
+       ),
+     ).rejects.toThrow('RESOURCE_LIMIT');
+     expect(providerCalls).toBe(0);
++  });
++  it.each([undefined, true])(
++    'retains the old per-request input ceiling unless observation is explicit (%s)',
++    async (enabled) => {
++      aggregateLimitsEnabled = enabled;
++      await expect(
++        call({
++          ...params,
++          prompt: [{ role: 'user', content: [{ type: 'text', text: '中文'.repeat(85000) }] }],
++        }),
++      ).rejects.toThrow('RESOURCE_LIMIT');
++      expect(providerCalls).toBe(0);
++      expect(operations.map((o) => o.operation)).toEqual(['context']);
++    },
++  );
++  it('meters large UTF-8 input in observation mode without changing the task output parameter', async () => {
++    aggregateLimitsEnabled = false;
++    await call({
++      ...params,
++      prompt: [{ role: 'user', content: [{ type: 'text', text: '中文'.repeat(85000) }] }],
++    });
++    expect(providerCalls).toBe(1);
++    expect(operations.map((o) => o.operation)).toEqual([
++      'context',
++      'reserve',
++      'dispatch',
++      'settle',
++    ]);
++    expect(operations[1].body.maxUnits.input_tokens).toBeGreaterThan(500000);
++    expect(operations[1].body.maxUnits.output_tokens).toBe(params.maxOutputTokens);
++    expect(operations[3].body.actualUnits).toEqual({
++      calls: 1,
++      input_tokens: 30,
++      output_tokens: 20,
++    });
++  });
++  it('observation removes price-table ceilings but still validates units and one request per dispatch', async () => {
++    aggregateLimitsEnabled = false;
++    for (const measured of [
++      { calls: 2, characters: 2000 },
++      { calls: 1, characters: -1 },
++      { calls: 1, characters: 1.5 },
++      { calls: 1, characters: Number.NaN },
++      { calls: 1, characters: 2, forged: 1 },
++    ]) {
++      await expect(
++        withPaidBudget(binding, 'bad-units', () =>
++          budgetedOperation('qwen-tts', 'qwen3-tts-flash', {}, measured, async () => {
++            providerCalls++;
++          }),
++        ),
++      ).rejects.toThrow('RESOURCE_LIMIT');
++    }
++    expect(providerCalls).toBe(0);
++    await withPaidBudget(binding, 'observed-media', () =>
++      budgetedOperation(
++        'qwen-tts',
++        'qwen3-tts-flash',
++        {},
++        { calls: 1, characters: 2000 },
++        async () => {
++          providerCalls++;
++        },
++      ),
++    );
++    expect(providerCalls).toBe(1);
++    expect(operations.at(-1)?.body.actualUnits).toEqual({ calls: 1, characters: 2000 });
+   });
+   it('captures streamed finish usage before releasing the hold', async () => {
+     const output = await withPaidBudget(binding, 'stream', () =>
+@@ -165,22 +235,26 @@
+       'settle',
+     ]);
+   });
+-  it('retains the full reservation when a provider response is lost', async () => {
+-    const failing = {
+-      ...model(),
+-      doGenerate: async () => {
+-        providerCalls++;
+-        throw new Error('connection lost');
+-      },
+-    };
+-    await expect(
+-      withPaidBudget(binding, 'job-a', () =>
+-        (budgetedModel(failing as any, 'fake', 'fake-text') as any).doGenerate(params),
+-      ),
+-    ).rejects.toThrow('connection lost');
+-    expect(operations.at(-1)?.operation).toBe('unknown');
+-    expect(operations.some((o) => o.operation === 'settle')).toBe(false);
+-  });
++  it.each([undefined, false])(
++    'retains the full reservation when a provider response is lost (%s)',
++    async (enabled) => {
++      aggregateLimitsEnabled = enabled;
++      const failing = {
++        ...model(),
++        doGenerate: async () => {
++          providerCalls++;
++          throw new Error('connection lost');
++        },
++      };
++      await expect(
++        withPaidBudget(binding, 'job-a', () =>
++          (budgetedModel(failing as any, 'fake', 'fake-text') as any).doGenerate(params),
++        ),
++      ).rejects.toThrow('connection lost');
++      expect(operations.at(-1)?.operation).toBe('unknown');
++      expect(operations.some((o) => o.operation === 'settle')).toBe(false);
++    },
++  );
+   it('meters media units and rejects a forged browser authorization header', async () => {
+     await withPaidBudget(binding, 'tts', () =>
+       budgetedOperation(

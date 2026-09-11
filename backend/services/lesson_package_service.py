@@ -123,7 +123,7 @@ class LessonPackageService:
         )
 
     def process_next_formal_candidate(
-        self, runtime_service: Any
+        self, runtime_service: Any, *, preparation_plan: Mapping[str, object] | None = None
     ) -> LessonPackageGenerationResult | None:
         """Prepare one inert package authority and issue one full Runtime job.
 
@@ -133,7 +133,7 @@ class LessonPackageService:
 
         with self.repository.transaction() as conn:
             authority = self.repository.get_next_formal_candidate_authority(
-                conn
+                conn, preparation_plan=preparation_plan
             )
         if authority is None:
             return None

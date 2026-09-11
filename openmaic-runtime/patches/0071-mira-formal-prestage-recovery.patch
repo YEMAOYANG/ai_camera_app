@@ -1,0 +1,393 @@
+diff --git a/lib/server/mira-formal-prestage-recovery.ts b/lib/server/mira-formal-prestage-recovery.ts
+new file mode 100644
+index 0000000..c27425c
+--- /dev/null
++++ b/lib/server/mira-formal-prestage-recovery.ts
+@@ -0,0 +1,309 @@
++/** One diagnosed pre-stage dependency failure; never a general regeneration API. */
++import { createHash } from 'node:crypto';
++import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
++import { join, resolve } from 'node:path';
++import { PgAgentSessionStore } from '@openmaic/storage/agent-session/pg';
++import { getServerPersistenceProvider } from '@/lib/persistence/server-provider';
++import { CLASSROOM_JOBS_DIR } from './classroom-storage';
++import { assertMiraFormalGenerationInput } from './mira-formal-generation-policy';
++import { parsePaidBudget, readSessionPaidBudget } from './mira-paid-budget';
++import { resolveWebSearchApiKey, resolveServerWebSearchProviderId } from './provider-config';
++
++export const PRESTAGE_JOB = 'omformal_d57c133cbf917beb4cb30bb0';
++export const PRESTAGE_SESSION =
++  'miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e';
++const SOURCE_ERROR = 'MIRA_PAID_BUDGET_RESERVE_REJECTED';
++const EVENT = 'mira_formal_prestage_recovery';
++const schemaVersion = 'mira.openmaic.prestage-recovery.v1';
++const canonical = (value: unknown): string =>
++  JSON.stringify(value, (_key, v) =>
++    v && typeof v === 'object' && !Array.isArray(v)
++      ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
++      : v,
++  );
++const sha = (value: unknown) =>
++  createHash('sha256')
++    .update(typeof value === 'string' ? value : canonical(value))
++    .digest('hex');
++const fail = (): never => {
++  throw new Error('FORMAL_PRESTAGE_RECOVERY_SOURCE_MISMATCH');
++};
++
++export function validatePrestageHistory(source: {
++  job: any;
++  session: any;
++  events: any[];
++  entries: any[];
++  stageCount: number;
++  sceneCount: number;
++}) {
++  const { job, session, events, entries } = source;
++  if (
++    job.id !== PRESTAGE_JOB ||
++    job.status !== 'failed' ||
++    job.error !== `FORMAL_PROFESSIONAL_SESSION_FAILED:${SOURCE_ERROR}` ||
++    session.id !== PRESTAGE_SESSION ||
++    session.status !== 'failed' ||
++    session.error !== SOURCE_ERROR ||
++    Number(session.attempt) !== 1 ||
++    session.active_stage_id ||
++    source.stageCount ||
++    source.sceneCount ||
++    !job.completedAt ||
++    job.result ||
++    !job.formalInput
++  )
++    fail();
++  assertMiraFormalGenerationInput(job.formalInput);
++  if (
++    sha(job.formalInput) !== job.formalInputSha256 ||
++    `miraformal_${sha(`${job.runtimeRequestId}\n${canonical(job.formalInput)}`)}` !== session.id ||
++    session.owner_id !== `mira-formal-professional:${session.id.slice(11)}`
++  )
++    fail();
++  const contract = JSON.parse(job.formalInput.requirement);
++  const course = contract.teachingBrief?.course;
++  if (
++    course?.gradeCode !== 'primary_6' ||
++    course.subject !== 'math' ||
++    course.skillId !== 'fraction_ratio_percentage' ||
++    course.difficultyCode !== 'standard' ||
++    contract.runtimeRequestId !== job.runtimeRequestId
++  )
++    fail();
++  const starts = events.filter((e) => e.type === 'tool_execution_start');
++  const ends = events.filter((e) => e.type === 'tool_execution_end');
++  if (
++    starts.length !== 10 ||
++    starts.filter((e) => e.data?.toolName === 'read').length !== 7 ||
++    starts.filter((e) => e.data?.toolName === 'web_search').length !== 3 ||
++    ends.length !== 10 ||
++    events.some((e) =>
++      /mira_formal_research_search|stage_link|course_link|inspection|quality_review|prestage_recovery/.test(
++        e.type,
++      ),
++    )
++  )
++    fail();
++  for (const start of starts) {
++    const end = ends.find((e) => e.data?.toolCallId === start.data?.toolCallId);
++    if (
++      !end ||
++      (start.data.toolName === 'read' && end.data.isError !== false) ||
++      (start.data.toolName === 'web_search' &&
++        (end.data.isError !== true ||
++          !end.data.result?.content?.some(
++            (c: any) => c.type === 'text' && /^Brave Search error \(429\):/.test(c.text),
++          )))
++    )
++      fail();
++  }
++  if (events.at(-1)?.type !== 'session_end' || events.at(-1)?.data?.error !== SOURCE_ERROR) fail();
++  return {
++    schemaVersion,
++    jobId: PRESTAGE_JOB,
++    sessionId: PRESTAGE_SESSION,
++    runtimeRequestId: job.runtimeRequestId,
++    buildItemId: contract.buildItemId,
++    courseId: course.id,
++    courseVersion: course.version,
++    targetFingerprint: contract.targetFingerprint,
++    formalInputSha256: job.formalInputSha256,
++    sessionSeq: Number(events.at(-1).seq),
++    eventsSha256: sha(events),
++    entriesSha256: sha(entries),
++    jobSha256: sha(job),
++    sessionSha256: sha(session),
++    searchAttempts: 3,
++    remainingSearchAttempts: 1,
++    stageCount: 0,
++    qaCount: 0,
++  };
++}
++
++async function atomic(file: string, value: unknown) {
++  const temporary = `${file}.${process.pid}.tmp`;
++  await writeFile(temporary, canonical(value), { mode: 0o600 });
++  await rename(temporary, file);
++}
++
++async function requireBudget(binding: unknown) {
++  const parsed = parsePaidBudget(binding);
++  const base = process.env.MIRA_BACKEND_INTERNAL_URL;
++  const token = process.env.MIRA_INTERNAL_API_TOKEN;
++  if (!base || !token) throw new Error('FORMAL_PRESTAGE_RECOVERY_BUDGET_UNAVAILABLE');
++  const response = await fetch(new URL('/internal/learning/budget/context', base), {
++    method: 'POST',
++    redirect: 'error',
++    headers: {
++      'Content-Type': 'application/json',
++      'X-Mira-Internal-Token': token,
++      'X-Mira-Internal-Source': 'openmaic-runtime-gateway',
++    },
++    body: JSON.stringify({ authorizationId: parsed.authorizationId }),
++    signal: AbortSignal.timeout(15000),
++  });
++  const result = await response.json();
++  if (
++    !response.ok ||
++    result?.ok !== true ||
++    result.budget?.authorizationId !== parsed.authorizationId ||
++    result.budget?.purpose !== 'production'
++  )
++    throw new Error('FORMAL_PRESTAGE_RECOVERY_BUDGET_UNAVAILABLE');
++}
++
++/** apply authorizes continuation; no model or search is called by this function. */
++export async function recoverFormalPrestage(input: {
++  mode: 'plan' | 'apply';
++  expectedHistorySha256?: string;
++}) {
++  if (
++    !['plan', 'apply'].includes(input.mode) ||
++    (input.mode === 'apply' && !/^[a-f0-9]{64}$/.test(input.expectedHistorySha256 || ''))
++  )
++    throw new Error('FORMAL_PRESTAGE_RECOVERY_HISTORY_REQUIRED');
++  const { pool } = await getServerPersistenceProvider(process.env.DATABASE_URL!);
++  const conn = await pool.connect();
++  const jobFile = join(CLASSROOM_JOBS_DIR, `${PRESTAGE_JOB}.json`);
++  const archiveRoot = resolve('data/formal-prestage-recovery');
++  let originalJob: any;
++  let written = false;
++  let committed = false;
++  try {
++    await conn.query('BEGIN');
++    await conn.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [
++      `mira.formal-classroom-completion:${PRESTAGE_JOB}`,
++    ]);
++    const session = (
++      await conn.query('SELECT * FROM agent_sessions WHERE id=$1 FOR UPDATE', [PRESTAGE_SESSION])
++    ).rows[0];
++    const job = JSON.parse(await readFile(jobFile, 'utf8'));
++    const applied = (
++      await conn.query(
++        'SELECT data FROM agent_session_events WHERE session_id=$1 AND type=$2 ORDER BY seq DESC LIMIT 1',
++        [PRESTAGE_SESSION, EVENT],
++      )
++    ).rows[0];
++    if (applied) {
++      if (
++        input.expectedHistorySha256 !== applied.data.historySha256 ||
++        job.prestageRecovery?.historySha256 !== applied.data.historySha256 ||
++        !['running', 'succeeded'].includes(job.status)
++      )
++        fail();
++      await conn.query('ROLLBACK');
++      return { ...applied.data, applied: true };
++    }
++    const events = (
++      await conn.query('SELECT * FROM agent_session_events WHERE session_id=$1 ORDER BY seq', [
++        PRESTAGE_SESSION,
++      ])
++    ).rows;
++    const entries = (
++      await conn.query('SELECT * FROM agent_session_entries WHERE session_id=$1 ORDER BY seq', [
++        PRESTAGE_SESSION,
++      ])
++    ).rows;
++    const stages = (
++      await conn.query(
++        'SELECT COUNT(*)::int AS count FROM document_stages WHERE owner_id=$1 OR id=$2',
++        [session?.owner_id, session?.stage_id],
++      )
++    ).rows[0].count;
++    const scenes = (
++      await conn.query('SELECT COUNT(*)::int AS count FROM document_scenes WHERE stage_id=$1', [
++        session?.stage_id,
++      ])
++    ).rows[0].count;
++    // A crash between atomic file replacement and PG commit may leave the armed job.
++    // Only its exact archived original can be reused; no transcript is rewritten.
++    originalJob = job;
++    if (
++      job.prestageRecovery &&
++      input.expectedHistorySha256 === job.prestageRecovery.historySha256
++    ) {
++      const saved = JSON.parse(
++        await readFile(join(archiveRoot, `${input.expectedHistorySha256}.json`), 'utf8'),
++      );
++      if (
++        sha(saved.history) !== input.expectedHistorySha256 ||
++        job.formalInputSha256 !== saved.job.formalInputSha256
++      )
++        fail();
++      originalJob = saved.job;
++    }
++    const history = validatePrestageHistory({
++      job: originalJob,
++      session,
++      events,
++      entries,
++      stageCount: stages,
++      sceneCount: scenes,
++    });
++    const historySha256 = sha(history);
++    if (input.expectedHistorySha256 && input.expectedHistorySha256 !== historySha256) fail();
++    const marker = JSON.parse(
++      await readFile(
++        join(CLASSROOM_JOBS_DIR, `${PRESTAGE_JOB}.formal-dispatch-started.json`),
++        'utf8',
++      ),
++    );
++    if (
++      marker.jobId !== PRESTAGE_JOB ||
++      marker.formalInputSha256 !== history.formalInputSha256 ||
++      marker.runtimeRequestId !== history.runtimeRequestId
++    )
++      fail();
++    const binding = await readSessionPaidBudget(PRESTAGE_SESSION, true);
++    if (canonical(binding) !== canonical(originalJob.formalInput.paidBudget)) fail();
++    const searchApiConfigured =
++      resolveServerWebSearchProviderId() === 'brave' &&
++      Boolean(resolveWebSearchApiKey('brave', undefined));
++    const receipt = { ...history, historySha256, searchApiConfigured };
++    if (input.mode === 'plan') {
++      await conn.query('ROLLBACK');
++      return { ...receipt, applied: false };
++    }
++    if (!searchApiConfigured) throw new Error('FORMAL_PRESTAGE_RECOVERY_SEARCH_API_REQUIRED');
++    await requireBudget(binding);
++    await mkdir(archiveRoot, { recursive: true, mode: 0o700 });
++    const archive = join(archiveRoot, `${historySha256}.json`);
++    try {
++      await writeFile(archive, canonical({ history, job: originalJob, session, events, entries }), {
++        flag: 'wx',
++        mode: 0o600,
++      });
++    } catch (error) {
++      if (
++        (error as NodeJS.ErrnoException).code !== 'EEXIST' ||
++        sha(JSON.parse(await readFile(archive, 'utf8')).history) !== historySha256
++      )
++        throw error;
++    }
++    const audit = { ...receipt, recoveredAt: new Date().toISOString() };
++    await atomic(jobFile, {
++      ...originalJob,
++      status: 'running',
++      step: 'researching',
++      completedAt: undefined,
++      error: undefined,
++      updatedAt: audit.recoveredAt,
++      message: 'Continuing the original audited pre-stage session',
++      prestageRecovery: audit,
++    });
++    written = true;
++    const store = new PgAgentSessionStore(conn, { withTransaction: async (body) => body(conn) });
++    if (!(await store.requeueForRetry(PRESTAGE_SESSION))) fail();
++    await store.appendControlEvent(PRESTAGE_SESSION, { type: EVENT, ts: Date.now(), data: audit });
++    await conn.query('COMMIT');
++    committed = true;
++    return { ...audit, applied: true };
++  } catch (error) {
++    await conn.query('ROLLBACK').catch(() => {});
++    if (written && !committed) await atomic(jobFile, originalJob);
++    throw error;
++  } finally {
++    conn.release();
++  }
++}
+diff --git a/app/api/generate-classroom/[jobId]/prestage-recovery/route.ts b/app/api/generate-classroom/[jobId]/prestage-recovery/route.ts
+new file mode 100644
+index 0000000..d1e5171
+--- /dev/null
++++ b/app/api/generate-classroom/[jobId]/prestage-recovery/route.ts
+@@ -0,0 +1,25 @@
++import { type NextRequest, NextResponse } from 'next/server';
++import { authorizeMiraInternalLoopbackRequest } from '@/lib/server/mira-internal-loopback-auth';
++import { PRESTAGE_JOB, recoverFormalPrestage } from '@/lib/server/mira-formal-prestage-recovery';
++export const dynamic = 'force-dynamic';
++export async function POST(req: NextRequest, context: { params: Promise<{ jobId: string }> }) {
++  try {
++    authorizeMiraInternalLoopbackRequest(req);
++  } catch {
++    return NextResponse.json({ error: 'INVALID_CREDENTIALS' }, { status: 403 });
++  }
++  if ((await context.params).jobId !== PRESTAGE_JOB)
++    return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 });
++  try {
++    const body = await req.json();
++    if (Object.keys(body).some((k) => !['mode', 'expectedHistorySha256'].includes(k)))
++      throw new Error('FORMAL_PRESTAGE_RECOVERY_INVALID_REQUEST');
++    return NextResponse.json({ ok: true, recovery: await recoverFormalPrestage(body) });
++  } catch (error) {
++    const message =
++      error instanceof Error && /^FORMAL_PRESTAGE_RECOVERY_[A-Z_]+$/.test(error.message)
++        ? error.message
++        : 'FORMAL_PRESTAGE_RECOVERY_UNAVAILABLE';
++    return NextResponse.json({ ok: false, error: message }, { status: 409 });
++  }
++}
+diff --git a/tests/server/mira-formal-prestage-recovery.test.ts b/tests/server/mira-formal-prestage-recovery.test.ts
+new file mode 100644
+index 0000000..61a323a
+--- /dev/null
++++ b/tests/server/mira-formal-prestage-recovery.test.ts
+@@ -0,0 +1,41 @@
++import { existsSync, readFileSync } from 'node:fs';
++import { resolve } from 'node:path';
++import { describe, expect, it, vi } from 'vitest';
++vi.mock('@/lib/persistence/server-provider', () => ({
++  getServerPersistenceProvider: vi.fn(() => {
++    throw new Error('DB must not be called');
++  }),
++}));
++import { validatePrestageHistory, PRESTAGE_JOB } from '@/lib/server/mira-formal-prestage-recovery';
++// Optional local diagnostic fixture: never query live DB or call a provider.
++const exported = resolve('../../../output/primary6-math-native-failed-session.json');
++const jobFile = resolve(`data/classroom-jobs/${PRESTAGE_JOB}.json`);
++describe.skipIf(!existsSync(exported) || !existsSync(jobFile))('reviewed pre-stage history', () => {
++  it('accepts the original frozen history and rejects state/identity drift without calling providers', () => {
++    const x = JSON.parse(readFileSync(exported, 'utf8'));
++    const source = {
++      job: JSON.parse(readFileSync(jobFile, 'utf8')),
++      session: x.session,
++      events: x.events,
++      entries: x.entries,
++      stageCount: 0,
++      sceneCount: 0,
++    };
++    expect(validatePrestageHistory(source)).toMatchObject({
++      jobId: PRESTAGE_JOB,
++      sessionSeq: 175,
++      remainingSearchAttempts: 1,
++    });
++    for (const changed of [
++      { ...source, stageCount: 1 },
++      { ...source, sceneCount: 1 },
++      { ...source, session: { ...source.session, attempt: 0 } },
++      { ...source, job: { ...source.job, formalInputSha256: '0'.repeat(64) } },
++      { ...source, events: source.events.slice(0, -1) },
++    ]) {
++      expect(() => validatePrestageHistory(changed)).toThrow(
++        'FORMAL_PRESTAGE_RECOVERY_SOURCE_MISMATCH',
++      );
++    }
++  });
++});

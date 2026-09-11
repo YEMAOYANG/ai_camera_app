@@ -15,6 +15,8 @@ from content.primary_skill_boundaries import (
     boundaries_for,
     primary_one_content_contract,
 )
+from content.formal_curriculum_registry import formal_content_contract, require_formal_grade
+from content.formal_objective_rules import validate_objective_question
 from core.errors import ApiError
 
 
@@ -393,6 +395,17 @@ class PrimaryOneCourseTarget:
     variant_ordinal: int
     instruction_language_code: str
     target_language_code: str
+    difficulty_code: str | None = None
+
+    def __post_init__(self):
+        if self.grade_code != "primary_1":
+            from content.formal_curriculum_registry import formal_slot_difficulty
+            declared = formal_slot_difficulty(self.grade_code, self.subject, self.skill_id, self.variant_ordinal)
+            if self.difficulty_code is not None and self.difficulty_code != declared:
+                raise ValueError("difficulty does not match the explicit formal slot")
+            object.__setattr__(self, "difficulty_code", declared)
+        elif self.difficulty_code is not None:
+            raise ValueError("frozen primary_1 target cannot acquire difficulty")
 
 
 @dataclass(frozen=True)
@@ -522,6 +535,8 @@ class LearningCatalogValidator:
         self.validate_course(publishable)
         content = publishable["content"]
         questions = content["questions"]
+        if target.grade_code != "primary_1" and content.get("difficultyCode") != target.difficulty_code:
+            self._reject("正式候选难度与授权目标不一致")
         self._validate_primary_one_common_semantics(
             publishable,
             content,
@@ -551,9 +566,16 @@ class LearningCatalogValidator:
             (dispatcher[kind] for kind in inventory_kinds if kind in dispatcher),
             None,
         )
-        if validator is None:
+        if target.grade_code != "primary_1":
+            try:
+                for question in questions:
+                    validate_objective_question(target.grade_code, target.subject, target.skill_id, question, target.difficulty_code)
+            except (ValueError, KeyError, TypeError, ArithmeticError) as exc:
+                self._reject(f"正式候选超出已注册客观题验证规则: {exc}")
+        elif validator is None:
             self._reject("一年级正式候选缺少版本化验证器")
-        validator(questions, content, context)
+        else:
+            validator(questions, content, context)
         return (
             "formal_schema",
             "target_binding",
@@ -645,9 +667,13 @@ class LearningCatalogValidator:
         target: PrimaryOneCourseTarget,
         skill_boundary: Mapping[str, object] | None,
     ) -> dict[str, Any]:
-        contract = primary_one_content_contract()
         if not isinstance(target, PrimaryOneCourseTarget):
             self._reject("一年级正式目标类型无效")
+        try:
+            contract = (primary_one_content_contract() if target.grade_code == "primary_1"
+                        else formal_content_contract(target.grade_code))
+        except ValueError as exc:
+            self._reject(f"正式目标年级未注册: {exc}")
         for label, value in (
             ("subjectOrdinal", target.subject_ordinal),
             ("boundaryOrdinal", target.boundary_ordinal),
@@ -655,7 +681,7 @@ class LearningCatalogValidator:
         ):
             if isinstance(value, bool) or not isinstance(value, int):
                 self._reject(f"一年级正式目标{label}必须是整数")
-        if target.grade_code != "primary_1" or target.variant_ordinal not in {1, 2, 3}:
+        if target.variant_ordinal not in {1, 2, 3}:
             self._reject("一年级正式目标年级或变体无效")
         subject_policy = next(
             (
@@ -685,7 +711,7 @@ class LearningCatalogValidator:
         registered = next(
             (
                 item
-                for item in boundaries_for("primary_1", target.subject)
+                for item in boundaries_for(target.grade_code, target.subject)
                 if item.skill_id == target.skill_id
             ),
             None,

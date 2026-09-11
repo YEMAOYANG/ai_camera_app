@@ -1,0 +1,801 @@
+--- a/lib/mira/student-interaction-bridge.ts
++++ b/lib/mira/student-interaction-bridge.ts
+@@ -13,7 +13,7 @@
+   if (plans.length !== 1) return [];
+   try {
+     const value = JSON.parse(plans[0][2]);
+-    return value.schemaVersion === 'mira.openmaic.interaction-design-plan.v1' && Array.isArray(value.objectives)
++    return ['mira.openmaic.interaction-design-plan.v1','mira.openmaic.interaction-design-plan.v2'].includes(value.schemaVersion) && Array.isArray(value.objectives)
+       ? value.objectives.filter((item: InteractionObjective) => Number.isInteger(item?.objectiveIndex) &&
+         item.objectiveIndex >= 0 && item.objectiveIndex < 30 && item.operation?.sceneId && item.feedback?.sceneId)
+       : [];
+--- /dev/null
++++ b/lib/server/mira-formal-exploration.ts
+@@ -0,0 +1,185 @@
++import type { Frame, Page } from 'playwright-core';
++import { createHash } from 'node:crypto';
++import { VISUAL_RUBRIC } from './mira-formal-visual-contract';
++
++export const EXPLORATION_SCHEMA = 'mira.openmaic.multistate-exploration.v1' as const;
++export const EXPLORATION_POLICY = {
++  schemaVersion: EXPLORATION_SCHEMA, minimumStates: 3, maximumStates: 5, resetRequired: true,
++  inputModes: ['pointer', 'touch'],
++  mechanismRegistry: ['fraction-ratio-percentage.v1', 'semantic-state-model.v1'],
++} as const;
++type Operation = { selector: string; action: 'click' | 'fill' | 'select'; value?: string };
++export type ExplorationState = { id: string; operations: Operation[]; resultText: string; explanationText: string;
++  numerator?: number; denominator?: number };
++export type Exploration = {
++  schemaVersion: typeof EXPLORATION_SCHEMA;
++  mechanism: { kind: 'fraction-ratio-percentage.v1'; numeratorSelector: string; denominatorSelector: string;
++    decimalSelector: string; percentSelector: string; wholeSelector: string; partSelector: string }
++    | { kind: 'semantic-state-model.v1' };
++  diagramSelector: string; feedbackSelector: string; states: ExplorationState[];
++  reset: { selector: string; stateId: string };
++};
++export type ExplorationObservation = {
++  mechanism: Exploration['mechanism']['kind']; verification: 'independent_numeric_svg' | 'structural_then_semantic_visual_review';
++  inputMode: 'pointer' | 'touch'; resetPassed: true;
++  states: Array<{ stateId: string; diagramSha256: string; feedbackSha256: string;
++    numeric?: { numerator: number; denominator: number; decimal: number; percent: number; diagramRatio: number } }>;
++};
++const obj = (v: unknown): v is Record<string, any> => !!v && typeof v === 'object' && !Array.isArray(v);
++const exact = (v: unknown, fields: string[]) => obj(v) && Object.keys(v).sort().join(',') === fields.sort().join(',');
++const sel = (v: unknown): v is string => typeof v === 'string' && /^#[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(v);
++const text = (v: unknown) => typeof v === 'string' && v.trim().length >= 3 && v.length <= 500;
++const fail = (): never => { throw new Error('FORMAL_EXPLORATION_CONTRACT_INVALID'); };
++
++/** Registered mechanisms never execute generated JS to decide the expected answer. */
++export function validateExploration(raw: unknown, skillId?: unknown): asserts raw is Exploration {
++  if (!obj(raw)) return fail();
++  const value = raw;
++  if (!exact(value, ['schemaVersion','mechanism','diagramSelector','feedbackSelector','states','reset']) || !obj(value)
++    || value.schemaVersion !== EXPLORATION_SCHEMA || !sel(value.diagramSelector) || !sel(value.feedbackSelector)
++    || value.diagramSelector === value.feedbackSelector || !Array.isArray(value.states) || value.states.length < 3 || value.states.length > 5
++    || !exact(value.reset, ['selector','stateId']) || !sel(value.reset.selector) || !obj(value.mechanism)) fail();
++  const numeric = value.mechanism.kind === 'fraction-ratio-percentage.v1';
++  if (numeric) {
++    if (!exact(value.mechanism, ['kind','numeratorSelector','denominatorSelector','decimalSelector','percentSelector','wholeSelector','partSelector'])
++      || Object.entries(value.mechanism).some(([k,v]) => k !== 'kind' && !sel(v))) fail();
++  } else if (!exact(value.mechanism,['kind']) || value.mechanism.kind !== 'semantic-state-model.v1') fail();
++  // This known quantitative skill cannot silently downgrade to a semantic check.
++  if (skillId === 'fraction_ratio_percentage' && !numeric) fail();
++  const ids = new Set<string>(), outputs = new Set<string>(), ratios = new Set<number>();
++  for (const s of value.states) {
++    if (!exact(s,['id','operations','resultText','explanationText',...(numeric ? ['numerator','denominator'] : [])])
++      || !/^[A-Za-z0-9_-]{1,40}$/.test(s.id) || ids.has(s.id) || !text(s.resultText) || !text(s.explanationText)
++      || !Array.isArray(s.operations) || !s.operations.length || s.operations.length > 3) fail();
++    ids.add(s.id); outputs.add(s.resultText);
++    for (const op of s.operations) if (!exact(op,['selector','action',...(op.action !== 'click' ? ['value'] : [])])
++      || !sel(op.selector) || !['click','fill','select'].includes(op.action)
++      || (op.action !== 'click' && (typeof op.value !== 'string' || !op.value || op.value.length > 100))) fail();
++    if (numeric) {
++      if (!Number.isInteger(s.numerator) || !Number.isInteger(s.denominator) || s.numerator <= 0
++        || s.numerator > s.denominator || s.denominator > 1000) fail();
++      ratios.add(s.numerator / s.denominator);
++    }
++  }
++  if (!ids.has(value.reset.stateId) || outputs.size !== value.states.length || (numeric && ratios.size !== value.states.length)) fail();
++}
++
++export const EXPLORATION_PROMPT = `
++MULTISTATE EXPLORATION v2: For each core goal extend its interaction-plan objective with exploration.
++Use plan schema mira.openmaic.interaction-design-plan.v2. exploration schema is ${EXPLORATION_SCHEMA}.
++Shape: {schemaVersion,mechanism,diagramSelector:'#model',feedbackSelector:'#result',states:[
++{id:'state-a',operations:[{selector:'#control',action:'fill',value:'1'}],resultText:'observable result',explanationText:'why it happens'}],
++reset:{selector:'#reset',stateId:'state-a'}}. Exactly 3-5 distinct meaningful states; 1-3 local click/fill/select operations per state;
++click omits value. Every state MUST change the actual diagram AND explain the corresponding result. Reset restores the stated baseline.
++Use semantic-state-model.v1 for language/classification/other models: mechanism:{kind:'semantic-state-model.v1'}.
++For fraction_ratio_percentage, use the independently checked mechanism {kind:'fraction-ratio-percentage.v1',
++numeratorSelector:'#numerator',denominatorSelector:'#denominator',decimalSelector:'#decimal',percentSelector:'#percent',
++wholeSelector:'#whole-bar',partSelector:'#part-bar'}. Every state adds numerator and denominator (positive integers <=1000,
++numerator<=denominator). The inputs expose those actual numbers. Decimal and percent elements contain ONLY their numeric value
++(percent may end with %). Show an SVG fraction bar: separate whole and part rects share x/y/height, and part.width/whole.width=numerator/denominator.
++Compute decimal=numerator/denominator and percent=100*decimal. Test three DIFFERENT ratios, not equivalent fractions or altered button colors.
++For example 1/4, 2/5, 3/4 create distinct quantity/diagram/explanation states; use values aligned with the locked grade/difficulty.
++Never fake data attributes, static answer labels or decorative bars. This numeric skill cannot use the semantic fallback.
++Provide visible reset and labelled controls with >=44px touch targets, body type >=14px, clear heading hierarchy, unclipped content,
++and a central teaching graphic at least 120x80px. Desktop pointer and touch paths must both operate the same model without hover-only actions.
++Visual inspection will review ACTUAL screenshots; a text-only reviewer never counts as image review.
++Use the teaching model as the main visual region, adjacent parameter controls, clear numeric units, synchronized explanation,
++meaningful presets and reset. Match older primary learners: restrained, precise visual language, short copy but intact reasoning,
++not decorative card piles or childish illustrations. Complete the teaching chain within at most 16 well-planned scenes (32 actual screenshots).
++The independent visual rubric is: ${JSON.stringify(VISUAL_RUBRIC)}
++`;
++
++/** Recheck persisted observations rather than accepting a signed-looking cached pass. */
++export function assertExplorationObservation(raw: unknown, model: Exploration, mode: 'pointer' | 'touch'): asserts raw is ExplorationObservation {
++  validateExploration(model);
++  if (!obj(raw)) return fail();
++  const numeric = model.mechanism.kind === 'fraction-ratio-percentage.v1';
++  if (!exact(raw, ['mechanism','verification','inputMode','resetPassed','states'])
++    || raw.mechanism !== model.mechanism.kind || raw.resetPassed !== true || raw.inputMode !== mode
++    || raw.verification !== (numeric ? 'independent_numeric_svg' : 'structural_then_semantic_visual_review')
++    || !Array.isArray(raw.states) || raw.states.length !== model.states.length) fail();
++  for (const [index, actual] of raw.states.entries()) {
++    const state = model.states[index];
++    if (!exact(actual, ['stateId','diagramSha256','feedbackSha256',...(numeric ? ['numeric'] : [])])
++      || actual.stateId !== state.id || !/^[a-f0-9]{64}$/.test(actual.diagramSha256)
++      || !/^[a-f0-9]{64}$/.test(actual.feedbackSha256)) fail();
++    if (numeric) {
++      const n = actual.numeric, ratio = state.numerator! / state.denominator!;
++      if (!exact(n, ['numerator','denominator','decimal','percent','diagramRatio'])
++        || Object.values(n).some(v => typeof v !== 'number' || !Number.isFinite(v))
++        || n.numerator !== state.numerator || n.denominator !== state.denominator
++        || Math.abs(n.decimal-ratio)>0.0001 || Math.abs(n.percent-ratio*100)>0.01
++        || Math.abs(n.diagramRatio-ratio)>0.015) fail();
++    }
++  }
++  if (new Set(raw.states.map((s: any) => s.diagramSha256)).size !== model.states.length
++    || new Set(raw.states.map((s: any) => s.feedbackSha256)).size !== model.states.length) fail();
++}
++
++/** A bounded browser verifier. Generated code supplies observations, never executable oracle code. */
++export async function inspectExploration(target: Page | Frame, model: Exploration, inputMode: 'pointer' | 'touch',
++  activate: (selector: string, inputMode: 'pointer' | 'touch') => Promise<void>): Promise<ExplorationObservation> {
++  validateExploration(model);
++  const sha = (v: string | Buffer) => createHash('sha256').update(v).digest('hex');
++  const observe = async (s: ExplorationState) => {
++    await target.waitForFunction(({model,s}) => {
++      const f = document.querySelector<HTMLElement>(model.feedbackSelector);
++      return !!f && f.checkVisibility({checkOpacity:true,checkVisibilityCSS:true})
++        && f.innerText.includes(s.resultText) && f.innerText.includes(s.explanationText);
++    }, {model,s}, {timeout:2500});
++    const actual = await target.evaluate(({model,s}) => {
++      const visible = (selector: string) => {
++        const e = document.querySelector(selector);
++        if (!e || !e.checkVisibility({checkOpacity:true,checkVisibilityCSS:true})) throw new Error('model element is not visible');
++        return e;
++      };
++      const diagram = visible(model.diagramSelector), feedback = visible(model.feedbackSelector) as HTMLElement;
++      if (diagram.contains(feedback) || feedback.contains(diagram)) throw new Error('diagram must be separate from explanation');
++      const r = diagram.getBoundingClientRect();
++      if (r.width < 120 || r.height < 80) throw new Error('teaching graphic too small');
++      let numeric;
++      if (model.mechanism.kind === 'fraction-ratio-percentage.v1') {
++        const m = model.mechanism;
++        const read = (selector: string, input=false) => {
++          const e = visible(selector) as HTMLInputElement;
++          const raw = (input ? e.value : e.innerText).trim().replace(/%$/, '');
++          if (!/^-?\d+(?:\.\d+)?$/.test(raw)) throw new Error('numeric output must be a visible number');
++          return Number(raw);
++        };
++        const numerator=read(m.numeratorSelector,true), denominator=read(m.denominatorSelector,true);
++        const decimal=read(m.decimalSelector), percent=read(m.percentSelector);
++        const whole=visible(m.wholeSelector), part=visible(m.partSelector);
++        if (whole.tagName.toLowerCase() !== 'rect' || part.tagName.toLowerCase() !== 'rect'
++          || !diagram.contains(whole) || !diagram.contains(part)) throw new Error('independent fraction verifier requires SVG rects');
++        const w=whole.getBoundingClientRect(), p=part.getBoundingClientRect(), ratio=numerator/denominator;
++        if (numerator !== s.numerator || denominator !== s.denominator || denominator <= 0
++          || Math.abs(decimal-ratio)>0.0001 || Math.abs(percent-100*ratio)>0.01 || w.width<100 || w.height<12
++          || Math.abs(p.x-w.x)>2 || Math.abs(p.y-w.y)>2 || Math.abs(p.height-w.height)>2
++          || Math.abs(p.width/w.width-ratio)>0.015) throw new Error('fraction mechanism output or SVG geometry is incorrect');
++        numeric={numerator,denominator,decimal,percent,diagramRatio:p.width/w.width};
++      }
++      return {feedback:feedback.innerText,numeric};
++    }, {model,s});
++    const png=await target.locator(model.diagramSelector).screenshot({animations:'disabled',timeout:2500});
++    return {stateId:s.id,diagramSha256:sha(png),feedbackSha256:sha(actual.feedback),...(actual.numeric?{numeric:actual.numeric}:{})};
++  };
++  const states: ExplorationObservation['states']=[];
++  for (const s of model.states) {
++    for (const op of s.operations) {
++      await activate(op.selector,inputMode);
++      const control=target.locator(op.selector);
++      if (op.action === 'fill') await control.fill(op.value!,{timeout:2000});
++      else if (op.action === 'select') await control.selectOption(op.value!,{timeout:2000});
++    }
++    states.push(await observe(s));
++  }
++  if (new Set(states.map(s=>s.diagramSha256)).size !== states.length
++    || new Set(states.map(s=>s.feedbackSha256)).size !== states.length) throw new Error('exploration states do not change model and explanation');
++  await activate(model.reset.selector,inputMode);
++  const reset=await observe(model.states.find(s=>s.id===model.reset.stateId)!);
++  const baseline=states.find(s=>s.stateId===model.reset.stateId)!;
++  if (reset.diagramSha256!==baseline.diagramSha256 || reset.feedbackSha256!==baseline.feedbackSha256)
++    throw new Error('reset does not restore the original model and feedback');
++  return {mechanism:model.mechanism.kind,verification:model.mechanism.kind==='fraction-ratio-percentage.v1'
++    ?'independent_numeric_svg':'structural_then_semantic_visual_review',inputMode,resetPassed:true,states};
++}
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -5,7 +5,7 @@
+ import { MIRA_FORMAL_SKILL_ORCHESTRATION_POLICY } from './mira-formal-skill-policy';
+ import { MIRA_ADAPTIVE_SKILL_ORCHESTRATION_POLICY } from './mira-formal-skill-selection';
+ import { MIRA_TEACHING_QUALITY_POLICY } from './mira-formal-quality-contract';
+-import { MIRA_INTERACTION_DESIGN_POLICY } from './mira-formal-interaction-design';
++import { MIRA_INTERACTION_DESIGN_POLICY, MIRA_MULTISTATE_INTERACTION_POLICY } from './mira-formal-interaction-design';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+   'mira.openmaic.formal-runtime.v4-deepseek-professional' as const;
+@@ -95,13 +95,18 @@
+   interactionDesignPolicy: MIRA_INTERACTION_DESIGN_POLICY,
+ } as const;
+ 
++export const MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY, interactionDesignPolicy: MIRA_MULTISTATE_INTERACTION_POLICY,
++} as const;
++
+ export type MiraProfessionalCreationPolicy =
+   | typeof MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY
+-  | typeof MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY;
++  | typeof MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY;
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+@@ -226,8 +231,7 @@
+ }
+ 
+ export function isMiraInteractionCreationPolicy(value: unknown): boolean {
+-  return JSON.stringify(canonical(value)) ===
+-    JSON.stringify(canonical(MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY));
++  return [MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY, MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY].some(policy => JSON.stringify(canonical(value)) === JSON.stringify(canonical(policy)));
+ }
+ 
+ export function assertMiraFormalGenerationInput(
+--- a/lib/server/mira-formal-interaction-design.ts
++++ b/lib/server/mira-formal-interaction-design.ts
+@@ -1,3 +1,5 @@
++import { EXPLORATION_POLICY, EXPLORATION_PROMPT, validateExploration, assertExplorationObservation, type Exploration, type ExplorationObservation } from './mira-formal-exploration';
++import { VISUAL_RUBRIC_VERSION, assertVisualReview, type VisualReviewReceipt } from './mira-formal-visual-contract';
+ import type { Scene, Stage } from '@/lib/types/stage';
+ import type { FormalInteractionProbe, FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
+ import { qualitySha, qualitySnapshot, QUALITY_VIEWPORTS, type MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
+@@ -16,24 +18,33 @@
+   renderedInteractionRequired: true,
+ } as const;
+ 
++export const MIRA_MULTISTATE_INTERACTION_POLICY = {
++  ...MIRA_INTERACTION_DESIGN_POLICY, schemaVersion: 'mira.openmaic.interaction-design.v2',
++  policyId: 'mira-primary-multistate-interaction.v2', explorationPolicy: EXPLORATION_POLICY,
++  visualRubricVersion: VISUAL_RUBRIC_VERSION, visualReviewRequired: true,
++} as const;
++export function isMultistatePolicy(policy: unknown) { return qualitySha(policy) === qualitySha(MIRA_MULTISTATE_INTERACTION_POLICY); }
+ export interface InteractionDesignContext {
+-  policy: typeof MIRA_INTERACTION_DESIGN_POLICY;
++  policy: typeof MIRA_INTERACTION_DESIGN_POLICY | typeof MIRA_MULTISTATE_INTERACTION_POLICY;
+   independentQuestionIds: string[];
+ }
+ export interface InteractionObjective {
+   objectiveIndex: number;
++  exploration?: Exploration;
+   demonstration: { sceneId: string; quote: string };
+   operation: { sceneId: string; controlSelector: string; action: 'click' | 'fill' | 'range' | 'select'; value?: string };
+   feedback: { sceneId: string; selector: string; textIncludes: string; reasonQuote: string };
+   independentJudgment: { sceneId: string; questionId: string };
+ }
+ export interface InteractionDesignPlan {
+-  schemaVersion: 'mira.openmaic.interaction-design-plan.v1';
++  schemaVersion: 'mira.openmaic.interaction-design-plan.v1' | 'mira.openmaic.interaction-design-plan.v2';
+   objectives: InteractionObjective[];
+ }
+ export interface InteractionDesignReceipt {
+-  schemaVersion: 'mira.openmaic.interaction-design-receipt.v1';
+-  policyId: typeof MIRA_INTERACTION_DESIGN_POLICY.policyId;
++  schemaVersion: 'mira.openmaic.interaction-design-receipt.v1' | 'mira.openmaic.interaction-design-receipt.v2';
++  policyId: typeof MIRA_INTERACTION_DESIGN_POLICY.policyId | typeof MIRA_MULTISTATE_INTERACTION_POLICY.policyId;
++  visualReview?: VisualReviewReceipt;
++  explorationChecks?: Array<{objectiveIndex: number; viewport: {width:number;height:number}; evidence: ExplorationObservation}>;
+   status: 'passed'; sessionId: string; stageId: string;
+   gradeBoundarySha256: string; snapshotSha256: string; planSha256: string;
+   teachingQualityReceiptSha256: string;
+@@ -55,7 +66,7 @@
+ 
+ export function assertInteractionDesignContext(value: unknown): asserts value is InteractionDesignContext {
+   if (!exact(value, 'independentQuestionIds,policy') || !object(value) ||
+-      qualitySha(value.policy) !== qualitySha(MIRA_INTERACTION_DESIGN_POLICY) ||
++      (qualitySha(value.policy) !== qualitySha(MIRA_INTERACTION_DESIGN_POLICY) && !isMultistatePolicy(value.policy)) ||
+       !Array.isArray(value.independentQuestionIds) || !value.independentQuestionIds.length ||
+       value.independentQuestionIds.some(id => !text(id, 1, 128)) ||
+       new Set(value.independentQuestionIds).size !== value.independentQuestionIds.length)
+@@ -81,7 +92,7 @@
+ that makes THIS learning objective observable rather than repeating one reveal-button template.
+ Before review_course_quality, embed exactly one non-executable application/json script with
+ id="mira-interaction-plan" in the FIRST interactive scene's HTML. JSON shape:
+-{"schemaVersion":"mira.openmaic.interaction-design-plan.v1","objectives":[{"objectiveIndex":0,
++{"schemaVersion":"${isMultistatePolicy(context.policy) ? 'mira.openmaic.interaction-design-plan.v2' : 'mira.openmaic.interaction-design-plan.v1'}","objectives":[{"objectiveIndex":0,
+ "demonstration":{"sceneId":"actual-scene-id","quote":"exact teacher speech excerpt"},
+ "operation":{"sceneId":"actual-interactive-scene-id","controlSelector":"#actual-control","action":"click"},
+ "feedback":{"sceneId":"same-interactive-scene-id","selector":"#separate-result","textIncludes":"observed result","reasonQuote":"explanation of why"},
+@@ -96,7 +107,7 @@
+ The independent question must follow the operation, never use a guided/example question.
+ Real browser probes and independent teaching review validate the final snapshot. The plan is
+ not a claim that a real student has already performed these operations.
+-`;
++` + (isMultistatePolicy(context.policy) ? EXPLORATION_PROMPT : '');
+ }
+ 
+ export function interactionDesignContextFromPrompt(prompt: string): InteractionDesignContext | undefined {
+@@ -121,17 +132,19 @@
+     return fail('PLAN_MISSING_OR_DUPLICATE');
+   let raw: unknown;
+   try { raw = JSON.parse(plans[0].value); } catch { return fail('PLAN_INVALID'); }
++  const multistate = isMultistatePolicy(input.interactionDesign.policy);
+   const objectives = input.gradeBoundary.learningObjectives;
+-  if (!exact(raw, 'objectives,schemaVersion') || !object(raw) || raw.schemaVersion !== 'mira.openmaic.interaction-design-plan.v1' ||
++  if (!exact(raw, 'objectives,schemaVersion') || !object(raw) || raw.schemaVersion !== (multistate ? 'mira.openmaic.interaction-design-plan.v2' : 'mira.openmaic.interaction-design-plan.v1') ||
+       !Array.isArray(objectives) || !objectives.length || !Array.isArray(raw.objectives) ||
+       raw.objectives.length !== objectives.length || raw.objectives.length > 30) return fail('OBJECTIVE_COVERAGE_INVALID');
+   const byId = new Map(ordered.map((scene, index) => [scene.id, { scene, index }]));
+   const seen = new Set<number>();
+   for (const item of raw.objectives) {
+-    if (!exact(item, 'demonstration,feedback,independentJudgment,objectiveIndex,operation') || !object(item) ||
++    if (!exact(item, multistate ? 'demonstration,exploration,feedback,independentJudgment,objectiveIndex,operation' : 'demonstration,feedback,independentJudgment,objectiveIndex,operation') || !object(item) ||
+         !Number.isInteger(item.objectiveIndex) || Number(item.objectiveIndex) < 0 || Number(item.objectiveIndex) >= objectives.length ||
+         seen.has(Number(item.objectiveIndex))) return fail('OBJECTIVE_COVERAGE_INVALID');
+     seen.add(Number(item.objectiveIndex));
++    if (multistate) validateExploration(item.exploration, input.gradeBoundary.skillId);
+     const { demonstration: demo, operation: op, feedback: feedback, independentJudgment: judge } = item;
+     if (!exact(demo, 'quote,sceneId') || !object(demo) || !text(demo.sceneId, 1, 128) || !text(demo.quote, 3) ||
+         !object(op) || !['action,controlSelector,sceneId', 'action,controlSelector,sceneId,value'].includes(Object.keys(op).sort().join(',')) ||
+@@ -155,7 +168,7 @@
+ 
+ export function interactionDesignProbes(plan: InteractionDesignPlan, sceneId: string): FormalInteractionProbe[] {
+   return plan.objectives.filter(item => item.operation.sceneId === sceneId).map(item => ({
+-    id: `objective-${item.objectiveIndex}`, action: item.operation.action,
++    id: `objective-${item.objectiveIndex}`, ...(item.exploration ? {exploration: item.exploration} : {}), action: item.operation.action,
+     selector: item.operation.controlSelector, ...(item.operation.value === undefined ? {} : { value: item.operation.value }),
+     expect: { selector: item.feedback.selector, textIncludes: item.feedback.textIncludes,
+       textIncludesAll: [item.feedback.reasonQuote], changed: true, distinctFeedback: true },
+@@ -175,18 +188,24 @@
+ export function buildInteractionDesignReceipt(input: {
+   stage: Stage; scenes: readonly Scene[]; sessionId: string; gradeBoundary: Obj;
+   plan: InteractionDesignPlan; quality: MiraTeachingQualityReceipt;
+-  observations: readonly FormalSceneInspectionResult[];
++  observations: readonly FormalSceneInspectionResult[]; visualReview?: VisualReviewReceipt;
+ }): InteractionDesignReceipt {
+   const snapshot = qualitySnapshot(input.stage, input.scenes);
+   if (input.quality.sessionId !== input.sessionId || input.quality.stageId !== input.stage.id ||
+       input.quality.snapshotSha256 !== qualitySha(snapshot) || input.quality.gradeBoundarySha256 !== qualitySha(input.gradeBoundary))
+     return fail('QUALITY_BINDING_INVALID');
++  const multistate = input.plan.schemaVersion.endsWith('.v2');
+   const unsigned = {
+-    schemaVersion: 'mira.openmaic.interaction-design-receipt.v1' as const,
+-    policyId: MIRA_INTERACTION_DESIGN_POLICY.policyId, status: 'passed' as const,
++    schemaVersion: multistate ? 'mira.openmaic.interaction-design-receipt.v2' as const : 'mira.openmaic.interaction-design-receipt.v1' as const,
++    policyId: multistate ? MIRA_MULTISTATE_INTERACTION_POLICY.policyId : MIRA_INTERACTION_DESIGN_POLICY.policyId, status: 'passed' as const,
+     sessionId: input.sessionId, stageId: input.stage.id,
+     gradeBoundarySha256: qualitySha(input.gradeBoundary), snapshotSha256: qualitySha(snapshot),
+     planSha256: qualitySha(input.plan), teachingQualityReceiptSha256: input.quality.receiptSha256,
++    ...(multistate ? {visualReview: input.visualReview, explorationChecks: input.plan.objectives.flatMap(item => QUALITY_VIEWPORTS.map(viewport => {
++      const probe = input.observations.find(o => o.sceneId === item.operation.sceneId && qualitySha(o.viewport) === qualitySha(viewport))?.probeResults.find(p => p.id === `objective-${item.objectiveIndex}`);
++      if (!probe?.exploration) return fail('EXPLORATION_PROOF_MISSING');
++      return {objectiveIndex: item.objectiveIndex, viewport: {...viewport}, evidence: probe.exploration};
++    }))} : {}),
+     objectives: input.plan.objectives.map(item => ({ ...item, checks: QUALITY_VIEWPORTS.map(viewport => {
+       const matches = input.observations.filter(value => value.sceneId === item.operation.sceneId &&
+         value.viewport.width === viewport.width && value.viewport.height === viewport.height);
+@@ -203,20 +222,32 @@
+         screenshotSha256: observed.screenshotSha256, domSha256: observed.domSha256, probeId };
+     }) })),
+   };
+-  return { ...unsigned, receiptSha256: qualitySha(unsigned) };
++  const receipt = { ...unsigned, receiptSha256: qualitySha(unsigned) };
++  assertInteractionDesignReceipt(receipt, input.plan, input.quality);
++  return receipt;
+ }
+ 
+ /** Cached passes must preserve the same plan, QA identity and two viewport proofs. */
+ export function assertInteractionDesignReceipt(value: unknown, plan: InteractionDesignPlan,
+   quality: MiraTeachingQualityReceipt): asserts value is InteractionDesignReceipt {
+-  if (!exact(value, 'gradeBoundarySha256,objectives,planSha256,policyId,receiptSha256,schemaVersion,sessionId,snapshotSha256,stageId,status,teachingQualityReceiptSha256') ||
+-      !object(value) || value.schemaVersion !== 'mira.openmaic.interaction-design-receipt.v1' ||
+-      value.policyId !== MIRA_INTERACTION_DESIGN_POLICY.policyId || value.status !== 'passed' ||
++  const multistate = plan.schemaVersion.endsWith('.v2');
++  if (!exact(value, multistate ? 'explorationChecks,gradeBoundarySha256,objectives,planSha256,policyId,receiptSha256,schemaVersion,sessionId,snapshotSha256,stageId,status,teachingQualityReceiptSha256,visualReview' : 'gradeBoundarySha256,objectives,planSha256,policyId,receiptSha256,schemaVersion,sessionId,snapshotSha256,stageId,status,teachingQualityReceiptSha256') ||
++      !object(value) || value.schemaVersion !== (multistate ? 'mira.openmaic.interaction-design-receipt.v2' : 'mira.openmaic.interaction-design-receipt.v1') ||
++      value.policyId !== (multistate ? MIRA_MULTISTATE_INTERACTION_POLICY.policyId : MIRA_INTERACTION_DESIGN_POLICY.policyId) || value.status !== 'passed' ||
+       value.sessionId !== quality.sessionId || value.stageId !== quality.stageId ||
+       value.snapshotSha256 !== quality.snapshotSha256 || value.gradeBoundarySha256 !== quality.gradeBoundarySha256 ||
+       value.planSha256 !== qualitySha(plan) || value.teachingQualityReceiptSha256 !== quality.receiptSha256 ||
+       !Array.isArray(value.objectives) || value.objectives.length !== plan.objectives.length)
+     return fail('RECEIPT_INVALID');
++  if (multistate) {
++    assertVisualReview(value.visualReview, {snapshotSha256: quality.snapshotSha256, teachingQualityContextSha256: qualitySha({snapshotSha256:quality.snapshotSha256,gradeBoundarySha256:quality.gradeBoundarySha256,selectionPlanSha256:quality.selectionPlanSha256,teachingBriefSha256:quality.teachingBriefSha256}), observations: quality.renderChecks.map(r=>({...r,screenshotPath:''}))});
++    if ((value.visualReview as VisualReviewReceipt).status !== 'passed' || !Array.isArray(value.explorationChecks) || value.explorationChecks.length !== plan.objectives.length * QUALITY_VIEWPORTS.length) return fail('MULTISTATE_RECEIPT_INVALID');
++    for (const item of plan.objectives) for (const [index, viewport] of QUALITY_VIEWPORTS.entries()) {
++      const matches = value.explorationChecks.filter((r: any) => object(r) && r.objectiveIndex === item.objectiveIndex && qualitySha(r.viewport) === qualitySha(viewport));
++      if (matches.length !== 1 || !exact(matches[0], 'evidence,objectiveIndex,viewport') || !item.exploration) return fail('MULTISTATE_RECEIPT_INVALID');
++      assertExplorationObservation((matches[0] as any).evidence, item.exploration, index === 0 ? 'pointer' : 'touch');
++    }
++  }
+   const { receiptSha256, ...unsigned } = value;
+   if (receiptSha256 !== qualitySha(unsigned)) return fail('RECEIPT_INVALID');
+   for (const [index, raw] of value.objectives.entries()) {
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -51,7 +51,7 @@
+ import { reviewFormalCourse, type FormalQualityReviewGrant } from './mira-formal-teaching-quality';
+ import type { MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
+ import {
+-  MIRA_INTERACTION_DESIGN_POLICY, interactionDesignPrompt, interactionDesignContextFromPrompt,
++  interactionDesignPrompt, interactionDesignContextFromPrompt,
+   type InteractionDesignReceipt, type InteractionDesignContext,
+ } from './mira-formal-interaction-design';
+ import { formalInspectionConfiguration } from './mira-formal-scene-inspector';
+@@ -366,6 +366,24 @@
+     gradeBoundary: contract.gradeBoundary,
+     gradeBoundarySha256: String(contract.gradeBoundarySha256 ?? ''),
+   };
++}
++
++function formalDifficultyPolicy(input: GenerateClassroomInput): Record<string, unknown> | undefined {
++  const contract = formalContractPayload(input);
++  const brief = plainObject(contract.teachingBrief), policy = plainObject(contract.difficultyPolicy);
++  if (!policy && !brief?.difficultyPolicy) {
++    if ((plainObject(input.professionalCreationPolicy)?.interactionDesignPolicy as {schemaVersion?:string})?.schemaVersion === 'mira.openmaic.interaction-design.v2'
++      && /^primary_[2-6]$/.test(String(plainObject(contract.gradeBoundary)?.gradeCode))) throw new Error('FORMAL_DIFFICULTY_AUTHORITY_MISSING');
++    return undefined; // Old job bytes remain valid.
++  }
++  const boundary = plainObject(contract.gradeBoundary), course = plainObject(contract.course), briefCourse = plainObject(brief?.course);
++  if (!policy || !brief || canonicalJson(policy) !== canonicalJson(brief.difficultyPolicy)
++    || policy.schemaVersion !== 'mira.learning.difficulty-policy.v1' || !['basic','standard','challenge'].includes(String(policy.difficultyCode))
++    || policy.gradeCode !== boundary?.gradeCode || policy.subject !== boundary?.subject || policy.skillId !== boundary?.skillId
++    || course?.difficultyCode !== policy.difficultyCode || briefCourse?.difficultyCode !== policy.difficultyCode
++    || policy.policySha256 !== canonicalSha256(Object.fromEntries(Object.entries(policy).filter(([k])=>k!=='policySha256'))))
++    throw new Error('FORMAL_DIFFICULTY_AUTHORITY_INVALID');
++  return policy;
+ }
+ 
+ function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewareSpec): string {
+@@ -458,8 +476,10 @@
+       ? formalAdaptiveSkillSelectionInput(input)
+       : undefined,
+   );
++  const difficulty = formalDifficultyPolicy(input);
++  const difficultyPrompt = difficulty ? `\nLocked difficultyPolicy: ${canonicalJson(difficulty)}\nTeach its reasoning steps and evidence complexity; variantOrdinal is not a difficulty label. Never simplify a standard/challenge goal to basic recall.\n` : '';
+   return isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
+-    ? prompt + interactionDesignPrompt({ policy: MIRA_INTERACTION_DESIGN_POLICY,
++    ? prompt + difficultyPrompt + interactionDesignPrompt({ policy: (input.professionalCreationPolicy as {interactionDesignPolicy: InteractionDesignContext['policy']}).interactionDesignPolicy,
+         independentQuestionIds: spec.independent.map(question => question.id) })
+     : prompt;
+ }
+@@ -1374,8 +1394,9 @@
+       gradeBoundary: { ...skillBundle.gradeBoundary },
+       selectionPlan: { ...skillBundle.selectionPlan },
+       teachingBrief: skillBundle.teachingBrief,
++      ...(formalDifficultyPolicy(input) ? {difficultyPolicy: formalDifficultyPolicy(input)} : {}),
+       ...(isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
+-        ? { interactionDesign: { policy: MIRA_INTERACTION_DESIGN_POLICY,
++        ? { interactionDesign: { policy: (input.professionalCreationPolicy as {interactionDesignPolicy: InteractionDesignContext['policy']}).interactionDesignPolicy,
+             independentQuestionIds: spec.independent.map(question => question.id) } } : {}),
+     }, undefined, { recheckUnsentBrowserReview: options.recheckUnsentBrowserReview,
+       approvedReviewGrant: options.approvedReviewGrant,
+--- a/lib/server/mira-formal-scene-inspector.ts
++++ b/lib/server/mira-formal-scene-inspector.ts
+@@ -1,3 +1,4 @@
++import { inspectExploration, validateExploration } from './mira-formal-exploration';
+ import { createHash } from 'node:crypto';
+ import { promises as fs } from 'node:fs';
+ import path from 'node:path';
+@@ -64,6 +65,7 @@
+ function assertProbes(probes: readonly FormalInteractionProbe[]) {
+   if (probes.length > 4) throw new Error('FORMAL_QUALITY_TOO_MANY_PROBES');
+   for (const probe of probes) {
++    if (probe.exploration) validateExploration(probe.exploration);
+     if (
+       !/^[A-Za-z0-9_-]{1,60}$/.test(probe.id) ||
+       !['click', 'fill', 'range', 'select'].includes(probe.action) ||
+@@ -178,9 +180,10 @@
+ /** Chromium's cross-process iframe coordinates can omit the host CSS scale.
+  * Project the actual DOM point through the preview host, retaining real mouse
+  * input and hit tests in both documents. Never synthesize a DOM click. */
+-async function clickLocalControl(target: Page | Frame, control: Locator) {
++async function clickLocalControl(target: Page | Frame, control: Locator, mode: 'pointer' | 'touch' = 'pointer') {
+   if (!('frameElement' in target)) {
+-    await control.click({ timeout: 2000 });
++    if (mode === 'touch') await control.tap({timeout:2000});
++    else await control.click({ timeout: 2000 });
+     return;
+   }
+   await control.waitFor({ state: 'visible', timeout: 2000 });
+@@ -224,13 +227,14 @@
+         throw new Error('probe iframe is outside the viewport or covered');
+       return { x, y };
+     }, local);
+-    await target.page().mouse.click(point.x, point.y);
++    if (mode === 'touch') await target.page().touchscreen.tap(point.x, point.y);
++    else await target.page().mouse.click(point.x, point.y);
+   } finally {
+     await host.dispose();
+   }
+ }
+ 
+-async function runProbe(target: Page | Frame, probe: FormalInteractionProbe) {
++async function runProbe(target: Page | Frame, probe: FormalInteractionProbe, inputMode: 'pointer' | 'touch' = 'pointer') {
+   // native querySelector rejects Playwright's non-CSS selector engines. Scope
+   // is this snapshot's document, never another browser tab or a student frame.
+   await target.evaluate(
+@@ -263,7 +267,7 @@
+   }));
+   if (tag.tag === 'a' || tag.type === 'file' || tag.type === 'submit' || tag.type === 'image')
+     throw new Error('probe action is not a local control');
+-  if (probe.action === 'click') await clickLocalControl(target, control);
++  if (probe.action === 'click') await clickLocalControl(target, control, inputMode);
+   else if (probe.action === 'fill') await control.fill(probe.value ?? '', { timeout: 2000 });
+   else if (probe.action === 'select')
+     await control.selectOption(probe.value ?? '', { timeout: 2000 });
+@@ -300,6 +304,12 @@
+     { selector: probe.expect.selector, expect: probe.expect, before },
+     { timeout: 2500 },
+   );
++  if (probe.exploration) return inspectExploration(target, probe.exploration, inputMode, async (selector,mode) => {
++    const targetControl = target.locator(selector);
++    const box = await targetControl.boundingBox();
++    if (!box || box.width < 44 || box.height < 44) throw new Error('exploration controls require 44px touch targets');
++    await clickLocalControl(target, targetControl, mode);
++  });
+ }
+ 
+ async function automaticProbe(
+@@ -445,8 +455,10 @@
+       ],
+     });
+     combined.throwIfAborted();
++    const inputMode = cloned.multistate && viewport.width === QUALITY_VIEWPORTS[1].width ? 'touch' as const : 'pointer' as const;
+     const context = await browser.newContext({
+       viewport,
++      ...(cloned.multistate ? {hasTouch: inputMode === 'touch'} : {}),
+       deviceScaleFactor: 1,
+       locale: 'zh-CN',
+       // Playwright's built-in block shim reads navigator.serviceWorker in
+@@ -631,8 +643,9 @@
+       for (const probe of probes) {
+         combined.throwIfAborted();
+         try {
+-          await runProbe(target, probe);
++          const exploration = await runProbe(target, probe, inputMode);
+           probeResults.push({
++            ...(exploration ? {exploration} : {}),
+             id: probe.id,
+             passed: true,
+             message: 'Declared local DOM state transition observed.',
+@@ -684,6 +697,7 @@
+       sceneSha256,
+       viewport,
+       screenshotSha256,
++      ...(cloned.multistate ? {screenshotPath: path.join(evidenceDir, `${sceneSha256}-${viewport.width}x${viewport.height}-${screenshotSha256}.png`), inputMode} : {}),
+       domSha256: qualitySha({ initial: initial.state, final: final.state }),
+       passed: issues.length === 0,
+       probeCount: probeResults.filter((probe) => probe.passed).length,
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -1,3 +1,5 @@
++import { reviewFormalVisualSnapshot } from './mira-formal-visual-review';
++import { VISUAL_RUBRIC_VERSION, assertVisualReview, type VisualReviewReceipt } from './mira-formal-visual-contract';
+ import { mkdir, open, readFile, rename } from 'node:fs/promises';
+ import { resolve, join } from 'node:path';
+ import { Type } from 'typebox';
+@@ -34,6 +36,7 @@
+   selectionPlan: { planSha256: string } & JsonRecord;
+   teachingBrief: JsonRecord;
+   interactionDesign?: InteractionDesignContext;
++  difficultyPolicy?: JsonRecord;
+ }
+ export interface FormalQualityInput extends FormalQualityContext {
+   stage: Stage; scenes: Scene[]; ownerId: string; sessionId: string;
+@@ -145,7 +148,8 @@
+   const interactionPlan = input.interactionDesign ? readInteractionDesignPlan({
+     ...input, interactionDesign: input.interactionDesign,
+   }) : undefined;
+-  const reviewPromptVersion = interactionPlan ? INTERACTION_REVIEW_PROMPT_VERSION : FORMAL_QUALITY_REVIEW_PROMPT_VERSION;
++  const multistate = interactionPlan?.schemaVersion === 'mira.openmaic.interaction-design-plan.v2';
++  const reviewPromptVersion = multistate ? 'mira.formal-course-review.v4-multistate-visual' : interactionPlan ? INTERACTION_REVIEW_PROMPT_VERSION : FORMAL_QUALITY_REVIEW_PROMPT_VERSION;
+   const snapshot = qualitySnapshot(input.stage, input.scenes);
+   const snapshotSha256 = qualitySha(snapshot);
+   const gradeBoundarySha256 = qualitySha(input.gradeBoundary);
+@@ -154,7 +158,8 @@
+   if (!SHA.test(selectionPlanSha256)) throw new Error('FORMAL_QUALITY_SELECTION_INVALID');
+   const identity = { ownerId: input.ownerId, sessionId: input.sessionId, stageId: input.stage.id,
+     gradeBoundarySha256, teachingBriefSha256, selectionPlanSha256,
+-    ...(input.interactionDesign ? { interactionDesignContextSha256: qualitySha(input.interactionDesign) } : {}) };
++    ...(input.interactionDesign ? { interactionDesignContextSha256: qualitySha(input.interactionDesign) } : {}),
++    ...(input.difficultyPolicy ? { difficultyPolicySha256: qualitySha(input.difficultyPolicy) } : {}) };
+   const grant = deps.approvedReviewGrant;
+   if (grant) assertGrantBinding(grant, identity, snapshotSha256);
+   const folder = join(resolve(deps.cacheRoot ?? 'data/formal-quality-reviews'), qualitySha(identity));
+@@ -253,6 +258,7 @@
+           const observed = await (deps.inspect ?? inspectFormalScene)({
+             scene, scenes, sceneIndex, stage: input.stage, ownerId: input.ownerId,
+             sessionId: input.sessionId, snapshotSha256, viewport,
++            ...(multistate ? {multistate:true} : {}),
+             ...(interactionPlan && interactionDesignProbes(interactionPlan, scene.id).length
+               ? { probes: interactionDesignProbes(interactionPlan, scene.id) } : {}),
+           }, signal);
+@@ -274,6 +280,19 @@
+         }
+       }
+       await save(join(folder, `${artifactPrefix}-browser.json`), observations);
++      let visualReview: VisualReviewReceipt | undefined;
++      if (!issues.length && multistate) {
++        const visualInput = {snapshotSha256, teachingQualityContextSha256:qualitySha({snapshotSha256,gradeBoundarySha256,selectionPlanSha256,teachingBriefSha256}),
++          gradeBoundary:input.gradeBoundary, scenes:snapshot.scenes, rubricVersion:VISUAL_RUBRIC_VERSION,
++          observations:observations.map(o=>({...o,screenshotPath:o.screenshotPath ?? '',title:scenes.find(s=>s.id===o.sceneId)?.title,objective:JSON.stringify(input.gradeBoundary.learningObjectives)}))};
++        visualReview = await reviewFormalVisualSnapshot(visualInput, signal);
++        assertVisualReview(visualReview,visualInput);
++        await save(join(folder, `${artifactPrefix}-visual.json`), visualReview);
++        if (visualReview.status !== 'passed') for (const scene of visualReview.sceneReviews) {
++          if ([scene.legibility,scene.layout,scene.teachingGraphic,scene.interactionAffordance].some(v=>v!=='passed'))
++            issues.push({sceneId:scene.sceneId,problem:`Visual check: ${scene.notes}`,repair:'Repair the actual final page, retain locked assessments, and request the next bounded review.'});
++        }
++      }
+       let result: FormalQualityResult;
+       if (issues.length) result = { status: 'needs_revision', snapshotSha256, issues };
+       else {
+@@ -283,6 +302,7 @@
+         const userPrompt = JSON.stringify(qualityCanonical({
+           promptVersion: reviewPromptVersion,
+           gradeBoundary: input.gradeBoundary, teachingBrief: input.teachingBrief,
++          ...(input.difficultyPolicy ? {difficultyPolicy: input.difficultyPolicy, difficultyInstruction: 'Audit actual reasoning and evidence complexity against this locked policy, never infer difficulty from variantOrdinal.'} : {}),
+           selectionPlan: input.selectionPlan, snapshot, evidenceCatalog, browserChecks: renderChecks,
+           ...(interactionPlan ? { interactionDesignPlan: interactionPlan,
+             independentQuestionIds: input.interactionDesign!.independentQuestionIds } : {}),
+@@ -326,7 +346,7 @@
+           result = { status: 'passed', snapshotSha256, issues: [],
+             receipt: { ...unsigned, receiptSha256: qualitySha(unsigned) } };
+           if (interactionPlan) result.interactionDesign = buildInteractionDesignReceipt({
+-            ...input, plan: interactionPlan, quality: result.receipt!, observations,
++            ...input, plan: interactionPlan, quality: result.receipt!, observations, ...(visualReview ? {visualReview} : {}),
+           });
+         }
+       }
+--- /dev/null
++++ b/lib/server/mira-formal-visual-contract.ts
+@@ -0,0 +1,46 @@
++import { qualitySha } from './mira-formal-quality-contract';
++
++export const VISUAL_RUBRIC_VERSION = 'mira.primary-teaching-visual.v1' as const;
++export const VISUAL_RUBRIC = {
++  legibility: '实际截图正文清晰、字号适龄、无截断遮挡、对比足够。',
++  layout: '信息层级明确、留白合理、主要任务突出，不挤成文字墙。',
++  teachingGraphic: '教学图形足够大且准确，图示、数量、标注和文字一致，服务本页学习目标。',
++  interactionAffordance: '操作入口清楚，触屏可点、结果反馈可辨；静态页不伪装交互。',
++} as const;
++export type VisualInput = {
++  snapshotSha256: string; teachingQualityContextSha256: string; gradeBoundary: Record<string, unknown>;
++  scenes: readonly unknown[]; rubricVersion: typeof VISUAL_RUBRIC_VERSION;
++  observations: Array<{ sceneId: string; sceneSha256: string; viewport: {width:number;height:number};
++    screenshotSha256: string; screenshotPath: string; domSha256: string; title?: string; objective?: string }>;
++};
++export type VisualReviewReceipt = {
++  schemaVersion: 'mira.openmaic.visual-review.v1'; reviewerKind: 'vision_model';
++  status: 'passed' | 'needs_revision'; rubricVersion: typeof VISUAL_RUBRIC_VERSION;
++  snapshotSha256: string; teachingQualityContextSha256: string;
++  sceneReviews: Array<{sceneId:string;sceneSha256:string;viewport:{width:number;height:number};screenshotSha256:string;
++    legibility:'passed'|'needs_revision';layout:'passed'|'needs_revision';teachingGraphic:'passed'|'needs_revision';interactionAffordance:'passed'|'needs_revision';notes:string}>;
++  providerId:string;modelId:string;providerResponseModelId?:string;providerRequestIdHash:string;receiptSha256:string;
++};
++export function assertVisualReview(value: unknown, input: Pick<VisualInput,'snapshotSha256'|'teachingQualityContextSha256'|'observations'>): asserts value is VisualReviewReceipt {
++  const r=value as VisualReviewReceipt;
++  const sha=(v:unknown)=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
++  if (!r || r.schemaVersion!=='mira.openmaic.visual-review.v1'||r.reviewerKind!=='vision_model'
++    ||r.rubricVersion!==VISUAL_RUBRIC_VERSION||r.snapshotSha256!==input.snapshotSha256
++    ||r.teachingQualityContextSha256!==input.teachingQualityContextSha256
++    ||!['passed','needs_revision'].includes(r.status)||r.providerId!=='deepseek'||r.modelId!=='deepseek-v4-flash-vision-exp'||!sha(r.providerRequestIdHash)
++    ||(r.providerResponseModelId!==undefined&&(typeof r.providerResponseModelId!=='string'||!r.providerResponseModelId.trim()||r.providerResponseModelId.length>200))
++    ||!Array.isArray(r.sceneReviews)||r.sceneReviews.length!==input.observations.length) throw new Error('FORMAL_VISUAL_RECEIPT_INVALID');
++  const seen=new Set<string>();
++  for(const s of r.sceneReviews){
++    const key=qualitySha({sceneId:s.sceneId,viewport:s.viewport});
++    if(seen.has(key)||!input.observations.some(o=>o.sceneId===s.sceneId&&qualitySha(o.viewport)===qualitySha(s.viewport)
++      &&o.sceneSha256===s.sceneSha256&&o.screenshotSha256===s.screenshotSha256)
++      ||Object.keys(VISUAL_RUBRIC).some(k=>!['passed','needs_revision'].includes(s[k as keyof typeof VISUAL_RUBRIC]))
++      ||typeof s.notes!=='string'||!s.notes.trim()||s.notes.length>2000
++      ||(r.status==='passed'&&Object.keys(VISUAL_RUBRIC).some(k=>s[k as keyof typeof VISUAL_RUBRIC]!=='passed')))
++      throw new Error('FORMAL_VISUAL_SCENE_EVIDENCE_INVALID');
++    seen.add(key);
++  }
++  const {receiptSha256,...unsigned}=r;
++  if(!sha(receiptSha256)||qualitySha(unsigned)!==receiptSha256) throw new Error('FORMAL_VISUAL_RECEIPT_HASH_INVALID');
++}
+--- a/lib/types/formal-scene-inspection.ts
++++ b/lib/types/formal-scene-inspection.ts
+@@ -1,3 +1,4 @@
++import type { Exploration, ExplorationObservation } from '@/lib/server/mira-formal-exploration';
+ import type { Scene, Stage } from '@/lib/types/stage';
+ 
+ export interface FormalInspectionViewport {
+@@ -7,6 +8,7 @@
+ /** CSS locators and local form actions only; no script, network, or file operations. */
+ export interface FormalInteractionProbe {
+   id: string;
++  exploration?: Exploration;
+   action: 'click' | 'fill' | 'range' | 'select';
+   selector: string;
+   value?: string;
+@@ -31,6 +33,7 @@
+   snapshotSha256: string;
+   viewport?: FormalInspectionViewport;
+   probes?: readonly FormalInteractionProbe[];
++  multistate?: boolean;
+ }
+ 
+ export interface FormalPreviewSnapshot {
+@@ -63,13 +66,15 @@
+   sceneSha256: string;
+   viewport: FormalInspectionViewport;
+   screenshotSha256: string;
++  screenshotPath?: string;
++  inputMode?: 'pointer' | 'touch';
+   domSha256: string;
+   passed: boolean;
+   probeCount: number;
+   issues: string[];
+   visibleText: string;
+   metrics: FormalInspectionMetrics;
+-  probeResults: Array<{ id: string; passed: boolean; message: string }>;
++  probeResults: Array<{ id: string; passed: boolean; message: string; exploration?: ExplorationObservation }>;
+   /** Explicit scope: screenshots are evidence, not a claim of model vision. */
+   coverage:
+     | 'slide'
+--- /dev/null
++++ b/tests/server/mira-formal-exploration.test.ts
+@@ -0,0 +1,63 @@
++import { describe, expect, it } from 'vitest';
++import { chromium } from 'playwright-core';
++import { assertExplorationObservation, inspectExploration, validateExploration, type Exploration } from '@/lib/server/mira-formal-exploration';
++import { qualitySha } from '@/lib/server/mira-formal-quality-contract';
++
++const ratios = [[1,4],[2,5],[3,4]];
++function model(): Exploration {
++  return { schemaVersion:'mira.openmaic.multistate-exploration.v1',
++    mechanism:{kind:'fraction-ratio-percentage.v1',numeratorSelector:'#n',denominatorSelector:'#d',decimalSelector:'#decimal',percentSelector:'#percent',wholeSelector:'#whole',partSelector:'#part'},
++    diagramSelector:'#model',feedbackSelector:'#result',
++    states:ratios.map(([numerator,denominator],i)=>({id:`s${i}`,operations:[{selector:`#s${i}`,action:'click'}],numerator,denominator,
++      resultText:`${numerator}/${denominator} = ${numerator/denominator*100}%`,explanationText:`把整体平均分成${denominator}份，取其中${numerator}份。`})),
++    reset:{selector:'#reset',stateId:'s0'}};
++}
++function observation() {
++  return {mechanism:'fraction-ratio-percentage.v1',verification:'independent_numeric_svg',inputMode:'pointer',resetPassed:true,
++    states:ratios.map(([n,d],i)=>({stateId:`s${i}`,diagramSha256:qualitySha(`diagram${i}`),feedbackSha256:qualitySha(`feedback${i}`),
++      numeric:{numerator:n,denominator:d,decimal:n/d,percent:n/d*100,diagramRatio:n/d}}))};
++}
++describe('multistate independent mechanism authority',()=>{
++  it('requires distinct meaningful ratios and forbids semantic downgrade of the quantitative skill',()=>{
++    validateExploration(model(),'fraction_ratio_percentage');
++    const same=model(); same.states[2]={...same.states[2],numerator:2,denominator:8};
++    expect(()=>validateExploration(same)).toThrow();
++    const generic={...model(),mechanism:{kind:'semantic-state-model.v1'},states:model().states.map(({numerator,denominator,...s})=>s)};
++    validateExploration(generic,'language_organization');
++    expect(()=>validateExploration(generic,'fraction_ratio_percentage')).toThrow();
++  });
++  it('rechecks numeric, reset and device evidence when resuming cached passes',()=>{
++    assertExplorationObservation(observation(),model(),'pointer');
++    for(const mutate of [
++      (o:any)=>o.states[1].numeric.diagramRatio=0.5,
++      (o:any)=>o.states[1].numeric.percent=25,
++      (o:any)=>o.states[1].diagramSha256=o.states[0].diagramSha256,
++      (o:any)=>o.resetPassed=false,
++      (o:any)=>o.inputMode='touch',
++    ]) {const o=observation();mutate(o);expect(()=>assertExplorationObservation(o,model(),'pointer')).toThrow();}
++  });
++});
++
++const browserDescribe=process.env.FORMAL_INSPECTION_BROWSER==='1'?describe:describe.skip;
++browserDescribe('actual fraction controls and SVG results, no providers',()=>{
++  it('operates three states and reset on pointer/touch and rejects decorative incorrect geometry',async()=>{
++    const browser=await chromium.launch({executablePath:process.env.MIRA_FORMAL_QA_BROWSER_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
++    try {
++      for(const mode of ['pointer','touch'] as const){
++        const context=await browser.newContext({hasTouch:mode==='touch',viewport:{width:1280,height:720}});
++        const page=await context.newPage();
++        await page.setContent(`<style>button{width:90px;height:48px} #model{width:400px;height:140px}</style>
++          ${ratios.map((_,i)=>`<button id="s${i}" onclick="set(${i})">状态${i}</button>`).join('')}<button id="reset" onclick="set(0)">重置</button>
++          <input id="n"><input id="d"><span id="decimal"></span><span id="percent"></span>
++          <svg id="model" viewBox="0 0 400 140"><rect id="whole" x="20" y="30" width="320" height="60" fill="#ddd"/><rect id="part" x="20" y="30" height="60" fill="#3678dc"/></svg><p id="result"></p>
++          <script>const data=${JSON.stringify(ratios)};function set(i){const[a,b]=data[i];n.value=a;d.value=b;decimal.textContent=a/b;percent.textContent=a/b*100+'%';part.setAttribute('width',320*a/b);result.textContent=a+'/'+b+' = '+(a/b*100)+'% 把整体平均分成'+b+'份，取其中'+a+'份。'}set(0)</script>`);
++        const activate=async(selector:string)=>{if(mode==='touch')await page.locator(selector).tap();else await page.locator(selector).click();};
++        const seen=await inspectExploration(page,model(),mode,activate);
++        assertExplorationObservation(seen,model(),mode);
++        await page.evaluate(()=>{const original=(window as any).set;(window as any).set=(i:number)=>{original(i);document.querySelector('#part')!.setAttribute('width','160');};});
++        await expect(inspectExploration(page,model(),mode,activate)).rejects.toThrow('fraction mechanism');
++        await context.close();
++      }
++    } finally {await browser.close();}
++  },20000);
++});

@@ -1,0 +1,82 @@
+--- a/lib/server/mira-formal-visual-review.ts
++++ b/lib/server/mira-formal-visual-review.ts
+@@ -1,6 +1,6 @@
+ import { createHash } from 'node:crypto';
+-import { readFile, realpath } from 'node:fs/promises';
+-import { isAbsolute, relative, resolve } from 'node:path';
++import { mkdir, open, readFile, realpath } from 'node:fs/promises';
++import { isAbsolute, join, relative, resolve } from 'node:path';
+ import { defaultSettingsMiddleware, wrapLanguageModel } from 'ai';
+ import { callLLM } from '@/lib/ai/llm';
+ import { resolveModel } from './resolve-model';
+@@ -119,6 +119,29 @@
+     undefined,
+     { mode: 'disabled', enabled: false },
+   );
++  // Preserve the actual paid reply before parsing. A malformed report must be
++  // diagnosable without buying the same response again or inventing a receipt.
++  const archiveFolder = join(root, 'formal-visual-provider-responses', input.snapshotSha256);
++  await mkdir(archiveFolder, { recursive: true, mode: 0o700 });
++  const archive = {
++    schemaVersion: 'mira.openmaic.visual-provider-response.v1',
++    snapshotSha256: input.snapshotSha256,
++    teachingQualityContextSha256: input.teachingQualityContextSha256,
++    authorizationId: paidBudgetContext.getStore()!.binding.authorizationId,
++    providerId: resolved.providerId,
++    requestedModelId: resolved.modelId,
++    responseId: result.response?.id ?? null,
++    responseModelId: result.response?.modelId ?? null,
++    content: result.text,
++    usage: result.usage,
++  };
++  const archiveFile = await open(join(archiveFolder, `${qualitySha(archive)}.json`), 'wx', 0o600);
++  try {
++    await archiveFile.writeFile(JSON.stringify(archive));
++    await archiveFile.sync();
++  } finally {
++    await archiveFile.close();
++  }
+   // A malformed review remains a paid, recorded failure; no hidden retries.
+   let parsed: { sceneReviews?: unknown };
+   try {
+--- a/lib/server/mira-courseware-provider.ts
++++ b/lib/server/mira-courseware-provider.ts
+@@ -1,9 +1,12 @@
+ import { createHash, timingSafeEqual } from 'node:crypto';
++import { mkdir, open } from 'node:fs/promises';
++import { join, resolve } from 'node:path';
+ import type { NextRequest } from 'next/server';
+ import { defaultSettingsMiddleware, wrapLanguageModel } from 'ai';
+ import { callLLM } from '@/lib/ai/llm';
+ import { isProviderKeyRequired } from '@/lib/ai/providers';
+ import { resolveModel } from '@/lib/server/resolve-model';
++import { qualitySha } from './mira-formal-quality-contract';
+ 
+ export const MIRA_COURSEWARE_PROVIDER_SCHEMA = 'mira.openmaic.courseware-provider-call.v1' as const;
+ 
+@@ -287,6 +290,25 @@
+         undefined,
+         COURSEWARE_THINKING_DISABLED,
+       );
++      // The caller may reject JSON or a later checkpoint. Preserve paid output
++      // before those checks without changing the public provider contract.
++      const archive = {
++        schemaVersion: 'mira.openmaic.courseware-provider-response.v1',
++        requestId, phase, inputSha256: qualitySha(body),
++        providerId: resolved.providerId, requestedModelId: resolved.modelId,
++        responseId: result.response?.id ?? null,
++        responseModelId: result.response?.modelId ?? null,
++        content: result.text, usage: result.totalUsage ?? result.usage,
++      };
++      const archiveFolder = resolve('data/formal-courseware-provider-responses', qualitySha({requestId, phase}));
++      await mkdir(archiveFolder, {recursive: true, mode: 0o700});
++      const archiveFile = await open(join(archiveFolder, `${qualitySha(archive)}.json`), 'wx', 0o600);
++      try {
++        await archiveFile.writeFile(JSON.stringify(archive));
++        await archiveFile.sync();
++      } finally {
++        await archiveFile.close();
++      }
+       const content = result.text.trim();
+       if (!content) {
+         throw new MiraCoursewareProviderError('provider_failed', 'Provider returned no content');

@@ -1,0 +1,1238 @@
+diff --git a/lib/server/mira-paid-budget.ts b/lib/server/mira-paid-budget.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-paid-budget.ts
+@@ -0,0 +1,356 @@
++/** Server-owned, pre-dispatch budget context. No provider credentials enter this protocol. */
++import { AsyncLocalStorage } from 'node:async_hooks';
++import { createHash, timingSafeEqual } from 'node:crypto';
++import { mkdir, readFile, writeFile } from 'node:fs/promises';
++import { resolve, join } from 'node:path';
++import { wrapLanguageModel, type LanguageModel, type LanguageModelMiddleware } from 'ai';
++
++export interface PaidBudgetBinding {
++  schemaVersion: 'mira.learning.paid-budget-binding.v1';
++  authorizationId: string;
++  required: true;
++}
++type Price = {
++  provider: string;
++  model: string;
++  allowedUnits: string[];
++  perCallMax: Record<string, number>;
++};
++type Context = {
++  binding: PaidBudgetBinding;
++  namespace: string;
++  prices?: Promise<Record<string, Price>>;
++};
++const globals = globalThis as typeof globalThis & { __miraPaidBudget?: AsyncLocalStorage<Context> };
++export const paidBudgetContext = (globals.__miraPaidBudget ??= new AsyncLocalStorage<Context>());
++const sha = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
++export function parsePaidBudget(value: unknown): PaidBudgetBinding {
++  const b = value as PaidBudgetBinding;
++  if (
++    !b ||
++    Object.keys(b).sort().join(',') !== 'authorizationId,required,schemaVersion' ||
++    b.schemaVersion !== 'mira.learning.paid-budget-binding.v1' ||
++    b.required !== true ||
++    !/^[a-f0-9]{64}$/.test(b.authorizationId)
++  )
++    throw new Error('MIRA_PAID_BUDGET_BINDING_INVALID');
++  return b;
++}
++export function withPaidBudget<T>(binding: unknown, namespace: string, work: () => T): T {
++  if (binding === undefined) return work(); // Historical playback retains its existing caps.
++  return paidBudgetContext.run({ binding: parsePaidBudget(binding), namespace }, work);
++}
++export async function withPaidBudgetRequest(
++  req: Request,
++  work: () => Promise<Response>,
++): Promise<Response> {
++  const required = req.headers.get('x-mira-paid-budget-required');
++  const authorizationId = req.headers.get('x-mira-paid-budget-authorization');
++  if (!required && !authorizationId) return work();
++  const expected = process.env.MIRA_INTERNAL_API_TOKEN || '';
++  const supplied = req.headers.get('x-mira-internal-token') || '';
++  if (
++    required !== '1' ||
++    !expected ||
++    Buffer.byteLength(supplied) !== Buffer.byteLength(expected) ||
++    !timingSafeEqual(Buffer.from(expected), Buffer.from(supplied))
++  )
++    return Response.json({ error: 'MIRA_PAID_BUDGET_TRUST_REQUIRED' }, { status: 403 });
++  try {
++    const bodyHash = createHash('sha256')
++      .update(Buffer.from(await req.clone().arrayBuffer()))
++      .digest('hex');
++    return await withPaidBudget(
++      { schemaVersion: 'mira.learning.paid-budget-binding.v1', required: true, authorizationId },
++      `${new URL(req.url).pathname}:${bodyHash}`,
++      work,
++    );
++  } catch (error) {
++    if (String(error).includes('MIRA_PAID_BUDGET'))
++      return Response.json(
++        {
++          error: 'MIRA_PAID_BUDGET_UNAVAILABLE',
++          message: '互动暂时不可用，已准备好的课程可以继续学习。',
++        },
++        { status: 503 },
++      );
++    throw error;
++  }
++}
++async function backend(operation: string, body: unknown): Promise<Record<string, any>> {
++  const token = process.env.MIRA_INTERNAL_API_TOKEN;
++  const base = process.env.MIRA_BACKEND_INTERNAL_URL;
++  if (!token || !base) throw new Error('MIRA_PAID_BUDGET_SERVICE_UNCONFIGURED');
++  const response = await fetch(new URL(`/internal/learning/budget/${operation}`, base), {
++    method: 'POST',
++    redirect: 'error',
++    headers: {
++      'Content-Type': 'application/json',
++      'X-Mira-Internal-Token': token,
++      'X-Mira-Internal-Source': 'openmaic-runtime-gateway',
++    },
++    body: JSON.stringify(body),
++    signal: AbortSignal.timeout(15000),
++  });
++  const result = await response.json();
++  if (!response.ok || !result.ok || !result.budget)
++    throw new Error(`MIRA_PAID_BUDGET_${operation.toUpperCase()}_REJECTED`);
++  return result.budget;
++}
++export async function hasRequiredTeachingBudget(): Promise<boolean> {
++  const context = paidBudgetContext.getStore();
++  if (!context) return false;
++  const result = await backend('context', { authorizationId: context.binding.authorizationId });
++  return result.purpose === 'required_teaching';
++}
++async function authorizedPrice(provider: string, model: string): Promise<[string, Price]> {
++  const context = paidBudgetContext.getStore();
++  if (!context) throw new Error('MIRA_PAID_BUDGET_CONTEXT_REQUIRED');
++  const { authorizationId } = context.binding;
++  context.prices ??= backend('context', { authorizationId }).then((r) => r.prices);
++  const entries = Object.entries(await context.prices).filter(
++    ([, p]) => p.provider === provider && p.model === model,
++  );
++  if (entries.length !== 1) throw new Error('MIRA_PAID_BUDGET_PRICE_NOT_AUTHORIZED');
++  return entries[0];
++}
++async function reserve(
++  provider: string,
++  model: string,
++  request: unknown,
++  measured: Record<string, number>,
++) {
++  const context = paidBudgetContext.getStore();
++  if (!context) return undefined;
++  const { authorizationId } = context.binding;
++  const [priceKey, price] = await authorizedPrice(provider, model);
++  const maxUnits = Object.fromEntries(
++    price.allowedUnits.map((unit) => [unit, price.perCallMax[unit]]),
++  );
++  for (const [unit, value] of Object.entries(measured)) {
++    if (!Number.isSafeInteger(value) || value < 0 || !(unit in maxUnits) || value > maxUnits[unit])
++      throw new Error('MIRA_PAID_BUDGET_RESOURCE_LIMIT');
++    maxUnits[unit] = value;
++  }
++  if (
++    price.allowedUnits.some((unit) => !Number.isSafeInteger(maxUnits[unit]) || maxUnits[unit] < 0)
++  )
++    throw new Error('MIRA_PAID_BUDGET_RESOURCE_LIMIT');
++  const requestSha256 = sha({ provider, model, request, maxUnits });
++  const dispatchId = `runtime:${sha([authorizationId, context.namespace, requestSha256])}`;
++  const reservation = await backend('reserve', {
++    authorizationId,
++    dispatchId,
++    requestSha256,
++    priceKey,
++    maxUnits,
++  });
++  const claim = await backend('dispatch', {
++    authorizationId,
++    reservationId: reservation.reservationId,
++    requestSha256,
++  });
++  if (claim.dispatchAllowed !== true) throw new Error('MIRA_PAID_BUDGET_DISPATCH_ALREADY_CLAIMED');
++  const identity = { authorizationId, reservationId: reservation.reservationId };
++  let completed = false;
++  return {
++    async unknown() {
++      if (completed) return;
++      completed = true;
++      // A failed notification does not release anything: durable dispatched state is still held.
++      await backend('unknown', { ...identity, reasonCode: 'provider_result_unknown' }).catch(
++        () => undefined,
++      );
++    },
++    async finish(actual: Record<string, number> | undefined) {
++      if (completed) return;
++      if (
++        !actual ||
++        price.allowedUnits.some((u) => !Number.isSafeInteger(actual[u]) || actual[u] < 0)
++      ) {
++        completed = true;
++        await backend('unknown', { ...identity, reasonCode: 'provider_usage_missing' }).catch(
++          () => undefined,
++        );
++        return;
++      }
++      const actualUnits = Object.fromEntries(price.allowedUnits.map((u) => [u, actual[u]]));
++      await backend('settle', {
++        ...identity,
++        actualUnits,
++        providerRequestId: null,
++        evidenceSha256: sha(actualUnits),
++      });
++      completed = true;
++    },
++  };
++}
++function tokenUsage(usage: any) {
++  const input =
++    typeof usage?.inputTokens === 'number' ? usage.inputTokens : usage?.inputTokens?.total;
++  const output =
++    typeof usage?.outputTokens === 'number' ? usage.outputTokens : usage?.outputTokens?.total;
++  return Number.isSafeInteger(input) && Number.isSafeInteger(output)
++    ? { calls: 1, input_tokens: input, output_tokens: output }
++    : undefined;
++}
++/** V3 middleware is called for EACH provider step, including multi-step tool calls. */
++export function budgetedModel(
++  model: LanguageModel,
++  provider: string,
++  modelId: string,
++): LanguageModel {
++  if (!paidBudgetContext.getStore()) return model;
++  if (typeof model === 'string' || model.specificationVersion !== 'v3')
++    throw new Error('MIRA_PAID_BUDGET_MODEL_UNSUPPORTED');
++  const middleware: LanguageModelMiddleware = {
++    specificationVersion: 'v3',
++    transformParams: async ({ params }) => {
++      const [, price] = await authorizedPrice(provider, modelId);
++      const maximum = params.maxOutputTokens ?? price.perCallMax.output_tokens;
++      if (!Number.isSafeInteger(maximum) || maximum < 1)
++        throw new Error('MIRA_PAID_BUDGET_RESOURCE_LIMIT');
++      return { ...params, maxOutputTokens: maximum };
++    },
++    wrapGenerate: async ({ doGenerate, params }) => {
++      // Unknown binary vision tokenization cannot safely use a character estimate.
++      const serialized = JSON.stringify({ prompt: params.prompt, tools: params.tools });
++      if (
++        params.prompt.some(
++          (m) => Array.isArray(m.content) && m.content.some((p) => p.type === 'file'),
++        )
++      )
++        throw new Error('MIRA_PAID_BUDGET_VISION_METER_UNAVAILABLE');
++      const ticket = await reserve(
++        provider,
++        modelId,
++        {
++          prompt: params.prompt,
++          tools: params.tools,
++          providerOptions: params.providerOptions,
++          maxOutputTokens: params.maxOutputTokens,
++        },
++        {
++          calls: 1,
++          input_tokens: Buffer.byteLength(serialized) + 4096,
++          output_tokens: params.maxOutputTokens ?? Number.MAX_SAFE_INTEGER,
++        },
++      );
++      try {
++        const result = await doGenerate();
++        await ticket?.finish(tokenUsage(result.usage));
++        return result;
++      } catch (error) {
++        await ticket?.unknown();
++        throw error;
++      }
++    },
++    wrapStream: async ({ doStream, params }) => {
++      const serialized = JSON.stringify({ prompt: params.prompt, tools: params.tools });
++      if (
++        params.prompt.some(
++          (m) => Array.isArray(m.content) && m.content.some((p) => p.type === 'file'),
++        )
++      )
++        throw new Error('MIRA_PAID_BUDGET_VISION_METER_UNAVAILABLE');
++      const ticket = await reserve(
++        provider,
++        modelId,
++        {
++          prompt: params.prompt,
++          tools: params.tools,
++          providerOptions: params.providerOptions,
++          maxOutputTokens: params.maxOutputTokens,
++        },
++        {
++          calls: 1,
++          input_tokens: Buffer.byteLength(serialized) + 4096,
++          output_tokens: params.maxOutputTokens ?? Number.MAX_SAFE_INTEGER,
++        },
++      );
++      try {
++        const result = await doStream();
++        const reader = result.stream.getReader();
++        return {
++          ...result,
++          stream: new ReadableStream({
++            async pull(controller) {
++              try {
++                const next = await reader.read();
++                if (next.done) {
++                  await ticket?.unknown();
++                  controller.close();
++                  return;
++                }
++                if (next.value.type === 'finish')
++                  await ticket?.finish(tokenUsage(next.value.usage));
++                if (next.value.type === 'error') await ticket?.unknown();
++                controller.enqueue(next.value);
++              } catch (error) {
++                await ticket?.unknown();
++                controller.error(error);
++              }
++            },
++            async cancel(reason) {
++              await ticket?.unknown();
++              await reader.cancel(reason);
++            },
++          }),
++        };
++      } catch (error) {
++        await ticket?.unknown();
++        throw error;
++      }
++    },
++  };
++  return wrapLanguageModel({ model, middleware });
++}
++export async function budgetedOperation<T>(
++  provider: string,
++  model: string,
++  request: unknown,
++  measurement: Record<string, number>,
++  work: () => Promise<T>,
++): Promise<T> {
++  const ticket = await reserve(provider, model, request, measurement);
++  try {
++    const result = await work();
++    await ticket?.finish(measurement);
++    return result;
++  } catch (error) {
++    await ticket?.unknown();
++    throw error;
++  }
++}
++// Media modules are client-transitive. They use this bridge without importing Node builtins.
++(globalThis as any).__miraBudgetBridge = {
++  active: () => Boolean(paidBudgetContext.getStore()),
++  run: budgetedOperation,
++};
++const bindingRoot = () => resolve('data/formal-paid-budget-bindings');
++export async function persistSessionPaidBudget(sessionId: string, binding: unknown) {
++  if (binding === undefined) return;
++  const parsed = parsePaidBudget(binding);
++  if (!/^miraformal_[a-f0-9]{64}$/.test(sessionId))
++    throw new Error('MIRA_PAID_BUDGET_SESSION_INVALID');
++  await mkdir(bindingRoot(), { recursive: true, mode: 0o700 });
++  const file = join(bindingRoot(), `${sessionId}.json`);
++  try {
++    await writeFile(file, JSON.stringify(parsed), { flag: 'wx', mode: 0o600 });
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
++  }
++  if (sha(JSON.parse(await readFile(file, 'utf8'))) !== sha(parsed))
++    throw new Error('MIRA_PAID_BUDGET_SESSION_CONFLICT');
++}
++export async function readSessionPaidBudget(sessionId: string, required = false) {
++  if (!/^miraformal_[a-f0-9]{64}$/.test(sessionId)) return undefined;
++  try {
++    return parsePaidBudget(
++      JSON.parse(await readFile(join(bindingRoot(), `${sessionId}.json`), 'utf8')),
++    );
++  } catch (error) {
++    if (!required && (error as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
++    throw error;
++  }
++}
+diff --git a/lib/mira-paid-budget-bridge.ts b/lib/mira-paid-budget-bridge.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira-paid-budget-bridge.ts
+@@ -0,0 +1,69 @@
++/** Client-safe bridge: only a trusted server context can activate paid metering. */
++interface Bridge {
++  active(): boolean;
++  run<T>(
++    provider: string,
++    model: string,
++    request: unknown,
++    measurement: Record<string, number>,
++    work: () => Promise<T>,
++  ): Promise<T>;
++}
++const bridge = () =>
++  (globalThis as typeof globalThis & { __miraBudgetBridge?: Bridge }).__miraBudgetBridge;
++export const hasPaidBudget = () => bridge()?.active() === true;
++export function meteredOperation<T>(
++  provider: string,
++  model: string,
++  request: unknown,
++  measurement: Record<string, number>,
++  work: () => Promise<T>,
++) {
++  return bridge()?.active() ? bridge()!.run(provider, model, request, measurement, work) : work();
++}
++
++/** Verify PCM timing from actual bytes; client-supplied duration is never trusted. */
++export function pcmWavDurationMs(bytes: Uint8Array): number {
++  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
++  const tag = (offset: number) => String.fromCharCode(...bytes.subarray(offset, offset + 4));
++  const fail = () => {
++    throw new Error('MIRA_PAID_BUDGET_ASR_WAV_INVALID');
++  };
++  if (
++    bytes.length < 44 ||
++    tag(0) !== 'RIFF' ||
++    tag(8) !== 'WAVE' ||
++    view.getUint32(4, true) + 8 !== bytes.length
++  )
++    fail();
++  let rate = 0,
++    alignment = 0,
++    dataSize = 0;
++  for (let offset = 12; offset + 8 <= bytes.length; ) {
++    const size = view.getUint32(offset + 4, true),
++      end = offset + 8 + size;
++    if (end > bytes.length) fail();
++    if (tag(offset) === 'fmt ') {
++      if (rate || size < 16 || view.getUint16(offset + 8, true) !== 1) fail();
++      const channels = view.getUint16(offset + 10, true),
++        sampleRate = view.getUint32(offset + 12, true);
++      const bits = view.getUint16(offset + 22, true);
++      alignment = view.getUint16(offset + 20, true);
++      rate = view.getUint32(offset + 16, true);
++      if (
++        channels < 1 ||
++        channels > 8 ||
++        ![8, 16, 24, 32].includes(bits) ||
++        sampleRate < 8000 ||
++        sampleRate > 192000 ||
++        alignment !== (channels * bits) / 8 ||
++        rate !== sampleRate * alignment
++      )
++        fail();
++    }
++    if (tag(offset) === 'data') dataSize += size;
++    offset = end + (size % 2);
++  }
++  if (!rate || !dataSize || dataSize % alignment) fail();
++  return Math.ceil((dataSize / rate) * 1000);
++}
+diff --git a/tests/server/mira-paid-budget.test.ts b/tests/server/mira-paid-budget.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-paid-budget.test.ts
+@@ -0,0 +1,207 @@
++import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
++import {
++  budgetedModel,
++  budgetedOperation,
++  withPaidBudget,
++  withPaidBudgetRequest,
++} from '@/lib/server/mira-paid-budget';
++const binding = {
++  schemaVersion: 'mira.learning.paid-budget-binding.v1',
++  authorizationId: 'a'.repeat(64),
++  required: true,
++};
++const usage = { inputTokens: { total: 30 }, outputTokens: { total: 20 } };
++let operations: Array<{ operation: string; body: any }>;
++let claims: Set<string>;
++let rejected = '';
++let providerCalls = 0;
++const model = () => ({
++  specificationVersion: 'v3' as const,
++  provider: 'fake',
++  modelId: 'fake-text',
++  supportedUrls: {},
++  doGenerate: async () => {
++    providerCalls++;
++    return {
++      content: [{ type: 'text', text: 'Hello' }],
++      finishReason: { unified: 'stop', raw: 'stop' },
++      usage,
++      warnings: [],
++    };
++  },
++  doStream: async () => {
++    providerCalls++;
++    return {
++      stream: new ReadableStream({
++        start(c) {
++          c.enqueue({ type: 'finish', finishReason: { unified: 'stop', raw: 'stop' }, usage });
++          c.close();
++        },
++      }),
++    };
++  },
++});
++const params = {
++  prompt: [{ role: 'user', content: [{ type: 'text', text: '中文问题' }] }],
++  maxOutputTokens: 100,
++};
++beforeEach(() => {
++  operations = [];
++  claims = new Set();
++  providerCalls = 0;
++  rejected = '';
++  vi.stubEnv('MIRA_BACKEND_INTERNAL_URL', 'http://fake-backend.invalid');
++  vi.stubEnv('MIRA_INTERNAL_API_TOKEN', 'fake-internal');
++  vi.stubGlobal(
++    'fetch',
++    vi.fn(async (url, options) => {
++      const operation = new URL(String(url)).pathname.split('/').pop()!;
++      const body = JSON.parse(options.body);
++      operations.push({ operation, body });
++      if (rejected === operation) return Response.json({ ok: false }, { status: 429 });
++      if (operation === 'context')
++        return Response.json({
++          ok: true,
++          budget: {
++            prices: {
++              fake: {
++                provider: 'fake',
++                model: 'fake-text',
++                allowedUnits: ['calls', 'input_tokens', 'output_tokens'],
++                perCallMax: { calls: 1, input_tokens: 100000, output_tokens: 1000 },
++              },
++              media: {
++                provider: 'qwen-tts',
++                model: 'qwen3-tts-flash',
++                allowedUnits: ['calls', 'characters'],
++                perCallMax: { calls: 1, characters: 1000 },
++              },
++            },
++          },
++        });
++      if (operation === 'reserve')
++        return Response.json({
++          ok: true,
++          budget: { reservationId: body.dispatchId, dispatchAllowed: false },
++        });
++      if (operation === 'dispatch') {
++        const allowed = !claims.has(body.reservationId);
++        claims.add(body.reservationId);
++        return Response.json({ ok: true, budget: { dispatchAllowed: allowed } });
++      }
++      return Response.json({
++        ok: true,
++        budget: { state: operation === 'settle' ? 'settled' : 'unknown' },
++      });
++    }),
++  );
++});
++afterEach(() => {
++  vi.unstubAllGlobals();
++  vi.unstubAllEnvs();
++});
++function call() {
++  return withPaidBudget(binding, 'job-a', () =>
++    (budgetedModel(model() as any, 'fake', 'fake-text') as any).doGenerate(params),
++  );
++}
++describe('paid provider admission', () => {
++  it('preserves old playback without inventing a budget grant', async () => {
++    await budgetedOperation('fake', 'old', {}, {}, async () => {
++      providerCalls++;
++    });
++    expect(providerCalls).toBe(1);
++    expect(operations).toHaveLength(0);
++  });
++  it('claims before sending and settles actual usage, including Chinese input', async () => {
++    await call();
++    expect(providerCalls).toBe(1);
++    expect(operations.map((o) => o.operation)).toEqual([
++      'context',
++      'reserve',
++      'dispatch',
++      'settle',
++    ]);
++    expect(operations[1].body.maxUnits.input_tokens).toBeGreaterThan(4096);
++    expect(operations[3].body.actualUnits).toEqual({
++      calls: 1,
++      input_tokens: 30,
++      output_tokens: 20,
++    });
++    expect(operations[3].body.providerRequestId).toBeNull();
++  });
++  it('does not send when reserve or dispatch authorization is unavailable', async () => {
++    rejected = 'reserve';
++    await expect(call()).rejects.toThrow('RESERVE_REJECTED');
++    expect(providerCalls).toBe(0);
++  });
++  it('does not redispatch identical work across a fresh async context', async () => {
++    await call();
++    await expect(call()).rejects.toThrow('DISPATCH_ALREADY_CLAIMED');
++    expect(providerCalls).toBe(1);
++  });
++  it('enforces an output ceiling instead of silently truncating teaching', async () => {
++    await expect(
++      withPaidBudget(binding, 'job-a', () =>
++        (budgetedModel(model() as any, 'fake', 'fake-text') as any).doGenerate({
++          ...params,
++          maxOutputTokens: 1001,
++        }),
++      ),
++    ).rejects.toThrow('RESOURCE_LIMIT');
++    expect(providerCalls).toBe(0);
++  });
++  it('captures streamed finish usage before releasing the hold', async () => {
++    const output = await withPaidBudget(binding, 'stream', () =>
++      (budgetedModel(model() as any, 'fake', 'fake-text') as any).doStream(params),
++    );
++    const reader = output.stream.getReader();
++    await reader.read();
++    await reader.read();
++    expect(operations.map((o) => o.operation)).toEqual([
++      'context',
++      'reserve',
++      'dispatch',
++      'settle',
++    ]);
++  });
++  it('retains the full reservation when a provider response is lost', async () => {
++    const failing = {
++      ...model(),
++      doGenerate: async () => {
++        providerCalls++;
++        throw new Error('connection lost');
++      },
++    };
++    await expect(
++      withPaidBudget(binding, 'job-a', () =>
++        (budgetedModel(failing as any, 'fake', 'fake-text') as any).doGenerate(params),
++      ),
++    ).rejects.toThrow('connection lost');
++    expect(operations.at(-1)?.operation).toBe('unknown');
++    expect(operations.some((o) => o.operation === 'settle')).toBe(false);
++  });
++  it('meters media units and rejects a forged browser authorization header', async () => {
++    await withPaidBudget(binding, 'tts', () =>
++      budgetedOperation(
++        'qwen-tts',
++        'qwen3-tts-flash',
++        { text: '你好' },
++        { calls: 1, characters: 2 },
++        async () => 'audio',
++      ),
++    );
++    expect(operations.at(-1)?.body.actualUnits).toEqual({ calls: 1, characters: 2 });
++    const request = new Request('http://runtime.invalid/api/chat', {
++      method: 'POST',
++      headers: {
++        'x-mira-paid-budget-required': '1',
++        'x-mira-paid-budget-authorization': 'a'.repeat(64),
++      },
++      body: '{}',
++    });
++    const work = vi.fn(async () => Response.json({ ok: true }));
++    expect((await withPaidBudgetRequest(request, work)).status).toBe(403);
++    expect(work).not.toHaveBeenCalled();
++  });
++});
+diff --git a/lib/ai/llm.ts b/lib/ai/llm.ts
+--- a/lib/ai/llm.ts
++++ b/lib/ai/llm.ts
+@@ -1,3 +1,4 @@
++import { budgetedModel, paidBudgetContext } from '@/lib/server/mira-paid-budget';
+ /**
+  * Unified LLM Call Layer
+  *
+@@ -341,6 +342,11 @@
+       // Resolve effective thinking config: per-call > global env > undefined
+       const effectiveThinking = thinking ?? getGlobalThinkingConfig();
+       const injectedParams = injectProviderOptions(params, effectiveThinking);
++      if (paidBudgetContext.getStore()) {
++        const meta = buildUsageMeta(params, source);
++        injectedParams.model = budgetedModel(params.model, meta.providerId, meta.modelId);
++        injectedParams.maxRetries = 0;
++      }
+ 
+       // Wrap in thinkingContext so the custom fetch wrapper in providers.ts
+       // can read the config and inject vendor-specific body params for
+@@ -418,6 +424,10 @@
+   } as T;
+ 
+   const injectedParams = injectProviderOptions(wrappedParams, effectiveThinking);
++  if (paidBudgetContext.getStore()) {
++    injectedParams.model = budgetedModel(params.model, usageMeta.providerId, usageMeta.modelId);
++    injectedParams.maxRetries = 0;
++  }
+   const result = thinkingContext.run(effectiveThinking, () => streamText(injectedParams));
+ 
+   return result;
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -82,6 +82,7 @@
+   formalRuntimeContract?: unknown;
+   coursewareAuthority?: unknown;
+   professionalCreationPolicy?: unknown;
++  paidBudget?: unknown;
+   pdfContent?: { text: string; images: string[] };
+   enableWebSearch?: boolean;
+   webSearchProviderId?: WebSearchProviderId;
+diff --git a/app/api/generate-classroom/route.ts b/app/api/generate-classroom/route.ts
+--- a/app/api/generate-classroom/route.ts
++++ b/app/api/generate-classroom/route.ts
+@@ -88,6 +88,7 @@
+     const rawBody = (await req.json()) as Partial<GenerateClassroomInput>;
+     requirementSnippet = rawBody.requirement?.substring(0, 60);
+     const body: GenerateClassroomInput = {
++      ...(rawBody.paidBudget !== undefined ? { paidBudget: rawBody.paidBudget } : {}),
+       requirement: rawBody.requirement || '',
+       ...(rawBody.pdfContent ? { pdfContent: rawBody.pdfContent } : {}),
+ 
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -1,3 +1,4 @@
++import { parsePaidBudget } from './mira-paid-budget';
+ import { timingSafeEqual } from 'node:crypto';
+ import type { NextRequest } from 'next/server';
+ import type { GenerateClassroomInput } from '@/lib/server/classroom-generation';
+@@ -237,6 +238,8 @@
+   coursewareAuthority: typeof MIRA_COURSEWARE_AUTHORITY;
+   professionalCreationPolicy: MiraProfessionalCreationPolicy;
+ } {
++  if (input.paidBudget !== undefined || isMiraInteractionCreationPolicy(input.professionalCreationPolicy))
++    parsePaidBudget(input.paidBudget);
+   if (!REQUEST_ID.test(input.runtimeRequestId || '')) {
+     throw new Error('FORMAL_RUNTIME_REQUEST_ID_INVALID');
+   }
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -1,3 +1,4 @@
++import { persistSessionPaidBudget, withPaidBudget } from './mira-paid-budget';
+ import { createHash } from 'node:crypto';
+ import { access } from 'node:fs/promises';
+ import { constants as fsConstants } from 'node:fs';
+@@ -555,6 +556,7 @@
+     await access(formalInspectionConfiguration().executablePath, fsConstants.X_OK);
+   }
+   const identity = professionalIdentity(input);
++  await persistSessionPaidBudget(identity.sessionId, input.paidBudget);
+   const prompt = professionalPrompt(input, spec);
+   const store = await getAgentSessionStore();
+   let session = await store.getSession(identity.sessionId);
+@@ -1259,6 +1261,13 @@
+ }
+ 
+ async function completeMiraFormalProfessionalClassroom(
++  ...args: Parameters<typeof completeMiraFormalProfessionalClassroomInner>
++): Promise<MiraFormalProfessionalRecoveryCompletion> {
++  return withPaidBudget(args[0].paidBudget, args[2].sessionId + ':completion',
++    () => completeMiraFormalProfessionalClassroomInner(...args));
++}
++
++async function completeMiraFormalProfessionalClassroomInner(
+   input: GenerateClassroomInput,
+   spec: FormalCoursewareSpec,
+   identity: FormalIdentity,
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -1,3 +1,4 @@
++import { readSessionPaidBudget, withPaidBudget } from '@/lib/server/mira-paid-budget';
+ /**
+  * Lease-coordinated background execution for durable agent conversations.
+  *
+@@ -941,6 +942,11 @@
+ // finally blocks pair every timer, subscription, and agent listener with the
+ // exact lifetime in which it can fire.
+ export async function runSession(ctx: RunContext, meta: ClaimedAgentSession): Promise<void> {
++  const required = meta.prompt.includes('mira-primary-adaptive-interaction.v1');
++  const budget = await readSessionPaidBudget(meta.id, required);
++  return withPaidBudget(budget, meta.id, () => runSessionWithBudget(ctx, meta));
++}
++async function runSessionWithBudget(ctx: RunContext, meta: ClaimedAgentSession): Promise<void> {
+   const id = meta.id;
+   const attempt = meta.attempt;
+   const claimSeq = meta.claimSeq;
+diff --git a/lib/audio/tts-providers.ts b/lib/audio/tts-providers.ts
+--- a/lib/audio/tts-providers.ts
++++ b/lib/audio/tts-providers.ts
+@@ -1,3 +1,4 @@
++import { hasPaidBudget, meteredOperation } from '@/lib/mira-paid-budget-bridge';
+ /**
+  * TTS (Text-to-Speech) Provider Implementation
+  *
+@@ -204,7 +205,14 @@
+  * cancel aborts the in-flight fetch within seconds and a hung provider fails
+  * with {@link TTSRequestTimeoutError} instead of hanging forever.
+  */
+-export async function generateTTS(
++export async function generateTTS(config: TTSModelConfig, text: string): Promise<TTSGenerationResult> {
++  if (!hasPaidBudget()) return generateTTSUnmetered(config, text);
++  if (config.providerId !== 'qwen-tts') throw new Error('MIRA_PAID_BUDGET_TTS_METER_UNAVAILABLE');
++  const model = resolveTTSModelForVoice('qwen-tts', config.voice, config.modelId);
++  return meteredOperation(config.providerId, model || 'qwen3-tts-flash', { text, voice: config.voice, model },
++    { calls: 1, characters: Array.from(text).length }, () => generateTTSUnmetered(config, text));
++}
++async function generateTTSUnmetered(
+   config: TTSModelConfig,
+   text: string,
+ ): Promise<TTSGenerationResult> {
+diff --git a/lib/audio/asr-providers.ts b/lib/audio/asr-providers.ts
+--- a/lib/audio/asr-providers.ts
++++ b/lib/audio/asr-providers.ts
+@@ -1,3 +1,4 @@
++import { hasPaidBudget, meteredOperation, pcmWavDurationMs } from '@/lib/mira-paid-budget-bridge';
+ /**
+  * ASR (Automatic Speech Recognition) Provider Implementation
+  *
+@@ -161,7 +162,18 @@
+ /**
+  * Transcribe audio using specified ASR provider
+  */
+-export async function transcribeAudio(
++export async function transcribeAudio(config: ASRModelConfig, audioBuffer: Buffer | Blob): Promise<ASRTranscriptionResult> {
++  if (!hasPaidBudget()) return transcribeAudioUnmetered(config, audioBuffer);
++  if (config.providerId !== 'qwen-asr') throw new Error('MIRA_PAID_BUDGET_ASR_METER_UNAVAILABLE');
++  const bytes = Buffer.isBuffer(audioBuffer) ? audioBuffer : Buffer.from(await audioBuffer.arrayBuffer());
++  const audioMs = pcmWavDurationMs(bytes);
++  const digest = await crypto.subtle.digest('SHA-256', new Uint8Array(bytes));
++  const audioHash = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
++  return meteredOperation(config.providerId, config.modelId || ASR_PROVIDERS['qwen-asr'].defaultModelId,
++    { audioHash, language: config.language }, { calls: 1, audio_ms: audioMs },
++    () => transcribeAudioUnmetered(config, audioBuffer));
++}
++async function transcribeAudioUnmetered(
+   config: ASRModelConfig,
+   audioBuffer: Buffer | Blob,
+ ): Promise<ASRTranscriptionResult> {
+diff --git a/lib/media/image-providers.ts b/lib/media/image-providers.ts
+--- a/lib/media/image-providers.ts
++++ b/lib/media/image-providers.ts
+@@ -1,3 +1,4 @@
++import { hasPaidBudget, meteredOperation } from '@/lib/mira-paid-budget-bridge';
+ /**
+  * Image Generation Service -- routes to provider adapters
+  */
+@@ -188,7 +189,13 @@
+   }
+ }
+ 
+-export async function generateImage(
++export async function generateImage(config: ImageGenerationConfig, options: ImageGenerationOptions): Promise<ImageGenerationResult> {
++  if (!hasPaidBudget()) return generateImageUnmetered(config, options);
++  if (config.providerId !== 'qwen-image') throw new Error('MIRA_PAID_BUDGET_IMAGE_METER_UNAVAILABLE');
++  return meteredOperation(config.providerId, config.model || '', options, { calls: 1, images: 1 },
++    () => generateImageUnmetered(config, options));
++}
++async function generateImageUnmetered(
+   config: ImageGenerationConfig,
+   options: ImageGenerationOptions,
+ ): Promise<ImageGenerationResult> {
+diff --git a/lib/media/video-providers.ts b/lib/media/video-providers.ts
+--- a/lib/media/video-providers.ts
++++ b/lib/media/video-providers.ts
+@@ -1,3 +1,4 @@
++import { hasPaidBudget, meteredOperation } from '@/lib/mira-paid-budget-bridge';
+ /**
+  * Video Generation Service -- routes to provider adapters
+  */
+@@ -188,7 +189,14 @@
+   return normalized;
+ }
+ 
+-export async function generateVideo(
++export async function generateVideo(config: VideoGenerationConfig, options: VideoGenerationOptions): Promise<VideoGenerationResult> {
++  if (!hasPaidBudget()) return generateVideoUnmetered(config, options);
++  if (config.providerId !== 'happyhorse' || !Number.isFinite(options.duration) || !options.duration)
++    throw new Error('MIRA_PAID_BUDGET_VIDEO_METER_UNAVAILABLE');
++  return meteredOperation(config.providerId, config.model || '', options,
++    { calls: 1, video_ms: Math.ceil(options.duration * 1000) }, () => generateVideoUnmetered(config, options));
++}
++async function generateVideoUnmetered(
+   config: VideoGenerationConfig,
+   options: VideoGenerationOptions,
+ ): Promise<VideoGenerationResult> {
+diff --git a/lib/web-search/index.ts b/lib/web-search/index.ts
+--- a/lib/web-search/index.ts
++++ b/lib/web-search/index.ts
+@@ -1,3 +1,4 @@
++import { hasPaidBudget } from '@/lib/mira-paid-budget-bridge';
+ import { searchWithBaidu } from './baidu';
+ import { searchWithBocha } from './bocha';
+ import { searchWithBrave } from './brave';
+@@ -21,6 +22,7 @@
+   claudeModelId?: string;
+   signal?: AbortSignal;
+ }): Promise<WebSearchResult> {
++  if (hasPaidBudget() && params.providerId !== 'brave') throw new Error('MIRA_PAID_BUDGET_SEARCH_METER_UNAVAILABLE');
+   const {
+     providerId,
+     query,
+diff --git a/lib/web-search/brave.ts b/lib/web-search/brave.ts
+--- a/lib/web-search/brave.ts
++++ b/lib/web-search/brave.ts
+@@ -1,3 +1,4 @@
++import { meteredOperation } from '@/lib/mira-paid-budget-bridge';
+ /**
+  * Brave Web Search integration.
+  *
+@@ -266,11 +267,11 @@
+ 
+     for (let attempt = 0; attempt < 2; attempt += 1) {
+       await waitForBraveScrapeThrottle(signal);
+-      const res = await proxyFetch(url, {
++      const res = await meteredOperation('brave', 'brave-search', { url: String(url), attempt }, { calls: 1, search_requests: 1 }, () => proxyFetch(url, {
+         method: 'GET',
+         headers: BRAVE_HEADERS,
+         ...(signal ? { signal } : {}),
+-      });
++      }));
+ 
+       if (res.ok) {
+         const html = await res.text();
+@@ -304,7 +305,7 @@
+   const startedAt = Date.now();
+ 
+   const sources = apiKey
+-    ? await searchWithBraveApi(query, apiKey, maxResults, signal)
++    ? await meteredOperation('brave', 'brave-search', { query, maxResults }, { calls: 1, search_requests: 1 }, () => searchWithBraveApi(query, apiKey, maxResults, signal))
+     : await searchWithBraveScrape(query, maxResults, baseUrl, signal);
+ 
+   return {
+diff --git a/components/chat/use-chat-sessions.ts b/components/chat/use-chat-sessions.ts
+--- a/components/chat/use-chat-sessions.ts
++++ b/components/chat/use-chat-sessions.ts
+@@ -179,6 +179,7 @@
+ }
+ 
+ export type ChatRequestTemplate = {
++  miraScriptedAction?: { sceneId: string; actionId: string };
+   messages: UIMessage<ChatMessageMetadata>[];
+   config: {
+     agentIds: string[];
+@@ -1310,6 +1311,7 @@
+         return;
+       }
+ 
++      let scriptedInitialization = requestTemplate.miraScriptedAction;
+       const streamConsumer = createStatelessStreamConsumer(sessionId, controller, sessionType);
+ 
+       const outcome = await runAgentLoop(
+@@ -1330,13 +1332,16 @@
+             return currentSession?.messages ?? requestTemplate.messages;
+           },
+ 
+-          fetchChat: (body, signal) =>
+-            fetch('/api/chat', {
++          fetchChat: (body, signal) => {
++            const marker = scriptedInitialization;
++            scriptedInitialization = undefined;
++            return fetch('/api/chat', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+-              body: JSON.stringify(body),
++              body: JSON.stringify({ ...body, ...(marker ? { miraScriptedAction: marker } : {}) }),
+               signal,
+-            }),
++            });
++          },
+ 
+           onEvent: streamConsumer.onEvent,
+           onIterationEnd: streamConsumer.onIterationEnd,
+@@ -2039,6 +2044,7 @@
+           sessionId,
+           {
+             messages: [],
++            miraScriptedAction: request.miraScriptedAction,
+             config: {
+               agentIds,
+               sessionType: 'discussion',
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -36,6 +36,7 @@
+ import { getMiraEffectiveAsrEnabled } from '@/lib/mira/student-runtime';
+ 
+ export interface DiscussionRequest {
++  miraScriptedAction?: { sceneId: string; actionId: string };
+   topic: string;
+   prompt?: string;
+   agentId?: string; // Agent ID to initiate discussion (default: 'default-1')
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -1,3 +1,5 @@
++import { pcmWavDurationMs } from '@/lib/mira-paid-budget-bridge';
++import { budgetedOperation, paidBudgetContext } from './mira-paid-budget';
+ import { createHash } from 'crypto';
+ import { lookup } from 'dns/promises';
+ import { promises as fs } from 'fs';
+@@ -894,6 +896,8 @@
+       throw new MiraFormalAudioError('provider_unavailable', 'Formal TTS is unavailable');
+     const endpoint = providerEndpoint(resolveTTSBaseUrl('qwen-tts'));
+     const policy = SUBJECT_POLICIES[input.subject];
++    const providerBody = await budgetedOperation('qwen-tts', 'qwen3-tts-flash', input,
++      { calls: 1, characters: Array.from(input.text).length }, async () => {
+     const response = await fetchProvider(fetchImpl, endpoint, {
+       method: 'POST',
+       headers: {
+@@ -911,7 +915,8 @@
+       }),
+     });
+     if (!response.ok) throw new OperationalFailure('failed', 'provider_rejected');
+-    const providerBody = await readProviderJson(response);
++    return readProviderJson(response);
++    });
+     const output = providerBody.output as Record<string, unknown> | undefined;
+     const audio = output?.audio as Record<string, unknown> | undefined;
+     if (!audio || typeof audio.url !== 'string') {
+@@ -1008,6 +1013,9 @@
+       throw new MiraFormalAudioError('provider_unavailable', 'Formal ASR is unavailable');
+     const endpoint = providerEndpoint(resolveASRBaseUrl('qwen-asr'));
+     const policy = SUBJECT_POLICIES[input.subject];
++    const audioMs = paidBudgetContext.getStore() ? pcmWavDurationMs(bytes) : 0;
++    const providerBody = await budgetedOperation('qwen-asr', 'qwen3-asr-flash', input,
++      { calls: 1, audio_ms: audioMs }, async () => {
+     const response = await fetchProvider(fetchImpl, endpoint, {
+       method: 'POST',
+       headers: {
+@@ -1033,7 +1041,8 @@
+       }),
+     });
+     if (!response.ok) throw new OperationalFailure('failed', 'provider_rejected');
+-    const providerBody = await readProviderJson(response);
++    return readProviderJson(response);
++    });
+     const output = providerBody.output as Record<string, unknown> | undefined;
+     const choices = output?.choices;
+     const first = Array.isArray(choices) ? choices[0] : undefined;
+diff --git a/app/api/chat/route.ts b/app/api/chat/route.ts
+--- a/app/api/chat/route.ts
++++ b/app/api/chat/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ /**
+  * Stateless Chat API Endpoint
+  *
+@@ -46,6 +47,9 @@
+  * Response: SSE stream of StatelessEvent
+  */
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   const encoder = new TextEncoder();
+   let chatModel: string | undefined;
+   let chatMessageCount: number | undefined;
+diff --git a/app/api/chat/pi/route.ts b/app/api/chat/pi/route.ts
+--- a/app/api/chat/pi/route.ts
++++ b/app/api/chat/pi/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest, hasRequiredTeachingBudget } from '@/lib/server/mira-paid-budget';
+ /**
+  * Pi Director Chat API Endpoint
+  *
+@@ -35,7 +36,10 @@
+ export const maxDuration = 300;
+ 
+ export async function POST(req: NextRequest) {
+-  if (!isPiChatEnabled()) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
++  if (!isPiChatEnabled() && !(await hasRequiredTeachingBudget())) {
+     return apiError('INVALID_REQUEST', 404, 'Pi chat runtime is disabled');
+   }
+ 
+diff --git a/app/api/generate/tts/route.ts b/app/api/generate/tts/route.ts
+--- a/app/api/generate/tts/route.ts
++++ b/app/api/generate/tts/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ /**
+  * Single TTS Generation API
+  *
+@@ -32,6 +33,9 @@
+ export const maxDuration = 30;
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   let ttsProviderId: string | undefined;
+   let ttsVoice: string | undefined;
+   let audioId: string | undefined;
+diff --git a/app/api/transcription/route.ts b/app/api/transcription/route.ts
+--- a/app/api/transcription/route.ts
++++ b/app/api/transcription/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ import { NextRequest } from 'next/server';
+ import { transcribeAudio } from '@/lib/audio/asr-providers';
+ import {
+@@ -27,6 +28,9 @@
+ export const maxDuration = 60;
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   let resolvedProviderId: string | undefined;
+   let resolvedModelId: string | undefined;
+   const miraRuntime = isMiraRuntimeRequest(req.headers);
+diff --git a/app/api/quiz-grade/route.ts b/app/api/quiz-grade/route.ts
+--- a/app/api/quiz-grade/route.ts
++++ b/app/api/quiz-grade/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ /**
+  * Quiz Grading API
+  *
+@@ -26,6 +27,9 @@
+ }
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   let questionSnippet: string | undefined;
+   let resolvedPoints: number | undefined;
+   try {
+diff --git a/app/api/mira/formal-audio/tts/route.ts b/app/api/mira/formal-audio/tts/route.ts
+--- a/app/api/mira/formal-audio/tts/route.ts
++++ b/app/api/mira/formal-audio/tts/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ import type { NextRequest } from 'next/server';
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import {
+@@ -45,6 +46,9 @@
+ }
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   try {
+     authorizeMiraFormalAudioRequest(req);
+     const result = await executeMiraFormalTts(await req.json());
+diff --git a/app/api/mira/formal-audio/asr/route.ts b/app/api/mira/formal-audio/asr/route.ts
+--- a/app/api/mira/formal-audio/asr/route.ts
++++ b/app/api/mira/formal-audio/asr/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ import type { NextRequest } from 'next/server';
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import {
+@@ -35,6 +36,9 @@
+ }
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   try {
+     authorizeMiraFormalAudioRequest(req);
+     const result = await executeMiraFormalAsr(await req.json());
+diff --git a/app/api/mira/courseware-provider-call/route.ts b/app/api/mira/courseware-provider-call/route.ts
+--- a/app/api/mira/courseware-provider-call/route.ts
++++ b/app/api/mira/courseware-provider-call/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ import type { NextRequest } from 'next/server';
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import {
+@@ -10,6 +11,9 @@
+ export const maxDuration = 360;
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   try {
+     authorizeMiraCoursewareProviderRequest(req);
+     return apiSuccess({ ...(await executeMiraCoursewareProvider(await req.json())) });
+diff --git a/app/api/pbl/v2/evaluate/route.ts b/app/api/pbl/v2/evaluate/route.ts
+--- a/app/api/pbl/v2/evaluate/route.ts
++++ b/app/api/pbl/v2/evaluate/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ /**
+  * POST /api/pbl/v2/evaluate
+  *
+@@ -55,6 +56,9 @@
+ }
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   let body: EvaluateRequest;
+   try {
+     body = (await req.json()) as EvaluateRequest;
+diff --git a/app/api/pbl/v2/instructor/route.ts b/app/api/pbl/v2/instructor/route.ts
+--- a/app/api/pbl/v2/instructor/route.ts
++++ b/app/api/pbl/v2/instructor/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ /**
+  * POST /api/pbl/v2/instructor
+  *
+@@ -36,6 +37,9 @@
+ }
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   let body: InstructorRequest;
+   try {
+     body = (await req.json()) as InstructorRequest;
+diff --git a/app/api/pbl/v2/open-task/route.ts b/app/api/pbl/v2/open-task/route.ts
+--- a/app/api/pbl/v2/open-task/route.ts
++++ b/app/api/pbl/v2/open-task/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ /**
+  * POST /api/pbl/v2/open-task
+  *
+@@ -38,6 +39,9 @@
+ }
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   let body: OpenTaskRequest;
+   try {
+     body = (await req.json()) as OpenTaskRequest;
+diff --git a/app/api/pbl/v2/simulator/route.ts b/app/api/pbl/v2/simulator/route.ts
+--- a/app/api/pbl/v2/simulator/route.ts
++++ b/app/api/pbl/v2/simulator/route.ts
+@@ -1,3 +1,4 @@
++import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ /**
+  * POST /api/pbl/v2/simulator   (SCENARIO ONLY)
+  *
+@@ -37,6 +38,9 @@
+ }
+ 
+ export async function POST(req: NextRequest) {
++  return withPaidBudgetRequest(req, () => postWithBudget(req));
++}
++async function postWithBudget(req: NextRequest) {
+   let body: SimulatorRequest;
+   try {
+     body = (await req.json()) as SimulatorRequest;

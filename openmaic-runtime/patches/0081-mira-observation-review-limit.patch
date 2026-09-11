@@ -1,0 +1,197 @@
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -26,6 +26,7 @@
+   type InteractionDesignContext, type InteractionDesignReceipt,
+ } from './mira-formal-interaction-design';
+ import type { FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
++import { isPaidBudgetObservationMode } from './mira-paid-budget';
+ 
+ type JsonRecord = Record<string, unknown>;
+ const object = (value: unknown): value is JsonRecord =>
+@@ -46,7 +47,9 @@
+   issues: Array<{ sceneId: string; problem: string; repair: string }>;
+   receipt?: MiraTeachingQualityReceipt;
+   interactionDesign?: InteractionDesignReceipt;
+-  remainingReviewAttempts?: number;
++  /** null means the trusted accounting context disables the cumulative limit. */
++  remainingReviewAttempts?: number | null;
++  reviewAttemptLimitEnabled?: boolean;
+ }
+ interface ReviewReport {
+   status: 'passed' | 'needs_revision'; dimensions: QualityDimension[];
+@@ -141,12 +144,15 @@
+     throw new Error('FORMAL_QUALITY_REVIEW_GRANT_INVALID');
+ }
+ 
+-/** Three durable attempts per formal session. An unchanged snapshot reuses its
+- * result; resuming cannot silently spend another review call. */
++/** Keep every attempt; enforce the cumulative limit outside trusted observation
++ * mode. An unchanged snapshot never silently spends another review call. */
+ export async function reviewFormalCourse(
+   input: FormalQualityInput, signal?: AbortSignal, deps: QualityReviewDeps = {},
+ ): Promise<FormalQualityResult> {
+   if (signal?.aborted) throw new Error('FORMAL_QUALITY_ABORTED');
++  const observationMode = await isPaidBudgetObservationMode();
++  const remainingAttempts = (count: number) => observationMode ? null
++    : Math.max(0, MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts - count);
+   // Tool review and terminal promotion derive the same identity from the frozen brief.
+   const frozenDifficulty = input.teachingBrief.difficultyPolicy;
+   if (frozenDifficulty !== undefined) {
+@@ -209,8 +215,8 @@
+     const { reviewPromptVersion: _version, ...result } = cached;
+     const ledger = await readJson(join(folder, 'attempts.json'));
+     if (!Array.isArray(ledger)) throw new Error('FORMAL_QUALITY_LEDGER_INVALID');
+-    return { ...result, remainingReviewAttempts: Math.max(0,
+-      MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts - ledger.length) } as unknown as FormalQualityResult;
++    return { ...result, remainingReviewAttempts: remainingAttempts(ledger.length),
++      reviewAttemptLimitEnabled: !observationMode } as unknown as FormalQualityResult;
+   }
+   if (deps.cachedOnly) throw new Error('FORMAL_AUDIO_TAIL_NEW_REVIEW_FORBIDDEN');
+   const lockPath = join(folder, 'review.lock');
+@@ -236,7 +242,7 @@
+     const existingAttempt = attempts.find(item => object(item) && item.snapshotSha256 === snapshotSha256);
+     if (existingAttempt && !recheckUnsent && !grant)
+       throw new Error('FORMAL_QUALITY_PRIOR_ATTEMPT_UNRESOLVED');
+-    if (!recheckUnsent && !grant && attempts.length >= MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts)
++    if (!observationMode && !recheckUnsent && !grant && attempts.length >= MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts)
+       throw new Error('FORMAL_QUALITY_REPAIR_BUDGET_EXHAUSTED');
+     if (recheckUnsent) {
+       const priorBrowser = await readJson(join(folder, `${snapshotSha256}-browser.json`));
+@@ -371,8 +377,8 @@
+       // remaining audio/publication tail. Failed old evidence is never relabeled.
+       if (grant && result.status === 'passed') await save(resultPath, stored);
+       await save(ledgerPath, attempts);
+-      return { ...result, remainingReviewAttempts: Math.max(0,
+-        MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts - attempts.length) };
++      return { ...result, remainingReviewAttempts: remainingAttempts(attempts.length),
++        reviewAttemptLimitEnabled: !observationMode };
+     } catch (error) {
+       attempt.status = 'failed';
+       await save(ledgerPath, attempts);
+@@ -389,7 +395,7 @@
+   return [{
+     name: 'review_course_quality', label: 'Review teaching and page quality',
+     executionMode: 'sequential',
+-    description: 'Required before finishing this formal course. Actually render every page at two viewports, exercise local interactions and independently review grade fit and teaching. Repair reported pages using Pro edit tools, then rerun. At most three distinct snapshots can be reviewed.',
++    description: 'Required before finishing this formal course. Actually render every page at two viewports, exercise local interactions and independently review grade fit and teaching. Repair reported pages using Pro edit tools, then rerun. The trusted accounting policy controls the cumulative review limit; null remainingReviewAttempts means observation mode has no cumulative limit. Unchanged snapshots reuse their recorded result.',
+     parameters: params,
+     async execute(_id, input, signal) {
+       if ((await deps.stageAccess(input.stageId)).kind !== 'owned') throw new Error('FORMAL_QUALITY_STAGE_NOT_OWNED');
+@@ -410,6 +416,7 @@
+         snapshotSha256: result.snapshotSha256, issues: result.issues,
+         receiptSha256: result.receipt?.receiptSha256,
+         remainingReviewAttempts: result.remainingReviewAttempts,
++        reviewAttemptLimitEnabled: result.reviewAttemptLimitEnabled,
+         ...(exhausted ? { errorCode: 'FORMAL_QUALITY_REPAIR_BUDGET_EXHAUSTED' } : {}),
+         ...(result.status === 'needs_revision' && !exhausted ? {
+           repairContext: await prepareMiraFormalRepairSkillContext(deps.ownerId, doc.scenes, result.issues),
+diff --git a/tests/server/mira-formal-teaching-quality.test.ts b/tests/server/mira-formal-teaching-quality.test.ts
+--- a/tests/server/mira-formal-teaching-quality.test.ts
++++ b/tests/server/mira-formal-teaching-quality.test.ts
+@@ -23,11 +23,13 @@
+ import fixtures from '../fixtures/mira-formal-skill-selection-v2.json';
+ import { reviewFormalVisualSnapshot } from '@/lib/server/mira-formal-visual-review';
+ import { MIRA_INTERACTION_DESIGN_POLICY } from '@/lib/server/mira-formal-interaction-design';
++import { isPaidBudgetObservationMode } from '@/lib/server/mira-paid-budget';
+ 
+ // This suite exercises the real receipt/cache/budget boundary without launching
+ // browsers or a model. Inspector/provider outcomes are explicit per test.
+ vi.mock('@/lib/server/mira-formal-visual-review', () => ({ reviewFormalVisualSnapshot: vi.fn() }));
+ vi.mock('@/lib/server/mira-formal-scene-inspector', () => ({ inspectFormalScene: vi.fn() }));
++vi.mock('@/lib/server/mira-paid-budget', () => ({ isPaidBudgetObservationMode: vi.fn() }));
+ vi.mock('@/lib/server/mira-courseware-provider', () => ({
+   MIRA_COURSEWARE_PROVIDER_SCHEMA: 'mira.openmaic.courseware-provider-call.v1',
+   executeMiraCoursewareProvider: vi.fn(),
+@@ -122,6 +124,7 @@
+ }
+ let cacheRoot: string;
+ beforeEach(async () => {
++  vi.mocked(isPaidBudgetObservationMode).mockReset().mockResolvedValue(false);
+   cacheRoot = await mkdtemp(join(tmpdir(), 'formal-quality-test-'));
+ });
+ afterEach(async () => {
+@@ -462,6 +465,7 @@
+       });
+       const result = await reviewFormalCourse(value, undefined, deps);
+       expect(result.remainingReviewAttempts).toBe(3 - attempt);
++      expect(result.reviewAttemptLimitEnabled).toBe(true);
+     }
+     value.scenes[0]!.title = 'revision 4';
+     await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('BUDGET_EXHAUSTED');
+@@ -475,6 +479,65 @@
+     ]);
+   });
+ 
++  it('uses trusted observation mode for further changed snapshots without resetting the attempt ledger', async () => {
++    vi.mocked(isPaidBudgetObservationMode).mockResolvedValue(true);
++    const value = input();
++    const deps = { ...mocks(value), cacheRoot };
++    let firstThree: unknown;
++    for (let attempt = 1; attempt <= 4; attempt += 1) {
++      value.scenes[0]!.title = `observed revision ${attempt}`;
++      const result = await reviewFormalCourse(value, undefined, deps);
++      expect(result.remainingReviewAttempts).toBeNull();
++      expect(result.reviewAttemptLimitEnabled).toBe(false);
++      const ledger = JSON.parse(await readFile(join(await folder(), 'attempts.json'), 'utf8'));
++      expect(ledger).toHaveLength(attempt);
++      if (attempt === 3) firstThree = structuredClone(ledger);
++      if (attempt === 4) expect(ledger.slice(0, 3)).toEqual(firstThree);
++    }
++    const cached = await reviewFormalCourse(value, undefined, deps);
++    expect(cached.remainingReviewAttempts).toBeNull();
++    expect(cached.reviewAttemptLimitEnabled).toBe(false);
++    expect(deps.provider).toHaveBeenCalledTimes(4);
++    // The flag is read from the current trusted context, never persisted into
++    // the quality receipt or inferred from the length of an existing ledger.
++    vi.mocked(isPaidBudgetObservationMode).mockResolvedValue(false);
++    const limited = await reviewFormalCourse(value, undefined, deps);
++    expect(limited.remainingReviewAttempts).toBe(0);
++    expect(limited.reviewAttemptLimitEnabled).toBe(true);
++    expect(deps.provider).toHaveBeenCalledTimes(4);
++  });
++
++  it('retains real browser rejection in observation mode without reporting exhausted attempts', async () => {
++    vi.mocked(isPaidBudgetObservationMode).mockResolvedValue(true);
++    const value = input();
++    const deps = { ...mocks(value), cacheRoot };
++    const inspect = deps.inspect.getMockImplementation()!;
++    deps.inspect.mockImplementation(async (...args) => ({
++      ...await inspect(...args), passed: false, issues: ['text overflow'],
++    }));
++    for (let attempt = 1; attempt <= 4; attempt += 1) {
++      value.scenes[0]!.title = `overflow revision ${attempt}`;
++      const result = await reviewFormalCourse(value, undefined, deps);
++      expect(result.status).toBe('needs_revision');
++      expect(result.issues[0]!.problem).toContain('text overflow');
++      expect(result.receipt).toBeUndefined();
++      expect(result.remainingReviewAttempts).toBeNull();
++      expect(result.remainingReviewAttempts === 0).toBe(false);
++    }
++    expect(deps.provider).not.toHaveBeenCalled();
++    expect(JSON.parse(await readFile(join(await folder(), 'attempts.json'), 'utf8'))).toHaveLength(4);
++  });
++
++  it('does not infer observation mode when the trusted accounting context is unavailable', async () => {
++    vi.mocked(isPaidBudgetObservationMode).mockRejectedValue(new Error('MIRA_PAID_BUDGET_CONTEXT_REJECTED'));
++    const value = input();
++    const deps = { ...mocks(value), cacheRoot };
++    await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('MIRA_PAID_BUDGET_CONTEXT_REJECTED');
++    expect(deps.inspect).not.toHaveBeenCalled();
++    expect(deps.provider).not.toHaveBeenCalled();
++    expect(await readdir(cacheRoot)).toEqual([]);
++  });
++
+   it('rejects an older reviewer cache without resetting the budget or redispatching', async () => {
+     const value = input();
+     const deps = { ...mocks(value), cacheRoot };
+@@ -516,7 +579,8 @@
+     expect(deps.provider).toHaveBeenCalledOnce();
+   });
+ 
+-  it('does not repeat an ambiguous failed provider attempt after resume of the same snapshot', async () => {
++  it.each([false, true])('does not repeat an ambiguous failed provider attempt after resume of the same snapshot (observation=%s)', async (observation) => {
++    vi.mocked(isPaidBudgetObservationMode).mockResolvedValue(observation);
+     const value = input();
+     const deps = { ...mocks(value), cacheRoot };
+     deps.provider.mockRejectedValue(new Error('connection ended after dispatch'));

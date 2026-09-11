@@ -1,0 +1,187 @@
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -11,21 +11,92 @@
+ import { inspectFormalScene } from '../lib/server/mira-formal-scene-inspector';
+ import { CLASSROOM_JOBS_DIR, writeJsonFileAtomic } from '../lib/server/classroom-storage';
+ import type { ClassroomGenerationJob } from '../lib/server/classroom-job-store';
+-import { assertMiraFormalAudioProviderReady, readMiraFormalAsrJob, readMiraFormalTtsJob,
++import { assertMiraFormalAudioProviderReady, readMiraFormalAsrJob, readMiraFormalTtsJob, readMiraFormalTtsAsset,
+   executeMiraFormalAsr, type MiraFormalAsrRequest } from '../lib/server/mira-formal-audio';
+-import { prepareMiraFormalSpeechText, prepareMiraFormalAsrComparisonText,
++import { prepareMiraFormalSpeechText, prepareMiraFormalAsrComparisonText, miraFormalAudioClassroomContentSha256,
+   normalizeMiraFormalAsrText, miraFormalAsrSimilarityBps } from '../lib/server/mira-formal-audio-lifecycle';
+ import { acquireFormalQualityLock, type QualityLockLease } from '../lib/server/mira-formal-quality-lock';
+ import { repairMiraFormalAudioSegment } from '../lib/server/mira-formal-audio-repair';
+ import type { FormalQualityReviewGrant } from '../lib/server/mira-formal-teaching-quality';
+ import { claimUnsentBrowserRecheck } from '../lib/server/mira-formal-browser-recheck';
+-import { parsePaidBudget } from '../lib/server/mira-paid-budget';
++import { parsePaidBudget, withPaidBudget } from '../lib/server/mira-paid-budget';
+ import { revalidateSavedAsrComparison, readValidatedAsrComparison,
+   normalizeAsrComparisonReferences, asrComparisonClaimSha256,
+   type AsrComparisonReference } from '../lib/server/mira-formal-asr-revalidation';
+ 
+ const sha = (value: Buffer) => createHash('sha256').update(value).digest('hex');
+ let lease: QualityLockLease | undefined;
++
++/** Read-only proof of the actual repair1 promotion, not a manifest retry flag. */
++async function verifiedAudioRepair(value: unknown, prepared: Awaited<ReturnType<typeof prepareMiraFormalSavedStageRecovery>>) {
++  const reference = value as {asrRequestId: string; receiptSha256: string};
++  if (!reference || Object.keys(reference).sort().join(',') !== 'asrRequestId,receiptSha256' ||
++      !/^formal_asr_[a-f0-9]{48}$/.test(reference.asrRequestId) || !/^[a-f0-9]{64}$/.test(reference.receiptSha256))
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_REFERENCE_INVALID');
++  const root = process.env.MIRA_FORMAL_AUDIO_DATA_DIR || path.join(process.cwd(), 'data/formal-audio');
++  const directory = path.join(root, 'repairs', sha(Buffer.from(reference.asrRequestId)));
++  const source = JSON.parse(await fs.readFile(path.join(directory, 'source.json'), 'utf8'));
++  const journal = JSON.parse(await fs.readFile(path.join(directory, 'promotion.json'), 'utf8'));
++  const originalTts = source.tts;
++  const asrId = reference.asrRequestId;
++  const ttsId = asrId.replace(/^formal_asr_/, 'formal_tts_');
++  const scene = prepared.scenes.find(scene => scene.id === originalTts?.sceneId);
++  const action = scene?.actions?.find(action => action.id === originalTts?.actionId);
++  if (source.policy !== 'mira-single-narration-repair.v1' || (source.asrRequestId ?? source.asr?.requestId) !== asrId ||
++      !originalTts || originalTts.requestId !== ttsId || originalTts.classroomId !== prepared.stage.id ||
++      originalTts.classroomContentSha256 !== miraFormalAudioClassroomContentSha256(prepared.stage, prepared.scenes) ||
++      !action || action.type !== 'speech' || 'operatorRepair' in originalTts ||
++      qualitySha(journal) !== reference.receiptSha256)
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_SOURCE_INVALID');
++  const text = prepareMiraFormalSpeechText(action.text.trim(), originalTts.subject);
++  const knownBadAsr = source.asr && source.asr.state === 'succeeded' && Number.isSafeInteger(source.asr.similarityBps) &&
++    source.asr.similarityBps >= 0 && source.asr.similarityBps < 8500 && source.asr.ttsRequestId === ttsId &&
++    source.asr.audioSha256 === originalTts.audioSha256 && originalTts.state === 'succeeded';
++  const unknownOrFailedTts = !source.asr && ['failed', 'ambiguous'].includes(originalTts.state) && !originalTts.audioSha256;
++  if ((!knownBadAsr && !unknownOrFailedTts) || originalTts.textSha256 !== sha(Buffer.from(text)))
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_ORIGINAL_NOT_REJECTED');
++  const tts = await readMiraFormalTtsJob(`${ttsId}.repair1`);
++  const asr = await readMiraFormalAsrJob(`${asrId}.repair1`);
++  if (!tts || !asr || tts.state !== 'succeeded' || asr.state !== 'succeeded' ||
++      tts.requestId !== `${ttsId}.repair1` || asr.requestId !== `${asrId}.repair1` || asr.ttsRequestId !== tts.requestId ||
++      tts.providerId !== 'qwen-tts' || tts.modelId !== 'qwen3-tts-flash' || tts.fallbackUsed !== false ||
++      asr.providerId !== 'qwen-asr' || asr.modelId !== 'qwen3-asr-flash' || asr.fallbackUsed !== false ||
++      !Number.isSafeInteger(asr.similarityBps) || (asr.similarityBps ?? 0) < 8500 || (asr.similarityBps ?? 0) > 10000 ||
++      tts.audioSha256 !== asr.audioSha256)
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_PHYSICAL_INCOMPLETE');
++  const keys = ['classroomId', 'classroomContentSha256', 'subject', 'teacherProfileId',
++    'teacherProfileVersion', 'teacherProfileSha256', 'teacherGender', 'sceneId', 'sceneOrder', 'actionId', 'narrationSegmentId'] as const;
++  if (keys.some(key => tts[key] !== originalTts[key] || asr[key] !== originalTts[key]))
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_IDENTITY_CHANGED');
++  const identity = Object.fromEntries(keys.map(key => [key, originalTts[key]]));
++  const ttsRequest = {...identity, requestId: tts.requestId, text, textSha256: sha(Buffer.from(text))};
++  const asrRequest = {...identity, requestId: asr.requestId, ttsRequestId: tts.requestId, audioSha256: tts.audioSha256};
++  if (tts.requestSha256 !== qualitySha(ttsRequest) || asr.requestSha256 !== qualitySha(asrRequest))
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_REQUEST_CHANGED');
++  const asset = await readMiraFormalTtsAsset(tts.requestId);
++  const transcript = JSON.parse(await fs.readFile(path.join(root, 'transcripts', `${sha(Buffer.from(asr.requestId))}.json`), 'utf8'));
++  const actual = prepareMiraFormalAsrComparisonText(transcript.transcript, tts.subject);
++  if (qualitySha(asset.record) !== qualitySha(tts) || transcript.requestId !== asr.requestId ||
++      transcript.audioSha256 !== asr.audioSha256 || transcript.transcriptSha256 !== asr.transcriptSha256 ||
++      sha(Buffer.from(transcript.transcript)) !== asr.transcriptSha256 ||
++      sha(Buffer.from(normalizeMiraFormalAsrText(actual))) !== asr.normalizedTranscriptSha256 ||
++      miraFormalAsrSimilarityBps(prepareMiraFormalAsrComparisonText(text, tts.subject), actual) !== asr.similarityBps)
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_MEDIA_CHANGED');
++  const audit = {policy: source.policy, originalTtsSha256: qualitySha(originalTts),
++    originalAsrSha256: source.asr ? qualitySha(source.asr) : null, originalAudioSha256: source.asr?.audioSha256 ?? null,
++    physicalTtsRequestId: tts.requestId, physicalAsrRequestId: asr.requestId};
++  const promotedTts = {...tts, requestId: ttsId, requestSha256: originalTts.requestSha256,
++    createdAt: originalTts.createdAt, operatorRepair: audit};
++  const promotedAsr = {...asr, requestId: asrId, ttsRequestId: ttsId,
++    requestSha256: qualitySha({...asrRequest, requestId: asrId, ttsRequestId: ttsId}),
++    createdAt: source.asr?.createdAt ?? asr.createdAt, operatorRepair: audit};
++  if (qualitySha({...audit, tts: promotedTts, asr: promotedAsr}) !== reference.receiptSha256 ||
++      qualitySha(await readMiraFormalTtsJob(ttsId)) !== qualitySha(promotedTts) ||
++      qualitySha(await readMiraFormalAsrJob(asrId)) !== qualitySha(promotedAsr))
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_PROMOTION_CHANGED');
++  return {...reference, sourceSha256: qualitySha(source)};
++}
++
+ async function main() {
+   const [mode, manifestPath] = process.argv.slice(2);
+   if (!['prepare', 'inspect', 'complete', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
+@@ -54,9 +125,14 @@
+   const snapshotSha256 = qualitySha(qualitySnapshot(prepared.stage, prepared.scenes));
+   const identity = { sourceJobSha256: sha(source), sourceSnapshotSha256: manifest.sourceSnapshotSha256,
+     repairSnapshotSha256: snapshotSha256, sessionId: prepared.sessionId, stageId: prepared.stage.id };
++  const runPaidAudio = <T>(operation: 'repair1' | 'diagnostic1', requestId: string, work: () => Promise<T>) =>
++    withPaidBudget(parsePaidBudget(job.formalInput!.paidBudget),
++      `formal-saved-stage:${job.id}:${identity.sourceJobSha256}:${requestId}:${operation}`, work);
+   if (['revalidate-audio-comparison','complete-audio-comparison-tail'].includes(mode) &&
+       (manifest.reviewGrantPath || manifest.ttsSourceRequestId || manifest.browserRecheck))
+     throw new Error('SAVED_ASR_COMPARISON_CANNOT_MIX_RECOVERIES');
++  if (manifest.audioRepair && mode !== 'complete-audio-comparison-tail')
++    throw new Error('SAVED_STAGE_AUDIO_REPAIR_TAIL_ONLY');
+   if (mode === 'revalidate-audio-comparison') {
+     const receipt = await revalidateSavedAsrComparison({stage:prepared.stage,scenes:prepared.scenes,
+       binding:{sessionId:prepared.sessionId,stageId:prepared.stage.id,snapshotSha256,
+@@ -81,10 +157,10 @@
+     const action = prepared.scenes.flatMap(scene => scene.actions ?? []).find(action => action.id === prior?.actionId);
+     if (!prior || prior.classroomId !== prepared.stage.id || !action || action.type !== 'speech'
+         || !['failed', 'ambiguous'].includes(prior.state)) throw new Error('SAVED_STAGE_FAILED_TTS_SOURCE_INVALID');
+-    console.log(JSON.stringify(await repairMiraFormalAudioSegment({
++    console.log(JSON.stringify(await runPaidAudio('repair1', manifest.asrSourceRequestId, () => repairMiraFormalAudioSegment({
+       asrRequestId: manifest.asrSourceRequestId, ttsRequestId: prior.requestId,
+       expectedOriginalTtsRequestSha256: prior.requestSha256, classroomId: prepared.stage.id,
+-      text: prepareMiraFormalSpeechText(action.text, prior.subject), expectedOriginalAudioSha256: null })));
++      text: prepareMiraFormalSpeechText(action.text.trim(), prior.subject), expectedOriginalAudioSha256: null }))));
+     return;
+   }
+   if (mode === 'diagnose-audio' || mode === 'repair-audio') {
+@@ -94,12 +170,12 @@
+       throw new Error('SAVED_STAGE_AUDIO_DIAGNOSTIC_SOURCE_INVALID');
+     const action = prepared.scenes.flatMap(scene => scene.actions ?? []).find(action => action.id === prior.actionId);
+     if (!action || action.type !== 'speech') throw new Error('SAVED_STAGE_AUDIO_ACTION_MISSING');
+-    const expected = prepareMiraFormalSpeechText(action.text, prior.subject);
++    const expected = prepareMiraFormalSpeechText(action.text.trim(), prior.subject);
+     const tts = await readMiraFormalTtsJob(prior.ttsRequestId);
+     if (tts?.textSha256 !== sha(Buffer.from(expected))) throw new Error('SAVED_STAGE_AUDIO_TEXT_CHANGED');
+     if (mode === 'repair-audio') {
+-      console.log(JSON.stringify(await repairMiraFormalAudioSegment({ asrRequestId: prior.requestId,
+-        classroomId: prepared.stage.id, text: expected, expectedOriginalAudioSha256: prior.audioSha256 })));
++      console.log(JSON.stringify(await runPaidAudio('repair1', prior.requestId, () => repairMiraFormalAudioSegment({ asrRequestId: prior.requestId,
++        classroomId: prepared.stage.id, text: expected, expectedOriginalAudioSha256: prior.audioSha256 }))));
+       return;
+     }
+     const keys = ['ttsRequestId', 'classroomId', 'classroomContentSha256', 'subject',
+@@ -107,11 +183,11 @@
+       'sceneId', 'sceneOrder', 'actionId', 'narrationSegmentId', 'audioSha256'] as const;
+     const request = { requestId: `${prior.requestId}.diagnostic1`,
+       ...Object.fromEntries(keys.map(key => [key, prior[key]])) } as MiraFormalAsrRequest;
+-    const result = await executeMiraFormalAsr(request, { transcriptEvidence: transcript => {
++    const result = await runPaidAudio('diagnostic1', prior.requestId, () => executeMiraFormalAsr(request, { transcriptEvidence: transcript => {
+       const actual = prepareMiraFormalAsrComparisonText(transcript, prior.subject);
+       return { normalizedTranscriptSha256: sha(Buffer.from(normalizeMiraFormalAsrText(actual))),
+         similarityBps: miraFormalAsrSimilarityBps(prepareMiraFormalAsrComparisonText(expected, prior.subject), actual) };
+-    } });
++    } }));
+     await writeJsonFileAtomic(path.join(folder, 'audio-diagnostic.json'),
+       { originalAsrRequestId: prior.requestId, originalTranscriptSha256: prior.transcriptSha256,
+         expected, ...result });
+@@ -138,6 +214,7 @@
+     throw new Error('SAVED_STAGE_BROWSER_PREFLIGHT_REQUIRED');
+   let audioTailReceipt: string | undefined;
+   let asrComparisonRevalidation: AsrComparisonReference[] | undefined;
++  let audioRepair: Awaited<ReturnType<typeof verifiedAudioRepair>> | undefined;
+   if (mode === 'complete-audio-tail' || mode === 'complete-audio-comparison-tail') {
+     const qualityFolders = await fs.readdir(path.join(process.cwd(), 'data/formal-quality-reviews'));
+     let cachedPass = false;
+@@ -164,6 +241,13 @@
+         await readValidatedAsrComparison({reference,stage:prepared.stage,scenes:prepared.scenes});
+       asrComparisonRevalidation=references;
+       audioTailReceipt=asrComparisonClaimSha256(references);
++      if (manifest.audioRepair) {
++        const previous = JSON.parse(await fs.readFile(path.join(folder, `complete-${snapshotSha256}-audio-${audioTailReceipt}.claim`), 'utf8'));
++        if (Object.entries(identity).some(([key, value]) => previous[key] !== value))
++          throw new Error('SAVED_STAGE_AUDIO_REPAIR_PRIOR_CLAIM_CHANGED');
++        audioRepair = await verifiedAudioRepair(manifest.audioRepair, prepared);
++        audioTailReceipt = qualitySha({comparisonReceiptSha256: audioTailReceipt, audioRepair});
++      }
+     } else {
+     const repairedAsr = await readMiraFormalAsrJob(manifest.asrSourceRequestId);
+     if (!cachedPass || !repairedAsr || repairedAsr.classroomId !== prepared.stage.id
+@@ -210,6 +294,7 @@
+     ...(browserRecheckSha256 ? { browserRecheckSha256 } : {}),
+     ...(asrComparisonRevalidation ? { asrComparisonRevalidationReceiptSha256: audioTailReceipt,
+       asrComparisonRevalidationReceipts: asrComparisonRevalidation } : {}),
++    ...(audioRepair ? {audioRepair} : {}),
+     result: completion.result };
+   const receiptSha256 = qualitySha(receipt);
+   await writeJsonFileAtomic(path.join(folder, 'completion.json'), { ...receipt, receiptSha256 });

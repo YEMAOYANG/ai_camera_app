@@ -18,6 +18,8 @@ from content.primary_skill_boundaries import (
     PRIMARY_ONE_CONTENT_DATASET_SHA256,
     SUBJECT_LANGUAGE_POLICY_VERSION,
 )
+from content.formal_curriculum_registry import formal_content_validation_identity, require_formal_grade
+from content.formal_objective_rules import bounded_numeric_ast
 from core.errors import ApiError
 from integrations.openmaic_question_adapter import (
     PRIMARY_ONE_ADD_SUB_HOST_SOLVER,
@@ -586,12 +588,13 @@ class LearningGeneratedCourseValidator:
                 target=target,
                 skill_boundary=skill_boundary,
             )
-        except ApiError:
+        except ApiError as exc:
             return self._primary_one_rejected(
                 common_receipt,
                 checks,
                 issue="content",
                 fingerprint=self._safe_primary_one_fingerprint(course, target),
+                reason=exc.message if target.grade_code != "primary_1" else None,
             )
         except Exception as exc:
             raise PrimaryOneHostGateDependencyError(
@@ -1195,12 +1198,13 @@ class LearningGeneratedCourseValidator:
             == receipt.get("verifierProfileHash")
             else "isolated_request_distinct_profile"
         )
+        authority = formal_content_validation_identity(proof.target.grade_code)
         expected = {
-            "schemaVersion": PRIMARY_ONE_HOST_GATE_RECEIPT_SCHEMA_VERSION,
-            "validatorVersion": PRIMARY_ONE_HOST_GATE_VERSION,
-            "fingerprintVersion": PRIMARY_ONE_HOST_FINGERPRINT_VERSION,
-            "contentValidationContractVersion": CONTENT_VALIDATION_CONTRACT_VERSION,
-            "contentValidationDatasetSha256": PRIMARY_ONE_CONTENT_DATASET_SHA256,
+            "schemaVersion": authority["hostGateReceiptSchemaVersion"],
+            "validatorVersion": authority["hostGateVersion"],
+            "fingerprintVersion": authority["hostFingerprintVersion"],
+            "contentValidationContractVersion": authority["contentValidationContractVersion"],
+            "contentValidationDatasetSha256": authority["contentValidationDatasetSha256"],
             "subjectLanguagePolicyVersion": SUBJECT_LANGUAGE_POLICY_VERSION,
             "courseId": immutable_course.get("id"),
             "courseVersion": immutable_course.get("version"),
@@ -1211,6 +1215,7 @@ class LearningGeneratedCourseValidator:
             "boundaryOrdinal": proof.target.boundary_ordinal,
             "boundaryVersion": proof.target.boundary_version,
             "variantOrdinal": proof.target.variant_ordinal,
+            **({"difficultyCode": proof.target.difficulty_code} if proof.target.grade_code != "primary_1" else {}),
             "instructionLanguageCode": proof.target.instruction_language_code,
             "targetLanguageCode": proof.target.target_language_code,
             "verificationIsolation": expected_isolation,
@@ -1291,11 +1296,12 @@ class LearningGeneratedCourseValidator:
                 path="candidateCourse.content.questions",
             )
         payload = {
-            "schemaVersion": PRIMARY_ONE_HOST_FINGERPRINT_PAYLOAD_SCHEMA_VERSION,
+            "schemaVersion": formal_content_validation_identity(target.grade_code)["hostFingerprintPayloadSchemaVersion"],
             "gradeCode": target.grade_code,
             "subject": target.subject,
             "skillId": target.skill_id,
             "boundaryVersion": target.boundary_version,
+            **({"difficultyCode": target.difficulty_code} if target.grade_code != "primary_1" else {}),
             "questions": sorted(
                 normalized_questions, key=lambda item: self._canonical_json(item)
             ),
@@ -1346,10 +1352,11 @@ class LearningGeneratedCourseValidator:
         ):
             if not isinstance(value, str) or not value.strip() or len(value) > maximum:
                 raise PrimaryOneHostGateControlError(f"{label} identity drift")
+        authority = formal_content_validation_identity(target.grade_code)
         fixed = {
             "curriculum_version": PRIMARY_CURRICULUM_VERSION,
-            "content_validation_contract_version": CONTENT_VALIDATION_CONTRACT_VERSION,
-            "content_validation_dataset_sha256": PRIMARY_ONE_CONTENT_DATASET_SHA256,
+            "content_validation_contract_version": authority["contentValidationContractVersion"],
+            "content_validation_dataset_sha256": authority["contentValidationDatasetSha256"],
             "subject_language_policy_version": SUBJECT_LANGUAGE_POLICY_VERSION,
         }
         for field, expected in fixed.items():
@@ -1358,8 +1365,7 @@ class LearningGeneratedCourseValidator:
         for field in ("generator_profile_hash", "verifier_profile_hash"):
             if not self._is_sha256(getattr(identity, field)):
                 raise PrimaryOneHostGateControlError(f"host identity digest drift: {field}")
-        if target.grade_code != "primary_1":
-            raise PrimaryOneHostGateControlError("host target grade drift")
+        require_formal_grade(target.grade_code)
 
     def _validate_primary_one_profile(
         self,
@@ -1949,12 +1955,13 @@ class LearningGeneratedCourseValidator:
         candidate_course_sha256: str,
         sidecar_evidence_sha256: str,
     ) -> dict[str, object]:
+        authority = formal_content_validation_identity(target.grade_code)
         return {
-            "schemaVersion": PRIMARY_ONE_HOST_GATE_RECEIPT_SCHEMA_VERSION,
-            "validatorVersion": PRIMARY_ONE_HOST_GATE_VERSION,
-            "fingerprintVersion": PRIMARY_ONE_HOST_FINGERPRINT_VERSION,
-            "contentValidationContractVersion": CONTENT_VALIDATION_CONTRACT_VERSION,
-            "contentValidationDatasetSha256": PRIMARY_ONE_CONTENT_DATASET_SHA256,
+            "schemaVersion": authority["hostGateReceiptSchemaVersion"],
+            "validatorVersion": authority["hostGateVersion"],
+            "fingerprintVersion": authority["hostFingerprintVersion"],
+            "contentValidationContractVersion": authority["contentValidationContractVersion"],
+            "contentValidationDatasetSha256": authority["contentValidationDatasetSha256"],
             "subjectLanguagePolicyVersion": SUBJECT_LANGUAGE_POLICY_VERSION,
             "catalogItemId": identity.catalog_item_id,
             "logicalAttempt": identity.logical_attempt,
@@ -1970,6 +1977,7 @@ class LearningGeneratedCourseValidator:
             "boundaryOrdinal": target.boundary_ordinal,
             "boundaryVersion": target.boundary_version,
             "variantOrdinal": target.variant_ordinal,
+            **({"difficultyCode": target.difficulty_code} if target.grade_code != "primary_1" else {}),
             "instructionLanguageCode": target.instruction_language_code,
             "targetLanguageCode": target.target_language_code,
             "finalProviderPhase": evidence.final_phase,
@@ -1993,13 +2001,17 @@ class LearningGeneratedCourseValidator:
         *,
         issue: str,
         fingerprint: str,
+        reason: str | None = None,
     ) -> PrimaryOneHostGateResult:
+        issue_payload = copy.deepcopy(_PRIMARY_ONE_ISSUES[issue])
+        if common_receipt.get("gradeCode") != "primary_1" and reason:
+            issue_payload["message"] = " ".join(str(reason).split())[:400]
         receipt = {
             **dict(common_receipt),
             "hostContentFingerprint": fingerprint,
             "outcome": "rejected",
             "checksPassed": list(checks),
-            "issues": [copy.deepcopy(_PRIMARY_ONE_ISSUES[issue])],
+            "issues": [issue_payload],
         }
         self._assert_primary_one_receipt_shape(receipt)
         return PrimaryOneHostGateResult(
@@ -2010,7 +2022,7 @@ class LearningGeneratedCourseValidator:
         )
 
     def _assert_primary_one_receipt_shape(self, receipt: Mapping[str, object]) -> None:
-        if not isinstance(receipt, Mapping) or set(receipt) != set(_PRIMARY_ONE_RECEIPT_KEYS):
+        if not isinstance(receipt, Mapping) or set(receipt) != (_PRIMARY_ONE_RECEIPT_KEYS | ({"difficultyCode"} if receipt.get("gradeCode") != "primary_1" else set())):
             raise PrimaryOneHostGateControlError("Host receipt field drift")
         checks = receipt.get("checksPassed")
         if (
@@ -2121,10 +2133,13 @@ class LearningGeneratedCourseValidator:
                 answer = self._primary_one_decimal_text(
                     Decimal(str(question.get("answer") or "").replace(",", ""))
                 )
-                numeric_ast = self.catalog_validator.primary_one_numeric_ast(
-                    str(question.get("verificationExpression") or "")
+                expression = str(question.get("verificationExpression") or "")
+                numeric_ast = (
+                    self.catalog_validator.primary_one_numeric_ast(expression)
+                    if target.grade_code == "primary_1" else
+                    bounded_numeric_ast(expression, mode="derived_measurement")[1]
                 )
-            except (InvalidOperation, ApiError) as exc:
+            except (InvalidOperation, ApiError, ValueError, SyntaxError) as exc:
                 self._fail(
                     "invalid_primary_one_fingerprint",
                     "Formal numeric semantics are invalid.",
@@ -2333,7 +2348,7 @@ class LearningGeneratedCourseValidator:
                 "candidate.content must be an object.",
                 path="candidate.content",
             )
-        self._exact_keys(content, _CONTENT_KEYS, "candidate.content")
+        self._exact_keys(content, _CONTENT_KEYS | ({"difficultyCode"} if course.get("gradeCode") != "primary_1" else set()), "candidate.content")
         fixed = {
             "schemaVersion": COURSE_SCHEMA_VERSION,
             "sessionKind": "lesson",

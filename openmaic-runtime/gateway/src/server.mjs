@@ -14,6 +14,10 @@ const SAFE_API_PATHS = new Set([
   "/api/transcription",
   "/api/quiz-grade",
 ]);
+const PAID_API_PATHS = new Set([
+  '/api/chat', '/api/chat/pi', '/api/generate/tts', '/api/transcription', '/api/quiz-grade',
+  '/api/pbl/v2/evaluate', '/api/pbl/v2/instructor', '/api/pbl/v2/open-task', '/api/pbl/v2/simulator',
+]);
 const PUBLIC_ASSET_PREFIXES = [
   "/_next/",
   "/avatars/",
@@ -34,6 +38,10 @@ const BLOCKED_LEGACY_BRAND_ASSET_PATHS = new Set([
 // hot-update payload can enter an active classroom.
 const NEXT_DEVELOPMENT_ASSET_PATTERN = /(?:hmr|hot-update|react(?:_|-)refresh)/i;
 const SECRET_KEYS = new Set([
+  "mirateachingcontext",
+  "paidbudget",
+  "paidbudgets",
+  "authorizationid",
   "apikey",
   "api_key",
   "ttsapikey",
@@ -184,6 +192,7 @@ export function prepareRuntimeEvent(raw, runtime) {
     action_completed: ["actionId", "sceneId", "sceneIndex"],
     answer_submitted: ["attemptNumber", "questionId", "response", "sceneId", "sceneIndex"],
     asr_transcribed: ["sceneId", "sceneIndex", "transcript", "turnId"],
+    interaction_completed: ["action", "controlSelector", "feedbackText", "objectiveIndex", "sceneId", "sceneIndex", "value"],
     classroom_completed: ["sceneId", "sceneIndex"],
   };
   const expectedFields = fieldsByType[input.type];
@@ -228,6 +237,14 @@ export function prepareRuntimeEvent(raw, runtime) {
   ) {
     return invalidRuntimeEvent();
   }
+  if (input.type === "interaction_completed" && (
+    !Number.isInteger(payload.objectiveIndex) || payload.objectiveIndex < 0 || payload.objectiveIndex >= 30 ||
+    typeof payload.controlSelector !== "string" || !/^#[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(payload.controlSelector) ||
+    !["click", "fill", "range", "select"].includes(payload.action) ||
+    typeof payload.value !== "string" || payload.value.length > 500 ||
+    (payload.action === "click" && payload.value !== "") ||
+    typeof payload.feedbackText !== "string" || !payload.feedbackText.trim() || payload.feedbackText.length > 2000
+  )) return invalidRuntimeEvent();
   if (!runtime.runtimeSessionId || !runtime.learningSessionId || !runtime.classroomId) {
     const error = new Error("runtime identity incomplete");
     error.statusCode = 401;
@@ -445,7 +462,7 @@ export function authorizeRuntimeRequest(request, url, runtime) {
 }
 
 async function proxyToUpstream(request, response, url, runtime, config, decision) {
-  const upstreamUrl = new URL(url.pathname + url.search, `${config.upstreamUrl}/`);
+  let upstreamUrl = new URL(url.pathname + url.search, `${config.upstreamUrl}/`);
   let body;
   const method = String(request.method || "GET").toUpperCase();
   if (!["GET", "HEAD"].includes(method)) {
@@ -463,6 +480,37 @@ async function proxyToUpstream(request, response, url, runtime, config, decision
   if (runtime.purpose === "conversation_probe") {
     headers.set("x-mira-runtime-purpose", "conversation_probe");
     headers.set("x-mira-verification-challenge", String(runtime.challenge));
+  }
+  if (method === "POST" && PAID_API_PATHS.has(url.pathname) && runtime.purpose !== "conversation_probe" && runtime.paidBudgets !== undefined) {
+    let paidRequest;
+    if (isJsonRequest(request)) {
+      try { paidRequest = JSON.parse(body.toString("utf8")); }
+      catch { throw Object.assign(new Error("budget request JSON invalid"), { statusCode: 400 }); }
+    } else {
+      paidRequest = { audioSha256: createHash("sha256").update(body).digest("hex"), sizeBytes: body.length };
+    }
+    const admitted = await backendJson(config, "/internal/learning/openmaic/runtime/paid-call", {
+      path: url.pathname, request: paidRequest,
+    }, trustedRuntimeHeaders(runtime));
+    if (admitted.upstreamPath !== undefined) {
+      if (!['/api/chat', '/api/chat/pi'].includes(url.pathname)
+          || admitted.upstreamPath !== '/api/chat/pi' || admitted.purpose !== 'required_teaching')
+        throw Object.assign(new Error('paid request routing invalid'), {statusCode:502});
+      upstreamUrl = new URL('/api/chat/pi', `${config.upstreamUrl}/`);
+    }
+    const binding = admitted.paidBudget;
+    if (!admitted.ok || !binding || binding.schemaVersion !== "mira.learning.paid-budget-binding.v1"
+        || binding.required !== true || !/^[a-f0-9]{64}$/.test(binding.authorizationId))
+      throw Object.assign(new Error("paid interaction unavailable"), { statusCode: 503,
+        payload: { error: "learning_budget_unavailable", message: "互动暂时不可用，已经准备好的课程可以继续学习。" } });
+    if (admitted.request !== undefined) {
+      if (!isJsonRequest(request) || !admitted.request || typeof admitted.request !== "object")
+        throw Object.assign(new Error("budget canonical request invalid"), { statusCode: 502 });
+      body = Buffer.from(JSON.stringify(admitted.request));
+    }
+    headers.set("x-mira-paid-budget-required", "1");
+    headers.set("x-mira-paid-budget-authorization", binding.authorizationId);
+    headers.set("x-mira-internal-token", config.internalToken);
   }
   headers.set("x-forwarded-host", new URL(config.publicOrigin).host);
   headers.set("x-forwarded-proto", new URL(config.publicOrigin).protocol.replace(":", ""));

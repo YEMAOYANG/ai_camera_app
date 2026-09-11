@@ -1,0 +1,434 @@
+diff --git a/lib/server/mira-formal-budget-resume.ts b/lib/server/mira-formal-budget-resume.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-budget-resume.ts
+@@ -0,0 +1,335 @@
++/** Resume the reviewed budget rejection after research, preserving its original session. */
++import { createHash } from 'node:crypto';
++import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
++import { join, resolve } from 'node:path';
++import { PgAgentSessionStore } from '@openmaic/storage/agent-session/pg';
++import { getServerPersistenceProvider } from '@/lib/persistence/server-provider';
++import { CLASSROOM_JOBS_DIR } from './classroom-storage';
++import { assertMiraFormalGenerationInput } from './mira-formal-generation-policy';
++import { parsePaidBudget, readSessionPaidBudget } from './mira-paid-budget';
++import { resolveServerWebSearchProviderId } from './provider-config';
++import { getMiraWebSearchProductionConfig } from './mira-web-search-production-config';
++
++export const BUDGET_RESUME_JOB = 'omformal_d57c133cbf917beb4cb30bb0';
++export const BUDGET_RESUME_SESSION =
++  'miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e';
++const SOURCE_ERROR = 'MIRA_PAID_BUDGET_RESERVE_REJECTED_AUTHORIZATION_LIMIT';
++const EVENT = 'mira_formal_budget_resume';
++const schemaVersion = 'mira.openmaic.budget-resume.v1';
++const canonical = (value: unknown): string =>
++  JSON.stringify(value, (_key, v) =>
++    v && typeof v === 'object' && !Array.isArray(v)
++      ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
++      : v,
++  );
++const sha = (value: unknown) =>
++  createHash('sha256')
++    .update(typeof value === 'string' ? value : canonical(value))
++    .digest('hex');
++const fail = (): never => {
++  throw new Error('FORMAL_BUDGET_RESUME_SOURCE_MISMATCH');
++};
++
++export function validateBudgetResumeHistory(source: {
++  job: any;
++  session: any;
++  events: any[];
++  entries: any[];
++  stageCount: number;
++  sceneCount: number;
++}) {
++  const { job, session, events, entries } = source;
++  if (
++    job.id !== BUDGET_RESUME_JOB ||
++    job.status !== 'failed' ||
++    job.error !== `FORMAL_PROFESSIONAL_SESSION_FAILED:${SOURCE_ERROR}` ||
++    session.id !== BUDGET_RESUME_SESSION ||
++    session.status !== 'failed' ||
++    session.error !== SOURCE_ERROR ||
++    Number(session.attempt) !== 2 ||
++    session.active_stage_id ||
++    source.stageCount ||
++    source.sceneCount ||
++    !job.completedAt ||
++    job.result ||
++    !job.formalInput
++  )
++    fail();
++  assertMiraFormalGenerationInput(job.formalInput);
++  if (
++    sha(job.formalInput) !== job.formalInputSha256 ||
++    `miraformal_${sha(`${job.runtimeRequestId}\n${canonical(job.formalInput)}`)}` !== session.id ||
++    session.owner_id !== `mira-formal-professional:${session.id.slice(11)}`
++  )
++    fail();
++  const contract = JSON.parse(job.formalInput.requirement);
++  const course = contract.teachingBrief?.course;
++  if (
++    course?.gradeCode !== 'primary_6' ||
++    course.subject !== 'math' ||
++    course.skillId !== 'fraction_ratio_percentage' ||
++    course.difficultyCode !== 'standard' ||
++    contract.runtimeRequestId !== job.runtimeRequestId
++  )
++    fail();
++  const starts = events.filter((e) => e.type === 'tool_execution_start');
++  const ends = events.filter((e) => e.type === 'tool_execution_end');
++  const searches = starts.filter((e) => e.data?.toolName === 'web_search');
++  const fetches = starts.filter((e) => e.data?.toolName === 'fetch_url');
++  const research = events.filter((e) => e.type === 'mira_formal_research_search');
++  if (
++    starts.length !== 12 ||
++    ends.length !== 12 ||
++    searches.length !== 4 ||
++    fetches.length !== 1 ||
++    starts.filter((e) => e.data?.toolName === 'read').length !== 7 ||
++    research.length !== 1 ||
++    research[0].data?.providerId !== 'baidu' ||
++    Number(research[0].data?.resultCount) < 1 ||
++    !job.prestageRecovery ||
++    events.filter((e) => e.type === 'mira_formal_prestage_recovery').length !== 1 ||
++    events.some((e) =>
++      /stage_link|course_link|inspection|quality_review|budget_resume/.test(e.type),
++    )
++  )
++    fail();
++  for (const [index, search] of searches.entries()) {
++    const matching = ends.filter((e) => e.data?.toolCallId === search.data?.toolCallId);
++    if (matching.length !== 1 || matching[0].data?.isError !== index < 3) fail();
++  }
++  for (const start of starts.filter((e) => e.data?.toolName !== 'web_search')) {
++    const matching = ends.filter((e) => e.data?.toolCallId === start.data?.toolCallId);
++    if (matching.length !== 1 || matching[0].data?.isError !== false) fail();
++  }
++  const messages = entries
++    .filter((entry) => entry.type === 'message')
++    .map((entry) => entry.data?.message);
++  const terminal = messages.at(-1);
++  const fetched = messages.at(-2);
++  if (
++    terminal?.role !== 'assistant' ||
++    terminal.stopReason !== 'error' ||
++    terminal.errorMessage !== SOURCE_ERROR ||
++    terminal.content?.length !== 0 ||
++    fetched?.role !== 'toolResult' ||
++    fetched.toolName !== 'fetch_url' ||
++    fetched.isError !== false ||
++    events.at(-1)?.type !== 'session_end' ||
++    events.at(-1)?.data?.error !== SOURCE_ERROR
++  )
++    fail();
++  return {
++    schemaVersion,
++    jobId: BUDGET_RESUME_JOB,
++    sessionId: BUDGET_RESUME_SESSION,
++    runtimeRequestId: job.runtimeRequestId,
++    buildItemId: contract.buildItemId,
++    courseId: course.id,
++    courseVersion: course.version,
++    targetFingerprint: contract.targetFingerprint,
++    formalInputSha256: job.formalInputSha256,
++    sessionSeq: Number(events.at(-1).seq),
++    eventsSha256: sha(events),
++    entriesSha256: sha(entries),
++    jobSha256: sha(job),
++    sessionSha256: sha(session),
++    searchAttempts: 4,
++    remainingSearchAttempts: 0,
++    researchReceiptSha256: sha(research[0].data),
++    fetchedResultSha256: sha(fetched),
++    stageCount: 0,
++    qaCount: 0,
++  };
++}
++
++async function atomic(file: string, value: unknown) {
++  const temporary = `${file}.${process.pid}.tmp`;
++  await writeFile(temporary, canonical(value), { mode: 0o600 });
++  await rename(temporary, file);
++}
++
++async function requireBudget(binding: unknown) {
++  const parsed = parsePaidBudget(binding);
++  const base = process.env.MIRA_BACKEND_INTERNAL_URL;
++  const token = process.env.MIRA_INTERNAL_API_TOKEN;
++  if (!base || !token) throw new Error('FORMAL_BUDGET_RESUME_BUDGET_UNAVAILABLE');
++  const response = await fetch(new URL('/internal/learning/budget/context', base), {
++    method: 'POST',
++    redirect: 'error',
++    headers: {
++      'Content-Type': 'application/json',
++      'X-Mira-Internal-Token': token,
++      'X-Mira-Internal-Source': 'openmaic-runtime-gateway',
++    },
++    body: JSON.stringify({ authorizationId: parsed.authorizationId }),
++    signal: AbortSignal.timeout(15000),
++  });
++  const result = await response.json();
++  if (
++    !response.ok ||
++    result?.ok !== true ||
++    result.budget?.authorizationId !== parsed.authorizationId ||
++    result.budget?.purpose !== 'production' ||
++    result.budget?.unsettledReservationCount !== 0 ||
++    result.budget?.aggregateLimitsEnabled !== false
++  )
++    throw new Error('FORMAL_BUDGET_RESUME_BUDGET_UNAVAILABLE');
++}
++
++/** apply authorizes continuation; no model or search is called by this function. */
++export async function resumeFormalBudgetFailure(input: {
++  mode: 'plan' | 'apply';
++  expectedHistorySha256?: string;
++}) {
++  if (
++    !['plan', 'apply'].includes(input.mode) ||
++    (input.mode === 'apply' && !/^[a-f0-9]{64}$/.test(input.expectedHistorySha256 || ''))
++  )
++    throw new Error('FORMAL_BUDGET_RESUME_HISTORY_REQUIRED');
++  const { pool } = await getServerPersistenceProvider(process.env.DATABASE_URL!);
++  const conn = await pool.connect();
++  const jobFile = join(CLASSROOM_JOBS_DIR, `${BUDGET_RESUME_JOB}.json`);
++  const archiveRoot = resolve('data/formal-budget-resume');
++  let originalJob: any;
++  let written = false;
++  let committed = false;
++  try {
++    await conn.query('BEGIN');
++    await conn.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [
++      `mira.formal-classroom-completion:${BUDGET_RESUME_JOB}`,
++    ]);
++    const session = (
++      await conn.query('SELECT * FROM agent_sessions WHERE id=$1 FOR UPDATE', [
++        BUDGET_RESUME_SESSION,
++      ])
++    ).rows[0];
++    const job = JSON.parse(await readFile(jobFile, 'utf8'));
++    const applied = (
++      await conn.query(
++        'SELECT data FROM agent_session_events WHERE session_id=$1 AND type=$2 ORDER BY seq DESC LIMIT 1',
++        [BUDGET_RESUME_SESSION, EVENT],
++      )
++    ).rows[0];
++    if (applied) {
++      if (
++        input.expectedHistorySha256 !== applied.data.historySha256 ||
++        job.budgetResume?.historySha256 !== applied.data.historySha256 ||
++        !['running', 'succeeded'].includes(job.status)
++      )
++        fail();
++      await conn.query('ROLLBACK');
++      return { ...applied.data, applied: true };
++    }
++    const events = (
++      await conn.query('SELECT * FROM agent_session_events WHERE session_id=$1 ORDER BY seq', [
++        BUDGET_RESUME_SESSION,
++      ])
++    ).rows;
++    const entries = (
++      await conn.query('SELECT * FROM agent_session_entries WHERE session_id=$1 ORDER BY seq', [
++        BUDGET_RESUME_SESSION,
++      ])
++    ).rows;
++    const stages = (
++      await conn.query(
++        'SELECT COUNT(*)::int AS count FROM document_stages WHERE owner_id=$1 OR id=$2',
++        [session?.owner_id, session?.stage_id],
++      )
++    ).rows[0].count;
++    const scenes = (
++      await conn.query('SELECT COUNT(*)::int AS count FROM document_scenes WHERE stage_id=$1', [
++        session?.stage_id,
++      ])
++    ).rows[0].count;
++    // A crash between atomic file replacement and PG commit may leave the armed job.
++    // Only its exact archived original can be reused; no transcript is rewritten.
++    originalJob = job;
++    if (job.budgetResume && input.expectedHistorySha256 === job.budgetResume.historySha256) {
++      const saved = JSON.parse(
++        await readFile(join(archiveRoot, `${input.expectedHistorySha256}.json`), 'utf8'),
++      );
++      if (
++        sha(saved.history) !== input.expectedHistorySha256 ||
++        job.formalInputSha256 !== saved.job.formalInputSha256
++      )
++        fail();
++      originalJob = saved.job;
++    }
++    const history = validateBudgetResumeHistory({
++      job: originalJob,
++      session,
++      events,
++      entries,
++      stageCount: stages,
++      sceneCount: scenes,
++    });
++    const historySha256 = sha(history);
++    if (input.expectedHistorySha256 && input.expectedHistorySha256 !== historySha256) fail();
++    const marker = JSON.parse(
++      await readFile(
++        join(CLASSROOM_JOBS_DIR, `${BUDGET_RESUME_JOB}.formal-dispatch-started.json`),
++        'utf8',
++      ),
++    );
++    if (
++      marker.jobId !== BUDGET_RESUME_JOB ||
++      marker.formalInputSha256 !== history.formalInputSha256 ||
++      marker.runtimeRequestId !== history.runtimeRequestId
++    )
++      fail();
++    const binding = await readSessionPaidBudget(BUDGET_RESUME_SESSION, true);
++    if (canonical(binding) !== canonical(originalJob.formalInput.paidBudget)) fail();
++    const searchApiConfigured = getMiraWebSearchProductionConfig(
++      resolveServerWebSearchProviderId(),
++    ).formalProductionConfigured;
++    const receipt = { ...history, historySha256, searchApiConfigured };
++    if (input.mode === 'plan') {
++      await conn.query('ROLLBACK');
++      return { ...receipt, applied: false };
++    }
++    if (!searchApiConfigured) throw new Error('FORMAL_BUDGET_RESUME_SEARCH_API_REQUIRED');
++    await requireBudget(binding);
++    await mkdir(archiveRoot, { recursive: true, mode: 0o700 });
++    const archive = join(archiveRoot, `${historySha256}.json`);
++    try {
++      await writeFile(archive, canonical({ history, job: originalJob, session, events, entries }), {
++        flag: 'wx',
++        mode: 0o600,
++      });
++    } catch (error) {
++      if (
++        (error as NodeJS.ErrnoException).code !== 'EEXIST' ||
++        sha(JSON.parse(await readFile(archive, 'utf8')).history) !== historySha256
++      )
++        throw error;
++    }
++    const audit = { ...receipt, recoveredAt: new Date().toISOString() };
++    await atomic(jobFile, {
++      ...originalJob,
++      status: 'running',
++      step: 'researching',
++      completedAt: undefined,
++      error: undefined,
++      updatedAt: audit.recoveredAt,
++      message: 'Continuing the original audited session after completed research',
++      budgetResume: audit,
++    });
++    written = true;
++    const store = new PgAgentSessionStore(conn, { withTransaction: async (body) => body(conn) });
++    if (!(await store.requeueForRetry(BUDGET_RESUME_SESSION))) fail();
++    await store.appendControlEvent(BUDGET_RESUME_SESSION, {
++      type: EVENT,
++      ts: Date.now(),
++      data: audit,
++    });
++    await conn.query('COMMIT');
++    committed = true;
++    return { ...audit, applied: true };
++  } catch (error) {
++    await conn.query('ROLLBACK').catch(() => {});
++    if (written && !committed) await atomic(jobFile, originalJob);
++    throw error;
++  } finally {
++    conn.release();
++  }
++}
+diff --git a/app/api/generate-classroom/[jobId]/budget-resume/route.ts b/app/api/generate-classroom/[jobId]/budget-resume/route.ts
+new file mode 100644
+--- /dev/null
++++ b/app/api/generate-classroom/[jobId]/budget-resume/route.ts
+@@ -0,0 +1,28 @@
++import { type NextRequest, NextResponse } from 'next/server';
++import { authorizeMiraInternalLoopbackRequest } from '@/lib/server/mira-internal-loopback-auth';
++import {
++  BUDGET_RESUME_JOB,
++  resumeFormalBudgetFailure,
++} from '@/lib/server/mira-formal-budget-resume';
++export const dynamic = 'force-dynamic';
++export async function POST(req: NextRequest, context: { params: Promise<{ jobId: string }> }) {
++  try {
++    authorizeMiraInternalLoopbackRequest(req);
++  } catch {
++    return NextResponse.json({ error: 'INVALID_CREDENTIALS' }, { status: 403 });
++  }
++  if ((await context.params).jobId !== BUDGET_RESUME_JOB)
++    return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 });
++  try {
++    const body = await req.json();
++    if (Object.keys(body).some((k) => !['mode', 'expectedHistorySha256'].includes(k)))
++      throw new Error('FORMAL_BUDGET_RESUME_INVALID_REQUEST');
++    return NextResponse.json({ ok: true, recovery: await resumeFormalBudgetFailure(body) });
++  } catch (error) {
++    const message =
++      error instanceof Error && /^FORMAL_BUDGET_RESUME_[A-Z_]+$/.test(error.message)
++        ? error.message
++        : 'FORMAL_BUDGET_RESUME_UNAVAILABLE';
++    return NextResponse.json({ ok: false, error: message }, { status: 409 });
++  }
++}
+diff --git a/tests/server/mira-formal-budget-resume.test.ts b/tests/server/mira-formal-budget-resume.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-budget-resume.test.ts
+@@ -0,0 +1,56 @@
++import { existsSync, readFileSync } from 'node:fs';
++import { resolve } from 'node:path';
++import { describe, expect, it, vi } from 'vitest';
++vi.mock('@/lib/persistence/server-provider', () => ({
++  getServerPersistenceProvider: vi.fn(() => {
++    throw new Error('DB must not be called');
++  }),
++}));
++import { validateBudgetResumeHistory } from '@/lib/server/mira-formal-budget-resume';
++import { planResume } from '@/lib/server/agent-runtime/resume';
++
++const file = resolve('../../../output/primary6-math-budget-paused-snapshot.json');
++describe.skipIf(!existsSync(file))('actual budget-refused sample snapshot', () => {
++  it('preserves the exact successful research and continues after fetch without providers', () => {
++    const source = JSON.parse(readFileSync(file, 'utf8'));
++    const before = JSON.stringify(source);
++    const receipt = validateBudgetResumeHistory(source);
++    expect(receipt).toMatchObject({
++      searchAttempts: 4,
++      remainingSearchAttempts: 0,
++      stageCount: 0,
++      qaCount: 0,
++    });
++    const plan = planResume(
++      source.entries
++        .filter((entry: any) => entry.type === 'message')
++        .map((entry: any) => entry.data.message),
++    );
++    expect(plan.kind).toBe('continue');
++    if (plan.kind !== 'continue') throw new Error('Unexpected resume branch');
++    expect(plan.repairedToolCalls).toEqual([]);
++    expect(plan.messages.at(-1)).toMatchObject({
++      role: 'toolResult',
++      toolName: 'fetch_url',
++      isError: false,
++    });
++    expect(JSON.stringify(source)).toBe(before);
++  });
++  it('rejects changed identity, a paid or ambiguous failure and missing research evidence', () => {
++    const source = JSON.parse(readFileSync(file, 'utf8'));
++    const variants = [
++      { ...source, stageCount: 1 },
++      { ...source, job: { ...source.job, formalInputSha256: '0'.repeat(64) } },
++      { ...source, session: { ...source.session, error: 'MIRA_PAID_BUDGET_DISPATCH_REJECTED' } },
++      {
++        ...source,
++        events: source.events.filter((event: any) => event.type !== 'mira_formal_research_search'),
++      },
++      { ...source, entries: source.entries.slice(0, -1) },
++    ];
++    for (const changed of variants)
++      expect(() => validateBudgetResumeHistory(changed)).toThrow(
++        'FORMAL_BUDGET_RESUME_SOURCE_MISMATCH',
++      );
++  });
++});

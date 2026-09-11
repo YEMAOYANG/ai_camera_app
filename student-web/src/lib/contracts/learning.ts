@@ -116,6 +116,8 @@ export const learningTodayItemSchema = z.object({
   }).nullable().optional(),
 });
 
+const learningAvailabilityStatusSchema = z.enum(["ready", "preparing", "paused", "empty", "not_open", "scope_completed"]);
+
 export const courseSupplySummarySchema = z.object({
   schemaVersion: z.literal("learning.course-supply-summary.v1"),
   version: z.string(),
@@ -126,9 +128,20 @@ export const courseSupplySummarySchema = z.object({
   lastProgressAt: z.number().int().nullable(),
   retryAfterMs: z.number().int().min(2500).max(30000),
   message: z.string(),
+  availabilityStatus: learningAvailabilityStatusSchema.optional(),
 });
 
 export const learningCatalogStatusSchema = z.enum(["preparing", "complete", "failed"]);
+export const learningAvailabilityStateSchema = z.object({
+  schemaVersion: z.literal("mira.learning.availability-state.v1"),
+  availabilityStatus: learningAvailabilityStatusSchema,
+  availableCourseCount: z.number().int().nonnegative(),
+  newCourseCount: z.number().int().nonnegative(),
+  reviewCourseCount: z.number().int().nonnegative(),
+  publishedCourseCount: z.number().int().nonnegative(),
+  message: z.string().min(1),
+}).refine(value => value.availableCourseCount === value.newCourseCount + value.reviewCourseCount
+  && value.availableCourseCount <= value.publishedCourseCount);
 
 export const learningTodayResponseSchema = z.object({
   ok: z.literal(true),
@@ -141,6 +154,7 @@ export const learningTodayResponseSchema = z.object({
   backlogCount: z.number().int().nonnegative().optional(),
   preparationProgressPercent: z.number().int().min(0).max(100).nullable().optional(),
   courseSupply: courseSupplySummarySchema.optional(),
+  learningState: learningAvailabilityStateSchema.optional(),
   catalogStatus: learningCatalogStatusSchema,
   availableCourseCount: z.number().int().nonnegative(),
   targetCourseCount: z.number().int().positive(),
@@ -222,6 +236,7 @@ export const learningLibraryResponseSchema = z.object({
   historyComplete: z.boolean().optional().default(true),
   preparationProgressPercent: z.number().int().min(0).max(100).nullable().optional(),
   courseSupply: courseSupplySummarySchema.optional(),
+  learningState: learningAvailabilityStateSchema.optional(),
   catalogStatus: learningCatalogStatusSchema,
   availableCourseCount: z.number().int().nonnegative(),
   targetCourseCount: z.number().int().positive(),

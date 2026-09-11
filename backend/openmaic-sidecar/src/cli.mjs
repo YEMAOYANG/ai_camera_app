@@ -2,6 +2,8 @@
 
 import { performance } from 'node:perf_hooks';
 import process from 'node:process';
+import {prepareQuestionPhaseReplyArchive} from './question-phase-reply-archive.mjs';
+import {assertFormalObjectiveCandidate, formalObjectiveQuestionIssues} from './formal-objective-preflight.mjs';
 import {
   buildClassroomRequirement,
   classroomSchemas,
@@ -68,6 +70,7 @@ import {
   normalizeCompiledReconciliationCheckpoint,
   normalizeQuestionGenerationRequest,
   normalizeQuestionPhaseOutputCheckpoint,
+  legacyQuestionPhaseRequest,
   normalizeQuestionPhaseRequest,
   normalizeRawCandidateCheckpoint,
   normalizeQuestionConsistencyRepair,
@@ -251,23 +254,6 @@ function parseQuestionPhaseJson(body) {
   }
 }
 
-function legacyQuestionPhaseRequest(request) {
-  return {
-    requestId: request.requestId,
-    gradeCode: request.gradeCode,
-    subject: request.subject,
-    skillBoundary: {
-      ...request.skillBoundary,
-      language: request.targetLanguageCode,
-    },
-    questionCount: request.checkpoint.questionCount ?? 5,
-    existingFingerprints: request.checkpoint.existingFingerprints ?? [],
-    generationFeedback: request.checkpoint.generationFeedback ?? undefined,
-    provider: request.provider,
-    mode: request.mode,
-    fakeResponses: request.fakeResponses,
-  };
-}
 
 function parseQuestionPhaseContent(content) {
   try {
@@ -701,6 +687,7 @@ function projectExactCandidateQuestionSlots(raw) {
 async function executeQuestionPhase(request) {
   const legacyRequest = legacyQuestionPhaseRequest(request);
   let dispatchCall = null;
+  let replyArchive = null;
   let receipt = emptyQuestionPhaseReceipt();
   let providerCompleted = false;
   const invoke = async (
@@ -708,6 +695,8 @@ async function executeQuestionPhase(request) {
     { languageWrapped = false, responseJsonSchema = null } = {},
   ) => {
     if (!dispatchCall) {
+      try { replyArchive = await prepareQuestionPhaseReplyArchive(request); }
+      catch { throw new ContractError('paid response archive is unavailable or this request already has an intent', 'question_phase_preflight_rejected'); }
       dispatchCall = request.mode === 'fake'
         ? createSingleDispatchFakeAICall(request.fakeResponses)
         : createSingleDispatchAICall(request.provider, {
@@ -727,6 +716,12 @@ async function executeQuestionPhase(request) {
       outputTokens: response.outputTokens,
       billingEvidence: response.billingEvidence,
     };
+    // Persist the exact returned content before JSON/semantic/checkpoint parsing.
+    // The archive is evidence only, never a synthesized successful review.
+    if (replyArchive) {
+      try { await replyArchive.save(response); }
+      catch { throw new ContractError('paid response archive write failed', 'question_phase_output_rejected'); }
+    }
     return parseQuestionPhaseContent(response.content);
   };
   const invokeIndependentVerification = async (verificationRequest) => {
@@ -824,6 +819,10 @@ async function executeQuestionPhase(request) {
     } else if (request.phase === 'candidate_repair'
       || request.phase === 'candidate_repair_retry') {
       const retry = request.phase === 'candidate_repair_retry';
+      // Raw shape acceptance is not objective validity. An invalid raw set
+      // remains eligible for this phase's one paid repair, with exact Host
+      // reasons; it must never be compiled straight into paid lesson work.
+      const objectiveIssues = formalObjectiveQuestionIssues(request, request.checkpoint.rawCandidate);
       if (!retry && (isCanonicalNumberSensePhase3Request(request)
         || isCanonicalLettersSoundsPhase3Request(request))) {
         checkpoint = {
@@ -834,22 +833,22 @@ async function executeQuestionPhase(request) {
           hostCompilation: buildHostCompilationEvidence('canonical_skill_builder', request),
         };
       }
-      if (!checkpoint && !retry) {
+      if (!checkpoint && !retry && objectiveIssues.length === 0) {
         try {
           checkpoint = {
             phaseStatus: 'accepted',
-            candidate: compileAcceptedRawCandidateCheckpoint(request),
+            candidate: assertFormalObjectiveCandidate(request, compileAcceptedRawCandidateCheckpoint(request)),
             hostCompilation: buildHostCompilationEvidence('accepted_raw_candidate'),
           };
         } catch {
           checkpoint = null;
         }
       }
-      if (!checkpoint) {
+      if (!checkpoint && objectiveIssues.length === 0) {
         try {
           checkpoint = {
             phaseStatus: 'accepted',
-            candidate: compileHostSealedRawCandidateCheckpoint(request, legacyRequest),
+            candidate: assertFormalObjectiveCandidate(request, compileHostSealedRawCandidateCheckpoint(request, legacyRequest)),
             ...(retry
               ? {}
               : { hostCompilation: buildHostCompilationEvidence('accepted_raw_candidate') }),
@@ -868,15 +867,19 @@ async function executeQuestionPhase(request) {
             legacyRequest,
             request.checkpoint.rawCandidate,
           );
+        if (objectiveIssues.length) {
+          prompts.system += ' The Host objective preflight below is authoritative validation data. Regenerate each invalid complete question shell and its answer together inside the frozen objectivePolicy grammar. A different subskill, simpler question, or changed answer alone is not a repair. Preserve already valid questions when possible.';
+          prompts.user += `\nHost objective preflight: ${JSON.stringify(objectiveIssues)}`;
+        }
         try {
           const raw = projectExactCandidateQuestionSlots(await invoke(prompts));
           const frozen = freezeUnchangedQuestionAuthority(request.checkpoint.rawCandidate, raw);
           assertQuestionCandidateRepairAuthority(request.checkpoint.rawCandidate, frozen);
-          const candidate = compileQuestionRepairCandidateCheckpoint(
+          const candidate = assertFormalObjectiveCandidate(request, compileQuestionRepairCandidateCheckpoint(
             frozen,
             legacyRequest,
             request.checkpoint.existingFingerprints,
-          );
+          ));
           checkpoint = {
             phaseStatus: 'accepted',
             candidate,
@@ -894,9 +897,10 @@ async function executeQuestionPhase(request) {
             );
           }
           try {
+            if (objectiveIssues.length) throw error;
             checkpoint = {
               phaseStatus: 'accepted',
-              candidate: compileAcceptedRawCandidateCheckpoint(request),
+              candidate: assertFormalObjectiveCandidate(request, compileAcceptedRawCandidateCheckpoint(request)),
               hostCompilation: buildHostCompilationEvidence('accepted_raw_candidate'),
             };
           } catch {

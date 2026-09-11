@@ -6,11 +6,18 @@ from typing import Mapping
 from core.errors import ApiError
 from repositories.formal_student_runtime_gate import current_formal_runtime_sql
 from schemas.education import grade_definition_from_row
+from content.formal_curriculum_registry import formal_supported_grade_codes, formal_content_contract
 
 
-FORMAL_STUDENT_GRADE_CODES = frozenset({"primary_1"})
+FORMAL_STUDENT_GRADE_CODES = frozenset(formal_supported_grade_codes())
 FORMAL_PUBLICATION_CONTRACT_VERSION = "mira.learning.formal-publication.v1"
 FORMAL_COURSE_COUNT = 30
+
+
+def formal_course_count(grade_code: str) -> int:
+    """Registered capacity only; availability still requires a published release."""
+    authority = formal_content_contract(grade_code)
+    return sum(len(subject["boundaries"]) * 3 for subject in authority["subjects"])
 
 
 def assert_formal_student_grade_open(child: Mapping[str, object]) -> str:
@@ -172,7 +179,8 @@ def _formal_student_release_is_ready(
         and str(plan.get("status") or "") == "ready"
         and str(plan.get("stage") or "") == "completed"
         and int(plan.get("progress_percent") or 0) == 100
-        and total_count == FORMAL_COURSE_COUNT
+        and grade_code in FORMAL_STUDENT_GRADE_CODES
+        and total_count == formal_course_count(grade_code)
         and int(plan.get("ready_course_count") or 0) == total_count
         and int(plan.get("failed_course_count") or 0) == 0
         and int(plan.get("content_target_count") or 0) == total_count

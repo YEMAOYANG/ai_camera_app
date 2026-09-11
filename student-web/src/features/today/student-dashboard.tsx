@@ -28,6 +28,7 @@ export function StudentDashboard({
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState(false);
   const [locking, setLocking] = useState(false);
+  const availability = today?.learningState?.availabilityStatus ?? today?.courseSupply?.availabilityStatus;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -53,7 +54,8 @@ export function StudentDashboard({
   }, []);
 
   useEffect(() => {
-    if (loading || today?.catalogStatus !== "preparing") return;
+    if (loading || availability === "empty" || availability === "not_open" || availability === "scope_completed"
+      || today?.catalogStatus !== "preparing" || today.availableCourseCount > 0) return;
     let active = true;
     let timer: number | undefined;
     let failures = 0;
@@ -70,7 +72,9 @@ export function StudentDashboard({
           setToday(value);
           setError("");
         }
-        if (active && value.catalogStatus === "preparing") {
+        const nextAvailability = value.learningState?.availabilityStatus ?? value.courseSupply?.availabilityStatus;
+        if (active && !["empty", "not_open", "scope_completed"].includes(nextAvailability ?? "")
+          && value.catalogStatus === "preparing" && value.availableCourseCount === 0) {
           timer = window.setTimeout(() => void poll(), delay(value.courseSupply?.paused || value.courseSupply?.delayed));
         }
       } catch {
@@ -84,7 +88,22 @@ export function StudentDashboard({
       active = false;
       if (timer !== undefined) window.clearTimeout(timer);
     };
-  }, [loading, pollIntervalMs, today?.catalogStatus, today?.courseSupply?.paused, today?.courseSupply?.delayed]);
+  }, [loading, availability, pollIntervalMs, today?.catalogStatus, today?.availableCourseCount, today?.courseSupply?.paused, today?.courseSupply?.delayed]);
+
+  useEffect(() => {
+    let active = true;
+    const refresh = () => {
+      if (document.hidden) return;
+      void getTodayLearning().then(value => { if (active) setToday(value); }).catch(() => undefined);
+    };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, []);
 
   async function prepareCourses() {
     setAssigning(true);
@@ -109,10 +128,13 @@ export function StudentDashboard({
   const completedCount = today?.completedCount ?? 0;
   const carryoverCount = today?.carryoverCount ?? 0;
   const dailyTargetCount = 3;
-  const preparingSlotCount = today?.catalogStatus === "preparing"
+  const scopeFinished = availability === "scope_completed" || availability === "not_open" || availability === "empty";
+  const preparingSlotCount = today?.catalogStatus === "preparing" && !scopeFinished && today.availableCourseCount === 0
     ? Math.max(0, dailyTargetCount - itemCount)
     : 0;
-  const dailySummary = itemCount >= dailyTargetCount
+  const availabilityMessage = today?.learningState?.message ?? (availability === "empty"
+    ? "这里还没有课程，课程准备好后就会出现。" : today?.courseSupply?.message);
+  const dailySummary = scopeFinished ? availabilityMessage : itemCount >= dailyTargetCount
     ? `今天有 ${dailyTargetCount} 节小课。${carryoverCount
       ? `先补上 ${carryoverCount} 节没学完的课，再学习今天的新内容。`
       : "老师会先讲清楚，再陪你一起练。"}`
@@ -149,7 +171,7 @@ export function StudentDashboard({
               <p className="mt-4 max-w-2xl text-[17px] leading-8 text-[var(--mira-muted)]">
                 {gradeLabel(student.gradeCode)} · {dailySummary}
               </p>
-              <div className="mt-6 flex max-w-md items-center gap-3 rounded-[20px] bg-white/75 p-3 pr-5 shadow-sm">
+              {availability !== "empty" ? <div className="mt-6 flex max-w-md items-center gap-3 rounded-[20px] bg-white/75 p-3 pr-5 shadow-sm">
                 <span className="grid size-11 shrink-0 place-items-center rounded-[15px] bg-[var(--mira-mint)] text-[var(--mira-mint-deep)]">
                   <Sparkles className="size-5" aria-hidden="true" />
                 </span>
@@ -161,7 +183,7 @@ export function StudentDashboard({
                     <div className="h-full rounded-full bg-[var(--mira-brand)] transition-[width] duration-500" style={{ width: `${(completedCount / dailyTargetCount) * 100}%` }} />
                   </div>
                 </div>
-              </div>
+              </div> : null}
             </div>
             <MiraBuddy mood={completedCount === itemCount && itemCount > 0 ? "celebrate" : "hello"} className="mx-auto w-[170px] md:w-[205px]" label={completedCount === itemCount ? "为你庆祝的小伙伴" : "陪你学习的小伙伴"} />
           </div>
@@ -183,8 +205,15 @@ export function StudentDashboard({
             </div>
           ) : null}
 
-          {!loading && !error && today?.catalogStatus === "preparing" && today.availableCourseCount === 0 ? (
+          {!loading && !error && today?.catalogStatus === "preparing" && today.availableCourseCount === 0 && !scopeFinished ? (
             <PreparationProgress today={today} />
+          ) : null}
+          {!loading && !error && scopeFinished ? (
+            <div className="mb-5 rounded-[20px] border-2 border-white bg-[var(--mira-mint)] px-5 py-4 shadow-sm" role="status">
+              <p className="font-extrabold">{availability === "scope_completed" ? "本单元已完成" : availability === "empty" ? "这里还没有课程" : "课程尚未开放"}</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--mira-muted)]">{availabilityMessage}</p>
+              {(today?.learningState?.reviewCourseCount ?? 0) > 0 ? <Link className="mt-3 inline-flex font-bold text-[var(--mira-brand-deep)]" href="/learning">去复习学过的课程 <ArrowRight className="ml-1 size-5" /></Link> : null}
+            </div>
           ) : null}
           {!loading && !error && today?.catalogStatus === "failed" && today.items.length ? (
             <div className="mb-5 flex items-center gap-3 rounded-[20px] border-2 border-white bg-[var(--mira-sun-soft)]/75 px-4 py-3 text-sm font-bold text-[var(--mira-muted)] shadow-sm">
@@ -205,7 +234,7 @@ export function StudentDashboard({
               ))}
             </div>
           ) : null}
-          {!loading && !error && today && today.items.length === 0 && today.catalogStatus !== "preparing" ? (
+          {!loading && !error && today && today.items.length === 0 && today.catalogStatus !== "preparing" && !scopeFinished ? (
             <TodayError message="今天还没有排好课程" onRetry={prepareCourses} />
           ) : null}
         </section>

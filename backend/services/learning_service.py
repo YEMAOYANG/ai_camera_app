@@ -27,6 +27,7 @@ from schemas.learning import (
     session_payload,
 )
 from services.auth_service import AuthService
+from services.learning_difficulty import available_skill_order, preferred_difficulty, selection_payload
 from services.formal_student_learning_access import (
     FORMAL_STUDENT_GRADE_CODES,
     assert_formal_student_grade_open,
@@ -983,6 +984,7 @@ class LearningService:
                         child_id=child_id,
                         node_code=course["node_code"],
                         subject=course["subject"],
+                        grade_code=course["grade_code"],
                     )
             return {
                 "ok": True,
@@ -1761,6 +1763,7 @@ class LearningService:
                 child_id=child["id"],
                 node_code=display_course["node_code"],
                 subject=display_course["subject"],
+                grade_code=display_course["grade_code"],
             )
             if task is None:
                 state = "recommended"
@@ -1785,6 +1788,13 @@ class LearningService:
                     child_id=child["id"],
                     subject=actual_subject,
                 )
+            recommendation = recommendation_payload(display_course)
+            if not self.static_catalog_enabled and display_course['grade_code'] != 'primary_1':
+                selection = selection_payload(display_course, mastery,
+                    review_fallback=bool(display_course.get('_difficulty_review_fallback')))
+                recommendation['difficultySelection'] = selection
+                if selection['message']:
+                    recommendation['intro'] = selection['message']
             items.append(
                 {
                     "slot": slot,
@@ -1792,7 +1802,7 @@ class LearningService:
                     "subject": actual_subject,
                     "subjectFallback": actual_subject != subjects[slot],
                     "state": state,
-                    "recommendation": recommendation_payload(display_course),
+                    "recommendation": recommendation,
                     "task": learning_task_payload(task),
                     "session": (
                         session_payload(
@@ -1929,6 +1939,20 @@ class LearningService:
             supply = cached_supply_summary(self.repository.database.database_url, grade_code=grade_code)
             if supply is not None:
                 result["courseSupply"] = supply
+        from services.learning_availability_state import personal_learning_state
+        identity = {"family_id": str(child["family_id"]), "child_id": str(child["id"]), "grade_code": grade_code}
+        state = personal_learning_state(
+            grade_code=grade_code,
+            courses=self.repository.personal_visible_course_inventory(conn, **identity,
+                grade_selection_revision=int(child.get("grade_selection_revision") or 0)),
+            mastery=self.repository.personal_grade_mastery(conn, **identity),
+            supply=result.get("courseSupply"), grade_open=grade_code in FORMAL_STUDENT_GRADE_CODES,
+        )
+        result["learningState"] = state
+        result["availableCourseCount"] = state["availableCourseCount"]
+        if state["availabilityStatus"] in {"scope_completed", "empty", "not_open"}:
+            result["catalogStatus"] = "complete"
+            result["preparationProgressPercent"] = None
         return result
 
     def _teaching_flow_requires_correct_answer(
@@ -2109,6 +2133,7 @@ class LearningService:
                 child_id=child["id"],
                 node_code=boundary.skill_id,
                 subject=subject,
+                grade_code=grade_code,
             )
             if mastery is None or str(mastery.get("mastery_level")) != "mastered":
                 return boundary.skill_id
@@ -2286,12 +2311,24 @@ class LearningService:
                         subject=candidate,
                     )
                 )
-                node_attempts = (
+                adaptive = not self.static_catalog_enabled and grade_code != 'primary_1'
+                mastery_by_node = {}
+                if adaptive:
+                    progression = boundaries_for(grade_code, candidate)
+                    mastery_by_node = {boundary.skill_id: self.repository.get_mastery_state(
+                        conn, family_id=family_id, child_id=child['id'], grade_code=grade_code,
+                        subject=candidate, node_code=boundary.skill_id) for boundary in progression}
+                    node_attempts = available_skill_order(progression, mastery_by_node)
+                else:
+                    node_attempts = (
                     (required_node_code, None)
                     if required_node_code is not None
                     else (None,)
-                )
-                for node_code in node_attempts:
+                    )
+                attempts = [(node, False) for node in node_attempts]
+                if adaptive:
+                    attempts += [(node, True) for node in node_attempts]
+                for node_code, review_fallback in attempts:
                     course = self.repository.get_recommended_course(
                         conn,
                         family_id=family_id,
@@ -2324,8 +2361,12 @@ class LearningService:
                             if node_code
                             else None
                         ),
+                        **({'difficulty_code': None if review_fallback else preferred_difficulty(mastery_by_node.get(node_code)),
+                            'require_completed': review_fallback} if adaptive else {}),
                     )
                     if course is not None:
+                        if adaptive and review_fallback:
+                            course = {**course, '_difficulty_review_fallback': True}
                         return course
             if not excluding_course_ids:
                 break

@@ -5,6 +5,11 @@ import json
 import re
 from typing import Mapping
 
+from content.formal_curriculum_registry import (
+    formal_content_contract, formal_content_validation_identity,
+    require_formal_grade,
+)
+
 from content.primary_skill_boundaries import (
     CONTENT_VALIDATION_CONTRACT_VERSION,
     PRIMARY_CURRICULUM_VERSION,
@@ -106,9 +111,8 @@ def build_preparation_target(grade_code: str) -> dict[str, object]:
         for boundary in PRIMARY_SKILL_BOUNDARIES
         if boundary.grade_code == normalized
     ]
-    primary_one_authority = (
-        primary_one_content_contract() if normalized == "primary_1" else None
-    )
+    primary_one_authority = formal_content_contract(normalized)
+    validation_identity = formal_content_validation_identity(normalized)
     if primary_one_authority is not None:
         registered = {
             (boundary.subject, boundary.skill_id): boundary
@@ -207,6 +211,10 @@ def build_preparation_target(grade_code: str) -> dict[str, object]:
                         ],
                     }
                 )
+        if normalized != "primary_1":
+            from content.formal_curriculum_registry import formal_slot_difficulty
+            for course_target in course_targets:
+                course_target["difficultyCode"] = formal_slot_difficulty(normalized, course_target["subject"], course_target["skillId"], course_target["variantOrdinal"])
         boundary_by_identity = {
             (item["subject"], item["skillId"]): item
             for item in boundary_targets
@@ -225,7 +233,7 @@ def build_preparation_target(grade_code: str) -> dict[str, object]:
             "contentProviderProfileContractVersion": (
                 CONTENT_PROVIDER_PROFILE_CONTRACT_VERSION
             ),
-            "contentValidationContractVersion": CONTENT_VALIDATION_CONTRACT_VERSION,
+            "contentValidationContractVersion": validation_identity["contentValidationContractVersion"],
             "contentValidationDatasetSha256": primary_one_authority[
                 "datasetSha256"
             ],
@@ -233,7 +241,7 @@ def build_preparation_target(grade_code: str) -> dict[str, object]:
             "subjectLanguagePolicies": language_policies,
             "courseTargets": course_targets,
             "canaryManifest": {
-                "version": PRIMARY_ONE_CANARY_MANIFEST_VERSION,
+                "version": primary_one_authority["canaryManifest"]["version"],
                 "targets": canary_targets,
             },
             "formalRuntimePackageContract": {
@@ -326,6 +334,33 @@ def preparation_target_fingerprint(target: Mapping[str, object]) -> str:
         dict(target), ensure_ascii=False, sort_keys=True, separators=(",", ":")
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def preparation_authority_grade(authority: object) -> str:
+    """Read an explicit grade from frozen target/plan/build authority only."""
+    if isinstance(authority, str):
+        if authority.startswith("{"):
+            return preparation_authority_grade(json.loads(authority))
+        return require_formal_grade(authority)
+    if not isinstance(authority, Mapping):
+        raise ValueError("formal preparation authority is missing")
+    direct = authority.get("gradeCode", authority.get("grade_code"))
+    nested = authority.get("target_spec_json", authority.get("targetSpec"))
+    if nested is not None:
+        nested_grade = preparation_authority_grade(nested)
+        if direct is not None and direct != nested_grade:
+            raise ValueError("formal preparation authority grade drift")
+        return nested_grade
+    return require_formal_grade(direct)
+
+
+def canonical_preparation_target_for(authority: object) -> dict[str, object]:
+    return build_preparation_target(preparation_authority_grade(authority))
+
+
+def formal_target_course_count(authority: object) -> int:
+    target = canonical_preparation_target_for(authority)
+    return len(target["courseTargets"])
 
 
 def compatible_preparation_scope_sql(

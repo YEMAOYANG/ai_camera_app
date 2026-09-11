@@ -915,6 +915,7 @@ structured_health_payload="$(printf '%s' "${structured_health_payload}" | node -
         sceneContextRequired: true, gradeBoundaryRequired: true,
       },
       video: {"schemaVersion":"mira.openmaic.formal-video-policy.v1","policyId":"mira-formal-happyhorse-video.v1","enabled":true,"providerManaged":true,"providerId":"happyhorse","modelId":"happyhorse-1.0-t2v","usage":"teaching_need","maxCalls":1,"maxVideos":1,"durationSec":5,"resolution":"720p","aspectRatio":"16:9","assetValidationRequired":true},
+      interactionDesignPolicy: {"schemaVersion":"mira.openmaic.interaction-design.v2","policyId":"mira-primary-multistate-interaction.v2","enabled":true,"profile":"primary-adaptive","objectiveCoverageRequired":true,"demonstrationRequired":true,"learnerOperationRequired":true,"explanatoryFeedbackRequired":true,"independentJudgmentRequired":true,"finalSnapshotRequired":true,"renderedInteractionRequired":true,"explorationPolicy":{"schemaVersion":"mira.openmaic.multistate-exploration.v1","minimumStates":3,"maximumStates":5,"resetRequired":true,"inputModes":["pointer","touch"],"mechanismRegistry":["fraction-ratio-percentage.v1","semantic-state-model.v1"]},"visualRubricVersion":"mira.primary-teaching-visual.v1","visualReviewRequired":true},
       teachingQuality: {
         schemaVersion: "mira.openmaic.teaching-quality-policy.v1", policyId: "mira-primary-quality.v1",
         gradeBoundaryRequired: true, finalSnapshotRequired: true, independentReviewRequired: true,
@@ -925,6 +926,12 @@ structured_health_payload="$(printf '%s' "${structured_health_payload}" | node -
   });
 ')"
 validate_health_payload openmaic "${structured_health_payload}"
+if validate_health_payload openmaic "${structured_health_payload/mira-primary-multistate-interaction.v2/mira-primary-adaptive-interaction.v1}"; then
+  fail "old interaction policy unexpectedly passed current generation health"
+fi
+if validate_health_payload openmaic "${structured_health_payload/\"visualReviewRequired\":true/\"visualReviewRequired\":false}"; then
+  fail "disabled visual review unexpectedly passed current generation health"
+fi
 if validate_health_payload openmaic "${structured_health_payload/mira-primary-adaptive.v2/unknown-skill-profile}"; then
   fail "unreviewed skill profile unexpectedly passed formal generation health"
 fi

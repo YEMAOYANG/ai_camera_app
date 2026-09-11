@@ -1,0 +1,36 @@
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -152,7 +152,7 @@
+   queryByRuntimeRequestId: true,
+   speechAudioGenerated: true,
+   coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
+-  professionalCreation: MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++  professionalCreation: MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
+   studentRuntimeEvents: {
+     enforced: true,
+     schemaVersion: 'mira.openmaic.student-runtime-events.v1',
+--- a/tests/server/mira-formal-video.test.ts
++++ b/tests/server/mira-formal-video.test.ts
+@@ -37,6 +37,8 @@
+   MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY,
+   MIRA_PROFESSIONAL_CREATION_POLICY,
+   MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++  MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
++  getMiraFormalGenerationRuntimePolicy,
+   MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+   MIRA_COURSEWARE_AUTHORITY,
+   MIRA_FORMAL_GENERATION_POLICY,
+@@ -253,8 +255,11 @@
+       }),
+     ).toBe(false);
+     expect(MIRA_FORMAL_GENERATION_POLICY.professionalCreation).toEqual(
+-      MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
+-    );
++      MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
++    );
++    expect(getMiraFormalGenerationRuntimePolicy().professionalCreation).toEqual(MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY);
++    expect(isExactMiraProfessionalCreationPolicy(MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY)).toBe(true);
++    expect(MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY).not.toHaveProperty('interactionDesignPolicy');
+     expect(digest(JSON.stringify(MIRA_PROFESSIONAL_CREATION_POLICY))).not.toBe(
+       digest(JSON.stringify(MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY)),
+     );

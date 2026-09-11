@@ -108,6 +108,8 @@ class _HomePrimaryLearningPreviewState
     }
     final value = next.asData?.value;
     if (value?.shouldPoll != true ||
+        _lastSuccessfulAvailability?.canLearnNow == true ||
+        _lastSuccessfulAvailability?.learningState?.isTerminal == true ||
         _lifecycleState != AppLifecycleState.resumed) {
       _cancelPoll();
       return;
@@ -124,7 +126,10 @@ class _HomePrimaryLearningPreviewState
   }
 
   void _schedulePollRetry(LearningPreparation value) {
-    if (_lifecycleState != AppLifecycleState.resumed || !value.shouldPoll) {
+    if (_lifecycleState != AppLifecycleState.resumed ||
+        !value.shouldPoll ||
+        _lastSuccessfulAvailability?.canLearnNow == true ||
+        _lastSuccessfulAvailability?.learningState?.isTerminal == true) {
       return;
     }
     _cancelPoll();
@@ -256,7 +261,12 @@ class _HomePrimaryLearningPreviewState
       next,
     ) {
       final value = next.asData?.value;
-      if (value != null) _lastSuccessfulAvailability = value;
+      if (value != null) {
+        _lastSuccessfulAvailability = value;
+        if (value.canLearnNow || value.learningState?.isTerminal == true) {
+          _cancelPoll();
+        }
+      }
     });
     final preparation = ref.watch(provider);
     final availability = ref.watch(availabilityProvider);
@@ -304,6 +314,8 @@ class _HomePrimaryLearningPreviewState
           LearningPreparationNetworkErrorCard(
             onRetry: () => unawaited(_refreshPreparation()),
           )
+        else if (currentAvailability.learningState?.isTerminal == true)
+          _LearningScopeStatus(state: currentAvailability.learningState!)
         else if (canLearnNow) ...[
           _ReadyPrimaryLearningPreview(
             child: widget.child,
@@ -343,6 +355,52 @@ class _HomePrimaryLearningPreviewState
           ],
         ],
       ],
+    );
+  }
+}
+
+class _LearningScopeStatus extends StatelessWidget {
+  const _LearningScopeStatus({required this.state});
+  final LearningAvailabilityState state;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const ValueKey('learningScopeStatus'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            state.status == 'scope_completed'
+                ? Icons.task_alt
+                : Icons.menu_book_outlined,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(switch (state.status) {
+                  'scope_completed' => '本单元已完成',
+                  'empty' => '暂无课程',
+                  _ => '课程尚未开放',
+                }, style: Theme.of(context).textTheme.titleSmall),
+                const SizedBox(height: 6),
+                Text(
+                  state.message,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

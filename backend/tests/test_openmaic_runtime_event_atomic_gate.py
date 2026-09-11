@@ -48,6 +48,8 @@ class _BarrierChildRepository:
             "course_version": "1",
             "package_id": "package-1",
             "package_version": 1,
+            "binding_grade_code": "primary_1",
+            "binding_grade_revision": 1,
         }
 
     @staticmethod
@@ -145,7 +147,7 @@ class OpenMaicRuntimeEventAtomicGateTest(unittest.TestCase):
             with self.assertRaises(ApiError) as raised:
                 record_future.result(timeout=15)
 
-        self.assertEqual(raised.exception.code, "student_learning_grade_not_open")
+        self.assertEqual(raised.exception.code, "student_learning_release_not_ready")
         self.assertEqual(learning.answer_calls, 0)
         self.assertEqual(learning.complete_calls, 0)
         with self.database.transaction() as conn:

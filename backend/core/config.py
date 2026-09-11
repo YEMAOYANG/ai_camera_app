@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ipaddress
+import json
 import os
 import platform
 from dataclasses import asdict, dataclass
@@ -102,6 +103,7 @@ class AppConfig:
     LEARNING_CURRICULUM_PREPARATION_RUNNER_ENABLED: bool
     LEARNING_COURSE_LIBRARY_ENABLED: bool
     LEARNING_COURSE_SUPPLY_SCOPE: str
+    LEARNING_COURSE_SUPPLY_GRADE_SCOPES: dict[str, str]
     LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS: int
     LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS: int
     LEARNING_CURRICULUM_PREPARATION_CONTENT_GENERATION_ENABLED: bool
@@ -359,6 +361,7 @@ class AppConfig:
             ),
             LEARNING_COURSE_LIBRARY_ENABLED=_bool(_env("LEARNING_COURSE_LIBRARY_ENABLED", "1")),
             LEARNING_COURSE_SUPPLY_SCOPE=_env("LEARNING_COURSE_SUPPLY_SCOPE", "canary"),
+            LEARNING_COURSE_SUPPLY_GRADE_SCOPES=json.loads(_env("LEARNING_COURSE_SUPPLY_GRADE_SCOPES", "{}")),
             LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS=int(
                 _env("LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS", "15")
             ),
@@ -790,6 +793,7 @@ def apply_test_defaults(config: dict) -> dict:
     next_config.setdefault("LEARNING_CURRICULUM_PREPARATION_RUNNER_ENABLED", False)
     next_config.setdefault("LEARNING_COURSE_LIBRARY_ENABLED", False)
     next_config.setdefault("LEARNING_COURSE_SUPPLY_SCOPE", "canary")
+    next_config.setdefault("LEARNING_COURSE_SUPPLY_GRADE_SCOPES", {})
     next_config.setdefault("LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS", 15)
     next_config.setdefault(
         "LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS",
@@ -894,6 +898,12 @@ def validate_flask_config(config: dict) -> None:
         raise ConfigError("LEARNING_COURSE_LIBRARY_ENABLED must be boolean.")
     if config.get("LEARNING_COURSE_SUPPLY_SCOPE", "canary") not in {"canary", "first_unit", "catalog"}:
         raise ConfigError("LEARNING_COURSE_SUPPLY_SCOPE must be canary, first_unit or catalog.")
+    grade_scopes = config.get("LEARNING_COURSE_SUPPLY_GRADE_SCOPES", {})
+    if (type(grade_scopes) is not dict or any(
+        grade not in {f"primary_{n}" for n in range(1, 7)} or scope not in {"canary", "first_unit", "catalog"}
+        for grade, scope in grade_scopes.items()
+    )):
+        raise ConfigError("LEARNING_COURSE_SUPPLY_GRADE_SCOPES must map registered grades to explicit scopes.")
     if int(config.get("LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS", 15)) < 5:
         raise ConfigError(
             "LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS must be at least 5."
@@ -1170,9 +1180,11 @@ def _validate_learning_curriculum_preparation_config(
         raise ConfigError(
             "Learning curriculum preparation enable flags must be booleans."
         )
-    if type(grade_allowlist) is not list or grade_allowlist != ["primary_1"]:
+    if (type(grade_allowlist) is not list or not grade_allowlist
+        or any(type(grade) is not str or grade not in {f"primary_{n}" for n in range(1, 7)} for grade in grade_allowlist)
+        or len(set(grade_allowlist)) != len(grade_allowlist)):
         raise ConfigError(
-            "LEARNING_CURRICULUM_PREPARATION_GRADE_ALLOWLIST must be exactly primary_1."
+            "LEARNING_CURRICULUM_PREPARATION_GRADE_ALLOWLIST must contain unique registered primary grades."
         )
     if type(max_provider_subcalls_per_tick) is not int or max_provider_subcalls_per_tick != 1:
         raise ConfigError(
@@ -1182,9 +1194,9 @@ def _validate_learning_curriculum_preparation_config(
         raise ConfigError(
             "LEARNING_CURRICULUM_PREPARATION_MAX_INFLIGHT_PER_BUILD must be 1."
         )
-    if canary_enabled is not True or canary_auto_expand is not True:
+    if canary_enabled is not True or type(canary_auto_expand) is not bool:
         raise ConfigError(
-            "Learning curriculum preparation canary and auto expansion must remain enabled."
+            "Learning curriculum preparation canary must remain enabled and auto expansion must be an explicit boolean."
         )
     if reconciliation_enabled is not False:
         raise ConfigError(

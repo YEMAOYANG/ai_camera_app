@@ -80,7 +80,7 @@ class FormalStudentLearningAccessTest(unittest.TestCase):
         self.assertFalse(
             formal_student_release_available(unopened, _child("primary_2"))
         )
-        self.assertEqual(unopened.calls, [])
+        self.assertEqual(unopened.calls[0][1], ("primary_2",))
 
     def test_exact_current_formal_release_is_allowed(self) -> None:
         conn = _Connection(_formal_ready_plan())
@@ -119,14 +119,23 @@ class FormalStudentLearningAccessTest(unittest.TestCase):
 
         self.assertEqual(raised.exception.code, "student_learning_release_not_ready")
 
-    def test_unopened_grade_fails_before_release_lookup(self) -> None:
+    def test_registered_grade_without_its_own_release_stays_closed(self) -> None:
         conn = _Connection(_formal_ready_plan())
 
         with self.assertRaises(ApiError) as raised:
             assert_formal_student_release_ready(conn, _child("primary_2"))
 
-        self.assertEqual(raised.exception.code, "student_learning_grade_not_open")
-        self.assertEqual(conn.calls, [])
+        self.assertEqual(raised.exception.code, "student_learning_release_not_ready")
+        self.assertEqual(conn.calls[0][1], ("primary_2",))
+
+    def test_each_registered_grade_requires_its_exact_published_capacity(self):
+        for number in range(2, 7):
+            grade = f"primary_{number}"
+            plan = {key: 27 if value == 30 else value for key, value in _formal_ready_plan().items()}
+            plan["grade_code"] = grade
+            self.assertTrue(formal_student_release_available(_Connection(plan), _child(grade)))
+            plan["published_course_count"] = 26
+            self.assertFalse(formal_student_release_available(_Connection(plan), _child(grade)))
 
     def test_saved_grade_revision_opens_workspace_before_catalog_is_ready(self) -> None:
         self.assertEqual(

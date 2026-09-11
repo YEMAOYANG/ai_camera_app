@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { difficultyCodeSchema, difficultyPolicySchema, interactionDesignPolicySchema,
+  interactionDesignEvidenceSchema, requiredTeachingActionsSchema } from "./openmaic-interaction-evidence";
 import { gradeBoundarySchema, imagePolicySchema, videoPolicySchema, skillPolicySchema,
   teachingQualityPolicySchema, professionalEvidenceExtensions, teachingQualityEvidenceSchema,
   imageReceiptSchema, videoReceiptSchema, imageEvidenceSchema, videoEvidenceSchema,
@@ -584,12 +586,14 @@ const openMaicFormalQuestionSchema = z.object({
 }).strict();
 
 const openMaicFormalTeachingBriefSchema = z.object({
+  difficultyPolicy: difficultyPolicySchema.optional(),
   schemaVersion: z.literal("mira.learning.formal-runtime-teaching-brief.v1"),
   sourceCourseContentSha256: openMaicFormalSha256Schema,
   course: z.object({
     id: z.string().trim().min(1).max(255),
     version: z.string().trim().min(1).max(64),
     gradeCode: z.string().regex(/^primary_[1-6]$/),
+    difficultyCode: difficultyCodeSchema.optional(),
     subject: openMaicFormalSubjectSchema,
     skillId: z.string().trim().min(1).max(120),
     title: z.string().trim().min(1).max(160),
@@ -663,6 +667,7 @@ const openMaicProfessionalCoursewareAuthoritySchema = z.object({
 }).strict();
 
 const openMaicProfessionalCreationPolicySchema = z.object({
+  interactionDesignPolicy: interactionDesignPolicySchema.optional(),
   image: imagePolicySchema.optional(), video: videoPolicySchema.optional(),
   skillOrchestration: skillPolicySchema.optional(), teachingQuality: teachingQualityPolicySchema.optional(),
   schemaVersion: z.literal("mira.openmaic.professional-creation.v1"),
@@ -778,6 +783,7 @@ const openMaicFormalGenerationContractSchema = z.object({
 });
 
 export const openMaicAdaptiveFormalGenerationContractSchema = z.object({
+  difficultyPolicy: difficultyPolicySchema.optional(),
   gradeBoundary: gradeBoundarySchema.optional(), gradeBoundarySha256: openMaicFormalSha256Schema.optional(),
   schemaVersion: z.literal("mira.openmaic.formal-runtime.v4-deepseek-professional"),
   authority: z.literal("mira_backend_formal_candidate"),
@@ -787,6 +793,7 @@ export const openMaicAdaptiveFormalGenerationContractSchema = z.object({
     version: z.string().trim().min(1).max(64),
     packageId: z.string().trim().min(1).max(128),
     packageVersion: z.number().int().positive(),
+    difficultyCode: difficultyCodeSchema.optional(),
   }).strict(),
   targetFingerprint: openMaicFormalSha256Schema,
   runtimeRequestId: z.string().trim().min(1).max(128),
@@ -800,6 +807,17 @@ export const openMaicAdaptiveFormalGenerationContractSchema = z.object({
   generation: openMaicProfessionalGenerationOptionsSchema,
 }).strict().superRefine((contract, context) => {
   const brief = contract.teachingBrief;
+  const difficulty = contract.difficultyPolicy;
+  if (difficulty || brief.difficultyPolicy || contract.course.difficultyCode || brief.course.difficultyCode) {
+    if (!difficulty || !brief.difficultyPolicy
+      || difficulty.policySha256 !== brief.difficultyPolicy.policySha256
+      || difficulty.gradeCode !== brief.course.gradeCode || difficulty.subject !== brief.course.subject
+      || difficulty.skillId !== brief.course.skillId
+      || difficulty.difficultyCode !== contract.course.difficultyCode
+      || difficulty.difficultyCode !== brief.course.difficultyCode) {
+      context.addIssue({ code: "custom", path: ["difficultyPolicy"], message: "课程难度必须绑定同一年级、学科、技能及冻结策略" });
+    }
+  }
   if (contract.generation.enableImageGeneration !== Boolean(contract.professionalCreationPolicy.image)
       || contract.generation.enableVideoGeneration !== Boolean(contract.professionalCreationPolicy.video)
       || Boolean(contract.professionalCreationPolicy.teachingQuality) !== Boolean(contract.gradeBoundary && contract.gradeBoundarySha256)
@@ -1124,6 +1142,8 @@ export const openMaicAdaptiveFormalRuntimeManifestV2Schema = z.object({
   formalEvidence: z.object({
     media: imageEvidenceSchema.optional(), video: videoEvidenceSchema.optional(),
     teachingQuality: teachingQualityEvidenceSchema.optional(),
+    interactionDesign: interactionDesignEvidenceSchema.optional(),
+    requiredTeachingActions: requiredTeachingActionsSchema.optional(),
     sceneDistribution: z.object({
       slide: z.number().int().min(1).max(60),
       quiz: z.number().int().min(1).max(60),
@@ -1163,8 +1183,66 @@ export const openMaicAdaptiveFormalRuntimeManifestV2Schema = z.object({
   const evidenceTeacher = formalEvidence.teacher;
   const distribution = formalEvidence.sceneDistribution;
   const professionalReceipt = manifest.professionalCreation;
-  const extended = generation.professionalCreationPolicy;
+  const interaction = professionalReceipt.interactionDesign;
+  const interactionProof = formalEvidence.interactionDesign;
+  const interactionPolicy = generation.professionalCreationPolicy.interactionDesignPolicy;
   const quality = professionalReceipt.teachingQuality;
+  const eventScenes = formalEvidence.runtimeEventAuthority.scenes;
+  if (interaction || interactionProof || interactionPolicy || formalEvidence.professionalCreation.interactionDesign) {
+    const rejectInteraction = () => context.addIssue({ code: "custom", path: ["professionalCreation", "interactionDesign"],
+      message: "深度交互、视觉审核与当前课堂的冻结目标、快照及教学回执必须一致" });
+    if (!interaction || !interactionProof || !interactionPolicy || !quality
+      || interaction.policyId !== interactionPolicy.policyId
+      || interaction.sessionId !== professionalReceipt.sessionId || interaction.stageId !== professionalReceipt.classroomId
+      || interaction.snapshotSha256 !== quality.snapshotSha256 || interaction.gradeBoundarySha256 !== generation.gradeBoundarySha256
+      || interaction.teachingQualityReceiptSha256 !== quality.receiptSha256
+      || interaction.receiptSha256 !== interactionProof.receiptSha256
+      || interaction.planSha256 !== interactionProof.planSha256 || interaction.snapshotSha256 !== interactionProof.snapshotSha256
+      || interaction.receiptSha256 !== formalEvidence.professionalCreation.interactionDesign?.receiptSha256
+      || interaction.objectives.length !== interactionProof.objectiveCount
+      || interaction.objectives.length !== generation.gradeBoundary?.learningObjectives.length) {
+      rejectInteraction();
+    } else {
+      for (const [i, objective] of interaction.objectives.entries()) {
+        if (objective.objectiveIndex !== i
+          || !eventScenes.some(s => s.sceneId === objective.demonstration.sceneId)
+          || !eventScenes.some(s => s.sceneId === objective.operation.sceneId)
+          || objective.feedback.sceneId !== objective.operation.sceneId
+          || !brief.lesson.teachingFlow.independentQuestionIds.includes(objective.independentJudgment.questionId)
+          || !eventScenes.some(s => s.sceneId === objective.independentJudgment.sceneId
+            && s.questionIds.includes(objective.independentJudgment.questionId))
+          || objective.checks.some((check, index) => check.probeId !== `objective-${i}`
+            || check.viewport.width !== (index === 0 ? 1280 : 1024)
+            || !quality.renderChecks.some(c => c.sceneId === objective.operation.sceneId
+              && c.viewport.width === check.viewport.width && c.viewport.height === check.viewport.height
+              && c.sceneSha256 === check.sceneSha256 && c.screenshotSha256 === check.screenshotSha256
+              && c.domSha256 === check.domSha256 && c.probeCount > 0))) rejectInteraction();
+      }
+      if (interaction.schemaVersion === "mira.openmaic.interaction-design-receipt.v2") {
+        const visual = interaction.visualReview;
+        if (visual.snapshotSha256 !== quality.snapshotSha256 || visual.sceneReviews.length !== quality.renderChecks.length
+          || new Set(visual.sceneReviews.map(r => `${r.sceneId}:${r.viewport.width}`)).size !== visual.sceneReviews.length
+          || visual.sceneReviews.some(r => !quality.renderChecks.some(c => c.sceneId === r.sceneId
+            && c.sceneSha256 === r.sceneSha256 && c.screenshotSha256 === r.screenshotSha256
+            && c.viewport.width === r.viewport.width && c.viewport.height === r.viewport.height))
+          || interaction.explorationChecks.length !== interaction.objectives.length * 2) rejectInteraction();
+        for (const objective of interaction.objectives) {
+          for (const [width, mode] of [[1280, "pointer"], [1024, "touch"]] as const) {
+            const checks = interaction.explorationChecks.filter(c => c.objectiveIndex === objective.objectiveIndex && c.viewport.width === width);
+            if (checks.length !== 1 || checks[0].evidence.inputMode !== mode
+              || checks[0].evidence.mechanism !== objective.exploration.mechanism.kind
+              || checks[0].evidence.states.length !== objective.exploration.states.length
+              || checks[0].evidence.states.some((s, i) => s.stateId !== objective.exploration.states[i].id)) rejectInteraction();
+          }
+        }
+      }
+    }
+    const actions = formalEvidence.requiredTeachingActions;
+    if (!actions || actions.length !== formalEvidence.discussionActionCount
+      || new Set(actions.map(a => `${a.sceneId}:${a.actionId}`)).size !== actions.length
+      || actions.some(a => !eventScenes.some(s => s.sceneId === a.sceneId))) rejectInteraction();
+  }
+  const extended = generation.professionalCreationPolicy;
   const skills = professionalReceipt.skillOrchestration;
   if (extended.teachingQuality || extended.skillOrchestration) {
     const qualityEvidence = formalEvidence.teachingQuality;

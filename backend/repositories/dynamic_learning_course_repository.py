@@ -93,14 +93,39 @@ def _validate_strict_reservation_request(
     command_checkpoint: Mapping[str, object],
     prepared_request: Mapping[str, object],
 ) -> None:
-    expected_keys = {
-        "schemaVersion", "questionContractVersion", "requestId", "phase",
-        "phaseOrdinal", "gradeCode", "subject", "instructionLanguageCode",
-        "targetLanguageCode", "skillBoundary", "checkpoint", "provider",
-        "mode", "fakeResponses",
-    }
+    from content.formal_curriculum_registry import require_formal_grade, formal_registered_boundary
+    from content.formal_objective_rules import objective_question_policy
+    from integrations.openmaic_question_adapter import (
+        QUESTION_CONTRACT_VERSION, QUESTION_PHASE_INPUT_SCHEMA,
+        _QUESTION_PHASE_REQUEST_KEYS, _normalize_phase_boundary,
+    )
+
+    if not isinstance(prepared_request, Mapping):
+        raise ValueError("provider dispatch prepared request is invalid")
+    grade_code = require_formal_grade(prepared_request.get("gradeCode"))
+    higher_grade = grade_code != "primary_1"
+    expected_keys = _QUESTION_PHASE_REQUEST_KEYS | ({"objectivePolicy"} if higher_grade else set())
     if set(prepared_request) != expected_keys:
         raise ValueError("provider dispatch prepared request fields mismatch")
+    if (prepared_request.get("schemaVersion") != QUESTION_PHASE_INPUT_SCHEMA
+            or prepared_request.get("questionContractVersion") != QUESTION_CONTRACT_VERSION):
+        raise ValueError("provider dispatch question contract version mismatch")
+    if higher_grade:
+        policy = prepared_request.get("objectivePolicy")
+        boundary = prepared_request.get("skillBoundary")
+        if not isinstance(policy, Mapping) or not isinstance(boundary, Mapping):
+            raise ValueError("provider dispatch formal objective authority is missing")
+        subject = prepared_request.get("subject")
+        registered = formal_registered_boundary(grade_code, subject, boundary.get("skillId"))
+        expected_policy = objective_question_policy(grade_code, subject, registered.skill_id, policy.get("difficultyCode"))
+        if _canonical_dispatch_json(policy) != _canonical_dispatch_json(expected_policy):
+            raise ValueError("provider dispatch sealed objective policy mismatch")
+        expected_boundary = _normalize_phase_boundary(registered.to_openmaic_payload())
+        if _canonical_dispatch_json(boundary) != _canonical_dispatch_json(expected_boundary):
+            raise ValueError("provider dispatch formal skill boundary mismatch")
+        if (prepared_request.get("instructionLanguageCode") != "zh-CN"
+                or prepared_request.get("targetLanguageCode") != ("en-US" if subject == "english" else "zh-CN")):
+            raise ValueError("provider dispatch formal subject language mismatch")
     if (
         prepared_request.get("requestId") != generation_request_id
         or prepared_request.get("phase") != phase
@@ -349,6 +374,7 @@ def _normalize_locked_predecessors(
             subject=str(prepared_request.get("subject") or ""),
             instruction_language_code=str(prepared_request.get("instructionLanguageCode") or ""),
             target_language_code=str(prepared_request.get("targetLanguageCode") or ""),
+            difficulty_code=(prepared_request.get("objectivePolicy") or {}).get("difficultyCode"),
             boundary=boundary,
             checkpoint=reconstructed,
         )
@@ -462,6 +488,7 @@ def _verify_phase_14_inventory_proof(
         subject=str(prepared_request.get("subject") or ""),
         instruction_language_code=str(prepared_request.get("instructionLanguageCode") or ""),
         target_language_code=str(prepared_request.get("targetLanguageCode") or ""),
+        difficulty_code=(prepared_request.get("objectivePolicy") or {}).get("difficultyCode"),
         boundary=boundary,
         checkpoint=reconstructed,
     )
@@ -521,6 +548,7 @@ def _normalize_attempt_initial_checkpoint(
         target_language_code=str(
             prepared_request.get("targetLanguageCode") or ""
         ),
+        difficulty_code=(prepared_request.get("objectivePolicy") or {}).get("difficultyCode"),
         boundary=boundary,
         checkpoint=raw,
     )
@@ -644,6 +672,11 @@ def _reserve_provider_dispatch_strict(
         lease_expires_at=lease_expires_at,
     ):
         raise ValueError("provider dispatch item lease identity mismatch")
+    if grade_code != "primary_1":
+        from content.formal_curriculum_registry import formal_slot_difficulty
+        declared_difficulty = formal_slot_difficulty(grade_code, subject, skill_id, int(item.get("variant_ordinal") or 0))
+        if prepared_request["objectivePolicy"]["difficultyCode"] != declared_difficulty:
+            raise ValueError("provider dispatch difficulty does not match the locked formal slot")
 
     predecessor_rows = conn.execute(
         """
@@ -713,6 +746,15 @@ def _reserve_provider_dispatch_strict(
         if any(str(existing.get(key)) != str(value) for key, value in immutable.items()):
             raise ValueError("provider dispatch replay identity conflict")
         return ProviderDispatchReservation(dispatch=existing, created=False)
+
+    if logical_attempt == 2 and grade_code != 'primary_1':
+        from services.learning_content_recovery import load_recovery_receipt
+        recovery = load_recovery_receipt(conn, build_id=str(item['build_job_id']), item_id=build_item_id)
+        if recovery is not None:
+            total = conn.execute('SELECT COUNT(*) AS count FROM learning_course_provider_dispatches WHERE build_item_id=?',
+                (build_item_id,)).fetchone()
+            if int(total['count']) >= int(recovery['maximumDispatchCount']):
+                raise ValueError('audited single-course dispatch ceiling reached')
 
     fresh_now = clock_ms()
     if type(fresh_now) is not int or fresh_now < 0:

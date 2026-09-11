@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from services.learning_curriculum_preparation_contract import (canonical_preparation_target_for, formal_target_course_count, preparation_authority_grade)
+
 import hashlib
 import json
 import re
@@ -391,13 +393,13 @@ class LearningCurriculumPreparationRepository:
         if not reusable_state:
             return plan
 
-        canonical_target = build_preparation_target("primary_1")
+        canonical_target = build_preparation_target(preparation_authority_grade(plan))
         try:
             plan_target = json.loads(str(plan.get("target_spec_json") or ""))
         except (TypeError, ValueError, json.JSONDecodeError):
             return plan
         if not (
-            str(plan.get("grade_code") or "") == "primary_1"
+            str(plan.get("grade_code") or "") == preparation_authority_grade(plan)
             and compatible_preparation_target(plan_target, canonical_target)
             and preparation_target_fingerprint(plan_target) == target_fingerprint
             and str(plan.get("shared_build_request_id") or "")
@@ -442,13 +444,13 @@ class LearningCurriculumPreparationRepository:
               ON release_row.id = pointer.release_id
             JOIN learning_catalog_build_jobs AS build
               ON build.release_id = release_row.id
-            WHERE pointer.grade_code = 'primary_1'
+            WHERE pointer.grade_code = ?
               AND pointer.target_fingerprint = ?
               AND pointer.contract_version = ?
               AND pointer.pointer_revision >= 1
             LIMIT 1 FOR UPDATE
             """,
-            (target_fingerprint, self.FORMAL_PUBLICATION_CONTRACT_VERSION),
+            (preparation_authority_grade(plan), target_fingerprint, self.FORMAL_PUBLICATION_CONTRACT_VERSION),
         ).fetchone()
         if authority is None:
             return plan
@@ -464,7 +466,7 @@ class LearningCurriculumPreparationRepository:
         if not (
             str(authority.get("pointer_contract_version") or "")
             == self.FORMAL_PUBLICATION_CONTRACT_VERSION
-            and str(authority.get("history_grade_code") or "") == "primary_1"
+            and str(authority.get("history_grade_code") or "") == preparation_authority_grade(plan)
             and str(authority.get("history_target_fingerprint") or "")
             == target_fingerprint
             and str(authority.get("history_contract_version") or "")
@@ -478,8 +480,8 @@ class LearningCurriculumPreparationRepository:
             and int(authority.get("history_activated_at") or 0) == activated_at > 0
             and str(authority.get("release_status") or "") == "published"
             and str(authority.get("release_quality_status") or "") == "ready"
-            and int(authority.get("required_boundary_count") or 0) == 10
-            and int(authority.get("release_ready_item_count") or 0) == 30
+            and int(authority.get("required_boundary_count") or 0) == int(canonical_preparation_target_for(plan)["boundaryCount"])
+            and int(authority.get("release_ready_item_count") or 0) == formal_target_course_count(plan)
             and str(authority.get("build_request_id") or "")
             == f"grade-build:{target_fingerprint}"
             and str(authority.get("build_release_id") or "") == release_id
@@ -491,7 +493,7 @@ class LearningCurriculumPreparationRepository:
             == self._encode_json(plan_target, sort_keys=True)
             and preparation_target_fingerprint(build_target)
             == target_fingerprint
-            and int(authority.get("build_total_item_count") or 0) == 30
+            and int(authority.get("build_total_item_count") or 0) == formal_target_course_count(plan)
             and str(authority.get("build_execution_mode") or "")
             == "content_only"
             and str(authority.get("build_stage_ceiling") or "")
@@ -518,7 +520,7 @@ class LearningCurriculumPreparationRepository:
             """
             SELECT COUNT(*) AS item_count,
               COALESCE(SUM(
-                grade_code = 'primary_1'
+                grade_code = ?
                 AND status = 'published'
                 AND quality_status = 'ready'
                 AND retired_at IS NULL
@@ -526,15 +528,15 @@ class LearningCurriculumPreparationRepository:
             FROM learning_catalog_release_items
             WHERE release_id = ?
             """,
-            (release_id,),
+            (preparation_authority_grade(plan), release_id),
         ).fetchone()
         if not (
             build_items is not None
-            and int(build_items.get("item_count") or 0) == 30
-            and int(build_items.get("exact_count") or 0) == 30
+            and int(build_items.get("item_count") or 0) == formal_target_course_count(plan)
+            and int(build_items.get("exact_count") or 0) == formal_target_course_count(plan)
             and release_items is not None
-            and int(release_items.get("item_count") or 0) == 30
-            and int(release_items.get("exact_count") or 0) == 30
+            and int(release_items.get("item_count") or 0) == formal_target_course_count(plan)
+            and int(release_items.get("exact_count") or 0) == formal_target_course_count(plan)
         ):
             return plan
 
@@ -549,22 +551,22 @@ class LearningCurriculumPreparationRepository:
                 "contentFailedCount": 0,
             }
         stage_progress = {
-            "candidateCount": 30,
+            "candidateCount": formal_target_course_count(plan),
             "canaryCandidateCount": 3,
             "canaryFailedCount": 0,
             "canaryTargetCount": 3,
             "failedCount": 0,
-            "targetCount": 30,
+            "targetCount": formal_target_course_count(plan),
         }
         updated = conn.execute(
-            """
+            f"""
             UPDATE learning_curriculum_preparation_plans
             SET status = 'ready', stage = 'completed',
               catalog_build_id = ?, catalog_release_id = ?,
               ready_course_count = total_course_count,
               failed_course_count = 0, progress_percent = 100,
-              subject_progress_json = ?, content_target_count = 30,
-              content_candidate_count = 30, content_failed_count = 0,
+              subject_progress_json = ?, content_target_count = {formal_target_course_count(plan)},
+              content_candidate_count = {formal_target_course_count(plan)}, content_failed_count = 0,
               content_canary_target_count = 3,
               content_canary_candidate_count = 3,
               content_canary_failed_count = 0,
@@ -911,8 +913,6 @@ class LearningCurriculumPreparationRepository:
         cls._validate_identifier(grade_code, "grade_code")
         if re.fullmatch(r"[0-9a-f]{64}", target_fingerprint) is None:
             raise ValueError("target_fingerprint is invalid")
-        if grade_code != "primary_1":
-            return " AND grade_code = ? AND target_fingerprint = ?", (grade_code, target_fingerprint)
         current = build_preparation_target(grade_code)
         if preparation_target_fingerprint(current) != target_fingerprint:
             # Explicit historical/recovery callers retain their exact scope.
@@ -921,7 +921,17 @@ class LearningCurriculumPreparationRepository:
             current, target_column="target_spec_json", fingerprint_column="target_fingerprint",
             automatic_only=True,
         )
-        return " AND grade_code = ? AND " + paired, (grade_code, *params)
+        # Compatibility keeps historical published courses usable; it must not
+        # restart an older production owner after a current owner/scope exists.
+        active_owner = (
+            " AND (target_fingerprint = ? OR NOT EXISTS ("
+            "SELECT 1 FROM learning_curriculum_preparation_plans AS current_library_owner "
+            "WHERE current_library_owner.library_target_fingerprint = ? "
+            "AND current_library_owner.grade_code = ?))"
+        )
+        return " AND grade_code = ? AND " + paired + active_owner, (
+            grade_code, *params, target_fingerprint, target_fingerprint, grade_code,
+        )
 
     def renew_undispatched_content_budget(
         self,
@@ -1549,7 +1559,7 @@ class LearningCurriculumPreparationRepository:
     ) -> bool:
         try:
             target = json.loads(str(plan["target_spec_json"]))
-            expected_target = build_preparation_target("primary_1")
+            expected_target = build_preparation_target(preparation_authority_grade(plan))
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             return False
         empty_fields = (
@@ -1574,13 +1584,13 @@ class LearningCurriculumPreparationRepository:
         return bool(
             compatible_preparation_target(target, expected_target)
             and str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
-            and str(target.get("gradeCode") or "") == "primary_1"
+            and str(target.get("gradeCode") or "") == preparation_authority_grade(plan)
             and preparation_target_fingerprint(target) == target_fingerprint
             and str(plan.get("target_fingerprint") or "")
             == target_fingerprint
             and str(plan.get("shared_build_request_id") or "")
             == f"grade-build:{target_fingerprint}"
-            and str(plan.get("grade_code") or "") == "primary_1"
+            and str(plan.get("grade_code") or "") == preparation_authority_grade(plan)
             and str(plan.get("curriculum_version") or "")
             == str(target.get("curriculumVersion") or "")
             and str(plan.get("preparation_contract_version") or "")
@@ -2136,7 +2146,7 @@ class LearningCurriculumPreparationRepository:
                 ).fetchall()
             )
             if (
-                len(coordinator_items) != 30
+                len(coordinator_items) != formal_target_course_count(plan)
                 or any(
                     not self._coordinator_dependency_item_is_pristine(item)
                     for item in coordinator_items
@@ -2348,7 +2358,7 @@ class LearningCurriculumPreparationRepository:
                 (build_id, target_fingerprint),
             ).fetchall()
         )
-        current_target = build_preparation_target("primary_1")
+        current_target = build_preparation_target(preparation_authority_grade(build))
         try:
             plan_targets = [
                 json.loads(str(plan["target_spec_json"])) for plan in plans
@@ -2360,13 +2370,13 @@ class LearningCurriculumPreparationRepository:
             and str(build.get("status") or "") == "running"
             and build.get("error_code") is None
             and build.get("completed_at") is None
-            and len(items) == 30
+            and len(items) == formal_target_course_count(build)
             and sum(str(item.get("status") or "") == "processing" for item in items)
             == 1
             and not any(str(item.get("status") or "") == "failed" for item in items)
             and plans
             and all(
-                str(plan.get("grade_code") or "") == "primary_1"
+                str(plan.get("grade_code") or "") == preparation_authority_grade(build)
                 and str(plan.get("status") or "") == "failed"
                 and str(plan.get("stage") or "") == "completed"
                 and str(plan.get("error_code") or "")
@@ -2468,7 +2478,7 @@ class LearningCurriculumPreparationRepository:
                 (build_id, target_fingerprint),
             ).fetchall()
         )
-        current_target = build_preparation_target("primary_1")
+        current_target = build_preparation_target(preparation_authority_grade(build))
         try:
             plan_targets = [
                 json.loads(str(plan["target_spec_json"])) for plan in plans
@@ -2480,11 +2490,11 @@ class LearningCurriculumPreparationRepository:
             and str(build.get("status") or "") == "running"
             and build.get("error_code") is None
             and build.get("completed_at") is None
-            and len(items) == 30
+            and len(items) == formal_target_course_count(build)
             and 1 <= sum(
                 str(item.get("status") or "") == "course_ready"
                 for item in items
-            ) < 30
+            ) < formal_target_course_count(build)
             and any(str(item.get("status") or "") == "pending" for item in items)
             and all(
                 str(item.get("status") or "") in {"pending", "course_ready"}
@@ -2492,7 +2502,7 @@ class LearningCurriculumPreparationRepository:
             )
             and plans
             and all(
-                str(plan.get("grade_code") or "") == "primary_1"
+                str(plan.get("grade_code") or "") == preparation_authority_grade(build)
                 and str(plan.get("status") or "") == "failed"
                 and str(plan.get("stage") or "") == "completed"
                 and str(plan.get("error_code") or "")
@@ -2615,9 +2625,9 @@ class LearningCurriculumPreparationRepository:
             and str(plan.get("status") or "") == "running"
             and str(plan.get("stage") or "") == "building_classrooms"
             and type(plan.get("content_target_count")) is int
-            and int(plan["content_target_count"]) == 30
+            and int(plan["content_target_count"]) == formal_target_course_count(plan)
             and type(plan.get("content_candidate_count")) is int
-            and int(plan["content_candidate_count"]) == 30
+            and int(plan["content_candidate_count"]) == formal_target_course_count(plan)
             and type(plan.get("content_failed_count")) is int
             and int(plan["content_failed_count"]) == 0
             and type(plan.get("content_canary_target_count")) is int
@@ -2634,12 +2644,12 @@ class LearningCurriculumPreparationRepository:
             and int(plan["failed_course_count"]) == 0
             and stage_progress
             == {
-                "candidateCount": 30,
+                "candidateCount": formal_target_course_count(plan),
                 "canaryCandidateCount": 3,
                 "canaryFailedCount": 0,
                 "canaryTargetCount": 3,
                 "failedCount": 0,
-                "targetCount": 30,
+                "targetCount": formal_target_course_count(plan),
             }
             and all(
                 plan.get(field) is None
@@ -2823,7 +2833,7 @@ class LearningCurriculumPreparationRepository:
                 (build_id,),
             ).fetchall()
         )
-        if release is None or build is None or len(items) != 30:
+        if release is None or build is None or len(items) != formal_target_course_count(plan):
             return None
         release_item = conn.execute(
             "SELECT release_id FROM learning_catalog_release_items "
@@ -3242,10 +3252,10 @@ class LearningCurriculumPreparationRepository:
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             canonical_plan = dict(plan)
             canonical_plan["target_spec_json"] = self._encode_json(
-                build_preparation_target("primary_1"),
+                build_preparation_target(str(plan.get("grade_code") or "")),
                 sort_keys=True,
             )
-            canonical_plan["grade_code"] = "primary_1"
+            canonical_plan["grade_code"] = str(plan.get("grade_code") or "")
             subject_progress = self._safe_failure_subject_progress(canonical_plan)
         progress = self._progress_percent(
             expected_stage,
@@ -3315,10 +3325,10 @@ class LearningCurriculumPreparationRepository:
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             canonical_plan = dict(plan)
             canonical_plan["target_spec_json"] = self._encode_json(
-                build_preparation_target("primary_1"),
+                build_preparation_target(str(plan.get("grade_code") or "")),
                 sort_keys=True,
             )
-            canonical_plan["grade_code"] = "primary_1"
+            canonical_plan["grade_code"] = str(plan.get("grade_code") or "")
             subject_progress = self._safe_failure_subject_progress(canonical_plan)
         progress = self._progress_percent(
             failure_stage,
@@ -3744,7 +3754,7 @@ class LearningCurriculumPreparationRepository:
             now=now,
         ):
             return False, expected_stage
-        if release is None or build is None or len(items) != 30:
+        if release is None or build is None or len(items) != formal_target_course_count(plan):
             raise ValueError("formal preparation build authority is incomplete")
         try:
             build_target = json.loads(str(build["target_spec_json"]))
@@ -3925,8 +3935,8 @@ class LearningCurriculumPreparationRepository:
         classroom_ready = int(classroom_ready_count)
         speech_ready = int(speech_ready_count)
         if not (
-            total == 30
-            and int(plan.get("content_candidate_count") or 0) == 30
+            total == formal_target_course_count(plan)
+            and int(plan.get("content_candidate_count") or 0) == formal_target_course_count(plan)
             and int(plan.get("content_failed_count") or 0) == 0
             and int(plan.get("failed_course_count") or 0) == 0
             and formal_failed == 0
@@ -4135,23 +4145,23 @@ class LearningCurriculumPreparationRepository:
             for row in items
         )
         if not (
-            len(items) == 30
+            len(items) == formal_target_course_count(plan)
             and len(exact) == int(validation_ready_count)
-            and 0 <= int(validation_ready_count) <= 30
+            and 0 <= int(validation_ready_count) <= formal_target_course_count(plan)
             and not terminal_invalid
-            and int(plan.get("classroom_ready_count") or 0) == 30
-            and int(plan.get("speech_ready_count") or 0) == 30
+            and int(plan.get("classroom_ready_count") or 0) == formal_target_course_count(plan)
+            and int(plan.get("speech_ready_count") or 0) == formal_target_course_count(plan)
             and int(plan.get("validation_ready_count") or 0)
             <= int(validation_ready_count)
             and int(next_run_at) >= int(now)
         ):
             raise ValueError("formal validation readiness is incomplete")
-        handoff = int(validation_ready_count) == 30
+        handoff = int(validation_ready_count) == formal_target_course_count(plan)
         next_stage = "publishing" if handoff else "validating"
         progress = (
             95
             if handoff
-            else min(94, 85 + int(validation_ready_count) * 9 // 30)
+            else min(94, 85 + int(validation_ready_count) * 9 // formal_target_course_count(plan))
         )
         updated = conn.execute(
             """
@@ -4225,8 +4235,8 @@ class LearningCurriculumPreparationRepository:
             and str(plan.get("stage") or "") == "building_classrooms"
             and plan.get("catalog_build_id") is not None
             and plan.get("catalog_release_id") is not None
-            and int(plan.get("content_target_count") or 0) == 30
-            and int(plan.get("content_candidate_count") or 0) == 30
+            and int(plan.get("content_target_count") or 0) == formal_target_course_count(plan)
+            and int(plan.get("content_candidate_count") or 0) == formal_target_course_count(plan)
             and int(plan.get("content_failed_count") or 0) == 0
             and int(plan.get("content_canary_candidate_count") or 0) == 3
             and int(plan.get("content_canary_failed_count") or 0) == 0
@@ -4546,9 +4556,9 @@ class LearningCurriculumPreparationRepository:
                 )
             if not (
                 self._is_v2_plan(plan)
-                and int(plan.get("total_course_count") or 0) == 30
-                and int(plan.get("content_target_count") or 0) == 30
-                and int(plan.get("content_candidate_count") or 0) == 30
+                and int(plan.get("total_course_count") or 0) == formal_target_course_count(plan)
+                and int(plan.get("content_target_count") or 0) == formal_target_course_count(plan)
+                and int(plan.get("content_candidate_count") or 0) == formal_target_course_count(plan)
                 and int(plan.get("content_failed_count") or 0) == 0
                 and int(plan.get("failed_course_count") or 0) == 0
             ):
@@ -4557,7 +4567,7 @@ class LearningCurriculumPreparationRepository:
                 )
             self._validate_progress_counts(
                 plan,
-                ready_course_count=30,
+                ready_course_count=formal_target_course_count(plan),
                 failed_course_count=0,
                 subject_progress=subject_progress,
                 monotonic=True,
@@ -5252,6 +5262,9 @@ class LearningCurriculumPreparationRepository:
             expected_release_id = f"catalog_release_{request_digest}"
             plan_build_id = plan.get("catalog_build_id")
             plan_release_id = plan.get("catalog_release_id")
+            grade_code = preparation_authority_grade(plan)
+            canonical_grade_target = build_preparation_target(grade_code)
+            total_course_count = len(canonical_grade_target["courseTargets"])
             plan_catalog_pair_matches = bool(
                 (
                     allow_unbound_plan_catalog_ids
@@ -5267,9 +5280,9 @@ class LearningCurriculumPreparationRepository:
             return False
         if not (
             str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
-            and str(target.get("gradeCode") or "") == "primary_1"
+            and str(target.get("gradeCode") or "") == grade_code
             and compatible_preparation_target(
-                target, build_preparation_target("primary_1")
+                target, canonical_grade_target
             )
             and preparation_target_fingerprint(target) == target_fingerprint
             and str(build.get("request_id") or "")
@@ -5288,7 +5301,7 @@ class LearningCurriculumPreparationRepository:
             == str(target["curriculumVersion"])
             and str(build.get("canary_manifest_json") or "") == canary_json
             and type(build.get("total_item_count")) is int
-            and int(build["total_item_count"]) == 30
+            and int(build["total_item_count"]) == total_course_count
             and type(build.get("ready_item_count")) is int
             and int(build["ready_item_count"]) == 0
             and type(build.get("failed_item_count")) is int
@@ -5309,9 +5322,9 @@ class LearningCurriculumPreparationRepository:
             and str(plan.get("grade_code") or "")
             == str(target["gradeCode"])
             and type(release.get("required_boundary_count")) is int
-            and int(release["required_boundary_count"]) == 10
+            and int(release["required_boundary_count"]) == int(canonical_preparation_target_for(plan)["boundaryCount"])
             and type(release.get("ready_item_count")) is int
-            and 0 <= int(release["ready_item_count"]) <= 30
+            and 0 <= int(release["ready_item_count"]) <= formal_target_course_count(plan)
             and int(release["ready_item_count"])
             == int(plan.get("published_course_count") or 0)
             and int(plan.get("published_course_count") or 0)
@@ -5330,7 +5343,7 @@ class LearningCurriculumPreparationRepository:
             return False
         if items is None:
             return True
-        return len(items) == 30 and all(
+        return len(items) == formal_target_course_count(plan) and all(
             cls._canonical_content_item_identity_matches(
                 release=release,
                 build=build,
@@ -5386,7 +5399,7 @@ class LearningCurriculumPreparationRepository:
             skill_id = str(identity_target["skillId"])
             variant = int(identity_target["variantOrdinal"])
             identity = (
-                f"{build['id']}:primary_1:{subject}:{skill_id}:{variant}"
+                f"{build['id']}:{preparation_authority_grade(build)}:{subject}:{skill_id}:{variant}"
             )
             item_digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()
         except (KeyError, StopIteration, TypeError, ValueError, json.JSONDecodeError):
@@ -5400,7 +5413,7 @@ class LearningCurriculumPreparationRepository:
             == str(build.get("id") or "")
             and str(item.get("release_id") or "")
             == str(release.get("id") or "")
-            and str(item.get("grade_code") or "") == "primary_1"
+            and str(item.get("grade_code") or "") == preparation_authority_grade(build)
             and str(item.get("execution_mode_snapshot") or "")
             == "content_only"
             and str(item.get("content_manifest_version_snapshot") or "")
@@ -5473,7 +5486,7 @@ class LearningCurriculumPreparationRepository:
             == str(build.get("id") or "")
             and str(item.get("release_id") or "")
             == str(release.get("id") or "")
-            and str(item.get("grade_code") or "") == "primary_1"
+            and str(item.get("grade_code") or "") == preparation_authority_grade(build)
             and str(item.get("execution_mode_snapshot") or "")
             == "content_only"
             and str(item.get("content_manifest_version_snapshot") or "")
@@ -5817,9 +5830,9 @@ class LearningCurriculumPreparationRepository:
             return 0
         if not (
             str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
-            and str(target.get("gradeCode") or "") == "primary_1"
+            and str(target.get("gradeCode") or "") == preparation_authority_grade(build)
             and compatible_preparation_target(
-                target, build_preparation_target("primary_1")
+                target, build_preparation_target(preparation_authority_grade(build))
             )
             and preparation_target_fingerprint(target) == target_fingerprint
             and str(build.get("request_id") or "")
@@ -5830,8 +5843,8 @@ class LearningCurriculumPreparationRepository:
             == str(target["schemaVersion"])
             and str(build.get("canary_manifest_json") or "")
             == self._encode_json(target["canaryManifest"], sort_keys=True)
-            and int(build.get("total_item_count") or 0) == 30
-            and len(items) == 30
+            and int(build.get("total_item_count") or 0) == formal_target_course_count(build)
+            and len(items) == formal_target_course_count(build)
             and str(build.get("release_id") or "") == release_id
             and str(release.get("id") or "") == release_id
             and str(release.get("status") or "") == "draft"
@@ -5860,7 +5873,7 @@ class LearningCurriculumPreparationRepository:
         ):
             return 0
         item_by_id = {str(item.get("id") or ""): item for item in items}
-        if len(item_by_id) != 30:
+        if len(item_by_id) != formal_target_course_count(build):
             return 0
         passed_ids = frozenset(proof_snapshot.passed_item_ids)
         repairable_ids = frozenset(proof_snapshot.repairable_item_ids)
@@ -5925,10 +5938,10 @@ class LearningCurriculumPreparationRepository:
         )
         candidate_count = len(passed)
         failed_count = len(failed)
-        if candidate_count + failed_count > 30:
+        if candidate_count + failed_count > formal_target_course_count(build):
             return 0
         handoff = bool(
-            candidate_count == 30
+            candidate_count == formal_target_course_count(build)
             and failed_count == 0
             and passed_canaries == 3
             and failed_canaries == 0
@@ -5940,13 +5953,13 @@ class LearningCurriculumPreparationRepository:
                 "canaryFailedCount": failed_canaries,
                 "canaryTargetCount": 3,
                 "failedCount": failed_count,
-                "targetCount": 30,
+                "targetCount": formal_target_course_count(build),
             },
             sort_keys=True,
         )
         progress = max(
             self.STAGE_FLOORS["generating_content"],
-            5 + (30 * candidate_count // 30),
+            5 + (30 * candidate_count // formal_target_course_count(build)),
         )
         subject_progress = self._encode_json(
             self._content_subject_progress(
@@ -5968,7 +5981,7 @@ class LearningCurriculumPreparationRepository:
                 FROM learning_curriculum_preparation_plans
                 WHERE target_fingerprint = ?
                   AND shared_build_request_id = ?
-                  AND grade_code = 'primary_1'
+                  AND grade_code = ?
                   AND status IN ('queued', 'running')
                   AND (catalog_build_id IS NULL OR catalog_build_id = ?)
                   AND (catalog_release_id IS NULL OR catalog_release_id = ?)
@@ -5977,6 +5990,7 @@ class LearningCurriculumPreparationRepository:
                 (
                     target_fingerprint,
                     build["request_id"],
+                    preparation_authority_grade(build),
                     build_id,
                     release_id,
                 ),
@@ -6043,7 +6057,7 @@ class LearningCurriculumPreparationRepository:
                     )
                 )
                 and self._plan_owner_matches(plan, child)
-                and str(plan.get("grade_code") or "") == "primary_1"
+                and str(plan.get("grade_code") or "") == preparation_authority_grade(build)
                 and type(plan.get("grade_selection_revision")) is int
                 and str(plan.get("curriculum_version") or "")
                 == str(target.get("curriculumVersion") or "")
@@ -6068,11 +6082,11 @@ class LearningCurriculumPreparationRepository:
                 error_code = self._catalog_failure_code(build.get("error_code"))
                 if proof_trusted:
                     cursor = conn.execute(
-                        """
+                        f"""
                         UPDATE learning_curriculum_preparation_plans
                         SET status = 'failed', stage = 'completed',
                           catalog_build_id = ?, catalog_release_id = ?,
-                          content_target_count = 30,
+                          content_target_count = {formal_target_course_count(plan)},
                           content_canary_target_count = 3,
                           content_candidate_count = ?, content_failed_count = ?,
                           content_canary_candidate_count = ?,
@@ -6169,9 +6183,9 @@ class LearningCurriculumPreparationRepository:
                     UPDATE learning_curriculum_preparation_plans
                     SET status = 'running', stage = 'building_classrooms',
                       catalog_build_id = ?, catalog_release_id = ?,
-                      content_target_count = 30,
+                      content_target_count = {formal_target_course_count(plan)},
                       content_canary_target_count = 3,
-                      content_candidate_count = 30, content_failed_count = 0,
+                      content_candidate_count = {formal_target_course_count(plan)}, content_failed_count = 0,
                       content_canary_candidate_count = 3,
                       content_canary_failed_count = 0,
                       content_canary_passed_at = COALESCE(content_canary_passed_at, ?),
@@ -6231,10 +6245,10 @@ class LearningCurriculumPreparationRepository:
             )
             if exact_owner:
                 cursor = conn.execute(
-                    """
+                    f"""
                     UPDATE learning_curriculum_preparation_plans
                     SET catalog_build_id = ?, catalog_release_id = ?,
-                      content_target_count = 30,
+                      content_target_count = {formal_target_course_count(plan)},
                       content_canary_target_count = 3,
                       content_candidate_count = ?, content_failed_count = ?,
                       content_canary_candidate_count = ?,
@@ -6277,10 +6291,10 @@ class LearningCurriculumPreparationRepository:
             retry_wait = str(plan.get("stage") or "") == "retry_wait"
             if retry_wait:
                 cursor = conn.execute(
-                    """
+                    f"""
                     UPDATE learning_curriculum_preparation_plans
                     SET catalog_build_id = ?, catalog_release_id = ?,
-                      content_target_count = 30,
+                      content_target_count = {formal_target_course_count(plan)},
                       content_canary_target_count = 3,
                       content_candidate_count = ?, content_failed_count = ?,
                       content_canary_candidate_count = ?,
@@ -6311,11 +6325,11 @@ class LearningCurriculumPreparationRepository:
                 )
             else:
                 cursor = conn.execute(
-                    """
+                    f"""
                     UPDATE learning_curriculum_preparation_plans
                     SET status = 'running', stage = 'generating_content',
                       catalog_build_id = ?, catalog_release_id = ?,
-                      content_target_count = 30,
+                      content_target_count = {formal_target_course_count(plan)},
                       content_canary_target_count = 3,
                       content_candidate_count = ?, content_failed_count = ?,
                       content_canary_candidate_count = ?,
@@ -6381,6 +6395,7 @@ class LearningCurriculumPreparationRepository:
         )
         params: list[object] = [
             target_fingerprint,
+            preparation_authority_grade(build),
             build_id,
             release_id,
         ]
@@ -6394,7 +6409,7 @@ class LearningCurriculumPreparationRepository:
                 SELECT id, family_id, child_id
                 FROM learning_curriculum_preparation_plans
                 WHERE target_fingerprint = ?
-                  AND grade_code = 'primary_1'
+                  AND grade_code = ?
                   AND status IN ('queued', 'running')
                   AND ((catalog_build_id = ? AND catalog_release_id = ?)
                     {shared_clause})
@@ -6429,7 +6444,7 @@ class LearningCurriculumPreparationRepository:
                 plan_ids,
             ).fetchall()
         )
-        current_target = build_preparation_target("primary_1")
+        current_target = build_preparation_target(preparation_authority_grade(build))
         error_code = self._catalog_failure_code(build.get("error_code"))
         updated = 0
         for plan in plans:
@@ -6741,6 +6756,11 @@ class LearningCurriculumPreparationRepository:
                         in attempt_pairs
                     ],
                 }
+            if int(row.get('attempt_count') or 0) == 2 and row.get('grade_code') != 'primary_1':
+                from services.learning_content_recovery import load_recovery_receipt
+                receipt = load_recovery_receipt(conn, build_id=str(row['build_job_id']), item_id=item_id)
+                if receipt is not None:
+                    attempts[1]['recoveryReceipt'] = receipt
             histories[item_id] = attempts
         return histories
 
@@ -6927,7 +6947,7 @@ class LearningCurriculumPreparationRepository:
             canary_targets = (
                 canary.get("targets") if isinstance(canary, Mapping) else None
             )
-            if target_count != 30 or not isinstance(canary_targets, list):
+            if target_count != formal_target_course_count(target) or not isinstance(canary_targets, list):
                 raise ValueError("v2 preparation target content evidence mismatch")
             canary_target_count = len(canary_targets)
             if canary_target_count != 3:

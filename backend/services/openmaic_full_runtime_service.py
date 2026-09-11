@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import hashlib
 import math
 import re
@@ -33,6 +34,7 @@ from integrations.openmaic_formal_pedagogy import (
 from integrations.openmaic_formal_quality import (
     professional_quality_fields, validate_classroom_quality,
 )
+from integrations.openmaic_formal_interaction import professional_interaction_fields, validate_classroom_interaction
 from core.database import Database
 from core.security import hash_value, new_token, now_ms
 from integrations.openmaic_full_runtime_client import (
@@ -486,6 +488,7 @@ class OpenMaicFullRuntimeService:
         formal_citation_recovery_enabled: bool = False,
         formal_citation_recovery_source_job_id: str = "",
         formal_citation_recovery_client: OpenMaicFormalCitationRecoveryClient | None = None,
+        paid_budget_service: Any | None = None,
     ):
         # Imported lazily because the catalog repository's preparation
         # contract intentionally fingerprints this runtime service.
@@ -499,6 +502,7 @@ class OpenMaicFullRuntimeService:
         )
         self.student_auth_service = student_auth_service
         self.client = client
+        self.paid_budget_service = paid_budget_service
         self.enabled = bool(enabled)
         self.generation_enabled = bool(generation_enabled)
         self.public_url = str(public_url or "").strip().rstrip("/")
@@ -2026,6 +2030,7 @@ class OpenMaicFullRuntimeService:
             runtime_request_id=str(runtime["request_id"]),
             generation_contract=generation_contract,
             formal_contract=formal_contract,
+            paid_budget=manifest.get("paidBudget"),
         )
         recovery_request_id = f"mira-fcr-{runtime_key}"
         local_recovery_id = "formal_citation_recovery_" + hashlib.sha256(
@@ -2259,6 +2264,7 @@ class OpenMaicFullRuntimeService:
                 runtime_request_id=str(runtime["request_id"]),
                 generation_contract=requested_manifest.get("generationContract"),
                 formal_contract=requested_manifest.get("formalRuntimeContract"),
+                paid_budget=requested_manifest.get("paidBudget"),
             )
             if (
                 observed is None
@@ -2357,6 +2363,7 @@ class OpenMaicFullRuntimeService:
                     formal_contract=requested_manifest.get(
                         "formalRuntimeContract"
                     ),
+                    paid_budget=requested_manifest.get("paidBudget"),
                 )
                 if (
                     str(job.job_id) != job_id
@@ -2711,12 +2718,31 @@ class OpenMaicFullRuntimeService:
                         )
                     ),
                 }
+                if isinstance(teaching_brief.get("difficultyPolicy"), Mapping):
+                    from content.formal_difficulty_policy import formal_difficulty_policy
+                    difficulty = formal_difficulty_policy(str(brief_course.get("gradeCode")), str(brief_course.get("subject")),
+                        str(brief_course.get("skillId")), str(brief_course.get("difficultyCode")))
+                    if _canonical_sha256(difficulty) != _canonical_sha256(teaching_brief["difficultyPolicy"]):
+                        raise ValueError("formal candidate difficulty authority mismatch")
+                    generation_contract["difficultyPolicy"] = difficulty
+                    generation_contract["course"]["difficultyCode"] = difficulty["difficultyCode"]
                 if adaptive_policy(selected_policy):
                     generation_contract.update({
                         "gradeBoundary": authority.get("gradeBoundary"),
                         "gradeBoundarySha256": authority.get("gradeBoundarySha256"),
                     })
                 validate_generation_grade_boundary(generation_contract)
+                paid_budget = None
+                if "interactionDesignPolicy" in selected_policy:
+                    if self.paid_budget_service is None:
+                        self._fail("learning_budget_unavailable", "新课生产预算尚未配置，未发起付费调用", 503)
+                    paid_budget = self.paid_budget_service.issue_catalog_production_authorization(
+                        build_item_id=item_key, expected_grade=str(brief_course.get("gradeCode") or ""),
+                        expected_subject=str(brief_course.get("subject") or ""),
+                        expected_skill=str(brief_course.get("skillId") or ""),
+                        expected_course_id=course_key, expected_course_version=course_version_key)
+                    if paid_budget is None:
+                        self._fail("learning_budget_unavailable", "新课生产预算尚未配置，未发起付费调用", 503)
                 requirement = json.dumps(
                     generation_contract,
                     ensure_ascii=False,
@@ -2732,6 +2758,7 @@ class OpenMaicFullRuntimeService:
                             "enableVideoGeneration": selected_options["enableVideoGeneration"],
                             "enableTTS": False,
                             "agentMode": "generate",
+                            **({"paidBudget": paid_budget} if paid_budget is not None else {}),
                             "runtimeRequestId": request_key,
                             "formalRuntimeContract": formal_contract,
                             "coursewareAuthority": dict(
@@ -2756,6 +2783,8 @@ class OpenMaicFullRuntimeService:
                 manifest["formalRuntimeContract"] = formal_contract
                 manifest["sourceCourseContentSha256"] = source_content_sha256
                 manifest["teachingBriefSha256"] = teaching_brief_sha256
+                if paid_budget is not None:
+                    manifest["paidBudget"] = paid_budget
                 runtime, created = self.repository.reserve_candidate_runtime(
                     conn,
                     runtime_id=new_token("omfc"),
@@ -2776,6 +2805,10 @@ class OpenMaicFullRuntimeService:
                     if "ambiguous" in message
                     or "safely retryable" in message
                     else "openmaic_formal_candidate_conflict"
+                )
+                logging.getLogger(__name__).warning(
+                    "Formal candidate reservation rejected: code=%s reason=%s",
+                    code, message[:512],
                 )
                 self._fail(code, "正式候选课堂状态冲突，未发起生成", 409)
 
@@ -2815,6 +2848,7 @@ class OpenMaicFullRuntimeService:
                     runtime_request_id=request_key,
                     formal_runtime_contract=formal_contract,
                     professional_creation_policy=selected_policy,
+                    **({"paid_budget": paid_budget} if paid_budget is not None else {}),
                 )
             except OpenMaicFullRuntimeError as dispatch_error:
                 try:
@@ -2897,6 +2931,7 @@ class OpenMaicFullRuntimeService:
         runtime_request_id: str,
         generation_contract: object,
         formal_contract: object,
+        paid_budget: object = None,
     ) -> str:
         if not isinstance(generation_contract, Mapping) or not isinstance(
             formal_contract, Mapping
@@ -2926,6 +2961,7 @@ class OpenMaicFullRuntimeService:
                 "enableVideoGeneration": selected_options["enableVideoGeneration"],
                 "enableTTS": False,
                 "agentMode": "generate",
+                **({"paidBudget": paid_budget} if paid_budget is not None else {}),
                 "runtimeRequestId": runtime_request_id,
                 "formalRuntimeContract": dict(formal_contract),
                 "coursewareAuthority": dict(
@@ -3132,6 +3168,14 @@ class OpenMaicFullRuntimeService:
             quality_evidence = validate_classroom_quality(professional_creation, generation_contract, classroom)
             if quality_evidence is not None:
                 formal_evidence["teachingQuality"] = quality_evidence
+            interaction_evidence = validate_classroom_interaction(professional_creation, generation_contract, classroom)
+            if interaction_evidence is not None:
+                formal_evidence["interactionDesign"] = interaction_evidence
+                formal_evidence["requiredTeachingActions"] = [
+                    {"sceneId": str(scene["id"]), "actionId": str(action["id"])}
+                    for scene in sorted(classroom["scenes"], key=lambda value: value["order"])
+                    for action in scene["actions"] if action.get("type") == "discussion"
+                ]
         except ValueError as exc:
             self._fail("openmaic_formal_teaching_quality_invalid", "正式课堂最终课件与独立教学质量验收不一致", 502)
             raise AssertionError("unreachable") from exc
@@ -3180,6 +3224,8 @@ class OpenMaicFullRuntimeService:
         manifest["teachingBriefSha256"] = requested_manifest.get(
             "teachingBriefSha256"
         )
+        if requested_manifest.get("paidBudget") is not None:
+            manifest["paidBudget"] = requested_manifest["paidBudget"]
         completed_at = now_ms()
         receipt_payload = {
             "schemaVersion": (
@@ -3433,6 +3479,7 @@ class OpenMaicFullRuntimeService:
             **professional_video_fields(professional),
             **professional_skill_fields(professional),
             **professional_quality_fields(professional),
+            **professional_interaction_fields(professional),
             "receiptSha256": professional["receiptSha256"],
         }
         research_evidence = {
@@ -4918,6 +4965,7 @@ class OpenMaicFullRuntimeService:
                 **professional_video_fields(professional_receipt),
                 **professional_skill_fields(professional_receipt),
                 **professional_quality_fields(professional_receipt),
+                **professional_interaction_fields(professional_receipt),
                 "receiptSha256": professional_receipt["receiptSha256"],
             }
             and research_evidence
@@ -5141,6 +5189,7 @@ class OpenMaicFullRuntimeService:
         if existing_teacher is not None and existing_teacher != teacher_identity:
             return None
         student_manifest = dict(manifest)
+        student_manifest.pop("paidBudget", None)
         student_manifest["teacherIdentity"] = teacher_identity
         return student_manifest
 
@@ -5436,6 +5485,8 @@ class OpenMaicFullRuntimeService:
                         409,
                     )
             expires_at = timestamp + self.session_ttl_seconds * 1000
+            from services.learning_paid_authority import teaching_budget_bindings
+            paid_budgets = teaching_budget_bindings(getattr(self, "paid_budget_service", None), row, manifest, admit=True)
             try:
                 self.repository.consume_launch_ticket(
                     conn,
@@ -5454,6 +5505,7 @@ class OpenMaicFullRuntimeService:
             "classroomId": str(row["upstream_classroom_id"]),
             "learningSessionId": str(row["learning_session_id"]),
             "features": manifest,
+            **({"paidBudgets": paid_budgets} if paid_budgets is not None else {}),
         }
 
     def validate_runtime_session(self, runtime_token: str) -> dict[str, Any]:
@@ -5505,6 +5557,8 @@ class OpenMaicFullRuntimeService:
             self.repository.touch_runtime_session(
                 conn, runtime_session_id=str(row["id"]), now=timestamp
             )
+            from services.learning_paid_authority import teaching_budget_bindings
+            paid_budgets = teaching_budget_bindings(getattr(self, "paid_budget_service", None), row, manifest, admit=False)
         return {
             "ok": True,
             "runtimeSessionId": str(row["id"]),
@@ -5512,6 +5566,7 @@ class OpenMaicFullRuntimeService:
             "learningSessionId": str(row["learning_session_id"]),
             "expiresAt": int(row["expires_at"]),
             "features": manifest,
+            **({"paidBudgets": paid_budgets} if paid_budgets is not None else {}),
         }
 
     def _handle_deterministic_recovery_result(

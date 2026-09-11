@@ -62,6 +62,15 @@ class LearningOpenMaicRuntimeEventsMigrationTest(unittest.TestCase):
         )
         self.assertNotIn("update learning_openmaic_runtime_events", normalized)
 
+    def test_interaction_extension_keeps_non_assessment_shape_and_adaptive_bounds(self):
+        sql = (ROOT / "migrations/075_learning_openmaic_interaction_events.sql").read_text(encoding="utf-8")
+        normalized = " ".join(sql.split()).lower()
+        self.assertEqual(len(_split_sql_script(sql)), 1)
+        self.assertIn("'interaction_completed'", normalized)
+        self.assertIn("event_type = 'interaction_completed' and action_id is null and question_id is null and attempt_number is null", normalized)
+        self.assertIn("scene_index >= 0 and scene_index < 60", normalized)
+        self.assertNotIn("update learning_openmaic_runtime_events", normalized)
+
     def test_adaptive_extension_bounds_counts_and_uses_per_job_audio_authority(self):
         sql = ADAPTIVE_MIGRATION.read_text(encoding="utf-8")
         normalized = " ".join(sql.split()).lower()

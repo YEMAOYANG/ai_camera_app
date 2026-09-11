@@ -1,0 +1,161 @@
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -40,6 +40,7 @@
+ import { resolveAgentDriverModel } from '@/lib/server/agent-runtime/agent-driver-model';
+ import { getAgentSessionStore } from '@/lib/server/agent-runtime/store';
+ import { resolveWebSearchCapability } from '@/lib/server/agent-runtime/web-search';
++import { getMiraWebSearchProductionConfig } from '@/lib/server/mira-web-search-production-config';
+ 
+ const version = process.env.npm_package_version || '1.0.0';
+ 
+@@ -56,7 +57,9 @@
+         runtimePolicy: {
+           formalProviderReadiness: getMiraFormalProviderReadinessPolicy(),
+           modelPolicy,
+-          modelService: describeDeepSeekService(resolveBaseUrl('deepseek') || 'https://api.deepseek.com/v1'),
++          modelService: describeDeepSeekService(
++            resolveBaseUrl('deepseek') || 'https://api.deepseek.com/v1',
++          ),
+         },
+       });
+     } catch (error) {
+@@ -117,6 +120,7 @@
+           formalAudio: getMiraFormalAudioRuntimePolicy(),
+           professionalResearch: getMiraProfessionalResearchPolicy(),
+           modelPolicy,
++          webSearch: getMiraWebSearchProductionConfig(search.providerId),
+         },
+       });
+     } catch (error) {
+@@ -183,7 +187,10 @@
+       instrumentationBoundary: instrumentationBoundaryPolicy,
+       professionalResearch: getMiraProfessionalResearchPolicy(),
+       modelPolicy,
+-      modelService: describeDeepSeekService(resolveBaseUrl('deepseek') || 'https://api.deepseek.com/v1'),
++      modelService: describeDeepSeekService(
++        resolveBaseUrl('deepseek') || 'https://api.deepseek.com/v1',
++      ),
++      webSearch: getMiraWebSearchProductionConfig(resolveWebSearchCapability()?.providerId),
+     },
+   });
+ }
+--- /dev/null
++++ b/lib/server/mira-web-search-production-config.ts
+@@ -0,0 +1,17 @@
++import { isServerProviderDisabled, resolveWebSearchApiKey } from '@/lib/server/provider-config';
++
++/** Configuration metadata only: no request, secret, or connectivity claim. */
++export function getMiraWebSearchProductionConfig(providerId?: string) {
++  // One argument is the legacy Tavily client-key overload. Explicit undefined
++  // is essential: the literal provider name must never be treated as a key.
++  const hasBraveKey = Boolean(resolveWebSearchApiKey('brave', undefined).trim());
++  const isBrave = providerId === 'brave';
++  return {
++    schemaVersion: 'mira.openmaic.web-search-production-config.v1',
++    providerId: providerId ?? null,
++    productionMode: isBrave ? (hasBraveKey ? 'brave_api' : 'public_html') : null,
++    formalProductionConfigured:
++      isBrave && hasBraveKey && !isServerProviderDisabled('webSearch', 'brave'),
++    verification: 'configuration_only',
++  };
++}
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -1,5 +1,6 @@
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ import { NextRequest } from 'next/server';
++import { MIRA_MULTISTATE_INTERACTION_POLICY } from '@/lib/server/mira-formal-interaction-design';
+ 
+ const healthRequest = () => new NextRequest('http://runtime.test/api/health');
+ 
+@@ -28,6 +29,8 @@
+   resolveASRBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
+   resolveApiKey: () => process.env.DEEPSEEK_API_KEY || '',
+   resolveBaseUrl: () => process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1',
++  resolveWebSearchApiKey: (provider: string, clientKey?: string) =>
++    provider === 'brave' && clientKey === undefined ? process.env.MIRA_TEST_BRAVE_KEY || '' : '',
+ }));
+ 
+ vi.mock('@/lib/config/feature-flags', async (importOriginal) => ({
+@@ -86,6 +89,7 @@
+     });
+     delete process.env.DEEPSEEK_API_KEY;
+     delete process.env.DEEPSEEK_BASE_URL;
++    delete process.env.MIRA_TEST_BRAVE_KEY;
+     process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED = '1';
+     process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID = 'uKQl3vMr4d';
+     process.env.MIRA_OPENMAIC_DETERMINISTIC_RECOVERY_PATCH_SHA256 = 'c'.repeat(64);
+@@ -97,6 +101,7 @@
+   });
+ 
+   afterEach(() => {
++    delete process.env.MIRA_TEST_BRAVE_KEY;
+     delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
+     delete process.env.MIRA_OPENMAIC_REQUIRE_QWEN_TTS;
+     delete process.env.MIRA_OPENMAIC_QWEN_TTS_MODEL;
+@@ -240,6 +245,7 @@
+         backendProviderCredentialsAccepted: false,
+       },
+       professionalCreation: {
++        interactionDesignPolicy: MIRA_MULTISTATE_INTERACTION_POLICY,
+         schemaVersion: 'mira.openmaic.professional-creation.v1',
+         mode: 'professional_skill',
+         workflowVersion: 'openmaic-pro-agent.v1',
+@@ -402,6 +408,13 @@
+ 
+     expect(response.status).toBe(200);
+     expect(body.version).toBe('1.0.0');
++    expect(body.runtimePolicy.webSearch).toEqual({
++      schemaVersion: 'mira.openmaic.web-search-production-config.v1',
++      providerId: 'brave',
++      productionMode: 'public_html',
++      formalProductionConfigured: false,
++      verification: 'configuration_only',
++    });
+     expect(body.capabilities).toEqual({
+       formalGeneration: true,
+       professionalAgent: true,
+--- /dev/null
++++ b/tests/server/mira-web-search-production-config.test.ts
+@@ -0,0 +1,41 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++const state = vi.hoisted(() => ({ key: '', disabled: false }));
++const keyResolver = vi.hoisted(() => vi.fn());
++vi.mock('@/lib/server/provider-config', () => ({
++  resolveWebSearchApiKey: keyResolver,
++  isServerProviderDisabled: () => state.disabled,
++}));
++import { getMiraWebSearchProductionConfig } from '@/lib/server/mira-web-search-production-config';
++afterEach(() => {
++  state.key = '';
++  state.disabled = false;
++  keyResolver.mockReset();
++});
++describe('formal search configuration metadata', () => {
++  it('reports public HTML without claiming production configuration or failing health', () => {
++    keyResolver.mockReturnValue('  ');
++    expect(getMiraWebSearchProductionConfig('brave')).toMatchObject({
++      productionMode: 'public_html',
++      formalProductionConfigured: false,
++      verification: 'configuration_only',
++    });
++    expect(keyResolver).toHaveBeenCalledWith('brave', undefined);
++    expect(keyResolver.mock.calls[0]).toHaveLength(2);
++  });
++  it('reports the effective keyed mode without returning a secret or claiming connectivity', () => {
++    keyResolver.mockReturnValue('secret-test-key-not-for-output');
++    const configured = getMiraWebSearchProductionConfig('brave');
++    expect(configured).toMatchObject({
++      productionMode: 'brave_api',
++      formalProductionConfigured: true,
++      verification: 'configuration_only',
++    });
++    expect(JSON.stringify(configured)).not.toContain('secret-test-key');
++    state.disabled = true;
++    expect(getMiraWebSearchProductionConfig('brave').formalProductionConfigured).toBe(false);
++    expect(getMiraWebSearchProductionConfig('searxng')).toMatchObject({
++      productionMode: null,
++      formalProductionConfigured: false,
++    });
++  });
++});

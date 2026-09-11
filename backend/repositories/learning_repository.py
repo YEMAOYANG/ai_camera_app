@@ -523,6 +523,8 @@ class LearningRepository:
         student_grade_selection_revision: int | None = None,
         curriculum_version: str | None = None,
         boundary_version: str | None = None,
+        difficulty_code: str | None = None,
+        require_completed: bool = False,
     ) -> DatabaseRow | None:
         exclusions = tuple(
             str(course_id).strip()
@@ -541,6 +543,22 @@ class LearningRepository:
         if required_node:
             required_node_sql = " AND course.node_code = ?"
             params.append(required_node)
+        difficulty_sql = ""
+        if difficulty_code is not None:
+            from content.formal_difficulty_policy import require_difficulty
+            difficulty_sql = " AND JSON_UNQUOTE(JSON_EXTRACT(course.content_json, '$.difficultyCode')) = ?"
+            params.append(require_difficulty(difficulty_code))
+        elif require_completed and grade_code != 'primary_1':
+            difficulty_sql = " AND JSON_UNQUOTE(JSON_EXTRACT(course.content_json, '$.difficultyCode')) IN ('basic','standard','challenge')"
+        completed_sql = ""
+        if require_completed:
+            completed_sql = """ AND EXISTS (
+                SELECT 1 FROM learning_sessions AS difficulty_review
+                WHERE difficulty_review.family_id = ? AND difficulty_review.child_id = ?
+                  AND difficulty_review.course_id = course.id AND difficulty_review.course_version = course.version
+                  AND difficulty_review.status = 'completed' AND difficulty_review.completed_at IS NOT NULL
+            )"""
+            params.extend((family_id, child_id))
         if exclusions:
             exclusion_sql = (
                 f" AND course.id NOT IN ({', '.join('?' for _ in exclusions)})"
@@ -634,10 +652,13 @@ class LearningRepository:
              AND mastery.child_id = ?
              AND mastery.node_code = course.node_code
              AND mastery.subject = course.subject
+             AND mastery.grade_code = course.grade_code
             WHERE course.grade_code = ?
               AND course.subject = ?
               AND course.status = 'published'
               {required_node_sql}
+              {difficulty_sql}
+              {completed_sql}
               {exclusion_sql}
               {origin_sql}
               {teaching_flow_sql}
@@ -902,6 +923,7 @@ class LearningRepository:
              AND mastery.child_id = ?
              AND mastery.node_code = course.node_code
              AND mastery.subject = course.subject
+             AND mastery.grade_code = course.grade_code
             WHERE course.grade_code = ?
               AND course.subject = ?
               AND course.status = 'published'
@@ -1192,6 +1214,29 @@ class LearningRepository:
             "availableCourseCount": available_count,
             "targetCourseCount": resolved_target,
         }
+
+    def personal_visible_course_inventory(self, conn: DatabaseConnection, *, family_id: str,
+                                          child_id: str, grade_code: str,
+                                          grade_selection_revision: int) -> list[DatabaseRow]:
+        return conn.execute(
+            f"""SELECT course.id, course.version, course.subject, course.node_code
+                FROM learning_courses AS course
+                WHERE course.grade_code = ? AND course.status = 'published'
+                  AND course.quality_status = 'released' AND course.retired_at IS NULL
+                  AND course.content_origin = 'openmaic_generated'
+                  AND {_student_visible_course_sql()}""",
+            (grade_code, family_id, child_id, grade_selection_revision,
+             family_id, child_id, grade_selection_revision),
+        ).fetchall()
+
+    def personal_grade_mastery(self, conn: DatabaseConnection, *, family_id: str,
+                              child_id: str, grade_code: str) -> dict[str, str]:
+        rows = conn.execute(
+            """SELECT subject, node_code, mastery_level FROM learning_mastery_states
+               WHERE family_id = ? AND child_id = ? AND grade_code = ?""",
+            (family_id, child_id, grade_code),
+        ).fetchall()
+        return {f"{row['subject']}:{row['node_code']}": str(row["mastery_level"]) for row in rows}
 
     def count_published_grade_courses(
         self,
@@ -2212,7 +2257,6 @@ class LearningRepository:
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE
-              grade_code = VALUES(grade_code),
               attempts = attempts + VALUES(attempts),
               correct_count = correct_count + VALUES(correct_count),
               independent_correct_count = independent_correct_count + VALUES(independent_correct_count),
@@ -2250,6 +2294,7 @@ class LearningRepository:
             child_id=child_id,
             node_code=node_code,
             subject=subject,
+            grade_code=grade_code,
         )
 
     def get_mastery_state(
@@ -2260,14 +2305,15 @@ class LearningRepository:
         child_id: str,
         node_code: str,
         subject: str,
+        grade_code: str,
     ) -> DatabaseRow | None:
         return conn.execute(
             """
             SELECT * FROM learning_mastery_states
-            WHERE family_id = ? AND child_id = ? AND node_code = ? AND subject = ?
+            WHERE family_id = ? AND child_id = ? AND node_code = ? AND subject = ? AND grade_code = ?
             LIMIT 1
             """,
-            (family_id, child_id, node_code, subject),
+            (family_id, child_id, node_code, subject, grade_code),
         ).fetchone()
 
     def add_task_event(

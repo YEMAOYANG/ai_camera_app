@@ -190,7 +190,11 @@ clear_openmaic_provider_env() {
   OPENMAIC_WEB_SEARCH_ENABLED="0"
   OPENMAIC_WEB_SEARCH_PROVIDER=""
   OPENMAIC_BRAVE_BASE_URL=""
+  OPENMAIC_BRAVE_API_KEY=""
   OPENMAIC_BRAVE_ENABLED="false"
+  OPENMAIC_BAIDU_BASE_URL=""
+  OPENMAIC_BAIDU_API_KEY=""
+  OPENMAIC_BAIDU_ENABLED="false"
   OPENMAIC_TTS_QWEN_API_KEY=""
   OPENMAIC_TTS_QWEN_BASE_URL=""
   OPENMAIC_TTS_QWEN_MODELS=""
@@ -534,34 +538,63 @@ load_openmaic_agent_runtime_env() {
   OPENMAIC_MODEL_ROUTES='{"maic-agent-driver":{"model":"deepseek:deepseek-v4-pro","api":"openai-completions","thinking":{"mode":"enabled","enabled":true}},"generate-classroom":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-creator":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-verifier":{"model":"deepseek:deepseek-v4-flash","thinking":{"mode":"disabled","enabled":false}},"web-search-query-rewrite":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}}}'
 }
 
-# Formal courseware uses a server-managed provider and fails closed when search
-# is unavailable. Brave's public HTML endpoint is keyless, but an explicit base
-# URL is still required so OpenMAIC registers it as an operator-managed search
-# capability rather than accepting a client-selected provider.
+# Search credentials and the selected provider belong to OpenMAIC. The legacy
+# backend switch remains a fallback for existing installations only.
 load_openmaic_web_search_env() {
   OPENMAIC_WEB_SEARCH_ENABLED="0"
   OPENMAIC_WEB_SEARCH_PROVIDER=""
   OPENMAIC_BRAVE_BASE_URL=""
+  OPENMAIC_BRAVE_API_KEY=""
   OPENMAIC_BRAVE_ENABLED="false"
+  OPENMAIC_BAIDU_BASE_URL=""
+  OPENMAIC_BAIDU_API_KEY=""
+  OPENMAIC_BAIDU_ENABLED="false"
 
-  local env_file enabled provider base_url
+  local env_file own_env_file enabled provider base_url api_key
   env_file="$(provider_env_file)"
+  own_env_file="$(model_provider_env_file)"
   enabled="${MIRA_OPENMAIC_ENABLE_WEB_SEARCH:-}"
+  [[ -n "${enabled}" ]] || enabled="$(read_env_value MIRA_OPENMAIC_ENABLE_WEB_SEARCH "${own_env_file}" || true)"
   [[ -n "${enabled}" ]] || enabled="$(read_env_value MIRA_OPENMAIC_ENABLE_WEB_SEARCH "${env_file}" || true)"
   [[ -n "${enabled}" ]] || enabled="0"
   validate_opt_in MIRA_OPENMAIC_ENABLE_WEB_SEARCH "${enabled}" || return 1
   [[ "${enabled}" == "1" ]] || return 0
 
   provider="${MIRA_OPENMAIC_WEB_SEARCH_PROVIDER:-}"
+  [[ -n "${provider}" ]] || provider="$(read_env_value MIRA_OPENMAIC_WEB_SEARCH_PROVIDER "${own_env_file}" || true)"
   [[ -n "${provider}" ]] || provider="$(read_env_value MIRA_OPENMAIC_WEB_SEARCH_PROVIDER "${env_file}" || true)"
   [[ -n "${provider}" ]] || provider="brave"
   provider="$(printf '%s' "${provider}" | tr '[:upper:]' '[:lower:]')"
-  [[ "${provider}" == "brave" ]] || {
-    echo "Professional courseware currently requires the server-managed Brave search provider." >&2
+  [[ "${provider}" == "brave" || "${provider}" == "baidu" ]] || {
+    echo "Professional courseware requires the server-managed brave or baidu search provider." >&2
     return 1
   }
 
+  if [[ "${provider}" == "baidu" ]]; then
+    base_url="${MIRA_OPENMAIC_BAIDU_BASE_URL:-${BAIDU_BASE_URL:-}}"
+    [[ -n "${base_url}" ]] || base_url="$(read_env_value BAIDU_BASE_URL "${own_env_file}" || true)"
+    [[ -n "${base_url}" ]] || base_url="https://qianfan.baidubce.com"
+    base_url="$(normalize_credential_free_http_origin BAIDU_BASE_URL "${base_url}")" || return 1
+    [[ "${base_url}" == "https://qianfan.baidubce.com" ]] || {
+      echo "BAIDU_BASE_URL must be the official https://qianfan.baidubce.com origin." >&2
+      return 1
+    }
+    api_key="${MIRA_OPENMAIC_BAIDU_API_KEY:-${BAIDU_API_KEY:-}}"
+    [[ -n "${api_key}" ]] || api_key="$(read_env_value BAIDU_API_KEY "${own_env_file}" || true)"
+    if [[ -n "${api_key}" && ( "${api_key}" == *$'\n'* || "${api_key}" == *$'\r'* || "${api_key}" == *' '* || "${api_key}" == *$'\t'* ) ]]; then
+      echo "BAIDU_API_KEY must be a single credential without whitespace." >&2
+      return 1
+    fi
+    OPENMAIC_WEB_SEARCH_ENABLED="1"
+    OPENMAIC_WEB_SEARCH_PROVIDER="baidu"
+    OPENMAIC_BAIDU_BASE_URL="${base_url}"
+    OPENMAIC_BAIDU_API_KEY="${api_key}"
+    OPENMAIC_BAIDU_ENABLED="true"
+    return 0
+  fi
+
   base_url="${MIRA_OPENMAIC_BRAVE_BASE_URL:-${BRAVE_BASE_URL:-}}"
+  [[ -n "${base_url}" ]] || base_url="$(read_env_value BRAVE_BASE_URL "${own_env_file}" || true)"
   [[ -n "${base_url}" ]] || base_url="$(read_env_value MIRA_OPENMAIC_BRAVE_BASE_URL "${env_file}" || true)"
   [[ -n "${base_url}" ]] || base_url="$(read_env_value BRAVE_BASE_URL "${env_file}" || true)"
   [[ -n "${base_url}" ]] || base_url="https://search.brave.com"
@@ -571,9 +604,18 @@ load_openmaic_web_search_env() {
     return 1
   }
 
+  # Keep search credentials with OpenMAIC, never in a client or the App API.
+  api_key="${MIRA_OPENMAIC_BRAVE_API_KEY:-${BRAVE_API_KEY:-}}"
+  [[ -n "${api_key}" ]] || api_key="$(read_env_value BRAVE_API_KEY "$(model_provider_env_file)" || true)"
+  if [[ -n "${api_key}" && ( "${api_key}" == *$'\n'* || "${api_key}" == *$'\r'* || "${api_key}" == *' '* || "${api_key}" == *$'\t'* ) ]]; then
+    echo "BRAVE_API_KEY must be a single credential without whitespace." >&2
+    return 1
+  fi
+
   OPENMAIC_WEB_SEARCH_ENABLED="1"
   OPENMAIC_WEB_SEARCH_PROVIDER="brave"
   OPENMAIC_BRAVE_BASE_URL="${base_url}"
+  OPENMAIC_BRAVE_API_KEY="${api_key}"
   OPENMAIC_BRAVE_ENABLED="true"
 }
 
@@ -763,7 +805,17 @@ show_provider_status() {
     echo "Agent Runtime: disabled (set MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1 to opt in)"
   fi
   if [[ "${OPENMAIC_WEB_SEARCH_ENABLED}" == "1" ]]; then
-    echo "Web search: enabled by default (server-managed Brave, keyless)"
+    if [[ "${OPENMAIC_WEB_SEARCH_PROVIDER}" == "baidu" ]]; then
+      if [[ -n "${OPENMAIC_BAIDU_API_KEY}" ]]; then
+        echo "Web search: Baidu official API (server credential configured; connectivity not checked)"
+      else
+        echo "Web search: Baidu selected, API key missing (formal production blocked)"
+      fi
+    elif [[ -n "${OPENMAIC_BRAVE_API_KEY}" ]]; then
+      echo "Web search: Brave official API (server credential configured; connectivity not checked)"
+    else
+      echo "Web search: Brave public HTML (formal production blocked without API key)"
+    fi
   else
     echo "Web search: disabled"
   fi
@@ -1356,6 +1408,7 @@ validate_health_payload() {
               renderedScenesRequired: true,
               maxReviewAttempts: 3,
             },
+            interactionDesignPolicy: {"schemaVersion":"mira.openmaic.interaction-design.v2","policyId":"mira-primary-multistate-interaction.v2","enabled":true,"profile":"primary-adaptive","objectiveCoverageRequired":true,"demonstrationRequired":true,"learnerOperationRequired":true,"explanatoryFeedbackRequired":true,"independentJudgmentRequired":true,"finalSnapshotRequired":true,"renderedInteractionRequired":true,"explorationPolicy":{"schemaVersion":"mira.openmaic.multistate-exploration.v1","minimumStates":3,"maximumStates":5,"resetRequired":true,"inputModes":["pointer","touch"],"mechanismRegistry":["fraction-ratio-percentage.v1","semantic-state-model.v1"]},"visualRubricVersion":"mira.primary-teaching-visual.v1","visualReviewRequired":true},
             studentToolsEnabled: false,
           },
           studentRuntimeEvents: {
@@ -1907,7 +1960,11 @@ run_openmaic_production_foreground() {
     MIRA_OPENMAIC_ENABLE_WEB_SEARCH="${OPENMAIC_WEB_SEARCH_ENABLED}" \
     MIRA_OPENMAIC_WEB_SEARCH_PROVIDER="${OPENMAIC_WEB_SEARCH_PROVIDER}" \
     BRAVE_BASE_URL="${OPENMAIC_BRAVE_BASE_URL}" \
+    BRAVE_API_KEY="${OPENMAIC_BRAVE_API_KEY}" \
     BRAVE_ENABLED="${OPENMAIC_BRAVE_ENABLED}" \
+    BAIDU_BASE_URL="${OPENMAIC_BAIDU_BASE_URL}" \
+    BAIDU_API_KEY="${OPENMAIC_BAIDU_API_KEY}" \
+    BAIDU_ENABLED="${OPENMAIC_BAIDU_ENABLED}" \
     MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY="${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" \
     DEEPSEEK_API_KEY="${OPENMAIC_DEEPSEEK_API_KEY}" \
     DEEPSEEK_BASE_URL="${OPENMAIC_DEEPSEEK_BASE_URL}" \
@@ -1941,6 +1998,7 @@ run_openmaic_production_foreground() {
     MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_ENABLED="${OPENMAIC_FORMAL_CITATION_RECOVERY_ENABLED}" \
     MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID="${OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID}" \
     MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256="${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256}" \
+    MIRA_BACKEND_INTERNAL_URL="${MIRA_BACKEND_INTERNAL_URL:-http://127.0.0.1:8000}" \
     MIRA_INTERNAL_API_TOKEN="${OPENMAIC_INTERNAL_API_TOKEN}" \
     "${node_bin}" node_modules/next/dist/bin/next start \
       --hostname 127.0.0.1 --port "${OPENMAIC_PORT}"
@@ -1994,7 +2052,11 @@ run_openmaic_foreground() {
     MIRA_OPENMAIC_ENABLE_WEB_SEARCH="${OPENMAIC_WEB_SEARCH_ENABLED}" \
     MIRA_OPENMAIC_WEB_SEARCH_PROVIDER="${OPENMAIC_WEB_SEARCH_PROVIDER}" \
     BRAVE_BASE_URL="${OPENMAIC_BRAVE_BASE_URL}" \
+    BRAVE_API_KEY="${OPENMAIC_BRAVE_API_KEY}" \
     BRAVE_ENABLED="${OPENMAIC_BRAVE_ENABLED}" \
+    BAIDU_BASE_URL="${OPENMAIC_BAIDU_BASE_URL}" \
+    BAIDU_API_KEY="${OPENMAIC_BAIDU_API_KEY}" \
+    BAIDU_ENABLED="${OPENMAIC_BAIDU_ENABLED}" \
     MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY="${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" \
     DEEPSEEK_API_KEY="${OPENMAIC_DEEPSEEK_API_KEY}" \
     DEEPSEEK_BASE_URL="${OPENMAIC_DEEPSEEK_BASE_URL}" \
@@ -2028,6 +2090,7 @@ run_openmaic_foreground() {
     MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_ENABLED="${OPENMAIC_FORMAL_CITATION_RECOVERY_ENABLED}" \
     MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID="${OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID}" \
     MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256="${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256}" \
+    MIRA_BACKEND_INTERNAL_URL="${MIRA_BACKEND_INTERNAL_URL:-http://127.0.0.1:8000}" \
     MIRA_INTERNAL_API_TOKEN="${OPENMAIC_INTERNAL_API_TOKEN}" \
     "${node_bin}" node_modules/next/dist/bin/next dev --webpack \
       --hostname 127.0.0.1 --port "${OPENMAIC_PORT}"
@@ -2132,7 +2195,11 @@ start_openmaic() {
       MIRA_OPENMAIC_ENABLE_WEB_SEARCH="${OPENMAIC_WEB_SEARCH_ENABLED}" \
       MIRA_OPENMAIC_WEB_SEARCH_PROVIDER="${OPENMAIC_WEB_SEARCH_PROVIDER}" \
       BRAVE_BASE_URL="${OPENMAIC_BRAVE_BASE_URL}" \
+    BRAVE_API_KEY="${OPENMAIC_BRAVE_API_KEY}" \
       BRAVE_ENABLED="${OPENMAIC_BRAVE_ENABLED}" \
+    BAIDU_BASE_URL="${OPENMAIC_BAIDU_BASE_URL}" \
+    BAIDU_API_KEY="${OPENMAIC_BAIDU_API_KEY}" \
+    BAIDU_ENABLED="${OPENMAIC_BAIDU_ENABLED}" \
       MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY="${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" \
       DEEPSEEK_API_KEY="${OPENMAIC_DEEPSEEK_API_KEY}" \
       DEEPSEEK_BASE_URL="${OPENMAIC_DEEPSEEK_BASE_URL}" \
@@ -2166,7 +2233,8 @@ start_openmaic() {
       MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_ENABLED="${OPENMAIC_FORMAL_CITATION_RECOVERY_ENABLED}" \
       MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID="${OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID}" \
       MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256="${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256}" \
-      MIRA_INTERNAL_API_TOKEN="${OPENMAIC_INTERNAL_API_TOKEN}" \
+      MIRA_BACKEND_INTERNAL_URL="${MIRA_BACKEND_INTERNAL_URL:-http://127.0.0.1:8000}" \
+    MIRA_INTERNAL_API_TOKEN="${OPENMAIC_INTERNAL_API_TOKEN}" \
       "${node_bin}" node_modules/next/dist/bin/next start \
         --hostname 127.0.0.1 --port "${OPENMAIC_PORT}" \
         > "${OPENMAIC_LOG}" 2>&1 &

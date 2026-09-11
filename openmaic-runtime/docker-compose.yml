@@ -35,9 +35,13 @@ services:
       PERSISTENCE_DEV_TOKEN: ${MIRA_OPENMAIC_PERSISTENCE_DEV_TOKEN:?MIRA_OPENMAIC_PERSISTENCE_DEV_TOKEN is required for private authoring}
       DATABASE_URL: "postgresql://openmaic:${OPENMAIC_POSTGRES_PASSWORD:?OPENMAIC_POSTGRES_PASSWORD is required}@postgres:5432/openmaic"
       MODEL_ROUTES: '{"maic-agent-driver":{"model":"deepseek:deepseek-v4-pro","api":"openai-completions","thinking":{"mode":"enabled","enabled":true}},"generate-classroom":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-creator":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-verifier":{"model":"deepseek:deepseek-v4-flash","thinking":{"mode":"disabled","enabled":false}},"web-search-query-rewrite":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}}}'
-      MIRA_OPENMAIC_ENABLE_WEB_SEARCH: "1"
-      MIRA_OPENMAIC_WEB_SEARCH_PROVIDER: brave
+      MIRA_OPENMAIC_ENABLE_WEB_SEARCH: ${MIRA_OPENMAIC_ENABLE_WEB_SEARCH:-1}
+      MIRA_OPENMAIC_WEB_SEARCH_PROVIDER: ${MIRA_OPENMAIC_WEB_SEARCH_PROVIDER:-baidu}
+      BAIDU_BASE_URL: https://qianfan.baidubce.com
+      BAIDU_API_KEY: ${BAIDU_API_KEY:-}
+      BAIDU_ENABLED: "true"
       BRAVE_BASE_URL: https://search.brave.com
+      BRAVE_API_KEY: ${BRAVE_API_KEY:-}
       BRAVE_ENABLED: "true"
       MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY: deepseek-v4-pro-flash-v1
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}

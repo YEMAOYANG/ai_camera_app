@@ -1487,9 +1487,7 @@ class LearningCatalogContentReviewFixTwoMysqlRedTest(unittest.TestCase):
                 evidence,
                 target=target,
                 identity=identity,
-                skill_boundary=service._content_boundary(
-                    str(plan["item"]["skill_id"])
-                ),
+                skill_boundary=service._content_boundary(plan["item"]),
                 accepted_host_receipts=prior,
             )
         )
@@ -2296,7 +2294,7 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
                 phase_ordinal=ordinal,
                 subject=item["subject"],
                 target_language_code="zh-CN",
-                boundary=service._content_boundary(item["skill_id"]),
+                boundary=service._content_boundary(item),
                 checkpoint=service._assemble_content_checkpoint(
                     phase=phase,
                     phase_ordinal=ordinal,
@@ -2501,7 +2499,7 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
             generation_request_id="fixture.simple-sentences.typed-boundary",
             subject="chinese",
             target_language_code="zh-CN",
-            boundary=service._content_boundary("simple_sentences"),
+            boundary=service._content_boundary({"grade_code": "primary_1", "subject": "chinese", "skill_id": "simple_sentences"}),
             checkpoint={
                 "questionCount": 5,
                 "existingFingerprints": [],

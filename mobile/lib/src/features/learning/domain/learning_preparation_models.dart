@@ -133,9 +133,11 @@ class LearningPreparationCurrentState {
   factory LearningPreparationCurrentState.fromPreparation(
     LearningPreparation? preparation,
   ) {
-    if (preparation != null && preparation.gradeCode != 'primary_1') {
+    if (preparation != null &&
+        (!RegExp(r'^primary_[1-6]$').hasMatch(preparation.gradeCode) ||
+         (preparation.schemaVersion == LearningPreparation.schema && preparation.gradeCode != 'primary_1'))) {
       throw const LearningPreparationFormatException(
-        'normal preparation response must belong to primary_1',
+        'normal preparation response must belong to a registered primary grade',
       );
     }
     return LearningPreparationCurrentState._(
@@ -328,7 +330,7 @@ class LearningPreparationContentProgress {
       json['targetCount'],
       'contentProgress.targetCount',
     );
-    if (target != 30 || candidate + failed > target) {
+    if (!{27, 30}.contains(target) || candidate + failed > target) {
       throw const LearningPreparationFormatException(
         'contentProgress counts are inconsistent',
       );
@@ -630,7 +632,8 @@ class LearningPreparation {
         ? LearningPreparationContentProgress.fromJson(json['contentProgress'])
         : null;
     if (contentProgress != null) {
-      if (total != 30 || contentProgress.targetCount != total) {
+      final expectedTotal = json['gradeCode'] == 'primary_1' ? 30 : 27;
+      if (total != expectedTotal || contentProgress.targetCount != total) {
         throw const LearningPreparationFormatException(
           'contentProgress target does not match preparation total',
         );

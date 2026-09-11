@@ -1,0 +1,4177 @@
+{
+  "assessmentAuthority": "mira_backend",
+  "expiresAt": 1789035689967,
+  "features": {
+    "actionTypes": [
+      "discussion",
+      "speech",
+      "spotlight",
+      "widget_annotation",
+      "widget_highlight",
+      "widget_setState"
+    ],
+    "classroomContentSha256": "798e82f6f4f7006f1ed0d69e4b160fd069a85b3762873ecac41b9ed6b792a4af",
+    "enabled": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "simulation"
+    ],
+    "evidence": {
+      "3d_visualization": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "code": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "diagram": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "html_game": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "mp4_export": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "multi_agent_roundtable": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:multi_agent_roundtable"
+        ],
+        "verified": true
+      },
+      "pbl": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "quiz": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:quiz"
+        ],
+        "verified": true
+      },
+      "realtime_whiteboard": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      },
+      "simulation": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:simulation"
+        ],
+        "verified": true
+      },
+      "slides": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:slides"
+        ],
+        "verified": true
+      },
+      "teacher_actions": {
+        "reasons": [],
+        "signals": [
+          "openmaic-artifact:teacher_actions"
+        ],
+        "verified": true
+      },
+      "video": {
+        "reasons": [
+          "not_verified"
+        ],
+        "signals": [],
+        "verified": false
+      }
+    },
+    "formalEvidence": {
+      "assessmentQuestionIds": [
+        "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q2",
+        "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q3",
+        "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q4",
+        "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q5"
+      ],
+      "discussionActionCount": 3,
+      "distinctDiscussionPeerCount": 2,
+      "interactionDesign": {
+        "objectiveCount": 2,
+        "planSha256": "91d81c0742efabb66b3a8072bc0bfc1af7fa8f24119f38dfd39187f70dd5fc86",
+        "receiptSha256": "71d9956f50a1bf0302cebf72caa0c343ad942b318f94b22b80c86ce17c28d1b0",
+        "snapshotSha256": "8a308b2aa1eeede6cb132e20cbd7a75846fd157374be4705767d76f5a4cd1705",
+        "verified": true
+      },
+      "media": {
+        "imageCount": 0,
+        "modelId": "qwen-image-max",
+        "policyId": "mira-formal-qwen-image.v1",
+        "providerId": "qwen-image",
+        "receiptSha256": "fedeeda57dddd343459b9058feaea358c7f02067443bff13e0ef8bcec708c30a",
+        "schemaVersion": "mira.openmaic.formal-media-receipt.v1",
+        "verified": true,
+        "verifiedAssetCount": 0
+      },
+      "peerCount": 4,
+      "professionalCreation": {
+        "imageGenerationEnabled": true,
+        "imagePolicyId": "mira-formal-qwen-image.v1",
+        "interactionDesign": {
+          "explorationChecks": [
+            {
+              "evidence": {
+                "inputMode": "pointer",
+                "mechanism": "fraction-ratio-percentage.v1",
+                "resetPassed": true,
+                "states": [
+                  {
+                    "diagramSha256": "78de6465e4fb789bc9ee9104a103884504a225cb255e89a56a179f86d50eb0bd",
+                    "feedbackSha256": "789168f73e9f210aca738f65f558dc8e77085cf29f34218f4291f21e9e8b1a72",
+                    "numeric": {
+                      "decimal": 0.25,
+                      "denominator": 4,
+                      "diagramRatio": 0.25,
+                      "numerator": 1,
+                      "percent": 25
+                    },
+                    "stateId": "state-a"
+                  },
+                  {
+                    "diagramSha256": "d3919ce2d43a0261ea8211a0b9919a2f5c9018a3dff5367eb0717ec34e1c4b01",
+                    "feedbackSha256": "fc824d5c4b11628d6d984cbbf564956b693349a62bdfbca1b6a8d3dd00a1c5b5",
+                    "numeric": {
+                      "decimal": 0.4,
+                      "denominator": 5,
+                      "diagramRatio": 0.4000000529896495,
+                      "numerator": 2,
+                      "percent": 40
+                    },
+                    "stateId": "state-b"
+                  },
+                  {
+                    "diagramSha256": "81f1d1d813f19ec2078d058edcb1a2a162f0fa8b6c2e5f1590b9dcbb63c90901",
+                    "feedbackSha256": "a070f1aa61f449e3212c723e58da29c847ea5d026968942fa9976ecd573aa690",
+                    "numeric": {
+                      "decimal": 0.75,
+                      "denominator": 4,
+                      "diagramRatio": 0.75,
+                      "numerator": 3,
+                      "percent": 75
+                    },
+                    "stateId": "state-c"
+                  }
+                ],
+                "verification": "independent_numeric_svg"
+              },
+              "objectiveIndex": 0,
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "evidence": {
+                "inputMode": "touch",
+                "mechanism": "fraction-ratio-percentage.v1",
+                "resetPassed": true,
+                "states": [
+                  {
+                    "diagramSha256": "0777ccf7d428b2388c9819401f8d749950f13e9e05189a40ea3ee0f13afda2e6",
+                    "feedbackSha256": "789168f73e9f210aca738f65f558dc8e77085cf29f34218f4291f21e9e8b1a72",
+                    "numeric": {
+                      "decimal": 0.25,
+                      "denominator": 4,
+                      "diagramRatio": 0.25,
+                      "numerator": 1,
+                      "percent": 25
+                    },
+                    "stateId": "state-a"
+                  },
+                  {
+                    "diagramSha256": "3d51a4ccc481200c72d12fc13d291a7f2460419d6d2aacfac1da2567f9e9627c",
+                    "feedbackSha256": "fc824d5c4b11628d6d984cbbf564956b693349a62bdfbca1b6a8d3dd00a1c5b5",
+                    "numeric": {
+                      "decimal": 0.4,
+                      "denominator": 5,
+                      "diagramRatio": 0.4000000529896495,
+                      "numerator": 2,
+                      "percent": 40
+                    },
+                    "stateId": "state-b"
+                  },
+                  {
+                    "diagramSha256": "9ffaafcaf1dac538822e6ddb58568b8e12b431784ea49d24e217c4181c358d92",
+                    "feedbackSha256": "a070f1aa61f449e3212c723e58da29c847ea5d026968942fa9976ecd573aa690",
+                    "numeric": {
+                      "decimal": 0.75,
+                      "denominator": 4,
+                      "diagramRatio": 0.75,
+                      "numerator": 3,
+                      "percent": 75
+                    },
+                    "stateId": "state-c"
+                  }
+                ],
+                "verification": "independent_numeric_svg"
+              },
+              "objectiveIndex": 0,
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "evidence": {
+                "inputMode": "pointer",
+                "mechanism": "fraction-ratio-percentage.v1",
+                "resetPassed": true,
+                "states": [
+                  {
+                    "diagramSha256": "78de6465e4fb789bc9ee9104a103884504a225cb255e89a56a179f86d50eb0bd",
+                    "feedbackSha256": "789168f73e9f210aca738f65f558dc8e77085cf29f34218f4291f21e9e8b1a72",
+                    "numeric": {
+                      "decimal": 0.25,
+                      "denominator": 4,
+                      "diagramRatio": 0.25,
+                      "numerator": 1,
+                      "percent": 25
+                    },
+                    "stateId": "state-a"
+                  },
+                  {
+                    "diagramSha256": "d3919ce2d43a0261ea8211a0b9919a2f5c9018a3dff5367eb0717ec34e1c4b01",
+                    "feedbackSha256": "fc824d5c4b11628d6d984cbbf564956b693349a62bdfbca1b6a8d3dd00a1c5b5",
+                    "numeric": {
+                      "decimal": 0.4,
+                      "denominator": 5,
+                      "diagramRatio": 0.4000000529896495,
+                      "numerator": 2,
+                      "percent": 40
+                    },
+                    "stateId": "state-b"
+                  },
+                  {
+                    "diagramSha256": "81f1d1d813f19ec2078d058edcb1a2a162f0fa8b6c2e5f1590b9dcbb63c90901",
+                    "feedbackSha256": "a070f1aa61f449e3212c723e58da29c847ea5d026968942fa9976ecd573aa690",
+                    "numeric": {
+                      "decimal": 0.75,
+                      "denominator": 4,
+                      "diagramRatio": 0.75,
+                      "numerator": 3,
+                      "percent": 75
+                    },
+                    "stateId": "state-c"
+                  }
+                ],
+                "verification": "independent_numeric_svg"
+              },
+              "objectiveIndex": 1,
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "evidence": {
+                "inputMode": "touch",
+                "mechanism": "fraction-ratio-percentage.v1",
+                "resetPassed": true,
+                "states": [
+                  {
+                    "diagramSha256": "0777ccf7d428b2388c9819401f8d749950f13e9e05189a40ea3ee0f13afda2e6",
+                    "feedbackSha256": "789168f73e9f210aca738f65f558dc8e77085cf29f34218f4291f21e9e8b1a72",
+                    "numeric": {
+                      "decimal": 0.25,
+                      "denominator": 4,
+                      "diagramRatio": 0.25,
+                      "numerator": 1,
+                      "percent": 25
+                    },
+                    "stateId": "state-a"
+                  },
+                  {
+                    "diagramSha256": "3d51a4ccc481200c72d12fc13d291a7f2460419d6d2aacfac1da2567f9e9627c",
+                    "feedbackSha256": "fc824d5c4b11628d6d984cbbf564956b693349a62bdfbca1b6a8d3dd00a1c5b5",
+                    "numeric": {
+                      "decimal": 0.4,
+                      "denominator": 5,
+                      "diagramRatio": 0.4000000529896495,
+                      "numerator": 2,
+                      "percent": 40
+                    },
+                    "stateId": "state-b"
+                  },
+                  {
+                    "diagramSha256": "9ffaafcaf1dac538822e6ddb58568b8e12b431784ea49d24e217c4181c358d92",
+                    "feedbackSha256": "a070f1aa61f449e3212c723e58da29c847ea5d026968942fa9976ecd573aa690",
+                    "numeric": {
+                      "decimal": 0.75,
+                      "denominator": 4,
+                      "diagramRatio": 0.75,
+                      "numerator": 3,
+                      "percent": 75
+                    },
+                    "stateId": "state-c"
+                  }
+                ],
+                "verification": "independent_numeric_svg"
+              },
+              "objectiveIndex": 1,
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            }
+          ],
+          "gradeBoundarySha256": "1386572be3fc8d49d88915344c238811b8f70f03ebb679d7e82cd42dc465bd62",
+          "objectives": [
+            {
+              "checks": [
+                {
+                  "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+                  "probeId": "objective-0",
+                  "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                  "screenshotSha256": "8f7a96ca8b918b7c996a0310639a3835447eb9f1774b4bf116340a0b2c245175",
+                  "viewport": {
+                    "height": 720,
+                    "width": 1280
+                  }
+                },
+                {
+                  "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+                  "probeId": "objective-0",
+                  "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                  "screenshotSha256": "6a7dd4617c6ebb4c0dad00c962586ba5678fd2d3384cf49d6d006cf29caacf92",
+                  "viewport": {
+                    "height": 768,
+                    "width": 1024
+                  }
+                }
+              ],
+              "demonstration": {
+                "quote": "60%就是每一百份中占60份",
+                "sceneId": "scene-p2"
+              },
+              "exploration": {
+                "diagramSelector": "#model",
+                "feedbackSelector": "#result",
+                "mechanism": {
+                  "decimalSelector": "#decimal",
+                  "denominatorSelector": "#denominator",
+                  "kind": "fraction-ratio-percentage.v1",
+                  "numeratorSelector": "#numerator",
+                  "partSelector": "#part-bar",
+                  "percentSelector": "#percent",
+                  "wholeSelector": "#whole-bar"
+                },
+                "reset": {
+                  "selector": "#reset",
+                  "stateId": "state-a"
+                },
+                "schemaVersion": "mira.openmaic.multistate-exploration.v1",
+                "states": [
+                  {
+                    "denominator": 4,
+                    "explanationText": "因为把整体分成4份取1份，换成100份就是25份。",
+                    "id": "state-a",
+                    "numerator": 1,
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#preset-1-4"
+                      }
+                    ],
+                    "resultText": "1/4 = 1÷4 = 0.25 = 25%"
+                  },
+                  {
+                    "denominator": 5,
+                    "explanationText": "因为把整体分成5份取2份，换成100份就是40份。",
+                    "id": "state-b",
+                    "numerator": 2,
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#preset-2-5"
+                      }
+                    ],
+                    "resultText": "2/5 = 2÷5 = 0.4 = 40%"
+                  },
+                  {
+                    "denominator": 4,
+                    "explanationText": "因为把整体分成4份取3份，换成100份就是75份。",
+                    "id": "state-c",
+                    "numerator": 3,
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#preset-3-4"
+                      }
+                    ],
+                    "resultText": "3/4 = 3÷4 = 0.75 = 75%"
+                  }
+                ]
+              },
+              "feedback": {
+                "reasonQuote": "因为把整体分成5份取2份，换成100份就是40份。",
+                "sceneId": "scene-p3",
+                "selector": "#result",
+                "textIncludes": "40%"
+              },
+              "independentJudgment": {
+                "questionId": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q4",
+                "sceneId": "scene-p8"
+              },
+              "objectiveIndex": 0,
+              "operation": {
+                "action": "click",
+                "controlSelector": "#preset-2-5",
+                "sceneId": "scene-p3"
+              }
+            },
+            {
+              "checks": [
+                {
+                  "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+                  "probeId": "objective-1",
+                  "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                  "screenshotSha256": "8f7a96ca8b918b7c996a0310639a3835447eb9f1774b4bf116340a0b2c245175",
+                  "viewport": {
+                    "height": 720,
+                    "width": 1280
+                  }
+                },
+                {
+                  "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+                  "probeId": "objective-1",
+                  "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                  "screenshotSha256": "6a7dd4617c6ebb4c0dad00c962586ba5678fd2d3384cf49d6d006cf29caacf92",
+                  "viewport": {
+                    "height": 768,
+                    "width": 1024
+                  }
+                }
+              ],
+              "demonstration": {
+                "quote": "1/4 = 0.25 = 25%",
+                "sceneId": "scene-p3"
+              },
+              "exploration": {
+                "diagramSelector": "#model",
+                "feedbackSelector": "#result",
+                "mechanism": {
+                  "decimalSelector": "#decimal",
+                  "denominatorSelector": "#denominator",
+                  "kind": "fraction-ratio-percentage.v1",
+                  "numeratorSelector": "#numerator",
+                  "partSelector": "#part-bar",
+                  "percentSelector": "#percent",
+                  "wholeSelector": "#whole-bar"
+                },
+                "reset": {
+                  "selector": "#reset",
+                  "stateId": "state-a"
+                },
+                "schemaVersion": "mira.openmaic.multistate-exploration.v1",
+                "states": [
+                  {
+                    "denominator": 4,
+                    "explanationText": "因为把整体分成4份取1份，换成100份就是25份。",
+                    "id": "state-a",
+                    "numerator": 1,
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#preset-1-4"
+                      }
+                    ],
+                    "resultText": "1/4 = 1÷4 = 0.25 = 25%"
+                  },
+                  {
+                    "denominator": 5,
+                    "explanationText": "因为把整体分成5份取2份，换成100份就是40份。",
+                    "id": "state-b",
+                    "numerator": 2,
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#preset-2-5"
+                      }
+                    ],
+                    "resultText": "2/5 = 2÷5 = 0.4 = 40%"
+                  },
+                  {
+                    "denominator": 4,
+                    "explanationText": "因为把整体分成4份取3份，换成100份就是75份。",
+                    "id": "state-c",
+                    "numerator": 3,
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#preset-3-4"
+                      }
+                    ],
+                    "resultText": "3/4 = 3÷4 = 0.75 = 75%"
+                  }
+                ]
+              },
+              "feedback": {
+                "reasonQuote": "因为把整体分成4份取3份，换成100份就是75份。",
+                "sceneId": "scene-p3",
+                "selector": "#result",
+                "textIncludes": "75%"
+              },
+              "independentJudgment": {
+                "questionId": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q5",
+                "sceneId": "scene-p9"
+              },
+              "objectiveIndex": 1,
+              "operation": {
+                "action": "click",
+                "controlSelector": "#preset-3-4",
+                "sceneId": "scene-p3"
+              }
+            }
+          ],
+          "planSha256": "91d81c0742efabb66b3a8072bc0bfc1af7fa8f24119f38dfd39187f70dd5fc86",
+          "policyId": "mira-primary-multistate-interaction.v2",
+          "receiptSha256": "71d9956f50a1bf0302cebf72caa0c343ad942b318f94b22b80c86ce17c28d1b0",
+          "schemaVersion": "mira.openmaic.interaction-design-receipt.v2",
+          "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+          "snapshotSha256": "8a308b2aa1eeede6cb132e20cbd7a75846fd157374be4705767d76f5a4cd1705",
+          "stageId": "stage-p83SomVEUh",
+          "status": "passed",
+          "teachingQualityReceiptSha256": "e7fd7aabcaa602c47bb7cec2acc0f9023635a34a4f3484e242157432541c826d",
+          "visualReview": {
+            "modelId": "deepseek-v4-flash-vision-exp",
+            "providerId": "deepseek",
+            "providerRequestIdHash": "8a8add2b62a218d95136294cc3350923393c56a6952a93002e42f0f242ccfb99",
+            "providerResponseModelId": "deepseek-flash",
+            "receiptSha256": "9f4aa6c00d2ebcdd8cf6f1d378863b628ac0ecc46c3714f84afa429c23d4d7ad",
+            "reviewerKind": "vision_model",
+            "rubricVersion": "mira.primary-teaching-visual.v1",
+            "sceneReviews": [
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "标题、情境文字与蓝色分数条清晰可读，5格中3格涂色与'80人平均分成5份，取3份'标注一致，静态引导页无控件属正常。",
+                "sceneId": "scene-p1",
+                "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd",
+                "screenshotSha256": "eefd84c6e41f86f5ac79dff6bb8568052566c0a88b618da90a5c6ecf8c122778",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "1024×768视口下文字与分数条仍清晰，无截断遮挡，留白合理。",
+                "sceneId": "scene-p1",
+                "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd",
+                "screenshotSha256": "4083a8dd6dc61cd8fa229afb1dd4a7195fe155cfda63b5ab842be39f194cc704",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "3/5→60/100→60%转换链与100格涂60格图示一致，'100格中涂色60格'标注准确，底部来源链接字号偏小但不影响教学。",
+                "sceneId": "scene-p2",
+                "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8",
+                "screenshotSha256": "d50d21b2dc8b86bd078bd22785d82b9704e26b87e5693b814e4d84d17b8e0e14",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "窄视口下三栏转换链与方格图完整可见，无遮挡，信息层级清楚。",
+                "sceneId": "scene-p2",
+                "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8",
+                "screenshotSha256": "fbf2f8ea5b03d24593a90dd3dcc855743cec48b95ff5572cee4b4fade71fdd28",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "分子分母输入框、快速预设1/4、2/5、3/4、重置按钮入口明确；分数条橙色部分与1/4对应，小数0.25与百分数25%一致，结果说明与试做提示可读。",
+                "sceneId": "scene-p3",
+                "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                "screenshotSha256": "8f7a96ca8b918b7c996a0310639a3835447eb9f1774b4bf116340a0b2c245175",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "窄视口下控件与分数条、0.25、25%结果区均完整可辨，无截断。",
+                "sceneId": "scene-p3",
+                "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                "screenshotSha256": "6a7dd4617c6ebb4c0dad00c962586ba5678fd2d3384cf49d6d006cf29caacf92",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "两步走流程用蓝绿分块与箭头串联，80×3/5=48、48÷80=0.6=60%计算正确，底部快捷换算链3/5=3÷5=0.6=60/100=60%一致。",
+                "sceneId": "scene-p4",
+                "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68",
+                "screenshotSha256": "b63afb55e0943d11d4fc2f4fab02b202ca59c42aa0845549731b3dc335a254c5",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "窄视口下两步算式与快捷换算行完整显示，无遮挡，配色区分步骤清楚。",
+                "sceneId": "scene-p4",
+                "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68",
+                "screenshotSha256": "62e86e93e2d6ee2a1f3cab66c5308e243c76250f880a0aeb0ee200e5a4d26963",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "题干'120人，2/5参加绘画'清晰，选项A 50;41.7%等四个选项可点，提交答案按钮明确；正确应为48;40%，选项B存在，题目可解。",
+                "sceneId": "scene-p5",
+                "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b",
+                "screenshotSha256": "fe2d3f5c9daae1c09d75c186d0ad563458e7a80250ed3177d44b037793e4aecb",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "窄视口下题干与四个选项完整可读，选中态高亮明显，提交按钮可见。",
+                "sceneId": "scene-p5",
+                "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b",
+                "screenshotSha256": "1c1750d90d230cbe085db7bdc96006adcf3ca195be53984225d8b6d9819d5de5",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "题干'150人，3/10参加合唱'清晰，选项含正确值45;30%，提交入口明确。",
+                "sceneId": "scene-p6",
+                "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf",
+                "screenshotSha256": "283fecde5d0ac11581cf1fdc31f2d50b0ed5aeaaa6968012e77b99ac53639c80",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "窄视口下题干与选项无截断，选中态与提交按钮可辨。",
+                "sceneId": "scene-p6",
+                "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf",
+                "screenshotSha256": "fc51a7154cd1961c604d68276da17a7c9241cd9db98342901428f5a8504e6dab",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "左右对比'小刚的算法'与'正确算法'红绿分栏清楚，错误点3/5≠35%与正确48÷80=0.6=60%标注准确，静态辨析页无控件合理。",
+                "sceneId": "scene-p7",
+                "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201",
+                "screenshotSha256": "5180dc6d7c58f9ba24e940dfa33e4ee37406178322eb084ab54a316566df1dd4",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "窄视口下两栏对比完整，算式与对错标记清晰无遮挡。",
+                "sceneId": "scene-p7",
+                "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201",
+                "screenshotSha256": "6988cb305eac6e5b3b8a606be7b8137865c184c6aeeedf3a340bf70dd5010675",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "题干'200人，7/10参加运动'清晰，选项含正确值140;70%，提交按钮明确。",
+                "sceneId": "scene-p8",
+                "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b",
+                "screenshotSha256": "90c6ead8a1b5b4ba24babe232c962ff0eed2cbf17be6d2d0dcdb07524a754366",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "窄视口下题干与选项完整可读，选中态明显。",
+                "sceneId": "scene-p8",
+                "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b",
+                "screenshotSha256": "3bbfc8134e3d6183a4ec2d361e934da5cb5343bed0646b6fc372451c5302915b",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "题干'250人，4/5参加手工'清晰，选项含正确值200;80%，提交入口明确。",
+                "sceneId": "scene-p9",
+                "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383",
+                "screenshotSha256": "fac2bd82527174d28e3ef0d3132080ea30a5e07e697eb4c71f839742c09f8f3d",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "窄视口下题干与四个选项无截断，选中态与提交按钮可辨。",
+                "sceneId": "scene-p9",
+                "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383",
+                "screenshotSha256": "6fa08cd4b676eeba1891b448507145499c6bbb024357466a633545571d3836dc",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "方法要点四条与反思三问分蓝黄两栏，文字清晰，总结页无控件属正常，底部来源链接字号偏小但不影响。",
+                "sceneId": "scene-p10",
+                "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475",
+                "screenshotSha256": "da43f88834d581f009a9b11666d65aefa0018a2f5df771b162954fa8f3e9f088",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "窄视口下方法卡两栏内容完整，无遮挡截断，层级清楚。",
+                "sceneId": "scene-p10",
+                "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475",
+                "screenshotSha256": "2a1dd6012bf203d6e835868ce4406a58dcd2080afcd14bb54823dad6b297de6b",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              }
+            ],
+            "schemaVersion": "mira.openmaic.visual-review.v1",
+            "snapshotSha256": "8a308b2aa1eeede6cb132e20cbd7a75846fd157374be4705767d76f5a4cd1705",
+            "status": "passed",
+            "teachingQualityContextSha256": "3b307b2524253bc5741436e4e6d527fe03e90b299232376268fa1aea6227b830"
+          }
+        },
+        "receiptSha256": "6c0c3cf13080eaa3b632cb70cbbb811fad505ccf4864272699b8f75ad4b84d59",
+        "schemaVersion": "mira.openmaic.professional-creation-receipt.v1",
+        "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+        "skillId": "mira-primary-courseware",
+        "skillOrchestration": {
+          "profileId": "mira-primary-adaptive.v2",
+          "receiptSha256": "1023f2d3e7c513bc3d8770eb59aa596fa43c1d177080e2f81b7c6f3aec4e990c",
+          "referenceReads": [
+            {
+              "resourcePath": "k12-core-literacy-planning/references/core-literacy.md",
+              "sourceHash": "47635d06a4a598b28c22a408f5f218e96dd2eca664ca74c1774bb95c848a47ee"
+            },
+            {
+              "resourcePath": "k12-core-literacy-planning/references/subjects/mathematics.md",
+              "sourceHash": "c6a3867f7eb9546928c7ba08243ac3add5e4ec7a963c745191186565632712b1"
+            }
+          ],
+          "sceneContexts": [
+            {
+              "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+              "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+              "sceneId": "scene-p1",
+              "sceneType": "slide"
+            },
+            {
+              "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+              "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+              "sceneId": "scene-p2",
+              "sceneType": "slide"
+            },
+            {
+              "actionsContextSha256": "cb3559a3a8fab6996dc276ddb628e86a1f448a3e4342f518e004b7680f8a41d3",
+              "contentContextSha256": "376454157dbcbf28462a2dc21415f77f47176be1a9f8055f870f0579acd8a24a",
+              "sceneId": "scene-p3",
+              "sceneType": "interactive"
+            },
+            {
+              "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+              "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+              "sceneId": "scene-p4",
+              "sceneType": "slide"
+            },
+            {
+              "actionsContextSha256": "27b3b7d90a21d23b4a2108373205c318188e9c271800b34ab2fd68f88ab7e092",
+              "contentContextSha256": "828c99b291ef30c4aa6a9b4152889b82b06b28e69c78048295f28b69a2e85f5c",
+              "sceneId": "scene-p5",
+              "sceneType": "quiz"
+            },
+            {
+              "actionsContextSha256": "27b3b7d90a21d23b4a2108373205c318188e9c271800b34ab2fd68f88ab7e092",
+              "contentContextSha256": "828c99b291ef30c4aa6a9b4152889b82b06b28e69c78048295f28b69a2e85f5c",
+              "sceneId": "scene-p6",
+              "sceneType": "quiz"
+            },
+            {
+              "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+              "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+              "sceneId": "scene-p7",
+              "sceneType": "slide"
+            },
+            {
+              "actionsContextSha256": "27b3b7d90a21d23b4a2108373205c318188e9c271800b34ab2fd68f88ab7e092",
+              "contentContextSha256": "828c99b291ef30c4aa6a9b4152889b82b06b28e69c78048295f28b69a2e85f5c",
+              "sceneId": "scene-p8",
+              "sceneType": "quiz"
+            },
+            {
+              "actionsContextSha256": "27b3b7d90a21d23b4a2108373205c318188e9c271800b34ab2fd68f88ab7e092",
+              "contentContextSha256": "828c99b291ef30c4aa6a9b4152889b82b06b28e69c78048295f28b69a2e85f5c",
+              "sceneId": "scene-p9",
+              "sceneType": "quiz"
+            },
+            {
+              "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+              "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+              "sceneId": "scene-p10",
+              "sceneType": "slide"
+            }
+          ],
+          "schemaVersion": "mira.openmaic.skill-orchestration-receipt.v2",
+          "selectionPlan": {
+            "decisions": [
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "mira-primary-courseware",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "stage-design",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "k12-core-literacy-planning",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "deep-interactive",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "slide-craft",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "learning-to-learn",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/teachingBrief/course/objective",
+                  "/teachingBrief/lesson/questions"
+                ],
+                "reasonCode": "bounded_goal_and_assessment_backward_design",
+                "skillId": "understanding-by-design",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/teachingBrief/course/objective",
+                  "/gradeBoundary/learningObjectives/0",
+                  "/gradeBoundary/allowedContent/0",
+                  "/teachingBrief/lesson/teachingFlow/teach/sayText",
+                  "/teachingBrief/lesson/teachingFlow/teach/keyPoints/0"
+                ],
+                "reasonCode": "explanation_goal_allowed_and_taught",
+                "skillId": "feynman-learning",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "primary_method_feynman_wins",
+                "skillId": "workshop-style",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_explicit_social_learning_situation",
+                "skillId": "social-emotional-learning",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "stable_subject_formal_source_gate_suffices",
+                "skillId": "deep-research",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode"
+                ],
+                "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
+                "skillId": "lecture-style",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "only_after_persisted_page_requires_repair",
+                "skillId": "pro-editing",
+                "status": "deferred"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "only_after_persisted_page_requires_repair",
+                "skillId": "stage-dsl",
+                "status": "deferred"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "only_after_persisted_page_requires_repair",
+                "skillId": "slide-dsl",
+                "status": "deferred"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+                "skillId": "pptx-import",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+                "skillId": "style-clone",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+                "skillId": "page-clone",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_teacher_material",
+                "skillId": "teacher-style-clone",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "single_course_not_series_or_cross_course_memory",
+                "skillId": "curriculum-planner",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "single_course_not_series_or_cross_course_memory",
+                "skillId": "spiral-curriculum",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_personal_history_or_skill_creation_request",
+                "skillId": "build-personal-skill",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "primary_subject_not_occupational_procedure",
+                "skillId": "vocational",
+                "status": "not_applicable"
+              }
+            ],
+            "gradeBand": "upper_primary",
+            "gradeBoundarySha256": "1386572be3fc8d49d88915344c238811b8f70f03ebb679d7e82cd42dc465bd62",
+            "inputSha256": "5dccfe5dd589485359eeea67da0937619a55c992645b40880fe6b28c2dbd6d0f",
+            "planSha256": "8db510d3215bdecb25f156ef43f06dd0d7c170fe3279f41622b1c35f999b54f5",
+            "primaryMethod": "feynman-learning",
+            "registryId": "openmaic-builtin-skills.v1-23",
+            "schemaVersion": "mira.openmaic.skill-selection.v1",
+            "selectedSkillIds": [
+              "mira-primary-courseware",
+              "stage-design",
+              "k12-core-literacy-planning",
+              "deep-interactive",
+              "slide-craft",
+              "learning-to-learn",
+              "understanding-by-design",
+              "feynman-learning"
+            ]
+          },
+          "skillReads": [
+            {
+              "skillId": "mira-primary-courseware",
+              "sourceHash": "2bb9434f452705182dbb6b71a912f8e24c8bed0c07561ce08fb493f6bd74e678"
+            },
+            {
+              "skillId": "stage-design",
+              "sourceHash": "6031161607914bb7ac37eb380b93b83c15ae9af7f25376b5b0749ce6cd06d76d"
+            },
+            {
+              "skillId": "k12-core-literacy-planning",
+              "sourceHash": "fbc03e9245406bac2d5b312f1a5711de311d17dc98eeb30d8eab298ee397c08f"
+            },
+            {
+              "skillId": "deep-interactive",
+              "sourceHash": "bb26d6b34f34bad37a76fef7f9863e1e67a2d4a5fbdf89d4ef08734c74db97bb"
+            },
+            {
+              "skillId": "slide-craft",
+              "sourceHash": "cf35eea56909b1427f171c6798ba55392761edb081603138892368d1bd727081"
+            },
+            {
+              "skillId": "learning-to-learn",
+              "sourceHash": "fe8be28613d01efe49a858bb89bf97f84273bd20311c805c36e2bfd28519c2ce"
+            },
+            {
+              "skillId": "understanding-by-design",
+              "sourceHash": "75af8be3ec7772b6ae97ac70ceedbb00fcfbb16a6d4addceb5f62ec0b3614808"
+            },
+            {
+              "skillId": "feynman-learning",
+              "sourceHash": "af7d9eaca12896a498259cbae3fa09d196d455b4e72af75d63ed1d1575ca944e"
+            }
+          ],
+          "status": "succeeded"
+        },
+        "studentToolsEnabled": false,
+        "supportingSkillIds": [
+          "k12-core-literacy-planning",
+          "deep-interactive"
+        ],
+        "teachingQuality": {
+          "gradeBoundarySha256": "1386572be3fc8d49d88915344c238811b8f70f03ebb679d7e82cd42dc465bd62",
+          "policyId": "mira-primary-quality.v1",
+          "receiptSha256": "e7fd7aabcaa602c47bb7cec2acc0f9023635a34a4f3484e242157432541c826d",
+          "renderChecks": [
+            {
+              "domSha256": "41f613b473f4613f182c2cead1f2b5f428b07e9b27407694009a19787bd1a074",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p1",
+              "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd",
+              "screenshotSha256": "eefd84c6e41f86f5ac79dff6bb8568052566c0a88b618da90a5c6ecf8c122778",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "9e3ab6f2cdcddd790761e60094e194e2511825fd4f5b16ceeb561e937b139209",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p1",
+              "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd",
+              "screenshotSha256": "4083a8dd6dc61cd8fa229afb1dd4a7195fe155cfda63b5ab842be39f194cc704",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "9c7a41a3e36e6e9f4acdf8f9ff31bdc718f9b781fa6879b6e81ad817bac74f10",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p2",
+              "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8",
+              "screenshotSha256": "d50d21b2dc8b86bd078bd22785d82b9704e26b87e5693b814e4d84d17b8e0e14",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "94a519d2a5efb0f2486b65e20918abb7bf14b1699192875b35e5280df2b81ee7",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p2",
+              "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8",
+              "screenshotSha256": "fbf2f8ea5b03d24593a90dd3dcc855743cec48b95ff5572cee4b4fade71fdd28",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+              "passed": true,
+              "probeCount": 2,
+              "sceneId": "scene-p3",
+              "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+              "screenshotSha256": "8f7a96ca8b918b7c996a0310639a3835447eb9f1774b4bf116340a0b2c245175",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+              "passed": true,
+              "probeCount": 2,
+              "sceneId": "scene-p3",
+              "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+              "screenshotSha256": "6a7dd4617c6ebb4c0dad00c962586ba5678fd2d3384cf49d6d006cf29caacf92",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "503d402070c6f79bea5957bb6f41ffca7d40cf4b5fd10f5c76b5aa0bb8110f27",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p4",
+              "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68",
+              "screenshotSha256": "b63afb55e0943d11d4fc2f4fab02b202ca59c42aa0845549731b3dc335a254c5",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "c6db264d168325cd17cfd0894659d739d9449bb105c2c637de339df8f518f9e1",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p4",
+              "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68",
+              "screenshotSha256": "62e86e93e2d6ee2a1f3cab66c5308e243c76250f880a0aeb0ee200e5a4d26963",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "d3ddc512540086792d39995fa99bd1e441fb7dec8b9e225a2cd141b670b37a53",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p5",
+              "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b",
+              "screenshotSha256": "fe2d3f5c9daae1c09d75c186d0ad563458e7a80250ed3177d44b037793e4aecb",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "dd819b21b1d9f5c2097705b40fc7158b9bc44029ca221350a8c7bf687215d47c",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p5",
+              "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b",
+              "screenshotSha256": "1c1750d90d230cbe085db7bdc96006adcf3ca195be53984225d8b6d9819d5de5",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "dd8518b08f9cf24e4955d60a0fcc08bf177007bdbf3e83181364baec1948847c",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p6",
+              "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf",
+              "screenshotSha256": "283fecde5d0ac11581cf1fdc31f2d50b0ed5aeaaa6968012e77b99ac53639c80",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "38cce2c8902eb261c961cd0ecd61844c29c2f9efda1d4868fd3f1d037f00e431",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p6",
+              "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf",
+              "screenshotSha256": "fc51a7154cd1961c604d68276da17a7c9241cd9db98342901428f5a8504e6dab",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "fbdd73a955a1443c250514a8e4cdd3a08dc845b45354c163cc7702a568627a7c",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p7",
+              "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201",
+              "screenshotSha256": "5180dc6d7c58f9ba24e940dfa33e4ee37406178322eb084ab54a316566df1dd4",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "7e8dbc0fa3187832d521720a1c4d96e5b038d580bc2bcc209da5948b2dceac78",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p7",
+              "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201",
+              "screenshotSha256": "6988cb305eac6e5b3b8a606be7b8137865c184c6aeeedf3a340bf70dd5010675",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "5632b187611a0c4dc53cce4993b3cce2e46583655636488d956861fffc20a98e",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p8",
+              "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b",
+              "screenshotSha256": "90c6ead8a1b5b4ba24babe232c962ff0eed2cbf17be6d2d0dcdb07524a754366",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "5632b187611a0c4dc53cce4993b3cce2e46583655636488d956861fffc20a98e",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p8",
+              "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b",
+              "screenshotSha256": "3bbfc8134e3d6183a4ec2d361e934da5cb5343bed0646b6fc372451c5302915b",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "2bbae5fd6edf28069f390e91c5604dca9e3a716ccd825e63d3809e2b7f27995e",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p9",
+              "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383",
+              "screenshotSha256": "fac2bd82527174d28e3ef0d3132080ea30a5e07e697eb4c71f839742c09f8f3d",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "ec0ba627eea3be8521cb2dd4e8935cf7e7b42c0a1a0af7a5043f10bf0e38d700",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p9",
+              "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383",
+              "screenshotSha256": "6fa08cd4b676eeba1891b448507145499c6bbb024357466a633545571d3836dc",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "f5b2a6716a32838ee126ed35ed6b55b9a7916e5ea4c4871171f8a428ffec7475",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p10",
+              "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475",
+              "screenshotSha256": "da43f88834d581f009a9b11666d65aefa0018a2f5df771b162954fa8f3e9f088",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "8f9bb637327991a691cd92ba88a23bc2604403071a17b5572f0578d19083baab",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p10",
+              "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475",
+              "screenshotSha256": "2a1dd6012bf203d6e835868ce4406a58dcd2080afcd14bb54823dad6b297de6b",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            }
+          ],
+          "review": {
+            "dimensions": [
+              {
+                "evidence": [
+                  {
+                    "quote": "全年级80名同学参加文化节。这80人就是我们的整体。现在告诉你，其中3/5参加阅读摊位。",
+                    "sceneId": "scene-p1"
+                  },
+                  {
+                    "quote": "一百分之六十，写成百分数就是60%。百分号%表示'每一百'，所以60%就是每一百份中占60份。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "1/4 = 1÷4 = 0.25 = 25%。因为把整体分成4份取1份，换成100份就是25份。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "看这条换算链：五分之三就是 3 除以 5，得 0.6。百分数的分母是一百，0.6 乘 100 就是 60。为什么乘 100？因为百分数要把整体平均分成 100 份，看部分占了多少份。所以女生占全队的 60%。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "· 分数→百分数：先化小数，再改写成分母为 100 的分数",
+                    "sceneId": "scene-p10"
+                  }
+                ],
+                "id": "grade_fit",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "再看这句话：阅读人数是总人数的60%。注意，60%说的不是'60个人'，而是两个数量之间的关系——阅读人数和总人数相比，每一百份里占60份。百分数只表示两个数量之间的倍数关系，不表示具体数量，所以它又叫百分比或百分率。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "最后自己输入一个分数，比如先把分母改成8，再把分子改成3。先预测百分比，再观察数值和图条随输入立刻更新的结果。用一句话说说为什么分数、小数和百分数能表示同一个量。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "求一个数的几分之几，用乘法。80 乘五分之三，等于 48。所以女生有 48 人。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "看这条换算链：五分之三就是 3 除以 5，得 0.6。百分数的分母是一百，0.6 乘 100 就是 60。为什么乘 100？因为百分数要把整体平均分成 100 份，看部分占了多少份。所以女生占全队的 60%。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "· 求部分量＝整体×分数；部分÷整体的结果再化为百分数",
+                    "sceneId": "scene-p10"
+                  }
+                ],
+                "id": "goal_coverage",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "先别急着翻答案。你先猜一猜：参加阅读的大约有多少人？占总人数的百分之几？然后想一想，你打算怎么算。",
+                    "sceneId": "scene-p1"
+                  },
+                  {
+                    "quote": "现在轮到你了。先别急着翻书，看着这张百格图和这句话，用自己的话说一说：60%表示什么？可以在心里默说一遍，也可以小声讲给同桌听。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "别急着下结论。把你的猜想悄悄记在心里,然后点击 2/5,观察分数条的长度,再看小数和百分数同时变成了什么。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "合唱队有 80 人，其中五分之三是女生。女生占全队的百分之几？先别急着算，想一想：要回答这个问题，我们得先知道什么？",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "现在到了独立挑战环节，请你自己完成接下来的两道题。先仔细读题，列式计算，遇到不确定的地方可以把题目里的分数用分数条画出来。我在这儿等你提交，之后再一起看你哪里想对了、哪里要调整。",
+                    "sceneId": "scene-p8"
+                  },
+                  {
+                    "quote": "现在来完成反思三问。先问自己：我一开始是怎么想的？",
+                    "sceneId": "scene-p10"
+                  }
+                ],
+                "id": "teaching_sequence",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "再看第二步，小刚直接把五分之三写成了百分之三十五。停在这里想一想：分子3能直接变成百分号前面的35吗？",
+                    "sceneId": "scene-p7"
+                  },
+                  {
+                    "quote": "✗ 第二步：3/5 ≠ 35%",
+                    "sceneId": "scene-p7"
+                  },
+                  {
+                    "quote": "48 \\div 80 = 0.6 = 60\\%",
+                    "sceneId": "scene-p7"
+                  },
+                  {
+                    "quote": "✓ 第二步：部分 ÷ 整体 = 百分数",
+                    "sceneId": "scene-p7"
+                  }
+                ],
+                "id": "misconception_repair",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "widget_setState",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "1/4 = 1÷4 = 0.25 = 25%。因为把整体分成4份取1份，换成100份就是25份。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "因为把整体分成5份取2份，换成100份就是40份。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "因为把整体分成4份取3份，换成100份就是75份。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "已更新 · 观察同步变化",
+                    "sceneId": "scene-p3"
+                  }
+                ],
+                "id": "meaningful_interaction",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "某活动共有120人,其中2/5参加绘画。参加绘画的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "某活动共有150人,其中3/10参加合唱。参加合唱的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "某活动共有200人,其中7/10参加运动。参加运动的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                    "sceneId": "scene-p8"
+                  },
+                  {
+                    "quote": "某活动共有250人,其中4/5参加手工。参加手工的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                    "sceneId": "scene-p9"
+                  }
+                ],
+                "id": "assessment_alignment",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "如果你一时说不清，就看着这条分数条，它已经把80人平均分成了5份。现在，拿出笔，把你的想法写一写。",
+                    "sceneId": "scene-p1"
+                  },
+                  {
+                    "quote": "现在轮到你了。先别急着翻书，看着这张百格图和这句话，用自己的话说一说：60%表示什么？可以在心里默说一遍，也可以小声讲给同桌听。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "先猜一猜 2/5 变成百分之几？点上面的 2/5，再观察分数条、小数和百分数怎么一起变。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "请用自己的话复述一个方法要点，再说出一个你还不太确定的地方，以及下次想怎么再练一次。",
+                    "sceneId": "scene-p10"
+                  }
+                ],
+                "id": "language_load",
+                "passed": true
+              }
+            ],
+            "inputSha256": "dd1b641c9ae4e6d0f77a896de545456cecd7a93b6ee2dd25e7548691e28dcd5d",
+            "modelId": "deepseek-v4-flash",
+            "objectives": [
+              {
+                "evidence": [
+                  {
+                    "quote": "一百分之六十，写成百分数就是60%。百分号%表示'每一百'，所以60%就是每一百份中占60份。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "再看这句话：阅读人数是总人数的60%。注意，60%说的不是'60个人'，而是两个数量之间的关系——阅读人数和总人数相比，每一百份里占60份。百分数只表示两个数量之间的倍数关系，不表示具体数量，所以它又叫百分比或百分率。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "1/4 = 1÷4 = 0.25 = 25%。因为把整体分成4份取1份，换成100份就是25份。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "看这条换算链：五分之三就是 3 除以 5，得 0.6。百分数的分母是一百，0.6 乘 100 就是 60。为什么乘 100？因为百分数要把整体平均分成 100 份，看部分占了多少份。所以女生占全队的 60%。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "某活动共有200人,其中7/10参加运动。参加运动的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                    "sceneId": "scene-p8"
+                  }
+                ],
+                "objectiveIndex": 0
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "最后自己输入一个分数，比如先把分母改成8，再把分子改成3。先预测百分比，再观察数值和图条随输入立刻更新的结果。用一句话说说为什么分数、小数和百分数能表示同一个量。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "1/4 = 1÷4 = 0.25 = 25%。因为把整体分成4份取1份，换成100份就是25份。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "因为把整体分成5份取2份，换成100份就是40份。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "\\frac{3}{5} = 3 \\div 5 = 0.6 = \\frac{60}{100} = 60\\%",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "某活动共有250人,其中4/5参加手工。参加手工的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                    "sceneId": "scene-p9"
+                  }
+                ],
+                "objectiveIndex": 1
+              }
+            ],
+            "providerId": "deepseek",
+            "requestIdHash": "e8a108a538a7c94c142dee39cd95902610eaff2da739c490a4d9d66b33a71eb7"
+          },
+          "sceneHashes": [
+            {
+              "sceneId": "scene-p1",
+              "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd"
+            },
+            {
+              "sceneId": "scene-p2",
+              "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8"
+            },
+            {
+              "sceneId": "scene-p3",
+              "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851"
+            },
+            {
+              "sceneId": "scene-p4",
+              "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68"
+            },
+            {
+              "sceneId": "scene-p5",
+              "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b"
+            },
+            {
+              "sceneId": "scene-p6",
+              "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf"
+            },
+            {
+              "sceneId": "scene-p7",
+              "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201"
+            },
+            {
+              "sceneId": "scene-p8",
+              "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b"
+            },
+            {
+              "sceneId": "scene-p9",
+              "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383"
+            },
+            {
+              "sceneId": "scene-p10",
+              "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475"
+            }
+          ],
+          "schemaVersion": "mira.openmaic.teaching-quality-receipt.v1",
+          "selectionPlanSha256": "8db510d3215bdecb25f156ef43f06dd0d7c170fe3279f41622b1c35f999b54f5",
+          "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+          "snapshotSha256": "8a308b2aa1eeede6cb132e20cbd7a75846fd157374be4705767d76f5a4cd1705",
+          "stageId": "stage-p83SomVEUh",
+          "status": "passed",
+          "teachingBriefSha256": "b04099df77333dfc93f7fbc74090a914ebc491663b8dcb79825a9df79022708b"
+        },
+        "userPromptRequired": false,
+        "verified": true,
+        "videoGenerationEnabled": true,
+        "videoPolicyId": "mira-formal-happyhorse-video.v1",
+        "webSearchEnabled": true,
+        "workflowVersion": "openmaic-pro-agent.v1"
+      },
+      "requiredTeachingActions": [
+        {
+          "actionId": "action_wEHTeiIO",
+          "sceneId": "scene-p2"
+        },
+        {
+          "actionId": "action_LLeyQpLJ",
+          "sceneId": "scene-p7"
+        },
+        {
+          "actionId": "action_DUK69OCZ",
+          "sceneId": "scene-p10"
+        }
+      ],
+      "research": {
+        "citationCount": 1,
+        "citedSceneCount": 3,
+        "fetchedSourceCount": 1,
+        "providerId": "baidu",
+        "receiptSha256": "27df927fed300fe02f2a798a7ed4f7b04f85e18d12b4f623bf12c3fc8a8f1821",
+        "resultCount": 10,
+        "schemaVersion": "mira.openmaic.professional-research-receipt.v1",
+        "searchCount": 1,
+        "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+        "verified": true
+      },
+      "runtimeEventAuthority": {
+        "scenes": [
+          {
+            "completionActionId": "action_1Xj6Oeu7",
+            "questionIds": [],
+            "sceneId": "scene-p1",
+            "sceneIndex": 0
+          },
+          {
+            "completionActionId": "action_wEHTeiIO",
+            "questionIds": [],
+            "sceneId": "scene-p2",
+            "sceneIndex": 1
+          },
+          {
+            "completionActionId": "action_tbZ0QtKc",
+            "questionIds": [],
+            "sceneId": "scene-p3",
+            "sceneIndex": 2
+          },
+          {
+            "completionActionId": "action_KIaum6rS",
+            "questionIds": [],
+            "sceneId": "scene-p4",
+            "sceneIndex": 3
+          },
+          {
+            "completionActionId": "action_S4wNHvGZ",
+            "questionIds": [
+              "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q2"
+            ],
+            "sceneId": "scene-p5",
+            "sceneIndex": 4
+          },
+          {
+            "completionActionId": "action_GeD7dkQ_",
+            "questionIds": [
+              "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q3"
+            ],
+            "sceneId": "scene-p6",
+            "sceneIndex": 5
+          },
+          {
+            "completionActionId": "action_LLeyQpLJ",
+            "questionIds": [],
+            "sceneId": "scene-p7",
+            "sceneIndex": 6
+          },
+          {
+            "completionActionId": "action_6ZBBQSz7",
+            "questionIds": [
+              "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q4"
+            ],
+            "sceneId": "scene-p8",
+            "sceneIndex": 7
+          },
+          {
+            "completionActionId": "action_-Uk82O4N",
+            "questionIds": [
+              "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q5"
+            ],
+            "sceneId": "scene-p9",
+            "sceneIndex": 8
+          },
+          {
+            "completionActionId": "action_DUK69OCZ",
+            "questionIds": [],
+            "sceneId": "scene-p10",
+            "sceneIndex": 9
+          }
+        ],
+        "schemaVersion": "mira.openmaic.runtime-event-authority.v1"
+      },
+      "sceneDistribution": {
+        "interactive": 1,
+        "pbl": 0,
+        "quiz": 4,
+        "slide": 5
+      },
+      "speechActionCount": 43,
+      "speechSceneCount": 10,
+      "spotlightVerified": true,
+      "teacher": {
+        "agentId": "mira-formal-teacher",
+        "avatar": "/avatars/teacher.png",
+        "name": "小数老师",
+        "teacherGender": "male",
+        "voiceGender": "male",
+        "voiceId": "Ethan"
+      },
+      "teacherActionCount": 35,
+      "teachingQuality": {
+        "receiptSha256": "e7fd7aabcaa602c47bb7cec2acc0f9023635a34a4f3484e242157432541c826d",
+        "sceneHashes": [
+          {
+            "sceneId": "scene-p1",
+            "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd"
+          },
+          {
+            "sceneId": "scene-p2",
+            "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8"
+          },
+          {
+            "sceneId": "scene-p3",
+            "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851"
+          },
+          {
+            "sceneId": "scene-p4",
+            "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68"
+          },
+          {
+            "sceneId": "scene-p5",
+            "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b"
+          },
+          {
+            "sceneId": "scene-p6",
+            "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf"
+          },
+          {
+            "sceneId": "scene-p7",
+            "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201"
+          },
+          {
+            "sceneId": "scene-p8",
+            "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b"
+          },
+          {
+            "sceneId": "scene-p9",
+            "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383"
+          },
+          {
+            "sceneId": "scene-p10",
+            "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475"
+          }
+        ],
+        "snapshotSha256": "8a308b2aa1eeede6cb132e20cbd7a75846fd157374be4705767d76f5a4cd1705",
+        "verified": true
+      },
+      "video": {
+        "modelId": "happyhorse-1.0-t2v",
+        "policyId": "mira-formal-happyhorse-video.v1",
+        "providerId": "happyhorse",
+        "receiptSha256": "1ca9d62c0ca75cdc7f0e67324406a712668d825cbd4455bb88f5b8882c905890",
+        "schemaVersion": "mira.openmaic.formal-video-receipt.v1",
+        "verified": true,
+        "verifiedAssetCount": 0,
+        "videoCount": 0
+      },
+      "widgetHighlightVerified": true,
+      "widgetTypes": [
+        "simulation"
+      ]
+    },
+    "formalRuntimeContract": {
+      "distinctPeerDiscussions": 2,
+      "interactive": {
+        "allowedWidgetTypes": [
+          "simulation",
+          "diagram",
+          "code",
+          "game",
+          "visualization3d"
+        ],
+        "fake3dRejected": true,
+        "noopRejected": true,
+        "productiveScriptRequired": true,
+        "widgetConfigRequired": true
+      },
+      "roster": {
+        "peerCount": 4,
+        "teacherCount": 1
+      },
+      "scenePlanning": {
+        "allowedSceneTypes": [
+          "slide",
+          "quiz",
+          "interactive",
+          "pbl"
+        ],
+        "authority": "openmaic_professional_agent",
+        "defaultDurationMinutes": {
+          "max": 30,
+          "min": 15
+        },
+        "exactCountRequired": false,
+        "maxSceneCount": 60,
+        "mode": "adaptive",
+        "requiredSceneTypes": [
+          "slide",
+          "quiz",
+          "interactive"
+        ],
+        "scenesPerMinute": {
+          "max": 2,
+          "min": 1
+        }
+      },
+      "schemaVersion": "mira.openmaic.formal-runtime.v4-deepseek-professional",
+      "slideSpotlight": {
+        "consecutiveSpotlightsAllowed": true,
+        "focusExplanationSequenceRequired": true,
+        "minimumPerSlide": 1,
+        "targetMustBeRenderable": true
+      },
+      "speechActions": {
+        "interactiveSpotlightRequired": false,
+        "perScene": {
+          "max": 20,
+          "min": 1
+        },
+        "total": {
+          "max": 240,
+          "min": 1
+        }
+      },
+      "speechRequiredForEveryScene": true,
+      "teacherEvidence": [
+        "spotlight",
+        "widget_highlight"
+      ],
+      "whiteboardRequired": false
+    },
+    "generationContract": {
+      "authority": "mira_backend_formal_candidate",
+      "buildItemId": "catalog_build_item_ddaa5bc7be54a293272cc3e3",
+      "course": {
+        "difficultyCode": "standard",
+        "id": "candidate_primary_6_math_91e56dc8caa0_catalog_gen_ddaa5bc7be54a293272cc3e_e09aad2c36fc",
+        "packageId": "formal_runtime_package_e1bc208ea5e1e24cb054b0400d3f272380d53ff93d7c2850",
+        "packageVersion": 1,
+        "version": "0.0.0-candidate"
+      },
+      "coursewareAuthority": {
+        "backendProviderCredentialsAccepted": false,
+        "classroomCompilation": "professional_skill_workflow",
+        "generationOwner": "openmaic",
+        "providerInvocation": "professional_agent",
+        "schemaVersion": "mira.openmaic.courseware-authority.v2-professional"
+      },
+      "difficultyPolicy": {
+        "complexity": {
+          "assessmentOperation": "fraction_percentage",
+          "grammarVersion": "mira.learning.banded-objective-grammar.v1",
+          "maxEvidenceFacts": 1,
+          "minEvidenceFacts": 1,
+          "operandBounds": {
+            "denominator": [
+              2,
+              100
+            ],
+            "numerator": "positive and less than denominator",
+            "participants": "integer",
+            "percentDecimalPlacesMax": 1,
+            "totalPeople": [
+              10,
+              1000
+            ]
+          },
+          "reasoningSteps": 2
+        },
+        "difficultyCode": "standard",
+        "gradeCode": "primary_6",
+        "mode": "fraction_percentage",
+        "objectiveRuleVersion": "mira.learning.primary-2-6-objective-rules.v2",
+        "policySha256": "1f98f76d1d7c7abacfe00921f86e7c510a1277c16b40d55857814401baf1ea9e",
+        "publicPromptExample": "某活动共有80人，其中3/5参加阅读。参加阅读的有多少人，占总人数的百分之几？按“人数;百分数”回答。",
+        "schemaVersion": "mira.learning.difficulty-policy.v1",
+        "skillId": "fraction_ratio_percentage",
+        "subject": "math"
+      },
+      "generation": {
+        "agentMode": "generate",
+        "automaticRetries": 0,
+        "enableImageGeneration": true,
+        "enableTTS": false,
+        "enableVideoGeneration": true,
+        "enableWebSearch": true,
+        "maximumAttempts": 1,
+        "mode": "professional_skill",
+        "providerInvocation": "openmaic_agent_managed",
+        "skillId": "mira-primary-courseware",
+        "supportingSkillIds": [
+          "k12-core-literacy-planning",
+          "deep-interactive"
+        ],
+        "userPromptRequired": false,
+        "webSearchRequired": true,
+        "workflowVersion": "openmaic-pro-agent.v1"
+      },
+      "gradeBoundary": {
+        "allowedContent": [
+          "比的意义",
+          "百分率",
+          "折扣",
+          "分数小数互化"
+        ],
+        "boundaryVersion": "mira.primary.2026-fall.v1:fraction_ratio_percentage:34730a0bcee18bb9",
+        "curriculumVersion": "mira.primary.2026-fall.v1",
+        "estimatedMinutes": 10,
+        "excludedContent": [
+          "复利",
+          "三角比",
+          "复杂比例证明"
+        ],
+        "gradeCode": "primary_6",
+        "language": "zh-CN",
+        "learningObjectives": [
+          "理解比和百分数",
+          "在分数小数百分数之间转换"
+        ],
+        "prerequisiteSkills": [],
+        "skillId": "fraction_ratio_percentage",
+        "skillTitle": "分数、比与百分数",
+        "subject": "math"
+      },
+      "gradeBoundarySha256": "1386572be3fc8d49d88915344c238811b8f70f03ebb679d7e82cd42dc465bd62",
+      "professionalCreationPolicy": {
+        "image": {
+          "assetValidationRequired": true,
+          "enabled": true,
+          "modelId": "qwen-image-max",
+          "policyId": "mira-formal-qwen-image.v1",
+          "providerId": "qwen-image",
+          "providerManaged": true,
+          "schemaVersion": "mira.openmaic.formal-image-policy.v1",
+          "usage": "teaching_need"
+        },
+        "interactionDesignPolicy": {
+          "demonstrationRequired": true,
+          "enabled": true,
+          "explanatoryFeedbackRequired": true,
+          "explorationPolicy": {
+            "inputModes": [
+              "pointer",
+              "touch"
+            ],
+            "maximumStates": 5,
+            "mechanismRegistry": [
+              "fraction-ratio-percentage.v1",
+              "semantic-state-model.v1"
+            ],
+            "minimumStates": 3,
+            "resetRequired": true,
+            "schemaVersion": "mira.openmaic.multistate-exploration.v1"
+          },
+          "finalSnapshotRequired": true,
+          "independentJudgmentRequired": true,
+          "learnerOperationRequired": true,
+          "objectiveCoverageRequired": true,
+          "policyId": "mira-primary-multistate-interaction.v2",
+          "profile": "primary-adaptive",
+          "renderedInteractionRequired": true,
+          "schemaVersion": "mira.openmaic.interaction-design.v2",
+          "visualReviewRequired": true,
+          "visualRubricVersion": "mira.primary-teaching-visual.v1"
+        },
+        "mode": "professional_skill",
+        "schemaVersion": "mira.openmaic.professional-creation.v1",
+        "skillId": "mira-primary-courseware",
+        "skillOrchestration": {
+          "baseSkillIds": [
+            "mira-primary-courseware",
+            "stage-design",
+            "k12-core-literacy-planning",
+            "deep-interactive",
+            "slide-craft",
+            "learning-to-learn"
+          ],
+          "decisionCoverageRequired": true,
+          "gradeBoundaryRequired": true,
+          "mainMethodMax": 1,
+          "profileId": "mira-primary-adaptive.v2",
+          "registryId": "openmaic-builtin-skills.v1-23",
+          "sceneContextRequired": true,
+          "schemaVersion": "mira.openmaic.skill-orchestration.v2",
+          "selectionMode": "server_rules"
+        },
+        "studentToolsEnabled": false,
+        "supportingSkillIds": [
+          "k12-core-literacy-planning",
+          "deep-interactive"
+        ],
+        "teachingQuality": {
+          "finalSnapshotRequired": true,
+          "gradeBoundaryRequired": true,
+          "independentReviewRequired": true,
+          "maxReviewAttempts": 3,
+          "policyId": "mira-primary-quality.v1",
+          "renderedScenesRequired": true,
+          "schemaVersion": "mira.openmaic.teaching-quality-policy.v1"
+        },
+        "userPromptRequired": false,
+        "video": {
+          "aspectRatio": "16:9",
+          "assetValidationRequired": true,
+          "durationSec": 5,
+          "enabled": true,
+          "maxCalls": 1,
+          "maxVideos": 1,
+          "modelId": "happyhorse-1.0-t2v",
+          "policyId": "mira-formal-happyhorse-video.v1",
+          "providerId": "happyhorse",
+          "providerManaged": true,
+          "resolution": "720p",
+          "schemaVersion": "mira.openmaic.formal-video-policy.v1",
+          "usage": "teaching_need"
+        },
+        "webSearch": {
+          "citationsRequired": true,
+          "enabled": true,
+          "maxCalls": 4,
+          "minimumFetchedSources": 1,
+          "primarySourcesPreferred": true,
+          "providerManaged": true
+        },
+        "workflowVersion": "openmaic-pro-agent.v1"
+      },
+      "requiredClassroom": {
+        "distinctPeerDiscussions": 2,
+        "interactive": {
+          "allowedWidgetTypes": [
+            "simulation",
+            "diagram",
+            "code",
+            "game",
+            "visualization3d"
+          ],
+          "fake3dRejected": true,
+          "noopRejected": true,
+          "productiveScriptRequired": true,
+          "widgetConfigRequired": true
+        },
+        "roster": {
+          "peerCount": 4,
+          "teacherCount": 1
+        },
+        "scenePlanning": {
+          "allowedSceneTypes": [
+            "slide",
+            "quiz",
+            "interactive",
+            "pbl"
+          ],
+          "authority": "openmaic_professional_agent",
+          "defaultDurationMinutes": {
+            "max": 30,
+            "min": 15
+          },
+          "exactCountRequired": false,
+          "maxSceneCount": 60,
+          "mode": "adaptive",
+          "requiredSceneTypes": [
+            "slide",
+            "quiz",
+            "interactive"
+          ],
+          "scenesPerMinute": {
+            "max": 2,
+            "min": 1
+          }
+        },
+        "schemaVersion": "mira.openmaic.formal-runtime.v4-deepseek-professional",
+        "slideSpotlight": {
+          "consecutiveSpotlightsAllowed": true,
+          "focusExplanationSequenceRequired": true,
+          "minimumPerSlide": 1,
+          "targetMustBeRenderable": true
+        },
+        "speechActions": {
+          "interactiveSpotlightRequired": false,
+          "perScene": {
+            "max": 20,
+            "min": 1
+          },
+          "total": {
+            "max": 240,
+            "min": 1
+          }
+        },
+        "speechRequiredForEveryScene": true,
+        "teacherEvidence": [
+          "spotlight",
+          "widget_highlight"
+        ],
+        "whiteboardRequired": false
+      },
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_ddaa5bc7be54a293272cc3e3-attempt-1",
+      "schemaVersion": "mira.openmaic.formal-runtime.v4-deepseek-professional",
+      "sourceCourseContentSha256": "9bf0c45f5fbe7186f12b79603e387c52a738dd45b3a07b78042bf088e28d7af2",
+      "targetFingerprint": "ea1b95dc616d483536c75507ba48440353f632288fafc4887c2a21b3f5b6a7f7",
+      "teacher": {
+        "runtime": {
+          "avatar": "/avatars/teacher.png",
+          "name": "小数老师",
+          "role": "teacher",
+          "teacherGender": "male",
+          "voiceConfig": {
+            "modelId": "qwen3-tts-flash",
+            "providerId": "qwen-tts",
+            "voiceId": "Ethan"
+          },
+          "voiceGender": "male"
+        },
+        "teacherProfile": {
+          "avatarPath": "/teachers/ashu-math-v1.png",
+          "contentHash": "4f5a986a765f69798c8546d7f9091fe297f2a98c5353fdd01cd1aa06884c98fb",
+          "displayName": "小数老师",
+          "id": "mira_math_clear",
+          "version": 2
+        }
+      },
+      "teachingBrief": {
+        "authority": {
+          "answerContractProvided": false,
+          "providerSecretsProvided": false,
+          "scoringRulesProvided": false,
+          "source": "locked_learning_course"
+        },
+        "course": {
+          "difficultyCode": "standard",
+          "gradeCode": "primary_6",
+          "id": "candidate_primary_6_math_91e56dc8caa0_catalog_gen_ddaa5bc7be54a293272cc3e_e09aad2c36fc",
+          "objective": "理解比和百分数;在分数小数百分数之间转换",
+          "skillId": "fraction_ratio_percentage",
+          "subject": "math",
+          "title": "校园活动中的分数与百分数",
+          "version": "0.0.0-candidate"
+        },
+        "difficultyPolicy": {
+          "complexity": {
+            "assessmentOperation": "fraction_percentage",
+            "grammarVersion": "mira.learning.banded-objective-grammar.v1",
+            "maxEvidenceFacts": 1,
+            "minEvidenceFacts": 1,
+            "operandBounds": {
+              "denominator": [
+                2,
+                100
+              ],
+              "numerator": "positive and less than denominator",
+              "participants": "integer",
+              "percentDecimalPlacesMax": 1,
+              "totalPeople": [
+                10,
+                1000
+              ]
+            },
+            "reasoningSteps": 2
+          },
+          "difficultyCode": "standard",
+          "gradeCode": "primary_6",
+          "mode": "fraction_percentage",
+          "objectiveRuleVersion": "mira.learning.primary-2-6-objective-rules.v2",
+          "policySha256": "1f98f76d1d7c7abacfe00921f86e7c510a1277c16b40d55857814401baf1ea9e",
+          "publicPromptExample": "某活动共有80人，其中3/5参加阅读。参加阅读的有多少人，占总人数的百分之几？按“人数;百分数”回答。",
+          "schemaVersion": "mira.learning.difficulty-policy.v1",
+          "skillId": "fraction_ratio_percentage",
+          "subject": "math"
+        },
+        "lesson": {
+          "estimatedMinutes": 10,
+          "intro": "同学们,今天我们来学习分数和百分数之间的关系。先看一个例子:某活动共有80人,其中3/5参加阅读。参加阅读的有多少人,占总人数的百分之几?我们可以先算人数:80×3/5=48人。再算百分数:48÷80=0.6=60%。所以答案是48人;60%。这个例子告诉我们:分数可以表示部分占整体的比例,百分数就是把这个比例写成百分之几。接下来我们学习其中的道理。",
+          "questions": [
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "48;60%"
+                },
+                {
+                  "id": "B",
+                  "label": "45;56.25%"
+                },
+                {
+                  "id": "C",
+                  "label": "50;62.5%"
+                },
+                {
+                  "id": "D",
+                  "label": "40;50%"
+                }
+              ],
+              "explanation": "80×3/5=48人;48÷80=0.6=60%。所以答案是48;60%。",
+              "hint": "先算80的3/5是多少,再算这个人数占80的百分之几。",
+              "id": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q1",
+              "prompt": "某活动共有80人,其中3/5参加阅读。参加阅读的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+              "skill": "分数、比与百分数",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "50;41.7%"
+                },
+                {
+                  "id": "B",
+                  "label": "48;40%"
+                },
+                {
+                  "id": "C",
+                  "label": "45;37.5%"
+                },
+                {
+                  "id": "D",
+                  "label": "52;43.3%"
+                }
+              ],
+              "explanation": "120×2/5=48人;48÷120=0.4=40%。所以答案是48;40%。",
+              "hint": "先算120的2/5,再除以120化成百分数。",
+              "id": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q2",
+              "prompt": "某活动共有120人,其中2/5参加绘画。参加绘画的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+              "skill": "分数、比与百分数",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "40;26.7%"
+                },
+                {
+                  "id": "B",
+                  "label": "50;33.3%"
+                },
+                {
+                  "id": "C",
+                  "label": "45;30%"
+                },
+                {
+                  "id": "D",
+                  "label": "55;36.7%"
+                }
+              ],
+              "explanation": "150×3/10=45人;45÷150=0.3=30%。所以答案是45;30%。",
+              "hint": "先算150的3/10,再除以150化成百分数。",
+              "id": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q3",
+              "prompt": "某活动共有150人,其中3/10参加合唱。参加合唱的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+              "skill": "分数、比与百分数",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "130;65%"
+                },
+                {
+                  "id": "B",
+                  "label": "150;75%"
+                },
+                {
+                  "id": "C",
+                  "label": "120;60%"
+                },
+                {
+                  "id": "D",
+                  "label": "140;70%"
+                }
+              ],
+              "explanation": "200×7/10=140人;140÷200=0.7=70%。所以答案是140;70%。",
+              "hint": "先算200的7/10,再除以200化成百分数。",
+              "id": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q4",
+              "prompt": "某活动共有200人,其中7/10参加运动。参加运动的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+              "skill": "分数、比与百分数",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "200;80%"
+                },
+                {
+                  "id": "B",
+                  "label": "180;72%"
+                },
+                {
+                  "id": "C",
+                  "label": "210;84%"
+                },
+                {
+                  "id": "D",
+                  "label": "190;76%"
+                }
+              ],
+              "explanation": "250×4/5=200人;200÷250=0.8=80%。所以答案是200;80%。",
+              "hint": "先算250的4/5,再除以250化成百分数。",
+              "id": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q5",
+              "prompt": "某活动共有250人,其中4/5参加手工。参加手工的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+              "skill": "分数、比与百分数",
+              "type": "single_choice"
+            }
+          ],
+          "teachingFlow": {
+            "demoQuestionId": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q1",
+            "guidedQuestionIds": [
+              "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q2",
+              "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q3"
+            ],
+            "independentQuestionIds": [
+              "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q4",
+              "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q5"
+            ],
+            "recap": {
+              "sayText": "今天我们学习了分数和百分数的关系:分数表示部分占整体的比例,百分数表示每一百份中的份数。分数化百分数可以先化成小数,再乘100加百分号。求部分量用整体乘分数,求百分数用部分量除以整体。例如80人的3/5是48人,48人占总人数的60%。"
+            },
+            "schemaVersion": "mira.learning.teaching-flow.v1",
+            "teach": {
+              "keyPoints": [
+                "分数表示部分占整体的比例,百分数表示每一百份中的份数。",
+                "分数化百分数:先化成小数,再乘100加百分号。",
+                "求部分量用整体乘分数;求百分数用部分量除以整体。"
+              ],
+              "sayText": "我们先理解什么是分数和百分数。分数像3/5,表示把整体平均分成5份,取其中的3份。百分数像60%,表示每一百份里占60份。它们都是表示部分和整体的关系。要把分数变成百分数,可以先把分数化成小数,再乘100加百分号。例如3/5=0.6,0.6×100=60,所以是60%。如果已知整体和分数,求部分量,就用整体乘分数。例如80×3/5=48。如果已知部分量和整体,求百分数,就用部分量除以整体,再化成百分数。例如48÷80=0.6=60%。",
+              "title": "分数和百分数的换算方法"
+            }
+          }
+        },
+        "schemaVersion": "mira.learning.formal-runtime-teaching-brief.v1",
+        "sourceCourseContentSha256": "9bf0c45f5fbe7186f12b79603e387c52a738dd45b3a07b78042bf088e28d7af2"
+      },
+      "teachingBriefSha256": "b04099df77333dfc93f7fbc74090a914ebc491663b8dcb79825a9df79022708b"
+    },
+    "media": {
+      "assets": [],
+      "buildItemId": "catalog_build_item_ddaa5bc7be54a293272cc3e3",
+      "classroomId": "stage-p83SomVEUh",
+      "imageCount": 0,
+      "modelId": "qwen-image-max",
+      "policyId": "mira-formal-qwen-image.v1",
+      "providerId": "qwen-image",
+      "receiptSha256": "fedeeda57dddd343459b9058feaea358c7f02067443bff13e0ef8bcec708c30a",
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_ddaa5bc7be54a293272cc3e3-attempt-1",
+      "schemaVersion": "mira.openmaic.formal-media-receipt.v1",
+      "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+      "status": "succeeded"
+    },
+    "missing": [],
+    "platform": {
+      "assessmentAuthority": "mira_backend",
+      "mp4Export": false,
+      "mp4ExportCapabilityProbed": false,
+      "mp4ExportClassroomDryRun": false,
+      "mp4ExportConfigured": false
+    },
+    "present": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "simulation"
+    ],
+    "professionalCreation": {
+      "buildItemId": "catalog_build_item_ddaa5bc7be54a293272cc3e3",
+      "classroomId": "stage-p83SomVEUh",
+      "imageGenerationEnabled": true,
+      "imagePolicyId": "mira-formal-qwen-image.v1",
+      "interactionDesign": {
+        "explorationChecks": [
+          {
+            "evidence": {
+              "inputMode": "pointer",
+              "mechanism": "fraction-ratio-percentage.v1",
+              "resetPassed": true,
+              "states": [
+                {
+                  "diagramSha256": "78de6465e4fb789bc9ee9104a103884504a225cb255e89a56a179f86d50eb0bd",
+                  "feedbackSha256": "789168f73e9f210aca738f65f558dc8e77085cf29f34218f4291f21e9e8b1a72",
+                  "numeric": {
+                    "decimal": 0.25,
+                    "denominator": 4,
+                    "diagramRatio": 0.25,
+                    "numerator": 1,
+                    "percent": 25
+                  },
+                  "stateId": "state-a"
+                },
+                {
+                  "diagramSha256": "d3919ce2d43a0261ea8211a0b9919a2f5c9018a3dff5367eb0717ec34e1c4b01",
+                  "feedbackSha256": "fc824d5c4b11628d6d984cbbf564956b693349a62bdfbca1b6a8d3dd00a1c5b5",
+                  "numeric": {
+                    "decimal": 0.4,
+                    "denominator": 5,
+                    "diagramRatio": 0.4000000529896495,
+                    "numerator": 2,
+                    "percent": 40
+                  },
+                  "stateId": "state-b"
+                },
+                {
+                  "diagramSha256": "81f1d1d813f19ec2078d058edcb1a2a162f0fa8b6c2e5f1590b9dcbb63c90901",
+                  "feedbackSha256": "a070f1aa61f449e3212c723e58da29c847ea5d026968942fa9976ecd573aa690",
+                  "numeric": {
+                    "decimal": 0.75,
+                    "denominator": 4,
+                    "diagramRatio": 0.75,
+                    "numerator": 3,
+                    "percent": 75
+                  },
+                  "stateId": "state-c"
+                }
+              ],
+              "verification": "independent_numeric_svg"
+            },
+            "objectiveIndex": 0,
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "evidence": {
+              "inputMode": "touch",
+              "mechanism": "fraction-ratio-percentage.v1",
+              "resetPassed": true,
+              "states": [
+                {
+                  "diagramSha256": "0777ccf7d428b2388c9819401f8d749950f13e9e05189a40ea3ee0f13afda2e6",
+                  "feedbackSha256": "789168f73e9f210aca738f65f558dc8e77085cf29f34218f4291f21e9e8b1a72",
+                  "numeric": {
+                    "decimal": 0.25,
+                    "denominator": 4,
+                    "diagramRatio": 0.25,
+                    "numerator": 1,
+                    "percent": 25
+                  },
+                  "stateId": "state-a"
+                },
+                {
+                  "diagramSha256": "3d51a4ccc481200c72d12fc13d291a7f2460419d6d2aacfac1da2567f9e9627c",
+                  "feedbackSha256": "fc824d5c4b11628d6d984cbbf564956b693349a62bdfbca1b6a8d3dd00a1c5b5",
+                  "numeric": {
+                    "decimal": 0.4,
+                    "denominator": 5,
+                    "diagramRatio": 0.4000000529896495,
+                    "numerator": 2,
+                    "percent": 40
+                  },
+                  "stateId": "state-b"
+                },
+                {
+                  "diagramSha256": "9ffaafcaf1dac538822e6ddb58568b8e12b431784ea49d24e217c4181c358d92",
+                  "feedbackSha256": "a070f1aa61f449e3212c723e58da29c847ea5d026968942fa9976ecd573aa690",
+                  "numeric": {
+                    "decimal": 0.75,
+                    "denominator": 4,
+                    "diagramRatio": 0.75,
+                    "numerator": 3,
+                    "percent": 75
+                  },
+                  "stateId": "state-c"
+                }
+              ],
+              "verification": "independent_numeric_svg"
+            },
+            "objectiveIndex": 0,
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "evidence": {
+              "inputMode": "pointer",
+              "mechanism": "fraction-ratio-percentage.v1",
+              "resetPassed": true,
+              "states": [
+                {
+                  "diagramSha256": "78de6465e4fb789bc9ee9104a103884504a225cb255e89a56a179f86d50eb0bd",
+                  "feedbackSha256": "789168f73e9f210aca738f65f558dc8e77085cf29f34218f4291f21e9e8b1a72",
+                  "numeric": {
+                    "decimal": 0.25,
+                    "denominator": 4,
+                    "diagramRatio": 0.25,
+                    "numerator": 1,
+                    "percent": 25
+                  },
+                  "stateId": "state-a"
+                },
+                {
+                  "diagramSha256": "d3919ce2d43a0261ea8211a0b9919a2f5c9018a3dff5367eb0717ec34e1c4b01",
+                  "feedbackSha256": "fc824d5c4b11628d6d984cbbf564956b693349a62bdfbca1b6a8d3dd00a1c5b5",
+                  "numeric": {
+                    "decimal": 0.4,
+                    "denominator": 5,
+                    "diagramRatio": 0.4000000529896495,
+                    "numerator": 2,
+                    "percent": 40
+                  },
+                  "stateId": "state-b"
+                },
+                {
+                  "diagramSha256": "81f1d1d813f19ec2078d058edcb1a2a162f0fa8b6c2e5f1590b9dcbb63c90901",
+                  "feedbackSha256": "a070f1aa61f449e3212c723e58da29c847ea5d026968942fa9976ecd573aa690",
+                  "numeric": {
+                    "decimal": 0.75,
+                    "denominator": 4,
+                    "diagramRatio": 0.75,
+                    "numerator": 3,
+                    "percent": 75
+                  },
+                  "stateId": "state-c"
+                }
+              ],
+              "verification": "independent_numeric_svg"
+            },
+            "objectiveIndex": 1,
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "evidence": {
+              "inputMode": "touch",
+              "mechanism": "fraction-ratio-percentage.v1",
+              "resetPassed": true,
+              "states": [
+                {
+                  "diagramSha256": "0777ccf7d428b2388c9819401f8d749950f13e9e05189a40ea3ee0f13afda2e6",
+                  "feedbackSha256": "789168f73e9f210aca738f65f558dc8e77085cf29f34218f4291f21e9e8b1a72",
+                  "numeric": {
+                    "decimal": 0.25,
+                    "denominator": 4,
+                    "diagramRatio": 0.25,
+                    "numerator": 1,
+                    "percent": 25
+                  },
+                  "stateId": "state-a"
+                },
+                {
+                  "diagramSha256": "3d51a4ccc481200c72d12fc13d291a7f2460419d6d2aacfac1da2567f9e9627c",
+                  "feedbackSha256": "fc824d5c4b11628d6d984cbbf564956b693349a62bdfbca1b6a8d3dd00a1c5b5",
+                  "numeric": {
+                    "decimal": 0.4,
+                    "denominator": 5,
+                    "diagramRatio": 0.4000000529896495,
+                    "numerator": 2,
+                    "percent": 40
+                  },
+                  "stateId": "state-b"
+                },
+                {
+                  "diagramSha256": "9ffaafcaf1dac538822e6ddb58568b8e12b431784ea49d24e217c4181c358d92",
+                  "feedbackSha256": "a070f1aa61f449e3212c723e58da29c847ea5d026968942fa9976ecd573aa690",
+                  "numeric": {
+                    "decimal": 0.75,
+                    "denominator": 4,
+                    "diagramRatio": 0.75,
+                    "numerator": 3,
+                    "percent": 75
+                  },
+                  "stateId": "state-c"
+                }
+              ],
+              "verification": "independent_numeric_svg"
+            },
+            "objectiveIndex": 1,
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          }
+        ],
+        "gradeBoundarySha256": "1386572be3fc8d49d88915344c238811b8f70f03ebb679d7e82cd42dc465bd62",
+        "objectives": [
+          {
+            "checks": [
+              {
+                "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+                "probeId": "objective-0",
+                "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                "screenshotSha256": "8f7a96ca8b918b7c996a0310639a3835447eb9f1774b4bf116340a0b2c245175",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+                "probeId": "objective-0",
+                "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                "screenshotSha256": "6a7dd4617c6ebb4c0dad00c962586ba5678fd2d3384cf49d6d006cf29caacf92",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              }
+            ],
+            "demonstration": {
+              "quote": "60%就是每一百份中占60份",
+              "sceneId": "scene-p2"
+            },
+            "exploration": {
+              "diagramSelector": "#model",
+              "feedbackSelector": "#result",
+              "mechanism": {
+                "decimalSelector": "#decimal",
+                "denominatorSelector": "#denominator",
+                "kind": "fraction-ratio-percentage.v1",
+                "numeratorSelector": "#numerator",
+                "partSelector": "#part-bar",
+                "percentSelector": "#percent",
+                "wholeSelector": "#whole-bar"
+              },
+              "reset": {
+                "selector": "#reset",
+                "stateId": "state-a"
+              },
+              "schemaVersion": "mira.openmaic.multistate-exploration.v1",
+              "states": [
+                {
+                  "denominator": 4,
+                  "explanationText": "因为把整体分成4份取1份，换成100份就是25份。",
+                  "id": "state-a",
+                  "numerator": 1,
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#preset-1-4"
+                    }
+                  ],
+                  "resultText": "1/4 = 1÷4 = 0.25 = 25%"
+                },
+                {
+                  "denominator": 5,
+                  "explanationText": "因为把整体分成5份取2份，换成100份就是40份。",
+                  "id": "state-b",
+                  "numerator": 2,
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#preset-2-5"
+                    }
+                  ],
+                  "resultText": "2/5 = 2÷5 = 0.4 = 40%"
+                },
+                {
+                  "denominator": 4,
+                  "explanationText": "因为把整体分成4份取3份，换成100份就是75份。",
+                  "id": "state-c",
+                  "numerator": 3,
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#preset-3-4"
+                    }
+                  ],
+                  "resultText": "3/4 = 3÷4 = 0.75 = 75%"
+                }
+              ]
+            },
+            "feedback": {
+              "reasonQuote": "因为把整体分成5份取2份，换成100份就是40份。",
+              "sceneId": "scene-p3",
+              "selector": "#result",
+              "textIncludes": "40%"
+            },
+            "independentJudgment": {
+              "questionId": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q4",
+              "sceneId": "scene-p8"
+            },
+            "objectiveIndex": 0,
+            "operation": {
+              "action": "click",
+              "controlSelector": "#preset-2-5",
+              "sceneId": "scene-p3"
+            }
+          },
+          {
+            "checks": [
+              {
+                "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+                "probeId": "objective-1",
+                "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                "screenshotSha256": "8f7a96ca8b918b7c996a0310639a3835447eb9f1774b4bf116340a0b2c245175",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+                "probeId": "objective-1",
+                "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+                "screenshotSha256": "6a7dd4617c6ebb4c0dad00c962586ba5678fd2d3384cf49d6d006cf29caacf92",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              }
+            ],
+            "demonstration": {
+              "quote": "1/4 = 0.25 = 25%",
+              "sceneId": "scene-p3"
+            },
+            "exploration": {
+              "diagramSelector": "#model",
+              "feedbackSelector": "#result",
+              "mechanism": {
+                "decimalSelector": "#decimal",
+                "denominatorSelector": "#denominator",
+                "kind": "fraction-ratio-percentage.v1",
+                "numeratorSelector": "#numerator",
+                "partSelector": "#part-bar",
+                "percentSelector": "#percent",
+                "wholeSelector": "#whole-bar"
+              },
+              "reset": {
+                "selector": "#reset",
+                "stateId": "state-a"
+              },
+              "schemaVersion": "mira.openmaic.multistate-exploration.v1",
+              "states": [
+                {
+                  "denominator": 4,
+                  "explanationText": "因为把整体分成4份取1份，换成100份就是25份。",
+                  "id": "state-a",
+                  "numerator": 1,
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#preset-1-4"
+                    }
+                  ],
+                  "resultText": "1/4 = 1÷4 = 0.25 = 25%"
+                },
+                {
+                  "denominator": 5,
+                  "explanationText": "因为把整体分成5份取2份，换成100份就是40份。",
+                  "id": "state-b",
+                  "numerator": 2,
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#preset-2-5"
+                    }
+                  ],
+                  "resultText": "2/5 = 2÷5 = 0.4 = 40%"
+                },
+                {
+                  "denominator": 4,
+                  "explanationText": "因为把整体分成4份取3份，换成100份就是75份。",
+                  "id": "state-c",
+                  "numerator": 3,
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#preset-3-4"
+                    }
+                  ],
+                  "resultText": "3/4 = 3÷4 = 0.75 = 75%"
+                }
+              ]
+            },
+            "feedback": {
+              "reasonQuote": "因为把整体分成4份取3份，换成100份就是75份。",
+              "sceneId": "scene-p3",
+              "selector": "#result",
+              "textIncludes": "75%"
+            },
+            "independentJudgment": {
+              "questionId": "catalog_gen_ddaa5bc7be54a293272cc3e3596dc6f35892029_e09aad2c36fc_q5",
+              "sceneId": "scene-p9"
+            },
+            "objectiveIndex": 1,
+            "operation": {
+              "action": "click",
+              "controlSelector": "#preset-3-4",
+              "sceneId": "scene-p3"
+            }
+          }
+        ],
+        "planSha256": "91d81c0742efabb66b3a8072bc0bfc1af7fa8f24119f38dfd39187f70dd5fc86",
+        "policyId": "mira-primary-multistate-interaction.v2",
+        "receiptSha256": "71d9956f50a1bf0302cebf72caa0c343ad942b318f94b22b80c86ce17c28d1b0",
+        "schemaVersion": "mira.openmaic.interaction-design-receipt.v2",
+        "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+        "snapshotSha256": "8a308b2aa1eeede6cb132e20cbd7a75846fd157374be4705767d76f5a4cd1705",
+        "stageId": "stage-p83SomVEUh",
+        "status": "passed",
+        "teachingQualityReceiptSha256": "e7fd7aabcaa602c47bb7cec2acc0f9023635a34a4f3484e242157432541c826d",
+        "visualReview": {
+          "modelId": "deepseek-v4-flash-vision-exp",
+          "providerId": "deepseek",
+          "providerRequestIdHash": "8a8add2b62a218d95136294cc3350923393c56a6952a93002e42f0f242ccfb99",
+          "providerResponseModelId": "deepseek-flash",
+          "receiptSha256": "9f4aa6c00d2ebcdd8cf6f1d378863b628ac0ecc46c3714f84afa429c23d4d7ad",
+          "reviewerKind": "vision_model",
+          "rubricVersion": "mira.primary-teaching-visual.v1",
+          "sceneReviews": [
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "标题、情境文字与蓝色分数条清晰可读，5格中3格涂色与'80人平均分成5份，取3份'标注一致，静态引导页无控件属正常。",
+              "sceneId": "scene-p1",
+              "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd",
+              "screenshotSha256": "eefd84c6e41f86f5ac79dff6bb8568052566c0a88b618da90a5c6ecf8c122778",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "1024×768视口下文字与分数条仍清晰，无截断遮挡，留白合理。",
+              "sceneId": "scene-p1",
+              "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd",
+              "screenshotSha256": "4083a8dd6dc61cd8fa229afb1dd4a7195fe155cfda63b5ab842be39f194cc704",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "3/5→60/100→60%转换链与100格涂60格图示一致，'100格中涂色60格'标注准确，底部来源链接字号偏小但不影响教学。",
+              "sceneId": "scene-p2",
+              "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8",
+              "screenshotSha256": "d50d21b2dc8b86bd078bd22785d82b9704e26b87e5693b814e4d84d17b8e0e14",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "窄视口下三栏转换链与方格图完整可见，无遮挡，信息层级清楚。",
+              "sceneId": "scene-p2",
+              "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8",
+              "screenshotSha256": "fbf2f8ea5b03d24593a90dd3dcc855743cec48b95ff5572cee4b4fade71fdd28",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "分子分母输入框、快速预设1/4、2/5、3/4、重置按钮入口明确；分数条橙色部分与1/4对应，小数0.25与百分数25%一致，结果说明与试做提示可读。",
+              "sceneId": "scene-p3",
+              "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+              "screenshotSha256": "8f7a96ca8b918b7c996a0310639a3835447eb9f1774b4bf116340a0b2c245175",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "窄视口下控件与分数条、0.25、25%结果区均完整可辨，无截断。",
+              "sceneId": "scene-p3",
+              "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+              "screenshotSha256": "6a7dd4617c6ebb4c0dad00c962586ba5678fd2d3384cf49d6d006cf29caacf92",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "两步走流程用蓝绿分块与箭头串联，80×3/5=48、48÷80=0.6=60%计算正确，底部快捷换算链3/5=3÷5=0.6=60/100=60%一致。",
+              "sceneId": "scene-p4",
+              "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68",
+              "screenshotSha256": "b63afb55e0943d11d4fc2f4fab02b202ca59c42aa0845549731b3dc335a254c5",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "窄视口下两步算式与快捷换算行完整显示，无遮挡，配色区分步骤清楚。",
+              "sceneId": "scene-p4",
+              "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68",
+              "screenshotSha256": "62e86e93e2d6ee2a1f3cab66c5308e243c76250f880a0aeb0ee200e5a4d26963",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "题干'120人，2/5参加绘画'清晰，选项A 50;41.7%等四个选项可点，提交答案按钮明确；正确应为48;40%，选项B存在，题目可解。",
+              "sceneId": "scene-p5",
+              "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b",
+              "screenshotSha256": "fe2d3f5c9daae1c09d75c186d0ad563458e7a80250ed3177d44b037793e4aecb",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "窄视口下题干与四个选项完整可读，选中态高亮明显，提交按钮可见。",
+              "sceneId": "scene-p5",
+              "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b",
+              "screenshotSha256": "1c1750d90d230cbe085db7bdc96006adcf3ca195be53984225d8b6d9819d5de5",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "题干'150人，3/10参加合唱'清晰，选项含正确值45;30%，提交入口明确。",
+              "sceneId": "scene-p6",
+              "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf",
+              "screenshotSha256": "283fecde5d0ac11581cf1fdc31f2d50b0ed5aeaaa6968012e77b99ac53639c80",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "窄视口下题干与选项无截断，选中态与提交按钮可辨。",
+              "sceneId": "scene-p6",
+              "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf",
+              "screenshotSha256": "fc51a7154cd1961c604d68276da17a7c9241cd9db98342901428f5a8504e6dab",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "左右对比'小刚的算法'与'正确算法'红绿分栏清楚，错误点3/5≠35%与正确48÷80=0.6=60%标注准确，静态辨析页无控件合理。",
+              "sceneId": "scene-p7",
+              "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201",
+              "screenshotSha256": "5180dc6d7c58f9ba24e940dfa33e4ee37406178322eb084ab54a316566df1dd4",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "窄视口下两栏对比完整，算式与对错标记清晰无遮挡。",
+              "sceneId": "scene-p7",
+              "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201",
+              "screenshotSha256": "6988cb305eac6e5b3b8a606be7b8137865c184c6aeeedf3a340bf70dd5010675",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "题干'200人，7/10参加运动'清晰，选项含正确值140;70%，提交按钮明确。",
+              "sceneId": "scene-p8",
+              "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b",
+              "screenshotSha256": "90c6ead8a1b5b4ba24babe232c962ff0eed2cbf17be6d2d0dcdb07524a754366",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "窄视口下题干与选项完整可读，选中态明显。",
+              "sceneId": "scene-p8",
+              "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b",
+              "screenshotSha256": "3bbfc8134e3d6183a4ec2d361e934da5cb5343bed0646b6fc372451c5302915b",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "题干'250人，4/5参加手工'清晰，选项含正确值200;80%，提交入口明确。",
+              "sceneId": "scene-p9",
+              "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383",
+              "screenshotSha256": "fac2bd82527174d28e3ef0d3132080ea30a5e07e697eb4c71f839742c09f8f3d",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "窄视口下题干与四个选项无截断，选中态与提交按钮可辨。",
+              "sceneId": "scene-p9",
+              "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383",
+              "screenshotSha256": "6fa08cd4b676eeba1891b448507145499c6bbb024357466a633545571d3836dc",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "方法要点四条与反思三问分蓝黄两栏，文字清晰，总结页无控件属正常，底部来源链接字号偏小但不影响。",
+              "sceneId": "scene-p10",
+              "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475",
+              "screenshotSha256": "da43f88834d581f009a9b11666d65aefa0018a2f5df771b162954fa8f3e9f088",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "窄视口下方法卡两栏内容完整，无遮挡截断，层级清楚。",
+              "sceneId": "scene-p10",
+              "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475",
+              "screenshotSha256": "2a1dd6012bf203d6e835868ce4406a58dcd2080afcd14bb54823dad6b297de6b",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            }
+          ],
+          "schemaVersion": "mira.openmaic.visual-review.v1",
+          "snapshotSha256": "8a308b2aa1eeede6cb132e20cbd7a75846fd157374be4705767d76f5a4cd1705",
+          "status": "passed",
+          "teachingQualityContextSha256": "3b307b2524253bc5741436e4e6d527fe03e90b299232376268fa1aea6227b830"
+        }
+      },
+      "receiptSha256": "6c0c3cf13080eaa3b632cb70cbbb811fad505ccf4864272699b8f75ad4b84d59",
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_ddaa5bc7be54a293272cc3e3-attempt-1",
+      "schemaVersion": "mira.openmaic.professional-creation-receipt.v1",
+      "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+      "skillId": "mira-primary-courseware",
+      "skillOrchestration": {
+        "profileId": "mira-primary-adaptive.v2",
+        "receiptSha256": "1023f2d3e7c513bc3d8770eb59aa596fa43c1d177080e2f81b7c6f3aec4e990c",
+        "referenceReads": [
+          {
+            "resourcePath": "k12-core-literacy-planning/references/core-literacy.md",
+            "sourceHash": "47635d06a4a598b28c22a408f5f218e96dd2eca664ca74c1774bb95c848a47ee"
+          },
+          {
+            "resourcePath": "k12-core-literacy-planning/references/subjects/mathematics.md",
+            "sourceHash": "c6a3867f7eb9546928c7ba08243ac3add5e4ec7a963c745191186565632712b1"
+          }
+        ],
+        "sceneContexts": [
+          {
+            "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+            "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+            "sceneId": "scene-p1",
+            "sceneType": "slide"
+          },
+          {
+            "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+            "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+            "sceneId": "scene-p2",
+            "sceneType": "slide"
+          },
+          {
+            "actionsContextSha256": "cb3559a3a8fab6996dc276ddb628e86a1f448a3e4342f518e004b7680f8a41d3",
+            "contentContextSha256": "376454157dbcbf28462a2dc21415f77f47176be1a9f8055f870f0579acd8a24a",
+            "sceneId": "scene-p3",
+            "sceneType": "interactive"
+          },
+          {
+            "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+            "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+            "sceneId": "scene-p4",
+            "sceneType": "slide"
+          },
+          {
+            "actionsContextSha256": "27b3b7d90a21d23b4a2108373205c318188e9c271800b34ab2fd68f88ab7e092",
+            "contentContextSha256": "828c99b291ef30c4aa6a9b4152889b82b06b28e69c78048295f28b69a2e85f5c",
+            "sceneId": "scene-p5",
+            "sceneType": "quiz"
+          },
+          {
+            "actionsContextSha256": "27b3b7d90a21d23b4a2108373205c318188e9c271800b34ab2fd68f88ab7e092",
+            "contentContextSha256": "828c99b291ef30c4aa6a9b4152889b82b06b28e69c78048295f28b69a2e85f5c",
+            "sceneId": "scene-p6",
+            "sceneType": "quiz"
+          },
+          {
+            "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+            "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+            "sceneId": "scene-p7",
+            "sceneType": "slide"
+          },
+          {
+            "actionsContextSha256": "27b3b7d90a21d23b4a2108373205c318188e9c271800b34ab2fd68f88ab7e092",
+            "contentContextSha256": "828c99b291ef30c4aa6a9b4152889b82b06b28e69c78048295f28b69a2e85f5c",
+            "sceneId": "scene-p8",
+            "sceneType": "quiz"
+          },
+          {
+            "actionsContextSha256": "27b3b7d90a21d23b4a2108373205c318188e9c271800b34ab2fd68f88ab7e092",
+            "contentContextSha256": "828c99b291ef30c4aa6a9b4152889b82b06b28e69c78048295f28b69a2e85f5c",
+            "sceneId": "scene-p9",
+            "sceneType": "quiz"
+          },
+          {
+            "actionsContextSha256": "38fe48d6c021dde18cd08da0c809f3ce85f4bdc2574bb420e408107da2af4211",
+            "contentContextSha256": "6a9062ec7c5044e7ddaed04bd8ea4bc3fa48fceec64beb2673e736d193c76d03",
+            "sceneId": "scene-p10",
+            "sceneType": "slide"
+          }
+        ],
+        "schemaVersion": "mira.openmaic.skill-orchestration-receipt.v2",
+        "selectionPlan": {
+          "decisions": [
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "mira-primary-courseware",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "stage-design",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "k12-core-literacy-planning",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "deep-interactive",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "slide-craft",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "learning-to-learn",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/teachingBrief/course/objective",
+                "/teachingBrief/lesson/questions"
+              ],
+              "reasonCode": "bounded_goal_and_assessment_backward_design",
+              "skillId": "understanding-by-design",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/teachingBrief/course/objective",
+                "/gradeBoundary/learningObjectives/0",
+                "/gradeBoundary/allowedContent/0",
+                "/teachingBrief/lesson/teachingFlow/teach/sayText",
+                "/teachingBrief/lesson/teachingFlow/teach/keyPoints/0"
+              ],
+              "reasonCode": "explanation_goal_allowed_and_taught",
+              "skillId": "feynman-learning",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "primary_method_feynman_wins",
+              "skillId": "workshop-style",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_explicit_social_learning_situation",
+              "skillId": "social-emotional-learning",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "stable_subject_formal_source_gate_suffices",
+              "skillId": "deep-research",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode"
+              ],
+              "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
+              "skillId": "lecture-style",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "only_after_persisted_page_requires_repair",
+              "skillId": "pro-editing",
+              "status": "deferred"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "only_after_persisted_page_requires_repair",
+              "skillId": "stage-dsl",
+              "status": "deferred"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "only_after_persisted_page_requires_repair",
+              "skillId": "slide-dsl",
+              "status": "deferred"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+              "skillId": "pptx-import",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+              "skillId": "style-clone",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+              "skillId": "page-clone",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_teacher_material",
+              "skillId": "teacher-style-clone",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "single_course_not_series_or_cross_course_memory",
+              "skillId": "curriculum-planner",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "single_course_not_series_or_cross_course_memory",
+              "skillId": "spiral-curriculum",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_personal_history_or_skill_creation_request",
+              "skillId": "build-personal-skill",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "primary_subject_not_occupational_procedure",
+              "skillId": "vocational",
+              "status": "not_applicable"
+            }
+          ],
+          "gradeBand": "upper_primary",
+          "gradeBoundarySha256": "1386572be3fc8d49d88915344c238811b8f70f03ebb679d7e82cd42dc465bd62",
+          "inputSha256": "5dccfe5dd589485359eeea67da0937619a55c992645b40880fe6b28c2dbd6d0f",
+          "planSha256": "8db510d3215bdecb25f156ef43f06dd0d7c170fe3279f41622b1c35f999b54f5",
+          "primaryMethod": "feynman-learning",
+          "registryId": "openmaic-builtin-skills.v1-23",
+          "schemaVersion": "mira.openmaic.skill-selection.v1",
+          "selectedSkillIds": [
+            "mira-primary-courseware",
+            "stage-design",
+            "k12-core-literacy-planning",
+            "deep-interactive",
+            "slide-craft",
+            "learning-to-learn",
+            "understanding-by-design",
+            "feynman-learning"
+          ]
+        },
+        "skillReads": [
+          {
+            "skillId": "mira-primary-courseware",
+            "sourceHash": "2bb9434f452705182dbb6b71a912f8e24c8bed0c07561ce08fb493f6bd74e678"
+          },
+          {
+            "skillId": "stage-design",
+            "sourceHash": "6031161607914bb7ac37eb380b93b83c15ae9af7f25376b5b0749ce6cd06d76d"
+          },
+          {
+            "skillId": "k12-core-literacy-planning",
+            "sourceHash": "fbc03e9245406bac2d5b312f1a5711de311d17dc98eeb30d8eab298ee397c08f"
+          },
+          {
+            "skillId": "deep-interactive",
+            "sourceHash": "bb26d6b34f34bad37a76fef7f9863e1e67a2d4a5fbdf89d4ef08734c74db97bb"
+          },
+          {
+            "skillId": "slide-craft",
+            "sourceHash": "cf35eea56909b1427f171c6798ba55392761edb081603138892368d1bd727081"
+          },
+          {
+            "skillId": "learning-to-learn",
+            "sourceHash": "fe8be28613d01efe49a858bb89bf97f84273bd20311c805c36e2bfd28519c2ce"
+          },
+          {
+            "skillId": "understanding-by-design",
+            "sourceHash": "75af8be3ec7772b6ae97ac70ceedbb00fcfbb16a6d4addceb5f62ec0b3614808"
+          },
+          {
+            "skillId": "feynman-learning",
+            "sourceHash": "af7d9eaca12896a498259cbae3fa09d196d455b4e72af75d63ed1d1575ca944e"
+          }
+        ],
+        "status": "succeeded"
+      },
+      "status": "succeeded",
+      "studentToolsEnabled": false,
+      "supportingSkillIds": [
+        "k12-core-literacy-planning",
+        "deep-interactive"
+      ],
+      "teachingBriefSha256": "b04099df77333dfc93f7fbc74090a914ebc491663b8dcb79825a9df79022708b",
+      "teachingQuality": {
+        "gradeBoundarySha256": "1386572be3fc8d49d88915344c238811b8f70f03ebb679d7e82cd42dc465bd62",
+        "policyId": "mira-primary-quality.v1",
+        "receiptSha256": "e7fd7aabcaa602c47bb7cec2acc0f9023635a34a4f3484e242157432541c826d",
+        "renderChecks": [
+          {
+            "domSha256": "41f613b473f4613f182c2cead1f2b5f428b07e9b27407694009a19787bd1a074",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p1",
+            "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd",
+            "screenshotSha256": "eefd84c6e41f86f5ac79dff6bb8568052566c0a88b618da90a5c6ecf8c122778",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "9e3ab6f2cdcddd790761e60094e194e2511825fd4f5b16ceeb561e937b139209",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p1",
+            "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd",
+            "screenshotSha256": "4083a8dd6dc61cd8fa229afb1dd4a7195fe155cfda63b5ab842be39f194cc704",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "9c7a41a3e36e6e9f4acdf8f9ff31bdc718f9b781fa6879b6e81ad817bac74f10",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p2",
+            "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8",
+            "screenshotSha256": "d50d21b2dc8b86bd078bd22785d82b9704e26b87e5693b814e4d84d17b8e0e14",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "94a519d2a5efb0f2486b65e20918abb7bf14b1699192875b35e5280df2b81ee7",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p2",
+            "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8",
+            "screenshotSha256": "fbf2f8ea5b03d24593a90dd3dcc855743cec48b95ff5572cee4b4fade71fdd28",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+            "passed": true,
+            "probeCount": 2,
+            "sceneId": "scene-p3",
+            "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+            "screenshotSha256": "8f7a96ca8b918b7c996a0310639a3835447eb9f1774b4bf116340a0b2c245175",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "19665007f19c5c7b7e793861f41cbc138698650d997895ffbb1a7a7b31f701c4",
+            "passed": true,
+            "probeCount": 2,
+            "sceneId": "scene-p3",
+            "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851",
+            "screenshotSha256": "6a7dd4617c6ebb4c0dad00c962586ba5678fd2d3384cf49d6d006cf29caacf92",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "503d402070c6f79bea5957bb6f41ffca7d40cf4b5fd10f5c76b5aa0bb8110f27",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p4",
+            "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68",
+            "screenshotSha256": "b63afb55e0943d11d4fc2f4fab02b202ca59c42aa0845549731b3dc335a254c5",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "c6db264d168325cd17cfd0894659d739d9449bb105c2c637de339df8f518f9e1",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p4",
+            "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68",
+            "screenshotSha256": "62e86e93e2d6ee2a1f3cab66c5308e243c76250f880a0aeb0ee200e5a4d26963",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "d3ddc512540086792d39995fa99bd1e441fb7dec8b9e225a2cd141b670b37a53",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p5",
+            "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b",
+            "screenshotSha256": "fe2d3f5c9daae1c09d75c186d0ad563458e7a80250ed3177d44b037793e4aecb",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "dd819b21b1d9f5c2097705b40fc7158b9bc44029ca221350a8c7bf687215d47c",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p5",
+            "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b",
+            "screenshotSha256": "1c1750d90d230cbe085db7bdc96006adcf3ca195be53984225d8b6d9819d5de5",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "dd8518b08f9cf24e4955d60a0fcc08bf177007bdbf3e83181364baec1948847c",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p6",
+            "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf",
+            "screenshotSha256": "283fecde5d0ac11581cf1fdc31f2d50b0ed5aeaaa6968012e77b99ac53639c80",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "38cce2c8902eb261c961cd0ecd61844c29c2f9efda1d4868fd3f1d037f00e431",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p6",
+            "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf",
+            "screenshotSha256": "fc51a7154cd1961c604d68276da17a7c9241cd9db98342901428f5a8504e6dab",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "fbdd73a955a1443c250514a8e4cdd3a08dc845b45354c163cc7702a568627a7c",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p7",
+            "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201",
+            "screenshotSha256": "5180dc6d7c58f9ba24e940dfa33e4ee37406178322eb084ab54a316566df1dd4",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "7e8dbc0fa3187832d521720a1c4d96e5b038d580bc2bcc209da5948b2dceac78",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p7",
+            "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201",
+            "screenshotSha256": "6988cb305eac6e5b3b8a606be7b8137865c184c6aeeedf3a340bf70dd5010675",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "5632b187611a0c4dc53cce4993b3cce2e46583655636488d956861fffc20a98e",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p8",
+            "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b",
+            "screenshotSha256": "90c6ead8a1b5b4ba24babe232c962ff0eed2cbf17be6d2d0dcdb07524a754366",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "5632b187611a0c4dc53cce4993b3cce2e46583655636488d956861fffc20a98e",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p8",
+            "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b",
+            "screenshotSha256": "3bbfc8134e3d6183a4ec2d361e934da5cb5343bed0646b6fc372451c5302915b",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "2bbae5fd6edf28069f390e91c5604dca9e3a716ccd825e63d3809e2b7f27995e",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p9",
+            "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383",
+            "screenshotSha256": "fac2bd82527174d28e3ef0d3132080ea30a5e07e697eb4c71f839742c09f8f3d",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "ec0ba627eea3be8521cb2dd4e8935cf7e7b42c0a1a0af7a5043f10bf0e38d700",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p9",
+            "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383",
+            "screenshotSha256": "6fa08cd4b676eeba1891b448507145499c6bbb024357466a633545571d3836dc",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "f5b2a6716a32838ee126ed35ed6b55b9a7916e5ea4c4871171f8a428ffec7475",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p10",
+            "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475",
+            "screenshotSha256": "da43f88834d581f009a9b11666d65aefa0018a2f5df771b162954fa8f3e9f088",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "8f9bb637327991a691cd92ba88a23bc2604403071a17b5572f0578d19083baab",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p10",
+            "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475",
+            "screenshotSha256": "2a1dd6012bf203d6e835868ce4406a58dcd2080afcd14bb54823dad6b297de6b",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          }
+        ],
+        "review": {
+          "dimensions": [
+            {
+              "evidence": [
+                {
+                  "quote": "全年级80名同学参加文化节。这80人就是我们的整体。现在告诉你，其中3/5参加阅读摊位。",
+                  "sceneId": "scene-p1"
+                },
+                {
+                  "quote": "一百分之六十，写成百分数就是60%。百分号%表示'每一百'，所以60%就是每一百份中占60份。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "1/4 = 1÷4 = 0.25 = 25%。因为把整体分成4份取1份，换成100份就是25份。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "看这条换算链：五分之三就是 3 除以 5，得 0.6。百分数的分母是一百，0.6 乘 100 就是 60。为什么乘 100？因为百分数要把整体平均分成 100 份，看部分占了多少份。所以女生占全队的 60%。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "· 分数→百分数：先化小数，再改写成分母为 100 的分数",
+                  "sceneId": "scene-p10"
+                }
+              ],
+              "id": "grade_fit",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "再看这句话：阅读人数是总人数的60%。注意，60%说的不是'60个人'，而是两个数量之间的关系——阅读人数和总人数相比，每一百份里占60份。百分数只表示两个数量之间的倍数关系，不表示具体数量，所以它又叫百分比或百分率。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "最后自己输入一个分数，比如先把分母改成8，再把分子改成3。先预测百分比，再观察数值和图条随输入立刻更新的结果。用一句话说说为什么分数、小数和百分数能表示同一个量。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "求一个数的几分之几，用乘法。80 乘五分之三，等于 48。所以女生有 48 人。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "看这条换算链：五分之三就是 3 除以 5，得 0.6。百分数的分母是一百，0.6 乘 100 就是 60。为什么乘 100？因为百分数要把整体平均分成 100 份，看部分占了多少份。所以女生占全队的 60%。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "· 求部分量＝整体×分数；部分÷整体的结果再化为百分数",
+                  "sceneId": "scene-p10"
+                }
+              ],
+              "id": "goal_coverage",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "先别急着翻答案。你先猜一猜：参加阅读的大约有多少人？占总人数的百分之几？然后想一想，你打算怎么算。",
+                  "sceneId": "scene-p1"
+                },
+                {
+                  "quote": "现在轮到你了。先别急着翻书，看着这张百格图和这句话，用自己的话说一说：60%表示什么？可以在心里默说一遍，也可以小声讲给同桌听。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "别急着下结论。把你的猜想悄悄记在心里,然后点击 2/5,观察分数条的长度,再看小数和百分数同时变成了什么。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "合唱队有 80 人，其中五分之三是女生。女生占全队的百分之几？先别急着算，想一想：要回答这个问题，我们得先知道什么？",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "现在到了独立挑战环节，请你自己完成接下来的两道题。先仔细读题，列式计算，遇到不确定的地方可以把题目里的分数用分数条画出来。我在这儿等你提交，之后再一起看你哪里想对了、哪里要调整。",
+                  "sceneId": "scene-p8"
+                },
+                {
+                  "quote": "现在来完成反思三问。先问自己：我一开始是怎么想的？",
+                  "sceneId": "scene-p10"
+                }
+              ],
+              "id": "teaching_sequence",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "再看第二步，小刚直接把五分之三写成了百分之三十五。停在这里想一想：分子3能直接变成百分号前面的35吗？",
+                  "sceneId": "scene-p7"
+                },
+                {
+                  "quote": "✗ 第二步：3/5 ≠ 35%",
+                  "sceneId": "scene-p7"
+                },
+                {
+                  "quote": "48 \\div 80 = 0.6 = 60\\%",
+                  "sceneId": "scene-p7"
+                },
+                {
+                  "quote": "✓ 第二步：部分 ÷ 整体 = 百分数",
+                  "sceneId": "scene-p7"
+                }
+              ],
+              "id": "misconception_repair",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "widget_setState",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "1/4 = 1÷4 = 0.25 = 25%。因为把整体分成4份取1份，换成100份就是25份。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "因为把整体分成5份取2份，换成100份就是40份。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "因为把整体分成4份取3份，换成100份就是75份。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "已更新 · 观察同步变化",
+                  "sceneId": "scene-p3"
+                }
+              ],
+              "id": "meaningful_interaction",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "某活动共有120人,其中2/5参加绘画。参加绘画的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "某活动共有150人,其中3/10参加合唱。参加合唱的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "某活动共有200人,其中7/10参加运动。参加运动的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                  "sceneId": "scene-p8"
+                },
+                {
+                  "quote": "某活动共有250人,其中4/5参加手工。参加手工的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                  "sceneId": "scene-p9"
+                }
+              ],
+              "id": "assessment_alignment",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "如果你一时说不清，就看着这条分数条，它已经把80人平均分成了5份。现在，拿出笔，把你的想法写一写。",
+                  "sceneId": "scene-p1"
+                },
+                {
+                  "quote": "现在轮到你了。先别急着翻书，看着这张百格图和这句话，用自己的话说一说：60%表示什么？可以在心里默说一遍，也可以小声讲给同桌听。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "先猜一猜 2/5 变成百分之几？点上面的 2/5，再观察分数条、小数和百分数怎么一起变。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "请用自己的话复述一个方法要点，再说出一个你还不太确定的地方，以及下次想怎么再练一次。",
+                  "sceneId": "scene-p10"
+                }
+              ],
+              "id": "language_load",
+              "passed": true
+            }
+          ],
+          "inputSha256": "dd1b641c9ae4e6d0f77a896de545456cecd7a93b6ee2dd25e7548691e28dcd5d",
+          "modelId": "deepseek-v4-flash",
+          "objectives": [
+            {
+              "evidence": [
+                {
+                  "quote": "一百分之六十，写成百分数就是60%。百分号%表示'每一百'，所以60%就是每一百份中占60份。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "再看这句话：阅读人数是总人数的60%。注意，60%说的不是'60个人'，而是两个数量之间的关系——阅读人数和总人数相比，每一百份里占60份。百分数只表示两个数量之间的倍数关系，不表示具体数量，所以它又叫百分比或百分率。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "1/4 = 1÷4 = 0.25 = 25%。因为把整体分成4份取1份，换成100份就是25份。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "看这条换算链：五分之三就是 3 除以 5，得 0.6。百分数的分母是一百，0.6 乘 100 就是 60。为什么乘 100？因为百分数要把整体平均分成 100 份，看部分占了多少份。所以女生占全队的 60%。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "某活动共有200人,其中7/10参加运动。参加运动的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                  "sceneId": "scene-p8"
+                }
+              ],
+              "objectiveIndex": 0
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "最后自己输入一个分数，比如先把分母改成8，再把分子改成3。先预测百分比，再观察数值和图条随输入立刻更新的结果。用一句话说说为什么分数、小数和百分数能表示同一个量。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "1/4 = 1÷4 = 0.25 = 25%。因为把整体分成4份取1份，换成100份就是25份。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "因为把整体分成5份取2份，换成100份就是40份。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "\\frac{3}{5} = 3 \\div 5 = 0.6 = \\frac{60}{100} = 60\\%",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "某活动共有250人,其中4/5参加手工。参加手工的有多少人,占总人数的百分之几?按“人数;百分数”回答。",
+                  "sceneId": "scene-p9"
+                }
+              ],
+              "objectiveIndex": 1
+            }
+          ],
+          "providerId": "deepseek",
+          "requestIdHash": "e8a108a538a7c94c142dee39cd95902610eaff2da739c490a4d9d66b33a71eb7"
+        },
+        "sceneHashes": [
+          {
+            "sceneId": "scene-p1",
+            "sceneSha256": "dd5bcbfc4bf4afe377365c69b25f995cf5059ce469780a30814b5ba7217396dd"
+          },
+          {
+            "sceneId": "scene-p2",
+            "sceneSha256": "a87681b7ad6fe4befdbb1fb6fc6cc7cf79a954f948acfafbf3b7abf912621af8"
+          },
+          {
+            "sceneId": "scene-p3",
+            "sceneSha256": "b961fa7757960e39a4c6dca2a21f3b31930f491922048c59ddda25ceaf35e851"
+          },
+          {
+            "sceneId": "scene-p4",
+            "sceneSha256": "88e484b327468d9baf70e7a75b37838c97562ff74893dee509b88ad60fd20c68"
+          },
+          {
+            "sceneId": "scene-p5",
+            "sceneSha256": "e192bbd4b73dd0ade26dafcc5e716088d996cce254e1ab1e649de6453b99b30b"
+          },
+          {
+            "sceneId": "scene-p6",
+            "sceneSha256": "4439acf350259d11e6dd682a0f32070739d4c57f01012443aea61bac6e5f8eaf"
+          },
+          {
+            "sceneId": "scene-p7",
+            "sceneSha256": "3099b99c0a2920a5776e2171784bea1d0c434ab0fedb069f22c22664d08be201"
+          },
+          {
+            "sceneId": "scene-p8",
+            "sceneSha256": "c1a8afe1837d2354708cb698733afce0362e5455d5f8fca167ec85546eb3ab3b"
+          },
+          {
+            "sceneId": "scene-p9",
+            "sceneSha256": "8cd72ad83baacabba6ea8821efbf1136ea19789d278c9f136d3240fc6cf83383"
+          },
+          {
+            "sceneId": "scene-p10",
+            "sceneSha256": "4d59e32dc81ccf39b28e135167b2adf56114c77d7ed74cf36cfdca14bdc81475"
+          }
+        ],
+        "schemaVersion": "mira.openmaic.teaching-quality-receipt.v1",
+        "selectionPlanSha256": "8db510d3215bdecb25f156ef43f06dd0d7c170fe3279f41622b1c35f999b54f5",
+        "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+        "snapshotSha256": "8a308b2aa1eeede6cb132e20cbd7a75846fd157374be4705767d76f5a4cd1705",
+        "stageId": "stage-p83SomVEUh",
+        "status": "passed",
+        "teachingBriefSha256": "b04099df77333dfc93f7fbc74090a914ebc491663b8dcb79825a9df79022708b"
+      },
+      "userPromptRequired": false,
+      "videoGenerationEnabled": true,
+      "videoPolicyId": "mira-formal-happyhorse-video.v1",
+      "webSearchEnabled": true,
+      "workflowVersion": "openmaic-pro-agent.v1"
+    },
+    "requested": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "simulation"
+    ],
+    "required": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "simulation"
+    ],
+    "research": {
+      "buildItemId": "catalog_build_item_ddaa5bc7be54a293272cc3e3",
+      "citationCount": 1,
+      "citations": [
+        {
+          "sceneIds": [
+            "scene-p2",
+            "scene-p4",
+            "scene-p10"
+          ],
+          "url": "https://baijiahao.baidu.com/s?id=1810998052399056967&wfr=spider&for=pc"
+        }
+      ],
+      "classroomId": "stage-p83SomVEUh",
+      "fetchedSourceCount": 1,
+      "providerId": "baidu",
+      "receiptSha256": "27df927fed300fe02f2a798a7ed4f7b04f85e18d12b4f623bf12c3fc8a8f1821",
+      "resultCount": 10,
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_ddaa5bc7be54a293272cc3e3-attempt-1",
+      "schemaVersion": "mira.openmaic.professional-research-receipt.v1",
+      "searchCount": 1,
+      "searches": [
+        {
+          "query": "百分数 意义 六年级 义务教育 课程标准",
+          "resultCount": 10,
+          "searchedAt": "2026-09-10T06:43:00.639Z"
+        }
+      ],
+      "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+      "sources": [
+        {
+          "textSha256": "f1439107261893fed7f43f480c3c47e02d6348f28bd5369472a74a155d9b293a",
+          "title": "《百分数:百分数的意义》教学设计",
+          "url": "https://baijiahao.baidu.com/s?id=1810998052399056967&wfr=spider&for=pc"
+        }
+      ],
+      "status": "succeeded"
+    },
+    "sceneCount": 10,
+    "sceneTypes": [
+      "interactive",
+      "quiz",
+      "slide"
+    ],
+    "schemaVersion": "mira.openmaic.runtime-features.v2",
+    "sourceCommit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+    "sourceCourseContentSha256": "9bf0c45f5fbe7186f12b79603e387c52a738dd45b3a07b78042bf088e28d7af2",
+    "sourceVersion": "openmaic@1.0.0",
+    "teacherIdentity": {
+      "agentId": "mira-formal-teacher",
+      "asr": {
+        "fallbackAllowed": false,
+        "modelId": "qwen3-asr-flash",
+        "providerId": "qwen-asr"
+      },
+      "avatarPath": "/teachers/ashu-math-v1.png",
+      "languageCode": "zh-CN",
+      "runtimeAvatar": "/avatars/teacher.png",
+      "schemaVersion": "mira.openmaic.formal-subject-qwen3-voice.v1",
+      "subject": "math",
+      "teacherGender": "male",
+      "teacherName": "小数老师",
+      "teacherProfile": {
+        "contentHash": "4f5a986a765f69798c8546d7f9091fe297f2a98c5353fdd01cd1aa06884c98fb",
+        "id": "mira_math_clear",
+        "version": 2
+      },
+      "tts": {
+        "fallbackAllowed": false,
+        "modelId": "qwen3-tts-flash",
+        "providerId": "qwen-tts"
+      },
+      "verified": true,
+      "voiceGender": "male",
+      "voiceId": "Ethan"
+    },
+    "teachingBriefSha256": "b04099df77333dfc93f7fbc74090a914ebc491663b8dcb79825a9df79022708b",
+    "video": {
+      "assets": [],
+      "buildItemId": "catalog_build_item_ddaa5bc7be54a293272cc3e3",
+      "classroomId": "stage-p83SomVEUh",
+      "modelId": "happyhorse-1.0-t2v",
+      "policyId": "mira-formal-happyhorse-video.v1",
+      "providerId": "happyhorse",
+      "receiptSha256": "1ca9d62c0ca75cdc7f0e67324406a712668d825cbd4455bb88f5b8882c905890",
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_ddaa5bc7be54a293272cc3e3-attempt-1",
+      "schemaVersion": "mira.openmaic.formal-video-receipt.v1",
+      "sessionId": "miraformal_5eeb45b676d6fd8ba8fc68c2770936778b3c7f04d5276d6f8e5eccc4ebb5077e",
+      "status": "succeeded",
+      "videoCount": 0
+    }
+  },
+  "launchUrl": "http://127.0.0.1:3101/redacted-launch",
+  "mode": "openmaic_full_runtime",
+  "ok": true
+}

@@ -1,0 +1,1118 @@
+diff --git a/app/api/chat/pi/route.ts b/app/api/chat/pi/route.ts
+--- a/app/api/chat/pi/route.ts
++++ b/app/api/chat/pi/route.ts
+@@ -7,6 +7,7 @@
+   publicTeachingContext,
+   TeachingConversationError,
+   type TeachingConversation,
++  normalizeRequiredTeachingAgents,
+ } from '@/lib/server/mira-teaching-conversation';
+ import { withPaidBudgetRequest, hasRequiredTeachingBudget } from '@/lib/server/mira-paid-budget';
+ /**
+@@ -68,6 +69,7 @@
+         );
+       if (!(await hasRequiredTeachingBudget()))
+         throw new TeachingConversationError('MIRA_TEACHING_ACTIVE_BUDGET_REQUIRED', 503);
++      body = normalizeRequiredTeachingAgents(body);
+     } else if (!isPiChatEnabled()) {
+       return apiError('INVALID_REQUEST', 404, 'Pi chat runtime is disabled');
+     }
+@@ -141,22 +143,6 @@
+ 
+     if (req.signal.aborted)
+       return Response.json({ error: 'MIRA_TEACHING_REQUEST_ABORTED' }, { status: 499 });
+-    if (teachingContext) {
+-      const claim = await claimTeachingTurn(body, teachingContext);
+-      teaching = claim.record;
+-      if (claim.replay) {
+-        const events = [publicTeachingContext(teaching), ...claim.replay];
+-        return new Response(events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join(''), {
+-          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store' },
+-        });
+-      }
+-      body = {
+-        ...teaching.canonicalRequest,
+-        messages: structuredClone(teaching.messages),
+-        directorState: teaching.directorState,
+-      };
+-    }
+-
+     const signal = req.signal;
+     const abortController = new AbortController();
+     signal.addEventListener('abort', () => abortController.abort(), { once: true });
+@@ -242,6 +228,19 @@
+       return apiError('INVALID_REQUEST', 400, message);
+     }
+ 
++    // Configuration failures must not claim a durable teaching turn before any provider call.
++    if (teachingContext) {
++      const claim = await claimTeachingTurn(body, teachingContext);
++      teaching = claim.record;
++      if (claim.replay) {
++        const events = [publicTeachingContext(teaching), ...claim.replay];
++        return new Response(events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join(''), {
++          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store' },
++        });
++      }
++      body = { ...teaching.canonicalRequest, messages: structuredClone(teaching.messages),
++        directorState: teaching.directorState };
++    }
+     log.info(
+       `Pi request agents=${body.config.agentIds.join(', ')} messages=${body.messages.length} maxAgentTurns=${maxAgentTurns}`,
+     );
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -72,6 +72,7 @@
+ } from '@/lib/mira/student-runtime';
+ import { toast } from 'sonner';
+ import { requiredInteractionsBeforeScene } from '@/lib/mira/student-interaction-bridge';
++import { firstUnfinishedTeachingScene } from '@/lib/mira/student-teaching-navigation';
+ import {
+   finishGuidedDiscussionPlayback,
+   type GuidedDiscussionPlayback,
+@@ -207,6 +208,7 @@
+     const [liveSpeech, setLiveSpeech] = useState<string | null>(null); // From buffer (discussion/QA)
+     const [speechProgress, setSpeechProgress] = useState<number | null>(null); // StreamBuffer reveal progress (0–1)
+     const [discussionTrigger, setDiscussionTrigger] = useState<TriggerEvent | null>(null);
++    const [requiredDiscussionError, setRequiredDiscussionError] = useState<string | null>(null);
+ 
+     // Speaking agent tracking (Issue 2)
+     const [speakingAgentId, setSpeakingAgentId] = useState<string | null>(null);
+@@ -443,6 +445,7 @@
+         setShowEndFlash(false);
+         setActiveBubbleId(null);
+         setDiscussionTrigger(null);
++        setRequiredDiscussionError(null);
+       },
+       [resetLiveState, updateCurrentPlaybackActionIndex],
+     );
+@@ -450,9 +453,12 @@
+     /** Request failure should exit live discussion UI without hard-closing the session. */
+     const handleLiveSessionError = useCallback(() => {
+       engineRef.current?.handleDiscussionError();
++      if (studentMode && engineRef.current?.hasPendingRequiredDiscussion()) {
++        setRequiredDiscussionError('课堂讨论暂时未能完成，进度已保留。');
++      }
+       resetLiveState();
+       setActiveBubbleId(null);
+-    }, [resetLiveState]);
++    }, [resetLiveState, studentMode]);
+ 
+     /**
+      * Unified session cleanup — called by both roundtable stop button and chat area end button.
+@@ -465,6 +471,9 @@
+       manualStopRef.current = true;
+       engineRef.current?.handleEndDiscussion();
+       manualStopRef.current = false;
++      if (studentMode && engineRef.current?.hasPendingRequiredDiscussion()) {
++        setRequiredDiscussionError('这段课堂讨论还没有完成，请继续。');
++      }
+ 
+       // Show end flash with correct session type
+       if (activeType === 'qa' || activeType === 'discussion') {
+@@ -477,7 +486,7 @@
+       discussionTTS.cleanup();
+ 
+       resetLiveState();
+-    }, [chatSessionType, resetLiveState, discussionTTS]);
++    }, [chatSessionType, resetLiveState, discussionTTS, studentMode]);
+ 
+     // Shared stop-discussion handler (used by both Roundtable and Canvas toolbar)
+     const handleStopDiscussion = useCallback(async () => {
+@@ -694,6 +703,30 @@
+         await chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
+         if (cancelled) return;
+ 
++        // Read-only synchronization deliberately does NOT flush an old rejected
++        // completion. Returning to its discussion is what makes that event valid.
++        if (studentMode && runtimeEvents && currentScene) {
++          try {
++            await runtimeEvents.readProgress();
++            if (cancelled) return;
++            const unfinished = firstUnfinishedTeachingScene(
++              useStageStore.getState().scenes,
++              currentScene.id,
++              (sceneId) => runtimeEvents.hasCompletedScene(sceneId),
++            );
++            if (unfinished) {
++              autoStartRef.current = false;
++              engineRef.current?.stop();
++              useStageStore.getState().setCurrentSceneId(unfinished.id);
++              toast.info('先继续这页的课堂讨论，完成后再往下学。');
++              return;
++            }
++          } catch {
++            autoStartRef.current = false;
++            toast.info('课堂进度暂时无法读取，请稍后再试。');
++          }
++        }
++
+         // Also abort the engine-level discussion controller
+         if (discussionAbortRef.current) {
+           discussionAbortRef.current.abort();
+@@ -792,6 +825,7 @@
+ 
+         // Create new PlaybackEngine
+         const engine = new PlaybackEngine([currentScene], actionEngine, audioPlayerRef.current, {
++          requireScriptedDiscussions: studentMode,
+           onModeChange: (mode) => {
+             setEngineMode(mode);
+           },
+@@ -933,50 +967,69 @@
+             return ids.includes(agentId);
+           },
+           getPlaybackSpeed: () => useSettingsStore.getState().playbackSpeed || 1,
+-          onComplete: () => {
++          onComplete: async () => {
+             if (
+               engineRef.current !== engine ||
+               useStageStore.getState().currentSceneId !== currentScene.id
+             )
+               return;
+-            // lectureSpeech intentionally NOT cleared — last sentence stays visible
+-            // until scene transition (auto-play) or user restarts. Scene change
+-            // effect handles the reset.
++            if (studentMode && runtimeEvents) {
++              const orderedScenes = [...useStageStore.getState().scenes].sort(
++                (left, right) => left.order - right.order,
++              );
++              const sceneIndex = orderedScenes.findIndex((scene) => scene.id === currentScene.id);
++              const actionId = currentScene.actions?.at(-1)?.id;
++              if (sceneIndex < 0 || !actionId) return;
++              try {
++                await runtimeEvents.actionCompleted({
++                  sceneIndex,
++                  sceneId: currentScene.id,
++                  actionId,
++                });
++              } catch (error) {
++                if (
++                  engineRef.current !== engine ||
++                  useStageStore.getState().currentSceneId !== currentScene.id
++                )
++                  return;
++                setPlaybackCompleted(false);
++                const discussion = currentScene.actions?.findLast(
++                  (action) => action.type === 'discussion',
++                );
++                if (
++                  error instanceof Error &&
++                  error.name === 'runtime_teaching_incomplete' &&
++                  discussion &&
++                  engine.reopenRequiredDiscussion(discussion.id)
++                ) {
++                  setRequiredDiscussionError('这段课堂讨论还没有完成，请继续。');
++                }
++                toast.error('本页学习进度还没有确认', {
++                  description: error instanceof Error ? error.message : '请继续本页课堂讨论。',
++                  action: { label: '重试保存', onClick: () => engine.continuePlayback() },
++                });
++                return; // Never advance on a rejected or unconfirmed completion.
++              }
++              if (
++                engineRef.current !== engine ||
++                useStageStore.getState().currentSceneId !== currentScene.id
++              )
++                return;
++              const finalScene = orderedScenes.at(-1);
++              if (finalScene) {
++                void runtimeEvents
++                  .completeWhenReady({
++                    sceneIndex: orderedScenes.length - 1,
++                    sceneId: finalScene.id,
++                  })
++                  .catch((error) =>
++                    console.error('[Mira Runtime] Failed to finalize classroom progress', error),
++                  );
++              }
++            }
+             updateCurrentPlaybackActionIndex(currentScene.actions?.length ?? 0);
+             clearSceneResumePosition(currentScene.id);
+             setPlaybackCompleted(true);
+-
+-            if (studentMode && runtimeEvents) {
+-              const stageState = useStageStore.getState();
+-              const orderedScenes = [...stageState.scenes].sort(
+-                (left, right) => left.order - right.order,
+-              );
+-              const sceneIndex = orderedScenes.findIndex((scene) => scene.id === currentScene.id);
+-              const authoritativeActionId = currentScene.actions?.at(-1)?.id;
+-              if (sceneIndex >= 0 && authoritativeActionId) {
+-                void runtimeEvents
+-                  .actionCompleted({
+-                    sceneIndex,
+-                    sceneId: currentScene.id,
+-                    actionId: authoritativeActionId,
+-                  })
+-                  .then(async () => {
+-                    const finalScene = orderedScenes.at(-1);
+-                    if (finalScene) {
+-                      await runtimeEvents.completeWhenReady({
+-                        sceneIndex: orderedScenes.length - 1,
+-                        sceneId: finalScene.id,
+-                      });
+-                    }
+-                  })
+-                  .catch((error) =>
+-                    console.error(
+-                      '[Mira Runtime] Failed to record authoritative scene completion',
+-                      error,
+-                    ),
+-                  );
+-              }
+-            }
+ 
+             // End lecture session on playback complete
+             if (lectureSessionIdRef.current) {
+@@ -992,6 +1045,8 @@
+             if (autoPlayEnabled) {
+               setTimeout(() => {
+                 const stageState = useStageStore.getState();
++                if (engineRef.current !== engine || stageState.currentSceneId !== currentScene.id)
++                  return;
+                 if (
+                   !getMiraEffectiveAutoPlayLecture({
+                     studentMode,
+@@ -1139,6 +1194,12 @@
+       ) => {
+         if (engineRef.current !== engine || useStageStore.getState().currentSceneId !== sceneId)
+           return;
++        setRequiredDiscussionError(null);
++        if (!chatAreaRef.current) {
++          engine.handleDiscussionError();
++          if (studentMode) setRequiredDiscussionError('课堂讨论还未准备好，请重试。');
++          return;
++        }
+         // Start discussion display in ChatArea (lecture speech is preserved independently)
+         chatAreaRef.current?.startDiscussion(
+           {
+@@ -1244,10 +1305,37 @@
+           return false;
+         }
+         if (studentMode && runtimeEvents) {
+-          const required = requiredInteractionsBeforeScene(useStageStore.getState().scenes, targetSceneId);
++          try {
++            await runtimeEvents.readProgress();
++          } catch {
++            toast.info('课堂进度暂时无法读取，请稍后再试。');
++            return false;
++          }
++          if (requestId !== sceneSwitchRequestRef.current) return false;
++          const unfinished = firstUnfinishedTeachingScene(
++            useStageStore.getState().scenes,
++            targetSceneId,
++            (sceneId) => runtimeEvents.hasCompletedScene(sceneId),
++          );
++          if (unfinished) {
++            toast.info('先完成这页的课堂讨论，再进入下一页。');
++            if (unfinished.id !== currentSceneId) {
++              autoStartRef.current = false;
++              setCurrentSceneId(unfinished.id);
++            }
++            return false;
++          }
++          const required = requiredInteractionsBeforeScene(
++            useStageStore.getState().scenes,
++            targetSceneId,
++          );
+           if (!runtimeEvents.hasCompletedInteractions(required)) {
+-            try { await runtimeEvents.resume(); }
+-            catch { toast.info('操作进度还没保存好，请再点一次下一页。'); return false; }
++            try {
++              await runtimeEvents.resume();
++            } catch {
++              toast.info('操作进度还没保存好，请再点一次下一页。');
++              return false;
++            }
+             if (!runtimeEvents.hasCompletedInteractions(required)) {
+               toast.info('先动手试一试，看看结果为什么会变，再进入下一页。');
+               return false;
+@@ -1264,7 +1352,14 @@
+         setCurrentSceneId(targetSceneId);
+         return true;
+       },
+-      [armSelectedSceneAutoStart, currentSceneId, isTopicActive, setCurrentSceneId, studentMode, runtimeEvents],
++      [
++        armSelectedSceneAutoStart,
++        currentSceneId,
++        isTopicActive,
++        setCurrentSceneId,
++        studentMode,
++        runtimeEvents,
++      ],
+     );
+ 
+     /** User confirmed scene switch via AlertDialog */
+@@ -1736,6 +1831,24 @@
+                 isPresenting && 'absolute inset-x-0 bottom-0 z-20',
+               )}
+             >
++              {studentMode && requiredDiscussionError && (
++                <div
++                  role="alert"
++                  className="mx-4 mb-3 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-slate-800"
++                >
++                  <span>{requiredDiscussionError}</span>
++                  <button
++                    type="button"
++                    className="shrink-0 rounded-lg bg-slate-900 px-3 py-2 font-medium text-white"
++                    onClick={() => {
++                      if (engineRef.current?.retryRequiredDiscussion())
++                        setRequiredDiscussionError(null);
++                    }}
++                  >
++                    重试课堂讨论
++                  </button>
++                </div>
++              )}
+               <Roundtable
+                 mode={mode}
+                 initialParticipants={participants}
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+--- a/lib/mira/student-runtime-events.ts
++++ b/lib/mira/student-runtime-events.ts
+@@ -88,6 +88,7 @@
+   readonly completionReady: boolean;
+   readonly answeredQuestionIds: readonly string[];
+   readonly completedInteractionObjectiveIndexes?: readonly number[];
++  readonly completedActionSceneIds?: readonly string[];
+ }
+ 
+ interface RuntimeReceipt {
+@@ -99,6 +100,9 @@
+ 
+ export interface MiraStudentRuntimeEventClient {
+   resume(): Promise<void>;
++  /** Read accepted progress without flushing an unfinished teaching event. */
++  readProgress(): Promise<void>;
++  hasCompletedScene(sceneId: string): boolean;
+   sceneEntered(payload: SceneIdentity): Promise<void>;
+   actionCompleted(payload: SceneIdentity & { readonly actionId: string }): Promise<void>;
+   answerSubmitted(
+@@ -139,6 +143,7 @@
+   let lastStatus: RuntimeStatus | null = null;
+   let tail: Promise<void> = Promise.resolve();
+   let completedInteractions = new Set<number>();
++  let completedScenes = new Set<string>();
+ 
+   const persist = () => safeSet(storage, storageKey, JSON.stringify(state));
+ 
+@@ -172,6 +177,7 @@
+     synchronized = true;
+     lastStatus = status;
+     completedInteractions = new Set(status.completedInteractionObjectiveIndexes ?? []);
++    completedScenes = new Set(status.completedActionSceneIds ?? []);
+     return status;
+   };
+ 
+@@ -192,7 +198,10 @@
+     if (!result.ok) throw runtimeRequestError(result.status, body);
+     const receipt = runtimeReceipt(body, pending.event.sequence);
+     rememberEmitted(state, pending.eventKey);
+-    if (pending.event.type === 'interaction_completed') completedInteractions.add(pending.event.payload.objectiveIndex);
++    if (pending.event.type === 'interaction_completed')
++      completedInteractions.add(pending.event.payload.objectiveIndex);
++    if (pending.event.type === 'action_completed')
++      completedScenes.add(pending.event.payload.sceneId);
+     state.nextSequence = receipt.sequence + 1;
+     state.completed = receipt.completed === true;
+     state.pending = null;
+@@ -211,7 +220,11 @@
+       persist();
+       return;
+     }
+-    if (type === 'interaction_completed' && completedInteractions.has((payload as MiraInteractionOperation).objectiveIndex)) return;
++    if (
++      type === 'interaction_completed' &&
++      completedInteractions.has((payload as MiraInteractionOperation).objectiveIndex)
++    )
++      return;
+     if (state.emittedKeys.includes(eventKey)) return;
+     await flushPending();
+     if (state.emittedKeys.includes(eventKey)) return;
+@@ -239,6 +252,16 @@
+   };
+ 
+   return {
++    readProgress: () => {
++      const operation = tail
++        .catch(() => undefined)
++        .then(async () => {
++          await synchronize(true);
++        });
++      tail = operation;
++      return operation;
++    },
++    hasCompletedScene: (sceneId) => completedScenes.has(sceneId),
+     resume: () => {
+       const operation = tail
+         .catch(() => undefined)
+@@ -270,8 +293,10 @@
+         turnId: identifier(payload.turnId, 'turnId'),
+         transcript: asrTranscript(payload.transcript),
+       }),
+-    interactionCompleted: (payload) => record('interaction_completed', { ...scenePayload(payload), ...interactionPayload(payload) }),
+-    hasCompletedInteractions: (indexes) => indexes.every(index => completedInteractions.has(index)),
++    interactionCompleted: (payload) =>
++      record('interaction_completed', { ...scenePayload(payload), ...interactionPayload(payload) }),
++    hasCompletedInteractions: (indexes) =>
++      indexes.every((index) => completedInteractions.has(index)),
+     completeWhenReady: (payload) => {
+       const completionPayload = scenePayload(payload) as EventPayload<'classroom_completed'>;
+       const operation = tail
+@@ -367,15 +392,27 @@
+ }
+ 
+ export function interactionPayload(value: MiraInteractionOperation): MiraInteractionOperation {
+-  if (!Number.isInteger(value.objectiveIndex) || value.objectiveIndex < 0 || value.objectiveIndex >= 30 ||
+-      !/^#[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(value.controlSelector) ||
+-      !['click', 'fill', 'range', 'select'].includes(value.action) ||
+-      typeof value.value !== 'string' || value.value.length > 500 ||
+-      (value.action === 'click' && value.value !== '') ||
+-      typeof value.feedbackText !== 'string' || !value.feedbackText.trim() || value.feedbackText.length > 2000)
++  if (
++    !Number.isInteger(value.objectiveIndex) ||
++    value.objectiveIndex < 0 ||
++    value.objectiveIndex >= 30 ||
++    !/^#[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(value.controlSelector) ||
++    !['click', 'fill', 'range', 'select'].includes(value.action) ||
++    typeof value.value !== 'string' ||
++    value.value.length > 500 ||
++    (value.action === 'click' && value.value !== '') ||
++    typeof value.feedbackText !== 'string' ||
++    !value.feedbackText.trim() ||
++    value.feedbackText.length > 2000
++  )
+     throw new Error('Mira Runtime interaction evidence is invalid');
+-  return { objectiveIndex: value.objectiveIndex, controlSelector: value.controlSelector,
+-    action: value.action, value: value.value, feedbackText: value.feedbackText };
++  return {
++    objectiveIndex: value.objectiveIndex,
++    controlSelector: value.controlSelector,
++    action: value.action,
++    value: value.value,
++    feedbackText: value.feedbackText,
++  };
+ }
+ 
+ function scenePayload(value: SceneIdentity): SceneIdentity {
+@@ -429,9 +466,18 @@
+         typeof questionId === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(questionId),
+     ) ||
+     new Set(body.answeredQuestionIds).size !== body.answeredQuestionIds.length ||
++    (body.completedActionSceneIds !== undefined &&
++      (!Array.isArray(body.completedActionSceneIds) ||
++        body.completedActionSceneIds.length > 60 ||
++        !body.completedActionSceneIds.every(
++          (id) => typeof id === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(id),
++        ) ||
++        new Set(body.completedActionSceneIds).size !== body.completedActionSceneIds.length)) ||
+     (body.completedInteractionObjectiveIndexes !== undefined &&
+-      (!Array.isArray(body.completedInteractionObjectiveIndexes) || !body.completedInteractionObjectiveIndexes.every(
+-        index => Number.isInteger(index) && index >= 0 && index < 30)))
++      (!Array.isArray(body.completedInteractionObjectiveIndexes) ||
++        !body.completedInteractionObjectiveIndexes.every(
++          (index) => Number.isInteger(index) && index >= 0 && index < 30,
++        )))
+   ) {
+     throw new Error('Mira Runtime returned an invalid event status');
+   }
+diff --git a/lib/mira/student-teaching-navigation.ts b/lib/mira/student-teaching-navigation.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/student-teaching-navigation.ts
+@@ -0,0 +1,18 @@
++import type { Scene } from '@/lib/types/stage';
++
++/** A later page cannot hide an unfinished required teaching discussion. */
++export function firstUnfinishedTeachingScene(
++  scenes: readonly Scene[],
++  targetSceneId: string,
++  isCompleted: (sceneId: string) => boolean,
++): Scene | undefined {
++  const ordered = [...scenes].sort((left, right) => left.order - right.order);
++  const targetIndex = ordered.findIndex((scene) => scene.id === targetSceneId);
++  if (targetIndex < 0) return undefined;
++  return ordered
++    .slice(0, targetIndex)
++    .find(
++      (scene) =>
++        scene.actions?.some((action) => action.type === 'discussion') && !isCompleted(scene.id),
++    );
++}
+diff --git a/lib/playback/discussion-completion.ts b/lib/playback/discussion-completion.ts
+--- a/lib/playback/discussion-completion.ts
++++ b/lib/playback/discussion-completion.ts
+@@ -37,6 +37,7 @@
+   // An interrupted session is terminal too: a late callback must not resume
+   // a newer live session that happens to reuse this engine and scene.
+   binding.settled = true;
++  if (canContinue) engine.acknowledgeDiscussionCompletion();
+   // Clear the live session and restore its saved cursor before any continuation.
+   input.cleanup();
+   if (!canContinue) return true;
+diff --git a/lib/playback/engine.ts b/lib/playback/engine.ts
+--- a/lib/playback/engine.ts
++++ b/lib/playback/engine.ts
+@@ -84,6 +84,7 @@
+ 
+   // Internal state
+   private currentTrigger: TriggerEvent | null = null;
++  private requiredDiscussionId: string | null = null;
+   private triggerDelayTimer: ReturnType<typeof setTimeout> | null = null;
+   // Reading-time timer for speech actions without pre-generated audio (TTS disabled)
+   private speechTimer: ReturnType<typeof setTimeout> | null = null;
+@@ -227,6 +228,7 @@
+       if (this.triggerDelayTimer) {
+         clearTimeout(this.triggerDelayTimer);
+         this.triggerDelayTimer = null;
++        if (this.callbacks.requireScriptedDiscussions) this.rewindRequiredDiscussion();
+       }
+       if (this.speechTimer) {
+         // Save remaining time so resume() can reschedule
+@@ -383,8 +385,13 @@
+     }
+     this.invalidatePlaybackGeneration();
+ 
+-    // Mark consumed so it won't re-trigger on replay
+-    this.markDiscussionConsumed(this.currentTrigger.id);
++    // Joining is not completion for mandatory teaching. Keep a retry cursor
++    // until the normal discussion-end callback settles this exact action.
++    if (this.callbacks.requireScriptedDiscussions) {
++      this.requiredDiscussionId = this.currentTrigger.id;
++    } else {
++      this.markDiscussionConsumed(this.currentTrigger.id);
++    }
+ 
+     // Save lecture state — keep actionIndex as-is (past the discussion).
+     // Discussions are placed after all speech actions, so the preceding
+@@ -409,6 +416,10 @@
+ 
+   /** User clicks "Skip" on ProactiveCard → consumed → processNext */
+   skipDiscussion(): void {
++    if (this.callbacks.requireScriptedDiscussions) {
++      if (this.currentTrigger) this.confirmDiscussion();
++      return;
++    }
+     if (this.currentTrigger) {
+       this.markDiscussionConsumed(this.currentTrigger.id);
+       this.currentTrigger = null;
+@@ -419,6 +430,54 @@
+     if (this.mode === 'playing') {
+       this.processNext(generation);
+     }
++  }
++
++  hasPendingRequiredDiscussion(): boolean {
++    return this.requiredDiscussionId !== null;
++  }
++
++  /** Called only by the current scripted session's natural-end handler. */
++  acknowledgeDiscussionCompletion(): void {
++    if (!this.requiredDiscussionId) return;
++    this.markDiscussionConsumed(this.requiredDiscussionId);
++    this.requiredDiscussionId = null;
++  }
++
++  private rewindRequiredDiscussion(): void {
++    if (!this.requiredDiscussionId) return;
++    const index = this.scenes[this.sceneIndex]?.actions?.findIndex(
++      (action) => action.type === 'discussion' && action.id === this.requiredDiscussionId,
++    );
++    if (index !== undefined && index >= 0) this.actionIndex = index;
++  }
++
++  /** A server rejection overrides local end-of-turn playback bookkeeping. */
++  reopenRequiredDiscussion(actionId: string): boolean {
++    if (
++      !this.callbacks.requireScriptedDiscussions ||
++      !this.scenes[this.sceneIndex]?.actions?.some(
++        (action) => action.type === 'discussion' && action.id === actionId,
++      )
++    )
++      return false;
++    this.requiredDiscussionId = actionId;
++    this.consumedDiscussions.delete(actionId);
++    this.rewindRequiredDiscussion();
++    return true;
++  }
++
++  /** Retry the same frozen action, without replaying the page's narration. */
++  retryRequiredDiscussion(): boolean {
++    if (!this.requiredDiscussionId || this.mode === 'live') return false;
++    this.invalidatePlaybackGeneration();
++    this.cancelActivePlaybackWork();
++    this.restoreSavedLectureState();
++    this.rewindRequiredDiscussion();
++    this.currentTrigger = null;
++    this.currentTopicState = null;
++    this.setMode('idle');
++    this.continuePlayback();
++    return true;
+   }
+ 
+   /** End discussion → restore lecture → idle (user clicks "start" to continue) */
+@@ -433,6 +492,7 @@
+     // Restore the interrupted lecture cursor before notifying consumers. The
+     // callback may inspect isExhausted() to decide whether playback completed.
+     this.restoreSavedLectureState();
++    this.rewindRequiredDiscussion();
+ 
+     this.callbacks.onDiscussionEnd?.();
+ 
+@@ -459,6 +519,7 @@
+     this.currentTopicState = 'closed';
+     this.currentTrigger = null;
+     this.restoreSavedLectureState();
++    this.rewindRequiredDiscussion();
+     this.setMode('idle');
+   }
+ 
+@@ -731,6 +792,7 @@
+         }
+         // Skip if the discussion's agent isn't in the user's selected list
+         if (
++          !this.callbacks.requireScriptedDiscussions &&
+           discussionAction.agentId &&
+           this.callbacks.isAgentSelected &&
+           !this.callbacks.isAgentSelected(discussionAction.agentId)
+@@ -740,6 +802,8 @@
+           return;
+         }
+ 
++        if (this.callbacks.requireScriptedDiscussions)
++          this.requiredDiscussionId = discussionAction.id;
+         // 3s delay before showing ProactiveCard (allows previous speech to finish naturally)
+         const trigger: TriggerEvent = {
+           id: discussionAction.id,
+@@ -753,6 +817,10 @@
+           this.triggerDelayTimer = null;
+           if (this.mode !== 'playing') return; // Cancelled if user paused/stopped
+           this.currentTrigger = trigger;
++          if (this.callbacks.requireScriptedDiscussions) {
++            this.confirmDiscussion();
++            return;
++          }
+           this.callbacks.onProactiveShow?.(trigger);
+           // Engine pauses here — user calls confirmDiscussion() or skipDiscussion()
+         }, DISCUSSION_TRIGGER_DELAY_MS);
+diff --git a/lib/playback/types.ts b/lib/playback/types.ts
+--- a/lib/playback/types.ts
++++ b/lib/playback/types.ts
+@@ -49,8 +49,16 @@
+   onProactiveShow?: (trigger: TriggerEvent) => void;
+   onProactiveHide?: () => void;
+ 
++  /** Frozen student teaching discussions are mandatory, never opt-in prompts. */
++  requireScriptedDiscussions?: boolean;
++
+   // Discussion lifecycle
+-  onDiscussionConfirmed?: (topic: string, prompt?: string, agentId?: string, actionId?: string) => void;
++  onDiscussionConfirmed?: (
++    topic: string,
++    prompt?: string,
++    agentId?: string,
++    actionId?: string,
++  ) => void;
+   onDiscussionEnd?: () => void;
+   onUserInterrupt?: (text: string) => void;
+ 
+diff --git a/lib/server/mira-paid-budget.ts b/lib/server/mira-paid-budget.ts
+--- a/lib/server/mira-paid-budget.ts
++++ b/lib/server/mira-paid-budget.ts
+@@ -112,6 +112,14 @@
+   if (!context) return false;
+   const result = await backend('context', { authorizationId: context.binding.authorizationId });
+   return result.purpose === 'required_teaching';
++}
++/** A missing-agent-action preflight may retry only before this grant ever dispatched. */
++export async function hasUnsentRequiredTeachingBudget(): Promise<boolean> {
++  const context = paidBudgetContext.getStore();
++  if (!context) return false;
++  const result = await backend('context', { authorizationId: context.binding.authorizationId });
++  return result.purpose === 'required_teaching' && result.unsettledReservationCount === 0
++    && result.latestProviderDispatchAt === null;
+ }
+ function authorizationPrices(context: Context): Promise<Record<string, Price>> {
+   const { authorizationId } = context.binding;
+diff --git a/lib/server/mira-teaching-conversation.ts b/lib/server/mira-teaching-conversation.ts
+--- a/lib/server/mira-teaching-conversation.ts
++++ b/lib/server/mira-teaching-conversation.ts
+@@ -3,7 +3,8 @@
+ import { mkdir, open, readFile, readdir, rename } from 'node:fs/promises';
+ import { join, resolve } from 'node:path';
+ import { getServerPersistenceProvider } from '@/lib/persistence/server-provider';
+-import { paidBudgetContext, hasRequiredTeachingBudget } from './mira-paid-budget';
++import { paidBudgetContext, hasRequiredTeachingBudget, hasUnsentRequiredTeachingBudget } from './mira-paid-budget';
++import { getActionsForRole } from '@/lib/orchestration/registry/types';
+ import type { StatelessChatRequest, StatelessEvent, DirectorState } from '@/lib/types/chat';
+ 
+ export interface TeachingContext {
+@@ -36,6 +37,8 @@
+   activeMessageId?: string;
+   activeSegment?: string;
+   updatedAt: number;
++  preflightRecovery?: { schemaVersion: 'mira.openmaic.teaching-preflight-recovery.v1';
++    reason: 'missing_teacher_role_actions'; failedRevision: number; failedRecordSha256: string };
+ }
+ type Deps = { root?: string; withLock?: <T>(key: string, work: () => Promise<T>) => Promise<T> };
+ const sha = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+@@ -161,6 +164,39 @@
+   ] as const)
+     if (record[key] !== c[key]) fail('MIRA_TEACHING_SCOPE_MISMATCH', 403);
+ }
++/** Call only after trustedTeachingContext; browser roles never acquire default permissions here. */
++export function normalizeRequiredTeachingAgents(body: StatelessChatRequest): StatelessChatRequest {
++  const agents = body.config?.agentConfigs;
++  if (!Array.isArray(agents) || agents.length !== 1 || agents[0]?.role !== 'teacher'
++      || !Array.isArray(body.config.agentIds) || body.config.agentIds.length !== 1 || body.config.agentIds[0] !== agents[0].id)
++    fail('MIRA_TEACHING_AGENT_CONFIG_INVALID', 400);
++  return { ...body, config: { ...body.config, agentConfigs: agents.map(agent => ({
++    ...agent, allowedActions: [...getActionsForRole('teacher')],
++  })) } };
++}
++function isUnsentRoleConfigFailure(record: TeachingConversation, c: TeachingContext): boolean {
++  const agents = record.canonicalRequest.config?.agentConfigs;
++  return c.replyId === undefined && c.expectedRevision === record.revision
++    && record.state === 'failed' && record.revision === 2 && !record.preflightRecovery
++    && record.turns.length === 1 && record.turns[0].replyId === null && record.turns[0].events.length === 0
++    && record.messages.length === 0 && record.utterances.length === 0 && record.audioReceipts.length === 0
++    && record.replyIds.length === 0 && !record.activeMessageId && !record.activeSegment && !record.directorState
++    && Array.isArray(agents) && agents.length === 1 && agents[0].role === 'teacher'
++    && agents[0].allowedActions === undefined;
++}
++async function archiveUnsentRoleConfigFailure(record: TeachingConversation, deps: Deps) {
++  const content = JSON.stringify(record);
++  const path = join(directory(record.id, deps), `failed-role-actions-revision-${record.revision}.json`);
++  try {
++    const handle = await open(path, 'wx', 0o600);
++    try { await handle.writeFile(content); await handle.sync(); } finally { await handle.close(); }
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code !== 'EEXIST' || await readFile(path, 'utf8') !== content) throw error;
++  }
++  return { schemaVersion: 'mira.openmaic.teaching-preflight-recovery.v1' as const,
++    reason: 'missing_teacher_role_actions' as const, failedRevision: record.revision,
++    failedRecordSha256: textSha(content) };
++}
+ /** Only invoke after internal authentication plus required_teaching authorization. */
+ export async function claimTeachingTurn(
+   canonical: StatelessChatRequest,
+@@ -174,6 +210,15 @@
+       let record = await load(c.conversationId, deps);
+       if (record) {
+         checkIdentity(record, c);
++        if (isUnsentRoleConfigFailure(record, c) && await hasUnsentRequiredTeachingBudget()) {
++          // Preserve the complete failed record; retain conversation identity and all usage history.
++          const preflightRecovery = await archiveUnsentRoleConfigFailure(record, deps);
++          const normalized = normalizeRequiredTeachingAgents(record.canonicalRequest);
++          record = { ...record, canonicalRequest: normalized, state: 'running',
++            revision: record.revision + 1, preflightRecovery };
++          await save(record, deps);
++          return { record, replay: undefined };
++        }
+         const previous = record.turns.find((turn) => turn.replyId === (c.replyId ?? null));
+         if (previous) {
+           if (c.replyId) {
+@@ -270,7 +315,10 @@
+   }
+   if (record.state === 'running' && previous === record.turns.at(-1))
+     fail('MIRA_TEACHING_TURN_RUNNING');
+-  if (record.state === 'failed') fail('MIRA_TEACHING_TURN_FAILED');
++  if (record.state === 'failed') {
++    if (isUnsentRoleConfigFailure(record, c) && await hasUnsentRequiredTeachingBudget()) return null;
++    fail('MIRA_TEACHING_TURN_FAILED');
++  }
+   return { record, events: previous.events };
+ }
+ export async function trustedTeachingContext(
+diff --git a/tests/playback/discussion-consumption.test.ts b/tests/playback/discussion-consumption.test.ts
+--- a/tests/playback/discussion-consumption.test.ts
++++ b/tests/playback/discussion-consumption.test.ts
+@@ -117,17 +117,122 @@
+   });
+ });
+ 
+-
+ it('passes the exact persisted scripted action identity only when the discussion is confirmed', async () => {
+   vi.useFakeTimers();
+   const onDiscussionConfirmed = vi.fn();
+-  const engine = new PlaybackEngine([scene([discussion('scripted-action-1', 'teacher-1')])],
+-    createActionEngine(), createAudioPlayer(), { onDiscussionConfirmed });
++  const engine = new PlaybackEngine(
++    [scene([discussion('scripted-action-1', 'teacher-1')])],
++    createActionEngine(),
++    createAudioPlayer(),
++    { onDiscussionConfirmed },
++  );
+   try {
+     engine.start();
+     await vi.advanceTimersByTimeAsync(3100);
+     expect(onDiscussionConfirmed).not.toHaveBeenCalled();
+     engine.confirmDiscussion();
+-    expect(onDiscussionConfirmed).toHaveBeenCalledWith('topic-scripted-action-1', 'prompt-scripted-action-1', 'teacher-1', 'scripted-action-1');
+-  } finally { engine.stop(); vi.useRealTimers(); }
+-});
++    expect(onDiscussionConfirmed).toHaveBeenCalledWith(
++      'topic-scripted-action-1',
++      'prompt-scripted-action-1',
++      'teacher-1',
++      'scripted-action-1',
++    );
++  } finally {
++    engine.stop();
++    vi.useRealTimers();
++  }
++});
++
++describe('required student teaching discussions', () => {
++  afterEach(() => vi.useRealTimers());
++
++  it('opens automatically even with an unselected agent; failed or skipped discussions never complete', async () => {
++    vi.useFakeTimers();
++    const onDiscussionConfirmed = vi.fn();
++    const onProactiveShow = vi.fn();
++    const onComplete = vi.fn();
++    const engine = new PlaybackEngine(
++      [scene([discussion('required-1', 'peer-1')])],
++      createActionEngine(),
++      createAudioPlayer(),
++      {
++        requireScriptedDiscussions: true,
++        isAgentSelected: () => false,
++        onDiscussionConfirmed,
++        onProactiveShow,
++        onComplete,
++      },
++    );
++    engine.start();
++    await vi.advanceTimersByTimeAsync(3100);
++    expect(onDiscussionConfirmed).toHaveBeenCalledWith(
++      'topic-required-1',
++      'prompt-required-1',
++      'peer-1',
++      'required-1',
++    );
++    expect(onProactiveShow).not.toHaveBeenCalled();
++    expect(engine.getSnapshot().consumedDiscussions).toEqual([]);
++    engine.skipDiscussion();
++    expect(engine.getMode()).toBe('live');
++    expect(onComplete).not.toHaveBeenCalled();
++    engine.handleDiscussionError();
++    expect(engine.hasPendingRequiredDiscussion()).toBe(true);
++    expect(engine.retryRequiredDiscussion()).toBe(true);
++    await vi.advanceTimersByTimeAsync(3100);
++    expect(onDiscussionConfirmed).toHaveBeenCalledTimes(2);
++    expect(onComplete).not.toHaveBeenCalled();
++    engine.acknowledgeDiscussionCompletion();
++    engine.handleEndDiscussion();
++    engine.continuePlayback();
++    expect(onComplete).toHaveBeenCalledTimes(1);
++    expect(engine.getSnapshot().consumedDiscussions).toEqual(['required-1']);
++    engine.stop();
++  });
++
++  it('manual close retains the exact discussion cursor instead of advancing', async () => {
++    vi.useFakeTimers();
++    const onComplete = vi.fn();
++    const onDiscussionConfirmed = vi.fn();
++    const engine = new PlaybackEngine(
++      [scene([discussion('required-stop')])],
++      createActionEngine(),
++      createAudioPlayer(),
++      { requireScriptedDiscussions: true, onDiscussionConfirmed, onComplete },
++    );
++    engine.start();
++    await vi.advanceTimersByTimeAsync(3100);
++    engine.handleEndDiscussion();
++    expect(engine.getSnapshot().actionIndex).toBe(0);
++    engine.continuePlayback();
++    await vi.advanceTimersByTimeAsync(3100);
++    expect(onDiscussionConfirmed).toHaveBeenCalledTimes(2);
++    expect(onComplete).not.toHaveBeenCalled();
++    engine.stop();
++  });
++});
++
++it('pausing in the mandatory trigger delay does not consume or skip the discussion', async () => {
++  vi.useFakeTimers();
++  const onDiscussionConfirmed = vi.fn();
++  const onComplete = vi.fn();
++  const engine = new PlaybackEngine(
++    [scene([discussion('required-delay')])],
++    createActionEngine(),
++    createAudioPlayer(),
++    { requireScriptedDiscussions: true, onDiscussionConfirmed, onComplete },
++  );
++  try {
++    engine.start();
++    await vi.advanceTimersByTimeAsync(100);
++    engine.pause();
++    await vi.advanceTimersByTimeAsync(4000);
++    engine.resume();
++    await vi.advanceTimersByTimeAsync(3100);
++    expect(onDiscussionConfirmed).toHaveBeenCalledTimes(1);
++    expect(onComplete).not.toHaveBeenCalled();
++  } finally {
++    engine.stop();
++    vi.useRealTimers();
++  }
++});
+diff --git a/tests/runtime/mira-student-runtime-events.test.ts b/tests/runtime/mira-student-runtime-events.test.ts
+--- a/tests/runtime/mira-student-runtime-events.test.ts
++++ b/tests/runtime/mira-student-runtime-events.test.ts
+@@ -574,15 +574,28 @@
+ it('records acknowledged operations once, restores them from server status and rejects synthetic grades', async () => {
+   const submitted: unknown[] = [];
+   const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+-    if (init?.method !== 'POST') return response({ ...status(0), completedInteractionObjectiveIndexes: [1] });
+-    const event = JSON.parse(String(init.body)); submitted.push(event);
++    if (init?.method !== 'POST')
++      return response({ ...status(0), completedInteractionObjectiveIndexes: [1] });
++    const event = JSON.parse(String(init.body));
++    submitted.push(event);
+     return response({ ok: true, sequence: event.sequence, receiptSha256: 'a'.repeat(64) });
+   });
+-  const client = createMiraStudentRuntimeEventClient({ classroomId: 'interaction', fetcher, storage: memoryStorage() });
++  const client = createMiraStudentRuntimeEventClient({
++    classroomId: 'interaction',
++    fetcher,
++    storage: memoryStorage(),
++  });
+   await client.resume();
+   expect(client.hasCompletedInteractions([0, 1])).toBe(false);
+-  const payload = { sceneIndex: 1, sceneId: 'operate', objectiveIndex: 0, controlSelector: '#quantity',
+-    action: 'range' as const, value: '12', feedbackText: '一个十两个一，因为十个一是一个十' };
++  const payload = {
++    sceneIndex: 1,
++    sceneId: 'operate',
++    objectiveIndex: 0,
++    controlSelector: '#quantity',
++    action: 'range' as const,
++    value: '12',
++    feedbackText: '一个十两个一，因为十个一是一个十',
++  };
+   await client.interactionCompleted(payload);
+   await client.interactionCompleted({ ...payload, feedbackText: payload.feedbackText + '。' });
+   expect(client.hasCompletedInteractions([0, 1])).toBe(true);
+@@ -590,3 +603,41 @@
+   expect(submitted[0]).toMatchObject({ type: 'interaction_completed', payload });
+   expect(() => client.interactionCompleted({ ...payload, objectiveIndex: 30 })).toThrow();
+ });
++
++it('reads accepted progress without flushing the rejected teaching completion, then reuses its exact event', async () => {
++  let discussionCompleted = false;
++  let lastSequence = 0;
++  const posted: string[] = [];
++  const fetcher = vi.fn(async (_url: RequestInfo | URL, init?: RequestInit) => {
++    if (init?.method === 'GET')
++      return response({
++        ...status(lastSequence),
++        completedActionSceneIds: discussionCompleted ? ['scene-p2'] : [],
++      });
++    const body = String(init?.body);
++    posted.push(body);
++    if (!discussionCompleted)
++      return response(
++        { error: 'runtime_teaching_incomplete', message: 'Continue the discussion' },
++        409,
++      );
++    lastSequence = JSON.parse(body).sequence;
++    return response({ ok: true, sequence: lastSequence, receiptSha256: 'a'.repeat(64) });
++  });
++  const client = createMiraStudentRuntimeEventClient({
++    classroomId: 'lesson-1',
++    storage: memoryStorage(),
++    fetcher,
++  });
++  await expect(
++    client.actionCompleted({ sceneIndex: 1, sceneId: 'scene-p2', actionId: 'discussion-2' }),
++  ).rejects.toMatchObject({ name: 'runtime_teaching_incomplete' });
++  await client.readProgress();
++  expect(client.hasCompletedScene('scene-p2')).toBe(false);
++  expect(posted).toHaveLength(1);
++  discussionCompleted = true;
++  await client.actionCompleted({ sceneIndex: 1, sceneId: 'scene-p2', actionId: 'discussion-2' });
++  expect(posted).toHaveLength(2);
++  expect(posted[1]).toBe(posted[0]);
++  expect(client.hasCompletedScene('scene-p2')).toBe(true);
++});
+diff --git a/tests/runtime/mira-student-teaching-navigation.test.ts b/tests/runtime/mira-student-teaching-navigation.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/mira-student-teaching-navigation.test.ts
+@@ -0,0 +1,15 @@
++import { expect, it } from 'vitest';
++import { firstUnfinishedTeachingScene } from '@/lib/mira/student-teaching-navigation';
++import type { Scene } from '@/lib/types/stage';
++
++it('returns missed discussion, permits returning to it, and respects accepted progress on re-entry', () => {
++  const scenes = [
++    { id: 'p1', order: 1, actions: [] },
++    { id: 'p2', order: 2, actions: [{ type: 'discussion', id: 'd2' }] },
++    { id: 'p3', order: 3, actions: [] },
++    { id: 'p7', order: 7, actions: [{ type: 'discussion', id: 'd7' }] },
++  ] as unknown as Scene[];
++  expect(firstUnfinishedTeachingScene(scenes, 'p3', () => false)?.id).toBe('p2');
++  expect(firstUnfinishedTeachingScene(scenes, 'p2', () => false)).toBeUndefined();
++  expect(firstUnfinishedTeachingScene(scenes, 'p7', (id) => id === 'p2')).toBeUndefined();
++});
+diff --git a/tests/server/mira-teaching-preflight.test.ts b/tests/server/mira-teaching-preflight.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-teaching-preflight.test.ts
+@@ -0,0 +1,54 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { mkdtemp, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
++import { join } from 'node:path';
++import { tmpdir } from 'node:os';
++import type { StatelessChatRequest } from '@/lib/types/chat';
++
++const budget = vi.hoisted(() => ({ unsent: true }));
++vi.mock('@/lib/server/mira-paid-budget', () => ({
++  paidBudgetContext: { getStore: () => undefined },
++  hasRequiredTeachingBudget: async () => true,
++  hasUnsentRequiredTeachingBudget: async () => budget.unsent,
++}));
++vi.mock('@/lib/persistence/server-provider', () => ({ getServerPersistenceProvider: vi.fn() }));
++import { claimTeachingTurn, normalizeRequiredTeachingAgents, replayTeachingTurn, teachingConversationId,
++  type TeachingConversation } from '@/lib/server/mira-teaching-conversation';
++import { getActionsForRole } from '@/lib/orchestration/registry/types';
++
++const roots: string[] = [];
++afterEach(async () => { budget.unsent = true; await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))); });
++const canonical = { messages: [], config: { agentIds: ['teacher'], agentConfigs: [{ id: 'teacher', role: 'teacher',
++  persona: 'Frozen subject teacher', name: 'Teacher', avatar: '/teacher.png', color: '#425CBA', priority: 100 }] },
++  storeState: {} } as unknown as StatelessChatRequest;
++async function failedFixture() {
++  const root = await mkdtemp(join(tmpdir(), 'mira-teaching-preflight-')); roots.push(root);
++  const identity = { authorizationId: 'a'.repeat(64), learningSessionId: 'lesson', classroomId: 'stage',
++    sceneId: 'scene-p2', actionId: 'discussion' };
++  const context = { ...identity, conversationId: teachingConversationId(identity), expectedRevision: 2 };
++  const record = { ...identity, id: context.conversationId, state: 'failed', revision: 2,
++    canonicalRequest: structuredClone(canonical), messages: [], utterances: [], audioReceipts: [], replyIds: [],
++    turns: [{ replyId: null, events: [] }], updatedAt: 123 } as TeachingConversation;
++  await mkdir(join(root, record.id));
++  await writeFile(join(root, record.id, 'conversation.json'), JSON.stringify(record));
++  return { root, context, record, deps: { root, withLock: async <T>(_key: string, work: () => Promise<T>) => work() } };
++}
++describe('required teaching role-action preflight', () => {
++  it('uses registered teacher actions and preserves the same conversation plus failed audit on a proven unsent retry', async () => {
++    const f = await failedFixture();
++    const normalized = normalizeRequiredTeachingAgents(canonical);
++    expect(normalized.config.agentConfigs?.[0].allowedActions).toEqual(getActionsForRole('teacher'));
++    expect(canonical.config.agentConfigs?.[0].allowedActions).toBeUndefined();
++    expect(await replayTeachingTurn(f.context, f.deps)).toBeNull();
++    const retry = await claimTeachingTurn(normalized, f.context, f.deps);
++    expect(retry.record).toMatchObject({ id: f.record.id, authorizationId: f.record.authorizationId,
++      state: 'running', revision: 3, preflightRecovery: { failedRevision: 2 } });
++    expect(JSON.parse(await readFile(join(f.root, f.record.id, 'failed-role-actions-revision-2.json'), 'utf8'))).toEqual(f.record);
++    await expect(replayTeachingTurn({ ...f.context, expectedRevision: 3 }, f.deps)).rejects.toThrow('MIRA_TEACHING_TURN_RUNNING');
++  });
++  it('does not retry the old failed claim when paid or unknown dispatch cannot be excluded', async () => {
++    const f = await failedFixture(); budget.unsent = false;
++    await expect(replayTeachingTurn(f.context, f.deps)).rejects.toThrow('MIRA_TEACHING_TURN_FAILED');
++    await expect(claimTeachingTurn(normalizeRequiredTeachingAgents(canonical), f.context, f.deps)).rejects.toThrow('MIRA_TEACHING_TURN_FAILED');
++    expect(JSON.parse(await readFile(join(f.root, f.record.id, 'conversation.json'), 'utf8'))).toEqual(f.record);
++  });
++});

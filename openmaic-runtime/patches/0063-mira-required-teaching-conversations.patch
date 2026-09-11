@@ -1,0 +1,890 @@
+diff --git a/app/api/chat/pi/route.ts b/app/api/chat/pi/route.ts
+--- a/app/api/chat/pi/route.ts
++++ b/app/api/chat/pi/route.ts
+@@ -1,3 +1,13 @@
++import {
++  trustedTeachingContext,
++  replayTeachingTurn,
++  claimTeachingTurn,
++  appendTeachingEvent,
++  failTeachingTurn,
++  publicTeachingContext,
++  TeachingConversationError,
++  type TeachingConversation,
++} from '@/lib/server/mira-teaching-conversation';
+ import { withPaidBudgetRequest, hasRequiredTeachingBudget } from '@/lib/server/mira-paid-budget';
+ /**
+  * Pi Director Chat API Endpoint
+@@ -39,16 +49,28 @@
+   return withPaidBudgetRequest(req, () => postWithBudget(req));
+ }
+ async function postWithBudget(req: NextRequest) {
+-  if (!isPiChatEnabled() && !(await hasRequiredTeachingBudget())) {
+-    return apiError('INVALID_REQUEST', 404, 'Pi chat runtime is disabled');
+-  }
+-
+   const encoder = new TextEncoder();
++  let teaching: TeachingConversation | undefined;
+   let chatModel: string | undefined;
+   let chatMessageCount: number | undefined;
+ 
+   try {
+-    const body: StatelessChatRequest = await req.json();
++    let body: StatelessChatRequest = await req.json();
++    const teachingContext = await trustedTeachingContext(body);
++    if (teachingContext) {
++      const saved = await replayTeachingTurn(teachingContext);
++      if (saved)
++        return new Response(
++          [publicTeachingContext(saved.record), ...saved.events]
++            .map((event) => `data: ${JSON.stringify(event)}\n\n`)
++            .join(''),
++          { headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store' } },
++        );
++      if (!(await hasRequiredTeachingBudget()))
++        throw new TeachingConversationError('MIRA_TEACHING_ACTIVE_BUDGET_REQUIRED', 503);
++    } else if (!isPiChatEnabled()) {
++      return apiError('INVALID_REQUEST', 404, 'Pi chat runtime is disabled');
++    }
+     chatModel = body.model;
+     chatMessageCount = body.messages?.length;
+ 
+@@ -117,14 +139,42 @@
+       );
+     }
+ 
++    if (req.signal.aborted)
++      return Response.json({ error: 'MIRA_TEACHING_REQUEST_ABORTED' }, { status: 499 });
++    if (teachingContext) {
++      const claim = await claimTeachingTurn(body, teachingContext);
++      teaching = claim.record;
++      if (claim.replay) {
++        const events = [publicTeachingContext(teaching), ...claim.replay];
++        return new Response(events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join(''), {
++          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store' },
++        });
++      }
++      body = {
++        ...teaching.canonicalRequest,
++        messages: structuredClone(teaching.messages),
++        directorState: teaching.directorState,
++      };
++    }
++
+     const signal = req.signal;
+     const abortController = new AbortController();
+     signal.addEventListener('abort', () => abortController.abort(), { once: true });
++    if (signal.aborted) abortController.abort();
+ 
+     const { readable, writable } = new TransformStream();
+     const writer = writable.getWriter();
+ 
+     const send: SendEvent = async (event) => {
++      if (teaching) {
++        teaching = await appendTeachingEvent(teaching.id, event);
++        if (event.type === 'done' && teaching.state === 'failed')
++          throw new TeachingConversationError('MIRA_TEACHING_END_INCOMPLETE');
++        if (event.type === 'done')
++          await writer.write(
++            encoder.encode(`data: ${JSON.stringify(publicTeachingContext(teaching))}\n\n`),
++          );
++      }
+       await writer.write(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+     };
+ 
+@@ -188,6 +238,7 @@
+           : undefined;
+     } catch (error) {
+       const message = error instanceof Error ? error.message : 'Invalid Web Search configuration';
++      if (teaching) await failTeachingTurn(teaching.id);
+       return apiError('INVALID_REQUEST', 400, message);
+     }
+ 
+@@ -211,6 +262,10 @@
+ 
+       try {
+         startHeartbeat();
++        if (teaching)
++          await writer.write(
++            encoder.encode(`data: ${JSON.stringify(publicTeachingContext(teaching))}\n\n`),
++          );
+ 
+         await runPiDirectorLoop({
+           body,
+@@ -239,6 +294,7 @@
+         });
+ 
+         if (signal.aborted) {
++          if (teaching) await failTeachingTurn(teaching.id);
+           stopHeartbeat();
+           await writer.close();
+           return;
+@@ -248,6 +304,7 @@
+         await writer.close();
+       } catch (error) {
+         stopHeartbeat();
++        if (teaching) await failTeachingTurn(teaching.id).catch(() => undefined);
+ 
+         if (signal.aborted) {
+           try {
+@@ -279,6 +336,9 @@
+       },
+     });
+   } catch (error) {
++    if (teaching) await failTeachingTurn(teaching.id).catch(() => undefined);
++    if (error instanceof TeachingConversationError)
++      return Response.json({ error: error.code }, { status: error.status });
+     log.error(
+       `Pi chat request failed [model=${chatModel ?? 'unknown'}, messages=${chatMessageCount ?? 0}]:`,
+       error,
+diff --git a/app/api/generate/tts/route.ts b/app/api/generate/tts/route.ts
+--- a/app/api/generate/tts/route.ts
++++ b/app/api/generate/tts/route.ts
+@@ -1,3 +1,7 @@
++import {
++  cachedTeachingTts,
++  TeachingConversationError,
++} from '@/lib/server/mira-teaching-conversation';
+ import { withPaidBudgetRequest } from '@/lib/server/mira-paid-budget';
+ /**
+  * Single TTS Generation API
+@@ -33,7 +37,18 @@
+ export const maxDuration = 30;
+ 
+ export async function POST(req: NextRequest) {
+-  return withPaidBudgetRequest(req, () => postWithBudget(req));
++  return withPaidBudgetRequest(req, async () => {
++    try {
++      const body = await req.clone().json();
++      return body.miraTeachingContext
++        ? await cachedTeachingTts(body, () => postWithBudget(req))
++        : postWithBudget(req);
++    } catch (error) {
++      if (error instanceof TeachingConversationError)
++        return Response.json({ error: error.code }, { status: error.status });
++      throw error;
++    }
++  });
+ }
+ async function postWithBudget(req: NextRequest) {
+   let ttsProviderId: string | undefined;
+diff --git a/lib/types/chat.ts b/lib/types/chat.ts
+--- a/lib/types/chat.ts
++++ b/lib/types/chat.ts
+@@ -63,6 +63,7 @@
+   /** Absolute deadline for the client-side soft-closing grace window. */
+   softCloseDeadline?: number;
+   directorState?: DirectorState;
++  requiredTeachingConversation?: { conversationId: string; revision: number };
+ }
+ 
+ export interface PiSessionBoundaryContext {
+@@ -311,6 +312,7 @@
+  * All state is sent from the client on each request
+  */
+ export interface StatelessChatRequest {
++  miraTeachingContext?: import('@/lib/server/mira-teaching-conversation').TeachingContext;
+   /** Conversation history (client-maintained) */
+   messages: UIMessage<ChatMessageMetadata>[];
+   /** Current application state */
+@@ -424,6 +426,7 @@
+  * Server-Sent Events for stateless chat API
+  */
+ export type StatelessEvent =
++  | { type: 'mira_teaching_context'; data: { conversationId: string; revision: number } }
+   | {
+       type: 'agent_start';
+       data: {
+diff --git a/components/chat/use-chat-sessions.ts b/components/chat/use-chat-sessions.ts
+--- a/components/chat/use-chat-sessions.ts
++++ b/components/chat/use-chat-sessions.ts
+@@ -1,4 +1,6 @@
+ 'use client';
++
++import { bindTeachingMessage } from '@/lib/chat/mira-teaching-context';
+ 
+ import { useState, useCallback, useRef, useEffect } from 'react';
+ import {
+@@ -180,6 +182,7 @@
+ 
+ export type ChatRequestTemplate = {
+   miraScriptedAction?: { sceneId: string; actionId: string };
++  miraRequiredConversation?: { conversationId: string; replyId?: string; userText?: string };
+   messages: UIMessage<ChatMessageMetadata>[];
+   config: {
+     agentIds: string[];
+@@ -1154,8 +1157,20 @@
+     (sessionId: string, controller: AbortController, sessionType: SessionType) => {
+       let currentBuffer: StreamBuffer | null = null;
+       let currentMessageId: string | null = null;
++      let requiredConversation = sessionsRef.current.find(
++        (s) => s.id === sessionId,
++      )?.requiredTeachingConversation;
+ 
+       const onEvent = (event: StatelessEvent) => {
++        if (event.type === 'mira_teaching_context') {
++          requiredConversation = event.data;
++          setSessions((prev) =>
++            prev.map((s) =>
++              s.id === sessionId ? { ...s, requiredTeachingConversation: event.data } : s,
++            ),
++          );
++          return;
++        }
+         if (event.type === 'whiteboard') {
+           consumePiWhiteboardEvent(event.data, controller.signal);
+           return;
+@@ -1168,6 +1183,8 @@
+           case 'agent_start': {
+             const { messageId, agentId, agentName, agentAvatar, agentColor } = event.data;
+             currentMessageId = messageId;
++            if (requiredConversation)
++              bindTeachingMessage(messageId, requiredConversation.conversationId);
+             currentBuffer.pushAgentStart({
+               messageId,
+               agentId,
+@@ -1262,6 +1279,11 @@
+       controller: AbortController,
+       sessionType: SessionType,
+     ): Promise<void> => {
++      const restored = sessionsRef.current.find(
++        (s) => s.id === sessionId,
++      )?.requiredTeachingConversation;
++      if (restored && !requestTemplate.miraRequiredConversation)
++        requestTemplate.miraRequiredConversation = { conversationId: restored.conversationId };
+       // Attach full configs for generated (non-default) agents so the server can use them.
+       // The server-side registry only has default agents; generated agents exist only client-side.
+       const generatedConfigs = requestTemplate.config.agentIds
+@@ -1312,6 +1334,7 @@
+       }
+ 
+       let scriptedInitialization = requestTemplate.miraScriptedAction;
++      let requiredContinuation = requestTemplate.miraRequiredConversation;
+       const streamConsumer = createStatelessStreamConsumer(sessionId, controller, sessionType);
+ 
+       const outcome = await runAgentLoop(
+@@ -1335,10 +1358,16 @@
+           fetchChat: (body, signal) => {
+             const marker = scriptedInitialization;
+             scriptedInitialization = undefined;
++            const continuation = requiredContinuation;
++            requiredContinuation = undefined;
+             return fetch('/api/chat', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+-              body: JSON.stringify({ ...body, ...(marker ? { miraScriptedAction: marker } : {}) }),
++              body: JSON.stringify({
++                ...body,
++                ...(marker ? { miraScriptedAction: marker } : {}),
++                ...(continuation ? { miraRequiredConversation: continuation } : {}),
++              }),
+               signal,
+             });
+           },
+@@ -1912,6 +1941,15 @@
+           sessionId!,
+           {
+             messages: sessionMessages,
++            ...(existingSession?.requiredTeachingConversation
++              ? {
++                  miraRequiredConversation: {
++                    conversationId: existingSession.requiredTeachingConversation.conversationId,
++                    replyId: userMessage.id,
++                    userText: content,
++                  },
++                }
++              : {}),
+             config: {
+               agentIds,
+               sessionType,
+diff --git a/lib/hooks/use-discussion-tts.ts b/lib/hooks/use-discussion-tts.ts
+--- a/lib/hooks/use-discussion-tts.ts
++++ b/lib/hooks/use-discussion-tts.ts
+@@ -1,5 +1,6 @@
+ 'use client';
+ 
++import { teachingConversationForMessage } from '@/lib/chat/mira-teaching-context';
+ import { useCallback, useEffect, useRef, useState } from 'react';
+ import { useSettingsStore } from '@/lib/store/settings';
+ import { useBrowserTTS } from '@/lib/hooks/use-browser-tts';
+@@ -250,6 +251,13 @@
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+           text: item.text,
++          ...(teachingConversationForMessage(item.messageId)
++            ? {
++                miraRequiredConversation: {
++                  conversationId: teachingConversationForMessage(item.messageId),
++                },
++              }
++            : {}),
+           audioId: item.partId,
+           ttsProviderId: item.providerId,
+           ttsModelId: item.modelId || providerConfig?.modelId,
+diff --git a/lib/server/mira-teaching-conversation.ts b/lib/server/mira-teaching-conversation.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-teaching-conversation.ts
+@@ -0,0 +1,504 @@
++/** Durable, server-owned transcript for required teaching. No browser history is authoritative. */
++import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
++import { mkdir, open, readFile, readdir, rename } from 'node:fs/promises';
++import { join, resolve } from 'node:path';
++import { getServerPersistenceProvider } from '@/lib/persistence/server-provider';
++import { paidBudgetContext, hasRequiredTeachingBudget } from './mira-paid-budget';
++import type { StatelessChatRequest, StatelessEvent, DirectorState } from '@/lib/types/chat';
++
++export interface TeachingContext {
++  conversationId: string;
++  authorizationId: string;
++  learningSessionId: string;
++  classroomId: string;
++  sceneId: string;
++  actionId: string;
++  expectedRevision: number;
++  replyId?: string;
++  replyTextSha256?: string;
++}
++export interface TeachingConversation {
++  id: string;
++  authorizationId: string;
++  learningSessionId: string;
++  classroomId: string;
++  sceneId: string;
++  actionId: string;
++  state: 'running' | 'awaiting_user' | 'completed' | 'failed';
++  revision: number;
++  canonicalRequest: StatelessChatRequest;
++  messages: StatelessChatRequest['messages'];
++  directorState?: DirectorState;
++  utterances: Array<{ id: string; text: string }>;
++  audioReceipts: Array<{ id: string; utteranceId: string; textSha256: string; state: 'ready' }>;
++  replyIds: string[];
++  turns: Array<{ replyId: string | null; events: StatelessEvent[] }>;
++  activeMessageId?: string;
++  activeSegment?: string;
++  updatedAt: number;
++}
++type Deps = { root?: string; withLock?: <T>(key: string, work: () => Promise<T>) => Promise<T> };
++const sha = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
++const idPattern = /^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,159}$/;
++const validId = (value: unknown) => typeof value === 'string' && idPattern.test(value);
++const textSha = (value: string) => createHash('sha256').update(value).digest('hex');
++const rootPath = (deps: Deps) => resolve(deps.root ?? 'data/required-teaching-conversations');
++export class TeachingConversationError extends Error {
++  constructor(
++    public code: string,
++    public status = 409,
++  ) {
++    super(code);
++  }
++}
++function fail(code: string, status = 409): never {
++  throw new TeachingConversationError(code, status);
++}
++export function hasTeachingInternalToken(headers: Headers): boolean {
++  const expected = Buffer.from(process.env.MIRA_INTERNAL_API_TOKEN ?? '');
++  const supplied = Buffer.from(headers.get('x-mira-internal-token') ?? '');
++  return (
++    expected.length > 0 &&
++    expected.length === supplied.length &&
++    timingSafeEqual(expected, supplied)
++  );
++}
++export function teachingConversationId(
++  context: Omit<TeachingContext, 'conversationId' | 'expectedRevision' | 'replyId'>,
++): string {
++  return (
++    'mtc_' +
++    sha([
++      context.authorizationId,
++      context.learningSessionId,
++      context.classroomId,
++      context.sceneId,
++      context.actionId,
++    ])
++  );
++}
++function validateContext(value: unknown): TeachingContext {
++  const c = value as TeachingContext;
++  if (
++    !c ||
++    !/^[a-f0-9]{64}$/.test(c.authorizationId) ||
++    ['learningSessionId', 'classroomId', 'sceneId', 'actionId'].some(
++      (k) => !validId((c as any)[k]),
++    ) ||
++    !Number.isSafeInteger(c.expectedRevision) ||
++    c.expectedRevision < 0 ||
++    (c.replyId !== undefined &&
++      (!validId(c.replyId) || !/^[a-f0-9]{64}$/.test(c.replyTextSha256 ?? ''))) ||
++    c.conversationId !== teachingConversationId(c)
++  )
++    fail('MIRA_TEACHING_CONTEXT_INVALID', 403);
++  return c;
++}
++async function mutex<T>(key: string, work: () => Promise<T>, deps: Deps): Promise<T> {
++  if (deps.withLock) return deps.withLock(key, work);
++  const url = process.env.DATABASE_URL;
++  if (!url) fail('MIRA_TEACHING_STORE_UNAVAILABLE', 503);
++  const { pool } = await getServerPersistenceProvider(url);
++  const client = await pool.connect();
++  try {
++    await client.query('BEGIN');
++    // Held only for an atomic local record update, never a provider call.
++    await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [
++      `mira-teaching:${key}`,
++    ]);
++    const value = await work();
++    await client.query('COMMIT');
++    return value;
++  } catch (error) {
++    await client.query('ROLLBACK').catch(() => undefined);
++    throw error;
++  } finally {
++    client.release();
++  }
++}
++function directory(id: string, deps: Deps): string {
++  if (!/^mtc_[a-f0-9]{64}$/.test(id)) fail('MIRA_TEACHING_ID_INVALID', 400);
++  return join(rootPath(deps), id);
++}
++async function load(id: string, deps: Deps): Promise<TeachingConversation | null> {
++  try {
++    return JSON.parse(await readFile(join(directory(id, deps), 'conversation.json'), 'utf8'));
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
++    throw error;
++  }
++}
++async function atomicJson(path: string, data: unknown) {
++  const temp = `${path}.${randomUUID()}.tmp`;
++  const handle = await open(temp, 'wx', 0o600);
++  try {
++    await handle.writeFile(JSON.stringify(data));
++    await handle.sync();
++  } finally {
++    await handle.close();
++  }
++  await rename(temp, path);
++  const folder = await open(resolve(path, '..'), 'r');
++  try {
++    await folder.sync();
++  } finally {
++    await folder.close();
++  }
++}
++async function save(record: TeachingConversation, deps: Deps) {
++  const folder = directory(record.id, deps);
++  await mkdir(folder, { recursive: true, mode: 0o700 });
++  record.updatedAt = Date.now();
++  await atomicJson(join(folder, 'conversation.json'), record);
++}
++function checkIdentity(record: TeachingConversation, c: TeachingContext) {
++  for (const key of [
++    'authorizationId',
++    'learningSessionId',
++    'classroomId',
++    'sceneId',
++    'actionId',
++  ] as const)
++    if (record[key] !== c[key]) fail('MIRA_TEACHING_SCOPE_MISMATCH', 403);
++}
++/** Only invoke after internal authentication plus required_teaching authorization. */
++export async function claimTeachingTurn(
++  canonical: StatelessChatRequest,
++  value: unknown,
++  deps: Deps = {},
++) {
++  const c = validateContext(value);
++  return mutex(
++    c.conversationId,
++    async () => {
++      let record = await load(c.conversationId, deps);
++      if (record) {
++        checkIdentity(record, c);
++        const previous = record.turns.find((turn) => turn.replyId === (c.replyId ?? null));
++        if (previous) {
++          if (c.replyId) {
++            const original = record.messages.find((m) => m.id === c.replyId && m.role === 'user');
++            const originalText = original?.parts
++              .filter((p) => p.type === 'text')
++              .map((p) => (p as { text: string }).text)
++              .join('');
++            if (originalText === undefined || textSha(originalText) !== c.replyTextSha256)
++              fail('MIRA_TEACHING_REPLY_ID_CONFLICT');
++          }
++          if (record.state === 'running' && previous === record.turns.at(-1))
++            fail('MIRA_TEACHING_TURN_RUNNING');
++          if (record.state === 'failed') fail('MIRA_TEACHING_TURN_FAILED');
++          return { record, replay: previous.events };
++        }
++        if (
++          !c.replyId ||
++          record.state !== 'awaiting_user' ||
++          c.expectedRevision !== record.revision
++        )
++          fail('MIRA_TEACHING_REVISION_CONFLICT');
++        const last = canonical.messages.at(-1);
++        const text = last?.parts
++          ?.filter((part) => part.type === 'text')
++          .map((part) => (part as { text: string }).text)
++          .join('');
++        if (
++          last?.role !== 'user' ||
++          last.id !== c.replyId ||
++          !text?.trim() ||
++          text.length > 4000 ||
++          textSha(text) !== c.replyTextSha256
++        )
++          fail('MIRA_TEACHING_REPLY_INVALID', 400);
++        // Rebuild again at the execution boundary: backend and browser history cannot race this store.
++        record.messages.push({ id: c.replyId, role: 'user', parts: [{ type: 'text', text }] });
++        record.replyIds.push(c.replyId);
++        record.state = 'running';
++        record.revision++;
++        record.turns.push({ replyId: c.replyId, events: [] });
++      } else {
++        if (c.replyId || c.expectedRevision !== 0) fail('MIRA_TEACHING_CONVERSATION_MISSING');
++        const stored = structuredClone(canonical);
++        // Runtime resolves managed credentials. Never persist caller credentials or private context.
++        for (const field of [
++          'apiKey',
++          'baseUrl',
++          'webSearchApiKey',
++          'miraTeachingContext',
++        ] as const)
++          delete (stored as any)[field];
++        record = {
++          id: c.conversationId,
++          authorizationId: c.authorizationId,
++          learningSessionId: c.learningSessionId,
++          classroomId: c.classroomId,
++          sceneId: c.sceneId,
++          actionId: c.actionId,
++          state: 'running',
++          revision: 1,
++          canonicalRequest: stored,
++          messages: structuredClone(stored.messages),
++          utterances: [],
++          audioReceipts: [],
++          replyIds: [],
++          turns: [{ replyId: null, events: [] }],
++          updatedAt: Date.now(),
++        };
++      }
++      await save(record, deps);
++      return { record, replay: undefined };
++    },
++    deps,
++  );
++}
++export async function replayTeachingTurn(value: unknown, deps: Deps = {}) {
++  const c = validateContext(value);
++  const record = await load(c.conversationId, deps);
++  if (!record) return null;
++  checkIdentity(record, c);
++  const previous = c.replyId
++    ? record.turns.find((t) => t.replyId === c.replyId)
++    : record.turns.at(-1);
++  if (!previous) return null;
++  if (c.replyId) {
++    const original = record.messages.find((m) => m.id === c.replyId && m.role === 'user');
++    const text = original?.parts
++      .filter((p) => p.type === 'text')
++      .map((p) => (p as { text: string }).text)
++      .join('');
++    if (text === undefined || textSha(text) !== c.replyTextSha256)
++      fail('MIRA_TEACHING_REPLY_ID_CONFLICT');
++  }
++  if (record.state === 'running' && previous === record.turns.at(-1))
++    fail('MIRA_TEACHING_TURN_RUNNING');
++  if (record.state === 'failed') fail('MIRA_TEACHING_TURN_FAILED');
++  return { record, events: previous.events };
++}
++export async function trustedTeachingContext(
++  body: StatelessChatRequest,
++): Promise<TeachingContext | undefined> {
++  const value = body.miraTeachingContext;
++  if (value === undefined) return undefined;
++  const context = validateContext(value);
++  if (paidBudgetContext.getStore()?.binding.authorizationId !== context.authorizationId)
++    fail('MIRA_TEACHING_TRUST_REQUIRED', 403);
++  return context;
++}
++function sealSegment(record: TeachingConversation) {
++  const text = record.activeSegment;
++  if (text?.trim() && !record.utterances.some((u) => u.text === text)) {
++    const id = 'mtu_' + sha([record.activeMessageId, record.utterances.length, text]);
++    record.utterances.push({ id, text });
++  }
++  record.activeSegment = '';
++}
++export async function appendTeachingEvent(id: string, event: StatelessEvent, deps: Deps = {}) {
++  return mutex(
++    id,
++    async () => {
++      const record = await load(id, deps);
++      if (
++        !record ||
++        (record.state !== 'running' && !(record.state === 'failed' && event.type === 'error'))
++      )
++        fail('MIRA_TEACHING_NOT_RUNNING');
++      if (event.type === 'agent_start') {
++        sealSegment(record);
++        record.activeMessageId = event.data.messageId;
++        record.messages.push({
++          id: event.data.messageId,
++          role: 'assistant',
++          parts: [],
++          metadata: { agentId: event.data.agentId },
++        });
++      } else if (event.type === 'text_delta') {
++        const messageId = event.data.messageId ?? record.activeMessageId;
++        const message = record.messages.find((m) => m.id === messageId && m.role === 'assistant');
++        if (!message || typeof event.data.content !== 'string')
++          fail('MIRA_TEACHING_TRANSCRIPT_INVALID');
++        if (record.activeMessageId !== messageId) {
++          sealSegment(record);
++          record.activeMessageId = messageId;
++        }
++        record.activeSegment = (record.activeSegment ?? '') + event.data.content;
++        const last = message.parts.at(-1);
++        if (last?.type === 'text') last.text += event.data.content;
++        else message.parts.push({ type: 'text', text: event.data.content });
++      } else if (event.type === 'action' || event.type === 'agent_end') {
++        sealSegment(record);
++        if (event.type === 'action') {
++          const message = record.messages.find(
++            (m) => m.id === (event.data.messageId ?? record.activeMessageId),
++          );
++          // Preserve teaching actions in the real event log and establish a text boundary in history.
++          if (message) message.parts.push({ type: 'text', text: '' });
++        }
++      } else if (event.type === 'done') {
++        sealSegment(record);
++        record.directorState = event.data.directorState;
++        const visible = record.turns
++          .at(-1)!
++          .events.some((e) => e.type === 'text_delta' && e.data.content.trim());
++        record.state =
++          visible && event.data.agentHadContent !== false && event.data.sessionClosed === true
++            ? 'completed'
++            : visible && event.data.cueUserReceived === true
++              ? 'awaiting_user'
++              : 'failed';
++        record.revision++;
++      } else if (event.type === 'error') {
++        sealSegment(record);
++        record.state = 'failed';
++        record.revision++;
++      }
++      record.turns.at(-1)!.events.push(event);
++      if (JSON.stringify(record).length > 8_000_000) fail('MIRA_TEACHING_TRANSCRIPT_LIMIT');
++      await save(record, deps);
++      return record;
++    },
++    deps,
++  );
++}
++export async function failTeachingTurn(id: string, deps: Deps = {}) {
++  await mutex(
++    id,
++    async () => {
++      const record = await load(id, deps);
++      if (record?.state === 'running') {
++        sealSegment(record);
++        record.state = 'failed';
++        record.revision++;
++        await save(record, deps);
++      }
++    },
++    deps,
++  );
++}
++export async function readTeachingConversation(
++  input: { conversationId?: string; learningSessionId: string; classroomId: string },
++  deps: Deps = {},
++) {
++  if (!validId(input.learningSessionId) || !validId(input.classroomId))
++    fail('MIRA_TEACHING_SCOPE_INVALID', 400);
++  if (input.conversationId) {
++    const record = await load(input.conversationId, deps);
++    if (
++      record &&
++      (record.learningSessionId !== input.learningSessionId ||
++        record.classroomId !== input.classroomId)
++    )
++      fail('MIRA_TEACHING_SCOPE_MISMATCH', 403);
++    return record;
++  }
++  let ids: string[];
++  try {
++    ids = await readdir(rootPath(deps));
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
++    throw error;
++  }
++  const candidates = await Promise.all(
++    ids.filter((id) => /^mtc_[a-f0-9]{64}$/.test(id)).map((id) => load(id, deps)),
++  );
++  return (
++    candidates
++      .filter(
++        (r): r is TeachingConversation =>
++          !!r &&
++          r.learningSessionId === input.learningSessionId &&
++          r.classroomId === input.classroomId,
++      )
++      .sort((a, b) => b.updatedAt - a.updatedAt)[0] ?? null
++  );
++}
++export function publicTeachingContext(record: TeachingConversation): StatelessEvent {
++  return {
++    type: 'mira_teaching_context',
++    data: { conversationId: record.id, revision: record.revision },
++  };
++}
++/** Cache only exact server-established text under the trusted fixed voice/model. */
++export async function cachedTeachingTts(
++  body: any,
++  work: () => Promise<Response>,
++  deps: Deps = {},
++): Promise<Response> {
++  const c = validateContext(body.miraTeachingContext);
++  if (paidBudgetContext.getStore()?.binding.authorizationId !== c.authorizationId)
++    fail('MIRA_TEACHING_TRUST_REQUIRED', 403);
++  const record = await readTeachingConversation(c, deps);
++  if (!record) fail('MIRA_TEACHING_CONVERSATION_MISSING');
++  checkIdentity(record, c);
++  const utterance = record.utterances.find((u) => u.text === body.text);
++  if (!utterance) fail('MIRA_TEACHING_TTS_TEXT_UNVERIFIED', 403);
++  const key = sha([
++    record.id,
++    body.text,
++    body.ttsProviderId,
++    body.ttsModelId,
++    body.ttsVoice,
++    body.ttsSpeed ?? 1,
++  ]);
++  const path = join(directory(record.id, deps), `tts-${key}.json`);
++  const cached = await mutex(
++    `tts:${key}`,
++    async () => {
++      try {
++        return JSON.parse(await readFile(path, 'utf8'));
++      } catch (error) {
++        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
++      }
++      if (!(await hasRequiredTeachingBudget())) fail('MIRA_TEACHING_ACTIVE_BUDGET_REQUIRED', 503);
++      await atomicJson(path, { state: 'running' });
++      return null;
++    },
++    deps,
++  );
++  const receipt = {
++    id: 'mta_' + key,
++    utteranceId: utterance.id,
++    textSha256: textSha(body.text),
++    state: 'ready' as const,
++  };
++  const registerReceipt = async () =>
++    mutex(
++      record.id,
++      async () => {
++        const current = await load(record.id, deps);
++        if (!current) fail('MIRA_TEACHING_CONVERSATION_MISSING');
++        current.audioReceipts ??= [];
++        if (!current.audioReceipts.some((r) => r.id === receipt.id)) {
++          current.audioReceipts.push(receipt);
++          await save(current, deps);
++        }
++      },
++      deps,
++    );
++  const publicAudio = {
++    conversationId: record.id,
++    sceneId: record.sceneId,
++    actionId: record.actionId,
++    utteranceId: utterance.id,
++    audioReceiptId: receipt.id,
++  };
++  if (cached) {
++    if (cached.state !== 'completed') fail('MIRA_TEACHING_TTS_ALREADY_DISPATCHED');
++    await registerReceipt();
++    return Response.json({ ...cached.data, audioId: body.audioId, miraTeachingAudio: publicAudio });
++  }
++  try {
++    const response = await work();
++    if (!response.ok) {
++      await atomicJson(path, { state: 'failed' });
++      return response;
++    }
++    const data = await response.clone().json();
++    if (typeof data.base64 !== 'string' || !data.base64.length || data.base64.length > 16_000_000)
++      fail('MIRA_TEACHING_TTS_RESULT_INVALID', 502);
++    await atomicJson(path, { state: 'completed', data });
++    await registerReceipt();
++    return Response.json({ ...data, miraTeachingAudio: publicAudio });
++  } catch (error) {
++    await atomicJson(path, { state: 'failed' });
++    throw error;
++  }
++}
+diff --git a/app/api/mira/teaching-conversation/read/route.ts b/app/api/mira/teaching-conversation/read/route.ts
+new file mode 100644
+--- /dev/null
++++ b/app/api/mira/teaching-conversation/read/route.ts
+@@ -0,0 +1,37 @@
++import {
++  hasTeachingInternalToken,
++  readTeachingConversation,
++  TeachingConversationError,
++} from '@/lib/server/mira-teaching-conversation';
++export async function POST(req: Request) {
++  if (!hasTeachingInternalToken(req.headers))
++    return Response.json({ error: 'MIRA_TEACHING_TRUST_REQUIRED' }, { status: 403 });
++  try {
++    const input = await req.json();
++    if (
++      !input ||
++      typeof input !== 'object' ||
++      Object.keys(input).some(
++        (k) => !['conversationId', 'learningSessionId', 'classroomId'].includes(k),
++      )
++    )
++      return Response.json({ error: 'MIRA_TEACHING_READ_INVALID' }, { status: 400 });
++    const conversation = await readTeachingConversation(input);
++    if (!conversation) return Response.json({ conversation: null });
++    const { turns, activeMessageId, activeSegment, ...safe } = conversation;
++    void turns;
++    void activeMessageId;
++    void activeSegment;
++    return Response.json({ conversation: safe });
++  } catch (error) {
++    return Response.json(
++      {
++        error:
++          error instanceof TeachingConversationError
++            ? error.code
++            : 'MIRA_TEACHING_STORE_UNAVAILABLE',
++      },
++      { status: error instanceof TeachingConversationError ? error.status : 503 },
++    );
++  }
++}
+diff --git a/lib/chat/mira-teaching-context.ts b/lib/chat/mira-teaching-context.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/chat/mira-teaching-context.ts
+@@ -0,0 +1,11 @@
++/** Opaque server-issued ID only; no authorization or transcript is trusted from this map. */
++const messageConversations = new Map<string, string>();
++export function bindTeachingMessage(messageId: string, conversationId: string) {
++  if (!/^mtc_[a-f0-9]{64}$/.test(conversationId)) return;
++  messageConversations.set(messageId, conversationId);
++  if (messageConversations.size > 2000)
++    messageConversations.delete(messageConversations.keys().next().value!);
++}
++export function teachingConversationForMessage(messageId: string): string | undefined {
++  return messageConversations.get(messageId);
++}

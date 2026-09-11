@@ -352,6 +352,12 @@ class _Repository:
             "maximum_scene_index": max(scene_indices, default=-1),
         }
 
+    def learning_session_completed_action_scene_ids(self, _conn, **kwargs):
+        self.learning_session_scene_evidence(_conn, **kwargs)
+        indices = self.prior_action_scene_indices | self.action_scene_indices
+        scenes = self.authority["feature_manifest_json"]["formalEvidence"]["runtimeEventAuthority"]["scenes"]
+        return sorted(scene["sceneId"] for scene in scenes if scene["sceneIndex"] in indices)
+
     def answered_question_ids(self, _conn, *, runtime_session_id):
         return [
             str(item["question_id"])
@@ -564,6 +570,7 @@ class OpenMaicRuntimeEventBridgeTest(unittest.TestCase):
         self.assertEqual(resumed["releaseId"], "release-1")
         self.assertEqual(resumed["sceneEnteredCount"], 1)
         self.assertEqual(resumed["actionCompletedSceneCount"], 0)
+        self.assertEqual(resumed["completedActionSceneIds"], [])
         self.assertFalse(resumed["questionsComplete"])
         self.assertFalse(resumed["completionReady"])
         self.assertEqual(
@@ -814,7 +821,7 @@ class OpenMaicRuntimeEventBridgeTest(unittest.TestCase):
                 )
             )
 
-        self.assertEqual(raised.exception.code, "student_learning_grade_not_open")
+        self.assertEqual(raised.exception.code, "student_learning_release_not_ready")
         self.assertEqual(self.learning.answer_calls, 0)
         self.assertEqual(self.learning.complete_calls, 0)
         self.assertEqual(self.repository.events, [])
@@ -949,6 +956,7 @@ class OpenMaicRuntimeEventBridgeTest(unittest.TestCase):
         )
         self.assertEqual(ready["sceneEnteredCount"], 10)
         self.assertEqual(ready["actionCompletedSceneCount"], 10)
+        self.assertEqual(ready["completedActionSceneIds"], [f"scene-{index}" for index in range(10)])
         self.assertTrue(ready["questionsComplete"])
         self.assertTrue(ready["completionReady"])
         completion = _event(

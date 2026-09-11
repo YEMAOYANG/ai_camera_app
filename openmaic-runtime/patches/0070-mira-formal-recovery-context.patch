@@ -1,0 +1,215 @@
+diff --git a/lib/server/mira-paid-budget.ts b/lib/server/mira-paid-budget.ts
+--- a/lib/server/mira-paid-budget.ts
++++ b/lib/server/mira-paid-budget.ts
+@@ -93,9 +93,15 @@
+     body: JSON.stringify(body),
+     signal: AbortSignal.timeout(15000),
+   });
+-  const result = await response.json();
+-  if (!response.ok || !result.ok || !result.budget)
+-    throw new Error(`MIRA_PAID_BUDGET_${operation.toUpperCase()}_REJECTED`);
++  const result = await response.json().catch(() => null);
++  if (!response.ok || !result?.ok || !result.budget) {
++    // Keep only the backend's fixed public code. Never copy a response body,
++    // message, request measurement or credential into the classroom error.
++    const reason = typeof result?.error === 'string' && /^learning_budget_[a-z_]{1,48}$/.test(result.error)
++      ? `_${result.error.slice('learning_budget_'.length).toUpperCase()}` : '';
++    const code = `MIRA_PAID_BUDGET_${operation.toUpperCase()}_REJECTED${reason}`;
++    throw Object.assign(new Error(code), { code });
++  }
+   return result.budget;
+ }
+ export async function hasRequiredTeachingBudget(): Promise<boolean> {
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -19,6 +19,7 @@
+ import { buildAgent } from '@/lib/agent/runtime/build-agent';
+ import { createCallLlmStreamFn } from '@/lib/agent/runtime/stream-fn';
+ import { MIRA_FORMAL_AGENT_BUDGET, reserveMiraFormalAgentDispatch } from '@/lib/server/mira-formal-agent-budget';
++import { formalSearchEventCounts, projectFormalErrorContext } from '@/lib/server/mira-formal-context';
+ import { HOST_AGENT_LIFECYCLE as LIFECYCLE } from '@/lib/agent-runtime/lifecycle';
+ import { createLogger } from '@/lib/logger';
+ import { parseCourseRefs, type CourseRef } from '@/lib/workbench/course-refs';
+@@ -150,11 +151,17 @@
+   sessionId: string,
+ ): Promise<number> {
+   let cursor = 0;
+-  let count = 0;
++  let attempts = 0;
++  let receipts = 0;
+   for (;;) {
+     const events = await store.readEventsAfter(sessionId, cursor, 500);
+-    count += events.filter((event) => event.type === MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE).length;
+-    if (events.length < 500) return count;
++    const counts = formalSearchEventCounts(events, MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE);
++    attempts += counts.attempts;
++    receipts += counts.receipts;
++    // Every current invocation emits a start, including failures. Preserve a
++    // receipt-count floor for historical stores that omitted start telemetry;
++    // never count a successful invocation twice.
++    if (events.length < 500) return Math.max(attempts, receipts);
+     cursor = events[events.length - 1]!.id;
+   }
+ }
+@@ -1694,6 +1701,9 @@
+         voice: voiceCloneToolsPrompt(voiceRegistrationEnabled),
+       }),
+       model: driver.piModel,
++      ...(formalProfessionalSession ? {
++        transformContext: async (messages: AgentMessage[]) => projectFormalErrorContext(messages),
++      } : {}),
+       tools,
+       allowedToolNames: new Set([
+         ...(formalProfessionalSession ? [] : MINIMAL_AGENT_TOOL_NAMES),
+diff --git a/lib/server/mira-formal-context.ts b/lib/server/mira-formal-context.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-context.ts
+@@ -0,0 +1,54 @@
++import { createHash } from 'node:crypto';
++import type { AgentMessage } from '@earendil-works/pi-agent-core';
++
++/** Failed and interrupted searches consumed the same bounded attempt budget. */
++export function formalSearchEventCounts(
++  events: readonly { type: string; data: unknown }[],
++  receiptType: string,
++) {
++  let attempts = 0;
++  let receipts = 0;
++  for (const event of events) {
++    if (event.type === receiptType) receipts++;
++    if (
++      event.type === 'tool_execution_start' &&
++      event.data &&
++      typeof event.data === 'object' &&
++      'toolName' in event.data &&
++      event.data.toolName === 'web_search'
++    )
++      attempts++;
++  }
++  return { attempts, receipts };
++}
++
++/** Preserve failed evidence in storage while omitting an upstream error page
++ * from the model request. This is deterministic projection, not a paid summary;
++ * successful research, skills, course content and user messages remain intact.
++ */
++export function projectFormalErrorContext(messages: AgentMessage[]): AgentMessage[] {
++  return messages.map((message) => {
++    if (message.role !== 'toolResult' || message.isError !== true) return message;
++    let changed = false;
++    const content = message.content.map((part) => {
++      if (part.type !== 'text' || Buffer.byteLength(part.text) <= 2048) return part;
++      const htmlStart = part.text.search(/<!doctype\s+html\b|<html(?:\s|>)/i);
++      if (htmlStart < 0) return part;
++      changed = true;
++      const prefix = part.text.slice(0, htmlStart);
++      const status = prefix.match(/(?:status[=: ]+|error\s*\(|HTTP\s+)([45]\d{2})/i)?.[1];
++      return {
++        ...part,
++        text: [
++          'The tool failed. Its upstream HTML error page is omitted from this model request.',
++          status ? `Original upstream HTTP status: ${status}.` : '',
++          `Original UTF-8 bytes: ${Buffer.byteLength(part.text)}. SHA256: ${createHash('sha256').update(part.text).digest('hex')}.`,
++          'The complete failed response remains in the durable session record. This is not a successful source or research result.',
++        ]
++          .filter(Boolean)
++          .join('\n'),
++      };
++    });
++    return changed ? { ...message, content } : message;
++  });
++}
+diff --git a/tests/server/mira-formal-context.test.ts b/tests/server/mira-formal-context.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-context.test.ts
+@@ -0,0 +1,87 @@
++import { afterEach, expect, it, vi } from 'vitest';
++import type { AgentMessage } from '@earendil-works/pi-agent-core';
++import {
++  formalSearchEventCounts,
++  projectFormalErrorContext,
++} from '@/lib/server/mira-formal-context';
++import { hasRequiredTeachingBudget, withPaidBudget } from '@/lib/server/mira-paid-budget';
++import { sanitizedWebSearchToolError } from '@/lib/web-search/provider-error';
++
++afterEach(() => {
++  vi.unstubAllGlobals();
++  vi.unstubAllEnvs();
++});
++
++it('projects only failed HTML tool output and preserves the durable source unchanged', () => {
++  const html = `Brave Search error (429): <!doctype html><html>${'error page '.repeat(1000)}</html>`;
++  const failed = {
++    role: 'toolResult',
++    toolCallId: 'search-1',
++    toolName: 'web_search',
++    content: [{ type: 'text', text: html }],
++    isError: true,
++    timestamp: 1,
++  } as AgentMessage;
++  const success = { ...failed, isError: false } as AgentMessage;
++  const user = { role: 'user', content: html, timestamp: 1 } as AgentMessage;
++  const history = [failed, success, user];
++  const source = JSON.stringify(history);
++  const projected = projectFormalErrorContext(history);
++  expect(JSON.stringify(history)).toBe(source);
++  expect(projected[1]).toBe(success);
++  expect(projected[2]).toBe(user);
++  expect(JSON.stringify(projected[0])).toContain('HTTP status: 429');
++  expect(JSON.stringify(projected[0])).toContain('SHA256:');
++  expect(JSON.stringify(projected[0])).not.toContain('<html>');
++  expect(JSON.stringify(projected[0]).length).toBeLessThan(800);
++});
++
++it('counts failed and interrupted searches as attempts without doubling success receipts', () => {
++  const events = [
++    { type: 'tool_execution_start', data: { toolName: 'web_search' } },
++    { type: 'tool_execution_end', data: { toolName: 'web_search', isError: true } },
++    { type: 'tool_execution_start', data: { toolName: 'web_search' } },
++    { type: 'tool_execution_start', data: { toolName: 'read' } },
++    { type: 'tool_execution_start', data: { toolName: 'web_search' } },
++    { type: 'research_receipt', data: {} },
++  ];
++  const counts = formalSearchEventCounts(events, 'research_receipt');
++  expect(counts).toEqual({ attempts: 3, receipts: 1 });
++  expect(Math.max(counts.attempts, counts.receipts)).toBe(3);
++});
++
++it('preserves a fixed budget reason through tool sanitization without copying backend details', async () => {
++  vi.stubEnv('MIRA_BACKEND_INTERNAL_URL', 'http://fake-backend.invalid');
++  vi.stubEnv('MIRA_INTERNAL_API_TOKEN', 'test-only');
++  vi.stubGlobal(
++    'fetch',
++    vi.fn(async () =>
++      Response.json(
++        {
++          ok: false,
++          error: 'learning_budget_purpose_day_limit',
++          message: 'sensitive body must never escape',
++        },
++        { status: 429 },
++      ),
++    ),
++  );
++  const work = withPaidBudget(
++    {
++      schemaVersion: 'mira.learning.paid-budget-binding.v1',
++      required: true,
++      authorizationId: 'a'.repeat(64),
++    },
++    'test-only',
++    hasRequiredTeachingBudget,
++  );
++  try {
++    await work;
++    throw new Error('expected admission rejection');
++  } catch (error) {
++    expect(sanitizedWebSearchToolError(error).message).toBe(
++      'MIRA_PAID_BUDGET_CONTEXT_REJECTED_PURPOSE_DAY_LIMIT',
++    );
++  }
++  expect(fetch).toHaveBeenCalledTimes(1);
++});

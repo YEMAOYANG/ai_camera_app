@@ -88,6 +88,24 @@ class OpenMaicRuntimeRepository:
         plan: Mapping[str, Any],
         complete_item_count: int,
     ) -> bool:
+        from services.learning_curriculum_preparation_contract import (
+            canonical_preparation_target_for, formal_target_course_count,
+            preparation_authority_grade,
+        )
+
+        try:
+            target = cls.decode_json(build.get("target_spec_json"), {})
+            current_target = canonical_preparation_target_for(target)
+            grade = preparation_authority_grade(target)
+            if (
+                not compatible_preparation_target(target, current_target)
+                or preparation_authority_grade(item) != grade
+                or preparation_authority_grade(plan) != grade
+            ):
+                return False
+            course_count = formal_target_course_count(target)
+        except (KeyError, TypeError, ValueError):
+            return False
         candidate_count = int(plan.get("content_candidate_count") or 0)
         canary_passed = plan.get("content_canary_passed_at") is not None
         canary_candidate_count = int(
@@ -99,12 +117,12 @@ class OpenMaicRuntimeRepository:
             and str(release.get("quality_status") or "") == "building"
             and release.get("activated_at") is None
             and release.get("retired_at") is None
-            and 0 <= published_count <= candidate_count <= 30
+            and 0 <= published_count <= candidate_count <= course_count
             and int(release.get("ready_item_count") or 0) == published_count
             and str(build.get("execution_mode") or "") == "content_only"
             and str(build.get("stage_ceiling") or "") == "content_ready"
             and str(build.get("status") or "") in {"queued", "running"}
-            and int(build.get("total_item_count") or 0) == 30
+            and int(build.get("total_item_count") or 0) == course_count
             and int(build.get("ready_item_count") or 0) == 0
             and int(build.get("failed_item_count") or 0) == 0
             and build.get("error_code") is None
@@ -126,7 +144,7 @@ class OpenMaicRuntimeRepository:
                 "validating",
                 "publishing",
             }
-            and int(plan.get("content_target_count") or 0) == 30
+            and int(plan.get("content_target_count") or 0) == course_count
             and 1 <= candidate_count
             and (int(plan.get("content_failed_count") or 0) == 0 or plan.get("library_target_fingerprint") is not None)
             and int(plan.get("content_canary_target_count") or 0) == 3
@@ -141,7 +159,7 @@ class OpenMaicRuntimeRepository:
                 )
             )
             and (
-                (candidate_count == 30)
+                (candidate_count == course_count)
                 == (plan.get("content_generation_completed_at") is not None)
             )
             and int(plan.get("ready_course_count") or 0) == 0
@@ -955,7 +973,7 @@ class OpenMaicRuntimeRepository:
 
         import re
         from services.learning_curriculum_preparation_contract import (
-            build_preparation_target,
+            canonical_preparation_target_for,
             preparation_target_fingerprint,
         )
 
@@ -1141,8 +1159,8 @@ class OpenMaicRuntimeRepository:
         ):
             raise ValueError("candidate runtime handoff authority is not current")
         target_spec = self.decode_json(build.get("target_spec_json"), {})
-        current_target = build_preparation_target("primary_1")
         try:
+            current_target = canonical_preparation_target_for(target_spec)
             canonical_fingerprint = preparation_target_fingerprint(target_spec)
             current_fingerprint = preparation_target_fingerprint(current_target)
         except (KeyError, TypeError, ValueError):
@@ -1630,7 +1648,8 @@ class OpenMaicRuntimeRepository:
             (authority["release_id"],),
         ).fetchone()
         from services.learning_curriculum_preparation_contract import (
-            build_preparation_target,
+            canonical_preparation_target_for,
+            preparation_authority_grade,
             preparation_target_fingerprint,
         )
         from services.lesson_package_validator import (
@@ -1649,10 +1668,11 @@ class OpenMaicRuntimeRepository:
             get_formal_runtime_teacher_contract,
         )
 
-        current_target = build_preparation_target("primary_1")
         persisted_target = self.decode_json(
             authority.get("plan_target_spec_json"), {}
         )
+        current_target = canonical_preparation_target_for(persisted_target)
+        expected_grade = preparation_authority_grade(persisted_target)
         current_target_matches = bool(
             compatible_preparation_target(persisted_target, current_target)
             and preparation_target_fingerprint(persisted_target) == target_fingerprint
@@ -1831,6 +1851,17 @@ class OpenMaicRuntimeRepository:
                 )
             ),
         }
+        if isinstance(brief.get("difficultyPolicy"), Mapping):
+            from content.formal_difficulty_policy import formal_difficulty_policy
+            brief_course = brief["course"]
+            difficulty = formal_difficulty_policy(
+                str(brief_course.get("gradeCode")), str(brief_course.get("subject")),
+                str(brief_course.get("skillId")), str(brief_course.get("difficultyCode")),
+            )
+            if difficulty != brief["difficultyPolicy"]:
+                raise ValueError("candidate completion difficulty authority mismatch")
+            expected_generation_contract["difficultyPolicy"] = difficulty
+            expected_generation_contract["course"]["difficultyCode"] = difficulty["difficultyCode"]
         expected_generation_contract.update(
             grade_boundary_fields(locked_course, policy_from_target(persisted_target))
         )
@@ -1865,6 +1896,7 @@ class OpenMaicRuntimeRepository:
                 "ready_item_count": authority.get("release_ready_item_count"),
             },
             build={
+                "target_spec_json": authority.get("plan_target_spec_json"),
                 "execution_mode": authority.get("execution_mode"),
                 "stage_ceiling": authority.get("stage_ceiling"),
                 "status": authority.get("build_status"),
@@ -1882,6 +1914,7 @@ class OpenMaicRuntimeRepository:
                 ),
             },
             item={
+                "grade_code": authority.get("item_grade_code"),
                 "subject": authority.get("item_subject"),
                 "skill_id": authority.get("skill_id"),
                 "variant_ordinal": authority.get("variant_ordinal"),
@@ -1897,6 +1930,8 @@ class OpenMaicRuntimeRepository:
                 ),
             },
             plan={
+                "grade_code": authority.get("plan_grade_code"),
+                "target_spec_json": authority.get("plan_target_spec_json"),
                 "status": authority.get("plan_status"),
                 "stage": authority.get("plan_stage"),
                 "content_target_count": authority.get("content_target_count"),
@@ -1953,7 +1988,7 @@ class OpenMaicRuntimeRepository:
             == str(authority.get("candidate_grade_code") or "")
             == str(authority.get("plan_grade_code") or "")
             == str(authority.get("locked_course_grade_code") or "")
-            == "primary_1"
+            == expected_grade
             and str(authority.get("item_curriculum_version") or "")
             == str(authority.get("build_curriculum_version") or "")
             == str(authority.get("release_curriculum_version") or "")
@@ -4715,6 +4750,8 @@ class OpenMaicRuntimeRepository:
               runtime.candidate_target_fingerprint,
               runtime.candidate_binding_contract_version,
               session.course_id, session.course_version,
+              session.status AS learning_session_status,
+              session.completed_at AS learning_session_completed_at,
               session.lesson_package_id, session.lesson_package_version,
               session.lesson_package_content_hash,
               formal_binding.learning_session_id
@@ -4954,6 +4991,8 @@ class OpenMaicRuntimeRepository:
               runtime.candidate_target_fingerprint,
               runtime.candidate_binding_contract_version,
               session.course_id, session.course_version,
+              session.status AS learning_session_status,
+              session.completed_at AS learning_session_completed_at,
               session.lesson_package_id, session.lesson_package_version,
               session.lesson_package_content_hash,
               formal_binding.learning_session_id

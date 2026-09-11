@@ -107,6 +107,7 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
             curriculum_version=target["curriculumVersion"],
             content_manifest_version=target["schemaVersion"],
             course_targets=target["courseTargets"],
+            grade_code=target["gradeCode"],
         )
         rows = [
             {

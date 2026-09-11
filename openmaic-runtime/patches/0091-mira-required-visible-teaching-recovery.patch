@@ -1,0 +1,406 @@
+diff --git a/app/api/chat/pi/route.ts b/app/api/chat/pi/route.ts
+--- a/app/api/chat/pi/route.ts
++++ b/app/api/chat/pi/route.ts
+@@ -268,6 +268,7 @@
+ 
+         await runPiDirectorLoop({
+           body,
++          requiredVisibleTeaching: Boolean(teaching),
+           agentConfigs,
+           send,
+           languageModel,
+diff --git a/lib/chat/pi/director-loop.ts b/lib/chat/pi/director-loop.ts
+--- a/lib/chat/pi/director-loop.ts
++++ b/lib/chat/pi/director-loop.ts
+@@ -38,6 +38,8 @@
+   maxAgentTurns: number;
+   maxActionsPerAgent: number;
+   enableWhiteboardTools: boolean;
++  /** Set by the authenticated required-teaching route, never from browser config. */
++  requiredVisibleTeaching?: boolean;
+   childRuntimeMode?: ChildRuntimeMode;
+   enableNativeChildSpotlight?: boolean;
+   nativeWebSearchConfig?: NativeWebSearchConfig;
+@@ -81,7 +83,7 @@
+     const agent = opts.agentConfigs.find((candidate) => candidate.id === summary.agentId);
+     return (
+       (agent?.role === 'teacher' || agent?.role === 'assistant') &&
+-      (summary.contentPreview.trim().length > 0 || summary.actionCount > 0)
++      (summary.contentPreview.trim().length > 0 || (!opts.requiredVisibleTeaching && summary.actionCount > 0))
+     );
+   };
+   const hasTeachingSubstantiveTurn = (): boolean =>
+@@ -134,7 +136,8 @@
+       languageModel: opts.languageModel,
+       onAgentDone: (summary) => {
+         totalAgents += 1;
+-        if (summary.contentPreview || summary.actionCount > 0) agentHadContent = true;
++        if (opts.requiredVisibleTeaching ? isTeachingSubstantiveTurn(summary) : summary.contentPreview || summary.actionCount > 0)
++          agentHadContent = true;
+         piAgentResponses.push(summary);
+       },
+       onActionDone: (record) => {
+@@ -155,6 +158,7 @@
+       getWhiteboardLedger: () => piWhiteboardLedger,
+       maxActionsPerAgent: opts.maxActionsPerAgent,
+       enableWhiteboardTools: opts.enableWhiteboardTools,
++      requiredVisibleTeaching: opts.requiredVisibleTeaching === true,
+       childRuntimeMode: opts.childRuntimeMode ?? 'legacy',
+       enableNativeChildSpotlight: opts.enableNativeChildSpotlight === true,
+       nativeWebSearchConfig: opts.nativeWebSearchConfig,
+@@ -186,7 +190,7 @@
+     }),
+     buildCloseSessionTool({
+       closeSession,
+-      canCloseSession: hasVisibleAgentTurn,
++      canCloseSession: opts.requiredVisibleTeaching ? hasTeachingSubstantiveTurn : hasVisibleAgentTurn,
+       isUserCued: () => userCued,
+     }),
+     buildCueUserTool({
+@@ -200,7 +204,8 @@
+ 
+   const director = buildAgent({
+     streamFn,
+-    systemPrompt: buildDirectorPrompt(opts.body, opts.agentConfigs, opts.maxAgentTurns),
++    systemPrompt: buildDirectorPrompt(opts.body, opts.agentConfigs, opts.maxAgentTurns)
++      + (opts.requiredVisibleTeaching ? '\nRequired teaching: spotlight/highlighting or other actions alone do not deliver the teacher explanation. Before cue_user or close_session, a teacher must speak visible explanatory text in this turn. If call_agent reports no_visible_teaching_speech, ask that same teacher once more to give the missing short explanation in plain spoken words; do not claim a demonstration happened or invent learner participation. If that repair also lacks speech, stop and preserve the failure.' : ''),
+     tools,
+     allowedToolNames: new Set(tools.map((tool) => tool.name)),
+     history: toHistoryMessages(opts.body.messages, null),
+@@ -226,7 +231,11 @@
+         resultPreview,
+         details: context.result.details,
+       });
+-      const terminate = sessionClosed || userCued || directorToolCalls >= maxDirectorToolCalls;
++      const speechRepairExhausted = opts.requiredVisibleTeaching === true
++        && context.toolCall.name === 'call_agent'
++        && (context.result.details as { reason?: string; speechRepairExhausted?: boolean } | undefined)?.reason === 'no_visible_teaching_speech'
++        && (context.result.details as { speechRepairExhausted?: boolean }).speechRepairExhausted === true;
++      const terminate = sessionClosed || userCued || speechRepairExhausted || directorToolCalls >= maxDirectorToolCalls;
+       if (!terminate && !evidenceError) return undefined;
+       return {
+         ...(terminate ? { terminate: true } : {}),
+@@ -244,7 +253,7 @@
+ 
+   if (opts.signal.aborted) return;
+ 
+-  if (!sessionClosed && !userCued && hasAgentContent()) {
++  if (!sessionClosed && !userCued && (opts.requiredVisibleTeaching ? hasTeachingSubstantiveTurn() : hasAgentContent())) {
+     await cueUser({ fromAgentId: piAgentResponses.at(-1)?.agentId });
+   }
+ 
+diff --git a/lib/chat/pi/tools/call-agent.ts b/lib/chat/pi/tools/call-agent.ts
+--- a/lib/chat/pi/tools/call-agent.ts
++++ b/lib/chat/pi/tools/call-agent.ts
+@@ -543,6 +543,8 @@
+   getWhiteboardLedger: () => WhiteboardActionRecord[];
+   maxActionsPerAgent: number;
+   enableWhiteboardTools: boolean;
++  /** Only the trusted required-teaching route may require visible speech. */
++  requiredVisibleTeaching?: boolean;
+   childRuntimeMode?: ChildRuntimeMode;
+   enableNativeChildSpotlight?: boolean;
+   nativeWebSearchConfig?: NativeWebSearchConfig;
+@@ -804,7 +806,8 @@
+         }
+ 
+         const finalText = nativeResult.visibleOutput.trim();
+-        const isCompleted = nativeResult.status === 'completed';
++        const missingRequiredSpeech = opts.requiredVisibleTeaching === true && !finalText;
++        const isCompleted = nativeResult.status === 'completed' && !missingRequiredSpeech;
+         consecutiveEmptyTurns = isCompleted ? 0 : consecutiveEmptyTurns + 1;
+         await opts.send({ type: 'agent_end', data: { messageId, agentId: agent.id } });
+         opts.onAgentDone({
+@@ -820,7 +823,9 @@
+           content: [
+             {
+               type: 'text',
+-              text: `${agent.name}: ${finalText || '(no visible response)'}`,
++              text: missingRequiredSpeech
++                ? `No visible teacher explanation was delivered; actions alone are insufficient. ${consecutiveEmptyTurns < MAX_CONSECUTIVE_EMPTY_TURNS ? 'Ask this same teacher once to give the missing short explanation in spoken words before inviting the learner.' : 'The speech repair also failed. Stop this turn without cue_user or close_session.'}`
++                : `${agent.name}: ${finalText || '(no visible response)'}`,
+             },
+           ],
+           details: {
+@@ -830,6 +835,7 @@
+             runtimeMode: childRuntimeMode,
+             availableToolNames,
+             nativeChildRun: nativeResult,
++            ...(missingRequiredSpeech ? { reason: 'no_visible_teaching_speech', speechRepairExhausted: consecutiveEmptyTurns >= MAX_CONSECUTIVE_EMPTY_TURNS } : {}),
+             ...(sceneEvidence ? { sceneEvidence: sceneEvidence.metadata } : {}),
+           },
+           ...(isCompleted ? {} : { isError: true }),
+@@ -947,7 +953,8 @@
+       if (finalText && !emittedText) {
+         await opts.send({ type: 'text_delta', data: { content: finalText, messageId } });
+       }
+-      const isEmptyTurn = childErrored || (!hasVisibleText && actionCount === 0);
++      const missingRequiredSpeech = opts.requiredVisibleTeaching === true && !hasVisibleText;
++      const isEmptyTurn = childErrored || missingRequiredSpeech || (!hasVisibleText && actionCount === 0);
+       consecutiveEmptyTurns = isEmptyTurn ? consecutiveEmptyTurns + 1 : 0;
+       await opts.send({ type: 'agent_end', data: { messageId, agentId: agent.id } });
+       opts.onAgentDone({
+@@ -963,7 +970,9 @@
+         content: [
+           {
+             type: 'text',
+-            text: `${agent.name}: ${finalText || '(no visible response)'}`,
++            text: missingRequiredSpeech
++              ? `No visible teacher explanation was delivered; actions alone are insufficient. ${consecutiveEmptyTurns < MAX_CONSECUTIVE_EMPTY_TURNS ? 'Ask this same teacher once to give the missing short explanation in spoken words before inviting the learner.' : 'The speech repair also failed. Stop this turn without cue_user or close_session.'}`
++              : `${agent.name}: ${finalText || '(no visible response)'}`,
+           },
+         ],
+         details: {
+@@ -971,8 +980,10 @@
+           agentName: agent.name,
+           text: finalText,
+           actionWarnings,
++          ...(missingRequiredSpeech ? { reason: 'no_visible_teaching_speech', speechRepairExhausted: consecutiveEmptyTurns >= MAX_CONSECUTIVE_EMPTY_TURNS } : {}),
+           ...(sceneEvidence ? { sceneEvidence: sceneEvidence.metadata } : {}),
+         },
++        ...(missingRequiredSpeech ? { isError: true } : {}),
+       };
+     },
+   };
+diff --git a/lib/server/mira-paid-budget.ts b/lib/server/mira-paid-budget.ts
+--- a/lib/server/mira-paid-budget.ts
++++ b/lib/server/mira-paid-budget.ts
+@@ -120,6 +120,14 @@
+   const result = await backend('context', { authorizationId: context.binding.authorizationId });
+   return result.purpose === 'required_teaching' && result.unsettledReservationCount === 0
+     && result.latestProviderDispatchAt === null;
++}
++/** Retrying a definitively finished empty teaching turn never erases its settled usage. */
++export async function hasSettledRequiredTeachingBudget(): Promise<boolean> {
++  const context = paidBudgetContext.getStore();
++  if (!context) return false;
++  const result = await backend('context', { authorizationId: context.binding.authorizationId });
++  return result.purpose === 'required_teaching' && result.unsettledReservationCount === 0
++    && typeof result.latestProviderDispatchAt === 'number';
+ }
+ function authorizationPrices(context: Context): Promise<Record<string, Price>> {
+   const { authorizationId } = context.binding;
+diff --git a/lib/server/mira-teaching-conversation.ts b/lib/server/mira-teaching-conversation.ts
+--- a/lib/server/mira-teaching-conversation.ts
++++ b/lib/server/mira-teaching-conversation.ts
+@@ -3,7 +3,7 @@
+ import { mkdir, open, readFile, readdir, rename } from 'node:fs/promises';
+ import { join, resolve } from 'node:path';
+ import { getServerPersistenceProvider } from '@/lib/persistence/server-provider';
+-import { paidBudgetContext, hasRequiredTeachingBudget, hasUnsentRequiredTeachingBudget } from './mira-paid-budget';
++import { paidBudgetContext, hasRequiredTeachingBudget, hasUnsentRequiredTeachingBudget, hasSettledRequiredTeachingBudget } from './mira-paid-budget';
+ import { getActionsForRole } from '@/lib/orchestration/registry/types';
+ import type { StatelessChatRequest, StatelessEvent, DirectorState } from '@/lib/types/chat';
+ 
+@@ -39,6 +39,8 @@
+   updatedAt: number;
+   preflightRecovery?: { schemaVersion: 'mira.openmaic.teaching-preflight-recovery.v1';
+     reason: 'missing_teacher_role_actions'; failedRevision: number; failedRecordSha256: string };
++  emptySpeechRecoveries?: Array<{ reason: 'no_visible_teaching_speech'; failedRevision: number;
++    failedRecordSha256: string }>;
+ }
+ type Deps = { root?: string; withLock?: <T>(key: string, work: () => Promise<T>) => Promise<T> };
+ const sha = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+@@ -197,6 +199,34 @@
+     reason: 'missing_teacher_role_actions' as const, failedRevision: record.revision,
+     failedRecordSha256: textSha(content) };
+ }
++function isFinishedEmptySpeechFailure(record: TeachingConversation, c: TeachingContext): boolean {
++  const events = record.turns[0]?.events;
++  const done = events?.findLast(event => event.type === 'done');
++  return c.replyId === undefined && c.expectedRevision === record.revision
++    && record.state === 'failed' && record.turns.length === 1 && record.turns[0].replyId === null
++    && record.utterances.length === 0 && record.audioReceipts.length === 0 && record.replyIds.length === 0
++    && record.messages.every(message => message.role === 'assistant'
++      && message.parts.every(part => part.type === 'text' && !part.text.trim()))
++    && !record.activeSegment?.trim()
++    && !!done && done.type === 'done' && typeof done.data.cueUserReceived === 'boolean'
++    && done.data.sessionClosed === false
++    && events.every(event => event.type !== 'text_delta' || !event.data.content.trim())
++    && events.at(-1)?.type === 'error'
++    && events.filter(event => event.type === 'error').every(event =>
++      event.type === 'error' && event.data.message === 'MIRA_TEACHING_END_INCOMPLETE');
++}
++async function archiveEmptySpeechFailure(record: TeachingConversation, deps: Deps) {
++  const content = JSON.stringify(record);
++  const path = join(directory(record.id, deps), `failed-empty-speech-revision-${record.revision}.json`);
++  try {
++    const handle = await open(path, 'wx', 0o600);
++    try { await handle.writeFile(content); await handle.sync(); } finally { await handle.close(); }
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code !== 'EEXIST' || await readFile(path, 'utf8') !== content) throw error;
++  }
++  return { reason: 'no_visible_teaching_speech' as const, failedRevision: record.revision,
++    failedRecordSha256: textSha(content) };
++}
+ /** Only invoke after internal authentication plus required_teaching authorization. */
+ export async function claimTeachingTurn(
+   canonical: StatelessChatRequest,
+@@ -210,6 +240,17 @@
+       let record = await load(c.conversationId, deps);
+       if (record) {
+         checkIdentity(record, c);
++        if (isFinishedEmptySpeechFailure(record, c) && await hasSettledRequiredTeachingBudget()) {
++          const recovery = await archiveEmptySpeechFailure(record, deps);
++          // The provider finished, but delivered no spoken teaching. Keep the failed attempt
++          // and paid history; a new revision retries this same initial classroom action.
++          record = { ...record, state: 'running', revision: record.revision + 1,
++            messages: [], turns: [{ replyId: null, events: [] }],
++            activeMessageId: undefined, activeSegment: undefined, directorState: undefined,
++            emptySpeechRecoveries: [...(record.emptySpeechRecoveries ?? []), recovery] };
++          await save(record, deps);
++          return { record, replay: undefined };
++        }
+         if (isUnsentRoleConfigFailure(record, c) && await hasUnsentRequiredTeachingBudget()) {
+           // Preserve the complete failed record; retain conversation identity and all usage history.
+           const preflightRecovery = await archiveUnsentRoleConfigFailure(record, deps);
+@@ -317,6 +358,7 @@
+     fail('MIRA_TEACHING_TURN_RUNNING');
+   if (record.state === 'failed') {
+     if (isUnsentRoleConfigFailure(record, c) && await hasUnsentRequiredTeachingBudget()) return null;
++    if (isFinishedEmptySpeechFailure(record, c) && await hasSettledRequiredTeachingBudget()) return null;
+     fail('MIRA_TEACHING_TURN_FAILED');
+   }
+   return { record, events: previous.events };
+diff --git a/tests/lib/chat/pi/call-agent-json-actions.test.ts b/tests/lib/chat/pi/call-agent-json-actions.test.ts
+--- a/tests/lib/chat/pi/call-agent-json-actions.test.ts
++++ b/tests/lib/chat/pi/call-agent-json-actions.test.ts
+@@ -188,6 +188,23 @@
+     mocks.buildAgent.mockReset();
+   });
+ 
++  it('required teaching rejects action-only speech and permits only one repair while keeping normal behavior', async () => {
++    mockChildWithJsonOutput(JSON.stringify([{ type: 'action', name: 'wb_open', params: {} }]));
++    const { buildCallAgentTool } = await import('@/lib/chat/pi/tools/call-agent');
++    const events: StatelessEvent[] = [];
++    const tool = buildCallAgentTool({ ...baseToolOpts(events), requiredVisibleTeaching: true });
++    const first = await tool.execute('first', { agentId: teacher.id, instruction: 'Explain.' });
++    expect(first).toMatchObject({ isError: true, details: { reason: 'no_visible_teaching_speech', speechRepairExhausted: false } });
++    const repair = await tool.execute('repair', { agentId: teacher.id, instruction: 'Give the missing spoken explanation.' });
++    expect(repair).toMatchObject({ isError: true, details: { reason: 'no_visible_teaching_speech', speechRepairExhausted: true } });
++    const calls = mocks.buildAgent.mock.calls.length;
++    await tool.execute('third', { agentId: teacher.id, instruction: 'Again.' });
++    expect(mocks.buildAgent).toHaveBeenCalledTimes(calls);
++    expect(events.some(e => e.type === 'text_delta')).toBe(false);
++    const normal = await buildCallAgentTool(baseToolOpts([])).execute('normal', { agentId: teacher.id, instruction: 'Highlight.' });
++    expect(normal.isError).not.toBe(true);
++  });
++
+   it('parses child JSON actions, executes all action events, and does not leak raw JSON speech', async () => {
+     const jsonOutput = JSON.stringify([
+       { type: 'action', name: 'wb_open', params: {} },
+diff --git a/tests/lib/chat/pi/route-cue-user.test.ts b/tests/lib/chat/pi/route-cue-user.test.ts
+--- a/tests/lib/chat/pi/route-cue-user.test.ts
++++ b/tests/lib/chat/pi/route-cue-user.test.ts
+@@ -446,6 +446,23 @@
+ }
+ 
+ describe('POST /api/chat/pi cue_user', () => {
++  it.each([true, false])('required visible teaching=%s blocks action-only cue and fallback without changing ordinary Pi', async (requiredVisibleTeaching) => {
++    mockDirectorWithWhiteboardTeacherTurn(JSON.stringify([{ type: 'action', name: 'wb_open', params: {} }]));
++    const { runPiDirectorLoop } = await import('@/lib/chat/pi/director-loop');
++    const body = makeBody();
++    body.config.agentConfigs[0].allowedActions = ['wb_open'];
++    const events: Array<{ type: string; data: unknown }> = [];
++    const signal = new AbortController().signal;
++    await runPiDirectorLoop({ body: body as never, agentConfigs: body.config.agentConfigs as never,
++      send: async event => { events.push(event); }, languageModel: {} as never,
++      thinkingConfig: { mode: 'disabled', enabled: false }, signal, abortSignal: signal,
++      maxAgentTurns: 6, maxActionsPerAgent: 8, enableWhiteboardTools: true, requiredVisibleTeaching });
++    expect(events.some(event => event.type === 'cue_user')).toBe(!requiredVisibleTeaching);
++    expect(events.find(event => event.type === 'done')).toMatchObject({
++      data: { agentHadContent: !requiredVisibleTeaching, cueUserReceived: !requiredVisibleTeaching, sessionClosed: false },
++    });
++  });
++
+   beforeEach(() => {
+     originalPiChatFlag = process.env[PI_CHAT_FLAG];
+     process.env[PI_CHAT_FLAG] = 'true';
+diff --git a/tests/server/mira-teaching-preflight.test.ts b/tests/server/mira-teaching-preflight.test.ts
+--- a/tests/server/mira-teaching-preflight.test.ts
++++ b/tests/server/mira-teaching-preflight.test.ts
+@@ -4,11 +4,12 @@
+ import { tmpdir } from 'node:os';
+ import type { StatelessChatRequest } from '@/lib/types/chat';
+ 
+-const budget = vi.hoisted(() => ({ unsent: true }));
++const budget = vi.hoisted(() => ({ unsent: true, settled: true }));
+ vi.mock('@/lib/server/mira-paid-budget', () => ({
+   paidBudgetContext: { getStore: () => undefined },
+   hasRequiredTeachingBudget: async () => true,
+   hasUnsentRequiredTeachingBudget: async () => budget.unsent,
++  hasSettledRequiredTeachingBudget: async () => budget.settled,
+ }));
+ vi.mock('@/lib/persistence/server-provider', () => ({ getServerPersistenceProvider: vi.fn() }));
+ import { claimTeachingTurn, normalizeRequiredTeachingAgents, replayTeachingTurn, teachingConversationId,
+@@ -16,7 +17,7 @@
+ import { getActionsForRole } from '@/lib/orchestration/registry/types';
+ 
+ const roots: string[] = [];
+-afterEach(async () => { budget.unsent = true; await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))); });
++afterEach(async () => { budget.unsent = true; budget.settled = true; await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))); });
+ const canonical = { messages: [], config: { agentIds: ['teacher'], agentConfigs: [{ id: 'teacher', role: 'teacher',
+   persona: 'Frozen subject teacher', name: 'Teacher', avatar: '/teacher.png', color: '#425CBA', priority: 100 }] },
+   storeState: {} } as unknown as StatelessChatRequest;
+@@ -52,3 +53,61 @@
+     expect(JSON.parse(await readFile(join(f.root, f.record.id, 'conversation.json'), 'utf8'))).toEqual(f.record);
+   });
+ });
++
++async function emptySpeechFixture() {
++  const f = await failedFixture();
++  f.context.expectedRevision = 3;
++  f.record.revision = 3;
++  f.record.canonicalRequest = normalizeRequiredTeachingAgents(canonical);
++  f.record.messages = [{ id: 'assistant-message', role: 'assistant', parts: [{ type: 'text', text: '' }] }];
++  f.record.turns[0].events = [
++    { type: 'agent_start', data: { messageId: 'assistant-message', agentId: 'teacher', agentName: 'Teacher' } },
++    { type: 'action', data: { actionId: 'highlight', actionName: 'spotlight', params: { elementId: 'method' }, agentId: 'teacher' } },
++    { type: 'cue_user', data: { fromAgentId: 'teacher', prompt: 'Explain your method.' } },
++    { type: 'done', data: { totalActions: 1, totalAgents: 1, agentHadContent: true,
++      cueUserReceived: true, sessionClosed: false } },
++    { type: 'error', data: { message: 'MIRA_TEACHING_END_INCOMPLETE' } },
++  ];
++  await writeFile(join(f.root, f.record.id, 'conversation.json'), JSON.stringify(f.record));
++  return f;
++}
++describe('required teaching empty speech retry', () => {
++  it('archives the finished silent attempt and retries the same identity only after usage settlement', async () => {
++    const f = await emptySpeechFixture();
++    expect(await replayTeachingTurn(f.context, f.deps)).toBeNull();
++    const retry = await claimTeachingTurn(f.record.canonicalRequest, f.context, f.deps);
++    expect(retry.record).toMatchObject({ id: f.record.id, authorizationId: f.record.authorizationId,
++      state: 'running', revision: 4, emptySpeechRecoveries: [{ failedRevision: 3 }] });
++    expect(retry.record.messages).toEqual([]);
++    expect(retry.record.turns).toEqual([{ replyId: null, events: [] }]);
++    expect(JSON.parse(await readFile(join(f.root, f.record.id, 'failed-empty-speech-revision-3.json'), 'utf8'))).toEqual(f.record);
++    await expect(claimTeachingTurn(f.record.canonicalRequest, f.context, f.deps)).rejects.toThrow('MIRA_TEACHING_TURN_RUNNING');
++  });
++  it('retains the failed record when a provider outcome is unresolved', async () => {
++    const f = await emptySpeechFixture(); budget.settled = false;
++    await expect(replayTeachingTurn(f.context, f.deps)).rejects.toThrow('MIRA_TEACHING_TURN_FAILED');
++    await expect(claimTeachingTurn(f.record.canonicalRequest, f.context, f.deps)).rejects.toThrow('MIRA_TEACHING_TURN_FAILED');
++    expect(JSON.parse(await readFile(join(f.root, f.record.id, 'conversation.json'), 'utf8'))).toEqual(f.record);
++  });
++  it('also permits a settled silent turn stopped before cueing the learner', async () => {
++    const f = await emptySpeechFixture();
++    f.record.turns[0].events = f.record.turns[0].events.filter(event => event.type !== 'cue_user');
++    const done = f.record.turns[0].events.find(event => event.type === 'done');
++    if (done?.type !== 'done') throw new Error('fixture_done_missing');
++    done.data.cueUserReceived = false;
++    done.data.agentHadContent = false;
++    await writeFile(join(f.root, f.record.id, 'conversation.json'), JSON.stringify(f.record));
++    expect(await replayTeachingTurn(f.context, f.deps)).toBeNull();
++    expect((await claimTeachingTurn(f.record.canonicalRequest, f.context, f.deps)).record.revision).toBe(4);
++  });
++  it('does not erase already spoken teaching, accept a stale revision, or retry an uncertain transport failure', async () => {
++    const f = await emptySpeechFixture();
++    await expect(replayTeachingTurn({ ...f.context, expectedRevision: 2 }, f.deps)).rejects.toThrow('MIRA_TEACHING_TURN_FAILED');
++    f.record.turns[0].events.splice(1, 0, { type: 'text_delta', data: { content: 'An actual explanation.' } });
++    await writeFile(join(f.root, f.record.id, 'conversation.json'), JSON.stringify(f.record));
++    await expect(replayTeachingTurn(f.context, f.deps)).rejects.toThrow('MIRA_TEACHING_TURN_FAILED');
++    f.record.turns[0].events = [{ type: 'error', data: { message: 'Network interrupted' } }];
++    await writeFile(join(f.root, f.record.id, 'conversation.json'), JSON.stringify(f.record));
++    await expect(replayTeachingTurn(f.context, f.deps)).rejects.toThrow('MIRA_TEACHING_TURN_FAILED');
++  });
++});

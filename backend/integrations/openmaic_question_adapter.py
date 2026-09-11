@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import time
 from types import MappingProxyType
 from typing import Any, Literal, Mapping, Sequence
@@ -410,6 +411,7 @@ class QuestionPhaseCommand:
     target_language_code: str
     boundary: Mapping[str, object]
     checkpoint: Mapping[str, object]
+    difficulty_code: str | None = None
 
 
 @dataclass(frozen=True)
@@ -458,6 +460,7 @@ class OpenMaicQuestionPhaseAdapter:
         temperature: float = 0.2,
         process_timeout_seconds: float = 305.0,
         process_runner=subprocess.run,
+        paid_budget_environment=None,
     ):
         backend_root = Path(__file__).resolve().parents[1]
         self.sidecar_root = Path(
@@ -482,6 +485,7 @@ class OpenMaicQuestionPhaseAdapter:
             or not 0 <= float(temperature) <= 1
         ):
             raise ValueError("V2 temperature is invalid")
+        self.paid_budget_environment = paid_budget_environment
         self.provider_name = str(provider_name or os.getenv("APP_AI_PROVIDER") or "kimi").strip()
         self.model_name = str(model_name or os.getenv("APP_AI_MODEL") or "").strip()
         self.base_url = str(base_url or os.getenv("APP_AI_BASE_URL") or "")
@@ -529,8 +533,11 @@ class OpenMaicQuestionPhaseAdapter:
         if type(command.logical_attempt) is not int or command.logical_attempt not in (1, 2):
             raise ValueError("logical attempt must be one or two")
         io = _phase_io_for(command.phase, command.phase_ordinal)
-        if command.grade_code != "primary_1":
-            raise ValueError("gradeCode must be primary_1")
+        from content.formal_curriculum_registry import formal_registered_boundary
+        from content.formal_objective_rules import objective_question_policy
+        registered_boundary = formal_registered_boundary(
+            command.grade_code, command.subject, command.boundary.get("skillId")
+        ) if command.grade_code != "primary_1" else None
         if command.subject not in {"chinese", "math", "english"}:
             raise ValueError("subject is invalid")
         expected_target = "en-US" if command.subject == "english" else "zh-CN"
@@ -546,6 +553,10 @@ class OpenMaicQuestionPhaseAdapter:
             "temperature": self.temperature,
         })
         boundary = _normalize_phase_boundary(command.boundary)
+        if command.grade_code != "primary_1":
+            expected_boundary = registered_boundary.to_catalog_payload()
+            if any(boundary[key] != expected_boundary[key] for key in boundary):
+                raise ValueError("formal grade skill boundary drift")
         checkpoint = _normalize_phase_checkpoint(
             command,
             io,
@@ -568,7 +579,10 @@ class OpenMaicQuestionPhaseAdapter:
             "mode": "live",
             "fakeResponses": [],
         }
-        if set(request) != _QUESTION_PHASE_REQUEST_KEYS:
+        if command.grade_code != "primary_1":
+            request["objectivePolicy"] = json.loads(json.dumps(objective_question_policy(command.grade_code, command.subject, boundary["skillId"], command.difficulty_code), ensure_ascii=False))
+        expected_keys = _QUESTION_PHASE_REQUEST_KEYS | ({"objectivePolicy"} if command.grade_code != "primary_1" else set())
+        if set(request) != expected_keys:
             raise ValueError("question phase request fields mismatch")
         canonical_input = _canonical_json(request)
         canonical_profile = _canonical_json(provider)
@@ -585,6 +599,17 @@ class OpenMaicQuestionPhaseAdapter:
     def execute_phase(self, prepared: PreparedQuestionPhase) -> QuestionPhaseResult:
         if not isinstance(prepared, PreparedQuestionPhase):
             raise ValueError("prepared question phase is invalid")
+        environment = os.environ.copy()
+        environment['OPENMAIC_HOST_VALIDATOR_PYTHON'] = sys.executable
+        for key in ("MIRA_PAID_BUDGET_BINDING", "MIRA_PAID_BUDGET_BACKEND_URL", "MIRA_PAID_BUDGET_INTERNAL_TOKEN"):
+            environment.pop(key, None)
+        if self.paid_budget_environment is not None:
+            try:
+                environment.update(self.paid_budget_environment(prepared.command))
+            except Exception:
+                return self._failed_safe_result(prepared, "provider_unavailable")
+        elif prepared.command.grade_code != "primary_1":
+            return self._failed_safe_result(prepared, "provider_unavailable")
         try:
             completed = self._run(
                 [self.node_binary, str(self.cli_path), "--question-phase-v2"],
@@ -593,7 +618,7 @@ class OpenMaicQuestionPhaseAdapter:
                 text=True,
                 capture_output=True,
                 timeout=self.process_timeout_seconds,
-                env=os.environ.copy(),
+                env=environment,
                 check=False,
             )
         except subprocess.TimeoutExpired:
@@ -2896,6 +2921,7 @@ def _build_candidate_course(
         "objective": ";".join(str(item) for item in command.boundary.get("learningObjectives", [])),
         "status": "unverified",
         "content": {
+            **({"difficultyCode": command.difficulty_code} if command.grade_code != "primary_1" else {}),
             "schemaVersion": "mira.learning.course.v1",
             "sessionKind": "lesson",
             "outcomeMode": "scored_deterministic",
@@ -2979,7 +3005,7 @@ def _normalize_candidate_course(
     content = _plain_mapping(value.get("content"), f"{field}.content")
     _require_exact_keys(
         content,
-        {"schemaVersion", "sessionKind", "outcomeMode", "sourceAuthority", "reviewPolicy", "intro", "estimatedMinutes", "teachingFlow", "questions"},
+        {"schemaVersion", "sessionKind", "outcomeMode", "sourceAuthority", "reviewPolicy", "intro", "estimatedMinutes", "teachingFlow", "questions"} | ({"difficultyCode"} if command.grade_code != "primary_1" else set()),
         f"{field}.content",
     )
     authority = _plain_mapping(content.get("sourceAuthority"), f"{field}.content.sourceAuthority")
@@ -3014,6 +3040,7 @@ def _normalize_candidate_course(
         "objective": _normalized_string(value.get("objective"), f"{field}.objective", maximum=6500),
         "status": _normalized_string(value.get("status"), f"{field}.status", maximum=40),
         "content": {
+            **({"difficultyCode": command.difficulty_code} if command.grade_code != "primary_1" else {}),
             "schemaVersion": _normalized_string(content.get("schemaVersion"), f"{field}.content.schemaVersion", maximum=80),
             "sessionKind": _normalized_string(content.get("sessionKind"), f"{field}.content.sessionKind", maximum=40),
             "outcomeMode": _normalized_string(content.get("outcomeMode"), f"{field}.content.outcomeMode", maximum=80),

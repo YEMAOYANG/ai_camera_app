@@ -8,6 +8,7 @@ import { studentMeResponseSchema, type Student } from "@/lib/contracts/student-s
 import { StudentDashboard } from "@/features/today/student-dashboard";
 import { ClassroomEntry } from "@/features/classroom/classroom-entry";
 import { LearningCourseDetail } from "@/features/learning/learning-course-detail";
+import { LearningPractice } from "@/features/learning/learning-practice";
 import { LearningLibrary } from "@/features/learning/learning-library";
 
 export function StudentSessionGate({
@@ -16,10 +17,12 @@ export function StudentSessionGate({
   learningView,
   courseId,
   courseVersion,
+  practiceSessionId,
 }: {
   lessonTaskId?: string;
   classroomMode?: "discover" | "openmaic";
-  learningView?: "library" | "course";
+  learningView?: "library" | "course" | "practice";
+  practiceSessionId?: string;
   courseId?: string;
   courseVersion?: string;
 }) {
@@ -82,6 +85,7 @@ export function StudentSessionGate({
   if (learningView === "course" && courseId) {
     return <LearningCourseDetail student={student} courseId={courseId} version={courseVersion} />;
   }
+  if (learningView === "practice") return <LearningPractice student={student} sessionId={practiceSessionId} />;
   if (learningView === "library") return <LearningLibrary student={student} />;
   return <StudentDashboard student={student} />;
 }

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { interactionDesignReceiptSchema } from "./openmaic-interaction-evidence";
 
 const sha = z.string().regex(/^[0-9a-f]{64}$/);
 const id = z.string().trim().min(1).max(255);
@@ -104,6 +105,7 @@ export const imageEvidenceSchema = z.object({ ...mediaIdentity, verified: z.lite
 export const videoEvidenceSchema = z.object({ ...videoIdentity, verified: z.literal(true),
   videoCount: count.max(1), verifiedAssetCount: count.max(1), receiptSha256: sha }).strict();
 export const professionalEvidenceExtensions = {
+  interactionDesign: interactionDesignReceiptSchema.optional(),
   imageGenerationEnabled: z.literal(true).optional(), imagePolicyId: z.literal("mira-formal-qwen-image.v1").optional(),
   videoGenerationEnabled: z.literal(true).optional(), videoPolicyId: z.literal("mira-formal-happyhorse-video.v1").optional(),
   skillOrchestration: skillReceiptSchema.optional(), teachingQuality: teachingQualityReceiptSchema.optional(),

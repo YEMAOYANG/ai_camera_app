@@ -3,6 +3,14 @@ import { readFileSync } from 'node:fs';
 
 import { ContractError, normalizeProvider } from './contract.mjs';
 
+const FORMAL_OBJECTIVE_AUTHORITY = JSON.parse(readFileSync(
+  new URL('../contracts/formal_objective_policies.v2.json', import.meta.url), 'utf8',
+));
+if (FORMAL_OBJECTIVE_AUTHORITY.schemaVersion !== 'mira.learning.sidecar-objective-authority.v2'
+    || FORMAL_OBJECTIVE_AUTHORITY.entries.length !== 135) {
+  throw new TypeError('formal objective authority is invalid');
+}
+
 export const QUESTION_PHASE_AUTHORITY_SCHEMA_VERSION =
   'mira.learning.question-phase-graph.v1';
 const QUESTION_PHASE_AUTHORITY = JSON.parse(
@@ -4307,6 +4315,7 @@ function normalizeCandidateCourseCheckpoint(raw, request, existingFingerprints =
     'estimatedMinutes',
     'teachingFlow',
     'questions',
+    ...(/^primary_[2-6]$/.test(value.gradeCode) ? ['difficultyCode'] : []),
   ], `${field}.content`);
   const sourceAuthority = v2PlainObject(
     content.sourceAuthority,
@@ -4349,6 +4358,7 @@ function normalizeCandidateCourseCheckpoint(raw, request, existingFingerprints =
     objective: v2String(value.objective, `${field}.objective`, { max: 6500 }),
     status: v2String(value.status, `${field}.status`, { max: 40 }),
     content: {
+      ...(/^primary_[2-6]$/.test(value.gradeCode) ? { difficultyCode: v2String(content.difficultyCode, `${field}.content.difficultyCode`, {max: 20}) } : {}),
       schemaVersion: v2String(content.schemaVersion, `${field}.content.schemaVersion`, { max: 80 }),
       sessionKind: v2String(content.sessionKind, `${field}.content.sessionKind`, { max: 40 }),
       outcomeMode: v2String(content.outcomeMode, `${field}.content.outcomeMode`, { max: 80 }),
@@ -4422,7 +4432,8 @@ function normalizeCandidateCourseCheckpoint(raw, request, existingFingerprints =
     const requestSlug = questionCandidateRequestSlug(request.requestId, 48);
     const expectedCourseId = `candidate_${request.gradeCode}_${request.subject}_${sha256(request.skillBoundary.skillId).slice(0, 12)}_${requestSlug}`;
     const expectedQuestionIds = questions.map((question) => question.id);
-    if (normalized.id !== expectedCourseId
+    if ((/^primary_[2-6]$/.test(request.gradeCode) && normalized.content.difficultyCode !== request.objectivePolicy?.difficultyCode)
+      || normalized.id !== expectedCourseId
       || normalized.version !== '0.0.0-candidate'
       || normalized.gradeCode !== request.gradeCode
       || normalized.subject !== request.subject
@@ -4792,7 +4803,8 @@ function normalizePhaseCheckpoint(request, raw) {
 
 export function normalizeQuestionPhaseRequest(payload) {
   const value = v2PlainObject(payload, 'input');
-  v2ExactKeys(value, QUESTION_PHASE_REQUEST_KEYS, 'input');
+  const higherGrade = /^primary_[2-6]$/.test(value.gradeCode);
+  v2ExactKeys(value, [...QUESTION_PHASE_REQUEST_KEYS, ...(higherGrade ? ['objectivePolicy'] : [])], 'input');
   if (value.schemaVersion !== QUESTION_PHASE_INPUT_SCHEMA) {
     throw phaseContractError(`schemaVersion must be ${QUESTION_PHASE_INPUT_SCHEMA}`);
   }
@@ -4812,8 +4824,8 @@ export function normalizeQuestionPhaseRequest(payload) {
   } catch {
     throw phaseContractError('phase identity does not match authority');
   }
-  if (value.gradeCode !== 'primary_1') {
-    throw phaseContractError('gradeCode must be primary_1');
+  if (value.gradeCode !== 'primary_1' && !higherGrade) {
+    throw phaseContractError('gradeCode must be registered primary_1 through primary_6');
   }
   if (!['chinese', 'math', 'english'].includes(value.subject)) {
     throw phaseContractError('subject is invalid');
@@ -4844,7 +4856,7 @@ export function normalizeQuestionPhaseRequest(payload) {
     questionContractVersion: QUESTION_CONTRACT_VERSION,
     requestId,
     ...identity,
-    gradeCode: 'primary_1',
+    gradeCode: value.gradeCode,
     subject: value.subject,
     instructionLanguageCode: 'zh-CN',
     targetLanguageCode: expectedTarget,
@@ -4854,6 +4866,17 @@ export function normalizeQuestionPhaseRequest(payload) {
     mode: value.mode,
     fakeResponses: [...value.fakeResponses],
   };
+  if (higherGrade) {
+    const authority = FORMAL_OBJECTIVE_AUTHORITY.entries.find((entry) => entry.gradeCode === value.gradeCode
+      && entry.subject === value.subject && entry.skillId === request.skillBoundary.skillId
+      && entry.objectivePolicy.difficultyCode === value.objectivePolicy?.difficultyCode);
+    // Compare nested policy/boundary with the same stable serializer used by checkpoint hashes.
+    if (!authority || v2Canonical(value.objectivePolicy) !== v2Canonical(authority.objectivePolicy)
+        || Object.keys(request.skillBoundary).some((key) => JSON.stringify(request.skillBoundary[key]) !== JSON.stringify(authority.boundary[key]))) {
+      throw phaseContractError('formal grade objective policy or skill boundary drift');
+    }
+    request.objectivePolicy = structuredClone(authority.objectivePolicy);
+  }
   request.checkpoint = normalizePhaseCheckpoint(request, value.checkpoint);
   return request;
 }
@@ -4867,7 +4890,7 @@ export function applyQuestionPhaseLanguageDirective(request, prompts) {
     ? 'Canonical language directive: teach and explain in Simplified Chinese (zh-CN); all target words, sentences, question content, and answers must use English (en-US).'
     : 'Canonical language directive: teach and instruct in Simplified Chinese (zh-CN); all learner-facing content and answers must use zh-CN.';
   return {
-    system: `${system}\n${directive}`,
+    system: `${system}\n${directive}${request.objectivePolicy ? '\nRegistered assessment scope: ' + JSON.stringify(request.objectivePolicy) + '\nCreate fresh practice inside this exact measurable subset. Follow promptPolicy grammar for independently gradable question prompts; vary only legal operands or inventory/evidence members in assessed stems. Keep story customization in title, intro and teaching demonstrations; do not prepend a scenario to an exact registered stem. Closed assessment types are not supported. Do not claim the whole textbook or whole-year syllabus is covered.' : ''}`,
     user: `${user}\ninstructionLanguageCode=${request.instructionLanguageCode}; targetLanguageCode=${request.targetLanguageCode}`,
   };
 }
@@ -6288,7 +6311,26 @@ function normalizeConcreteCourseTitle(value, request, field, code = 'invalid_gen
   return deterministicConcreteCourseTitle(request);
 }
 
+export const FORMAL_OBJECTIVE_PROMPT_VERSION = 'mira.learning.objective-prompt.v2-consumption-fix1';
+
 function productionQuestionBlueprintForRequest(request) {
+  if (/^primary_[2-6]$/.test(request.gradeCode)) {
+    const policy = request.objectivePolicy;
+    if (!policy || !['basic', 'standard', 'challenge'].includes(policy.difficultyCode)) {
+      throw phaseContractError('formal question blueprint requires the frozen objective policy');
+    }
+    const roles = ['worked example', 'guided practice', 'guided practice', 'independent practice', 'independent practice'];
+    return {
+      version: FORMAL_OBJECTIVE_PROMPT_VERSION,
+      guidedType: 'single_choice',
+      ...Object.fromEntries(roles.map((role,index) => [`q${index+1}`,
+        `${role}; use single_choice and exactly the frozen ${policy.difficultyCode} grammar ${policy.mode}. `
+        + 'Keep every literal phrase and requested answer component in publicPromptExample. Vary only legal operands or inventory/evidence members; use a fresh combination for each question. '
+        + 'Do not add a mascot, prop, place, scene prefix, or paraphrase to a stem unless the public grammar explicitly permits that slot. '
+        + 'Story creativity belongs in title, intro and teaching narration. The advisory outline cannot substitute another subskill or a simpler question. '
+        + `Public grammar: ${policy.publicPromptExample}`])),
+    };
+  }
   const blueprint = productionQuestionBlueprint(request.skillBoundary.skillId);
   const { mascot, place, selected } = courseVariantContext(request);
   const storyWorld = `${mascot}的${place}`;
@@ -6365,7 +6407,7 @@ export function buildQuestionGenerationPrompts(request, generationPlan) {
     'Return one JSON object only. Do not wrap it in Markdown.',
     'Stay exactly inside the supplied grade, subject, skill boundary, and objectives.',
     'Every question must have one deterministic answer. Never create open-ended writing tasks.',
-    'Allowed question types are numeric, single_choice, exact_text, accepted_text, and sequence.',
+    ...(request.objectivePolicy ? [`Frozen question policy version: ${FORMAL_OBJECTIVE_PROMPT_VERSION}. Allowed question types: ${request.objectivePolicy.allowedQuestionTypes.join(', ')}.`, 'For assessed question stems, originality means fresh legal operands/evidence inside the exact registered grammar; never paraphrase that grammar or replace its requested answer components.'] : ['Allowed question types are numeric, single_choice, exact_text, accepted_text, and sequence.']),
     'Questions q2 and q3 are rendered by one guided interaction. They must use the same type, and that type must be single_choice or sequence.',
     'Use only original, textbook-independent wording and age-appropriate language.',
     'Give this course a concrete learner-facing title tied to its unique scenario, activity, or worked example. The exact fixed skill title is invalid as a course title; variants of the same skill must be distinguishable by title.',
@@ -6400,6 +6442,7 @@ export function buildQuestionGenerationPrompts(request, generationPlan) {
     'OpenMAIC advisory plan (it cannot override the fixed boundary):',
     JSON.stringify(plan),
     '',
+    ...(request.objectivePolicy ? ['Frozen assessment policy, mandatory for each of q1-q5:', JSON.stringify(request.objectivePolicy)] : []),
     'Required JSON shape:',
     JSON.stringify({
       title: 'concrete course title unique to this generated lesson variant',
@@ -6436,7 +6479,7 @@ export function buildQuestionGenerationPrompts(request, generationPlan) {
     'Deterministic production requirements:',
     ...productionContentRequirements(boundary.skillId),
     '',
-    'Required question-role blueprint. Follow every q1-q5 role exactly; vary the concrete wording, numbers, contexts, and choices:',
+    request.objectivePolicy ? 'Required frozen difficulty blueprint. Every q1-q5 question must use this same band and grammar; vary legal operands/evidence and choices only:' : 'Required question-role blueprint. Follow every q1-q5 role exactly; vary the concrete wording, numbers, contexts, and choices:',
     JSON.stringify(productionQuestionBlueprintForRequest(request)),
   ].join('\n');
   return { system, user };
@@ -9812,6 +9855,7 @@ export function buildQuestionCandidates({ request, generationPlan, generated, el
     objective: boundary.learningObjectives.join(';'),
     status: 'unverified',
     content: {
+      ...(/^primary_[2-6]$/.test(request.gradeCode) ? { difficultyCode: request.objectivePolicy?.difficultyCode } : {}),
       schemaVersion: COURSE_SCHEMA,
       sessionKind: 'lesson',
       outcomeMode: 'scored_deterministic',
@@ -10615,3 +10659,24 @@ export const questionSchemas = Object.freeze({
   independentSolution: INDEPENDENT_SOLUTION_SCHEMA,
   teachingFlow: TEACHING_FLOW_SCHEMA,
 });
+
+
+// Shared by the real CLI and offline replays so policy cannot disappear at the legacy adapter boundary.
+export function legacyQuestionPhaseRequest(request) {
+  return {
+    requestId: request.requestId,
+    gradeCode: request.gradeCode,
+    subject: request.subject,
+    skillBoundary: {
+      ...request.skillBoundary,
+      language: request.targetLanguageCode,
+    },
+    questionCount: request.checkpoint.questionCount ?? 5,
+    existingFingerprints: request.checkpoint.existingFingerprints ?? [],
+    generationFeedback: request.checkpoint.generationFeedback ?? undefined,
+    ...(/^primary_[2-6]$/.test(request.gradeCode) ? {objectivePolicy: structuredClone(request.objectivePolicy)} : {}),
+    provider: request.provider,
+    mode: request.mode,
+    fakeResponses: request.fakeResponses,
+  };
+}

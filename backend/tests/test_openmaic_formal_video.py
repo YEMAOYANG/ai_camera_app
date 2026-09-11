@@ -122,6 +122,7 @@ class OpenMaicFormalVideoTest(unittest.TestCase):
         healthy = {"success": True, "status": "ok", "version": client.FORMAL_RUNTIME_VERSION,
             "capabilities": {"formalGeneration": True, "professionalAgent": True, "webSearch": True, "speechAudioGeneration": True},
             "runtimePolicy": {"formalGeneration": deepcopy(client.FORMAL_GENERATION_POLICY),
+                "webSearch": {"schemaVersion":"mira.openmaic.web-search-production-config.v1","providerId":"brave","productionMode":"brave_api","formalProductionConfigured":True,"verification":"configuration_only"},
                 "professionalResearch": deepcopy(client.FORMAL_PROFESSIONAL_RESEARCH_POLICY),
                 "modelPolicy": deepcopy(client.FORMAL_PROFESSIONAL_MODEL_POLICY)}}
         client._request_json = Mock(return_value=healthy)
@@ -137,6 +138,18 @@ class OpenMaicFormalVideoTest(unittest.TestCase):
         altered["runtimePolicy"]["formalGeneration"]["professionalCreation"] = deepcopy(PROFESSIONAL_POLICY)
         client._request_json.return_value = altered
         self.assertFalse(client.formal_generation_readiness()["ready"])
+
+        for config in (None, {"productionMode":"public_html","formalProductionConfigured":False}, {"formalProductionConfigured":1}, {"verification":"network_verified"}):
+            altered=deepcopy(healthy)
+            if config is None:del altered['runtimePolicy']['webSearch']
+            else:altered['runtimePolicy']['webSearch'].update(config)
+            client._request_json.return_value=altered
+            result=client.formal_generation_readiness()
+            self.assertFalse(result['ready'])
+            self.assertTrue(result['error'].startswith('openmaic_formal_search_'))
+            self.assertTrue(result['reason'])
+        client._request_json.return_value=healthy
+        self.assertIn('未验证实际联网',client.formal_generation_readiness()['reason'])
 
     def test_valid_video_and_zero_video_receipts_bind_exact_professional_identity(self):
         row, _ = video_fixture()

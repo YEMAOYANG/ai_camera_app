@@ -11,13 +11,15 @@ from urllib.request import Request, urlopen
 
 
 from integrations.openmaic_formal_media import (
-    FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY,
+    FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY,
     LEGACY_GENERATION_OPTIONS, generation_options, professional_policy,
     professional_image_fields, media_receipt,
 )
 from integrations.openmaic_formal_video import FORMAL_VIDEO_POLICY, professional_video_fields, video_receipt
 from integrations.openmaic_formal_skills import professional_skill_fields
 from integrations.openmaic_formal_quality import professional_quality_fields
+from integrations.openmaic_formal_interaction import professional_interaction_fields
+from integrations.openmaic_asr_revalidation import validate_asr_comparison_revalidation
 
 
 class OpenMaicFullRuntimeError(RuntimeError):
@@ -44,6 +46,7 @@ class OpenMaicFormalAudioAsrReceipt:
     transcript_sha256: str
     normalized_transcript_sha256: str
     similarity_bps: int
+    comparison_revalidation: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -174,7 +177,7 @@ class OpenMaicFullRuntimeClient:
     FORMAL_IMAGE_POLICY = FORMAL_IMAGE_POLICY
     FORMAL_VIDEO_POLICY = FORMAL_VIDEO_POLICY
     LEGACY_FORMAL_PROFESSIONAL_CREATION_POLICY = LEGACY_PROFESSIONAL_POLICY
-    FORMAL_PROFESSIONAL_CREATION_POLICY = VIDEO_PROFESSIONAL_POLICY
+    FORMAL_PROFESSIONAL_CREATION_POLICY = MULTISTATE_PROFESSIONAL_POLICY
     FORMAL_PROFESSIONAL_CREATION_RECEIPT_VERSION = (
         "mira.openmaic.professional-creation-receipt.v1"
     )
@@ -464,6 +467,8 @@ class OpenMaicFullRuntimeClient:
                 "policy": None,
                 "professionalResearch": None,
                 "modelPolicy": None,
+                "webSearch": None,
+                "reason": "无法读取正式生成配置；尚未发起课程或搜索调用。",
                 "error": exc.code,
             }
         runtime_policy = payload.get("runtimePolicy")
@@ -483,6 +488,16 @@ class OpenMaicFullRuntimeClient:
             if isinstance(runtime_policy, Mapping)
             else None
         )
+        web_search = runtime_policy.get("webSearch") if isinstance(runtime_policy, Mapping) else None
+        search_configured = bool(
+            isinstance(web_search, Mapping)
+            and set(web_search) == {"schemaVersion", "providerId", "productionMode", "formalProductionConfigured", "verification"}
+            and web_search.get("schemaVersion") == "mira.openmaic.web-search-production-config.v1"
+            and (web_search.get("providerId"), web_search.get("productionMode"))
+                in (("brave", "brave_api"), ("baidu", "baidu_api"))
+            and web_search.get("formalProductionConfigured") is True
+            and web_search.get("verification") == "configuration_only"
+        )
         reported_version = str(payload.get("version") or "") or None
         ready = bool(
             payload.get("success") is True
@@ -492,6 +507,7 @@ class OpenMaicFullRuntimeClient:
             and capabilities.get("formalGeneration") is True
             and capabilities.get("professionalAgent") is True
             and capabilities.get("webSearch") is True
+            and search_configured
             and capabilities.get("speechAudioGeneration") is True
             and isinstance(formal_policy, Mapping)
             and _canonical_sha256(dict(formal_policy)) == _canonical_sha256(self.FORMAL_GENERATION_POLICY)
@@ -520,7 +536,14 @@ class OpenMaicFullRuntimeClient:
             "modelPolicy": (
                 dict(model_policy) if isinstance(model_policy, Mapping) else None
             ),
-            "error": None if ready else "openmaic_formal_generation_not_ready",
+            "webSearch": ({key: web_search.get(key) for key in ("schemaVersion", "providerId", "productionMode", "formalProductionConfigured", "verification")} if isinstance(web_search, Mapping) else None),
+            "reason": (
+                "正式搜索 API 已配置；此检查未验证实际联网能力。" if ready else
+                "Runtime 尚未报告正式搜索配置，请先更新 Runtime；未发起付费生成。" if not isinstance(web_search, Mapping) else
+                "正式课程需要配置百度搜索或 Brave Search API Key，并选择对应供应商；公共网页搜索不满足生产配置要求。配置检查不代表已验证联网。" if not search_configured else
+                "正式课堂的模型、版本或生成合同尚未就绪。"
+            ),
+            "error": None if ready else "openmaic_formal_search_configuration_unreported" if not isinstance(web_search, Mapping) else "openmaic_formal_search_api_not_configured" if not search_configured else "openmaic_formal_generation_not_ready",
         }
 
     def formal_generation_provider_canary(self) -> dict[str, Any]:
@@ -568,6 +591,7 @@ class OpenMaicFullRuntimeClient:
         narration_segment_id: str,
         text: str,
         text_sha256: str,
+        paid_budget: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         payload = self._formal_audio_identity_payload(
             request_id=request_id,
@@ -595,7 +619,7 @@ class OpenMaicFullRuntimeClient:
             )
         payload.update({"text": normalized_text, "textSha256": actual_text_sha256})
         response = self._request_formal_audio_json(
-            "POST", "/api/mira/formal-audio/tts", payload
+            "POST", "/api/mira/formal-audio/tts", payload, paid_budget=paid_budget
         )
         return self._validate_formal_tts_response(response, request_id=request_id)
 
@@ -686,6 +710,7 @@ class OpenMaicFullRuntimeClient:
         action_id: str,
         narration_segment_id: str,
         audio_sha256: str,
+        paid_budget: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         payload = self._formal_audio_identity_payload(
             request_id=request_id,
@@ -708,7 +733,7 @@ class OpenMaicFullRuntimeClient:
             )
         payload["audioSha256"] = str(audio_sha256)
         response = self._request_formal_audio_json(
-            "POST", "/api/mira/formal-audio/asr", payload
+            "POST", "/api/mira/formal-audio/asr", payload, paid_budget=paid_budget
         )
         return self._validate_formal_asr_response(
             response, request_id=request_id, require_ephemeral_transcript=True
@@ -1546,12 +1571,22 @@ class OpenMaicFullRuntimeClient:
         method: str,
         path: str,
         body: Mapping[str, Any] | None = None,
+        paid_budget: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
+        headers = self._formal_audio_headers()
+        if paid_budget is not None:
+            if (set(paid_budget) != {"schemaVersion", "authorizationId", "required"}
+                or paid_budget.get("schemaVersion") != "mira.learning.paid-budget-binding.v1"
+                or paid_budget.get("required") is not True
+                or re.fullmatch(r"[a-f0-9]{64}", str(paid_budget.get("authorizationId") or "")) is None):
+                raise OpenMaicFullRuntimeError("invalid_paid_budget_binding", "课程生产预算授权无效", status_code=400)
+            headers.update({"X-Mira-Paid-Budget-Required": "1",
+                "X-Mira-Paid-Budget-Authorization": paid_budget["authorizationId"]})
         return self._request_json(
             method,
             path,
             body,
-            extra_headers=self._formal_audio_headers(),
+            extra_headers=headers,
             timeout_seconds=self.FORMAL_AUDIO_REQUEST_TIMEOUT_SECONDS,
         )
 
@@ -1567,6 +1602,7 @@ class OpenMaicFullRuntimeClient:
         runtime_request_id: str | None = None,
         formal_runtime_contract: Mapping[str, Any] | None = None,
         professional_creation_policy: Mapping[str, Any] | None = None,
+        paid_budget: Mapping[str, Any] | None = None,
     ) -> OpenMaicGenerationJob:
         formal = runtime_request_id is not None or formal_runtime_contract is not None
         selected_policy = None
@@ -1619,6 +1655,7 @@ class OpenMaicFullRuntimeClient:
             "enableVideoGeneration": bool(enable_video_generation),
             "enableTTS": bool(enable_tts),
             "agentMode": agent_mode,
+            **({"paidBudget": dict(paid_budget)} if paid_budget is not None else {}),
             **(
                 {
                     "runtimeRequestId": str(runtime_request_id),
@@ -1769,6 +1806,26 @@ class OpenMaicFullRuntimeClient:
             )
         return classroom
 
+    def read_teaching_conversation(self, *, learning_session_id: str, classroom_id: str,
+                                   conversation_id: str | None = None) -> dict[str, Any] | None:
+        """Read server-recorded dialogue only over the private authenticated API."""
+        for value in (learning_session_id, classroom_id):
+            if not _safe_identifier(value, max_length=255):
+                raise OpenMaicFullRuntimeError("invalid_teaching_conversation_scope", "课堂指导身份无效", status_code=400)
+        if conversation_id is not None and re.fullmatch(r"mtc_[a-f0-9]{64}", conversation_id) is None:
+            raise OpenMaicFullRuntimeError("invalid_teaching_conversation_id", "课堂指导身份无效", status_code=400)
+        payload = self._request_json("POST", "/api/mira/teaching-conversation/read",
+            {"learningSessionId": learning_session_id, "classroomId": classroom_id,
+             **({"conversationId": conversation_id} if conversation_id else {})},
+            extra_headers=self._formal_generation_headers())
+        conversation = payload.get("conversation")
+        if conversation is not None and (not isinstance(conversation, dict)
+                or conversation.get("learningSessionId") != learning_session_id
+                or conversation.get("classroomId") != classroom_id
+                or (conversation_id is not None and conversation.get("id") != conversation_id)):
+            raise OpenMaicFullRuntimeError("invalid_teaching_conversation_scope", "课堂指导记录身份不一致", status_code=409)
+        return conversation
+
     def video_export_capability(self) -> bool:
         """Probe the pinned runtime and its render service, not local config."""
         payload = self._request_json("GET", "/api/export-video/capability")
@@ -1880,6 +1937,7 @@ class OpenMaicFullRuntimeClient:
                 formal_audio = self._formal_audio_receipt_from_payload(
                     raw_formal_audio,
                     classroom_id=classroom_id,
+                    professional_creation=result.get("professionalCreation"),
                     expected_segment_count=(
                         speech_action_count
                         if speech_action_count is not None
@@ -2036,6 +2094,7 @@ class OpenMaicFullRuntimeClient:
             video_fields = professional_video_fields(value) if isinstance(value, Mapping) else {}
             skill_fields = professional_skill_fields(value) if isinstance(value, Mapping) else {}
             quality_fields = professional_quality_fields(value) if isinstance(value, Mapping) else {}
+            interaction_fields = professional_interaction_fields(value) if isinstance(value, Mapping) else {}
             if skill_fields and not image_fields:
                 raise ValueError("integrated skills require the versioned image policy")
             adaptive = skill_fields.get("skillOrchestration", {}).get("schemaVersion") == "mira.openmaic.skill-orchestration-receipt.v2"
@@ -2043,6 +2102,8 @@ class OpenMaicFullRuntimeClient:
                 raise ValueError("adaptive skills require final teaching quality evidence")
             if video_fields and not (image_fields and adaptive and quality_fields):
                 raise ValueError("formal video requires adaptive image and quality evidence")
+            if interaction_fields and not (video_fields and adaptive and quality_fields):
+                raise ValueError("formal interaction requires the versioned final quality policy")
         except ValueError as exc:
             raise OpenMaicFullRuntimeError(code, "OpenMAIC 专业创作策略回执无效") from exc
         receipt = _exact_mapping(
@@ -2066,6 +2127,7 @@ class OpenMaicFullRuntimeClient:
                 *video_fields,
                 *skill_fields,
                 *quality_fields,
+                *interaction_fields,
             },
             code=code,
         )
@@ -2176,7 +2238,9 @@ class OpenMaicFullRuntimeClient:
             or session_id is None
             or provider_id is None
             or any(type(count) is not int for count in counts)
-            or not 1 <= int(receipt.get("searchCount") or 0) <= 4
+            # Execution policy controls attempts; a receipt reports actual work.
+            # Metering-only runs may legitimately contain more than four searches.
+            or int(receipt.get("searchCount") or 0) < 1
             or int(receipt.get("resultCount") or 0) < 1
             or int(receipt.get("fetchedSourceCount") or 0) < 1
             or int(receipt.get("citationCount") or 0) < 1
@@ -2291,6 +2355,7 @@ class OpenMaicFullRuntimeClient:
         *,
         classroom_id: str,
         expected_segment_count: int,
+        professional_creation: object = None,
     ) -> OpenMaicFormalAudioReceipt:
         receipt = _exact_mapping(
             value,
@@ -2422,6 +2487,8 @@ class OpenMaicFullRuntimeClient:
                     "providerId",
                     "modelId",
                     "fallbackUsed",
+                    *({"comparisonRevalidation"} if isinstance(segment.get("asr"), Mapping)
+                      and "comparisonRevalidation" in segment["asr"] else set()),
                 },
                 code="invalid_openmaic_formal_audio_receipt",
             )
@@ -2495,6 +2562,18 @@ class OpenMaicFullRuntimeClient:
             seen_narration_ids.add(narration_segment_id)
             seen_tts_request_ids.add(tts_request_id)
             seen_asr_request_ids.add(asr_request_id)
+            comparison_revalidation = None
+            if "comparisonRevalidation" in asr:
+                try:
+                    comparison_revalidation = validate_asr_comparison_revalidation(
+                        asr["comparisonRevalidation"], lifecycle=receipt, segment=segment,
+                        professional_creation=professional_creation,
+                    )
+                except (ValueError, TypeError, KeyError) as exc:
+                    raise OpenMaicFullRuntimeError(
+                        "invalid_openmaic_formal_audio_receipt",
+                        "OpenMAIC 原语音转写复核凭据无效",
+                    ) from exc
             segments.append(
                 OpenMaicFormalAudioSegmentReceipt(
                     scene_order=expected_order,
@@ -2518,6 +2597,7 @@ class OpenMaicFullRuntimeClient:
                             normalized_transcript_sha256
                         ),
                         similarity_bps=similarity_bps,
+                        comparison_revalidation=comparison_revalidation,
                     ),
                 )
             )

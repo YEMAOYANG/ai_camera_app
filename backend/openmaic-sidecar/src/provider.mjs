@@ -1,3 +1,4 @@
+import { paidBudgetHeaders, beginPaidProviderDispatch } from './paid-budget.mjs';
 import { createHash } from 'node:crypto';
 import process from 'node:process';
 import { ContractError } from './contract.mjs';
@@ -45,6 +46,7 @@ async function callOpenMaicRuntimeProvider(
         headers: {
           'Content-Type': 'application/json',
           'X-Mira-Internal-Token': internalToken,
+          ...paidBudgetHeaders(),
           'X-Forwarded-For': '127.0.0.1',
           'X-Forwarded-Host': endpoint.host,
           'X-Forwarded-Port': endpoint.port || (endpoint.protocol === 'https:' ? '443' : '80'),
@@ -687,6 +689,9 @@ export function createSingleDispatchAICall(
       requestBody.stream = true;
       requestBody.stream_options = { include_usage: true };
     }
+    let budget;
+    try { budget = await beginPaidProviderDispatch(provider, requestBody, requestId, fetchImpl); }
+    catch { throw failedSafe('provider_unavailable'); }
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), provider.timeoutMs);
     try {
@@ -760,12 +765,14 @@ export function createSingleDispatchAICall(
       }
       const successfulRequestIdHash = providerRequestIdHash ?? requestIdentityHash(payload.id);
       const usage = normalizedUsage(payload, successfulRequestIdHash);
+      await budget?.settle(usage);
       const content = payload?.choices?.[0]?.message?.content;
       if (typeof content !== 'string' || !content.trim()) {
         throw failedSafe('provider_no_candidate', usage);
       }
       return { content: content.trim(), ...usage };
     } finally {
+      await budget?.unknown();
       clearTimeout(timeout);
     }
   };
@@ -808,6 +815,7 @@ export function createLiveAICall(provider, { fetchImpl = globalThis.fetch } = {}
       requestBody.temperature = 0.6;
       requestBody.response_format = { type: 'json_object' };
     }
+    const budget = await beginPaidProviderDispatch(provider, requestBody, null, fetchImpl);
     try {
       const response = await fetchImpl(endpoint, {
         method: 'POST',
@@ -823,6 +831,7 @@ export function createLiveAICall(provider, { fetchImpl = globalThis.fetch } = {}
         throw new Error(`OpenAI-compatible API returned HTTP ${response.status}: ${detail}`);
       }
       const payload = await response.json();
+      await budget?.settle(normalizedUsage(payload, responseRequestIdentityHash(response) ?? requestIdentityHash(payload.id)));
       const content = payload?.choices?.[0]?.message?.content;
       if (typeof content !== 'string' || !content.trim()) {
         throw new Error('OpenAI-compatible API returned no message content');
@@ -834,6 +843,7 @@ export function createLiveAICall(provider, { fetchImpl = globalThis.fetch } = {}
       }
       throw error;
     } finally {
+      await budget?.unknown();
       clearTimeout(timeout);
     }
   };

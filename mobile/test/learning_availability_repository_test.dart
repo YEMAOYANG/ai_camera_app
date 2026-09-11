@@ -38,6 +38,37 @@ void main() {
     expect(availability.canLearnNow, isFalse);
   });
 
+  test(
+    'empty primary grades keep workspace access without preparation polling',
+    () {
+      for (var grade = 2; grade <= 6; grade++) {
+        final availability = LearningAvailability.fromJson({
+          'ok': true,
+          'availability': {
+            'gradeCode': 'primary_$grade',
+            'hasActiveRelease': false,
+            'availableCourseCount': 0,
+            'canLearnNow': false,
+            'canAccessWorkspace': true,
+            'learningState': {
+              'schemaVersion': 'mira.learning.availability-state.v1',
+              'availabilityStatus': 'empty',
+              'availableCourseCount': 0,
+              'newCourseCount': 0,
+              'reviewCourseCount': 0,
+              'publishedCourseCount': 0,
+              'message': '可以扫码进入学习空间，当前暂无课程。',
+            },
+          },
+        });
+        expect(availability.canAccessWorkspace, isTrue);
+        expect(availability.canLearnNow, isFalse);
+        expect(availability.learningState?.status, 'empty');
+        expect(availability.learningState?.isTerminal, isTrue);
+      }
+    },
+  );
+
   for (final payload in <Object?>[
     {
       'ok': true,
@@ -107,6 +138,7 @@ void main() {
     expect(interceptor.request?.queryParameters, {
       'childId': 'child-1',
       'includeWorkspaceAccess': 'true',
+      'includeLearningState': 'true',
     });
     expect(availability.hasActiveRelease, isTrue);
   });

@@ -885,6 +885,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
                 "speechAudioGeneration": True,
             },
             "runtimePolicy": {
+                "webSearch": {"schemaVersion":"mira.openmaic.web-search-production-config.v1","providerId":"brave","productionMode":"brave_api","formalProductionConfigured":True,"verification":"configuration_only"},
                 "formalGeneration": (
                     OpenMaicFullRuntimeClient.FORMAL_GENERATION_POLICY
                 ),

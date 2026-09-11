@@ -1,0 +1,664 @@
+--- a/lib/server/agent-runtime/web-search.ts
++++ b/lib/server/agent-runtime/web-search.ts
+@@ -101,6 +101,9 @@
+         providerId: capability.providerId,
+         query: params.query,
+         apiKey: capability.apiKey,
++        ...(capability.providerId === 'baidu'
++          ? { baiduSubSources: { webSearch: true, baike: false, scholar: false } }
++          : {}),
+         ...(capability.baseUrl ? { baseUrl: capability.baseUrl } : {}),
+         ...(signal ? { signal } : {}),
+       }).catch((error: unknown) => {
+--- a/lib/server/mira-formal-prestage-recovery.ts
++++ b/lib/server/mira-formal-prestage-recovery.ts
+@@ -7,7 +7,8 @@
+ import { CLASSROOM_JOBS_DIR } from './classroom-storage';
+ import { assertMiraFormalGenerationInput } from './mira-formal-generation-policy';
+ import { parsePaidBudget, readSessionPaidBudget } from './mira-paid-budget';
+-import { resolveWebSearchApiKey, resolveServerWebSearchProviderId } from './provider-config';
++import { resolveServerWebSearchProviderId } from './provider-config';
++import { getMiraWebSearchProductionConfig } from './mira-web-search-production-config';
+ 
+ export const PRESTAGE_JOB = 'omformal_d57c133cbf917beb4cb30bb0';
+ export const PRESTAGE_SESSION =
+@@ -257,9 +258,7 @@
+       fail();
+     const binding = await readSessionPaidBudget(PRESTAGE_SESSION, true);
+     if (canonical(binding) !== canonical(originalJob.formalInput.paidBudget)) fail();
+-    const searchApiConfigured =
+-      resolveServerWebSearchProviderId() === 'brave' &&
+-      Boolean(resolveWebSearchApiKey('brave', undefined));
++    const searchApiConfigured = getMiraWebSearchProductionConfig(resolveServerWebSearchProviderId()).formalProductionConfigured;
+     const receipt = { ...history, historySha256, searchApiConfigured };
+     if (input.mode === 'plan') {
+       await conn.query('ROLLBACK');
+--- a/lib/server/mira-web-search-production-config.ts
++++ b/lib/server/mira-web-search-production-config.ts
+@@ -4,14 +4,24 @@
+ export function getMiraWebSearchProductionConfig(providerId?: string) {
+   // One argument is the legacy Tavily client-key overload. Explicit undefined
+   // is essential: the literal provider name must never be treated as a key.
+-  const hasBraveKey = Boolean(resolveWebSearchApiKey('brave', undefined).trim());
++  const supported = providerId === 'brave' || providerId === 'baidu';
++  const hasKey = supported && Boolean(resolveWebSearchApiKey(providerId, undefined).trim());
++  const searchDisabled = ['0', 'false'].includes(
++    process.env.MIRA_OPENMAIC_ENABLE_WEB_SEARCH?.trim().toLowerCase() ?? '',
++  );
+   const isBrave = providerId === 'brave';
+   return {
+     schemaVersion: 'mira.openmaic.web-search-production-config.v1',
+     providerId: providerId ?? null,
+-    productionMode: isBrave ? (hasBraveKey ? 'brave_api' : 'public_html') : null,
++    productionMode: isBrave
++      ? hasKey
++        ? 'brave_api'
++        : 'public_html'
++      : providerId === 'baidu' && hasKey
++        ? 'baidu_api'
++        : null,
+     formalProductionConfigured:
+-      isBrave && hasBraveKey && !isServerProviderDisabled('webSearch', 'brave'),
++      supported && hasKey && !searchDisabled && !isServerProviderDisabled('webSearch', providerId),
+     verification: 'configuration_only',
+   };
+ }
+--- a/lib/server/provider-config.ts
++++ b/lib/server/provider-config.ts
+@@ -995,6 +995,23 @@
+   const webSearch = getConfig().webSearch;
+   const disabled = getConfig().disabled.webSearch;
+   const enabled = (id: string) => !disabled.has(id);
++  const managedSearch = process.env.MIRA_OPENMAIC_WEB_SEARCH_PROVIDER?.trim();
++  if (managedSearch !== undefined) {
++    // Mira production selects one reviewed, metered search API. A missing key,
++    // disabled provider or invalid selection must not silently switch vendor.
++    if (
++      ['0', 'false'].includes(
++        process.env.MIRA_OPENMAIC_ENABLE_WEB_SEARCH?.trim().toLowerCase() ?? '',
++      )
++    ) {
++      return undefined;
++    }
++    return ['brave', 'baidu'].includes(managedSearch) &&
++      enabled(managedSearch) &&
++      Boolean(webSearch[managedSearch]?.apiKey?.trim())
++      ? managedSearch
++      : undefined;
++  }
+   if (
+     preferredProviderId &&
+     enabled(preferredProviderId) &&
+--- a/lib/server/web-search-config.ts
++++ b/lib/server/web-search-config.ts
+@@ -107,9 +107,11 @@
+   // (server precedence, #665); resolveServerWebSearchProviderId already skips
+   // disabled providers internally.
+   const providerId =
+-    (requestedProviderId && !isServerProviderDisabled('webSearch', requestedProviderId)
+-      ? requestedProviderId
+-      : undefined) ?? (resolveServerWebSearchProviderId() as WebSearchProviderId | undefined);
++    process.env.MIRA_OPENMAIC_WEB_SEARCH_PROVIDER !== undefined
++      ? (resolveServerWebSearchProviderId() as WebSearchProviderId | undefined)
++      : ((requestedProviderId && !isServerProviderDisabled('webSearch', requestedProviderId)
++          ? requestedProviderId
++          : undefined) ?? (resolveServerWebSearchProviderId() as WebSearchProviderId | undefined));
+   if (!providerId) return undefined;
+ 
+   const provider = WEB_SEARCH_PROVIDERS[providerId];
+--- a/lib/web-search/baidu.ts
++++ b/lib/web-search/baidu.ts
+@@ -6,12 +6,15 @@
+  */
+ 
+ import { proxyFetch } from '@/lib/server/proxy-fetch';
+-import { createLogger } from '@/lib/logger';
+ import type { WebSearchResult, WebSearchSource } from '@/lib/types/web-search';
+ import type { BaiduSubSources } from './types';
+ import { normalizeWebSearchQuery } from './utils';
+-
+-const log = createLogger('BaiduSearch');
++import { hasPaidBudget, meteredOperation } from '@/lib/mira-paid-budget-bridge';
++import {
++  sanitizedWebSearchToolError,
++  webSearchResponseError,
++  WebSearchProviderError,
++} from './provider-error';
+ 
+ const BAIDU_QIANFAN_BASE_URL = 'https://qianfan.baidubce.com';
+ const BAIDU_BAIKE_BASE_URL = 'https://appbuilder.baidu.com';
+@@ -26,6 +29,28 @@
+     'X-Appbuilder-From': 'openmaic',
+     'Content-Type': 'application/json',
+   };
++}
++
++function baiduWebHeaders(apiKey: string): Record<string, string> {
++  const headers = baiduHeaders(apiKey);
++  if (apiKey.startsWith('bce-v3')) {
++    delete headers.Authorization;
++    headers['X-Appbuilder-Authorization'] = `Bearer ${apiKey}`;
++  }
++  return headers;
++}
++
++function baiduApiError(code: unknown): WebSearchProviderError {
++  const safe =
++    typeof code === 'string' || typeof code === 'number' ? String(code) : 'INVALID_RESPONSE';
++  return new WebSearchProviderError(
++    'WEB_SEARCH_API_ERROR',
++    200,
++    0,
++    'json_omitted',
++    'baidu',
++    /^[A-Za-z0-9_.-]{1,48}$/.test(safe) ? safe : 'UNCLASSIFIED',
++  );
+ }
+ 
+ function buildQianfanUrl(path: string, baseUrl?: string): string {
+@@ -63,28 +88,33 @@
+   signal?: AbortSignal,
+ ): Promise<WebSearchSource[]> {
+   try {
+-    const res = await proxyFetch(buildQianfanUrl(BAIDU_WEB_SEARCH_PATH, baseUrl), {
+-      method: 'POST',
+-      headers: baiduHeaders(apiKey),
+-      body: JSON.stringify({
+-        messages: [{ content: query, role: 'user' }],
+-        search_source: 'baidu_search_v2',
+-        resource_type_filter: [{ type: 'web', top_k: maxResults }],
+-      }),
+-      ...(signal ? { signal } : {}),
+-    });
++    const res = await meteredOperation(
++      'baidu',
++      'baidu-web-search',
++      { query, maxResults, edition: 'standard' },
++      { calls: 1, search_requests: 1 },
++      () =>
++        proxyFetch(buildQianfanUrl(BAIDU_WEB_SEARCH_PATH, baseUrl), {
++          method: 'POST',
++          headers: baiduWebHeaders(apiKey),
++          body: JSON.stringify({
++            messages: [{ content: query, role: 'user' }],
++            search_source: 'baidu_search_v2',
++            edition: 'standard',
++            resource_type_filter: [{ type: 'web', top_k: maxResults }],
++          }),
++          ...(signal ? { signal } : {}),
++        }),
++    );
+ 
+     if (!res.ok) {
+-      const errorText = await res.text().catch(() => '');
+-      log.warn(`[Baidu Web] HTTP ${res.status}: ${errorText || res.statusText}`);
+-      return [];
++      throw await webSearchResponseError(res, 0, 'baidu');
+     }
+ 
+     const data = (await res.json()) as BaiduWebResponse;
+-    if (data.code && data.code !== 0) {
+-      log.warn(`[Baidu Web] API error ${data.code}: ${data.message || 'Request failed'}`);
+-      return [];
+-    }
++    if (data.code !== undefined && data.code !== 0 && data.code !== '0')
++      throw baiduApiError(data.code);
++    if (!Array.isArray(data.references)) throw baiduApiError('INVALID_RESPONSE');
+ 
+     return (data.references || [])
+       .filter((ref) => ref.url)
+@@ -92,13 +122,12 @@
+       .map((ref, index) => ({
+         title: ref.title || ref.site_name || ref.url || '',
+         url: ref.url || '',
+-        content: ref.content || '',
++        content: ref.content || ref.snippet || '',
+         score: Number((0.9 - index * 0.05).toFixed(2)),
+       }));
+   } catch (error) {
+     if (signal?.aborted) throw signal.reason ?? error;
+-    log.warn('[Baidu Web] Failed:', error);
+-    return [];
++    throw sanitizedWebSearchToolError(error);
+   }
+ }
+ 
+@@ -115,13 +144,12 @@
+     });
+ 
+     if (!res.ok) {
+-      const errorText = await res.text().catch(() => '');
+-      log.warn(`[Baidu Baike] HTTP ${res.status}: ${errorText || res.statusText}`);
+-      return [];
++      throw await webSearchResponseError(res, 0, 'baidu');
+     }
+ 
+     const data = (await res.json()) as BaiduBaikeResponse;
+-    if ((data.errno !== undefined && data.errno !== 0) || !data.result) return [];
++    if (data.errno !== undefined && data.errno !== 0) throw baiduApiError(data.errno);
++    if (!data.result) return [];
+ 
+     const result = data.result;
+     const title = result.lemma_title || query;
+@@ -135,8 +163,7 @@
+     ];
+   } catch (error) {
+     if (signal?.aborted) throw signal.reason ?? error;
+-    log.warn('[Baidu Baike] Failed:', error);
+-    return [];
++    throw sanitizedWebSearchToolError(error);
+   }
+ }
+ 
+@@ -155,13 +182,11 @@
+     });
+ 
+     if (!res.ok) {
+-      const errorText = await res.text().catch(() => '');
+-      log.warn(`[Baidu Scholar] HTTP ${res.status}: ${errorText || res.statusText}`);
+-      return [];
++      throw await webSearchResponseError(res, 0, 'baidu');
+     }
+ 
+     const data = (await res.json()) as BaiduScholarResponse;
+-    if (data.code && data.code !== '0') return [];
++    if (data.code && data.code !== '0') throw baiduApiError(data.code);
+ 
+     return (data.data || [])
+       .filter((paper) => paper.url)
+@@ -181,8 +206,7 @@
+       }));
+   } catch (error) {
+     if (signal?.aborted) throw signal.reason ?? error;
+-    log.warn('[Baidu Scholar] Failed:', error);
+-    return [];
++    throw sanitizedWebSearchToolError(error);
+   }
+ }
+ 
+@@ -198,7 +222,9 @@
+   if (!apiKey) throw new Error('Baidu API key is required');
+ 
+   const query = normalizeWebSearchQuery(rawQuery);
+-  const subSources = normalizeSubSources(params.subSources);
++  const subSources = hasPaidBudget()
++    ? { webSearch: true, baike: false, scholar: false }
++    : normalizeSubSources(params.subSources);
+   const startedAt = Date.now();
+ 
+   const [webResults, baikeResults, scholarResults] = await Promise.all([
+@@ -229,10 +255,11 @@
+   url?: string;
+   site_name?: string;
+   content?: string;
++  snippet?: string;
+ }
+ 
+ interface BaiduWebResponse {
+-  code?: number;
++  code?: number | string;
+   message?: string;
+   references?: BaiduWebReference[];
+ }
+--- a/lib/web-search/index.ts
++++ b/lib/web-search/index.ts
+@@ -22,7 +22,8 @@
+   claudeModelId?: string;
+   signal?: AbortSignal;
+ }): Promise<WebSearchResult> {
+-  if (hasPaidBudget() && params.providerId !== 'brave') throw new Error('MIRA_PAID_BUDGET_SEARCH_METER_UNAVAILABLE');
++  if (hasPaidBudget() && !['brave', 'baidu'].includes(params.providerId))
++    throw new Error('MIRA_PAID_BUDGET_SEARCH_METER_UNAVAILABLE');
+   const {
+     providerId,
+     query,
+@@ -43,7 +44,9 @@
+         apiKey,
+         maxResults,
+         baseUrl,
+-        subSources: baiduSubSources,
++        subSources: hasPaidBudget()
++          ? { webSearch: true, baike: false, scholar: false }
++          : baiduSubSources,
+         ...abortOptions,
+       });
+     case 'bocha':
+--- a/lib/web-search/provider-error.ts
++++ b/lib/web-search/provider-error.ts
+@@ -3,14 +3,17 @@
+   constructor(
+     readonly code:
+       | 'WEB_SEARCH_HTTP_ERROR'
++      | 'WEB_SEARCH_API_ERROR'
+       | 'WEB_SEARCH_RATE_LIMITED'
+       | 'WEB_SEARCH_RATE_LIMIT_COOLDOWN',
+     readonly status: number,
+     readonly retryAfterMs: number,
+     readonly bodySummary: 'html_omitted' | 'json_omitted' | 'body_omitted' | 'cooldown',
++    readonly provider: 'brave' | 'baidu' = 'brave',
++    readonly providerCode?: string,
+   ) {
+     super(
+-      `${code} provider=brave status=${status} retry_after_ms=${Math.ceil(retryAfterMs)} body=${bodySummary}`,
++      `${code} provider=${provider} status=${status} retry_after_ms=${Math.ceil(retryAfterMs)} body=${bodySummary}${providerCode && /^[A-Za-z0-9_.-]{1,48}$/.test(providerCode) ? ` api_code=${providerCode}` : ''}`,
+     );
+     this.name = 'WebSearchProviderError';
+   }
+@@ -19,6 +22,14 @@
+ export async function braveResponseError(
+   response: Response,
+   retryAfterMs: number,
++): Promise<WebSearchProviderError> {
++  return webSearchResponseError(response, retryAfterMs, 'brave');
++}
++
++export async function webSearchResponseError(
++  response: Response,
++  retryAfterMs: number,
++  provider: 'brave' | 'baidu',
+ ): Promise<WebSearchProviderError> {
+   const type = response.headers.get('content-type') ?? '';
+   const summary = /html/i.test(type)
+@@ -34,6 +45,7 @@
+     response.status,
+     retryAfterMs,
+     summary,
++    provider,
+   );
+ }
+ 
+--- a/tests/agent-runtime/web-search.test.ts
++++ b/tests/agent-runtime/web-search.test.ts
+@@ -164,6 +164,33 @@
+ 
+ describe('web_search bounded failure context', () => {
+   const capability: WebSearchCapability = { providerId: 'brave', apiKey: '' };
++  it('keeps Baidu agent calls web-only, registers real results, and retains the four-call limit', async () => {
++    searchWebMock.mockResolvedValue({
++      answer: '',
++      query: 'q',
++      responseTime: 0.2,
++      sources: [{ title: 'Source', url: 'https://example.org', content: 'snippet', score: 0.9 }],
++    });
++    const completed = vi.fn();
++    const observed = vi.fn();
++    const tool = buildWebSearchTool({ providerId: 'baidu', apiKey: 'test-only' }, observed, {
++      maxCalls: 4,
++      onSearchCompleted: completed,
++    });
++    for (let i = 0; i < 4; i++) await tool.execute(`call${i}`, { query: 'q' } as never, undefined);
++    expect(searchWebMock).toHaveBeenCalledWith(
++      expect.objectContaining({
++        providerId: 'baidu',
++        baiduSubSources: { webSearch: true, baike: false, scholar: false },
++      }),
++    );
++    expect(completed).toHaveBeenCalledTimes(4);
++    expect(observed).toHaveBeenCalledWith(['https://example.org']);
++    await expect(tool.execute('fifth', { query: 'q' } as never, undefined)).rejects.toThrow(
++      'web_search call limit reached (4)',
++    );
++    expect(searchWebMock).toHaveBeenCalledTimes(4);
++  });
+ 
+   it('does not expose arbitrary provider HTML or record failed searches as completed', async () => {
+     searchWebMock.mockRejectedValue(
+--- a/tests/server/mira-web-search-production-config.test.ts
++++ b/tests/server/mira-web-search-production-config.test.ts
+@@ -12,6 +12,22 @@
+   keyResolver.mockReset();
+ });
+ describe('formal search configuration metadata', () => {
++  it('accepts only the configured Baidu API without claiming network verification', () => {
++    keyResolver.mockReturnValue('bce-v3/test-only-key');
++    expect(getMiraWebSearchProductionConfig('baidu')).toEqual({
++      schemaVersion: 'mira.openmaic.web-search-production-config.v1',
++      providerId: 'baidu',
++      productionMode: 'baidu_api',
++      formalProductionConfigured: true,
++      verification: 'configuration_only',
++    });
++    expect(keyResolver).toHaveBeenCalledWith('baidu', undefined);
++    keyResolver.mockReturnValue(' ');
++    expect(getMiraWebSearchProductionConfig('baidu')).toMatchObject({
++      productionMode: null,
++      formalProductionConfigured: false,
++    });
++  });
+   it('reports public HTML without claiming production configuration or failing health', () => {
+     keyResolver.mockReturnValue('  ');
+     expect(getMiraWebSearchProductionConfig('brave')).toMatchObject({
+--- a/tests/server/web-search-config.test.ts
++++ b/tests/server/web-search-config.test.ts
+@@ -4,6 +4,10 @@
+   beforeEach(() => {
+     vi.resetModules();
+     vi.unstubAllEnvs();
++    delete process.env.MIRA_OPENMAIC_WEB_SEARCH_PROVIDER;
++    delete process.env.MIRA_OPENMAIC_ENABLE_WEB_SEARCH;
++    delete process.env.BAIDU_ENABLED;
++    delete process.env.BRAVE_ENABLED;
+     delete process.env.TAVILY_API_KEY;
+     delete process.env.TAVILY_BASE_URL;
+     delete process.env.BOCHA_API_KEY;
+@@ -28,6 +32,55 @@
+     ).toThrow('Unsupported Bocha base URL');
+   });
+ 
++  it('uses the selected managed API despite other keys and a client provider override', async () => {
++    vi.stubEnv('MIRA_OPENMAIC_WEB_SEARCH_PROVIDER', 'baidu');
++    vi.stubEnv('BAIDU_API_KEY', 'baidu-server-key');
++    vi.stubEnv('TAVILY_API_KEY', 'tavily-server-key');
++    const { resolveServerWebSearchProviderId } = await import('@/lib/server/provider-config');
++    const { resolveClassroomWebSearchConfig } = await import('@/lib/server/web-search-config');
++    expect(resolveServerWebSearchProviderId('tavily')).toBe('baidu');
++    expect(resolveClassroomWebSearchConfig({ webSearchProviderId: 'tavily' })).toMatchObject({
++      providerId: 'baidu',
++      apiKey: 'baidu-server-key',
++    });
++  });
++
++  it.each([
++    'missing_key',
++    'disabled_provider',
++    'empty_selection',
++    'invalid_selection',
++    'global_0',
++    'global_false',
++  ])(
++    'keeps managed search closed with %s instead of selecting another vendor',
++    async (condition) => {
++      vi.stubEnv(
++        'MIRA_OPENMAIC_WEB_SEARCH_PROVIDER',
++        condition === 'empty_selection'
++          ? ''
++          : condition === 'invalid_selection'
++            ? 'tavily'
++            : 'baidu',
++      );
++      vi.stubEnv('BRAVE_API_KEY', 'brave-server-key');
++      vi.stubEnv('TAVILY_API_KEY', 'tavily-server-key');
++      if (condition !== 'missing_key') vi.stubEnv('BAIDU_API_KEY', 'baidu-server-key');
++      if (condition === 'disabled_provider') vi.stubEnv('BAIDU_ENABLED', 'false');
++      if (condition.startsWith('global_'))
++        vi.stubEnv('MIRA_OPENMAIC_ENABLE_WEB_SEARCH', condition.slice(7));
++      const { resolveServerWebSearchProviderId } = await import('@/lib/server/provider-config');
++      const { resolveClassroomWebSearchConfig } = await import('@/lib/server/web-search-config');
++      expect(resolveServerWebSearchProviderId('brave')).toBeUndefined();
++      expect(
++        resolveClassroomWebSearchConfig({
++          webSearchProviderId: 'tavily',
++          webSearchApiKey: 'client-key',
++        }),
++      ).toBeUndefined();
++    },
++  );
++
+   it('allows official Bocha client base URLs', async () => {
+     const { resolveSafeClientWebSearchBaseUrl } = await import('@/lib/server/web-search-config');
+ 
+--- a/tests/web-search/baidu.test.ts
++++ b/tests/web-search/baidu.test.ts
+@@ -1,6 +1,14 @@
+ import { beforeEach, describe, expect, it, vi } from 'vitest';
+ 
+ const proxyFetchMock = vi.hoisted(() => vi.fn());
++const budget = vi.hoisted(() => ({
++  active: false,
++  run: vi.fn((_provider, _model, _request, _units, work: () => Promise<unknown>) => work()),
++}));
++vi.mock('@/lib/mira-paid-budget-bridge', () => ({
++  hasPaidBudget: () => budget.active,
++  meteredOperation: budget.run,
++}));
+ 
+ vi.mock('@/lib/server/proxy-fetch', () => ({
+   proxyFetch: proxyFetchMock,
+@@ -20,6 +28,8 @@
+ describe('searchWithBaidu', () => {
+   beforeEach(() => {
+     proxyFetchMock.mockReset();
++    budget.active = false;
++    budget.run.mockClear();
+   });
+ 
+   it('queries only enabled Baidu sub-sources and merges their results', async () => {
+@@ -113,4 +123,94 @@
+       'https://qianfan.baidubce.com/v2/tools/baidu_scholar/search?wd=OpenMAIC&pageNum=0&enable_ai_abstract=true',
+     ]);
+   });
++
++  it('meters exactly one standard web request in formal mode, supports bce-v3 and snippet, and retains legacy auth', async () => {
++    budget.active = true;
++    for (const apiKey of ['bce-v3/test-only-credential', 'legacy-test-key']) {
++      proxyFetchMock.mockReset();
++      budget.run.mockClear();
++      proxyFetchMock.mockResolvedValueOnce(
++        new Response(
++          JSON.stringify({
++            code: 0,
++            references: [
++              {
++                title: 'Official source',
++                url: 'https://example.org/source',
++                snippet: 'Source summary',
++              },
++            ],
++          }),
++          { status: 200 },
++        ),
++      );
++      const result = await searchWithBaidu({
++        query: 'fraction percentage',
++        apiKey,
++        subSources: { webSearch: false, baike: true, scholar: true },
++      });
++      expect(proxyFetchMock).toHaveBeenCalledTimes(1);
++      const [url, init] = proxyFetchMock.mock.calls[0];
++      expect(url).toBe('https://qianfan.baidubce.com/v2/ai_search/web_search');
++      expect(init.method).toBe('POST');
++      expect(
++        init.headers[apiKey.startsWith('bce-v3') ? 'X-Appbuilder-Authorization' : 'Authorization'],
++      ).toBe(`Bearer ${apiKey}`);
++      if (apiKey.startsWith('bce-v3')) expect(init.headers.Authorization).toBeUndefined();
++      expect(JSON.parse(init.body)).toMatchObject({
++        edition: 'standard',
++        search_source: 'baidu_search_v2',
++        messages: [{ role: 'user', content: 'fraction percentage' }],
++      });
++      expect(budget.run).toHaveBeenCalledExactlyOnceWith(
++        'baidu',
++        'baidu-web-search',
++        expect.objectContaining({ edition: 'standard' }),
++        { calls: 1, search_requests: 1 },
++        expect.any(Function),
++      );
++      expect(result.sources).toEqual([
++        {
++          title: 'Official source',
++          url: 'https://example.org/source',
++          content: 'Source summary',
++          score: 0.9,
++        },
++      ]);
++    }
++  });
++
++  it('preserves HTTP and API failure codes instead of returning successful empty searches', async () => {
++    budget.active = true;
++    const response = new Response('<html>' + 'private error '.repeat(100_000), {
++      status: 429,
++      headers: { 'content-type': 'text/html' },
++    });
++    const read = vi.spyOn(response, 'text');
++    proxyFetchMock.mockResolvedValueOnce(response);
++    const error = await searchWithBaidu({ query: 'q', apiKey: 'bce-v3/test' }).catch(
++      (value) => value,
++    );
++    expect(error).toMatchObject({
++      code: 'WEB_SEARCH_RATE_LIMITED',
++      provider: 'baidu',
++      status: 429,
++    });
++    expect(error.message.length).toBeLessThan(180);
++    expect(error.message).not.toContain('private');
++    expect(read).not.toHaveBeenCalled();
++    proxyFetchMock.mockResolvedValueOnce(
++      new Response(JSON.stringify({ code: 'IAM_AUTH_FAILED', message: 'private auth body' }), {
++        status: 200,
++      }),
++    );
++    await expect(searchWithBaidu({ query: 'q', apiKey: 'bce-v3/test' })).rejects.toMatchObject({
++      code: 'WEB_SEARCH_API_ERROR',
++      providerCode: 'IAM_AUTH_FAILED',
++    });
++    proxyFetchMock.mockRejectedValueOnce(new Error('network failed <html>private details'));
++    await expect(searchWithBaidu({ query: 'q', apiKey: 'bce-v3/test' })).rejects.toThrow(
++      'WEB_SEARCH_PROVIDER_FAILED detail=omitted',
++    );
++  });
+ });
+--- a/tests/web-search/index.test.ts
++++ b/tests/web-search/index.test.ts
+@@ -1,6 +1,8 @@
+ import { beforeEach, describe, expect, it, vi } from 'vitest';
+ 
+ const searchWithBochaMock = vi.hoisted(() => vi.fn());
++const paid = vi.hoisted(() => ({ active: false }));
++vi.mock('@/lib/mira-paid-budget-bridge', () => ({ hasPaidBudget: () => paid.active }));
+ const searchWithBraveMock = vi.hoisted(() => vi.fn());
+ const searchWithClaudeMock = vi.hoisted(() => vi.fn());
+ const searchWithBaiduMock = vi.hoisted(() => vi.fn());
+@@ -45,6 +47,7 @@
+ 
+ describe('searchWeb', () => {
+   beforeEach(() => {
++    paid.active = false;
+     searchWithBochaMock.mockReset();
+     searchWithBraveMock.mockReset();
+     searchWithClaudeMock.mockReset();
+@@ -53,6 +56,24 @@
+     searchWithMiniMaxMock.mockReset();
+     searchWithDoubaoMock.mockReset();
+     searchWithSearxngMock.mockReset();
++  });
++
++  it('admits metered Baidu with web-only source selection and keeps unmetered providers closed', async () => {
++    paid.active = true;
++    searchWithBaiduMock.mockResolvedValue({ answer: '', query: 'q', sources: [], responseTime: 0 });
++    await searchWeb({
++      providerId: 'baidu',
++      query: 'q',
++      apiKey: 'test-key',
++      baiduSubSources: { webSearch: false, baike: true, scholar: true },
++    });
++    expect(searchWithBaiduMock).toHaveBeenCalledWith(
++      expect.objectContaining({ subSources: { webSearch: true, baike: false, scholar: false } }),
++    );
++    await expect(searchWeb({ providerId: 'searxng', query: 'q' })).rejects.toThrow(
++      'MIRA_PAID_BUDGET_SEARCH_METER_UNAVAILABLE',
++    );
++    expect(searchWithSearxngMock).not.toHaveBeenCalled();
+   });
+ 
+   it('dispatches Tavily provider requests', async () => {

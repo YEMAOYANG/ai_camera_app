@@ -1,0 +1,250 @@
+diff --git a/lib/server/mira-formal-browser-recheck.ts b/lib/server/mira-formal-browser-recheck.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-browser-recheck.ts
+@@ -0,0 +1,115 @@
++/** Operator-only proof that a saved snapshot stopped before any paid dispatch. */
++import { createHash } from 'node:crypto';
++import { readFile, readdir, open } from 'node:fs/promises';
++import { join } from 'node:path';
++import { qualitySha } from './mira-formal-quality-contract';
++
++const SHA = /^[a-f0-9]{64}$/;
++const SCHEMA = 'mira.formal.browser-only-recheck.v1';
++export const INSPECTOR_SOURCES = [
++  'lib/server/mira-formal-exploration.ts',
++  'lib/server/mira-formal-scene-dom.ts',
++  'lib/server/mira-formal-scene-inspector.ts',
++] as const;
++const bytesSha = (value: Buffer) => createHash('sha256').update(value).digest('hex');
++const object = (value: unknown): value is Record<string, any> => !!value && typeof value === 'object' && !Array.isArray(value);
++function fail(): never { throw new Error('SAVED_STAGE_BROWSER_RECHECK_NOT_PROVEN'); }
++async function exists(path: string) {
++  try { await readFile(path); return true; }
++  catch (error) { if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false; throw error; }
++}
++async function files(path: string) {
++  try { return await readdir(path); }
++  catch (error) { if ((error as NodeJS.ErrnoException).code === 'ENOENT') return []; throw error; }
++}
++export async function inspectorSourceBundle(root: string) {
++  const bundle: Record<string, string> = {};
++  for (const path of INSPECTOR_SOURCES) bundle[path] = bytesSha(await readFile(join(root, path)));
++  return { bundle, sha256: qualitySha(bundle) };
++}
++
++export async function readBrowserRecheckBudget(authorizationId: string) {
++  const base = process.env.MIRA_BACKEND_INTERNAL_URL;
++  const token = process.env.MIRA_INTERNAL_API_TOKEN;
++  if (!base || !token || !SHA.test(authorizationId)) fail();
++  const response = await fetch(new URL('/internal/learning/budget/context', base), {
++    method: 'POST', redirect: 'error', signal: AbortSignal.timeout(15000),
++    headers: { 'Content-Type': 'application/json', 'X-Mira-Internal-Token': token,
++      'X-Mira-Internal-Source': 'openmaic-runtime-gateway' },
++    body: JSON.stringify({ authorizationId }),
++  });
++  const body = await response.json().catch(() => null);
++  if (!response.ok || !body?.ok || !object(body.budget)) fail();
++  // Never return price data or credentials to the recovery audit.
++  return { authorizationId: body.budget.authorizationId, purpose: body.budget.purpose,
++    unsettledReservationCount: body.budget.unsettledReservationCount,
++    latestProviderDispatchAt: body.budget.latestProviderDispatchAt };
++}
++
++export async function proveUnsentBrowserRecheck(input: {
++  root: string; recoveryFolder: string;
++  identity: { sourceJobSha256: string; sourceSnapshotSha256: string; repairSnapshotSha256: string; sessionId: string; stageId: string };
++  ownerId: string; authorizationId: string; manifest: unknown;
++}, deps: { readBudget?: typeof readBrowserRecheckBudget } = {}) {
++  const { identity, root, recoveryFolder } = input;
++  const spec = input.manifest;
++  if (!object(spec) || Object.keys(spec).sort().join(',') !==
++      'inspectorSourceSha256,priorClaimSha256,priorResultSha256,qualityIdentitySha256,schemaVersion'
++      || spec.schemaVersion !== SCHEMA || !SHA.test(input.authorizationId)
++      || ['qualityIdentitySha256','priorClaimSha256','priorResultSha256','inspectorSourceSha256']
++        .some(key => typeof spec[key] !== 'string' || !SHA.test(spec[key]))) fail();
++  const snapshot = identity.repairSnapshotSha256;
++  const priorClaimBytes = await readFile(join(recoveryFolder, `complete-${snapshot}.claim`));
++  const priorClaim = JSON.parse(priorClaimBytes.toString('utf8'));
++  const claimAt = Date.parse(priorClaim.createdAt);
++  if (bytesSha(priorClaimBytes) !== spec.priorClaimSha256 || !Number.isSafeInteger(claimAt)
++      || Object.entries(identity).some(([key, value]) => priorClaim[key] !== value)
++      || priorClaim.reviewGrantSha256 || await exists(join(recoveryFolder, 'completion.json'))) fail();
++  const folder = join(root, 'data/formal-quality-reviews', spec.qualityIdentitySha256);
++  const resultBytes = await readFile(join(folder, `${snapshot}.json`));
++  const result = JSON.parse(resultBytes.toString('utf8'));
++  const browser = JSON.parse(await readFile(join(folder, `${snapshot}-browser.json`), 'utf8'));
++  const ledger = JSON.parse(await readFile(join(folder, 'attempts.json'), 'utf8'));
++  const originalInput = JSON.parse(await readFile(join(folder, `${snapshot}-input.json`), 'utf8'));
++  const attempts = Array.isArray(ledger) ? ledger.filter(item => object(item) && item.snapshotSha256 === snapshot) : [];
++  const qualityIdentity = Object.fromEntries(['ownerId','sessionId','stageId','gradeBoundarySha256',
++    'teachingBriefSha256','selectionPlanSha256','interactionDesignContextSha256','difficultyPolicySha256']
++    .filter(key => originalInput[key] !== undefined).map(key => [key, originalInput[key]]));
++  if (bytesSha(resultBytes) !== spec.priorResultSha256 || result.status !== 'needs_revision'
++      || result.snapshotSha256 !== snapshot || result.receipt || !Array.isArray(result.issues) || !result.issues.length
++      || result.issues.some((issue: unknown) => !object(issue) || typeof issue.problem !== 'string' || !issue.problem.startsWith('Browser check '))
++      || !Array.isArray(browser) || !browser.some(check => object(check) && check.passed === false)
++      || attempts.length !== 1 || attempts[0].status !== 'needs_revision' || attempts[0].grantId || attempts[0].artifactPrefix
++      || qualitySha(qualityIdentity) !== spec.qualityIdentitySha256
++      || originalInput.ownerId !== input.ownerId || originalInput.sessionId !== identity.sessionId
++      || originalInput.stageId !== identity.stageId || qualitySha(originalInput.snapshot) !== snapshot
++      || (await files(folder)).some(name => name.startsWith(snapshot) && /(?:provider|dispatch|visual)/.test(name))
++      || (await files(join(root, 'data/formal-visual-provider-responses', snapshot))).length > 0) fail();
++  const inspector = await inspectorSourceBundle(root);
++  if (inspector.sha256 !== spec.inspectorSourceSha256) fail();
++  const budget = await (deps.readBudget ?? readBrowserRecheckBudget)(input.authorizationId);
++  if (budget.authorizationId !== input.authorizationId || budget.purpose !== 'production'
++      || budget.unsettledReservationCount !== 0
++      || !(budget.latestProviderDispatchAt === null
++        || Number.isSafeInteger(budget.latestProviderDispatchAt) && budget.latestProviderDispatchAt < claimAt)) fail();
++  const evidence = { schemaVersion: SCHEMA, ...identity, authorizationId: input.authorizationId,
++    qualityIdentitySha256: spec.qualityIdentitySha256, priorClaimSha256: spec.priorClaimSha256,
++    priorResultSha256: spec.priorResultSha256, inspectorSourceSha256: inspector.sha256,
++    inspectorSources: inspector.bundle, budgetProof: budget, originalClaimCreatedAt: claimAt,
++    priorClaim, priorResult: result, priorBrowser: browser, priorAttempt: attempts[0],
++    priorQualityInputSha256: bytesSha(Buffer.from(await readFile(join(folder, `${snapshot}-input.json`)))) };
++  return { evidence, evidenceSha256: qualitySha(evidence) };
++}
++
++/** Called while the saved-stage active.lock is held. A repeated proof cannot re-claim. */
++export async function claimUnsentBrowserRecheck(input: Parameters<typeof proveUnsentBrowserRecheck>[0]) {
++  const proof = await proveUnsentBrowserRecheck(input);
++  const filename = `complete-${input.identity.repairSnapshotSha256}-browser-${proof.evidenceSha256}.claim`;
++  const claim = await open(join(input.recoveryFolder, filename), 'wx', 0o600);
++  try {
++    await claim.writeFile(JSON.stringify({ ...proof.evidence, evidenceSha256: proof.evidenceSha256,
++      pid: process.pid, createdAt: new Date().toISOString() }));
++    await claim.sync();
++  } finally { await claim.close(); }
++  return proof.evidenceSha256;
++}
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -18,14 +18,18 @@
+ import { acquireFormalQualityLock, type QualityLockLease } from '../lib/server/mira-formal-quality-lock';
+ import { repairMiraFormalAudioSegment } from '../lib/server/mira-formal-audio-repair';
+ import type { FormalQualityReviewGrant } from '../lib/server/mira-formal-teaching-quality';
++import { claimUnsentBrowserRecheck } from '../lib/server/mira-formal-browser-recheck';
++import { parsePaidBudget } from '../lib/server/mira-paid-budget';
+ 
+ const sha = (value: Buffer) => createHash('sha256').update(value).digest('hex');
+ let lease: QualityLockLease | undefined;
+ async function main() {
+   const [mode, manifestPath] = process.argv.slice(2);
+-  if (!['prepare', 'inspect', 'complete', 'diagnose-audio', 'repair-audio', 'complete-audio-tail'].includes(mode) || !manifestPath)
+-    throw new Error('Usage: recover-formal-saved-stage.ts prepare|inspect|complete manifest.json');
++  if (!['prepare', 'inspect', 'complete', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail'].includes(mode) || !manifestPath)
++    throw new Error('Usage: recover-formal-saved-stage.ts prepare|inspect|complete|complete-browser-recheck manifest.json');
+   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
++  if (mode === 'complete-browser-recheck' && (manifest.reviewGrantPath || manifest.asrSourceRequestId || manifest.ttsSourceRequestId))
++    throw new Error('SAVED_STAGE_BROWSER_RECHECK_CANNOT_MIX_RECOVERIES');
+   if (!/^[A-Za-z0-9_-]+$/.test(manifest.jobId) || !/^[a-f0-9]{64}$/.test(manifest.sourceJobSha256))
+     throw new Error('SAVED_STAGE_MANIFEST_INVALID');
+   const jobPath = path.join(CLASSROOM_JOBS_DIR, `${manifest.jobId}.json`);
+@@ -141,16 +145,23 @@
+   // A crash or concurrent operator is fail-closed; never delete a durable claim
+   // automatically. Review the saved result/paid ledger before resuming it.
+   lease = await acquireFormalQualityLock(path.join(folder, 'active.lock'));
+-  const legacyClaim = path.join(folder, 'complete.claim');
+-  try {
+-    const legacy = JSON.parse(await fs.readFile(legacyClaim, 'utf8'));
+-    if (!audioTailReceipt && !reviewGrantSha256 && legacy.repairSnapshotSha256 === snapshotSha256)
+-      throw new Error('SAVED_STAGE_PRIOR_COMPLETION_CLAIM');
+-  } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+-  const claim = await fs.open(path.join(folder,
+-    `complete-${snapshotSha256}${audioTailReceipt ? `-audio-${audioTailReceipt}` : reviewGrantSha256 ? `-review-${reviewGrantSha256}` : ''}.claim`), 'wx', 0o600);
+-  await claim.writeFile(JSON.stringify({ ...identity, reviewGrantSha256, pid: process.pid, createdAt: new Date().toISOString() }));
+-  await claim.sync(); await claim.close();
++  let browserRecheckSha256: string | undefined;
++  if (mode === 'complete-browser-recheck') {
++    browserRecheckSha256 = await claimUnsentBrowserRecheck({ root: process.cwd(), recoveryFolder: folder,
++      identity, ownerId: prepared.ownerId, authorizationId: parsePaidBudget(job.formalInput.paidBudget).authorizationId,
++      manifest: manifest.browserRecheck });
++  } else {
++    const legacyClaim = path.join(folder, 'complete.claim');
++    try {
++      const legacy = JSON.parse(await fs.readFile(legacyClaim, 'utf8'));
++      if (!audioTailReceipt && !reviewGrantSha256 && legacy.repairSnapshotSha256 === snapshotSha256)
++        throw new Error('SAVED_STAGE_PRIOR_COMPLETION_CLAIM');
++    } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
++    const claim = await fs.open(path.join(folder,
++      `complete-${snapshotSha256}${audioTailReceipt ? `-audio-${audioTailReceipt}` : reviewGrantSha256 ? `-review-${reviewGrantSha256}` : ''}.claim`), 'wx', 0o600);
++    await claim.writeFile(JSON.stringify({ ...identity, reviewGrantSha256, pid: process.pid, createdAt: new Date().toISOString() }));
++    await claim.sync(); await claim.close();
++  }
+   try { await fs.writeFile(path.join(folder, 'source-job.json'), source, { flag: 'wx', mode: 0o600 }); }
+   catch (error) {
+     if ((error as NodeJS.ErrnoException).code !== 'EEXIST'
+@@ -164,7 +175,8 @@
+   });
+   const receipt = { ...identity, kind: 'operator_saved_stage_repair', originalSessionStatus: prepared.originalSessionStatus,
+     recoveryId: `omsaved_${qualitySha(identity).slice(0, 24)}`, completedAt: new Date().toISOString(),
+-    newAgentSessions: 0, newSearches: 0, ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}), result: completion.result };
++    newAgentSessions: 0, newSearches: 0, ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}),
++    ...(browserRecheckSha256 ? { browserRecheckSha256 } : {}), result: completion.result };
+   const receiptSha256 = qualitySha(receipt);
+   await writeJsonFileAtomic(path.join(folder, 'completion.json'), { ...receipt, receiptSha256 });
+   if (sha(await fs.readFile(jobPath)) !== manifest.sourceJobSha256)
+diff --git a/tests/server/mira-formal-browser-recheck.test.ts b/tests/server/mira-formal-browser-recheck.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-browser-recheck.test.ts
+@@ -0,0 +1,57 @@
++import { afterEach, describe, expect, it } from 'vitest';
++import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
++import { tmpdir } from 'node:os';
++import { join } from 'node:path';
++import { createHash } from 'node:crypto';
++import { qualitySha } from '../../lib/server/mira-formal-quality-contract';
++import { INSPECTOR_SOURCES, inspectorSourceBundle, proveUnsentBrowserRecheck } from '../../lib/server/mira-formal-browser-recheck';
++
++const folders: string[] = [];
++afterEach(async () => { await Promise.all(folders.splice(0).map(path => rm(path, {recursive:true,force:true}))); });
++const sha = (text: string) => createHash('sha256').update(text).digest('hex');
++async function fixture() {
++  const root = await mkdtemp(join(tmpdir(), 'mira-browser-recheck-')); folders.push(root);
++  const snapshot = {stage:{id:'stage-test'},scenes:[{id:'scene-test'}]};
++  const hash = qualitySha(snapshot);
++  const identity = {sourceJobSha256:'a'.repeat(64),sourceSnapshotSha256:'b'.repeat(64),
++    repairSnapshotSha256:hash,sessionId:'session-test',stageId:'stage-test'};
++  const quality = {ownerId:'owner-test',sessionId:identity.sessionId,stageId:identity.stageId,
++    gradeBoundarySha256:'c'.repeat(64),teachingBriefSha256:'d'.repeat(64),selectionPlanSha256:'e'.repeat(64)};
++  const recoveryFolder=join(root,'recovery'); const folder=join(root,'data/formal-quality-reviews',qualitySha(quality));
++  await mkdir(recoveryFolder,{recursive:true}); await mkdir(folder,{recursive:true});
++  for (const path of INSPECTOR_SOURCES) { await mkdir(join(root,'lib/server'),{recursive:true}); await writeFile(join(root,path),path); }
++  const claim=JSON.stringify({...identity,createdAt:'2026-09-10T08:31:07.349Z',pid:123});
++  const result=JSON.stringify({status:'needs_revision',snapshotSha256:hash,issues:[{problem:'Browser check 1024x768: reset state'}]});
++  await writeFile(join(recoveryFolder,`complete-${hash}.claim`),claim);
++  await writeFile(join(folder,`${hash}.json`),result);
++  await writeFile(join(folder,`${hash}-browser.json`),JSON.stringify([{passed:false}]));
++  await writeFile(join(folder,`${hash}-input.json`),JSON.stringify({...quality,snapshot}));
++  await writeFile(join(folder,'attempts.json'),JSON.stringify([{snapshotSha256:hash,status:'needs_revision'}]));
++  const authorizationId='f'.repeat(64);
++  const budget={authorizationId,purpose:'production',unsettledReservationCount:0,latestProviderDispatchAt:Date.parse('2026-09-10T08:00:00Z')};
++  return {root,folder,claim,budget,input:{root,recoveryFolder,identity,ownerId:quality.ownerId,authorizationId,
++    manifest:{schemaVersion:'mira.formal.browser-only-recheck.v1',qualityIdentitySha256:qualitySha(quality),
++      priorClaimSha256:sha(claim),priorResultSha256:sha(result),inspectorSourceSha256:(await inspectorSourceBundle(root)).sha256}}};
++}
++describe('saved snapshot browser-only recheck', () => {
++  it('accepts the original browser-only failure with exact source/claim and authoritative zero-dispatch proof', async () => {
++    const f=await fixture();
++    const proof=await proveUnsentBrowserRecheck(f.input,{readBudget:async()=>f.budget});
++    expect(proof.evidenceSha256).toBe(qualitySha(proof.evidence));
++    expect(proof.evidence.priorAttempt.status).toBe('needs_revision');
++    expect(await readFile(join(f.input.recoveryFolder,`complete-${f.input.identity.repairSnapshotSha256}.claim`),'utf8')).toBe(f.claim);
++  });
++  it('rejects paid dispatch evidence, visual replies, and unresolved authoritative ledger calls', async () => {
++    const f=await fixture(); const snapshot=f.input.identity.repairSnapshotSha256;
++    for (const field of ['latestProviderDispatchAt','unsettledReservationCount'] as const) {
++      const budget={...f.budget,[field]:field==='latestProviderDispatchAt'?Date.parse('2026-09-10T08:32:00Z'):1};
++      await expect(proveUnsentBrowserRecheck(f.input,{readBudget:async()=>budget})).rejects.toThrow('NOT_PROVEN');
++    }
++    const marker=join(f.folder,`${snapshot}-provider-dispatch.json`); await writeFile(marker,'{}');
++    await expect(proveUnsentBrowserRecheck(f.input,{readBudget:async()=>f.budget})).rejects.toThrow('NOT_PROVEN');
++    await rm(marker);
++    const visual=join(f.root,'data/formal-visual-provider-responses',snapshot); await mkdir(visual,{recursive:true});
++    await writeFile(join(visual,'original-paid-reply.json'),'{}');
++    await expect(proveUnsentBrowserRecheck(f.input,{readBudget:async()=>f.budget})).rejects.toThrow('NOT_PROVEN');
++  });
++});
