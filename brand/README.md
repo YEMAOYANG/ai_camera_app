@@ -29,9 +29,9 @@
 Flutter 可引用的核心资产已同步到：
 
 - `mobile/assets/brand/nuantong-logo-mark.png`
-- `mobile/assets/brand/nuantong-logo-horizontal.png`
-- `mobile/assets/brand/nuantong-logo-vertical.png`
 - `mobile/assets/brand/nuantong-app-icon-1024.png`
+
+横版和竖版组合原图保存在 `brand/logo/png/`，按需使用。
 
 本轮没有替换 Android / iOS 平台图标。后续确认后再使用 `flutter_launcher_icons` 生成平台图标。
 

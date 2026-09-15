@@ -171,9 +171,9 @@ App 内图标应与暖瞳 Logo 的柔和几何气质一致：
 已同步到 Flutter 可用目录：
 
 - `mobile/assets/brand/nuantong-logo-mark.png`
-- `mobile/assets/brand/nuantong-logo-horizontal.png`
-- `mobile/assets/brand/nuantong-logo-vertical.png`
 - `mobile/assets/brand/nuantong-app-icon-1024.png`
+
+横版和竖版组合原图保存在 `brand/logo/png/`，按需使用。
 
 `mobile/pubspec.yaml` 已加入：
 
