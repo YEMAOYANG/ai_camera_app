@@ -21,6 +21,7 @@ from integrations.openmaic_formal_pedagogy import FORMAL_TEACHING_QUALITY_POLICY
 from integrations.openmaic_formal_quality import validate_quality_manifest
 from integrations.openmaic_formal_video import FORMAL_VIDEO_POLICY, validate_video_manifest
 from integrations.openmaic_formal_interaction import INTERACTION_DESIGN_POLICY, MULTISTATE_INTERACTION_POLICY, validate_interaction_manifest
+from integrations.openmaic_formal_playful import PLAYFUL_LEARNING_POLICY, REQUIRED_3D_PLAYFUL_LEARNING_POLICY
 
 
 FORMAL_IMAGE_POLICY = {
@@ -68,6 +69,13 @@ INTERACTIVE_PROFESSIONAL_POLICY = {
 MULTISTATE_PROFESSIONAL_POLICY = {
     **deepcopy(VIDEO_PROFESSIONAL_POLICY), "interactionDesignPolicy": MULTISTATE_INTERACTION_POLICY,
 }
+PLAYFUL_PROFESSIONAL_POLICY = {
+    **deepcopy(MULTISTATE_PROFESSIONAL_POLICY), "playfulLearningPolicy": PLAYFUL_LEARNING_POLICY,
+}
+REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY = {
+    **deepcopy(MULTISTATE_PROFESSIONAL_POLICY),
+    "playfulLearningPolicy": REQUIRED_3D_PLAYFUL_LEARNING_POLICY,
+}
 LEGACY_CONTENT_PROVIDER_PROFILE = "mira.learning.question-provider-profile.v105-deepseek-professional"
 VIDEO_CONTENT_PROVIDER_PROFILE = "mira.learning.question-provider-profile.v106-deepseek-professional-video"
 LEGACY_GENERATION_OPTIONS = {
@@ -102,7 +110,8 @@ def professional_policy(value: object) -> dict[str, Any]:
     if not isinstance(value, Mapping) or canonical_sha256(value) not in {
         canonical_sha256(LEGACY_PROFESSIONAL_POLICY), canonical_sha256(IMAGE_PROFESSIONAL_POLICY),
         canonical_sha256(INTEGRATED_PROFESSIONAL_POLICY), canonical_sha256(PROFESSIONAL_POLICY),
-        canonical_sha256(VIDEO_PROFESSIONAL_POLICY), canonical_sha256(INTERACTIVE_PROFESSIONAL_POLICY), canonical_sha256(MULTISTATE_PROFESSIONAL_POLICY)
+        canonical_sha256(VIDEO_PROFESSIONAL_POLICY), canonical_sha256(INTERACTIVE_PROFESSIONAL_POLICY), canonical_sha256(MULTISTATE_PROFESSIONAL_POLICY),
+        canonical_sha256(PLAYFUL_PROFESSIONAL_POLICY), canonical_sha256(REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)
     }:
         raise ValueError("unsupported formal professional policy")
     return deepcopy(dict(value))
@@ -128,7 +137,9 @@ def compatible_preparation_targets(current: Mapping[str, Any]) -> tuple[dict[str
     policy_from_target(current)
     targets = [deepcopy(dict(current))]
     for historical_policy in (LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY,
-                              INTEGRATED_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY):
+                              INTEGRATED_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY,
+                              MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
+                              REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY):
         historical = deepcopy(dict(current))
         historical["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(historical_policy)
         if "video" in policy_from_target(current):

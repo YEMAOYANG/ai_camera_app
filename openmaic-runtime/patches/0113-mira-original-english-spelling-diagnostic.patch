@@ -1,0 +1,81 @@
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -200,8 +200,9 @@
+ }
+ 
+ export const MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY = 'mira.english.repair-asr-auto-language.v1' as const;
++export const MIRA_ENGLISH_SPELLING_ASR_DIAGNOSTIC_POLICY = 'mira.english.spelling-asr-auto-language.v1' as const;
+ export interface MiraEnglishRepairAsrDiagnosticProfile {
+-  policyVersion: typeof MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY;
++  policyVersion: typeof MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY | typeof MIRA_ENGLISH_SPELLING_ASR_DIAGNOSTIC_POLICY;
+   sourceEvidenceSha256: string;
+ }
+ 
+@@ -1053,6 +1054,22 @@
+     {policyVersion: MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY, sourceEvidenceSha256});
+ }
+ 
++/** Separate operator lane for an original WAV with audited English spelling.
++ * No repair child is synthesized and the repair1 diagnostic contract is unchanged. */
++export async function executeMiraEnglishSpellingAsrDiagnostic(
++  value: unknown,
++  sourceEvidenceSha256: string,
++  dependencies: RuntimeDependencies = {},
++): Promise<{ record: MiraFormalAsrJob; created: boolean; transcript?: string }> {
++  const input = assertMiraFormalAsrRequest(value);
++  if (input.subject !== 'english' || !SHA256.test(sourceEvidenceSha256) ||
++      !/^formal_asr_[a-f0-9]{48}\.diagnostic1$/.test(input.requestId) ||
++      input.ttsRequestId !== input.requestId.replace(/^formal_asr_/, 'formal_tts_').replace(/\.diagnostic1$/, ''))
++    throw new MiraFormalAudioError('invalid_request', 'Invalid English spelling diagnostic identity');
++  return executeFormalAsr(input, dependencies,
++    {policyVersion: MIRA_ENGLISH_SPELLING_ASR_DIAGNOSTIC_POLICY, sourceEvidenceSha256});
++}
++
+ async function executeFormalAsr(
+   value: unknown,
+   dependencies: RuntimeDependencies,
+diff --git a/tests/server/mira-english-repair-asr-diagnostic.test.ts b/tests/server/mira-english-repair-asr-diagnostic.test.ts
+--- a/tests/server/mira-english-repair-asr-diagnostic.test.ts
++++ b/tests/server/mira-english-repair-asr-diagnostic.test.ts
+@@ -6,7 +6,8 @@
+ import * as paidBudget from '@/lib/server/mira-paid-budget';
+ import { qualitySha } from '@/lib/server/mira-formal-quality-contract';
+ import { MIRA_FORMAL_AUDIO_POLICY, MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY,
+-  executeMiraFormalAsr, executeMiraEnglishRepairAsrDiagnostic,
++  executeMiraFormalAsr, executeMiraEnglishRepairAsrDiagnostic, executeMiraEnglishSpellingAsrDiagnostic,
++  MIRA_ENGLISH_SPELLING_ASR_DIAGNOSTIC_POLICY,
+   readMiraFormalAsrJob, readMiraFormalTtsJob, type MiraFormalTtsJob, type MiraFormalAsrJob } from '@/lib/server/mira-formal-audio';
+ import { readMiraEnglishPronunciationRepairEvidence, readMiraEnglishRepairAsrDiagnosticSource,
+   diagnoseMiraEnglishRepairAsr, readMiraEnglishRepairAsrDiagnostic, repairMiraFormalAudioSegment } from '@/lib/server/mira-formal-audio-repair';
+@@ -161,3 +162,30 @@
+     expect(fetchMock).toHaveBeenCalledTimes(1);
+   });
+ });
++
++
++describe('separate original spelling WAV diagnostic dispatch', () => {
++  it('uses the original WAV once with an independent profile and no language or text hints', async () => {
++    const request = {...identity, requestId: `${asrId}.diagnostic1`, ttsRequestId: ttsId, audioSha256: originalTts.audioSha256!};
++    const result = await executeMiraEnglishSpellingAsrDiagnostic(request, 'c'.repeat(64));
++    expect(result.record.state).toBe('succeeded');
++    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
++    expect(body).toEqual({model: 'qwen3-asr-flash', input: {messages: [{role: 'user', content: [
++      {audio: `data:audio/wav;base64,${oldWav.toString('base64')}`},
++    ]}]}, parameters: {asr_options: {}}});
++    expect(result.record.providerDiagnostic).toEqual({policyVersion: MIRA_ENGLISH_SPELLING_ASR_DIAGNOSTIC_POLICY,
++      sourceEvidenceSha256: 'c'.repeat(64), providerBodySha256: qualitySha(body)});
++    expect((await executeMiraEnglishSpellingAsrDiagnostic(request, 'c'.repeat(64))).created).toBe(false);
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++    await expect(executeMiraEnglishRepairAsrDiagnostic(request, 'c'.repeat(64))).rejects.toThrow('identity');
++    await expect(executeMiraEnglishSpellingAsrDiagnostic({...request, requestId: `${asrId}.diagnostic2`}, 'c'.repeat(64))).rejects.toThrow('identity');
++    expect(await readMiraFormalAsrJob(asrId)).toEqual(originalAsr);
++  });
++  it('retains an unknown diagnostic outcome and never dispatches again', async () => {
++    fetchMock.mockRejectedValue(new Error('uncertain outcome'));
++    const request = {...identity, requestId: `${asrId}.diagnostic1`, ttsRequestId: ttsId, audioSha256: originalTts.audioSha256!};
++    expect((await executeMiraEnglishSpellingAsrDiagnostic(request, 'c'.repeat(64))).record.state).toBe('ambiguous');
++    expect((await executeMiraEnglishSpellingAsrDiagnostic(request, 'c'.repeat(64))).created).toBe(false);
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++  });
++});

@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { DocumentLink } from "@/components/navigation/document-link";
 import { MiraMark } from "@/components/student/mira-mark";
+import { SpaceAtmosphere } from "@/components/student/space-atmosphere";
 import { Button } from "@/components/ui/button";
 import type { LearningStartResponse } from "@/lib/contracts/learning";
 import type { OpenMaicFormalRuntimeLaunch } from "@/lib/contracts/openmaic-runtime";
@@ -39,8 +40,10 @@ export function FullOpenMaicClassroom({
     <main
       id="main-content"
       className="full-openmaic-shell"
+      data-space-stage
       aria-label="完整互动课堂"
     >
+      <SpaceAtmosphere scenic={false} variant="toolbar" />
       <nav className="full-openmaic-toolbar" aria-label="课堂导航">
         <DocumentLink
           href="/learning"

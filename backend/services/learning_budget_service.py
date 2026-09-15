@@ -110,21 +110,35 @@ class LearningBudgetService:
                 for slot in target.get("courseTargets", []))):
             _fail("catalog_target_scope_mismatch", 403)
         fingerprint = preparation_target_fingerprint(target)
-        from integrations.openmaic_formal_media import policy_from_target
+        from integrations.openmaic_formal_media import (
+            policy_from_target, compatible_preparation_target,
+            REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+        )
         try:
             policy = policy_from_target(target)
         except ValueError:
             _fail("catalog_target_policy_invalid", 403)
         required = item["grade_code"] != "primary_1" or "interactionDesignPolicy" in policy or self.policy.raw["enabled"]
-        owner = conn.execute("SELECT id FROM learning_curriculum_preparation_plans WHERE catalog_build_id = ? AND library_target_fingerprint IS NOT NULL", (item["build_job_id"],)).fetchone()
+        owner = conn.execute("SELECT id, library_target_fingerprint, grade_code FROM learning_curriculum_preparation_plans WHERE catalog_build_id = ? AND library_target_fingerprint IS NOT NULL", (item["build_job_id"],)).fetchone()
         if required and owner is None:
             _fail("catalog_shared_scope_required", 403)
         if owner is not None:
             from services.learning_curriculum_preparation_contract import build_preparation_target
-            current_fingerprint = preparation_target_fingerprint(build_preparation_target(item["grade_code"]))
+            current_target = build_preparation_target(item["grade_code"])
+            current_fingerprint = preparation_target_fingerprint(current_target)
+            # The isolated operator can explicitly prepare required-3D v2 while
+            # the ordinary API still defaults to v1. This is a concurrent opt-in
+            # target, not a superseded curriculum. Only the exact registered v2
+            # policy with otherwise unchanged authority and owner may coexist.
+            required_3d_opt_in = (
+                policy == REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY
+                and compatible_preparation_target(target, current_target)
+                and owner["library_target_fingerprint"] == fingerprint
+                and owner["grade_code"] == item["grade_code"]
+            )
             if fingerprint != current_fingerprint and conn.execute(
                     "SELECT 1 FROM learning_curriculum_preparation_plans WHERE library_target_fingerprint = ? AND grade_code = ?",
-                    (current_fingerprint, item["grade_code"])).fetchone() is not None:
+                    (current_fingerprint, item["grade_code"])).fetchone() is not None and not required_3d_opt_in:
                 _fail("catalog_scope_superseded", 403)
             enabled = conn.execute("""SELECT enabled FROM learning_course_supply_requests
                 WHERE target_fingerprint = ? AND subject = ? AND skill_id = ? AND variant_ordinal = ?""",
@@ -285,6 +299,8 @@ class LearningBudgetService:
                 current, _required = self._catalog_production_scope(conn, scope["productionJobId"])
                 if current != scope:
                     _fail("catalog_scope_changed", 403)
+            from services.learning_saved_stage_tail_authorization import verified_tail_grant
+            verified_tail_grant(conn, row, self.policy)
         return row
 
     def _windows(self, now):
@@ -300,8 +316,22 @@ class LearningBudgetService:
             authorization_id=authority["id"], course_key=course_key)
         rows = [r for r in rows if r["id"] != exclude_id and r["state"] != "released"]
         limits = self.policy.raw["limits"]
-        inflight = sum(json.loads(r["max_units_json"])["calls"] for r in rows if r["state"] in _PENDING)
-        if check_inflight and inflight + requested["calls"] > limits["global"]["maxInflightCalls"]:
+        confirmed_terminal_ids = set()
+        if check_inflight and not self.policy.aggregate_limits_enabled:
+            from services.learning_transport_terminal_reconciliation import verified_transport_terminal_reservation_ids
+            confirmed_terminal_ids = verified_transport_terminal_reservation_ids(
+                conn, pending_rows=[r for r in rows if r["state"] == "unknown"])
+        # A transport receipt affects observation admission only. The same rows,
+        # including their full unresolved cost, remain in every financial check.
+        inflight = sum(json.loads(r["max_units_json"])["calls"] for r in rows
+            if r["state"] in _PENDING
+            and not (r["state"] == "unknown" and r["id"] in confirmed_terminal_ids))
+        active = sum(json.loads(r["max_units_json"])["calls"] for r in rows
+            if r["state"] in {"reserved", "dispatched"})
+        override = self.policy.production_inflight_override(scope=scope, authorization_id=authority["id"], now=now)
+        inflight_limit = override["maxInflightCalls"] if override is not None else limits["global"]["maxInflightCalls"]
+        if check_inflight and (inflight + requested["calls"] > inflight_limit
+                or active + requested["calls"] > limits["global"]["maxInflightCalls"]):
             _fail("inflight_limit", 429)
         if not self.policy.aggregate_limits_enabled:
             # Metering-only policy: preserve prices, identity and durable holds;
@@ -356,6 +386,9 @@ class LearningBudgetService:
         now = self.clock()
         with self.repository.locked() as conn:
             authority = self._authority(conn, authorization_id, now, active=False)
+            from services.learning_saved_stage_tail_authorization import validate_tail_dispatch
+            validate_tail_dispatch(authority, dispatch_id=dispatch_id,
+                request_sha256=request_sha256, price_key=price_key)
             existing = self.repository.reservation(conn, identity)
             if existing is not None:
                 if existing["request_identity_sha256"] != request_identity:
@@ -384,7 +417,11 @@ class LearningBudgetService:
                 "policy_sha256": self.policy.sha256, "price_json": canonical({"key": price_key, **price}),
                 "max_units_json": canonical(maximum), "state": "reserved", "created_at": now, "charge_at": now,
             })
-            self.repository.event(conn, identity, "reserved", {"requestSha256": request_sha256}, now)
+            evidence = {"requestSha256": request_sha256}
+            override = self.policy.production_inflight_override(scope=scope, authorization_id=authority["id"], now=now)
+            if override is not None:
+                evidence["productionInflightOverride"] = override
+            self.repository.event(conn, identity, "reserved", evidence, now)
             return self._view(self.repository.reservation(conn, identity))
 
     def _bound(self, conn, reservation_id, authorization_id):
@@ -404,6 +441,9 @@ class LearningBudgetService:
                 return {**self._view(row, reused=True), "dispatchAllowed": False}
             self._enabled(conn)
             authority = self._authority(conn, authorization_id, now)
+            from services.learning_saved_stage_tail_authorization import validate_tail_dispatch
+            validate_tail_dispatch(authority, dispatch_id=row['dispatch_id'],
+                request_sha256=request_sha256, price_key=json.loads(row['price_json'])['key'])
             from services.learning_single_search_transition import transition_active_prices
             active_prices = transition_active_prices(conn, authority)
             if active_prices is not None and json.loads(row['price_json'])['key'] not in active_prices:
@@ -484,6 +524,8 @@ class LearningBudgetService:
             from services.learning_single_search_transition import transition_active_prices
             active_prices = transition_active_prices(conn, authority)
             ledger = self.repository.authorization_ledger(conn, authorization_id)
+            from services.learning_saved_stage_tail_authorization import verified_tail_grant
+            tail_grant = verified_tail_grant(conn, authority, self.policy)
             return {"authorizationId": authorization_id,
                     "purpose": json.loads(authority["scope_json"])["purpose"],
                     "aggregateLimitsEnabled": self.policy.aggregate_limits_enabled,
@@ -491,7 +533,8 @@ class LearningBudgetService:
                         for row in ledger),
                     "latestProviderDispatchAt": max((int(row["dispatched_at"]) for row in ledger
                         if row.get("dispatched_at") is not None), default=None),
-                    "prices": active_prices if active_prices is not None else json.loads(authority["price_keys_json"])["prices"]}
+                    "prices": active_prices if active_prices is not None else json.loads(authority["price_keys_json"])["prices"],
+                    **({"completionTailGrant": tail_grant} if tail_grant is not None else {})}
 
     def close_authorization(self, *, authorization_id):
         """Trusted owner closes a lesson/package; dispatched holds remain charged."""

@@ -1,0 +1,152 @@
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -7,8 +7,14 @@
+ import { promises as fs } from 'node:fs';
+ import path from 'node:path';
+ import { qualitySha, qualitySnapshot, QUALITY_VIEWPORTS } from '../lib/server/mira-formal-quality-contract';
+-import { prepareMiraFormalSavedStageRecovery, recoverMiraFormalSavedStage } from '../lib/server/mira-formal-professional-classroom';
++import { prepareMiraFormalSavedStageRecovery, recoverMiraFormalSavedStage,
++  formalAdaptiveSkillSelectionInput } from '../lib/server/mira-formal-professional-classroom';
+ import { inspectFormalScene } from '../lib/server/mira-formal-scene-inspector';
++import { parseFormalCoursewareSpec } from '../lib/server/mira-formal-compiled-classroom';
++import { isMiraInteractionCreationPolicy } from '../lib/server/mira-formal-generation-policy';
++import { assertMiraFormalSelectionInput } from '../lib/server/mira-formal-skill-selection';
++import type { InteractionDesignContext } from '../lib/server/mira-formal-interaction-design';
++import { savedStageInspectionPlanner } from './formal-saved-stage-inspection';
+ import { CLASSROOM_JOBS_DIR, writeJsonFileAtomic } from '../lib/server/classroom-storage';
+ import type { ClassroomGenerationJob } from '../lib/server/classroom-job-store';
+ import { assertMiraFormalAudioProviderReady, readMiraFormalAsrJob, readMiraFormalTtsJob, readMiraFormalTtsAsset,
+@@ -238,9 +244,26 @@
+   }
+   const preflightPath = path.join(folder, 'browser-preflight.json');
+   if (mode === 'inspect') {
++    // Reconstruct the same frozen authority used by terminal teaching review.
++    // In particular, never replace a declared objective with a generic click
++    // on the first DOM button (which can legitimately be an unchanged reset).
++    const spec = parseFormalCoursewareSpec(job.formalInput);
++    const inspectionOptions = savedStageInspectionPlanner(
++      isMiraInteractionCreationPolicy(job.formalInput.professionalCreationPolicy) ? {
++        stage: prepared.stage, scenes: prepared.scenes,
++        gradeBoundary: { ...assertMiraFormalSelectionInput(formalAdaptiveSkillSelectionInput(job.formalInput)) },
++        interactionDesign: {
++          policy: (job.formalInput.professionalCreationPolicy as {
++            interactionDesignPolicy: InteractionDesignContext['policy'];
++          }).interactionDesignPolicy,
++          independentQuestionIds: spec.independent.map(question => question.id),
++        },
++      } : undefined,
++    );
+     const checks = [];
+     for (const [sceneIndex, scene] of prepared.scenes.entries()) for (const viewport of QUALITY_VIEWPORTS) {
+-      const check = await inspectFormalScene({ ...prepared, scene, sceneIndex, snapshotSha256, viewport });
++      const check = await inspectFormalScene({ ...prepared, scene, sceneIndex, snapshotSha256, viewport,
++        ...inspectionOptions(scene.id) });
+       checks.push(check);
+       console.log(JSON.stringify({ sceneId: scene.id, viewport, passed: check.passed, issues: check.issues }));
+     }
+diff --git a/scripts/formal-saved-stage-inspection.ts b/scripts/formal-saved-stage-inspection.ts
+new file mode 100644
+--- /dev/null
++++ b/scripts/formal-saved-stage-inspection.ts
+@@ -0,0 +1,20 @@
++import {
++  readInteractionDesignPlan, interactionDesignProbes,
++} from '../lib/server/mira-formal-interaction-design';
++import type { FormalSceneInspectionInput } from '../lib/types/formal-scene-inspection';
++
++/** Use the same validated objective planner as reviewFormalCourse. This only
++ * selects browser probes; it does not issue a teaching-quality receipt. */
++export function savedStageInspectionPlanner(
++  context?: Parameters<typeof readInteractionDesignPlan>[0],
++) {
++  const plan = context ? readInteractionDesignPlan(context) : undefined;
++  const multistate = plan?.schemaVersion === 'mira.openmaic.interaction-design-plan.v2';
++  return (sceneId: string): Pick<FormalSceneInspectionInput, 'multistate' | 'probes'> => {
++    const probes = plan ? interactionDesignProbes(plan, sceneId) : [];
++    return {
++      ...(multistate ? { multistate: true } : {}),
++      ...(probes.length ? { probes } : {}),
++    };
++  };
++}
+diff --git a/tests/server/formal-saved-stage-inspection.test.ts b/tests/server/formal-saved-stage-inspection.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/formal-saved-stage-inspection.test.ts
+@@ -0,0 +1,75 @@
++import { describe, expect, it } from 'vitest';
++import type { Scene, Stage } from '@/lib/types/stage';
++import { savedStageInspectionPlanner } from '../../scripts/formal-saved-stage-inspection';
++import {
++  MIRA_INTERACTION_DESIGN_POLICY, MIRA_MULTISTATE_INTERACTION_POLICY,
++  readInteractionDesignPlan, interactionDesignProbes, type InteractionDesignPlan,
++} from '@/lib/server/mira-formal-interaction-design';
++
++function fixture(multistate = true) {
++  const plan: InteractionDesignPlan = {
++    schemaVersion: multistate ? 'mira.openmaic.interaction-design-plan.v2' : 'mira.openmaic.interaction-design-plan.v1',
++    objectives: [{ objectiveIndex: 0,
++      demonstration: { sceneId: 'demo', quote: '平均分成四份，取其中一份。' },
++      operation: { sceneId: 'operate', controlSelector: '#numerator-plus', action: 'click' },
++      feedback: { sceneId: 'operate', selector: '#reason', textIncludes: '50%', reasonQuote: '2÷4=0.5' },
++      independentJudgment: { sceneId: 'judge', questionId: 'independent-1' },
++      ...(multistate ? { exploration: {
++        schemaVersion: 'mira.openmaic.multistate-exploration.v1' as const,
++        diagramSelector: '#model', feedbackSelector: '#result',
++        mechanism: { kind: 'fraction-ratio-percentage.v1' as const, numeratorSelector: '#n',
++          denominatorSelector: '#d', decimalSelector: '#decimal', percentSelector: '#percent',
++          wholeSelector: '#whole', partSelector: '#part' },
++        states: [[1, 4], [2, 5], [3, 4]].map(([numerator, denominator], i) => ({ id: `s${i}`,
++          numerator, denominator, operations: [{ selector: `#s${i}`, action: 'click' as const }],
++          resultText: `${numerator}/${denominator}=${numerator / denominator * 100}%`,
++          explanationText: `整体分成${denominator}份，取${numerator}份。` })),
++        reset: { selector: '#reset', stateId: 's0' },
++      } } : {}),
++    }],
++  };
++  const scenes = [
++    { id: 'demo', type: 'slide', content: { type: 'slide' }, actions: [
++      { type: 'speech', text: plan.objectives[0].demonstration.quote }] },
++    { id: 'operate', type: 'interactive', content: { type: 'interactive',
++      // The first generic control is intentionally an idempotent reset.
++      html: `<button id="reset">重置</button><button id="numerator-plus">加一份</button><output id="reason">25%</output><script type="application/json" id="mira-interaction-plan">${JSON.stringify(plan)}</script>` }, actions: [] },
++    { id: 'judge', type: 'quiz', content: { type: 'quiz', questions: [{ id: 'independent-1' }] }, actions: [] },
++  ].map((scene, order) => ({ ...scene, order, stageId: 'stage-1' })) as Scene[];
++  return { stage: { id: 'stage-1' } as Stage, scenes,
++    gradeBoundary: { learningObjectives: ['理解分数、小数与百分数'], skillId: 'fraction_ratio_percentage' },
++    interactionDesign: { policy: multistate ? MIRA_MULTISTATE_INTERACTION_POLICY : MIRA_INTERACTION_DESIGN_POLICY,
++      independentQuestionIds: ['independent-1'] } };
++}
++
++describe('saved-stage preflight uses the formal objective planner', () => {
++  it.each([true, false])('matches normal review probes for multistate=%s even when reset is first', multistate => {
++    const context = fixture(multistate);
++    const options = savedStageInspectionPlanner(context)('operate');
++    expect(options.probes).toEqual(interactionDesignProbes(readInteractionDesignPlan(context), 'operate'));
++    expect(options.probes?.[0].selector).toBe('#numerator-plus');
++    expect(options.probes?.[0].expect).toMatchObject({ selector: '#reason', textIncludes: '50%',
++      textIncludesAll: ['2÷4=0.5'], changed: true, distinctFeedback: true });
++    expect(options.multistate).toBe(multistate || undefined);
++    if (multistate) expect(options.probes?.[0].exploration?.reset).toEqual({ selector: '#reset', stateId: 's0' });
++  });
++  it('keeps v2 device checks on every page and generic probes for pages without objectives', () => {
++    expect(savedStageInspectionPlanner(fixture())('judge')).toEqual({ multistate: true });
++    expect(savedStageInspectionPlanner(fixture(false))('judge')).toEqual({});
++    expect(savedStageInspectionPlanner()('operate')).toEqual({});
++  });
++  it('does not downgrade a missing or malformed required contract to auto-click', () => {
++    const context = fixture();
++    (context.scenes[1].content as { html: string }).html = '<button id="reset">重置</button>';
++    expect(() => savedStageInspectionPlanner(context)).toThrow('PLAN_MISSING_OR_DUPLICATE');
++    (context.scenes[1].content as { html: string }).html += '<script type="application/json" id="mira-interaction-plan">{}</script>';
++    expect(() => savedStageInspectionPlanner(context)).toThrow('FORMAL_INTERACTION_');
++  });
++  it('rejects changed objective coverage or independent-question authority before any browser probe', () => {
++    const context = fixture();
++    context.interactionDesign.independentQuestionIds = ['different-locked-question'];
++    expect(() => savedStageInspectionPlanner(context)).toThrow('OBJECTIVE_MAPPING_INVALID');
++    const other = fixture(); other.gradeBoundary.learningObjectives.push('另一目标');
++    expect(() => savedStageInspectionPlanner(other)).toThrow('OBJECTIVE_COVERAGE_INVALID');
++  });
++});

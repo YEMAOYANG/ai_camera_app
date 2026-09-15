@@ -53,7 +53,8 @@ describe("QrPairing", () => {
     const qrCode = await screen.findByTitle("Mira 学生登录二维码");
     const qrFrame = qrCode.closest("svg")?.parentElement;
     expect(qrCode).toBeInTheDocument();
-    expect(qrFrame).toHaveClass("border-2", "border-[var(--mira-brand-wash)]");
+    expect(qrFrame).toHaveClass("space-qr-code");
+    expect(qrCode.closest("svg")?.querySelector('path[fill="#ffffff"]')).toBeInTheDocument();
     expect(qrFrame?.childElementCount).toBe(1);
     expect(screen.getByText("请家长用 Mira App 扫一扫")).toBeInTheDocument();
     expect(screen.getByLabelText("核对码 4826")).toHaveTextContent("4826");

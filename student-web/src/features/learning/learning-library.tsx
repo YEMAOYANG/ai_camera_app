@@ -6,25 +6,23 @@ import {
   CheckCircle2,
   Clock3,
   Heart,
-  LibraryBig,
   LoaderCircle,
-  LockKeyhole,
   RotateCcw,
   Sparkles,
 } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 
-import { MiraBuddy } from "@/components/student/mira-buddy";
-import { MiraMark } from "@/components/student/mira-mark";
+import { SpaceShell, SpacePageHeading } from "@/components/student/space-shell";
+import { SpaceCourseArt } from "@/components/student/space-course-art";
 import { DocumentLink } from "@/components/navigation/document-link";
 import { Button } from "@/components/ui/button";
+import { LearningCourseStartButton } from "@/features/learning/learning-course-start-button";
 import {
   getLearningLibrary,
   setLearningFavorite,
 } from "@/features/learning/learning-client";
-import { gradeLabel, subjectPresentation } from "@/features/learning/learning-presenters";
 import type {
   LearningLibraryBucket,
   LearningLibraryItem,
@@ -56,14 +54,15 @@ export function LearningLibrary({
   student: Student;
   pollIntervalMs?: number;
 }) {
-  const router = useRouter();
+  const filterId = useId();
+  const reducedMotion = useReducedMotion();
   const [bucket, setBucket] = useState<LearningLibraryBucket>("all");
   const [subject, setSubject] = useState<LearningSubject | undefined>();
   const [data, setData] = useState<LearningLibraryResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [locking, setLocking] = useState(false);
   const [error, setError] = useState("");
   const [favoriteBusy, setFavoriteBusy] = useState("");
+  const [favoritePulse, setFavoritePulse] = useState<{ courseId: string; sequence: number } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -139,19 +138,13 @@ export function LearningLibrary({
     };
   }, [bucket, subject]);
 
-  async function lock() {
-    setLocking(true);
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
-    router.replace("/unlock");
-    router.refresh();
-  }
-
   async function toggleFavorite(item: LearningLibraryItem) {
     if (favoriteBusy) return;
     setFavoriteBusy(item.course.id);
     setError("");
     try {
       const result = await setLearningFavorite(item.course.id, item.course.version, !item.favorite);
+      if (result.favorite) setFavoritePulse(current => ({ courseId: item.course.id, sequence: (current?.sequence ?? 0) + 1 }));
       setData((current) => current ? {
         ...current,
         continueItem: current.continueItem?.course.id === item.course.id
@@ -174,79 +167,53 @@ export function LearningLibrary({
   const visibleItems = data?.items || [];
 
   return (
-    <div className="learning-space mira-doodle-grid">
-      <header className="learning-topbar">
-        <Link href="/today" className="focus-ring" aria-label="回到今日学习"><MiraMark compact /></Link>
-        <nav aria-label="学生学习导航">
-          <Link href="/today">今日学习</Link>
-          <Link href="/learning" aria-current="page">我的学习</Link>
-        </nav>
-        <Button variant="quiet" size="compact" onClick={lock} disabled={locking}>
-          <LockKeyhole className="size-4" />{locking ? "正在锁定" : "休息一下"}
-        </Button>
-      </header>
+    <SpaceShell student={student} active="learning" className="space-library-page space-explore-library">
+      <SpacePageHeading title="我的学习">
+        <Button asChild variant="secondary"><Link href="/learning/practice">学过的内容，练一练<ArrowRight className="size-5" aria-hidden="true" /></Link></Button>
+      </SpacePageHeading>
 
-      <main id="main-content" className="learning-main">
-        <section className="learning-library-hero" aria-labelledby="learning-library-title">
-          <div>
-            <p className="learning-eyebrow"><LibraryBig className="size-5" />{gradeLabel(student.gradeCode)}学习书架</p>
-            <h1 id="learning-library-title">{student.displayName}的<br /><span>我的学习</span></h1>
-            <p>今天的课、学过的课和喜欢的课，都在这里。每次回来都能接着学。</p>
-            <Link href="/learning/practice" className="focus-ring mt-4 inline-flex min-h-12 items-center gap-2 rounded-2xl bg-[var(--mira-brand-deep)] px-5 font-bold text-white">学过的内容，练一练<ArrowRight className="size-5" aria-hidden="true" /></Link>
+      {continuation ? (
+        <ContinueLesson item={continuation} onFavorite={() => void toggleFavorite(continuation)} favoriteBusy={favoriteBusy === continuation.course.id} favoritePulse={favoritePulse?.courseId === continuation.course.id ? favoritePulse.sequence : 0} />
+      ) : null}
+
+      <section className="space-library-section" aria-labelledby="course-list-title">
+        <div className="space-section-heading">
+          <h2 id="course-list-title">选择一节想学的课</h2>
+          {data ? <p>
+            {(data.learningState?.availabilityStatus ?? data.courseSupply?.availabilityStatus) === "empty"
+              ? "课程准备好后就会出现在这里"
+              : data.catalogStatus === "preparing"
+                ? `已有 ${data.availableCourseCount} 门可用，新课完成一门就会自动加入`
+                : data.catalogStatus === "failed"
+                  ? `本轮更新未全部完成，现有 ${data.availableCourseCount} 门仍可学习`
+                  : `共 ${data.availableCourseCount} 门课程`}
+          </p> : null}
+        </div>
+        <div className="space-filter-tabs space-segmented" role="group" aria-label="课程状态筛选">
+          {buckets.map((item) => (
+            <button key={item.id} type="button" className={`focus-ring space-segment ${bucket === item.id ? "is-active" : ""}`} aria-pressed={bucket === item.id} onClick={() => { if (bucket === item.id) return; setLoading(true); setError(""); setBucket(item.id); }}>
+              {bucket === item.id ? <motion.span className="space-segment-indicator" layoutId={`${filterId}-course-state`} transition={reducedMotion ? { duration: 0 } : { type: "spring", stiffness: 440, damping: 38 }} aria-hidden="true" /> : null}
+              <span className="space-segment-label">{item.label}</span>
+            </button>
+          ))}
+        </div>
+        <div className="space-subject-tabs space-subject-chips" role="group" aria-label="学科筛选">
+          {subjects.map((item) => (
+            <button key={item.id || "all"} type="button" data-subject={item.id || "all"} className={`focus-ring ${subject === item.id ? "is-active" : ""}`} aria-pressed={subject === item.id} onClick={() => { if (subject === item.id) return; setLoading(true); setError(""); setSubject(item.id); }}>
+              <span className="space-subject-chip-dot" aria-hidden="true" /><span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+        {loading ? <LearningListLoading /> : null}
+        {!loading && error ? <LearningLibraryError message={error} onRetry={load} /> : null}
+        {!loading && !error && visibleItems.length ? (
+          <div className="space-course-grid">
+            {visibleItems.map((item) => <CourseRow key={`${item.taskId || item.course.id}:${item.course.version}`} item={item} makeup={bucket === "makeup"} favoriteBusy={favoriteBusy === item.course.id} favoritePulse={favoritePulse?.courseId === item.course.id ? favoritePulse.sequence : 0} onFavorite={() => void toggleFavorite(item)} />)}
           </div>
-          <MiraBuddy mood="reading" className="learning-library-buddy" label="Mira 在整理课程书架" />
-        </section>
-
-        {continuation && bucket === "all" ? (
-          <ContinueLesson item={continuation} onFavorite={() => void toggleFavorite(continuation)} favoriteBusy={favoriteBusy === continuation.course.id} />
         ) : null}
-
-        <section className="learning-library-section" aria-labelledby="course-list-title">
-          <div className="learning-library-heading">
-            <div>
-              <p>课程目录</p>
-              <h2 id="course-list-title">选择一节想学的课</h2>
-            </div>
-            {data ? (
-              <span>
-                {(data.learningState?.availabilityStatus ?? data.courseSupply?.availabilityStatus) === "empty"
-                  ? "课程准备好后就会出现在这里"
-                  : data.catalogStatus === "preparing"
-                  ? `已有 ${data.availableCourseCount} 门可用，新课完成一门就会自动加入`
-                  : data.catalogStatus === "failed"
-                    ? `本轮更新未全部完成，现有 ${data.availableCourseCount} 门仍可学习`
-                    : `共 ${data.availableCourseCount} 门课程`}
-              </span>
-            ) : null}
-          </div>
-
-          <div className="learning-filter-row" role="group" aria-label="课程状态筛选">
-            {buckets.map((item) => <button key={item.id} type="button" className={`focus-ring ${bucket === item.id ? "is-active" : ""}`} aria-pressed={bucket === item.id} onClick={() => { if (bucket === item.id) return; setLoading(true); setError(""); setBucket(item.id); }}>{item.label}</button>)}
-          </div>
-          <div className="learning-subject-row" role="group" aria-label="学科筛选">
-            {subjects.map((item) => <button key={item.id || "all"} type="button" className={`focus-ring ${subject === item.id ? "is-active" : ""}`} aria-pressed={subject === item.id} onClick={() => { if (subject === item.id) return; setLoading(true); setError(""); setSubject(item.id); }}>{item.label}</button>)}
-          </div>
-
-          {loading ? <LearningListLoading /> : null}
-          {!loading && error ? <LearningLibraryError message={error} onRetry={load} /> : null}
-          {!loading && !error && visibleItems.length ? (
-            <div className="learning-course-list">
-              {visibleItems.map((item) => (
-                <CourseRow
-                  key={`${item.taskId || item.course.id}:${item.course.version}`}
-                  item={item}
-                  makeup={bucket === "makeup"}
-                  favoriteBusy={favoriteBusy === item.course.id}
-                  onFavorite={() => void toggleFavorite(item)}
-                />
-              ))}
-            </div>
-          ) : null}
-          {!loading && !error && !visibleItems.length ? <LearningEmpty bucket={bucket} catalogStatus={data?.catalogStatus}
-            availability={data?.learningState?.availabilityStatus ?? data?.courseSupply?.availabilityStatus} /> : null}
-        </section>
-      </main>
-    </div>
+        {!loading && !error && !visibleItems.length ? <LearningEmpty bucket={bucket} catalogStatus={data?.catalogStatus} availability={data?.learningState?.availabilityStatus ?? data?.courseSupply?.availabilityStatus} /> : null}
+      </section>
+    </SpaceShell>
   );
 }
 
@@ -261,44 +228,38 @@ function libraryHasPreparingClassroom(data: LearningLibraryResponse | null) {
     || [data.continueItem, ...data.items].some((item) => item && !item.fullClassroomAvailable);
 }
 
-function ContinueLesson({ item, onFavorite, favoriteBusy }: { item: LearningLibraryItem; onFavorite: () => void; favoriteBusy: boolean }) {
-  const presentation = subjectPresentation(item.course.subject);
-  const Icon = presentation.icon;
+function ContinueLesson({ item, onFavorite, favoriteBusy, favoritePulse }: { item: LearningLibraryItem; onFavorite: () => void; favoriteBusy: boolean; favoritePulse: number }) {
   const progress = courseProgress(item);
   return (
-    <section className="learning-continue" aria-labelledby="continue-title">
-      <div className={`learning-continue-rail ${presentation.surface}`} aria-hidden="true" />
-      <div className="learning-continue-copy">
-        <p><RotateCcw className="size-5" />上次学到这里</p>
+    <section className="space-continue space-explore-launch" aria-labelledby="continue-title">
+      <SpaceCourseArt subject={item.course.subject} className="space-continue-art" />
+      <div className="space-continue-content">
+        <p className="space-eyebrow"><RotateCcw className="size-5" aria-hidden="true" />{item.course.subjectLabel} · 上次学到这里</p>
         <h2 id="continue-title">{item.course.title}</h2>
-        <span>{item.course.objective}</span>
-        <div className="learning-progress-line"><i style={{ width: `${progress}%` }} /><small>{progress}%</small></div>
-      </div>
-      <div className="learning-continue-actions">
-        <span className={`learning-subject-seal ${presentation.surface} ${presentation.strong}`}><Icon className="size-6" />{item.course.subjectLabel}</span>
-        <FavoriteButton item={item} busy={favoriteBusy} onClick={onFavorite} />
-        <CourseAction item={item} label="继续上课" />
+        <p className="space-continue-objective">{item.course.objective}</p>
+        <div className="space-progress" role="progressbar" aria-label="课程学习进度" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${progress}%` }} /></div>
+        <p className="space-progress-caption">已完成 {progress}%</p>
+        <div className="space-inline-actions"><CourseAction item={item} label="继续上课" /><FavoriteButton item={item} busy={favoriteBusy} pulse={favoritePulse} onClick={onFavorite} /></div>
       </div>
     </section>
   );
 }
 
-function CourseRow({ item, makeup, onFavorite, favoriteBusy }: { item: LearningLibraryItem; makeup: boolean; onFavorite: () => void; favoriteBusy: boolean }) {
-  const presentation = subjectPresentation(item.course.subject);
-  const Icon = presentation.icon;
+function CourseRow({ item, makeup, onFavorite, favoriteBusy, favoritePulse }: { item: LearningLibraryItem; makeup: boolean; onFavorite: () => void; favoriteBusy: boolean; favoritePulse: number }) {
   const status = courseStatus(item, makeup);
   return (
-    <article className="learning-course-row">
-      <span className={`learning-course-icon ${presentation.surface} ${presentation.strong}`}><Icon className="size-6" /></span>
-      <div className="learning-course-copy">
-        <div><span>{item.course.subjectLabel}</span><i>·</i><span>{status.label}</span>{status.kind !== "completed" && (item.fullClassroomAvailable ? <em>完整互动课堂已就绪</em> : <em className="is-preparing">完整课堂准备中</em>)}</div>
-        <h3><Link href={`/learning/${encodeURIComponent(item.course.id)}?version=${encodeURIComponent(item.course.version)}`}>{item.course.title}</Link></h3>
-        <p>{item.course.objective}</p>
-        <small><Clock3 className="size-4" />约 {item.course.estimatedMinutes} 分钟{item.scheduledStart ? ` · ${item.scheduledStart}` : ""}</small>
+    <article className={`space-library-course is-${status.kind}`}>
+      <div className="space-course-cover space-explore-cover">
+        <SpaceCourseArt subject={item.course.subject} className="space-course-cover-art" />
+        <div className="space-course-cover-label"><span>{item.course.subjectLabel}</span><span className={`space-course-status is-${status.kind}`}>{status.kind === "completed" ? <CheckCircle2 aria-hidden="true" /> : <span className="space-status-dot" />}{status.label}</span></div>
+        <FavoriteButton item={item} busy={favoriteBusy} pulse={favoritePulse} onClick={onFavorite} />
       </div>
-      <div className="learning-course-actions">
-        <FavoriteButton item={item} busy={favoriteBusy} onClick={onFavorite} />
-        {status.kind === "completed" ? <span className="learning-complete-mark"><CheckCircle2 className="size-5" />学完啦</span> : <CourseAction item={item} label={status.kind === "makeup" ? "补上这节课" : undefined} />}
+      <div className="space-course-info">
+        <h3><Link className="focus-ring" href={`/learning/${encodeURIComponent(item.course.id)}?version=${encodeURIComponent(item.course.version)}`}>{item.course.title}</Link></h3>
+        <p>{item.course.objective}</p>
+        <div className="space-course-meta"><Clock3 className="size-5" aria-hidden="true" />约 {item.course.estimatedMinutes} 分钟{item.scheduledStart ? ` · ${item.scheduledStart}` : ""}</div>
+        {status.kind !== "completed" ? <span className="space-course-readiness">{item.fullClassroomAvailable ? "完整互动课堂已就绪" : "完整课堂准备中"}</span> : null}
+        <div className="space-course-footer">{status.kind === "completed" ? <span className="space-complete-mark"><CheckCircle2 className="size-5" aria-hidden="true" />学完啦</span> : <CourseAction item={item} label={status.kind === "makeup" ? "补上这节课" : undefined} />}</div>
       </div>
     </article>
   );
@@ -306,28 +267,29 @@ function CourseRow({ item, makeup, onFavorite, favoriteBusy }: { item: LearningL
 
 function CourseAction({ item, label }: { item: LearningLibraryItem; label?: string }) {
   if (!item.fullClassroomAvailable) {
-    return <span className="learning-making-action"><Sparkles className="size-4" />完整课堂准备中</span>;
+    return <span className="space-making-action"><Sparkles className="size-4" />完整课堂准备中</span>;
   }
   if (!item.taskId) {
-    return <span className="learning-making-action"><Clock3 className="size-4" />等待安排</span>;
+    return <LearningCourseStartButton courseId={item.course.id} version={item.course.version} label={label} />;
   }
   return <Button asChild><DocumentLink href={openMaicLessonPath(item.taskId)}>{label || "开始上课"}<ArrowRight className="size-5" /></DocumentLink></Button>;
 }
 
-function FavoriteButton({ item, busy, onClick }: { item: LearningLibraryItem; busy: boolean; onClick: () => void }) {
+function FavoriteButton({ item, busy, onClick, pulse }: { item: LearningLibraryItem; busy: boolean; onClick: () => void; pulse: number }) {
   return (
-    <button type="button" className={`focus-ring learning-favorite ${item.favorite ? "is-active" : ""}`} onClick={onClick} disabled={busy} aria-label={item.favorite ? `取消收藏${item.course.title}` : `收藏${item.course.title}`}>
-      {busy ? <LoaderCircle className="size-5 animate-spin" /> : <Heart className={`size-5 ${item.favorite ? "fill-current" : ""}`} />}
+    <button type="button" className={`focus-ring space-favorite ${item.favorite ? "is-active" : ""}`} onClick={onClick} disabled={busy} aria-pressed={item.favorite} aria-label={item.favorite ? `取消收藏${item.course.title}` : `收藏${item.course.title}`}>
+      {busy ? <LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" /> : <Heart className={`size-5 ${item.favorite ? "fill-current" : ""}`} />}
+      {pulse > 0 && item.favorite ? <span key={pulse} className="space-favorite-burst" aria-hidden="true"><Sparkles /><i /><i /></span> : null}
     </button>
   );
 }
 
 function LearningListLoading() {
-  return <div className="learning-course-list is-loading" aria-label="正在加载课程">{[0, 1, 2].map((item) => <div key={item}><i /><span><b /><small /></span></div>)}</div>;
+  return <div className="space-course-grid space-course-loading" role="status" aria-label="正在加载课程">{[0, 1, 2].map((item) => <div key={item} aria-hidden="true"><span /><i /><i /></div>)}<span className="sr-only">正在加载课程</span></div>;
 }
 
 function LearningLibraryError({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return <div className="learning-library-state" role="alert"><MiraBuddy mood="thinking" className="w-24" /><h3>课程书架刚刚走神了</h3><p>{message}</p><Button onClick={onRetry}>再试一次</Button></div>;
+  return <div className="space-page-state" role="alert"><BookMarked aria-hidden="true" /><h3>课程暂时没有连上</h3><p>{message}</p><Button onClick={onRetry}>再试一次</Button></div>;
 }
 
 function LearningEmpty({
@@ -352,7 +314,7 @@ function LearningEmpty({
         : bucket === "makeup"
           ? ["没有待补的课程", "之前没学完的课会保留在这里，不会悄悄消失。"]
         : ["这里还没有课程", "家长安排或系统生成课程后，会自动出现在这里。"];
-  return <div className="learning-library-state"><BookMarked className="size-10" /><h3>{copy[0]}</h3><p>{copy[1]}</p></div>;
+  return <div className="space-page-state"><BookMarked className="size-10" /><h3>{copy[0]}</h3><p>{copy[1]}</p></div>;
 }
 
 function courseStatus(item: LearningLibraryItem, forceMakeup = false) {

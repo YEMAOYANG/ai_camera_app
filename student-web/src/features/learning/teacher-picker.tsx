@@ -68,15 +68,15 @@ export function TeacherPicker({ compact = false, subject }: { compact?: boolean;
   }
 
   return (
-    <section className={`learning-teacher-picker ${compact ? "is-compact" : ""}`} aria-labelledby="teacher-picker-title">
-      <div className="learning-teacher-intro">
+    <section className={`space-teacher-picker ${compact ? "is-compact" : ""}`} aria-labelledby="teacher-picker-title">
+      <div className="space-teacher-intro">
         <p>课堂老师</p>
         <h2 id="teacher-picker-title">今天想和谁一起学？</h2>
-        <span>按学科选择老师；发布后的讲解声音会跟随课程正式音频。</span>
+        <span>选择喜欢的老师，陪你探索新的知识。</span>
       </div>
-      <div className="learning-teacher-chooser">
+      <div className="space-teacher-chooser">
         {!subject ? (
-          <div className="learning-teacher-subjects" role="group" aria-label="选择老师学科">
+          <div className="space-teacher-subjects" role="group" aria-label="选择老师学科">
             {subjectChoices.map((item) => (
               <button
                 key={item.id}
@@ -91,10 +91,10 @@ export function TeacherPicker({ compact = false, subject }: { compact?: boolean;
           </div>
         ) : null}
         {!data && !error ? (
-          <div className="learning-teacher-loading" aria-live="polite"><LoaderCircle className="size-5 animate-spin" />正在叫老师来</div>
+          <div className="space-teacher-loading" aria-live="polite"><LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" />正在叫老师来</div>
         ) : null}
         {data ? (
-          <div className="learning-teacher-options" role="radiogroup" aria-label="选择课堂老师">
+          <div className="space-teacher-options" role="radiogroup" aria-label="选择课堂老师">
             {data.items.map((teacher) => {
               const selected = teacher.id === data.selected?.id && teacher.version === data.selected.version;
               return (
@@ -103,20 +103,20 @@ export function TeacherPicker({ compact = false, subject }: { compact?: boolean;
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  className={`focus-ring learning-teacher-option tone-${teacherTone(teacher)} ${selected ? "is-selected" : ""}`}
+                  className={`focus-ring space-teacher-option tone-${teacherTone(teacher)} ${selected ? "is-selected" : ""}`}
                   onClick={() => void select(teacher)}
                   disabled={Boolean(savingId)}
                 >
-                  <span className="learning-teacher-avatar"><Image src={teacher.avatarPath} width={64} height={64} alt={`${teacher.displayName}头像`} priority={false} /></span>
+                  <span className="space-teacher-avatar"><Image src={teacher.avatarPath} width={64} height={64} alt={`${teacher.displayName}头像`} priority={false} /></span>
                   <span><strong>{teacher.displayName}</strong><small>{teacherStyleDescription(teacher)}</small></span>
-                  <i aria-hidden="true">{savingId === teacher.id ? <LoaderCircle className="size-4 animate-spin" /> : selected ? <Check className="size-4" /> : null}</i>
+                  <i aria-hidden="true">{savingId === teacher.id ? <LoaderCircle className="size-4 animate-spin motion-reduce:animate-none" /> : selected ? <Check className="size-4" /> : null}</i>
                 </button>
               );
             })}
           </div>
         ) : null}
-        {data && !data.items.length ? <p className="learning-inline-error">这个学科的老师还在准备中。</p> : null}
-        {error ? <p className="learning-inline-error" role="alert">{error} <button type="button" onClick={() => void load()}>再试一次</button></p> : null}
+        {data && !data.items.length ? <p className="space-inline-error">这个学科的老师还在准备中。</p> : null}
+        {error ? <p className="space-inline-error" role="alert">{error} <button type="button" onClick={() => void load()}>再试一次</button></p> : null}
       </div>
     </section>
   );

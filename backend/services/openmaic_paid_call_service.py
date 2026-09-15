@@ -130,7 +130,13 @@ class OpenMaicPaidCallService:
             if isinstance(manifest, str): manifest = json.loads(manifest)
         if not upgraded_manifest(manifest):
             raise ApiError('learning_paid_context_not_supported', '课堂费用合同不匹配', 409)
-        binding_row = {**row, 'course_id': row['session_course_id'], 'course_version': row['session_course_version']}
+        # Runtime authority uses session_* aliases; the shared teaching budget
+        # contract uses learning_session_*. Preserve the stored lifecycle state
+        # so an active lesson is not mistaken for an ended session.
+        binding_row = {**row, 'course_id': row['session_course_id'],
+                       'course_version': row['session_course_version'],
+                       'learning_session_status': row['session_status'],
+                       'learning_session_completed_at': row['session_completed_at']}
         bindings = teaching_budget_bindings(self.budget_service, binding_row, manifest, admit=False)
         body = data['request']
         marker = body.get('miraScriptedAction')

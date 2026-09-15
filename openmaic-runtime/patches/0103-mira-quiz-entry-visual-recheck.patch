@@ -1,0 +1,460 @@
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -249,7 +249,7 @@
+ 
+   return (
+     <QuestionCard question={question} index={index} result={result}>
+-      <div className="grid gap-2">
++      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+         {question.options?.map((opt) => {
+           const selected = value === opt.value;
+           const isCorrectOpt = isReview && question.answer?.includes(opt.value);
+@@ -360,7 +360,7 @@
+           {t('quiz.multipleChoiceHint')}
+         </p>
+       )}
+-      <div className="grid gap-2">
++      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+         {question.options?.map((opt) => {
+           const isSelected = selected.includes(opt.value);
+           const isCorrectOpt = isReview && question.answer?.includes(opt.value);
+diff --git a/lib/server/mira-formal-completion-tail-budget.ts b/lib/server/mira-formal-completion-tail-budget.ts
+--- a/lib/server/mira-formal-completion-tail-budget.ts
++++ b/lib/server/mira-formal-completion-tail-budget.ts
+@@ -60,12 +60,12 @@
+ /** The new flag is intentionally separate from the frozen recovery manifest. */
+ export function completionTailArgument(mode: string, manifest: RecordValue, args: string[]): string | undefined {
+   if (!args.length) {
+-    if (['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery'].includes(mode)) return fail('SIDECAR_REQUIRED');
++    if (['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review'].includes(mode)) return fail('SIDECAR_REQUIRED');
+     return undefined;
+   }
+   if (args.length !== 2 || args[0] !== '--completion-paid-budget' || !args[1].trim())
+     return fail('ARGUMENT_INVALID');
+-  if (!['complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery'].includes(mode)) return fail('COMPLETE_ONLY');
++  if (!['complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review'].includes(mode)) return fail('COMPLETE_ONLY');
+   if (['reviewGrantPath', 'browserRecheck', 'asrSourceRequestId', 'ttsSourceRequestId',
+     'audioRepair', 'pronunciationRepair', 'asrComparisonRevalidation'].some(key => key in manifest))
+     return fail('CANNOT_MIX_RECOVERIES');
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -1327,7 +1327,7 @@
+     asrComparisonRevalidation?: AsrComparisonReferences;
+     approvedReviewGrant?: FormalQualityReviewGrant;
+     completionTailBudget?: ValidatedCompletionTailBudget;
+-    learnerDiscussionRepair?: { sourceSnapshotSha256: string; priorCompletionClaimSha256: string; responseRecovery?: LearnerDiscussionResponseRecovery };
++    learnerDiscussionRepair?: { sourceSnapshotSha256: string; priorCompletionClaimSha256: string; responseRecovery?: LearnerDiscussionResponseRecovery; reviewGrant?: FormalQualityReviewGrant };
+   },
+ ): Promise<MiraFormalProfessionalRecoveryCompletion> {
+   const events = await readAllSessionEvents(identity.sessionId);
+@@ -1452,7 +1452,8 @@
+       assertMiraFormalPlayfulScenes(scenes, formalPlayfulContext(input.professionalCreationPolicy, spec));
+       // A derived snapshot gets the complete ordinary browser, visual and
+       // pedagogical review. The rejected source report is never overwritten.
+-      quality = await reviewFormalCourse({ ...qualityInput, scenes });
++      quality = await reviewFormalCourse({ ...qualityInput, scenes }, undefined,
++        { approvedReviewGrant: options.learnerDiscussionRepair.reviewGrant });
+     }
+     if (quality.status !== 'passed' || !quality.receipt)
+       throw new Error(
+@@ -1650,11 +1651,14 @@
+     completionTailBudget?: ValidatedCompletionTailBudget;
+     learnerDiscussionRepairClaimSha256?: string;
+     learnerDiscussionResponseRecovery?: LearnerDiscussionResponseRecovery;
++    learnerDiscussionReviewGrant?: FormalQualityReviewGrant;
+     onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void },
+ ) {
+   const prepared = await prepareMiraFormalSavedStageRecovery(input, repair);
+   const spec = parseFormalCoursewareSpec(input);
+-  const { learnerDiscussionRepairClaimSha256, learnerDiscussionResponseRecovery, ...completionOptions } = options;
++  const { learnerDiscussionRepairClaimSha256, learnerDiscussionResponseRecovery, learnerDiscussionReviewGrant, ...completionOptions } = options;
++  if (learnerDiscussionReviewGrant && (!learnerDiscussionRepairClaimSha256 || !learnerDiscussionResponseRecovery))
++    throw new Error('SAVED_STAGE_LEARNER_REVIEW_PRIOR_RECOVERY_REQUIRED');
+   if (learnerDiscussionResponseRecovery && !learnerDiscussionRepairClaimSha256)
+     throw new Error('SAVED_STAGE_LEARNER_RESPONSE_RECOVERY_CLAIM_REQUIRED');
+   if (learnerDiscussionRepairClaimSha256 && (!/^[a-f0-9]{64}$/.test(learnerDiscussionRepairClaimSha256)
+@@ -1679,6 +1683,7 @@
+         sourceSnapshotSha256: repair.expectedSourceSnapshotSha256,
+         priorCompletionClaimSha256: learnerDiscussionRepairClaimSha256,
+         responseRecovery: learnerDiscussionResponseRecovery,
++        reviewGrant: learnerDiscussionReviewGrant,
+       } } : {}),
+       recheckUnsentBrowserReview: true });
+ }
+diff --git a/scripts/formal-learner-discussion-completion-claim.ts b/scripts/formal-learner-discussion-completion-claim.ts
+--- a/scripts/formal-learner-discussion-completion-claim.ts
++++ b/scripts/formal-learner-discussion-completion-claim.ts
+@@ -2,6 +2,7 @@
+ import path from 'node:path';
+ import { qualitySha } from '../lib/server/mira-formal-quality-contract';
+ import type { LearnerDiscussionResponseRecovery } from '../lib/server/mira-formal-learner-discussion-repair';
++import type { FormalQualityReviewGrant } from '../lib/server/mira-formal-teaching-quality';
+ 
+ export interface LearnerRepairCompletionIdentity {
+   sourceJobSha256: string;
+@@ -16,6 +17,7 @@
+ export async function claimLearnerDiscussionCompletion(
+   folder: string, identity: LearnerRepairCompletionIdentity, completionTailGrantSha256: string,
+   responseRecovery?: LearnerDiscussionResponseRecovery,
++  reviewGrant?: FormalQualityReviewGrant,
+ ) {
+   if (!/^[a-f0-9]{64}$/.test(completionTailGrantSha256)
+       || !/^[a-f0-9]{64}$/.test(identity.repairSnapshotSha256))
+@@ -42,11 +44,24 @@
+       || repair.priorCompletionClaimSha256 !== priorCompletionClaimSha256)
+       throw new Error('SAVED_STAGE_LEARNER_RESPONSE_PRIOR_CLAIM_MISMATCH');
+   }
+-  const suffix = responseRecovery ? 'learner-discussion-response-recovery' : 'learner-discussion-repair';
++  if (reviewGrant) {
++    if (!responseRecovery || reviewGrant.sessionId !== identity.sessionId || reviewGrant.stageId !== identity.stageId)
++      throw new Error('SAVED_STAGE_LEARNER_REVIEW_IDENTITY_INVALID');
++    const recovery = JSON.parse(await fs.readFile(path.join(folder,
++      `complete-${identity.repairSnapshotSha256}-learner-discussion-response-recovery.claim`), 'utf8'));
++    if (Object.entries(identity).some(([key, value]) => recovery[key] !== value)
++      || recovery.completionTailGrantSha256 !== completionTailGrantSha256
++      || recovery.priorCompletionClaimSha256 !== priorCompletionClaimSha256
++      || qualitySha(recovery.responseRecovery) !== qualitySha(responseRecovery))
++      throw new Error('SAVED_STAGE_LEARNER_REVIEW_PRIOR_CLAIM_MISMATCH');
++  }
++  const suffix = reviewGrant ? `learner-discussion-review-${qualitySha(reviewGrant)}`
++    : responseRecovery ? 'learner-discussion-response-recovery' : 'learner-discussion-repair';
+   const claim = await fs.open(path.join(folder, `complete-${identity.repairSnapshotSha256}-${suffix}.claim`), 'wx', 0o600);
+   try {
+     await claim.writeFile(JSON.stringify({ ...identity, completionTailGrantSha256,
+       priorCompletionClaimSha256, ...(responseRecovery ? { responseRecovery } : {}),
++      ...(reviewGrant ? { reviewGrant } : {}),
+       pid: process.pid, createdAt: new Date().toISOString() }));
+     await claim.sync();
+   } finally { await claim.close(); }
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -145,12 +145,14 @@
+ 
+ async function main() {
+   const [mode, manifestPath, ...extraArgs] = process.argv.slice(2);
+-  if (!['prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
++  if (!['prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
+     'revalidate-audio-comparison', 'complete-audio-comparison-tail'].includes(mode) || !manifestPath)
+     throw new Error('Usage: recover-formal-saved-stage.ts prepare|inspect|complete|complete-browser-recheck|revalidate-audio-comparison|complete-audio-comparison-tail manifest.json [--completion-paid-budget sidecar.json]');
+   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
+   const completionTailPath = completionTailArgument(mode, manifest, extraArgs);
+-  const responseRecoveryMode = mode === 'complete-learner-discussion-response-recovery';
++  const responseRecoveryMode = ['complete-learner-discussion-response-recovery', 'complete-learner-discussion-review'].includes(mode);
++  if ((mode === 'complete-learner-discussion-review') !== (manifest.learnerDiscussionReviewGrant !== undefined))
++    throw new Error('SAVED_STAGE_LEARNER_REVIEW_MODE_INVALID');
+   if (responseRecoveryMode !== (manifest.learnerDiscussionResponseRecovery !== undefined))
+     throw new Error('SAVED_STAGE_LEARNER_RESPONSE_RECOVERY_MODE_INVALID');
+   if (mode === 'complete-browser-recheck' && (manifest.reviewGrantPath || manifest.asrSourceRequestId || manifest.ttsSourceRequestId))
+@@ -359,7 +361,8 @@
+   if (mode === 'complete-learner-discussion-repair' || responseRecoveryMode) {
+     if (!completionTailBudget) throw new Error('SAVED_STAGE_LEARNER_REPAIR_COMPLETION_BUDGET_REQUIRED');
+     learnerDiscussionRepairClaimSha256 = await claimLearnerDiscussionCompletion(folder, identity, completionTailBudget.receiptSha256,
+-      responseRecoveryMode ? manifest.learnerDiscussionResponseRecovery : undefined);
++      responseRecoveryMode ? manifest.learnerDiscussionResponseRecovery : undefined,
++      manifest.learnerDiscussionReviewGrant);
+   } else if (mode === 'complete-browser-recheck') {
+     browserRecheckSha256 = await claimUnsentBrowserRecheck({ root: process.cwd(), recoveryFolder: folder,
+       identity, ownerId: prepared.ownerId, authorizationId: parsePaidBudget(job.formalInput.paidBudget).authorizationId,
+@@ -391,6 +394,7 @@
+     completionTailBudget,
+     learnerDiscussionRepairClaimSha256,
+     learnerDiscussionResponseRecovery: manifest.learnerDiscussionResponseRecovery,
++    learnerDiscussionReviewGrant: manifest.learnerDiscussionReviewGrant,
+     onProgress: progress => { console.log(JSON.stringify(progress)); },
+   });
+   const receipt = { ...identity, kind: 'operator_saved_stage_repair', originalSessionStatus: prepared.originalSessionStatus,
+diff --git a/tests/server/formal-learner-discussion-completion-claim.test.ts b/tests/server/formal-learner-discussion-completion-claim.test.ts
+--- a/tests/server/formal-learner-discussion-completion-claim.test.ts
++++ b/tests/server/formal-learner-discussion-completion-claim.test.ts
+@@ -21,6 +21,19 @@
+   const responseRecovery = { inputSha256: '1'.repeat(64), requestSha256: '2'.repeat(64),
+     dispatchClaimSha256: '3'.repeat(64), rejectedReviewSha256: '4'.repeat(64),
+     providerResponseSha256: '5'.repeat(64), failureSha256: '6'.repeat(64) };
++  it('requires the exact completed-response attempt for a distinct review claim', async () => {
++    const { folder, identity, grant, prior } = await fixture();
++    const review = { schemaVersion: 'mira.formal-quality-review-grant.v1' as const, grantId: 'render-fix',
++      approvalRef: 'explicit operator review', sessionId: identity.sessionId, stageId: identity.stageId,
++      reviewIdentitySha256: '7'.repeat(64), snapshotSha256: '8'.repeat(64), priorAttemptsSha256: '9'.repeat(64),
++      maxAdditionalReviews: 1 as const };
++    await claimLearnerDiscussionCompletion(folder, identity, grant);
++    await expect(claimLearnerDiscussionCompletion(folder, identity, grant, responseRecovery, review)).rejects.toMatchObject({ code: 'ENOENT' });
++    await claimLearnerDiscussionCompletion(folder, identity, grant, responseRecovery);
++    await expect(claimLearnerDiscussionCompletion(folder, identity, grant, { ...responseRecovery, failureSha256: '0'.repeat(64) }, review)).rejects.toThrow('PRIOR_CLAIM_MISMATCH');
++    expect(await claimLearnerDiscussionCompletion(folder, identity, grant, responseRecovery, review)).toBe(qualitySha(prior));
++    await expect(claimLearnerDiscussionCompletion(folder, identity, grant, responseRecovery, review)).rejects.toMatchObject({ code: 'EEXIST' });
++  });
+   it('requires the exact prior repair and allows one distinct cached-response recovery without changing earlier claims', async () => {
+     const { folder, identity, grant, prior } = await fixture();
+     await expect(claimLearnerDiscussionCompletion(folder, identity, grant, responseRecovery)).rejects.toMatchObject({ code: 'ENOENT' });
+diff --git a/tests/server/mira-formal-completion-tail-budget.test.ts b/tests/server/mira-formal-completion-tail-budget.test.ts
+--- a/tests/server/mira-formal-completion-tail-budget.test.ts
++++ b/tests/server/mira-formal-completion-tail-budget.test.ts
+@@ -91,7 +91,7 @@
+       ['--completion-paid-budget', 'one', '--completion-paid-budget', 'two']])
+       expect(() => completionTailArgument('complete', {}, args)).toThrow('ARGUMENT_INVALID');
+   });
+-  it.each(['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery'])('requires the same verified sidecar for %s', mode => {
++  it.each(['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review'])('requires the same verified sidecar for %s', mode => {
+     expect(() => completionTailArgument(mode, {}, [])).toThrow('SIDECAR_REQUIRED');
+     expect(completionTailArgument(mode, {}, ['--completion-paid-budget', 'same.json'])).toBe('same.json');
+     expect(() => completionTailArgument(mode, { reviewGrantPath: 'other' }, ['--completion-paid-budget', 'same.json'])).toThrow('CANNOT_MIX_RECOVERIES');
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -118,7 +118,7 @@
+   cachedOnly?: boolean;
+   /** Explicit operator recovery of the SAME snapshot rejected before provider dispatch. */
+   recheckUnsentBrowserReview?: boolean;
+-  /** Operator-only, explicitly approved fourth review of one frozen snapshot. */
++  /** Operator-only, explicitly approved additional review of one frozen snapshot. */
+   approvedReviewGrant?: FormalQualityReviewGrant;
+ }
+ 
+@@ -244,10 +244,11 @@
+     if (!Array.isArray(attempts)) throw new Error('FORMAL_QUALITY_LEDGER_INVALID');
+     if (grant) {
+       // One additional operator review per session, regardless of grant ID. The
+-      // original three attempts and every old provider response remain intact.
++      // Entire prior history and every old provider response remain intact.
+       if (await readJson(join(folder, 'operator-review-grant.json')) !== undefined)
+         throw new Error('FORMAL_QUALITY_REVIEW_GRANT_ALREADY_CONSUMED');
+-      if (attempts.length !== MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts
++      if ((observationMode ? attempts.length === 0
++          : attempts.length !== MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts)
+           || qualitySha(attempts) !== grant.priorAttemptsSha256
+           || attempts.some(item => !object(item) || !['failed', 'needs_revision'].includes(String(item.status))))
+         throw new Error('FORMAL_QUALITY_REVIEW_GRANT_LEDGER_CHANGED');
+diff --git a/tests/server/mira-formal-teaching-quality.test.ts b/tests/server/mira-formal-teaching-quality.test.ts
+--- a/tests/server/mira-formal-teaching-quality.test.ts
++++ b/tests/server/mira-formal-teaching-quality.test.ts
+@@ -177,12 +177,12 @@
+   expect(deps.inspect).toHaveBeenCalledTimes(4);
+ });
+ 
+-async function exhaustedGrantFixture() {
++async function exhaustedGrantFixture(attemptCount = 3) {
+   const value = input(); const deps = { ...mocks(value), cacheRoot };
+   const valid = await deps.provider();
+   deps.provider.mockClear();
+   deps.provider.mockResolvedValue({ ...valid, content: '{"invalid":true}' });
+-  for (let revision = 1; revision <= 3; revision++) {
++  for (let revision = 1; revision <= attemptCount; revision++) {
+     value.scenes[0].title = `failed revision ${revision}`;
+     await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow();
+   }
+@@ -200,6 +200,74 @@
+ }
+ 
+ describe('one approved operator review without resetting ordinary limits', () => {
++  it.each([1, 5])('binds one explicit observation-mode review to all %s prior attempts without rewriting evidence', async (count) => {
++    vi.mocked(isPaidBudgetObservationMode).mockResolvedValue(true);
++    const { value, deps, directory, ledger, grant } = await exhaustedGrantFixture(count);
++    const priorResponses = await Promise.all(ledger.map((attempt: { snapshotSha256: string }) =>
++      readFile(join(directory, `${attempt.snapshotSha256}-provider.json`), 'utf8')));
++    const result = await reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant });
++    expect(result.status).toBe('passed');
++    expect(result.remainingReviewAttempts).toBeNull();
++    expect(result.reviewAttemptLimitEnabled).toBe(false);
++    expect(deps.provider).toHaveBeenCalledTimes(count + 1);
++    const after = JSON.parse(await readFile(join(directory, 'attempts.json'), 'utf8'));
++    expect(after).toHaveLength(count + 1);
++    expect(after.slice(0, count)).toEqual(ledger);
++    expect(after[count]).toMatchObject({ grantId: grant.grantId, priorAttemptsSha256: qualitySha(ledger), status: 'passed' });
++    expect(await Promise.all(ledger.map((attempt: { snapshotSha256: string }) =>
++      readFile(join(directory, `${attempt.snapshotSha256}-provider.json`), 'utf8')))).toEqual(priorResponses);
++    expect((await reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant })).status).toBe('passed');
++    expect(deps.provider).toHaveBeenCalledTimes(count + 1);
++  });
++
++  it.each([1, 5])('keeps strict-mode grants restricted to exactly three attempts when history contains %s', async (count) => {
++    vi.mocked(isPaidBudgetObservationMode).mockResolvedValue(true);
++    const { value, deps, directory, grant } = await exhaustedGrantFixture(count);
++    vi.mocked(isPaidBudgetObservationMode).mockResolvedValue(false);
++    await expect(reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant }))
++      .rejects.toThrow('REVIEW_GRANT_LEDGER_CHANGED');
++    expect(deps.provider).toHaveBeenCalledTimes(count);
++    expect(await readdir(directory)).not.toContain('operator-review-grant.json');
++  });
++
++  it('rejects empty, stale or nonterminal observation-mode history before claiming an explicit review', async () => {
++    vi.mocked(isPaidBudgetObservationMode).mockResolvedValue(true);
++    const { value, deps, directory, ledger, grant } = await exhaustedGrantFixture(5);
++    for (const history of [[], [{ ...ledger[0], status: 'started' }, ...ledger.slice(1)],
++      [{ ...ledger[0], status: 'passed' }, ...ledger.slice(1)]]) {
++      await writeFile(join(directory, 'attempts.json'), JSON.stringify(history));
++      await expect(reviewFormalCourse(value, undefined,
++        { ...deps, approvedReviewGrant: { ...grant, priorAttemptsSha256: qualitySha(history) } }))
++        .rejects.toThrow('REVIEW_GRANT_LEDGER_CHANGED');
++    }
++    await writeFile(join(directory, 'attempts.json'), JSON.stringify(ledger));
++    for (const changes of [{ priorAttemptsSha256: qualitySha(ledger.slice(1)) }, { maxAdditionalReviews: 2 },
++      { snapshotSha256: 'f'.repeat(64) }, { reviewIdentitySha256: 'f'.repeat(64) }]) {
++      await expect(reviewFormalCourse(value, undefined,
++        { ...deps, approvedReviewGrant: { ...grant, ...changes } as FormalQualityReviewGrant }))
++        .rejects.toThrow(/REVIEW_GRANT_(INVALID|LEDGER_CHANGED)/);
++    }
++    expect(deps.provider).toHaveBeenCalledTimes(5);
++    expect(await readdir(directory)).not.toContain('operator-review-grant.json');
++  });
++
++  it('cannot reuse or rename an observation-mode grant after an ambiguous additional review', async () => {
++    vi.mocked(isPaidBudgetObservationMode).mockResolvedValue(true);
++    const { value, deps, directory, grant, ledger } = await exhaustedGrantFixture(5);
++    deps.provider.mockRejectedValue(new Error('ambiguous observed review'));
++    await expect(reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant }))
++      .rejects.toThrow('ambiguous observed review');
++    for (const nextGrant of [grant, { ...grant, grantId: 'renamed-observation-review' }]) {
++      await expect(reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: nextGrant }))
++        .rejects.toThrow('GRANT_ALREADY_CONSUMED');
++    }
++    await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('PRIOR_ATTEMPT_UNRESOLVED');
++    expect(deps.provider).toHaveBeenCalledTimes(6);
++    const after = JSON.parse(await readFile(join(directory, 'attempts.json'), 'utf8'));
++    expect(after).toHaveLength(6);
++    expect(after.slice(0, 5)).toEqual(ledger);
++  });
++
+   it('reviews the same failed snapshot once, retaining all prior evidence and reusing only its valid pass', async () => {
+     const { value, deps, directory, ledger, grant } = await exhaustedGrantFixture();
+     const oldResponse = await readFile(join(directory, `${grant.snapshotSha256}-provider.json`), 'utf8');
+--- a/lib/server/mira-formal-scene-inspector.ts
++++ b/lib/server/mira-formal-scene-inspector.ts
+@@ -1,4 +1,5 @@
+ import { inspectExploration, projectFormalFrameRect, validateExploration } from './mira-formal-exploration';
++import { prepareFormalQuizScreenshot } from './mira-formal-quiz-screenshot';
+ import { createHash } from 'node:crypto';
+ import { promises as fs } from 'node:fs';
+ import path from 'node:path';
+@@ -637,7 +638,14 @@
+     }
+     await awaitPaint(target);
+     const final = await target.evaluate(observeFormalSceneDom);
+-    for (const observation of [initial, final]) {
++    let screenshotObservation = final;
++    if (cloned.scene.type === 'quiz' && !unsupported) {
++      await prepareFormalQuizScreenshot(page, previewUrl);
++      screenshotObservation = await page.evaluate(observeFormalSceneDom);
++      for (const probe of probeResults) if (probe.passed)
++        probe.message += ' This was a disposable local response, not a correct-answer claim; the visual screenshot shows the reloaded unanswered quiz.';
++    }
++    for (const observation of [initial, final, ...(screenshotObservation !== final ? [screenshotObservation] : [])]) {
+       if (observation.metrics.horizontalOverflow > 2) issues.push('horizontal_overflow');
+       issues.push(
+         ...observation.metrics.textOverflow.map((id) => `text_overflow:${id}`),
+@@ -675,12 +683,13 @@
+       viewport,
+       screenshotSha256,
+       ...(cloned.multistate ? {screenshotPath: path.join(evidenceDir, `${sceneSha256}-${viewport.width}x${viewport.height}-${screenshotSha256}.png`), inputMode} : {}),
+-      domSha256: qualitySha({ initial: initial.state, final: final.state }),
++      domSha256: qualitySha({ initial: initial.state,
++        ...(screenshotObservation !== final ? { probeFinal: final.state } : {}), final: screenshotObservation.state }),
+       passed: issues.length === 0,
+       probeCount: probeResults.filter((probe) => probe.passed).length,
+       issues: [...new Set(issues)].slice(0, 80),
+-      visibleText: `${initial.visibleText}\n${final.visibleText}`.slice(0, 24000),
+-      metrics: final.metrics,
++      visibleText: `${initial.visibleText}\n${final.visibleText}${screenshotObservation !== final ? `\n${screenshotObservation.visibleText}` : ''}`.slice(0, 24000),
++      metrics: screenshotObservation.metrics,
+       probeResults,
+       coverage:
+         cloned.scene.type === 'slide'
+diff --git a/lib/server/mira-formal-quiz-screenshot.ts b/lib/server/mira-formal-quiz-screenshot.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-quiz-screenshot.ts
+@@ -0,0 +1,59 @@
++import type { Page } from 'playwright-core';
++
++/** Runs only in the inspector's disposable, capability-backed read-only quiz.
++ * Probe selections demonstrate a local state transition, not correct answers.
++ * Reload before capturing visuals so no selected distractor or probe-induced
++ * scroll position is presented as the authored course's initial state. */
++export async function prepareFormalQuizScreenshot(page: Page, previewUrl: string): Promise<void> {
++  const url = new URL(previewUrl);
++  if (url.protocol !== 'http:' || url.username || url.password
++      || !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
++      || !/^\/internal\/formal-scene-preview\/[a-f0-9]{64}$/.test(url.pathname)
++      || url.search || url.hash || page.url() !== previewUrl)
++    throw new Error('FORMAL_QUIZ_SCREENSHOT_PREVIEW_REQUIRED');
++  await page.reload({ waitUntil: 'domcontentloaded', timeout: 20_000 });
++  await page.locator('#formal-scene-root[data-qa-ready="true"][data-scene-type="quiz"]').waitFor({ timeout: 12_000 });
++  await page.evaluate(async () => {
++    const root = document.querySelector<HTMLElement>('#formal-scene-root');
++    if (!root || root.dataset.sceneType !== 'quiz' || !root.querySelector('[data-quiz-option],textarea'))
++      throw new Error('FORMAL_QUIZ_SCREENSHOT_CONTROLS_MISSING');
++    await document.fonts.ready;
++    // Restore the initial viewport only inside this fresh private render. This
++    // neither changes a learner's scroll nor treats deliberate scrolling as an
++    // authored-content defect.
++    const resetScroll = () => {
++      window.scrollTo(0, 0);
++      for (const element of [root, ...root.querySelectorAll<HTMLElement>('*')]) {
++        if (element.scrollTop) element.scrollTop = 0;
++        if (element.scrollLeft) element.scrollLeft = 0;
++      }
++    };
++    resetScroll();
++    // Motion's JS-driven entrance transforms may outlive two RAFs and are not
++    // necessarily finished by Playwright's animations:'disabled'. Wait for
++    // actual geometry/opacity stability; never remove or override animations.
++    await new Promise<void>((resolve, reject) => {
++      const started = performance.now();
++      let previous = '', stableFrames = 0;
++      const sample = () => {
++        const elements = [root, ...root.querySelectorAll<HTMLElement>('div,button,textarea')];
++        const signature = JSON.stringify(elements.map(element => {
++          const r = element.getBoundingClientRect(), css = getComputedStyle(element);
++          return [r.x,r.y,r.width,r.height,css.opacity,css.transform];
++        }));
++        const running = root.getAnimations({subtree:true}).some(animation => animation.playState === 'running'
++          && Number.isFinite(animation.effect?.getComputedTiming().endTime));
++        stableFrames = signature === previous && !running ? stableFrames + 1 : 0;
++        previous = signature;
++        if (stableFrames >= 3) { resetScroll(); resolve(); return; }
++        if (performance.now() - started > 5000) { reject(new Error('FORMAL_QUIZ_SCREENSHOT_UNSTABLE')); return; }
++        requestAnimationFrame(sample);
++      };
++      requestAnimationFrame(sample);
++    });
++    await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
++    if (root.querySelector('[data-formal-auto-probe]')
++        || Array.from(root.querySelectorAll<HTMLTextAreaElement>('textarea')).some(input => input.value !== ''))
++      throw new Error('FORMAL_QUIZ_SCREENSHOT_NOT_INITIAL');
++  });
++}
+diff --git a/tests/server/mira-formal-quiz-screenshot.test.ts b/tests/server/mira-formal-quiz-screenshot.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-quiz-screenshot.test.ts
+@@ -0,0 +1,28 @@
++import { describe, expect, it, vi } from 'vitest';
++import type { Page } from 'playwright-core';
++import { prepareFormalQuizScreenshot } from '@/lib/server/mira-formal-quiz-screenshot';
++
++const url = `http://127.0.0.1:3100/internal/formal-scene-preview/${'a'.repeat(64)}`;
++function fakePage(current=url) {
++  const ready=vi.fn(async()=>undefined), evaluate=vi.fn(async()=>undefined);
++  const page={url:()=>current,reload:vi.fn(async()=>undefined),locator:vi.fn(()=>({waitFor:ready})),evaluate};
++  return {page:page as unknown as Page,raw:page,ready,evaluate};
++}
++describe('private quiz visual capture',()=>{
++  it('reloads only the same private quiz and waits for the ready entry before stable capture',async()=>{
++    const f=fakePage();await prepareFormalQuizScreenshot(f.page,url);
++    expect(f.raw.reload).toHaveBeenCalledExactlyOnceWith({waitUntil:'domcontentloaded',timeout:20000});
++    expect(f.raw.locator).toHaveBeenCalledWith('#formal-scene-root[data-qa-ready="true"][data-scene-type="quiz"]');
++    expect(f.ready).toHaveBeenCalledBefore(f.evaluate);expect(f.evaluate).toHaveBeenCalledTimes(1);
++  });
++  it.each(['http://example.com/internal/formal-scene-preview/'+ 'a'.repeat(64),
++    'http://127.0.0.1:3100/classroom/stage-one',url+'?student=one',url+'#question'])('never reloads a student/external or altered URL %s',async target=>{
++    const f=fakePage(target);await expect(prepareFormalQuizScreenshot(f.page,target)).rejects.toThrow('PREVIEW_REQUIRED');expect(f.raw.reload).not.toHaveBeenCalled();
++  });
++  it('refuses a different page instead of navigating a student browser',async()=>{
++    const f=fakePage('http://127.0.0.1:3100/classroom/stage-one');await expect(prepareFormalQuizScreenshot(f.page,url)).rejects.toThrow('PREVIEW_REQUIRED');expect(f.raw.reload).not.toHaveBeenCalled();
++  });
++  it('preserves reload and render failures instead of manufacturing a fresh screenshot',async()=>{
++    const f=fakePage();f.raw.reload.mockRejectedValueOnce(new Error('preview expired'));await expect(prepareFormalQuizScreenshot(f.page,url)).rejects.toThrow('preview expired');expect(f.evaluate).not.toHaveBeenCalled();
++  });
++});

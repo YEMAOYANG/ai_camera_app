@@ -314,12 +314,15 @@ def _solve_legacy_objective_question(grade_code: str, subject: str, skill_id: st
         m=match(r"填空[:：](I|You|He|She|We|They) can(?:'t)? ____ \(([a-z]+)\)\.")
         if m and m[2] in VERBS: return m[2]
     if mode in {"present_simple","present_tense","past_future"}:
-        m=match(r"填空[:：](I|You|He|She|We|They) ____ \(([a-z]+)\) (every day|now|yesterday|tomorrow)\.")
+        # The registered past_future boundary includes last week as a simple
+        # past marker. Keep this allowance local to that mode.
+        time_words = r"yesterday|last week|tomorrow" if mode == 'past_future' else r"every day|now|yesterday|tomorrow"
+        m=match(r"填空[:：](I|You|He|She|We|They) ____ \(([a-z]+)\) ("+time_words+r")\.")
         if m and m[2] in VERBS:
             who,verb,time=m.groups(); singular=who in {'He','She'}
             if mode in {'present_simple','present_tense'} and time=='every day': return VERBS[verb][0] if singular else verb
             if mode=='present_tense' and time=='now': return ('am' if who=='I' else 'is' if singular else 'are')+' '+VERBS[verb][1]
-            if mode=='past_future' and time=='yesterday': return VERBS[verb][2]
+            if mode=='past_future' and time in {'yesterday','last week'}: return VERBS[verb][2]
             if mode=='past_future' and time=='tomorrow': return 'will '+verb
     if mode == 'self_information':
         m=match(r"My name is "+name+r"\. What is my name\?")
@@ -351,13 +354,27 @@ def _solve_legacy_objective_question(grade_code: str, subject: str, skill_id: st
     raise ValueError("public question is outside the sealed objective grammar")
 
 
+def _objective_answer_text(value: object, policy: Mapping) -> str:
+    normalized = _text(value).casefold().replace(' ', '')
+    # The solver has already accepted the sealed people-count / percentage
+    # question. Only its first component may spell out the declared 人 unit;
+    # do not erase arbitrary units or reinterpret a decimal as a percentage.
+    if (policy.get('gradeCode'), policy.get('subject'), policy.get('skillId'),
+            policy.get('difficultyCode'), policy.get('mode')) == (
+            'primary_6', 'math', 'fraction_ratio_percentage', 'standard', 'fraction_percentage'):
+        match = re.fullmatch(r'([0-9]+)人;([0-9]+(?:\.[0-9]+)?%)', normalized)
+        if match:
+            return match[1] + ';' + match[2]
+    return normalized
+
+
 def validate_objective_question(grade_code: str, subject: str, skill_id: str, question: Mapping, difficulty_code: str = "standard") -> str:
     policy = objective_question_policy(grade_code, subject, skill_id, difficulty_code)
     expected = solve_objective_question(grade_code, subject, skill_id, str(question.get("prompt") or ""), difficulty_code)
     question_type = question.get('type')
     if question_type not in policy['allowedQuestionTypes']:
         raise ValueError('assessment type is closed for this skill authority')
-    normalize = lambda value: _text(value).casefold().replace(' ', '')
+    normalize = lambda value: _objective_answer_text(value, policy)
     if question_type == 'single_choice':
         matches = [c.get('id') for c in question.get('choices', []) if isinstance(c,Mapping) and normalize(c.get('label'))==normalize(expected)]
         if len(matches)!=1 or question.get('answer')!=matches[0]: raise ValueError('model choice disagrees with Host solution')

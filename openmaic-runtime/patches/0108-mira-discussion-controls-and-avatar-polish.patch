@@ -1,0 +1,432 @@
+diff --git a/PRODUCT.md b/PRODUCT.md
+--- a/PRODUCT.md
++++ b/PRODUCT.md
+@@ -23,7 +23,7 @@
+ ## Design Principles
+ 
+ - Keep the learner's next action clear.
+-- Keep classroom controls visually consistent across current and historical discussion.
++- Keep classroom controls visually consistent across current and historical discussion. Desktop discussion choices, history actions and playback controls share a 36 px height; coarse-pointer controls use 48 px. Voice capture remains a larger dedicated target.
+ - Scope the student theme to classroom chrome; preserve authored lesson and whiteboard content.
+ - Preserve meaningful status labels and the existing interaction flow.
+ 
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -15,6 +15,8 @@
+   --mira-orbit-muted: #a0b5ca;
+   --mira-orbit-cyan: #63dcff;
+   --mira-orbit-lime: #d3ff48;
++  --mira-orbit-control-height: 36px;
++  --mira-orbit-control-radius: 9px;
+   background: var(--mira-orbit-space);
+   scrollbar-gutter: auto;
+   overflow: hidden;
+@@ -309,9 +311,7 @@
+ }
+ 
+ html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [role='alert'] button {
+-  min-height: 44px;
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
++  min-height: var(--mira-orbit-control-height);
+ }
+ 
+ html[data-mira-student-theme='orbit'] [data-testid='roundtable-non-presentation-card'] {
+@@ -347,9 +347,10 @@
+   > div:first-child
+   > button,
+ html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [role='tab'] {
+-  min-width: 44px;
+-  min-height: 44px;
+-  border-radius: 10px;
++  min-width: var(--mira-orbit-control-height);
++  min-height: var(--mira-orbit-control-height);
++  height: var(--mira-orbit-control-height);
++  border-radius: var(--mira-orbit-control-radius);
+   color: var(--mira-orbit-muted);
+   background: transparent;
+   box-shadow: none;
+@@ -385,7 +386,7 @@
+ 
+ html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] > div > div {
+   height: auto;
+-  min-height: 44px;
++  min-height: var(--mira-orbit-control-height);
+ }
+ 
+ /* Tiny state marks must remain distinct from the surrounding chrome surface. */
+@@ -488,6 +489,7 @@
+ /* Keep the action visible during playback, including on touch screens. The
+  * upstream waveform and hover-only icon are not reliable action affordances. */
+ html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-bubble-control] {
++  border-color: var(--mira-orbit-line);
+   color: var(--mira-orbit-cyan);
+   background: #194358;
+   box-shadow: none;
+@@ -749,6 +751,7 @@
+ 
+ html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-bubble-avatar] {
+   border-color: var(--mira-orbit-cyan);
++  --tw-ring-color: var(--mira-orbit-cyan);
+   box-shadow: none;
+ }
+ 
+@@ -943,6 +946,144 @@
+   [data-mira-chrome='complete']
+   :is(h1, h2, [class*='text-amber-'], [class*='text-orange-']) {
+   color: var(--mira-orbit-lime);
++}
++
++/* The response cue keeps its larger voice/text target, with the same palette. */
++html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-cue-action] {
++  color: var(--mira-orbit-space);
++  background: var(--mira-orbit-lime);
++  border-color: var(--mira-orbit-lime);
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-cue-action]:hover {
++  background: #e2ff86;
++  border-color: #e2ff86;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-cue-action] svg {
++  color: inherit;
++  filter: none;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-cue-decoration] {
++  border-color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-cue-decoration='glow'] {
++  background: transparent;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-user-cue]
++  :is([class*='text-amber-'], [class*='text-purple-']) {
++  color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-cue-decoration='wave'] {
++  background: var(--mira-orbit-cyan);
++}
++
++/* One size vocabulary for discussion choices, recovery, history and navigation. */
++html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-actions] {
++  align-items: stretch;
++  gap: 8px;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action] {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  gap: 6px;
++  height: var(--mira-orbit-control-height);
++  min-height: var(--mira-orbit-control-height);
++  padding: 0 12px;
++  border: 1px solid var(--mira-orbit-line);
++  border-radius: var(--mira-orbit-control-radius);
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-raised);
++  box-shadow: none;
++  font-size: 12px;
++  font-weight: 600;
++  line-height: 16px;
++  white-space: nowrap;
++  transition:
++    background-color 160ms ease,
++    border-color 160ms ease,
++    color 160ms ease;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome]
++  [data-mira-discussion-action]:not(:disabled):hover {
++  border-color: var(--mira-orbit-cyan);
++  background: #194358;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action='primary'] {
++  color: var(--mira-orbit-space);
++  background: var(--mira-orbit-lime);
++  border-color: var(--mira-orbit-lime);
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome]
++  [data-mira-discussion-action='primary']:not(:disabled):hover {
++  background: #e2ff86;
++  border-color: #e2ff86;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action='end'] {
++  color: #ffb9b9;
++  background: #34202a;
++  border-color: #784854;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome]
++  [data-mira-discussion-action='end']:not(:disabled):hover {
++  background: #472632;
++  border-color: #ffb9b9;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action='pause'] {
++  width: var(--mira-orbit-control-height);
++  min-width: var(--mira-orbit-control-height);
++  padding: 0;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action]:disabled {
++  opacity: 0.45;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion-prompt']
++  [data-mira-discussion-badge] {
++  /* Persona colors are content metadata, not the student chrome palette. */
++  color: var(--mira-orbit-cyan) !important;
++  background: #194358 !important;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion-confirm'] {
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-panel);
++  border: 1px solid var(--mira-orbit-line);
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion-confirm'] :is(h3, p) {
++  color: var(--mira-orbit-text);
++}
++
++@media (pointer: coarse) {
++  html[data-mira-student-theme='orbit'] {
++    --mira-orbit-control-height: 48px;
++  }
+ }
+ 
+ html[data-mira-student-theme='orbit']
+diff --git a/components/chat/chat-session.tsx b/components/chat/chat-session.tsx
+--- a/components/chat/chat-session.tsx
++++ b/components/chat/chat-session.tsx
+@@ -366,6 +366,7 @@
+             className="mt-2 mx-2 flex flex-wrap items-center justify-center gap-1.5"
+           >
+             <button
++              data-mira-discussion-action="end"
+               onClick={() => onEndSession(session.id)}
+               className="h-7 bg-red-50/80 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-800/50 px-2.5 rounded-md text-[11px] font-semibold flex items-center gap-1.5 transition-colors hover:bg-red-100 dark:hover:bg-red-900/35"
+             >
+@@ -375,6 +376,7 @@
+             {isSoftClosing && onContinueSession && (
+               <button
+                 data-mira-chat-continue
++                data-mira-discussion-action="primary"
+                 onClick={() => onContinueSession(session.id)}
+                 className="h-7 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-300 border border-purple-200 dark:border-purple-700 px-2.5 rounded-md text-[11px] font-semibold flex items-center gap-1.5 transition-colors hover:bg-purple-50 dark:hover:bg-purple-900/25"
+               >
+diff --git a/components/chat/proactive-card.tsx b/components/chat/proactive-card.tsx
+--- a/components/chat/proactive-card.tsx
++++ b/components/chat/proactive-card.tsx
+@@ -202,6 +202,7 @@
+                 </span>
+               )}
+               <span
++                data-mira-discussion-badge
+                 className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full shrink-0"
+                 style={{
+                   color: agentColor || '#d97706',
+@@ -226,8 +227,9 @@
+             {action.topic}
+           </p>
+ 
+-          <div className="flex items-center gap-1.5 mt-0.5">
++          <div data-mira-discussion-actions className="flex items-center gap-1.5 mt-0.5">
+             <button
++              data-mira-discussion-action="primary"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 onListen();
+@@ -240,11 +242,12 @@
+             {required && (
+               <button
+                 type="button"
++                data-mira-discussion-action="secondary"
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   onSkip();
+                 }}
+-                className="min-h-12 rounded-lg border border-gray-200 px-3 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
++                className="h-9 rounded-lg border border-gray-200 px-3 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+               >
+                 跳过讨论
+               </button>
+@@ -252,6 +255,7 @@
+ 
+             {!required && (
+               <button
++                data-mira-discussion-action="pause"
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   onTogglePause();
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -1861,7 +1861,8 @@
+                   <div className="flex shrink-0 flex-wrap gap-2">
+                     <button
+                       type="button"
+-                      className="min-h-12 rounded-lg bg-slate-900 px-3 py-2 font-medium text-white"
++                      data-mira-discussion-action="primary"
++                      className="h-9 rounded-lg bg-slate-900 px-3 py-2 font-medium text-white"
+                       onClick={() => {
+                         if (engineRef.current?.retryRequiredDiscussion())
+                           setRequiredDiscussionError(null);
+@@ -1871,7 +1872,8 @@
+                     </button>
+                     <button
+                       type="button"
+-                      className="min-h-12 rounded-lg border border-slate-300 px-3 py-2 font-medium"
++                      data-mira-discussion-action="secondary"
++                      className="h-9 rounded-lg border border-slate-300 px-3 py-2 font-medium"
+                       onClick={() => {
+                         if (engineRef.current?.skipDiscussion({ explicit: true }))
+                           setRequiredDiscussionError(null);
+@@ -2112,6 +2114,7 @@
+           }}
+         >
+           <AlertDialogContent
++            data-mira-chrome={studentMode ? 'discussion-confirm' : undefined}
+             container={isPresenting ? stageRef.current : undefined}
+             className="max-w-sm rounded-2xl p-0 overflow-hidden border-0 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.5)]"
+           >
+@@ -2139,10 +2142,15 @@
+             </div>
+ 
+             <AlertDialogFooter className="px-6 pb-5 pt-3 flex-row gap-3">
+-              <AlertDialogCancel onClick={cancelSceneSwitch} className="flex-1 rounded-xl">
++              <AlertDialogCancel
++                data-mira-discussion-action="secondary"
++                onClick={cancelSceneSwitch}
++                className="flex-1 rounded-xl"
++              >
+                 {t('common.cancel')}
+               </AlertDialogCancel>
+               <AlertDialogAction
++                data-mira-discussion-action="primary"
+                 onClick={confirmSceneSwitch}
+                 className="flex-1 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md shadow-amber-200/50 dark:shadow-amber-900/30"
+               >
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -923,6 +923,7 @@
+             {isCueUser && !bubbleRole && !thinkingState && !isInputOpen && !isVoiceOpen && (
+               <motion.div
+                 key="presentation-cue-user"
++                data-mira-user-cue="presentation"
+                 initial={{ opacity: 0, scale: 0.92, y: 8 }}
+                 animate={{ opacity: 1, scale: 1, y: 0 }}
+                 exit={{ opacity: 0, scale: 0.92, y: 8 }}
+@@ -930,6 +931,7 @@
+                 className="pointer-events-auto"
+               >
+                 <button
++                  data-mira-cue-action
+                   onClick={() => (asrEnabled ? handleToggleVoice() : handleToggleInput())}
+                   className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/70 dark:bg-black/50 backdrop-blur-xl border border-amber-400/50 dark:border-amber-500/50 shadow-[0_0_16px_rgba(245,158,11,0.2),0_8px_32px_rgba(0,0,0,0.06)] dark:shadow-[0_0_16px_rgba(245,158,11,0.25),0_8px_32px_rgba(0,0,0,0.4)] text-amber-600 dark:text-amber-400 text-sm font-semibold tracking-wide hover:bg-gray-100/80 dark:hover:bg-black/60 hover:border-amber-500/70 dark:hover:border-amber-400/70 hover:shadow-[0_0_24px_rgba(245,158,11,0.25)] dark:hover:shadow-[0_0_24px_rgba(245,158,11,0.35)] transition-all active:scale-95 animate-pulse"
+                 >
+@@ -1537,6 +1539,7 @@
+             <AnimatePresence>
+               {isCueUser && !bubbleRole && !thinkingState && !isInputOpen && !isVoiceOpen && (
+                 <motion.div
++                  data-mira-user-cue="standard"
+                   initial={{ opacity: 0, scale: 0.85 }}
+                   animate={{ opacity: 1, scale: 1 }}
+                   exit={{ opacity: 0, scale: 0.85 }}
+@@ -1547,6 +1550,7 @@
+                   <div className="relative flex items-center justify-center">
+                     {/* Soft background glow */}
+                     <div
++                      data-mira-cue-decoration="glow"
+                       className={cn(
+                         'absolute w-24 h-24 rounded-full blur-2xl',
+                         asrEnabled
+@@ -1557,6 +1561,7 @@
+ 
+                     {/* Expanding ripple 1 */}
+                     <motion.div
++                      data-mira-cue-decoration="ripple"
+                       animate={{ scale: [1, 2.2], opacity: [0.25, 0] }}
+                       transition={{
+                         repeat: Infinity,
+@@ -1572,6 +1577,7 @@
+                     />
+                     {/* Expanding ripple 2 */}
+                     <motion.div
++                      data-mira-cue-decoration="ripple"
+                       animate={{ scale: [1, 2.2], opacity: [0.25, 0] }}
+                       transition={{
+                         repeat: Infinity,
+@@ -1589,6 +1595,7 @@
+ 
+                     {/* Action circle — voice (ASR on) or text input (ASR off) */}
+                     <motion.button
++                      data-mira-cue-action
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         if (asrEnabled) handleToggleVoice();
+@@ -1621,6 +1628,7 @@
+                       {[0, 1, 2, 3, 4, 3, 2, 1, 0].map((intensity, i) => (
+                         <motion.div
+                           key={i}
++                          data-mira-cue-decoration="wave"
+                           animate={{
+                             scaleY: [0.3, 0.5 + intensity * 0.15, 0.3],
+                             opacity: [0.3, 0.7, 0.3],
+@@ -1640,6 +1648,7 @@
+                       {[0, 1, 2, 3, 2, 1, 0].map((intensity, i) => (
+                         <motion.div
+                           key={i}
++                          data-mira-cue-decoration="wave"
+                           animate={{
+                             scaleY: [0.3, 0.45 + intensity * 0.15, 0.3],
+                             opacity: [0.25, 0.6, 0.25],
+@@ -1754,6 +1763,7 @@
+                               title={bubbleName}
+                             >
+                               <div
++                                data-mira-bubble-avatar
+                                 className={cn(
+                                   'w-6 h-6 rounded-full overflow-hidden border-2 shadow-sm',
+                                   bubbleRole === 'user'
+diff --git a/components/roundtable/presentation-speech-overlay.tsx b/components/roundtable/presentation-speech-overlay.tsx
+--- a/components/roundtable/presentation-speech-overlay.tsx
++++ b/components/roundtable/presentation-speech-overlay.tsx
+@@ -133,6 +133,7 @@
+   return (
+     <div className="flex items-center gap-2" onClick={onExpand}>
+       <div
++        data-mira-speech-card={bubble.role}
+         className={cn(
+           'flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-xl shadow-md cursor-pointer transition-all duration-200',
+           'hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]',
+@@ -144,6 +145,7 @@
+         )}
+       >
+         <div
++          data-mira-bubble-avatar
+           className={cn(
+             'w-6 h-6 rounded-full overflow-hidden border shrink-0',
+             bubble.role === 'user'

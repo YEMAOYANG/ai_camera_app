@@ -4,6 +4,8 @@ import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { SpaceShell } from "@/components/student/space-shell";
+import { Button } from "@/components/ui/button";
 import { studentMeResponseSchema, type Student } from "@/lib/contracts/student-session";
 import { StudentDashboard } from "@/features/today/student-dashboard";
 import { ClassroomEntry } from "@/features/classroom/classroom-entry";
@@ -44,7 +46,8 @@ export function StudentSessionGate({
           }
           throw new Error(state.message || "暂时无法读取学习身份，请稍后再试");
         }
-        setStudent(studentMeResponseSchema.parse(payload).student);
+        const nextStudent = studentMeResponseSchema.parse(payload).student;
+        setStudent(nextStudent);
       } catch (caught) {
         if (controller.signal.aborted) return;
         setError(caught instanceof Error ? caught.message : "暂时无法读取学习身份");
@@ -54,13 +57,41 @@ export function StudentSessionGate({
     return () => controller.abort();
   }, [router]);
 
+  if (!lessonTaskId && (error || !student)) {
+    const active = learningView === "practice" ? "practice" : learningView ? "learning" : "today";
+    return (
+      <SpaceShell
+        active={active}
+        scenic={active === "today"}
+        className={`space-session-shell${active === "today" ? " space-today" : ""}`}
+      >
+        <section className="space-session-state" role={error ? "alert" : "status"}>
+          <p className="space-eyebrow">MIRA · 学习空间</p>
+          <h1>{error ? "暂时没有连接上" : "正在打开学习空间"}</h1>
+          {error ? (
+            <>
+              <p className="space-session-message">{error}</p>
+              <Button className="space-session-retry" onClick={() => location.reload()}>再试一次</Button>
+            </>
+          ) : (
+            <>
+              <p className="space-session-message">马上就好。</p>
+              <div className="space-session-progress" aria-hidden="true"><i /></div>
+              <div className="space-session-skeleton" aria-hidden="true"><span /><span /></div>
+            </>
+          )}
+        </section>
+      </SpaceShell>
+    );
+  }
+
   if (error) {
     return (
       <main id="main-content" className="grid min-h-screen place-items-center px-5">
-        <div className="max-w-md rounded-[24px] bg-white p-7 text-center shadow-[var(--mira-shadow-card)]">
+        <div className="max-w-md rounded-[24px] bg-[var(--mira-surface)] p-7 text-center shadow-[var(--mira-shadow-card)]">
           <h1 className="text-2xl font-black">暂时没有连接上</h1>
           <p className="mt-3 leading-7 text-[var(--mira-muted)]">{error}</p>
-          <button className="focus-ring mt-6 h-12 rounded-[15px] bg-[var(--mira-brand-deep)] px-6 font-bold text-white" onClick={() => location.reload()}>
+          <button className="focus-ring mt-6 h-12 rounded-[15px] bg-[var(--mira-brand-deep)] px-6 font-bold text-[var(--mira-on-brand)]" onClick={() => location.reload()}>
             再试一次
           </button>
         </div>
@@ -71,7 +102,7 @@ export function StudentSessionGate({
   if (!student) {
     return (
       <main id="main-content" className="grid min-h-screen place-items-center" aria-live="polite">
-        <div className="flex items-center gap-3 rounded-full bg-white/80 px-5 py-3 font-bold text-[var(--mira-muted)] shadow-sm">
+        <div className="flex items-center gap-3 rounded-full bg-[var(--mira-surface)] px-5 py-3 font-bold text-[var(--mira-muted)] shadow-sm">
           <LoaderCircle className="size-5 animate-spin text-[var(--mira-brand)]" aria-hidden="true" />
           正在打开学习空间
         </div>

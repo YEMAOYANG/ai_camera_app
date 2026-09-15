@@ -21,6 +21,7 @@ from core.database import DatabaseConnection
 from repositories.learning_teacher_media_repository import (
     LearningTeacherMediaRepository,
 )
+from integrations.openmaic_formal_playful import playful_generation_kwargs
 from integrations.openmaic_full_runtime_client import (
     OpenMaicFormalAudioReceipt,
     OpenMaicFormalAudioSegmentReceipt,
@@ -576,6 +577,13 @@ class FormalQwenAudioService:
             job = self.repository.get_formal_audio_job(
                 conn, build_item_id=build_item_id
             )
+            runtime = conn.execute(
+                "SELECT feature_manifest_json FROM learning_openmaic_runtime_classrooms WHERE id = ? LIMIT 1",
+                (job["runtime_classroom_id"],),
+            ).fetchone() if job is not None else None
+            generation_manifest = self.repository.decode_json(
+                runtime.get("feature_manifest_json") if runtime else None, {}
+            )
         if job is None:
             raise RuntimeError("formal audio job disappeared after claim")
         try:
@@ -583,7 +591,8 @@ class FormalQwenAudioService:
                 str(job["upstream_classroom_id"])
             )
             generation_job = self.runtime_client.get_generation_job_by_request_id(
-                str(job["runtime_request_id"])
+                str(job["runtime_request_id"]),
+                **playful_generation_kwargs(generation_manifest.get("generationContract")),
             )
             voice = get_formal_subject_qwen_voice_identity(str(job["subject"]))
             manifest = build_formal_speech_manifest(

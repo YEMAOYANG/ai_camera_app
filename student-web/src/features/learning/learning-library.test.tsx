@@ -4,8 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LearningLibrary } from "@/features/learning/learning-library";
 import type { LearningLibraryResponse } from "@/lib/contracts/learning";
 
-const { getLearningLibrary, replace, refresh } = vi.hoisted(() => ({
+const { getLearningLibrary, startLearningCourse, replace, refresh } = vi.hoisted(() => ({
   getLearningLibrary: vi.fn(),
+  startLearningCourse: vi.fn(),
   replace: vi.fn(),
   refresh: vi.fn(),
 }));
@@ -13,6 +14,7 @@ const { getLearningLibrary, replace, refresh } = vi.hoisted(() => ({
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace, refresh }) }));
 vi.mock("@/features/learning/learning-client", () => ({
   getLearningLibrary,
+  startLearningCourse,
   setLearningFavorite: vi.fn(),
 }));
 
@@ -64,6 +66,7 @@ describe("LearningLibrary full runtime links", () => {
   beforeEach(() => {
     getLearningLibrary.mockReset();
     getLearningLibrary.mockResolvedValue(library);
+    startLearningCourse.mockReset();
   });
 
   it("routes a ready full-runtime course directly to the trusted document route", async () => {
@@ -85,6 +88,17 @@ describe("LearningLibrary full runtime links", () => {
     );
     expect(screen.queryByRole("heading", { name: "今天想和谁一起学？" })).not.toBeInTheDocument();
     expect(document.body.textContent).not.toMatch(/open\s*maic/i);
+  });
+
+  it("offers a taskless formal course immediately and keeps its card visible after a failed start", async () => {
+    getLearningLibrary.mockResolvedValue({ ...library, items: [{ ...library.items[0], taskId: null, taskStatus: "available" }] });
+    startLearningCourse.mockRejectedValue(Object.assign(new Error("课程发布已变化"), { code: "learning_classroom_release_changed" }));
+    render(<LearningLibrary student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} />);
+    fireEvent.click(await screen.findByRole("button", { name: "开始上课" }));
+    expect(startLearningCourse).toHaveBeenCalledExactlyOnceWith("course-runtime-1", "1");
+    expect(await screen.findByRole("alert")).toHaveTextContent("这节课刚刚更新，请刷新后再试。");
+    expect(screen.getByText("拼音声母进阶课")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "开始上课" })).toBeEnabled();
   });
 
   it("does not present a legacy package as a ready formal classroom", async () => {
@@ -141,6 +155,12 @@ describe("LearningLibrary full runtime links", () => {
       "/lesson/task-runtime-1/classroom",
     );
     expect(screen.queryByText("第一门课程正在准备")).not.toBeInTheDocument();
+    const continuationLink = screen.getByRole("link", { name: /继续上课/ });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "继续学习" }));
+    });
+    expect(getLearningLibrary).toHaveBeenLastCalledWith({ bucket: "continue", subject: undefined });
+    expect(screen.getByRole("link", { name: /继续上课/ })).toBe(continuationLink);
   });
 
   it("silently turns a preparing course into a ready action without a page refresh", async () => {

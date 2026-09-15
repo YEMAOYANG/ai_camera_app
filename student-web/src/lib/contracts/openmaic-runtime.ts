@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { playfulLearningPolicySchema } from "./openmaic-playful-policy";
 import { difficultyCodeSchema, difficultyPolicySchema, interactionDesignPolicySchema,
   interactionDesignEvidenceSchema, requiredTeachingActionsSchema } from "./openmaic-interaction-evidence";
 import { gradeBoundarySchema, imagePolicySchema, videoPolicySchema, skillPolicySchema,
@@ -667,6 +668,7 @@ const openMaicProfessionalCoursewareAuthoritySchema = z.object({
 }).strict();
 
 const openMaicProfessionalCreationPolicySchema = z.object({
+  playfulLearningPolicy: playfulLearningPolicySchema.optional(),
   interactionDesignPolicy: interactionDesignPolicySchema.optional(),
   image: imagePolicySchema.optional(), video: videoPolicySchema.optional(),
   skillOrchestration: skillPolicySchema.optional(), teachingQuality: teachingQualityPolicySchema.optional(),
@@ -1182,6 +1184,17 @@ export const openMaicAdaptiveFormalRuntimeManifestV2Schema = z.object({
   const formalEvidence = manifest.formalEvidence;
   const evidenceTeacher = formalEvidence.teacher;
   const distribution = formalEvidence.sceneDistribution;
+  const playfulPolicy = generation.professionalCreationPolicy.playfulLearningPolicy;
+  if (playfulPolicy
+    && (distribution.quiz > 2 || !formalEvidence.widgetTypes.includes("game"))) {
+    context.addIssue({ code: "custom", path: ["formalEvidence"],
+      message: "探索课程需要 AI 小游戏，独立答题页面不得超过两页" });
+  }
+  if (playfulPolicy?.threeDUsage === "required"
+    && !formalEvidence.widgetTypes.includes("visualization3d")) {
+    context.addIssue({ code: "custom", path: ["formalEvidence", "widgetTypes"],
+      message: "3D 探索课程需要至少一个通过核验的 3D 教学场景" });
+  }
   const professionalReceipt = manifest.professionalCreation;
   const interaction = professionalReceipt.interactionDesign;
   const interactionProof = formalEvidence.interactionDesign;

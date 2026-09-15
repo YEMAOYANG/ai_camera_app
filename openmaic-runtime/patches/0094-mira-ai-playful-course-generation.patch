@@ -1,0 +1,448 @@
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -6,6 +6,7 @@
+ import { MIRA_ADAPTIVE_SKILL_ORCHESTRATION_POLICY } from './mira-formal-skill-selection';
+ import { MIRA_TEACHING_QUALITY_POLICY } from './mira-formal-quality-contract';
+ import { MIRA_INTERACTION_DESIGN_POLICY, MIRA_MULTISTATE_INTERACTION_POLICY } from './mira-formal-interaction-design';
++import { MIRA_FORMAL_PLAYFUL_POLICY } from './mira-formal-playful-policy';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+   'mira.openmaic.formal-runtime.v4-deepseek-professional' as const;
+@@ -99,6 +100,12 @@
+   ...MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY, interactionDesignPolicy: MIRA_MULTISTATE_INTERACTION_POLICY,
+ } as const;
+ 
++// A new identity opts into AI-designed play; previously stored policies stay frozen.
++export const MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
++  playfulLearningPolicy: MIRA_FORMAL_PLAYFUL_POLICY,
++} as const;
++
+ export type MiraProfessionalCreationPolicy =
+   | typeof MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY
+@@ -106,7 +113,8 @@
+   | typeof MIRA_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY
+-  | typeof MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY;
++  | typeof MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY;
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+@@ -152,7 +160,7 @@
+   queryByRuntimeRequestId: true,
+   speechAudioGenerated: true,
+   coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
+-  professionalCreation: MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
++  professionalCreation: MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
+   studentRuntimeEvents: {
+     enforced: true,
+     schemaVersion: 'mira.openmaic.student-runtime-events.v1',
+@@ -231,7 +239,7 @@
+ }
+ 
+ export function isMiraInteractionCreationPolicy(value: unknown): boolean {
+-  return [MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY, MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY].some(policy => JSON.stringify(canonical(value)) === JSON.stringify(canonical(policy)));
++  return [MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY, MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY, MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY].some(policy => JSON.stringify(canonical(value)) === JSON.stringify(canonical(policy)));
+ }
+ 
+ export function assertMiraFormalGenerationInput(
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -59,6 +59,12 @@
+   interactionDesignPrompt, interactionDesignContextFromPrompt,
+   type InteractionDesignReceipt, type InteractionDesignContext,
+ } from './mira-formal-interaction-design';
++import {
++  assertMiraFormalPlayfulScenes,
++  formalPlayfulContext,
++  formalPlayfulContextFromPrompt,
++  withMiraFormalPlayfulInstructions,
++} from './mira-formal-playful-policy';
+ import { formalInspectionConfiguration } from './mira-formal-scene-inspector';
+ import type { AgentMessage } from '@earendil-works/pi-agent-core';
+ import {
+@@ -391,7 +397,7 @@
+   return policy;
+ }
+ 
+-function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewareSpec): string {
++export function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewareSpec): string {
+   const contract = formalContractPayload(input);
+   const lockedAssessment = [...spec.guided, ...spec.independent].map((question) => ({
+     id: question.id,
+@@ -483,10 +489,14 @@
+   );
+   const difficulty = formalDifficultyPolicy(input);
+   const difficultyPrompt = difficulty ? `\nLocked difficultyPolicy: ${canonicalJson(difficulty)}\nTeach its reasoning steps and evidence complexity; variantOrdinal is not a difficulty label. Never simplify a standard/challenge goal to basic recall.\n` : '';
+-  return isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
++  const interactionPrompt = isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
+     ? prompt + difficultyPrompt + interactionDesignPrompt({ policy: (input.professionalCreationPolicy as {interactionDesignPolicy: InteractionDesignContext['policy']}).interactionDesignPolicy,
+         independentQuestionIds: spec.independent.map(question => question.id) })
+     : prompt;
++  return withMiraFormalPlayfulInstructions(
++    interactionPrompt,
++    formalPlayfulContext(input.professionalCreationPolicy, spec),
++  );
+ }
+ 
+ export function withMiraFormalSkillInstructions(
+@@ -884,6 +894,7 @@
+   if (ordered.some((scene, index) => scene.order !== index + 1))
+     throw new Error('FORMAL_PROFESSIONAL_SOURCE_SCENE_ORDER_INVALID');
+   const normalized = normalizeProfessionalScenes(ordered, questions as QuizQuestion[], true);
++  assertMiraFormalPlayfulScenes(normalized, formalPlayfulContextFromPrompt(session.prompt));
+   return {
+     stage: input.stage,
+     scenes: canonicalizeMiraFormalResearchFooters(normalized, research.fetched).scenes,
+@@ -1333,6 +1344,10 @@
+     identity.sessionId,
+     document.outline,
+   );
++  assertMiraFormalPlayfulScenes(
++    promoted.scenes,
++    formalPlayfulContext(input.professionalCreationPolicy, spec),
++  );
+   const evidence = await loadResearchEvidence(events, identity.sessionId);
+   const canonicalized = canonicalizeMiraFormalResearchFooters(promoted.scenes, evidence.fetched);
+   if (options.requireCitationRepair && canonicalized.repairedSceneIds.length === 0) {
+diff --git a/lib/server/mira-formal-playful-policy.ts b/lib/server/mira-formal-playful-policy.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-playful-policy.ts
+@@ -0,0 +1,180 @@
++import type { Scene } from '@/lib/types/stage';
++import type { FormalCoursewareSpec } from './mira-formal-compiled-classroom';
++
++/** Opt-in authority for NEW requests. Never add this field to a persisted policy. */
++export const MIRA_FORMAL_PLAYFUL_POLICY = {
++  schemaVersion: 'mira.openmaic.playful-learning.v1',
++  policyId: 'mira-primary-playful-exploration.v1',
++  aiDesigned: true,
++  maxQuizScenes: 2,
++  lockedAssessmentPreserved: true,
++  minimumReplayableGames: 1,
++  threeDUsage: 'teaching_need',
++} as const;
++
++export interface MiraFormalPlayfulContext {
++  policy: typeof MIRA_FORMAL_PLAYFUL_POLICY;
++  subject: FormalCoursewareSpec['course']['subject'];
++  guidedQuestionIds: string[];
++  independentQuestionIds: string[];
++}
++
++const START = '\nMIRA_FORMAL_PLAYFUL_CONTEXT:\n';
++const END = '\nEND_MIRA_FORMAL_PLAYFUL_CONTEXT\n';
++const HISTORICAL_QUIZ_RULE = '- Use between one and four quiz scenes. Distribute the four locked assessment questions across them in original order so every locked question appears exactly once.';
++const PLAYFUL_QUIZ_RULE = '- Use exactly two quiz scenes: the first contains the two locked guided questions together, and the second contains the two locked independent questions together after exploration. Preserve their original order and include each exactly once.';
++const object = (value: unknown): value is Record<string, unknown> =>
++  value !== null && typeof value === 'object' && !Array.isArray(value);
++const canonical = (value: unknown): string => JSON.stringify(value, (_, item) =>
++  object(item) ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b))) : item);
++function fail(reason: string): never { throw new Error(`FORMAL_PLAYFUL_${reason}`); }
++
++/** Missing means historical; a malformed opt-in must never silently downgrade. */
++export function isMiraFormalPlayfulPolicy(value: unknown): boolean {
++  return canonical(value) === canonical(MIRA_FORMAL_PLAYFUL_POLICY);
++}
++
++export function formalPlayfulContext(
++  creationPolicy: unknown,
++  spec: Pick<FormalCoursewareSpec, 'course' | 'guided' | 'independent'>,
++): MiraFormalPlayfulContext | undefined {
++  if (!object(creationPolicy) || !Object.hasOwn(creationPolicy, 'playfulLearningPolicy'))
++    return undefined;
++  if (!isMiraFormalPlayfulPolicy(creationPolicy.playfulLearningPolicy)) fail('POLICY_INVALID');
++  const context = {
++    policy: MIRA_FORMAL_PLAYFUL_POLICY,
++    subject: spec.course.subject,
++    guidedQuestionIds: spec.guided.map(question => question.id),
++    independentQuestionIds: spec.independent.map(question => question.id),
++  };
++  assertContext(context);
++  return context;
++}
++
++function assertContext(value: unknown): asserts value is MiraFormalPlayfulContext {
++  if (!object(value) || Object.keys(value).sort().join(',') !== 'guidedQuestionIds,independentQuestionIds,policy,subject'
++    || !isMiraFormalPlayfulPolicy(value.policy) || !['math', 'chinese', 'english'].includes(String(value.subject)))
++    fail('CONTEXT_INVALID');
++  const groups = [value.guidedQuestionIds, value.independentQuestionIds];
++  if (groups.some(group => !Array.isArray(group) || group.length !== 2
++    || group.some(id => typeof id !== 'string' || !id.trim() || id.length > 128))
++    || new Set(groups.flat()).size !== 4) fail('LOCKED_QUESTION_GROUPS_INVALID');
++}
++
++/** Exact old bytes are returned unless the new request explicitly opted in. */
++export function withMiraFormalPlayfulInstructions(
++  originalPrompt: string,
++  context: MiraFormalPlayfulContext | undefined,
++): string {
++  if (!context) return originalPrompt;
++  assertContext(context);
++  if (originalPrompt.includes(START) || originalPrompt.split(HISTORICAL_QUIZ_RULE).length !== 2)
++    fail('PROMPT_CONFLICT');
++  return originalPrompt.replace(HISTORICAL_QUIZ_RULE, PLAYFUL_QUIZ_RULE)
++    + START + JSON.stringify(context) + END + `
++AI-DESIGNED PLAYFUL LEARNING v1 — this job's experience requirements:
++Design this course's own exploration game from its exact gradeBoundary, learning objectives,
++allowed content and difficulty. You, the Pro Agent, choose the setting, rules, manipulable objects,
++meaningful states and feedback. No fixed lesson template, predefined level array, copied game,
++mandatory space theme, widget rotation or extra course strand is supplied or required.
++
++Make learning primarily a short demonstration -> learner attempt -> visible consequence ->
++brief explanation -> retry loop. Exploration and hands-on play lead the lesson; a long slide
++lecture followed by an exam does not meet this brief. Plan the smallest complete sequence,
++respect the existing scene/time limits, and never use a percentage quota or add filler pages.
++Show one short instruction at a time, a large teaching model and compact controls. Let the
++teacher narrate the explanation; avoid paragraphs of duplicated on-screen narration.
++
++Create at least one interactive scene with widgetType="game" and matching widgetConfig.type.
++Choose puzzle, strategy or card for gameType; never quiz. Its self-contained HTML/JS must have
++a visible child-readable goal, concise rules, meaningful learner operations, a result computed
++from the manipulated teaching model, explanatory feedback, and a working restart/replay control.
++The goal must require the target knowledge: unrelated clicking, a timer, a counter, a reward
++animation, a choice that reveals a canned answer, or decorative 3D is not a learning game.
++Allow mistakes, explain the observed consequence gently, and let the learner try again.
++Use the existing multistate interaction plan and real pointer/touch probes to prove distinct
++model states and reset. Include a path toward the goal and a recoverable unsuccessful attempt
++in the generated verification states. Goal/rules are learner-visible, not just metadata.
++Pass these concrete game requirements in generate_scene briefs for BOTH content and actions,
++then read back and repair the actual HTML, controls and narration before quality review.
++
++Preserve all FOUR locked assessment questions, wording, IDs, types and options exactly.
++Group guidedQuestionIds in one guided quiz scene after the learner has tried the model;
++group independentQuestionIds in one later independent quiz scene to close the learning check.
++Do not spread them over four quiz pages, merge the two groups, duplicate them inside the game,
++remove guided questions, or describe this as fewer scored questions. Game exploration adds no
++new assessment items: omit game.questions and never disguise extra quizzes as a game.
++Game feedback is local practice feedback only; it must not award official points, mastery,
++rewards, completion or runtime events. If game widgetConfig requires scoring, use
++scoring:{correctPoints:0}, omit bonuses/achievements, and show task feedback rather than points.
++The existing four-question backend contract remains the sole scoring/progress authority.
++
++For a mathematics brief whose actual allowed content and learning objectives teach quantities,
++grouping, fractions, ratios or percentages, create at least one real manipulable 3D teaching
++model inside the game or a supporting visualization3d scene. Even a scalar ratio can be made
++observable through selectable/grouped objects: provide meaningful rotate, select and
++split/regroup operations tied to that objective. The Agent chooses the representation and
++rules from the brief, not from a fixed course title or a prewritten game/level list.
++Use real geometry, camera/projection and state-linked quantities with learner controls.
++Do not introduce volume formulas, advanced solids or other unlisted prerequisites just
++because the representation has depth. The taught concept stays within the exact boundary.
++For other mathematics, use 3D when depth, construction or decomposition improves the specific
++objective; do not force it onto every mathematical topic.
++A CSS tilted card, static rendered planet, spinning decoration or camera-only orbit is not
++meaningful 3D. Use available supported rendering dependencies and a readable recovery state;
++do not invent CDN URLs or require network assets that the course cannot load.
++For language and concepts better served by 2D arrangements, use a clear 2D game; no compulsory
++3D for Chinese/English. State the teaching reason for the representation in the private brief.
++Keep the existing independently verified numeric diagram when that mechanism requires it:
++3D supplements it and never replaces its exact geometry, quantities or assessment evidence.
++
++AUTHORITY: this policy narrows quiz page count and requires a genuine game; the remaining
++widget choices stay adaptive. Generic Skill defaults must not turn it back into a quiz game,
++force a widget roster or add questions. Grade, difficulty, locked question groups, research,
++roster, audio, interaction/visual quality and all existing publication gates remain unchanged.
++The game label alone proves nothing: the actual model, goal, controls, feedback, replay and
++teaching chain must pass the existing independent semantic and rendered interaction reviews.
++`;
++}
++
++/** Only the frozen new prompt activates new checks in the read-only review path. */
++export function formalPlayfulContextFromPrompt(prompt: string): MiraFormalPlayfulContext | undefined {
++  const parts = prompt.split(START);
++  if (parts.length === 1) return undefined;
++  if (parts.length !== 2 || parts[1].split(END).length !== 2) return fail('CONTEXT_INVALID');
++  let value: unknown;
++  try { value = JSON.parse(parts[1].split(END)[0]); } catch { return fail('CONTEXT_INVALID'); }
++  assertContext(value);
++  return value;
++}
++
++/** A structural guard, not a semantic or browser pass. Existing quality gates still run. */
++export function assertMiraFormalPlayfulScenes(
++  scenes: readonly Scene[],
++  context: MiraFormalPlayfulContext | undefined,
++): void {
++  if (!context) return;
++  assertContext(context);
++  const ordered = [...scenes].sort((a, b) => a.order - b.order);
++  const quizzes = ordered.filter(scene => scene.type === 'quiz');
++  if (quizzes.length !== 2) fail('QUIZ_SCENE_COUNT');
++  for (const [index, ids] of [context.guidedQuestionIds, context.independentQuestionIds].entries()) {
++    const content = quizzes[index].content;
++    if (content.type !== 'quiz' || canonical(content.questions.map(question => question.id)) !== canonical(ids))
++      fail('LOCKED_QUESTION_PLACEMENT');
++  }
++  const games = ordered.filter(scene => scene.content.type === 'interactive' && scene.content.widgetType === 'game');
++  if (!games.length) fail('GAME_MISSING');
++  if (!games.some(scene => scene.order < quizzes[0].order)) fail('EXPLORE_BEFORE_GUIDED');
++  for (const scene of games) {
++    if (scene.content.type !== 'interactive') continue;
++    const config = scene.content.widgetConfig;
++    if (!object(config) || config.type !== 'game' || !['puzzle', 'strategy', 'card'].includes(String(config.gameType))
++      || (config.questions !== undefined && (!Array.isArray(config.questions) || config.questions.length > 0)))
++      fail('QUIZ_DISGUISED_AS_GAME');
++    const scoring = config.scoring;
++    if (!object(scoring) || scoring.correctPoints !== 0 || scoring.speedBonus || scoring.comboMultiplier
++      || scoring.penalty || (config.achievements !== undefined
++        && (!Array.isArray(config.achievements) || config.achievements.length > 0))) fail('GAME_SCORE_AUTHORITY');
++  }
++}
+diff --git a/tests/server/mira-formal-playful-policy.test.ts b/tests/server/mira-formal-playful-policy.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-playful-policy.test.ts
+@@ -0,0 +1,146 @@
++import { describe, expect, it } from 'vitest';
++import fixtures from '../fixtures/mira-formal-skill-selection-v2.json';
++import type { GenerateClassroomInput } from '@/lib/server/classroom-generation';
++import type { FormalCoursewareSpec, FormalQuestion } from '@/lib/server/mira-formal-compiled-classroom';
++import type { Scene } from '@/lib/types/stage';
++import {
++  MIRA_FORMAL_PLAYFUL_POLICY,
++  assertMiraFormalPlayfulScenes,
++  formalPlayfulContext,
++  formalPlayfulContextFromPrompt,
++  withMiraFormalPlayfulInstructions,
++} from '@/lib/server/mira-formal-playful-policy';
++import { professionalPrompt } from '@/lib/server/mira-formal-professional-classroom';
++import {
++  MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++  MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
++  MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY,
++  MIRA_PROFESSIONAL_CREATION_POLICY,
++  MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++  MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY,
++  MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
++  MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
++  isExactMiraProfessionalCreationPolicy,
++} from '@/lib/server/mira-formal-generation-policy';
++
++const selection = fixtures[0].input;
++const question = (id: string): FormalQuestion => ({
++  id, type: 'single_choice', prompt: `已锁定的问题 ${id}`, skill: 'number_sense_20',
++  hint: '看清数量', explanation: '对应已锁定的数量关系',
++  choices: [{ id: 'a', label: '甲' }, { id: 'b', label: '乙' }],
++});
++const spec: FormalCoursewareSpec = {
++  buildItemId: 'playful-test-build', runtimeRequestId: 'playful-test-request',
++  course: { ...selection.teachingBrief.course, subject: 'math' }, intro: '摆一摆', estimatedMinutes: 10,
++  teach: selection.teachingBrief.lesson.teachingFlow.teach, recap: '说说你的发现',
++  demo: question('demo'), guided: [question('guided-1'), question('guided-2')],
++  independent: [question('independent-1'), question('independent-2')],
++  teacher: { name: '老师', avatar: '/teacher.png', voiceConfig: { providerId: 'test', modelId: 'test', voiceId: 'test' } },
++};
++function input(professionalCreationPolicy: unknown): GenerateClassroomInput {
++  return { requirement: JSON.stringify(selection), professionalCreationPolicy } as GenerateClassroomInput;
++}
++const context = formalPlayfulContext(MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY, spec)!;
++
++function quiz(id: string, order: number, ids: string[]): Scene {
++  return { id, order, type: 'quiz', content: { type: 'quiz', questions: ids.map(id => ({ id })) } } as Scene;
++}
++function game(order = 1): Scene {
++  return {
++    id: 'agent-created-game', order, type: 'interactive',
++    content: { type: 'interactive', widgetType: 'game', html: '<p>Agent output fixture</p>',
++      widgetConfig: { type: 'game', gameType: 'puzzle', description: '由模型生成的教学任务', scoring: { correctPoints: 0 } } },
++  } as Scene;
++}
++function scenes(): Scene[] {
++  return [game(), quiz('guided', 2, context.guidedQuestionIds), quiz('independent', 3, context.independentQuestionIds)];
++}
++
++describe('new formal playful generation authority', () => {
++  it('injects through the actual professional prompt without rewriting any locked question or old context', () => {
++    const beforeSpec = JSON.stringify(spec);
++    const oldPrompt = professionalPrompt(input(MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY), spec);
++    const newPrompt = professionalPrompt(input(MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY), spec);
++    expect(isExactMiraProfessionalCreationPolicy(MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY)).toBe(true);
++    expect(formalPlayfulContextFromPrompt(newPrompt)).toEqual(context);
++    const oldRule = oldPrompt.split('\n').find(line => line.startsWith('- Use between one and four quiz'))!;
++    const updatedPrefix = newPrompt.split('\nMIRA_FORMAL_PLAYFUL_CONTEXT:\n')[0];
++    const newRule = updatedPrefix.split('\n').find(line => line.startsWith('- Use exactly two quiz'))!;
++    expect(updatedPrefix.replace(newRule, oldRule)).toBe(oldPrompt);
++    const assessment = (prompt: string) => JSON.parse(prompt.split('\nLocked assessment questions:\n')[1]
++      .split('\n\nAnswer-blind teaching brief (authoritative):\n')[0]);
++    expect(assessment(newPrompt)).toEqual(assessment(oldPrompt));
++    expect(assessment(newPrompt).map((q: { id: string }) => q.id)).toEqual([
++      'guided-1', 'guided-2', 'independent-1', 'independent-2',
++    ]);
++    expect(JSON.stringify(spec)).toBe(beforeSpec);
++    expect(newPrompt).not.toContain('Use between one and four quiz scenes');
++    expect(newPrompt).toContain('No fixed lesson template');
++    expect(newPrompt).toContain('independently verified numeric diagram');
++    expect(newPrompt).toContain('Do not introduce volume formulas');
++  });
++
++  it.each([
++    MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY, MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
++    MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY, MIRA_PROFESSIONAL_CREATION_POLICY,
++    MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY, MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY,
++    MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
++  ])('keeps each historical policy prompt outside the new policy and acceptance checks', policy => {
++    const frozen = professionalPrompt(input(policy), spec);
++    expect(formalPlayfulContext(policy, spec)).toBeUndefined();
++    expect(formalPlayfulContextFromPrompt(frozen)).toBeUndefined();
++    expect(withMiraFormalPlayfulInstructions(frozen, undefined)).toBe(frozen);
++    expect(frozen).toContain('Use between one and four quiz scenes');
++    // An old four-page course is not retroactively subjected to the new structure.
++    expect(() => assertMiraFormalPlayfulScenes([
++      quiz('g1', 1, ['guided-1']), quiz('g2', 2, ['guided-2']),
++      quiz('i1', 3, ['independent-1']), quiz('i2', 4, ['independent-2']),
++    ], formalPlayfulContextFromPrompt(frozen))).not.toThrow();
++  });
++
++  it('rejects conflicting opt-ins, duplicate prompt injection and overlapping assessment identity', () => {
++    for (const policy of [
++      { ...MIRA_FORMAL_PLAYFUL_POLICY, maxQuizScenes: 4 },
++      { ...MIRA_FORMAL_PLAYFUL_POLICY, lockedAssessmentPreserved: false },
++      { ...MIRA_FORMAL_PLAYFUL_POLICY, extra: true },
++    ]) {
++      expect(() => formalPlayfulContext({ playfulLearningPolicy: policy }, spec)).toThrow('FORMAL_PLAYFUL_POLICY_INVALID');
++      expect(isExactMiraProfessionalCreationPolicy({ ...MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY, playfulLearningPolicy: policy })).toBe(false);
++    }
++    const frozen = professionalPrompt(input(MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY), spec);
++    expect(() => withMiraFormalPlayfulInstructions(frozen, context)).toThrow('FORMAL_PLAYFUL_PROMPT_CONFLICT');
++    expect(() => formalPlayfulContextFromPrompt(frozen + frozen)).toThrow('FORMAL_PLAYFUL_CONTEXT_INVALID');
++    expect(() => formalPlayfulContext(MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
++      { ...spec, independent: [spec.guided[0], spec.independent[1]] })).toThrow('FORMAL_PLAYFUL_LOCKED_QUESTION_GROUPS_INVALID');
++  });
++
++  it('requires exploration before a grouped guided check and the distinct independent check', () => {
++    const original = scenes();
++    const saved = JSON.stringify(original);
++    expect(() => assertMiraFormalPlayfulScenes(original, context)).not.toThrow();
++    expect(JSON.stringify(original)).toBe(saved);
++    expect(() => assertMiraFormalPlayfulScenes([game(), ...context.guidedQuestionIds.concat(context.independentQuestionIds)
++      .map((id, index) => quiz(id, index + 2, [id]))], context)).toThrow('FORMAL_PLAYFUL_QUIZ_SCENE_COUNT');
++    expect(() => assertMiraFormalPlayfulScenes([game(), quiz('all', 2,
++      [...context.guidedQuestionIds, ...context.independentQuestionIds])], context)).toThrow('FORMAL_PLAYFUL_QUIZ_SCENE_COUNT');
++    expect(() => assertMiraFormalPlayfulScenes([game(), quiz('guided', 2, context.independentQuestionIds),
++      quiz('independent', 3, context.guidedQuestionIds)], context)).toThrow('FORMAL_PLAYFUL_LOCKED_QUESTION_PLACEMENT');
++    expect(() => assertMiraFormalPlayfulScenes([game(4), ...original.slice(1)], context)).toThrow('FORMAL_PLAYFUL_EXPLORE_BEFORE_GUIDED');
++  });
++
++  it('does not let extra quizzes or unofficial rewards pass as the required game', () => {
++    expect(() => assertMiraFormalPlayfulScenes(scenes().slice(1), context)).toThrow('FORMAL_PLAYFUL_GAME_MISSING');
++    const variants = [
++      { gameType: 'quiz' },
++      { questions: [{ id: 'extra-question' }] },
++      { scoring: { correctPoints: 10 } },
++      { achievements: [{ id: 'unearned-reward' }] },
++    ];
++    for (const change of variants) {
++      const [scene, ...rest] = scenes();
++      if (scene.content.type !== 'interactive') throw new Error('invalid fixture');
++      Object.assign(scene.content.widgetConfig!, change);
++      expect(() => assertMiraFormalPlayfulScenes([scene, ...rest], context)).toThrow(/FORMAL_PLAYFUL_(QUIZ_DISGUISED_AS_GAME|GAME_SCORE_AUTHORITY)/);
++    }
++  });
++});

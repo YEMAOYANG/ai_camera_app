@@ -1,0 +1,566 @@
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -15,6 +15,7 @@
+ import { assertMiraFormalSelectionInput } from '../lib/server/mira-formal-skill-selection';
+ import type { InteractionDesignContext } from '../lib/server/mira-formal-interaction-design';
+ import { savedStageInspectionPlanner } from './formal-saved-stage-inspection';
++import { prepareLearnerAudioTail, claimLearnerAudioTail, type ValidatedLearnerAudioTail } from '../lib/server/mira-formal-learner-audio-tail';
+ import { claimLearnerDiscussionCompletion } from './formal-learner-discussion-completion-claim';
+ import { completionTailArgument, validateCompletionTailBudget,
+   type ValidatedCompletionTailBudget } from '../lib/server/mira-formal-completion-tail-budget';
+@@ -145,13 +146,16 @@
+ 
+ async function main() {
+   const [mode, manifestPath, ...extraArgs] = process.argv.slice(2);
+-  if (!['prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
++  if (!['prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
+     'revalidate-audio-comparison', 'complete-audio-comparison-tail'].includes(mode) || !manifestPath)
+     throw new Error('Usage: recover-formal-saved-stage.ts prepare|inspect|complete|complete-browser-recheck|revalidate-audio-comparison|complete-audio-comparison-tail manifest.json [--completion-paid-budget sidecar.json]');
+   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
+   const completionTailPath = completionTailArgument(mode, manifest, extraArgs);
+-  const responseRecoveryMode = ['complete-learner-discussion-response-recovery', 'complete-learner-discussion-review'].includes(mode);
+-  if ((mode === 'complete-learner-discussion-review') !== (manifest.learnerDiscussionReviewGrant !== undefined))
++  const learnerAudioTailMode = ['complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail'].includes(mode);
++  if (learnerAudioTailMode !== (manifest.learnerDiscussionAudioTail !== undefined))
++    throw new Error('SAVED_STAGE_LEARNER_AUDIO_TAIL_MODE_INVALID');
++  const responseRecoveryMode = ['complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail'].includes(mode);
++  if ((mode === 'complete-learner-discussion-review' || learnerAudioTailMode) !== (manifest.learnerDiscussionReviewGrant !== undefined))
+     throw new Error('SAVED_STAGE_LEARNER_REVIEW_MODE_INVALID');
+   if (responseRecoveryMode !== (manifest.learnerDiscussionResponseRecovery !== undefined))
+     throw new Error('SAVED_STAGE_LEARNER_RESPONSE_RECOVERY_MODE_INVALID');
+@@ -309,6 +313,20 @@
+           || qualitySha(JSON.parse(await fs.readFile(auditPath, 'utf8'))) !== completionTailBudget.receiptSha256) throw error;
+     }
+   }
++  let learnerDiscussionAudioTail: ValidatedLearnerAudioTail | undefined;
++  if (learnerAudioTailMode) {
++    if (!completionTailBudget) throw new Error('SAVED_STAGE_LEARNER_AUDIO_TAIL_BUDGET_REQUIRED');
++    const spec = parseFormalCoursewareSpec(job.formalInput);
++    learnerDiscussionAudioTail = await prepareLearnerAudioTail({folder, identity, budget: completionTailBudget,
++      reference: manifest.learnerDiscussionAudioTail, responseRecovery: manifest.learnerDiscussionResponseRecovery,
++      reviewGrant: manifest.learnerDiscussionReviewGrant,
++      audioInput: {buildItemId: spec.buildItemId, subject: spec.course.subject, stage: prepared.stage, scenes: prepared.scenes}});
++  }
++  if (mode === 'inspect-learner-discussion-audio-tail') {
++    console.log(JSON.stringify({status: 'audio_tail_preflight_passed', ...identity,
++      reference: manifest.learnerDiscussionAudioTail, referenceSha256: learnerDiscussionAudioTail!.referenceSha256,
++      providerCalls: 0, claimCreated: false})); return;
++  }
+   let audioTailReceipt: string | undefined;
+   let asrComparisonRevalidation: AsrComparisonReference[] | undefined;
+   let audioRepair: Awaited<ReturnType<typeof verifiedAudioRepairs>> | undefined;
+@@ -358,7 +376,10 @@
+   lease = await acquireFormalQualityLock(path.join(folder, 'active.lock'));
+   let browserRecheckSha256: string | undefined;
+   let learnerDiscussionRepairClaimSha256: string | undefined;
+-  if (mode === 'complete-learner-discussion-repair' || responseRecoveryMode) {
++  if (learnerDiscussionAudioTail) {
++    await claimLearnerAudioTail(learnerDiscussionAudioTail);
++    learnerDiscussionRepairClaimSha256 = learnerDiscussionAudioTail.priorCompletionClaimSha256;
++  } else if (mode === 'complete-learner-discussion-repair' || responseRecoveryMode) {
+     if (!completionTailBudget) throw new Error('SAVED_STAGE_LEARNER_REPAIR_COMPLETION_BUDGET_REQUIRED');
+     learnerDiscussionRepairClaimSha256 = await claimLearnerDiscussionCompletion(folder, identity, completionTailBudget.receiptSha256,
+       responseRecoveryMode ? manifest.learnerDiscussionResponseRecovery : undefined,
+@@ -393,15 +414,28 @@
+     approvedReviewGrant,
+     completionTailBudget,
+     learnerDiscussionRepairClaimSha256,
++    learnerDiscussionAudioTail,
+     learnerDiscussionResponseRecovery: manifest.learnerDiscussionResponseRecovery,
+     learnerDiscussionReviewGrant: manifest.learnerDiscussionReviewGrant,
+     onProgress: progress => { console.log(JSON.stringify(progress)); },
++  }).catch(async error => {
++    if (learnerDiscussionAudioTail) {
++      const file = await fs.open(path.join(folder, 'learner-discussion-audio-tail-failure.json'), 'wx', 0o600);
++      try {
++        await file.writeFile(JSON.stringify({...identity, referenceSha256: learnerDiscussionAudioTail.referenceSha256,
++          completionTailGrantSha256: completionTailBudget!.receiptSha256, failedAt: new Date().toISOString(),
++          error: error instanceof Error ? error.message : String(error), retryAllowed: false}));
++        await file.sync();
++      } finally { await file.close(); }
++    }
++    throw error;
+   });
+   const receipt = { ...identity, kind: 'operator_saved_stage_repair', originalSessionStatus: prepared.originalSessionStatus,
+     recoveryId: `omsaved_${qualitySha(identity).slice(0, 24)}`, completedAt: new Date().toISOString(),
+     newAgentSessions: 0, newSearches: 0, ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}),
+     ...(completionTailBudget ? { completionTailGrantSha256: completionTailBudget.receiptSha256 } : {}),
+     ...(completion.learnerDiscussionRepair ? { learnerDiscussionRepair: completion.learnerDiscussionRepair } : {}),
++    ...(completion.learnerDiscussionAudioTail ? { learnerDiscussionAudioTail: completion.learnerDiscussionAudioTail } : {}),
+     ...(browserRecheckSha256 ? { browserRecheckSha256 } : {}),
+     ...(asrComparisonRevalidation ? { asrComparisonRevalidationReceiptSha256: audioTailReceipt,
+       asrComparisonRevalidationReceipts: asrComparisonRevalidation } : {}),
+diff --git a/lib/server/mira-formal-completion-tail-budget.ts b/lib/server/mira-formal-completion-tail-budget.ts
+--- a/lib/server/mira-formal-completion-tail-budget.ts
++++ b/lib/server/mira-formal-completion-tail-budget.ts
+@@ -60,12 +60,12 @@
+ /** The new flag is intentionally separate from the frozen recovery manifest. */
+ export function completionTailArgument(mode: string, manifest: RecordValue, args: string[]): string | undefined {
+   if (!args.length) {
+-    if (['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review'].includes(mode)) return fail('SIDECAR_REQUIRED');
++    if (['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail'].includes(mode)) return fail('SIDECAR_REQUIRED');
+     return undefined;
+   }
+   if (args.length !== 2 || args[0] !== '--completion-paid-budget' || !args[1].trim())
+     return fail('ARGUMENT_INVALID');
+-  if (!['complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review'].includes(mode)) return fail('COMPLETE_ONLY');
++  if (!['complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail'].includes(mode)) return fail('COMPLETE_ONLY');
+   if (['reviewGrantPath', 'browserRecheck', 'asrSourceRequestId', 'ttsSourceRequestId',
+     'audioRepair', 'pronunciationRepair', 'asrComparisonRevalidation'].some(key => key in manifest))
+     return fail('CANNOT_MIX_RECOVERIES');
+@@ -156,3 +156,14 @@
+   if (!(sidecar.startsAt <= Date.now() && Date.now() < sidecar.expiresAt)) return fail('WINDOW_CLOSED');
+   return { ...sidecar.paidBudget };
+ }
++
++/** Renewal changes the validity window only; old durable claims keep their hash. */
++export function assertCompletionTailRenewal(token: ValidatedCompletionTailBudget, original: unknown) {
++  const current = validated.get(token);
++  if (!current || !object(original)) return fail('RENEWAL_CONTEXT_REQUIRED');
++  const { expiresAt: previousExpiry, ...before } = original;
++  const { expiresAt: currentExpiry, ...after } = current;
++  if (!Number.isSafeInteger(previousExpiry) || currentExpiry < Number(previousExpiry)
++      || qualitySha(before) !== qualitySha(after)) return fail('RENEWAL_SCOPE_CHANGED');
++  return completionTailPaidBudget(token);
++}
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -6,6 +6,7 @@
+ } from './mira-paid-budget';
+ import { assertCompletionTailExecution, completionTailPaidBudget,
+   type ValidatedCompletionTailBudget } from './mira-formal-completion-tail-budget';
++import { repairLearnerAudioTail, type ValidatedLearnerAudioTail } from './mira-formal-learner-audio-tail';
+ import { repairFormalLearnerDiscussions, type LearnerDiscussionResponseRecovery } from './mira-formal-learner-discussion-repair';
+ import { createHash } from 'node:crypto';
+ import { normalizeAsrComparisonReferences, type AsrComparisonReferences } from './mira-formal-asr-revalidation';
+@@ -141,6 +142,7 @@
+   result: GenerateClassroomResult;
+   repair: MiraFormalCitationRepairAudit;
+   learnerDiscussionRepair?: Awaited<ReturnType<typeof repairFormalLearnerDiscussions>>['receipt'];
++  learnerDiscussionAudioTail?: Awaited<ReturnType<typeof repairLearnerAudioTail>>;
+ }
+ 
+ export interface MiraFormalProfessionalCreationReceipt {
+@@ -1303,6 +1305,8 @@
+   ...args: Parameters<typeof completeMiraFormalProfessionalClassroomInner>
+ ): Promise<MiraFormalProfessionalRecoveryCompletion> {
+   const tail = args[3].completionTailBudget;
++  if (args[3].learnerDiscussionAudioTail && (!tail || !args[3].learnerDiscussionRepair?.responseRecovery))
++    throw new Error('SAVED_STAGE_LEARNER_AUDIO_TAIL_CONTEXT_REQUIRED');
+   if (args[3].learnerDiscussionRepair && !tail)
+     throw new Error('SAVED_STAGE_LEARNER_REPAIR_COMPLETION_BUDGET_REQUIRED');
+   if (tail && (!args[3].expectedStageId || !args[3].recoveredScenes || args[3].requireCitationRepair
+@@ -1327,6 +1331,7 @@
+     asrComparisonRevalidation?: AsrComparisonReferences;
+     approvedReviewGrant?: FormalQualityReviewGrant;
+     completionTailBudget?: ValidatedCompletionTailBudget;
++    learnerDiscussionAudioTail?: ValidatedLearnerAudioTail;
+     learnerDiscussionRepair?: { sourceSnapshotSha256: string; priorCompletionClaimSha256: string; responseRecovery?: LearnerDiscussionResponseRecovery; reviewGrant?: FormalQualityReviewGrant };
+   },
+ ): Promise<MiraFormalProfessionalRecoveryCompletion> {
+@@ -1453,7 +1458,8 @@
+       // A derived snapshot gets the complete ordinary browser, visual and
+       // pedagogical review. The rejected source report is never overwritten.
+       quality = await reviewFormalCourse({ ...qualityInput, scenes }, undefined,
+-        { approvedReviewGrant: options.learnerDiscussionRepair.reviewGrant });
++        options.learnerDiscussionAudioTail ? { cachedOnly: true }
++          : { approvedReviewGrant: options.learnerDiscussionRepair.reviewGrant });
+     }
+     if (quality.status !== 'passed' || !quality.receipt)
+       throw new Error(
+@@ -1496,6 +1502,10 @@
+   if (options.asrComparisonRevalidation && (!options.cachedQualityOnly ||
+     normalizeAsrComparisonReferences(options.asrComparisonRevalidation).some(reference => reference.sessionId !== identity.sessionId)))
+     throw new Error('SAVED_ASR_COMPARISON_CONTEXT_INVALID');
++  const learnerDiscussionAudioTail = options.learnerDiscussionAudioTail
++    ? await repairLearnerAudioTail(options.learnerDiscussionAudioTail,
++      { buildItemId: spec.buildItemId, subject: spec.course.subject, stage, scenes },
++      learnerDiscussionRepair, teachingQuality?.receiptSha256) : undefined;
+   const formalAudio: MiraFormalAudioLifecycleReceipt = await completeMiraFormalAudioLifecycle(
+     { buildItemId: spec.buildItemId, subject: spec.course.subject, stage, scenes },
+     undefined,
+@@ -1541,6 +1551,7 @@
+   });
+   return {
+     ...(learnerDiscussionRepair ? { learnerDiscussionRepair } : {}),
++    ...(learnerDiscussionAudioTail ? { learnerDiscussionAudioTail } : {}),
+     result: {
+       id: persisted.id,
+       url: persisted.url,
+@@ -1649,6 +1660,7 @@
+   options: { baseUrl: string; cachedQualityOnly?: boolean; approvedReviewGrant?: FormalQualityReviewGrant;
+     asrComparisonRevalidation?: AsrComparisonReferences;
+     completionTailBudget?: ValidatedCompletionTailBudget;
++    learnerDiscussionAudioTail?: ValidatedLearnerAudioTail;
+     learnerDiscussionRepairClaimSha256?: string;
+     learnerDiscussionResponseRecovery?: LearnerDiscussionResponseRecovery;
+     learnerDiscussionReviewGrant?: FormalQualityReviewGrant;
+diff --git a/lib/server/mira-formal-audio-lifecycle.ts b/lib/server/mira-formal-audio-lifecycle.ts
+--- a/lib/server/mira-formal-audio-lifecycle.ts
++++ b/lib/server/mira-formal-audio-lifecycle.ts
+@@ -355,7 +355,7 @@
+   return Math.max(0, Math.floor(((denominator - distance) * 10_000) / denominator));
+ }
+ 
+-function buildLifecycleSegments(input: FormalAudioLifecycleInput): {
++export function buildLifecycleSegments(input: FormalAudioLifecycleInput): {
+   classroomContentSha256: string;
+   segments: LifecycleSegment[];
+ } {
+diff --git a/tests/server/mira-formal-completion-tail-budget.test.ts b/tests/server/mira-formal-completion-tail-budget.test.ts
+--- a/tests/server/mira-formal-completion-tail-budget.test.ts
++++ b/tests/server/mira-formal-completion-tail-budget.test.ts
+@@ -2,7 +2,7 @@
+ import { qualitySha } from '@/lib/server/mira-formal-quality-contract';
+ import { paidBudgetContext, withPaidBudget } from '@/lib/server/mira-paid-budget';
+ import {
+-  assertCompletionTailExecution, completionTailArgument, completionTailPaidBudget,
++  assertCompletionTailExecution, assertCompletionTailRenewal, completionTailArgument, completionTailPaidBudget,
+   validateCompletionTailBudget, type CompletionTailSidecar,
+ } from '@/lib/server/mira-formal-completion-tail-budget';
+ 
+@@ -91,7 +91,7 @@
+       ['--completion-paid-budget', 'one', '--completion-paid-budget', 'two']])
+       expect(() => completionTailArgument('complete', {}, args)).toThrow('ARGUMENT_INVALID');
+   });
+-  it.each(['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review'])('requires the same verified sidecar for %s', mode => {
++  it.each(['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail'])('requires the same verified sidecar for %s', mode => {
+     expect(() => completionTailArgument(mode, {}, [])).toThrow('SIDECAR_REQUIRED');
+     expect(completionTailArgument(mode, {}, ['--completion-paid-budget', 'same.json'])).toBe('same.json');
+     expect(() => completionTailArgument(mode, { reviewGrantPath: 'other' }, ['--completion-paid-budget', 'same.json'])).toThrow('CANNOT_MIX_RECOVERIES');
+@@ -142,3 +142,15 @@
+     expect(() => completionTailPaidBudget(token)).toThrow('WINDOW_CLOSED');
+   });
+ });
++
++it('accepts only an authority-verified expiry renewal without changing the original claim scope', async () => {
++  const {sidecar, expected} = fixture(); const original = structuredClone(sidecar);
++  sidecar.expiresAt += 60_000; mockAuthority(sidecar);
++  const token = await validateCompletionTailBudget(sidecar, expected);
++  expect(assertCompletionTailRenewal(token, original).authorizationId).toBe(original.authorizationId);
++  expect(qualitySha(original)).not.toBe(token.receiptSha256);
++  for (const key of ['planSha256', 'startsAt', 'limits', 'scope', 'identity']) {
++    const changed = {...original, [key]: 'changed'};
++    expect(() => assertCompletionTailRenewal(token, changed)).toThrow('RENEWAL_SCOPE_CHANGED');
++  }
++});
+diff --git a/lib/server/mira-formal-learner-audio-tail.ts b/lib/server/mira-formal-learner-audio-tail.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-learner-audio-tail.ts
+@@ -0,0 +1,190 @@
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import { qualitySha, qualitySnapshot } from './mira-formal-quality-contract';
++import { assertCompletionTailRenewal, type ValidatedCompletionTailBudget } from './mira-formal-completion-tail-budget';
++import { buildLifecycleSegments } from './mira-formal-audio-lifecycle';
++import { readMiraFormalTtsJob, readMiraFormalAsrJob, readMiraFormalTtsAsset } from './mira-formal-audio';
++import { repairMiraFormalAudioSegment } from './mira-formal-audio-repair';
++import type { LearnerDiscussionRepairReceipt, LearnerDiscussionResponseRecovery } from './mira-formal-learner-discussion-repair';
++import type { FormalQualityReviewGrant } from './mira-formal-teaching-quality';
++import type { LearnerRepairCompletionIdentity } from '../../scripts/formal-learner-discussion-completion-claim';
++
++const SHA = /^[a-f0-9]{64}$/;
++const fail = (reason: string): never => { throw new Error(`SAVED_STAGE_LEARNER_AUDIO_TAIL_${reason}`); };
++const json = async (file: string) => JSON.parse(await fs.readFile(file, 'utf8'));
++type AudioInput = Parameters<typeof buildLifecycleSegments>[0];
++export interface LearnerAudioTailReference {
++  priorReviewClaimSha256: string;
++  learnerRepairIdentitySha256: string;
++  learnerRepairCompletionSha256: string;
++  derivedSnapshotSha256: string;
++  qualityReceiptSha256: string;
++  failedTtsRequestId: string;
++  failedTtsRecordSha256: string;
++  completedSegmentCount: number;
++  expectedSegmentCount: number;
++}
++const REFERENCE_KEYS = ['priorReviewClaimSha256', 'learnerRepairIdentitySha256', 'learnerRepairCompletionSha256',
++  'derivedSnapshotSha256', 'qualityReceiptSha256', 'failedTtsRequestId', 'failedTtsRecordSha256',
++  'completedSegmentCount', 'expectedSegmentCount'];
++export function assertLearnerAudioTailReference(value: LearnerAudioTailReference) {
++  if (!value || Object.keys(value).sort().join(',') !== REFERENCE_KEYS.sort().join(',')
++      || REFERENCE_KEYS.filter(key => key.endsWith('Sha256')).some(key => !SHA.test(String(value[key as keyof LearnerAudioTailReference])))
++      || !/^formal_tts_[a-f0-9]{48}$/.test(value.failedTtsRequestId)
++      || !Number.isSafeInteger(value.completedSegmentCount) || value.completedSegmentCount < 1
++      || !Number.isSafeInteger(value.expectedSegmentCount) || value.expectedSegmentCount > 240
++      || value.completedSegmentCount >= value.expectedSegmentCount) fail('REFERENCE_INVALID');
++}
++declare const verified: unique symbol;
++export interface ValidatedLearnerAudioTail {
++  readonly priorCompletionClaimSha256: string;
++  readonly referenceSha256: string;
++  readonly [verified]: true;
++}
++interface Evidence {
++  reference: LearnerAudioTailReference; folder: string; identity: LearnerRepairCompletionIdentity;
++  originalGrantSha256: string; currentGrantSha256: string; input: AudioInput;
++  learnerReceipt: LearnerDiscussionRepairReceipt; recordHashes: string[];
++  claimed?: boolean;
++}
++const validated = new WeakMap<ValidatedLearnerAudioTail, Evidence>();
++
++/** Check all saved segments before any physical replacement can be dispatched. */
++export function assertLearnerAudioTailProgress(reference: LearnerAudioTailReference,
++  plan: ReturnType<typeof buildLifecycleSegments>, records: { tts: any; asr: any }[]) {
++  assertLearnerAudioTailReference(reference);
++  if (plan.segments.length !== reference.expectedSegmentCount || records.length !== plan.segments.length
++      || plan.segments[reference.completedSegmentCount].ttsRequestId !== reference.failedTtsRequestId)
++    fail('SEGMENT_PLAN_CHANGED');
++  for (const [index, segment] of plan.segments.entries()) {
++    const {tts, asr} = records[index];
++    if (index > reference.completedSegmentCount) {
++      if (tts || asr) fail('UNSENT_SUFFIX_CHANGED');
++      continue;
++    }
++    if (!tts || tts.requestId !== segment.ttsRequestId || tts.sceneOrder !== index
++        || tts.classroomContentSha256 !== plan.classroomContentSha256 || tts.textSha256 !== segment.textSha256
++        || tts.sceneId !== segment.sceneId || tts.actionId !== segment.actionId)
++      fail('SAVED_SEGMENT_CHANGED');
++    if (index === reference.completedSegmentCount) {
++      if (qualitySha(tts) !== reference.failedTtsRecordSha256 || tts.state !== 'ambiguous'
++          || !['provider_outcome_unknown', 'stale_provider_outcome_unknown', 'response_stream_outcome_unknown'].includes(tts.safeErrorCode)
++          || tts.audioSha256 || asr || tts.operatorRepair) fail('UNKNOWN_TTS_NOT_PROVEN');
++    } else if (tts.state !== 'succeeded' || !tts.audioSha256 || !asr || asr.state !== 'succeeded'
++        || asr.requestId !== segment.asrRequestId || asr.ttsRequestId !== tts.requestId
++        || asr.audioSha256 !== tts.audioSha256 || asr.classroomContentSha256 !== plan.classroomContentSha256
++        || !Number.isSafeInteger(asr.similarityBps) || asr.similarityBps < 8500 || asr.similarityBps > 10000)
++      fail('COMPLETED_PREFIX_CHANGED');
++  }
++}
++async function readProgress(input: AudioInput, reference: LearnerAudioTailReference) {
++  const plan = buildLifecycleSegments(input);
++  const records = [];
++  for (const segment of plan.segments) records.push({tts: await readMiraFormalTtsJob(segment.ttsRequestId),
++    asr: await readMiraFormalAsrJob(segment.asrRequestId)});
++  assertLearnerAudioTailProgress(reference, plan, records);
++  for (const {tts} of records.slice(0, reference.completedSegmentCount)) {
++    const asset = await readMiraFormalTtsAsset(tts!.requestId);
++    if (qualitySha(asset.record) !== qualitySha(tts)) fail('PREFIX_ASSET_CHANGED');
++  }
++  return {plan, records, hashes: records.map(record => qualitySha(record))};
++}
++
++/** Reads the consumed review claim and the exact cached derivation. Never reviews. */
++export async function prepareLearnerAudioTail(args: {
++  folder: string; identity: LearnerRepairCompletionIdentity; budget: ValidatedCompletionTailBudget;
++  reference: LearnerAudioTailReference; responseRecovery: LearnerDiscussionResponseRecovery;
++  reviewGrant: FormalQualityReviewGrant; audioInput: AudioInput;
++}): Promise<ValidatedLearnerAudioTail> {
++  const {folder, identity, reference, reviewGrant, responseRecovery} = args;
++  assertLearnerAudioTailReference(reference);
++  if (!reviewGrant || !SHA.test(reviewGrant.reviewIdentitySha256)
++      || reviewGrant.snapshotSha256 !== reference.derivedSnapshotSha256) fail('REVIEW_GRANT_CHANGED');
++  const prior = await json(path.join(folder, `complete-${identity.repairSnapshotSha256}-learner-discussion-review-${qualitySha(reviewGrant)}.claim`));
++  if (qualitySha(prior) !== reference.priorReviewClaimSha256
++      || Object.entries(identity).some(([key, value]) => prior[key] !== value)
++      || qualitySha(prior.responseRecovery) !== qualitySha(responseRecovery)
++      || qualitySha(prior.reviewGrant) !== qualitySha(reviewGrant)
++      || !SHA.test(prior.completionTailGrantSha256)) fail('CONSUMED_REVIEW_CLAIM_CHANGED');
++  const originalGrant = await json(path.join(folder, `completion-paid-budget-${prior.completionTailGrantSha256}.json`));
++  if (qualitySha(originalGrant) !== prior.completionTailGrantSha256) fail('ORIGINAL_GRANT_CHANGED');
++  const binding = assertCompletionTailRenewal(args.budget, originalGrant);
++  const originalClaim = await json(path.join(folder, `complete-${identity.repairSnapshotSha256}.claim`));
++  if (qualitySha(originalClaim) !== prior.priorCompletionClaimSha256
++      || originalClaim.completionTailGrantSha256 !== prior.completionTailGrantSha256
++      || Object.entries(identity).some(([key, value]) => originalClaim[key] !== value)) fail('ORIGINAL_CLAIM_CHANGED');
++  for (const suffix of ['learner-discussion-repair', 'learner-discussion-response-recovery']) {
++    const claim = await json(path.join(folder, `complete-${identity.repairSnapshotSha256}-${suffix}.claim`));
++    if (Object.entries(identity).some(([key, value]) => claim[key] !== value)
++        || claim.completionTailGrantSha256 !== prior.completionTailGrantSha256
++        || claim.priorCompletionClaimSha256 !== prior.priorCompletionClaimSha256
++        || (suffix.endsWith('response-recovery') && qualitySha(claim.responseRecovery) !== qualitySha(responseRecovery)))
++      fail('PRIOR_RECOVERY_CLAIM_CHANGED');
++  }
++  const completion = await json(path.join(process.cwd(), 'data/formal-learner-discussion-repairs', reference.learnerRepairIdentitySha256, 'completion.json'));
++  const {receiptSha256, ...unsigned} = completion.receipt;
++  if (qualitySha(completion) !== reference.learnerRepairCompletionSha256 || receiptSha256 !== qualitySha(unsigned)
++      || unsigned.sessionId !== identity.sessionId || unsigned.stageId !== identity.stageId
++      || unsigned.sourceSnapshotSha256 !== identity.sourceSnapshotSha256
++      || unsigned.inputSnapshotSha256 !== identity.repairSnapshotSha256
++      || unsigned.outputSnapshotSha256 !== reference.derivedSnapshotSha256
++      || unsigned.authorizationId !== binding.authorizationId || unsigned.repairReference !== prior.priorCompletionClaimSha256)
++    fail('DERIVED_COMPLETION_CHANGED');
++  const input = {...args.audioInput, scenes: completion.scenes};
++  if (qualitySha(qualitySnapshot(input.stage, input.scenes)) !== reference.derivedSnapshotSha256) fail('DERIVED_SNAPSHOT_CHANGED');
++  const quality = await json(path.join(process.cwd(), 'data/formal-quality-reviews', reviewGrant.reviewIdentitySha256,
++    `${reference.derivedSnapshotSha256}.json`));
++  const {receiptSha256: qualityReceiptSha256, ...qualityUnsigned} = quality.receipt;
++  if (quality.status !== 'passed' || quality.snapshotSha256 !== reference.derivedSnapshotSha256
++      || qualityReceiptSha256 !== reference.qualityReceiptSha256 || qualitySha(qualityUnsigned) !== qualityReceiptSha256
++      || qualityUnsigned.sessionId !== identity.sessionId || qualityUnsigned.stageId !== identity.stageId
++      || qualityUnsigned.snapshotSha256 !== reference.derivedSnapshotSha256) fail('CACHED_QUALITY_PASS_CHANGED');
++  const progress = await readProgress(input, reference);
++  const token = Object.freeze({priorCompletionClaimSha256: prior.priorCompletionClaimSha256,
++    referenceSha256: qualitySha(reference)}) as ValidatedLearnerAudioTail;
++  validated.set(token, {reference: structuredClone(reference), folder, identity: structuredClone(identity),
++    originalGrantSha256: prior.completionTailGrantSha256, currentGrantSha256: args.budget.receiptSha256,
++    input: structuredClone(input), learnerReceipt: completion.receipt, recordHashes: progress.hashes});
++  return token;
++}
++
++export async function claimLearnerAudioTail(token: ValidatedLearnerAudioTail) {
++  const evidence = validated.get(token); if (!evidence) return fail('VERIFIED_CONTEXT_REQUIRED');
++  const file = await fs.open(path.join(evidence.folder,
++    `complete-${evidence.reference.derivedSnapshotSha256}-learner-discussion-audio-tail.claim`), 'wx', 0o600);
++  try {
++    await file.writeFile(JSON.stringify({...evidence.identity, ...evidence.reference,
++      priorCompletionClaimSha256: token.priorCompletionClaimSha256,
++      originalCompletionTailGrantSha256: evidence.originalGrantSha256,
++      completionTailGrantSha256: evidence.currentGrantSha256, recordHashes: evidence.recordHashes,
++      pid: process.pid, createdAt: new Date().toISOString()}));
++    await file.sync();
++    evidence.claimed = true;
++  } finally { await file.close(); }
++}
++
++/** Called inside the existing completion paid namespace after cached quality and
++ * cached learner derivation have passed their full original validations. */
++export async function repairLearnerAudioTail(token: ValidatedLearnerAudioTail, input: AudioInput,
++  learnerReceipt: LearnerDiscussionRepairReceipt | undefined, qualityReceiptSha256: string | undefined) {
++  const evidence = validated.get(token); if (!evidence?.claimed) return fail('CLAIM_REQUIRED');
++  if (qualitySha(input) !== qualitySha(evidence.input) || qualitySha(learnerReceipt) !== qualitySha(evidence.learnerReceipt)
++      || qualityReceiptSha256 !== evidence.reference.qualityReceiptSha256) fail('EXECUTION_CHANGED');
++  const progress = await readProgress(input, evidence.reference);
++  if (qualitySha(progress.hashes) !== qualitySha(evidence.recordHashes)) fail('SAVED_PROGRESS_CHANGED');
++  const index = evidence.reference.completedSegmentCount;
++  const segment = progress.plan.segments[index];
++  const original = progress.records[index].tts!;
++  const repaired = await repairMiraFormalAudioSegment({asrRequestId: segment.asrRequestId,
++    ttsRequestId: segment.ttsRequestId, expectedOriginalTtsRequestSha256: original.requestSha256,
++    classroomId: input.stage.id, text: segment.text, expectedOriginalAudioSha256: null});
++  if (repaired.originalTtsSha256 !== evidence.reference.failedTtsRecordSha256
++      || repaired.physicalTtsRequestId !== `${segment.ttsRequestId}.repair1`
++      || repaired.physicalAsrRequestId !== `${segment.asrRequestId}.repair1`) fail('REPAIR_RECEIPT_CHANGED');
++  return {schemaVersion: 'mira.openmaic.learner-discussion-audio-tail.v1',
++    ...evidence.reference, referenceSha256: token.referenceSha256,
++    originalCompletionTailGrantSha256: evidence.originalGrantSha256,
++    completionTailGrantSha256: evidence.currentGrantSha256, audioRepair: repaired,
++    reusedSegmentCount: index, remainingSegmentCount: input.scenes.flatMap(scene => scene.actions ?? []).filter(action => action.type === 'speech').length - index,
++    newReviews: 0, newAgentSessions: 0, newSearches: 0};
++}
+diff --git a/tests/server/mira-formal-learner-audio-tail.test.ts b/tests/server/mira-formal-learner-audio-tail.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-learner-audio-tail.test.ts
+@@ -0,0 +1,118 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import os from 'node:os';
++import { qualitySha, qualitySnapshot } from '@/lib/server/mira-formal-quality-contract';
++import { buildLifecycleSegments } from '@/lib/server/mira-formal-audio-lifecycle';
++import { assertLearnerAudioTailProgress, claimLearnerAudioTail, prepareLearnerAudioTail,
++  repairLearnerAudioTail, type LearnerAudioTailReference } from '@/lib/server/mira-formal-learner-audio-tail';
++
++const mocks = vi.hoisted(() => ({tts: new Map(), asr: new Map(), repair: vi.fn(), renewal: vi.fn()}));
++vi.mock('@/lib/server/mira-formal-completion-tail-budget', () => ({assertCompletionTailRenewal: mocks.renewal}));
++vi.mock('@/lib/server/mira-formal-audio-repair', () => ({repairMiraFormalAudioSegment: mocks.repair}));
++vi.mock('@/lib/server/mira-formal-audio', async importOriginal => ({...await importOriginal<object>(),
++  readMiraFormalTtsJob: async (id: string) => mocks.tts.get(id) ?? null,
++  readMiraFormalAsrJob: async (id: string) => mocks.asr.get(id) ?? null,
++  readMiraFormalTtsAsset: async (id: string) => ({record: mocks.tts.get(id), bytes: Buffer.from('audio')}),
++}));
++let root: string;
++beforeEach(async () => {
++  root = await fs.mkdtemp(path.join(os.tmpdir(), 'learner-audio-tail-'));
++  vi.spyOn(process, 'cwd').mockReturnValue(root);
++  vi.stubGlobal('fetch', vi.fn(() => {throw new Error('Provider dispatch forbidden');}));
++  mocks.tts.clear(); mocks.asr.clear(); mocks.repair.mockReset(); mocks.renewal.mockReset();
++  mocks.renewal.mockReturnValue({authorizationId: '1'.repeat(64)});
++});
++afterEach(async () => {vi.restoreAllMocks(); vi.unstubAllGlobals(); await fs.rm(root, {recursive:true,force:true});});
++async function write(file: string, value: unknown) {
++  await fs.mkdir(path.dirname(file), {recursive:true}); await fs.writeFile(file, JSON.stringify(value));
++}
++async function fixture() {
++  const stage = {id:'stage-test',name:'Test classroom'} as any;
++  const scenes = [{id:'scene-1', stageId:stage.id, order:0, type:'slide', title:'Test', content:{type:'slide'},
++    actions: Array.from({length:4}, (_, i) => ({id:`speech-${i}`,type:'speech',text:`请把第${i+1}个数字读出来。`}))}] as any;
++  const input = {stage, scenes, subject:'math' as const, buildItemId:'build-test'};
++  const plan = buildLifecycleSegments(input);
++  const records = plan.segments.map((segment, i) => ({tts: i > 2 ? null : {
++    requestId:segment.ttsRequestId, requestSha256:'a'.repeat(64), sceneOrder:i,
++    classroomContentSha256:plan.classroomContentSha256, textSha256:segment.textSha256,
++    sceneId:segment.sceneId, actionId:segment.actionId, state:i === 2 ? 'ambiguous' : 'succeeded',
++    ...(i === 2 ? {safeErrorCode:'provider_outcome_unknown'} : {audioSha256:String(i+1).repeat(64)})},
++    asr: i >= 2 ? null : {requestId:segment.asrRequestId,ttsRequestId:segment.ttsRequestId,
++      state:'succeeded',audioSha256:String(i+1).repeat(64),similarityBps:10000,
++      classroomContentSha256:plan.classroomContentSha256}}));
++  records.forEach((record,i) => {if(record.tts) mocks.tts.set(plan.segments[i].ttsRequestId,record.tts);
++    if(record.asr) mocks.asr.set(plan.segments[i].asrRequestId,record.asr);});
++  const identity = {sourceJobSha256:'2'.repeat(64), sourceSnapshotSha256:'3'.repeat(64),
++    repairSnapshotSha256:'4'.repeat(64), sessionId:'session-test',stageId:stage.id};
++  const derivedSnapshotSha256 = qualitySha(qualitySnapshot(stage, scenes));
++  const originalGrant = {identity,expiresAt:100};
++  const originalGrantSha256 = qualitySha(originalGrant);
++  const originalClaim = {...identity,completionTailGrantSha256:originalGrantSha256};
++  const priorCompletionClaimSha256 = qualitySha(originalClaim);
++  const responseRecovery = {inputSha256:'5'.repeat(64)} as any;
++  const reviewGrant = {reviewIdentitySha256:'6'.repeat(64),snapshotSha256:derivedSnapshotSha256} as any;
++  const prior = {...identity,completionTailGrantSha256:originalGrantSha256,priorCompletionClaimSha256,responseRecovery,reviewGrant};
++  const unsigned = {...identity,inputSnapshotSha256:identity.repairSnapshotSha256,outputSnapshotSha256:derivedSnapshotSha256,
++    authorizationId:'1'.repeat(64),repairReference:priorCompletionClaimSha256};
++  const completion = {scenes,receipt:{...unsigned,receiptSha256:qualitySha(unsigned)}};
++  const qualityUnsigned = {sessionId:identity.sessionId,stageId:stage.id,snapshotSha256:derivedSnapshotSha256};
++  const quality = {status:'passed',snapshotSha256:derivedSnapshotSha256,
++    receipt:{...qualityUnsigned,receiptSha256:qualitySha(qualityUnsigned)}};
++  const reference: LearnerAudioTailReference = {priorReviewClaimSha256:qualitySha(prior),
++    learnerRepairIdentitySha256:'7'.repeat(64),learnerRepairCompletionSha256:qualitySha(completion),
++    derivedSnapshotSha256,qualityReceiptSha256:quality.receipt.receiptSha256,
++    failedTtsRequestId:plan.segments[2].ttsRequestId,failedTtsRecordSha256:qualitySha(records[2].tts),
++    completedSegmentCount:2,expectedSegmentCount:4};
++  const folder = path.join(root,'recovery');
++  await write(path.join(folder,`complete-${identity.repairSnapshotSha256}-learner-discussion-review-${qualitySha(reviewGrant)}.claim`),prior);
++  await write(path.join(folder,`completion-paid-budget-${originalGrantSha256}.json`),originalGrant);
++  await write(path.join(folder,`complete-${identity.repairSnapshotSha256}.claim`),originalClaim);
++  for(const suffix of ['learner-discussion-repair','learner-discussion-response-recovery'])
++    await write(path.join(folder,`complete-${identity.repairSnapshotSha256}-${suffix}.claim`),prior);
++  await write(path.join(root,'data/formal-learner-discussion-repairs',reference.learnerRepairIdentitySha256,'completion.json'),completion);
++  await write(path.join(root,'data/formal-quality-reviews',reviewGrant.reviewIdentitySha256,`${derivedSnapshotSha256}.json`),quality);
++  const args = {folder,identity,budget:{receiptSha256:'8'.repeat(64)} as any,reference,responseRecovery,reviewGrant,audioInput:input};
++  return {args,input,plan,records,completion,quality};
++}
++describe('audited learner audio tail', () => {
++  it('requires a new durable claim and repairs only the proven missing narration', async () => {
++    const f=await fixture(); const token=await prepareLearnerAudioTail(f.args);
++    expect(mocks.repair).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled();
++    await expect(repairLearnerAudioTail(token,f.input,f.completion.receipt as any,f.quality.receipt.receiptSha256)).rejects.toThrow('CLAIM_REQUIRED');
++    await claimLearnerAudioTail(token);
++    await expect(claimLearnerAudioTail(token)).rejects.toThrow('EEXIST');
++    mocks.repair.mockResolvedValue({originalTtsSha256:f.args.reference.failedTtsRecordSha256,
++      physicalTtsRequestId:`${f.plan.segments[2].ttsRequestId}.repair1`,physicalAsrRequestId:`${f.plan.segments[2].asrRequestId}.repair1`});
++    const receipt=await repairLearnerAudioTail(token,f.input,f.completion.receipt as any,f.quality.receipt.receiptSha256);
++    expect(mocks.repair).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ttsRequestId:f.plan.segments[2].ttsRequestId,
++      asrRequestId:f.plan.segments[2].asrRequestId,expectedOriginalAudioSha256:null}));
++    expect(receipt).toMatchObject({reusedSegmentCount:2,newReviews:0,newSearches:0,newAgentSessions:0});
++    expect(fetch).not.toHaveBeenCalled();
++  });
++  it.each(['prefix deleted','prefix ASR rejected','unknown changed','suffix dispatched','count changed'])('rejects %s before repair', async kind => {
++    const f=await fixture();
++    if(kind==='prefix deleted') f.records[0].tts=null;
++    if(kind==='prefix ASR rejected') f.records[0].asr!.similarityBps=8400;
++    if(kind==='unknown changed') f.records[2].tts!.state='failed';
++    if(kind==='suffix dispatched') f.records[3].tts=f.records[0].tts;
++    if(kind==='count changed') f.args.reference.completedSegmentCount=1;
++    expect(()=>assertLearnerAudioTailProgress(f.args.reference,f.plan,f.records)).toThrow('SAVED_STAGE_LEARNER_AUDIO_TAIL_');
++    expect(mocks.repair).not.toHaveBeenCalled();
++  });
++  it('rejects a changed cached quality pass or consumed review claim', async()=>{
++    const f=await fixture(); f.args.reference.priorReviewClaimSha256='f'.repeat(64);
++    await expect(prepareLearnerAudioTail(f.args)).rejects.toThrow('CONSUMED_REVIEW_CLAIM_CHANGED');
++    const other=await fixture(); other.args.reference.qualityReceiptSha256='e'.repeat(64);
++    await expect(prepareLearnerAudioTail(other.args)).rejects.toThrow('CACHED_QUALITY_PASS_CHANGED');
++    expect(mocks.repair).not.toHaveBeenCalled();
++  });
++  it('rechecks saved records and the exact derived snapshot after claiming',async()=>{
++    const f=await fixture();const token=await prepareLearnerAudioTail(f.args);await claimLearnerAudioTail(token);
++    const changed=structuredClone(f.input);changed.scenes[0].actions[0].text='changed';
++    await expect(repairLearnerAudioTail(token,changed,f.completion.receipt as any,f.quality.receipt.receiptSha256)).rejects.toThrow('EXECUTION_CHANGED');
++    mocks.tts.delete(f.plan.segments[0].ttsRequestId);
++    await expect(repairLearnerAudioTail(token,f.input,f.completion.receipt as any,f.quality.receipt.receiptSha256)).rejects.toThrow('SAVED_SEGMENT_CHANGED');
++    expect(mocks.repair).not.toHaveBeenCalled();
++  });
++});

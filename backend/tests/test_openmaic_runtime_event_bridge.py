@@ -780,6 +780,75 @@ class OpenMaicRuntimeEventBridgeTest(unittest.TestCase):
             self._record(_event(1, "scene_entered", {"sceneIndex": 0, "sceneId": "changed"}))
         self.assertEqual(stale.exception.code, "runtime_event_sequence_conflict")
 
+    def test_directory_can_visit_later_scenes_without_completing_unvisited_pages(self):
+        later_scene = _event(
+            1, "scene_entered", {"sceneIndex": 4, "sceneId": "scene-4"},
+        )
+        first = self._record(later_scene)
+        self.assertEqual(first, self._record(dict(later_scene)))
+        self.assertEqual(self.repository.scene_ids, {4: "scene-4"})
+
+        self._record(_event(
+            2, "scene_entered", {"sceneIndex": 9, "sceneId": "scene-9"},
+        ))
+        self._record(_event(
+            3, "action_completed",
+            {"sceneIndex": 9, "sceneId": "scene-9", "actionId": "action-9"},
+        ))
+        status = self.service.status(
+            runtime_session_id="runtime-session-1",
+            learning_session_id="learning-session-1",
+            upstream_classroom_id="classroom-1",
+        )
+        self.assertEqual(status["sceneEnteredCount"], 2)
+        self.assertEqual(status["actionCompletedSceneCount"], 1)
+        self.assertFalse(status["questionsComplete"])
+        self.assertFalse(status["completionReady"])
+        self.assertEqual(self.learning.answer_calls, 0)
+
+        # Even an independently complete quiz cannot fill in missing visits or
+        # page actions. Reaching the last page is not completing the course.
+        self.learning.questions_complete = True
+        with self.assertRaises(ApiError) as incomplete:
+            self._record(_event(
+                4, "classroom_completed", {"sceneIndex": 9, "sceneId": "scene-9"},
+            ))
+        self.assertEqual(incomplete.exception.code, "runtime_event_evidence_incomplete")
+        self.assertEqual(self.learning.complete_calls, 0)
+        self.assertEqual(len(self.repository.events), 3)
+
+        # Returning to an earlier real page is also a visit, not a gap repair
+        # that invents entries for the intervening pages.
+        self._record(_event(
+            4, "scene_entered", {"sceneIndex": 1, "sceneId": "scene-1"},
+        ))
+        self.assertEqual(self.repository.scene_ids, {4: "scene-4", 9: "scene-9", 1: "scene-1"})
+
+    def test_directory_navigation_still_rejects_forged_scenes_and_work_before_entry(self):
+        self._record(_event(
+            1, "scene_entered", {"sceneIndex": 4, "sceneId": "scene-4"},
+        ))
+        invalid_events = [
+            ("scene_entered", {"sceneIndex": 4, "sceneId": "scene-0"},
+             "runtime_event_scene_authority_mismatch"),
+            ("scene_entered", {"sceneIndex": 10, "sceneId": "scene-10"},
+             "runtime_event_scene_invalid"),
+            ("action_completed", {"sceneIndex": 7, "sceneId": "scene-7", "actionId": "action-7"},
+             "runtime_event_scene_not_entered"),
+            ("answer_submitted", {"sceneIndex": 0, "sceneId": "scene-0", "questionId": "q1",
+                                  "response": "12", "attemptNumber": 1},
+             "runtime_event_scene_not_entered"),
+        ]
+        for event_type, payload, expected_code in invalid_events:
+            with self.subTest(event_type=event_type, code=expected_code):
+                with self.assertRaises(ApiError) as rejected:
+                    self._record(_event(2, event_type, payload))
+                self.assertEqual(rejected.exception.code, expected_code)
+        self.assertEqual(self.repository.scene_ids, {4: "scene-4"})
+        self.assertEqual(len(self.repository.events), 1)
+        self.assertEqual(self.learning.answer_calls, 0)
+        self.assertEqual(self.learning.complete_calls, 0)
+
     def test_record_uses_child_first_global_write_lock_order(self):
         self._record(
             _event(1, "scene_entered", {"sceneIndex": 0, "sceneId": "scene-0"})

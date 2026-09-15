@@ -1,0 +1,918 @@
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -547,11 +547,68 @@
+   background: var(--mira-orbit-space);
+ }
+ 
++/* Arrow gutters never overlap the portraits. The track padding also contains
++   the active avatar's scale, speaking badge, and breathing ring. */
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-participant-carousel] {
++  padding-inline: 14px;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-participant-viewport] {
++  padding-inline: 0;
++  scroll-padding-inline: 6px;
++  overscroll-behavior-x: contain;
++  touch-action: pan-x;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-participant-track] {
++  gap: 4px;
++  padding: 6px;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-participant-avatar] {
++  display: block;
++  width: 30px;
++  height: 30px;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-participant-avatar]:focus-visible {
++  outline: 2px solid var(--mira-orbit-cyan);
++  outline-offset: 2px;
++  opacity: 1;
++  filter: none;
++}
++
+ html[data-mira-student-theme='orbit']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-scroll] {
++  width: 14px;
+   color: var(--mira-orbit-cyan);
+-  background: var(--mira-orbit-panel);
++  background: transparent;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-participant-carousel]:focus-within
++  [data-mira-participant-scroll] {
++  opacity: 1;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='discussion']
++  [data-mira-participant-scroll]:focus-visible {
++  outline: 1px solid var(--mira-orbit-cyan);
++  outline-offset: -1px;
++  border-radius: 5px;
+ }
+ 
+ html[data-mira-student-theme='orbit']
+diff --git a/components/chat/proactive-card.tsx b/components/chat/proactive-card.tsx
+--- a/components/chat/proactive-card.tsx
++++ b/components/chat/proactive-card.tsx
+@@ -10,6 +10,8 @@
+ 
+ interface ProactiveCardProps {
+   action: DiscussionAction;
++  /** Required teaching waits for an explicit join and must never auto-skip. */
++  required?: boolean;
+   mode: 'playback' | 'paused' | 'autonomous';
+   /** Ref to the anchor element the card points to (avatar, etc.) */
+   anchorRef: React.RefObject<HTMLElement | null>;
+@@ -37,6 +39,7 @@
+  */
+ export const ProactiveCard = ({
+   action,
++  required = false,
+   mode,
+   anchorRef,
+   align = 'right',
+@@ -91,7 +94,7 @@
+   }, [updatePosition]);
+ 
+   useEffect(() => {
+-    if (mode !== 'playback') return;
++    if (required || mode !== 'playback') return;
+ 
+     const duration = DISCUSSION_AUTO_SKIP_MS;
+     const interval = 50;
+@@ -109,20 +112,21 @@
+     }, interval);
+ 
+     return () => clearInterval(timer);
+-  }, [mode]);
++  }, [mode, required]);
+ 
+   useEffect(() => {
+-    if (progress <= 0 && !skippedRef.current && mode === 'playback') {
++    if (!required && progress <= 0 && !skippedRef.current && mode === 'playback') {
+       skippedRef.current = true;
+       onSkip();
+     }
+-  }, [progress, onSkip, mode]);
++  }, [progress, onSkip, mode, required]);
+ 
+   if (!pos) return null;
+ 
+   const card = (
+     <motion.div
+       data-mira-chrome="discussion-prompt"
++      data-required={required}
+       initial={{ opacity: 0, y: 10, scale: 0.95 }}
+       animate={{ opacity: 1, y: 0, scale: 1 }}
+       exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+@@ -137,16 +141,18 @@
+     >
+       <div className="relative">
+         {/* Close button */}
+-        <button
+-          onClick={(e) => {
+-            e.stopPropagation();
+-            onSkip();
+-          }}
+-          className="absolute -top-2 -right-2 w-6 h-6 bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:scale-110 transition-all z-20 group/close"
+-          title={t('proactiveCard.skip')}
+-        >
+-          <X className="w-3 h-3 stroke-[2.5]" />
+-        </button>
++        {!required && (
++          <button
++            onClick={(e) => {
++              e.stopPropagation();
++              onSkip();
++            }}
++            className="absolute -top-2 -right-2 w-6 h-6 bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:scale-110 transition-all z-20 group/close"
++            title={t('proactiveCard.skip')}
++          >
++            <X className="w-3 h-3 stroke-[2.5]" />
++          </button>
++        )}
+ 
+         {/* Triangle Tail */}
+         <div
+@@ -160,21 +166,23 @@
+         {/* Card body */}
+         <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm p-3.5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-gray-100 dark:border-gray-700 flex flex-col gap-2.5 relative overflow-hidden">
+           {/* Progress Bar */}
+-          <div
+-            data-mira-indicator="discussion-progress-track"
+-            className="absolute top-0 left-0 right-0 h-1 bg-gray-50/50 dark:bg-gray-700/50"
+-          >
++          {!required && (
+             <div
+-              data-mira-indicator="discussion-progress"
+-              data-paused={isPaused}
+-              className={`h-full transition-all duration-[50ms] ease-linear ${
+-                isPaused
+-                  ? 'bg-gray-300 dark:bg-gray-600'
+-                  : 'bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600'
+-              }`}
+-              style={{ width: `${progress}%` }}
+-            />
+-          </div>
++              data-mira-indicator="discussion-progress-track"
++              className="absolute top-0 left-0 right-0 h-1 bg-gray-50/50 dark:bg-gray-700/50"
++            >
++              <div
++                data-mira-indicator="discussion-progress"
++                data-paused={isPaused}
++                className={`h-full transition-all duration-[50ms] ease-linear ${
++                  isPaused
++                    ? 'bg-gray-300 dark:bg-gray-600'
++                    : 'bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600'
++                }`}
++                style={{ width: `${progress}%` }}
++              />
++            </div>
++          )}
+ 
+           {/* Header */}
+           <div className="flex items-center gap-2 px-0.5 pt-1">
+@@ -203,13 +211,15 @@
+                 {t('proactiveCard.discussion')}
+               </span>
+             </div>
+-            <span
+-              className={`text-[10px] font-bold tabular-nums shrink-0 ${
+-                isPaused ? 'text-gray-300 dark:text-gray-600' : 'text-gray-400 dark:text-gray-500'
+-              }`}
+-            >
+-              {Math.max(0, Math.ceil((progress / 100) * (DISCUSSION_AUTO_SKIP_MS / 1000)))}s
+-            </span>
++            {!required && (
++              <span
++                className={`text-[10px] font-bold tabular-nums shrink-0 ${
++                  isPaused ? 'text-gray-300 dark:text-gray-600' : 'text-gray-400 dark:text-gray-500'
++                }`}
++              >
++                {Math.max(0, Math.ceil((progress / 100) * (DISCUSSION_AUTO_SKIP_MS / 1000)))}s
++              </span>
++            )}
+           </div>
+ 
+           <p className="text-[13px] font-bold text-gray-800 dark:text-gray-200 leading-snug px-0.5">
+@@ -227,24 +237,26 @@
+               <Play className="w-3 h-3 fill-current" /> {t('proactiveCard.join')}
+             </button>
+ 
+-            <button
+-              onClick={(e) => {
+-                e.stopPropagation();
+-                onTogglePause();
+-              }}
+-              className={`p-2 aspect-square rounded-lg border transition-colors active:scale-90 ${
+-                isPaused
+-                  ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/50'
+-                  : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 border-gray-100 dark:border-gray-600'
+-              }`}
+-              title={isPaused ? t('proactiveCard.resume') : t('proactiveCard.pause')}
+-            >
+-              {isPaused ? (
+-                <Play className="w-3 h-3 fill-current" />
+-              ) : (
+-                <Pause className="w-3 h-3 fill-current" />
+-              )}
+-            </button>
++            {!required && (
++              <button
++                onClick={(e) => {
++                  e.stopPropagation();
++                  onTogglePause();
++                }}
++                className={`p-2 aspect-square rounded-lg border transition-colors active:scale-90 ${
++                  isPaused
++                    ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/50'
++                    : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 border-gray-100 dark:border-gray-600'
++                }`}
++                title={isPaused ? t('proactiveCard.resume') : t('proactiveCard.pause')}
++              >
++                {isPaused ? (
++                  <Play className="w-3 h-3 fill-current" />
++                ) : (
++                  <Pause className="w-3 h-3 fill-current" />
++                )}
++              </button>
++            )}
+           </div>
+         </div>
+       </div>
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -18,6 +18,7 @@
+ } from 'lucide-react';
+ import { cn } from '@/lib/utils';
+ import type { AudioIndicatorState } from './audio-indicator';
++import { resolveDiscussionInvitePresenter } from './discussion-invite-presenter';
+ import { CanvasToolbar } from '@/components/canvas/canvas-toolbar';
+ import { useAudioRecorder } from '@/lib/hooks/use-audio-recorder';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+@@ -258,6 +259,14 @@
+   const studentParticipants = initialParticipants.filter(
+     (p) => p.role !== 'teacher' && p.role !== 'user',
+   );
++  const discussionInvitePresenter = resolveDiscussionInvitePresenter(
++    initialParticipants,
++    discussionRequest?.agentId,
++  );
++  const discussionUsesTeacher = discussionInvitePresenter.role === 'teacher';
++  const discussionStudentId = discussionUsesTeacher
++    ? undefined
++    : discussionInvitePresenter.participant?.id;
+ 
+   // Stable ref object for the current discussion agent's avatar
+   const discussionAnchorRef = useRef<HTMLDivElement>(null);
+@@ -268,13 +277,27 @@
+       discussionAnchorRef.current = null;
+       return;
+     }
+-    if (discussionRequest.agentId === teacherParticipant?.id) {
++    if (discussionUsesTeacher) {
+       discussionAnchorRef.current = teacherAvatarRef.current;
+     } else {
+-      discussionAnchorRef.current =
+-        studentAvatarRefs.current.get(discussionRequest.agentId || '') || null;
++      const avatar = studentAvatarRefs.current.get(discussionStudentId || '') || null;
++      discussionAnchorRef.current = avatar;
++
++      // Keep the invitation's anchor visible without scrolling the classroom.
++      // Immediate movement also respects reduced-motion preferences.
++      const viewport = agentScrollRef.current;
++      if (avatar && viewport && !isPresenting) {
++        const avatarBounds = avatar.getBoundingClientRect();
++        const viewportBounds = viewport.getBoundingClientRect();
++        const edgePadding = 6;
++        if (avatarBounds.left < viewportBounds.left + edgePadding) {
++          viewport.scrollLeft += avatarBounds.left - viewportBounds.left - edgePadding;
++        } else if (avatarBounds.right > viewportBounds.right - edgePadding) {
++          viewport.scrollLeft += avatarBounds.right - viewportBounds.right + edgePadding;
++        }
++      }
+     }
+-  }, [discussionRequest, teacherParticipant?.id]);
++  }, [discussionRequest, discussionUsesTeacher, discussionStudentId, isPresenting]);
+ 
+   // Derived state from Stage's computePlaybackView (centralised derivation)
+   const isInLiveFlow =
+@@ -629,13 +652,16 @@
+   const getAgentConfig = (id: string) => agentRegistry.getAgent(id);
+ 
+   const presentationDiscussionParticipant = discussionRequest
+-    ? discussionRequest.agentId === teacherParticipant?.id
+-      ? teacherParticipant || null
+-      : studentParticipants.find((student) => student.id === discussionRequest.agentId) || null
++    ? {
++        id: discussionInvitePresenter.participant?.id || 'discussion-teacher-display',
++        name: discussionInvitePresenter.participant?.name || teacherName,
++        avatar: discussionInvitePresenter.participant?.avatar || teacherAvatar,
++      }
+     : null;
+   const presentationDiscussionAgentConfig = discussionRequest
+-    ? getAgentConfig(discussionRequest.agentId || '')
++    ? getAgentConfig(discussionInvitePresenter.participant?.id || '')
+     : null;
++  const presentationDockParticipant = presentationDiscussionParticipant || speakingStudent;
+ 
+   const handlePresentationBubbleClick = useCallback(() => {
+     if (isTopicPending) {
+@@ -984,7 +1010,7 @@
+                       presentationDiscussionParticipant) && (
+                       <motion.div
+                         ref={presentationAgentAvatarRef}
+-                        key={`dock-agent-${(speakingStudent || presentationDiscussionParticipant)?.id}`}
++                        key={`dock-agent-${presentationDockParticipant?.id}`}
+                         initial={{ opacity: 0, scale: 0.8, width: 0 }}
+                         animate={{ opacity: 1, scale: 1, width: 'auto' }}
+                         exit={{ opacity: 0, scale: 0.8, width: 0 }}
+@@ -998,13 +1024,8 @@
+                           />
+                           <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden relative z-10 text-lg">
+                             <AvatarDisplay
+-                              src={
+-                                (speakingStudent || presentationDiscussionParticipant)?.avatar ||
+-                                '/avatars/user.png'
+-                              }
+-                              alt={
+-                                (speakingStudent || presentationDiscussionParticipant)?.name || ''
+-                              }
++                              src={presentationDockParticipant?.avatar || teacherAvatar}
++                              alt={presentationDockParticipant?.name || teacherName}
+                             />
+                           </div>
+                         </div>
+@@ -1121,6 +1142,7 @@
+                   {discussionRequest && (
+                     <ProactiveCard
+                       action={discussionRequest}
++                      required={studentMode}
+                       mode={engineMode === 'paused' ? 'paused' : 'playback'}
+                       anchorRef={presentationAgentAvatarRef}
+                       portalContainer={fullscreenContainerRef?.current}
+@@ -1286,9 +1308,10 @@
+ 
+               {/* ProactiveCard from teacher avatar */}
+               <AnimatePresence>
+-                {discussionRequest && discussionRequest.agentId === teacherParticipant?.id && (
++                {discussionRequest && discussionUsesTeacher && (
+                   <ProactiveCard
+                     action={discussionRequest}
++                    required={studentMode}
+                     mode={engineMode === 'paused' ? 'paused' : 'playback'}
+                     anchorRef={teacherAvatarRef}
+                     align="left"
+@@ -1924,10 +1947,12 @@
+           )}
+         >
+           {/* Companion agent avatars — horizontal row, scrollable on overflow, arrows on hover */}
+-          <div className="flex-none relative group/scroll">
++          <div data-mira-participant-carousel className="flex-none relative group/scroll">
+             {/* Left arrow */}
+             <button
++              type="button"
+               data-mira-participant-scroll
++              aria-label={studentMode ? '查看前面的同学' : 'Previous participants'}
+               onClick={() => {
+                 agentScrollRef.current?.scrollBy({
+                   left: -80,
+@@ -1941,6 +1966,7 @@
+ 
+             <div
+               ref={agentScrollRef}
++              data-mira-participant-viewport
+               className="overflow-x-auto overflow-y-hidden px-2 scrollbar-hide"
+               onWheel={(e) => {
+                 if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+@@ -1949,7 +1975,7 @@
+                 }
+               }}
+             >
+-              <div className="flex gap-1 w-max py-1">
++              <div data-mira-participant-track className="flex gap-1 w-max py-1">
+                 {studentParticipants.map((student) => {
+                   const isSpeaking = speakingAgentId === student.id;
+                   const isThinkingAgent =
+@@ -1969,7 +1995,7 @@
+                       : agentConfig?.persona || '';
+                   const hasDescription = !!description;
+                   const isDiscussionAgent =
+-                    !!discussionRequest && discussionRequest.agentId === student.id;
++                    !!discussionRequest && discussionStudentId === student.id;
+                   return (
+                     <div
+                       key={student.id}
+@@ -2000,7 +2026,10 @@
+                       )}
+                       <HoverCard openDelay={300} closeDelay={100}>
+                         <HoverCardTrigger asChild>
+-                          <div
++                          <button
++                            type="button"
++                            data-mira-participant-avatar
++                            aria-label={student.name}
+                             className={cn(
+                               'relative w-9 h-9 rounded-full transition-all duration-300 cursor-pointer',
+                               isSpeaking
+@@ -2040,7 +2069,7 @@
+                                 className="absolute inset-0 rounded-full border-2 border-purple-400 border-t-transparent animate-spin z-20"
+                               />
+                             )}
+-                          </div>
++                          </button>
+                         </HoverCardTrigger>
+                         <HoverCardContent
+                           side="bottom"
+@@ -2084,7 +2113,9 @@
+ 
+             {/* Right arrow */}
+             <button
++              type="button"
+               data-mira-participant-scroll
++              aria-label={studentMode ? '查看后面的同学' : 'Next participants'}
+               onClick={() => {
+                 agentScrollRef.current?.scrollBy({
+                   left: 80,
+@@ -2099,15 +2130,14 @@
+             {/* ProactiveCard for student/non-teacher agents — rendered via portal */}
+             <AnimatePresence>
+               {discussionRequest &&
+-                discussionRequest.agentId !== teacherParticipant?.id &&
++                !discussionUsesTeacher &&
+                 (() => {
+-                  const matchedStudent = studentParticipants.find(
+-                    (s) => s.id === discussionRequest.agentId,
+-                  );
+-                  const agentConfig = getAgentConfig(discussionRequest.agentId || '');
++                  const matchedStudent = discussionInvitePresenter.participant;
++                  const agentConfig = getAgentConfig(matchedStudent?.id || '');
+                   return (
+                     <ProactiveCard
+                       action={discussionRequest}
++                      required={studentMode}
+                       mode={engineMode === 'paused' ? 'paused' : 'playback'}
+                       anchorRef={discussionAnchorRef}
+                       align="left"
+diff --git a/lib/playback/engine.ts b/lib/playback/engine.ts
+--- a/lib/playback/engine.ts
++++ b/lib/playback/engine.ts
+@@ -416,10 +416,9 @@
+ 
+   /** User clicks "Skip" on ProactiveCard → consumed → processNext */
+   skipDiscussion(): void {
+-    if (this.callbacks.requireScriptedDiscussions) {
+-      if (this.currentTrigger) this.confirmDiscussion();
+-      return;
+-    }
++    // Required discussions still need an explicit Join. A stale skip callback
++    // must neither consume the action nor silently start a paid live request.
++    if (this.callbacks.requireScriptedDiscussions) return;
+     if (this.currentTrigger) {
+       this.markDiscussionConsumed(this.currentTrigger.id);
+       this.currentTrigger = null;
+@@ -473,10 +472,21 @@
+     this.cancelActivePlaybackWork();
+     this.restoreSavedLectureState();
+     this.rewindRequiredDiscussion();
+-    this.currentTrigger = null;
++    const action = this.scenes[this.sceneIndex]?.actions?.[this.actionIndex];
++    if (action?.type !== 'discussion' || action.id !== this.requiredDiscussionId) return false;
++    // Retry is already an explicit request to join this exact discussion.
++    // Restore the post-action cursor used by confirmDiscussion without showing
++    // a second invitation or replaying the preceding narration.
++    this.callbacks.onProgress?.(this.getSnapshot());
++    this.actionIndex++;
++    this.currentTrigger = {
++      id: action.id,
++      question: action.topic,
++      prompt: action.prompt,
++      agentId: action.agentId,
++    };
+     this.currentTopicState = null;
+-    this.setMode('idle');
+-    this.continuePlayback();
++    this.confirmDiscussion();
+     return true;
+   }
+ 
+@@ -556,6 +566,7 @@
+ 
+   /** Whether all remaining actions have been consumed (no speech left to play) */
+   isExhausted(): boolean {
++    if (this.requiredDiscussionId) return false;
+     let si = this.sceneIndex;
+     let ai = this.actionIndex;
+     while (si < this.scenes.length) {
+@@ -817,10 +828,6 @@
+           this.triggerDelayTimer = null;
+           if (this.mode !== 'playing') return; // Cancelled if user paused/stopped
+           this.currentTrigger = trigger;
+-          if (this.callbacks.requireScriptedDiscussions) {
+-            this.confirmDiscussion();
+-            return;
+-          }
+           this.callbacks.onProactiveShow?.(trigger);
+           // Engine pauses here — user calls confirmDiscussion() or skipDiscussion()
+         }, DISCUSSION_TRIGGER_DELAY_MS);
+diff --git a/tests/playback/discussion-consumption.test.ts b/tests/playback/discussion-consumption.test.ts
+--- a/tests/playback/discussion-consumption.test.ts
++++ b/tests/playback/discussion-consumption.test.ts
+@@ -146,7 +146,7 @@
+ describe('required student teaching discussions', () => {
+   afterEach(() => vi.useRealTimers());
+ 
+-  it('opens automatically even with an unselected agent; failed or skipped discussions never complete', async () => {
++  it('invites even with an unselected agent and waits for Join before starting the required discussion', async () => {
+     vi.useFakeTimers();
+     const onDiscussionConfirmed = vi.fn();
+     const onProactiveShow = vi.fn();
+@@ -165,13 +165,35 @@
+     );
+     engine.start();
+     await vi.advanceTimersByTimeAsync(3100);
++    expect(onProactiveShow).toHaveBeenCalledWith({
++      id: 'required-1',
++      question: 'topic-required-1',
++      prompt: 'prompt-required-1',
++      agentId: 'peer-1',
++    });
++    expect(onDiscussionConfirmed).not.toHaveBeenCalled();
++    expect(engine.getMode()).toBe('playing');
++    expect(engine.hasPendingRequiredDiscussion()).toBe(true);
++    expect(engine.isExhausted()).toBe(false);
++    expect(engine.getSnapshot().consumedDiscussions).toEqual([]);
++
++    // Old card timers or close callbacks must not silently join or skip.
++    engine.skipDiscussion();
++    await vi.advanceTimersByTimeAsync(30000);
++    expect(onDiscussionConfirmed).not.toHaveBeenCalled();
++    expect(onComplete).not.toHaveBeenCalled();
++    expect(engine.getSnapshot().consumedDiscussions).toEqual([]);
++
++    engine.confirmDiscussion();
+     expect(onDiscussionConfirmed).toHaveBeenCalledWith(
+       'topic-required-1',
+       'prompt-required-1',
+       'peer-1',
+       'required-1',
+     );
+-    expect(onProactiveShow).not.toHaveBeenCalled();
++    expect(onProactiveShow).toHaveBeenCalledTimes(1);
++    expect(engine.getMode()).toBe('live');
++    expect(engine.isExhausted()).toBe(false);
+     expect(engine.getSnapshot().consumedDiscussions).toEqual([]);
+     engine.skipDiscussion();
+     expect(engine.getMode()).toBe('live');
+@@ -179,14 +201,17 @@
+     engine.handleDiscussionError();
+     expect(engine.hasPendingRequiredDiscussion()).toBe(true);
+     expect(engine.retryRequiredDiscussion()).toBe(true);
+-    await vi.advanceTimersByTimeAsync(3100);
+     expect(onDiscussionConfirmed).toHaveBeenCalledTimes(2);
++    expect(onProactiveShow).toHaveBeenCalledTimes(1);
++    expect(engine.getMode()).toBe('live');
+     expect(onComplete).not.toHaveBeenCalled();
+     engine.acknowledgeDiscussionCompletion();
+     engine.handleEndDiscussion();
+     engine.continuePlayback();
+     expect(onComplete).toHaveBeenCalledTimes(1);
+     expect(engine.getSnapshot().consumedDiscussions).toEqual(['required-1']);
++    expect(engine.hasPendingRequiredDiscussion()).toBe(false);
++    expect(engine.isExhausted()).toBe(true);
+     engine.stop();
+   });
+ 
+@@ -194,20 +219,65 @@
+     vi.useFakeTimers();
+     const onComplete = vi.fn();
+     const onDiscussionConfirmed = vi.fn();
++    const onProactiveShow = vi.fn();
+     const engine = new PlaybackEngine(
+       [scene([discussion('required-stop')])],
+       createActionEngine(),
+       createAudioPlayer(),
+-      { requireScriptedDiscussions: true, onDiscussionConfirmed, onComplete },
+-    );
+-    engine.start();
+-    await vi.advanceTimersByTimeAsync(3100);
++      { requireScriptedDiscussions: true, onDiscussionConfirmed, onProactiveShow, onComplete },
++    );
++    engine.start();
++    await vi.advanceTimersByTimeAsync(3100);
++    engine.confirmDiscussion();
+     engine.handleEndDiscussion();
+     expect(engine.getSnapshot().actionIndex).toBe(0);
+     engine.continuePlayback();
+     await vi.advanceTimersByTimeAsync(3100);
++    expect(onProactiveShow).toHaveBeenCalledTimes(2);
++    expect(onDiscussionConfirmed).toHaveBeenCalledTimes(1);
++    expect(onComplete).not.toHaveBeenCalled();
++    expect(engine.getSnapshot().consumedDiscussions).toEqual([]);
++    engine.confirmDiscussion();
+     expect(onDiscussionConfirmed).toHaveBeenCalledTimes(2);
+-    expect(onComplete).not.toHaveBeenCalled();
++    engine.stop();
++  });
++
++  it('keeps a visible invitation pending across pause and resume without starting a request', async () => {
++    vi.useFakeTimers();
++    const onProactiveShow = vi.fn();
++    const onProactiveHide = vi.fn();
++    const onDiscussionConfirmed = vi.fn();
++    const onComplete = vi.fn();
++    const engine = new PlaybackEngine(
++      [scene([discussion('required-visible')])],
++      createActionEngine(),
++      createAudioPlayer(),
++      {
++        requireScriptedDiscussions: true,
++        onProactiveShow,
++        onProactiveHide,
++        onDiscussionConfirmed,
++        onComplete,
++      },
++    );
++
++    engine.start();
++    await vi.advanceTimersByTimeAsync(3100);
++    engine.pause();
++    await vi.advanceTimersByTimeAsync(30000);
++    engine.resume();
++    await vi.advanceTimersByTimeAsync(30000);
++    expect(onProactiveShow).toHaveBeenCalledTimes(1);
++    expect(onProactiveHide).not.toHaveBeenCalled();
++    expect(onDiscussionConfirmed).not.toHaveBeenCalled();
++    expect(onComplete).not.toHaveBeenCalled();
++    expect(engine.getSnapshot().consumedDiscussions).toEqual([]);
++    expect(engine.isExhausted()).toBe(false);
++
++    engine.confirmDiscussion();
++    expect(onDiscussionConfirmed).toHaveBeenCalledTimes(1);
++    expect(onProactiveHide).toHaveBeenCalledTimes(1);
++    expect(engine.getMode()).toBe('live');
+     engine.stop();
+   });
+ });
+@@ -215,20 +285,27 @@
+ it('pausing in the mandatory trigger delay does not consume or skip the discussion', async () => {
+   vi.useFakeTimers();
+   const onDiscussionConfirmed = vi.fn();
++  const onProactiveShow = vi.fn();
+   const onComplete = vi.fn();
+   const engine = new PlaybackEngine(
+     [scene([discussion('required-delay')])],
+     createActionEngine(),
+     createAudioPlayer(),
+-    { requireScriptedDiscussions: true, onDiscussionConfirmed, onComplete },
++    { requireScriptedDiscussions: true, onDiscussionConfirmed, onProactiveShow, onComplete },
+   );
+   try {
+     engine.start();
+     await vi.advanceTimersByTimeAsync(100);
+     engine.pause();
+     await vi.advanceTimersByTimeAsync(4000);
++    expect(onProactiveShow).not.toHaveBeenCalled();
++    expect(engine.getSnapshot().actionIndex).toBe(0);
+     engine.resume();
+     await vi.advanceTimersByTimeAsync(3100);
++    expect(onProactiveShow).toHaveBeenCalledTimes(1);
++    expect(onDiscussionConfirmed).not.toHaveBeenCalled();
++    expect(onComplete).not.toHaveBeenCalled();
++    engine.confirmDiscussion();
+     expect(onDiscussionConfirmed).toHaveBeenCalledTimes(1);
+     expect(onComplete).not.toHaveBeenCalled();
+   } finally {
+diff --git a/tests/chat/proactive-card.test.ts b/tests/chat/proactive-card.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/chat/proactive-card.test.ts
+@@ -0,0 +1,137 @@
++// @vitest-environment jsdom
++
++import { act, createElement } from 'react';
++import { createRoot, type Root } from 'react-dom/client';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import type { DiscussionAction } from '@/lib/types/action';
++import { DISCUSSION_AUTO_SKIP_MS } from '@/lib/choreography';
++
++vi.mock('motion/react', () => ({
++  motion: {
++    div: (props: Record<string, unknown>) =>
++      createElement(
++        'div',
++        Object.fromEntries(
++          Object.entries(props).filter(([key]) => !['initial', 'animate', 'exit'].includes(key)),
++        ),
++      ),
++  },
++}));
++
++vi.mock('@/lib/hooks/use-i18n', () => ({
++  useI18n: () => ({ t: (key: string) => key }),
++}));
++
++import { ProactiveCard } from '@/components/chat/proactive-card';
++
++const roots: Root[] = [];
++const requestFrame = vi.fn<(callback: FrameRequestCallback) => number>();
++(
++  globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
++).IS_REACT_ACT_ENVIRONMENT = true;
++
++beforeEach(() => {
++  vi.useFakeTimers();
++  // Keep the anchor stationary: render one positioning frame without running
++  // an unrelated animation loop while advancing the invitation countdown.
++  requestFrame.mockReset().mockReturnValue(1);
++  vi.stubGlobal('requestAnimationFrame', requestFrame);
++  vi.stubGlobal('cancelAnimationFrame', vi.fn());
++});
++
++afterEach(() => {
++  for (const root of roots.splice(0)) act(() => root.unmount());
++  document.body.replaceChildren();
++  vi.useRealTimers();
++  vi.unstubAllGlobals();
++});
++
++function mount(required: boolean, mode: 'playback' | 'paused' = 'playback') {
++  const host = document.createElement('div');
++  const anchor = document.createElement('button');
++  document.body.append(host, anchor);
++  const root = createRoot(host);
++  roots.push(root);
++  const onSkip = vi.fn();
++  const onListen = vi.fn();
++
++  act(() =>
++    root.render(
++      createElement(ProactiveCard, {
++        action: {
++          id: 'discussion-invitation',
++          type: 'discussion',
++          topic: '用自己的话说：60% 表示什么？',
++          prompt: '请一起讨论百分数的含义。',
++        } as DiscussionAction,
++        required,
++        mode,
++        anchorRef: { current: anchor },
++        agentName: '小林同学',
++        onSkip,
++        onListen,
++        onTogglePause: vi.fn(),
++      }),
++    ),
++  );
++  act(() => requestFrame.mock.calls[0][0](0));
++
++  const card = document.querySelector<HTMLElement>('[data-mira-chrome="discussion-prompt"]')!;
++  expect(card).not.toBeNull();
++  return { card, onSkip, onListen };
++}
++
++async function passAutoSkipWindow() {
++  await act(async () => {
++    await vi.advanceTimersByTimeAsync(DISCUSSION_AUTO_SKIP_MS * 2);
++  });
++  // The progress update commits first; the separate effect then calls onSkip.
++  await act(async () => {});
++}
++
++describe('discussion invitation', () => {
++  it('keeps a required invitation visible until the student explicitly joins', async () => {
++    const { card, onSkip, onListen } = mount(true);
++    expect(card.querySelector('[title="proactiveCard.skip"]')).toBeNull();
++    expect(card.querySelector('[data-mira-indicator="discussion-progress-track"]')).toBeNull();
++    expect(card.textContent).not.toMatch(/\b\d+s\b/);
++    expect(card.querySelectorAll('button')).toHaveLength(1);
++
++    await passAutoSkipWindow();
++
++    expect(card.isConnected).toBe(true);
++    expect(card.textContent).toContain('用自己的话说：60% 表示什么？');
++    expect(onSkip).not.toHaveBeenCalled();
++    expect(onListen).not.toHaveBeenCalled();
++
++    act(() => card.querySelector('button')!.click());
++    expect(onListen).toHaveBeenCalledTimes(1);
++    expect(onSkip).not.toHaveBeenCalled();
++  });
++
++  it('retains the countdown and automatic skip for optional invitations', async () => {
++    const { card, onSkip, onListen } = mount(false);
++    expect(card.querySelector('[title="proactiveCard.skip"]')).not.toBeNull();
++    expect(card.querySelector('[data-mira-indicator="discussion-progress-track"]')).not.toBeNull();
++    expect(onSkip).not.toHaveBeenCalled();
++
++    await passAutoSkipWindow();
++
++    expect(onSkip).toHaveBeenCalledTimes(1);
++    expect(onListen).not.toHaveBeenCalled();
++  });
++
++  it('does not count down or auto-skip an optional invitation while paused', async () => {
++    const { card, onSkip, onListen } = mount(false, 'paused');
++    const progress = card.querySelector<HTMLElement>(
++      '[data-mira-indicator="discussion-progress"]',
++    )!;
++    expect(progress.style.width).toBe('100%');
++
++    await passAutoSkipWindow();
++
++    expect(progress.style.width).toBe('100%');
++    expect(onSkip).not.toHaveBeenCalled();
++    expect(onListen).not.toHaveBeenCalled();
++  });
++});
+diff --git a/components/roundtable/discussion-invite-presenter.ts b/components/roundtable/discussion-invite-presenter.ts
+new file mode 100644
+--- /dev/null
++++ b/components/roundtable/discussion-invite-presenter.ts
+@@ -0,0 +1,17 @@
++import type { Participant } from '@/lib/types/roundtable';
++
++/** Resolve a visible invitation anchor without changing the discussion's agent ID. */
++export function resolveDiscussionInvitePresenter(
++  participants: readonly Participant[],
++  agentId: string | undefined,
++): { role: 'student' | 'teacher'; participant: Participant | null } {
++  const student = participants.find((person) => person.id === agentId && person.role === 'student');
++  if (student) return { role: 'student', participant: student };
++
++  // Restored classrooms may omit the original initiator from their avatar roster.
++  // The teacher rail exists even without a teacher record, using its default art.
++  return {
++    role: 'teacher',
++    participant: participants.find((person) => person.role === 'teacher') || null,
++  };
++}
+diff --git a/tests/discussion-invite-presenter.test.ts b/tests/discussion-invite-presenter.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/discussion-invite-presenter.test.ts
+@@ -0,0 +1,43 @@
++import { describe, expect, it } from 'vitest';
++import { resolveDiscussionInvitePresenter } from '@/components/roundtable/discussion-invite-presenter';
++import type { Participant } from '@/lib/types/roundtable';
++
++const teacher: Participant = {
++  id: 'teacher',
++  name: '老师',
++  avatar: '/teacher.png',
++  role: 'teacher',
++  isOnline: true,
++};
++const student: Participant = {
++  id: 'classmate',
++  name: '同学',
++  avatar: '/student.png',
++  role: 'student',
++  isOnline: true,
++};
++
++describe('discussion invitation display anchors', () => {
++  it('anchors an available initiator to that student', () => {
++    expect(resolveDiscussionInvitePresenter([teacher, student], student.id)).toEqual({
++      role: 'student',
++      participant: student,
++    });
++  });
++
++  it('uses the visible teacher when a restored initiator is missing or unspecified', () => {
++    for (const agentId of ['previous-classmate', undefined, teacher.id]) {
++      expect(resolveDiscussionInvitePresenter([teacher, student], agentId)).toEqual({
++        role: 'teacher',
++        participant: teacher,
++      });
++    }
++  });
++
++  it('keeps the default teacher anchor available without any teacher record', () => {
++    expect(resolveDiscussionInvitePresenter([student], 'previous-classmate')).toEqual({
++      role: 'teacher',
++      participant: null,
++    });
++  });
++});

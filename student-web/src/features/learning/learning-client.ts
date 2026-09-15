@@ -1,6 +1,7 @@
 import {
   learningAnswerResponseSchema,
   learningCourseDetailResponseSchema,
+  learningCourseStartResponseSchema,
   learningFavoriteResponseSchema,
   learningLibraryResponseSchema,
   learningReportSchema,
@@ -79,6 +80,17 @@ export async function setLearningFavorite(courseId: string, version: string, fav
       { method: favorite ? "PUT" : "DELETE", body: JSON.stringify({}) },
     ),
   );
+}
+
+export async function startLearningCourse(courseId: string, version: string) {
+  const result = learningCourseStartResponseSchema.safeParse(await requestJson(
+    `/api/learning/courses/${encodeURIComponent(courseId)}/versions/${encodeURIComponent(version)}/start`,
+    { method: "POST", body: JSON.stringify({}) },
+  ));
+  if (!result.success || result.data.courseId !== courseId || result.data.courseVersion !== version) {
+    throw new LearningClientError(502, "learning_course_start_invalid", "暂时无法进入这节课，请再试一次");
+  }
+  return result.data;
 }
 
 export async function getLearningTeachers(subject?: LearningSubject) {

@@ -1,0 +1,217 @@
+diff --git a/packages/@openmaic/storage/src/agent-session/types.ts b/packages/@openmaic/storage/src/agent-session/types.ts
+--- a/packages/@openmaic/storage/src/agent-session/types.ts
++++ b/packages/@openmaic/storage/src/agent-session/types.ts
+@@ -390,6 +390,7 @@
+     sessionId: string,
+     afterSeq: number,
+     limit?: number,
++    projection?: { excludeTypes: readonly string[]; throughSeq: number },
+   ): Promise<PersistedAgentSessionEvent[]>;
+   /** Returns raw rows scanned separately from the compacted replay frames. */
+   readEventsAfterForReplay(
+diff --git a/packages/@openmaic/storage/src/agent-session/pg.ts b/packages/@openmaic/storage/src/agent-session/pg.ts
+--- a/packages/@openmaic/storage/src/agent-session/pg.ts
++++ b/packages/@openmaic/storage/src/agent-session/pg.ts
+@@ -931,7 +931,13 @@
+     sessionId: string,
+     afterSeq: number,
+     limit = 500,
++    projection?: { excludeTypes: readonly string[]; throughSeq: number },
+   ): Promise<PersistedAgentSessionEvent[]> {
++    if (projection && (!Number.isSafeInteger(projection.throughSeq) || projection.throughSeq < 0
++        || !Array.isArray(projection.excludeTypes)
++        || projection.excludeTypes.some((type) => typeof type !== 'string' || !type))) {
++      throw new Error('AGENT_SESSION_EVENT_PROJECTION_INVALID');
++    }
+     const result = await this.queryable.query<{
+       seq: number;
+       ts: number | string;
+@@ -943,8 +949,10 @@
+        FROM ${this.table('events')} e
+        INNER JOIN ${this.table('sessions')} s ON s.id = e.session_id
+        WHERE e.session_id = $1 AND e.seq > $2 AND s.deleted_at IS NULL
++       ${projection ? 'AND NOT (e.type = ANY($4::text[])) AND e.seq <= $5' : ''}
+        ORDER BY e.seq LIMIT $3`,
+-      [sessionId, afterSeq, limit],
++      projection ? [sessionId, afterSeq, limit, [...projection.excludeTypes], projection.throughSeq]
++        : [sessionId, afterSeq, limit],
+     );
+     return result.rows.map((row) => ({
+       id: Number(row.seq),
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -85,6 +85,7 @@
+ } from '@/lib/server/agent-runtime/session-materials';
+ import { getOwnerScopedDocumentStore } from '@/lib/server/agent-runtime/owner-scoped-documents';
+ import { getAgentSessionStore } from '@/lib/server/agent-runtime/store';
++import { readMiraFormalSessionEvents } from './mira-formal-session-events';
+ import { resolveWebSearchCapability } from '@/lib/server/agent-runtime/web-search';
+ import type { QuizQuestion, Scene, Stage } from '@/lib/types/stage';
+ import {
+@@ -100,7 +101,6 @@
+ 
+ const FORMAL_SESSION_TIMEOUT_MS = 60 * 60 * 1_000;
+ const FORMAL_SESSION_POLL_MS = 2_000;
+-const MAX_AGENT_EVENTS = 20_000;
+ const PROFESSIONAL_CREATION_RECEIPT_VERSION =
+   'mira.openmaic.professional-creation-receipt.v1' as const;
+ const RESEARCH_RECEIPT_VERSION = 'mira.openmaic.professional-research-receipt.v1' as const;
+@@ -703,16 +703,7 @@
+ }
+ 
+ async function readAllSessionEvents(sessionId: string): Promise<PersistedAgentSessionEvent[]> {
+-  const store = await getAgentSessionStore();
+-  const events: PersistedAgentSessionEvent[] = [];
+-  let cursor = 0;
+-  for (;;) {
+-    const page = await store.readEventsAfter(sessionId, cursor, 500);
+-    events.push(...page);
+-    if (events.length > MAX_AGENT_EVENTS) throw new Error('FORMAL_PROFESSIONAL_EVENT_LIMIT');
+-    if (page.length < 500) return events;
+-    cursor = page.at(-1)!.id;
+-  }
++  return readMiraFormalSessionEvents(await getAgentSessionStore(), sessionId);
+ }
+ 
+ export function resolveMiraFormalStageId(
+diff --git a/lib/server/mira-formal-session-events.ts b/lib/server/mira-formal-session-events.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-session-events.ts
+@@ -0,0 +1,37 @@
++import type { PersistedAgentSessionEvent } from '@openmaic/storage';
++
++type EvidenceReader = {
++  lastEventSeq(sessionId: string): Promise<number>;
++  readEventsAfter(sessionId: string, afterSeq: number, limit?: number,
++    projection?: { excludeTypes: readonly string[]; throughSeq: number }): Promise<PersistedAgentSessionEvent[]>;
++};
++const PAGE_SIZE = 500;
++const MAX_STRUCTURAL_EVENTS = 20_000;
++
++/** Keep every structural/unknown event; only the known streaming delta is omitted.
++ * PostgreSQL retains the original log. The fixed high-water mark makes a review
++ * independent of new tokens arriving while its evidence pages are being read. */
++export async function readMiraFormalSessionEvents(store: EvidenceReader, sessionId: string) {
++  const throughSeq = await store.lastEventSeq(sessionId);
++  if (!Number.isSafeInteger(throughSeq) || throughSeq < 0)
++    throw new Error('FORMAL_PROFESSIONAL_EVENT_CURSOR_INVALID');
++  const events: PersistedAgentSessionEvent[] = [];
++  let cursor = 0;
++  while (cursor < throughSeq) {
++    const page = await store.readEventsAfter(sessionId, cursor, PAGE_SIZE,
++      { excludeTypes: ['message_update'], throughSeq });
++    if (page.length > PAGE_SIZE) throw new Error('FORMAL_PROFESSIONAL_EVENT_PAGE_INVALID');
++    for (const event of page) {
++      if (!Number.isSafeInteger(event.id) || event.id <= cursor || event.id > throughSeq)
++        throw new Error('FORMAL_PROFESSIONAL_EVENT_CURSOR_INVALID');
++      cursor = event.id;
++      // Also preserve bounded memory with an older store that does not yet
++      // implement SQL projection. Unknown types are intentionally not dropped.
++      if (event.type !== 'message_update') events.push(event);
++      if (events.length > MAX_STRUCTURAL_EVENTS)
++        throw new Error('FORMAL_PROFESSIONAL_EVENT_LIMIT');
++    }
++    if (page.length < PAGE_SIZE) break;
++  }
++  return events;
++}
+diff --git a/tests/server/mira-formal-quality-normalization.test.ts b/tests/server/mira-formal-quality-normalization.test.ts
+--- a/tests/server/mira-formal-quality-normalization.test.ts
++++ b/tests/server/mira-formal-quality-normalization.test.ts
+@@ -11,7 +11,8 @@
+ 
+ const mocks = vi.hoisted(() => ({ session: vi.fn(), events: vi.fn() }));
+ vi.mock('@/lib/server/agent-runtime/store', () => ({
+-  getAgentSessionStore: async () => ({ getSession: mocks.session, readEventsAfter: mocks.events }),
++  getAgentSessionStore: async () => ({ getSession: mocks.session, readEventsAfter: mocks.events,
++    lastEventSeq: async () => 1 }),
+ }));
+ vi.mock('@/lib/server/agent-runtime/session-materials', () => ({
+   listSessionMaterials: async () => [
+@@ -76,6 +77,7 @@
+   });
+   mocks.events.mockResolvedValue([
+     {
++      id: 1, ts: 1, attempt: 1,
+       type: MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
+       data: {
+         kind: MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
+diff --git a/tests/server/mira-formal-session-events.test.ts b/tests/server/mira-formal-session-events.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-session-events.test.ts
+@@ -0,0 +1,72 @@
++import { describe, expect, it, vi } from 'vitest';
++import type { PersistedAgentSessionEvent } from '@openmaic/storage';
++import { PgAgentSessionStore } from '../../packages/@openmaic/storage/src/agent-session/pg';
++import { readMiraFormalSessionEvents } from '@/lib/server/mira-formal-session-events';
++
++const event = (id: number, type: string): PersistedAgentSessionEvent =>
++  ({ id, type, ts: id, attempt: 1, data: { stageId: 'same-stage', receipt: id } });
++function reader(events: PersistedAgentSessionEvent[], projected = true) {
++  const highWater = events.at(-1)?.id ?? 0;
++  return {
++    lastEventSeq: vi.fn(async () => highWater),
++    readEventsAfter: vi.fn(async (_session: string, after: number, limit = 500,
++      projection?: { excludeTypes: readonly string[]; throughSeq: number }) =>
++      events.filter(e => e.id > after && e.id <= (projection?.throughSeq ?? highWater)
++        && (!projected || !projection?.excludeTypes.includes(e.type))).slice(0, limit)),
++  };
++}
++
++describe('formal structural event projection', () => {
++  it('retains every receipt and unknown type after more than 20k streaming deltas', async () => {
++    const raw = Array.from({ length: 25_001 }, (_, i) => event(i + 1, 'message_update'));
++    const types = ['stage_link', 'course_link', 'mira_formal_research_search',
++      'mira_formal_skill_scene_context', 'mira_formal_image_generated', 'mira_formal_video_generated',
++      'tool_execution_end', 'session_end', 'future_structural_receipt'];
++    const receipts = types.map((type, i) => event(25_002 + i, type));
++    raw.push(...receipts);
++    for (const projected of [true, false]) {
++      const store = reader(raw, projected);
++      expect(await readMiraFormalSessionEvents(store, 'session')).toEqual(receipts);
++      expect(store.lastEventSeq).toHaveBeenCalledTimes(1);
++      expect(store.readEventsAfter.mock.calls.every(call => call[2] === 500
++        && call[3]?.throughSeq === 25_010 && call[3]?.excludeTypes.join() === 'message_update')).toBe(true);
++    }
++    expect(raw).toHaveLength(25_010);
++  });
++
++  it('reads exact page boundaries and excludes events appended beyond the starting watermark', async () => {
++    const raw = Array.from({ length: 1_000 }, (_, i) => event((i + 1) * 3, 'future_receipt'));
++    const store = reader(raw);
++    raw.push(event(3001, 'stage_link'));
++    const result = await readMiraFormalSessionEvents(store, 'session');
++    expect(result).toHaveLength(1000);
++    expect(result.at(-1)?.id).toBe(3000);
++    expect(store.readEventsAfter.mock.calls.map(call => call[1])).toEqual([0, 1500]);
++  });
++
++  it('keeps the 20k structural limit including unknown future events', async () => {
++    const store = reader(Array.from({ length: 20_001 }, (_, i) => event(i + 1, 'future_receipt')));
++    await expect(readMiraFormalSessionEvents(store, 'session')).rejects.toThrow('FORMAL_PROFESSIONAL_EVENT_LIMIT');
++  });
++
++  it('fails closed on repeated, reversed or out-of-watermark cursors', async () => {
++    for (const page of [[event(0, 'stage_link')], [event(2, 'stage_link'), event(1, 'course_link')],
++      [event(11, 'stage_link')]]) {
++      await expect(readMiraFormalSessionEvents({ lastEventSeq: async () => 10,
++        readEventsAfter: async () => page }, 'session')).rejects.toThrow('FORMAL_PROFESSIONAL_EVENT_CURSOR_INVALID');
++    }
++  });
++
++  it('filters in SQL before selecting payloads and preserves the legacy read API', async () => {
++    const query = vi.fn(async (_sql: string, _values?: unknown[]) => ({ rows: [{ seq: 9001, ts: 1, attempt: 1,
++      type: 'future_receipt', data: { unchanged: true } }] }));
++    const store = new PgAgentSessionStore({ query } as never, { withTransaction: vi.fn() });
++    await store.readEventsAfter('session', 500, 500, { excludeTypes: ['message_update'], throughSeq: 9500 });
++    expect(query.mock.calls[0]?.[0]).toContain('AND NOT (e.type = ANY($4::text[])) AND e.seq <= $5');
++    expect(query.mock.calls[0]?.[1]).toEqual(['session', 500, 500, ['message_update'], 9500]);
++    query.mockClear();
++    await store.readEventsAfter('session', 500, 500);
++    expect(query.mock.calls[0]?.[0]).not.toContain('ANY($4');
++    expect(query.mock.calls[0]?.[1]).toEqual(['session', 500, 500]);
++  });
++});

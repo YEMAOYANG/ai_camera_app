@@ -1,0 +1,142 @@
+diff --git a/lib/server/mira-formal-exploration.ts b/lib/server/mira-formal-exploration.ts
+--- a/lib/server/mira-formal-exploration.ts
++++ b/lib/server/mira-formal-exploration.ts
+@@ -1,6 +1,7 @@
+ import type { Frame, Page } from 'playwright-core';
+ import { createHash } from 'node:crypto';
+ import { VISUAL_RUBRIC } from './mira-formal-visual-contract';
++import { sameNumericResetVisual, type NumericResetCapture } from './mira-formal-reset-visual';
+ 
+ export const EXPLORATION_SCHEMA = 'mira.openmaic.multistate-exploration.v1' as const;
+ export const EXPLORATION_POLICY = {
+@@ -225,6 +226,7 @@
+   activate: (selector: string, inputMode: 'pointer' | 'touch') => Promise<void>): Promise<ExplorationObservation> {
+   validateExploration(model);
+   const sha = (v: string | Buffer) => createHash('sha256').update(v).digest('hex');
++  const captures = new Map<string, NumericResetCapture>();
+   const observe = async (s: ExplorationState) => {
+     await target.waitForFunction(({model,s}) => {
+       const f = document.querySelector<HTMLElement>(model.feedbackSelector);
+@@ -262,9 +264,12 @@
+           || Math.abs(p.width/w.width-ratio)>0.015) throw new Error('fraction mechanism output or SVG geometry is incorrect');
+         numeric={numerator,denominator,decimal,percent,diagramRatio:p.width/w.width};
+       }
+-      return {feedback:feedback.innerText,numeric};
++      return {feedback:feedback.innerText,numeric,
++        svg: diagram.tagName.toLowerCase() === 'svg' ? diagram.outerHTML : null,
++        rect: {x:r.x,y:r.y,width:r.width,height:r.height}};
+     }, {model,s});
+     const png=await captureFormalDiagram(target, model.diagramSelector);
++    captures.set(s.id, {png, ...actual});
+     return {stateId:s.id,diagramSha256:sha(png),feedbackSha256:sha(actual.feedback),...(actual.numeric?{numeric:actual.numeric}:{})};
+   };
+   const states: ExplorationObservation['states']=[];
+@@ -280,9 +285,14 @@
+   if (new Set(states.map(s=>s.diagramSha256)).size !== states.length
+     || new Set(states.map(s=>s.feedbackSha256)).size !== states.length) throw new Error('exploration states do not change model and explanation');
+   await activate(model.reset.selector,inputMode);
++  const originalCapture=captures.get(model.reset.stateId)!;
+   const reset=await observe(model.states.find(s=>s.id===model.reset.stateId)!);
+   const baseline=states.find(s=>s.stateId===model.reset.stateId)!;
+-  if (reset.diagramSha256!==baseline.diagramSha256 || reset.feedbackSha256!==baseline.feedbackSha256)
++  const diagramMatches=reset.diagramSha256===baseline.diagramSha256 ||
++    (model.mechanism.kind==='fraction-ratio-percentage.v1' &&
++      reset.feedbackSha256===baseline.feedbackSha256 &&
++      await sameNumericResetVisual(originalCapture,captures.get(model.reset.stateId)!));
++  if (!diagramMatches || reset.feedbackSha256!==baseline.feedbackSha256)
+     throw new Error('reset does not restore the original model and feedback');
+   return {mechanism:model.mechanism.kind,verification:model.mechanism.kind==='fraction-ratio-percentage.v1'
+     ?'independent_numeric_svg':'structural_then_semantic_visual_review',inputMode,resetPassed:true,states};
+diff --git a/lib/server/mira-formal-reset-visual.ts b/lib/server/mira-formal-reset-visual.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-reset-visual.ts
+@@ -0,0 +1,39 @@
++import sharp from 'sharp';
++
++export type NumericResetCapture = {
++  png: Buffer;
++  svg: string | null;
++  rect: { x: number; y: number; width: number; height: number };
++  feedback: string;
++  numeric: unknown;
++};
++
++/** Only an independently verified numeric reset may use this bounded AA check. */
++export async function sameNumericResetVisual(a: NumericResetCapture, b: NumericResetCapture): Promise<boolean> {
++  if (!a.svg || a.svg !== b.svg || a.feedback !== b.feedback ||
++      JSON.stringify(a.rect) !== JSON.stringify(b.rect) ||
++      !a.numeric || JSON.stringify(a.numeric) !== JSON.stringify(b.numeric)) return false;
++  try {
++    const [left, right] = await Promise.all([a.png, b.png].map(png =>
++      sharp(png, { limitInputPixels: 4_000_000 }).ensureAlpha().raw().toBuffer({ resolveWithObject: true })));
++    const { width, height, channels } = left.info;
++    if (channels !== 4 || right.info.channels !== 4 || width !== right.info.width || height !== right.info.height) return false;
++    const limit = Math.min(64, Math.floor(width * height * 0.0005));
++    let changed = 0;
++    for (let pixel = 0; pixel < width * height; pixel++) {
++      const offset = pixel * 4;
++      if (left.data[offset + 3] !== right.data[offset + 3]) return false;
++      const delta = [0, 1, 2].map(channel => Math.abs(left.data[offset + channel] - right.data[offset + channel]));
++      if (delta.some(value => value > 1)) return false;
++      if (delta.every(value => value === 0)) continue;
++      if (++changed > limit) return false;
++      const x = pixel % width, y = Math.floor(pixel / width);
++      const neighbors = [x > 0 ? pixel - 1 : -1, x + 1 < width ? pixel + 1 : -1,
++        y > 0 ? pixel - width : -1, y + 1 < height ? pixel + width : -1];
++      const edge = neighbors.some(neighbor => neighbor >= 0 && [0, 1, 2].some(channel =>
++        Math.abs(left.data[offset + channel] - left.data[neighbor * 4 + channel]) >= 8));
++      if (!edge) return false;
++    }
++    return true;
++  } catch { return false; }
++}
+diff --git a/tests/server/mira-formal-reset-visual.test.ts b/tests/server/mira-formal-reset-visual.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-reset-visual.test.ts
+@@ -0,0 +1,44 @@
++import { describe, expect, it } from 'vitest';
++import sharp from 'sharp';
++import { sameNumericResetVisual, type NumericResetCapture } from '@/lib/server/mira-formal-reset-visual';
++
++async function capture(changes: Array<[number, number, number]> = [], width=712): Promise<NumericResetCapture> {
++  const height=150, bytes=Buffer.alloc(width*height*4);
++  for(let y=0;y<height;y++) for(let x=0;x<width;x++) {
++    const color=y===37?[129,177,239,255]:y>37&&y<100?[26,115,232,255]:[250,252,255,255];
++    color.forEach((v,c)=>{bytes[(y*width+x)*4+c]=v;});
++  }
++  for(const [pixel,channel,delta] of changes) bytes[pixel*4+channel]+=delta;
++  return {png:await sharp(bytes,{raw:{width,height,channels:4}}).png().toBuffer(),
++    svg:'<svg viewBox="0 0 4 120"><rect width="1" height="50"/></svg>',
++    rect:{x:461,y:190,width,height},feedback:'1÷4=0.25，也就是25%。',
++    numeric:{numerator:1,denominator:4,decimal:0.25,percent:25,diagramRatio:0.25}};
++}
++describe('independent numeric reset raster comparison',()=>{
++  it('accepts the observed twenty top-edge pixels with one RGB level difference',async()=>{
++    const baseline=await capture(), reset=await capture(Array.from({length:20},(_,i)=>[37*712+i+3,0,1]));
++    expect(baseline.png.equals(reset.png)).toBe(false);
++    expect(await sameNumericResetVisual(baseline,reset)).toBe(true);
++  });
++  it.each(['svg','feedback','numeric','rect'] as const)('rejects changed %s even with only edge noise',async key=>{
++    const a=await capture(),b=await capture([[37*712+3,0,1]]);
++    if(key==='svg')b.svg='<svg viewBox="0 0 5 120"/>';
++    if(key==='feedback')b.feedback='40%';
++    if(key==='numeric')b.numeric={numerator:2,denominator:5};
++    if(key==='rect')b.rect={...b.rect,x:462};
++    expect(await sameNumericResetVisual(a,b)).toBe(false);
++  });
++  it('rejects one large pixel change, alpha changes and flat-area noise',async()=>{
++    for(const change of [[37*712+3,0,2],[37*712+3,3,-1],[10*712+20,0,1]] as Array<[number,number,number]>)
++      expect(await sameNumericResetVisual(await capture(),await capture([change]))).toBe(false);
++  });
++  it('rejects the relative and absolute pixel budgets independently',async()=>{
++    expect(await sameNumericResetVisual(await capture(),await capture(Array.from({length:54},(_,i)=>[37*712+i,0,1])))).toBe(false);
++    expect(await sameNumericResetVisual(await capture([],2000),await capture(Array.from({length:65},(_,i)=>[37*2000+i,0,1]),2000))).toBe(false);
++  });
++  it('rejects a changed image size and invalid image bytes',async()=>{
++    const a=await capture(),b=await capture([],711);b.rect=a.rect;
++    expect(await sameNumericResetVisual(a,b)).toBe(false);
++    expect(await sameNumericResetVisual(a,{...a,png:Buffer.from('not a png')})).toBe(false);
++  });
++});

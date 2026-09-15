@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, LoaderCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, LoaderCircle, Orbit, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -274,7 +274,7 @@ function ClassroomPlayerReady({
           <div className={`classroom-stage classroom-stage-${scene.type}`}>
             <ClassroomSceneContent scene={scene} focusTarget={playback.focusTarget} session={learningSession} question={question} teacher={teacher} quizEnabled={scene.type !== "quiz" || action?.type === "await_interaction"} onSession={setLearningSession} onQuestion={setQuestion} onInteractionComplete={onInteractionComplete} onQuizComplete={handleQuizComplete} />
           </div>
-          {playback.error ? <div className="classroom-error" role="alert"><AlertCircle className="size-5" /><p>{playback.error}</p><Button variant="secondary" size="compact" onClick={() => void reloadRuntime()}><RefreshCw className="size-4" />同步进度</Button></div> : null}
+          {playback.error ? <div className="mt-3 flex flex-wrap items-center gap-3 rounded-[18px] border border-[var(--mira-border)] bg-[var(--mira-surface)] p-4 text-[var(--mira-danger)]" role="alert"><AlertCircle className="size-5 shrink-0" aria-hidden="true" /><p className="min-w-0 flex-1 font-semibold">{playback.error}</p><Button variant="secondary" size="compact" onClick={() => void reloadRuntime()}><RefreshCw className="size-4" />同步进度</Button></div> : null}
           <div className="classroom-companion-row">
             <TeacherDock teacher={teacher} text={playback.teacherText} status={playback.status} audioSource={audioSource} progress={progress} onReplay={replayTeacher} />
             <PlaybackControls status={playback.status} sceneNumber={sceneIndex + 1} sceneCount={scenes.length} canPrevious={sceneIndex > 0} canNext={sceneIndex < authoritativeSceneIndex} waitingLabel={waitingLabel} waitingDisabled={action?.type === "await_interaction" && !interactionResult} onToggle={togglePlayback} onPrevious={() => moveScene(-1)} onNext={() => moveScene(1)} onContinue={continueWaiting} onOpenRail={() => setRailOpen(true)} />
@@ -299,7 +299,7 @@ function scenePhaseLabel(scene: ReturnType<typeof currentScene>) {
 }
 
 export function ClassroomBooting() {
-  return <main id="main-content" className="grid min-h-screen place-items-center"><p className="flex items-center gap-3 rounded-full bg-white px-5 py-3 font-extrabold text-[var(--mira-muted)] shadow-sm"><LoaderCircle className="size-5 animate-spin text-[var(--mira-brand)]" />Mira 正在打开互动课堂</p></main>;
+  return <main id="main-content" className="space-route-state" aria-busy="true"><div className="space-route-state-content" role="status"><span className="space-route-orbit" aria-hidden="true"><Orbit /></span><p className="space-route-eyebrow">MIRA 学习空间</p><h1>准备进入课堂</h1><p><LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />Mira 正在打开互动课堂</p></div></main>;
 }
 
 function createIdempotencyKey(sessionId: string, actionId: string) {

@@ -1,15 +1,19 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LearningCourseDetail } from "@/features/learning/learning-course-detail";
 import type { LearningCourseDetailResponse } from "@/lib/contracts/learning";
 
-const { getLearningCourse } = vi.hoisted(() => ({
+const { getLearningCourse, startLearningCourse } = vi.hoisted(() => ({
   getLearningCourse: vi.fn(),
+  startLearningCourse: vi.fn(),
 }));
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }) }));
 
 vi.mock("@/features/learning/learning-client", () => ({
   getLearningCourse,
+  startLearningCourse,
   setLearningFavorite: vi.fn(),
 }));
 
@@ -50,6 +54,7 @@ describe("LearningCourseDetail formal classroom gate", () => {
   beforeEach(() => {
     getLearningCourse.mockReset();
     getLearningCourse.mockResolvedValue(detail);
+    startLearningCourse.mockReset();
   });
 
   it("keeps package-only content in preparation instead of opening a fallback player", async () => {
@@ -65,6 +70,17 @@ describe("LearningCourseDetail formal classroom gate", () => {
     expect(screen.getByText("完整课堂准备中")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "今天想和谁一起学？" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /开始上课/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /开始上课/ })).not.toBeInTheDocument();
+  });
+
+  it("starts the exact ready version without requiring a scheduled task", async () => {
+    getLearningCourse.mockResolvedValue({ ...detail, item: { ...detail.item, taskId: null, fullClassroomAvailable: true } });
+    startLearningCourse.mockRejectedValue(new Error("暂时没有连上，请再试一次"));
+    render(<LearningCourseDetail student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} courseId="course-formal-1" version="1" />);
+    fireEvent.click(await screen.findByRole("button", { name: "开始上课" }));
+    expect(startLearningCourse).toHaveBeenCalledExactlyOnceWith("course-formal-1", "1");
+    expect(await screen.findByRole("alert")).toHaveTextContent("暂时没有连上，请再试一次");
+    expect(screen.queryByText("完整课堂准备中")).not.toBeInTheDocument();
   });
 
   it("silently opens the action when the formal classroom becomes ready", async () => {

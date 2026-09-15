@@ -1,0 +1,110 @@
+/* Motion stays on the world around the lesson; reading surfaces remain stable. */
+.space-explore-library { --explore-glow: #65dcf0; }
+.space-explore-cover { transform-origin: center bottom; }
+.space-explore-cover .space-course-cover-art img,
+.space-explore-detail .space-detail-art img,
+.space-explore-launch .space-continue-art img {
+  transform: scale(1.06);
+  animation: space-explore-float 12s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.space-explore-library .space-library-course:nth-child(2n) .space-course-cover-art img { animation-delay: -4s; }
+.space-explore-library .space-library-course:nth-child(3n) .space-course-cover-art img { animation-delay: -8s; }
+.space-explore-cover::before {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(112deg, transparent 20%, #c9faff35 47%, transparent 66%);
+  transform: translateX(-120%); opacity: 0;
+}
+.space-explore-library .space-library-course { transition: border-color 240ms, box-shadow 240ms; }
+.space-explore-library .space-library-course:hover { transform: none; }
+.space-explore-library .space-filter-tabs button,
+.space-explore-library .space-subject-tabs button { min-height: 44px; position: relative; isolation: isolate; overflow: hidden; }
+.space-explore-library .space-filter-tabs button.is-active { text-shadow: 0 0 16px #d8ff6644; }
+.space-explore-library .space-subject-tabs button.is-active { box-shadow: 0 0 20px #d8ff661c; }
+.space-explore-library .space-filter-tabs button.is-active::after,
+.space-explore-library .space-subject-tabs button.is-active::after {
+  content: ''; pointer-events: none; position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 30%, #ffffff40 50%, transparent 70%);
+  transform: translateX(-150%); animation: space-explore-signal 6s ease-in-out infinite;
+}
+.space-explore-launch { box-shadow: inset 0 0 30px #65dcf00a; }
+.space-explore-launch::before {
+  content: ''; pointer-events: none; position: absolute; z-index: -1;
+  width: 300px; height: 300px; right: 9%; top: 50%; border: 1px solid #65dcf035;
+  border-radius: 50%; box-shadow: 0 0 0 18px #65dcf007, 0 0 0 48px #65dcf009;
+  transform: translateY(-50%) rotateX(68deg) rotate(-16deg);
+}
+.space-explore-launch .space-continue-content { position: relative; }
+.space-explore-launch .space-continue-content::after {
+  content: ''; pointer-events: none; position: absolute; bottom: 0; left: 0;
+  width: 25%; height: 1px; opacity: 0;
+  background: linear-gradient(90deg, transparent, #8bedff, transparent);
+  box-shadow: 0 0 9px #65dcf080; animation: space-explore-launch 7s ease-in-out infinite;
+}
+.space-explore-detail .space-detail-hero { border-color: #65dcf03d; box-shadow: inset 0 0 50px #65dcf008; }
+.space-explore-detail .space-detail-hero::before {
+  content: ''; pointer-events: none; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(ellipse at 78% 35%, #65dcf025, transparent 45%);
+  animation: space-explore-light 9s ease-in-out infinite alternate;
+}
+.space-goal-orbit { position: relative; }
+.space-goal-orbit li { position: relative; min-width: 0; gap: 14px; }
+.space-goal-orbit .space-goal-node {
+  position: relative; flex: none; display: grid; place-items: center;
+  width: 34px; height: 34px; border: 1px solid #65dcf052; border-radius: 50%;
+  font-size: 14px; line-height: 1; color: #adefff; background: #0c1b2b;
+  box-shadow: 0 0 0 5px #65dcf007;
+}
+.space-goal-node::after { content: ''; position: absolute; width: 4px; height: 4px; top: 3px; right: 3px; border-radius: 50%; background: #a5eeff; box-shadow: 0 0 8px #65dcf090; }
+.space-goal-orbit li:not(:last-child)::after {
+  content: ''; pointer-events: none; position: absolute; top: -6px; left: 17px;
+  width: calc(100% + 7px); height: 8px; border-top: 1px dashed #65dcf030; border-radius: 50%;
+}
+.space-goal-orbit li > div { position: relative; z-index: 1; padding-right: 6px; }
+.space-goal-orbit li > div > h3 { color: #e4f6ff; }
+.space-favorite, .space-detail-favorite { position: relative; }
+.space-favorite-burst {
+  position: absolute; pointer-events: none; display: block; width: 48px; height: 48px;
+  top: 50%; left: 50%; opacity: 0; color: #d8ff66;
+  animation: space-explore-favorite 700ms ease-out both;
+}
+.space-favorite-burst > svg { width: 19px; height: 19px; position: absolute; top: 0; right: 0; filter: drop-shadow(0 0 5px #d8ff6670); }
+.space-favorite-burst > i { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #a7f1ff; left: 2px; top: 7px; box-shadow: 0 0 5px #65dcf0; }
+.space-favorite-burst > i:last-child { left: 18px; top: 43px; width: 3px; height: 3px; }
+@keyframes space-explore-float { from { transform: scale(1.06) translate3d(-.4%, .5%, 0); } to { transform: scale(1.09) translate3d(.4%, -.7%, 0); } }
+@keyframes space-explore-signal { 0%, 70% { transform: translateX(-150%); } 100% { transform: translateX(150%); } }
+@keyframes space-explore-launch { 0%, 65% { transform: translateX(-100%); opacity: 0; } 72% { opacity: .85; } 100% { transform: translateX(500%); opacity: 0; } }
+@keyframes space-explore-light { from { opacity: .35; } to { opacity: 1; } }
+@keyframes space-explore-favorite { 0% { transform: translate(-50%, -50%) scale(.65); opacity: 0; } 22% { opacity: 1; } 100% { transform: translate(-50%, -65%) scale(1.6); opacity: 0; } }
+@keyframes space-explore-shine { 0% { transform: translateX(-120%); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateX(120%); opacity: 0; } }
+@media (hover: hover) and (pointer: fine) {
+  .space-explore-library .space-library-course:hover { border-color: #65dcf080; box-shadow: 0 8px 28px #00000030, 0 0 20px #65dcf014; }
+  .space-explore-cover { transition: transform 350ms cubic-bezier(.2,.7,.2,1); }
+  .space-explore-library .space-library-course:hover .space-explore-cover { transform: perspective(900px) rotateX(2deg) scale(1.025); }
+  .space-explore-library .space-library-course:hover .space-explore-cover::before { animation: space-explore-shine 850ms ease-out; }
+}
+@media (max-width: 760px) {
+  .space-goal-orbit li:not(:last-child)::after { top: 39px; left: 17px; width: 0; height: calc(100% - 19px); border-top: 0; border-left: 1px dashed #65dcf030; }
+  .space-goal-orbit li > div { background: transparent; }
+}
+/* The data attribute may live on this page shell or a surrounding shell. */
+:is([data-space-motion="paused"], [data-space-motion="hidden"]) :is(.space-course-cover-art, .space-detail-art, .space-continue-art) img,
+:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-favorite-burst,
+:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-explore-cover::before,
+:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-detail-hero::before,
+:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-continue-content::after,
+:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-filter-tabs button::after,
+:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-subject-tabs button::after { animation-play-state: paused !important; }
+:is([data-space-motion="paused"], [data-space-motion="hidden"], [data-space-motion="reduced"]) .space-library-course:hover .space-explore-cover { transform: none; transition: none; }
+[data-space-motion="reduced"] :is(.space-course-cover-art, .space-detail-art, .space-continue-art) img,
+[data-space-motion="reduced"] .space-favorite-burst,
+[data-space-motion="reduced"] .space-explore-cover::before,
+[data-space-motion="reduced"] .space-detail-hero::before,
+[data-space-motion="reduced"] .space-continue-content::after,
+[data-space-motion="reduced"] .space-filter-tabs button::after,
+[data-space-motion="reduced"] .space-subject-tabs button::after { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .space-explore-library *, .space-explore-library *::before, .space-explore-library *::after,
+  .space-explore-detail *, .space-explore-detail *::before, .space-explore-detail *::after { animation: none !important; transition: none !important; }
+  .space-explore-library .space-library-course:hover .space-explore-cover { transform: none; }
+}

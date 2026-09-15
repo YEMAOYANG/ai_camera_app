@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import copy
+import json
 import unittest
 from contextlib import contextmanager
 from unittest.mock import patch
 
 from repositories.course_supply_inventory import inherited_scope_requests, published_supply
 from repositories.course_supply_repository import requested_supply
+from repositories.lesson_package_repository import LessonPackageRepository
 from services import course_library_service as supply
 from services.learning_curriculum_preparation_contract import build_preparation_target
 
@@ -250,6 +252,97 @@ class CourseSupplyAvailabilityTest(unittest.TestCase):
                      "asset.status <> 'ready'", "asset.scan_status <> 'passed'",
                      "asset_review.status <> 'approved'", "asset_variant.status = 'ready'"):
             self.assertIn(gate, sql)
+
+
+class PlayfulGenerationSupplyTest(unittest.TestCase):
+    def setUp(self):
+        self.target = build_preparation_target('primary_6')
+        self.target['formalRuntimePolicy']['professionalCreationPolicy']['playfulLearningPolicy'] = {
+            'policyId': 'test.playful.v1', 'minimumExplorations': 2,
+            'generatedForLesson': True,
+        }
+        self.legacy_target = copy.deepcopy(self.target)
+        self.legacy_target['formalRuntimePolicy']['professionalCreationPolicy'].pop('playfulLearningPolicy')
+        self.key = ('math', 'fraction_ratio_percentage', 1)
+        # The source rows below stand in for records which already passed every
+        # SQL publication gate. Creation-policy compatibility is tested elsewhere;
+        # these cases isolate the display versus generation reuse decision.
+        self.compatibility = patch('repositories.course_supply_inventory.compatible_preparation_scope_sql',
+                                   return_value=('(TRUE)', ()))
+        self.compatibility.start()
+        self.addCleanup(self.compatibility.stop)
+
+    def published(self, target, *, course='published-course'):
+        return {**pending_slot('math', 'fraction_ratio_percentage'),
+                **available_slot(course=course),
+                'source_target_spec_json': json.dumps(target)}
+
+    def test_students_keep_compatible_legacy_course_while_new_course_is_generating(self):
+        result = published_supply(RecordedConnection([self.published(self.legacy_target)]), self.target)
+        self.assertEqual(result[self.key]['course_id'], 'published-course')
+        self.assertNotIn('source_target_spec_json', result[self.key])
+
+    def test_playful_generation_does_not_reuse_legacy_published_course(self):
+        connection = RecordedConnection([self.published(self.legacy_target)])
+        self.assertEqual(published_supply(connection, self.target, for_generation=True), {})
+        self.assertIn('build.target_spec_json AS source_target_spec_json', connection.calls[0][0])
+
+    def test_exact_playful_policy_reuses_published_course_without_new_dispatch(self):
+        source = copy.deepcopy(self.target)
+        source['formalRuntimePolicy']['professionalCreationPolicy']['playfulLearningPolicy'] = {
+            'generatedForLesson': True, 'minimumExplorations': 2, 'policyId': 'test.playful.v1',
+        }
+        rows = [self.published(self.legacy_target, course='legacy'),
+                self.published(source, course='playful')]
+        result = published_supply(RecordedConnection(rows), self.target, for_generation=True)
+        self.assertEqual(result[self.key]['course_id'], 'playful')
+        self.assertNotIn('source_target_spec_json', result[self.key])
+
+    def test_full_policy_must_match_not_just_policy_id_or_truthiness(self):
+        for field, value in (('minimumExplorations', 1), ('generatedForLesson', 1)):
+            with self.subTest(field=field):
+                source = copy.deepcopy(self.target)
+                source['formalRuntimePolicy']['professionalCreationPolicy']['playfulLearningPolicy'][field] = value
+                self.assertEqual(published_supply(RecordedConnection([self.published(source)]),
+                                                   self.target, for_generation=True), {})
+
+    def test_missing_or_invalid_source_target_cannot_satisfy_playful_generation(self):
+        for raw in (None, 'invalid-json', '[]', '{}'):
+            with self.subTest(raw=raw):
+                row = {**self.published(self.target), 'source_target_spec_json': raw}
+                self.assertEqual(published_supply(RecordedConnection([row]), self.target,
+                                                   for_generation=True), {})
+
+    def test_legacy_generation_reuse_is_unchanged_without_playful_marker(self):
+        row = self.published(self.legacy_target)
+        row.pop('source_target_spec_json')
+        connection = RecordedConnection([row])
+        self.assertEqual(published_supply(connection, self.legacy_target, for_generation=True)[self.key], row)
+        self.assertNotIn('AS source_target_spec_json', connection.calls[0][0])
+
+    def test_content_claim_requires_new_policy_then_stops_once_it_is_published(self):
+        for source, expected in ((self.legacy_target, {self.key: 0}), (self.target, {})):
+            with self.subTest(playful=source == self.target):
+                connection = RecordedConnection([{'id': 'owner'}],
+                    [pending_slot('math', 'fraction_ratio_percentage')], [self.published(source)])
+                self.assertEqual(requested_supply(connection, {'target_spec_json': self.target}), expected)
+                self.assertTrue(all(sql.lstrip().startswith(('SELECT', 'WITH student_runtime_manifests AS ('))
+                                    for sql, _ in connection.calls))
+
+    def test_runtime_claim_uses_each_candidates_frozen_target_not_current_registry(self):
+        old = {**pending_slot('math', 'fraction_ratio_percentage'), 'build_item_id': 'old',
+               'target_spec_json': json.dumps(self.legacy_target)}
+        new = {**old, 'build_item_id': 'new', 'target_spec_json': json.dumps(self.target)}
+        connection = RecordedConnection([old, new])
+
+        def inventory(_conn, target, *, for_generation=False):
+            self.assertTrue(for_generation)
+            return {self.key: available_slot()} if target == self.legacy_target else {}
+
+        with patch('repositories.course_supply_inventory.published_supply', side_effect=inventory) as query:
+            selected = LessonPackageRepository(None).get_next_formal_candidate_authority(connection)
+        self.assertEqual(selected['build_item_id'], 'new')
+        self.assertEqual([call.args[1] for call in query.call_args_list], [self.legacy_target, self.target])
 
 
 if __name__ == '__main__':

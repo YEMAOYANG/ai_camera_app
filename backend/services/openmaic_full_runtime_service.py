@@ -21,6 +21,7 @@ from content.teacher_profiles import (
 from integrations.openmaic_formal_media import (
     professional_policy, generation_options, professional_image_fields,
     media_receipt, validate_classroom_media, validate_media_manifest,
+    REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
 )
 from integrations.openmaic_formal_skills import (
     professional_skill_fields, validate_classroom_skills,
@@ -31,6 +32,7 @@ from integrations.openmaic_formal_video import (
 from integrations.openmaic_formal_pedagogy import (
     adaptive_policy, validate_generation_grade_boundary,
 )
+from integrations.openmaic_formal_playful import playful_generation_kwargs
 from integrations.openmaic_formal_quality import (
     professional_quality_fields, validate_classroom_quality,
 )
@@ -2043,7 +2045,7 @@ class OpenMaicFullRuntimeService:
         if existing is None:
             try:
                 source_job = self.client.get_generation_job(
-                    source_job_id, formal=True
+                    source_job_id, formal=True, **playful_generation_kwargs(generation_contract)
                 )
             except OpenMaicFullRuntimeError as exc:
                 raise OpenMaicRuntimeServiceError(
@@ -2256,7 +2258,8 @@ class OpenMaicFullRuntimeService:
             # durable Agent, but this path never POSTs another generation.
             try:
                 observed = self.client.get_generation_job_by_request_id(
-                    str(runtime["request_id"])
+                    str(runtime["request_id"]),
+                    **playful_generation_kwargs(requested_manifest.get("generationContract")),
                 )
             except OpenMaicFullRuntimeError:
                 return self._runtime_payload(runtime)
@@ -2301,7 +2304,8 @@ class OpenMaicFullRuntimeService:
                 try:
                     authoritative_formal_job = (
                         self.client.get_generation_job_by_request_id(
-                            str(runtime["request_id"])
+                            str(runtime["request_id"]),
+                            **playful_generation_kwargs(requested_manifest.get("generationContract")),
                         )
                     )
                 except OpenMaicFullRuntimeError as exc:
@@ -2353,6 +2357,7 @@ class OpenMaicFullRuntimeService:
             job = authoritative_formal_job or self.client.get_generation_job(
                 job_id,
                 formal=formal_candidate,
+                **playful_generation_kwargs(requested_manifest.get("generationContract")),
             )
             if formal_candidate:
                 expected_input_sha256 = self._formal_input_sha256(
@@ -2640,6 +2645,12 @@ class OpenMaicFullRuntimeService:
                     target_fingerprint=fingerprint,
                 )
                 selected_policy = professional_policy(authority.get("professionalCreationPolicy"))
+                if selected_policy == REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY and not any(
+                    isinstance(supported, Mapping)
+                    and _canonical_sha256(supported) == _canonical_sha256(selected_policy)
+                    for supported in readiness.get("supportedProfessionalPolicies", [])
+                ):
+                    raise ValueError("formal runtime does not advertise the frozen required 3D policy")
                 selected_options = generation_options(selected_policy)
                 teaching_brief = authority.get("teachingBrief")
                 teaching_brief_sha256 = str(
@@ -2824,7 +2835,7 @@ class OpenMaicFullRuntimeService:
                 return self._runtime_payload(runtime)
 
         try:
-            upstream = self.client.get_generation_job_by_request_id(request_key)
+            upstream = self.client.get_generation_job_by_request_id(request_key, **playful_generation_kwargs(generation_contract))
         except OpenMaicFullRuntimeError as exc:
             self._quarantine_formal_candidate(
                 runtime,
@@ -2848,12 +2859,13 @@ class OpenMaicFullRuntimeService:
                     runtime_request_id=request_key,
                     formal_runtime_contract=formal_contract,
                     professional_creation_policy=selected_policy,
+                    **playful_generation_kwargs(generation_contract),
                     **({"paid_budget": paid_budget} if paid_budget is not None else {}),
                 )
             except OpenMaicFullRuntimeError as dispatch_error:
                 try:
                     upstream = self.client.get_generation_job_by_request_id(
-                        request_key
+                        request_key, **playful_generation_kwargs(generation_contract)
                     )
                 except OpenMaicFullRuntimeError:
                     upstream = None
@@ -3165,6 +3177,8 @@ class OpenMaicFullRuntimeService:
         formal_evidence["professionalCreation"] = professional_evidence
         formal_evidence["research"] = research_evidence
         try:
+            from integrations.openmaic_formal_playful import validate_playful_classroom
+            validate_playful_classroom(generation_contract, classroom)
             quality_evidence = validate_classroom_quality(professional_creation, generation_contract, classroom)
             if quality_evidence is not None:
                 formal_evidence["teachingQuality"] = quality_evidence
@@ -3410,6 +3424,7 @@ class OpenMaicFullRuntimeService:
             professional = (
                 OpenMaicFullRuntimeClient._professional_creation_receipt_from_payload(
                     professional_raw,
+                    generation_contract=generation_contract,
                     runtime_request_id=runtime_request_id,
                     classroom_id=classroom_id,
                 )
@@ -3478,7 +3493,7 @@ class OpenMaicFullRuntimeService:
             **professional_image_fields(professional),
             **professional_video_fields(professional),
             **professional_skill_fields(professional),
-            **professional_quality_fields(professional),
+            **professional_quality_fields(professional, generation_contract=generation_contract),
             **professional_interaction_fields(professional),
             "receiptSha256": professional["receiptSha256"],
         }
@@ -4913,6 +4928,7 @@ class OpenMaicFullRuntimeService:
             professional_receipt = (
                 OpenMaicFullRuntimeClient._professional_creation_receipt_from_payload(
                     professional_raw,
+                    generation_contract=generation,
                     runtime_request_id=runtime_request_id,
                     classroom_id=str(
                         authority.get("upstream_classroom_id") or ""
@@ -4964,7 +4980,7 @@ class OpenMaicFullRuntimeService:
                 **professional_image_fields(professional_receipt),
                 **professional_video_fields(professional_receipt),
                 **professional_skill_fields(professional_receipt),
-                **professional_quality_fields(professional_receipt),
+                **professional_quality_fields(professional_receipt, generation_contract=generation),
                 **professional_interaction_fields(professional_receipt),
                 "receiptSha256": professional_receipt["receiptSha256"],
             }

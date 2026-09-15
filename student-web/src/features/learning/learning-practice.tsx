@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, CheckCircle2, LoaderCircle, RotateCcw } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleHelp, LoaderCircle, Orbit, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SpaceShell, SpacePageHeading } from "@/components/student/space-shell";
+import { SpaceCourseArt } from "@/components/student/space-course-art";
+import { SpaceSuccessBurst } from "@/components/student/space-success-burst";
 import { practiceResponseSchema, type PracticeResponse } from "@/lib/contracts/learning-practice";
 import type { Student } from "@/lib/contracts/student-session";
 
@@ -26,6 +29,9 @@ export function LearningPractice({ student, sessionId }: { student: Student; ses
   const [sequence, setSequence] = useState<string[]>([]);
   const [busy, setBusy] = useState(Boolean(sessionId));
   const [error, setError] = useState("");
+  const [celebration, setCelebration] = useState(0);
+  const [completedNow, setCompletedNow] = useState(false);
+  const [subjectPicked, setSubjectPicked] = useState(false);
   const requestId = useRef<string | null>(null);
   const loadedSessionId = useRef<string | null>(null);
 
@@ -41,7 +47,7 @@ export function LearningPractice({ student, sessionId }: { student: Student; ses
 
   async function start() {
     if (busy) return;
-    setBusy(true); setError(""); setFeedback(undefined); setAnswer(""); setSequence([]);
+    setBusy(true); setError(""); setFeedback(undefined); setAnswer(""); setSequence([]); setCompletedNow(false);
     requestId.current ??= crypto.randomUUID();
     try {
       const value = await practiceRequest("/api/learning/practice/sessions", { requestId: requestId.current, subject, count: 5 });
@@ -60,71 +66,73 @@ export function LearningPractice({ student, sessionId }: { student: Student; ses
         questionId: question.id, response: question.type === "sequence" ? sequence : answer,
       });
       setResult(value); setFeedback(value.evaluation); setAnswer(""); setSequence([]);
+      if (value.evaluation?.correct) setCelebration(current => current + 1);
     } catch (caught) { setError(caught instanceof Error ? caught.message : "答案还没保存，请再试一次"); }
     finally { setBusy(false); }
   }
   function chooseSubject(value: typeof subject) {
-    setSubject(value); requestId.current = null; setResult(null); setError("");
+    setSubject(value); setSubjectPicked(true); requestId.current = null; setResult(null); setError("");
+  }
+  function continuePractice() {
+    if (result?.session?.status === "completed") setCompletedNow(true);
+    setFeedback(undefined);
   }
   const session = result?.session;
   const question = session?.currentQuestion;
   return (
-    <div className="learning-space mira-doodle-grid">
-      <main id="main-content" className="learning-main max-w-3xl">
-        <Link href="/learning" className="focus-ring inline-flex min-h-12 items-center gap-2 font-bold text-[var(--mira-brand-deep)]"><ArrowLeft className="size-5" />回到学习书架</Link>
-        <header className="my-7">
-          <p className="learning-eyebrow">{student.displayName}的复习时间</p>
-          <h1 className="mt-2 text-3xl font-black">学过的内容，练一练</h1>
-          <p className="mt-3 text-lg leading-8 text-[var(--mira-muted)]">每次最多五题，只复习已经学完的课程。</p>
-        </header>
-        <section className="rounded-[28px] border-2 border-white bg-white p-6 shadow-[var(--mira-shadow-card)] sm:p-8" aria-live="polite">
-          {error && <p role="alert" className="mb-5 rounded-2xl bg-amber-50 p-4 leading-7">{error}</p>}
-          {busy && !result ? <p className="flex items-center gap-3 py-5 text-lg"><LoaderCircle className="size-6 animate-spin motion-reduce:animate-none" />正在取出复习题…</p> : feedback ? (
-            <div>
-              <h2 className="text-2xl font-black">{feedback.message}</h2>
-              {feedback.explanation && <p className="mt-4 text-xl leading-9">{feedback.explanation}</p>}
-              <Button className="mt-7 min-h-12" onClick={() => setFeedback(undefined)}>{session?.status === "completed" ? "看看这次练习" : "下一题"}</Button>
+    <SpaceShell student={student} active="practice" className={`space-practice-page ${question ? "is-answering" : ""}`}>
+      <SpacePageHeading eyebrow={`${student.displayName}的复习时间`} title="学过的内容，练一练" description="每次最多五题，只复习已经学完的课程。" backHref="/learning" backLabel="回到学习书架" />
+      <section className="space-practice-stage" aria-live="polite">
+        {error && <p role="alert" className="space-inline-error">{error}</p>}
+        {busy && !result ? <div className="space-page-state space-practice-launching"><span className="space-launch-signal" aria-hidden="true"><Orbit /><i /></span><h2>正在取出复习题…</h2></div> : feedback ? (
+          <div className={`space-practice-feedback ${feedback.correct ? "is-correct" : "is-review"}`}>
+            <div className="space-feedback-emblem"><span className="space-result-icon">{feedback.correct ? <CheckCircle2 aria-hidden="true" /> : <CircleHelp aria-hidden="true" />}</span><SpaceSuccessBurst key={celebration} active={feedback.correct && celebration > 0} /></div>
+            <p className="space-eyebrow">{feedback.correct ? "这道题答对了" : "一起看看这道题"}</p>
+            <h2>{feedback.message}</h2>
+            {feedback.explanation && <p className="space-answer-explanation">{feedback.explanation}</p>}
+            <Button className="space-practice-action" onClick={continuePractice}>{session?.status === "completed" ? "看看这次练习" : "下一题"}<ArrowRight className="size-5" aria-hidden="true" /></Button>
+          </div>
+        ) : session?.status === "completed" ? (
+          <div className="space-practice-complete">
+            <div className="space-feedback-emblem"><span className="space-result-icon"><CheckCircle2 aria-hidden="true" /></span><SpaceSuccessBurst active={completedNow} /></div>
+            <p className="space-eyebrow">探索完成</p>
+            <h2>这次复习完成啦！</h2>
+            <p className="space-answer-explanation">完成 {session.totalQuestions} 题，答对 {session.correctCount} 题。</p>
+            <div className="space-practice-score" aria-hidden="true"><strong>{session.correctCount}</strong><span>/ {session.totalQuestions}</span></div>
+            <div className="space-inline-actions"><Button asChild><Link href="/learning">回到学习书架<ArrowRight className="size-5" aria-hidden="true" /></Link></Button><Button variant="secondary" onClick={() => { requestId.current = null; setResult(null); router.replace("/learning/practice"); }}>再选一组</Button></div>
+          </div>
+        ) : question ? (
+          <div className="space-practice-question">
+            <div className="space-question-topline"><p className="space-eyebrow">{subjects.find(item => item.id === subject)?.label} · 复习</p><span>第 {(session?.currentQuestionIndex ?? 0) + 1} 题 / {session?.totalQuestions} 题</span></div>
+            <div className="space-question-progress space-progress-orbit" role="progressbar" aria-label="复习进度" aria-valuemin={0} aria-valuemax={session?.totalQuestions} aria-valuenow={session?.currentQuestionIndex ?? 0}>
+              <span style={{ width: `${((session?.currentQuestionIndex ?? 0) / Math.max(1, session?.totalQuestions ?? 1)) * 100}%` }} />
+              <div className="space-progress-nodes" aria-hidden="true">{Array.from({ length: session?.totalQuestions ?? 0 }, (_, index) => <i key={index} className={index < (session?.currentQuestionIndex ?? 0) ? "is-complete" : index === (session?.currentQuestionIndex ?? 0) ? "is-current" : ""} />)}</div>
             </div>
-          ) : session?.status === "completed" ? (
-            <div>
-              <CheckCircle2 className="mb-4 size-10 text-emerald-600" aria-hidden="true" />
-              <h2 className="text-2xl font-black">这次复习完成啦！</h2>
-              <p className="mt-4 text-xl">完成 {session.totalQuestions} 题，答对 {session.correctCount} 题。</p>
-              <div className="mt-7 flex flex-wrap gap-4"><Link href="/learning" className="focus-ring inline-flex min-h-12 items-center rounded-2xl bg-[var(--mira-brand-deep)] px-6 font-bold text-white">回到学习书架</Link>
-                <Button variant="quiet" onClick={() => { requestId.current = null; setResult(null); router.replace("/learning/practice"); }}>再选一组</Button></div>
+            <h2>{question.prompt}</h2>
+            {(question.type === "single_choice" || question.type === "sequence") && question.choices.length ? (
+              <div className="space-answer-choices" role="group" aria-label={question.type === "sequence" ? "按顺序选择" : "选择答案"}>
+                {question.choices.map((choice, index) => {
+                  const position = sequence.indexOf(choice.id), selected = question.type === "sequence" ? position >= 0 : answer === choice.id;
+                  return <button key={choice.id} disabled={busy || (question.type === "sequence" && selected)} aria-pressed={selected} className={`focus-ring space-answer-choice ${selected ? "is-selected" : ""}`} onClick={() => question.type === "sequence" ? setSequence(current => [...current, choice.id]) : setAnswer(choice.id)}>
+                    <span className="space-answer-letter" aria-hidden="true">{question.type === "sequence" ? (selected ? position + 1 : "–") : String.fromCharCode(65 + index)}</span><span>{choice.label}</span>{selected && <CheckCircle2 className="space-choice-check" aria-hidden="true" />}
+                  </button>;
+                })}
+                {question.type === "sequence" && <Button variant="quiet" disabled={busy} onClick={() => setSequence([])}><RotateCcw className="size-5" aria-hidden="true" />重新排列</Button>}
+              </div>
+            ) : <label className="space-answer-input-label">你的答案<input autoComplete="off" value={answer} disabled={busy} onChange={event => setAnswer(event.target.value)} inputMode={question.type === "numeric" ? "decimal" : "text"} className="focus-ring space-answer-input" /></label>}
+            <div className="space-question-submit"><Button className="space-practice-action" data-busy={busy} disabled={busy || (question.type === "sequence" ? sequence.length !== question.choices.length : !answer.trim())} onClick={() => void submit()}>{busy ? "正在保存…" : "提交答案"}{busy ? <LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <ArrowRight className="size-5" aria-hidden="true" />}</Button></div>
+          </div>
+        ) : (
+          <div className="space-practice-start">
+            {result?.session === null && <p className="space-inline-note">{result.message}</p>}
+            <h2>想复习哪一科？</h2>
+            <div className="space-practice-subjects" role="group" aria-label="复习学科">
+              {subjects.map(item => <button key={item.id} disabled={busy} aria-label={item.label} aria-pressed={subject === item.id} className={`focus-ring space-practice-subject space-destination-${item.id} ${subject === item.id ? `is-selected ${subjectPicked ? "is-picked" : ""}` : ""}`} onClick={() => chooseSubject(item.id)}><SpaceCourseArt subject={item.id} className="space-practice-subject-art" /><i className="space-destination-orbit" aria-hidden="true" /><span className="space-destination-label"><strong>{item.label}</strong><small>{subject === item.id ? "已选择这个星球" : "前往这个星球"}</small></span>{subject === item.id && <CheckCircle2 aria-hidden="true" />}</button>)}
             </div>
-          ) : question ? (
-            <div>
-              <p className="font-bold text-[var(--mira-brand-deep)]">第 {(session?.currentQuestionIndex ?? 0) + 1} 题 / {session?.totalQuestions} 题</p>
-              <h2 className="my-6 text-2xl font-black leading-10">{question.prompt}</h2>
-              {(question.type === "single_choice" || question.type === "sequence") && question.choices.length ? (
-                <div className="grid gap-3" role="group" aria-label={question.type === "sequence" ? "按顺序选择" : "选择答案"}>
-                  {question.choices.map(choice => {
-                    const position = sequence.indexOf(choice.id), selected = question.type === "sequence" ? position >= 0 : answer === choice.id;
-                    return <button key={choice.id} disabled={busy || (question.type === "sequence" && selected)} aria-pressed={selected}
-                      className={`focus-ring min-h-14 rounded-2xl border-2 px-5 py-3 text-left text-xl font-bold ${selected ? "border-[var(--mira-brand)] bg-blue-50" : "border-slate-200 bg-white"}`}
-                      onClick={() => question.type === "sequence" ? setSequence(current => [...current, choice.id]) : setAnswer(choice.id)}>
-                      {question.type === "sequence" && selected ? `${position + 1}. ` : ""}{choice.label}
-                    </button>;
-                  })}
-                  {question.type === "sequence" && <Button variant="quiet" disabled={busy} onClick={() => setSequence([])}><RotateCcw className="size-4" />重新排列</Button>}
-                </div>
-              ) : <label className="block text-lg font-bold">你的答案<input autoComplete="off" value={answer} disabled={busy} onChange={event => setAnswer(event.target.value)}
-                  inputMode={question.type === "numeric" ? "decimal" : "text"} className="focus-ring mt-3 block min-h-14 w-full rounded-2xl border-2 border-slate-200 px-5 py-3 text-2xl" /></label>}
-              <Button className="mt-7 min-h-12" disabled={busy || (question.type === "sequence" ? sequence.length !== question.choices.length : !answer.trim())} onClick={() => void submit()}>{busy ? "正在保存…" : "提交答案"}</Button>
-            </div>
-          ) : (
-            <div>
-              {result?.session === null && <p className="mb-5 text-lg leading-8">{result.message}</p>}
-              <h2 className="text-xl font-black">想复习哪一科？</h2>
-              <div className="my-5 flex flex-wrap gap-3" role="group" aria-label="复习学科">{subjects.map(item => <button key={item.id} disabled={busy} aria-pressed={subject === item.id}
-                className={`focus-ring min-h-12 rounded-2xl border-2 px-6 py-3 text-xl font-bold ${subject === item.id ? "border-[var(--mira-brand)] bg-blue-50" : "border-slate-200"}`} onClick={() => chooseSubject(item.id)}>{item.label}</button>)}</div>
-              <Button className="min-h-12" disabled={busy} onClick={() => void start()}>{busy ? "正在准备…" : "开始复习"}</Button>
-              {result?.session === null && <Link className="focus-ring ml-5 inline-flex min-h-12 items-center font-bold" href="/learning">先复习学过的课程</Link>}
-            </div>
-          )}
-        </section>
-      </main>
-    </div>
+            <div className="space-inline-actions"><Button className="space-practice-action" data-busy={busy} disabled={busy} onClick={() => void start()}>{busy ? "正在准备…" : "开始复习"}<ArrowRight className="size-5" aria-hidden="true" /></Button>{result?.session === null && <Button variant="secondary" asChild><Link href="/learning">先复习学过的课程</Link></Button>}</div>
+          </div>
+        )}
+      </section>
+    </SpaceShell>
   );
 }

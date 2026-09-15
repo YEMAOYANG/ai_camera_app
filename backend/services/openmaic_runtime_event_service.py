@@ -10,7 +10,6 @@ from typing import Any, Callable, Mapping
 from core.errors import ApiError
 from core.security import now_ms
 from integrations.openmaic_formal_interaction import validate_interaction_manifest
-from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
 from services.formal_student_learning_access import (
     formal_course_count,
     FORMAL_PUBLICATION_CONTRACT_VERSION,
@@ -321,9 +320,9 @@ class OpenMaicRuntimeEventService:
             authoritative: dict[str, Any] | None = None
             report_id: str | None = None
             completed = False
-            if event["type"] in {"action_completed", "classroom_completed"}:
-                self._require_teaching_completed(authority,
-                    scene_id=event["payload"]["sceneId"] if event["type"] == "action_completed" else None)
+            # Discussion participation is optional. A scene playback receipt does
+            # not assert that its conversation was answered/completed; only the
+            # separate operation and authoritative quiz evidence gates mastery.
             if event["type"] == "answer_submitted":
                 authoritative = self.learning_service.record_authoritative_runtime_answer(
                     conn,
@@ -393,34 +392,6 @@ class OpenMaicRuntimeEventService:
         if completed:
             self._close_completed_budget(authority)
         return response
-
-    def _require_teaching_completed(self, authority, *, scene_id=None):
-        from services.learning_paid_authority import scope_digest, teaching_budget_scope, upgraded_manifest
-        from services.openmaic_paid_call_service import teaching_conversation_id
-        manifest = authority.get("feature_manifest_json")
-        manifest = json.loads(manifest) if isinstance(manifest, str) else manifest
-        if not isinstance(manifest, Mapping) or not upgraded_manifest(manifest):
-            return
-        actions = manifest["formalEvidence"]["requiredTeachingActions"]
-        required = [item for item in actions if scene_id is None or item["sceneId"] == scene_id]
-        if not required:
-            return
-        if getattr(self, "teaching_conversation_reader", None) is None:
-            raise ApiError("runtime_teaching_verification_unavailable", "老师指导的完成记录暂时无法确认，进度已保留。", 503)
-        row = {**authority, "course_id": authority["session_course_id"], "course_version": authority["session_course_version"]}
-        identity = scope_digest(teaching_budget_scope(row, manifest, "required_teaching"))
-        for action in required:
-            conversation_id = teaching_conversation_id(authorization_id=identity,
-                learning_session_id=authority["learning_session_id"], classroom_id=authority["upstream_classroom_id"],
-                scene_id=action["sceneId"], action_id=action["actionId"])
-            try:
-                conversation = self.teaching_conversation_reader(conversation_id=conversation_id,
-                    learning_session_id=authority["learning_session_id"], classroom_id=authority["upstream_classroom_id"])
-            except OpenMaicFullRuntimeError as exc:
-                raise ApiError("runtime_teaching_verification_unavailable", "老师指导的完成记录暂时无法确认，进度已保留。", 503) from exc
-            if (not isinstance(conversation, Mapping) or conversation.get("id") != conversation_id
-                    or conversation.get("authorizationId") != identity or conversation.get("state") != "completed"):
-                raise ApiError("runtime_teaching_incomplete", "这段老师指导尚未完成，请先继续课堂对话。", 409)
 
     def _close_completed_budget(self, authority: Mapping[str, Any]) -> None:
         # Budget uses its own lock order. Always run after learning commits; a
@@ -1289,17 +1260,9 @@ class OpenMaicRuntimeEventService:
                 409,
             )
         if event["type"] == "scene_entered":
-            if existing is None:
-                evidence = self.repository.scene_evidence(
-                    conn,
-                    runtime_session_id=str(stream["runtime_session_id"]),
-                )
-                if scene_index != int(evidence.get("scene_count") or 0):
-                    raise ApiError(
-                        "runtime_event_scene_gap",
-                        "课堂场景进度不连续",
-                        409,
-                    )
+            # The directory can open any published scene, including a later
+            # page on re-entry. Record only that actual visit; full completion
+            # still requires every scene, its actions, and independent answers.
             return
         if existing is None:
             raise ApiError(
@@ -1383,14 +1346,18 @@ class OpenMaicRuntimeEventService:
 
     @staticmethod
     def _operation_matches(objective: Mapping[str, Any], payload: Mapping[str, Any]) -> bool:
-        operation, feedback = objective["operation"], objective["feedback"]
-        text = payload.get("feedbackText")
+        # Publication examples prove the widget works; they are not the one
+        # value a learner must reproduce. This receipt records participation,
+        # while independent answers remain the assessment authority.
+        operation = objective["operation"]
+        text, value = payload.get("feedbackText"), payload.get("value")
         return bool(payload.get("objectiveIndex") == objective["objectiveIndex"]
             and payload.get("sceneId") == operation["sceneId"]
             and payload.get("controlSelector") == operation["controlSelector"]
             and payload.get("action") == operation["action"]
-            and payload.get("value") == ("" if operation["action"] == "click" else operation.get("value"))
-            and isinstance(text, str) and feedback["textIncludes"] in text and feedback["reasonQuote"] in text)
+            and isinstance(value, str) and len(value) <= 500
+            and (operation["action"] != "click" or value == "")
+            and isinstance(text, str) and bool(text.strip()) and len(text) <= 2000)
 
     @classmethod
     def _completed_interactions(cls, objectives: list[dict[str, Any]], evidence: list[dict[str, Any]]) -> set[int]:

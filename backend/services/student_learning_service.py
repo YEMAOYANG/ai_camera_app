@@ -8,7 +8,8 @@ from typing import Any, Iterator
 
 from core.database import Database
 from core.errors import ApiError
-from repositories.learning_repository import LearningRepository
+from core.security import now_ms
+from repositories.learning_repository import LearningCatalogTaskUnavailable, LearningRepository
 from repositories.learning_teacher_media_repository import (
     LearningTeacherMediaRepository,
 )
@@ -174,6 +175,68 @@ class StudentLearningService:
                 formal_student_child_id=principal["child_id"],
                 atomic_session_binder=atomic_binder,
             )
+
+    def start_course(self, access_token: str, course_id: str, course_version: str) -> dict:
+        """Choose one published lesson without replacing today's learning work."""
+        from repositories.student_shared_course_repository import claim_published_shared_course
+
+        context = self.student_auth_service.authenticate(access_token)
+        principal = context['principal']
+        course_id = str(course_id or '').strip()
+        course_version = str(course_version or '').strip()
+        if not course_id or not course_version or self.static_catalog_enabled:
+            raise ApiError('learning_course_not_found', '课程不存在', 404)
+        timestamp = now_ms()
+        with self.repository.transaction() as conn:
+            child = self.learning_service._child_for_formal_student_write(
+                conn, family_id=principal['family_id'], child_id=principal['child_id'],
+                formal_student_child_id=principal['child_id'],
+            )
+            course = self.repository.get_student_visible_course(
+                conn, family_id=principal['family_id'], child_id=principal['child_id'],
+                grade_code=str(child['grade_code']),
+                grade_selection_revision=int(child['grade_selection_revision']),
+                course_id=course_id, course_version=course_version,
+            )
+            if course is None:
+                raise ApiError('learning_course_not_found', '课程还未准备好，请稍后再来', 404)
+            claim_published_shared_course(
+                conn, database=self.repository.database, child=child, course=course, now=timestamp,
+            )
+            # Reuse the production package resolver after the follower claim.
+            # It pins the exact published package; no preview route is exposed.
+            from repositories.lesson_package_repository import LessonPackageRepository
+            from repositories.learning_repository import _student_required_package_assets_sql
+            package = LessonPackageRepository(self.repository.database).get_active_formal_package(
+                conn, course_id=course_id, course_version=course_version,
+                family_id=principal['family_id'], child_id=principal['child_id'],
+            )
+            assets = None if package is None else conn.execute(
+                f"SELECT package.id FROM learning_lesson_packages AS package "
+                f"WHERE package.id = ? AND package.version = ? "
+                f"AND {_student_required_package_assets_sql(package_alias='package')}",
+                (package['id'], package['version']),
+            ).fetchone()
+            if package is None or assets is None:
+                raise ApiError('learning_course_not_found', '课程还未准备好，请稍后再来', 404)
+            try:
+                task, created = self.repository.assign_catalog_task(
+                    conn, family_id=principal['family_id'], child_id=principal['child_id'],
+                    course=course, created_by=f"student:{principal['id']}", now=timestamp,
+                )
+            except LearningCatalogTaskUnavailable as exc:
+                reason = {'cancelled': '已取消', 'rejected': '已结束', 'expired': '已过期'}[exc.status]
+                raise ApiError('learning_course_start_unavailable',
+                               f'这节课的安排{reason}，请选择其他课程', 409) from exc
+            if created:
+                self.repository.add_task_event(
+                    conn, family_id=principal['family_id'], task_id=task['id'],
+                    event_type='learning_assigned', message='已选择这节课，随时可以继续学习',
+                    payload={'source': 'student_catalog', 'courseId': course_id,
+                             'courseVersion': course_version, 'slot': 'catalog'}, now=timestamp,
+                )
+            return {'ok': True, 'taskId': str(task['id']), 'created': created,
+                    'courseId': course_id, 'courseVersion': course_version}
 
     def answer(
         self,

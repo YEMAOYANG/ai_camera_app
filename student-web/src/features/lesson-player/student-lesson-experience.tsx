@@ -1,10 +1,9 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, CircleHelp, Eraser, Lightbulb, LoaderCircle, PartyPopper, PenLine, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Check, CircleAlert, CircleHelp, Eraser, Lightbulb, LoaderCircle, Orbit, PartyPopper, PenLine, Sparkles, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { MiraBuddy } from "@/components/student/mira-buddy";
 import { MiraMark } from "@/components/student/mira-mark";
 import { Button } from "@/components/ui/button";
 import { getLatestLearningReport, startLearningSession, submitLearningAnswer } from "@/features/learning/learning-client";
@@ -81,22 +80,22 @@ export function StudentLessonExperience({
   const presentation = subjectPresentation(lesson.subject);
   const activeStageIndex = stages.findIndex((item) => item.id === stage);
   return (
-    <div className="mira-doodle-grid min-h-screen bg-[linear-gradient(145deg,var(--mira-bg),#fffdf4)] px-4 pb-10 pt-4 sm:px-7 sm:pt-6">
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3">
-        <Link href="/today" className="focus-ring inline-flex min-h-12 items-center gap-2 rounded-[16px] bg-white/85 px-4 font-extrabold text-[var(--mira-ink)] shadow-sm">
+    <div className="space-lesson min-h-screen px-4 pb-10 pt-4 sm:px-7 sm:pt-6">
+      <header className="space-lesson-header mx-auto flex w-full max-w-6xl items-center justify-between gap-3">
+        <Link href="/today" className="focus-ring space-lesson-back inline-flex min-h-12 items-center gap-2 rounded-[16px] px-4 font-extrabold text-[var(--mira-ink)]">
           <ArrowLeft className="size-5" /> 回到今天
         </Link>
         <MiraMark compact />
-        <span className="hidden rounded-full bg-white/80 px-4 py-2 text-sm font-bold text-[var(--mira-muted)] sm:block">{student.displayName}的课堂</span>
+        <span className="hidden rounded-full px-4 py-2 text-sm font-bold text-[var(--mira-muted)] sm:block">{student.displayName}的课堂</span>
       </header>
 
       <main id="main-content" className="mx-auto mt-5 w-full max-w-6xl">
-        <section className="overflow-hidden rounded-[32px] border-2 border-white bg-white shadow-[var(--mira-shadow-card)]">
-          <div className={`h-2 ${presentation.surface}`} aria-hidden="true" />
+        <section className="space-lesson-stage overflow-hidden rounded-[28px] border border-[var(--mira-border)]">
+          <div className="space-lesson-accent" aria-hidden="true" />
           <div className="border-b border-[var(--mira-border-soft)] px-5 py-5 sm:px-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className={`text-sm font-extrabold ${presentation.strong}`}>{presentation.label} · {presentation.eyebrow}</p>
+                <p className="space-lesson-eyebrow text-sm font-extrabold">{presentation.label} · {presentation.eyebrow}</p>
                 <h1 className="mt-1 text-[clamp(25px,4vw,38px)] font-black tracking-[-.045em]">{lesson.title}</h1>
               </div>
               <StageRail activeIndex={activeStageIndex} />
@@ -135,7 +134,7 @@ function StageRail({ activeIndex }: { activeIndex: number }) {
   return (
     <ol className="flex items-center gap-1.5" aria-label="课堂进度">
       {stages.map((item, index) => (
-        <li key={item.id} className={`grid min-h-10 min-w-10 place-items-center rounded-full px-3 text-xs font-extrabold transition-colors ${index === activeIndex ? "bg-[var(--mira-brand)] text-white" : index < activeIndex ? "bg-[var(--mira-mint)] text-[var(--mira-mint-deep)]" : "bg-[var(--mira-bg)] text-[var(--mira-subtle)]"}`} aria-current={index === activeIndex ? "step" : undefined}>
+        <li key={item.id} className={`space-lesson-step grid min-h-10 min-w-10 place-items-center rounded-full px-3 text-xs font-extrabold transition-colors ${index === activeIndex ? "is-current" : index < activeIndex ? "is-done" : "is-next"}`} aria-current={index === activeIndex ? "step" : undefined}>
           <span className="sm:hidden">{index < activeIndex ? <Check className="size-4" /> : index + 1}</span>
           <span className="hidden sm:inline">{index < activeIndex ? "✓ " : ""}{item.label}</span>
         </li>
@@ -149,9 +148,10 @@ function TeachScene({ lesson, onNext }: { lesson: LearningLesson; onNext: () => 
   if (!flow) return null;
   return (
     <div className="grid items-center gap-8 lg:grid-cols-[250px_1fr]">
-      <div className="relative mx-auto">
-        <MiraBuddy mood="reading" className="w-[210px] sm:w-[240px]" label="Mira 老师正在讲课" />
-        <span className="absolute -right-5 top-4 rounded-[18px_18px_18px_5px] bg-[var(--mira-sun-soft)] px-4 py-2 text-sm font-extrabold text-[#8b651d] shadow-sm">先听我讲</span>
+      <div className="space-lesson-teacher relative mx-auto" role="img" aria-label="Mira 老师正在讲课">
+        <Orbit className="space-lesson-teacher-orbit" aria-hidden="true" />
+        <BookOpen className="space-lesson-teacher-book" aria-hidden="true" />
+        <span>先听我讲</span>
       </div>
       <div>
         <p className="text-sm font-extrabold text-[var(--mira-brand-deep)]">今天要学会</p>
@@ -162,7 +162,7 @@ function TeachScene({ lesson, onNext }: { lesson: LearningLesson; onNext: () => 
         {flow.teach.keyPoints.length ? (
           <ul className="mt-5 grid gap-3 sm:grid-cols-2">
             {flow.teach.keyPoints.map((point, index) => (
-              <li key={point} className="flex items-start gap-3 rounded-[18px] border-2 border-[var(--mira-border-soft)] bg-white p-4 font-bold leading-6">
+              <li key={point} className="flex items-start gap-3 rounded-[18px] border-2 border-[var(--mira-border-soft)] bg-[var(--mira-surface)] p-4 font-bold leading-6">
                 <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[var(--mira-sun)] text-sm text-[var(--mira-ink)]">{index + 1}</span>{point}
               </li>
             ))}
@@ -180,13 +180,13 @@ function DemoScene({ lesson, onBack, onNext }: { lesson: LearningLesson; onBack:
   return (
     <div className="mx-auto max-w-3xl">
       <div className="flex items-center gap-3">
-        <span className="grid size-12 place-items-center rounded-[18px] bg-[var(--mira-sun-soft)] text-[#9c6a13]"><Lightbulb className="size-6" /></span>
-        <div><p className="text-sm font-extrabold text-[#9c6a13]">Mira 示范题</p><h2 className="text-3xl font-black tracking-[-.04em]">看一看是怎么想的</h2></div>
+        <span className="grid size-12 place-items-center rounded-[18px] bg-[var(--mira-sun-soft)] text-[var(--mira-warning)]"><Lightbulb className="size-6" /></span>
+        <div><p className="text-sm font-extrabold text-[var(--mira-warning)]">Mira 示范题</p><h2 className="text-3xl font-black tracking-[-.04em]">看一看是怎么想的</h2></div>
       </div>
       <div className="mt-7 rounded-[28px] border-2 border-[var(--mira-border-soft)] bg-[var(--mira-bg)] p-6 sm:p-8">
         <p className="text-[clamp(22px,4vw,32px)] font-black leading-relaxed">{demo.prompt}</p>
         {demo.choices.length ? (
-          <div className="mt-5 grid gap-2 sm:grid-cols-2">{demo.choices.map((choice, index) => <div key={choice.id} className="rounded-[16px] bg-white px-4 py-3 font-bold"><span className="mr-2 text-[var(--mira-subtle)]">{String.fromCharCode(65 + index)}.</span>{choice.label}</div>)}</div>
+          <div className="mt-5 grid gap-2 sm:grid-cols-2">{demo.choices.map((choice, index) => <div key={choice.id} className="rounded-[16px] bg-[var(--mira-surface)] px-4 py-3 font-bold"><span className="mr-2 text-[var(--mira-subtle)]">{String.fromCharCode(65 + index)}.</span>{choice.label}</div>)}</div>
         ) : null}
         <div className="mt-6 rounded-[20px] bg-[var(--mira-mint)] p-5">
           <p className="text-sm font-extrabold text-[var(--mira-mint-deep)]">答案是</p>
@@ -271,7 +271,7 @@ function PracticeScene({
   }
 
   if (!question && session.status !== "completed") {
-    return <div className="mx-auto max-w-xl py-16 text-center"><MiraBuddy mood="thinking" className="mx-auto w-32" /><h2 className="mt-4 text-2xl font-black">题目正在准备</h2><p className="mt-2 text-[var(--mira-muted)]">先回到今天，过一会儿再试试。</p><Button asChild className="mt-6"><Link href="/today">回到今天</Link></Button></div>;
+    return <div className="mx-auto max-w-xl py-16 text-center"><Orbit className="space-lesson-state-icon mx-auto" aria-hidden="true" /><h2 className="mt-4 text-2xl font-black">题目正在准备</h2><p className="mt-2 text-[var(--mira-muted)]">先回到今天，过一会儿再试试。</p><Button asChild className="mt-6"><Link href="/today">回到今天</Link></Button></div>;
   }
 
   if (!question) return null;
@@ -279,7 +279,7 @@ function PracticeScene({
   return (
     <div className="mx-auto max-w-3xl">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3"><MiraBuddy mood={result ? (result.correct ? "celebrate" : "thinking") : "hello"} className="w-20" /><div><p className="text-sm font-extrabold text-[var(--mira-brand-deep)]">{guided ? "一起练习" : "独立挑战"}</p><h2 className="text-2xl font-black">第 {currentNumber} 题 / 共 {session.totalQuestions} 题</h2></div></div>
+        <div className="flex items-center gap-3"><span className="space-lesson-practice-icon" aria-hidden="true">{result?.correct ? <Check /> : <PenLine />}</span><div><p className="text-sm font-extrabold text-[var(--mira-brand-deep)]">{guided ? "一起练习" : "独立挑战"}</p><h2 className="text-2xl font-black">第 {currentNumber} 题 / 共 {session.totalQuestions} 题</h2></div></div>
         <div className="h-3 w-full overflow-hidden rounded-full bg-[var(--mira-border-soft)] sm:w-52"><div className="h-full rounded-full bg-[var(--mira-brand)] transition-[width]" style={{ width: `${((session.currentQuestionIndex + (result && !result.canRetry ? 1 : 0)) / Math.max(1, session.totalQuestions)) * 100}%` }} /></div>
       </div>
 
@@ -287,25 +287,25 @@ function PracticeScene({
         <p className="text-[clamp(22px,4vw,34px)] font-black leading-relaxed tracking-[-.025em]">{question.prompt}</p>
         <div className="mt-7">
           {question.type === "single_choice" ? (
-            <div className="grid gap-3 sm:grid-cols-2">{question.choices.map((choice, index) => <button key={choice.id} type="button" disabled={Boolean(result)} onClick={() => setSelected(choice.id)} className={`focus-ring min-h-16 rounded-[20px] border-2 px-5 text-left font-extrabold transition ${selected === choice.id ? "border-[var(--mira-brand)] bg-[var(--mira-brand-wash)] text-[var(--mira-brand-deep)]" : "border-white bg-white hover:border-[var(--mira-border)]"}`}><span className="mr-3 text-[var(--mira-subtle)]">{String.fromCharCode(65 + index)}.</span>{choice.label}</button>)}</div>
+            <div className="grid gap-3 sm:grid-cols-2">{question.choices.map((choice, index) => <button key={choice.id} type="button" disabled={Boolean(result)} onClick={() => setSelected(choice.id)} className={`focus-ring min-h-16 rounded-[20px] border-2 px-5 text-left font-extrabold transition ${selected === choice.id ? "border-[var(--mira-brand)] bg-[var(--mira-brand-wash)] text-[var(--mira-brand-deep)]" : "border-[var(--mira-border)] bg-[var(--mira-surface)] hover:border-[var(--mira-border)]"}`}><span className="mr-3 text-[var(--mira-subtle)]">{String.fromCharCode(65 + index)}.</span>{choice.label}</button>)}</div>
           ) : null}
           {question.type === "sequence" ? (
             <div>
-              <div className="min-h-16 rounded-[20px] border-2 border-dashed border-[var(--mira-border)] bg-white p-3">{sequence.length ? <div className="flex flex-wrap gap-2">{sequence.map((id, index) => { const choice = question.choices.find((item) => item.id === id); return <span key={id} className="rounded-full bg-[var(--mira-brand-wash)] px-3 py-2 font-bold text-[var(--mira-brand-deep)]">{index + 1}. {choice?.label}</span>; })}</div> : <p className="py-2 text-center text-[var(--mira-subtle)]">按正确顺序点击下面的内容</p>}</div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">{question.choices.map((choice) => <button key={choice.id} type="button" disabled={sequence.includes(choice.id) || Boolean(result)} onClick={() => setSequence((items) => [...items, choice.id])} className="focus-ring min-h-14 rounded-[17px] border-2 border-white bg-white px-4 font-bold disabled:opacity-40">{choice.label}</button>)}</div>
+              <div className="min-h-16 rounded-[20px] border-2 border-dashed border-[var(--mira-border)] bg-[var(--mira-surface)] p-3">{sequence.length ? <div className="flex flex-wrap gap-2">{sequence.map((id, index) => { const choice = question.choices.find((item) => item.id === id); return <span key={id} className="rounded-full bg-[var(--mira-brand-wash)] px-3 py-2 font-bold text-[var(--mira-brand-deep)]">{index + 1}. {choice?.label}</span>; })}</div> : <p className="py-2 text-center text-[var(--mira-subtle)]">按正确顺序点击下面的内容</p>}</div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">{question.choices.map((choice) => <button key={choice.id} type="button" disabled={sequence.includes(choice.id) || Boolean(result)} onClick={() => setSequence((items) => [...items, choice.id])} className="focus-ring min-h-14 rounded-[17px] border-2 border-[var(--mira-border)] bg-[var(--mira-surface)] px-4 font-bold disabled:opacity-40">{choice.label}</button>)}</div>
               {!result && sequence.length ? <Button variant="quiet" size="compact" className="mt-3" onClick={() => setSequence([])}><Eraser className="size-4" />重新排列</Button> : null}
             </div>
           ) : null}
           {!question.choices.length ? (
-            <label className="block"><span className="sr-only">我的答案</span><input value={text} disabled={Boolean(result)} onChange={(event) => setText(event.target.value)} inputMode={question.type === "numeric" ? "decimal" : "text"} className="focus-ring h-16 w-full rounded-[20px] border-2 border-white bg-white px-5 text-xl font-extrabold outline-none focus:border-[var(--mira-brand)]" placeholder="把答案写在这里" /></label>
+            <label className="block"><span className="sr-only">我的答案</span><input value={text} disabled={Boolean(result)} onChange={(event) => setText(event.target.value)} inputMode={question.type === "numeric" ? "decimal" : "text"} className="focus-ring h-16 w-full rounded-[20px] border-2 border-[var(--mira-border)] bg-[var(--mira-surface)] px-5 text-xl font-extrabold outline-none focus:border-[var(--mira-brand)]" placeholder="把答案写在这里" /></label>
           ) : null}
         </div>
       </div>
 
-      {error ? <p className="mt-4 rounded-[16px] bg-[#fff1ee] p-4 font-bold text-[var(--mira-danger)]" role="alert">{error}</p> : null}
+      {error ? <p className="mt-4 rounded-[16px] bg-[var(--mira-danger-wash,#301a24)] p-4 font-bold text-[var(--mira-danger)]" role="alert">{error}</p> : null}
       {result ? (
         <div className={`mt-5 rounded-[24px] p-5 ${result.correct ? "bg-[var(--mira-mint)]" : "bg-[var(--mira-sun-soft)]"}`} role="status">
-          <div className="flex items-start gap-3"><span className={`grid size-10 shrink-0 place-items-center rounded-full bg-white ${result.correct ? "text-[var(--mira-mint-deep)]" : "text-[#9c6a13]"}`}>{result.correct ? <Check className="size-5" /> : <CircleHelp className="size-5" />}</span><div><p className="text-lg font-black">{result.feedback}</p>{result.hint ? <p className="mt-2 leading-7 text-[var(--mira-muted)]"><strong>小提示：</strong>{result.hint}</p> : null}</div></div>
+          <div className="flex items-start gap-3"><span className={`grid size-10 shrink-0 place-items-center rounded-full bg-[var(--mira-surface)] ${result.correct ? "text-[var(--mira-mint-deep)]" : "text-[var(--mira-warning)]"}`}>{result.correct ? <Check className="size-5" /> : <CircleHelp className="size-5" />}</span><div><p className="text-lg font-black">{result.feedback}</p>{result.hint ? <p className="mt-2 leading-7 text-[var(--mira-muted)]"><strong>小提示：</strong>{result.hint}</p> : null}</div></div>
           <Button className="mt-5 w-full sm:w-auto" onClick={continueAfterFeedback}>{result.canRetry ? "按照提示再试一次" : result.completed ? "看看我的小总结" : "下一题"}<ArrowRight className="size-5" /></Button>
         </div>
       ) : (
@@ -317,15 +317,15 @@ function PracticeScene({
 
 function ReportScene({ lesson, report }: { lesson: LearningLesson; report: LearningReport | null }) {
   return (
-    <div className="mx-auto max-w-3xl text-center">
-      <MiraBuddy mood="celebrate" className="mx-auto w-44" label="Mira 在为你庆祝" />
-      <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-[var(--mira-sun-soft)] px-4 py-2 text-sm font-extrabold text-[#8b651d]"><PartyPopper className="size-4" />这节课完成啦</p>
+    <div className="space-lesson-report mx-auto max-w-3xl text-center">
+      <span className="space-lesson-trophy" aria-hidden="true"><Trophy /></span>
+      <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-[var(--mira-sun-soft)] px-4 py-2 text-sm font-extrabold text-[var(--mira-warning)]"><PartyPopper className="size-4" />这节课完成啦</p>
       <h2 className="mt-4 text-[clamp(34px,6vw,52px)] font-black tracking-[-.05em]">学会一点，就是很棒！</h2>
       {report ? (
-        <div className="mt-7 grid gap-4 text-left sm:grid-cols-3">
+        <div className="space-lesson-report-stats mt-7 grid gap-4 text-left sm:grid-cols-3">
           <div className="rounded-[22px] bg-[var(--mira-brand-wash)] p-5"><p className="text-sm font-bold text-[var(--mira-muted)]">独立答对</p><p className="mt-2 text-3xl font-black text-[var(--mira-brand-deep)]">{report.independentCorrectCount}/{report.totalQuestions}</p></div>
           <div className="rounded-[22px] bg-[var(--mira-mint)] p-5"><p className="text-sm font-bold text-[var(--mira-muted)]">掌握情况</p><p className="mt-2 text-xl font-black text-[var(--mira-mint-deep)]">{masteryLabel(report.masteryLevel)}</p></div>
-          <div className="rounded-[22px] bg-[var(--mira-sun-soft)] p-5"><p className="text-sm font-bold text-[var(--mira-muted)]">用到提示</p><p className="mt-2 text-3xl font-black text-[#9c6a13]">{report.hintCount} 次</p></div>
+          <div className="rounded-[22px] bg-[var(--mira-sun-soft)] p-5"><p className="text-sm font-bold text-[var(--mira-muted)]">用到提示</p><p className="mt-2 text-3xl font-black text-[var(--mira-warning)]">{report.hintCount} 次</p></div>
         </div>
       ) : null}
       <div className="mt-5 rounded-[24px] bg-[var(--mira-bg)] p-6 text-left">
@@ -339,9 +339,9 @@ function ReportScene({ lesson, report }: { lesson: LearningLesson; report: Learn
 }
 
 function LessonLoading() {
-  return <main id="main-content" className="grid min-h-screen place-items-center px-5"><div className="text-center"><MiraBuddy mood="reading" className="mx-auto w-36" /><p className="mt-4 flex items-center gap-2 font-extrabold text-[var(--mira-muted)]"><LoaderCircle className="size-5 animate-spin" />Mira 正在打开课件</p></div></main>;
+  return <main id="main-content" className="space-route-state" aria-busy="true"><div className="space-route-state-content" role="status"><span className="space-route-orbit" aria-hidden="true"><Orbit /></span><p className="space-route-eyebrow">MIRA 学习空间</p><h1>正在打开课件</h1><p><LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />马上就可以开始学习</p></div></main>;
 }
 
 function LessonError({ message }: { message: string }) {
-  return <main id="main-content" className="grid min-h-screen place-items-center px-5"><div className="max-w-md rounded-[28px] border-2 border-white bg-white p-7 text-center shadow-[var(--mira-shadow-card)]"><MiraBuddy mood="thinking" className="mx-auto w-32" /><h1 className="mt-4 text-3xl font-black">这节课刚刚走神了</h1><p className="mt-3 leading-7 text-[var(--mira-muted)]">{message}</p><Button asChild className="mt-6"><Link href="/today">回到今天</Link></Button></div></main>;
+  return <main id="main-content" className="space-route-state"><div className="space-route-state-content" role="alert"><span className="space-route-orbit is-warning" aria-hidden="true"><CircleAlert /></span><p className="space-route-eyebrow">MIRA 学习空间</p><h1>这节课暂时打不开</h1><p>{message}</p><div className="space-route-actions"><Button asChild><Link href="/today">回到今天 <ArrowRight className="size-5" /></Link></Button></div></div></main>;
 }

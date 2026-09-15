@@ -1,0 +1,68 @@
+/* Shared atmosphere outside the home scene: light travels around the content. */
+.space-shell:not(.space-shell--scenic)::before {
+  height: min(780px, 100svh);
+  background: linear-gradient(90deg, #060c17ed 8%, #060c17b0 52%, #060c1755), linear-gradient(0deg, #060c17, #060c1700 90%), url('/images/space/hero-space.png') right 30% / cover;
+  opacity: .85;
+}
+.space-atmosphere.is-quiet { height: min(100svh, 1000px); opacity: .9; }
+.space-auth-header, .space-auth-main { position: relative; z-index: 1; }
+.space-auth-scenery { transform: translate3d(var(--space-pointer-x, 0px), var(--space-pointer-y, 0px), 0) scale(1.025); transform-origin: 35% 50%; }
+.space-auth-panel { position: relative; }
+.space-auth-panel::before {
+  content: ''; position: absolute; inset: 0 18px auto; height: 2px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #7ce8ff, #daff7e, transparent) -100% 0 / 45% 100% no-repeat;
+  animation: space-dock-signal 5s ease-in-out infinite;
+}
+.space-auth-steps li > svg { animation: space-dock-float 4s ease-in-out infinite; }
+.space-auth-steps li:nth-child(2) > svg { animation-delay: -.9s; }
+.space-auth-steps li:nth-child(3) > svg { animation-delay: -1.8s; }
+.space-qr-code { position: relative; }
+/* Only the outside frame glows. QR data, white margin and position stay still. */
+.space-qr[data-qr-state="waiting"] .space-qr-code::after {
+  content: ''; position: absolute; inset: -5px; border: 1px solid #80e9ff; border-radius: 16px; pointer-events: none;
+  animation: space-dock-beacon 3.2s ease-in-out infinite;
+}
+.space-qr[data-qr-state="success"] [role="status"] > span { animation: space-dock-arrival .5s ease-out both; }
+.space-unlock-panel[data-pin-state="ready"] input { border-color: #d4ff85; box-shadow: 0 0 0 3px #c9ff6a18; }
+.space-unlock-panel[data-pin-state="connecting"]::before { animation-duration: 1.2s; }
+.space-auth-panel button:not(:disabled):hover > svg:last-child { transform: translateX(3px); }
+.space-auth-panel button > svg { transition: transform .18s ease-out; }
+
+/* The embedded lesson owns its content. Effects stay in the 60px outer toolbar. */
+.full-openmaic-shell { position: relative; isolation: isolate; }
+.full-openmaic-shell .space-atmosphere--toolbar { height: 60px; opacity: 1; }
+.full-openmaic-toolbar.full-openmaic-toolbar { position: relative; z-index: 1; padding-right: 76px; background: transparent; }
+.full-openmaic-toolbar::after {
+  content: ''; position: absolute; inset: auto 0 0; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #79dfff, transparent) -100% 0 / 35% 100% no-repeat;
+  animation: space-dock-signal 7s ease-in-out infinite;
+}
+.full-openmaic-shell .space-motion-toggle { position: absolute; top: 6px; right: 14px; bottom: auto; min-width: 44px; width: 44px; min-height: 48px; height: 48px; padding: 0; }
+.full-openmaic-shell .space-motion-toggle > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.space-route-state-content { z-index: 1; }
+.space-route-orbit { animation: space-dock-float 4.5s ease-in-out infinite; }
+.space-route-orbit::after { content: ''; position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #8de7ff; box-shadow: 0 0 12px #8de7ff; transform: translate(44px, 0); animation: space-route-satellite 7s linear infinite; }
+.space-route-orbit { position: relative; }
+.space-lesson-report .space-lesson-trophy { animation: space-dock-arrival .55s ease-out both; }
+
+@keyframes space-dock-signal { 0%, 10% { background-position: -100% 0; } 75%, 100% { background-position: 200% 0; } }
+@keyframes space-dock-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes space-dock-beacon { 0%, 100% { opacity: .3; } 50% { opacity: .95; } }
+@keyframes space-dock-arrival { from { opacity: .7; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
+@keyframes space-route-satellite { from { transform: rotate(0) translateX(44px); } to { transform: rotate(360deg) translateX(44px); } }
+
+/* One pause preference covers the ambient CSS as well as the star canvas. */
+:is(.space-shell,[data-space-stage]):is([data-space-motion="paused"],[data-space-motion="hidden"],[data-space-motion="reduced"]) :is(.space-auth-panel,.space-auth-steps li > svg,.space-qr-code,.space-route-orbit,.full-openmaic-toolbar,.space-lesson-trophy),
+:is(.space-shell,[data-space-stage]):is([data-space-motion="paused"],[data-space-motion="hidden"],[data-space-motion="reduced"]) :is(.space-auth-panel,.space-qr-code,.space-route-orbit,.full-openmaic-toolbar)::before,
+:is(.space-shell,[data-space-stage]):is([data-space-motion="paused"],[data-space-motion="hidden"],[data-space-motion="reduced"]) :is(.space-auth-panel,.space-qr-code,.space-route-orbit,.full-openmaic-toolbar)::after { animation-play-state: paused; }
+@media (max-width: 700px) {
+  .space-auth .space-motion-toggle, .space-route-state .space-motion-toggle { position: absolute; top: 14px; bottom: auto; right: 18px; }
+  .full-openmaic-toolbar.full-openmaic-toolbar { padding-right: 68px; }
+  .space-auth-scenery { transform-origin: center top; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .space-auth-scenery { transform: none; }
+  .space-auth-panel::before, .space-auth-steps li > svg, .space-qr-code::after, .space-route-orbit, .space-route-orbit::after, .full-openmaic-toolbar::after, .space-lesson-report .space-lesson-trophy,
+  .space-qr[data-qr-state="success"] [role="status"] > span { animation: none !important; }
+  .space-auth-panel button > svg { transition: none; transform: none !important; }
+}

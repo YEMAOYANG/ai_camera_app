@@ -1,15 +1,15 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, BookOpenCheck, Check, Clock3, Heart, LoaderCircle, Sparkles, Target } from "lucide-react";
+import { ArrowRight, Check, Clock3, Heart, LoaderCircle, Sparkles, Target } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
-import { MiraBuddy } from "@/components/student/mira-buddy";
-import { MiraMark } from "@/components/student/mira-mark";
+import { SpaceShell, SpacePageHeading } from "@/components/student/space-shell";
+import { SpaceCourseArt } from "@/components/student/space-course-art";
 import { DocumentLink } from "@/components/navigation/document-link";
 import { Button } from "@/components/ui/button";
 import { getLearningCourse, setLearningFavorite } from "@/features/learning/learning-client";
-import { subjectPresentation } from "@/features/learning/learning-presenters";
+import { LearningCourseStartButton } from "@/features/learning/learning-course-start-button";
 import type { LearningCourseDetailResponse } from "@/lib/contracts/learning";
 import { openMaicLessonPath } from "@/lib/routing/classroom";
 import type { Student } from "@/lib/contracts/student-session";
@@ -28,6 +28,7 @@ export function LearningCourseDetail({
   const [data, setData] = useState<LearningCourseDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [favoriteBusy, setFavoriteBusy] = useState(false);
+  const [favoritePulse, setFavoritePulse] = useState(0);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -97,6 +98,7 @@ export function LearningCourseDetail({
     try {
       const result = await setLearningFavorite(data.item.course.id, data.item.course.version, !data.item.favorite);
       setData({ ...data, item: { ...data.item, favorite: result.favorite } });
+      if (result.favorite) setFavoritePulse(current => current + 1);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "收藏状态暂时没有保存成功");
     } finally {
@@ -104,62 +106,55 @@ export function LearningCourseDetail({
     }
   }
 
-  if (loading) return <CourseDetailLoading />;
-  if (!data) return <CourseDetailError message={error} onRetry={load} />;
+  if (loading) return <SpaceShell student={student} active="learning"><CourseDetailLoading /></SpaceShell>;
+  if (!data) return <SpaceShell student={student} active="learning"><CourseDetailError message={error} onRetry={load} /></SpaceShell>;
 
   const item = data.item;
-  const presentation = subjectPresentation(item.course.subject);
-  const Icon = presentation.icon;
   return (
-    <div className="learning-space learning-detail-space mira-doodle-grid">
-      <header className="learning-topbar">
-        <Link href="/today" className="focus-ring"><MiraMark compact /></Link>
-        <nav aria-label="学生学习导航"><Link href="/today">今日学习</Link><Link href="/learning" aria-current="page">我的学习</Link></nav>
-        <span className="learning-detail-student">{student.displayName}的课程</span>
-      </header>
-      <main id="main-content" className="learning-detail-main">
-        <Link href="/learning" className="focus-ring learning-detail-back"><ArrowLeft className="size-5" />返回我的学习</Link>
-        <section className="learning-detail-hero">
-          <div className="learning-detail-copy">
-            <p className={presentation.strong}><Icon className="size-5" />{item.course.subjectLabel} · {item.course.estimatedMinutes} 分钟</p>
-            <h1>{item.course.title}</h1>
-            <p>{item.course.intro || item.course.objective}</p>
-            <div className="learning-detail-actions">
-              {completed ? (
-                <span className="learning-detail-preparing"><Check className="size-5" />这节课学完啦<span>{item.report ? "学习结果已保存，可以在下方查看。" : "学习记录已保存，报告准备好后会出现在这里。"}</span></span>
-              ) : item.fullClassroomAvailable && item.taskId ? (
-                <Button asChild><DocumentLink href={openMaicLessonPath(item.taskId)}>{item.session?.status === "in_progress" ? "继续上课" : "开始上课"}<ArrowRight className="size-5" /></DocumentLink></Button>
-              ) : (
-                <span className="learning-detail-preparing"><Sparkles className="size-5" />完整课堂准备中<span>课件、声音和互动检查全部通过后就能开始</span></span>
-              )}
-              <button type="button" className={`focus-ring learning-detail-favorite ${item.favorite ? "is-active" : ""}`} onClick={() => void toggleFavorite()} disabled={favoriteBusy}>{favoriteBusy ? <LoaderCircle className="size-5 animate-spin" /> : <Heart className={`size-5 ${item.favorite ? "fill-current" : ""}`} />}{item.favorite ? "已收藏" : "收藏课程"}</button>
-            </div>
+    <SpaceShell student={student} active="learning" className="space-detail-page space-explore-detail">
+      <SpacePageHeading title="课程详情" backHref="/learning" backLabel="返回我的学习" />
+      <section className="space-detail-hero">
+        <SpaceCourseArt subject={item.course.subject} className="space-detail-art" priority />
+        <div className="space-detail-copy">
+          <p className="space-eyebrow">{item.course.subjectLabel} · {completed ? "已经学完" : "探索下一站"}</p>
+          <h2>{item.course.title}</h2>
+          <p className="space-detail-intro">{item.course.objective}</p>
+          <p className="space-course-meta"><Clock3 className="size-5" aria-hidden="true" />约 {item.course.estimatedMinutes} 分钟</p>
+          <div className="space-detail-actions">
+            {completed ? (
+              <div className="space-detail-status is-complete"><p><Check className="size-5" aria-hidden="true" />这节课学完啦</p><span>{item.report ? "学习结果已保存，可以在下方查看。" : "学习记录已保存，报告准备好后会出现在这里。"}</span></div>
+            ) : item.fullClassroomAvailable && item.taskId ? (
+              <Button asChild><DocumentLink href={openMaicLessonPath(item.taskId)}>{item.session?.status === "in_progress" ? "继续上课" : "开始上课"}<ArrowRight className="size-5" aria-hidden="true" /></DocumentLink></Button>
+            ) : item.fullClassroomAvailable ? (
+              <LearningCourseStartButton key={`${item.course.id}:${item.course.version}`} courseId={item.course.id} version={item.course.version} />
+            ) : (
+              <div className="space-detail-status"><p><Sparkles className="size-5" aria-hidden="true" />完整课堂准备中</p><span>准备好后就能和老师一起开始。</span></div>
+            )}
+            <button type="button" className={`focus-ring space-detail-favorite ${item.favorite ? "is-active" : ""}`} aria-pressed={item.favorite} onClick={() => void toggleFavorite()} disabled={favoriteBusy}>{favoriteBusy ? <LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Heart className={`size-5 ${item.favorite ? "fill-current" : ""}`} aria-hidden="true" />}{item.favorite ? "已收藏" : "收藏课程"}{favoritePulse > 0 && item.favorite ? <span key={favoritePulse} className="space-favorite-burst" aria-hidden="true"><Sparkles /><i /><i /></span> : null}</button>
           </div>
-          <div className={`learning-detail-visual ${presentation.surface}`}><MiraBuddy mood={completed ? "celebrate" : "reading"} className="w-44" /><span>{completed ? <><Check className="size-5" />已经学完</> : <><BookOpenCheck className="size-5" />先讲再练</>}</span></div>
-        </section>
-
-        <div className="learning-detail-grid is-single">
-          <section className="learning-detail-outline" aria-labelledby="course-goal-title">
-            <p>这节课会学什么</p>
-            <h2 id="course-goal-title"><Target className="size-6" />学习目标</h2>
-            <div className="learning-goal-line"><span>01</span><p>{item.course.objective}</p></div>
-            <div className="learning-goal-line"><span>02</span><p>跟着老师听讲、看示范，再进入互动练习。</p></div>
-            <div className="learning-goal-line"><span>03</span><p>学习结果由服务端课程规则判断，网页不保存答案。</p></div>
-            <dl><div><dt>课程版本</dt><dd>{item.course.version}</dd></div><div><dt>题目数量</dt><dd>{item.course.questionCount} 道</dd></div><div><dt>预计时间</dt><dd><Clock3 className="size-4" />{item.course.estimatedMinutes} 分钟</dd></div></dl>
-          </section>
         </div>
+      </section>
 
-        {item.report ? <section className="learning-detail-report"><Check className="size-6" /><div><p>上次学习结果</p><h2>{item.report.summary}</h2><span>{item.report.nextStep}</span></div><strong>{item.report.score}<small>分</small></strong></section> : null}
-        {error ? <p className="learning-inline-error" role="alert">{error}</p> : null}
-      </main>
-    </div>
+      <section className="space-detail-outline" aria-labelledby="course-goal-title">
+        <div className="space-section-heading"><h2 id="course-goal-title"><Target className="size-6" aria-hidden="true" />学习目标</h2><p>这节课会学什么</p></div>
+        <ol className="space-learning-goals space-goal-orbit">
+          <li><span className="space-goal-node">01</span><div><h3>发现新知识</h3><p>{item.course.objective}</p></div></li>
+          <li><span className="space-goal-node">02</span><div><h3>跟着老师试一试</h3><p>听讲解、看示范，再亲手完成互动练习。</p></div></li>
+          <li><span className="space-goal-node">03</span><div><h3>把学会的记住</h3><p>看看自己的学习结果，找到下次进步的方向。</p></div></li>
+        </ol>
+        <div className="space-detail-facts"><span><Clock3 aria-hidden="true" />{item.course.estimatedMinutes} 分钟</span><span>{item.course.questionCount} 道互动练习</span></div>
+        {item.course.intro && item.course.intro !== item.course.objective ? <details className="space-course-introduction"><summary className="focus-ring">课程介绍</summary><p>{item.course.intro}</p></details> : null}
+      </section>
+      {item.report ? <section className="space-detail-report"><span className="space-result-icon"><Check aria-hidden="true" /></span><div><p className="space-eyebrow">上次学习结果</p><h2>{item.report.summary}</h2><p>{item.report.nextStep}</p></div><strong>{item.report.score}<small>分</small></strong></section> : null}
+      {error ? <p className="space-inline-error" role="alert">{error}</p> : null}
+    </SpaceShell>
   );
 }
 
 function CourseDetailLoading() {
-  return <main id="main-content" className="learning-detail-loading" aria-live="polite"><LoaderCircle className="size-6 animate-spin" />正在打开课程详情</main>;
+  return <div className="space-page-state" role="status"><LoaderCircle className="animate-spin motion-reduce:animate-none" aria-hidden="true" /><h1>正在打开课程详情</h1></div>;
 }
 
 function CourseDetailError({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return <main id="main-content" className="learning-detail-error"><MiraBuddy mood="thinking" className="w-28" /><h1>这门课暂时打不开</h1><p>{message}</p><div><Button onClick={onRetry}>再试一次</Button><Button variant="secondary" asChild><Link href="/learning">返回我的学习</Link></Button></div></main>;
+  return <div className="space-page-state"><Target aria-hidden="true" /><h1>这门课暂时打不开</h1><p>{message}</p><div className="space-inline-actions"><Button onClick={onRetry}>再试一次</Button><Button variant="secondary" asChild><Link href="/learning">返回我的学习</Link></Button></div></div>;
 }

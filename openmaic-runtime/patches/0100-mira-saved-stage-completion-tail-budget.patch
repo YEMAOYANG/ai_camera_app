@@ -1,0 +1,459 @@
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -15,6 +15,8 @@
+ import { assertMiraFormalSelectionInput } from '../lib/server/mira-formal-skill-selection';
+ import type { InteractionDesignContext } from '../lib/server/mira-formal-interaction-design';
+ import { savedStageInspectionPlanner } from './formal-saved-stage-inspection';
++import { completionTailArgument, validateCompletionTailBudget,
++  type ValidatedCompletionTailBudget } from '../lib/server/mira-formal-completion-tail-budget';
+ import { CLASSROOM_JOBS_DIR, writeJsonFileAtomic } from '../lib/server/classroom-storage';
+ import type { ClassroomGenerationJob } from '../lib/server/classroom-job-store';
+ import { assertMiraFormalAudioProviderReady, readMiraFormalAsrJob, readMiraFormalTtsJob, readMiraFormalTtsAsset,
+@@ -141,11 +143,12 @@
+ }
+ 
+ async function main() {
+-  const [mode, manifestPath] = process.argv.slice(2);
++  const [mode, manifestPath, ...extraArgs] = process.argv.slice(2);
+   if (!['prepare', 'inspect', 'complete', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
+     'revalidate-audio-comparison', 'complete-audio-comparison-tail'].includes(mode) || !manifestPath)
+-    throw new Error('Usage: recover-formal-saved-stage.ts prepare|inspect|complete|complete-browser-recheck|revalidate-audio-comparison|complete-audio-comparison-tail manifest.json');
++    throw new Error('Usage: recover-formal-saved-stage.ts prepare|inspect|complete|complete-browser-recheck|revalidate-audio-comparison|complete-audio-comparison-tail manifest.json [--completion-paid-budget sidecar.json]');
+   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
++  const completionTailPath = completionTailArgument(mode, manifest, extraArgs);
+   if (mode === 'complete-browser-recheck' && (manifest.reviewGrantPath || manifest.asrSourceRequestId || manifest.ttsSourceRequestId))
+     throw new Error('SAVED_STAGE_BROWSER_RECHECK_CANNOT_MIX_RECOVERIES');
+   if (!/^[A-Za-z0-9_-]+$/.test(manifest.jobId) || !/^[a-f0-9]{64}$/.test(manifest.sourceJobSha256))
+@@ -250,7 +253,7 @@
+     const spec = parseFormalCoursewareSpec(job.formalInput);
+     const inspectionOptions = savedStageInspectionPlanner(
+       isMiraInteractionCreationPolicy(job.formalInput.professionalCreationPolicy) ? {
+-        stage: prepared.stage, scenes: prepared.scenes,
++        scenes: prepared.scenes,
+         gradeBoundary: { ...assertMiraFormalSelectionInput(formalAdaptiveSkillSelectionInput(job.formalInput)) },
+         interactionDesign: {
+           policy: (job.formalInput.professionalCreationPolicy as {
+@@ -276,6 +279,30 @@
+   if (!preflight.passed || Object.entries(identity).some(([key, value]) => preflight[key] !== value)
+       || Date.now() - Date.parse(preflight.checkedAt) > 24 * 60 * 60 * 1000)
+     throw new Error('SAVED_STAGE_BROWSER_PREFLIGHT_REQUIRED');
++  let completionTailBudget: ValidatedCompletionTailBudget | undefined;
++  if (completionTailPath) {
++    const stat = await fs.lstat(completionTailPath);
++    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 65536)
++      throw new Error('SAVED_STAGE_COMPLETION_BUDGET_SIDECAR_FILE_INVALID');
++    const sidecar = JSON.parse(await fs.readFile(completionTailPath, 'utf8'));
++    const spec = parseFormalCoursewareSpec(job.formalInput);
++    if (job.formalInputSha256 !== qualitySha(job.formalInput))
++      throw new Error('SAVED_STAGE_COMPLETION_BUDGET_FORMAL_INPUT_CHANGED');
++    completionTailBudget = await validateCompletionTailBudget(sidecar, {
++      parentAuthorizationId: parsePaidBudget(job.formalInput.paidBudget).authorizationId,
++      buildItemId: spec.buildItemId, jobId: job.id, runtimeRequestId: spec.runtimeRequestId,
++      ...identity, formalInputSha256: job.formalInputSha256, ownerId: prepared.ownerId,
++      speechActionCount: prepared.scenes.flatMap(scene => scene.actions ?? []).filter(action => action.type === 'speech').length,
++      sceneIds: prepared.scenes.map(scene => scene.id),
++      lockedQuestionIds: [...spec.guided, ...spec.independent].map(question => question.id),
++    });
++    const auditPath = path.join(folder, `completion-paid-budget-${completionTailBudget.receiptSha256}.json`);
++    try { await fs.writeFile(auditPath, JSON.stringify(sidecar), { flag: 'wx', mode: 0o600 }); }
++    catch (error) {
++      if ((error as NodeJS.ErrnoException).code !== 'EEXIST'
++          || qualitySha(JSON.parse(await fs.readFile(auditPath, 'utf8'))) !== completionTailBudget.receiptSha256) throw error;
++    }
++  }
+   let audioTailReceipt: string | undefined;
+   let asrComparisonRevalidation: AsrComparisonReference[] | undefined;
+   let audioRepair: Awaited<ReturnType<typeof verifiedAudioRepairs>> | undefined;
+@@ -337,7 +364,9 @@
+     } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+     const claim = await fs.open(path.join(folder,
+       `complete-${snapshotSha256}${audioTailReceipt ? `-audio-${audioTailReceipt}` : reviewGrantSha256 ? `-review-${reviewGrantSha256}` : ''}.claim`), 'wx', 0o600);
+-    await claim.writeFile(JSON.stringify({ ...identity, reviewGrantSha256, pid: process.pid, createdAt: new Date().toISOString() }));
++    await claim.writeFile(JSON.stringify({ ...identity, reviewGrantSha256,
++      ...(completionTailBudget ? { completionTailGrantSha256: completionTailBudget.receiptSha256 } : {}),
++      pid: process.pid, createdAt: new Date().toISOString() }));
+     await claim.sync(); await claim.close();
+   }
+   try { await fs.writeFile(path.join(folder, 'source-job.json'), source, { flag: 'wx', mode: 0o600 }); }
+@@ -350,11 +379,13 @@
+     baseUrl: 'http://127.0.0.1:3100', cachedQualityOnly: !!audioTailReceipt,
+     asrComparisonRevalidation,
+     approvedReviewGrant,
++    completionTailBudget,
+     onProgress: progress => { console.log(JSON.stringify(progress)); },
+   });
+   const receipt = { ...identity, kind: 'operator_saved_stage_repair', originalSessionStatus: prepared.originalSessionStatus,
+     recoveryId: `omsaved_${qualitySha(identity).slice(0, 24)}`, completedAt: new Date().toISOString(),
+     newAgentSessions: 0, newSearches: 0, ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}),
++    ...(completionTailBudget ? { completionTailGrantSha256: completionTailBudget.receiptSha256 } : {}),
+     ...(browserRecheckSha256 ? { browserRecheckSha256 } : {}),
+     ...(asrComparisonRevalidation ? { asrComparisonRevalidationReceiptSha256: audioTailReceipt,
+       asrComparisonRevalidationReceipts: asrComparisonRevalidation } : {}),
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -1,8 +1,11 @@
+ import {
+   isPaidBudgetObservationMode,
++  parsePaidBudget,
+   persistSessionPaidBudget,
+   withPaidBudget,
+ } from './mira-paid-budget';
++import { assertCompletionTailExecution, completionTailPaidBudget,
++  type ValidatedCompletionTailBudget } from './mira-formal-completion-tail-budget';
+ import { createHash } from 'node:crypto';
+ import { normalizeAsrComparisonReferences, type AsrComparisonReferences } from './mira-formal-asr-revalidation';
+ import { access } from 'node:fs/promises';
+@@ -1297,7 +1300,11 @@
+ async function completeMiraFormalProfessionalClassroom(
+   ...args: Parameters<typeof completeMiraFormalProfessionalClassroomInner>
+ ): Promise<MiraFormalProfessionalRecoveryCompletion> {
+-  return withPaidBudget(args[0].paidBudget, args[2].sessionId + ':completion',
++  const tail = args[3].completionTailBudget;
++  if (tail && (!args[3].expectedStageId || !args[3].recoveredScenes || args[3].requireCitationRepair
++      || args[3].approvedReviewGrant || args[3].cachedQualityOnly || args[3].asrComparisonRevalidation))
++    throw new Error('SAVED_STAGE_COMPLETION_BUDGET_CANNOT_MIX_RECOVERIES');
++  return withPaidBudget(tail ? completionTailPaidBudget(tail) : args[0].paidBudget, args[2].sessionId + ':completion',
+     () => completeMiraFormalProfessionalClassroomInner(...args));
+ }
+ 
+@@ -1315,6 +1322,7 @@
+     cachedQualityOnly?: boolean;
+     asrComparisonRevalidation?: AsrComparisonReferences;
+     approvedReviewGrant?: FormalQualityReviewGrant;
++    completionTailBudget?: ValidatedCompletionTailBudget;
+   },
+ ): Promise<MiraFormalProfessionalRecoveryCompletion> {
+   const events = await readAllSessionEvents(identity.sessionId);
+@@ -1614,10 +1622,25 @@
+   repair: MiraSavedStageRecoveryInput,
+   options: { baseUrl: string; cachedQualityOnly?: boolean; approvedReviewGrant?: FormalQualityReviewGrant;
+     asrComparisonRevalidation?: AsrComparisonReferences;
++    completionTailBudget?: ValidatedCompletionTailBudget;
+     onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void },
+ ) {
+   const prepared = await prepareMiraFormalSavedStageRecovery(input, repair);
+-  return completeMiraFormalProfessionalClassroom(input, parseFormalCoursewareSpec(input), prepared,
++  const spec = parseFormalCoursewareSpec(input);
++  if (options.completionTailBudget) {
++    const { qualitySha, qualitySnapshot } = await import('./mira-formal-quality-contract');
++    assertCompletionTailExecution(options.completionTailBudget, {
++      parentAuthorizationId: parsePaidBudget(input.paidBudget).authorizationId,
++      buildItemId: spec.buildItemId, runtimeRequestId: spec.runtimeRequestId,
++      formalInputSha256: qualitySha(input), sourceSnapshotSha256: repair.expectedSourceSnapshotSha256,
++      repairSnapshotSha256: qualitySha(qualitySnapshot(prepared.stage, prepared.scenes)),
++      sessionId: prepared.sessionId, ownerId: prepared.ownerId, stageId: prepared.stage.id,
++      speechActionCount: prepared.scenes.flatMap(scene => scene.actions ?? []).filter(action => action.type === 'speech').length,
++      sceneIds: prepared.scenes.map(scene => scene.id),
++      lockedQuestionIds: [...spec.guided, ...spec.independent].map(question => question.id),
++    });
++  }
++  return completeMiraFormalProfessionalClassroom(input, spec, prepared,
+     { ...options, expectedStageId: repair.expectedStageId, recoveredScenes: repair.scenes,
+       recheckUnsentBrowserReview: true });
+ }
+diff --git a/lib/server/mira-formal-completion-tail-budget.ts b/lib/server/mira-formal-completion-tail-budget.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-completion-tail-budget.ts
+@@ -0,0 +1,155 @@
++/** A separately audited budget for completing one frozen saved classroom.
++ * It never replaces the original job/session binding and cannot start an Agent. */
++import { parsePaidBudget, type PaidBudgetBinding } from './mira-paid-budget';
++import { qualitySha } from './mira-formal-quality-contract';
++
++const SCHEMA = 'mira.learning.saved-stage-tail-grant.v1';
++const SHA = /^[a-f0-9]{64}$/;
++const PRICE_MODELS = {
++  'deepseek-flash-peak': ['deepseek', 'deepseek-v4-flash'],
++  'deepseek-vision-peak': ['deepseek', 'deepseek-v4-flash-vision-exp'],
++  'qwen-tts-beijing': ['qwen-tts', 'qwen3-tts-flash'],
++  'qwen-asr-beijing': ['qwen-asr', 'qwen3-asr-flash'],
++} as const;
++type RecordValue = Record<string, unknown>;
++const object = (value: unknown): value is RecordValue =>
++  !!value && typeof value === 'object' && !Array.isArray(value);
++const fail = (detail: string): never => { throw new Error(`SAVED_STAGE_COMPLETION_BUDGET_${detail}`); };
++const exact = (value: unknown, keys: string[]) => object(value)
++  && Object.keys(value).sort().join(',') === [...keys].sort().join(',');
++
++export interface CompletionTailIdentity {
++  parentAuthorizationId: string;
++  buildItemId: string;
++  runtimeId: string;
++  runtimeRequestId: string;
++  jobId: string;
++  sourceJobSha256: string;
++  sourceSnapshotSha256: string;
++  repairSnapshotSha256: string;
++  formalInputSha256: string;
++  sessionId: string;
++  ownerId: string;
++  stageId: string;
++  speechActionCount: number;
++  sceneIds: string[];
++  lockedQuestionIds: string[];
++}
++export interface CompletionTailSidecar {
++  schemaVersion: typeof SCHEMA;
++  planSha256: string;
++  authorizationId: string;
++  paidBudget: PaidBudgetBinding;
++  identity: CompletionTailIdentity;
++  parentAuthorizationSha256: string;
++  scopeSha256: string;
++  scope: RecordValue;
++  startsAt: number;
++  expiresAt: number;
++  priceKeys: string[];
++  limits: RecordValue;
++  transportTerminalPlanSha256: string;
++}
++declare const verified: unique symbol;
++export interface ValidatedCompletionTailBudget {
++  readonly receiptSha256: string;
++  readonly [verified]: true;
++}
++const validated = new WeakMap<ValidatedCompletionTailBudget, CompletionTailSidecar>();
++
++/** The new flag is intentionally separate from the frozen recovery manifest. */
++export function completionTailArgument(mode: string, manifest: RecordValue, args: string[]): string | undefined {
++  if (!args.length) return undefined;
++  if (args.length !== 2 || args[0] !== '--completion-paid-budget' || !args[1].trim())
++    return fail('ARGUMENT_INVALID');
++  if (mode !== 'complete') return fail('COMPLETE_ONLY');
++  if (['reviewGrantPath', 'browserRecheck', 'asrSourceRequestId', 'ttsSourceRequestId',
++    'audioRepair', 'pronunciationRepair', 'asrComparisonRevalidation'].some(key => key in manifest))
++    return fail('CANNOT_MIX_RECOVERIES');
++  return args[1];
++}
++
++async function authoritativeContext(authorizationId: string): Promise<RecordValue> {
++  const token = process.env.MIRA_INTERNAL_API_TOKEN;
++  const base = process.env.MIRA_BACKEND_INTERNAL_URL;
++  if (!token || !base) return fail('SERVICE_UNCONFIGURED');
++  const response = await fetch(new URL('/internal/learning/budget/context', base), {
++    method: 'POST', redirect: 'error', signal: AbortSignal.timeout(15000),
++    headers: { 'Content-Type': 'application/json', 'X-Mira-Internal-Token': token,
++      'X-Mira-Internal-Source': 'openmaic-runtime-gateway' },
++    body: JSON.stringify({ authorizationId }),
++  });
++  const result: unknown = await response.json().catch(() => null);
++  if (!response.ok || !object(result) || result.ok !== true || !object(result.budget))
++    return fail('AUTHORITY_REJECTED');
++  return result.budget;
++}
++
++/** The internal accounting service validates the full stored audit before
++ * returning completionTailGrant. A locally rehashed file is not authority. */
++export async function validateCompletionTailBudget(
++  value: unknown,
++  expected: Omit<CompletionTailIdentity, 'runtimeId'>,
++): Promise<ValidatedCompletionTailBudget> {
++  if (!exact(value, ['schemaVersion', 'planSha256', 'authorizationId', 'paidBudget', 'identity',
++    'parentAuthorizationSha256', 'scopeSha256', 'scope', 'startsAt', 'expiresAt', 'priceKeys',
++    'limits', 'transportTerminalPlanSha256'])) return fail('SIDECAR_INVALID');
++  const sidecar = value as unknown as CompletionTailSidecar;
++  const identityKeys = ['parentAuthorizationId', 'buildItemId', 'runtimeId', 'runtimeRequestId', 'jobId',
++    'sourceJobSha256', 'sourceSnapshotSha256', 'repairSnapshotSha256', 'formalInputSha256',
++    'sessionId', 'ownerId', 'stageId', 'speechActionCount', 'sceneIds', 'lockedQuestionIds'];
++  if (sidecar.schemaVersion !== SCHEMA || !exact(sidecar.identity, identityKeys)
++      || !/^omfc_[A-Za-z0-9_-]+$/.test(sidecar.identity.runtimeId)
++      || Object.entries(expected).some(([key, item]) => qualitySha(sidecar.identity[key as keyof CompletionTailIdentity]) !== qualitySha(item))
++      || [sidecar.planSha256, sidecar.authorizationId, sidecar.parentAuthorizationSha256,
++        sidecar.scopeSha256, sidecar.transportTerminalPlanSha256].some(item => !SHA.test(item))
++      || !object(sidecar.scope) || sidecar.scope.purpose !== 'production'
++      || sidecar.scope.productionJobId !== expected.buildItemId
++      || sidecar.scope.userId !== null || sidecar.scope.sessionId !== null
++      || sidecar.scopeSha256 !== qualitySha(sidecar.scope)
++      || !object(sidecar.limits)
++      || !Array.isArray(sidecar.priceKeys)
++      || sidecar.priceKeys.slice().sort().join(',') !== Object.keys(PRICE_MODELS).sort().join(','))
++    return fail('IDENTITY_MISMATCH');
++  if (sidecar.authorizationId !== qualitySha({ schema: 'mira.learning.saved-stage-tail-authorization.v1', identity: sidecar.identity }))
++    return fail('AUTHORIZATION_ID_MISMATCH');
++  const binding = parsePaidBudget(sidecar.paidBudget);
++  if (binding.authorizationId !== sidecar.authorizationId || binding.authorizationId === expected.parentAuthorizationId)
++    return fail('BINDING_MISMATCH');
++  if (!Number.isSafeInteger(sidecar.startsAt) || !Number.isSafeInteger(sidecar.expiresAt)
++      || !(sidecar.startsAt <= Date.now() && Date.now() < sidecar.expiresAt))
++    return fail('WINDOW_CLOSED');
++  const authority = await authoritativeContext(binding.authorizationId);
++  if (authority.authorizationId !== binding.authorizationId || authority.purpose !== 'production'
++      || !object(authority.completionTailGrant) || qualitySha(authority.completionTailGrant) !== qualitySha(sidecar)
++      || !object(authority.prices)
++      || Object.keys(authority.prices).sort().join(',') !== Object.keys(PRICE_MODELS).sort().join(',')
++      || Object.entries(PRICE_MODELS).some(([key, [provider, model]]) => {
++        const price = (authority.prices as RecordValue)[key];
++        return !object(price) || price.provider !== provider || price.model !== model;
++      })) return fail('AUTHORITY_MISMATCH');
++  // Clone after verification, so mutating the caller's parsed JSON cannot alter execution.
++  const token = Object.freeze({ receiptSha256: qualitySha(sidecar) }) as ValidatedCompletionTailBudget;
++  validated.set(token, JSON.parse(JSON.stringify(sidecar)) as CompletionTailSidecar);
++  return token;
++}
++
++export function assertCompletionTailExecution(
++  token: ValidatedCompletionTailBudget,
++  expected: Pick<CompletionTailIdentity, 'parentAuthorizationId' | 'buildItemId' | 'runtimeRequestId'
++    | 'formalInputSha256' | 'sourceSnapshotSha256' | 'repairSnapshotSha256' | 'sessionId' | 'ownerId'
++    | 'stageId' | 'speechActionCount' | 'sceneIds' | 'lockedQuestionIds'>,
++) {
++  const sidecar = validated.get(token);
++  if (!sidecar || Object.entries(expected).some(([key, value]) =>
++    qualitySha(sidecar.identity[key as keyof CompletionTailIdentity]) !== qualitySha(value)))
++    return fail('EXECUTION_MISMATCH');
++  return completionTailPaidBudget(token);
++}
++
++export function completionTailPaidBudget(token: ValidatedCompletionTailBudget): PaidBudgetBinding {
++  const sidecar = validated.get(token);
++  if (!sidecar) return fail('VALIDATED_CONTEXT_REQUIRED');
++  if (!(sidecar.startsAt <= Date.now() && Date.now() < sidecar.expiresAt)) return fail('WINDOW_CLOSED');
++  return { ...sidecar.paidBudget };
++}
+diff --git a/tests/server/mira-formal-completion-tail-budget.test.ts b/tests/server/mira-formal-completion-tail-budget.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-completion-tail-budget.test.ts
+@@ -0,0 +1,139 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { qualitySha } from '@/lib/server/mira-formal-quality-contract';
++import { paidBudgetContext, withPaidBudget } from '@/lib/server/mira-paid-budget';
++import {
++  assertCompletionTailExecution, completionTailArgument, completionTailPaidBudget,
++  validateCompletionTailBudget, type CompletionTailSidecar,
++} from '@/lib/server/mira-formal-completion-tail-budget';
++
++const NOW = 1_800_000_000_000;
++const models = {
++  'deepseek-flash-peak': { provider: 'deepseek', model: 'deepseek-v4-flash' },
++  'deepseek-vision-peak': { provider: 'deepseek', model: 'deepseek-v4-flash-vision-exp' },
++  'qwen-tts-beijing': { provider: 'qwen-tts', model: 'qwen3-tts-flash' },
++  'qwen-asr-beijing': { provider: 'qwen-asr', model: 'qwen3-asr-flash' },
++};
++function fixture() {
++  const identity = {
++    parentAuthorizationId: '1'.repeat(64), buildItemId: 'catalog_build_item_frozen',
++    runtimeId: 'omfc_original', runtimeRequestId: 'frozen-attempt-1', jobId: 'omformal_original',
++    sourceJobSha256: '2'.repeat(64), sourceSnapshotSha256: '3'.repeat(64),
++    repairSnapshotSha256: '4'.repeat(64), formalInputSha256: '5'.repeat(64),
++    sessionId: 'miraformal_' + '6'.repeat(64), ownerId: 'mira-formal-professional:' + '6'.repeat(64),
++    stageId: 'stage-frozen', speechActionCount: 36,
++    sceneIds: ['p1', 'p2', 'p4', 'p3', 'p5', 'p6', 'p7', 'p8'], lockedQuestionIds: ['q2', 'q3', 'q4', 'q5'],
++  };
++  const authorizationId = qualitySha({ schema: 'mira.learning.saved-stage-tail-authorization.v1', identity });
++  const scope = { purpose: 'production', gradeCode: 'primary_6', subject: 'math',
++    courseId: 'catalog-item:catalog_build_item_frozen', courseVersion: 'frozen-policy', userId: null,
++    sessionId: null, productionJobId: identity.buildItemId, approvalReference: 'original-approval' };
++  const sidecar: CompletionTailSidecar = {
++    schemaVersion: 'mira.learning.saved-stage-tail-grant.v1', planSha256: '7'.repeat(64), authorizationId,
++    paidBudget: { schemaVersion: 'mira.learning.paid-budget-binding.v1', required: true, authorizationId },
++    identity, parentAuthorizationSha256: '8'.repeat(64), scopeSha256: qualitySha(scope), scope,
++    startsAt: NOW - 1000, expiresAt: NOW + 60_000, priceKeys: Object.keys(models).sort(),
++    limits: { calls: 74 }, transportTerminalPlanSha256: '9'.repeat(64),
++  };
++  const { runtimeId: _, ...expected } = identity;
++  return { sidecar, expected };
++}
++function mockAuthority(sidecar: CompletionTailSidecar, change?: (authority: Record<string, any>) => void) {
++  const authority = { authorizationId: sidecar.authorizationId, purpose: 'production',
++    completionTailGrant: structuredClone(sidecar), prices: structuredClone(models) };
++  change?.(authority);
++  const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ ok: true, budget: authority }) });
++  vi.stubGlobal('fetch', fetchMock);
++  return fetchMock;
++}
++beforeEach(() => {
++  vi.spyOn(Date, 'now').mockReturnValue(NOW);
++  vi.stubEnv('MIRA_INTERNAL_API_TOKEN', 'test-only-internal-token');
++  vi.stubEnv('MIRA_BACKEND_INTERNAL_URL', 'http://127.0.0.1:8000');
++  vi.stubGlobal('fetch', vi.fn(() => { throw new Error('Unexpected network attempt'); }));
++});
++afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
++
++describe('saved-stage completion-only sidecar authority', () => {
++  it('uses an independently verified binding in completion and restores the original context', async () => {
++    const { sidecar, expected } = fixture(); const fetchMock = mockAuthority(sidecar);
++    const before = JSON.stringify(sidecar);
++    const token = await validateCompletionTailBudget(sidecar, expected);
++    expect(fetchMock).toHaveBeenCalledOnce();
++    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ authorizationId: sidecar.authorizationId });
++    expect(fetchMock.mock.calls[0][0].pathname).toBe('/internal/learning/budget/context');
++    const original = { ...sidecar.paidBudget, authorizationId: expected.parentAuthorizationId };
++    const { jobId: _, sourceJobSha256: __, ...execution } = expected;
++    await withPaidBudget(original, 'original-session', async () => {
++      const binding = assertCompletionTailExecution(token, execution);
++      await withPaidBudget(binding, expected.sessionId + ':completion', async () => {
++        expect(paidBudgetContext.getStore()?.binding.authorizationId).toBe(sidecar.authorizationId);
++      });
++      expect(paidBudgetContext.getStore()?.binding.authorizationId).toBe(original.authorizationId);
++    });
++    expect(paidBudgetContext.getStore()).toBeUndefined();
++    expect(JSON.stringify(sidecar)).toBe(before);
++    expect(token.receiptSha256).toBe(qualitySha(sidecar));
++    sidecar.paidBudget.authorizationId = 'f'.repeat(64);
++    expect(completionTailPaidBudget(token).authorizationId).not.toBe(sidecar.paidBudget.authorizationId);
++  });
++  it.each(['prepare', 'inspect', 'complete-browser-recheck', 'repair-audio', 'diagnose-audio',
++    'revalidate-audio-comparison', 'complete-audio-tail', 'complete-audio-comparison-tail'])('rejects %s with the sidecar before work', mode => {
++    expect(() => completionTailArgument(mode, {}, ['--completion-paid-budget', 'sidecar.json'])).toThrow('COMPLETE_ONLY');
++  });
++  it.each(['reviewGrantPath', 'browserRecheck', 'asrSourceRequestId', 'ttsSourceRequestId',
++    'audioRepair', 'pronunciationRepair', 'asrComparisonRevalidation'])('rejects mixing %s', key => {
++    expect(() => completionTailArgument('complete', { [key]: null }, ['--completion-paid-budget', 'sidecar.json'])).toThrow('CANNOT_MIX_RECOVERIES');
++  });
++  it('keeps old invocations unchanged and rejects unrecognized or repeated extra flags', () => {
++    expect(completionTailArgument('complete', { reviewGrantPath: 'old.json' }, [])).toBeUndefined();
++    expect(completionTailArgument('complete', {}, ['--completion-paid-budget', 'sidecar.json'])).toBe('sidecar.json');
++    for (const args of [['--other', 'sidecar.json'], ['--completion-paid-budget'],
++      ['--completion-paid-budget', 'one', '--completion-paid-budget', 'two']])
++      expect(() => completionTailArgument('complete', {}, args)).toThrow('ARGUMENT_INVALID');
++  });
++  it.each(['parentAuthorizationId', 'buildItemId', 'runtimeRequestId', 'jobId', 'sourceJobSha256',
++    'sourceSnapshotSha256', 'repairSnapshotSha256', 'formalInputSha256', 'sessionId', 'ownerId', 'stageId',
++    'speechActionCount', 'sceneIds', 'lockedQuestionIds'])('rejects changed frozen %s without contacting authority', async key => {
++    const { sidecar, expected } = fixture();
++    (sidecar.identity as any)[key] = key === 'speechActionCount' ? 35
++      : key === 'sceneIds' || key === 'lockedQuestionIds' ? ['changed'] : 'changed';
++    await expect(validateCompletionTailBudget(sidecar, expected)).rejects.toThrow('IDENTITY_MISMATCH');
++    expect(fetch).not.toHaveBeenCalled();
++  });
++  it.each(['missing', 'mismatch', 'scope', 'extra price', 'wrong model', 'wrong purpose'])('rejects %s backend authority', async kind => {
++    const { sidecar, expected } = fixture();
++    mockAuthority(sidecar, authority => {
++      if (kind === 'missing') delete authority.completionTailGrant;
++      if (kind === 'mismatch') authority.completionTailGrant.planSha256 = 'a'.repeat(64);
++      if (kind === 'scope') authority.completionTailGrant.scope.approvalReference = 'different';
++      if (kind === 'extra price') authority.prices['deepseek-pro-peak'] = { provider: 'deepseek', model: 'deepseek-v4-pro' };
++      if (kind === 'wrong model') authority.prices['qwen-tts-beijing'].model = 'other-model';
++      if (kind === 'wrong purpose') authority.purpose = 'required_teaching';
++    });
++    await expect(validateCompletionTailBudget(sidecar, expected)).rejects.toThrow('AUTHORITY_MISMATCH');
++  });
++  it('rejects a locally rehashed different authority and a stale or future window', async () => {
++    for (const change of [(s: CompletionTailSidecar) => s.authorizationId = 'a'.repeat(64),
++      (s: CompletionTailSidecar) => s.expiresAt = NOW,
++      (s: CompletionTailSidecar) => s.startsAt = NOW + 1]) {
++      const { sidecar, expected } = fixture(); change(sidecar);
++      await expect(validateCompletionTailBudget(sidecar, expected)).rejects.toThrow('SAVED_STAGE_COMPLETION_BUDGET_');
++    }
++    expect(fetch).not.toHaveBeenCalled();
++  });
++  it('rejects an expired backend authority even when the file claims future expiry', async () => {
++    const { sidecar, expected } = fixture();
++    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false,
++      json: async () => ({ ok: false, error: 'learning_budget_authorization_expired' }) }));
++    await expect(validateCompletionTailBudget(sidecar, expected)).rejects.toThrow('AUTHORITY_REJECTED');
++  });
++  it('does not accept a serialized token, changed execution snapshot, or expiry after validation', async () => {
++    const { sidecar, expected } = fixture(); mockAuthority(sidecar);
++    const token = await validateCompletionTailBudget(sidecar, expected);
++    expect(() => completionTailPaidBudget(JSON.parse(JSON.stringify(token)))).toThrow('VALIDATED_CONTEXT_REQUIRED');
++    const { jobId: _, sourceJobSha256: __, ...execution } = expected;
++    expect(() => assertCompletionTailExecution(token, { ...execution, repairSnapshotSha256: 'f'.repeat(64) })).toThrow('EXECUTION_MISMATCH');
++    vi.spyOn(Date, 'now').mockReturnValue(sidecar.expiresAt);
++    expect(() => completionTailPaidBudget(token)).toThrow('WINDOW_CLOSED');
++  });
++});

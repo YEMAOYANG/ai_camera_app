@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+from datetime import datetime
 import json
 import re
 import uuid
@@ -13,6 +14,7 @@ from core.database import Database, DatabaseConnection, DatabaseRow
 from repositories.formal_student_runtime_gate import (
     current_formal_runtime_sql,
     current_formal_validation_authority_sql,
+    with_parsed_runtime_manifests,
 )
 
 
@@ -441,6 +443,14 @@ def _student_visible_course_sql(
           )
       )
     """
+
+
+class LearningCatalogTaskUnavailable(ValueError):
+    """A stopped assignment must not be revived by a catalog start."""
+
+    def __init__(self, status: str):
+        super().__init__(status)
+        self.status = status
 
 
 class LearningRepository:
@@ -1030,7 +1040,7 @@ class LearningRepository:
     ) -> DatabaseRow | None:
         """Return one exact rolling item or a shared active-pointer fallback."""
 
-        return conn.execute(
+        visible = conn.execute(
             f"""
             SELECT course.*
             FROM learning_courses AS course
@@ -1055,6 +1065,15 @@ class LearningRepository:
                 int(grade_selection_revision),
             ),
         ).fetchone()
+        if visible is not None:
+            return visible
+        from repositories.student_shared_course_repository import shared_course_rows
+        shared = shared_course_rows(
+            conn, family_id=family_id, child_id=child_id, grade_code=grade_code,
+            grade_selection_revision=grade_selection_revision,
+            course_id=course_id, course_version=course_version,
+        )
+        return shared[0] if shared else None
 
     def list_student_visible_courses(
         self,
@@ -1095,9 +1114,9 @@ class LearningRepository:
         )
         favorite_sql = " AND favorite.course_id IS NOT NULL" if favorite_only else ""
         params.append(int(limit))
-        return list(
+        rows = list(
             conn.execute(
-                f"""
+                with_parsed_runtime_manifests(f"""
                 SELECT course.*,
                   favorite.course_id AS favorite_course_id,
                   (
@@ -1139,10 +1158,19 @@ class LearningRepository:
                   course.published_at DESC,
                   course.id
                 LIMIT ?
-                """,
+                """),
                 params,
             ).fetchall()
         )
+        from repositories.student_shared_course_repository import shared_course_rows
+        shared = shared_course_rows(
+            conn, family_id=family_id, child_id=child_id, grade_code=grade_code,
+            grade_selection_revision=grade_selection_revision,
+            subject=subject, favorite_only=favorite_only,
+        )
+        merged = {(str(row['id']), str(row['version'])): row for row in shared}
+        merged.update({(str(row['id']), str(row['version'])): row for row in rows})
+        return list(merged.values())[:int(limit)]
 
     def student_catalog_summary(
         self,
@@ -1168,8 +1196,8 @@ class LearningRepository:
             (family_id, child_id, grade_code, int(grade_selection_revision)),
         ).fetchone()
         available = conn.execute(
-            f"""
-            SELECT COUNT(*) AS value
+            with_parsed_runtime_manifests(f"""
+            SELECT course.id, course.version
             FROM learning_courses AS course
             WHERE course.grade_code = ?
               AND course.status = 'published'
@@ -1177,7 +1205,7 @@ class LearningRepository:
               AND course.content_origin = 'openmaic_generated'
               AND course.retired_at IS NULL
               AND {_student_visible_course_sql()}
-            """,
+            """),
             (
                 grade_code,
                 family_id,
@@ -1187,8 +1215,13 @@ class LearningRepository:
                 child_id,
                 int(grade_selection_revision),
             ),
-        ).fetchone()
-        available_count = int((available or {}).get("value") or 0)
+        ).fetchall()
+        from repositories.student_shared_course_repository import shared_course_inventory
+        shared = shared_course_inventory(
+            conn, family_id=family_id, child_id=child_id, grade_code=grade_code,
+            grade_selection_revision=grade_selection_revision,
+        )
+        available_count = len({(str(row['id']), str(row['version'])) for row in available} | set(shared))
         resolved_target = int(
             (plan or {}).get("total_course_count") or target_course_count
         )
@@ -1218,16 +1251,24 @@ class LearningRepository:
     def personal_visible_course_inventory(self, conn: DatabaseConnection, *, family_id: str,
                                           child_id: str, grade_code: str,
                                           grade_selection_revision: int) -> list[DatabaseRow]:
-        return conn.execute(
-            f"""SELECT course.id, course.version, course.subject, course.node_code
+        rows = conn.execute(
+            with_parsed_runtime_manifests(f"""SELECT course.id, course.version, course.subject, course.node_code
                 FROM learning_courses AS course
                 WHERE course.grade_code = ? AND course.status = 'published'
                   AND course.quality_status = 'released' AND course.retired_at IS NULL
                   AND course.content_origin = 'openmaic_generated'
-                  AND {_student_visible_course_sql()}""",
+                  AND {_student_visible_course_sql()}"""),
             (grade_code, family_id, child_id, grade_selection_revision,
              family_id, child_id, grade_selection_revision),
         ).fetchall()
+        from repositories.student_shared_course_repository import shared_course_rows
+        shared = shared_course_rows(
+            conn, family_id=family_id, child_id=child_id, grade_code=grade_code,
+            grade_selection_revision=grade_selection_revision,
+        )
+        merged = {(str(row['id']), str(row['version'])): row for row in shared}
+        merged.update({(str(row['id']), str(row['version'])): row for row in rows})
+        return list(merged.values())
 
     def personal_grade_mastery(self, conn: DatabaseConnection, *, family_id: str,
                               child_id: str, grade_code: str) -> dict[str, str]:
@@ -1373,6 +1414,7 @@ class LearningRepository:
             WHERE family_id = ? AND child_id = ? AND scheduled_date = ?
               AND type = 'learning' AND learning_course_id IS NOT NULL
               AND status <> 'cancelled'
+              AND COALESCE(learning_slot, 'core') <> 'catalog'
               {slot_sql}
             ORDER BY
               CASE learning_slot WHEN 'core' THEN 0 WHEN 'rotation' THEN 1 ELSE 2 END,
@@ -1397,6 +1439,7 @@ class LearningRepository:
                 WHERE family_id = ? AND child_id = ? AND scheduled_date = ?
                   AND type = 'learning' AND learning_course_id IS NOT NULL
                   AND status <> 'cancelled'
+                  AND COALESCE(learning_slot, 'core') <> 'catalog'
                 ORDER BY
                   CASE learning_slot WHEN 'core' THEN 0 WHEN 'rotation' THEN 1 ELSE 2 END,
                   created_at, id
@@ -1469,6 +1512,7 @@ class LearningRepository:
                 WHERE task.family_id = ? AND task.child_id = ?
                   AND task.type = 'learning'
                   AND task.learning_course_id IS NOT NULL
+                  AND COALESCE(task.learning_slot, 'core') <> 'catalog'
                   AND task.scheduled_date >= ? AND task.scheduled_date < ?
                   AND task.status NOT IN (
                     'completed', 'confirmed', 'awaiting_parent_confirmation',
@@ -1496,6 +1540,7 @@ class LearningRepository:
                       AND newer_task.child_id = task.child_id
                       AND newer_task.type = 'learning'
                       AND newer_task.learning_course_id IS NOT NULL
+                      AND COALESCE(newer_task.learning_slot, 'core') <> 'catalog'
                       AND newer_task.status NOT IN (
                         'cancelled', 'rejected', 'expired'
                       )
@@ -1670,6 +1715,7 @@ class LearningRepository:
             WHERE task.family_id = ? AND task.child_id = ?
               AND task.type = 'learning'
               AND task.learning_course_id IS NOT NULL
+              AND COALESCE(task.learning_slot, 'core') <> 'catalog'
               AND task.scheduled_date < ?
               AND task.status NOT IN (
                 'completed', 'confirmed', 'awaiting_parent_confirmation',
@@ -1696,6 +1742,7 @@ class LearningRepository:
                   AND newer_task.child_id = task.child_id
                   AND newer_task.type = 'learning'
                   AND newer_task.learning_course_id IS NOT NULL
+                      AND COALESCE(newer_task.learning_slot, 'core') <> 'catalog'
                   AND newer_task.status NOT IN (
                     'cancelled', 'rejected', 'expired'
                   )
@@ -1754,6 +1801,40 @@ class LearningRepository:
         if existing is not None:
             return existing, False
 
+        return self._insert_learning_task(
+            conn, family_id=family_id, child_id=child_id, learning_date=learning_date,
+            slot=slot, scheduled_start=scheduled_start, course=course,
+            created_by=created_by, now=now, assignment_key=assignment_key,
+        )
+
+    def assign_catalog_task(self, conn, *, family_id, child_id, course, created_by, now):
+        """One independently resumable task per child and exact course version.
+
+        Callers hold the child row lock, also used by session creation. A daily
+        task for this exact version is reusable; other versions stay untouched.
+        """
+        existing = conn.execute(
+            "SELECT * FROM tasks WHERE family_id = ? AND child_id = ? "
+            "AND type = 'learning' AND learning_course_id = ? AND learning_course_version = ? "
+            "ORDER BY created_at DESC, id DESC LIMIT 1 FOR UPDATE",
+            (family_id, child_id, course['id'], course['version']),
+        ).fetchone()
+        if existing is not None:
+            if existing['status'] in {'cancelled', 'rejected', 'expired'}:
+                raise LearningCatalogTaskUnavailable(str(existing['status']))
+            return existing, False
+        assignment_key = hashlib.sha256(
+            f"catalog\n{family_id}\n{child_id}\n{course['id']}\n{course['version']}".encode()
+        ).hexdigest()
+        return self._insert_learning_task(
+            conn, family_id=family_id, child_id=child_id,
+            learning_date=datetime.fromtimestamp(now / 1000).date().isoformat(),
+            slot='catalog', scheduled_start=None, course=course,
+            created_by=created_by, now=now, assignment_key=assignment_key,
+        )
+
+    def _insert_learning_task(self, conn, *, family_id, child_id, learning_date,
+                              slot, scheduled_start, course, created_by, now, assignment_key):
         task_id = f"task_{uuid.uuid4().hex}"
         start_at = (
             f"{learning_date}T{scheduled_start}:00" if scheduled_start else None

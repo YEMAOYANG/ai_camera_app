@@ -7,7 +7,7 @@ from integrations.openmaic_formal_interaction import (
     validate_classroom_interaction, validate_interaction_manifest,
 )
 from integrations.openmaic_formal_media import (
-    INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY,
+    INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY,
     compatible_preparation_target, generation_options,
 )
 from integrations.openmaic_formal_quality import quality_sha, quality_snapshot, QUALITY_VIEWPORTS
@@ -76,7 +76,7 @@ def interaction_fixture(*, discussion=False):
 class FormalInteractionTest(unittest.TestCase):
     def test_new_policy_and_exact_published_video_target_compatibility(self):
         current = build_preparation_target("primary_1")
-        self.assertEqual(current["formalRuntimePolicy"]["professionalCreationPolicy"], MULTISTATE_PROFESSIONAL_POLICY)
+        self.assertEqual(current["formalRuntimePolicy"]["professionalCreationPolicy"], PLAYFUL_PROFESSIONAL_POLICY)
         old = deepcopy(current)
         old["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(VIDEO_PROFESSIONAL_POLICY)
         self.assertEqual(preparation_target_fingerprint(old), "e7f3d4be11e40d516d68b793682c67afe6e515b9e18bab1cd12d6649435cc0cc")

@@ -71,6 +71,72 @@ class FormalDifficultyContractTest(unittest.TestCase):
             with self.assertRaises(ValueError,msg=prompt):solve_objective_question(*args,prompt,'standard')
         self.assertEqual(solve_objective_question(*args,example.replace('3/5','1/8'),'standard'),'10;12.5%')
 
+    def test_fraction_people_unit_matches_declared_quantity_without_editing_answer(self):
+        args = ('primary_6', 'math', 'fraction_ratio_percentage')
+        example = objective_question_policy(*args, 'standard')['publicPromptExample']
+        for prompt, answer, expected in (
+            (example, '48;60%', '48;60%'),
+            (example, '48人;60%', '48;60%'),
+            (example, '４８人；６０％', '48;60%'),
+            (example.replace('3/5', '1/8'), '10人;12.5%', '10;12.5%'),
+        ):
+            for kind in ('exact_text', 'single_choice'):
+                with self.subTest(answer=answer, kind=kind):
+                    question = {'type': kind, 'prompt': prompt, 'answer': answer}
+                    if kind == 'single_choice':
+                        question.update(answer='B', choices=[{'id': 'A', 'label': '32人;40%'},
+                                                             {'id': 'B', 'label': answer}])
+                    frozen = copy.deepcopy(question)
+                    self.assertEqual(validate_objective_question(*args, question, 'standard'), expected)
+                    self.assertEqual(question, frozen)
+
+    def test_fraction_people_unit_rejects_wrong_values_and_other_dimensions(self):
+        args = ('primary_6', 'math', 'fraction_ratio_percentage')
+        prompt = objective_question_policy(*args, 'standard')['publicPromptExample']
+        invalid = ('49人;60%', '48人;61%', '48米;60%', '48名;60%', '48人;60人',
+                   '48%;60%', '48人;0.6', '48人;0.6%', '48人;60', '48人;60%%',
+                   '48人;60%人', '48人60%', '60%;48人', '-48人;60%', '48人;-60%',
+                   '四十八人;60%', '48人;百分之六十', '48人;60%或40%', '48人人;60%')
+        for answer in invalid:
+            for kind in ('exact_text', 'single_choice'):
+                with self.subTest(answer=answer, kind=kind):
+                    question = {'type': kind, 'prompt': prompt, 'answer': answer}
+                    if kind == 'single_choice':
+                        question.update(answer='A', choices=[{'id': 'A', 'label': answer},
+                                                             {'id': 'B', 'label': '32;40%'}])
+                    with self.assertRaises(ValueError):
+                        validate_objective_question(*args, question, 'standard')
+        decimal_prompt = prompt.replace('3/5', '1/8')
+        for answer in ('10人;12.05%', '10人;1.25%', '10人;0.125', '10人;12.5人'):
+            with self.subTest(answer=answer), self.assertRaises(ValueError):
+                validate_objective_question(*args, {'type': 'exact_text', 'prompt': decimal_prompt,
+                                                    'answer': answer}, 'standard')
+
+    def test_fraction_unit_equivalence_still_requires_one_correct_selected_choice(self):
+        args = ('primary_6', 'math', 'fraction_ratio_percentage')
+        prompt = objective_question_policy(*args, 'standard')['publicPromptExample']
+        for choices, answer in (
+            ([{'id': 'A', 'label': '48人;60%'}, {'id': 'B', 'label': '48;60%'}], 'A'),
+            ([{'id': 'A', 'label': '48人;60%'}, {'id': 'B', 'label': '32人;40%'}], 'B'),
+        ):
+            with self.subTest(choices=choices), self.assertRaises(ValueError):
+                validate_objective_question(*args, {'type': 'single_choice', 'prompt': prompt,
+                                                    'choices': choices, 'answer': answer}, 'standard')
+
+    def test_people_unit_does_not_expand_other_bands_or_prompt_grammar(self):
+        args = ('primary_6', 'math', 'fraction_ratio_percentage')
+        for band in ('basic', 'challenge'):
+            prompt = objective_question_policy(*args, band)['publicPromptExample']
+            expected = solve_objective_question(*args, prompt, band)
+            with self.subTest(band=band), self.assertRaises(ValueError):
+                validate_objective_question(*args, {'type': 'exact_text', 'prompt': prompt,
+                                                    'answer': expected[:-1] + '人%'}, band)
+        prompt = objective_question_policy(*args, 'standard')['publicPromptExample']
+        for changed in (prompt.replace('80人', '80米'), prompt.replace('阅读', '阅读增加二人')):
+            with self.subTest(prompt=changed), self.assertRaises(ValueError):
+                validate_objective_question(*args, {'type': 'exact_text', 'prompt': changed,
+                                                    'answer': '48人;60%'}, 'standard')
+
     def test_explicit_slot_allocation_preserves_p1_and_binds_host_receipt(self):
         self.assertEqual(formal_content_contract('primary_1')['datasetSha256'],PRIMARY_ONE_CONTENT_DATASET_SHA256)
         self.assertTrue(all('difficultyCode' not in x for x in build_preparation_target('primary_1')['courseTargets']))

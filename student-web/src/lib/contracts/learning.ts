@@ -262,6 +262,14 @@ export const learningFavoriteResponseSchema = z.object({
   storage: z.enum(["backend", "web_preference"]),
 });
 
+export const learningCourseStartResponseSchema = z.object({
+  ok: z.literal(true),
+  taskId: z.string().trim().min(1).max(160),
+  created: z.boolean(),
+  courseId: z.string().trim().min(1).max(160),
+  courseVersion: z.string().trim().min(1).max(80),
+}).strict();
+
 export const learningTeacherProfileSchema = z.object({
   id: z.string().trim().min(1).max(80),
   version: z.number().int().positive(),

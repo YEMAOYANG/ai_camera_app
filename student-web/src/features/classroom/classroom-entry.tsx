@@ -1,9 +1,8 @@
 "use client";
 
-import { CircleAlert, Clock3, Sparkles } from "lucide-react";
+import { CircleAlert, Clock3, Orbit } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { MiraBuddy } from "@/components/student/mira-buddy";
 import { DocumentLink } from "@/components/navigation/document-link";
 import { Button } from "@/components/ui/button";
 import { ClassroomBooting, ClassroomPlayer } from "@/features/classroom/classroom-player";
@@ -195,24 +194,28 @@ export function ClassroomEntry({
 
 function ClassroomPreparing({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <main id="main-content" className="classroom-preparing-state">
-      <div className="classroom-preparing-visual"><MiraBuddy mood="reading" className="w-40" label="Mira 正在制作课程" /><Sparkles className="classroom-preparing-sparkle size-8" /></div>
-      <p><Clock3 className="size-5" />课程制作中</p>
-      <h1>老师正在把课件和声音准备好</h1>
-      <span>{message || "通过内容、语音和课堂运行检查后，这节课就会自动开放。"}</span>
-      <div><Button asChild><DocumentLink href="/learning">看看其他课程</DocumentLink></Button><Button variant="secondary" onClick={onRetry}>重新检查</Button></div>
+    <main id="main-content" className="space-route-state">
+      <div className="space-route-state-content">
+        <span className="space-route-orbit" aria-hidden="true"><Orbit /></span>
+        <p className="space-route-eyebrow"><Clock3 className="size-5" aria-hidden="true" />课程制作中</p>
+        <h1>老师正在把课件和声音准备好</h1>
+        <p>{message || "通过内容、语音和课堂运行检查后，这节课就会自动开放。"}</p>
+        <div className="space-route-actions"><Button asChild><DocumentLink href="/learning">看看其他课程</DocumentLink></Button><Button variant="secondary" onClick={onRetry}>重新检查</Button></div>
+      </div>
     </main>
   );
 }
 
 function OpenMaicRuntimeError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <main id="main-content" className="classroom-preparing-state" role="alert">
-      <CircleAlert className="size-12 text-[var(--mira-danger)]" aria-hidden="true" />
-      <p>完整课堂未就绪</p>
-      <h1>完整互动课堂暂时打不开</h1>
-      <span>{message || "课堂运行服务暂时不可用。请重新检查；如果仍未恢复，请让家长检查课堂运行、语音服务和麦克风安全域名配置。"}</span>
-      <div><Button onClick={onRetry}>重新检查</Button><Button variant="secondary" asChild><DocumentLink href="/learning">返回课程列表</DocumentLink></Button></div>
+    <main id="main-content" className="space-route-state" role="alert">
+      <div className="space-route-state-content">
+        <span className="space-route-orbit is-warning" aria-hidden="true"><CircleAlert /></span>
+        <p className="space-route-eyebrow">完整课堂未就绪</p>
+        <h1>完整互动课堂暂时打不开</h1>
+        <p>{message || "课堂运行服务暂时不可用。请重新检查；如果仍未恢复，请让家长检查课堂运行、语音服务和麦克风安全域名配置。"}</p>
+        <div className="space-route-actions"><Button onClick={onRetry}>重新检查</Button><Button variant="secondary" asChild><DocumentLink href="/learning">返回课程列表</DocumentLink></Button></div>
+      </div>
     </main>
   );
 }

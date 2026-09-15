@@ -1,0 +1,1956 @@
+diff --git a/components/chat/proactive-card.tsx b/components/chat/proactive-card.tsx
+--- a/components/chat/proactive-card.tsx
++++ b/components/chat/proactive-card.tsx
+@@ -10,7 +10,7 @@
+ 
+ interface ProactiveCardProps {
+   action: DiscussionAction;
+-  /** Required teaching waits for an explicit join and must never auto-skip. */
++  /** Student invitations wait for an explicit join or skip and never auto-skip. */
+   required?: boolean;
+   mode: 'playback' | 'paused' | 'autonomous';
+   /** Ref to the anchor element the card points to (avatar, etc.) */
+@@ -237,6 +237,19 @@
+               <Play className="w-3 h-3 fill-current" /> {t('proactiveCard.join')}
+             </button>
+ 
++            {required && (
++              <button
++                type="button"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  onSkip();
++                }}
++                className="min-h-12 rounded-lg border border-gray-200 px-3 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
++              >
++                跳过讨论
++              </button>
++            )}
++
+             {!required && (
+               <button
+                 onClick={(e) => {
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -72,7 +72,6 @@
+ } from '@/lib/mira/student-runtime';
+ import { toast } from 'sonner';
+ import { requiredInteractionsBeforeScene } from '@/lib/mira/student-interaction-bridge';
+-import { firstUnfinishedTeachingScene } from '@/lib/mira/student-teaching-navigation';
+ import {
+   finishGuidedDiscussionPlayback,
+   type GuidedDiscussionPlayback,
+@@ -454,7 +453,7 @@
+     const handleLiveSessionError = useCallback(() => {
+       engineRef.current?.handleDiscussionError();
+       if (studentMode && engineRef.current?.hasPendingRequiredDiscussion()) {
+-        setRequiredDiscussionError('课堂讨论暂时未能完成，进度已保留。');
++        setRequiredDiscussionError('课堂讨论暂时中断。可以重试，也可以跳过继续学习。');
+       }
+       resetLiveState();
+       setActiveBubbleId(null);
+@@ -472,7 +471,7 @@
+       engineRef.current?.handleEndDiscussion();
+       manualStopRef.current = false;
+       if (studentMode && engineRef.current?.hasPendingRequiredDiscussion()) {
+-        setRequiredDiscussionError('这段课堂讨论还没有完成，请继续。');
++        setRequiredDiscussionError('讨论已暂停。可以继续讨论，也可以跳过继续学习。');
+       }
+ 
+       // Show end flash with correct session type
+@@ -703,24 +702,11 @@
+         await chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
+         if (cancelled) return;
+ 
+-        // Read-only synchronization deliberately does NOT flush an old rejected
+-        // completion. Returning to its discussion is what makes that event valid.
++        // Synchronize accepted progress without forcing a return to a discussion.
+         if (studentMode && runtimeEvents && currentScene) {
+           try {
+             await runtimeEvents.readProgress();
+             if (cancelled) return;
+-            const unfinished = firstUnfinishedTeachingScene(
+-              useStageStore.getState().scenes,
+-              currentScene.id,
+-              (sceneId) => runtimeEvents.hasCompletedScene(sceneId),
+-            );
+-            if (unfinished) {
+-              autoStartRef.current = false;
+-              engineRef.current?.stop();
+-              useStageStore.getState().setCurrentSceneId(unfinished.id);
+-              toast.info('先继续这页的课堂讨论，完成后再往下学。');
+-              return;
+-            }
+           } catch {
+             autoStartRef.current = false;
+             toast.info('课堂进度暂时无法读取，请稍后再试。');
+@@ -1002,10 +988,10 @@
+                   discussion &&
+                   engine.reopenRequiredDiscussion(discussion.id)
+                 ) {
+-                  setRequiredDiscussionError('这段课堂讨论还没有完成，请继续。');
++                  setRequiredDiscussionError('讨论进度尚未确认。可以重试，也可以跳过继续学习。');
+                 }
+                 toast.error('本页学习进度还没有确认', {
+-                  description: error instanceof Error ? error.message : '请继续本页课堂讨论。',
++                  description: error instanceof Error ? error.message : '请稍后重试保存本页进度。',
+                   action: { label: '重试保存', onClick: () => engine.continuePlayback() },
+                 });
+                 return; // Never advance on a rejected or unconfirmed completion.
+@@ -1293,6 +1279,37 @@
+       [studentAutoPlayRuntime, studentMode],
+     );
+ 
++    // Leaving a discussion consumes its playback action only. If that reaches
++    // the real page end, save that fact before switching; no answer or live
++    // conversation completion is manufactured by navigation.
++    const saveDiscussionNavigation = useCallback(async (): Promise<boolean> => {
++      const engine = engineRef.current;
++      if (!studentMode || !engine || !currentScene) return true;
++      if (engine.hasPendingRequiredDiscussion()) {
++        if (!engine.skipDiscussion({ explicit: true, resume: false })) return false;
++        setRequiredDiscussionError(null);
++      }
++      if (
++        !runtimeEvents ||
++        !engine.isExhausted() ||
++        runtimeEvents.hasCompletedScene(currentScene.id)
++      )
++        return true;
++      const orderedScenes = [...useStageStore.getState().scenes].sort(
++        (left, right) => left.order - right.order,
++      );
++      const sceneIndex = orderedScenes.findIndex((scene) => scene.id === currentScene.id);
++      const actionId = currentScene.actions?.at(-1)?.id;
++      if (sceneIndex < 0 || !actionId) return true;
++      try {
++        await runtimeEvents.actionCompleted({ sceneIndex, sceneId: currentScene.id, actionId });
++        return true;
++      } catch {
++        toast.info('本页进度暂时未保存，请再点一次继续。');
++        return false;
++      }
++    }, [currentScene, runtimeEvents, studentMode]);
++
+     /**
+      * Gated scene switch — if a topic is active, show AlertDialog before switching.
+      * Returns true if the switch was immediate, false if gated (dialog shown).
+@@ -1312,19 +1329,6 @@
+             return false;
+           }
+           if (requestId !== sceneSwitchRequestRef.current) return false;
+-          const unfinished = firstUnfinishedTeachingScene(
+-            useStageStore.getState().scenes,
+-            targetSceneId,
+-            (sceneId) => runtimeEvents.hasCompletedScene(sceneId),
+-          );
+-          if (unfinished) {
+-            toast.info('先完成这页的课堂讨论，再进入下一页。');
+-            if (unfinished.id !== currentSceneId) {
+-              autoStartRef.current = false;
+-              setCurrentSceneId(unfinished.id);
+-            }
+-            return false;
+-          }
+           const required = requiredInteractionsBeforeScene(
+             useStageStore.getState().scenes,
+             targetSceneId,
+@@ -1342,11 +1346,13 @@
+             }
+           }
+         }
+-        if (isTopicActive) {
++        if (isTopicActive && !(studentMode && playbackView.phase === 'waitingProactive')) {
+           setPendingSceneId(targetSceneId);
+           return false;
+         }
+         await chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
++        if (requestId !== sceneSwitchRequestRef.current) return false;
++        if (!(await saveDiscussionNavigation())) return false;
+         if (requestId !== sceneSwitchRequestRef.current) return false;
+         armSelectedSceneAutoStart(targetSceneId);
+         setCurrentSceneId(targetSceneId);
+@@ -1356,9 +1362,11 @@
+         armSelectedSceneAutoStart,
+         currentSceneId,
+         isTopicActive,
++        playbackView.phase,
+         setCurrentSceneId,
+         studentMode,
+         runtimeEvents,
++        saveDiscussionNavigation,
+       ],
+     );
+ 
+@@ -1373,12 +1381,20 @@
+         await chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
+         if (requestId !== sceneSwitchRequestRef.current) return;
+         doSessionCleanup();
++        if (!(await saveDiscussionNavigation())) return;
++        if (requestId !== sceneSwitchRequestRef.current) return;
+         armSelectedSceneAutoStart(targetSceneId);
+         setCurrentSceneId(targetSceneId);
+       } finally {
+         sceneSwitchConfirmingRef.current = false;
+       }
+-    }, [armSelectedSceneAutoStart, pendingSceneId, setCurrentSceneId, doSessionCleanup]);
++    }, [
++      armSelectedSceneAutoStart,
++      pendingSceneId,
++      setCurrentSceneId,
++      doSessionCleanup,
++      saveDiscussionNavigation,
++    ]);
+ 
+     /** User cancelled scene switch via AlertDialog */
+     const cancelSceneSwitch = useCallback(() => {
+@@ -1842,16 +1858,28 @@
+                   className="mx-4 mb-3 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-slate-800"
+                 >
+                   <span>{requiredDiscussionError}</span>
+-                  <button
+-                    type="button"
+-                    className="shrink-0 rounded-lg bg-slate-900 px-3 py-2 font-medium text-white"
+-                    onClick={() => {
+-                      if (engineRef.current?.retryRequiredDiscussion())
+-                        setRequiredDiscussionError(null);
+-                    }}
+-                  >
+-                    重试课堂讨论
+-                  </button>
++                  <div className="flex shrink-0 flex-wrap gap-2">
++                    <button
++                      type="button"
++                      className="min-h-12 rounded-lg bg-slate-900 px-3 py-2 font-medium text-white"
++                      onClick={() => {
++                        if (engineRef.current?.retryRequiredDiscussion())
++                          setRequiredDiscussionError(null);
++                      }}
++                    >
++                      继续讨论
++                    </button>
++                    <button
++                      type="button"
++                      className="min-h-12 rounded-lg border border-slate-300 px-3 py-2 font-medium"
++                      onClick={() => {
++                        if (engineRef.current?.skipDiscussion({ explicit: true }))
++                          setRequiredDiscussionError(null);
++                      }}
++                    >
++                      跳过讨论
++                    </button>
++                  </div>
+                 </div>
+               )}
+               <Roundtable
+@@ -1933,7 +1961,8 @@
+                 }}
+                 onDiscussionSkip={() => {
+                   // User clicks "Skip" on ProactiveCard
+-                  engineRef.current?.skipDiscussion();
++                  if (engineRef.current?.skipDiscussion({ explicit: studentMode }))
++                    setRequiredDiscussionError(null);
+                 }}
+                 onStopDiscussion={handleStopDiscussion}
+                 onContinueDiscussion={handleContinueDiscussion}
+@@ -2103,7 +2132,9 @@
+               </h3>
+               {/* Description */}
+               <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+-                {t('stage.confirmSwitchMessage')}
++                {studentMode
++                  ? '结束这次讨论并继续学习。已说过的内容会保留。'
++                  : t('stage.confirmSwitchMessage')}
+               </p>
+             </div>
+ 
+@@ -2115,7 +2146,7 @@
+                 onClick={confirmSceneSwitch}
+                 className="flex-1 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md shadow-amber-200/50 dark:shadow-amber-900/30"
+               >
+-                {t('common.confirm')}
++                {studentMode ? '结束讨论并继续' : t('common.confirm')}
+               </AlertDialogAction>
+             </AlertDialogFooter>
+           </AlertDialogContent>
+diff --git a/lib/chat/pi/director-loop.ts b/lib/chat/pi/director-loop.ts
+--- a/lib/chat/pi/director-loop.ts
++++ b/lib/chat/pi/director-loop.ts
+@@ -7,6 +7,7 @@
+ import type { StatelessChatRequest, StatelessEvent } from '@/lib/types/chat';
+ import type { ThinkingConfig } from '@/lib/types/provider';
+ import { buildDirectorPrompt, buildUserPrompt, toHistoryMessages } from './prompts';
++import { withRequiredLearnerIdentity } from '@/lib/prompts/mira-classroom-speaker-identity.v1';
+ import { createDirectorCompactionRuntime } from './director-compaction';
+ import type { DirectorToolTraceEntry, SendEvent } from './types';
+ import type { ChildRuntimeMode } from './child-runtime';
+@@ -83,7 +84,8 @@
+     const agent = opts.agentConfigs.find((candidate) => candidate.id === summary.agentId);
+     return (
+       (agent?.role === 'teacher' || agent?.role === 'assistant') &&
+-      (summary.contentPreview.trim().length > 0 || (!opts.requiredVisibleTeaching && summary.actionCount > 0))
++      (summary.contentPreview.trim().length > 0 ||
++        (!opts.requiredVisibleTeaching && summary.actionCount > 0))
+     );
+   };
+   const hasTeachingSubstantiveTurn = (): boolean =>
+@@ -136,7 +138,11 @@
+       languageModel: opts.languageModel,
+       onAgentDone: (summary) => {
+         totalAgents += 1;
+-        if (opts.requiredVisibleTeaching ? isTeachingSubstantiveTurn(summary) : summary.contentPreview || summary.actionCount > 0)
++        if (
++          opts.requiredVisibleTeaching
++            ? isTeachingSubstantiveTurn(summary)
++            : summary.contentPreview || summary.actionCount > 0
++        )
+           agentHadContent = true;
+         piAgentResponses.push(summary);
+       },
+@@ -190,7 +196,9 @@
+     }),
+     buildCloseSessionTool({
+       closeSession,
+-      canCloseSession: opts.requiredVisibleTeaching ? hasTeachingSubstantiveTurn : hasVisibleAgentTurn,
++      canCloseSession: opts.requiredVisibleTeaching
++        ? hasTeachingSubstantiveTurn
++        : hasVisibleAgentTurn,
+       isUserCued: () => userCued,
+     }),
+     buildCueUserTool({
+@@ -204,11 +212,16 @@
+ 
+   const director = buildAgent({
+     streamFn,
+-    systemPrompt: buildDirectorPrompt(opts.body, opts.agentConfigs, opts.maxAgentTurns)
+-      + (opts.requiredVisibleTeaching ? '\nRequired teaching: spotlight/highlighting or other actions alone do not deliver the teacher explanation. Before cue_user or close_session, a teacher must speak visible explanatory text in this turn. If call_agent reports no_visible_teaching_speech, ask that same teacher once more to give the missing short explanation in plain spoken words; do not claim a demonstration happened or invent learner participation. If that repair also lacks speech, stop and preserve the failure.' : ''),
++    systemPrompt: withRequiredLearnerIdentity(
++      buildDirectorPrompt(opts.body, opts.agentConfigs, opts.maxAgentTurns) +
++        (opts.requiredVisibleTeaching
++          ? '\nRequired teaching: spotlight/highlighting or other actions alone do not deliver the teacher explanation. Before cue_user or close_session, a teacher must speak visible explanatory text in this turn. If call_agent reports no_visible_teaching_speech, ask that same teacher once more to give the missing short explanation in plain spoken words; do not claim a demonstration happened or invent learner participation. If that repair also lacks speech, stop and preserve the failure.'
++          : ''),
++      opts.requiredVisibleTeaching === true,
++    ),
+     tools,
+     allowedToolNames: new Set(tools.map((tool) => tool.name)),
+-    history: toHistoryMessages(opts.body.messages, null),
++    history: toHistoryMessages(opts.body.messages, null, opts.requiredVisibleTeaching === true),
+     transformContext: compactionRuntime.transformContext,
+     convertToLlm,
+     afterToolCall: (context) => {
+@@ -231,11 +244,18 @@
+         resultPreview,
+         details: context.result.details,
+       });
+-      const speechRepairExhausted = opts.requiredVisibleTeaching === true
+-        && context.toolCall.name === 'call_agent'
+-        && (context.result.details as { reason?: string; speechRepairExhausted?: boolean } | undefined)?.reason === 'no_visible_teaching_speech'
+-        && (context.result.details as { speechRepairExhausted?: boolean }).speechRepairExhausted === true;
+-      const terminate = sessionClosed || userCued || speechRepairExhausted || directorToolCalls >= maxDirectorToolCalls;
++      const speechRepairExhausted =
++        opts.requiredVisibleTeaching === true &&
++        context.toolCall.name === 'call_agent' &&
++        (context.result.details as { reason?: string; speechRepairExhausted?: boolean } | undefined)
++          ?.reason === 'no_visible_teaching_speech' &&
++        (context.result.details as { speechRepairExhausted?: boolean }).speechRepairExhausted ===
++          true;
++      const terminate =
++        sessionClosed ||
++        userCued ||
++        speechRepairExhausted ||
++        directorToolCalls >= maxDirectorToolCalls;
+       if (!terminate && !evidenceError) return undefined;
+       return {
+         ...(terminate ? { terminate: true } : {}),
+@@ -245,7 +265,7 @@
+   });
+ 
+   try {
+-    await director.prompt(buildUserPrompt(opts.body));
++    await director.prompt(buildUserPrompt(opts.body, opts.requiredVisibleTeaching === true));
+     await director.waitForIdle();
+   } finally {
+     compactionRuntime.dispose();
+@@ -253,7 +273,11 @@
+ 
+   if (opts.signal.aborted) return;
+ 
+-  if (!sessionClosed && !userCued && (opts.requiredVisibleTeaching ? hasTeachingSubstantiveTurn() : hasAgentContent())) {
++  if (
++    !sessionClosed &&
++    !userCued &&
++    (opts.requiredVisibleTeaching ? hasTeachingSubstantiveTurn() : hasAgentContent())
++  ) {
+     await cueUser({ fromAgentId: piAgentResponses.at(-1)?.agentId });
+   }
+ 
+diff --git a/lib/chat/pi/prompts.ts b/lib/chat/pi/prompts.ts
+--- a/lib/chat/pi/prompts.ts
++++ b/lib/chat/pi/prompts.ts
+@@ -523,13 +523,19 @@
+   return 'Your visible speech MUST be no more than 40 Chinese characters or 1 short sentence.';
+ }
+ 
+-export function buildUserPrompt(body: StatelessChatRequest): string {
++export function buildUserPrompt(body: StatelessChatRequest, requiredTeaching = false): string {
+   const latestUserText = [...body.messages].reverse().find((message) => message.role === 'user');
+   const discussion = body.config.discussionPrompt || body.config.discussionTopic;
+   return [
+     'Handle the latest classroom turn.',
+-    discussion ? `Discussion context: ${discussion}` : '',
+-    `Latest user message: ${latestUserText ? extractMessageText(latestUserText) : '(none)'}`,
++    discussion
++      ? `${requiredTeaching ? 'Original course discussion context (not the real learner identity)' : 'Discussion context'}: ${discussion}`
++      : '',
++    requiredTeaching
++      ? latestUserText
++        ? `Latest speaker: [Real learner / 真人学生]. Respond to this real learner as “你”; do not credit a named virtual classmate.\nLatest real learner message: ${extractMessageText(latestUserText)}`
++        : 'Latest real learner message: (none). Ask the real learner directly as “你” and wait; no real learner has answered yet.'
++      : `Latest user message: ${latestUserText ? extractMessageText(latestUserText) : '(none)'}`,
+   ]
+     .filter(Boolean)
+     .join('\n');
+@@ -538,12 +544,20 @@
+ export function toHistoryMessages(
+   messages: StatelessChatRequest['messages'],
+   maxMessages: number | null = 12,
++  requiredTeaching = false,
+ ): AgentMessage[] {
+   const selectedMessages = maxMessages === null ? messages : messages.slice(-maxMessages);
+   return selectedMessages
+     .map((message): AgentMessage | null => {
+-      const text = extractMessageText(message).trim();
+-      if (!text) return null;
++      const originalText = extractMessageText(message).trim();
++      if (!originalText) return null;
++      // Role is authoritative; display names and names mentioned in text cannot
++      // turn a real learner reply into a virtual classmate's contribution.
++      const speaker =
++        message.role === 'user'
++          ? '[Real learner / 真人学生]'
++          : `[Classroom agent / AI角色; agentId=${JSON.stringify(message.metadata?.agentId ?? 'unknown')}]`;
++      const text = requiredTeaching ? `${speaker}\n${originalText}` : originalText;
+       if (message.role === 'user') return { role: 'user', content: text, timestamp: Date.now() };
+       if (message.role === 'assistant') {
+         return {
+diff --git a/lib/chat/pi/tools/call-agent.ts b/lib/chat/pi/tools/call-agent.ts
+--- a/lib/chat/pi/tools/call-agent.ts
++++ b/lib/chat/pi/tools/call-agent.ts
+@@ -1,3 +1,4 @@
++import { withRequiredLearnerIdentity } from '@/lib/prompts/mira-classroom-speaker-identity.v1';
+ import type { AgentTool } from '@earendil-works/pi-agent-core';
+ import { Type, type Static } from 'typebox';
+ import type { LanguageModel } from 'ai';
+@@ -769,12 +770,15 @@
+               maxOutputTokens: opts.maxOutputTokens,
+               abortSignal: childAbort.signal,
+             }),
+-            systemPrompt: buildNativeChildPrompt(
+-              opts.body,
+-              agent,
+-              opts.getAgentResponses(),
+-              availableToolNames,
+-              capturedScene,
++            systemPrompt: withRequiredLearnerIdentity(
++              buildNativeChildPrompt(
++                opts.body,
++                agent,
++                opts.getAgentResponses(),
++                availableToolNames,
++                capturedScene,
++              ),
++              opts.requiredVisibleTeaching === true,
+             ),
+             prompt: buildNativeChildTurnPrompt(params.instruction, agent.role, {
+               scene: sceneEvidence?.content,
+@@ -782,7 +786,11 @@
+             }),
+             tools: nativeTools,
+             allowedToolNames: new Set(availableToolNames),
+-            history: toHistoryMessages(opts.body.messages),
++            history: toHistoryMessages(
++              opts.body.messages,
++              12,
++              opts.requiredVisibleTeaching === true,
++            ),
+             abortSignal: childAbort.signal,
+             timeoutMs: 60_000,
+             maxProviderTransports: 5,
+@@ -835,7 +843,12 @@
+             runtimeMode: childRuntimeMode,
+             availableToolNames,
+             nativeChildRun: nativeResult,
+-            ...(missingRequiredSpeech ? { reason: 'no_visible_teaching_speech', speechRepairExhausted: consecutiveEmptyTurns >= MAX_CONSECUTIVE_EMPTY_TURNS } : {}),
++            ...(missingRequiredSpeech
++              ? {
++                  reason: 'no_visible_teaching_speech',
++                  speechRepairExhausted: consecutiveEmptyTurns >= MAX_CONSECUTIVE_EMPTY_TURNS,
++                }
++              : {}),
+             ...(sceneEvidence ? { sceneEvidence: sceneEvidence.metadata } : {}),
+           },
+           ...(isCompleted ? {} : { isError: true }),
+@@ -866,16 +879,19 @@
+           maxOutputTokens: opts.maxOutputTokens,
+           abortSignal: childAbort.signal,
+         }),
+-        systemPrompt: buildChildPrompt(
+-          opts.body,
+-          agent,
+-          opts.getAgentResponses(),
+-          opts.getWhiteboardLedger(),
+-          childTools.map((tool) => tool.name),
++        systemPrompt: withRequiredLearnerIdentity(
++          buildChildPrompt(
++            opts.body,
++            agent,
++            opts.getAgentResponses(),
++            opts.getWhiteboardLedger(),
++            childTools.map((tool) => tool.name),
++          ),
++          opts.requiredVisibleTeaching === true,
+         ),
+         tools: [],
+         allowedToolNames: new Set(),
+-        history: toHistoryMessages(opts.body.messages),
++        history: toHistoryMessages(opts.body.messages, 12, opts.requiredVisibleTeaching === true),
+       });
+ 
+       const parserState = createParserState();
+@@ -954,7 +970,8 @@
+         await opts.send({ type: 'text_delta', data: { content: finalText, messageId } });
+       }
+       const missingRequiredSpeech = opts.requiredVisibleTeaching === true && !hasVisibleText;
+-      const isEmptyTurn = childErrored || missingRequiredSpeech || (!hasVisibleText && actionCount === 0);
++      const isEmptyTurn =
++        childErrored || missingRequiredSpeech || (!hasVisibleText && actionCount === 0);
+       consecutiveEmptyTurns = isEmptyTurn ? consecutiveEmptyTurns + 1 : 0;
+       await opts.send({ type: 'agent_end', data: { messageId, agentId: agent.id } });
+       opts.onAgentDone({
+@@ -980,7 +997,12 @@
+           agentName: agent.name,
+           text: finalText,
+           actionWarnings,
+-          ...(missingRequiredSpeech ? { reason: 'no_visible_teaching_speech', speechRepairExhausted: consecutiveEmptyTurns >= MAX_CONSECUTIVE_EMPTY_TURNS } : {}),
++          ...(missingRequiredSpeech
++            ? {
++                reason: 'no_visible_teaching_speech',
++                speechRepairExhausted: consecutiveEmptyTurns >= MAX_CONSECUTIVE_EMPTY_TURNS,
++              }
++            : {}),
+           ...(sceneEvidence ? { sceneEvidence: sceneEvidence.metadata } : {}),
+         },
+         ...(missingRequiredSpeech ? { isError: true } : {}),
+diff --git a/lib/mira/student-interaction-bridge.ts b/lib/mira/student-interaction-bridge.ts
+--- a/lib/mira/student-interaction-bridge.ts
++++ b/lib/mira/student-interaction-bridge.ts
+@@ -5,28 +5,70 @@
+ /** The persisted plan is public teaching data. The backend independently binds
+  * every submission to the frozen professional receipt, never to this parser. */
+ export function studentInteractionObjectives(scenes: readonly Scene[]): InteractionObjective[] {
+-  const first = [...scenes].sort((a, b) => a.order - b.order).find(scene => scene.type === 'interactive');
++  const first = [...scenes]
++    .sort((a, b) => a.order - b.order)
++    .find((scene) => scene.type === 'interactive');
+   if (first?.content.type !== 'interactive') return [];
+-  const scripts = [...(first.content.html ?? '').matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)];
+-  const plans = scripts.filter(match => /\bid\s*=\s*["']mira-interaction-plan["']/i.test(match[1]) &&
+-    /\btype\s*=\s*["']application\/json["']/i.test(match[1]));
++  const scripts = [
++    ...(first.content.html ?? '').matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi),
++  ];
++  const plans = scripts.filter(
++    (match) =>
++      /\bid\s*=\s*["']mira-interaction-plan["']/i.test(match[1]) &&
++      /\btype\s*=\s*["']application\/json["']/i.test(match[1]),
++  );
+   if (plans.length !== 1) return [];
+   try {
+     const value = JSON.parse(plans[0][2]);
+-    return ['mira.openmaic.interaction-design-plan.v1','mira.openmaic.interaction-design-plan.v2'].includes(value.schemaVersion) && Array.isArray(value.objectives)
+-      ? value.objectives.filter((item: InteractionObjective) => Number.isInteger(item?.objectiveIndex) &&
+-        item.objectiveIndex >= 0 && item.objectiveIndex < 30 && item.operation?.sceneId && item.feedback?.sceneId)
++    return [
++      'mira.openmaic.interaction-design-plan.v1',
++      'mira.openmaic.interaction-design-plan.v2',
++    ].includes(value.schemaVersion) && Array.isArray(value.objectives)
++      ? value.objectives.filter(
++          (item: InteractionObjective) =>
++            Number.isInteger(item?.objectiveIndex) &&
++            item.objectiveIndex >= 0 &&
++            item.objectiveIndex < 30 &&
++            item.operation?.sceneId &&
++            item.feedback?.sceneId,
++        )
+       : [];
+-  } catch { return []; }
++  } catch {
++    return [];
++  }
+ }
+ 
+-export function requiredInteractionsBeforeScene(scenes: readonly Scene[], targetSceneId: string): number[] {
+-  const target = scenes.find(scene => scene.id === targetSceneId);
++export function requiredInteractionsBeforeScene(
++  scenes: readonly Scene[],
++  targetSceneId: string,
++): number[] {
++  const target = scenes.find((scene) => scene.id === targetSceneId);
+   if (!target) return [];
+-  return studentInteractionObjectives(scenes).filter(objective => {
+-    const operation = scenes.find(scene => scene.id === objective.operation.sceneId);
+-    return operation && operation.order < target.order;
+-  }).map(objective => objective.objectiveIndex);
++  return studentInteractionObjectives(scenes)
++    .filter((objective) => {
++      const operation = scenes.find((scene) => scene.id === objective.operation.sceneId);
++      return operation && operation.order < target.order;
++    })
++    .map((objective) => objective.objectiveIndex);
++}
++
++/** Participation is bound to the reviewed control, not to the publisher's
++ * sample answer. A private observer supplies actual changed-state evidence;
++ * assessment and mastery remain separate from this participation receipt. */
++export function matchesStudentInteractionObjective(
++  objective: InteractionObjective,
++  observation: MiraInteractionOperation,
++): boolean {
++  try {
++    const operation = interactionPayload(observation);
++    return (
++      objective.objectiveIndex === operation.objectiveIndex &&
++      objective.operation.controlSelector === operation.controlSelector &&
++      objective.operation.action === operation.action
++    );
++  } catch {
++    return false;
++  }
+ }
+ 
+ /** Only this private port is an observation channel. General iframe postMessage,
+@@ -43,17 +85,25 @@
+     if (!connected || !options.active()) return;
+     try {
+       const operation = interactionPayload(event.data);
+-      const objective = options.objectives.find(item => item.objectiveIndex === operation.objectiveIndex);
+-      if (!objective || objective.operation.controlSelector !== operation.controlSelector ||
+-          objective.operation.action !== operation.action ||
+-          (objective.operation.action !== 'click' && objective.operation.value !== operation.value) ||
+-          !operation.feedbackText.includes(objective.feedback.textIncludes) ||
+-          !operation.feedbackText.includes(objective.feedback.reasonQuote)) return;
++      const objective = options.objectives.find(
++        (item) => item.objectiveIndex === operation.objectiveIndex,
++      );
++      if (!objective || !matchesStudentInteractionObjective(objective, operation)) return;
+       options.onOperation(operation);
+-    } catch { /* Malformed iframe observations never enter the event stream. */ }
++    } catch {
++      /* Malformed iframe observations never enter the event stream. */
++    }
+   };
+-  options.frame.contentWindow?.postMessage({ type: 'mira:observe-student-interactions', objectives: options.objectives }, '*', [channel.port2]);
+-  return () => { connected = false; channel.port1.onmessage = null; channel.port1.close(); };
++  options.frame.contentWindow?.postMessage(
++    { type: 'mira:observe-student-interactions', objectives: options.objectives },
++    '*',
++    [channel.port2],
++  );
++  return () => {
++    connected = false;
++    channel.port1.onmessage = null;
++    channel.port1.close();
++  };
+ }
+ 
+ /** Inject before generated scripts. A captured native MessageChannel endpoint
+@@ -61,7 +111,7 @@
+  * This records browser interaction, not a tamper-proof remote attestation. */
+ export const STUDENT_INTERACTION_OBSERVER = `<script data-mira-student-interaction-observer>
+ (function () {
+-  var port = null, objectives = [], pending = new Map(), completed = new Set();
++  var port = null, objectives = [], pending = new Map(), completed = new Set(), beforeValues = new WeakMap();
+   var query = document.querySelector.bind(document);
+   var schedule = window.setTimeout.bind(window);
+   var textGetter = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerText').get;
+@@ -80,8 +130,20 @@
+     event.stopImmediatePropagation();
+     if (port) port.close();
+     port = event.ports[0]; objectives = Array.isArray(event.data.objectives) ? event.data.objectives : [];
+-    pending.clear(); completed.clear();
++    pending.clear(); completed.clear(); beforeValues = new WeakMap();
+   }, true);
++  // input/change fire after the browser edits a control's value. Capture the
++  // value before the trusted gesture, independently of generated handlers.
++  function prepare(event) {
++    if (!event.isTrusted || !port) return;
++    objectives.forEach(function (item) {
++      var op = item.operation, control = query(op.controlSelector);
++      if (op.action !== 'click' && control &&
++          (event.target === control || control.contains(event.target))) {
++        beforeValues.set(control, String(control.value));
++      }
++    });
++  }
+   function observed(event) {
+     if (!event.isTrusted || !port) return;
+     objectives.forEach(function (item) {
+@@ -89,17 +151,19 @@
+       var op = item.operation, control = query(op.controlSelector);
+       if (!control || !(event.target === control || control.contains(event.target))) return;
+       if ((op.action === 'click' ? 'click' : op.action === 'select' ? 'change' : 'input') !== event.type) return;
+-      var value = op.action === 'click' ? '' : String(control.value);
+-      if (op.action !== 'click' && value !== op.value) return;
+       var node = feedback(item, control);
+       if (!node) return;
+-      var before = text(node), currentPort = port, ticket = {};
++      var before = text(node), beforeValue = beforeValues.get(control), currentPort = port, ticket = {};
+       pending.set(item.objectiveIndex, ticket);
+       var started = performance.now();
+       function inspect() {
+         if (port !== currentPort || pending.get(item.objectiveIndex) !== ticket) return;
+         var result = feedback(item, control), after = result ? text(result) : '';
+-        if (after && after !== before && after.includes(item.feedback.textIncludes) && after.includes(item.feedback.reasonQuote)) {
++        var value = op.action === 'click' ? '' : String(control.value);
++        var valueChanged = op.action !== 'click' && beforeValue !== undefined && value !== beforeValue;
++        var validValue = op.action === 'click' || (value.trim() && value.length <= 500 &&
++          (!control.validity || control.validity.valid));
++        if (after && validValue && (after !== before || valueChanged)) {
+           completed.add(item.objectiveIndex); pending.delete(item.objectiveIndex);
+           send.call(currentPort, {objectiveIndex:item.objectiveIndex, controlSelector:op.controlSelector, action:op.action, value:value, feedbackText:after});
+         } else if (performance.now() - started < 2000) schedule(inspect, 40);
+@@ -107,6 +171,7 @@
+       schedule(inspect, 0);
+     });
+   }
++  ['pointerdown','keydown','beforeinput'].forEach(function (type) { window.addEventListener(type, prepare, true); });
+   ['click','input','change'].forEach(function (type) { window.addEventListener(type, observed, true); });
+ })();
+ </script>`;
+diff --git a/lib/playback/engine.ts b/lib/playback/engine.ts
+--- a/lib/playback/engine.ts
++++ b/lib/playback/engine.ts
+@@ -414,21 +414,33 @@
+     this.currentTrigger = null;
+   }
+ 
+-  /** User clicks "Skip" on ProactiveCard → consumed → processNext */
+-  skipDiscussion(): void {
+-    // Required discussions still need an explicit Join. A stale skip callback
+-    // must neither consume the action nor silently start a paid live request.
+-    if (this.callbacks.requireScriptedDiscussions) return;
+-    if (this.currentTrigger) {
+-      this.markDiscussionConsumed(this.currentTrigger.id);
+-      this.currentTrigger = null;
+-    }
++  /** Explicit skip consumes playback only; it never completes a live conversation. */
++  skipDiscussion(options: { explicit?: boolean; resume?: boolean } = {}): boolean {
++    // Old timers cannot silently skip a student's invitation. The UI must also
++    // stop an active live session before choosing to leave that discussion.
++    if (this.callbacks.requireScriptedDiscussions && !options.explicit) return false;
++    if (this.mode === 'live' || (this.mode === 'paused' && this.currentTopicState === 'pending'))
++      return false;
++    const id = this.currentTrigger?.id ?? this.requiredDiscussionId;
++    if (!id) return false;
++    const sceneIndex = this.savedSceneIndex ?? this.sceneIndex;
++    const actionIndex = this.scenes[sceneIndex]?.actions?.findIndex(
++      (action) => action.type === 'discussion' && action.id === id,
++    );
++    if (actionIndex === undefined || actionIndex < 0) return false;
++    const resume = options.resume ?? (options.explicit === true || this.mode === 'playing');
+     const generation = this.invalidatePlaybackGeneration();
+-    this.callbacks.onProactiveHide?.();
+-
+-    if (this.mode === 'playing') {
+-      this.processNext(generation);
+-    }
++    this.cancelActivePlaybackWork();
++    this.restoreSavedLectureState();
++    this.sceneIndex = sceneIndex;
++    this.actionIndex = actionIndex + 1;
++    this.currentTrigger = null;
++    this.requiredDiscussionId = null;
++    this.currentTopicState = 'closed';
++    this.markDiscussionConsumed(id);
++    this.setMode(resume ? 'playing' : 'idle');
++    if (resume) this.processNext(generation);
++    return true;
+   }
+ 
+   hasPendingRequiredDiscussion(): boolean {
+diff --git a/lib/playback/types.ts b/lib/playback/types.ts
+--- a/lib/playback/types.ts
++++ b/lib/playback/types.ts
+@@ -49,7 +49,7 @@
+   onProactiveShow?: (trigger: TriggerEvent) => void;
+   onProactiveHide?: () => void;
+ 
+-  /** Frozen student teaching discussions are mandatory, never opt-in prompts. */
++  /** Frozen student discussions require explicit join/skip; never auto-skip or auto-join. */
+   requireScriptedDiscussions?: boolean;
+ 
+   // Discussion lifecycle
+diff --git a/lib/prompts/mira-classroom-speaker-identity.v1.ts b/lib/prompts/mira-classroom-speaker-identity.v1.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/prompts/mira-classroom-speaker-identity.v1.ts
+@@ -0,0 +1,17 @@
++/** Applied only by the trusted required-teaching execution path, including saved conversations. */
++export const CLASSROOM_SPEAKER_IDENTITY_VERSION = 'mira.classroom-speaker-identity.v1';
++
++export const REQUIRED_LEARNER_IDENTITY_PROMPT = `
++# Real learner and virtual classmates (${CLASSROOM_SPEAKER_IDENTITY_VERSION})
++- Messages marked [Real learner / 真人学生] come from the real child using this classroom's text or voice input. They are never a virtual classmate's turn.
++- Names in the course script, discussion prompt, scene evidence, or agent roster identify virtual classroom characters, not the real learner. A script that calls on 乐乐 does not rename the person who answers next.
++- Address the real learner directly as “你”. Do not infer a personal name from the script, the previous question, an avatar, or a previous teacher reply. In direct feedback say “你说得对” rather than attributing the real learner's answer to a named virtual classmate.
++- When a saved discussion originally asks a virtual classmate to explain, adapt that question for the real learner without assigning the classmate's name to them. If only the teacher is available, ask the real learner and wait; do not pretend the missing classmate spoke.
++- Credit a virtual classmate only for a message actually attributed to that classroom agent. The real learner mentioning or quoting a classmate does not make them that classmate.
++- Prior teacher messages may have misnamed the learner. Do not repeat or treat that mistake as identity evidence; follow the actual message role and respond to the real learner's own answer.
++- Keep the real learner's words intact. Never invent their response or let a virtual classmate answer in their place.
++`;
++
++export function withRequiredLearnerIdentity(systemPrompt: string, required: boolean): string {
++  return required ? `${systemPrompt}\n${REQUIRED_LEARNER_IDENTITY_PROMPT}` : systemPrompt;
++}
+diff --git a/tests/chat/proactive-card.test.ts b/tests/chat/proactive-card.test.ts
+--- a/tests/chat/proactive-card.test.ts
++++ b/tests/chat/proactive-card.test.ts
+@@ -90,12 +90,13 @@
+ }
+ 
+ describe('discussion invitation', () => {
+-  it('keeps a required invitation visible until the student explicitly joins', async () => {
++  it('keeps a student invitation visible until an explicit join or skip', async () => {
+     const { card, onSkip, onListen } = mount(true);
+     expect(card.querySelector('[title="proactiveCard.skip"]')).toBeNull();
+     expect(card.querySelector('[data-mira-indicator="discussion-progress-track"]')).toBeNull();
+     expect(card.textContent).not.toMatch(/\b\d+s\b/);
+-    expect(card.querySelectorAll('button')).toHaveLength(1);
++    expect(card.querySelectorAll('button')).toHaveLength(2);
++    expect(card.textContent).toContain('跳过讨论');
+ 
+     await passAutoSkipWindow();
+ 
+@@ -107,6 +108,19 @@
+     act(() => card.querySelector('button')!.click());
+     expect(onListen).toHaveBeenCalledTimes(1);
+     expect(onSkip).not.toHaveBeenCalled();
++  });
++
++  it('allows the student to explicitly skip without joining a live discussion', () => {
++    const { card, onSkip, onListen } = mount(true);
++    const skip = [...card.querySelectorAll('button')].find(
++      (button) => button.textContent === '跳过讨论',
++    );
++    expect(skip).toBeDefined();
++
++    act(() => skip!.click());
++
++    expect(onSkip).toHaveBeenCalledTimes(1);
++    expect(onListen).not.toHaveBeenCalled();
+   });
+ 
+   it('retains the countdown and automatic skip for optional invitations', async () => {
+diff --git a/tests/lib/chat/pi/mira-required-identity-wiring.test.ts b/tests/lib/chat/pi/mira-required-identity-wiring.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/lib/chat/pi/mira-required-identity-wiring.test.ts
+@@ -0,0 +1,243 @@
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++import type { AgentMessage, AgentTool } from '@earendil-works/pi-agent-core';
++import type { AgentConfig } from '@/lib/orchestration/registry/types';
++import type { StatelessChatRequest, StatelessEvent } from '@/lib/types/chat';
++
++const mocks = vi.hoisted(() => ({
++  buildAgent: vi.fn(),
++  runNativeChild: vi.fn(),
++  createCallLlmStreamFn: vi.fn(),
++  transport: vi.fn(),
++}));
++
++vi.mock('@/lib/agent/runtime/build-agent', () => ({ buildAgent: mocks.buildAgent }));
++vi.mock('@/lib/agent/runtime/run-native-child', () => ({
++  runNativeChild: mocks.runNativeChild,
++}));
++vi.mock('@/lib/agent/runtime/stream-fn', () => ({
++  createCallLlmStreamFn: mocks.createCallLlmStreamFn,
++}));
++
++import { runPiDirectorLoop } from '@/lib/chat/pi/director-loop';
++
++const IDENTITY_VERSION = 'mira.classroom-speaker-identity.v1';
++const LEARNER_TEXT = '乐乐的例子让我发现，分母表示整体分成几份，分子表示占几份。';
++const OLD_TEACHER_TEXT = '对，乐乐说到点上了。';
++const TEACHER_OUTPUT = '你说得对，要同时看分子和分母。';
++
++const teacher: AgentConfig = {
++  id: 'mira-formal-teacher',
++  name: '小数老师',
++  role: 'teacher',
++  persona: '围绕原课件讨论给学生反馈。',
++  avatar: '',
++  color: '#425CBA',
++  priority: 100,
++  allowedActions: [],
++  createdAt: new Date('2026-01-01T00:00:00Z'),
++  updatedAt: new Date('2026-01-01T00:00:00Z'),
++  isDefault: false,
++};
++
++function savedDiscussionBody(): StatelessChatRequest {
++  return {
++    messages: [
++      {
++        id: 'saved-teacher-reply',
++        role: 'assistant',
++        parts: [{ type: 'text', text: OLD_TEACHER_TEXT }],
++        metadata: { agentId: teacher.id },
++      },
++      {
++        id: 'real-child-reply',
++        role: 'user',
++        parts: [{ type: 'text', text: LEARNER_TEXT }],
++        // A display name matching a virtual classmate must not override role.
++        metadata: { senderName: '乐乐', originalRole: 'user' },
++      },
++    ],
++    config: {
++      agentIds: [teacher.id],
++      agentConfigs: [teacher],
++      sessionType: 'discussion',
++      triggerAgentId: teacher.id,
++      discussionTopic: '分子和分母的关系',
++      discussionPrompt: '请乐乐说说他只看分子、忘了看分母时会怎么错。',
++    },
++    storeState: {
++      stage: { id: 'stage-identity', name: '分数与百分数', createdAt: 1, updatedAt: 2 },
++      scenes: [
++        {
++          id: 'scene-p3',
++          stageId: 'stage-identity',
++          title: '观察分数',
++          order: 0,
++          type: 'slide',
++          content: { type: 'slide', canvas: { elements: [] } as never },
++        },
++      ],
++      currentSceneId: 'scene-p3',
++      mode: 'autonomous',
++      whiteboardOpen: false,
++    },
++    apiKey: '',
++  } as StatelessChatRequest;
++}
++
++type CapturedContext = {
++  systemPrompt: string;
++  history: AgentMessage[];
++  tools: AgentTool[];
++};
++
++function textOf(message: AgentMessage): string {
++  if (!('content' in message)) return '';
++  return typeof message.content === 'string'
++    ? message.content
++    : message.content
++        .filter((part) => part.type === 'text')
++        .map((part) => ('text' in part ? part.text : ''))
++        .join('');
++}
++
++function expectIdentityContext(context: CapturedContext, required: boolean) {
++  const user = context.history.find((message) => message.role === 'user');
++  const priorTeacher = context.history.find((message) => message.role === 'assistant');
++  expect(user).toBeDefined();
++  expect(priorTeacher).toBeDefined();
++
++  if (required) {
++    expect(context.systemPrompt).toContain(IDENTITY_VERSION);
++    expect(context.systemPrompt).toContain('Address the real learner directly as “你”');
++    expect(context.systemPrompt).toContain('Prior teacher messages may have misnamed the learner');
++    expect(textOf(user!)).toBe('[Real learner / 真人学生]\n' + LEARNER_TEXT);
++    expect(textOf(priorTeacher!)).toBe(
++      '[Classroom agent / AI角色; agentId="mira-formal-teacher"]\n' + OLD_TEACHER_TEXT,
++    );
++  } else {
++    expect(context.systemPrompt).not.toContain(IDENTITY_VERSION);
++    expect(textOf(user!)).toBe(LEARNER_TEXT);
++    expect(textOf(priorTeacher!)).toBe(OLD_TEACHER_TEXT);
++  }
++}
++
++describe('required learner identity reaches the real Pi execution wiring', () => {
++  beforeEach(() => {
++    vi.clearAllMocks();
++    mocks.transport.mockImplementation(() => {
++      throw new Error('Provider transport must never run in this wiring regression');
++    });
++    mocks.createCallLlmStreamFn.mockReturnValue(mocks.transport);
++  });
++
++  for (const mode of ['native', 'legacy'] as const) {
++    for (const required of [true, false]) {
++      it(`${mode}: director and teacher receive identity rules only when requiredVisibleTeaching=${required}`, async () => {
++        const body = savedDiscussionBody();
++        const originalBody = structuredClone(body);
++        const events: StatelessEvent[] = [];
++        const directorPrompt = vi.fn();
++        let directorContext: CapturedContext | undefined;
++        let childContext: CapturedContext | undefined;
++
++        mocks.runNativeChild.mockImplementation(async (options) => {
++          childContext = options;
++          await options.onVisibleTextDelta(TEACHER_OUTPUT);
++          return { status: 'completed', visibleOutput: TEACHER_OUTPUT };
++        });
++
++        mocks.buildAgent.mockImplementation((options: CapturedContext) => {
++          const callAgent = options.tools.find((tool) => tool.name === 'call_agent');
++          if (callAgent) {
++            directorContext = options;
++            return {
++              // Exercise the actual director-created call_agent tool so the
++              // required flag must propagate through both production layers.
++              prompt: async (prompt: string) => {
++                directorPrompt(prompt);
++                const result = await callAgent.execute('identity-call', {
++                  agentId: teacher.id,
++                  instruction: '回应刚刚通过输入框回答的学生。',
++                });
++                expect(result).not.toMatchObject({ isError: true });
++              },
++              waitForIdle: async () => {},
++            };
++          }
++
++          childContext = options;
++          const output = JSON.stringify([{ type: 'text', content: TEACHER_OUTPUT }]);
++          let subscriber: ((event: unknown) => unknown) | undefined;
++          return {
++            subscribe: (handler: (event: unknown) => unknown) => {
++              subscriber = handler;
++              return () => {};
++            },
++            prompt: async () => {},
++            waitForIdle: async () => {
++              await subscriber?.({
++                type: 'message_update',
++                assistantMessageEvent: { type: 'text_delta', delta: output },
++              });
++            },
++            state: {
++              messages: [{ role: 'assistant', content: [{ type: 'text', text: output }] }],
++            },
++          };
++        });
++
++        const signal = new AbortController().signal;
++        await runPiDirectorLoop({
++          body,
++          agentConfigs: [teacher],
++          send: async (event) => {
++            events.push(event);
++          },
++          languageModel: {} as never,
++          thinkingConfig: { mode: 'disabled', enabled: false },
++          abortSignal: signal,
++          signal,
++          maxAgentTurns: 2,
++          maxActionsPerAgent: 0,
++          enableWhiteboardTools: false,
++          childRuntimeMode: mode,
++          requiredVisibleTeaching: required,
++        });
++
++        expect(directorContext).toBeDefined();
++        expect(childContext).toBeDefined();
++        expectIdentityContext(directorContext!, required);
++        expectIdentityContext(childContext!, required);
++        expect(directorPrompt).toHaveBeenCalledTimes(1);
++        const turnPrompt = directorPrompt.mock.calls[0][0] as string;
++        if (required) {
++          expect(turnPrompt).toContain('Latest speaker: [Real learner / 真人学生]');
++          expect(turnPrompt).toContain(
++            'Original course discussion context (not the real learner identity)',
++          );
++          expect(turnPrompt).toContain('Latest real learner message: ' + LEARNER_TEXT);
++        } else {
++          expect(turnPrompt).toContain('Latest user message: ' + LEARNER_TEXT);
++          expect(turnPrompt).not.toContain('[Real learner / 真人学生]');
++          expect(turnPrompt).not.toContain('not the real learner identity');
++        }
++
++        expect(mocks.runNativeChild).toHaveBeenCalledTimes(mode === 'native' ? 1 : 0);
++        expect(mocks.buildAgent).toHaveBeenCalledTimes(mode === 'native' ? 1 : 2);
++        expect(
++          events
++            .filter((event) => event.type === 'text_delta')
++            .map((event) => event.data.content)
++            .join(''),
++        ).toBe(TEACHER_OUTPUT);
++        expect(events.at(-1)).toMatchObject({
++          type: 'done',
++          data: { totalAgents: 1, agentHadContent: true, cueUserReceived: true },
++        });
++        // Prompt annotations must not rewrite persisted teacher/user history.
++        expect(body).toEqual(originalBody);
++        expect(mocks.transport).not.toHaveBeenCalled();
++      });
++    }
++  }
++});
+diff --git a/tests/lib/chat/pi/mira-speaker-identity.test.ts b/tests/lib/chat/pi/mira-speaker-identity.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/lib/chat/pi/mira-speaker-identity.test.ts
+@@ -0,0 +1,167 @@
++import { describe, expect, it } from 'vitest';
++import type { AgentMessage } from '@earendil-works/pi-agent-core';
++import { buildUserPrompt, toHistoryMessages } from '@/lib/chat/pi/prompts';
++import { withRequiredLearnerIdentity } from '@/lib/prompts/mira-classroom-speaker-identity.v1';
++import type { StatelessChatRequest } from '@/lib/types/chat';
++
++const REAL_LEARNER = '[Real learner / 真人学生]';
++const AI_AGENT = '[Classroom agent / AI角色';
++const oldDiscussion = '乐乐，请说说你是怎样把分数化成百分数的。';
++const oldTeacherReply = '乐乐，你的想法很清楚。';
++const learnerReply = '我先用分子除以分母，再乘以百分之百。';
++
++function makeBody(messages: StatelessChatRequest['messages']): StatelessChatRequest {
++  return {
++    messages,
++    config: {
++      agentIds: ['teacher'],
++      sessionType: 'discussion',
++      discussionPrompt: oldDiscussion,
++    },
++    storeState: {
++      stage: { id: 'identity-stage', name: '分数与百分数' },
++      scenes: [],
++      currentSceneId: null,
++      mode: 'playback',
++      whiteboardOpen: false,
++    },
++    apiKey: '',
++  } as StatelessChatRequest;
++}
++
++function humanMessage(
++  metadata?: StatelessChatRequest['messages'][number]['metadata'],
++): StatelessChatRequest['messages'][number] {
++  return {
++    id: 'real-reply',
++    role: 'user',
++    parts: [{ type: 'text', text: learnerReply }],
++    metadata,
++  };
++}
++
++function historyText(message: AgentMessage): string {
++  const content = (message as { content: string | Array<{ type: string; text?: string }> }).content;
++  return typeof content === 'string'
++    ? content
++    : content
++        .filter((part) => part.type === 'text')
++        .map((part) => part.text ?? '')
++        .join('\n');
++}
++
++describe('required Pi teaching keeps the real learner separate from classroom agents', () => {
++  it('labels a fresh human reply even when a saved discussion and old teacher reply called someone 乐乐', () => {
++    const body = makeBody([
++      {
++        id: 'old-teacher',
++        role: 'assistant',
++        parts: [{ type: 'text', text: oldTeacherReply }],
++        metadata: { agentId: 'teacher' },
++      },
++      humanMessage(),
++    ]);
++    const before = structuredClone(body);
++    const userPrompt = buildUserPrompt(body, true);
++    const history = toHistoryMessages(body.messages, 12, true);
++
++    expect(body.userProfile).toBeUndefined();
++    expect(userPrompt).toContain(oldDiscussion);
++    expect(userPrompt).toContain(`${REAL_LEARNER}`);
++    expect(userPrompt).toContain(learnerReply);
++    expect(history.map((message) => message.role)).toEqual(['assistant', 'user']);
++    expect(historyText(history[0])).toContain(AI_AGENT);
++    expect(historyText(history[0])).toContain('agentId="teacher"');
++    expect(historyText(history[0])).toContain(oldTeacherReply);
++    expect(historyText(history[1])).toContain(REAL_LEARNER);
++    expect(historyText(history[1])).toContain(learnerReply);
++    expect(historyText(history[1])).not.toContain('乐乐');
++    expect(body).toEqual(before);
++  });
++
++  it('does not let a human message borrow an AI identity from sender metadata', () => {
++    const body = makeBody([
++      humanMessage({ senderName: '乐乐', agentId: 'peer-lele', originalRole: 'agent' }),
++    ]);
++    const history = toHistoryMessages(body.messages, 12, true);
++
++    expect(history[0].role).toBe('user');
++    expect(historyText(history[0])).toContain(REAL_LEARNER);
++    expect(historyText(history[0])).not.toContain(AI_AGENT);
++    expect(historyText(history[0])).not.toContain('乐乐');
++    expect(historyText(history[0])).not.toContain('peer-lele');
++    expect(buildUserPrompt(body, true)).toContain(`${REAL_LEARNER}`);
++    expect(buildUserPrompt(body, true)).not.toContain('[乐乐]');
++  });
++
++  it('keeps virtual peer speech as assistant history with its agent id, distinct from the next real reply', () => {
++    const body = makeBody([
++      {
++        id: 'peer-turn',
++        role: 'assistant',
++        parts: [{ type: 'text', text: '我想试试另一种方法。' }],
++        metadata: { senderName: '乐乐', agentId: 'peer-lele' },
++      },
++      humanMessage(),
++    ]);
++    const history = toHistoryMessages(body.messages, null, true);
++
++    expect(history.map((message) => message.role)).toEqual(['assistant', 'user']);
++    expect(historyText(history[0])).toContain(AI_AGENT);
++    expect(historyText(history[0])).toContain('agentId="peer-lele"');
++    expect(historyText(history[0])).not.toContain(REAL_LEARNER);
++    expect(historyText(history[0])).not.toContain('乐乐');
++    expect(historyText(history[1])).toContain(REAL_LEARNER);
++    expect(historyText(history[1])).not.toContain(AI_AGENT);
++  });
++
++  it('does not turn a scripted invitation or the opening turn into a human answer', () => {
++    const body = makeBody([]);
++    const prompt = buildUserPrompt(body, true);
++
++    expect(prompt).toContain(oldDiscussion);
++    expect(prompt).toContain('(none)');
++    expect(prompt).not.toContain('Latest speaker:');
++    expect(prompt).not.toContain(learnerReply);
++    expect(toHistoryMessages(body.messages, 12, true)).toEqual([]);
++  });
++
++  it('preserves non-required history and latest-turn prompts', () => {
++    const body = makeBody([
++      {
++        id: 'peer-turn',
++        role: 'assistant',
++        parts: [{ type: 'text', text: oldTeacherReply }],
++        metadata: { agentId: 'peer-lele', senderName: '乐乐' },
++      },
++      humanMessage({ senderName: '乐乐' }),
++    ]);
++    const history = toHistoryMessages(body.messages, 12, false);
++
++    expect(history.map((message) => message.role)).toEqual(['assistant', 'user']);
++    expect(history.map(historyText)).toEqual([oldTeacherReply, learnerReply]);
++    expect(buildUserPrompt(body, false)).toBe(
++      [
++        'Handle the latest classroom turn.',
++        `Discussion context: ${oldDiscussion}`,
++        `Latest user message: ${learnerReply}`,
++      ].join('\n'),
++    );
++    expect(buildUserPrompt(body)).toBe(buildUserPrompt(body, false));
++    expect(toHistoryMessages(body.messages).map(historyText)).toEqual(history.map(historyText));
++  });
++
++  it('adds the real-learner address rule at execution time without rewriting an old system prompt', () => {
++    const oldSystemPrompt = '你是数学老师。' + oldDiscussion;
++    const requiredPrompt = withRequiredLearnerIdentity(oldSystemPrompt, true);
++    const identityRules = requiredPrompt.replace(oldSystemPrompt, '');
++
++    expect(requiredPrompt).toContain(oldSystemPrompt);
++    expect(identityRules).toContain(REAL_LEARNER);
++    expect(identityRules).toContain('Address the real learner directly as “你”');
++    expect(identityRules).toContain('Do not infer a personal name');
++    expect(identityRules).toContain('Prior teacher messages may have misnamed the learner');
++    expect(requiredPrompt).not.toBe(oldSystemPrompt);
++    expect(withRequiredLearnerIdentity(oldSystemPrompt, false)).toBe(oldSystemPrompt);
++  });
++});
+diff --git a/tests/playback/discussion-consumption.test.ts b/tests/playback/discussion-consumption.test.ts
+--- a/tests/playback/discussion-consumption.test.ts
++++ b/tests/playback/discussion-consumption.test.ts
+@@ -145,6 +145,130 @@
+ 
+ describe('required student teaching discussions', () => {
+   afterEach(() => vi.useRealTimers());
++
++  it('waits for an explicit choice, then skips an unselected peer invitation without inventing a discussion', async () => {
++    vi.useFakeTimers();
++    const onDiscussionConfirmed = vi.fn();
++    const onComplete = vi.fn();
++    const onProactiveShow = vi.fn();
++    const engine = new PlaybackEngine(
++      [scene([discussion('explicit-skip', 'unselected-peer')])],
++      createActionEngine(),
++      createAudioPlayer(),
++      {
++        requireScriptedDiscussions: true,
++        isAgentSelected: () => false,
++        onDiscussionConfirmed,
++        onComplete,
++        onProactiveShow,
++      },
++    );
++    const acknowledge = vi.spyOn(engine, 'acknowledgeDiscussionCompletion');
++    engine.start();
++    await vi.advanceTimersByTimeAsync(30000);
++    expect(onProactiveShow).toHaveBeenCalledTimes(1);
++    expect(onComplete).not.toHaveBeenCalled();
++    expect(engine.skipDiscussion()).toBe(false);
++
++    expect(engine.skipDiscussion({ explicit: true })).toBe(true);
++
++    expect(onDiscussionConfirmed).not.toHaveBeenCalled();
++    expect(acknowledge).not.toHaveBeenCalled();
++    expect(engine.hasPendingRequiredDiscussion()).toBe(false);
++    expect(engine.getSnapshot().consumedDiscussions).toEqual(['explicit-skip']);
++    expect(engine.isExhausted()).toBe(true);
++    expect(onComplete).toHaveBeenCalledTimes(1);
++    expect(engine.skipDiscussion({ explicit: true })).toBe(false);
++    expect(onComplete).toHaveBeenCalledTimes(1);
++    engine.stop();
++  });
++
++  it.each(['error', 'manual close'] as const)(
++    'can skip after %s without acknowledging conversation completion',
++    async (ending) => {
++      vi.useFakeTimers();
++      const onComplete = vi.fn();
++      const onDiscussionConfirmed = vi.fn();
++      const engine = new PlaybackEngine(
++        [scene([discussion('interrupted-skip')])],
++        createActionEngine(),
++        createAudioPlayer(),
++        { requireScriptedDiscussions: true, onComplete, onDiscussionConfirmed },
++      );
++      const acknowledge = vi.spyOn(engine, 'acknowledgeDiscussionCompletion');
++      engine.start();
++      await vi.advanceTimersByTimeAsync(3100);
++      engine.confirmDiscussion();
++      // A caller must first stop the live request, not abandon a running stream.
++      expect(engine.skipDiscussion({ explicit: true })).toBe(false);
++      if (ending === 'error') engine.handleDiscussionError();
++      else engine.handleEndDiscussion();
++      expect(engine.getSnapshot().actionIndex).toBe(0);
++
++      expect(engine.skipDiscussion({ explicit: true })).toBe(true);
++
++      expect(engine.hasPendingRequiredDiscussion()).toBe(false);
++      expect(onComplete).toHaveBeenCalledTimes(1);
++      expect(onDiscussionConfirmed).toHaveBeenCalledTimes(1);
++      expect(acknowledge).not.toHaveBeenCalled();
++      engine.stop();
++    },
++  );
++
++  it('can leave during the invitation delay without a late invitation or a paid join', async () => {
++    vi.useFakeTimers();
++    const onComplete = vi.fn();
++    const onProactiveShow = vi.fn();
++    const onDiscussionConfirmed = vi.fn();
++    const engine = new PlaybackEngine(
++      [scene([discussion('navigation-skip')])],
++      createActionEngine(),
++      createAudioPlayer(),
++      { requireScriptedDiscussions: true, onComplete, onProactiveShow, onDiscussionConfirmed },
++    );
++    engine.start();
++    await vi.advanceTimersByTimeAsync(100);
++
++    expect(engine.skipDiscussion({ explicit: true, resume: false })).toBe(true);
++    await vi.advanceTimersByTimeAsync(30000);
++
++    expect(engine.getMode()).toBe('idle');
++    expect(engine.isExhausted()).toBe(true);
++    expect(engine.hasPendingRequiredDiscussion()).toBe(false);
++    expect(onProactiveShow).not.toHaveBeenCalled();
++    expect(onDiscussionConfirmed).not.toHaveBeenCalled();
++    // Navigation owns persistence; the old engine must not auto-advance too.
++    expect(onComplete).not.toHaveBeenCalled();
++    engine.stop();
++  });
++
++  it('does not consume later actions when navigation skips only the current discussion', async () => {
++    vi.useFakeTimers();
++    const actionEngine = createActionEngine();
++    const engine = new PlaybackEngine(
++      [
++        scene([
++          discussion('skip-only-discussion'),
++          { id: 'later-spotlight', type: 'spotlight', elementId: 'later-element' } as Action,
++        ]),
++      ],
++      actionEngine,
++      createAudioPlayer(),
++      { requireScriptedDiscussions: true },
++    );
++    engine.start();
++    await vi.advanceTimersByTimeAsync(3100);
++    engine.pause();
++
++    expect(engine.skipDiscussion({ explicit: true, resume: false })).toBe(true);
++
++    expect(engine.getSnapshot().actionIndex).toBe(1);
++    expect(engine.getSnapshot().consumedDiscussions).toEqual(['skip-only-discussion']);
++    expect(engine.hasPendingRequiredDiscussion()).toBe(false);
++    expect(engine.isExhausted()).toBe(false);
++    expect(actionEngine.execute).not.toHaveBeenCalled();
++    engine.stop();
++  });
+ 
+   it('invites even with an unselected agent and waits for Join before starting the required discussion', async () => {
+     vi.useFakeTimers();
+diff --git a/tests/runtime/mira-student-interaction-bridge.browser.test.ts b/tests/runtime/mira-student-interaction-bridge.browser.test.ts
+--- a/tests/runtime/mira-student-interaction-bridge.browser.test.ts
++++ b/tests/runtime/mira-student-interaction-bridge.browser.test.ts
+@@ -3,72 +3,158 @@
+ import { createRequire } from 'node:module';
+ import { patchHtmlForIframe } from '@/lib/utils/iframe';
+ 
+-const objective = { objectiveIndex: 0, demonstration: {sceneId:'demo',quote:'先看示范'},
+-  operation:{sceneId:'operate',controlSelector:'#quantity',action:'range',value:'12'},
+-  feedback:{sceneId:'operate',selector:'#result',textIncludes:'一个十两个一',reasonQuote:'十个一是一个十'},
+-  independentJudgment:{sceneId:'quiz',questionId:'q4'} };
++const objective = {
++  objectiveIndex: 0,
++  demonstration: { sceneId: 'demo', quote: '先看示范' },
++  operation: { sceneId: 'operate', controlSelector: '#quantity', action: 'range', value: '12' },
++  feedback: {
++    sceneId: 'operate',
++    selector: '#result',
++    textIncludes: '一个十两个一',
++    reasonQuote: '十个一是一个十',
++  },
++  independentJudgment: { sceneId: 'quiz', questionId: 'q4' },
++};
+ const original = `<input aria-label="数量" id="quantity" type="range" min="0" max="20" value="2"><output id="result">两个一</output>
+ <script>quantity.oninput=()=>{result.textContent=Number(quantity.value)===12?'一个十两个一，因为十个一是一个十':'当前数量'+quantity.value}</script>`;
+-const escape = (value: string) => value.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');
++const escape = (value: string) =>
++  value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
+ 
+-describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')('actual student operation browser bridge', () => {
+-  it('accepts trusted manipulation and rejects teacher scripts, postMessage forgery and stale/hidden channels', async () => {
+-    const require = createRequire(import.meta.url);
+-    const { build } = createRequire(require.resolve('tsx'))('esbuild');
+-    const bundle = await build({ stdin:{ resolveDir:process.cwd(), loader:'ts', contents:`
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')(
++  'actual student operation browser bridge',
++  () => {
++    it('accepts trusted manipulation and rejects teacher scripts, postMessage forgery and stale/hidden channels', async () => {
++      const require = createRequire(import.meta.url);
++      const { build } = createRequire(require.resolve('tsx'))('esbuild');
++      const bundle = await build({
++        stdin: {
++          resolveDir: process.cwd(),
++          loader: 'ts',
++          contents: `
+       import {connectStudentInteractionFrame} from './lib/mira/student-interaction-bridge';
+       window.events=[]; window.active=true;
+       window.connect=()=>{ window.disconnect?.(); window.disconnect=connectStudentInteractionFrame({
+         frame:document.querySelector('iframe'), objectives:${JSON.stringify([objective])},
+         active:()=>window.active, onOperation:op=>window.events.push(op) }); };
+-      window.connect();` }, bundle:true, write:false, format:'iife', platform:'browser', logLevel:'silent' });
+-    const browser = await chromium.launch({ executablePath:process.env.MIRA_FORMAL_QA_BROWSER_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless:true });
+-    try {
+-      const page = await browser.newPage();
+-      await page.route('**/*', route=>route.abort());
+-      await page.setContent(`<iframe sandbox="allow-scripts" srcdoc="${escape(patchHtmlForIframe(original))}"></iframe>`);
+-      await page.addScriptTag({content:bundle.outputFiles[0].text});
+-      const frame = page.frames().find(frame=>frame !== page.mainFrame())!;
+-      await frame.evaluate(()=>{const range=document.querySelector('input')!; range.value='12'; range.dispatchEvent(new Event('input',{bubbles:true})); window.parent.postMessage({objectiveIndex:0,passed:true},'*');});
+-      await page.waitForTimeout(100);
+-      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events)).toEqual([]);
+-      // Reset via page script; only subsequent trusted keyboard input may complete.
+-      await frame.evaluate(()=>{const range=document.querySelector('input')!; range.value='11'; document.querySelector('output')!.textContent='当前数量11';});
+-      await frame.getByRole('slider').focus();
+-      await frame.getByRole('slider').press('ArrowRight');
+-      await page.waitForFunction(()=> (window as unknown as {events:unknown[]}).events.length===1);
+-      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events[0])).toMatchObject({objectiveIndex:0,value:'12',feedbackText:'一个十两个一，因为十个一是一个十'});
+-      // A kept-alive scene may still run scripts, but its closed/hidden host port is inert.
+-      await page.evaluate(()=>{const w=window as unknown as {active:boolean;disconnect:()=>void};w.active=false;w.disconnect();});
+-      await frame.evaluate(()=>{const range=document.querySelector('input')!;range.value='11';document.querySelector('output')!.textContent='当前数量11';});
+-      await frame.getByRole('slider').press('ArrowRight');
+-      await page.waitForTimeout(100);
+-      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events.length)).toBe(1);
+-      // Re-entry opens a fresh channel; the old document's observation cannot cross a scene swap.
+-      await page.evaluate(()=>{const w=window as unknown as {active:boolean;connect:()=>void};w.active=true;w.connect();});
+-      await frame.evaluate(()=>{const range=document.querySelector('input')!;range.value='11';document.querySelector('output')!.textContent='当前数量11';});
+-      await frame.getByRole('slider').press('ArrowRight');
+-      await page.waitForFunction(()=> (window as unknown as {events:unknown[]}).events.length===2);
+-      // Hidden descendants cannot manufacture "visible" result evidence.
+-      await page.evaluate(()=> (window as unknown as {connect:()=>void}).connect());
+-      await frame.evaluate(()=>{
+-        const range=document.querySelector('input')!, result=document.querySelector('output')!;
+-        range.value='11'; result.innerHTML='<span>可见结果没有变化</span><span id="hidden-result" style="display:none">等待</span>';
+-        range.oninput=()=>{document.querySelector('#hidden-result')!.textContent='一个十两个一，因为十个一是一个十';};
++      window.connect();`,
++        },
++        bundle: true,
++        write: false,
++        format: 'iife',
++        platform: 'browser',
++        logLevel: 'silent',
+       });
+-      await frame.getByRole('slider').press('ArrowRight');
+-      await page.waitForTimeout(100);
+-      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events.length)).toBe(2);
+-      await page.evaluate(()=> (window as unknown as {connect:()=>void}).connect());
+-      await frame.evaluate(()=>{
+-        const range=document.querySelector('input')!, result=document.querySelector('output')!;
+-        range.value='11'; result.textContent='当前数量11'; result.style.opacity='0';
+-        range.oninput=()=>{result.textContent='一个十两个一，因为十个一是一个十';};
++      const browser = await chromium.launch({
++        executablePath:
++          process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++        headless: true,
+       });
+-      await frame.getByRole('slider').press('ArrowRight');
+-      await page.waitForTimeout(100);
+-      expect(await page.evaluate(()=> (window as unknown as {events:unknown[]}).events.length)).toBe(2);
+-
+-    } finally { await browser.close(); }
+-  }, 30_000);
+-});
++      try {
++        const page = await browser.newPage();
++        await page.route('**/*', (route) => route.abort());
++        await page.setContent(
++          `<iframe sandbox="allow-scripts" srcdoc="${escape(patchHtmlForIframe(original))}"></iframe>`,
++        );
++        await page.addScriptTag({ content: bundle.outputFiles[0].text });
++        const frame = page.frames().find((frame) => frame !== page.mainFrame())!;
++        await frame.evaluate(() => {
++          const range = document.querySelector('input')!;
++          range.value = '12';
++          range.dispatchEvent(new Event('input', { bubbles: true }));
++          window.parent.postMessage({ objectiveIndex: 0, passed: true }, '*');
++        });
++        await page.waitForTimeout(100);
++        expect(
++          await page.evaluate(() => (window as unknown as { events: unknown[] }).events),
++        ).toEqual([]);
++        // Reset via page script; only subsequent trusted keyboard input may complete.
++        await frame.evaluate(() => {
++          const range = document.querySelector('input')!;
++          range.value = '11';
++          document.querySelector('output')!.textContent = '当前数量11';
++        });
++        await frame.getByRole('slider').focus();
++        await frame.getByRole('slider').press('ArrowRight');
++        await page.waitForFunction(
++          () => (window as unknown as { events: unknown[] }).events.length === 1,
++        );
++        expect(
++          await page.evaluate(() => (window as unknown as { events: unknown[] }).events[0]),
++        ).toMatchObject({
++          objectiveIndex: 0,
++          value: '12',
++          feedbackText: '一个十两个一，因为十个一是一个十',
++        });
++        // A kept-alive scene may still run scripts, but its closed/hidden host port is inert.
++        await page.evaluate(() => {
++          const w = window as unknown as { active: boolean; disconnect: () => void };
++          w.active = false;
++          w.disconnect();
++        });
++        await frame.evaluate(() => {
++          const range = document.querySelector('input')!;
++          range.value = '11';
++          document.querySelector('output')!.textContent = '当前数量11';
++        });
++        await frame.getByRole('slider').press('ArrowRight');
++        await page.waitForTimeout(100);
++        expect(
++          await page.evaluate(() => (window as unknown as { events: unknown[] }).events.length),
++        ).toBe(1);
++        // Re-entry opens a fresh channel; the old document's observation cannot cross a scene swap.
++        await page.evaluate(() => {
++          const w = window as unknown as { active: boolean; connect: () => void };
++          w.active = true;
++          w.connect();
++        });
++        await frame.evaluate(() => {
++          const range = document.querySelector('input')!;
++          range.value = '11';
++          document.querySelector('output')!.textContent = '当前数量11';
++        });
++        await frame.getByRole('slider').press('ArrowRight');
++        await page.waitForFunction(
++          () => (window as unknown as { events: unknown[] }).events.length === 2,
++        );
++        // A real value change is participation even if visible rounded feedback
++        // stays the same. Hidden descendant text is not needed as evidence.
++        await page.evaluate(() => (window as unknown as { connect: () => void }).connect());
++        await frame.evaluate(() => {
++          const range = document.querySelector('input')!,
++            result = document.querySelector('output')!;
++          range.value = '11';
++          result.innerHTML =
++            '<span>可见结果没有变化</span><span id="hidden-result" style="display:none">等待</span>';
++          range.oninput = () => {
++            document.querySelector('#hidden-result')!.textContent =
++              '一个十两个一，因为十个一是一个十';
++          };
++        });
++        await frame.getByRole('slider').press('ArrowRight');
++        await page.waitForTimeout(100);
++        expect(
++          await page.evaluate(() => (window as unknown as { events: unknown[] }).events.length),
++        ).toBe(3);
++        await page.evaluate(() => (window as unknown as { connect: () => void }).connect());
++        await frame.evaluate(() => {
++          const range = document.querySelector('input')!,
++            result = document.querySelector('output')!;
++          range.value = '11';
++          result.textContent = '当前数量11';
++          result.style.opacity = '0';
++          range.oninput = () => {
++            result.textContent = '一个十两个一，因为十个一是一个十';
++          };
++        });
++        await frame.getByRole('slider').press('ArrowRight');
++        await page.waitForTimeout(100);
++        expect(
++          await page.evaluate(() => (window as unknown as { events: unknown[] }).events.length),
++        ).toBe(3);
++      } finally {
++        await browser.close();
++      }
++    }, 30_000);
++  },
++);
+diff --git a/tests/runtime/mira-student-interaction-bridge.test.ts b/tests/runtime/mira-student-interaction-bridge.test.ts
+--- a/tests/runtime/mira-student-interaction-bridge.test.ts
++++ b/tests/runtime/mira-student-interaction-bridge.test.ts
+@@ -1,15 +1,38 @@
+ import { describe, expect, it } from 'vitest';
++import { runInNewContext } from 'node:vm';
+ import type { Scene } from '@/lib/types/stage';
+-import { studentInteractionObjectives, requiredInteractionsBeforeScene } from '@/lib/mira/student-interaction-bridge';
+-
+-const objective = { objectiveIndex: 0, demonstration: { sceneId: 'demo', quote: '把两个部分合起来' },
++import type { InteractionObjective } from '@/lib/server/mira-formal-interaction-design';
++import type { MiraInteractionOperation } from '@/lib/mira/student-runtime-events';
++import {
++  studentInteractionObjectives,
++  requiredInteractionsBeforeScene,
++  matchesStudentInteractionObjective,
++  STUDENT_INTERACTION_OBSERVER,
++} from '@/lib/mira/student-interaction-bridge';
++
++const objective = {
++  objectiveIndex: 0,
++  demonstration: { sceneId: 'demo', quote: '把两个部分合起来' },
+   operation: { sceneId: 'operate', controlSelector: '#quantity', action: 'range', value: '12' },
+-  feedback: { sceneId: 'operate', selector: '#result', textIncludes: '一个十两个一', reasonQuote: '十个一是一个十' },
+-  independentJudgment: { sceneId: 'quiz', questionId: 'q4' } };
++  feedback: {
++    sceneId: 'operate',
++    selector: '#result',
++    textIncludes: '一个十两个一',
++    reasonQuote: '十个一是一个十',
++  },
++  independentJudgment: { sceneId: 'quiz', questionId: 'q4' },
++};
+ const scenes = [
+   { id: 'demo', order: 0, type: 'slide', content: { type: 'slide' } },
+-  { id: 'operate', order: 1, type: 'interactive', content: { type: 'interactive', html:
+-    `<script type="application/json" id="mira-interaction-plan">${JSON.stringify({schemaVersion:'mira.openmaic.interaction-design-plan.v1',objectives:[objective]})}</script>` } },
++  {
++    id: 'operate',
++    order: 1,
++    type: 'interactive',
++    content: {
++      type: 'interactive',
++      html: `<script type="application/json" id="mira-interaction-plan">${JSON.stringify({ schemaVersion: 'mira.openmaic.interaction-design-plan.v1', objectives: [objective] })}</script>`,
++    },
++  },
+   { id: 'quiz', order: 2, type: 'quiz', content: { type: 'quiz', questions: [] } },
+ ] as Scene[];
+ describe('student interaction teaching-plan navigation', () => {
+@@ -21,3 +44,277 @@
+     expect(requiredInteractionsBeforeScene(scenes, 'demo')).toEqual([]);
+   });
+ });
++
++const fractionObjectives: InteractionObjective[] = [
++  {
++    ...objective,
++    objectiveIndex: 0,
++    operation: { sceneId: 'operate', controlSelector: '#numerator-plus', action: 'click' },
++    feedback: {
++      sceneId: 'operate',
++      selector: '#reason',
++      textIncludes: '50%',
++      reasonQuote: '2÷4=0.5',
++    },
++  },
++  {
++    ...objective,
++    objectiveIndex: 1,
++    operation: { sceneId: 'operate', controlSelector: '#denominator-plus', action: 'click' },
++    feedback: {
++      sceneId: 'operate',
++      selector: '#reason',
++      textIncludes: '20%',
++      reasonQuote: '1÷5=0.2',
++    },
++  },
++];
++
++describe('student participation is independent of publication sample answers', () => {
++  it('binds the actual 3/5 observation to its declared control without requiring 2/4 or 1/5', () => {
++    const observation: MiraInteractionOperation = {
++      objectiveIndex: 0,
++      controlSelector: '#numerator-plus',
++      action: 'click',
++      value: '',
++      feedbackText: '3÷5=0.6，也就是60%。',
++    };
++    expect(matchesStudentInteractionObjective(fractionObjectives[0], observation)).toBe(true);
++    for (const invalid of [
++      { ...observation, objectiveIndex: 1 },
++      { ...observation, controlSelector: '#reset' },
++      { ...observation, action: 'fill' as const, value: '3' },
++      { ...observation, value: 'invented-button-value' },
++      { ...observation, feedbackText: '   ' },
++    ]) {
++      expect(matchesStudentInteractionObjective(fractionObjectives[0], invalid)).toBe(false);
++    }
++  });
++
++  it('accepts the actual input value rather than the reviewer sample value', () => {
++    expect(
++      matchesStudentInteractionObjective(objective as InteractionObjective, {
++        objectiveIndex: 0,
++        controlSelector: '#quantity',
++        action: 'range',
++        value: '13',
++        feedbackText: '十三个一，可以合成一个十和三个一。',
++      }),
++    ).toBe(true);
++  });
++});
++
++// Run the production injected script against an isolated DOM/event simulator.
++// This does not open a browser or send any learning-progress request. Trusted
++// and synthetic event flags explicitly exercise the observer's boundary.
++class ObserverElement {
++  value = '';
++  visible = true;
++  validity = { valid: true };
++  constructor(
++    public tagName: string,
++    public textContent = '',
++  ) {}
++  get innerText() {
++    return this.textContent;
++  }
++  contains(target: unknown) {
++    return target === this;
++  }
++  getBoundingClientRect() {
++    return { width: this.visible ? 100 : 0, height: this.visible ? 30 : 0 };
++  }
++  checkVisibility() {
++    return this.visible;
++  }
++}
++class ObserverPort {
++  observations: MiraInteractionOperation[] = [];
++  closed = false;
++  close() {
++    this.closed = true;
++  }
++  postMessage(observation: MiraInteractionOperation) {
++    this.observations.push(observation);
++  }
++}
++
++function observerHarness(plan: InteractionObjective[]) {
++  const nodes = new Map<string, ObserverElement>();
++  for (const item of plan) {
++    nodes.set(
++      item.operation.controlSelector,
++      new ObserverElement(item.operation.action === 'click' ? 'BUTTON' : 'INPUT'),
++    );
++    nodes.set(item.feedback.selector, new ObserverElement('OUTPUT', '原来的可见反馈'));
++  }
++  const listeners = new Map<string, Array<(event: Record<string, unknown>) => void>>();
++  const queue: Array<{ at: number; run: () => void }> = [];
++  let now = 0;
++  const parent = {};
++  const emit = (type: string, event: Record<string, unknown>) => {
++    for (const listener of listeners.get(type) ?? []) listener(event);
++  };
++  runInNewContext(
++    STUDENT_INTERACTION_OBSERVER.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, ''),
++    {
++      window: {
++        parent,
++        setTimeout: (run: () => void, delay = 0) => queue.push({ at: now + delay, run }),
++        addEventListener: (type: string, listener: (event: Record<string, unknown>) => void) => {
++          listeners.set(type, [...(listeners.get(type) ?? []), listener]);
++        },
++      },
++      document: { querySelector: (selector: string) => nodes.get(selector) },
++      HTMLElement: ObserverElement,
++      MessagePort: ObserverPort,
++      performance: { now: () => now },
++    },
++  );
++  const connect = (source: object = parent) => {
++    const port = new ObserverPort();
++    emit('message', {
++      source,
++      data: { type: 'mira:observe-student-interactions', objectives: plan },
++      ports: [port],
++      stopImmediatePropagation() {},
++    });
++    return port;
++  };
++  const flush = () => {
++    const end = now + 2100;
++    while (queue.length) {
++      queue.sort((a, b) => a.at - b.at);
++      if (queue[0].at > end) break;
++      const next = queue.shift()!;
++      now = next.at;
++      next.run();
++    }
++    now = end;
++  };
++  const dispatch = (type: string, control: ObserverElement, trusted = true) =>
++    emit(type, { type, target: control, isTrusted: trusted });
++  return { nodes, connect, flush, dispatch };
++}
++
++describe('injected student observer observes changes without rehearsing golden answers', () => {
++  it('records real numerator and denominator button changes ending at 3/5 and 60%', () => {
++    const h = observerHarness(fractionObjectives);
++    const port = h.connect();
++    const reason = h.nodes.get('#reason')!;
++    reason.textContent = '2÷5=0.4，也就是40%。';
++    h.dispatch('click', h.nodes.get('#numerator-plus')!);
++    reason.textContent = '3÷5=0.6，也就是60%。';
++    h.flush();
++    reason.textContent = '3÷4=0.75，也就是75%。';
++    h.dispatch('click', h.nodes.get('#denominator-plus')!);
++    reason.textContent = '3÷5=0.6，也就是60%。';
++    h.flush();
++    expect(port.observations).toEqual([
++      {
++        objectiveIndex: 0,
++        controlSelector: '#numerator-plus',
++        action: 'click',
++        value: '',
++        feedbackText: '3÷5=0.6，也就是60%。',
++      },
++      {
++        objectiveIndex: 1,
++        controlSelector: '#denominator-plus',
++        action: 'click',
++        value: '',
++        feedbackText: '3÷5=0.6，也就是60%。',
++      },
++    ]);
++    expect(
++      port.observations.every((observation) =>
++        matchesStudentInteractionObjective(
++          fractionObjectives[observation.objectiveIndex],
++          observation,
++        ),
++      ),
++    ).toBe(true);
++  });
++
++  it('observes an actual control-value change even when rounded visible feedback stays the same', () => {
++    const h = observerHarness([objective as InteractionObjective]);
++    const port = h.connect();
++    const control = h.nodes.get('#quantity')!;
++    control.value = '10';
++    h.nodes.get('#result')!.textContent = '接近一个十';
++    h.dispatch('beforeinput', control);
++    control.value = '11';
++    h.dispatch('input', control);
++    h.flush();
++    expect(port.observations).toEqual([
++      {
++        objectiveIndex: 0,
++        controlSelector: '#quantity',
++        action: 'range',
++        value: '11',
++        feedbackText: '接近一个十',
++      },
++    ]);
++  });
++
++  it('rejects synthetic operations, undeclared controls/actions, unchanged state and empty or hidden feedback', () => {
++    const h = observerHarness(fractionObjectives);
++    const port = h.connect();
++    const control = h.nodes.get('#numerator-plus')!;
++    const reason = h.nodes.get('#reason')!;
++    h.dispatch('click', control, false);
++    reason.textContent = '脚本改成60%';
++    h.flush();
++    h.dispatch('click', new ObserverElement('BUTTON'));
++    reason.textContent = '另一个按钮改成60%';
++    h.flush();
++    h.dispatch('input', control);
++    reason.textContent = '错误事件改成60%';
++    h.flush();
++    h.dispatch('click', control);
++    h.flush();
++    h.dispatch('click', control);
++    reason.textContent = '';
++    h.flush();
++    reason.textContent = '隐藏反馈之前';
++    reason.visible = false;
++    h.dispatch('click', control);
++    reason.textContent = '隐藏反馈之后';
++    h.flush();
++    expect(port.observations).toEqual([]);
++  });
++
++  it('rejects invalid control values despite generated feedback changing', () => {
++    const h = observerHarness([objective as InteractionObjective]);
++    const port = h.connect();
++    const control = h.nodes.get('#quantity')!;
++    control.value = '10';
++    h.dispatch('beforeinput', control);
++    control.value = 'invalid';
++    control.validity.valid = false;
++    h.dispatch('input', control);
++    h.nodes.get('#result')!.textContent = '请重新输入';
++    h.flush();
++    expect(port.observations).toEqual([]);
++  });
++
++  it('rejects another frame handshake and pending observations from the replaced private port', () => {
++    const h = observerHarness(fractionObjectives);
++    const foreign = h.connect({});
++    const control = h.nodes.get('#numerator-plus')!;
++    const reason = h.nodes.get('#reason')!;
++    h.dispatch('click', control);
++    reason.textContent = '3÷5=0.6，也就是60%。';
++    h.flush();
++    expect(foreign.observations).toEqual([]);
++
++    const oldPort = h.connect();
++    h.dispatch('click', control);
++    reason.textContent = '4÷5=0.8，也就是80%。';
++    const currentPort = h.connect();
++    h.flush();
++    expect(oldPort.closed).toBe(true);
++    expect(oldPort.observations).toEqual([]);
++    expect(currentPort.observations).toEqual([]);
++  });
++});

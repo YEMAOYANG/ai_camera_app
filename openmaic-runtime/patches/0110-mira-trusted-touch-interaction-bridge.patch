@@ -1,0 +1,256 @@
+diff --git a/lib/mira/student-interaction-bridge.ts b/lib/mira/student-interaction-bridge.ts
+--- a/lib/mira/student-interaction-bridge.ts
++++ b/lib/mira/student-interaction-bridge.ts
+@@ -150,10 +150,17 @@
+       if (completed.has(item.objectiveIndex)) return;
+       var op = item.operation, control = query(op.controlSelector);
+       if (!control || !(event.target === control || control.contains(event.target))) return;
+-      if ((op.action === 'click' ? 'click' : op.action === 'select' ? 'change' : 'input') !== event.type) return;
++      var touch = op.action === 'click' && event.type === 'touchstart';
++      if (!touch && (op.action === 'click' ? 'click' : op.action === 'select' ? 'change' : 'input') !== event.type) return;
++      // Some generated controls act on touchstart and cancel the compatibility
++      // click. Observe before that handler, while keeping the same logical action.
++      // If a click does follow, retain the pre-touch feedback until this bounded
++      // observation finishes; replacing it would lose the already changed state.
++      var previous = pending.get(item.objectiveIndex);
++      if (event.type === 'click' && previous && previous.touch && previous.control === control) return;
+       var node = feedback(item, control);
+       if (!node) return;
+-      var before = text(node), beforeValue = beforeValues.get(control), currentPort = port, ticket = {};
++      var before = text(node), beforeValue = beforeValues.get(control), currentPort = port, ticket = {touch:touch,control:control};
+       pending.set(item.objectiveIndex, ticket);
+       var started = performance.now();
+       function inspect() {
+@@ -167,11 +174,12 @@
+           completed.add(item.objectiveIndex); pending.delete(item.objectiveIndex);
+           send.call(currentPort, {objectiveIndex:item.objectiveIndex, controlSelector:op.controlSelector, action:op.action, value:value, feedbackText:after});
+         } else if (performance.now() - started < 2000) schedule(inspect, 40);
++        else pending.delete(item.objectiveIndex);
+       }
+       schedule(inspect, 0);
+     });
+   }
+-  ['pointerdown','keydown','beforeinput'].forEach(function (type) { window.addEventListener(type, prepare, true); });
+-  ['click','input','change'].forEach(function (type) { window.addEventListener(type, observed, true); });
++  ['pointerdown','touchstart','keydown','beforeinput'].forEach(function (type) { window.addEventListener(type, prepare, true); });
++  ['touchstart','click','input','change'].forEach(function (type) { window.addEventListener(type, observed, true); });
+ })();
+ </script>`;
+diff --git a/tests/runtime/mira-student-interaction-bridge.test.ts b/tests/runtime/mira-student-interaction-bridge.test.ts
+--- a/tests/runtime/mira-student-interaction-bridge.test.ts
++++ b/tests/runtime/mira-student-interaction-bridge.test.ts
+@@ -198,6 +198,40 @@
+ }
+ 
+ describe('injected student observer observes changes without rehearsing golden answers', () => {
++  it('keeps pre-touch feedback when a compatibility click arrives before polling and reports once', () => {
++    const h = observerHarness(fractionObjectives);
++    const port = h.connect();
++    const control = h.nodes.get('#numerator-plus')!;
++    h.dispatch('touchstart', control);
++    h.nodes.get('#reason')!.textContent = '触摸操作后的可见反馈';
++    h.dispatch('click', control);
++    h.flush();
++    h.dispatch('click', control);
++    h.nodes.get('#reason')!.textContent = '重复事件后的反馈';
++    h.flush();
++    expect(port.observations).toHaveLength(1);
++    expect(port.observations[0]).toMatchObject({
++      action: 'click',
++      feedbackText: '触摸操作后的可见反馈',
++    });
++  });
++
++  it('rejects synthetic and unchanged touches and expires their pending observation before a later click', () => {
++    const h = observerHarness(fractionObjectives);
++    const port = h.connect();
++    const control = h.nodes.get('#numerator-plus')!;
++    h.dispatch('touchstart', control, false);
++    h.nodes.get('#reason')!.textContent = '脚本改了反馈';
++    h.flush();
++    h.dispatch('touchstart', control);
++    h.flush();
++    expect(port.observations).toEqual([]);
++    h.dispatch('click', control);
++    h.nodes.get('#reason')!.textContent = '之后真实点击的新反馈';
++    h.flush();
++    expect(port.observations).toHaveLength(1);
++  });
++
+   it('records real numerator and denominator button changes ending at 3/5 and 60%', () => {
+     const h = observerHarness(fractionObjectives);
+     const port = h.connect();
+diff --git a/tests/runtime/mira-student-touch-bridge.browser.test.ts b/tests/runtime/mira-student-touch-bridge.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/mira-student-touch-bridge.browser.test.ts
+@@ -0,0 +1,169 @@
++import { describe, expect, it } from 'vitest';
++import { chromium } from 'playwright-core';
++import { createRequire } from 'node:module';
++import { patchHtmlForIframe } from '@/lib/utils/iframe';
++
++const objective = {
++  objectiveIndex: 1,
++  operation: { sceneId: 'operate', controlSelector: '#sing', action: 'click' },
++  feedback: { sceneId: 'operate', selector: '#result' },
++};
++type Host = Window & { events: unknown[]; active: boolean; disconnect: () => void };
++const escape = (value: string) =>
++  value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
++// Real p6 behavior: two local touch handlers change feedback and cancel click.
++const fixture = (cancel: boolean, touchChanges = true, clickChanges = true) => `
++<button id="sing" style="width:120px;height:60px">sing</button>
++<output id="result" style="display:block">He ate yesterday.</output>
++<script>
++window.nativeEvents=[];
++['touchstart','click'].forEach(type=>window.addEventListener(type,e=>window.nativeEvents.push({type,trusted:e.isTrusted}),true));
++const change=()=>{result.textContent='He sang yesterday. sing 的过去式 sang';};
++for(let i=0;i<2;i++)sing.addEventListener('touchstart',e=>{${cancel ? 'e.preventDefault();' : ''}${touchChanges ? 'change();' : ''}},{passive:false});
++sing.addEventListener('click',()=>{${clickChanges ? 'change();' : ''}});
++window.addEventListener('message',e=>{if(e.data.type==='SET_WIDGET_STATE')change();});
++</script>`;
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')(
++  'trusted touch participation bridge',
++  () => {
++    it('records canceled and compatible taps once while preserving private-port and visible-change checks', async () => {
++      const require = createRequire(import.meta.url);
++      const { build } = createRequire(require.resolve('tsx'))('esbuild');
++      const bundle = await build({
++        stdin: {
++          resolveDir: process.cwd(),
++          loader: 'ts',
++          contents: `
++import {connectStudentInteractionFrame} from './lib/mira/student-interaction-bridge';
++window.events=[];window.active=true;
++window.disconnect=connectStudentInteractionFrame({frame:document.querySelector('iframe'),objectives:${JSON.stringify([objective])},active:()=>window.active,onOperation:op=>window.events.push(op)});`,
++        },
++        bundle: true,
++        write: false,
++        format: 'iife',
++        platform: 'browser',
++        logLevel: 'silent',
++      });
++      const browser = await chromium.launch({
++        executablePath:
++          process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++        headless: true,
++      });
++      try {
++        for (const mode of [
++          'cancel',
++          'compatibility',
++          'click-only',
++          'no-change',
++          'untrusted',
++          'hidden-feedback',
++          'inactive',
++          'disconnected',
++          'mouse',
++          'keyboard',
++        ]) {
++          const context = await browser.newContext({
++            viewport: { width: 800, height: 600 },
++            hasTouch: true,
++          });
++          try {
++            const page = await context.newPage();
++            await page.route('**/*', (route) => route.abort());
++            const markup = fixture(
++              mode !== 'compatibility' && mode !== 'click-only',
++              mode !== 'no-change' && mode !== 'click-only',
++              mode !== 'no-change',
++            );
++            await page.setContent(
++              `<iframe sandbox="allow-scripts" style="width:600px;height:300px" srcdoc="${escape(patchHtmlForIframe(markup))}"></iframe>`,
++            );
++            await page.addScriptTag({ content: bundle.outputFiles[0].text });
++            const frame = page.frames().find((frame) => frame !== page.mainFrame())!;
++            await page.waitForTimeout(50); // Private MessagePort delivery is asynchronous.
++            if (mode === 'untrusted') {
++              await frame.evaluate(() => {
++                const button = document.querySelector('button')!;
++                button.dispatchEvent(new Event('touchstart', { bubbles: true, cancelable: true }));
++                button.click();
++                window.parent.postMessage(
++                  { objectiveIndex: 1, action: 'click', feedbackText: 'forged' },
++                  '*',
++                );
++              });
++              await page
++                .locator('iframe')
++                .evaluate((frame) =>
++                  (frame as HTMLIFrameElement).contentWindow!.postMessage(
++                    { type: 'SET_WIDGET_STATE', state: { action: 'sing' } },
++                    '*',
++                  ),
++                );
++            } else {
++              if (mode === 'hidden-feedback')
++                await frame.locator('output').evaluate((e) => (e.style.opacity = '0'));
++              if (mode === 'inactive')
++                await page.evaluate(() => ((window as unknown as Host).active = false));
++              if (mode === 'disconnected')
++                await page.evaluate(() => (window as unknown as Host).disconnect());
++              if (mode === 'mouse') await frame.getByRole('button').click();
++              else if (mode === 'keyboard') await frame.getByRole('button').press('Enter');
++              else await frame.getByRole('button').tap();
++            }
++            const accepted = [
++              'cancel',
++              'compatibility',
++              'click-only',
++              'mouse',
++              'keyboard',
++            ].includes(mode);
++            if (accepted)
++              await page.waitForFunction(() => (window as unknown as Host).events.length === 1);
++            await page.waitForTimeout(mode === 'no-change' ? 2150 : 100);
++            const events = await page.evaluate(() => (window as unknown as Host).events);
++            expect(events, mode).toHaveLength(accepted ? 1 : 0);
++            if (accepted) {
++              expect(events[0], mode).toMatchObject({
++                objectiveIndex: 1,
++                controlSelector: '#sing',
++                action: 'click',
++                value: '',
++                feedbackText: 'He sang yesterday. sing 的过去式 sang',
++              });
++              await frame.getByRole('button').tap();
++              await page.waitForTimeout(100);
++              expect(
++                await page.evaluate(() => (window as unknown as Host).events.length),
++                mode + ' repeated tap',
++              ).toBe(1);
++            }
++            if (mode === 'cancel') {
++              expect(
++                await frame.evaluate(
++                  () => (window as unknown as { nativeEvents: unknown[] }).nativeEvents,
++                ),
++              ).toEqual([
++                { type: 'touchstart', trusted: true },
++                { type: 'touchstart', trusted: true },
++              ]);
++            }
++            if (mode === 'compatibility') {
++              expect(
++                await frame.evaluate(() =>
++                  (
++                    window as unknown as { nativeEvents: Array<{ type: string }> }
++                  ).nativeEvents.some((e) => e.type === 'click'),
++                ),
++              ).toBe(true);
++            }
++          } finally {
++            await context.close();
++          }
++        }
++      } finally {
++        await browser.close();
++      }
++    }, 30_000);
++  },
++);

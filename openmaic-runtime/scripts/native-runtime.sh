@@ -1409,6 +1409,7 @@ validate_health_payload() {
               maxReviewAttempts: 3,
             },
             interactionDesignPolicy: {"schemaVersion":"mira.openmaic.interaction-design.v2","policyId":"mira-primary-multistate-interaction.v2","enabled":true,"profile":"primary-adaptive","objectiveCoverageRequired":true,"demonstrationRequired":true,"learnerOperationRequired":true,"explanatoryFeedbackRequired":true,"independentJudgmentRequired":true,"finalSnapshotRequired":true,"renderedInteractionRequired":true,"explorationPolicy":{"schemaVersion":"mira.openmaic.multistate-exploration.v1","minimumStates":3,"maximumStates":5,"resetRequired":true,"inputModes":["pointer","touch"],"mechanismRegistry":["fraction-ratio-percentage.v1","semantic-state-model.v1"]},"visualRubricVersion":"mira.primary-teaching-visual.v1","visualReviewRequired":true},
+            playfulLearningPolicy: {"schemaVersion":"mira.openmaic.playful-learning.v1","policyId":"mira-primary-playful-exploration.v1","aiDesigned":true,"maxQuizScenes":2,"lockedAssessmentPreserved":true,"minimumReplayableGames":1,"threeDUsage":"teaching_need"},
             studentToolsEnabled: false,
           },
           studentRuntimeEvents: {

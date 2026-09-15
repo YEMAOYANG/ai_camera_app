@@ -56,7 +56,10 @@ export function replayQuestionPhaseReply(input) {
     ...(request.phase==='candidate_repair' ? {hostCompilation:buildHostCompilationEvidence('candidate_repair_output')} : {}),
   });
   return {schemaVersion:'mira.openmaic.archived-candidate-host-replay.v1',
-    implementationRepair:'fraction-activity-label-and-percent-precision.v1',inputSha256,providerProfileSha256,
+    implementationRepair:request.gradeCode==='primary_6' && request.subject==='english'
+      && request.skillBoundary.skillId==='past_future'
+      ? 'past-future-registered-last-week-marker.v1'
+      : 'fraction-activity-label-and-percent-precision.v1',inputSha256,providerProfileSha256,
     archiveContentSha256:archive.contentSha256,checkpointSha256:sha(canonical(checkpoint)),checkpoint};
 }
 

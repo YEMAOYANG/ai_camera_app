@@ -1,0 +1,198 @@
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -222,6 +222,77 @@
+   )
+   :is([class*='bg-purple-'], [class*='bg-violet-'], [class*='from-purple-']) {
+   background: #194358;
++}
++
++/* Sidebar history uses ChatSession, independently of the presentation bubble.
++ * Semantic hooks cover every originalRole, including teachers recorded as agents. */
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-session] {
++  background: var(--mira-orbit-panel);
++  border-color: var(--mira-orbit-line);
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='chat']
++  [data-mira-chat-session][data-active='true'] {
++  border-color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-bubble] {
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-raised);
++  border-color: var(--mira-orbit-line);
++  --tw-ring-color: var(--mira-orbit-line);
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-bubble='user'] {
++  background: #194358;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-speaker] {
++  color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-avatar] {
++  background: var(--mira-orbit-raised);
++  --tw-ring-color: var(--mira-orbit-line);
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-message] {
++  /* Upstream Motion writes a repeating purple box-shadow inline. */
++  box-shadow: none !important;
++}
++
++html[data-mira-student-theme='orbit']
++  [data-mira-chrome='chat']
++  [data-mira-chat-message][data-active='true'] {
++  background: var(--mira-orbit-raised);
++  border-left-color: var(--mira-orbit-lime);
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-session-badge] {
++  color: var(--mira-orbit-cyan);
++  background: #194358;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-session-dot] > span {
++  background: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-continue] {
++  color: var(--mira-orbit-space);
++  background: var(--mira-orbit-lime);
++  border-color: var(--mira-orbit-lime);
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-continue]:hover {
++  background: #e2ff86;
++}
++
++html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-continue] span {
++  color: inherit;
+ }
+ 
+ html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] > div,
+diff --git a/components/chat/chat-session.tsx b/components/chat/chat-session.tsx
+--- a/components/chat/chat-session.tsx
++++ b/components/chat/chat-session.tsx
+@@ -109,6 +109,7 @@
+ 
+   return (
+     <div
++      data-mira-chat-bubble={isUser ? 'user' : isTeacher ? 'teacher' : 'agent'}
+       className={cn(
+         'inline-block px-2.5 py-1.5 rounded-xl text-[12px] leading-relaxed max-w-full text-left transition-shadow duration-300',
+         isUser
+@@ -248,6 +249,8 @@
+           return (
+             <motion.div
+               key={message.id}
++              data-mira-chat-message
++              data-active={isActiveBubble}
+               ref={isActiveBubble ? activeBubbleRef : undefined}
+               initial={{ opacity: 0, y: 4 }}
+               animate={
+@@ -287,13 +290,17 @@
+               )}
+             >
+               {/* Mini Avatar */}
+-              <div className="w-5 h-5 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0 mt-0.5 ring-1 ring-gray-200/50 dark:ring-gray-700/50">
++              <div
++                data-mira-chat-avatar
++                className="w-5 h-5 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0 mt-0.5 ring-1 ring-gray-200/50 dark:ring-gray-700/50"
++              >
+                 <AvatarDisplay src={avatar} alt="avatar" className="text-xs" />
+               </div>
+ 
+               {/* Content */}
+               <div className={cn('flex-1 min-w-0', isUser && 'text-right')}>
+                 <span
++                  data-mira-chat-speaker={isUser ? 'user' : isTeacher ? 'teacher' : 'agent'}
+                   className={cn(
+                     'text-[9px] font-bold uppercase tracking-wider block mb-0.5',
+                     isUser
+@@ -367,6 +374,7 @@
+             </button>
+             {isSoftClosing && onContinueSession && (
+               <button
++                data-mira-chat-continue
+                 onClick={() => onContinueSession(session.id)}
+                 className="h-7 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-300 border border-purple-200 dark:border-purple-700 px-2.5 rounded-md text-[11px] font-semibold flex items-center gap-1.5 transition-colors hover:bg-purple-50 dark:hover:bg-purple-900/25"
+               >
+diff --git a/components/chat/session-list.tsx b/components/chat/session-list.tsx
+--- a/components/chat/session-list.tsx
++++ b/components/chat/session-list.tsx
+@@ -68,6 +68,8 @@
+         return (
+           <div
+             key={session.id}
++            data-mira-chat-session={session.type}
++            data-active={isActive}
+             className={cn(
+               'rounded-xl border transition-all duration-500 overflow-hidden',
+               isActive
+@@ -80,7 +82,7 @@
+               onClick={() => onToggleExpand(session.id)}
+               className="w-full flex items-center gap-1.5 px-3 py-2 text-left hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors"
+             >
+-              <span className="relative flex h-2.5 w-2.5 shrink-0">
++              <span data-mira-session-dot className="relative flex h-2.5 w-2.5 shrink-0">
+                 <span className={cn(dotColor, 'relative inline-flex rounded-full h-2.5 w-2.5')} />
+                 {isActive && (
+                   <span
+@@ -92,6 +94,7 @@
+                 )}
+               </span>
+               <span
++                data-mira-session-badge={session.type}
+                 className={cn(
+                   'text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-px rounded shrink-0',
+                   sessionBadgeStyles[session.type],
+diff --git a/PRODUCT.md b/PRODUCT.md
+new file mode 100644
+--- /dev/null
++++ b/PRODUCT.md
+@@ -0,0 +1,36 @@
++# Mira student classroom product context
++
++## Register
++
++product
++
++## Users
++
++School-age learners entering a released Mira lesson through Student Web and its authenticated classroom gateway.
++
++## Product Purpose
++
++Help learners follow narration, explore interactive courseware, discuss ideas, and complete practice. Mira owns identity, course visibility, progress, and mastery; OpenMAIC owns classroom playback and discussion.
++
++## Brand Personality
++
++Warm, clear, playful. The student classroom continues the existing Mira Orbit presentation.
++
++## Anti-references
++
++Do not transplant the operator workbench or default OpenMAIC theme into the student experience. Avoid an administrative appearance and decoration that competes with the lesson.
++
++## Design Principles
++
++- Keep the learner's next action clear.
++- Keep classroom controls visually consistent across current and historical discussion.
++- Scope the student theme to classroom chrome; preserve authored lesson and whiteboard content.
++- Preserve meaningful status labels and the existing interaction flow.
++
++## Accessibility & Inclusion
++
++Maintain readable contrast, visible keyboard focus, and reduced-motion support. Early-primary flows use large type and at least 48 px touch targets, as required by Student Web instructions.
++
++## Existing references
++
++Context is derived from the integration README, Student Web AGENTS.md, and app/mira-student-orbit.css. The parent repository's product references continue to govern parent-facing surfaces.

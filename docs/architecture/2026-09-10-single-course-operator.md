@@ -132,6 +132,8 @@ apply 先在预算锁下 CAS 原授权并追加不可变审计事件，再原子
 
 若 attempt 2 的 phase 4 已付费返回、只是本地规则实现误拒，使用 `plan-billed-reply-recovery` 检查，确认返回的 `historySha256` 后用 `recover-billed-reply --expected-history-sha SHA --confirm-workers-stopped` 执行。两者沿用上面相同的年级、技能、槽位及预算参数。固定纯本地 replay 程序从原响应归档重新编译，逐字段对齐真实 Provider 请求哈希、token 用量和账单证据，经过 Python 输出契约及进入 lesson 前的五题确定性验算。
 
+2026-09-11 增加仅适用于精确 `playfulLearningPolicy` 新课程的 attempt 1 分支，仍使用同一 plan/apply 命令。要求只有 outline、raw_candidate、candidate_repair、candidate_repair_retry 四条已返回记录，前三成功、最后为已保存回复的本地输出拒绝；不接受模糊派发、另一个尝试、已存在候选或 Runtime。以原尝试起点重建历史题目快照，严格复现原 input/profile 哈希。恢复前保存 `mira.single-course.playful-first-billed-reply-recovery.v1` 完整审计；不新增调用、不改账单、不延长硬截止。具体样课状态见 [AI 探索课件记录](2026-09-11-ai-playful-courseware.md)。
+
 执行前会把原完整失败行、该 attempt 的全部原记录、原 Provider 回复和校验产物写入 `backend/data/learning-provider-replies/recovery-<sha>.json`，以只创建、不覆盖的方式保存，再在准备事件中绑定文件 SHA。随后才复用已有 billed-checkpoint 恢复器封存同一个 phase 4 并续到 lesson；真实 Provider 计费字段不变，不新增派发、不创建 attempt 3，也不延长原硬截止。这个本地实现修复不构成独立 AI 审核通过，后续 reconciliation、独立审核、课件、媒体与发布门槛仍全部执行。
 
 2026-09-10 本次实际恢复记录：同一 `catalog_build_item_ddaa5bc7be54a293272cc3e3` 的 attempt 2 phase 4 已由操作者成功执行 plan/apply，阶段记录仍为 10 条，恢复新增 Provider 调用为 0，下一阶段为 `lesson_text`。原 attempt 2 四条记录的历史 SHA 为 `086fa4b0b6d409c82638609a02a3be609819935b43ab53aa2b96f7bf973b0a59`；完整审计文件 SHA 为 `068068918eaf6ca18dfdeb4aea5ba9f895f199772a826c2c2151e427dfd623fa`；真实源回复归档 SHA 为 `bd17aedc790275276bf65c563aac88108b3b649794e333c89df2fc6d9115a35c`；本地接受的 checkpoint SHA 为 `3351d2d2181c80e28e8a253a766cf92a4c8d5942b1a6e31d9b1e520fbfb06f86`。这些只证明本次本地恢复完成，不表示后续独立审核或正式发布已经完成。

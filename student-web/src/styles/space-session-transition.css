@@ -1,0 +1,23 @@
+/* Keep navigation present while every route performs its existing identity check. */
+.space-session-shell .space-main { min-height: calc(100dvh - 80px); }
+.space-session-state { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; max-width: 560px; padding: 16px 0 32px; }
+.space-session-state h1 { margin: 0; color: var(--mira-ink); font-size: clamp(26px, 3vw, 34px); line-height: 1.3; font-weight: 700; letter-spacing: -.035em; }
+.space-session-message { margin: 0; color: var(--mira-muted); font-size: 16px; line-height: 1.65; overflow-wrap: anywhere; }
+.space-session-retry { margin-top: 8px; min-height: 48px; }
+.space-session-progress { width: 156px; height: 3px; margin-top: 4px; overflow: hidden; border-radius: 999px; background: #273a4e; }
+.space-session-progress > i { display: block; width: 42%; height: 100%; border-radius: inherit; background: #d8ff66; animation: space-session-progress 1.5s ease-in-out infinite; }
+.space-session-skeleton { display: grid; gap: 10px; width: min(240px, 100%); margin-top: 14px; }
+.space-session-skeleton > span { height: 8px; border-radius: 4px; background: #6f97b51c; }
+.space-session-skeleton > span:last-child { width: 65%; }
+@keyframes space-session-progress { from { transform: translateX(-105%); } to { transform: translateX(345%); } }
+.space-session-shell:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-session-progress > i { animation-play-state: paused; }
+@media (min-width: 701px) {
+  .space-today.space-session-shell .space-session-state { grid-row: 1 / -1; align-self: start; margin-left: 24px; padding-top: 34px; }
+}
+@media (max-width: 700px) {
+  .space-session-shell .space-main { min-height: calc(100dvh - 86px); }
+  .space-today.space-session-shell .space-session-state { padding-top: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .space-session-progress > i { animation: none; transform: none; }
+}

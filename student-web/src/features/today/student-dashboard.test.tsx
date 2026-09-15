@@ -26,11 +26,36 @@ describe("StudentDashboard", () => {
   it("shows three real daily courses with child-friendly start actions", async () => {
     render(<StudentDashboard student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} />);
 
-    expect(await screen.findByText("拼音声母小侦探")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "拼音声母小侦探", level: 1 })).toBeInTheDocument();
     expect(screen.getByText("20以内加法小实验")).toBeInTheDocument();
     expect(screen.getByText("Hello! 见面问好")).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /开始这节课/ })[0]).toHaveAttribute("href", "/lesson/task-1/classroom");
+    expect(screen.getByRole("link", { name: "开始这节课" })).toHaveAttribute("href", "/lesson/task-1/classroom");
     expect(screen.getByText("一年级 · 今天有 3 节小课。老师会先讲清楚，再陪你一起练。")).toBeInTheDocument();
+  });
+
+  it("changes the featured lesson and trusted classroom action when the student selects another course", async () => {
+    render(<StudentDashboard student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} />);
+
+    expect(await screen.findByRole("heading", { name: "拼音声母小侦探", level: 1 })).toBeInTheDocument();
+    const chinese = screen.getByRole("button", { name: "选择语文课程：拼音声母小侦探" });
+    const math = screen.getByRole("button", { name: "选择数学课程：20以内加法小实验" });
+    expect(chinese).toHaveAttribute("aria-pressed", "true");
+    expect(math).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(math);
+
+    expect(screen.getByRole("heading", { name: "20以内加法小实验", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText("理解把两个数量合在一起")).toBeInTheDocument();
+    expect(math).toHaveAttribute("aria-pressed", "true");
+    expect(chinese).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("link", { name: "开始这节课" })).toHaveAttribute("href", "/lesson/task-2/classroom");
+
+    fireEvent.click(screen.getByRole("button", { name: "下一节课程" }));
+
+    expect(screen.getByRole("heading", { name: "Hello! 见面问好", level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "开始这节课" })).toHaveAttribute("href", "/lesson/task-3/classroom");
+    expect(getTodayLearning).toHaveBeenCalledTimes(1);
+    expect(assignTodayLearning).not.toHaveBeenCalled();
   });
 
   it("updates preparation progress and hides it automatically when the first lesson is ready", async () => {
@@ -66,7 +91,7 @@ describe("StudentDashboard", () => {
         paused: true, retryAfterMs: 30000, lastProgressAt: 1, message: "新课需要调整，已有课程可以继续学。" },
     });
     render(<StudentDashboard student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} />);
-    expect(await screen.findByText("拼音声母小侦探")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "拼音声母小侦探", level: 1 })).toBeInTheDocument();
     expect(screen.queryByRole("progressbar", { name: "新课准备进度" })).not.toBeInTheDocument();
     expect(screen.queryByText("35%")).not.toBeInTheDocument();
     expect(screen.queryByText("小课堂还需要一点调整")).not.toBeInTheDocument();
@@ -133,7 +158,7 @@ describe("StudentDashboard", () => {
       />,
     );
 
-    expect(await screen.findByText("拼音声母小侦探")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "拼音声母小侦探", level: 1 })).toBeInTheDocument();
     expect(screen.getByText(/今天已有 1 节小课可以学/)).toBeInTheDocument();
     expect(screen.queryByRole("progressbar", { name: "新课准备进度" })).not.toBeInTheDocument();
     expect(screen.queryByText("完成后自动出现")).not.toBeInTheDocument();

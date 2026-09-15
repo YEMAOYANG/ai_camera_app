@@ -5,6 +5,7 @@ from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
+import re
 from zoneinfo import ZoneInfo
 
 UNITS = ("calls", "input_tokens", "output_tokens", "characters", "audio_ms",
@@ -48,6 +49,8 @@ class LearningBudgetPolicy:
             fields.add("aggregateLimitsEnabled")
         if "renewTeachingAuthorizations" in raw:
             fields.add("renewTeachingAuthorizations")
+        if "productionInflightOverride" in raw:
+            fields.add("productionInflightOverride")
         _exact(raw, fields)
         # Keep absent fields absent so legacy frozen policy hashes remain valid.
         self.aggregate_limits_enabled = raw.get("aggregateLimitsEnabled", True)
@@ -141,8 +144,37 @@ class LearningBudgetPolicy:
             if len({canonical(scope) for scope in scopes}) != len(scopes):
                 raise ValueError("duplicate fixed budget scope")
             raw["authorizationWindow"] = allowed_window
+        override = raw.get("productionInflightOverride")
+        if "productionInflightOverride" in raw:
+            _exact(override, {"scopeSha256", "authorizationId", "maxInflightCalls", "auditReferenceSha256"})
+            for key in ("scopeSha256", "authorizationId", "auditReferenceSha256"):
+                if not isinstance(override[key], str) or not re.fullmatch(r"[a-f0-9]{64}", override[key]):
+                    raise ValueError("invalid production inflight override identity")
+            scopes = (allowed_window or {}).get("scopes", [])
+            production = [scope for scope in scopes if scope["purpose"] == "production"]
+            if (len(production) != 1 or digest(production[0]) != override["scopeSha256"]
+                    or production[0]["userId"] is not None or production[0]["sessionId"] is not None
+                    or not isinstance(production[0]["productionJobId"], str)
+                    or production[0]["courseId"] != "catalog-item:" + production[0]["productionJobId"]
+                    or override["authorizationId"] != digest({"schema": "mira.catalog-paid-budget.v1", "scope": production[0]})):
+                raise ValueError("production inflight override requires one exact allowed catalog scope")
+            if (self.aggregate_limits_enabled or limits["global"]["maxInflightCalls"] != 4
+                    or type(override["maxInflightCalls"]) is not int or override["maxInflightCalls"] != 5):
+                raise ValueError("production inflight override permits only one temporary slot above four")
         self.raw = raw
         self.sha256 = digest(raw)
+
+    def production_inflight_override(self, *, scope, authorization_id, now):
+        """A fixed-window admission exception; unresolved accounting stays intact."""
+        override = self.raw.get("productionInflightOverride")
+        window = self.raw.get("authorizationWindow")
+        if (override is not None and window is not None
+                and window["startsAt"] <= now < window["expiresAt"]
+                and scope in window["scopes"] and scope["purpose"] == "production"
+                and digest(scope) == override["scopeSha256"]
+                and authorization_id == override["authorizationId"]):
+            return deepcopy(override)
+        return None
 
     @classmethod
     def load(cls, path=None):

@@ -156,14 +156,16 @@ def assert_scope(state, args, *, require_request=True):
         raise RuntimeError('course instance failed or has a retry history; stopping without another instance')
 
 
-def review_ready(state):
+def review_ready(state, *, selected_runtime=None):
     receipt = state['receipt'] or {}
-    return bool(len(state['runtimes']) == 1 and state['runtimes'][0]['status'] == 'ready'
+    runtime = selected_runtime or (state['runtimes'][0] if len(state['runtimes']) == 1 else None)
+    return bool(runtime and runtime['status'] == 'ready'
+        and (selected_runtime is None or receipt.get('runtime_classroom_id') == runtime['id'])
         and all(receipt.get(key) == 'passed' for key in ('classroom_status','tts_status','asr_roundtrip_status')))
 
 
-def review_identity(state, identity):
-    runtime = state['runtimes'][0]
+def review_identity(state, identity, *, selected_runtime=None):
+    runtime = selected_runtime or state['runtimes'][0]
     manifest = json.loads(runtime['feature_manifest_json'])
     from integrations.openmaic_formal_visual import validate_visual_review
     visual = validate_visual_review(manifest)
@@ -173,12 +175,103 @@ def review_identity(state, identity):
         'upstreamClassroomId':runtime['upstream_classroom_id'], 'featureManifestSha256':digest(manifest), 'visualReviewReceiptSha256':visual['receiptSha256']}
 
 
-def write_review_request(path, state, identity):
-    data = {**review_identity(state,identity),'status':'awaiting_visual_observation',
-            'featureManifest':json.loads(state['runtimes'][0]['feature_manifest_json'])}
+def write_review_request(path, state, identity, *, selected_runtime=None):
+    runtime = selected_runtime or state['runtimes'][0]
+    data = {**review_identity(state,identity,selected_runtime=runtime),'status':'awaiting_visual_observation',
+            'featureManifest':json.loads(runtime['feature_manifest_json'])}
     path = Path(path).resolve(); path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n'); path.chmod(0o600)
     return str(path)
+
+
+def run_selected_saved_stage_tail(args, library, identity, *, publishing):
+    """Only the normal audio/publication tail; ordinary generation is unreachable."""
+    from services.learning_duplicate_runtime_recovery import authorized_selection
+    from services.service_factory import learning_curriculum_preparation_checkpoint_adapter
+    adapter = learning_curriculum_preparation_checkpoint_adapter()
+    old_processor, old_publication = adapter.runtime_candidate_processor, adapter.formal_auto_publication_enabled
+    state = inventory(library, identity)
+    with library.database.transaction() as conn:
+        runtime, _ = authorized_selection(conn, identity=identity, state=state,
+            runtime_id=args.runtime_id, audit_sha=args.duplicate_recovery_sha)
+        if runtime['status'] != 'ready':
+            raise RuntimeError('selected saved classroom has not passed normal Runtime validation')
+        if publishing:
+            if not review_ready(state, selected_runtime=runtime):
+                raise RuntimeError('selected classroom quality and audio receipts are not ready')
+            confirmation = json.loads(Path(args.visual_confirmation).read_text())
+            if confirmation != {**review_identity(state, identity, selected_runtime=runtime), 'status': 'approved'}:
+                raise RuntimeError('visual confirmation does not match the selected final candidate')
+        if publishing and (state['receipt'] or {}).get('publication_status') == 'published':
+            emit('already_published', runtimeId=runtime['id'], historicalRuntimeCount=2)
+            return 0
+    renewal_evidence = None
+    with adapter.repository.transaction() as conn:
+        claim_time = now_ms()
+        plan = adapter.repository.claim_next(conn, now=claim_time, lease_ms=600_000,
+            supported_stages=('generating_content','building_classrooms','generating_speech','validating'),
+            grade_code=args.grade, target_fingerprint=identity['targetFingerprint'])
+        if not plan or plan['id'] != state['owner']['id']:
+            raise RuntimeError('selected library owner lease is unavailable')
+        if publishing and int(plan.get('lease_expires_at') or 0) <= claim_time:
+            # A resumed coordinator retains its original generation deadline.
+            # claim_next therefore deliberately returns an expired lease when
+            # that deadline elapsed. Only the existing saved-classroom gate may
+            # give this already reviewed artifact time to publish.
+            if int(plan.get('hard_deadline_at') or 0) > claim_time:
+                raise RuntimeError('selected saved publication lease is unavailable')
+            renewed = adapter.repository.renew_saved_classroom_publication_lease(
+                conn, plan_id=str(plan['id']), lease_token=str(plan['lease_token']),
+                runtime_id=str(runtime['id']), upstream_job_id=str(runtime['upstream_job_id']),
+                target_fingerprint=identity['targetFingerprint'], now=claim_time, lease_ms=600_000)
+            if (not renewed or renewed['id'] != plan['id']
+                    or renewed.get('lease_token') != plan['lease_token']
+                    or renewed.get('stage') != plan['stage']
+                    or int(renewed.get('lease_expires_at') or 0) <= claim_time):
+                raise RuntimeError('selected saved publication lease renewal was rejected')
+            renewal_evidence = {'planId': str(plan['id']), 'runtimeId': str(runtime['id']),
+                'previousHardDeadlineAt': plan.get('hard_deadline_at'),
+                'previousLeaseExpiresAt': plan.get('lease_expires_at'),
+                'hardDeadlineAt': renewed.get('hard_deadline_at'),
+                'leaseExpiresAt': renewed.get('lease_expires_at')}
+            plan = renewed
+    if renewal_evidence:
+        emit('saved_classroom_publication_lease_renewed', **renewal_evidence)
+    adapter.runtime_candidate_processor = None
+    adapter.formal_auto_publication_enabled = publishing
+    try:
+        for _ in range(6):
+            state = inventory(library, identity)
+            with library.database.transaction() as conn:
+                runtime, _ = authorized_selection(conn, identity=identity, state=state,
+                    runtime_id=args.runtime_id, audit_sha=args.duplicate_recovery_sha)
+            adapter._process_progressive_formal_tail(plan, stage=str(plan['stage']))
+            state = inventory(library, identity)
+            with library.database.transaction() as conn:
+                runtime, _ = authorized_selection(conn, identity=identity, state=state,
+                    runtime_id=args.runtime_id, audit_sha=args.duplicate_recovery_sha)
+            if publishing and (state['receipt'] or {}).get('publication_status') == 'published':
+                emit('published', runtimeId=runtime['id'], historicalRuntimeCount=2,
+                     courseId=runtime['course_id'], courseVersion=runtime['course_version'])
+                return 0
+            if not publishing and review_ready(state, selected_runtime=runtime):
+                path = write_review_request(args.review_output, state, identity, selected_runtime=runtime)
+                emit('awaiting_visual_observation', reviewRequest=path, runtimeId=runtime['id'], historicalRuntimeCount=2)
+                return 0
+            current_plan = state['owner']
+            if (current_plan.get('lease_token') != plan['lease_token'] or current_plan.get('status') != 'running'
+                    or current_plan.get('stage') not in ('generating_content','building_classrooms','generating_speech','validating')
+                    or int(current_plan.get('lease_expires_at') or 0) <= now_ms()):
+                raise RuntimeError('saved classroom tail lease changed; no further work was dispatched')
+            plan = current_plan
+        raise RuntimeError('selected saved classroom tail remains incomplete; no generation was started')
+    finally:
+        adapter.runtime_candidate_processor, adapter.formal_auto_publication_enabled = old_processor, old_publication
+        with adapter.repository.transaction() as conn:
+            current_plan = adapter.repository.get_plan(conn, str(plan['id']))
+            if current_plan and current_plan.get('lease_token') == plan['lease_token']:
+                adapter.repository.release_lease(conn, plan_id=str(plan['id']), lease_token=str(plan['lease_token']),
+                    expected_stage=str(current_plan['stage']), now=now_ms())
 
 
 def authorize_teaching(args, library, identity, state):
@@ -271,6 +364,9 @@ def pause_budget(args, identity):
 
 def run(args):
     identity = single_slot_identity(args.grade,args.subject,args.skill,args.slot)
+    duplicate_sha = getattr(args, 'duplicate_recovery_sha', None)
+    if duplicate_sha and args.command not in {'reconcile-saved-stage', 'publish'}:
+        raise RuntimeError('duplicate recovery authorizes only the saved-stage completion/publication tail')
     if args.command == 'observe-budget':
         if not args.budget_policy:
             raise RuntimeError('observe-budget requires the original paused --budget-policy')
@@ -322,6 +418,24 @@ def run(args):
                  buildItemId=identity['buildItemId'])
             return 0
         state = inventory(library,identity)
+        if args.command in {'plan-duplicate-runtime-recovery', 'apply-duplicate-runtime-recovery'}:
+            from services.learning_duplicate_runtime_recovery import plan_or_apply
+            apply = args.command == 'apply-duplicate-runtime-recovery'
+            if not args.runtime_id or not args.duplicate_runtime_id or not args.native_evidence_dir or not args.source_snapshot:
+                raise RuntimeError('duplicate recovery requires both Runtime ids, Native cancel evidence and original source snapshot')
+            if apply and (not args.confirm_workers_stopped or not args.expected_history_sha):
+                raise RuntimeError('duplicate recovery apply requires stopped workers and the reviewed history SHA')
+            result = plan_or_apply(runtime_service=openmaic_full_runtime_service(),
+                preparation_repository=preparation.repository, identity=identity, state=state,
+                runtime_id=args.runtime_id, duplicate_runtime_id=args.duplicate_runtime_id,
+                evidence_dir=args.native_evidence_dir, source_snapshot=args.source_snapshot,
+                expected_sha=args.expected_history_sha, apply=apply, now=now_ms())
+            emit('duplicate_recovery_applied' if apply else 'duplicate_recovery_plan', **result)
+            return 0
+        if args.command == 'publish' and duplicate_sha:
+            if not args.confirm_workers_stopped or not args.runtime_id:
+                raise RuntimeError('selected publication requires stopped workers and the original Runtime id')
+            return run_selected_saved_stage_tail(args, library, identity, publishing=True)
         if args.command == 'status':
             emit('status',gradeCode=args.grade,buildItemId=identity['buildItemId'],dispatches=state['dispatches'],
                  instances=len(state['runtimes']),reviewReady=review_ready(state),receipt=state['receipt'])
@@ -335,10 +449,13 @@ def run(args):
             assert_scope({**state, 'runtimes': []}, args)
             result = reconcile_saved_stage(runtime_service=openmaic_full_runtime_service(),
                 preparation_repository=preparation.repository, identity=identity, state=state,
-                runtime_id=args.runtime_id, completion_path=args.completion, now=now_ms())
+                runtime_id=args.runtime_id, completion_path=args.completion, now=now_ms(),
+                duplicate_recovery_sha=duplicate_sha)
             emit('saved_stage_reconciled', **result)
             if (result.get('result') or {}).get('runtime', {}).get('status') != 'ready':
                 raise RuntimeError('same saved classroom did not pass normal Runtime validation; saved outcome retained')
+            if duplicate_sha:
+                return run_selected_saved_stage_tail(args, library, identity, publishing=False)
             return 0
         if args.command in {'plan-native-budget-resume', 'resume-native-budget'}:
             from services.learning_native_budget_resume import resume_single_native_budget_failure
@@ -370,7 +487,7 @@ def run(args):
                 expected_history_sha=args.expected_history_sha,now=now_ms(),apply=apply)
             emit('native_prestage_recovery_applied' if apply else 'native_prestage_recovery_plan',**result)
             return 0
-        if args.command in {'plan-content-recovery', 'recover-content', 'plan-billed-reply-recovery', 'recover-billed-reply', 'plan-runtime-preflight-recovery', 'recover-runtime-preflight'}:
+        if args.command in {'plan-content-recovery', 'recover-content', 'plan-billed-reply-recovery', 'recover-billed-reply', 'plan-runtime-preflight-recovery', 'recover-runtime-preflight', 'plan-content-preflight-recovery', 'recover-content-preflight'}:
             from services.learning_content_recovery import recover_single_content_item, recover_billed_single_content_reply, recover_single_runtime_preflight
             from services.service_factory import learning_curriculum_preparation_checkpoint_adapter, learning_budget_service
             if not args.budget_policy:
@@ -380,7 +497,7 @@ def run(args):
             if (not policy.raw['enabled'] or window.get('scopes') != [identity['scope']]
                     or not window.get('startsAt', now_ms()+1) <= now_ms() < window.get('expiresAt', 0)):
                 raise RuntimeError('original single-course authorization is no longer active')
-            apply = args.command in {'recover-content','recover-billed-reply','recover-runtime-preflight'}
+            apply = args.command in {'recover-content','recover-billed-reply','recover-runtime-preflight','recover-content-preflight'}
             if apply:
                 if not args.confirm_workers_stopped or not args.expected_history_sha:
                     raise RuntimeError('recover-content requires --confirm-workers-stopped and --expected-history-sha')
@@ -391,6 +508,12 @@ def run(args):
             if 'runtime-preflight' in args.command:
                 operation = recover_single_runtime_preflight
                 extra['readiness'] = openmaic_full_runtime_service().client.formal_generation_readiness()
+            if 'content-preflight' in args.command:
+                from services.learning_content_preflight_recovery import recover_preflight_content
+                operation = recover_preflight_content
+                if not args.preflight_failure_audit:
+                    raise RuntimeError('content preflight recovery requires --preflight-failure-audit')
+                extra['failure_audit_path'] = args.preflight_failure_audit
             result = operation(adapter=learning_curriculum_preparation_checkpoint_adapter(),
                 identity=identity, expected_history_sha=args.expected_history_sha, now=now_ms(), apply=apply, **extra)
             emit('content_recovery_applied' if apply else 'content_recovery_plan', **result)
@@ -455,6 +578,10 @@ def run(args):
             for runtime in state['runtimes']:
                 if runtime['status'] == 'generating' and runtime.get('upstream_job_id'):
                     runtime_service.generation_status(runtime['upstream_job_id'])
+                    # Polling can reject the current instance. Recheck before
+                    # a tick can interpret that failure as permission to replace it.
+                    state = inventory(library,identity); assert_scope(state,args)
+            receipt = state['receipt'] or {}
             observation = (state['dispatches'],(state['item'] or {}).get('content_phase'),
                 tuple((r['status'],r.get('quality_status')) for r in state['runtimes']),
                 tuple(receipt.get(k) for k in ('classroom_status','tts_status','asr_roundtrip_status','publication_status')))
@@ -463,6 +590,9 @@ def run(args):
                      contentPhase=observation[1],instances=len(state['runtimes']),quality=observation[2],receipts=observation[3])
                 observed=observation
             learning_curriculum_preparation_runner.run_once(app,now_ms=now_ms())
+            # Also guard --once: an inner transition must not escape the
+            # operator's existing single-instance and no-retry boundaries.
+            state = inventory(library,identity); assert_scope(state,args)
             if args.once:
                 emit('step_completed', buildItemId=identity['buildItemId'],
                      previousContentPhase=observation[1], reviewReady=False)
@@ -473,10 +603,12 @@ def run(args):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('command',choices=('make-policy','prepare','status','run-to-review','publish','authorize-teaching','close-budget','pause-budget','observe-budget','plan-search-transition','apply-search-transition','plan-budget-continuation','apply-budget-continuation','plan-content-recovery','recover-content','plan-billed-reply-recovery','recover-billed-reply','plan-runtime-preflight-recovery','recover-runtime-preflight','plan-native-prestage-recovery','recover-native-prestage','plan-native-budget-resume','resume-native-budget','reconcile-saved-stage'))
+    p.add_argument('command',choices=('make-policy','prepare','status','run-to-review','publish','authorize-teaching','close-budget','pause-budget','observe-budget','plan-search-transition','apply-search-transition','plan-budget-continuation','apply-budget-continuation','plan-content-recovery','recover-content','plan-billed-reply-recovery','recover-billed-reply','plan-runtime-preflight-recovery','recover-runtime-preflight','plan-content-preflight-recovery','recover-content-preflight','plan-native-prestage-recovery','recover-native-prestage','plan-native-budget-resume','resume-native-budget','reconcile-saved-stage','plan-duplicate-runtime-recovery','apply-duplicate-runtime-recovery'))
     p.add_argument('--grade',choices=tuple(f'primary_{n}' for n in range(1,7)),required=True)
     p.add_argument('--subject',choices=('chinese','math','english'),required=True)
     p.add_argument('--skill',required=True);p.add_argument('--slot',type=int,required=True)
+    p.add_argument('--require-3d', action='store_true',
+        help='select a new frozen policy requiring separate interactive 3D and game pages; repeat for this course on every command')
     p.add_argument('--budget-policy');p.add_argument('--vision-provider',choices=('openai','deepseek'),default='deepseek')
     p.add_argument('--search-provider', choices=('brave','baidu'),
         help='make-policy only: explicitly choose the search price scope (default: brave)')
@@ -485,7 +617,10 @@ def main():
     p.add_argument('--visual-confirmation');p.add_argument('--confirm-workers-stopped',action='store_true')
     p.add_argument('--learning-session-id')
     p.add_argument('--runtime-id'); p.add_argument('--completion')
+    p.add_argument('--duplicate-runtime-id'); p.add_argument('--native-evidence-dir'); p.add_argument('--source-snapshot')
+    p.add_argument('--duplicate-recovery-sha', help='reviewed selection audit; saved-stage reconciliation/publication only')
     p.add_argument('--expected-history-sha')
+    p.add_argument('--preflight-failure-audit', help='immutable failed-state audit for the exact English required-3D preflight recovery')
     p.add_argument('--expected-transition-sha')
     p.add_argument('--expected-continuation-sha')
     p.add_argument('--continuation-expires-at', type=int,
@@ -493,6 +628,8 @@ def main():
     p.add_argument('--once', action='store_true', help='run one existing preparation tick without claiming review readiness')
     p.add_argument('--timeout-seconds',type=int,default=7200);p.add_argument('--ttl-minutes',type=int,default=180)
     args=p.parse_args()
+    if args.require_3d:
+        os.environ['MIRA_FORMAL_PLAYFUL_REQUIRE_3D'] = '1'
     if args.search_provider is not None and args.command != 'make-policy':
         p.error('--search-provider is only for make-policy; it cannot switch an existing authorization')
     if args.continuation_expires_at is not None and args.command not in {'plan-search-transition','apply-search-transition','plan-budget-continuation','apply-budget-continuation'}:
@@ -504,6 +641,8 @@ def main():
         p.error('learning session identifier is invalid')
     if args.expected_history_sha and not re.fullmatch(r'[a-f0-9]{64}',args.expected_history_sha):
         p.error('expected history must be a SHA256')
+    if args.duplicate_recovery_sha and not re.fullmatch(r'[a-f0-9]{64}',args.duplicate_recovery_sha):
+        p.error('duplicate recovery must be a SHA256')
     if args.expected_transition_sha and not re.fullmatch(r'[a-f0-9]{64}',args.expected_transition_sha):
         p.error('expected transition must be a SHA256')
     if args.expected_continuation_sha and not re.fullmatch(r'[a-f0-9]{64}',args.expected_continuation_sha):

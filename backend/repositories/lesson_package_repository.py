@@ -120,6 +120,7 @@ class LessonPackageRepository:
         from services.learning_curriculum_preparation_contract import (
             build_preparation_target,
             compatible_preparation_scope_sql,
+            preparation_target_fingerprint,
         )
 
         # The no-plan path is the existing bounded Grade-1 operator entry.
@@ -295,8 +296,17 @@ class LessonPackageRepository:
             (grade_code, *target_params, *plan_params),
         ).fetchall())
         from repositories.course_supply_inventory import published_supply
-        playable = published_supply(conn, current_target)
+        playable_by_target = {}
         for candidate in candidates:
+            # A historical candidate keeps its own creation policy even when
+            # the current registry has introduced a newer playful target.
+            raw_target = candidate['target_spec_json']
+            generation_target = json.loads(raw_target) if isinstance(raw_target, str) else raw_target
+            generation_fingerprint = preparation_target_fingerprint(generation_target)
+            if generation_fingerprint not in playable_by_target:
+                playable_by_target[generation_fingerprint] = published_supply(
+                    conn, generation_target, for_generation=True)
+            playable = playable_by_target[generation_fingerprint]
             key = (str(candidate["subject"]), str(candidate["skill_id"]), int(candidate["variant_ordinal"]))
             if key in playable:
                 continue

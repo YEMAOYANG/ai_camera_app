@@ -1,0 +1,39 @@
+/* The canvas adds light and movement over the selected artwork, never a replacement scene. */
+.space-atmosphere { position: absolute; z-index: 0; inset: 0 0 auto; height: min(100svh, 1200px); overflow: hidden; contain: strict; pointer-events: none; }
+.space-atmosphere.is-quiet { height: min(70svh, 680px); opacity: 0.6; }
+.space-atmosphere canvas { display: block; width: 100%; height: 100%; pointer-events: none; }
+.space-shell > .space-main { z-index: 1; }
+.space-shell[data-space-motion] .space-scenery img { transform: translate3d(var(--space-pointer-x, 0px), var(--space-pointer-y, 0px), 0) scale(1.025); transform-origin: 65% 35%; }
+.space-shell[data-space-motion="running"] .space-scenery img { will-change: transform; }
+.space-motion-toggle { position: fixed; z-index: 35; right: 20px; bottom: max(10px, env(safe-area-inset-bottom)); display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 106px; min-height: 48px; padding: 0 13px; border: 1px solid rgb(158 199 229 / 22%); border-radius: 999px; color: #bdcddd; background: #091524ed; font-size: 12px; line-height: 1; box-shadow: 0 4px 22px rgb(0 0 0 / 20%); }
+.space-motion-toggle:hover:enabled { color: #e7ffb3; border-color: #9db967; }
+.space-motion-toggle[aria-pressed="true"] > svg { color: #c9f78b; }
+.space-motion-toggle:disabled { opacity: 0.65; cursor: default; }
+
+/* A visible launch-button light sweep, with a quiet interval between each pass. */
+.space-hero-action { position: relative; isolation: isolate; overflow: hidden; }
+.space-hero-action::before { content: ""; position: absolute; z-index: -1; top: -30%; bottom: -30%; left: -45%; width: 34%; pointer-events: none; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 65%), transparent); transform: skewX(-20deg) translateX(0); animation: space-launch-sweep 4.2s ease-in-out infinite; }
+.space-hero-action > svg:last-child { transition: transform 180ms ease-out; }
+.space-hero-action:hover > svg:last-child { transform: translateX(5px); }
+.space-course-tile[aria-pressed="true"]::before { animation: space-selected-edge-top 3s linear infinite; }
+.space-course-tile[aria-pressed="true"]::after { animation: space-selected-edge-bottom 3s linear infinite; animation-delay: -1.5s; }
+@keyframes space-launch-sweep { 0%, 14% { transform: skewX(-20deg) translateX(0); opacity: 0; } 19% { opacity: 0.85; } 40% { transform: skewX(-20deg) translateX(440%); opacity: 0; } 100% { transform: skewX(-20deg) translateX(440%); opacity: 0; } }
+@keyframes space-selected-edge-top { 0% { transform: translateX(0); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateX(270%); opacity: 0; } }
+@keyframes space-selected-edge-bottom { 0% { transform: translateX(0); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateX(-270%); opacity: 0; } }
+.space-shell:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-hero-action::before,
+.space-shell:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-course-tile::before,
+.space-shell:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-course-tile::after { animation-play-state: paused; }
+.space-shell[data-space-motion="reduced"] .space-hero-action::before,
+.space-shell[data-space-motion="reduced"] .space-course-tile::before,
+.space-shell[data-space-motion="reduced"] .space-course-tile::after { animation: none; opacity: 0; }
+@media (max-width: 700px) {
+  .space-atmosphere.is-scenic { height: 630px; }
+  .space-motion-toggle { right: 14px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); min-width: 48px; width: 48px; height: 48px; padding: 0; }
+  .space-motion-toggle > span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+  .space-motion-toggle > svg { width: 18px; height: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .space-shell[data-space-motion] .space-scenery img { transform: none; will-change: auto; }
+  .space-hero-action::before, .space-course-tile::before, .space-course-tile::after { animation: none !important; opacity: 0 !important; }
+  .space-hero-action > svg:last-child { transition: none; transform: none !important; }
+}

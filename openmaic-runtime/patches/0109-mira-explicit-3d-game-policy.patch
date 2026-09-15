@@ -1,0 +1,243 @@
+diff --git a/lib/server/mira-formal-playful-policy.ts b/lib/server/mira-formal-playful-policy.ts
+--- a/lib/server/mira-formal-playful-policy.ts
++++ b/lib/server/mira-formal-playful-policy.ts
+@@ -12,8 +12,18 @@
+   threeDUsage: 'teaching_need',
+ } as const;
+ 
++/** Explicit per-job opt-in; the v1 policy and its saved prompts remain unchanged. */
++export const MIRA_FORMAL_PLAYFUL_3D_POLICY = {
++  ...MIRA_FORMAL_PLAYFUL_POLICY,
++  schemaVersion: 'mira.openmaic.playful-learning.v2',
++  policyId: 'mira-primary-playful-3d.v2',
++  threeDUsage: 'required',
++  minimumThreeDScenes: 1,
++} as const;
++export type MiraFormalPlayfulPolicy = typeof MIRA_FORMAL_PLAYFUL_POLICY | typeof MIRA_FORMAL_PLAYFUL_3D_POLICY;
++
+ export interface MiraFormalPlayfulContext {
+-  policy: typeof MIRA_FORMAL_PLAYFUL_POLICY;
++  policy: MiraFormalPlayfulPolicy;
+   subject: FormalCoursewareSpec['course']['subject'];
+   guidedQuestionIds: string[];
+   independentQuestionIds: string[];
+@@ -30,8 +40,9 @@
+ function fail(reason: string): never { throw new Error(`FORMAL_PLAYFUL_${reason}`); }
+ 
+ /** Missing means historical; a malformed opt-in must never silently downgrade. */
+-export function isMiraFormalPlayfulPolicy(value: unknown): boolean {
+-  return canonical(value) === canonical(MIRA_FORMAL_PLAYFUL_POLICY);
++export function isMiraFormalPlayfulPolicy(value: unknown): value is MiraFormalPlayfulPolicy {
++  return [MIRA_FORMAL_PLAYFUL_POLICY, MIRA_FORMAL_PLAYFUL_3D_POLICY]
++    .some(policy => canonical(value) === canonical(policy));
+ }
+ 
+ export function formalPlayfulContext(
+@@ -42,7 +53,7 @@
+     return undefined;
+   if (!isMiraFormalPlayfulPolicy(creationPolicy.playfulLearningPolicy)) fail('POLICY_INVALID');
+   const context = {
+-    policy: MIRA_FORMAL_PLAYFUL_POLICY,
++    policy: creationPolicy.playfulLearningPolicy,
+     subject: spec.course.subject,
+     guidedQuestionIds: spec.guided.map(question => question.id),
+     independentQuestionIds: spec.independent.map(question => question.id),
+@@ -70,7 +81,7 @@
+   assertContext(context);
+   if (originalPrompt.includes(START) || originalPrompt.split(HISTORICAL_QUIZ_RULE).length !== 2)
+     fail('PROMPT_CONFLICT');
+-  return originalPrompt.replace(HISTORICAL_QUIZ_RULE, PLAYFUL_QUIZ_RULE)
++  const text = originalPrompt.replace(HISTORICAL_QUIZ_RULE, PLAYFUL_QUIZ_RULE)
+     + START + JSON.stringify(context) + END + `
+ AI-DESIGNED PLAYFUL LEARNING v1 — this job's experience requirements:
+ Design this course's own exploration game from its exact gradeBoundary, learning objectives,
+@@ -135,6 +146,18 @@
+ The game label alone proves nothing: the actual model, goal, controls, feedback, replay and
+ teaching chain must pass the existing independent semantic and rendered interaction reviews.
+ `;
++  return requiredThreeDInstructions(text, context);
++}
++
++function requiredThreeDInstructions(text: string, context: MiraFormalPlayfulContext): string {
++  if (context.policy.threeDUsage !== 'required') return text;
++  return text
++    .replace('For language and concepts better served by 2D arrangements, use a clear 2D game; no compulsory\n3D for Chinese/English. State the teaching reason for the representation in the private brief.',
++      'This explicit v2 job requires educational 3D for its language or mathematics objective.')
++    .replace('Other math and language choose 2D/3D for teaching need; language does not require 3D.',
++      'This explicit v2 job requires educational 3D for every subject.')
++    .replace('Language does not require 3D.', 'This explicit v2 job requires educational 3D for language too.')
++    + `\nEXPLICIT 3D AND GAME REQUIREMENTS v2:\nThis job must contain BOTH a separate interactive visualization3d page and a separate interactive game page. Neither may be omitted or replaced by the other. Use real geometry, camera/projection and learner operations that change the teaching state; a tilted card, decorative spinning object or orbit-only view fails. For language, manipulate characters, actions, objects or events in a concrete scene and synchronise the visible situation, time cue and correct English/Chinese expression with the state. Explain why each change expresses the locked objective without adding grammar outside the frozen boundary. The AI chooses the setting and mechanics. In the 3D page pass widgetType=visualization3d and matching widgetConfig.type; in the game page pass widgetType=game with the existing no-scoring rules. Both pages need visible controls and reset; the game additionally needs a knowledge-dependent goal, computed success/failure, explanation, retry and replay. Verify at least three meaningful states using pointer and touch. Independent review must reject absent or merely decorative 3D, absent game or unplayable controls using actual rendered evidence. Preserve all four locked questions, grouped quizzes and all original quality/audio gates.\n`;
+ }
+ 
+ /** Only the frozen new prompt activates new checks in the read-only review path. */
+@@ -152,7 +175,7 @@
+ export function formalPlayfulSceneInstructions(context: MiraFormalPlayfulContext,
+   input: { sceneType: string; phase: 'content' | 'actions' }): string {
+   assertContext(context);
+-  return `MIRA SERVER-OWNED PLAYFUL PAGE RULES v1\n${JSON.stringify(context)}\n` +
++  const text = `MIRA SERVER-OWNED PLAYFUL PAGE RULES v1\n${JSON.stringify(context)}\n` +
+     `This is only the requested ${input.sceneType} page's ${input.phase} phase. Never generate extra pages or change the approved plan.\n` +
+     `The server's playful policy overrides generic game/Skill defaults, including a user-template gameType=quiz or scoring=10/speedBonus=5.\n` +
+     `For a game page, the AI designs a puzzle, strategy or card task from the locked learning objective. Never make a quiz game. Show a concise goal and rules, manipulable teaching objects, state-computed consequences, explanatory feedback, recoverable mistakes and working restart/replay. Keep game.questions absent; widget-config scoring is {"correctPoints":0}, with no bonuses or achievements. Local feedback must never emit official score, mastery, reward or completion events.\n` +
+@@ -160,15 +183,17 @@
+     `Use short visible instructions and a large model. A short demonstration leads to learner operation, observable consequence and a brief reason. In actions, narrate the actual controls and feedback in short steps; do not dictate an independent answer or describe nonexistent interaction. In content, implement the controls and computed feedback, not a static promise of a game.\n` +
+     `Keep the four locked question IDs, text and options unchanged: the guided pair share one earlier quiz page, the independent pair share one later quiz page after exploration. If this is a quiz, generate only its assigned pair, hasAnswer=false and answer=[]. Never duplicate assessments in the game or add scored questions.\n` +
+     `Honor the page brief's model, misconception, feedback and transition, existing multistate probes/reset, exact grade/difficulty, source attribution and all original quality rules. Planning language stays private; output only this page/phase.`;
++  return requiredThreeDInstructions(text, context);
+ }
+ 
+ export const MIRA_FORMAL_PLAYFUL_REVIEW_VERSION = 'mira.formal-course-review.v5-playful-context' as const;
+ export function formalPlayfulReviewInstructions(context: MiraFormalPlayfulContext): string {
+   assertContext(context);
+-  return `\nADDITIONAL SERVER PLAYFUL REVIEW v1:\n` +
++  const text = `\nADDITIONAL SERVER PLAYFUL REVIEW v1:\n` +
+     `Audit playfulLearning against actual persisted HTML/JS, narration, visible text and browser observations, not its self-description or game label. The AI must have designed a knowledge-dependent game with a child-readable goal and concise rules, meaningful model manipulation, state-computed result, explanatory feedback, a recoverable unsuccessful attempt and a working restart/replay. Reject disguised quizzes, click counters, canned answer reveals, extra assessment items or local rewards presented as official learning credit.\n` +
+     `For math briefs teaching quantities/grouping/fractions/ratios/percentages, require an actual manipulable 3D teaching model with real geometry/projection and meaningful rotate, select and split/regroup operations linked to the locked objective. A 2D game, tilted card, decorative 3D or camera-only orbit cannot satisfy that requirement. Reject unsupported claims of 3D, missing operations and advanced volume/solid concepts outside the grade boundary. Preserve the registered numeric SVG evidence; 3D never replaces its independent quantitative check. Language does not require 3D.\n` +
+     `Verify a short demonstration -> learner operation -> visible consequence -> brief explanation -> retry teaching rhythm, concise reading, the guided pair together after exploration and independent pair together later, with all four locked questions unchanged. Mark meaningful_interaction, teaching_sequence, grade_fit, language_load or assessment_alignment false as applicable when a playful requirement fails; cite actual scene evidence and a concrete repair. Never treat the metadata or this prompt as evidence of successful play.\n`;
++  return requiredThreeDInstructions(text, context);
+ }
+ 
+ /** A structural guard, not a semantic or browser pass. Existing quality gates still run. */
+@@ -188,6 +213,10 @@
+   }
+   const games = ordered.filter(scene => scene.content.type === 'interactive' && scene.content.widgetType === 'game');
+   if (!games.length) fail('GAME_MISSING');
++  if (context.policy.threeDUsage === 'required' && !ordered.some(scene =>
++    scene.type === 'interactive' && scene.content.type === 'interactive'
++    && scene.content.widgetType === 'visualization3d'
++    && scene.content.widgetConfig?.type === 'visualization3d')) fail('THREE_D_MISSING');
+   if (!games.some(scene => scene.order < quizzes[0].order)) fail('EXPLORE_BEFORE_GUIDED');
+   for (const scene of games) {
+     if (scene.content.type !== 'interactive') continue;
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -6,7 +6,7 @@
+ import { MIRA_ADAPTIVE_SKILL_ORCHESTRATION_POLICY } from './mira-formal-skill-selection';
+ import { MIRA_TEACHING_QUALITY_POLICY } from './mira-formal-quality-contract';
+ import { MIRA_INTERACTION_DESIGN_POLICY, MIRA_MULTISTATE_INTERACTION_POLICY } from './mira-formal-interaction-design';
+-import { MIRA_FORMAL_PLAYFUL_POLICY } from './mira-formal-playful-policy';
++import { MIRA_FORMAL_PLAYFUL_POLICY, MIRA_FORMAL_PLAYFUL_3D_POLICY } from './mira-formal-playful-policy';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+   'mira.openmaic.formal-runtime.v4-deepseek-professional' as const;
+@@ -106,6 +106,15 @@
+   playfulLearningPolicy: MIRA_FORMAL_PLAYFUL_POLICY,
+ } as const;
+ 
++export const MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
++  playfulLearningPolicy: MIRA_FORMAL_PLAYFUL_3D_POLICY,
++} as const;
++
++export const MIRA_SUPPORTED_PLAYFUL_PROFESSIONAL_POLICIES = [
++  MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY, MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY,
++] as const;
++
+ export type MiraProfessionalCreationPolicy =
+   | typeof MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY
+@@ -114,7 +123,8 @@
+   | typeof MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY
+-  | typeof MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY;
++  | typeof MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY;
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+@@ -239,7 +249,7 @@
+ }
+ 
+ export function isMiraInteractionCreationPolicy(value: unknown): boolean {
+-  return [MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY, MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY, MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY].some(policy => JSON.stringify(canonical(value)) === JSON.stringify(canonical(policy)));
++  return [MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY, MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY, ...MIRA_SUPPORTED_PLAYFUL_PROFESSIONAL_POLICIES].some(policy => JSON.stringify(canonical(value)) === JSON.stringify(canonical(policy)));
+ }
+ 
+ export function assertMiraFormalGenerationInput(
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -19,7 +19,7 @@
+ import { getMiraSampleTtsCredentialRecoveryRuntimePolicy } from '@/lib/server/mira-sample-tts-credential-recovery';
+ import { getMiraFormalCitationRecoveryRuntimePolicy } from '@/lib/server/mira-formal-citation-recovery';
+ import { getMiraStudentChromeRuntimePolicy } from '@/lib/mira/student-runtime';
+-import { getMiraFormalGenerationRuntimePolicy } from '@/lib/server/mira-formal-generation-policy';
++import { getMiraFormalGenerationRuntimePolicy, MIRA_SUPPORTED_PLAYFUL_PROFESSIONAL_POLICIES } from '@/lib/server/mira-formal-generation-policy';
+ import { assertMiraFormalImageProviderReady } from '@/lib/server/mira-formal-media';
+ import { assertMiraFormalVideoProviderReady } from '@/lib/server/mira-formal-video';
+ import { getMiraInstrumentationBoundaryPolicy } from '@/lib/server/mira-instrumentation-policy';
+@@ -117,6 +117,7 @@
+         },
+         runtimePolicy: {
+           formalGeneration: formalGenerationPolicy,
++          formalGenerationSupportedProfessionalPolicies: MIRA_SUPPORTED_PLAYFUL_PROFESSIONAL_POLICIES,
+           formalAudio: getMiraFormalAudioRuntimePolicy(),
+           professionalResearch: getMiraProfessionalResearchPolicy(),
+           modelPolicy,
+@@ -184,6 +185,7 @@
+       formalCitationRecovery: formalCitationRecoveryPolicy,
+       studentChrome: studentChromePolicy,
+       formalGeneration: formalGenerationPolicy,
++      formalGenerationSupportedProfessionalPolicies: MIRA_SUPPORTED_PLAYFUL_PROFESSIONAL_POLICIES,
+       instrumentationBoundary: instrumentationBoundaryPolicy,
+       professionalResearch: getMiraProfessionalResearchPolicy(),
+       modelPolicy,
+diff --git a/tests/server/mira-formal-playful-3d-policy.test.ts b/tests/server/mira-formal-playful-3d-policy.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-playful-3d-policy.test.ts
+@@ -0,0 +1,52 @@
++import { describe, expect, it } from 'vitest';
++import type { Scene } from '@/lib/types/stage';
++import { MIRA_FORMAL_PLAYFUL_POLICY, MIRA_FORMAL_PLAYFUL_3D_POLICY,
++  formalPlayfulContext, formalPlayfulContextFromPrompt, formalPlayfulSceneInstructions,
++  formalPlayfulReviewInstructions, withMiraFormalPlayfulInstructions,
++  assertMiraFormalPlayfulScenes } from '@/lib/server/mira-formal-playful-policy';
++import { MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY, MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY,
++  isExactMiraProfessionalCreationPolicy } from '@/lib/server/mira-formal-generation-policy';
++
++const spec = { course: { subject: 'english' }, guided: [{ id: 'g1' }, { id: 'g2' }],
++  independent: [{ id: 'i1' }, { id: 'i2' }] } as Parameters<typeof formalPlayfulContext>[1];
++const old = formalPlayfulContext(MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY, spec)!;
++const current = formalPlayfulContext(MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY, spec)!;
++const prompt = '- Use between one and four quiz scenes. Distribute the four locked assessment questions across them in original order so every locked question appears exactly once.';
++const game = { id: 'game', order: 1, type: 'interactive', content: { type: 'interactive', widgetType: 'game',
++  widgetConfig: { type: 'game', gameType: 'puzzle', scoring: { correctPoints: 0 } } } } as Scene;
++const threeD = { id: '3d', order: 0, type: 'interactive', content: { type: 'interactive', widgetType: 'visualization3d',
++  widgetConfig: { type: 'visualization3d' } } } as Scene;
++const quizzes = [old.guidedQuestionIds, old.independentQuestionIds].map((ids, index) => ({
++  id: `quiz-${index}`, order: index + 2, type: 'quiz', content: { type: 'quiz', questions: ids.map(id => ({ id })) },
++})) as Scene[];
++
++describe('explicit language 3D and game opt-in', () => {
++  it('recognises exact v2 while preserving frozen v1', () => {
++    expect(old.policy).toEqual(MIRA_FORMAL_PLAYFUL_POLICY);
++    expect(current.policy).toEqual(MIRA_FORMAL_PLAYFUL_3D_POLICY);
++    expect(isExactMiraProfessionalCreationPolicy(MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY)).toBe(true);
++    expect(isExactMiraProfessionalCreationPolicy({ ...MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
++      playfulLearningPolicy: { ...MIRA_FORMAL_PLAYFUL_POLICY, threeDUsage: 'required' } })).toBe(false);
++  });
++  it('threads 3D authority through frozen main, isolated pages and independent review', () => {
++    const frozen = withMiraFormalPlayfulInstructions(prompt, current);
++    expect(formalPlayfulContextFromPrompt(frozen)).toEqual(current);
++    const instructions = [frozen, formalPlayfulReviewInstructions(current),
++      ...(['content', 'actions'] as const).map(phase => formalPlayfulSceneInstructions(current, { sceneType: 'interactive', phase }))];
++    for (const text of instructions) {
++      expect(text).toContain('BOTH a separate interactive visualization3d page and a separate interactive game page');
++      expect(text).toContain('Independent review must reject');
++      expect(text).not.toMatch(/language does not require 3D|Language does not require 3D|no compulsory\s+3D/);
++    }
++    expect(withMiraFormalPlayfulInstructions(prompt, old)).not.toContain('EXPLICIT 3D AND GAME REQUIREMENTS v2');
++  });
++  it('requires both distinct page kinds but never treats structure as proof of semantics', () => {
++    expect(() => assertMiraFormalPlayfulScenes([game, ...quizzes], old)).not.toThrow();
++    expect(() => assertMiraFormalPlayfulScenes([game, ...quizzes], current)).toThrow('THREE_D_MISSING');
++    expect(() => assertMiraFormalPlayfulScenes([threeD, ...quizzes], current)).toThrow('GAME_MISSING');
++    expect(() => assertMiraFormalPlayfulScenes([threeD, game, ...quizzes], current)).not.toThrow();
++    const mislabeled = structuredClone(threeD);
++    if (mislabeled.content.type === 'interactive') mislabeled.content.widgetConfig = { type: 'game' } as never;
++    expect(() => assertMiraFormalPlayfulScenes([mislabeled, game, ...quizzes], current)).toThrow('THREE_D_MISSING');
++  });
++});

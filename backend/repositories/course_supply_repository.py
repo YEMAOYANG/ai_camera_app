@@ -26,7 +26,7 @@ def requested_supply(conn, build):
         FROM learning_course_supply_requests WHERE target_fingerprint = ? AND enabled = TRUE""",
         (fingerprint,),
     ).fetchall()
-    ready = published_supply(conn, target)
+    ready = published_supply(conn, target, for_generation=True)
     return {(r['subject'], r['skill_id'], r['variant_ordinal']): r['priority'] for r in rows
             if (r['subject'], r['skill_id'], int(r['variant_ordinal'])) not in ready}
 

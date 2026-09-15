@@ -766,6 +766,47 @@ describe("full OpenMAIC runtime contract", () => {
     }
   });
 
+  it("requires verified 3D evidence only when a playful course opts into v2", () => {
+    const launch = adaptiveFormalLaunch("english");
+    const policy = {
+      schemaVersion: "mira.openmaic.playful-learning.v1",
+      policyId: "mira-primary-playful-exploration.v1",
+      aiDesigned: true,
+      maxQuizScenes: 2,
+      lockedAssessmentPreserved: true,
+      minimumReplayableGames: 1,
+      threeDUsage: "teaching_need",
+    };
+    Object.assign(launch.features.generationContract.professionalCreationPolicy, {
+      playfulLearningPolicy: policy,
+    });
+    expect(openMaicFormalRuntimeLaunchSchema.safeParse(launch).success).toBe(true);
+
+    Object.assign(policy, {
+      schemaVersion: "mira.openmaic.playful-learning.v2",
+      policyId: "mira-primary-playful-3d.v2",
+      threeDUsage: "required",
+      minimumThreeDScenes: 1,
+    });
+    const missingThreeD = openMaicFormalRuntimeLaunchSchema.safeParse(launch);
+    expect(missingThreeD.success).toBe(false);
+    if (!missingThreeD.success) {
+      expect(missingThreeD.error.issues.some(issue => issue.message.includes("3D 教学场景"))).toBe(true);
+    }
+
+    launch.features.formalEvidence.widgetTypes.push("visualization3d");
+    const features = [...launch.features.required, "3d_visualization"];
+    Object.assign(launch.features, { enabled: features, requested: features, required: features, present: features });
+    expect(openMaicFormalRuntimeLaunchSchema.safeParse(launch).success).toBe(false);
+
+    launch.features.evidence["3d_visualization"] = {
+      verified: true,
+      signals: ["scene:adaptive:3d_visualization"],
+      reasons: [],
+    };
+    expect(openMaicFormalRuntimeLaunchSchema.safeParse(launch).success).toBe(true);
+  });
+
   it("rejects adaptive manifests whose dynamic count, evidence, research or feature derivation diverges", () => {
     const validAdaptive = adaptiveFormalLaunch("math");
 

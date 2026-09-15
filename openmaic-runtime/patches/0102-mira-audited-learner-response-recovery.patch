@@ -1,0 +1,493 @@
+diff --git a/lib/server/mira-formal-completion-tail-budget.ts b/lib/server/mira-formal-completion-tail-budget.ts
+--- a/lib/server/mira-formal-completion-tail-budget.ts
++++ b/lib/server/mira-formal-completion-tail-budget.ts
+@@ -60,12 +60,12 @@
+ /** The new flag is intentionally separate from the frozen recovery manifest. */
+ export function completionTailArgument(mode: string, manifest: RecordValue, args: string[]): string | undefined {
+   if (!args.length) {
+-    if (mode === 'complete-learner-discussion-repair') return fail('SIDECAR_REQUIRED');
++    if (['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery'].includes(mode)) return fail('SIDECAR_REQUIRED');
+     return undefined;
+   }
+   if (args.length !== 2 || args[0] !== '--completion-paid-budget' || !args[1].trim())
+     return fail('ARGUMENT_INVALID');
+-  if (!['complete', 'complete-learner-discussion-repair'].includes(mode)) return fail('COMPLETE_ONLY');
++  if (!['complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery'].includes(mode)) return fail('COMPLETE_ONLY');
+   if (['reviewGrantPath', 'browserRecheck', 'asrSourceRequestId', 'ttsSourceRequestId',
+     'audioRepair', 'pronunciationRepair', 'asrComparisonRevalidation'].some(key => key in manifest))
+     return fail('CANNOT_MIX_RECOVERIES');
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -6,7 +6,7 @@
+ } from './mira-paid-budget';
+ import { assertCompletionTailExecution, completionTailPaidBudget,
+   type ValidatedCompletionTailBudget } from './mira-formal-completion-tail-budget';
+-import { repairFormalLearnerDiscussions } from './mira-formal-learner-discussion-repair';
++import { repairFormalLearnerDiscussions, type LearnerDiscussionResponseRecovery } from './mira-formal-learner-discussion-repair';
+ import { createHash } from 'node:crypto';
+ import { normalizeAsrComparisonReferences, type AsrComparisonReferences } from './mira-formal-asr-revalidation';
+ import { access } from 'node:fs/promises';
+@@ -1327,7 +1327,7 @@
+     asrComparisonRevalidation?: AsrComparisonReferences;
+     approvedReviewGrant?: FormalQualityReviewGrant;
+     completionTailBudget?: ValidatedCompletionTailBudget;
+-    learnerDiscussionRepair?: { sourceSnapshotSha256: string; priorCompletionClaimSha256: string };
++    learnerDiscussionRepair?: { sourceSnapshotSha256: string; priorCompletionClaimSha256: string; responseRecovery?: LearnerDiscussionResponseRecovery };
+   },
+ ): Promise<MiraFormalProfessionalRecoveryCompletion> {
+   const events = await readAllSessionEvents(identity.sessionId);
+@@ -1444,7 +1444,7 @@
+         sourceSnapshotSha256: options.learnerDiscussionRepair.sourceSnapshotSha256,
+         authorizationId: completionTailPaidBudget(options.completionTailBudget).authorizationId,
+         repairReference: options.learnerDiscussionRepair.priorCompletionClaimSha256,
+-      });
++      }, { cachedResponseOnly: options.learnerDiscussionRepair.responseRecovery });
+       scenes = revised.scenes;
+       learnerDiscussionRepair = revised.receipt;
+       if (assertProfessionalClassroom(stage, scenes, spec, identity.sessionId, document.outline) !== speechActionCount)
+@@ -1649,11 +1649,14 @@
+     asrComparisonRevalidation?: AsrComparisonReferences;
+     completionTailBudget?: ValidatedCompletionTailBudget;
+     learnerDiscussionRepairClaimSha256?: string;
++    learnerDiscussionResponseRecovery?: LearnerDiscussionResponseRecovery;
+     onProgress?: (progress: ClassroomGenerationProgress) => Promise<void> | void },
+ ) {
+   const prepared = await prepareMiraFormalSavedStageRecovery(input, repair);
+   const spec = parseFormalCoursewareSpec(input);
+-  const { learnerDiscussionRepairClaimSha256, ...completionOptions } = options;
++  const { learnerDiscussionRepairClaimSha256, learnerDiscussionResponseRecovery, ...completionOptions } = options;
++  if (learnerDiscussionResponseRecovery && !learnerDiscussionRepairClaimSha256)
++    throw new Error('SAVED_STAGE_LEARNER_RESPONSE_RECOVERY_CLAIM_REQUIRED');
+   if (learnerDiscussionRepairClaimSha256 && (!/^[a-f0-9]{64}$/.test(learnerDiscussionRepairClaimSha256)
+       || !options.completionTailBudget))
+     throw new Error('SAVED_STAGE_LEARNER_REPAIR_CLAIM_INVALID');
+@@ -1675,6 +1678,7 @@
+       ...(learnerDiscussionRepairClaimSha256 ? { learnerDiscussionRepair: {
+         sourceSnapshotSha256: repair.expectedSourceSnapshotSha256,
+         priorCompletionClaimSha256: learnerDiscussionRepairClaimSha256,
++        responseRecovery: learnerDiscussionResponseRecovery,
+       } } : {}),
+       recheckUnsentBrowserReview: true });
+ }
+diff --git a/scripts/formal-learner-discussion-completion-claim.ts b/scripts/formal-learner-discussion-completion-claim.ts
+--- a/scripts/formal-learner-discussion-completion-claim.ts
++++ b/scripts/formal-learner-discussion-completion-claim.ts
+@@ -1,6 +1,7 @@
+ import { promises as fs } from 'node:fs';
+ import path from 'node:path';
+ import { qualitySha } from '../lib/server/mira-formal-quality-contract';
++import type { LearnerDiscussionResponseRecovery } from '../lib/server/mira-formal-learner-discussion-repair';
+ 
+ export interface LearnerRepairCompletionIdentity {
+   sourceJobSha256: string;
+@@ -14,6 +15,7 @@
+  * The original claim and every paid outcome remain untouched. */
+ export async function claimLearnerDiscussionCompletion(
+   folder: string, identity: LearnerRepairCompletionIdentity, completionTailGrantSha256: string,
++  responseRecovery?: LearnerDiscussionResponseRecovery,
+ ) {
+   if (!/^[a-f0-9]{64}$/.test(completionTailGrantSha256)
+       || !/^[a-f0-9]{64}$/.test(identity.repairSnapshotSha256))
+@@ -28,10 +30,24 @@
+       || prior.reviewGrantSha256 !== undefined)
+     throw new Error('SAVED_STAGE_LEARNER_REPAIR_PRIOR_CLAIM_MISMATCH');
+   const priorCompletionClaimSha256 = qualitySha(prior);
+-  const claim = await fs.open(path.join(folder, `complete-${identity.repairSnapshotSha256}-learner-discussion-repair.claim`), 'wx', 0o600);
++  if (responseRecovery) {
++    if (Object.keys(responseRecovery).sort().join(',') !== ['inputSha256', 'requestSha256', 'dispatchClaimSha256',
++      'rejectedReviewSha256', 'providerResponseSha256', 'failureSha256'].sort().join(',')
++      || Object.values(responseRecovery).some(value => typeof value !== 'string' || !/^[a-f0-9]{64}$/.test(value)))
++      throw new Error('SAVED_STAGE_LEARNER_RESPONSE_AUDIT_INVALID');
++    const repair = JSON.parse(await fs.readFile(path.join(folder,
++      `complete-${identity.repairSnapshotSha256}-learner-discussion-repair.claim`), 'utf8'));
++    if (Object.entries(identity).some(([key, value]) => repair[key] !== value)
++      || repair.completionTailGrantSha256 !== completionTailGrantSha256
++      || repair.priorCompletionClaimSha256 !== priorCompletionClaimSha256)
++      throw new Error('SAVED_STAGE_LEARNER_RESPONSE_PRIOR_CLAIM_MISMATCH');
++  }
++  const suffix = responseRecovery ? 'learner-discussion-response-recovery' : 'learner-discussion-repair';
++  const claim = await fs.open(path.join(folder, `complete-${identity.repairSnapshotSha256}-${suffix}.claim`), 'wx', 0o600);
+   try {
+     await claim.writeFile(JSON.stringify({ ...identity, completionTailGrantSha256,
+-      priorCompletionClaimSha256, pid: process.pid, createdAt: new Date().toISOString() }));
++      priorCompletionClaimSha256, ...(responseRecovery ? { responseRecovery } : {}),
++      pid: process.pid, createdAt: new Date().toISOString() }));
+     await claim.sync();
+   } finally { await claim.close(); }
+   return priorCompletionClaimSha256;
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -145,11 +145,14 @@
+ 
+ async function main() {
+   const [mode, manifestPath, ...extraArgs] = process.argv.slice(2);
+-  if (!['prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
++  if (!['prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
+     'revalidate-audio-comparison', 'complete-audio-comparison-tail'].includes(mode) || !manifestPath)
+     throw new Error('Usage: recover-formal-saved-stage.ts prepare|inspect|complete|complete-browser-recheck|revalidate-audio-comparison|complete-audio-comparison-tail manifest.json [--completion-paid-budget sidecar.json]');
+   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
+   const completionTailPath = completionTailArgument(mode, manifest, extraArgs);
++  const responseRecoveryMode = mode === 'complete-learner-discussion-response-recovery';
++  if (responseRecoveryMode !== (manifest.learnerDiscussionResponseRecovery !== undefined))
++    throw new Error('SAVED_STAGE_LEARNER_RESPONSE_RECOVERY_MODE_INVALID');
+   if (mode === 'complete-browser-recheck' && (manifest.reviewGrantPath || manifest.asrSourceRequestId || manifest.ttsSourceRequestId))
+     throw new Error('SAVED_STAGE_BROWSER_RECHECK_CANNOT_MIX_RECOVERIES');
+   if (!/^[A-Za-z0-9_-]+$/.test(manifest.jobId) || !/^[a-f0-9]{64}$/.test(manifest.sourceJobSha256))
+@@ -353,9 +356,10 @@
+   lease = await acquireFormalQualityLock(path.join(folder, 'active.lock'));
+   let browserRecheckSha256: string | undefined;
+   let learnerDiscussionRepairClaimSha256: string | undefined;
+-  if (mode === 'complete-learner-discussion-repair') {
++  if (mode === 'complete-learner-discussion-repair' || responseRecoveryMode) {
+     if (!completionTailBudget) throw new Error('SAVED_STAGE_LEARNER_REPAIR_COMPLETION_BUDGET_REQUIRED');
+-    learnerDiscussionRepairClaimSha256 = await claimLearnerDiscussionCompletion(folder, identity, completionTailBudget.receiptSha256);
++    learnerDiscussionRepairClaimSha256 = await claimLearnerDiscussionCompletion(folder, identity, completionTailBudget.receiptSha256,
++      responseRecoveryMode ? manifest.learnerDiscussionResponseRecovery : undefined);
+   } else if (mode === 'complete-browser-recheck') {
+     browserRecheckSha256 = await claimUnsentBrowserRecheck({ root: process.cwd(), recoveryFolder: folder,
+       identity, ownerId: prepared.ownerId, authorizationId: parsePaidBudget(job.formalInput.paidBudget).authorizationId,
+@@ -386,6 +390,7 @@
+     approvedReviewGrant,
+     completionTailBudget,
+     learnerDiscussionRepairClaimSha256,
++    learnerDiscussionResponseRecovery: manifest.learnerDiscussionResponseRecovery,
+     onProgress: progress => { console.log(JSON.stringify(progress)); },
+   });
+   const receipt = { ...identity, kind: 'operator_saved_stage_repair', originalSessionStatus: prepared.originalSessionStatus,
+diff --git a/tests/server/formal-learner-discussion-completion-claim.test.ts b/tests/server/formal-learner-discussion-completion-claim.test.ts
+--- a/tests/server/formal-learner-discussion-completion-claim.test.ts
++++ b/tests/server/formal-learner-discussion-completion-claim.test.ts
+@@ -18,6 +18,28 @@
+   return { folder, identity, grant, prior, priorPath };
+ }
+ describe('explicit AI learner-discussion completion claim', () => {
++  const responseRecovery = { inputSha256: '1'.repeat(64), requestSha256: '2'.repeat(64),
++    dispatchClaimSha256: '3'.repeat(64), rejectedReviewSha256: '4'.repeat(64),
++    providerResponseSha256: '5'.repeat(64), failureSha256: '6'.repeat(64) };
++  it('requires the exact prior repair and allows one distinct cached-response recovery without changing earlier claims', async () => {
++    const { folder, identity, grant, prior } = await fixture();
++    await expect(claimLearnerDiscussionCompletion(folder, identity, grant, responseRecovery)).rejects.toMatchObject({ code: 'ENOENT' });
++    await claimLearnerDiscussionCompletion(folder, identity, grant);
++    const before = await Promise.all((await fs.readdir(folder)).map(async name => [name, await fs.readFile(path.join(folder, name), 'utf8')]));
++    expect(await claimLearnerDiscussionCompletion(folder, identity, grant, responseRecovery)).toBe(qualitySha(prior));
++    for (const [name, bytes] of before) expect(await fs.readFile(path.join(folder, name), 'utf8')).toBe(bytes);
++    await expect(claimLearnerDiscussionCompletion(folder, identity, grant, responseRecovery)).rejects.toMatchObject({ code: 'EEXIST' });
++  });
++  it('rejects a malformed audit or a changed prior repair claim', async () => {
++    const { folder, identity, grant } = await fixture();
++    await claimLearnerDiscussionCompletion(folder, identity, grant);
++    await expect(claimLearnerDiscussionCompletion(folder, identity, grant, { ...responseRecovery, failureSha256: 'bad' })).rejects.toThrow('AUDIT_INVALID');
++    const target = path.join(folder, `complete-${identity.repairSnapshotSha256}-learner-discussion-repair.claim`);
++    const claim = JSON.parse(await fs.readFile(target, 'utf8')); claim.completionTailGrantSha256 = 'f'.repeat(64);
++    await fs.writeFile(target, JSON.stringify(claim));
++    await expect(claimLearnerDiscussionCompletion(folder, identity, grant, responseRecovery)).rejects.toThrow('PRIOR_CLAIM_MISMATCH');
++    expect((await fs.readdir(folder)).some(file => file.endsWith('-response-recovery.claim'))).toBe(false);
++  });
+   it('allows one concurrent claim and preserves the original paid attempt bytes', async () => {
+     const { folder, identity, grant, prior, priorPath } = await fixture();
+     const before = await fs.readFile(priorPath);
+diff --git a/tests/server/mira-formal-completion-tail-budget.test.ts b/tests/server/mira-formal-completion-tail-budget.test.ts
+--- a/tests/server/mira-formal-completion-tail-budget.test.ts
++++ b/tests/server/mira-formal-completion-tail-budget.test.ts
+@@ -91,10 +91,10 @@
+       ['--completion-paid-budget', 'one', '--completion-paid-budget', 'two']])
+       expect(() => completionTailArgument('complete', {}, args)).toThrow('ARGUMENT_INVALID');
+   });
+-  it('requires the same verified sidecar for the explicit learner-discussion completion repair', () => {
+-    expect(() => completionTailArgument('complete-learner-discussion-repair', {}, [])).toThrow('SIDECAR_REQUIRED');
+-    expect(completionTailArgument('complete-learner-discussion-repair', {}, ['--completion-paid-budget', 'same.json'])).toBe('same.json');
+-    expect(() => completionTailArgument('complete-learner-discussion-repair', { reviewGrantPath: 'other' }, ['--completion-paid-budget', 'same.json'])).toThrow('CANNOT_MIX_RECOVERIES');
++  it.each(['complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery'])('requires the same verified sidecar for %s', mode => {
++    expect(() => completionTailArgument(mode, {}, [])).toThrow('SIDECAR_REQUIRED');
++    expect(completionTailArgument(mode, {}, ['--completion-paid-budget', 'same.json'])).toBe('same.json');
++    expect(() => completionTailArgument(mode, { reviewGrantPath: 'other' }, ['--completion-paid-budget', 'same.json'])).toThrow('CANNOT_MIX_RECOVERIES');
+   });
+   it.each(['parentAuthorizationId', 'buildItemId', 'runtimeRequestId', 'jobId', 'sourceJobSha256',
+     'sourceSnapshotSha256', 'repairSnapshotSha256', 'formalInputSha256', 'sessionId', 'ownerId', 'stageId',
+--- a/lib/server/mira-formal-learner-discussion-repair.ts
++++ b/lib/server/mira-formal-learner-discussion-repair.ts
+@@ -41,7 +41,26 @@
+   receiptSha256: string;
+ }
+ interface RepairContext { sourceSnapshotSha256: string; authorizationId: string; repairReference: string }
+-interface RepairDeps { provider?: typeof executeMiraCoursewareProvider; cacheRoot?: string }
++export interface LearnerDiscussionResponseRecovery {
++  inputSha256: string;
++  requestSha256: string;
++  dispatchClaimSha256: string;
++  rejectedReviewSha256: string;
++  providerResponseSha256: string;
++  failureSha256: string;
++}
++interface RepairDeps {
++  provider?: typeof executeMiraCoursewareProvider;
++  cacheRoot?: string;
++  /** Explicitly recover one fully returned response rejected by the old local
++   * action validator. All source files must match the operator's frozen hashes.
++   * This path cannot dispatch a Provider request or replace the original claim. */
++  cachedResponseOnly?: LearnerDiscussionResponseRecovery;
++}
++const RECOVERY_FILES = {
++  inputSha256: 'input.json', requestSha256: 'request.json', dispatchClaimSha256: 'dispatch.claim',
++  rejectedReviewSha256: 'rejected-review.json', providerResponseSha256: 'provider-response.json', failureSha256: 'failure.json',
++} as const;
+ 
+ async function saveExclusive(path: string, value: unknown) {
+   const file = await open(path, 'wx', 0o600);
+@@ -87,12 +106,23 @@
+         || typeof a.id !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]{2,100}$/.test(a.id) || usedIds.has(a.id)
+         || typeof a.topic !== 'string' || a.topic.trim().length < 4 || a.topic.length > 120
+         || typeof a.prompt !== 'string' || a.prompt.trim().length < 30 || a.prompt.length > 1200
+-        || /[<>]/.test(a.topic + a.prompt) || !/真实|屏幕前/.test(a.prompt)
+-        || !/等|等待/.test(a.prompt) || !/自己|自己的/.test(a.prompt)
+-        || !/回答|解释|说出|复述/.test(a.prompt)) return fail('ACTION_INVALID');
++        || /[<>]/.test(a.topic + a.prompt) || !hasLearnerInputContract(a.prompt)) return fail('ACTION_INVALID');
+     usedIds.add(a.id);
+   }
+   return raw.insertions as unknown as LearnerDiscussionInsertion[];
++}
++
++/** Require a usable invitation, not a magic label for the child. For example,
++ * “这位同学” is a real learner when the teacher waits for classroom text/voice
++ * input and explicitly prevents an AI classmate from substituting the answer.
++ * Independent teaching review still decides whether the prompts teach well. */
++function hasLearnerInputContract(prompt: string): boolean {
++  return /课堂输入|输入框/.test(prompt)
++    && /文字|语音|文本/.test(prompt)
++    && /等|等待/.test(prompt)
++    && /自己/.test(prompt)
++    && /回答|解释|说出|复述/.test(prompt)
++    && /AI.{0,12}(?:不能|不得|不要|不可).{0,12}(?:代替|代答|替.{0,6}回答)|(?:不让|禁止|不要让).{0,8}AI.{0,12}(?:代替|代答|替.{0,6}回答)/i.test(prompt);
+ }
+ 
+ function derive(input: FormalQualityInput, insertions: LearnerDiscussionInsertion[]): Scene[] {
+@@ -142,6 +172,40 @@
+       rejectedReview: normalizedRejection, snapshot, teacherId: teacher, appendTargets: targets }), responseJsonSchema };
+   const folder = resolve(deps.cacheRoot ?? 'data/formal-learner-discussion-repairs', qualitySha(identity));
+   await mkdir(folder, { recursive: true, mode: 0o700 });
++  const expectedInput = { ...identity, frozenContext, snapshot, sourceScenes: input.scenes };
++  const recovery = deps.cachedResponseOnly;
++  const checkRecoverySources = async () => {
++    if (!exact(recovery, Object.keys(RECOVERY_FILES)) || Object.values(recovery).some(hash => typeof hash !== 'string' || !SHA.test(hash)))
++      return fail('RESPONSE_RECOVERY_HASHES_INVALID');
++    const values: Record<string, Record<string, unknown>> = {};
++    for (const [key, filename] of Object.entries(RECOVERY_FILES)) {
++      const value = await json(join(folder, filename));
++      if (!object(value) || qualitySha(value) !== recovery[key as keyof LearnerDiscussionResponseRecovery])
++        return fail('RESPONSE_RECOVERY_SOURCE_CHANGED');
++      values[key] = value;
++    }
++    const claim = values.dispatchClaimSha256, failure = values.failureSha256, response = values.providerResponseSha256;
++    if (qualitySha(values.inputSha256) !== qualitySha(expectedInput)
++        || qualitySha(values.requestSha256) !== qualitySha(request)
++        || qualitySha(values.rejectedReviewSha256) !== identity.rejectedReviewSha256
++        || Object.entries(identity).some(([key, value]) => claim[key] !== value || failure[key] !== value)
++        || claim.authorizationId !== context.authorizationId || claim.namespace !== namespace
++        || claim.repairReference !== context.repairReference || claim.requestSha256 !== qualitySha(request)
++        || !Number.isSafeInteger(claim.startedAt) || failure.requestSha256 !== qualitySha(request)
++        || !Number.isSafeInteger(failure.failedAt) || Number(failure.failedAt) < Number(claim.startedAt)
++        || failure.error !== 'FORMAL_LEARNER_DISCUSSION_REPAIR_ACTION_INVALID' || failure.retryAllowed !== false
++        || response.schemaVersion !== MIRA_COURSEWARE_PROVIDER_SCHEMA || response.requestId !== request.requestId
++        || response.phase !== request.phase || typeof response.content !== 'string' || !response.content.trim()
++        || typeof response.providerRequestIdHash !== 'string' || !SHA.test(response.providerRequestIdHash))
++      return fail('RESPONSE_RECOVERY_IDENTITY_INVALID');
++    return response as unknown as MiraCoursewareProviderResult;
++  };
++  // Frozen source validation happens even on a completed recovery read. A caller
++  // cannot present different source hashes and silently reuse a prior result.
++  const cachedResponse = recovery ? await checkRecoverySources() : undefined;
++  const recoveryIdentity = recovery ? { schemaVersion: 'mira.openmaic.learner-discussion-response-recovery.v1',
++    ...identity, authorizationId: context.authorizationId, namespace, repairReference: context.repairReference,
++    sourceHashes: recovery, providerCalls: 0 } : undefined;
+   const completed = await json(join(folder, 'completion.json'));
+   if (completed !== undefined) {
+     if (!object(completed) || !object(completed.receipt) || !Array.isArray(completed.scenes)) return fail('CACHED_AUDIT_INVALID');
+@@ -157,7 +221,7 @@
+         || claim.repairReference !== context.repairReference
+         || Object.entries(identity).some(([k, v]) => claim[k] !== v)
+         || qualitySha(archivedRequest) !== qualitySha(request)
+-        || qualitySha(archivedInput) !== qualitySha({ ...identity, frozenContext, snapshot, sourceScenes: input.scenes })
++        || qualitySha(archivedInput) !== qualitySha(expectedInput)
+         || qualitySha(archivedRejection) !== identity.rejectedReviewSha256
+         || raw.schemaVersion !== MIRA_COURSEWARE_PROVIDER_SCHEMA || raw.phase !== request.phase || raw.requestId !== request.requestId
+         || qualitySha(raw) !== unsigned.providerResponseSha256 || qualitySha(request) !== unsigned.requestSha256
+@@ -172,7 +236,49 @@
+     if (qualitySha(insertions) !== qualitySha(unsigned.insertions) || qualitySha(scenes) !== qualitySha(completed.scenes)
+         || qualitySha(qualitySnapshot(input.stage, scenes)) !== unsigned.outputSnapshotSha256)
+       return fail('CACHED_OUTPUT_CHANGED');
++    if (recoveryIdentity) {
++      const recoveryClaim = await json(join(folder, 'response-recovery.claim'));
++      const audit = await json(join(folder, 'response-recovery.json'));
++      if (!object(recoveryClaim) || !object(audit)
++          || Object.entries(recoveryIdentity).some(([k,v]) => qualitySha(recoveryClaim[k] ?? null) !== qualitySha(v)
++            || qualitySha(audit[k] ?? null) !== qualitySha(v))
++          || audit.recoveryClaimSha256 !== qualitySha(recoveryClaim) || audit.status !== 'completed'
++          || audit.outputSnapshotSha256 !== unsigned.outputSnapshotSha256 || audit.completionReceiptSha256 !== receiptSha256)
++        return fail('RESPONSE_RECOVERY_AUDIT_INVALID');
++    }
+     return { scenes, receipt: completed.receipt as unknown as LearnerDiscussionRepairReceipt };
++  }
++  const buildCompletion = (response: MiraCoursewareProviderResult) => {
++    const insertions = validateInsertions(JSON.parse(response.content), input, teacher);
++    const scenes = derive(input, insertions);
++    const unsigned = { schemaVersion: SCHEMA, promptVersion: LEARNER_DISCUSSION_REPAIR_PROMPT_VERSION, ...identity,
++      outputSnapshotSha256: qualitySha(qualitySnapshot(input.stage, scenes)), requestSha256: qualitySha(request),
++      providerResponseSha256: qualitySha(response), providerRequestIdHash: response.providerRequestIdHash,
++      providerId: 'deepseek' as const, modelId: 'deepseek-v4-flash' as const,
++      authorizationId: context.authorizationId, namespace, repairReference: context.repairReference, insertions } as const;
++    const receipt: LearnerDiscussionRepairReceipt = { ...unsigned, receiptSha256: qualitySha(unsigned) };
++    return { scenes, receipt };
++  };
++  if (recoveryIdentity && cachedResponse) {
++    const recoveryClaim = { ...recoveryIdentity, startedAt: Date.now() };
++    try { await saveExclusive(join(folder, 'response-recovery.claim'), recoveryClaim); }
++    catch (error) { if ((error as NodeJS.ErrnoException).code === 'EEXIST') return fail('PRIOR_RESPONSE_RECOVERY_REQUIRES_AUDIT'); throw error; }
++    try {
++      signal?.throwIfAborted();
++      const result = buildCompletion(cachedResponse);
++      // Recheck every frozen source immediately before materializing the result.
++      await checkRecoverySources();
++      await saveExclusive(join(folder, 'response-recovery.json'), { ...recoveryIdentity,
++        recoveryClaimSha256: qualitySha(recoveryClaim), status: 'completed', completedAt: Date.now(),
++        outputSnapshotSha256: result.receipt.outputSnapshotSha256, completionReceiptSha256: result.receipt.receiptSha256 });
++      await saveExclusive(join(folder, 'completion.json'), result);
++      return result;
++    } catch (error) {
++      await saveExclusive(join(folder, 'response-recovery-failure.json'), { ...recoveryIdentity,
++        recoveryClaimSha256: qualitySha(recoveryClaim), failedAt: Date.now(),
++        error: error instanceof Error ? error.message : String(error), retryAllowed: false });
++      throw error;
++    }
+   }
+   // Acquiring this append-only claim precedes every potential Provider call.
+   // An interrupted or failed attempt cannot be reminted by another process.
+@@ -180,7 +286,7 @@
+     namespace, repairReference: context.repairReference, requestSha256: qualitySha(request), startedAt: Date.now() }); }
+   catch (error) { if ((error as NodeJS.ErrnoException).code === 'EEXIST') return fail('PRIOR_DISPATCH_REQUIRES_AUDIT'); throw error; }
+   try {
+-    await saveExclusive(join(folder, 'input.json'), { ...identity, frozenContext, snapshot, sourceScenes: input.scenes });
++    await saveExclusive(join(folder, 'input.json'), expectedInput);
+     await saveExclusive(join(folder, 'rejected-review.json'), normalizedRejection);
+     await saveExclusive(join(folder, 'request.json'), request);
+     signal?.throwIfAborted();
+@@ -189,16 +295,9 @@
+     if (response.schemaVersion !== MIRA_COURSEWARE_PROVIDER_SCHEMA || response.phase !== request.phase
+         || response.requestId !== request.requestId || !SHA.test(response.providerRequestIdHash)) return fail('PROVIDER_IDENTITY_INVALID');
+     signal?.throwIfAborted();
+-    const insertions = validateInsertions(JSON.parse(response.content), input, teacher);
+-    const scenes = derive(input, insertions);
+-    const unsigned = { schemaVersion: SCHEMA, promptVersion: LEARNER_DISCUSSION_REPAIR_PROMPT_VERSION, ...identity,
+-      outputSnapshotSha256: qualitySha(qualitySnapshot(input.stage, scenes)), requestSha256: qualitySha(request),
+-      providerResponseSha256: qualitySha(response), providerRequestIdHash: response.providerRequestIdHash,
+-      providerId: 'deepseek' as const, modelId: 'deepseek-v4-flash' as const,
+-      authorizationId: context.authorizationId, namespace, repairReference: context.repairReference, insertions } as const;
+-    const receipt: LearnerDiscussionRepairReceipt = { ...unsigned, receiptSha256: qualitySha(unsigned) };
+-    await saveExclusive(join(folder, 'completion.json'), { scenes, receipt });
+-    return { scenes, receipt };
++    const result = buildCompletion(response);
++    await saveExclusive(join(folder, 'completion.json'), result);
++    return result;
+   } catch (error) {
+     await saveExclusive(join(folder, 'failure.json'), { ...identity, requestSha256: qualitySha(request),
+       failedAt: Date.now(), error: error instanceof Error ? error.message : String(error), retryAllowed: false });
+--- a/tests/server/mira-formal-learner-discussion-repair.test.ts
++++ b/tests/server/mira-formal-learner-discussion-repair.test.ts
+@@ -4,7 +4,7 @@
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ import type { FormalQualityInput, FormalQualityResult } from '@/lib/server/mira-formal-teaching-quality';
+ import { qualitySha, qualitySnapshot } from '@/lib/server/mira-formal-quality-contract';
+-import { repairFormalLearnerDiscussions } from '@/lib/server/mira-formal-learner-discussion-repair';
++import { repairFormalLearnerDiscussions, type LearnerDiscussionResponseRecovery } from '@/lib/server/mira-formal-learner-discussion-repair';
+ const mocks = vi.hoisted(() => ({ paid: vi.fn() }));
+ vi.mock('@/lib/server/mira-paid-budget', () => ({ paidBudgetContext: { getStore: mocks.paid } }));
+ vi.mock('@/lib/server/mira-courseware-provider', () => ({ MIRA_COURSEWARE_PROVIDER_SCHEMA: 'mira.openmaic.courseware-provider-call.v1', executeMiraCoursewareProvider: vi.fn() }));
+@@ -28,7 +28,7 @@
+   return { insertions: ['scene-p1','scene-p8'].map((sceneId,j) => ({ sceneId,
+     afterActionCount: i.scenes.find(s => s.id === sceneId)!.actions!.length,
+     action: {id:`learner-${j}`,type:'discussion',agentId:'teacher',topic:'请你说说自己的想法',
+-      prompt:'请屏幕前的真实孩子通过输入框说出自己的解释，教师等待孩子回答，不让 AI 同学代替回答，也不提前提供规则和答案。'},
++      prompt:'请老师请这位同学用自己的话说一说自己的想法。请老师问完后等这位同学通过课堂输入（文字或语音）回答，不要替他回答，也不要提前说出答案或换算规则；AI同学不能代替这位同学回答。'},
+   })) };
+ }
+ describe('one frozen classroom learner explanation repair', () => {
+@@ -104,4 +104,78 @@
+     const path=join(cacheRoot,(await readdir(cacheRoot))[0],'completion.json');const d=JSON.parse(await readFile(path,'utf8'));d.scenes[3].content.html='different game';await writeFile(path,JSON.stringify(d));
+     await expect(repairFormalLearnerDiscussions(i,rejection(i),context,{provider:p,cacheRoot})).rejects.toThrow('CACHED_OUTPUT_CHANGED');expect(p).toHaveBeenCalledTimes(1);
+   });
++
++  const sourceFiles = { inputSha256:'input.json',requestSha256:'request.json',dispatchClaimSha256:'dispatch.claim',
++    rejectedReviewSha256:'rejected-review.json',providerResponseSha256:'provider-response.json',failureSha256:'failure.json' };
++  async function seedPriorActionRejection() {
++    const i=input(),p=provider(i);
++    // Model the old validator rejecting an already archived, fully returned
++    // Provider response. This is isolated fixture construction, not recovery.
++    const original=await repairFormalLearnerDiscussions(i,rejection(i),context,{provider:p,cacheRoot});
++    const folder=join(cacheRoot,(await readdir(cacheRoot))[0]);
++    await rm(join(folder,'completion.json'));
++    const claim=JSON.parse(await readFile(join(folder,'dispatch.claim'),'utf8'));
++    const {authorizationId:_authorizationId,namespace:_namespace,repairReference:_repairReference,startedAt,...identity}=claim;
++    await writeFile(join(folder,'failure.json'),JSON.stringify({...identity,failedAt:startedAt+1,error:'FORMAL_LEARNER_DISCUSSION_REPAIR_ACTION_INVALID',retryAllowed:false}));
++    const bytes:Record<string,string>={},hashes:Record<string,string>={};
++    for(const [key,file] of Object.entries(sourceFiles)) { bytes[file]=await readFile(join(folder,file),'utf8');hashes[key]=qualitySha(JSON.parse(bytes[file])); }
++    p.mockClear();
++    return {i,p,folder,original,bytes,hashes:hashes as unknown as LearnerDiscussionResponseRecovery};
++  }
++  it('accepts explicit classroom input and waiting without requiring magic words for the real learner',async()=>{
++    const i=input(),p=provider(i);expect(generated(i).insertions[0].action.prompt).not.toMatch(/真实|屏幕前/);
++    const result=await repairFormalLearnerDiscussions(i,rejection(i),context,{provider:p,cacheRoot});
++    expect(result.receipt.insertions[0].action.prompt).toBe(generated(i).insertions[0].action.prompt);
++  });
++  it('recovers an unchanged paid response without any Provider dispatch and retains the entire failure record',async()=>{
++    const f=await seedPriorActionRejection();
++    const result=await repairFormalLearnerDiscussions(f.i,rejection(f.i),context,{provider:f.p,cacheRoot,cachedResponseOnly:f.hashes});
++    expect(result).toEqual(f.original);expect(f.p).not.toHaveBeenCalled();
++    for(const [file,bytes] of Object.entries(f.bytes))expect(await readFile(join(f.folder,file),'utf8')).toBe(bytes);
++    const audit=JSON.parse(await readFile(join(f.folder,'response-recovery.json'),'utf8'));
++    expect(audit).toMatchObject({providerCalls:0,status:'completed',sourceHashes:f.hashes,completionReceiptSha256:result.receipt.receiptSha256});
++    expect(await repairFormalLearnerDiscussions(f.i,rejection(f.i),context,{provider:f.p,cacheRoot,cachedResponseOnly:f.hashes})).toEqual(result);
++    expect(f.p).not.toHaveBeenCalled();
++  });
++  it('never treats a saved response as automatic permission to retry or recover',async()=>{
++    const f=await seedPriorActionRejection();
++    await expect(repairFormalLearnerDiscussions(f.i,rejection(f.i),context,{provider:f.p,cacheRoot})).rejects.toThrow('PRIOR_DISPATCH');
++    expect(f.p).not.toHaveBeenCalled();expect(await readdir(f.folder)).not.toContain('response-recovery.claim');
++  });
++  it.each(Object.keys(sourceFiles))('rejects recovery when the frozen %s changes',async key=>{
++    const f=await seedPriorActionRejection();const hashes={...f.hashes,[key]:'f'.repeat(64)};
++    await expect(repairFormalLearnerDiscussions(f.i,rejection(f.i),context,{provider:f.p,cacheRoot,cachedResponseOnly:hashes})).rejects.toThrow('RESPONSE_RECOVERY_SOURCE_CHANGED');
++    expect(f.p).not.toHaveBeenCalled();expect(await readdir(f.folder)).not.toContain('response-recovery.claim');
++  });
++  it('refuses an ambiguous transport failure even when all supplied hashes match',async()=>{
++    const f=await seedPriorActionRejection();const failure=JSON.parse(f.bytes['failure.json']);failure.error='transport timeout';
++    await writeFile(join(f.folder,'failure.json'),JSON.stringify(failure));f.hashes.failureSha256=qualitySha(failure);
++    await expect(repairFormalLearnerDiscussions(f.i,rejection(f.i),context,{provider:f.p,cacheRoot,cachedResponseOnly:f.hashes})).rejects.toThrow('RESPONSE_RECOVERY_IDENTITY_INVALID');
++    expect(f.p).not.toHaveBeenCalled();
++  });
++  it('rejects a self-rehashed response with the wrong Provider request identity',async()=>{
++    const f=await seedPriorActionRejection();const response=JSON.parse(f.bytes['provider-response.json']);response.requestId='another-request';
++    await writeFile(join(f.folder,'provider-response.json'),JSON.stringify(response));f.hashes.providerResponseSha256=qualitySha(response);
++    await expect(repairFormalLearnerDiscussions(f.i,rejection(f.i),context,{provider:f.p,cacheRoot,cachedResponseOnly:f.hashes})).rejects.toThrow('RESPONSE_RECOVERY_IDENTITY_INVALID');
++    expect(f.p).not.toHaveBeenCalled();
++  });
++  it('fails closed on concurrent recovery without a Provider fallback',async()=>{
++    const f=await seedPriorActionRejection();
++    const outcomes=await Promise.allSettled([0,1].map(()=>repairFormalLearnerDiscussions(f.i,rejection(f.i),context,{provider:f.p,cacheRoot,cachedResponseOnly:f.hashes})));
++    expect(outcomes.filter(r=>r.status==='fulfilled')).toHaveLength(1);expect(f.p).not.toHaveBeenCalled();
++  });
++  it('rejects a recovery cache missing its separate immutable recovery audit',async()=>{
++    const f=await seedPriorActionRejection();await repairFormalLearnerDiscussions(f.i,rejection(f.i),context,{provider:f.p,cacheRoot,cachedResponseOnly:f.hashes});
++    await rm(join(f.folder,'response-recovery.json'));
++    await expect(repairFormalLearnerDiscussions(f.i,rejection(f.i),context,{provider:f.p,cacheRoot,cachedResponseOnly:f.hashes})).rejects.toThrow('RESPONSE_RECOVERY_AUDIT_INVALID');
++    expect(f.p).not.toHaveBeenCalled();
++  });
++  it.each(['no-input','no-wait','ai-answer'])('rejects an invitation lacking a real %s contract',async scenario=>{
++    const i=input(),p=provider(i),g=generated(i);
++    const prompt=g.insertions[0].action.prompt;
++    g.insertions[0].action.prompt=scenario==='no-input'?prompt.replace('课堂输入','课本内容'):
++      scenario==='no-wait'?prompt.replace('等这位同学','请这位同学'):prompt.replace('AI同学不能代替这位同学回答','AI同学先替这位同学回答');
++    p.mockImplementation(async(request)=>({...await provider(i)(request),content:JSON.stringify(g)}));
++    await expect(repairFormalLearnerDiscussions(i,rejection(i),context,{provider:p,cacheRoot})).rejects.toThrow('ACTION_INVALID');
++  });
+ });

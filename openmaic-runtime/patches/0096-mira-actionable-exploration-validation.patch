@@ -1,0 +1,193 @@
+diff --git a/lib/server/mira-formal-exploration.ts b/lib/server/mira-formal-exploration.ts
+--- a/lib/server/mira-formal-exploration.ts
++++ b/lib/server/mira-formal-exploration.ts
+@@ -29,39 +29,80 @@
+ const exact = (v: unknown, fields: string[]) => obj(v) && Object.keys(v).sort().join(',') === fields.sort().join(',');
+ const sel = (v: unknown): v is string => typeof v === 'string' && /^#[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(v);
+ const text = (v: unknown) => typeof v === 'string' && v.trim().length >= 3 && v.length <= 500;
+-const fail = (): never => { throw new Error('FORMAL_EXPLORATION_CONTRACT_INVALID'); };
++const fail = (path?: string, reason?: string): never => {
++  throw new Error(`FORMAL_EXPLORATION_CONTRACT_INVALID${path ? `: ${path}: ${reason}` : ''}`);
++};
++function fields(value: unknown, expected: string[], path: string): asserts value is Record<string, any> {
++  if (!obj(value)) return fail(path, 'expected an object');
++  const keys = Object.keys(value);
++  const missing = expected.filter(key => !keys.includes(key));
++  const unexpected = keys.filter(key => !expected.includes(key));
++  if (missing.length || unexpected.length) fail(path, [
++    ...(missing.length ? [`missing required fields: ${missing.join(', ')}`] : []),
++    ...(unexpected.length ? [`unexpected fields: ${unexpected.join(', ')}`] : []),
++  ].join('; '));
++}
+ 
+ /** Registered mechanisms never execute generated JS to decide the expected answer. */
+ export function validateExploration(raw: unknown, skillId?: unknown): asserts raw is Exploration {
+-  if (!obj(raw)) return fail();
++  const path = 'exploration';
++  fields(raw, ['schemaVersion','mechanism','diagramSelector','feedbackSelector','states','reset'], path);
+   const value = raw;
+-  if (!exact(value, ['schemaVersion','mechanism','diagramSelector','feedbackSelector','states','reset']) || !obj(value)
+-    || value.schemaVersion !== EXPLORATION_SCHEMA || !sel(value.diagramSelector) || !sel(value.feedbackSelector)
+-    || value.diagramSelector === value.feedbackSelector || !Array.isArray(value.states) || value.states.length < 3 || value.states.length > 5
+-    || !exact(value.reset, ['selector','stateId']) || !sel(value.reset.selector) || !obj(value.mechanism)) fail();
++  if (value.schemaVersion !== EXPLORATION_SCHEMA) fail(`${path}.schemaVersion`, `must equal ${EXPLORATION_SCHEMA}`);
++  if (!sel(value.diagramSelector)) fail(`${path}.diagramSelector`, 'must be a local #element-id selector');
++  if (!sel(value.feedbackSelector)) fail(`${path}.feedbackSelector`, 'must be a local #element-id selector');
++  if (value.diagramSelector === value.feedbackSelector) fail(`${path}.feedbackSelector`, 'must differ from diagramSelector');
++  if (!Array.isArray(value.states) || value.states.length < 3 || value.states.length > 5)
++    fail(`${path}.states`, 'must contain 3 to 5 states');
++  fields(value.reset, ['selector','stateId'], `${path}.reset`);
++  if (!sel(value.reset.selector)) fail(`${path}.reset.selector`, 'must be a local #element-id selector');
++  if (!obj(value.mechanism)) fail(`${path}.mechanism`, 'expected an object');
+   const numeric = value.mechanism.kind === 'fraction-ratio-percentage.v1';
+   if (numeric) {
+-    if (!exact(value.mechanism, ['kind','numeratorSelector','denominatorSelector','decimalSelector','percentSelector','wholeSelector','partSelector'])
+-      || Object.entries(value.mechanism).some(([k,v]) => k !== 'kind' && !sel(v))) fail();
+-  } else if (!exact(value.mechanism,['kind']) || value.mechanism.kind !== 'semantic-state-model.v1') fail();
++    fields(value.mechanism, ['kind','numeratorSelector','denominatorSelector','decimalSelector','percentSelector','wholeSelector','partSelector'], `${path}.mechanism`);
++    for (const [key, selector] of Object.entries(value.mechanism))
++      if (key !== 'kind' && !sel(selector)) fail(`${path}.mechanism.${key}`, 'must be a local #element-id selector');
++  } else {
++    fields(value.mechanism, ['kind'], `${path}.mechanism`);
++    if (value.mechanism.kind !== 'semantic-state-model.v1') fail(`${path}.mechanism.kind`, 'must name a registered exploration mechanism');
++  }
+   // This known quantitative skill cannot silently downgrade to a semantic check.
+-  if (skillId === 'fraction_ratio_percentage' && !numeric) fail();
++  if (skillId === 'fraction_ratio_percentage' && !numeric)
++    fail(`${path}.mechanism.kind`, 'fraction_ratio_percentage requires fraction-ratio-percentage.v1; semantic fallback is not allowed');
+   const ids = new Set<string>(), outputs = new Set<string>(), ratios = new Set<number>();
+-  for (const s of value.states) {
+-    if (!exact(s,['id','operations','resultText','explanationText',...(numeric ? ['numerator','denominator'] : [])])
+-      || !/^[A-Za-z0-9_-]{1,40}$/.test(s.id) || ids.has(s.id) || !text(s.resultText) || !text(s.explanationText)
+-      || !Array.isArray(s.operations) || !s.operations.length || s.operations.length > 3) fail();
++  for (const [index, s] of value.states.entries()) {
++    const statePath = `${path}.states[${index}]`;
++    fields(s, ['id','operations','resultText','explanationText',...(numeric ? ['numerator','denominator'] : [])], statePath);
++    if (!/^[A-Za-z0-9_-]{1,40}$/.test(s.id)) fail(`${statePath}.id`, 'must contain 1 to 40 letters, digits, underscores or hyphens');
++    if (ids.has(s.id)) fail(`${statePath}.id`, 'duplicates an earlier state id');
++    if (!text(s.resultText)) fail(`${statePath}.resultText`, 'must be a string with at least 3 non-padding characters and at most 500 characters');
++    if (!text(s.explanationText)) fail(`${statePath}.explanationText`, 'must be a string with at least 3 non-padding characters and at most 500 characters');
++    if (!Array.isArray(s.operations) || !s.operations.length || s.operations.length > 3)
++      fail(`${statePath}.operations`, 'must contain 1 to 3 operations');
+     ids.add(s.id); outputs.add(s.resultText);
+-    for (const op of s.operations) if (!exact(op,['selector','action',...(op.action !== 'click' ? ['value'] : [])])
+-      || !sel(op.selector) || !['click','fill','select'].includes(op.action)
+-      || (op.action !== 'click' && (typeof op.value !== 'string' || !op.value || op.value.length > 100))) fail();
++    for (const [operationIndex, op] of s.operations.entries()) {
++      const operationPath = `${statePath}.operations[${operationIndex}]`;
++      if (!obj(op)) fail(operationPath, 'expected an object');
++      fields(op, ['selector','action',...(op.action !== 'click' ? ['value'] : [])], operationPath);
++      if (!sel(op.selector)) fail(`${operationPath}.selector`, 'must be a local #element-id selector');
++      if (!['click','fill','select'].includes(op.action)) fail(`${operationPath}.action`, 'must be click, fill or select');
++      if (op.action !== 'click' && (typeof op.value !== 'string' || !op.value || op.value.length > 100))
++        fail(`${operationPath}.value`, 'fill/select requires a non-empty string of at most 100 characters');
++    }
+     if (numeric) {
+-      if (!Number.isInteger(s.numerator) || !Number.isInteger(s.denominator) || s.numerator <= 0
+-        || s.numerator > s.denominator || s.denominator > 1000) fail();
++      if (!Number.isInteger(s.numerator) || s.numerator <= 0)
++        fail(`${statePath}.numerator`, 'must be a positive integer');
++      if (!Number.isInteger(s.denominator) || s.denominator > 1000)
++        fail(`${statePath}.denominator`, 'must be an integer no greater than 1000 and at least numerator');
++      if (s.numerator > s.denominator)
++        fail(`${statePath}.numerator`, 'must not exceed denominator; denominator must be positive');
+       ratios.add(s.numerator / s.denominator);
+     }
+   }
+-  if (!ids.has(value.reset.stateId) || outputs.size !== value.states.length || (numeric && ratios.size !== value.states.length)) fail();
++  if (!ids.has(value.reset.stateId)) fail(`${path}.reset.stateId`, 'must identify one of the declared states');
++  if (outputs.size !== value.states.length) fail(`${path}.states[*].resultText`, 'every state must have distinct resultText');
++  if (numeric && ratios.size !== value.states.length)
++    fail(`${path}.states[*].numerator/denominator`, 'every state must have a distinct ratio; equivalent fractions do not count as different states');
+ }
+ 
+ export const EXPLORATION_PROMPT = `
+diff --git a/lib/server/mira-formal-interaction-design.ts b/lib/server/mira-formal-interaction-design.ts
+--- a/lib/server/mira-formal-interaction-design.ts
++++ b/lib/server/mira-formal-interaction-design.ts
+@@ -60,7 +60,7 @@
+   typeof value === 'string' && value.trim().length >= min && value.length <= max;
+ const exact = (value: unknown, keys: string) => object(value) && Object.keys(value).sort().join(',') === keys;
+ const selector = (value: unknown): value is string => typeof value === 'string' && /^#[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(value);
+-const fail = (suffix: string): never => { throw new Error(`FORMAL_INTERACTION_${suffix}`); };
++const fail = (suffix: string, detail?: string): never => { throw new Error(`FORMAL_INTERACTION_${suffix}${detail ? `: ${detail}` : ''}`); };
+ const START = '\nMIRA_INTERACTION_DESIGN_CONTEXT:\n';
+ const END = '\nEND_MIRA_INTERACTION_DESIGN_CONTEXT\n';
+ 
+@@ -153,9 +153,11 @@
+         !exact(feedback, 'reasonQuote,sceneId,selector,textIncludes') || !object(feedback) || feedback.sceneId !== op.sceneId ||
+         !selector(feedback.selector) || feedback.selector === op.controlSelector || !text(feedback.textIncludes, 3) || !text(feedback.reasonQuote, 3) ||
+         !exact(judge, 'questionId,sceneId') || !object(judge) || !text(judge.sceneId, 1, 128) ||
+-        !text(judge.questionId, 1, 128) || !input.interactionDesign.independentQuestionIds.includes(judge.questionId)) return fail('OBJECTIVE_MAPPING_INVALID');
++        !text(judge.questionId, 1, 128) || !input.interactionDesign.independentQuestionIds.includes(judge.questionId)) return fail('OBJECTIVE_MAPPING_INVALID', `objectiveIndex=${item.objectiveIndex}: invalid demonstration, operation, feedback or independentJudgment mapping`);
+     const d = byId.get(demo.sceneId), o = byId.get(op.sceneId), j = byId.get(judge.sceneId);
+-    if (!d || !o || !j || d.index > o.index || j.index <= o.index || o.scene.type !== 'interactive' ||
++    if (d && o && d.index > o.index)
++      return fail('TEACHING_CHAIN_INVALID', `objectiveIndex=${item.objectiveIndex} demonstration.sceneId=${JSON.stringify(demo.sceneId)} (sortedIndex=${d.index}, order=${d.scene.order}) must be at or before operation.sceneId=${JSON.stringify(op.sceneId)} (sortedIndex=${o.index}, order=${o.scene.order})`);
++    if (!d || !o || !j || j.index <= o.index || o.scene.type !== 'interactive' ||
+         !d.scene.actions?.some(action => action.type === 'speech' && action.text.includes(demo.quote as string)) ||
+         j.scene.content.type !== 'quiz' || !j.scene.content.questions.some(question => question.id === judge.questionId))
+       return fail('TEACHING_CHAIN_INVALID');
+diff --git a/tests/server/mira-formal-exploration.test.ts b/tests/server/mira-formal-exploration.test.ts
+--- a/tests/server/mira-formal-exploration.test.ts
++++ b/tests/server/mira-formal-exploration.test.ts
+@@ -18,6 +18,38 @@
+       numeric:{numerator:n,denominator:d,decimal:n/d,percent:n/d*100,diagramRatio:n/d}}))};
+ }
+ describe('multistate independent mechanism authority',()=>{
++  it('names the missing numeric state fields without accepting an incomplete model',()=>{
++    const value:any=model();
++    delete value.states[0].numerator;
++    delete value.states[0].denominator;
++    expect(()=>validateExploration(value,'fraction_ratio_percentage')).toThrow(
++      'FORMAL_EXPLORATION_CONTRACT_INVALID: exploration.states[0]: missing required fields: numerator, denominator');
++  });
++  it.each([
++    ['schema', (v:any)=>v.schemaVersion='other', /exploration\.schemaVersion/],
++    ['unknown root field', (v:any)=>v.extra=true, /exploration: unexpected fields: extra/],
++    ['selector', (v:any)=>v.diagramSelector='body', /exploration\.diagramSelector/],
++    ['same diagram and feedback', (v:any)=>v.feedbackSelector=v.diagramSelector, /exploration\.feedbackSelector.*differ/],
++    ['state count', (v:any)=>v.states.pop(), /exploration\.states.*3 to 5/],
++    ['mechanism', (v:any)=>delete v.mechanism.partSelector, /exploration\.mechanism.*partSelector/],
++    ['state id', (v:any)=>v.states[1].id=v.states[0].id, /exploration\.states\[1\]\.id.*duplicate/],
++    ['explanation', (v:any)=>v.states[0].explanationText='', /exploration\.states\[0\]\.explanationText/],
++    ['operations', (v:any)=>v.states[0].operations=[], /exploration\.states\[0\]\.operations/],
++    ['operation object', (v:any)=>v.states[0].operations=[null], /exploration\.states\[0\]\.operations\[0\].*object/],
++    ['fill value', (v:any)=>v.states[0].operations=[{selector:'#n',action:'fill'}], /exploration\.states\[0\]\.operations\[0\].*value/],
++    ['click value forbidden', (v:any)=>v.states[0].operations[0].value='1', /exploration\.states\[0\]\.operations\[0\].*unexpected fields: value/],
++    ['numeric string', (v:any)=>v.states[0].numerator='1', /exploration\.states\[0\]\.numerator.*positive integer/],
++    ['zero numerator', (v:any)=>v.states[0].numerator=0, /exploration\.states\[0\]\.numerator/],
++    ['denominator bound', (v:any)=>v.states[0].denominator=1001, /exploration\.states\[0\]\.denominator/],
++    ['invalid ratio', (v:any)=>v.states[0].numerator=5, /exploration\.states\[0\]\.numerator.*exceed denominator/],
++    ['equivalent ratio', (v:any)=>{v.states[1].numerator=2;v.states[1].denominator=8;}, /exploration\.states\[\*\]\.numerator\/denominator.*distinct ratio/],
++    ['same output', (v:any)=>v.states[1].resultText=v.states[0].resultText, /exploration\.states\[\*\]\.resultText/],
++    ['unknown reset', (v:any)=>v.reset.stateId='missing', /exploration\.reset\.stateId/],
++  ])('keeps %s invalid and supplies a repair location',(_name,mutate,diagnostic)=>{
++    const value:any=model(); mutate(value);
++    expect(()=>validateExploration(value,'fraction_ratio_percentage')).toThrow('FORMAL_EXPLORATION_CONTRACT_INVALID');
++    expect(()=>validateExploration(value,'fraction_ratio_percentage')).toThrow(diagnostic);
++  });
+   it('requires distinct meaningful ratios and forbids semantic downgrade of the quantitative skill',()=>{
+     validateExploration(model(),'fraction_ratio_percentage');
+     const same=model(); same.states[2]={...same.states[2],numerator:2,denominator:8};
+diff --git a/tests/server/mira-formal-interaction-design.test.ts b/tests/server/mira-formal-interaction-design.test.ts
+--- a/tests/server/mira-formal-interaction-design.test.ts
++++ b/tests/server/mira-formal-interaction-design.test.ts
+@@ -101,6 +101,17 @@
+       plan.objectives[0].demonstration.quote = '没有实际讲过的示范';
+     }))).toThrow('TEACHING_CHAIN_INVALID');
+   });
++  it('identifies the objective and scene positions when demonstration follows operation', () => {
++    const value=fixture();
++    value.scenes[0].order=1;
++    value.scenes[1].order=0;
++    expect(()=>readInteractionDesignPlan(value)).toThrow(
++      'FORMAL_INTERACTION_TEACHING_CHAIN_INVALID: objectiveIndex=0 demonstration.sceneId="demo" (sortedIndex=1, order=1) must be at or before operation.sceneId="operate" (sortedIndex=0, order=0)');
++  });
++  it('keeps an invalid mapping rejected and identifies its objective', () => {
++    const value=withPlan(fixture(),plan=>{plan.objectives[0].feedback.sceneId='demo';});
++    expect(()=>readInteractionDesignPlan(value)).toThrow('FORMAL_INTERACTION_OBJECTIVE_MAPPING_INVALID: objectiveIndex=0');
++  });
+   it('binds two actual objective probes to the final snapshot and the independent QA receipt', () => {
+     const value = evidence(), receipt = buildInteractionDesignReceipt(value);
+     expect(receipt.objectives[0].checks.map(check => check.probeId)).toEqual(['objective-0', 'objective-0']);

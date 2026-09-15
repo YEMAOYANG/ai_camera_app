@@ -21,7 +21,14 @@ def main():
         raise ValueError('preflight authority invalid')
     band = policy.get('difficultyCode')
     expected = objective_question_policy(data['gradeCode'], data['subject'], data['skillId'], band)
-    if policy != expected:
+    # The adapter sends JSON through Node before returning here. Registered
+    # inventories can contain Python tuples (for example English verb forms),
+    # which become JSON arrays. Compare the exact JSON authority so that this
+    # lossless transport cannot be mistaken for drift. Canonical JSON still
+    # distinguishes booleans from numbers and rejects any changed field.
+    canonical = lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True,
+                                          separators=(',', ':'), allow_nan=False)
+    if canonical(policy) != canonical(expected):
         raise ValueError('preflight objective authority mismatch')
     questions = data['questions']
     if not isinstance(questions, list) or len(questions) != 5:

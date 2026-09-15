@@ -1,0 +1,179 @@
+/* Shared controls: precise edges and brief feedback, with no idle animation. */
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button {
+  position: relative;
+  flex-shrink: 0;
+  gap: 9px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  padding-inline: 19px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: .01em;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, transform 140ms ease;
+}
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="primary"] {
+  background: var(--mira-brand-deep);
+  color: var(--mira-on-brand);
+  border-color: #e9ffb569;
+  box-shadow: inset 0 1px 0 #ffffff35, 0 3px 10px #0000001c;
+}
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="secondary"] {
+  color: #e2eaf5;
+  border-color: #b7d0ee2b;
+  background: #142236b8;
+  box-shadow: inset 0 1px 0 #ffffff05, 0 2px 5px #0000000f;
+}
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="quiet"] {
+  color: #acbed4;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-size="compact"] { min-height: 40px; height: 40px; padding-inline: 15px; border-radius: 11px; font-size: 14px; }
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-size="icon"] { width: 44px; min-width: 44px; height: 44px; padding: 0; border-radius: 12px; }
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button > svg { flex: none; width: 18px; height: 18px; stroke-width: 1.8; }
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button:active:not(:disabled):not([aria-disabled="true"]) { transform: translateY(1px); box-shadow: inset 0 1px 3px #00000019; }
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button:focus-visible { outline: 2px solid #a8ddff; outline-offset: 3px; }
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button:is(:disabled, [aria-disabled="true"]) {
+  color: #72859c;
+  background: #142133;
+  border-color: #9fb6d111;
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+/* Keep the approved home launch control prominent without enlarging other actions. */
+.space-shell .mira-button.space-hero-action { min-height: 52px; height: auto; border-radius: 999px; font-size: 19px; padding-inline: 26px; gap: 12px; }
+.space-shell .mira-button.space-hero-action > svg { width: 24px; height: 24px; }
+
+.space-shell .space-filter-tabs.space-segmented {
+  display: flex;
+  flex-wrap: nowrap;
+  min-width: 0;
+  width: fit-content;
+  max-width: 100%;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #a5c2e319;
+  border-radius: 14px;
+  background: #091525a8;
+  box-shadow: inset 0 1px 3px #00000026;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.space-shell .space-filter-tabs.space-segmented::-webkit-scrollbar { display: none; }
+.space-shell .space-filter-tabs.space-segmented .space-segment {
+  position: relative;
+  isolation: isolate;
+  flex: 1 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 14px;
+  margin: 0;
+  border: 0;
+  border-radius: 10px;
+  color: #93a7c0;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 550;
+  white-space: nowrap;
+  text-shadow: none;
+  box-shadow: none;
+  overflow: visible;
+  transition: color 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.space-shell .space-segment-label { position: relative; z-index: 1; }
+.space-shell .space-segment-indicator {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border: 1px solid #afd0ed2c;
+  border-radius: 10px;
+  background: #20334b;
+  box-shadow: inset 0 1px 0 #d4e9ff0c, 0 2px 5px #0000001c;
+  pointer-events: none;
+}
+.space-shell .space-filter-tabs.space-segmented .space-segment.is-active { color: #edf5ff; font-weight: 600; border: 0; text-shadow: none; }
+.space-shell .space-filter-tabs.space-segmented .space-segment:active { color: #fff; }
+.space-shell .space-filter-tabs.space-segmented .space-segment:focus-visible { outline: 2px solid #a8ddff; outline-offset: -2px; }
+.space-shell .space-filter-tabs.space-segmented button::after { content: none; animation: none; }
+
+.space-shell .space-subject-tabs.space-subject-chips { gap: 5px; align-items: center; }
+.space-shell .space-subject-tabs.space-subject-chips button {
+  --subject-chip-color: #b5cce4;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #8fa5bf;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: none;
+  text-shadow: none;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.space-shell .space-subject-chips button[data-subject="chinese"] { --subject-chip-color: #ebc39b; }
+.space-shell .space-subject-chips button[data-subject="math"] { --subject-chip-color: #86d5f0; }
+.space-shell .space-subject-chips button[data-subject="english"] { --subject-chip-color: #a3e4ca; }
+.space-shell .space-subject-chip-dot { display: block; flex: none; width: 5px; height: 5px; border-radius: 50%; background: var(--subject-chip-color); opacity: .6; }
+.space-shell .space-subject-tabs.space-subject-chips button.is-active { color: #e1edf9; background: #14253a; border-color: #a4c4df23; box-shadow: inset 0 1px 0 #ffffff04; font-weight: 600; }
+.space-shell .space-subject-tabs.space-subject-chips button.is-active .space-subject-chip-dot { opacity: 1; }
+.space-shell .space-subject-tabs.space-subject-chips button:focus-visible { outline: 2px solid #a8ddff; outline-offset: 2px; }
+.space-shell .space-subject-tabs.space-subject-chips button::after { content: none; animation: none; }
+
+.space-shell.space-grade-lower .mira-button,
+.space-grade-lower .space-filter-tabs.space-segmented .space-segment,
+.space-grade-lower .space-subject-tabs.space-subject-chips button { min-height: 48px; }
+.space-grade-lower .mira-button[data-size="icon"] { width: 48px; height: 48px; }
+.space-grade-lower .space-filter-tabs.space-segmented .space-segment,
+.space-grade-lower .space-subject-tabs.space-subject-chips button { font-size: 15px; }
+@media (hover: hover) and (pointer: fine) {
+  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="primary"]:hover:not(:disabled):not([aria-disabled="true"]) { background: #e5ff9c; border-color: #efffc580; box-shadow: inset 0 1px 0 #ffffff4a, 0 4px 14px #c4ed701a; }
+  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="secondary"]:hover:not(:disabled):not([aria-disabled="true"]) { background: #1b2d45; border-color: #b9d4f14c; color: #f3f8ff; }
+  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="quiet"]:hover:not(:disabled):not([aria-disabled="true"]) { background: #bdd5ee0b; color: #e3edf8; }
+  .space-shell .space-filter-tabs.space-segmented .space-segment:hover:not(.is-active) { color: #ccdaec; }
+  .space-shell .space-subject-tabs.space-subject-chips button:hover:not(.is-active) { color: #cadbeb; background: #a4c7e908; }
+}
+@media (max-width: 700px) {
+  .space-shell .space-filter-tabs.space-segmented { width: 100%; }
+  .space-shell .space-filter-tabs.space-segmented .space-segment { min-height: 44px; padding-inline: 5px; }
+  .space-grade-lower .space-filter-tabs.space-segmented .space-segment { min-height: 48px; }
+  .space-shell .space-subject-tabs.space-subject-chips { flex-wrap: wrap; }
+  .space-auth .mira-button { min-height: 48px; }
+}
+@media (max-width: 374px) {
+  .space-shell .space-filter-tabs.space-segmented { flex-wrap: wrap; }
+  .space-shell .space-filter-tabs.space-segmented .space-segment { flex-basis: calc(33.333% - 2px); }
+}
+@media (max-width: 420px) {
+  .space-grade-lower .space-filter-tabs.space-segmented { flex-wrap: wrap; }
+  .space-grade-lower .space-filter-tabs.space-segmented .space-segment { flex-basis: calc(33.333% - 2px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button,
+  .space-shell .space-filter-tabs.space-segmented .space-segment,
+  .space-shell .space-subject-tabs.space-subject-chips button { transition: none; }
+  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
+}
+
+/* Legacy lesson pages have no grade marker; preserve their larger study controls. */
+.space-lesson .mira-button,
+.classroom-page.classroom-grade-lower button,
+.classroom-page.classroom-grade-lower .mira-button { min-height: 48px; min-width: 48px; }
+:is(.space-lesson, .classroom-grade-lower) .mira-button[data-size="icon"] { width: 48px; height: 48px; }

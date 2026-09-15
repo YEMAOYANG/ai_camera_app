@@ -120,25 +120,25 @@ export function QrPairing({ paused = false }: { paused?: boolean }) {
   }, [reducedMotion, router, status]);
 
   return (
-    <div className="mt-6" aria-live="polite">
+    <div className="space-qr mt-6" data-qr-state={status} aria-live="polite">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-[15px] font-extrabold text-[var(--mira-ink)]">
+        <div className="flex items-center gap-2 text-lg font-extrabold text-[var(--mira-ink)]">
           <ScanLine className="size-5 text-[var(--mira-brand-deep)]" aria-hidden="true" />
           家长扫码确认
         </div>
         {status === "waiting" ? (
-          <span className="flex min-h-12 items-center gap-1.5 rounded-full px-3 text-sm font-bold text-[var(--mira-muted)]">
+          <span className="flex min-h-[52px] items-center gap-1.5 rounded-full px-3 text-lg font-bold text-[var(--mira-muted)]">
             <Clock3 className="size-4" aria-hidden="true" />
             {formatCountdown(remainingSeconds)}
           </span>
         ) : null}
       </div>
 
-      <div className="mt-3 grid min-h-[300px] place-items-center rounded-[26px] border-2 border-[var(--mira-border-soft)] bg-[var(--mira-bg-warm)] p-5 sm:min-h-[318px]">
+      <div className="mt-3 grid min-h-[300px] place-items-center rounded-[26px] border border-[var(--mira-border-soft)] bg-[var(--mira-bg)] p-5 sm:min-h-[318px]">
         {status === "starting" ? <QrStarting /> : null}
         {status === "waiting" && challenge ? (
           <div className="text-center">
-            <div className="mx-auto w-fit rounded-[30px] border-2 border-[var(--mira-brand-wash)] bg-white p-3 shadow-[0_16px_40px_rgba(33,54,89,.10)]">
+            <div className="mx-auto w-fit space-qr-code">
               <QRCodeSVG
                 value={challenge.qrValue}
                 size={220}
@@ -150,19 +150,19 @@ export function QrPairing({ paused = false }: { paused?: boolean }) {
                 className="h-auto w-[220px] max-w-full"
               />
             </div>
-            <p className="mt-5 flex items-center justify-center gap-2 text-[16px] font-black text-[var(--mira-ink)]">
+            <p className="mt-5 flex items-center justify-center gap-2 text-lg font-black text-[var(--mira-ink)]">
               <Smartphone className="size-5 text-[var(--mira-brand-deep)]" aria-hidden="true" />
               请家长用 Mira App 扫一扫
             </p>
             <div className="mx-auto mt-4 max-w-[290px] border-t border-[var(--mira-border-soft)] pt-4">
-              <p className="text-xs font-extrabold tracking-[.12em] text-[var(--mira-muted)]">4 位核对码</p>
+              <p className="text-lg font-extrabold tracking-[.12em] text-[var(--mira-muted)]">4 位核对码</p>
               <strong
                 className="mt-1 block text-[34px] font-black tracking-[.28em] text-[var(--mira-brand-deep)]"
                 aria-label={`核对码 ${challenge.displayCode}`}
               >
                 {challenge.displayCode}
               </strong>
-              <p className="mt-1 text-sm leading-6 text-[var(--mira-muted)]">请家长确认 App 里也是这 4 位数字，再同意登录。</p>
+              <p className="mt-1 text-lg leading-6 text-[var(--mira-muted)]">请家长确认 App 里也是这 4 位数字，再同意登录。</p>
             </div>
           </div>
         ) : null}
@@ -197,7 +197,7 @@ function QrStarting() {
     <div className="text-center" role="status">
       <LoaderCircle className="mx-auto size-11 animate-spin text-[var(--mira-brand-deep)] motion-reduce:animate-none" aria-hidden="true" />
       <p className="mt-4 text-lg font-black">正在准备二维码</p>
-      <p className="mt-1 text-sm text-[var(--mira-muted)]">马上就好</p>
+      <p className="mt-1 text-lg text-[var(--mira-muted)]">马上就好</p>
     </div>
   );
 }
@@ -215,7 +215,7 @@ function QrRecovery({
 }) {
   return (
     <div className="max-w-[310px] text-center" role={error ? "alert" : "status"}>
-      <span className={`mx-auto grid size-16 place-items-center rounded-full ${error ? "bg-[#fff1ee] text-[var(--mira-danger)]" : "bg-[var(--mira-sun-soft)] text-[var(--mira-warning)]"}`}>
+      <span className={`mx-auto grid size-16 place-items-center rounded-full ${error ? "bg-[var(--mira-surface)] text-[var(--mira-danger)]" : "bg-[var(--mira-sun-soft)] text-[var(--mira-warning)]"}`}>
         <TriangleAlert className="size-8" aria-hidden="true" />
       </span>
       <h3 className="mt-4 text-2xl font-black">{title}</h3>

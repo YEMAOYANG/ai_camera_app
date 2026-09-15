@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import re
 import sqlite3
 import unittest
 
@@ -9,7 +10,7 @@ from repositories.learning_repository import (
     _student_required_package_assets_sql,
     _student_visible_course_sql,
 )
-from repositories.formal_student_runtime_gate import current_formal_runtime_sql
+from repositories.formal_student_runtime_gate import current_formal_runtime_sql, with_parsed_runtime_manifests
 from repositories.lesson_package_repository import LessonPackageRepository
 from repositories.openmaic_runtime_repository import OpenMaicRuntimeRepository
 from repositories.student_learning_library_repository import (
@@ -21,6 +22,33 @@ from services.formal_student_learning_access import (
 
 
 class FormalStudentCatalogVisibilityContractTest(unittest.TestCase):
+    def test_parsed_manifest_read_preserves_all_visibility_predicates_and_bound_scope(self):
+        # The optimization must change only the manifest representation, never
+        # the gates deciding whether a child may see or launch a classroom.
+        for gate in (_student_visible_course_sql(),
+                     _classroom_availability_sql(require_full_runtime=False),
+                     _classroom_availability_sql(require_full_runtime=True)):
+            query = 'SELECT course.id FROM learning_courses AS course WHERE ' + gate
+            parsed = with_parsed_runtime_manifests(query)
+            body = parsed.split(') SELECT course.id', 1)[1]
+            restored = 'SELECT course.id' + body.replace(
+                'student_runtime_manifests AS ', 'learning_openmaic_runtime_classrooms AS ')
+            self.assertEqual(' '.join(restored.split()), ' '.join(query.split()))
+            self.assertEqual(parsed.count('?'), query.count('?'))
+            self.assertIn('CAST(IF(JSON_VALID(feature_manifest_json), feature_manifest_json, NULL) AS JSON)', parsed)
+            self.assertIn('LIMIT 18446744073709551615', parsed)
+            self.assertIn('WHERE retired_at IS NULL', parsed)
+            aliases = re.findall(r'learning_openmaic_runtime_classrooms\s+AS\s+(\w+)', query)
+            for alias in aliases:
+                self.assertIn(f'{alias}.retired_at IS NULL', query)
+
+    def test_parsed_manifest_read_cannot_wrap_mutations_or_non_runtime_queries(self):
+        for query in ('DELETE FROM learning_openmaic_runtime_classrooms AS runtime',
+                      'UPDATE learning_openmaic_runtime_classrooms AS runtime SET status = ? ',
+                      'SELECT course.id FROM learning_courses AS course'):
+            with self.subTest(query=query), self.assertRaises(ValueError):
+                with_parsed_runtime_manifests(query)
+
     def test_current_runtime_gate_requires_openmaic_one_professional_search_receipts(self):
         sql = " ".join(
             current_formal_runtime_sql(runtime_alias="runtime").lower().split()

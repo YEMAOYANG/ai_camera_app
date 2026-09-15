@@ -53,6 +53,16 @@ def start_session():
         return error_response(exc)
 
 
+@student_learning_bp.post("/courses/<course_id>/versions/<course_version>/start")
+def start_course(course_id: str, course_version: str):
+    try:
+        return jsonify(student_learning_service().start_course(
+            bearer_token(request), course_id, course_version,
+        ))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @student_learning_bp.post("/sessions/<session_id>/answer")
 def answer(session_id: str):
     try:

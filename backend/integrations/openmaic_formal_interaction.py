@@ -143,7 +143,7 @@ def _bound_interaction(professional: Mapping[str, Any], generation: Mapping[str,
     if quality_sha(selected) not in {quality_sha(INTERACTION_DESIGN_POLICY), quality_sha(MULTISTATE_INTERACTION_POLICY)}:
         raise ValueError("unsupported interaction design policy")
     receipt = interaction_design_receipt(professional.get("interactionDesign"))
-    quality = teaching_quality_receipt(professional.get("teachingQuality"))
+    quality = teaching_quality_receipt(professional.get("teachingQuality"), generation_contract=generation)
     if receipt["policyId"] != selected["policyId"]:
         raise ValueError("interaction policy and receipt version mismatch")
     if receipt["schemaVersion"].endswith(".v2"):

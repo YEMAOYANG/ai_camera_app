@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import hashlib
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -17,10 +18,92 @@ KIND = 'mira.single-course.content-recovery.v1'
 EVENT = 'single_course_content_recovery'
 BILLED_EVENT = 'single_course_billed_reply_recovery'
 BILLED_KIND = 'mira.single-course.billed-reply-recovery.v1'
+BILLED_PLAYFUL_KIND = 'mira.single-course.playful-first-billed-reply-recovery.v1'
 ARCHIVE_ROOT = Path(__file__).resolve().parents[1] / 'data/learning-provider-replies'
 PHASES = (('outline', 1, 'succeeded'), ('raw_candidate', 2, 'succeeded'),
           ('candidate_repair', 3, 'succeeded'), ('lesson_text', 5, 'succeeded'),
           ('reconciliation', 6, 'succeeded'), ('independent_verification', 11, 'failed_safe'))
+
+
+def playful_billed_attempt_one_evidence(*, item, histories):
+    """Accept only four returned first-attempt calls, never an ambiguous retry."""
+    from services.learning_provider_deadline_contract import provider_attempt_deadline_is_valid
+    current = histories.get(1) or {}
+    dispatches = current.get('dispatches')
+    expected = [('outline', 1, 'succeeded'), ('raw_candidate', 2, 'succeeded'),
+                ('candidate_repair', 3, 'succeeded'), ('candidate_repair_retry', 4, 'failed_safe')]
+    if (item.get('grade_code') not in {f'primary_{n}' for n in range(2, 7)}
+            or item.get('attempt_count') != 1 or item.get('variant_ordinal') != 1
+            or item.get('status') != 'failed' or item.get('content_phase') != 'failed'
+            or item.get('content_claim_attempt_ordinal') != 1
+            or item.get('content_gate_status') != 'not_started' or item.get('content_gate_attempt_count') != 0
+            or item.get('error_code') != 'preparation_content_validation_failed'
+            or not item.get('generation_request_id')
+            or item.get('active_generation_request_id') != item['generation_request_id']
+            or any(item.get(key) is not None for key in ('course_id', 'course_version', 'content_lease_token'))
+            or any(current.get(key) for key in ('jobs', 'candidates', 'courses', 'recoveryReceipt'))
+            or any((histories.get(2) or {}).get(key) for key in ('dispatches', 'jobs', 'candidates', 'courses'))
+            or not isinstance(dispatches, list) or len(dispatches) != 4):
+        raise ValueError('playful billed replay requires an untouched first-attempt four-call failure')
+    frozen_deadline = dispatches[0].get('attempt_hard_deadline_at')
+    # Failure clears the active item deadline; only the unchanged four durable
+    # dispatch rows may restore it. The original start is never reset.
+    if item.get('content_provider_attempt_hard_deadline_at') not in (None, frozen_deadline):
+        raise ValueError('playful billed replay active deadline changed')
+    for row, phase in zip(dispatches, expected):
+        if (row.get('build_item_id') != item['id'] or row.get('logical_attempt') != 1
+                or row.get('generation_request_id') != item['generation_request_id']
+                or (row.get('phase'), row.get('phase_ordinal'), row.get('status')) != phase
+                or row.get('completed_at') is None or row.get('billing_evidence') != 'reported'
+                or re.fullmatch(r'[0-9a-f]{64}', str(row.get('provider_request_id_hash') or '')) is None
+                or any(type(row.get(key)) is not int or row[key] < 0 for key in ('input_tokens', 'output_tokens'))
+                or re.fullmatch(r'[0-9a-f]{64}', str(row.get('input_sha256') or '')) is None
+                or re.fullmatch(r'[0-9a-f]{64}', str(row.get('profile') or '')) is None
+                or row.get('attempt_started_at') != item.get('content_attempt_started_at')
+                or row.get('attempt_hard_deadline_at') != frozen_deadline
+                or not provider_attempt_deadline_is_valid(row.get('attempt_started_at'), row.get('attempt_hard_deadline_at'))):
+            raise ValueError('playful billed replay history identity or returned billing evidence changed')
+        if phase[2] == 'succeeded':
+            if digest(json.loads(row['checkpoint_json'])) != row.get('output_sha256'):
+                raise ValueError('playful billed replay predecessor checkpoint hash changed')
+    failed = dispatches[-1]
+    repair = json.loads(dispatches[2]['checkpoint_json'])
+    if (failed.get('safe_error_code') != 'question_phase_output_rejected'
+            or failed.get('checkpoint_json') is not None or failed.get('output_sha256') is not None
+            or repair not in ({'phaseStatus': 'rejected', 'rejectionCode': 'candidate_repair_schema_rejected'},
+                              {'phaseStatus': 'rejected', 'rejectionCode': 'candidate_repair_originality_rejected'})):
+        raise ValueError('playful billed replay is not the reviewed repair-output failure')
+    return dispatches
+
+
+def require_playful_billed_recovery_authority(conn, *, build, item, histories, now, identity=None):
+    """Frozen new-policy, one-slot authority; this function performs reads only."""
+    from integrations.openmaic_formal_media import PLAYFUL_PROFESSIONAL_POLICY
+    target = json.loads(build['target_spec_json'])
+    if canonical((target.get('formalRuntimePolicy') or {}).get('professionalCreationPolicy')) != canonical(PLAYFUL_PROFESSIONAL_POLICY):
+        raise ValueError('first-attempt billed replay is restricted to the exact new playful policy')
+    dispatches = playful_billed_attempt_one_evidence(item=item, histories=histories)
+    if now >= dispatches[-1]['attempt_hard_deadline_at']:
+        raise ValueError('original attempt deadline expired; recovery cannot renew it')
+    fingerprint = digest(target)
+    if identity is not None:
+        from content.single_course_budget import single_slot_identity
+        expected_identity = single_slot_identity(item['grade_code'], item['subject'], item['skill_id'], 1)
+        if identity != expected_identity or identity['targetFingerprint'] != fingerprint or identity['buildId'] != build['id']:
+            raise ValueError('playful billed replay single-course identity changed')
+    requested = list(conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
+        'WHERE target_fingerprint=? AND enabled=TRUE', (fingerprint,)).fetchall())
+    if requested != [{'subject': item['subject'], 'skill_id': item['skill_id'], 'variant_ordinal': 1}]:
+        raise ValueError('playful billed replay requires one unchanged enabled supply slot')
+    all_calls = list(conn.execute('SELECT id FROM learning_course_provider_dispatches WHERE build_item_id=? '
+        'ORDER BY logical_attempt,phase_ordinal,id FOR UPDATE', (item['id'],)).fetchall())
+    if [row['id'] for row in all_calls] != [row['id'] for row in dispatches]:
+        raise ValueError('playful billed replay has additional Provider dispatches')
+    runtime = conn.execute('SELECT id FROM learning_openmaic_runtime_classrooms WHERE candidate_build_item_id=? FOR UPDATE', (item['id'],)).fetchall()
+    receipts = conn.execute('SELECT build_item_id FROM learning_curriculum_classroom_item_receipts WHERE build_item_id=? FOR UPDATE', (item['id'],)).fetchall()
+    if runtime or receipts:
+        raise ValueError('playful billed replay cannot replace an existing runtime or classroom receipt')
+    return fingerprint
 
 
 def _original_history(item, dispatches):
@@ -57,10 +140,15 @@ def candidate_less_evidence(*, item, histories):
     if not isinstance(receipt, dict):
         return None
     try:
+        from services.learning_content_preflight_recovery import KIND as PREFLIGHT_KIND, preflight_receipt
+        is_preflight = receipt.get('recoveryKindId') == PREFLIGHT_KIND
+        expected_receipt = (preflight_receipt(item, history.get('dispatches'),
+            approval_reference=receipt['approvalReferenceId'], source_audit_sha=receipt.get('sourceAuditShaId'))
+            if is_preflight else recovery_receipt(item, history.get('dispatches'), approval_reference=receipt['approvalReferenceId']))
         if (int(item.get('attempt_count') or 0) != 2
                 or item.get('active_generation_request_id') != item['generation_request_id'] + '.attempt2'
                 or any(history.get(key) for key in ('jobs', 'candidates', 'courses'))
-                or receipt != recovery_receipt(item, history.get('dispatches'), approval_reference=receipt['approvalReferenceId'])):
+                or receipt != expected_receipt):
             return None
         current = (histories.get(2) or {}).get('dispatches') or []
         if len(current) + len(history['dispatches']) > receipt['maximumDispatchCount']:
@@ -73,8 +161,15 @@ def candidate_less_evidence(*, item, histories):
                     or outline.get('input_tokens') is not None or outline.get('output_tokens') is not None
                     or outline.get('billing_evidence') != 'unknown'):
                 return None
+        if is_preflight and len(current) > 1:
+            raw = current[1]
+            if (raw.get('phase') != 'raw_candidate' or raw.get('status') != 'succeeded'
+                    or raw.get('output_sha256') != receipt['sourceRawCandidateShaId']
+                    or any(raw.get(key) is not None for key in ('provider_request_id_hash', 'input_tokens', 'output_tokens'))
+                    or raw.get('billing_evidence') != 'unknown'):
+                return None
         return {'item': dict(item), 'dispatches': history['dispatches'],
-                'recoveryKind': KIND, 'recoveryReceipt': receipt}
+                'recoveryKind': receipt['recoveryKindId'], 'recoveryReceipt': receipt}
     except (KeyError, TypeError, ValueError):
         return None
 
@@ -108,9 +203,11 @@ def require_billed_recovery_audit(conn, *, build_id, item, histories, audit_sha2
     """A Host-only replay must retain its complete former failed row first."""
     path = ARCHIVE_ROOT / ('recovery-' + audit_sha256 + '.json')
     audit = json.loads(path.read_text())
-    if (digest(audit) != audit_sha256 or audit.get('schemaVersion') != BILLED_KIND
+    first = item.get('attempt_count') == 1
+    attempt = 1 if first else 2
+    if (digest(audit) != audit_sha256 or audit.get('schemaVersion') != (BILLED_PLAYFUL_KIND if first else BILLED_KIND)
             or audit.get('buildId') != build_id or audit.get('buildItemId') != item['id']
-            or audit.get('originalAttemptDispatches') != histories[2]['dispatches']
+            or audit.get('originalAttemptDispatches') != histories[attempt]['dispatches']
             or audit.get('checkpoint') != checkpoint):
         raise ValueError('billed reply recovery audit does not match the locked original history')
     event = conn.execute('SELECT event.payload_json FROM learning_curriculum_preparation_events event '
@@ -120,24 +217,38 @@ def require_billed_recovery_audit(conn, *, build_id, item, histories, audit_sha2
         (build_id, BILLED_EVENT, audit_sha256)).fetchall()
     if len(event) != 1 or json.loads(event[0]['payload_json']).get('buildItemId') != item['id']:
         raise ValueError('billed reply recovery has no exact immutable preparation event')
+    if first:
+        failed = histories[1]['dispatches'][-1]
+        expected_event = {'recoveryKindId': BILLED_PLAYFUL_KIND, 'buildItemId': item['id'],
+            'auditShaId': audit_sha256, 'sourceDispatchId': failed['id'],
+            'originalHistoryShaId': digest(histories[1]['dispatches']),
+            'sourceArchiveShaId': digest(audit.get('sourceArchive')), 'checkpointShaId': digest(checkpoint)}
+        if (audit.get('logicalAttempt') != 1 or audit.get('originalItem') != dict(item)
+                or audit.get('checkpointSha256') != digest(checkpoint)
+                or audit.get('sourceArchiveSha256') != digest(audit.get('sourceArchive'))
+                or json.loads(event[0]['payload_json']) != expected_event):
+            raise ValueError('first-attempt billed recovery original row or immutable event changed')
 
 
-def replay_billed_reply(*, catalog, item, histories, archive):
+def replay_billed_reply(*, catalog, item, histories, archive, historical_fingerprints=None):
     """Recompile the actual saved response locally; never execute a Provider."""
     from integrations.openmaic_question_adapter import _normalize_phase_output_checkpoint
     from services.learning_formal_question_preflight import validate_formal_phase_question_checkpoint
-    current = histories[2]['dispatches']
-    if (len(current) != 4 or candidate_less_evidence(item=item, histories=histories) is None
+    first = item.get('attempt_count') == 1
+    current = playful_billed_attempt_one_evidence(item=item, histories=histories) if first else histories[2]['dispatches']
+    if (not first and (len(current) != 4 or candidate_less_evidence(item=item, histories=histories) is None
             or [(d['phase'], d['status']) for d in current] != [
                 ('outline','succeeded'),('raw_candidate','succeeded'),
-                ('candidate_repair','succeeded'),('candidate_repair_retry','failed_safe')]):
+                ('candidate_repair','succeeded'),('candidate_repair_retry','failed_safe')])):
         raise ValueError('billed reply recovery requires the exact failed attempt-two phase-four history')
     failed = current[-1]
     rebuilt = {**item, 'status':'processing', 'content_phase':'candidate_repair_retry',
         'content_attempt_started_at':failed['attempt_started_at'],
         'content_provider_attempt_hard_deadline_at':failed['attempt_hard_deadline_at']}
-    plan = {'priorEvidence':[], 'historicalQuestionFingerprints':[],
-            'attemptOneEvidence':candidate_less_evidence(item=item,histories=histories)}
+    if first and not isinstance(historical_fingerprints, list):
+        raise ValueError('first-attempt replay requires its frozen historical question inventory')
+    plan = {'priorEvidence':[], 'historicalQuestionFingerprints':historical_fingerprints if first else [],
+            'attemptOneEvidence':None if first else candidate_less_evidence(item=item,histories=histories)}
     command, _ = catalog._content_phase_command(item=rebuilt,dispatches=current[:-1],plan=plan)
     prepared = catalog._content_provider_preflight(command)
     if prepared.input_sha256 != failed['input_sha256'] or prepared.profile_sha256 != failed['profile']:
@@ -149,6 +260,8 @@ def replay_billed_reply(*, catalog, item, histories, archive):
             or archive.get('phase') != 'candidate_repair_retry' or archive.get('phaseOrdinal') != 4
             or archive.get('gradeCode') != item['grade_code'] or archive.get('subject') != item['subject']
             or archive.get('skillId') != item['skill_id'] or archive.get('receipt') != expected_receipt
+            or (first and (archive.get('inputSha256') != prepared.input_sha256
+                           or archive.get('providerProfileSha256') != prepared.profile_sha256))
             or hashlib.sha256(archive['content'].encode()).hexdigest() != archive.get('contentSha256')):
         raise ValueError('saved reply is not the exact billed Provider evidence')
     phase_adapter = catalog.staged_content_candidate_generator._adapter
@@ -182,7 +295,7 @@ def recover_billed_single_content_reply(*, adapter, identity, expected_history_s
         rows = repository.list_build_items(conn,build_id=identity['buildId'],for_update=True)
         item = next((row for row in rows if row['id']==identity['buildItemId']),None)
         if (not item or not repository._content_authority_is_exact(conn,release=release,build=build,rows=rows,allow_terminal=True)
-                or item['status']!='failed' or item['attempt_count']!=2 or item['variant_ordinal']!=1
+                or item['status']!='failed' or item['attempt_count'] not in {1, 2} or item['variant_ordinal']!=1
                 or item.get('course_id') is not None or item.get('content_lease_token') is not None
                 or item['error_code']!='preparation_content_validation_failed'
                 or any(row['status']!='pending' for row in rows if row['id']!=item['id'])):
@@ -192,9 +305,18 @@ def recover_billed_single_content_reply(*, adapter, identity, expected_history_s
         if list(requested)!=[{'subject':item['subject'],'skill_id':item['skill_id'],'variant_ordinal':1}]:
             raise ValueError('billed reply recovery requires unchanged single-slot scope')
         histories = repository._load_content_attempt_histories_locked(conn,rows=[item])[item['id']]
-        if any(histories[2].get(key) for key in ('jobs','candidates','courses')):
+        first = item['attempt_count'] == 1
+        attempt = item['attempt_count']
+        target_sha = None
+        historical_fingerprints = None
+        if first:
+            target_sha = require_playful_billed_recovery_authority(conn, build=build, item=item,
+                histories=histories, now=now, identity=identity)
+            historical_fingerprints = repository._historical_question_fingerprints(conn, item=item,
+                attempt_started_at=histories[1]['dispatches'][0]['attempt_started_at'])
+        if any(histories[attempt].get(key) for key in ('jobs','candidates','courses')):
             raise ValueError('billed reply recovery cannot replace a persisted candidate')
-        current=histories[2]['dispatches']; history_sha=digest(current)
+        current=histories[attempt]['dispatches']; history_sha=digest(current)
         if expected_history_sha is not None and expected_history_sha!=history_sha:
             raise ValueError('billed reply history differs from the reviewed failure')
         failed=current[-1]
@@ -202,11 +324,16 @@ def recover_billed_single_content_reply(*, adapter, identity, expected_history_s
             raise ValueError('original attempt deadline expired; recovery cannot renew it')
         archive_path=ARCHIVE_ROOT / ('candidate_repair_retry.'+failed['input_sha256']+'.json')
         archive=json.loads(archive_path.read_text())
-        checkpoint,replay=replay_billed_reply(catalog=catalog,item=item,histories=histories,archive=archive)
-        audit={'schemaVersion':BILLED_KIND,'buildId':build['id'],'buildItemId':item['id'],
+        checkpoint,replay=replay_billed_reply(catalog=catalog,item=item,histories=histories,archive=archive,
+            historical_fingerprints=historical_fingerprints)
+        recovery_kind = BILLED_PLAYFUL_KIND if first else BILLED_KIND
+        audit={'schemaVersion':recovery_kind,'buildId':build['id'],'buildItemId':item['id'],
             'approvalReference':identity['scope']['approvalReference'],'originalItem':dict(item),
             'originalAttemptDispatches':current,'sourceArchive':archive,'sourceArchiveSha256':digest(archive),
             'checkpoint':checkpoint,'checkpointSha256':digest(checkpoint),'replay':replay}
+        if first:
+            audit.update(logicalAttempt=1, targetSha256=target_sha,
+                         historicalQuestionFingerprints=historical_fingerprints)
         audit_sha=digest(audit)
         plans=conn.execute('SELECT * FROM learning_curriculum_preparation_plans WHERE catalog_build_id=? '
             'AND target_fingerprint=? ORDER BY id FOR UPDATE',(build['id'],identity['targetFingerprint'])).fetchall()
@@ -232,7 +359,7 @@ def recover_billed_single_content_reply(*, adapter, identity, expected_history_s
                 json.dump(audit,output,ensure_ascii=False,sort_keys=True,separators=(',',':'))
                 output.flush(); os.fsync(output.fileno())
         preparations.append_event(conn,plan_id=owner['id'],event_type=BILLED_EVENT,stage='generating_content',
-            payload={'recoveryKindId':BILLED_KIND,'buildItemId':item['id'],'auditShaId':audit_sha,
+            payload={'recoveryKindId':recovery_kind,'buildItemId':item['id'],'auditShaId':audit_sha,
                      'sourceDispatchId':failed['id'],'originalHistoryShaId':history_sha,
                      'sourceArchiveShaId':digest(archive),'checkpointShaId':digest(checkpoint)},now=now)
         updated=repository.recover_billed_candidate_retry_host_checkpoint(conn,build_id=build['id'],item_id=item['id'],

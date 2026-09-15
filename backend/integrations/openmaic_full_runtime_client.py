@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import os
 import re
 from dataclasses import dataclass
 from typing import Any, Mapping
@@ -11,7 +12,7 @@ from urllib.request import Request, urlopen
 
 
 from integrations.openmaic_formal_media import (
-    FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY,
+    FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
     LEGACY_GENERATION_OPTIONS, generation_options, professional_policy,
     professional_image_fields, media_receipt,
 )
@@ -177,7 +178,16 @@ class OpenMaicFullRuntimeClient:
     FORMAL_IMAGE_POLICY = FORMAL_IMAGE_POLICY
     FORMAL_VIDEO_POLICY = FORMAL_VIDEO_POLICY
     LEGACY_FORMAL_PROFESSIONAL_CREATION_POLICY = LEGACY_PROFESSIONAL_POLICY
-    FORMAL_PROFESSIONAL_CREATION_POLICY = MULTISTATE_PROFESSIONAL_POLICY
+    FORMAL_PROFESSIONAL_CREATION_POLICY = PLAYFUL_PROFESSIONAL_POLICY
+
+    @classmethod
+    def selected_professional_creation_policy(cls) -> dict[str, Any]:
+        """Read the operator opt-in at target construction, never at import time."""
+        policy = (REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY
+                  if os.environ.get("MIRA_FORMAL_PLAYFUL_REQUIRE_3D") == "1"
+                  else cls.FORMAL_PROFESSIONAL_CREATION_POLICY)
+        return professional_policy(policy)
+
     FORMAL_PROFESSIONAL_CREATION_RECEIPT_VERSION = (
         "mira.openmaic.professional-creation-receipt.v1"
     )
@@ -489,6 +499,17 @@ class OpenMaicFullRuntimeClient:
             else None
         )
         web_search = runtime_policy.get("webSearch") if isinstance(runtime_policy, Mapping) else None
+        supported_policies = (runtime_policy.get("formalGenerationSupportedProfessionalPolicies")
+                              if isinstance(runtime_policy, Mapping) else None)
+        selected_policy = self.selected_professional_creation_policy()
+        required_3d_ready = (
+            selected_policy != REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY
+            or isinstance(supported_policies, list) and any(
+                isinstance(policy, Mapping)
+                and _canonical_sha256(policy) == _canonical_sha256(selected_policy)
+                for policy in supported_policies
+            )
+        )
         search_configured = bool(
             isinstance(web_search, Mapping)
             and set(web_search) == {"schemaVersion", "providerId", "productionMode", "formalProductionConfigured", "verification"}
@@ -508,6 +529,7 @@ class OpenMaicFullRuntimeClient:
             and capabilities.get("professionalAgent") is True
             and capabilities.get("webSearch") is True
             and search_configured
+            and required_3d_ready
             and capabilities.get("speechAudioGeneration") is True
             and isinstance(formal_policy, Mapping)
             and _canonical_sha256(dict(formal_policy)) == _canonical_sha256(self.FORMAL_GENERATION_POLICY)
@@ -528,6 +550,8 @@ class OpenMaicFullRuntimeClient:
                 else None
             ),
             "policy": dict(formal_policy) if isinstance(formal_policy, Mapping) else None,
+            "supportedProfessionalPolicies": [dict(policy) for policy in supported_policies
+                if isinstance(policy, Mapping)] if isinstance(supported_policies, list) else [],
             "professionalResearch": (
                 dict(professional_research)
                 if isinstance(professional_research, Mapping)
@@ -1603,6 +1627,7 @@ class OpenMaicFullRuntimeClient:
         formal_runtime_contract: Mapping[str, Any] | None = None,
         professional_creation_policy: Mapping[str, Any] | None = None,
         paid_budget: Mapping[str, Any] | None = None,
+        generation_contract: Mapping[str, Any] | None = None,
     ) -> OpenMaicGenerationJob:
         formal = runtime_request_id is not None or formal_runtime_contract is not None
         selected_policy = None
@@ -1682,7 +1707,7 @@ class OpenMaicFullRuntimeClient:
                 self._formal_generation_headers() if formal else None
             ),
         )
-        job = self._job_from_payload(payload)
+        job = self._job_from_payload(payload, generation_contract=generation_contract)
         if formal:
             expected_sha256 = self.formal_input_sha256(request_payload)
             if not self.formal_job_identity_matches(
@@ -1698,7 +1723,7 @@ class OpenMaicFullRuntimeClient:
         return job
 
     def get_generation_job_by_request_id(
-        self, runtime_request_id: str
+        self, runtime_request_id: str, *, generation_contract: Mapping[str, Any] | None = None
     ) -> OpenMaicGenerationJob | None:
         """Read patch 0012's idempotency record without starting generation."""
 
@@ -1720,7 +1745,7 @@ class OpenMaicFullRuntimeClient:
             if exc.status_code == 404:
                 return None
             raise
-        job = self._job_from_payload(payload)
+        job = self._job_from_payload(payload, generation_contract=generation_contract)
         if (
             job.runtime_request_id != normalized
             or job.formal_contract_version
@@ -1762,7 +1787,7 @@ class OpenMaicFullRuntimeClient:
         )
 
     def get_generation_job(
-        self, job_id: str, *, formal: bool = False
+        self, job_id: str, *, formal: bool = False, generation_contract: Mapping[str, Any] | None = None
     ) -> OpenMaicGenerationJob:
         if not _safe_identifier(job_id, max_length=128):
             raise OpenMaicFullRuntimeError(
@@ -1777,7 +1802,7 @@ class OpenMaicFullRuntimeClient:
                 self._formal_generation_headers() if formal else None
             ),
         )
-        job = self._job_from_payload(payload)
+        job = self._job_from_payload(payload, generation_contract=generation_contract)
         if job.job_id != job_id:
             raise OpenMaicFullRuntimeError(
                 "openmaic_formal_job_identity_mismatch",
@@ -1889,7 +1914,7 @@ class OpenMaicFullRuntimeClient:
         except (HTTPError, URLError, TimeoutError, OSError):
             return False
 
-    def _job_from_payload(self, payload: object) -> OpenMaicGenerationJob:
+    def _job_from_payload(self, payload: object, *, generation_contract: Mapping[str, Any] | None = None) -> OpenMaicGenerationJob:
         if not isinstance(payload, dict):
             raise OpenMaicFullRuntimeError(
                 "invalid_openmaic_response", "OpenMAIC 返回格式无效"
@@ -2001,6 +2026,7 @@ class OpenMaicFullRuntimeClient:
             professional_creation = (
                 self._professional_creation_receipt_from_payload(
                     raw_professional_creation,
+                    generation_contract=generation_contract,
                     runtime_request_id=runtime_request_id,
                     classroom_id=classroom_id,
                 )
@@ -2087,13 +2113,14 @@ class OpenMaicFullRuntimeClient:
         *,
         runtime_request_id: str,
         classroom_id: str,
+        generation_contract: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         code = "invalid_openmaic_professional_creation_receipt"
         try:
             image_fields = professional_image_fields(value) if isinstance(value, Mapping) else {}
             video_fields = professional_video_fields(value) if isinstance(value, Mapping) else {}
             skill_fields = professional_skill_fields(value) if isinstance(value, Mapping) else {}
-            quality_fields = professional_quality_fields(value) if isinstance(value, Mapping) else {}
+            quality_fields = professional_quality_fields(value, generation_contract=generation_contract) if isinstance(value, Mapping) else {}
             interaction_fields = professional_interaction_fields(value) if isinstance(value, Mapping) else {}
             if skill_fields and not image_fields:
                 raise ValueError("integrated skills require the versioned image policy")

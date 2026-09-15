@@ -1,0 +1,117 @@
+--- a/lib/server/mira-formal-quiz-screenshot.ts
++++ b/lib/server/mira-formal-quiz-screenshot.ts
+@@ -12,6 +12,9 @@
+       || url.search || url.hash || page.url() !== previewUrl)
+     throw new Error('FORMAL_QUIZ_SCREENSHOT_PREVIEW_REQUIRED');
+   await page.reload({ waitUntil: 'domcontentloaded', timeout: 20_000 });
++  // A mouse left over a probed option would make the fresh unanswered page
++  // display its hover highlight. Park it on the empty viewport corner.
++  await page.mouse.move(0, 0);
+   await page.locator('#formal-scene-root[data-qa-ready="true"][data-scene-type="quiz"]').waitFor({ timeout: 12_000 });
+   await page.evaluate(async () => {
+     const root = document.querySelector<HTMLElement>('#formal-scene-root');
+@@ -21,21 +24,24 @@
+     // Restore the initial viewport only inside this fresh private render. This
+     // neither changes a learner's scroll nor treats deliberate scrolling as an
+     // authored-content defect.
+-    const resetScroll = () => {
++    // Object methods remain self-contained when tsx/esbuild keepNames is on;
++    // named arrow bindings would acquire an external __name wrapper that does
++    // not exist in Playwright's serialized browser execution context.
++    const scrolling = { reset() {
+       window.scrollTo(0, 0);
+       for (const element of [root, ...root.querySelectorAll<HTMLElement>('*')]) {
+         if (element.scrollTop) element.scrollTop = 0;
+         if (element.scrollLeft) element.scrollLeft = 0;
+       }
+-    };
+-    resetScroll();
++    } };
++    scrolling.reset();
+     // Motion's JS-driven entrance transforms may outlive two RAFs and are not
+     // necessarily finished by Playwright's animations:'disabled'. Wait for
+     // actual geometry/opacity stability; never remove or override animations.
+     await new Promise<void>((resolve, reject) => {
+       const started = performance.now();
+       let previous = '', stableFrames = 0;
+-      const sample = () => {
++      const sampling = { sample() {
+         const elements = [root, ...root.querySelectorAll<HTMLElement>('div,button,textarea')];
+         const signature = JSON.stringify(elements.map(element => {
+           const r = element.getBoundingClientRect(), css = getComputedStyle(element);
+@@ -45,11 +51,11 @@
+           && Number.isFinite(animation.effect?.getComputedTiming().endTime));
+         stableFrames = signature === previous && !running ? stableFrames + 1 : 0;
+         previous = signature;
+-        if (stableFrames >= 3) { resetScroll(); resolve(); return; }
++        if (stableFrames >= 3) { scrolling.reset(); resolve(); return; }
+         if (performance.now() - started > 5000) { reject(new Error('FORMAL_QUIZ_SCREENSHOT_UNSTABLE')); return; }
+-        requestAnimationFrame(sample);
+-      };
+-      requestAnimationFrame(sample);
++        requestAnimationFrame(sampling.sample);
++      } };
++      requestAnimationFrame(sampling.sample);
+     });
+     await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+     if (root.querySelector('[data-formal-auto-probe]')
+--- a/tests/server/mira-formal-quiz-screenshot.test.ts
++++ b/tests/server/mira-formal-quiz-screenshot.test.ts
+@@ -1,17 +1,22 @@
+ import { describe, expect, it, vi } from 'vitest';
+ import type { Page } from 'playwright-core';
++import { readFile } from 'node:fs/promises';
++import { createRequire } from 'node:module';
++import { runInNewContext } from 'node:vm';
+ import { prepareFormalQuizScreenshot } from '@/lib/server/mira-formal-quiz-screenshot';
+ 
+ const url = `http://127.0.0.1:3100/internal/formal-scene-preview/${'a'.repeat(64)}`;
+ function fakePage(current=url) {
+-  const ready=vi.fn(async()=>undefined), evaluate=vi.fn(async()=>undefined);
+-  const page={url:()=>current,reload:vi.fn(async()=>undefined),locator:vi.fn(()=>({waitFor:ready})),evaluate};
++  const ready=vi.fn(async()=>undefined), evaluate=vi.fn<(callback:()=>Promise<void>)=>Promise<void>>(async()=>undefined);
++  const page={url:()=>current,reload:vi.fn(async()=>undefined),mouse:{move:vi.fn(async()=>undefined)},locator:vi.fn(()=>({waitFor:ready})),evaluate};
+   return {page:page as unknown as Page,raw:page,ready,evaluate};
+ }
+ describe('private quiz visual capture',()=>{
+   it('reloads only the same private quiz and waits for the ready entry before stable capture',async()=>{
+     const f=fakePage();await prepareFormalQuizScreenshot(f.page,url);
+     expect(f.raw.reload).toHaveBeenCalledExactlyOnceWith({waitUntil:'domcontentloaded',timeout:20000});
++    expect(f.raw.mouse.move).toHaveBeenCalledExactlyOnceWith(0,0);
++    expect(f.raw.mouse.move).toHaveBeenCalledBefore(f.evaluate);
+     expect(f.raw.locator).toHaveBeenCalledWith('#formal-scene-root[data-qa-ready="true"][data-scene-type="quiz"]');
+     expect(f.ready).toHaveBeenCalledBefore(f.evaluate);expect(f.evaluate).toHaveBeenCalledTimes(1);
+   });
+@@ -25,4 +30,32 @@
+   it('preserves reload and render failures instead of manufacturing a fresh screenshot',async()=>{
+     const f=fakePage();f.raw.reload.mockRejectedValueOnce(new Error('preview expired'));await expect(prepareFormalQuizScreenshot(f.page,url)).rejects.toThrow('preview expired');expect(f.evaluate).not.toHaveBeenCalled();
+   });
++  it('executes the serialized browser callback after the actual tsx esbuild keepNames transform',async()=>{
++    const require=createRequire(import.meta.url);
++    const {transform}=createRequire(require.resolve('tsx'))('esbuild');
++    const source=await readFile(new URL('../../lib/server/mira-formal-quiz-screenshot.ts',import.meta.url),'utf8');
++    const compiled=await transform(source,{loader:'ts',format:'cjs',target:'es2022',keepNames:true});
++    expect(compiled.code).toContain('__name');
++    const mod={exports:{} as {prepareFormalQuizScreenshot:typeof prepareFormalQuizScreenshot}};
++    new Function('module','exports',compiled.code)(mod,mod.exports);
++    let frames=0,clock=0;
++    const root={dataset:{sceneType:'quiz'},scrollTop:51,scrollLeft:15,
++      querySelector:(selector:string)=>selector==='[data-quiz-option],textarea'?{}:null,
++      querySelectorAll:()=>[],getAnimations:()=>[],getBoundingClientRect:()=>({x:0,y:0,width:1280,height:720})};
++    const scrollTo=vi.fn();
++    const f=fakePage();
++    f.evaluate.mockImplementation(async(callback:()=>Promise<void>)=>{
++      // Deliberately provide no transpiler helpers in the isolated browser-like
++      // realm. Any captured __name dependency therefore throws as Chrome did.
++      const execute=runInNewContext(`(${callback.toString()})`,{
++        document:{querySelector:()=>root,fonts:{ready:Promise.resolve()}},
++        window:{scrollTo},getComputedStyle:()=>({opacity:'1',transform:'none'}),
++        performance:{now:()=>clock},requestAnimationFrame:(cb:()=>void)=>{frames++;clock+=16;queueMicrotask(cb);},
++      });
++      await execute();
++    });
++    await mod.exports.prepareFormalQuizScreenshot(f.page,url);
++    expect(f.evaluate).toHaveBeenCalledTimes(1);expect(frames).toBeGreaterThanOrEqual(6);
++    expect(root.scrollTop).toBe(0);expect(root.scrollLeft).toBe(0);expect(scrollTo).toHaveBeenCalledWith(0,0);
++  });
+ });

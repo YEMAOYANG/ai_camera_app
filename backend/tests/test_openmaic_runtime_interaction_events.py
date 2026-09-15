@@ -52,12 +52,50 @@ class RuntimeInteractionTest(unittest.TestCase):
         status = self.service.status(runtime_session_id="runtime-session-1", learning_session_id="learning-session-1", upstream_classroom_id="classroom-1")
         self.assertEqual(status["completedInteractionObjectiveIndexes"], [0])
 
-    def test_wrong_scene_value_selector_and_decorative_feedback_fail_without_write(self):
-        for changed in [{"objectiveIndex": 1}, {"sceneId": "scene-4", "sceneIndex": 4}, {"value": "10"},
-                        {"controlSelector": "#another"}, {"feedbackText": "答对了！"}]:
+    def test_wrong_scene_selector_action_and_empty_feedback_fail_without_write(self):
+        for changed in [{"objectiveIndex": 1}, {"sceneId": "scene-4", "sceneIndex": 4}, {"action": "fill"},
+                        {"controlSelector": "#another"}, {"feedbackText": "   "}]:
             with self.subTest(changed=changed), self.assertRaises(ApiError):
                 self.record("interaction_completed", {**self.payload, **changed})
         self.assertEqual(self.repo.events, [])
+
+    def test_free_exploration_records_actual_values_without_awarding_an_answer(self):
+        observed = {**self.payload, "value": "15", "feedbackText": "一个十和五个一，共十五个"}
+        self.record("interaction_completed", observed)
+        self.assertEqual(self.repo.events[0]["payload"], observed)
+        self.assertEqual(self.learning.answer_calls, 0)
+        self.assertEqual(self.learning.complete_calls, 0)
+        self.assertEqual(self.objective["operation"]["value"], "12")
+        status = self.service.status(runtime_session_id="runtime-session-1", learning_session_id="learning-session-1", upstream_classroom_id="classroom-1")
+        self.assertEqual(status["completedInteractionObjectiveIndexes"], [0])
+        self.assertFalse(status["questionsComplete"])
+        self.assertFalse(status["completionReady"])
+
+    def test_fraction_buttons_accept_three_fifths_instead_of_the_publication_example(self):
+        self.objective["operation"] = {"sceneId": "scene-5", "controlSelector": "#numerator-plus", "action": "click"}
+        self.objective["feedback"] = {"sceneId": "scene-5", "selector": "#result", "textIncludes": "50%", "reasonQuote": "2÷4=0.5"}
+        observed = {**self.payload, "controlSelector": "#numerator-plus", "action": "click", "value": "", "feedbackText": "3÷5=0.6，也就是60%。"}
+        self.record("interaction_completed", observed)
+        self.assertEqual(self.repo.events[0]["payload"]["feedbackText"], observed["feedbackText"])
+        self.assertEqual(self.learning.answer_calls, 0)
+
+    def test_skipping_discussion_does_not_fake_a_reply_or_bypass_the_independent_quiz(self):
+        self.repo.authority["feature_manifest_json"]["formalEvidence"]["requiredTeachingActions"] = [
+            {"sceneId": "scene-5", "actionId": "discussion-lele"}]
+        self.service.teaching_conversation_reader = Mock(return_value={"state": "awaiting_user", "messages": []})
+        with patch("services.learning_paid_authority.upgraded_manifest", return_value=True):
+            self.record("interaction_completed", {**self.payload, "value": "15", "feedbackText": "十五个"})
+            self.record("action_completed", {"sceneIndex": 5, "sceneId": "scene-5", "actionId": "action-5"}, 2)
+            with self.assertRaises(ApiError) as incomplete:
+                self.record("classroom_completed", {"sceneIndex": 9, "sceneId": "scene-9"}, 3)
+            self.assertEqual(incomplete.exception.code, "runtime_event_evidence_incomplete")
+            self.assertEqual(self.learning.answer_calls, 0)
+            self.assertEqual(self.learning.complete_calls, 0)
+            self.record("answer_submitted", {"sceneIndex": 6, "sceneId": "scene-6", "questionId": "q4", "response": "15", "attemptNumber": 1}, 3)
+            self.assertTrue(self.record("classroom_completed", {"sceneIndex": 9, "sceneId": "scene-9"}, 4)["completed"])
+        self.service.teaching_conversation_reader.assert_not_called()
+        self.assertEqual(self.learning.answer_calls, 1)
+        self.assertEqual(self.learning.complete_calls, 1)
 
     def test_malformed_payload_cannot_claim_success_or_score(self):
         for changed in [{"objectiveIndex": True}, {"objectiveIndex": 30}, {"action": "evaluate"},

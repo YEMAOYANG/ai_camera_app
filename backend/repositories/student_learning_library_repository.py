@@ -9,6 +9,7 @@ from core.database import Database, DatabaseConnection, DatabaseRow
 from repositories.formal_student_runtime_gate import (
     current_formal_runtime_sql,
     current_formal_validation_authority_sql,
+    with_parsed_runtime_manifests,
 )
 from repositories.learning_repository import (
     _student_required_package_assets_sql,
@@ -276,6 +277,7 @@ class StudentLearningLibraryRepository:
         elif bucket == "makeup":
             conditions.extend(
                 (
+                    "COALESCE(task.learning_slot, 'core') <> 'catalog'",
                     "task.scheduled_date < ?",
                     "task.status NOT IN ("
                     "'completed', 'confirmed', 'awaiting_parent_confirmation', "
@@ -302,7 +304,7 @@ class StudentLearningLibraryRepository:
             conditions.append("favorite.course_id IS NOT NULL")
         if bucket in {"all", "continue", "makeup"}:
             conditions.append(
-                "NOT EXISTS ("
+                "((session.id IS NOT NULL AND session.status <> 'completed') OR NOT EXISTS ("
                 "SELECT 1 FROM tasks AS newer_task "
                 "JOIN learning_courses AS newer_course "
                 "ON newer_course.id = newer_task.learning_course_id "
@@ -323,7 +325,7 @@ class StudentLearningLibraryRepository:
                 "OR (newer_task.scheduled_date = task.scheduled_date "
                 "AND newer_task.created_at = task.created_at "
                 "AND newer_task.id > task.id))"
-                ")"
+                "))"
             )
         if cursor is not None:
             conditions.append(
@@ -334,7 +336,7 @@ class StudentLearningLibraryRepository:
             params.extend((cursor[0], cursor[0], cursor[1]))
         params.append(limit + 1)
         rows = conn.execute(
-            f"""
+            with_parsed_runtime_manifests(f"""
             SELECT
               task.id AS task_id,
               task.status AS task_status,
@@ -388,7 +390,7 @@ class StudentLearningLibraryRepository:
             ORDER BY COALESCE(session.updated_at, task.updated_at) DESC,
               task.id DESC
             LIMIT ?
-            """,
+            """),
             params,
         ).fetchall()
         has_more = len(rows) > limit
@@ -437,7 +439,7 @@ class StudentLearningLibraryRepository:
             version_sql = " AND course.version = ?"
             params.append(course_version)
         row = conn.execute(
-            f"""
+            with_parsed_runtime_manifests(f"""
             SELECT
               task.id AS task_id,
               task.status AS task_status,
@@ -494,7 +496,7 @@ class StudentLearningLibraryRepository:
             ORDER BY COALESCE(session.updated_at, task.updated_at) DESC,
               task.id DESC
             LIMIT 1
-            """,
+            """),
             params,
         ).fetchone()
         return self._item_payload(row, include_intro=True) if row is not None else None

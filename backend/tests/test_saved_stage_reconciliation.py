@@ -61,3 +61,12 @@ class SavedStageReconciliationTest(unittest.TestCase):
                 changed.pop('receiptSha256')
                 changed['receiptSha256'] = quality_sha(changed)
                 validate_saved_stage_completion(changed, original, current, **arguments)
+
+    def test_optional_discussion_repair_cannot_skip_its_frozen_input_validation(self):
+        completion, source_bytes, promoted, options = self.fixture()
+        completion['learnerDiscussionRepair'] = {}
+        completion.pop('receiptSha256')
+        completion['receiptSha256'] = quality_sha(completion)
+        promoted['formalSavedStageRecovery']['receiptSha256'] = completion['receiptSha256']
+        with self.assertRaisesRegex(ValueError, 'learner discussion repair'):
+            validate_saved_stage_completion(completion, source_bytes, promoted, **options)

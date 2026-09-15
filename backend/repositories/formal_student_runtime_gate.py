@@ -27,6 +27,36 @@ CURRENT_ARTIFACT_PUBLICATION_CONTRACT_VERSION = (
 )
 
 
+def with_parsed_runtime_manifests(query: str) -> str:
+    """Parse each Runtime manifest once within a single student read query.
+
+    The stored manifest is LONGTEXT. Repeated JSON_EXTRACT predicates otherwise
+    reparse the entire classroom for every expression, row and gate branch.
+    A non-mergeable CTE materializes MySQL's binary JSON representation while
+    retaining every existing predicate and identity column. Every caller already
+    excludes retired runtimes in its joins, so do not parse historical manifests.
+    It is not a cache:
+    every request still reads current publication, retirement and asset state.
+    Invalid manifests remain NULL and fail the existing JSON_VALID gate.
+    """
+    relation = 'student_runtime_manifests'
+    rewritten, count = re.subn(r'\blearning_openmaic_runtime_classrooms\s+AS\s+',
+                               relation + ' AS ', query)
+    if not count or re.match(r'\s*SELECT\b', query, re.IGNORECASE) is None:
+        raise ValueError('parsed Runtime manifests require a student SELECT with Runtime aliases')
+    return f"""WITH {relation} AS (
+      SELECT id, candidate_binding_contract_version, candidate_build_item_id,
+        candidate_grade_code, candidate_release_id, candidate_target_fingerprint,
+        course_id, course_version, package_id, package_version, quality_status,
+        request_id, retired_at, status, upstream_classroom_id,
+        CAST(IF(JSON_VALID(feature_manifest_json), feature_manifest_json, NULL) AS JSON)
+          AS feature_manifest_json
+      FROM learning_openmaic_runtime_classrooms
+      WHERE retired_at IS NULL
+      LIMIT 18446744073709551615
+    ) {rewritten}"""
+
+
 def _formal_video_sql(alias: str) -> str:
     """Require the new video receipt while preserving image-only classrooms."""
     def raw(key: str) -> str:

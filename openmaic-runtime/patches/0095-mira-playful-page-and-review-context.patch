@@ -1,0 +1,508 @@
+diff --git a/lib/server/mira-formal-playful-policy.ts b/lib/server/mira-formal-playful-policy.ts
+--- a/lib/server/mira-formal-playful-policy.ts
++++ b/lib/server/mira-formal-playful-policy.ts
+@@ -146,6 +146,29 @@
+   try { value = JSON.parse(parts[1].split(END)[0]); } catch { return fail('CONTEXT_INVALID'); }
+   assertContext(value);
+   return value;
++}
++
++/** Versioned projection for isolated page calls; the v1 job prompt above stays frozen. */
++export function formalPlayfulSceneInstructions(context: MiraFormalPlayfulContext,
++  input: { sceneType: string; phase: 'content' | 'actions' }): string {
++  assertContext(context);
++  return `MIRA SERVER-OWNED PLAYFUL PAGE RULES v1\n${JSON.stringify(context)}\n` +
++    `This is only the requested ${input.sceneType} page's ${input.phase} phase. Never generate extra pages or change the approved plan.\n` +
++    `The server's playful policy overrides generic game/Skill defaults, including a user-template gameType=quiz or scoring=10/speedBonus=5.\n` +
++    `For a game page, the AI designs a puzzle, strategy or card task from the locked learning objective. Never make a quiz game. Show a concise goal and rules, manipulable teaching objects, state-computed consequences, explanatory feedback, recoverable mistakes and working restart/replay. Keep game.questions absent; widget-config scoring is {"correctPoints":0}, with no bonuses or achievements. Local feedback must never emit official score, mastery, reward or completion events.\n` +
++    `For a quantitative/grouping/fraction/ratio/percentage mathematics brief, the lesson includes real interactive 3D linked to the objective: actual geometry/projection with meaningful rotate, select and split/regroup operations. If this is its 3D/game page, implement that model rather than decorative rotation or CSS perspective. Stay within allowed content; do not introduce volume formulas or advanced solids. Preserve any independently required numeric SVG model as evidence. Other math and language choose 2D/3D for teaching need; language does not require 3D.\n` +
++    `Use short visible instructions and a large model. A short demonstration leads to learner operation, observable consequence and a brief reason. In actions, narrate the actual controls and feedback in short steps; do not dictate an independent answer or describe nonexistent interaction. In content, implement the controls and computed feedback, not a static promise of a game.\n` +
++    `Keep the four locked question IDs, text and options unchanged: the guided pair share one earlier quiz page, the independent pair share one later quiz page after exploration. If this is a quiz, generate only its assigned pair, hasAnswer=false and answer=[]. Never duplicate assessments in the game or add scored questions.\n` +
++    `Honor the page brief's model, misconception, feedback and transition, existing multistate probes/reset, exact grade/difficulty, source attribution and all original quality rules. Planning language stays private; output only this page/phase.`;
++}
++
++export const MIRA_FORMAL_PLAYFUL_REVIEW_VERSION = 'mira.formal-course-review.v5-playful-context' as const;
++export function formalPlayfulReviewInstructions(context: MiraFormalPlayfulContext): string {
++  assertContext(context);
++  return `\nADDITIONAL SERVER PLAYFUL REVIEW v1:\n` +
++    `Audit playfulLearning against actual persisted HTML/JS, narration, visible text and browser observations, not its self-description or game label. The AI must have designed a knowledge-dependent game with a child-readable goal and concise rules, meaningful model manipulation, state-computed result, explanatory feedback, a recoverable unsuccessful attempt and a working restart/replay. Reject disguised quizzes, click counters, canned answer reveals, extra assessment items or local rewards presented as official learning credit.\n` +
++    `For math briefs teaching quantities/grouping/fractions/ratios/percentages, require an actual manipulable 3D teaching model with real geometry/projection and meaningful rotate, select and split/regroup operations linked to the locked objective. A 2D game, tilted card, decorative 3D or camera-only orbit cannot satisfy that requirement. Reject unsupported claims of 3D, missing operations and advanced volume/solid concepts outside the grade boundary. Preserve the registered numeric SVG evidence; 3D never replaces its independent quantitative check. Language does not require 3D.\n` +
++    `Verify a short demonstration -> learner operation -> visible consequence -> brief explanation -> retry teaching rhythm, concise reading, the guided pair together after exploration and independent pair together later, with all four locked questions unchanged. Mark meaningful_interaction, teaching_sequence, grade_fit, language_load or assessment_alignment false as applicable when a playful requirement fails; cite actual scene evidence and a concrete repair. Never treat the metadata or this prompt as evidence of successful play.\n`;
+ }
+ 
+ /** A structural guard, not a semantic or browser pass. Existing quality gates still run. */
+diff --git a/lib/server/mira-formal-skill-policy.ts b/lib/server/mira-formal-skill-policy.ts
+--- a/lib/server/mira-formal-skill-policy.ts
++++ b/lib/server/mira-formal-skill-policy.ts
+@@ -3,6 +3,7 @@
+ import { dirname, join, resolve } from 'node:path';
+ import type { AgentMessage } from '@earendil-works/pi-agent-core';
+ import type { Scene } from '@/lib/types/stage';
++import { formalPlayfulSceneInstructions, type MiraFormalPlayfulContext } from './mira-formal-playful-policy';
+ import {
+   createNativeSkillReadTool,
+   readSkillFileText,
+@@ -122,6 +123,8 @@
+   selectionPlan?: MiraFormalSkillSelectionPlan;
+   gradeBoundary?: MiraFormalGradeBoundary;
+   teachingBrief?: Record<string, unknown>;
++  /** Only parsed from a new job's frozen playful marker. */
++  playfulLearning?: MiraFormalPlayfulContext;
+ }
+ 
+ export function formalAdaptiveSkillPromptSuffix(input: MiraFormalSelectionInput): string {
+@@ -162,6 +165,7 @@
+ export async function prepareMiraFormalAdaptiveSkillBundle(
+   installed: readonly LoadedSkill[],
+   input: MiraFormalSelectionInput,
++  playfulLearning?: MiraFormalPlayfulContext,
+ ): Promise<MiraFormalSkillBundle> {
+   const gradeBoundary = assertMiraFormalSelectionInput(input);
+   const selectionPlan = selectMiraFormalSkills(input);
+@@ -188,6 +192,7 @@
+     gradeBoundary,
+     selectionPlan,
+     teachingBrief: structuredClone(input.teachingBrief) as Record<string, unknown>,
++    ...(playfulLearning ? { playfulLearning: structuredClone(playfulLearning) } : {}),
+     resources: [
+       ...base.resources.filter((entry) => entry.skillId),
+       ...additional,
+@@ -358,6 +363,7 @@
+ export interface MiraFormalSceneSkillContext {
+   text: string;
+   contextSha256: string;
++  playfulLearning?: MiraFormalPlayfulContext;
+ }
+ 
+ /** The page model gets applicable source sections, not the Agent's hidden memory. */
+@@ -475,8 +481,10 @@
+   sections.push(
+     'FINAL AUTHORITY: exact gradeBoundary, locked assessments and approved page brief win. UbD planning/GRASPS labels stay private; no automatic PBL or extra page. Selected methods do not change the grade, subject, roster, scoring or source authority. Output only this page/phase.',
+   );
++  if (bundle.playfulLearning) sections.push(formalPlayfulSceneInstructions(bundle.playfulLearning, input));
+   const text = sections.join('\n\n');
+-  return { text, contextSha256: sha256(text) };
++  return { text, contextSha256: sha256(text),
++    ...(bundle.playfulLearning ? { playfulLearning: bundle.playfulLearning } : {}) };
+ }
+ 
+ export interface MiraFormalSkillContextTrace extends MiraFormalSceneSkillInput {
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -868,7 +868,8 @@
+   scenes: Scene[];
+   ownerId: string;
+   sessionId: string;
+-}): Promise<{ stage: Stage; scenes: Scene[]; interactionDesign?: InteractionDesignContext }> {
++}): Promise<{ stage: Stage; scenes: Scene[]; interactionDesign?: InteractionDesignContext;
++  playfulLearning?: ReturnType<typeof formalPlayfulContextFromPrompt> }> {
+   const session = await (await getAgentSessionStore()).getSession(input.sessionId);
+   if (
+     !session ||
+@@ -894,10 +895,12 @@
+   if (ordered.some((scene, index) => scene.order !== index + 1))
+     throw new Error('FORMAL_PROFESSIONAL_SOURCE_SCENE_ORDER_INVALID');
+   const normalized = normalizeProfessionalScenes(ordered, questions as QuizQuestion[], true);
+-  assertMiraFormalPlayfulScenes(normalized, formalPlayfulContextFromPrompt(session.prompt));
++  const playfulLearning = formalPlayfulContextFromPrompt(session.prompt);
++  assertMiraFormalPlayfulScenes(normalized, playfulLearning);
+   return {
+     stage: input.stage,
+     scenes: canonicalizeMiraFormalResearchFooters(normalized, research.fetched).scenes,
++    ...(playfulLearning ? { playfulLearning } : {}),
+     ...(interactionDesignContextFromPrompt(session.prompt)
+       ? { interactionDesign: interactionDesignContextFromPrompt(session.prompt) } : {}),
+   };
+@@ -1376,6 +1379,7 @@
+       ? await prepareMiraFormalAdaptiveSkillBundle(
+           installed,
+           formalAdaptiveSkillSelectionInput(input),
++          formalPlayfulContext(input.professionalCreationPolicy, spec),
+         )
+       : await prepareMiraFormalSkillBundle(installed, spec.course.subject);
+     const sessionStore = await getAgentSessionStore();
+@@ -1419,6 +1423,7 @@
+       gradeBoundary: { ...skillBundle.gradeBoundary },
+       selectionPlan: { ...skillBundle.selectionPlan },
+       teachingBrief: skillBundle.teachingBrief,
++      ...(skillBundle.playfulLearning ? { playfulLearning: skillBundle.playfulLearning } : {}),
+       ...(formalDifficultyPolicy(input) ? {difficultyPolicy: formalDifficultyPolicy(input)} : {}),
+       ...(isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
+         ? { interactionDesign: { policy: (input.professionalCreationPolicy as {interactionDesignPolicy: InteractionDesignContext['policy']}).interactionDesignPolicy,
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -27,6 +27,8 @@
+ } from './mira-formal-interaction-design';
+ import type { FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
+ import { isPaidBudgetObservationMode } from './mira-paid-budget';
++import { assertMiraFormalPlayfulScenes, formalPlayfulReviewInstructions,
++  MIRA_FORMAL_PLAYFUL_REVIEW_VERSION, type MiraFormalPlayfulContext } from './mira-formal-playful-policy';
+ 
+ type JsonRecord = Record<string, unknown>;
+ const object = (value: unknown): value is JsonRecord =>
+@@ -38,6 +40,7 @@
+   teachingBrief: JsonRecord;
+   interactionDesign?: InteractionDesignContext;
+   difficultyPolicy?: JsonRecord;
++  playfulLearning?: MiraFormalPlayfulContext;
+ }
+ export interface FormalQualityInput extends FormalQualityContext {
+   stage: Stage; scenes: Scene[]; ownerId: string; sessionId: string;
+@@ -150,6 +153,7 @@
+   input: FormalQualityInput, signal?: AbortSignal, deps: QualityReviewDeps = {},
+ ): Promise<FormalQualityResult> {
+   if (signal?.aborted) throw new Error('FORMAL_QUALITY_ABORTED');
++  assertMiraFormalPlayfulScenes(input.scenes, input.playfulLearning);
+   const observationMode = await isPaidBudgetObservationMode();
+   const remainingAttempts = (count: number) => observationMode ? null
+     : Math.max(0, MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts - count);
+@@ -168,7 +172,9 @@
+     ...input, interactionDesign: input.interactionDesign,
+   }) : undefined;
+   const multistate = interactionPlan?.schemaVersion === 'mira.openmaic.interaction-design-plan.v2';
+-  const reviewPromptVersion = multistate ? 'mira.formal-course-review.v4-multistate-visual' : interactionPlan ? INTERACTION_REVIEW_PROMPT_VERSION : FORMAL_QUALITY_REVIEW_PROMPT_VERSION;
++  const reviewPromptVersion = input.playfulLearning ? MIRA_FORMAL_PLAYFUL_REVIEW_VERSION
++    : multistate ? 'mira.formal-course-review.v4-multistate-visual' : interactionPlan ? INTERACTION_REVIEW_PROMPT_VERSION : FORMAL_QUALITY_REVIEW_PROMPT_VERSION;
++  const playfulContextSha256 = input.playfulLearning ? qualitySha(input.playfulLearning) : undefined;
+   const snapshot = qualitySnapshot(input.stage, input.scenes);
+   const snapshotSha256 = qualitySha(snapshot);
+   const gradeBoundarySha256 = qualitySha(input.gradeBoundary);
+@@ -178,10 +184,18 @@
+   const identity = { ownerId: input.ownerId, sessionId: input.sessionId, stageId: input.stage.id,
+     gradeBoundarySha256, teachingBriefSha256, selectionPlanSha256,
+     ...(input.interactionDesign ? { interactionDesignContextSha256: qualitySha(input.interactionDesign) } : {}),
++    ...(playfulContextSha256 ? { playfulContextSha256 } : {}),
+     ...(input.difficultyPolicy ? { difficultyPolicySha256: qualitySha(input.difficultyPolicy) } : {}) };
+   const grant = deps.approvedReviewGrant;
+   if (grant) assertGrantBinding(grant, identity, snapshotSha256);
+   const folder = join(resolve(deps.cacheRoot ?? 'data/formal-quality-reviews'), qualitySha(identity));
++  if (playfulContextSha256) {
++    const { playfulContextSha256: _playful, ...priorIdentity } = identity;
++    // A pre-projection review must not be reused OR silently reset its paid ledger.
++    const priorFolder = join(resolve(deps.cacheRoot ?? 'data/formal-quality-reviews'), qualitySha(priorIdentity));
++    if (await readJson(join(priorFolder, 'attempts.json')) !== undefined)
++      throw new Error('FORMAL_PLAYFUL_REVIEW_CONTEXT_MIGRATION_REQUIRED');
++  }
+   await mkdir(folder, { recursive: true, mode: 0o700 });
+   const resultPath = join(folder, `${snapshotSha256}.json`);
+   const cached = await readJson(resultPath);
+@@ -193,6 +207,8 @@
+     && await readJson(join(folder, `${snapshotSha256}-provider-dispatch.json`)) === undefined;
+   if (cached !== undefined && (!object(cached) || cached.snapshotSha256 !== snapshotSha256
+       || !Array.isArray(cached.issues))) throw new Error('FORMAL_QUALITY_CACHE_CORRUPT');
++  if (object(cached) && playfulContextSha256 && cached.playfulContextSha256 !== playfulContextSha256)
++    throw new Error('FORMAL_QUALITY_CACHE_CORRUPT');
+   if (!recheckUnsent && object(cached) && cached.snapshotSha256 === snapshotSha256
+       && (!grant || cached.status === 'passed')) {
+     if (cached.status === 'passed') {
+@@ -212,7 +228,7 @@
+     // session's durable paid-attempt budget by choosing a new cache directory.
+     if (cached.reviewPromptVersion !== reviewPromptVersion)
+       throw new Error('FORMAL_QUALITY_REVIEW_VERSION_CHANGED');
+-    const { reviewPromptVersion: _version, ...result } = cached;
++    const { reviewPromptVersion: _version, playfulContextSha256: _playfulContext, ...result } = cached;
+     const ledger = await readJson(join(folder, 'attempts.json'));
+     if (!Array.isArray(ledger)) throw new Error('FORMAL_QUALITY_LEDGER_INVALID');
+     return { ...result, remainingReviewAttempts: remainingAttempts(ledger.length),
+@@ -318,10 +334,11 @@
+       else {
+         const evidenceCatalog = buildFormalReviewEvidence(input);
+         const reviewIdentity = { snapshotSha256, gradeBoundarySha256, selectionPlanSha256,
+-          teachingBriefSha256, renderChecks };
++          teachingBriefSha256, renderChecks, ...(playfulContextSha256 ? { playfulContextSha256 } : {}) };
+         const userPrompt = JSON.stringify(qualityCanonical({
+           promptVersion: reviewPromptVersion,
+           gradeBoundary: input.gradeBoundary, teachingBrief: input.teachingBrief,
++          ...(input.playfulLearning ? { playfulLearning: input.playfulLearning } : {}),
+           ...(input.difficultyPolicy ? {difficultyPolicy: input.difficultyPolicy, difficultyInstruction: 'Audit actual reasoning and evidence complexity against this locked policy, never infer difficulty from variantOrdinal.'} : {}),
+           selectionPlan: input.selectionPlan, snapshot, evidenceCatalog, browserChecks: renderChecks,
+           ...(interactionPlan ? { interactionDesignPlan: interactionPlan,
+@@ -340,7 +357,8 @@
+           requestId: `quality-${qualitySha({ ...identity, snapshotSha256,
+             ...(grant ? { reviewGrantSha256: qualitySha(grant) } : {}) })}`,
+           phase: attempts.length === 1 ? 'independent_verification' : 'verification_after_repair',
+-          systemPrompt: FORMAL_QUALITY_REVIEW_SYSTEM + (interactionPlan ? INTERACTION_REVIEW_SYSTEM_SUFFIX : ''), userPrompt,
++          systemPrompt: FORMAL_QUALITY_REVIEW_SYSTEM + (interactionPlan ? INTERACTION_REVIEW_SYSTEM_SUFFIX : '')
++            + (input.playfulLearning ? formalPlayfulReviewInstructions(input.playfulLearning) : ''), userPrompt,
+           responseJsonSchema: formalReviewEvidenceSchema(evidenceCatalog),
+         }, signal);
+         // Preserve the actual response and usage before parsing; an invalid report
+@@ -371,7 +389,7 @@
+         }
+       }
+       attempt.status = result.status;
+-      const stored = { ...result, reviewPromptVersion };
++      const stored = { ...result, reviewPromptVersion, ...(playfulContextSha256 ? { playfulContextSha256 } : {}) };
+       await save(join(folder, `${artifactPrefix}.json`), stored);
+       // Only an actual valid pass can become the canonical cache used by the
+       // remaining audio/publication tail. Failed old evidence is never relabeled.
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -1291,10 +1291,12 @@
+       skillId: meta.skillId,
+       origin: meta.origin,
+     };
++    const { formalPlayfulContextFromPrompt } = await import('../mira-formal-playful-policy');
+     const formalSkillBundle = isMiraFormalAdaptiveSkillSession(formalSkillIdentity)
+       ? await prepareMiraFormalAdaptiveSkillBundle(
+           installedSkills,
+           formalAdaptiveSelectionInputFromPrompt(meta.prompt),
++          formalPlayfulContextFromPrompt(meta.prompt),
+         )
+       : isMiraFormalIntegratedSkillSession(formalSkillIdentity)
+         ? await prepareMiraFormalSkillBundle(
+@@ -1647,6 +1649,7 @@
+               gradeBoundary: { ...formalSkillBundle.gradeBoundary },
+               selectionPlan: { ...formalSkillBundle.selectionPlan },
+               teachingBrief: formalSkillBundle.teachingBrief,
++              ...(formalSkillBundle.playfulLearning ? { playfulLearning: formalSkillBundle.playfulLearning } : {}),
+             },
+           })
+         : [];
+diff --git a/tests/server/mira-formal-playful-policy.test.ts b/tests/server/mira-formal-playful-policy.test.ts
+--- a/tests/server/mira-formal-playful-policy.test.ts
++++ b/tests/server/mira-formal-playful-policy.test.ts
+@@ -11,6 +11,8 @@
+   withMiraFormalPlayfulInstructions,
+ } from '@/lib/server/mira-formal-playful-policy';
+ import { professionalPrompt } from '@/lib/server/mira-formal-professional-classroom';
++import { composeMiraFormalSceneSkillContext, prepareMiraFormalAdaptiveSkillBundle } from '@/lib/server/mira-formal-skill-policy';
++import { listSkills } from '@/lib/server/agent-runtime/skills';
+ import {
+   MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
+   MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY,
+@@ -57,6 +59,27 @@
+ }
+ 
+ describe('new formal playful generation authority', () => {
++  it('projects frozen playful context into every isolated content/actions call without changing historical contexts', async () => {
++    const installed = await listSkills();
++    const frozen = professionalPrompt(input(MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY), spec);
++    const parsed = formalPlayfulContextFromPrompt(frozen);
++    const legacy = await prepareMiraFormalAdaptiveSkillBundle(installed, selection);
++    const current = await prepareMiraFormalAdaptiveSkillBundle(installed, selection, parsed);
++    const absent = await prepareMiraFormalAdaptiveSkillBundle(installed, selection, undefined);
++    for (const sceneType of ['slide', 'interactive', 'quiz']) for (const phase of ['content', 'actions'] as const) {
++      const old = composeMiraFormalSceneSkillContext(legacy, { sceneType, phase });
++      const projected = composeMiraFormalSceneSkillContext(current, { sceneType, phase });
++      expect(composeMiraFormalSceneSkillContext(absent, { sceneType, phase })).toEqual(old);
++      expect(old.playfulLearning).toBeUndefined();
++      expect(projected.text.startsWith(old.text + '\n\n')).toBe(true);
++      expect(projected.playfulLearning).toEqual(parsed);
++      expect(projected.contextSha256).not.toBe(old.contextSha256);
++      expect(projected.text).toContain('MIRA SERVER-OWNED PLAYFUL PAGE RULES v1');
++      expect(projected.text).toContain('never emit official score');
++      expect(projected.text).toContain('real interactive 3D');
++    }
++    expect(professionalPrompt(input(MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY), spec)).toBe(frozen);
++  });
+   it('injects through the actual professional prompt without rewriting any locked question or old context', () => {
+     const beforeSpec = JSON.stringify(spec);
+     const oldPrompt = professionalPrompt(input(MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY), spec);
+diff --git a/tests/server/mira-formal-teaching-quality.test.ts b/tests/server/mira-formal-teaching-quality.test.ts
+--- a/tests/server/mira-formal-teaching-quality.test.ts
++++ b/tests/server/mira-formal-teaching-quality.test.ts
+@@ -21,6 +21,7 @@
+ import { formalCanonicalSha256 } from '@/lib/server/mira-formal-skill-selection';
+ import { buildFormalReviewEvidence, decodeFormalReviewEvidence } from '@/lib/server/mira-formal-review-evidence';
+ import fixtures from '../fixtures/mira-formal-skill-selection-v2.json';
++import { MIRA_FORMAL_PLAYFUL_POLICY, MIRA_FORMAL_PLAYFUL_REVIEW_VERSION } from '@/lib/server/mira-formal-playful-policy';
+ import { reviewFormalVisualSnapshot } from '@/lib/server/mira-formal-visual-review';
+ import { MIRA_INTERACTION_DESIGN_POLICY } from '@/lib/server/mira-formal-interaction-design';
+ import { isPaidBudgetObservationMode } from '@/lib/server/mira-paid-budget';
+@@ -659,3 +660,61 @@
+     { ...deps, cachedOnly: true })).rejects.toThrow('FORMAL_QUALITY_DIFFICULTY_INVALID');
+   expect(deps.provider).toHaveBeenCalledTimes(1);
+ });
++
++function playfulInput(): FormalQualityInput {
++  const value = input();
++  value.playfulLearning = { policy: MIRA_FORMAL_PLAYFUL_POLICY, subject: 'math',
++    guidedQuestionIds: ['guided-1', 'guided-2'], independentQuestionIds: ['independent-1', 'independent-2'] };
++  Object.assign(value.scenes[0].content, { widgetType: 'game', widgetConfig: {
++    type: 'game', gameType: 'puzzle', scoring: { correctPoints: 0 }, description: '学习数量关系',
++  } });
++  for (const [index, ids] of [value.playfulLearning.guidedQuestionIds, value.playfulLearning.independentQuestionIds].entries())
++    value.scenes.push({ id: `quiz-${index}`, stageId: value.stage.id, order: index + 2, type: 'quiz', title: '已锁定的判断',
++      content: { type: 'quiz', questions: ids.map(id => ({ id, type: 'short_answer', question: `已锁定 ${id}`, hasAnswer: false, answer: [] })) },
++      actions: [] } as Scene);
++  return value;
++}
++
++it('sends frozen playful requirements to independent review and binds cached-only completion to the same context', async () => {
++  const value = playfulInput(), deps = { ...mocks(value), cacheRoot };
++  const first = await reviewFormalCourse(value, undefined, deps);
++  expect(first.status).toBe('passed');
++  const request = deps.provider.mock.calls[0][0] as { systemPrompt: string; userPrompt: string };
++  expect(JSON.parse(request.userPrompt)).toMatchObject({
++    promptVersion: MIRA_FORMAL_PLAYFUL_REVIEW_VERSION, playfulLearning: value.playfulLearning,
++  });
++  expect(request.systemPrompt).toContain('ADDITIONAL SERVER PLAYFUL REVIEW v1');
++  expect(request.systemPrompt).toContain('child-readable goal');
++  expect(request.systemPrompt).toContain('actual manipulable 3D');
++  expect(request.systemPrompt).toContain('recoverable unsuccessful attempt');
++  expect(first.receipt!.review.inputSha256).toBe(qualityReviewIdentity({
++    snapshotSha256: first.snapshotSha256, gradeBoundarySha256: qualitySha(value.gradeBoundary),
++    selectionPlanSha256: value.selectionPlan.planSha256, teachingBriefSha256: qualitySha(value.teachingBrief),
++    renderChecks: first.receipt!.renderChecks, ...{ playfulContextSha256: qualitySha(value.playfulLearning) },
++  }));
++  const repeat = await reviewFormalCourse(structuredClone(value), undefined, { ...deps, cachedOnly: true });
++  expect(repeat.receipt).toEqual(first.receipt);
++  expect(deps.provider).toHaveBeenCalledTimes(1);
++  const file = join(await folder(), `${first.snapshotSha256}.json`);
++  const cached = JSON.parse(await readFile(file, 'utf8'));
++  delete cached.playfulContextSha256;
++  await writeFile(file, JSON.stringify(cached));
++  await expect(reviewFormalCourse(value, undefined, { ...deps, cachedOnly: true })).rejects.toThrow('CACHE_CORRUPT');
++  expect(deps.provider).toHaveBeenCalledTimes(1);
++});
++
++it('never reuses a pre-playful review or resets its paid ledger by choosing the new context cache', async () => {
++  const value = playfulInput(), prior = { ...value };
++  delete prior.playfulLearning;
++  const deps = { ...mocks(prior), cacheRoot };
++  const old = await reviewFormalCourse(prior, undefined, deps);
++  expect(old.status).toBe('passed');
++  const request = deps.provider.mock.calls[0][0] as { systemPrompt: string };
++  expect(request.systemPrompt).not.toContain('ADDITIONAL SERVER PLAYFUL REVIEW');
++  const oldFolder = await folder(), ledger = await readFile(join(oldFolder, 'attempts.json'), 'utf8');
++  await expect(reviewFormalCourse(value, undefined, { ...deps, cachedOnly: true }))
++    .rejects.toThrow('FORMAL_PLAYFUL_REVIEW_CONTEXT_MIGRATION_REQUIRED');
++  expect(await readFile(join(oldFolder, 'attempts.json'), 'utf8')).toBe(ledger);
++  expect(deps.provider).toHaveBeenCalledTimes(1);
++  expect((await reviewFormalCourse(prior, undefined, { ...deps, cachedOnly: true })).receipt).toEqual(old.receipt);
++});
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -227,6 +227,7 @@
+       : base;
+     return {
+       call,
++      context,
+       record: async () => {
+         if (!context) return;
+         if (!succeeded) throw new Error('FORMAL_SKILL_CONTEXT_CALL_MISSING');
+@@ -388,6 +389,9 @@
+           // Formal context comes only from the server-owned Skill bundle. The
+           // post-processor must not add CDN dependencies to self-contained pages.
+           ...(deps.getGenerationSkillContext ? { interactiveIncludeKatex: false } : {}),
++          ...(params.widgetType === 'game' && contentCall.context?.playfulLearning
++            ? { explorationGame: true }
++            : {}),
+           ...(assignedImages.length ? { assignedImages, imageMapping } : {}),
+           ...(params.instruction ? { editDirective: params.instruction } : {}),
+           ...(baseline ? { baselineContent: baseline } : {}),
+diff --git a/tests/agent-runtime/generation-tools.test.ts b/tests/agent-runtime/generation-tools.test.ts
+--- a/tests/agent-runtime/generation-tools.test.ts
++++ b/tests/agent-runtime/generation-tools.test.ts
+@@ -9,6 +9,7 @@
+   filterKnownActions,
+ } from '@/lib/server/agent-runtime/generation-tools';
+ import type { Scene } from '@/lib/types/stage';
++import { MIRA_FORMAL_PLAYFUL_POLICY } from '@/lib/server/mira-formal-playful-policy';
+ 
+ // Exercise current package source without rebuilding shared dist during an
+ // isolated paid-run audit. Production bootstrap builds this same package.
+@@ -102,6 +103,53 @@
+ }
+ 
+ describe('generation and deck tools', () => {
++  it('lets AI choose an unscored game only for server-owned playful context', async () => {
++    for (const playful of [false, true]) {
++      const current = state(document([]));
++      const html = '<html><body><button>再试一次</button><script type="application/json" id="widget-config">'
++        + '{"type":"game","gameType":"strategy","scoring":{"correctPoints":0}}'
++        + '</script></body></html>';
++      const aiCall = vi.fn(async () => html);
++      const tool = find(buildGenerationTools(deps(current.store, {
++        aiCall,
++        generateActions: async (_outline: unknown, _content: unknown, call: (system: string, user: string) => Promise<string>) => {
++          await call('actions', 'narrate the actual game');
++          return [];
++        },
++        getGenerationSkillContext: () => ({
++          text: 'server-owned page context',
++          contextSha256: 'a'.repeat(64),
++          ...(playful ? { playfulLearning: {
++            policy: MIRA_FORMAL_PLAYFUL_POLICY, subject: 'math',
++            guidedQuestionIds: ['g1', 'g2'], independentQuestionIds: ['i1', 'i2'],
++          } } : {}),
++        }),
++        onGenerationSkillContext: vi.fn(async () => {}),
++      })), 'generate_scene');
++      await tool.execute('game-test', {
++        stageId: 'stage-test', order: 1, title: '探索分组', type: 'interactive',
++        widgetType: 'game', brief: '根据分组目标设计可重玩的探索游戏，具体玩法由 AI 设计。',
++      } as never);
++      const userPrompt = (aiCall.mock.calls[0] as unknown as [string, string])[1];
++      if (playful) {
++        expect(userPrompt).toContain('Choose puzzle, strategy or card');
++        expect(userPrompt).toMatch(/"correctPoints"\s*:\s*0/);
++        expect(userPrompt).not.toContain('speedBonus');
++        expect(userPrompt).not.toContain('## Game Type\n\nquiz');
++      } else {
++        expect(userPrompt).toContain('## Game Type\n\nquiz');
++        expect(userPrompt).toMatch(/"correctPoints"\s*:\s*10/);
++        expect(userPrompt).toContain('speedBonus');
++      }
++      // The persisted rule/category comes from the AI output, not a host game template.
++      const content = current.get()?.scenes[0].content;
++      expect(content?.type).toBe('interactive');
++      if (content?.type === 'interactive') {
++        expect(content.widgetConfig?.gameType).toBe('strategy');
++        expect(content.html).toBe(html);
++      }
++    }
++  });
+   it('persists formal interactive HTML without adding external KaTeX while ordinary Pro keeps its default', async () => {
+     const html =
+       '<html><head></head><body><button id="count">数一数</button><script>let n=0;document.querySelector("#count").onclick=()=>n++;</script></body></html>';
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -97,6 +97,8 @@
+   allowProceduralSkill?: boolean;
+   /** Interactive only: self-contained hosts disable automatic external KaTeX injection. */
+   interactiveIncludeKatex?: boolean;
++  /** Host-selected exploration: AI chooses a non-quiz game with local, unscored feedback. */
++  explorationGame?: boolean;
+   /**
+    * Natural-language edit instruction for whole-slide regeneration (MAIC Editor
+    * agent `regenerate_scene`). When set, the slide content prompt switches to
+@@ -271,6 +273,7 @@
+     return generateWidgetContent(outline, aiCall, languageDirective, {
+       allowProceduralSkill,
+       includeKatex: options.interactiveIncludeKatex,
++      explorationGame: options.explorationGame,
+       logger: log,
+     });
+   }
+@@ -1110,6 +1113,7 @@
+   options: {
+     allowProceduralSkill?: boolean;
+     includeKatex?: boolean;
++    explorationGame?: boolean;
+     logger?: GenerationLogger;
+   } = {},
+ ): Promise<GeneratedInteractiveContent | null> {
+@@ -1174,10 +1178,14 @@
+       promptId = PROMPT_IDS.GAME_CONTENT;
+       variables = {
+         title: outline.title,
+-        gameType: widgetOutline.gameType || 'quiz',
++        gameType: options.explorationGame
++          ? 'Choose puzzle, strategy or card to serve this lesson objective; design the rules yourself. Never quiz.'
++          : widgetOutline.gameType || 'quiz',
+         description: outline.description,
+         keyPoints: (outline.keyPoints || []).join('\n'),
+-        scoring: { correctPoints: 10, speedBonus: 5 },
++        scoring: options.explorationGame
++          ? { correctPoints: 0 }
++          : { correctPoints: 10, speedBonus: 5 },
+         languageDirective: languageDirective || '',
+       };
+       break;

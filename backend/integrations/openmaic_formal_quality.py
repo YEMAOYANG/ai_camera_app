@@ -150,7 +150,7 @@ def _evidence(value: object, scene_ids: set[str]) -> None:
             raise ValueError("invalid formal teaching quality citation")
 
 
-def teaching_quality_receipt(value: object) -> dict[str, Any]:
+def teaching_quality_receipt(value: object, *, generation_contract: Mapping[str, Any] | None = None) -> dict[str, Any]:
     raw = _exact(value, {"schemaVersion", "policyId", "status", "sessionId", "stageId", "gradeBoundarySha256",
         "selectionPlanSha256", "teachingBriefSha256", "snapshotSha256", "sceneHashes", "renderChecks", "review", "receiptSha256"})
     if (raw["schemaVersion"] != "mira.openmaic.teaching-quality-receipt.v1"
@@ -182,6 +182,12 @@ def teaching_quality_receipt(value: object) -> dict[str, Any]:
     review = _exact(raw["review"], {"providerId", "modelId", "requestIdHash", "inputSha256", "dimensions", "objectives"})
     expected_input = {key: raw[key] for key in ("snapshotSha256", "gradeBoundarySha256", "selectionPlanSha256",
                                                "teachingBriefSha256", "renderChecks")}
+    from integrations.openmaic_formal_playful import playful_quality_context
+    playful_context = playful_quality_context(generation_contract)
+    if playful_context is not None:
+        if raw["teachingBriefSha256"] != generation_contract.get("teachingBriefSha256"):
+            raise ValueError("playful review teaching brief authority drifted")
+        expected_input["playfulContextSha256"] = quality_sha(playful_context)
     if (review["providerId"] != "deepseek" or review["modelId"] != "deepseek-v4-flash"
             or not _digest(review["requestIdHash"]) or review["inputSha256"] != quality_sha(expected_input)):
         raise ValueError("formal teaching quality review identity drifted")
@@ -214,10 +220,10 @@ def teaching_quality_receipt(value: object) -> dict[str, Any]:
     return deepcopy(dict(raw))
 
 
-def professional_quality_fields(professional: Mapping[str, Any]) -> dict[str, Any]:
+def professional_quality_fields(professional: Mapping[str, Any], *, generation_contract: Mapping[str, Any] | None = None) -> dict[str, Any]:
     if "teachingQuality" not in professional:
         return {}
-    return {"teachingQuality": teaching_quality_receipt(professional["teachingQuality"])}
+    return {"teachingQuality": teaching_quality_receipt(professional["teachingQuality"], generation_contract=generation_contract)}
 
 
 def _bound_quality(professional: Mapping[str, Any], generation: Mapping[str, Any]) -> dict[str, Any] | None:
@@ -227,7 +233,7 @@ def _bound_quality(professional: Mapping[str, Any], generation: Mapping[str, Any
     if not adaptive:
         return None
     validate_generation_grade_boundary(generation)
-    receipt = teaching_quality_receipt(professional["teachingQuality"])
+    receipt = teaching_quality_receipt(professional["teachingQuality"], generation_contract=generation)
     unsigned = dict(professional)
     parent_hash = unsigned.pop("receiptSha256", None)
     skill = professional.get("skillOrchestration")

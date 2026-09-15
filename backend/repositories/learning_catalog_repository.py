@@ -1943,9 +1943,18 @@ class LearningCatalogRepository:
         if not isinstance(histories, Mapping):
             return None
         if audited_high_grade:
-            from services.learning_content_recovery import candidate_less_evidence, require_billed_recovery_audit
-            if (logical_attempt != 2 or candidate_less_evidence(item=item, histories=histories) is None
-                    or item.get("course_id") is not None or item.get("course_version") is not None):
+            from services.learning_content_recovery import (
+                candidate_less_evidence, require_billed_recovery_audit,
+                require_playful_billed_recovery_authority,
+            )
+            if item.get("course_id") is not None or item.get("course_version") is not None:
+                return None
+            if logical_attempt == 1:
+                if any(row['status'] != 'pending' for row in rows if row['id'] != item['id']):
+                    return None
+                require_playful_billed_recovery_authority(conn, build=build, item=item,
+                    histories=histories, now=int(now))
+            elif logical_attempt != 2 or candidate_less_evidence(item=item, histories=histories) is None:
                 return None
             require_billed_recovery_audit(conn, build_id=build_id, item=item, histories=histories,
                                          audit_sha256=recovery_audit_sha256, checkpoint=checkpoint)

@@ -242,7 +242,7 @@ class LearningCurriculumPreparationContractTest(unittest.TestCase):
         )
         self.assertEqual(
             preparation_target_fingerprint(target),
-            "d526af0146e824185c7eedf0e0b0eba3c195d0f17247c7297525205b3428d0d3",
+            "51d9f37d20489a4255acea6507336daf0839228e395c11bac64e3bcd211e3431",
         )
 
     def test_v95_provider_phase_budget_fits_every_formal_deadline(self):

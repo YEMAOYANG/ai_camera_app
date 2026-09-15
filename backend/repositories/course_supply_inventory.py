@@ -1,11 +1,13 @@
 """Read reusable, currently playable supply without changing frozen builds."""
 from __future__ import annotations
 
+import json
 from typing import Mapping
 
 from repositories.formal_student_runtime_gate import (
     current_formal_runtime_sql,
     current_formal_validation_authority_sql,
+    with_parsed_runtime_manifests,
 )
 from repositories.learning_repository import _student_required_package_assets_sql
 from services.learning_curriculum_preparation_contract import (
@@ -58,26 +60,39 @@ def inherited_scope_request_state(conn, target: Mapping) -> list[dict] | None:
             and (row['subject'], row['skill_id'], int(row['variant_ordinal'])) in desired]
 
 
-def published_supply(conn, target: Mapping) -> dict[tuple[str, str, int], dict]:
+def _playful_policy_identity(target: Mapping) -> str | None:
+    runtime = target.get('formalRuntimePolicy')
+    creation = runtime.get('professionalCreationPolicy') if isinstance(runtime, Mapping) else None
+    policy = creation.get('playfulLearningPolicy') if isinstance(creation, Mapping) else None
+    if policy is None:
+        return None
+    return json.dumps(policy, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+
+
+def published_supply(conn, target: Mapping, *, for_generation: bool = False) -> dict[tuple[str, str, int], dict]:
     """Resolve exact compatible published slots, preferring this target.
 
     Compatibility applies to immutable target/hash pairs, not just a matching
     skill name. All readiness checks are live: a withdrawn package, Runtime or
     required media asset stops satisfying supply on the next read. This query
-    is also used before content claims, so a policy upgrade can reuse an old
-    published lesson without launching its replacement automatically.
+    is also used before content claims. Student availability keeps compatible
+    old lessons; an explicitly requested playful generation slot is satisfied
+    only by published content made under the exact same playful policy.
     """
     grade = str(target['gradeCode'])
     fingerprint = preparation_target_fingerprint(target)
+    required_playful_policy = _playful_policy_identity(target) if for_generation else None
+    source_target_column = (', build.target_spec_json AS source_target_spec_json'
+                            if required_playful_policy is not None else '')
     scope_sql, scope_params = compatible_preparation_scope_sql(
         target, target_column='build.target_spec_json',
         fingerprint_column='receipt.target_fingerprint',
     )
     rows = conn.execute(
-        f"""SELECT item.subject, item.skill_id, item.variant_ordinal,
+        with_parsed_runtime_manifests(f"""SELECT item.subject, item.skill_id, item.variant_ordinal,
           item.id AS build_item_id, receipt.course_id, receipt.course_version,
           receipt.target_fingerprint, receipt.published_at,
-          runtime.id AS runtime_classroom_id
+          runtime.id AS runtime_classroom_id{source_target_column}
         FROM learning_catalog_build_items AS item
         JOIN learning_catalog_build_jobs AS build ON build.id = item.build_job_id
         JOIN learning_curriculum_preparation_plans AS owner
@@ -150,14 +165,26 @@ def published_supply(conn, target: Mapping) -> dict[tuple[str, str, int], dict]:
           AND receipt.publication_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
           {current_formal_validation_authority_sql(receipt_alias='receipt', provider_alias='provider')}
           AND {_student_required_package_assets_sql(package_alias='package')}
-        ORDER BY (receipt.target_fingerprint = ?) DESC, receipt.published_at DESC, item.id""",
+        ORDER BY (receipt.target_fingerprint = ?) DESC, receipt.published_at DESC, item.id"""),
         (grade, *scope_params, fingerprint),
     ).fetchall()
     desired = {(item['subject'], item['skillId'], int(item['variantOrdinal']))
                for item in target['courseTargets']}
     result = {}
     for row in rows:
+        if required_playful_policy is not None:
+            try:
+                source_target = row.get('source_target_spec_json')
+                if isinstance(source_target, str):
+                    source_target = json.loads(source_target)
+                if (not isinstance(source_target, Mapping)
+                        or _playful_policy_identity(source_target) != required_playful_policy):
+                    continue
+            except (TypeError, ValueError):
+                continue
         key = (row['subject'], row['skill_id'], int(row['variant_ordinal']))
         if key in desired:
-            result.setdefault(key, dict(row))
+            available = dict(row)
+            available.pop('source_target_spec_json', None)
+            result.setdefault(key, available)
     return result
