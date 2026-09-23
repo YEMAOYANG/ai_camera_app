@@ -1,0 +1,439 @@
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -178,6 +178,7 @@
+   mimeType?: 'audio/wav';
+   sizeBytes?: number;
+   audioSha256?: string;
++  providerLanguageRepair?: MiraEnglishRepairAsrDiagnosticProfile & { providerBodySha256: string };
+   providerPronunciation?: {
+     policyVersion: typeof MIRA_FORMAL_MATH_TTS_PRONUNCIATION_POLICY |
+       typeof MIRA_FORMAL_ENGLISH_TTS_PRONUNCIATION_POLICY;
+@@ -201,8 +202,10 @@
+ 
+ export const MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY = 'mira.english.repair-asr-auto-language.v1' as const;
+ export const MIRA_ENGLISH_SPELLING_ASR_DIAGNOSTIC_POLICY = 'mira.english.spelling-asr-auto-language.v1' as const;
++export const MIRA_ENGLISH_MIXED_LANGUAGE_REPAIR_POLICY = 'mira.english.mixed-tts-auto-language-repair.v1' as const;
+ export interface MiraEnglishRepairAsrDiagnosticProfile {
+-  policyVersion: typeof MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY | typeof MIRA_ENGLISH_SPELLING_ASR_DIAGNOSTIC_POLICY;
++  policyVersion: typeof MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY | typeof MIRA_ENGLISH_SPELLING_ASR_DIAGNOSTIC_POLICY |
++    typeof MIRA_ENGLISH_MIXED_LANGUAGE_REPAIR_POLICY;
+   sourceEvidenceSha256: string;
+ }
+ 
+@@ -498,8 +501,9 @@
+ async function claimTts(
+   input: MiraFormalTtsRequest,
+   now: Date,
++  languageRepairProfile?: MiraEnglishRepairAsrDiagnosticProfile,
+ ): Promise<{ record: MiraFormalTtsJob; created: boolean }> {
+-  const digest = requestDigest(input);
++  const digest = requestDigest(languageRepairProfile ? {logicalRequest: input, languageRepairProfile} : input);
+   const existing = await readMiraFormalTtsJob(input.requestId, now);
+   if (existing) {
+     if (existing.requestSha256 !== digest) {
+@@ -904,9 +908,24 @@
+   value: unknown,
+   dependencies: RuntimeDependencies = {},
+ ): Promise<{ record: MiraFormalTtsJob; created: boolean }> {
++  return executeFormalTts(value, dependencies);
++}
++
++/** Audited operator lane: same text and voice, explicit mixed-language synthesis. */
++export async function executeMiraEnglishMixedLanguageTts(value: unknown, sourceEvidenceSha256: string) {
++  const input = assertMiraFormalTtsRequest(value);
++  if (input.subject !== 'english' || !SHA256.test(sourceEvidenceSha256) ||
++      !/^formal_tts_[a-f0-9]{48}\.language1$/.test(input.requestId))
++    throw new MiraFormalAudioError('invalid_request', 'Invalid English language repair identity');
++  return executeFormalTts(input, {}, {policyVersion: MIRA_ENGLISH_MIXED_LANGUAGE_REPAIR_POLICY, sourceEvidenceSha256});
++}
++
++async function executeFormalTts(
++  value: unknown, dependencies: RuntimeDependencies = {}, languageRepairProfile?: MiraEnglishRepairAsrDiagnosticProfile,
++): Promise<{ record: MiraFormalTtsJob; created: boolean }> {
+   const input = assertMiraFormalTtsRequest(value);
+   const now = dependencies.now?.() || new Date();
+-  const claim = await claimTts(input, now);
++  const claim = await claimTts(input, now, languageRepairProfile);
+   if (!claim.created) return claim;
+   let record = claim.record;
+   const fetchImpl = dependencies.fetchImpl || fetch;
+@@ -923,7 +942,7 @@
+       : input.subject === 'english' && providerText !== input.text ? MIRA_FORMAL_ENGLISH_TTS_PRONUNCIATION_POLICY : undefined;
+     const providerRequest = {
+       model: 'qwen3-tts-flash',
+-      input: { text: providerText, voice: policy.voiceId, language_type: policy.qwenLanguageType },
++      input: { text: providerText, voice: policy.voiceId, language_type: languageRepairProfile ? 'Auto' : policy.qwenLanguageType },
+       parameters: { rate: 0 },
+     };
+     const characters = Array.from(providerText).length;
+@@ -937,7 +956,11 @@
+       // Existing logical requests return above and retain their original WAV.
+       await updateTts(record);
+     }
+-    const paidRequest = record.providerPronunciation ? {
++    if (languageRepairProfile) {
++      record = {...record, providerLanguageRepair: {...languageRepairProfile, providerBodySha256: requestDigest(providerRequest)}};
++      await updateTts(record);
++    }
++    const paidRequest = languageRepairProfile ? {logicalRequest: input, languageRepairProfile, providerRequest} : record.providerPronunciation ? {
+       logicalRequest: input, providerPronunciation: record.providerPronunciation, providerRequest,
+     } : input;
+     const providerBody = await budgetedOperation('qwen-tts', 'qwen3-tts-flash', paidRequest,
+@@ -1034,6 +1057,17 @@
+   dependencies: RuntimeDependencies = {},
+ ): Promise<{ record: MiraFormalAsrJob; created: boolean; transcript?: string }> {
+   return executeFormalAsr(value, dependencies);
++}
++
++export async function executeMiraEnglishMixedLanguageAsr(value: unknown, sourceEvidenceSha256: string,
++  dependencies: RuntimeDependencies = {}) {
++  const input = assertMiraFormalAsrRequest(value);
++  if (input.subject !== 'english' || !SHA256.test(sourceEvidenceSha256) ||
++      !/^formal_asr_[a-f0-9]{48}\.language1$/.test(input.requestId) ||
++      input.ttsRequestId !== input.requestId.replace(/^formal_asr_/, 'formal_tts_'))
++    throw new MiraFormalAudioError('invalid_request', 'Invalid English language repair ASR identity');
++  return executeFormalAsr(input, dependencies,
++    {policyVersion: MIRA_ENGLISH_MIXED_LANGUAGE_REPAIR_POLICY, sourceEvidenceSha256});
+ }
+ 
+ /** Operator-only profile; the ordinary ASR request/API contract stays exact.
+diff --git a/lib/server/mira-formal-audio-repair.ts b/lib/server/mira-formal-audio-repair.ts
+--- a/lib/server/mira-formal-audio-repair.ts
++++ b/lib/server/mira-formal-audio-repair.ts
+@@ -6,6 +6,7 @@
+ import { writeJsonFileAtomic } from './classroom-storage';
+ import { readMiraFormalAsrJob, readMiraFormalTtsJob, readMiraFormalTtsAsset, executeMiraFormalTts, executeMiraFormalAsr,
+   executeMiraEnglishRepairAsrDiagnostic, MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY,
++  executeMiraEnglishMixedLanguageTts, executeMiraEnglishMixedLanguageAsr, MIRA_ENGLISH_MIXED_LANGUAGE_REPAIR_POLICY,
+   MIRA_FORMAL_AUDIO_POLICY, type MiraFormalTtsRequest, type MiraFormalAsrRequest, type MiraFormalTtsJob, type MiraFormalAsrJob } from './mira-formal-audio';
+ import { prepareMiraFormalAsrComparisonText, normalizeMiraFormalAsrText, miraFormalAsrSimilarityBps } from './mira-formal-audio-lifecycle';
+ import { MIRA_FORMAL_MATH_TTS_PRONUNCIATION_POLICY, prepareMiraMathTtsPronunciation } from './mira-formal-math-pronunciation';
+@@ -120,15 +121,48 @@
+     throw new Error('AUDIO_ENGLISH_DIAGNOSTIC_IDENTITY_INVALID');
+   const folder = path.dirname(englishDiagnosticFolder(input.asrRequestId));
+   const source = JSON.parse(await fs.readFile(path.join(folder, 'source.json'), 'utf8'));
+-  if (source.policy !== ENGLISH_REPAIR_POLICY || !source.englishPronunciationRepair ||
++  // A short mixed-language repair that is still below the unchanged threshold
++  // may diagnose its existing WAV once. This never authorizes another TTS.
++  const mixedLowScore = source.policy === 'mira-single-narration-repair.v1' &&
++    !source.englishPronunciationRepair && input.text.length <= 160 &&
++    /[A-Za-z]/.test(input.text) && /\p{Script=Han}/u.test(input.text) &&
++    prepareMiraEnglishTtsPronunciation(input.text) === input.text &&
++    Number.isSafeInteger(source.asr?.similarityBps) && source.asr.similarityBps >= 0 && source.asr.similarityBps < 8500;
++  if ((!mixedLowScore && (source.policy !== ENGLISH_REPAIR_POLICY || !source.englishPronunciationRepair)) ||
+       source.asrRequestId !== input.asrRequestId || source.tts?.classroomId !== input.classroomId ||
+       source.tts?.requestId !== input.asrRequestId.replace(/^formal_asr_/, 'formal_tts_') ||
+       source.asr?.audioSha256 !== input.expectedOriginalAudioSha256 ||
+-      !Number.isSafeInteger(source.asr?.similarityBps) || source.asr.similarityBps < 8500)
++      !Number.isSafeInteger(source.asr?.similarityBps) || (!mixedLowScore && source.asr.similarityBps < 8500))
+     throw new Error('AUDIO_ENGLISH_DIAGNOSTIC_ORIGINAL_NOT_PROVEN');
+-  const originalEvidence = await readMiraEnglishPronunciationRepairEvidence({asrRequestId: input.asrRequestId,
+-    tts: source.tts, asr: source.asr, text: input.text});
+-  if (qualitySha(originalEvidence) !== qualitySha(source.englishPronunciationRepair))
++  let originalEvidence;
++  if (mixedLowScore) {
++    const tts = source.tts as MiraFormalTtsJob, asr = source.asr as MiraFormalAsrJob;
++    const identity = Object.fromEntries(identityKeys.map(key => [key, tts[key]]));
++    if (tts.kind !== 'tts' || asr.kind !== 'asr' || tts.subject !== 'english' || asr.subject !== 'english' ||
++        tts.state !== 'succeeded' || asr.state !== 'succeeded' ||
++        tts.providerId !== 'qwen-tts' || tts.modelId !== 'qwen3-tts-flash' || tts.fallbackUsed !== false ||
++        asr.providerId !== 'qwen-asr' || asr.modelId !== 'qwen3-asr-flash' || asr.fallbackUsed !== false ||
++        asr.requestId !== input.asrRequestId || asr.ttsRequestId !== tts.requestId ||
++        tts.audioSha256 !== asr.audioSha256 || tts.textSha256 !== sha(input.text) ||
++        'operatorRepair' in tts || 'operatorRepair' in asr || asr.providerDiagnostic ||
++        identityKeys.some(key => asr[key] !== tts[key]) ||
++        tts.requestSha256 !== qualitySha({...identity, requestId: tts.requestId, text: input.text, textSha256: sha(input.text)}) ||
++        asr.requestSha256 !== qualitySha({...identity, requestId: asr.requestId, ttsRequestId: tts.requestId, audioSha256: tts.audioSha256}) ||
++        !tts.assetFileName || !/^[A-Za-z0-9._-]+\.wav$/.test(tts.assetFileName))
++      throw new Error('AUDIO_ENGLISH_MIXED_DIAGNOSTIC_ORIGINAL_NOT_PROVEN');
++    const archive = await verifiedEnglishTranscript(asr, input.text);
++    const root = process.env.MIRA_FORMAL_AUDIO_DATA_DIR || path.join(process.cwd(), 'data/formal-audio');
++    const bytes = await fs.readFile(path.join(root, 'assets', tts.assetFileName));
++    if (bytes.length !== tts.sizeBytes || bytes.length > 16 * 1024 * 1024 || sha(bytes) !== tts.audioSha256)
++      throw new Error('AUDIO_ENGLISH_MIXED_DIAGNOSTIC_ORIGINAL_WAV_CHANGED');
++    originalEvidence = {policyVersion: 'mira.english.mixed-low-score-repair-source.v1',
++      originalTtsSha256: qualitySha(tts), originalAsrSha256: qualitySha(asr),
++      originalAudioSha256: tts.audioSha256, transcriptArchiveSha256: qualitySha(archive)};
++  } else {
++    originalEvidence = await readMiraEnglishPronunciationRepairEvidence({asrRequestId: input.asrRequestId,
++      tts: source.tts, asr: source.asr, text: input.text});
++  }
++  if (!mixedLowScore && qualitySha(originalEvidence) !== qualitySha(source.englishPronunciationRepair))
+     throw new Error('AUDIO_ENGLISH_DIAGNOSTIC_ORIGINAL_CHANGED');
+   const tts = await readMiraFormalTtsJob(`${source.tts.requestId}.repair1`);
+   const priorAsr = await readMiraFormalAsrJob(`${input.asrRequestId}.repair1`);
+@@ -138,7 +172,8 @@
+       tts.providerId !== 'qwen-tts' || tts.modelId !== 'qwen3-tts-flash' || tts.fallbackUsed !== false ||
+       priorAsr.providerId !== 'qwen-asr' || priorAsr.modelId !== 'qwen3-asr-flash' || priorAsr.fallbackUsed !== false ||
+       priorAsr.ttsRequestId !== tts.requestId || priorAsr.audioSha256 !== tts.audioSha256 ||
+-      !Number.isSafeInteger(priorAsr.similarityBps) || (priorAsr.similarityBps ?? 0) < 8500 ||
++      !Number.isSafeInteger(priorAsr.similarityBps) || (priorAsr.similarityBps ?? -1) < 0 ||
++      (mixedLowScore ? priorAsr.similarityBps! >= 8500 : priorAsr.similarityBps! < 8500) ||
+       (priorAsr.similarityBps ?? 10001) > 10000 || priorAsr.providerDiagnostic ||
+       'operatorRepair' in tts || 'operatorRepair' in priorAsr ||
+       identityKeys.some(key => tts[key] !== source.tts[key] || priorAsr[key] !== source.tts[key]))
+@@ -155,6 +190,7 @@
+   if (qualitySha(asset.record) !== qualitySha(tts) || sha(asset.bytes) !== tts.audioSha256)
+     throw new Error('AUDIO_ENGLISH_DIAGNOSTIC_REPAIR_WAV_CHANGED');
+   const evidence = {policyVersion: MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY,
++    ...(mixedLowScore ? {sourceKind: 'mixed_language_low_score_repair' as const} : {}),
+     originalAsrRequestId: input.asrRequestId, sourceSha256: qualitySha(source),
+     originalPronunciationEvidenceSha256: qualitySha(originalEvidence), sourceTextSha256: sha(input.text),
+     repairTtsSha256: qualitySha(tts), repairAsrSha256: qualitySha(priorAsr),
+@@ -203,6 +239,10 @@
+ 
+ /** Adoption and completion re-read all source/WAV/transcript/provider proofs. */
+ export async function readMiraEnglishRepairAsrDiagnostic(input: EnglishRepairDiagnosticInput & {receiptSha256: string}) {
++  return readEnglishRepairAsrDiagnostic(input);
++}
++
++async function readEnglishRepairAsrDiagnostic(input: EnglishRepairDiagnosticInput & {receiptSha256: string}, rejectedMixed = false) {
+   if (!/^[a-f0-9]{64}$/.test(input.receiptSha256)) throw new Error('AUDIO_ENGLISH_DIAGNOSTIC_RECEIPT_INVALID');
+   const {evidence, tts, priorAsr, bytes} = await englishDiagnosticContext(input);
+   const folder = englishDiagnosticFolder(input.asrRequestId);
+@@ -225,9 +265,127 @@
+       qualitySha(asr.providerDiagnostic) !== qualitySha({...diagnosticProfile, providerBodySha256: qualitySha(providerRequest)}))
+     throw new Error('AUDIO_ENGLISH_DIAGNOSTIC_PROVIDER_INPUT_NOT_PROVEN');
+   if (asr.state !== 'succeeded') throw new Error('AUDIO_ENGLISH_DIAGNOSTIC_NOT_SUCCEEDED');
+-  await verifiedEnglishTranscript(asr, input.text);
++  const archive = await verifiedEnglishTranscript(asr, input.text);
++  if (rejectedMixed) {
++    if (evidence.sourceKind !== 'mixed_language_low_score_repair' || (asr.similarityBps ?? 10000) >= 8500)
++      throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_DIAGNOSTIC_NOT_REJECTED');
++    return {tts, asr, priorAsr, receipt};
++  }
++  if (evidence.sourceKind === 'mixed_language_low_score_repair') {
++    const han = (text: string) => (text.match(/\p{Script=Han}/gu) ?? []).join('');
++    if ((asr.similarityBps ?? 0) < 8500 || !miraEnglishPronunciationTermsPreserved(input.text, archive.transcript) ||
++        han(input.text) !== han(archive.transcript))
++      throw new Error('AUDIO_ENGLISH_MIXED_DIAGNOSTIC_RESULT_NOT_VERIFIED');
++  }
+   await assertMiraEnglishPronunciationRepairResult({text: input.text, tts, asr});
+   return {tts, asr, priorAsr, receipt};
++}
++
++async function englishLanguageRepairSource(input: EnglishRepairDiagnosticInput) {
++  const context = await englishDiagnosticContext(input);
++  if (context.evidence.sourceKind !== 'mixed_language_low_score_repair')
++    throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_SOURCE_INVALID');
++  const diagnosticReceipt = JSON.parse(await fs.readFile(path.join(englishDiagnosticFolder(input.asrRequestId), 'receipt.json'), 'utf8'));
++  const failed = await readEnglishRepairAsrDiagnostic({...input, receiptSha256: qualitySha(diagnosticReceipt)}, true);
++  const parent = path.dirname(englishDiagnosticFolder(input.asrRequestId));
++  const original = JSON.parse(await fs.readFile(path.join(parent, 'source.json'), 'utf8'));
++  const evidence = {policyVersion: MIRA_ENGLISH_MIXED_LANGUAGE_REPAIR_POLICY,
++    source: context.evidence, failedDiagnosticReceiptSha256: qualitySha(failed.receipt),
++    originalTts: original.tts as MiraFormalTtsJob, originalAsr: original.asr as MiraFormalAsrJob,
++    unchangedTextSha256: sha(input.text)};
++  return {evidence, parent, folder: path.join(parent, 'language1')};
++}
++
++/** Read-only preflight for one new synthesis strategy after proven ASR failures. */
++export async function readMiraEnglishLanguageRepairSource(input: EnglishRepairDiagnosticInput) {
++  return (await englishLanguageRepairSource(input)).evidence;
++}
++
++async function englishLanguageRepairResult(input: EnglishRepairDiagnosticInput) {
++  const context = await englishLanguageRepairSource(input);
++  const saved = JSON.parse(await fs.readFile(path.join(context.folder, 'source.json'), 'utf8'));
++  if (qualitySha(saved) !== qualitySha(context.evidence)) throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_SOURCE_CHANGED');
++  const tts = await readMiraFormalTtsJob(`${context.evidence.originalTts.requestId}.language1`);
++  const asr = await readMiraFormalAsrJob(`${input.asrRequestId}.language1`);
++  if (!tts || !asr || tts.state !== 'succeeded' || asr.state !== 'succeeded' ||
++      tts.providerId !== 'qwen-tts' || tts.modelId !== 'qwen3-tts-flash' || tts.fallbackUsed !== false ||
++      asr.providerId !== 'qwen-asr' || asr.modelId !== 'qwen3-asr-flash' || asr.fallbackUsed !== false ||
++      tts.textSha256 !== sha(input.text) || asr.audioSha256 !== tts.audioSha256 || asr.ttsRequestId !== tts.requestId ||
++      identityKeys.some(key => tts[key] !== context.evidence.originalTts[key] || asr[key] !== tts[key]))
++    throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_RESULT_INVALID');
++  const identity = Object.fromEntries(identityKeys.map(key => [key, tts[key]]));
++  const profile = {policyVersion: MIRA_ENGLISH_MIXED_LANGUAGE_REPAIR_POLICY, sourceEvidenceSha256: qualitySha(context.evidence)};
++  const ttsRequest = {...identity, requestId: tts.requestId, text: input.text, textSha256: sha(input.text)};
++  const asrRequest = {...identity, requestId: asr.requestId, ttsRequestId: tts.requestId, audioSha256: tts.audioSha256};
++  const ttsBody = {model: 'qwen3-tts-flash', input: {text: input.text, voice: 'Jennifer', language_type: 'Auto'}, parameters: {rate: 0}};
++  const asset = await readMiraFormalTtsAsset(tts.requestId);
++  const asrBody = {model:'qwen3-asr-flash',input:{messages:[{role:'user',content:[
++    {audio:`data:audio/wav;base64,${Buffer.from(asset.bytes).toString('base64')}`},
++  ]}]},parameters:{asr_options:{}}};
++  if (tts.requestSha256 !== qualitySha({logicalRequest:ttsRequest,languageRepairProfile:profile}) ||
++      asr.requestSha256 !== qualitySha({logicalRequest:asrRequest,diagnosticProfile:profile}) ||
++      qualitySha(tts.providerLanguageRepair) !== qualitySha({...profile,providerBodySha256:qualitySha(ttsBody)}) ||
++      qualitySha(asr.providerDiagnostic) !== qualitySha({...profile,providerBodySha256:qualitySha(asrBody)}) ||
++      qualitySha(asset.record) !== qualitySha(tts))
++    throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_PROVIDER_INPUT_CHANGED');
++  const archive = await verifiedEnglishTranscript(asr,input.text);
++  const han=(text:string)=>(text.match(/\p{Script=Han}/gu)??[]).join('');
++  if ((asr.similarityBps??0)<8500 || !miraEnglishPronunciationTermsPreserved(input.text,archive.transcript) ||
++      han(input.text)!==han(archive.transcript)) throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_NOT_VERIFIED');
++  const audit = {policy:MIRA_ENGLISH_MIXED_LANGUAGE_REPAIR_POLICY,sourceEvidenceSha256:qualitySha(context.evidence),
++    originalTtsSha256:qualitySha(context.evidence.originalTts),originalAsrSha256:qualitySha(context.evidence.originalAsr),
++    originalAudioSha256:input.expectedOriginalAudioSha256,physicalTtsRequestId:tts.requestId,physicalAsrRequestId:asr.requestId};
++  const promotedTts={...tts,requestId:context.evidence.originalTts.requestId,
++    requestSha256:context.evidence.originalTts.requestSha256,createdAt:context.evidence.originalTts.createdAt,operatorRepair:audit};
++  const promotedAsr={...asr,requestId:input.asrRequestId,ttsRequestId:context.evidence.originalTts.requestId,
++    requestSha256:qualitySha({...asrRequest,requestId:input.asrRequestId,ttsRequestId:context.evidence.originalTts.requestId}),
++    createdAt:context.evidence.originalAsr.createdAt,operatorRepair:audit};
++  return {...context,journal:{...audit,tts:promotedTts,asr:promotedAsr},tts,asr};
++}
++
++export async function repairMiraEnglishMixedLanguageAudio(input: EnglishRepairDiagnosticInput) {
++  const context=await englishLanguageRepairSource(input);
++  await fs.mkdir(context.folder,{recursive:true,mode:0o700});
++  const lock=await acquireFormalQualityLock(path.join(context.folder,'repair.lock'));
++  try {
++    const file=path.join(context.folder,'source.json');
++    try { if(qualitySha(JSON.parse(await fs.readFile(file,'utf8')))!==qualitySha(context.evidence))
++      throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_SOURCE_CHANGED'); }
++    catch(error) { if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
++      await writeJsonFileAtomic(file,context.evidence); }
++    const identity=Object.fromEntries(identityKeys.map(key=>[key,context.evidence.originalTts[key]]));
++    const ttsRequest={...identity,requestId:`${context.evidence.originalTts.requestId}.language1`,text:input.text,textSha256:sha(input.text)};
++    const tts=(await executeMiraEnglishMixedLanguageTts(ttsRequest,qualitySha(context.evidence))).record;
++    if(tts.state!=='succeeded'||!tts.audioSha256)throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_TTS_NOT_SUCCEEDED');
++    await executeMiraEnglishMixedLanguageAsr({...identity,requestId:`${input.asrRequestId}.language1`,ttsRequestId:tts.requestId,
++      audioSha256:tts.audioSha256},qualitySha(context.evidence),{transcriptEvidence:transcript=>{
++        const actual=prepareMiraFormalAsrComparisonText(transcript,'english');
++        return {normalizedTranscriptSha256:sha(normalizeMiraFormalAsrText(actual)),
++          similarityBps:miraFormalAsrSimilarityBps(prepareMiraFormalAsrComparisonText(input.text,'english'),actual)};
++      }});
++    const result=await englishLanguageRepairResult(input);
++    await writeJsonFileAtomic(path.join(context.folder,'promotion.json'),result.journal);
++    const root=process.env.MIRA_FORMAL_AUDIO_DATA_DIR||path.join(process.cwd(),'data/formal-audio');
++    for(const [kind,original,promoted] of [['tts',context.evidence.originalTts,result.journal.tts],['asr',context.evidence.originalAsr,result.journal.asr]] as const){
++      const file=path.join(root,'jobs',kind,`${sha(promoted.requestId)}.json`);
++      const current=JSON.parse(await fs.readFile(file,'utf8'));
++      if(qualitySha(current)!==qualitySha(original)&&qualitySha(current)!==qualitySha(promoted))
++        throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_PROMOTION_CHANGED');
++      await writeJsonFileAtomic(file,promoted);
++    }
++    return {asrRequestId:input.asrRequestId,receiptSha256:qualitySha(result.journal),
++      audioSha256:result.tts.audioSha256,similarityBps:result.asr.similarityBps,repairKind:'language1'};
++  } finally {await lock.release();}
++}
++
++export async function readMiraEnglishLanguageRepairPromotion(input: EnglishRepairDiagnosticInput & {receiptSha256:string}) {
++  const result=await englishLanguageRepairResult(input);
++  const saved=JSON.parse(await fs.readFile(path.join(result.folder,'promotion.json'),'utf8'));
++  if(qualitySha(saved)!==input.receiptSha256||qualitySha(result.journal)!==input.receiptSha256||
++      qualitySha(await readMiraFormalTtsJob(result.journal.tts.requestId))!==qualitySha(result.journal.tts)||
++      qualitySha(await readMiraFormalAsrJob(input.asrRequestId))!==qualitySha(result.journal.asr))
++    throw new Error('AUDIO_ENGLISH_LANGUAGE_REPAIR_PROMOTION_CHANGED');
++  return {sourceSha256:qualitySha(result.evidence)};
+ }
+ 
+ /** Only a proven old-input pronunciation failure gets the fixed new lane. */
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -30,7 +30,8 @@
+ import { repairMiraFormalAudioSegment, readMiraPronunciationRepairEvidence,
+   readMiraEnglishPronunciationRepairEvidence, assertMiraEnglishPronunciationRepairResult,
+   readMiraEnglishRepairAsrDiagnosticSource, diagnoseMiraEnglishRepairAsr,
+-  readMiraEnglishRepairAsrDiagnostic } from '../lib/server/mira-formal-audio-repair';
++  readMiraEnglishRepairAsrDiagnostic, readMiraEnglishLanguageRepairSource,
++  repairMiraEnglishMixedLanguageAudio, readMiraEnglishLanguageRepairPromotion } from '../lib/server/mira-formal-audio-repair';
+ import { MIRA_FORMAL_MATH_TTS_PRONUNCIATION_POLICY, prepareMiraMathTtsPronunciation } from '../lib/server/mira-formal-math-pronunciation';
+ import type { FormalQualityReviewGrant } from '../lib/server/mira-formal-teaching-quality';
+ import { claimUnsentBrowserRecheck } from '../lib/server/mira-formal-browser-recheck';
+@@ -44,7 +45,23 @@
+ 
+ /** Read-only proof of the actual repair1 promotion, not a manifest retry flag. */
+ async function verifiedAudioRepair(value: unknown, prepared: Awaited<ReturnType<typeof prepareMiraFormalSavedStageRecovery>>) {
+-  const reference = value as {asrRequestId: string; receiptSha256: string; repairKind?: 'pronunciation1'};
++  const reference = value as {asrRequestId: string; receiptSha256: string; repairKind?: 'pronunciation1' | 'language1'};
++  if (reference?.repairKind === 'language1') {
++    if (Object.keys(reference).sort().join(',') !== 'asrRequestId,receiptSha256,repairKind' ||
++        !/^formal_asr_[a-f0-9]{48}$/.test(reference.asrRequestId) || !/^[a-f0-9]{64}$/.test(reference.receiptSha256))
++      throw new Error('SAVED_STAGE_LANGUAGE_REPAIR_REFERENCE_INVALID');
++    const root=process.env.MIRA_FORMAL_AUDIO_DATA_DIR||path.join(process.cwd(),'data/formal-audio');
++    const source=JSON.parse(await fs.readFile(path.join(root,'repairs',sha(Buffer.from(reference.asrRequestId)),'language1/source.json'),'utf8'));
++    const original=source.originalTts;
++    const action=prepared.scenes.find(scene=>scene.id===original?.sceneId)?.actions?.find(action=>action.id===original?.actionId);
++    if(!action||action.type!=='speech'||original.classroomId!==prepared.stage.id||
++        original.classroomContentSha256!==miraFormalAudioClassroomContentSha256(prepared.stage,prepared.scenes))
++      throw new Error('SAVED_STAGE_LANGUAGE_REPAIR_SOURCE_INVALID');
++    const verified=await readMiraEnglishLanguageRepairPromotion({asrRequestId:reference.asrRequestId,
++      receiptSha256:reference.receiptSha256,classroomId:prepared.stage.id,
++      text:prepareMiraFormalSpeechText(action.text.trim(),'english'),expectedOriginalAudioSha256:original.audioSha256});
++    return {...reference,...verified};
++  }
+   const pronunciation = reference?.repairKind === 'pronunciation1';
+   const kind = pronunciation ? 'pronunciation1' : 'repair1';
+   if (!reference || Object.keys(reference).sort().join(',') !== (pronunciation ? 'asrRequestId,receiptSha256,repairKind' : 'asrRequestId,receiptSha256') ||
+@@ -92,7 +109,8 @@
+       throw new Error('SAVED_STAGE_PRONUNCIATION_REPAIR_SOURCE_CHANGED');
+   }
+   const diagnosticReceiptSha256 = journal.englishRepairAsrDiagnosticReceiptSha256;
+-  if (diagnosticReceiptSha256 !== undefined && (!englishPronunciation ||
++  if (diagnosticReceiptSha256 !== undefined && ((!englishPronunciation &&
++      !(knownBadAsr && !pronunciation && originalTts.subject === 'english' && source.policy === 'mira-single-narration-repair.v1')) ||
+       typeof diagnosticReceiptSha256 !== 'string' || !/^[a-f0-9]{64}$/.test(diagnosticReceiptSha256)))
+     throw new Error('SAVED_STAGE_ENGLISH_DIAGNOSTIC_REFERENCE_INVALID');
+   const diagnostic = diagnosticReceiptSha256 ? await readMiraEnglishRepairAsrDiagnostic({
+@@ -187,10 +205,24 @@
+     stage: prepared.stage, scenes: prepared.scenes});
+   for (const segment of segments) {
+     const folder = path.join(root, 'repairs', sha(Buffer.from(segment.asrRequestId)));
++    let languageJournal;
++    try { languageJournal=JSON.parse(await fs.readFile(path.join(folder,'language1/promotion.json'),'utf8')); }
++    catch(error) { if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error; }
++    if(languageJournal){
++      references.push(await verifiedAudioRepair({asrRequestId:segment.asrRequestId,
++        receiptSha256:qualitySha(languageJournal),repairKind:'language1'},prepared));
++      continue;
++    }
+     let source;
+     try { source = JSON.parse(await fs.readFile(path.join(folder, 'source.json'), 'utf8')); }
+     catch (error) { if ((error as NodeJS.ErrnoException).code === 'ENOENT') continue; throw error; }
+-    if (source.policy !== 'mira-english-pronunciation-repair.v1' && !source.englishPronunciationRepair) continue;
++    if (source.policy !== 'mira-english-pronunciation-repair.v1' && !source.englishPronunciationRepair) {
++      if (source.policy !== 'mira-single-narration-repair.v1') continue;
++      let journal;
++      try { journal = JSON.parse(await fs.readFile(path.join(folder, 'promotion.json'), 'utf8')); }
++      catch (error) { if ((error as NodeJS.ErrnoException).code === 'ENOENT') continue; throw error; }
++      if (!journal.englishRepairAsrDiagnosticReceiptSha256) continue;
++    }
+     // Do not skip a missing promotion: the saved source is proof that this
+     // otherwise high-scoring narration was explicitly rejected by the operator.
+     const journal = JSON.parse(await fs.readFile(path.join(folder, 'promotion.json'), 'utf8'));
+@@ -203,6 +235,7 @@
+ async function main() {
+   const [mode, manifestPath, ...extraArgs] = process.argv.slice(2);
+   if (!['prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
++    'prepare-english-language-repair','repair-english-language-audio',
+     'prepare-english-repair-diagnostic', 'diagnose-english-repair-audio',
+     'revalidate-audio-comparison', 'complete-audio-comparison-tail'].includes(mode) || !manifestPath)
+     throw new Error('Usage: recover-formal-saved-stage.ts prepare|inspect|complete|complete-browser-recheck|prepare-english-repair-diagnostic|diagnose-english-repair-audio|repair-audio|revalidate-audio-comparison|complete-audio-comparison-tail manifest.json [--completion-paid-budget sidecar.json]');
+@@ -238,7 +271,7 @@
+   const snapshotSha256 = qualitySha(qualitySnapshot(prepared.stage, prepared.scenes));
+   const identity = { sourceJobSha256: sha(source), sourceSnapshotSha256: manifest.sourceSnapshotSha256,
+     repairSnapshotSha256: snapshotSha256, sessionId: prepared.sessionId, stageId: prepared.stage.id };
+-  const runPaidAudio = <T>(operation: 'repair1' | 'pronunciation1' | 'diagnostic1', requestId: string, work: () => Promise<T>) =>
++  const runPaidAudio = <T>(operation: 'repair1' | 'pronunciation1' | 'diagnostic1' | 'language1', requestId: string, work: () => Promise<T>) =>
+     withPaidBudget(parsePaidBudget(job.formalInput!.paidBudget),
+       `formal-saved-stage:${job.id}:${identity.sourceJobSha256}:${requestId}:${operation}`, work);
+   if (['revalidate-audio-comparison','complete-audio-comparison-tail'].includes(mode) &&
+@@ -246,6 +279,24 @@
+     throw new Error('SAVED_ASR_COMPARISON_CANNOT_MIX_RECOVERIES');
+   if (manifest.audioRepair && mode !== 'complete-audio-comparison-tail')
+     throw new Error('SAVED_STAGE_AUDIO_REPAIR_TAIL_ONLY');
++  if (['prepare-english-language-repair','repair-english-language-audio'].includes(mode)) {
++    if(manifest.pronunciationRepair||manifest.ttsSourceRequestId||manifest.reviewGrantPath||manifest.browserRecheck||
++        manifest.audioRepair||manifest.asrComparisonRevalidation||manifest.englishRepairAsrDiagnostic)
++      throw new Error('SAVED_STAGE_LANGUAGE_REPAIR_CANNOT_MIX_RECOVERIES');
++    const prior=await readMiraFormalAsrJob(manifest.asrSourceRequestId);
++    const action=prepared.scenes.find(scene=>scene.id===prior?.sceneId)?.actions?.find(action=>action.id===prior?.actionId);
++    if(!prior||prior.subject!=='english'||prior.classroomId!==prepared.stage.id||!action||action.type!=='speech'||
++        prior.classroomContentSha256!==miraFormalAudioClassroomContentSha256(prepared.stage,prepared.scenes))
++      throw new Error('SAVED_STAGE_LANGUAGE_REPAIR_SOURCE_INVALID');
++    const input={asrRequestId:prior.requestId,classroomId:prepared.stage.id,
++      text:prepareMiraFormalSpeechText(action.text.trim(),'english'),expectedOriginalAudioSha256:prior.audioSha256};
++    const evidence=await readMiraEnglishLanguageRepairSource(input);
++    if(mode==='prepare-english-language-repair'){
++      console.log(JSON.stringify({status:'language_repair_prepared',...identity,sourceEvidenceSha256:qualitySha(evidence),providerCalls:0}));return;
++    }
++    assertMiraFormalAudioProviderReady();
++    console.log(JSON.stringify(await runPaidAudio('language1',prior.requestId,()=>repairMiraEnglishMixedLanguageAudio(input))));return;
++  }
+   if (manifest.pronunciationRepair && (mode !== 'repair-audio' || manifest.ttsSourceRequestId))
+     throw new Error('SAVED_STAGE_PRONUNCIATION_REPAIR_MODE_INVALID');
+   const englishDiagnosticMode = ['prepare-english-repair-diagnostic', 'diagnose-english-repair-audio'].includes(mode);

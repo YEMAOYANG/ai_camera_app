@@ -71,29 +71,24 @@ class LearningPracticeService:
         request_key = digest({**scope, 'requestId': request_id})
         request_hash = digest({'subject': subject, 'skillId': skill, 'count': count})
         with self.repository.transaction() as conn:
-            _, grade, revision = self._child(conn, principal)
+            child, grade, revision = self._child(conn, principal)
             prior = self.repository.existing(conn, **scope, request_key=request_key)
             if prior is not None:
                 if prior['request_sha256'] != request_hash:
                     raise ApiError('practice_request_conflict', '这次练习请求已使用，请重新开始', 409)
                 self._assert_session_grade(prior, grade, revision)
+                self._validate_progressive_session(conn, child=child, session=prior)
                 return self._view(conn, prior)
             active = self.repository.active(conn, **scope, grade_code=grade, grade_revision=revision, subject=subject, skill_id=skill)
             if active is not None:
+                self._validate_progressive_session(conn, child=child, session=active)
                 return self._view(conn, active)
             sources = self.repository.eligible_sources(conn, **scope, grade_code=grade, subject=subject, skill_id=skill)
-            mastery_by_node = None
-            if grade != 'primary_1':
-                mastery_by_node = self.repository.difficulty_mastery(conn, **scope, grade_code=grade, subject=subject)
-                eligible = set(available_skill_order(boundaries_for(grade, subject), mastery_by_node))
-                sources = [row for row in sources if row['node_code'] in eligible]
             pool = {}
             for source in sources:
                 try:
-                    if (mastery_by_node is not None and course_difficulty(source)
-                            != preferred_difficulty(mastery_by_node.get(source['node_code']))):
-                        continue
-                    rows = self._project_source(source, grade=grade, subject=subject, skill=skill, timestamp=timestamp)
+                    rows = self._project_progressive_source(conn, child=child, source=source,
+                        subject=subject, skill=skill, timestamp=timestamp)
                     for row in rows:
                         item = self.repository.project(conn, row)
                         pool[item['dedupe_sha256']] = item
@@ -105,8 +100,7 @@ class LearningPracticeService:
             chosen = available[:count]
             if not chosen:
                 return {'ok': True, 'schemaVersion': SCHEMA, 'session': None, 'availableCount': 0,
-                        'fallbackPath': '/learning', 'message': ('当前难度还没有新的复习题，先回学习书架复习学过的课程吧。'
-                            if grade != 'primary_1' else '暂时没有新的复习题，先回学习书架复习学过的课程吧。')}
+                        'fallbackPath': '/learning', 'message': '请先回学习路线完成对应课程，再来复习学过的内容。'}
             session = { 'id': 'practice_' + secrets.token_hex(16), **scope, 'grade_code': grade,
                 'grade_revision': revision, 'subject': subject, 'skill_id': skill,
                 'request_key_sha256': request_key, 'request_sha256': request_hash,
@@ -117,6 +111,77 @@ class LearningPracticeService:
                 'created_at': timestamp } for row in chosen]
             self.repository.create(conn, session=session, questions=chosen, exposures=exposures)
             return {**self._view(conn, session), 'availableCount': len(available)}
+
+    def _verified_progressive_source(self, conn, *, child, source):
+        from repositories.progressive_formal_course_repository import progressive_formal_authority
+        from repositories.progressive_learning_repository import ProgressiveLearningRepository
+        from services.progressive_learning_service import ProgressiveLearningService
+        from services.progressive_course_generation import validate_progressive_course_for_release
+        authority = progressive_formal_authority(conn, database=self.repository.database, child=child, course=source)
+        if authority is None:
+            raise ValueError('practice fine course is not formally available')
+        progression = ProgressiveLearningService(ProgressiveLearningRepository(self.repository.database))
+        state = progression.progression_for_course(conn, child=child, course=source)
+        if state is None or not state['canStart']:
+            raise ValueError('practice fine lesson prerequisites are missing')
+        validate_progressive_course_for_release(conn, course=source, expected_lesson_id=state['lessonId'])
+        return authority
+
+    def _project_progressive_source(self, conn, *, child, source, subject, skill, timestamp):
+        from services.progressive_learning_service import _question_fingerprint
+        authority = self._verified_progressive_source(conn, child=child, source=source)
+        content = decoded(source['content_json'])
+        if (source['subject'] != subject or (skill is not None and source['node_code'] != skill)
+                or content.get('assessmentMode') != 'objective'):
+            return []
+        allowed = {step['questionId'] for step in content['progressiveFlow']
+                   if step['phase'] == 'independent' and step.get('questionId')}
+        rows = []
+        for original in content['questions']:
+            if original['id'] not in allowed:
+                continue
+            question = deepcopy(original)
+            if not self.evaluator.is_scored_deterministic(question['type']):
+                raise ValueError('practice question has no registered scorer')
+            identity = {'gradeCode': source['grade_code'], 'subject': subject, 'skillId': source['node_code'],
+                'releaseId': authority['release_id'], 'courseId': source['id'], 'courseVersion': source['version'], 'questionId': question['id']}
+            question['practiceSource'] = {'curriculumVersion': source['curriculum_version'], 'lessonId': source['node_code'],
+                'courseId': source['id'], 'courseVersion': source['version'], 'questionId': question['id']}
+            contract = digest(question)
+            rows.append({'id': digest({**identity, 'contractSha256': contract}), 'source_key_sha256': digest(identity),
+                'grade_code': source['grade_code'], 'subject': subject, 'skill_id': source['node_code'],
+                'release_id': authority['release_id'], 'course_id': source['id'], 'course_version': source['version'],
+                'source_question_id': question['id'], 'source_content_sha256': digest(content), 'contract_sha256': contract,
+                'dedupe_sha256': digest({'lessonId':source['node_code'],'task':_question_fingerprint(question)}),
+                'question_json':canonical(question), 'created_at':timestamp})
+        return rows
+
+    def _validate_progressive_session(self, conn, *, child, session):
+        sources = {}
+        for item in self.repository.items(conn, session['id']):
+            question = decoded(item['snapshot_json'])
+            origin = question.get('practiceSource') or {}
+            if (origin.get('curriculumVersion') != 'mira.primary.progressive.v1'
+                    or not origin.get('courseId') or not origin.get('courseVersion')
+                    or digest(question) != item['contract_sha256']):
+                raise ApiError('practice_curriculum_upgraded', '练习已更新，请返回学习路线完成对应课程后再来复习', 409)
+            key = (origin['courseId'], origin['courseVersion'])
+            if key not in sources:
+                source = self.repository.completed_progressive_course(conn, family_id=child['family_id'], child_id=child['id'],
+                    course_id=key[0], course_version=key[1])
+                if source is None:
+                    raise ApiError('practice_source_unavailable', '这节课尚未完成或暂不可用，请返回学习路线', 409)
+                try:
+                    self._verified_progressive_source(conn, child=child, source=source)
+                except (ApiError, KeyError, TypeError, ValueError) as exc:
+                    raise ApiError('practice_source_unavailable', '这组复习题暂不可用，请返回学习路线', 409) from exc
+                sources[key] = decoded(source['content_json'])
+            content = sources[key]
+            allowed = {step.get('questionId') for step in content['progressiveFlow'] if step['phase']=='independent'}
+            original = next((value for value in content['questions'] if value['id']==origin.get('questionId')), None)
+            frozen = {key: value for key,value in question.items() if key!='practiceSource'}
+            if original is None or original['id'] not in allowed or frozen != original:
+                raise ApiError('practice_contract_changed', '复习题与已学课程版本不一致，请返回学习路线', 409)
 
     def _project_source(self, source, *, grade, subject, skill, timestamp):
         if (source['grade_code'] != grade or source['subject'] != subject
@@ -209,6 +274,8 @@ class LearningPracticeService:
         if session is None:
             raise ApiError('practice_session_not_found', '没有找到这次练习', 404)
         self._assert_session_grade(session, grade, revision)
+        self._validate_progressive_session(conn, child={'id':principal['child_id'], 'family_id':principal['family_id'],
+            'grade_code':grade, 'grade_selection_revision':revision}, session=session)
         return session
 
     @staticmethod

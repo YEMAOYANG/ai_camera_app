@@ -3996,6 +3996,7 @@ class OpenMaicQuestionAdapter:
         verification_fake_responses: Sequence[str] | None = None,
         consistency_repair_fake_responses: Sequence[str] | None = None,
         process_runner=subprocess.run,
+        execution_environment=None,
     ):
         backend_root = Path(__file__).resolve().parents[1]
         self.sidecar_root = Path(
@@ -4019,6 +4020,7 @@ class OpenMaicQuestionAdapter:
             consistency_repair_fake_responses or []
         )
         self._run = process_runner
+        self.execution_environment = execution_environment
 
     @property
     def cli_path(self) -> Path:
@@ -4527,6 +4529,10 @@ class OpenMaicQuestionAdapter:
         fake_mode: bool = False,
     ):
         environment = os.environ.copy()
+        if self.execution_environment is not None and input_text is not None and not fake_mode:
+            for key in ("MIRA_PAID_BUDGET_BINDING", "MIRA_PAID_BUDGET_BACKEND_URL", "MIRA_PAID_BUDGET_INTERNAL_TOKEN"):
+                environment.pop(key, None)
+            environment.update(self.execution_environment(json.loads(input_text)))
         if fake_mode:
             environment["OPENMAIC_FAKE_MODE"] = "1"
         return self._run(

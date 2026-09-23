@@ -46,6 +46,45 @@ class PersonalLearningAvailabilityTest(unittest.TestCase):
         self.assertEqual(self.state()["newCourseCount"], 3)
         self.assertEqual(self.state(courses=[])["availableCourseCount"], 0)
 
+    def test_mastered_future_course_after_a_gap_is_not_available_or_completed(self):
+        second = boundaries_for("primary_1", "math")[1].skill_id
+        future = {"id": "future", "version": "1", "subject": "math", "node_code": second}
+        state = self.state(courses=[future], mastery={f"math:{second}": "mastered"},
+                           scopeSkills=[{"subject": "math", "skillId": second}])
+        self.assertEqual(state["publishedCourseCount"], 1)
+        self.assertEqual(state["availableCourseCount"], 0)
+        self.assertEqual(state["reviewCourseCount"], 0)
+        self.assertEqual(state["availabilityStatus"], "preparing")
+
+    def test_no_current_asset_offers_only_prior_review_and_preserves_supply_state(self):
+        first, second, third = boundaries_for("primary_1", "math")
+        courses = [{"id": boundary.skill_id, "version": "1", "subject": "math", "node_code": boundary.skill_id}
+                   for boundary in (first, third)]
+        mastery = {f"math:{first.skill_id}": "mastered", f"math:{third.skill_id}": "mastered"}
+        state = self.state(courses=courses, mastery=mastery, paused=True,
+                           scopeSkills=[{"subject": "math", "skillId": boundary.skill_id}
+                                        for boundary in (first, second, third)])
+        self.assertEqual(state["availableCourseCount"], 1)
+        self.assertEqual(state["reviewCourseCount"], 1)
+        self.assertEqual(state["newCourseCount"], 0)
+        self.assertEqual(state["availabilityStatus"], "paused")
+
+    def test_same_named_skill_in_another_subject_does_not_unlock(self):
+        english = boundaries_for("primary_3", "english")
+        last = english[-1]
+        state = personal_learning_state(grade_code="primary_3",
+            courses=[{"id": "english-reading", "version": "1", "subject": "english", "node_code": last.skill_id}],
+            mastery={f"chinese:{boundary.skill_id}": "mastered" for boundary in english}, supply=None)
+        self.assertEqual(state["availableCourseCount"], 0)
+
+    def test_unknown_skill_is_published_but_never_available(self):
+        row = {"id": "unknown", "version": "1", "subject": "math", "node_code": "unknown"}
+        state = self.state(courses=[row], mastery={"math:unknown": "mastered"},
+                           scopeSkills=[{"subject": "math", "skillId": "unknown"}])
+        self.assertEqual(state["publishedCourseCount"], 1)
+        self.assertEqual(state["availableCourseCount"], 0)
+        self.assertEqual(state["availabilityStatus"], "preparing")
+
 
 if __name__ == "__main__":
     unittest.main()

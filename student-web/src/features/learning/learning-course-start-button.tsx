@@ -1,10 +1,12 @@
 "use client";
 
-import { ArrowRight, LoaderCircle } from "lucide-react";
+import { ArrowRight, LoaderCircle, LockKeyhole } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { startLearningCourse } from "@/features/learning/learning-client";
+import { learningProgressionLocked, learningProgressionMessage } from "@/features/learning/learning-progression";
+import type { LearningProgression } from "@/lib/contracts/learning";
 import { openMaicLessonPath } from "@/lib/routing/classroom";
 
 function navigateToDocument(path: string) {
@@ -12,10 +14,11 @@ function navigateToDocument(path: string) {
   window.location.assign(path);
 }
 
-export function LearningCourseStartButton({ courseId, version, label = "开始上课", navigate = navigateToDocument }: {
+export function LearningCourseStartButton({ courseId, version, label = "开始上课", progression, navigate = navigateToDocument }: {
   courseId: string;
   version: string;
   label?: string;
+  progression?: LearningProgression;
   navigate?: (path: string) => void;
 }) {
   const [pending, setPending] = useState(false);
@@ -23,13 +26,14 @@ export function LearningCourseStartButton({ courseId, version, label = "开始�
   const inFlight = useRef(false);
   const mounted = useRef(true);
   const errorId = useId();
+  const locked = learningProgressionLocked(progression);
   useEffect(() => {
     mounted.current = true;
     return () => { mounted.current = false; };
   }, []);
 
   async function start() {
-    if (inFlight.current) return;
+    if (inFlight.current || locked) return;
     inFlight.current = true;
     setPending(true);
     setError("");
@@ -55,9 +59,9 @@ export function LearningCourseStartButton({ courseId, version, label = "开始�
 
   return (
     <div className="flex min-w-0 flex-col items-start gap-2">
-      <Button type="button" onClick={() => void start()} disabled={pending} aria-busy={pending} aria-describedby={error ? errorId : undefined}>
-        {pending ? "正在进入…" : label}
-        {pending ? <LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <ArrowRight className="size-5" aria-hidden="true" />}
+      <Button type="button" onClick={() => void start()} disabled={pending || locked} aria-busy={pending} aria-describedby={error ? errorId : undefined} aria-description={locked && progression ? learningProgressionMessage(progression) : undefined}>
+        {locked ? "暂未解锁" : pending ? "正在进入…" : label}
+        {locked ? <LockKeyhole className="size-5" aria-hidden="true" /> : pending ? <LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <ArrowRight className="size-5" aria-hidden="true" />}
       </Button>
       {error ? <p id={errorId} className="space-inline-error text-sm" role="alert">{error}</p> : null}
     </div>

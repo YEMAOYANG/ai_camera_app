@@ -308,6 +308,7 @@ class LearningCatalogReleaseService:
                 "formal grade validation identity is invalid"
             )
         with self.repository.transaction() as conn:
+            expected_count = formal_target_course_count(self.repository.get_build(conn, build_id=build_id))
             prepare_args = {
                 "grade_code": grade_code,
                 "build_id": build_id,
@@ -430,6 +431,7 @@ class LearningCatalogReleaseService:
                         published_at=publication_at,
                         finalize_release=False,
                     )
+                    self._bind_published_progressive_lessons(conn, release_id=release_id, now=publication_at)
                     published = (
                         preparation_repository.persist_progressive_formal_counts(
                             conn,
@@ -442,7 +444,7 @@ class LearningCatalogReleaseService:
                     )
             if (
                 not allow_partial
-                and total == formal_target_course_count(grade_code)
+                and total == expected_count
                 and failed == 0
                 and ambiguous == 0
             ):
@@ -457,7 +459,7 @@ class LearningCatalogReleaseService:
                         now=int(self._content_clock_ms()),
                     )
                 )
-                expected_stage = "publishing" if ready == formal_target_course_count(grade_code) else "validating"
+                expected_stage = "publishing" if ready == expected_count else "validating"
                 if not persisted or next_stage != expected_stage:
                     raise LearningCatalogActivationError(
                         "formal validation handoff authority is stale"
@@ -501,6 +503,7 @@ class LearningCatalogReleaseService:
             )
         activated_at = int(self._content_clock_ms())
         with self.repository.transaction() as conn:
+            expected_count = formal_target_course_count(self.repository.get_build(conn, build_id=build_id))
             authority = self.repository.lock_formal_publication_authority(
                 conn,
                 grade_code=grade_code,
@@ -512,8 +515,8 @@ class LearningCatalogReleaseService:
                 now=activated_at,
             )
             if (
-                int(authority.get("itemCount") or 0) != formal_target_course_count(grade_code)
-                or int(authority.get("readyItemCount") or 0) != formal_target_course_count(grade_code)
+                int(authority.get("itemCount") or 0) != expected_count
+                or int(authority.get("readyItemCount") or 0) != expected_count
                 or re.fullmatch(
                     r"[0-9a-f]{64}",
                     str(authority.get("publicationReceiptSha256") or ""),
@@ -521,7 +524,7 @@ class LearningCatalogReleaseService:
                 is None
             ):
                 raise LearningCatalogActivationError(
-                    "formal publication requires thirty exact ready items"
+                    "formal publication requires the exact target items"
                 )
             release_id = str(authority.get("releaseId") or "")
             publication_at = int(
@@ -533,6 +536,7 @@ class LearningCatalogReleaseService:
                 publication_request_id=publication_request_id,
                 published_at=publication_at,
             )
+            self._bind_published_progressive_lessons(conn, release_id=release_id, now=publication_at)
             pointer = self.repository.activate_grade_release_pointer(
                 conn,
                 grade_code=grade_code,
@@ -843,6 +847,10 @@ class LearningCatalogReleaseService:
         build_id: str,
     ) -> ContentProofAuditSnapshot:
         build_id = self._identifier(build_id, "buildId")
+        candidate_build = self.repository.get_build(conn, build_id=build_id)
+        if candidate_build is not None and candidate_build.get("curriculum_version") == "mira.primary.progressive.v1":
+            from services.progressive_formal_preparation import audit_progressive_content
+            return audit_progressive_content(self, conn, build=candidate_build)
         inventory = self.repository.load_content_proof_inventory(
             conn, build_id=build_id
         )
@@ -5498,92 +5506,78 @@ class LearningCatalogReleaseService:
                 "公开课程目录创建不接受内容阶段或备课目标参数",
                 400,
             )
-        request_id = self._request_id(data.get("requestId"))
-        grades = self._selection(
-            data.get("grades"),
-            supported=SUPPORTED_GRADES,
-            default=tuple(sorted(SUPPORTED_GRADES)),
-            code="invalid_catalog_grades",
-        )
-        subjects = self._selection(
-            data.get("subjects"),
-            supported=SUPPORTED_SUBJECTS,
-            default=("chinese", "math", "english"),
-            code="invalid_catalog_subjects",
-        )
-        variants = self._integer(data.get("variantsPerBoundary"), default=1, maximum=5)
-        allow_partial = bool(data.get("allowPartial", False))
-        targets = [
-            boundary.to_catalog_payload()
-            for boundary in PRIMARY_SKILL_BOUNDARIES
-            if boundary.grade_code in grades and boundary.subject in subjects
-        ]
-        if not targets:
-            raise ApiError("empty_catalog_target", "课程目录构建范围为空")
-        is_full = len(targets) == len(PRIMARY_SKILL_BOUNDARIES)
-        if not is_full and not allow_partial:
-            raise ApiError(
-                "partial_catalog_requires_confirmation",
-                "部分课程目录只能在明确允许 allowPartial 后构建",
-                409,
-            )
-        title = str(data.get("title") or "Mira 小学核心课程").strip()[:255]
-        target_spec = {
-            "schemaVersion": "mira.learning.catalog-build-target.v1",
-            "curriculumVersion": PRIMARY_CURRICULUM_VERSION,
-            "grades": list(grades),
-            "subjects": list(subjects),
-            "variantsPerBoundary": variants,
-            "allowPartial": allow_partial,
-            "boundaryVersions": [str(item["boundaryVersion"]) for item in targets],
-        }
-        try:
+        if data.get("lessonIds") is None and data.get("requestId"):
             with self.repository.transaction() as conn:
-                self.repository.sync_boundaries(
-                    conn,
-                    boundaries=[
-                        boundary.to_catalog_payload()
-                        for boundary in PRIMARY_SKILL_BOUNDARIES
-                    ],
-                    curriculum_version=PRIMARY_CURRICULUM_VERSION,
-                    now=now_ms(),
-                )
-                build, created = self.repository.create_or_get_build(
-                    conn,
-                    request_id=request_id,
-                    curriculum_version=PRIMARY_CURRICULUM_VERSION,
-                    title=title,
-                    target_spec=target_spec,
-                    targets=targets,
-                    variants_per_boundary=variants,
-                    now=now_ms(),
-                )
-                release = self.repository.get_release(
-                    conn,
-                    release_id=str(build["release_id"]),
-                    for_update=True,
-                )
-                items = self.repository.list_build_items(
-                    conn,
-                    build_id=str(build["id"]),
-                    for_update=True,
-                )
-                readiness = self.repository.get_build_release_readiness(
-                    conn,
-                    build_id=str(build["id"]),
-                    for_update=True,
-                )
-        except LearningCatalogBuildConflict as exc:
-            raise ApiError("catalog_build_request_conflict", str(exc), 409) from exc
-        return {
-            **self._build_payload(
-                build,
-                release=release,
-                items=items,
-                readiness=readiness,
-            ),
-            "created": created,
-        }
+                existing = self.repository.get_build_by_request(conn, request_id=self._request_id(data["requestId"]))
+            if existing is not None:
+                return self.status(existing["id"])
+        if data.get("lessonIds") is not None or data.get("curriculumVersion") in {None, "mira.primary.progressive.v1"}:
+            return self._create_progressive_catalog(data)
+        request_id = self._request_id(data.get("requestId"))
+        with self.repository.transaction() as conn:
+            existing = self.repository.get_build_by_request(conn, request_id=request_id)
+        if existing is not None:
+            return self.status(existing["id"])
+        raise ApiError("progressive_lesson_targets_required", "新课程目录须指定完整学习路线中的 lessonIds", 409)
+
+    def _create_progressive_catalog(self, data: Mapping[str, Any]) -> dict[str, Any]:
+        """Reserve exact fine lessons in the formal graph; creation makes no calls."""
+        from content.progressive_curriculum import CURRICULUM_VERSION, lesson_by_id
+        from services.progressive_course_generation import generation_brief
+        from services.learning_curriculum_preparation_contract import build_progressive_preparation_target
+        from repositories.learning_curriculum_preparation_repository import LearningCurriculumPreparationRepository
+        if data.get("curriculumVersion") not in {None, "mira.primary.progressive.v1"}:
+            raise ApiError("invalid_progressive_curriculum_version", "新课次须使用当前完整课程体系版本", 409)
+        request_id = self._request_id(data.get("requestId"))
+        identifiers = data.get("lessonIds")
+        if (not isinstance(identifiers, list) or not 1 <= len(identifiers) <= 20
+                or any(not isinstance(value, str) for value in identifiers) or len(set(identifiers)) != len(identifiers)):
+            raise ApiError("invalid_progressive_lesson_targets", "请选择 1 至 20 个明确课次", 400)
+        try:
+            lessons = [lesson_by_id(value) for value in identifiers]
+            grade = lessons[0]["gradeCode"]
+            if any(lesson["gradeCode"] != grade for lesson in lessons):
+                raise ValueError("mixed progressive grades")
+            target = build_progressive_preparation_target(grade, assessment_batch_ordinal=data.get("assessmentBatchOrdinal", 1))
+        except ValueError as exc:
+            raise ApiError("invalid_progressive_lesson_targets", "每个正式准备任务须选择同一年级的已注册课次", 400) from exc
+        variants = data.get("variantsPerLesson", 2)
+        if type(variants) is not int or variants not in {1, 2}:
+            raise ApiError("progressive_basic_first_required", "每课先准备一至两组独立入门练习", 400)
+        fingerprint = preparation_target_fingerprint(target)
+        shared_request = f"grade-build:{fingerprint}"
+        preparations = LearningCurriculumPreparationRepository(self.repository.database,
+            content_proof_auditor=self.audit_locked_content_proofs)
+        timestamp = now_ms()
+        boundaries = []
+        for lesson in lessons:
+            brief = generation_brief(lesson["lessonId"])
+            boundaries.append({"gradeCode": grade, "subject": lesson["subject"], "skillId": lesson["lessonId"],
+                "skillTitle": lesson["title"], "curriculumVersion": CURRICULUM_VERSION,
+                "boundaryVersion": CURRICULUM_VERSION + ":" + brief["binding"]["lessonSha256"][:24],
+                "learningObjectives": lesson["learningObjectives"], "prerequisiteSkills": lesson["prerequisiteLessonIds"],
+                "allowedContent": lesson["learningObjectives"], "excludedContent": brief["mustNotDependOnKnowledgeIds"]})
+        with self.repository.transaction() as conn:
+            self.repository.sync_boundaries(conn, boundaries=boundaries, curriculum_version=CURRICULUM_VERSION,
+                now=timestamp, retire_missing=False)
+            plan, _ = preparations.reserve_plan(conn, family_id=None, child_id=None, grade_code=grade,
+                school_year_start_year=0, grade_selection_revision=0, target=target, target_fingerprint=fingerprint,
+                request_id=f"library:{fingerprint}", shared_build_request_id=shared_request, now=timestamp, library_owned=True)
+            build, created = self.repository.create_or_get_content_build(conn, request_id=shared_request,
+                curriculum_version=CURRICULUM_VERSION, title=str(data.get("title") or "Mira 循序渐进课程")[:255],
+                target_spec=target, target_fingerprint=fingerprint, now=timestamp)
+            for item in target["courseTargets"]:
+                if item["skillId"] not in identifiers or item["variantOrdinal"] > variants:
+                    continue
+                conn.execute("INSERT INTO learning_course_supply_requests(target_fingerprint, subject, skill_id, variant_ordinal, "
+                    "priority, purpose, enabled, created_at, updated_at) VALUES (?, ?, ?, ?, 0, 'core', TRUE, ?, ?) "
+                    "ON DUPLICATE KEY UPDATE enabled=TRUE, updated_at=VALUES(updated_at)",
+                    (fingerprint, item["subject"], item["skillId"], item["variantOrdinal"], timestamp, timestamp))
+            release = self.repository.get_release(conn, release_id=build["release_id"])
+            items = self.repository.list_build_items(conn, build_id=build["id"])
+            readiness = self.repository.get_build_release_readiness(conn, build_id=build["id"])
+        return {**self._build_payload(build, release=release, items=items, readiness=readiness), "created": created,
+                "preparationPlanId": plan["id"], "targetFingerprint": fingerprint, "requestId": request_id}
 
     def create_preparation_content_build(
         self,
@@ -5697,6 +5691,9 @@ class LearningCatalogReleaseService:
                             "备课计划已失效，未创建课程目录",
                             409,
                         )
+                if canonical_target.get("schemaVersion") != "mira.learning.preparation-target.progressive.v1" and planning_authority is None:
+                    if self.repository.get_build_by_request(conn, request_id=request_id) is None:
+                        raise ApiError("progressive_lesson_targets_required", "新备课须使用完整学习路线的课次目标", 409)
                 build, created = self.repository.create_or_get_content_build(
                     conn,
                     request_id=request_id,
@@ -5735,6 +5732,15 @@ class LearningCatalogReleaseService:
 
     def run(self, build_id: object, data: Mapping[str, Any]) -> dict[str, Any]:
         build_id = self._identifier(build_id, "buildId")
+        with self.repository.transaction() as conn:
+            scoped_build = self.repository.get_build(conn, build_id=build_id)
+        if scoped_build and scoped_build.get("curriculum_version") == "mira.primary.progressive.v1":
+            import json
+            from flask import current_app
+            from services.learning_curriculum_preparation_runner import learning_curriculum_preparation_runner
+            target = json.loads(scoped_build["target_spec_json"])
+            result = learning_curriculum_preparation_runner.run_scoped_once(current_app._get_current_object(), now_ms(), target=target)
+            return {**self.status(build_id), "preparationRun": result}
         maximum = self._integer(data.get("maxItems"), default=1, maximum=100)
         retry_failed = bool(data.get("retryFailed", True))
         retry_external_value = data.get("retryExternal", False)
@@ -5856,6 +5862,11 @@ class LearningCatalogReleaseService:
                         409,
                     )
                 spec = self.repository.decode_json(build.get("target_spec_json"))
+                if build.get("curriculum_version") == "mira.primary.progressive.v1":
+                    # Fine lessons use the formal publication flow; the generic
+                    # asset-only activation cannot establish runtime/audio proof.
+                    raise ApiError("progressive_formal_publication_required",
+                                   "细课次须通过正式课堂、语音及发布验收", 409)
                 self._validate_release_items(conn, items=items)
                 activated = self.repository.activate_release(
                     conn,
@@ -5903,19 +5914,26 @@ class LearningCatalogReleaseService:
                     and prior_error_message
                     else None
                 )
-                generated = self.dynamic_generation_service.generate_for_skill(
-                    grade_code=str(item["grade_code"]),
-                    subject=str(item["subject"]),
-                    skill_id=str(item["skill_id"]),
-                    attempts=1,
-                    request_id=request_id,
-                    enqueue_classroom=False,
-                    generation_feedback=generation_feedback,
-                    retry_transient_failed=(
-                        str(item.get("claimed_from_status") or "")
-                        == "external_failed"
-                    ),
-                )
+                if item.get("curriculum_version") == "mira.primary.progressive.v1":
+                    generated = self.dynamic_generation_service.generate({
+                        "requestId": request_id, "curriculumVersion": item["curriculum_version"],
+                        "gradeCode": item["grade_code"], "subject": item["subject"],
+                        "lessonId": item["skill_id"], "difficultyCode": "basic",
+                    }, enqueue_classroom=False)
+                else:
+                    generated = self.dynamic_generation_service.generate_for_skill(
+                        grade_code=str(item["grade_code"]),
+                        subject=str(item["subject"]),
+                        skill_id=str(item["skill_id"]),
+                        attempts=1,
+                        request_id=request_id,
+                        enqueue_classroom=False,
+                        generation_feedback=generation_feedback,
+                        retry_transient_failed=(
+                            str(item.get("claimed_from_status") or "")
+                            == "external_failed"
+                        ),
+                    )
                 if not generated.payload.get("ok"):
                     raise _CatalogItemError(
                         str(generated.payload.get("error") or "course_generation_failed"),
@@ -6118,7 +6136,30 @@ class LearningCatalogReleaseService:
                     "课程版本不存在，不能生成课件",
                 )
             content = self.repository.decode_json(row.get("content_json"))
-        self._validate_stored_course_row(row, content=content)
+            self._validate_stored_course_row(row, content=content, conn=conn)
+
+    def _bind_published_progressive_lessons(self, conn, *, release_id: str, now: int) -> None:
+        """Called inside the transaction after the full formal publisher succeeds."""
+        from repositories.progressive_learning_repository import ProgressiveLearningRepository
+        from services.progressive_learning_service import ProgressiveLearningService
+        from services.progressive_course_generation import validate_progressive_course_for_release
+
+        rows = conn.execute(
+            "SELECT course.* FROM learning_catalog_release_items AS item "
+            "JOIN learning_courses AS course ON course.id = item.course_id "
+            "AND course.version = item.course_version "
+            "WHERE item.release_id = ? AND item.status = 'published' "
+            "AND course.curriculum_version = 'mira.primary.progressive.v1' "
+            "AND course.status = 'published' AND course.quality_status = 'released' "
+            "AND item.retired_at IS NULL AND course.retired_at IS NULL",
+            (release_id,),
+        ).fetchall()
+        service = ProgressiveLearningService(ProgressiveLearningRepository(self.repository.database))
+        for course in rows:
+            validate_progressive_course_for_release(conn, course=course,
+                                                   expected_lesson_id=str(course["node_code"]))
+            service.bind_course(conn, course=course, lesson_id=str(course["node_code"]),
+                                assessment_set_id=str(course["generation_request_id"]), now=now)
 
     def _validate_release_items(self, conn, *, items: Sequence[Mapping[str, Any]]) -> None:
         for item in items:
@@ -6150,7 +6191,7 @@ class LearningCatalogReleaseService:
                 )
             content = self.repository.decode_json(content_json)
             try:
-                self._validate_stored_course_row(integrity, content=content)
+                self._validate_stored_course_row(integrity, content=content, conn=conn)
             except _CatalogCourseRejected as exc:
                 raise LearningCatalogActivationError(exc.message) from exc
 
@@ -6159,12 +6200,30 @@ class LearningCatalogReleaseService:
         row: Mapping[str, Any],
         *,
         content: object,
+        conn=None,
     ) -> None:
         if not isinstance(content, dict):
             raise _CatalogCourseRejected(
                 "catalog_course_content_invalid",
                 "课程内容无法通过发布前校验",
             )
+        if (content.get("schemaVersion") == "mira.learning.progressive-course.v1"
+                or row.get("curriculum_version") == "mira.primary.progressive.v1"):
+            from services.progressive_course_generation import validate_progressive_course_for_release
+            try:
+                if conn is None:
+                    raise ApiError("progressive_acceptance_receipt_missing", "缺少课次发布验收记录", 409)
+                # Integrity rows may contain only the legacy projection. Read the exact full version.
+                course = self.repository.get_course_for_release_gate(
+                    conn, course_id=str(row["id"]), course_version=str(row["version"]),
+                )
+                if course is None:
+                    raise ApiError("progressive_course_not_found", "课程版本不存在", 409)
+                validate_progressive_course_for_release(conn, course=course,
+                                                       expected_lesson_id=str(course["node_code"]))
+            except ApiError as exc:
+                raise _CatalogCourseRejected("catalog_course_content_rejected", exc.message) from exc
+            return
         stored_course = {
             "id": str(row["id"]),
             "version": str(row["version"]),

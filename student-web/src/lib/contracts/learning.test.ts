@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   learningLibraryResponseSchema,
+  learningProgressionSchema,
   learningQuestionSchema,
   learningStartResponseSchema,
   learningTeacherPreferenceResponseSchema,
@@ -10,6 +11,25 @@ import {
 import { lessonFixture, sessionFixture } from "@/test/fixtures/learning";
 
 describe("student learning product contracts", () => {
+  it("retains prerequisite gates and accepts zero only as an unnumbered skill boundary", () => {
+    const progression = {
+      schemaVersion: "mira.learning.progression.v1",
+      curriculumVersion: "primary-progressive.v1",
+      granularity: "skill_boundary",
+      skillId: "math.counting",
+      sequence: 1,
+      learningStatus: "locked",
+      canStart: false,
+      canResume: true,
+      blockedBySkillIds: ["math.recognize_quantity"],
+      message: "先学会认识数量。",
+    };
+    expect(learningProgressionSchema.parse(progression)).toEqual(progression);
+    expect(learningProgressionSchema.safeParse({ ...progression, skillId: "", sequence: 0 }).success).toBe(true);
+    expect(learningProgressionSchema.safeParse({ ...progression, sequence: -1 }).success).toBe(false);
+    expect(learningProgressionSchema.safeParse({ ...progression, granularity: "lesson" }).success).toBe(false);
+  });
+
   it("parses the exact backend library envelope and adds only safe defaults", () => {
     const response = learningLibraryResponseSchema.parse({
       ok: true,

@@ -16,6 +16,24 @@ from services.learning_curriculum_preparation_contract import (
 learning_bp = Blueprint("learning", __name__)
 
 
+@learning_bp.get("/path")
+def curriculum_path():
+    try:
+        return jsonify(learning_service().curriculum_path(bearer_token(request), request.args))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@learning_bp.post("/path/observations")
+def confirm_observed_lesson():
+    try:
+        return jsonify(learning_service().confirm_observed_lesson(
+            bearer_token(request), request.get_json(silent=True) or {},
+        ))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @learning_bp.get("/today")
 def today():
     try:

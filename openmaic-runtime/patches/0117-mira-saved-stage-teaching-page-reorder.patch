@@ -1,0 +1,70 @@
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -59,7 +59,7 @@
+ } from './mira-formal-skill-selection';
+ import { listSkills } from './agent-runtime/skills';
+ import { reviewFormalCourse, type FormalQualityInput, type FormalQualityReviewGrant } from './mira-formal-teaching-quality';
+-import type { MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
++import { qualitySha, type MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
+ import {
+   interactionDesignPrompt, interactionDesignContextFromPrompt,
+   type InteractionDesignReceipt, type InteractionDesignContext,
+@@ -1620,6 +1620,32 @@
+   scenes: Scene[];
+ }
+ 
++/** Reorder teaching pages without changing scene identities or locked quizzes. */
++export function validateMiraFormalSavedStageSceneRepair(
++  sourceScenes: readonly Scene[],
++  repairedScenes: readonly Scene[],
++): Scene[] {
++  const reject = () => { throw new Error('FORMAL_SAVED_STAGE_LOCKED_ASSESSMENT_CHANGED'); };
++  const ordered = (scenes: readonly Scene[]) => {
++    if (scenes.some((scene) => !scene || !Number.isFinite(scene.order))
++        || new Set(scenes.map((scene) => scene.id)).size !== scenes.length
++        || new Set(scenes.map((scene) => scene.order)).size !== scenes.length) reject();
++    return [...scenes].sort((a, b) => a.order - b.order);
++  };
++  const source = ordered(sourceScenes);
++  const repaired = ordered(repairedScenes);
++  const sourceById = new Map(source.map((scene) => [scene.id, scene]));
++  if (source.length !== repaired.length || repaired.some((target) => {
++    const original = sourceById.get(target.id);
++    return !original || original.type !== target.type || original.stageId !== target.stageId
++      || (original.type === 'quiz' && qualitySha(original.content) !== qualitySha(target.content));
++  })) reject();
++  const sourceQuizzes = source.filter((scene) => scene.type === 'quiz');
++  const repairedQuizzes = repaired.filter((scene) => scene.type === 'quiz');
++  if (sourceQuizzes.some((scene, index) => scene.id !== repairedQuizzes[index]?.id)) reject();
++  return repaired;
++}
++
+ /** Operator-only recovery of a terminal, persisted course. No Agent is resumed.
+  * Source events, research, immutable assessment and all release gates still apply.
+  * The source document and terminal Agent remain intact for audit. */
+@@ -1627,7 +1653,7 @@
+   input: GenerateClassroomInput,
+   repair: MiraSavedStageRecoveryInput,
+ ) {
+-  const { qualitySha, qualitySnapshot } = await import('./mira-formal-quality-contract');
++  const { qualitySnapshot } = await import('./mira-formal-quality-contract');
+   const spec = parseFormalCoursewareSpec(input);
+   const identity = professionalIdentity(input);
+   const session = await (await getAgentSessionStore()).getSession(identity.sessionId);
+@@ -1644,14 +1670,7 @@
+   if (!document || stageId !== repair.expectedStageId
+       || qualitySha(qualitySnapshot(document.stage, document.scenes)) !== repair.expectedSourceSnapshotSha256)
+     throw new Error('FORMAL_SAVED_STAGE_SOURCE_MISMATCH');
+-  const sourceScenes = [...document.scenes].sort((a, b) => a.order - b.order);
+-  const repairedScenes = [...repair.scenes].sort((a, b) => a.order - b.order);
+-  if (sourceScenes.length !== repairedScenes.length || sourceScenes.some((source, index) => {
+-    const target = repairedScenes[index];
+-    return source.id !== target.id || source.type !== target.type || source.order !== target.order
+-      || source.stageId !== target.stageId
+-      || (source.type === 'quiz' && qualitySha(source.content) !== qualitySha(target.content));
+-  })) throw new Error('FORMAL_SAVED_STAGE_LOCKED_ASSESSMENT_CHANGED');
++  const repairedScenes = validateMiraFormalSavedStageSceneRepair(document.scenes, repair.scenes);
+   const promoted = promoteProfessionalDocument(document.stage as Stage, repairedScenes, spec,
+     isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy));
+   assertProfessionalClassroom(promoted.stage, promoted.scenes, spec, identity.sessionId, document.outline);

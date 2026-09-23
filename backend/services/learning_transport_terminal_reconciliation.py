@@ -145,12 +145,16 @@ def verified_transport_terminal_reservation_ids(conn, *, pending_rows):
         return set()
     events = [dict(row) for row in conn.execute('SELECT * FROM learning_budget_events WHERE event_type=? ORDER BY id', (EVENT,)).fetchall()]
     ids = sorted({event['reservation_id'] for event in events})
-    if not ids:
-        return set()
-    rows, authorities = _load_rows(conn, ids)
-    marks = ','.join('?' for _ in ids)
-    events += [dict(row) for row in conn.execute(f"SELECT * FROM learning_budget_events WHERE event_type='settled' AND reservation_id IN ({marks}) ORDER BY id", tuple(ids)).fetchall()]
-    return validated_terminal_ids(rows, events, authorities)
+    result = set()
+    if ids:
+        rows, authorities = _load_rows(conn, ids)
+        marks = ','.join('?' for _ in ids)
+        events += [dict(row) for row in conn.execute(f"SELECT * FROM learning_budget_events WHERE event_type='settled' AND reservation_id IN ({marks}) ORDER BY id", tuple(ids)).fetchall()]
+        result = validated_terminal_ids(rows, events, authorities)
+    from services.learning_audio_transport_terminal import verified_audio_terminal_ids
+    from services.learning_http402_transport_terminal import verified_http402_terminal_ids
+    return (result | verified_audio_terminal_ids(conn, pending_rows=pending_rows)
+            | verified_http402_terminal_ids(conn, pending_rows=pending_rows))
 
 
 def _file(path):

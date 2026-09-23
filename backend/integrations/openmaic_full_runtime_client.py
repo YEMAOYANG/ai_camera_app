@@ -1645,7 +1645,7 @@ class OpenMaicFullRuntimeClient:
                     "invalid_openmaic_professional_creation_policy",
                     "OpenMAIC 专业图片策略无效", status_code=400,
                 ) from exc
-            if not _safe_identifier(str(runtime_request_id or ""), max_length=128):
+            if not _formal_runtime_request_identifier(str(runtime_request_id or "")):
                 raise OpenMaicFullRuntimeError(
                     "invalid_openmaic_runtime_request_id",
                     "OpenMAIC 正式生成请求编号无效",
@@ -1728,7 +1728,7 @@ class OpenMaicFullRuntimeClient:
         """Read patch 0012's idempotency record without starting generation."""
 
         normalized = str(runtime_request_id or "").strip()
-        if not _safe_identifier(normalized, max_length=128):
+        if not _formal_runtime_request_identifier(normalized):
             raise OpenMaicFullRuntimeError(
                 "invalid_openmaic_runtime_request_id",
                 "OpenMAIC 正式生成请求编号无效",
@@ -1976,9 +1976,7 @@ class OpenMaicFullRuntimeClient:
         progress = payload.get("progress", 100 if status == "succeeded" else 0)
         raw_runtime_request_id = str(payload.get("runtimeRequestId") or "").strip()
         runtime_request_id = raw_runtime_request_id or None
-        if runtime_request_id is not None and not _safe_identifier(
-            runtime_request_id, max_length=128
-        ):
+        if runtime_request_id is not None and not _formal_runtime_request_identifier(runtime_request_id):
             raise OpenMaicFullRuntimeError(
                 "invalid_openmaic_job", "OpenMAIC 返回的生成任务无效"
             )
@@ -2725,6 +2723,12 @@ def _safe_identifier(value: str, *, max_length: int) -> bool:
     if not value or len(value) > max_length:
         return False
     return all(char.isalnum() or char in {"-", "_"} for char in value)
+
+
+def _formal_runtime_request_identifier(value: str) -> bool:
+    # Match Native classroom-job-store's idempotency key contract. These are
+    # request keys, not filenames, stage IDs, or other resource identifiers.
+    return re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}", value) is not None
 
 
 def _formal_audio_identifier(value: object, *, maximum: int) -> str | None:

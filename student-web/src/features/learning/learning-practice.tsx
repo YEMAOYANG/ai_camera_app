@@ -10,6 +10,7 @@ import { SpaceCourseArt } from "@/components/student/space-course-art";
 import { SpaceSuccessBurst } from "@/components/student/space-success-burst";
 import { practiceResponseSchema, type PracticeResponse } from "@/lib/contracts/learning-practice";
 import type { Student } from "@/lib/contracts/student-session";
+import { TapObjectsInput } from "@/features/learning/tap-objects-input";
 
 const subjects = [{ id: "chinese", label: "语文" }, { id: "math", label: "数学" }, { id: "english", label: "英语" }] as const;
 async function practiceRequest(path: string, body?: object): Promise<PracticeResponse> {
@@ -63,7 +64,7 @@ export function LearningPractice({ student, sessionId }: { student: Student; ses
     setBusy(true); setError("");
     try {
       const value = await practiceRequest(`/api/learning/practice/sessions/${session.id}/answers`, {
-        questionId: question.id, response: question.type === "sequence" ? sequence : answer,
+        questionId: question.id, response: question.type === "sequence" || question.type === "tap_objects" ? sequence : answer,
       });
       setResult(value); setFeedback(value.evaluation); setAnswer(""); setSequence([]);
       if (value.evaluation?.correct) setCelebration(current => current + 1);
@@ -109,7 +110,7 @@ export function LearningPractice({ student, sessionId }: { student: Student; ses
               <div className="space-progress-nodes" aria-hidden="true">{Array.from({ length: session?.totalQuestions ?? 0 }, (_, index) => <i key={index} className={index < (session?.currentQuestionIndex ?? 0) ? "is-complete" : index === (session?.currentQuestionIndex ?? 0) ? "is-current" : ""} />)}</div>
             </div>
             <h2>{question.prompt}</h2>
-            {(question.type === "single_choice" || question.type === "sequence") && question.choices.length ? (
+            {question.type === "tap_objects" ? <TapObjectsInput objects={question.objects || []} value={sequence} onChange={setSequence} disabled={busy} /> : (question.type === "single_choice" || question.type === "sequence") && question.choices.length ? (
               <div className="space-answer-choices" role="group" aria-label={question.type === "sequence" ? "按顺序选择" : "选择答案"}>
                 {question.choices.map((choice, index) => {
                   const position = sequence.indexOf(choice.id), selected = question.type === "sequence" ? position >= 0 : answer === choice.id;
@@ -120,7 +121,7 @@ export function LearningPractice({ student, sessionId }: { student: Student; ses
                 {question.type === "sequence" && <Button variant="quiet" disabled={busy} onClick={() => setSequence([])}><RotateCcw className="size-5" aria-hidden="true" />重新排列</Button>}
               </div>
             ) : <label className="space-answer-input-label">你的答案<input autoComplete="off" value={answer} disabled={busy} onChange={event => setAnswer(event.target.value)} inputMode={question.type === "numeric" ? "decimal" : "text"} className="focus-ring space-answer-input" /></label>}
-            <div className="space-question-submit"><Button className="space-practice-action" data-busy={busy} disabled={busy || (question.type === "sequence" ? sequence.length !== question.choices.length : !answer.trim())} onClick={() => void submit()}>{busy ? "正在保存…" : "提交答案"}{busy ? <LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <ArrowRight className="size-5" aria-hidden="true" />}</Button></div>
+            <div className="space-question-submit"><Button className="space-practice-action" data-busy={busy} disabled={busy || (question.type === "sequence" ? sequence.length !== question.choices.length : question.type === "tap_objects" ? sequence.length === 0 : !answer.trim())} onClick={() => void submit()}>{busy ? "正在保存…" : "提交答案"}{busy ? <LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <ArrowRight className="size-5" aria-hidden="true" />}</Button></div>
           </div>
         ) : (
           <div className="space-practice-start">

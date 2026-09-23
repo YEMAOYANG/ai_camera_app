@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MiraBuddy } from "@/components/student/mira-buddy";
 import { Button } from "@/components/ui/button";
 import { submitLearningAnswer } from "@/features/learning/learning-client";
+import { TapObjectsInput } from "@/features/learning/tap-objects-input";
 import { createClassroomAudioController, type NarrationPlaybackSource } from "@/features/classroom/speech-controller";
 import type { ClassroomGameRules } from "@/lib/contracts/lesson-package";
 import type { LearningAnswerResponse, LearningQuestion, LearningSession, LearningTeacherProfile } from "@/lib/contracts/learning";
@@ -54,6 +55,7 @@ export function ClassroomQuizScene({
     if (!question) return false;
     if (question.type === "single_choice") return Boolean(selected);
     if (question.type === "sequence") return sequence.length === question.choices.length;
+    if (question.type === "tap_objects") return sequence.length > 0;
     return Boolean(text.trim());
   }, [question, selected, sequence, text]);
 
@@ -74,8 +76,8 @@ export function ClassroomQuizScene({
     try {
       const body = question.type === "single_choice"
         ? { response: { kind: "single_choice", optionId: selected } }
-        : question.type === "sequence"
-          ? { response: { kind: "sequence", items: sequence } }
+        : question.type === "sequence" || question.type === "tap_objects"
+          ? { response: { kind: question.type, items: sequence } }
           : { answer: text.trim() };
       const answer = await submitAnswer(session.id, body);
       setResult(answer);
@@ -155,9 +157,10 @@ export function ClassroomQuizScene({
       <div className="mt-5 rounded-[24px] bg-[var(--mira-bg)] p-5 sm:p-7">
         <div className="classroom-question-heading"><p className="text-[clamp(21px,3.2vw,31px)] font-black leading-relaxed">{question.prompt}</p>{guidedGame ? <button type="button" className={`focus-ring classroom-listen-question ${listening ? "is-listening" : ""}`} onClick={() => void listenToQuestion()} aria-label="用设备朗读再听一遍题目"><span className="classroom-listen-ripple" aria-hidden="true" />{listening ? <Volume2 className="size-6" /> : <Headphones className="size-6" />}<span>{listening ? "正在朗读" : "设备听题"}</span><small>{listeningSource === "silent" ? "音频不可用" : "开发降级"}</small></button> : null}</div>
         <div className="mt-6">
+          {question.type === "tap_objects" ? <TapObjectsInput objects={question.objects || []} value={sequence} onChange={setSequence} disabled={Boolean(result) || submitting} /> : null}
           {question.type === "single_choice" ? <div className={`grid gap-3 sm:grid-cols-2 ${guidedGame ? "classroom-choice-garden" : ""}`}>{question.choices.map((choice, index) => <button key={choice.id} type="button" disabled={Boolean(result)} onClick={() => setSelected(choice.id)} className={`focus-ring classroom-choice min-h-16 rounded-[18px] border-2 px-5 text-left text-lg font-extrabold ${selected === choice.id ? "is-selected border-[var(--mira-brand)] bg-[var(--mira-brand-wash)] text-[var(--mira-brand-deep)]" : "border-white bg-white"}`}><span className="classroom-choice-index">{String.fromCharCode(65 + index)}</span><span>{choice.label}</span>{selected === choice.id ? <Check className="ml-auto size-5" /> : null}</button>)}</div> : null}
           {question.type === "sequence" ? <div><div className="min-h-16 rounded-[18px] border-2 border-dashed border-[var(--mira-border)] bg-white p-3">{sequence.length ? <div className="flex flex-wrap gap-2">{sequence.map((id, index) => <span key={id} className="rounded-full bg-[var(--mira-brand-wash)] px-3 py-2 font-bold text-[var(--mira-brand-deep)]">{index + 1}. {question.choices.find((item) => item.id === id)?.label}</span>)}</div> : <p className="py-2 text-center text-[var(--mira-subtle)]">按正确顺序点下面的内容</p>}</div><div className="mt-3 grid gap-2 sm:grid-cols-2">{question.choices.map((choice) => <button key={choice.id} type="button" disabled={sequence.includes(choice.id) || Boolean(result)} onClick={() => setSequence((items) => [...items, choice.id])} className="focus-ring min-h-14 rounded-[17px] border-2 border-white bg-white px-4 font-bold disabled:opacity-40">{choice.label}</button>)}</div>{!result && sequence.length ? <Button variant="quiet" size="compact" className="mt-3" onClick={() => setSequence([])}><Eraser className="size-4" />重新排列</Button> : null}</div> : null}
-          {!question.choices.length ? <label className="block"><span className="sr-only">我的答案</span><input value={text} disabled={Boolean(result)} onChange={(event) => setText(event.target.value)} inputMode={question.type === "numeric" ? "decimal" : "text"} className="focus-ring h-16 w-full rounded-[18px] border-2 border-white bg-white px-5 text-xl font-extrabold outline-none focus:border-[var(--mira-brand)]" placeholder="把答案写在这里" /></label> : null}
+          {question.type !== "tap_objects" && !question.choices.length ? <label className="block"><span className="sr-only">我的答案</span><input value={text} disabled={Boolean(result)} onChange={(event) => setText(event.target.value)} inputMode={question.type === "numeric" ? "decimal" : "text"} className="focus-ring h-16 w-full rounded-[18px] border-2 border-white bg-white px-5 text-xl font-extrabold outline-none focus:border-[var(--mira-brand)]" placeholder="把答案写在这里" /></label> : null}
         </div>
       </div>
       {error ? <p className="mt-4 rounded-[16px] bg-[#fff1ee] p-4 font-bold text-[var(--mira-danger)]" role="alert">{error}</p> : null}

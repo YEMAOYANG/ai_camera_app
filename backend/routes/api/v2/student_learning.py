@@ -14,6 +14,48 @@ from services.service_factory import (
 student_learning_bp = Blueprint("student_learning_v2", __name__)
 
 
+@student_learning_bp.get('/placement')
+def placement_status():
+    try:
+        return jsonify(student_learning_service().placement_status(bearer_token(request), request.args))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@student_learning_bp.post('/placement')
+def start_placement():
+    try:
+        return jsonify(student_learning_service().start_placement(bearer_token(request), json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@student_learning_bp.get('/placement/<attempt_id>')
+def placement_attempt(attempt_id: str):
+    try:
+        return jsonify(student_learning_service().placement_attempt(bearer_token(request), attempt_id))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@student_learning_bp.post('/placement/<attempt_id>/answers')
+def answer_placement(attempt_id: str):
+    try:
+        return jsonify(student_learning_service().answer_placement(bearer_token(request), attempt_id, json_body(request)))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@student_learning_bp.get("/path")
+def curriculum_path():
+    try:
+        return jsonify(student_learning_service().curriculum_path(
+            bearer_token(request), request.args,
+        ))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @student_learning_bp.get("/today")
 def today():
     try:

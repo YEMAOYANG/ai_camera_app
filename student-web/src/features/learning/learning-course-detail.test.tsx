@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LearningCourseDetail } from "@/features/learning/learning-course-detail";
-import type { LearningCourseDetailResponse } from "@/lib/contracts/learning";
+import type { LearningCourseDetailResponse, LearningProgression } from "@/lib/contracts/learning";
 
 const { getLearningCourse, startLearningCourse } = vi.hoisted(() => ({
   getLearningCourse: vi.fn(),
@@ -48,6 +48,17 @@ const detail: LearningCourseDetailResponse = {
     lastActivityAt: null,
   },
 };
+const lockedProgression: LearningProgression = {
+  schemaVersion: "mira.learning.progression.v1",
+  curriculumVersion: "primary-progressive.v1",
+  granularity: "skill_boundary",
+  skillId: "math.number_composition",
+  sequence: 3,
+  learningStatus: "locked",
+  canStart: false,
+  blockedBySkillIds: ["math.counting"],
+  message: "先把数数练熟，再来学习数量关系。",
+};
 
 describe("LearningCourseDetail formal classroom gate", () => {
   afterEach(cleanup);
@@ -55,6 +66,36 @@ describe("LearningCourseDetail formal classroom gate", () => {
     getLearningCourse.mockReset();
     getLearningCourse.mockResolvedValue(detail);
     startLearningCourse.mockReset();
+  });
+
+  it.each(["task-package-only", null])("preserves details and favorites while blocking a future lesson", async (taskId) => {
+    getLearningCourse.mockResolvedValue({
+      ...detail,
+      item: { ...detail.item, taskId, fullClassroomAvailable: true, progression: lockedProgression },
+    });
+    render(<LearningCourseDetail student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} courseId="course-formal-1" version="1" />);
+    expect(await screen.findByRole("button", { name: "暂未解锁" })).toBeDisabled();
+    expect(screen.getByText(`知识点学习顺序 3 · ${lockedProgression.message}`)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "收藏课程" })).toBeEnabled();
+    expect(screen.getByRole("heading", { name: "学习目标" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /开始上课|继续上课/ })).not.toBeInTheDocument();
+    expect(startLearningCourse).not.toHaveBeenCalled();
+  });
+
+  it("keeps the completed record while explaining that the knowledge still needs practice", async () => {
+    getLearningCourse.mockResolvedValue({
+      ...detail,
+      item: {
+        ...detail.item,
+        taskStatus: "completed",
+        progression: { ...lockedProgression, learningStatus: "needs_practice", canStart: true, message: "这节课已经学完，这个知识点还需要巩固。" },
+      },
+    });
+    render(<LearningCourseDetail student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} courseId="course-formal-1" />);
+    expect(await screen.findByText("这节课学完啦")).toBeInTheDocument();
+    expect(screen.getByText(/这个知识点还需要巩固/)).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /开始上课|继续上课|再练/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /开始上课|继续上课|再练/ })).not.toBeInTheDocument();
   });
 
   it("keeps package-only content in preparation instead of opening a fallback player", async () => {

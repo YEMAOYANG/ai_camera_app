@@ -15,6 +15,7 @@ _INPUT_MODES = {
     "accepted_text": "text",
     "single_choice": "single_choice",
     "sequence": "sequence",
+    "tap_objects": "tap_objects",
 }
 
 
@@ -115,6 +116,11 @@ def question_payload(
             ),
         ),
     }
+    if question_type == "tap_objects":
+        payload["objects"] = [
+            {key: item[key] for key in ("id", "shape", "color") if key in item}
+            for item in question.get("objects") or [] if isinstance(item, dict)
+        ]
     return payload
 
 

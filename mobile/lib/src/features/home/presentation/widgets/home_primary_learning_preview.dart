@@ -11,6 +11,7 @@ import 'package:warm_sight/src/features/learning/domain/learning_availability_mo
 import 'package:warm_sight/src/features/learning/domain/learning_preparation_models.dart';
 import 'package:warm_sight/src/features/learning/domain/learning_models.dart';
 import 'package:warm_sight/src/features/learning/presentation/widgets/learning_preparation_card.dart';
+import 'package:warm_sight/src/features/learning/presentation/widgets/parent_learning_observation_sheet.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
 import 'package:warm_sight/src/shared/widgets/app_bottom_sheet.dart';
@@ -354,6 +355,10 @@ class _HomePrimaryLearningPreviewState
             const _PreparationSyncDelayedHint(),
           ],
         ],
+        ParentLearningObservationEntry(
+          childId: widget.child.id,
+          childName: widget.child.name,
+        ),
       ],
     );
   }

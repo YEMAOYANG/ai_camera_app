@@ -3,7 +3,9 @@ from __future__ import annotations
 from contextlib import contextmanager
 from contextvars import ContextVar
 from datetime import date
+import json
 from pathlib import Path
+import re
 from typing import Any, Iterator
 
 from core.database import Database
@@ -112,6 +114,34 @@ class StudentLearningService:
                 formal_student_child_id=context["principal"]["child_id"],
             )
 
+    def curriculum_path(self, access_token: str, query: dict) -> dict:
+        context = self.student_auth_service.authenticate(access_token)
+        forced_query = {"subject": (query or {}).get("subject"),
+                        "gradeCode": (query or {}).get("gradeCode"),
+                        "childId": context["principal"]["child_id"]}
+        with self._auth_adapter.bind(context):
+            return self.learning_service.curriculum_path(access_token, forced_query)
+
+    def _placement_service(self):
+        from repositories.learning_placement_repository import LearningPlacementRepository
+        from services.learning_placement_service import LearningPlacementService
+        return LearningPlacementService(
+            repository=LearningPlacementRepository(self.repository.database),
+            student_auth_service=self.student_auth_service,
+        )
+
+    def placement_status(self, access_token: str, query: dict) -> dict:
+        return self._placement_service().status(access_token, query)
+
+    def start_placement(self, access_token: str, data: dict) -> dict:
+        return self._placement_service().start(access_token, data)
+
+    def placement_attempt(self, access_token: str, attempt_id: str) -> dict:
+        return self._placement_service().get(access_token, attempt_id)
+
+    def answer_placement(self, access_token: str, attempt_id: str, data: dict) -> dict:
+        return self._placement_service().answer(access_token, attempt_id, data)
+
     def assign_today(self, access_token: str, data: dict) -> dict:
         context = self.student_auth_service.authenticate(access_token)
         forced_data = dict(data or {})
@@ -200,9 +230,11 @@ class StudentLearningService:
             )
             if course is None:
                 raise ApiError('learning_course_not_found', '课程还未准备好，请稍后再来', 404)
-            claim_published_shared_course(
-                conn, database=self.repository.database, child=child, course=course, now=timestamp,
-            )
+            self.learning_service.assert_course_progression(conn, child=child, course=course)
+            if not self.learning_service._is_progressive_course(course):
+                claim_published_shared_course(
+                    conn, database=self.repository.database, child=child, course=course, now=timestamp,
+                )
             # Reuse the production package resolver after the follower claim.
             # It pins the exact published package; no preview route is exposed.
             from repositories.lesson_package_repository import LessonPackageRepository
@@ -291,16 +323,12 @@ class StudentLearningService:
             )
         except ValueError as exc:
             raise ApiError("invalid_learning_library_cursor", "分页位置无效", 400) from exc
+        current_catalog_page = not self.static_catalog_enabled and bucket in {"all", "favorites"}
         with self.library_repository.transaction() as conn:
-            items, next_cursor = self.library_repository.list_library(
-                conn,
-                family_id=principal["family_id"],
-                child_id=principal["child_id"],
-                bucket=bucket,
-                subject=subject,
-                before_date=date.today().isoformat(),
-                cursor=cursor,
-                limit=limit,
+            items, next_cursor = ([], None) if current_catalog_page else self.library_repository.list_library(
+                conn, family_id=principal["family_id"], child_id=principal["child_id"],
+                bucket=bucket, subject=subject, before_date=date.today().isoformat(),
+                cursor=cursor, limit=limit,
             )
             continue_item = self.library_repository.get_continue_item(
                 conn,
@@ -315,37 +343,19 @@ class StudentLearningService:
             if child is None:
                 raise ApiError("child_not_found", "孩子资料不存在", 404)
             catalog = self.learning_service._catalog_status_payload(conn, child)
-            if not self.static_catalog_enabled and bucket in {"all", "favorites"}:
-                visible_courses = self.repository.list_student_visible_courses(
-                    conn,
-                    family_id=principal["family_id"],
-                    child_id=principal["child_id"],
-                    grade_code=str(child["grade_code"]),
-                    grade_selection_revision=int(
-                        child.get("grade_selection_revision") or 0
-                    ),
-                    subject=subject,
-                    favorite_only=bucket == "favorites",
-                    limit=50,
+            if current_catalog_page:
+                items, next_cursor = self._current_catalog_library_page(
+                    conn, child=child, bucket=bucket, subject=subject, cursor=cursor, limit=limit,
                 )
-                merged = {
-                    (str(item["course"]["id"]), str(item["course"]["version"])): item
-                    for item in (
-                        self._catalog_library_item(course) for course in visible_courses
-                    )
-                }
-                for item in items:
-                    merged[
-                        (str(item["course"]["id"]), str(item["course"]["version"]))
-                    ] = item
-                items = sorted(
-                    merged.values(),
-                    key=lambda item: (
-                        int(item.get("lastActivityAt") or 0),
-                        str(item["course"]["id"]),
-                    ),
-                    reverse=True,
-                )[:limit]
+            if not self.static_catalog_enabled:
+                mastery_by_subject = {}
+                if not current_catalog_page:
+                    items = [self._with_progression(conn, child, item, mastery_by_subject) for item in items]
+                    items = [item for item in items if self._current_course_or_started_history(conn, child, item)]
+                if continue_item is not None:
+                    continue_item = self._with_progression(conn, child, continue_item, mastery_by_subject)
+                    if not self._current_course_or_started_history(conn, child, continue_item):
+                        continue_item = None
         return {
             "ok": True,
             "bucket": bucket,
@@ -404,6 +414,8 @@ class StudentLearningService:
                     item = None
                 elif item is None:
                     item = self._catalog_library_item(visible, include_intro=True)
+                if item is not None:
+                    item = self._with_progression(conn, child, item, {})
         if item is None:
             raise ApiError("learning_course_not_found", "课程不存在", 404)
         return {"ok": True, "item": item}
@@ -556,6 +568,179 @@ class StudentLearningService:
             action_id=action_id,
             data=dict(data or {}),
         )
+
+    def _current_catalog_library_page(self, conn, *, child, bucket, subject, cursor, limit):
+        """Page fine lessons by sequence, then history by its existing cursor.
+
+        Keep the public opaque [integer, string] cursor envelope. A marked
+        string identifies the fine segment; ordinary activity/task cursors
+        continue the historical segment and never reinsert catalog lessons.
+        """
+        from content.progressive_curriculum import CURRICULUM_VERSION, lesson_by_id
+        from repositories.student_shared_course_repository import shared_course_rows
+        prefix = "progressive-library.v1:"
+        scope = [child["grade_code"], bucket, subject]
+        fine_after = None
+        fine_segment = cursor is None
+        history_cursor = cursor
+        if cursor is not None and cursor[1].startswith(prefix):
+            try:
+                marker = json.loads(cursor[1][len(prefix):])
+                if (cursor[0] != 0 or not isinstance(marker, dict)
+                        or marker.get("scope") != scope or marker.get("segment") not in {"fine", "history"}):
+                    raise ValueError
+                fine_segment = marker["segment"] == "fine"
+                history_cursor = None
+                if fine_segment:
+                    after = marker.get("after")
+                    if (not isinstance(after, list) or len(after) != 4
+                            or type(after[0]) is not int or type(after[1]) is not int
+                            or not 0 <= after[0] <= 2 or after[1] < 1
+                            or not all(isinstance(value, str) and value for value in after[2:])):
+                        raise ValueError
+                    fine_after = tuple(after)
+            except (ValueError, TypeError, KeyError) as exc:
+                raise ApiError("invalid_learning_library_cursor", "分页位置无效，请重新打开课程库", 400) from exc
+
+        def segment_cursor(segment, after=None):
+            marker = {"scope": scope, "segment": segment}
+            if after is not None:
+                marker["after"] = list(after)
+            return self.library_repository.encode_cursor(0, prefix + json.dumps(marker, separators=(",", ":")))
+
+        courses = shared_course_rows(
+            conn, family_id=child["family_id"], child_id=child["id"],
+            grade_code=child["grade_code"], grade_selection_revision=int(child["grade_selection_revision"]),
+            subject=subject, favorite_only=bucket == "favorites",
+        )
+        courses = [course for course in courses
+                   if course.get("curriculum_version") == CURRICULUM_VERSION
+                   and course.get("grade_code") == child["grade_code"]]
+        subject_order = {"chinese": 0, "math": 1, "english": 2}
+        ranked = sorted((
+            (subject_order[course["subject"]], int(lesson_by_id(course["node_code"])["sequence"]),
+             str(course["id"]), str(course["version"])), course,
+        ) for course in courses)
+        page = []
+        mastery = {}
+        if fine_segment:
+            remaining = [(key, course) for key, course in ranked if fine_after is None or key > fine_after]
+            for key, course in remaining[:limit]:
+                item = self._catalog_library_item(course)
+                history = self.library_repository.get_course_detail(
+                    conn, family_id=child["family_id"], child_id=child["id"],
+                    course_id=str(course["id"]), course_version=str(course["version"]),
+                )
+                if history is not None:
+                    # Keep the exact live publication/media result above while
+                    # retaining this course's existing task/session/report.
+                    for field in ("taskId", "taskStatus", "learningDate", "scheduledStart", "slot",
+                                  "session", "report", "lastActivityAt"):
+                        item[field] = history[field]
+                page.append(self._with_progression(conn, child, item, mastery))
+            if len(remaining) > limit:
+                return page, segment_cursor("fine", remaining[limit - 1][0])
+
+        # Read one extra eligible historical record to prove that another page
+        # exists. Advance by raw activity/task keys even when records are filtered.
+        room = limit - len(page)
+        historical = []
+        scan_cursor = history_cursor
+        while len(historical) <= room:
+            rows, next_raw = self.library_repository.list_library(
+                conn, family_id=child["family_id"], child_id=child["id"],
+                bucket=bucket, subject=subject, before_date=date.today().isoformat(),
+                cursor=scan_cursor, limit=50,
+            )
+            for raw in rows:
+                # Current catalog courses can also have older real attempts.
+                # Keep those records for the expandable history; the client
+                # deduplicates the exact task/session already shown above.
+                item = self._with_progression(conn, child, raw, mastery)
+                if self._current_course_or_started_history(conn, child, item):
+                    historical.append(item)
+                    if len(historical) > room:
+                        break
+            if len(historical) > room or next_raw is None:
+                break
+            next_scan = self.library_repository.decode_cursor(next_raw)
+            if next_scan == scan_cursor:
+                raise ApiError("invalid_learning_library_cursor", "课程库分页暂时不可用，请重新打开", 409)
+            scan_cursor = next_scan
+        page.extend(historical[:room])
+        if len(historical) <= room:
+            return page, None
+        if room == 0:
+            return page, segment_cursor("history")
+        last = historical[room - 1]
+        return page, self.library_repository.encode_cursor(int(last["lastActivityAt"]), str(last["taskId"]))
+
+    @staticmethod
+    def _is_current_curriculum_item(child, item) -> bool:
+        from content.progressive_curriculum import CURRICULUM_VERSION
+        return (item["course"]["gradeCode"] == child["grade_code"]
+                and (item.get("progression") or {}).get("curriculumVersion") == CURRICULUM_VERSION
+                and (item.get("progression") or {}).get("granularity") == "lesson")
+
+    def _current_course_or_started_history(self, conn, child, item) -> bool:
+        """Unstarted legacy courses are neither new lessons nor makeup work."""
+        if self._is_current_curriculum_item(child, item):
+            return True
+        session = item.get("session")
+        if not item.get("taskId") or not isinstance(session, dict):
+            return False
+        if session.get("status") == "in_progress":
+            # _with_progression has already checked the persisted identity.
+            return (item.get("progression") or {}).get("canResume") is True
+        if session.get("status") != "completed":
+            return False
+        stored = self.repository.get_session_for_task(
+            conn, family_id=child["family_id"], task_id=item["taskId"],
+        )
+        return bool(stored and stored.get("completed_at") is not None
+                    and all(str(stored.get(key) or "") == str(value) for key, value in (
+            ("id", session["id"]), ("family_id", child["family_id"]), ("child_id", child["id"]),
+            ("task_id", item["taskId"]), ("course_id", item["course"]["id"]),
+            ("course_version", item["course"]["version"]), ("status", "completed"),
+        )))
+
+    def _with_progression(self, conn, child, item, mastery_by_subject) -> dict:
+        public_course = item["course"]
+        course = {
+            "grade_code": public_course["gradeCode"],
+            "subject": public_course["subject"],
+            "node_code": public_course["nodeCode"],
+        }
+        if re.fullmatch(r"(?:ZH|EN|M)[1-6][AB]\d{2}\.\d{2}", str(public_course["nodeCode"] or "")):
+            stored = self.repository.get_course(
+                conn, course_id=public_course["id"], version=public_course["version"],
+            )
+            if stored is None:
+                raise ApiError("learning_course_not_found", "课程不存在", 404)
+            course = stored
+        progression = self.learning_service.progression_for_course(
+            conn, child=child, course=course, mastery_by_subject=mastery_by_subject,
+        )
+        # The historical exception belongs to one persisted session, not the
+        # whole course or skill. New start_course requests still fail closed.
+        session = item.get("session")
+        if (item.get("taskId") and isinstance(session, dict)
+                and session.get("status") == "in_progress"
+                and (public_course["gradeCode"] == child["grade_code"]
+                     or self.learning_service._is_progressive_course(course))):
+            stored = self.repository.get_session_for_task(
+                conn, family_id=child["family_id"], task_id=item["taskId"],
+            )
+            progression["canResume"] = bool(stored and all(
+                str(stored.get(key) or "") == str(value) for key, value in (
+                    ("id", session["id"]), ("child_id", child["id"]),
+                    ("course_id", public_course["id"]), ("course_version", public_course["version"]),
+                    ("status", "in_progress"),
+                )
+            ))
+            if progression["canResume"] and not progression["canStart"]:
+                progression["message"] = "可以继续之前已开始的课程，新课仍需先完成前面的知识点。"
+        return {**item, "progression": progression}
 
     @staticmethod
     def _catalog_library_item(

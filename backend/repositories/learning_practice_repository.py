@@ -25,38 +25,27 @@ class LearningPracticeRepository:
         return child if active is not None else None
 
     def eligible_sources(self, conn, *, family_id, child_id, grade_code, subject, skill_id):
-        # Completion of this exact version is the prerequisite gate. The reused
-        # live availability expression includes release, formal Runtime and every
-        # required media/audio asset; publication status alone is insufficient.
-        return conn.execute(f"""
-            SELECT course.*, binding.release_id, runtime.feature_manifest_json,
-              item.subject_ordinal, item.boundary_ordinal, item.variant_ordinal,
-              item.content_receipt_hash, candidate.validation_json
+        # Fine provenance and full formal media authority are rechecked by the
+        # service. Exact personal completion is required before revision.
+        return conn.execute("""SELECT DISTINCT course.*
             FROM learning_sessions AS session
-            JOIN tasks AS task ON task.id = session.task_id AND task.family_id = session.family_id
-              AND task.child_id = session.child_id
-            JOIN learning_courses AS course ON course.id = session.course_id AND course.version = session.course_version
-            JOIN learning_student_formal_session_bindings AS binding
-              ON binding.learning_session_id = session.id AND binding.family_id = session.family_id
-              AND binding.child_id = session.child_id AND binding.course_id = course.id
-              AND binding.course_version = course.version AND binding.grade_code = course.grade_code
-            JOIN learning_openmaic_runtime_classrooms AS runtime
-              ON runtime.id = binding.runtime_classroom_id AND runtime.course_id = course.id
-              AND runtime.course_version = course.version AND runtime.candidate_release_id = binding.release_id
-            JOIN learning_catalog_build_items AS item ON item.id = runtime.candidate_build_item_id
-              AND item.course_id = course.id AND item.course_version = course.version
-              AND item.grade_code = course.grade_code AND item.subject = course.subject AND item.skill_id = course.node_code
-              AND item.content_gate_status = 'passed' AND item.content_gate_passed_at IS NOT NULL
-            JOIN learning_course_generation_jobs AS job ON job.request_id = item.active_generation_request_id
-            JOIN learning_course_generation_candidates AS candidate ON candidate.job_id = job.id
-              AND candidate.ordinal = 1 AND candidate.course_id = course.id AND candidate.course_version = course.version
-            WHERE session.family_id = ? AND session.child_id = ? AND session.status = 'completed'
-              AND session.completed_at IS NOT NULL AND course.grade_code = ? AND course.subject = ?
-              AND (? IS NULL OR course.node_code = ?)
-              AND course.status = 'published' AND course.quality_status = 'released' AND course.retired_at IS NULL
-              AND {_FULL_CLASSROOM_AVAILABILITY_SQL}
-            ORDER BY course.created_at DESC, course.id, course.version LIMIT 120
-        """, (family_id, child_id, grade_code, subject, skill_id, skill_id)).fetchall()
+            JOIN tasks AS task ON task.id=session.task_id AND task.family_id=session.family_id AND task.child_id=session.child_id
+            JOIN learning_courses AS course ON course.id=session.course_id AND course.version=session.course_version
+            WHERE session.family_id=? AND session.child_id=? AND session.status='completed' AND session.completed_at IS NOT NULL
+              AND course.curriculum_version='mira.primary.progressive.v1' AND course.subject=?
+              AND (? IS NULL OR course.node_code=?) AND course.status='published' AND course.quality_status='released'
+              AND course.retired_at IS NULL
+            ORDER BY course.created_at DESC, course.id, course.version LIMIT 120""",
+            (family_id, child_id, subject, skill_id, skill_id)).fetchall()
+
+    def completed_progressive_course(self, conn, *, family_id, child_id, course_id, course_version):
+        return conn.execute("""SELECT course.* FROM learning_courses AS course
+            WHERE course.id=? AND course.version=? AND course.curriculum_version='mira.primary.progressive.v1'
+              AND EXISTS (SELECT 1 FROM learning_sessions AS session JOIN tasks AS task ON task.id=session.task_id
+                AND task.family_id=session.family_id AND task.child_id=session.child_id
+                WHERE session.family_id=? AND session.child_id=? AND session.course_id=course.id
+                AND session.course_version=course.version AND session.status='completed' AND session.completed_at IS NOT NULL)
+            LIMIT 1""", (course_id, course_version, family_id, child_id)).fetchone()
 
     def difficulty_mastery(self, conn, *, family_id, child_id, grade_code, subject):
         rows = conn.execute('SELECT node_code,mastery_level,independent_correct_count,hint_count '
@@ -85,6 +74,8 @@ class LearningPracticeRepository:
     def active(self, conn, *, family_id, child_id, grade_code, grade_revision, subject, skill_id):
         return conn.execute("""SELECT * FROM learning_practice_sessions WHERE family_id = ? AND child_id = ?
             AND grade_code = ? AND grade_revision = ? AND subject = ? AND skill_id <=> ? AND status = 'in_progress'
+            AND EXISTS (SELECT 1 FROM learning_practice_session_questions AS question WHERE question.session_id=learning_practice_sessions.id
+              AND JSON_UNQUOTE(JSON_EXTRACT(question.snapshot_json,'$.practiceSource.curriculumVersion'))='mira.primary.progressive.v1')
             ORDER BY created_at LIMIT 1 FOR UPDATE""", (family_id, child_id, grade_code, grade_revision, subject, skill_id)).fetchone()
 
     def get_session(self, conn, *, family_id, child_id, session_id):

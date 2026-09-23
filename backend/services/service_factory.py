@@ -174,6 +174,22 @@ def _catalog_paid_budget_environment(command):
             "MIRA_PAID_BUDGET_INTERNAL_TOKEN": current_app.config["INTERNAL_API_TOKEN"]}
 
 
+def _progressive_paid_budget_environment(payload):
+    from types import SimpleNamespace
+    from core.errors import ApiError
+    request_id = str(payload.get("requestId") or "")
+    if payload.get("schemaVersion") == "mira.openmaic.progressive-verification-input.v1":
+        request_id = request_id.removesuffix(":verify")
+    binding = payload.get("brief", {}).get("binding", {})
+    with Database(current_app.config["DATABASE_URL"]).transaction() as conn:
+        item = conn.execute("SELECT * FROM learning_catalog_build_items WHERE generation_request_id=? "
+            "AND curriculum_version='mira.primary.progressive.v1' LIMIT 1", (request_id,)).fetchone()
+    if not item or item["skill_id"] != binding.get("lessonId"):
+        raise ApiError("progressive_formal_authority_required", "新课次须通过已授权的正式准备任务生成", 409)
+    return _catalog_paid_budget_environment(SimpleNamespace(build_item_id=item["id"], grade_code=item["grade_code"],
+        subject=item["subject"], boundary={"skillId": item["skill_id"]}))
+
+
 def learning_budget_service():
     # Deliberately reload operator policy at the call boundary. Disabled by
     # default; installing the ledger does not activate old paid requests.
@@ -360,9 +376,14 @@ def learning_curriculum_preparation_checkpoint_adapter() -> CheckpointSharedBuil
             repository=DynamicLearningCourseRepository(Database(database_url)),
             adapter=phase_adapter,
         )
+        progressive_generator = DynamicLearningCourseGenerationService(database_url,
+            adapter=OpenMaicQuestionAdapter(provider_name=str(profile["name"]), model_name=str(profile["model"]),
+                base_url=str(profile["baseUrl"]), api_key_env=str(profile["apiKeyEnv"]),
+                provider_timeout_ms=int(profile["timeoutMs"]), max_tokens=int(profile["maxTokens"]),
+                temperature=float(profile["temperature"]), execution_environment=_progressive_paid_budget_environment))
         restricted_catalog_service = LearningCatalogReleaseService(
             database_url,
-            dynamic_generation_service=None,
+            dynamic_generation_service=progressive_generator,
             lesson_package_service=None,
             catalog_validator=LearningCatalogValidator(),
             staged_content_candidate_generator=staged_generator,
@@ -895,6 +916,13 @@ def dynamic_learning_course_generation_service() -> DynamicLearningCourseGenerat
         ),
         classroom_enqueue=lesson_package_service().enqueue,
     )
+    progressive_profile = _checkpoint_question_phase_profile()
+    if progressive_profile is not None:
+        service.progressive_adapter = OpenMaicQuestionAdapter(provider_name=str(progressive_profile["name"]),
+            model_name=str(progressive_profile["model"]), base_url=str(progressive_profile["baseUrl"]),
+            api_key_env=str(progressive_profile["apiKeyEnv"]), provider_timeout_ms=int(progressive_profile["timeoutMs"]),
+            max_tokens=int(progressive_profile["maxTokens"]), temperature=float(progressive_profile["temperature"]),
+            execution_environment=_progressive_paid_budget_environment)
     current_app.extensions[
         "mira_dynamic_learning_course_generation_service"
     ] = service

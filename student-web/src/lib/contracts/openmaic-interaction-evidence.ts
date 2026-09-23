@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { progressiveDifficultyPolicySchema } from "./openmaic-progressive-contract";
 
 const sha = z.string().regex(/^[0-9a-f]{64}$/);
 const id = z.string().trim().min(1).max(255);
@@ -10,7 +11,7 @@ const viewport = z.union([
   z.object({ width: z.literal(1024), height: z.literal(768) }).strict(),
 ]);
 export const difficultyCodeSchema = z.enum(["basic", "standard", "challenge"]);
-export const difficultyPolicySchema = z.object({
+export const legacyDifficultyPolicySchema = z.object({
   schemaVersion: z.literal("mira.learning.difficulty-policy.v1"),
   gradeCode: z.string().regex(/^primary_[2-6]$/), subject: z.enum(["chinese", "math", "english"]),
   skillId: id, difficultyCode: difficultyCodeSchema,
@@ -34,6 +35,9 @@ export const difficultyPolicySchema = z.object({
     ]).optional(),
   }).strict(),
 }).strict();
+export const difficultyPolicySchema = z.discriminatedUnion("objectiveRuleVersion", [
+  legacyDifficultyPolicySchema, progressiveDifficultyPolicySchema,
+]);
 
 const policyBase = {
   enabled: z.literal(true), profile: z.literal("primary-adaptive"),

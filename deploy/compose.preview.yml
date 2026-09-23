@@ -1,0 +1,16 @@
+# Explicit private remote-test mode, never selected by the production default.
+# server.py requires a non-public IP allowlist for every edge endpoint.
+services:
+  backend:
+    command: [python, -m, gunicorn, --workers, "1", --worker-class, gthread, --threads, "8", --timeout, "300", --bind, "0.0.0.0:8000", --access-logfile, "-", --error-logfile, "-", "app:app"]
+    environment:
+      APP_ENV: development
+      APP_DEBUG: "0"
+      APP_ENABLE_DEV_ADAPTERS: "1"
+      APP_SMS_PROVIDER: development
+  curriculum-worker:
+    environment:
+      APP_ENV: development
+      APP_DEBUG: "0"
+      APP_ENABLE_DEV_ADAPTERS: "1"
+      APP_SMS_PROVIDER: development

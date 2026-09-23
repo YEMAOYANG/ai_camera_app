@@ -22,6 +22,39 @@ _DISCUSSION_REPAIR_IDENTITY = ('sessionId', 'stageId', 'sourceSnapshotSha256', '
                               'frozenContextSha256', 'rejectedReviewSha256')
 
 
+def _saved_stage_event_for_runtime(events, *, owner_id, build_item_id, runtime_id):
+    """Resolve old owner-wide events through their immutable per-Runtime audit."""
+    matches = []
+    for event in events:
+        try:
+            payload = json.loads(event['payload_json'])
+            audit_sha = payload['auditReceiptId']
+            if not isinstance(audit_sha, str) or re.fullmatch(r'[0-9a-f]{64}', audit_sha) is None:
+                raise ValueError('invalid saved-stage audit identity')
+            audit = json.loads((ARCHIVES / ('saved-stage-reconciliation-' + audit_sha + '.json')).read_bytes())
+            original_runtime = audit['originalRuntime']
+            archived_item, archived_runtime = audit['buildItemId'], original_runtime['id']
+            if (digest(audit) != audit_sha
+                    or audit.get('schemaVersion') != 'mira.single-course.saved-stage-reconciliation.v1'
+                    or audit['originalOwner']['id'] != owner_id
+                    or not isinstance(archived_item, str) or not archived_item
+                    or not isinstance(archived_runtime, str) or not archived_runtime
+                    or original_runtime.get('candidate_build_item_id') != archived_item
+                    or audit['completionReceiptSha256'] != payload.get('recoveryReceiptId')
+                    or any(key in payload and payload[key] != value for key, value in
+                           (('buildItemId', archived_item), ('runtimeId', archived_runtime)))):
+                raise ValueError('saved-stage event/audit binding changed')
+            if archived_item == build_item_id or archived_runtime == runtime_id:
+                if (archived_item, archived_runtime) != (build_item_id, runtime_id):
+                    raise ValueError('saved-stage Runtime history conflicts with its build item')
+                matches.append(payload)
+        except (KeyError, TypeError, AttributeError, ValueError, OSError) as exc:
+            raise ValueError('saved-stage historical audit is missing, conflicting or changed') from exc
+    if len(matches) > 1:
+        raise ValueError('saved-stage Runtime has conflicting revalidation history')
+    return matches[0] if matches else None
+
+
 def _validate_learner_discussion_audit(receipt, prepared_snapshot, result, audit):
     """Check immutable Native source/request/response artifacts without any Provider call."""
     names = {'input', 'request', 'provider-response', 'rejected-review', 'completion', 'dispatch.claim'}
@@ -300,10 +333,12 @@ def reconcile_saved_stage(*, runtime_service, preparation_repository, identity, 
         if (dict(current or {}) != runtime or dict(current_owner or {}) != owner or dict(current_item or {}) != item
                 or requests != state['requests'] or promoted_path.read_bytes() != promoted_bytes):
             raise ValueError('saved-stage reconciliation source changed before compare-and-set')
-        previous = conn.execute('SELECT payload_json FROM learning_curriculum_preparation_events WHERE plan_id=? '
-            'AND event_type=? ORDER BY created_at DESC,id DESC LIMIT 1', (owner['id'], EVENT)).fetchone()
+        previous = _saved_stage_event_for_runtime(
+            conn.execute('SELECT payload_json FROM learning_curriculum_preparation_events WHERE plan_id=? '
+                'AND event_type=? ORDER BY created_at,id', (owner['id'], EVENT)).fetchall(),
+            owner_id=owner['id'], build_item_id=identity['buildItemId'], runtime_id=runtime_id)
         if previous:
-            if json.loads(previous['payload_json']).get('recoveryReceiptId') != receipt_sha or runtime['status'] == 'failed':
+            if previous.get('recoveryReceiptId') != receipt_sha or runtime['status'] == 'failed':
                 raise ValueError('saved-stage revalidation was already attempted; diagnose the saved outcome')
         else:
             ARCHIVES.mkdir(parents=True, exist_ok=True)
@@ -322,7 +357,8 @@ def reconcile_saved_stage(*, runtime_service, preparation_repository, identity, 
                 raise ValueError('saved-stage Runtime rejection no longer matches')
             preparation_repository.append_event(conn, plan_id=owner['id'], event_type=EVENT, stage=owner['stage'],
                 payload={'code': 'saved_classroom_recovery', 'status': 'pending_review',
-                    'recoveryReceiptId': receipt_sha, 'auditReceiptId': audit_sha}, now=now)
+                    'recoveryReceiptId': receipt_sha, 'auditReceiptId': audit_sha,
+                    'buildItemId': identity['buildItemId'], 'runtimeId': runtime_id}, now=now)
     result = runtime_service.generation_status(runtime['upstream_job_id'])
     return {'runtimeId': runtime_id, 'upstreamJobId': runtime['upstream_job_id'],
         'completionReceiptSha256': receipt_sha, 'result': result,

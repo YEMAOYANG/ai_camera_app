@@ -70,11 +70,17 @@ def select_formal_skills(*, teaching_brief: object, grade_boundary: object,
     lesson = _mapping(brief.get("lesson"))
     teach = _mapping(_mapping(lesson.get("teachingFlow")).get("teach"))
     questions = lesson.get("questions")
-    if (brief.get("schemaVersion") != "mira.learning.formal-runtime-teaching-brief.v1"
+    progressive = brief.get("schemaVersion") == "mira.learning.formal-runtime-teaching-brief.progressive.v1"
+    question_count_valid = (isinstance(questions, list) and (
+        (not questions if lesson.get("assessmentMode") == "observed" else 6 <= len(questions) <= 14)
+        if progressive else len(questions) == 5
+    ))
+    if (brief.get("schemaVersion") not in {"mira.learning.formal-runtime-teaching-brief.v1",
+                                           "mira.learning.formal-runtime-teaching-brief.progressive.v1"}
             or any(course.get(key) != boundary[key] for key in ("gradeCode", "subject", "skillId"))
             or not _text(course.get("objective")) or not _text(teach.get("sayText"))
-            or not _texts(teach.get("keyPoints"), True) or not isinstance(questions, list)
-            or len(questions) != 5 or any(not isinstance(q, Mapping) or not _text(q.get("prompt")) for q in questions)):
+            or not _texts(teach.get("keyPoints"), True) or not question_count_valid
+            or any(not isinstance(q, Mapping) or not _text(q.get("prompt")) for q in questions)):
         raise ValueError("formal skill brief and grade boundary mismatch")
     goals = [("/teachingBrief/course/objective", course["objective"]),
         *[(f"/gradeBoundary/learningObjectives/{i}", text) for i, text in enumerate(boundary["learningObjectives"])]]

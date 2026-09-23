@@ -12,7 +12,7 @@ from core.security import now_ms
 from repositories.learning_curriculum_preparation_repository import LearningCurriculumPreparationRepository
 from repositories.course_supply_inventory import inherited_scope_requests, published_supply
 from services.learning_curriculum_preparation_contract import (
-    TARGET_SCHEMA_V2, build_preparation_target, preparation_target_fingerprint,
+    TARGET_SCHEMA_PROGRESSIVE, build_progressive_preparation_target, preparation_target_fingerprint,
 )
 
 
@@ -23,15 +23,15 @@ class CourseLibraryNotOpen(ValueError):
     """The requested grade has no approved formal production target yet."""
 
 
-def formal_supply_target(grade_code: str) -> dict:
+def formal_supply_target(grade_code: str, *, assessment_batch_ordinal: int = 1) -> dict:
     if not isinstance(grade_code, str) or not grade_code:
         raise CourseLibraryNotOpen('course library grade is not open')
     try:
-        target = build_preparation_target(grade_code)
+        target = build_progressive_preparation_target(grade_code, assessment_batch_ordinal=assessment_batch_ordinal)
     except (KeyError, ValueError) as exc:
         raise CourseLibraryNotOpen('course library grade is not open') from exc
     if (target.get('gradeCode') != grade_code
-            or target.get('schemaVersion') != TARGET_SCHEMA_V2
+            or target.get('schemaVersion') != TARGET_SCHEMA_PROGRESSIVE
             or not target.get('courseTargets')
             or not isinstance(target.get('canaryManifest'), Mapping)):
         raise CourseLibraryNotOpen('course library grade has no formal target')
@@ -84,10 +84,10 @@ class CourseLibraryService:
     """The production owner and desired coverage; contains no Provider calls."""
 
     def __init__(self, database_url: str, *, grade_code: str = 'primary_1',
-                 preparation_repository=None, clock=now_ms):
+                 preparation_repository=None, clock=now_ms, assessment_batch_ordinal: int = 1):
         # Existing single-grade operator entry points retain their explicit
         # primary-one default. A supplied grade never falls back to that grade.
-        self.target = formal_supply_target(grade_code)
+        self.target = formal_supply_target(grade_code, assessment_batch_ordinal=assessment_batch_ordinal)
         self.fingerprint = preparation_target_fingerprint(self.target)
         self.database = Database(database_url)
         self.preparations = preparation_repository or LearningCurriculumPreparationRepository(self.database)
@@ -98,26 +98,142 @@ class CourseLibraryService:
     def ensure_owner(self) -> Mapping:
         timestamp = self.clock()
         with self.database.transaction() as conn:
-            plan, _ = self.preparations.reserve_plan(
-                conn, family_id=None, child_id=None, grade_code=self.target['gradeCode'],
-                school_year_start_year=0, grade_selection_revision=0,
-                target=self.target, target_fingerprint=self.fingerprint,
-                request_id=f'library:{self.fingerprint}',
-                shared_build_request_id=f'grade-build:{self.fingerprint}',
-                now=timestamp, library_owned=True,
+            return self._ensure_owner_in_connection(conn, timestamp=timestamp)
+
+    def _ensure_owner_in_connection(self, conn, *, timestamp: int) -> Mapping:
+        plan, _ = self.preparations.reserve_plan(
+            conn, family_id=None, child_id=None, grade_code=self.target['gradeCode'],
+            school_year_start_year=0, grade_selection_revision=0,
+            target=self.target, target_fingerprint=self.fingerprint,
+            request_id=f'library:{self.fingerprint}',
+            shared_build_request_id=f'grade-build:{self.fingerprint}',
+            now=timestamp, library_owned=True,
+        )
+        digest = hashlib.sha256(f'grade-build:{self.fingerprint}'.encode()).hexdigest()[:24]
+        # Adopt persisted candidates/checkpoints without rewriting their
+        # target or reopening a terminal build. Child plans remain followers.
+        # Adoption is only needed before this owner is linked. Repeating
+        # reconciliation on every operator tick resets next_run_at and can
+        # indefinitely postpone an otherwise eligible production task.
+        if not plan.get('catalog_build_id') and self.preparations.content_proof_auditor is not None:
+            self.preparations.reconcile_shared_build(
+                conn, build_id=f'catalog_build_{digest}',
+                target_fingerprint=self.fingerprint, now=timestamp,
             )
-            digest = hashlib.sha256(f'grade-build:{self.fingerprint}'.encode()).hexdigest()[:24]
-            # Adopt persisted candidates/checkpoints without rewriting their
-            # target or reopening a terminal build. Child plans remain followers.
-            # Adoption is only needed before this owner is linked. Repeating
-            # reconciliation on every operator tick resets next_run_at and can
-            # indefinitely postpone an otherwise eligible production task.
-            if not plan.get('catalog_build_id') and self.preparations.content_proof_auditor is not None:
-                self.preparations.reconcile_shared_build(
-                    conn, build_id=f'catalog_build_{digest}',
-                    target_fingerprint=self.fingerprint, now=timestamp,
-                )
-            return dict(self.preparations.get_plan(conn, str(plan['id'])) or plan)
+        return dict(self.preparations.get_plan(conn, str(plan['id'])) or plan)
+
+    def request_personal_supply(self, *, fallback_scope: str = 'canary') -> dict:
+        """Refresh each learner's next missing classroom within their own grade."""
+        with self.database.transaction() as conn:
+            children = conn.execute("SELECT * FROM children WHERE grade_code IN "
+                "('primary_1','primary_2','primary_3','primary_4','primary_5','primary_6') "
+                "AND grade_selection_revision >= 1").fetchall()
+            if children:
+                requested = self.request_children_in_connection(conn, children=children)
+                return {'scope': 'personal_next_lessons', 'gradeCode': self.target['gradeCode'],
+                        'requestedCount': len(requested), 'requests': requested,
+                        'targetFingerprint': self.fingerprint}
+        # No learner profile exists yet. Retain the operator's bounded initial
+        # scope; the full registry target itself never authorizes generation.
+        return self._request_registered_scope(fallback_scope, preserve_existing_scope=True)
+
+    def request_children_in_connection(self, conn, *, children) -> list[dict]:
+        from repositories.learning_repository import LearningRepository
+        from repositories.learning_placement_repository import LearningPlacementRepository
+        from repositories.progressive_learning_repository import ProgressiveLearningRepository
+        from services.progressive_learning_service import ProgressiveLearningService
+        learning = LearningRepository(self.database)
+        placements = LearningPlacementRepository(self.database)
+        progression_repository = ProgressiveLearningRepository(self.database)
+        def visible(connection, *, child, course):
+            return learning.get_student_visible_course(connection, family_id=child['family_id'], child_id=child['id'],
+                grade_code=child['grade_code'], grade_selection_revision=int(child['grade_selection_revision']),
+                course_id=course['id'], course_version=course['version']) is not None
+        progression = ProgressiveLearningService(progression_repository, course_validator=visible)
+        requested = {}
+        timestamp = int(self.clock())
+        for child in children:
+            for subject in ('chinese', 'math', 'english'):
+                lesson = progression.get_path(conn, child=child, subject=subject)['nextLesson']
+                if (lesson is None or lesson.get('gradeCode') != child['grade_code']
+                        or lesson.get('course') is not None or not lesson.get('canStart')):
+                    continue
+                lesson_subject = lesson['subject']
+                scope = {'family_id': str(child['family_id']), 'child_id': str(child['id']),
+                         'curriculum_version': self.target['curriculumVersion']}
+                activity = progression_repository.course_activity(conn, **scope, lesson_id=lesson['lessonId'])
+                if any(row.get('session_status') == 'in_progress' for row in activity.values()):
+                    continue  # Existing teaching remains the next action.
+                used_sets = {row['assessment_set_id'] for row in progression_repository.list_evidence(
+                    conn, **scope, lesson_id=lesson['lessonId'])}
+                used_sets.update(placements.reserved_assessment_sets(conn, **scope, lesson_id=lesson['lessonId']))
+                completed = [row for row in activity.values()
+                             if row.get('session_status') == 'completed' or row.get('task_status') == 'completed']
+                used_sets.update(row['assessment_set_id'] for row in completed)
+                if lesson['assessmentMode'] == 'observed' and completed:
+                    continue  # Await authenticated observation; another quiz cannot establish mastery.
+                slots = self._unseen_supply_slots(conn, lesson_id=lesson['lessonId'],
+                    occupied_sets=used_sets, count=1)
+                for batch, variant in slots:
+                    self._request_personal_slot(conn, requested=requested, lesson=lesson,
+                        subject=lesson_subject, batch=batch, variant=variant, timestamp=timestamp)
+        return list(requested.values())
+
+    def _unseen_supply_slots(self, conn, *, lesson_id, occupied_sets, count):
+        """Choose exact unused slots, even when variant two was published first."""
+        if count == 0:
+            return []
+        rows = conn.execute(
+            'SELECT item.generation_request_id, item.variant_ordinal, build.target_spec_json '
+            'FROM learning_catalog_build_items AS item '
+            'JOIN learning_catalog_build_jobs AS build ON build.id = item.build_job_id '
+            'WHERE item.curriculum_version = ? AND item.skill_id = ?',
+            (self.target['curriculumVersion'], lesson_id),
+        ).fetchall()
+        occupied = set()
+        for row in rows:
+            if row['generation_request_id'] not in occupied_sets:
+                continue
+            target = json.loads(row['target_spec_json'])
+            if target.get('schemaVersion') != TARGET_SCHEMA_PROGRESSIVE:
+                continue
+            batch = target.get('assessmentBatchOrdinal')
+            variant = int(row['variant_ordinal'])
+            if type(batch) is not int or batch < 1 or variant not in (1, 2):
+                raise ValueError('progressive supply slot identity is invalid')
+            occupied.add((batch, variant))
+        slots = []
+        ordinal = 0
+        while len(slots) < count:
+            slot = (1 + ordinal // 2, 1 + ordinal % 2)
+            if slot not in occupied:
+                slots.append(slot)
+            ordinal += 1
+        return slots
+
+    def _request_personal_slot(self, conn, *, requested, lesson, subject, batch, variant, timestamp):
+        library = CourseLibraryService(self.database.database_url, grade_code=lesson['gradeCode'],
+            preparation_repository=self.preparations, clock=self.clock, assessment_batch_ordinal=batch)
+        key = (library.fingerprint, subject, lesson['lessonId'], variant)
+        if key in requested:
+            return
+        owner = library._ensure_owner_in_connection(conn, timestamp=timestamp)
+        locked = conn.execute('SELECT id FROM learning_curriculum_preparation_plans WHERE id = ? '
+            'AND library_target_fingerprint = ? AND grade_code = ? FOR UPDATE',
+            (owner['id'], library.fingerprint, lesson['gradeCode'])).fetchone()
+        if locked is None:
+            raise RuntimeError('course library ownership changed')
+        # Exact next sets are additive. Another child's demand never disables
+        # earlier requests, and registering a slot does not call a Provider.
+        conn.execute("""INSERT INTO learning_course_supply_requests(
+            target_fingerprint, subject, skill_id, variant_ordinal, priority, purpose, enabled, created_at, updated_at)
+            VALUES (?, ?, ?, ?, 1, 'core', TRUE, ?, ?)
+            ON DUPLICATE KEY UPDATE priority = LEAST(priority, 1), updated_at = VALUES(updated_at)""",
+            (*key, timestamp, timestamp))
+        requested[key] = {'planId': owner['id'], 'gradeCode': lesson['gradeCode'], 'subject': subject,
+            'lessonId': lesson['lessonId'], 'variantOrdinal': variant, 'assessmentBatchOrdinal': batch,
+            'targetFingerprint': library.fingerprint}
+        invalidate_supply_cache(str(self.database.database_url), lesson['gradeCode'])
 
     def request_slot(self, *, subject: str, skill_id: str, variant_ordinal: int) -> dict:
         """Explicit operator ceiling: exactly one existing curriculum slot, no paid work."""
@@ -147,6 +263,13 @@ class CourseLibraryService:
                 'slot': {'subject': subject, 'skillId': skill_id, 'variantOrdinal': variant_ordinal}}
 
     def request_scope(self, scope: str, *, preserve_existing_scope: bool = False) -> dict:
+        if scope not in {'canary', 'first_unit', 'catalog'}:
+            raise ValueError('unsupported course supply scope')
+        if preserve_existing_scope:
+            return self.request_personal_supply(fallback_scope=scope)
+        return self._request_registered_scope(scope, preserve_existing_scope=False)
+
+    def _request_registered_scope(self, scope: str, *, preserve_existing_scope: bool = False) -> dict:
         desired = supply_targets(self.target, self.policy, scope)
         plan = self.ensure_owner()
         timestamp = self.clock()
@@ -184,12 +307,12 @@ class CourseLibraryService:
                     desired = [item for item in supply_targets(self.target, self.policy, 'catalog')
                                if (item['subject'], item['skillId'], item['variantOrdinal']) in enabled]
             mastery = conn.execute(
-                """SELECT mastery.child_id, mastery.subject, mastery.node_code, mastery.mastery_level
-                FROM learning_mastery_states AS mastery
+                """SELECT mastery.child_id, mastery.subject, mastery.lesson_id AS node_code, mastery.mastery_status AS mastery_level
+                FROM learning_progressive_lesson_progress AS mastery
                 JOIN children AS child ON child.id = mastery.child_id AND child.family_id = mastery.family_id
-                WHERE child.grade_code = ? AND mastery.grade_code = child.grade_code
+                WHERE child.grade_code = ? AND mastery.curriculum_version = ?
                   AND mastery.updated_at >= ?""",
-                (self.target['gradeCode'], timestamp - 30 * 86400000),
+                (self.target['gradeCode'], self.target['curriculumVersion'], timestamp - 30 * 86400000),
             ).fetchall()
             desired = prioritize_demand(desired, mastery, forward_boundaries=self.policy['forwardBoundaryCount'])
             # A scope is an explicit production ceiling. Keep disabled requests

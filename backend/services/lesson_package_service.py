@@ -135,6 +135,18 @@ class LessonPackageService:
             authority = self.repository.get_next_formal_candidate_authority(
                 conn, preparation_plan=preparation_plan
             )
+            if authority is not None:
+                content = self.repository.decode_json(authority.get("content_json"))
+                if isinstance(content, dict) and content.get("schemaVersion") == "mira.learning.progressive-course.v1":
+                    from services.progressive_course_generation import validate_progressive_course_for_release
+                    stored = self.repository.get_course(conn, course_id=str(authority["course_id"]), course_version=str(authority["course_version"]))
+                    if stored is None:
+                        raise ApiError("learning_course_not_found", "细课次原始课程不存在", 409)
+                    validate_progressive_course_for_release(conn, course=stored, expected_lesson_id=str(stored["node_code"]))
+            if authority is not None:
+                from services.progressive_math2_revision import formal_package_identity
+                package_identity = formal_package_identity(conn, build_item_id=str(authority["build_item_id"]),
+                    course_id=str(authority["course_id"]), course_version=str(authority["course_version"]))
         if authority is None:
             return None
         item_id = str(authority["build_item_id"])
@@ -160,8 +172,7 @@ class LessonPackageService:
                 "正式候选课堂的锁定课程内容无效",
                 409,
             ) from exc
-        package_seed = hashlib.sha256(item_id.encode("utf-8")).hexdigest()
-        package_id = f"formal_runtime_package_{package_seed[:48]}"
+        package_id = package_identity["packageId"]
         public_payload = {
             "schemaVersion": FORMAL_RUNTIME_PACKAGE_SCHEMA,
             "authority": "mira_backend_candidate_only",
@@ -280,6 +291,9 @@ class LessonPackageService:
                     "只有当前且已通过校验的课程可以生成互动课堂",
                     409,
                 )
+            if course.get("curriculum_version") == "mira.primary.progressive.v1":
+                from services.progressive_course_generation import validate_progressive_course_for_release
+                validate_progressive_course_for_release(conn, course=course, expected_lesson_id=str(course["node_code"]))
             job, created = self.repository.create_or_get_job(
                 conn,
                 request_id=request_id,
@@ -725,6 +739,9 @@ class LessonPackageService:
     @staticmethod
     def _public_practice_questions(course: Mapping[str, Any]) -> list[dict[str, Any]]:
         content = LessonPackageService._course_content(course)
+        if content.get("schemaVersion") == "mira.learning.progressive-course.v1":
+            from services.progressive_course_generation import progressive_runtime_teaching_brief
+            return progressive_runtime_teaching_brief(course)[0]["lesson"]["questions"]
         questions = content.get("questions")
         flow = content.get("teachingFlow")
         if not isinstance(questions, list) or not isinstance(flow, Mapping):
@@ -773,6 +790,9 @@ class LessonPackageService:
 
     @staticmethod
     def _boundary(course: Mapping[str, Any]) -> dict[str, Any]:
+        if course.get("curriculum_version") == "mira.primary.progressive.v1":
+            from services.progressive_course_generation import progressive_boundary
+            return progressive_boundary(course)
         candidates = boundaries_for(str(course["grade_code"]), str(course["subject"]))
         for boundary in candidates:
             if boundary.skill_id == str(course["node_code"]):

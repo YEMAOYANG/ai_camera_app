@@ -12,10 +12,49 @@ from tests.test_learning_practice import PracticeTest, source
 
 
 class DifficultySelectionTest(unittest.TestCase):
+    def test_grade_one_missing_first_course_never_falls_back_to_unrestricted_node(self):
+        service = object.__new__(LearningService)
+        service.static_catalog_enabled = False
+        service.repository = Mock()
+        service.repository.list_published_subjects.return_value = ['math']
+        service.repository.get_mastery_state.return_value = None
+        future = {'id': 'later', 'version': '1', 'node_code': 'addition_subtraction_20'}
+        service.repository.get_recommended_course.side_effect = (
+            lambda conn, **kw: future if kw['required_node_code'] is None else None
+        )
+        chosen = service._course_for_child(
+            None, family_id='family', child={'family_id': 'family', 'id': 'child', 'grade_code': 'primary_1'},
+            learning_date='2026-09-16', subject='math', allow_missing=True,
+        )
+        self.assertIsNone(chosen)
+        calls = service.repository.get_recommended_course.call_args_list
+        self.assertTrue(calls)
+        self.assertTrue(all(call.kwargs['required_node_code'] == 'number_sense_20' for call in calls))
+
+    def test_grade_one_missing_current_course_can_review_only_mastered_prefix(self):
+        service = object.__new__(LearningService)
+        service.static_catalog_enabled = False
+        service.repository = Mock()
+        service.repository.list_published_subjects.return_value = ['math']
+        service.repository.get_mastery_state.side_effect = lambda conn, **kw: (
+            {'mastery_level': 'mastered'} if kw['node_code'] == 'number_sense_20' else None
+        )
+        review = {'id': 'review', 'version': '1', 'node_code': 'number_sense_20'}
+        service.repository.get_recommended_course.side_effect = lambda conn, **kw: (
+            review if kw['required_node_code'] == 'number_sense_20' else None
+        )
+        chosen = service._course_for_child(
+            None, family_id='family', child={'family_id': 'family', 'id': 'child', 'grade_code': 'primary_1'},
+            learning_date='2026-09-16', subject='math', allow_missing=True,
+        )
+        self.assertEqual(chosen, review)
+        self.assertEqual([call.kwargs['required_node_code'] for call in service.repository.get_recommended_course.call_args_list],
+                         ['addition_subtraction_20', 'number_sense_20'])
+
     def test_only_independent_evidence_promotes_and_prerequisites_remain_ordered(self):
-        self.assertEqual(preferred_difficulty(None), 'standard')
+        self.assertEqual(preferred_difficulty(None), 'basic')
         self.assertEqual(preferred_difficulty({'mastery_level': 'mastered', 'correct_count': 20}), 'standard')
-        self.assertEqual(preferred_difficulty({'mastery_level': 'mastered', 'independent_correct_count': 2, 'hint_count': 0}), 'challenge')
+        self.assertEqual(preferred_difficulty({'mastery_level': 'mastered', 'independent_correct_count': 2, 'hint_count': 0}), 'standard')
         self.assertEqual(preferred_difficulty({'mastery_level': 'mastered', 'independent_correct_count': 20, 'hint_count': 2}), 'basic')
         self.assertEqual(preferred_difficulty({'mastery_level': 'needs_practice'}), 'basic')
         bounds = boundaries_for('primary_6', 'math')
@@ -68,5 +107,5 @@ class DifficultySelectionTest(unittest.TestCase):
         self.assertEqual(response['fallbackPath'], '/learning')
         self.assertIn('当前难度', response['message'])
         self.assertFalse(fixture.repo.questions)
-        fixture.repo.difficulty_mastery = lambda conn, **scope: {}
+        fixture.repo.difficulty_mastery = lambda conn, **scope: {skill: {'mastery_level': 'mastered'}}
         self.assertEqual(fixture.start()['session']['totalQuestions'], 2)

@@ -97,7 +97,7 @@ class LearningMasteryLoopUnitTest(unittest.TestCase):
                 )
             )
 
-    def test_corrected_independent_answers_close_the_mastery_loop(self):
+    def test_corrected_independent_answers_complete_without_unlocking_next_skill(self):
         runtime_questions = QUESTIONS[1:]
         answers = [
             {"questionId": "q2", "attemptNumber": 1, "correct": True},
@@ -128,10 +128,24 @@ class LearningMasteryLoopUnitTest(unittest.TestCase):
         self.assertEqual(
             self.repository.report_args["independent_correct_count"], 1
         )
-        self.assertEqual(self.repository.report_args["mastery_level"], "mastered")
-        self.assertIn("当堂闭环", self.repository.report_args["summary"])
-        self.assertEqual(self.repository.mastery_args["mastery_level"], "mastered")
-        self.assertEqual(self.repository.mastery_args["next_review_date"], "2026-09-08")
+        self.assertEqual(self.repository.report_args["mastery_level"], "developing")
+        self.assertIn("需要巩固", self.repository.report_args["summary"])
+        self.assertEqual(self.repository.mastery_args["mastery_level"], "developing")
+        self.assertEqual(self.repository.mastery_args["next_review_date"], "2026-09-04")
+
+    def test_independent_first_answers_are_required_for_mastery(self):
+        for successes, expected in ((0, 'needs_practice'), (1, 'developing'), (2, 'mastered')):
+            with self.subTest(successes=successes):
+                answers = [{'questionId': f'q{i}', 'attemptNumber': 1,
+                            'correct': i < 4 or i - 4 < successes} for i in range(2, 6)]
+                answers += [{'questionId': f'q{i}', 'attemptNumber': 2, 'correct': True}
+                            for i in range(4 + successes, 6)]
+                self.service._complete_and_report(
+                    object(), session={'id': 'session-1', 'family_id': 'family-1', 'child_id': 'child-1',
+                                       'task_id': 'task-1', 'correct_count': 4, 'attempted_count': len(answers)},
+                    course=self.course, questions=QUESTIONS[1:], answers=answers, now=1000,
+                )
+                self.assertEqual(self.repository.mastery_args['mastery_level'], expected)
 
 
 if __name__ == "__main__":

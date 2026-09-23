@@ -26,6 +26,7 @@ FORMAL_VIDEO_POLICY = {
 }
 VIDEO_RECEIPT_SCHEMA = "mira.openmaic.formal-video-receipt.v1"
 _IDENTIFIER = re.compile(r"[A-Za-z0-9_-]{1,255}")
+_RUNTIME_REQUEST_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}")
 _SHA = re.compile(r"[0-9a-f]{64}")
 
 
@@ -55,8 +56,9 @@ def video_receipt(value: object, *, runtime_request_id: str, classroom_id: str,
                 **{key: FORMAL_VIDEO_POLICY[key] for key in ("policyId", "providerId", "modelId")}}
     if any(receipt.get(key) != value for key, value in expected.items()):
         raise ValueError("formal video receipt identity mismatch")
-    if any(not isinstance(value, str) or not _IDENTIFIER.fullmatch(value)
-           for value in (runtime_request_id, classroom_id, build_item_id, session_id)):
+    if (not isinstance(runtime_request_id, str) or not _RUNTIME_REQUEST_ID.fullmatch(runtime_request_id)
+            or any(not isinstance(value, str) or not _IDENTIFIER.fullmatch(value)
+                   for value in (classroom_id, build_item_id, session_id))):
         raise ValueError("invalid formal video identity")
     assets = receipt.get("assets")
     if (not isinstance(assets, list) or type(receipt.get("videoCount")) is not int

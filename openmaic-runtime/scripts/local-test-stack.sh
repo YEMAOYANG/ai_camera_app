@@ -28,6 +28,7 @@ CURRICULUM_WORKER_PID_FILE="${STATE_DIR}/curriculum-worker.pid"
 CURRICULUM_WORKER_LOG="${STATE_DIR}/curriculum-worker.log"
 CURRICULUM_WORKER_COMMAND_TOKEN="workers.learning_curriculum_preparation_worker"
 REPAIR_MODE="${MIRA_LOCAL_TEST_REPAIR_MODE:-0}"
+CURRICULUM_WORKER_ENABLED="${MIRA_LOCAL_TEST_CURRICULUM_WORKER_ENABLED:-1}"
 STUDENT_WEB_PID_FILE="${STATE_DIR}/student-web.pid"
 STUDENT_WEB_LAUNCH_PID_FILE="${STATE_DIR}/student-web.launch.pid"
 STUDENT_WEB_BUILD_RECORD="${STATE_DIR}/student-web-build.identity"
@@ -80,6 +81,9 @@ Usage: local-test-stack.sh [start|stop|restart|status|start-curriculum-worker|st
 State and logs default to /tmp/mira-local-test-stack.
 This script never kills an unknown process merely because it owns a port.
 MIRA_LOCAL_TEST_REPAIR_MODE=1 starts a passive API without background workers.
+MIRA_LOCAL_TEST_CURRICULUM_WORKER_ENABLED=0 disables only curriculum generation;
+the normal API, parent task scheduler and event stream remain enabled.
+Both flags accept only 0 or 1. Repair mode takes precedence. Generation defaults on.
 Generation uses backend/.env gates and the existing single-call concurrency.
 Student Web is served with Next.js production `next start`; `next dev` is
 recognized only for safe migration of an older identity created by this script.
@@ -98,6 +102,10 @@ validate_positive_integer() {
 validate_configuration() {
   [[ "${REPAIR_MODE}" == "0" || "${REPAIR_MODE}" == "1" ]] || {
     echo "MIRA_LOCAL_TEST_REPAIR_MODE must be 0 or 1." >&2
+    return 1
+  }
+  [[ "${CURRICULUM_WORKER_ENABLED}" == "0" || "${CURRICULUM_WORKER_ENABLED}" == "1" ]] || {
+    echo "MIRA_LOCAL_TEST_CURRICULUM_WORKER_ENABLED must be 0 or 1." >&2
     return 1
   }
   validate_positive_integer MIRA_LOCAL_TEST_BACKEND_PORT "${BACKEND_PORT}"
@@ -1119,13 +1127,28 @@ stop_managed_service() {
 }
 
 curriculum_worker_status() {
+  local candidate_pid
   if identity_matches_process "${CURRICULUM_WORKER_PID_FILE}" curriculum-worker \
     "${BACKEND_DIR}" "${CURRICULUM_WORKER_COMMAND_TOKEN}"; then
+    if [[ "${REPAIR_MODE}" == "1" || "${CURRICULUM_WORKER_ENABLED}" == "0" ]]; then
+      echo "Curriculum worker: still running (PID ${RECORD_PID}); apply the explicit disable flag with start or stop-curriculum-worker." >&2
+      return 1
+    fi
     echo "Curriculum worker: running (PID ${RECORD_PID}, log: ${CURRICULUM_WORKER_LOG})"
     return 0
   fi
-  if [[ "${REPAIR_MODE}" == "1" && ! -e "${CURRICULUM_WORKER_PID_FILE}" ]]; then
-    echo "Curriculum worker: disabled by explicit repair mode"
+  if [[ ! -e "${CURRICULUM_WORKER_PID_FILE}" && ( "${REPAIR_MODE}" == "1" || "${CURRICULUM_WORKER_ENABLED}" == "0" ) ]]; then
+    for candidate_pid in $(pgrep -f "[w]orkers[.]learning_curriculum_preparation_worker" || true); do
+      if [[ "$(process_cwd "${candidate_pid}")" == "${BACKEND_DIR}" ]]; then
+        echo "Curriculum worker: unmanaged process is still running; refusing to report generation disabled." >&2
+        return 1
+      fi
+    done
+    if [[ "${REPAIR_MODE}" == "1" ]]; then
+      echo "Curriculum worker: disabled by explicit repair mode"
+    else
+      echo "Curriculum worker: disabled by explicit MIRA_LOCAL_TEST_CURRICULUM_WORKER_ENABLED=0"
+    fi
     return 0
   fi
   echo "Curriculum worker: stopped or identity invalid" >&2
@@ -1134,10 +1157,10 @@ curriculum_worker_status() {
 
 start_curriculum_worker() {
   local python_bin pid candidate_pid i
-  if [[ "${REPAIR_MODE}" == "1" ]]; then
+  if [[ "${REPAIR_MODE}" == "1" || "${CURRICULUM_WORKER_ENABLED}" == "0" ]]; then
     stop_curriculum_worker || return 1
-    echo "Curriculum worker: disabled by explicit repair mode"
-    return 0
+    curriculum_worker_status
+    return
   fi
   if identity_matches_process "${CURRICULUM_WORKER_PID_FILE}" curriculum-worker \
     "${BACKEND_DIR}" "${CURRICULUM_WORKER_COMMAND_TOKEN}"; then

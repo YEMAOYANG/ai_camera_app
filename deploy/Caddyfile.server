@@ -1,0 +1,37 @@
+# No direct route to OpenMAIC's administration/authoring listener.
+(access) {
+    @outside not remote_ip {$MIRA_ACCESS_CIDRS}
+    respond @outside "This environment is restricted to invited testers." 403
+}
+
+{$MIRA_PARENT_ORIGIN} {
+    import access
+    encode zstd gzip
+    root * /srv/parent
+    header Cache-Control "no-cache"
+    try_files {path} /index.html
+    file_server
+}
+
+{$MIRA_STUDENT_ORIGIN} {
+    import access
+    encode zstd gzip
+    reverse_proxy student-web:3000
+}
+
+{$MIRA_CLASSROOM_ORIGIN} {
+    import access
+    encode zstd gzip
+    reverse_proxy gateway:3101
+}
+
+{$MIRA_API_ORIGIN} {
+    import access
+    encode zstd gzip
+    reverse_proxy backend:8000
+}
+
+{$MIRA_REALTIME_ORIGIN} {
+    import access
+    reverse_proxy backend:8001
+}

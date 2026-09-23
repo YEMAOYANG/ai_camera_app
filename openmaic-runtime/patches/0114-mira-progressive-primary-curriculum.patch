@@ -1,0 +1,811 @@
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -54,6 +54,30 @@
+   readonly stageId: string;
+   /** Server-owned page inspection: local answers only, no attempt or grading. */
+   readonly readOnly?: boolean;
++}
++
++type TapObjectVisual = { id: string; shape: 'circle' | 'square' | 'triangle'; color: 'red' | 'blue' | 'yellow' | 'green' };
++const TAP_OBJECT_COLORS = { red: '#dc4c40', blue: '#2879c6', yellow: '#e8b72d', green: '#348d57' } as const;
++const TAP_OBJECT_NAMES = { circle: '圆形', square: '方形', triangle: '三角形' } as const;
++const TAP_COLOR_NAMES = { red: '红色', blue: '蓝色', yellow: '黄色', green: '绿色' } as const;
++
++function tapObjectVisuals(question: QuizQuestion): TapObjectVisual[] | null {
++  const source = question as unknown as Record<string, unknown>;
++  if (source.sourceType !== 'tap_objects' || !Array.isArray(source.objects)
++      || !source.objects.length || source.objects.length > 20) return null;
++  const objects: TapObjectVisual[] = [];
++  for (const raw of source.objects) {
++    if (!raw || typeof raw !== 'object') return null;
++    const item = raw as Record<string, unknown>;
++    if (typeof item.id !== 'string' || !item.id || typeof item.shape !== 'string'
++        || !Object.hasOwn(TAP_OBJECT_NAMES, item.shape) || typeof item.color !== 'string'
++        || !Object.hasOwn(TAP_OBJECT_COLORS, item.color)) return null;
++    objects.push(item as TapObjectVisual);
++  }
++  const ids = new Set(objects.map(item => item.id));
++  if (ids.size !== objects.length || question.options?.length !== objects.length
++      || question.options.some(option => !ids.has(option.value))) return null;
++  return objects;
+ }
+ 
+ const QuizMathText = memo(function QuizMathText({
+@@ -352,6 +376,34 @@
+   };
+ 
+   const { t } = useI18n();
++  const tapObjects = tapObjectVisuals(question);
++
++  if (tapObjects) return (
++    <QuestionCard question={question} index={index} result={result}>
++      {!isReview && <p className="mb-3 text-sm text-gray-600 dark:text-gray-300">一个一个点，点过的会打勾。</p>}
++      <div className="flex flex-wrap gap-3" role="group" aria-label="逐个点击物体">
++        {tapObjects.map(item => {
++          const isSelected = selected.includes(item.id);
++          return (
++            <button key={item.id} type="button" data-quiz-option={item.id}
++              disabled={disabled} aria-pressed={isSelected}
++              aria-label={`${TAP_COLOR_NAMES[item.color]}${TAP_OBJECT_NAMES[item.shape]}`}
++              onClick={() => toggle(item.id)}
++              className={cn('relative flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border-2 transition-colors touch-manipulation focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-300',
++                isSelected ? 'border-violet-500 bg-violet-50 dark:bg-violet-950/40' : 'border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800',
++                disabled ? 'cursor-default' : 'hover:border-violet-400')}>
++              <svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true" focusable="false">
++                {item.shape === 'circle' && <circle cx="26" cy="26" r="21" fill={TAP_OBJECT_COLORS[item.color]} />}
++                {item.shape === 'square' && <rect x="5" y="5" width="42" height="42" rx="3" fill={TAP_OBJECT_COLORS[item.color]} />}
++                {item.shape === 'triangle' && <path d="M26 4 L49 46 H3 Z" fill={TAP_OBJECT_COLORS[item.color]} />}
++              </svg>
++              {isSelected && <span className="absolute bottom-1 right-1 rounded-full bg-violet-600 p-1 text-white" aria-hidden="true"><Check className="h-4 w-4" /></span>}
++            </button>
++          );
++        })}
++      </div>
++    </QuestionCard>
++  );
+ 
+   return (
+     <QuestionCard question={question} index={index} result={result}>
+diff --git a/lib/server/agent-runtime/dsl-tools.ts b/lib/server/agent-runtime/dsl-tools.ts
+--- a/lib/server/agent-runtime/dsl-tools.ts
++++ b/lib/server/agent-runtime/dsl-tools.ts
+@@ -451,6 +451,27 @@
+         'hasAnswer',
+         'points',
+       ];
++      if (question.sourceType === 'tap_objects') {
++        allowed.push('sourceType', 'objects');
++        if (question.type !== 'multiple' || !Array.isArray(question.objects)
++          || question.objects.length < 1 || question.objects.length > 20)
++          return `/content/questions/${index}: invalid tap objects`;
++        const ids: string[] = [];
++        for (const item of question.objects) {
++          if (item === null || typeof item !== 'object' || Array.isArray(item))
++            return `/content/questions/${index}: invalid tap object`;
++          const object = item as Record<string, unknown>;
++          if (Object.keys(object).sort().join(',') !== 'color,id,shape'
++            || typeof object.id !== 'string' || !object.id || object.id.length > 128
++            || !['circle', 'square', 'triangle'].includes(String(object.shape))
++            || !['red', 'blue', 'yellow', 'green'].includes(String(object.color)))
++            return `/content/questions/${index}: invalid tap object`;
++          ids.push(object.id);
++        }
++        if (new Set(ids).size !== ids.length || !Array.isArray(question.options)
++          || JSON.stringify(question.options.map(option => (option as {value?: unknown}).value)) !== JSON.stringify(ids))
++          return `/content/questions/${index}: tap object options must preserve object IDs`;
++      }
+       const unknown = Object.keys(question).filter((key) => !allowed.includes(key));
+       if (unknown.length)
+         return `/content/questions/${index}: unknown field(s) ${unknown.join(', ')}`;
+diff --git a/lib/server/mira-courseware-provider.ts b/lib/server/mira-courseware-provider.ts
+--- a/lib/server/mira-courseware-provider.ts
++++ b/lib/server/mira-courseware-provider.ts
+@@ -12,6 +12,8 @@
+ 
+ const REQUEST_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$/;
+ const PHASES = new Set([
++  'progressive_generation',
++  'progressive_verification',
+   'outline',
+   'raw_candidate',
+   'candidate_repair',
+@@ -32,7 +34,7 @@
+ const MAX_PROMPT_CHARS = 200_000;
+ const MAX_SCHEMA_BYTES = 128_000;
+ const COURSEWARE_THINKING_DISABLED = { mode: 'disabled', enabled: false } as const;
+-const VERIFIER_PHASES = new Set(['independent_verification', 'verification_after_repair']);
++const VERIFIER_PHASES = new Set(['independent_verification', 'verification_after_repair', 'progressive_verification']);
+ const COURSEWARE_CREATOR = {
+   stage: 'mira-courseware-creator' as const,
+   providerId: 'deepseek',
+diff --git a/lib/server/mira-formal-compiled-classroom.ts b/lib/server/mira-formal-compiled-classroom.ts
+--- a/lib/server/mira-formal-compiled-classroom.ts
++++ b/lib/server/mira-formal-compiled-classroom.ts
+@@ -30,12 +30,13 @@
+ 
+ export interface FormalQuestion {
+   id: string;
+-  type: 'numeric' | 'single_choice' | 'exact_text' | 'accepted_text' | 'sequence';
++  type: 'numeric' | 'single_choice' | 'exact_text' | 'accepted_text' | 'sequence' | 'tap_objects';
+   prompt: string;
+   skill: string;
+   hint: string;
+   explanation: string;
+   choices?: Array<{ id: string; label: string }>;
++  objects?: Array<{ id: string; shape: 'circle' | 'square' | 'triangle'; color: 'red' | 'blue' | 'yellow' | 'green' }>;
+ }
+ 
+ export interface FormalCoursewareSpec {
+@@ -55,8 +56,11 @@
+   teach: { title: string; sayText: string; keyPoints: string[] };
+   recap: string;
+   demo: FormalQuestion;
+-  guided: [FormalQuestion, FormalQuestion];
+-  independent: [FormalQuestion, FormalQuestion];
++  guided: FormalQuestion[];
++  independent: FormalQuestion[];
++  progressiveLesson?: JsonObject;
++  assessmentMode?: 'objective' | 'observed';
++  observations?: string[];
+   teacher: {
+     name: string;
+     avatar: string;
+@@ -106,19 +110,21 @@
+   return JSON.stringify(canonical(value)) === JSON.stringify(canonical(expected));
+ }
+ 
+-function parseQuestion(value: unknown, label: string): FormalQuestion {
++function parseQuestion(value: unknown, label: string, progressive = false): FormalQuestion {
+   const question = record(value, label);
++  if (progressive && ['answer', 'evidence', 'hint', 'explanation', 'scoringRules'].some(key => Object.hasOwn(question, key)))
++    throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}.privateAssessment`);
+   const type = textValue(question.type, `${label}.type`, 32);
+-  if (!['numeric', 'single_choice', 'exact_text', 'accepted_text', 'sequence'].includes(type)) {
++  if (!(progressive ? ['single_choice', 'tap_objects'] : ['numeric', 'single_choice', 'exact_text', 'accepted_text', 'sequence']).includes(type)) {
+     throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}.type`);
+   }
+   const result: FormalQuestion = {
+     id: textValue(question.id, `${label}.id`, 160),
+     type: type as FormalQuestion['type'],
+     prompt: textValue(question.prompt, `${label}.prompt`, 1_200),
+-    skill: textValue(question.skill, `${label}.skill`, 240),
+-    hint: textValue(question.hint, `${label}.hint`, 800),
+-    explanation: textValue(question.explanation, `${label}.explanation`, 1_600),
++    skill: progressive ? '' : textValue(question.skill, `${label}.skill`, 240),
++    hint: progressive ? '' : textValue(question.hint, `${label}.hint`, 800),
++    explanation: progressive ? '' : textValue(question.explanation, `${label}.explanation`, 1_600),
+   };
+   if (result.type === 'single_choice' || result.type === 'sequence') {
+     if (!Array.isArray(question.choices) || question.choices.length < 2) {
+@@ -132,6 +138,19 @@
+       };
+     });
+   }
++  if (result.type === 'tap_objects') {
++    if (!Array.isArray(question.objects) || !question.objects.length || question.objects.length > 20)
++      throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}.objects`);
++    result.objects = question.objects.map((raw, index) => {
++      const item = record(raw, `${label}.objects.${index}`);
++      if (!['circle', 'square', 'triangle'].includes(String(item.shape)) || !['red', 'blue', 'yellow', 'green'].includes(String(item.color)))
++        throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}.objects`);
++      return { id: textValue(item.id, `${label}.objects.${index}.id`, 80),
++        shape: item.shape as 'circle' | 'square' | 'triangle', color: item.color as 'red' | 'blue' | 'yellow' | 'green' };
++    });
++    if (new Set(result.objects.map(item => item.id)).size !== result.objects.length)
++      throw new Error(`FORMAL_COMPILED_INPUT_INVALID:${label}.objects`);
++  }
+   return result;
+ }
+ 
+@@ -165,9 +184,10 @@
+     throw new Error('FORMAL_COMPILED_INPUT_INVALID:runtimeIdentity');
+   }
+   const brief = record(contract.teachingBrief, 'teachingBrief');
++  const progressive = brief.schemaVersion === 'mira.learning.formal-runtime-teaching-brief.progressive.v1';
+   const briefAuthority = record(brief.authority, 'teachingBrief.authority');
+   if (
+-    brief.schemaVersion !== 'mira.learning.formal-runtime-teaching-brief.v1' ||
++    (!progressive && brief.schemaVersion !== 'mira.learning.formal-runtime-teaching-brief.v1') ||
+     !exactObject(briefAuthority, {
+       source: 'locked_learning_course',
+       answerContractProvided: false,
+@@ -186,28 +206,45 @@
+   const flow = record(lesson.teachingFlow, 'teachingFlow');
+   const teach = record(flow.teach, 'teachingFlow.teach');
+   const recap = record(flow.recap, 'teachingFlow.recap');
+-  if (!Array.isArray(lesson.questions) || lesson.questions.length !== 5) {
++  const observed = progressive && lesson.assessmentMode === 'observed';
++  if (progressive && (flow.schemaVersion !== 'mira.learning.progressive-teaching-flow.v1'
++      || !['objective', 'observed'].includes(String(lesson.assessmentMode))
++      || lesson.autoMasteryEligible !== !observed || lesson.manualConfirmationRequired !== observed))
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:progressiveAssessment');
++  if (!Array.isArray(lesson.questions) || (progressive
++      ? (observed ? lesson.questions.length !== 0 : lesson.questions.length < 6 || lesson.questions.length > 14)
++      : lesson.questions.length !== 5)) {
+     throw new Error('FORMAL_COMPILED_INPUT_INVALID:questions');
+   }
+   const questions = lesson.questions.map((item, index) =>
+-    parseQuestion(item, `questions.${index}`),
++    parseQuestion(item, `questions.${index}`, progressive),
+   );
+   const questionById = new Map(questions.map((question) => [question.id, question]));
+-  if (questionById.size !== 5) throw new Error('FORMAL_COMPILED_INPUT_INVALID:questionIds');
+-  const demoId = textValue(flow.demoQuestionId, 'teachingFlow.demoQuestionId', 160);
+-  const guidedIds = stringList(flow.guidedQuestionIds, 'teachingFlow.guidedQuestionIds', 2);
++  if (questionById.size !== questions.length) throw new Error('FORMAL_COMPILED_INPUT_INVALID:questionIds');
++  const demoId = progressive ? undefined : textValue(flow.demoQuestionId, 'teachingFlow.demoQuestionId', 160);
++  const guidedIds = stringList(flow.guidedQuestionIds, 'teachingFlow.guidedQuestionIds', progressive ? undefined : 2);
+   const independentIds = stringList(
+     flow.independentQuestionIds,
+     'teachingFlow.independentQuestionIds',
+-    2,
++    progressive ? undefined : 2,
+   );
+-  const orderedIds = [demoId, ...guidedIds, ...independentIds];
++  if (progressive && (Object.hasOwn(flow, 'demoQuestionId') || (observed
++      ? guidedIds.length + independentIds.length !== 0
++      : !guidedIds.length || guidedIds.length > 4 || independentIds.length < 5 || independentIds.length > 10)))
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:teachingRoles');
++  const orderedIds = [...(demoId ? [demoId] : []), ...guidedIds, ...independentIds];
+   if (
+-    new Set(orderedIds).size !== 5 ||
++    new Set(orderedIds).size !== questions.length ||
+     orderedIds.some((id, index) => questions[index]?.id !== id || !questionById.has(id))
+   ) {
+     throw new Error('FORMAL_COMPILED_INPUT_INVALID:teachingRoles');
+   }
++  const examples = progressive && Array.isArray(flow.examples)
++    ? flow.examples.map((item, index) => textValue(record(item, 'example').text, `examples.${index}`, 2_400)) : [];
++  const observations = progressive && Array.isArray(flow.observations)
++    ? flow.observations.map((item, index) => textValue(record(item, 'observation').text, `observations.${index}`, 2_400)) : [];
++  if (progressive && (!examples.length || (observed && !observations.length)))
++    throw new Error('FORMAL_COMPILED_INPUT_INVALID:progressiveDemonstration');
+   const teacherContract = record(contract.teacher, 'teacher');
+   const runtimeTeacher = record(teacherContract.runtime, 'teacher.runtime');
+   const voiceConfig = record(runtimeTeacher.voiceConfig, 'teacher.runtime.voiceConfig');
+@@ -243,9 +280,13 @@
+       keyPoints: stringList(teach.keyPoints, 'teachingFlow.teach.keyPoints'),
+     },
+     recap: textValue(recap.sayText, 'teachingFlow.recap.sayText', 1_200),
+-    demo: questionById.get(demoId)!,
+-    guided: [questionById.get(guidedIds[0])!, questionById.get(guidedIds[1])!],
+-    independent: [questionById.get(independentIds[0])!, questionById.get(independentIds[1])!],
++    // New lessons have a teaching demonstration, never a fabricated scored demo item.
++    demo: progressive ? { id: 'teaching-demonstration', type: 'exact_text', prompt: examples.join('\n'),
++      skill: '', hint: '', explanation: '' } : questionById.get(demoId!)!,
++    guided: guidedIds.map(id => questionById.get(id)!),
++    independent: independentIds.map(id => questionById.get(id)!),
++    ...(progressive ? { progressiveLesson: record(brief.progressiveLesson, 'progressiveLesson'),
++      assessmentMode: lesson.assessmentMode as 'objective' | 'observed', observations } : {}),
+     teacher: {
+       name: textValue(runtimeTeacher.name, 'teacher.runtime.name', 160),
+       avatar: textValue(runtimeTeacher.avatar, 'teacher.runtime.avatar', 500),
+@@ -826,6 +867,7 @@
+   formalAudioContext: { buildItemId: string; subject: MiraFormalAudioSubject };
+ } {
+   const spec = preparedSpec || parseFormalCoursewareSpec(input);
++  if (spec.progressiveLesson) throw new Error('FORMAL_PROGRESSIVE_PROFESSIONAL_CLASSROOM_REQUIRED');
+   const stage: Stage = {
+     id: classroomId,
+     name: spec.course.title,
+diff --git a/lib/server/mira-formal-interaction-design.ts b/lib/server/mira-formal-interaction-design.ts
+--- a/lib/server/mira-formal-interaction-design.ts
++++ b/lib/server/mira-formal-interaction-design.ts
+@@ -2,7 +2,7 @@
+ import { VISUAL_RUBRIC_VERSION, assertVisualReview, type VisualReviewReceipt } from './mira-formal-visual-contract';
+ import type { Scene, Stage } from '@/lib/types/stage';
+ import type { FormalInteractionProbe, FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
+-import { qualitySha, qualitySnapshot, QUALITY_VIEWPORTS, type MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
++import { qualitySha, qualitySnapshot, qualitySceneText, QUALITY_VIEWPORTS, type MiraTeachingQualityReceipt } from './mira-formal-quality-contract';
+ 
+ export const MIRA_INTERACTION_DESIGN_POLICY = {
+   schemaVersion: 'mira.openmaic.interaction-design.v1',
+@@ -24,9 +24,14 @@
+   visualRubricVersion: VISUAL_RUBRIC_VERSION, visualReviewRequired: true,
+ } as const;
+ export function isMultistatePolicy(policy: unknown) { return qualitySha(policy) === qualitySha(MIRA_MULTISTATE_INTERACTION_POLICY); }
++export interface ObservedAssessment {
++  schemaVersion: 'mira.learning.observed-assessment.v1';
++  criteria: string[];
++}
+ export interface InteractionDesignContext {
+   policy: typeof MIRA_INTERACTION_DESIGN_POLICY | typeof MIRA_MULTISTATE_INTERACTION_POLICY;
+   independentQuestionIds: string[];
++  observedAssessment?: ObservedAssessment;
+ }
+ export interface InteractionObjective {
+   objectiveIndex: number;
+@@ -34,11 +39,13 @@
+   demonstration: { sceneId: string; quote: string };
+   operation: { sceneId: string; controlSelector: string; action: 'click' | 'fill' | 'range' | 'select'; value?: string };
+   feedback: { sceneId: string; selector: string; textIncludes: string; reasonQuote: string };
+-  independentJudgment: { sceneId: string; questionId: string };
++  independentJudgment: { sceneId: string; questionId: string; observationIndex?: never; criterionText?: never; confirmationAuthority?: never }
++    | { sceneId: string; observationIndex: number; criterionText: string; confirmationAuthority: 'parent_or_teacher'; questionId?: never };
+ }
+ export interface InteractionDesignPlan {
+   schemaVersion: 'mira.openmaic.interaction-design-plan.v1' | 'mira.openmaic.interaction-design-plan.v2';
+   objectives: InteractionObjective[];
++  observedAssessment?: ObservedAssessment;
+ }
+ export interface InteractionDesignReceipt {
+   schemaVersion: 'mira.openmaic.interaction-design-receipt.v1' | 'mira.openmaic.interaction-design-receipt.v2';
+@@ -48,6 +55,7 @@
+   status: 'passed'; sessionId: string; stageId: string;
+   gradeBoundarySha256: string; snapshotSha256: string; planSha256: string;
+   teachingQualityReceiptSha256: string;
++  observedAssessment?: ObservedAssessment;
+   objectives: Array<InteractionObjective & { checks: Array<{
+     viewport: { width: number; height: number }; sceneSha256: string;
+     screenshotSha256: string; domSha256: string; probeId: string;
+@@ -65,17 +73,37 @@
+ const END = '\nEND_MIRA_INTERACTION_DESIGN_CONTEXT\n';
+ 
+ export function assertInteractionDesignContext(value: unknown): asserts value is InteractionDesignContext {
+-  if (!exact(value, 'independentQuestionIds,policy') || !object(value) ||
++  const observed = object(value) && Object.hasOwn(value, 'observedAssessment');
++  if (!exact(value, observed ? 'independentQuestionIds,observedAssessment,policy' : 'independentQuestionIds,policy') || !object(value) ||
+       (qualitySha(value.policy) !== qualitySha(MIRA_INTERACTION_DESIGN_POLICY) && !isMultistatePolicy(value.policy)) ||
+-      !Array.isArray(value.independentQuestionIds) || !value.independentQuestionIds.length ||
++      !Array.isArray(value.independentQuestionIds) || (observed ? value.independentQuestionIds.length !== 0 : !value.independentQuestionIds.length) ||
+       value.independentQuestionIds.some(id => !text(id, 1, 128)) ||
+       new Set(value.independentQuestionIds).size !== value.independentQuestionIds.length)
+     fail('CONTEXT_INVALID');
++  if (observed) assertObservedAssessment(value.observedAssessment);
++}
++
++function assertObservedAssessment(value: unknown): asserts value is ObservedAssessment {
++  if (!exact(value, 'criteria,schemaVersion') || !object(value) || value.schemaVersion !== 'mira.learning.observed-assessment.v1' ||
++      !Array.isArray(value.criteria) || value.criteria.length < 1 || value.criteria.length > 30 ||
++      value.criteria.some(criterion => !text(criterion, 3, 16_000))) fail('OBSERVATION_INVALID');
+ }
+ 
+ /** The server appends this to NEW job prompts only. Old prompt bytes stay frozen. */
+ export function interactionDesignPrompt(context: InteractionDesignContext): string {
+   assertInteractionDesignContext(context);
++  if (context.observedAssessment) {
++    const plain = interactionDesignPrompt({ policy: context.policy, independentQuestionIds: ['observation-placeholder'] });
++    const instructions = plain.split(END)[1]
++      .replace('then require an independent judgment using one of the locked independentQuestionIds above.',
++        'then give the child a later independent practice opportunity using the exact observedAssessment criterion. Only an authenticated parent or teacher can confirm personal mastery.')
++      .replace('"independentJudgment":{"sceneId":"later-quiz-scene-id","questionId":"locked-independent-id"}',
++        '"independentJudgment":{"sceneId":"later-practice-scene-id","observationIndex":0,"criterionText":"exact criterion from observedAssessment.criteria","confirmationAuthority":"parent_or_teacher"}')
++      .replace('"objectives":[', '"observedAssessment":' + JSON.stringify(context.observedAssessment) + ',"objectives":[')
++      .replace('The independent question must follow the operation, never use a guided/example question.',
++        'The independent practice scene must follow the operation and be a slide or interactive page showing the exact criterion text, so the child can practice without a worked answer. Do not create a quiz, scoring endpoint, automated mastery, or fake parent confirmation. Both viewports must render this scene and pass final quality review.');
++    return START + JSON.stringify(context) + END + instructions;
++  }
+   return START + JSON.stringify(context) + END + `
+ Required adaptive interaction design for this formal course:
+ For EVERY gradeBoundary.learningObjectives entry, teach an explicit worked demonstration,
+@@ -133,8 +161,10 @@
+   let raw: unknown;
+   try { raw = JSON.parse(plans[0].value); } catch { return fail('PLAN_INVALID'); }
+   const multistate = isMultistatePolicy(input.interactionDesign.policy);
++  const observed = input.interactionDesign.observedAssessment;
+   const objectives = input.gradeBoundary.learningObjectives;
+-  if (!exact(raw, 'objectives,schemaVersion') || !object(raw) || raw.schemaVersion !== (multistate ? 'mira.openmaic.interaction-design-plan.v2' : 'mira.openmaic.interaction-design-plan.v1') ||
++  if (!exact(raw, observed ? 'objectives,observedAssessment,schemaVersion' : 'objectives,schemaVersion') || !object(raw) ||
++      (observed && qualitySha(raw.observedAssessment) !== qualitySha(observed)) || raw.schemaVersion !== (multistate ? 'mira.openmaic.interaction-design-plan.v2' : 'mira.openmaic.interaction-design-plan.v1') ||
+       !Array.isArray(objectives) || !objectives.length || !Array.isArray(raw.objectives) ||
+       raw.objectives.length !== objectives.length || raw.objectives.length > 30) return fail('OBJECTIVE_COVERAGE_INVALID');
+   const byId = new Map(ordered.map((scene, index) => [scene.id, { scene, index }]));
+@@ -152,14 +182,19 @@
+         (op.action !== 'click' && !text(op.value)) || (op.value !== undefined && !text(op.value)) ||
+         !exact(feedback, 'reasonQuote,sceneId,selector,textIncludes') || !object(feedback) || feedback.sceneId !== op.sceneId ||
+         !selector(feedback.selector) || feedback.selector === op.controlSelector || !text(feedback.textIncludes, 3) || !text(feedback.reasonQuote, 3) ||
+-        !exact(judge, 'questionId,sceneId') || !object(judge) || !text(judge.sceneId, 1, 128) ||
+-        !text(judge.questionId, 1, 128) || !input.interactionDesign.independentQuestionIds.includes(judge.questionId)) return fail('OBJECTIVE_MAPPING_INVALID', `objectiveIndex=${item.objectiveIndex}: invalid demonstration, operation, feedback or independentJudgment mapping`);
++        !object(judge) || !text(judge.sceneId, 1, 128)) return fail('OBJECTIVE_MAPPING_INVALID', `objectiveIndex=${item.objectiveIndex}: invalid demonstration, operation, feedback or independentJudgment mapping`);
++    if (observed ? (!exact(judge, 'confirmationAuthority,criterionText,observationIndex,sceneId') ||
++        !Number.isInteger(judge.observationIndex) || Number(judge.observationIndex) < 0 || Number(judge.observationIndex) >= observed.criteria.length ||
++        judge.criterionText !== observed.criteria[Number(judge.observationIndex)] || judge.confirmationAuthority !== 'parent_or_teacher') :
++        (!exact(judge, 'questionId,sceneId') || !text(judge.questionId, 1, 128) || !input.interactionDesign.independentQuestionIds.includes(judge.questionId)))
++      return fail('OBJECTIVE_MAPPING_INVALID');
+     const d = byId.get(demo.sceneId), o = byId.get(op.sceneId), j = byId.get(judge.sceneId);
+     if (d && o && d.index > o.index)
+       return fail('TEACHING_CHAIN_INVALID', `objectiveIndex=${item.objectiveIndex} demonstration.sceneId=${JSON.stringify(demo.sceneId)} (sortedIndex=${d.index}, order=${d.scene.order}) must be at or before operation.sceneId=${JSON.stringify(op.sceneId)} (sortedIndex=${o.index}, order=${o.scene.order})`);
+     if (!d || !o || !j || j.index <= o.index || o.scene.type !== 'interactive' ||
+         !d.scene.actions?.some(action => action.type === 'speech' && action.text.includes(demo.quote as string)) ||
+-        j.scene.content.type !== 'quiz' || !j.scene.content.questions.some(question => question.id === judge.questionId))
++        (observed ? (!['slide', 'interactive'].includes(j.scene.type) || !qualitySceneText({ content: j.scene.content, actions: j.scene.actions ?? [] }).includes(String(judge.criterionText))) :
++          (j.scene.content.type !== 'quiz' || !j.scene.content.questions.some(question => question.id === judge.questionId))))
+       return fail('TEACHING_CHAIN_INVALID');
+   }
+   const plan = raw as unknown as InteractionDesignPlan;
+@@ -197,12 +232,14 @@
+       input.quality.snapshotSha256 !== qualitySha(snapshot) || input.quality.gradeBoundarySha256 !== qualitySha(input.gradeBoundary))
+     return fail('QUALITY_BINDING_INVALID');
+   const multistate = input.plan.schemaVersion.endsWith('.v2');
++  if (input.plan.observedAssessment) assertObservedAssessment(input.plan.observedAssessment);
+   const unsigned = {
+     schemaVersion: multistate ? 'mira.openmaic.interaction-design-receipt.v2' as const : 'mira.openmaic.interaction-design-receipt.v1' as const,
+     policyId: multistate ? MIRA_MULTISTATE_INTERACTION_POLICY.policyId : MIRA_INTERACTION_DESIGN_POLICY.policyId, status: 'passed' as const,
+     sessionId: input.sessionId, stageId: input.stage.id,
+     gradeBoundarySha256: qualitySha(input.gradeBoundary), snapshotSha256: qualitySha(snapshot),
+     planSha256: qualitySha(input.plan), teachingQualityReceiptSha256: input.quality.receiptSha256,
++    ...(input.plan.observedAssessment ? { observedAssessment: input.plan.observedAssessment } : {}),
+     ...(multistate ? {visualReview: input.visualReview, explorationChecks: input.plan.objectives.flatMap(item => QUALITY_VIEWPORTS.map(viewport => {
+       const probe = input.observations.find(o => o.sceneId === item.operation.sceneId && qualitySha(o.viewport) === qualitySha(viewport))?.probeResults.find(p => p.id === `objective-${item.objectiveIndex}`);
+       if (!probe?.exploration) return fail('EXPLORATION_PROOF_MISSING');
+@@ -233,8 +270,11 @@
+ export function assertInteractionDesignReceipt(value: unknown, plan: InteractionDesignPlan,
+   quality: MiraTeachingQualityReceipt): asserts value is InteractionDesignReceipt {
+   const multistate = plan.schemaVersion.endsWith('.v2');
+-  if (!exact(value, multistate ? 'explorationChecks,gradeBoundarySha256,objectives,planSha256,policyId,receiptSha256,schemaVersion,sessionId,snapshotSha256,stageId,status,teachingQualityReceiptSha256,visualReview' : 'gradeBoundarySha256,objectives,planSha256,policyId,receiptSha256,schemaVersion,sessionId,snapshotSha256,stageId,status,teachingQualityReceiptSha256') ||
++  const fields = (multistate ? 'explorationChecks,gradeBoundarySha256,objectives,planSha256,policyId,receiptSha256,schemaVersion,sessionId,snapshotSha256,stageId,status,teachingQualityReceiptSha256,visualReview' : 'gradeBoundarySha256,objectives,planSha256,policyId,receiptSha256,schemaVersion,sessionId,snapshotSha256,stageId,status,teachingQualityReceiptSha256').split(',');
++  if (plan.observedAssessment) { assertObservedAssessment(plan.observedAssessment); fields.push('observedAssessment'); }
++  if (!exact(value, fields.sort().join(',')) ||
+       !object(value) || value.schemaVersion !== (multistate ? 'mira.openmaic.interaction-design-receipt.v2' : 'mira.openmaic.interaction-design-receipt.v1') ||
++      (plan.observedAssessment && qualitySha(value.observedAssessment) !== qualitySha(plan.observedAssessment)) ||
+       value.policyId !== (multistate ? MIRA_MULTISTATE_INTERACTION_POLICY.policyId : MIRA_INTERACTION_DESIGN_POLICY.policyId) || value.status !== 'passed' ||
+       value.sessionId !== quality.sessionId || value.stageId !== quality.stageId ||
+       value.snapshotSha256 !== quality.snapshotSha256 || value.gradeBoundarySha256 !== quality.gradeBoundarySha256 ||
+@@ -257,6 +297,14 @@
+       return fail('RECEIPT_INVALID');
+     const { checks, ...mapping } = raw;
+     if (qualitySha(mapping) !== qualitySha(plan.objectives[index])) return fail('RECEIPT_INVALID');
++    if (plan.observedAssessment) {
++      const judgment = plan.objectives[index].independentJudgment;
++      if (judgment.confirmationAuthority !== 'parent_or_teacher' || judgment.observationIndex === undefined ||
++          judgment.criterionText !== plan.observedAssessment.criteria[judgment.observationIndex]) return fail('RECEIPT_INVALID');
++      for (const viewport of QUALITY_VIEWPORTS) if (!quality.renderChecks.some(render =>
++        render.sceneId === judgment.sceneId && render.viewport.width === viewport.width && render.viewport.height === viewport.height && render.passed &&
++        quality.sceneHashes.some(scene => scene.sceneId === judgment.sceneId && scene.sceneSha256 === render.sceneSha256))) return fail('OBSERVATION_RENDER_PROOF_MISSING');
++    }
+     for (const [viewportIndex, check] of checks.entries()) {
+       const viewport = QUALITY_VIEWPORTS[viewportIndex];
+       if (!exact(check, 'domSha256,probeId,sceneSha256,screenshotSha256,viewport') || !object(check) ||
+diff --git a/lib/server/mira-formal-playful-policy.ts b/lib/server/mira-formal-playful-policy.ts
+--- a/lib/server/mira-formal-playful-policy.ts
++++ b/lib/server/mira-formal-playful-policy.ts
+@@ -27,6 +27,9 @@
+   subject: FormalCoursewareSpec['course']['subject'];
+   guidedQuestionIds: string[];
+   independentQuestionIds: string[];
++  assessmentMode?: 'objective' | 'observed';
++  manualConfirmationRequired?: boolean;
++  progressiveLesson?: Record<string, unknown>;
+ }
+ 
+ const START = '\nMIRA_FORMAL_PLAYFUL_CONTEXT:\n';
+@@ -47,7 +50,7 @@
+ 
+ export function formalPlayfulContext(
+   creationPolicy: unknown,
+-  spec: Pick<FormalCoursewareSpec, 'course' | 'guided' | 'independent'>,
++  spec: Pick<FormalCoursewareSpec, 'course' | 'guided' | 'independent' | 'assessmentMode' | 'progressiveLesson'>,
+ ): MiraFormalPlayfulContext | undefined {
+   if (!object(creationPolicy) || !Object.hasOwn(creationPolicy, 'playfulLearningPolicy'))
+     return undefined;
+@@ -57,19 +60,63 @@
+     subject: spec.course.subject,
+     guidedQuestionIds: spec.guided.map(question => question.id),
+     independentQuestionIds: spec.independent.map(question => question.id),
++    ...(spec.progressiveLesson ? { progressiveLesson: spec.progressiveLesson,
++      assessmentMode: spec.assessmentMode, manualConfirmationRequired: spec.assessmentMode === 'observed' } : {}),
+   };
+   assertContext(context);
+   return context;
+ }
+ 
+ function assertContext(value: unknown): asserts value is MiraFormalPlayfulContext {
+-  if (!object(value) || Object.keys(value).sort().join(',') !== 'guidedQuestionIds,independentQuestionIds,policy,subject'
++  const progressive = object(value) && object(value.progressiveLesson);
++  if (!object(value) || Object.keys(value).sort().join(',') !== (progressive
++    ? 'assessmentMode,guidedQuestionIds,independentQuestionIds,manualConfirmationRequired,policy,progressiveLesson,subject'
++    : 'guidedQuestionIds,independentQuestionIds,policy,subject')
+     || !isMiraFormalPlayfulPolicy(value.policy) || !['math', 'chinese', 'english'].includes(String(value.subject)))
+     fail('CONTEXT_INVALID');
+   const groups = [value.guidedQuestionIds, value.independentQuestionIds];
+-  if (groups.some(group => !Array.isArray(group) || group.length !== 2
++  if (groups.some(group => !Array.isArray(group) || (!progressive && group.length !== 2)
+     || group.some(id => typeof id !== 'string' || !id.trim() || id.length > 128))
+-    || new Set(groups.flat()).size !== 4) fail('LOCKED_QUESTION_GROUPS_INVALID');
++    || new Set(groups.flat()).size !== groups.flat().length) fail('LOCKED_QUESTION_GROUPS_INVALID');
++  if (progressive && ((value.progressiveLesson as Record<string, unknown>).schemaVersion !== 'mira.learning.progressive-binding.v1'
++    || !['objective', 'observed'].includes(String(value.assessmentMode))
++    || value.manualConfirmationRequired !== (value.assessmentMode === 'observed')
++    || (value.assessmentMode === 'observed' ? groups.flat().length !== 0
++      : (groups[0] as unknown[]).length < 1 || (groups[0] as unknown[]).length > 4
++        || (groups[1] as unknown[]).length < 5 || (groups[1] as unknown[]).length > 10))) fail('LOCKED_QUESTION_GROUPS_INVALID');
++}
++
++function progressiveInstructions(text: string, context: MiraFormalPlayfulContext): string {
++  if (!context.progressiveLesson) return text;
++  // Prompts contain frozen one-line JSON payloads. Rewrite instruction prose only.
++  const payloads: string[] = [];
++  text = text.replace(/^[ \t]*[\[{].*$/gm, line => {
++    try { JSON.parse(line); } catch { return line; }
++    return `MIRA_FROZEN_PROGRESSIVE_PAYLOAD_${payloads.push(line) - 1}`;
++  });
++  if (context.assessmentMode === 'observed') {
++    text = text
++      .replaceAll(HISTORICAL_QUIZ_RULE, '- This is an observed performance lesson: create no quiz scenes or scored questions.')
++      .replaceAll(PLAYFUL_QUIZ_RULE, '- This is an observed performance lesson: create no quiz scenes or scored questions.')
++      .replace(/Preserve all FOUR locked assessment questions[\s\S]*?sole scoring\/progress authority\./u,
++        'Create demonstrated practice followed by an independent performance using the exact observation criteria. A parent or teacher confirms actual ability separately. No quiz, automatic score, or mastery claim is permitted. The game supplies practice feedback only, with scoring:{correctPoints:0}, no game.questions, rewards or completion events.')
++      .replaceAll('one slide, one quiz and one interactive scene', 'one slide and one interactive scene')
++      .replace(/Keep the four locked question IDs[^\n]*/u,
++        'This observed lesson has no questions or quiz scenes. Present its exact independent performance criteria after practice. Do not emit automatic scores or mastery.')
++      .replace('the guided pair together after exploration and independent pair together later, with all four locked questions unchanged',
++        'guided performance after exploration and an independent attempt at the exact registered observation criteria later, with no quiz or automatic score')
++      .replaceAll('Preserve all four locked questions, grouped quizzes and all original quality/audio gates.',
++        'Preserve the exact observation criteria and all original quality/audio gates; this observed lesson has no quiz or automatic score.');
++  } else {
++    text = text.replaceAll('all FOUR locked assessment questions', 'all locked assessment questions')
++      .replaceAll('four locked', 'registered locked')
++      .replaceAll('the two locked guided questions', 'all locked guided questions')
++      .replaceAll('the two locked independent questions', 'all locked independent questions')
++      .replaceAll('guided pair', 'guided group').replaceAll('independent pair', 'independent group')
++      .replaceAll('assigned pair', 'assigned group').replaceAll('four-question backend contract', 'registered lesson backend contract');
++  }
++  return text.replace(/^MIRA_FROZEN_PROGRESSIVE_PAYLOAD_(\d+)$/gm,
++    (_, index: string) => payloads[Number(index)]);
+ }
+ 
+ /** Exact old bytes are returned unless the new request explicitly opted in. */
+@@ -150,14 +197,15 @@
+ }
+ 
+ function requiredThreeDInstructions(text: string, context: MiraFormalPlayfulContext): string {
+-  if (context.policy.threeDUsage !== 'required') return text;
+-  return text
++  if (context.policy.threeDUsage !== 'required') return progressiveInstructions(text, context);
++  const result = text
+     .replace('For language and concepts better served by 2D arrangements, use a clear 2D game; no compulsory\n3D for Chinese/English. State the teaching reason for the representation in the private brief.',
+       'This explicit v2 job requires educational 3D for its language or mathematics objective.')
+     .replace('Other math and language choose 2D/3D for teaching need; language does not require 3D.',
+       'This explicit v2 job requires educational 3D for every subject.')
+     .replace('Language does not require 3D.', 'This explicit v2 job requires educational 3D for language too.')
+     + `\nEXPLICIT 3D AND GAME REQUIREMENTS v2:\nThis job must contain BOTH a separate interactive visualization3d page and a separate interactive game page. Neither may be omitted or replaced by the other. Use real geometry, camera/projection and learner operations that change the teaching state; a tilted card, decorative spinning object or orbit-only view fails. For language, manipulate characters, actions, objects or events in a concrete scene and synchronise the visible situation, time cue and correct English/Chinese expression with the state. Explain why each change expresses the locked objective without adding grammar outside the frozen boundary. The AI chooses the setting and mechanics. In the 3D page pass widgetType=visualization3d and matching widgetConfig.type; in the game page pass widgetType=game with the existing no-scoring rules. Both pages need visible controls and reset; the game additionally needs a knowledge-dependent goal, computed success/failure, explanation, retry and replay. Verify at least three meaningful states using pointer and touch. Independent review must reject absent or merely decorative 3D, absent game or unplayable controls using actual rendered evidence. Preserve all four locked questions, grouped quizzes and all original quality/audio gates.\n`;
++  return progressiveInstructions(result, context);
+ }
+ 
+ /** Only the frozen new prompt activates new checks in the read-only review path. */
+@@ -205,8 +253,8 @@
+   assertContext(context);
+   const ordered = [...scenes].sort((a, b) => a.order - b.order);
+   const quizzes = ordered.filter(scene => scene.type === 'quiz');
+-  if (quizzes.length !== 2) fail('QUIZ_SCENE_COUNT');
+-  for (const [index, ids] of [context.guidedQuestionIds, context.independentQuestionIds].entries()) {
++  if (quizzes.length !== (context.assessmentMode === 'observed' ? 0 : 2)) fail('QUIZ_SCENE_COUNT');
++  for (const [index, ids] of (context.assessmentMode === 'observed' ? [] : [context.guidedQuestionIds, context.independentQuestionIds]).entries()) {
+     const content = quizzes[index].content;
+     if (content.type !== 'quiz' || canonical(content.questions.map(question => question.id)) !== canonical(ids))
+       fail('LOCKED_QUESTION_PLACEMENT');
+@@ -217,7 +265,8 @@
+     scene.type === 'interactive' && scene.content.type === 'interactive'
+     && scene.content.widgetType === 'visualization3d'
+     && scene.content.widgetConfig?.type === 'visualization3d')) fail('THREE_D_MISSING');
+-  if (!games.some(scene => scene.order < quizzes[0].order)) fail('EXPLORE_BEFORE_GUIDED');
++  if (context.assessmentMode !== 'observed' && !games.some(scene => scene.order < quizzes[0].order))
++    fail('EXPLORE_BEFORE_GUIDED');
+   for (const scene of games) {
+     if (scene.content.type !== 'interactive') continue;
+     const config = scene.content.widgetConfig;
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -406,27 +406,7 @@
+ 
+ export function professionalPrompt(input: GenerateClassroomInput, spec: FormalCoursewareSpec): string {
+   const contract = formalContractPayload(input);
+-  const lockedAssessment = [...spec.guided, ...spec.independent].map((question) => ({
+-    id: question.id,
+-    type:
+-      question.type === 'single_choice'
+-        ? 'single'
+-        : question.type === 'sequence'
+-          ? 'multiple'
+-          : 'short_answer',
+-    question: question.prompt,
+-    ...(question.choices
+-      ? {
+-          options: question.choices.map((choice) => ({
+-            value: choice.id,
+-            label: choice.label,
+-          })),
+-        }
+-      : {}),
+-    hasAnswer: false,
+-    answer: [],
+-    points: 1,
+-  }));
++  const lockedAssessment = [...spec.guided, ...spec.independent].map(lockedRuntimeQuestion);
+   const originalPrompt = [
+     'MIRA SERVER-AUTHORED FORMAL PROFESSIONAL COURSEWARE JOB',
+     '',
+@@ -498,11 +478,25 @@
+   const difficultyPrompt = difficulty ? `\nLocked difficultyPolicy: ${canonicalJson(difficulty)}\nTeach its reasoning steps and evidence complexity; variantOrdinal is not a difficulty label. Never simplify a standard/challenge goal to basic recall.\n` : '';
+   const interactionPrompt = isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
+     ? prompt + difficultyPrompt + interactionDesignPrompt({ policy: (input.professionalCreationPolicy as {interactionDesignPolicy: InteractionDesignContext['policy']}).interactionDesignPolicy,
+-        independentQuestionIds: spec.independent.map(question => question.id) })
++        independentQuestionIds: spec.independent.map(question => question.id),
++        ...(spec.assessmentMode === 'observed' ? { observedAssessment: {
++          schemaVersion: 'mira.learning.observed-assessment.v1', criteria: spec.observations || [],
++        } } : {}) })
+     : prompt;
+-  return withMiraFormalPlayfulInstructions(
++  const finalPrompt = withMiraFormalPlayfulInstructions(
+     interactionPrompt,
+     formalPlayfulContext(input.professionalCreationPolicy, spec),
++  );
++  if (!spec.progressiveLesson) return finalPrompt;
++  return finalPrompt.replace(
++    '- Use between one and four quiz scenes. Distribute the four locked assessment questions across them in original order so every locked question appears exactly once.',
++    spec.assessmentMode === 'observed'
++      ? '- This lesson has zero scored questions. Present the registered independent observation criteria; actual mastery requires separate parent or teacher confirmation.'
++      : `- Preserve all ${spec.guided.length + spec.independent.length} registered assessment questions in order, with guided practice before independent assessment.`,
++  ).replace(
++    '- Use only slide, quiz, interactive and pbl scenes. Include at least one slide, one quiz and one interactive scene; use pbl only when the learning task genuinely warrants it.',
++    spec.assessmentMode === 'observed' ? '- Use slide, interactive and optional pbl scenes, with at least one slide and one interactive scene. This observed lesson has no quiz scenes.'
++      : '- Use only slide, quiz, interactive and pbl scenes. Include at least one slide, one quiz and one interactive scene; use pbl only when the learning task genuinely warrants it.',
+   );
+ }
+ 
+@@ -748,10 +742,13 @@
+     type:
+       question.type === 'single_choice'
+         ? 'single'
+-        : question.type === 'sequence'
++        : question.type === 'sequence' || question.type === 'tap_objects'
+           ? 'multiple'
+           : 'short_answer',
+     question: question.prompt,
++    ...(question.type === 'tap_objects' ? { sourceType: 'tap_objects', objects: question.objects,
++      options: (question.objects || []).map(item => ({ value: item.id,
++        label: item.shape === 'square' ? '■' : item.shape === 'triangle' ? '▲' : '●' })) } : {}),
+     ...(question.choices
+       ? {
+           options: question.choices.map((choice) => ({
+@@ -805,7 +802,7 @@
+   const lockedQuestions = [...spec.guided, ...spec.independent].map(lockedRuntimeQuestion);
+   return {
+     stage: promotedStage,
+-    scenes: normalizeProfessionalScenes(ordered, lockedQuestions, preserveQuestionPlacement),
++    scenes: normalizeProfessionalScenes(ordered, lockedQuestions, preserveQuestionPlacement, spec.assessmentMode === 'observed'),
+   };
+ }
+ 
+@@ -813,9 +810,11 @@
+   ordered: Scene[],
+   lockedQuestions: QuizQuestion[],
+   preserveQuestionPlacement: boolean,
++  observedAssessment = false,
+ ): Scene[] {
+   const quizSceneCount = ordered.filter((scene) => scene.type === 'quiz').length;
+-  if (quizSceneCount < 1 || quizSceneCount > lockedQuestions.length) {
++  if (observedAssessment ? quizSceneCount !== 0 || lockedQuestions.length !== 0
++    : quizSceneCount < 1 || quizSceneCount > lockedQuestions.length) {
+     throw new Error('FORMAL_PROFESSIONAL_SOURCE_QUIZ_COUNT_INVALID');
+   }
+   const questionsByQuiz = Array.from({ length: quizSceneCount }, (_, quizIndex) => {
+@@ -841,6 +840,8 @@
+                     type: q.type,
+                     question: q.question,
+                     ...(q.options ? { options: q.options } : {}),
++                    ...((q as unknown as Record<string, unknown>).sourceType === 'tap_objects'
++                      ? { sourceType: 'tap_objects', objects: (q as unknown as Record<string, unknown>).objects } : {}),
+                   });
+                   if (
+                     !locked ||
+@@ -885,14 +886,18 @@
+   const section = session.prompt.split(questionMarker);
+   if (section.length !== 2) throw new Error('FORMAL_QUALITY_LOCKED_QUESTIONS_MISSING');
+   const questions: unknown = JSON.parse(section[1].split(briefMarker)[0]);
+-  if (!Array.isArray(questions) || questions.length !== 4)
++  const savedBrief = JSON.parse(section[1].split(briefMarker)[1]?.split('\n')[0] || 'null');
++  const progressive = savedBrief?.schemaVersion === 'mira.learning.formal-runtime-teaching-brief.progressive.v1';
++  const observed = progressive && savedBrief?.lesson?.assessmentMode === 'observed';
++  if (!Array.isArray(questions) || (progressive ? (observed ? questions.length !== 0
++    : questions.length < 6 || questions.length > 14) : questions.length !== 4))
+     throw new Error('FORMAL_QUALITY_LOCKED_QUESTIONS_INVALID');
+   const events = await readAllSessionEvents(input.sessionId);
+   const research = await loadResearchEvidence(events, input.sessionId);
+   const ordered = [...input.scenes].sort((a, b) => a.order - b.order);
+   if (ordered.some((scene, index) => scene.order !== index + 1))
+     throw new Error('FORMAL_PROFESSIONAL_SOURCE_SCENE_ORDER_INVALID');
+-  const normalized = normalizeProfessionalScenes(ordered, questions as QuizQuestion[], true);
++  const normalized = normalizeProfessionalScenes(ordered, questions as QuizQuestion[], true, observed);
+   const playfulLearning = formalPlayfulContextFromPrompt(session.prompt);
+   assertMiraFormalPlayfulScenes(normalized, playfulLearning);
+   return {
+@@ -987,7 +992,7 @@
+     throw new Error('FORMAL_PROFESSIONAL_SCENE_CONTRACT_INVALID');
+   }
+   const observedTypes = new Set(scenes.map((scene) => scene.type));
+-  if (planning.requiredSceneTypes.some((sceneType) => !observedTypes.has(sceneType))) {
++  if (planning.requiredSceneTypes.some((sceneType) => !(spec.assessmentMode === 'observed' && sceneType === 'quiz') && !observedTypes.has(sceneType))) {
+     throw new Error('FORMAL_PROFESSIONAL_REQUIRED_SCENE_TYPE_MISSING');
+   }
+   const roster = Array.isArray(stage.generatedAgentConfigs) ? stage.generatedAgentConfigs : [];
+@@ -1048,7 +1053,8 @@
+   }
+   const expectedQuestions = [...spec.guided, ...spec.independent].map(expectedRuntimeQuestion);
+   const quizScenes = scenes.filter((scene) => scene.type === 'quiz');
+-  if (quizScenes.length < 1 || quizScenes.length > expectedQuestions.length) {
++  if (spec.assessmentMode === 'observed' ? quizScenes.length !== 0
++    : quizScenes.length < 1 || quizScenes.length > expectedQuestions.length) {
+     throw new Error('FORMAL_PROFESSIONAL_ASSESSMENT_INVALID');
+   }
+   const actualQuestions = quizScenes.flatMap((scene) => {
+@@ -1056,7 +1062,7 @@
+     return Array.isArray(scene.content.questions) ? scene.content.questions : [];
+   });
+   if (
+-    actualQuestions.length !== 4 ||
++    actualQuestions.length !== expectedQuestions.length ||
+     actualQuestions.some((question, index) => {
+       const actual = plainObject(question);
+       if (!actual || actual.hasAnswer !== false || canonicalJson(actual.answer) !== '[]')
+@@ -1066,6 +1072,7 @@
+         type: actual.type,
+         question: actual.question,
+         ...(actual.options !== undefined ? { options: actual.options } : {}),
++        ...(actual.sourceType === 'tap_objects' ? { sourceType: actual.sourceType, objects: actual.objects } : {}),
+       };
+       return canonicalJson(comparable) !== canonicalJson(expectedQuestions[index]);
+     })
+@@ -1437,7 +1444,10 @@
+       ...(formalDifficultyPolicy(input) ? {difficultyPolicy: formalDifficultyPolicy(input)} : {}),
+       ...(isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
+         ? { interactionDesign: { policy: (input.professionalCreationPolicy as {interactionDesignPolicy: InteractionDesignContext['policy']}).interactionDesignPolicy,
+-            independentQuestionIds: spec.independent.map(question => question.id) } } : {}),
++            independentQuestionIds: spec.independent.map(question => question.id),
++            ...(spec.assessmentMode === 'observed' ? { observedAssessment: {
++              schemaVersion: 'mira.learning.observed-assessment.v1', criteria: spec.observations || [],
++            } } : {}) } } : {}),
+     };
+     let quality = await reviewFormalCourse(qualityInput, undefined, { recheckUnsentBrowserReview: options.recheckUnsentBrowserReview,
+       approvedReviewGrant: options.approvedReviewGrant,
+diff --git a/lib/server/mira-formal-skill-selection.ts b/lib/server/mira-formal-skill-selection.ts
+--- a/lib/server/mira-formal-skill-selection.ts
++++ b/lib/server/mira-formal-skill-selection.ts
+@@ -154,14 +154,16 @@
+   const lesson = record(brief.lesson);
+   const flow = record(lesson.teachingFlow);
+   const teach = record(flow.teach);
++  const progressive = brief.schemaVersion === 'mira.learning.formal-runtime-teaching-brief.progressive.v1';
+   if (
+-    brief.schemaVersion !== 'mira.learning.formal-runtime-teaching-brief.v1' ||
++    (!progressive && brief.schemaVersion !== 'mira.learning.formal-runtime-teaching-brief.v1') ||
+     !['gradeCode', 'subject', 'skillId'].every((key) => course[key] === boundary[key]) ||
+     !text(course.objective) ||
+     !text(teach.sayText) ||
+     !textList(teach.keyPoints, true) ||
+     !Array.isArray(lesson.questions) ||
+-    lesson.questions.length !== 5 ||
++    (progressive ? (lesson.assessmentMode === 'observed' ? lesson.questions.length !== 0
++      : lesson.questions.length < 6 || lesson.questions.length > 14) : lesson.questions.length !== 5) ||
+     !lesson.questions.every((question) => text(record(question).prompt))
+   )
+     throw new Error('FORMAL_SKILL_BRIEF_BOUNDARY_MISMATCH');
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -343,7 +343,9 @@
+           ...(input.difficultyPolicy ? {difficultyPolicy: input.difficultyPolicy, difficultyInstruction: 'Audit actual reasoning and evidence complexity against this locked policy, never infer difficulty from variantOrdinal.'} : {}),
+           selectionPlan: input.selectionPlan, snapshot, evidenceCatalog, browserChecks: renderChecks,
+           ...(interactionPlan ? { interactionDesignPlan: interactionPlan,
+-            independentQuestionIds: input.interactionDesign!.independentQuestionIds } : {}),
++            independentQuestionIds: input.interactionDesign!.independentQuestionIds,
++            ...(input.interactionDesign!.observedAssessment
++              ? { observedAssessment: input.interactionDesign!.observedAssessment } : {}) } : {}),
+           browserObservations: observations.map((value) => object(value) ? {
+             sceneId: value.sceneId, viewport: value.viewport, visibleText: value.visibleText,
+             probeResults: value.probeResults, metrics: value.metrics,
+@@ -358,7 +360,11 @@
+           requestId: `quality-${qualitySha({ ...identity, snapshotSha256,
+             ...(grant ? { reviewGrantSha256: qualitySha(grant) } : {}) })}`,
+           phase: attempts.length === 1 ? 'independent_verification' : 'verification_after_repair',
+-          systemPrompt: FORMAL_QUALITY_REVIEW_SYSTEM + (interactionPlan ? INTERACTION_REVIEW_SYSTEM_SUFFIX : '')
++          systemPrompt: FORMAL_QUALITY_REVIEW_SYSTEM + (interactionPlan ? (input.interactionDesign?.observedAssessment
++            ? INTERACTION_REVIEW_SYSTEM_SUFFIX.replace('the locked independent question',
++              'the exact registered independent observation criterion, shown in a slide or interactive scene with no quiz or automatic score')
++              + '\nThis observed lesson has zero scored questions. Verify the registered performance criterion and practice opportunity; only a parent or teacher can separately confirm actual mastery.\n'
++            : INTERACTION_REVIEW_SYSTEM_SUFFIX) : '')
+             + (input.playfulLearning ? formalPlayfulReviewInstructions(input.playfulLearning) : ''), userPrompt,
+           responseJsonSchema: formalReviewEvidenceSchema(evidenceCatalog),
+         }, signal);

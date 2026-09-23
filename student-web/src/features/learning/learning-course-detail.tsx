@@ -10,6 +10,7 @@ import { DocumentLink } from "@/components/navigation/document-link";
 import { Button } from "@/components/ui/button";
 import { getLearningCourse, setLearningFavorite } from "@/features/learning/learning-client";
 import { LearningCourseStartButton } from "@/features/learning/learning-course-start-button";
+import { LearningProgressionNote, learningProgressionCanResume, learningProgressionLocked } from "@/features/learning/learning-progression";
 import type { LearningCourseDetailResponse } from "@/lib/contracts/learning";
 import { openMaicLessonPath } from "@/lib/routing/classroom";
 import type { Student } from "@/lib/contracts/student-session";
@@ -119,14 +120,17 @@ export function LearningCourseDetail({
           <p className="space-eyebrow">{item.course.subjectLabel} · {completed ? "已经学完" : "探索下一站"}</p>
           <h2>{item.course.title}</h2>
           <p className="space-detail-intro">{item.course.objective}</p>
+          <LearningProgressionNote progression={item.progression} />
           <p className="space-course-meta"><Clock3 className="size-5" aria-hidden="true" />约 {item.course.estimatedMinutes} 分钟</p>
           <div className="space-detail-actions">
             {completed ? (
               <div className="space-detail-status is-complete"><p><Check className="size-5" aria-hidden="true" />这节课学完啦</p><span>{item.report ? "学习结果已保存，可以在下方查看。" : "学习记录已保存，报告准备好后会出现在这里。"}</span></div>
+            ) : learningProgressionLocked(item.progression) && !learningProgressionCanResume(item) ? (
+              <LearningCourseStartButton courseId={item.course.id} version={item.course.version} progression={item.progression} />
             ) : item.fullClassroomAvailable && item.taskId ? (
               <Button asChild><DocumentLink href={openMaicLessonPath(item.taskId)}>{item.session?.status === "in_progress" ? "继续上课" : "开始上课"}<ArrowRight className="size-5" aria-hidden="true" /></DocumentLink></Button>
             ) : item.fullClassroomAvailable ? (
-              <LearningCourseStartButton key={`${item.course.id}:${item.course.version}`} courseId={item.course.id} version={item.course.version} />
+              <LearningCourseStartButton key={`${item.course.id}:${item.course.version}`} courseId={item.course.id} version={item.course.version} progression={item.progression} />
             ) : (
               <div className="space-detail-status"><p><Sparkles className="size-5" aria-hidden="true" />完整课堂准备中</p><span>准备好后就能和老师一起开始。</span></div>
             )}

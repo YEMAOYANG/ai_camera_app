@@ -1,0 +1,137 @@
+diff --git a/lib/mira/student-interaction-bridge.ts b/lib/mira/student-interaction-bridge.ts
+--- a/lib/mira/student-interaction-bridge.ts
++++ b/lib/mira/student-interaction-bridge.ts
+@@ -26,23 +26,7 @@
+     ids.set(node.id, node);
+   }
+   for (const id of duplicates) ids.delete(id);
+-  const selected = ids.get(original.controlSelector.slice(1));
+   const reset = objective.exploration?.reset.selector;
+-  const parent = selected?.parentElement;
+-  if (selected?.tagName === 'BUTTON' && parent && !['HTML', 'BODY'].includes(parent.tagName)) {
+-    for (const [id, node] of ids) {
+-      if (
+-        /^[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(id) &&
+-        node.tagName === 'BUTTON' &&
+-        node.parentElement === parent &&
+-        !node.hasAttribute('disabled') &&
+-        !['reset', 'submit'].includes((node.getAttribute('type') ?? 'button').toLowerCase()) &&
+-        '#' + id !== reset
+-      ) {
+-        controls.push({ controlSelector: '#' + id, action: 'click' });
+-      }
+-    }
+-  }
+   for (const state of objective.exploration?.states ?? []) {
+     for (const operation of state.operations) {
+       if (
+@@ -51,6 +35,26 @@
+         operation.selector !== reset
+       ) {
+         controls.push({ controlSelector: operation.selector, action: operation.action });
++      }
++    }
++  }
++  // Mirror the server: each reviewed state anchors its own direct button
++  // group. Never widen to ancestors or unrelated buttons in the scene.
++  for (const anchor of [...controls]) {
++    const selected = ids.get(anchor.controlSelector.slice(1));
++    const parent = selected?.parentElement;
++    if (selected?.tagName === 'BUTTON' && parent && !['HTML', 'BODY'].includes(parent.tagName)) {
++      for (const [id, node] of ids) {
++        if (
++          /^[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(id) &&
++          node.tagName === 'BUTTON' &&
++          node.parentElement === parent &&
++          !node.hasAttribute('disabled') &&
++          !['reset', 'submit'].includes((node.getAttribute('type') ?? 'button').toLowerCase()) &&
++          '#' + id !== reset
++        ) {
++          controls.push({ controlSelector: '#' + id, action: 'click' });
++        }
+       }
+     }
+   }
+diff --git a/tests/runtime/mira-student-interaction-bridge.browser.test.ts b/tests/runtime/mira-student-interaction-bridge.browser.test.ts
+--- a/tests/runtime/mira-student-interaction-bridge.browser.test.ts
++++ b/tests/runtime/mira-student-interaction-bridge.browser.test.ts
+@@ -24,6 +24,79 @@
+ describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')(
+   'actual student operation browser bridge',
+   () => {
++    it('includes both choices in each reviewed English row without widening to unrelated groups', async () => {
++      const require = createRequire(import.meta.url);
++      const { build } = createRequire(require.resolve('tsx'))('esbuild');
++      const pairs = [
++        ['he', 'him'],
++        ['her', 'she'],
++        ['we', 'us'],
++        ['me', 'i'],
++        ['them', 'they'],
++      ];
++      const plan = {
++        ...objective,
++        operation: { sceneId: 'operate', controlSelector: '#pick-him', action: 'click' },
++        exploration: {
++          reset: { selector: '#reset' },
++          states: pairs.map((pair) => ({
++            operations: [{ selector: '#pick-' + pair[1], action: 'click' }],
++          })),
++        },
++      };
++      const groups = pairs
++        .map(
++          (pair, index) =>
++            `<div class="row"><div class="tiles">${pair.map((word) => `<button id="pick-${word}" type="button">${word}</button>`).join('')}<button id="disabled-${index}" disabled></button></div></div>`,
++        )
++        .join('');
++      const html = `<main>${groups}<button id="reset">Reset</button><div><button id="outside">Next</button></div></main><script id="mira-interaction-plan" type="application/json">${JSON.stringify({ schemaVersion: 'mira.openmaic.interaction-design-plan.v2', objectives: [plan] })}</script>`;
++      const bundle = await build({
++        stdin: {
++          resolveDir: process.cwd(),
++          loader: 'ts',
++          contents: `
++          import {studentInteractionObjectives} from './lib/mira/student-interaction-bridge';
++          window.controls=studentInteractionObjectives([{id:'operate',order:0,type:'interactive',content:{type:'interactive',html:${JSON.stringify(html)}}}])[0].participationControls;
++        `,
++        },
++        bundle: true,
++        write: false,
++        format: 'iife',
++        platform: 'browser',
++        logLevel: 'silent',
++      });
++      const browser = await chromium.launch({
++        executablePath:
++          process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++        headless: true,
++      });
++      try {
++        const page = await browser.newPage();
++        await page.route('**/*', (route) => route.abort());
++        await page.setContent('<main>Isolated control-scope check</main>');
++        await page.addScriptTag({ content: bundle.outputFiles[0].text });
++        const controls = await page.evaluate(
++          () =>
++            (
++              window as unknown as {
++                controls: Array<{ controlSelector: string; action: string }>;
++              }
++            ).controls,
++        );
++        expect(controls.map((control) => control.controlSelector).sort()).toEqual(
++          pairs
++            .flat()
++            .map((word) => '#pick-' + word)
++            .sort(),
++        );
++        expect(controls).toHaveLength(10);
++      } finally {
++        await browser.close();
++      }
++    });
++
+     it('retries a delayed private handshake and a rejected save without accepting synthetic clicks', async () => {
+       const require = createRequire(import.meta.url);
+       const { build } = createRequire(require.resolve('tsx'))('esbuild');

@@ -1,0 +1,327 @@
+diff --git a/lib/server/mira-formal-review-evidence.ts b/lib/server/mira-formal-review-evidence.ts
+--- a/lib/server/mira-formal-review-evidence.ts
++++ b/lib/server/mira-formal-review-evidence.ts
+@@ -1,4 +1,4 @@
+-import { qualitySceneText, qualitySnapshot, QUALITY_DIMENSIONS } from './mira-formal-quality-contract';
++import { qualitySceneText, qualitySnapshot, QUALITY_DIMENSIONS, MAX_QUALITY_EVIDENCE_PER_ROW } from './mira-formal-quality-contract';
+ import type { FormalQualityInput } from './mira-formal-teaching-quality';
+ 
+ export interface ReviewEvidence { id: string; sceneId: string; quote: string }
+@@ -35,7 +35,7 @@
+ }
+ 
+ export function formalReviewEvidenceSchema(evidence: ReviewEvidence[]) {
+-  const ids = { type: 'array', minItems: 1, maxItems: 10,
++  const ids = { type: 'array', minItems: 1, maxItems: Math.min(MAX_QUALITY_EVIDENCE_PER_ROW, new Set(evidence.map(item => item.id)).size), uniqueItems: true,
+     items: { type: 'string', enum: evidence.map(item => item.id) } };
+   return { type: 'object', additionalProperties: false, required: ['dimensions', 'objectives', 'issues'],
+     properties: {
+@@ -62,7 +62,8 @@
+     if (!row || typeof row !== 'object' || Object.keys(row).sort().join(',') !== keys)
+       throw new Error('FORMAL_QUALITY_EVIDENCE_ROW_INVALID');
+     const { evidenceIds, ...fields } = row as Record<string, unknown>;
+-    if (!Array.isArray(evidenceIds) || !evidenceIds.length || evidenceIds.length > 10
++    if (!Array.isArray(evidenceIds) || !evidenceIds.length || evidenceIds.length > Math.min(MAX_QUALITY_EVIDENCE_PER_ROW, byId.size)
++        || new Set(evidenceIds).size !== evidenceIds.length
+         || evidenceIds.some(id => typeof id !== 'string' || !byId.has(id)))
+       throw new Error('FORMAL_QUALITY_EVIDENCE_ID_INVALID');
+     return { ...fields, evidence: evidenceIds.map(id => {
+diff --git a/lib/server/mira-formal-quality-contract.ts b/lib/server/mira-formal-quality-contract.ts
+--- a/lib/server/mira-formal-quality-contract.ts
++++ b/lib/server/mira-formal-quality-contract.ts
+@@ -9,6 +9,9 @@
+   renderedScenesRequired: true,
+   maxReviewAttempts: 3,
+ } as const;
++
++// Shared wire-format bound; teaching judgments and source quote checks remain independent.
++export const MAX_QUALITY_EVIDENCE_PER_ROW = 30;
+ 
+ export const QUALITY_DIMENSIONS = [
+   'grade_fit', 'goal_coverage', 'teaching_sequence', 'misconception_repair',
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -8,7 +8,7 @@
+ import type { CourseStore } from './agent-runtime/course-tools';
+ import type { Scene, Stage } from '@/lib/types/stage';
+ import {
+-  MIRA_TEACHING_QUALITY_POLICY, QUALITY_DIMENSIONS, QUALITY_VIEWPORTS,
++  MIRA_TEACHING_QUALITY_POLICY, QUALITY_DIMENSIONS, QUALITY_VIEWPORTS, MAX_QUALITY_EVIDENCE_PER_ROW,
+   qualityCanonical, qualitySha, qualitySceneText, qualitySnapshot, qualityReviewIdentity,
+   type MiraTeachingQualityReceipt, type QualityDimension, type QualityObjective,
+   type QualityRenderCheck,
+@@ -112,7 +112,7 @@
+   const snapshot = qualitySnapshot(input.stage, input.scenes);
+   const texts = new Map(snapshot.scenes.map((scene) => [scene.id, qualitySceneText(scene)]));
+   const validEvidence = (value: unknown, required: boolean) => Array.isArray(value)
+-    && (!required || value.length > 0) && value.length <= 30 && value.every((item) => object(item)
++    && (!required || value.length > 0) && value.length <= MAX_QUALITY_EVIDENCE_PER_ROW && value.every((item) => object(item)
+       && Object.keys(item).sort().join(',') === 'quote,sceneId' && typeof item.sceneId === 'string'
+       && typeof item.quote === 'string' && item.quote.length >= 3 && item.quote.length <= 1000
+       && texts.get(item.sceneId)?.includes(item.quote));
+@@ -140,6 +140,53 @@
+         || typeof item.repair !== 'string' || !item.repair.trim() || item.repair.length > 2000))
+     throw new Error('FORMAL_QUALITY_ISSUES_INVALID');
+   return raw as unknown as ReviewReport;
++}
++
++/** Same pure finalizer for a fresh Provider reply or its explicitly audited saved bytes. */
++export function finalizeFormalQualityResponse(
++  input: FormalQualityInput,
++  response: Pick<Awaited<ReturnType<typeof executeMiraCoursewareProvider>>, 'content' | 'providerRequestIdHash'>,
++  observations: FormalSceneInspectionResult[], visualReview?: VisualReviewReceipt,
++): FormalQualityResult {
++  const snapshot=qualitySnapshot(input.stage,input.scenes), snapshotSha256=qualitySha(snapshot);
++  const gradeBoundarySha256=qualitySha(input.gradeBoundary),teachingBriefSha256=qualitySha(input.teachingBrief);
++  const selectionPlanSha256=input.selectionPlan.planSha256;
++  const playfulContextSha256=input.playfulLearning?qualitySha(input.playfulLearning):undefined;
++  assertMiraFormalPlayfulScenes(input.scenes,input.playfulLearning);
++  const plan=input.interactionDesign?readInteractionDesignPlan({...input,interactionDesign:input.interactionDesign}):undefined;
++  const expected=new Set(snapshot.scenes.flatMap(scene=>QUALITY_VIEWPORTS.map(viewport=>`${scene.id}:${viewport.width}:${viewport.height}`)));
++  const seen=new Set<string>();
++  const renderChecks:QualityRenderCheck[]=observations.map(o=>{
++    const key=`${o.sceneId}:${o.viewport.width}:${o.viewport.height}`;
++    const scene=snapshot.scenes.find(scene=>scene.id===o.sceneId);
++    if(!expected.has(key)||seen.has(key)||!scene||!o.passed||o.sceneSha256!==qualitySha(scene)
++      ||!SHA.test(o.screenshotSha256)||!SHA.test(o.domSha256)||(scene.type==='interactive'&&o.probeCount<1)
++      ||(plan&&interactionDesignProbes(plan,scene.id).some(probe=>!o.probeResults.some(r=>r.id===probe.id&&r.passed))))
++      throw new Error('FORMAL_QUALITY_RENDER_IDENTITY_MISMATCH');
++    seen.add(key);return {sceneId:o.sceneId,sceneSha256:o.sceneSha256,viewport:o.viewport,
++      screenshotSha256:o.screenshotSha256,domSha256:o.domSha256,passed:true,probeCount:o.probeCount};
++  });
++  if(seen.size!==expected.size)throw new Error('FORMAL_QUALITY_RENDER_IDENTITY_MISMATCH');
++  if(plan?.schemaVersion==='mira.openmaic.interaction-design-plan.v2') {
++    assertVisualReview(visualReview,{snapshotSha256,
++      teachingQualityContextSha256:qualitySha({snapshotSha256,gradeBoundarySha256,selectionPlanSha256,teachingBriefSha256}),
++      observations:observations.map(o=>({...o,screenshotPath:o.screenshotPath??''}))});
++    if(visualReview.status!=='passed')throw new Error('FORMAL_VISUAL_RECEIPT_INVALID');
++  }
++  const report=parseFormalQualityReview(decodeFormalReviewEvidence(JSON.parse(response.content),buildFormalReviewEvidence(input)),input);
++  if(report.status!=='passed')return {status:'needs_revision',snapshotSha256,issues:report.issues};
++  if(!SHA.test(response.providerRequestIdHash))throw new Error('FORMAL_QUALITY_PROVIDER_RECEIPT_INVALID');
++  const reviewIdentity={snapshotSha256,gradeBoundarySha256,selectionPlanSha256,teachingBriefSha256,renderChecks,
++    ...(playfulContextSha256?{playfulContextSha256}:{})};
++  const unsigned={schemaVersion:'mira.openmaic.teaching-quality-receipt.v1' as const,
++    policyId:MIRA_TEACHING_QUALITY_POLICY.policyId,status:'passed' as const,sessionId:input.sessionId,stageId:input.stage.id,
++    gradeBoundarySha256,selectionPlanSha256,teachingBriefSha256,snapshotSha256,
++    sceneHashes:snapshot.scenes.map(scene=>({sceneId:scene.id,sceneSha256:qualitySha(scene)})),renderChecks,
++    review:{providerId:'deepseek' as const,modelId:'deepseek-v4-flash' as const,requestIdHash:response.providerRequestIdHash,
++      inputSha256:qualityReviewIdentity(reviewIdentity),dimensions:report.dimensions,objectives:report.objectives}};
++  const result:FormalQualityResult={status:'passed',snapshotSha256,issues:[],receipt:{...unsigned,receiptSha256:qualitySha(unsigned)}};
++  if(plan)result.interactionDesign=buildInteractionDesignReceipt({...input,plan,quality:result.receipt!,observations,...(visualReview?{visualReview}:{})});
++  return result;
+ }
+ 
+ async function save(path: string, value: unknown) {
+@@ -427,28 +474,7 @@
+         // is a failed attempt, never a fabricated pass or an invisible retry.
+         await save(join(folder, `${artifactPrefix}-provider.json`), response);
+         if (signal?.aborted) throw new Error('FORMAL_QUALITY_ABORTED');
+-        const report = parseFormalQualityReview(
+-          decodeFormalReviewEvidence(JSON.parse(response.content), evidenceCatalog), input);
+-        if (report.status !== 'passed') result = { status: 'needs_revision', snapshotSha256, issues: report.issues };
+-        else {
+-          const unsigned = {
+-            schemaVersion: 'mira.openmaic.teaching-quality-receipt.v1' as const,
+-            policyId: MIRA_TEACHING_QUALITY_POLICY.policyId, status: 'passed' as const,
+-            sessionId: input.sessionId, stageId: input.stage.id, gradeBoundarySha256,
+-            selectionPlanSha256, teachingBriefSha256, snapshotSha256,
+-            sceneHashes: snapshot.scenes.map((scene) => ({ sceneId: scene.id, sceneSha256: qualitySha(scene) })),
+-            renderChecks,
+-            review: { providerId: 'deepseek' as const, modelId: 'deepseek-v4-flash' as const,
+-              requestIdHash: response.providerRequestIdHash, inputSha256: qualityReviewIdentity(reviewIdentity),
+-              dimensions: report.dimensions, objectives: report.objectives },
+-          };
+-          if (!SHA.test(response.providerRequestIdHash)) throw new Error('FORMAL_QUALITY_PROVIDER_RECEIPT_INVALID');
+-          result = { status: 'passed', snapshotSha256, issues: [],
+-            receipt: { ...unsigned, receiptSha256: qualitySha(unsigned) } };
+-          if (interactionPlan) result.interactionDesign = buildInteractionDesignReceipt({
+-            ...input, plan: interactionPlan, quality: result.receipt!, observations, ...(visualReview ? {visualReview} : {}),
+-          });
+-        }
++        result = finalizeFormalQualityResponse(input, response, observations, visualReview);
+       }
+       attempt.status = result.status;
+       const stored = { ...result, reviewPromptVersion, ...(playfulContextSha256 ? { playfulContextSha256 } : {}) };
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -36,6 +36,7 @@
+ import type { FormalQualityReviewGrant } from '../lib/server/mira-formal-teaching-quality';
+ import { claimUnsentBrowserRecheck } from '../lib/server/mira-formal-browser-recheck';
+ import { proveVisualPredispatchRecovery, claimVisualPredispatchRecovery, withVisualPredispatchRecovery } from '../lib/server/mira-formal-visual-predispatch';
++import { prepareEnglish1ReviewRevalidation, commitEnglish1ReviewRevalidation } from '../lib/server/mira-formal-english1-review-revalidation';
+ import { parsePaidBudget, withPaidBudget } from '../lib/server/mira-paid-budget';
+ import { revalidateSavedAsrComparison, readValidatedAsrComparison,
+   normalizeAsrComparisonReferences, asrComparisonClaimSha256,
+@@ -235,7 +236,7 @@
+ 
+ async function main() {
+   const [mode, manifestPath, ...extraArgs] = process.argv.slice(2);
+-  if (!['prepare-visual-predispatch-recovery', 'complete-visual-predispatch-recovery', 'prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
++  if (!['prepare-quality-response-revalidation','complete-quality-response-revalidation','prepare-visual-predispatch-recovery', 'complete-visual-predispatch-recovery', 'prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
+     'prepare-english-language-repair','repair-english-language-audio',
+     'prepare-english-repair-diagnostic', 'diagnose-english-repair-audio',
+     'revalidate-audio-comparison', 'complete-audio-comparison-tail'].includes(mode) || !manifestPath)
+@@ -272,6 +273,19 @@
+   const snapshotSha256 = qualitySha(qualitySnapshot(prepared.stage, prepared.scenes));
+   const identity = { sourceJobSha256: sha(source), sourceSnapshotSha256: manifest.sourceSnapshotSha256,
+     repairSnapshotSha256: snapshotSha256, sessionId: prepared.sessionId, stageId: prepared.stage.id };
++  const responseRevalidationMode=['prepare-quality-response-revalidation','complete-quality-response-revalidation'].includes(mode);
++  if(responseRevalidationMode!==(manifest.qualityResponseRevalidationEvidencePath!==undefined))
++    throw new Error('SAVED_STAGE_REVIEW_REVALIDATION_MODE_INVALID');
++  if(responseRevalidationMode&&(completionTailPath||manifest.visualPredispatchEvidencePath||manifest.reviewGrantPath
++      ||manifest.asrSourceRequestId||manifest.ttsSourceRequestId||manifest.browserRecheck||manifest.audioRepair||manifest.asrComparisonRevalidation))
++    throw new Error('SAVED_STAGE_REVIEW_REVALIDATION_CANNOT_MIX');
++  const responseRevalidation=responseRevalidationMode?await prepareEnglish1ReviewRevalidation({root:process.cwd(),recoveryFolder:folder,
++    input:job.formalInput,prepared,evidencePath:path.resolve(path.dirname(manifestPath),manifest.qualityResponseRevalidationEvidencePath)}):undefined;
++  if(mode==='prepare-quality-response-revalidation') {
++    console.log(JSON.stringify({status:'saved_review_revalidated',...identity,audit:responseRevalidation!.audit,
++      auditSha256:responseRevalidation!.auditSha256,qualityReceipt:responseRevalidation!.stored.receipt,
++      providerCalls:0,claimCreated:false}));return;
++  }
+   const visualPredispatchMode = ['prepare-visual-predispatch-recovery','complete-visual-predispatch-recovery'].includes(mode);
+   if (visualPredispatchMode !== (manifest.visualPredispatchEvidencePath !== undefined))
+     throw new Error('SAVED_STAGE_VISUAL_PREDISPATCH_MODE_INVALID');
+@@ -537,7 +551,9 @@
+   lease = await acquireFormalQualityLock(path.join(folder, 'active.lock'));
+   let browserRecheckSha256: string | undefined;
+   let learnerDiscussionRepairClaimSha256: string | undefined;
+-  if (visualPredispatch) {
++  if (responseRevalidation) {
++    await commitEnglish1ReviewRevalidation(responseRevalidation);
++  } else if (visualPredispatch) {
+     await claimVisualPredispatchRecovery(visualPredispatch,folder);
+   } else if (learnerDiscussionAudioTail) {
+     await claimLearnerAudioTail(learnerDiscussionAudioTail);
+@@ -573,7 +589,7 @@
+   }
+   await writeJsonFileAtomic(path.join(folder, `repair-proposal-${snapshotSha256}.json`), proposal);
+   const completion = await withVisualPredispatchRecovery(visualPredispatch, () => recoverMiraFormalSavedStage(job.formalInput!, repair, {
+-    baseUrl: 'http://127.0.0.1:3100', cachedQualityOnly: !!audioTailReceipt,
++    baseUrl: 'http://127.0.0.1:3100', cachedQualityOnly: !!audioTailReceipt || !!responseRevalidation,
+     asrComparisonRevalidation,
+     approvedReviewGrant,
+     completionTailBudget,
+@@ -599,7 +615,8 @@
+   const receipt = { ...identity, kind: 'operator_saved_stage_repair', originalSessionStatus: prepared.originalSessionStatus,
+     recoveryId: `omsaved_${qualitySha(identity).slice(0, 24)}`, completedAt: new Date().toISOString(),
+     newAgentSessions: 0, newSearches: 0,
+-    ...(visualPredispatch ? {visualPredispatchRecoverySha256:visualPredispatch.evidenceSha256} : {}), ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}),
++    ...(visualPredispatch ? {visualPredispatchRecoverySha256:visualPredispatch.evidenceSha256} : {}),
++    ...(responseRevalidation ? {qualityResponseRevalidationSha256:responseRevalidation.auditSha256} : {}), ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}),
+     ...(completionTailBudget ? { completionTailGrantSha256: completionTailBudget.receiptSha256 } : {}),
+     ...(completion.learnerDiscussionRepair ? { learnerDiscussionRepair: completion.learnerDiscussionRepair } : {}),
+     ...(completion.learnerDiscussionAudioTail ? { learnerDiscussionAudioTail: completion.learnerDiscussionAudioTail } : {}),
+diff --git a/lib/server/mira-formal-english1-review-revalidation.ts b/lib/server/mira-formal-english1-review-revalidation.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-english1-review-revalidation.ts
+@@ -0,0 +1,106 @@
++/** Re-parse one preserved English1 reply after the wire evidence bound is aligned. */
++import { createHash } from 'node:crypto';
++import { readFile, open, readdir } from 'node:fs/promises';
++import { join } from 'node:path';
++import { qualitySha, qualitySnapshot } from './mira-formal-quality-contract';
++import { finalizeFormalQualityResponse, type FormalQualityInput } from './mira-formal-teaching-quality';
++import { formalAdaptiveSkillSelectionInput, type prepareMiraFormalSavedStageRecovery } from './mira-formal-professional-classroom';
++import { parseFormalCoursewareSpec } from './mira-formal-compiled-classroom';
++import { formalPlayfulContext, MIRA_FORMAL_PLAYFUL_REVIEW_VERSION } from './mira-formal-playful-policy';
++import { readBrowserRecheckBudget } from './mira-formal-browser-recheck';
++import { acquireFormalQualityLock } from './mira-formal-quality-lock';
++import { writeJsonFileAtomic } from './classroom-storage';
++import type { InteractionDesignContext } from './mira-formal-interaction-design';
++
++const TARGET='278de60ab4580431b84b6b8fe656a82cc25b4b8409871857a8217f172ece6983';
++const REVIEW='550b7f32a490d9374d2291c2de3077712d1e491819c1e771e03b0ec2aa9b382b';
++const PREFIX=TARGET+'-predispatch-1356e0162f945f506ee93d1727a4009c4a72666fc4e11f49a9601cc25c7afd92';
++const AUTH='d8eca649c6be4ccb5d19b8422b1333253d76bef3ef0b555b7027efb6471f74fc';
++const bytesSha=(b:Buffer)=>createHash('sha256').update(b).digest('hex');
++const json=async(p:string)=>JSON.parse(await readFile(p,'utf8'));
++function check(v:unknown):asserts v {if(!v)throw new Error('SAVED_ENGLISH1_REVIEW_REVALIDATION_NOT_PROVEN');}
++type Args={root:string;recoveryFolder:string;evidencePath:string;
++  input:Parameters<typeof prepareMiraFormalSavedStageRecovery>[0];
++  prepared:Awaited<ReturnType<typeof prepareMiraFormalSavedStageRecovery>>};
++const originals=new WeakMap<object,Args>();
++
++export async function prepareEnglish1ReviewRevalidation(args:Args) {
++  const {root,input,prepared,recoveryFolder}=args;
++  const evidence=await json(args.evidencePath);
++  check(evidence.schemaVersion==='mira.english1.saved-quality-response-revalidation.v1'
++    &&evidence.jobId==='omformal_35329ccda267db6155963636'&&evidence.authorizationId===AUTH
++    &&qualitySha(input)==='ec788e0b8393230e870a2f221cfe1329d1b40263ab814485c9d8b1671f6c414e'
++    &&qualitySha(qualitySnapshot(prepared.stage,prepared.scenes))===TARGET);
++  const folder=join(root,'data/formal-quality-reviews',REVIEW);
++  const all=await readdir(folder);
++  check(!all.includes(TARGET+'.json')&&!all.some(f=>f.startsWith(TARGET+'-local-revalidation'))
++    &&!(await readdir(recoveryFolder)).includes('completion.json'));
++  const raw=await readFile(join(folder,PREFIX+'-provider.json'));
++  check(bytesSha(raw)==='b820d569bc564c65ca6faaef62c06e22981cf2015e8f8d1903087b9613cbb690'
++    &&evidence.providerResponseSha256===bytesSha(raw));
++  const response=JSON.parse(raw.toString()),storedInput=await json(join(folder,PREFIX+'-input.json'));
++  const observations=await json(join(folder,PREFIX+'-browser.json')),visual=await json(join(folder,PREFIX+'-visual.json'));
++  const attempts=await json(join(folder,'attempts.json'));
++  check(qualitySha(attempts)===evidence.priorAttemptsSha256&&qualitySha(observations)===evidence.browserSha256
++    &&qualitySha(visual)===evidence.visualSha256&&qualitySha(storedInput)===evidence.inputSha256
++    &&attempts.filter((a:any)=>a.artifactPrefix===PREFIX&&a.status==='failed').length===1);
++  const claim=await readFile(join(recoveryFolder,`complete-${TARGET}-visual-predispatch.claim`));
++  check(bytesSha(claim)===evidence.priorClaimSha256
++    &&evidence.failureLog.trim().endsWith('FORMAL_QUALITY_EVIDENCE_ID_INVALID')
++    &&bytesSha(Buffer.from(evidence.failureLog))===evidence.failureLogSha256);
++  const spec=parseFormalCoursewareSpec(input),frozen=formalAdaptiveSkillSelectionInput(input);
++  check(qualitySha(storedInput.teachingBrief)===qualitySha(frozen.teachingBrief)
++    &&qualitySha(storedInput.gradeBoundary)===qualitySha(frozen.gradeBoundary)
++    &&qualitySha(storedInput.snapshot)===TARGET&&storedInput.ownerId===prepared.ownerId
++    &&storedInput.sessionId===prepared.sessionId&&storedInput.stageId===prepared.stage.id);
++  const qualityInput:FormalQualityInput={stage:prepared.stage,scenes:prepared.scenes,ownerId:prepared.ownerId,
++    sessionId:prepared.sessionId,gradeBoundary:storedInput.gradeBoundary,teachingBrief:storedInput.teachingBrief,
++    selectionPlan:storedInput.selectionPlan,difficultyPolicy:storedInput.teachingBrief.difficultyPolicy,
++    playfulLearning:formalPlayfulContext(input.professionalCreationPolicy,spec),
++    interactionDesign:{policy:(input.professionalCreationPolicy as {interactionDesignPolicy:InteractionDesignContext['policy']}).interactionDesignPolicy,
++      independentQuestionIds:spec.independent.map(q=>q.id)}};
++  const identity={ownerId:prepared.ownerId,sessionId:prepared.sessionId,stageId:prepared.stage.id,
++    gradeBoundarySha256:qualitySha(qualityInput.gradeBoundary),teachingBriefSha256:qualitySha(qualityInput.teachingBrief),
++    selectionPlanSha256:qualityInput.selectionPlan.planSha256,interactionDesignContextSha256:qualitySha(qualityInput.interactionDesign),
++    playfulContextSha256:qualitySha(qualityInput.playfulLearning),difficultyPolicySha256:qualitySha(qualityInput.difficultyPolicy)};
++  check(qualitySha(identity)===REVIEW&&response.requestId===`quality-${qualitySha({...identity,snapshotSha256:TARGET})}`
++    &&response.phase==='verification_after_repair'&&response.billingEvidence==='reported'
++    &&response.providerRequestIdHash==='3359f77f16846de1554320caaf7f288187d9bbba14f4b13da0941d9a64ca782a');
++  const row=evidence.providerReservation;
++  check(row.id==='8a7153a3449ecc8b2bdb03977ecf88bf2163be26a1dad54989aca2025496f2b5'
++    &&row.authorization_id===AUTH&&row.state==='settled'
++    &&JSON.parse(row.actual_units_json).input_tokens===response.inputTokens
++    &&JSON.parse(row.actual_units_json).output_tokens===response.outputTokens);
++  const budget=await readBrowserRecheckBudget(AUTH);
++  check(budget.authorizationId===AUTH&&budget.purpose==='production'&&budget.unsettledReservationCount===0
++    &&budget.latestProviderDispatchAt===row.dispatched_at);
++  const result=finalizeFormalQualityResponse(qualityInput,response,observations,visual);
++  check(result.status==='passed'&&result.receipt&&result.interactionDesign);
++  const stored={...result,reviewPromptVersion:MIRA_FORMAL_PLAYFUL_REVIEW_VERSION,playfulContextSha256:identity.playfulContextSha256};
++  const audit={schemaVersion:evidence.schemaVersion,sourceArtifactPrefix:PREFIX,snapshotSha256:TARGET,
++    evidenceSha256:qualitySha(evidence),sourceResponseSha256:bytesSha(raw),priorAttemptsSha256:qualitySha(attempts),
++    kind:'local_response_revalidation',newProviderCalls:0,originalProviderRequestId:response.requestId,
++    resultSha256:qualitySha(stored),qualityReceiptSha256:result.receipt.receiptSha256,
++    reason:'Align the ID wire-format bound with the existing 30-source-quote bound; preserve all original evidence and judgments.'};
++  const proof={audit,auditSha256:qualitySha(audit),stored,folder,attempts};originals.set(proof,args);return proof;
++}
++
++/** Caller owns the saved-stage lock; the quality lock guards append + canonical receipt. */
++export async function commitEnglish1ReviewRevalidation(proof:Awaited<ReturnType<typeof prepareEnglish1ReviewRevalidation>>) {
++  const args=originals.get(proof);check(args);
++  const lease=await acquireFormalQualityLock(join(proof.folder,'review.lock'));
++  try {
++    const current=await prepareEnglish1ReviewRevalidation(args);check(current.auditSha256===proof.auditSha256);
++    const claim=await open(join(args.recoveryFolder,`complete-${TARGET}-local-response-revalidation.claim`),'wx',0o600);
++    try{await claim.writeFile(JSON.stringify({...proof.audit,auditSha256:proof.auditSha256,createdAt:new Date().toISOString(),pid:process.pid}));await claim.sync();}finally{await claim.close();}
++    const prefix=TARGET+'-local-revalidation-'+proof.auditSha256;
++    const auditFile=await open(join(proof.folder,prefix+'-audit.json'),'wx',0o600);
++    try{await auditFile.writeFile(JSON.stringify({...proof.audit,auditSha256:proof.auditSha256}));await auditFile.sync();}finally{await auditFile.close();}
++    await writeJsonFileAtomic(join(proof.folder,prefix+'.json'),proof.stored);
++    await writeJsonFileAtomic(join(proof.folder,'attempts.json'),[...proof.attempts,{snapshotSha256:TARGET,status:'passed',
++      startedAt:Date.now(),kind:'local_response_revalidation',artifactPrefix:prefix,revalidationAuditSha256:proof.auditSha256,
++      sourceArtifactPrefix:PREFIX,sourceResponseSha256:proof.audit.sourceResponseSha256}]);
++    const canonical=await open(join(proof.folder,TARGET+'.json'),'wx',0o600);
++    try{await canonical.writeFile(JSON.stringify(proof.stored));await canonical.sync();}finally{await canonical.close();}
++  } finally {await lease.release();}
++}

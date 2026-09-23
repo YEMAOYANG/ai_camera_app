@@ -104,6 +104,8 @@ class OpenMaicRuntimeRepository:
             ):
                 return False
             course_count = formal_target_course_count(target)
+            canary_count = len(current_target["canaryManifest"]["targets"])
+            progressive = target.get("schemaVersion") == "mira.learning.preparation-target.progressive.v1"
         except (KeyError, TypeError, ValueError):
             return False
         candidate_count = int(plan.get("content_candidate_count") or 0)
@@ -147,12 +149,13 @@ class OpenMaicRuntimeRepository:
             and int(plan.get("content_target_count") or 0) == course_count
             and 1 <= candidate_count
             and (int(plan.get("content_failed_count") or 0) == 0 or plan.get("library_target_fingerprint") is not None)
-            and int(plan.get("content_canary_target_count") or 0) == 3
-            and 1 <= canary_candidate_count <= 3
+            and int(plan.get("content_canary_target_count") or 0) == canary_count
+            and (0 if progressive else 1) <= canary_candidate_count <= canary_count
             and (int(plan.get("content_canary_failed_count") or 0) == 0 or plan.get("library_target_fingerprint") is not None)
-            and (not canary_passed or canary_candidate_count == 3)
+            and (not canary_passed or canary_candidate_count == canary_count)
             and (
-                canary_passed
+                progressive
+                or canary_passed
                 or cls._candidate_item_is_in_canary_manifest(
                     build=build,
                     item=item,
@@ -1187,9 +1190,10 @@ class OpenMaicRuntimeRepository:
         except ValueError:
             raise ValueError("formal candidate course content is invalid") from None
 
-        expected_package_id = "formal_runtime_package_" + hashlib.sha256(
-            build_item_id.encode("utf-8")
-        ).hexdigest()[:48]
+        from services.progressive_math2_revision import formal_package_identity, is_audited_predecessor
+        package_identity = formal_package_identity(conn, build_item_id=build_item_id,
+            course_id=course_id, course_version=course_version)
+        expected_package_id = package_identity["packageId"]
         expected_public_payload = {
             "schemaVersion": FORMAL_RUNTIME_PACKAGE_SCHEMA,
             "authority": "mira_backend_candidate_only",
@@ -1245,7 +1249,7 @@ class OpenMaicRuntimeRepository:
             source_validation_report = json.loads(source_report_json)
         except (TypeError, ValueError, json.JSONDecodeError):
             raise ValueError("formal candidate package payload is invalid") from None
-        seed_digest = hashlib.sha256(build_item_id.encode("utf-8")).hexdigest()[:48]
+        seed_digest = package_identity["seed"]
         package_contract_matches = bool(
             package_id == expected_package_id
             and int(package_version) == 1
@@ -1363,14 +1367,20 @@ class OpenMaicRuntimeRepository:
                 target_fingerprint,
             )
             for row in attempts
+            if not is_audited_predecessor(conn, build_item_id=build_item_id, runtime=row)
         ):
             raise ValueError("candidate runtime attempt history drifted")
         attempt_ordinal = len(attempts) + 1
         provider_attempt_ordinal = len(provider_attempts) + 1
+        if package_identity.get("revisionSourceRuntimeId") and not (
+            len(attempts) == 1 and attempts[0]["id"] == package_identity["revisionSourceRuntimeId"]
+            and attempt_ordinal == 2 and provider_attempt_ordinal == 2
+        ):
+            raise ValueError("the audited content revision authorizes only one new Runtime attempt")
         if attempt_ordinal > 16 or provider_attempt_ordinal > 3:
             raise ValueError("candidate Provider attempt limit reached")
         previous = attempts[-1] if attempts else None
-        if previous is not None:
+        if previous is not None and not is_audited_predecessor(conn, build_item_id=build_item_id, runtime=previous):
             previous_error = str(previous.get("error_code") or "")
             if (
                 str(previous.get("status") or "") != "failed"
@@ -1751,7 +1761,10 @@ class OpenMaicRuntimeRepository:
         public_json = str(authority.get("locked_public_payload_json") or "")
         private_json = str(authority.get("locked_private_payload_json") or "")
         source_json = str(authority.get("locked_source_payload_json") or "")
-        seed_digest = hashlib.sha256(build_item_id.encode("utf-8")).hexdigest()[:48]
+        from services.progressive_math2_revision import formal_package_identity
+        seed_digest = formal_package_identity(conn, build_item_id=build_item_id,
+            course_id=str(authority.get("course_id") or ""),
+            course_version=str(authority.get("course_version") or ""))["seed"]
         package_authority_matches = bool(
             str(authority.get("locked_course_id") or "")
             == str(authority.get("course_id") or "")
@@ -1810,6 +1823,10 @@ class OpenMaicRuntimeRepository:
         expected_request_id = formal_runtime_request_id(
             build_item_id, int(authority.get("attempt_ordinal") or 0)
         )
+        from services.progressive_contract_fix import audited_runtime_request_id
+        expected_request_id = audited_runtime_request_id(
+            conn, runtime_id=runtime_id, canonical_request_id=expected_request_id
+        )
         expected_generation_contract = {
             "schemaVersion": OpenMaicFullRuntimeClient.FORMAL_RUNTIME_CONTRACT_VERSION,
             "authority": "mira_backend_formal_candidate",
@@ -1851,14 +1868,18 @@ class OpenMaicRuntimeRepository:
                 )
             ),
         }
-        if isinstance(brief.get("difficultyPolicy"), Mapping):
-            from content.formal_difficulty_policy import formal_difficulty_policy
+        progressive_brief = brief.get("schemaVersion") == "mira.learning.formal-runtime-teaching-brief.progressive.v1"
+        if progressive_brief or isinstance(brief.get("difficultyPolicy"), Mapping):
+            if progressive_brief:
+                from content.progressive_difficulty_policy import progressive_difficulty_policy as difficulty_policy
+            else:
+                from content.formal_difficulty_policy import formal_difficulty_policy as difficulty_policy
             brief_course = brief["course"]
-            difficulty = formal_difficulty_policy(
+            difficulty = difficulty_policy(
                 str(brief_course.get("gradeCode")), str(brief_course.get("subject")),
                 str(brief_course.get("skillId")), str(brief_course.get("difficultyCode")),
             )
-            if difficulty != brief["difficultyPolicy"]:
+            if difficulty != brief.get("difficultyPolicy"):
                 raise ValueError("candidate completion difficulty authority mismatch")
             expected_generation_contract["difficultyPolicy"] = difficulty
             expected_generation_contract["course"]["difficultyCode"] = difficulty["difficultyCode"]
@@ -4180,6 +4201,41 @@ class OpenMaicRuntimeRepository:
         ).fetchone()
         authority = candidate
         if authority is None:
+            from repositories.progressive_formal_course_repository import progressive_formal_authority
+            fine_session = conn.execute(
+                "SELECT * FROM learning_sessions WHERE id=? AND family_id=? AND child_id=? LIMIT 1 FOR UPDATE",
+                (learning_session_id, family_id, child_id),
+            ).fetchone()
+            if fine_session is not None and str(fine_session.get('course_id') or '').startswith('progressive_'):
+                fine_course = conn.execute("SELECT * FROM learning_courses WHERE id=? AND version=? LIMIT 1",
+                                          (fine_session['course_id'], fine_session['course_version'])).fetchone()
+                if fine_course is not None:
+                    fine_authority = progressive_formal_authority(conn, database=self.database,
+                        child={**child, 'id': child_id, 'family_id': family_id}, course=fine_course)
+                    if fine_authority is not None and all(str(fine_session.get(session_key) or '') == str(fine_authority[authority_key])
+                        for session_key, authority_key in (
+                            ('lesson_package_id', 'package_id'), ('lesson_package_version', 'package_version'),
+                            ('lesson_package_content_hash', 'package_content_hash'))):
+                        authority = fine_authority
+        if authority is None:
+            # Only a registry prerequisite with the exact published content hash
+            # may use another grade's shared release; legacy courses stay scoped.
+            session_course = None
+            if str(child["grade_code"]) in {f"primary_{grade}" for grade in range(2, 7)}:
+                session_course = conn.execute(
+                    "SELECT course_id, course_version FROM learning_sessions "
+                    "WHERE id = ? AND family_id = ? AND child_id = ? LIMIT 1",
+                    (learning_session_id, family_id, child_id),
+                ).fetchone()
+            remedial = None
+            if session_course is not None and str(session_course.get("course_id") or "").startswith("progressive_"):
+                from repositories.learning_repository import LearningRepository
+                remedial = LearningRepository(self.database).get_progressive_remedial_course(
+                    conn, family_id=family_id, child_id=child_id,
+                    grade_code=str(child["grade_code"]),
+                    grade_selection_revision=int(child["grade_selection_revision"]),
+                    course_id=str(session_course["course_id"]),
+                    course_version=str(session_course["course_version"]))
             authority = conn.execute(
                 f"""
                 SELECT 'active_pointer' AS authority_kind,
@@ -4193,6 +4249,7 @@ class OpenMaicRuntimeRepository:
                     AS runtime_binding_contract_version,
                   build_item.id AS build_item_id,
                   course.id AS course_id, course.version AS course_version,
+                  course.grade_code AS binding_grade_code,
                   package.id AS package_id, package.version AS package_version,
                   package.public_content_hash AS package_content_hash,
                   runtime.id AS runtime_classroom_id,
@@ -4204,7 +4261,7 @@ class OpenMaicRuntimeRepository:
             JOIN learning_courses AS course
               ON course.id = session.course_id
              AND course.version = session.course_version
-             AND course.grade_code = child.grade_code
+             AND (course.grade_code = child.grade_code OR (course.id = ? AND course.version = ?))
              AND course.status = 'published'
              AND course.quality_status = 'released'
              AND course.content_origin = 'openmaic_generated'
@@ -4326,6 +4383,8 @@ class OpenMaicRuntimeRepository:
                 FOR UPDATE
                 """,
                 (
+                    str(remedial["id"]) if remedial is not None else "",
+                    str(remedial["version"]) if remedial is not None else "",
                     self.CANDIDATE_BINDING_CONTRACT_VERSION,
                     self.CANDIDATE_BINDING_CONTRACT_VERSION,
                     learning_session_id,
@@ -4356,7 +4415,7 @@ class OpenMaicRuntimeRepository:
                 learning_session_id,
                 family_id,
                 child_id,
-                str(child["grade_code"]),
+                str(authority.get("binding_grade_code") or child["grade_code"]),
                 authority["authority_kind"],
                 authority.get("pointer_history_id"),
                 authority.get("pointer_revision"),
@@ -4739,6 +4798,16 @@ class OpenMaicRuntimeRepository:
         *,
         token_hash: str,
     ) -> DatabaseRow | None:
+        # Serialize this ticket's consumption/revocation without locking every
+        # authority row in optimizer order alongside course production writes.
+        # The complete authority projection below remains required for access.
+        locked = conn.execute(
+            "SELECT id FROM student_openmaic_launch_tickets "
+            "WHERE token_hash = ? LIMIT 1 FOR UPDATE",
+            (token_hash,),
+        ).fetchone()
+        if locked is None:
+            return None
         return conn.execute(
             """
             SELECT ticket.*, runtime.status AS runtime_status,
@@ -4911,7 +4980,7 @@ class OpenMaicRuntimeRepository:
              AND formal_provider.target_fingerprint =
                runtime.candidate_target_fingerprint
             WHERE ticket.token_hash = ?
-            LIMIT 1 FOR UPDATE
+            LIMIT 1
             """,
             (token_hash,),
         ).fetchone()

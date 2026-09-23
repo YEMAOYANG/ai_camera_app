@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from services.learning_curriculum_preparation_contract import (canonical_preparation_target_for, formal_target_course_count, preparation_authority_grade)
+from services.learning_curriculum_preparation_contract import (
+    TARGET_SCHEMA_PROGRESSIVE, is_content_preparation_target, formal_canary_count,
+    canonical_preparation_target_for, formal_target_course_count, preparation_authority_grade,
+)
 
 import hashlib
 import json
@@ -219,9 +222,11 @@ class LearningCurriculumPreparationRepository:
             raise ValueError("preparation target fingerprint mismatch")
         if str(normalized_target.get("gradeCode")) != str(grade_code):
             raise ValueError("preparation target grade mismatch")
-        if (
-            str(normalized_target.get("preparationContractVersion"))
-            != PREPARATION_CONTRACT_VERSION
+        progressive = normalized_target.get("schemaVersion") == TARGET_SCHEMA_PROGRESSIVE
+        if progressive and normalized_target != canonical_preparation_target_for(normalized_target):
+            raise ValueError("preparation target is not the exact registered authority")
+        if str(normalized_target.get("preparationContractVersion")) != (
+            "mira.learning.grade-preparation.progressive.v1" if progressive else PREPARATION_CONTRACT_VERSION
         ):
             raise ValueError("unsupported preparation contract version")
         if int(grade_selection_revision) < 0:
@@ -232,6 +237,8 @@ class LearningCurriculumPreparationRepository:
         subject_progress = self._initial_subject_progress(normalized_target)
         total_course_count = int(normalized_target.get("totalCourseCount") or 0)
         canonical_totals = self.CANONICAL_SUBJECT_TOTALS.get(str(grade_code))
+        if progressive:
+            canonical_totals = {subject: item["totalCourseCount"] for subject, item in normalized_target["subjectTargets"].items()}
         actual_totals = {
             subject: item["totalCourseCount"]
             for subject, item in subject_progress.items()
@@ -393,7 +400,7 @@ class LearningCurriculumPreparationRepository:
         if not reusable_state:
             return plan
 
-        canonical_target = build_preparation_target(preparation_authority_grade(plan))
+        canonical_target = canonical_preparation_target_for(plan)
         try:
             plan_target = json.loads(str(plan.get("target_spec_json") or ""))
         except (TypeError, ValueError, json.JSONDecodeError):
@@ -552,9 +559,9 @@ class LearningCurriculumPreparationRepository:
             }
         stage_progress = {
             "candidateCount": formal_target_course_count(plan),
-            "canaryCandidateCount": 3,
+            "canaryCandidateCount": formal_canary_count(plan),
             "canaryFailedCount": 0,
-            "canaryTargetCount": 3,
+            "canaryTargetCount": formal_canary_count(plan),
             "failedCount": 0,
             "targetCount": formal_target_course_count(plan),
         }
@@ -567,8 +574,8 @@ class LearningCurriculumPreparationRepository:
               failed_course_count = 0, progress_percent = 100,
               subject_progress_json = ?, content_target_count = {formal_target_course_count(plan)},
               content_candidate_count = {formal_target_course_count(plan)}, content_failed_count = 0,
-              content_canary_target_count = 3,
-              content_canary_candidate_count = 3,
+              content_canary_target_count = {formal_canary_count(plan)},
+              content_canary_candidate_count = {formal_canary_count(plan)},
               content_canary_failed_count = 0,
               content_canary_passed_at = ?,
               content_generation_completed_at = ?, stage_progress_json = ?,
@@ -1209,6 +1216,8 @@ class LearningCurriculumPreparationRepository:
             next_stage=next_stage,
             deadlines=deadlines,
         )
+        if json.loads(row["target_spec_json"]).get("schemaVersion") == TARGET_SCHEMA_PROGRESSIVE and next_stage == "generating_content":
+            deadline_ms = 11 * 60 * 1000  # Two bounded 300-second calls plus host persistence.
         if deadline_ms <= 0:
             raise ValueError("preparation stage deadline must be positive")
         token = uuid.uuid4().hex
@@ -1559,7 +1568,7 @@ class LearningCurriculumPreparationRepository:
     ) -> bool:
         try:
             target = json.loads(str(plan["target_spec_json"]))
-            expected_target = build_preparation_target(preparation_authority_grade(plan))
+            expected_target = canonical_preparation_target_for(plan)
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             return False
         empty_fields = (
@@ -1583,7 +1592,7 @@ class LearningCurriculumPreparationRepository:
         )
         return bool(
             compatible_preparation_target(target, expected_target)
-            and str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
+            and is_content_preparation_target(target)
             and str(target.get("gradeCode") or "") == preparation_authority_grade(plan)
             and preparation_target_fingerprint(target) == target_fingerprint
             and str(plan.get("target_fingerprint") or "")
@@ -2358,7 +2367,7 @@ class LearningCurriculumPreparationRepository:
                 (build_id, target_fingerprint),
             ).fetchall()
         )
-        current_target = build_preparation_target(preparation_authority_grade(build))
+        current_target = canonical_preparation_target_for(build)
         try:
             plan_targets = [
                 json.loads(str(plan["target_spec_json"])) for plan in plans
@@ -2478,7 +2487,7 @@ class LearningCurriculumPreparationRepository:
                 (build_id, target_fingerprint),
             ).fetchall()
         )
-        current_target = build_preparation_target(preparation_authority_grade(build))
+        current_target = canonical_preparation_target_for(build)
         try:
             plan_targets = [
                 json.loads(str(plan["target_spec_json"])) for plan in plans
@@ -2631,9 +2640,9 @@ class LearningCurriculumPreparationRepository:
             and type(plan.get("content_failed_count")) is int
             and int(plan["content_failed_count"]) == 0
             and type(plan.get("content_canary_target_count")) is int
-            and int(plan["content_canary_target_count"]) == 3
+            and int(plan["content_canary_target_count"]) == formal_canary_count(plan)
             and type(plan.get("content_canary_candidate_count")) is int
-            and int(plan["content_canary_candidate_count"]) == 3
+            and int(plan["content_canary_candidate_count"]) == formal_canary_count(plan)
             and type(plan.get("content_canary_failed_count")) is int
             and int(plan["content_canary_failed_count"]) == 0
             and type(plan.get("progress_percent")) is int
@@ -2645,9 +2654,9 @@ class LearningCurriculumPreparationRepository:
             and stage_progress
             == {
                 "candidateCount": formal_target_course_count(plan),
-                "canaryCandidateCount": 3,
+                "canaryCandidateCount": formal_canary_count(plan),
                 "canaryFailedCount": 0,
-                "canaryTargetCount": 3,
+                "canaryTargetCount": formal_canary_count(plan),
                 "failedCount": 0,
                 "targetCount": formal_target_course_count(plan),
             }
@@ -3400,7 +3409,7 @@ class LearningCurriculumPreparationRepository:
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             target = json.loads(str(plan["target_spec_json"]))
             targets = target["subjectTargets"]
-            is_v2 = str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
+            is_v2 = is_content_preparation_target(target)
             remaining_ready = ready
             remaining_failed = failed
             remaining_content_candidate = (
@@ -4238,7 +4247,7 @@ class LearningCurriculumPreparationRepository:
             and int(plan.get("content_target_count") or 0) == formal_target_course_count(plan)
             and int(plan.get("content_candidate_count") or 0) == formal_target_course_count(plan)
             and int(plan.get("content_failed_count") or 0) == 0
-            and int(plan.get("content_canary_candidate_count") or 0) == 3
+            and int(plan.get("content_canary_candidate_count") or 0) == formal_canary_count(plan)
             and int(plan.get("content_canary_failed_count") or 0) == 0
             and plan.get("content_canary_passed_at") is not None
             and plan.get("content_generation_completed_at") is not None
@@ -5263,7 +5272,7 @@ class LearningCurriculumPreparationRepository:
             plan_build_id = plan.get("catalog_build_id")
             plan_release_id = plan.get("catalog_release_id")
             grade_code = preparation_authority_grade(plan)
-            canonical_grade_target = build_preparation_target(grade_code)
+            canonical_grade_target = canonical_preparation_target_for(plan)
             total_course_count = len(canonical_grade_target["courseTargets"])
             plan_catalog_pair_matches = bool(
                 (
@@ -5279,7 +5288,7 @@ class LearningCurriculumPreparationRepository:
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             return False
         if not (
-            str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
+            is_content_preparation_target(target)
             and str(target.get("gradeCode") or "") == grade_code
             and compatible_preparation_target(
                 target, canonical_grade_target
@@ -5829,10 +5838,10 @@ class LearningCurriculumPreparationRepository:
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             return 0
         if not (
-            str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
+            is_content_preparation_target(target)
             and str(target.get("gradeCode") or "") == preparation_authority_grade(build)
             and compatible_preparation_target(
-                target, build_preparation_target(preparation_authority_grade(build))
+                target, canonical_preparation_target_for(build)
             )
             and preparation_target_fingerprint(target) == target_fingerprint
             and str(build.get("request_id") or "")
@@ -5914,7 +5923,7 @@ class LearningCurriculumPreparationRepository:
             for value in canary_targets
             if isinstance(value, Mapping)
         }
-        if len(canary_keys) != 3:
+        if len(canary_keys) != len(canonical_preparation_target_for(build)["canaryManifest"]["targets"]):
             return 0
         passed_canaries = sum(
             1
@@ -5943,7 +5952,7 @@ class LearningCurriculumPreparationRepository:
         handoff = bool(
             candidate_count == formal_target_course_count(build)
             and failed_count == 0
-            and passed_canaries == 3
+            and passed_canaries == len(canary_keys)
             and failed_canaries == 0
         )
         stage_progress = self._encode_json(
@@ -5951,7 +5960,7 @@ class LearningCurriculumPreparationRepository:
                 "candidateCount": candidate_count,
                 "canaryCandidateCount": passed_canaries,
                 "canaryFailedCount": failed_canaries,
-                "canaryTargetCount": 3,
+                "canaryTargetCount": len(canary_keys),
                 "failedCount": failed_count,
                 "targetCount": formal_target_course_count(build),
             },
@@ -6087,11 +6096,11 @@ class LearningCurriculumPreparationRepository:
                         SET status = 'failed', stage = 'completed',
                           catalog_build_id = ?, catalog_release_id = ?,
                           content_target_count = {formal_target_course_count(plan)},
-                          content_canary_target_count = 3,
+                          content_canary_target_count = {len(canary_keys)},
                           content_candidate_count = ?, content_failed_count = ?,
                           content_canary_candidate_count = ?,
                           content_canary_failed_count = ?,
-                          content_canary_passed_at = CASE WHEN ? = 3
+                          content_canary_passed_at = CASE WHEN ? = {len(canary_keys)}
                             THEN COALESCE(content_canary_passed_at, ?) ELSE NULL END,
                           stage_progress_json = ?, subject_progress_json = ?,
                           progress_percent = ?, error_code = ?,
@@ -6184,9 +6193,9 @@ class LearningCurriculumPreparationRepository:
                     SET status = 'running', stage = 'building_classrooms',
                       catalog_build_id = ?, catalog_release_id = ?,
                       content_target_count = {formal_target_course_count(plan)},
-                      content_canary_target_count = 3,
+                      content_canary_target_count = {len(canary_keys)},
                       content_candidate_count = {formal_target_course_count(plan)}, content_failed_count = 0,
-                      content_canary_candidate_count = 3,
+                      content_canary_candidate_count = {len(canary_keys)},
                       content_canary_failed_count = 0,
                       content_canary_passed_at = COALESCE(content_canary_passed_at, ?),
                       content_generation_completed_at =
@@ -6249,11 +6258,11 @@ class LearningCurriculumPreparationRepository:
                     UPDATE learning_curriculum_preparation_plans
                     SET catalog_build_id = ?, catalog_release_id = ?,
                       content_target_count = {formal_target_course_count(plan)},
-                      content_canary_target_count = 3,
+                      content_canary_target_count = {len(canary_keys)},
                       content_candidate_count = ?, content_failed_count = ?,
                       content_canary_candidate_count = ?,
                       content_canary_failed_count = ?,
-                      content_canary_passed_at = CASE WHEN ? = 3
+                      content_canary_passed_at = CASE WHEN ? = {len(canary_keys)}
                         THEN COALESCE(content_canary_passed_at, ?) ELSE NULL END,
                       stage_progress_json = ?, subject_progress_json = ?,
                       progress_percent = GREATEST(progress_percent, ?),
@@ -6295,11 +6304,11 @@ class LearningCurriculumPreparationRepository:
                     UPDATE learning_curriculum_preparation_plans
                     SET catalog_build_id = ?, catalog_release_id = ?,
                       content_target_count = {formal_target_course_count(plan)},
-                      content_canary_target_count = 3,
+                      content_canary_target_count = {len(canary_keys)},
                       content_candidate_count = ?, content_failed_count = ?,
                       content_canary_candidate_count = ?,
                       content_canary_failed_count = ?,
-                      content_canary_passed_at = CASE WHEN ? = 3
+                      content_canary_passed_at = CASE WHEN ? = {len(canary_keys)}
                         THEN COALESCE(content_canary_passed_at, ?) ELSE NULL END,
                       stage_progress_json = ?, subject_progress_json = ?,
                       progress_percent = GREATEST(progress_percent, ?),
@@ -6330,11 +6339,11 @@ class LearningCurriculumPreparationRepository:
                     SET status = 'running', stage = 'generating_content',
                       catalog_build_id = ?, catalog_release_id = ?,
                       content_target_count = {formal_target_course_count(plan)},
-                      content_canary_target_count = 3,
+                      content_canary_target_count = {len(canary_keys)},
                       content_candidate_count = ?, content_failed_count = ?,
                       content_canary_candidate_count = ?,
                       content_canary_failed_count = ?,
-                      content_canary_passed_at = CASE WHEN ? = 3
+                      content_canary_passed_at = CASE WHEN ? = {len(canary_keys)}
                         THEN COALESCE(content_canary_passed_at, ?) ELSE NULL END,
                       stage_progress_json = ?, subject_progress_json = ?,
                       progress_percent = GREATEST(progress_percent, ?),
@@ -6444,7 +6453,7 @@ class LearningCurriculumPreparationRepository:
                 plan_ids,
             ).fetchall()
         )
-        current_target = build_preparation_target(preparation_authority_grade(build))
+        current_target = canonical_preparation_target_for(build)
         error_code = self._catalog_failure_code(build.get("error_code"))
         updated = 0
         for plan in plans:
@@ -6923,14 +6932,14 @@ class LearningCurriculumPreparationRepository:
             if not isinstance(item, Mapping):
                 raise ValueError("preparation target is missing a subject")
             total = int(item.get("totalCourseCount") or 0)
-            if total <= 0:
+            if total < 0 or total == 0 and target.get("schemaVersion") != TARGET_SCHEMA_PROGRESSIVE:
                 raise ValueError("preparation subject total must be positive")
             result[subject] = {
                 "totalCourseCount": total,
                 "readyCourseCount": 0,
                 "failedCourseCount": 0,
             }
-            if str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2:
+            if is_content_preparation_target(target):
                 result[subject].update(
                     {
                         "contentCandidateCount": 0,
@@ -6941,7 +6950,7 @@ class LearningCurriculumPreparationRepository:
 
     @classmethod
     def _initial_content_progress(cls, target: Mapping[str, Any]) -> dict[str, int]:
-        if str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2:
+        if is_content_preparation_target(target):
             target_count = int(target.get("totalCourseCount") or 0)
             canary = target.get("canaryManifest")
             canary_targets = (
@@ -6950,7 +6959,8 @@ class LearningCurriculumPreparationRepository:
             if target_count != formal_target_course_count(target) or not isinstance(canary_targets, list):
                 raise ValueError("v2 preparation target content evidence mismatch")
             canary_target_count = len(canary_targets)
-            if canary_target_count != 3:
+            expected_canaries = len(canonical_preparation_target_for(target)["canaryManifest"]["targets"])
+            if canary_target_count != expected_canaries:
                 raise ValueError("v2 preparation target canary evidence mismatch")
         else:
             target_count = 0
@@ -6967,7 +6977,7 @@ class LearningCurriculumPreparationRepository:
     @staticmethod
     def _is_v2_plan(plan: DatabaseRow) -> bool:
         target = json.loads(str(plan["target_spec_json"]))
-        return str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
+        return is_content_preparation_target(target)
 
     @classmethod
     def _validate_progress_counts(
@@ -6993,7 +7003,7 @@ class LearningCurriculumPreparationRepository:
             raise ValueError("subject progress must use canonical subject order")
         target = json.loads(str(plan["target_spec_json"]))
         target_subjects = target["subjectTargets"]
-        is_v2 = str(target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
+        is_v2 = is_content_preparation_target(target)
         expected_keys = {
             "totalCourseCount",
             "readyCourseCount",

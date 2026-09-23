@@ -44,6 +44,7 @@ PREPARATION_SCHEMA_V2 = "mira.learning.preparation.v2"
 PREPARATION_SCHEMA_HEADER = "X-Mira-Preparation-Schema"
 TARGET_SCHEMA_V1 = "mira.learning.preparation-target.v1"
 TARGET_SCHEMA_V2 = "mira.learning.preparation-target.v2"
+TARGET_SCHEMA_PROGRESSIVE = "mira.learning.preparation-target.progressive.v1"
 PREPARATION_CONTRACT_VERSION = "mira.learning.grade-preparation.v1"
 VARIANTS_PER_BOUNDARY = 3
 MAX_PARENT_RETRIES = 1
@@ -336,6 +337,68 @@ def preparation_target_fingerprint(target: Mapping[str, object]) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def build_progressive_preparation_target(grade_code: str, *, lesson_ids=None, assessment_batch_ordinal: int = 1) -> dict[str, object]:
+    """Explicit new-version target; the sealed legacy builder stays unchanged.
+
+    Two independent basic sets per fixed lesson are planned in each batch. Runtime/audio/teacher policy
+    identities are retained so new content cannot bypass media publication gates.
+    """
+    from content.progressive_curriculum import CURRICULUM_VERSION, curriculum_identity, lessons_for
+    from services.progressive_course_generation import CONTRACT_VERSION, VALIDATION_SCHEMA, lesson_binding
+
+    if type(assessment_batch_ordinal) is not int or assessment_batch_ordinal < 1:
+        raise ValueError("assessment batch ordinal must be a positive integer")
+    base = build_preparation_target(grade_code)
+    lessons = lessons_for(grade_code)
+    if lesson_ids is not None:
+        if (not isinstance(lesson_ids, (list, tuple)) or not lesson_ids
+                or any(not isinstance(item, str) for item in lesson_ids)
+                or len(set(lesson_ids)) != len(lesson_ids)):
+            raise ValueError("lesson_ids must be a nonempty unique lesson list")
+        selected = set(lesson_ids)
+        lessons = [lesson for lesson in lessons if lesson["lessonId"] in selected]
+        if {lesson["lessonId"] for lesson in lessons} != selected:
+            raise ValueError("every requested lesson must belong to the requested grade")
+    targets = []
+    for lesson in lessons:
+        binding = lesson_binding(lesson["lessonId"])
+        targets.append({"lessonId": lesson["lessonId"], "skillId": lesson["lessonId"],
+            "subject": lesson["subject"], "subjectOrdinal": PREPARATION_SUBJECTS.index(lesson["subject"]) + 1,
+            "boundaryOrdinal": lesson["sequence"], "boundaryVersion": CURRICULUM_VERSION + ":" + binding["lessonSha256"][:24],
+            "lessonSha256": binding["lessonSha256"], "assessmentMode": lesson["assessmentMode"],
+            "difficultyCode": "basic", "variantOrdinals": [1, 2],
+            "instructionLanguageCode": "zh-CN", "targetLanguageCode": "en-US" if lesson["subject"] == "english" else "zh-CN"})
+    boundaries = targets
+    targets = [{**boundary, "variantOrdinal": ordinal} for boundary in boundaries for ordinal in (1, 2)]
+    preserved = {key: base[key] for key in (
+        "teacherRegistryVersion", "formalSubjectVoiceContractVersion", "formalAudioContracts", "teacherTargets",
+        "fullRuntimeContractVersion", "formalRuntimeClassroomContract", "formalRuntimePackageContract", "formalRuntimePolicy",
+        "contentProviderProfileContractVersion", "subjectLanguagePolicyVersion", "subjectLanguagePolicies",
+    ) if key in base}
+    preserved["formalRuntimePackageContract"] = {**preserved["formalRuntimePackageContract"],
+        "teachingBriefSchemaVersion": "mira.learning.formal-runtime-teaching-brief.progressive.v1"}
+    preserved["fullRuntimeContractVersion"] = str(preserved["fullRuntimeContractVersion"]).replace(
+        FORMAL_RUNTIME_TEACHING_BRIEF_SCHEMA, "mira.learning.formal-runtime-teaching-brief.progressive.v1")
+    canaries = [next(item for item in targets if item["subject"] == subject)
+                for subject in PREPARATION_SUBJECTS if any(item["subject"] == subject for item in targets)]
+    return {"schemaVersion": TARGET_SCHEMA_PROGRESSIVE,
+        "preparationContractVersion": "mira.learning.grade-preparation.progressive.v1",
+        "curriculumVersion": CURRICULUM_VERSION, "curriculumIdentity": curriculum_identity(),
+        "gradeCode": grade_code, "granularity": "lesson", "subjects": list(PREPARATION_SUBJECTS),
+        "assessmentBatchOrdinal": assessment_batch_ordinal,
+        "contentGenerationContractVersion": CONTRACT_VERSION, "contentValidationContractVersion": VALIDATION_SCHEMA,
+        "contentValidationDatasetSha256": curriculum_identity()["datasetSha256"],
+        "boundaries": boundaries, "courseTargets": targets, "boundaryCount": len(boundaries),
+        "lessonIds": [lesson["lessonId"] for lesson in lessons],
+        "canaryManifest": {"version": "mira.learning.progressive-canary.v1",
+                           "targets": [{key: item[key] for key in ("subject", "skillId", "variantOrdinal")} for item in canaries]},
+        "boundaryVersions": [item["boundaryVersion"] for item in boundaries], "variantsPerBoundary": 2,
+        "totalCourseCount": len(targets), "basicFirst": True,
+        "subjectTargets": {subject: {"boundaryCount": sum(item["subject"] == subject for item in boundaries),
+                                     "totalCourseCount": sum(item["subject"] == subject for item in targets)}
+                           for subject in PREPARATION_SUBJECTS}, **preserved}
+
+
 def preparation_authority_grade(authority: object) -> str:
     """Read an explicit grade from frozen target/plan/build authority only."""
     if isinstance(authority, str):
@@ -355,7 +418,26 @@ def preparation_authority_grade(authority: object) -> str:
 
 
 def canonical_preparation_target_for(authority: object) -> dict[str, object]:
+    value = authority
+    if isinstance(value, str) and value.startswith("{"):
+        value = json.loads(value)
+    if isinstance(value, Mapping):
+        nested = value.get("target_spec_json", value.get("targetSpec"))
+        if nested is not None:
+            return canonical_preparation_target_for(nested)
+        if value.get("schemaVersion") == TARGET_SCHEMA_PROGRESSIVE:
+            if value.get("curriculumVersion") != "mira.primary.progressive.v1":
+                raise ValueError("progressive target curriculum mismatch")
+            return build_progressive_preparation_target(preparation_authority_grade(value), lesson_ids=value.get("lessonIds"), assessment_batch_ordinal=value.get("assessmentBatchOrdinal", 1))
     return build_preparation_target(preparation_authority_grade(authority))
+
+
+def is_content_preparation_target(target: Mapping) -> bool:
+    return target.get("schemaVersion") in {TARGET_SCHEMA_V2, TARGET_SCHEMA_PROGRESSIVE}
+
+
+def formal_canary_count(authority: object) -> int:
+    return len(canonical_preparation_target_for(authority)["canaryManifest"]["targets"])
 
 
 def formal_target_course_count(authority: object) -> int:

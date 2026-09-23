@@ -224,6 +224,9 @@ def formal_runtime_teaching_brief(
         raise ValueError("formal candidate course content is invalid") from None
     if not isinstance(content, Mapping):
         raise ValueError("formal candidate course content is invalid")
+    if content.get("schemaVersion") == "mira.learning.progressive-course.v1":
+        from services.progressive_course_generation import progressive_runtime_teaching_brief
+        return progressive_runtime_teaching_brief(course)
     if (
         content.get("schemaVersion") != "mira.learning.course.v1"
         or content.get("sessionKind") != "lesson"
@@ -2253,6 +2256,13 @@ class LessonPackageValidator:
         source: Mapping[str, Any],
         course: Mapping[str, Any],
     ) -> None:
+        if course.get("curriculum_version") == "mira.primary.progressive.v1":
+            from services.progressive_course_generation import progressive_boundary
+            if (source.get("skillBoundary") != progressive_boundary(course)
+                    or source.get("gradeCode") != course["grade_code"]
+                    or source.get("subject") != course["subject"]):
+                self._fail("classroom_boundary_mismatch", "Classroom changed its fixed progressive lesson", "source.skillBoundary")
+            return
         boundary = source.get("skillBoundary")
         if not isinstance(boundary, Mapping):
             self._fail(

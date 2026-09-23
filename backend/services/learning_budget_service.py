@@ -55,8 +55,12 @@ class LearningBudgetService:
             _fail("halted", 503)
 
     def _scope_allowed(self, scope, now):
-        window = self.policy.raw.get("authorizationWindow")
-        if window is not None:
+        windows = [self.policy.raw.get("authorizationWindow")]
+        if scope["purpose"] == "production":
+            windows.append(self.policy.raw.get("productionAuthorizationWindow"))
+        for window in windows:
+            if window is None:
+                continue
             if not window["startsAt"] <= now < window["expiresAt"]:
                 _fail("authorization_window_closed", 403)
             if scope not in window["scopes"]:
@@ -123,8 +127,12 @@ class LearningBudgetService:
         if required and owner is None:
             _fail("catalog_shared_scope_required", 403)
         if owner is not None:
-            from services.learning_curriculum_preparation_contract import build_preparation_target
-            current_target = build_preparation_target(item["grade_code"])
+            from services.learning_curriculum_preparation_contract import build_preparation_target, canonical_preparation_target_for
+            progressive = target.get("schemaVersion") == "mira.learning.preparation-target.progressive.v1"
+            current_target = canonical_preparation_target_for(target) if progressive else build_preparation_target(item["grade_code"])
+            if progressive and (target != current_target or owner["library_target_fingerprint"] != fingerprint
+                    or owner["grade_code"] != item["grade_code"]):
+                _fail("catalog_target_scope_mismatch", 403)
             current_fingerprint = preparation_target_fingerprint(current_target)
             # The isolated operator can explicitly prepare required-3D v2 while
             # the ordinary API still defaults to v1. This is a concurrent opt-in
@@ -176,6 +184,8 @@ class LearningBudgetService:
         expires_at = now + template["ttlMs"]
         if self.policy.raw.get("authorizationWindow"):
             expires_at = min(expires_at, self.policy.raw["authorizationWindow"]["expiresAt"])
+        if scope["purpose"] == "production" and self.policy.raw.get("productionAuthorizationWindow"):
+            expires_at = min(expires_at, self.policy.raw["productionAuthorizationWindow"]["expiresAt"])
         self.create_authorization(authorization_id=authorization_id, scope=scope,
             max_units=template["maxUnits"], price_keys=template["priceKeys"],
             expires_at=expires_at, _reuse_expiry=True, _existing_only=existing_only)

@@ -640,6 +640,21 @@ class DynamicLearningCourseGenerationService:
         enqueue_classroom: bool = True,
         retry_transient_failed: bool = False,
     ) -> DynamicCourseGenerationResult:
+        if data.get("lessonId") is not None or data.get("curriculumVersion") == "mira.primary.progressive.v1":
+            from services.progressive_course_generation import generate_progressive_course
+            normalized = {**data, "curriculumVersion": data.get("curriculumVersion") or "mira.primary.progressive.v1"}
+            return generate_progressive_course(self, normalized, enqueue_classroom=enqueue_classroom)
+        # Existing frozen jobs keep their original contract. No new request may
+        # create another coarse skill course after the curriculum upgrade.
+        legacy_request = self._request_id(data.get("requestId")) if data.get("requestId") else None
+        with self.repository.transaction() as conn:
+            legacy_job = self.repository.get_job_by_request(conn, request_id=legacy_request) if legacy_request else None
+            frozen_item = conn.execute("SELECT item.id FROM learning_catalog_build_items AS item "
+                "JOIN learning_catalog_build_jobs AS build ON build.id=item.build_job_id "
+                "WHERE item.generation_request_id=? AND item.curriculum_version=build.curriculum_version "
+                "AND item.curriculum_version <> 'mira.primary.progressive.v1' LIMIT 1", (legacy_request,)).fetchone() if legacy_request else None
+        if legacy_job is None and frozen_item is None:
+            raise ApiError("progressive_lesson_required", "课程体系已升级，请指定学习路线中的 lessonId 后再生成课程", 409)
         grade_code = self._grade(data.get("gradeCode"))
         subject = self._subject(data.get("subject"))
         boundary = self._resolve_boundary(
@@ -1028,6 +1043,15 @@ class DynamicLearningCourseGenerationService:
     ) -> DynamicCourseGenerationResult:
         """Generate a fresh course for the explicitly selected progression step."""
 
+        from content.progressive_curriculum import lesson_by_id, CURRICULUM_VERSION
+        try:
+            lesson = lesson_by_id(skill_id)
+        except ValueError:
+            lesson = None
+        if lesson is not None:
+            return self.generate({"gradeCode": grade_code, "subject": subject, "lessonId": skill_id,
+                "curriculumVersion": CURRICULUM_VERSION, "difficultyCode": "basic",
+                **({"requestId": request_id} if request_id else {})}, enqueue_classroom=enqueue_classroom)
         last: DynamicCourseGenerationResult | None = None
         for attempt in range(max(1, int(attempts))):
             attempt_request_id = None

@@ -96,6 +96,7 @@ LEGACY_GENERATION_OPTIONS = {
 }
 MEDIA_RECEIPT_SCHEMA = "mira.openmaic.formal-media-receipt.v1"
 _IDENTIFIER = re.compile(r"[A-Za-z0-9_-]{1,255}")
+_RUNTIME_REQUEST_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}")
 _SHA = re.compile(r"[0-9a-f]{64}")
 _IMAGE_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
 
@@ -135,6 +136,8 @@ def policy_from_target(target: object) -> dict[str, Any]:
 def compatible_preparation_targets(current: Mapping[str, Any]) -> tuple[dict[str, Any], ...]:
     """Enumerate frozen contracts; never replace a persisted target in place."""
     policy_from_target(current)
+    if current.get("schemaVersion") == "mira.learning.preparation-target.progressive.v1":
+        return (deepcopy(dict(current)),)
     targets = [deepcopy(dict(current))]
     for historical_policy in (LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY,
                               INTEGRATED_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY,
@@ -184,7 +187,8 @@ def media_receipt(value: object, *, runtime_request_id: str, classroom_id: str,
                 **{k: FORMAL_IMAGE_POLICY[k] for k in ("policyId", "providerId", "modelId")}}
     if any(receipt.get(k) != v for k, v in expected.items()):
         raise ValueError("formal media receipt identity mismatch")
-    if any(not _IDENTIFIER.fullmatch(v) for v in (runtime_request_id, classroom_id, build_item_id, session_id)):
+    if (not isinstance(runtime_request_id, str) or not _RUNTIME_REQUEST_ID.fullmatch(runtime_request_id)
+            or any(not _IDENTIFIER.fullmatch(v) for v in (classroom_id, build_item_id, session_id))):
         raise ValueError("invalid formal media identity")
     assets = receipt.get("assets")
     if (not isinstance(assets, list) or type(receipt.get("imageCount")) is not int

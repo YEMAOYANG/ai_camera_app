@@ -14,12 +14,17 @@ export const learningChoiceSchema = z.object({
 export const learningQuestionSchema = z.object({
   id: z.string().min(1),
   index: z.number().int().nonnegative().optional(),
-  type: z.enum(["numeric", "exact_text", "accepted_text", "single_choice", "sequence"]),
+  type: z.enum(["numeric", "exact_text", "accepted_text", "single_choice", "sequence", "tap_objects"]),
   prompt: z.string().min(1),
   skill: z.string().optional().default(""),
   attemptNumber: z.number().int().positive().optional(),
   inputMode: z.string().optional().default("text"),
   choices: z.array(learningChoiceSchema).optional().default([]),
+  objects: z.array(z.object({
+    id: z.string().min(1),
+    shape: z.enum(["circle", "square", "triangle"]).default("circle"),
+    color: z.enum(["red", "blue", "yellow", "green"]).default("blue"),
+  })).max(20).optional(),
 });
 
 export const teachingFlowSchema = z.object({
@@ -165,6 +170,21 @@ export const learningLibrarySourceSchema = z.literal("backend");
 
 export const learningSubjectSchema = z.enum(["chinese", "math", "english"]);
 
+export const learningProgressionSchema = z.object({
+  schemaVersion: z.literal("mira.learning.progression.v1"),
+  curriculumVersion: z.string().min(1),
+  granularity: z.enum(["skill_boundary", "lesson"]),
+  lessonId: z.string().optional(),
+  skillId: z.string(),
+  // Zero means the backend has not mapped this legacy skill into the sequence.
+  sequence: z.number().int().nonnegative(),
+  learningStatus: z.enum(["locked", "available", "needs_practice", "mastered"]),
+  canStart: z.boolean(),
+  canResume: z.boolean().optional(),
+  blockedBySkillIds: z.array(z.string()),
+  message: z.string(),
+});
+
 export const learningLibraryCourseSchema = z.object({
   id: z.string().min(1),
   version: z.string().min(1),
@@ -210,6 +230,7 @@ export const learningLibraryItemSchema = z.object({
   session: learningLibrarySessionSchema.nullable(),
   report: learningLibraryReportSchema.nullable(),
   favorite: z.boolean(),
+  progression: learningProgressionSchema.optional(),
   classroomAvailable: z.boolean(),
   // Optional only for a rolling deployment from the pre-release-gate
   // backend.  Missing explicit gates fail closed; the old, weaker
@@ -383,6 +404,7 @@ export type LearningTodayItem = z.infer<typeof learningTodayItemSchema>;
 export type LearningTodayResponse = z.infer<typeof learningTodayResponseSchema>;
 export type LearningLibraryBucket = z.infer<typeof learningLibraryBucketSchema>;
 export type LearningSubject = z.infer<typeof learningSubjectSchema>;
+export type LearningProgression = z.infer<typeof learningProgressionSchema>;
 export type LearningLibraryItem = z.infer<typeof learningLibraryItemSchema>;
 export type LearningLibraryResponse = z.infer<typeof learningLibraryResponseSchema>;
 export type LearningCourseDetailResponse = z.infer<typeof learningCourseDetailResponseSchema>;

@@ -2,14 +2,52 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LearningCourseStartButton } from "@/features/learning/learning-course-start-button";
+import type { LearningProgression } from "@/lib/contracts/learning";
 
 const { startLearningCourse } = vi.hoisted(() => ({ startLearningCourse: vi.fn() }));
 vi.mock("@/features/learning/learning-client", () => ({ startLearningCourse }));
 const response = { ok: true, taskId: "new task", created: true, courseId: "course-1", courseVersion: "2" };
+const lockedProgression: LearningProgression = {
+  schemaVersion: "mira.learning.progression.v1",
+  curriculumVersion: "primary-progressive.v1",
+  granularity: "skill_boundary",
+  skillId: "chinese.pinyin.initials",
+  sequence: 2,
+  learningStatus: "locked",
+  canStart: false,
+  blockedBySkillIds: ["chinese.pinyin.vowels"],
+  message: "先学会单韵母，再来认识声母。",
+};
 
 describe("new shared course start", () => {
   afterEach(cleanup);
   beforeEach(() => { startLearningCourse.mockReset(); });
+
+  it.each([
+    lockedProgression,
+    { ...lockedProgression, learningStatus: "available" as const },
+    { ...lockedProgression, canStart: true },
+    { ...lockedProgression, canResume: true },
+  ])("keeps a locked or disallowed new course from creating a task", (progression) => {
+    const navigate = vi.fn();
+    render(<LearningCourseStartButton courseId="course-1" version="2" progression={progression} navigate={navigate} />);
+    const button = screen.getByRole("button", { name: "暂未解锁" });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("aria-description", lockedProgression.message);
+    fireEvent.click(button);
+    expect(startLearningCourse).not.toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it("shows the backend prerequisite reason if progression changed after loading", async () => {
+    startLearningCourse.mockRejectedValue(Object.assign(new Error(lockedProgression.message), {
+      status: 409,
+      code: "learning_prerequisite_required",
+    }));
+    render(<LearningCourseStartButton courseId="course-1" version="2" />);
+    fireEvent.click(screen.getByRole("button", { name: "开始上课" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(lockedProgression.message);
+  });
 
   it("locks repeated clicks while creating a task and navigates to the existing classroom document", async () => {
     let complete!: (value: typeof response) => void;

@@ -1,0 +1,241 @@
+diff --git a/lib/server/mira-formal-visual-review.ts b/lib/server/mira-formal-visual-review.ts
+--- a/lib/server/mira-formal-visual-review.ts
++++ b/lib/server/mira-formal-visual-review.ts
+@@ -62,7 +62,9 @@
+   > = [];
+   content.push({
+     type: 'text',
+-    text: JSON.stringify({ rubric: VISUAL_RUBRIC, gradeBoundary: input.gradeBoundary }),
++    text: JSON.stringify({ snapshotSha256: input.snapshotSha256,
++      teachingQualityContextSha256: input.teachingQualityContextSha256,
++      rubric: VISUAL_RUBRIC, gradeBoundary: input.gradeBoundary }),
+   });
+   let bytes = 0;
+   const seen = new Set<string>();
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -1,3 +1,4 @@
++import { visualPredispatchRecovery } from './mira-formal-visual-predispatch';
+ import { reviewFormalVisualSnapshot } from './mira-formal-visual-review';
+ import { VISUAL_RUBRIC_VERSION, assertVisualReview, type VisualReviewReceipt } from './mira-formal-visual-contract';
+ import { mkdir, open, readFile, rename } from 'node:fs/promises';
+@@ -231,7 +232,9 @@
+     ...(input.interactionDesign ? { interactionDesignContextSha256: qualitySha(input.interactionDesign) } : {}),
+     ...(playfulContextSha256 ? { playfulContextSha256 } : {}),
+     ...(input.difficultyPolicy ? { difficultyPolicySha256: qualitySha(input.difficultyPolicy) } : {}) };
++  const predispatch = visualPredispatchRecovery(qualitySha(identity), snapshotSha256);
+   const grant = deps.approvedReviewGrant;
++  if (predispatch && (grant || deps.cachedOnly)) throw new Error('FORMAL_QUALITY_PREDISPATCH_MIXED_RECOVERY');
+   if (grant) assertGrantBinding(grant, identity, snapshotSha256);
+   const folder = join(resolve(deps.cacheRoot ?? 'data/formal-quality-reviews'), qualitySha(identity));
+   if (playfulContextSha256) {
+@@ -302,7 +305,10 @@
+       finally { await claim.close(); }
+     }
+     const existingAttempt = attempts.find(item => object(item) && item.snapshotSha256 === snapshotSha256);
+-    if (existingAttempt && !recheckUnsent && !grant)
++    if (predispatch && (qualitySha(attempts) !== predispatch.priorAttemptsSha256
++        || !object(existingAttempt) || existingAttempt.status !== 'failed' || cached !== undefined))
++      throw new Error('FORMAL_QUALITY_PREDISPATCH_HISTORY_CHANGED');
++    if (existingAttempt && !recheckUnsent && !grant && !predispatch)
+       throw new Error('FORMAL_QUALITY_PRIOR_ATTEMPT_UNRESOLVED');
+     if (!observationMode && !recheckUnsent && !grant && attempts.length >= MIRA_TEACHING_QUALITY_POLICY.maxReviewAttempts)
+       throw new Error('FORMAL_QUALITY_REPAIR_BUDGET_EXHAUSTED');
+@@ -318,9 +324,12 @@
+       await save(join(folder, `${snapshotSha256}-browser-rejection-${Date.now()}.json`),
+         { result: cached, browser: priorBrowser, attempt: existingAttempt });
+     }
+-    const artifactPrefix = grant ? `${snapshotSha256}-grant-${qualitySha(grant)}` : snapshotSha256;
++    const artifactPrefix = predispatch ? `${snapshotSha256}-predispatch-${predispatch.evidenceSha256}`
++      : grant ? `${snapshotSha256}-grant-${qualitySha(grant)}` : snapshotSha256;
+     const attempt = (recheckUnsent ? existingAttempt :
+       { snapshotSha256, status: 'started', startedAt: Date.now(),
++        ...(predispatch ? { predispatchRecoverySha256: predispatch.evidenceSha256, artifactPrefix,
++          priorAttemptsSha256: predispatch.priorAttemptsSha256 } : {}),
+         ...(grant ? { grantId: grant.grantId, approvalRef: grant.approvalRef, artifactPrefix,
+           priorAttemptsSha256: grant.priorAttemptsSha256 } : {}) }) as JsonRecord;
+     if (recheckUnsent) attempt.browserRecheckedAt = Date.now();
+@@ -446,7 +455,7 @@
+       await save(join(folder, `${artifactPrefix}.json`), stored);
+       // Only an actual valid pass can become the canonical cache used by the
+       // remaining audio/publication tail. Failed old evidence is never relabeled.
+-      if (grant && result.status === 'passed') await save(resultPath, stored);
++      if ((grant || predispatch) && result.status === 'passed') await save(resultPath, stored);
+       await save(ledgerPath, attempts);
+       return { ...result, remainingReviewAttempts: remainingAttempts(attempts.length),
+         reviewAttemptLimitEnabled: !observationMode };
+diff --git a/scripts/recover-formal-saved-stage.ts b/scripts/recover-formal-saved-stage.ts
+--- a/scripts/recover-formal-saved-stage.ts
++++ b/scripts/recover-formal-saved-stage.ts
+@@ -35,6 +35,7 @@
+ import { MIRA_FORMAL_MATH_TTS_PRONUNCIATION_POLICY, prepareMiraMathTtsPronunciation } from '../lib/server/mira-formal-math-pronunciation';
+ import type { FormalQualityReviewGrant } from '../lib/server/mira-formal-teaching-quality';
+ import { claimUnsentBrowserRecheck } from '../lib/server/mira-formal-browser-recheck';
++import { proveVisualPredispatchRecovery, claimVisualPredispatchRecovery, withVisualPredispatchRecovery } from '../lib/server/mira-formal-visual-predispatch';
+ import { parsePaidBudget, withPaidBudget } from '../lib/server/mira-paid-budget';
+ import { revalidateSavedAsrComparison, readValidatedAsrComparison,
+   normalizeAsrComparisonReferences, asrComparisonClaimSha256,
+@@ -234,7 +235,7 @@
+ 
+ async function main() {
+   const [mode, manifestPath, ...extraArgs] = process.argv.slice(2);
+-  if (!['prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
++  if (!['prepare-visual-predispatch-recovery', 'complete-visual-predispatch-recovery', 'prepare', 'inspect', 'complete', 'complete-learner-discussion-repair', 'complete-learner-discussion-response-recovery', 'complete-learner-discussion-review', 'complete-learner-discussion-audio-tail', 'inspect-learner-discussion-audio-tail', 'complete-browser-recheck', 'diagnose-audio', 'repair-audio', 'complete-audio-tail',
+     'prepare-english-language-repair','repair-english-language-audio',
+     'prepare-english-repair-diagnostic', 'diagnose-english-repair-audio',
+     'revalidate-audio-comparison', 'complete-audio-comparison-tail'].includes(mode) || !manifestPath)
+@@ -271,6 +272,19 @@
+   const snapshotSha256 = qualitySha(qualitySnapshot(prepared.stage, prepared.scenes));
+   const identity = { sourceJobSha256: sha(source), sourceSnapshotSha256: manifest.sourceSnapshotSha256,
+     repairSnapshotSha256: snapshotSha256, sessionId: prepared.sessionId, stageId: prepared.stage.id };
++  const visualPredispatchMode = ['prepare-visual-predispatch-recovery','complete-visual-predispatch-recovery'].includes(mode);
++  if (visualPredispatchMode !== (manifest.visualPredispatchEvidencePath !== undefined))
++    throw new Error('SAVED_STAGE_VISUAL_PREDISPATCH_MODE_INVALID');
++  if (visualPredispatchMode && (completionTailPath || manifest.reviewGrantPath || manifest.asrSourceRequestId
++      || manifest.ttsSourceRequestId || manifest.browserRecheck || manifest.audioRepair || manifest.asrComparisonRevalidation))
++    throw new Error('SAVED_STAGE_VISUAL_PREDISPATCH_CANNOT_MIX');
++  const visualPredispatch = visualPredispatchMode ? await proveVisualPredispatchRecovery({root:process.cwd(),recoveryFolder:folder,
++    identity,authorizationId:parsePaidBudget(job.formalInput!.paidBudget).authorizationId,
++    evidencePath:path.resolve(path.dirname(manifestPath),manifest.visualPredispatchEvidencePath)}) : undefined;
++  if (mode==='prepare-visual-predispatch-recovery') {
++    console.log(JSON.stringify({status:'visual_predispatch_recovery_proven',...identity,
++      evidenceSha256:visualPredispatch!.evidenceSha256,providerCalls:0,claimCreated:false}));return;
++  }
+   const runPaidAudio = <T>(operation: 'repair1' | 'pronunciation1' | 'diagnostic1' | 'language1', requestId: string, work: () => Promise<T>) =>
+     withPaidBudget(parsePaidBudget(job.formalInput!.paidBudget),
+       `formal-saved-stage:${job.id}:${identity.sourceJobSha256}:${requestId}:${operation}`, work);
+@@ -523,7 +537,9 @@
+   lease = await acquireFormalQualityLock(path.join(folder, 'active.lock'));
+   let browserRecheckSha256: string | undefined;
+   let learnerDiscussionRepairClaimSha256: string | undefined;
+-  if (learnerDiscussionAudioTail) {
++  if (visualPredispatch) {
++    await claimVisualPredispatchRecovery(visualPredispatch,folder);
++  } else if (learnerDiscussionAudioTail) {
+     await claimLearnerAudioTail(learnerDiscussionAudioTail);
+     learnerDiscussionRepairClaimSha256 = learnerDiscussionAudioTail.priorCompletionClaimSha256;
+   } else if (mode === 'complete-learner-discussion-repair' || responseRecoveryMode) {
+@@ -556,7 +572,7 @@
+         || sha(await fs.readFile(path.join(folder, 'source-job.json'))) !== sha(source)) throw error;
+   }
+   await writeJsonFileAtomic(path.join(folder, `repair-proposal-${snapshotSha256}.json`), proposal);
+-  const completion = await recoverMiraFormalSavedStage(job.formalInput, repair, {
++  const completion = await withVisualPredispatchRecovery(visualPredispatch, () => recoverMiraFormalSavedStage(job.formalInput!, repair, {
+     baseUrl: 'http://127.0.0.1:3100', cachedQualityOnly: !!audioTailReceipt,
+     asrComparisonRevalidation,
+     approvedReviewGrant,
+@@ -566,7 +582,7 @@
+     learnerDiscussionResponseRecovery: manifest.learnerDiscussionResponseRecovery,
+     learnerDiscussionReviewGrant: manifest.learnerDiscussionReviewGrant,
+     onProgress: progress => { console.log(JSON.stringify(progress)); },
+-  }).catch(async error => {
++  })).catch(async error => {
+     if (learnerDiscussionAudioTail) {
+       const file = await fs.open(path.join(folder, 'learner-discussion-audio-tail-failure.json'), 'wx', 0o600);
+       try {
+@@ -582,7 +598,8 @@
+       qualitySha(englishPronunciationRepairs)) throw new Error('SAVED_STAGE_ENGLISH_REPAIR_CHANGED_DURING_COMPLETION');
+   const receipt = { ...identity, kind: 'operator_saved_stage_repair', originalSessionStatus: prepared.originalSessionStatus,
+     recoveryId: `omsaved_${qualitySha(identity).slice(0, 24)}`, completedAt: new Date().toISOString(),
+-    newAgentSessions: 0, newSearches: 0, ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}),
++    newAgentSessions: 0, newSearches: 0,
++    ...(visualPredispatch ? {visualPredispatchRecoverySha256:visualPredispatch.evidenceSha256} : {}), ...(reviewGrantSha256 ? { reviewGrantSha256 } : {}),
+     ...(completionTailBudget ? { completionTailGrantSha256: completionTailBudget.receiptSha256 } : {}),
+     ...(completion.learnerDiscussionRepair ? { learnerDiscussionRepair: completion.learnerDiscussionRepair } : {}),
+     ...(completion.learnerDiscussionAudioTail ? { learnerDiscussionAudioTail: completion.learnerDiscussionAudioTail } : {}),
+diff --git a/lib/server/mira-formal-visual-predispatch.ts b/lib/server/mira-formal-visual-predispatch.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-visual-predispatch.ts
+@@ -0,0 +1,90 @@
++/** One audited recovery of English1's snapshot identity collision, never a paid retry. */
++import { AsyncLocalStorage } from 'node:async_hooks';
++import { createHash } from 'node:crypto';
++import { readFile, readdir, open, lstat } from 'node:fs/promises';
++import { join } from 'node:path';
++import { qualitySha } from './mira-formal-quality-contract';
++import { readBrowserRecheckBudget } from './mira-formal-browser-recheck';
++
++const TARGET = '278de60ab4580431b84b6b8fe656a82cc25b4b8409871857a8217f172ece6983';
++const SOURCE = 'ce327bcb84a0836065def3bc20fcfe62ede100a099be5194df5b4c8014c2d8a9';
++const JOB = 'omformal_35329ccda267db6155963636';
++const AUTH = 'd8eca649c6be4ccb5d19b8422b1333253d76bef3ef0b555b7027efb6471f74fc';
++const REVIEW = '550b7f32a490d9374d2291c2de3077712d1e491819c1e771e03b0ec2aa9b382b';
++const bytesSha = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
++const context = new AsyncLocalStorage<Proof>();
++const validated = new WeakSet<object>();
++const proofInputs = new WeakMap<object, Parameters<typeof proveVisualPredispatchRecovery>[0]>();
++type Identity = {sourceJobSha256:string; sourceSnapshotSha256:string; repairSnapshotSha256:string; sessionId:string; stageId:string};
++type Proof = { evidence: any; evidenceSha256: string; identity: Identity; reviewIdentitySha256:string; priorAttemptsSha256:string };
++function require(value: unknown): asserts value { if (!value) throw new Error('SAVED_STAGE_VISUAL_PREDISPATCH_NOT_PROVEN'); }
++async function json(path:string) { return JSON.parse(await readFile(path,'utf8')); }
++async function files(path:string) { try { return await readdir(path); } catch(e) { if((e as NodeJS.ErrnoException).code==='ENOENT') return []; throw e; } }
++
++export async function proveVisualPredispatchRecovery(args:{root:string;recoveryFolder:string;identity:Identity;authorizationId:string;evidencePath:string}) {
++  const {root,recoveryFolder,identity}=args;
++  const stat=await lstat(args.evidencePath);
++  require(stat.isFile()&&!stat.isSymbolicLink()&&stat.size<2_000_000);
++  const evidence=await json(args.evidencePath);
++  require(evidence.schemaVersion==='mira.english1.visual-predispatch-recovery.v1'
++    &&evidence.jobId===JOB&&args.authorizationId===AUTH&&evidence.authorizationId===AUTH
++    &&identity.repairSnapshotSha256===TARGET&&qualitySha(evidence.identity)===qualitySha(identity)
++    &&identity.sourceJobSha256==='9229b9a216abfaa5e7b30a87140e758a7b2d67186843f5fef1c06d8b7f0e1ab1'
++    &&identity.sessionId==='miraformal_232f8120d6c3b73196ccc60b06740e695fe52d97db911af5ca282f05fb4f645e'
++    &&identity.stageId==='stage-McsF1obUqo'&&evidence.error==='MIRA_PAID_BUDGET_DISPATCH_ALREADY_CLAIMED'
++    &&typeof evidence.failureLog==='string'&&evidence.failureLog.trim().endsWith(evidence.error)
++    &&bytesSha(Buffer.from(evidence.failureLog))===evidence.failureLogSha256);
++  const claimRaw=await readFile(join(recoveryFolder,`complete-${TARGET}.claim`));
++  const claim=JSON.parse(claimRaw.toString('utf8'));const claimAt=Date.parse(claim.createdAt);
++  require(bytesSha(claimRaw)===evidence.priorClaimSha256&&Number.isSafeInteger(claimAt)
++    &&Object.entries(identity).every(([k,v])=>claim[k]===v)&&!claim.reviewGrantSha256
++    &&!(await files(recoveryFolder)).includes('completion.json'));
++  const folder=join(root,'data/formal-quality-reviews',REVIEW);
++  const attempts=await json(join(folder,'attempts.json'));
++  const selected=attempts.filter((a:any)=>a.snapshotSha256===TARGET);
++  require(qualitySha(attempts)===evidence.priorAttemptsSha256&&selected.length===1&&selected[0].status==='failed'
++    &&selected[0].startedAt>=claimAt&&!selected[0].artifactPrefix&&!selected[0].grantId);
++  const inputRaw=await readFile(join(folder,`${TARGET}-input.json`));const input=JSON.parse(inputRaw.toString());
++  require(bytesSha(inputRaw)===evidence.priorInputSha256&&qualitySha(input.snapshot)===TARGET
++    &&input.sessionId===identity.sessionId&&input.stageId===identity.stageId);
++  const current=await json(join(folder,`${TARGET}-browser.json`));
++  const previous=await json(join(folder,`${SOURCE}-browser.json`));
++  require(qualitySha(current)===evidence.browserSha256&&current.length===16&&previous.length===16
++    &&current.every((a:any,i:number)=>a.passed===true&&previous[i].passed===true
++      &&a.sceneId===previous[i].sceneId&&qualitySha(a.viewport)===qualitySha(previous[i].viewport)
++      &&a.screenshotSha256===previous[i].screenshotSha256));
++  const visual=await json(join(folder,`${SOURCE}-visual.json`));
++  const {receiptSha256,...unsigned}=visual;
++  require(qualitySha(unsigned)===receiptSha256&&receiptSha256===evidence.sourceVisualReceiptSha256
++    &&visual.status==='passed'&&visual.snapshotSha256===SOURCE);
++  const targetFiles=await files(folder);
++  require(!targetFiles.includes(`${TARGET}.json`)
++    &&!targetFiles.some(name=>name.startsWith(TARGET)&&/(?:provider|dispatch|visual|predispatch)/.test(name))
++    &&(await files(join(root,'data/formal-visual-provider-responses',TARGET))).length===0);
++  const r=evidence.collisionReservation;
++  require(r.id==='b674d1c68c002534b5006bba33d76274a578a9ed68f1409f65324a483f414731'
++    &&r.authorization_id===AUTH&&r.state==='settled'
++    &&r.request_sha256==='36b6eb4caf8a1e3d9777f43954999c69c72be9c30ccd99844ef4adbb3b56d335'
++    &&r.dispatch_id==='runtime:033c582d30915a354ea5417b30d5ddc9f6b50c06f5dd6b08265f4a781185f303'
++    &&r.dispatched_at<r.settled_at&&r.settled_at<claimAt);
++  const budget=await readBrowserRecheckBudget(AUTH);
++  require(budget.authorizationId===AUTH&&budget.purpose==='production'&&budget.unsettledReservationCount===0
++    &&Number.isSafeInteger(budget.latestProviderDispatchAt)&&budget.latestProviderDispatchAt<claimAt);
++  const proof={evidence,evidenceSha256:qualitySha(evidence),identity,reviewIdentitySha256:REVIEW,priorAttemptsSha256:evidence.priorAttemptsSha256};
++  validated.add(proof);proofInputs.set(proof,args);return proof;
++}
++export async function claimVisualPredispatchRecovery(proof:Proof,folder:string) {
++  require(validated.has(proof));
++  const args=proofInputs.get(proof);require(args&&args.recoveryFolder===folder);
++  const fresh=await proveVisualPredispatchRecovery(args);
++  require(fresh.evidenceSha256===proof.evidenceSha256&&qualitySha(fresh.identity)===qualitySha(proof.identity));
++  const f=await open(join(folder,`complete-${TARGET}-visual-predispatch.claim`),'wx',0o600);
++  try {await f.writeFile(JSON.stringify({...proof.evidence,evidenceSha256:proof.evidenceSha256,createdAt:new Date().toISOString(),pid:process.pid}));await f.sync();}finally{await f.close();}
++}
++export function withVisualPredispatchRecovery<T>(proof:Proof|undefined,work:()=>T):T {
++  if(!proof)return work();require(validated.has(proof));return context.run(proof,work);
++}
++export function visualPredispatchRecovery(identitySha:string,snapshotSha:string) {
++  const proof=context.getStore();if(!proof)return undefined;
++  require(validated.has(proof)&&identitySha===proof.reviewIdentitySha256&&snapshotSha===TARGET);return proof;
++}

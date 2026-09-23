@@ -64,6 +64,7 @@ class OpenMaicRuntimeEventService:
         task_runtime_service: Any | None = None,
         budget_service: Any | None = None,
         teaching_conversation_reader: Any | None = None,
+        classroom_reader: Any | None = None,
         clock: Callable[[], int] = now_ms,
     ):
         self.repository = repository
@@ -71,6 +72,7 @@ class OpenMaicRuntimeEventService:
         self.task_runtime_service = task_runtime_service
         self.budget_service = budget_service
         self.teaching_conversation_reader = teaching_conversation_reader
+        self.classroom_reader = classroom_reader
         self.clock = clock
 
     def status(
@@ -144,9 +146,24 @@ class OpenMaicRuntimeEventService:
             completed = (stream or {}).get("completed_at") is not None
             scene_count = int(evidence.get("scene_count") or 0)
             action_scene_count = int(evidence.get("action_scene_count") or 0)
-            interaction_objectives = self._interaction_objectives(authority)
+            interaction_objectives = self._participation_objectives(authority)
             interaction_evidence = self._interaction_evidence(conn, authority=authority) if interaction_objectives else []
             completed_interactions = self._completed_interactions(interaction_objectives, interaction_evidence)
+            resume_row = self.repository.learning_session_resume_scene(
+                conn, family_id=str(authority["family_id"]), child_id=str(authority["child_id"]),
+                learning_session_id=str(authority["learning_session_id"]),
+                runtime_classroom_id=str(authority["runtime_classroom_id"]),
+                release_id=str(authority["candidate_release_id"]),
+                target_fingerprint=str(authority["candidate_target_fingerprint"]),
+            )
+            resume_scene = None
+            if resume_row is not None:
+                index = resume_row.get("scene_index")
+                if (not isinstance(index, int) or isinstance(index, bool)
+                        or not 0 <= index < expected_scene_count
+                        or resume_row.get("scene_id") != expected_scenes[index]["sceneId"]):
+                    raise ApiError("runtime_event_resume_invalid", "保存的学习位置与当前课堂不一致", 503)
+                resume_scene = {"sceneIndex": index, "sceneId": expected_scenes[index]["sceneId"]}
             completion_ready = bool(
                 not completed
                 and scene_count == expected_scene_count
@@ -174,6 +191,7 @@ class OpenMaicRuntimeEventService:
                 "answeredQuestionIds": answered_question_ids,
                 "completionReady": completion_ready,
                 "completedInteractionObjectiveIndexes": sorted(completed_interactions),
+                "resumeScene": resume_scene,
                 "completedActionSceneIds": self.repository.learning_session_completed_action_scene_ids(
                     conn, family_id=str(authority["family_id"]), child_id=str(authority["child_id"]),
                     learning_session_id=str(authority["learning_session_id"]),
@@ -307,7 +325,7 @@ class OpenMaicRuntimeEventService:
                 event=event,
                 expected_scenes=expected_scenes,
             )
-            objectives = self._interaction_objectives(authority)
+            objectives = self._participation_objectives(authority)
             if event["type"] == "interaction_completed":
                 matched = next((item for item in objectives if item["objectiveIndex"] == event["payload"]["objectiveIndex"]), None)
                 if matched is None or not self._operation_matches(matched, event["payload"]):
@@ -508,12 +526,17 @@ class OpenMaicRuntimeEventService:
         )
         if grade_revision < 1:
             raise self._release_not_ready()
-        # A new, supported grade must still invalidate the former grade's
-        # frozen classroom. This unlocked snapshot is only an early rejection;
-        # matching identities remain subject to the locked authority checks.
-        if subject.get("binding_grade_code") and (
-            str(subject["binding_grade_code"]) != grade_code
-            or self._positive_integer(subject.get("binding_grade_revision")) != grade_revision
+        # New plans bind the current grade revision; legacy active pointers
+        # retain their own immutable history/revision authority below.
+        binding_kind = str(subject.get("binding_authority_kind") or "")
+        binding_grade = str(subject.get("binding_grade_code") or "")
+        prior_fine_grade = (binding_kind == "progressive_course"
+            and re.fullmatch(r"primary_[1-6]", binding_grade) is not None
+            and binding_grade < grade_code)
+        if binding_grade and (
+            (binding_grade != grade_code and not prior_fine_grade)
+            or (binding_kind in {"progressive_plan", "progressive_course"}
+                and self._positive_integer(subject.get("binding_grade_revision")) != grade_revision)
         ):
             raise self._release_not_ready()
 
@@ -556,15 +579,19 @@ class OpenMaicRuntimeEventService:
         ):
             raise self._release_not_ready()
 
-        if str(subject.get("binding_authority_kind") or "") in {
+        if prior_fine_grade and (session.get("status") != "in_progress"
+                or session.get("completed_at") is not None):
+            raise self._release_not_ready()
+        if binding_kind in {
             "active_pointer",
             "progressive_plan",
+            "progressive_course",
         }:
             return self._lock_immutable_formal_binding_authority(
                 conn,
                 subject=subject,
                 child=child,
-                grade_code=grade_code,
+                grade_code=binding_grade if binding_kind == "progressive_course" else grade_code,
                 runtime_session_id=runtime_session_id,
                 learning_session_id=learning_session_id,
                 upstream_classroom_id=upstream_classroom_id,
@@ -716,6 +743,34 @@ class OpenMaicRuntimeEventService:
             grade_code=grade_code,
         ):
             raise self._release_not_ready()
+        if subject.get("binding_authority_kind") == "progressive_course":
+            from repositories.progressive_formal_course_repository import progressive_formal_authority
+            course = conn.execute(
+                "SELECT * FROM learning_courses WHERE id = ? AND version = ? LIMIT 1",
+                (course_id, course_version),
+            ).fetchone()
+            published = progressive_formal_authority(
+                conn, database=self.repository.database, child=child, course=course,
+                runtime_classroom_id=str(subject.get("runtime_classroom_id") or ""),
+            ) if course is not None else None
+            if published is None or any(
+                str(published.get(field) or "") != str(expected or "") for field, expected in (
+                    ("authority_kind", "progressive_course"),
+                    ("release_id", subject.get("binding_release_id")),
+                    ("target_fingerprint", subject.get("binding_target_fingerprint")),
+                    ("publication_contract_version", FORMAL_PUBLICATION_CONTRACT_VERSION),
+                    ("runtime_binding_contract_version", subject.get("binding_runtime_contract_version")),
+                    ("build_item_id", subject.get("binding_build_item_id")),
+                    ("binding_grade_code", grade_code),
+                    ("grade_selection_revision", child.get("grade_selection_revision")),
+                    ("course_id", course_id), ("course_version", course_version),
+                    ("package_id", package_id), ("package_version", package_version),
+                    ("package_content_hash", subject.get("binding_package_content_hash")),
+                    ("runtime_classroom_id", subject.get("runtime_classroom_id")),
+                    ("upstream_classroom_id", upstream_classroom_id),
+                )
+            ):
+                raise self._release_not_ready()
         return authority
 
     @classmethod
@@ -1030,6 +1085,20 @@ class OpenMaicRuntimeEventService:
         binding_grade_revision = cls._positive_integer(
             subject.get("binding_grade_revision")
         )
+        if authority_kind == "progressive_course":
+            # This shape is only admission to the shared full publication gate
+            # in _lock_immutable_formal_binding_authority, never a replacement.
+            return bool(
+                not str(subject.get("binding_history_id") or "")
+                and cls._positive_integer(subject.get("binding_pointer_revision")) == 0
+                and not str(subject.get("binding_plan_id") or "")
+                and not str(ownership.get("binding_history_id") or "")
+                and cls._positive_integer(ownership.get("binding_pointer_revision")) == 0
+                and not str(ownership.get("binding_plan_id") or "")
+                and binding_grade_revision >= 1
+                and binding_grade_revision == cls._positive_integer(child.get("grade_selection_revision"))
+                and cls._positive_integer(ownership.get("binding_grade_revision")) == binding_grade_revision
+            )
         return bool(
             authority_kind == "progressive_plan"
             and not str(subject.get("binding_history_id") or "")
@@ -1282,7 +1351,7 @@ class OpenMaicRuntimeEventService:
             conn,
             authority=authority,
         )
-        objectives = self._interaction_objectives(authority)
+        objectives = self._participation_objectives(authority)
         completed_operations = self._completed_interactions(objectives, self._interaction_evidence(conn, authority=authority)) if objectives else set()
         if (
             len(completed_operations) != len(objectives)
@@ -1344,6 +1413,25 @@ class OpenMaicRuntimeEventService:
         except (ValueError, TypeError, KeyError) as exc:
             raise ApiError("runtime_event_authority_invalid", "课程互动合同与已发布版本不一致", 409) from exc
 
+    def _participation_objectives(self, authority: Mapping[str, Any]) -> list[dict[str, Any]]:
+        objectives = self._interaction_objectives(authority)
+        if not objectives or self.classroom_reader is None:
+            return objectives
+        from services.openmaic_student_participation import reviewed_controls
+        from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
+        manifest = authority["feature_manifest_json"]
+        if isinstance(manifest, str):
+            manifest = json.loads(manifest)
+        try:
+            controls = reviewed_controls(classroom_id=str(authority["upstream_classroom_id"]),
+                content_sha256=str(manifest["classroomContentSha256"]),
+                objectives=objectives, reader=self.classroom_reader)
+        except OpenMaicFullRuntimeError as exc:
+            raise ApiError("runtime_event_classroom_unavailable", "课堂操作内容暂时无法读取，请稍后重试", 503) from exc
+        except (ValueError, KeyError, TypeError) as exc:
+            raise ApiError("runtime_event_authority_invalid", "课堂操作内容与已发布版本不一致", 409) from exc
+        return [{**item, "participationControls": controls[item["objectiveIndex"]]} for item in objectives]
+
     @staticmethod
     def _operation_matches(objective: Mapping[str, Any], payload: Mapping[str, Any]) -> bool:
         # Publication examples prove the widget works; they are not the one
@@ -1353,10 +1441,11 @@ class OpenMaicRuntimeEventService:
         text, value = payload.get("feedbackText"), payload.get("value")
         return bool(payload.get("objectiveIndex") == objective["objectiveIndex"]
             and payload.get("sceneId") == operation["sceneId"]
-            and payload.get("controlSelector") == operation["controlSelector"]
-            and payload.get("action") == operation["action"]
+            and any(payload.get("controlSelector") == control["controlSelector"]
+                and payload.get("action") == control["action"]
+                for control in objective.get("participationControls", [operation]))
             and isinstance(value, str) and len(value) <= 500
-            and (operation["action"] != "click" or value == "")
+            and (payload.get("action") != "click" or value == "")
             and isinstance(text, str) and bool(text.strip()) and len(text) <= 2000)
 
     @classmethod
@@ -1584,7 +1673,31 @@ class OpenMaicRuntimeEventService:
                     "questionIds": normalized_question_ids,
                 }
             )
-        if len(question_ids) != 4 or len(set(question_ids)) != 4:
+        generation = manifest.get("generationContract")
+        brief = generation.get("teachingBrief") if isinstance(generation, Mapping) else None
+        progressive = (isinstance(brief, Mapping) and brief.get("schemaVersion")
+            == "mira.learning.formal-runtime-teaching-brief.progressive.v1")
+        if progressive:
+            # Reuse launch's registry-bound, answer-blind question contract.
+            # New lessons have their own guided/independent counts (or observed
+            # assessment); scene events must cover exactly those frozen IDs.
+            from services.openmaic_full_runtime_service import OpenMaicFullRuntimeService
+            try:
+                expected_ids = [question["id"] for question in
+                    OpenMaicFullRuntimeService._formal_runtime_assessment_contract(generation)]
+                course = brief.get("course")
+                exact_course = isinstance(course, Mapping) and all(
+                    course.get(field) == authority.get(source) for field, source in (
+                        ("id", "session_course_id"), ("version", "session_course_version"),
+                        ("gradeCode", "course_grade_code"), ("subject", "course_subject"),
+                        ("skillId", "course_node_code")))
+                questions_valid = (exact_course and question_ids == expected_ids
+                    and formal_evidence.get("assessmentQuestionIds") == expected_ids)
+            except (ApiError, TypeError, ValueError, KeyError):
+                questions_valid = False
+        else:
+            questions_valid = len(question_ids) == 4 and len(set(question_ids)) == 4
+        if not questions_valid:
             raise ApiError(
                 "runtime_event_authority_invalid",
                 "正式课堂的事件权威合同无效",

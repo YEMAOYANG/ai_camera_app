@@ -81,8 +81,15 @@
 .space-course-info > p { grid-column: 1 / -1; font-size: 16px; color: #b6c5d9; line-height: 1.6; min-height: 0; margin: 0; }
 .space-course-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; font-size: 14px; color: #c2cee0; line-height: 1.6; }
 .space-course-readiness { text-align: right; margin-top: 0; display: block; color: #92bad0; font-size: 14px; line-height: 1.6; }
+.space-course-progression { text-align: left; }
 .space-course-footer { grid-column: 1 / -1; padding-top: 4px; display: flex; align-items: center; min-height: 48px; }
 .space-course-footer > a { width: 100%; }
+.space-course-group { grid-column: 1 / -1; width: 100%; border-top: 1px solid #ffffff24; padding-top: 8px; }
+.space-course-group summary { cursor: pointer; min-height: 44px; padding: 10px 0; color: #d8e5f6; font-size: 15px; }
+.space-course-group > p { font-size: 14px; color: #c2cee0; }
+.space-course-group ul { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 12px; }
+.space-course-group li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; }
+.space-course-group li > a { padding: 10px 0; }
 .space-favorite { display: inline-grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; border: 1px solid #ffffff40; background: #081321b8; color: #d4dfed; transition: color 150ms, border-color 150ms; }
 .space-favorite:hover, .space-favorite.is-active { color: #d8ff66; border-color: #d8ff6677; }
 .space-favorite:disabled { opacity: .65; cursor: wait; }
@@ -224,7 +231,7 @@
   .space-library-page .space-progress { grid-column: 2; grid-row: 2; margin: 0; width: 100%; }
   .space-library-page .space-progress-caption { grid-column: 2; grid-row: 3; margin: 0; }
   .space-library-page .space-inline-actions { grid-column: 3; grid-row: 1 / 4; gap: 10px; }
-  .space-library-page .space-course-info > p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .space-library-page .space-course-info > p:not(.space-course-progression) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 }
 @media (min-width: 761px) {
   .space-qr > div:nth-child(2) > div:has(.space-qr-code) { display: grid; grid-template-columns: 212px minmax(0, 1fr); align-items: center; gap: 8px 12px; text-align: left; width: 100%; }

@@ -7,6 +7,7 @@ import {
   Clock3,
   Heart,
   LoaderCircle,
+  LockKeyhole,
   RotateCcw,
   Sparkles,
 } from "lucide-react";
@@ -19,6 +20,8 @@ import { SpaceCourseArt } from "@/components/student/space-course-art";
 import { DocumentLink } from "@/components/navigation/document-link";
 import { Button } from "@/components/ui/button";
 import { LearningCourseStartButton } from "@/features/learning/learning-course-start-button";
+import { LearningProgressionNote, learningProgressionCanResume, learningProgressionLocked } from "@/features/learning/learning-progression";
+import { groupLearningLibraryItems, learningLibraryCourseKey, learningLibraryGroupKey, type LearningLibraryGroup } from "./learning-library-groups";
 import {
   getLearningLibrary,
   setLearningFavorite,
@@ -138,22 +141,24 @@ export function LearningLibrary({
     };
   }, [bucket, subject]);
 
-  async function toggleFavorite(item: LearningLibraryItem) {
+  async function toggleFavorite(group: LearningLibraryGroup) {
     if (favoriteBusy) return;
-    setFavoriteBusy(item.course.id);
+    setFavoriteBusy(group.key);
     setError("");
     try {
-      const result = await setLearningFavorite(item.course.id, item.course.version, !item.favorite);
-      if (result.favorite) setFavoritePulse(current => ({ courseId: item.course.id, sequence: (current?.sequence ?? 0) + 1 }));
+      const favorite = !group.items.some(item => item.favorite);
+      const courses = new Map(group.items.map(item => [learningLibraryCourseKey(item), item]));
+      await Promise.all([...courses.values()].map(item => setLearningFavorite(item.course.id, item.course.version, favorite)));
+      if (favorite) setFavoritePulse(current => ({ courseId: group.key, sequence: (current?.sequence ?? 0) + 1 }));
       setData((current) => current ? {
         ...current,
-        continueItem: current.continueItem?.course.id === item.course.id
-          ? { ...current.continueItem, favorite: result.favorite }
+        continueItem: current.continueItem && courses.has(learningLibraryCourseKey(current.continueItem))
+          ? { ...current.continueItem, favorite }
           : current.continueItem,
-        items: bucket === "favorites" && !result.favorite
-          ? current.items.filter((candidate) => candidate.course.id !== item.course.id)
-          : current.items.map((candidate) => candidate.course.id === item.course.id
-            ? { ...candidate, favorite: result.favorite }
+        items: bucket === "favorites" && !favorite
+          ? current.items.filter((candidate) => !courses.has(learningLibraryCourseKey(candidate)))
+          : current.items.map((candidate) => courses.has(learningLibraryCourseKey(candidate))
+            ? { ...candidate, favorite }
             : candidate),
       } : current);
     } catch (caught) {
@@ -163,17 +168,24 @@ export function LearningLibrary({
     }
   }
 
+  const groups = groupLearningLibraryItems(data?.items ?? []);
   const continuation = data?.continueItem;
-  const visibleItems = data?.items || [];
+  const continuationGroup = continuation ? groupLearningLibraryItems([
+    continuation, ...(groups.find(group => group.key === learningLibraryGroupKey(continuation))?.items ?? []),
+  ])[0] : null;
+  // The continuation already is this lesson's main entrance. Its other sets
+  // and historical sessions remain available in the same expandable group.
+  const visibleGroups = groups.filter(group => group.key !== continuationGroup?.key);
 
   return (
     <SpaceShell student={student} active="learning" className="space-library-page space-explore-library">
       <SpacePageHeading title="我的学习">
+        <Button asChild variant="secondary"><Link href="/learning/path">查看学习路线<ArrowRight className="size-5" aria-hidden="true" /></Link></Button>
         <Button asChild variant="secondary"><Link href="/learning/practice">学过的内容，练一练<ArrowRight className="size-5" aria-hidden="true" /></Link></Button>
       </SpacePageHeading>
 
-      {continuation ? (
-        <ContinueLesson item={continuation} onFavorite={() => void toggleFavorite(continuation)} favoriteBusy={favoriteBusy === continuation.course.id} favoritePulse={favoritePulse?.courseId === continuation.course.id ? favoritePulse.sequence : 0} />
+      {continuationGroup ? (
+        <ContinueLesson group={continuationGroup} onFavorite={() => void toggleFavorite(continuationGroup)} favoriteBusy={favoriteBusy === continuationGroup.key} favoritePulse={favoritePulse?.courseId === continuationGroup.key ? favoritePulse.sequence : 0} />
       ) : null}
 
       <section className="space-library-section" aria-labelledby="course-list-title">
@@ -183,10 +195,10 @@ export function LearningLibrary({
             {(data.learningState?.availabilityStatus ?? data.courseSupply?.availabilityStatus) === "empty"
               ? "课程准备好后就会出现在这里"
               : data.catalogStatus === "preparing"
-                ? `已有 ${data.availableCourseCount} 门可用，新课完成一门就会自动加入`
+                ? `已有 ${groups.length} 节课程，新课准备好后会自动加入`
                 : data.catalogStatus === "failed"
-                  ? `本轮更新未全部完成，现有 ${data.availableCourseCount} 门仍可学习`
-                  : `共 ${data.availableCourseCount} 门课程`}
+                  ? `本轮更新未全部完成，现有课程仍可学习`
+                  : `${data.nextCursor ? "已显示" : "共"} ${groups.length} 节课程`}
           </p> : null}
         </div>
         <div className="space-filter-tabs space-segmented" role="group" aria-label="课程状态筛选">
@@ -206,12 +218,12 @@ export function LearningLibrary({
         </div>
         {loading ? <LearningListLoading /> : null}
         {!loading && error ? <LearningLibraryError message={error} onRetry={load} /> : null}
-        {!loading && !error && visibleItems.length ? (
+        {!loading && !error && visibleGroups.length ? (
           <div className="space-course-grid">
-            {visibleItems.map((item) => <CourseRow key={`${item.taskId || item.course.id}:${item.course.version}`} item={item} makeup={bucket === "makeup"} favoriteBusy={favoriteBusy === item.course.id} favoritePulse={favoritePulse?.courseId === item.course.id ? favoritePulse.sequence : 0} onFavorite={() => void toggleFavorite(item)} />)}
+            {visibleGroups.map((group) => <CourseRow key={group.key} group={group} makeup={bucket === "makeup"} favoriteBusy={favoriteBusy === group.key} favoritePulse={favoritePulse?.courseId === group.key ? favoritePulse.sequence : 0} onFavorite={() => void toggleFavorite(group)} />)}
           </div>
         ) : null}
-        {!loading && !error && !visibleItems.length ? <LearningEmpty bucket={bucket} catalogStatus={data?.catalogStatus} availability={data?.learningState?.availabilityStatus ?? data?.courseSupply?.availabilityStatus} /> : null}
+        {!loading && !error && !groups.length ? <LearningEmpty bucket={bucket} catalogStatus={data?.catalogStatus} availability={data?.learningState?.availabilityStatus ?? data?.courseSupply?.availabilityStatus} /> : null}
       </section>
     </SpaceShell>
   );
@@ -228,7 +240,8 @@ function libraryHasPreparingClassroom(data: LearningLibraryResponse | null) {
     || [data.continueItem, ...data.items].some((item) => item && !item.fullClassroomAvailable);
 }
 
-function ContinueLesson({ item, onFavorite, favoriteBusy, favoritePulse }: { item: LearningLibraryItem; onFavorite: () => void; favoriteBusy: boolean; favoritePulse: number }) {
+function ContinueLesson({ group, onFavorite, favoriteBusy, favoritePulse }: { group: LearningLibraryGroup; onFavorite: () => void; favoriteBusy: boolean; favoritePulse: number }) {
+  const item = group.item;
   const progress = courseProgress(item);
   return (
     <section className="space-continue space-explore-launch" aria-labelledby="continue-title">
@@ -237,42 +250,68 @@ function ContinueLesson({ item, onFavorite, favoriteBusy, favoritePulse }: { ite
         <p className="space-eyebrow"><RotateCcw className="size-5" aria-hidden="true" />{item.course.subjectLabel} · 上次学到这里</p>
         <h2 id="continue-title">{item.course.title}</h2>
         <p className="space-continue-objective">{item.course.objective}</p>
+        <LearningProgressionNote progression={item.progression} />
         <div className="space-progress" role="progressbar" aria-label="课程学习进度" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${progress}%` }} /></div>
         <p className="space-progress-caption">已完成 {progress}%</p>
-        <div className="space-inline-actions"><CourseAction item={item} label="继续上课" /><FavoriteButton item={item} busy={favoriteBusy} pulse={favoritePulse} onClick={onFavorite} /></div>
+        <div className="space-inline-actions"><CourseAction item={item} label="继续上课" /><FavoriteButton item={{ ...item, favorite: group.items.some(member => member.favorite) }} busy={favoriteBusy} pulse={favoritePulse} onClick={onFavorite} /></div>
+        <CourseGroupDetails group={group} />
       </div>
     </section>
   );
 }
 
-function CourseRow({ item, makeup, onFavorite, favoriteBusy, favoritePulse }: { item: LearningLibraryItem; makeup: boolean; onFavorite: () => void; favoriteBusy: boolean; favoritePulse: number }) {
+function CourseRow({ group, makeup, onFavorite, favoriteBusy, favoritePulse }: { group: LearningLibraryGroup; makeup: boolean; onFavorite: () => void; favoriteBusy: boolean; favoritePulse: number }) {
+  const item = group.item;
   const status = courseStatus(item, makeup);
   return (
     <article className={`space-library-course is-${status.kind}`}>
       <div className="space-course-cover space-explore-cover">
         <SpaceCourseArt subject={item.course.subject} className="space-course-cover-art" />
-        <div className="space-course-cover-label"><span>{item.course.subjectLabel}</span><span className={`space-course-status is-${status.kind}`}>{status.kind === "completed" ? <CheckCircle2 aria-hidden="true" /> : <span className="space-status-dot" />}{status.label}</span></div>
-        <FavoriteButton item={item} busy={favoriteBusy} pulse={favoritePulse} onClick={onFavorite} />
+        <div className="space-course-cover-label"><span>{item.course.subjectLabel}</span><span className={`space-course-status is-${status.kind}`}>{status.kind === "completed" ? <CheckCircle2 aria-hidden="true" /> : learningProgressionLocked(item.progression) && !learningProgressionCanResume(item) ? <LockKeyhole aria-hidden="true" /> : <span className="space-status-dot" />}{status.label}</span></div>
+        <FavoriteButton item={{ ...item, favorite: group.items.some(member => member.favorite) }} busy={favoriteBusy} pulse={favoritePulse} onClick={onFavorite} />
       </div>
       <div className="space-course-info">
         <h3><Link className="focus-ring" href={`/learning/${encodeURIComponent(item.course.id)}?version=${encodeURIComponent(item.course.version)}`}>{item.course.title}</Link></h3>
         <p>{item.course.objective}</p>
+        <LearningProgressionNote progression={item.progression} />
         <div className="space-course-meta"><Clock3 className="size-5" aria-hidden="true" />约 {item.course.estimatedMinutes} 分钟{item.scheduledStart ? ` · ${item.scheduledStart}` : ""}</div>
-        {status.kind !== "completed" ? <span className="space-course-readiness">{item.fullClassroomAvailable ? "完整互动课堂已就绪" : "完整课堂准备中"}</span> : null}
+        {status.kind !== "completed" && !learningProgressionLocked(item.progression) ? <span className="space-course-readiness">{item.fullClassroomAvailable ? "完整互动课堂已就绪" : "完整课堂准备中"}</span> : null}
         <div className="space-course-footer">{status.kind === "completed" ? <span className="space-complete-mark"><CheckCircle2 className="size-5" aria-hidden="true" />学完啦</span> : <CourseAction item={item} label={status.kind === "makeup" ? "补上这节课" : undefined} />}</div>
+        <CourseGroupDetails group={group} />
       </div>
     </article>
   );
 }
 
+function CourseGroupDetails({ group }: { group: LearningLibraryGroup }) {
+  if (group.items.length < 2) return null;
+  const setNumbers = new Map([...new Set(group.items.map(learningLibraryCourseKey))].sort().map((key, index) => [key, index + 1]));
+  return <details className="space-course-group">
+    <summary className="focus-ring">{group.exerciseSetCount > 1 ? `${group.exerciseSetCount} 组练习` : "学习记录"}{group.exerciseSetCount > 1 && group.completedExerciseSetCount > 0 ? ` · 已完成 ${group.completedExerciseSetCount} 组` : ""}{group.historyCount > 1 ? ` · ${group.historyCount} 次学习记录` : ""}</summary>
+    <p>同一节课的练习与学习记录保留在这里。</p>
+    <ul>{group.items.map(item => <li key={`${learningLibraryCourseKey(item)}:${item.taskId ?? "catalog"}:${item.session?.id ?? ""}`}>
+      <span>{group.exerciseSetCount > 1 ? `练习 ${setNumbers.get(learningLibraryCourseKey(item))} · ` : ""}{item.session ? `${item.learningDate} · ` : ""}{courseStatus(item).label}</span>
+      {item === group.item ? <span className="space-course-readiness">当前入口</span> : courseStatus(item).kind === "completed"
+        ? <Link className="focus-ring" href={`/learning/${encodeURIComponent(item.course.id)}?version=${encodeURIComponent(item.course.version)}`}>查看课程</Link>
+        : <CourseAction item={item} label={learningProgressionCanResume(item) ? "继续这次学习" : "选择这组练习"} />}
+    </li>)}</ul>
+  </details>;
+}
+
 function CourseAction({ item, label }: { item: LearningLibraryItem; label?: string }) {
+  if (courseStatus(item).kind === "completed") {
+    return <span className="space-complete-mark"><CheckCircle2 className="size-5" aria-hidden="true" />学完啦</span>;
+  }
+  if (learningProgressionLocked(item.progression) && !learningProgressionCanResume(item)) {
+    return <LearningCourseStartButton courseId={item.course.id} version={item.course.version} progression={item.progression} />;
+  }
   if (!item.fullClassroomAvailable) {
     return <span className="space-making-action"><Sparkles className="size-4" />完整课堂准备中</span>;
   }
   if (!item.taskId) {
-    return <LearningCourseStartButton courseId={item.course.id} version={item.course.version} label={label} />;
+    return <LearningCourseStartButton courseId={item.course.id} version={item.course.version} label={label} progression={item.progression} />;
   }
-  return <Button asChild><DocumentLink href={openMaicLessonPath(item.taskId)}>{label || "开始上课"}<ArrowRight className="size-5" /></DocumentLink></Button>;
+  return <Button asChild><DocumentLink href={openMaicLessonPath(item.taskId)}>{label || (learningProgressionCanResume(item) ? "继续上课" : "开始上课")}<ArrowRight className="size-5" /></DocumentLink></Button>;
 }
 
 function FavoriteButton({ item, busy, onClick, pulse }: { item: LearningLibraryItem; busy: boolean; onClick: () => void; pulse: number }) {
@@ -319,6 +358,9 @@ function LearningEmpty({
 
 function courseStatus(item: LearningLibraryItem, forceMakeup = false) {
   if (item.report || item.session?.status === "completed" || item.taskStatus === "completed") return { kind: "completed", label: "已经学完" } as const;
+  if (learningProgressionCanResume(item)) return { kind: "continue", label: "可以继续" } as const;
+  if (learningProgressionLocked(item.progression)) return { kind: "scheduled", label: "暂未解锁" } as const;
+  if (item.progression?.learningStatus === "needs_practice") return { kind: "scheduled", label: "需要巩固" } as const;
   if (forceMakeup || item.taskStatus === "missed") return { kind: "makeup", label: "未完成，待补课" } as const;
   if (item.session?.status === "in_progress" || item.taskStatus === "in_progress") return { kind: "continue", label: "可以继续" } as const;
   return { kind: "scheduled", label: "等待开课" } as const;

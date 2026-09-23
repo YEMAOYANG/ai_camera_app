@@ -18,6 +18,7 @@ SCORED_DETERMINISTIC_TYPES = frozenset(
         "accepted_text",
         "single_choice",
         "sequence",
+        "tap_objects",
     }
 )
 SUPPORTED_QUESTION_TYPES = SCORED_DETERMINISTIC_TYPES
@@ -40,6 +41,7 @@ _NORMALIZATION_OPERATIONS_BY_TYPE = {
     "accepted_text": _SUPPORTED_NORMALIZATION_OPERATIONS
     - {"remove_grouping_separators"},
     "single_choice": frozenset({"trim", "casefold"}),
+    "tap_objects": frozenset({"trim"}),
     "sequence": _SUPPORTED_NORMALIZATION_OPERATIONS
     - {"remove_grouping_separators"},
 }
@@ -101,6 +103,22 @@ class LearningQuestionEvaluator:
             )
         if question_type == "sequence":
             return self._evaluate_sequence(question, evaluation, response, operations)
+        if question_type == "tap_objects":
+            objects = question.get("objects")
+            expected = question.get("answer")
+            if (not isinstance(objects, list) or not objects or len(objects) > 20
+                    or any(not isinstance(item, Mapping) or not isinstance(item.get("id"), str)
+                           or not item["id"] for item in objects)):
+                return self._unsupported("invalid_objects", question_type)
+            identifiers = [item["id"] for item in objects]
+            if (len(set(identifiers)) != len(identifiers) or not isinstance(expected, list)
+                    or any(not isinstance(item, str) for item in expected)
+                    or len(expected) != len(identifiers) or set(expected) != set(identifiers)):
+                return self._unsupported("invalid_expected_answer", question_type)
+            actual = self._sequence_response(response)
+            correct = (isinstance(actual, list) and all(isinstance(item, str) for item in actual)
+                       and len(actual) == len(identifiers) and set(actual) == set(identifiers))
+            return self._scored(question_type, correct, normalized_response=actual)
         return self._unsupported("unsupported_question_type", question_type)
 
     def _evaluate_numeric(

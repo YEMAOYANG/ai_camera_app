@@ -28,6 +28,7 @@ from schemas.learning import (
 )
 from services.auth_service import AuthService
 from services.learning_difficulty import available_skill_order, preferred_difficulty, selection_payload
+from services.learning_progression import course_progression
 from services.formal_student_learning_access import (
     FORMAL_STUDENT_GRADE_CODES,
     assert_formal_student_grade_open,
@@ -110,6 +111,56 @@ class LearningService:
         self.dynamic_pool_target = max(1, int(dynamic_pool_target))
         self.formal_learning_access_checker = formal_learning_access_checker
         self._catalog_ready = False
+        self._progressive_curriculum_enabled = True
+
+    def progressive_service(self):
+        """Keep the versioned lesson graph separate from legacy coarse mastery."""
+        from repositories.progressive_learning_repository import ProgressiveLearningRepository
+        from services.progressive_learning_service import ProgressiveLearningService
+
+        return ProgressiveLearningService(
+            ProgressiveLearningRepository(self.repository.database),
+            course_validator=self._progressive_course_visible,
+        )
+
+    def _progressive_course_visible(self, conn, *, child, course) -> bool:
+        if course.get("grade_code") != child.get("grade_code"):
+            return False
+        visible = self.repository.get_student_visible_course(
+            conn, family_id=child["family_id"], child_id=child["id"],
+            grade_code=str(child["grade_code"]),
+            grade_selection_revision=int(child.get("grade_selection_revision") or 0),
+            course_id=str(course["id"]), course_version=str(course["version"]),
+        )
+        return visible is not None
+
+    def curriculum_path(self, access_token: str, query: dict) -> dict:
+        context = self.auth_service.authenticate(access_token)
+        child_id = self._required_text(query, "childId", "请选择孩子")
+        subject = self._required_text(query, "subject", "请选择学科")
+        with self.repository.transaction() as conn:
+            child = self._child_or_error(conn, context["family"]["id"], child_id)
+            return {"ok": True, **self.progressive_service().get_path(
+                conn, child=child, subject=subject, grade_code=query.get("gradeCode") or None,
+            )}
+
+    def confirm_observed_lesson(self, access_token: str, data: dict) -> dict:
+        context = self.auth_service.authenticate(access_token)
+        if "student" in context:
+            raise ApiError("parent_confirmation_required", "请家长确认实际完成情况", 403)
+        child_id = self._required_text(data, "childId", "请选择孩子")
+        lesson_id = self._required_text(data, "lessonId", "请选择课次")
+        confirmation_id = self._required_text(data, "confirmationId", "缺少确认标识")
+        if type(data.get("confirmed")) is not bool:
+            raise ApiError("invalid_confirmation", "请确认是否已独立完成", 400)
+        with self.repository.transaction() as conn:
+            child = self._child_or_error(conn, context["family"]["id"], child_id)
+            result = self.progressive_service().record_observed_confirmation(
+                conn, child=child, lesson_id=lesson_id,
+                actor_role="parent", actor_id=str(context["user"]["id"]),
+                confirmation_id=confirmation_id, confirmed=data["confirmed"], now=now_ms(),
+            )
+            return {"ok": True, "progress": result}
 
     def today(
         self,
@@ -346,7 +397,7 @@ class LearningService:
                 raise ApiError("not_learning_task", "这个任务不是可授课的学习任务")
             # One stable write order for start and answer: child, task,
             # session, then formal publication authority.
-            self.repository.get_session_for_task(
+            existing_session = self.repository.get_session_for_task(
                 conn,
                 family_id=family_id,
                 task_id=task_id,
@@ -384,8 +435,23 @@ class LearningService:
                 )
             if course is None:
                 raise ApiError("course_version_not_found", "课程版本不存在", 409)
-            if child["grade_code"] != course["grade_code"]:
-                raise ApiError("course_grade_mismatch", "课程与孩子当前年级不匹配", 409)
+            if child["grade_code"] != course["grade_code"] and not (
+                not self.static_catalog_enabled and self._is_progressive_course(course)
+                and self._exact_in_progress_course_session(child=child, course=course,
+                                                          task=task, session=existing_session)
+            ):
+                raise ApiError("course_grade_mismatch", "新课只能学习当前年级的课程，请返回学习路线", 409)
+            if not self.static_catalog_enabled:
+                # A session that was already started keeps its exact course
+                # identity. It cannot authorize a new task or another version.
+                if existing_session is not None:
+                    if any(str(existing_session.get(key) or "") != str(value) for key, value in (
+                        ("child_id", child["id"]), ("course_id", course["id"]),
+                        ("course_version", course["version"]),
+                    )):
+                        raise ApiError("learning_session_course_conflict", "学习任务的课程版本已变化，请重新打开", 409)
+                else:
+                    self.assert_course_progression(conn, child=child, course=course)
             session, created = self.repository.create_or_get_session(
                 conn,
                 family_id=family_id,
@@ -1104,21 +1170,20 @@ class LearningService:
             and [str(question.get("id") or "") for question in questions]
             == [*guided_ids, *independent_ids]
         )
-        evidence_count = 2 if has_lesson_roles else total
+        if self._is_progressive_course(course):
+            steps = content.get("progressiveFlow") or []
+            guided_ids = [step["questionId"] for step in steps
+                          if step.get("phase") == "guided" and step.get("questionId")]
+            independent_ids = [step["questionId"] for step in steps
+                               if step.get("phase") == "independent" and step.get("questionId")]
+            has_lesson_roles = bool(independent_ids)
+        evidence_count = len(independent_ids) if has_lesson_roles else total
         evidence_ids = independent_ids if has_lesson_roles else list(first_attempts)
         independent_correct_count = sum(
             1
             for question_id in evidence_ids
             if isinstance(first_attempts.get(question_id), dict)
             and first_attempts[question_id].get("correct") is True
-        )
-        eventually_correct_ids = {
-            str(item.get("questionId") or "")
-            for item in answers
-            if isinstance(item, dict) and item.get("correct") is True
-        }
-        eventual_independent_correct_count = sum(
-            1 for question_id in evidence_ids if question_id in eventually_correct_ids
         )
         hint_count = sum(
             1
@@ -1149,13 +1214,9 @@ class LearningService:
             ),
         )
         subject_label = SUBJECT_LABELS.get(str(course["subject"]), "本学科")
-        if has_lesson_roles and eventual_independent_correct_count == evidence_count:
+        if has_lesson_roles and independent_correct_count == evidence_count:
             mastery = "mastered"
-            summary = (
-                "两道独立练习首答全对；本结论只代表本课的 2 条学习证据。"
-                if independent_correct_count == evidence_count
-                else "经过提示、再讲和重新验证，两道独立练习都已答对，本能力点已完成当堂闭环。"
-            )
+            summary = "两道独立练习首答全对；本结论只代表本课的 2 条学习证据。"
             next_step = (
                 f"下次{subject_label}练习进入同年级的下一个能力点。"
                 if has_unpracticed_course
@@ -1164,11 +1225,7 @@ class LearningService:
         elif has_lesson_roles and independent_correct_count == 1:
             mastery = "developing"
             summary = "两道独立练习中有 1 道首答正确，目前只有 2 条本课证据，需要巩固。"
-            next_step = (
-                f"下次{subject_label}练习先复习本课错题，再进入未练能力点。"
-                if has_unpracticed_course
-                else "下次先复习本课错题，再按复习日期安排巩固。"
-            )
+            next_step = f"下次{subject_label}练习继续巩固本能力点，独立掌握后再进入下一知识点。"
         elif has_lesson_roles:
             mastery = "needs_practice"
             summary = "两道独立练习首答都未通过，目前只有 2 条本课证据，需要放慢速度巩固。"
@@ -1193,6 +1250,24 @@ class LearningService:
             mastery = "needs_practice"
             summary = f"完成 {total} 道题，目前需要放慢速度巩固基础。"
             next_step = "建议从提示题开始复习，并用同类小题再练一次。"
+
+        if self._is_progressive_course(course):
+            child = self._child_or_error(conn, session["family_id"], session["child_id"])
+            progress = self.progressive_service().record_session_evidence(
+                conn, child=child, course=course, session=session,
+                questions=questions, answers=answers, now=now,
+            )
+            if progress is None:
+                raise ApiError("progressive_course_binding_missing", "课程缺少有效的课次绑定", 409)
+            mastery = "mastered" if progress["mastery_status"] == "mastered" else "needs_practice"
+            summary = (f"已积累 {progress['independent_count']} 道不同题目的独立首答，"
+                       f"其中 {progress['independent_correct_count']} 道正确，来自 {progress['distinct_assessment_sets']} 组练习。")
+            next_step = ("本课已达标，可以学习前置知识已齐备的下一课；之后还会复习。"
+                         if mastery == "mastered" else
+                         "继续巩固本课；至少两组练习、五道不同题目独立首答达到八成正确后再前进。")
+            if content.get("progressiveLesson", {}).get("assessmentMode") == "observed":
+                summary = "已完成本课学习，实际朗读、表达或操作表现需要家长确认。"
+                next_step = "请家长按本课表现要求确认孩子能否独立完成。"
 
         correct_question_ids = {
             item.get("questionId")
@@ -1590,7 +1665,8 @@ class LearningService:
             target_date=learning_date,
         )
         if len(existing) >= MAX_AUTOMATIC_CARRYOVER_COUNT:
-            return existing[:MAX_AUTOMATIC_CARRYOVER_COUNT]
+            return [task for task in existing[:MAX_AUTOMATIC_CARRYOVER_COUNT]
+                    if self._carryover_matches_grade_or_started_session(conn, child=child, task=task)]
 
         learning_day = date.fromisoformat(learning_date)
         earliest_date = (
@@ -1615,6 +1691,8 @@ class LearningService:
         )
         timestamp = now_ms()
         for candidate in candidates:
+            if not self._carryover_matches_grade_or_started_session(conn, child=child, task=candidate):
+                continue
             slot = str(candidate.get("learning_slot") or "core")
             if slot not in LEARNING_SLOTS:
                 slot = "core"
@@ -1681,13 +1759,16 @@ class LearningService:
                 },
                 now=timestamp,
             )
-            return self.repository.list_daily_carryovers(
+            carryovers = self.repository.list_daily_carryovers(
                 conn,
                 family_id=family_id,
                 child_id=child["id"],
                 target_date=learning_date,
             )
-        return existing
+            return [task for task in carryovers
+                    if self._carryover_matches_grade_or_started_session(conn, child=child, task=task)]
+        return [task for task in existing
+                if self._carryover_matches_grade_or_started_session(conn, child=child, task=task)]
 
     def _today_payload(
         self,
@@ -1708,6 +1789,8 @@ class LearningService:
             child_id=child["id"],
             target_date=learning_date,
         )
+        carryovers = [task for task in carryovers
+                      if self._carryover_matches_grade_or_started_session(conn, child=child, task=task)]
         carryover_by_slot = {
             str(item.get("carryover_target_slot") or "core"): item
             for item in carryovers
@@ -1726,22 +1809,33 @@ class LearningService:
                     course_id=task["learning_course_id"],
                     version=task["learning_course_version"],
                 )
-                if (
-                    display_course is not None
-                    and not self._course_is_assignable(conn, child, display_course)
+                session = self.repository.get_session_for_task(
+                    conn, family_id=family_id, task_id=task["id"],
+                )
+                if display_course is None or (
+                    not self._course_is_assignable(conn, child, display_course)
+                    and not self._course_is_resumable(conn, child=child, course=display_course,
+                                                     task=task, session=session)
                 ):
                     display_course = None
                     task = None
+                    session = None
                 if task is not None:
-                    session = self.repository.get_session_for_task(
-                        conn,
-                        family_id=family_id,
-                        task_id=task["id"],
-                    )
-                    used_course_ids.add(str(task["learning_course_id"]))
+                    if (not self.static_catalog_enabled and session is None
+                            and not self.progression_for_course(
+                                conn, child=child, course=display_course,
+                            )["canStart"]):
+                        display_course = None
+                        task = None
+                    else:
+                        used_course_ids.add(str(task["learning_course_id"]))
                 if display_course is not None:
                     used_subjects.add(str(display_course["subject"]))
             if display_course is None:
+                # A replacement recommendation must never inherit the rejected
+                # task's session, answers or completed report identity.
+                task = None
+                session = None
                 display_course = self._course_for_child(
                     conn,
                     family_id=family_id,
@@ -1789,7 +1883,8 @@ class LearningService:
                     subject=actual_subject,
                 )
             recommendation = recommendation_payload(display_course)
-            if not self.static_catalog_enabled and display_course['grade_code'] != 'primary_1':
+            if (not self.static_catalog_enabled and display_course['grade_code'] != 'primary_1'
+                    and not self._is_progressive_course(display_course)):
                 selection = selection_payload(display_course, mastery,
                     review_fallback=bool(display_course.get('_difficulty_review_fallback')))
                 recommendation['difficultySelection'] = selection
@@ -1939,13 +2034,9 @@ class LearningService:
             supply = cached_supply_summary(self.repository.database.database_url, grade_code=grade_code)
             if supply is not None:
                 result["courseSupply"] = supply
-        from services.learning_availability_state import personal_learning_state
-        identity = {"family_id": str(child["family_id"]), "child_id": str(child["id"]), "grade_code": grade_code}
-        state = personal_learning_state(
-            grade_code=grade_code,
-            courses=self.repository.personal_visible_course_inventory(conn, **identity,
-                grade_selection_revision=int(child.get("grade_selection_revision") or 0)),
-            mastery=self.repository.personal_grade_mastery(conn, **identity),
+        from services.progressive_learning_availability import progressive_personal_learning_state
+        state = progressive_personal_learning_state(
+            conn, child=child, learning_service=self,
             supply=result.get("courseSupply"), grade_open=grade_code in FORMAL_STUDENT_GRADE_CODES,
         )
         result["learningState"] = state
@@ -2010,13 +2101,17 @@ class LearningService:
         self._catalog_ready = True
 
     def _ensure_dynamic_supply(self, *, child, learning_date: str) -> None:
-        """Verify today's skills exist in the active, package-ready catalog.
+        """Keep legacy pool checks out of the fine-lesson request path.
 
-        Student traffic never triggers OpenMAIC generation. Catalog builds run
-        through the internal batch API/CLI and publish atomically.
+        Fine selection is verified by _course_for_child against the current
+        grade's real path. Missing fine inventory is a preparing state, not a
+        failure of the old coarse catalog that blocks the entire Today page.
         """
 
         if self.static_catalog_enabled:
+            return
+        if getattr(self, "_progressive_curriculum_enabled", False):
+            self._primary_grade_code(child)
             return
         grade_code = self._primary_grade_code(child)
         subjects = tuple(
@@ -2118,6 +2213,10 @@ class LearningService:
 
     def _next_skill_node_for_child(self, conn, *, child, subject: str) -> str:
         grade_code = self._primary_grade_code(child)
+        if not self.static_catalog_enabled and getattr(self, "_progressive_curriculum_enabled", False):
+            path = self.progressive_service().get_path(conn, child=child, subject=subject)
+            lesson = path.get("nextLesson")
+            return (str(lesson["lessonId"]) if lesson and lesson.get("gradeCode") == grade_code else "")
         progression = boundaries_for(grade_code, subject)
         if not progression:
             raise ApiError(
@@ -2149,6 +2248,52 @@ class LearningService:
         )
         return boundary.skill_id
 
+    @staticmethod
+    def _exact_in_progress_course_session(*, child, course, task, session) -> bool:
+        """Only call with the persisted task/session, never request payloads."""
+        if (session is None or task is None or session.get("status") != "in_progress"
+                or session.get("completed_at") is not None
+                or task.get("status") in {"completed", "confirmed", "awaiting_parent_confirmation",
+                                          "rejected", "expired", "cancelled"}):
+            return False
+        return all(str(session.get(key) or "") == str(value) for key, value in (
+            ("family_id", child["family_id"]), ("child_id", child["id"]), ("task_id", task["id"]),
+            ("course_id", course["id"]), ("course_version", course["version"]),
+        )) and all(str(task.get(key) or "") == str(value) for key, value in (
+            ("family_id", child["family_id"]), ("child_id", child["id"]),
+            ("learning_course_id", course["id"]), ("learning_course_version", course["version"]),
+        ))
+
+    def _course_is_resumable(self, conn, *, child, course, task, session) -> bool:
+        if not self._exact_in_progress_course_session(child=child, course=course, task=task, session=session):
+            return False
+        if course.get("grade_code") != child.get("grade_code") and not self._is_progressive_course(course):
+            return False
+        if self.static_catalog_enabled:
+            return course.get("grade_code") == child.get("grade_code")
+        return self.repository.get_student_visible_course(
+            conn, family_id=str(child["family_id"]), child_id=str(child["id"]),
+            grade_code=str(child["grade_code"]),
+            grade_selection_revision=int(child.get("grade_selection_revision") or 0),
+            course_id=str(course["id"]), course_version=str(course["version"]),
+        ) is not None
+
+    def _carryover_matches_grade_or_started_session(self, conn, *, child, task) -> bool:
+        course = self.repository.get_course(conn, course_id=task["learning_course_id"],
+                                            version=task["learning_course_version"])
+        if course is None:
+            return False
+        session = self.repository.get_session_for_task(conn, family_id=child["family_id"], task_id=task["id"])
+        if session is not None:
+            return self._course_is_resumable(conn, child=child, course=course, task=task, session=session)
+        if course.get("grade_code") != child.get("grade_code"):
+            return False
+        if not self.static_catalog_enabled and getattr(self, "_progressive_curriculum_enabled", False):
+            return (self._is_progressive_course(course)
+                    and self._course_is_assignable(conn, child, course)
+                    and self.progression_for_course(conn, child=child, course=course)["canStart"])
+        return True
+
     def _task_can_replace_course(self, conn, task) -> bool:
         if str(task.get("status")) not in {
             "scheduled",
@@ -2165,6 +2310,51 @@ class LearningService:
             )
             is None
         )
+
+    def _subject_mastery(self, conn, *, child, subject: str) -> dict:
+        grade_code = self._primary_grade_code(child)
+        return {
+            boundary.skill_id: self.repository.get_mastery_state(
+                conn, family_id=child["family_id"], child_id=child["id"],
+                grade_code=grade_code, subject=subject, node_code=boundary.skill_id,
+            )
+            for boundary in boundaries_for(grade_code, subject)
+        }
+
+    def progression_for_course(self, conn, *, child, course, mastery_by_subject=None) -> dict:
+        """Read the same personal eligibility used at the locked write boundary."""
+        if self._is_progressive_course(course):
+            return self.progressive_service().progression_for_course(conn, child=child, course=course)
+        grade_code = self._primary_grade_code(child)
+        subject = str(course.get("subject") or "")
+        cache = mastery_by_subject if mastery_by_subject is not None else {}
+        if subject not in cache:
+            cache[subject] = self._subject_mastery(conn, child=child, subject=subject)
+        result = course_progression(
+            grade_code=grade_code, subject=subject,
+            skill_id=str(course.get("node_code") or ""), mastery=cache[subject],
+        )
+        if str(course.get("grade_code") or "") != grade_code:
+            result.update(canStart=False, learningStatus="locked", message="这节课不属于当前学习年级。")
+        if not self.static_catalog_enabled and getattr(self, "_progressive_curriculum_enabled", False):
+            result.update(canStart=False, learningStatus="locked",
+                          message="请从学习路线开始，这节课尚未对应到新的循序课次。")
+        return result
+
+    def _is_progressive_course(self, course) -> bool:
+        content = self.repository.parse_json(course.get("content_json"), {})
+        return (str(course.get("curriculum_version") or "").startswith("mira.primary.progressive.")
+                or isinstance(content, dict) and "progressiveLesson" in content)
+
+    def assert_course_progression(self, conn, *, child, course) -> None:
+        if course.get("grade_code") != child.get("grade_code"):
+            raise ApiError("learning_grade_scope_mismatch", "新课只能学习当前年级的课程，请返回学习路线", 409)
+        if self._is_progressive_course(course):
+            self.progressive_service().assert_course_progression(conn, child=child, course=course)
+            return
+        progression = self.progression_for_course(conn, child=child, course=course)
+        if not progression["canStart"]:
+            raise ApiError("learning_prerequisite_not_mastered", progression["message"], 409)
 
     def _scheduled_content_origins(self) -> tuple[str, ...]:
         return () if self.static_catalog_enabled else ("openmaic_generated",)
@@ -2259,6 +2449,25 @@ class LearningService:
         allow_missing: bool = False,
     ):
         grade_code = self._primary_grade_code(child)
+        if not self.static_catalog_enabled and getattr(self, "_progressive_curriculum_enabled", False):
+            # The registered fine path owns all new primary study, even before
+            # its first package is ready. Inventory gaps cannot authorize old
+            # broad topics or substitute another grade's course.
+            subjects = [candidate for candidate in [subject, *SUBJECT_LABELS]
+                        if candidate not in excluding_subjects]
+            for candidate_subject in dict.fromkeys(subjects):
+                path = self.progressive_service().get_path(conn, child=child, subject=candidate_subject)
+                next_lesson = path.get("nextLesson")
+                if (next_lesson and next_lesson.get("course")
+                        and next_lesson.get("gradeCode") == grade_code
+                        and next_lesson.get("courseId") not in excluding_course_ids):
+                    course = self.repository.get_course(conn, course_id=next_lesson["courseId"],
+                                                        version=next_lesson["courseVersion"])
+                    if course is not None and course.get("grade_code") == grade_code:
+                        return course
+            if allow_missing:
+                return None
+            raise ApiError("learning_progressive_course_preparing", "本年级下一课正在准备，请在学习路线查看当前进度", 409)
         excluded_subject_set = {
             str(item).strip() for item in excluding_subjects if str(item).strip()
         }
@@ -2300,31 +2509,19 @@ class LearningService:
             if allow_missing or not excluding_course_ids
             else (excluding_course_ids, ())
         )
+        mastery_by_subject = {}
         for exclusions in exclusion_attempts:
             for candidate in subject_candidates:
-                required_node_code = (
-                    None
-                    if self.static_catalog_enabled
-                    else self._next_skill_node_for_child(
-                        conn,
-                        child=child,
-                        subject=candidate,
-                    )
-                )
                 adaptive = not self.static_catalog_enabled and grade_code != 'primary_1'
                 mastery_by_node = {}
-                if adaptive:
+                if not self.static_catalog_enabled:
                     progression = boundaries_for(grade_code, candidate)
-                    mastery_by_node = {boundary.skill_id: self.repository.get_mastery_state(
-                        conn, family_id=family_id, child_id=child['id'], grade_code=grade_code,
-                        subject=candidate, node_code=boundary.skill_id) for boundary in progression}
+                    if candidate not in mastery_by_subject:
+                        mastery_by_subject[candidate] = self._subject_mastery(conn, child=child, subject=candidate)
+                    mastery_by_node = mastery_by_subject[candidate]
                     node_attempts = available_skill_order(progression, mastery_by_node)
                 else:
-                    node_attempts = (
-                    (required_node_code, None)
-                    if required_node_code is not None
-                    else (None,)
-                    )
+                    node_attempts = (None,)
                 attempts = [(node, False) for node in node_attempts]
                 if adaptive:
                     attempts += [(node, True) for node in node_attempts]
@@ -2386,8 +2583,20 @@ class LearningService:
         )
 
     def _course_is_assignable(self, conn, child, course) -> bool:
+        if course.get("grade_code") != child.get("grade_code"):
+            return False
         if self.static_catalog_enabled:
             return str(course.get("status") or "") == "published"
+        if self._is_progressive_course(course):
+            formal_course = self.repository.get_student_visible_course(
+                conn, family_id=str(child["family_id"]), child_id=str(child["id"]),
+                grade_code=str(child["grade_code"]),
+                grade_selection_revision=int(child.get("grade_selection_revision") or 0),
+                course_id=str(course.get("id") or ""), course_version=str(course.get("version") or ""),
+            )
+            return formal_course is not None and self.progressive_service().binding_for_course(
+                conn, course=formal_course,
+            ) is not None
         try:
             boundary = self._boundary_for_node(
                 grade_code=str(course.get("grade_code") or ""),
@@ -2418,6 +2627,18 @@ class LearningService:
     def _questions(self, course) -> list[dict]:
         content = self.repository.parse_json(course.get("content_json"), {})
         questions = content.get("questions") if isinstance(content, dict) else None
+        if self._is_progressive_course(course) and isinstance(questions, list):
+            steps = content.get("progressiveFlow")
+            if not isinstance(steps, list):
+                raise ApiError("invalid_course_content", "课程教学流程暂时不可用", 503)
+            if content.get("assessmentMode") == "observed" and not questions:
+                return []
+            ids = [step.get("questionId") for step in steps
+                   if isinstance(step, dict) and step.get("phase") in {"guided", "independent"}]
+            by_id = {question.get("id"): question for question in questions if isinstance(question, dict)}
+            if not ids or len(set(ids)) != len(ids) or set(ids) != set(by_id):
+                raise ApiError("invalid_course_content", "课程教学流程暂时不可用", 503)
+            return [by_id[identifier] for identifier in ids]
         if not isinstance(questions, list) or not questions:
             raise ApiError("invalid_course_content", "课程内容暂时不可用", 503)
         flow = content.get("teachingFlow")
@@ -2446,6 +2667,12 @@ class LearningService:
         content = self.repository.parse_json(course.get("content_json"), {})
         if not isinstance(content, dict):
             return False
+        if self._is_progressive_course(course):
+            try:
+                self._questions(course)
+            except ApiError:
+                return False
+            return True
         flow = content.get("teachingFlow")
         questions = content.get("questions")
         if not isinstance(flow, dict) or not isinstance(questions, list):

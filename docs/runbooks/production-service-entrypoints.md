@@ -1,5 +1,7 @@
 # Mira 学习闭环生产服务入口
 
+> 新服务器部署请使用 [完整部署与数据迁移手册](../../deploy/README.md) 和 `deploy/server.py`。本文保留早期单独启动服务的参考命令，不包含家长 Web、双库恢复、WS 公网入口及正式语音的 loopback 拓扑，不能直接作为全栈部署步骤。
+
 本文只覆盖学生学习闭环的四个服务入口：Student Web、OpenMAIC、Runtime Gateway 和 Backend。数据库迁移、课程发布及业务数据不由这些启动命令执行。
 
 ## 1. 网络边界
@@ -54,7 +56,7 @@ npm run start -- --hostname 127.0.0.1 --port 3000
 
 ## 4. OpenMAIC 与 Runtime Gateway
 
-不要使用 `scripts/native-runtime.sh` 作为生产入口；它明确启动 Next.js dev server。使用现有的 multi-stage production Dockerfile 和 compose：
+`scripts/native-runtime.sh` 用于受管本地环境，包含开发和 production 构建模式；服务器部署使用新手册中的镜像和 Compose。以下是早期三服务 Compose 参考命令，不能替代完整部署：
 
 ```bash
 cd openmaic-runtime

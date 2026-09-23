@@ -260,6 +260,8 @@ def _student_visible_course_sql(
     course_alias: str = "course",
     child_alias: str | None = None,
     require_available_package_assets: bool = False,
+    allow_progressive_publication: bool = False,
+    exact_runtime_alias: str | None = None,
 ) -> str:
     """Return the exact per-course rolling/active formal visibility gate.
 
@@ -278,6 +280,23 @@ def _student_visible_course_sql(
         if require_available_package_assets
         else ""
     )
+    history_gate = (f"""OR (
+              {course}.curriculum_version = 'mira.primary.progressive.v1'
+              AND student_receipt.publication_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
+              AND student_receipt.published_at IS NOT NULL
+              AND EXISTS (
+                SELECT 1 FROM learning_curriculum_preparation_plans AS fine_owner
+                WHERE fine_owner.catalog_build_id = student_build_item.build_job_id
+                  AND fine_owner.catalog_release_id = student_release_item.release_id
+                  AND fine_owner.grade_code = student_release_item.grade_code
+                  AND fine_owner.target_fingerprint = student_receipt.target_fingerprint
+                  AND fine_owner.library_target_fingerprint = fine_owner.target_fingerprint
+                  AND fine_owner.family_id IS NULL AND fine_owner.child_id IS NULL
+                  AND JSON_UNQUOTE(JSON_EXTRACT(fine_owner.target_spec_json, '$.curriculumVersion'))
+                    = 'mira.primary.progressive.v1'
+              )
+            )""" if allow_progressive_publication else "")
+    runtime_gate = f"AND student_runtime.id = {exact_runtime_alias}.id" if exact_runtime_alias else ""
     return f"""
       EXISTS (
         SELECT 1
@@ -398,6 +417,7 @@ def _student_visible_course_sql(
           AND student_release_item.boundary_version = {course}.boundary_version
           AND student_release.curriculum_version = {course}.curriculum_version
           {asset_gate}
+          {runtime_gate}
           AND (
             EXISTS (
               SELECT 1
@@ -440,6 +460,7 @@ def _student_visible_course_sql(
                   release_item_alias="student_release_item", child_alias=child_alias
               )}
             )
+            {history_gate}
           )
       )
     """
@@ -1040,6 +1061,12 @@ class LearningRepository:
     ) -> DatabaseRow | None:
         """Return one exact rolling item or a shared active-pointer fallback."""
 
+        if str(course_id).startswith("progressive_"):
+            return self.get_progressive_remedial_course(
+                conn, family_id=family_id, child_id=child_id, grade_code=grade_code,
+                grade_selection_revision=grade_selection_revision,
+                course_id=course_id, course_version=course_version,
+            )
         visible = conn.execute(
             f"""
             SELECT course.*
@@ -1067,6 +1094,13 @@ class LearningRepository:
         ).fetchone()
         if visible is not None:
             return visible
+        remedial = self.get_progressive_remedial_course(
+            conn, family_id=family_id, child_id=child_id, grade_code=grade_code,
+            grade_selection_revision=grade_selection_revision,
+            course_id=course_id, course_version=course_version,
+        )
+        if remedial is not None:
+            return remedial
         from repositories.student_shared_course_repository import shared_course_rows
         shared = shared_course_rows(
             conn, family_id=family_id, child_id=child_id, grade_code=grade_code,
@@ -1074,6 +1108,23 @@ class LearningRepository:
             course_id=course_id, course_version=course_version,
         )
         return shared[0] if shared else None
+
+    def get_progressive_remedial_course(self, conn, *, family_id, child_id, grade_code,
+                                       grade_selection_revision, course_id, course_version):
+        """Resolve a registered fine course through its exact formal publication."""
+        if not str(course_id).startswith("progressive_"):
+            return None
+        from repositories.progressive_formal_course_repository import progressive_formal_authority
+        child = conn.execute("SELECT * FROM children WHERE id = ? AND family_id = ? LIMIT 1",
+                             (child_id, family_id)).fetchone()
+        if (child is None or child["grade_code"] != grade_code
+                or int(child["grade_selection_revision"]) != int(grade_selection_revision)):
+            return None
+        course = self.get_course(conn, course_id=course_id, version=course_version)
+        if course is None:
+            return None
+        authority = progressive_formal_authority(conn, database=self.database, child=child, course=course)
+        return course if authority is not None else None
 
     def list_student_visible_courses(
         self,

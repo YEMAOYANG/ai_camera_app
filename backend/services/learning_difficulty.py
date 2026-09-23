@@ -5,16 +5,16 @@ import json
 from collections.abc import Mapping
 
 from content.formal_difficulty_policy import require_difficulty
+from services.learning_progression import eligible_skill_order
 
 
 def preferred_difficulty(mastery):
     mastery = mastery or {}
     hints = int(mastery.get('hint_count') or 0)
-    if mastery.get('mastery_level') == 'needs_practice' or hints >= 2:
+    if mastery.get('mastery_level') != 'mastered' or hints >= 2:
         return 'basic'
-    if (mastery.get('mastery_level') == 'mastered' and hints == 0
-            and int(mastery.get('independent_correct_count') or 0) >= 2):
-        return 'challenge'
+    # A single successful legacy lesson is insufficient evidence for challenge.
+    # The fine curriculum records independent sets and delayed retention itself.
     return 'standard'
 
 
@@ -29,12 +29,7 @@ def course_difficulty(course):
 
 def available_skill_order(boundaries, mastery):
     """The first unmastered skill, followed by already mastered prerequisites."""
-    prior = []
-    for boundary in boundaries:
-        if (mastery.get(boundary.skill_id) or {}).get('mastery_level') != 'mastered':
-            return [boundary.skill_id, *reversed(prior)]
-        prior.append(boundary.skill_id)
-    return list(reversed(prior))
+    return eligible_skill_order(boundaries, mastery)
 
 
 def selection_payload(course, mastery, *, review_fallback=False):

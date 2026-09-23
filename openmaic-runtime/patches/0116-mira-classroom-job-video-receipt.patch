@@ -1,0 +1,27 @@
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -15,6 +15,7 @@
+ import { assertMiraFormalGenerationInput } from '@/lib/server/mira-formal-generation-policy';
+ import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
+ import type { MiraFormalMediaReceipt } from '@/lib/server/mira-formal-media';
++import type { MiraFormalVideoReceipt } from '@/lib/server/mira-formal-video';
+ import type {
+   MiraFormalProfessionalCreationReceipt,
+   MiraFormalResearchReceipt,
+@@ -55,6 +56,7 @@
+     professionalCreation?: MiraFormalProfessionalCreationReceipt;
+     research?: MiraFormalResearchReceipt;
+     media?: MiraFormalMediaReceipt;
++    video?: MiraFormalVideoReceipt;
+   };
+   formalCitationRecovery?: {
+     originalStatus: 'failed';
+@@ -440,6 +442,7 @@
+       ...(result.professionalCreation ? { professionalCreation: result.professionalCreation } : {}),
+       ...(result.research ? { research: result.research } : {}),
+       ...(result.media ? { media: result.media } : {}),
++      ...(result.video ? { video: result.video } : {}),
+     },
+   });
+ }

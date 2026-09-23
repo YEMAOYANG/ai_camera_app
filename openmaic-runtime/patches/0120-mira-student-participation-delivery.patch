@@ -1,0 +1,629 @@
+diff --git a/lib/mira/student-interaction-bridge.ts b/lib/mira/student-interaction-bridge.ts
+--- a/lib/mira/student-interaction-bridge.ts
++++ b/lib/mira/student-interaction-bridge.ts
+@@ -2,9 +2,71 @@
+ import type { InteractionObjective } from '@/lib/server/mira-formal-interaction-design';
+ import { interactionPayload, type MiraInteractionOperation } from './student-runtime-events';
+ 
++type ParticipationControl = Pick<MiraInteractionOperation, 'controlSelector' | 'action'>;
++type StudentInteractionObjective = InteractionObjective & {
++  participationControls?: ParticipationControl[];
++};
++
++/** Mirror the backend's reviewed-HTML control scope. The formal plan itself is
++ * unchanged; these alternatives record participation, never assessment. */
++function participationControls(
++  html: string,
++  objective: InteractionObjective,
++): ParticipationControl[] {
++  const original = objective.operation;
++  const controls: ParticipationControl[] = [
++    { controlSelector: original.controlSelector, action: original.action },
++  ];
++  if (typeof DOMParser === 'undefined') return controls;
++  const document = new DOMParser().parseFromString(html, 'text/html');
++  const ids = new Map<string, Element>();
++  const duplicates = new Set<string>();
++  for (const node of document.querySelectorAll('[id]')) {
++    if (ids.has(node.id)) duplicates.add(node.id);
++    ids.set(node.id, node);
++  }
++  for (const id of duplicates) ids.delete(id);
++  const selected = ids.get(original.controlSelector.slice(1));
++  const reset = objective.exploration?.reset.selector;
++  const parent = selected?.parentElement;
++  if (selected?.tagName === 'BUTTON' && parent && !['HTML', 'BODY'].includes(parent.tagName)) {
++    for (const [id, node] of ids) {
++      if (
++        /^[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(id) &&
++        node.tagName === 'BUTTON' &&
++        node.parentElement === parent &&
++        !node.hasAttribute('disabled') &&
++        !['reset', 'submit'].includes((node.getAttribute('type') ?? 'button').toLowerCase()) &&
++        '#' + id !== reset
++      ) {
++        controls.push({ controlSelector: '#' + id, action: 'click' });
++      }
++    }
++  }
++  for (const state of objective.exploration?.states ?? []) {
++    for (const operation of state.operations) {
++      if (
++        operation.selector.startsWith('#') &&
++        ids.has(operation.selector.slice(1)) &&
++        operation.selector !== reset
++      ) {
++        controls.push({ controlSelector: operation.selector, action: operation.action });
++      }
++    }
++  }
++  return controls.filter(
++    (item, index) =>
++      controls.findIndex(
++        (other) => other.controlSelector === item.controlSelector && other.action === item.action,
++      ) === index,
++  );
++}
++
+ /** The persisted plan is public teaching data. The backend independently binds
+  * every submission to the frozen professional receipt, never to this parser. */
+-export function studentInteractionObjectives(scenes: readonly Scene[]): InteractionObjective[] {
++export function studentInteractionObjectives(
++  scenes: readonly Scene[],
++): StudentInteractionObjective[] {
+   const first = [...scenes]
+     .sort((a, b) => a.order - b.order)
+     .find((scene) => scene.type === 'interactive');
+@@ -24,14 +86,25 @@
+       'mira.openmaic.interaction-design-plan.v1',
+       'mira.openmaic.interaction-design-plan.v2',
+     ].includes(value.schemaVersion) && Array.isArray(value.objectives)
+-      ? value.objectives.filter(
+-          (item: InteractionObjective) =>
+-            Number.isInteger(item?.objectiveIndex) &&
+-            item.objectiveIndex >= 0 &&
+-            item.objectiveIndex < 30 &&
+-            item.operation?.sceneId &&
+-            item.feedback?.sceneId,
+-        )
++      ? value.objectives
++          .filter(
++            (item: InteractionObjective) =>
++              Number.isInteger(item?.objectiveIndex) &&
++              item.objectiveIndex >= 0 &&
++              item.objectiveIndex < 30 &&
++              item.operation?.sceneId &&
++              item.feedback?.sceneId,
++          )
++          .map((item: InteractionObjective) => {
++            const scene = scenes.find((scene) => scene.id === item.operation.sceneId);
++            return {
++              ...item,
++              participationControls: participationControls(
++                scene?.content.type === 'interactive' ? (scene.content.html ?? '') : '',
++                item,
++              ),
++            };
++          })
+       : [];
+   } catch {
+     return [];
+@@ -56,15 +129,18 @@
+  * sample answer. A private observer supplies actual changed-state evidence;
+  * assessment and mastery remain separate from this participation receipt. */
+ export function matchesStudentInteractionObjective(
+-  objective: InteractionObjective,
++  objective: StudentInteractionObjective,
+   observation: MiraInteractionOperation,
+ ): boolean {
+   try {
+     const operation = interactionPayload(observation);
+     return (
+       objective.objectiveIndex === operation.objectiveIndex &&
+-      objective.operation.controlSelector === operation.controlSelector &&
+-      objective.operation.action === operation.action
++      (objective.participationControls ?? [objective.operation]).some(
++        (control) =>
++          control.controlSelector === operation.controlSelector &&
++          control.action === operation.action,
++      )
+     );
+   } catch {
+     return false;
+@@ -75,34 +151,89 @@
+  * teacher widget actions, another frame and closed/hidden scenes cannot submit. */
+ export function connectStudentInteractionFrame(options: {
+   frame: HTMLIFrameElement;
+-  objectives: readonly InteractionObjective[];
+-  onOperation: (operation: MiraInteractionOperation) => void;
++  objectives: readonly StudentInteractionObjective[];
++  onOperation: (operation: MiraInteractionOperation) => Promise<void>;
+   active: () => boolean;
+ }): () => void {
+-  const channel = new MessageChannel();
+   let connected = true;
+-  channel.port1.onmessage = (event) => {
+-    if (!connected || !options.active()) return;
+-    try {
+-      const operation = interactionPayload(event.data);
+-      const objective = options.objectives.find(
+-        (item) => item.objectiveIndex === operation.objectiveIndex,
+-      );
+-      if (!objective || !matchesStudentInteractionObjective(objective, operation)) return;
+-      options.onOperation(operation);
+-    } catch {
+-      /* Malformed iframe observations never enter the event stream. */
+-    }
++  let channel: MessageChannel | null = null;
++  let retry: ReturnType<typeof setTimeout> | undefined;
++  const connect = () => {
++    if (!connected) return;
++    clearTimeout(retry);
++    channel?.port1.close();
++    const current = new MessageChannel();
++    channel = current;
++    let ready = false;
++    const saving = new Map<number, Promise<void>>();
++    current.port1.onmessage = async (event) => {
++      if (!connected || channel !== current) return;
++      if (event.data?.type === 'mira:student-interaction-ready') {
++        ready = true;
++        clearTimeout(retry);
++        return;
++      }
++      const message = event.data;
++      if (
++        !ready ||
++        message?.type !== 'mira:student-interaction' ||
++        !Number.isSafeInteger(message.observationId) ||
++        message.observationId < 1
++      )
++        return;
++      const acknowledge = (accepted: boolean) => {
++        if (connected && channel === current)
++          current.port1.postMessage({
++            type: 'mira:student-interaction-ack',
++            observationId: message.observationId,
++            accepted,
++          });
++      };
++      if (!options.active()) {
++        acknowledge(false);
++        return;
++      }
++      try {
++        const operation = interactionPayload(message.operation);
++        const objective = options.objectives.find(
++          (item) => item.objectiveIndex === operation.objectiveIndex,
++        );
++        if (!objective || !matchesStudentInteractionObjective(objective, operation)) {
++          acknowledge(false);
++          return;
++        }
++        let result = saving.get(message.observationId);
++        if (!result) {
++          result = Promise.resolve().then(() => options.onOperation(operation));
++          saving.set(message.observationId, result);
++        }
++        await result;
++        acknowledge(true);
++      } catch {
++        acknowledge(false);
++      } finally {
++        saving.delete(message.observationId);
++      }
++    };
++    // The first message can arrive before srcDoc has installed its listener.
++    // A fresh private port is retried until the observer explicitly acknowledges it.
++    retry = setTimeout(connect, 250);
++    options.frame.contentWindow?.postMessage(
++      { type: 'mira:observe-student-interactions', objectives: options.objectives },
++      '*',
++      [current.port2],
++    );
+   };
+-  options.frame.contentWindow?.postMessage(
+-    { type: 'mira:observe-student-interactions', objectives: options.objectives },
+-    '*',
+-    [channel.port2],
+-  );
++  options.frame.addEventListener('load', connect);
++  connect();
+   return () => {
+     connected = false;
+-    channel.port1.onmessage = null;
+-    channel.port1.close();
++    clearTimeout(retry);
++    options.frame.removeEventListener('load', connect);
++    if (channel) {
++      channel.port1.onmessage = null;
++      channel.port1.close();
++    }
+   };
+ }
+ 
+@@ -112,11 +243,17 @@
+ export const STUDENT_INTERACTION_OBSERVER = `<script data-mira-student-interaction-observer>
+ (function () {
+   var port = null, objectives = [], pending = new Map(), completed = new Set(), beforeValues = new WeakMap();
++  var unacknowledged = new Map(), nextObservationId = 1;
+   var query = document.querySelector.bind(document);
+   var schedule = window.setTimeout.bind(window);
+   var textGetter = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerText').get;
+   var send = MessagePort.prototype.postMessage;
+   function text(node) { return textGetter.call(node).trim().slice(0, 2000); }
++  function submit(observation) {
++    observation.saving = true;
++    send.call(port, {type:'mira:student-interaction', observationId:observation.id, operation:observation.operation});
++  }
++  function controls(item) { return item.participationControls || [item.operation]; }
+   function feedback(item, control) {
+     var node = query(item.feedback.selector);
+     if (!(node instanceof HTMLElement) || node === control || node.contains(control) || control.contains(node) ||
+@@ -131,27 +268,55 @@
+     if (port) port.close();
+     port = event.ports[0]; objectives = Array.isArray(event.data.objectives) ? event.data.objectives : [];
+     pending.clear(); completed.clear(); beforeValues = new WeakMap();
++    unacknowledged.forEach(function (observation, index) {
++      var item = objectives.find(function (item) { return item.objectiveIndex === index; });
++      if (!item || !controls(item).some(function (op) {
++        return op.controlSelector === observation.operation.controlSelector && op.action === observation.operation.action;
++      })) unacknowledged.delete(index);
++      else observation.saving = false;
++    });
++    var currentPort = port;
++    port.onmessage = function (message) {
++      if (port !== currentPort || message.data?.type !== 'mira:student-interaction-ack') return;
++      unacknowledged.forEach(function (observation, index) {
++        if (observation.id !== message.data.observationId) return;
++        if (message.data.accepted === true) {
++          completed.add(index); unacknowledged.delete(index);
++        } else observation.saving = false;
++      });
++    };
++    send.call(port, {type:'mira:student-interaction-ready'});
+   }, true);
+   // input/change fire after the browser edits a control's value. Capture the
+   // value before the trusted gesture, independently of generated handlers.
+   function prepare(event) {
+     if (!event.isTrusted || !port) return;
+     objectives.forEach(function (item) {
+-      var op = item.operation, control = query(op.controlSelector);
+-      if (op.action !== 'click' && control &&
+-          (event.target === control || control.contains(event.target))) {
+-        beforeValues.set(control, String(control.value));
+-      }
++      controls(item).forEach(function (op) {
++        var control = query(op.controlSelector);
++        if (op.action !== 'click' && control &&
++            (event.target === control || control.contains(event.target))) {
++          beforeValues.set(control, String(control.value));
++        }
++      });
+     });
+   }
+   function observed(event) {
+     if (!event.isTrusted || !port) return;
+     objectives.forEach(function (item) {
+       if (completed.has(item.objectiveIndex)) return;
+-      var op = item.operation, control = query(op.controlSelector);
+-      if (!control || !(event.target === control || control.contains(event.target))) return;
++      var control, op = controls(item).find(function (candidate) {
++        var node = query(candidate.controlSelector);
++        if (node && (event.target === node || node.contains(event.target))) { control = node; return true; }
++        return false;
++      });
++      if (!op || !control) return;
+       var touch = op.action === 'click' && event.type === 'touchstart';
+       if (!touch && (op.action === 'click' ? 'click' : op.action === 'select' ? 'change' : 'input') !== event.type) return;
++      // Retry the original trusted observation even when the control's result
++      // is now unchanged. The Host reuses its pending idempotent runtime event.
++      var unsaved = unacknowledged.get(item.objectiveIndex);
++      if (unsaved) { if (!unsaved.saving) submit(unsaved); return; }
+       // Some generated controls act on touchstart and cancel the compatibility
+       // click. Observe before that handler, while keeping the same logical action.
+       // If a click does follow, retain the pre-touch feedback until this bounded
+@@ -171,8 +336,10 @@
+         var validValue = op.action === 'click' || (value.trim() && value.length <= 500 &&
+           (!control.validity || control.validity.valid));
+         if (after && validValue && (after !== before || valueChanged)) {
+-          completed.add(item.objectiveIndex); pending.delete(item.objectiveIndex);
+-          send.call(currentPort, {objectiveIndex:item.objectiveIndex, controlSelector:op.controlSelector, action:op.action, value:value, feedbackText:after});
++          pending.delete(item.objectiveIndex);
++          var observation = {id:nextObservationId++, saving:false, operation:{objectiveIndex:item.objectiveIndex, controlSelector:op.controlSelector, action:op.action, value:value, feedbackText:after}};
++          unacknowledged.set(item.objectiveIndex, observation);
++          submit(observation);
+         } else if (performance.now() - started < 2000) schedule(inspect, 40);
+         else pending.delete(item.objectiveIndex);
+       }
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+ import { createPortal } from 'react-dom';
++import { toast } from 'sonner';
+ import { useWidgetIframeStore } from '@/lib/store/widget-iframe';
+ import {
+   useInteractiveIframePool,
+@@ -18,7 +19,10 @@
+ import { useElementRefsStore } from '@/lib/store/element-refs';
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import { useStageStore } from '@/lib/store/stage';
+-import { connectStudentInteractionFrame, studentInteractionObjectives } from '@/lib/mira/student-interaction-bridge';
++import {
++  connectStudentInteractionFrame,
++  studentInteractionObjectives,
++} from '@/lib/mira/student-interaction-bridge';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+ import {
+   ELEMENT_REF_SELECTOR_MAX,
+@@ -159,6 +163,12 @@
+ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+   const { t } = useI18n();
+   const runtimeEvents = useMiraStudentRuntimeEvents();
++  const storedScenes = useStageStore((state) => state.scenes);
++  const scenes = useMemo(() => [...storedScenes].sort((a, b) => a.order - b.order), [storedScenes]);
++  const objectives = useMemo(
++    () => studentInteractionObjectives(scenes).filter((item) => item.operation.sceneId === sceneId),
++    [scenes, sceneId],
++  );
+   const visibleRef = useRef(visible);
+   visibleRef.current = visible;
+   const iframeRef = useRef<HTMLIFrameElement>(null);
+@@ -178,27 +188,30 @@
+   useEffect(() => {
+     const frame = iframeRef.current;
+     if (!frame || !runtimeEvents || !visible) return;
+-    const scenes = [...useStageStore.getState().scenes].sort((a, b) => a.order - b.order);
+-    const sceneIndex = scenes.findIndex(scene => scene.id === sceneId);
+-    const objectives = studentInteractionObjectives(scenes).filter(item => item.operation.sceneId === sceneId);
++    const sceneIndex = scenes.findIndex((scene) => scene.id === sceneId);
+     if (sceneIndex < 0 || !objectives.length) return;
+-    let disconnect = () => {};
+-    const connect = () => {
+-      disconnect();
+-      disconnect = connectStudentInteractionFrame({ frame, objectives,
+-        active: () => visibleRef.current && useStageStore.getState().currentSceneId === sceneId,
+-        onOperation: operation => {
+-          void runtimeEvents.interactionCompleted({ sceneIndex, sceneId, ...operation }).then(async () => {
+-            const finalScene = scenes.at(-1);
+-            if (finalScene) await runtimeEvents.completeWhenReady({ sceneIndex: scenes.length - 1, sceneId: finalScene.id });
+-          }).catch(error => console.error('[Mira Runtime] Failed to save student interaction', error));
+-        },
+-      });
+-    };
+-    frame.addEventListener('load', connect);
+-    connect();
+-    return () => { frame.removeEventListener('load', connect); disconnect(); };
+-  }, [entry.srcDoc, runtimeEvents, sceneId, visible]);
++    return connectStudentInteractionFrame({
++      frame,
++      objectives,
++      active: () => visibleRef.current && useStageStore.getState().currentSceneId === sceneId,
++      onOperation: async (operation) => {
++        try {
++          await runtimeEvents.interactionCompleted({ sceneIndex, sceneId, ...operation });
++        } catch (error) {
++          console.error('[Mira Runtime] Failed to save student interaction', error);
++          toast.error('操作进度未保存，请再点一次刚才的控件。');
++          throw error;
++        }
++        const finalScene = scenes.at(-1);
++        if (finalScene)
++          void runtimeEvents
++            .completeWhenReady({ sceneIndex: scenes.length - 1, sceneId: finalScene.id })
++            .catch((error) =>
++              console.error('[Mira Runtime] Failed to finish classroom progress', error),
++            );
++      },
++    });
++  }, [entry.srcDoc, runtimeEvents, sceneId, visible, scenes, objectives]);
+ 
+   // Register the postMessage callback for this scene (moved here from the
+   // placeholder, since the iframe now lives in the host). Stable per scene:
+diff --git a/tests/runtime/mira-student-interaction-bridge.test.ts b/tests/runtime/mira-student-interaction-bridge.test.ts
+--- a/tests/runtime/mira-student-interaction-bridge.test.ts
++++ b/tests/runtime/mira-student-interaction-bridge.test.ts
+@@ -38,7 +38,12 @@
+ describe('student interaction teaching-plan navigation', () => {
+   it('leaves historical courses unaffected and requires operation before later independent pages', () => {
+     expect(studentInteractionObjectives([])).toEqual([]);
+-    expect(studentInteractionObjectives(scenes)).toEqual([objective]);
++    expect(studentInteractionObjectives(scenes)).toEqual([
++      {
++        ...objective,
++        participationControls: [{ controlSelector: '#quantity', action: 'range' }],
++      },
++    ]);
+     expect(requiredInteractionsBeforeScene(scenes, 'operate')).toEqual([]);
+     expect(requiredInteractionsBeforeScene(scenes, 'quiz')).toEqual([0]);
+     expect(requiredInteractionsBeforeScene(scenes, 'demo')).toEqual([]);
+@@ -129,13 +134,32 @@
+   }
+ }
+ class ObserverPort {
+-  observations: MiraInteractionOperation[] = [];
++  messages: Array<{ type: string; observationId?: number; operation?: MiraInteractionOperation }> =
++    [];
++  onmessage?: (message: { data: unknown }) => void;
++  get observations() {
++    return this.messages
++      .filter((message) => message.type === 'mira:student-interaction')
++      .map((message) => message.operation!);
++  }
++  acknowledge(accepted: boolean) {
++    const observation = this.messages.findLast(
++      (message) => message.type === 'mira:student-interaction',
++    )!;
++    this.onmessage?.({
++      data: {
++        type: 'mira:student-interaction-ack',
++        observationId: observation.observationId,
++        accepted,
++      },
++    });
++  }
+   closed = false;
+   close() {
+     this.closed = true;
+   }
+-  postMessage(observation: MiraInteractionOperation) {
+-    this.observations.push(observation);
++  postMessage(message: ObserverPort['messages'][number]) {
++    this.messages.push(message);
+   }
+ }
+ 
+@@ -198,6 +222,29 @@
+ }
+ 
+ describe('injected student observer observes changes without rehearsing golden answers', () => {
++  it('waits for saved ACK and retries the same trusted observation after rejection and reconnect', () => {
++    const h = observerHarness(fractionObjectives);
++    const port = h.connect();
++    expect(port.messages).toEqual([{ type: 'mira:student-interaction-ready' }]);
++    const control = h.nodes.get('#numerator-plus')!;
++    h.dispatch('click', control);
++    h.nodes.get('#reason')!.textContent = '3÷5=0.6，也就是60%。';
++    h.flush();
++    port.acknowledge(false);
++    h.dispatch('click', control, false);
++    h.flush();
++    expect(port.observations).toHaveLength(1);
++    const currentPort = h.connect();
++    h.dispatch('click', control); // Feedback no longer changes, but the actual observation is retained.
++    h.flush();
++    expect(currentPort.observations).toEqual(port.observations);
++    currentPort.acknowledge(true);
++    h.dispatch('click', control);
++    h.nodes.get('#reason')!.textContent = '后续探索';
++    h.flush();
++    expect(currentPort.observations).toHaveLength(1);
++  });
++
+   it('keeps pre-touch feedback when a compatibility click arrives before polling and reports once', () => {
+     const h = observerHarness(fractionObjectives);
+     const port = h.connect();
+diff --git a/tests/runtime/mira-student-interaction-bridge.browser.test.ts b/tests/runtime/mira-student-interaction-bridge.browser.test.ts
+--- a/tests/runtime/mira-student-interaction-bridge.browser.test.ts
++++ b/tests/runtime/mira-student-interaction-bridge.browser.test.ts
+@@ -2,6 +2,7 @@
+ import { chromium } from 'playwright-core';
+ import { createRequire } from 'node:module';
+ import { patchHtmlForIframe } from '@/lib/utils/iframe';
++import { STUDENT_INTERACTION_OBSERVER } from '@/lib/mira/student-interaction-bridge';
+ 
+ const objective = {
+   objectiveIndex: 0,
+@@ -23,6 +24,88 @@
+ describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')(
+   'actual student operation browser bridge',
+   () => {
++    it('retries a delayed private handshake and a rejected save without accepting synthetic clicks', async () => {
++      const require = createRequire(import.meta.url);
++      const { build } = createRequire(require.resolve('tsx'))('esbuild');
++      const plan = {
++        ...objective,
++        operation: { sceneId: 'operate', controlSelector: '#sample', action: 'click' },
++        exploration: { reset: { selector: '#reset' }, states: [] },
++      };
++      const html = `<div><button id="sample">示范取值</button><button id="alternative">其他取值</button><button id="reset">重置</button><button id="submit" type="SUBMIT">提交</button><button id="disabled" disabled>禁用</button></div><output id="result" style="display:block">等待操作</output><script type="application/json" id="mira-interaction-plan">${JSON.stringify({ schemaVersion: 'mira.openmaic.interaction-design-plan.v2', objectives: [plan] })}</script><script>alternative.onclick=()=>result.textContent='3/5 × 3 = 9/5';setTimeout(()=>{const script=document.createElement('script');script.textContent=${JSON.stringify(STUDENT_INTERACTION_OBSERVER.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, ''))};document.head.append(script);document.body.dataset.observer='ready';},600);</script>`;
++      const bundle = await build({
++        stdin: {
++          resolveDir: process.cwd(),
++          loader: 'ts',
++          contents: `
++        import {connectStudentInteractionFrame,studentInteractionObjectives} from './lib/mira/student-interaction-bridge';
++        window.attempts=[];window.saved=false;
++        const objectives=studentInteractionObjectives([{id:'operate',order:0,type:'interactive',content:{type:'interactive',html:${JSON.stringify(html)}}}]);
++        window.controls=objectives[0].participationControls;
++        window.disconnect=connectStudentInteractionFrame({frame:document.querySelector('iframe'),objectives,active:()=>true,onOperation:async op=>{window.attempts.push(op);if(window.attempts.length===1)throw new Error('temporary save failure');window.saved=true;}});
++      `,
++        },
++        bundle: true,
++        write: false,
++        format: 'iife',
++        platform: 'browser',
++        logLevel: 'silent',
++      });
++      const browser = await chromium.launch({
++        executablePath:
++          process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++        headless: true,
++      });
++      try {
++        const page = await browser.newPage();
++        await page.route('**/*', (route) => route.abort());
++        await page.setContent(
++          `<iframe sandbox="allow-scripts" style="width:700px;height:200px" srcdoc="${escape(html)}"></iframe>`,
++        );
++        await page.addScriptTag({ content: bundle.outputFiles[0].text });
++        const frame = page.frames().find((frame) => frame !== page.mainFrame())!;
++        await frame.waitForSelector('body[data-observer="ready"]');
++        await page.waitForTimeout(300); // One handshake retry after the deliberately delayed listener.
++        type Host = Window & { attempts: unknown[]; saved: boolean; controls: unknown[] };
++        expect(await page.evaluate(() => (window as unknown as Host).controls)).toEqual([
++          { controlSelector: '#sample', action: 'click' },
++          { controlSelector: '#alternative', action: 'click' },
++        ]);
++        await frame.getByRole('button', { name: '其他取值' }).click();
++        await page.waitForFunction(() => (window as unknown as Host).attempts.length === 1);
++        await page.waitForTimeout(50);
++        expect(await page.evaluate(() => (window as unknown as Host).saved)).toBe(false);
++        await frame.evaluate(() => {
++          (document.querySelector('#alternative') as HTMLButtonElement).click();
++          window.parent.postMessage(
++            {
++              type: 'mira:student-interaction',
++              observationId: 1,
++              operation: { objectiveIndex: 0 },
++            },
++            '*',
++          );
++        });
++        await page.waitForTimeout(50);
++        expect(await page.evaluate(() => (window as unknown as Host).attempts.length)).toBe(1);
++        await frame.getByRole('button', { name: '其他取值' }).click(); // Same result must retry the original real observation.
++        await page.waitForFunction(() => (window as unknown as Host).saved);
++        const attempts = await page.evaluate(() => (window as unknown as Host).attempts);
++        expect(attempts).toHaveLength(2);
++        expect(attempts[1]).toEqual(attempts[0]);
++        expect(attempts[0]).toMatchObject({
++          controlSelector: '#alternative',
++          feedbackText: '3/5 × 3 = 9/5',
++        });
++        await frame.getByRole('button', { name: '其他取值' }).click();
++        await page.waitForTimeout(50);
++        expect(await page.evaluate(() => (window as unknown as Host).attempts.length)).toBe(2);
++      } finally {
++        await browser.close();
++      }
++    }, 15_000);
++
+     it('accepts trusted manipulation and rejects teacher scripts, postMessage forgery and stale/hidden channels', async () => {
+       const require = createRequire(import.meta.url);
+       const { build } = createRequire(require.resolve('tsx'))('esbuild');
+@@ -35,7 +118,7 @@
+       window.events=[]; window.active=true;
+       window.connect=()=>{ window.disconnect?.(); window.disconnect=connectStudentInteractionFrame({
+         frame:document.querySelector('iframe'), objectives:${JSON.stringify([objective])},
+-        active:()=>window.active, onOperation:op=>window.events.push(op) }); };
++        active:()=>window.active, onOperation:async op=>{window.events.push(op);} }); };
+       window.connect();`,
+         },
+         bundle: true,
+diff --git a/tests/runtime/mira-student-touch-bridge.browser.test.ts b/tests/runtime/mira-student-touch-bridge.browser.test.ts
+--- a/tests/runtime/mira-student-touch-bridge.browser.test.ts
++++ b/tests/runtime/mira-student-touch-bridge.browser.test.ts
+@@ -37,7 +37,7 @@
+           contents: `
+ import {connectStudentInteractionFrame} from './lib/mira/student-interaction-bridge';
+ window.events=[];window.active=true;
+-window.disconnect=connectStudentInteractionFrame({frame:document.querySelector('iframe'),objectives:${JSON.stringify([objective])},active:()=>window.active,onOperation:op=>window.events.push(op)});`,
++window.disconnect=connectStudentInteractionFrame({frame:document.querySelector('iframe'),objectives:${JSON.stringify([objective])},active:()=>window.active,onOperation:async op=>{window.events.push(op);}});`,
+         },
+         bundle: true,
+         write: false,

@@ -122,6 +122,90 @@ test("one-time Mira ticket becomes a private classroom cookie", async () => {
   );
 });
 
+test("two open classrooms keep audio and event credentials isolated", async () => {
+  const calls = [];
+  const wav = Buffer.alloc(100, 0);
+  wav.write("RIFF", 0); wav.write("WAVE", 8);
+  const backend = await listen(http.createServer(async (request, response) => {
+    const body = await jsonBody(request);
+    if (request.url.endsWith("/exchange")) {
+      const id = body.ticket.endsWith("a") ? "classroom-a" : "classroom-b";
+      return reply(response, { ok: true, classroomId: id, runtimeToken: `omr_${id}`,
+        expiresAt: Date.now() + 60_000 });
+    }
+    if (request.url.endsWith("/validate")) {
+      const id = body.runtimeToken.slice(4);
+      return reply(response, { ok: true, classroomId: id, runtimeSessionId: `runtime-${id}`,
+        learningSessionId: `learning-${id}`, expiresAt: Date.now() + 60_000 });
+    }
+    const id = request.headers["x-mira-runtime-classroom-id"];
+    calls.push({ method: request.method, path: request.url, id });
+    assert.equal(request.headers["x-mira-runtime-session"], `runtime-${id}`);
+    assert.equal(request.headers["x-mira-learning-session"], `learning-${id}`);
+    if (request.url.includes("/audio/")) {
+      if (!request.url.endsWith(`/audio/audio-${id}`)) return response.writeHead(404).end();
+      response.writeHead(200, { "content-type": "audio/wav", "content-length": wav.length,
+        "x-mira-audio-sha256": createHash("sha256").update(wav).digest("hex") });
+      return response.end(wav);
+    }
+    return reply(response, { ok: true, classroom: id, nextSequence: 1 });
+  }));
+  const upstream = await listen(http.createServer((_request, response) => {
+    response.writeHead(200, { "content-type": "text/html" }); response.end("<main>classroom</main>");
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  const jar = new Map();
+  for (const suffix of ["a", "b"]) {
+    const launch = await fetch(`${gateway}/mira/launch?ticket=omt_abcdefghijklmnopqrstuvwxyz${suffix}`,
+      { redirect: "manual" });
+    assert.equal(launch.status, 303);
+    for (const value of launch.headers.getSetCookie()) {
+      assert.match(value, /HttpOnly/);
+      const [name, token] = value.split(";", 1)[0].split("="); jar.set(name, token);
+    }
+  }
+  assert.equal(jar.size, 3);
+  assert.equal(jar.get("mira_openmaic_runtime"), "omr_classroom-b");
+  const cookie = [...jar].map(([name, token]) => `${name}=${token}`).join("; ");
+  const headersFor = id => ({ cookie, referer: `http://runtime.test/classroom/${id}?mira=1`,
+    "x-mira-runtime-session": "forged", "x-mira-runtime-classroom-id": "classroom-b" });
+  for (const id of ["classroom-a", "classroom-b", "classroom-a"]) {
+    const headers = headersFor(id);
+    const page = await fetch(`${gateway}/classroom/${id}?mira=1`, { headers });
+    assert.equal(page.status, 200);
+    assert.equal(page.headers.get("referrer-policy"), "same-origin");
+    const audio = await fetch(`${gateway}/mira/runtime-audio/audio-${id}`, { headers });
+    assert.equal(audio.status, 200);
+    assert.deepEqual(Buffer.from(await audio.arrayBuffer()), wav);
+    const status = await fetch(`${gateway}/mira/runtime-events`, { headers });
+    assert.equal((await status.json()).classroom, id);
+    const event = await fetch(`${gateway}/mira/runtime-events`, { method: "POST",
+      headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({
+        schemaVersion: "mira.openmaic.student-runtime-event.v1", sequence: 1,
+        type: "scene_entered", payload: { sceneIndex: 0, sceneId: "scene-0" },
+      }) });
+    assert.equal((await event.json()).classroom, id);
+  }
+  const priorCalls = calls.length;
+  const onlyB = [...jar].filter(([, value]) => value !== "omr_classroom-a")
+    .map(([name, value]) => `${name}=${value}`).join("; ");
+  for (const headers of [
+    { cookie },
+    { ...headersFor("classroom-a"), cookie: onlyB },
+    { cookie, referer: "https://outside.example/classroom/classroom-a?classroomId=classroom-b" },
+    { ...headersFor("classroom-a"), cookie: cookie.replace("=omr_classroom-a", "=omr_classroom-b") },
+  ]) {
+    assert.equal((await fetch(`${gateway}/mira/runtime-events`, { headers })).status, 401);
+  }
+  assert.equal((await fetch(`${gateway}/api/classroom?id=classroom-b`,
+    { headers: headersFor("classroom-a") })).status, 401);
+  assert.equal(calls.length, priorCalls, "rejected selections never reach event or audio handlers");
+  const query = await fetch(`${gateway}/mira/runtime-events?classroomId=classroom-b`, { headers: {
+    ...headersFor("classroom-a"), referer: "http://runtime.test/classroom/classroom-a?classroomId=classroom-b",
+  } });
+  assert.equal((await query.json()).classroom, "classroom-a");
+});
+
 test("runtime events are session-bound by the gateway and never accept client identity or score", async () => {
   let eventCalls = 0;
   const backend = await listen(

@@ -352,6 +352,14 @@ class _Repository:
             "maximum_scene_index": max(scene_indices, default=-1),
         }
 
+    def learning_session_resume_scene(self, _conn, **kwargs):
+        self.learning_session_scene_evidence(_conn, **kwargs)
+        indices = self.prior_scene_indices | set(self.scene_ids)
+        if not indices:
+            return None
+        index = max(indices)
+        return {"scene_index": index, "scene_id": self.scene_ids.get(index, f"scene-{index}")}
+
     def learning_session_completed_action_scene_ids(self, _conn, **kwargs):
         self.learning_session_scene_evidence(_conn, **kwargs)
         indices = self.prior_action_scene_indices | self.action_scene_indices
@@ -577,6 +585,24 @@ class OpenMaicRuntimeEventBridgeTest(unittest.TestCase):
             self.task_runtime.started,
             [("family-1", "task-1")],
         )
+
+    def test_resume_uses_highest_accepted_visit_without_fabricating_completion(self):
+        self.repository.prior_scene_indices = {0, 1, 2, 3, 4}
+        self._record(_event(1, "scene_entered", {"sceneIndex": 0, "sceneId": "scene-0"}))
+        result = self.service.status(runtime_session_id="runtime-session-1",
+            learning_session_id="learning-session-1", upstream_classroom_id="classroom-1")
+        self.assertEqual(result["resumeScene"], {"sceneIndex": 4, "sceneId": "scene-4"})
+        self.assertEqual(result["completedActionSceneIds"], [])
+        self.assertEqual(result["answeredQuestionIds"], [])
+        self.assertEqual(len(self.repository.events), 1)
+        self.assertFalse(result["completionReady"])
+
+    def test_resume_rejects_a_saved_index_id_mismatch(self):
+        self.repository.scene_ids = {4: "scene-from-another-classroom"}
+        with self.assertRaises(ApiError) as rejected:
+            self.service.status(runtime_session_id="runtime-session-1",
+                learning_session_id="learning-session-1", upstream_classroom_id="classroom-1")
+        self.assertEqual(rejected.exception.code, "runtime_event_resume_invalid")
 
     def test_status_restores_authoritative_answers_from_an_earlier_runtime_session(self):
         self.learning.answered_question_ids = ["q1", "q2"]

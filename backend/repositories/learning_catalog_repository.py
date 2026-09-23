@@ -91,6 +91,7 @@ class LearningCatalogRepository:
         boundaries: Sequence[Mapping[str, Any]],
         curriculum_version: str,
         now: int,
+        retire_missing: bool = True,
     ) -> None:
         active_versions: list[str] = []
         for boundary in boundaries:
@@ -121,7 +122,7 @@ class LearningCatalogRepository:
                     now,
                 ),
             )
-        if active_versions:
+        if active_versions and retire_missing:
             placeholders = ", ".join("?" for _ in active_versions)
             conn.execute(
                 f"""
@@ -331,17 +332,18 @@ class LearningCatalogRepository:
             )
         course_targets = target_spec.get("courseTargets")
         canary_manifest = target_spec.get("canaryManifest")
+        progressive = target_spec.get("schemaVersion") == "mira.learning.preparation-target.progressive.v1"
         if (
             str(target_spec.get("schemaVersion") or "")
-            != "mira.learning.preparation-target.v2"
+            not in {"mira.learning.preparation-target.v2", "mira.learning.preparation-target.progressive.v1"}
             or str(target_spec.get("gradeCode") or "") != grade_code
-            or int(target_spec.get("variantsPerBoundary") or 0) != 3
+            or int(target_spec.get("variantsPerBoundary") or 0) != (2 if progressive else 3)
             or int(target_spec.get("totalCourseCount") or 0) != target_count
             or not isinstance(course_targets, list)
             or len(course_targets) != target_count
             or not isinstance(canary_manifest, Mapping)
             or not isinstance(canary_manifest.get("targets"), list)
-            or len(canary_manifest["targets"]) != 3
+            or len(canary_manifest["targets"]) != len(canonical_target["canaryManifest"]["targets"])
         ):
             raise LearningCatalogBuildConflict(
                 "content-only preparation target is not the exact registered grade shape"
@@ -7975,7 +7977,7 @@ class LearningCatalogRepository:
                 self.decode_json(build.get("target_spec_json"))
             )
             == target_fingerprint
-            and len(items) == formal_target_course_count(grade_code)
+            and len(items) == formal_target_course_count(build)
             and (items_progressive if allow_partial else items_complete)
         ):
             raise LearningCatalogActivationError(
@@ -8116,11 +8118,11 @@ class LearningCatalogRepository:
             # Incomplete or rejected siblings are not publication candidates.
             rows = [row for row in rows if row.get("audio_state") == "auto_validated"
                     and row.get("runtime_status") == "ready"]
-        if not allow_partial and len(rows) != formal_target_course_count(grade_code):
+        if not allow_partial and len(rows) != formal_target_course_count(build):
             raise LearningCatalogActivationError(
                 "formal validation evidence does not cover thirty items"
             )
-        if allow_partial and len(rows) > formal_target_course_count(grade_code):
+        if allow_partial and len(rows) > formal_target_course_count(build):
             raise LearningCatalogActivationError(
                 "formal validation evidence cardinality is invalid"
             )
@@ -8739,6 +8741,8 @@ class LearningCatalogRepository:
                 "formal publication requires one release Provider receipt"
             )
         for row in rows:
+            from services.progressive_math2_revision import assert_publishable_revision
+            assert_publishable_revision(str(row.get("course_id") or ""))
             if artifact_mode:
                 manifest = self.decode_json(row.get("feature_manifest_json"))
                 if not isinstance(manifest, Mapping):

@@ -15,6 +15,7 @@ vi.mock("@/features/today/student-dashboard", () => ({ StudentDashboard: () => <
 vi.mock("@/features/learning/learning-library", () => ({ LearningLibrary: () => <div>已授权的课程库</div> }));
 vi.mock("@/features/learning/learning-course-detail", () => ({ LearningCourseDetail: () => <div>已授权的课程详情</div> }));
 vi.mock("@/features/learning/learning-practice", () => ({ LearningPractice: () => <div>已授权的练习</div> }));
+vi.mock("@/features/learning/learning-path", () => ({ LearningPath: () => <div>已授权的学习路线</div> }));
 vi.mock("@/features/classroom/classroom-entry", () => ({ ClassroomEntry: () => <div>已授权的课堂</div> }));
 
 describe("StudentSessionGate", () => {
@@ -63,5 +64,15 @@ describe("StudentSessionGate", () => {
     render(<StudentSessionGate lessonTaskId="task-1" classroomMode="openmaic" />);
     expect(screen.getByText("正在打开学习空间")).toBeInTheDocument();
     expect(screen.queryByTestId("session-shell")).not.toBeInTheDocument();
+  });
+
+  it("opens the learning path only after student identity is verified", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      ok: true, student: { id: "student-1", childId: "child-1", displayName: "小米", gradeCode: "primary_1" },
+      device: { id: "device-1", label: "学习设备" },
+    }))));
+    render(<StudentSessionGate learningView="path" />);
+    expect(screen.queryByText("已授权的学习路线")).not.toBeInTheDocument();
+    expect(await screen.findByText("已授权的学习路线")).toBeInTheDocument();
   });
 });

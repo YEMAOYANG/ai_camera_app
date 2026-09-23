@@ -6,6 +6,8 @@ import { URL } from "node:url";
 const DEFAULT_MAX_BODY_BYTES = 25 * 1024 * 1024;
 const MAX_RUNTIME_AUDIO_BYTES = 16 * 1024 * 1024;
 const RUNTIME_COOKIE = "mira_openmaic_runtime";
+const CLASSROOM_COOKIE_PREFIX = `${RUNTIME_COOKIE}_classroom_`;
+const CLASSROOM_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,159}$/;
 const SAFE_API_PREFIXES = ["/api/pbl/v2/"];
 const SAFE_API_PATHS = new Set([
   "/api/chat",
@@ -94,9 +96,24 @@ async function handleRequest(request, response, config) {
     return launchConversationProbe(request, response, url, config);
   }
 
-  const runtimeToken = readCookie(request.headers.cookie, RUNTIME_COOKIE);
+  const selection = selectRuntimeCookie(request, url, config);
+  const runtimeToken = selection?.token;
   if (!runtimeToken) return unauthorized(response);
   const runtime = await validateRuntime(runtimeToken, config);
+  // The page/referrer only selects a credential; the backend remains the
+  // authority for its classroom, student, expiry, and permitted operations.
+  if (selection.classroomId && runtime.classroomId !== selection.classroomId) {
+    return unauthorized(response);
+  }
+  if (selection.legacy && selection.classroomId && runtime.purpose !== "conversation_probe") {
+    // A previously open, matching classroom can migrate on reload without
+    // accepting the most recently launched *other* classroom's credential.
+    response.setHeader("Set-Cookie", serializeCookie(
+      classroomCookieName(selection.classroomId), runtimeToken,
+      { maxAge: Math.max(1, Math.floor((Number(runtime.expiresAt) - Date.now()) / 1000)),
+        secure: config.secureCookie },
+    ));
+  }
   if (url.pathname === "/mira/runtime-events") {
     return recordRuntimeEvent(request, response, runtime, config);
   }
@@ -299,17 +316,15 @@ async function launch(_request, response, url, config) {
   const result = await backendJson(config, "/internal/learning/openmaic/runtime/exchange", {
     ticket,
   });
-  if (!result.ok || !result.runtimeToken || !result.classroomId) {
+  if (!result.ok || !result.runtimeToken || !CLASSROOM_ID_PATTERN.test(String(result.classroomId || ""))) {
     return unauthorized(response);
   }
   const maxAge = Math.max(1, Math.floor((Number(result.expiresAt) - Date.now()) / 1000));
   response.statusCode = 303;
   response.setHeader(
     "Set-Cookie",
-    serializeCookie(RUNTIME_COOKIE, result.runtimeToken, {
-      maxAge,
-      secure: config.secureCookie,
-    }),
+    [RUNTIME_COOKIE, classroomCookieName(result.classroomId)].map(name =>
+      serializeCookie(name, result.runtimeToken, { maxAge, secure: config.secureCookie })),
   );
   response.setHeader("Cache-Control", "no-store");
   response.setHeader("Location", `/classroom/${encodeURIComponent(result.classroomId)}?mira=1`);
@@ -927,7 +942,9 @@ function copyResponseHeaders(source, response, config, decision, pathname) {
   );
   response.setHeader("Cross-Origin-Resource-Policy", "same-origin");
   response.setHeader("X-Content-Type-Options", "nosniff");
-  response.setHeader("Referrer-Policy", "no-referrer");
+  // Same-origin audio/events fetches retain their owning classroom URL when
+  // several classrooms are open. Other origins still receive no referrer.
+  response.setHeader("Referrer-Policy", decision.kind === "document" ? "same-origin" : "no-referrer");
   response.setHeader(
     "Permissions-Policy",
     "camera=(), geolocation=(), payment=(), usb=(), microphone=(self)",
@@ -1041,6 +1058,65 @@ function readCookie(header, name) {
     if (rawName === name) return decodeURIComponent(rest.join("="));
   }
   return "";
+}
+
+function classroomCookieName(classroomId) {
+  return CLASSROOM_COOKIE_PREFIX + createHash("sha256").update(classroomId).digest("hex").slice(0, 32);
+}
+
+function classroomInPath(pathname) {
+  const match = pathname.match(/^\/classroom\/([^/]+)$/)
+    || pathname.match(/^\/api\/classroom-media\/([^/]+)\//);
+  if (!match) return "";
+  try {
+    const id = decodeURIComponent(match[1]);
+    return CLASSROOM_ID_PATTERN.test(id) ? id : "";
+  } catch { return ""; }
+}
+
+function selectRuntimeCookie(request, url, config) {
+  let classroomId = classroomInPath(url.pathname);
+  if (url.pathname === "/api/classroom") {
+    const ids = url.searchParams.getAll("id");
+    if (ids.length !== 1 || !CLASSROOM_ID_PATTERN.test(ids[0])) return null;
+    classroomId = ids[0];
+  }
+  const referer = request.headers.referer;
+  if (referer) {
+    let source;
+    try { source = new URL(referer); } catch { return null; }
+    const origins = new Set([new URL(config.publicOrigin).origin]);
+    if (config.localLanProductionMode && isPrivateHttpOrigin(config.publicOrigin)) {
+      for (const hostname of ["localhost", "127.0.0.1"]) {
+        const alias = new URL(config.publicOrigin);
+        alias.hostname = hostname;
+        origins.add(alias.origin);
+      }
+    }
+    if (source.username || source.password) return null;
+    if (origins.has(source.origin)) {
+      // Ignore query parameters: a page cannot name another classroom there.
+      const sourceClassroom = classroomInPath(source.pathname);
+      if (classroomId && sourceClassroom && classroomId !== sourceClassroom) return null;
+      classroomId ||= sourceClassroom;
+    } else if (!classroomId) {
+      // An external page must never select a credential for unscoped APIs.
+      return null;
+    }
+  }
+  const cookies = request.headers.cookie;
+  const scoped = classroomId && readCookie(cookies, classroomCookieName(classroomId));
+  if (scoped) return { token: scoped, classroomId, legacy: false };
+  const legacy = readCookie(cookies, RUNTIME_COOKIE);
+  const hasScopedCookies = String(cookies || "").split(";").some(part =>
+    part.trim().startsWith(CLASSROOM_COOKIE_PREFIX));
+  if (hasScopedCookies) {
+    // Static assets have no classroom-specific data and their referrer may
+    // be a stylesheet. All new classroom API/audio calls require page scope.
+    const asset = authorizeRuntimeRequest(request, url, { classroomId: "" }).kind === "asset";
+    if (classroomId || (!asset && !legacy.startsWith("ompr_"))) return null;
+  }
+  return { token: legacy, classroomId, legacy: true };
 }
 
 function serializeCookie(name, value, { maxAge, secure }) {

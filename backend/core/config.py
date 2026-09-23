@@ -414,7 +414,7 @@ class AppConfig:
             LEARNING_STATIC_CATALOG_ENABLED=_bool(
                 _env(
                     "LEARNING_STATIC_CATALOG_ENABLED",
-                    "0" if learning_dynamic_generation_enabled else "1",
+                    "0",
                 )
             ),
             LEARNING_DYNAMIC_POOL_TARGET=max(

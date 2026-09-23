@@ -58,4 +58,16 @@ describe("formal classroom launch client", () => {
     fetchMock.mockResolvedValue(jsonResponse({ ok: true, courseId: "other", courseVersion: "2", taskId: "task-2", created: true }));
     await expect(startLearningCourse("requested", "2")).rejects.toMatchObject({ code: "learning_course_start_invalid" });
   });
+
+  it("preserves a prerequisite conflict and its child-friendly backend message", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({
+      error: "learning_prerequisite_required",
+      message: "先学会数数，再来学习加法。",
+    }), { status: 409, headers: { "content-type": "application/json" } }));
+    await expect(startLearningCourse("course-addition", "1")).rejects.toMatchObject({
+      status: 409,
+      code: "learning_prerequisite_required",
+      message: "先学会数数，再来学习加法。",
+    });
+  });
 });

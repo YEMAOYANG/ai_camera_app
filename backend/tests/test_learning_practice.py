@@ -40,6 +40,7 @@ class Repository:
             self.questions,self.sessions,self.session_items,self.exposures=snapshot
             raise
     def lock_child(self, conn, principal): return self.child
+    def difficulty_mastery(self, conn, **scope): return {}
     def eligible_sources(self, conn, **scope):
         self.scope = scope
         return self.sources
@@ -76,6 +77,14 @@ class PracticeTest(unittest.TestCase):
     def solve(self,result):
         session=result['session'];item=next(row for row in self.repo.items(None,session['id']) if row['question_id']==session['currentQuestion']['id'])
         return self.service.answer('student-token',session['id'],{'questionId':item['question_id'],'response':json.loads(item['snapshot_json'])['answer']})
+    def test_grade_one_future_sources_require_mastered_prerequisites(self):
+        self.repo.sources[0].update(node_code='addition_subtraction_20', boundary_ordinal=2)
+        self.assertIsNone(self.start()['session'])
+        self.assertFalse(self.repo.questions)
+        self.host.validate_primary_one_accepted_receipt.assert_not_called()
+        self.repo.difficulty_mastery = lambda conn, **scope: {'number_sense_20': {'mastery_level': 'mastered'}}
+        self.assertIsNotNone(self.start(requestId='unlocked')['session'])
+
     def test_shared_projection_hides_answers_and_admits_only_independent_phase(self):
         result=self.start()
         self.assertEqual(result['session']['totalQuestions'],2)

@@ -2,6 +2,7 @@
 
 import { performance } from 'node:perf_hooks';
 import process from 'node:process';
+import {progressiveSchemas, runProgressiveCourse} from './progressive-course-contract.mjs';
 import {prepareQuestionPhaseReplyArchive} from './question-phase-reply-archive.mjs';
 import {assertFormalObjectiveCandidate, formalObjectiveQuestionIssues} from './formal-objective-preflight.mjs';
 import {
@@ -1266,6 +1267,8 @@ async function availability() {
         '@openmaic/dsl': '0.10.1',
       },
       supportedContracts: [
+        { input: progressiveSchemas.generationInput, output: progressiveSchemas.output },
+        { input: progressiveSchemas.verificationInput, output: progressiveSchemas.output },
         { input: schemas.input, output: schemas.output },
         {
           input: questionSchemas.generationInput,
@@ -1736,6 +1739,9 @@ async function generateClassroom(payload) {
 }
 
 async function dispatch(payload) {
+  if ([progressiveSchemas.generationInput, progressiveSchemas.verificationInput].includes(payload?.schemaVersion)) {
+    return runProgressiveCourse(payload);
+  }
   if (payload?.schemaVersion === classroomSchemas.input) {
     return generateClassroom(payload);
   }
@@ -1752,6 +1758,9 @@ async function dispatch(payload) {
 }
 
 function errorOutputSchema(payload) {
+  if ([progressiveSchemas.generationInput, progressiveSchemas.verificationInput].includes(payload?.schemaVersion)) {
+    return progressiveSchemas.output;
+  }
   if (payload?.schemaVersion === classroomSchemas.input) {
     return classroomSchemas.output;
   }

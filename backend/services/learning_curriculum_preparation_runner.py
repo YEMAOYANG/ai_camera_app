@@ -274,6 +274,9 @@ class CheckpointSharedBuildAdapter:
         *,
         now_ms: int,
     ) -> PreparationStageResult:
+        if _target_spec(plan).get("schemaVersion") == "mira.learning.preparation-target.progressive.v1":
+            from services.progressive_formal_preparation import advance_progressive_content
+            return advance_progressive_content(self, plan, now_ms=now_ms)
         build_id = str(plan.get("catalog_build_id") or "")
         release_id = str(plan.get("catalog_release_id") or "")
         if not build_id or not release_id:
@@ -1048,7 +1051,18 @@ class LearningCurriculumPreparationRunner:
         finally:
             self._tick_lock.release()
 
-    def _run_once(self, app, now_ms: int) -> dict[str, object]:
+    def run_scoped_once(self, app, now_ms: int, *, target: Mapping) -> dict[str, object]:
+        from services.learning_curriculum_preparation_contract import TARGET_SCHEMA_PROGRESSIVE, canonical_preparation_target_for
+        if target.get("schemaVersion") != TARGET_SCHEMA_PROGRESSIVE or dict(target) != canonical_preparation_target_for(target):
+            raise ValueError("explicit progressive preparation target is invalid")
+        if not self._tick_lock.acquire(blocking=False):
+            return {"claimed": 0, "busy": True}
+        try:
+            return self._run_once(app, now_ms, explicit_target=target)
+        finally:
+            self._tick_lock.release()
+
+    def _run_once(self, app, now_ms: int, *, explicit_target=None) -> dict[str, object]:
         config = learning_curriculum_preparation_config_projection(app)
         if not (
             config is not None
@@ -1063,8 +1077,12 @@ class LearningCurriculumPreparationRunner:
             cursor = self._grade_cursor.get(scheduling_key, 0)
             grade_code = config.grade_allowlist[cursor % len(config.grade_allowlist)]
             self._grade_cursor[scheduling_key] = (cursor + 1) % len(config.grade_allowlist)
+        if explicit_target is not None:
+            grade_code = str(explicit_target["gradeCode"])
+            if grade_code not in config.grade_allowlist:
+                return {"claimed": 0, "disabled": True, "reason": "grade_not_enabled"}
         config = replace(config, grade_code=grade_code,
-                         target_fingerprint=preparation_target_fingerprint(build_preparation_target(grade_code)))
+                         target_fingerprint=preparation_target_fingerprint(explicit_target or build_preparation_target(grade_code)))
         # The old scalar switch authorizes Grade 1 only. Merely adding a grade
         # to scheduler eligibility must never create a paid production scope.
         grade_scopes = app.config.get("LEARNING_COURSE_SUPPLY_GRADE_SCOPES", {})
@@ -1072,7 +1090,7 @@ class LearningCurriculumPreparationRunner:
         if scope is None and grade_code == "primary_1":
             scope = app.config.get("LEARNING_COURSE_SUPPLY_SCOPE", "canary")
         refresh_key = (app.config.get("DATABASE_URL"), grade_code, config.target_fingerprint, scope)
-        if (app.config.get("LEARNING_COURSE_LIBRARY_ENABLED") is True and scope is not None
+        if (explicit_target is None and app.config.get("LEARNING_COURSE_LIBRARY_ENABLED") is True and scope is not None
             and int(self.clock()) >= self._library_refresh.get(refresh_key, 0)):
             from services.course_library_service import CourseLibraryService
             CourseLibraryService(
@@ -1080,10 +1098,28 @@ class LearningCurriculumPreparationRunner:
                 preparation_repository=repository, clock=self.clock,
             ).request_scope(scope, preserve_existing_scope=True)
             self._library_refresh[refresh_key] = int(self.clock()) + 60_000
+        if explicit_target is None:
+            with repository.transaction() as conn:
+                fine = conn.execute("SELECT plan.target_spec_json FROM learning_curriculum_preparation_plans AS plan "
+                    "WHERE plan.grade_code=? AND plan.curriculum_version='mira.primary.progressive.v1' "
+                    "AND plan.status IN ('queued','running') AND plan.superseded_at IS NULL "
+                    "AND EXISTS (SELECT 1 FROM learning_course_supply_requests AS request "
+                    "LEFT JOIN learning_catalog_build_items AS item ON item.build_job_id=plan.catalog_build_id "
+                    "AND item.subject=request.subject AND item.skill_id=request.skill_id AND item.variant_ordinal=request.variant_ordinal "
+                    "LEFT JOIN learning_curriculum_classroom_item_receipts AS receipt ON receipt.build_item_id=item.id "
+                    "AND receipt.target_fingerprint=plan.target_fingerprint "
+                    "WHERE request.target_fingerprint=plan.target_fingerprint AND request.enabled=TRUE "
+                    "AND (item.id IS NULL OR item.status IN ('pending','processing') OR "
+                    "(item.status='course_ready' AND (receipt.publication_status IS NULL OR receipt.publication_status<>'published')))) "
+                    "ORDER BY plan.next_run_at, plan.updated_at, plan.id LIMIT 1", (grade_code,)).fetchone()
+            if fine is not None:
+                from services.learning_curriculum_preparation_contract import canonical_preparation_target_for
+                explicit_target = canonical_preparation_target_for(fine["target_spec_json"])
+                config = replace(config, target_fingerprint=preparation_target_fingerprint(explicit_target))
         generator = getattr(getattr(adapter, "catalog_service", None),
                             "staged_content_candidate_generator", None)
         required_budget = getattr(generator, "required_phase_budget_ms", 0)
-        if isinstance(repository, LearningCurriculumPreparationRepository) and required_budget:
+        if explicit_target is None and isinstance(repository, LearningCurriculumPreparationRepository) and required_budget:
             with repository.transaction() as conn:
                 repository.renew_undispatched_content_budget(
                     conn, grade_code=config.grade_code,

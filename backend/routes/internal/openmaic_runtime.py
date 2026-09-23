@@ -653,6 +653,7 @@ def _runtime_event_service() -> OpenMaicRuntimeEventService:
         task_runtime_service=task_runtime_service(),
         budget_service=learning_budget_service(),
         teaching_conversation_reader=openmaic_full_runtime_service().client.read_teaching_conversation,
+        classroom_reader=openmaic_full_runtime_service().client.get_classroom,
     )
 
 

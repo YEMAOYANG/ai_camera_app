@@ -1,0 +1,191 @@
+diff --git a/lib/server/mira-formal-asr-revalidation.ts b/lib/server/mira-formal-asr-revalidation.ts
+--- a/lib/server/mira-formal-asr-revalidation.ts
++++ b/lib/server/mira-formal-asr-revalidation.ts
+@@ -7,6 +7,7 @@
+   type MiraFormalAsrJob, type MiraFormalTtsJob } from './mira-formal-audio';
+ import { MIRA_FORMAL_ASR_COMPARISON_POLICY_VERSION, miraFormalAudioClassroomContentSha256, prepareMiraFormalSpeechText,
+   prepareMiraFormalAsrComparisonText, normalizeMiraFormalAsrText, miraFormalAsrSimilarityBps } from './mira-formal-audio-lifecycle';
++import { buildEnglishOrthographyRevalidation } from './mira-formal-english-asr-orthography';
+ 
+ export type AsrComparisonBinding = {
+   sessionId: string; stageId: string; snapshotSha256: string; sourceJobSha256: string; asrRequestId: string;
+@@ -14,7 +15,7 @@
+ export type AsrComparisonReference = AsrComparisonBinding & { receiptSha256: string };
+ export type AsrComparisonReferences = AsrComparisonReference | AsrComparisonReference[];
+ type TranscriptArchive = { requestId: string; audioSha256: string; transcript: string; transcriptSha256: string };
+-type OriginalSources = { asrRecord: MiraFormalAsrJob; ttsRecord: MiraFormalTtsJob;
++export type OriginalSources = { asrRecord: MiraFormalAsrJob; ttsRecord: MiraFormalTtsJob;
+   transcriptArchive: TranscriptArchive; spokenText: string; audio: Uint8Array };
+ const sha = (value: string | Uint8Array) => createHash('sha256').update(value).digest('hex');
+ const HASH = /^[a-f0-9]{64}$/;
+@@ -83,7 +84,14 @@
+       normalizedTranscriptSha256:sha(normalizeMiraFormalAsrText(actual)),similarityBps},createdAt};
+   return {...receipt,receiptSha256:qualitySha(receipt)};
+ }
+-export type AsrComparisonRevalidation = ReturnType<typeof buildAsrComparisonRevalidation>;
++export type AsrComparisonRevalidation = ReturnType<typeof buildAsrComparisonRevalidation>
++  | ReturnType<typeof buildEnglishOrthographyRevalidation>;
++function buildComparison(binding: AsrComparisonBinding, original: OriginalSources,
++  sourceSha256: string, createdAt: string): AsrComparisonRevalidation {
++  return original.asrRecord.subject === 'english'
++    ? buildEnglishOrthographyRevalidation(binding, original, sourceSha256, createdAt)
++    : buildAsrComparisonRevalidation(binding, original, sourceSha256, createdAt);
++}
+ type Context = {binding:AsrComparisonBinding;stage:Stage;scenes:Scene[]};
+ async function sourceAndPath(input: Context) {
+   const {binding,stage,scenes} = input;
+@@ -98,7 +106,9 @@
+   const asset = await readMiraFormalTtsAsset(tts.requestId);
+   if (qualitySha(asset.record) !== qualitySha(tts)) fail();
+   const transcriptArchive = JSON.parse(await fs.readFile(path.join(audioRoot(),'transcripts',`${sha(asr.requestId)}.json`),'utf8')) as TranscriptArchive;
+-  const sourceSha256 = sha(await fs.readFile(path.join(process.cwd(),'lib/server/mira-formal-audio-lifecycle.ts')));
++  // Preserve the original math source hash and receipt algorithm verbatim.
++  const comparatorPath = asr.subject === 'english' ? 'mira-formal-english-asr-orthography.ts' : 'mira-formal-audio-lifecycle.ts';
++  const sourceSha256 = sha(await fs.readFile(path.join(process.cwd(), 'lib/server', comparatorPath)));
+   const file = path.join(audioRoot(),'comparison-revalidations',sha(asr.requestId),
+     `${binding.snapshotSha256}-${sourceSha256}.json`);
+   return {file,sourceSha256,original:{asrRecord:asr,ttsRecord:tts,transcriptArchive,
+@@ -109,7 +119,7 @@
+   let prior: AsrComparisonRevalidation | undefined;
+   try { prior=JSON.parse(await fs.readFile(file,'utf8')); }
+   catch(error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+-  const receipt=buildAsrComparisonRevalidation(input.binding,original,sourceSha256,prior?.createdAt ?? new Date().toISOString());
++  const receipt=buildComparison(input.binding,original,sourceSha256,prior?.createdAt ?? new Date().toISOString());
+   if (prior) {
+     if (qualitySha(prior) !== qualitySha(receipt)) throw new Error('SAVED_ASR_COMPARISON_AUDIT_CHANGED');
+     return receipt;
+@@ -124,7 +134,7 @@
+   const {receiptSha256,...binding}=input.reference;
+   const {file,sourceSha256,original}=await sourceAndPath({...input,binding});
+   const saved=JSON.parse(await fs.readFile(file,'utf8')) as AsrComparisonRevalidation;
+-  const replay=buildAsrComparisonRevalidation(binding,original,sourceSha256,saved.createdAt);
++  const replay=buildComparison(binding,original,sourceSha256,saved.createdAt);
+   if (!HASH.test(receiptSha256) || replay.receiptSha256 !== receiptSha256 || qualitySha(saved) !== qualitySha(replay))
+     throw new Error('SAVED_ASR_COMPARISON_AUDIT_CHANGED');
+   return replay;
+diff --git a/lib/server/mira-formal-english-asr-orthography.ts b/lib/server/mira-formal-english-asr-orthography.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-english-asr-orthography.ts
+@@ -0,0 +1,86 @@
++/** A single archived English narration's transcription equivalence, not an
++ * acoustic verdict or a general proper-name dictionary. Original audio and ASR
++ * records remain unchanged; only a separately bound comparison is issued. */
++import { createHash } from 'node:crypto';
++import { qualitySha } from './mira-formal-quality-contract';
++import { normalizeMiraFormalAsrText, miraFormalAsrSimilarityBps } from './mira-formal-audio-lifecycle';
++import type { AsrComparisonBinding, OriginalSources } from './mira-formal-asr-revalidation';
++
++export const ENGLISH_ORTHOGRAPHY_POLICY = 'mira.learning.formal-asr-comparison.v1-english-name-orthography' as const;
++export const ENGLISH_ORTHOGRAPHY_SCHEMA = 'mira.openmaic.asr-comparison-revalidation.v2-english-orthography' as const;
++export const ENGLISH_ORTHOGRAPHY_BINDING: AsrComparisonBinding = Object.freeze({
++  sessionId: 'miraformal_06fd3faa925c2d7d2c7cbdc7b983f10fff1dead09ca3b2865d304bf3af33b1ae',
++  stageId: 'stage-FC2nTYOIET',
++  snapshotSha256: 'f678e29bd3954cca3db49820fda9a58974677259e5913e7d2a262b98a5f93904',
++  sourceJobSha256: 'a3fb84e1c4e1f16424aa255b9f035453109b7103a7d61c609cfcdff41aaec037',
++  asrRequestId: 'formal_asr_6041228c0db83966b76f926f2cf20ff85d75cb1a1c9e97f1',
++});
++const TEXT = '这位是女孩 Mila，她是主动发出问候动作的人。';
++const TRANSCRIPT = '这位是女孩儿米拉，她是主动发出问候动作的人。';
++const AUDIO_SHA = '6d24b9a487acc8be70d4fdc0e9a6ed87031526261c9b5cdabcae3aa2a00df5c5';
++const sha = (value: string | Uint8Array) => createHash('sha256').update(value).digest('hex');
++const fail = (): never => { throw new Error('SAVED_ENGLISH_ORTHOGRAPHY_SOURCE_INVALID'); };
++const rules = [
++  { side: 'expected', from: 'Mila', to: '米拉', occurrences: 1 },
++  { side: 'transcript', from: '女孩儿', to: '女孩', occurrences: 1 },
++] as const;
++
++export function compareArchivedEnglishOrthography(spokenText: string, transcript: string) {
++  // No other narration or taught pronoun can enter this narrow spelling rule.
++  if (spokenText !== TEXT || transcript !== TRANSCRIPT
++      || miraFormalAsrSimilarityBps(spokenText, transcript) !== 8095) fail();
++  let expected = spokenText, actual = transcript;
++  for (const rule of rules) {
++    const input = rule.side === 'expected' ? expected : actual;
++    if (input.split(rule.from).length - 1 !== rule.occurrences) fail();
++    const output = input.replace(rule.from, rule.to);
++    if (rule.side === 'expected') expected = output; else actual = output;
++  }
++  const normalized = normalizeMiraFormalAsrText(actual);
++  if (normalized !== normalizeMiraFormalAsrText(expected)
++      || miraFormalAsrSimilarityBps(expected, actual) !== 10000) fail();
++  return { normalizedTranscriptSha256: sha(normalized), similarityBps: 10000,
++    appliedRules: rules.map(rule => ({ ...rule })) };
++}
++
++export function buildEnglishOrthographyRevalidation(binding: AsrComparisonBinding,
++  original: OriginalSources, comparatorSourceSha256: string, createdAt: string) {
++  const { asrRecord: asr, ttsRecord: tts, transcriptArchive: archive, spokenText, audio } = original;
++  const identity = {
++    classroomId: ENGLISH_ORTHOGRAPHY_BINDING.stageId,
++    classroomContentSha256: '4808dd2c58c1e5fafec961e27a996052a872b551533570c9aabee0280ef81420',
++    subject: 'english', teacherProfileId: 'mira_english_standard', teacherProfileVersion: 2,
++    teacherProfileSha256: '4725f27c5438c0f68fe8923ac977fa1dd01452b990ac58912b880320750ee040',
++    teacherGender: 'female', sceneId: 'scene-p1', sceneOrder: 3, actionId: 'action_QNBwhwWM',
++    narrationSegmentId: 'formal_narration_6041228c0db83966b76f926f2cf20ff85d75cb1a1c9e97f1',
++    languageCode: 'en-US', state: 'succeeded', fallbackUsed: false,
++  } as const;
++  if (qualitySha(binding) !== qualitySha(ENGLISH_ORTHOGRAPHY_BINDING)
++      || !/^[a-f0-9]{64}$/.test(comparatorSourceSha256) || !Number.isFinite(Date.parse(createdAt))
++      || !asr || !tts || asr.kind !== 'asr' || tts.kind !== 'tts'
++      || Object.entries(identity).some(([key, value]) => asr[key as keyof typeof asr] !== value || tts[key as keyof typeof tts] !== value)
++      || asr.requestId !== binding.asrRequestId
++      || tts.requestId !== binding.asrRequestId.replace('formal_asr_', 'formal_tts_')
++      || asr.ttsRequestId !== tts.requestId
++      || asr.requestSha256 !== 'b5b667d982e8816258525d7261a45a0f77bb23185377d691b1518d2713392f12'
++      || tts.requestSha256 !== '6b55dbcd8b3aaf20709ba649a8d6afcc14c267d61352d487cbd6ca84944cc7b3'
++      || asr.providerId !== 'qwen-asr' || asr.modelId !== 'qwen3-asr-flash'
++      || tts.providerId !== 'qwen-tts' || tts.modelId !== 'qwen3-tts-flash'
++      || tts.voiceId !== 'Jennifer' || tts.voiceGender !== 'female'
++      || 'operatorRepair' in asr || 'operatorRepair' in tts
++      || asr.similarityBps !== 8095 || tts.textSha256 !== sha(spokenText)
++      || tts.textSha256 !== 'ce99eade3e103be2eb037d545894170760a188450d8ab89167237e1aa05f2064'
++      || archive.requestId !== asr.requestId || sha(archive.transcript) !== archive.transcriptSha256
++      || archive.transcriptSha256 !== asr.transcriptSha256
++      || archive.transcriptSha256 !== 'ebf60d21d66a583b2205e618dbb84cebe21b25c87f0e320794571b7394ea6cab'
++      || asr.normalizedTranscriptSha256 !== sha(normalizeMiraFormalAsrText(archive.transcript))
++      || asr.audioSha256 !== AUDIO_SHA || tts.audioSha256 !== AUDIO_SHA || archive.audioSha256 !== AUDIO_SHA
++      || audio.byteLength !== 234284 || tts.sizeBytes !== 234284 || sha(audio) !== AUDIO_SHA) fail();
++  const comparison = compareArchivedEnglishOrthography(spokenText, archive.transcript);
++  const receipt = { schemaVersion: ENGLISH_ORTHOGRAPHY_SCHEMA, binding,
++    source: { asrRecord: asr, ttsRecord: tts, transcriptArchive: archive, spokenText,
++      asrRecordSha256: qualitySha(asr), ttsRecordSha256: qualitySha(tts), transcriptArchiveSha256: qualitySha(archive) },
++    comparison: { policyVersion: ENGLISH_ORTHOGRAPHY_POLICY, sourceSha256: comparatorSourceSha256, ...comparison },
++    createdAt };
++  return { ...receipt, receiptSha256: qualitySha(receipt) };
++}
+diff --git a/tests/server/mira-formal-english-asr-orthography.test.ts b/tests/server/mira-formal-english-asr-orthography.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-english-asr-orthography.test.ts
+@@ -0,0 +1,30 @@
++import { describe, expect, it } from 'vitest';
++import { compareArchivedEnglishOrthography } from '@/lib/server/mira-formal-english-asr-orthography';
++import { miraFormalAsrSimilarityBps } from '@/lib/server/mira-formal-audio-lifecycle';
++
++describe('archived English narration orthography', () => {
++  const expected = '这位是女孩 Mila，她是主动发出问候动作的人。';
++  const transcript = '这位是女孩儿米拉，她是主动发出问候动作的人。';
++
++  it('preserves the original comparison and explains the exact two spelling changes', () => {
++    expect(miraFormalAsrSimilarityBps(expected, transcript)).toBe(8095);
++    expect(compareArchivedEnglishOrthography(expected, transcript)).toMatchObject({
++      similarityBps: 10000,
++      appliedRules: [
++        { side: 'expected', from: 'Mila', to: '米拉', occurrences: 1 },
++        { side: 'transcript', from: '女孩儿', to: '女孩', occurrences: 1 },
++      ],
++    });
++    expect(miraFormalAsrSimilarityBps(expected, transcript)).toBe(8095);
++  });
++
++  it('does not normalize another name, a changed role or taught pronoun', () => {
++    for (const changed of [transcript.replace('米拉', '米娜'), transcript.replace('她', '他'),
++      transcript.replace('主动', '被动'), `${transcript}I`, `${transcript}me`,
++      `${transcript}She`, `${transcript}her`, `${transcript}They`, `${transcript}them`]) {
++      expect(() => compareArchivedEnglishOrthography(expected, changed)).toThrow('SOURCE_INVALID');
++    }
++    expect(() => compareArchivedEnglishOrthography(expected.replace('Mila', 'Mina'), transcript))
++      .toThrow('SOURCE_INVALID');
++  });
++});

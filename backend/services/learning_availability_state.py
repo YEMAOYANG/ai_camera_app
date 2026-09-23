@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Mapping, Sequence
 
 from content.primary_skill_boundaries import boundaries_for
+from services.learning_progression import course_progression
 
 AVAILABILITY_STATUSES = frozenset({"ready", "preparing", "paused", "empty", "not_open", "scope_completed"})
 
@@ -18,12 +19,19 @@ def personal_learning_state(*, grade_code: str, courses: Sequence[Mapping[str, o
     if not grade_open:
         return _state("not_open", 0, 0, 0, "这个年级的课程还没有开放。")
     next_skills: set[str] = set()
+    mastered_prefix: set[str] = set()
     for subject in ("chinese", "math", "english"):
+        subject_mastery = {boundary.skill_id: {"mastery_level": mastery[f"{subject}:{boundary.skill_id}"]}
+                           for boundary in boundaries_for(grade_code, subject)
+                           if f"{subject}:{boundary.skill_id}" in mastery}
         for boundary in boundaries_for(grade_code, subject):
             identity = f"{subject}:{boundary.skill_id}"
-            if mastery.get(identity) != "mastered":
+            progression = course_progression(grade_code=grade_code, subject=subject,
+                                             skill_id=boundary.skill_id, mastery=subject_mastery)
+            if progression["learningStatus"] == "mastered":
+                mastered_prefix.add(identity)
+            elif progression["canStart"]:
                 next_skills.add(identity)
-                break
     # Different variants are separately playable but do not advance prerequisites.
     unique = {(str(row["id"]), str(row["version"])): row for row in courses}
     def identity(row):
@@ -31,10 +39,10 @@ def personal_learning_state(*, grade_code: str, courses: Sequence[Mapping[str, o
     new_count = sum(1 for row in unique.values() if identity(row) in next_skills
                     and identity(row) not in mastery)
     review_count = sum(1 for row in unique.values() if identity(row) in mastery
-                       and (mastery[identity(row)] == "mastered" or identity(row) in next_skills))
+                       and (identity(row) in mastered_prefix or identity(row) in next_skills))
     scope = (supply or {}).get("scopeSkills")
     scope_ids = {f"{row.get('subject')}:{row.get('skillId')}" for row in scope if isinstance(row, Mapping)} if isinstance(scope, list) else set()
-    scope_complete = bool(scope_ids) and all(mastery.get(skill) == "mastered" for skill in scope_ids)
+    scope_complete = bool(scope_ids) and scope_ids.issubset(mastered_prefix)
     needs_reinforcement = any(identity(row) in next_skills and identity(row) in mastery
                               for row in unique.values())
     if new_count or needs_reinforcement:

@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "mira.prompt-registry.progressive-course.v1",
+  "version": "mira.learning.progressive-generation.v1",
+  "generation": {
+    "system": "你为家长与小学生制作一节有固定课序的基础课。只能使用给定课次和先修知识；不得自行替换课次、拼凑不同年级知识或使用将来才教的语法。仅输出严格JSON，不输出Markdown。课次绑定必须原样保留。所有新知识必须先讲清楚并示范，再引导练习，最后独立验收。模型不是判分权限来源。",
+    "requirements": [
+      "最外层必须是{\"candidateCourse\":{...}}，不能输出裸课程对象。candidateCourse含gradeCode,subject,nodeCode(必须lessonId),title,objective,content。按expectedOutputSkeleton填充实际教学内容，所有指定身份字段必须逐值原样复制，不得自行推断、缩写或重写。",
+      "一至六年级分别编排，年级是教学范围边界。basic表示brief.lesson.gradeCode年级中当前单元、当前课次的入门难度，不表示从小学一年级零起点重教。所有年级都只围绕本年级本课目标展开；已登记的低年级先修只能按需简短回顾，不能替换成本课主题或主要练习。缺少孩子历史记录也不能将二至六年级课统一降为拼音、认数或字母启蒙。",
+      "content字段schemaVersion=mira.learning.progressive-course.v1,progressiveLesson,difficultyCode=basic,assessmentMode,autoMasteryEligible,manualConfirmationRequired,estimatedMinutes,intro,progressiveFlow,questions。content.progressiveLesson必须是expectedOutputSkeleton中完整的JSON对象，与brief.binding深度相等，完整包含schemaVersion,curriculumVersion,lessonId,identitySha256,lessonSha256,difficultyCode,assessmentMode；不能写成lessonId字符串、对象引用文本或删减字段，两个SHA256逐字符复制。",
+      "本课教学与验收范围由brief.lesson.learningObjectives和sourceStepTitle共同限定，unitTitle只提供单元语境，不要求第一课教完整个单元；不得提前考查后续课次的目标。lessonScopedRequirements仅适用于服务器为当前课次选出的要求。若有correctionRequirements，针对其中历史issues重新制作完整候选，不能把失败候选的绑定补齐后直接当作新合格课件，也不能把旧审核结论改为通过。",
+      "progressiveFlow是按发生顺序排列的步骤；每步含phase,text,knowledgeIds,requiresKnowledgeIds；phase为teach/example/guided/independent/observe/recap。只有teach能引入新知识；每项introducedKnowledgeIds必须先teach覆盖；example在任何练习前；guided在independent前。",
+      "objective课必须保留expectedOutputSkeleton预配的1道guided及至少5道independent（数量已按assessmentCriteria.minimumDistinctTasks确定）。逐一填写questions及对应progressiveFlow步骤，保留每道题id与单个字符串questionId；每个guided/independent步骤只能引用一题，questions每题恰好引用一次，不得合并为questionIds数组、逗号分隔字符串、重复引用或另加无题引用的guided/independent过渡步骤。‘我们来做练习’等过渡语放入已有步骤text，不新增练习步骤。",
+      "题目模板中的prompt、选项label、hint、explanation及教学text为空的部分须填写真实内容，不能照抄空占位。单选题可设2至4个不同选项，使用A/B/C/D作为选项id，answer为唯一正确选项id；count_objects模板必须保留tap_objects以及objects/answer数组，不改为单选。evidence只可采用constraints.assessmentEvidenceKinds已登记能力，按实际题意填写。答案和解题说明只放题目私有answer/explanation，禁止把任何练习题答案、正确选项或解答写入progressiveFlow.text；teach/example可讲解另设示例，不得提前解答后面的独立题。",
+      "仅使用constraints.assessmentEvidenceKinds明确登记的能力：主机支持已登记词元的token_match evidence{kind:token_match,targetToken}，和本课constraints.allowedOperations允许的numeric_expression evidence{kind:numeric_expression,expression}。数字范围以constraints为准。登记independent_choice时，可以生成有唯一客观答案的阅读或语法题，并交由独立无答案复核者解答；主机检查答案一致，不冒充语义复算。不得用任意模型答案或主观判断冒充确定性证据。不能满足时返回明确错误，不改变assessmentMode。",
+      "numeric_expression.expression是供主机计算的纯算术表达式，只用数字、小数点、ASCII + - * / 和括号；不得写等号、计算结果、文字、单位、×或÷，例如只写(2/7)*3，不写(2/7)*3=6/7。此类题的选项label只能是纯十进制数或简单分数。先分别约分并比较全部选项的实际数值，所有选项数值须互不相同；不得把某分数与它约分后的等值分数同时列入选项，只有一项可等于expression计算值。",
+      "observed课questions必须空数组，autoMasteryEligible=false,manualConfirmationRequired=true，必须有observe步骤列出家长可观察的表现；禁止答案、分数、自动通过或自动掌握结论。",
+      "每道练习至少测一个本课introducedKnowledgeIds，其他依赖只能来自priorKnowledgeIds；不能通过虚假knowledge标签隐藏陌生单词、语法、运算或阅读基础。",
+      "共享判重规则mira.learning.assessment-novelty.v1：比较单位是题目的具体材料和实际需要读取、判断或计算的信息，不是教学目标、题型模板、问题类别、答案字母或正确类别。同一课的不同题组可以使用相同题型、目标及正确类别；新情境提供了不同的具体信息，需要重新读材料才能判断，即可作为同一知识点的新实例，不要求引入新知识或更难目标。旧题换ID、调选项顺序、近义改写，或只改人名物品名而保留原材料的具体陈述和作答信息，仍属重复。判重复必须对照旧courseId/题号与新题号，指出两题仍相同的具体材料、实际作答信息及对应原文；不能仅凭模板相似、都选事实/观点/证据、同为数量记录或正确答案字母相同判重复。",
+      "generationContext.previousQuestions是明确禁止复用的旧题材料，只用于避重，是负面上下文，不是示例、题目蓝本或待填骨架。不得把旧题原句、补全句子、选项组合或仅换名改写复制到本次questions、intro、teach、example、guided、independent或recap。expectedOutputSkeleton中的空题干必须独立创作，不能用previousQuestions填空。先确定自足的新情境和真正不同的作答信息，再组织题面与选项；最后逐题对照旧材料，若仍只需记住旧句即可作答，必须重新创作。同一知识点、题型、常见配对或正确类别可以复用，不需要增加新知识或难度；禁止的是具体旧作答材料，不是正常讲授共享概念。",
+      "英语只有allowedGrammarCodes含simple_past时可以使用went/did等过去式；同样不得提前使用将来时。字母、拼音及数字严格限于本课constraints。",
+      "constraints.assessmentEvidenceKinds含count_objects时，使用tap_objects题型，题面请孩子依次点选全部目标物体，不得要求认读阿拉伯数字。objects为1至20个{id,shape:circle|square|triangle,color:red|blue|yellow|green}对象，数量必须是introducedTokens本课数词，私有answer为全部objectIds，evidence={kind:count_objects}。所有对象id唯一，不输出图片链接或执行代码。"
+    ]
+  },
+  "verification": {
+    "system": "你独立复核一节小学基础课。你只收到公开课文和题面，不会收到生成者的答案或计算证据。独立解答全部题目，核对题面含义，核查是否超出给定先修知识、是否每项新知识先教后练。观察类内容不得认作自动判分。仅输出JSON。",
+    "requirements": [
+      "最外层必须是{\"verification\":{...}}，不能输出裸验证对象。verification含requestId,lessonId,binding,passed:boolean,issues:string[],undeclaredKnowledgeIds:string[],answers:题目id到正确选项id的对象。requestId必须逐字符复制expectedOutputSkeleton.verification.requestId（含:verify），不是自行重构生成请求ID；lessonId和完整binding对象也必须原样复制。",
+      "expectedOutputSkeleton的passed:null是待审占位，必须替换为本次独立审核得出的boolean；空issues和answers也只是结构占位，必须按实际审核问题和独立解答填写。任何骨架值或格式正确都不代表课程通过。",
+      "任意未登记或未教知识、模糊或多解题目、教学错误、答案泄漏、课程身份不符，必须passed=false并写issues。不要信任生成者的knowledgeIds标签，依据实际文本判断。",
+      "issues仅列出本次确实存在、能从当前内容定位的缺陷；每条须包含对应题号或教学步骤、具体原文或缺失信息，以及违反的当前规则。不要把‘答案唯一/可接受/已覆盖/无泄漏/无越界’等合格检查过程写进issues。若声称多解或歧义，应指出哪些选项在给定语境下都成立，或缺少哪项条件使答案无法确定；若声称越界，应指出实际要求了哪项尚未开放的知识。",
+      "完成全部检查后，若没有具体真实缺陷，必须输出passed=true且issues=[]；发现具体缺陷则passed=false，并只列这些缺陷。不得仅凭‘可能有风险’‘为严谨起见’‘偏好更难’或风格偏好判失败，也不得在承认不违反当前规则后用同一理由判失败。信息不足确实导致无法唯一解答仍是真实缺陷，须明确指出缺少的内容，不可因此放行。",
+      "objective课程每个guided/independent步骤必须有单一questionId且每道questions恰好被引用一次；无引用的练习过渡步骤、questionIds合并数组、重复或遗漏引用均应失败。progressiveFlow.text若已给出练习题答案、正确选项或解答，即使题目自身答案正确也属于泄漏，必须失败。",
+      "worked example是示范教学，必须讲清示范题的答案和解释；使用不同材料的示范题展示完整解法是合格教学，不能因此判失败。共享概念、方法或相同选项用语不等于答案泄漏。只有提前给出后续练习题自身的具体答案或解答才违规，判定泄漏时必须指出泄漏发生的步骤及对应练习题号、被提前给出的内容。",
+      "核查实际教学和题目是否符合brief.lesson.gradeCode与本课learningObjectives、sourceStepTitle，unitTitle只提供语境，不能把整个单元后续目标都算作本课必须覆盖。遵守服务器选出的lessonScopedRequirements。不得因为标记basic而把高年级教学替换为低年级启蒙；若主要篇幅或练习在重教低年级先修而未落实本年级本课目标，必须passed=false。",
+      "复核英文填空题时，先独立解出每道题，再把所选答案填回含空格的句子，逐项与teach/example/recap原文对照。若教学已出现该完整补全句，或只省略时间/地点等附加语而保留同一具体人物关系、动作与代词的核心补全句，必须列出教学原文与对应题号，判定提前泄漏。仅相同语法、常见词义、代词配对或使用不同具体情境的示范不算泄漏；不要因此禁止正常教学概念。",
+      "难度以当前年级这一课的入门目标为准；已落实该目标时，不得以‘六年级应更深’为由额外要求后续单元技能、复杂推理或更难题。仍需检查当前目标是否真正讲清和练到，不能用入门难度为未教知识、错误内容或答案歧义开脱。",
+      "共享判重规则mira.learning.assessment-novelty.v1：比较单位是题目的具体材料和实际需要读取、判断或计算的信息，不是教学目标、题型模板、问题类别、答案字母或正确类别。同一课的不同题组可以使用相同题型、目标及正确类别；新情境提供了不同的具体信息，需要重新读材料才能判断，即可作为同一知识点的新实例，不要求引入新知识或更难目标。旧题换ID、调选项顺序、近义改写，或只改人名物品名而保留原材料的具体陈述和作答信息，仍属重复。判重复必须对照旧courseId/题号与新题号，指出两题仍相同的具体材料、实际作答信息及对应原文；不能仅凭模板相似、都选事实/观点/证据、同为数量记录或正确答案字母相同判重复。",
+      "若提供generationContext.previousQuestions，仅用其中公开材料做上述语义避重对照，不扩大本课知识范围，不要求同课不同题组更换既定题型或判断目标。重复缺陷必须按共享规则给出新旧题的具体对应证据；若核心材料和实际作答信息已不同，就继续审核新题的正确性、唯一性、先教后练及范围，不得用笼统的‘换材料近义改写’替代证据。不得因为以前一轮审核拒绝过相似题型就沿用其结论；只对当前候选作独立判断。",
+      "observed课程answers必须{}；仅判断教学内容和可观察表现是否合理，不给孩子打分，不声称孩子掌握。",
+      "tap_objects题答案为全部需要点击的objectIds数组，独立检查物体数量及本课数词范围，不要求孩子识读阿拉伯数字。"
+    ]
+  },
+  "lessonScopes": [
+    {
+      "match": {
+        "gradeCode": "primary_6",
+        "subject": "chinese",
+        "unitTitle": "观点事实证据",
+        "sourceStepTitle": "区分信息性质"
+      },
+      "generationRequirements": [
+        "本课只落实六年级《观点事实证据》中‘区分信息性质’这一入门目标：讲清可核实的事实陈述、表达个人判断的观点，以及事实材料在明确语境中被用来支持某个观点时所起的证据作用；不能只做脱离语境的事实/观点二分。",
+        "先讲解再用短语境示范：同一条材料可以既陈述事实，又在文段中承担证据作用。严禁在同题中把‘事实、观点、证据’列为互斥选项，也不得以‘事实’和‘证据’两项互相排除。教孩子分别看‘这句话表达何种信息’与‘这句话在这段话中起什么作用’，问题与选项必须保持同一判断维度。",
+        "练习提供足以独立判断的简短材料或明确记录，并指出待判断句子，至少覆盖事实陈述、个人判断、材料的证据作用；独立题使用与示范、引导题不同的材料。通过材料内信息确定唯一答案，不依赖学生自行验证历史、健康等世界知识，不使用‘中国有五千年历史’‘吸烟有害健康’这类脱离语境且分类可能有歧义的断言。",
+        "证据作用的入门辨认可给出已明确的观点和材料；不要求孩子另找证据、比较证据强弱、判断是否直接支持、补充论证或分析完整论证结构，这些后续目标不能提前成为本课验收条件。题面不得直接标出待选答案或使用与正确选项同义的提示泄漏独立题答案。",
+        "按固定题号落实两种判断维度：guided_1提供短文中的明确观点和具体事实记录，问所指句子在文中起什么作用；independent_1和independent_3问‘哪个句子是可核实的事实陈述’，independent_2问‘哪个句子表达个人观点’，这三题的选项均为不同的完整句子，不是‘事实/观点/证据’标签；independent_4和independent_5各用新的短文、明确观点与事实记录，问指定句子在该段中的作用。作用题的选项比较‘提供支持观点的事实材料’‘表达个人感受’‘提出问题’等同一维度的功能，不把‘事实’作为‘证据’的排他选项。示范与六道练习使用不同材料，不考证据是否充分、可靠或完整论证结构。",
+        "校园材料结构参考：图书角登记‘科普书借出18次、童话书借出11次’，人物说‘应先增添科普书’，信息性质题可问哪个完整句子表达建议，其余选项是文中登记事实；另一则短文先写‘午间应增加借书窗口’的建议，再引用‘周一、周二排队均超过20人’的记录，作用题只问引用记录在文中起什么作用，选项可区分‘提供记录材料支持建议/提出另一条规定/表达个人喜好’。这些只是设计蓝图，不是要复用的现成题或旧题答案；请为各题另编不同的校园情境、数据与完整句子，所有依据均能从材料中定位，不要求判断建议对不对或证据够不够。",
+        "independent_1至independent_3的信息性质题须把记录事实与明确的个人评价或建议分开：主观选项使用‘我认为……更值得’‘我们应该……’等明确判断，事实选项使用材料中的日期、数量或直接记录。避免用‘消防演习能提高安全意识’‘很受欢迎’等可能由调查证实、也可能是个人推断的模糊因果或概括句充当观点选项；不要仅在可核实事实前添加‘我认为’就把它当作主观评价。先确认判断内容本身是个人评价或建议，而非只凭提示词判类别。"
+      ],
+      "verificationRequirements": [
+        "仅审核‘区分信息性质’这一课的实际目标：可核实事实、个人判断，以及材料在短语境中的证据作用是否已讲解、示范和练习；若只教事实/观点二分而完全未教证据作用，必须失败。不能要求本课完成整个单元的证据匹配、强弱评价或论证结构目标。",
+        "信息性质题须逐一分析每个选项的实际内容：能否由观察、记录或调查核实，还是某人的个人评价或建议，并核对来源归属；不能用有没有数字或‘我认为’字样直接判类别。‘消防演习能提高意识’等经验因果、‘很受欢迎’等可调查概括不能自动当作个人观点；学校已发布的规定与个人提出的建议要由题面明确区分。若两个选项都可合理核实，或来源、时间、评价主体不明导致无法唯一分类，这是具体歧义，必须指出对应题号、选项及缺失信息并判失败。分析合格选项的过程留在内部，issues仍仅输出真实缺陷。",
+        "事实材料也能承担证据作用。逐题检查题干判断维度与选项是否一致、短语境是否足够、答案是否唯一；同题以‘事实/观点/证据’作互斥分类，或以‘事实’与‘证据’作排他选项，必须失败。信息性质题应在完整句子间辨认事实陈述或个人判断；作用题须给出短文、明确观点和事实记录，只辨认所指句子的作用，不额外要求证据充分性、可靠性或论证结构。缺少语境、分类歧义、依赖有争议的世界知识或独立题泄漏答案必须passed=false并说明具体题号。"
+      ]
+    },
+    {
+      "match": {
+        "gradeCode": "primary_6",
+        "subject": "math",
+        "unitTitle": "分数乘法",
+        "sourceStepTitle": "分数乘整数的意义"
+      },
+      "generationRequirements": [
+        "本课只教‘几个相同分数相加’与‘分数乘整数’所表达的同量分组关系。先借同样大小的单位整体、分份或生活中的同量分组讲清每份量、份数和总量，再示范把相同分数连加写为分数乘整数，最后用新材料练习，不能只给计算口诀而不讲意义。",
+        "保持六年级当前课的入门深度，使用简单分数及小整数，选项可用普通分数如3/4；涉及图示时必须同步用题面文字说明单位整体、平均分份和所取数量，使题目不依赖未提供的图片。numeric_expression证据填写可复算表达式，所有选项label只能填写纯十进制数或简单分数，不能填写算式、单位、文字或LaTeX；单位与所求量在题干说明。",
+        "不能把交换因子顺序的两个等价乘法当成一对正确项与干扰项，也不能把相同分数连加与其等值乘法用于只按结果判断的单选干扰。独立题的具体分数组合、份数和作答信息须区别于前面示范；仅换食物或人物而沿用示范的同一算式与结果不算新的练习材料。",
+        "本课这组6道题均保留numeric_expression，题干给出每份的简单分数量与整数份数，询问合计量；choices.label全部填写纯数值分数。采用每袋质量、每天用量、每段长度等数个相同分数量合计的实际情境，优先用简单非单位分数；不能全部只写把同一个整体平均分成若干份再取几份，使学生只凭低年级分数认识直接读出答案。不要再出‘请选择乘法算式’或‘每份量×份数的标准形式’题，不得将交换因子后的乘法解释为错误。分数乘整数的意义先在teach/example中通过连加与同量分组讲清，练习再要求学生读懂新的分组信息并计算总量。",
+        "allowedOperations是已学运算工具的上限，不等于本课教学目标。不得提前要求分数乘分数、分数除法、比、百分数或综合应用；不把本课退回整数123启蒙，也不要求首课掌握整个分数乘法单元。示例和独立题的材料、数字须不同，不将独立题答案写入教学步骤。"
+      ],
+      "verificationRequirements": [
+        "核查是否真正讲清相同分数的连加与分数乘整数的同量分组意义，题面中单位整体、每份量和份数是否明确，分数答案是否唯一且与数量关系一致。numeric_expression的选项必须是纯数值或简单分数。检查交换因子及等值连加是否造成多个正确选项，检查独立题是否仅换名称复制前面示范的同一算式与答案。只有计算口诀、图示缺失导致信息不足或独立题泄漏答案须失败；不能因已登记divide等运算工具而放行分数除法、分数乘分数、比或百分数等后续目标，也不能要求本课提前覆盖这些目标。"
+      ]
+    },
+    {
+      "match": {
+        "gradeCode": "primary_6",
+        "subject": "english",
+        "unitTitle": "指代连贯",
+        "sourceStepTitle": "常见主宾形式"
+      },
+      "generationRequirements": [
+        "本课聚焦常见人称代词主格与宾格的形式及作用：先讲清代词所指的人或物，再按作主语或本课常见动词的宾语选择形式；主格用于主语，宾格用于动词宾语。句首、动词前后只能描述本课简单陈述句的位置，不能当作无条件语法定义。选择少量常见配对先教清，再在两三句连贯的短语境中示范。所有要考的形式和必要新词先讲解，不能只做无语境背表或重新教26个字母。",
+        "句子与问题只使用constraints.allowedGrammarCodes允许的语法，保持简单现在时和明确指代；不得使用过去时、将来时、现在进行时、复杂从句或被动结构，不因小学六年级就绕过本课语法边界。每道题由给定语境和句法位置确定唯一形式，不凭姓名、外貌或职业猜测性别，不让多个对象同时成为同一个代词的合理指代。",
+        "先示范再引导，独立题使用自足的新语境和新的实际作答信息，仍只考本课已教的常见主宾形式；仅替换旧题人物或物品不算新题，不得复制previousQuestions中的具体句子及选项。教学示例另编，不能采用任何本套或旧套练习的补全句子；不得提前给出独立题的补全句子或选项答案。不要求完成整个“指代连贯”单元的篇章改写、复杂指代推理或其他后续目标。"
+      ],
+      "verificationRequirements": [
+        "核查被考的主格/宾格形式是否先教后练，短语境中所指对象和主宾位置是否唯一，实际语法是否全部在allowedGrammarCodes内。指代歧义、未教形式、过去/将来/进行时或复杂从句越界、独立题答案泄漏均须失败；不能把六年级首课降成字母启蒙，也不能要求首课覆盖整个单元的复杂篇章指代。 解释应以主语/动词宾语作用为依据，不能把句首或动词后无条件等同于主格或宾格；具体示例正确描述位置本身不是缺陷。"
+      ]
+    }
+  ]
+}

@@ -55,7 +55,10 @@ abstract interface class ParentLearningReportsGateway {
 
 class LearningRepository
     implements LearningGateway, ParentLearningReportsGateway {
-  const LearningRepository({required this._apiClient});
+  // Keep the existing public constructor used by gateway overrides and callers.
+  const LearningRepository({required ApiClient apiClient})
+    // ignore: prefer_initializing_formals
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 

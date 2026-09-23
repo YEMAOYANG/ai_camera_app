@@ -45,12 +45,22 @@ const nativeProbeFiles = new Set([
 const loadTypeScript = require.extensions['.ts'];
 if (!loadTypeScript) throw new Error('NATIVE_OPERATOR_REQUIRES_TSX_CJS_FIRST');
 require.extensions['.ts'] = function loadNativeProbe(module, filename) {
-  if (!nativeProbeFiles.has(filename)) return loadTypeScript(module, filename);
-  const result = esbuild.transformSync(fs.readFileSync(filename, 'utf8'), {
+  const probe = nativeProbeFiles.has(filename);
+  const localModule = filename.startsWith(path.join(nativeRoot, 'lib') + path.sep)
+    || filename.startsWith(path.join(nativeRoot, 'scripts') + path.sep);
+  if (!probe && !localModule) return loadTypeScript(module, filename);
+  const source = fs.readFileSync(filename, 'utf8');
+  if (!probe && !/\bimport\s*\(/.test(source)) return loadTypeScript(module, filename);
+  // This operator runs as CJS. Node's ESM view of a tsx-transformed local
+  // module can expose only `default`, breaking an internal named import.
+  // Preserve the asynchronous boundary but resolve local dynamic imports
+  // through this same CJS loader. Production and dependency files are untouched.
+  const result = esbuild.transformSync(source, {
     loader: 'ts',
     format: 'cjs',
     target: 'es2022',
-    keepNames: false,
+    supported: { 'dynamic-import': false },
+    keepNames: !probe,
     sourcefile: filename,
   });
   module._compile(result.code, filename);

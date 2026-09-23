@@ -2573,6 +2573,41 @@ class OpenMaicFullRuntimeTest(unittest.TestCase):
             service.create_student_launch("student-access", "session-1")
         self.assertEqual(raised.exception.code, "openmaic_student_grade_mismatch")
 
+    def test_launch_exchange_locks_only_the_ticket_before_reading_authority(self):
+        from repositories.openmaic_runtime_repository import OpenMaicRuntimeRepository
+
+        authority = {"id": "ticket-1", "runtime_status": "ready"}
+
+        class Connection:
+            def __init__(self, ticket_exists=True):
+                self.ticket_exists = ticket_exists
+                self.calls = []
+
+            def execute(self, sql, params):
+                self.calls.append((sql, params))
+                value = ({"id": "ticket-1"} if self.ticket_exists else None) if len(self.calls) == 1 else authority
+                return SimpleNamespace(fetchone=lambda: value)
+
+        repository = OpenMaicRuntimeRepository(object())
+        conn = Connection()
+        self.assertIs(repository.get_launch_ticket_for_update(conn, token_hash="ticket-hash"), authority)
+        self.assertEqual(len(conn.calls), 2)
+        lock_sql, lock_params = conn.calls[0]
+        self.assertIn("FROM student_openmaic_launch_tickets", lock_sql)
+        self.assertIn("WHERE token_hash = ? LIMIT 1 FOR UPDATE", lock_sql)
+        self.assertNotIn("JOIN", lock_sql)
+        self.assertEqual(lock_params, ("ticket-hash",))
+        authority_sql, authority_params = conn.calls[1]
+        self.assertNotIn("FOR UPDATE", authority_sql)
+        self.assertIn("learning_student_formal_session_bindings", authority_sql)
+        self.assertIn("learning_curriculum_classroom_item_receipts", authority_sql)
+        self.assertIn("learning_formal_qwen_audio_jobs", authority_sql)
+        self.assertEqual(authority_params, lock_params)
+
+        missing = Connection(ticket_exists=False)
+        self.assertIsNone(repository.get_launch_ticket_for_update(missing, token_hash="missing-hash"))
+        self.assertEqual(len(missing.calls), 1)
+
     def test_exchange_and_runtime_session_recheck_the_verified_manifest(self):
         class Repository:
             def __init__(self):

@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { playfulLearningPolicySchema } from "./openmaic-playful-policy";
-import { difficultyCodeSchema, difficultyPolicySchema, interactionDesignPolicySchema,
+import { difficultyCodeSchema, difficultyPolicySchema, legacyDifficultyPolicySchema, interactionDesignPolicySchema,
   interactionDesignEvidenceSchema, requiredTeachingActionsSchema } from "./openmaic-interaction-evidence";
+import { progressiveTeachingBriefSchema, sameProgressiveValue } from "./openmaic-progressive-contract";
 import { gradeBoundarySchema, imagePolicySchema, videoPolicySchema, skillPolicySchema,
   teachingQualityPolicySchema, professionalEvidenceExtensions, teachingQualityEvidenceSchema,
   imageReceiptSchema, videoReceiptSchema, imageEvidenceSchema, videoEvidenceSchema,
@@ -586,8 +587,8 @@ const openMaicFormalQuestionSchema = z.object({
   }).strict()).min(1).max(32).optional(),
 }).strict();
 
-const openMaicFormalTeachingBriefSchema = z.object({
-  difficultyPolicy: difficultyPolicySchema.optional(),
+const openMaicLegacyFormalTeachingBriefSchema = z.object({
+  difficultyPolicy: legacyDifficultyPolicySchema.optional(),
   schemaVersion: z.literal("mira.learning.formal-runtime-teaching-brief.v1"),
   sourceCourseContentSha256: openMaicFormalSha256Schema,
   course: z.object({
@@ -650,6 +651,10 @@ const openMaicFormalTeachingBriefSchema = z.object({
     });
   }
 });
+
+const openMaicFormalTeachingBriefSchema = z.discriminatedUnion("schemaVersion", [
+  openMaicLegacyFormalTeachingBriefSchema, progressiveTeachingBriefSchema,
+]);
 
 const openMaicCoursewareAuthoritySchema = z.object({
   schemaVersion: z.literal("mira.openmaic.courseware-authority.v1"),
@@ -728,7 +733,7 @@ const openMaicAdaptiveRuntimeEventAuthoritySchema = z.object({
     sceneIndex: z.number().int().min(0).max(59),
     sceneId: z.string().trim().min(1).max(255),
     completionActionId: z.string().trim().min(1).max(255),
-    questionIds: z.array(z.string().trim().min(1).max(160)).max(5),
+    questionIds: z.array(z.string().trim().min(1).max(160)).max(14),
   }).strict()).min(1).max(60),
 }).strict().superRefine((authority, context) => {
   if (authority.scenes.some((scene, index) => scene.sceneIndex !== index)) {
@@ -755,7 +760,7 @@ const openMaicFormalGenerationContractSchema = z.object({
   coursewareAuthority: openMaicCoursewareAuthoritySchema,
   sourceCourseContentSha256: openMaicFormalSha256Schema,
   teachingBriefSha256: openMaicFormalSha256Schema,
-  teachingBrief: openMaicFormalTeachingBriefSchema,
+  teachingBrief: openMaicLegacyFormalTeachingBriefSchema,
   teacher: openMaicFormalTeacherGenerationBindingSchema,
   requiredClassroom: openMaicFormalRuntimeClassroomContractSchema,
   generation: z.object({
@@ -819,6 +824,21 @@ export const openMaicAdaptiveFormalGenerationContractSchema = z.object({
       || difficulty.difficultyCode !== brief.course.difficultyCode) {
       context.addIssue({ code: "custom", path: ["difficultyPolicy"], message: "课程难度必须绑定同一年级、学科、技能及冻结策略" });
     }
+  }
+  if (brief.schemaVersion === "mira.learning.formal-runtime-teaching-brief.progressive.v1") {
+    const boundary = contract.gradeBoundary;
+    const binding = brief.progressiveLesson;
+    if (!sameProgressiveValue(difficulty, brief.difficultyPolicy) || !boundary
+      || boundary.curriculumVersion !== binding.curriculumVersion
+      || boundary.boundaryVersion !== `${binding.curriculumVersion}:${binding.lessonSha256.slice(0, 24)}`
+      || boundary.gradeCode !== brief.course.gradeCode || boundary.subject !== brief.course.subject
+      || boundary.skillId !== binding.lessonId
+      || !sameProgressiveValue(boundary.learningObjectives, brief.difficultyPolicy.lessonScope.learningObjectives)
+      || !sameProgressiveValue(boundary.prerequisiteSkills, brief.difficultyPolicy.lessonScope.prerequisiteLessonIds)) {
+      context.addIssue({ code: "custom", path: ["gradeBoundary"], message: "分级课堂必须使用同一冻结课次的年级边界和难度策略" });
+    }
+  } else if (difficulty?.objectiveRuleVersion === "mira.learning.progressive-host-validation.v1") {
+    context.addIssue({ code: "custom", path: ["difficultyPolicy"], message: "旧版课堂不能套用分级课次难度策略" });
   }
   if (contract.generation.enableImageGeneration !== Boolean(contract.professionalCreationPolicy.image)
       || contract.generation.enableVideoGeneration !== Boolean(contract.professionalCreationPolicy.video)
@@ -903,7 +923,9 @@ const openMaicProfessionalResearchReceiptSchema = z.object({
   classroomId: z.string().trim().min(1).max(255),
   sessionId: z.string().trim().min(1).max(128),
   providerId: z.string().trim().min(1).max(64),
-  searchCount: z.number().int().min(1).max(4),
+  // Execution policy limits calls; this receipt preserves actual audited work,
+  // including metering-only runs with more than four searches.
+  searchCount: z.number().int().positive(),
   resultCount: z.number().int().positive(),
   fetchedSourceCount: z.number().int().positive(),
   citationCount: z.number().int().positive(),
@@ -911,7 +933,7 @@ const openMaicProfessionalResearchReceiptSchema = z.object({
     query: z.string().trim().min(1).max(512),
     searchedAt: z.string().trim().min(1).max(64),
     resultCount: z.number().int().positive(),
-  }).strict()).min(1).max(4),
+  }).strict()).min(1),
   sources: z.array(z.object({
     title: z.string().trim().min(1).max(512),
     url: z.string().url().max(2_048),
@@ -967,7 +989,7 @@ const openMaicProfessionalResearchEvidenceSchema = z.object({
   schemaVersion: z.literal("mira.openmaic.professional-research-receipt.v1"),
   sessionId: z.string().trim().min(1).max(128),
   providerId: z.string().trim().min(1).max(64),
-  searchCount: z.number().int().min(1).max(4),
+  searchCount: z.number().int().positive(),
   resultCount: z.number().int().positive(),
   fetchedSourceCount: z.number().int().positive(),
   citationCount: z.number().int().positive(),
@@ -1162,7 +1184,7 @@ export const openMaicAdaptiveFormalRuntimeManifestV2Schema = z.object({
     widgetHighlightVerified: z.literal(true),
     widgetTypes: z.array(openMaicAdaptiveWidgetTypeSchema).min(1).max(5),
     runtimeEventAuthority: openMaicAdaptiveRuntimeEventAuthoritySchema,
-    assessmentQuestionIds: z.array(z.string().trim().min(1).max(160)).length(4),
+    assessmentQuestionIds: z.array(z.string().trim().min(1).max(160)).max(14),
     teacher: openMaicFormalTeacherEvidenceSchema,
     professionalCreation: openMaicProfessionalCreationEvidenceSchema,
     research: openMaicProfessionalResearchEvidenceSchema,
@@ -1405,7 +1427,8 @@ export const openMaicAdaptiveFormalRuntimeManifestV2Schema = z.object({
   }
 
   const hasExactAssessmentAuthority = (
-    formalEvidence.assessmentQuestionIds.every((questionId, index) => (
+    formalEvidence.assessmentQuestionIds.length === expectedAssessmentQuestionIds.length
+    && formalEvidence.assessmentQuestionIds.every((questionId, index) => (
       questionId === expectedAssessmentQuestionIds[index]
     ))
     && runtimeEventQuestionIds.length === expectedAssessmentQuestionIds.length
@@ -1425,7 +1448,7 @@ export const openMaicAdaptiveFormalRuntimeManifestV2Schema = z.object({
     context.addIssue({
       code: "custom",
       path: ["formalEvidence", "runtimeEventAuthority"],
-      message: "专业课堂运行事件与四道服务端评分题必须逐一绑定",
+      message: "专业课堂运行事件与冻结教学流程中的服务端评分题必须逐一绑定",
     });
   }
 

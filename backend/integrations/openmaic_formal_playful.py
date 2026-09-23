@@ -41,16 +41,44 @@ def playful_quality_context(generation: Mapping[str, Any] | None) -> dict[str, A
     if not isinstance(course, Mapping) or course.get("subject") not in {"math", "chinese", "english"} or not isinstance(flow, Mapping):
         raise ValueError("playful review teaching context is missing")
     groups = [flow.get("guidedQuestionIds"), flow.get("independentQuestionIds")]
-    if any(not isinstance(group, list) or len(group) != 2 or any(
+    progressive = brief.get("schemaVersion") == "mira.learning.formal-runtime-teaching-brief.progressive.v1"
+    if any(not isinstance(group, list) or any(
             not isinstance(q, str) or not q.strip() or len(q) > 128 for q in group) for group in groups):
+        raise ValueError("playful review requires the frozen two question groups")
+    if progressive:
+        from services.progressive_course_generation import lesson_binding
+        binding = lesson_binding(str(course.get("skillId") or ""))
+        if (brief.get("progressiveLesson") != binding
+                or lesson.get("assessmentMode") != binding["assessmentMode"]):
+            raise ValueError("playful progressive lesson binding drifted")
+        if flow.get("schemaVersion") != "mira.learning.progressive-teaching-flow.v1":
+            raise ValueError("playful progressive teaching flow drifted")
+        mode = lesson.get("assessmentMode")
+        if mode == "observed":
+            if (any(groups) or lesson.get("autoMasteryEligible") is not False
+                    or lesson.get("manualConfirmationRequired") is not True
+                    or not isinstance(flow.get("observations"), list) or not flow["observations"]):
+                raise ValueError("playful observed lesson must preserve explicit confirmation")
+        elif (mode != "objective" or not 1 <= len(groups[0]) <= 4
+                or not 5 <= len(groups[1]) <= 10 or sum(map(len, groups)) > 14
+                or lesson.get("autoMasteryEligible") is not True
+                or lesson.get("manualConfirmationRequired") is not False):
+            raise ValueError("playful progressive lesson needs guided and independent evidence")
+    elif any(len(group) != 2 for group in groups):
         raise ValueError("playful review requires the frozen two question groups")
     ids = [q for group in groups for q in group]
     questions = lesson.get("questions")
-    if (len(set(ids)) != 4 or not isinstance(questions, list)
+    if (len(set(ids)) != len(ids) or not isinstance(questions, list)
+            or progressive and len(questions) != len(ids)
             or any(sum(isinstance(q, Mapping) and q.get("id") == question_id for q in questions) != 1 for question_id in ids)):
         raise ValueError("playful review assessment identities drifted")
-    return {"policy": deepcopy(frozen_policy), "subject": course["subject"],
-            "guidedQuestionIds": deepcopy(groups[0]), "independentQuestionIds": deepcopy(groups[1])}
+    context = {"policy": deepcopy(frozen_policy), "subject": course["subject"],
+               "guidedQuestionIds": deepcopy(groups[0]), "independentQuestionIds": deepcopy(groups[1])}
+    if progressive:
+        context.update(assessmentMode=lesson["assessmentMode"],
+                       manualConfirmationRequired=lesson.get("manualConfirmationRequired"),
+                       progressiveLesson=deepcopy(brief.get("progressiveLesson")))
+    return context
 
 
 def playful_generation_kwargs(generation: object) -> dict[str, Any]:

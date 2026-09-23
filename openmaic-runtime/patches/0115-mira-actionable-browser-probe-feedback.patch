@@ -1,0 +1,74 @@
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -25,7 +25,7 @@
+   assertInteractionDesignReceipt, INTERACTION_REVIEW_PROMPT_VERSION, INTERACTION_REVIEW_SYSTEM_SUFFIX,
+   type InteractionDesignContext, type InteractionDesignReceipt,
+ } from './mira-formal-interaction-design';
+-import type { FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
++import type { FormalInteractionProbe, FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
+ import { isPaidBudgetObservationMode } from './mira-paid-budget';
+ import { assertMiraFormalPlayfulScenes, formalPlayfulReviewInstructions,
+   MIRA_FORMAL_PLAYFUL_REVIEW_VERSION, type MiraFormalPlayfulContext } from './mira-formal-playful-policy';
+@@ -57,6 +57,51 @@
+ interface ReviewReport {
+   status: 'passed' | 'needs_revision'; dimensions: QualityDimension[];
+   objectives: QualityObjective[]; issues: FormalQualityResult['issues'];
++}
++
++// Only these inspector-authored reasons may enter the author-facing tool reply.
++// Raw Playwright errors can contain document HTML, URLs or other private data.
++const SAFE_BROWSER_PROBE_REASONS = [
++  'probe control is disabled',
++  'probe control is outside the viewport or covered',
++  'probe region is outside the viewport',
++  'probe iframe transform is unsupported',
++  'probe iframe geometry is unsupported',
++  'probe iframe is outside the viewport or covered',
++  'probe target absent',
++  'probe feedback must be separate from the control',
++  'probe action is not a local control',
++  'range input required',
++  'model element is not visible',
++  'diagram must be separate from explanation',
++  'teaching graphic too small',
++  'numeric output must be a visible number',
++  'independent fraction verifier requires SVG rects',
++  'fraction mechanism output or SVG geometry is incorrect',
++  'exploration states do not change model and explanation',
++  'reset does not restore the original model and feedback',
++] as const;
++
++/** Diagnostic projection only; existing browser verdicts and receipts are unchanged. */
++export function formatFormalBrowserFailure(
++  observed: FormalSceneInspectionResult, probes: readonly FormalInteractionProbe[],
++): string {
++  const failures = observed.probeResults.filter(probe => !probe.passed).slice(0, 3).map(failed => {
++    const id = /^[A-Za-z0-9_-]{1,80}$/.test(failed.id) ? failed.id : 'local-probe';
++    const reason = SAFE_BROWSER_PROBE_REASONS.find(value => failed.message.includes(value))
++      ?? (/\bTimeout\b[^\n]{0,80}\bexceeded\b/i.test(failed.message)
++        ? 'probe timed out before the declared state was observed' : 'local probe failed (details withheld)');
++    const probe = probes.find(value => value.id === failed.id);
++    // These are related local controls/regions, not a claim that each caused the failure.
++    const candidates = [probe?.selector, probe?.expect.selector, probe?.exploration?.diagramSelector,
++      probe?.exploration?.feedbackSelector, probe?.exploration?.reset.selector,
++      ...(probe?.exploration?.states.flatMap(state => state.operations.map(op => op.selector)) ?? [])];
++    const selectors = [...new Set(candidates.filter((value): value is string =>
++      typeof value === 'string' && /^#[A-Za-z][A-Za-z0-9_-]{0,98}$/.test(value)))].slice(0, 6);
++    return `${id}: ${reason}${selectors.length ? `; related selectors: ${selectors.join(', ')}` : ''}`;
++  });
++  const existing = observed.issues.join('; ') || 'missing render or interaction evidence';
++  return `Browser check ${observed.viewport.width}x${observed.viewport.height}: ${[...failures, existing].join('; ')}`.slice(0, 2000);
+ }
+ 
+ export function parseFormalQualityReview(raw: unknown, input: FormalQualityInput): ReviewReport {
+@@ -309,7 +354,8 @@
+           if (!observed.passed || !SHA.test(observed.screenshotSha256) || !SHA.test(observed.domSha256)
+               || (scene.type === 'interactive' && observed.probeCount < 1) || interactionProbeMissing) {
+             issues.push({ sceneId: scene.id,
+-              problem: `Browser check ${viewport.width}x${viewport.height}: ${observed.issues.join('; ') || 'missing render or interaction evidence'}`.slice(0, 2000),
++              problem: formatFormalBrowserFailure(observed,
++                interactionPlan ? interactionDesignProbes(interactionPlan, scene.id) : []),
+               repair: 'Repair the actual page content/control/feedback and rerun review_course_quality; preserve the locked assessments.' });
+           } else renderChecks.push({ sceneId: scene.id, sceneSha256, viewport: { ...viewport },
+             screenshotSha256: observed.screenshotSha256, domSha256: observed.domSha256,

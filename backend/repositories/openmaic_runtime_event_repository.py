@@ -616,6 +616,34 @@ class OpenMaicRuntimeEventRepository:
             ),
         }
 
+    def learning_session_resume_scene(
+        self, conn: DatabaseConnection, *, family_id: str, child_id: str,
+        learning_session_id: str, runtime_classroom_id: str, release_id: str,
+        target_fingerprint: str,
+    ) -> DatabaseRow | None:
+        """Highest accepted visit, isolated by the complete frozen authority.
+
+        A fresh launch may have recorded page zero before a previous client
+        restored its position. That visit must not erase an earlier page.
+        This is a navigation position, never completion or assessment evidence.
+        """
+        return conn.execute(
+            """
+            SELECT event.scene_index, event.scene_id
+            FROM learning_openmaic_runtime_events AS event
+            JOIN learning_openmaic_runtime_event_streams AS stream
+              ON stream.runtime_session_id = event.runtime_session_id
+            WHERE stream.family_id = ? AND stream.child_id = ?
+              AND stream.learning_session_id = ? AND stream.runtime_classroom_id = ?
+              AND stream.release_id = ? AND stream.target_fingerprint = ?
+              AND event.event_type = 'scene_entered'
+            ORDER BY event.scene_index DESC, event.created_at DESC, event.sequence DESC
+            LIMIT 1
+            """,
+            (family_id, child_id, learning_session_id, runtime_classroom_id,
+             release_id, target_fingerprint),
+        ).fetchone()
+
     def learning_session_completed_action_scene_ids(
         self, conn: DatabaseConnection, *, family_id: str, child_id: str,
         learning_session_id: str, runtime_classroom_id: str, release_id: str,

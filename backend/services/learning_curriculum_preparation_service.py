@@ -25,7 +25,10 @@ from services.learning_curriculum_preparation_contract import (
     PREPARATION_SCHEMA_VERSION,
     PREPARATION_SUBJECTS,
     TARGET_SCHEMA_V2,
+    TARGET_SCHEMA_PROGRESSIVE,
     build_preparation_target,
+    build_progressive_preparation_target,
+    canonical_preparation_target_for,
     preparation_target_fingerprint,
 )
 from services.formal_student_learning_access import (
@@ -223,7 +226,7 @@ class LearningCurriculumPreparationService:
             )
             return None
 
-        target = build_preparation_target(grade_code)
+        target = build_progressive_preparation_target(grade_code)
         fingerprint = preparation_target_fingerprint(target)
         revision = int(child["grade_selection_revision"])
         request_digest = hashlib.sha256(
@@ -279,6 +282,14 @@ class LearningCurriculumPreparationService:
             keep_plan_id=str(plan["id"]),
             now=now,
         )
+        if self.course_library_enabled:
+            from services.course_library_service import CourseLibraryService
+            library = CourseLibraryService(self.database_url, grade_code=grade_code,
+                preparation_repository=self.repository, clock=lambda: now)
+            # The child keeps their actual grade. Foundation demand is owned by
+            # the prerequisite's shared library, never a forged child grade.
+            library._ensure_owner_in_connection(conn, timestamp=now)
+            library.request_children_in_connection(conn, children=[child])
         return self.preparation_payload(plan, now_ms=now)
 
     @staticmethod
@@ -339,7 +350,7 @@ class LearningCurriculumPreparationService:
                     response["learningPreparationAvailability"] = availability
                 return response
             target_fingerprint = preparation_target_fingerprint(
-                build_preparation_target(grade_code)
+                build_progressive_preparation_target(grade_code)
             )
             plan = self.repository.get_current_for_child(
                 conn,
@@ -348,6 +359,12 @@ class LearningCurriculumPreparationService:
                 grade_selection_revision=int(child["grade_selection_revision"]),
                 target_fingerprint=target_fingerprint,
             )
+            if plan is None:
+                # Reads can still show a previously frozen legacy job. Saving a
+                # child or requesting a new library scope always uses fine lessons.
+                plan = self.repository.get_current_for_child(conn, family_id=family_id, child_id=child_id,
+                    grade_selection_revision=int(child['grade_selection_revision']),
+                    target_fingerprint=preparation_target_fingerprint(build_preparation_target(grade_code)))
         retry_authority = None
         if plan is not None and str(plan.get("status") or "") == "failed":
             retry_repository = self.retry_repository_factory()
@@ -412,21 +429,13 @@ class LearningCurriculumPreparationService:
                 available_course_count = int(
                     summary["availableCourseCount"]
                 )
-            learning_state = None
-            if query.get("includeLearningState") == "true":
-                from services.learning_availability_state import personal_learning_state
-                from services.course_library_service import cached_supply_summary
-                identity = {"family_id": family_id, "child_id": child_id, "grade_code": grade_code}
-                supply = (cached_supply_summary(self.repository.database.database_url, grade_code=grade_code)
-                          if self.course_library_enabled and grade_code in FORMAL_STUDENT_GRADE_CODES else None)
-                learning_state = personal_learning_state(
-                    grade_code=grade_code, grade_open=can_access_workspace,
-                    courses=self.learning_repository.personal_visible_course_inventory(conn, **identity,
-                        grade_selection_revision=int(child.get("grade_selection_revision") or 0)) if can_access_workspace else [],
-                    mastery=self.learning_repository.personal_grade_mastery(conn, **identity) if can_access_workspace else {},
-                    supply=supply,
-                )
-                available_course_count = int(learning_state["availableCourseCount"])
+            from services.progressive_learning_availability import progressive_personal_learning_state
+            from services.course_library_service import cached_supply_summary
+            supply = (cached_supply_summary(self.repository.database.database_url, grade_code=grade_code)
+                      if self.course_library_enabled and grade_code in FORMAL_STUDENT_GRADE_CODES else None)
+            learning_state = progressive_personal_learning_state(conn, child=child,
+                learning_repository=self.learning_repository, supply=supply, grade_open=can_access_workspace)
+            available_course_count = int(learning_state["availableCourseCount"])
         return {
             "ok": True,
             "availability": {
@@ -440,10 +449,9 @@ class LearningCurriculumPreparationService:
                 "hasActiveRelease": has_active_release,
                 "availableCourseCount": available_course_count,
                 "canLearnNow": bool(
-                    available_course_count > 0 if learning_state is not None
-                    else has_active_release or available_course_count > 0
+                    available_course_count > 0
                 ),
-                **({"learningState": learning_state} if learning_state is not None else {}),
+                **({"learningState": learning_state} if query.get("includeLearningState") == "true" else {}),
             },
         }
 
@@ -503,7 +511,7 @@ class LearningCurriculumPreparationService:
             try:
                 persisted_target = json.loads(str(source.get("target_spec_json") or "{}"))
                 target_compatible = live_grade_code in FORMAL_STUDENT_GRADE_CODES and compatible_preparation_target(
-                    persisted_target, build_preparation_target(live_grade_code)
+                    persisted_target, canonical_preparation_target_for(persisted_target)
                 )
                 current_fingerprint = preparation_target_fingerprint(persisted_target) if target_compatible else ""
             except (TypeError, ValueError):
@@ -681,10 +689,10 @@ class LearningCurriculumPreparationService:
             if not isinstance(target, Mapping):
                 raise ValueError("target must be an object")
             if (
-                str(target.get("schemaVersion") or "") != TARGET_SCHEMA_V2
+                str(target.get("schemaVersion") or "") not in {TARGET_SCHEMA_V2, TARGET_SCHEMA_PROGRESSIVE}
                 or str(row.get("grade_code") or "") not in FORMAL_STUDENT_GRADE_CODES
                 or target.get("gradeCode") != row.get("grade_code")
-                or not compatible_preparation_target(target, build_preparation_target(str(row["grade_code"])))
+                or not compatible_preparation_target(target, canonical_preparation_target_for(target))
                 or str(row.get("target_fingerprint") or "")
                 != preparation_target_fingerprint(target)
             ):
@@ -707,7 +715,7 @@ class LearningCurriculumPreparationService:
             canary_target = row["content_canary_target_count"]
             if not (
                 target_count == len(target["courseTargets"])
-                and canary_target == 3
+                and canary_target == len(target['canaryManifest']['targets'])
                 and candidate >= 0
                 and failed >= 0
                 and candidate + failed <= target_count
@@ -720,7 +728,7 @@ class LearningCurriculumPreparationService:
                 raise ValueError("v2 content count invariant drift")
             passed = row.get("content_canary_passed_at") is not None
             if passed != (
-                canary_candidate == canary_target == 3 and canary_failed == 0
+                canary_candidate == canary_target == len(target['canaryManifest']['targets']) and canary_failed == 0
             ):
                 raise ValueError("v2 canary evidence drift")
             expected_stage = {
@@ -773,7 +781,7 @@ class LearningCurriculumPreparationService:
                     target["subjectTargets"][subject]["totalCourseCount"]
                 )
                 if not (
-                    total == expected_total > 0
+                    total == expected_total >= 0
                     and ready >= 0
                     and formal_failed >= 0
                     and ready + formal_failed <= total

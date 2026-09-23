@@ -1,0 +1,13 @@
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -1674,7 +1674,8 @@
+   const promoted = promoteProfessionalDocument(document.stage as Stage, repairedScenes, spec,
+     isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy));
+   assertProfessionalClassroom(promoted.stage, promoted.scenes, spec, identity.sessionId, document.outline);
+-  const evidence = await loadResearchEvidence(events, identity.sessionId);
++  const evidence = await withPaidBudget(input.paidBudget, identity.sessionId + ':saved-stage-preparation',
++    () => loadResearchEvidence(events, identity.sessionId));
+   const canonicalized = canonicalizeMiraFormalResearchFooters(promoted.scenes, evidence.fetched);
+   buildResearchReceipt(evidence, canonicalized.scenes, spec, identity.sessionId);
+   return { ...identity, stage: promoted.stage, scenes: canonicalized.scenes,

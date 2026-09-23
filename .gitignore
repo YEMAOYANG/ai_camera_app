@@ -1,6 +1,7 @@
 .DS_Store
 .playwright-mcp/
 backend/.env
+backend/.venv/
 backend/backend-8000.log
 backend/backend-8000.pid
 .local_backups/
@@ -23,3 +24,10 @@ backend/backend-8000.pid
 
 # Private paid-provider reply audit artifacts.
 /backend/data/learning-provider-replies/
+
+# Server credentials, data bundles and local deployment overrides.
+/deploy/.local/
+/deploy/backups/
+/deploy/env/*.env
+/deploy/*.local.*
+/deploy/**/__pycache__/

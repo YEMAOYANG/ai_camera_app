@@ -1,0 +1,3668 @@
+{
+  "ok": true,
+  "mode": "openmaic_full_runtime",
+  "launchUrl": "http://localhost:3101/mira/launch?ticket=known-local-contract-fixture",
+  "expiresAt": 9999999999999,
+  "features": {
+    "schemaVersion": "mira.openmaic.runtime-features.v2",
+    "sourceVersion": "openmaic@1.0.0",
+    "sourceCommit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+    "enabled": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "diagram",
+      "html_game"
+    ],
+    "requested": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "diagram",
+      "html_game"
+    ],
+    "required": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "diagram",
+      "html_game"
+    ],
+    "present": [
+      "slides",
+      "quiz",
+      "multi_agent_roundtable",
+      "teacher_actions",
+      "diagram",
+      "html_game"
+    ],
+    "missing": [],
+    "evidence": {
+      "3d_visualization": {
+        "verified": false,
+        "signals": [],
+        "reasons": [
+          "not_verified"
+        ]
+      },
+      "code": {
+        "verified": false,
+        "signals": [],
+        "reasons": [
+          "not_verified"
+        ]
+      },
+      "diagram": {
+        "verified": true,
+        "signals": [
+          "openmaic-artifact:diagram"
+        ],
+        "reasons": []
+      },
+      "html_game": {
+        "verified": true,
+        "signals": [
+          "openmaic-artifact:html_game"
+        ],
+        "reasons": []
+      },
+      "mp4_export": {
+        "verified": false,
+        "signals": [],
+        "reasons": [
+          "not_verified"
+        ]
+      },
+      "multi_agent_roundtable": {
+        "verified": true,
+        "signals": [
+          "openmaic-artifact:multi_agent_roundtable"
+        ],
+        "reasons": []
+      },
+      "pbl": {
+        "verified": false,
+        "signals": [],
+        "reasons": [
+          "not_verified"
+        ]
+      },
+      "quiz": {
+        "verified": true,
+        "signals": [
+          "openmaic-artifact:quiz"
+        ],
+        "reasons": []
+      },
+      "realtime_whiteboard": {
+        "verified": false,
+        "signals": [],
+        "reasons": [
+          "not_verified"
+        ]
+      },
+      "simulation": {
+        "verified": false,
+        "signals": [],
+        "reasons": [
+          "not_verified"
+        ]
+      },
+      "slides": {
+        "verified": true,
+        "signals": [
+          "openmaic-artifact:slides"
+        ],
+        "reasons": []
+      },
+      "teacher_actions": {
+        "verified": true,
+        "signals": [
+          "openmaic-artifact:teacher_actions"
+        ],
+        "reasons": []
+      },
+      "video": {
+        "verified": false,
+        "signals": [],
+        "reasons": [
+          "not_verified"
+        ]
+      }
+    },
+    "platform": {
+      "mp4Export": false,
+      "mp4ExportConfigured": false,
+      "mp4ExportCapabilityProbed": false,
+      "mp4ExportClassroomDryRun": false,
+      "assessmentAuthority": "mira_backend"
+    },
+    "sceneTypes": [
+      "interactive",
+      "quiz",
+      "slide"
+    ],
+    "actionTypes": [
+      "discussion",
+      "speech",
+      "spotlight",
+      "widget_highlight"
+    ],
+    "sceneCount": 7,
+    "media": {
+      "schemaVersion": "mira.openmaic.formal-media-receipt.v1",
+      "status": "succeeded",
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_7b6c5e725bb1003f70897ae2-attempt-1.contractfix1",
+      "buildItemId": "catalog_build_item_7b6c5e725bb1003f70897ae2",
+      "classroomId": "stage-tYYCDS_mnS",
+      "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+      "policyId": "mira-formal-qwen-image.v1",
+      "providerId": "qwen-image",
+      "modelId": "qwen-image-max",
+      "imageCount": 0,
+      "assets": [],
+      "receiptSha256": "6af310a092a1c2ab563773ab394258d314fec52ee1c1e674ecfe0ba0d23b3ed9"
+    },
+    "video": {
+      "schemaVersion": "mira.openmaic.formal-video-receipt.v1",
+      "status": "succeeded",
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_7b6c5e725bb1003f70897ae2-attempt-1.contractfix1",
+      "buildItemId": "catalog_build_item_7b6c5e725bb1003f70897ae2",
+      "classroomId": "stage-tYYCDS_mnS",
+      "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+      "policyId": "mira-formal-happyhorse-video.v1",
+      "providerId": "happyhorse",
+      "modelId": "happyhorse-1.0-t2v",
+      "videoCount": 0,
+      "assets": [],
+      "receiptSha256": "01bb1ab58323fbf11b7511603553ebaa18ccccea02f8d4ae948dabadd87d40ca"
+    },
+    "generationContract": {
+      "authority": "mira_backend_formal_candidate",
+      "buildItemId": "catalog_build_item_7b6c5e725bb1003f70897ae2",
+      "course": {
+        "difficultyCode": "basic",
+        "id": "progressive_bbdd89368ddebffd97116712",
+        "packageId": "formal_runtime_package_e3a8d94e031d4ba7766f7a5e89cde6b521335595d1a83c57",
+        "packageVersion": 1,
+        "version": "1.0.0"
+      },
+      "coursewareAuthority": {
+        "backendProviderCredentialsAccepted": false,
+        "classroomCompilation": "professional_skill_workflow",
+        "generationOwner": "openmaic",
+        "providerInvocation": "professional_agent",
+        "schemaVersion": "mira.openmaic.courseware-authority.v2-professional"
+      },
+      "difficultyPolicy": {
+        "assessment": {
+          "autoMasteryEligible": true,
+          "criteria": {
+            "claimScope": "this_lesson_only",
+            "minimumAccuracy": 0.8,
+            "minimumDistinctTasks": 5,
+            "minimumIndependentAttempts": 5,
+            "promptedAnswersCountAsIndependent": false,
+            "requiresObservedConfirmation": false
+          },
+          "evidenceKinds": [
+            "independent_choice"
+          ],
+          "manualConfirmationRequired": false,
+          "mode": "objective",
+          "semanticScoringAuthority": "independent_answer_blind_review"
+        },
+        "complexity": {
+          "assessmentOperation": "independent_lesson_tasks",
+          "maxCoreNewTargets": 1,
+          "reasoningScope": "direct_application_of_taught_lesson_objectives",
+          "requirements": [
+            "basic means the entry level of this grade and this lesson, not a restart at grade 1.",
+            "Teach and demonstrate the declared lesson objectives before guided practice and assessment.",
+            "Use prerequisites only to support this lesson; do not replace it with another grade or coarse skill.",
+            "Do not add future lesson skills, harder unit-wide reasoning, vocabulary, grammar or operations outside the locked scope.",
+            "Different assessment set ordinals change task material, never the difficulty or lesson boundary."
+          ],
+          "scope": "current_grade_current_lesson"
+        },
+        "curriculumIdentitySha256": "76c51a42b183102089749c51c3250fd1a3cae887ef207add5c4c7f6f4933dff9",
+        "curriculumVersion": "mira.primary.progressive.v1",
+        "difficultyCode": "basic",
+        "gradeCode": "primary_6",
+        "lessonScope": {
+          "constraints": {
+            "allowedGrammarCodes": [],
+            "allowedLetters": [],
+            "allowedOperations": [],
+            "allowedPinyin": [
+              "a",
+              "o",
+              "e",
+              "i",
+              "u",
+              "ü",
+              "一声",
+              "二声",
+              "三声",
+              "四声",
+              "b",
+              "p",
+              "m",
+              "f",
+              "d",
+              "t",
+              "n",
+              "l",
+              "g",
+              "k",
+              "h",
+              "j",
+              "q",
+              "x",
+              "y",
+              "w",
+              "z",
+              "c",
+              "s",
+              "zh",
+              "ch",
+              "sh",
+              "r",
+              "ai",
+              "ei",
+              "ui",
+              "ao",
+              "ou",
+              "iu",
+              "ie",
+              "üe",
+              "er",
+              "an",
+              "en",
+              "in",
+              "un",
+              "ün",
+              "ang",
+              "eng",
+              "ing",
+              "ong",
+              "zhi",
+              "chi",
+              "shi",
+              "ri",
+              "zi",
+              "ci",
+              "si",
+              "yi",
+              "wu",
+              "yu",
+              "ye",
+              "yue",
+              "yuan",
+              "yin",
+              "yun",
+              "ying"
+            ],
+            "assessmentEvidenceKinds": [
+              "independent_choice"
+            ],
+            "assessmentEvidenceScope": "declared_objective_only",
+            "audioInstructionsAllowed": true,
+            "challengeMayOnlyCombineDeclaredKnowledge": true,
+            "excludedGrammarCodes": [],
+            "introducedGrammarCodes": [],
+            "introducedOperations": [],
+            "introducedTokens": [],
+            "maxCoreNewTargets": 1,
+            "maximumNumber": null,
+            "minimumNumber": null,
+            "neutralDistractorTokens": [],
+            "newVocabularyMustBeIntroducedBeforeUse": true,
+            "noUnintroducedKnowledgeInInstructions": true,
+            "teachBeforeAssessment": true,
+            "tokenKind": "general",
+            "writtenNumberRecognitionRequired": true
+          },
+          "introducedKnowledgeIds": [
+            "ZH6A01.01"
+          ],
+          "learningObjectives": [
+            "围绕六年级《观点事实证据》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：区分信息性质"
+          ],
+          "prerequisiteLessonIds": [
+            "ZH5B03.04"
+          ],
+          "sourceStepTitle": "区分信息性质",
+          "unitId": "ZH6A01",
+          "unitTitle": "观点事实证据"
+        },
+        "lessonSha256": "3fce628344c4b79de59e0a0210cb235d40f6a0d5c5c70e574049b4d97dc8805b",
+        "mode": "progressive_objective",
+        "objectiveRuleVersion": "mira.learning.progressive-host-validation.v1",
+        "policySha256": "80672acf57269102361c49f5bbc87f2070c180bcb10526b2c363656577dbce2b",
+        "policyVersion": "mira.learning.progressive-difficulty-policy.v1",
+        "schemaVersion": "mira.learning.difficulty-policy.v1",
+        "skillId": "ZH6A01.01",
+        "subject": "chinese"
+      },
+      "generation": {
+        "agentMode": "generate",
+        "automaticRetries": 0,
+        "enableImageGeneration": true,
+        "enableTTS": false,
+        "enableVideoGeneration": true,
+        "enableWebSearch": true,
+        "maximumAttempts": 1,
+        "mode": "professional_skill",
+        "providerInvocation": "openmaic_agent_managed",
+        "skillId": "mira-primary-courseware",
+        "supportingSkillIds": [
+          "k12-core-literacy-planning",
+          "deep-interactive"
+        ],
+        "userPromptRequired": false,
+        "webSearchRequired": true,
+        "workflowVersion": "openmaic-pro-agent.v1"
+      },
+      "gradeBoundary": {
+        "allowedContent": [
+          "围绕六年级《观点事实证据》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：区分信息性质",
+          "本课为六年级《观点事实证据》中的入门步骤；难度从本年级起步。",
+          "本课已登记范围：{\"allowedGrammarCodes\": [], \"allowedLetters\": [], \"allowedOperations\": [], \"allowedPinyin\": [\"a\", \"o\", \"e\", \"i\", \"u\", \"ü\", \"一声\", \"二声\", \"三声\", \"四声\", \"b\", \"p\", \"m\", \"f\", \"d\", \"t\", \"n\", \"l\", \"g\", \"k\", \"h\", \"j\", \"q\", \"x\", \"y\", \"w\", \"z\", \"c\", \"s\", \"zh\", \"ch\", \"sh\", \"r\", \"ai\", \"ei\", \"ui\", \"ao\", \"ou\", \"iu\", \"ie\", \"üe\", \"er\", \"an\", \"en\", \"in\", \"un\", \"ün\", \"ang\", \"eng\", \"ing\", \"ong\", \"zhi\", \"chi\", \"shi\", \"ri\", \"zi\", \"ci\", \"si\", \"yi\", \"wu\", \"yu\", \"ye\", \"yue\", \"yuan\", \"yin\", \"yun\", \"ying\"], \"assessmentEvidenceKinds\": [\"independent_choice\"], \"assessmentEvidenceScope\": \"declared_objective_only\", \"audioInstructionsAllowed\": true, \"challengeMayOnlyCombineDeclaredKnowledge\": true, \"excludedGrammarCodes\": [], \"introducedGrammarCodes\": [], \"introducedOperations\": [], \"introducedTokens\": [], \"maxCoreNewTargets\": 1, \"maximumNumber\": null, \"minimumNumber\": null, \"neutralDistractorTokens\": [], \"newVocabularyMustBeIntroducedBeforeUse\": true, \"noUnintroducedKnowledgeInInstructions\": true, \"teachBeforeAssessment\": true, \"tokenKind\": \"general\", \"writtenNumberRecognitionRequired\": true}",
+          "本课新增知识：ZH6A01.01"
+        ],
+        "boundaryVersion": "mira.primary.progressive.v1:3fce628344c4b79de59e0a02",
+        "curriculumVersion": "mira.primary.progressive.v1",
+        "estimatedMinutes": 8,
+        "excludedContent": [
+          "不得依赖未登记为先修的后续知识。",
+          "不得把演示、提示或重复作答作为独立掌握证据。",
+          "不得把本年级入门课替换为低年级启蒙；低年级先修只能必要时简短回顾，不能成为主要教学和练习。"
+        ],
+        "gradeCode": "primary_6",
+        "language": "zh-CN",
+        "learningObjectives": [
+          "围绕六年级《观点事实证据》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：区分信息性质"
+        ],
+        "prerequisiteSkills": [
+          "ZH5B03.04"
+        ],
+        "skillId": "ZH6A01.01",
+        "skillTitle": "区分信息性质",
+        "subject": "chinese"
+      },
+      "gradeBoundarySha256": "8a616850d38b3dafacf84d20b879d208affaaf2eb332e64eff99caa45519f3ef",
+      "professionalCreationPolicy": {
+        "image": {
+          "assetValidationRequired": true,
+          "enabled": true,
+          "modelId": "qwen-image-max",
+          "policyId": "mira-formal-qwen-image.v1",
+          "providerId": "qwen-image",
+          "providerManaged": true,
+          "schemaVersion": "mira.openmaic.formal-image-policy.v1",
+          "usage": "teaching_need"
+        },
+        "interactionDesignPolicy": {
+          "demonstrationRequired": true,
+          "enabled": true,
+          "explanatoryFeedbackRequired": true,
+          "explorationPolicy": {
+            "inputModes": [
+              "pointer",
+              "touch"
+            ],
+            "maximumStates": 5,
+            "mechanismRegistry": [
+              "fraction-ratio-percentage.v1",
+              "semantic-state-model.v1"
+            ],
+            "minimumStates": 3,
+            "resetRequired": true,
+            "schemaVersion": "mira.openmaic.multistate-exploration.v1"
+          },
+          "finalSnapshotRequired": true,
+          "independentJudgmentRequired": true,
+          "learnerOperationRequired": true,
+          "objectiveCoverageRequired": true,
+          "policyId": "mira-primary-multistate-interaction.v2",
+          "profile": "primary-adaptive",
+          "renderedInteractionRequired": true,
+          "schemaVersion": "mira.openmaic.interaction-design.v2",
+          "visualReviewRequired": true,
+          "visualRubricVersion": "mira.primary-teaching-visual.v1"
+        },
+        "mode": "professional_skill",
+        "playfulLearningPolicy": {
+          "aiDesigned": true,
+          "lockedAssessmentPreserved": true,
+          "maxQuizScenes": 2,
+          "minimumReplayableGames": 1,
+          "policyId": "mira-primary-playful-exploration.v1",
+          "schemaVersion": "mira.openmaic.playful-learning.v1",
+          "threeDUsage": "teaching_need"
+        },
+        "schemaVersion": "mira.openmaic.professional-creation.v1",
+        "skillId": "mira-primary-courseware",
+        "skillOrchestration": {
+          "baseSkillIds": [
+            "mira-primary-courseware",
+            "stage-design",
+            "k12-core-literacy-planning",
+            "deep-interactive",
+            "slide-craft",
+            "learning-to-learn"
+          ],
+          "decisionCoverageRequired": true,
+          "gradeBoundaryRequired": true,
+          "mainMethodMax": 1,
+          "profileId": "mira-primary-adaptive.v2",
+          "registryId": "openmaic-builtin-skills.v1-23",
+          "sceneContextRequired": true,
+          "schemaVersion": "mira.openmaic.skill-orchestration.v2",
+          "selectionMode": "server_rules"
+        },
+        "studentToolsEnabled": false,
+        "supportingSkillIds": [
+          "k12-core-literacy-planning",
+          "deep-interactive"
+        ],
+        "teachingQuality": {
+          "finalSnapshotRequired": true,
+          "gradeBoundaryRequired": true,
+          "independentReviewRequired": true,
+          "maxReviewAttempts": 3,
+          "policyId": "mira-primary-quality.v1",
+          "renderedScenesRequired": true,
+          "schemaVersion": "mira.openmaic.teaching-quality-policy.v1"
+        },
+        "userPromptRequired": false,
+        "video": {
+          "aspectRatio": "16:9",
+          "assetValidationRequired": true,
+          "durationSec": 5,
+          "enabled": true,
+          "maxCalls": 1,
+          "maxVideos": 1,
+          "modelId": "happyhorse-1.0-t2v",
+          "policyId": "mira-formal-happyhorse-video.v1",
+          "providerId": "happyhorse",
+          "providerManaged": true,
+          "resolution": "720p",
+          "schemaVersion": "mira.openmaic.formal-video-policy.v1",
+          "usage": "teaching_need"
+        },
+        "webSearch": {
+          "citationsRequired": true,
+          "enabled": true,
+          "maxCalls": 4,
+          "minimumFetchedSources": 1,
+          "primarySourcesPreferred": true,
+          "providerManaged": true
+        },
+        "workflowVersion": "openmaic-pro-agent.v1"
+      },
+      "requiredClassroom": {
+        "distinctPeerDiscussions": 2,
+        "interactive": {
+          "allowedWidgetTypes": [
+            "simulation",
+            "diagram",
+            "code",
+            "game",
+            "visualization3d"
+          ],
+          "fake3dRejected": true,
+          "noopRejected": true,
+          "productiveScriptRequired": true,
+          "widgetConfigRequired": true
+        },
+        "roster": {
+          "peerCount": 4,
+          "teacherCount": 1
+        },
+        "scenePlanning": {
+          "allowedSceneTypes": [
+            "slide",
+            "quiz",
+            "interactive",
+            "pbl"
+          ],
+          "authority": "openmaic_professional_agent",
+          "defaultDurationMinutes": {
+            "max": 30,
+            "min": 15
+          },
+          "exactCountRequired": false,
+          "maxSceneCount": 60,
+          "mode": "adaptive",
+          "requiredSceneTypes": [
+            "slide",
+            "quiz",
+            "interactive"
+          ],
+          "scenesPerMinute": {
+            "max": 2,
+            "min": 1
+          }
+        },
+        "schemaVersion": "mira.openmaic.formal-runtime.v4-deepseek-professional",
+        "slideSpotlight": {
+          "consecutiveSpotlightsAllowed": true,
+          "focusExplanationSequenceRequired": true,
+          "minimumPerSlide": 1,
+          "targetMustBeRenderable": true
+        },
+        "speechActions": {
+          "interactiveSpotlightRequired": false,
+          "perScene": {
+            "max": 20,
+            "min": 1
+          },
+          "total": {
+            "max": 240,
+            "min": 1
+          }
+        },
+        "speechRequiredForEveryScene": true,
+        "teacherEvidence": [
+          "spotlight",
+          "widget_highlight"
+        ],
+        "whiteboardRequired": false
+      },
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_7b6c5e725bb1003f70897ae2-attempt-1.contractfix1",
+      "schemaVersion": "mira.openmaic.formal-runtime.v4-deepseek-professional",
+      "sourceCourseContentSha256": "2b8d5d4354fd122ca85809ab5ca7987806cc59aab10545ad8f3ba589dface72f",
+      "targetFingerprint": "c3adfddc5fa5884ff594667f3cb56e131d6ce19a15e41d2d7fe7ce27961e98dd",
+      "teacher": {
+        "runtime": {
+          "avatar": "/avatars/teacher-2.png",
+          "name": "小语老师",
+          "role": "teacher",
+          "teacherGender": "female",
+          "voiceConfig": {
+            "modelId": "qwen3-tts-flash",
+            "providerId": "qwen-tts",
+            "voiceId": "Serena"
+          },
+          "voiceGender": "female"
+        },
+        "teacherProfile": {
+          "avatarPath": "/teachers/mi-chinese-v1.png",
+          "contentHash": "a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8",
+          "displayName": "小语老师",
+          "id": "mira_chinese_gentle",
+          "version": 2
+        }
+      },
+      "teachingBrief": {
+        "authority": {
+          "answerContractProvided": false,
+          "providerSecretsProvided": false,
+          "scoringRulesProvided": false,
+          "source": "locked_learning_course"
+        },
+        "course": {
+          "difficultyCode": "basic",
+          "gradeCode": "primary_6",
+          "id": "progressive_bbdd89368ddebffd97116712",
+          "objective": "围绕六年级《观点事实证据》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：区分信息性质",
+          "skillId": "ZH6A01.01",
+          "subject": "chinese",
+          "title": "区分信息性质",
+          "version": "1.0.0"
+        },
+        "difficultyPolicy": {
+          "assessment": {
+            "autoMasteryEligible": true,
+            "criteria": {
+              "claimScope": "this_lesson_only",
+              "minimumAccuracy": 0.8,
+              "minimumDistinctTasks": 5,
+              "minimumIndependentAttempts": 5,
+              "promptedAnswersCountAsIndependent": false,
+              "requiresObservedConfirmation": false
+            },
+            "evidenceKinds": [
+              "independent_choice"
+            ],
+            "manualConfirmationRequired": false,
+            "mode": "objective",
+            "semanticScoringAuthority": "independent_answer_blind_review"
+          },
+          "complexity": {
+            "assessmentOperation": "independent_lesson_tasks",
+            "maxCoreNewTargets": 1,
+            "reasoningScope": "direct_application_of_taught_lesson_objectives",
+            "requirements": [
+              "basic means the entry level of this grade and this lesson, not a restart at grade 1.",
+              "Teach and demonstrate the declared lesson objectives before guided practice and assessment.",
+              "Use prerequisites only to support this lesson; do not replace it with another grade or coarse skill.",
+              "Do not add future lesson skills, harder unit-wide reasoning, vocabulary, grammar or operations outside the locked scope.",
+              "Different assessment set ordinals change task material, never the difficulty or lesson boundary."
+            ],
+            "scope": "current_grade_current_lesson"
+          },
+          "curriculumIdentitySha256": "76c51a42b183102089749c51c3250fd1a3cae887ef207add5c4c7f6f4933dff9",
+          "curriculumVersion": "mira.primary.progressive.v1",
+          "difficultyCode": "basic",
+          "gradeCode": "primary_6",
+          "lessonScope": {
+            "constraints": {
+              "allowedGrammarCodes": [],
+              "allowedLetters": [],
+              "allowedOperations": [],
+              "allowedPinyin": [
+                "a",
+                "o",
+                "e",
+                "i",
+                "u",
+                "ü",
+                "一声",
+                "二声",
+                "三声",
+                "四声",
+                "b",
+                "p",
+                "m",
+                "f",
+                "d",
+                "t",
+                "n",
+                "l",
+                "g",
+                "k",
+                "h",
+                "j",
+                "q",
+                "x",
+                "y",
+                "w",
+                "z",
+                "c",
+                "s",
+                "zh",
+                "ch",
+                "sh",
+                "r",
+                "ai",
+                "ei",
+                "ui",
+                "ao",
+                "ou",
+                "iu",
+                "ie",
+                "üe",
+                "er",
+                "an",
+                "en",
+                "in",
+                "un",
+                "ün",
+                "ang",
+                "eng",
+                "ing",
+                "ong",
+                "zhi",
+                "chi",
+                "shi",
+                "ri",
+                "zi",
+                "ci",
+                "si",
+                "yi",
+                "wu",
+                "yu",
+                "ye",
+                "yue",
+                "yuan",
+                "yin",
+                "yun",
+                "ying"
+              ],
+              "assessmentEvidenceKinds": [
+                "independent_choice"
+              ],
+              "assessmentEvidenceScope": "declared_objective_only",
+              "audioInstructionsAllowed": true,
+              "challengeMayOnlyCombineDeclaredKnowledge": true,
+              "excludedGrammarCodes": [],
+              "introducedGrammarCodes": [],
+              "introducedOperations": [],
+              "introducedTokens": [],
+              "maxCoreNewTargets": 1,
+              "maximumNumber": null,
+              "minimumNumber": null,
+              "neutralDistractorTokens": [],
+              "newVocabularyMustBeIntroducedBeforeUse": true,
+              "noUnintroducedKnowledgeInInstructions": true,
+              "teachBeforeAssessment": true,
+              "tokenKind": "general",
+              "writtenNumberRecognitionRequired": true
+            },
+            "introducedKnowledgeIds": [
+              "ZH6A01.01"
+            ],
+            "learningObjectives": [
+              "围绕六年级《观点事实证据》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：区分信息性质"
+            ],
+            "prerequisiteLessonIds": [
+              "ZH5B03.04"
+            ],
+            "sourceStepTitle": "区分信息性质",
+            "unitId": "ZH6A01",
+            "unitTitle": "观点事实证据"
+          },
+          "lessonSha256": "3fce628344c4b79de59e0a0210cb235d40f6a0d5c5c70e574049b4d97dc8805b",
+          "mode": "progressive_objective",
+          "objectiveRuleVersion": "mira.learning.progressive-host-validation.v1",
+          "policySha256": "80672acf57269102361c49f5bbc87f2070c180bcb10526b2c363656577dbce2b",
+          "policyVersion": "mira.learning.progressive-difficulty-policy.v1",
+          "schemaVersion": "mira.learning.difficulty-policy.v1",
+          "skillId": "ZH6A01.01",
+          "subject": "chinese"
+        },
+        "lesson": {
+          "assessmentMode": "objective",
+          "autoMasteryEligible": true,
+          "estimatedMinutes": 10,
+          "intro": "同学们，今天我们学习区分信息性质。有些句子是可以核实的事实，有些是个人观点，还有些事实材料在文中用来支持观点，起证据作用。我们先来了解这些概念。",
+          "manualConfirmationRequired": false,
+          "progressiveFlow": [
+            {
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "phase": "teach",
+              "requiresKnowledgeIds": [],
+              "text": "事实陈述是可以核实的，比如记录日期、数量、事件。观点是个人判断或建议，常用“我认为”“应该”等。证据是文中用来支持观点的事实材料。注意，同一个事实句子，单独看是事实，在文中可能起证据作用。"
+            },
+            {
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "phase": "example",
+              "requiresKnowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "text": "看这个例子：图书角登记“科普书借出18次”，这是事实；“我认为应先增添科普书”是观点；如果文中先写观点“应先增添科普书”，再引用“科普书借出18次”，这个事实记录就起证据作用。"
+            },
+            {
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "phase": "guided",
+              "questionId": "guided_1",
+              "requiresKnowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "text": "我们来做一道引导题。阅读短文，然后选择指定句子在文中的作用。"
+            },
+            {
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "phase": "independent",
+              "questionId": "independent_1",
+              "requiresKnowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "text": "现在独立完成第一题：选出可核实的事实陈述。"
+            },
+            {
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "phase": "independent",
+              "questionId": "independent_2",
+              "requiresKnowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "text": "第二题：选出表达个人观点的句子。"
+            },
+            {
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "phase": "independent",
+              "questionId": "independent_3",
+              "requiresKnowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "text": "第三题：选出可核实的事实陈述。"
+            },
+            {
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "phase": "independent",
+              "questionId": "independent_4",
+              "requiresKnowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "text": "第四题：阅读新短文，判断指定句子在文中的作用。"
+            },
+            {
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "phase": "independent",
+              "questionId": "independent_5",
+              "requiresKnowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "text": "第五题：阅读另一则短文，判断指定句子在文中的作用。"
+            },
+            {
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "phase": "recap",
+              "requiresKnowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "text": "今天我们学习了区分事实、观点，以及事实材料在文中作为证据的作用。记住：判断信息性质看句子本身，判断作用要看它在上下文中的功能。"
+            }
+          ],
+          "questions": [
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "提供记录材料支持建议"
+                },
+                {
+                  "id": "B",
+                  "label": "表达个人感受"
+                },
+                {
+                  "id": "C",
+                  "label": "提出另一条规定"
+                }
+              ],
+              "id": "guided_1",
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "prompt": "阅读短文：“午间应增加借书窗口。”班长在班会上说。他补充：“周一、周二排队借书的同学均超过20人。” 问：文中“周一、周二排队借书的同学均超过20人”这句话在文中起什么作用？",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "学校操场边新种了五棵桂花树。"
+                },
+                {
+                  "id": "B",
+                  "label": "我觉得桂花的香味最好闻。"
+                },
+                {
+                  "id": "C",
+                  "label": "大家都应该爱护校园里的花草。"
+                }
+              ],
+              "id": "independent_1",
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "prompt": "选出下面哪个句子是可核实的事实陈述。",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "学校通知写明，消防演习定于本周三下午举行。"
+                },
+                {
+                  "id": "B",
+                  "label": "我认为学校应该每学期安排一次消防演习。"
+                },
+                {
+                  "id": "C",
+                  "label": "演习记录显示，所有班级都已按路线撤离到操场。"
+                }
+              ],
+              "id": "independent_2",
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "prompt": "选出下面哪个句子表达个人观点。",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "我认为新购的绘本很精彩。"
+                },
+                {
+                  "id": "B",
+                  "label": "上周图书馆共借出绘本42本。"
+                },
+                {
+                  "id": "C",
+                  "label": "我们应该增加绘本的采购数量。"
+                }
+              ],
+              "id": "independent_3",
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "prompt": "选出下面哪个句子是可核实的事实陈述。",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "提供记录材料支持观点"
+                },
+                {
+                  "id": "B",
+                  "label": "表达个人感受"
+                },
+                {
+                  "id": "C",
+                  "label": "提出新的建议"
+                }
+              ],
+              "id": "independent_4",
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "prompt": "阅读短文：学校广播站准备增加“科学小知识”栏目。站长说：“我认为这个栏目能丰富大家的课外知识。”他拿出记录：“上学期科学类书籍借阅量增加了30%。” 问：文中“上学期科学类书籍借阅量增加了30%”这句话在文中起什么作用？",
+              "type": "single_choice"
+            },
+            {
+              "choices": [
+                {
+                  "id": "A",
+                  "label": "提供记录材料支持建议"
+                },
+                {
+                  "id": "B",
+                  "label": "表达个人喜好"
+                },
+                {
+                  "id": "C",
+                  "label": "提出另一条规定"
+                }
+              ],
+              "id": "independent_5",
+              "knowledgeIds": [
+                "ZH6A01.01"
+              ],
+              "prompt": "阅读短文：班级决定设立“图书管理员”岗位。小明说：“我们应该轮流管理图书角。”他补充：“上周图书角有5本书没有放回原位。” 问：文中“上周图书角有5本书没有放回原位”这句话在文中起什么作用？",
+              "type": "single_choice"
+            }
+          ],
+          "teachingFlow": {
+            "examples": [
+              {
+                "knowledgeIds": [
+                  "ZH6A01.01"
+                ],
+                "text": "看这个例子：图书角登记“科普书借出18次”，这是事实；“我认为应先增添科普书”是观点；如果文中先写观点“应先增添科普书”，再引用“科普书借出18次”，这个事实记录就起证据作用。"
+              }
+            ],
+            "guidedQuestionIds": [
+              "guided_1"
+            ],
+            "independentQuestionIds": [
+              "independent_1",
+              "independent_2",
+              "independent_3",
+              "independent_4",
+              "independent_5"
+            ],
+            "observations": [],
+            "recap": {
+              "sayText": "今天我们学习了区分事实、观点，以及事实材料在文中作为证据的作用。记住：判断信息性质看句子本身，判断作用要看它在上下文中的功能。"
+            },
+            "schemaVersion": "mira.learning.progressive-teaching-flow.v1",
+            "teach": {
+              "keyPoints": [
+                "围绕六年级《观点事实证据》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：区分信息性质"
+              ],
+              "sayText": "事实陈述是可以核实的，比如记录日期、数量、事件。观点是个人判断或建议，常用“我认为”“应该”等。证据是文中用来支持观点的事实材料。注意，同一个事实句子，单独看是事实，在文中可能起证据作用。",
+              "title": "区分信息性质"
+            }
+          }
+        },
+        "progressiveLesson": {
+          "assessmentMode": "objective",
+          "curriculumVersion": "mira.primary.progressive.v1",
+          "difficultyCode": "basic",
+          "identitySha256": "76c51a42b183102089749c51c3250fd1a3cae887ef207add5c4c7f6f4933dff9",
+          "lessonId": "ZH6A01.01",
+          "lessonSha256": "3fce628344c4b79de59e0a0210cb235d40f6a0d5c5c70e574049b4d97dc8805b",
+          "schemaVersion": "mira.learning.progressive-binding.v1"
+        },
+        "schemaVersion": "mira.learning.formal-runtime-teaching-brief.progressive.v1",
+        "sourceCourseContentSha256": "2b8d5d4354fd122ca85809ab5ca7987806cc59aab10545ad8f3ba589dface72f"
+      },
+      "teachingBriefSha256": "9724750373ca203105a3cd702ca0631e3cefbed8ec74bef3aac9bd873a25f2f1"
+    },
+    "formalRuntimeContract": {
+      "schemaVersion": "mira.openmaic.formal-runtime.v4-deepseek-professional",
+      "scenePlanning": {
+        "mode": "adaptive",
+        "authority": "openmaic_professional_agent",
+        "exactCountRequired": false,
+        "allowedSceneTypes": [
+          "slide",
+          "quiz",
+          "interactive",
+          "pbl"
+        ],
+        "requiredSceneTypes": [
+          "slide",
+          "quiz",
+          "interactive"
+        ],
+        "defaultDurationMinutes": {
+          "min": 15,
+          "max": 30
+        },
+        "scenesPerMinute": {
+          "min": 1,
+          "max": 2
+        },
+        "maxSceneCount": 60
+      },
+      "roster": {
+        "teacherCount": 1,
+        "peerCount": 4
+      },
+      "speechRequiredForEveryScene": true,
+      "speechActions": {
+        "perScene": {
+          "min": 1,
+          "max": 20
+        },
+        "total": {
+          "min": 1,
+          "max": 240
+        },
+        "interactiveSpotlightRequired": false
+      },
+      "slideSpotlight": {
+        "minimumPerSlide": 1,
+        "targetMustBeRenderable": true,
+        "focusExplanationSequenceRequired": true,
+        "consecutiveSpotlightsAllowed": true
+      },
+      "distinctPeerDiscussions": 2,
+      "teacherEvidence": [
+        "spotlight",
+        "widget_highlight"
+      ],
+      "interactive": {
+        "allowedWidgetTypes": [
+          "simulation",
+          "diagram",
+          "code",
+          "game",
+          "visualization3d"
+        ],
+        "widgetConfigRequired": true,
+        "productiveScriptRequired": true,
+        "noopRejected": true,
+        "fake3dRejected": true
+      },
+      "whiteboardRequired": false
+    },
+    "formalEvidence": {
+      "sceneDistribution": {
+        "interactive": 2,
+        "pbl": 0,
+        "quiz": 2,
+        "slide": 3
+      },
+      "peerCount": 4,
+      "speechSceneCount": 7,
+      "speechActionCount": 34,
+      "discussionActionCount": 2,
+      "distinctDiscussionPeerCount": 2,
+      "teacherActionCount": 16,
+      "spotlightVerified": true,
+      "widgetHighlightVerified": true,
+      "widgetTypes": [
+        "diagram",
+        "game"
+      ],
+      "runtimeEventAuthority": {
+        "schemaVersion": "mira.openmaic.runtime-event-authority.v1",
+        "scenes": [
+          {
+            "sceneIndex": 0,
+            "sceneId": "scene-p1",
+            "completionActionId": "action_RZZwiHwq",
+            "questionIds": []
+          },
+          {
+            "sceneIndex": 1,
+            "sceneId": "scene-p2",
+            "completionActionId": "action_ELjy7j-E",
+            "questionIds": []
+          },
+          {
+            "sceneIndex": 2,
+            "sceneId": "scene-p3",
+            "completionActionId": "action_pgSoOEwv",
+            "questionIds": []
+          },
+          {
+            "sceneIndex": 3,
+            "sceneId": "scene-p4",
+            "completionActionId": "disc-p4-b",
+            "questionIds": []
+          },
+          {
+            "sceneIndex": 4,
+            "sceneId": "scene-p5",
+            "completionActionId": "action_YTx92ECK",
+            "questionIds": [
+              "guided_1"
+            ]
+          },
+          {
+            "sceneIndex": 5,
+            "sceneId": "scene-p6",
+            "completionActionId": "action_z44gv62Q",
+            "questionIds": [
+              "independent_1",
+              "independent_2",
+              "independent_3",
+              "independent_4",
+              "independent_5"
+            ]
+          },
+          {
+            "sceneIndex": 6,
+            "sceneId": "scene-p7",
+            "completionActionId": "action_QhLZ1hQX",
+            "questionIds": []
+          }
+        ]
+      },
+      "assessmentQuestionIds": [
+        "guided_1",
+        "independent_1",
+        "independent_2",
+        "independent_3",
+        "independent_4",
+        "independent_5"
+      ],
+      "teacher": {
+        "agentId": "mira-formal-teacher",
+        "name": "小语老师",
+        "avatar": "/avatars/teacher-2.png",
+        "teacherGender": "female",
+        "voiceGender": "female",
+        "voiceId": "Serena"
+      },
+      "professionalCreation": {
+        "verified": true,
+        "schemaVersion": "mira.openmaic.professional-creation-receipt.v1",
+        "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+        "workflowVersion": "openmaic-pro-agent.v1",
+        "skillId": "mira-primary-courseware",
+        "supportingSkillIds": [
+          "k12-core-literacy-planning",
+          "deep-interactive"
+        ],
+        "userPromptRequired": false,
+        "studentToolsEnabled": false,
+        "webSearchEnabled": true,
+        "imageGenerationEnabled": true,
+        "imagePolicyId": "mira-formal-qwen-image.v1",
+        "videoGenerationEnabled": true,
+        "videoPolicyId": "mira-formal-happyhorse-video.v1",
+        "skillOrchestration": {
+          "profileId": "mira-primary-adaptive.v2",
+          "referenceReads": [
+            {
+              "resourcePath": "k12-core-literacy-planning/references/core-literacy.md",
+              "sourceHash": "47635d06a4a598b28c22a408f5f218e96dd2eca664ca74c1774bb95c848a47ee"
+            },
+            {
+              "resourcePath": "k12-core-literacy-planning/references/subjects/languages.md",
+              "sourceHash": "b88c8350e51ffcaf502ef891e0e69f8351295b550c4fe7202efa595de7327b89"
+            }
+          ],
+          "sceneContexts": [
+            {
+              "actionsContextSha256": "4b59e43d1b7b563e51987a4f4a58c10d24753f2145c9f9b5bcfbd99ac4ee1880",
+              "contentContextSha256": "18c7426f91b26c4191f8b421c45b1b0efab9e447bcfb8987ff96fabf86042007",
+              "sceneId": "scene-p1",
+              "sceneType": "slide"
+            },
+            {
+              "actionsContextSha256": "4b59e43d1b7b563e51987a4f4a58c10d24753f2145c9f9b5bcfbd99ac4ee1880",
+              "contentContextSha256": "18c7426f91b26c4191f8b421c45b1b0efab9e447bcfb8987ff96fabf86042007",
+              "sceneId": "scene-p2",
+              "sceneType": "slide"
+            },
+            {
+              "actionsContextSha256": "64bfd5f8f0486a096b0e99ea8c3b56c389f1707c247c51bd81957ee5af525d3a",
+              "contentContextSha256": "5663c81c71349c2340298dd9e2d60e99d81cb3958a1fb9e93d37a1f92ab25253",
+              "sceneId": "scene-p3",
+              "sceneType": "interactive"
+            },
+            {
+              "actionsContextSha256": "64bfd5f8f0486a096b0e99ea8c3b56c389f1707c247c51bd81957ee5af525d3a",
+              "contentContextSha256": "5663c81c71349c2340298dd9e2d60e99d81cb3958a1fb9e93d37a1f92ab25253",
+              "sceneId": "scene-p4",
+              "sceneType": "interactive"
+            },
+            {
+              "actionsContextSha256": "60cd0b5535e1d2f9594107e0fe4546feae6b299b7077169f10d8532320434960",
+              "contentContextSha256": "17193556dfe336776fe0a0676649206cf53143456dc14d1859538d0a021bce2a",
+              "sceneId": "scene-p5",
+              "sceneType": "quiz"
+            },
+            {
+              "actionsContextSha256": "60cd0b5535e1d2f9594107e0fe4546feae6b299b7077169f10d8532320434960",
+              "contentContextSha256": "17193556dfe336776fe0a0676649206cf53143456dc14d1859538d0a021bce2a",
+              "sceneId": "scene-p6",
+              "sceneType": "quiz"
+            },
+            {
+              "actionsContextSha256": "4b59e43d1b7b563e51987a4f4a58c10d24753f2145c9f9b5bcfbd99ac4ee1880",
+              "contentContextSha256": "18c7426f91b26c4191f8b421c45b1b0efab9e447bcfb8987ff96fabf86042007",
+              "sceneId": "scene-p7",
+              "sceneType": "slide"
+            }
+          ],
+          "schemaVersion": "mira.openmaic.skill-orchestration-receipt.v2",
+          "selectionPlan": {
+            "decisions": [
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "mira-primary-courseware",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "stage-design",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "k12-core-literacy-planning",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "deep-interactive",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "slide-craft",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode",
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "formal_primary_baseline",
+                "skillId": "learning-to-learn",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [
+                  "/teachingBrief/course/objective",
+                  "/teachingBrief/lesson/questions"
+                ],
+                "reasonCode": "bounded_goal_and_assessment_backward_design",
+                "skillId": "understanding-by-design",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_supported_explanation_cycle",
+                "skillId": "feynman-learning",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [
+                  "/teachingBrief/course/objective",
+                  "/gradeBoundary/learningObjectives/0",
+                  "/gradeBoundary/allowedContent/0",
+                  "/teachingBrief/lesson/teachingFlow/teach/keyPoints/0",
+                  "/teachingBrief/lesson/questions/0/prompt",
+                  "/teachingBrief/lesson/questions/1/prompt",
+                  "/teachingBrief/lesson/questions/2/prompt",
+                  "/teachingBrief/lesson/questions/3/prompt",
+                  "/teachingBrief/lesson/questions/4/prompt",
+                  "/teachingBrief/lesson/questions/5/prompt"
+                ],
+                "reasonCode": "practice_goal_and_repeated_tasks",
+                "skillId": "workshop-style",
+                "status": "selected"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_explicit_social_learning_situation",
+                "skillId": "social-emotional-learning",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "stable_subject_formal_source_gate_suffices",
+                "skillId": "deep-research",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/gradeCode"
+                ],
+                "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
+                "skillId": "lecture-style",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "only_after_persisted_page_requires_repair",
+                "skillId": "pro-editing",
+                "status": "deferred"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "only_after_persisted_page_requires_repair",
+                "skillId": "stage-dsl",
+                "status": "deferred"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "only_after_persisted_page_requires_repair",
+                "skillId": "slide-dsl",
+                "status": "deferred"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+                "skillId": "pptx-import",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+                "skillId": "style-clone",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+                "skillId": "page-clone",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_authorized_teacher_material",
+                "skillId": "teacher-style-clone",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "single_course_not_series_or_cross_course_memory",
+                "skillId": "curriculum-planner",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "single_course_not_series_or_cross_course_memory",
+                "skillId": "spiral-curriculum",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [],
+                "reasonCode": "no_personal_history_or_skill_creation_request",
+                "skillId": "build-personal-skill",
+                "status": "not_applicable"
+              },
+              {
+                "evidencePaths": [
+                  "/gradeBoundary/subject"
+                ],
+                "reasonCode": "primary_subject_not_occupational_procedure",
+                "skillId": "vocational",
+                "status": "not_applicable"
+              }
+            ],
+            "gradeBand": "upper_primary",
+            "gradeBoundarySha256": "8a616850d38b3dafacf84d20b879d208affaaf2eb332e64eff99caa45519f3ef",
+            "inputSha256": "9ea46a1e7cf962b5f9e75d4a1e274cd755e03e873d2e4c962ec6acd3cc74dc30",
+            "planSha256": "be8af87c450ac7d36b7477e2423861e6821a8ca1ee57b3b68e47b6f20eda760c",
+            "primaryMethod": "workshop-style",
+            "registryId": "openmaic-builtin-skills.v1-23",
+            "schemaVersion": "mira.openmaic.skill-selection.v1",
+            "selectedSkillIds": [
+              "mira-primary-courseware",
+              "stage-design",
+              "k12-core-literacy-planning",
+              "deep-interactive",
+              "slide-craft",
+              "learning-to-learn",
+              "understanding-by-design",
+              "workshop-style"
+            ]
+          },
+          "skillReads": [
+            {
+              "skillId": "mira-primary-courseware",
+              "sourceHash": "2bb9434f452705182dbb6b71a912f8e24c8bed0c07561ce08fb493f6bd74e678"
+            },
+            {
+              "skillId": "stage-design",
+              "sourceHash": "6031161607914bb7ac37eb380b93b83c15ae9af7f25376b5b0749ce6cd06d76d"
+            },
+            {
+              "skillId": "k12-core-literacy-planning",
+              "sourceHash": "fbc03e9245406bac2d5b312f1a5711de311d17dc98eeb30d8eab298ee397c08f"
+            },
+            {
+              "skillId": "deep-interactive",
+              "sourceHash": "bb26d6b34f34bad37a76fef7f9863e1e67a2d4a5fbdf89d4ef08734c74db97bb"
+            },
+            {
+              "skillId": "slide-craft",
+              "sourceHash": "cf35eea56909b1427f171c6798ba55392761edb081603138892368d1bd727081"
+            },
+            {
+              "skillId": "learning-to-learn",
+              "sourceHash": "fe8be28613d01efe49a858bb89bf97f84273bd20311c805c36e2bfd28519c2ce"
+            },
+            {
+              "skillId": "understanding-by-design",
+              "sourceHash": "75af8be3ec7772b6ae97ac70ceedbb00fcfbb16a6d4addceb5f62ec0b3614808"
+            },
+            {
+              "skillId": "workshop-style",
+              "sourceHash": "002a4c9842069fb6f24da4b2d3ed0b6a65b0cef08298f5ae05d5905e661d884a"
+            }
+          ],
+          "status": "succeeded",
+          "receiptSha256": "0da61044bc0152fa7529d2281ddc3a14637ff4f972acb75287ff485b56118397"
+        },
+        "teachingQuality": {
+          "gradeBoundarySha256": "8a616850d38b3dafacf84d20b879d208affaaf2eb332e64eff99caa45519f3ef",
+          "policyId": "mira-primary-quality.v1",
+          "receiptSha256": "5d19308e61bff1e627d960fd572931da129c9ea799dab876835b3d12188b8273",
+          "renderChecks": [
+            {
+              "domSha256": "b33ef949e2048000b7ab19bd56af8b55e07285562058d546e5b0fcb6bae52a35",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p1",
+              "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c",
+              "screenshotSha256": "fbd25d887c07cc7d66184c7573bbd78ef958460a97a14f5a569b5ca7e9e1cf6c",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "bdedafaef4a3a543e130f471dd3386205435785f3b4121b25f615a02cc88250b",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p1",
+              "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c",
+              "screenshotSha256": "7267be9d3597caa3b80f306914061eab7d5d7b06e0705cb2a74a1780684f35c5",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "5f96c7294f7523445b5277a2ac6e505a9f0e7dcb2f5a8e60a4b35985e631365e",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p2",
+              "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78",
+              "screenshotSha256": "4d0ecb26c6af72d3d647de1f0c5105fa9319671e961584785089b4b7b7619d6a",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "3d05f7e28fa978642b187154919d2a78f8b0ad7345625f866d5ff3e2514e0fcd",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p2",
+              "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78",
+              "screenshotSha256": "246f7289aa67d2d60a2568b4c826e0054c20ecb7d8a7dcd421de40d07ea4c84a",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "43aa32c72a2663b83d43d273fb1e37e331d327707159452de7a7ba879d6ff013",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p3",
+              "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+              "screenshotSha256": "ccd9b7fa3999776fa478ca8c3e31217dd21519d3b44819320d16f6d309acad27",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "43aa32c72a2663b83d43d273fb1e37e331d327707159452de7a7ba879d6ff013",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p3",
+              "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+              "screenshotSha256": "b31065930790514ac36bc409d942e9959bf86ddfe16c5ba39f15a2c6e9863588",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "f5fdfbbb7b43993d31863a633285d50f5a61697405d294df93681d802bbebe08",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p4",
+              "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12",
+              "screenshotSha256": "62329f23fa4470cef270d60022edf8246934b3bf15675e0b757b3dfccf355ca0",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "f5fdfbbb7b43993d31863a633285d50f5a61697405d294df93681d802bbebe08",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p4",
+              "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12",
+              "screenshotSha256": "6115c86ec3365660f796979efdc1f317a5af60a73d3c50da00e98255e8a275c2",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "a7d926cc91301e7e6c6d370c760496b0fc85d7a8c1197e8ccac5000b557d1001",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p5",
+              "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463",
+              "screenshotSha256": "b47abc9a95040fd6340647ab48ac2a9c7aa8f64afb20e0baeb8fe1403bfc12ab",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "3a2d868ec626daee35eaa20e83cc34fd9d5c64ca4522dc63932a52eaeb436d9e",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p5",
+              "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463",
+              "screenshotSha256": "edb90a28321bf811092b4022bf5b4a6c33170aaff9305f08a7d67eef45336da3",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "c99daca6c61498bfa5ce081e7cea01e53004d4023b2c2b47f7fe632b2dcc3984",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p6",
+              "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf",
+              "screenshotSha256": "da4d23b66148b28cd67bf97d007cdccaa225eb0e9e5085191f6b6bcc0f788994",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "bff130031ff29a9e3c4f0da7e4bd51dff2b2bbeeb7908e688a34ee6bf8d29858",
+              "passed": true,
+              "probeCount": 1,
+              "sceneId": "scene-p6",
+              "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf",
+              "screenshotSha256": "210753cc8e8c1a400631faccd1c7a66e06e245dd7f1e1aa5aecf4e9006eec2e0",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "domSha256": "70645548a1e309a252a130f7a38d95d3f6974433610f60e53b62f10d28f487db",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p7",
+              "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593",
+              "screenshotSha256": "9bfd80b7f0af6835fc933f492631ebb2a82656469556083ab52cef452ca0bc97",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "domSha256": "f43fe7faffb2648e35893dcefea69b625c4fdf0128e5fce44334930ff14358ff",
+              "passed": true,
+              "probeCount": 0,
+              "sceneId": "scene-p7",
+              "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593",
+              "screenshotSha256": "1f7ddbf07146e34b3ebbdc0249de1cc6571a48d1e8fde55a7838b79128b7205b",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            }
+          ],
+          "review": {
+            "dimensions": [
+              {
+                "evidence": [
+                  {
+                    "quote": "看左边这张蓝色卡片，事实是可以核对的信息，比如日期、数量、事件。判断它是什么，要看句子本身。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "中间的绿色卡片是观点。观点是个人的判断或建议，常用“我认为”“应该”这样的词来开头。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "再看黄色卡片，证据是用来支持观点的事实材料。一个事实句是不是证据，要看它有没有被用来支持某个观点。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "“24人”是具体数量，能核对，判断性质看句子本身——所以是事实。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "✅ 看句子本身：这句话有具体数量“15名”，是可以核对的事实材料。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "选出下面哪个句子是可核实的事实陈述。",
+                    "sceneId": "scene-p6"
+                  }
+                ],
+                "id": "grade_fit",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "看左边这张蓝色卡片，事实是可以核对的信息，比如日期、数量、事件。判断它是什么，要看句子本身。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "中间的绿色卡片是观点。观点是个人的判断或建议，常用“我认为”“应该”这样的词来开头。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "再看黄色卡片，证据是用来支持观点的事实材料。一个事实句是不是证据，要看它有没有被用来支持某个观点。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "“24人”是具体数量，能核对，判断性质看句子本身——所以是事实。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "✅ 看上下文作用：短文里，作者用“上周有15名同学参与了浇水”来支持“每周开展一次植物观察活动”的建议，所以它在这个论证中起证据作用。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "阅读短文：学校广播站准备增加“科学小知识”栏目。站长说：“我认为这个栏目能丰富大家的课外知识。”他拿出记录：“上学期科学类书籍借阅量增加了30%。” 问：文中“上学期科学类书籍借阅量增加了30%”这句话在文中起什么作用？",
+                    "sceneId": "scene-p6"
+                  }
+                ],
+                "id": "goal_coverage",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "先别急着翻答案，自己猜一猜：哪一句是可以核对的事实，哪一句是个人的观点？",
+                    "sceneId": "scene-p1"
+                  },
+                  {
+                    "quote": "记住：判断性质看句子本身，判断作用看上下文。下面你来试试。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "读句子，然后点“事实”或“观点”，把它送进正确的箱子。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "再点“② 看上下文作用”，看看作者用它来做什么。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "想一想：先看这句话本身是什么性质，再看它跟在建议后面，是支持这个建议，还是表达自己的感受？",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "先判断句子本身是事实还是观点；问“作用”的题，要看它跟在谁后面、是不是在支持一个建议。做完这五题，今天的本领就练成了。",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "记住这句口诀：判断性质看句子本身，判断作用看上下文。",
+                    "sceneId": "scene-p7"
+                  }
+                ],
+                "id": "teaching_sequence",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "点错了没关系，看看提示，再点另一个按钮试试。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "❌ 再想想。句子性质要看有没有可核对的数量或记录，以及是否包含个人感受。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "朵朵说：“我把‘我觉得’那句话差点当成事实，后来圈出‘我觉得’才改对。”",
+                    "sceneId": "scene-p3"
+                  }
+                ],
+                "id": "misconception_repair",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "✅ 送对了！这是可核实的事实。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "“18人”是有记录的数量，能核对；如果用它来支持“应增加棋类社团活动次数”的建议，它就起了证据作用。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "🔄 重来",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "✅ 看句子本身：这句话有具体数量“15名”，是可以核对的事实材料。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "✅ 对照两种判断：同一句话，性质是事实，作用是证据，两者可以同时成立。",
+                    "sceneId": "scene-p4"
+                  }
+                ],
+                "id": "meaningful_interaction",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "阅读短文：“午间应增加借书窗口。”班长在班会上说。他补充：“周一、周二排队借书的同学均超过20人。” 问：文中“周一、周二排队借书的同学均超过20人”这句话在文中起什么作用？",
+                    "sceneId": "scene-p5"
+                  },
+                  {
+                    "quote": "选出下面哪个句子是可核实的事实陈述。",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "阅读短文：学校广播站准备增加“科学小知识”栏目。站长说：“我认为这个栏目能丰富大家的课外知识。”他拿出记录：“上学期科学类书籍借阅量增加了30%。” 问：文中“上学期科学类书籍借阅量增加了30%”这句话在文中起什么作用？",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "阅读短文：班级决定设立“图书管理员”岗位。小明说：“我们应该轮流管理图书角。”他补充：“上周图书角有5本书没有放回原位。” 问：文中“上周图书角有5本书没有放回原位”这句话在文中起什么作用？",
+                    "sceneId": "scene-p6"
+                  }
+                ],
+                "id": "assessment_alignment",
+                "passed": true
+              },
+              {
+                "evidence": [
+                  {
+                    "quote": "把句子正确送进“事实箱”或“观点箱”。　📖",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "读句子→点按钮分类，错了可重试，送完点“重来”。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "👋 点按钮，把句子送进箱子吧。三张卡片都还没有分类。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "口诀：判断性质看句子本身，判断作用看上下文。",
+                    "sceneId": "scene-p7"
+                  }
+                ],
+                "id": "language_load",
+                "passed": true
+              }
+            ],
+            "inputSha256": "0f276ffd735f2681c690ec9a4e384b9dbd6889e6ac46a9c75ee3222c0e7a78b9",
+            "modelId": "deepseek-v4-flash",
+            "objectives": [
+              {
+                "evidence": [
+                  {
+                    "quote": "看左边这张蓝色卡片，事实是可以核对的信息，比如日期、数量、事件。判断它是什么，要看句子本身。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "再看黄色卡片，证据是用来支持观点的事实材料。一个事实句是不是证据，要看它有没有被用来支持某个观点。",
+                    "sceneId": "scene-p2"
+                  },
+                  {
+                    "quote": "“24人”是具体数量，能核对，判断性质看句子本身——所以是事实。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "“18人”是有记录的数量，能核对；如果用它来支持“应增加棋类社团活动次数”的建议，它就起了证据作用。",
+                    "sceneId": "scene-p3"
+                  },
+                  {
+                    "quote": "✅ 看上下文作用：短文里，作者用“上周有15名同学参与了浇水”来支持“每周开展一次植物观察活动”的建议，所以它在这个论证中起证据作用。",
+                    "sceneId": "scene-p4"
+                  },
+                  {
+                    "quote": "选出下面哪个句子是可核实的事实陈述。",
+                    "sceneId": "scene-p6"
+                  },
+                  {
+                    "quote": "阅读短文：学校广播站准备增加“科学小知识”栏目。站长说：“我认为这个栏目能丰富大家的课外知识。”他拿出记录：“上学期科学类书籍借阅量增加了30%。” 问：文中“上学期科学类书籍借阅量增加了30%”这句话在文中起什么作用？",
+                    "sceneId": "scene-p6"
+                  }
+                ],
+                "objectiveIndex": 0
+              }
+            ],
+            "providerId": "deepseek",
+            "requestIdHash": "5fb1bdb7009f8525a49952d4e6cf68fef5cf34262ece58107b6b55a23db74e19"
+          },
+          "sceneHashes": [
+            {
+              "sceneId": "scene-p1",
+              "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c"
+            },
+            {
+              "sceneId": "scene-p2",
+              "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78"
+            },
+            {
+              "sceneId": "scene-p3",
+              "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df"
+            },
+            {
+              "sceneId": "scene-p4",
+              "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12"
+            },
+            {
+              "sceneId": "scene-p5",
+              "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463"
+            },
+            {
+              "sceneId": "scene-p6",
+              "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf"
+            },
+            {
+              "sceneId": "scene-p7",
+              "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593"
+            }
+          ],
+          "schemaVersion": "mira.openmaic.teaching-quality-receipt.v1",
+          "selectionPlanSha256": "be8af87c450ac7d36b7477e2423861e6821a8ca1ee57b3b68e47b6f20eda760c",
+          "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+          "snapshotSha256": "4c22173c009c946c1275bd83312978165ec68a94e32452ba5edaf0b63dea0d32",
+          "stageId": "stage-tYYCDS_mnS",
+          "status": "passed",
+          "teachingBriefSha256": "9724750373ca203105a3cd702ca0631e3cefbed8ec74bef3aac9bd873a25f2f1"
+        },
+        "interactionDesign": {
+          "explorationChecks": [
+            {
+              "evidence": {
+                "inputMode": "pointer",
+                "mechanism": "semantic-state-model.v1",
+                "resetPassed": true,
+                "states": [
+                  {
+                    "diagramSha256": "f2fd2c66dc3e6e23639d139596bc6fa694e87f1c8e075be289b30331dad0ff80",
+                    "feedbackSha256": "ab7b15e35c8ba4e6e7f3aa03a8f4a09cfe05a9b0905ea3772095d3a0dbf7f5ce",
+                    "stateId": "state-baseline"
+                  },
+                  {
+                    "diagramSha256": "1bc111baca34c15df9315ff3f9485f469587a29b2eb0b88f853a3c1d9e260b5c",
+                    "feedbackSha256": "d994e27eeeb14d895f0b215fde3dd50584fd763e4c9ac189afd36b3f1b7acd6e",
+                    "stateId": "state-a"
+                  },
+                  {
+                    "diagramSha256": "248b5dbd21a8f0108c2ffb23897dea2daef5b17bb3d1e3eea8db3ad224fde5ed",
+                    "feedbackSha256": "85927b06113f0da97703eb85a4213535144b55b5d727199eaef611269a462586",
+                    "stateId": "state-b"
+                  },
+                  {
+                    "diagramSha256": "593297c9aed4260aa68ae66d38dddce7aaf2d49c4d1dca4135dfe390e3873b93",
+                    "feedbackSha256": "dfefb4726a5287698c0c07c7cf0a6239e9873309d886583864027fd608c0b743",
+                    "stateId": "state-c"
+                  }
+                ],
+                "verification": "structural_then_semantic_visual_review"
+              },
+              "objectiveIndex": 0,
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "evidence": {
+                "inputMode": "touch",
+                "mechanism": "semantic-state-model.v1",
+                "resetPassed": true,
+                "states": [
+                  {
+                    "diagramSha256": "e16857f0e81c4f6e8dc9a1a54d8bec3f1cb6ea318151e921465cc13ee1cbcddb",
+                    "feedbackSha256": "ab7b15e35c8ba4e6e7f3aa03a8f4a09cfe05a9b0905ea3772095d3a0dbf7f5ce",
+                    "stateId": "state-baseline"
+                  },
+                  {
+                    "diagramSha256": "e6e0cbf6a23cff4a98ac2ffa37778905a779dae5131b416c2fdc43a81c56e56e",
+                    "feedbackSha256": "d994e27eeeb14d895f0b215fde3dd50584fd763e4c9ac189afd36b3f1b7acd6e",
+                    "stateId": "state-a"
+                  },
+                  {
+                    "diagramSha256": "07d557997592cc53ce421789ecc72659eee6045d28058d7fc4f5806900231dbf",
+                    "feedbackSha256": "85927b06113f0da97703eb85a4213535144b55b5d727199eaef611269a462586",
+                    "stateId": "state-b"
+                  },
+                  {
+                    "diagramSha256": "d0c5b967bc0c44f2e45e4e5d5edbe399fbb53d78b76b48e1776357609dea4ca7",
+                    "feedbackSha256": "dfefb4726a5287698c0c07c7cf0a6239e9873309d886583864027fd608c0b743",
+                    "stateId": "state-c"
+                  }
+                ],
+                "verification": "structural_then_semantic_visual_review"
+              },
+              "objectiveIndex": 0,
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            }
+          ],
+          "gradeBoundarySha256": "8a616850d38b3dafacf84d20b879d208affaaf2eb332e64eff99caa45519f3ef",
+          "objectives": [
+            {
+              "checks": [
+                {
+                  "domSha256": "43aa32c72a2663b83d43d273fb1e37e331d327707159452de7a7ba879d6ff013",
+                  "probeId": "objective-0",
+                  "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+                  "screenshotSha256": "ccd9b7fa3999776fa478ca8c3e31217dd21519d3b44819320d16f6d309acad27",
+                  "viewport": {
+                    "height": 720,
+                    "width": 1280
+                  }
+                },
+                {
+                  "domSha256": "43aa32c72a2663b83d43d273fb1e37e331d327707159452de7a7ba879d6ff013",
+                  "probeId": "objective-0",
+                  "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+                  "screenshotSha256": "b31065930790514ac36bc409d942e9959bf86ddfe16c5ba39f15a2c6e9863588",
+                  "viewport": {
+                    "height": 768,
+                    "width": 1024
+                  }
+                }
+              ],
+              "demonstration": {
+                "quote": "科普书借出18次，是可以核对的事实。",
+                "sceneId": "scene-p2"
+              },
+              "exploration": {
+                "diagramSelector": "#model",
+                "feedbackSelector": "#result",
+                "mechanism": {
+                  "kind": "semantic-state-model.v1"
+                },
+                "reset": {
+                  "selector": "#reset-btn",
+                  "stateId": "state-baseline"
+                },
+                "schemaVersion": "mira.openmaic.multistate-exploration.v1",
+                "states": [
+                  {
+                    "explanationText": "三张卡片都还没有分类。",
+                    "id": "state-baseline",
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#reset-btn"
+                      }
+                    ],
+                    "resultText": "👋 点按钮，把句子送进箱子吧。"
+                  },
+                  {
+                    "explanationText": "“24人”是具体数量，能核对，判断性质看句子本身——所以是事实。",
+                    "id": "state-a",
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#actual-control"
+                      }
+                    ],
+                    "resultText": "✅ 送对了！这是可核实的事实。"
+                  },
+                  {
+                    "explanationText": "“我觉得”是个人判断，换一个人想法可能不同，所以是观点。",
+                    "id": "state-b",
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#card2-opinion"
+                      }
+                    ],
+                    "resultText": "✅ 送对了！这是个人观点。"
+                  },
+                  {
+                    "explanationText": "“18人”是有记录的数量，能核对；如果用它来支持“应增加棋类社团活动次数”的建议，它就起了证据作用。",
+                    "id": "state-c",
+                    "operations": [
+                      {
+                        "action": "click",
+                        "selector": "#card3-fact"
+                      }
+                    ],
+                    "resultText": "✅ 送对了！这是可核实的事实，还能当证据。"
+                  }
+                ]
+              },
+              "feedback": {
+                "reasonQuote": "判断性质看句子本身",
+                "sceneId": "scene-p3",
+                "selector": "#separate-result",
+                "textIncludes": "送对了"
+              },
+              "independentJudgment": {
+                "questionId": "independent_1",
+                "sceneId": "scene-p6"
+              },
+              "objectiveIndex": 0,
+              "operation": {
+                "action": "click",
+                "controlSelector": "#actual-control",
+                "sceneId": "scene-p3"
+              }
+            }
+          ],
+          "planSha256": "09ba789179043db79039342010e5236d971addbf03d2ecaea9339546a16774ba",
+          "policyId": "mira-primary-multistate-interaction.v2",
+          "receiptSha256": "6deaa1c55ae58ea456912a6420074957b9af527d5b871fc27778ebf3b1cd9a3e",
+          "schemaVersion": "mira.openmaic.interaction-design-receipt.v2",
+          "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+          "snapshotSha256": "4c22173c009c946c1275bd83312978165ec68a94e32452ba5edaf0b63dea0d32",
+          "stageId": "stage-tYYCDS_mnS",
+          "status": "passed",
+          "teachingQualityReceiptSha256": "5d19308e61bff1e627d960fd572931da129c9ea799dab876835b3d12188b8273",
+          "visualReview": {
+            "modelId": "deepseek-v4-flash-vision-exp",
+            "providerId": "deepseek",
+            "providerRequestIdHash": "6fb6091c9ddcf4960b6a2c7c4585eb9ab95e248c99d556289d98dd30649118a3",
+            "providerResponseModelId": "deepseek-flash",
+            "receiptSha256": "dff2d3ad27d2fd5f0a2adf1cd571e863215dd0c8f4ffaa8223ec491ae2c881c8",
+            "reviewerKind": "vision_model",
+            "rubricVersion": "mira.primary-teaching-visual.v1",
+            "sceneReviews": [
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "标题、引导语与两个例句均清晰可读，无截断遮挡；左右分栏对比句子①事实与句子②观点，层级明确；本页为静态导入页，无控件，符合静态页允许无交互的规则。",
+                "sceneId": "scene-p1",
+                "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c",
+                "screenshotSha256": "fbd25d887c07cc7d66184c7573bbd78ef958460a97a14f5a569b5ca7e9e1cf6c",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "1024×768视口下标题、引导语、两个例句与底部提示均完整显示，无截断；左右对比布局保持，留白合理；静态导入页无控件，不伪装交互。",
+                "sceneId": "scene-p1",
+                "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c",
+                "screenshotSha256": "7267be9d3597caa3b80f306914061eab7d5d7b06e0705cb2a74a1780684f35c5",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "三栏“事实/观点/证据”定义清晰，下方用观点句与事实句示例说明证据作用，图示与文字一致；字号适龄，无遮挡；静态示范页无控件，符合规则。",
+                "sceneId": "scene-p2",
+                "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78",
+                "screenshotSha256": "4d0ecb26c6af72d3d647de1f0c5105fa9319671e961584785089b4b7b7619d6a",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "1024×768视口下三栏定义与示例完整可见，无截断；信息层级清楚，留白充足；静态示范页无控件。",
+                "sceneId": "scene-p2",
+                "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78",
+                "screenshotSha256": "246f7289aa67d2d60a2568b4c826e0054c20ecb7d8a7dcd421de40d07ea4c84a",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "三张句子卡片与“事实/观点”按钮清晰可辨，目标与规则说明完整；底部“已送对 0/3”进度与“重来”按钮入口明确，反馈区域可辨；卡片文字无截断。",
+                "sceneId": "scene-p3",
+                "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+                "screenshotSha256": "ccd9b7fa3999776fa478ca8c3e31217dd21519d3b44819320d16f6d309acad27",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "1024×768视口下三张卡片、按钮、进度与重来按钮均完整显示，无遮挡；操作入口清楚，符合触屏可点要求。",
+                "sceneId": "scene-p3",
+                "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+                "screenshotSha256": "b31065930790514ac36bc409d942e9959bf86ddfe16c5ba39f15a2c6e9863588",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "短文与高亮标注清晰，三个步骤按钮（看句子本身/看上下文作用/对照两种判断）入口明确，当前步骤反馈框显示判断结果；文字无截断。",
+                "sceneId": "scene-p4",
+                "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12",
+                "screenshotSha256": "62329f23fa4470cef270d60022edf8246934b3bf15675e0b757b3dfccf355ca0",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "1024×768视口下短文、三个步骤按钮与反馈框完整可见，无截断；操作入口与反馈区域清楚。",
+                "sceneId": "scene-p4",
+                "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12",
+                "screenshotSha256": "6115c86ec3365660f796979efdc1f317a5af60a73d3c50da00e98255e8a275c2",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "题干与三个选项清晰可读，无截断；顶部“答题中 0/1”与“提交答案”按钮入口明确；选项布局合理，留白充足。",
+                "sceneId": "scene-p5",
+                "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463",
+                "screenshotSha256": "b47abc9a95040fd6340647ab48ac2a9c7aa8f64afb20e0baeb8fe1403bfc12ab",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "1024×768视口下题干与选项完整显示，无遮挡；提交答案按钮可见，操作入口明确。",
+                "sceneId": "scene-p5",
+                "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463",
+                "screenshotSha256": "edb90a28321bf811092b4022bf5b4a6c33170aaff9305f08a7d67eef45336da3",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "三道单选题题干与选项清晰，无截断；顶部“答题中 0/5”与“提交答案”入口明确；选项两列布局合理，信息层级清楚。",
+                "sceneId": "scene-p6",
+                "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf",
+                "screenshotSha256": "da4d23b66148b28cd67bf97d007cdccaa225eb0e9e5085191f6b6bcc0f788994",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "1024×768视口下三题完整显示，无遮挡；选项与提交按钮入口清楚，符合独立作答要求。",
+                "sceneId": "scene-p6",
+                "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf",
+                "screenshotSha256": "210753cc8e8c1a400631faccd1c7a66e06e245dd7f1e1aa5aecf4e9006eec2e0",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "三栏总结与口诀、自我反思、下次再练提示均清晰可读，无截断；静态总结页无控件，符合规则，信息层级明确。",
+                "sceneId": "scene-p7",
+                "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593",
+                "screenshotSha256": "9bfd80b7f0af6835fc933f492631ebb2a82656469556083ab52cef452ca0bc97",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "interactionAffordance": "passed",
+                "layout": "passed",
+                "legibility": "passed",
+                "notes": "1024×768视口下总结三栏与底部提示完整显示，无遮挡；静态总结页无控件，留白合理。",
+                "sceneId": "scene-p7",
+                "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593",
+                "screenshotSha256": "1f7ddbf07146e34b3ebbdc0249de1cc6571a48d1e8fde55a7838b79128b7205b",
+                "teachingGraphic": "passed",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              }
+            ],
+            "schemaVersion": "mira.openmaic.visual-review.v1",
+            "snapshotSha256": "4c22173c009c946c1275bd83312978165ec68a94e32452ba5edaf0b63dea0d32",
+            "status": "passed",
+            "teachingQualityContextSha256": "0d6d67e59ebc3cd362aae3e5582aa4b0b5c774c8fd960d6cfa6c21b25fc311bd"
+          }
+        },
+        "receiptSha256": "8740d06792b1fd9ad527c56ccb9ca4f06ffcd47e8054f868ee8733f3f675c915"
+      },
+      "research": {
+        "verified": true,
+        "schemaVersion": "mira.openmaic.professional-research-receipt.v1",
+        "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+        "providerId": "baidu",
+        "searchCount": 2,
+        "resultCount": 20,
+        "fetchedSourceCount": 2,
+        "citationCount": 1,
+        "citedSceneCount": 1,
+        "receiptSha256": "ae15e5855871adf677026255ed4805cb3af60ca9abb162ddb067313856806aef"
+      },
+      "teachingQuality": {
+        "verified": true,
+        "snapshotSha256": "4c22173c009c946c1275bd83312978165ec68a94e32452ba5edaf0b63dea0d32",
+        "sceneHashes": [
+          {
+            "sceneId": "scene-p1",
+            "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c"
+          },
+          {
+            "sceneId": "scene-p2",
+            "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78"
+          },
+          {
+            "sceneId": "scene-p3",
+            "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df"
+          },
+          {
+            "sceneId": "scene-p4",
+            "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12"
+          },
+          {
+            "sceneId": "scene-p5",
+            "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463"
+          },
+          {
+            "sceneId": "scene-p6",
+            "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf"
+          },
+          {
+            "sceneId": "scene-p7",
+            "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593"
+          }
+        ],
+        "receiptSha256": "5d19308e61bff1e627d960fd572931da129c9ea799dab876835b3d12188b8273"
+      },
+      "interactionDesign": {
+        "verified": true,
+        "snapshotSha256": "4c22173c009c946c1275bd83312978165ec68a94e32452ba5edaf0b63dea0d32",
+        "planSha256": "09ba789179043db79039342010e5236d971addbf03d2ecaea9339546a16774ba",
+        "receiptSha256": "6deaa1c55ae58ea456912a6420074957b9af527d5b871fc27778ebf3b1cd9a3e",
+        "objectiveCount": 1
+      },
+      "requiredTeachingActions": [
+        {
+          "sceneId": "scene-p4",
+          "actionId": "disc-p4-a"
+        },
+        {
+          "sceneId": "scene-p4",
+          "actionId": "disc-p4-b"
+        }
+      ],
+      "media": {
+        "verified": true,
+        "schemaVersion": "mira.openmaic.formal-media-receipt.v1",
+        "policyId": "mira-formal-qwen-image.v1",
+        "providerId": "qwen-image",
+        "modelId": "qwen-image-max",
+        "imageCount": 0,
+        "receiptSha256": "6af310a092a1c2ab563773ab394258d314fec52ee1c1e674ecfe0ba0d23b3ed9",
+        "verifiedAssetCount": 0
+      },
+      "video": {
+        "verified": true,
+        "schemaVersion": "mira.openmaic.formal-video-receipt.v1",
+        "policyId": "mira-formal-happyhorse-video.v1",
+        "providerId": "happyhorse",
+        "modelId": "happyhorse-1.0-t2v",
+        "videoCount": 0,
+        "receiptSha256": "01bb1ab58323fbf11b7511603553ebaa18ccccea02f8d4ae948dabadd87d40ca",
+        "verifiedAssetCount": 0
+      }
+    },
+    "professionalCreation": {
+      "buildItemId": "catalog_build_item_7b6c5e725bb1003f70897ae2",
+      "classroomId": "stage-tYYCDS_mnS",
+      "imageGenerationEnabled": true,
+      "imagePolicyId": "mira-formal-qwen-image.v1",
+      "interactionDesign": {
+        "explorationChecks": [
+          {
+            "evidence": {
+              "inputMode": "pointer",
+              "mechanism": "semantic-state-model.v1",
+              "resetPassed": true,
+              "states": [
+                {
+                  "diagramSha256": "f2fd2c66dc3e6e23639d139596bc6fa694e87f1c8e075be289b30331dad0ff80",
+                  "feedbackSha256": "ab7b15e35c8ba4e6e7f3aa03a8f4a09cfe05a9b0905ea3772095d3a0dbf7f5ce",
+                  "stateId": "state-baseline"
+                },
+                {
+                  "diagramSha256": "1bc111baca34c15df9315ff3f9485f469587a29b2eb0b88f853a3c1d9e260b5c",
+                  "feedbackSha256": "d994e27eeeb14d895f0b215fde3dd50584fd763e4c9ac189afd36b3f1b7acd6e",
+                  "stateId": "state-a"
+                },
+                {
+                  "diagramSha256": "248b5dbd21a8f0108c2ffb23897dea2daef5b17bb3d1e3eea8db3ad224fde5ed",
+                  "feedbackSha256": "85927b06113f0da97703eb85a4213535144b55b5d727199eaef611269a462586",
+                  "stateId": "state-b"
+                },
+                {
+                  "diagramSha256": "593297c9aed4260aa68ae66d38dddce7aaf2d49c4d1dca4135dfe390e3873b93",
+                  "feedbackSha256": "dfefb4726a5287698c0c07c7cf0a6239e9873309d886583864027fd608c0b743",
+                  "stateId": "state-c"
+                }
+              ],
+              "verification": "structural_then_semantic_visual_review"
+            },
+            "objectiveIndex": 0,
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "evidence": {
+              "inputMode": "touch",
+              "mechanism": "semantic-state-model.v1",
+              "resetPassed": true,
+              "states": [
+                {
+                  "diagramSha256": "e16857f0e81c4f6e8dc9a1a54d8bec3f1cb6ea318151e921465cc13ee1cbcddb",
+                  "feedbackSha256": "ab7b15e35c8ba4e6e7f3aa03a8f4a09cfe05a9b0905ea3772095d3a0dbf7f5ce",
+                  "stateId": "state-baseline"
+                },
+                {
+                  "diagramSha256": "e6e0cbf6a23cff4a98ac2ffa37778905a779dae5131b416c2fdc43a81c56e56e",
+                  "feedbackSha256": "d994e27eeeb14d895f0b215fde3dd50584fd763e4c9ac189afd36b3f1b7acd6e",
+                  "stateId": "state-a"
+                },
+                {
+                  "diagramSha256": "07d557997592cc53ce421789ecc72659eee6045d28058d7fc4f5806900231dbf",
+                  "feedbackSha256": "85927b06113f0da97703eb85a4213535144b55b5d727199eaef611269a462586",
+                  "stateId": "state-b"
+                },
+                {
+                  "diagramSha256": "d0c5b967bc0c44f2e45e4e5d5edbe399fbb53d78b76b48e1776357609dea4ca7",
+                  "feedbackSha256": "dfefb4726a5287698c0c07c7cf0a6239e9873309d886583864027fd608c0b743",
+                  "stateId": "state-c"
+                }
+              ],
+              "verification": "structural_then_semantic_visual_review"
+            },
+            "objectiveIndex": 0,
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          }
+        ],
+        "gradeBoundarySha256": "8a616850d38b3dafacf84d20b879d208affaaf2eb332e64eff99caa45519f3ef",
+        "objectives": [
+          {
+            "checks": [
+              {
+                "domSha256": "43aa32c72a2663b83d43d273fb1e37e331d327707159452de7a7ba879d6ff013",
+                "probeId": "objective-0",
+                "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+                "screenshotSha256": "ccd9b7fa3999776fa478ca8c3e31217dd21519d3b44819320d16f6d309acad27",
+                "viewport": {
+                  "height": 720,
+                  "width": 1280
+                }
+              },
+              {
+                "domSha256": "43aa32c72a2663b83d43d273fb1e37e331d327707159452de7a7ba879d6ff013",
+                "probeId": "objective-0",
+                "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+                "screenshotSha256": "b31065930790514ac36bc409d942e9959bf86ddfe16c5ba39f15a2c6e9863588",
+                "viewport": {
+                  "height": 768,
+                  "width": 1024
+                }
+              }
+            ],
+            "demonstration": {
+              "quote": "科普书借出18次，是可以核对的事实。",
+              "sceneId": "scene-p2"
+            },
+            "exploration": {
+              "diagramSelector": "#model",
+              "feedbackSelector": "#result",
+              "mechanism": {
+                "kind": "semantic-state-model.v1"
+              },
+              "reset": {
+                "selector": "#reset-btn",
+                "stateId": "state-baseline"
+              },
+              "schemaVersion": "mira.openmaic.multistate-exploration.v1",
+              "states": [
+                {
+                  "explanationText": "三张卡片都还没有分类。",
+                  "id": "state-baseline",
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#reset-btn"
+                    }
+                  ],
+                  "resultText": "👋 点按钮，把句子送进箱子吧。"
+                },
+                {
+                  "explanationText": "“24人”是具体数量，能核对，判断性质看句子本身——所以是事实。",
+                  "id": "state-a",
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#actual-control"
+                    }
+                  ],
+                  "resultText": "✅ 送对了！这是可核实的事实。"
+                },
+                {
+                  "explanationText": "“我觉得”是个人判断，换一个人想法可能不同，所以是观点。",
+                  "id": "state-b",
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#card2-opinion"
+                    }
+                  ],
+                  "resultText": "✅ 送对了！这是个人观点。"
+                },
+                {
+                  "explanationText": "“18人”是有记录的数量，能核对；如果用它来支持“应增加棋类社团活动次数”的建议，它就起了证据作用。",
+                  "id": "state-c",
+                  "operations": [
+                    {
+                      "action": "click",
+                      "selector": "#card3-fact"
+                    }
+                  ],
+                  "resultText": "✅ 送对了！这是可核实的事实，还能当证据。"
+                }
+              ]
+            },
+            "feedback": {
+              "reasonQuote": "判断性质看句子本身",
+              "sceneId": "scene-p3",
+              "selector": "#separate-result",
+              "textIncludes": "送对了"
+            },
+            "independentJudgment": {
+              "questionId": "independent_1",
+              "sceneId": "scene-p6"
+            },
+            "objectiveIndex": 0,
+            "operation": {
+              "action": "click",
+              "controlSelector": "#actual-control",
+              "sceneId": "scene-p3"
+            }
+          }
+        ],
+        "planSha256": "09ba789179043db79039342010e5236d971addbf03d2ecaea9339546a16774ba",
+        "policyId": "mira-primary-multistate-interaction.v2",
+        "receiptSha256": "6deaa1c55ae58ea456912a6420074957b9af527d5b871fc27778ebf3b1cd9a3e",
+        "schemaVersion": "mira.openmaic.interaction-design-receipt.v2",
+        "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+        "snapshotSha256": "4c22173c009c946c1275bd83312978165ec68a94e32452ba5edaf0b63dea0d32",
+        "stageId": "stage-tYYCDS_mnS",
+        "status": "passed",
+        "teachingQualityReceiptSha256": "5d19308e61bff1e627d960fd572931da129c9ea799dab876835b3d12188b8273",
+        "visualReview": {
+          "modelId": "deepseek-v4-flash-vision-exp",
+          "providerId": "deepseek",
+          "providerRequestIdHash": "6fb6091c9ddcf4960b6a2c7c4585eb9ab95e248c99d556289d98dd30649118a3",
+          "providerResponseModelId": "deepseek-flash",
+          "receiptSha256": "dff2d3ad27d2fd5f0a2adf1cd571e863215dd0c8f4ffaa8223ec491ae2c881c8",
+          "reviewerKind": "vision_model",
+          "rubricVersion": "mira.primary-teaching-visual.v1",
+          "sceneReviews": [
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "标题、引导语与两个例句均清晰可读，无截断遮挡；左右分栏对比句子①事实与句子②观点，层级明确；本页为静态导入页，无控件，符合静态页允许无交互的规则。",
+              "sceneId": "scene-p1",
+              "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c",
+              "screenshotSha256": "fbd25d887c07cc7d66184c7573bbd78ef958460a97a14f5a569b5ca7e9e1cf6c",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "1024×768视口下标题、引导语、两个例句与底部提示均完整显示，无截断；左右对比布局保持，留白合理；静态导入页无控件，不伪装交互。",
+              "sceneId": "scene-p1",
+              "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c",
+              "screenshotSha256": "7267be9d3597caa3b80f306914061eab7d5d7b06e0705cb2a74a1780684f35c5",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "三栏“事实/观点/证据”定义清晰，下方用观点句与事实句示例说明证据作用，图示与文字一致；字号适龄，无遮挡；静态示范页无控件，符合规则。",
+              "sceneId": "scene-p2",
+              "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78",
+              "screenshotSha256": "4d0ecb26c6af72d3d647de1f0c5105fa9319671e961584785089b4b7b7619d6a",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "1024×768视口下三栏定义与示例完整可见，无截断；信息层级清楚，留白充足；静态示范页无控件。",
+              "sceneId": "scene-p2",
+              "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78",
+              "screenshotSha256": "246f7289aa67d2d60a2568b4c826e0054c20ecb7d8a7dcd421de40d07ea4c84a",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "三张句子卡片与“事实/观点”按钮清晰可辨，目标与规则说明完整；底部“已送对 0/3”进度与“重来”按钮入口明确，反馈区域可辨；卡片文字无截断。",
+              "sceneId": "scene-p3",
+              "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+              "screenshotSha256": "ccd9b7fa3999776fa478ca8c3e31217dd21519d3b44819320d16f6d309acad27",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "1024×768视口下三张卡片、按钮、进度与重来按钮均完整显示，无遮挡；操作入口清楚，符合触屏可点要求。",
+              "sceneId": "scene-p3",
+              "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+              "screenshotSha256": "b31065930790514ac36bc409d942e9959bf86ddfe16c5ba39f15a2c6e9863588",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "短文与高亮标注清晰，三个步骤按钮（看句子本身/看上下文作用/对照两种判断）入口明确，当前步骤反馈框显示判断结果；文字无截断。",
+              "sceneId": "scene-p4",
+              "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12",
+              "screenshotSha256": "62329f23fa4470cef270d60022edf8246934b3bf15675e0b757b3dfccf355ca0",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "1024×768视口下短文、三个步骤按钮与反馈框完整可见，无截断；操作入口与反馈区域清楚。",
+              "sceneId": "scene-p4",
+              "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12",
+              "screenshotSha256": "6115c86ec3365660f796979efdc1f317a5af60a73d3c50da00e98255e8a275c2",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "题干与三个选项清晰可读，无截断；顶部“答题中 0/1”与“提交答案”按钮入口明确；选项布局合理，留白充足。",
+              "sceneId": "scene-p5",
+              "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463",
+              "screenshotSha256": "b47abc9a95040fd6340647ab48ac2a9c7aa8f64afb20e0baeb8fe1403bfc12ab",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "1024×768视口下题干与选项完整显示，无遮挡；提交答案按钮可见，操作入口明确。",
+              "sceneId": "scene-p5",
+              "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463",
+              "screenshotSha256": "edb90a28321bf811092b4022bf5b4a6c33170aaff9305f08a7d67eef45336da3",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "三道单选题题干与选项清晰，无截断；顶部“答题中 0/5”与“提交答案”入口明确；选项两列布局合理，信息层级清楚。",
+              "sceneId": "scene-p6",
+              "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf",
+              "screenshotSha256": "da4d23b66148b28cd67bf97d007cdccaa225eb0e9e5085191f6b6bcc0f788994",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "1024×768视口下三题完整显示，无遮挡；选项与提交按钮入口清楚，符合独立作答要求。",
+              "sceneId": "scene-p6",
+              "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf",
+              "screenshotSha256": "210753cc8e8c1a400631faccd1c7a66e06e245dd7f1e1aa5aecf4e9006eec2e0",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "三栏总结与口诀、自我反思、下次再练提示均清晰可读，无截断；静态总结页无控件，符合规则，信息层级明确。",
+              "sceneId": "scene-p7",
+              "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593",
+              "screenshotSha256": "9bfd80b7f0af6835fc933f492631ebb2a82656469556083ab52cef452ca0bc97",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 720,
+                "width": 1280
+              }
+            },
+            {
+              "interactionAffordance": "passed",
+              "layout": "passed",
+              "legibility": "passed",
+              "notes": "1024×768视口下总结三栏与底部提示完整显示，无遮挡；静态总结页无控件，留白合理。",
+              "sceneId": "scene-p7",
+              "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593",
+              "screenshotSha256": "1f7ddbf07146e34b3ebbdc0249de1cc6571a48d1e8fde55a7838b79128b7205b",
+              "teachingGraphic": "passed",
+              "viewport": {
+                "height": 768,
+                "width": 1024
+              }
+            }
+          ],
+          "schemaVersion": "mira.openmaic.visual-review.v1",
+          "snapshotSha256": "4c22173c009c946c1275bd83312978165ec68a94e32452ba5edaf0b63dea0d32",
+          "status": "passed",
+          "teachingQualityContextSha256": "0d6d67e59ebc3cd362aae3e5582aa4b0b5c774c8fd960d6cfa6c21b25fc311bd"
+        }
+      },
+      "receiptSha256": "8740d06792b1fd9ad527c56ccb9ca4f06ffcd47e8054f868ee8733f3f675c915",
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_7b6c5e725bb1003f70897ae2-attempt-1.contractfix1",
+      "schemaVersion": "mira.openmaic.professional-creation-receipt.v1",
+      "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+      "skillId": "mira-primary-courseware",
+      "skillOrchestration": {
+        "profileId": "mira-primary-adaptive.v2",
+        "receiptSha256": "0da61044bc0152fa7529d2281ddc3a14637ff4f972acb75287ff485b56118397",
+        "referenceReads": [
+          {
+            "resourcePath": "k12-core-literacy-planning/references/core-literacy.md",
+            "sourceHash": "47635d06a4a598b28c22a408f5f218e96dd2eca664ca74c1774bb95c848a47ee"
+          },
+          {
+            "resourcePath": "k12-core-literacy-planning/references/subjects/languages.md",
+            "sourceHash": "b88c8350e51ffcaf502ef891e0e69f8351295b550c4fe7202efa595de7327b89"
+          }
+        ],
+        "sceneContexts": [
+          {
+            "actionsContextSha256": "4b59e43d1b7b563e51987a4f4a58c10d24753f2145c9f9b5bcfbd99ac4ee1880",
+            "contentContextSha256": "18c7426f91b26c4191f8b421c45b1b0efab9e447bcfb8987ff96fabf86042007",
+            "sceneId": "scene-p1",
+            "sceneType": "slide"
+          },
+          {
+            "actionsContextSha256": "4b59e43d1b7b563e51987a4f4a58c10d24753f2145c9f9b5bcfbd99ac4ee1880",
+            "contentContextSha256": "18c7426f91b26c4191f8b421c45b1b0efab9e447bcfb8987ff96fabf86042007",
+            "sceneId": "scene-p2",
+            "sceneType": "slide"
+          },
+          {
+            "actionsContextSha256": "64bfd5f8f0486a096b0e99ea8c3b56c389f1707c247c51bd81957ee5af525d3a",
+            "contentContextSha256": "5663c81c71349c2340298dd9e2d60e99d81cb3958a1fb9e93d37a1f92ab25253",
+            "sceneId": "scene-p3",
+            "sceneType": "interactive"
+          },
+          {
+            "actionsContextSha256": "64bfd5f8f0486a096b0e99ea8c3b56c389f1707c247c51bd81957ee5af525d3a",
+            "contentContextSha256": "5663c81c71349c2340298dd9e2d60e99d81cb3958a1fb9e93d37a1f92ab25253",
+            "sceneId": "scene-p4",
+            "sceneType": "interactive"
+          },
+          {
+            "actionsContextSha256": "60cd0b5535e1d2f9594107e0fe4546feae6b299b7077169f10d8532320434960",
+            "contentContextSha256": "17193556dfe336776fe0a0676649206cf53143456dc14d1859538d0a021bce2a",
+            "sceneId": "scene-p5",
+            "sceneType": "quiz"
+          },
+          {
+            "actionsContextSha256": "60cd0b5535e1d2f9594107e0fe4546feae6b299b7077169f10d8532320434960",
+            "contentContextSha256": "17193556dfe336776fe0a0676649206cf53143456dc14d1859538d0a021bce2a",
+            "sceneId": "scene-p6",
+            "sceneType": "quiz"
+          },
+          {
+            "actionsContextSha256": "4b59e43d1b7b563e51987a4f4a58c10d24753f2145c9f9b5bcfbd99ac4ee1880",
+            "contentContextSha256": "18c7426f91b26c4191f8b421c45b1b0efab9e447bcfb8987ff96fabf86042007",
+            "sceneId": "scene-p7",
+            "sceneType": "slide"
+          }
+        ],
+        "schemaVersion": "mira.openmaic.skill-orchestration-receipt.v2",
+        "selectionPlan": {
+          "decisions": [
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "mira-primary-courseware",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "stage-design",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "k12-core-literacy-planning",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "deep-interactive",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "slide-craft",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode",
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "formal_primary_baseline",
+              "skillId": "learning-to-learn",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [
+                "/teachingBrief/course/objective",
+                "/teachingBrief/lesson/questions"
+              ],
+              "reasonCode": "bounded_goal_and_assessment_backward_design",
+              "skillId": "understanding-by-design",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_supported_explanation_cycle",
+              "skillId": "feynman-learning",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [
+                "/teachingBrief/course/objective",
+                "/gradeBoundary/learningObjectives/0",
+                "/gradeBoundary/allowedContent/0",
+                "/teachingBrief/lesson/teachingFlow/teach/keyPoints/0",
+                "/teachingBrief/lesson/questions/0/prompt",
+                "/teachingBrief/lesson/questions/1/prompt",
+                "/teachingBrief/lesson/questions/2/prompt",
+                "/teachingBrief/lesson/questions/3/prompt",
+                "/teachingBrief/lesson/questions/4/prompt",
+                "/teachingBrief/lesson/questions/5/prompt"
+              ],
+              "reasonCode": "practice_goal_and_repeated_tasks",
+              "skillId": "workshop-style",
+              "status": "selected"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_explicit_social_learning_situation",
+              "skillId": "social-emotional-learning",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "stable_subject_formal_source_gate_suffices",
+              "skillId": "deep-research",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/gradeCode"
+              ],
+              "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
+              "skillId": "lecture-style",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "only_after_persisted_page_requires_repair",
+              "skillId": "pro-editing",
+              "status": "deferred"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "only_after_persisted_page_requires_repair",
+              "skillId": "stage-dsl",
+              "status": "deferred"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "only_after_persisted_page_requires_repair",
+              "skillId": "slide-dsl",
+              "status": "deferred"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+              "skillId": "pptx-import",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+              "skillId": "style-clone",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_layout_source_in_generated_single_course",
+              "skillId": "page-clone",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_authorized_teacher_material",
+              "skillId": "teacher-style-clone",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "single_course_not_series_or_cross_course_memory",
+              "skillId": "curriculum-planner",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "single_course_not_series_or_cross_course_memory",
+              "skillId": "spiral-curriculum",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [],
+              "reasonCode": "no_personal_history_or_skill_creation_request",
+              "skillId": "build-personal-skill",
+              "status": "not_applicable"
+            },
+            {
+              "evidencePaths": [
+                "/gradeBoundary/subject"
+              ],
+              "reasonCode": "primary_subject_not_occupational_procedure",
+              "skillId": "vocational",
+              "status": "not_applicable"
+            }
+          ],
+          "gradeBand": "upper_primary",
+          "gradeBoundarySha256": "8a616850d38b3dafacf84d20b879d208affaaf2eb332e64eff99caa45519f3ef",
+          "inputSha256": "9ea46a1e7cf962b5f9e75d4a1e274cd755e03e873d2e4c962ec6acd3cc74dc30",
+          "planSha256": "be8af87c450ac7d36b7477e2423861e6821a8ca1ee57b3b68e47b6f20eda760c",
+          "primaryMethod": "workshop-style",
+          "registryId": "openmaic-builtin-skills.v1-23",
+          "schemaVersion": "mira.openmaic.skill-selection.v1",
+          "selectedSkillIds": [
+            "mira-primary-courseware",
+            "stage-design",
+            "k12-core-literacy-planning",
+            "deep-interactive",
+            "slide-craft",
+            "learning-to-learn",
+            "understanding-by-design",
+            "workshop-style"
+          ]
+        },
+        "skillReads": [
+          {
+            "skillId": "mira-primary-courseware",
+            "sourceHash": "2bb9434f452705182dbb6b71a912f8e24c8bed0c07561ce08fb493f6bd74e678"
+          },
+          {
+            "skillId": "stage-design",
+            "sourceHash": "6031161607914bb7ac37eb380b93b83c15ae9af7f25376b5b0749ce6cd06d76d"
+          },
+          {
+            "skillId": "k12-core-literacy-planning",
+            "sourceHash": "fbc03e9245406bac2d5b312f1a5711de311d17dc98eeb30d8eab298ee397c08f"
+          },
+          {
+            "skillId": "deep-interactive",
+            "sourceHash": "bb26d6b34f34bad37a76fef7f9863e1e67a2d4a5fbdf89d4ef08734c74db97bb"
+          },
+          {
+            "skillId": "slide-craft",
+            "sourceHash": "cf35eea56909b1427f171c6798ba55392761edb081603138892368d1bd727081"
+          },
+          {
+            "skillId": "learning-to-learn",
+            "sourceHash": "fe8be28613d01efe49a858bb89bf97f84273bd20311c805c36e2bfd28519c2ce"
+          },
+          {
+            "skillId": "understanding-by-design",
+            "sourceHash": "75af8be3ec7772b6ae97ac70ceedbb00fcfbb16a6d4addceb5f62ec0b3614808"
+          },
+          {
+            "skillId": "workshop-style",
+            "sourceHash": "002a4c9842069fb6f24da4b2d3ed0b6a65b0cef08298f5ae05d5905e661d884a"
+          }
+        ],
+        "status": "succeeded"
+      },
+      "status": "succeeded",
+      "studentToolsEnabled": false,
+      "supportingSkillIds": [
+        "k12-core-literacy-planning",
+        "deep-interactive"
+      ],
+      "teachingBriefSha256": "9724750373ca203105a3cd702ca0631e3cefbed8ec74bef3aac9bd873a25f2f1",
+      "teachingQuality": {
+        "gradeBoundarySha256": "8a616850d38b3dafacf84d20b879d208affaaf2eb332e64eff99caa45519f3ef",
+        "policyId": "mira-primary-quality.v1",
+        "receiptSha256": "5d19308e61bff1e627d960fd572931da129c9ea799dab876835b3d12188b8273",
+        "renderChecks": [
+          {
+            "domSha256": "b33ef949e2048000b7ab19bd56af8b55e07285562058d546e5b0fcb6bae52a35",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p1",
+            "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c",
+            "screenshotSha256": "fbd25d887c07cc7d66184c7573bbd78ef958460a97a14f5a569b5ca7e9e1cf6c",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "bdedafaef4a3a543e130f471dd3386205435785f3b4121b25f615a02cc88250b",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p1",
+            "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c",
+            "screenshotSha256": "7267be9d3597caa3b80f306914061eab7d5d7b06e0705cb2a74a1780684f35c5",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "5f96c7294f7523445b5277a2ac6e505a9f0e7dcb2f5a8e60a4b35985e631365e",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p2",
+            "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78",
+            "screenshotSha256": "4d0ecb26c6af72d3d647de1f0c5105fa9319671e961584785089b4b7b7619d6a",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "3d05f7e28fa978642b187154919d2a78f8b0ad7345625f866d5ff3e2514e0fcd",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p2",
+            "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78",
+            "screenshotSha256": "246f7289aa67d2d60a2568b4c826e0054c20ecb7d8a7dcd421de40d07ea4c84a",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "43aa32c72a2663b83d43d273fb1e37e331d327707159452de7a7ba879d6ff013",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p3",
+            "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+            "screenshotSha256": "ccd9b7fa3999776fa478ca8c3e31217dd21519d3b44819320d16f6d309acad27",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "43aa32c72a2663b83d43d273fb1e37e331d327707159452de7a7ba879d6ff013",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p3",
+            "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df",
+            "screenshotSha256": "b31065930790514ac36bc409d942e9959bf86ddfe16c5ba39f15a2c6e9863588",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "f5fdfbbb7b43993d31863a633285d50f5a61697405d294df93681d802bbebe08",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p4",
+            "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12",
+            "screenshotSha256": "62329f23fa4470cef270d60022edf8246934b3bf15675e0b757b3dfccf355ca0",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "f5fdfbbb7b43993d31863a633285d50f5a61697405d294df93681d802bbebe08",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p4",
+            "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12",
+            "screenshotSha256": "6115c86ec3365660f796979efdc1f317a5af60a73d3c50da00e98255e8a275c2",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "a7d926cc91301e7e6c6d370c760496b0fc85d7a8c1197e8ccac5000b557d1001",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p5",
+            "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463",
+            "screenshotSha256": "b47abc9a95040fd6340647ab48ac2a9c7aa8f64afb20e0baeb8fe1403bfc12ab",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "3a2d868ec626daee35eaa20e83cc34fd9d5c64ca4522dc63932a52eaeb436d9e",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p5",
+            "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463",
+            "screenshotSha256": "edb90a28321bf811092b4022bf5b4a6c33170aaff9305f08a7d67eef45336da3",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "c99daca6c61498bfa5ce081e7cea01e53004d4023b2c2b47f7fe632b2dcc3984",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p6",
+            "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf",
+            "screenshotSha256": "da4d23b66148b28cd67bf97d007cdccaa225eb0e9e5085191f6b6bcc0f788994",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "bff130031ff29a9e3c4f0da7e4bd51dff2b2bbeeb7908e688a34ee6bf8d29858",
+            "passed": true,
+            "probeCount": 1,
+            "sceneId": "scene-p6",
+            "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf",
+            "screenshotSha256": "210753cc8e8c1a400631faccd1c7a66e06e245dd7f1e1aa5aecf4e9006eec2e0",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          },
+          {
+            "domSha256": "70645548a1e309a252a130f7a38d95d3f6974433610f60e53b62f10d28f487db",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p7",
+            "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593",
+            "screenshotSha256": "9bfd80b7f0af6835fc933f492631ebb2a82656469556083ab52cef452ca0bc97",
+            "viewport": {
+              "height": 720,
+              "width": 1280
+            }
+          },
+          {
+            "domSha256": "f43fe7faffb2648e35893dcefea69b625c4fdf0128e5fce44334930ff14358ff",
+            "passed": true,
+            "probeCount": 0,
+            "sceneId": "scene-p7",
+            "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593",
+            "screenshotSha256": "1f7ddbf07146e34b3ebbdc0249de1cc6571a48d1e8fde55a7838b79128b7205b",
+            "viewport": {
+              "height": 768,
+              "width": 1024
+            }
+          }
+        ],
+        "review": {
+          "dimensions": [
+            {
+              "evidence": [
+                {
+                  "quote": "看左边这张蓝色卡片，事实是可以核对的信息，比如日期、数量、事件。判断它是什么，要看句子本身。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "中间的绿色卡片是观点。观点是个人的判断或建议，常用“我认为”“应该”这样的词来开头。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "再看黄色卡片，证据是用来支持观点的事实材料。一个事实句是不是证据，要看它有没有被用来支持某个观点。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "“24人”是具体数量，能核对，判断性质看句子本身——所以是事实。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "✅ 看句子本身：这句话有具体数量“15名”，是可以核对的事实材料。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "选出下面哪个句子是可核实的事实陈述。",
+                  "sceneId": "scene-p6"
+                }
+              ],
+              "id": "grade_fit",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "看左边这张蓝色卡片，事实是可以核对的信息，比如日期、数量、事件。判断它是什么，要看句子本身。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "中间的绿色卡片是观点。观点是个人的判断或建议，常用“我认为”“应该”这样的词来开头。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "再看黄色卡片，证据是用来支持观点的事实材料。一个事实句是不是证据，要看它有没有被用来支持某个观点。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "“24人”是具体数量，能核对，判断性质看句子本身——所以是事实。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "✅ 看上下文作用：短文里，作者用“上周有15名同学参与了浇水”来支持“每周开展一次植物观察活动”的建议，所以它在这个论证中起证据作用。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "阅读短文：学校广播站准备增加“科学小知识”栏目。站长说：“我认为这个栏目能丰富大家的课外知识。”他拿出记录：“上学期科学类书籍借阅量增加了30%。” 问：文中“上学期科学类书籍借阅量增加了30%”这句话在文中起什么作用？",
+                  "sceneId": "scene-p6"
+                }
+              ],
+              "id": "goal_coverage",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "先别急着翻答案，自己猜一猜：哪一句是可以核对的事实，哪一句是个人的观点？",
+                  "sceneId": "scene-p1"
+                },
+                {
+                  "quote": "记住：判断性质看句子本身，判断作用看上下文。下面你来试试。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "读句子，然后点“事实”或“观点”，把它送进正确的箱子。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "再点“② 看上下文作用”，看看作者用它来做什么。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "想一想：先看这句话本身是什么性质，再看它跟在建议后面，是支持这个建议，还是表达自己的感受？",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "先判断句子本身是事实还是观点；问“作用”的题，要看它跟在谁后面、是不是在支持一个建议。做完这五题，今天的本领就练成了。",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "记住这句口诀：判断性质看句子本身，判断作用看上下文。",
+                  "sceneId": "scene-p7"
+                }
+              ],
+              "id": "teaching_sequence",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "点错了没关系，看看提示，再点另一个按钮试试。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "❌ 再想想。句子性质要看有没有可核对的数量或记录，以及是否包含个人感受。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "朵朵说：“我把‘我觉得’那句话差点当成事实，后来圈出‘我觉得’才改对。”",
+                  "sceneId": "scene-p3"
+                }
+              ],
+              "id": "misconception_repair",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "✅ 送对了！这是可核实的事实。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "“18人”是有记录的数量，能核对；如果用它来支持“应增加棋类社团活动次数”的建议，它就起了证据作用。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "🔄 重来",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "✅ 看句子本身：这句话有具体数量“15名”，是可以核对的事实材料。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "✅ 对照两种判断：同一句话，性质是事实，作用是证据，两者可以同时成立。",
+                  "sceneId": "scene-p4"
+                }
+              ],
+              "id": "meaningful_interaction",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "阅读短文：“午间应增加借书窗口。”班长在班会上说。他补充：“周一、周二排队借书的同学均超过20人。” 问：文中“周一、周二排队借书的同学均超过20人”这句话在文中起什么作用？",
+                  "sceneId": "scene-p5"
+                },
+                {
+                  "quote": "选出下面哪个句子是可核实的事实陈述。",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "阅读短文：学校广播站准备增加“科学小知识”栏目。站长说：“我认为这个栏目能丰富大家的课外知识。”他拿出记录：“上学期科学类书籍借阅量增加了30%。” 问：文中“上学期科学类书籍借阅量增加了30%”这句话在文中起什么作用？",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "阅读短文：班级决定设立“图书管理员”岗位。小明说：“我们应该轮流管理图书角。”他补充：“上周图书角有5本书没有放回原位。” 问：文中“上周图书角有5本书没有放回原位”这句话在文中起什么作用？",
+                  "sceneId": "scene-p6"
+                }
+              ],
+              "id": "assessment_alignment",
+              "passed": true
+            },
+            {
+              "evidence": [
+                {
+                  "quote": "把句子正确送进“事实箱”或“观点箱”。　📖",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "读句子→点按钮分类，错了可重试，送完点“重来”。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "👋 点按钮，把句子送进箱子吧。三张卡片都还没有分类。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "口诀：判断性质看句子本身，判断作用看上下文。",
+                  "sceneId": "scene-p7"
+                }
+              ],
+              "id": "language_load",
+              "passed": true
+            }
+          ],
+          "inputSha256": "0f276ffd735f2681c690ec9a4e384b9dbd6889e6ac46a9c75ee3222c0e7a78b9",
+          "modelId": "deepseek-v4-flash",
+          "objectives": [
+            {
+              "evidence": [
+                {
+                  "quote": "看左边这张蓝色卡片，事实是可以核对的信息，比如日期、数量、事件。判断它是什么，要看句子本身。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "再看黄色卡片，证据是用来支持观点的事实材料。一个事实句是不是证据，要看它有没有被用来支持某个观点。",
+                  "sceneId": "scene-p2"
+                },
+                {
+                  "quote": "“24人”是具体数量，能核对，判断性质看句子本身——所以是事实。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "“18人”是有记录的数量，能核对；如果用它来支持“应增加棋类社团活动次数”的建议，它就起了证据作用。",
+                  "sceneId": "scene-p3"
+                },
+                {
+                  "quote": "✅ 看上下文作用：短文里，作者用“上周有15名同学参与了浇水”来支持“每周开展一次植物观察活动”的建议，所以它在这个论证中起证据作用。",
+                  "sceneId": "scene-p4"
+                },
+                {
+                  "quote": "选出下面哪个句子是可核实的事实陈述。",
+                  "sceneId": "scene-p6"
+                },
+                {
+                  "quote": "阅读短文：学校广播站准备增加“科学小知识”栏目。站长说：“我认为这个栏目能丰富大家的课外知识。”他拿出记录：“上学期科学类书籍借阅量增加了30%。” 问：文中“上学期科学类书籍借阅量增加了30%”这句话在文中起什么作用？",
+                  "sceneId": "scene-p6"
+                }
+              ],
+              "objectiveIndex": 0
+            }
+          ],
+          "providerId": "deepseek",
+          "requestIdHash": "5fb1bdb7009f8525a49952d4e6cf68fef5cf34262ece58107b6b55a23db74e19"
+        },
+        "sceneHashes": [
+          {
+            "sceneId": "scene-p1",
+            "sceneSha256": "dcfd1d001fdb4e4ce95cef1c25db769955c5cec58fe7d8ab79089bd152978c6c"
+          },
+          {
+            "sceneId": "scene-p2",
+            "sceneSha256": "682eed6c378af7fcaf97bc0152a0aca880e46ddd482c8d468eccad915c52fc78"
+          },
+          {
+            "sceneId": "scene-p3",
+            "sceneSha256": "a3dafde445da2db992fee6cae2e0d2fee718e86e4d91f1cc632af094246220df"
+          },
+          {
+            "sceneId": "scene-p4",
+            "sceneSha256": "57c896f94ea2dff30a5d764a31cb7735e142b21e7adb40fcc194b6cabc4abe12"
+          },
+          {
+            "sceneId": "scene-p5",
+            "sceneSha256": "a1178a43f1a8f0dd59fb77c8c6e5c7ad12383b226107698fb66e414e456ac463"
+          },
+          {
+            "sceneId": "scene-p6",
+            "sceneSha256": "771041cf4622879baf06242143fd6df85eed746448368ac6ef7e072ce1e5c2cf"
+          },
+          {
+            "sceneId": "scene-p7",
+            "sceneSha256": "2362d1aeffe9d048960c22a4174aa100f970dc05f82b328a528733477c19b593"
+          }
+        ],
+        "schemaVersion": "mira.openmaic.teaching-quality-receipt.v1",
+        "selectionPlanSha256": "be8af87c450ac7d36b7477e2423861e6821a8ca1ee57b3b68e47b6f20eda760c",
+        "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+        "snapshotSha256": "4c22173c009c946c1275bd83312978165ec68a94e32452ba5edaf0b63dea0d32",
+        "stageId": "stage-tYYCDS_mnS",
+        "status": "passed",
+        "teachingBriefSha256": "9724750373ca203105a3cd702ca0631e3cefbed8ec74bef3aac9bd873a25f2f1"
+      },
+      "userPromptRequired": false,
+      "videoGenerationEnabled": true,
+      "videoPolicyId": "mira-formal-happyhorse-video.v1",
+      "webSearchEnabled": true,
+      "workflowVersion": "openmaic-pro-agent.v1"
+    },
+    "research": {
+      "buildItemId": "catalog_build_item_7b6c5e725bb1003f70897ae2",
+      "citationCount": 1,
+      "citations": [
+        {
+          "sceneIds": [
+            "scene-p2"
+          ],
+          "url": "http://www.qxteacher.com/id714705.html"
+        }
+      ],
+      "classroomId": "stage-tYYCDS_mnS",
+      "fetchedSourceCount": 2,
+      "providerId": "baidu",
+      "receiptSha256": "ae15e5855871adf677026255ed4805cb3af60ca9abb162ddb067313856806aef",
+      "resultCount": 20,
+      "runtimeRequestId": "mira-formal-runtime-catalog_build_item_7b6c5e725bb1003f70897ae2-attempt-1.contractfix1",
+      "schemaVersion": "mira.openmaic.professional-research-receipt.v1",
+      "searchCount": 2,
+      "searches": [
+        {
+          "query": "义务教育语文课程标准 2022年版 思辨性阅读与表达 区分事实与观点",
+          "resultCount": 10,
+          "searchedAt": "2026-09-16T13:05:14.865Z"
+        },
+        {
+          "query": "六年级语文 区分事实和观点 证据 思辨性阅读 教学设计 课标",
+          "resultCount": 10,
+          "searchedAt": "2026-09-16T13:05:15.760Z"
+        }
+      ],
+      "sessionId": "miraformal_ab60c22962408c704878b698c03f3df1914826c6619fcd3b794c0ec8614daee6",
+      "sources": [
+        {
+          "textSha256": "978c4104d9a32c78f5a3efc31eaaf84c1c01c0aa038e2fcfcd282ffd82b87d02",
+          "title": "【知行晓庄】【金陵好课堂·单元整组】聚焦单元整体设计,点亮课堂思维火花——晓庄小学高语组思辨性阅读与表达教学探索暨校本主题研修活动",
+          "url": "http://www.qxteacher.com/id714705.html"
+        },
+        {
+          "textSha256": "227b0c8654336c8da138bd220e4856d10a0b360870fb9ca60ec862c51bee57ec",
+          "title": "张贵栓‖三年级上册“思辨性阅读与表达”学习任务群对应内容参考",
+          "url": "https://learning.sohu.com/a/583037594_100206325"
+        }
+      ],
+      "status": "succeeded"
+    },
+    "classroomContentSha256": "270cda674475624ef7961f9a6adacacd575a6e0c16779a772a5b3b071ac97fc3",
+    "sourceCourseContentSha256": "2b8d5d4354fd122ca85809ab5ca7987806cc59aab10545ad8f3ba589dface72f",
+    "teachingBriefSha256": "9724750373ca203105a3cd702ca0631e3cefbed8ec74bef3aac9bd873a25f2f1",
+    "teacherIdentity": {
+      "verified": true,
+      "agentId": "mira-formal-teacher",
+      "subject": "chinese",
+      "avatarPath": "/teachers/mi-chinese-v1.png",
+      "runtimeAvatar": "/avatars/teacher-2.png",
+      "schemaVersion": "mira.openmaic.formal-subject-qwen3-voice.v1",
+      "teacherProfile": {
+        "id": "mira_chinese_gentle",
+        "version": 2,
+        "contentHash": "a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8"
+      },
+      "teacherName": "小语老师",
+      "teacherGender": "female",
+      "voiceGender": "female",
+      "voiceId": "Serena",
+      "languageCode": "zh-CN",
+      "tts": {
+        "providerId": "qwen-tts",
+        "modelId": "qwen3-tts-flash",
+        "fallbackAllowed": false
+      },
+      "asr": {
+        "providerId": "qwen-asr",
+        "modelId": "qwen3-asr-flash",
+        "fallbackAllowed": false
+      }
+    }
+  },
+  "assessmentAuthority": "mira_backend"
+}

@@ -1,0 +1,26 @@
+# Never send local configuration, credentials or generated output to Docker.
+.env
+.env.*
+**/.env
+**/.env.*
+.git
+.next
+node_modules
+out
+dist
+build
+coverage
+playwright-report
+test-results
+blob-report
+.cache
+.turbo
+*.log
+*.tsbuildinfo
+.DS_Store
+**/.DS_Store
+*.pem
+*.key
+.npmrc
+.build-public-urls.json
+docker-start.cjs

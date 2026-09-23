@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "mira.learning.progressive-runtime-authoring-scope.v1",
+  "policyVersion": "mira.learning.progressive-runtime-authoring-policy.v1",
+  "issuer": "mira_backend",
+  "progressiveLesson": {
+    "assessmentMode": "objective",
+    "curriculumVersion": "mira.primary.progressive.v1",
+    "difficultyCode": "basic",
+    "identitySha256": "76c51a42b183102089749c51c3250fd1a3cae887ef207add5c4c7f6f4933dff9",
+    "lessonId": "ZH6A01.01",
+    "lessonSha256": "3fce628344c4b79de59e0a0210cb235d40f6a0d5c5c70e574049b4d97dc8805b",
+    "schemaVersion": "mira.learning.progressive-binding.v1"
+  },
+  "sourceGenerationRequestId": "student-contract-scope-fixture",
+  "sourceProviderContentSha256": "1c6754afdc34c7f6849ce5089fb98b46b1380abe7821979fa5a0a46635f6fabc",
+  "lessonScope": {
+    "gradeCode": "primary_6",
+    "subject": "chinese",
+    "unitId": "ZH6A01",
+    "unitTitle": "观点事实证据",
+    "sourceStepTitle": "区分信息性质",
+    "learningObjectives": [
+      "围绕六年级《观点事实证据》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：区分信息性质"
+    ],
+    "introducedKnowledgeIds": [
+      "ZH6A01.01"
+    ],
+    "constraints": {
+      "introducedTokens": [],
+      "tokenKind": "general",
+      "allowedLetters": [],
+      "allowedPinyin": [
+        "a",
+        "o",
+        "e",
+        "i",
+        "u",
+        "ü",
+        "一声",
+        "二声",
+        "三声",
+        "四声",
+        "b",
+        "p",
+        "m",
+        "f",
+        "d",
+        "t",
+        "n",
+        "l",
+        "g",
+        "k",
+        "h",
+        "j",
+        "q",
+        "x",
+        "y",
+        "w",
+        "z",
+        "c",
+        "s",
+        "zh",
+        "ch",
+        "sh",
+        "r",
+        "ai",
+        "ei",
+        "ui",
+        "ao",
+        "ou",
+        "iu",
+        "ie",
+        "üe",
+        "er",
+        "an",
+        "en",
+        "in",
+        "un",
+        "ün",
+        "ang",
+        "eng",
+        "ing",
+        "ong",
+        "zhi",
+        "chi",
+        "shi",
+        "ri",
+        "zi",
+        "ci",
+        "si",
+        "yi",
+        "wu",
+        "yu",
+        "ye",
+        "yue",
+        "yuan",
+        "yin",
+        "yun",
+        "ying"
+      ],
+      "minimumNumber": null,
+      "maximumNumber": null,
+      "introducedGrammarCodes": [],
+      "allowedGrammarCodes": [],
+      "excludedGrammarCodes": [],
+      "introducedOperations": [],
+      "allowedOperations": [],
+      "assessmentEvidenceKinds": [
+        "independent_choice"
+      ],
+      "neutralDistractorTokens": [],
+      "teachBeforeAssessment": true,
+      "newVocabularyMustBeIntroducedBeforeUse": true,
+      "noUnintroducedKnowledgeInInstructions": true,
+      "assessmentEvidenceScope": "declared_objective_only",
+      "writtenNumberRecognitionRequired": true,
+      "audioInstructionsAllowed": true,
+      "maxCoreNewTargets": 1,
+      "challengeMayOnlyCombineDeclaredKnowledge": true
+    }
+  },
+  "allowedLearningActions": [
+    "只围绕本年级当前课次的learningObjectives和sourceStepTitle讲解、示范与直接应用；单元标题不是要求首课完成整个单元。",
+    "先修知识只用于支持本课，不替换为其他年级课程；示范题使用另外的材料，讲清示范答案与原因。",
+    "辨认可核实的事实陈述、个人评价或建议；辨认已经给定的事实材料在短文中起的证据作用。",
+    "事实是信息性质，证据是材料的语境作用；同一材料可以同时是事实并承担证据作用。",
+    "使用另编的、自足的校园短材料与明确来源，分别演示信息性质和语境作用；只让学生辨认已给定句子的性质或作用。"
+  ],
+  "forbiddenLearningActions": [
+    "不得扩大到后续课次目标、未登记词汇语法或运算；基础难度不表示回到一年级零起点。",
+    "不得从若干候选材料中挑选、配对或寻找支持某观点的证据；这属于后续‘证据对应观点’课次。",
+    "不得评价证据是否直接支持、充分或可靠，也不要求补充证据、反驳观点或分析完整论证结构。",
+    "不得把事实、观点、证据列作互斥类别；不得用有没有数字或‘我认为’字样代替对句子内容和来源的判断。"
+  ],
+  "assessmentProtection": {
+    "materialSource": "teachingBrief.lesson.questions",
+    "protectedQuestions": [
+      {
+        "questionId": "guided_1",
+        "phase": "guided",
+        "publicQuestionSha256": "38a13b7a6fc2a691f864070fe58c5d53afad299e1d8d0f3f060c28870a9ade30"
+      },
+      {
+        "questionId": "independent_1",
+        "phase": "independent",
+        "publicQuestionSha256": "0e2ef028295c651d05744bd461faff3992b732fc12eddf789f7c069709a5cf7d"
+      },
+      {
+        "questionId": "independent_2",
+        "phase": "independent",
+        "publicQuestionSha256": "c6a618ad7953f7c5c9cdfe03a730e8b22d55cfae38c0340e4d707485f71dbf3d"
+      },
+      {
+        "questionId": "independent_3",
+        "phase": "independent",
+        "publicQuestionSha256": "c9d64b2cf3d589c289aebea169dfb6808e847825bad104ffaa95d903dbab5dd1"
+      },
+      {
+        "questionId": "independent_4",
+        "phase": "independent",
+        "publicQuestionSha256": "5fd8ee8f00acccbe1952ee288ed4508790cb68743dbb9af6b85050f2cb98e883"
+      },
+      {
+        "questionId": "independent_5",
+        "phase": "independent",
+        "publicQuestionSha256": "72e38cb94d9fd22f8d5a1d98c2351386d91fa7fbd5b2e96ce6df90398e682916"
+      }
+    ],
+    "allowedUse": "exact_registered_quiz_role_only",
+    "rules": [
+      "保护清单对应lesson.questions中的全部正式公开题面，包括引导题和独立题；仅在各自登记的quiz阶段按原题使用。",
+      "讲解、示范、三维场景、互动游戏、讨论和反馈必须另编材料，不得提前使用保护题的具体情境、数据、句子、选项或核心作答信息。",
+      "换人物名、换题号、调选项顺序或只作近义改写仍算提前复用；不得先让学生操作或练习保护题材料，再将原题当成独立验收。",
+      "可以迁移已教概念与解题方法；禁止透露正式题答案，游戏反馈仅说明另编练习材料的现象，不授予正式分数或掌握结论。"
+    ]
+  },
+  "scopeSha256": "12680508858f5874fdaebedbf44797ac0d7e59ffdf74bf3f11a5242921b7bc45"
+}

@@ -98,6 +98,7 @@ class SharedCourseStartTest(unittest.TestCase):
         self.conn.raw.execute('CREATE TABLE learning_catalog_build_items (id, build_job_id, release_id, grade_code)')
         self.conn.raw.execute('CREATE TABLE learning_courses (' + ','.join(self.course) + ')')
         self.conn.raw.execute('CREATE TABLE student_learning_course_favorites (family_id,child_id,course_id,course_version)')
+        self.conn.raw.execute('CREATE TABLE learning_mastery_states (family_id,child_id,grade_code,subject,node_code,mastery_level)')
         self.insert('children', self.child)
         self.insert('learning_courses', self.course)
         self.insert('learning_catalog_build_jobs', dict(id=self.build_id, release_id=self.release_id,
@@ -134,10 +135,65 @@ class SharedCourseStartTest(unittest.TestCase):
         service.static_catalog_enabled = False
         service.repository = self.repo
         learning = LearningService.__new__(LearningService)
+        learning.repository = self.repo
         learning.profile_repository = ProfileRepository(self.db)
         learning.formal_learning_access_checker = None
         service.learning_service = learning
         return service
+
+    def future_course(self):
+        self.course['node_code'] = 'proportional_reasoning'
+        self.conn.execute('UPDATE learning_courses SET node_code=? WHERE id=?',
+                          (self.course['node_code'], self.course['id']))
+        self.published.return_value = {('math', self.course['node_code'], 1): self.available}
+        self.conn.raw.commit()
+
+    def test_future_course_is_blocked_before_follower_or_task_creation(self):
+        self.future_course()
+        with self.assertRaises(ApiError) as failure:
+            self.start()
+        self.assertEqual(failure.exception.code, 'learning_prerequisite_not_mastered')
+        self.assertEqual(failure.exception.status_code, 409)
+        self.assertIn('分数、比与百分数', failure.exception.message)
+        self.assertEqual(self.conn.execute('SELECT COUNT(*) AS n FROM tasks').fetchone()['n'], 0)
+        self.assertEqual(self.conn.execute('SELECT COUNT(*) AS n FROM learning_curriculum_preparation_plans').fetchone()['n'], 1)
+
+    def test_next_course_unlocks_only_with_this_child_subject_grade_mastery(self):
+        self.future_course()
+        base = dict(family_id='family-a', child_id='child-primary6', grade_code='primary_6',
+                    subject='math', node_code='fraction_ratio_percentage', mastery_level='mastered')
+        for change in ({'child_id': 'another-child'}, {'family_id': 'another-family'},
+                       {'subject': 'english'}, {'grade_code': 'primary_5'}, {'mastery_level': 'developing'}):
+            with self.subTest(change=change):
+                self.insert('learning_mastery_states', {**base, **change})
+                self.conn.raw.commit()
+                with self.assertRaises(ApiError) as failure:
+                    self.start()
+                self.assertEqual(failure.exception.code, 'learning_prerequisite_not_mastered')
+                self.conn.execute('DELETE FROM learning_mastery_states')
+                self.conn.raw.commit()
+        self.insert('learning_mastery_states', base)
+        self.conn.raw.commit()
+        self.assertTrue(self.start()['created'])
+
+    def test_read_progression_matches_write_gate_and_resume_is_exact_session_only(self):
+        self.future_course()
+        service = self.service()
+        item = service._catalog_library_item(self.course)
+        annotated = service._with_progression(self.conn, self.child, item, {})
+        self.assertFalse(annotated['progression']['canStart'])
+        self.assertEqual(annotated['progression']['sequence'], 2)
+        item.update(taskId='old-task', session={'id': 'old-session', 'status': 'in_progress'})
+        stored = dict(id='old-session', child_id=self.child['id'], course_id=self.course['id'],
+                      course_version=self.course['version'], status='in_progress')
+        with patch.object(self.repo, 'get_session_for_task', return_value=stored):
+            state = service._with_progression(self.conn, self.child, item, {})['progression']
+        self.assertTrue(state['canResume'])
+        self.assertFalse(state['canStart'])
+        for change in ({'child_id': 'other'}, {'course_version': 'other'}, {'status': 'completed'}):
+            with patch.object(self.repo, 'get_session_for_task', return_value={**stored, **change}):
+                state = service._with_progression(self.conn, self.child, item, {})['progression']
+            self.assertFalse(state['canResume'])
 
     def start(self):
         def visible(conn, **scope):
@@ -304,6 +360,51 @@ class SharedCourseStartTest(unittest.TestCase):
         self.assertEqual([item['id'] for item in candidates], [old['id']])
         self.assertEqual(self.repo.count_learning_backlog(self.conn,family_id='family-a',child_id='child-primary6',
             before_date='2026-09-13'), 1)
+
+    def test_latest_attempt_completion_wins_over_reopened_history_only_for_exact_course(self):
+        self.conn.raw.execute('CREATE TABLE learning_sessions (id,family_id,child_id,task_id,status,current_question_index,correct_count,attempted_count,started_at,completed_at,updated_at)')
+        self.conn.raw.execute('CREATE TABLE learning_reports (id,family_id,task_id,session_id,score,mastery_level,summary,next_step,created_at)')
+        old, _ = self.repo.assign_today_task(self.conn, family_id='family-a', child_id='child-primary6',
+            learning_date='2026-09-17', slot='core', scheduled_start='19:30', course=self.course, created_by='student:a', now=1000)
+        self.conn.execute("UPDATE tasks SET status='in_progress', updated_at=9000 WHERE id=?", (old['id'],))
+        self.insert('learning_sessions', dict(id='old-session', family_id='family-a', child_id='child-primary6',
+            task_id=old['id'], status='in_progress', current_question_index=1, correct_count=1, attempted_count=1,
+            started_at=1000, updated_at=9000))
+        completed = {**old, 'id': 'completed-task', 'learning_assignment_key': 'completed-assignment',
+                     'status': 'completed', 'created_at': 1900, 'updated_at': 3000}
+        self.insert('tasks', completed)
+        self.insert('learning_sessions', dict(id='completed-session', family_id='family-a', child_id='child-primary6',
+            task_id=completed['id'], status='completed', current_question_index=6, correct_count=6, attempted_count=6,
+            started_at=2000, completed_at=3000, updated_at=3000))
+        another_course = {**self.course, 'id': 'another-set'}
+        self.insert('learning_courses', another_course)
+        another = {**old, 'id': 'another-task', 'learning_assignment_key': 'another-assignment',
+                   'learning_course_id': another_course['id'], 'status': 'in_progress', 'created_at': 2900, 'updated_at': 3500}
+        self.insert('tasks', another)
+        self.insert('learning_sessions', dict(id='another-session', family_id='family-a', child_id='child-primary6',
+            task_id=another['id'], status='in_progress', current_question_index=0, correct_count=0, attempted_count=0,
+            started_at=3000, updated_at=3500))
+        library = StudentLearningLibraryRepository(self.db)
+        scope = dict(family_id='family-a', child_id='child-primary6')
+        with patch('repositories.student_learning_library_repository._PACKAGE_CLASSROOM_AVAILABILITY_SQL', '1'), \
+             patch('repositories.student_learning_library_repository._FULL_CLASSROOM_AVAILABILITY_SQL', '1'), \
+             patch('repositories.student_learning_library_repository.with_parsed_runtime_manifests', side_effect=lambda sql: sql):
+            detail = library.get_course_detail(self.conn, **scope, course_id=self.course['id'], course_version=self.course['version'])
+            self.assertEqual(detail['taskId'], completed['id'])
+            self.assertEqual(detail['session']['attemptedCount'], 6)
+            self.assertEqual(library.get_continue_item(self.conn, **scope)['taskId'], another['id'])
+            history, _ = library.list_library(self.conn, **scope, bucket='all', subject=None,
+                before_date='2026-09-18', cursor=None, limit=20)
+            self.assertEqual({item['taskId'] for item in history}, {old['id'], completed['id'], another['id']})
+            restart = {**old, 'id': 'restart-task', 'learning_assignment_key': 'restart-assignment',
+                       'status': 'in_progress', 'created_at': 3900, 'updated_at': 4000}
+            self.insert('tasks', restart)
+            self.insert('learning_sessions', dict(id='restart-session', family_id='family-a', child_id='child-primary6',
+                task_id=restart['id'], status='in_progress', current_question_index=0, correct_count=0, attempted_count=0,
+                started_at=4000, updated_at=4000))
+            self.assertEqual(library.get_course_detail(self.conn, **scope, course_id=self.course['id'],
+                course_version=self.course['version'])['taskId'], restart['id'])
+            self.assertEqual(library.get_continue_item(self.conn, **scope)['taskId'], restart['id'])
 
     def test_route_preserves_identity_response_and_safe_errors(self):
         from routes.api.v2.student_learning import student_learning_bp

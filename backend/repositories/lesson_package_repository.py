@@ -122,6 +122,7 @@ class LessonPackageRepository:
             compatible_preparation_scope_sql,
             preparation_target_fingerprint,
         )
+        from services.progressive_math2_revision import predecessor_selection_sql, formal_package_identity
 
         # The no-plan path is the existing bounded Grade-1 operator entry.
         # Every automatic scheduler call supplies its exact leased plan.
@@ -182,8 +183,8 @@ class LessonPackageRepository:
              AND plan.content_target_count = {target_count}
              AND plan.content_candidate_count BETWEEN 1 AND {target_count}
              AND (plan.content_failed_count = 0 OR plan.library_target_fingerprint IS NOT NULL)
-             AND plan.content_canary_target_count = 3
-             AND plan.content_canary_candidate_count BETWEEN 0 AND 3
+             AND plan.content_canary_target_count = JSON_LENGTH(plan.target_spec_json, '$.canaryManifest.targets')
+             AND plan.content_canary_candidate_count BETWEEN 0 AND plan.content_canary_target_count
              AND (plan.content_canary_failed_count = 0 OR plan.library_target_fingerprint IS NOT NULL)
              AND plan.ready_course_count = 0
              AND plan.failed_course_count = 0
@@ -217,7 +218,7 @@ class LessonPackageRepository:
               AND build.completed_at IS NULL
               AND JSON_UNQUOTE(JSON_EXTRACT(
                     plan.target_spec_json, '$.schemaVersion'
-                  )) = 'mira.learning.preparation-target.v2'
+                  )) IN ('mira.learning.preparation-target.v2', 'mira.learning.preparation-target.progressive.v1')
               AND JSON_UNQUOTE(JSON_EXTRACT(
                     plan.target_spec_json, '$.gradeCode'
                   )) = item.grade_code
@@ -240,7 +241,8 @@ class LessonPackageRepository:
                   AND request.variant_ordinal = item.variant_ordinal AND request.enabled = TRUE
               ))
               AND (
-                plan.content_canary_passed_at IS NOT NULL
+                JSON_UNQUOTE(JSON_EXTRACT(plan.target_spec_json, '$.schemaVersion')) = 'mira.learning.preparation-target.progressive.v1'
+                OR plan.content_canary_passed_at IS NOT NULL
                 OR JSON_CONTAINS(
                   build.canary_manifest_json,
                   JSON_OBJECT(
@@ -261,6 +263,7 @@ class LessonPackageRepository:
                 SELECT 1
                 FROM learning_openmaic_runtime_classrooms AS blocked
                 WHERE blocked.candidate_build_item_id = item.id
+                  AND NOT ({predecessor_selection_sql()})
                   AND (
                     blocked.status IN ('pending', 'generating', 'ready', 'recovering')
                     OR blocked.quality_status = 'quarantined'
@@ -298,6 +301,8 @@ class LessonPackageRepository:
         from repositories.course_supply_inventory import published_supply
         playable_by_target = {}
         for candidate in candidates:
+            formal_package_identity(conn, build_item_id=str(candidate["build_item_id"]),
+                course_id=str(candidate["course_id"]), course_version=str(candidate["course_version"]))
             # A historical candidate keeps its own creation policy even when
             # the current registry has introduced a newer playful target.
             raw_target = candidate['target_spec_json']
@@ -391,10 +396,10 @@ class LessonPackageRepository:
              )
              AND plan.content_target_count = {target_count}
              AND plan.content_candidate_count BETWEEN 1 AND {target_count}
-             AND plan.content_failed_count = 0
-             AND plan.content_canary_target_count = 3
-             AND plan.content_canary_candidate_count BETWEEN 0 AND 3
-             AND plan.content_canary_failed_count = 0
+             AND (plan.content_failed_count = 0 OR plan.library_target_fingerprint IS NOT NULL)
+             AND plan.content_canary_target_count = JSON_LENGTH(plan.target_spec_json, '$.canaryManifest.targets')
+             AND plan.content_canary_candidate_count BETWEEN 0 AND plan.content_canary_target_count
+             AND (plan.content_canary_failed_count = 0 OR plan.library_target_fingerprint IS NOT NULL)
              AND plan.ready_course_count = 0
              AND plan.failed_course_count = 0
              AND plan.completed_at IS NULL
@@ -437,9 +442,10 @@ class LessonPackageRepository:
               ))
               AND JSON_UNQUOTE(JSON_EXTRACT(
                     plan.target_spec_json, '$.schemaVersion'
-                  )) = 'mira.learning.preparation-target.v2'
+                  )) IN ('mira.learning.preparation-target.v2', 'mira.learning.preparation-target.progressive.v1')
               AND (
-                plan.content_canary_passed_at IS NOT NULL
+                JSON_UNQUOTE(JSON_EXTRACT(plan.target_spec_json, '$.schemaVersion')) = 'mira.learning.preparation-target.progressive.v1'
+                OR plan.content_canary_passed_at IS NOT NULL
                 OR JSON_CONTAINS(
                   build.canary_manifest_json,
                   JSON_OBJECT(
@@ -477,6 +483,11 @@ class LessonPackageRepository:
         course_hash = hashlib.sha256(
             str(locked.get("content_json") or "").encode("utf-8")
         ).hexdigest()
+        from services.progressive_math2_revision import formal_package_identity
+        package_identity = formal_package_identity(conn, build_item_id=item_id,
+            course_id=course_id, course_version=course_version)
+        if package_id != package_identity["packageId"]:
+            raise ValueError("formal package identity differs from its audited source")
         existing = self.get_package_any_status(
             conn, package_id=package_id, package_version=1
         )
@@ -500,7 +511,7 @@ class LessonPackageRepository:
                 raise ValueError("formal package identity conflict")
             return existing, False
 
-        seed = hashlib.sha256(item_id.encode("utf-8")).hexdigest()[:48]
+        seed = package_identity["seed"]
         job_id = f"formal_runtime_job_{seed}"
         request_id = f"formal-package-{seed}"
         artifact_id = f"formal_runtime_source_{seed}"
@@ -1311,6 +1322,17 @@ class LessonPackageRepository:
     ) -> DatabaseRow | None:
         """Resolve an exact progressive item, then the shared active fallback."""
 
+        if str(course_id).startswith("progressive_") and family_id and child_id:
+            from repositories.progressive_formal_course_repository import progressive_formal_authority
+            child = conn.execute("SELECT * FROM children WHERE id=? AND family_id=? LIMIT 1",
+                                 (child_id, family_id)).fetchone()
+            course = conn.execute("SELECT * FROM learning_courses WHERE id=? AND version=? LIMIT 1",
+                                  (course_id, course_version)).fetchone()
+            authority = (progressive_formal_authority(conn, database=self.database, child=child, course=course)
+                         if child is not None and course is not None else None)
+            return (self.get_package(conn, package_id=authority['package_id'],
+                                     package_version=int(authority['package_version']))
+                    if authority is not None else None)
         if family_id and child_id:
             progressive = conn.execute(
                 f"""

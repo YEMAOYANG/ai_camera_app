@@ -173,6 +173,20 @@ def _formal_student_release_is_ready(
     receipt = str((plan or {}).get("formal_publication_receipt_hash") or "")
     target_fingerprint = str((plan or {}).get("target_fingerprint") or "")
     total_count = int((plan or {}).get("total_course_count") or 0)
+    expected_count = formal_course_count(grade_code)
+    if (plan or {}).get("curriculum_version") == "mira.primary.progressive.v1":
+        try:
+            import json
+            from services.learning_curriculum_preparation_contract import canonical_preparation_target_for, preparation_target_fingerprint
+            target = json.loads(plan["target_spec_json"])
+            canonical = canonical_preparation_target_for(target)
+            if (target != canonical or target["curriculumVersion"] != plan["curriculum_version"]
+                    or target["gradeCode"] != grade_code or preparation_target_fingerprint(target) != target_fingerprint):
+                return False
+            expected_count = len(target["courseTargets"])
+        except (KeyError, ValueError, TypeError):
+            return False
+
     return bool(
         plan is not None
         and str(plan.get("grade_code") or "") == grade_code
@@ -180,7 +194,7 @@ def _formal_student_release_is_ready(
         and str(plan.get("stage") or "") == "completed"
         and int(plan.get("progress_percent") or 0) == 100
         and grade_code in FORMAL_STUDENT_GRADE_CODES
-        and total_count == formal_course_count(grade_code)
+        and total_count == expected_count
         and int(plan.get("ready_course_count") or 0) == total_count
         and int(plan.get("failed_course_count") or 0) == 0
         and int(plan.get("content_target_count") or 0) == total_count

@@ -43,6 +43,7 @@ class LearningBudgetPolicy:
     def __init__(self, raw):
         raw = deepcopy(raw)
         allowed_window = raw.pop("authorizationWindow", None)
+        production_window = raw.pop("productionAuthorizationWindow", None)
         fields = {"schemaVersion", "version", "enabled", "currency", "timezone",
                   "allowUnpriced", "limits", "prices", "authorizationTemplates"}
         if "aggregateLimitsEnabled" in raw:
@@ -127,12 +128,17 @@ class LearningBudgetPolicy:
                 raise ValueError("authorization template price scope is invalid")
             if type(template["ttlMs"]) is not int or not 1 <= template["ttlMs"] <= 31 * 86400000:
                 raise ValueError("authorization template expiry is invalid")
-        if allowed_window is not None:
-            _exact(allowed_window, {"startsAt", "expiresAt", "scopes"})
-            start, end = allowed_window["startsAt"], allowed_window["expiresAt"]
+        for window_name, window, production_only in (
+            ("authorizationWindow", allowed_window, False),
+            ("productionAuthorizationWindow", production_window, True),
+        ):
+            if window is None:
+                continue
+            _exact(window, {"startsAt", "expiresAt", "scopes"})
+            start, end = window["startsAt"], window["expiresAt"]
             if type(start) is not int or type(end) is not int or not 0 <= start < end <= start + 31 * 86400000:
                 raise ValueError("invalid fixed budget authorization window")
-            scopes = allowed_window["scopes"]
+            scopes = window["scopes"]
             fields = {"purpose", "gradeCode", "subject", "courseId", "courseVersion",
                       "userId", "sessionId", "productionJobId", "approvalReference"}
             if not isinstance(scopes, list) or not 1 <= len(scopes) <= 32:
@@ -141,9 +147,19 @@ class LearningBudgetPolicy:
                 _exact(scope, fields)
                 if scope["purpose"] not in PURPOSES:
                     raise ValueError("invalid fixed budget purpose")
+                if production_only:
+                    if (scope["purpose"] != "production" or scope["userId"] is not None
+                            or scope["sessionId"] is not None
+                            or scope["gradeCode"] not in {f"primary_{grade}" for grade in range(1, 7)}
+                            or scope["subject"] not in {"chinese", "math", "english"}):
+                        raise ValueError("production authorization window requires exact production scopes")
+                    for key in ("courseId", "courseVersion", "productionJobId", "approvalReference"):
+                        if (not isinstance(scope[key], str)
+                                or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,159}", scope[key]) is None):
+                            raise ValueError("invalid production authorization scope identity")
             if len({canonical(scope) for scope in scopes}) != len(scopes):
                 raise ValueError("duplicate fixed budget scope")
-            raw["authorizationWindow"] = allowed_window
+            raw[window_name] = window
         override = raw.get("productionInflightOverride")
         if "productionInflightOverride" in raw:
             _exact(override, {"scopeSha256", "authorizationId", "maxInflightCalls", "auditReferenceSha256"})

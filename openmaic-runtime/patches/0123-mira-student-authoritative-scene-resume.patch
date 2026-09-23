@@ -1,0 +1,412 @@
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+--- a/lib/mira/student-runtime-events.ts
++++ b/lib/mira/student-runtime-events.ts
+@@ -11,10 +11,11 @@
+   readonly feedbackText: string;
+ };
+ 
+-type SceneIdentity = {
++export type MiraStudentSceneIdentity = {
+   readonly sceneIndex: number;
+   readonly sceneId: string;
+ };
++type SceneIdentity = MiraStudentSceneIdentity;
+ 
+ export type MiraStudentRuntimeEvent =
+   | {
+@@ -89,6 +90,10 @@
+   readonly answeredQuestionIds: readonly string[];
+   readonly completedInteractionObjectiveIndexes?: readonly number[];
+   readonly completedActionSceneIds?: readonly string[];
++  readonly classroomId?: string;
++  readonly learningSessionId?: string;
++  readonly releaseId?: string;
++  readonly resumeScene?: SceneIdentity | null;
+ }
+ 
+ interface RuntimeReceipt {
+@@ -102,6 +107,8 @@
+   resume(): Promise<void>;
+   /** Read accepted progress without flushing an unfinished teaching event. */
+   readProgress(): Promise<void>;
++  /** Highest server-accepted visit; never sourced from the local playback cursor. */
++  getResumeScene(): SceneIdentity | null;
+   hasCompletedScene(sceneId: string): boolean;
+   sceneEntered(payload: SceneIdentity): Promise<void>;
+   actionCompleted(payload: SceneIdentity & { readonly actionId: string }): Promise<void>;
+@@ -144,6 +151,8 @@
+   let tail: Promise<void> = Promise.resolve();
+   let completedInteractions = new Set<number>();
+   let completedScenes = new Set<string>();
++  let initialResumeScene: SceneIdentity | null | undefined;
++  let initialResumeAuthority: string | undefined;
+ 
+   const persist = () => safeSet(storage, storageKey, JSON.stringify(state));
+ 
+@@ -158,6 +167,24 @@
+     const body = await jsonBody(result);
+     if (!result.ok) throw runtimeRequestError(result.status, body);
+     const status = runtimeStatus(body);
++    if (status.resumeScene !== undefined) {
++      if (status.classroomId !== classroomId)
++        throw new Error('Mira Runtime resume classroom does not match');
++      const authority = JSON.stringify([
++        status.classroomId,
++        status.learningSessionId,
++        status.releaseId,
++      ]);
++      if (initialResumeAuthority !== undefined && initialResumeAuthority !== authority)
++        throw new Error('学习会话已改变，请重新进入课堂。');
++      initialResumeAuthority = authority;
++    } else if (initialResumeAuthority !== undefined) {
++      throw new Error('课堂进度身份暂时无法确认，请重新进入课堂。');
++    }
++    // Freeze the entry position for this mount. A scene-entered event emitted
++    // later in this visit must not present an ordinary page as a resumed page.
++    if (initialResumeScene === undefined)
++      initialResumeScene = status.resumeScene ? { ...status.resumeScene } : null;
+ 
+     if (state.runtimeSessionId !== status.runtimeSessionId) {
+       state = freshState(status.runtimeSessionId, status.nextSequence, status.completed);
+@@ -262,6 +289,7 @@
+       return operation;
+     },
+     hasCompletedScene: (sceneId) => completedScenes.has(sceneId),
++    getResumeScene: () => (initialResumeScene ? { ...initialResumeScene } : null),
+     resume: () => {
+       const operation = tail
+         .catch(() => undefined)
+@@ -466,6 +494,19 @@
+         typeof questionId === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(questionId),
+     ) ||
+     new Set(body.answeredQuestionIds).size !== body.answeredQuestionIds.length ||
++    (body.resumeScene !== undefined &&
++      ![body.classroomId, body.learningSessionId, body.releaseId].every(
++        (id) => typeof id === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,254}$/.test(id),
++      )) ||
++    (body.resumeScene !== undefined &&
++      body.resumeScene !== null &&
++      (typeof body.resumeScene !== 'object' ||
++        Object.keys(body.resumeScene).sort().join(',') !== 'sceneId,sceneIndex' ||
++        !Number.isInteger(body.resumeScene.sceneIndex) ||
++        body.resumeScene.sceneIndex < 0 ||
++        body.resumeScene.sceneIndex >= 60 ||
++        typeof body.resumeScene.sceneId !== 'string' ||
++        !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(body.resumeScene.sceneId))) ||
+     (body.completedActionSceneIds !== undefined &&
+       (!Array.isArray(body.completedActionSceneIds) ||
+         body.completedActionSceneIds.length > 60 ||
+diff --git a/components/classroom/ClassroomSurface.tsx b/components/classroom/ClassroomSurface.tsx
+--- a/components/classroom/ClassroomSurface.tsx
++++ b/components/classroom/ClassroomSurface.tsx
+@@ -51,7 +51,11 @@
+   paneAvailabilityRetryDelay,
+   shouldResumeClassroomGeneration,
+ } from '@/lib/classroom/progressive-load-policy';
+-import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
++import {
++  useMiraStudentRuntime,
++  useMiraStudentRuntimeEvents,
++} from '@/lib/contexts/mira-student-runtime-context';
++import { studentResumeSceneId } from '@/lib/mira/student-resume-scene';
+ import {
+   applyHydratedClassroomFallbackScenes,
+   hydrateClassroomFallbackChats,
+@@ -73,6 +77,7 @@
+ }) {
+   const { loadFromStorage } = useStageStore();
+   const studentMode = useMiraStudentRuntime();
++  const runtimeEvents = useMiraStudentRuntimeEvents();
+   const loadedClassroomId = useStageStore((s) => s.stage?.id ?? null);
+   const { t } = useI18n();
+   // The retry loop below reads the message after async gaps, so it must see
+@@ -118,8 +123,15 @@
+           loadFromStorage,
+           getCurrentStage: () => useStageStore.getState().stage,
+           fetchClassroom: defaultClassroomLoadDeps.fetchClassroom,
+-          applyFallbackScenes: (args) =>
+-            applyHydratedClassroomFallbackScenes({
++          applyFallbackScenes: async (args) => {
++            // Stage must not mount and emit a default page-zero visit before
++            // authoritative resume has selected the already accepted page.
++            if (studentMode) {
++              if (!runtimeEvents) throw new Error('课堂进度暂时无法读取，请重试。');
++              await runtimeEvents.readProgress();
++              if (!isCurrent()) return false;
++            }
++            return applyHydratedClassroomFallbackScenes({
+               ...args,
+               isCurrent,
+               // Student playback owns no editor chat history. Skipping legacy
+@@ -139,8 +151,13 @@
+                   // server authority on every launch.
+                   persist: !studentMode,
+                   memoryOnly: studentMode,
++                  initialSceneId:
++                    studentMode && runtimeEvents
++                      ? studentResumeSceneId(classroomId, scenes, runtimeEvents)
++                      : undefined,
+                 }),
+-            }),
++            });
++          },
+           loadRestoredMediaTasks: defaultClassroomLoadDeps.loadRestoredMediaTasks,
+           applyRestoredMediaTasks: defaultClassroomLoadDeps.applyRestoredMediaTasks,
+           discardRestoredMediaTasks: defaultClassroomLoadDeps.discardRestoredMediaTasks,
+@@ -178,7 +195,7 @@
+         return isCurrent() ? 'failed' : 'cancelled';
+       }
+     },
+-    [classroomId, loadFromStorage, studentMode, variant],
++    [classroomId, loadFromStorage, runtimeEvents, studentMode, variant],
+   );
+ 
+   useEffect(() => {
+diff --git a/lib/classroom/load-classroom.ts b/lib/classroom/load-classroom.ts
+--- a/lib/classroom/load-classroom.ts
++++ b/lib/classroom/load-classroom.ts
+@@ -283,6 +283,7 @@
+   options: {
+     persist?: boolean;
+     memoryOnly?: boolean;
++    initialSceneId?: string;
+     chats?: ChatSession[];
+     chatSnapshot?: ChatStorageSnapshot;
+   } = {},
+@@ -307,7 +308,10 @@
+   useStageStore.setState((state) => ({
+     stage,
+     scenes: nextScenes,
+-    currentSceneId: nextScenes[0]?.id ?? null,
++    currentSceneId:
++      nextScenes.find((scene) => scene.id === options.initialSceneId)?.id ??
++      nextScenes[0]?.id ??
++      null,
+     chats: options.chats ?? [],
+     chatSnapshot: options.chatSnapshot ?? { sessions: [], restoreMarker: null },
+     generationComplete: false,
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -1092,11 +1092,13 @@
+           // Load saved playback state and restore position (but never auto-play).
+           if (
+             studentMode &&
+-            (studentAutoPlayRuntime?.audioStartAccepted || hasSavedPlaybackPosition) &&
++            (studentAutoPlayRuntime?.audioStartAccepted ||
++              hasSavedPlaybackPosition ||
++              runtimeEvents?.getResumeScene()?.sceneId === currentScene.id) &&
+             !studentResumeNoticeShownRef.current
+           ) {
+             studentResumeNoticeShownRef.current = true;
+-            toast.info('课堂进度已恢复', {
++            toast.info('学习位置已恢复', {
+               id: `mira-student-refresh-resume-${currentScene.id}`,
+               description: '点击播放按钮继续老师讲解；刷新后浏览器可能需要再次确认声音播放。',
+             });
+diff --git a/tests/classroom/load-classroom.test.ts b/tests/classroom/load-classroom.test.ts
+--- a/tests/classroom/load-classroom.test.ts
++++ b/tests/classroom/load-classroom.test.ts
+@@ -103,6 +103,24 @@
+   });
+   return { promise, resolve, reject };
+ }
++
++it('applies the accepted student resume page atomically without a first-page store emission', () => {
++  const first = makeScene('scene-first', 'stage-resume');
++  const resumed = { ...makeScene('scene-resumed', 'stage-resume'), order: 2 };
++  const seen: Array<string | null> = [];
++  const unsubscribe = useStageStore.subscribe((state) => seen.push(state.currentSceneId));
++  try {
++    applyClassroomStageAndScenes(makeStage('stage-resume'), [first, resumed], {
++      persist: false,
++      memoryOnly: true,
++      initialSceneId: resumed.id,
++    });
++    expect(seen).toEqual(['scene-resumed']);
++    expect(useStageStore.getState().persistenceMode).toBe('memory-only');
++  } finally {
++    unsubscribe();
++  }
++});
+ 
+ function makeDeps(overrides: Partial<Parameters<typeof runClassroomLoad>[0]> = {}) {
+   let current = true;
+diff --git a/lib/mira/student-resume-scene.ts b/lib/mira/student-resume-scene.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/student-resume-scene.ts
+@@ -0,0 +1,23 @@
++import type { Scene } from '@/lib/types/stage';
++import type { MiraStudentRuntimeEventClient } from './student-runtime-events';
++import { requiredInteractionsBeforeScene } from './student-interaction-bridge';
++
++/** Restore navigation only, after the authenticated status has been read.
++ * The server's index/id pair must match the fresh classroom, and the ordinary
++ * Next-page participation gate still applies. No local cursor grants a page.
++ */
++export function studentResumeSceneId(
++  classroomId: string,
++  scenes: readonly Scene[],
++  progress: Pick<MiraStudentRuntimeEventClient, 'getResumeScene' | 'hasCompletedInteractions'>,
++): string | undefined {
++  const resume = progress.getResumeScene();
++  if (!resume) return undefined;
++  const ordered = [...scenes].sort((left, right) => left.order - right.order);
++  const scene = ordered[resume.sceneIndex];
++  if (scene?.id !== resume.sceneId || scene.stageId !== classroomId)
++    throw new Error('保存的学习位置与当前课堂不一致，请重试。');
++  if (!progress.hasCompletedInteractions(requiredInteractionsBeforeScene(ordered, scene.id)))
++    return undefined;
++  return scene.id;
++}
+diff --git a/tests/runtime/mira-student-resume-scene.test.ts b/tests/runtime/mira-student-resume-scene.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/mira-student-resume-scene.test.ts
+@@ -0,0 +1,145 @@
++import { describe, expect, it, vi } from 'vitest';
++import type { Scene } from '@/lib/types/stage';
++import { createMiraStudentRuntimeEventClient } from '@/lib/mira/student-runtime-events';
++import { studentResumeSceneId } from '@/lib/mira/student-resume-scene';
++
++const status = (resumeScene: unknown, classroomId = 'stage-a', learningSessionId = 'learning-a') =>
++  new Response(
++    JSON.stringify({
++      ok: true,
++      schemaVersion: 'mira.openmaic.student-runtime-event-receipt.v1',
++      runtimeSessionId: 'runtime-new',
++      classroomId,
++      learningSessionId,
++      releaseId: 'release-a',
++      lastSequence: 0,
++      nextSequence: 1,
++      completed: false,
++      completionReady: false,
++      answeredQuestionIds: [],
++      resumeScene,
++    }),
++  );
++const storage = { getItem: () => null, setItem: () => undefined } as unknown as Storage;
++const plan = {
++  schemaVersion: 'mira.openmaic.interaction-design-plan.v2',
++  objectives: [
++    {
++      objectiveIndex: 0,
++      operation: { sceneId: 'scene-game', controlSelector: '#pick-him', action: 'click' },
++      feedback: { sceneId: 'scene-game', selector: '#result' },
++    },
++  ],
++};
++const scenes = [
++  { id: 'scene-first', stageId: 'stage-a', order: 1, type: 'slide', content: { type: 'slide' } },
++  {
++    id: 'scene-game',
++    stageId: 'stage-a',
++    order: 2,
++    type: 'interactive',
++    content: {
++      type: 'interactive',
++      html: `<script id="mira-interaction-plan" type="application/json">${JSON.stringify(plan)}</script>`,
++    },
++  },
++  { id: 'scene-quiz', stageId: 'stage-a', order: 3, type: 'quiz', content: { type: 'quiz' } },
++] as Scene[];
++
++describe('authoritative student resume position', () => {
++  it('reads an earlier accepted scene with GET only, and does not turn later visits into resume', async () => {
++    let resumeScene: unknown = { sceneIndex: 1, sceneId: 'scene-game' };
++    const fetcher = vi.fn(async () => status(resumeScene));
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'stage-a',
++      storage,
++      fetcher,
++    });
++    await client.readProgress();
++    expect(studentResumeSceneId('stage-a', scenes, client)).toBe('scene-game');
++    resumeScene = { sceneIndex: 2, sceneId: 'scene-quiz' };
++    await client.readProgress();
++    expect(client.getResumeScene()).toEqual({ sceneIndex: 1, sceneId: 'scene-game' });
++    expect(
++      fetcher.mock.calls.every(
++        (call) => (call as unknown as [unknown, RequestInit])[1].method === 'GET',
++      ),
++    ).toBe(true);
++  });
++
++  it('keeps a fresh or older-server launch at the first page without fabricating progress', async () => {
++    let resumeScene: unknown;
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'stage-a',
++      storage,
++      fetcher: vi.fn(async () => status(resumeScene)),
++    });
++    await client.readProgress();
++    expect(studentResumeSceneId('stage-a', scenes, client)).toBeUndefined();
++    resumeScene = { sceneIndex: 1, sceneId: 'scene-game' };
++    await client.readProgress();
++    expect(client.getResumeScene()).toBeNull();
++  });
++
++  it('rejects another classroom or malformed index before returning a resume position', async () => {
++    for (const [resumeScene, classroomId] of [
++      [{ sceneIndex: 1, sceneId: 'scene-game' }, 'stage-other'],
++      [{ sceneIndex: -1, sceneId: 'scene-game' }, 'stage-a'],
++    ] as const) {
++      const client = createMiraStudentRuntimeEventClient({
++        classroomId: 'stage-a',
++        storage,
++        fetcher: vi.fn(async () => status(resumeScene, classroomId)),
++      });
++      await expect(client.readProgress()).rejects.toThrow();
++      expect(client.getResumeScene()).toBeNull();
++    }
++  });
++
++  it('rejects a frozen index/id or stage mismatch and preserves the usual interaction gate', () => {
++    const progress = {
++      getResumeScene: () => ({ sceneIndex: 2, sceneId: 'scene-quiz' }),
++      hasCompletedInteractions: (required: readonly number[]) => required.length === 0,
++    };
++    expect(studentResumeSceneId('stage-a', scenes, progress)).toBeUndefined();
++    expect(
++      studentResumeSceneId('stage-a', scenes, {
++        ...progress,
++        hasCompletedInteractions: () => true,
++      }),
++    ).toBe('scene-quiz');
++    expect(() => studentResumeSceneId('stage-other', scenes, progress)).toThrow('不一致');
++    expect(() =>
++      studentResumeSceneId('stage-a', scenes, {
++        ...progress,
++        getResumeScene: () => ({ sceneIndex: 1, sceneId: 'scene-quiz' }),
++      }),
++    ).toThrow('不一致');
++  });
++
++  it('does not offer a resume page after a failed progress read', async () => {
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'stage-a',
++      storage,
++      fetcher: vi.fn(async () => {
++        throw new Error('temporarily unavailable');
++      }),
++    });
++    await expect(client.readProgress()).rejects.toThrow('temporarily unavailable');
++    expect(client.getResumeScene()).toBeNull();
++  });
++
++  it('rejects a same-classroom switch to another learning session before mixing progress', async () => {
++    let learningSessionId = 'learning-a';
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'stage-a',
++      storage,
++      fetcher: vi.fn(async () =>
++        status({ sceneIndex: 1, sceneId: 'scene-game' }, 'stage-a', learningSessionId),
++      ),
++    });
++    await client.readProgress();
++    learningSessionId = 'learning-b';
++    await expect(client.readProgress()).rejects.toThrow('学习会话已改变');
++  });
++});

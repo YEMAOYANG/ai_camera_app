@@ -1,0 +1,256 @@
+# Use deploy/server.py so configuration and restore checks run before startup.
+name: ${MIRA_PROJECT_NAME:-mira-server}
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-backend-environment: &backend-environment
+  APP_ENV: production
+  APP_DEBUG: "0"
+  APP_HOST: 0.0.0.0
+  APP_PORT: "8000"
+  MIRA_BACKEND_BIND: 0.0.0.0:8000
+  APP_DATABASE_URL: mysql+pymysql://mira:${MIRA_MYSQL_PASSWORD:?required}@mysql:3306/mira?charset=utf8mb4
+  APP_CORS_ORIGINS: ${MIRA_PARENT_ORIGIN:?required},${MIRA_STUDENT_ORIGIN:?required}
+  APP_STUDENT_AUTH_PEPPER: ${MIRA_STUDENT_AUTH_PEPPER:?required}
+  INTERNAL_API_TOKEN: ${MIRA_INTERNAL_API_TOKEN:?required}
+  INTERNAL_ALLOWED_SOURCES: 127.0.0.1,::1
+  OPENMAIC_FULL_RUNTIME_INTERNAL_URL: http://127.0.0.1:3000
+  OPENMAIC_FULL_RUNTIME_PUBLIC_URL: ${MIRA_CLASSROOM_ORIGIN:?required}
+  MIRA_OPENMAIC_AGENT_DATABASE_URL: postgresql://openmaic:${MIRA_POSTGRES_PASSWORD:?required}@postgres:5432/openmaic
+  LEARNING_BUDGET_INTERNAL_URL: http://127.0.0.1:8000
+  APP_DEVICE_SECRET_STORE_DIR: /app/data/device-secrets
+  APP_DEVICE_SECRET_KEY_FILE: /app/data/.device-secret.key
+  LEARNING_MEDIA_STORAGE_ROOT: /app/data/learning-media
+  LEARNING_BUDGET_POLICY_PATH: /app/data/deployment-policies/learning-budget-policy.json
+  TASK_WEBSOCKET_ENABLED: "1"
+  TASK_WEBSOCKET_HOST: 0.0.0.0
+  TASK_WEBSOCKET_PORT: "8001"
+
+services:
+  database-migrate:
+    profiles: [operations]
+    image: mira-backend:${MIRA_RELEASE_TAG:?required}
+    # Schema-only command: no app initialization, worker or Provider calls.
+    command: [python, -c, "import os; from scripts.migrate import run_migrations; run_migrations(os.environ['APP_DATABASE_URL'])"]
+    environment:
+      APP_DATABASE_URL: mysql+pymysql://mira:${MIRA_MYSQL_PASSWORD:?required}@mysql:3306/mira?charset=utf8mb4
+    networks: [database]
+    depends_on:
+      mysql: {condition: service_healthy}
+    restart: "no"
+    logging: *logging
+
+  mysql:
+    image: ${MIRA_MYSQL_IMAGE:-mysql:8.4}
+    environment:
+      MYSQL_DATABASE: mira
+      MYSQL_USER: mira
+      MYSQL_PASSWORD: ${MIRA_MYSQL_PASSWORD:?required}
+      MYSQL_ROOT_PASSWORD: ${MIRA_MYSQL_ROOT_PASSWORD:?required}
+    volumes:
+      - ${MIRA_DATA_ROOT:?required}/mysql:/var/lib/mysql
+    networks: [database]
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysql --user=root --batch --skip-column-names --execute="SELECT 1" >/dev/null']
+      interval: 5s
+      timeout: 5s
+      retries: 40
+      start_period: 30s
+    restart: unless-stopped
+    logging: *logging
+
+  postgres:
+    image: ${MIRA_POSTGRES_IMAGE:-postgres:16-alpine}
+    environment:
+      POSTGRES_DB: openmaic
+      POSTGRES_USER: openmaic
+      POSTGRES_PASSWORD: ${MIRA_POSTGRES_PASSWORD:?required}
+    volumes:
+      - ${MIRA_DATA_ROOT:?required}/postgres:/var/lib/postgresql/data
+    networks: [database]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U openmaic -d openmaic']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+    logging: *logging
+
+  # Bind-mount ownership is initialized explicitly, including restored files.
+  storage-init:
+    image: alpine:3.22
+    user: "0:0"
+    network_mode: none
+    command: [sh, -ec, 'mkdir -p /backend/learning-media /backend/device-secrets /openmaic; chown -R 10001:10001 /backend; chown -R 1001:1001 /openmaic']
+    volumes:
+      - ${MIRA_DATA_ROOT:?required}/backend-data:/backend
+      - ${MIRA_DATA_ROOT:?required}/openmaic-data:/openmaic
+    restart: "no"
+    logging: *logging
+
+  openmaic:
+    image: mira-openmaic:${MIRA_RELEASE_TAG:?required}
+    build:
+      context: ../openmaic-runtime/.runtime/OpenMAIC
+      dockerfile: ../../../deploy/Dockerfile.openmaic
+      args:
+        ALLOWED_FRAME_ANCESTORS: ${MIRA_STUDENT_ORIGIN:?required}
+        NEXT_PUBLIC_PRO_WORKBENCH_ENABLED: "true"
+        NEXT_PUBLIC_MIRA_WORKBENCH_DOCUMENTS_ENABLED: "true"
+        NEXT_PUBLIC_MAIC_EDITOR_ENABLED: "true"
+        NEXT_PUBLIC_MAIC_EDITOR_RENDERER_ENABLED: "true"
+        NEXT_PUBLIC_MAIC_PLAYBACK_RENDERER_ENABLED: "true"
+        NEXT_PUBLIC_PI_CHAT_ENABLED: "true"
+        NEXT_PUBLIC_ENABLE_PPTX_IMPORT: "true"
+        NEXT_PUBLIC_ENABLE_VIDEO_EXPORT: "false"
+    env_file: ["${MIRA_RUNTIME_ENV_FILE:?required}"]
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 127.0.0.1
+      PORT: "3000"
+      # Prevent restored queued Agent jobs from resuming paid work at boot.
+      OPENMAIC_AGENT_RUNTIME_ENABLED: "false"
+      # Preserve migrated assets until post-migration acceptance is complete.
+      ASSET_COLLECTION_ENABLED: "false"
+      DATABASE_URL: postgresql://openmaic:${MIRA_POSTGRES_PASSWORD:?required}@postgres:5432/openmaic
+      PERSISTENCE_DEV_TOKEN: ${MIRA_PERSISTENCE_TOKEN:?required}
+      MIRA_INTERNAL_API_TOKEN: ${MIRA_INTERNAL_API_TOKEN:?required}
+      MIRA_BACKEND_INTERNAL_URL: http://127.0.0.1:8000
+      MIRA_OPENMAIC_PRIVATE_PORT: "3000"
+      MIRA_FORMAL_QA_BASE_URL: http://127.0.0.1:3000
+      MIRA_FORMAL_QA_BROWSER_PATH: /usr/bin/chromium-browser
+      ALLOWED_FRAME_ANCESTORS: ${MIRA_STUDENT_ORIGIN:?required}
+    depends_on:
+      postgres: {condition: service_healthy}
+      storage-init: {condition: service_completed_successfully}
+    volumes:
+      - ${MIRA_DATA_ROOT:?required}/openmaic-data:/app/data
+    shm_size: 1gb
+    networks:
+      runtime:
+        aliases: [backend, gateway]
+      database: {}
+      egress: {}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+    stop_grace_period: 60s
+    logging: *logging
+
+  # These services share one private network namespace. This preserves the
+  # existing formal-audio direct-loopback checks; no auth check is relaxed.
+  backend:
+    image: mira-backend:${MIRA_RELEASE_TAG:?required}
+    build: {context: ../backend}
+    network_mode: service:openmaic
+    env_file: ["${MIRA_BACKEND_ENV_FILE:?required}"]
+    environment:
+      <<: *backend-environment
+      MIRA_PROCESS_ROLE: api
+    volumes:
+      - ${MIRA_DATA_ROOT:?required}/backend-data:/app/data
+    depends_on:
+      openmaic: {condition: service_started, restart: true}
+      mysql: {condition: service_healthy}
+      storage-init: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5)"]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+    restart: unless-stopped
+    stop_grace_period: 60s
+    logging: *logging
+
+  gateway:
+    image: mira-gateway:${MIRA_RELEASE_TAG:?required}
+    build: {context: ../openmaic-runtime/gateway}
+    network_mode: service:openmaic
+    environment:
+      NODE_ENV: production
+      PORT: "3101"
+      OPENMAIC_UPSTREAM_URL: http://127.0.0.1:3000
+      MIRA_BACKEND_INTERNAL_URL: http://127.0.0.1:8000
+      MIRA_RUNTIME_PUBLIC_ORIGIN: ${MIRA_CLASSROOM_ORIGIN:?required}
+      MIRA_STUDENT_WEB_ORIGIN: ${MIRA_STUDENT_ORIGIN:?required}
+      MIRA_INTERNAL_API_TOKEN: ${MIRA_INTERNAL_API_TOKEN:?required}
+    depends_on:
+      openmaic: {condition: service_started, restart: true}
+      backend: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3101/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+    restart: unless-stopped
+    logging: *logging
+
+  curriculum-worker:
+    profiles: [generation]
+    image: mira-backend:${MIRA_RELEASE_TAG:?required}
+    network_mode: service:openmaic
+    command: [python, -m, workers.learning_curriculum_preparation_worker]
+    env_file: ["${MIRA_BACKEND_ENV_FILE:?required}"]
+    environment:
+      <<: *backend-environment
+      MIRA_PROCESS_ROLE: curriculum-worker
+    volumes:
+      - ${MIRA_DATA_ROOT:?required}/backend-data:/app/data
+    depends_on:
+      openmaic: {condition: service_healthy, restart: true}
+      backend: {condition: service_healthy}
+    restart: unless-stopped
+    stop_grace_period: 240s
+    logging: *logging
+
+  student-web:
+    image: mira-student-web:${MIRA_RELEASE_TAG:?required}
+    build:
+      context: ../student-web
+      args:
+        MIRA_STUDENT_WEB_PUBLIC_URL: ${MIRA_STUDENT_ORIGIN:?required}
+        OPENMAIC_FULL_RUNTIME_PUBLIC_URL: ${MIRA_CLASSROOM_ORIGIN:?required}
+    environment:
+      MIRA_BACKEND_URL: http://backend:8000
+      MIRA_STUDENT_WEB_PUBLIC_URL: ${MIRA_STUDENT_ORIGIN:?required}
+      OPENMAIC_FULL_RUNTIME_PUBLIC_URL: ${MIRA_CLASSROOM_ORIGIN:?required}
+    networks: [runtime, egress]
+    depends_on:
+      backend: {condition: service_healthy}
+    restart: unless-stopped
+    logging: *logging
+
+  edge:
+    image: caddy:2.10-alpine
+    ports: ["80:80", "443:443", "443:443/udp"]
+    environment:
+      MIRA_PARENT_ORIGIN: ${MIRA_PARENT_ORIGIN:?required}
+      MIRA_STUDENT_ORIGIN: ${MIRA_STUDENT_ORIGIN:?required}
+      MIRA_CLASSROOM_ORIGIN: ${MIRA_CLASSROOM_ORIGIN:?required}
+      MIRA_API_ORIGIN: ${MIRA_API_ORIGIN:?required}
+      MIRA_REALTIME_ORIGIN: ${MIRA_REALTIME_ORIGIN:?required}
+      MIRA_ACCESS_CIDRS: ${MIRA_ACCESS_CIDRS:?required}
+    volumes:
+      - ./Caddyfile.server:/etc/caddy/Caddyfile:ro
+      - ${MIRA_PARENT_WEB_DIST:?required}:/srv/parent:ro
+      - ${MIRA_DATA_ROOT:?required}/caddy-data:/data
+      - ${MIRA_DATA_ROOT:?required}/caddy-config:/config
+    networks: [runtime, egress]
+    depends_on:
+      gateway: {condition: service_healthy}
+      student-web: {condition: service_healthy}
+    restart: unless-stopped
+    logging: *logging
+
+networks:
+  runtime: {internal: true}
+  database: {internal: true}
+  egress: {}

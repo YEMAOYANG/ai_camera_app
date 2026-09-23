@@ -302,7 +302,26 @@ class StudentLearningLibraryRepository:
             conditions.append("session.status = 'completed'")
         elif bucket == "favorites":
             conditions.append("favorite.course_id IS NOT NULL")
-        if bucket in {"all", "continue", "makeup"}:
+        if bucket == "continue":
+            # Opening an old task changes updated_at, not which attempt is
+            # newest. A later completed attempt supersedes it only within the
+            # same immutable course/version; another exercise set is separate.
+            conditions.append(
+                "NOT EXISTS (SELECT 1 FROM tasks AS newer_task "
+                "JOIN learning_sessions AS newer_session "
+                "ON newer_session.family_id = newer_task.family_id "
+                "AND newer_session.task_id = newer_task.id "
+                "WHERE newer_task.family_id = task.family_id "
+                "AND newer_task.child_id = task.child_id "
+                "AND newer_task.type = 'learning' "
+                "AND newer_task.status NOT IN ('cancelled', 'rejected', 'expired') "
+                "AND newer_task.learning_course_id = task.learning_course_id "
+                "AND newer_task.learning_course_version = task.learning_course_version "
+                "AND (newer_session.started_at > session.started_at "
+                "OR (newer_session.started_at = session.started_at "
+                "AND newer_task.id > task.id)))"
+            )
+        if bucket == "makeup":
             conditions.append(
                 "((session.id IS NOT NULL AND session.status <> 'completed') OR NOT EXISTS ("
                 "SELECT 1 FROM tasks AS newer_task "
@@ -493,7 +512,11 @@ class StudentLearningLibraryRepository:
               AND task.type = 'learning'
               AND course.id = ?
               {version_sql}
-            ORDER BY COALESCE(session.updated_at, task.updated_at) DESC,
+            ORDER BY CASE WHEN task.status IN ('cancelled', 'rejected', 'expired')
+              THEN 1 ELSE 0 END,
+              CASE WHEN session.id IS NOT NULL THEN 0 ELSE 1 END,
+              session.started_at DESC,
+              CASE WHEN session.id IS NULL THEN task.created_at ELSE 0 END DESC,
               task.id DESC
             LIMIT 1
             """),

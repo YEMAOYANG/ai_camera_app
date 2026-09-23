@@ -766,6 +766,34 @@ describe("full OpenMAIC runtime contract", () => {
     }
   });
 
+  it("accepts six audited research searches while rejecting inconsistent counts", () => {
+    const base = adaptiveFormalLaunch("english");
+    const searches = Array.from({ length: 6 }, (_, index) => ({
+      ...base.features.research.searches[0], query: `六年级主宾代词教学材料 ${index + 1}`,
+    }));
+    const launch = {
+      ...base,
+      features: {
+        ...base.features,
+        research: { ...base.features.research, searches, searchCount: 6 },
+        formalEvidence: {
+          ...base.features.formalEvidence,
+          research: { ...base.features.formalEvidence.research, searchCount: 6 },
+        },
+      },
+    };
+    expect(openMaicFormalRuntimeLaunchSchema.safeParse(launch).success).toBe(true);
+
+    const mismatched = {
+      ...launch,
+      features: {
+        ...launch.features,
+        research: { ...launch.features.research, searches: searches.slice(0, 5) },
+      },
+    };
+    expect(openMaicFormalRuntimeLaunchSchema.safeParse(mismatched).success).toBe(false);
+  });
+
   it("requires verified 3D evidence only when a playful course opts into v2", () => {
     const launch = adaptiveFormalLaunch("english");
     const policy = {

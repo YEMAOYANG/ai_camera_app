@@ -2729,11 +2729,15 @@ class OpenMaicFullRuntimeService:
                         )
                     ),
                 }
-                if isinstance(teaching_brief.get("difficultyPolicy"), Mapping):
-                    from content.formal_difficulty_policy import formal_difficulty_policy
-                    difficulty = formal_difficulty_policy(str(brief_course.get("gradeCode")), str(brief_course.get("subject")),
+                progressive_brief = teaching_brief.get("schemaVersion") == "mira.learning.formal-runtime-teaching-brief.progressive.v1"
+                if progressive_brief or isinstance(teaching_brief.get("difficultyPolicy"), Mapping):
+                    if progressive_brief:
+                        from content.progressive_difficulty_policy import progressive_difficulty_policy as difficulty_policy
+                    else:
+                        from content.formal_difficulty_policy import formal_difficulty_policy as difficulty_policy
+                    difficulty = difficulty_policy(str(brief_course.get("gradeCode")), str(brief_course.get("subject")),
                         str(brief_course.get("skillId")), str(brief_course.get("difficultyCode")))
-                    if _canonical_sha256(difficulty) != _canonical_sha256(teaching_brief["difficultyPolicy"]):
+                    if _canonical_sha256(difficulty) != _canonical_sha256(teaching_brief.get("difficultyPolicy")):
                         raise ValueError("formal candidate difficulty authority mismatch")
                     generation_contract["difficultyPolicy"] = difficulty
                     generation_contract["course"]["difficultyCode"] = difficulty["difficultyCode"]
@@ -3511,14 +3515,15 @@ class OpenMaicFullRuntimeService:
         }
         return professional, research, professional_evidence, research_evidence
 
+    @classmethod
     def _formal_runtime_assessment_contract(
-        self,
+        cls,
         generation_contract: Mapping[str, Any],
     ) -> list[dict[str, Any]]:
-        """Project the four scored brief questions without answer authority."""
+        """Project frozen assessment items without exporting answer authority."""
 
         def invalid() -> None:
-            self._fail(
+            cls._fail(
                 "openmaic_formal_assessment_contract_invalid",
                 "正式候选课堂缺少服务端锁定的评分题目合同",
                 502,
@@ -3529,8 +3534,10 @@ class OpenMaicFullRuntimeService:
         teaching_brief = generation_contract.get("teachingBrief")
         if (
             not isinstance(teaching_brief, Mapping)
-            or teaching_brief.get("schemaVersion")
-            != "mira.learning.formal-runtime-teaching-brief.v1"
+            or teaching_brief.get("schemaVersion") not in {
+                "mira.learning.formal-runtime-teaching-brief.v1",
+                "mira.learning.formal-runtime-teaching-brief.progressive.v1",
+            }
         ):
             invalid()
         authority = teaching_brief.get("authority")
@@ -3550,12 +3557,38 @@ class OpenMaicFullRuntimeService:
             invalid()
         guided_ids = flow.get("guidedQuestionIds")
         independent_ids = flow.get("independentQuestionIds")
-        if (
-            not isinstance(guided_ids, list)
-            or not isinstance(independent_ids, list)
-            or len(guided_ids) != 2
-            or len(independent_ids) != 2
-        ):
+        progressive = teaching_brief.get("schemaVersion") == "mira.learning.formal-runtime-teaching-brief.progressive.v1"
+        if not isinstance(guided_ids, list) or not isinstance(independent_ids, list):
+            invalid()
+        if progressive:
+            from content.progressive_curriculum import lesson_by_id
+            from services.progressive_course_generation import lesson_binding
+            identity = teaching_brief.get("course")
+            try:
+                registered = lesson_by_id(identity.get("skillId")) if isinstance(identity, Mapping) else None
+                expected_binding = lesson_binding(registered["lessonId"]) if registered else None
+            except (ValueError, TypeError, KeyError):
+                invalid()
+            if (registered is None or teaching_brief.get("progressiveLesson") != expected_binding
+                    or identity.get("gradeCode") != registered["gradeCode"]
+                    or identity.get("subject") != registered["subject"]
+                    or generation_contract.get("teachingBriefSha256") != _canonical_sha256(teaching_brief)
+                    or flow.get("schemaVersion") != "mira.learning.progressive-teaching-flow.v1"
+                    or "demoQuestionId" in flow or lesson.get("assessmentMode") != registered["assessmentMode"]):
+                invalid()
+            if registered["assessmentMode"] == "observed":
+                if (guided_ids or independent_ids or questions
+                        or lesson.get("autoMasteryEligible") is not False
+                        or lesson.get("manualConfirmationRequired") is not True
+                        or not isinstance(flow.get("observations"), list) or not flow["observations"]):
+                    invalid()
+                return []
+            if (not 1 <= len(guided_ids) <= 4 or not 5 <= len(independent_ids) <= 10
+                    or len(guided_ids) + len(independent_ids) > 14
+                    or lesson.get("autoMasteryEligible") is not True
+                    or lesson.get("manualConfirmationRequired") is not False):
+                invalid()
+        elif len(guided_ids) != 2 or len(independent_ids) != 2:
             invalid()
         scored_ids = [*guided_ids, *independent_ids]
         if (
@@ -3565,7 +3598,7 @@ class OpenMaicFullRuntimeService:
                 or str(question_id) != str(question_id).strip()
                 for question_id in scored_ids
             )
-            or len(set(str(question_id) for question_id in scored_ids)) != 4
+            or len(set(str(question_id) for question_id in scored_ids)) != len(scored_ids)
         ):
             invalid()
 
@@ -3586,10 +3619,13 @@ class OpenMaicFullRuntimeService:
                         "verificationExpression",
                     )
                 )
+                or progressive and any(key in question for key in ("evidence", "hint", "explanation"))
             ):
                 invalid()
             questions_by_id[str(question_id)] = question
         if any(str(question_id) not in questions_by_id for question_id in scored_ids):
+            invalid()
+        if progressive and set(questions_by_id) != set(scored_ids):
             invalid()
 
         runtime_types = {
@@ -3598,6 +3634,7 @@ class OpenMaicFullRuntimeService:
             "accepted_text": "short_answer",
             "single_choice": "single",
             "sequence": "multiple",
+            "tap_objects": "multiple",
         }
         expected: list[dict[str, Any]] = []
         for raw_question_id in scored_ids:
@@ -3610,7 +3647,17 @@ class OpenMaicFullRuntimeService:
                 invalid()
             options: list[dict[str, str]] = []
             choices = question.get("choices")
-            if source_type in {"single_choice", "sequence"}:
+            object_projection = None
+            if source_type == "tap_objects":
+                if not progressive or choices not in (None, []):
+                    invalid()
+                object_projection = _formal_tap_object_projection(question.get("objects"))
+                if (object_projection is None
+                        or "count_objects" not in registered["constraints"]["assessmentEvidenceKinds"]
+                        or len(object_projection["objects"]) > registered["constraints"]["maximumNumber"]):
+                    invalid()
+                options = object_projection["options"]
+            elif source_type in {"single_choice", "sequence"}:
                 if (
                     not isinstance(choices, list)
                     or not 2 <= len(choices) <= MAX_QUIZ_OPTIONS
@@ -3639,6 +3686,8 @@ class OpenMaicFullRuntimeService:
                     "question": str(prompt).strip(),
                     "runtimeType": runtime_type,
                     "options": options,
+                    **({"sourceType": "tap_objects", "objects": object_projection["objects"]}
+                       if object_projection is not None else {}),
                 }
             )
         return expected
@@ -3646,22 +3695,29 @@ class OpenMaicFullRuntimeService:
     def _validate_locked_formal_assessment(
         self, classroom: Mapping[str, Any], generation: Mapping[str, Any]
     ) -> None:
-        """Reuse the independently verified course's four scored public items."""
+        """Keep the registered source tasks exact, including observation-only lessons."""
 
         expected = self._formal_runtime_assessment_contract(generation)
+        progressive = generation["teachingBrief"].get("schemaVersion") == "mira.learning.formal-runtime-teaching-brief.progressive.v1"
         scenes = classroom.get("scenes")
         actual = [question for scene in sorted(scenes, key=lambda item: item["order"])
                   if scene.get("type") == "quiz"
                   for question in scene["content"].get("questions", [])]
         def mismatch() -> None:
             self._fail("openmaic_formal_assessment_mismatch", "正式课件评分题必须逐题保持锁定内容、类型和选项", 502)
-        if len(expected) != 4 or len(actual) != 4:
+        if len(actual) != len(expected):
             mismatch()
         for question, locked in zip(actual, expected):
             if (question.get("id") != locked["id"] or question.get("question") != locked["question"]
                     or question.get("type") != locked["runtimeType"] or question.get("hasAnswer") is not False
                     or question.get("answer") not in (None, [])
-                    or any(key in question for key in ("evaluation", "verificationExpression"))):
+                    or any(key in question for key in ("evaluation", "verificationExpression"))
+                    or progressive and any(key in question for key in ("evidence", "hint", "explanation"))):
+                mismatch()
+            if locked.get("sourceType") == "tap_objects":
+                if question.get("sourceType") != "tap_objects" or question.get("objects") != locked["objects"]:
+                    mismatch()
+            elif "sourceType" in question or "objects" in question:
                 mismatch()
             options = question.get("options")
             if locked["options"]:
@@ -4611,6 +4667,52 @@ class OpenMaicFullRuntimeService:
             )
 
     @staticmethod
+    def _formal_course_grade_is_compatible(authority: Mapping[str, Any]) -> bool:
+        """New study is grade-specific; only a frozen old classroom may resume."""
+        child_grade = str(authority.get("child_grade_code") or "")
+        course_grade = str(authority.get("course_grade_code") or "")
+        if child_grade == course_grade:
+            return True
+        from content.progressive_curriculum import CURRICULUM_VERSION
+        if (authority.get("course_curriculum_version") != CURRICULUM_VERSION
+                or not re.fullmatch(r"primary_[1-6]", child_grade)
+                or not re.fullmatch(r"primary_[1-6]", course_grade)
+                or course_grade >= child_grade):
+            return False
+        if (authority.get("session_status", authority.get("learning_session_status")) != "in_progress"
+                or authority.get("formal_binding_authority_kind") != "progressive_course"):
+            return False
+        identities = (
+            ("formal_binding_learning_session_id", "learning_session_id"),
+            ("formal_binding_course_id", "course_id"),
+            ("formal_binding_course_version", "course_version"),
+            ("formal_binding_package_id", "lesson_package_id"),
+            ("formal_binding_package_version", "lesson_package_version"),
+            ("formal_binding_package_content_hash", "lesson_package_content_hash"),
+            ("formal_binding_runtime_classroom_id", "runtime_classroom_id"),
+            ("formal_binding_upstream_classroom_id", "upstream_classroom_id"),
+        )
+        return all(str(authority.get(bound) or "")
+                   and str(authority.get(bound)) == str(authority.get(current))
+                   for bound, current in identities)
+
+    def _require_student_course_grade(self, conn: Any, authority: Mapping[str, Any], *,
+                                      family_id: str, child_id: str) -> None:
+        if str(authority.get("child_grade_code") or "") == str(authority.get("course_grade_code") or ""):
+            return
+        if self._formal_course_grade_is_compatible(authority):
+            from repositories.learning_repository import LearningRepository
+            visible = LearningRepository(self.repository.database).get_student_visible_course(
+                conn, family_id=family_id, child_id=child_id,
+                grade_code=str(authority.get("child_grade_code") or ""),
+                grade_selection_revision=int(authority.get("child_grade_selection_revision") or 0),
+                course_id=str(authority.get("course_id") or ""),
+                course_version=str(authority.get("course_version") or ""))
+            if visible is not None:
+                return
+        self._fail("openmaic_student_grade_mismatch", "学生当前年级与这节正式课程不一致", 409)
+
+    @staticmethod
     def _formal_session_binding_state(
         authority: Mapping[str, Any],
         *,
@@ -4694,6 +4796,42 @@ class OpenMaicFullRuntimeService:
             and binding_grade_revision >= 1
             and binding_grade_revision == child_grade_revision
         )
+        progressive_course_authority_valid = False
+        if authority_kind == "progressive_course":
+            from content.progressive_curriculum import (
+                CURRICULUM_VERSION,
+                lesson_by_id,
+            )
+
+            try:
+                lesson = lesson_by_id(
+                    str(authority.get("course_node_code") or "")
+                )
+            except ValueError:
+                lesson = None
+            progressive_course_authority_valid = bool(
+                lesson is not None
+                and authority.get("course_curriculum_version")
+                == CURRICULUM_VERSION
+                and lesson["gradeCode"] == authority.get("course_grade_code")
+                and lesson["subject"] == authority.get("course_subject")
+                and re.fullmatch(
+                    r"primary_[1-6]",
+                    str(authority.get("child_grade_code") or ""),
+                )
+                and OpenMaicFullRuntimeService._formal_course_grade_is_compatible(
+                    authority
+                )
+                and not str(
+                    authority.get("formal_binding_pointer_history_id") or ""
+                )
+                and pointer_revision == 0
+                and not str(
+                    authority.get("formal_binding_preparation_plan_id") or ""
+                )
+                and binding_grade_revision >= 1
+                and binding_grade_revision == child_grade_revision
+            )
         exact = bool(
             str(authority.get("formal_binding_learning_session_id") or "")
             == str(authority.get("learning_session_id") or "")
@@ -4710,8 +4848,12 @@ class OpenMaicFullRuntimeService:
             and str(authority.get("formal_binding_grade_code") or "")
             == str(authority.get("candidate_grade_code") or "")
             == str(authority.get("course_grade_code") or "")
-            == str(authority.get("child_grade_code") or "")
-            and (pointer_authority_valid or progressive_authority_valid)
+            and OpenMaicFullRuntimeService._formal_course_grade_is_compatible(authority)
+            and (
+                pointer_authority_valid
+                or progressive_authority_valid
+                or progressive_course_authority_valid
+            )
             and str(authority.get("formal_binding_release_id") or "")
             == str(authority.get("candidate_release_id") or "")
             and re.fullmatch(r"[0-9a-f]{64}", target_fingerprint) is not None
@@ -5231,14 +5373,8 @@ class OpenMaicFullRuntimeService:
                 self._fail(
                     "learning_session_not_found", "没有找到这节课的学习会话", 404
                 )
-            if str(runtime.get("child_grade_code") or "") != str(
-                runtime.get("course_grade_code") or ""
-            ):
-                self._fail(
-                    "openmaic_student_grade_mismatch",
-                    "学生当前年级与这节正式课程不一致",
-                    409,
-                )
+            self._require_student_course_grade(conn, runtime,
+                family_id=str(principal["family_id"]), child_id=str(principal["child_id"]))
             candidate_release_id = str(
                 runtime.get("candidate_release_id") or ""
             )
@@ -9350,6 +9486,22 @@ def _renderable_slide_element(element: Mapping[str, Any]) -> bool:
     return element_type in {"shape", "line"}
 
 
+def _formal_tap_object_projection(objects: object) -> dict[str, Any] | None:
+    """Safe visual objects; no answer set or evaluator contract is projected."""
+    if not isinstance(objects, list) or not 1 <= len(objects) <= MAX_QUIZ_OPTIONS:
+        return None
+    shapes = {"circle": "●", "square": "■", "triangle": "▲"}
+    if any(not isinstance(item, Mapping) or set(item) != {"id", "shape", "color"}
+           or not _bounded_identifier(item.get("id")) or len(str(item["id"])) > 128
+           or item.get("shape") not in shapes or item.get("color") not in {"red", "blue", "yellow", "green"}
+           for item in objects):
+        return None
+    if len({item["id"] for item in objects}) != len(objects):
+        return None
+    return {"objects": [dict(item) for item in objects],
+            "options": [{"value": item["id"], "label": shapes[item["shape"]]} for item in objects]}
+
+
 def _validate_quiz_content(
     content: Mapping[str, Any], *, fail: Any, require_answers: bool = False
 ) -> int:
@@ -9411,8 +9563,14 @@ def _validate_quiz_content(
                     "OpenMAIC 测验包含重复选项值",
                     502,
                 )
+        tap_projection = (_formal_tap_object_projection(question.get("objects"))
+                          if question.get("sourceType") == "tap_objects" else None)
+        tap_valid = (tap_projection is not None and question["type"] == "multiple"
+                     and options == tap_projection["options"])
+        if question.get("sourceType") == "tap_objects" and not tap_valid:
+            fail("invalid_openmaic_quiz", "逐物点击题的对象与选项不一致", 502)
         if question["type"] in {"single", "multiple"} and (
-            not isinstance(options, list) or len(options) < 2
+            not isinstance(options, list) or len(options) < (1 if tap_valid else 2)
         ):
             fail(
                 "invalid_openmaic_quiz",

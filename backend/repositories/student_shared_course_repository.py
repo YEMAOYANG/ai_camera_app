@@ -17,7 +17,7 @@ def shared_course_inventory(conn, *, family_id, child_id, grade_code, grade_sele
     # Authenticate the supplied scope against the current child, even for callers
     # outside StudentLearningService. No child preparation is created by a read.
     child = conn.execute(
-        "SELECT id FROM children WHERE family_id = ? AND id = ? AND grade_code = ? "
+        "SELECT * FROM children WHERE family_id = ? AND id = ? AND grade_code = ? "
         "AND grade_selection_revision = ? AND grade_selection_revision >= 1 LIMIT 1",
         (family_id, child_id, grade_code, grade_selection_revision),
     ).fetchone()
@@ -30,10 +30,25 @@ def shared_course_inventory(conn, *, family_id, child_id, grade_code, grade_sele
     # Local import avoids the existing inventory -> LearningRepository asset
     # gate dependency. This is the same full published/media gate as supply.
     from repositories.course_supply_inventory import published_supply
-    return {
+    inventory = {
         (str(row['course_id']), str(row['course_version'])): row
         for row in published_supply(conn, target).values()
     }
+    # Fine batches remain discoverable after a supplementary batch changes the
+    # grade pointer. Every row reuses the full exact publication/media gate.
+    from repositories.progressive_formal_course_repository import progressive_formal_authority
+    from content.progressive_curriculum import CURRICULUM_VERSION
+    rows = conn.execute("SELECT course.* FROM learning_courses AS course "
+                        "JOIN learning_progressive_course_bindings AS binding ON binding.course_id=course.id "
+                        "AND binding.course_version=course.version AND binding.retired_at IS NULL "
+                        "WHERE course.grade_code=? AND course.curriculum_version=? "
+                        "AND course.status='published' AND course.quality_status='released' AND course.retired_at IS NULL",
+                        (grade_code, CURRICULUM_VERSION)).fetchall()
+    for course in rows:
+        authority = progressive_formal_authority(conn, database=None, child=child, course=course)
+        if authority is not None:
+            inventory[(str(course['id']), str(course['version']))] = authority
+    return inventory
 
 
 def shared_course_rows(conn, *, family_id, child_id, grade_code,
