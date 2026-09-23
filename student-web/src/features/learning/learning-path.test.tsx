@@ -61,12 +61,12 @@ describe("LearningPath", () => {
     render(<LearningPath student={student} />);
     await screen.findByRole("heading", { name: "认读单韵母 a", level: 2 });
     fireEvent.change(screen.getByRole("combobox", { name: "查看年级" }), { target: { value: "primary_6" } });
-    expect(await screen.findByText(/正在预览六年级路线/)).toBeInTheDocument();
+    expect(await screen.findByText(/正在预览六年级课程目录/)).toBeInTheDocument();
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
     expect(screen.queryByRole("button", { name: "开始这一步" })).not.toBeInTheDocument();
     const summary = await screen.findByText("观点事实证据", { selector: ".learning-path-unit__title" });
     fireEvent.click(summary.closest("summary")!);
-    expect(screen.getByRole("button", { name: "观点事实证据：暂未解锁" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "观点事实证据：目录预览" })).toBeDisabled();
     expect(startLearningCourse).not.toHaveBeenCalled();
   });
 

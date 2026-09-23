@@ -2358,6 +2358,17 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
           ),
           const SizedBox(height: 14),
         ],
+        if (isSavedPrimary) ...[
+          AppListRow(
+            icon: Icons.menu_book_outlined,
+            title: '学校教材',
+            subtitle: '确认学校使用的出版社与册次',
+            onTap: canManageChildProfile
+                ? () => context.push(profileSchoolTextbooksPath)
+                : null,
+          ),
+          const SizedBox(height: 14),
+        ],
         AppSurface(
           key: const ValueKey('studentLearningSpaceEntry'),
           color: AppColors.brandWash.withValues(alpha: 0.62),

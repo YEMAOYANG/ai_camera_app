@@ -2347,6 +2347,8 @@ class LearningService:
                 or isinstance(content, dict) and "progressiveLesson" in content)
 
     def assert_course_progression(self, conn, *, child, course) -> None:
+        from services.textbook_course_policy import assert_textbook_course
+        assert_textbook_course(conn, child=child, course=course)
         if course.get("grade_code") != child.get("grade_code"):
             raise ApiError("learning_grade_scope_mismatch", "新课只能学习当前年级的课程，请返回学习路线", 409)
         if self._is_progressive_course(course):

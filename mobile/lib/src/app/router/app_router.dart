@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:warm_sight/src/features/learning/presentation/school_textbooks_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:warm_sight/src/app/router/app_route.dart';
 import 'package:warm_sight/src/app/router/app_route_observer.dart';
@@ -225,6 +226,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: profileStudentAccessPath,
         name: 'profileStudentAccess',
         builder: (_, _) => const StudentAccessPairingPage(),
+      ),
+      GoRoute(
+        path: profileSchoolTextbooksPath,
+        name: 'profileSchoolTextbooks',
+        builder: (_, _) => const SchoolTextbooksPage(),
       ),
       GoRoute(
         path: studentAccessQrPath,

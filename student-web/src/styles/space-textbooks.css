@@ -1,0 +1,36 @@
+.space-textbooks .mira-button { min-height: 48px; }
+.textbook-layout { display: grid; grid-template-columns: minmax(220px, 290px) minmax(0, 1fr); gap: 32px; align-items: start; }
+.textbook-books { display: grid; gap: 14px; }
+.textbook-mobile-choice { display: none; }
+.textbook-book { display: grid; gap: 8px; min-height: 48px; text-align: left; padding: 22px; background: var(--mira-surface); border: 2px solid var(--mira-border); border-radius: 20px; cursor: pointer; color: var(--mira-ink); overflow-wrap: anywhere; }
+.textbook-book[aria-pressed="true"] { border-color: var(--mira-brand-deep); }
+.textbook-book:focus-visible { outline: 3px solid var(--mira-brand-deep); outline-offset: 4px; }
+.textbook-book strong { font-size: 20px; }
+.textbook-book span, .textbook-book small { color: var(--mira-muted); line-height: 1.65; }
+.textbook-book-subject { font-weight: 800; }
+.textbook-confirmed { display: flex; gap: 6px; align-items: center; }
+.textbook-intro { padding: 4px 0 24px; }
+.textbook-intro h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 850; }
+.textbook-intro p { margin-top: 10px; line-height: 1.7; color: var(--mira-muted); }
+.textbook-intro .textbook-notice { padding-left: 14px; border-left: 3px solid var(--mira-brand); color: var(--mira-ink); }
+.textbook-source { display: inline-flex; min-height: 48px; align-items: center; margin-top: 8px; color: var(--mira-brand-deep); text-decoration: underline; text-underline-offset: 4px; }
+.textbook-unit { border-top: 1px solid var(--mira-border); }
+.textbook-unit summary { display: flex; gap: 12px; align-items: center; justify-content: space-between; min-height: 64px; padding: 16px 0; cursor: pointer; }
+.textbook-unit summary h3 { font-weight: 800; font-size: 21px; }
+.textbook-unit summary::-webkit-details-marker { display: none; }
+.textbook-unit[open] summary > svg { transform: rotate(180deg); }
+.textbook-lesson { display: flex; gap: 20px; justify-content: space-between; align-items: center; padding: 22px 0; border-top: 1px solid var(--mira-border); }
+.textbook-lesson[aria-current="step"] { padding-inline: 14px; border-left: 3px solid var(--mira-brand-deep); }
+.textbook-lesson h4 { font-size: 20px; font-weight: 750; }
+.textbook-lesson p { margin-top: 8px; font-size: 16px; color: var(--mira-muted); }
+.textbook-lesson-status { max-width: 320px; color: var(--mira-muted); font-size: 16px; line-height: 1.6; }
+.textbook-state { display: grid; justify-items: start; gap: 18px; padding: 40px 0; font-size: 18px; line-height: 1.7; }
+.textbook-state h2 { font-size: 24px; font-weight: 800; }
+@media (max-width: 760px) {
+  .textbook-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .textbook-books { display: none; }
+  .textbook-mobile-choice { display: grid; gap: 10px; font-size: 18px; font-weight: 700; }
+  .textbook-mobile-choice select { width: 100%; min-width: 0; min-height: 52px; padding: 10px; border: 1px solid var(--mira-border); border-radius: 12px; background: var(--mira-surface); color: var(--mira-ink); font: inherit; text-overflow: ellipsis; }
+  .textbook-mobile-choice select:focus-visible { outline: 3px solid var(--mira-brand-deep); outline-offset: 4px; }
+  .textbook-lesson { align-items: flex-start; flex-direction: column; gap: 14px; }
+}

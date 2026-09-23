@@ -1,0 +1,137 @@
+"""Check migration 082 and concurrent repository writes on a disposable MySQL.
+
+Starts its own server with networking disabled and a fresh temporary data dir.
+Never reads AppConfig, .env or an existing database. Requires a local mysqld.
+"""
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
+import argparse
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+import pymysql
+from pymysql.cursors import DictCursor
+from content.textbook_catalog import generation_brief
+from core.database import DatabaseConnection
+from core.errors import ApiError
+from repositories.textbook_repository import TextbookRepository
+from services.textbook_learning_service import TextbookLearningService
+
+
+class SocketDatabase:
+    def __init__(self, socket):
+        self.socket = socket
+
+    @contextmanager
+    def transaction(self):
+        raw = pymysql.connect(unix_socket=self.socket, user="root", database="textbook_isolated_test", cursorclass=DictCursor, autocommit=False)
+        conn = DatabaseConnection(raw, dialect="mysql")
+        try:
+            yield conn
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+
+def verify(socket):
+    raw = pymysql.connect(unix_socket=socket, user="root", autocommit=True)
+    with raw.cursor() as cursor:
+        cursor.execute("CREATE DATABASE textbook_isolated_test CHARACTER SET utf8mb4 COLLATE utf8mb4_bin")
+    raw.close()
+    db = SocketDatabase(socket)
+    repo = TextbookRepository(db)
+    service = TextbookLearningService(repo)
+    with db.transaction() as conn:
+        conn.executescript((ROOT / "migrations/082_fixed_textbook_learning.sql").read_text())
+        conn.execute("CREATE TABLE children (id VARCHAR(128) PRIMARY KEY, family_id VARCHAR(128), grade_code VARCHAR(32), grade_selection_revision INT)")
+        conn.execute("INSERT INTO children VALUES ('isolated-child','isolated-family','primary_1',1)")
+    m = json.loads((ROOT / "content/textbooks/pep-chinese-g1-upper.preview.v1.json").read_text())
+    m["rightsReview"] = {"status": "cleared", "basis": "Synthetic disposable database test only"}
+    m["units"][0]["lessons"][0]["brief"]["status"] = "approved"
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        imported = list(pool.map(lambda _: service.import_manifest(m), range(4)))
+    assert sum(r["created"] for r in imported) == 1, imported
+    query = {"editionId": m["editionId"], "alignmentRevisionId": m["revisionId"], "nodeId": "u1-l1"}
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        prepared = list(pool.map(lambda _: service.prepare(query), range(4)))
+    assert sum(r["created"] for r in prepared) == 1, prepared
+    assert len({r["contentKey"] for r in prepared}) == 1
+
+    def select(_):
+        try:
+            with db.transaction() as conn:
+                child = repo.child(conn, "isolated-family", "isolated-child", lock=True)
+                return repo.select(conn, child=child, manifest=m, year=2026, semester="upper", expected_revision=0,
+                                   current_node=None, confirmed_by="isolated-parent", now=1)
+        except ApiError as exc:
+            return exc.code
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        selected = list(pool.map(select, range(4)))
+    assert selected.count(1) == 1 and selected.count("textbook_selection_changed") == 3, selected
+    with db.transaction() as conn:
+        assert conn.execute("SELECT COUNT(*) AS n FROM learning_textbook_course_builds").fetchone()["n"] == 1
+        assert conn.execute("SELECT COUNT(*) AS n FROM learning_textbook_selection_events").fetchone()["n"] == 1
+    try:
+        with db.transaction() as conn:
+            conn.execute("UPDATE learning_textbook_course_builds SET status='published'")
+        raise AssertionError("MySQL accepted publication without course/hash/review")
+    except pymysql.err.OperationalError as exc:
+        assert exc.args[0] == 3819, exc
+    assert prepared[0]["contentKey"] == generation_brief(m, "u1-l1")["contentKey"]
+    return {"migration": "passed", "concurrentImports": 4, "uniqueImportedRevision": 1,
+            "concurrentPreparations": 4, "uniqueBuild": 1, "concurrentSelections": 4,
+            "successfulSelections": 1, "publicationCheckConstraint": "passed", "existingDatabaseTouched": False}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--mysqld", default=shutil.which("mysqld"))
+    args = parser.parse_args()
+    if not args.mysqld:
+        parser.error("Pass --mysqld /absolute/path/to/mysqld")
+    with tempfile.TemporaryDirectory(prefix="mira-textbook-mysql-", dir="/tmp") as temp:
+        root = Path(temp)
+        log = root / "server.log"
+        data = root / "data"
+        socket = str(root / "mysql.sock")
+        with log.open("w+") as output:
+            try:
+                subprocess.run([args.mysqld, "--no-defaults", "--initialize-insecure", f"--datadir={data}"], stdout=output, stderr=subprocess.STDOUT, check=True, timeout=60)
+            except subprocess.CalledProcessError:
+                output.flush()
+                print(log.read_text()[-1800:], file=sys.stderr)
+                raise
+            process = subprocess.Popen([args.mysqld, "--no-defaults", f"--datadir={data}", f"--socket={socket}", "--skip-networking", "--mysqlx=OFF", f"--pid-file={root / 'mysql.pid'}"], stdout=output, stderr=subprocess.STDOUT)
+            try:
+                deadline = time.monotonic() + 25
+                while not Path(socket).exists():
+                    if process.poll() is not None or time.monotonic() > deadline:
+                        raise RuntimeError("Disposable MySQL did not start")
+                    time.sleep(0.1)
+                print(json.dumps(verify(socket), indent=2))
+            except Exception:
+                output.flush()
+                print(log.read_text()[-1800:], file=sys.stderr)
+                raise
+            finally:
+                process.terminate()
+                try:
+                    process.wait(timeout=20)
+                except subprocess.TimeoutExpired:
+                    process.kill(); process.wait(timeout=5)
+
+
+if __name__ == "__main__":
+    main()

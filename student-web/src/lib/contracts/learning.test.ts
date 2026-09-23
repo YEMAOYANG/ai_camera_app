@@ -27,7 +27,8 @@ describe("student learning product contracts", () => {
     expect(learningProgressionSchema.parse(progression)).toEqual(progression);
     expect(learningProgressionSchema.safeParse({ ...progression, skillId: "", sequence: 0 }).success).toBe(true);
     expect(learningProgressionSchema.safeParse({ ...progression, sequence: -1 }).success).toBe(false);
-    expect(learningProgressionSchema.safeParse({ ...progression, granularity: "lesson" }).success).toBe(false);
+    expect(learningProgressionSchema.safeParse({ ...progression, granularity: "lesson", lessonId: "M1A01.01" }).success).toBe(true);
+    expect(learningProgressionSchema.safeParse({ ...progression, granularity: "unknown" }).success).toBe(false);
   });
 
   it("parses the exact backend library envelope and adds only safe defaults", () => {

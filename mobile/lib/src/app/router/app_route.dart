@@ -29,6 +29,7 @@ const profileSecurityPath = '/profile/security';
 const profileFamilyMembersPath = '/profile/family-members';
 const profileChildPath = '/profile/child';
 const profileStudentAccessPath = '/profile/child/student-access';
+const profileSchoolTextbooksPath = '/profile/child/textbooks';
 const studentAccessQrPath = '/student-access/scan';
 const profileContactsPath = '/profile/emergency-contacts';
 const profileDevicesPath = '/profile/devices';

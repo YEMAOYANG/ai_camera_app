@@ -13,6 +13,7 @@ import { LearningCourseDetail } from "@/features/learning/learning-course-detail
 import { LearningPractice } from "@/features/learning/learning-practice";
 import { LearningLibrary } from "@/features/learning/learning-library";
 import { LearningPath } from "@/features/learning/learning-path";
+import { LearningTextbooks } from "@/features/learning/learning-textbooks";
 
 export function StudentSessionGate({
   lessonTaskId,
@@ -24,7 +25,7 @@ export function StudentSessionGate({
 }: {
   lessonTaskId?: string;
   classroomMode?: "discover" | "openmaic";
-  learningView?: "library" | "course" | "practice" | "path";
+  learningView?: "library" | "course" | "practice" | "path" | "textbooks";
   practiceSessionId?: string;
   courseId?: string;
   courseVersion?: string;
@@ -119,6 +120,7 @@ export function StudentSessionGate({
   }
   if (learningView === "practice") return <LearningPractice student={student} sessionId={practiceSessionId} />;
   if (learningView === "path") return <LearningPath student={student} />;
+  if (learningView === "textbooks") return <LearningTextbooks student={student} />;
   if (learningView === "library") return <LearningLibrary student={student} />;
   return <StudentDashboard student={student} />;
 }

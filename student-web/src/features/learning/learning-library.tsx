@@ -180,6 +180,7 @@ export function LearningLibrary({
   return (
     <SpaceShell student={student} active="learning" className="space-library-page space-explore-library">
       <SpacePageHeading title="我的学习">
+        <Button asChild variant="secondary"><Link href="/learning/textbooks">学校教材<ArrowRight className="size-5" aria-hidden="true" /></Link></Button>
         <Button asChild variant="secondary"><Link href="/learning/path">查看学习路线<ArrowRight className="size-5" aria-hidden="true" /></Link></Button>
         <Button asChild variant="secondary"><Link href="/learning/practice">学过的内容，练一练<ArrowRight className="size-5" aria-hidden="true" /></Link></Button>
       </SpacePageHeading>

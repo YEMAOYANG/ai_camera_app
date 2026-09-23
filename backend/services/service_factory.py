@@ -590,6 +590,18 @@ def student_learning_service() -> StudentLearningService:
     return service
 
 
+def textbook_learning_service():
+    from repositories.textbook_repository import TextbookRepository
+    from services.textbook_learning_service import TextbookLearningService
+    service = current_app.extensions.get("mira_textbook_learning_service")
+    if service is None:
+        service = TextbookLearningService(TextbookRepository(Database(current_app.config["DATABASE_URL"])),
+            student_auth_service=student_auth_service(), profile_service=profile_service(),
+            student_learning_service=student_learning_service())
+        current_app.extensions["mira_textbook_learning_service"] = service
+    return service
+
+
 def student_learning_media_service() -> StudentLearningMediaService:
     service = current_app.extensions.get("mira_student_learning_media_service")
     if isinstance(service, StudentLearningMediaService):
