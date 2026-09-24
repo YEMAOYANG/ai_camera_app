@@ -24,6 +24,9 @@ from core.database import DatabaseConnection
 from core.errors import ApiError
 from repositories.textbook_repository import TextbookRepository
 from services.textbook_learning_service import TextbookLearningService
+from services.textbook_preview_service import TextbookPreviewService
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 
 class SocketDatabase:
@@ -54,6 +57,7 @@ def verify(socket):
     service = TextbookLearningService(repo)
     with db.transaction() as conn:
         conn.executescript((ROOT / "migrations/082_fixed_textbook_learning.sql").read_text())
+        conn.executescript((ROOT / "migrations/083_textbook_course_previews.sql").read_text())
         conn.execute("CREATE TABLE children (id VARCHAR(128) PRIMARY KEY, family_id VARCHAR(128), grade_code VARCHAR(32), grade_selection_revision INT)")
         conn.execute("INSERT INTO children VALUES ('isolated-child','isolated-family','primary_1',1)")
     m = json.loads((ROOT / "content/textbooks/pep-chinese-g1-upper.preview.v1.json").read_text())
@@ -90,9 +94,26 @@ def verify(socket):
     except pymysql.err.OperationalError as exc:
         assert exc.args[0] == 3819, exc
     assert prepared[0]["contentKey"] == generation_brief(m, "u1-l1")["contentKey"]
+    preview_manifest = json.loads((ROOT / "content/textbooks/revisions/pep-chinese-g1-upper.preview.v2.json").read_text())
+    service.import_manifest(preview_manifest)
+    job = SimpleNamespace(job_id="isolated-preview-job", status="running", step="generating_scenes", progress=30, scenes_count=None, classroom_id=None)
+    runtime = Mock(base_url="http://127.0.0.1:3100")
+    runtime.start_generation.return_value = job
+    runtime.get_generation_job.return_value = job
+    previews = TextbookPreviewService(repo, runtime)
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        reservations = list(pool.map(lambda _: previews.prepare(preview_manifest["editionId"], preview_manifest["revisionId"], "u1-l1"), range(4)))
+    assert len({r["previewKey"] for r in reservations}) == 1
+    preview_key = reservations[0]["previewKey"]
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(lambda _: previews.start(preview_key), range(4)))
+    assert runtime.start_generation.call_count == 1
+    assert previews.poll(preview_key)["runtimeJobId"] == job.job_id
     return {"migration": "passed", "concurrentImports": 4, "uniqueImportedRevision": 1,
             "concurrentPreparations": 4, "uniqueBuild": 1, "concurrentSelections": 4,
-            "successfulSelections": 1, "publicationCheckConstraint": "passed", "existingDatabaseTouched": False}
+            "successfulSelections": 1, "publicationCheckConstraint": "passed", "existingDatabaseTouched": False,
+            "concurrentPreviewStarts": 4, "previewDispatches": runtime.start_generation.call_count,
+            "realProviderDispatched": False}
 
 
 def main():

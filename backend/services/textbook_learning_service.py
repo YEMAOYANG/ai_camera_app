@@ -72,8 +72,18 @@ class TextbookLearningService:
             choices = self.repository.selections(conn, child, year, semester)
         selected = {(r["edition_id"], r["revision_id"]): r for r in choices}
         subject_revisions = {r["subject"]: int(r["selection_revision"]) for r in choices}
-        books = []
+        # A metadata correction is another revision of the same school book,
+        # not a second book in the picker. Preserve a parent's pinned revision;
+        # otherwise show the latest imported revision without rewriting history.
+        displayed = {}
         for row in rows:
+            previous = displayed.get(row["edition_id"])
+            priority = lambda r: ((r["edition_id"], r["revision_id"]) in selected,
+                                  r["imported_at"], r["revision_id"])
+            if previous is None or priority(row) > priority(previous):
+                displayed[row["edition_id"]] = row
+        books = []
+        for row in displayed.values():
             m = self.repository.manifest(row)
             choice = selected.get((row["edition_id"], row["revision_id"]))
             books.append({**self._book(m), "selected": choice is not None,

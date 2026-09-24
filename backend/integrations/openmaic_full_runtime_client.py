@@ -1811,6 +1811,16 @@ class OpenMaicFullRuntimeClient:
             )
         return job
 
+    def save_preview_classroom(self, classroom: Mapping[str, Any]) -> None:
+        """Persist an operator-owned draft after attaching durable audio assets."""
+        classroom_id = str(classroom.get("id") or "")
+        if (not _safe_identifier(classroom_id, max_length=255)
+                or classroom.get("stage", {}).get("id") != classroom_id):
+            raise OpenMaicFullRuntimeError("invalid_preview_classroom", "预览课堂编号无效", status_code=400)
+        payload = self._request_json("POST", "/api/classroom", {"stage": classroom["stage"], "scenes": classroom["scenes"]})
+        if payload.get("id") != classroom_id:
+            raise OpenMaicFullRuntimeError("preview_classroom_save_mismatch", "预览课堂保存编号不一致")
+
     def get_classroom(self, classroom_id: str) -> dict[str, Any]:
         if not _safe_identifier(classroom_id, max_length=255):
             raise OpenMaicFullRuntimeError(

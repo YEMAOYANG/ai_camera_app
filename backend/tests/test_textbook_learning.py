@@ -29,11 +29,11 @@ def sample(*, reviewed=False):
 
 
 class IsolatedDatabase:
-    def __init__(self):
+    def __init__(self, migrations=("082_fixed_textbook_learning.sql",)):
         self.raw = sqlite3.connect(":memory:")
         self.raw.row_factory = sqlite3.Row
         self.raw.execute("PRAGMA foreign_keys=ON")
-        source = (ROOT / "migrations/082_fixed_textbook_learning.sql").read_text()
+        source = "\n".join((ROOT / "migrations" / name).read_text() for name in migrations)
         for name, body in re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)\s*\((.*?)\)\s*ENGINE=[^;]+;", source, re.S):
             items, start, depth = [], 0, 0
             for i, char in enumerate(body):
@@ -143,6 +143,19 @@ class TextbookLearningTest(unittest.TestCase):
         changed["revisionId"] = "next-revision"; changed["gradeCode"] = "primary_2"
         self.assert_error("textbook_edition_conflict", lambda: self.service.import_manifest(changed))
 
+    def test_catalog_collapses_revisions_but_preserves_parent_selection(self):
+        newer = deepcopy(self.manifest)
+        newer["revisionId"] = "next-revision"
+        self.service.import_manifest(newer)
+        books = self.service.student_catalog("student-a", {})["books"]
+        self.assertEqual(len(books), 1)
+        self.assertEqual(books[0]["revisionId"], "next-revision")
+        self.choose()
+        pinned = self.service.student_catalog("student-a", {})["books"]
+        self.assertEqual(len(pinned), 1)
+        self.assertEqual(pinned[0]["revisionId"], self.manifest["revisionId"])
+        self.assertTrue(pinned[0]["selected"])
+
     def test_manifest_rejects_body_bad_source_dates_and_duplicate_sequence(self):
         variants = []
         for key, value in (("pdfContent", "原文"), ("subject", []), ("gradeCode", {})):
@@ -210,7 +223,7 @@ class TextbookLearningTest(unittest.TestCase):
         newer = deepcopy(self.manifest); newer["revisionId"] = "review-2"
         self.service.import_manifest(newer)
         catalog = self.service.parent_catalog("parent-a", "child-a")
-        self.assertEqual([b["selectionRevision"] for b in catalog["books"]], [1, 1])
+        self.assertEqual([b["selectionRevision"] for b in catalog["books"]], [1])
         self.choose(manifest=newer, expected=1)
         self.assertFalse(self.detail()["selected"])
         self.assertEqual(self.db.execute("SELECT COUNT(*) AS n FROM learning_textbook_selection_events").fetchone()["n"], 2)
