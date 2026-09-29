@@ -276,6 +276,7 @@ def learning_curriculum_preparation_service() -> LearningCurriculumPreparationSe
         return service
     service = LearningCurriculumPreparationService(
         current_app.config["DATABASE_URL"],
+        textbook_library_only=bool(current_app.config.get("LEARNING_TEXTBOOK_LIBRARY_ONLY", True)),
         course_library_enabled=bool(current_app.config.get("LEARNING_COURSE_LIBRARY_ENABLED", False)),
         auth_service=auth_service(),
         repository=learning_curriculum_preparation_repository(),
@@ -549,6 +550,7 @@ def learning_service() -> LearningService:
         dynamic_generation_service=(
             dynamic_learning_course_generation_service()
             if current_app.config.get("LEARNING_DYNAMIC_GENERATION_ENABLED")
+            and not current_app.config.get("LEARNING_TEXTBOOK_LIBRARY_ONLY", True)
             else None
         ),
         dynamic_pool_target=int(
@@ -573,6 +575,7 @@ def student_learning_service() -> StudentLearningService:
         dynamic_generation_service=(
             dynamic_learning_course_generation_service()
             if current_app.config.get("LEARNING_DYNAMIC_GENERATION_ENABLED")
+            and not current_app.config.get("LEARNING_TEXTBOOK_LIBRARY_ONLY", True)
             else None
         ),
         dynamic_pool_target=int(
@@ -590,6 +593,12 @@ def student_learning_service() -> StudentLearningService:
     return service
 
 
+def student_textbook_access_service():
+    from services.student_textbook_access_service import StudentTextbookAccessService
+    return StudentTextbookAccessService(Database(current_app.config["DATABASE_URL"]),
+                                       student_auth_service=student_auth_service())
+
+
 def textbook_learning_service():
     from repositories.textbook_repository import TextbookRepository
     from services.textbook_learning_service import TextbookLearningService
@@ -599,6 +608,19 @@ def textbook_learning_service():
             student_auth_service=student_auth_service(), profile_service=profile_service(),
             student_learning_service=student_learning_service())
         current_app.extensions["mira_textbook_learning_service"] = service
+    return service
+
+
+def textbook_classroom_service():
+    from repositories.textbook_repository import TextbookRepository
+    from services.textbook_classroom_service import TextbookClassroomService
+    service = current_app.extensions.get('mira_textbook_classroom_service')
+    if service is None:
+        service = TextbookClassroomService(TextbookRepository(Database(current_app.config['DATABASE_URL'])),
+            student_auth=student_auth_service(), signing_key=current_app.config['STUDENT_AUTH_PEPPER'],
+            public_url=current_app.config['OPENMAIC_FULL_RUNTIME_PUBLIC_URL'],
+            budget_service=learning_budget_service())
+        current_app.extensions['mira_textbook_classroom_service'] = service
     return service
 
 
@@ -708,6 +730,7 @@ def openmaic_full_runtime_service() -> OpenMaicFullRuntimeService:
     )
     service = OpenMaicFullRuntimeService(
         current_app.config["DATABASE_URL"],
+        textbook_library_only=bool(current_app.config.get("LEARNING_TEXTBOOK_LIBRARY_ONLY", True)),
         student_auth_service=student_auth_service(),
         client=client,
         paid_budget_service=learning_budget_service(),

@@ -46,6 +46,8 @@ def _wait_seconds_after_tick(result: object, interval: int) -> int:
 
 
 def _preflight() -> None:
+    if app.config.get("LEARNING_TEXTBOOK_LIBRARY_ONLY", True):
+        raise RuntimeError("Textbook library mode disables the legacy curriculum worker; prepare textbook courses through the operator workflow.")
     projection = learning_curriculum_preparation_config_projection(app)
     if projection is None:
         raise RuntimeError("curriculum worker configuration contract is invalid")

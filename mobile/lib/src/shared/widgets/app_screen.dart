@@ -1,11 +1,10 @@
-import 'dart:ui';
-
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:warm_sight/src/core/theme/app_system_ui.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/shared/widgets/app_background.dart';
+import 'package:warm_sight/src/shared/widgets/app_glass_surface.dart';
 
 const _refreshIndicatorTextStyle = TextStyle(
   color: Color(0xFF9AA6B6),
@@ -28,6 +27,7 @@ class AppScreen extends StatelessWidget {
     this.backLabel = '返回',
     this.fixedHeader = true,
     this.showHeader = true,
+    this.plainBackground = false,
     this.reserveBottomNavigation = true,
     this.avoidFooterOverlap = false,
     this.pinnedHeaderHeight = AppChrome.pinnedHeaderHeight,
@@ -54,6 +54,7 @@ class AppScreen extends StatelessWidget {
   final String backLabel;
   final bool fixedHeader;
   final bool showHeader;
+  final bool plainBackground;
   final bool reserveBottomNavigation;
   final bool avoidFooterOverlap;
   final double pinnedHeaderHeight;
@@ -111,7 +112,8 @@ class AppScreen extends StatelessWidget {
         backgroundColor: AppColors.appBackground,
         body: Stack(
           children: [
-            const Positioned.fill(child: AppScreenBackground()),
+            if (!plainBackground)
+              const Positioned.fill(child: AppScreenBackground()),
             Positioned(
               top: scrollTopInset,
               left: 0,
@@ -364,85 +366,69 @@ class _AppPinnedHeader extends StatelessWidget {
       left: 0,
       right: 0,
       top: 0,
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: AppColors.appBackground.withValues(alpha: 0.78),
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.ink.withValues(alpha: 0.07),
-                  width: 0.6,
-                ),
-              ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.pageHorizontal,
-                safeTop,
-                AppSpacing.pageHorizontal,
-                0,
-              ),
-              child: SizedBox(
-                height: headerHeight,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (hasBack) ...[
-                      AppIconButton(
-                        icon: Icons.arrow_back_ios_new,
-                        label: backLabel,
-                        onTap: onBack!,
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-                    Expanded(
-                      child:
-                          headerContent ??
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: AppColors.ink,
-                                  fontFamily: AppTypography.systemFont,
-                                  fontSize: hasBack ? 24 : 28,
-                                  fontWeight: FontWeight.w800,
-                                  height: hasBack ? 1.14 : 1.12,
-                                  letterSpacing: 0,
-                                ),
-                              ),
-                              if (subtitle != null) ...[
-                                const SizedBox(height: 7),
-                                Text(
-                                  subtitle!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: AppColors.muted,
-                                    fontFamily: AppTypography.systemFont,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.35,
-                                    letterSpacing: 0,
-                                  ),
-                                ),
-                              ],
-                            ],
+      child: AppGlassSurface(
+        style: AppGlassStyle.header,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.pageHorizontal,
+            safeTop,
+            AppSpacing.pageHorizontal,
+            0,
+          ),
+          child: SizedBox(
+            height: headerHeight,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (hasBack) ...[
+                  AppIconButton(
+                    icon: Icons.arrow_back_ios_new,
+                    label: backLabel,
+                    onTap: onBack!,
+                  ),
+                  const SizedBox(width: 12),
+                ],
+                Expanded(
+                  child:
+                      headerContent ??
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.ink,
+                              fontFamily: AppTypography.systemFont,
+                              fontSize: hasBack ? 24 : 28,
+                              fontWeight: FontWeight.w700,
+                              height: hasBack ? 1.14 : 1.12,
+                              letterSpacing: 0,
+                            ),
                           ),
-                    ),
-                    if (trailing != null) ...[
-                      const SizedBox(width: 10),
-                      trailing!,
-                    ],
-                  ],
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 7),
+                            Text(
+                              subtitle!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: AppColors.mutedStrong,
+                                fontFamily: AppTypography.systemFont,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                height: 1.35,
+                                letterSpacing: 0,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                 ),
-              ),
+                if (trailing != null) ...[const SizedBox(width: 10), trailing!],
+              ],
             ),
           ),
         ),
@@ -465,32 +451,19 @@ class AppIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Semantics(
-        button: true,
-        label: label,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.surfaceSoft,
-            borderRadius: BorderRadius.circular(AppRadii.control),
-            border: Border.all(color: AppColors.borderSoft),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF4C6685).withValues(alpha: 0.035),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: SizedBox(
-            width: AppControls.iconButtonSize,
-            height: AppControls.iconButtonSize,
-            child: Center(child: Icon(icon, color: AppColors.ink, size: 18)),
-          ),
+    return IconButton(
+      tooltip: label,
+      onPressed: onTap,
+      style: IconButton.styleFrom(
+        fixedSize: const Size.square(AppControls.iconButtonSize),
+        backgroundColor: AppColors.surfaceElevated,
+        foregroundColor: AppColors.ink,
+        side: const BorderSide(color: AppColors.borderSoft),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.control),
         ),
       ),
+      icon: Icon(icon, size: 18),
     );
   }
 }

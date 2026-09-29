@@ -6,6 +6,7 @@ import { gzipSync } from "node:zlib";
 
 import {
   authorizeRuntimeRequest,
+  authorizeTextbookRequest,
   createGateway,
   injectRuntimeAudioBindings,
   mergeContentSecurityPolicy,
@@ -14,12 +15,174 @@ import {
 } from "../src/server.mjs";
 
 const servers = [];
+
+test('fixed textbook permits only its published snapshot and exact archived media', () => {
+  const runtime = { purpose: 'fixed_textbook', classroomId: 'tbpub_one',
+    media: [{ path: '/api/classroom-media/tbpub_one/audio/one.wav' }] };
+  const allowed = (method, path) => authorizeTextbookRequest({ method }, new URL(path, 'https://classroom.example'), runtime).allowed;
+  assert.equal(allowed('GET', '/api/classroom?id=tbpub_one'), true);
+  assert.equal(allowed('GET', '/api/classroom?id=tbpub_other'), false);
+  assert.equal(allowed('GET', '/api/classroom?id=tbpub_one&id=tbpub_other'), false);
+  assert.equal(allowed('GET', '/api/classroom-media/tbpub_one/audio/one.wav'), true);
+  assert.equal(allowed('GET', '/api/classroom-media/tbpub_one/audio/not-published.wav'), false);
+  assert.equal(allowed('GET', '/api/classroom-media/tbpub_other/audio/one.wav'), false);
+  assert.equal(allowed('POST', '/mira/textbook-quiz'), true);
+  assert.equal(allowed('GET', '/mira/textbook-play'), true);
+  assert.equal(allowed('POST', '/mira/textbook-play'), true);
+  assert.equal(allowed('DELETE', '/mira/textbook-play'), false);
+  assert.equal(allowed('GET', '/mira/textbook-audio/' + 'a'.repeat(24) + '.wav'), true);
+  assert.equal(allowed('GET', '/mira/textbook-audio/other.wav'), false);
+  assert.equal(allowed('POST', '/mira/textbook-audio/' + 'a'.repeat(24) + '.wav'), false);
+  assert.equal(allowed('GET', '/mira/textbook-audio/' + 'a'.repeat(24) + '.wav?child=other'), false);
+  assert.equal(allowed('GET', '/mira/textbook-play?session=other'), false);
+  for (const path of ['/api/chat', '/api/chat/pi', '/api/generate/tts', '/api/transcription']) {
+    assert.equal(allowed('POST', path), true);
+    assert.equal(allowed('GET', path), false);
+    assert.equal(allowed('POST', path + '?id=other'), false);
+  }
+  assert.equal(allowed('POST', '/api/generate-classroom'), false);
+  assert.equal(allowed('POST', '/api/classroom'), false);
+  assert.equal(allowed('GET', '/settings'), false);
+});
 const legacyBrandAssetPaths = [
   "/logo-horizontal.png",
   "/openmaic-mark.png",
   "/openmaic-favicon.ico",
   "/openmaic-apple-icon.png",
 ];
+
+test('fixed textbook delivery uses private backend snapshot, verified media and server grading', async () => {
+  const classroomId = 'tbpub_' + 'a'.repeat(24);
+  const mediaPath = `/api/classroom-media/${classroomId}/audio/frozen.wav`;
+  const frozenBytes = Buffer.from('archived-audio');
+  let corrupt = false;
+  let submitted;
+  let paidCalls = 0;
+  const backend = await listen(http.createServer(async (request, response) => {
+    assert.equal(request.headers['x-mira-internal-token'], 'test-internal-token');
+    if (request.url.endsWith('/exchange')) {
+      assert.equal((await jsonBody(request)).ticket, 'tbpt_reviewed-release');
+      return reply(response, { ok: true, runtimeToken: 'tbpr_student-session', classroomId, expiresAt: Date.now() + 60000 });
+    }
+    if (request.url.endsWith('/validate')) {
+      assert.equal((await jsonBody(request)).runtimeToken, 'tbpr_student-session');
+      return reply(response, { ok: true, purpose: 'fixed_textbook', classroomId, runtimeSessionId: 'session',
+        learningSessionId: 'session', expiresAt: Date.now() + 60000,
+        media: [{ path: mediaPath, sha256: createHash('sha256').update(frozenBytes).digest('hex'),
+          byteSize: frozenBytes.length, mimeType: 'audio/wav' }] });
+    }
+    assert.equal(request.headers['x-mira-textbook-token'], 'tbpr_student-session');
+    if (request.url.endsWith('/classroom')) return reply(response, { success: true, classroom: { id: classroomId,
+      scenes: [{ type: 'interactive', content: { html: `<audio src="${mediaPath}"></audio>` } }] } });
+    if (request.url.endsWith('/quiz')) {
+      submitted = await jsonBody(request);
+      return reply(response, { ok: true, result: { score: 5 } });
+    }
+    if (request.url.endsWith('/play-audio/' + 'b'.repeat(24) + '.wav')) {
+      response.writeHead(200, { 'Content-Type': 'audio/wav' });
+      return response.end(Buffer.from('authored-journey-audio'));
+    }
+    if (request.url.endsWith('/play')) {
+      if (request.method === 'POST') submitted = await jsonBody(request);
+      return reply(response, { ok: true, version: 1, games: { phase: 'hunt', index: 1 } });
+    }
+    response.writeHead(404).end();
+  }));
+  const upstream = await listen(http.createServer((request, response) => {
+    if (request.url === mediaPath) return response.end(corrupt ? Buffer.from('changed') : frozenBytes);
+    paidCalls++;
+    response.writeHead(500).end();
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  const launch = await fetch(`${gateway}/mira/textbook-launch?ticket=tbpt_reviewed-release`, { redirect: 'manual' });
+  assert.equal(launch.status, 303);
+  assert.equal(launch.headers.get('location'), `/classroom/${classroomId}?mira=1&textbook=1`);
+  const cookie = launch.headers.getSetCookie().map(item => item.split(';')[0]).join('; ');
+  const headers = { cookie, referer: `http://runtime.test/classroom/${classroomId}?mira=1&textbook=1` };
+  const snapshot = await fetch(`${gateway}/api/classroom?id=${classroomId}`, { headers });
+  assert.equal(snapshot.status, 200);
+  const classroom = (await snapshot.json()).classroom;
+  assert.equal(classroom.id, classroomId);
+  assert.equal(classroom.scenes[0].content.html, `<audio src="data:audio/wav;base64,${frozenBytes.toString('base64')}"></audio>`);
+  assert.deepEqual(Buffer.from(await (await fetch(gateway + mediaPath, { headers })).arrayBuffer()), frozenBytes);
+  const quiz = await fetch(`${gateway}/mira/textbook-quiz`, { method: 'POST', headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify({ answers: { q1: 'A' } }) });
+  assert.equal(quiz.status, 200);
+  assert.deepEqual(submitted, { answers: { q1: 'A' } });
+  assert.equal((await quiz.json()).result.score, 5);
+  const clip = await fetch(`${gateway}/mira/textbook-audio/${'b'.repeat(24)}.wav`, { headers });
+  assert.equal(clip.status, 200);
+  assert.equal(clip.headers.get('content-type'), 'audio/wav');
+  assert.equal(await clip.text(), 'authored-journey-audio');
+  assert.equal((await fetch(`${gateway}/mira/textbook-audio/${'b'.repeat(24)}.wav`)).status, 401);
+  assert.equal((await fetch(`${gateway}/mira/textbook-audio/${'c'.repeat(24)}.wav`, { headers })).status, 404);
+  const progress = await fetch(`${gateway}/mira/textbook-play`, { headers });
+  assert.equal((await progress.json()).games.index, 1);
+  const action = { section: 'games', version: 0, action: 'answer', choice: 'sky' };
+  const play = await fetch(`${gateway}/mira/textbook-play`, { method: 'POST',
+    headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify(action) });
+  assert.equal(play.status, 200);
+  assert.deepEqual(submitted, action);
+  assert.equal((await fetch(`${gateway}/mira/textbook-play`)).status, 401);
+  assert.equal((await fetch(`${gateway}/api/generate-classroom`, { method: 'POST', headers })).status, 403);
+  assert.equal((await fetch(gateway + mediaPath)).status, 401);
+  corrupt = true;
+  assert.equal((await fetch(gateway + mediaPath, { headers })).status, 502);
+  assert.equal(paidCalls, 0);
+});
+
+test('fixed textbook discussions and speech retain native endpoints with session-bound admission', async () => {
+  const classroomId = 'tbpub_' + 'b'.repeat(24);
+  let admitted = 0;
+  let forwarded = 0;
+  let reject = false;
+  const backend = await listen(http.createServer(async (request, response) => {
+    if (request.url.endsWith('/validate')) return reply(response, {
+      ok: true, purpose: 'fixed_textbook', classroomId, runtimeSessionId: 'session',
+      learningSessionId: 'session', expiresAt: Date.now() + 60000, media: [],
+    });
+    assert.equal(request.url, '/internal/learning/textbooks/runtime/paid-call');
+    assert.equal(request.headers['x-mira-textbook-token'], 'tbpr_student-session');
+    admitted++;
+    const body = await jsonBody(request);
+    assert.equal(body.request.apiKey, undefined);
+    if (reject) {
+      response.writeHead(401, { 'content-type': 'application/json' });
+      return response.end(JSON.stringify({ error: 'textbook_session_invalid' }));
+    }
+    return reply(response, {
+      ok: true, purpose: 'required_teaching',
+      paidBudget: { schemaVersion: 'mira.learning.paid-budget-binding.v1', required: true, authorizationId: 'c'.repeat(64) },
+      ...(body.path.startsWith('/api/chat') ? { request: { messages: [], config: { agentIds: ['teacher', 'default-3'] } } } : {}),
+    });
+  }));
+  const upstream = await listen(http.createServer(async (request, response) => {
+    forwarded++;
+    assert.equal(request.headers['x-mira-paid-budget-required'], '1');
+    assert.equal(request.headers['x-mira-paid-budget-authorization'], 'c'.repeat(64));
+    assert.equal(request.headers['x-mira-textbook-token'], undefined);
+    assert.equal(request.headers['x-mira-learning-session'], 'session');
+    if (request.url.startsWith('/api/chat')) {
+      assert.deepEqual((await jsonBody(request)).config.agentIds, ['teacher', 'default-3']);
+      response.writeHead(200, { 'Content-Type': 'text/event-stream' });
+      return response.end('data: {"type":"text","agentId":"default-3","text":"一起讨论"}\n\n');
+    }
+    return reply(response, { success: true });
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  const headers = { cookie: 'mira_openmaic_runtime=tbpr_student-session',
+    referer: `http://runtime.test/classroom/${classroomId}?mira=1&textbook=1`, 'content-type': 'application/json' };
+  for (const path of ['/api/chat', '/api/chat/pi', '/api/generate/tts', '/api/transcription']) {
+    const result = await fetch(gateway + path, { method: 'POST', headers, body: JSON.stringify({ apiKey: 'untrusted', text: '你好' }) });
+    assert.equal(result.status, 200);
+    if (path.startsWith('/api/chat')) assert.match(await result.text(), /一起讨论/);
+  }
+  assert.equal(admitted, 4);
+  assert.equal(forwarded, 4);
+  reject = true;
+  const rejected = await fetch(gateway + '/api/chat/pi', { method: 'POST', headers, body: '{}' });
+  assert.equal(rejected.status, 401);
+  assert.equal(forwarded, 4);
+});
 
 test("production gateway rejects insecure public origins", () => {
   const productionConfig = {
@@ -1187,7 +1350,7 @@ test("formal classroom JSON is assembled with session-bound audio and same-origi
         headers: { cookie },
       })
     ).status,
-    404,
+    401, // No credential scoped to classroom-b; reject before looking up its content.
   );
   assert.equal(
     (

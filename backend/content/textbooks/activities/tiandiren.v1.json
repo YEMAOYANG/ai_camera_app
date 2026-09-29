@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "mira.textbook.activity-plan.v1",
+  "id": "tiandiren-native-v1",
+  "releaseSha256": "aea67eab9fabe38184945a19fe671fade31dc4ad9646116aefd81f4874de788f",
+  "sceneIds": {
+    "games": "scene_659k_ZlS7f",
+    "challenge": "scene_kUNakhs7WU"
+  },
+  "skills": {
+    "sky": {
+      "word": "天",
+      "name": "天空",
+      "explanation": "头顶上，白云和飞鸟所在的天空，就是天。",
+      "hints": [
+        "抬头找一找，白云在哪里？",
+        "看看图上方的蓝色天空。"
+      ],
+      "zones": [
+        "sky"
+      ],
+      "learnAudio": [
+        "action_p484C5iR",
+        "action_-ryZUHAg"
+      ]
+    },
+    "earth": {
+      "word": "地",
+      "name": "地面",
+      "explanation": "脚下的路、泥土和草地，都是地。",
+      "hints": [
+        "看看小朋友的脚下。",
+        "沿着脚下的小路找一找。"
+      ],
+      "zones": [
+        "earth"
+      ],
+      "learnAudio": [
+        "action_n-PO9SgE",
+        "action_MEoguc1W"
+      ]
+    },
+    "person": {
+      "word": "人",
+      "name": "人物",
+      "explanation": "小朋友是人，老师也是人。",
+      "hints": [
+        "谁有头、身体、手和脚？",
+        "点一位小朋友，三位都可以。"
+      ],
+      "zones": [
+        "coral",
+        "teal",
+        "yellow"
+      ],
+      "learnAudio": [
+        "action_JLPJil6-",
+        "action_qvx86PyG"
+      ]
+    },
+    "me": {
+      "word": "我",
+      "name": "说话的人",
+      "explanation": "谁在说话，谁就用我称呼自己。",
+      "hints": [
+        "先找出正在说话的人。",
+        "金色话筒旁边的人，用我称呼自己。"
+      ],
+      "learnAudio": [
+        "action_Ym-sYsq_"
+      ]
+    },
+    "you": {
+      "word": "你",
+      "name": "正在听的人",
+      "explanation": "说话的人用你称呼正在和自己说话的人。",
+      "hints": [
+        "先看谁在说，再看对方。",
+        "红衣女孩和蓝衣男孩正在对话，找听话的那一位。"
+      ],
+      "learnAudio": [
+        "action_NxFIJVKR"
+      ]
+    },
+    "he": {
+      "word": "他",
+      "name": "谈到的男孩",
+      "explanation": "他们谈到旁边的男孩，用他来称呼。",
+      "hints": [
+        "他们谈到的是旁边的哪位男孩？",
+        "找正在旁边挥手的黄衣男孩。"
+      ],
+      "learnAudio": [
+        "action_Ajbzw3Kz"
+      ]
+    }
+  },
+  "quizSkills": [
+    "sky",
+    "earth",
+    "person",
+    "you",
+    "me",
+    "he"
+  ],
+  "roles": [
+    {
+      "speaker": "teal",
+      "skill": "me"
+    },
+    {
+      "speaker": "teal",
+      "skill": "you"
+    },
+    {
+      "speaker": "teal",
+      "skill": "he"
+    },
+    {
+      "speaker": "coral",
+      "skill": "me"
+    },
+    {
+      "speaker": "coral",
+      "skill": "you"
+    },
+    {
+      "speaker": "coral",
+      "skill": "he"
+    }
+  ],
+  "transfer": [
+    {
+      "skill": "earth"
+    },
+    {
+      "skill": "me",
+      "speaker": "coral"
+    },
+    {
+      "skill": "sky"
+    },
+    {
+      "skill": "you",
+      "speaker": "coral"
+    },
+    {
+      "skill": "person"
+    },
+    {
+      "skill": "he",
+      "speaker": "teal"
+    }
+  ],
+  "quizSpeakers": [
+    null,
+    null,
+    null,
+    "teal",
+    "coral",
+    "coral"
+  ],
+  "roleSwitchAudio": "action_UxyXLsT_"
+}

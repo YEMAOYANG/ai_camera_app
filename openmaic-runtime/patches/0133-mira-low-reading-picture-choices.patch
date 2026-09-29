@@ -1,0 +1,988 @@
+diff --git a/components/scene-renderers/textbook-play.tsx b/components/scene-renderers/textbook-play.tsx
+--- a/components/scene-renderers/textbook-play.tsx
++++ b/components/scene-renderers/textbook-play.tsx
+@@ -5,10 +5,21 @@
+ import { useStageStore } from '@/lib/store';
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import styles from './textbook-play.module.css';
++import { PictureChoice, PicturePrompt, type PictureScene } from './textbook-picture-prompt';
+ 
+ type Section = 'games' | 'challenge';
+ type View = {
+-  phase: 'diagnostic' | 'hunt' | 'roles' | 'quiz' | 'repair' | 'transfer' | 'probe' | 'locked' | 'break' | 'done';
++  phase:
++    | 'diagnostic'
++    | 'hunt'
++    | 'roles'
++    | 'quiz'
++    | 'repair'
++    | 'transfer'
++    | 'probe'
++    | 'locked'
++    | 'break'
++    | 'done';
+   index: number;
+   total?: number;
+   done: boolean;
+@@ -16,7 +27,9 @@
+   prompt?: string;
+   word?: string;
+   speaker?: string;
+-  options?: { value: string; label: string }[];
++  options?: { value: string; label: string; picture: string }[];
++  visual?: PictureScene;
++  selectedChoice?: string;
+   audio?: string[];
+   hintAudio?: string[];
+   hintLevel?: number;
+@@ -35,9 +48,17 @@
+   games: View;
+   challenge: View;
+   journey?: {
+-    status: string; parentNeeded: boolean; nextStep: string; independentBefore: number;
+-    verifiedCount: number; remainingSkills: string[]; reviewDueAt: number | null;
+-    reviewDue: boolean; reviewLevel: number; diagnoses: string[]; skippedCount: number;
++    status: string;
++    parentNeeded: boolean;
++    nextStep: string;
++    independentBefore: number;
++    verifiedCount: number;
++    remainingSkills: string[];
++    reviewDueAt: number | null;
++    reviewDue: boolean;
++    reviewLevel: number;
++    diagnoses: string[];
++    skippedCount: number;
+   };
+   evidence: {
+     answered: number;
+@@ -80,6 +101,7 @@
+   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
+   const picture = useRef<HTMLDivElement>(null);
+   const surface = useRef<HTMLElement>(null);
++  const nextAction = useRef<HTMLButtonElement>(null);
+   const dragOrigin = useRef<{ x: number; y: number } | null>(null);
+   const player = useRef<HTMLAudioElement | null>(null);
+   const soundRun = useRef(0);
+@@ -90,6 +112,9 @@
+   useEffect(() => {
+     surface.current?.scrollTo({ top: 0, behavior: 'instant' });
+   }, [view?.phase, view?.index]);
++  useEffect(() => {
++    if (view?.feedback?.canNext) nextAction.current?.scrollIntoView({ block: 'nearest' });
++  }, [view?.phase, view?.index, view?.feedback?.canNext]);
+ 
+   const silence = useCallback(() => {
+     soundRun.current += 1;
+@@ -142,7 +167,9 @@
+         return;
+       }
+       if (
+-        !/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(wav|mp3|ogg)$/.test(src) &&
++        !/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(wav|mp3|ogg)$/.test(
++          src,
++        ) &&
+         !/^\/mira\/textbook-audio\/[a-f0-9]{24}\.wav$/.test(src)
+       )
+         return;
+@@ -186,10 +213,12 @@
+       }
+       if (!alive.current) return;
+       setSnapshot(payload);
+-      setChosen('');
++      if (!['answer', 'hint', 'adult'].includes(action)) setChosen('');
+       if (action === 'hint') listen(payload[section].hintAudio);
+-      else if (action === 'answer' && payload[section].feedback?.audio) listen(payload[section].feedback.audio);
+-      else if (['next', 'review', 'resume', 'speaker'].includes(action)) listen(payload[section].audio);
++      else if (action === 'answer' && payload[section].feedback?.audio)
++        listen(payload[section].feedback.audio);
++      else if (['next', 'review', 'resume', 'speaker'].includes(action))
++        listen(payload[section].audio);
+       if (payload.challenge.done && events) {
+         const scenes = [...useStageStore.getState().scenes].sort((a, b) => a.order - b.order);
+         const last = scenes.at(-1);
+@@ -213,9 +242,10 @@
+     const store = useStageStore.getState();
+     const scenes = [...store.scenes].sort((a, b) => a.order - b.order);
+     const index = scenes.findIndex((s) => s.id === sceneId);
+-    const target = section === 'games' && snapshot?.journey
+-      ? scenes.find(s => s.miraActivity?.section === 'challenge')
+-      : scenes[index + 1];
++    const target =
++      section === 'games' && snapshot?.journey
++        ? scenes.find((s) => s.miraActivity?.section === 'challenge')
++        : scenes[index + 1];
+     if (target) store.setCurrentSceneId(target.id);
+   }
+ 
+@@ -281,16 +311,30 @@
+           </header>
+           {view.phase === 'locked' || view.phase === 'break' ? (
+             <div className={styles.done}>
+-              <h3>{view.phase === 'locked' ? '先做几个小任务，再来挑战。' : '已经认真试过啦，歇一歇再回来。'}</h3>
+-              <p>{view.phase === 'break' ? '老师会记住卡住的地方，也会告诉家长该帮哪一步。' : '会的字会自动缩短，没认熟的字一起练。'}</p>
+-              <button className={styles.primary} disabled={busy} onClick={() => {
+-                if (view.phase === 'break') void act('resume');
+-                else {
+-                  const store = useStageStore.getState();
+-                  const first = store.scenes.find(s => s.miraActivity?.section === 'games');
+-                  if (first) store.setCurrentSceneId(first.id);
+-                }
+-              }}>{view.phase === 'break' ? '休息好了，再试一次' : '开始小任务'}</button>
++              <h3>
++                {view.phase === 'locked'
++                  ? '先做几个小任务，再来挑战。'
++                  : '已经认真试过啦，歇一歇再回来。'}
++              </h3>
++              <p>
++                {view.phase === 'break'
++                  ? '老师会记住卡住的地方，也会告诉家长该帮哪一步。'
++                  : '会的字会自动缩短，没认熟的字一起练。'}
++              </p>
++              <button
++                className={styles.primary}
++                disabled={busy}
++                onClick={() => {
++                  if (view.phase === 'break') void act('resume');
++                  else {
++                    const store = useStageStore.getState();
++                    const first = store.scenes.find((s) => s.miraActivity?.section === 'games');
++                    if (first) store.setCurrentSceneId(first.id);
++                  }
++                }}
++              >
++                {view.phase === 'break' ? '休息好了，再试一次' : '开始小任务'}
++              </button>
+             </div>
+           ) : view.done ? (
+             <div className={styles.done}>
+@@ -298,7 +342,11 @@
+                 <Star size={44} aria-hidden />
+               </div>
+               <h3>
+-                {section === 'games' ? `已会的 ${snapshot.journey?.skippedCount ?? 0} 个字，少练一点！` : snapshot.journey?.status === 'retained' ? '隔了几天，也记得！' : '换了场景，你也会啦！'}
++                {section === 'games'
++                  ? `已会的 ${snapshot.journey?.skippedCount ?? 0} 个字，少练一点！`
++                  : snapshot.journey?.status === 'retained'
++                    ? '隔了几天，也记得！'
++                    : '换了场景，你也会啦！'}
+               </h3>
+               {section === 'challenge' && (
+                 <>
+@@ -306,8 +354,7 @@
+                     前测自己答对 <strong>{snapshot.evidence.independent} / 6</strong> 题
+                   </p>
+                   <p>
+-                    新情境，独立完成 <strong>{snapshot.evidence.transferIndependent} / 6</strong>{' '}
+-                    题
++                    新情境，独立完成 <strong>{snapshot.evidence.transferIndependent} / 6</strong> 题
+                   </p>
+                   <details className={styles.evidence}>
+                     <summary>给家长的学习记录</summary>
+@@ -320,15 +367,32 @@
+                         ? `课内已安排再练：${snapshot.evidence.practiceSkills.join('、')}。`
+                         : '本次选择题均独立答对。'}
+                     </p>
+-                    <p>{snapshot.journey?.nextStep}
+-                      {snapshot.journey?.diagnoses.map(text => <span key={text} className={styles.recordLine}>{text}</span>)}
+-                      <span className={styles.recordLine}>这里记录识字与情境理解，未评价朗读和书写。</span></p>
++                    <p>
++                      {snapshot.journey?.nextStep}
++                      {snapshot.journey?.diagnoses.map((text) => (
++                        <span key={text} className={styles.recordLine}>
++                          {text}
++                        </span>
++                      ))}
++                      <span className={styles.recordLine}>
++                        这里记录图片支持下的情境理解，不等同于独立识字；未评价朗读和书写。
++                      </span>
++                    </p>
+                   </details>
+                 </>
+               )}
+-              {section === 'challenge' && snapshot.journey?.reviewDueAt && <p>
+-                下次短复习：{new Date(snapshot.journey.reviewDueAt).toLocaleString('zh-CN', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Shanghai' })}
+-              </p>}
++              {section === 'challenge' && snapshot.journey?.reviewDueAt && (
++                <p>
++                  下次短复习：
++                  {new Date(snapshot.journey.reviewDueAt).toLocaleString('zh-CN', {
++                    month: 'long',
++                    day: 'numeric',
++                    hour: '2-digit',
++                    minute: '2-digit',
++                    timeZone: 'Asia/Shanghai',
++                  })}
++                </p>
++              )}
+               <div className={styles.actions}>
+                 {section === 'games' && (
+                   <button
+@@ -340,15 +404,34 @@
+                     再玩一次
+                   </button>
+                 )}
+-                {section === 'games' ? <button onClick={nextScene} className={styles.primary}>
+-                  换个场景试试<ArrowRight size={20} />
+-                </button> : snapshot.journey?.reviewDue ? <button disabled={busy} onClick={() => void act('review')} className={styles.primary}>
+-                  开始今天的短复习<ArrowRight size={20} />
+-                </button> : <a href="#" className={styles.primary} onClick={event => {
+-                  event.preventDefault();
+-                  if (window.parent !== window) window.parent.postMessage({ type: 'mira.textbook.close' }, '*');
+-                  else window.history.back();
+-                }}>今天先到这里</a>}
++                {section === 'games' ? (
++                  <button onClick={nextScene} className={styles.primary}>
++                    换个场景试试
++                    <ArrowRight size={20} />
++                  </button>
++                ) : snapshot.journey?.reviewDue ? (
++                  <button
++                    disabled={busy}
++                    onClick={() => void act('review')}
++                    className={styles.primary}
++                  >
++                    开始今天的短复习
++                    <ArrowRight size={20} />
++                  </button>
++                ) : (
++                  <a
++                    href="#"
++                    className={styles.primary}
++                    onClick={(event) => {
++                      event.preventDefault();
++                      if (window.parent !== window)
++                        window.parent.postMessage({ type: 'mira.textbook.close' }, '*');
++                      else window.history.back();
++                    }}
++                  >
++                    今天先到这里
++                  </a>
++                )}
+               </div>
+             </div>
+           ) : (
+@@ -399,11 +482,12 @@
+                   </div>
+                 )}
+               </div>
+-              {view.options && <div className={styles.contextStage} aria-label={view.context || '先试一试'}>
+-                <span className={styles.contextName}>{view.context || '认识六个字'}</span>
+-                <div className={styles.wordConstellation} aria-hidden>{['天', '地', '人', '你', '我', '他'].map((word, index) => <span key={word} data-lit={index < (snapshot.journey?.verifiedCount ?? 0)}>{word}</span>)}</div>
+-                <p>{view.phase === 'diagnostic' ? '先听题，选一选。会的少学一点。' : '换了一个地方，还能认出来吗？'}</p>
+-              </div>}
++              {view.options && view.visual && (
++                <div className={styles.contextStage}>
++                  <PicturePrompt scene={view.visual} label={view.prompt || '看图听题'} />
++                  <span className={styles.contextName}>{view.context || '看图听一听'}</span>
++                </div>
++              )}
+               <div className={styles.task}>
+                 {view.speaker && (
+                   <p className={styles.context}>
+@@ -411,28 +495,42 @@
+                     {view.speaker === 'teal' ? '红衣女孩' : '蓝衣男孩'}聊天。
+                   </p>
+                 )}
+-                {view.speaker && !view.options && <button className={styles.listen} disabled={frozen} onClick={() => void act('speaker', view.speaker === 'teal' ? 'coral' : 'teal')}><Mic size={20} />换个人说话</button>}
+-                <h3>{view.prompt}</h3>
++                {view.speaker && !view.options && (
++                  <button
++                    className={styles.listen}
++                    disabled={frozen}
++                    onClick={() => void act('speaker', view.speaker === 'teal' ? 'coral' : 'teal')}
++                  >
++                    <Mic size={20} />
++                    换个人说话
++                  </button>
++                )}
++                <h3>{view.options ? '听一听，点图片' : view.prompt}</h3>
+                 <button
+                   className={styles.listen}
+                   disabled={busy}
+                   onClick={() => (playing ? silence() : listen())}
++                  aria-label={playing ? '暂停声音' : '听一听题目'}
+                 >
+-                  <Volume2 size={21} />
+-                  {playing ? '暂停声音' : '听一听'}
++                  <Volume2 size={32} aria-hidden />
++                  {playing ? '暂停声音' : '听题'}
+                 </button>
+                 {view.options ? (
+-                  <div className={styles.options} role="radiogroup" aria-label="选择一个答案">
++                  <div className={styles.options} role="group" aria-label="点一幅图回答">
+                     {view.options.map((option) => (
+                       <button
+                         key={option.value}
+-                        role="radio"
+-                        aria-checked={chosen === option.value}
++                        aria-label={`${option.label}的图片`}
++                        aria-pressed={(view.selectedChoice || chosen) === option.value}
+                         data-demonstrate={view.demonstration?.includes(option.value) || undefined}
+                         disabled={frozen}
+-                        onClick={() => setChosen(option.value)}
++                        onClick={() => {
++                          setChosen(option.value);
++                          void act('answer', option.value);
++                        }}
+                       >
+-                        {option.label}
++                        <PictureChoice picture={option.picture} />
++                        <span className={styles.optionCaption}>{option.label}</span>
+                       </button>
+                     ))}
+                   </div>
+@@ -460,13 +558,26 @@
+                     <p>拖到图里，或直接点图</p>
+                   </div>
+                 )}
++                {view.options && (
++                  <details className={styles.transcript}>
++                    <summary>题目文字</summary>
++                    <p>{view.prompt}</p>
++                  </details>
++                )}
+                 <div className={styles.help}>
+-                  <button disabled={frozen || (view.hintLevel ?? 0) >= 3} onClick={() => void act('hint')}>
+-                    <Lightbulb size={19} />
+-                    {(view.hintLevel ?? 0) === 0 ? '给我一点提示' : view.hintLevel === 1 ? '举个例子' : '带我做一次'}
++                  <button
++                    disabled={frozen || (view.hintLevel ?? 0) >= 3}
++                    onClick={() => void act('hint')}
++                  >
++                    <Lightbulb size={26} aria-hidden />
++                    {(view.hintLevel ?? 0) === 0
++                      ? '给我一点提示'
++                      : view.hintLevel === 1
++                        ? '举个例子'
++                        : '带我做一次'}
+                   </button>
+                   <button disabled={frozen || view.adultHelp} onClick={() => void act('adult')}>
+-                    <Hand size={18} />
++                    <Hand size={26} aria-hidden />
+                     请大人帮了忙
+                   </button>
+                 </div>
+@@ -500,25 +611,15 @@
+                 )}
+                 {view.feedback?.canNext ? (
+                   <button
++                    ref={nextAction}
+                     className={styles.primary}
+                     disabled={busy}
+                     onClick={() => void act('next')}
+                   >
+                     下一步
+-                    <ArrowRight size={20} />
++                    <ArrowRight size={32} aria-hidden />
+                   </button>
+-                ) : (
+-                  view.options && (
+-                    <button
+-                      className={styles.primary}
+-                      disabled={busy || !chosen}
+-                      onClick={() => void act('answer', chosen)}
+-                    >
+-                      选好了
+-                      <Check size={20} />
+-                    </button>
+-                  )
+-                )}
++                ) : null}
+               </div>
+             </div>
+           )}
+diff --git a/components/scene-renderers/textbook-play.module.css b/components/scene-renderers/textbook-play.module.css
+--- a/components/scene-renderers/textbook-play.module.css
++++ b/components/scene-renderers/textbook-play.module.css
+@@ -66,7 +66,7 @@
+ }
+ .playArea {
+   display: grid;
+-  grid-template-columns: minmax(0, 1.75fr) minmax(245px, 1fr);
++  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+   gap: 24px;
+   align-items: start;
+ }
+@@ -203,8 +203,9 @@
+   transform: translateY(-2px);
+ }
+ .options {
+-  display: flex;
+-  gap: 10px;
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
++  gap: 8px;
+   width: 100%;
+ }
+ .options button {
+@@ -216,7 +217,7 @@
+   border-radius: 16px;
+   font-size: 40px;
+ }
+-.options button[aria-checked='true'] {
++.options button[aria-pressed='true'] {
+   border-color: #528261;
+   background: #e6f0df;
+   box-shadow: 0 3px 0 #528261;
+@@ -427,23 +428,111 @@
+   }
+ }
+ .contextStage {
++  position: relative;
++  align-self: start;
++  width: 100%;
++  overflow: hidden;
++  border-radius: 22px;
++  border: 2px solid #dbe3cf;
++  background: #d9edf0;
++}
++.contextStage > svg {
++  display: block;
++  width: 100%;
++  height: auto;
++}
++.contextName {
++  position: absolute;
++  top: 12px;
++  left: 12px;
++  padding: 5px 12px;
++  background: #fffdf4e8;
++  border-radius: 16px;
++  font-size: 14px;
++}
++.zone[data-demonstrate='true'],
++.options button[data-demonstrate='true'] {
++  outline: 4px solid #bf851c;
++  outline-offset: -4px;
++  background: #efcf7366;
++}
++.recordLine {
++  display: block;
++  margin-top: 8px;
++}
++.options button {
++  position: relative;
++  min-width: 0;
++  min-height: 120px;
++  padding: 6px;
+   display: flex;
+   flex-direction: column;
++  align-items: center;
+   justify-content: center;
+-  align-items: center;
+-  min-height: 260px;
+-  padding: 24px;
+-  background: #e7eee1;
+-  border-radius: 16px;
+-  text-align: center;
+-  gap: 24px;
+-}
+-.contextName { font-size: clamp(24px, 4cqw, 42px); font-weight: 700; }
+-.wordConstellation { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 360px; }
+-.wordConstellation span { display: grid; place-items: center; width: 80px; height: 80px; border-radius: 14px; background: #fbf7ed; font-size: 42px; color: #465d4d; transition: background .2s; }
+-.wordConstellation span[data-lit='true'] { background: #28664d; color: white; }
+-.zone[data-demonstrate='true'], .options button[data-demonstrate='true'] { outline: 4px solid #bf851c; outline-offset: -4px; background: #efcf7366; }
+-.recordLine { display: block; margin-top: 8px; }
+-.options button { min-height: 54px; padding: 12px; font-size: clamp(22px, 2.8cqw, 32px); }
+-.primary { text-decoration: none; }
+-@media (prefers-reduced-motion: reduce) { .wordConstellation span { transition: none; } }
++  gap: 4px;
++  border-radius: 18px;
++}
++.options button > svg {
++  width: 100%;
++  max-height: 145px;
++  display: block;
++}
++.optionCaption {
++  font-size: clamp(17px, 2cqw, 22px);
++  line-height: 1.25;
++  padding-bottom: 4px;
++}
++.options button:disabled {
++  opacity: 0.72;
++}
++.options button[aria-pressed='true']:disabled {
++  opacity: 1;
++}
++.listen {
++  min-height: 64px;
++  padding: 12px 22px;
++  font-size: 19px !important;
++}
++.transcript {
++  width: 100%;
++  color: #637063;
++  font-size: 13px;
++}
++.transcript summary {
++  min-height: 48px;
++  display: flex;
++  align-items: center;
++  cursor: pointer;
++  text-decoration: underline;
++  text-underline-offset: 4px;
++}
++.transcript p {
++  margin: 0 0 8px;
++  line-height: 1.6;
++}
++.transcript summary:focus-visible {
++  outline: 3px solid #28664d;
++  outline-offset: 2px;
++}
++.primary {
++  text-decoration: none;
++}
++@container (max-width:700px) {
++  .playArea {
++    grid-template-columns: 1fr;
++  }
++  .contextStage {
++    max-width: 580px;
++    justify-self: center;
++  }
++  .options {
++    max-width: 560px;
++    align-self: center;
++  }
++  .options button {
++    min-height: 116px;
++  }
++  .task {
++    gap: 10px;
++  }
++}
+diff --git a/components/scene-renderers/textbook-picture-prompt.tsx b/components/scene-renderers/textbook-picture-prompt.tsx
+new file mode 100644
+--- /dev/null
++++ b/components/scene-renderers/textbook-picture-prompt.tsx
+@@ -0,0 +1,371 @@
++/** Original vector illustrations: shared portraits make names optional. */
++export type PictureScene = {
++  setting: string;
++  skyObject: string;
++  ground: string;
++  cast: string[];
++  speaker?: string;
++  listener?: string;
++  activity?: string;
++};
++
++const people: Record<string, { shirt: string; hair: string; kind?: string }> = {
++  teal: { shirt: '#4b9dac', hair: '#56483e' },
++  coral: { shirt: '#d77767', hair: '#584338', kind: 'girl' },
++  yellow: { shirt: '#e9b94f', hair: '#443b35', kind: 'cap' },
++  dad: { shirt: '#628a65', hair: '#55443d', kind: 'dad' },
++  grandpa: { shirt: '#a58a70', hair: '#dad6cc', kind: 'glasses' },
++  grandma: { shirt: '#ab87af', hair: '#ded7cf', kind: 'bun' },
++  sister: { shirt: '#9c85b7', hair: '#554038', kind: 'girl' },
++  mom: { shirt: '#ba805c', hair: '#584238', kind: 'bun' },
++  farmer: { shirt: '#689068', hair: '#5d493c', kind: 'hat' },
++  teacher: { shirt: '#bf8277', hair: '#57453e', kind: 'glasses' },
++  uncle: { shirt: '#7397b0', hair: '#524337', kind: 'dad' },
++};
++
++function Person({ id, talking = false }: { id: string; talking?: boolean }) {
++  const p = people[id] || people.teal;
++  return (
++    <g stroke="#514a41" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
++      <ellipse cx="0" cy="122" rx="28" ry="5" fill="#52755e" opacity=".13" stroke="none" />
++      <path d="M-15 83L-17 116M15 83L17 116" stroke="#4c6471" strokeWidth="13" />
++      <path d="M-25 119h15M10 119h15" stroke="#faf6ea" strokeWidth="9" />
++      <path
++        d="M-23 48Q-38 61-34 81M23 48Q37 57 33 75"
++        stroke="#eac2a0"
++        strokeWidth="10"
++        fill="none"
++      />
++      <path d="M-20 39Q0 32 20 39L26 86H-26Z" fill={p.shirt} />
++      <path d="M-12 41Q0 53 12 41" fill="#fbf5e7" stroke="none" />
++      {id === 'teal' && <path d="M-23 64h46M-24 74h48" stroke="#e2f0e7" strokeWidth="5" />}
++      {id === 'coral' && (
++        <path d="M0 57l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1Z" fill="#f9d86e" stroke="none" />
++      )}
++      {id === 'yellow' && (
++        <rect x="-8" y="59" width="16" height="15" rx="3" fill="#fbf1be" stroke="none" />
++      )}
++      {p.kind === 'girl' && (
++        <>
++          <ellipse cx="-27" cy="15" rx="9" ry="16" fill={p.hair} />
++          <ellipse cx="27" cy="15" rx="9" ry="16" fill={p.hair} />
++        </>
++      )}
++      {p.kind === 'bun' && <circle cy="-19" r="11" fill={p.hair} />}
++      <circle r="28" cy="9" fill="#f1c9a8" />
++      <path d="M-27 6Q-31-23-3-23Q27-23 28 5L17-1 12-12 4-3-7-10-16 1Z" fill={p.hair} />
++      <circle cx="-9" cy="10" r="2.3" fill="#514a41" stroke="none" />
++      <circle cx="9" cy="10" r="2.3" fill="#514a41" stroke="none" />
++      <ellipse cx="-17" cy="18" rx="5" ry="3" fill="#dc967c" opacity=".65" stroke="none" />
++      <ellipse cx="17" cy="18" rx="5" ry="3" fill="#dc967c" opacity=".65" stroke="none" />
++      {talking ? (
++        <ellipse cy="23" rx="5" ry="6" fill="#815246" stroke="none" />
++      ) : (
++        <path d="M-5 22Q0 27 5 22" fill="none" strokeWidth="2" />
++      )}
++      {p.kind === 'glasses' && (
++        <g fill="none" strokeWidth="2">
++          <circle cx="-10" cy="10" r="8" />
++          <circle cx="10" cy="10" r="8" />
++          <path d="M-2 10h4" />
++        </g>
++      )}
++      {p.kind === 'dad' && <path d="M-8 22q4-5 8 0 4-5 8 0" strokeWidth="3" />}
++      {p.kind === 'hat' && (
++        <>
++          <path d="M-24-13L-17-32H17L24-13Z" fill="#eac47d" />
++          <path d="M-36-12h72" stroke="#ba9250" strokeWidth="9" />
++        </>
++      )}
++      {p.kind === 'cap' && (
++        <>
++          <path d="M-26-5Q-24-28 0-28Q24-26 26-5Z" fill="#e9b94f" />
++          <path d="M-6-5h38" stroke="#c39132" strokeWidth="6" />
++        </>
++      )}
++    </g>
++  );
++}
++
++function Cloud({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
++  return (
++    <g transform={`translate(${x} ${y}) scale(${scale})`} fill="#fffdf4">
++      <ellipse cy="10" rx="37" ry="13" />
++      <circle cx="-16" r="18" />
++      <circle cx="10" cy="-7" r="22" />
++      <circle cx="29" cy="5" r="15" />
++    </g>
++  );
++}
++
++function Tree({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
++  return (
++    <g transform={`translate(${x} ${y}) scale(${scale})`}>
++      <path
++        d="M0 0v85M0 38l-22-22M0 50l24-24"
++        stroke="#b89167"
++        strokeWidth="12"
++        strokeLinecap="round"
++      />
++      <path
++        d="M-52 1Q-62-30-34-45Q-25-80 13-60Q60-65 62-22Q88 24 31 34Q-32 51-52 1"
++        fill="#83ad7e"
++      />
++      <path
++        d="M-25-18q21-21 46-5"
++        stroke="#adc998"
++        strokeWidth="7"
++        strokeLinecap="round"
++        fill="none"
++      />
++    </g>
++  );
++}
++
++function SkyObject({ kind }: { kind: string }) {
++  if (kind === 'kite')
++    return (
++      <g stroke="#755d49" strokeWidth="3" strokeLinejoin="round">
++        <path d="M455 45l38 36-29 48-40-35Z" fill="#e38e70" />
++        <path d="M455 45l9 84M424 94l69-13" fill="none" />
++        <path d="M464 129q25 50-10 64t-11 56" fill="none" />
++        <path d="M466 164l-15-5 6 15 12-7 10 11 1-15Z" fill="#e4b95b" />
++      </g>
++    );
++  if (kind === 'rainbow')
++    return (
++      <g fill="none" strokeWidth="11">
++        <path d="M288 137a96 96 0 0 1 192 0" stroke="#d9907f" />
++        <path d="M300 137a84 84 0 0 1 168 0" stroke="#e2c66a" />
++        <path d="M312 137a72 72 0 0 1 144 0" stroke="#93b99f" />
++      </g>
++    );
++  if (kind === 'balloon')
++    return (
++      <g>
++        <path d="M465 127q-20 47 0 96" fill="none" stroke="#9b8269" strokeWidth="2" />
++        <ellipse cx="465" cy="82" rx="35" ry="44" fill="#e29d87" />
++        <path d="M454 124l10-10 11 10Z" fill="#cb786b" />
++        <path
++          d="M450 54q-15 7-12 27"
++          stroke="#f4d3b7"
++          strokeWidth="7"
++          fill="none"
++          strokeLinecap="round"
++        />
++      </g>
++    );
++  if (kind === 'sun')
++    return (
++      <g fill="#efca70" stroke="#efca70" strokeWidth="6">
++        <circle cx="440" cy="75" r="32" />
++        {Array.from({ length: 8 }, (_, i) => (
++          <path
++            key={i}
++            d="M440 29v-9"
++            transform={`rotate(${i * 45} 440 75)`}
++            strokeLinecap="round"
++          />
++        ))}
++      </g>
++    );
++  if (kind === 'cloud') return <Cloud x={420} y={85} scale={1.7} />;
++  return (
++    <g
++      transform="translate(420 95)"
++      stroke="#526e73"
++      strokeWidth="5"
++      strokeLinecap="round"
++      fill="#fffbed"
++    >
++      <path d="M-55 9Q-25-34 0 0Q25-34 55 9Q22-9 0 15Q-24-9-55 9" />
++      <path d="M-7 10l-6 16 15-9 13 9-7-17" />
++    </g>
++  );
++}
++
++export function PicturePrompt({ scene, label }: { scene: PictureScene; label: string }) {
++  const positions = scene.cast.map((id, i) => ({ id, x: 245 + i * 130 }));
++  const speaker = positions.find((p) => p.id === scene.speaker);
++  const listener = positions.find((p) => p.id === scene.listener);
++  return (
++    <svg viewBox="0 0 760 420" role="img" aria-label={label}>
++      <rect
++        width="760"
++        height="420"
++        rx="22"
++        fill={scene.setting === 'rain' ? '#d9e7e3' : '#d9edf0'}
++      />
++      <Cloud x={100} y={68} scale={1.15} />
++      <Cloud x={650} y={98} scale={0.9} />
++      {scene.setting === 'mountains' && (
++        <path d="M0 235L150 70 270 219 382 89 574 235 698 125 760 235Z" fill="#9bb9a6" />
++      )}
++      {scene.setting === 'beach' ? (
++        <>
++          <path d="M0 201Q190 190 380 208T760 200V340H0Z" fill="#84bfcb" />
++          <path d="M0 269q180-24 340 1t420-3v153H0Z" fill="#e7cd97" />
++          <path d="M0 255q180-24 340 1t420-3" fill="none" stroke="#f8f6df" strokeWidth="7" />
++        </>
++      ) : (
++        <>
++          <path d="M0 214q200-49 390-5t370-1v212H0Z" fill="#afc99a" />
++          <path d="M0 315q310-50 760 0v105H0Z" fill="#95b67f" />
++          <Tree x={94} y={173} scale={0.9} />
++          <Tree x={673} y={183} scale={0.7} />
++        </>
++      )}
++      {scene.setting === 'school' && (
++        <g fill="#e6c49b" stroke="#bca787" strokeWidth="3">
++          <path d="M55 226V131h130v95Z" />
++          <path d="M44 132l76-39 77 39Z" fill="#c78975" />
++          <path d="M80 158h23v28H80ZM137 158h23v28h-23Z" fill="#faf6df" />
++        </g>
++      )}
++      {scene.ground === 'track' ? (
++        <>
++          <path d="M0 291Q300 246 760 291V420H0Z" fill="#cd9c79" />
++          <path
++            d="M0 336Q300 286 760 336M0 390Q300 333 760 390"
++            stroke="#f5e6cb"
++            strokeWidth="5"
++            fill="none"
++          />
++        </>
++      ) : scene.ground === 'sand' ? null : (
++        <path d="M282 237q52 26 4 67t-97 116h332q-148-88-125-127t5-56" fill="#e0caa7" />
++      )}
++      {scene.ground === 'puddle' && (
++        <>
++          <ellipse cx="164" cy="355" rx="76" ry="19" fill="#9cc6cc" />
++          <path d="M111 353q49-10 102 0" stroke="#e2f0ec" strokeWidth="4" fill="none" />
++        </>
++      )}
++      {scene.ground === 'blanket' && (
++        <g stroke="#e9dab7" strokeWidth="5">
++          <path d="M490 316l105-9 57 67-118 7Z" fill="#dc9e8b" />
++          <path d="M525 313l47 64M560 310l47 64M504 338l112-6M518 359l116-7" />
++        </g>
++      )}
++      {scene.setting === 'field' && (
++        <g stroke="#b69a72" strokeWidth="4" fill="none">
++          {[0, 1, 2].map((i) => (
++            <path key={i} d={`M45 ${330 + i * 24}h116m430 0h112`} />
++          ))}
++        </g>
++      )}
++      {scene.setting === 'field' &&
++        [85, 132, 624, 680].map((x, i) => (
++          <g key={x} transform={`translate(${x} ${320 + (i % 2) * 24})`} fill="#648f59">
++            <path d="M0 14V-8" stroke="#648f59" strokeWidth="3" />
++            <ellipse cx="-7" cy="-1" rx="10" ry="5" transform="rotate(35)" />
++            <ellipse cx="7" cy="-1" rx="10" ry="5" transform="rotate(-35)" />
++          </g>
++        ))}
++      <SkyObject kind={scene.skyObject} />
++      {positions.map(({ id, x }) => (
++        <g key={id} transform={`translate(${x} 245) scale(1.05)`}>
++          <Person id={id} talking={id === scene.speaker} />
++        </g>
++      ))}
++      {speaker && listener && (
++        <g stroke="#718d79" strokeWidth="3" fill="none" strokeLinecap="round">
++          <path
++            d={`M${speaker.x} 168Q${(speaker.x + listener.x) / 2} 140 ${listener.x} 181`}
++            strokeDasharray="5 7"
++          />
++          <path d={`M${listener.x - 8} 174l8 7 7-9`} />
++          <g transform={`translate(${speaker.x - 39} 177)`} fill="#fffdf4" stroke="#859982">
++            <path d="M14 0h47q14 0 14 14v14q0 14-14 14H39l-12 12v-12H14Q0 42 0 28V14Q0 0 14 0Z" />
++            <g stroke="#68816d" fill="none" strokeWidth="3">
++              <path d="M29 15v12M38 10v23M47 15v12" />
++            </g>
++          </g>
++        </g>
++      )}
++      <path
++        d="M38 390l3-9 7 8m643 10 4-11 5 8"
++        fill="none"
++        stroke="#6f9360"
++        strokeWidth="3"
++        strokeLinecap="round"
++      />
++    </svg>
++  );
++}
++
++export function PictureChoice({ picture }: { picture: string }) {
++  return (
++    <svg viewBox="0 0 160 140" aria-hidden="true" focusable="false">
++      <rect x="2" y="2" width="156" height="136" rx="16" fill="#f4f3e8" />
++      {picture === 'sky' ? (
++        <>
++          <rect x="2" y="2" width="156" height="136" rx="16" fill="#dceff1" />
++          <circle cx="125" cy="30" r="15" fill="#efca70" />
++          <Cloud x={49} y={56} scale={0.7} />
++          <Cloud x={110} y={100} scale={0.5} />
++          <path d="M78 23q9-9 18 0 9-9 18 0" fill="none" stroke="#637f85" strokeWidth="3" />
++        </>
++      ) : picture === 'earth' ? (
++        <>
++          <path d="M3 39q70-25 154 0v82q0 17-17 17H20q-17 0-17-17Z" fill="#a9c38d" />
++          <path d="M72 31q-35 33-5 52t-5 55h57q-34-34-27-55t-3-52" fill="#d9bc8d" />
++          <path
++            d="M27 88l3-15 5 13M126 52l4-13 6 13M132 116l4-14 5 12"
++            stroke="#5e8456"
++            strokeWidth="3"
++            fill="none"
++          />
++        </>
++      ) : picture === 'people' ? (
++        <>
++          {['coral', 'teal', 'yellow'].map((id, i) => (
++            <g key={id} transform={`translate(${34 + i * 45} ${i === 1 ? 41 : 49}) scale(.64)`}>
++              <Person id={id} />
++            </g>
++          ))}
++        </>
++      ) : picture === 'rock' ? (
++        <>
++          <ellipse cx="80" cy="115" rx="47" ry="8" fill="#d8d9c8" />
++          <path
++            d="M33 108l10-36 29-18 30 8 24 30-8 20Z"
++            fill="#a5aaa1"
++            stroke="#747d71"
++            strokeWidth="3"
++          />
++          <path
++            d="M47 77l26-16 21 9M99 91l17 14"
++            stroke="#d4d8cc"
++            strokeWidth="5"
++            fill="none"
++            strokeLinecap="round"
++          />
++        </>
++      ) : ['above', 'below'].includes(picture) ? (
++        <>
++          <rect x="3" y="3" width="154" height="58" rx="15" fill="#dceff1" />
++          <Cloud x={45} y={27} scale={0.48} />
++          <path d="M4 109h152v14q0 13-14 13H17Q4 136 4 123Z" fill="#a9c38d" />
++          <g transform="translate(86 55) scale(.62)">
++            <Person id="teal" />
++          </g>
++          <path
++            d={
++              picture === 'above' ? 'M132 75V32m-11 12 11-12 11 12' : 'M34 76v44m-11-12 11 12 11-12'
++            }
++            stroke="#c78f36"
++            strokeWidth="6"
++            strokeLinecap="round"
++            strokeLinejoin="round"
++            fill="none"
++          />
++        </>
++      ) : (
++        <g transform="translate(80 37) scale(.78)">
++          <Person id={picture} />
++        </g>
++      )}
++    </svg>
++  );
++}
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -1488,6 +1488,7 @@
+           ? 'resumed'
+           : 'fresh';
+     const showStudentStartGate = shouldShowMiraStudentStartGate({
++      nativeActivity: Boolean(currentScene?.miraActivity),
+       studentMode,
+       lectureStarted: studentAutoPlayRuntime?.audioStartAccepted ?? false,
+       resumeStatus: studentResumeStatus,
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+--- a/lib/mira/student-runtime.ts
++++ b/lib/mira/student-runtime.ts
+@@ -102,17 +102,21 @@
+ 
+ /** Browsers require a direct user gesture before a classroom can reliably play audio. */
+ export function shouldShowMiraStudentStartGate({
++  nativeActivity = false,
+   studentMode,
+   lectureStarted,
+   resumeStatus,
+   hasScene,
+ }: {
++  nativeActivity?: boolean;
+   readonly studentMode: boolean;
+   readonly lectureStarted: boolean;
+   readonly resumeStatus: 'checking' | 'fresh' | 'resumed';
+   readonly hasScene: boolean;
+ }): boolean {
+-  return studentMode && hasScene && resumeStatus === 'fresh' && !lectureStarted;
++  // Native activities have their own direct-gesture audio controls and no
++  // lecture engine; a lecture-start overlay would permanently block them.
++  return !nativeActivity && studentMode && hasScene && resumeStatus === 'fresh' && !lectureStarted;
+ }
+ 
+ export function getMiraEffectiveAsrEnabled({
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+--- a/tests/runtime/mira-student-runtime.test.ts
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -135,6 +135,15 @@
+         lectureStarted: false,
+         resumeStatus: 'fresh',
+         hasScene: true,
++        nativeActivity: true,
++      }),
++    ).toBe(false);
++    expect(
++      shouldShowMiraStudentStartGate({
++        studentMode: true,
++        lectureStarted: false,
++        resumeStatus: 'fresh',
++        hasScene: true,
+       }),
+     ).toBe(true);
+     expect(

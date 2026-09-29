@@ -1,4 +1,5 @@
 import 'package:warm_sight/src/shared/domain/child_grade.dart';
+import 'package:warm_sight/src/features/profile/domain/report_learning_models.dart';
 
 class ProfileSummary {
   const ProfileSummary({
@@ -811,6 +812,8 @@ class ReportData {
     required this.observations,
     required this.tasks,
     required this.nextActions,
+    this.learning = const ReportLearningSummary(),
+    this.skillMaps = const [],
   });
 
   final String title;
@@ -832,6 +835,8 @@ class ReportData {
   final List<ReportSectionItem> observations;
   final List<ReportTaskItem> tasks;
   final List<ReportSectionItem> nextActions;
+  final ReportLearningSummary learning;
+  final List<ReportSkillMap> skillMaps;
 
   static ReportData fromJson(Map<String, dynamic> json) {
     return ReportData(
@@ -865,6 +870,10 @@ class ReportData {
       nextActions: _asList(
         json['nextActions'],
       ).map(ReportSectionItem.fromJson).toList(),
+      learning: ReportLearningSummary.fromJson(json['learning']),
+      skillMaps: _asList(
+        json['skillMaps'],
+      ).map(ReportSkillMap.fromJson).toList(),
     );
   }
 }
@@ -877,30 +886,68 @@ class ReportSkill {
     required this.maxScore,
     required this.level,
     required this.detail,
+    this.sources = const [],
+    this.evidence = const [],
   });
 
   final String key;
   final String label;
-  final int score;
+  final int? score;
   final int maxScore;
   final String level;
   final String detail;
+  final List<String> sources;
+  final List<ReportSkillEvidence> evidence;
+  bool get observed => score != null;
+  String get scoreLabel => score == null ? '待观察' : '$score';
 
   double get ratio {
-    if (maxScore <= 0) return 0;
-    return (score / maxScore).clamp(0, 1).toDouble();
+    if (maxScore <= 0 || score == null) return 0;
+    return (score! / maxScore).clamp(0, 1).toDouble();
   }
 
   static ReportSkill fromJson(Map<String, dynamic> json) {
     return ReportSkill(
       key: _asString(json['key']),
       label: _asString(json['label']),
-      score: _asInt(json['score']),
+      score: json['score'] is num ? _asInt(json['score']) : null,
       maxScore: _asInt(json['maxScore']) == 0 ? 100 : _asInt(json['maxScore']),
       level: _asString(json['level']),
       detail: _asString(json['detail']),
+      sources: _asStringList(json['sources']),
+      evidence: _asList(
+        json['evidence'],
+      ).map(ReportSkillEvidence.fromJson).toList(),
     );
   }
+}
+
+class ReportSkillMap {
+  const ReportSkillMap({
+    required this.childId,
+    required this.childName,
+    required this.scope,
+    required this.skills,
+  });
+  final String childId, childName, scope;
+  final List<ReportSkill> skills;
+  static ReportSkillMap fromJson(Map<String, dynamic> json) => ReportSkillMap(
+    childId: _asString(json['childId']),
+    childName: _asString(json['childName']),
+    scope: _asString(json['scope']),
+    skills: _asList(json['skills']).map(ReportSkill.fromJson).toList(),
+  );
+}
+
+class ReportSkillEvidence {
+  ReportSkillEvidence.fromJson(Map<String, dynamic> json)
+    : label = _asString(json['label']),
+      detail = _asString(json['detail']),
+      recordDate = _asString(json['recordDate']),
+      correct = _asInt(json['correct']),
+      total = _asInt(json['total']);
+  final String label, detail, recordDate;
+  final int correct, total;
 }
 
 class ReportSectionItem {

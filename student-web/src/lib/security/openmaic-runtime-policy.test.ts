@@ -5,6 +5,7 @@ import {
   buildStudentSecurityHeaderRules,
   isTrustedOpenMaicLaunchUrl,
   OPENMAIC_RUNTIME_HEADER_SOURCE,
+  TEXTBOOK_RUNTIME_HEADER_SOURCE,
   openMaicLaunchUrlForRequest,
   resolveOpenMaicRuntimeOrigin,
 } from "@/lib/security/openmaic-runtime-policy";
@@ -14,13 +15,13 @@ function permissionsPolicy(rule: ReturnType<typeof buildStudentSecurityHeaderRul
 }
 
 describe("OpenMAIC classroom Permissions-Policy", () => {
-  it("keeps every page blocked and overrides only the dedicated classroom route", () => {
+  it("keeps other pages blocked and delegates microphone only to the two classroom routes", () => {
     const rules = buildStudentSecurityHeaderRules({
       runtimePublicUrl: "https://classroom.mira.test/runtime/path",
       environment: "production",
     });
 
-    expect(rules).toHaveLength(2);
+    expect(rules).toHaveLength(3);
     expect(rules[0].source).toBe("/(.*)");
     expect(permissionsPolicy(rules[0])).toBe(BLOCKED_PERMISSIONS_POLICY);
     expect(OPENMAIC_RUNTIME_HEADER_SOURCE).toBe("/lesson/:taskId/classroom");
@@ -29,6 +30,9 @@ describe("OpenMAIC classroom Permissions-Policy", () => {
       'camera=(), microphone=(self "https://classroom.mira.test"), geolocation=()',
     );
     expect(permissionsPolicy(rules[1])).not.toContain("*");
+    expect(rules[2].source).toBe(TEXTBOOK_RUNTIME_HEADER_SOURCE);
+    expect(TEXTBOOK_RUNTIME_HEADER_SOURCE).toBe("/learning/textbooks/courses/:contentKey");
+    expect(permissionsPolicy(rules[2])).toBe(permissionsPolicy(rules[1]));
   });
 
   it("fails closed in production when the configured runtime origin is missing or insecure", () => {
@@ -37,6 +41,7 @@ describe("OpenMAIC classroom Permissions-Policy", () => {
     expect(resolveOpenMaicRuntimeOrigin("not a URL", "production")).toBeNull();
     const rules = buildStudentSecurityHeaderRules({ environment: "production" });
     expect(permissionsPolicy(rules[1])).toBe(BLOCKED_PERMISSIONS_POLICY);
+    expect(permissionsPolicy(rules[2])).toBe(BLOCKED_PERMISSIONS_POLICY);
   });
 
   it("allows HTTP microphone access only for explicit private-LAN production mode", () => {

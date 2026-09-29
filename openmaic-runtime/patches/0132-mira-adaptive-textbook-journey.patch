@@ -1,0 +1,274 @@
+diff --git a/components/scene-renderers/textbook-play.tsx b/components/scene-renderers/textbook-play.tsx
+--- a/components/scene-renderers/textbook-play.tsx
++++ b/components/scene-renderers/textbook-play.tsx
+@@ -8,7 +8,7 @@
+ 
+ type Section = 'games' | 'challenge';
+ type View = {
+-  phase: 'hunt' | 'roles' | 'quiz' | 'repair' | 'transfer' | 'done';
++  phase: 'diagnostic' | 'hunt' | 'roles' | 'quiz' | 'repair' | 'transfer' | 'probe' | 'locked' | 'break' | 'done';
+   index: number;
+   total?: number;
+   done: boolean;
+@@ -19,10 +19,13 @@
+   options?: { value: string; label: string }[];
+   audio?: string[];
+   hintAudio?: string[];
++  hintLevel?: number;
++  context?: string;
++  demonstration?: string[];
+   hintUsed: boolean;
+   adultHelp: boolean;
+   hint?: string;
+-  feedback?: { correct: boolean; canNext: boolean; explanation: string };
++  feedback?: { correct: boolean; canNext: boolean; explanation: string; audio?: string[] };
+ };
+ type Snapshot = {
+   ok: true;
+@@ -31,6 +34,11 @@
+   image: string;
+   games: View;
+   challenge: View;
++  journey?: {
++    status: string; parentNeeded: boolean; nextStep: string; independentBefore: number;
++    verifiedCount: number; remainingSkills: string[]; reviewDueAt: number | null;
++    reviewDue: boolean; reviewLevel: number; diagnoses: string[]; skippedCount: number;
++  };
+   evidence: {
+     answered: number;
+     independent: number;
+@@ -49,11 +57,15 @@
+   { id: 'yellow', name: '黄衣男孩', x: 71, y: 35, w: 14, h: 47 },
+ ];
+ const titles: Record<View['phase'], string> = {
++  diagnostic: '先试一试，会的少学',
++  locked: '先去字宝宝花园',
++  probe: '拆开想一想',
++  break: '先休息一下吧',
+   hunt: '字宝宝，回家啦',
+   roles: '换个人来说',
+   quiz: '自己试一试',
+   repair: '再认一认',
+-  transfer: '换种玩法，找一找',
++  transfer: '换个地方，自己试试',
+   done: '这一关完成啦',
+ };
+ 
+@@ -130,7 +142,8 @@
+         return;
+       }
+       if (
+-        !/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(wav|mp3|ogg)$/.test(src)
++        !/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(wav|mp3|ogg)$/.test(src) &&
++        !/^\/mira\/textbook-audio\/[a-f0-9]{24}\.wav$/.test(src)
+       )
+         return;
+       const audio = new Audio(src);
+@@ -175,6 +188,8 @@
+       setSnapshot(payload);
+       setChosen('');
+       if (action === 'hint') listen(payload[section].hintAudio);
++      else if (action === 'answer' && payload[section].feedback?.audio) listen(payload[section].feedback.audio);
++      else if (['next', 'review', 'resume', 'speaker'].includes(action)) listen(payload[section].audio);
+       if (payload.challenge.done && events) {
+         const scenes = [...useStageStore.getState().scenes].sort((a, b) => a.order - b.order);
+         const last = scenes.at(-1);
+@@ -198,7 +213,10 @@
+     const store = useStageStore.getState();
+     const scenes = [...store.scenes].sort((a, b) => a.order - b.order);
+     const index = scenes.findIndex((s) => s.id === sceneId);
+-    if (scenes[index + 1]) store.setCurrentSceneId(scenes[index + 1].id);
++    const target = section === 'games' && snapshot?.journey
++      ? scenes.find(s => s.miraActivity?.section === 'challenge')
++      : scenes[index + 1];
++    if (target) store.setCurrentSceneId(target.id);
+   }
+ 
+   function drop(event: PointerEvent<HTMLButtonElement>) {
+@@ -243,7 +261,7 @@
+               </p>
+               <h2>{titles[view.phase]}</h2>
+             </div>
+-            {!view.done && (
++            {!view.done && view.total && (
+               <div
+                 className={styles.progress}
+                 aria-label={`第 ${view.index + 1} 题，共 ${view.total} 题`}
+@@ -261,21 +279,34 @@
+               </div>
+             )}
+           </header>
+-          {view.done ? (
++          {view.phase === 'locked' || view.phase === 'break' ? (
++            <div className={styles.done}>
++              <h3>{view.phase === 'locked' ? '先做几个小任务，再来挑战。' : '已经认真试过啦，歇一歇再回来。'}</h3>
++              <p>{view.phase === 'break' ? '老师会记住卡住的地方，也会告诉家长该帮哪一步。' : '会的字会自动缩短，没认熟的字一起练。'}</p>
++              <button className={styles.primary} disabled={busy} onClick={() => {
++                if (view.phase === 'break') void act('resume');
++                else {
++                  const store = useStageStore.getState();
++                  const first = store.scenes.find(s => s.miraActivity?.section === 'games');
++                  if (first) store.setCurrentSceneId(first.id);
++                }
++              }}>{view.phase === 'break' ? '休息好了，再试一次' : '开始小任务'}</button>
++            </div>
++          ) : view.done ? (
+             <div className={styles.done}>
+               <div className={styles.badge}>
+                 <Star size={44} aria-hidden />
+               </div>
+               <h3>
+-                {section === 'games' ? '找到字宝宝，也会换角色啦！' : '你认真想，也动手试了！'}
++                {section === 'games' ? `已会的 ${snapshot.journey?.skippedCount ?? 0} 个字，少练一点！` : snapshot.journey?.status === 'retained' ? '隔了几天，也记得！' : '换了场景，你也会啦！'}
+               </h3>
+               {section === 'challenge' && (
+                 <>
+                   <p>
+-                    第一次自己答对 <strong>{snapshot.evidence.independent} / 6</strong> 题
++                    前测自己答对 <strong>{snapshot.evidence.independent} / 6</strong> 题
+                   </p>
+                   <p>
+-                    换种玩法，独立找到 <strong>{snapshot.evidence.transferIndependent} / 6</strong>{' '}
++                    新情境，独立完成 <strong>{snapshot.evidence.transferIndependent} / 6</strong>{' '}
+                     题
+                   </p>
+                   <details className={styles.evidence}>
+@@ -289,10 +320,15 @@
+                         ? `课内已安排再练：${snapshot.evidence.practiceSkills.join('、')}。`
+                         : '本次选择题均独立答对。'}
+                     </p>
+-                    <p>这是看图和选择练习记录，尚未评价朗读、书写或长期掌握。</p>
++                    <p>{snapshot.journey?.nextStep}
++                      {snapshot.journey?.diagnoses.map(text => <span key={text} className={styles.recordLine}>{text}</span>)}
++                      <span className={styles.recordLine}>这里记录识字与情境理解，未评价朗读和书写。</span></p>
+                   </details>
+                 </>
+               )}
++              {section === 'challenge' && snapshot.journey?.reviewDueAt && <p>
++                下次短复习：{new Date(snapshot.journey.reviewDueAt).toLocaleString('zh-CN', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Shanghai' })}
++              </p>}
+               <div className={styles.actions}>
+                 {section === 'games' && (
+                   <button
+@@ -304,10 +340,15 @@
+                     再玩一次
+                   </button>
+                 )}
+-                <button onClick={nextScene} className={styles.primary}>
+-                  继续上课
+-                  <ArrowRight size={20} />
+-                </button>
++                {section === 'games' ? <button onClick={nextScene} className={styles.primary}>
++                  换个场景试试<ArrowRight size={20} />
++                </button> : snapshot.journey?.reviewDue ? <button disabled={busy} onClick={() => void act('review')} className={styles.primary}>
++                  开始今天的短复习<ArrowRight size={20} />
++                </button> : <a href="#" className={styles.primary} onClick={event => {
++                  event.preventDefault();
++                  if (window.parent !== window) window.parent.postMessage({ type: 'mira.textbook.close' }, '*');
++                  else window.history.back();
++                }}>今天先到这里</a>}
+               </div>
+             </div>
+           ) : (
+@@ -315,6 +356,7 @@
+               <div
+                 ref={picture}
+                 className={styles.picture}
++                hidden={Boolean(view.options)}
+                 data-success={view.feedback?.correct || undefined}
+               >
+                 {/* Native authored lesson media is authorized by the classroom gateway. */}
+@@ -332,6 +374,7 @@
+                         type="button"
+                         className={styles.zone}
+                         aria-label={`选择${zone.name}`}
++                        data-demonstrate={view.demonstration?.includes(zone.id) || undefined}
+                         disabled={frozen}
+                         style={{
+                           left: `${zone.x}%`,
+@@ -356,6 +399,11 @@
+                   </div>
+                 )}
+               </div>
++              {view.options && <div className={styles.contextStage} aria-label={view.context || '先试一试'}>
++                <span className={styles.contextName}>{view.context || '认识六个字'}</span>
++                <div className={styles.wordConstellation} aria-hidden>{['天', '地', '人', '你', '我', '他'].map((word, index) => <span key={word} data-lit={index < (snapshot.journey?.verifiedCount ?? 0)}>{word}</span>)}</div>
++                <p>{view.phase === 'diagnostic' ? '先听题，选一选。会的少学一点。' : '换了一个地方，还能认出来吗？'}</p>
++              </div>}
+               <div className={styles.task}>
+                 {view.speaker && (
+                   <p className={styles.context}>
+@@ -363,6 +411,7 @@
+                     {view.speaker === 'teal' ? '红衣女孩' : '蓝衣男孩'}聊天。
+                   </p>
+                 )}
++                {view.speaker && !view.options && <button className={styles.listen} disabled={frozen} onClick={() => void act('speaker', view.speaker === 'teal' ? 'coral' : 'teal')}><Mic size={20} />换个人说话</button>}
+                 <h3>{view.prompt}</h3>
+                 <button
+                   className={styles.listen}
+@@ -373,12 +422,13 @@
+                   {playing ? '暂停声音' : '听一听'}
+                 </button>
+                 {view.options ? (
+-                  <div className={styles.options} role="radiogroup" aria-label="选择一个字">
++                  <div className={styles.options} role="radiogroup" aria-label="选择一个答案">
+                     {view.options.map((option) => (
+                       <button
+                         key={option.value}
+                         role="radio"
+                         aria-checked={chosen === option.value}
++                        data-demonstrate={view.demonstration?.includes(option.value) || undefined}
+                         disabled={frozen}
+                         onClick={() => setChosen(option.value)}
+                       >
+@@ -411,9 +461,9 @@
+                   </div>
+                 )}
+                 <div className={styles.help}>
+-                  <button disabled={frozen || view.hintUsed} onClick={() => void act('hint')}>
++                  <button disabled={frozen || (view.hintLevel ?? 0) >= 3} onClick={() => void act('hint')}>
+                     <Lightbulb size={19} />
+-                    给我提示
++                    {(view.hintLevel ?? 0) === 0 ? '给我一点提示' : view.hintLevel === 1 ? '举个例子' : '带我做一次'}
+                   </button>
+                   <button disabled={frozen || view.adultHelp} onClick={() => void act('adult')}>
+                     <Hand size={18} />
+@@ -440,8 +490,8 @@
+                           : '再看看，换个地方试一试。'}
+                     </strong>
+                     <p>{view.feedback.explanation}</p>
+-                    {!!view.hintAudio?.length && (
+-                      <button onClick={() => listen(view.hintAudio)}>
++                    {!!view.feedback.audio?.length && (
++                      <button onClick={() => listen(view.feedback?.audio)}>
+                         <Volume2 size={18} />
+                         听讲解
+                       </button>
+diff --git a/components/scene-renderers/textbook-play.module.css b/components/scene-renderers/textbook-play.module.css
+--- a/components/scene-renderers/textbook-play.module.css
++++ b/components/scene-renderers/textbook-play.module.css
+@@ -426,3 +426,24 @@
+     transition: none !important;
+   }
+ }
++.contextStage {
++  display: flex;
++  flex-direction: column;
++  justify-content: center;
++  align-items: center;
++  min-height: 260px;
++  padding: 24px;
++  background: #e7eee1;
++  border-radius: 16px;
++  text-align: center;
++  gap: 24px;
++}
++.contextName { font-size: clamp(24px, 4cqw, 42px); font-weight: 700; }
++.wordConstellation { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 360px; }
++.wordConstellation span { display: grid; place-items: center; width: 80px; height: 80px; border-radius: 14px; background: #fbf7ed; font-size: 42px; color: #465d4d; transition: background .2s; }
++.wordConstellation span[data-lit='true'] { background: #28664d; color: white; }
++.zone[data-demonstrate='true'], .options button[data-demonstrate='true'] { outline: 4px solid #bf851c; outline-offset: -4px; background: #efcf7366; }
++.recordLine { display: block; margin-top: 8px; }
++.options button { min-height: 54px; padding: 12px; font-size: clamp(22px, 2.8cqw, 32px); }
++.primary { text-decoration: none; }
++@media (prefers-reduced-motion: reduce) { .wordConstellation span { transition: none; } }

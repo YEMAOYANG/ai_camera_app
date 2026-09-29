@@ -1867,8 +1867,9 @@ class LearningRepository:
         existing = conn.execute(
             "SELECT * FROM tasks WHERE family_id = ? AND child_id = ? "
             "AND type = 'learning' AND learning_course_id = ? AND learning_course_version = ? "
+            "AND (learning_slot IS NULL OR learning_slot NOT LIKE ?) "
             "ORDER BY created_at DESC, id DESC LIMIT 1 FOR UPDATE",
-            (family_id, child_id, course['id'], course['version']),
+            (family_id, child_id, course['id'], course['version'], 'tbr_%'),
         ).fetchone()
         if existing is not None:
             if existing['status'] in {'cancelled', 'rejected', 'expired'}:

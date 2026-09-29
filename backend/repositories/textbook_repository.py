@@ -49,9 +49,62 @@ class TextbookRepository:
                             (family_id, child_id)).fetchone()
 
     def selections(self, conn, child, year, semester):
-        return conn.execute("SELECT * FROM learning_textbook_selections WHERE family_id=? AND child_id=? "
+        choices = conn.execute("SELECT * FROM learning_textbook_selections WHERE family_id=? AND child_id=? "
                             "AND school_year_start=? AND semester=? AND grade_revision=? ORDER BY subject",
                             (child["family_id"], child["id"], year, semester, child["grade_selection_revision"])).fetchall()
+        # A parent selected a book, not the absence of its directory. Enrich only
+        # an empty index with an explicitly linked revision of that SAME resource.
+        # Keep their selection/event/CAS history intact, and never move an existing
+        # directory, current lesson or course build to another revision.
+        result = []
+        for choice in choices:
+            row = self.get_revision(conn, choice["edition_id"], choice["revision_id"])
+            manifest = self.manifest(row) if row else None
+            if (not manifest or manifest["units"] or manifest["coverage"]["status"] != "index_only"
+                    or digest(manifest) != row["manifest_sha256"] or choice["current_node_id"]):
+                result.append(choice)
+                continue
+            has_build = conn.execute("SELECT content_key FROM learning_textbook_course_builds WHERE edition_id=? AND revision_id=? LIMIT 1",
+                                     (choice["edition_id"], choice["revision_id"])).fetchone()
+            if has_build:
+                result.append(choice)
+                continue
+            candidates = conn.execute("SELECT * FROM learning_textbook_revisions WHERE edition_id=? AND retired_at IS NULL ORDER BY imported_at,revision_id",
+                                      (choice["edition_id"],)).fetchall()
+            enriched = choice
+            for candidate in candidates:
+                value = self.manifest(candidate)
+                provenance = value.get("directorySource", {})
+                if (provenance.get("baseRevisionId") == choice["revision_id"] and value["units"]
+                        and provenance.get("resourceId") == manifest["source"]["resourceId"]
+                        and value["source"]["resourceId"] == manifest["source"]["resourceId"]
+                        and digest(value) == candidate["manifest_sha256"]):
+                    enriched = {**choice, "revision_id": candidate["revision_id"]}
+                    break  # Stable first enrichment; subsequent revisions require a parent choice.
+            result.append(enriched)
+        return result
+
+    def learning_context(self, conn, child):
+        row = conn.execute("SELECT value FROM app_settings WHERE family_id=? AND setting_key=?",
+                           (child["family_id"], "textbook_context." + child["id"])).fetchone()
+        return self.parse(row["value"]) if row else {}
+
+    def save_learning_context(self, conn, child, value, now):
+        # The caller holds the family and child locks, including first insert.
+        key = (child["family_id"], "textbook_context." + child["id"])
+        exists = conn.execute("SELECT value FROM app_settings WHERE family_id=? AND setting_key=?", key).fetchone()
+        if exists:
+            conn.execute("UPDATE app_settings SET value=?,updated_at=? WHERE family_id=? AND setting_key=?",
+                         (canonical(value), now, *key))
+        else:
+            conn.execute("INSERT INTO app_settings(family_id,setting_key,value,updated_at) VALUES (?,?,?,?)",
+                         (*key, canonical(value), now))
+
+    def completed_courses(self, conn, child):
+        return {(r["course_id"], r["course_version"]) for r in conn.execute(
+            "SELECT DISTINCT course_id,course_version FROM learning_sessions "
+            "WHERE family_id=? AND child_id=? AND status='completed'",
+            (child["family_id"], child["id"])).fetchall()}
 
     def select(self, conn, *, child, manifest, year, semester, expected_revision, current_node, confirmed_by, now):
         key = (child["family_id"], child["id"], year, semester, manifest["subject"])
@@ -92,7 +145,7 @@ class TextbookRepository:
         return json.loads(value) if isinstance(value, str) else value
 
     def builds(self, conn, edition_id, revision_id):
-        return conn.execute("SELECT * FROM learning_textbook_course_builds WHERE edition_id=? AND revision_id=? AND status='published' ORDER BY node_id,part_index,created_at DESC",
+        return conn.execute("SELECT * FROM learning_textbook_course_builds WHERE edition_id=? AND revision_id=? AND status='published' ORDER BY node_id,part_index,created_at DESC,content_key ASC",
                             (edition_id, revision_id)).fetchall()
 
     def get_build(self, conn, content_key, *, lock=False):

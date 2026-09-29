@@ -9,6 +9,7 @@ This directory is the child-facing Mira learning website.
 - Build Server Components by default. Limit Client Components to interactive learning and authentication islands.
 - Use the Mira student tokens from `src/styles/tokens.css`; do not apply default shadcn/OpenMAIC themes wholesale.
 - 1–2 grade flows need large type, at least 48px touch targets, one primary action, and reduced-motion support.
+- Grade 1–2 must work without independent reading: meaningful scene illustrations, distinct picture choices and prerecorded teacher narration are required for most learning tasks. Text supports pictures; it cannot be the only way to identify an answer or operate the page. Follow `../docs/learning/low-reading-interaction-rule.md` and the root AGENTS rule, including native classroom integrations.
 - Run `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` before handoff.
 
 <!-- BEGIN:nextjs-agent-rules -->

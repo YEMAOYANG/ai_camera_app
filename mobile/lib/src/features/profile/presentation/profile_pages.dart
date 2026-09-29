@@ -1,6 +1,12 @@
 import 'dart:math' as math;
+import 'package:warm_sight/src/features/profile/presentation/widgets/report_learning_section.dart';
+import 'package:warm_sight/src/features/profile/presentation/widgets/report_growth_section.dart';
 
 import 'package:flutter/material.dart';
+import 'package:warm_sight/src/shared/widgets/child_learning_identity_fields.dart';
+import 'package:warm_sight/src/features/learning/application/textbook_repository.dart';
+import 'package:warm_sight/src/features/learning/presentation/widgets/textbook_learning_summary.dart';
+import 'package:warm_sight/src/features/student_access/application/student_access_availability.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,9 +24,6 @@ import 'package:warm_sight/src/features/devices/application/selected_device_cont
 import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
 import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
-import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
-import 'package:warm_sight/src/features/learning/domain/learning_preparation_models.dart';
-import 'package:warm_sight/src/features/learning/presentation/widgets/learning_preparation_card.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
@@ -1331,6 +1334,17 @@ class _ReportsHubPageState extends ConsumerState<ReportsHubPage> {
   late int _index = widget.initialIndex.clamp(0, 1).toInt();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      for (final provider in [dailyReportProvider, weeklyReportProvider]) {
+        if (!ref.read(provider).isLoading) ref.invalidate(provider);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return _Page(
       title: '看护报告',
@@ -2231,7 +2245,6 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
   late ChildProfile _draft;
   late ChildProfileEditorValue _value;
   var _saving = false;
-  var _retryingPreparation = false;
 
   @override
   void initState() {
@@ -2269,18 +2282,16 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
           educationStage: _draft.educationStage,
           grade: _draft.grade,
         );
-    final canSave = !_saving && gradeOption != null;
+    final canSave =
+        !_saving && gradeOption != null && _value.name.trim().isNotEmpty;
+    final gradeIsDirty = gradeOption?.code != savedGradeOption?.code;
     final isSavedPrimary = savedGradeOption?.isPrimary == true;
-    final preparation = isSavedPrimary && _draft.id.trim().isNotEmpty
-        ? ref.watch(currentLearningPreparationProvider(_draft.id))
-        : null;
     final availability = isSavedPrimary && _draft.id.trim().isNotEmpty
-        ? ref.watch(currentLearningAvailabilityProvider(_draft.id))
+        ? ref.watch(
+            studentAccessAvailabilityProvider(studentAccessScope(_draft)),
+          )
         : null;
     final currentAvailability = availability?.asData?.value;
-    final canLearnNow =
-        currentAvailability?.gradeCode == savedGradeOption?.code &&
-        currentAvailability?.canLearnNow == true;
     final canAccessWorkspace =
         currentAvailability?.gradeCode == savedGradeOption?.code &&
         currentAvailability?.canAccessWorkspace == true;
@@ -2288,6 +2299,13 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
 
     return AppScreen(
       title: '孩子资料',
+      plainBackground: true,
+      pinnedHeaderHeight: 56,
+      headerContent: const Text(
+        '孩子资料',
+        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+      ),
+      avoidFooterOverlap: true,
       fixedHeader: true,
       reserveBottomNavigation: false,
       backLabel: '返回我的',
@@ -2308,90 +2326,104 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
         onTap: canManageChildProfile && canSave ? _save : null,
       ),
       children: [
-        AppSurface(
-          radius: 22,
-          padding: const EdgeInsets.fromLTRB(15, 16, 15, 15),
+        Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 6),
           child: AbsorbPointer(
             absorbing: !canManageChildProfile,
             child: Opacity(
               opacity: canManageChildProfile ? 1 : 0.76,
-              child: ChildProfileEditorPanel(
-                value: _value,
-                includeExtendedFields: false,
-                includeGender: false,
-                includeBirthday: false,
-                includeSleepTime: false,
-                stageOptions: const ['幼儿园', '小学'],
-                showStageSelector: true,
-                recommendEducationFromBirthday: false,
-                noteText: '称呼和就读阶段可随时修改；学习内容按你确认的年级匹配。',
-                onChanged: (value) {
-                  if (canManageChildProfile) setState(() => _value = value);
-                },
+              child: ChildLearningIdentityFields(
+                editing: true,
+                nickname: _value.name,
+                schoolYearStartYear:
+                    _draft.schoolYearStartYear ?? gradeSchoolYearStartYear(),
+                activeStageCode: _value.normalizedStage == '小学'
+                    ? 'primary'
+                    : 'kindergarten',
+                selected: gradeOption,
+                enabled: canManageChildProfile && !_saving,
+                onNicknameChanged: (name) =>
+                    setState(() => _value = _value.copyWith(name: name)),
+                onStageChanged: (stage) => setState(
+                  () => _value = _value.copyWith(
+                    stage: stage == 'primary' ? '小学' : '幼儿园',
+                    grade: '',
+                  ),
+                ),
+                onGradeSelected: (grade) => setState(
+                  () => _value = _value.copyWith(
+                    stage: grade.stageLabel,
+                    grade: grade.gradeLabel,
+                  ),
+                ),
               ),
             ),
           ),
         ),
         const SizedBox(height: 14),
-        if (preparation != null &&
-            availability?.hasValue == true &&
-            !canLearnNow) ...[
-          preparation.when(
-            loading: () => const LearningPreparationLoadingCard(),
-            error: (error, _) => LearningPreparationNetworkErrorCard(
-              onRetry: () => _refreshPreparation(),
-            ),
-            data: (value) {
-              if (value == null) {
-                return LearningPreparationMissingCard(
-                  onRefresh: () => _refreshPreparation(),
-                );
-              }
-              return LearningPreparationCard(
-                preparation: value,
-                awaitingPublication: value.isReady,
-                onRefresh: () => _refreshPreparation(),
-                onRetry: value.canRetry ? () => _retryPreparation(value) : null,
-                retrying: _retryingPreparation,
-              );
-            },
-          ),
-          const SizedBox(height: 14),
-        ],
         if (isSavedPrimary) ...[
-          AppListRow(
-            icon: Icons.menu_book_outlined,
-            title: '学校教材',
-            subtitle: '确认学校使用的出版社与册次',
-            onTap: canManageChildProfile
+          TextbookLearningSummary(
+            childId: _draft.id,
+            disabledHint: gradeIsDirty ? '先保存新的年级，再设置对应教材' : null,
+            onManage: canManageChildProfile && !gradeIsDirty && !_saving
                 ? () => context.push(profileSchoolTextbooksPath)
                 : null,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 20),
         ],
-        AppSurface(
+        Material(
           key: const ValueKey('studentLearningSpaceEntry'),
-          color: AppColors.brandWash.withValues(alpha: 0.62),
-          borderColor: AppColors.brand.withValues(alpha: 0.10),
-          radius: AppRadii.cardLarge,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-          child: AppListRow(
-            icon: Icons.school_outlined,
-            title: '学生学习空间',
-            subtitle: savedGradeOption?.isPrimary != true
-                ? '当前正式学习空间仅面向已开放年级'
-                : !canManageChildProfile
-                ? '仅家庭管理员可创建或更新学生登录方式'
-                : availability?.isLoading == true
-                ? '正在确认学习空间权限'
-                : availability?.hasError == true
-                ? '学习空间权限加载失败，请检查网络后重试'
-                : !canAccessWorkspace
-                ? '请确认已选择开放年级并完成设置'
-                : '设置学习 PIN，生成 10 分钟有效的网页配对码',
-            tone: AppListRowTone.blue,
+          color: AppColors.surfaceElevated,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadii.card),
+            side: const BorderSide(color: AppColors.borderSoft),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 2,
+            ),
+            leading: const Icon(
+              Icons.devices_outlined,
+              size: 22,
+              color: AppColors.ink,
+            ),
+            minLeadingWidth: 24,
+            title: const Text(
+              '学生学习空间',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            subtitle: Text(
+              !isSavedPrimary
+                  ? '完成小学年级设置后开启'
+                  : !canManageChildProfile
+                  ? '请家庭管理员设置登录方式'
+                  : availability?.isLoading == true
+                  ? '正在确认登录权限'
+                  : availability?.hasError == true
+                  ? '登录权限读取失败，点击重试'
+                  : !canAccessWorkspace
+                  ? '请确认年级并完成设置'
+                  : '设置学习 PIN 或连接学生网页',
+              style: const TextStyle(
+                fontSize: 12,
+                height: 1.5,
+                color: AppColors.mutedStrong,
+              ),
+            ),
+            trailing: const Icon(
+              Icons.chevron_right,
+              size: 20,
+              color: AppColors.muted,
+            ),
             onTap: canCreateStudentAccess
                 ? () => context.push(profileStudentAccessPath)
+                : availability?.hasError == true
+                ? () => ref.invalidate(
+                    studentAccessAvailabilityProvider(
+                      studentAccessScope(_draft),
+                    ),
+                  )
                 : null,
           ),
         ),
@@ -2441,17 +2473,15 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
       final savedGrade = ChildGradeOption.fromCode(saved.gradeCode);
       ref.invalidate(currentChildProvider);
       ref.invalidate(profileSummaryProvider);
-      // Saving an unchanged grade can attach a newly available shared catalog.
-      // Refresh its access gate even when the grade itself did not change.
+      if (gradeChanged) ref.invalidate(schoolTextbooksProvider(_draft.id));
+      // Login eligibility is independent of textbook publication.
+      ref.invalidate(studentAccessAvailabilityProvider);
       ref.invalidate(currentLearningAvailabilityProvider(_draft.id));
-      if (gradeChanged && savedGrade?.isPrimary == true) {
-        ref.invalidate(currentLearningPreparationProvider(_draft.id));
-      }
       if (mounted) {
         final message = !gradeChanged
             ? '孩子资料已保存'
             : savedGrade?.isPrimary == true
-            ? '年级已保存，课程将在后台准备'
+            ? '年级已保存，请确认对应教材'
             : '年级已保存';
         _toast(context, message);
       }
@@ -2459,61 +2489,6 @@ class _ChildProfileFormState extends ConsumerState<_ChildProfileForm> {
       if (mounted) _toast(context, error.message);
     } finally {
       if (mounted) setState(() => _saving = false);
-    }
-  }
-
-  Future<void> _refreshPreparation() async {
-    try {
-      final _ = await ref.refresh(
-        currentLearningPreparationProvider(_draft.id).future,
-      );
-    } catch (_) {
-      // The provider remains in error and renders the explicit refresh action.
-    }
-    try {
-      final _ = await ref.refresh(
-        currentLearningAvailabilityProvider(_draft.id).future,
-      );
-    } catch (_) {
-      // Keep the availability error visible next to the student-space entry.
-    }
-  }
-
-  Future<void> _retryPreparation(LearningPreparation preparation) async {
-    if (_retryingPreparation) return;
-    setState(() => _retryingPreparation = true);
-    final requestId =
-        'parent-prep-retry:${preparation.id}:${DateTime.now().millisecondsSinceEpoch}';
-    try {
-      await ref
-          .read(learningPreparationRepositoryProvider)
-          .retry(planId: preparation.id, requestId: requestId);
-      final _ = await ref.refresh(
-        currentLearningPreparationProvider(_draft.id).future,
-      );
-      final _ = await ref.refresh(
-        currentLearningAvailabilityProvider(_draft.id).future,
-      );
-    } catch (error) {
-      var reconciled = false;
-      try {
-        final current = await ref.refresh(
-          currentLearningPreparationProvider(_draft.id).future,
-        );
-        reconciled = current != null && current.id != preparation.id;
-      } catch (_) {
-        // Keep the original failure when current status cannot reconcile it.
-      }
-      if (mounted && !reconciled) {
-        _toast(
-          context,
-          error is LearningPreparationException
-              ? error.message
-              : '课程重新准备失败，请稍后重试',
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _retryingPreparation = false);
     }
   }
 }
@@ -5924,13 +5899,23 @@ class _ReportPane extends ConsumerWidget {
     final report = ref.watch(provider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: report.when(
-        data: _reportSections,
-        loading: () => const [_Loading(title: '正在生成报告')],
-        error: (error, _) => [
-          _ErrorState(error: error, onRetry: () => ref.invalidate(provider)),
-        ],
-      ),
+      children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: report.isLoading ? null : () => ref.invalidate(provider),
+            icon: const Icon(Icons.refresh, size: 18),
+            label: Text(report.isLoading ? '正在同步' : '刷新报告'),
+          ),
+        ),
+        ...report.when(
+          data: _reportSections,
+          loading: () => const [_Loading(title: '正在生成报告')],
+          error: (error, _) => [
+            _ErrorState(error: error, onRetry: () => ref.invalidate(provider)),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -5938,7 +5923,9 @@ class _ReportPane extends ConsumerWidget {
 List<Widget> _reportSections(ReportData data) {
   final sections = <Widget>[
     _ReportHero(data: data),
-    if (data.skills.isNotEmpty) _ReportSkillMap(skills: data.skills),
+    if (data.learning.lessons.isNotEmpty)
+      ReportLearningSection(learning: data.learning),
+    if (data.skillMaps.isNotEmpty) ReportGrowthSection(maps: data.skillMaps),
     _ReportSectionBlock(
       title: '成长亮点',
       items: data.highlights,
@@ -6099,356 +6086,6 @@ class _ReportAttentionBar extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _ReportSkillMap extends StatelessWidget {
-  const _ReportSkillMap({required this.skills});
-
-  final List<ReportSkill> skills;
-
-  @override
-  Widget build(BuildContext context) {
-    final ranked = [...skills]..sort((a, b) => b.score.compareTo(a.score));
-    final strongest = ranked.isEmpty ? null : ranked.first;
-    final focus = ranked.isEmpty ? null : ranked.last;
-    return AppSurface(
-      radius: 22,
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _ReportIconBadge(
-                icon: Icons.radar_outlined,
-                color: AppColors.brand,
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('成长能力图谱', style: _reportTitleStyle),
-                    SizedBox(height: 4),
-                    Text('根据任务完成和看护记录生成', style: _reportBodyStyle),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 188,
-            child: CustomPaint(
-              painter: _ReportSkillRadarPainter(skills: skills),
-              child: const SizedBox.expand(),
-            ),
-          ),
-          if (strongest != null && focus != null) ...[
-            const SizedBox(height: 14),
-            _ReportSkillSummary(strongest: strongest, focus: focus),
-            const SizedBox(height: 14),
-            _ReportSkillMeterList(skills: skills, topKey: strongest.key),
-            const SizedBox(height: 12),
-            Text(
-              '${strongest.label}: ${strongest.detail}',
-              style: _reportBodyStyle,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _ReportSkillSummary extends StatelessWidget {
-  const _ReportSkillSummary({required this.strongest, required this.focus});
-
-  final ReportSkill strongest;
-  final ReportSkill focus;
-
-  @override
-  Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        children: [
-          Expanded(
-            child: _ReportSkillSpotlight(
-              eyebrow: '优势能力',
-              skill: strongest,
-              color: AppColors.brand,
-            ),
-          ),
-          const VerticalDivider(
-            width: 22,
-            thickness: 1,
-            color: AppColors.borderSoft,
-          ),
-          Expanded(
-            child: _ReportSkillSpotlight(
-              eyebrow: '重点关注',
-              skill: focus,
-              color: AppColors.brandWarm,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ReportSkillSpotlight extends StatelessWidget {
-  const _ReportSkillSpotlight({
-    required this.eyebrow,
-    required this.skill,
-    required this.color,
-  });
-
-  final String eyebrow;
-  final ReportSkill skill;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          eyebrow,
-          style: const TextStyle(
-            color: AppColors.subtle,
-            fontFamily: AppTypography.systemFont,
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            height: 1.2,
-            letterSpacing: 0,
-          ),
-        ),
-        const SizedBox(height: 5),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(child: Text(skill.label, style: _reportRowTitle)),
-            Text(
-              '${skill.score}',
-              style: TextStyle(
-                color: color,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                height: 1,
-                letterSpacing: 0,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 5),
-        Text(skill.level, style: _reportMetaStyle),
-      ],
-    );
-  }
-}
-
-class _ReportSkillMeterList extends StatelessWidget {
-  const _ReportSkillMeterList({required this.skills, required this.topKey});
-
-  final List<ReportSkill> skills;
-  final String topKey;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (var index = 0; index < skills.length; index++) ...[
-          _ReportSkillMeterRow(
-            skill: skills[index],
-            active: skills[index].key == topKey,
-          ),
-          if (index != skills.length - 1) const SizedBox(height: 9),
-        ],
-      ],
-    );
-  }
-}
-
-class _ReportSkillMeterRow extends StatelessWidget {
-  const _ReportSkillMeterRow({required this.skill, required this.active});
-
-  final ReportSkill skill;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = active ? AppColors.brandDeep : AppColors.brandSoft;
-    return Row(
-      children: [
-        SizedBox(
-          width: 48,
-          child: Text(
-            skill.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: active ? AppColors.brandDeep : AppColors.muted,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              height: 1.1,
-              letterSpacing: 0,
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadii.full),
-            child: SizedBox(
-              height: 7,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  const ColoredBox(color: AppColors.surfaceStrong),
-                  FractionallySizedBox(
-                    widthFactor: skill.ratio,
-                    alignment: Alignment.centerLeft,
-                    child: ColoredBox(color: color),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        SizedBox(
-          width: 28,
-          child: Text(
-            '${skill.score}',
-            textAlign: TextAlign.right,
-            style: TextStyle(
-              color: active ? AppColors.brandDeep : AppColors.subtle,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              height: 1.1,
-              letterSpacing: 0,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ReportSkillRadarPainter extends CustomPainter {
-  const _ReportSkillRadarPainter({required this.skills});
-
-  final List<ReportSkill> skills;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (skills.length < 3) return;
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) * 0.35;
-    final gridPaint = Paint()
-      ..color = AppColors.border.withValues(alpha: 0.82)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final axisPaint = Paint()
-      ..color = AppColors.border.withValues(alpha: 0.72)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final fillPaint = Paint()
-      ..color = AppColors.brand.withValues(alpha: 0.16)
-      ..style = PaintingStyle.fill;
-    final linePaint = Paint()
-      ..color = AppColors.brand
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..strokeJoin = StrokeJoin.round;
-    final pointPaint = Paint()
-      ..color = AppColors.ink
-      ..style = PaintingStyle.fill;
-
-    for (var level = 1; level <= 4; level++) {
-      final path = Path();
-      for (var index = 0; index < skills.length; index++) {
-        final point = _radarPoint(
-          center,
-          radius * level / 4,
-          index,
-          skills.length,
-        );
-        if (index == 0) {
-          path.moveTo(point.dx, point.dy);
-        } else {
-          path.lineTo(point.dx, point.dy);
-        }
-      }
-      path.close();
-      canvas.drawPath(path, gridPaint);
-    }
-
-    final valuePath = Path();
-    for (var index = 0; index < skills.length; index++) {
-      final axis = _radarPoint(center, radius, index, skills.length);
-      canvas.drawLine(center, axis, axisPaint);
-      final point = _radarPoint(
-        center,
-        radius * skills[index].ratio,
-        index,
-        skills.length,
-      );
-      if (index == 0) {
-        valuePath.moveTo(point.dx, point.dy);
-      } else {
-        valuePath.lineTo(point.dx, point.dy);
-      }
-    }
-    valuePath.close();
-    canvas.drawPath(valuePath, fillPaint);
-    canvas.drawPath(valuePath, linePaint);
-
-    for (var index = 0; index < skills.length; index++) {
-      final point = _radarPoint(
-        center,
-        radius * skills[index].ratio,
-        index,
-        skills.length,
-      );
-      canvas.drawCircle(point, 4, pointPaint);
-      final labelPoint = _radarPoint(center, radius + 24, index, skills.length);
-      final painter = TextPainter(
-        text: TextSpan(
-          text: skills[index].label,
-          style: const TextStyle(
-            color: AppColors.muted,
-            fontFamily: AppTypography.systemFont,
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout(maxWidth: 64);
-      painter.paint(
-        canvas,
-        labelPoint - Offset(painter.width / 2, painter.height / 2),
-      );
-    }
-  }
-
-  Offset _radarPoint(Offset center, double radius, int index, int count) {
-    final angle = -math.pi / 2 + (math.pi * 2 * index / count);
-    return Offset(
-      center.dx + math.cos(angle) * radius,
-      center.dy + math.sin(angle) * radius,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _ReportSkillRadarPainter oldDelegate) {
-    return oldDelegate.skills != skills;
   }
 }
 

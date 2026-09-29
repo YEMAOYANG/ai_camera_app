@@ -1,0 +1,514 @@
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -388,7 +388,10 @@
+   color: var(--mira-orbit-cyan);
+ }
+ 
+-html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] > div > div {
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='playback-controls']
++  > .flex-1
++  > .inline-flex {
+   height: auto;
+   min-height: var(--mira-orbit-control-height);
+ }
+@@ -1234,38 +1237,6 @@
+   font-size: 16px;
+   box-shadow: none;
+ }
+-html[data-mira-student-theme='storybook'] [data-mira-fixed-student] {
+-  display: flex;
+-  align-items: center;
+-  justify-content: center;
+-  flex-direction: column;
+-  gap: 6px;
+-  color: var(--mira-orbit-muted);
+-  font-size: 12px;
+-}
+-html[data-mira-student-theme='storybook'] [data-mira-fixed-student] img {
+-  width: 52px;
+-  height: 52px;
+-  border-radius: 50%;
+-  object-fit: cover;
+-  background: #ede8d6;
+-}
+-html[data-mira-student-theme='storybook']
+-  [data-mira-fixed-textbook]
+-  [data-mira-participant-carousel],
+-html[data-mira-student-theme='storybook']
+-  [data-mira-fixed-textbook]
+-  [data-mira-discussion-rail='participants']
+-  > [data-mira-indicator='toolbar-divider'] {
+-  display: none;
+-}
+-html[data-mira-student-theme='storybook']
+-  [data-mira-fixed-textbook]
+-  [data-mira-discussion-rail='participants'] {
+-  width: 100px;
+-  justify-content: center;
+-}
+-
+ html[data-mira-student-theme='storybook']
+   [data-mira-fixed-textbook]
+   [data-mira-discussion-rail='teacher']
+@@ -1278,3 +1249,184 @@
+   > .flex-1 {
+   padding-top: 4px;
+ }
++
++/* One divider belongs to the toolbar. Avatar rails and speech surfaces don't
++ * draw another frame against that same edge. Keep every original interaction. */
++html[data-mira-student-theme='storybook'] [data-mira-roundtable-layout='standard'] {
++  border: 0;
++  flex-shrink: 0;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-roundtable-layout='standard']
++  > div:first-child {
++  flex-shrink: 0;
++  border-block: 1px solid var(--mira-orbit-line);
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-roundtable-layout='standard']
++  [data-mira-chrome='playback-controls'] {
++  min-height: 56px;
++  padding-block: 4px;
++  border: 0;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-roundtable-layout='standard']
++  [data-mira-discussion-rail] {
++  border: 0;
++}
++html[data-mira-student-theme='storybook'] [data-testid='roundtable-non-presentation-card'] {
++  border: 0;
++  border-radius: 0;
++  background: transparent;
++  padding-inline: 12px;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-roundtable-layout='standard']
++  [data-mira-discussion-rail='participants'] {
++  width: 216px;
++  padding-block: 8px;
++}
++html[data-mira-student-theme='storybook'] [data-mira-participant-input] {
++  gap: 12px;
++}
++html[data-mira-student-theme='storybook'] [data-mira-input-modes] {
++  flex-direction: row;
++  gap: 4px;
++}
++html[data-mira-student-theme='storybook'] [data-mira-user-avatar] {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  gap: 4px;
++}
++html[data-mira-student-theme='storybook'] [data-mira-user-name] {
++  max-width: 84px;
++  overflow: hidden;
++  text-overflow: ellipsis;
++  white-space: nowrap;
++  color: var(--mira-orbit-muted);
++  font-size: 11px;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-participant-avatar] {
++  width: 48px;
++  height: 48px;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-participant-scroll] {
++  min-height: 48px;
++  opacity: 1;
++}
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-speech-card] {
++  max-width: 100%;
++}
++@media (max-width: 640px) {
++  html[data-mira-student-theme='storybook']
++    [data-mira-fixed-textbook][data-mira-roundtable-layout='standard'] {
++    height: 272px !important;
++  }
++  html[data-mira-student-theme='storybook']
++    [data-mira-roundtable-layout='standard']
++    [data-mira-discussion-rail='participants'] {
++    width: 176px;
++  }
++  html[data-mira-student-theme='storybook']
++    [data-mira-roundtable-layout='standard']
++    [data-mira-discussion-rail='teacher'] {
++    width: 64px;
++  }
++}
++
++/* Respond to the space between the two resizable sidebars, not the window.
++ * A narrow classroom uses two toolbar rows and a separate classmates row. */
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] {
++  container: mira-classroom / inline-size;
++}
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-input-mode] {
++  min-width: 48px;
++  min-height: 48px;
++  width: 48px;
++  height: 48px;
++}
++@container mira-classroom (max-width: 640px) {
++  html[data-mira-student-theme='storybook'] [data-mira-roundtable-layout='standard'] {
++    height: 304px !important;
++  }
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] {
++    display: grid;
++    height: auto;
++    grid-template-columns: minmax(0, 1fr) auto;
++    gap: 0;
++  }
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] > .flex-1 {
++    grid-column: 1 / -1;
++    grid-row: 2;
++    min-width: 0;
++  }
++  html[data-mira-student-theme='storybook']
++    [data-mira-chrome='playback-controls']
++    > div:last-child {
++    grid-column: 2;
++    grid-row: 1;
++    margin: 0;
++  }
++  html[data-mira-student-theme='storybook']
++    [data-mira-chrome='playback-controls']
++    > [data-mira-indicator='toolbar-divider'] {
++    display: none;
++  }
++  html[data-mira-student-theme='storybook'] [data-mira-interaction-row] {
++    display: grid;
++    grid-template-columns: 64px minmax(0, 1fr);
++    grid-template-rows: minmax(0, 1fr) 88px;
++  }
++  html[data-mira-student-theme='storybook']
++    [data-mira-roundtable-layout='standard']
++    [data-mira-discussion-rail='teacher'] {
++    width: 64px;
++  }
++  html[data-mira-student-theme='storybook'] [data-mira-speech-stage] {
++    min-width: 0;
++    margin: 0 8px 0 0;
++  }
++  html[data-mira-student-theme='storybook'] [data-mira-speech-card] {
++    width: 100%;
++  }
++  html[data-mira-student-theme='storybook']
++    [data-mira-roundtable-layout='standard']
++    [data-mira-discussion-rail='participants'] {
++    grid-column: 1 / -1;
++    width: auto;
++    min-width: 0;
++    flex-direction: row;
++    align-items: center;
++    padding: 0 8px;
++  }
++  html[data-mira-student-theme='storybook'] [data-mira-participant-carousel] {
++    flex: 1;
++    min-width: 0;
++  }
++  html[data-mira-student-theme='storybook']
++    [data-mira-discussion-rail='participants']
++    > [data-mira-indicator='toolbar-divider'] {
++    display: none;
++  }
++  html[data-mira-student-theme='storybook'] [data-mira-participant-input] {
++    flex: 0 0 auto;
++    padding-inline: 4px;
++    gap: 8px;
++  }
++  html[data-mira-student-theme='storybook'] [data-mira-user-avatar] > div:first-child {
++    width: 52px;
++    height: 52px;
++  }
++  html[data-mira-student-theme='storybook']
++    [data-mira-user-avatar]
++    > div:first-child
++    > div:not([data-mira-avatar-ring]) {
++    max-width: 48px;
++    max-height: 48px;
++  }
++}
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -1724,7 +1724,7 @@
+       const headerHeight = isPresenting || hideHeader ? 0 : studentMode ? 48 : 80;
+       const fixedTextbook = (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook;
+       const roundtableHeight =
+-        mode === 'playback' && !isPresenting ? (fixedTextbook ? 168 : 192) : 0;
++        mode === 'playback' && !isPresenting ? (fixedTextbook ? 216 : 192) : 0;
+       return `calc(100% - ${headerHeight + roundtableHeight}px)`;
+     })();
+ 
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -433,7 +433,7 @@
+     });
+ 
+   const handleSendMessage = () => {
+-    if (fixedTextbook || !inputValue.trim() || isSendCooldown) return;
++    if (!inputValue.trim() || isSendCooldown) return;
+ 
+     showLocalUserMessage(inputValue);
+     onMessageSend?.(inputValue);
+@@ -444,7 +444,6 @@
+   };
+ 
+   const handleToggleInput = () => {
+-    if (fixedTextbook) return;
+     if (isSendCooldown) return;
+     if (!isInputOpen) {
+       onInputActivate?.();
+@@ -458,7 +457,6 @@
+   };
+ 
+   const handleToggleVoice = () => {
+-    if (fixedTextbook) return;
+     if (isVoiceOpen) {
+       if (isRecording) {
+         stopRecording();
+@@ -537,7 +535,6 @@
+     window.addEventListener('keydown', handleKeyDown);
+     return () => window.removeEventListener('keydown', handleKeyDown);
+   }, [
+-    fixedTextbook,
+     isInLiveFlow,
+     isDiscussionPaused,
+     thinkingState,
+@@ -1067,7 +1064,6 @@
+                     <>
+                       <button
+                         data-mira-input-mode="voice"
+-                        style={fixedTextbook ? { display: 'none' } : undefined}
+                         data-active={isVoiceOpen}
+                         aria-label={
+                           asrEnabled
+@@ -1092,7 +1088,6 @@
+                       </button>
+                       <button
+                         data-mira-input-mode="text"
+-                        style={fixedTextbook ? { display: 'none' } : undefined}
+                         data-active={isInputOpen}
+                         aria-label={t('roundtable.textInput')}
+                         onClick={(e) => {
+@@ -1110,20 +1105,9 @@
+                       </button>
+                     </>
+                   )}
+-
+-                  {fixedTextbook && (
+-                    <div data-mira-fixed-student>
+-                      <AvatarDisplay
+-                        src={userAvatar}
+-                        alt={userParticipant?.name || t('roundtable.you')}
+-                      />
+-                      <span>{userParticipant?.name || t('roundtable.you')}</span>
+-                    </div>
+-                  )}
+                   <button
+                     type="button"
+                     aria-label={t('roundtable.you')}
+-                    style={fixedTextbook ? { display: 'none' } : undefined}
+                     className="relative group cursor-pointer shrink-0 bg-transparent border-none p-0"
+                     onClick={(e) => {
+                       e.stopPropagation();
+@@ -1156,7 +1140,10 @@
+                         )}
+                       />
+                       <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden relative z-10 text-lg">
+-                        <AvatarDisplay src={userAvatar} alt={t('roundtable.you')} />
++                        <AvatarDisplay
++                          src={userAvatar}
++                          alt={userParticipant?.name || t('roundtable.you')}
++                        />
+                       </div>
+                     </div>
+                   </button>
+@@ -1197,7 +1184,8 @@
+   return (
+     <div
+       data-mira-fixed-textbook={fixedTextbook ? '' : undefined}
+-      style={fixedTextbook ? { height: 168 } : undefined}
++      data-mira-roundtable-layout="standard"
++      style={fixedTextbook ? { height: 216 } : undefined}
+       className={cn(
+         'h-[192px] w-full flex flex-col relative z-10 transition-all duration-300',
+         isPresenting && !controlsVisible
+@@ -1215,7 +1203,7 @@
+         {toolbar}
+       </div>
+       {/* ── Interaction area — three-column layout ── */}
+-      <div className="flex-1 flex items-stretch min-h-0">
++      <div data-mira-interaction-row className="flex-1 flex items-stretch min-h-0">
+         {/* Left: Teacher identity */}
+         <div
+           data-mira-discussion-rail="teacher"
+@@ -1355,7 +1343,7 @@
+         </div>
+ 
+         {/* Center: Interaction stage */}
+-        <div className="flex-1 relative mx-3 mb-2">
++        <div data-mira-speech-stage className="flex-1 relative mx-3 mb-2">
+           {/* End flash banner (Issue 3) */}
+           <AnimatePresence>
+             {endFlashVisible && (
+@@ -2194,8 +2182,11 @@
+           />
+ 
+           {/* User avatar + interaction buttons */}
+-          <div className="flex-1 flex items-center justify-center gap-3 px-2 min-h-0">
+-            <div className="flex flex-col gap-1.5 shrink-0">
++          <div
++            data-mira-participant-input
++            className="flex-1 flex items-center justify-center gap-3 px-2 min-h-0"
++          >
++            <div data-mira-input-modes className="flex flex-col gap-1.5 shrink-0">
+               {isSendCooldown ? (
+                 /* Unified cooldown indicator — replaces both buttons with a single dot wave */
+                 <div className="flex items-center justify-center w-8 h-8">
+@@ -2223,7 +2214,6 @@
+                 <>
+                   <button
+                     data-mira-input-mode="voice"
+-                    style={fixedTextbook ? { display: 'none' } : undefined}
+                     data-active={isVoiceOpen}
+                     aria-label={
+                       asrEnabled ? t('roundtable.voiceInput') : t('roundtable.voiceInputDisabled')
+@@ -2250,7 +2240,7 @@
+                   </button>
+                   <button
+                     data-mira-input-mode="text"
+-                    style={fixedTextbook ? { display: 'none' } : undefined}
++                    aria-label={t('roundtable.textInput')}
+                     data-active={isInputOpen}
+                     onClick={(e) => {
+                       e.stopPropagation();
+@@ -2270,18 +2260,19 @@
+             </div>
+ 
+             {/* User avatar (big, clickable to open input) */}
+-            {fixedTextbook && (
+-              <div data-mira-fixed-student>
+-                <AvatarDisplay
+-                  src={userAvatar}
+-                  alt={userParticipant?.name || t('roundtable.you')}
+-                />
+-                <span>{userParticipant?.name || t('roundtable.you')}</span>
+-              </div>
+-            )}
+             <div
++              data-mira-user-avatar
++              role="button"
++              tabIndex={0}
++              aria-label={`${userParticipant?.name || t('roundtable.you')}，文字提问`}
++              onKeyDown={(event) => {
++                if (event.key === 'Enter' || event.key === ' ') {
++                  event.preventDefault();
++                  event.stopPropagation();
++                  handleToggleInput();
++                }
++              }}
+               className="relative group cursor-pointer shrink-0"
+-              style={fixedTextbook ? { display: 'none' } : undefined}
+               onClick={(e) => {
+                 e.stopPropagation();
+                 handleToggleInput();
+@@ -2309,7 +2300,10 @@
+                   )}
+                 />
+                 <div className="w-14 h-14 rounded-full bg-gray-50 dark:bg-gray-800 overflow-hidden relative z-10 shadow-sm border border-gray-50 dark:border-gray-700 text-2xl">
+-                  <AvatarDisplay src={userAvatar} alt={t('roundtable.you')} />
++                  <AvatarDisplay
++                    src={userAvatar}
++                    alt={userParticipant?.name || t('roundtable.you')}
++                  />
+                 </div>
+                 <div className="absolute top-0 right-0 w-5 h-5 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md border border-gray-100 dark:border-gray-700 z-20">
+                   <div
+@@ -2324,6 +2318,9 @@
+                   />
+                 </div>
+               </div>
++              {studentMode && (
++                <span data-mira-user-name>{userParticipant?.name || t('roundtable.you')}</span>
++              )}
+               {/* Cue user hint (Issue 7) */}
+               <AnimatePresence>
+                 {isCueUser && (
+diff --git a/lib/classroom/load-classroom.ts b/lib/classroom/load-classroom.ts
+--- a/lib/classroom/load-classroom.ts
++++ b/lib/classroom/load-classroom.ts
+@@ -235,6 +235,7 @@
+       persistedIsUserSet: settings.agentSelectionIsUserSet,
+       generatedAgentIds,
+       stageAgentIds: getCurrentStage()?.agentIds,
++      preferStageRoster: requireServerClassroom,
+       isPresetAgent: (id) => {
+         const agent = getAgent(id);
+         return !!agent && !agent.isGenerated;
+diff --git a/lib/orchestration/registry/agent-selection.ts b/lib/orchestration/registry/agent-selection.ts
+--- a/lib/orchestration/registry/agent-selection.ts
++++ b/lib/orchestration/registry/agent-selection.ts
+@@ -29,9 +29,24 @@
+   persistedIsUserSet: boolean;
+   generatedAgentIds: string[];
+   stageAgentIds?: string[];
++  /** Session-bound rosters can mix a subject teacher with built-in classmates. */
++  preferStageRoster?: boolean;
+   isPresetAgent: (id: string) => boolean;
+ }): RestoredAgentSelection {
+   const { persisted, persistedIsUserSet, generatedAgentIds, stageAgentIds, isPresetAgent } = params;
++
++  if (params.preferStageRoster && stageAgentIds?.length) {
++    const known = new Set(generatedAgentIds);
++    const selectedAgentIds = [...new Set(stageAgentIds)].filter(
++      (id) => known.has(id) || isPresetAgent(id),
++    );
++    if (selectedAgentIds.length) {
++      return {
++        selection: { mode: generatedAgentIds.length ? 'auto' : 'preset', selectedAgentIds },
++        isUserSet: false,
++      };
++    }
++  }
+ 
+   if (persistedIsUserSet && persisted.selectedAgentIds.length > 0) {
+     if (persisted.mode === 'auto') {
+diff --git a/tests/classroom/agent-selection-restore.test.ts b/tests/classroom/agent-selection-restore.test.ts
+--- a/tests/classroom/agent-selection-restore.test.ts
++++ b/tests/classroom/agent-selection-restore.test.ts
+@@ -169,3 +169,24 @@
+     }
+   });
+ });
++
++describe('session-bound textbook roster', () => {
++  it('keeps built-in classmates alongside the subject teacher, ignoring stale operator choices', () => {
++    expect(
++      restoreAgentSelection({
++        persisted: { mode: 'auto', selectedAgentIds: ['mira-textbook-chinese'] },
++        persistedIsUserSet: true,
++        generatedAgentIds: ['mira-textbook-chinese'],
++        stageAgentIds: ['mira-textbook-chinese', 'default-2', 'default-3', 'default-4', 'unknown'],
++        preferStageRoster: true,
++        isPresetAgent,
++      }),
++    ).toEqual({
++      selection: {
++        mode: 'auto',
++        selectedAgentIds: ['mira-textbook-chinese', 'default-2', 'default-3', 'default-4'],
++      },
++      isUserSet: false,
++    });
++  });
++});

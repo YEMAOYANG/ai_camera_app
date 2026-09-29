@@ -1,9 +1,5 @@
-import type { Metadata } from "next";
-
-import { StudentSessionGate } from "@/features/auth/student-session-gate";
-
-export const metadata: Metadata = { title: "今日学习" };
+import { redirect } from "next/navigation";
 
 export default function TodayPage() {
-  return <StudentSessionGate />;
+  redirect("/learning");
 }

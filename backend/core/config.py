@@ -102,6 +102,7 @@ class AppConfig:
     LEARNING_DAILY_TIMEZONE: str
     LEARNING_CURRICULUM_PREPARATION_RUNNER_ENABLED: bool
     LEARNING_COURSE_LIBRARY_ENABLED: bool
+    LEARNING_TEXTBOOK_LIBRARY_ONLY: bool
     LEARNING_COURSE_SUPPLY_SCOPE: str
     LEARNING_COURSE_SUPPLY_GRADE_SCOPES: dict[str, str]
     LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS: int
@@ -360,6 +361,7 @@ class AppConfig:
                 _env("LEARNING_CURRICULUM_PREPARATION_RUNNER_ENABLED", "0")
             ),
             LEARNING_COURSE_LIBRARY_ENABLED=_bool(_env("LEARNING_COURSE_LIBRARY_ENABLED", "1")),
+            LEARNING_TEXTBOOK_LIBRARY_ONLY=_bool(_env("LEARNING_TEXTBOOK_LIBRARY_ONLY", "1")),
             LEARNING_COURSE_SUPPLY_SCOPE=_env("LEARNING_COURSE_SUPPLY_SCOPE", "canary"),
             LEARNING_COURSE_SUPPLY_GRADE_SCOPES=json.loads(_env("LEARNING_COURSE_SUPPLY_GRADE_SCOPES", "{}")),
             LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS=int(
@@ -784,6 +786,9 @@ def apply_test_defaults(config: dict) -> dict:
     next_config.setdefault("LEARNING_DAILY_PREPARATION_ENABLED", False)
     next_config.setdefault("LEARNING_DYNAMIC_GENERATION_ENABLED", False)
     next_config.setdefault("LEARNING_STATIC_CATALOG_ENABLED", True)
+    # Legacy-domain regression fixtures opt into the retained legacy services.
+    # Normal application configuration defaults to the textbook library.
+    next_config.setdefault("LEARNING_TEXTBOOK_LIBRARY_ONLY", False)
     next_config.setdefault("LEARNING_DYNAMIC_POOL_TARGET", 1)
     next_config.setdefault("OPENMAIC_QUESTION_TIMEOUT_SECONDS", 420.0)
     next_config.setdefault("LEARNING_CLASSROOM_GENERATION_ENABLED", False)
@@ -874,6 +879,8 @@ def apply_test_defaults(config: dict) -> dict:
 
 
 def validate_flask_config(config: dict) -> None:
+    if type(config.get("LEARNING_TEXTBOOK_LIBRARY_ONLY", True)) is not bool:
+        raise ConfigError("LEARNING_TEXTBOOK_LIBRARY_ONLY must be boolean.")
     app_env = str(config.get("APP_ENV", "development")).strip().lower()
     if app_env not in VALID_APP_ENVS:
         raise ConfigError(f"Unsupported APP_ENV: {app_env}")

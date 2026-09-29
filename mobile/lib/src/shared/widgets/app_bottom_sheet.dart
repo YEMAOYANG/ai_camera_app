@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/shared/widgets/app_button.dart';
+import 'package:warm_sight/src/shared/widgets/app_glass_surface.dart';
 import 'package:warm_sight/src/shared/widgets/app_surface.dart';
 
 Future<T?> showAppBottomSheet<T>({
@@ -14,9 +15,17 @@ Future<T?> showAppBottomSheet<T>({
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
-    backgroundColor: AppColors.appBackgroundWarm,
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    barrierColor: AppColors.ink.withValues(alpha: 0.32),
+    sheetAnimationStyle: AnimationStyle(
+      duration: AppMotion.duration(context, 260),
+      reverseDuration: AppMotion.duration(context, 200),
+    ),
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(AppGlass.sheetRadius),
+      ),
     ),
     builder: (context) {
       return AppBottomSheetFrame(
@@ -85,17 +94,19 @@ class AppBottomSheetFrame extends StatelessWidget {
     final size = MediaQuery.sizeOf(context);
     final viewPadding = MediaQuery.viewPaddingOf(context);
     final topGap = viewPadding.top + 12;
-    final availableHeight = math.max(280.0, size.height - bottomInset - topGap);
+    final availableHeight = math.max(0.0, size.height - bottomInset - topGap);
     final preferredHeight = size.height * maxHeightFactor.clamp(0.32, 0.94);
     final maxHeight = math.min(preferredHeight, availableHeight);
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
-      child: SafeArea(
-        top: false,
-        bottom: true,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: maxHeight),
-          child: child,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: AppGlassSurface(
+          style: AppGlassStyle.sheet,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppGlass.sheetRadius),
+          ),
+          child: SafeArea(top: false, child: child),
         ),
       ),
     );
@@ -112,7 +123,7 @@ class AppBottomSheetBody extends StatelessWidget {
     this.padding = const EdgeInsets.fromLTRB(20, 8, 20, 12),
     this.handleTitleGap = 10,
     this.headerBottomGap = 16,
-    this.titleFontSize = 22,
+    this.titleFontSize = 20,
     this.subtitleFontSize = 13,
     this.subtitleLineHeight = 1.45,
     this.footer,
@@ -145,7 +156,7 @@ class AppBottomSheetBody extends StatelessWidget {
             color: AppColors.ink,
             fontFamily: AppTypography.systemFont,
             fontSize: titleFontSize,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w700,
             letterSpacing: 0,
           ),
         ),
@@ -154,10 +165,10 @@ class AppBottomSheetBody extends StatelessWidget {
           Text(
             subtitle!,
             style: TextStyle(
-              color: AppColors.muted,
+              color: AppColors.mutedStrong,
               fontFamily: AppTypography.systemFont,
               fontSize: subtitleFontSize,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               height: subtitleLineHeight,
               letterSpacing: 0,
             ),
@@ -205,7 +216,7 @@ class AppSheetHandle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 36,
+      height: AppControls.minTouchTarget,
       child: Stack(
         children: [
           Align(
@@ -220,26 +231,31 @@ class AppSheetHandle extends StatelessWidget {
           ),
           Align(
             alignment: Alignment.centerRight,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => Navigator.of(context).pop(),
-              child: Semantics(
-                button: true,
-                label: '关闭',
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.72),
-                    borderRadius: BorderRadius.circular(AppRadii.full),
-                    border: Border.all(color: AppColors.borderSoft),
-                  ),
-                  child: const SizedBox(
-                    width: 34,
-                    height: 34,
-                    child: Center(
-                      child: Icon(
-                        Icons.close,
-                        color: AppColors.muted,
-                        size: 18,
+            child: Tooltip(
+              message: '关闭',
+              excludeFromSemantics: true,
+              child: MergeSemantics(
+                child: Semantics(
+                  label: '关闭',
+                  button: true,
+                  child: IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: IconButton.styleFrom(
+                      minimumSize: const Size.square(
+                        AppControls.minTouchTarget,
+                      ),
+                      padding: EdgeInsets.zero,
+                      foregroundColor: AppColors.mutedStrong,
+                    ),
+                    icon: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceElevated,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.borderSoft),
+                      ),
+                      child: const SizedBox.square(
+                        dimension: 32,
+                        child: Icon(Icons.close, size: 18),
                       ),
                     ),
                   ),

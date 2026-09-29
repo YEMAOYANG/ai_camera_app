@@ -113,6 +113,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const ChildProfileSetupScreen(),
       ),
       GoRoute(
+        path: setupSchoolTextbooksPath,
+        name: 'setupSchoolTextbooks',
+        builder: (_, _) => const SchoolTextbooksPage(setupMode: true),
+      ),
+      GoRoute(
         path: setupCameraNamePath,
         name: 'setupCameraName',
         builder: (_, _) => const CameraNameSetupScreen(),

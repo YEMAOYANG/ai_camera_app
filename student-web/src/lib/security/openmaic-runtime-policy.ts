@@ -3,6 +3,7 @@ import { allowsLocalLanProductionHttp, isLocalLanHttpOrigin } from "./local-lan-
 const DEVELOPMENT_RUNTIME_ORIGIN = "http://127.0.0.1:3101";
 
 export const OPENMAIC_RUNTIME_HEADER_SOURCE = "/lesson/:taskId/classroom";
+export const TEXTBOOK_RUNTIME_HEADER_SOURCE = "/learning/textbooks/courses/:contentKey";
 export const BLOCKED_PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=()";
 
 type RuntimeEnvironment = "development" | "test" | "production" | string | undefined;
@@ -116,16 +117,16 @@ export function buildStudentSecurityHeaderRules(options: {
         { key: "Permissions-Policy", value: BLOCKED_PERMISSIONS_POLICY },
       ],
     },
-    {
+    ...[OPENMAIC_RUNTIME_HEADER_SOURCE, TEXTBOOK_RUNTIME_HEADER_SOURCE].map((source) => ({
       // This rule must remain after the global rule. Next applies the last
       // matching value when two header rules set the same header.
-      source: OPENMAIC_RUNTIME_HEADER_SOURCE,
+      source,
       headers: [
         {
           key: "Permissions-Policy",
           value: openMaicRuntimePermissionsPolicy(runtimeOrigin, options.localLanProductionMode),
         },
       ],
-    },
+    })),
   ];
 }

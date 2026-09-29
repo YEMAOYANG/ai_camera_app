@@ -7,7 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:warm_sight/src/core/theme/app_theme.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_primary_learning_preview.dart';
-import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
+import 'package:warm_sight/src/features/student_access/application/student_access_availability.dart';
+import 'package:warm_sight/src/features/learning/application/textbook_repository.dart';
+import 'support/fixed_textbook_fixtures.dart';
 import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
 import 'package:warm_sight/src/features/learning/application/learning_repository.dart';
 import 'package:warm_sight/src/features/learning/domain/learning_models.dart';
@@ -32,6 +34,9 @@ void main() {
         ),
       );
     await loader.load();
+    await (FontLoader(
+      'MaterialIcons',
+    )..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
   });
 
   test('golden CJK font is a repository-owned relative test asset', () {
@@ -275,7 +280,7 @@ void main() {
     );
   }
 
-  testWidgets('queued Home preparation golden at fixed phone surface', (
+  testWidgets('fixed textbook Home status golden at fixed phone surface', (
     tester,
   ) async {
     await _setViewport(tester, const Size(390, 844));
@@ -294,7 +299,7 @@ void main() {
     );
   });
 
-  testWidgets('failed Profile preparation golden at fixed phone surface', (
+  testWidgets('compact Profile textbook status golden at fixed phone surface', (
     tester,
   ) async {
     await _setViewport(tester, const Size(390, 844));
@@ -304,7 +309,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
-      find.text('课程准备需要重新启动'),
+      find.text('教材与课程'),
       260,
       scrollable: find.byType(Scrollable).first,
     );
@@ -351,13 +356,16 @@ Future<void> _pumpHomeGolden(
     ProviderScope(
       overrides: [
         profileSummaryProvider.overrideWith((ref) async => _goldenProfile),
-        currentLearningAvailabilityProvider.overrideWith(
+        studentAccessAvailabilityProvider.overrideWith(
           (ref, childId) async => const LearningAvailability(
             gradeCode: 'primary_1',
             hasActiveRelease: false,
             availableCourseCount: 0,
             canLearnNow: false,
           ),
+        ),
+        schoolTextbooksProvider.overrideWith(
+          (ref, id) async => fixtureCatalog(selected: true),
         ),
         learningPreparationRepositoryProvider.overrideWithValue(preparation),
         learningRepositoryProvider.overrideWithValue(learning),
@@ -389,7 +397,7 @@ Future<void> _pumpProfileGolden(
       overrides: [
         currentChildProvider.overrideWith((ref) async => _goldenChild),
         accountProfileProvider.overrideWith((ref) async => _goldenAdmin),
-        currentLearningAvailabilityProvider.overrideWith(
+        studentAccessAvailabilityProvider.overrideWith(
           (ref, childId) async => const LearningAvailability(
             gradeCode: 'primary_1',
             hasActiveRelease: false,
@@ -397,6 +405,9 @@ Future<void> _pumpProfileGolden(
             canLearnNow: false,
             canAccessWorkspace: true,
           ),
+        ),
+        schoolTextbooksProvider.overrideWith(
+          (ref, id) async => fixtureCatalog(selected: true),
         ),
         learningPreparationRepositoryProvider.overrideWithValue(preparation),
       ],

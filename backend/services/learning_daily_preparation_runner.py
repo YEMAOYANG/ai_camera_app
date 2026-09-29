@@ -26,6 +26,8 @@ class LearningDailyPreparationRunner:
         self._state = LearningDailyPreparationState()
 
     def start(self, app) -> None:
+        if app.config.get("LEARNING_TEXTBOOK_LIBRARY_ONLY", False):
+            return
         if self._thread and self._thread.is_alive():
             return
         if not app.config.get("LEARNING_DAILY_PREPARATION_ENABLED"):

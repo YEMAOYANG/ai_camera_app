@@ -1,0 +1,118 @@
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -21,6 +21,7 @@
+ const log = createLogger('QuizView');
+ import type { QuizQuestion } from '@/lib/types/stage';
+ import { SpeechButton } from '@/components/audio/speech-button';
++import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
+ import { gradeChoiceQuestions, isShortAnswer, type QuestionResult } from '@/lib/quiz/grading';
+ import { renderQuizMathText } from '@/lib/quiz/math-text';
+ import { writeDraftRecovery } from '@/lib/quiz/persistence';
+@@ -576,6 +577,7 @@
+   const { t } = useI18n();
+   const isReview = !!result;
+   const pts = question.points ?? 1;
++  const narrationSource = questionNarrationSource(question);
+ 
+   return (
+     <motion.div
+@@ -645,6 +647,7 @@
+       </div>
+ 
+       {/* Body */}
++      {narrationSource && <QuestionNarration src={narrationSource} number={index + 1} />}
+       {children}
+ 
+       {/* Analysis (review only) */}
+--- /dev/null
++++ b/components/audio/question-narration.tsx
+@@ -0,0 +1,65 @@
++'use client';
++
++import { useEffect, useRef, useState } from 'react';
++import { Pause, Volume2 } from 'lucide-react';
++
++/** Only already-authored, same-origin classroom audio; never calls a TTS API. */
++export function questionNarrationSource(question: unknown): string | null {
++  if (!question || typeof question !== 'object') return null;
++  const value = (question as Record<string, unknown>).questionAudioUrl;
++  return typeof value === 'string'
++    && /^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(?:wav|mp3|ogg)$/.test(value)
++    ? value : null;
++}
++
++let activeAudio: HTMLAudioElement | null = null;
++
++export function QuestionNarration({ src, number }: { src: string; number: number }) {
++  const audio = useRef<HTMLAudioElement | null>(null);
++  const [playing, setPlaying] = useState(false);
++  const [failed, setFailed] = useState(false);
++
++  useEffect(() => {
++    const player = new Audio(src);
++    player.preload = 'none';
++    audio.current = player;
++    const stopped = () => setPlaying(false);
++    const error = () => { setPlaying(false); setFailed(true); };
++    const hidden = () => { if (document.hidden) player.pause(); };
++    player.addEventListener('pause', stopped);
++    player.addEventListener('ended', stopped);
++    player.addEventListener('error', error);
++    document.addEventListener('visibilitychange', hidden);
++    return () => {
++      player.pause();
++      if (activeAudio === player) activeAudio = null;
++      player.removeEventListener('pause', stopped);
++      player.removeEventListener('ended', stopped);
++      player.removeEventListener('error', error);
++      document.removeEventListener('visibilitychange', hidden);
++      player.removeAttribute('src');
++      audio.current = null;
++    };
++  }, [src]);
++
++  async function toggle() {
++    const player = audio.current;
++    if (!player) return;
++    if (!player.paused) { player.pause(); return; }
++    activeAudio?.pause();
++    activeAudio = player;
++    player.currentTime = 0;
++    setFailed(false);
++    try { await player.play(); if (audio.current === player) setPlaying(true); }
++    catch { if (audio.current === player) { setPlaying(false); setFailed(true); } }
++  }
++
++  return <div className="mb-3">
++    <button type="button" onClick={toggle} aria-label={`${playing ? '暂停' : '听'}第 ${number} 题`}
++      className="inline-flex min-h-12 items-center gap-2 rounded-full bg-amber-100 px-5 text-base font-medium text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">
++      {playing ? <Pause size={20} aria-hidden /> : <Volume2 size={20} aria-hidden />}
++      {playing ? '暂停' : '听题目'}
++    </button>
++    {failed && <p role="status" className="mt-2 text-sm text-amber-800">声音暂时没放出来，请再试一次。</p>}
++  </div>;
++}
+--- /dev/null
++++ b/tests/quiz/question-narration.test.ts
+@@ -0,0 +1,21 @@
++import { describe, expect, it } from 'vitest';
++import { questionNarrationSource } from '@/components/audio/question-narration';
++
++describe('pre-generated quiz narration', () => {
++  it('accepts a saved same-origin classroom recording', () => {
++    const src = '/api/classroom-media/lesson_123/audio/question-1.wav';
++    expect(questionNarrationSource({ questionAudioUrl: src })).toBe(src);
++  });
++  it.each([
++    'https://untrusted.example/audio.wav',
++    '//untrusted.example/audio.wav',
++    '/api/generate/tts',
++    '/api/classroom-media/a/audio/../../private.wav',
++    '/api/classroom-media/a/audio/x.wav?token=anything',
++  ])('does not use dynamic or unrelated media: %s', value => {
++    expect(questionNarrationSource({ questionAudioUrl: value })).toBeNull();
++  });
++  it('leaves historical questions without narration unchanged', () => {
++    expect(questionNarrationSource({ question: '天' })).toBeNull();
++  });
++});

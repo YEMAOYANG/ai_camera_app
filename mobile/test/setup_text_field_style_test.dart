@@ -112,17 +112,17 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('设置孩子的学习身份'), findsOneWidget);
-    expect(find.text('用于称呼孩子并匹配适龄内容'), findsOneWidget);
+    expect(find.text('孩子的基本信息'), findsOneWidget);
+    expect(find.text('称呼和年级，以后都能修改。'), findsOneWidget);
     expect(find.text('2 / 2'), findsOneWidget);
     expect(find.text('3 / 2'), findsNothing);
     expect(find.text('幼儿园'), findsOneWidget);
     expect(find.text('小学'), findsOneWidget);
-    expect(_stageChoiceColor(tester, 'primary'), AppColors.brandDeep);
+    expect(_stageChoiceColor(tester, 'primary'), AppColors.brandWash);
     expect(_stageChoiceColor(tester, 'kindergarten'), Colors.transparent);
-    expect(find.text('选择小学年级'), findsOneWidget);
-    expect(find.text('新一年级'), findsOneWidget);
-    expect(find.text('新六年级'), findsOneWidget);
+    expect(find.text('年级'), findsOneWidget);
+    expect(find.text('一年级'), findsOneWidget);
+    expect(find.text('六年级'), findsOneWidget);
     expect(find.byKey(const ValueKey('gradeOption_primary_3')), findsOneWidget);
     expect(find.byKey(const ValueKey('gradeOption_primary_6')), findsOneWidget);
     expect(
@@ -131,7 +131,7 @@ void main() {
     );
     expect(find.text('孩子称呼'), findsOneWidget);
     expect(find.byKey(const ValueKey('setupInput_孩子称呼')), findsOneWidget);
-    expect(find.text('摄像头老师会这样称呼孩子'), findsOneWidget);
+    expect(find.text('当前选择'), findsNothing);
     expect(find.text('性别'), findsNothing);
     expect(find.text('出生日期'), findsNothing);
     expect(find.text('初中'), findsNothing);
@@ -156,7 +156,10 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('gradeOption_primary_3')));
     await tester.pumpAndSettle();
 
-    expect(_gradeChoiceColor(tester, 'primary_3'), AppColors.brandDeep);
+    expect(find.byKey(const ValueKey('gradeOption_primary_3')), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('childGradeDisclosure')));
+    await tester.pump();
+    expect(_gradeChoiceColor(tester, 'primary_3'), AppColors.brandWash);
     expect(
       tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
       isNotNull,
@@ -195,7 +198,7 @@ void main() {
       find.byKey(const ValueKey('gradeOption_primary_3')),
     );
     expect((first.top - second.top).abs(), lessThan(1));
-    expect((first.top - third.top).abs(), lessThan(1));
+    expect(third.top, greaterThan(first.bottom));
     expect(first.width, greaterThanOrEqualTo(44));
     expect(first.height, greaterThanOrEqualTo(44));
     final fourth = tester.getRect(
@@ -211,7 +214,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('gradeStage_kindergarten')));
     await tester.pumpAndSettle();
 
-    expect(_stageChoiceColor(tester, 'kindergarten'), AppColors.brandDeep);
+    expect(_stageChoiceColor(tester, 'kindergarten'), AppColors.brandWash);
     expect(_stageChoiceColor(tester, 'primary'), Colors.transparent);
     expect(find.byKey(const ValueKey('gradeOption_primary_3')), findsNothing);
     expect(
@@ -227,7 +230,13 @@ void main() {
       find.byKey(const ValueKey('gradeOption_kindergarten_big')),
     );
     await tester.pumpAndSettle();
-    expect(_gradeChoiceColor(tester, 'kindergarten_big'), AppColors.brandDeep);
+    expect(
+      find.byKey(const ValueKey('gradeOption_kindergarten_big')),
+      findsNothing,
+    );
+    await tester.tap(find.byKey(const ValueKey('childGradeDisclosure')));
+    await tester.pump();
+    expect(_gradeChoiceColor(tester, 'kindergarten_big'), AppColors.brandWash);
     expect(tester.takeException(), isNull);
   });
 
@@ -454,7 +463,7 @@ void main() {
 Color? _gradeChoiceColor(WidgetTester tester, String code) {
   final container = tester.widget<AnimatedContainer>(
     find
-        .descendant(
+        .ancestor(
           of: find.byKey(ValueKey('gradeOption_$code')),
           matching: find.byType(AnimatedContainer),
         )

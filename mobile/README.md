@@ -4,11 +4,18 @@
 
 ## 技术底座
 
-- Flutter 3.41 / Dart 3.11
+- Flutter 3.44.9 / Dart 3.12.2（当前验证版本）
 - `flutter_riverpod`：状态管理与依赖注入
 - `go_router`：声明式路由与底部主导航
 - `dio`：后端 API 客户端
 - Material 3：家长端基础主题
+- `fresnel` 0.1.0：iOS 26+ 使用系统原生 Liquid Glass，统一通过
+  `AppGlassSurface` 适配；Android 的小型浮动控件按图形能力使用折射或轻模糊，
+  减少透明度、高对比和减少动态效果使用实底降级。
+
+Flutter SDK 至少需要 3.44.9，Dart 至少需要 3.12.2。升级 SDK 后运行
+`flutter pub get`，提交更新后的 `pubspec.lock`。玻璃组件的选型和验收范围见
+[液态玻璃接入记录](../docs/design/2026-09-29-parent-liquid-glass.md)。
 
 ## 目录
 
@@ -29,6 +36,11 @@ cd mobile
 flutter pub get
 flutter run
 ```
+
+iOS 模拟器：先在 Xcode 的 Device Hub（Xcode 27）中启动设备，再运行
+`flutter devices` 查找设备 ID，并执行 `flutter run -d <device-id> --no-pub`。
+Runner 和 Pods 对 `iphonesimulator` SDK 使用至少 iOS 15 的部署目标，以满足
+Xcode 27 的构建要求；此设置仅针对模拟器。
 
 环境配置在 `mobile/.env.development` 和 `mobile/.env.product`。开发环境默认使用当前
 局域网后端地址。`.env.product` 里是不可发布的占位域名：生产构建前必须替换

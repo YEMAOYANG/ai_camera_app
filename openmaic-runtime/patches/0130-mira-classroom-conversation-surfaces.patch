@@ -1,0 +1,332 @@
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -17,6 +17,13 @@
+   --mira-orbit-lime: #f3c65b;
+   --mira-orbit-control-height: 48px;
+   --mira-orbit-control-radius: 9px;
++  --mira-orbit-speech-teacher: #f3e7cc;
++  --mira-orbit-speech-agent: #e8ede4;
++  --mira-orbit-speech-user: #f8df9a;
++  --mira-orbit-speech-line: #d9c59b;
++  --mira-orbit-note-surface: #fffdf8;
++  --mira-orbit-note-selected: #fcf3de;
++  --mira-orbit-note-playing: #f3dca5;
+   background: var(--mira-orbit-space);
+   scrollbar-gutter: auto;
+   overflow: hidden;
+@@ -242,14 +249,19 @@
+ 
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-bubble] {
+   color: var(--mira-orbit-text);
+-  background: var(--mira-orbit-raised);
+-  border-color: var(--mira-orbit-line);
+-  --tw-ring-color: var(--mira-orbit-line);
+-  box-shadow: none;
++  background: var(--mira-orbit-speech-teacher);
++  border: 1px solid var(--mira-orbit-speech-line);
++  --tw-ring-color: transparent;
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-bubble='agent'] {
++  background: var(--mira-orbit-speech-agent);
++  border-color: #c9d3c3;
+ }
+ 
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-bubble='user'] {
+-  background: #eee4cf;
++  background: var(--mira-orbit-speech-user);
+ }
+ 
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-speaker] {
+@@ -263,6 +275,8 @@
+ }
+ 
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-message] {
++  background: transparent;
++  border: 1px solid transparent;
+   /* Upstream Motion writes a repeating purple box-shadow inline. */
+   box-shadow: none !important;
+ }
+@@ -270,8 +284,8 @@
+ html[data-mira-student-theme='storybook']
+   [data-mira-chrome='chat']
+   [data-mira-chat-message][data-active='true'] {
+-  background: var(--mira-orbit-raised);
+-  border-left-color: var(--mira-orbit-cyan);
++  background: var(--mira-orbit-note-selected);
++  border-color: var(--mira-orbit-speech-line);
+ }
+ 
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-session-badge] {
+@@ -297,6 +311,114 @@
+ 
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-continue] span {
+   color: inherit;
++}
++
++/* Notes have three distinct states: page, current page, and the spoken line.
++ * Semantic hooks keep the skin independent of upstream utility class colors. */
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-lecture-notes] {
++  background: var(--mira-orbit-space);
++  padding-block: 12px;
++  scroll-padding-block: 12px;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-note-page] {
++  background: var(--mira-orbit-note-surface);
++  border: 1px solid transparent;
++  border-radius: 12px;
++  padding: 12px;
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='chat']
++  [data-mira-note-page][data-active='true'] {
++  background: var(--mira-orbit-note-selected);
++  border-color: var(--mira-orbit-speech-line);
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-note-label] {
++  color: var(--mira-orbit-cyan);
++  font-size: 11px;
++  letter-spacing: 0;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-note-current] {
++  color: #675127;
++  background: var(--mira-orbit-note-playing);
++  padding: 2px 7px;
++  font-size: 10px;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-note-page] h4 {
++  color: var(--mira-orbit-text);
++  font-size: 14px;
++  margin-bottom: 8px;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-note-line] {
++  color: var(--mira-orbit-text);
++  background: transparent;
++  border: 1px solid transparent;
++  padding: 4px 6px;
++  font-size: 13px;
++  line-height: 1.8;
++  opacity: 1;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='chat']
++  [data-mira-note-line]:not(:disabled):hover {
++  background: var(--mira-orbit-speech-teacher);
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='chat']
++  [data-mira-note-line][data-active='true'] {
++  color: #493e27;
++  background: var(--mira-orbit-note-playing);
++  border-color: var(--mira-orbit-speech-line);
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-header] {
++  height: 64px;
++  margin-block: 0;
++  padding: 8px 12px;
++  border-bottom: 1px solid var(--mira-orbit-line);
++  background: var(--mira-orbit-panel);
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='chat']
++  [data-mira-chat-header]
++  [role='tablist'] {
++  height: 48px;
++  padding: 0;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-collapse] {
++  width: 48px;
++  height: 48px;
++  color: var(--mira-orbit-muted);
++  background: transparent;
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='chat']
++  [data-mira-chat-collapse]:hover {
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-raised);
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-empty] {
++  opacity: 1;
++  color: var(--mira-orbit-muted);
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-empty] > p {
++  color: var(--mira-orbit-muted);
++  font-size: 13px;
++  line-height: 1.8;
+ }
+ 
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] > div,
+@@ -368,6 +490,16 @@
+   background: var(--mira-orbit-raised);
+ }
+ 
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [role='tab']::after {
++  display: none;
++}
++
++/* One keyboard focus outline; do not stack Radix's ring and focus border. */
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [role='tab']:focus-visible {
++  border-color: transparent;
++  box-shadow: none;
++}
++
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] button:disabled {
+   opacity: 0.4;
+ }
+@@ -753,8 +885,8 @@
+ /* Every speaker uses a warm, readable bubble, independent of upstream role colors. */
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-speech-card] {
+   color: var(--mira-orbit-text);
+-  background: var(--mira-orbit-panel);
+-  border-color: var(--mira-orbit-line);
++  background: var(--mira-orbit-speech-teacher);
++  border-color: var(--mira-orbit-speech-line);
+   box-shadow: none;
+   backdrop-filter: none;
+ }
+@@ -762,13 +894,14 @@
+ html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-speech-card='agent'] {
+-  background: var(--mira-orbit-raised);
++  background: var(--mira-orbit-speech-agent);
++  border-color: #c9d3c3;
+ }
+ 
+ html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-speech-card='user'] {
+-  background: #eee4cf;
++  background: var(--mira-orbit-speech-user);
+ }
+ 
+ html[data-mira-student-theme='storybook']
+@@ -1210,10 +1343,6 @@
+   border-color: #dac28a;
+   box-shadow: none;
+ }
+-html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-speech-card] {
+-  border-color: transparent;
+-  background: transparent;
+-}
+ html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-bubble-avatar] {
+diff --git a/components/chat/chat-area.tsx b/components/chat/chat-area.tsx
+--- a/components/chat/chat-area.tsx
++++ b/components/chat/chat-area.tsx
+@@ -299,7 +299,10 @@
+             className="flex flex-col h-full gap-0"
+           >
+             {/* Tab header row */}
+-            <div className="h-10 flex items-center gap-1 shrink-0 mt-3 mb-1 px-3">
++            <div
++              data-mira-chat-header
++              className="h-10 flex items-center gap-1 shrink-0 mt-3 mb-1 px-3"
++            >
+               <TabsList variant="line" className="h-full flex-1 w-0">
+                 <TabsTrigger value="lecture" className="text-xs gap-1 flex-1">
+                   <BookOpen className="w-3.5 h-3.5" />
+@@ -320,6 +323,8 @@
+ 
+               {onCollapseChange && (
+                 <button
++                  data-mira-chat-collapse
++                  aria-label={t('common.close')}
+                   onClick={() => onCollapseChange(true)}
+                   className="w-7 h-7 shrink-0 rounded-lg flex items-center justify-center bg-gray-100/80 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 ring-1 ring-black/[0.04] dark:ring-white/[0.06] hover:bg-gray-200/90 dark:hover:bg-gray-700/90 hover:text-gray-700 dark:hover:text-gray-200 active:scale-90 transition-all duration-200"
+                 >
+@@ -343,7 +348,10 @@
+             <TabsContent value="chat" className="flex-1 overflow-hidden flex flex-col">
+               <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-2 scrollbar-hide">
+                 {chatSessions.length === 0 ? (
+-                  <div className="h-full flex flex-col items-center justify-center text-center p-6 opacity-50">
++                  <div
++                    data-mira-chat-empty
++                    className="h-full flex flex-col items-center justify-center text-center p-6 opacity-50"
++                  >
+                     <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-3 text-gray-300 dark:text-gray-600">
+                       <MessageSquare className="w-6 h-6" />
+                     </div>
+diff --git a/components/chat/lecture-notes-view.tsx b/components/chat/lecture-notes-view.tsx
+--- a/components/chat/lecture-notes-view.tsx
++++ b/components/chat/lecture-notes-view.tsx
+@@ -101,6 +101,7 @@
+   return (
+     <div
+       ref={containerRef}
++      data-mira-lecture-notes
+       className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-2 scrollbar-hide"
+     >
+       {notes.map((note, index) => {
+@@ -112,6 +113,8 @@
+           <div
+             key={note.sceneId}
+             data-scene-id={note.sceneId}
++            data-mira-note-page
++            data-active={isCurrent}
+             className={cn(
+               'relative mb-3 last:mb-0 rounded-lg px-3 py-2.5 transition-colors duration-200',
+               isCurrent
+@@ -133,6 +136,7 @@
+                 )}
+               />
+               <span
++                data-mira-note-label
+                 className={cn(
+                   'text-[10px] font-semibold tracking-wide',
+                   isCurrent
+@@ -143,7 +147,10 @@
+                 {pageLabel}
+               </span>
+               {isCurrent && (
+-                <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300">
++                <span
++                  data-mira-note-current
++                  className="text-[9px] font-bold px-1.5 py-px rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300"
++                >
+                   {t('chat.lectureNotes.currentPage')}
+                 </span>
+               )}
+@@ -255,6 +262,8 @@
+                       <button
+                         key={row.actionId}
+                         type="button"
++                        data-mira-note-line
++                        data-active={isActiveSpeech}
+                         disabled={!canJump}
+                         title={jumpTitle}
+                         onClick={() => onJumpToAction?.(note.sceneId, row.actionIndex)}
+diff --git a/lib/i18n/locales/zh-CN.json b/lib/i18n/locales/zh-CN.json
+--- a/lib/i18n/locales/zh-CN.json
++++ b/lib/i18n/locales/zh-CN.json
+@@ -144,8 +144,8 @@
+       "emptyHint": "点击播放按钮开始授课",
+       "pageLabel": "第 {{n}} 页",
+       "currentPage": "当前页",
+-      "jumpToLine": "Jump to this line",
+-      "jumpUnavailable": "Jump unavailable for this line"
++      "jumpToLine": "从这一句开始听",
++      "jumpUnavailable": "这一句暂时不能跳转"
+     },
+     "badge": {
+       "qa": "Q&A",

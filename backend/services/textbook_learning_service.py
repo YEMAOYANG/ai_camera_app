@@ -5,17 +5,36 @@ import json
 import re
 from zoneinfo import ZoneInfo
 
-from content.textbook_catalog import (authoring_prompt, digest, fields, generation_brief,
-                                      identifier, lesson_by_id, text, validate_frozen_brief, validate_manifest)
+from content.textbook_catalog import (SUBJECTS, authoring_prompt, digest, fields, generation_brief,
+                                      identifier, lesson_by_id, superseded_resources, text, validate_frozen_brief, validate_manifest)
+from content.textbook_metadata import reviewed_edition_label
 from core.errors import ApiError
 from core.security import now_ms
+from content.textbook_introductions import public_introduction
+from services.textbook_journey_service import catalog_journeys
 
 RESPONSE_SCHEMA = "mira.learning.textbooks.v1"
 
 
-def school_term():
-    today = datetime.now(ZoneInfo("Asia/Shanghai"))
+def school_term(today=None):
+    today = today or datetime.now(ZoneInfo("Asia/Shanghai"))
     return today.year if today.month >= 9 else today.year - 1, "upper" if today.month >= 9 or today.month == 1 else "lower"
+
+
+def textbook_context(repository, conn, child):
+    """One effective term for catalogue, selections and every classroom gate.
+
+    The date is a suggestion, not a claim about a school's holiday calendar.
+    A parent's override expires with the academic year or confirmed grade.
+    """
+    year, suggested = school_term()
+    saved = repository.learning_context(conn, child)
+    applicable = (saved.get("schoolYearStartYear") == year
+                  and saved.get("gradeRevision") == child["grade_selection_revision"])
+    manual = saved.get("semester") if applicable else None
+    return {"schoolYearStartYear": year, "semester": manual or suggested,
+            "suggestedSemester": suggested, "termSource": "parent" if manual else "calendar",
+            "contextRevision": saved.get("revision", 0), "gradeRevision": int(child["grade_selection_revision"])}
 
 
 class TextbookLearningService:
@@ -63,11 +82,16 @@ class TextbookLearningService:
 
     def student_catalog(self, token, query):
         self._query(query)
-        return self.catalog(self._student(token))
+        catalog = self.catalog(self._student(token))
+        # Parents choose editions. Children choose subjects, never an arbitrary
+        # regional/system variant from the operator's complete catalogue.
+        catalog["books"] = [book for book in catalog["books"] if book["selected"]]
+        return catalog
 
     def catalog(self, child):
-        year, semester = school_term()
         with self.repository.transaction() as conn:
+            context = textbook_context(self.repository, conn, child)
+            year, semester = context["schoolYearStartYear"], context["semester"]
             rows = self.repository.list_revisions(conn, child["grade_code"])
             choices = self.repository.selections(conn, child, year, semester)
         selected = {(r["edition_id"], r["revision_id"]): r for r in choices}
@@ -86,18 +110,52 @@ class TextbookLearningService:
         for row in displayed.values():
             m = self.repository.manifest(row)
             choice = selected.get((row["edition_id"], row["revision_id"]))
+            if not choice and m["source"]["resourceId"] in superseded_resources():
+                continue
             books.append({**self._book(m), "selected": choice is not None,
                           "selectionRevision": subject_revisions.get(m["subject"], 0),
                           "currentNodeId": choice["current_node_id"] if choice else None})
         books.sort(key=lambda b: (not b["selected"], b["volume"] not in {semester, "full"},
                                   b["schoolSystem"] != "six_year", b["subject"], b["editionId"], b["revisionId"]))
+        with self.repository.transaction() as conn:
+            completed = None
+            visible_courses = set()
+            for book in books:
+                if not book["selected"]:
+                    continue
+                manifest = self._revision(conn, child, book["editionId"], book["revisionId"])
+                builds = self.repository.builds(conn, book["editionId"], book["revisionId"])
+                available, locked = [], 0
+                for unit in manifest["units"]:
+                    for node in unit["lessons"]:
+                        course, blocked = self._available_course(conn, child, manifest, node, builds)
+                        if course:
+                            available.append((course["courseId"], course["courseVersion"]))
+                        elif blocked:
+                            locked += 1
+                visible_courses.update(available)
+                if available and completed is None:
+                    completed = self.repository.completed_courses(conn, child)
+                book["learningStatus"] = {
+                    "status": "ready" if available else "locked" if locked else "unpublished",
+                    "availableLessonCount": len(available),
+                    "completedLessonCount": sum(key in (completed or set()) for key in available),
+                }
+        with self.repository.transaction() as conn:
+            journeys = catalog_journeys(self.repository, conn, child, books, visible_courses)
+        subjects = []
+        for subject in SUBJECTS:
+            selected_book = next((b for b in books if b["subject"] == subject and b["selected"]), None)
+            offered = any(b["subject"] == subject and b["volume"] in {semester, "full"} for b in books)
+            subjects.append({"subject": subject, "status": "confirmed" if selected_book else "selection_required" if offered else "unavailable"})
         return {"ok": True, "schemaVersion": RESPONSE_SCHEMA, "gradeCode": child["grade_code"],
-                "schoolYearStartYear": year, "semester": semester, "books": books}
+                **context, "subjects": subjects, "books": books, "learningJourneys": journeys}
 
     @staticmethod
     def _book(manifest):
         return {**{k: manifest[k] for k in ("editionId", "revisionId", "title", "publisher", "editionLabel",
                                             "gradeCode", "subject", "volume", "schoolSystem", "coverage")},
+                "editionLabel": reviewed_edition_label(manifest),
                 "sourceUrl": manifest["source"]["url"],
                 "unitCount": len(manifest["units"]),
                 "lessonCount": sum(len(u["lessons"]) for u in manifest["units"])}
@@ -117,11 +175,14 @@ class TextbookLearningService:
         self._query(query, ("alignmentRevisionId",))
         child = self._student(token)
         revision_id = (query or {}).get("alignmentRevisionId")
-        year, semester = school_term()
         with self.repository.transaction() as conn:
+            context = textbook_context(self.repository, conn, child)
+            year, semester = context["schoolYearStartYear"], context["semester"]
             manifest = self._revision(conn, child, edition_id, revision_id)
             choices = self.repository.selections(conn, child, year, semester)
             selection = next((r for r in choices if r["edition_id"] == edition_id and r["revision_id"] == revision_id), None)
+            if selection is None:
+                raise ApiError("textbook_selection_required", "请家长在 App 的“学校教材”中确认这学期的课本，再回到书包刷新。", 409)
             builds = self.repository.builds(conn, edition_id, revision_id)
             units = []
             for unit in manifest["units"]:
@@ -133,20 +194,40 @@ class TextbookLearningService:
                     reviewed = manifest["rightsReview"]["status"] == "cleared" and node["brief"]["status"] == "approved"
                     status = "ready" if course else "locked" if blocked else "preparing" if reviewed else "reviewing"
                     lessons.append({"nodeId": node["nodeId"], "title": node["title"], "sequence": node["sequence"],
+                                    **({"sectionTitle": node["sectionTitle"]} if node.get("sectionTitle") else {}),
                                     "printedPage": node["printedPage"], "pdfPage": node["pdfPage"],
                                     "objectives": node["brief"]["objectives"], "status": status, "message": blocked, "course": course})
-                units.append({"unitId": unit["unitId"], "title": unit["title"], "sequence": unit["sequence"], "lessons": lessons})
+                units.append({"unitId": unit["unitId"], "title": unit["title"], "sequence": unit["sequence"],
+                              "kind": unit.get("kind", "unit"),
+                              "introduction": public_introduction(unit.get("introduction"), manifest=manifest), "lessons": lessons})
         return {"ok": True, "schemaVersion": RESPONSE_SCHEMA, "book": self._book(manifest),
                 "selected": selection is not None, "selectionRevision": int(selection["selection_revision"]) if selection else 0,
-                "currentNodeId": selection["current_node_id"] if selection else None, "units": units}
+                "currentNodeId": selection["current_node_id"] if selection else None,
+                "introduction": public_introduction(manifest.get("introduction"), manifest=manifest), "units": units}
 
     def _available_course(self, conn, child, manifest, node, builds):
+        # Saved-artifact releases have a per-lesson review and immutable media
+        # audit. They do not upgrade the pending review of the entire book.
+        from content.textbook_release import INPUT_SCHEMA, validate_release
+        candidates = [b for b in builds if b['node_id'] == node['nodeId'] and b['part_index'] == 1]
+        if candidates:
+            build = candidates[0]
+            if self.repository.parse(build['input_json']).get('schemaVersion') == INPUT_SCHEMA:
+                course = conn.execute('SELECT * FROM learning_courses WHERE id=? AND version=?',
+                                      (build['course_id'], build['course_version'])).fetchone()
+                try:
+                    if course is not None and validate_release(build, manifest, course):
+                        return {'courseId': course['id'], 'courseVersion': course['version'],
+                                'contentKey': build['content_key'], 'delivery': 'fixed_textbook'}, None
+                except ApiError:
+                    pass
+                return None, None
         if manifest["rightsReview"]["status"] != "cleared" or node["brief"]["status"] != "approved" or self.student_learning_service is None:
             return None, None
         blocked = None
-        for build in builds:
-            if build["node_id"] != node["nodeId"] or build["part_index"] != 1:
-                continue
+        # Pick the shared published revision before checking personal access.
+        # Never fall back to different courseware for different students.
+        for build in candidates[:1]:
             course = self.student_learning_service.repository.get_student_visible_course(
                 conn, family_id=child["family_id"], child_id=child["id"], grade_code=child["grade_code"],
                 grade_selection_revision=int(child["grade_selection_revision"]),
@@ -183,32 +264,85 @@ class TextbookLearningService:
 
     def parent_select(self, token, child_id, data):
         fields(data, ("editionId", "alignmentRevisionId", "expectedSelectionRevision", "schoolYearStartYear", "semester"), ("currentNodeId",))
-        if type(data["expectedSelectionRevision"]) is not int or data["expectedSelectionRevision"] < 0:
-            raise ApiError("textbook_selection_invalid", "教材选择修订号无效", 400)
-        year, semester = school_term()
-        if type(data["schoolYearStartYear"]) is not int or (data["schoolYearStartYear"], data["semester"]) != (year, semester):
-            raise ApiError("textbook_term_changed", "学期已变化，请刷新教材列表", 409)
+        result = self.parent_select_many(token, child_id, {
+            "schoolYearStartYear": data["schoolYearStartYear"], "semester": data["semester"],
+            "selections": [{k: v for k, v in data.items() if k not in {"schoolYearStartYear", "semester"}}],
+        })
+        return {"ok": True, **{k: v for k, v in result["selections"][0].items() if k != "subject"}}
+
+    def parent_select_many(self, token, child_id, data):
+        fields(data, ("schoolYearStartYear", "semester", "selections"), ("expectedContextRevision",))
+        selections = data["selections"]
+        if not isinstance(selections, list) or not 1 <= len(selections) <= len(SUBJECTS):
+            raise ApiError("textbook_selection_invalid", "请选择需要确认的教材", 400)
+        for selection in selections:
+            fields(selection, ("editionId", "alignmentRevisionId", "expectedSelectionRevision"), ("currentNodeId",))
+            if type(selection["expectedSelectionRevision"]) is not int or selection["expectedSelectionRevision"] < 0:
+                raise ApiError("textbook_selection_invalid", "教材选择修订号无效", 400)
         profile = self.profile_service
-        context = profile._auth_context(token)
+        auth = profile._auth_context(token)
         with self.repository.transaction() as conn:
-            profile.repository.lock_family(conn, family_id=context["family"]["id"])
-            profile._assert_capability(conn, context, "manage_child_profile")
-            child = self.repository.child(conn, context["family"]["id"], child_id, lock=True)
+            profile.repository.lock_family(conn, family_id=auth["family"]["id"])
+            profile._assert_capability(conn, auth, "manage_child_profile")
+            child = self.repository.child(conn, auth["family"]["id"], child_id, lock=True)
             if child is None:
                 raise ApiError("child_not_found", "没有找到孩子", 404)
+            context = textbook_context(self.repository, conn, child)
+            year, semester = context["schoolYearStartYear"], context["semester"]
+            if (type(data["schoolYearStartYear"]) is not int
+                    or (data["schoolYearStartYear"], data["semester"]) != (year, semester)
+                    or ("expectedContextRevision" in data and (type(data["expectedContextRevision"]) is not int
+                        or data["expectedContextRevision"] != context["contextRevision"]))):
+                raise ApiError("textbook_term_changed", "学期或学科设置已变化，请刷新教材列表", 409)
             if not child.get("grade_selection_revision") or int(child["grade_selection_revision"]) < 1:
                 raise ApiError("textbook_grade_unconfirmed", "请先在孩子资料中确认就读年级", 409)
-            manifest = self._revision(conn, child, data["editionId"], data["alignmentRevisionId"])
-            if manifest["volume"] not in {semester, "full"}:
-                raise ApiError("textbook_volume_mismatch", "请选择本学期使用的册次", 409)
-            node = data.get("currentNodeId")
-            if node is not None:
-                lesson_by_id(manifest, node)
-            revision = self.repository.select(conn, child=child, manifest=manifest, year=year, semester=semester,
-                                             expected_revision=data["expectedSelectionRevision"], current_node=node,
-                                             confirmed_by=context["user"]["id"], now=now_ms())
-        return {"ok": True, "selectionRevision": revision, "editionId": manifest["editionId"],
-                "alignmentRevisionId": manifest["revisionId"]}
+            prepared, subjects = [], set()
+            for selection in selections:
+                manifest = self._revision(conn, child, selection["editionId"], selection["alignmentRevisionId"])
+                if manifest["subject"] in subjects:
+                    raise ApiError("textbook_selection_invalid", "每个学科只能确认一本教材", 400)
+                subjects.add(manifest["subject"])
+                if manifest["volume"] not in {semester, "full"}:
+                    raise ApiError("textbook_volume_mismatch", "请选择本学期使用的册次", 409)
+                node = selection.get("currentNodeId")
+                if node is not None:
+                    lesson_by_id(manifest, node)
+                prepared.append((manifest, selection, node))
+            result = []
+            for manifest, selection, node in prepared:
+                revision = self.repository.select(conn, child=child, manifest=manifest, year=year, semester=semester,
+                                                 expected_revision=selection["expectedSelectionRevision"], current_node=node,
+                                                 confirmed_by=auth["user"]["id"], now=now_ms())
+                result.append({"subject": manifest["subject"], "selectionRevision": revision,
+                               "editionId": manifest["editionId"], "alignmentRevisionId": manifest["revisionId"]})
+        return {"ok": True, "selections": result}
+
+    def parent_update_context(self, token, child_id, data):
+        fields(data, ("schoolYearStartYear", "semester", "expectedContextRevision", "expectedGradeRevision"))
+        if (data["semester"] not in (None, "upper", "lower")
+                or any(type(data[k]) is not int for k in ("schoolYearStartYear", "expectedContextRevision", "expectedGradeRevision"))):
+            raise ApiError("textbook_context_invalid", "学期或学科设置无效", 400)
+        profile = self.profile_service
+        auth = profile._auth_context(token)
+        with self.repository.transaction() as conn:
+            profile.repository.lock_family(conn, family_id=auth["family"]["id"])
+            profile._assert_capability(conn, auth, "manage_child_profile")
+            child = self.repository.child(conn, auth["family"]["id"], child_id, lock=True)
+            if child is None:
+                raise ApiError("child_not_found", "没有找到孩子", 404)
+            current = textbook_context(self.repository, conn, child)
+            if (data["schoolYearStartYear"] != current["schoolYearStartYear"]
+                    or data["expectedContextRevision"] != current["contextRevision"]
+                    or data["expectedGradeRevision"] != current["gradeRevision"]):
+                raise ApiError("textbook_context_changed", "年级或学期设置已更新，请刷新后再修改", 409)
+            if current["gradeRevision"] < 1 or not child["grade_code"].startswith("primary_"):
+                raise ApiError("textbook_grade_unconfirmed", "请先确认小学年级", 409)
+            self.repository.save_learning_context(conn, child, {
+                "revision": current["contextRevision"] + 1, "gradeRevision": current["gradeRevision"],
+                "schoolYearStartYear": current["schoolYearStartYear"], "semester": data["semester"],
+                "confirmedBy": auth["user"]["id"],
+            }, now_ms())
+        return {"ok": True}
 
     def prepare(self, data):
         fields(data, ("editionId", "alignmentRevisionId", "nodeId"), ("teachingRevision", "partIndex"))

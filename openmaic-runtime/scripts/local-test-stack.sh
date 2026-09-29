@@ -28,7 +28,7 @@ CURRICULUM_WORKER_PID_FILE="${STATE_DIR}/curriculum-worker.pid"
 CURRICULUM_WORKER_LOG="${STATE_DIR}/curriculum-worker.log"
 CURRICULUM_WORKER_COMMAND_TOKEN="workers.learning_curriculum_preparation_worker"
 REPAIR_MODE="${MIRA_LOCAL_TEST_REPAIR_MODE:-0}"
-CURRICULUM_WORKER_ENABLED="${MIRA_LOCAL_TEST_CURRICULUM_WORKER_ENABLED:-1}"
+CURRICULUM_WORKER_ENABLED="${MIRA_LOCAL_TEST_CURRICULUM_WORKER_ENABLED:-0}"
 STUDENT_WEB_PID_FILE="${STATE_DIR}/student-web.pid"
 STUDENT_WEB_LAUNCH_PID_FILE="${STATE_DIR}/student-web.launch.pid"
 STUDENT_WEB_BUILD_RECORD="${STATE_DIR}/student-web-build.identity"
@@ -69,7 +69,7 @@ usage() {
   cat <<'EOF'
 Usage: local-test-stack.sh [start|stop|restart|status|start-curriculum-worker|stop-curriculum-worker|build-student-web-production]
 
-  start    Start backend:8000, student-web:3000, OpenMAIC:3100, gateway:3101 and curriculum worker.
+  start    Start backend:8000, student-web:3000, OpenMAIC:3100 and gateway:3101.
   stop     Stop only processes whose strict PID identity belongs to this script.
   restart  Safely stop, then start, the local test stack.
   status   Report ownership and HTTP readiness without printing environments.
@@ -81,9 +81,10 @@ Usage: local-test-stack.sh [start|stop|restart|status|start-curriculum-worker|st
 State and logs default to /tmp/mira-local-test-stack.
 This script never kills an unknown process merely because it owns a port.
 MIRA_LOCAL_TEST_REPAIR_MODE=1 starts a passive API without background workers.
-MIRA_LOCAL_TEST_CURRICULUM_WORKER_ENABLED=0 disables only curriculum generation;
+MIRA_LOCAL_TEST_CURRICULUM_WORKER_ENABLED=0 (default) disables legacy curriculum generation;
 the normal API, parent task scheduler and event stream remain enabled.
-Both flags accept only 0 or 1. Repair mode takes precedence. Generation defaults on.
+Both flags accept only 0 or 1. Repair mode takes precedence. Fixed textbook courses are prepared by operators.
+The legacy worker also requires LEARNING_TEXTBOOK_LIBRARY_ONLY=0 in backend configuration.
 Generation uses backend/.env gates and the existing single-call concurrency.
 Student Web is served with Next.js production `next start`; `next dev` is
 recognized only for safe migration of an older identity created by this script.
@@ -922,7 +923,7 @@ wait_for_student_web_command() {
 }
 
 launch_student_web_production() {
-  local node_bin node_options next_version build_id_sha256
+  local node_bin node_options next_version build_id_sha256 python_bin
   local pid launch_recorded_pid started_start_hash i
   student_web_production_build_is_current || {
     echo "Student Web: refusing to start without a current production build." >&2
@@ -938,11 +939,18 @@ launch_student_web_production() {
     echo "Student Web: Node.js version could not be validated." >&2
     return 1
   }
+  python_bin="$(resolve_python_bin)" || {
+    echo "Student Web: Python 3 is unavailable for detached launch." >&2
+    return 1
+  }
   assert_unknown_port_is_free "Student Web" "${STUDENT_WEB_PORT}" || return 1
 
   (
     cd "${STUDENT_WEB_DIR}" || exit 1
-    nohup /bin/bash -c '
+    # Detach from the invoking terminal/process group without forking: the
+    # launcher, Bash and Next retain the exact PID recorded below. nohup alone
+    # only ignores SIGHUP and does not survive a caller's process-group cleanup.
+    nohup "${python_bin}" -c 'import os, sys; os.setsid(); os.execvp(sys.argv[1], sys.argv[1:])' /bin/bash -c '
       launch_pid_file="$1"
       shift
       umask 077

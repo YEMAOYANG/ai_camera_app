@@ -1,0 +1,229 @@
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -44,6 +44,7 @@
+ } from '@/lib/quiz/view-state';
+ import { useStageStore } from '@/lib/store';
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
++import { FixedTextbookQuiz } from './fixed-textbook-quiz';
+ 
+ // ─── Types ──────────────────────────────────────────────────────────────────
+ 
+@@ -757,7 +758,12 @@
+ 
+ // ─── Main Component ─────────────────────────────────────────────────────────
+ 
+-export function QuizView({ questions, sceneId, stageId, readOnly = false }: QuizViewProps) {
++export function QuizView(props: QuizViewProps) {
++  const fixed = useStageStore(state => (state.stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true);
++  return fixed && !props.readOnly ? <FixedTextbookQuiz questions={props.questions} /> : <StandardQuizView {...props} />;
++}
++
++function StandardQuizView({ questions, sceneId, stageId, readOnly = false }: QuizViewProps) {
+   const { t, locale } = useI18n();
+   const runtimeEvents = useMiraStudentRuntimeEvents();
+ 
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -23,6 +23,7 @@
+ import { useAudioRecorder } from '@/lib/hooks/use-audio-recorder';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { toast } from 'sonner';
++import { useStageStore } from '@/lib/store';
+ import { useSettingsStore, PLAYBACK_SPEEDS } from '@/lib/store/settings';
+ import { ProactiveCard } from '@/components/chat/proactive-card';
+ import { PresentationSpeechOverlay } from '@/components/roundtable/presentation-speech-overlay';
+@@ -217,6 +218,7 @@
+   const audioPlaybackAvailable = ttsEnabled || !!preGeneratedAudioAvailable;
+   const operatorAsrEnabled = useSettingsStore((state) => state.asrEnabled);
+   const studentMode = useMiraStudentRuntime();
++  const fixedTextbook = useStageStore(state => (state.stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true);
+   const asrEnabled = getMiraEffectiveAsrEnabled({ studentMode, operatorAsrEnabled });
+   const chatAreaWidth = useSettingsStore((s) => s.chatAreaWidth);
+   const operatorTTSVolume = useSettingsStore((s) => s.ttsVolume);
+@@ -429,7 +431,7 @@
+     });
+ 
+   const handleSendMessage = () => {
+-    if (!inputValue.trim() || isSendCooldown) return;
++    if (fixedTextbook || !inputValue.trim() || isSendCooldown) return;
+ 
+     showLocalUserMessage(inputValue);
+     onMessageSend?.(inputValue);
+@@ -440,6 +442,7 @@
+   };
+ 
+   const handleToggleInput = () => {
++    if (fixedTextbook) return;
+     if (isSendCooldown) return;
+     if (!isInputOpen) {
+       onInputActivate?.();
+@@ -453,6 +456,7 @@
+   };
+ 
+   const handleToggleVoice = () => {
++    if (fixedTextbook) return;
+     if (isVoiceOpen) {
+       if (isRecording) {
+         stopRecording();
+@@ -531,6 +535,7 @@
+     window.addEventListener('keydown', handleKeyDown);
+     return () => window.removeEventListener('keydown', handleKeyDown);
+   }, [
++    fixedTextbook,
+     isInLiveFlow,
+     isDiscussionPaused,
+     thinkingState,
+@@ -1057,6 +1062,7 @@
+                     <>
+                       <button
+                         data-mira-input-mode="voice"
++                        style={fixedTextbook ? { display: 'none' } : undefined}
+                         data-active={isVoiceOpen}
+                         aria-label={
+                           asrEnabled
+@@ -1081,6 +1087,7 @@
+                       </button>
+                       <button
+                         data-mira-input-mode="text"
++                        style={fixedTextbook ? { display: 'none' } : undefined}
+                         data-active={isInputOpen}
+                         aria-label={t('roundtable.textInput')}
+                         onClick={(e) => {
+@@ -1102,6 +1109,7 @@
+                   <button
+                     type="button"
+                     aria-label={t('roundtable.you')}
++                    style={fixedTextbook ? { display: 'none' } : undefined}
+                     className="relative group cursor-pointer shrink-0 bg-transparent border-none p-0"
+                     onClick={(e) => {
+                       e.stopPropagation();
+@@ -2199,6 +2207,7 @@
+                 <>
+                   <button
+                     data-mira-input-mode="voice"
++                        style={fixedTextbook ? { display: 'none' } : undefined}
+                     data-active={isVoiceOpen}
+                     aria-label={
+                       asrEnabled ? t('roundtable.voiceInput') : t('roundtable.voiceInputDisabled')
+@@ -2225,6 +2234,7 @@
+                   </button>
+                   <button
+                     data-mira-input-mode="text"
++                        style={fixedTextbook ? { display: 'none' } : undefined}
+                     data-active={isInputOpen}
+                     onClick={(e) => {
+                       e.stopPropagation();
+@@ -2246,6 +2256,7 @@
+             {/* User avatar (big, clickable to open input) */}
+             <div
+               className="relative group cursor-pointer shrink-0"
++              style={fixedTextbook ? { display: 'none' } : undefined}
+               onClick={(e) => {
+                 e.stopPropagation();
+                 handleToggleInput();
+--- /dev/null
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -0,0 +1,103 @@
++'use client';
++
++import { useCallback, useEffect, useState } from 'react';
++import { Check, ArrowRight, Loader2 } from 'lucide-react';
++import type { QuizQuestion } from '@/lib/types/stage';
++import { useStageStore } from '@/lib/store';
++import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
++import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
++
++type Result = {
++  score: number; maxScore: number; correctCount: number; totalQuestions: number;
++  results: { questionId: string; response: string; correct: boolean; explanation: string; correctAnswer: string }[];
++};
++
++/** Fixed releases have private server answers and student-scoped persistence. */
++export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] }) {
++  const [answers, setAnswers] = useState<Record<string, string>>({});
++  const [result, setResult] = useState<Result | null>(null);
++  const [loading, setLoading] = useState(true);
++  const [sending, setSending] = useState(false);
++  const [error, setError] = useState('');
++  const events = useMiraStudentRuntimeEvents();
++
++  const complete = useCallback(async () => {
++    const scenes = [...useStageStore.getState().scenes].sort((a, b) => a.order - b.order);
++    const last = scenes.at(-1);
++    if (last && events) await events.completeWhenReady({ sceneId: last.id, sceneIndex: scenes.length - 1 });
++  }, [events]);
++
++  const read = useCallback(async (signal?: AbortSignal) => {
++    const response = await fetch('/mira/textbook-quiz', { cache: 'no-store', signal });
++    const payload = await response.json();
++    if (!response.ok || !payload.ok) throw new Error(payload.message || '练习暂时没有加载成功');
++    if (payload.result) {
++      setResult(payload.result);
++      setAnswers(Object.fromEntries(payload.result.results.map((r: Result['results'][number]) => [r.questionId, r.response])));
++    }
++    setLoading(false);
++    setError('');
++  }, []);
++
++  useEffect(() => {
++    const controller = new AbortController();
++    void read(controller.signal).catch((caught: unknown) => {
++      if (!controller.signal.aborted) { setLoading(false); setError(caught instanceof Error ? caught.message : '请重新进入练习'); }
++    });
++    return () => controller.abort();
++  }, [read]);
++
++  async function submit() {
++    if (sending || result) return;
++    setSending(true); setError('');
++    try {
++      const response = await fetch('/mira/textbook-quiz', { method: 'POST',
++        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers }) });
++      const payload = await response.json();
++      if (!response.ok || !payload.ok) throw new Error(payload.message || '回答暂时没有保存，请重试');
++      setResult(payload.result);
++      await complete();
++    } catch (caught) { setError(caught instanceof Error ? caught.message : '回答暂时没有保存，请重试'); }
++    finally { setSending(false); }
++  }
++
++  return <section className="h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]" aria-label="天地人练习">
++    <div className="mx-auto max-w-5xl p-5 sm:p-8">
++      <header className="mb-7 flex items-end justify-between gap-4">
++        <div><p className="mb-2 text-sm text-[#697a6c]">小小识字家</p>
++          <h2 className="text-2xl font-semibold sm:text-3xl">{result ? `答对 ${result.correctCount} / ${result.totalQuestions} 题` : '听一听，选一选'}</h2></div>
++        {result && <span className="text-xl font-semibold">{result.score} / {result.maxScore}</span>}
++      </header>
++      {loading ? <p role="status">正在打开练习…</p> : <div className="grid gap-5 sm:grid-cols-2">
++        {questions.map((q, index) => {
++          const audio = questionNarrationSource(q);
++          const feedback = result?.results.find(r => r.questionId === q.id);
++          return <fieldset key={q.id} className="rounded-2xl border border-[#e9dfcd] bg-white/80 p-5">
++            <legend className="px-2 text-sm text-[#788275]">第 {index + 1} 题</legend>
++            <p className="mb-4 text-lg leading-relaxed">{q.question}</p>
++            {audio && <QuestionNarration src={audio} number={index + 1} />}
++            <div className="flex gap-3" role="radiogroup" aria-label={q.question}>
++              {(q.options || []).map(option => <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
++                aria-label={option.label} key={option.value} disabled={Boolean(result) || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
++                className={`min-h-16 flex-1 rounded-xl border text-3xl transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
++                {option.label}
++              </button>)}
++            </div>
++            {feedback && <p className={`mt-4 flex items-start gap-2 text-base ${feedback.correct ? 'text-[#377254]' : 'text-[#996238]'}`}>
++              {feedback.correct && <Check size={20} className="mt-0.5 shrink-0" aria-hidden />}{feedback.explanation}
++            </p>}
++          </fieldset>;
++        })}
++      </div>}
++      {error && <p role="alert" className="mt-5 text-[#9b503b]">{error}</p>}
++      <footer className="mt-7 flex justify-end">
++        {!result && !loading && <button type="button" onClick={() => void submit()}
++          disabled={sending || questions.some(q => !answers[q.id])}
++          className="inline-flex min-h-12 items-center gap-3 rounded-full bg-[#466a53] px-7 text-lg text-white disabled:opacity-40">
++          {sending ? <><Loader2 className="animate-spin" size={20} aria-hidden />正在保存</> : <>完成练习<ArrowRight size={20} aria-hidden /></>}
++        </button>}
++        {result && <p className="text-base text-[#68766b]">练习已保存，可以返回教材目录。</p>}
++      </footer>
++    </div>
++  </section>;
++}

@@ -1,0 +1,18 @@
+{
+  "version": "mira.growth.evidence.v1",
+  "cameraConfidenceThreshold": 0.72,
+  "dimensions": [
+    {"key": "self_care", "label": "自理表现", "taskTypes": ["life", "sleep"]},
+    {"key": "order", "label": "整理习惯", "taskTypes": ["housework", "schoolbag"]},
+    {"key": "movement", "label": "运动参与", "taskTypes": ["sports_outdoor"]},
+    {"key": "focus", "label": "专注表现", "taskTypes": []},
+    {"key": "initiative", "label": "主动开始", "taskTypes": []},
+    {"key": "independence", "label": "独立作答", "taskTypes": []},
+    {"key": "comprehension", "label": "情境理解", "taskTypes": []},
+    {"key": "retention", "label": "复习保持", "taskTypes": []}
+  ],
+  "cameraCompletionSignals": {
+    "toy_cleanup": {"cleanup_done": "order", "toys_put_away": "order"}
+  },
+  "scope": "分数是本期已有证据的表现比例，不是综合能力测评；无证据不计分。"
+}

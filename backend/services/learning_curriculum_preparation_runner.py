@@ -1668,6 +1668,8 @@ def _deterministic_error_code(exc: Exception) -> str:
 def learning_curriculum_preparation_config_projection(
     app,
 ) -> PreparationRunnerConfigProjection | None:
+    if app.config.get("LEARNING_TEXTBOOK_LIBRARY_ONLY", False):
+        return None
     runner_enabled = app.config.get(
         "LEARNING_CURRICULUM_PREPARATION_RUNNER_ENABLED",
         False,

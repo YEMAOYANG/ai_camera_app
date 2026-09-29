@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token, json_body
+from routes.api.v2.student_textbook_boundary import enforce_textbook_delivery
 from services.openmaic_full_runtime_service import OpenMaicRuntimeServiceError
 from services.service_factory import (
     openmaic_full_runtime_service,
@@ -12,6 +13,8 @@ from services.service_factory import (
 
 
 student_learning_bp = Blueprint("student_learning_v2", __name__)
+
+student_learning_bp.before_request(enforce_textbook_delivery)
 
 
 @student_learning_bp.get('/placement')

@@ -1,0 +1,575 @@
+{
+  "schemaVersion": "mira.textbook.play-sample.v2",
+  "id": "tiandiren-play-v2",
+  "title": "天地人",
+  "subtitle": "字宝宝花园",
+  "teachingRevision": "play-sample-2",
+  "gradeCode": "primary_1",
+  "publicationAllowed": false,
+  "reviewDelaySeconds": 86400,
+  "skills": {
+    "sky": {
+      "word": "天",
+      "name": "天空",
+      "explanation": "头顶上，白云和飞鸟所在的天空，就是天。",
+      "hints": [
+        "抬头找一找，白云在哪里？",
+        "看看图上方的蓝色天空。"
+      ],
+      "zones": [
+        "sky"
+      ],
+      "learnAudio": [
+        "action_p484C5iR",
+        "action_-ryZUHAg"
+      ]
+    },
+    "earth": {
+      "word": "地",
+      "name": "地面",
+      "explanation": "脚下的路、泥土和草地，都是地。",
+      "hints": [
+        "看看小朋友的脚下。",
+        "沿着脚下的小路找一找。"
+      ],
+      "zones": [
+        "earth"
+      ],
+      "learnAudio": [
+        "action_n-PO9SgE",
+        "action_MEoguc1W"
+      ]
+    },
+    "person": {
+      "word": "人",
+      "name": "人物",
+      "explanation": "小朋友是人，老师也是人。",
+      "hints": [
+        "谁有头、身体、手和脚？",
+        "点一位小朋友，三位都可以。"
+      ],
+      "zones": [
+        "coral",
+        "teal",
+        "yellow"
+      ],
+      "learnAudio": [
+        "action_JLPJil6-",
+        "action_qvx86PyG"
+      ]
+    },
+    "me": {
+      "word": "我",
+      "name": "说话的人",
+      "explanation": "谁在说话，谁就用我称呼自己。",
+      "hints": [
+        "先找出正在说话的人。",
+        "金色话筒旁边的人，用我称呼自己。"
+      ],
+      "learnAudio": [
+        "action_Ym-sYsq_"
+      ]
+    },
+    "you": {
+      "word": "你",
+      "name": "正在听的人",
+      "explanation": "说话的人用你称呼正在和自己说话的人。",
+      "hints": [
+        "先看谁在说，再看对方。",
+        "红衣女孩和蓝衣男孩正在对话，找听话的那一位。"
+      ],
+      "learnAudio": [
+        "action_NxFIJVKR"
+      ]
+    },
+    "he": {
+      "word": "他",
+      "name": "谈到的男孩",
+      "explanation": "他们谈到旁边的男孩，用他来称呼。",
+      "hints": [
+        "他们谈到的是旁边的哪位男孩？",
+        "找正在旁边挥手的黄衣男孩。"
+      ],
+      "learnAudio": [
+        "action_Ajbzw3Kz"
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "check-1",
+      "skill": "sky",
+      "prompt": "抬头看，天空是哪个字？",
+      "options": [
+        {
+          "value": "A",
+          "label": "天"
+        },
+        {
+          "value": "B",
+          "label": "地"
+        },
+        {
+          "value": "C",
+          "label": "人"
+        }
+      ],
+      "answer": "A",
+      "explanation": "天，天空的天。",
+      "audio": "review_question-1",
+      "speaker": null,
+      "displayPrompt": "抬头看，白云和飞鸟所在的那一片，用哪个字？"
+    },
+    {
+      "id": "check-2",
+      "skill": "earth",
+      "prompt": "脚下踩的地面，是哪个字？",
+      "options": [
+        {
+          "value": "A",
+          "label": "你"
+        },
+        {
+          "value": "B",
+          "label": "我"
+        },
+        {
+          "value": "C",
+          "label": "地"
+        }
+      ],
+      "answer": "C",
+      "explanation": "地，地面的地。",
+      "audio": "review_question-2",
+      "speaker": null,
+      "displayPrompt": "看看脚下踩着的小路，用哪个字？"
+    },
+    {
+      "id": "check-3",
+      "skill": "person",
+      "prompt": "老师和小朋友，都是哪个字？",
+      "options": [
+        {
+          "value": "A",
+          "label": "人"
+        },
+        {
+          "value": "B",
+          "label": "他"
+        },
+        {
+          "value": "C",
+          "label": "天"
+        }
+      ],
+      "answer": "A",
+      "explanation": "人。老师、小朋友和我们自己，都是人。",
+      "audio": "review_question-3",
+      "speaker": null
+    },
+    {
+      "id": "check-4",
+      "skill": "you",
+      "prompt": "蓝衣男孩对红衣女孩说话，称呼女孩用哪个字？",
+      "options": [
+        {
+          "value": "A",
+          "label": "你"
+        },
+        {
+          "value": "B",
+          "label": "我"
+        },
+        {
+          "value": "C",
+          "label": "他"
+        }
+      ],
+      "answer": "A",
+      "explanation": "你。说话的人用你称呼正在和自己说话的人。",
+      "audio": "review_question-4",
+      "speaker": "teal"
+    },
+    {
+      "id": "check-5",
+      "skill": "me",
+      "prompt": "红衣女孩正在说话，称呼自己用哪个字？",
+      "options": [
+        {
+          "value": "A",
+          "label": "他"
+        },
+        {
+          "value": "B",
+          "label": "我"
+        },
+        {
+          "value": "C",
+          "label": "你"
+        }
+      ],
+      "answer": "B",
+      "explanation": "我。谁在说话，谁就用我称呼自己。",
+      "audio": "review_question-5",
+      "speaker": "coral"
+    },
+    {
+      "id": "check-6",
+      "skill": "he",
+      "prompt": "他们谈到旁边的黄衣男孩，用哪个字？",
+      "options": [
+        {
+          "value": "A",
+          "label": "地"
+        },
+        {
+          "value": "B",
+          "label": "人"
+        },
+        {
+          "value": "C",
+          "label": "他"
+        }
+      ],
+      "answer": "C",
+      "explanation": "他。我们用他称呼谈到的第三位男孩。",
+      "audio": "review_question-6",
+      "speaker": "coral",
+      "displayPrompt": "谈到旁边的黄衣男孩，用哪个字？"
+    },
+    {
+      "id": "transfer-1",
+      "skill": "earth",
+      "prompt": "小朋友跑步时，脚下踩着的是？",
+      "options": [
+        {
+          "value": "A",
+          "label": "天"
+        },
+        {
+          "value": "B",
+          "label": "地"
+        },
+        {
+          "value": "C",
+          "label": "人"
+        }
+      ],
+      "answer": "B",
+      "explanation": "脚下的路、泥土和草地，都是地。",
+      "audio": "transfer-1"
+    },
+    {
+      "id": "transfer-2",
+      "skill": "me",
+      "prompt": "黄衣男孩正在说话，用哪个字称呼自己？",
+      "options": [
+        {
+          "value": "A",
+          "label": "他"
+        },
+        {
+          "value": "B",
+          "label": "你"
+        },
+        {
+          "value": "C",
+          "label": "我"
+        }
+      ],
+      "answer": "C",
+      "explanation": "谁在说话，谁就用我称呼自己。",
+      "audio": "transfer-2"
+    },
+    {
+      "id": "transfer-3",
+      "skill": "sky",
+      "prompt": "小鸟飞过白云。它们都在？",
+      "options": [
+        {
+          "value": "A",
+          "label": "天"
+        },
+        {
+          "value": "B",
+          "label": "人"
+        },
+        {
+          "value": "C",
+          "label": "地"
+        }
+      ],
+      "answer": "A",
+      "explanation": "头顶上，白云和飞鸟所在的天空，就是天。",
+      "audio": "transfer-3"
+    },
+    {
+      "id": "transfer-4",
+      "skill": "you",
+      "prompt": "红衣女孩对蓝衣男孩说话。她怎样称呼蓝衣男孩？",
+      "options": [
+        {
+          "value": "A",
+          "label": "我"
+        },
+        {
+          "value": "B",
+          "label": "你"
+        },
+        {
+          "value": "C",
+          "label": "他"
+        }
+      ],
+      "answer": "B",
+      "explanation": "说话的人用你称呼正在和自己说话的人。",
+      "audio": "transfer-4"
+    },
+    {
+      "id": "transfer-5",
+      "skill": "person",
+      "prompt": "老师走进教室。老师也是？",
+      "options": [
+        {
+          "value": "A",
+          "label": "地"
+        },
+        {
+          "value": "B",
+          "label": "天"
+        },
+        {
+          "value": "C",
+          "label": "人"
+        }
+      ],
+      "answer": "C",
+      "explanation": "小朋友是人，老师也是人。",
+      "audio": "transfer-5"
+    },
+    {
+      "id": "transfer-6",
+      "skill": "he",
+      "prompt": "蓝衣男孩谈到旁边的黄衣男孩，用哪个字？",
+      "options": [
+        {
+          "value": "A",
+          "label": "你"
+        },
+        {
+          "value": "B",
+          "label": "他"
+        },
+        {
+          "value": "C",
+          "label": "我"
+        }
+      ],
+      "answer": "B",
+      "explanation": "他们谈到旁边的男孩，用他来称呼。",
+      "audio": "transfer-6"
+    },
+    {
+      "id": "review-1",
+      "skill": "person",
+      "prompt": "公园里，一位爷爷正在散步。他也是？",
+      "options": [
+        {
+          "value": "A",
+          "label": "人"
+        },
+        {
+          "value": "B",
+          "label": "地"
+        },
+        {
+          "value": "C",
+          "label": "天"
+        }
+      ],
+      "answer": "A",
+      "explanation": "小朋友是人，老师也是人。",
+      "audio": "review-1"
+    },
+    {
+      "id": "review-2",
+      "skill": "you",
+      "prompt": "黄衣男孩对蓝衣男孩说话，怎样称呼对方？",
+      "options": [
+        {
+          "value": "A",
+          "label": "他"
+        },
+        {
+          "value": "B",
+          "label": "我"
+        },
+        {
+          "value": "C",
+          "label": "你"
+        }
+      ],
+      "answer": "C",
+      "explanation": "说话的人用你称呼正在和自己说话的人。",
+      "audio": "review-2"
+    },
+    {
+      "id": "review-3",
+      "skill": "earth",
+      "prompt": "小狗在小路上跑。脚下这一片是？",
+      "options": [
+        {
+          "value": "A",
+          "label": "地"
+        },
+        {
+          "value": "B",
+          "label": "天"
+        },
+        {
+          "value": "C",
+          "label": "人"
+        }
+      ],
+      "answer": "A",
+      "explanation": "脚下的路、泥土和草地，都是地。",
+      "audio": "review-3"
+    },
+    {
+      "id": "review-4",
+      "skill": "he",
+      "prompt": "老师和女孩谈到旁边的一个男孩。用哪个字称呼那个男孩？",
+      "options": [
+        {
+          "value": "A",
+          "label": "我"
+        },
+        {
+          "value": "B",
+          "label": "他"
+        },
+        {
+          "value": "C",
+          "label": "你"
+        }
+      ],
+      "answer": "B",
+      "explanation": "他们谈到旁边的男孩，用他来称呼。",
+      "audio": "review-4"
+    },
+    {
+      "id": "review-5",
+      "skill": "me",
+      "prompt": "小女孩正在说话，用哪个字称呼自己？",
+      "options": [
+        {
+          "value": "A",
+          "label": "你"
+        },
+        {
+          "value": "B",
+          "label": "我"
+        },
+        {
+          "value": "C",
+          "label": "他"
+        }
+      ],
+      "answer": "B",
+      "explanation": "谁在说话，谁就用我称呼自己。",
+      "audio": "review-5"
+    },
+    {
+      "id": "review-6",
+      "skill": "sky",
+      "prompt": "抬起头，月亮和星星在？",
+      "options": [
+        {
+          "value": "A",
+          "label": "人"
+        },
+        {
+          "value": "B",
+          "label": "地"
+        },
+        {
+          "value": "C",
+          "label": "天"
+        }
+      ],
+      "answer": "C",
+      "explanation": "头顶上，白云和飞鸟所在的天空，就是天。",
+      "audio": "review-6"
+    }
+  ],
+  "spoken": {
+    "welcome": "小朋友，欢迎来到字宝宝花园！今天，动动手，找一找天、地、人，再换个人说说你、我、他。点开始探险，我们就出发！",
+    "explore": "先用小手点一点图里的天空、地面和小朋友。每点一个，就能听到它的名字。",
+    "hunt": "字宝宝躲到画里啦。听一听，再点图里对应的地方。找不到也没关系，点小灯泡，我会给你一点提示。",
+    "role-demo": "现在你是小小配音员！先选谁来说话，再点我、你、他，看看它们指的是谁。",
+    "roles": "注意金色话筒！谁旁边有话筒，谁就在说话。听清楚，再点一个小朋友。",
+    "check": "接下来自己试一试。听完题目，选一个字，再点选好了。需要帮助时，点小灯泡。慢慢想，不着急。",
+    "repair": "刚才有几个字还需要练一练。我们在图里再找一找，然后换道题试试。",
+    "transfer": "现在换个生活小故事。听一听，再选一个字。这一次，看看你能不能自己找到。",
+    "complete": "今天的探险结束啦！你动脑想，也动手找。休息一下，明天再回来看看这些字吧。",
+    "review": "欢迎回来！换几个小故事，再找一找这些字。",
+    "review-preview": "我们先试试复习的玩法。真正的明日复习，明天再来。",
+    "correct": "找到了！点下一步，继续出发。",
+    "wrong": "再看看，试着找另一处。也可以点小灯泡，听一点提示。",
+    "quiz-wrong": "这次还没有选对。听听讲解，再继续。",
+    "saved": "已经记住你学到哪里了，下次回来可以接着玩。",
+    "finish-good": "这些新故事里的字，你都自己找到了。明天，我们再看看还记不记得。",
+    "finish-practice": "有几个字还要再认一认。今天先休息，明天我们继续。",
+    "help": "先听一个小提示，再试试看。",
+    "adult": "请大人帮了一下也没关系，我们会记住这是一起完成的。",
+    "sky-cue": "天。请在图里找一找天。",
+    "earth-cue": "地，地面的地。请在图里找一找地面。",
+    "person-cue": "人。请在图里点一位小朋友。",
+    "hint-sky-1": "抬头找一找，白云在哪里？",
+    "hint-sky-2": "看看图上方的蓝色天空。",
+    "explain-sky": "头顶上，白云和飞鸟所在的天空，就是天。",
+    "hint-earth-1": "看看小朋友的脚下。",
+    "hint-earth-2": "沿着脚下的小路找一找。",
+    "explain-earth": "脚下的路、泥土和草地，都是地。",
+    "hint-person-1": "谁有头、身体、手和脚？",
+    "hint-person-2": "点一位小朋友，三位都可以。",
+    "explain-person": "小朋友是人，老师也是人。",
+    "hint-me-1": "先找出正在说话的人。",
+    "hint-me-2": "金色话筒旁边的人，用我称呼自己。",
+    "explain-me": "谁在说话，谁就用我称呼自己。",
+    "hint-you-1": "先看谁在说，再看对方。",
+    "hint-you-2": "红衣女孩和蓝衣男孩正在对话，找听话的那一位。",
+    "explain-you": "说话的人用你称呼正在和自己说话的人。",
+    "hint-he-1": "他们谈到的是旁边的哪位男孩？",
+    "hint-he-2": "找正在旁边挥手的黄衣男孩。",
+    "explain-he": "他们谈到旁边的男孩，用他来称呼。",
+    "transfer-1": "小朋友跑步时，脚下踩着的是？。可以选择：天，地，人。请选一个字。",
+    "transfer-2": "黄衣男孩正在说话，用哪个字称呼自己？。可以选择：他，你，我。请选一个字。",
+    "transfer-3": "小鸟飞过白云。它们都在？。可以选择：天，人，地。请选一个字。",
+    "transfer-4": "红衣女孩对蓝衣男孩说话。她怎样称呼蓝衣男孩？。可以选择：我，你，他。请选一个字。",
+    "transfer-5": "老师走进教室。老师也是？。可以选择：地，天，人。请选一个字。",
+    "transfer-6": "蓝衣男孩谈到旁边的黄衣男孩，用哪个字？。可以选择：你，他，我。请选一个字。",
+    "review-1": "公园里，一位爷爷正在散步。他也是？。可以选择：人，地，天。请选一个字。",
+    "review-2": "黄衣男孩对蓝衣男孩说话，怎样称呼对方？。可以选择：他，我，你。请选一个字。",
+    "review-3": "小狗在小路上跑。脚下这一片是？。可以选择：地，天，人。请选一个字。",
+    "review-4": "老师和女孩谈到旁边的一个男孩。用哪个字称呼那个男孩？。可以选择：我，他，你。请选一个字。",
+    "review-5": "小女孩正在说话，用哪个字称呼自己？。可以选择：你，我，他。请选一个字。",
+    "review-6": "抬起头，月亮和星星在？。可以选择：人，地，天。请选一个字。"
+  },
+  "goals": [
+    "看图辨认天、地、人",
+    "随说话人变化理解你、我、他",
+    "在新的口头情境中选择对应汉字"
+  ],
+  "notAssessed": [
+    "口头朗读准确性",
+    "书写",
+    "长期掌握"
+  ],
+  "provenance": {
+    "originalIllustration": "lesson-media-v1/tiandiren.json",
+    "sourceReleaseSha256": "aea67eab9fabe38184945a19fe671fade31dc4ad9646116aefd81f4874de788f",
+    "newPrompts": "independently authored for this sample",
+    "rightsReview": "unchanged; sample is not commercial publication"
+  }
+}

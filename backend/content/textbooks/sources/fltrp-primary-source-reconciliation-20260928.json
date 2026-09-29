@@ -1,0 +1,356 @@
+{
+  "schemaVersion": "mira.textbook-source-reconciliation.v1",
+  "verifiedAt": "2026-09-28",
+  "series": "外研社版（一年级起点，陈琳主编）",
+  "sourcePriority": [
+    "smartedu_textbook",
+    "smartedu_sync_classroom",
+    "github_reference_if_official_missing"
+  ],
+  "bookIdentityFields": [
+    "publisher",
+    "editor",
+    "startingGrade",
+    "schoolSystem",
+    "grade",
+    "volume",
+    "revisionFamily"
+  ],
+  "officialEbookMatchCount": 0,
+  "officialSyncMatchCount": 12,
+  "newBooks": 8,
+  "preservedBooks": 4,
+  "githubOnlyBooks": 0,
+  "records": [
+    {
+      "gradeCode": "primary_1",
+      "volume": "lower",
+      "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+      "officialResourceId": "c8ae9406-6280-bd3e-0444-3227ae2dab7a",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）一年级下册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbd296-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390fcdce504bd&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/c8ae9406-6280-bd3e-0444-3227ae2dab7a.json",
+      "officialTreeSha256": "4c45291b4518ca2dc58994d33b923f13460e1a9f533408c204a4318709a2f04b",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）一年级下册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E4%B8%80%E5%B9%B4%E7%BA%A7%E4%B8%8B%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "0381794fe996c294717dfec7ea52f15e3e380f3e",
+        "sha256": "b4bbf3c87eabe05814a8394ff69a1d39fe1aae7e93a647773b5bcd3626b56aa1",
+        "pageCount": 83
+      },
+      "decision": "preserve_existing_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。"
+    },
+    {
+      "gradeCode": "primary_1",
+      "volume": "upper",
+      "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+      "officialResourceId": "af05bc77-0902-9842-f1b5-37cdfad7c5c8",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）一年级上册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbd296-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390f883db0453&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/af05bc77-0902-9842-f1b5-37cdfad7c5c8.json",
+      "officialTreeSha256": "0a787b3ac6c2205f666d1176b2220d162a27ad488fe325e1a5f8c6d548396d61",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）一年级上册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E4%B8%80%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "450dc275e7c30691feb857ec0727308b96d7aef9",
+        "sha256": "7b1eb1b3069a7b453b4db2f13821c1bea8b09b8b27670298be9b76c2c23aa67d",
+        "pageCount": 83
+      },
+      "decision": "preserve_existing_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。"
+    },
+    {
+      "gradeCode": "primary_2",
+      "volume": "lower",
+      "editionId": "smartedu-english-six-year-g2-lower-sync-99543b9e",
+      "officialResourceId": "99543b9e-e347-af8d-69bb-35ca88b1839e",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）二年级下册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbd304-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390fcdce504bd&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/99543b9e-e347-af8d-69bb-35ca88b1839e.json",
+      "officialTreeSha256": "b82a65994a040f9b18232353e4f0d82d652c550b18d10f8a8bc9cf556c06b090",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）二年级下册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E4%BA%8C%E5%B9%B4%E7%BA%A7%E4%B8%8B%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "2fb6292e6c184efccd24ad023e8b17dc5f67126b",
+        "sha256": "2cddaf22e80b2484d4b71ccb3ff42170a55d141e34521c913689145580cfd6fd",
+        "pageCount": 83
+      },
+      "decision": "preserve_existing_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。"
+    },
+    {
+      "gradeCode": "primary_2",
+      "volume": "upper",
+      "editionId": "smartedu-english-six-year-g2-upper-sync-52c3097c",
+      "officialResourceId": "52c3097c-06da-8279-5f3f-e70d042fdac3",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）二年级上册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbd304-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390f883db0453&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/52c3097c-06da-8279-5f3f-e70d042fdac3.json",
+      "officialTreeSha256": "38e3fcd9ae575f8c2461bcb5c1d0b81a63bff5fd203440fb54a6ed738525e490",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）二年级上册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E4%BA%8C%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "ac64ce191b693db0643a812de9352dcd16152748",
+        "sha256": "b8313c699cf874a39ae1e5d8f85808e6dd2100ca1b407c5828170d3a7d3026f5",
+        "pageCount": 83
+      },
+      "decision": "preserve_existing_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。"
+    },
+    {
+      "gradeCode": "primary_3",
+      "volume": "lower",
+      "editionId": "smartedu-english-six-year-g3-lower-sync-ae8e6612",
+      "officialResourceId": "ae8e6612-50ee-e21d-64b2-fde82b9e584c",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）三年级下册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbd372-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390fcdce504bd&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/ae8e6612-50ee-e21d-64b2-fde82b9e584c.json",
+      "officialTreeSha256": "cea144683d7c198fcab9c70145b4170fd80a7a585a888cb73931940dab1f48dd",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）三年级下册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E4%B8%89%E5%B9%B4%E7%BA%A7%E4%B8%8B%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "5005b4b918523b7139b75789b0d5c576eb521062",
+        "sha256": "e0827cacf08b29ad590fbd541027997a382ae02742f34a948742770bf1ec8810",
+        "pageCount": 91
+      },
+      "decision": "add_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。",
+      "comparison": {
+        "githubTitlePdfPage": 2,
+        "githubDirectoryPdfPages": [
+          5,
+          6
+        ],
+        "matchedCoreLessons": 20,
+        "officialModuleCount": 10,
+        "normalization": "忽略空白、标点及 Unit 后的数字；其余课题逐项比对。",
+        "differences": []
+      }
+    },
+    {
+      "gradeCode": "primary_3",
+      "volume": "upper",
+      "editionId": "smartedu-english-six-year-g3-upper-sync-f6031265",
+      "officialResourceId": "f6031265-9712-ac9c-b6a6-723637a4099b",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）三年级上册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbd372-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390f883db0453&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/f6031265-9712-ac9c-b6a6-723637a4099b.json",
+      "officialTreeSha256": "ef695f4434ff2a1107fd5cc08536da733d3f20229063f314919ee1ff1f2c83a9",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）三年级上册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E4%B8%89%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "e6cba697b2b2cc88c4694e2581615a7de1a7deeb",
+        "sha256": "e3926b0e5f38ff47fb30f41eb07e9c1e032f6f55b16139bdfe4befff7777cd8c",
+        "pageCount": 91
+      },
+      "decision": "add_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。",
+      "comparison": {
+        "githubTitlePdfPage": 2,
+        "githubDirectoryPdfPages": [
+          5,
+          6
+        ],
+        "matchedCoreLessons": 20,
+        "officialModuleCount": 10,
+        "normalization": "忽略空白、标点及 Unit 后的数字；其余课题逐项比对。",
+        "differences": []
+      }
+    },
+    {
+      "gradeCode": "primary_4",
+      "volume": "lower",
+      "editionId": "smartedu-english-six-year-g4-lower-sync-bd9fa5aa",
+      "officialResourceId": "bd9fa5aa-0994-2a0a-b78b-2c8aecaf4e38",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）四年级下册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbd3ea-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390fcdce504bd&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/bd9fa5aa-0994-2a0a-b78b-2c8aecaf4e38.json",
+      "officialTreeSha256": "cadee810d2033b452dc1681d075ca4315973e73e5f2473780f6fb6d17302fcfd",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）四年级下册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E5%9B%9B%E5%B9%B4%E7%BA%A7%E4%B8%8B%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "5f617d5c4826abaedafafa2ed656cc561473546a",
+        "sha256": "a058d13412ed672fd347f988703c4b020fbd0bd83e46557ebba16b80c5c38ca3",
+        "pageCount": 91
+      },
+      "decision": "add_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。",
+      "comparison": {
+        "githubTitlePdfPage": 2,
+        "githubDirectoryPdfPages": [
+          5,
+          6
+        ],
+        "matchedCoreLessons": 20,
+        "officialModuleCount": 10,
+        "normalization": "忽略空白、标点及 Unit 后的数字；其余课题逐项比对。",
+        "differences": []
+      }
+    },
+    {
+      "gradeCode": "primary_4",
+      "volume": "upper",
+      "editionId": "smartedu-english-six-year-g4-upper-sync-81ed5449",
+      "officialResourceId": "81ed5449-2ffc-fcdc-6023-5ae1e2fc0910",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）四年级上册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbd3ea-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390f883db0453&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/81ed5449-2ffc-fcdc-6023-5ae1e2fc0910.json",
+      "officialTreeSha256": "5569c5d4b325d2ef5d5d112abb059ea5b4113b687f1bc52b27d157427064490b",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）四年级上册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E5%9B%9B%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "5f945139df2eada90abc5f2ccc727febf0a27377",
+        "sha256": "404453edc7f434daa3a531c0a17aad3f6174fdb246836da16ee0a08afe228ec8",
+        "pageCount": 91
+      },
+      "decision": "add_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。",
+      "comparison": {
+        "githubTitlePdfPage": 2,
+        "githubDirectoryPdfPages": [
+          5,
+          6
+        ],
+        "matchedCoreLessons": 20,
+        "officialModuleCount": 10,
+        "normalization": "忽略空白、标点及 Unit 后的数字；其余课题逐项比对。",
+        "differences": []
+      }
+    },
+    {
+      "gradeCode": "primary_5",
+      "volume": "lower",
+      "editionId": "smartedu-english-six-year-g5-lower-sync-73ce4fe6",
+      "officialResourceId": "73ce4fe6-91b2-20bf-cdcb-5af0000112d7",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）五年级下册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbebc8-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390fcdce504bd&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/73ce4fe6-91b2-20bf-cdcb-5af0000112d7.json",
+      "officialTreeSha256": "87982c536764ff731f85eac457189c64d38603edb05eebccaa28572a522ffb99",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）五年级下册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E4%BA%94%E5%B9%B4%E7%BA%A7%E4%B8%8B%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "461a7d0134f82fd4e5b9bc6c673c73c44f82830b",
+        "sha256": "7d39468f22918072704464d47e8fea1373586b58dc851e52d194dc2487549ddc",
+        "pageCount": 99
+      },
+      "decision": "add_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。",
+      "comparison": {
+        "githubTitlePdfPage": 2,
+        "githubDirectoryPdfPages": [
+          5,
+          6
+        ],
+        "matchedCoreLessons": 20,
+        "officialModuleCount": 10,
+        "normalization": "忽略空白、标点及 Unit 后的数字；其余课题逐项比对。",
+        "differences": []
+      }
+    },
+    {
+      "gradeCode": "primary_5",
+      "volume": "upper",
+      "editionId": "smartedu-english-six-year-g5-upper-sync-bbbb88ae",
+      "officialResourceId": "bbbb88ae-9729-3a90-bc6e-381555134a82",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）五年级上册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbebc8-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390f883db0453&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/bbbb88ae-9729-3a90-bc6e-381555134a82.json",
+      "officialTreeSha256": "c811c2214bf5763e365e5d627f93e5d35a5bbcf7dba8d3477287c46f34616382",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）五年级上册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E4%BA%94%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "b2e43524f91c29b503c96f6f598a2b23a5c1a81a",
+        "sha256": "afb530947f7b85d77fac51b74e4300b18dcc3e6e8420ac21f99fa59b331a0e71",
+        "pageCount": 99
+      },
+      "decision": "add_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。",
+      "comparison": {
+        "githubTitlePdfPage": 2,
+        "githubDirectoryPdfPages": [
+          5,
+          6
+        ],
+        "matchedCoreLessons": 20,
+        "officialModuleCount": 10,
+        "normalization": "忽略空白、标点及 Unit 后的数字；其余课题逐项比对。",
+        "differences": [
+          "国家平台 Module 5 首课标题为 Unit It's mine!，GitHub 为 Unit 1 It’s mine!；采用国家平台原题及原节点编号。"
+        ]
+      }
+    },
+    {
+      "gradeCode": "primary_6",
+      "volume": "lower",
+      "editionId": "smartedu-english-six-year-g6-lower-sync-2ffdafdd",
+      "officialResourceId": "2ffdafdd-d9e8-6158-34c0-5eac67a7b868",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）六年级下册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbecae-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390fcdce504bd&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/2ffdafdd-d9e8-6158-34c0-5eac67a7b868.json",
+      "officialTreeSha256": "e8219c81a4955a10d6b2afb514ca2a0c45cc7e96dab2315e62528d3bd4dcbecd",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）六年级下册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E5%85%AD%E5%B9%B4%E7%BA%A7%E4%B8%8B%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "608db1c374383e58ced53c98e8c2260542c6eaf7",
+        "sha256": "5310b017279f688fc062a31dcaa740cf3b03cd407ed0032a03f95a5dfee315b1",
+        "pageCount": 99
+      },
+      "decision": "add_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。",
+      "comparison": {
+        "githubTitlePdfPage": 2,
+        "githubDirectoryPdfPages": [
+          5,
+          6
+        ],
+        "matchedCoreLessons": 20,
+        "officialModuleCount": 10,
+        "normalization": "忽略空白、标点及 Unit 后的数字；其余课题逐项比对。",
+        "differences": []
+      }
+    },
+    {
+      "gradeCode": "primary_6",
+      "volume": "upper",
+      "editionId": "smartedu-english-six-year-g6-upper-sync-2e5e4e6e",
+      "officialResourceId": "2e5e4e6e-7ea5-7a1c-2cc9-f7b0f9c41fc8",
+      "officialTitle": "小学英语外研社版（一年级起点）（主编：陈琳）六年级上册",
+      "officialUrl": "https://basic.smartedu.cn/syncClassroom?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbecae-0590-11ed-9c79-92fc3b3249d5%2F6a7495dc-0772-11ed-ac74-092ab92074e6%2F44bedc1e-54e6-11ed-9c34-850ba61fa9f4%2Fff8080814371757b014390f883db0453&reportHistory=true",
+      "officialTreeUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/2e5e4e6e-7ea5-7a1c-2cc9-f7b0f9c41fc8.json",
+      "officialTreeSha256": "5a56fcd71d64344d5b4651ed822303151a5209faf8ea0dcfaea0e3f93ed75942",
+      "github": {
+        "path": "小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）六年级上册.pdf",
+        "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/%E5%B0%8F%E5%AD%A6/%E8%8B%B1%E8%AF%AD/%E5%A4%96%E7%A0%94%E7%A4%BE%E7%89%88%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%EF%BC%88%E4%B8%BB%E7%BC%96%EF%BC%9A%E9%99%88%E7%90%B3%EF%BC%89/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E8%8B%B1%E8%AF%AD%EF%BC%88%E4%B8%80%E5%B9%B4%E7%BA%A7%E8%B5%B7%E7%82%B9%EF%BC%89%E5%85%AD%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C.pdf",
+        "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+        "gitBlobSha": "8d1d93cec8a85daaa3f98d98165ddbf87fa559c5",
+        "sha256": "4436b7e63169565fccca46102b9aa0964f726c704b501b8ce4f21dafc12b448d",
+        "pageCount": 99
+      },
+      "decision": "add_official_directory",
+      "note": "同一版本优先采用国家平台目录；GitHub 仅用作书目与版本交叉核对，不另外创建重复教材。",
+      "comparison": {
+        "githubTitlePdfPage": 2,
+        "githubDirectoryPdfPages": [
+          5,
+          6
+        ],
+        "matchedCoreLessons": 20,
+        "officialModuleCount": 10,
+        "normalization": "忽略空白、标点及 Unit 后的数字；其余课题逐项比对。",
+        "differences": []
+      }
+    }
+  ]
+}

@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowRight, Check, ChevronDown, KeyRound, LoaderCircle, ShieldCheck } from "lucide-react";
+import { ArrowRight, Check, KeyRound, LoaderCircle } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useRouter } from "next/navigation";
+import { useSchoolbagMotion } from "@/components/schoolbag/schoolbag-motion";
 import { useMemo, useState } from "react";
 
-import { SoftReveal } from "@/components/motion/soft-reveal";
 import { Button } from "@/components/ui/button";
+import { Disclosure } from "@/components/ui/disclosure";
+import { Input } from "@/components/ui/input";
 import { QrPairing } from "@/features/auth/qr-pairing";
 
 function normalizePairingCode(value: string) {
@@ -21,47 +22,31 @@ export function PairingForm() {
   const [usingCode, setUsingCode] = useState(false);
 
   return (
-    <SoftReveal delay={0.16}>
+    <div>
       <section className="space-auth-panel">
         <div className="relative">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="mb-2 text-lg font-extrabold tracking-[.1em] text-[var(--mira-brand-deep)]">第一次使用</p>
-              <h2 className="text-[30px] font-bold leading-tight tracking-[-.03em] sm:text-[36px]">和家长一起登录</h2>
+              <p className="auth-form-welcome">第一次使用</p>
+              <h2 className="auth-form-title">和家长一起登录</h2>
             </div>
           </div>
-          <p className="mt-3 text-lg leading-7 text-[var(--mira-muted)]">不需要输入账号密码，家长确认后就能开始学习。</p>
+          <p className="auth-form-description">请家长扫码确认，帮你准备好学习空间。</p>
 
           <QrPairing paused={usingCode} />
 
-          <details
-            className="group mt-6 border-t border-[var(--mira-border-soft)] pt-3"
-            onToggle={(event) => setUsingCode(event.currentTarget.open)}
-          >
-            <summary className="focus-ring flex min-h-[52px] cursor-pointer list-none items-center justify-center gap-2 rounded-[var(--mira-radius-button)] px-3 text-lg font-extrabold text-[var(--mira-brand-deep)] [&::-webkit-details-marker]:hidden">
-              <KeyRound className="size-5" aria-hidden="true" />
-              无法扫码？使用配对码
-              <ChevronDown className="size-5 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
-            </summary>
+          <Disclosure className="auth-pair-disclosure" title={<span><KeyRound size={17} aria-hidden="true" />无法扫码？使用配对码</span>} onOpenChange={setUsingCode}>
             <PairingCodeForm />
-          </details>
+          </Disclosure>
 
-          <div className="mt-5 flex items-start gap-3 border-t border-[var(--mira-border-soft)] pt-5 text-lg leading-6 text-[var(--mira-muted)]">
-            <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--mira-success)]" aria-hidden="true" />
-            <p>
-              <strong className="text-[var(--mira-ink)]">只会打开你的学习内容。</strong>
-              <br />
-              家庭设置、摄像头和家长信息不会出现在这里。
-            </p>
-          </div>
         </div>
       </section>
-    </SoftReveal>
+    </div>
   );
 }
 
 function PairingCodeForm() {
-  const router = useRouter();
+  const { enterLearning } = useSchoolbagMotion();
   const reduced = useReducedMotion();
   const [code, setCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -81,8 +66,7 @@ function PairingCodeForm() {
       });
       const payload = (await response.json()) as { ok?: boolean; message?: string };
       if (!response.ok) throw new Error(payload.message || "配对失败，请确认配对码后重试");
-      router.replace("/today");
-      router.refresh();
+      enterLearning();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "配对失败，请稍后再试");
       setSubmitting(false);
@@ -95,7 +79,7 @@ function PairingCodeForm() {
         <KeyRound className="size-4 text-[var(--mira-brand-deep)]" aria-hidden="true" /> 8位配对码
       </label>
       <div className="relative">
-        <input
+        <Input
           id="pairing-code"
           name="pairingCode"
           value={displayPairingCode(code)}
@@ -111,7 +95,7 @@ function PairingCodeForm() {
           aria-describedby="pairing-help pairing-error"
           aria-invalid={Boolean(error)}
           placeholder="ABCD 1234"
-          className="focus-ring h-[68px] w-full rounded-[20px] border-2 border-[var(--mira-border)] bg-[var(--mira-bg)] px-5 pr-14 text-center text-[26px] font-black uppercase tracking-[.16em] text-[var(--mira-ink)] outline-none transition-colors placeholder:text-[var(--mira-disabled)] focus:border-[var(--mira-brand)] focus:bg-[var(--mira-surface)] sm:text-[30px]"
+          className="pairing-code-input"
         />
         <AnimatePresence>
           {complete ? (

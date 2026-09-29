@@ -5,10 +5,20 @@ import 'package:warm_sight/src/features/learning/domain/textbook_models.dart';
 
 abstract interface class TextbookGateway {
   Future<SchoolTextbookCatalog> catalog(String childId);
+  Future<void> updateContext(
+    String childId,
+    SchoolTextbookCatalog catalog, {
+    required String? semester,
+  });
   Future<void> select(
     String childId,
     SchoolTextbookCatalog catalog,
     SchoolTextbook book,
+  );
+  Future<void> selectMany(
+    String childId,
+    SchoolTextbookCatalog catalog,
+    List<SchoolTextbook> books,
   );
 }
 
@@ -37,6 +47,27 @@ class TextbookRepository implements TextbookGateway {
   }
 
   @override
+  Future<void> updateContext(
+    String childId,
+    SchoolTextbookCatalog catalog, {
+    required String? semester,
+  }) async {
+    try {
+      await api.put(
+        '${_path(childId)}/context',
+        data: {
+          'schoolYearStartYear': catalog.year,
+          'semester': semester,
+          'expectedContextRevision': catalog.contextRevision,
+          'expectedGradeRevision': catalog.gradeRevision,
+        },
+      );
+    } on DioException catch (error) {
+      throw TextbookException.fromDio(error);
+    }
+  }
+
+  @override
   Future<void> select(
     String childId,
     SchoolTextbookCatalog catalog,
@@ -51,6 +82,34 @@ class TextbookRepository implements TextbookGateway {
           'expectedSelectionRevision': book.selectionRevision,
           'schoolYearStartYear': catalog.year,
           'semester': catalog.semester,
+        },
+      );
+    } on DioException catch (error) {
+      throw TextbookException.fromDio(error);
+    }
+  }
+
+  @override
+  Future<void> selectMany(
+    String childId,
+    SchoolTextbookCatalog catalog,
+    List<SchoolTextbook> books,
+  ) async {
+    try {
+      await api.put(
+        '${_path(childId)}/selections',
+        data: {
+          'schoolYearStartYear': catalog.year,
+          'semester': catalog.semester,
+          'expectedContextRevision': catalog.contextRevision,
+          'selections': [
+            for (final book in books)
+              {
+                'editionId': book.editionId,
+                'alignmentRevisionId': book.revisionId,
+                'expectedSelectionRevision': book.selectionRevision,
+              },
+          ],
         },
       );
     } on DioException catch (error) {

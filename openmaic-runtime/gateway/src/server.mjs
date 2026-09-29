@@ -16,6 +16,9 @@ const SAFE_API_PATHS = new Set([
   "/api/transcription",
   "/api/quiz-grade",
 ]);
+const TEXTBOOK_INTERACTION_PATHS = new Set([
+  '/api/chat', '/api/chat/pi', '/api/generate/tts', '/api/transcription',
+]);
 const PAID_API_PATHS = new Set([
   '/api/chat', '/api/chat/pi', '/api/generate/tts', '/api/transcription', '/api/quiz-grade',
   '/api/pbl/v2/evaluate', '/api/pbl/v2/instructor', '/api/pbl/v2/open-task', '/api/pbl/v2/simulator',
@@ -91,6 +94,10 @@ async function handleRequest(request, response, config) {
     if (request.method !== "GET") return methodNotAllowed(response);
     return launch(request, response, url, config);
   }
+  if (url.pathname === '/mira/textbook-launch') {
+    if (request.method !== 'GET') return methodNotAllowed(response);
+    return launchTextbook(request, response, url, config);
+  }
   if (url.pathname === "/mira/probe") {
     if (request.method !== "GET") return methodNotAllowed(response);
     return launchConversationProbe(request, response, url, config);
@@ -104,6 +111,9 @@ async function handleRequest(request, response, config) {
   // authority for its classroom, student, expiry, and permitted operations.
   if (selection.classroomId && runtime.classroomId !== selection.classroomId) {
     return unauthorized(response);
+  }
+  if (runtime.purpose === 'fixed_textbook') {
+    return handleTextbookRequest(request, response, url, runtime, runtimeToken, config);
   }
   if (selection.legacy && selection.classroomId && runtime.purpose !== "conversation_probe") {
     // A previously open, matching classroom can migrate on reload without
@@ -368,9 +378,10 @@ async function launchConversationProbe(_request, response, url, config) {
 
 async function validateRuntime(runtimeToken, config) {
   const isProbe = String(runtimeToken).startsWith("ompr_");
+  const isTextbook = String(runtimeToken).startsWith('tbpr_');
   const result = await backendJson(
     config,
-    isProbe
+    isTextbook ? '/internal/learning/textbooks/runtime/validate' : isProbe
       ? "/internal/learning/openmaic/runtime/probe/validate"
       : "/internal/learning/openmaic/runtime/validate",
     { runtimeToken },
@@ -389,6 +400,117 @@ async function validateRuntime(runtimeToken, config) {
     throw error;
   }
   return result;
+}
+
+async function launchTextbook(_request, response, url, config) {
+  const ticket = url.searchParams.get('ticket') || '';
+  if (!ticket.startsWith('tbpt_') || ticket.length > 3000 || url.searchParams.getAll('ticket').length !== 1)
+    return unauthorized(response);
+  const result = await backendJson(config, '/internal/learning/textbooks/runtime/exchange', { ticket });
+  if (!result.ok || !String(result.runtimeToken).startsWith('tbpr_')
+      || !/^tbpub_[a-f0-9]{24}$/.test(String(result.classroomId))) return unauthorized(response);
+  const maxAge = Math.max(1, Math.floor((Number(result.expiresAt) - Date.now()) / 1000));
+  response.statusCode = 303;
+  response.setHeader('Set-Cookie', [RUNTIME_COOKIE, classroomCookieName(result.classroomId)].map(name =>
+    serializeCookie(name, result.runtimeToken, { maxAge, secure: config.secureCookie })));
+  response.setHeader('Cache-Control', 'no-store');
+  response.setHeader('Referrer-Policy', 'no-referrer');
+  response.setHeader('Location', `/classroom/${result.classroomId}?mira=1&textbook=1`);
+  response.end();
+}
+
+export function authorizeTextbookRequest(request, url, runtime) {
+  const method = String(request.method || 'GET').toUpperCase();
+  if (['/mira/runtime-events', '/mira/textbook-quiz', '/mira/textbook-play'].includes(url.pathname))
+    return { allowed: ['GET', 'POST'].includes(method) && !url.search, kind: 'textbook-record' };
+  if (/^\/mira\/textbook-audio\/[a-f0-9]{24}\.wav$/.test(url.pathname))
+    return { allowed: method === 'GET' && !url.search, kind: 'textbook-activity-audio' };
+  if (TEXTBOOK_INTERACTION_PATHS.has(url.pathname))
+    return { allowed: method === 'POST' && !url.search, kind: 'runtime-api', sanitizeJson: true };
+  if (method !== 'GET') return { allowed: false };
+  if (url.pathname === '/api/server-providers') return { allowed: true, kind: 'json' };
+  if (url.pathname === '/api/classroom')
+    return { allowed: url.searchParams.getAll('id').length === 1 && url.searchParams.get('id') === runtime.classroomId,
+      kind: 'textbook-classroom' };
+  if (url.pathname.startsWith('/api/classroom-media/')) {
+    const media = runtime.media?.find(item => item.path === url.pathname);
+    return { allowed: Boolean(media && !url.search), kind: 'textbook-media', media };
+  }
+  const decision = authorizeRuntimeRequest(request, url, runtime);
+  return ['asset', 'document', 'student-video-export-capability'].includes(decision.kind)
+    ? decision : { allowed: false };
+}
+
+async function handleTextbookRequest(request, response, url, runtime, runtimeToken, config) {
+  const decision = authorizeTextbookRequest(request, url, runtime);
+  if (!decision.allowed) return json(response, 403, { ok: false, error: 'textbook_route_not_allowed', message: '固定课件不提供这个操作' });
+  const trusted = { 'X-Mira-Textbook-Token': runtimeToken };
+  if (decision.kind === 'textbook-activity-audio') {
+    const upstream = await fetch(new URL(`/internal/learning/textbooks/runtime/play-audio/${url.pathname.split('/').at(-1)}`, `${config.backendUrl}/`), {
+      headers: { ...trusted, 'X-Mira-Internal-Token': config.internalToken, 'X-Mira-Internal-Source': 'openmaic-runtime-gateway' },
+      redirect: 'error', signal: AbortSignal.timeout(config.backendTimeoutMs),
+    });
+    if (!upstream.ok) return json(response, upstream.status, { ok: false, message: '声音暂时不可用，请再试一次' });
+    if (!/^audio\/wav(?:;|$)/i.test(upstream.headers.get('content-type') || '')) return runtimeAudioDeliveryError();
+    const bytes = await readFetchBody(upstream.body, MAX_RUNTIME_AUDIO_BYTES, runtimeAudioBindingError);
+    response.writeHead(200, { 'Content-Type': 'audio/wav', 'Content-Length': bytes.length,
+      'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' });
+    response.end(bytes);
+    return;
+  }
+  if (decision.kind === 'textbook-classroom') {
+    const result = await backendJson(config, '/internal/learning/textbooks/runtime/classroom', undefined, trusted, 'GET');
+    // The interactive iframe intentionally has an opaque origin. Its media
+    // requests cannot carry the classroom's SameSite cookie. Deliver only
+    // these exact reviewed bytes inside the authenticated snapshot instead
+    // of relaxing iframe isolation or exposing a public media route.
+    for (const scene of result.classroom?.scenes || []) {
+      if (scene.miraActivity || scene.type !== 'interactive' || typeof scene.content?.html !== 'string') continue;
+      const embedded = runtime.media.filter(media => scene.content.html.includes(media.path));
+      const assets = await Promise.all(embedded.map(async media => [media.path,
+        `data:${media.mimeType};base64,${(await textbookMediaBytes(media, config)).toString('base64')}`]));
+      for (const [path, data] of assets) scene.content.html = scene.content.html.split(path).join(data);
+    }
+    return json(response, 200, result);
+  }
+  if (decision.kind === 'textbook-record') {
+    let data;
+    if (request.method === 'POST') {
+      if (!isJsonRequest(request)) return json(response, 415, { ok: false, error: 'textbook_json_required' });
+      try { data = JSON.parse((await readBody(request, 8192)).toString('utf8')); }
+      catch { return json(response, 400, { ok: false, error: 'textbook_json_invalid' }); }
+    }
+    const endpoint = url.pathname === '/mira/textbook-quiz' ? 'quiz'
+      : url.pathname === '/mira/textbook-play' ? 'play' : 'events';
+    const result = await backendJson(config, `/internal/learning/textbooks/runtime/${endpoint}`, data, trusted, request.method);
+    return json(response, 200, result);
+  }
+  if (decision.kind === 'textbook-media') {
+    const media = decision.media;
+    const bytes = await textbookMediaBytes(media, config);
+    response.statusCode = 200;
+    response.setHeader('Content-Type', media.mimeType);
+    response.setHeader('Content-Length', bytes.length);
+    response.setHeader('Cache-Control', 'private, no-store');
+    response.setHeader('X-Content-Type-Options', 'nosniff');
+    response.end(bytes);
+    return;
+  }
+  if (decision.kind === 'student-video-export-capability') return json(response, 200, { enabled: false });
+  return proxyToUpstream(request, response, url, runtime, config, decision, runtimeToken);
+}
+
+async function textbookMediaBytes(media, config) {
+  if (!/^\/api\/classroom-media\/tbpub_[a-f0-9]{24}\/(audio|media)\/[A-Za-z0-9_.-]+$/.test(media.path)
+      || !['audio/wav', 'audio/mpeg', 'image/webp', 'image/png'].includes(media.mimeType)
+      || !/^[a-f0-9]{64}$/.test(media.sha256) || !Number.isInteger(media.byteSize)
+      || media.byteSize <= 0 || media.byteSize > MAX_RUNTIME_AUDIO_BYTES) return runtimeAudioBindingError();
+  const upstream = await fetch(new URL(media.path, config.upstreamUrl), { redirect: 'error', signal: AbortSignal.timeout(config.upstreamTimeoutMs) });
+  if (!upstream.ok) return runtimeAudioDeliveryError();
+  const bytes = await readFetchBody(upstream.body, MAX_RUNTIME_AUDIO_BYTES, runtimeAudioBindingError);
+  if (bytes.length !== media.byteSize || createHash('sha256').update(bytes).digest('hex') !== media.sha256)
+    return runtimeAudioBindingError();
+  return bytes;
 }
 
 export function authorizeRuntimeRequest(request, url, runtime) {
@@ -476,7 +598,7 @@ export function authorizeRuntimeRequest(request, url, runtime) {
   return { allowed: false, status: 403, error: "openmaic_route_not_allowed" };
 }
 
-async function proxyToUpstream(request, response, url, runtime, config, decision) {
+async function proxyToUpstream(request, response, url, runtime, config, decision, textbookToken) {
   let upstreamUrl = new URL(url.pathname + url.search, `${config.upstreamUrl}/`);
   let body;
   const method = String(request.method || "GET").toUpperCase();
@@ -496,7 +618,8 @@ async function proxyToUpstream(request, response, url, runtime, config, decision
     headers.set("x-mira-runtime-purpose", "conversation_probe");
     headers.set("x-mira-verification-challenge", String(runtime.challenge));
   }
-  if (method === "POST" && PAID_API_PATHS.has(url.pathname) && runtime.purpose !== "conversation_probe" && runtime.paidBudgets !== undefined) {
+  if (method === "POST" && PAID_API_PATHS.has(url.pathname) && runtime.purpose !== "conversation_probe"
+      && (runtime.purpose === 'fixed_textbook' || runtime.paidBudgets !== undefined)) {
     let paidRequest;
     if (isJsonRequest(request)) {
       try { paidRequest = JSON.parse(body.toString("utf8")); }
@@ -504,9 +627,11 @@ async function proxyToUpstream(request, response, url, runtime, config, decision
     } else {
       paidRequest = { audioSha256: createHash("sha256").update(body).digest("hex"), sizeBytes: body.length };
     }
-    const admitted = await backendJson(config, "/internal/learning/openmaic/runtime/paid-call", {
+    const fixedTextbook = runtime.purpose === 'fixed_textbook';
+    const admitted = await backendJson(config, fixedTextbook
+      ? '/internal/learning/textbooks/runtime/paid-call' : "/internal/learning/openmaic/runtime/paid-call", {
       path: url.pathname, request: paidRequest,
-    }, trustedRuntimeHeaders(runtime));
+    }, fixedTextbook ? { 'X-Mira-Textbook-Token': textbookToken } : trustedRuntimeHeaders(runtime));
     if (admitted.upstreamPath !== undefined) {
       if (!['/api/chat', '/api/chat/pi'].includes(url.pathname)
           || admitted.upstreamPath !== '/api/chat/pi' || admitted.purpose !== 'required_teaching')

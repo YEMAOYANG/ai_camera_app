@@ -55,6 +55,41 @@
   --font-sans: var(--font-mira-sans);
 }
 
+/* The selected storybook direction is scoped away from formal classroom renderers. */
+.schoolbag-shell, .mira-ui-surface {
+  --mira-bg: #fcf6ec;
+  --mira-bg-warm: #fcf6ec;
+  --mira-surface: #fffcf6;
+  --mira-surface-soft: #f2ebdd;
+  --mira-ink: #29383b;
+  --mira-muted: #6b706c;
+  --mira-subtle: #73756c;
+  --mira-brand: #efb73d;
+  --mira-brand-deep: #f7c752;
+  --mira-brand-wash: #f7edce;
+  --mira-on-brand: #29383b;
+  --mira-ai: #7b662e;
+  --mira-sky: #f3eddf;
+  --mira-mint: #e4f0e7;
+  --mira-mint-deep: #36765b;
+  --mira-success: #36765b;
+  --mira-warning: #926718;
+  --mira-danger: #b63e3c;
+  --mira-border: #ded8ca;
+  --mira-border-soft: #e9e1d4;
+  --mira-disabled: #eee8dc;
+  --mira-shadow-action: none;
+  --mira-radius-control: 10px;
+  --mira-radius-card: 16px;
+  --mira-focus: #7d6530;
+  --mira-control-height: 48px;
+  --mira-control-hover: #f1e8d6;
+  --font-mira-story: "Mira Storybook", "Kaiti SC", "STKaiti", "KaiTi", serif;
+  --book-chinese: #d76a54;
+  --book-math: #5b91ad;
+  --book-english: #649380;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

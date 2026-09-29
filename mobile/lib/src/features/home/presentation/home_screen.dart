@@ -21,7 +21,7 @@ import 'package:warm_sight/src/features/home/presentation/widgets/home_primary_c
 import 'package:warm_sight/src/features/home/presentation/widgets/home_primary_learning_preview.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_rhythm_rail.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
-import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
+import 'package:warm_sight/src/features/student_access/application/student_access_availability.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/profile/domain/profile_models.dart';
@@ -148,7 +148,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
     final availability = child.id.trim().isEmpty
         ? null
-        : ref.read(currentLearningAvailabilityProvider(child.id));
+        : ref.read(
+            studentAccessAvailabilityProvider(studentAccessScope(child)),
+          );
     if (availability == null || availability.isLoading) {
       showAppToast(
         context,
@@ -190,7 +192,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final cameraHealth = ref.watch(cameraHealthProvider);
     final cameraStatus = ref.watch(cameraStatusProvider);
     final cameraMonitor = ref.watch(cameraMonitorDisplayProvider);
-    final childId = profileSummary.asData?.value.child?.id;
+    final child = profileSummary.asData?.value.child;
+    if (child != null && child.contentMode == 'primary_learning') {
+      ref.watch(studentAccessAvailabilityProvider(studentAccessScope(child)));
+    }
+    final childId = child?.id;
     final overrideReviews = ref.watch(pendingParentReviewsOverrideProvider);
     final serverReviews = childId != null && childId.isNotEmpty
         ? ref
@@ -321,7 +327,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       parent: AlwaysScrollableScrollPhysics(),
                     ),
                     slivers: [
-                      SliverToBoxAdapter(child: SizedBox(height: topSpacer)),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: topSpacer,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              top:
+                                  (safeArea.top > 0 ? safeArea.top : 24) +
+                                  (size.width <= 340 || size.height <= 620
+                                      ? 12
+                                      : 14),
+                              right: AppSpacing.pageHorizontal,
+                            ),
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child: HomeStudentQrButton(
+                                onTap: () =>
+                                    _openStudentQrScanner(profileSummary),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                       SliverToBoxAdapter(
                         child: DecoratedBox(
                           decoration: BoxDecoration(
@@ -387,15 +414,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                       ),
                     ],
-                  ),
-                ),
-                Positioned(
-                  top:
-                      (safeArea.top > 0 ? safeArea.top : 24) +
-                      (size.width <= 340 || size.height <= 620 ? 12 : 14),
-                  right: AppSpacing.pageHorizontal,
-                  child: HomeStudentQrButton(
-                    onTap: () => _openStudentQrScanner(profileSummary),
                   ),
                 ),
               ],
@@ -583,7 +601,9 @@ _HomeReportCopy _resolveHomeReport({
   if (dailyData != null && _hasReportContent(dailyData)) {
     return _reportCopy(
       title: '今日报告',
-      subtitle: '今天的安排和看护记录',
+      subtitle: dailyData.learning.lessonCount > 0
+          ? '今天的学习和看护记录'
+          : '今天的安排和看护记录',
       data: dailyData,
       icon: Icons.today_outlined,
       tone: StatusTone.success,
@@ -643,6 +663,9 @@ _HomeReportCopy _reportCopy({
     icon: icon,
     tone: tone,
     metrics: [
+      if (data.learning.lessonCount > 0) '学习 ${data.learning.lessonCount} 节',
+      if (data.learning.needsSupportCount > 0)
+        '${data.learning.needsSupportCount} 节需留意',
       if (data.taskTotal > 0) '完成 ${data.taskCompleted}/${data.taskTotal}',
       if (data.pointsEarned > 0) '+${data.pointsEarned} 分',
       if (data.pendingItems > 0) '${data.pendingItems} 项待处理',
@@ -651,7 +674,8 @@ _HomeReportCopy _reportCopy({
 }
 
 bool _hasReportContent(ReportData data) {
-  return data.taskTotal > 0 ||
+  return data.learning.lessonCount > 0 ||
+      data.taskTotal > 0 ||
       data.taskCompleted > 0 ||
       data.pointsEarned > 0 ||
       data.pendingItems > 0 ||

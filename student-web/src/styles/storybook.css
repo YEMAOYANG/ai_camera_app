@@ -1,0 +1,310 @@
+@font-face {
+  font-family: "Mira Storybook";
+  src: url("/fonts/mira-storybook.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* One paper surface connects the bag, contents and illustrated lesson. */
+html:has(.schoolbag-shell), body:has(.schoolbag-shell) { background: #fcf6ec; }
+html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
+.schoolbag-shell, .schoolbag-shell.schoolbag-auth { background: var(--mira-bg) url("/images/storybook/paper-texture.webp") repeat; background-size: 512px 512px; }
+.schoolbag-shell :is(a, button, input, summary):focus-visible { outline: 2px solid var(--mira-focus); outline-offset: 4px; }
+.schoolbag-shell .mira-button { border-radius: 999px; font-size: 15px; font-weight: 550; padding: 12px 22px; }
+.schoolbag-shell .mira-button[data-variant="primary"] { color: var(--mira-ink); background: var(--mira-brand-deep); }
+.schoolbag-shell .mira-button[data-variant="primary"]:hover:not(:disabled) { color: var(--mira-ink); background: #f3be43; }
+.schoolbag-shell .mira-button[data-variant="secondary"] { background: transparent; border-color: var(--mira-border); }
+.schoolbag-shell .mira-button:disabled { background: var(--mira-disabled); color: var(--mira-subtle); }
+.schoolbag-header { display: flex; justify-content: space-between; height: 64px; padding: 0 max(48px, calc((100% - 1440px) / 2)); border: 0; max-width: none; gap: 20px; }
+.schoolbag-header, .schoolbag-auth .space-auth-header { position: sticky; top: 0; z-index: 40; background: var(--mira-bg) url("/images/storybook/paper-texture.webp") repeat; background-size: 512px; box-shadow: 0 1px 0 #bdaa8126; }
+.schoolbag-header-start { display: flex; gap: 30px; align-items: center; min-width: 0; }
+.schoolbag-brand { gap: 12px; flex: none; min-width: 48px; min-height: 48px; }
+.schoolbag-brand > span { width: 38px; height: 40px; border-radius: 15px; background: #f6ca5f; }
+.schoolbag-brand strong { font-weight: 650; font-size: 21px; letter-spacing: .04em; }
+.schoolbag-brand small { display: none; }
+.schoolbag-context-nav { padding-left: 26px; border-left: 1px solid var(--mira-border); }
+.schoolbag-context-nav a { display: inline-flex; align-items: center; gap: 9px; min-height: 48px; font-size: 15px; color: var(--mira-muted); white-space: nowrap; }
+.schoolbag-context-nav a:hover { color: var(--mira-ink); }
+.schoolbag-account { gap: 22px; }
+.schoolbag-rest { border: 0; padding: 0 12px; border-radius: 50%; width: 48px; min-width: 48px; color: var(--mira-muted); }
+.schoolbag-rest span { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+.schoolbag-rest:hover { background: var(--mira-control-hover); }
+.schoolbag-main { max-width: 1320px; padding: 28px 48px 48px; }
+.schoolbag-lock-error { padding: 0 32px; }
+.bag-cinema-curtain, .bag-paper-transition { background: #fcf6ec url("/images/storybook/paper-texture.webp") repeat; background-size: 512px; }
+.bag-cinema-controls { color: #555d58; }
+.bag-cinema-controls button { border-color: #ded8ca; background: #fffcf6; }
+
+/* The homepage has three books and one small settings disclosure. */
+.schoolbag-home .schoolbag-main { max-width: 1360px; padding-top: 16px; }
+.schoolbag-hero { min-height: 600px; grid-template-columns: minmax(270px, .78fr) minmax(0, 1.4fr); gap: 20px; }
+.schoolbag-home .schoolbag-copy { padding: 0 0 80px 16px; }
+.schoolbag-eyebrow { margin-bottom: 21px; letter-spacing: .15em; font-size: 13px; color: var(--mira-muted); }
+.schoolbag-copy h1 { font-family: var(--font-mira-story); font-size: clamp(38px, 3.6vw, 50px); font-weight: 400; line-height: 1.45; max-width: 8.5em; letter-spacing: .02em; text-wrap: balance; }
+.schoolbag-invitation { margin: 22px 0 0; font-size: 16px; font-weight: 400; line-height: 1.8; }
+.schoolbag-stage--three { height: 570px; max-width: 760px; }
+.schoolbag-subjects { max-width: 510px; margin-top: -20px; gap: 16px; }
+.schoolbag-subject { min-height: 92px; border: 0; border-radius: 0; padding: 8px 12px; }
+.schoolbag-subject + .schoolbag-subject { border-left: 1px solid var(--mira-border-soft); }
+.schoolbag-subject:hover, .schoolbag-subject:focus-visible { background: #f5eacb80; border-color: var(--mira-border-soft); }
+.schoolbag-subject small { font-size: 12px; letter-spacing: .11em; }
+.schoolbag-subject strong { font-family: var(--font-mira-story); font-size: 32px; font-weight: 400; line-height: 1.6; }
+.schoolbag-subject > span { font-size: 12px; gap: 8px; }
+.schoolbag-home .schoolbag-feedback { margin-top: 8px; }
+.schoolbag-feedback:empty { display: none; }
+.schoolbag-notice { background: #fffaf1; box-shadow: none; border-color: var(--mira-border-soft); font-size: 15px; }
+.schoolbag-tip { font-size: 14px; }
+.schoolbag-home .schoolbag-account { position: relative; }
+.schoolbag-settings { flex: none; }
+.schoolbag-settings .mira-disclosure-trigger { width: auto; gap: 8px; padding: 10px 8px; white-space: nowrap; }
+.schoolbag-settings .mira-disclosure-trigger:is(:hover, [data-state="open"]) { color: var(--mira-ink); background: var(--mira-control-hover); }
+.schoolbag-settings .mira-disclosure-trigger > span { gap: 7px; }
+.schoolbag-settings .mira-disclosure-content { position: absolute; top: calc(100% + 8px); right: 0; width: min(360px, calc(100vw - 40px)); padding: 16px; border: 1px solid var(--mira-border); border-radius: 12px; background: var(--mira-surface); }
+.schoolbag-preferences { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-top: 8px; }
+.schoolbag-preferences .mira-switch[data-state="checked"] { background: #857447; }
+
+/* Authentication is part of the same paper desk, with no floating form card. */
+.schoolbag-auth .space-auth-header { padding: 24px max(48px, calc((100% - 1344px) / 2)); max-width: none; }
+.schoolbag-auth .space-auth-header > span { font-size: 12px; color: var(--mira-muted); }
+.schoolbag-auth .space-auth-main { max-width: 1280px; grid-template-columns: minmax(0, 1.4fr) minmax(320px, .9fr); gap: 60px; padding: 32px 48px 48px; min-height: calc(100svh - 100px); align-items: center; }
+.schoolbag-auth .space-auth-intro { align-self: center; text-align: center; padding: 0; }
+.schoolbag-auth .space-auth-intro h1 { font-family: var(--font-mira-story); font-size: 40px; font-weight: 400; line-height: 1.5; margin-bottom: 8px; }
+.schoolbag-auth .space-auth-description { font-size: 15px; margin: 0; }
+.schoolbag-auth .bag-scene-slot { float: none; width: 100%; max-width: 670px; height: 490px; min-height: 0; margin: -5px auto 0; }
+.auth-scene-caption { display: none; }
+.schoolbag-auth .space-auth-panel { max-width: 380px; padding: 28px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.schoolbag-auth .space-auth-panel .auth-form-title { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+.schoolbag-auth .space-auth-panel .auth-form-welcome { font-size: 13px; font-weight: 400; color: var(--mira-muted); letter-spacing: .06em; margin-bottom: 12px; }
+.schoolbag-auth .space-auth-panel .auth-form-description { font-size: 14px; line-height: 1.8; margin-top: 13px; }
+.auth-pin-form { margin-top: 28px; }
+.mira-pin-slots { gap: 12px; }
+.mira-pin-slot { height: 66px; border-radius: 12px; background: #fffaf2; border-color: #d8d0bf; }
+.mira-pin-slot[data-active] { box-shadow: 0 0 0 3px #e8d6a044; }
+.auth-field-error { min-height: 30px; padding-top: 8px; font-size: 14px; line-height: 1.5; color: var(--mira-danger); }
+.auth-pair-disclosure { border-top: 1px solid var(--mira-border-soft); margin-top: 18px; }
+.schoolbag-auth .space-pair-code-form { background: transparent; border: 0; padding: 8px 0 0; }
+.schoolbag-auth .space-auth-panel .pairing-code-input { min-height: 56px; font-size: 21px; text-align: center; letter-spacing: .16em; }
+.schoolbag-auth .space-qr-code { padding: 8px; box-shadow: none; }
+.schoolbag-auth .space-qr[data-qr-state="waiting"] .space-qr-code::after { display: none; }
+.schoolbag-auth .space-qr > div:nth-child(2) { border: 0; border-radius: 0; background: transparent; padding: 12px 0; }
+.schoolbag-auth .space-qr [aria-label^="核对码"] { color: var(--mira-ink); font-weight: 550; }
+.schoolbag-auth .space-qr > div:first-child { font-size: 14px; }
+.schoolbag-auth .space-qr > div:first-child > div, .schoolbag-auth .space-qr > div:first-child > span { font-size: 14px; font-weight: 500; }
+
+/* Published 2×2 art stays correctly cropped to its authored panel. */
+.textbook-picture { position: relative; display: block; width: 100%; overflow: hidden; }
+.textbook-picture-panel { position: relative; display: block; width: 100%; aspect-ratio: 1; overflow: hidden; }
+.textbook-picture-panel img { position: absolute; width: 200%; height: auto; max-width: none; }
+.textbook-picture--landscape { display: flex; justify-content: center; height: 100%; }
+.textbook-picture--landscape[data-wide="true"] > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.textbook-picture--landscape[data-wide="false"] .textbook-picture-panel { width: auto; height: 100%; flex: none; }
+
+/* A contents spread: one index, one illustrated introduction, one quiet list. */
+.textbook-empty-heading { display: flex; justify-content: space-between; gap: 24px; align-items: center; }
+.textbook-empty-heading h1 { font-size: 28px; font-weight: 550; }
+.schoolbag-shell .textbook-welcome { padding: 0 0 28px; background: none; border-radius: 0; grid-template-columns: minmax(0, 1fr) 200px; gap: 40px; }
+.textbook-welcome h1 { font-family: var(--font-mira-story); font-size: 45px; font-weight: 400; line-height: 1.5; margin: 12px 0 16px; }
+.textbook-welcome h1 > span { display: inline-block; white-space: nowrap; }
+.textbook-bookline { font-size: 13px; color: var(--mira-muted); letter-spacing: .08em; }
+.textbook-discover-link { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; font-size: 15px; color: var(--mira-muted); }
+.textbook-discover-link:hover { color: var(--mira-ink); }
+.textbook-welcome-art { display: block; min-height: 0; mask: url("/images/storybook/paper-edge-mask.png") center / 100% 100% no-repeat; }
+.textbook-layout { border-top: 1px solid var(--mira-border); padding-top: 34px; gap: 52px; grid-template-columns: 238px minmax(0, 1fr); }
+.textbook-unit-sidebar { top: 120px; max-height: calc(100svh - 144px); overflow-y: auto; }
+.textbook-unit-sidebar h3 { font-size: 18px; font-weight: 550; }
+.textbook-unit-sidebar > p { font-size: 12px; margin: 10px 0 22px; }
+.textbook-unit-nav { gap: 2px; }
+.textbook-unit-nav button { min-height: 57px; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 10px 13px; gap: 12px; border: 0; border-radius: 4px; }
+.textbook-unit-nav button > span { font-size: 15px; font-weight: 450; line-height: 1.6; }
+.textbook-unit-nav small { font-size: 12px; }
+.textbook-unit-nav button:hover { background: #f5ecdd; }
+.textbook-unit-nav button[aria-current] { color: var(--mira-ink); background: #f2e7ce; border: 0; box-shadow: inset 2px 0 #c39943; }
+.textbook-unit-heading { margin-bottom: 22px; }
+.textbook-unit-heading h3 { font-size: 22px; font-weight: 550; letter-spacing: .02em; }
+.textbook-unit-introduction { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; gap: 30px; padding: 0 0 28px; background: none; border-radius: 0; }
+.textbook-unit-art { width: 100%; mask: url("/images/storybook/paper-edge-mask.png") center / 100% 100% no-repeat; }
+.textbook-unit-invitation > p { font-size: 12px; color: var(--mira-muted); margin: 0 0 12px; }
+.textbook-unit-introduction h4 { font-family: var(--font-mira-story); font-size: 32px; font-weight: 400; line-height: 1.6; margin: 0 0 22px; }
+.textbook-lessons-heading { font-size: 13px; color: var(--mira-muted); font-weight: 450; margin: 0 0 10px; letter-spacing: .05em; }
+.textbook-lesson { padding: 20px 2px; border-color: var(--mira-border-soft); }
+.textbook-lesson h4 { font-size: 18px; font-weight: 500; }
+.textbook-lesson p { font-size: 12px; margin-top: 6px; }
+.textbook-lesson-status { font-size: 12px; }
+.textbook-lesson[aria-current="step"] { border-radius: 4px; background: #f3ebda; }
+.textbook-book-info { margin-top: 30px; border-top: 1px solid var(--mira-border-soft); padding: 8px 0 0; max-width: none; }
+.textbook-book-info .mira-disclosure-trigger { justify-content: flex-start; gap: 12px; width: fit-content; font-size: 12px; }
+.textbook-info-actions { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.textbook-source { color: #706144; }
+.mira-select-item[data-state="checked"] { color: var(--mira-ink); }
+
+/* The selected visual: a wide picture, quiet chapter dots, one audio control. */
+.storybook-guide .schoolbag-header { max-width: none; }
+.storybook-guide .schoolbag-main { max-width: 1536px; padding: 10px 40px 28px; }
+.storybook-pagination { display: flex; align-items: center; gap: 26px; color: var(--mira-muted); font-size: 15px; }
+.storybook-pagination ol { list-style: none; display: flex; gap: 12px; padding: 0; }
+.storybook-pagination li { width: 11px; height: 11px; border-radius: 50%; background: #e8dbc0; }
+.storybook-pagination li[aria-current], .storybook-pagination li[data-past="true"] { background: #edb84a; }
+.storybook-caption-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 48px; height: 48px; border: 0; color: var(--mira-muted); font-size: 14px; border-radius: 8px; }
+.storybook-caption-toggle[aria-pressed="true"] { background: var(--mira-control-hover); color: var(--mira-ink); }
+.storybook-title { position: relative; z-index: 1; padding: 12px 45px 10px; }
+.storybook-title p { color: var(--mira-muted); font-size: 14px; letter-spacing: .03em; margin-bottom: 8px; }
+.storybook-title h1 { font-family: var(--font-mira-story); font-size: 43px; font-weight: 400; line-height: 1.35; letter-spacing: .03em; }
+.storybook-scene { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 24px; }
+.storybook-illustration { min-width: 0; height: clamp(360px, calc(100svh - 365px), 650px); mask: url("/images/storybook/paper-edge-mask.png") center / 100% 100% no-repeat; animation: storybook-page-in 350ms var(--mira-ease-out) both; }
+.storybook-illustration:has([data-wide="false"]) { max-width: 720px; width: 100%; margin: auto; }
+.storybook-guide:has(.storybook-illustration [data-wide="true"]) .storybook-title { margin-bottom: -145px; padding-top: 24px; padding-bottom: 30px; }
+.storybook-guide:has(.storybook-illustration [data-wide="true"]) .storybook-title h1 { font-size: clamp(40px, 3.5vw, 52px); }
+.storybook-illustration:has([data-wide="true"]) { height: clamp(420px, calc(100svh - 320px), 720px); mask-image: url("/images/storybook/story-spread-mask.png"); }
+.storybook-player { display: grid; grid-template-columns: 220px minmax(0, 1fr) 220px; gap: 24px; align-items: center; min-height: 100px; padding: 12px 38px; }
+.storybook-player h2 { font-family: var(--font-mira-story); font-size: clamp(32px, 4.2vw, 60px); font-weight: 400; line-height: 1.45; letter-spacing: .03em; text-align: center; outline: none; }
+.storybook-play { display: inline-flex; align-items: center; gap: 18px; width: fit-content; border: 0; background: none; padding: 4px; color: var(--mira-ink); }
+.storybook-play > span { width: 80px; height: 80px; flex: none; display: grid; place-items: center; border-radius: 50%; background: #f7c752; transition: transform 180ms, background-color 180ms; }
+.storybook-play:hover > span { background: #f1bc40; transform: scale(1.04); }
+.storybook-play svg { stroke-width: 1.5; }
+.storybook-play b { font-size: 18px; font-weight: 550; white-space: nowrap; }
+.storybook-turns { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.storybook-turns button { min-height: 48px; min-width: 48px; display: flex; align-items: center; justify-content: center; gap: 12px; border: 0; background: transparent; padding: 6px; border-radius: 8px; color: var(--mira-muted); }
+.storybook-turns .storybook-next { color: var(--mira-ink); font-size: 16px; }
+.storybook-turns button:hover { background: var(--mira-control-hover); }
+.storybook-audio-progress { height: 2px; margin: 4px 42px 0; background: #e9dfcb; overflow: hidden; border-radius: 2px; }
+.storybook-audio-progress > span { display: block; height: 100%; background: #d8a432; transition: width 180ms linear; }
+.storybook-transcript { max-width: 800px; margin: 20px auto 0; padding: 20px 26px; border-top: 1px solid var(--mira-border); font-size: 17px; line-height: 1.9; color: var(--mira-muted); }
+.storybook-scene[data-interactive="true"] { grid-template-columns: minmax(0, 1fr) 240px; max-width: 1160px; margin: auto; }
+.storybook-explore { display: flex; flex-direction: column; gap: 10px; }
+.storybook-explore button { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 16px; border: 1px solid transparent; border-radius: 10px; padding: 7px; text-align: left; }
+.storybook-explore button > span:last-child { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 17px; }
+.storybook-explore .textbook-picture { border-radius: 6px; }
+.storybook-explore button:hover { background: #f2e8d3; }
+.storybook-explore button[aria-pressed="true"] { border-color: #b99a53; background: #f4e9cc; }
+.storybook-tried { display: flex; align-items: center; gap: 10px; min-height: 48px; margin: 18px auto 0; padding: 10px 22px; border: 1px solid var(--mira-border); border-radius: 999px; font-size: 17px; }
+.storybook-tried[aria-pressed="true"] { color: #3c6f53; background: #e6eddc; border-color: #afc9b1; }
+.storybook-player:has(.storybook-finish) { grid-template-columns: minmax(0, 1fr) auto; }
+.storybook-player:has(.storybook-finish) h2 { text-align: left; }
+.storybook-finish { display: flex; gap: 12px; align-items: center; }
+.storybook-guide .picture-guide-notice { padding: 0 44px; font-size: 14px; }
+@keyframes storybook-page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 1200px) {
+  .storybook-guide:has(.storybook-illustration [data-wide="true"]) .storybook-title { margin-bottom: 0; padding: 12px 18px 10px; }
+  .storybook-guide:has(.storybook-illustration [data-wide="true"]) .storybook-title h1 { font-size: 40px; }
+  .storybook-illustration:has([data-wide="true"]) { height: clamp(360px, calc(100svh - 360px), 640px); mask-image: url("/images/storybook/paper-edge-mask.png"); }
+}
+@media (max-width: 1050px) {
+  .schoolbag-header { padding-inline: 30px; }
+  .schoolbag-main { padding-inline: 30px; }
+  .schoolbag-hero { min-height: 540px; grid-template-columns: minmax(230px, .8fr) minmax(0, 1.3fr); }
+  .schoolbag-home .schoolbag-copy { padding-left: 0; }
+  .schoolbag-copy h1 { font-size: 38px; }
+  .schoolbag-stage--three { height: 490px; }
+  .schoolbag-auth .space-auth-main { gap: 32px; padding-inline: 30px; }
+  .schoolbag-auth .bag-scene-slot { height: 400px; }
+  .textbook-layout { grid-template-columns: 200px minmax(0, 1fr); gap: 30px; }
+  .textbook-unit-introduction { gap: 20px; }
+  .textbook-unit-introduction h4 { font-size: 27px; }
+  .storybook-player { grid-template-columns: 170px minmax(0, 1fr) 170px; gap: 14px; padding-inline: 18px; }
+  .storybook-play > span { width: 58px; height: 58px; }
+  .storybook-play { gap: 12px; }
+  .storybook-play b { font-size: 16px; }
+  .storybook-player h2 { font-size: 33px; }
+}
+@media (max-width: 760px) {
+  html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
+  .textbook-unit-sidebar { max-height: none; overflow-y: visible; }
+  .schoolbag-header { height: 60px; padding: 0 20px; gap: 12px; }
+  .schoolbag-brand { gap: 8px; }
+  .schoolbag-brand > span { width: 36px; height: 40px; border-radius: 12px; }
+  .schoolbag-brand strong { font-size: 18px; }
+  .schoolbag-header-start { gap: 16px; }
+  .schoolbag-context-nav { padding-left: 16px; }
+  .schoolbag-context-nav a { font-size: 13px; gap: 5px; }
+  .schoolbag-account { gap: 8px; }
+  .schoolbag-main { padding: 18px 22px 28px; }
+  .schoolbag-home .schoolbag-main { padding-top: 8px; }
+  .schoolbag-hero { grid-template-columns: minmax(0, 1fr); gap: 0; min-height: 0; }
+  .schoolbag-home .schoolbag-copy { padding: 8px 0 0; text-align: center; }
+  .schoolbag-eyebrow { margin-bottom: 8px; font-size: 12px; }
+  .schoolbag-copy h1 { max-width: none; font-size: 33px; }
+  .schoolbag-invitation { display: block; font-size: 14px; margin-top: 8px; }
+  .schoolbag-stage--three { height: min(106vw, 460px); min-height: 0; margin-top: -5px; }
+  .schoolbag-subjects { gap: 0; margin-top: -12px; max-width: 460px; }
+  .schoolbag-subject { min-height: 80px; padding-block: 2px; }
+  .schoolbag-subject strong { font-size: 30px; }
+  .schoolbag-settings .mira-disclosure-trigger { padding-inline: 4px; }
+  .schoolbag-auth .space-auth-header { padding: 20px 24px; }
+  .schoolbag-auth .space-auth-header > span { display: none; }
+  .schoolbag-auth .space-auth-main { display: flex; flex-direction: column; gap: 0; padding: 6px 28px 28px; min-height: 0; }
+  .schoolbag-auth .space-auth-intro { width: 100%; }
+  .schoolbag-auth .space-auth-intro h1 { font-size: 32px; margin: 0 0 8px; }
+  .schoolbag-auth .space-auth-description { font-size: 14px; }
+  .schoolbag-auth .bag-scene-slot { width: 100%; max-width: 410px; height: 285px; margin: -6px auto -12px; }
+  .schoolbag-auth .space-auth-panel { width: 100%; max-width: 360px; padding: 8px 0 0; }
+  .schoolbag-auth .space-auth-panel .auth-form-title { font-size: 23px; }
+  .schoolbag-auth .space-auth-panel .auth-form-welcome { display: none; }
+  .auth-pin-form { margin-top: 20px; }
+  .mira-pin-slot { height: 58px; }
+  .textbook-welcome h1 { font-size: 30px; }
+  .schoolbag-shell .textbook-welcome { grid-template-columns: minmax(0, 1fr) 115px; gap: 10px; padding-bottom: 20px; }
+  .textbook-bookline { font-size: 12px; }
+  .textbook-welcome-art { display: block; }
+  .textbook-discover-link { font-size: 13px; gap: 8px; }
+  .textbook-layout { grid-template-columns: minmax(0, 1fr); padding-top: 22px; gap: 24px; }
+  .textbook-unit-sidebar > h3, .textbook-unit-sidebar > p { display: none; }
+  .textbook-mobile-choice { gap: 8px; font-size: 12px; }
+  .textbook-unit-nav { display: none; }
+  .textbook-unit-heading h3 { font-size: 20px; }
+  .textbook-unit-introduction { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; padding-bottom: 24px; }
+  .textbook-unit-introduction h4 { font-size: 26px; margin-bottom: 12px; }
+  .textbook-unit-invitation .mira-button { padding-inline: 14px; font-size: 14px; }
+  .textbook-lesson { flex-direction: row; align-items: center; gap: 16px; }
+  .textbook-lesson h4 { font-size: 17px; }
+  .textbook-lesson-status { max-width: 100px; font-size: 12px; }
+  .storybook-guide .schoolbag-header { flex-wrap: wrap; height: auto; min-height: 76px; padding-block: 14px; row-gap: 2px; }
+  .storybook-guide .schoolbag-account { margin-left: auto; }
+  .storybook-caption-toggle span { display: none; }
+  .storybook-pagination { gap: 12px; font-size: 13px; }
+  .storybook-pagination ol { gap: 7px; }
+  .storybook-pagination li { width: 7px; height: 7px; }
+  .storybook-guide .schoolbag-main { padding: 2px 14px 26px; }
+  .storybook-title { padding: 12px 10px 10px; }
+  .storybook-title p { font-size: 12px; }
+  .storybook-title h1 { font-size: 34px; }
+  .storybook-illustration { height: clamp(310px, calc(100svh - 370px), 490px); }
+  .storybook-guide:has(.storybook-illustration [data-wide="true"]) .storybook-title { margin-bottom: 0; padding: 12px 10px 10px; }
+  .storybook-guide:has(.storybook-illustration [data-wide="true"]) .storybook-title h1 { font-size: 34px; }
+  .storybook-illustration:has([data-wide="true"]) { height: clamp(310px, calc(100svh - 370px), 490px); mask-image: url("/images/storybook/paper-edge-mask.png"); }
+  .textbook-picture--landscape[data-wide="true"] > img { object-position: 52% center; }
+  .storybook-scene[data-interactive="true"] { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .storybook-scene[data-interactive="true"] .storybook-illustration { height: clamp(250px, 37svh, 390px); }
+  .storybook-explore { flex-direction: row; gap: 8px; }
+  .storybook-explore button { flex: 1; min-width: 0; grid-template-columns: minmax(0, 1fr); padding: 6px; gap: 8px; }
+  .storybook-explore button > span:last-child { min-height: 32px; font-size: 14px; justify-content: center; }
+  .storybook-player { grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px 10px 10px; }
+  .storybook-player h2 { grid-column: 1 / -1; grid-row: 1; font-size: 30px; text-align: left; }
+  .storybook-play > span { width: 54px; height: 54px; }
+  .storybook-play b { font-size: 16px; }
+  .storybook-turns { gap: 0; }
+  .storybook-turns .storybook-next { font-size: 14px; gap: 8px; }
+  .storybook-turns .storybook-next > svg { width: 24px; }
+  .storybook-audio-progress { margin: 6px 14px 0; }
+  .storybook-player:has(.storybook-finish) { grid-template-columns: 1fr; }
+  .storybook-player:has(.storybook-finish) h2 { text-align: center; }
+  .storybook-finish { justify-content: center; flex-wrap: wrap; }
+  .storybook-transcript { font-size: 16px; padding: 16px 10px; }
+}
+@media (max-width: 440px) {
+  .storybook-guide .schoolbag-header-start { gap: 10px; }
+  .storybook-guide .schoolbag-context-nav { padding-left: 10px; }
+  .storybook-guide .schoolbag-brand strong { display: none; }
+  .storybook-pagination ol { display: none; }
+  .schoolbag-auth .bag-scene-slot { height: 240px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .storybook-illustration { animation: none; }
+  .storybook-play > span { transition: none; }
+  .storybook-play:hover > span { transform: none; }
+}
+/* The saved OpenMAIC lesson owns its playback layout below the pinned header. */
+.textbook-classroom .schoolbag-main { max-width: none; padding: 0; }
+.textbook-classroom-frame { display: block; width: 100%; height: calc(100dvh - 64px); min-height: 0; border: 0; background: #fbf7ec; }
+@media (max-width: 640px) { .textbook-classroom-frame { height: calc(100dvh - 60px); min-height: 0; } }

@@ -38,6 +38,7 @@ from integrations.openmaic_formal_quality import (
 )
 from integrations.openmaic_formal_interaction import professional_interaction_fields, validate_classroom_interaction
 from core.database import Database
+from core.errors import ApiError
 from core.security import hash_value, new_token, now_ms
 from integrations.openmaic_full_runtime_client import (
     OpenMaicFullRuntimeClient,
@@ -491,6 +492,7 @@ class OpenMaicFullRuntimeService:
         formal_citation_recovery_source_job_id: str = "",
         formal_citation_recovery_client: OpenMaicFormalCitationRecoveryClient | None = None,
         paid_budget_service: Any | None = None,
+        textbook_library_only: bool = False,
     ):
         # Imported lazily because the catalog repository's preparation
         # contract intentionally fingerprints this runtime service.
@@ -505,6 +507,7 @@ class OpenMaicFullRuntimeService:
         self.student_auth_service = student_auth_service
         self.client = client
         self.paid_budget_service = paid_budget_service
+        self.textbook_library_only = textbook_library_only
         self.enabled = bool(enabled)
         self.generation_enabled = bool(generation_enabled)
         self.public_url = str(public_url or "").strip().rstrip("/")
@@ -4698,6 +4701,7 @@ class OpenMaicFullRuntimeService:
 
     def _require_student_course_grade(self, conn: Any, authority: Mapping[str, Any], *,
                                       family_id: str, child_id: str) -> None:
+        self._require_textbook_delivery(conn, authority, family_id=family_id, child_id=child_id)
         if str(authority.get("child_grade_code") or "") == str(authority.get("course_grade_code") or ""):
             return
         if self._formal_course_grade_is_compatible(authority):
@@ -4711,6 +4715,17 @@ class OpenMaicFullRuntimeService:
             if visible is not None:
                 return
         self._fail("openmaic_student_grade_mismatch", "学生当前年级与这节正式课程不一致", 409)
+
+    def _require_textbook_delivery(self, conn, authority, *, family_id=None, child_id=None):
+        if not self.textbook_library_only:
+            return
+        from services.textbook_course_policy import require_published_textbook_course
+        try:
+            require_published_textbook_course(conn,
+                family_id=family_id or authority.get("family_id"), child_id=child_id or authority.get("child_id"),
+                course_id=authority.get("course_id"), course_version=authority.get("course_version"))
+        except ApiError as exc:
+            self._fail(exc.code, exc.message, exc.status_code)
 
     @staticmethod
     def _formal_session_binding_state(
@@ -5602,6 +5617,7 @@ class OpenMaicFullRuntimeService:
                 self._fail("openmaic_launch_consumed", "课堂登录票据已经使用", 401)
             if int(row["expires_at"]) < timestamp:
                 self._fail("openmaic_launch_expired", "课堂登录票据已经过期", 401)
+            self._require_textbook_delivery(conn, row)
             if str(row.get("runtime_status")) != "ready" or not row.get(
                 "upstream_classroom_id"
             ):
@@ -5672,6 +5688,7 @@ class OpenMaicFullRuntimeService:
                 self._fail("openmaic_runtime_session_invalid", "课堂登录已失效", 401)
             if int(row["expires_at"]) < timestamp:
                 self._fail("openmaic_runtime_session_expired", "课堂登录已过期", 401)
+            self._require_textbook_delivery(conn, row)
             if str(row.get("runtime_status")) != "ready" or not row.get(
                 "upstream_classroom_id"
             ):

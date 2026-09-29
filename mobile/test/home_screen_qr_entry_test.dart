@@ -7,7 +7,9 @@ import 'package:warm_sight/src/features/devices/application/device_repository.da
 import 'package:warm_sight/src/features/home/presentation/home_screen.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
-import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
+import 'package:warm_sight/src/features/student_access/application/student_access_availability.dart';
+import 'package:warm_sight/src/features/learning/application/textbook_repository.dart';
+import 'support/fixed_textbook_fixtures.dart';
 import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
 import 'package:warm_sight/src/features/learning/application/learning_repository.dart';
 import 'package:warm_sight/src/features/learning/domain/learning_availability_models.dart';
@@ -40,10 +42,13 @@ void main() {
       ProviderScope(
         overrides: [
           profileSummaryProvider.overrideWith((ref) async => _primaryProfile),
+          schoolTextbooksProvider.overrideWith(
+            (ref, childId) async => fixtureCatalog(),
+          ),
           currentLearningPreparationProvider.overrideWith(
             (ref, childId) async => _readyPreparation(childId),
           ),
-          currentLearningAvailabilityProvider.overrideWith(
+          studentAccessAvailabilityProvider.overrideWith(
             (ref, childId) async => _availability(
               hasActiveRelease: false,
               canAccessWorkspace: true,
@@ -76,6 +81,12 @@ void main() {
     final entry = find.byKey(const ValueKey('homeStudentQrScanButton'));
     expect(entry, findsOneWidget);
     expect(tester.getSize(entry), const Size(48, 48));
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -240));
+    await tester.pumpAndSettle();
+    expect(entry.hitTestable(), findsNothing);
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, 400));
+    await tester.pumpAndSettle();
+    expect(entry.hitTestable(), findsOneWidget);
     await tester.tap(entry);
     await tester.pumpAndSettle();
 
@@ -123,7 +134,11 @@ void main() {
       tester.element(find.byType(HomeScreen)),
     );
     current = _availability(hasActiveRelease: false);
-    container.invalidate(currentLearningAvailabilityProvider('child-1'));
+    container.invalidate(
+      studentAccessAvailabilityProvider(
+        studentAccessScope(_primaryProfile.child!),
+      ),
+    );
 
     await tester.tap(find.byKey(const ValueKey('homeStudentQrScanButton')));
     await tester.pumpAndSettle();
@@ -154,10 +169,13 @@ void main() {
         ProviderScope(
           overrides: [
             profileSummaryProvider.overrideWith((ref) async => _primaryProfile),
+            schoolTextbooksProvider.overrideWith(
+              (ref, childId) async => fixtureCatalog(),
+            ),
             learningPreparationRepositoryProvider.overrideWithValue(
               _ReadyPreparationGateway(),
             ),
-            currentLearningAvailabilityProvider.overrideWith(
+            studentAccessAvailabilityProvider.overrideWith(
               (ref, childId) async => _availability(),
             ),
             learningRepositoryProvider.overrideWithValue(learning),
@@ -199,7 +217,7 @@ void main() {
   );
 
   testWidgets(
-    'primary grade without workspace permission shows preparation and QR stays closed',
+    'primary grade without workspace permission still shows textbook state and QR stays closed',
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(390, 844));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -221,11 +239,14 @@ void main() {
             profileSummaryProvider.overrideWith(
               (ref) async => _primaryTwoProfile,
             ),
-            currentLearningAvailabilityProvider.overrideWith(
+            studentAccessAvailabilityProvider.overrideWith(
               (ref, childId) async => _availability(
                 gradeCode: 'primary_2',
                 hasActiveRelease: false,
               ),
+            ),
+            schoolTextbooksProvider.overrideWith(
+              (ref, childId) async => fixtureCatalog(),
             ),
             currentLearningPreparationProvider.overrideWith(
               (ref, childId) async => _queuedPreparation(
@@ -258,7 +279,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('首门课程准备好就能学'), findsOneWidget);
+      expect(find.text('教材与课程'), findsOneWidget);
       expect(
         find.byKey(const ValueKey('primaryLearningPreview')),
         findsOneWidget,
@@ -294,11 +315,14 @@ Future<void> _pumpHomeGate(
     ProviderScope(
       overrides: [
         profileSummaryProvider.overrideWith((ref) async => _primaryProfile),
+        schoolTextbooksProvider.overrideWith(
+          (ref, childId) async => fixtureCatalog(),
+        ),
         currentLearningPreparationProvider.overrideWith(
           (ref, childId) async => _queuedPreparation(childId),
         ),
-        currentLearningAvailabilityProvider.overrideWith(
-          (ref, childId) => loadAvailability(childId),
+        studentAccessAvailabilityProvider.overrideWith(
+          (ref, childId) => loadAvailability(childId.childId),
         ),
         todayTasksProvider.overrideWith((ref) async => const []),
         rewardRedemptionsProvider.overrideWith((ref) async => const []),

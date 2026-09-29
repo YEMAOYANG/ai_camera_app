@@ -8,6 +8,7 @@ const setupParentIdentityPath = '/setup/parent-identity';
 const setupDevicePath = '/setup/device';
 const setupWifiPath = '/setup/wifi';
 const setupChildProfilePath = '/setup/child-profile';
+const setupSchoolTextbooksPath = '/setup/textbooks';
 const setupCameraNamePath = '/setup/camera-name';
 const setupEmergencyContactsPath = '/setup/emergency-contacts';
 const addCameraPath = '/devices/add-camera';

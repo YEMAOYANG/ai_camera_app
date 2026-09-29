@@ -1,0 +1,170 @@
+body:has(.schoolbag-shell) { background: #f6f8fa; }
+.schoolbag-shell { min-height: 100dvh; background: var(--mira-bg); color: var(--mira-ink); }
+.schoolbag-shell :is(a, button, summary, select, input):not([data-input-otp]):focus-visible { outline: 2px solid var(--mira-focus); outline-offset: 3px; }
+.schoolbag-shell button { cursor: pointer; }
+.schoolbag-shell button:disabled { cursor: wait; }
+.schoolbag-header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; max-width: 1440px; height: 100px; padding: 0 56px; margin: auto; border-bottom: 1px solid var(--mira-border-soft); }
+.schoolbag-brand { display: flex; align-items: center; gap: 11px; width: fit-content; text-decoration: none; }
+.schoolbag-brand > span { display: grid; place-items: center; width: 46px; height: 46px; color: #684d1c; background: #f5cf70; border-radius: 14px; }
+.schoolbag-brand strong { display: flex; align-items: baseline; gap: 10px; font-size: 22px; letter-spacing: .04em; }
+.schoolbag-brand small { font-size: 13px; font-weight: 500; color: var(--mira-muted); letter-spacing: .08em; }
+.schoolbag-home-link { display: flex; gap: 9px; align-items: center; min-height: 48px; padding: 0 19px; border-radius: 12px; font-size: 16px; font-weight: 700; }
+.schoolbag-home-link[aria-current] { background: #e7edf1; }
+.schoolbag-home-link:hover, .schoolbag-rest:hover { background: #e4ebf0; }
+.schoolbag-account { display: flex; justify-content: end; align-items: center; gap: 24px; }
+.schoolbag-grade { font-size: 14px; font-weight: 600; color: var(--mira-muted); }
+.schoolbag-rest { display: flex; align-items: center; gap: 8px; padding: 0 12px; min-width: 48px; height: 48px; border: 1px solid var(--mira-border); border-radius: 12px; font-size: 14px; }
+.schoolbag-lock-error { max-width: 1200px; margin: 12px auto; color: var(--mira-danger); }
+.schoolbag-main { max-width: 1200px; margin: 0 auto; padding: 32px 44px 36px; }
+.schoolbag-home .schoolbag-main { padding-top: 54px; }
+.schoolbag-hero { display: grid; grid-template-columns: minmax(230px, .72fr) minmax(0, 1.65fr); align-items: center; min-height: 530px; }
+.schoolbag-copy { position: relative; z-index: 8; padding-bottom: 75px; }
+.schoolbag-eyebrow { margin: 0 0 19px; color: var(--mira-muted); font-size: 15px; letter-spacing: .12em; }
+.schoolbag-copy h1 { margin: 0; font-size: 46px; font-weight: 800; line-height: 1.32; letter-spacing: -.035em; }
+.schoolbag-copy h1 span { display: block; margin-top: 16px; font-size: 23px; line-height: 1.5; font-weight: 600; letter-spacing: 0; white-space: nowrap; }
+.schoolbag-invitation { margin: 23px 0 35px; font-size: 18px; line-height: 1.9; color: var(--mira-muted); }
+.schoolbag-gesture { display: inline-flex; align-items: center; gap: 10px; color: #876b28; font-size: 14px; padding-bottom: 10px; border-bottom: 2px solid #e9ce8d; }
+.schoolbag-stage { position: relative; width: 100%; max-width: 600px; aspect-ratio: 640 / 570; isolation: isolate; margin: 0 auto; }
+.schoolbag-ground { position: absolute; left: 13%; bottom: -1%; width: 80%; height: 17%; border-radius: 50%; background: #e9edf0; }
+.schoolbag-bag { position: absolute; left: 18%; top: 23%; width: 68%; height: auto; pointer-events: none; user-select: none; }
+.schoolbag-bag--back { z-index: 1; }
+.schoolbag-bag--front { z-index: 4; clip-path: polygon(0 27%, 7% 31%, 15% 36%, 28% 40%, 42% 42%, 58% 42%, 72% 40%, 85% 36%, 94% 31%, 100% 27%, 100% 100%, 0 100%); }
+.bag-book { --book-turn: 0deg; --book-tone: var(--book-chinese); position: absolute; z-index: 3; top: 2%; width: 24%; height: 56%; margin: 0; padding: 0; border: 0; text-decoration: none; text-align: left; transform: rotate(var(--book-turn)); transform-origin: center 88%; transition: transform 240ms var(--mira-ease-out); border-radius: 5px 12px 12px 5px; background: #f6eedc; box-shadow: 3px 7px 0 #e8e3d6, 6px 9px 0 #d0cbbf, 10px 15px 20px #263b481a; }
+.bag-book--chinese { left: 14%; --book-turn: -12deg; --book-tone: var(--book-chinese); }
+.bag-book--math { left: 39%; top: 0; --book-turn: -1deg; --book-tone: var(--book-math); }
+.bag-book--english { left: 64%; --book-turn: 12deg; --book-tone: var(--book-english); }
+.bag-book-cover { display: flex; flex-direction: column; position: absolute; inset: 0 1px 5px 0; padding: 22px 16px 12px 22px; overflow: hidden; border-radius: 5px 10px 10px 5px; color: #fffaf0; background: var(--book-tone); box-shadow: inset 5px 0 3px #263b481c, inset 9px 0 1px #ffffff17, inset 0 1px #ffffff45; }
+.bag-book-subject { position: relative; z-index: 1; display: flex; flex-direction: column; }
+.bag-book-subject small { font-size: 13px; letter-spacing: .1em; line-height: 1.5; color: #142a33; font-weight: 650; }
+.bag-book-subject strong { font-size: 34px; line-height: 1.55; letter-spacing: .13em; font-weight: 800; }
+.bag-book-art { display: grid; flex: 1; min-height: 95px; position: relative; align-items: center; justify-items: center; }
+.bag-book-art b { color: #fff5de; font-size: 63px; line-height: 1; font-weight: 700; letter-spacing: -.07em; transform: rotate(7deg); text-shadow: 2px 3px #263b4825; }
+.bag-book--chinese .bag-book-art b { font-family: "STKaiti", "Kaiti SC", serif; font-size: 73px; }
+.bag-book--math .bag-book-art b { font-size: 48px; letter-spacing: -.11em; transform: rotate(-8deg); }
+.bag-book-math-sign, .bag-book-hello { color: #142a33; font-size: 19px; font-weight: 650; letter-spacing: .1em; }
+.bag-book-footer { padding-top: 12px; border-top: 1px solid #ffffff60; color: #142a33; font-size: 11px; line-height: 1.6; white-space: nowrap; }
+.bag-book-status { position: absolute; z-index: 6; display: flex; align-items: center; justify-content: center; gap: 3px; top: -35px; left: 50%; transform: translateX(-50%); color: var(--mira-muted); font-size: 13px; white-space: nowrap; font-weight: 600; }
+.bag-book:is(a):hover, .bag-book:focus-visible { transform: translateY(-20px) rotate(var(--book-turn)); }
+.bag-book:is(button):hover:enabled { transform: translateY(-8px) rotate(var(--book-turn)); }
+.bag-book:active { transform: translateY(-12px) rotate(var(--book-turn)); }
+.bag-book:disabled { opacity: .7; }
+.bag-book.is-lifting { z-index: 9; animation: schoolbag-take-book 740ms cubic-bezier(.22, 1, .36, 1) both; pointer-events: none; }
+.schoolbag-stage.is-opening .bag-book:not(.is-lifting) { pointer-events: none; }
+.schoolbag-stage.is-opening .bag-book.is-lifting .bag-book-status { opacity: 0; }
+@keyframes schoolbag-take-book { 0% { transform: rotate(var(--book-turn)); } 48% { transform: translateY(-45%) rotate(0deg) scale(1.12); opacity: 1; } 100% { transform: translateY(-24%) rotate(0deg) scale(1.45); opacity: 0; } }
+.schoolbag-feedback { min-height: 72px; position: relative; z-index: 10; }
+.schoolbag-tip, .schoolbag-loading { text-align: center; margin: 20px 0 28px; font-size: 15px; color: var(--mira-muted); }
+.schoolbag-notice { display: flex; align-items: center; gap: 18px; max-width: 850px; margin: 8px auto 26px; padding: 20px 24px; background: #fff; border: 1px solid var(--mira-border); border-radius: 12px; }
+.schoolbag-notice > svg { flex-shrink: 0; color: var(--mira-brand); }
+.schoolbag-notice > div { flex: 1; }
+.schoolbag-notice strong { font-size: 18px; }
+.schoolbag-notice p { font-size: 15px; line-height: 1.7; color: var(--mira-muted); margin-top: 6px; }
+.schoolbag-notice > button { display: flex; gap: 8px; align-items: center; justify-content: center; min-height: 48px; padding: 8px 14px; background: var(--mira-brand-wash); border-radius: 8px; white-space: nowrap; }
+.schoolbag-footer { display: flex; align-items: start; justify-content: space-between; gap: 28px; border-top: 1px solid var(--mira-border); padding-top: 15px; font-size: 14px; color: var(--mira-muted); }
+.schoolbag-footer > div { display: flex; gap: 22px; flex-shrink: 0; }
+.schoolbag-footer button { display: flex; align-items: center; gap: 7px; min-height: 48px; }
+.schoolbag-footer summary { cursor: pointer; min-height: 48px; padding: 14px 0; }
+.schoolbag-footer details p { max-width: 520px; margin-top: 8px; line-height: 1.8; }
+.schoolbag-footer [aria-pressed="true"] { color: var(--mira-brand); }
+
+/* The same quiet reading space continues inside a book and its picture guide. */
+.schoolbag-shell .space-page-heading { margin: 0 0 24px; }
+.schoolbag-shell .space-page-heading h1 { font-size: 30px; text-shadow: none; color: var(--mira-ink); }
+.schoolbag-shell .space-page-description, .schoolbag-shell .space-eyebrow { color: var(--mira-muted); text-shadow: none; }
+.schoolbag-shell .space-back-link { min-height: 48px; color: var(--mira-muted); border-color: var(--mira-border); background: transparent; margin-bottom: 18px; }
+.schoolbag-shell .space-page-heading__row { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.schoolbag-shell.schoolbag-auth { background: var(--mira-bg); }
+.schoolbag-auth .space-auth-header { max-width: 1280px; padding: 24px 40px; }
+.schoolbag-auth .space-auth-header > span { color: var(--mira-muted); }
+.schoolbag-auth .space-auth-header > span svg, .schoolbag-auth .space-auth-steps svg { color: var(--mira-brand); }
+.schoolbag-auth .space-auth-intro h1 { text-shadow: none; font-size: 36px; }
+.schoolbag-auth .space-auth-description { text-shadow: none; color: var(--mira-muted); }
+.schoolbag-auth .space-eyebrow { color: var(--mira-muted); }
+.schoolbag-auth .space-auth-steps { border-color: var(--mira-border); }
+.schoolbag-auth .space-auth-steps small { color: var(--mira-muted); }
+.schoolbag-auth .space-auth-panel { background: #fff; border: 1px solid var(--mira-border); border-radius: 16px; box-shadow: 0 14px 45px #263b4808; }
+.schoolbag-auth .space-auth-panel :is(h1, h2) { color: var(--mira-ink); }
+.schoolbag-auth .space-auth-panel input { color: var(--mira-ink); caret-color: var(--mira-brand); }
+.schoolbag-auth .space-pair-code-form { background: var(--mira-surface-soft); border-color: var(--mira-border); }
+.schoolbag-auth .mira-button { min-height: 48px; }
+.schoolbag-auth .space-auth-panel::before { content: none; }
+.schoolbag-auth .space-auth-steps li > svg { animation: none; }
+.schoolbag-auth .space-unlock-panel[data-pin-state="ready"] input { border-color: var(--mira-brand); box-shadow: none; }
+.schoolbag-auth .space-qr-code { box-shadow: 0 0 0 4px var(--mira-brand-wash); }
+.schoolbag-auth .space-qr[data-qr-state="waiting"] .space-qr-code::after { border-color: var(--mira-brand); animation: none; }
+.schoolbag-auth-art { display: block; width: 240px; height: auto; margin-bottom: 22px; }
+.schoolbag-shell .space-session-state { color: var(--mira-ink); margin: 70px auto; background: var(--mira-surface); border: 1px solid var(--mira-border); box-shadow: none; }
+.schoolbag-shell .space-session-state h1 { text-shadow: none; color: var(--mira-ink); }
+.schoolbag-shell .space-session-message { color: var(--mira-muted); }
+.schoolbag-shell .space-session-skeleton span, .schoolbag-shell .space-session-progress { background: var(--mira-surface-soft); }
+.schoolbag-shell .space-session-progress i { background: var(--mira-brand); }
+
+@media (max-width: 1000px) {
+  .schoolbag-header { height: 86px; padding: 0 28px; }
+  .schoolbag-main { padding-inline: 28px; }
+  .schoolbag-hero { grid-template-columns: 220px minmax(0, 1fr); min-height: 480px; }
+  .schoolbag-copy h1 { font-size: 38px; }
+  .schoolbag-copy h1 span { font-size: 19px; }
+  .schoolbag-copy { padding-bottom: 40px; }
+  .bag-book-cover { padding: 18px 10px 10px 17px; }
+  .bag-book-subject strong { font-size: 27px; }
+  .bag-book-art b { font-size: 48px; }
+  .bag-book--chinese .bag-book-art b { font-size: 52px; }
+  .bag-book--math .bag-book-art b { font-size: 35px; }
+  .bag-book-art { min-height: 60px; }
+  .bag-book-footer { display: none; }
+}
+@media (max-width: 760px) {
+  .schoolbag-header { height: 78px; padding: 0 20px; gap: 12px; }
+  .schoolbag-brand strong { font-size: 19px; }
+  .schoolbag-brand small, .schoolbag-grade, .schoolbag-rest span { display: none; }
+  .schoolbag-rest { justify-content: center; padding: 0; border-color: transparent; }
+  .schoolbag-brand > span { width: 40px; height: 40px; border-radius: 11px; }
+  .schoolbag-main { padding: 24px 20px; }
+  .schoolbag-home .schoolbag-main { padding-top: 24px; }
+  .schoolbag-hero { display: flex; flex-direction: column; min-height: auto; }
+  .schoolbag-copy { width: 100%; padding: 4px 4px 36px; text-align: center; }
+  .schoolbag-eyebrow { font-size: 13px; margin-bottom: 12px; }
+  .schoolbag-copy h1 { font-size: 33px; }
+  .schoolbag-copy h1 span { font-size: 19px; margin-top: 9px; }
+  .schoolbag-invitation, .schoolbag-gesture { display: none; }
+  .schoolbag-stage { width: min(100%, 490px); }
+  .bag-book-subject small { font-size: 10px; }
+  .bag-book-subject strong { font-size: 25px; letter-spacing: .04em; }
+  .bag-book-cover { padding: 14px 10px 8px 14px; }
+  .bag-book-art b, .bag-book--chinese .bag-book-art b { font-size: 46px; }
+  .bag-book--math .bag-book-art b { font-size: 35px; }
+  .bag-book-math-sign, .bag-book-hello { font-size: 14px; }
+  .bag-book-status { font-size: 12px; top: -30px; }
+  .schoolbag-tip, .schoolbag-loading { font-size: 14px; margin: 30px 0 20px; line-height: 1.7; }
+  .schoolbag-footer { flex-direction: column-reverse; align-items: stretch; gap: 4px; padding-top: 8px; }
+  .schoolbag-footer > div { justify-content: space-between; }
+  .schoolbag-notice { align-items: start; flex-wrap: wrap; padding: 17px; gap: 10px; margin-top: 30px; }
+  .schoolbag-notice strong { font-size: 16px; }
+  .schoolbag-notice p { font-size: 14px; }
+  .schoolbag-notice > button { margin-left: 32px; }
+  .schoolbag-shell .space-page-heading h1 { font-size: 25px; }
+  .schoolbag-shell .space-page-heading__row { align-items: start; }
+  .schoolbag-auth-art { float: right; width: 116px; margin: 0 0 0 8px; }
+  .schoolbag-auth .space-auth-intro h1 { font-size: 30px; }
+  .schoolbag-auth .space-auth-header { padding: 20px; }
+}
+@media (max-width: 380px) {
+  .schoolbag-main { padding-inline: 14px; }
+  .schoolbag-header { padding-inline: 14px; }
+  .schoolbag-home-link { padding-inline: 12px; }
+  .bag-book-subject strong { font-size: 22px; }
+  .bag-book-cover { padding-left: 12px; }
+  .bag-book-art b, .bag-book--chinese .bag-book-art b { font-size: 39px; }
+  .bag-book--math .bag-book-art b { font-size: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bag-book { transition: none; }
+  .bag-book.is-lifting { animation: none; }
+  .bag-book:is(a):hover, .bag-book:is(button):hover:enabled, .bag-book:focus-visible { transform: rotate(var(--book-turn)); }
+}
+
+.schoolbag-next-lesson { margin-top: 24px; max-width: 32rem; }
+.schoolbag-next-lesson strong { font-size: 20px; }
+.schoolbag-next-lesson p { margin: 8px 0 14px; line-height: 1.6; }
+.schoolbag-next-lesson a { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; padding: 12px 20px; border-radius: 12px; background: var(--mira-primary, #28664d); color: white; text-decoration: none; font-weight: 600; }

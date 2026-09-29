@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-
-import { StudentSessionGate } from "@/features/auth/student-session-gate";
-import "@/styles/space-learning-path.css";
-
-export const metadata: Metadata = { title: "我的学习路线" };
+import { redirect } from "next/navigation";
 
 export default function LearningPathPage() {
-  return <StudentSessionGate learningView="path" />;
+  redirect("/learning");
 }

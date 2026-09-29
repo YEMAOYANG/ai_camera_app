@@ -6,11 +6,13 @@ import { StudentSessionGate } from "./student-session-gate";
 
 const { router } = vi.hoisted(() => ({ router: { replace: vi.fn(), refresh: vi.fn() } }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
-vi.mock("@/components/student/space-shell", () => ({
-  SpaceShell: ({ children, active, scenic }: { children: ReactNode; active: string; scenic: boolean }) => (
-    <div data-testid="session-shell" data-active={active} data-scenic={String(scenic)}><main>{children}</main></div>
+vi.mock("@/components/student/schoolbag-shell", () => ({
+  SchoolbagShell: ({ children }: { children: ReactNode }) => (
+    <div data-testid="session-shell" data-active="learning" data-scenic="undefined"><main>{children}</main></div>
   ),
 }));
+vi.mock("@/features/learning/learning-textbooks", () => ({ LearningTextbooks: () => <div>已授权的教材课程库</div> }));
+vi.mock("@/features/learning/learning-schoolbag", () => ({ LearningSchoolbag: () => <div>已授权的书包首页</div> }));
 vi.mock("@/features/today/student-dashboard", () => ({ StudentDashboard: () => <div>已授权的今日课程</div> }));
 vi.mock("@/features/learning/learning-library", () => ({ LearningLibrary: () => <div>已授权的课程库</div> }));
 vi.mock("@/features/learning/learning-course-detail", () => ({ LearningCourseDetail: () => <div>已授权的课程详情</div> }));
@@ -26,8 +28,8 @@ describe("StudentSessionGate", () => {
     const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ canUnlock }), { status: 401 }));
     vi.stubGlobal("fetch", fetch);
     render(<StudentSessionGate />);
-    expect(screen.getByTestId("session-shell")).toHaveAttribute("data-active", "today");
-    expect(screen.getByTestId("session-shell")).toHaveAttribute("data-scenic", "true");
+    expect(screen.getByTestId("session-shell")).toHaveAttribute("data-active", "learning");
+    expect(screen.getByTestId("session-shell")).toHaveAttribute("data-scenic", "undefined");
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith(destination));
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith("/api/auth/me", expect.objectContaining({ signal: expect.any(AbortSignal) }));
@@ -38,8 +40,8 @@ describe("StudentSessionGate", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ message: "学习身份服务暂时不可用" }), { status: 503 })));
     render(<StudentSessionGate learningView="practice" />);
     expect(await screen.findByRole("alert")).toHaveTextContent("学习身份服务暂时不可用");
-    expect(screen.getByTestId("session-shell")).toHaveAttribute("data-active", "practice");
-    expect(screen.getByTestId("session-shell")).toHaveAttribute("data-scenic", "false");
+    expect(screen.getByTestId("session-shell")).toHaveAttribute("data-active", "learning");
+    expect(screen.getByTestId("session-shell")).toHaveAttribute("data-scenic", "undefined");
     expect(screen.getByRole("button", { name: "再试一次" })).toBeEnabled();
     expect(screen.queryByText("已授权的练习")).not.toBeInTheDocument();
     expect(router.replace).not.toHaveBeenCalled();
@@ -66,13 +68,16 @@ describe("StudentSessionGate", () => {
     expect(screen.queryByTestId("session-shell")).not.toBeInTheDocument();
   });
 
-  it("opens the learning path only after student identity is verified", async () => {
+  it.each([undefined, "path", "library", "practice", "textbooks"] as const)("opens only the textbook library for entry %s after authentication", async (learningView) => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
       ok: true, student: { id: "student-1", childId: "child-1", displayName: "小米", gradeCode: "primary_1" },
       device: { id: "device-1", label: "学习设备" },
     }))));
-    render(<StudentSessionGate learningView="path" />);
+    render(<StudentSessionGate learningView={learningView} />);
     expect(screen.queryByText("已授权的学习路线")).not.toBeInTheDocument();
-    expect(await screen.findByText("已授权的学习路线")).toBeInTheDocument();
+    expect(await screen.findByText(learningView === "textbooks" ? "已授权的教材课程库" : "已授权的书包首页")).toBeInTheDocument();
+    expect(screen.queryByText("已授权的今日课程")).not.toBeInTheDocument();
+    expect(screen.queryByText("已授权的课程库")).not.toBeInTheDocument();
+    expect(screen.queryByText("已授权的练习")).not.toBeInTheDocument();
   });
 });

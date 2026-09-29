@@ -28,8 +28,20 @@ class ParentLearningObservationEntry extends StatelessWidget {
             childName: childName,
           ),
         ),
-        icon: const Icon(Icons.fact_check_outlined, size: 19),
-        label: const Text('确认孩子的学习表现'),
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.mutedStrong,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          minimumSize: const Size(44, 44),
+        ),
+        icon: const Icon(Icons.fact_check_outlined, size: 18),
+        label: const Text(
+          '确认孩子的学习表现',
+          style: TextStyle(
+            fontFamily: AppTypography.systemFont,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

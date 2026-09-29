@@ -21,6 +21,8 @@ class AppColors {
   static const focusRing = primaryButtonStart;
   static const ink = Color(0xFF142033);
   static const muted = Color(0xFF66758A);
+  // Small form copy on tinted backgrounds needs slightly stronger contrast.
+  static const mutedStrong = Color(0xFF5E6D82);
   static const subtle = Color(0xFF8A96A8);
   static const textPrimary = ink;
   static const textSecondary = muted;
@@ -54,8 +56,8 @@ class AppColors {
   static const navDockShadow = Color(0xFF18243A);
   static const navActiveBg = Color(0xEDF0F5FF);
   static const navActiveFg = brandDeep;
-  static const navInactiveFg = muted;
-  static const navFabBg = primaryButtonStart;
+  static const navInactiveFg = Color(0xFF49576B);
+  static const navFabBg = primaryButtonEnd;
   static const navFabFg = Color(0xFFFFFFFF);
   static const navItemActiveBg = navActiveBg;
   static const navItemActiveFg = navActiveFg;
@@ -133,6 +135,34 @@ class AppChrome {
         ? (safeAreaBottom * 0.45).clamp(12.0, 18.0)
         : 10.0;
   }
+}
+
+/// Materials for navigation and modal layers; content keeps its own surface.
+class AppGlass {
+  const AppGlass._();
+
+  static const fallbackBlurSigma = 8.0;
+  static const sheetRadius = 28.0;
+  static const fallbackRim = Color(0x66FFFFFF);
+  static const readableFallback = Color(0xF2F8FAFD);
+  static const overlayFallback = Color(0x38142033);
+  static const opaqueSurface = Color(0xFFF8FAFD);
+  static const androidBlurSigma = 6.0;
+  static const androidThickness = 0.42;
+  static const androidRefraction = 1.20;
+  static const androidNavigationFill = Color(0x99FFFFFF);
+  static const androidHeaderFill = Color(0xD9F8FAFD);
+  static const androidSheetFill = Color(0xEBF8FAFD);
+  static const androidOverlayFill = Color(0x24142033);
+  static const selectionTop = Color(0x1FFFFFFF);
+  static const selectionBottom = Color(0x182F6CF6);
+  static const selectionBorder = Color(0x302459D6);
+
+  static const dockShadow = BoxShadow(
+    color: Color(0x0A18243A),
+    blurRadius: 12,
+    offset: Offset(0, 5),
+  );
 }
 
 class AppTypography {

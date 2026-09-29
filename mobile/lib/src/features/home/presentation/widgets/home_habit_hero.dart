@@ -3,6 +3,7 @@ import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/home/domain/home_models.dart';
 import 'package:warm_sight/src/features/home/presentation/widgets/home_shared.dart';
 import 'package:warm_sight/src/shared/widgets/status_chip.dart';
+import 'package:warm_sight/src/shared/widgets/app_glass_surface.dart';
 
 class HomeHabitHero extends StatelessWidget {
   const HomeHabitHero({
@@ -351,23 +352,25 @@ class HomeStudentQrButton extends StatelessWidget {
         button: true,
         enabled: onTap != null,
         label: '扫码登录学习网页',
-        child: Material(
-          color: Colors.black.withValues(alpha: 0.20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
-          ),
-          child: InkWell(
-            key: const ValueKey('homeStudentQrScanButton'),
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
-              width: 48,
-              height: 48,
-              child: Icon(
-                Icons.qr_code_scanner_rounded,
-                color: Colors.white.withValues(alpha: onTap == null ? 0.58 : 1),
-                size: 23,
+        child: AppGlassSurface(
+          style: AppGlassStyle.overlayControl,
+          borderRadius: BorderRadius.circular(16),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              key: const ValueKey('homeStudentQrScanButton'),
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(16),
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: Icon(
+                  Icons.qr_code_scanner_rounded,
+                  color: Colors.white.withValues(
+                    alpha: onTap == null ? 0.58 : 1,
+                  ),
+                  size: 23,
+                ),
               ),
             ),
           ),

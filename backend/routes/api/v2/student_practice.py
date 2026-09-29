@@ -3,9 +3,12 @@ from __future__ import annotations
 from flask import Blueprint, jsonify, request
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token, json_body
+from routes.api.v2.student_textbook_boundary import enforce_textbook_delivery
 from services.service_factory import learning_practice_service
 
 student_practice_bp = Blueprint('student_practice_v2', __name__)
+
+student_practice_bp.before_request(enforce_textbook_delivery)
 
 
 @student_practice_bp.post('/sessions')

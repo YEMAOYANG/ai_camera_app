@@ -4,6 +4,7 @@ import json
 import uuid
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from core.database import Database
 from core.errors import ApiError
@@ -38,6 +39,8 @@ from services.learning_curriculum_preparation_service import (
 )
 from services.conversation_sync_service import ConversationSyncService
 from services.wake_name_validator import validate_wake_name
+from services.report_learning_summary import learning_for_period
+from services.report_growth_assessment import growth_for_period
 from services.setting_policy import (
     SETTING_DEFAULTS,
     SETTING_MANAGE_CAPABILITIES,
@@ -137,13 +140,6 @@ REPORT_EVENT_LABELS = {
     "care_reminder": "看护提醒",
 }
 REPORT_HIDDEN_EVENT_TYPES = {"monitor_started"}
-REPORT_SKILL_DEFS = (
-    ("self_care", "自理力"),
-    ("focus", "专注力"),
-    ("order", "秩序感"),
-    ("initiative", "主动性"),
-    ("movement", "运动力"),
-)
 
 LEGACY_GUARDIAN_IDENTITY_KEYS = {
     "母亲": "mom",
@@ -1310,7 +1306,7 @@ class ProfileService:
 
     def daily_report(self, access_token: str, query: dict) -> dict:
         context = self._auth_context(access_token)
-        target_date = self._optional_text(query, "date") or date.today().isoformat()
+        target_date = self._optional_text(query, "date") or datetime.now(ZoneInfo('Asia/Shanghai')).date().isoformat()
         with self.repository.transaction() as conn:
             rows = list(
                 conn.execute(
@@ -1329,6 +1325,10 @@ class ProfileService:
                 end_date=target_date,
             )
             summary = _report_summary(rows, events)
+            learning = learning_for_period(conn, family_id=context['family']['id'],
+                                           start_date=target_date, end_date=target_date)
+            skill_maps = growth_for_period(conn, family_id=context['family']['id'],
+                start_date=target_date, end_date=target_date, tasks=rows, learning=learning)
             return {
                 "ok": True,
                 "report": _build_report_payload(
@@ -1338,13 +1338,15 @@ class ProfileService:
                     events=events,
                     summary=summary,
                     date_value=target_date,
+                    learning=learning,
+                    skill_maps=skill_maps,
                 ),
             }
 
     def weekly_report(self, access_token: str, query: dict) -> dict:
         context = self._auth_context(access_token)
         end_date = date.fromisoformat(
-            self._optional_text(query, "endDate") or date.today().isoformat()
+            self._optional_text(query, "endDate") or datetime.now(ZoneInfo('Asia/Shanghai')).date().isoformat()
         )
         start_date = date.fromisoformat(
             self._optional_text(query, "startDate")
@@ -1372,6 +1374,10 @@ class ProfileService:
                 end_date=end_date.isoformat(),
             )
             summary = _report_summary(rows, events)
+            learning = learning_for_period(conn, family_id=context['family']['id'],
+                start_date=start_date.isoformat(), end_date=end_date.isoformat())
+            skill_maps = growth_for_period(conn, family_id=context['family']['id'],
+                start_date=start_date.isoformat(), end_date=end_date.isoformat(), tasks=rows, learning=learning)
             return {
                 "ok": True,
                 "report": _build_report_payload(
@@ -1382,6 +1388,8 @@ class ProfileService:
                     summary=summary,
                     start_date_value=start_date.isoformat(),
                     end_date_value=end_date.isoformat(),
+                    learning=learning,
+                    skill_maps=skill_maps,
                 ),
             }
 
@@ -2266,6 +2274,8 @@ def _build_report_payload(
     date_value: str | None = None,
     start_date_value: str | None = None,
     end_date_value: str | None = None,
+    learning: dict | None = None,
+    skill_maps: list[dict] | None = None,
 ) -> dict:
     task_total = int(summary["total"])
     task_completed = int(summary["completed"])
@@ -2273,6 +2283,14 @@ def _build_report_payload(
     is_weekly = start_date_value is not None and end_date_value is not None
     headline = _report_headline(is_weekly=is_weekly, summary=summary)
     body = _report_body(is_weekly=is_weekly, summary=summary)
+    learning = learning or {'schemaVersion': 'mira.report.learning.v1', 'lessonCount': 0,
+                           'needsSupportCount': 0, 'reviewCount': 0, 'lessons': []}
+    if learning['lessonCount']:
+        period = '本周' if is_weekly else '今天'
+        headline = f'{period}有 {learning["lessonCount"]} 节课程的学习记录。'
+        if learning['needsSupportCount']:
+            headline += f'{learning["needsSupportCount"]} 节需要您留意。'
+        body = '课程表现来自实际作答、提示使用和独立复核；任务完成情况另外统计。'
     return {
         "title": title,
         "periodLabel": period_label,
@@ -2287,7 +2305,9 @@ def _build_report_payload(
         "pointsEarned": int(summary["points"]),
         "pendingItems": pending_items,
         "completionRate": int(summary["completion_rate"]),
-        "skills": _report_skills(rows),
+        "learning": learning,
+        "skillMaps": skill_maps or [],
+        "skills": skill_maps[0]['skills'] if skill_maps and len(skill_maps) == 1 else [],
         "highlights": _report_highlights(
             rows,
             events,
@@ -2301,7 +2321,7 @@ def _build_report_payload(
         ),
         "observations": _report_observations(rows, events),
         "tasks": [_report_task_item(row) for row in rows[:12]],
-        "nextActions": _report_next_actions(rows, summary, is_weekly=is_weekly),
+        "nextActions": _report_next_actions(rows, summary, is_weekly=is_weekly, skill_maps=skill_maps),
     }
 
 
@@ -2328,76 +2348,6 @@ def _report_body(*, is_weekly: bool, summary: dict) -> str:
     if observed:
         return f"{period}结合任务完成和 {observed} 条看护观察生成，可用于回顾稳定表现和需要关注的地方。"
     return f"{period}主要根据任务完成情况生成。当前没有可用摄像头观察，建议为需要看护的任务保留证据或 AI 观察摘要。"
-
-
-def _report_skills(rows: list[dict]) -> list[dict]:
-    scores = {key: 42 for key, _ in REPORT_SKILL_DEFS}
-    touched = {key: 0 for key, _ in REPORT_SKILL_DEFS}
-    for row in rows:
-        key = _skill_key_for_task(row)
-        touched[key] += 1
-        status = row.get("status")
-        if status in REPORT_DONE_STATUSES:
-            scores[key] += 16
-            scores["initiative"] += 5
-        elif status in {"delayed", "missed", "rejected"}:
-            scores[key] -= 8
-        elif status in {"in_progress", "reminder_sent"}:
-            scores[key] += 4
-    if not rows:
-        scores = {key: 36 for key, _ in REPORT_SKILL_DEFS}
-    result = []
-    for key, label in REPORT_SKILL_DEFS:
-        score = max(20, min(96, int(scores[key])))
-        result.append({
-            "key": key,
-            "label": label,
-            "score": score,
-            "maxScore": 100,
-            "level": _skill_level(score),
-            "detail": _skill_detail(label, score, touched[key]),
-        })
-    return result
-
-
-def _skill_key_for_task(row: dict) -> str:
-    title = str(row.get("title") or "")
-    task_type = str(row.get("type") or "")
-    if task_type in {"life", "sleep"} or any(
-        word in title for word in ("喝水", "洗漱", "睡", "穿衣", "吃饭")
-    ):
-        return "self_care"
-    if task_type in {"housework", "schoolbag"} or any(
-        word in title for word in ("收纳", "整理", "书包", "玩具")
-    ):
-        return "order"
-    if task_type in {"learning", "reading_interest"} or any(
-        word in title for word in ("阅读", "绘本", "数学", "作业", "学习")
-    ):
-        return "focus"
-    if task_type == "sports_outdoor" or any(
-        word in title for word in ("户外", "运动", "遛娃", "散步", "跑步")
-    ):
-        return "movement"
-    return "initiative"
-
-
-def _skill_level(score: int) -> str:
-    if score >= 85:
-        return "稳定掌握"
-    if score >= 70:
-        return "正在成型"
-    if score >= 55:
-        return "需要关注"
-    return "刚开始建立"
-
-
-def _skill_detail(label: str, score: int, touched: int) -> str:
-    if touched == 0:
-        return f"{label}今天没有直接任务样本。"
-    if score >= 70:
-        return f"{label}有稳定完成记录，可以逐步减少提醒。"
-    return f"{label}还需要更清晰的步骤和更稳定的提醒节奏。"
 
 
 def _report_highlights(rows: list[dict], events: list[dict], summary: dict, *, is_weekly: bool) -> list[dict]:
@@ -2541,8 +2491,10 @@ def _report_task_item(row: dict) -> dict:
     }
 
 
-def _report_next_actions(rows: list[dict], summary: dict, *, is_weekly: bool) -> list[dict]:
-    if not rows:
+def _report_next_actions(rows: list[dict], summary: dict, *, is_weekly: bool, skill_maps=None) -> list[dict]:
+    observed = [(child, skill) for child in (skill_maps or []) for skill in child['skills']
+                if skill['score'] is not None and skill['score'] < 100]
+    if not rows and not observed:
         return [{
             "title": "先设置 2 个可观察任务",
             "detail": "建议从玩具收纳、喝水、阅读这类容易复盘的任务开始，不要一次排太满。",
@@ -2557,13 +2509,14 @@ def _report_next_actions(rows: list[dict], summary: dict, *, is_weekly: bool) ->
             "tone": "amber",
             "source": "待处理",
         })
-    weakest = min(_report_skills(rows), key=lambda item: item["score"])
-    actions.append({
-        "title": f"下次重点关注{weakest['label']}",
-        "detail": f"{weakest['label']}是当前技能图里最低的一项，可以把任务拆成更明确的第一步。",
-        "tone": "blue",
-        "source": "能力图谱",
-    })
+    if observed:
+        child, weakest = min(observed, key=lambda item: item[1]['score'])
+        actions.append({
+            "title": f"留意{child['childName']}的{weakest['label']}",
+            "detail": f"{weakest['detail']} 可展开图谱查看具体记录；样本少不代表能力弱。",
+            "tone": "blue",
+            "source": "能力图谱",
+        })
     if any("玩具" in str(row.get("title") or "") or "收纳" in str(row.get("title") or "") for row in rows):
         actions.append({
             "title": "把收纳标准说具体",

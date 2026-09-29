@@ -1,17 +1,19 @@
 "use client";
 
 import { ArrowRight, LoaderCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useSchoolbagMotion } from "@/components/schoolbag/schoolbag-motion";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { PinInput } from "@/components/ui/pin-input";
 import Link from "next/link";
 
 export function UnlockForm() {
-  const router = useRouter();
+  const { enterLearning } = useSchoolbagMotion();
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const pinInput = useRef<HTMLInputElement>(null);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,40 +28,35 @@ export function UnlockForm() {
       });
       const payload = (await response.json()) as { message?: string };
       if (!response.ok) throw new Error(payload.message || "PIN不正确，请重试");
-      router.replace("/today");
-      router.refresh();
+      enterLearning();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "解锁失败，请稍后再试");
       setPin("");
       setSubmitting(false);
+      requestAnimationFrame(() => pinInput.current?.focus());
     }
   }
 
   return (
     <section className="space-auth-panel space-unlock-panel" data-pin-state={submitting ? "connecting" : error ? "error" : pin.length === 4 ? "ready" : "entering"}>
-      <p className="text-lg font-extrabold tracking-[.1em] text-[var(--mira-brand-deep)]">欢迎回来</p>
-      <h1 className="mt-2 text-[34px] font-black tracking-[-.045em]">输入学习PIN</h1>
-      <p className="mt-3 text-lg leading-7 text-[var(--mira-muted)]">这是家长为你的学习空间设置的4位数字。</p>
-      <form className="mt-8" onSubmit={submit}>
+      <p className="auth-form-welcome">欢迎回来</p>
+      <h2 className="auth-form-title">输入学习 PIN</h2>
+      <p className="auth-form-description">用家长设置的 4 位数字解锁。</p>
+      <form className="auth-pin-form" onSubmit={submit}>
         <label className="sr-only" htmlFor="student-pin">4位学习PIN</label>
-        <input
+        <PinInput
+          ref={pinInput}
           id="student-pin"
-          type="password"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          autoComplete="current-password"
-          maxLength={4}
-          autoFocus
           value={pin}
-          onChange={(event) => {
-            setPin(event.target.value.replace(/\D/g, "").slice(0, 4));
+          onChange={(value) => {
+            setPin(value.replace(/\D/g, "").slice(0, 4));
             setError("");
           }}
-          aria-invalid={Boolean(error)}
-          aria-describedby="pin-error"
-          className="focus-ring h-[72px] w-full rounded-[18px] border-2 border-[var(--mira-border)] bg-[var(--mira-bg)] px-5 text-center text-[36px] font-black tracking-[.5em] outline-none transition-colors focus:border-[var(--mira-brand)]"
+          disabled={submitting}
+          invalid={Boolean(error)}
+          describedBy="pin-error"
         />
-        <p id="pin-error" aria-live="polite" className="min-h-10 pt-3 text-lg font-semibold text-[var(--mira-danger)]">{error}</p>
+        <p id="pin-error" aria-live="polite" className="auth-field-error">{error}</p>
         <Button className="mt-2 w-full" type="submit" disabled={pin.length !== 4 || submitting}>
           {submitting ? <LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> : null}
           {submitting ? "正在解锁…" : "继续学习"}

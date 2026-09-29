@@ -10,9 +10,8 @@ import 'package:warm_sight/src/features/devices/application/device_repository.da
 import 'package:warm_sight/src/features/devices/application/selected_device_controller.dart';
 import 'package:warm_sight/src/features/devices/domain/device_models.dart';
 import 'package:warm_sight/src/features/live_care/application/camera_repository.dart';
-import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
-import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
-import 'package:warm_sight/src/features/learning/application/learning_repository.dart';
+import 'package:warm_sight/src/features/learning/application/textbook_repository.dart';
+import 'package:warm_sight/src/features/student_access/application/student_access_availability.dart';
 import 'package:warm_sight/src/features/live_care/domain/camera_models.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
@@ -57,35 +56,21 @@ class HomeDataRefreshCoordinator {
       silentRefreshProvider(_ref, cameraHealthProvider),
       silentRefreshProvider(_ref, cameraStatusProvider),
       silentRefreshProvider(_ref, cameraMonitorStatusProvider),
+      silentRefreshProvider(_ref, dailyReportProvider.future),
+      silentRefreshProvider(_ref, weeklyReportProvider.future),
     ]);
 
     final child = freshProfile?.child;
     if (child != null &&
         child.id.isNotEmpty &&
         child.contentMode == 'primary_learning') {
-      try {
-        final _ = await _ref.refresh(
-          currentLearningPreparationProvider(child.id).future,
-        );
-      } catch (_) {
-        // Preparation progress is secondary and must not hide an active release.
-      }
-      try {
-        final availability = await _ref.refresh(
-          currentLearningAvailabilityProvider(child.id).future,
-        );
-        if (availability.gradeCode == child.gradeCode &&
-            availability.canLearnNow) {
-          final todayProvider = todayLearningProvider((
-            childId: child.id,
-            gradeCode: availability.gradeCode,
-          ));
-          final _ = await _ref.refresh(todayProvider.future);
-        }
-      } catch (_) {
-        // A failed fresh availability request must never unlock Today from stale
-        // preparation progress.
-      }
+      await Future.wait([
+        silentRefreshProvider(_ref, schoolTextbooksProvider(child.id)),
+        silentRefreshProvider(
+          _ref,
+          studentAccessAvailabilityProvider(studentAccessScope(child)),
+        ),
+      ]);
     }
 
     await refreshCareSummarySilently(_ref);
@@ -229,23 +214,14 @@ Future<void> refreshTaskProvidersSilently(
   final childId = _profileChildId(ref);
   final weekQuery = activeQuery ?? fallbackTaskWeekQuery(childId);
   final child = ref.read(profileSummaryProvider).asData?.value.child;
-  final availability = child == null
-      ? null
-      : ref.read(currentLearningAvailabilityProvider(child.id)).asData?.value;
   await Future.wait([
     silentRefreshProvider(ref, taskListProvider),
     silentRefreshProvider(ref, todayTasksProvider),
     silentRefreshProvider(ref, pointsSummaryProvider),
     silentRefreshProvider(ref, dailyReportProvider),
     silentRefreshProvider(ref, weeklyReportProvider),
-    if (child != null &&
-        child.contentMode == 'primary_learning' &&
-        availability?.gradeCode == child.gradeCode &&
-        availability?.canLearnNow == true)
-      silentRefreshProvider(
-        ref,
-        todayLearningProvider((childId: child.id, gradeCode: child.gradeCode)),
-      ),
+    if (child != null && child.contentMode == 'primary_learning')
+      silentRefreshProvider(ref, schoolTextbooksProvider(child.id)),
     if (weekQuery != null)
       silentRefreshProvider(ref, taskWeekProvider(weekQuery)),
     ...taskIds.map((id) => silentRefreshProvider(ref, taskDetailProvider(id))),

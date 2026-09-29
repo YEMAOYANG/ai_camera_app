@@ -1,0 +1,1748 @@
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1,46 +1,46 @@
+ /*
+- * Orbit is a presentation skin for the authenticated Mira student document.
++ * Storybook is a presentation skin for the authenticated Mira student document.
+  * The runtime intentionally retains its light rendering preference: slide
+  * colors, authored interactive iframes and whiteboard ink are content, not
+  * chrome. Only the player's marked overlay is styled within the viewport;
+  * authored content and thumbnails retain their colors. Operator routes never
+  * receive the document marker.
+  */
+-html[data-mira-student-theme='orbit'] {
+-  --mira-orbit-space: #050a13;
+-  --mira-orbit-panel: #0c1727;
+-  --mira-orbit-raised: #142337;
+-  --mira-orbit-line: #273c51;
+-  --mira-orbit-text: #eef6ff;
+-  --mira-orbit-muted: #a0b5ca;
+-  --mira-orbit-cyan: #63dcff;
+-  --mira-orbit-lime: #d3ff48;
+-  --mira-orbit-control-height: 36px;
++html[data-mira-student-theme='storybook'] {
++  --mira-orbit-space: #f5efe3;
++  --mira-orbit-panel: #fffbf3;
++  --mira-orbit-raised: #f2eadb;
++  --mira-orbit-line: #ded4c2;
++  --mira-orbit-text: #303b38;
++  --mira-orbit-muted: #6d726b;
++  --mira-orbit-cyan: #786747;
++  --mira-orbit-lime: #f3c65b;
++  --mira-orbit-control-height: 48px;
+   --mira-orbit-control-radius: 9px;
+   background: var(--mira-orbit-space);
+   scrollbar-gutter: auto;
+   overflow: hidden;
+ }
+ 
+-html[data-mira-student-theme='orbit'] body,
+-html[data-mira-student-theme='orbit'] [data-mira-classroom-surface='orbit'],
+-html[data-mira-student-theme='orbit'] [data-mira-playback-shell='orbit'],
+-html[data-mira-student-theme='orbit'] [data-mira-canvas-area],
+-html[data-mira-student-theme='orbit'] [data-mira-canvas-surround] {
++html[data-mira-student-theme='storybook'] body,
++html[data-mira-student-theme='storybook'] [data-mira-classroom-surface='storybook'],
++html[data-mira-student-theme='storybook'] [data-mira-playback-shell='storybook'],
++html[data-mira-student-theme='storybook'] [data-mira-canvas-area],
++html[data-mira-student-theme='storybook'] [data-mira-canvas-surround] {
+   background: var(--mira-orbit-space);
+ }
+ 
+-html[data-mira-student-theme='orbit']
+-  [data-mira-classroom-surface='orbit']
++html[data-mira-student-theme='storybook']
++  [data-mira-classroom-surface='storybook']
+   > :not([data-mira-playback-shell]):has(> .text-center),
+-html[data-mira-student-theme='orbit']
+-  [data-mira-classroom-surface='orbit']
++html[data-mira-student-theme='storybook']
++  [data-mira-classroom-surface='storybook']
+   > :has(> .text-muted-foreground) {
+   background: var(--mira-orbit-space);
+   color: var(--mira-orbit-text);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome] {
+   --background: var(--mira-orbit-panel);
+   --foreground: var(--mira-orbit-text);
+   --card: var(--mira-orbit-panel);
+@@ -48,7 +48,7 @@
+   --popover: var(--mira-orbit-raised);
+   --popover-foreground: var(--mira-orbit-text);
+   --primary: var(--mira-orbit-lime);
+-  --primary-foreground: var(--mira-orbit-space);
++  --primary-foreground: var(--mira-orbit-text);
+   --secondary: var(--mira-orbit-raised);
+   --secondary-foreground: var(--mira-orbit-text);
+   --muted: var(--mira-orbit-raised);
+@@ -60,19 +60,19 @@
+   --ring: var(--mira-orbit-cyan);
+   color: var(--mira-orbit-text);
+   font-family: 'Inter Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+-  color-scheme: dark;
++  color-scheme: light;
+ }
+ 
+ /* Navigation stays distinct from the white teaching canvas. */
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='scene-sidebar'],
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='scene-sidebar'],
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] {
+   background: var(--mira-orbit-panel);
+   border-color: var(--mira-orbit-line);
+   box-shadow: none;
+   backdrop-filter: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   > div
+   > div:first-child
+@@ -82,7 +82,7 @@
+   letter-spacing: 0.08em;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   [data-testid='scene-item'] {
+   padding: 10px;
+@@ -95,21 +95,21 @@
+     background-color 160ms ease;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   [data-testid='scene-item']:hover {
+   background: var(--mira-orbit-raised);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   [data-mira-scene-active='true'] {
+-  border-color: var(--mira-orbit-lime);
+-  background: #18242a;
+-  box-shadow: 0 0 14px #d3ff4814;
+-}
+-
+-html[data-mira-student-theme='orbit']
++  border-color: var(--mira-orbit-cyan);
++  background: #f8efd7;
++  box-shadow: 0 0 14px #f3c65b14;
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   [data-testid='scene-title'] {
+   color: var(--mira-orbit-muted);
+@@ -117,14 +117,14 @@
+   line-height: 1.6;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   [data-mira-scene-active='true']
+   [data-testid='scene-title'] {
+-  color: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='orbit']
++  color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   [data-testid='scene-item']
+   > div:first-child
+@@ -137,41 +137,41 @@
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   [data-mira-scene-active='true']
+   > div:first-child
+   > div
+   > span:first-child {
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-course-thumbnail] {
+-  color: #142033;
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-lime);
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-course-thumbnail] {
++  color: #303b38;
+   color-scheme: light;
+   background: white;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='header'] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='header'] {
+   border-bottom: 1px solid var(--mira-orbit-line);
+   background: var(--mira-orbit-space);
+   padding-inline: 24px;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='header'] h1 {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='header'] h1 {
+   color: var(--mira-orbit-text);
+   font-size: clamp(17px, 1.7vw, 23px);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='header'] span {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='header'] span {
+   color: var(--mira-orbit-cyan);
+   font-size: 11px;
+ }
+ 
+ /* Only chrome containers are remapped. The lesson/whiteboard viewport is not
+  * inside any of these selectors, including when the lesson opens an iframe. */
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   :is(
+     [data-mira-chrome='discussion'],
+     [data-mira-chrome='discussion-prompt'],
+@@ -192,7 +192,7 @@
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   :is(
+     [data-mira-chrome='discussion'],
+     [data-mira-chrome='discussion-prompt'],
+@@ -204,7 +204,7 @@
+   color: var(--mira-orbit-text);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   :is(
+     [data-mira-chrome='discussion'],
+     [data-mira-chrome='discussion-prompt'],
+@@ -215,7 +215,7 @@
+   color: var(--mira-orbit-cyan);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   :is(
+     [data-mira-chrome='discussion'],
+     [data-mira-chrome='discussion-prompt'],
+@@ -223,24 +223,24 @@
+     [data-mira-chrome='playback-controls']
+   )
+   :is([class*='bg-purple-'], [class*='bg-violet-'], [class*='from-purple-']) {
+-  background: #194358;
++  background: #eee4cf;
+ }
+ 
+ /* Sidebar history uses ChatSession, independently of the presentation bubble.
+  * Semantic hooks cover every originalRole, including teachers recorded as agents. */
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-session] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-session] {
+   background: var(--mira-orbit-panel);
+   border-color: var(--mira-orbit-line);
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='chat']
+   [data-mira-chat-session][data-active='true'] {
+   border-color: var(--mira-orbit-cyan);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-bubble] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-bubble] {
+   color: var(--mira-orbit-text);
+   background: var(--mira-orbit-raised);
+   border-color: var(--mira-orbit-line);
+@@ -248,73 +248,75 @@
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-bubble='user'] {
+-  background: #194358;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-speaker] {
+-  color: var(--mira-orbit-cyan);
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-avatar] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-bubble='user'] {
++  background: #eee4cf;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-speaker] {
++  color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-avatar] {
+   background: var(--mira-orbit-raised);
+   --tw-ring-color: var(--mira-orbit-line);
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-message] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-message] {
+   /* Upstream Motion writes a repeating purple box-shadow inline. */
+   box-shadow: none !important;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='chat']
+   [data-mira-chat-message][data-active='true'] {
+   background: var(--mira-orbit-raised);
+-  border-left-color: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-session-badge] {
+-  color: var(--mira-orbit-cyan);
+-  background: #194358;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-session-dot] > span {
++  border-left-color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-session-badge] {
++  color: var(--mira-orbit-cyan);
++  background: #eee4cf;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-session-dot] > span {
+   background: var(--mira-orbit-cyan);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-continue] {
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
+-  border-color: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-continue]:hover {
+-  background: #e2ff86;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-chat-continue] span {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-continue] {
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-lime);
++  border-color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='chat']
++  [data-mira-chat-continue]:hover {
++  background: #ecc05a;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-continue] span {
+   color: inherit;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] > div,
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] > div,
++html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] {
+   background: var(--mira-orbit-panel);
+   border-color: var(--mira-orbit-line);
+   backdrop-filter: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [role='alert'] {
+-  color: #ffe3a3;
+-  background: #30251a;
+-  border-color: #785a2d;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [role='alert'] button {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [role='alert'] {
++  color: #805425;
++  background: #fff2d7;
++  border-color: #dec58e;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [role='alert'] button {
+   min-height: var(--mira-orbit-control-height);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-testid='roundtable-non-presentation-card'] {
++html[data-mira-student-theme='storybook'] [data-testid='roundtable-non-presentation-card'] {
+   border: 1px solid var(--mira-orbit-line);
+   border-radius: 18px;
+   background: var(--mira-orbit-raised);
+@@ -322,31 +324,31 @@
+   backdrop-filter: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] textarea,
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] textarea {
+-  color: var(--mira-orbit-text);
+-  caret-color: var(--mira-orbit-lime);
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] textarea,
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] textarea {
++  color: var(--mira-orbit-text);
++  caret-color: var(--mira-orbit-cyan);
+   font-size: 17px;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] textarea::placeholder {
++html[data-mira-student-theme='storybook'] [data-mira-chrome] textarea::placeholder {
+   color: var(--mira-orbit-muted);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] {
+   min-height: 48px;
+   gap: 8px;
+   flex-wrap: wrap;
+   overflow: visible;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] button,
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] button,
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   > div
+   > div:first-child
+   > button,
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [role='tab'] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [role='tab'] {
+   min-width: var(--mira-orbit-control-height);
+   min-height: var(--mira-orbit-control-height);
+   height: var(--mira-orbit-control-height);
+@@ -356,131 +358,135 @@
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='playback-controls']
+   button:not(:disabled):hover,
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [role='tab'][data-state='active'] {
+-  color: var(--mira-orbit-lime);
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='chat']
++  [role='tab'][data-state='active'] {
++  color: var(--mira-orbit-cyan);
+   background: var(--mira-orbit-raised);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] button:disabled {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] button:disabled {
+   opacity: 0.4;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='playback-controls']
+   button[aria-label='Play'],
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='playback-controls']
+   button[aria-label='Pause'] {
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='orbit']
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-lime);
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='playback-controls']
+   button[aria-pressed='true'] {
+-  color: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] > div > div {
++  color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] > div > div {
+   height: auto;
+   min-height: var(--mira-orbit-control-height);
+ }
+ 
+ /* Tiny state marks must remain distinct from the surrounding chrome surface. */
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='chat']
+   [data-mira-indicator='note-position'],
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-indicator='student-status'] {
+   background: var(--mira-orbit-muted);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='chat']
+   [data-mira-indicator='note-position'][data-active='true'],
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-indicator='student-status'][data-active='true'] {
+   background: var(--mira-orbit-lime);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion-prompt']
+   [data-mira-indicator='discussion-progress-track'] {
+   background: var(--mira-orbit-line);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion-prompt']
+   [data-mira-indicator='discussion-progress'][data-paused='true'] {
+   background: var(--mira-orbit-muted);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-resize-handle] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-resize-handle] {
+   background: transparent;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-resize-handle]:hover,
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='chat'] [data-mira-resize-handle]:active {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-resize-handle]:hover,
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='chat']
++  [data-mira-resize-handle]:active {
+   background: var(--mira-orbit-raised);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='chat']
+   [data-mira-indicator='resize-grip'] {
+   background: var(--mira-orbit-muted);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='chat']
+   [data-mira-resize-handle]:hover
+   [data-mira-indicator='resize-grip'],
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='chat']
+   [data-mira-resize-handle]:active
+   [data-mira-indicator='resize-grip'] {
+   background: var(--mira-orbit-cyan);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   :is([data-mira-chrome='discussion'], [data-mira-chrome='chat'])
+   :is([data-mira-indicator='activity-dot'], [data-mira-indicator='voice-wave']),
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   :is([data-mira-chrome='discussion'], [data-mira-chrome='chat'])
+   [data-mira-loading-dots]
+   > :is(div, span) {
+   background: var(--mira-orbit-cyan);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   :is([data-mira-chrome='discussion'], [data-mira-chrome='playback-controls'])
+   [data-mira-indicator='toolbar-divider'] {
+   background: var(--mira-orbit-line);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='playback-controls']
+   [data-mira-indicator='whiteboard-content'] {
+   background: var(--mira-orbit-lime);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='playback-controls']
+   [data-mira-volume-slider] {
+   background: var(--mira-orbit-muted);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='playback-controls']
+   [data-mira-volume-slider]::-webkit-slider-thumb {
+   background: var(--mira-orbit-lime);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='playback-controls']
+   [data-mira-volume-slider]::-moz-range-thumb {
+   background: var(--mira-orbit-lime);
+@@ -488,14 +494,14 @@
+ 
+ /* Keep the action visible during playback, including on touch screens. The
+  * upstream waveform and hover-only icon are not reliable action affordances. */
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-bubble-control] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome] [data-mira-bubble-control] {
+   border-color: var(--mira-orbit-line);
+   color: var(--mira-orbit-cyan);
+-  background: #194358;
+-  box-shadow: none;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-bubble-control] > svg {
++  background: #eee4cf;
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome] [data-mira-bubble-control] > svg {
+   display: block;
+   width: 14px;
+   height: 14px;
+@@ -503,26 +509,30 @@
+   opacity: 1;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-bubble-control]:hover {
+-  background: #23556c;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-audio-bars] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome] [data-mira-bubble-control]:hover {
++  background: #e5d7ba;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome] [data-mira-audio-bars] {
+   display: none;
+ }
+ 
+ /* Discussion rails: quiet surfaces, legible selected modes, and consistent avatar rings. */
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-discussion-rail] {
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-discussion-rail] {
+   background: var(--mira-orbit-panel);
+   border-color: var(--mira-orbit-line);
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-rail-decoration] {
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-rail-decoration] {
+   background: transparent;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-input-mode] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-input-mode] {
+   color: var(--mira-orbit-muted);
+   background: var(--mira-orbit-raised);
+   border: 1px solid var(--mira-orbit-line);
+@@ -534,29 +544,29 @@
+     border-color 160ms ease;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-input-mode]:not(:disabled):hover {
+   color: var(--mira-orbit-cyan);
+   border-color: var(--mira-orbit-cyan);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-input-mode][data-active='true'] {
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
+-  border-color: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='orbit']
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-lime);
++  border-color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-input-mode][data-active='true']:hover {
+-  color: var(--mira-orbit-space);
+-  background: #e2ff86;
+-}
+-
+-html[data-mira-student-theme='orbit']
++  color: var(--mira-orbit-text);
++  background: #ecc05a;
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-input-mode]:disabled {
+   color: var(--mira-orbit-muted);
+@@ -564,56 +574,63 @@
+   opacity: 0.45;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-input-mode] svg {
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-input-mode]
++  svg {
+   color: inherit;
+   stroke: currentColor;
+   filter: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-avatar-ring] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-avatar-ring] {
+   border-color: var(--mira-orbit-line);
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-avatar-ring='active'] {
+   border-color: var(--mira-orbit-cyan);
+-  box-shadow: 0 0 0 3px #63dcff0d;
+-}
+-
+-html[data-mira-student-theme='orbit']
++  box-shadow: 0 0 0 3px #7867470d;
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-avatar-ring='cue'] {
+-  border-color: var(--mira-orbit-lime);
+-  box-shadow: 0 0 0 3px #d3ff4814;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-avatar-spinner] {
++  border-color: var(--mira-orbit-cyan);
++  box-shadow: 0 0 0 3px #f3c65b14;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-avatar-spinner] {
+   border-color: var(--mira-orbit-cyan);
+   border-top-color: transparent;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-avatar-label] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-avatar-label] {
+   color: var(--mira-orbit-muted);
+   background: transparent;
+   border-color: var(--mira-orbit-line);
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-avatar-label][data-active='true'] {
+   color: var(--mira-orbit-cyan);
+-  border-color: #63dcff40;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-speaking-badge] {
++  border-color: #78674740;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-speaking-badge] {
+   background: var(--mira-orbit-lime);
+   border-color: var(--mira-orbit-panel);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-speaking-badge]
+   > div {
+@@ -622,13 +639,13 @@
+ 
+ /* Arrow gutters never overlap the portraits. The track padding also contains
+    the active avatar's scale, speaking badge, and breathing ring. */
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-carousel] {
+   padding-inline: 14px;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-viewport] {
+   padding-inline: 0;
+@@ -637,14 +654,14 @@
+   touch-action: pan-x;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-track] {
+   gap: 4px;
+   padding: 6px;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-avatar] {
+   display: block;
+@@ -652,7 +669,7 @@
+   height: 30px;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-avatar]:focus-visible {
+   outline: 2px solid var(--mira-orbit-cyan);
+@@ -661,7 +678,7 @@
+   filter: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-scroll] {
+   width: 14px;
+@@ -669,14 +686,14 @@
+   background: transparent;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-carousel]:focus-within
+   [data-mira-participant-scroll] {
+   opacity: 1;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-scroll]:focus-visible {
+   outline: 1px solid var(--mira-orbit-cyan);
+@@ -684,7 +701,7 @@
+   border-radius: 5px;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-participant-scroll]
+   svg {
+@@ -692,44 +709,46 @@
+ }
+ 
+ /* Recording controls keep the existing microphone behavior and animations. */
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-recording-panel]
+   :is([class*='border-purple-'], [class*='border-indigo-']) {
+   border-color: var(--mira-orbit-line);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-recording-control]
+   [data-mira-recording-disc] {
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
+-  border-color: var(--mira-orbit-lime);
+-  box-shadow: 0 0 0 4px #d3ff4812;
+-}
+-
+-html[data-mira-student-theme='orbit']
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-lime);
++  border-color: var(--mira-orbit-cyan);
++  box-shadow: 0 0 0 4px #f3c65b12;
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-recording-disc]
+   svg {
+-  color: var(--mira-orbit-space);
++  color: var(--mira-orbit-text);
+   stroke: currentColor;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-recording-control]
+   [data-mira-recording-ring] {
+-  border-color: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-recording-glow] {
+-  background: var(--mira-orbit-lime);
+-}
+-
+-/* Every speaker uses a dark, readable bubble, independent of upstream role colors. */
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-speech-card] {
++  border-color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-recording-glow] {
++  background: var(--mira-orbit-lime);
++}
++
++/* Every speaker uses a warm, readable bubble, independent of upstream role colors. */
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-speech-card] {
+   color: var(--mira-orbit-text);
+   background: var(--mira-orbit-panel);
+   border-color: var(--mira-orbit-line);
+@@ -737,26 +756,28 @@
+   backdrop-filter: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-speech-card='agent'] {
+   background: var(--mira-orbit-raised);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-speech-card='user'] {
+-  background: #194358;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-bubble-avatar] {
++  background: #eee4cf;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-bubble-avatar] {
+   border-color: var(--mira-orbit-cyan);
+   --tw-ring-color: var(--mira-orbit-cyan);
+   box-shadow: none;
+ }
+ 
+ /* One calm focus boundary around the composer; keep the lesson readable while typing. */
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-composer] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-composer] {
+   min-width: 0;
+   width: min(440px, 100%);
+   max-width: 100%;
+@@ -771,17 +792,20 @@
+   transition: border-color 160ms ease;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-composer]:focus-within {
+   border-color: var(--mira-orbit-cyan);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-composer] > div {
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-composer]
++  > div {
+   padding: 0;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-composer]
+   textarea {
+@@ -797,7 +821,7 @@
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-composer]
+   textarea:focus-visible {
+@@ -805,7 +829,7 @@
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-send] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-send] {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+@@ -815,27 +839,29 @@
+   padding: 0;
+   border: 0;
+   border-radius: 12px;
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
+-  box-shadow: none;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-send] svg {
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-lime);
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-send] svg {
+   color: inherit;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-send]:not(:disabled):hover {
+-  background: #e2ff86;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-send]:disabled {
++  background: #ecc05a;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-send]:disabled {
+   color: var(--mira-orbit-muted);
+   background: var(--mira-orbit-line);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-input-obscured='true'] {
+   opacity: 1 !important;
+@@ -843,32 +869,32 @@
+ }
+ 
+ /* The central play hint is player chrome, separate from authored slide colors. */
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='play-hint'] > div {
+-  color: var(--mira-orbit-space);
++html[data-mira-student-theme='storybook'] [data-mira-chrome='play-hint'] > div {
++  color: var(--mira-orbit-text);
+   background: var(--mira-orbit-lime);
+   box-shadow:
+-    0 4px 30px #d3ff4833,
+-    inset 0 0 0 1px #e2ff86;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='play-hint'] svg {
+-  color: var(--mira-orbit-space);
++    0 4px 30px #f3c65b33,
++    inset 0 0 0 1px #ecc05a;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='play-hint'] svg {
++  color: var(--mira-orbit-text);
+   fill: currentColor;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='play-hint']:hover > div {
+-  background: #e2ff86;
++html[data-mira-student-theme='storybook'] [data-mira-chrome='play-hint']:hover > div {
++  background: #ecc05a;
+   box-shadow:
+-    0 4px 32px #d3ff484d,
+-    inset 0 0 0 1px #efffc2;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] {
+-  background: #050a13d9;
+-  backdrop-filter: blur(8px);
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] [role='dialog'] {
++    0 4px 32px #f3c65b4d,
++    inset 0 0 0 1px #f9e4ac;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] {
++  background: #f5efe3b3;
++  backdrop-filter: blur(3px);
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] [role='dialog'] {
+   max-width: 380px;
+   padding: 28px;
+   border: 1px solid var(--mira-orbit-line);
+@@ -877,7 +903,7 @@
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] h2 {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] h2 {
+   color: var(--mira-orbit-text);
+   font-size: 22px;
+   font-weight: 600;
+@@ -885,14 +911,14 @@
+   letter-spacing: 0;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] p {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] p {
+   margin-top: 10px;
+   color: var(--mira-orbit-muted);
+   font-size: 13px;
+   line-height: 22px;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] p:first-child {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] p:first-child {
+   margin-top: 0;
+   margin-bottom: 6px;
+   color: var(--mira-orbit-cyan);
+@@ -902,15 +928,15 @@
+   letter-spacing: 0.02em;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] button {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] button {
+   min-height: 44px;
+   height: 44px;
+   margin-top: 20px;
+   padding: 0 20px;
+   border-radius: 12px;
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
+-  box-shadow: 0 2px 8px #d3ff4814;
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-lime);
++  box-shadow: 0 2px 8px #f3c65b14;
+   font-size: 14px;
+   font-weight: 600;
+   line-height: 20px;
+@@ -920,82 +946,89 @@
+     background-color 180ms ease;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] button:hover {
+-  background: #e2ff86;
+-  box-shadow: 0 2px 8px #d3ff4826;
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] button:hover {
++  background: #ecc05a;
++  box-shadow: 0 2px 8px #f3c65b26;
+ }
+ 
+ @media (pointer: coarse) {
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] button {
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] button {
+     min-height: 48px;
+     height: 48px;
+   }
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='loading'],
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='complete'] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='loading'],
++html[data-mira-student-theme='storybook'] [data-mira-chrome='complete'] {
+   color: var(--mira-orbit-text);
+   background: var(--mira-orbit-space);
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='complete'] > div.absolute {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='complete'] > div.absolute {
+   background: var(--mira-orbit-space) !important;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='complete']
+   :is(h1, h2, [class*='text-amber-'], [class*='text-orange-']) {
+-  color: var(--mira-orbit-lime);
++  color: var(--mira-orbit-cyan);
+ }
+ 
+ /* The response cue keeps its larger voice/text target, with the same palette. */
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-cue-action] {
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
+-  border-color: var(--mira-orbit-lime);
+-  box-shadow: none;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-cue-action]:hover {
+-  background: #e2ff86;
+-  border-color: #e2ff86;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-cue-action] svg {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-cue-action] {
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-lime);
++  border-color: var(--mira-orbit-cyan);
++  box-shadow: none;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-cue-action]:hover {
++  background: #ecc05a;
++  border-color: #ecc05a;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-cue-action]
++  svg {
+   color: inherit;
+   filter: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion'] [data-mira-cue-decoration] {
+-  border-color: var(--mira-orbit-cyan);
+-}
+-
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-cue-decoration] {
++  border-color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-cue-decoration='glow'] {
+   background: transparent;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-user-cue]
+   :is([class*='text-amber-'], [class*='text-purple-']) {
+   color: var(--mira-orbit-cyan);
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion']
+   [data-mira-cue-decoration='wave'] {
+   background: var(--mira-orbit-cyan);
+ }
+ 
+ /* One size vocabulary for discussion choices, recovery, history and navigation. */
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-actions] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome] [data-mira-discussion-actions] {
+   align-items: stretch;
+   gap: 8px;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome] [data-mira-discussion-action] {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+@@ -1018,105 +1051,111 @@
+     color 160ms ease;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome]
+   [data-mira-discussion-action]:not(:disabled):hover {
+   border-color: var(--mira-orbit-cyan);
+-  background: #194358;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action='primary'] {
+-  color: var(--mira-orbit-space);
+-  background: var(--mira-orbit-lime);
+-  border-color: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='orbit']
++  background: #eee4cf;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome]
++  [data-mira-discussion-action='primary'] {
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-lime);
++  border-color: var(--mira-orbit-cyan);
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome]
+   [data-mira-discussion-action='primary']:not(:disabled):hover {
+-  background: #e2ff86;
+-  border-color: #e2ff86;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action='end'] {
+-  color: #ffb9b9;
+-  background: #34202a;
+-  border-color: #784854;
+-}
+-
+-html[data-mira-student-theme='orbit']
++  background: #ecc05a;
++  border-color: #ecc05a;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome] [data-mira-discussion-action='end'] {
++  color: #9e4941;
++  background: #fff0ec;
++  border-color: #e1b4ac;
++}
++
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome]
+   [data-mira-discussion-action='end']:not(:disabled):hover {
+-  background: #472632;
+-  border-color: #ffb9b9;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action='pause'] {
++  background: #fae1da;
++  border-color: #9e4941;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome] [data-mira-discussion-action='pause'] {
+   width: var(--mira-orbit-control-height);
+   min-width: var(--mira-orbit-control-height);
+   padding: 0;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] [data-mira-discussion-action]:disabled {
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome]
++  [data-mira-discussion-action]:disabled {
+   opacity: 0.45;
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome='discussion-prompt']
+   [data-mira-discussion-badge] {
+   /* Persona colors are content metadata, not the student chrome palette. */
+   color: var(--mira-orbit-cyan) !important;
+-  background: #194358 !important;
+-}
+-
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion-confirm'] {
++  background: #eee4cf !important;
++}
++
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion-confirm'] {
+   color: var(--mira-orbit-text);
+   background: var(--mira-orbit-panel);
+   border: 1px solid var(--mira-orbit-line);
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome='discussion-confirm'] :is(h3, p) {
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion-confirm'] :is(h3, p) {
+   color: var(--mira-orbit-text);
+ }
+ 
+ @media (pointer: coarse) {
+-  html[data-mira-student-theme='orbit'] {
++  html[data-mira-student-theme='storybook'] {
+     --mira-orbit-control-height: 48px;
+   }
+ }
+ 
+-html[data-mira-student-theme='orbit']
++html[data-mira-student-theme='storybook']
+   [data-mira-chrome]
+   :is(button, a, textarea, input, [role='tab']):focus-visible {
+   outline: 2px solid var(--mira-orbit-cyan);
+   outline-offset: 3px;
+ }
+ 
+-html[data-mira-student-theme='orbit'] [data-mira-chrome] {
++html[data-mira-student-theme='storybook'] [data-mira-chrome] {
+   scrollbar-color: var(--mira-orbit-line) transparent;
+ }
+ 
+ @media (max-width: 760px) {
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome='header'] {
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='header'] {
+     padding-inline: 16px;
+   }
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] [role='dialog'] {
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] [role='dialog'] {
+     padding: 24px;
+   }
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] {
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] {
+     gap: 2px;
+     padding-inline: 4px;
+   }
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] > .flex-1 {
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] > .flex-1 {
+     order: 1;
+     flex-basis: 100%;
+   }
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] > .flex-1 > div {
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] > .flex-1 > div {
+     flex-wrap: wrap;
+     justify-content: center;
+   }
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome='playback-controls'] > div:last-child {
++  html[data-mira-student-theme='storybook']
++    [data-mira-chrome='playback-controls']
++    > div:last-child {
+     margin-left: auto;
+   }
+ }
+@@ -1124,10 +1163,10 @@
+ /* Low-cost classroom motion: no continuous environmental effects behind the
+  * lesson. Existing semantic feedback remains, with reduced-motion respected. */
+ @media (prefers-reduced-motion: reduce) {
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome],
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome] *,
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome] *::before,
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome] *::after {
++  html[data-mira-student-theme='storybook'] [data-mira-chrome],
++  html[data-mira-student-theme='storybook'] [data-mira-chrome] *,
++  html[data-mira-student-theme='storybook'] [data-mira-chrome] *::before,
++  html[data-mira-student-theme='storybook'] [data-mira-chrome] *::after {
+     animation-duration: 0.001ms !important;
+     animation-iteration-count: 1 !important;
+     transition-duration: 0.001ms !important;
+@@ -1136,8 +1175,106 @@
+ }
+ 
+ @media (prefers-reduced-transparency: reduce) {
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome] *,
+-  html[data-mira-student-theme='orbit'] [data-mira-chrome='start-gate'] {
++  html[data-mira-student-theme='storybook'] [data-mira-chrome] *,
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] {
+     backdrop-filter: none !important;
+   }
+ }
++
++/* The classroom shares the paper desk with the schoolbag. These are player
++ * surfaces only: authored slides, exercises and whiteboard keep their colors. */
++html[data-mira-student-theme='storybook'] [data-mira-chrome='header'] {
++  height: 48px;
++  min-height: 48px;
++  padding-inline: 24px;
++}
++html[data-mira-student-theme='storybook'] [data-mira-chrome='header'] > div > div {
++  flex-direction: row;
++  align-items: baseline;
++  gap: 12px;
++}
++html[data-mira-student-theme='storybook'] [data-mira-chrome='header'] h1 {
++  font-size: 18px;
++  font-weight: 600;
++}
++html[data-mira-student-theme='storybook'] [data-mira-chrome='header'] span {
++  color: var(--mira-orbit-muted);
++  letter-spacing: 0.02em;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='scene-sidebar']
++  [data-mira-scene-active='true'] {
++  border-color: #dac28a;
++  box-shadow: none;
++}
++html[data-mira-student-theme='storybook'] [data-mira-chrome='discussion'] [data-mira-speech-card] {
++  border-color: transparent;
++  background: transparent;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='discussion']
++  [data-mira-bubble-avatar] {
++  border-color: var(--mira-orbit-line);
++}
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] [role='dialog'] {
++  border: 0;
++  border-radius: 24px;
++  background: #fffaf0;
++  padding: 32px;
++  box-shadow: 0 12px 48px #54462b14;
++}
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] h2 {
++  font-size: 26px;
++  line-height: 1.4;
++}
++html[data-mira-student-theme='storybook'] [data-mira-chrome='start-gate'] button {
++  min-height: 52px;
++  height: 52px;
++  border-radius: 999px;
++  font-size: 16px;
++  box-shadow: none;
++}
++html[data-mira-student-theme='storybook'] [data-mira-fixed-student] {
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  flex-direction: column;
++  gap: 6px;
++  color: var(--mira-orbit-muted);
++  font-size: 12px;
++}
++html[data-mira-student-theme='storybook'] [data-mira-fixed-student] img {
++  width: 52px;
++  height: 52px;
++  border-radius: 50%;
++  object-fit: cover;
++  background: #ede8d6;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-fixed-textbook]
++  [data-mira-participant-carousel],
++html[data-mira-student-theme='storybook']
++  [data-mira-fixed-textbook]
++  [data-mira-discussion-rail='participants']
++  > [data-mira-indicator='toolbar-divider'] {
++  display: none;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-fixed-textbook]
++  [data-mira-discussion-rail='participants'] {
++  width: 100px;
++  justify-content: center;
++}
++
++html[data-mira-student-theme='storybook']
++  [data-mira-fixed-textbook]
++  [data-mira-discussion-rail='teacher']
++  > .absolute {
++  display: none;
++}
++html[data-mira-student-theme='storybook']
++  [data-mira-fixed-textbook]
++  [data-mira-discussion-rail='teacher']
++  > .flex-1 {
++  padding-top: 4px;
++}
+diff --git a/components/classroom/ClassroomSurface.tsx b/components/classroom/ClassroomSurface.tsx
+--- a/components/classroom/ClassroomSurface.tsx
++++ b/components/classroom/ClassroomSurface.tsx
+@@ -164,7 +164,12 @@
+           loadLegacyAgentFallbacks: defaultClassroomLoadDeps.loadLegacyAgentFallbacks,
+           commitMigratedAgentConfigs: defaultClassroomLoadDeps.commitMigratedAgentConfigs,
+           applyGeneratedAgents: defaultClassroomLoadDeps.applyGeneratedAgents,
+-          getSettings: () => useSettingsStore.getState(),
++          // Student rosters come from the authenticated course, never from a
++          // previously selected operator/preset roster on the same browser.
++          getSettings: () => ({
++            ...useSettingsStore.getState(),
++            ...(studentMode ? { agentSelectionIsUserSet: false } : {}),
++          }),
+           getAgent: (id) => useAgentRegistry.getState().getAgent(id),
+           restoreAgentSelection: defaultClassroomLoadDeps.restoreAgentSelection,
+           setError,
+@@ -363,7 +368,7 @@
+     <ThemeProvider>
+       <MediaStageProvider value={classroomId}>
+         <div
+-          data-mira-classroom-surface={studentMode ? 'orbit' : undefined}
++          data-mira-classroom-surface={studentMode ? 'storybook' : undefined}
+           className={
+             variant === 'pane'
+               ? // A flex CHILD of the pane's row box, so it has to claim both
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -255,15 +255,27 @@
+     const selectedAgentIds = useSettingsStore((s) => s.selectedAgentIds);
+     const ttsEnabled = useSettingsStore((s) => s.ttsEnabled);
+ 
+-    // Generate participants from selected agents
+-    const participants = useMemo(
+-      () => agentsToParticipants(selectedAgentIds, t),
+-      [selectedAgentIds, t],
+-    );
+-
+     // Resolved AgentConfig array for hooks that need full agent objects
+     // Subscribe to the agents record so voiceConfig changes trigger re-resolution
+     const agentsRecord = useAgentRegistry((s) => s.agents);
++    const classroomStudent = studentMode
++      ? (stage as { miraStudent?: { name: string; avatar: string } } | null)?.miraStudent
++      : undefined;
++    const participants = useMemo(() => {
++      // Registry hydration and session identity can arrive after selection.
++      // Do not persist the child's profile in the operator's account store.
++      const roster = agentsToParticipants(
++        selectedAgentIds.filter((id) => agentsRecord[id]),
++        t,
++      );
++      return classroomStudent
++        ? roster.map((person) =>
++            person.role === 'user'
++              ? { ...person, name: classroomStudent.name, avatar: classroomStudent.avatar }
++              : person,
++          )
++        : roster;
++    }, [selectedAgentIds, t, agentsRecord, classroomStudent]);
+     const selectedAgents = useMemo(
+       () =>
+         selectedAgentIds.map((id) => agentsRecord[id]).filter((a): a is AgentConfig => a != null),
+@@ -1709,15 +1721,17 @@
+     // non-'edit' here since the parent Stage unmounts this component
+     // when entering Pro mode.
+     const sceneViewerHeight = (() => {
+-      const headerHeight = isPresenting || hideHeader ? 0 : 80;
+-      const roundtableHeight = mode === 'playback' && !isPresenting ? 192 : 0;
++      const headerHeight = isPresenting || hideHeader ? 0 : studentMode ? 48 : 80;
++      const fixedTextbook = (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook;
++      const roundtableHeight =
++        mode === 'playback' && !isPresenting ? (fixedTextbook ? 168 : 192) : 0;
+       return `calc(100% - ${headerHeight + roundtableHeight}px)`;
+     })();
+ 
+     return (
+       <div
+         ref={stageRef}
+-        data-mira-playback-shell={studentMode ? 'orbit' : undefined}
++        data-mira-playback-shell={studentMode ? 'storybook' : undefined}
+         className={cn(
+           'flex-1 flex overflow-hidden bg-gray-50 dark:bg-gray-900',
+           isPresenting && !controlsVisible && 'cursor-none',
+@@ -1745,7 +1759,7 @@
+                 className="w-full max-w-md rounded-[2rem] border border-white/70 bg-white px-8 py-9 text-center shadow-2xl"
+               >
+                 <p className="mb-2 text-sm font-semibold tracking-wide text-blue-600">
+-                  老师已经准备好了
++                  {participants.find((person) => person.role === 'teacher')?.name || '老师'}在等你
+                 </p>
+                 <h2
+                   id="mira-student-start-title"
+@@ -1754,7 +1768,7 @@
+                   点一下，开始上课
+                 </h2>
+                 <p className="mt-3 text-base leading-7 text-slate-600">
+-                  浏览器需要你先点一次，之后老师会自动讲解并继续下一页。
++                  看图、听故事，一起发现课本里的小秘密。
+                 </p>
+                 <button
+                   type="button"
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -218,7 +218,9 @@
+   const audioPlaybackAvailable = ttsEnabled || !!preGeneratedAudioAvailable;
+   const operatorAsrEnabled = useSettingsStore((state) => state.asrEnabled);
+   const studentMode = useMiraStudentRuntime();
+-  const fixedTextbook = useStageStore(state => (state.stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true);
++  const fixedTextbook = useStageStore(
++    (state) => (state.stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true,
++  );
+   const asrEnabled = getMiraEffectiveAsrEnabled({ studentMode, operatorAsrEnabled });
+   const chatAreaWidth = useSettingsStore((s) => s.chatAreaWidth);
+   const operatorTTSVolume = useSettingsStore((s) => s.ttsVolume);
+@@ -751,7 +753,10 @@
+ 
+   if (isPresenting) {
+     return (
+-      <div className="h-0 w-full relative z-10 overflow-visible">
++      <div
++        data-mira-fixed-textbook={fixedTextbook ? '' : undefined}
++        className="h-0 w-full relative z-10 overflow-visible"
++      >
+         {/* Speech overlay — fills the full stage area via absolute positioning */}
+         <PresentationSpeechOverlay
+           playbackView={enrichedPlaybackView}
+@@ -1106,6 +1111,15 @@
+                     </>
+                   )}
+ 
++                  {fixedTextbook && (
++                    <div data-mira-fixed-student>
++                      <AvatarDisplay
++                        src={userAvatar}
++                        alt={userParticipant?.name || t('roundtable.you')}
++                      />
++                      <span>{userParticipant?.name || t('roundtable.you')}</span>
++                    </div>
++                  )}
+                   <button
+                     type="button"
+                     aria-label={t('roundtable.you')}
+@@ -1182,6 +1196,8 @@
+ 
+   return (
+     <div
++      data-mira-fixed-textbook={fixedTextbook ? '' : undefined}
++      style={fixedTextbook ? { height: 168 } : undefined}
+       className={cn(
+         'h-[192px] w-full flex flex-col relative z-10 transition-all duration-300',
+         isPresenting && !controlsVisible
+@@ -2207,7 +2223,7 @@
+                 <>
+                   <button
+                     data-mira-input-mode="voice"
+-                        style={fixedTextbook ? { display: 'none' } : undefined}
++                    style={fixedTextbook ? { display: 'none' } : undefined}
+                     data-active={isVoiceOpen}
+                     aria-label={
+                       asrEnabled ? t('roundtable.voiceInput') : t('roundtable.voiceInputDisabled')
+@@ -2234,7 +2250,7 @@
+                   </button>
+                   <button
+                     data-mira-input-mode="text"
+-                        style={fixedTextbook ? { display: 'none' } : undefined}
++                    style={fixedTextbook ? { display: 'none' } : undefined}
+                     data-active={isInputOpen}
+                     onClick={(e) => {
+                       e.stopPropagation();
+@@ -2254,6 +2270,15 @@
+             </div>
+ 
+             {/* User avatar (big, clickable to open input) */}
++            {fixedTextbook && (
++              <div data-mira-fixed-student>
++                <AvatarDisplay
++                  src={userAvatar}
++                  alt={userParticipant?.name || t('roundtable.you')}
++                />
++                <span>{userParticipant?.name || t('roundtable.you')}</span>
++              </div>
++            )}
+             <div
+               className="relative group cursor-pointer shrink-0"
+               style={fixedTextbook ? { display: 'none' } : undefined}
+diff --git a/lib/contexts/mira-student-runtime-context.tsx b/lib/contexts/mira-student-runtime-context.tsx
+--- a/lib/contexts/mira-student-runtime-context.tsx
++++ b/lib/contexts/mira-student-runtime-context.tsx
+@@ -98,7 +98,7 @@
+   root.lang = 'zh-CN';
+   root.classList.remove('dark');
+   root.style.colorScheme = 'light';
+-  root.setAttribute('data-mira-student-theme', 'orbit');
++  root.setAttribute('data-mira-student-theme', 'storybook');
+ }
+ 
+ function MiraStudentPreferences({ onReady }: { readonly onReady: () => void }) {

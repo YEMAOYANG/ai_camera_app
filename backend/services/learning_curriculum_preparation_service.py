@@ -167,6 +167,7 @@ class LearningCurriculumPreparationService:
         *,
         auth_service: AuthService,
         course_library_enabled: bool = False,
+        textbook_library_only: bool = False,
         repository: LearningCurriculumPreparationRepository | None = None,
         learning_repository: LearningRepository | None = None,
         retry_repository_factory: Callable[
@@ -181,6 +182,7 @@ class LearningCurriculumPreparationService:
         database = Database(database_url)
         self.database_url = database.database_url
         self.course_library_enabled = course_library_enabled
+        self.textbook_library_only = textbook_library_only
         self.auth_service = auth_service
         self.repository = repository or LearningCurriculumPreparationRepository(database)
         self.learning_repository = learning_repository or LearningRepository(database)
@@ -216,6 +218,8 @@ class LearningCurriculumPreparationService:
         child: Mapping[str, object],
         now: int,
     ) -> dict[str, object] | None:
+        if self.textbook_library_only:
+            return None
         grade_code = str(child.get("grade_code") or "")
         if grade_code not in FORMAL_STUDENT_GRADE_CODES:
             self.repository.supersede_current_nonterminal(

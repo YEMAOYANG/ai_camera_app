@@ -1,0 +1,1002 @@
+diff --git a/components/stage/scene-renderer.tsx b/components/stage/scene-renderer.tsx
+--- a/components/stage/scene-renderer.tsx
++++ b/components/stage/scene-renderer.tsx
+@@ -6,6 +6,8 @@
+ import { QuizView } from '../scene-renderers/quiz-view';
+ import { InteractiveRenderer } from '../scene-renderers/interactive-renderer';
+ import { PBLRenderer } from '../scene-renderers/pbl-renderer';
++import { TextbookPlay } from '../scene-renderers/textbook-play';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
+ interface SceneRendererProps {
+   readonly scene: Scene;
+@@ -18,7 +20,11 @@
+  * path, so it does not branch on `mode === 'edit'`.
+  */
+ export function SceneRenderer({ scene, mode }: SceneRendererProps) {
++  const studentMode = useMiraStudentRuntime();
+   const renderer = useMemo(() => {
++    if (studentMode && scene.miraActivity?.id === 'tiandiren-native-v1') {
++      return <TextbookPlay key={scene.id} section={scene.miraActivity.section} sceneId={scene.id} />;
++    }
+     switch (scene.type) {
+       case 'slide':
+         if (scene.content.type !== 'slide') return <div>Invalid slide content</div>;
+@@ -42,7 +48,7 @@
+       default:
+         return <div>Unknown scene type</div>;
+     }
+-  }, [scene, mode]);
++  }, [scene, mode, studentMode]);
+ 
+   return <div className="w-full h-full">{renderer}</div>;
+ }
+diff --git a/lib/types/stage.ts b/lib/types/stage.ts
+--- a/lib/types/stage.ts
++++ b/lib/types/stage.ts
+@@ -97,6 +97,8 @@
+  * all four kinds).
+  */
+ export type AppScene = DslScene<Action, SceneContent> & {
++  /** Server-bound native activities for reviewed Mira textbook releases. */
++  miraActivity?: { id: 'tiandiren-native-v1'; section: 'games' | 'challenge' };
+   /**
+    * Stable id of the generation outline this scene was built from. Lets editor
+    * agent tools resolve a scene's outline by identity instead of by the mutable
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -315,6 +315,13 @@
+     }, [selectedAgentIds]);
+ 
+     const engineRef = useRef<PlaybackEngine | null>(null);
++    useEffect(() => {
++      // Native textbook cues share the classroom sound channel with the lecture.
++      // Pause narration on an explicit listen gesture; discussion remains available.
++      const pauseForActivity = () => engineRef.current?.pause();
++      window.addEventListener('mira:textbook-play-audio', pauseForActivity);
++      return () => window.removeEventListener('mira:textbook-play-audio', pauseForActivity);
++    }, []);
+     const audioPlayerRef = useRef(createAudioPlayer());
+     const chatAreaRef = useRef<ChatAreaRef>(null);
+     const lectureSessionIdRef = useRef<string | null>(null);
+diff --git a/components/scene-renderers/textbook-play.tsx b/components/scene-renderers/textbook-play.tsx
+new file mode 100644
+--- /dev/null
++++ b/components/scene-renderers/textbook-play.tsx
+@@ -0,0 +1,502 @@
++'use client';
++
++import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react';
++import { ArrowRight, Check, Hand, Lightbulb, Mic, RotateCcw, Star, Volume2 } from 'lucide-react';
++import { useStageStore } from '@/lib/store';
++import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
++import styles from './textbook-play.module.css';
++
++type Section = 'games' | 'challenge';
++type View = {
++  phase: 'hunt' | 'roles' | 'quiz' | 'repair' | 'transfer' | 'done';
++  index: number;
++  total?: number;
++  done: boolean;
++  replaying: boolean;
++  prompt?: string;
++  word?: string;
++  speaker?: string;
++  options?: { value: string; label: string }[];
++  audio?: string[];
++  hintAudio?: string[];
++  hintUsed: boolean;
++  adultHelp: boolean;
++  hint?: string;
++  feedback?: { correct: boolean; canNext: boolean; explanation: string };
++};
++type Snapshot = {
++  ok: true;
++  activityId: string;
++  version: number;
++  image: string;
++  games: View;
++  challenge: View;
++  evidence: {
++    answered: number;
++    independent: number;
++    hints: number;
++    adultHelp: number;
++    transferAnswered: number;
++    transferIndependent: number;
++    practiceSkills: string[];
++  };
++};
++const zones = [
++  { id: 'sky', name: '天空', x: 1, y: 1, w: 98, h: 23 },
++  { id: 'earth', name: '地面', x: 1, y: 87, w: 98, h: 12 },
++  { id: 'coral', name: '红衣女孩', x: 30, y: 29, w: 14, h: 57 },
++  { id: 'teal', name: '蓝衣男孩', x: 47, y: 25, w: 14, h: 61 },
++  { id: 'yellow', name: '黄衣男孩', x: 71, y: 35, w: 14, h: 47 },
++];
++const titles: Record<View['phase'], string> = {
++  hunt: '字宝宝，回家啦',
++  roles: '换个人来说',
++  quiz: '自己试一试',
++  repair: '再认一认',
++  transfer: '换种玩法，找一找',
++  done: '这一关完成啦',
++};
++
++/** A real OpenMAIC scene. The Python classroom owns questions, grading and resume. */
++export function TextbookPlay({ section, sceneId }: { section: Section; sceneId: string }) {
++  const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
++  const [busy, setBusy] = useState(false);
++  const [error, setError] = useState('');
++  const [soundError, setSoundError] = useState('');
++  const [playing, setPlaying] = useState(false);
++  const [chosen, setChosen] = useState('');
++  const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
++  const picture = useRef<HTMLDivElement>(null);
++  const surface = useRef<HTMLElement>(null);
++  const dragOrigin = useRef<{ x: number; y: number } | null>(null);
++  const player = useRef<HTMLAudioElement | null>(null);
++  const soundRun = useRef(0);
++  const alive = useRef(true);
++  const inFlight = useRef(false);
++  const events = useMiraStudentRuntimeEvents();
++  const view = snapshot?.[section];
++  useEffect(() => {
++    surface.current?.scrollTo({ top: 0, behavior: 'instant' });
++  }, [view?.phase, view?.index]);
++
++  const silence = useCallback(() => {
++    soundRun.current += 1;
++    if (player.current) {
++      player.current.pause();
++      player.current.removeAttribute('src');
++    }
++    player.current = null;
++    if (alive.current) setPlaying(false);
++  }, []);
++
++  const load = useCallback(async (signal?: AbortSignal) => {
++    const response = await fetch('/mira/textbook-play', { cache: 'no-store', signal });
++    const payload = await response.json();
++    if (!response.ok || !payload.ok)
++      throw new Error(payload.message || '互动还没有打开，请再试一次。');
++    if (alive.current) setSnapshot(payload);
++  }, []);
++
++  useEffect(() => {
++    alive.current = true;
++    const controller = new AbortController();
++    void load(controller.signal).catch((caught: unknown) => {
++      if (!controller.signal.aborted)
++        setError(caught instanceof Error ? caught.message : '请重新打开互动');
++    });
++    const hidden = () => {
++      if (document.hidden) silence();
++    };
++    document.addEventListener('visibilitychange', hidden);
++    return () => {
++      alive.current = false;
++      controller.abort();
++      silence();
++      document.removeEventListener('visibilitychange', hidden);
++    };
++  }, [load, silence]);
++
++  function listen(urls = view?.audio || []) {
++    silence();
++    setSoundError('');
++    window.dispatchEvent(new Event('mira:textbook-play-audio'));
++    const run = soundRun.current;
++    const queue = [...urls];
++    const next = () => {
++      if (!alive.current || run !== soundRun.current) return;
++      const src = queue.shift();
++      if (!src) {
++        setPlaying(false);
++        return;
++      }
++      if (
++        !/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(wav|mp3|ogg)$/.test(src)
++      )
++        return;
++      const audio = new Audio(src);
++      player.current = audio;
++      const fail = () => {
++        if (alive.current && run === soundRun.current) {
++          setPlaying(false);
++          setSoundError('声音暂时没放出来，点喇叭再听一次。');
++        }
++      };
++      audio.onended = next;
++      audio.onerror = fail;
++      setPlaying(true);
++      void audio.play().catch(fail);
++    };
++    next();
++  }
++
++  async function act(action: string, choice?: string) {
++    if (!snapshot || inFlight.current) return;
++    inFlight.current = true;
++    setBusy(true);
++    setError('');
++    silence();
++    try {
++      const response = await fetch('/mira/textbook-play', {
++        method: 'POST',
++        headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({
++          section,
++          version: snapshot.version,
++          action,
++          ...(choice ? { choice } : {}),
++        }),
++      });
++      const payload = await response.json();
++      if (!response.ok || !payload.ok) {
++        if (response.status === 409) await load();
++        throw new Error(payload.message || '这一步还没有保存，请重试。');
++      }
++      if (!alive.current) return;
++      setSnapshot(payload);
++      setChosen('');
++      if (action === 'hint') listen(payload[section].hintAudio);
++      if (payload.challenge.done && events) {
++        const scenes = [...useStageStore.getState().scenes].sort((a, b) => a.order - b.order);
++        const last = scenes.at(-1);
++        if (last)
++          await events.completeWhenReady({ sceneId: last.id, sceneIndex: scenes.length - 1 });
++      }
++    } catch (caught) {
++      // A disconnected response can still have committed. Re-read; never blindly repeat a score.
++      if (alive.current) {
++        await load().catch(() => undefined);
++        setError(caught instanceof Error ? caught.message : '连接断开了，恢复后点“重新连接”。');
++      }
++    } finally {
++      inFlight.current = false;
++      if (alive.current) setBusy(false);
++    }
++  }
++
++  function nextScene() {
++    silence();
++    const store = useStageStore.getState();
++    const scenes = [...store.scenes].sort((a, b) => a.order - b.order);
++    const index = scenes.findIndex((s) => s.id === sceneId);
++    if (scenes[index + 1]) store.setCurrentSceneId(scenes[index + 1].id);
++  }
++
++  function drop(event: PointerEvent<HTMLButtonElement>) {
++    const origin = dragOrigin.current;
++    dragOrigin.current = null;
++    setDrag(null);
++    if (!origin || Math.hypot(event.clientX - origin.x, event.clientY - origin.y) < 8) return;
++    const bounds = picture.current?.getBoundingClientRect();
++    if (!bounds) return;
++    const x = ((event.clientX - bounds.left) / bounds.width) * 100;
++    const y = ((event.clientY - bounds.top) / bounds.height) * 100;
++    const target = zones.find((z) => x >= z.x && x <= z.x + z.w && y >= z.y && y <= z.y + z.h);
++    if (target) void act('answer', target.id);
++  }
++
++  const frozen = busy || Boolean(view?.feedback?.canNext);
++  return (
++    <section
++      ref={surface}
++      className={styles.root}
++      aria-label={section === 'games' ? '天地人互动花园' : '天地人自主练习'}
++    >
++      {!view || !snapshot ? (
++        <div className={styles.loading} role="status">
++          {error || '正在打开字宝宝花园…'}
++          {error && (
++            <button
++              className={styles.primary}
++              onClick={() => void load().catch(() => setError('请重新进入课堂'))}
++            >
++              重新连接
++            </button>
++          )}
++        </div>
++      ) : (
++        <>
++          <header className={styles.header}>
++            <div>
++              <p>
++                {section === 'games' ? '动手玩 · 认汉字' : '我会自己学'}
++                {view.replaying ? ' · 再玩一次' : ''}
++              </p>
++              <h2>{titles[view.phase]}</h2>
++            </div>
++            {!view.done && (
++              <div
++                className={styles.progress}
++                aria-label={`第 ${view.index + 1} 题，共 ${view.total} 题`}
++              >
++                {Array.from({ length: view.total || 0 }, (_, index) => (
++                  <span
++                    key={index}
++                    data-done={index < view.index}
++                    data-current={index === view.index}
++                  />
++                ))}
++                <b>
++                  {view.index + 1} / {view.total}
++                </b>
++              </div>
++            )}
++          </header>
++          {view.done ? (
++            <div className={styles.done}>
++              <div className={styles.badge}>
++                <Star size={44} aria-hidden />
++              </div>
++              <h3>
++                {section === 'games' ? '找到字宝宝，也会换角色啦！' : '你认真想，也动手试了！'}
++              </h3>
++              {section === 'challenge' && (
++                <>
++                  <p>
++                    第一次自己答对 <strong>{snapshot.evidence.independent} / 6</strong> 题
++                  </p>
++                  <p>
++                    换种玩法，独立找到 <strong>{snapshot.evidence.transferIndependent} / 6</strong>{' '}
++                    题
++                  </p>
++                  <details className={styles.evidence}>
++                    <summary>给家长的学习记录</summary>
++                    <p>
++                      选择题提示 {snapshot.evidence.hints} 题，大人帮助{' '}
++                      {snapshot.evidence.adultHelp} 题。
++                    </p>
++                    <p>
++                      {snapshot.evidence.practiceSkills.length
++                        ? `课内已安排再练：${snapshot.evidence.practiceSkills.join('、')}。`
++                        : '本次选择题均独立答对。'}
++                    </p>
++                    <p>这是看图和选择练习记录，尚未评价朗读、书写或长期掌握。</p>
++                  </details>
++                </>
++              )}
++              <div className={styles.actions}>
++                {section === 'games' && (
++                  <button
++                    disabled={busy}
++                    onClick={() => void act('replay')}
++                    className={styles.secondary}
++                  >
++                    <RotateCcw size={19} />
++                    再玩一次
++                  </button>
++                )}
++                <button onClick={nextScene} className={styles.primary}>
++                  继续上课
++                  <ArrowRight size={20} />
++                </button>
++              </div>
++            </div>
++          ) : (
++            <div className={styles.playArea}>
++              <div
++                ref={picture}
++                className={styles.picture}
++                data-success={view.feedback?.correct || undefined}
++              >
++                {/* Native authored lesson media is authorized by the classroom gateway. */}
++                <img
++                  src={snapshot.image}
++                  alt="花园里，红衣女孩和蓝衣男孩面对面，黄衣男孩在旁边挥手。上方是天空，脚下是小路。"
++                  draggable={false}
++                />
++                {!view.options &&
++                  zones
++                    .filter((z) => !view.speaker || !['sky', 'earth'].includes(z.id))
++                    .map((zone) => (
++                      <button
++                        key={zone.id}
++                        type="button"
++                        className={styles.zone}
++                        aria-label={`选择${zone.name}`}
++                        disabled={frozen}
++                        style={{
++                          left: `${zone.x}%`,
++                          top: `${zone.y}%`,
++                          width: `${zone.w}%`,
++                          height: `${zone.h}%`,
++                        }}
++                        onClick={() => void act('answer', zone.id)}
++                      >
++                        {view.speaker === zone.id && (
++                          <span className={styles.speaker}>
++                            <Mic size={18} aria-hidden />
++                            我在说
++                          </span>
++                        )}
++                      </button>
++                    ))}
++                {view.feedback?.correct && (
++                  <div className={styles.found} aria-hidden>
++                    <Check size={32} />
++                    找到了
++                  </div>
++                )}
++              </div>
++              <div className={styles.task}>
++                {view.speaker && (
++                  <p className={styles.context}>
++                    {view.speaker === 'teal' ? '蓝衣男孩' : '红衣女孩'}在说话，和
++                    {view.speaker === 'teal' ? '红衣女孩' : '蓝衣男孩'}聊天。
++                  </p>
++                )}
++                <h3>{view.prompt}</h3>
++                <button
++                  className={styles.listen}
++                  disabled={busy}
++                  onClick={() => (playing ? silence() : listen())}
++                >
++                  <Volume2 size={21} />
++                  {playing ? '暂停声音' : '听一听'}
++                </button>
++                {view.options ? (
++                  <div className={styles.options} role="radiogroup" aria-label="选择一个字">
++                    {view.options.map((option) => (
++                      <button
++                        key={option.value}
++                        role="radio"
++                        aria-checked={chosen === option.value}
++                        disabled={frozen}
++                        onClick={() => setChosen(option.value)}
++                      >
++                        {option.label}
++                      </button>
++                    ))}
++                  </div>
++                ) : (
++                  <div className={styles.wordTray}>
++                    <button
++                      className={styles.word}
++                      aria-label={`拖动${view.word}字，也可以直接点图`}
++                      disabled={frozen}
++                      onPointerDown={(event) => {
++                        dragOrigin.current = { x: event.clientX, y: event.clientY };
++                        event.currentTarget.setPointerCapture(event.pointerId);
++                      }}
++                      onPointerMove={(event) => {
++                        if (dragOrigin.current) setDrag({ x: event.clientX, y: event.clientY });
++                      }}
++                      onPointerUp={drop}
++                      onPointerCancel={() => {
++                        dragOrigin.current = null;
++                        setDrag(null);
++                      }}
++                    >
++                      {view.word}
++                    </button>
++                    <p>拖到图里，或直接点图</p>
++                  </div>
++                )}
++                <div className={styles.help}>
++                  <button disabled={frozen || view.hintUsed} onClick={() => void act('hint')}>
++                    <Lightbulb size={19} />
++                    给我提示
++                  </button>
++                  <button disabled={frozen || view.adultHelp} onClick={() => void act('adult')}>
++                    <Hand size={18} />
++                    请大人帮了忙
++                  </button>
++                </div>
++                {view.hint && (
++                  <p className={styles.hint} role="status">
++                    {view.hint}
++                  </p>
++                )}
++                {view.adultHelp && <p className={styles.hint}>已记为一起完成，慢慢来。</p>}
++                {view.feedback && (
++                  <div
++                    className={styles.feedback}
++                    data-correct={view.feedback.correct}
++                    role="status"
++                  >
++                    <strong>
++                      {view.feedback.correct
++                        ? '找到了！'
++                        : view.feedback.canNext
++                          ? '再听一遍讲解，我们继续试。'
++                          : '再看看，换个地方试一试。'}
++                    </strong>
++                    <p>{view.feedback.explanation}</p>
++                    {!!view.hintAudio?.length && (
++                      <button onClick={() => listen(view.hintAudio)}>
++                        <Volume2 size={18} />
++                        听讲解
++                      </button>
++                    )}
++                  </div>
++                )}
++                {view.feedback?.canNext ? (
++                  <button
++                    className={styles.primary}
++                    disabled={busy}
++                    onClick={() => void act('next')}
++                  >
++                    下一步
++                    <ArrowRight size={20} />
++                  </button>
++                ) : (
++                  view.options && (
++                    <button
++                      className={styles.primary}
++                      disabled={busy || !chosen}
++                      onClick={() => void act('answer', chosen)}
++                    >
++                      选好了
++                      <Check size={20} />
++                    </button>
++                  )
++                )}
++              </div>
++            </div>
++          )}
++          {drag && (
++            <div className={styles.dragWord} style={{ left: drag.x, top: drag.y }} aria-hidden>
++              {view.word}
++            </div>
++          )}
++          <footer className={styles.footer}>
++            <p role="status">{busy ? '正在保存…' : '学到哪里，课堂都会记住'}</p>
++            {soundError && <p role="status">{soundError}</p>}
++            {error && (
++              <p role="alert">
++                {error}
++                <button
++                  onClick={() =>
++                    void load()
++                      .then(() => setError(''))
++                      .catch(() => setError('连接还未恢复，请稍后重试'))
++                  }
++                >
++                  重新连接
++                </button>
++              </p>
++            )}
++          </footer>
++        </>
++      )}
++    </section>
++  );
++}
+diff --git a/components/scene-renderers/textbook-play.module.css b/components/scene-renderers/textbook-play.module.css
+new file mode 100644
+--- /dev/null
++++ b/components/scene-renderers/textbook-play.module.css
+@@ -0,0 +1,428 @@
++.root {
++  height: 100%;
++  overflow: auto;
++  background: #fbf7ed;
++  color: #344b40;
++  font-family: inherit;
++  container-type: inline-size;
++  padding: clamp(12px, 2.4%, 28px);
++}
++.root button {
++  cursor: pointer;
++  touch-action: manipulation;
++  font: inherit;
++  transition:
++    background 0.18s,
++    transform 0.18s;
++}
++.root button:disabled {
++  cursor: default;
++  opacity: 0.55;
++}
++.root button:focus-visible,
++.root summary:focus-visible {
++  outline: 3px solid #28664d;
++  outline-offset: 4px;
++}
++.header {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  gap: 16px;
++  margin-bottom: 18px;
++}
++.header p {
++  font-size: 13px;
++  color: #68776b;
++  margin: 0 0 4px;
++}
++.header h2 {
++  font-size: clamp(22px, 3cqw, 32px);
++  font-weight: 700;
++  margin: 0;
++}
++.progress {
++  display: flex;
++  align-items: center;
++  gap: 5px;
++}
++.progress span {
++  width: 10px;
++  height: 10px;
++  background: #e5ddc9;
++  border-radius: 50%;
++}
++.progress span[data-done='true'] {
++  background: #558461;
++}
++.progress span[data-current='true'] {
++  background: #e4b451;
++  box-shadow: 0 0 0 3px #f4e8c8;
++}
++.progress b {
++  margin-left: 7px;
++  white-space: nowrap;
++  font-size: 15px;
++}
++.playArea {
++  display: grid;
++  grid-template-columns: minmax(0, 1.75fr) minmax(245px, 1fr);
++  gap: 24px;
++  align-items: start;
++}
++.picture {
++  position: relative;
++  aspect-ratio: 2/1;
++  border-radius: 24px;
++  overflow: hidden;
++  border: 3px solid #e9dfc9;
++  align-self: center;
++  background: #e1ecdc;
++}
++.picture img {
++  display: block;
++  width: 100%;
++  height: 100%;
++  object-fit: contain;
++  user-select: none;
++}
++.picture[data-success] {
++  border-color: #75a37e;
++}
++.zone {
++  position: absolute;
++  border: 2px solid transparent;
++  border-radius: 16px;
++  background: transparent;
++  min-width: 30px;
++  min-height: 30px;
++}
++.zone:hover:not(:disabled) {
++  background: #fff6cc44;
++  border-color: #c9983c;
++}
++.zone:focus-visible {
++  outline-offset: -4px !important;
++  background: #fff6cc44;
++}
++.speaker {
++  position: absolute;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  gap: 3px;
++  top: 2px;
++  left: 50%;
++  transform: translate(-50%, -70%);
++  background: #f6c861;
++  color: #463918;
++  box-shadow: 0 2px 8px #4e543129;
++  border-radius: 18px;
++  padding: 5px 8px;
++  font-size: 13px;
++  font-weight: 700;
++  white-space: nowrap;
++  pointer-events: none;
++}
++.found {
++  position: absolute;
++  left: 50%;
++  top: 50%;
++  transform: translate(-50%, -50%);
++  display: flex;
++  gap: 8px;
++  align-items: center;
++  border: 2px solid #fff;
++  background: #f7fbebf2;
++  color: #2b6b45;
++  border-radius: 30px;
++  padding: 8px 18px;
++  pointer-events: none;
++  animation: appear 0.25s ease-out;
++  font-weight: 700;
++}
++.task {
++  display: flex;
++  flex-direction: column;
++  align-items: flex-start;
++  gap: 12px;
++}
++.task h3 {
++  font-size: clamp(20px, 2.6cqw, 28px);
++  font-weight: 700;
++  line-height: 1.45;
++  margin: 0;
++}
++.context {
++  font-size: 15px;
++  line-height: 1.6;
++  margin: 0;
++  color: #667457;
++}
++.listen,
++.secondary {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  gap: 8px;
++  min-height: 48px;
++  border-radius: 24px;
++  padding: 10px 18px;
++  background: #f5e7bd;
++  border: 1px solid #e8d391;
++}
++.listen:hover {
++  background: #eddaa3;
++}
++.wordTray {
++  display: flex;
++  align-items: center;
++  gap: 12px;
++}
++.wordTray p {
++  font-size: 14px;
++  color: #758170;
++  margin: 0;
++  max-width: 85px;
++}
++.word {
++  display: grid;
++  place-items: center;
++  width: 84px;
++  height: 84px;
++  font-size: 52px !important;
++  font-family: serif !important;
++  background: #fffef6;
++  border: 2px solid #cdbb8d;
++  border-bottom-width: 6px;
++  border-radius: 18px;
++  touch-action: none !important;
++  user-select: none;
++}
++.word:not(:disabled):hover {
++  transform: translateY(-2px);
++}
++.options {
++  display: flex;
++  gap: 10px;
++  width: 100%;
++}
++.options button {
++  min-width: 60px;
++  min-height: 76px;
++  flex: 1;
++  border: 2px solid #e2d6b9;
++  background: #fffdf5;
++  border-radius: 16px;
++  font-size: 40px;
++}
++.options button[aria-checked='true'] {
++  border-color: #528261;
++  background: #e6f0df;
++  box-shadow: 0 3px 0 #528261;
++}
++.help {
++  display: flex;
++  gap: 7px;
++  flex-wrap: wrap;
++}
++.help button,
++.feedback button {
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++  min-height: 48px;
++  padding: 8px 10px;
++  font-size: 14px;
++  background: #f2eddf;
++  border: 1px solid #e3dac6;
++  border-radius: 12px;
++}
++.hint {
++  margin: 0;
++  font-size: 15px;
++  line-height: 1.6;
++  padding: 10px 12px;
++  background: #fff1c8;
++  border-radius: 12px;
++}
++.feedback {
++  width: 100%;
++  border-left: 4px solid #d3ac65;
++  padding: 10px 13px;
++  background: #f5edd9;
++  border-radius: 4px 12px 12px 4px;
++  animation: appear 0.2s ease-out;
++}
++.feedback[data-correct='true'] {
++  border-color: #74a077;
++  background: #edf3e5;
++}
++.feedback p {
++  font-size: 15px;
++  line-height: 1.6;
++  margin: 4px 0;
++}
++.primary {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  gap: 12px;
++  min-height: 52px;
++  background: #496d51;
++  color: #fff;
++  border: 0;
++  border-radius: 26px;
++  padding: 12px 25px;
++  font-weight: 600 !important;
++}
++.primary:hover:not(:disabled) {
++  background: #365b3e;
++}
++.footer {
++  font-size: 13px;
++  color: #697467;
++  margin-top: 18px;
++  display: flex;
++  flex-wrap: wrap;
++  justify-content: space-between;
++  gap: 10px;
++}
++.footer p {
++  margin: 0;
++}
++.footer [role='alert'] {
++  color: #964a34;
++}
++.footer button {
++  min-height: 48px;
++  text-decoration: underline;
++  margin-left: 10px;
++}
++.loading {
++  display: flex;
++  min-height: 260px;
++  align-items: center;
++  justify-content: center;
++  gap: 20px;
++}
++.done {
++  display: flex;
++  align-items: center;
++  flex-direction: column;
++  text-align: center;
++  gap: 12px;
++  padding: 18px 10px;
++}
++.done h3 {
++  font-size: 26px;
++  font-weight: 700;
++  margin: 4px 0;
++}
++.done p {
++  margin: 0;
++  line-height: 1.65;
++}
++.badge {
++  display: grid;
++  place-items: center;
++  width: 86px;
++  height: 86px;
++  background: #f5d887;
++  border: 6px solid #f9e9b9;
++  border-radius: 50%;
++  color: #8b6726;
++}
++.actions {
++  display: flex;
++  flex-wrap: wrap;
++  justify-content: center;
++  gap: 12px;
++  margin-top: 8px;
++}
++.evidence {
++  text-align: left;
++  max-width: 480px;
++  padding: 8px 15px;
++  background: #f3eddf;
++  border-radius: 14px;
++  font-size: 14px;
++}
++.evidence summary {
++  min-height: 48px;
++  display: flex;
++  align-items: center;
++  cursor: pointer;
++  font-weight: 600;
++}
++.evidence p {
++  margin: 5px 0;
++}
++.dragWord {
++  position: fixed;
++  z-index: 10000;
++  transform: translate(-50%, -50%);
++  pointer-events: none;
++  display: grid;
++  place-items: center;
++  width: 70px;
++  height: 70px;
++  background: #fff8db;
++  color: #344b40;
++  border: 2px solid #d4b469;
++  border-radius: 16px;
++  font-size: 44px;
++  box-shadow: 0 8px 20px #44543c30;
++}
++@keyframes appear {
++  from {
++    opacity: 0;
++  }
++  to {
++    opacity: 1;
++  }
++}
++@container (max-width:700px) {
++  .playArea {
++    grid-template-columns: 1fr;
++    gap: 18px;
++  }
++  .task {
++    align-items: stretch;
++  }
++  .task h3 {
++    text-align: center;
++  }
++  .task .listen {
++    align-self: center;
++  }
++  .wordTray {
++    justify-content: center;
++  }
++  .help {
++    justify-content: center;
++  }
++  .picture {
++    border-radius: 18px;
++  }
++  .speaker {
++    font-size: 11px;
++    padding: 3px 5px;
++  }
++  .progress span {
++    width: 7px;
++    height: 7px;
++  }
++  .header {
++    gap: 10px;
++  }
++  .done h3 {
++    font-size: 22px;
++  }
++}
++@media (prefers-reduced-motion: reduce) {
++  .root * {
++    animation: none !important;
++    transition: none !important;
++  }
++}

@@ -11,7 +11,7 @@ import wave
 from unittest.mock import Mock
 
 from content.textbook_catalog import generation_brief
-from content.textbook_preview import preview_input
+from content.textbook_preview import preview_checks, preview_input, preview_media
 from core.errors import ApiError
 from repositories.textbook_repository import TextbookRepository
 from services.textbook_learning_service import TextbookLearningService
@@ -19,6 +19,15 @@ from services.textbook_preview_service import TextbookPreviewService
 from services.textbook_preview_audio import narrate_preview
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
 from tests.test_textbook_learning import IsolatedDatabase
+
+
+def scene_content(kind):
+    reference = preview_media()["assets"][0]["mediaPath"]
+    if kind == "quiz":
+        return {"questions": [{}] * 6}
+    if kind == "interactive":
+        return {"html": f'<img src="{reference}" />'}
+    return {"canvas": {"elements": [{"type": "image", "src": reference}]}}
 
 
 class TextbookPreviewTest(unittest.TestCase):
@@ -60,7 +69,7 @@ class TextbookPreviewTest(unittest.TestCase):
         self.service.start(key)
         self.job.status, self.job.classroom_id = "succeeded", "class-a"
         scenes = [{"id": f"scene-{i}", "type": t, "actions": [{"type": "speech", "text": "天", "audioId": str(i), "audioUrl": "/audio/a.wav"}],
-                   "content": {"questions": [{}] * 6} if t == "quiz" else {}}
+                   "content": scene_content(t)}
                   for i, t in enumerate(["slide"] * 5 + ["interactive", "quiz", "slide"])]
         documents = {"class-a": {"id": "class-a", "stage": {"id": "class-a"}, "scenes": scenes}}
         def read(classroom_id):
@@ -105,7 +114,7 @@ class TextbookPreviewTest(unittest.TestCase):
         self.service.start(key)
         self.job.status, self.job.classroom_id = "succeeded", "class-a"
         scenes = [{"type": t, "actions": [{"type": "speech", "text": "天", "audioId": str(i), "audioUrl": "/audio/a.wav"}],
-                   "content": {"questions": [{}] * 6} if t == "quiz" else {}}
+                   "content": scene_content(t)}
                   for i, t in enumerate(["slide"] * 5 + ["interactive", "quiz", "slide"])]
         self.runtime.get_classroom.return_value = {"id": "class-a", "stage": {"id": "class-a"}, "scenes": scenes}
         ready = self.service.poll(key)
@@ -125,6 +134,16 @@ class TextbookPreviewTest(unittest.TestCase):
         self.runtime.base_url = "http://127.0.0.1:4100"
         with self.assertRaises(ApiError):
             self.service.start(key)
+
+    def test_text_only_or_placeholder_images_cannot_pass_picture_lesson_review(self):
+        scenes = [{"type": t, "actions": [{"type": "speech", "text": "天", "audioId": str(i), "audioUrl": "/audio/a.wav"}],
+                   "content": scene_content(t)} for i, t in enumerate(["slide"] * 5 + ["interactive", "quiz", "slide"])]
+        self.assertEqual(preview_checks({"scenes": scenes}, media_manifest=preview_media())["issues"], [])
+        scenes[0]["content"]["canvas"]["elements"][0]["src"] = "generated_image_placeholder"
+        scenes[5]["content"] = {"html": "<p>请看插画</p>"}
+        issues = preview_checks({"scenes": scenes}, media_manifest=preview_media())["issues"]
+        self.assertIn("original_teaching_image_missing", issues)
+        self.assertIn("interactive_teaching_image_missing", issues)
 
     def test_durable_segment_audio_reuses_receipts_and_stops_ambiguous_attempt(self):
         key = self.prepare()

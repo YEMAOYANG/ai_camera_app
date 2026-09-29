@@ -1,0 +1,44 @@
+{
+  "sourceClassroomId": "xcvXBEeKlr",
+  "sourceSha256": "3ef248cc0760713cd5d6787754bb67a9b7ba59d0d2663fc69fa462025ee08a66",
+  "notes": [
+    "补上第四页缺失的原创插画",
+    "修复超出画布的图片与过小目标字",
+    "去掉内部读音标记、长段文字和误导性称呼绑定",
+    "修复模型生成互动的任何选项都判对问题",
+    "增加独立角色切换、错选重试、正确后前进与预合成听题",
+    "六题替换为唯一答案的简短情境并保留原生quiz"
+  ],
+  "speechCorrections": {
+    "action_n-PO9SgE": "图里的小朋友站在土路上。再看看你自己的脚下，也有地面。",
+    "action_MEoguc1W": "来，指一指地面，跟我读：地。地面的地。",
+    "action_JLPJil6-": "看看图里的三位小朋友。再看看你身边，有哪些人？",
+    "action_nY9nu93X": "左边是红衣女孩。她是一个人。",
+    "action_3wxdFDHt": "中间的蓝衣男孩，把手放在胸前。他也是人。",
+    "action_DVuuxQSo": "右边黄衣男孩在挥手。他也是人。",
+    "action_uGafG4BM": "先来看这幅画。现在，蓝衣男孩正在对红衣女孩说话。",
+    "action_Ym-sYsq_": "他说到自己，用我。谁正在说话，谁就用我来称呼自己。跟着读：我。",
+    "action_NxFIJVKR": "他称呼对面的红衣女孩，用你。跟着读：你。",
+    "action_Ajbzw3Kz": "他们谈到旁边的黄衣男孩，用他。跟着读：他。",
+    "action_UxyXLsT_": "换成红衣女孩说话时，女孩用我称呼自己，用你称呼对面的蓝衣男孩。说话人变了，我和你指的人也变了。",
+    "action_iSCoLQxy": "我们来玩指一指。看清楚，谁的身边有金色小喇叭，谁就在说话。",
+    "action_81PLB5qL": "点一下听一听，就能再听到题目。听清楚，再点图里的小朋友。",
+    "action_L7StLYyD": "选错了可以再试。找到了，就点下一个。还可以点换人说话，看看我和你怎么变。",
+    "action_WSyl3ePl": "现在先听一听这几个小提示，再自己动手试一试。",
+    "action_eLH9ukkx": "还有你、我、他。谁在说话，谁就用我说自己；对面说话的人是你，谈到旁边的男孩用他。",
+    "action_wUOHSogM": "来做六个小挑战。每道题都可以点播放器听题，再选一个字。慢慢想，不着急。"
+  },
+  "audioAliases": {
+    "speaker-teal": "review_speaker-teal",
+    "speaker-coral": "review_speaker-coral",
+    "cue-me": "review_cue-me",
+    "cue-you": "review_cue-you",
+    "cue-he": "review_cue-he",
+    "question-1": "review_question-1",
+    "question-2": "review_question-2",
+    "question-3": "review_question-3",
+    "question-4": "review_question-4",
+    "question-5": "review_question-5",
+    "question-6": "review_question-6"
+  }
+}

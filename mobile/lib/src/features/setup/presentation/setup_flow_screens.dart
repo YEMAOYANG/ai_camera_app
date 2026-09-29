@@ -26,6 +26,7 @@ import 'package:warm_sight/src/shared/widgets/app_screen.dart';
 import 'package:warm_sight/src/shared/widgets/app_segmented_control.dart';
 import 'package:warm_sight/src/shared/widgets/app_time_picker_sheet.dart';
 import 'package:warm_sight/src/shared/widgets/app_toast.dart';
+import 'package:warm_sight/src/shared/widgets/child_learning_identity_fields.dart';
 import 'package:warm_sight/src/shared/widgets/guardian_identity_card_selector.dart';
 import 'package:warm_sight/src/shared/widgets/guardian_identity_selector.dart';
 
@@ -1012,9 +1013,10 @@ class ChildProfileSetupScreen extends ConsumerWidget {
         (draft.childStage.trim() == '幼儿园' ? 'kindergarten' : 'primary');
 
     return _LearningIdentitySetupShell(
+      showTextbookHint: activeStageCode == 'primary',
       body: AbsorbPointer(
         absorbing: saving,
-        child: _LearningIdentityTimeline(
+        child: ChildLearningIdentityFields(
           nickname: nickname,
           schoolYearStartYear: schoolYearStartYear,
           activeStageCode: activeStageCode,
@@ -1057,7 +1059,11 @@ class ChildProfileSetupScreen extends ConsumerWidget {
         ),
       ),
       onBack: saving ? null : () => context.go(setupParentIdentityPath),
-      primaryLabel: saving ? '正在保存' : '完成设置',
+      primaryLabel: saving
+          ? '正在保存'
+          : activeStageCode == 'primary'
+          ? '下一步，选择教材'
+          : '完成设置',
       loading: saving,
       onPrimary: nickname.trim().isEmpty || selected == null || saving
           ? null
@@ -1082,7 +1088,11 @@ class ChildProfileSetupScreen extends ConsumerWidget {
                 if (saved && context.mounted) {
                   ref.invalidate(profileSummaryProvider);
                   ref.invalidate(currentChildProvider);
-                  context.go(AppRoute.home.path);
+                  context.go(
+                    selected.isPrimary
+                        ? setupSchoolTextbooksPath
+                        : AppRoute.home.path,
+                  );
                 }
               } finally {
                 if (context.mounted) {
@@ -1236,353 +1246,6 @@ class ChildProfileSetupScreen extends ConsumerWidget {
   }
 }
 
-class _GradeSelectionPanel extends StatelessWidget {
-  const _GradeSelectionPanel({
-    required this.stageCode,
-    required this.selected,
-    required this.enabled,
-    required this.onSelect,
-  });
-
-  final String stageCode;
-  final ChildGradeOption? selected;
-  final bool enabled;
-  final ValueChanged<ChildGradeOption> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    final options = stageCode == 'primary'
-        ? ChildGradeOption.primary
-        : ChildGradeOption.kindergarten;
-    final stageLabel = stageCode == 'primary' ? '小学' : '幼儿园';
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '选择$stageLabel年级',
-          style: const TextStyle(
-            color: AppColors.ink,
-            fontFamily: AppTypography.systemFont,
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            height: 1.25,
-            letterSpacing: 0,
-          ),
-        ),
-        const SizedBox(height: 16),
-        _GradeScale(
-          options: options,
-          selectedCode: selected?.code ?? '',
-          enabled: enabled,
-          onSelect: onSelect,
-        ),
-        const SizedBox(height: 18),
-        _SelectedGradeSummary(selected: selected),
-      ],
-    );
-  }
-}
-
-class _GradeScale extends StatelessWidget {
-  const _GradeScale({
-    required this.options,
-    required this.selectedCode,
-    required this.enabled,
-    required this.onSelect,
-  });
-
-  final List<ChildGradeOption> options;
-  final String selectedCode;
-  final bool enabled;
-  final ValueChanged<ChildGradeOption> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    final isPrimary = options.length == ChildGradeOption.primary.length;
-    final selectedIndex = options.indexWhere(
-      (option) => option.code == selectedCode,
-    );
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (isPrimary && constraints.maxWidth < 264) {
-          return _CompactPrimaryGradeGrid(
-            options: options,
-            selectedCode: selectedCode,
-            enabled: enabled,
-            onSelect: onSelect,
-            captionStyle: _captionStyle,
-          );
-        }
-
-        const circleSize = 44.0;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                const Positioned(
-                  left: circleSize / 2,
-                  right: circleSize / 2,
-                  top: circleSize / 2 - 1,
-                  height: 2,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(color: AppColors.border),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    for (var index = 0; index < options.length; index++)
-                      _GradeOptionButton(
-                        size: circleSize,
-                        circleLabel: isPrimary
-                            ? '${index + 1}'
-                            : options[index].gradeLabel.replaceAll('班', ''),
-                        option: options[index],
-                        selected: selectedCode == options[index].code,
-                        enabled: enabled,
-                        onTap: () => onSelect(options[index]),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 11),
-            if (isPrimary)
-              Row(
-                children: [
-                  Text(
-                    options.first.displayLabel,
-                    style: _captionStyle(selectedCode == options.first.code),
-                  ),
-                  const Spacer(),
-                  if (selectedIndex > 0 && selectedIndex < options.length - 1)
-                    Text(
-                      options[selectedIndex].displayLabel,
-                      style: _captionStyle(true),
-                    ),
-                  const Spacer(),
-                  Text(
-                    options.last.displayLabel,
-                    style: _captionStyle(selectedCode == options.last.code),
-                  ),
-                ],
-              )
-            else
-              Row(
-                children: [
-                  for (var index = 0; index < options.length; index++) ...[
-                    if (index > 0) const Spacer(),
-                    Text(
-                      options[index].displayLabel,
-                      style: _captionStyle(selectedCode == options[index].code),
-                    ),
-                  ],
-                ],
-              ),
-          ],
-        );
-      },
-    );
-  }
-
-  TextStyle _captionStyle(bool selected) {
-    return TextStyle(
-      color: selected ? AppColors.brandDeep : AppColors.muted,
-      fontFamily: AppTypography.systemFont,
-      fontSize: 12,
-      fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-      height: 1.2,
-      letterSpacing: 0,
-    );
-  }
-}
-
-class _CompactPrimaryGradeGrid extends StatelessWidget {
-  const _CompactPrimaryGradeGrid({
-    required this.options,
-    required this.selectedCode,
-    required this.enabled,
-    required this.onSelect,
-    required this.captionStyle,
-  });
-
-  final List<ChildGradeOption> options;
-  final String selectedCode;
-  final bool enabled;
-  final ValueChanged<ChildGradeOption> onSelect;
-  final TextStyle Function(bool selected) captionStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (var rowStart = 0; rowStart < options.length; rowStart += 3) ...[
-          if (rowStart > 0) const SizedBox(height: 14),
-          Row(
-            children: [
-              for (var index = rowStart; index < rowStart + 3; index++) ...[
-                if (index > rowStart) const SizedBox(width: 6),
-                Expanded(
-                  child: Column(
-                    children: [
-                      _GradeOptionButton(
-                        size: 44,
-                        circleLabel: '${index + 1}',
-                        option: options[index],
-                        selected: selectedCode == options[index].code,
-                        enabled: enabled,
-                        onTap: () => onSelect(options[index]),
-                      ),
-                      const SizedBox(height: 7),
-                      Text(
-                        options[index].displayLabel,
-                        maxLines: 1,
-                        overflow: TextOverflow.fade,
-                        softWrap: false,
-                        style: captionStyle(
-                          selectedCode == options[index].code,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _GradeOptionButton extends StatelessWidget {
-  const _GradeOptionButton({
-    required this.size,
-    required this.circleLabel,
-    required this.option,
-    required this.selected,
-    required this.enabled,
-    required this.onTap,
-  });
-
-  final double size;
-  final String circleLabel;
-  final ChildGradeOption option;
-  final bool selected;
-  final bool enabled;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      enabled: enabled,
-      label: '${option.stageLabel}，${option.displayLabel}',
-      child: GestureDetector(
-        key: ValueKey('gradeOption_${option.code}'),
-        behavior: HitTestBehavior.opaque,
-        onTap: enabled ? onTap : null,
-        child: AnimatedContainer(
-          duration: AppMotion.duration(context, 180),
-          curve: Curves.easeOutCubic,
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: selected ? AppColors.brandDeep : AppColors.surfaceElevated,
-            border: Border.all(
-              color: selected ? AppColors.brandDeep : AppColors.border,
-              width: selected ? 1.5 : 1,
-            ),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: AppColors.brand.withValues(alpha: 0.16),
-                      blurRadius: 12,
-                      offset: const Offset(0, 5),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Center(
-            child: Text(
-              circleLabel,
-              style: TextStyle(
-                color: selected ? Colors.white : AppColors.ink,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                height: 1,
-                letterSpacing: 0,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SelectedGradeSummary extends StatelessWidget {
-  const _SelectedGradeSummary({required this.selected});
-
-  final ChildGradeOption? selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasSelection = selected != null;
-    return AnimatedContainer(
-      key: const ValueKey('selectedGradeSummary'),
-      duration: AppMotion.duration(context, 180),
-      width: double.infinity,
-      constraints: const BoxConstraints(minHeight: 78),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: hasSelection
-            ? AppColors.brandWash.withValues(alpha: 0.78)
-            : AppColors.surfaceSoft,
-        borderRadius: BorderRadius.circular(AppRadii.cardMedium),
-        border: Border.all(
-          color: hasSelection
-              ? AppColors.brand.withValues(alpha: 0.12)
-              : AppColors.borderSoft,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            hasSelection ? '当前选择' : '还未选择年级',
-            style: const TextStyle(
-              color: AppColors.muted,
-              fontFamily: AppTypography.systemFont,
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              height: 1.2,
-              letterSpacing: 0,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            selected?.displayLabel ?? '请在上方选择',
-            style: TextStyle(
-              color: hasSelection ? AppColors.brandDeep : AppColors.subtle,
-              fontFamily: AppTypography.systemFont,
-              fontSize: hasSelection ? 26 : 16,
-              fontWeight: FontWeight.w800,
-              height: 1.1,
-              letterSpacing: 0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _LearningIdentitySetupShell extends ConsumerWidget {
   const _LearningIdentitySetupShell({
     required this.body,
@@ -1590,505 +1253,157 @@ class _LearningIdentitySetupShell extends ConsumerWidget {
     required this.onPrimary,
     required this.onBack,
     required this.loading,
+    required this.showTextbookHint,
   });
 
   final Widget body;
   final String primaryLabel;
   final VoidCallback? onPrimary;
   final VoidCallback? onBack;
-  final bool loading;
+  final bool loading, showTextbookHint;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppSystemUi.light(),
       child: Scaffold(
-        backgroundColor: AppColors.appBackgroundWarm,
-        body: Stack(
-          children: [
-            const Positioned.fill(child: _SetupBackground()),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  _SetupTopBar(
-                    step: 2,
-                    onBack: loading ? null : onBack,
-                    onLogout: () => _confirmSetupLogout(context, ref),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior.onDrag,
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '设置孩子的学习身份',
-                            style: TextStyle(
-                              color: AppColors.ink,
-                              fontFamily: AppTypography.systemFont,
-                              fontSize: 28,
-                              fontWeight: FontWeight.w800,
-                              height: 1.12,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            '用于称呼孩子并匹配适龄内容',
-                            style: TextStyle(
-                              color: AppColors.muted,
-                              fontFamily: AppTypography.systemFont,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              height: 1.5,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                          const SizedBox(height: 26),
-                          body,
-                          const SizedBox(height: 24),
-                          const _LearningIdentityNote(),
-                        ],
-                      ),
-                    ),
-                  ),
-                  _SetupActionDock(
-                    bottomInset: bottomInset,
-                    primaryLabel: primaryLabel,
-                    onPrimary: onPrimary,
-                    loading: loading,
-                    showTrailing: false,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LearningIdentityTimeline extends StatelessWidget {
-  const _LearningIdentityTimeline({
-    required this.nickname,
-    required this.schoolYearStartYear,
-    required this.activeStageCode,
-    required this.selected,
-    required this.enabled,
-    required this.onNicknameChanged,
-    required this.onStageChanged,
-    required this.onGradeSelected,
-  });
-
-  final String nickname;
-  final int schoolYearStartYear;
-  final String activeStageCode;
-  final ChildGradeOption? selected;
-  final bool enabled;
-  final ValueChanged<String> onNicknameChanged;
-  final ValueChanged<String> onStageChanged;
-  final ValueChanged<ChildGradeOption> onGradeSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        const Positioned(
-          left: 21,
-          top: 42,
-          bottom: 8,
-          width: 2,
-          child: DecoratedBox(
-            decoration: BoxDecoration(color: AppColors.border),
-          ),
-        ),
-        Column(
-          children: [
-            _LearningIdentityStep(
-              number: '01',
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 28),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        backgroundColor: AppColors.appBackground,
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                child: Row(
                   children: [
-                    const _LearningIdentitySectionTitle('孩子称呼'),
-                    const SizedBox(height: 14),
-                    _LearningIdentityNameField(
-                      value: nickname,
-                      enabled: enabled,
-                      onChanged: onNicknameChanged,
+                    IconButton(
+                      tooltip: '返回家长身份',
+                      onPressed: loading ? null : onBack,
+                      icon: const Icon(Icons.chevron_left, size: 28),
                     ),
-                    const SizedBox(height: 9),
-                    const Text(
-                      '摄像头老师会这样称呼孩子',
-                      style: TextStyle(
-                        color: AppColors.muted,
-                        fontFamily: AppTypography.systemFont,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                        height: 1.35,
-                        letterSpacing: 0,
+                    const Expanded(
+                      child: Text(
+                        '完善孩子资料',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.ink,
+                        ),
                       ),
+                    ),
+                    const Text(
+                      '2 / 2',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.mutedStrong,
+                      ),
+                    ),
+                    PopupMenuButton<String>(
+                      tooltip: '更多操作',
+                      enabled: !loading,
+                      icon: const Icon(
+                        Icons.more_horiz,
+                        size: 21,
+                        color: AppColors.mutedStrong,
+                      ),
+                      onSelected: (_) => _confirmSetupLogout(context, ref),
+                      itemBuilder: (_) => [
+                        const PopupMenuItem(
+                          value: 'logout',
+                          child: Text('退出登录'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-            ),
-            _LearningIdentityStep(
-              number: '02',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _LearningIdentitySectionTitle(
-                    '$schoolYearStartYear 年 9 月开学后',
-                  ),
-                  const SizedBox(height: 15),
-                  _LearningStageControl(
-                    selected: activeStageCode,
-                    enabled: enabled,
-                    onChanged: onStageChanged,
-                  ),
-                  const SizedBox(height: 24),
-                  _GradeSelectionPanel(
-                    stageCode: activeStageCode,
-                    selected: selected?.stageCode == activeStageCode
-                        ? selected
-                        : null,
-                    enabled: enabled,
-                    onSelect: onGradeSelected,
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _LearningIdentityStep extends StatelessWidget {
-  const _LearningIdentityStep({required this.number, required this.child});
-
-  final String number;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 48,
-          child: DecoratedBox(
-            decoration: const BoxDecoration(
-              color: AppColors.brandWash,
-              shape: BoxShape.circle,
-            ),
-            child: SizedBox(
-              width: 44,
-              height: 44,
-              child: Center(
-                child: Text(
-                  number,
-                  style: const TextStyle(
-                    color: AppColors.brandDeep,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 14),
-        Expanded(child: child),
-      ],
-    );
-  }
-}
-
-class _LearningIdentitySectionTitle extends StatelessWidget {
-  const _LearningIdentitySectionTitle(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: AppColors.ink,
-        fontFamily: AppTypography.systemFont,
-        fontSize: 17,
-        fontWeight: FontWeight.w800,
-        height: 1.25,
-        letterSpacing: 0,
-      ),
-    );
-  }
-}
-
-class _LearningIdentityNameField extends StatefulWidget {
-  const _LearningIdentityNameField({
-    required this.value,
-    required this.enabled,
-    required this.onChanged,
-  });
-
-  final String value;
-  final bool enabled;
-  final ValueChanged<String> onChanged;
-
-  @override
-  State<_LearningIdentityNameField> createState() =>
-      _LearningIdentityNameFieldState();
-}
-
-class _LearningIdentityNameFieldState
-    extends State<_LearningIdentityNameField> {
-  late final TextEditingController _controller;
-  late final FocusNode _focusNode;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.value);
-    _focusNode = FocusNode();
-  }
-
-  @override
-  void didUpdateWidget(covariant _LearningIdentityNameField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.value != _controller.text && widget.value != oldWidget.value) {
-      _controller.value = TextEditingValue(
-        text: widget.value,
-        selection: TextSelection.collapsed(offset: widget.value.length),
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  void _clear() {
-    _controller.clear();
-    widget.onChanged('');
-    _focusNode.requestFocus();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Listenable.merge([_controller, _focusNode]),
-      builder: (context, _) {
-        final focused = _focusNode.hasFocus;
-        return AnimatedContainer(
-          key: const ValueKey('setupField_孩子称呼'),
-          duration: AppMotion.duration(context, 160),
-          constraints: const BoxConstraints(minHeight: 54),
-          decoration: BoxDecoration(
-            color: _controller.text.trim().isEmpty
-                ? AppColors.surfaceSoft
-                : AppColors.surfaceElevated,
-            borderRadius: BorderRadius.circular(AppRadii.input),
-            border: Border.all(
-              color: focused ? AppColors.focus : AppColors.border,
-              width: focused ? 1.2 : 1,
-            ),
-          ),
-          child: Row(
-            children: [
               Expanded(
-                child: TextField(
-                  key: const ValueKey('setupInput_孩子称呼'),
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  enabled: widget.enabled,
-                  textInputAction: TextInputAction.done,
-                  inputFormatters: [LengthLimitingTextInputFormatter(12)],
-                  onChanged: widget.onChanged,
-                  style: const TextStyle(
-                    color: AppColors.ink,
-                    fontFamily: AppTypography.systemFont,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
-                    letterSpacing: 0,
-                  ),
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    hintText: '例如：乐乐',
-                    hintStyle: TextStyle(
-                      color: AppColors.subtle,
-                      fontFamily: AppTypography.systemFont,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      height: 1.2,
-                      letterSpacing: 0,
-                    ),
-                    isDense: true,
-                    contentPadding: EdgeInsets.fromLTRB(16, 17, 10, 17),
+                child: SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '孩子的基本信息',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          height: 1.35,
+                          color: AppColors.ink,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        '称呼和年级，以后都能修改。',
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 1.5,
+                          color: AppColors.mutedStrong,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      body,
+                      if (showTextbookHint) ...[
+                        const SizedBox(height: 20),
+                        const Divider(height: 1, color: AppColors.border),
+                        const SizedBox(height: 22),
+                        const Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 3),
+                              child: Icon(
+                                Icons.menu_book_outlined,
+                                size: 24,
+                                color: AppColors.mutedStrong,
+                              ),
+                            ),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '下一步：学校教材',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.4,
+                                      color: AppColors.ink,
+                                    ),
+                                  ),
+                                  SizedBox(height: 6),
+                                  Text(
+                                    '语文、数学、英语与科学，按学校用书选择。\n也可以稍后设置。',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      height: 1.65,
+                                      color: AppColors.mutedStrong,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),
-              if (_controller.text.isNotEmpty)
-                IconButton(
-                  tooltip: '清空孩子称呼',
-                  onPressed: widget.enabled ? _clear : null,
-                  icon: const Icon(Icons.cancel, size: 20),
-                  color: AppColors.subtle,
-                )
-              else
-                const SizedBox(width: 12),
+              _SetupActionDock(
+                bottomInset: MediaQuery.paddingOf(context).bottom,
+                primaryLabel: primaryLabel,
+                onPrimary: onPrimary,
+                loading: loading,
+                showTrailing: false,
+              ),
             ],
           ),
-        );
-      },
-    );
-  }
-}
-
-class _LearningStageControl extends StatelessWidget {
-  const _LearningStageControl({
-    required this.selected,
-    required this.enabled,
-    required this.onChanged,
-  });
-
-  final String selected;
-  final bool enabled;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceStrong,
-        borderRadius: BorderRadius.circular(AppRadii.input),
-        border: Border.all(color: AppColors.borderSoft),
-      ),
-      child: Row(
-        children: [
-          _LearningStageOption(
-            code: 'kindergarten',
-            label: '幼儿园',
-            selected: selected == 'kindergarten',
-            enabled: enabled,
-            onTap: () => onChanged('kindergarten'),
-          ),
-          _LearningStageOption(
-            code: 'primary',
-            label: '小学',
-            selected: selected == 'primary',
-            enabled: enabled,
-            onTap: () => onChanged('primary'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LearningStageOption extends StatelessWidget {
-  const _LearningStageOption({
-    required this.code,
-    required this.label,
-    required this.selected,
-    required this.enabled,
-    required this.onTap,
-  });
-
-  final String code;
-  final String label;
-  final bool selected;
-  final bool enabled;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Semantics(
-        button: true,
-        selected: selected,
-        enabled: enabled,
-        label: label,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: enabled ? onTap : null,
-          child: AnimatedContainer(
-            key: ValueKey('gradeStage_$code'),
-            duration: AppMotion.duration(context, 180),
-            decoration: BoxDecoration(
-              color: selected ? AppColors.brandDeep : Colors.transparent,
-              borderRadius: BorderRadius.circular(AppRadii.control),
-            ),
-            child: Center(
-              child: AnimatedDefaultTextStyle(
-                duration: AppMotion.duration(context, 180),
-                style: TextStyle(
-                  color: selected ? Colors.white : AppColors.ink,
-                  fontFamily: AppTypography.systemFont,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                  letterSpacing: 0,
-                ),
-                child: Text(label),
-              ),
-            ),
-          ),
         ),
       ),
-    );
-  }
-}
-
-class _LearningIdentityNote extends StatelessWidget {
-  const _LearningIdentityNote();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        Divider(height: 1, color: AppColors.borderSoft),
-        SizedBox(height: 15),
-        Row(
-          children: [
-            Icon(Icons.info_outline, color: AppColors.muted, size: 19),
-            SizedBox(width: 9),
-            Text(
-              '称呼和年级可随时修改',
-              style: TextStyle(
-                color: AppColors.muted,
-                fontFamily: AppTypography.systemFont,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                height: 1.3,
-                letterSpacing: 0,
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

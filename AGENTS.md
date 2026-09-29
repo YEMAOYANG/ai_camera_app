@@ -75,6 +75,17 @@ Before backend, device, AI, or Flutter integration changes, output the architect
 - Avoid generic AI UI patterns: card piles, overused blue-purple gradients, decorative glassmorphism, emoji icons, and backend-admin layouts.
 - Keep the app parent-facing: calm, trustworthy, precise, and warm without becoming childish.
 
+## Grade 1–2 Student Learning Rule
+
+For **all grade 1–2 student games, courseware, questions, answer choices and learning navigation**, default to children who cannot independently read instructions. This applies to Student Web, native OpenMAIC activities and generated courseware, across subjects.
+
+- Pictures carry meaning; use a relevant scene and multiple distinguishable picture choices, supported by prerecorded teacher narration. Children must be able to understand and act without reading the prompt, answer labels or a paragraph of instructions.
+- Prefer pointing, tapping pictures, matching and dragging. Text is supplementary. A target character being taught may be large and visible, with picture/voice support; it must not make other instructions dependent on reading.
+- An emoji, a decorative background, pinyin or a speaker button next to otherwise text-only options does **not** satisfy this rule. People must be recognizable from consistent portraits and visible speaking/listening cues, not names alone.
+- Use one task per screen, large touch targets, pictorial feedback and visible replay. Do not expose the correct choice through option styling before the child responds or requests a demonstration.
+- Validate by covering the non-target text: can a child follow the spoken instruction, distinguish the pictures, answer and continue? Report picture-supported comprehension separately from unsupported character-reading ability.
+- Read `docs/learning/low-reading-interaction-rule.md` before changing low-grade learning content. The generation policy is `backend/content/low_reading_policy.v1.json`; native activities must follow it too.
+
 ## Flutter Work
 
 Flutter code lives in `mobile/`. Follow `mobile/AGENTS.md` for all Flutter changes.

@@ -1,8 +1,7 @@
 "use client";
 
 import { Check, Clock3, LoaderCircle, RefreshCw, ScanLine, Smartphone, TriangleAlert } from "lucide-react";
-import { useReducedMotion } from "motion/react";
-import { useRouter } from "next/navigation";
+import { useSchoolbagMotion } from "@/components/schoolbag/schoolbag-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -13,8 +12,7 @@ type QrStatus = "starting" | "waiting" | "expired" | "rejected" | "consumed" | "
 type QrTerminalStatus = Extract<QrStatus, "expired" | "rejected" | "consumed">;
 
 export function QrPairing({ paused = false }: { paused?: boolean }) {
-  const router = useRouter();
-  const reducedMotion = useReducedMotion();
+  const { enterLearning } = useSchoolbagMotion();
   const [challenge, setChallenge] = useState<StudentQrStartResponse | null>(null);
   const [status, setStatus] = useState<QrStatus>("starting");
   const [remainingSeconds, setRemainingSeconds] = useState(0);
@@ -113,11 +111,10 @@ export function QrPairing({ paused = false }: { paused?: boolean }) {
   useEffect(() => {
     if (status !== "success") return;
     const timer = window.setTimeout(() => {
-      router.replace("/today");
-      router.refresh();
-    }, reducedMotion ? 0 : 650);
+      enterLearning();
+    }, 0);
     return () => window.clearTimeout(timer);
-  }, [reducedMotion, router, status]);
+  }, [enterLearning, status]);
 
   return (
     <div className="space-qr mt-6" data-qr-state={status} aria-live="polite">

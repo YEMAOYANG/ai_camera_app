@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "mira.learning.low-reading-policy.v1",
+  "grades": ["primary_1", "primary_2"],
+  "independentReadingRequired": false,
+  "questionPresentation": "meaningful_scene_and_teacher_narration",
+  "answerPresentation": "distinguishable_pictures_with_optional_short_labels",
+  "interactionModes": ["picture_tap", "point", "drag_match", "imitate"],
+  "teacherNarrationRequired": true,
+  "systemSpeechFallbackAllowed": false,
+  "minimumTouchTargetPx": 48,
+  "rules": [
+    "默认一、二年级孩子不能独立读题；多数游戏、课件、问题和答案以多图表达，文字仅作辅助。",
+    "每题必须有真实表达题意的情境图；每个答案有明确且互相可区分的图片，不能依赖文字、拼音、姓名或选项字母完成选择。",
+    "人物在情境和选项中保持同一造型，用说话气泡、朝向和动作表达关系，不依赖孩子读姓名。",
+    "允许显示正在学习的目标汉字，但指令和操作仍须由图片、示范和老师语音支持。",
+    "装饰插图、表情图标和只有语音按钮的纯文字选择题不能通过验收。",
+    "独立识字和图像支持下的理解要分别表述，不能把看图答对等同于已经独立认字。"
+  ]
+}

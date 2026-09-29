@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:warm_sight/src/app/router/app_route.dart';
 import 'package:warm_sight/src/core/config/app_environment.dart';
 import 'package:warm_sight/src/core/network/api_client.dart';
-import 'package:warm_sight/src/features/learning/application/learning_availability_repository.dart';
 import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
 import 'package:warm_sight/src/features/learning/domain/learning_availability_models.dart';
 import 'package:warm_sight/src/features/learning/domain/learning_preparation_models.dart';
@@ -333,7 +332,7 @@ void main() {
           currentLearningPreparationProvider.overrideWith(
             (ref, childId) async => _readyPreparation(childId),
           ),
-          currentLearningAvailabilityProvider.overrideWith(
+          studentAccessAvailabilityProvider.overrideWith(
             (ref, childId) async => _availability(
               hasActiveRelease: false,
               canAccessWorkspace: true,
@@ -390,7 +389,7 @@ void main() {
                 stage: 'queued',
               ),
             ),
-            currentLearningAvailabilityProvider.overrideWith(
+            studentAccessAvailabilityProvider.overrideWith(
               (ref, childId) async => _availability(hasActiveRelease: false),
             ),
           ],
@@ -405,7 +404,7 @@ void main() {
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pumpAndSettle();
-      expect(find.text('请确认已选择开放年级并完成设置'), findsOneWidget);
+      expect(find.text('请确认年级并完成设置'), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('studentLearningSpaceEntry')));
       await tester.pumpAndSettle();
 

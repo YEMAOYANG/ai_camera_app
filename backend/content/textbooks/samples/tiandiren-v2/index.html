@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>天地人 · 字宝宝花园</title>
+    <link rel="stylesheet" href="/lesson.css" />
+    <link rel="icon" type="image/webp" href="/assets/garden" />
+    <script src="/lesson.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="恢复天地人样板进度"
+        >暖瞳<span>字宝宝花园</span></a
+      >
+      <div class="top-tools">
+        <span class="sample-label">样板体验</span>
+        <button id="sound" aria-label="关闭声音" aria-pressed="false"></button>
+        <button id="pause">休息一下</button>
+        <button id="parent">给家长</button>
+      </div>
+    </header>
+    <main id="app" aria-busy="true">
+      <div class="loading">
+        <div class="loading-art"></div>
+        <p>花园正在打开…</p>
+      </div>
+    </main>
+    <div id="connection" class="connection" role="alert" hidden>
+      <span></span><button id="recover">恢复进度</button>
+    </div>
+    <dialog id="pause-dialog" aria-labelledby="pause-title">
+      <h2 id="pause-title">歇一小会儿</h2>
+      <p>已经记住你学到哪里了。</p>
+      <button class="primary" id="resume">接着探险</button>
+      <a class="quiet-link" href="http://localhost:3000/learning">回到书包</a>
+    </dialog>
+    <dialog id="parent-dialog" aria-labelledby="parent-title">
+      <div id="parent-content"></div>
+      <button id="close-parent" class="primary">回到孩子的课件</button>
+    </dialog>
+    <noscript
+      >请启用
+      JavaScript，才能玩互动课件。学习进度保存在本机样板服务中。</noscript
+    >
+  </body>
+</html>

@@ -4,16 +4,15 @@ import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { SpaceShell } from "@/components/student/space-shell";
 import { Button } from "@/components/ui/button";
 import { studentMeResponseSchema, type Student } from "@/lib/contracts/student-session";
-import { StudentDashboard } from "@/features/today/student-dashboard";
 import { ClassroomEntry } from "@/features/classroom/classroom-entry";
 import { LearningCourseDetail } from "@/features/learning/learning-course-detail";
-import { LearningPractice } from "@/features/learning/learning-practice";
-import { LearningLibrary } from "@/features/learning/learning-library";
-import { LearningPath } from "@/features/learning/learning-path";
 import { LearningTextbooks } from "@/features/learning/learning-textbooks";
+import { LearningTextbookClassroom } from "@/features/learning/learning-textbook-classroom";
+import { LearningSchoolbag } from "@/features/learning/learning-schoolbag";
+import { SchoolbagShell } from "@/components/student/schoolbag-shell";
+import type { TextbookLocation } from "@/features/learning/textbook-navigation";
 
 export function StudentSessionGate({
   lessonTaskId,
@@ -21,14 +20,16 @@ export function StudentSessionGate({
   learningView,
   courseId,
   courseVersion,
-  practiceSessionId,
+  textbookLocation,
+  textbookCourseKey,
 }: {
   lessonTaskId?: string;
   classroomMode?: "discover" | "openmaic";
-  learningView?: "library" | "course" | "practice" | "path" | "textbooks";
-  practiceSessionId?: string;
+  learningView?: "library" | "course" | "practice" | "path" | "textbooks" | "schoolbag";
   courseId?: string;
   courseVersion?: string;
+  textbookLocation?: TextbookLocation;
+  textbookCourseKey?: string;
 }) {
   const router = useRouter();
   const [student, setStudent] = useState<Student | null>(null);
@@ -60,15 +61,12 @@ export function StudentSessionGate({
   }, [router]);
 
   if (!lessonTaskId && (error || !student)) {
-    const active = learningView === "practice" ? "practice" : learningView ? "learning" : "today";
     return (
-      <SpaceShell
-        active={active}
-        scenic={active === "today"}
-        className={`space-session-shell${active === "today" ? " space-today" : ""}`}
+      <SchoolbagShell
+        className="space-session-shell"
       >
         <section className="space-session-state" role={error ? "alert" : "status"}>
-          <p className="space-eyebrow">MIRA · 学习空间</p>
+          <p className="space-eyebrow">暖瞳 · 学习空间</p>
           <h1>{error ? "暂时没有连接上" : "正在打开学习空间"}</h1>
           {error ? (
             <>
@@ -83,7 +81,7 @@ export function StudentSessionGate({
             </>
           )}
         </section>
-      </SpaceShell>
+      </SchoolbagShell>
     );
   }
 
@@ -112,15 +110,13 @@ export function StudentSessionGate({
     );
   }
 
+  if (textbookCourseKey) return <LearningTextbookClassroom key={textbookCourseKey} student={student} contentKey={textbookCourseKey} />;
   if (lessonTaskId) {
     return <ClassroomEntry key={`${classroomMode}:${lessonTaskId}`} student={student} taskId={lessonTaskId} mode={classroomMode} />;
   }
   if (learningView === "course" && courseId) {
     return <LearningCourseDetail student={student} courseId={courseId} version={courseVersion} />;
   }
-  if (learningView === "practice") return <LearningPractice student={student} sessionId={practiceSessionId} />;
-  if (learningView === "path") return <LearningPath student={student} />;
-  if (learningView === "textbooks") return <LearningTextbooks student={student} />;
-  if (learningView === "library") return <LearningLibrary student={student} />;
-  return <StudentDashboard student={student} />;
+  if (learningView === "textbooks") return <LearningTextbooks student={student} location={textbookLocation} />;
+  return <LearningSchoolbag student={student} />;
 }

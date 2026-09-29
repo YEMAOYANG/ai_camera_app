@@ -669,21 +669,21 @@ void main() {
     await tester.tap(find.text('继续设置孩子身份'));
     await tester.pumpAndSettle();
 
-    expect(find.text('设置孩子的学习身份'), findsOneWidget);
-    expect(find.text('用于称呼孩子并匹配适龄内容'), findsOneWidget);
+    expect(find.text('孩子的基本信息'), findsOneWidget);
+    expect(find.text('称呼和年级，以后都能修改。'), findsOneWidget);
     expect(find.text('2 / 2'), findsOneWidget);
     expect(find.text('3 / 2'), findsNothing);
     expect(find.text('就读阶段'), findsNothing);
     expect(find.text('幼儿园'), findsOneWidget);
     expect(find.text('小学'), findsOneWidget);
-    expect(find.text('选择小学年级'), findsOneWidget);
-    expect(find.text('新六年级'), findsOneWidget);
+    expect(find.text('年级'), findsOneWidget);
+    expect(find.text('六年级'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('gradeOption_kindergarten_small')),
       findsNothing,
     );
     expect(find.text('孩子称呼'), findsOneWidget);
-    expect(find.text('摄像头老师会这样称呼孩子'), findsOneWidget);
+    expect(find.text('当前选择'), findsNothing);
     expect(find.text('性别'), findsNothing);
     expect(find.text('出生日期'), findsNothing);
     expect(find.text('入睡时间'), findsNothing);
@@ -710,14 +710,25 @@ void main() {
     );
     await tester.tap(find.byKey(const ValueKey('gradeOption_primary_3')));
     await tester.pumpAndSettle();
-    expect(find.text('新三年级'), findsWidgets);
+    expect(find.text('三年级'), findsWidgets);
     expect(
       tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onTap,
       isNotNull,
     );
 
-    await tester.tap(find.text('完成设置'));
+    await tester.tap(find.text('下一步，选择教材'));
     await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('textbookSubject_chinese')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('textbookSubject_math')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('textbookSubject_english')),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('稍后设置'));
     await tester.pumpAndSettle();
 
     expect(find.text('还没有连接摄像头'), findsWidgets);
@@ -728,8 +739,9 @@ void main() {
     expect(_lastSetupChildBody?.containsKey('birthday'), isFalse);
     expect(_lastSetupChildBody?.containsKey('gender'), isFalse);
     expect(find.text('连接第一台看护摄像头'), findsNothing);
-    expect(find.text('今日学习'), findsOneWidget);
-    expect(find.text('正式发布校验中'), findsOneWidget);
+    expect(find.text('教材与课程'), findsOneWidget);
+    expect(find.text('正式发布校验中'), findsNothing);
+    expect(find.text('英语'), findsOneWidget);
     expect(find.text('三位数进位加法'), findsNothing);
     expect(find.text('课程已就绪'), findsNothing);
     expect(find.text('扫码登录学生网页'), findsNothing);
@@ -1042,7 +1054,7 @@ void main() {
       tester,
       '孩子资料',
       expectedTitle: '孩子资料',
-      expectedTexts: const ['孩子称呼', '就读阶段', '年级'],
+      expectedTexts: const ['孩子称呼', '学段', '年级'],
       absentTexts: const ['性别', '出生日期', '入睡时间', '学校', '兴趣'],
     );
 
@@ -1949,6 +1961,17 @@ class _FakeApiServer {
     }
     if (method == 'GET' && path == '/children/current') {
       return _ok(options, {'ok': true, 'child': _child()});
+    }
+    if (method == 'GET' &&
+        path.startsWith('/children/') &&
+        path.endsWith('/textbooks')) {
+      return _ok(options, {
+        'ok': true,
+        'schemaVersion': 'mira.learning.textbooks.v1',
+        'schoolYearStartYear': DateTime.now().year,
+        'semester': 'upper',
+        'books': <Map<String, dynamic>>[],
+      });
     }
     if (method == 'PATCH' && path.startsWith('/children/')) {
       _childGradeCode = _text(body['gradeCode'], _childGradeCode);

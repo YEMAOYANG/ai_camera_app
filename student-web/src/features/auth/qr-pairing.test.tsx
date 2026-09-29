@@ -96,7 +96,7 @@ describe("QrPairing", () => {
       "/api/auth/qr/exchange",
       expect.objectContaining({ method: "POST", signal: expect.any(AbortSignal) }),
     );
-    expect(replace).toHaveBeenCalledWith("/today");
+    expect(replace).toHaveBeenCalledWith("/learning");
     expect(refresh).toHaveBeenCalledOnce();
   });
 
