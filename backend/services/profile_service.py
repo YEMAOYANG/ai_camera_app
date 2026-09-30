@@ -1304,6 +1304,16 @@ class ProfileService:
             ],
         }
 
+    def learning_coaching(self, access_token: str, session_id: str, *, data=None, record_date=None):
+        from services.learning_coaching_service import save_coaching, public_coaching
+        context = self._auth_context(access_token)
+        with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, 'manage_tasks' if data is not None else 'view_reports')
+            result = save_coaching(conn, family_id=context['family']['id'], user_id=context['user']['id'],
+                session_id=session_id, data=data, record_date=record_date)
+            result['coaching'] = public_coaching(result['coaching'])
+            return result
+
     def daily_report(self, access_token: str, query: dict) -> dict:
         context = self._auth_context(access_token)
         target_date = self._optional_text(query, "date") or datetime.now(ZoneInfo('Asia/Shanghai')).date().isoformat()

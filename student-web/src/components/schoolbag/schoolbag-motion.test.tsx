@@ -47,6 +47,26 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
 describe("schoolbag navigation choreography", () => {
+  it("keeps the canvas aligned after async page content moves an unchanged-size slot", async () => {
+    const observers: { targets: Element[]; callback: () => void }[] = [];
+    vi.stubGlobal("ResizeObserver", class {
+      entry: (typeof observers)[number];
+      constructor(callback: () => void) { this.entry = { targets: [], callback }; observers.push(this.entry); }
+      observe(element: Element) { this.entry.targets.push(element); }
+      disconnect() {}
+    });
+    let top = 180;
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(() => ({
+      top, left: 20, width: 350, height: 260, right: 370, bottom: top + 260, x: 20, y: top, toJSON() {},
+    }));
+    await boot(true);
+    expect(document.querySelector(".bag-scene-host")).toHaveStyle({ top: "180px" });
+    top = 420;
+    const page = document.querySelector(".schoolbag-route")!;
+    act(() => observers.filter(item => item.targets.includes(page)).forEach(item => item.callback()));
+    expect(document.querySelector(".bag-scene-host")).toHaveStyle({ top: "420px", height: "260px" });
+  });
+
   it.each(["math", "science"] as const)("closes and returns %s after a direct directory load without an earlier homepage", async subject => {
     state.path = "/learning/textbooks";
     render(<SchoolbagMotionProvider><DirectDirectory subject={subject} /></SchoolbagMotionProvider>);

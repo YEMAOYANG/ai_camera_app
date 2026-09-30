@@ -59,7 +59,6 @@ body:has(.schoolbag-shell) { background: #f6f8fa; }
 .schoolbag-notice > div { flex: 1; }
 .schoolbag-notice strong { font-size: 18px; }
 .schoolbag-notice p { font-size: 15px; line-height: 1.7; color: var(--mira-muted); margin-top: 6px; }
-.schoolbag-notice > button { display: flex; gap: 8px; align-items: center; justify-content: center; min-height: 48px; padding: 8px 14px; background: var(--mira-brand-wash); border-radius: 8px; white-space: nowrap; }
 .schoolbag-footer { display: flex; align-items: start; justify-content: space-between; gap: 28px; border-top: 1px solid var(--mira-border); padding-top: 15px; font-size: 14px; color: var(--mira-muted); }
 .schoolbag-footer > div { display: flex; gap: 22px; flex-shrink: 0; }
 .schoolbag-footer button { display: flex; align-items: center; gap: 7px; min-height: 48px; }
@@ -86,7 +85,6 @@ body:has(.schoolbag-shell) { background: #f6f8fa; }
 .schoolbag-auth .space-auth-panel :is(h1, h2) { color: var(--mira-ink); }
 .schoolbag-auth .space-auth-panel input { color: var(--mira-ink); caret-color: var(--mira-brand); }
 .schoolbag-auth .space-pair-code-form { background: var(--mira-surface-soft); border-color: var(--mira-border); }
-.schoolbag-auth .mira-button { min-height: 48px; }
 .schoolbag-auth .space-auth-panel::before { content: none; }
 .schoolbag-auth .space-auth-steps li > svg { animation: none; }
 .schoolbag-auth .space-unlock-panel[data-pin-state="ready"] input { border-color: var(--mira-brand); box-shadow: none; }
@@ -167,4 +165,3 @@ body:has(.schoolbag-shell) { background: #f6f8fa; }
 .schoolbag-next-lesson { margin-top: 24px; max-width: 32rem; }
 .schoolbag-next-lesson strong { font-size: 20px; }
 .schoolbag-next-lesson p { margin: 8px 0 14px; line-height: 1.6; }
-.schoolbag-next-lesson a { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; padding: 12px 20px; border-radius: 12px; background: var(--mira-primary, #28664d); color: white; text-decoration: none; font-weight: 600; }

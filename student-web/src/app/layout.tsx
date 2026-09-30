@@ -15,8 +15,10 @@ import "../styles/space-session-transition.css";
 import "../styles/space-textbooks.css";
 import "../styles/schoolbag.css";
 import "../styles/schoolbag-motion.css";
+import "../styles/learning-picture-navigation.css";
 import "../styles/student-ui.css";
 import "../styles/storybook.css";
+import "../styles/buttons.css";
 
 export const metadata: Metadata = {
   title: {

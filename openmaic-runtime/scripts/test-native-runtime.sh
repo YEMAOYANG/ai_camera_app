@@ -96,6 +96,7 @@ const reviewedModelRoutes = {
 };
 const state = {
   argv: process.argv.slice(2),
+  detachedProcessGroup: Number(require("node:child_process").execFileSync("ps", ["-o", "pgid=", "-p", String(process.pid)], { encoding: "utf8" }).trim()) === process.pid,
   nodeEnv: process.env.NODE_ENV,
   nativeBuild: process.env.MIRA_OPENMAIC_NATIVE_BUILD,
   allowedFrameAncestors: process.env.ALLOWED_FRAME_ANCESTORS,
@@ -406,6 +407,7 @@ IDENTITY_TEST_PID=""
     sleep 0.05
   done
   grep -Fq '"reviewedModelRoutes":true' "${OPENMAIC_LOG}" || fail "detached start did not replace caller routes with the exact reviewed model routes"
+  grep -Fq '"detachedProcessGroup":true' "${OPENMAIC_LOG}" || fail "detached start still belongs to the invoking terminal process group"
   grep -Fq '"structuredScenePolicy":"deepseek-v4-pro-flash-v1"' "${OPENMAIC_LOG}" || fail "detached start accepted a caller structured scene policy"
 )
 
@@ -749,10 +751,20 @@ video_duration_patch="${SCRIPT_DIR}/../patches/0052-mira-formal-video-stream-dur
 video_duration_patch_sha="$(shasum -a 256 "${video_duration_patch}" | awk '{print $1}')"
 formal_interactive_patch="${SCRIPT_DIR}/../patches/0053-mira-formal-self-contained-interactive.patch"
 formal_interactive_patch_sha="$(shasum -a 256 "${formal_interactive_patch}" | awk '{print $1}')"
-grep -Fq '"count": 54' "${SCRIPT_DIR}/../upstream.lock.json"
-grep -Fq '"latest": "0054-mira-bailian-deepseek-service.patch"' "${SCRIPT_DIR}/../upstream.lock.json"
-bailian_patch_sha="$(shasum -a 256 "${SCRIPT_DIR}/../patches/0054-mira-bailian-deepseek-service.patch" | awk '{print $1}')"
-grep -Fq "\"latestSha256\": \"${bailian_patch_sha}\"" "${SCRIPT_DIR}/../upstream.lock.json"
+# Validate the current series instead of pinning the historical 0054 tip.
+node - "${SCRIPT_DIR}/.." <<'NODE'
+const fs = require('node:fs');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const root = process.argv[2];
+const manifest = JSON.parse(fs.readFileSync(path.join(root, 'upstream.lock.json'), 'utf8')).patchManifest;
+const patches = fs.readdirSync(path.join(root, 'patches')).filter(name => /^\d{4}-.*\.patch$/.test(name)).sort();
+const latest = patches.at(-1);
+const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(root, 'patches', latest))).digest('hex');
+if (manifest.count !== patches.length || manifest.latest !== latest || manifest.latestSha256 !== hash) {
+  throw new Error('Native patch manifest does not match the installed patch series');
+}
+NODE
 grep -Fq 'interactiveIncludeKatex' "${formal_interactive_patch}"
 grep -Fq 'video_stream' "${video_duration_patch}"
 grep -Fq 'mira-formal-happyhorse-video.v1' "${video_patch}"
@@ -921,6 +933,7 @@ structured_health_payload="$(printf '%s' "${structured_health_payload}" | node -
         gradeBoundaryRequired: true, finalSnapshotRequired: true, independentReviewRequired: true,
         renderedScenesRequired: true, maxReviewAttempts: 3,
       },
+      playfulLearningPolicy: { schemaVersion: "mira.openmaic.playful-learning.v1", policyId: "mira-primary-playful-exploration.v1", aiDesigned: true, maxQuizScenes: 2, lockedAssessmentPreserved: true, minimumReplayableGames: 1, threeDUsage: "teaching_need" },
     };
     process.stdout.write(JSON.stringify(body));
   });

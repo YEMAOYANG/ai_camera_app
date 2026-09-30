@@ -11,11 +11,6 @@ html:has(.schoolbag-shell), body:has(.schoolbag-shell) { background: #fcf6ec; }
 html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
 .schoolbag-shell, .schoolbag-shell.schoolbag-auth { background: var(--mira-bg) url("/images/storybook/paper-texture.webp") repeat; background-size: 512px 512px; }
 .schoolbag-shell :is(a, button, input, summary):focus-visible { outline: 2px solid var(--mira-focus); outline-offset: 4px; }
-.schoolbag-shell .mira-button { border-radius: 999px; font-size: 15px; font-weight: 550; padding: 12px 22px; }
-.schoolbag-shell .mira-button[data-variant="primary"] { color: var(--mira-ink); background: var(--mira-brand-deep); }
-.schoolbag-shell .mira-button[data-variant="primary"]:hover:not(:disabled) { color: var(--mira-ink); background: #f3be43; }
-.schoolbag-shell .mira-button[data-variant="secondary"] { background: transparent; border-color: var(--mira-border); }
-.schoolbag-shell .mira-button:disabled { background: var(--mira-disabled); color: var(--mira-subtle); }
 .schoolbag-header { display: flex; justify-content: space-between; height: 64px; padding: 0 max(48px, calc((100% - 1440px) / 2)); border: 0; max-width: none; gap: 20px; }
 .schoolbag-header, .schoolbag-auth .space-auth-header { position: sticky; top: 0; z-index: 40; background: var(--mira-bg) url("/images/storybook/paper-texture.webp") repeat; background-size: 512px; box-shadow: 0 1px 0 #bdaa8126; }
 .schoolbag-header-start { display: flex; gap: 30px; align-items: center; min-width: 0; }
@@ -255,7 +250,6 @@ html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
   .textbook-unit-heading h3 { font-size: 20px; }
   .textbook-unit-introduction { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; padding-bottom: 24px; }
   .textbook-unit-introduction h4 { font-size: 26px; margin-bottom: 12px; }
-  .textbook-unit-invitation .mira-button { padding-inline: 14px; font-size: 14px; }
   .textbook-lesson { flex-direction: row; align-items: center; gap: 16px; }
   .textbook-lesson h4 { font-size: 17px; }
   .textbook-lesson-status { max-width: 100px; font-size: 12px; }

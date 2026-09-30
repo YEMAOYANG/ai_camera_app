@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -26,6 +26,13 @@ describe("school textbooks", () => {
     const fetch = vi.fn().mockResolvedValueOnce(reply(catalog())).mockResolvedValueOnce(reply(detail()));
     vi.stubGlobal("fetch", fetch);
     render(<LearningTextbooks student={student} />);
+    const welcome = await screen.findByRole("region", { name: "走进这门学科" });
+    expect(within(welcome).getByRole("heading", { level: 1 })).toHaveTextContent(book.title);
+    expect(welcome).toBeVisible();
+    expect(screen.getByRole("button", { name: "图片学习" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByRole("region", { name: "完整目录" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "完整目录" }));
+    expect(screen.queryByRole("region", { name: "图片选课" })).not.toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "1 天地人" })).toBeInTheDocument();
     expect(screen.getByText("课本第 8 页")).toBeInTheDocument();
     expect(screen.getByText(/目前展示 1 个单元/)).toBeInTheDocument();
@@ -43,7 +50,8 @@ describe("school textbooks", () => {
     render(<LearningTextbooks student={student} />);
     await screen.findByText("请家长帮你放入课本");
     fireEvent.click(screen.getByRole("button", { name: "刷新教材" }));
-    expect(await screen.findByText("家长已确认")).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: "完整目录" }));
+    expect(screen.getByText("家长已确认")).toBeInTheDocument();
     await screen.findByRole("heading", { name: "1 天地人" });
     expect(screen.queryByText(/请家长在 App/)).not.toBeInTheDocument();
     expect(startLearningCourse).not.toHaveBeenCalled();
@@ -59,6 +67,57 @@ describe("school textbooks", () => {
     expect(screen.queryByText(/目前展示/)).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "开始上课" })).not.toBeInTheDocument();
     expect(startLearningCourse).not.toHaveBeenCalled();
+  });
+
+  it("pages large units and keeps picture selection and the complete directory in sync", async () => {
+    const readyLesson = (index: number, unit = "u1") => ({ ...detail().units[0].lessons[0], nodeId: `${unit}-l${index}`, title: `${unit} 课程 ${index}`, sequence: index,
+      status: "ready", course: { courseId: `${unit}-course-${index}`, courseVersion: "1", contentKey: index.toString(16).padStart(64, "0"), delivery: "fixed_textbook" } });
+    const contents = { ...detail(), book: { ...book, unitCount: 2, lessonCount: 10 }, units: [
+      { ...detail().units[0], lessons: Array.from({ length: 8 }, (_, index) => readyLesson(index + 1)) },
+      { unitId: "u2", title: "第二单元 · 拼音", sequence: 2, lessons: [readyLesson(9, "u2"), { ...detail().units[0].lessons[0], nodeId: "u2-pending", title: "还在准备的课程" }] },
+    ] };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(reply(catalog())).mockResolvedValueOnce(reply(contents)));
+    render(<LearningTextbooks student={student} />);
+    const pictures = within(await screen.findByRole("region", { name: "图片选课" }));
+    expect(pictures.getAllByRole("link", { name: /开始上课/ })).toHaveLength(6);
+    expect(pictures.queryByRole("link", { name: "开始上课，u1 课程 7" })).not.toBeInTheDocument();
+    fireEvent.click(pictures.getByRole("button", { name: "下一组" }));
+    expect(pictures.getAllByRole("link", { name: /开始上课/ })).toHaveLength(2);
+    expect(pictures.getByRole("link", { name: "开始上课，u1 课程 8" })).toHaveAttribute("href", `/learning/textbooks/courses/${"8".padStart(64, "0")}`);
+    expect(pictures.getByRole("button", { name: "下一组" })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "完整目录" }));
+    expect(screen.queryByRole("region", { name: "图片选课" })).not.toBeInTheDocument();
+    const directoryUnits = within(screen.getByRole("navigation", { name: "教材单元" }));
+    fireEvent.click(directoryUnits.getByRole("button", { name: /第二单元/ }));
+    expect(screen.getByRole("heading", { name: "还在准备的课程" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "图片学习" }));
+    const second = within(screen.getByRole("region", { name: "图片选课" }));
+    expect(second.getAllByRole("link", { name: /开始上课/ })).toHaveLength(1);
+    expect(second.getByRole("link", { name: "开始上课，u2 课程 9" })).toBeVisible();
+    expect(second.queryByText(/u1 课程/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "换个单元" }));
+    expect(screen.queryByRole("region", { name: "图片选课" })).not.toBeInTheDocument();
+    const pictureUnits = within(screen.getByRole("region", { name: "图片单元" }));
+    expect(pictureUnits.getByRole("button", { name: /第二单元/ })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(pictureUnits.getByRole("button", { name: /第一单元/ }));
+    const first = within(screen.getByRole("region", { name: "图片选课" }));
+    expect(first.getAllByRole("link", { name: /开始上课/ })).toHaveLength(6);
+    expect(first.getByRole("button", { name: "上一组" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "完整目录" }));
+    expect(within(screen.getByRole("navigation", { name: "教材单元" })).getByRole("button", { name: /第一单元/ })).toHaveAttribute("aria-current", "true");
+  });
+
+  it.each([null, "u1-l1"])("opens a playable unit unless school progress already selects one (%s)", async currentNodeId => {
+    const contents = { ...detail(), currentNodeId, book: { ...book, unitCount: 2, lessonCount: 2 }, units: [detail().units[0],
+      { unitId: "u2", title: "第二单元", sequence: 2, lessons: [{ ...detail().units[0].lessons[0], nodeId: "u2-l1", status: "ready",
+        course: { courseId: "playable", courseVersion: "1", contentKey: "b".repeat(64), delivery: "fixed_textbook" } }] },
+    ] };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(reply(catalog())).mockResolvedValueOnce(reply(contents)));
+    render(<LearningTextbooks student={student} />);
+    fireEvent.click(await screen.findByRole("button", { name: "换个单元" }));
+    const units = within(screen.getByRole("region", { name: "图片单元" }));
+    expect(units.getByRole("button", { name: currentNodeId ? /第一单元/ : /第二单元/ })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("handles unavailable grades and retries failure without invented courses", async () => {

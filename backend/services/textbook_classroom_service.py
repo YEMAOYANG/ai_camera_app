@@ -167,7 +167,7 @@ class TextbookClassroomService:
                     progress = self._state(locked)
                     state = textbook_activity.initial(progress, release)
                     scene = canonical_request['storeState']['currentSceneId']
-                    section_name = next((name for name, scene_id in textbook_activity.PLAN['sceneIds'].items() if scene_id == scene), None)
+                    section_name = next((name for name, scene_id in textbook_activity.definition(release=release).plan['sceneIds'].items() if scene_id == scene), None)
                     if section_name:
                         section = state[section_name]
                         current = textbook_activity.item(section, release, state)
@@ -182,7 +182,7 @@ class TextbookClassroomService:
                             target['type'] = 'quiz'
                             target['content'] = {'type': 'quiz', 'questions': [{
                                 'id': current['id'], 'type': 'single',
-                                'question': view['prompt'] + '\n' + textbook_activity.FLOW['teachingGuidance'],
+                                'question': view['prompt'] + '\n' + textbook_activity.definition(release=release).flow['teachingGuidance'],
                                 'options': current.get('options', []), 'points': 0}]}
                             target['actions'] = []
             result['request'] = canonical_request
@@ -213,7 +213,7 @@ class TextbookClassroomService:
                             if play[section]['phase'] != 'done'), 'challenge')
             if pending:
                 resume = next(i for i, s in enumerate(scenes)
-                              if s['id'] == textbook_activity.PLAN['sceneIds'][pending])
+                              if s['id'] == textbook_activity.definition(release=release).plan['sceneIds'][pending])
         complete = session['status'] == 'completed'
         # OpenMAIC records the final action after the page's narration finishes.
         completed_scenes = [s['id'] for s in scenes if not s.get('actions')
@@ -222,7 +222,7 @@ class TextbookClassroomService:
         # Its own cues can pause the lecture without making a finished game
         # depend on replaying the legacy HTML introduction to the final action.
         required_audio = [s['id'] for s in scenes if not textbook_activity.supported(release)
-                          or s['id'] not in textbook_activity.PLAN['sceneIds'].values()]
+                          or s['id'] not in textbook_activity.definition(release=release).plan['sceneIds'].values()]
         return {'ok': True, 'schemaVersion': RECEIPT_SCHEMA, 'runtimeSessionId': session['id'],
             'learningSessionId': session['id'], 'classroomId': release['classroomId'], 'releaseId': release['sha256'],
             'lastSequence': state['lastSequence'], 'nextSequence': state['lastSequence'] + 1, 'completed': complete,

@@ -4,12 +4,14 @@ class ReportLearningSummary {
     this.needsSupportCount = 0,
     this.reviewCount = 0,
     this.lessons = const [],
+    this.coachingSummary = const {},
   });
 
   final int lessonCount;
   final int needsSupportCount;
   final int reviewCount;
   final List<ReportLearningLesson> lessons;
+  final Map<String, dynamic> coachingSummary;
 
   factory ReportLearningSummary.fromJson(Object? value) {
     final json = _map(value);
@@ -17,6 +19,7 @@ class ReportLearningSummary {
       lessonCount: _number(json['lessonCount']),
       needsSupportCount: _number(json['needsSupportCount']),
       reviewCount: _number(json['reviewCount']),
+      coachingSummary: _map(json['coachingSummary']),
       lessons: (json['lessons'] is List ? json['lessons'] as List : const [])
           .whereType<Map>()
           .map((item) => ReportLearningLesson.fromJson(_map(item)))
@@ -41,6 +44,9 @@ class ReportLearningLesson {
       remaining = _strings(json['remainingSkills']),
       diagnoses = _strings(json['diagnoses']),
       nextStep = _text(json['nextStep']),
+      sessionId = _text(json['learningSessionId']),
+      parentSupport = _map(json['parentSupport']),
+      coaching = _map(json['coaching']),
       reviewDueAt = json['reviewDueAt'] is num
           ? DateTime.fromMillisecondsSinceEpoch(
               (json['reviewDueAt'] as num).toInt(),
@@ -53,7 +59,9 @@ class ReportLearningLesson {
       statusLabel,
       evidenceLabel,
       recordDate,
-      nextStep;
+      nextStep,
+      sessionId;
+  final Map<String, dynamic> parentSupport, coaching;
   final bool needsSupport, pictureSupported;
   final Map<String, dynamic>? baseline, verification;
   final List<String> remaining, diagnoses;

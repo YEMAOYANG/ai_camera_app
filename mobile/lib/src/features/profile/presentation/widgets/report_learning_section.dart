@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/profile/domain/report_learning_models.dart';
 import 'package:warm_sight/src/shared/widgets/app_surface.dart';
+import 'package:warm_sight/src/features/profile/presentation/widgets/learning_coaching_form.dart';
 
 class ReportLearningSection extends StatelessWidget {
   const ReportLearningSection({super.key, required this.learning});
@@ -46,6 +47,21 @@ class ReportLearningSection extends StatelessWidget {
             ),
             if (learning.reviewCount > 0)
               Text('本期完成 ${learning.reviewCount} 次间隔复习', style: _secondary),
+            if ((learning.coachingSummary['recordedSessions'] as num? ?? 0) >
+                0) ...[
+              const SizedBox(height: 8),
+              Text(
+                '家长自报辅导 ${learning.coachingSummary['totalMinutes']} 分钟 · ${learning.coachingSummary['recordedSessions']} 次记录',
+                style: _body,
+              ),
+              if ((learning.coachingSummary['comparisonCount'] as num? ?? 0) >
+                  0)
+                Text(
+                  '可对比的 ${learning.coachingSummary['comparisonCount']} 次：以往 ${learning.coachingSummary['usualMinutes']} 分钟，本次 ${learning.coachingSummary['currentComparisonMinutes']} 分钟。',
+                  style: _secondary,
+                ),
+              const Text('未记录的课次不计入，以上来自家长自报。', style: _secondary),
+            ],
             for (var index = 0; index < learning.lessons.length; index++) ...[
               const Divider(height: 24, color: AppColors.border),
               _LessonEvidence(lesson: learning.lessons[index]),
@@ -91,7 +107,16 @@ class _LessonEvidence extends StatelessWidget {
         ),
         if (lesson.verificationLabel case final label?)
           Text(label, style: _body),
-        if (lesson.nextStep.isNotEmpty) ...[
+        if (lesson.parentSupport.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(
+            '只帮这一步 · ${lesson.parentSupport['focus']}',
+            style: _body.copyWith(fontWeight: FontWeight.w600),
+          ),
+          Text('${lesson.parentSupport['action']}', style: _body),
+          const SizedBox(height: 4),
+          Text('${lesson.parentSupport['handBack']}', style: _secondary),
+        ] else if (lesson.nextStep.isNotEmpty) ...[
           const SizedBox(height: 6),
           Text(lesson.nextStep, style: _body),
         ],
@@ -140,6 +165,13 @@ class _LessonEvidence extends StatelessWidget {
             ),
           ],
         ),
+        if (lesson.sessionId.isNotEmpty)
+          LearningCoachingForm(
+            key: ValueKey(
+              '${lesson.sessionId}-${lesson.recordDate}-${lesson.coaching['revision'] ?? 0}',
+            ),
+            lesson: lesson,
+          ),
       ],
     );
   }

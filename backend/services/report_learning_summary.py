@@ -5,6 +5,7 @@ import json
 from zoneinfo import ZoneInfo
 
 from content import textbook_journey as journey
+from services.learning_coaching_service import coaching_summary, public_coaching
 
 ZONE = ZoneInfo('Asia/Shanghai')
 LABELS = {'learning': '正在学习', 'checking': '正在独立验证', 'reviewing': '正在复习',
@@ -26,10 +27,10 @@ def _object(value):
         return {}
 
 
-def _transfer_evidence(records, *, first=False):
+def _transfer_evidence(records, *, first=False, skills=None):
     selected = {}
     for record in records:
-        if record.get('phase') != 'transfer' or record.get('skill') not in journey.SKILLS:
+        if record.get('phase') != 'transfer' or record.get('skill') not in (skills if skills is not None else journey.SKILLS):
             continue
         if not first or record['skill'] not in selected:
             selected[record['skill']] = record
@@ -46,22 +47,22 @@ def _journey_assessment(state):
     if not at:
         return evidence
     baseline = state.get('baseline', [])
-    if state.get('baselineRecordedAt') and len(baseline) == len(journey.SKILLS):
+    if state.get('baselineRecordedAt') and len(baseline) == len(journey.skills_for(state)):
         evidence['independence'] = {'correct': sum(journey.independent(r) for r in baseline),
             'total': len(baseline), 'recordDate': _day(state['baselineRecordedAt']),
             'detail': '首次练习独立答对比例；使用提示或家长帮助的题目不计独立答对。'}
-    transfer = _transfer_evidence(state.get('challenge', {}).get('records', []))
+    transfer = _transfer_evidence(state.get('challenge', {}).get('records', []), skills=journey.skills_for(state))
     if transfer:
         evidence['comprehension'] = {**transfer, 'recordDate': _day(at)}
     if state.get('reviewActive'):
-        retention = _transfer_evidence(state.get('challenge', {}).get('records', []), first=True)
+        retention = _transfer_evidence(state.get('challenge', {}).get('records', []), first=True, skills=journey.skills_for(state))
         if retention:
             evidence['retention'] = {**retention, 'recordDate': _day(at)}
     else:
         completed = [r for r in state.get('reviewHistory', []) if r.get('completedAt', 0) <= at]
         if completed:
             review = max(completed, key=lambda r: r['completedAt'])
-            retention = _transfer_evidence(review.get('records', []), first=True)
+            retention = _transfer_evidence(review.get('records', []), first=True, skills=journey.skills_for(state))
             if retention:
                 evidence['retention'] = {**retention, 'recordDate': _day(review['completedAt'])}
     return evidence
@@ -77,17 +78,17 @@ def journey_snapshot(state):
         'baseline': {'correct': info['independentBefore'], 'total': len(baseline),
                      'hints': sum(bool(r.get('hintUsed')) for r in baseline),
                      'adultHelp': sum(bool(r.get('adultHelp')) for r in baseline)},
-        'verification': {'correct': info['verifiedCount'], 'total': len(journey.SKILLS)},
+        'verification': {'correct': info['verifiedCount'], 'total': len(journey.skills_for(state))},
         'remainingSkills': info['remainingSkills'], 'diagnoses': info['diagnoses'],
         'nextStep': info['nextStep'], 'reviewDueAt': info['reviewDueAt'], 'reviewLevel': info['reviewLevel'],
-        'assessmentEvidence': _journey_assessment(state)}
+        'assessmentEvidence': _journey_assessment(state), 'parentSupport': info.get('parentSupport')}
 
 
 def save_journey_report_day(state, previous):
     """Called inside the existing answer transaction; never changes the first score."""
     days = state.setdefault('reportDays', {})
-    if (len(state.get('baseline', [])) == len(journey.SKILLS)
-            and len(previous.get('baseline', [])) < len(journey.SKILLS) and state.get('updatedAt')):
+    if (len(state.get('baseline', [])) == len(journey.skills_for(state))
+            and len(previous.get('baseline', [])) < len(journey.skills_for(state)) and state.get('updatedAt')):
         state.setdefault('baselineRecordedAt', state['updatedAt'])
     # Preserve the last known day when upgrading an existing, unfinished session.
     if previous.get('updatedAt'):
@@ -127,8 +128,14 @@ def learning_for_period(conn, *, family_id, start_date, end_date):
         (family_id, end, start, start, end)).fetchall()
     lessons = {}
     reviews = set()
+    coaching_records = {}
     for row in rows:
-        state = _object(_object(row['runtime_state_json']).get('textbookPlay'))
+        runtime = _object(row['runtime_state_json'])
+        state = _object(runtime.get('textbookPlay'))
+        coaching = _object(runtime.get('parentCoaching'))
+        for day, record in coaching.items():
+            if start_date <= day <= end_date and isinstance(record, dict):
+                coaching_records[(row['id'], day)] = record
         adaptive = state.get('flowVersion') == 2
         candidates = []
         if adaptive:
@@ -148,7 +155,7 @@ def learning_for_period(conn, *, family_id, start_date, end_date):
                             'status': 'review_passed', 'statusLabel': '本次间隔复习通过',
                             'needsSupport': False, 'evidenceLabel': '图片支持下的情境理解',
                             'baseline': None, 'verification': {'correct': len(review['independentSkills']),
-                                                              'total': len(journey.SKILLS)},
+                                                              'total': len(journey.skills_for(state))},
                             'remainingSkills': [], 'diagnoses': [], 'nextStep': '',
                             'reviewDueAt': None, 'reviewLevel': review['level'] + 1})
         if not candidates and row['report_id'] and start <= row['report_created_at'] < end:
@@ -174,17 +181,20 @@ def learning_for_period(conn, *, family_id, start_date, end_date):
                      if start <= r.get('completedAt', 0) <= (latest.get('observedAt') or 0)]
         if completed and 'retention' not in assessment:
             review = max(completed, key=lambda r: r['completedAt'])
-            metric = _transfer_evidence(review.get('records', []), first=True)
+            metric = _transfer_evidence(review.get('records', []), first=True, skills=journey.skills_for(state))
             if metric:
                 assessment['retention'] = {**metric, 'recordDate': _day(review['completedAt'])}
         item = {**latest, 'assessmentEvidence': assessment,
                 'courseTitle': row['title'], 'courseId': row['course_id'], 'courseVersion': row['course_version'], 'subject': row['subject'],
                 'childName': row['child_name'], 'childId': row['child_id'], 'reportId': row['report_id'],
-                'recordDate': _day(latest['observedAt'])}
+                'recordDate': _day(latest['observedAt']), 'learningSessionId': row['id'],
+                'coaching': public_coaching(coaching.get(_day(latest['observedAt'])))}
+        if adaptive and latest.get('observedAt') == state.get('updatedAt'):
+            item['parentSupport'] = journey.parent_support(state)
         identity = (row['child_id'], row['course_id'], row['course_version'])
         if identity not in lessons or item['observedAt'] > lessons[identity]['observedAt']:
             lessons[identity] = item
     items = sorted(lessons.values(), key=lambda item: (not item['needsSupport'], -item['observedAt']))
     return {'schemaVersion': 'mira.report.learning.v1', 'lessonCount': len(items),
             'needsSupportCount': sum(item['needsSupport'] for item in items),
-            'reviewCount': len(reviews), 'lessons': items}
+            'reviewCount': len(reviews), 'lessons': items, 'coachingSummary': coaching_summary(coaching_records)}

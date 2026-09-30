@@ -1,0 +1,544 @@
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -255,7 +255,9 @@
+   box-shadow: none;
+ }
+ 
+-html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [data-mira-chat-bubble='agent'] {
++html[data-mira-student-theme='storybook']
++  [data-mira-chrome='chat']
++  [data-mira-chat-bubble='agent'] {
+   background: var(--mira-orbit-speech-agent);
+   border-color: #c9d3c3;
+ }
+@@ -1559,3 +1561,66 @@
+     max-height: 48px;
+   }
+ }
++
++/* Picture-first courses keep advanced controls available on demand. */
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools {
++  display: flex;
++  flex-shrink: 0;
++  gap: 8px;
++  min-height: 56px;
++  justify-content: center;
++  align-items: center;
++  padding: 4px 12px;
++  border-top: 1px solid #e7dcc5;
++  background: #fbf7ed;
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button {
++  display: inline-flex;
++  align-items: center;
++  gap: 8px;
++  min-height: 48px;
++  padding: 6px 16px;
++  border-radius: 14px;
++  color: #344b40;
++  font-size: 14px;
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button:hover,
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button[aria-pressed='true'],
++html[data-mira-student-theme='storybook']
++  .mira-picture-classroom-tools
++  button[aria-expanded='true'] {
++  background: #eee3c9;
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button:focus-visible {
++  outline: 3px solid #28664d;
++  outline-offset: -3px;
++}
++@media (max-width: 600px) {
++  html[data-mira-student-theme='storybook']
++    [data-mira-picture-course='true']
++    > [data-mira-chrome='scene-sidebar'] {
++    position: absolute;
++    inset: 0 auto 56px 0;
++    max-width: 85%;
++    z-index: 30;
++  }
++  html[data-mira-student-theme='storybook'] [data-mira-picture-chat='true'] {
++    position: absolute;
++    inset: 0 0 360px auto;
++    max-width: 100%;
++    z-index: 30;
++  }
++  html[data-mira-student-theme='storybook']
++    [data-mira-picture-chat='true']
++    > [data-mira-chrome='chat'] {
++    max-width: 100%;
++  }
++  html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools {
++    gap: 2px;
++    padding-inline: 4px;
++  }
++  html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button {
++    padding-inline: 10px;
++    font-size: 12px;
++  }
++}
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -58,7 +58,7 @@
+   AlertDialogAction,
+   AlertDialogCancel,
+ } from '@/components/ui/alert-dialog';
+-import { AlertTriangle } from 'lucide-react';
++import { AlertTriangle, BookOpen, MessageCircle, SlidersHorizontal, X } from 'lucide-react';
+ import { VisuallyHidden } from 'radix-ui';
+ import {
+   useMiraStudentAutoPlayRuntime,
+@@ -151,13 +151,36 @@
+       [currentScene?.actions],
+     );
+ 
++    const pictureCourse = studentMode && scenes.some((scene) => Boolean(scene.miraActivity));
++    const [studentSidebarCollapsed, setStudentSidebarCollapsed] = useState(true);
++    const [studentChatCollapsed, setStudentChatCollapsed] = useState(true);
++    const [studentToolsOpen, setStudentToolsOpen] = useState(false);
++    // Student layout is local to this classroom, never written to operator preferences.
+     // Layout state from settings store (persisted via localStorage)
+-    const sidebarCollapsed = useSettingsStore((s) => s.sidebarCollapsed);
+-    const setSidebarCollapsed = useSettingsStore((s) => s.setSidebarCollapsed);
++    const operatorSidebarCollapsed = useSettingsStore((s) => s.sidebarCollapsed);
++    const setOperatorSidebarCollapsed = useSettingsStore((s) => s.setSidebarCollapsed);
+     const chatAreaWidth = useSettingsStore((s) => s.chatAreaWidth);
+     const setChatAreaWidth = useSettingsStore((s) => s.setChatAreaWidth);
+-    const chatAreaCollapsed = useSettingsStore((s) => s.chatAreaCollapsed);
+-    const setChatAreaCollapsed = useSettingsStore((s) => s.setChatAreaCollapsed);
++    const operatorChatAreaCollapsed = useSettingsStore((s) => s.chatAreaCollapsed);
++    const setOperatorChatAreaCollapsed = useSettingsStore((s) => s.setChatAreaCollapsed);
++    const sidebarCollapsed = pictureCourse ? studentSidebarCollapsed : operatorSidebarCollapsed;
++    const chatAreaCollapsed = pictureCourse ? studentChatCollapsed : operatorChatAreaCollapsed;
++    const setSidebarCollapsed = useCallback(
++      (collapsed: boolean) => {
++        if (pictureCourse) setStudentSidebarCollapsed(collapsed);
++        else setOperatorSidebarCollapsed(collapsed);
++      },
++      [pictureCourse, setOperatorSidebarCollapsed],
++    );
++    const setChatAreaCollapsed = useCallback(
++      (collapsed: boolean) => {
++        if (pictureCourse) {
++          setStudentChatCollapsed(collapsed);
++          if (collapsed) setStudentToolsOpen(false);
++        } else setOperatorChatAreaCollapsed(collapsed);
++      },
++      [pictureCourse, setOperatorChatAreaCollapsed],
++    );
+     const operatorTTSMuted = useSettingsStore((s) => s.ttsMuted);
+     const operatorTTSVolume = useSettingsStore((s) => s.ttsVolume);
+     const setOperatorTTSMuted = useSettingsStore((s) => s.setTTSMuted);
+@@ -1732,7 +1755,15 @@
+       const headerHeight = isPresenting || hideHeader ? 0 : studentMode ? 48 : 80;
+       const fixedTextbook = (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook;
+       const roundtableHeight =
+-        mode === 'playback' && !isPresenting ? (fixedTextbook ? 216 : 192) : 0;
++        mode === 'playback' && !isPresenting
++          ? pictureCourse
++            ? studentToolsOpen
++              ? 272
++              : 56
++            : fixedTextbook
++              ? 216
++              : 192
++          : 0;
+       return `calc(100% - ${headerHeight + roundtableHeight}px)`;
+     })();
+ 
+@@ -1740,8 +1771,9 @@
+       <div
+         ref={stageRef}
+         data-mira-playback-shell={studentMode ? 'storybook' : undefined}
++        data-mira-picture-course={pictureCourse ? 'true' : undefined}
+         className={cn(
+-          'flex-1 flex overflow-hidden bg-gray-50 dark:bg-gray-900',
++          'flex-1 flex overflow-hidden relative bg-gray-50 dark:bg-gray-900',
+           isPresenting && !controlsVisible && 'cursor-none',
+         )}
+       >
+@@ -1866,10 +1898,51 @@
+             />
+           </div>
+ 
++          {pictureCourse && mode === 'playback' && (
++            <nav aria-label="课堂工具" className="mira-picture-classroom-tools">
++              <button
++                type="button"
++                aria-pressed={!sidebarCollapsed}
++                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
++              >
++                <BookOpen size={26} aria-hidden />
++                课本
++              </button>
++              <button
++                type="button"
++                aria-pressed={!chatAreaCollapsed}
++                onClick={() => {
++                  const opening = chatAreaCollapsed;
++                  setChatAreaCollapsed(!opening);
++                  setStudentToolsOpen(opening);
++                  if (opening) {
++                    setSidebarCollapsed(true);
++                    chatAreaRef.current?.switchToTab('chat');
++                  }
++                }}
++              >
++                <MessageCircle size={26} aria-hidden />
++                找老师
++              </button>
++              <button
++                type="button"
++                aria-expanded={studentToolsOpen}
++                onClick={() => setStudentToolsOpen(!studentToolsOpen)}
++              >
++                {studentToolsOpen ? (
++                  <X size={26} aria-hidden />
++                ) : (
++                  <SlidersHorizontal size={26} aria-hidden />
++                )}
++                课堂工具
++              </button>
++            </nav>
++          )}
+           {/* Roundtable Area */}
+           {mode === 'playback' && (
+             <div
+               data-mira-chrome="discussion"
++              style={pictureCourse && !studentToolsOpen ? { display: 'none' } : undefined}
+               className={cn(
+                 'transition-opacity duration-300',
+                 !isPresenting && 'shrink-0',
+@@ -2059,7 +2132,7 @@
+         {/* Chat Area — playback / autonomous always renders it here; Pro
+           (edit) mode unmounts this whole PlaybackChromeRoot, so the
+           edit branch has no chat. */}
+-        <div className="flex shrink-0">
++        <div className="flex shrink-0" data-mira-picture-chat={pictureCourse ? 'true' : undefined}>
+           <ChatArea
+             ref={chatAreaRef}
+             width={chatAreaWidth}
+--- a/components/scene-renderers/textbook-picture-prompt.tsx
++++ b/components/scene-renderers/textbook-picture-prompt.tsx
+@@ -1,13 +1,16 @@
+ /** Original vector illustrations: shared portraits make names optional. */
+-export type PictureScene = {
+-  setting: string;
+-  skyObject: string;
+-  ground: string;
+-  cast: string[];
+-  speaker?: string;
+-  listener?: string;
+-  activity?: string;
+-};
++export type PictureArt = { src: string; alt: string };
++export type PictureScene =
++  | { art: PictureArt }
++  | {
++      setting: string;
++      skyObject: string;
++      ground: string;
++      cast: string[];
++      speaker?: string;
++      listener?: string;
++      activity?: string;
++    };
+ 
+ const people: Record<string, { shirt: string; hair: string; kind?: string }> = {
+   teal: { shirt: '#4b9dac', hair: '#56483e' },
+@@ -185,6 +188,15 @@
+ }
+ 
+ export function PicturePrompt({ scene, label }: { scene: PictureScene; label: string }) {
++  if ('art' in scene)
++    return (
++      <img
++        src={scene.art.src}
++        alt={scene.art.alt || label}
++        draggable={false}
++        style={{ width: '100%', maxHeight: '55vh', objectFit: 'contain' }}
++      />
++    );
+   const positions = scene.cast.map((id, i) => ({ id, x: 245 + i * 130 }));
+   const speaker = positions.find((p) => p.id === scene.speaker);
+   const listener = positions.find((p) => p.id === scene.listener);
+@@ -294,7 +306,16 @@
+   );
+ }
+ 
+-export function PictureChoice({ picture }: { picture: string }) {
++export function PictureChoice({ picture }: { picture: string | PictureArt }) {
++  if (typeof picture !== 'string')
++    return (
++      <img
++        src={picture.src}
++        alt={picture.alt}
++        draggable={false}
++        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
++      />
++    );
+   return (
+     <svg viewBox="0 0 160 140" aria-hidden="true" focusable="false">
+       <rect x="2" y="2" width="156" height="136" rx="16" fill="#f4f3e8" />
+--- a/components/scene-renderers/textbook-play.tsx
++++ b/components/scene-renderers/textbook-play.tsx
+@@ -1,11 +1,26 @@
+ 'use client';
+ 
+ import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react';
+-import { ArrowRight, Check, Hand, Lightbulb, Mic, RotateCcw, Star, Volume2 } from 'lucide-react';
++import {
++  Backpack,
++  ArrowRight,
++  Check,
++  Hand,
++  Lightbulb,
++  Mic,
++  RotateCcw,
++  Star,
++  Volume2,
++} from 'lucide-react';
+ import { useStageStore } from '@/lib/store';
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import styles from './textbook-play.module.css';
+-import { PictureChoice, PicturePrompt, type PictureScene } from './textbook-picture-prompt';
++import {
++  PictureChoice,
++  PicturePrompt,
++  type PictureScene,
++  type PictureArt,
++} from './textbook-picture-prompt';
+ 
+ type Section = 'games' | 'challenge';
+ type View = {
+@@ -27,7 +42,7 @@
+   prompt?: string;
+   word?: string;
+   speaker?: string;
+-  options?: { value: string; label: string; picture: string }[];
++  options?: { value: string; label: string; picture: string | PictureArt }[];
+   visual?: PictureScene;
+   selectedChoice?: string;
+   audio?: string[];
+@@ -61,6 +76,7 @@
+     skippedCount: number;
+   };
+   evidence: {
++    total?: number;
+     answered: number;
+     independent: number;
+     hints: number;
+@@ -105,6 +121,7 @@
+   const dragOrigin = useRef<{ x: number; y: number } | null>(null);
+   const player = useRef<HTMLAudioElement | null>(null);
+   const soundRun = useRef(0);
++  const spokenQuestion = useRef('');
+   const alive = useRef(true);
+   const inFlight = useRef(false);
+   const events = useMiraStudentRuntimeEvents();
+@@ -153,41 +170,53 @@
+     };
+   }, [load, silence]);
+ 
+-  function listen(urls = view?.audio || []) {
+-    silence();
+-    setSoundError('');
+-    window.dispatchEvent(new Event('mira:textbook-play-audio'));
+-    const run = soundRun.current;
+-    const queue = [...urls];
+-    const next = () => {
+-      if (!alive.current || run !== soundRun.current) return;
+-      const src = queue.shift();
+-      if (!src) {
+-        setPlaying(false);
+-        return;
+-      }
+-      if (
+-        !/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(wav|mp3|ogg)$/.test(
+-          src,
+-        ) &&
+-        !/^\/mira\/textbook-audio\/[a-f0-9]{24}\.wav$/.test(src)
+-      )
+-        return;
+-      const audio = new Audio(src);
+-      player.current = audio;
+-      const fail = () => {
+-        if (alive.current && run === soundRun.current) {
++  const listen = useCallback(
++    (urls: string[] = []) => {
++      silence();
++      setSoundError('');
++      window.dispatchEvent(new Event('mira:textbook-play-audio'));
++      const run = soundRun.current;
++      const queue = [...urls];
++      const next = () => {
++        if (!alive.current || run !== soundRun.current) return;
++        const src = queue.shift();
++        if (!src) {
+           setPlaying(false);
+-          setSoundError('声音暂时没放出来，点喇叭再听一次。');
++          return;
+         }
++        if (
++          !/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(wav|mp3|ogg)$/.test(
++            src,
++          ) &&
++          !/^\/mira\/textbook-audio\/[a-f0-9]{24}\.wav$/.test(src)
++        )
++          return;
++        const audio = new Audio(src);
++        player.current = audio;
++        const fail = () => {
++          if (alive.current && run === soundRun.current) {
++            setPlaying(false);
++            setSoundError('声音暂时没放出来，点喇叭再听一次。');
++          }
++        };
++        audio.onended = next;
++        audio.onerror = fail;
++        setPlaying(true);
++        void audio.play().catch(fail);
+       };
+-      audio.onended = next;
+-      audio.onerror = fail;
+-      setPlaying(true);
+-      void audio.play().catch(fail);
+-    };
+-    next();
+-  }
++      next();
++    },
++    [silence],
++  );
++
++  const questionKey = view
++    ? `${section}:${view.phase}:${view.index}:${view.prompt || ''}:${view.speaker || ''}:${Boolean(snapshot?.journey?.reviewDue)}`
++    : '';
++  useEffect(() => {
++    if (!view || !questionKey || questionKey === spokenQuestion.current) return;
++    spokenQuestion.current = questionKey;
++    listen(view.feedback?.audio ?? view.audio);
++  }, [questionKey, view, listen]);
+ 
+   async function act(action: string, choice?: string) {
+     if (!snapshot || inFlight.current) return;
+@@ -217,8 +246,7 @@
+       if (action === 'hint') listen(payload[section].hintAudio);
+       else if (action === 'answer' && payload[section].feedback?.audio)
+         listen(payload[section].feedback.audio);
+-      else if (['next', 'review', 'resume', 'speaker'].includes(action))
+-        listen(payload[section].audio);
++
+       if (payload.challenge.done && events) {
+         const scenes = [...useStageStore.getState().scenes].sort((a, b) => a.order - b.order);
+         const last = scenes.at(-1);
+@@ -267,7 +295,7 @@
+     <section
+       ref={surface}
+       className={styles.root}
+-      aria-label={section === 'games' ? '天地人互动花园' : '天地人自主练习'}
++      aria-label={section === 'games' ? '看图互动' : '自主练习'}
+     >
+       {!view || !snapshot ? (
+         <div className={styles.loading} role="status">
+@@ -284,6 +312,15 @@
+       ) : (
+         <>
+           <header className={styles.header}>
++            {(view.done || view.phase === 'locked' || view.phase === 'break') && (
++              <button
++                className={styles.listen}
++                onClick={() => listen(view.audio)}
++                aria-label="听老师说下一步"
++              >
++                <Volume2 size={32} aria-hidden />
++              </button>
++            )}
+             <div>
+               <p>
+                 {section === 'games' ? '动手玩 · 认汉字' : '我会自己学'}
+@@ -334,6 +371,7 @@
+                 }}
+               >
+                 {view.phase === 'break' ? '休息好了，再试一次' : '开始小任务'}
++                <ArrowRight size={32} aria-hidden />
+               </button>
+             </div>
+           ) : view.done ? (
+@@ -343,7 +381,7 @@
+               </div>
+               <h3>
+                 {section === 'games'
+-                  ? `已会的 ${snapshot.journey?.skippedCount ?? 0} 个字，少练一点！`
++                  ? `刚才独立完成的 ${snapshot.journey?.skippedCount ?? 0} 项，少练一点！`
+                   : snapshot.journey?.status === 'retained'
+                     ? '隔了几天，也记得！'
+                     : '换了场景，你也会啦！'}
+@@ -351,10 +389,18 @@
+               {section === 'challenge' && (
+                 <>
+                   <p>
+-                    前测自己答对 <strong>{snapshot.evidence.independent} / 6</strong> 题
++                    前测自己答对{' '}
++                    <strong>
++                      {snapshot.evidence.independent} / {snapshot.evidence.total ?? 6}
++                    </strong>{' '}
++                    题
+                   </p>
+                   <p>
+-                    新情境，独立完成 <strong>{snapshot.evidence.transferIndependent} / 6</strong> 题
++                    新情境，独立完成{' '}
++                    <strong>
++                      {snapshot.evidence.transferIndependent} / {snapshot.evidence.total ?? 6}
++                    </strong>{' '}
++                    题
+                   </p>
+                   <details className={styles.evidence}>
+                     <summary>给家长的学习记录</summary>
+@@ -429,6 +475,7 @@
+                       else window.history.back();
+                     }}
+                   >
++                    <Backpack size={36} aria-hidden />
+                     今天先到这里
+                   </a>
+                 )}
+@@ -509,7 +556,7 @@
+                 <button
+                   className={styles.listen}
+                   disabled={busy}
+-                  onClick={() => (playing ? silence() : listen())}
++                  onClick={() => (playing ? silence() : listen(view.audio))}
+                   aria-label={playing ? '暂停声音' : '听一听题目'}
+                 >
+                   <Volume2 size={32} aria-hidden />
+@@ -630,7 +677,16 @@
+           )}
+           <footer className={styles.footer}>
+             <p role="status">{busy ? '正在保存…' : '学到哪里，课堂都会记住'}</p>
+-            {soundError && <p role="status">{soundError}</p>}
++            {soundError && (
++              <button
++                className={styles.listen}
++                onClick={() => listen(view.feedback?.audio ?? view.audio)}
++                aria-label="重新播放老师声音"
++              >
++                <Volume2 size={32} aria-hidden />
++                点这里听老师说
++              </button>
++            )}
+             {error && (
+               <p role="alert">
+                 {error}
+--- a/lib/types/stage.ts
++++ b/lib/types/stage.ts
+@@ -98,7 +98,7 @@
+  */
+ export type AppScene = DslScene<Action, SceneContent> & {
+   /** Server-bound native activities for reviewed Mira textbook releases. */
+-  miraActivity?: { id: 'tiandiren-native-v1'; section: 'games' | 'challenge' };
++  miraActivity?: { id: string; section: 'games' | 'challenge' };
+   /**
+    * Stable id of the generation outline this scene was built from. Lets editor
+    * agent tools resolve a scene's outline by identity instead of by the mutable

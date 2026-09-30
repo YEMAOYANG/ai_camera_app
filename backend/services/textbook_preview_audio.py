@@ -148,7 +148,7 @@ def narrate_preview(service, key, classroom_directory, *, progress=lambda value:
             raise ApiError("textbook_preview_changed", "保存后的课件内容不一致", 409)
         frozen = service.repository.parse(row["input_json"])
         checks = {**(service.repository.parse(row["result_json"]) or {}),
-                  **preview_checks(saved, frozen["previewPrompt"]["expectedSceneCount"], frozen.get("originalMedia"))}
+                  **preview_checks(saved, frozen["previewPrompt"]["expectedSceneCount"], frozen.get("originalMedia"), frozen["previewPrompt"].get("expectedQuestionCount", 6))}
         checks.pop("frozenPreview", None)
         checks.update(audioSeconds=round(sum(r.get("durationSeconds", 0) for r in receipts), 3),
                       audioReceipts=receipts, audioStopCode=stopped)

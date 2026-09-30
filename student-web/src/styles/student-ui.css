@@ -1,15 +1,6 @@
 /* Mira's light component skin: Radix supplies behaviour; these tokens supply identity. */
 html:has(.schoolbag-shell) { background: #f6f8fa; }
 .schoolbag-shell :is(h1, h2, h3) { text-wrap: balance; }
-.schoolbag-shell .mira-button { min-height: var(--mira-control-height); height: auto; padding: 12px 19px; border-radius: var(--mira-radius-control); font-size: 15px; line-height: 1.4; font-weight: 600; letter-spacing: 0; box-shadow: none; }
-.schoolbag-shell .mira-button[data-variant="primary"] { background: var(--mira-brand-deep); color: var(--mira-on-brand); border: 0; }
-.schoolbag-shell .mira-button[data-variant="secondary"] { background: var(--mira-surface); color: var(--mira-ink); border: 1px solid var(--mira-border); }
-.schoolbag-shell .mira-button[data-variant="quiet"] { border: 0; color: var(--mira-muted); background: transparent; }
-.schoolbag-shell .mira-button:hover:not(:disabled) { background: var(--mira-control-hover); color: var(--mira-ink); }
-.schoolbag-shell .mira-button[data-variant="primary"]:hover:not(:disabled) { background: var(--mira-brand); color: var(--mira-on-brand); }
-.schoolbag-shell .mira-button:disabled { background: var(--mira-disabled); color: var(--mira-subtle); cursor: not-allowed; }
-.schoolbag-shell .mira-button > svg { width: 18px; height: 18px; stroke-width: 1.7; }
-.schoolbag-shell .mira-button:active:not(:disabled) { transform: translateY(1px); }
 .schoolbag-shell .mira-input { width: 100%; min-height: 52px; border: 1px solid var(--mira-border); border-radius: var(--mira-radius-control); background: var(--mira-surface); padding: 12px 16px; color: var(--mira-ink); font-size: 17px; font-weight: 500; transition: border-color 180ms, background-color 180ms; }
 .schoolbag-shell .mira-input::placeholder { color: var(--mira-muted); opacity: 1; }
 .schoolbag-shell .mira-input[aria-invalid="true"] { border-color: var(--mira-danger); }
@@ -54,5 +45,4 @@ html:has(.schoolbag-shell) { background: #f6f8fa; }
 @media (prefers-reduced-motion: reduce) {
   .mira-pin-caret { animation: none; }
   .mira-disclosure-content, .mira-disclosure-trigger > svg, .mira-switch-thumb { animation: none; transition: none; }
-  .schoolbag-shell .mira-button:active:not(:disabled) { transform: none; }
 }

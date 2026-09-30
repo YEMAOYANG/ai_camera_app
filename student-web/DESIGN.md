@@ -42,3 +42,28 @@ Short editorial headings use a locally subsetted Ma Shan Zheng font (SIL Open Fo
 The original welcome illustration and reusable paper assets are in `public/images/storybook/`. The landscape substitution is tied to the exact published illustration hash and panel in `textbook-picture.tsx`; other panels retain their authored art. The paper mask must remain fully opaque inside, with transparency only at its boundary. Desktop's asymmetric mask leaves room for the title; phones use the shallow edge mask to preserve the child's face and bag.
 
 Use the pre-generated image and voice assets. Do not create content on student clicks. Preserve formal publication, media, identity and prerequisite gates.
+
+## Textbook browsing, revised 2026-09-29
+
+### Shared button sizes
+
+`src/styles/buttons.css` owns button dimensions for the schoolbag UI and its light overlays. Use the existing `Button` component; keep page CSS limited to placement. Do not duplicate size rules in textbook, storybook or navigation styles.
+
+- Toolbar, narration, refresh and return: `<Button size="compact" variant="secondary">`, 36px visual height, 14px label, 18px icon, 8px radius. The shared pseudo-element keeps the touch area at least 48px.
+- Main actions: `<Button>`, 48px minimum height, 15px label, 18px icon.
+- Icon-only actions: `<Button size="icon" aria-label="…">`, 48px square, 18px icon.
+- Pictures, learning choices, playback overlays and navigation tabs are distinct controls; do not resize them using the button standard.
+
+Change the `--mira-button-*` tokens in that file when tuning sizes across subjects. Historical classroom skins keep their existing styling boundaries.
+
+### Contextual classroom controls and narration
+
+The learning homepage is quiet on entry, return, refresh and focus. It offers one explicit “听老师说” control with the current next-step cue. A saved lesson result is a learning record, not evidence that today's tasks are complete. OpenMAIC classrooms always show their original playback toolbar. Keep directory, playback, whiteboard and chat directly accessible; do not add collapse/expand controls, replace this toolbar with “更多”, or add duplicate navigation below it. Preserve the teacher/discussion area. Native activity action buttons use the shared orbit CSS tokens: 36px secondary actions, 48px main and icon-only actions, 18px icons and at least 48px touch targets. Illustrated answers retain large picture targets. Active questions and feedback retain teacher narration; completion audio plays on a newly completed action, with manual replay on saved results.
+
+### Course views
+
+For grades 1–2, default to the picture learning view. Keep the book title and subject introduction visible above a persistent “图片学习 / 完整目录” switch. Render only one view at a time; do not append a second directory under the picture cards.
+
+The picture view shows the selected unit and at most six course/guide choices. Across every subject and unit, place the unit exploration before interactive lessons. Keep the change-unit and narration controls visually compact (36px high, 14px labels, 18px icons), with a 48px touch area. “换个单元” replaces those choices with a responsive picture grid (nine units per page); selecting a unit returns to its courses. Do not bring back a horizontally scrolling unit strip. The complete directory preserves the original unit index, large illustrated unit introduction, paper-edge artwork, and side-by-side introduction text and exploration button. Do not replace this illustrated spread with a compact text link. Both views share the selected unit and use real availability states.
+
+References reviewed for this revision: [Khan Academy Kids Library](https://khankids.zendesk.com/hc/en-us/articles/4403657703821-Find-books-and-lessons-in-the-Khan-Kids-Library) for categorized picture browsing, [洪恩识字](https://www.ihuman.com/shizi/) for recognizable scene destinations, and [Duolingo unit navigation](https://blog.duolingo.com/how-to-review-lessons-on-duolingo/) for separating unit selection from the current learning surface. These inform hierarchy and interaction only; retain Mira assets, palette, typography, and course contracts.

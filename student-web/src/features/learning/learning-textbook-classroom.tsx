@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, RotateCcw } from "lucide-react";
+import { Backpack, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -44,7 +44,7 @@ export function LearningTextbookClassroom({ student, contentKey }: { student: St
   }, [entry, router]);
   const back = entry ? `/learning/textbooks?${new URLSearchParams({ editionId: entry.editionId, revisionId: entry.revisionId, unitId: entry.unitId })}` : "/learning";
   return <SchoolbagShell student={student} className="textbook-classroom"
-    navigation={<Link href={back}><ArrowLeft size={20} aria-hidden="true" /><span>教材目录</span></Link>}>
+    navigation={<Link href={back}><Backpack size={32} aria-hidden="true" /><span>回到课本</span></Link>}>
     {error ? <div className="textbook-state" role="alert"><h1>暂时没有打开课堂</h1><p>{error}</p>
       <Button onClick={() => retry(value => value + 1)}><RotateCcw size={18} aria-hidden="true" />重新进入</Button></div>
       // The authenticated, origin-pinned runtime owns storage and nested

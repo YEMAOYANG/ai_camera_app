@@ -1,0 +1,310 @@
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1562,45 +1562,75 @@
+   }
+ }
+ 
+-/* Picture-first courses keep advanced controls available on demand. */
+-html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools {
+-  display: flex;
++/* Secondary classroom controls share a compact header entry; leave the lesson clear. */
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-more {
++  position: relative;
++  display: inline-flex;
+   flex-shrink: 0;
+-  gap: 8px;
+-  min-height: 56px;
+-  justify-content: center;
++  gap: 6px;
++  min-height: 36px;
+   align-items: center;
+-  padding: 4px 12px;
+-  border-top: 1px solid #e7dcc5;
+-  background: #fbf7ed;
+-}
+-html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button {
+-  display: inline-flex;
+-  align-items: center;
+-  gap: 8px;
+-  min-height: 48px;
+-  padding: 6px 16px;
+-  border-radius: 14px;
+-  color: #344b40;
++  padding: 6px 10px;
++  border: 1px solid var(--mira-orbit-line);
++  border-radius: 8px;
++  color: var(--mira-orbit-text);
++  background: var(--mira-orbit-panel);
+   font-size: 14px;
+-}
+-html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button:hover,
+-html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button[aria-pressed='true'],
+-html[data-mira-student-theme='storybook']
+-  .mira-picture-classroom-tools
+-  button[aria-expanded='true'] {
+-  background: #eee3c9;
+-}
+-html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button:focus-visible {
++  line-height: 22px;
++  cursor: pointer;
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-more::before {
++  content: '';
++  position: absolute;
++  width: max(100%, var(--mira-orbit-control-height));
++  height: max(100%, var(--mira-orbit-control-height));
++  top: 50%;
++  left: 50%;
++  transform: translate(-50%, -50%);
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-more svg,
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-menu svg {
++  width: 18px;
++  height: 18px;
++}
++html[data-mira-student-theme='storybook']
++  .mira-picture-classroom-more:is(:hover, [data-state='open']) {
++  background: var(--mira-orbit-raised);
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-more:focus-visible {
+   outline: 3px solid #28664d;
+-  outline-offset: -3px;
++  outline-offset: 2px;
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-menu {
++  width: 200px;
++  max-width: calc(100vw - 24px);
++  border: 1px solid var(--mira-orbit-line);
++  border-radius: 12px;
++  padding: 4px;
++  background: var(--mira-orbit-panel);
++  color: var(--mira-orbit-text);
++  box-shadow: 0 8px 24px #303b3814;
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-menu [role='menuitemcheckbox'] {
++  min-height: var(--mira-orbit-control-height);
++  gap: 10px;
++  border-radius: 8px;
++  font-size: 14px;
++  cursor: pointer;
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-menu [data-highlighted] {
++  background: var(--mira-orbit-raised);
++  color: var(--mira-orbit-text);
++}
++html[data-mira-student-theme='storybook'] .mira-picture-classroom-menu [data-highlighted] svg {
++  color: inherit;
+ }
+ @media (max-width: 600px) {
+   html[data-mira-student-theme='storybook']
+     [data-mira-picture-course='true']
+     > [data-mira-chrome='scene-sidebar'] {
+     position: absolute;
+-    inset: 0 auto 56px 0;
++    inset: 0 auto 0 0;
+     max-width: 85%;
+     z-index: 30;
+   }
+@@ -1615,12 +1645,4 @@
+     > [data-mira-chrome='chat'] {
+     max-width: 100%;
+   }
+-  html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools {
+-    gap: 2px;
+-    padding-inline: 4px;
+-  }
+-  html[data-mira-student-theme='storybook'] .mira-picture-classroom-tools button {
+-    padding-inline: 10px;
+-    font-size: 12px;
+-  }
+-}
++}
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -58,7 +58,13 @@
+   AlertDialogAction,
+   AlertDialogCancel,
+ } from '@/components/ui/alert-dialog';
+-import { AlertTriangle, BookOpen, MessageCircle, SlidersHorizontal, X } from 'lucide-react';
++import { AlertTriangle, BookOpen, Ellipsis, MessageCircle, SlidersHorizontal } from 'lucide-react';
++import {
++  DropdownMenu,
++  DropdownMenuCheckboxItem,
++  DropdownMenuContent,
++  DropdownMenuTrigger,
++} from '@/components/ui/dropdown-menu';
+ import { VisuallyHidden } from 'radix-ui';
+ import {
+   useMiraStudentAutoPlayRuntime,
+@@ -1758,8 +1764,8 @@
+         mode === 'playback' && !isPresenting
+           ? pictureCourse
+             ? studentToolsOpen
+-              ? 272
+-              : 56
++              ? 216
++              : 0
+             : fixedTextbook
+               ? 216
+               : 192
+@@ -1838,6 +1844,59 @@
+               hideBackControl={hideHeaderBackControl}
+               hideGlobalControls={hideHeaderGlobalControls}
+               hideCourseActions={hideHeaderCourseActions}
++              studentActions={
++                pictureCourse && mode === 'playback' ? (
++                  <DropdownMenu>
++                    <DropdownMenuTrigger asChild>
++                      <button
++                        type="button"
++                        className="mira-picture-classroom-more"
++                        aria-label="更多课堂操作"
++                      >
++                        <Ellipsis aria-hidden />
++                        更多
++                      </button>
++                    </DropdownMenuTrigger>
++                    <DropdownMenuContent
++                      align="end"
++                      className="mira-picture-classroom-menu"
++                      aria-label="更多课堂操作"
++                    >
++                      <DropdownMenuCheckboxItem
++                        checked={!sidebarCollapsed}
++                        onCheckedChange={(open) => {
++                          setSidebarCollapsed(!open);
++                          if (open) setChatAreaCollapsed(true);
++                        }}
++                      >
++                        <BookOpen aria-hidden />
++                        课程目录
++                      </DropdownMenuCheckboxItem>
++                      <DropdownMenuCheckboxItem
++                        checked={!chatAreaCollapsed}
++                        onCheckedChange={(open) => {
++                          setChatAreaCollapsed(!open);
++                          setStudentToolsOpen(open);
++                          if (open) {
++                            setSidebarCollapsed(true);
++                            chatAreaRef.current?.switchToTab('chat');
++                          }
++                        }}
++                      >
++                        <MessageCircle aria-hidden />
++                        找老师
++                      </DropdownMenuCheckboxItem>
++                      <DropdownMenuCheckboxItem
++                        checked={studentToolsOpen}
++                        onCheckedChange={setStudentToolsOpen}
++                      >
++                        <SlidersHorizontal aria-hidden />
++                        课堂工具
++                      </DropdownMenuCheckboxItem>
++                    </DropdownMenuContent>
++                  </DropdownMenu>
++                ) : undefined
++              }
+             />
+           )}
+ 
+@@ -1898,46 +1957,6 @@
+             />
+           </div>
+ 
+-          {pictureCourse && mode === 'playback' && (
+-            <nav aria-label="课堂工具" className="mira-picture-classroom-tools">
+-              <button
+-                type="button"
+-                aria-pressed={!sidebarCollapsed}
+-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+-              >
+-                <BookOpen size={26} aria-hidden />
+-                课本
+-              </button>
+-              <button
+-                type="button"
+-                aria-pressed={!chatAreaCollapsed}
+-                onClick={() => {
+-                  const opening = chatAreaCollapsed;
+-                  setChatAreaCollapsed(!opening);
+-                  setStudentToolsOpen(opening);
+-                  if (opening) {
+-                    setSidebarCollapsed(true);
+-                    chatAreaRef.current?.switchToTab('chat');
+-                  }
+-                }}
+-              >
+-                <MessageCircle size={26} aria-hidden />
+-                找老师
+-              </button>
+-              <button
+-                type="button"
+-                aria-expanded={studentToolsOpen}
+-                onClick={() => setStudentToolsOpen(!studentToolsOpen)}
+-              >
+-                {studentToolsOpen ? (
+-                  <X size={26} aria-hidden />
+-                ) : (
+-                  <SlidersHorizontal size={26} aria-hidden />
+-                )}
+-                课堂工具
+-              </button>
+-            </nav>
+-          )}
+           {/* Roundtable Area */}
+           {mode === 'playback' && (
+             <div
+diff --git a/components/header.tsx b/components/header.tsx
+--- a/components/header.tsx
++++ b/components/header.tsx
+@@ -30,6 +30,7 @@
+   readonly hideGlobalControls?: boolean;
+   /** Hide course-level share/export in a workbench-attached classroom. */
+   readonly hideCourseActions?: boolean;
++  readonly studentActions?: ReactNode;
+ }
+ 
+ export function Header({
+@@ -42,6 +43,7 @@
+   hideBackControl,
+   hideGlobalControls,
+   hideCourseActions,
++  studentActions,
+ }: HeaderProps) {
+   const { t } = useI18n();
+   const router = useRouter();
+@@ -103,7 +105,9 @@
+             showGlobalControls={!hideGlobalControls}
+             showCourseActions={!hideCourseActions}
+           />
+-        ) : null}
++        ) : (
++          studentActions
++        )}
+       </header>
+     </>
+   );
+diff --git a/components/scene-renderers/textbook-play.tsx b/components/scene-renderers/textbook-play.tsx
+--- a/components/scene-renderers/textbook-play.tsx
++++ b/components/scene-renderers/textbook-play.tsx
+@@ -215,6 +215,8 @@
+   useEffect(() => {
+     if (!view || !questionKey || questionKey === spokenQuestion.current) return;
+     spokenQuestion.current = questionKey;
++    // Loading a saved result is not a new achievement. The speaker remains available.
++    if (view.done) return;
+     listen(view.feedback?.audio ?? view.audio);
+   }, [questionKey, view, listen]);
+ 
+@@ -243,7 +245,8 @@
+       if (!alive.current) return;
+       setSnapshot(payload);
+       if (!['answer', 'hint', 'adult'].includes(action)) setChosen('');
+-      if (action === 'hint') listen(payload[section].hintAudio);
++      if (!snapshot[section].done && payload[section].done) listen(payload[section].audio);
++      else if (action === 'hint') listen(payload[section].hintAudio);
+       else if (action === 'answer' && payload[section].feedback?.audio)
+         listen(payload[section].feedback.audio);
+ 

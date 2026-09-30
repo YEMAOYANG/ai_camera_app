@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LearningSchoolbag } from "./learning-schoolbag";
+import voice from "./navigation-audio.json";
 
 const { router } = vi.hoisted(() => ({ router: { push: vi.fn(), replace: vi.fn() } }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
@@ -9,11 +10,59 @@ vi.mock("@/components/student/schoolbag-shell", () => ({ SchoolbagShell: ({ chil
 const student = { id: "student-a", childId: "child-a", displayName: "小读者", gradeCode: "primary_1" };
 const book = { editionId: "pep-chinese-g1", revisionId: "review-1", title: "语文 一年级上册", publisher: "人民教育出版社", editionLabel: "测试目录", gradeCode: "primary_1", subject: "chinese", volume: "upper", schoolSystem: "six_year", coverage: { status: "complete", note: "" }, sourceUrl: "https://basic.smartedu.cn/tchMaterial/detail?contentId=test", unitCount: 1, lessonCount: 1, selected: true, selectionRevision: 1, currentNodeId: null };
 const catalog = { ok: true, schemaVersion: "mira.learning.textbooks.v1", gradeCode: "primary_1", schoolYearStartYear: 2026, semester: "upper", books: [book], subjects: [{ subject: "chinese", status: "confirmed" }, { subject: "math", status: "unavailable" }, { subject: "english", status: "unavailable" }] };
+const savedJourney = { contentKey: "a".repeat(64), title: "天地人", status: "session_passed",
+  parentNeeded: false, nextStep: "等待短复习", independentBefore: 4, verifiedCount: 6,
+  remainingSkills: [], reviewDueAt: Date.now() + 86_400_000, reviewDue: false, reviewLevel: 0,
+  diagnoses: [], skippedCount: 4, updatedAt: Date.now() - 86_400_000 };
 const response = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status });
-beforeEach(() => { vi.clearAllMocks(); window.localStorage.clear(); vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false }))); });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); });
+beforeEach(() => { vi.clearAllMocks(); vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(); vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => {}); window.localStorage.clear(); vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false }))); });
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); vi.restoreAllMocks(); });
 
 describe("shared textbook schoolbag", () => {
+  it.each(["primary_1", "primary_2", "primary_3"])("keeps %s home silent across entry, refresh, focus and return; reads only on request", async gradeCode => {
+    const fetch = vi.fn().mockImplementation(() => Promise.resolve(response({ ...catalog, gradeCode, learningJourneys: [savedJourney] })));
+    vi.stubGlobal("fetch", fetch);
+    const child = { ...student, gradeCode };
+    const heading = gradeCode === "primary_3" ? "本节学习已完成" : "上次的学习已保存";
+    const firstVisit = render(<LearningSchoolbag student={child} />);
+    expect(await screen.findByText(heading)).toBeInTheDocument();
+    expect(screen.queryByText(/今天.*完成/)).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "听老师说" })).toHaveLength(1);
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "家长与设置" }));
+    fireEvent.click(screen.getByRole("button", { name: "刷新书包" }));
+    expect(await screen.findByText(heading)).toBeInTheDocument();
+    fireEvent(window, new Event("focus"));
+    expect(await screen.findByText(heading)).toBeInTheDocument();
+    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
+
+    firstVisit.unmount();
+    render(<LearningSchoolbag student={child} />);
+    expect(await screen.findByText(heading)).toBeInTheDocument();
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "听老师说" }));
+    const playback = vi.mocked(HTMLMediaElement.prototype.play);
+    expect(playback).toHaveBeenCalledTimes(1);
+    expect((playback.mock.instances[0] as HTMLAudioElement).getAttribute("src")).toBe(voice.cues.welcome.src);
+  });
+
+  it("updates a due review after focus without announcing a new completion", async () => {
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce(response({ ...catalog, learningJourneys: [savedJourney] }))
+      .mockResolvedValueOnce(response({ ...catalog, learningJourneys: [{ ...savedJourney, reviewDue: true }] })));
+    render(<LearningSchoolbag student={student} />);
+    expect(await screen.findByText("上次的学习已保存")).toBeInTheDocument();
+    fireEvent(window, new Event("focus"));
+    expect(await screen.findByRole("link", { name: "再来试一试，天地人" })).toBeInTheDocument();
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "听老师说" }));
+    const playback = vi.mocked(HTMLMediaElement.prototype.play);
+    expect(playback).toHaveBeenCalledTimes(1);
+    expect((playback.mock.instances[0] as HTMLAudioElement).getAttribute("src")).toBe(voice.cues.review.src);
+  });
+
   it("surfaces a due review from server evidence with the real classroom entry", async () => {
     const journey = { contentKey: "a".repeat(64), title: "天地人", status: "session_passed",
       parentNeeded: false, nextStep: "打开课堂", independentBefore: 4, verifiedCount: 6,
@@ -21,8 +70,8 @@ describe("shared textbook schoolbag", () => {
       diagnoses: [], skippedCount: 4, updatedAt: Date.now() };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response({ ...catalog, learningJourneys: [journey] })));
     render(<LearningSchoolbag student={student} />);
-    expect(await screen.findByText("到短复习时间啦")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "开始短复习" })).toHaveAttribute("href", `/learning/textbooks/courses/${journey.contentKey}`);
+    expect(await screen.findByText("再来试一试")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "再来试一试，天地人" })).toHaveAttribute("href", `/learning/textbooks/courses/${journey.contentKey}`);
   });
 
   it("adds science to the same confirmation gate and opens the selected science revision", async () => {

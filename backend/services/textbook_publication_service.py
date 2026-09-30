@@ -37,7 +37,7 @@ class TextbookPublicationService:
             fail('课件与教材身份不一致')
         _, lesson = lesson_by_id(manifest, node)
         original_input = self.repository.parse(row['input_json'])
-        if preview_checks(source, original_input['previewPrompt']['expectedSceneCount'], original_input.get('originalMedia'))['issues']:
+        if preview_checks(source, original_input['previewPrompt']['expectedSceneCount'], original_input.get('originalMedia'), original_input['previewPrompt'].get('expectedQuestionCount', 6))['issues']:
             fail('课件结构或插画检查未通过')
         check_questions(source)
         if (audio_audit.get('sha256') != digest({k: v for k, v in audio_audit.items() if k != 'sha256'})
@@ -127,10 +127,10 @@ class TextbookPublicationService:
         release['sha256'] = digest(release)
         course_content = {'schemaVersion': 'mira.learning.fixed-textbook-course.v1',
             'textbookBinding': frozen['textbookBinding'], 'title': classroom['stage']['name'],
-            'objectives': lesson['brief']['objectives'], 'estimatedMinutes': 10,
+            'objectives': original_input['knowledgeBrief']['objectives'] if original_input.get('sourceScope') else lesson['brief']['objectives'], 'estimatedMinutes': 10,
             'questions': [{'id': q['id'], 'type': 'single_choice', 'prompt': q['question'],
                 'choices': [{'id': o['value'], 'text': o['label']} for o in q['options']],
-                'answer': q['answer'][0], 'explanation': q['analysis'], 'skill': '天地人、你我他'} for q in questions_for(classroom)],
+                'answer': q['answer'][0], 'explanation': q['analysis'], 'skill': original_input['previewPrompt'].get('targets', ['天地人、你我他'] * len(questions_for(classroom)))[i]} for i, q in enumerate(questions_for(classroom))],
             'releaseSha256': release['sha256']}
         return {'frozen': frozen, 'release': release, 'review': {**review, 'release': release},
             'course': {'id': course_id, 'version': teaching_revision, 'grade_code': manifest['gradeCode'],

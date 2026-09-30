@@ -117,6 +117,10 @@ export function SchoolbagMotionProvider({ children }: { children: ReactNode }) {
     if (host.current) host.current.style.opacity = "1";
     attach();
     const resize = new ResizeObserver(attach); resize.observe(element);
+    // A fetched learning suggestion can move the slot without resizing it.
+    // Keep the shared fixed canvas aligned with its place in the page.
+    const layoutRoot = element.closest(".schoolbag-route");
+    if (layoutRoot) resize.observe(layoutRoot);
     window.addEventListener("resize", attach); window.addEventListener("scroll", attach, { passive: true });
     return () => {
       resize.disconnect(); window.removeEventListener("resize", attach); window.removeEventListener("scroll", attach);

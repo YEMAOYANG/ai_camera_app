@@ -11,7 +11,7 @@ import wave
 from unittest.mock import Mock
 
 from content.textbook_catalog import generation_brief
-from content.textbook_preview import preview_checks, preview_input, preview_media
+from content.textbook_preview import blueprint_prompt, lesson_blueprint, preview_checks, preview_input, preview_media
 from core.errors import ApiError
 from repositories.textbook_repository import TextbookRepository
 from services.textbook_learning_service import TextbookLearningService
@@ -45,6 +45,23 @@ class TextbookPreviewTest(unittest.TestCase):
 
     def prepare(self):
         return self.service.prepare(self.manifest["editionId"], self.manifest["revisionId"], "u1-l1")["previewKey"]
+
+    def test_continuous_unit_has_distinct_scopes_and_stops_before_billing_without_art(self):
+        manifest = json.loads((Path(__file__).parents[1] / 'content/textbooks/revisions/pep-chinese-g1-upper.directory.v3.json').read_text())
+        for node, count in [('u1-l2', 7), ('u1-l3', 7), ('u1-l4', 8), ('u1-l5', 5)]:
+            blueprint = lesson_blueprint(manifest, node)
+            self.assertEqual(blueprint_prompt(blueprint)['expectedQuestionCount'], count)
+            self.assertFalse(blueprint['generationReady'])
+            with self.assertRaises(ApiError) as error:
+                preview_input(manifest, node)
+            self.assertEqual(error.exception.code, 'textbook_preview_media_required')
+        self.runtime.start_generation.assert_not_called()
+        self.assertIsNone(lesson_blueprint({**manifest, 'revisionId': 'another-version'}, 'u1-l2'))
+
+    def test_preview_uses_the_lesson_question_count(self):
+        classroom = {'scenes': [{'type': 'quiz', 'content': {'questions': [{}] * 7}}]}
+        self.assertNotIn('question_count_mismatch', preview_checks(classroom, 1, expected_question_count=7)['issues'])
+        self.assertIn('question_count_mismatch', preview_checks(classroom, 1, expected_question_count=8)['issues'])
 
     def test_preview_does_not_approve_publication_or_dispatch_on_prepare(self):
         key = self.prepare()

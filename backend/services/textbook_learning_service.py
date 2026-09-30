@@ -120,6 +120,7 @@ class TextbookLearningService:
         with self.repository.transaction() as conn:
             completed = None
             visible_courses = set()
+            suggestions = []
             for book in books:
                 if not book["selected"]:
                     continue
@@ -131,6 +132,9 @@ class TextbookLearningService:
                         course, blocked = self._available_course(conn, child, manifest, node, builds)
                         if course:
                             available.append((course["courseId"], course["courseVersion"]))
+                            suggestions.append({**course, 'title': node['title'], 'subject': book['subject'],
+                                'editionId': book['editionId'], 'revisionId': book['revisionId'],
+                                'nodeId': node['nodeId'], 'current': node['nodeId'] == book['currentNodeId']})
                         elif blocked:
                             locked += 1
                 visible_courses.update(available)
@@ -143,13 +147,19 @@ class TextbookLearningService:
                 }
         with self.repository.transaction() as conn:
             journeys = catalog_journeys(self.repository, conn, child, books, visible_courses)
+        # Suggestions can only point at courses already checked for this child.
+        # Completed lessons wait for their scheduled review instead of inviting repetition.
+        unfinished = [s for s in suggestions if s.get('delivery') == 'fixed_textbook'
+                      and (s['courseId'], s['courseVersion']) not in (completed or set())]
+        unfinished.sort(key=lambda s: not s['current'])
         subjects = []
         for subject in SUBJECTS:
             selected_book = next((b for b in books if b["subject"] == subject and b["selected"]), None)
             offered = any(b["subject"] == subject and b["volume"] in {semester, "full"} for b in books)
             subjects.append({"subject": subject, "status": "confirmed" if selected_book else "selection_required" if offered else "unavailable"})
         return {"ok": True, "schemaVersion": RESPONSE_SCHEMA, "gradeCode": child["grade_code"],
-                **context, "subjects": subjects, "books": books, "learningJourneys": journeys}
+                **context, "subjects": subjects, "books": books, "learningJourneys": journeys,
+                "startHere": unfinished[0] if unfinished else None}
 
     @staticmethod
     def _book(manifest):

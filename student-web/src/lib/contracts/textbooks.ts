@@ -69,6 +69,10 @@ export const textbookCatalogSchema = z.object({
   gradeRevision: z.number().int().nonnegative().optional(),
   subjects: z.array(z.object({ subject: textbookSubjectSchema, status: z.enum(["confirmed", "selection_required", "unavailable"]) })).optional(),
   learningJourneys: z.array(journeySchema).optional(),
+  startHere: z.object({ contentKey: hash, courseId: z.string(), courseVersion: z.string(),
+    title: z.string(), subject: textbookSubjectSchema, editionId: textbookIdSchema,
+    revisionId: textbookIdSchema, nodeId: textbookIdSchema, current: z.boolean(),
+    delivery: z.literal("fixed_textbook").optional() }).nullable().optional(),
   books: z.array(z.object({ ...bookFields, selected: z.boolean(), selectionRevision: z.number().int().nonnegative(), currentNodeId: textbookIdSchema.nullable(), learningStatus: z.object({status: z.enum(["ready", "unpublished", "locked"]), availableLessonCount: z.number().int().nonnegative(), completedLessonCount: z.number().int().nonnegative()}).optional() })),
 });
 export const textbookContentsSchema = z.object({

@@ -403,6 +403,31 @@ class ProfileRepository {
     return ReportData.fromJson(_asMap(_asMap(response.data)['report']));
   }
 
+  Future<Map<String, dynamic>> learningCoaching(
+    String sessionId,
+    String day,
+  ) async {
+    final response = await _get(
+      '/reports/learning/${Uri.encodeComponent(sessionId)}/coaching?recordDate=${Uri.encodeComponent(day)}',
+    );
+    return _asMap(_asMap(response.data)['coaching']);
+  }
+
+  Future<Map<String, dynamic>> saveLearningCoaching(
+    String sessionId,
+    Map<String, dynamic> record,
+  ) async {
+    try {
+      final response = await _apiClient.put(
+        '/reports/learning/${Uri.encodeComponent(sessionId)}/coaching',
+        data: record,
+      );
+      return _asMap(_asMap(response.data)['coaching']);
+    } on DioException catch (error) {
+      throw _fromDio(error);
+    }
+  }
+
   Future<List<GrowthMoment>> growthMoments() async {
     final response = await _get('/growth/moments');
     final raw = _asMap(response.data)['moments'];

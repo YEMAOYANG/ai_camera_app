@@ -11,6 +11,8 @@ from services.report_learning_summary import save_journey_report_day
 
 def sync_journey(conn, learning, session, child, course, state, previous):
     now = now_ms()
+    plan = journey.definition(state=state).plan
+    total = len(journey.skills_for(state))
     info = journey.summary(state, timestamp=now)
     before_task = previous.get('reviewTaskId')
     if len(state['reviewHistory']) > len(previous.get('reviewHistory', [])) and before_task:
@@ -27,18 +29,18 @@ def sync_journey(conn, learning, session, child, course, state, previous):
         task, _ = learning._insert_learning_task(conn, family_id=child['family_id'], child_id=child['id'],
             learning_date=local_due.date().isoformat(), slot='tbr_' + key[:24],
             scheduled_start=local_due.strftime('%H:%M'), course={**course, 'title': course['title'] + ' · 短复习',
-                'objective': '换一个情境，独立试一试。系统只补练仍需帮助的字。'},
+                'objective': '换一个情境，独立试一试。系统只补练仍需帮助的目标。'},
             created_by=original['created_by'], now=now, assignment_key=key)
         state['reviewTaskId'] = task['id']
         conn.execute('UPDATE tasks SET due_at=?,updated_at=? WHERE id=? AND family_id=?',
                      (local_due.isoformat(), now, task['id'], child['family_id']))
     save_journey_report_day(state, previous)
-    if len(state['baseline']) == 6:
+    if len(state['baseline']) == total:
         stage = ('两轮间隔复习均已通过' if info['status'] == 'retained' else
                  '本次独立复核通过，等待间隔复习' if state['challenge']['phase'] == 'done' else
                  '连续补练后仍需帮助，建议休息后家长陪同确认题意' if info['parentNeeded'] else '正在自主学习')
-        message = (f'《{course["title"]}》图片支持下的情境理解：前测独立答对 {info["independentBefore"]}/6，'
-                   f'本轮新情境独立通过 {info["verifiedCount"]}/6；{stage}。')
+        message = (f'《{course["title"]}》图片支持下的情境理解：前测独立答对 {info["independentBefore"]}/{total}，'
+                   f'本轮新情境独立通过 {info["verifiedCount"]}/{total}；{stage}。')
         if info['remainingSkills'] and info['parentNeeded']:
             message += '仍需练习：' + '、'.join(info['remainingSkills']) + '。'
         next_step = info['nextStep']
@@ -47,7 +49,7 @@ def sync_journey(conn, learning, session, child, course, state, previous):
         conn.execute('UPDATE learning_reports SET summary=?,next_step=?,mastery_level=?,strengths_json=? '
                      'WHERE family_id=? AND session_id=?',
             (message, next_step, 'mastered' if info['status'] == 'retained' else 'developing',
-             canonical([journey.PLAN['skills'][skill]['word'] + '：本轮新情境独立通过' for skill in state['verified']]), child['family_id'], session['id']))
+             canonical([plan['skills'][skill]['word'] + '：本轮新情境独立通过' for skill in state['verified']]), child['family_id'], session['id']))
 
 
 def catalog_journeys(repository, conn, child, books, visible_courses):

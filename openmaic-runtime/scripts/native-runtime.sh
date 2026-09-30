@@ -2153,8 +2153,15 @@ start_openmaic() {
     return 1
   fi
 
-  local node_bin node_major node_options openmaic_version next_version
+  local node_bin python_bin node_major node_options openmaic_version next_version
   local started_pid started_start_hash build_id_sha256 health_internal_token
+  python_bin="$(command -v python3)" || {
+    clear_openmaic_provider_env
+    clear_openmaic_recovery_secret
+    clear_openmaic_internal_token
+    echo "Python 3 is required for detached OpenMAIC launch." >&2
+    return 1
+  }
   node_bin="$(command -v node)"
   node_major="$(${node_bin} -p 'Number(process.versions.node.split(".")[0])')"
   openmaic_version="$(cd "${SOURCE_DIR}" && "${node_bin}" -p 'require("./package.json").version')"
@@ -2236,9 +2243,10 @@ start_openmaic() {
       MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256="${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256}" \
       MIRA_BACKEND_INTERNAL_URL="${MIRA_BACKEND_INTERNAL_URL:-http://127.0.0.1:8000}" \
     MIRA_INTERNAL_API_TOKEN="${OPENMAIC_INTERNAL_API_TOKEN}" \
+      "${python_bin}" -c 'import os, sys; os.setsid(); os.execv(sys.argv[1], sys.argv[1:])' \
       "${node_bin}" node_modules/next/dist/bin/next start \
         --hostname 127.0.0.1 --port "${OPENMAIC_PORT}" \
-        > "${OPENMAIC_LOG}" 2>&1 &
+        > "${OPENMAIC_LOG}" 2>&1 < /dev/null &
     echo "$!" > "${OPENMAIC_PID_FILE}"
   )
   started_pid="$(tr -d '[:space:]' < "${OPENMAIC_PID_FILE}")"
@@ -2301,7 +2309,11 @@ start_gateway() {
 
   prepare_gateway_start || return 1
 
-  local internal_token node_bin started_pid started_start_hash
+  local internal_token node_bin python_bin started_pid started_start_hash
+  python_bin="$(command -v python3)" || {
+    echo "Python 3 is required for detached Gateway launch." >&2
+    return 1
+  }
   load_runtime_origin_env
   internal_token="$(read_backend_internal_token)" || {
     echo "MIRA_INTERNAL_API_TOKEN is required (or provide backend/.env with INTERNAL_API_TOKEN)." >&2
@@ -2324,7 +2336,8 @@ start_gateway() {
       MIRA_STUDENT_WEB_ORIGIN="${MIRA_STUDENT_WEB_ORIGIN}" \
       MIRA_LOCAL_LAN_PRODUCTION_MODE="${MIRA_LOCAL_LAN_PRODUCTION_MODE:-0}" \
       MIRA_INTERNAL_API_TOKEN="${internal_token}" \
-      "${node_bin}" src/server.mjs > "${GATEWAY_LOG}" 2>&1 &
+      "${python_bin}" -c 'import os, sys; os.setsid(); os.execv(sys.argv[1], sys.argv[1:])' \
+      "${node_bin}" src/server.mjs > "${GATEWAY_LOG}" 2>&1 < /dev/null &
     echo "$!" > "${GATEWAY_PID_FILE}"
   )
   unset internal_token

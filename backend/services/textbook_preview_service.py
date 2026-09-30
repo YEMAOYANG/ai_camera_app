@@ -86,7 +86,7 @@ class TextbookPreviewService:
             if classroom.get("id") != job.classroom_id or classroom.get("stage", {}).get("id") != job.classroom_id:
                 raise OpenMaicFullRuntimeError("preview_classroom_mismatch", "预览结果课堂编号不一致")
             frozen = self.repository.parse(row["input_json"])
-            checks = preview_checks(classroom, frozen["previewPrompt"]["expectedSceneCount"], frozen.get("originalMedia"))
+            checks = preview_checks(classroom, frozen["previewPrompt"]["expectedSceneCount"], frozen.get("originalMedia"), frozen["previewPrompt"].get("expectedQuestionCount", 6))
             status = "review_required" if checks["issues"] else "preview_ready"
             result.update(checks)
         with self.repository.transaction() as conn:

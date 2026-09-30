@@ -338,6 +338,19 @@ class TextbookLearningTest(unittest.TestCase):
         with patch.object(self.service, "_assert_published_supply", side_effect=ApiError("textbook_course_unavailable", "media missing", 409)):
             self.assert_error("textbook_course_unavailable", lambda: self.service.bind_published(request))
 
+    def test_start_here_requires_selected_visible_unfinished_fixed_course(self):
+        course, request = self.bind()
+        self.visible.return_value = course
+        self.choose()
+        fixed = {'courseId': 'course-a', 'courseVersion': '1', 'contentKey': request['contentKey'], 'delivery': 'fixed_textbook'}
+        with patch.object(self.service, '_available_course', return_value=(fixed, None)), patch.object(self.repo, 'completed_courses', return_value=set()) as completed:
+            result = self.service.catalog(self.child)
+            self.assertEqual(result['startHere']['contentKey'], request['contentKey'])
+            completed.return_value = {('course-a', '1')}
+            self.assertIsNone(self.service.catalog(self.child)['startHere'])
+        with patch.object(self.service, '_available_course', return_value=(None, None)):
+            self.assertIsNone(self.service.catalog(self.child)['startHere'])
+
     def test_changed_content_and_missing_review_cannot_bind(self):
         course, request = self.bind()
         bad = deepcopy(request); bad["review"]["originalExpressionConfirmed"] = False
